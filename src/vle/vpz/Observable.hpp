@@ -60,15 +60,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT ObservablePort : public Base
     {
     public:
-        /**
-         * @brief Define an iterator to ViewNameList.
-         */
         typedef ViewNameList::iterator iterator;
-
-        /**
-         * @brief Define a constant iterator to ViewNameList.
-         */
         typedef ViewNameList::const_iterator const_iterator;
+        typedef ViewNameList::size_type size_type;
+        typedef ViewNameList::value_type value_type;
 
         /**
          * @brief Build a new ObservablePort with a specific name.
@@ -211,15 +206,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT Observable : public Base
     {
     public:
-        /**
-         * @brief Define an iterator to ObservablePortList.
-         */
         typedef ObservablePortList::iterator iterator;
-
-        /**
-         * @brief Define a constant iterator to ObservablePortList.
-         */
         typedef ObservablePortList::const_iterator const_iterator;
+        typedef ObservablePortList::size_type size_type;
+        typedef ObservablePortList::value_type value_type;
 
         /**
          * @brief Build a new Observable with specified name.
@@ -474,7 +464,6 @@ namespace vle { namespace vpz {
         ObservablePortList  m_list;
         std::string         m_name;
         bool                m_ispermanent;
-
     };
 
 }} // namespace vle vpz

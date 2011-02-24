@@ -40,10 +40,11 @@ namespace vle { namespace graph {
     class VLE_GRAPH_EXPORT ModelPortList
     {
     public:
-        typedef std::multimap < Model*, std::string > value_type;
-        typedef value_type::iterator iterator;
-        typedef value_type::const_iterator const_iterator;
-        typedef value_type::size_type size_type;
+        typedef std::multimap < Model*, std::string > Values;
+        typedef Values::iterator iterator;
+        typedef Values::const_iterator const_iterator;
+        typedef Values::size_type size_type;
+        typedef Values::value_type value_type;
 
         ModelPortList()
         { }
@@ -119,7 +120,7 @@ namespace vle { namespace graph {
         inline size_type size() const { return m_lst.size(); }
 
     private:
-        value_type m_lst;
+        Values m_lst;
     };
 
     std::ostream& operator<<(std::ostream& out, const ModelPortList& lst);

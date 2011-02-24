@@ -49,7 +49,7 @@ void VLE_GVLE_EXPORT Debug(const std::string& str);
  *
  * @param argv A boost::format argument.
  */
-inline void VLE_GVLE_EXPORT Debug(const boost::format& str)
+inline void Debug(const boost::format& str)
 {
     Debug(str.str());
 }
@@ -69,7 +69,7 @@ void VLE_GVLE_EXPORT Info(const std::string& str);
  *
  * @param argv A boost::format argument.
  */
-inline void VLE_GVLE_EXPORT Info(const boost::format& str)
+inline void Info(const boost::format& str)
 {
     Info(str.str());
 }
@@ -90,7 +90,7 @@ void VLE_GVLE_EXPORT Error(const std::string& msg, bool use_markup = true);
  * @param use_markup to enhance or not the text presentation by
  * inserting html tags inside the message string.
  */
-inline void VLE_GVLE_EXPORT Error(const boost::format& msg,
+inline void Error(const boost::format& msg,
                                   bool use_markup = true)
 {
     Error(msg.str(), use_markup);
@@ -114,7 +114,7 @@ bool VLE_GVLE_EXPORT Question(const std::string& str);
  *
  * @return true if user have clicked on YES, otherwise false.
  */
-inline bool VLE_GVLE_EXPORT Question(const boost::format& str)
+inline bool Question(const boost::format& str)
 {
     return Question(str.str());
 }

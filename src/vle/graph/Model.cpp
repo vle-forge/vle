@@ -315,11 +315,10 @@ ModelPortList& Model::addInputPort(const std::string& name)
         if (isCoupled()) {
             CoupledModel* cpl = static_cast < CoupledModel* >(this);
             cpl->getInternalInputPortList().insert(
-                std::make_pair < std::string, ModelPortList >(
-                    name, ModelPortList()));
+                ConnectionList::value_type(name, ModelPortList()));
         }
         return (*m_inPortList.insert(
-                std::make_pair < std::string, ModelPortList >(
+                ConnectionList::value_type(
                     name, ModelPortList())).first).second;
     } else {
         return it->second;
@@ -333,12 +332,11 @@ ModelPortList& Model::addOutputPort(const std::string& name)
         if (isCoupled()) {
             CoupledModel* cpl = static_cast < CoupledModel* >(this);
             cpl->getInternalOutputPortList().insert(
-                std::make_pair < std::string, ModelPortList >(
-                    name, ModelPortList()));
+                ConnectionList::value_type(name, ModelPortList()));
         }
         return (*m_outPortList.insert(
-                std::make_pair < std::string, ModelPortList >(
-                    name, ModelPortList())).first).second;
+                ConnectionList::value_type(name,
+                                           ModelPortList())).first).second;
     } else {
         return it->second;
     }
@@ -455,13 +453,11 @@ ModelPortList& Model::renameInputPort(const std::string& old_name,
 	if (isCoupled()) {
 	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
 	    cpl->getInternalInputPortList().insert(
-		std::make_pair < std::string, ModelPortList >(
-		new_name, internalConnect));
+                ConnectionList::value_type(new_name, internalConnect));
 	}
 	addInPort(connect, internalConnect,  new_name);
 	return (*m_inPortList.insert(
-		    std::make_pair < std::string, ModelPortList >(
-			new_name, connect)).first).second;
+                ConnectionList::value_type(new_name, connect)).first).second;
     } else {
 	return it->second;
     }
@@ -486,13 +482,11 @@ ModelPortList& Model::renameOutputPort(const std::string& old_name,
 	if (isCoupled()) {
 	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
 	    cpl->getInternalOutputPortList().insert(
-		std::make_pair < std::string, ModelPortList >(
-		new_name, internalConnect));
+                ConnectionList::value_type(new_name, internalConnect));
 	}
 	addOutPort(connect, internalConnect, new_name);
 	return (*m_outPortList.insert(
-		    std::make_pair < std::string, ModelPortList >(
-			new_name, connect)).first).second;
+                ConnectionList::value_type(new_name, connect)).first).second;
     } else {
 	return it->second;
     }

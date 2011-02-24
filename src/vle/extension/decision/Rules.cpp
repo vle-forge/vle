@@ -40,8 +40,7 @@ Rule& Rules::add(const std::string& name, const Rule& rule)
         throw utils::ArgError("Decision: rule already exist");
     }
 
-    return (*m_lst.insert(std::make_pair < std::string, Rule >(
-                name, rule)).first).second;
+    return (*m_lst.insert(value_type(name, rule)).first).second;
 }
 
 Rule& Rules::add(const std::string& name, const Predicate& pred)

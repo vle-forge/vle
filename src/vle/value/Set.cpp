@@ -26,6 +26,9 @@
  */
 
 
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/binary_object.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Matrix.hpp>
@@ -198,32 +201,6 @@ const Matrix& Set::getMatrix(const size_type& i) const
     return value::toMatrixValue(value);
 }
 
-void Set::serializeTxtFile(const Set& set, const std::string& filename)
-{
-    std::ofstream out(filename.c_str());
-    if (not out.is_open()) {
-        throw utils::ArgError(fmt(_(
-                    "serialize error: cannot open file '%1%'")) % filename);
-    }
-
-    boost::archive::text_oarchive oa(out);
-    value::Value::registerValues(oa);
-
-    oa << (const value::Set&)set;
-}
-
-void Set::serializeTxtBuffer(const Set& set, std::string& buffer)
-{
-    std::ostringstream out;
-
-    boost::archive::text_oarchive oa(out);
-    value::Value::registerValues(oa);
-
-    oa << (const value::Set&)set;
-
-    buffer = out.str();
-}
-
 void Set::serializeBinaryFile(const Set& set, const std::string& filename)
 {
     std::ofstream out(filename.c_str(), std::ofstream::binary);
@@ -232,7 +209,8 @@ void Set::serializeBinaryFile(const Set& set, const std::string& filename)
                     "serialize error: cannot open file '%1%'")) % filename);
     }
 
-    boost::archive::text_oarchive oa(out);
+    boost::archive::binary_oarchive oa(out);
+
     value::Value::registerValues(oa);
 
     oa << (const value::Set&)set;
@@ -242,36 +220,13 @@ void Set::serializeBinaryBuffer(const Set& set, std::string& buffer)
 {
     std::ostringstream out(std::ostringstream::binary);
 
-    boost::archive::text_oarchive oa(out);
+    boost::archive::binary_oarchive oa(out);
+
     value::Value::registerValues(oa);
 
     oa << (const value::Set&)set;
 
     buffer = out.str();
-}
-
-void Set::deserializeTxtFile(Set& set, const std::string& filename)
-{
-    std::ifstream out(filename.c_str());
-    if (not out.is_open()) {
-        throw utils::ArgError(fmt(_(
-                    "deserialize error: can not open file '%1%'")) % filename);
-    }
-
-    boost::archive::text_iarchive ia(out);
-    value::Value::registerValues(ia);
-
-    ia >> (value::Set&)set;
-}
-
-void Set::deserializeTxtBuffer(Set& set, const std::string& buffer)
-{
-    std::istringstream out(buffer);
-
-    boost::archive::text_iarchive ia(out);
-    value::Value::registerValues(ia);
-
-    ia >> (value::Set&)set;
 }
 
 void Set::deserializeBinaryFile(Set& set, const std::string& filename)
@@ -282,7 +237,8 @@ void Set::deserializeBinaryFile(Set& set, const std::string& filename)
                     "deserialize error: can not open file '%1%'")) % filename);
     }
 
-    boost::archive::text_iarchive ia(out);
+    boost::archive::binary_iarchive ia(out);
+
     value::Value::registerValues(ia);
 
     ia >> (value::Set&)set;
@@ -292,7 +248,8 @@ void Set::deserializeBinaryBuffer(Set& set, const std::string& buffer)
 {
     std::istringstream out(buffer, std::istringstream::binary);
 
-    boost::archive::text_iarchive ia(out);
+    boost::archive::binary_iarchive ia(out);
+
     value::Value::registerValues(ia);
 
     ia >> (value::Set&)set;

@@ -30,6 +30,11 @@
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Debug.hpp>
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
 
 namespace vle { namespace gvle {
 

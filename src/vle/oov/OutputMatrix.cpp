@@ -86,7 +86,7 @@ void OutputMatrix::deserialize(const value::Value& vals)
 
     if (id.size() % 3 != 0) {
         throw utils::ArgError(fmt(
-                _("Bad id's for the OutputMatrix: '%1%'")) % id);
+                _("Bad id's for the OutputMatrix: '%1%'")) % id.size());
     }
 
     if (id.size() / 3 != m_values->columns() - 1) {

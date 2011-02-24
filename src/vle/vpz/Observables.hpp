@@ -49,15 +49,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT Observables : public Base
     {
     public:
-        /**
-         * @brief Define a iterator for ObservableList.
-         */
         typedef ObservableList::iterator iterator;
-
-        /**
-         * @brief Define a const_iterator for ObservableList.
-         */
         typedef ObservableList::const_iterator const_iterator;
+        typedef ObservableList::size_type size_type;
+        typedef ObservableList::value_type value_type;
 
         /**
          * @brief Build a empty Observables.

@@ -45,7 +45,7 @@ void ModelPortList::add(Model* model, const std::string& portname)
             portname);
     }
 
-    m_lst.insert(std::make_pair < Model*, std::string >(model, portname));
+    m_lst.insert(value_type(model, portname));
 }
 
 void ModelPortList::remove(Model* model, const std::string& portname)
@@ -80,8 +80,7 @@ void ModelPortList::remove(Model* model, const std::string& portname)
 void ModelPortList::merge(ModelPortList& lst)
 {
     for (iterator it = lst.begin(); it != lst.end(); ++it) {
-        m_lst.insert(std::make_pair < Model*, std::string >(
-                it->first, it->second));
+        m_lst.insert(value_type(it->first, it->second));
     }
 }
 

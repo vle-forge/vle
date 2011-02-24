@@ -30,6 +30,8 @@
 #define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE values_serialization_test
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -76,7 +78,7 @@ BOOST_AUTO_TEST_CASE(check_tuple_serialization)
         }
 
         std::ostringstream out;
-        boost::archive::text_oarchive oa(out);
+        boost::archive::binary_oarchive oa(out);
         value::Value::registerValues(oa);
         oa << (const value::Tuple&)mp;
         save = out.str();
@@ -86,7 +88,7 @@ BOOST_AUTO_TEST_CASE(check_tuple_serialization)
         value::Tuple mp;
 
         std::istringstream in(save);
-        boost::archive::text_iarchive ia(in);
+        boost::archive::binary_iarchive ia(in);
         value::Value::registerValues(ia);
         ia >> (value::Tuple&)mp;
 
@@ -113,7 +115,7 @@ BOOST_AUTO_TEST_CASE(check_table_serialization)
         }
 
         std::ostringstream out;
-        boost::archive::text_oarchive oa(out);
+        boost::archive::binary_oarchive oa(out);
         value::Value::registerValues(oa);
         oa << (const value::Table&)mp;
         save = out.str();
@@ -123,7 +125,7 @@ BOOST_AUTO_TEST_CASE(check_table_serialization)
         value::Table mp;
 
         std::istringstream in(save);
-        boost::archive::text_iarchive ia(in);
+        boost::archive::binary_iarchive ia(in);
         value::Value::registerValues(ia);
         ia >> (value::Table&)mp;
 
@@ -154,7 +156,7 @@ BOOST_AUTO_TEST_CASE(check_map_serialization)
         mp->addXml("xml", "xml test");
 
         std::ostringstream out;
-        boost::archive::text_oarchive oa(out);
+        boost::archive::binary_oarchive oa(out);
         value::Value::registerValues(oa);
         oa << (const value::Map&)*mp;
         save = out.str();
@@ -166,7 +168,7 @@ BOOST_AUTO_TEST_CASE(check_map_serialization)
         value::Map* mp = value::Map::create();
 
         std::istringstream in(save);
-        boost::archive::text_iarchive ia(in);
+        boost::archive::binary_iarchive ia(in);
         value::Value::registerValues(ia);
         ia >> (value::Map&)*mp;
 
@@ -194,7 +196,7 @@ BOOST_AUTO_TEST_CASE(check_set_serialization)
         st->addNull();
 
         std::ostringstream out;
-        boost::archive::text_oarchive oa(out);
+        boost::archive::binary_oarchive oa(out);
         value::Value::registerValues(oa);
         oa << (const value::Set&)*st;
         save = out.str();
@@ -206,7 +208,7 @@ BOOST_AUTO_TEST_CASE(check_set_serialization)
         value::Set* st = value::Set::create();
 
         std::istringstream in(save);
-        boost::archive::text_iarchive ia(in);
+        boost::archive::binary_iarchive ia(in);
         value::Value::registerValues(ia);
         ia >> (value::Set&)*st;
 
@@ -239,7 +241,7 @@ BOOST_AUTO_TEST_CASE(check_matrix_serialization)
         mx->add(0, 0, value::Integer::create(10));
 
         std::ostringstream out;
-        boost::archive::text_oarchive oa(out);
+        boost::archive::binary_oarchive oa(out);
         value::Value::registerValues(oa);
         oa << (const value::Matrix&)*mx;
         save = out.str();
@@ -251,7 +253,7 @@ BOOST_AUTO_TEST_CASE(check_matrix_serialization)
         value::Matrix* mx = value::Matrix::create();
 
         std::istringstream in(save);
-        boost::archive::text_iarchive ia(in);
+        boost::archive::binary_iarchive ia(in);
         value::Value::registerValues(ia);
         ia >> (value::Matrix&)*mx;
 
@@ -286,7 +288,7 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
         mp.add("copain", st);
 
         std::ostringstream out;
-        boost::archive::text_oarchive oa(out);
+        boost::archive::binary_oarchive oa(out);
         value::Value::registerValues(oa);
         oa << (const value::Map&)mp;
         save = out.str();
@@ -296,7 +298,7 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
         value::Map mp;
 
         std::istringstream in(save);
-        boost::archive::text_iarchive ia(in);
+        boost::archive::binary_iarchive ia(in);
         value::Value::registerValues(ia);
         ia >> (value::Map&)mp;
 

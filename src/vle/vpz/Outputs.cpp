@@ -103,7 +103,7 @@ Output& Outputs::add(const Output& o)
 {
     std::pair < iterator, bool > x;
 
-    x = m_list.insert(std::make_pair < std::string, Output >( o.name(), o));
+    x = m_list.insert(value_type( o.name(), o));
 
     if (not x.second) {
         throw utils::ArgError(fmt(

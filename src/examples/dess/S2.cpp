@@ -29,6 +29,10 @@
 #include "S2.hpp"
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
 namespace vle { namespace examples { namespace dess {
 
 S2::S2(const devs::DynamicsInit& model,

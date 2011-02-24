@@ -95,7 +95,7 @@ void Views::add(const Views& views)
 View& Views::add(const View& view)
 {
     std::pair < iterator, bool > x;
-    x = m_list.insert(std::make_pair < std::string, View >(view.name(), view));
+    x = m_list.insert(value_type(view.name(), view));
 
     if (not x.second) {
         throw utils::ArgError(fmt(

@@ -78,8 +78,7 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
             mdl->getName());
     }
 
-    return (*m_lst.insert(std::make_pair < graph::Model*, AtomicModel >(
-                mdl, atom)).first).second;
+    return (*m_lst.insert(value_type(mdl, atom)).first).second;
 }
 
 void AtomicModelList::del(graph::Model* mdl)

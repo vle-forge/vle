@@ -30,6 +30,7 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/version.hpp>
 #include <algorithm>
 
 namespace vle { namespace utils {
@@ -165,7 +166,11 @@ void ModuleCache::fill(std::vector < ModuleCache::iterator >& output,
 
                         std::pair < iterator, bool > tmp;
 
+#if BOOST_VERSION > 104500
+                        tmp = mLst.insert(Module(it->path().string()));
+#else
                         tmp = mLst.insert(Module(it->path().file_string()));
+#endif
                         if (tmp.second) {
                             output.push_back(tmp.first);
                         }

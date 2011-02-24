@@ -31,6 +31,10 @@
 #include <vle/utils/Debug.hpp>
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
 namespace vle { namespace examples { namespace dess {
 
 seir::seir(const devs::DynamicsInit& model,

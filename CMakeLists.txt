@@ -129,8 +129,16 @@ ENDIF (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
 #
 
 OPTION(WITH_TEST "use the libboost test unit library [default: on]" ON)
+SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_LIBS OFF)
-SET(Boost_USE_MULTITHREAD ON)
+SET(Boost_NO_SYSTEM_PATHS OFF)
+SET(Boost_USE_STATIC_RUNTIME OFF)
+IF (WIN32)
+  SET(Boost_THREADAPI "win32")
+ENDIF (WIN32)
+SET(Boost_DETAILED_FAILURE_MSG FALSE)
+SET(Boost_DEBUG FALSE)
+
 FIND_PACKAGE(Boost COMPONENTS unit_test_framework serialization filesystem
   system date_time regex thread)
 IF (NOT Boost_SERIALIZATION_FOUND)

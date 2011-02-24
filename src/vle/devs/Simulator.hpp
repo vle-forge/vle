@@ -56,6 +56,7 @@ namespace vle { namespace devs {
         typedef TargetSimulatorList::const_iterator const_iterator;
         typedef TargetSimulatorList::iterator iterator;
         typedef TargetSimulatorList::size_type size_type;
+        typedef TargetSimulatorList::value_type value_type;
 
         /**
          * @brief Build a new devs::Simulator with an empty devs::Dynamics, a

@@ -685,8 +685,8 @@ void Editor::openTab(const std::string& filepath)
 		int page = append_page(*doc,
 				       *(addLabel(doc->getTitle(), filepath)));
 
-		mDocuments.insert(std::make_pair <std::string,
-				  DocumentText*>(filepath, doc));
+                mDocuments.insert(std::pair <std::string,
+                                  DocumentText*>(filepath, doc));
 		show_all_children();
 		set_current_page(page);
 	    } else {
@@ -748,8 +748,7 @@ void Editor::showCompleteView(const std::string& filepath,
 	    model);
 	doc->setTitle(filepath, model, mApp->getModeling()->isModified());
 	mDocuments.insert(
-	    std::make_pair < std::string, DocumentDrawingArea* >
-	    (filepath,doc));
+            std::pair < std::string, DocumentDrawingArea* > (filepath,doc));
 	append_page(*doc, *(addLabel(doc->getTitle(),
 				     filepath)));
 	reorder_child(*doc, page);
@@ -761,8 +760,7 @@ void Editor::showCompleteView(const std::string& filepath,
 	    model);
 	doc->setTitle(filepath, model, mApp->getModeling()->isModified());
 	mDocuments.insert(
-	    std::make_pair < std::string, DocumentDrawingArea* >(filepath,
-								 doc));
+            std::pair < std::string, DocumentDrawingArea* >(filepath, doc));
 	page = append_page(*doc, *(addLabel(doc->getTitle(),
 	filepath)));
     }
@@ -792,8 +790,7 @@ void Editor::showSimpleView(const std::string& filepath,
 	    model);
 	doc->setTitle(filepath, model, mApp->getModeling()->isModified());
 	mDocuments.insert(
-	    std::make_pair < std::string, DocumentDrawingArea* >
-	    (filepath, doc));
+            std::pair < std::string, DocumentDrawingArea* > (filepath, doc));
 	append_page(*doc, *(addLabel(doc->getTitle(),
 				     filepath)));
 

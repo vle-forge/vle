@@ -55,8 +55,7 @@ Observable& Observables::add(const Observable& obs)
 {
     std::pair < iterator, bool > x;
 
-    x = m_list.insert(std::make_pair < std::string, Observable >(
-            obs.name(), obs));
+    x = m_list.insert(value_type(obs.name(), obs));
 
     if (not x.second) {
         throw utils::ArgError(fmt(

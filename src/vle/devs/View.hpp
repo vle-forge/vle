@@ -53,6 +53,11 @@ typedef std::map < std::string, View* > ViewList;
 class VLE_DEVS_EXPORT View
 {
 public:
+    typedef ObservableList::iterator iterator;
+    typedef ObservableList::const_iterator const_iterator;
+    typedef ObservableList::size_type size_type;
+    typedef ObservableList::value_type value_type;
+
     View(const std::string& name, StreamWriter* stream)
         : m_name(name), m_stream(stream), m_size(0)
     {}

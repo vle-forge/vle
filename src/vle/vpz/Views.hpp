@@ -50,15 +50,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT Views : public Base
     {
     public:
-        /**
-         * @brief Define an iterator to ViewList.
-         */
         typedef ViewList::iterator iterator;
-
-        /**
-         * @brief Define a constant iterator to ViewList.
-         */
         typedef ViewList::const_iterator const_iterator;
+        typedef ViewList::size_type size_type;
+        typedef ViewList::value_type value_type;
 
         /**
          * @brief Build an empty Views.

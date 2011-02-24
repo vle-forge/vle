@@ -45,8 +45,7 @@ void View::addObservable(Simulator* model,
     assert(model);
 
     if (not exist(model, portname)) {
-        m_observableList.insert(
-            std::make_pair < Simulator*, std::string >(model, portname));
+        m_observableList.insert(value_type(model, portname));
         m_stream->processNewObservable(model, portname, currenttime,
                                        getName());
     }

@@ -51,15 +51,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT Outputs : public Base
     {
     public:
-        /**
-         * @brief Define an iterator to the OutputList.
-         */
         typedef OutputList::iterator iterator;
-
-        /**
-         * @brief Define a constant iterator to the OutputList.
-         */
         typedef OutputList::const_iterator const_iterator;
+        typedef OutputList::size_type size_type;
+        typedef OutputList::value_type value_type;
 
         /**
          * @brief Build an empty Outputs.

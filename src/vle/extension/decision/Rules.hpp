@@ -42,6 +42,7 @@ public:
     typedef std::map < std::string, Rule > rules_t;
     typedef rules_t::const_iterator const_iterator;
     typedef rules_t::iterator iterator;
+    typedef rules_t::value_type value_type;
     typedef rules_t::size_type size_type;
     typedef std::vector < const_iterator > result_t;
 

@@ -68,8 +68,7 @@ void Conditions::add(const Conditions& cdts)
 Condition& Conditions::add(const Condition& condition)
 {
     std::pair < iterator, bool > x;
-    x = m_list.insert(std::make_pair < std::string, Condition >(
-            condition.name(), condition));
+    x = m_list.insert(value_type(condition.name(), condition));
 
     if (not x.second) {
         throw utils::ArgError(fmt(

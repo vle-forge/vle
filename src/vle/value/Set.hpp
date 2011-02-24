@@ -677,24 +677,6 @@ public:
     ///
 
     /**
-     * @brief Serialize the value::Set into a text file using the
-     * text format archive of the boost::serialization library.
-     * @param set The value::Set to serialize.
-     * @param filename The output file.
-     */
-    static void serializeTxtFile(
-        const Set& set, const std::string& filename);
-
-    /**
-     * @brief Serialize the value::Set into a std::string buffer using the
-     * text format archive of the boost::serialization library.
-     * @param set The value::Set to serialize.
-     * @param filename The output file.
-     */
-    static void serializeTxtBuffer(
-        const Set& set, std::string& buffer);
-
-    /**
      * @brief Serialize the value::Set into a binary file using the
      * binary format archive of the boost::serialization library.
      * @param set The value::Set to serialize.
@@ -711,34 +693,6 @@ public:
      */
     static void serializeBinaryBuffer(
         const Set& set, std::string& buffer);
-
-    /**
-     * @brief Deserialize the text file into a value::Set.
-     * @code
-     * value::Set set;
-     * value::Set::deserializeTxtFile(set, "file.dat");
-     * @endcode
-     * @param set An output parameter to fill the Set.
-     * @param filename The filename.
-     */
-    static void deserializeTxtFile(
-        Set& set, const std::string& filename);
-
-    /**
-     * @brief Deserialize the text string buffer into a value::Set.
-     * @code
-     * value::Set set;
-     * [...] // fill the value::Set.
-     * std::string buffer;
-     * value::Set::serializeTxtBuffer(set, buffer);
-     * [...]
-     * value::Set::deserializeTxtBuffer(set, buffer);
-     * @endcode
-     * @param set An output parameter to fill the Set.
-     * @param filename The filename.
-     */
-    static void deserializeTxtBuffer(
-        Set& set, const std::string& buffer);
 
     /**
      * @brief Deserialize the binary file into a value::Set.

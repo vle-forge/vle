@@ -49,6 +49,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/version.hpp>
 
 namespace vle { namespace utils {
 
@@ -338,7 +339,11 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
                 {
                     fs::path tmp(it->path());
                     for (int i = it.level(); i >= 0; --i) {
+#if BOOST_VERSION > 104500
+                        store.push_back(tmp.filename().string());
+#else
                         store.push_back(tmp.leaf());
+#endif
                         tmp = tmp.branch_path();
                     }
                 }
@@ -651,7 +656,9 @@ PathList Path::getInstalledPackages()
     PathList result;
     for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
         if (fs::is_directory(it->status())) {
-#if BOOST_VERSION > 103600
+#if BOOST_VERSION > 104500
+            result.push_back(it->path().filename().string());
+#elif BOOST_VERSION > 103600
             result.push_back(it->path().filename());
 #else
             result.push_back(it->path().leaf());
@@ -669,7 +676,11 @@ PathList Path::getInstalledExperiments()
     if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
         throw utils::InternalError(fmt(
                 _("Pkg list error: '%1%' is not an experiments directory")) %
+#if BOOST_VERSION > 104500
+            pkgs.string());
+#else
             pkgs.file_string());
+#endif
     }
 
     PathList result;
@@ -681,7 +692,10 @@ PathList Path::getInstalledExperiments()
         stack.pop();
 
         for (fs::directory_iterator it(dir), end; it != end; ++it) {
-#if BOOST_VERSION > 103600
+#if BOOST_VERSION > 104500
+            if (fs::is_regular_file(it->status())) {
+                std::string ext = it->path().extension().string();
+#elif BOOST_VERSION > 103600
             if (fs::is_regular_file(it->status())) {
                 fs::path::string_type ext = it->path().extension();
 #else
@@ -689,7 +703,11 @@ PathList Path::getInstalledExperiments()
                 fs::path::string_type ext = fs::extension(it->path());
 #endif
                 if (ext == ".vpz") {
+#if BOOST_VERSION > 104500
+                    result.push_back(it->path().string());
+#else
                     result.push_back(it->path().file_string());
+#endif
                 }
             } else if (fs::is_directory(it->status())) {
                 stack.push(it->path());
@@ -710,11 +728,18 @@ PathList Path::getInstalledLibraries()
         if (not fs::exists(dir) or not fs::is_directory(dir)) {
             throw utils::InternalError(fmt(
                     _("Pkg list error: '%1%' is not a library directory")) %
+#if BOOST_VERSION > 103600
+                dir.string());
+#else
                 dir.file_string());
+#endif
         }
 
         for (fs::directory_iterator jt(dir), end; jt != end; ++jt) {
-#if BOOST_VERSION > 103600
+#if BOOST_VERSION > 104500
+            if (fs::is_regular_file(jt->status())) {
+                std::string ext = jt->path().extension().string();
+#elif BOOST_VERSION > 103600
             if (fs::is_regular_file(jt->status())) {
                 fs::path::string_type ext = jt->path().extension();
 #else
@@ -731,7 +756,11 @@ PathList Path::getInstalledLibraries()
                 }
 #else
                 if (ext == ".so") {
+#if BOOST_VERSION > 104500
+                    result.push_back(jt->path().string());
+#else
                     result.push_back(jt->path().file_string());
+#endif
                 }
 #endif
             }
@@ -758,7 +787,11 @@ std::string Path::getPackageFromPath(const std::string& path)
     }
 
     if (jt == package.end() and it != source.end()) {
+#if BOOST_VERSION > 104500
+        return it->string();
+#else
         return *it;
+#endif
     } else {
         return std::string();
     }
@@ -1094,7 +1127,11 @@ std::string Path::getCurrentPath()
 {
     fs::path current = fs::current_path();
 
+#if BOOST_VERSION > 104500
+    return current.string();
+#else
     return current.file_string();
+#endif
 }
 
 bool Path::exist(const std::string& filename)
@@ -1122,7 +1159,9 @@ bool Path::existFile(const std::string& filename)
 std::string Path::filename(const std::string& filename)
 {
     fs::path path(filename);
-#if BOOST_VERSION > 103600
+#if BOOST_VERSION > 104500
+    return path.filename().string();
+#elif BOOST_VERSION > 103600
     return path.filename();
 #else
     return path.leaf();

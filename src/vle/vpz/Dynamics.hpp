@@ -48,15 +48,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT Dynamics : public Base
     {
     public:
-        /**
-         * @brief A iterator to DynamicList.
-         */
         typedef DynamicList::iterator iterator;
-
-        /**
-         * @brief A constant iterator to DynamicList.
-         */
         typedef DynamicList::const_iterator const_iterator;
+        typedef DynamicList::size_type size_type;
+        typedef DynamicList::value_type value_type;
 
         /**
          * @brief Build a new Dynamics.

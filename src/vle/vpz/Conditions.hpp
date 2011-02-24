@@ -49,15 +49,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT Conditions : public Base
     {
     public:
-        /**
-         * @brief Define an iterator to the vpz::ConditionList.
-         */
         typedef ConditionList::iterator iterator;
-
-        /**
-         * @brief Define a constant iterator to the vpz::ConditionList.
-         */
         typedef ConditionList::const_iterator const_iterator;
+        typedef ConditionList::size_type size_type;
+        typedef ConditionList::value_type value_type;
 
         /**
          * @brief Build a new vpz::Conditions.

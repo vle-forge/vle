@@ -44,6 +44,7 @@ public:
     typedef activities_t::const_iterator const_iterator;
     typedef activities_t::iterator iterator;
     typedef activities_t::size_type size_type;
+    typedef activities_t::value_type value_type;
     typedef std::vector < iterator > result_t;
     typedef std::vector < const_iterator > const_result_t;
 

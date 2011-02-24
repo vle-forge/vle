@@ -46,8 +46,7 @@ void Classes::write(std::ostream& out) const
 Class& Classes::add(const std::string& name)
 {
     std::pair < iterator, bool > x;
-    x = m_lst.insert(std::make_pair < std::string, Class >(
-            name, Class(name)));
+    x = m_lst.insert(value_type(name, Class(name)));
 
     if (not x.second) {
         throw utils::ArgError(fmt(_("Class '%1%' already exists")) % name);
@@ -95,8 +94,7 @@ void Classes::rename(const std::string& oldname, const std::string& newname)
     }
 
     std::pair < iterator, bool > x;
-    x = m_lst.insert(std::make_pair < std::string, Class >(
-            newname, it->second));
+    x = m_lst.insert(value_type(newname, it->second));
     x.first->second.setName(newname);
 
     m_lst.erase(it);

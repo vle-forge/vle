@@ -44,6 +44,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/constants.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/version.hpp>
 
 #ifdef G_OS_WIN32
 #   include <windows.h>
@@ -133,17 +134,29 @@ void Package::install()
     if (not fs::exists(builddir)) {
         throw utils::ArgError(fmt(
                 _("Pkg build error: directory '%1%' does not exist")) %
+#if BOOST_VERSION > 104500
+            builddir.string());
+#else
             builddir.file_string());
+#endif
     }
 
     if (not fs::is_directory(builddir)) {
         throw utils::ArgError(fmt(
                 _("Pkg build error: '%1%' is not a directory")) %
+#if BOOST_VERSION > 104500
+            builddir.string());
+#else
             builddir.file_string());
+#endif
     }
 
     try {
+#if BOOST_VERSION > 104500
+        process(builddir.string(), argv);
+#else
         process(builddir.file_string(), argv);
+#endif
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg build error: install lib failed %1%")) % e.what());
@@ -337,7 +350,11 @@ void Package::addFile(const std::string& path, const std::string& name)
         tmp /= name;
 
         if (not fs::exists(tmp)) {
+#if BOOST_VERSION > 104500
+            std::ofstream file(tmp.string().c_str());
+#else
             std::ofstream file(tmp.file_string().c_str());
+#endif
         }
     }
 }
@@ -408,12 +425,20 @@ std::string Package::rename(const std::string& oldname,
     if (not fs::exists(oldfilepath) or fs::exists(newfilepath)) {
         throw utils::ArgError(fmt(
                 _("In Package `%1%', can not rename `%2%' in `%3%'")) %
+#if BOOST_VERSION > 104500
+            name() % oldfilepath.string() % newfilepath.string());
+#else
             name() % oldfilepath.file_string() % newfilepath.file_string());
+#endif
     }
 
     fs::rename(oldfilepath, newfilepath);
 
+#if BOOST_VERSION > 104500
+    return newfilepath.string();
+#else
     return newfilepath.file_string();
+#endif
 }
 
 void Package::copy(const std::string& source, std::string& target)

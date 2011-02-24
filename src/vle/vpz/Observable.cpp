@@ -86,8 +86,7 @@ ObservablePort& Observable::add(const std::string& portname)
 {
     std::pair < iterator, bool > x;
 
-    x = m_list.insert(std::make_pair < std::string, ObservablePort >(
-            portname, ObservablePort(portname)));
+    x = m_list.insert(value_type(portname, ObservablePort(portname)));
 
     if (not x.second) {
         throw utils::ArgError(fmt(
@@ -102,7 +101,7 @@ ObservablePort& Observable::add(const ObservablePort& obs)
 {
     std::pair < iterator, bool > x;
 
-    x = m_list.insert(std::make_pair < std::string, ObservablePort >(
+    x = m_list.insert(value_type(
                 obs.name(), obs));
 
     if (not x.second) {

@@ -43,8 +43,7 @@ Activity& Activities::add(const std::string& name, const Activity& act,
         throw utils::ArgError(_("Decision: activity already exist"));
     }
 
-    Activity& a((*m_lst.insert(std::make_pair < std::string, Activity >(
-                    name, act)).first).second);
+    Activity& a((*m_lst.insert(value_type(name, act)).first).second);
     if (out) {
         a.addOutputFunction(out);
     }
@@ -66,8 +65,7 @@ Activity& Activities::add(const std::string& name,
         throw utils::ArgError(_("Decision: activity already exist"));
     }
 
-    Activity& a((*m_lst.insert(std::make_pair < std::string, Activity >(
-                    name, Activity())).first).second);
+    Activity& a((*m_lst.insert(value_type(name, Activity())).first).second);
     if (out) {
         a.addOutputFunction(out);
     }

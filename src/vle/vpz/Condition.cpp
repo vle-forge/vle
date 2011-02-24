@@ -93,8 +93,7 @@ void Condition::portnames(std::list < std::string >& lst) const
 
 void Condition::add(const std::string& portname)
 {
-    m_list.insert(std::make_pair < std::string, value::Set* >(
-            portname, value::Set::create()));
+    m_list.insert(value_type(portname, value::Set::create()));
     m_last_port.assign(portname);
 }
 
@@ -124,8 +123,7 @@ void Condition::addValueToPort(const std::string& portname,
         value::Set* newset = value::Set::create();
         newset->add(value);
 
-        m_list.insert(std::make_pair < std::string, value::Set* >(
-                portname, newset));
+        m_list.insert(value_type(portname, newset));
         m_last_port.assign(portname);
     } else {
         it->second->add(value);
@@ -141,8 +139,7 @@ void Condition::addValueToPort(const std::string& portname,
         value::Set* newset = value::Set::create();
         newset->add(value);
 
-        m_list.insert(std::make_pair < std::string, value::Set* >(
-                portname, newset));
+        m_list.insert(value_type(portname, newset));
         m_last_port.assign(portname);
     } else {
         it->second->add(value);

@@ -52,8 +52,7 @@ Dynamic& Dynamics::add(const Dynamic& dynamic)
 {
     std::pair < iterator, bool > r;
 
-    r = m_list.insert(std::make_pair < std::string, Dynamic >(
-            dynamic.name(), dynamic));
+    r = m_list.insert(value_type(dynamic.name(), dynamic));
 
     if (not r.second) {
         throw utils::ArgError(fmt(

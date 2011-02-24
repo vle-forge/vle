@@ -71,8 +71,8 @@ Simulator::updateSimulatorTargets(
     m_atomicModel->getAtomicModelsTarget(port, result);
 
     if (result.begin() == result.end()) {
-        mTargets.insert(
-                std::make_pair(port, TargetSimulator(0, std::string())));
+        mTargets.insert(value_type(port, TargetSimulator(
+                   (Simulator*)0, std::string())));
     } else {
         for (graph::ModelPortList::iterator it = result.begin(); it !=
                 result.end(); ++it) {
@@ -122,7 +122,9 @@ void Simulator::addTargetPort(const std::string& port)
 {
     assert(mTargets.find(port) == mTargets.end());
 
-    mTargets.insert(std::make_pair(port, TargetSimulator(0, std::string())));
+    mTargets.insert(value_type(port,
+                               TargetSimulator((Simulator*)0,
+                                               std::string())));
 }
 
 void Simulator::addDynamics(Dynamics* dynamics)

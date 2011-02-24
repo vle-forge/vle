@@ -48,15 +48,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT Classes : public Base
     {
     public:
-        /**
-         * @brief An iterator for ClassList.
-         */
-        typedef ClassList::iterator        iterator;
-
-        /**
-         * @brief A constant iterator for the ClassList.
-         */
-        typedef ClassList::const_iterator  const_iterator;
+        typedef ClassList::iterator         iterator;
+        typedef ClassList::const_iterator   const_iterator;
+        typedef ClassList::size_type        size_type;
+        typedef ClassList::value_type       value_type;
 
         /**
          * @brief Empty constructor.

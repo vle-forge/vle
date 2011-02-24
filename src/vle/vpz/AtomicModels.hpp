@@ -146,15 +146,10 @@ namespace vle { namespace vpz {
     class VLE_VPZ_EXPORT AtomicModelList
     {
     public:
-        /**
-         * @brief A iterator for the atomicmodels.
-         */
         typedef AtomicModels::iterator iterator;
-
-        /**
-         * @brief A constant iterator for the AtomicModels.
-         */
         typedef AtomicModels::const_iterator const_iterator;
+        typedef AtomicModels::size_type size_type;
+        typedef AtomicModels::value_type value_type;
 
         /**
          * @brief Add a list of atomicmodel information.
