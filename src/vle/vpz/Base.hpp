@@ -45,12 +45,16 @@ namespace vle { namespace vpz {
          * @brief The list of available sub classes of vpz::Base. Use in the
          * vpz::SaxStackVpz class to sort the type of class.
          */
-        enum type { STRUCTURES, MODEL, SUBMODELS, CONNECTIONS,
-            INTERNAL_CONNECTION, INPUT_CONNECTION, OUTPUT_CONNECTION, ORIGIN,
-            DESTINATION, IN, OUT, INIT, STATE, PORT, DYNAMICS, DYNAMIC,
-            EXPERIMENT, PROJECT, VIEWS, OBSERVABLES, OBSERVABLE, OBSERVABLEPORT,
-            OUTPUTS, OUTPUT, VIEW, CONDITIONS, CONDITION, CLASSES, CLASS,
-            REPLICAS, VPZ, TRAME, MODELTRAME };
+        enum type { VLE_VPZ_STRUCTURES, VLE_VPZ_MODEL, VLE_VPZ_SUBMODELS,
+            VLE_VPZ_CONNECTIONS, VLE_VPZ_INTERNAL_CONNECTION,
+            VLE_VPZ_INPUT_CONNECTION, VLE_VPZ_OUTPUT_CONNECTION, VLE_VPZ_ORIGIN,
+            VLE_VPZ_DESTINATION, VLE_VPZ_IN, VLE_VPZ_OUT, VLE_VPZ_INIT,
+            VLE_VPZ_STATE, VLE_VPZ_PORT, VLE_VPZ_DYNAMICS, VLE_VPZ_DYNAMIC,
+            VLE_VPZ_EXPERIMENT, VLE_VPZ_PROJECT, VLE_VPZ_VIEWS,
+            VLE_VPZ_OBSERVABLES, VLE_VPZ_OBSERVABLE, VLE_VPZ_OBSERVABLEPORT,
+            VLE_VPZ_OUTPUTS, VLE_VPZ_OUTPUT, VLE_VPZ_VIEW, VLE_VPZ_CONDITIONS,
+            VLE_VPZ_CONDITION, VLE_VPZ_CLASSES, VLE_VPZ_CLASS, VLE_VPZ_REPLICAS,
+            VLE_VPZ_VPZ, VLE_VPZ_TRAME, VLE_VPZ_MODELTRAME };
 
         /**
          * @brief Default constructor.
@@ -92,187 +96,187 @@ namespace vle { namespace vpz {
          * @return True if type is STRUCTURES.
          */
         inline bool isStructures() const
-        { return getType() == STRUCTURES; }
+        { return getType() == VLE_VPZ_STRUCTURES; }
 
         /**
          * @return True if type is MODEL.
          */
         inline bool isModel() const
-        { return getType() == MODEL; }
+        { return getType() == VLE_VPZ_MODEL; }
 
         /**
          * @return True if type is SUBMODELS.
          */
         inline bool isSubmodels() const
-        { return getType() == SUBMODELS; }
+        { return getType() == VLE_VPZ_SUBMODELS; }
 
         /**
          * @return True if type is CONNECTIONS.
          */
         inline bool isConnections() const
-        { return getType() == CONNECTIONS; }
+        { return getType() == VLE_VPZ_CONNECTIONS; }
 
         /**
          * @return True if type is INTERNAL_CONNECTION.
          */
         inline bool isInternalConnection() const
-        { return getType() == INTERNAL_CONNECTION; }
+        { return getType() == VLE_VPZ_INTERNAL_CONNECTION; }
 
         /**
          * @return True if type is INPUT_CONNECTION.
          */
         inline bool isInputConnection() const
-        { return getType() == INPUT_CONNECTION; }
+        { return getType() == VLE_VPZ_INPUT_CONNECTION; }
 
         /**
          * @return True if type is OUTPUT_CONNECTION.
          */
         inline bool isOutputConnection() const
-        { return getType() == OUTPUT_CONNECTION; }
+        { return getType() == VLE_VPZ_OUTPUT_CONNECTION; }
 
         /**
          * @return True if type is ORIGIN.
          */
         inline bool isOrigin() const
-        { return getType() == ORIGIN; }
+        { return getType() == VLE_VPZ_ORIGIN; }
 
         /**
          * @return True if type is DESTINATION.
          */
         inline bool isDestination() const
-        { return getType() == DESTINATION; }
+        { return getType() == VLE_VPZ_DESTINATION; }
 
         /**
          * @return True if type is IN.
          */
         inline bool isIn() const
-        { return getType() == IN; }
+        { return getType() == VLE_VPZ_IN; }
 
         /**
          * @return True if type is OUT.
          */
         inline bool isOut() const
-        { return getType() == OUT; }
+        { return getType() == VLE_VPZ_OUT; }
 
         /**
          * @return True if type is INIT.
          */
         inline bool isInit() const
-        { return getType() == INIT; }
+        { return getType() == VLE_VPZ_INIT; }
 
         /**
          * @return True if type is STATE.
          */
         inline bool isState() const
-        { return getType() == STATE; }
+        { return getType() == VLE_VPZ_STATE; }
 
         /**
          * @return True if type is PORT.
          */
         inline bool isPort() const
-        { return getType() == PORT; }
+        { return getType() == VLE_VPZ_PORT; }
 
         /**
          * @return True if type is DYNAMICS.
          */
         inline bool isDynamics() const
-        { return getType() == DYNAMICS; }
+        { return getType() == VLE_VPZ_DYNAMICS; }
 
         /**
          * @return True if type is DYNAMIC.
          */
         inline bool isDynamic() const
-        { return getType() == DYNAMIC; }
+        { return getType() == VLE_VPZ_DYNAMIC; }
 
         /**
          * @return True if type is EXPERIMENT.
          */
         inline bool isExperiment() const
-        { return getType() == EXPERIMENT; }
+        { return getType() == VLE_VPZ_EXPERIMENT; }
 
         /**
          * @return True if type is PROJECT.
          */
         inline bool isProject() const
-        { return getType() == PROJECT; }
+        { return getType() == VLE_VPZ_PROJECT; }
 
         /**
          * @return True if type is VIEWS.
          */
         inline bool isViews() const
-        { return getType() == VIEWS; }
+        { return getType() == VLE_VPZ_VIEWS; }
 
         /**
          * @return True if type is VIEW.
          */
         inline bool isView() const
-        { return getType() == VIEW; }
+        { return getType() == VLE_VPZ_VIEW; }
 
         /**
          * @return True if type is OBSERVABLES.
          */
         inline bool isObservables() const
-        { return getType() == OBSERVABLES; }
+        { return getType() == VLE_VPZ_OBSERVABLES; }
 
         /**
          * @return True if type is OBSERVABLE.
          */
         inline bool isObservable() const
-        { return getType() == OBSERVABLE; }
+        { return getType() == VLE_VPZ_OBSERVABLE; }
 
         /**
          * @return True if type is OBSERVABLEPORT.
          */
         inline bool isObservablePort() const
-        { return getType() == OBSERVABLEPORT; }
+        { return getType() == VLE_VPZ_OBSERVABLEPORT; }
 
         /**
          * @return True if type is OUTPUTS.
          */
         inline bool isOutputs() const
-        { return getType() == OUTPUTS; }
+        { return getType() == VLE_VPZ_OUTPUTS; }
 
         /**
          * @return True if type is OUTPUT.
          */
         inline bool isOutput() const
-        { return getType() == OUTPUT; }
+        { return getType() == VLE_VPZ_OUTPUT; }
 
         /**
          * @return True if type is CONDITIONS.
          */
         inline bool isConditions() const
-        { return getType() == CONDITIONS; }
+        { return getType() == VLE_VPZ_CONDITIONS; }
 
         /**
          * @return True if type is CONDITION.
          */
         inline bool isCondition() const
-        { return getType() == CONDITION; }
+        { return getType() == VLE_VPZ_CONDITION; }
 
         /**
          * @return True if type is CLASSES.
          */
         inline bool isClasses() const
-        { return getType() == CLASSES; }
+        { return getType() == VLE_VPZ_CLASSES; }
 
         /**
          * @return True if type is CLASS.
          */
         inline bool isClass() const
-        { return getType() == CLASS; }
+        { return getType() == VLE_VPZ_CLASS; }
 
         /**
          * @return True if type is REPLICAS.
          */
         inline bool isReplicas() const
-        { return getType() == REPLICAS; }
+        { return getType() == VLE_VPZ_REPLICAS; }
 
         /**
          * @return True if type is VPZ.
          */
         inline bool isVpz() const
-        { return getType() == VPZ; }
+        { return getType() == VLE_VPZ_VPZ; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -306,7 +310,7 @@ namespace vle { namespace vpz {
              * @return true if pointer is not null and is a Class.
              */
             inline bool operator()(const vpz::Base* base) const
-            { return base != 0 and base->getType() == CLASS; }
+            { return base != 0 and base->getType() == VLE_VPZ_CLASS; }
 
             /**
              * @brief Check if the reference is a Class.
@@ -314,7 +318,7 @@ namespace vle { namespace vpz {
              * @return true if pointer if a Class.
              */
             inline bool operator()(const vpz::Base& base) const
-            { return base.getType() == CLASS; }
+            { return base.getType() == VLE_VPZ_CLASS; }
         };
     };
 

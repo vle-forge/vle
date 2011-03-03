@@ -227,7 +227,7 @@ void ObsAndViewBox::makeObs()
         while (it_view != view_list.end()) {
             Gtk::TreeModel::Row childrow = *(mRefTreeObs->append(row.children()));
             childrow[mColumnsObs.m_col_name] = *it_view;
-            childrow[mColumnsObs.m_col_type] = vpz::Base::VIEW;
+            childrow[mColumnsObs.m_col_type] = vpz::Base::VLE_VPZ_VIEW;
 
             ++it_view;
         }
@@ -276,9 +276,9 @@ void ObsAndViewBox::on_del_port()
         std::string data_name(row.get_value(mColumnsObs.m_col_name));
         Base::type type(row.get_value(mColumnsObs.m_col_type));
 
-        if (type == Base::OBSERVABLEPORT) {
+        if (type == Base::VLE_VPZ_OBSERVABLEPORT) {
             mObs->del(data_name);
-        } else if (type == Base::VIEW) {
+        } else if (type == Base::VLE_VPZ_VIEW) {
             TreeModel::Row parent(*(row.parent()));
             std::string port_name(parent.get_value(mColumnsObs.m_col_name));
             if (mObs->exist(port_name)) {

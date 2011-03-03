@@ -96,7 +96,7 @@ namespace vle { namespace vpz {
          * @return OBSERVABLEPORT.
          */
         virtual Base::type getType() const
-        { return OBSERVABLEPORT; }
+        { return VLE_VPZ_OBSERVABLEPORT; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -241,7 +241,7 @@ namespace vle { namespace vpz {
          * @return OBSERVABLE.
          */
         virtual Base::type getType() const
-        { return OBSERVABLE; }
+        { return VLE_VPZ_OBSERVABLE; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

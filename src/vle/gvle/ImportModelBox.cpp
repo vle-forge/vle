@@ -43,19 +43,19 @@ ImportWidget::ImportWidget(ImportModelBox* parent, vpz::Base* base):
         mAtom(0)
 {
     switch (base->getType()) {
-    case Base::DYNAMIC:
+    case Base::VLE_VPZ_DYNAMIC:
         mEntry.set_text(dynamic_cast<vpz::Dynamic*>(base)->name());
         break;
-    case Base::CONDITION:
+    case Base::VLE_VPZ_CONDITION:
         mEntry.set_text(dynamic_cast<vpz::Condition*>(base)->name());
         break;
-    case Base::OUTPUT:
+    case Base::VLE_VPZ_OUTPUT:
         mEntry.set_text(dynamic_cast<vpz::Output*>(base)->name());
         break;
-    case Base::OBSERVABLE:
+    case Base::VLE_VPZ_OBSERVABLE:
         mEntry.set_text(dynamic_cast<vpz::Observable*>(base)->name());
         break;
-    case Base::VIEW:
+    case Base::VLE_VPZ_VIEW:
         mEntry.set_text(dynamic_cast<vpz::View*>(base)->name());
         break;
     default:
@@ -123,19 +123,19 @@ bool ImportWidget::evaluate()
 {
     if (mBase) {
         switch (mBase->getType()) {
-        case Base::DYNAMIC:
+        case Base::VLE_VPZ_DYNAMIC:
             return mParent->is_valid_dynamic(mEntry.get_text());
             break;
-        case Base::CONDITION:
+        case Base::VLE_VPZ_CONDITION:
             return mParent->is_valid_condition(mEntry.get_text());
             break;
-        case Base::OUTPUT:
+        case Base::VLE_VPZ_OUTPUT:
             return mParent->is_valid_output(mEntry.get_text());
             break;
-        case Base::OBSERVABLE:
+        case Base::VLE_VPZ_OBSERVABLE:
             return mParent->is_valid_observable(mEntry.get_text());
             break;
-        case Base::VIEW:
+        case Base::VLE_VPZ_VIEW:
             return mParent->is_valid_view(mEntry.get_text());
             break;
         default:

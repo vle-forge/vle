@@ -83,7 +83,7 @@ namespace vle { namespace vpz {
          * @return OBSERVABLES.
          */
         virtual Base::type getType() const
-        { return OBSERVABLES; }
+        { return VLE_VPZ_OBSERVABLES; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

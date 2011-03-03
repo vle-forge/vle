@@ -74,7 +74,7 @@ namespace vle { namespace vpz {
          * @return The constant PROJECT.
          */
         virtual Base::type getType() const
-        { return PROJECT; }
+        { return VLE_VPZ_PROJECT; }
 
         /**
          * @brief Clear all information from the current project, ie: date,

@@ -124,22 +124,22 @@ bool InteractiveTypeBox::isValid()
     mState = false;
     if (mBase) {
 	switch (mBase->getType()) {
-	case vpz::Base::CLASSES:
+	case vpz::Base::VLE_VPZ_CLASSES:
 	    mState = not (dynamic_cast< vpz::Classes* >(mBase))->exist(mEntry->get_text());
 	    break;
-	case vpz::Base::CONDITIONS:
+	case vpz::Base::VLE_VPZ_CONDITIONS:
 	    mState = not (dynamic_cast< vpz::Conditions* >(mBase))->exist(mEntry->get_text());
 	    break;
-	case vpz::Base::DYNAMICS:
+	case vpz::Base::VLE_VPZ_DYNAMICS:
 	    mState = not (dynamic_cast< vpz::Dynamics* >(mBase))->exist(mEntry->get_text());
 	    break;
-	case vpz::Base::OBSERVABLES:
+	case vpz::Base::VLE_VPZ_OBSERVABLES:
 	    mState = not (dynamic_cast< vpz::Observables* >(mBase))->exist(mEntry->get_text());
 	    break;
-	case vpz::Base::OUTPUTS:
+	case vpz::Base::VLE_VPZ_OUTPUTS:
 	    mState = not (dynamic_cast< vpz::Outputs* >(mBase))->exist(mEntry->get_text());
 	    break;
-	case vpz::Base::VIEWS:
+	case vpz::Base::VLE_VPZ_VIEWS:
 	    mState = not (dynamic_cast< vpz::Views* >(mBase))->exist(mEntry->get_text());
 	    break;
 	default:

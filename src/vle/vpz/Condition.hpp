@@ -92,7 +92,7 @@ namespace vle { namespace vpz {
          * @return CONDITION.
          */
         inline virtual Base::type getType() const
-        { return CONDITION; }
+        { return VLE_VPZ_CONDITION; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

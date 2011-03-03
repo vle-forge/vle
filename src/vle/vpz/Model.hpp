@@ -78,7 +78,7 @@ namespace vle { namespace vpz {
          * @return MODEL.
          */
         virtual Base::type getType() const
-        { return MODEL; }
+        { return VLE_VPZ_MODEL; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -163,7 +163,7 @@ namespace vle { namespace vpz {
          * @return SUBMODELS.
          */
         virtual Base::type getType() const
-        { return SUBMODELS; }
+        { return VLE_VPZ_SUBMODELS; }
     };
 
     /**
@@ -195,7 +195,7 @@ namespace vle { namespace vpz {
          * @return CONNECTIONS.
          */
         virtual Base::type getType() const
-        { return CONNECTIONS; }
+        { return VLE_VPZ_CONNECTIONS; }
     };
 
     /**
@@ -227,7 +227,7 @@ namespace vle { namespace vpz {
          * @return INTERNAL_CONNECTION.
          */
         virtual Base::type getType() const
-        { return INTERNAL_CONNECTION; }
+        { return VLE_VPZ_INTERNAL_CONNECTION; }
     };
 
     /**
@@ -259,7 +259,7 @@ namespace vle { namespace vpz {
          * @return INPUT_CONNECTION.
          */
         virtual Base::type getType() const
-        { return INPUT_CONNECTION; }
+        { return VLE_VPZ_INPUT_CONNECTION; }
     };
 
     /**
@@ -291,7 +291,7 @@ namespace vle { namespace vpz {
          * @return OUTPUT_CONNECTION.
          */
         virtual Base::type getType() const
-        { return OUTPUT_CONNECTION; }
+        { return VLE_VPZ_OUTPUT_CONNECTION; }
     };
 
     /**
@@ -328,7 +328,7 @@ namespace vle { namespace vpz {
          * @return ORIGIN.
          */
         virtual Base::type getType() const
-        { return ORIGIN; }
+        { return VLE_VPZ_ORIGIN; }
 
         std::string model; //!< the name of the model.
         std::string port; //!< the name of the In port.
@@ -368,7 +368,7 @@ namespace vle { namespace vpz {
          * @return DESTINATION.
          */
         virtual Base::type getType() const
-        { return DESTINATION; }
+        { return VLE_VPZ_DESTINATION; }
 
         std::string model; //!< the name of the model.
         std::string port; //!< the name of the Out port.

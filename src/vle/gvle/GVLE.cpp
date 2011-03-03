@@ -69,7 +69,7 @@ GVLE::GVLE(BaseObjectType* cobject,
 	   const Glib::RefPtr<Gnome::Glade::Xml> xml):
     Gtk::Window(cobject),
     mModeling(new Modeling(this)),
-    mCurrentButton(POINTER),
+    mCurrentButton(VLE_GVLE_POINTER),
     mCurrentTab(-1)
 {
     mRefXML = xml;
@@ -296,49 +296,49 @@ bool GVLE::on_delete_event(GdkEventAny* event)
 
 void GVLE::onArrow()
 {
-    mCurrentButton = POINTER;
+    mCurrentButton = VLE_GVLE_POINTER;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Selection"));
 }
 
 void GVLE::onAddModels()
 {
-    mCurrentButton = ADDMODEL;
+    mCurrentButton = VLE_GVLE_ADDMODEL;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Add models"));
 }
 
 void GVLE::onAddLinks()
 {
-    mCurrentButton = ADDLINK;
+    mCurrentButton = VLE_GVLE_ADDLINK;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Add links"));
 }
 
 void GVLE::onDelete()
 {
-    mCurrentButton = DELETE;
+    mCurrentButton = VLE_GVLE_DELETE;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Delete object"));
 }
 
 void GVLE::onAddCoupled()
 {
-    mCurrentButton = ADDCOUPLED;
+    mCurrentButton = VLE_GVLE_ADDCOUPLED;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Coupled Model"));
 }
 
 void GVLE::onZoom()
 {
-    mCurrentButton = ZOOM;
+    mCurrentButton = VLE_GVLE_ZOOM;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Zoom"));
 }
 
 void GVLE::onQuestion()
 {
-    mCurrentButton = QUESTION;
+    mCurrentButton = VLE_GVLE_QUESTION;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Question"));
 }
@@ -369,7 +369,7 @@ void GVLE::onNewVpz()
         mEditor->getDocumentDrawingArea()->updateCursor();
         mModelTreeBox->set_sensitive(true);
         mModelClassBox->set_sensitive(true);
-        if (mCurrentButton == POINTER){
+        if (mCurrentButton == VLE_GVLE_POINTER){
             showMessage(_("Selection"));
         }
     }
@@ -388,7 +388,7 @@ void GVLE::onNewNamedVpz(const std::string& path, const std::string& filename)
         mEditor->getDocumentDrawingArea()->updateCursor();
         mModelTreeBox->set_sensitive(true);
         mModelClassBox->set_sensitive(true);
-        if (mCurrentButton == POINTER){
+        if (mCurrentButton == VLE_GVLE_POINTER){
             showMessage(_("Selection"));
         }
     }
@@ -454,7 +454,7 @@ void GVLE::onOpenVpz()
                 mModelTreeBox->set_sensitive(true);
                 mModelClassBox->set_sensitive(true);
                 mEditor->getDocumentDrawingArea()->updateCursor();
-                if (mCurrentButton == POINTER){
+                if (mCurrentButton == VLE_GVLE_POINTER){
                     showMessage(_("Selection"));
                 }
             }

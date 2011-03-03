@@ -79,9 +79,9 @@ public:
     typedef std::map < std::string, ObserverPlugin * > MapObserverPlugin;
 
     /** list off all available buttons. */
-    enum ButtonType { POINTER, ADDMODEL, ADDLINK, ADDCOUPLED, DELETE, ZOOM,
-                      PLUGINMODEL, GRID, QUESTION
-                    };
+    enum ButtonType { VLE_GVLE_POINTER, VLE_GVLE_ADDMODEL, VLE_GVLE_ADDLINK,
+        VLE_GVLE_ADDCOUPLED, VLE_GVLE_DELETE, VLE_GVLE_ZOOM,
+        VLE_GVLE_PLUGINMODEL, VLE_GVLE_GRID, VLE_GVLE_QUESTION };
 
     static const int overview_max = 60;
 

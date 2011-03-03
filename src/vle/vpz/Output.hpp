@@ -108,7 +108,7 @@ namespace vle {
          * @return OUTPUT.
          */
         virtual Base::type getType() const
-        { return OUTPUT; }
+        { return VLE_VPZ_OUTPUT; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

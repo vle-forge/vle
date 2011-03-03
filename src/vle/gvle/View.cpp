@@ -81,21 +81,21 @@ void View::initAllOptions()
     GVLE::ButtonType current = getCurrentButton();
 
     switch (current) {
-    case GVLE::POINTER:
+    case GVLE::VLE_GVLE_POINTER:
         mModeling->getGVLE()->
 	    get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
         break;
-    case GVLE::ADDMODEL:
-    case GVLE::GRID:
-    case GVLE::ADDLINK:
-    case GVLE::ADDCOUPLED:
-    case GVLE::ZOOM:
-    case GVLE::QUESTION:
-    case GVLE::PLUGINMODEL:
+    case GVLE::VLE_GVLE_ADDMODEL:
+    case GVLE::VLE_GVLE_GRID:
+    case GVLE::VLE_GVLE_ADDLINK:
+    case GVLE::VLE_GVLE_ADDCOUPLED:
+    case GVLE::VLE_GVLE_ZOOM:
+    case GVLE::VLE_GVLE_QUESTION:
+    case GVLE::VLE_GVLE_PLUGINMODEL:
         mModeling->getGVLE()->
 	    get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
         break;
-    case GVLE::DELETE:
+    case GVLE::VLE_GVLE_DELETE:
         mModeling->getGVLE()->
 	    get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
         break;

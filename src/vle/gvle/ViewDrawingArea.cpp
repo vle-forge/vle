@@ -386,7 +386,7 @@ void ViewDrawingArea::drawChildrenModels()
 
 void ViewDrawingArea::drawLink()
 {
-    if (mView->getCurrentButton() == GVLE::ADDLINK and
+    if (mView->getCurrentButton() == GVLE::VLE_GVLE_ADDLINK and
         mView->isEmptySelectedModels() == false) {
         graph::Model* src = mView->getFirstSelectedModels();
 	setColor(Settings::settings().getForegroundColor());
@@ -413,8 +413,8 @@ void ViewDrawingArea::drawLink()
 
 void ViewDrawingArea::drawZoomFrame()
 {
-    if ((mView->getCurrentButton() == GVLE::ZOOM
-	 or mView->getCurrentButton() == GVLE::POINTER)
+    if ((mView->getCurrentButton() == GVLE::VLE_GVLE_ZOOM
+	 or mView->getCurrentButton() == GVLE::VLE_GVLE_POINTER)
 	 and mPrecMouse.get_x() != -1 and mPrecMouse.get_y() != -1) {
         int xmin = std::min(mMouse.get_x(), mPrecMouse.get_x());
         int xmax = std::max(mMouse.get_x(), mPrecMouse.get_x());
@@ -566,7 +566,7 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
     }
 
     switch (mView->getCurrentButton()) {
-    case GVLE::POINTER :
+    case GVLE::VLE_GVLE_POINTER :
         if (button == 1) {
 	    if (not mView->isEmptySelectedModels()) {
                 mView->displaceModel(
@@ -583,19 +583,19 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
 	    mPrecMouse = mMouse;
         }
         break;
-    case GVLE::ZOOM:
+    case GVLE::VLE_GVLE_ZOOM:
         if (button == 1) {
             queueRedraw();
         }
         break;
-    case GVLE::ADDLINK :
+    case GVLE::VLE_GVLE_ADDLINK :
         if (button == 1) {
             addLinkOnMotion((int)mMouse.get_x(), (int)mMouse.get_y());
             queueRedraw();
         }
         mPrecMouse = mMouse;
         break;
-    case GVLE::DELETE:
+    case GVLE::VLE_GVLE_DELETE:
         highlightLine((int)event->x, (int)event->y);
         mPrecMouse = mMouse;
         break;

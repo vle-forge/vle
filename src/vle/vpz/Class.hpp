@@ -84,7 +84,7 @@ namespace vle { namespace vpz {
          * @return CLASS.
          */
         virtual Base::type getType() const
-        { return CLASS; }
+        { return VLE_VPZ_CLASS; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

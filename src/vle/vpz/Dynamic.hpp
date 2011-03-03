@@ -87,7 +87,7 @@ namespace vle { namespace vpz {
          * @return Return DYNAMIC.
          */
         virtual Base::type getType() const
-        { return DYNAMIC; }
+        { return VLE_VPZ_DYNAMIC; }
 
         /**
          * @brief Assign a new package name to the dynamics.

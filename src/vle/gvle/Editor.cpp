@@ -363,25 +363,25 @@ void DocumentDrawingArea::updateCursor()
     }
 
     switch(Document::mGVLE->getCurrentButton()) {
-        case GVLE::POINTER :
+        case GVLE::VLE_GVLE_POINTER :
         daw->set_cursor(Gdk::Cursor(Gdk::HAND2));
         break;
-        case GVLE::ADDMODEL :
+        case GVLE::VLE_GVLE_ADDMODEL :
         daw->set_cursor(Gdk::Cursor(Gdk::CROSS));
         break;
-        case GVLE::ADDLINK :
+        case GVLE::VLE_GVLE_ADDLINK :
         daw->set_cursor(Gdk::Cursor(Gdk::PENCIL));
         break;
-        case GVLE::DELETE :
+        case GVLE::VLE_GVLE_DELETE :
         daw->set_cursor(Gdk::Cursor(Gdk::X_CURSOR));
         break;
-        case GVLE::ADDCOUPLED :
+        case GVLE::VLE_GVLE_ADDCOUPLED :
         daw->set_cursor(Gdk::Cursor(Gdk::DRAPED_BOX));
         break;
-        case GVLE::ZOOM :
+        case GVLE::VLE_GVLE_ZOOM :
         daw->set_cursor(Gdk::Cursor(Gdk::SIZING));
         break;
-        case GVLE::QUESTION :
+        case GVLE::VLE_GVLE_QUESTION :
         daw->set_cursor(Gdk::Cursor(Gdk::QUESTION_ARROW));
         break;
     default :

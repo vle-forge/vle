@@ -34,6 +34,12 @@
 #include <gtkmm/stock.h>
 #include <iostream>
 
+#ifdef __WIN32__
+# ifdef DELETE 
+#  undef DELETE
+# endif
+#endif
+
 namespace vle { namespace gvle {
 
 const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =

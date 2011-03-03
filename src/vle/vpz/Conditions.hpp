@@ -85,7 +85,7 @@ namespace vle { namespace vpz {
          * @return CONDITIONS.
          */
         virtual Base::type getType() const
-        { return CONDITIONS; }
+        { return VLE_VPZ_CONDITIONS; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

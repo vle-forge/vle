@@ -81,7 +81,7 @@ namespace vle { namespace vpz {
          * @return DYNAMICS.
          */
         virtual Base::type getType() const
-        { return DYNAMICS; }
+        { return VLE_VPZ_DYNAMICS; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

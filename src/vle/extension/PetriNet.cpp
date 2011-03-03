@@ -641,15 +641,16 @@ devs::Time PetriNet::init(const devs::Time& time)
     build();
     buildInitialMarking(time);
     computeEnabledTransition(time);
-    if (mSigma == 0) mPhase = RUN;
-    else mPhase = WAITING;
+    if (mSigma == 0) mPhase = VLE_EXTENSION_PETRINE_RUN;
+    else mPhase = VLE_EXTENSION_PETRINE_WAITING;
     return mSigma;
 }
 
 void PetriNet::output(const devs::Time& time,
                       devs::ExternalEventList& output) const
 {
-    if (mPhase == OUT or mPhase == OUT2) {
+    if (mPhase == VLE_EXTENSION_PETRINE_OUT or
+        mPhase == VLE_EXTENSION_PETRINE_OUT2) {
         {
             devsPlaceMarkingList::const_iterator it = mOutPlaceMarkings.begin();
 
@@ -695,15 +696,15 @@ void PetriNet::output(const devs::Time& time,
 devs::Time PetriNet::timeAdvance() const
 {
     switch (mPhase) {
-    case IDLE:
+    case VLE_EXTENSION_PETRINE_IDLE:
         return 0;
-    case WAITING:
+    case VLE_EXTENSION_PETRINE_WAITING:
         return mSigma;
-    case OUT:
+    case VLE_EXTENSION_PETRINE_OUT:
         return 0;
-    case OUT2:
+    case VLE_EXTENSION_PETRINE_OUT2:
         return 0;
-    case RUN:
+    case VLE_EXTENSION_PETRINE_RUN:
         return 0;
     }
     return devs::Time::infinity;
@@ -712,33 +713,33 @@ devs::Time PetriNet::timeAdvance() const
 void PetriNet::internalTransition(const devs::Time& time)
 {
     switch (mPhase) {
-    case IDLE:
+    case VLE_EXTENSION_PETRINE_IDLE:
         {
-            mPhase = OUT;
+            mPhase = VLE_EXTENSION_PETRINE_OUT;
             break;
         }
-    case OUT:
+    case VLE_EXTENSION_PETRINE_OUT:
         {
             disableOutTransition();
             disableOutPlace(time);
             computeEnabledTransition(time);
-            if (mSigma == 0) mPhase = RUN;
-            else mPhase = WAITING;
+            if (mSigma == 0) mPhase = VLE_EXTENSION_PETRINE_RUN;
+            else mPhase = VLE_EXTENSION_PETRINE_WAITING;
             break;
         }
-    case OUT2:
+    case VLE_EXTENSION_PETRINE_OUT2:
         {
             disableOutTransition();
             disableOutPlace(time);
-            if (mSigma == 0) mPhase = RUN;
-            else mPhase = WAITING;
+            if (mSigma == 0) mPhase = VLE_EXTENSION_PETRINE_RUN;
+            else mPhase = VLE_EXTENSION_PETRINE_WAITING;
             break;
         }
-    case WAITING:
-    case RUN:
+    case VLE_EXTENSION_PETRINE_WAITING:
+    case VLE_EXTENSION_PETRINE_RUN:
         {
             run(time);
-            mPhase = OUT2;
+            mPhase = VLE_EXTENSION_PETRINE_OUT2;
         }
     }
 }
@@ -780,7 +781,7 @@ void PetriNet::externalTransition(const devs::ExternalEventList& event,
         }
         ++it;
     }
-    mPhase = IDLE;
+    mPhase = VLE_EXTENSION_PETRINE_IDLE;
 }
 
 value::Value* PetriNet::observation(const devs::ObservationEvent& event) const

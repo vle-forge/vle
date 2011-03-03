@@ -411,7 +411,7 @@ bool SimpleViewDrawingArea::on_button_press_event(GdkEventButton* event)
 					 2 * MODEL_RADIUS, 2 * MODEL_RADIUS);
 
     switch (currentbutton) {
-    case GVLE::POINTER:
+    case GVLE::VLE_GVLE_POINTER:
         if (event->type == GDK_BUTTON_PRESS and event->button == 1) {
 	    on_gvlepointer_button_1(model, shiftOrControl);
 	    queueRedraw();
@@ -424,37 +424,37 @@ bool SimpleViewDrawingArea::on_button_press_event(GdkEventButton* event)
             queueRedraw();
         }
         break;
-    case GVLE::ADDMODEL:
+    case GVLE::VLE_GVLE_ADDMODEL:
         mView->addAtomicModel(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::ADDLINK:
+    case GVLE::VLE_GVLE_ADDLINK:
         if (event->button == 1) {
             addLinkOnButtonPress(mMouse.get_x(), mMouse.get_y());
             mPrecMouse = mMouse;
             queueRedraw();
         }
         break;
-    case GVLE::DELETE:
+    case GVLE::VLE_GVLE_DELETE:
         delUnderMouse(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::QUESTION:
+    case GVLE::VLE_GVLE_QUESTION:
         mModeling->showDynamics((model) ? model->getName() :
                                 mCurrent->getName());
         break;
-    case GVLE::ZOOM:
+    case GVLE::VLE_GVLE_ZOOM:
         if (event->button == 1) {
             mPrecMouse = mMouse;
             queueRedraw();
         }
         queueRedraw();
         break;
-    case GVLE::PLUGINMODEL:
+    case GVLE::VLE_GVLE_PLUGINMODEL:
         mView->addPluginModel(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::ADDCOUPLED:
+    case GVLE::VLE_GVLE_ADDCOUPLED:
         if (event->button == 1) {
             if (model) {
                 mView->addModelInListModel(model, shiftOrControl);
@@ -478,7 +478,7 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
     mMouse.set_y((int)(event->y / mZoom));
 
     switch (mView->getCurrentButton()) {
-    case GVLE::POINTER:
+    case GVLE::VLE_GVLE_POINTER:
 	if (event->button == 1) {
 	    for(int x = std::min(mMouse.get_x(), mPrecMouse.get_x());
 		x <= std::max(mMouse.get_x(), mPrecMouse.get_x());
@@ -513,11 +513,11 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
 	mPrecMouse.set_x(-1);
 	mPrecMouse.set_y(-1);
 	break;
-    case GVLE::ADDLINK:
+    case GVLE::VLE_GVLE_ADDLINK:
         addLinkOnButtonRelease(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::ZOOM:
+    case GVLE::VLE_GVLE_ZOOM:
         if (event->button == 1) {
             // to not zoom in case of very small selection.
             if (std::max(mMouse.get_x(), mPrecMouse.get_x()) -

@@ -83,7 +83,7 @@ namespace vle { namespace vpz {
          * @return Return VPZ.
          */
         virtual Base::type getType() const
-        { return VPZ; }
+        { return VLE_VPZ_VPZ; }
 
         /**
          * @brief Open a VPZ file project.

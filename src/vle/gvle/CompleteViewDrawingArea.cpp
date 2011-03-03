@@ -48,19 +48,19 @@ CompleteViewDrawingArea::CompleteViewDrawingArea(View* view) :
 void CompleteViewDrawingArea::draw()
 {
     if (mIsRealized and mBuffer) {
-	maxModelWidthHeight();
+        maxModelWidthHeight();
         calcRectSize();
-	mContext->save();
-	mContext->scale(mZoom, mZoom);
-	drawCurrentCoupledModel();
+        mContext->save();
+        mContext->scale(mZoom, mZoom);
+        drawCurrentCoupledModel();
         drawCurrentModelPorts();
         drawConnection();
         drawChildrenModels();
         drawLink();
         drawZoomFrame();
         drawHighlightConnection();
-	set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
-	mContext->restore();
+        set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
+        mContext->restore();
     }
 }
 
@@ -181,31 +181,31 @@ ViewDrawingArea::StraightLine CompleteViewDrawingArea::computeConnection(
     Point outpt(xs, ys);
 
     list.push_back(Point((int)(xs),
-			 (int)(ys)));
+                         (int)(ys)));
     list.push_back(Point((int)((xs + SPACING_MODEL_PORT)),
-			 (int)(ys)));
+                         (int)(ys)));
     if (con.x2 >= con.x1) {
-	list.push_back(Point((int)(con.x1),
-			     (int)(con.y4)));
+        list.push_back(Point((int)(con.x1),
+                             (int)(con.y4)));
 
-	if (con.x2 > con.x1) {
-	    list.push_back(Point((int)(con.x1),
-				 (int)(con.y3)));
-	}
+        if (con.x2 > con.x1) {
+            list.push_back(Point((int)(con.x1),
+                                 (int)(con.y3)));
+        }
     } else {
-	list.push_back(Point((int)(con.x1),
-			     (int)(con.y4)));
-	list.push_back(Point((int)(con.x1),
-			     (int)(con.y1)));
-	list.push_back(Point((int)(con.x2),
-			     (int)(con.y1)));
+        list.push_back(Point((int)(con.x1),
+                             (int)(con.y4)));
+        list.push_back(Point((int)(con.x1),
+                             (int)(con.y1)));
+        list.push_back(Point((int)(con.x2),
+                             (int)(con.y1)));
     }
     list.push_back(Point((int)(con.x2),
-			 (int)(con.y3)));
+                         (int)(con.y3)));
     list.push_back(Point((int)(xd - SPACING_MODEL_PORT),
-			 (int)(yd)));
+                         (int)(yd)));
     list.push_back(Point((int)(xd),
-			 (int)(yd)));
+                         (int)(yd)));
     return list;
 }
 
@@ -237,9 +237,9 @@ void CompleteViewDrawingArea::drawChildrenModel(graph::Model* model,
 {
     setColor(color);
     mContext->rectangle(model->x() + mOffset,
-			(model->y()) + mOffset,
-			(model->width()),
-			(model->height()));
+                        (model->y()) + mOffset,
+                        (model->width()),
+                        (model->height()));
     mContext->stroke();
 
     drawChildrenPorts(model, color);
@@ -260,8 +260,8 @@ void CompleteViewDrawingArea::drawChildrenPorts(graph::Model* model,
     const int    mY = model->y();
 
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_OBLIQUE,
-			       Cairo::FONT_WEIGHT_NORMAL);
+                               Cairo::FONT_SLANT_OBLIQUE,
+                               Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     itl = ipl.begin();
@@ -269,29 +269,29 @@ void CompleteViewDrawingArea::drawChildrenPorts(graph::Model* model,
     for (size_t i = 0; i < maxInput; ++i) {
 
         // to draw the port
-	setColor(color);
-	mContext->move_to(mX,
-			  (mY + stepInput * (i + 1) -
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX),
-			  (mY + stepInput * (i + 1) +
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX + MODEL_SPACING_PORT),
-			  (mY + stepInput * (i + 1)));
-	mContext->line_to(mX,
-			  (mY + stepInput * (i + 1) -
-					 MODEL_SPACING_PORT));
-	mContext->fill();
-	mContext->stroke();
+        setColor(color);
+        mContext->move_to(mX,
+                          (mY + stepInput * (i + 1) -
+                           MODEL_SPACING_PORT));
+        mContext->line_to((mX),
+                          (mY + stepInput * (i + 1) +
+                           MODEL_SPACING_PORT));
+        mContext->line_to((mX + MODEL_SPACING_PORT),
+                          (mY + stepInput * (i + 1)));
+        mContext->line_to(mX,
+                          (mY + stepInput * (i + 1) -
+                                         MODEL_SPACING_PORT));
+        mContext->fill();
+        mContext->stroke();
 
-	// to draw the label of the port
-	if (mZoom >= 1.0) {
-	    mContext->move_to((mX + PORT_SPACING_LABEL),
-			      (mY + stepInput * (i + 1) + 10));
-	    mContext->show_text(itl->first);
-	    mContext->stroke();
-	}
-	itl++;
+        // to draw the label of the port
+        if (mZoom >= 1.0) {
+            mContext->move_to((mX + PORT_SPACING_LABEL),
+                              (mY + stepInput * (i + 1) + 10));
+            mContext->show_text(itl->first);
+            mContext->stroke();
+        }
+        itl++;
     }
 
     itl = opl.begin();
@@ -299,37 +299,37 @@ void CompleteViewDrawingArea::drawChildrenPorts(graph::Model* model,
     for (size_t i = 0; i < maxOutput; ++i) {
 
         // to draw the port
-	setColor(color);
-	mContext->move_to((mX + model->width()),
-			  (mY + stepOutput * (i + 1) -
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX + model->width()),
-			  (mY + stepOutput * (i + 1) +
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX + MODEL_SPACING_PORT +
-			   model->width()),
-			  (mY + stepOutput * (i + 1)));
-	mContext->line_to((mX + model->width()),
-			  (mY + stepOutput * (i + 1) -
-			    MODEL_SPACING_PORT));
-	mContext->fill();
-	mContext->stroke();
+        setColor(color);
+        mContext->move_to((mX + model->width()),
+                          (mY + stepOutput * (i + 1) -
+                           MODEL_SPACING_PORT));
+        mContext->line_to((mX + model->width()),
+                          (mY + stepOutput * (i + 1) +
+                           MODEL_SPACING_PORT));
+        mContext->line_to((mX + MODEL_SPACING_PORT +
+                           model->width()),
+                          (mY + stepOutput * (i + 1)));
+        mContext->line_to((mX + model->width()),
+                          (mY + stepOutput * (i + 1) -
+                            MODEL_SPACING_PORT));
+        mContext->fill();
+        mContext->stroke();
 
-	// to draw the label of the port
-	if (mZoom >= 1.0) {
-	    setColor(color);
-	    mContext->move_to((mX + model->width() +
-			     PORT_SPACING_LABEL),
-			    (mY + stepOutput * (i + 1) + 10));
-	    mContext->show_text(itl->first);
-	    mContext->stroke();
-	}
-	itl++;
+        // to draw the label of the port
+        if (mZoom >= 1.0) {
+            setColor(color);
+            mContext->move_to((mX + model->width() +
+                             PORT_SPACING_LABEL),
+                            (mY + stepOutput * (i + 1) + 10));
+            mContext->show_text(itl->first);
+            mContext->stroke();
+        }
+        itl++;
     }
 
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+                               Cairo::FONT_SLANT_NORMAL,
+                               Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     if (mZoom >= 1.0) {
@@ -337,8 +337,8 @@ void CompleteViewDrawingArea::drawChildrenPorts(graph::Model* model,
         mContext->get_text_extents(model->getName(), textExtents);
         mContext->move_to((model->x() + (model->width() / 2) -
                            (textExtents.width / 2)),
-			  (model->y() + model->height() +
-			   MODEL_SPACING_PORT) + 10);
+                          (model->y() + model->height() +
+                           MODEL_SPACING_PORT) + 10);
         mContext->show_text(model->getName());
     }
 }
@@ -390,50 +390,50 @@ bool CompleteViewDrawingArea::on_button_press_event(GdkEventButton* event)
     graph::Model* model = mCurrent->find(mMouse.get_x(), mMouse.get_y());
 
     switch (currentbutton) {
-    case GVLE::POINTER:
+    case GVLE::VLE_GVLE_POINTER:
         if (event->type == GDK_BUTTON_PRESS and event->button == 1) {
             on_gvlepointer_button_1(model, shiftOrControl);
             queueRedraw();
         } else if (event->type == GDK_2BUTTON_PRESS and event->button == 1) {
-	    mView->showModel(model);
+            mView->showModel(model);
         } else if (event->button == 2) {
-	    mView->showModel(model);
+            mView->showModel(model);
         }
         if (not model) {
             queueRedraw();
         }
         break;
-    case GVLE::ADDMODEL:
+    case GVLE::VLE_GVLE_ADDMODEL:
         mView->addAtomicModel(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::ADDLINK:
+    case GVLE::VLE_GVLE_ADDLINK:
         if (event->button == 1) {
             addLinkOnButtonPress(mMouse.get_x(), mMouse.get_y());
             mPrecMouse = mMouse;
             queueRedraw();
         }
         break;
-    case GVLE::DELETE:
+    case GVLE::VLE_GVLE_DELETE:
         delUnderMouse(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::QUESTION:
+    case GVLE::VLE_GVLE_QUESTION:
         mModeling->showDynamics((model) ? model->getName() :
                                 mCurrent->getName());
         break;
-    case GVLE::ZOOM:
+    case GVLE::VLE_GVLE_ZOOM:
         if (event->button == 1) {
             mPrecMouse = mMouse;
             queueRedraw();
         }
         queueRedraw();
         break;
-    case GVLE::PLUGINMODEL:
+    case GVLE::VLE_GVLE_PLUGINMODEL:
         mView->addPluginModel(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::ADDCOUPLED:
+    case GVLE::VLE_GVLE_ADDCOUPLED:
         if (event->button == 1) {
             if (model) {
                 mView->addModelInListModel(model, shiftOrControl);
@@ -457,24 +457,24 @@ bool CompleteViewDrawingArea::on_button_release_event(GdkEventButton* event)
     mMouse.set_y((int)(event->y / mZoom));
 
     switch (mView->getCurrentButton()) {
-    case GVLE::POINTER:
-	if (event->button == 1) {
-	    for(int x = std::min(mMouse.get_x(), mPrecMouse.get_x());
-		x <= std::max(mMouse.get_x(), mPrecMouse.get_x());
-		++x) {
-		for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
-		     y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
-		     ++y) {
-		    graph::Model* model = mCurrent->find(x, y);
-		    if (model)
-			if (not mView->existInSelectedModels(model))
-			    mView->addModelToSelectedModels(model);
-		}
-	    }
-	    queueRedraw();
+    case GVLE::VLE_GVLE_POINTER:
+        if (event->button == 1) {
+            for(int x = std::min(mMouse.get_x(), mPrecMouse.get_x());
+                x <= std::max(mMouse.get_x(), mPrecMouse.get_x());
+                ++x) {
+                for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
+                     y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
+                     ++y) {
+                    graph::Model* model = mCurrent->find(x, y);
+                    if (model)
+                        if (not mView->existInSelectedModels(model))
+                            mView->addModelToSelectedModels(model);
+                }
+            }
+            queueRedraw();
         } else if (event->button == 3) {
             mView->clearSelectedModels();
-	    queueRedraw();
+            queueRedraw();
         }
 
         if (mView->getAllSelectedModels().size() == 1) {
@@ -487,14 +487,14 @@ bool CompleteViewDrawingArea::on_button_release_event(GdkEventButton* event)
                 mModeling->getGVLE()->getModelTreeBox()->showRow(mod);
             }
         }
-	mPrecMouse.set_x(-1);
-	mPrecMouse.set_y(-1);
-	break;
-    case GVLE::ADDLINK:
+        mPrecMouse.set_x(-1);
+        mPrecMouse.set_y(-1);
+        break;
+    case GVLE::VLE_GVLE_ADDLINK:
         addLinkOnButtonRelease(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
         break;
-    case GVLE::ZOOM:
+    case GVLE::VLE_GVLE_ZOOM:
         if (event->button == 1) {
             // to not zoom in case of very small selection.
             if (std::max(mMouse.get_x(), mPrecMouse.get_x()) -
@@ -536,28 +536,28 @@ void CompleteViewDrawingArea::onOrder()
     graph::ModelList::const_iterator it = mCurrent->getModelList().begin();
 
     while (it != mCurrent->getModelList().end()) {
-	do {
-	    ++compteur;
-	    x = mModeling->getRand()->getInt(0, mCasesWidth - 1);
-	    y = mModeling->getRand()->getInt(0, mCasesHeight - 1);
-	    key = boost::lexical_cast < std::string > (x) + ":" +
-		boost::lexical_cast < std::string > (y);
-	    if (compteur == 100) {
-		mRectWidth += mMaxWidth + 15;
-		mRectHeight += mMaxHeight + 15;
-		mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) /
-		    (mMaxWidth + 15);
-		mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) /
-		    (mMaxHeight + 15);
-		compteur = 0;
-	    }
-	} while (std::find(mGrid.begin(), mGrid.end(), key) != mGrid.end());
+        do {
+            ++compteur;
+            x = mModeling->getRand()->getInt(0, mCasesWidth - 1);
+            y = mModeling->getRand()->getInt(0, mCasesHeight - 1);
+            key = boost::lexical_cast < std::string > (x) + ":" +
+                boost::lexical_cast < std::string > (y);
+            if (compteur == 100) {
+                mRectWidth += mMaxWidth + 15;
+                mRectHeight += mMaxHeight + 15;
+                mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) /
+                    (mMaxWidth + 15);
+                mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) /
+                    (mMaxHeight + 15);
+                compteur = 0;
+            }
+        } while (std::find(mGrid.begin(), mGrid.end(), key) != mGrid.end());
 
-	compteur = 0;
-	mGrid.push_back(key);
-	it->second->setX((x * (mMaxWidth + 15)) + MODEL_PORT + mOffset + 15);
-	it->second->setY((y * (mMaxHeight + 15)) + MODEL_PORT + mOffset + 15);
-	++it;
+        compteur = 0;
+        mGrid.push_back(key);
+        it->second->setX((x * (mMaxWidth + 15)) + MODEL_PORT + mOffset + 15);
+        it->second->setY((y * (mMaxHeight + 15)) + MODEL_PORT + mOffset + 15);
+        ++it;
     }
     queueRedraw();
 }

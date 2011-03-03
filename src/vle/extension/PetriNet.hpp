@@ -222,7 +222,9 @@ namespace vle { namespace extension {
         typedef std::vector < Token* > TokenList;
         typedef std::pair < devs::Time, Transition* > pairTimeTransition;
 
-        typedef enum { IDLE, WAITING, OUT, OUT2, RUN } phase;
+        typedef enum { VLE_EXTENSION_PETRINE_IDLE,
+            VLE_EXTENSION_PETRINE_WAITING, VLE_EXTENSION_PETRINE_OUT,
+            VLE_EXTENSION_PETRINE_OUT2, VLE_EXTENSION_PETRINE_RUN } phase;
 
         class Token
         {

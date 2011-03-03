@@ -76,7 +76,7 @@ namespace vle { namespace vpz {
          * @return The Base::EXPERIMENT.
          */
         virtual Base::type getType() const
-        { return EXPERIMENT; }
+        { return VLE_VPZ_EXPERIMENT; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

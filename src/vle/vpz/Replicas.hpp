@@ -70,7 +70,7 @@ namespace vle { namespace vpz {
          * @return REPLICAS.
          */
         virtual Base::type getType() const
-        { return REPLICAS; }
+        { return VLE_VPZ_REPLICAS; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

@@ -91,7 +91,7 @@ namespace vle { namespace vpz {
          * @return VIEW.
          */
         virtual Base::type getType() const
-        { return VIEW; }
+        { return VLE_VPZ_VIEW; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

@@ -63,7 +63,7 @@ namespace vle { namespace vpz {
          * @return STRUCTURES.
          */
         virtual Base::type getType() const
-        { return STRUCTURES; }
+        { return VLE_VPZ_STRUCTURES; }
     };
 
 }} // namespace vle vpz

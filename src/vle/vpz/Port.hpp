@@ -63,7 +63,7 @@ namespace vle { namespace vpz {
          * @return IN.
          */
         virtual Base::type getType() const
-        { return IN; }
+        { return VLE_VPZ_IN; }
     };
 
     /**
@@ -95,7 +95,7 @@ namespace vle { namespace vpz {
          * @return OUT.
          */
         virtual Base::type getType() const
-        { return OUT; }
+        { return VLE_VPZ_OUT; }
     };
 
     /**
@@ -127,7 +127,7 @@ namespace vle { namespace vpz {
          * @return INIT.
          */
         virtual Base::type getType() const
-        { return INIT; }
+        { return VLE_VPZ_INIT; }
     };
 
     /**
@@ -159,7 +159,7 @@ namespace vle { namespace vpz {
          * @return STATE.
          */
         virtual Base::type getType() const
-        { return STATE; }
+        { return VLE_VPZ_STATE; }
     };
 
     /**
@@ -191,7 +191,7 @@ namespace vle { namespace vpz {
          * @return PORT.
          */
         virtual Base::type getType() const
-        { return PORT; }
+        { return VLE_VPZ_PORT; }
     };
 
 }} // namespace vle vlz
