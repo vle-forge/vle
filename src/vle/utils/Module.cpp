@@ -31,6 +31,7 @@
 #include <vle/utils/i18n.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
+#include <boost/config.hpp>
 #include <algorithm>
 
 namespace vle { namespace utils {
@@ -47,7 +48,8 @@ Module::Module(const std::string& path, const std::string& file)
     if (not (*mModule.get())) {
         throw utils::ArgError(fmt(
                 _("Module: cannot load dynamic library `%1%' in directory"
-                  " `%2%' using path `%3%'")) % file % path % filename);
+                  " `%2%' using path `%3%' (%4%)")) % file % path % filename %
+            Glib::Module::get_last_error());
     }
 }
 
@@ -57,7 +59,8 @@ Module::Module(const std::string& filename)
 
     if (not (*mModule.get())) {
         throw utils::ArgError(fmt(
-                _("Module: cannot load dynamic library `%1%'")) % filename);
+                _("Module: cannot load dynamic library `%1%' (%2%)")) %
+            filename % Glib::Module::get_last_error());
     }
 }
 
@@ -108,7 +111,7 @@ std::string Module::getPathName(const std::string& path,
 
     fs::path file(name);
 
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
     if (fs::extension(file) != ".dll") {
         pluginname += ".dll";
     }
@@ -156,7 +159,7 @@ void ModuleCache::fill(std::vector < ModuleCache::iterator >& output,
         for (; it != end; ++it) {
             if (fs::is_regular_file(it->status())) {
                 try {
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
                     if (fs::extension(*it) == ".dll")
 #else
                     if (fs::extension(*it) == ".so")
