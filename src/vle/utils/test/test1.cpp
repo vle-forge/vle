@@ -34,6 +34,7 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/config.hpp>
 #include <stdexcept>
 #include <limits>
 #include <fstream>
@@ -423,10 +424,17 @@ BOOST_AUTO_TEST_CASE(to_scientific_string_function)
     BOOST_REQUIRE_EQUAL(vu::toScientificString(0.0),"0");
     BOOST_REQUIRE_EQUAL(vu::toScientificString(-1504),"-1504");
     BOOST_REQUIRE_EQUAL(vu::toScientificString(3022),"3022");
+#ifdef BOOST_WINDOWS
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(123456789123456789.0),
+                        "1.23456789123457e+017");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(0.00000000000000000000982),
+                        "9.82e-021");
+#else
     BOOST_REQUIRE_EQUAL(vu::toScientificString(123456789123456789.0),
                         "1.23456789123457e+17");
     BOOST_REQUIRE_EQUAL(vu::toScientificString(0.00000000000000000000982),
                         "9.82e-21");
+#endif
     BOOST_REQUIRE_EQUAL(vu::toScientificString(-0.12345),
                         "-0.12345");
     BOOST_REQUIRE_EQUAL(vu::toScientificString(0.12345),
