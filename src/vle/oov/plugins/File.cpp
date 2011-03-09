@@ -72,9 +72,8 @@ void File::onParameter(const std::string& plugin,
                 m_file.imbue(selected);
             }
         } catch (...) {
-            throw utils::ArgError(fmt(
-                    _("Output plug-in '%1%': unknow locale '%2%'")) %
-                plugin % locale);
+            std::locale selected("C");
+            m_file.imbue(selected);
         }
 
         if (map->exist("type")) {

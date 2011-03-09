@@ -85,9 +85,8 @@ public:
                         std::cout.imbue(selected);
                     }
                 } catch (...) {
-                    throw utils::ArgError(fmt(
-                            _("Output plug-in '%1%': unknow locale '%2%'")) %
-                        plugin % locale);
+                    std::locale selected("C");
+                    std::cout.imbue(selected);
                 }
             }
 
