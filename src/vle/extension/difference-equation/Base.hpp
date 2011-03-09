@@ -386,6 +386,8 @@ protected:
     bool mActive;
     bool mDependance;
     unsigned int mReceive;
+    unsigned int mNosyncReceive;
+    vle::devs::Time mNosyncReceiveTime;
     vle::devs::Time mSigma;
     vle::devs::Time mSigma2;
     vle::devs::Time mLastTime;

@@ -49,6 +49,7 @@ Base::Base(const DynamicsInit& model,
     mControl(control),
     mSynchro(false),
     mAllSynchro(false),
+    mNosyncReceiveTime(vle::devs::Time::infinity),
     mLastComputeTime(vle::devs::Time::infinity),
     mLastClearTime(vle::devs::Time::infinity),
     mWaiting(0)
@@ -393,6 +394,8 @@ void Base::processUpdate(const std::string& name,
             addExternalValue(value, name);
             if (not sync) {
                 mNosyncReceivedValues[name] = time;
+                mNosyncReceiveTime = time;
+                ++mNosyncReceive;
             } else {
                 if (mState == INIT or (mState == PRE and end)) {
                     ++mReceive;
@@ -494,6 +497,7 @@ Time Base::init(const devs::Time& time)
     }
 
     mReceive = 0;
+    mNosyncReceive = 0;
     mLastTime = time;
     mState = SEND_INIT;
     return 0.0;
@@ -534,6 +538,7 @@ void Base::internalTransition(const Time& time)
 
             if (mReceive == mSyncs and mWaiting <= 0) {
                 mReceive = 0;
+                mNosyncReceive = 0;
             }
 
             if (mActive and check()) {
@@ -626,6 +631,7 @@ void Base::internalTransition(const Time& time)
         break;
     case POST:
         mReceive = 0;
+        mNosyncReceive = 0;
         if (mSynchro or mAllSynchro) {
             mState = PRE;
         } else {
@@ -662,7 +668,14 @@ void Base::externalTransition(const ExternalEventList& event,
                 (mState == SEND_INIT or mState == POST_SEND_INIT)) {
                 std::string name = (*it)->getStringAttributeValue("name");
 
-                if (mReceive == 0 and mSyncs > 0 and
+                if ((mNosyncReceiveTime < time or
+                     mNosyncReceiveTime.isInfinity()) and
+                    (mLastComputeTime < time or
+                     mLastComputeTime.isInfinity())) {
+                    mNosyncReceive = 0;
+                }
+
+                if (mNosyncReceive == 0 and mReceive == 0 and mSyncs > 0 and
                     (mLastComputeTime < time or
                      mLastComputeTime.isInfinity())) {
                     clearReceivedValues();
@@ -705,11 +718,19 @@ void Base::externalTransition(const ExternalEventList& event,
 
             if ((*it)->existAttributeValue("value") or
                 (mState == SEND_INIT or mState == POST_SEND_INIT)) {
-                if (mReceive == 0 and mSyncs > 0 and
+
+                if ((mNosyncReceiveTime < time or
+                     mNosyncReceiveTime.isInfinity()) and
+                    (mLastComputeTime < time or
+                     mLastComputeTime.isInfinity())) {
+                    mNosyncReceive = 0;
+                }
+
+                if (mNosyncReceive == 0 and mReceive == 0 and mSyncs > 0 and
                     (mLastComputeTime < time or
                      mLastComputeTime.isInfinity())) {
                     clearReceivedValues();
-                }
+}
                 processUpdate(name, **it, begin, end, time);
                 ignore = false;
             }
@@ -756,6 +777,7 @@ void Base::externalTransition(const ExternalEventList& event,
                 }
                 if (mReceive == mSyncs) {
                     mReceive = 0;
+                    mNosyncReceive = 0;
                 }
             }
         } else {
@@ -764,6 +786,7 @@ void Base::externalTransition(const ExternalEventList& event,
                 mSigma = 0;
                 if (mReceive == mSyncs and mWaiting <= 0) {
                     mReceive = 0;
+                    mNosyncReceive = 0;
                 }
             } else {
                 if ((mState == RUN or mState == PRE)
