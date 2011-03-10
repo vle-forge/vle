@@ -1,6 +1,6 @@
 prefix=@VLE_PKGCONFIG_PREFIXPATH@
 exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
+libdir=${exec_prefix}/@VLE_PKGCONFIG_LIBDIR@
 includedir=${prefix}/include
 
 Name: vle
