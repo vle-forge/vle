@@ -1,4 +1,261 @@
-vle-1.0.0-alpha3
+vle-1.0.0-alpha4
+
+commit ce9038f0c8dbffe19d4592c2a17888489cbbb5f7
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Mar 11 11:09:40 2011 +0100
+
+    vle: update NEWS
+
+commit 16b755aa6af5dab44cba768f3d870aafdb4c9252
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Mar 11 10:31:08 2011 +0100
+
+    cpack: fix the default rpm and deb package name
+    
+    The RPM and Deb package use a name `vle-1.0' instead of `vle-1-0' for
+    Deb and `vle' for RPM.
+
+commit f6d63c13946bb15f05c310fb84610389065ead4e
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Mar 10 17:29:42 2011 +0100
+
+    win32: fix paths in vle's pkg-config files
+    
+    The Boost include path is no longer useful in Windows portage since the
+    Boost headers are included into the include global directory instead of
+    a prefixed Boost directory (ie. $prefix/vle/include/boost instead of
+    $prefix/vle/include/boost-1.46.0/boost).
+    
+    - Replace the $prefix/include/boost-x.y path from the -I cflags options
+      with the $prefix/include option.
+    - Replace the $prefix/lib into $prefix/bin since the Dll in bin are
+      resolved with g++.
+
+commit 6ba2990ae304ec933e01d31f96cb2488eec05b4a
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Mar 10 14:04:41 2011 +0100
+
+    win32: install the Boost headers directory
+    
+    The previous patch introduced an error in CPack script. The Boost
+    include directories was not copied into the include directory of the
+    NSIS package.
+
+commit 7b6a07e237fd34455daac2c18202ef30864d38e6
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Tue Feb 1 15:26:54 2011 +0100
+
+    gvle: fix the management of the events in fsa states
+    
+    Fix the management of the list of events in an fsa state. An event could
+    not be removed. Now it is enabled. (Closes: #3165901). Fix inclusion of
+    bogus output port when modifying a transition.
+    
+    gvle/modeling/fsa:
+    
+    - The container of events is emptied before to be feeded from the
+      dialog.
+    - When a transition has as send an empty string the port is not added.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 836d97697e6e710ff14359186f75fed101e94eb8
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Mar 9 13:26:10 2011 +0100
+
+    oov: fix default locale of the oov plug-ins
+    
+    In SimpleFile, Console and File plug-ins, if the users does not select a
+    locale, the Win32 std::locale throw exception. To avoid the problem, if
+    an error occured on Win32 or POSIX systems, the default locale "C" is
+    used.
+
+commit fdb06d9acd021e17809a23d30f154d1088aac0f0
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Mar 9 09:41:44 2011 +0100
+
+    win32: fix the toScientificString unit test
+    
+    The toScientificString() function returns a prefixed exponent by `0'.
+    For example, the real 1234 is transformed in `1.234e3' under linux and
+    `1.234e03' under Win32 systems. We just fix the unit test since this
+    function is used to improve the readability in GVLE application.
+
+commit 9ad16a322cb3a64b74f777af2aa8fdf240e87b12
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Mar 8 15:32:05 2011 +0100
+
+    cpack: fix Win32 variable name
+    
+    To avoid conflicts with CMake module variable, we change the name of
+    CPack variable (Boost_LIBRARY become VLE_BOOST_LIBRARY etc).
+
+commit 731696b16c099c84b0cc971243103f4a7413342e
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Thu Feb 3 14:27:32 2011 +0100
+
+    ext/fsa: fix bug on the call of send function
+    
+    On a transition, a send function can be called more than once but it
+    should not. A unit test is added that shows the problem and another test
+    (statechart8) is modified.
+
+commit 8cc40305a703f8169dcb9f199fbd7a70dfdf755b
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Wed Mar 9 08:52:08 2011 +0100
+
+    ext/de: fix bug on asynchronous variable receive
+    
+    When a bag contains asynchronous and synchronous variables, if the first
+    variable is asynchronous then the counter of received variables isn't
+    reset at correct moment. The asynchronous variables are ignored in this
+    case.
+    
+    This bug appears randomly because it depends to the order of element in
+    current bag.
+
+commit e2a65efd635768f394726ab92b2385edef3786ee
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Mar 8 14:59:06 2011 +0100
+
+    cpack: strip files before building package
+    
+    Since CMake 2.6, we can strip executables and shared libraries with the
+    CPack CPACK_STRIP_FILES variables which can be true or false now. We use
+    it to reduce file size.
+
+commit 1f71105f713214bb92a0ee6403651e596c211dd7
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Mar 3 11:29:43 2011 +0100
+
+    cpack: fix new win32 packaging tools
+    
+    We fix CMake and CPack scripts for the new Gtkmm-2.22 binaries provided
+    by Gtkmm project [1]. Somes dynamic libraries or headers are removed,
+    another are added. In addition, we change the MINGW_BASE, GTKMM_BASE,
+    BOOST_INCLUDE_DIRECTORY environment variables into CMake variables.
+    
+    [1] http://ftp.gnome.org/pub/GNOME/binaries/win32/gtkmm
+
+commit f55f019a0f586e0b32189cb7ab891b4929bdfaca
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Mar 3 11:34:25 2011 +0100
+
+    win32: remove IN and OUT symbols from VFL's API
+    
+    Enumeration with IN or OUT symbols collide with Windows API. The
+    Windows.h file is include by Boost::thread API. We fix VFL's API in vpz,
+    extension and gvle API.
+
+commit 9383ae82cc6c3934c5a76495ca9533e1c46fcf26
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Mar 3 11:09:37 2011 +0100
+
+    win32: fix the WIN32 detection in utils::Module
+    
+    The utils::Module code does not detect correctly the Win32 API since
+    G_OS_WIN32 is undefined whitout the Glib headers. We replace Glib
+    headers with boost/config.hpp file which define a BOOST_WINDOWS for
+    WIN32 and WIN64 API.
+
+commit a84ed5de41ae165336528f51212bede4d0cf4707
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Feb 24 14:34:47 2011 +0100
+
+    win32: update to Boost 1.46 and c++0x
+    
+    - Add a portable way to use the boost::thread library which is defined
+      as libboost_thread_win32-mt.dll. We need to use the CMake 2.8.4 with
+      the Boost_THREADAPI patch to correctly found the library.
+    - Add the c++0x cxxflags parameters to MinGW to compile Boost 1.46
+      without error about the boost::filesystem3::copy_file.
+    - Update source code to compile with the c++0x standard.
+
+commit 19b20fb57c1c11e24119cf23fa4914cfd56d7065
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Feb 1 15:49:39 2011 +0100
+
+    utils: add a generic dynamic loading shared libs
+    
+    We add a utils::Module and utils::ModuleCache to build Generic method.
+    The utils::ModuleCache is a singleton to regroup all dynamic loading
+    shared libraries. utils::ModuleCache and utils::Module are multi-thread
+    safe with a boost::thread mutex.
+    
+    - vle: add a dependency to boost::thread.
+    - utils: now oov's plug-ins and gvle' plug-ins are searched into
+      packages instead of current package only. (Closes: #3164878).
+    - devs, oov, eov, gvle: update devs::ModelFactory with new dynamic
+      module loading system.
+    - vpz: add package parameter into the vpz::Output, vpz::View classes.
+
+commit 4bb5e40f062a61edaae3eaf4498d4fb532f57533
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Mon Jan 31 18:55:31 2011 +0100
+
+    ext/de: fix bug on size method
+    
+    If an history is defined, only the two first values defines are used. The others values
+    are ignored.
+
+commit 1aac4e63c1e960c435a8d007fbec062e89baed3c
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Wed Jan 12 10:35:13 2011 +0100
+
+    ext/de: fix bug for early perturbation
+    
+    When DE models are perturbed early, the perturbation is ignored.
+
+commit 6cdcd5058ca49177c0c86d40ef6c7dfeda7c77f1
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Tue Jan 25 09:46:43 2011 +0100
+
+    gvle: fix the fsa source generator
+    
+    Fix the the wrong source code generation of the fsa plugin. The line
+    where the states of the fsa is defined is not commented
+    anymore. (Closes: #3163495).
+    
+    - gvle/modeling/fsa: modify the fsa template definition.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit b415c8e89bdd70a6bb3cd0101f799df34c7cedab
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Jan 25 09:11:35 2011 +0100
+
+    gvle: update the package tree view after simulation
+    
+    We need to refresh the package hierarchy tree view to show the
+    observations files into the output directory.
+
+commit 74a38c4c17d6842035ace1c7921d386f644b2620
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Jan 24 13:34:46 2011 +0100
+
+    value: add find() methods to value::Map
+    
+    The value::Map uses iterator and const_iterator with the begin() and
+    end() functions. In some case, to optimise source code, a find()
+    function can be useful. We add find() functions and use it in source
+    code of value::Map.
+
+commit 9fe644d57741697eee294e24707eae43c7fb74ed
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jan 21 10:50:43 2011 +0100
+
+    ext/dec: fix Agent with `init' message
+    
+    In some condition, the Difference Equation can send external events
+    without `value' in its message but with a `init' message. In this case,
+    the decision::Agent throws an exception. We fix the problem by reading
+    `init' if it exists (Closes: #3162893).
+
+commit 15b3b536137261dffa0fc9d2bf9a30594d290183
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Jan 17 18:14:06 2011 +0100
+
+    vle-1.0.0-alpha3
 
 commit 68b6c37586eb2176a5d2e9ce91c97673d47e7bc9
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
@@ -10467,7 +10724,7 @@ Date:   Wed Aug 22 12:06:00 2007 +0200
     Bug fix: combination tag not write into the output stream (closes: #19).
 
 commit eccaefc10f3678e48419ea19b37d21d8d390e9c3
-Merge: 7f1eae2... be8c299...
+Merge: 7f1eae2 be8c299
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
 Date:   Wed Aug 22 12:01:04 2007 +0200
 
@@ -11115,7 +11372,7 @@ Date:   Wed Jun 27 13:40:12 2007 +0200
     Bug fix: remove the virtual attributes to functions.
 
 commit 27b683f95c2960fc08b71ae8975ca7c8764ef458
-Merge: 937885c... f0db7d3...
+Merge: 937885c f0db7d3
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
 Date:   Wed Jun 27 11:29:15 2007 +0200
 
@@ -11492,7 +11749,7 @@ Date:   Mon Jun 11 20:44:25 2007 +0200
     * add a first part of the unit test function for measures.
 
 commit 9b0ec0c17e3fb4ab977d954c43e0a3d69a4db30a
-Merge: b5b2d93... e5ab4a1...
+Merge: b5b2d93 e5ab4a1
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
 Date:   Sun Jun 10 17:35:05 2007 +0200
 
@@ -11598,7 +11855,7 @@ Date:   Sun May 27 20:32:18 2007 +0200
     Bug fix: adjust the linear generator with new API.
 
 commit 827c8a52ee7d90c2ed6c07dd2d93a81fa26e9f27
-Merge: 0b54741... e6351c6...
+Merge: 0b54741 e6351c6
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
 Date:   Sun May 27 20:07:35 2007 +0200
 
@@ -11764,7 +12021,7 @@ Date:   Sun Feb 25 19:07:30 2007 +0100
     Bug fix: compilation problem with bad Makefile.am syntax.
 
 commit 640e9927c93256f77f2bd541d2e0107bb100e1b6
-Merge: eef674b... 8711550...
+Merge: eef674b 8711550
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
 Date:   Sun Feb 25 17:58:23 2007 +0100
 
