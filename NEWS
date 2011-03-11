@@ -1,3 +1,69 @@
+VLE 1.0.0-alpha4
+================
+
+A release to fix bug, to improve Win32 portage, to propose a new dynamic shared
+library loading system for both Linux and Win32 systems which reduce time
+loading in VLE, GVLE, OOV and EOV.
+
+Application
+~~~~~~~~~~~
+
+- vle:
+  - Add a dependency to boost::thread.
+  - Update CPack script.
+
+- gvle:
+  - Fix the the wrong source code generation of the fsa plugin. The line where
+    the states of the fsa is defined is not commented anymore. (Closes:
+    #3163495).
+  - We need to refresh the package hierarchy tree view to show the observations
+    files into the output directory.
+  - Fix the management of the list of events in an fsa state. An event could
+    not be removed. Now it is enabled. (Closes: #3165901). Fix inclusion of
+    bogus output port when modifying a transition.
+
+- oov:
+  - fix default locale of the oov plug-ins: In SimpleFile, Console and File
+    plug-ins, if the users does not select a locale, the Win32 std::locale
+    throw exception. To avoid the problem, if an error occurred on Win32 or
+    POSIX systems, the default locale "C" is used.
+
+VFL (VLE Foundation Libraries)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- common: update source code to build with Boost 1.46, Gtkmm 2.22 and with the
+  CXXFLAGS c++0x under Linux and Windows.
+- libvlevalue:
+  - The value::Map uses iterator and const_iterator with the begin() and end()
+    functions. In some case, to optimise source code, a find() function can be
+    useful. We add find() functions and use it in source code of value::Map.
+- libvleextension:
+  - decision: In some condition, the Difference Equation can send external
+    events without 'value' in its message but with a 'init' message. In this
+    case, the decision::Agent throws an exception. We fix the problem by reading
+    'init' if it exists (Closes: #3162893).
+  - difference equation:
+    - fix a bug for early perturbation, when difference equation are perturbed
+      early, the perturbation is ignored.
+    - fix bug on size method: if an history is defined, only the two first
+      values defines are used. The other are ignored.
+    - fix bug on asynchronous variable receive: When a bag contains
+      asynchronous and synchronous variables, if the first variable is
+      asynchronous then the counter of received variables isn't reset at
+      correct moment. The asynchronous variables are ignored in this case. This
+      bug appears randomly because it depends to the order of element in
+      current bag.
+  - finite state automata:
+    - fix bug on the call of send function: On a transition, a send function
+      can be called more than once but it should not. A unit test is added that
+      shows the problem and another test (statechart8) is modified.
+- libvleutils:
+  - Add a generic dynamic loading shared libs: We add a utils::Module and
+    utils::ModuleCache to build Generic method. The utils::ModuleCache is a
+    singleton to regroup all dynamic loading shared libraries.
+    utils::ModuleCache and utils::Module are multi-thread safe with a
+    boost::thread mutex.
+
 VLE 1.0.0-alpha3
 ================
 
