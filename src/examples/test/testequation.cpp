@@ -685,10 +685,10 @@ BOOST_AUTO_TEST_CASE(test_earlyPerturb)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)6);
 
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][0]), 0, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1]), 3, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][2]), 5, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][3]), 8, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][4]), 9, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 11, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][0]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1]), 3., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][2]), 5., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][3]), 8., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][4]), 9., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 11., 10e-5);
 }
