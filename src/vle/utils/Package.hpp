@@ -315,10 +315,13 @@ namespace vle { namespace utils {
          * threads to read output and error standard stream and move data into
          * stream.
          * @param workingDir The directory to start the process.
-         * @param lst The command line argument.
+         * @param argv The command line argument.
+         * @param envp The environment variable.
          */
         void process(const std::string& workingDir,
-                     const std::list < std::string >& lst);
+                     const std::list < std::string >& argv,
+                     const std::list < std::string >& envp =
+                     std::list < std::string >());
 
         /**
          * @brief A threaded method to read the stream and fill the output.

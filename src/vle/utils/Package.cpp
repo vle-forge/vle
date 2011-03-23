@@ -29,6 +29,8 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
+#include <vle/utils/Trace.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
@@ -45,8 +47,9 @@
 #include <boost/algorithm/string/constants.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/version.hpp>
+#include <boost/config.hpp>
 
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
 #   include <windows.h>
 #   include <io.h>
 #else
@@ -60,6 +63,144 @@ namespace fs = boost::filesystem;
 namespace vle { namespace utils {
 
 Package* Package::m_package = 0;
+
+
+#ifdef BOOST_WINDOWS
+/**
+ * @brief A specific \b Win32 function to convert a path into a 8.3 path.
+ * Attention, the file must exists instead the parameter is returned.
+ */
+static std::string convertPathTo83Path(const std::string& path)
+{
+    std::string newvalue(path);
+    DWORD lenght;
+
+    lenght = GetShortPathName(path.c_str(), NULL, 0);
+    if (lenght > 0) {
+        TCHAR* buffer = new TCHAR[lenght];
+        lenght = GetShortPathName(path.c_str(), buffer, lenght);
+        if (lenght > 0) {
+            newvalue.assign(static_cast < char* >(buffer));
+        }
+        delete [] buffer;
+    }
+
+    return newvalue;
+}
+#endif
+
+static std::string buildEnvironmentVariable(const std::string& variable,
+                                            const std::string& value,
+                                            bool append)
+{
+    std::string result(variable);
+    result += "=";
+    result += value;
+
+    if (append) {
+        char* env = std::getenv(variable.c_str());
+
+        if (env != NULL) {
+            std::string old(env, std::strlen(env));
+#ifdef BOOST_WINDOWS
+            result += ";";
+#else
+            result += ":";
+#endif
+            result += old;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * @brief Build list of string which represents the 'VARIABLE=VALUE' environment
+ * variable.
+ *
+ * @attention @b Win32: the PKG_CONFIG_FILE is path is update with the vle's
+ * pkgconfig directory. The BOOST_ROOT, BOOST_INCLUDEDIR and BOOST_LIBRARYDIR
+ * are assigned with the vle's patch to avoid conflict with different boost
+ * version.
+ *
+ * @return A list of string.
+ */
+static std::list < std::string > prepareEnvironmentVariable()
+{
+    std::list < std::string > envp;
+    gchar** allenv = g_listenv();
+    gchar** it = allenv;
+
+    while (*it != NULL) {
+
+#ifdef BOOST_WINDOWS
+        if (strcasecmp(*it, "PATH") and
+            strcasecmp(*it, "PKG_CONFIG_PATH") and
+            strcasecmp(*it, "BOOST_ROOT") and
+            strcasecmp(*it, "BOOST_INCLUDEDIR") and
+            strcasecmp(*it, "BOOST_LIBRARYDIR")) {
+
+            const gchar* res = g_getenv(*it);
+            if (res) {
+                std::string buffer(*it);
+                buffer += "=";
+                buffer += res;
+                envp.push_back(buffer);
+            }
+        }
+#else
+        const gchar* res = g_getenv(*it);
+        if (res) {
+            std::string buffer(*it);
+            buffer += "=";
+            buffer += res;
+            envp.push_back(buffer);
+        }
+#endif
+
+        it++;
+    }
+
+    g_strfreev(allenv);
+
+#ifdef BOOST_WINDOWS
+    /*
+     * @attention The Win32 version needs a 8.3 path for the VLE's
+     * PKG_CONFIG_PATH and update four others environment variables.
+     */
+    envp.push_back(buildEnvironmentVariable(
+            "PATH",
+            Path::buildFilename(
+                convertPathTo83Path(Path::path().getPrefixDir()),
+                "bin"),
+            true));
+
+    envp.push_back(buildEnvironmentVariable(
+            "PKG_CONFIG_PATH",
+            Path::buildFilename(
+                convertPathTo83Path(Path::path().getPrefixDir()),
+                "lib", "pkgconfig"),
+            true));
+
+    envp.push_back(buildEnvironmentVariable(
+            "BOOST_INCLUDEDIR",
+            Path::buildFilename(Path::path().getPrefixDir(), "include",
+                                "boost"),
+            false));
+
+    envp.push_back(buildEnvironmentVariable(
+            "BOOST_LIBRARYDIR",
+            Path::buildFilename(Path::path().getPrefixDir(), "lib"),
+            false));
+
+    envp.push_back(buildEnvironmentVariable(
+            "BOOST_ROOT",
+            Path::path().getPrefixDir(),
+            false));
+#endif
+
+    return envp;
+}
 
 void Package::create()
 {
@@ -81,8 +222,10 @@ void Package::configure()
     std::list < std::string > argv;
     buildCommandLine(cmd, argv);
 
+    std::list < std::string > envp = prepareEnvironmentVariable();
+
     try {
-        process(p.getPackageBuildDir(), argv);
+        process(p.getPackageBuildDir(), argv, envp);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg configure error: configure failed %1%")) % e.what());
@@ -97,8 +240,10 @@ void Package::test()
     std::list < std::string > argv;
     buildCommandLine(mCommandTest, argv);
 
+    std::list < std::string > envp = prepareEnvironmentVariable();
+
     try {
-        process(p.getPackageBuildDir(), argv);
+        process(p.getPackageBuildDir(), argv, envp);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg error: test launch failed %1%")) % e.what());
@@ -113,8 +258,10 @@ void Package::build()
     std::list < std::string > argv;
     buildCommandLine(mCommandBuild, argv);
 
+    std::list < std::string > envp = prepareEnvironmentVariable();
+
     try {
-        process(p.getPackageBuildDir(), argv);
+        process(p.getPackageBuildDir(), argv, envp);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg build error: build failed %1%")) % e.what());
@@ -151,11 +298,13 @@ void Package::install()
 #endif
     }
 
+    std::list < std::string > envp = prepareEnvironmentVariable();
+
     try {
 #if BOOST_VERSION > 104500
-        process(builddir.string(), argv);
+        process(builddir.string(), argv, envp);
 #else
-        process(builddir.file_string(), argv);
+        process(builddir.file_string(), argv, envp);
 #endif
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
@@ -174,8 +323,10 @@ void Package::clean()
         std::list < std::string > argv;
         buildCommandLine(mCommandClean, argv);
 
+        std::list < std::string > envp = prepareEnvironmentVariable();
+
         try {
-            process(p.getPackageBuildDir(), argv);
+            process(p.getPackageBuildDir(), argv, envp);
         } catch(const Glib::SpawnError& e) {
             throw utils::InternalError(fmt(
                     _("Pkg clean error: clean failed %1%")) % e.what());
@@ -198,8 +349,10 @@ void Package::pack()
     std::list < std::string > argv;
     buildCommandLine(mCommandPack, argv);
 
+    std::list < std::string > envp = prepareEnvironmentVariable();
+
     try {
-        process(p.getPackageBuildDir(), argv);
+        process(p.getPackageBuildDir(), argv, envp);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg packaging error: package failed %1%")) % e.what());
@@ -214,8 +367,10 @@ void Package::unzip(const std::string& filename)
     std::list < std::string > argv;
     buildCommandLine(mCommandUnzip, argv);
 
+    std::list < std::string > envp = prepareEnvironmentVariable();
+
     try {
-        process(p.getPackagesDir(), argv);
+        process(p.getPackagesDir(), argv, envp);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg packaging error: unzip `%1%' failed %2%")) % filename %
@@ -226,7 +381,7 @@ void Package::unzip(const std::string& filename)
 void Package::waitProcess()
 {
     m_success = false;
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
     DWORD status = 0;
 
     /*
@@ -474,7 +629,7 @@ void Package::refresh()
 Package::Package()
     : m_stop(true), m_success(false), m_out(0), m_err(0), m_wait(0), m_pid(0)
 {
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
     mCommandConfigure = "cmake.exe -G 'MinGW Makefiles' " \
                        "-DCMAKE_INSTALL_PREFIX='%1%' " \
                        "-DCMAKE_BUILD_TYPE=RelWithDebInfo ..";
@@ -500,7 +655,8 @@ Package::Package()
                             /*   manage thread   */
 
 void Package::process(const std::string& workingDir,
-                      const std::list < std::string >& lst)
+                      const std::list < std::string >& argv,
+                      const std::list < std::string >& envp)
 {
     if (m_out != 0 or m_err != 0) {
         throw utils::InternalError(_("Package error: wait an unknow process"));
@@ -508,11 +664,21 @@ void Package::process(const std::string& workingDir,
 
     m_stop = false;
 
+    if (utils::Trace::trace().isInLevel(utils::Trace::DEVS)) {
+        std::list < std::string >::const_iterator it = envp.begin();
+        std::list < std::string >::const_iterator et = envp.end();
+
+        for (; it != et; ++it) {
+            utils::Trace::trace().output() << "-[" << *it << "]\n";
+        }
+    }
+
     try {
         int out, err;
 
         Glib::spawn_async_with_pipes(workingDir,
-                                     lst,
+                                     argv,
+                                     envp,
 				     Glib::SPAWN_SEARCH_PATH |
                                      Glib::SPAWN_DO_NOT_REAP_CHILD,
                                      sigc::slot < void >(),
@@ -547,7 +713,7 @@ void Package::readStandardOutputStream(int stream)
 
     do {
         std::memset(buffer, 0, bufferSize);
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
         result = ::_read(stream, buffer, bufferSize - 1);
 #else
         result = ::read(stream, buffer, bufferSize - 1);
@@ -566,7 +732,7 @@ void Package::readStandardOutputStream(int stream)
     } while (result);
 
     delete[] buffer;
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
     ::_close(stream);
 #else
     ::close(stream);
@@ -581,7 +747,7 @@ void Package::readStandardErrorStream(int stream)
 
     do {
         std::memset(buffer, 0, bufferSize);
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
         result = ::_read(stream, buffer, bufferSize - 1);
 #else
         result = ::read(stream, buffer, bufferSize - 1);
@@ -600,7 +766,7 @@ void Package::readStandardErrorStream(int stream)
     } while (result);
 
     delete[] buffer;
-#ifdef G_OS_WIN32
+#ifdef BOOST_WINDOWS
     ::_close(stream);
 #else
     ::close(stream);
