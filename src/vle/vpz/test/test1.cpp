@@ -331,6 +331,82 @@ BOOST_AUTO_TEST_CASE(value_table)
     delete w;
 }
 
+
+BOOST_AUTO_TEST_CASE(value_table_map)
+{
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
+        "<map>"
+        "<key name=\"a\"><double>0.1</double></key>"
+        "<key name=\"tr\">"
+        "<table width=\"2\" height=\"3\">\n"
+        "1 2 3 4 5 6"
+        "</table>\n"
+        "</key>"
+        "<key name=\"c\"><double>0.1</double></key>"
+        "</map>";
+
+    const char* t2 = "<?xml version=\"1.0\"?>\n"
+        "<map>"
+        "<key name=\"a\"><double>0.1</double></key>"
+        "<key name=\"tr\">"
+        "<table width=\"2\" height=\"3\">\n"
+        "1 2 3 4 5 6"
+        "</table>\n"
+        "</key>"
+        "</map>";
+
+    const char* t3 = "<?xml version=\"1.0\"?>\n"
+        "<map>"
+        "<key name=\"tr\">"
+        "<table width=\"2\" height=\"3\">\n"
+        "1 2 3 4 5 6"
+        "</table>\n"
+        "</key>"
+        "<key name=\"c\"><double>0.1</double></key>"
+        "</map>";
+
+    {
+        value::Map* m = value::toMapValue(vpz::Vpz::parseValue(t1));
+        const value::Table& w(m->getTable("tr"));
+        BOOST_REQUIRE_EQUAL(w.width(), (value::Table::index)2);
+        BOOST_REQUIRE_EQUAL(w.height(), (value::Table::index)3);
+        BOOST_CHECK_CLOSE(w.get(0, 0), 1.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(0, 1), 3.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(0, 2), 5.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 0), 2.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 1), 4.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 2), 6.0, 0.1);
+        delete m;
+    }
+    {
+        value::Map* m = value::toMapValue(vpz::Vpz::parseValue(t2));
+        const value::Table& w(m->getTable("tr"));
+        BOOST_REQUIRE_EQUAL(w.width(), (value::Table::index)2);
+        BOOST_REQUIRE_EQUAL(w.height(), (value::Table::index)3);
+        BOOST_CHECK_CLOSE(w.get(0, 0), 1.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(0, 1), 3.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(0, 2), 5.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 0), 2.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 1), 4.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 2), 6.0, 0.1);
+        delete m;
+    }
+    {
+        value::Map* m = value::toMapValue(vpz::Vpz::parseValue(t3));
+        const value::Table& w(m->getTable("tr"));
+        BOOST_REQUIRE_EQUAL(w.width(), (value::Table::index)2);
+        BOOST_REQUIRE_EQUAL(w.height(), (value::Table::index)3);
+        BOOST_CHECK_CLOSE(w.get(0, 0), 1.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(0, 1), 3.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(0, 2), 5.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 0), 2.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 1), 4.0, 0.1);
+        BOOST_CHECK_CLOSE(w.get(1, 2), 6.0, 0.1);
+        delete m;
+    }
+
+}
+
 BOOST_AUTO_TEST_CASE(value_xml)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n"
