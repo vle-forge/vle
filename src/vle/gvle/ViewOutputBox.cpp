@@ -220,8 +220,8 @@ void ViewOutputBox::onAddViews()
                     m_plugin->set_active(0);
                 }
 
-                PluginFactory::OutputPlg& plugin =
-                    m_modeling.getGVLE()->pluginFactory().getOutput(
+                PluginFactory::OovPlg& plugin =
+                    m_modeling.getGVLE()->pluginFactory().getOov(
                         m_plugin->get_active_text());
 
                 m_viewscopy.addLocalStreamOutput(outputname, "",
