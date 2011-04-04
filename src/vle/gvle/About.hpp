@@ -27,41 +27,42 @@
 
 
 #ifndef VLE_GVLE_ABOUT_HPP
-#define VLE_GVLE_ABOUT_HPP
+#define VLE_GVLE_ABOUT_HPP 1
 
-#include <gtkmm/aboutdialog.h>
-#include <libglademm.h>
+#include <libglademm/xml.h>
 
 namespace vle { namespace gvle {
 
+/**
+ * @brief modal About dialog box.
+ *
+ */
+class About
+{
+public:
     /**
-     * @brief modal About dialog box.
-     *
+     * Buid a modal About dialog box.
      */
-    class About : public sigc::trackable
-    {
-    public:
-        /**
-         * Buid a modal About dialog box.
-         */
-        About(Glib::RefPtr < Gnome::Glade::Xml > refXml);
+    About(Glib::RefPtr < Gnome::Glade::Xml > refXml);
 
-        /**
-         * @brief Nothing to delete.
-         */
-        virtual ~About() {}
+    /**
+     * @brief Nothing to delete.
+     */
+    ~About();
 
-        /**
-         * @brief Run the Gtk::AboutDialog.
-         */
-        void run();
+    /**
+     * @brief Show the dialog box and wait for user's actions.
+     */
+    void run();
 
-    private:
-        Glib::RefPtr < Gnome::Glade::Xml > mRefXml;
-        Gtk::AboutDialog* mAbout;
+private:
+    About(const About& about);
+    About& operator=(const About& about);
 
-        void onAboutClose(int response);
-    };
+    class Pimpl;
+
+    Pimpl* mImpl;
+};
 
 }} // namespace vle gvle
 

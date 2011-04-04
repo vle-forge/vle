@@ -26,48 +26,84 @@
  */
 
 
+#include <boost/config.hpp>
+#include <gtkmm/aboutdialog.h>
+#include <gdkmm/pixbuf.h>
 #include <vle/gvle/About.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/version.hpp>
-#include <gdkmm/pixbuf.h>
 
 namespace vle { namespace gvle {
 
-About::About(Glib::RefPtr < Gnome::Glade::Xml > refXml) :
-    mRefXml(refXml)
+class About::Pimpl
 {
-    mRefXml->get_widget("DialogAbout", mAbout);
+public:
+    Pimpl(Glib::RefPtr < Gnome::Glade::Xml > refXml);
+
+    ~Pimpl();
+
+    void onAboutClose(int response);
+
+    Gtk::AboutDialog* dialog() const;
+
+private:
+    Gtk::AboutDialog* mAbout;
+    sigc::connection mConnectionResponse;
+};
+
+About::Pimpl::Pimpl(Glib::RefPtr < Gnome::Glade::Xml > refXml)
+{
+    refXml->get_widget("DialogAbout", mAbout);
+
     std::string extra(VLE_EXTRA_VERSION);
     if (extra.empty()) {
         mAbout->set_version(VLE_VERSION);
     } else {
-        std::string version(VLE_VERSION);
-        version += '-';
-        version += extra;
-        mAbout->set_version(version);
+        mAbout->set_version((fmt("%1%-%2%") % VLE_VERSION % extra).str());
     }
 
-    Glib::RefPtr < Gdk::Pixbuf > pix;
+    mAbout->set_logo(Gdk::Pixbuf::create_from_file(
+            utils::Path::path().getPixmapFile(
+#ifdef BOOST_WINDOWS
+                "icon128x128.png"
+#else
+                "yellowvle.svg"
+#endif
+                )));
 
-    pix = Gdk::Pixbuf::create_from_file(
-        utils::Path::path().getPixmapFile("yellowvle.svg"));
+    mConnectionResponse = mAbout->signal_response().connect(
+        sigc::mem_fun(*this, &About::Pimpl::onAboutClose));
+}
 
-    if (pix) {
-        mAbout->set_logo(pix);
-    }
+About::Pimpl::~Pimpl()
+{
+    mConnectionResponse.disconnect();
+}
 
-    mAbout->signal_response().connect(
-        sigc::mem_fun(*this, &About::onAboutClose));
+void About::Pimpl::onAboutClose(int /*response*/)
+{
+    mAbout->hide();
+}
+
+Gtk::AboutDialog* About::Pimpl::dialog() const
+{
+    return mAbout;
+}
+
+About::About(Glib::RefPtr < Gnome::Glade::Xml > refXml)
+    : mImpl(new Pimpl(refXml))
+{
+}
+
+About::~About()
+{
+    delete mImpl;
 }
 
 void About::run()
 {
-    mAbout->run();
-}
-
-void About::onAboutClose(int /* response */)
-{
-    mAbout->hide();
+    mImpl->dialog()->run();
 }
 
 }} // namespace vle gvle
