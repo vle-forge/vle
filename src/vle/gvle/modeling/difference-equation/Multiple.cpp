@@ -222,7 +222,7 @@ std::string Multiple::getTemplate() const
     "  * @file {{classname}}.cpp\n"                                     \
     "  * @author ...\n"                                                 \
     "  * ...\n"                                                         \
-    "  * @@tag DifferenceEquationMultiple@@"                              \
+    "  * @@tag DifferenceEquationMultiple (generic)@@"                  \
     "namespace:{{namespace}};"                                          \
     "class:{{classname}};par:"                                          \
     "{{for i in par}}"                                                  \

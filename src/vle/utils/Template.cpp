@@ -178,7 +178,7 @@ void Template::process(std::ostream& result) const
 
 void Template::tag(std::string& pluginname, std::string& conf)
 {
-    boost::regex tagbegin("@@tag [[:alnum:]]*@@", boost::regex::grep);
+    boost::regex tagbegin("@@tag [[:alnum:]]* ([[:alnum:]]*)@@", boost::regex::grep);
     boost::regex tagend("@@end tag@@", boost::regex::grep);
 
     boost::sregex_iterator it(buffer_.begin(), buffer_.end(), tagbegin);

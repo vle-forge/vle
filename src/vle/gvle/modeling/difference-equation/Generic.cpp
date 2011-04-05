@@ -203,7 +203,7 @@ std::string Generic::getTemplate() const
     "  * @file {{classname}}.cpp\n"                                     \
     "  * @author ...\n"                                                 \
     "  * ...\n"                                                         \
-    "  * @@tag DifferenceEquationGeneric@@"                              \
+    "  * @@tag DifferenceEquationGeneric (generic)@@"                   \
     "namespace:{{namespace}};"                                          \
     "class:{{classname}};par:"                                          \
     "{{for i in par}}"                                                  \

@@ -45,7 +45,7 @@ const std::string PluginFSA::TEMPLATE_DEFINITION =
     "  * @file {{classname}}.cpp\n"                                     \
     "  * @author ...\n"                                                 \
     "  * ...\n"                                                         \
-    "  * @@tag Statechart@@"                                            \
+    "  * @@tag Statechart (generic)@@"                                  \
     "namespace:{{namespace}};"                                          \
     "class:{{classname}};{{width}}|{{height}};s:"                       \
     "{{for i in states}}"                                               \

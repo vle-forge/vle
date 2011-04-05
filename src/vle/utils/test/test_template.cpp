@@ -56,7 +56,7 @@ struct F
 
 BOOST_GLOBAL_FIXTURE(F)
 
-const char* tpl1 = "@@tag test1@@" \
+const char* tpl1 = "@@tag test1 (generic)@@" \
                     "azertyuiop qsdfghjklm wxcvbn,;:!" \
                     "@@end tag@@" \
                     "a) My name is {{name}} and I am {{year}} old\n" \
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(test_template_simple)
     std::string str = out.str();
 
     BOOST_REQUIRE_EQUAL(str,
-                        "@@tag test1@@" \
+                        "@@tag test1 (generic)@@" \
                         "azertyuiop qsdfghjklm wxcvbn,;:!" \
                         "@@end tag@@" \
                         "a) My name is toto and I am 74 old\n"
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(test_template_tag)
     {
         vle::utils::Template tpl(tpl1);
         tpl.tag(tag, conf);
-        BOOST_REQUIRE_EQUAL(tag, "test1");
+        BOOST_REQUIRE_EQUAL(tag, "test1 (generic)");
         BOOST_REQUIRE_EQUAL(conf, "azertyuiop qsdfghjklm wxcvbn,;:!");
     }
 

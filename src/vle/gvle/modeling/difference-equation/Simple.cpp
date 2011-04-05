@@ -205,7 +205,7 @@ std::string Simple::getTemplate() const
     "  * @file {{classname}}.cpp\n"                                     \
     "  * @author ...\n"                                                 \
     "  * ...\n"                                                         \
-    "  * @@tag DifferenceEquationSimple@@"                              \
+    "  * @@tag DifferenceEquationSimple (generic)@@"                    \
     "namespace:{{namespace}};"                                          \
     "class:{{classname}};par:"                                          \
     "{{for i in par}}"                                                  \

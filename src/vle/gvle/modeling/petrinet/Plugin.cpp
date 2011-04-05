@@ -42,7 +42,7 @@ const std::string PluginPetriNet::TEMPLATE_DEFINITION =
     "  * @file {{classname}}.cpp\n"                                     \
     "  * @author ...\n"                                                 \
     "  * ...\n"                                                         \
-    "  * @@tag PetriNet@@"                                              \
+    "  * @@tag PetriNet (generic)@@"                                    \
     "namespace:{{namespace}};"                                          \
     "class:{{classname}};{{width}}|{{height}};p:"                       \
     "{{for i in places}}"                                               \
