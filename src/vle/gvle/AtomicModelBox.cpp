@@ -36,6 +36,7 @@
 #include <vle/utils/Template.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <fstream>
 
 namespace vle { namespace gvle {
 

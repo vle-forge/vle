@@ -95,9 +95,9 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    vle::utils::Trace::trace().setLogFile(
+    vle::utils::Trace::setLogFile(
         vle::utils::Trace::getLogFilename("gvle.log"));
-    vle::utils::Trace::trace().setLevel(
+    vle::utils::Trace::setLevel(
         static_cast < vle::utils::Trace::Level >(group.mLevel));
 
     bool result = true;

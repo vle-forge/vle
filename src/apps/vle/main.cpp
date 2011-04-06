@@ -359,7 +359,7 @@ int main(int argc, char* argv[])
     try {
         context.parse(argc, argv);
         command.check();
-        utils::Trace::trace().setLevel(static_cast < utils::Trace::Level >(
+        utils::Trace::setLevel(static_cast < utils::Trace::Level >(
                 command.verbose()));
         utils::Package::package().select(command.currentPackage());
     } catch(const Glib::Error& e) {
@@ -444,10 +444,10 @@ int main(int argc, char* argv[])
             }
         }
 
-        if (utils::Trace::trace().haveWarning()) {
+        if (utils::Trace::haveWarning()) {
             std::cerr << fmt(
                 "\n/!\\ Some warnings during run: See file %1%\n") %
-                utils::Trace::trace().getLogFile();
+                utils::Trace::getLogFile();
         }
     }
 

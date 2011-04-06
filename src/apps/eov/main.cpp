@@ -63,9 +63,8 @@ int main(int argc, char* argv[])
     try {
         context.parse(argc, argv);
         command.check();
-        utils::Trace::trace().setLogFile(
-            utils::Trace::getLogFilename("eov.log"));
-        utils::Trace::trace().setLevel(
+        utils::Trace::setLogFile(utils::Trace::getLogFilename("eov.log"));
+        utils::Trace::setLevel(
             static_cast < utils::Trace::Level >(command.verbose()));
     } catch(const Glib::Error& e) {
         std::cerr << _("Error parsing command line: ") << e.what() << std::endl;

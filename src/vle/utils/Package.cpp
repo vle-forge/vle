@@ -664,12 +664,12 @@ void Package::process(const std::string& workingDir,
 
     m_stop = false;
 
-    if (utils::Trace::trace().isInLevel(utils::Trace::DEVS)) {
+    if (utils::Trace::isInLevel(utils::Trace::DEVS)) {
         std::list < std::string >::const_iterator it = envp.begin();
         std::list < std::string >::const_iterator et = envp.end();
 
         for (; it != et; ++it) {
-            utils::Trace::trace().output() << "-[" << *it << "]\n";
+            utils::Trace::send((fmt("-[%1%]") % (*it)).str());
         }
     }
 

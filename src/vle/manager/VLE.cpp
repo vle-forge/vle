@@ -130,15 +130,15 @@ bool Manager::runSimulator(int process, int port)
     try {
         std::cerr << _("Simulator start in daemon mode\n");
 
-        if (utils::Trace::trace().getLevel() != utils::Trace::DEVS) {
+        if (utils::Trace::getLevel() != utils::Trace::DEVS) {
             utils::buildDaemon();
         }
 
-        utils::Trace::trace().setLogFile(
+        utils::Trace::setLogFile(
             utils::Trace::getLogFilename(boost::str(fmt(
                     "distant-%1%") % utils::DateTime::simpleCurrentDate())));
 
-        SimulatorDistant sim(utils::Trace::trace().output(), process, port);
+        SimulatorDistant sim(process, port);
         sim.start();
     } catch(const std::exception& e) {
         std::cerr << fmt(_("\n/!\\ vle distant simulator error "

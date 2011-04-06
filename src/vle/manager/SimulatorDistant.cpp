@@ -44,8 +44,7 @@
 
 namespace vle { namespace manager {
 
-SimulatorDistant::SimulatorDistant(std::ostream& out, size_t cpu, int port) :
-    m_out(out),
+SimulatorDistant::SimulatorDistant(size_t cpu, int port) :
     mNbCPU(cpu),
     mPort(port),
     mPool(cpu, false)
@@ -61,7 +60,8 @@ SimulatorDistant::~SimulatorDistant()
 
 void SimulatorDistant::start()
 {
-    m_out << fmt(_("Simulator: CPU=%1% Port=%2%\n")) % mNbCPU % mPort;
+    utils::Trace::send(fmt(
+            _("Simulator: CPU=%1% Port=%2%\n")) % mNbCPU % mPort);
 
     Glib::Thread* mWait = Glib::Thread::create(
         sigc::mem_fun(*this, &SimulatorDistant::wait), true);
@@ -74,7 +74,7 @@ void SimulatorDistant::wait()
 {
     for (;;) {
         mServer->acceptClient("manager");
-        m_out << fmt(_("Simulator: connection sucess\n"));
+        utils::Trace::send(fmt(_("Simulator: connection sucess\n")));
         std::string msg;
 
         for (;;) {
@@ -208,13 +208,13 @@ void SimulatorDistant::run()
     instance = file->project().instance();
     replica = file->project().replica();
 
-    m_out << fmt(_("Simulator: %1% %2% %3%\n")) % filename
-        % instance % replica;
+    utils::Trace::send(fmt(_("Simulator: %1% %2% %3%\n")) % filename % instance
+                       % replica);
 
     r.start(file);
 
     if (r.haveError()) {
-        m_out << fmt(_("/!\\ Error %1%\n")) % ostr.str();
+        utils::Trace::send(fmt(_("/!\\ Error %1%\n")) % ostr.str());
     }
 
     views = r.outputs();
