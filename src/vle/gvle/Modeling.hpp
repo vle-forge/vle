@@ -745,7 +745,8 @@ public:
                                     graph::Model* dest,
                                     graph::CoupledModel* mTop) const;
 
-    std::string getIdCardConnection(graph::Model* src, std::string srcport,
+    std::string getIdCardConnection(graph::Model* src,
+                                    std::string srcport,
                                     graph::Model* dest,
                                     std::string destport,
                                     graph::CoupledModel* mTop) const;

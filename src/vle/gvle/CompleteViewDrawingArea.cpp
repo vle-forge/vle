@@ -578,7 +578,7 @@ void CompleteViewDrawingArea::preComputeConnectInfo()
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 record.src = mCurrent;
-                record.srcport = jt->second;
+                record.srcport = it->first;
                 record.dst = jt->first;
                 record.dstport = jt->second;
                 mConnectionInfo.push_back(record);
