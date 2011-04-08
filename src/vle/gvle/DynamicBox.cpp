@@ -58,6 +58,11 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
         xml->get_widget("HBoxDynamicLibrary", mBoxDynamicLibrary);
         mComboLibrary = Gtk::manage(new Gtk::ComboBoxText());
         mComboLibrary->show();
+
+        Glib::RefPtr < Gtk::ListStore > toSortList =
+            Glib::RefPtr < Gtk::ListStore >::cast_dynamic(mComboLibrary->get_model());
+        toSortList->set_sort_column(0, Gtk::SORT_ASCENDING);
+
         mBoxDynamicLibrary->pack_start(*mComboLibrary);
     }
 
