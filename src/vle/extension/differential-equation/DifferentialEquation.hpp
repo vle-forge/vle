@@ -171,7 +171,7 @@ public:
     protected:
         Ext(const std::string& name, Base* equation) :
             Variable(name, equation)
-        {}
+        { equation->createExternalVariable(name); }
 
         friend class Base;
     };
@@ -282,6 +282,9 @@ private:
     typedef std::map < std::string, std::pair < double, thresholdType > >
         threshold;
     typedef std::deque < std::pair < devs::Time, double > > valueBuffer;
+
+    void createExternalVariable(const std::string& name)
+    { mExternalVariableValue[name] = 0; }
 
     const valueBuffer& externalValueBuffer(const std::string& name) const;
     valueBuffer& externalValueBuffer(const std::string& name);

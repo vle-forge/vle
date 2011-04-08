@@ -388,15 +388,20 @@ void Base::externalTransition(const ExternalEventList& event,
                 mExternalVariableGradient[name] =
                     (*it)->getDoubleAttributeValue("gradient");
                 ++linear;
+            } else {
+                mExternalVariableGradient[name] = 0;
             }
             ++index;
             ++it;
         }
-        mExternalValues = (linear < mExternalVariableValue.size());
-        mExternalVariableNumber = linear;
-        mState = RUN;
-        mGradient = compute(time);
-        updateSigma(time);
+        mExternalValues =
+            (mExternalVariableNumber + linear < mExternalVariableValue.size());
+        mExternalVariableNumber += index;
+        if (mExternalVariableValue.size() == mExternalVariableNumber) {
+            mState = RUN;
+            mGradient = compute(time);
+            updateSigma(time);
+        }
     } else {
         ExternalEventList::const_iterator it = event.begin();
         bool _reset = false;
@@ -408,9 +413,9 @@ void Base::externalTransition(const ExternalEventList& event,
             // it is a numerical external variable
             if ((*it)->onPort("update")) {
                 if (name == mVariableName) {
-                    throw utils::InternalError(fmt(_(
-                            "DifferentialEquation update, invalid variable " \
-                            "name: %1%")) % name);
+                    throw utils::InternalError(
+                        fmt(_("DifferentialEquation update, invalid variable " \
+                              "name: %1%")) % name);
                 }
 
                 pushExternalValue(name, time, value);
@@ -420,15 +425,19 @@ void Base::externalTransition(const ExternalEventList& event,
                 }
             }
             // it is a perturbation on an internal variable
-            if ((*it)->onPort("perturb")) {
+            else if ((*it)->onPort("perturb")) {
                 if (name != mVariableName) {
-                    throw utils::InternalError(fmt(_(
-                            "DifferentialEquation perturbation, invalid " \
-                            "variable name: %1%")) % name);
+                    throw utils::InternalError(
+                        fmt(_("DifferentialEquation perturbation, invalid " \
+                              "variable name: %1%")) % name);
                 }
 
                 reset(time, value);
                 _reset = true;
+            } else {
+                throw utils::InternalError(
+                    fmt(_("DifferentialEquation, wrong port name: %1%")) %
+                    (*it)->getPortName());
             }
             ++it;
         }
