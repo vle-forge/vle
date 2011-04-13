@@ -12,8 +12,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_cell" library="lifegame" model="cell" type="local"  />
-<dynamic name="dyn_executive" library="lifegame" model="executive" type="local"  />
+<dynamic name="dyn_cell" library="LifegameCell" type="local"  />
+<dynamic name="dyn_executive" library="LifegameExecutive" type="local"  />
 </dynamics>
 <classes>
 <class name="A" >

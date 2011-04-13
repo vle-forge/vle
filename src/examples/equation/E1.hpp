@@ -56,6 +56,6 @@ namespace vle { namespace examples { namespace equation {
 
 }}} // namespace vle examples equation
 
-DECLARE_NAMED_DYNAMICS(E1, vle::examples::equation::E1)
+DECLARE_DYNAMICS(vle::examples::equation::E1)
 
 #endif

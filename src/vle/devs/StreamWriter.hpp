@@ -34,6 +34,7 @@
 #include <vle/devs/Time.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/oov/Plugin.hpp>
+#include <vle/utils/ModuleManager.hpp>
 #include <map>
 #include <vector>
 
@@ -51,12 +52,14 @@ namespace vle { namespace devs {
     class VLE_DEVS_EXPORT StreamWriter
     {
     public:
-        StreamWriter() :
-            m_view(0)
-        {}
+        StreamWriter(const utils::ModuleManager& modulemgr)
+            : m_view(0), m_modulemgr(modulemgr)
+        {
+        }
 
         virtual ~StreamWriter()
-        {}
+        {
+        }
 
         ///
         ////
@@ -129,8 +132,15 @@ namespace vle { namespace devs {
         inline void setView(devs::View* View)
         { m_view = View; }
 
+        const utils::ModuleManager& getModuleManager() const
+        { return m_modulemgr; }
+
     private:
+        StreamWriter(const StreamWriter& other);
+        StreamWriter& operator=(const StreamWriter& other);
+
         devs::View*        m_view;
+        const utils::ModuleManager& m_modulemgr;
     };
 
 }} // namespace vle devs

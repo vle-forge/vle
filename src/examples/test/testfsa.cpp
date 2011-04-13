@@ -56,7 +56,8 @@ BOOST_AUTO_TEST_CASE(test_moore1)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -96,7 +97,8 @@ BOOST_AUTO_TEST_CASE(test_moore2)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -128,7 +130,8 @@ BOOST_AUTO_TEST_CASE(test_mealy1)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -172,7 +175,8 @@ BOOST_AUTO_TEST_CASE(test_mealy2)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -204,7 +208,8 @@ BOOST_AUTO_TEST_CASE(test_statechart1)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -236,7 +241,8 @@ BOOST_AUTO_TEST_CASE(test_statechart2)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -275,7 +281,8 @@ BOOST_AUTO_TEST_CASE(test_statechart3)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -314,7 +321,8 @@ BOOST_AUTO_TEST_CASE(test_statechart4)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -366,7 +374,8 @@ BOOST_AUTO_TEST_CASE(test_statechart5)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -410,7 +419,8 @@ BOOST_AUTO_TEST_CASE(test_statechart6)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -454,7 +464,8 @@ BOOST_AUTO_TEST_CASE(test_stage)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -488,7 +499,8 @@ BOOST_AUTO_TEST_CASE(test_statechart7)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -515,7 +527,8 @@ BOOST_AUTO_TEST_CASE(test_statechart8)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -545,7 +558,8 @@ BOOST_AUTO_TEST_CASE(test_statechart9)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -581,7 +595,8 @@ BOOST_AUTO_TEST_CASE(test_statechart10)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -605,7 +620,8 @@ BOOST_AUTO_TEST_CASE(test_statechart11)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -655,6 +671,7 @@ BOOST_AUTO_TEST_CASE(test_statechartMultipleSend)
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     BOOST_REQUIRE_NO_THROW(r.start(file));
 }

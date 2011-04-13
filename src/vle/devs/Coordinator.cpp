@@ -54,9 +54,14 @@ using std::pair;
 
 namespace vle { namespace devs {
 
-Coordinator::Coordinator(ModelFactory& modelfactory) :
-    m_currentTime(0),
-    m_modelFactory(modelfactory),
+Coordinator::Coordinator(const utils::ModuleManager& modulemgr,
+                         const vpz::Dynamics& dyn,
+                         const vpz::Classes& cls,
+                         const vpz::Experiment& experiment,
+                         const vpz::AtomicModelList& atom,
+                         RootCoordinator& root)
+    : m_currentTime(0.0), m_modelFactory(modulemgr, dyn, cls, experiment, atom,
+                                         root), m_modulemgr(modulemgr),
     m_isStarted(false)
 {
 }
@@ -509,10 +514,10 @@ StreamWriter* Coordinator::buildOutput(const vpz::View& view,
 
     switch (output.format()) {
     case vpz::Output::LOCAL:
-        stream = new LocalStreamWriter();
+        stream = new LocalStreamWriter(m_modulemgr);
         break;
     case vpz::Output::DISTANT:
-        stream = new NetStreamWriter();
+        stream = new NetStreamWriter(m_modulemgr);
         break;
     }
 

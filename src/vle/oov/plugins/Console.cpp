@@ -65,7 +65,7 @@ public:
     virtual ~Console()
     {}
 
-    virtual void onParameter(const std::string& plugin,
+    virtual void onParameter(const std::string& /* plugin */,
                              const std::string& /* location */,
                              const std::string& /* file */,
                              value::Value* parameters,

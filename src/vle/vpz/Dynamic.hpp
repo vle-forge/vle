@@ -43,7 +43,6 @@ namespace vle { namespace vpz {
      * @code
      * <dynamic name="xxxx"     <!-- name of the dynamics -->
      *          library="yyyy"  <!-- name of the library -->
-     *          model="zzzz"    <!-- name of the model in library -->
      *          type="distant|local" <!-- distant need attribut location,
      *                                      default is local -->
      *          location="xxx:yyy" /> <!-- the location of the distant library
@@ -102,13 +101,6 @@ namespace vle { namespace vpz {
          */
         void setLibrary(const std::string& name)
         { m_library.assign(name); }
-
-        /**
-         * @brief Assign a model to find into the library.
-         * @param name new name of the model.
-         */
-        void setModel(const std::string& name)
-        { m_model.assign(name); }
 
         /**
          * @brief Assign a language to the dynamics.
@@ -172,13 +164,6 @@ namespace vle { namespace vpz {
          */
         const std::string& location() const
         { return m_location; }
-
-        /**
-         * @brief Return the model of the library.
-         * @return A reference to the model.
-         */
-        const std::string& model() const
-        { return m_model; }
 
         /**
          * @brief Return the language of the dynamics models.
@@ -249,7 +234,6 @@ namespace vle { namespace vpz {
         std::string     m_name;
         std::string     m_package;
         std::string     m_library;
-        std::string     m_model;
         std::string     m_language;
         std::string     m_location;
         Dynamic::Type   m_type;

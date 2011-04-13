@@ -98,4 +98,4 @@ private:
 
 }}} // namespace vle examples decision
 
-DECLARE_NAMED_DYNAMICS(SimpleAgent, vle::examples::decision::SimpleAgent)
+DECLARE_DYNAMICS(vle::examples::decision::SimpleAgent)

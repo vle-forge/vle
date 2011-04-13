@@ -46,22 +46,27 @@
 #include <vle/value/String.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/PackageTable.hpp>
+#include <vle/version.hpp>
 #include <string>
 
-#define DECLARE_DYNAMICS(mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewDynamics(const vle::devs::DynamicsInit& init, \
-                        const vle::devs::InitEventList& events) \
-        { return new mdl(init, events); } \
-    }
-
-#define DECLARE_NAMED_DYNAMICS(name, mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewDynamics##name(const vle::devs::DynamicsInit& init, \
+#define DECLARE_DYNAMICS(mdl)                                         \
+    extern "C" {                                                      \
+        VLE_DEVS_EXPORT vle::devs::Dynamics*                          \
+        vle_make_new_dynamics(const vle::devs::DynamicsInit& init,    \
                               const vle::devs::InitEventList& events) \
-        { return new mdl(init, events); } \
+        {                                                             \
+            return new mdl(init, events);                             \
+        }                                                             \
+                                                                      \
+        VLE_DEVS_EXPORT void                                          \
+        vle_api_level(boost::uint32_t* major,                         \
+                      boost::uint32_t* minor,                         \
+                      boost::uint32_t* patch)                         \
+        {                                                             \
+            *major = VLE_MAJOR_VERSION;                               \
+            *minor = VLE_MINOR_VERSION;                               \
+            *patch = VLE_PATCH_VERSION;                               \
+        }                                                             \
     }
 
 namespace vle { namespace devs {

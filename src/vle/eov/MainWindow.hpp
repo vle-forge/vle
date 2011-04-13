@@ -31,6 +31,7 @@
 
 #include <vle/eov/DllDefines.hpp>
 #include <vle/eov/Plugin.hpp>
+#include <vle/utils/ModuleManager.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/aboutdialog.h>
@@ -108,6 +109,7 @@ namespace vle { namespace eov {
         Gtk::TextView* mTextview;
         Glib::RefPtr < Gnome::Glade::Xml > mRefXml;
 	sigc::connection mConnection;
+        utils::ModuleManager mModuleMgr;
 
 	std::map < Gtk::Window*, NetStreamReader* > mBufferedStream;
 

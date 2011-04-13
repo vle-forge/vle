@@ -29,6 +29,7 @@
 #ifndef VLE_GVLE_LAUNCHSIMULATIONBOX_HPP
 #define VLE_GVLE_LAUNCHSIMULATIONBOX_HPP
 
+#include <vle/utils/ModuleManager.hpp>
 #include <libglademm.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/radiobutton.h>
@@ -36,7 +37,6 @@
 #include <gtkmm/button.h>
 #include <gtkmm/progressbar.h>
 #include <gtkmm/label.h>
-#include <vle/utils/Module.hpp>
 
 namespace vle { namespace vpz {
 
@@ -62,12 +62,10 @@ private:
     /* The VPZ to execute */
     const vpz::Vpz& mVpz;
 
-    utils::ModuleCache::ModuleList mLoadedPlugin; /**< Stores the loaded
-                                                    plug-ins before simulation.
-                                                    In the descrutor of
-                                                    LaunchSimulationBox we need
-                                                    to erase all newest
-                                                    plugins. */
+    utils::ModuleManager mLoadedPlugin; /**< Stores the loaded plug-ins before
+                                          simulation. In the dtor of
+                                          LaunchSimulationBox we erase all
+                                          newest plugins. */
 
     /* Gtk Widgets */
     Gtk::Dialog      *mDialog;

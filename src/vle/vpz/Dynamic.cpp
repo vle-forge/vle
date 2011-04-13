@@ -36,8 +36,7 @@ void Dynamic::write(std::ostream& out) const
 {
     out << "<dynamic "
         << "name=\"" << m_name.c_str() << "\" "
-        << "library=\"" << m_library.c_str() << "\" "
-        << "model=\"" << m_model.c_str() << "\" ";
+        << "library=\"" << m_library.c_str() << "\" ";
 
     if (not m_package.empty()) {
         out << "package=\"" << m_package.c_str() << "\" ";
@@ -77,7 +76,7 @@ void Dynamic::setLocalDynamics()
 bool Dynamic::operator==(const Dynamic& dynamic) const
 {
     return m_name == dynamic.name() and m_library == dynamic.library()
-	and m_model == dynamic.model() and m_language == dynamic.language()
+	and m_language == dynamic.language()
 	and m_location == dynamic.location() and m_type == dynamic.type()
 	and m_ispermanent == dynamic.isPermanent();
 }

@@ -87,12 +87,12 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dynD" library="equation1" model="D1" type="local"  />
-<dynamic name="dynF" library="equation3" model="F1" type="local"  />
-<dynamic name="dynG" library="equation3" model="G1" type="local"  />
-<dynamic name="dynPerturb" library="equation1" model="Perturb8" type="local"  />
-<dynamic name="dynPerturb2" library="equation1" model="Perturb2" type="local"  />
-<dynamic name="dynPerturb3" library="equation1" model="Perturb9" type="local"  />
+<dynamic name="dynD" library="EquationD1" type="local"  />
+<dynamic name="dynF" library="EquationF1" type="local"  />
+<dynamic name="dynG" library="EquationG1" type="local"  />
+<dynamic name="dynPerturb" library="EquationPerturb8" type="local"  />
+<dynamic name="dynPerturb2" library="EquationPerturb2" type="local"  />
+<dynamic name="dynPerturb3" library="EquationPerturb9" type="local"  />
 </dynamics>
 <experiment name="exp" duration="20.000000000000000" begin="0.000000000000000" combination="linear" seed="3499211612" >
 <replicas seed="3499211612" number="1" />

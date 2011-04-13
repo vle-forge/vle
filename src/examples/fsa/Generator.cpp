@@ -137,6 +137,6 @@ private:
     vd::Time mLastTime;
 };
 
-DECLARE_NAMED_DYNAMICS(generator, generator)
+DECLARE_DYNAMICS(generator)
 
 }}} // namespace vle examples fsa

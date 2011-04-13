@@ -194,5 +194,4 @@ public:
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(DifferenceEquationAdaptor,
-                       vle::examples::qss::DifferenceEquationAdaptor)
+DECLARE_DYNAMICS(vle::examples::qss::DifferenceEquationAdaptor)

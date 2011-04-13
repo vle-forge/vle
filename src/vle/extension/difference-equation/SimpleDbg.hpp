@@ -30,7 +30,30 @@
 #define VLE_EXTENSION_DIFFERENCE_EQUATION_SIMPLE_DBG_HPP 1
 
 #include <vle/extension/difference-equation/Simple.hpp>
+#include <vle/extension/DllDefines.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/version.hpp>
+
+#define DECLARE_DIFFERENCE_EQUATION_SIMPLE_DBG(mdl)                     \
+    extern "C" {                                                        \
+        VLE_EXTENSION_EXPORT vle::devs::Dynamics*                       \
+        vle_make_new_dynamics(const vle::devs::DynamicsInit& init,      \
+                        const vle::devs::InitEventList& events)         \
+        {                                                               \
+            return new vle::extension::DifferenceEquation::SimpleDbg    \
+                < mdl >(init, events);                                  \
+        }                                                               \
+                                                                        \
+        VLE_EXTENSION_EXPORT void                                       \
+        vle_api_level(boost::uint32_t* major,                           \
+                      boost::uint32_t* minor,                           \
+                      boost::uint32_t* patch)                           \
+        {                                                               \
+            *major = VLE_MAJOR_VERSION;                                 \
+            *minor = VLE_MINOR_VERSION;                                 \
+            *patch = VLE_PATCH_VERSION;                                 \
+        }                                                               \
+    }
 
 namespace vle { namespace extension { namespace DifferenceEquation {
 
@@ -112,27 +135,5 @@ private:
 };
 
 }}} // namespace vle extension DifferenceEquation
-
-#define DECLARE_DIFFERENCE_EQUATION_SIMPLE_DBG(mdl)                     \
-    extern "C" {                                                        \
-        vle::devs::Dynamics*                                            \
-        makeNewDynamics(const vle::devs::DynamicsInit& init,            \
-                        const vle::devs::InitEventList& events)         \
-        {                                                               \
-            return new vle::extension::DifferenceEquation::SimpleDbg    \
-                < mdl >(init, events);                                  \
-        }                                                               \
-    }
-
-#define DECLARE_NAMED_DIFFERENCE_EQUATION_SIMPLE_DBG(name, mdl)         \
-    extern "C" {                                                        \
-        vle::devs::Dynamics*                                            \
-        makeNewDynamics##name(const vle::devs::DynamicsInit& init,      \
-                              const vle::devs::InitEventList& events)   \
-        {                                                               \
-            return new vle::extension::DifferenceEquation::SimpleDbg    \
-                < mdl >(init, events);                                  \
-        }                                                               \
-    }
 
 #endif

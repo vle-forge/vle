@@ -46,7 +46,7 @@ double S3::compute(const vle::devs::Time& /* time */) const
     return -r * S() * I();
 }
 
-DECLARE_NAMED_DYNAMICS(S3, S3)
+DECLARE_DYNAMICS(S3)
 
 }}} // namespace vle examples dess
 

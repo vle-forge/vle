@@ -1,5 +1,5 @@
 /*
- * @file examples/qss/smartgardener.cpp
+ * @file examples/qss/smartgardener.hpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -25,10 +25,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include "smartgardener.hpp"
+#include <vle/devs/Dynamics.hpp>
 
 namespace vle { namespace examples { namespace qss {
+
+class Smartgardener : public devs::Dynamics
+{
+public:
+    enum State { INIT, IDLE, PEST };
+
+    Smartgardener(const devs::DynamicsInit& model,
+                  const devs::InitEventList& events);
+
+    virtual ~Smartgardener();
+
+    virtual void output(const devs::Time& time,
+                        devs::ExternalEventList& output) const;
+
+    virtual devs::Time timeAdvance() const;
+
+    virtual devs::Time init(const vle::devs::Time& /* time */);
+
+    virtual void internalTransition(const devs::Time& event);
+
+    void externalTransition(const devs::ExternalEventList& event,
+                            const devs::Time& time);
+
+    virtual value::Value* observation(const devs::ObservationEvent& event)
+        const;
+
+private:
+    State state;
+
+    double s;
+    double p_p;
+    double p_l;
+    double d;
+    double plantlouseamount;
+    double ladybirdamount;
+};
 
 Smartgardener::Smartgardener(const devs::DynamicsInit& model,
                              const devs::InitEventList& events) :
@@ -36,11 +71,11 @@ Smartgardener::Smartgardener(const devs::DynamicsInit& model,
 {
     // Seuil de traitement sur les plantlouses
     s = value::toDouble(events.get("s"));
-    // Pourcentage de plantlouses supprimés par le traitement
+    // Pourcentage de plantlouses supprimÃ©s par le traitement
     p_p = value::toDouble(events.get("p_p"));
-    // Pourcentage de ladybirds supprimés par le traitement
+    // Pourcentage de ladybirds supprimÃ©s par le traitement
     p_l = value::toDouble(events.get("p_l"));
-    // Délai entre deux observations
+    // DÃ©lai entre deux observations
     d = value::toDouble(events.get("d"));
 }
 
@@ -52,7 +87,7 @@ void Smartgardener::output(const devs::Time& /*time*/,
                            devs::ExternalEventList& output) const
 {
 
-    // Observation la quantité de plantlouse et de ladybird
+    // Observation la quantitÃ© de plantlouse et de ladybird
     if (state == IDLE) {
         devs::RequestEvent* e = new
             devs::RequestEvent("inst_plantlouse");
@@ -132,9 +167,9 @@ value::Value* Smartgardener::observation(const devs::ObservationEvent& event)
 }
 
 void Smartgardener::externalTransition(const devs::ExternalEventList& event,
-                                          const devs::Time& /*time*/)
+                                       const devs::Time& /*time*/)
 {
-    // Récupération du nombre de plantlouses (x) et de
+    // RÃ©cupÃ©ration du nombre de plantlouses (x) et de
     // ladybirds (y)
     if (state == IDLE) {
         for (devs::ExternalEventList::const_iterator it = event.begin();
@@ -142,7 +177,7 @@ void Smartgardener::externalTransition(const devs::ExternalEventList& event,
             if ((*it)->getStringAttributeValue("name") == "x") {
                 plantlouseamount = (*it)->getDoubleAttributeValue("value");
 
-                // si le nb de plantlouses est supérieur au
+                // si le nb de plantlouses est supÃ©rieur au
                 // seuil alors mode traitement
                 if (plantlouseamount > s) {
                     state = PEST;
@@ -157,4 +192,4 @@ void Smartgardener::externalTransition(const devs::ExternalEventList& event,
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(smartgardener, vle::examples::qss::Smartgardener)
+DECLARE_DYNAMICS(vle::examples::qss::Smartgardener)

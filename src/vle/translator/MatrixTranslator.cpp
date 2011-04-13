@@ -497,9 +497,6 @@ void MatrixTranslator::translateDynamics()
                                        it->first).str());
 
                 dynamics.setLibrary(it->second.first);
-                if (it->second.second != "") {
-                    dynamics.setModel(it->second.second);
-                }
                 m_exe.dynamics().add(dynamics);
                 ++it;
             }
@@ -509,9 +506,6 @@ void MatrixTranslator::translateDynamics()
             vpz::Dynamic dynamics("cell");
 
             dynamics.setLibrary(m_library);
-            if (not m_model.empty()) {
-                dynamics.setModel(m_model);
-            }
             m_exe.dynamics().add(dynamics);
         }
     }

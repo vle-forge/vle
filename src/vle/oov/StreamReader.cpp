@@ -27,8 +27,8 @@
 
 
 #include <vle/oov/StreamReader.hpp>
-#include <vle/oov/PluginFactory.hpp>
 #include <vle/oov/Plugin.hpp>
+#include <vle/utils/Algo.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/value/String.hpp>
 #include <vle/version.hpp>
@@ -51,32 +51,26 @@ PluginPtr StreamReader::plugin() const
 
 void StreamReader::initPlugin(const std::string& plugin,
                               const std::string& package,
-                              const std::string& location)
+                              const std::string& location,
+                              const utils::ModuleManager& modulemgr)
 {
-    if (not package.empty()) {
-        PluginFactory pf(
-            plugin,
-            utils::Path::path().getExternalPackagePluginOutputDir(package));
-        m_plugin = pf.build(location);
-    } else {
-        utils::PathList lst(utils::Path::path().getGlobalStreamDirs());
-        utils::PathList::const_iterator it;
+    void *symbol = 0;
 
-        std::string error((fmt(
-                    _("Error opening oov plugin '%1%' in:")) % plugin).str());
-
-        for (it = lst.begin(); it != lst.end(); ++it) {
-            try {
-                PluginFactory pf(plugin, *it);
-                m_plugin = pf.build(location);
-                return;
-            } catch (const std::exception& e) {
-                error += e.what();
-            }
+    try {
+        if (not package.empty()) {
+            symbol = modulemgr.get(package, plugin, utils::MODULE_OOV);
+        } else {
+            symbol = modulemgr.get(plugin, utils::MODULE_OOV);
         }
-        throw utils::InternalError(error);
-    }
 
+        OovPluginSlot fct(utils::pointer_to_function < OovPluginSlot>(symbol));
+        PluginPtr ptr(fct(location));
+        m_plugin = ptr;
+    } catch(const std::exception& e) {
+        throw utils::InternalError(fmt(
+                _("Oov module: error when loading the module: %1%")) %
+            e.what());
+    }
 }
 
 void StreamReader::onParameter(const std::string& pluginname,
@@ -86,7 +80,7 @@ void StreamReader::onParameter(const std::string& pluginname,
                                value::Value* parameters,
                                const double& time)
 {
-    initPlugin(pluginname, package, location);
+    initPlugin(pluginname, package, location, m_modulemgr);
 
 #ifdef VLE_HAVE_CAIRO
     /*

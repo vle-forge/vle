@@ -59,4 +59,4 @@ namespace vle { namespace examples { namespace dess {
 
 }}} // namespace vle examples dess
 
-DECLARE_NAMED_DYNAMICS(Counter, vle::examples::dess::Counter)
+DECLARE_DYNAMICS(vle::examples::dess::Counter)

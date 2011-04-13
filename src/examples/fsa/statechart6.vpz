@@ -46,9 +46,9 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dynC" library="moore" model="counter2" type="local"  />
-<dynamic name="dynG" library="generator2" model="generator" type="local"  />
-<dynamic name="dynS" library="statechart" model="statechart6" type="local"  />
+<dynamic name="dynC" library="MooreCounter2" type="local"  />
+<dynamic name="dynG" library="Generator" type="local"  />
+<dynamic name="dynS" library="Statechart6" type="local"  />
 </dynamics>
 <experiment name="exp" duration="100.000000000000000" begin="0.000000000000000" combination="linear" seed="2147483648" >
 <replicas seed="581869302" number="1" />

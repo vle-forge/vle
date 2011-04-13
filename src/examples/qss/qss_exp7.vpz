@@ -91,9 +91,9 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_ladybirdpest" library="ladybirdplantlouse" model="ladybird" type="local"  />
-<dynamic name="dyn_plantlousepest" library="ladybirdplantlouse" model="plantlouse" type="local"  />
-<dynamic name="dyn_smartgardener" library="ladybirdplantlouse" model="smartgardener2" type="local"  />
+<dynamic name="dyn_ladybirdpest" library="QssLadyBird" type="local"  />
+<dynamic name="dyn_plantlousepest" library="QssPlantLouse" type="local"  />
+<dynamic name="dyn_smartgardener" library="QssPlantLouse2" type="local"  />
 </dynamics>
 <experiment name="exp7" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
 <conditions>

@@ -32,6 +32,26 @@
 #include <vle/oov/DllDefines.hpp>
 #include <vle/oov/OutputMatrix.hpp>
 #include <vle/value/Set.hpp>
+#include <vle/version.hpp>
+
+#define DECLARE_OOV_PLUGIN(x)                         \
+    extern "C" {                                      \
+        VLE_OOV_EXPORT vle::oov::Plugin*              \
+        vle_make_new_oov(const std::string& location) \
+        {                                             \
+            return new x(location);                   \
+        }                                             \
+                                                      \
+        VLE_OOV_EXPORT void                           \
+        vle_api_level(boost::uint32_t* major,         \
+                      boost::uint32_t* minor,         \
+                      boost::uint32_t* patch)         \
+        {                                             \
+            *major = VLE_MAJOR_VERSION;               \
+            *minor = VLE_MINOR_VERSION;               \
+            *patch = VLE_PATCH_VERSION;               \
+        }                                             \
+    }
 
 namespace vle { namespace oov {
 
@@ -198,15 +218,17 @@ namespace vle { namespace oov {
     typedef boost::shared_ptr < Plugin > PluginPtr;
 
     /**
+     * @brief Define the pointer to function of the oov::Plugin plug-in.
+     * @param The output location of the oov::Plugin.
+     * @return A pointer to the oov::Plugin newly build.
+     */
+    typedef Plugin* (*OovPluginSlot)(const std::string&);
+
+    /**
      * @brief This typedef is used to defined the dictionnary of key view name
      * and oov::PluginPtr.
      */
     typedef std::map < std::string, PluginPtr > PluginViewList;
-
-#define DECLARE_OOV_PLUGIN(x) \
-    extern "C" { vle::oov::Plugin* makeNewOovPlugin( \
-                const std::string& location) \
-        { return new x(location); } }
 
 }} // namespace vle oov
 

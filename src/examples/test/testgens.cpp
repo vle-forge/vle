@@ -64,7 +64,8 @@ BOOST_AUTO_TEST_CASE(test_gens)
     o2.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     /* begin check */
@@ -129,7 +130,8 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     o2.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
-    manager::RunVerbose r(std::cerr);
+    utils::ModuleManager man;
+    manager::RunVerbose r(man, std::cerr);
     r.start(file);
     file = 0;
 
@@ -183,7 +185,8 @@ BOOST_AUTO_TEST_CASE(test_gens_with_graph)
     o.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
-    manager::RunVerbose r(std::cerr);
+    utils::ModuleManager man;
+    manager::RunVerbose r(man, std::cerr);
     r.start(file);
     file = 0;
 
@@ -232,7 +235,8 @@ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
     o.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
-    manager::RunVerbose r(std::cerr);
+    utils::ModuleManager man;
+    manager::RunVerbose r(man, std::cerr);
     r.start(file);
     file = 0;
 

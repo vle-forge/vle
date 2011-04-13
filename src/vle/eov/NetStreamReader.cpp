@@ -27,7 +27,6 @@
 
 
 #include <vle/eov/NetStreamReader.hpp>
-#include <vle/eov/PluginFactory.hpp>
 #include <vle/eov/Window.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
@@ -78,7 +77,7 @@ void NetStreamReader::onParameter(const std::string& pluginname,
             pluginname);
     }
 
-    runWindow();
+    runWindow(pluginname, package);
 
     {
         Glib::Mutex::Lock lock(m_mutex);
@@ -131,69 +130,42 @@ void NetStreamReader::onClose(const double& time)
     }
 }
 
-void NetStreamReader::getGtkPlugin(const std::string& pluginname)
+void NetStreamReader::getPlugin(const std::string& pluginname,
+                                const std::string& package)
 {
-    utils::PathList lst(utils::Path::path().getGlobalStreamDirs());
-    utils::PathList::const_iterator it;
+    void *symbol = 0;
 
-    std::string error((fmt(_(
-                "Error opening eov plugin '%1%' in:")) % pluginname).str());
-
-    std::string newfilename(pluginname);
-
-    if (pluginname.size() <= 6 or pluginname.compare(0, 5, "cairo") != 0) {
-        throw utils::InternalError(fmt(_(
-                "oov plugin must begin by string 'cairo': '%1%'")) %
-            pluginname);
-    }
-
-    newfilename.replace(0, 5, "gtk");
-
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        try {
-            PluginFactory pf(newfilename, *it);
-            m_plugin = pf.build(plugin(), this);
-            return;
-        } catch (const std::exception& e) {
-            error += e.what();
+    try {
+        if (not package.empty()) {
+            symbol = getModuleManager().get(package, pluginname,
+                                            utils::MODULE_EOV);
+        } else {
+            symbol = getModuleManager().get(pluginname, utils::MODULE_EOV);
         }
-    }
 
-    throw utils::InternalError(error);
+        EovPluginSlot fct(utils::pointer_to_function < EovPluginSlot >(symbol));
+        Plugin* ptr = fct(plugin(), this);
+        PluginPtr plg(ptr);
+        m_plugin = plg;
+    } catch (const std::exception& e) {
+        throw utils::InternalError(fmt(
+                _("Eov module: error when loadin the module: %1%")) % e.what());
+    }
 }
 
-void NetStreamReader::getDefaultPlugin()
-{
-    utils::PathList lst(utils::Path::path().getGlobalStreamDirs());
-    utils::PathList::const_iterator it;
-
-    std::string error(_("Error opening eov default plugin:"));
-
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        try {
-            PluginFactory pf("gtkdefault", *it);
-            m_plugin = pf.build(plugin(), this);
-            return;
-        } catch (const std::exception& e) {
-            error += e.what();
-        }
-    }
-
-    throw utils::InternalError(error);
-}
-
-void NetStreamReader::runWindow()
+void NetStreamReader::runWindow(const std::string& pluginname,
+                                const std::string& package)
 {
     std::string error;
 
     try {
-        getGtkPlugin(m_newpluginname);
+        getPlugin(pluginname, package);
     } catch (const std::exception& e) {
         error.assign(e.what());
     }
 
     try {
-        getDefaultPlugin();
+        getPlugin("gtkdefault", std::string());
     } catch (const std::exception& e) {
         error += '\n' + e.what();
         throw utils::InternalError(error);

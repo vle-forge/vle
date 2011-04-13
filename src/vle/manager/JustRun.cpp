@@ -28,6 +28,7 @@
 
 #include <vle/manager/JustRun.hpp>
 #include <vle/manager/Run.hpp>
+#include <vle/utils/ModuleManager.hpp>
 
 namespace vle { namespace manager {
 
@@ -41,10 +42,12 @@ bool JustRunMono::operator()(const CmdArgs& args)
     int i = 0;
     bool success = true;
 
+    utils::ModuleManager modulemgr;
+
     if (m_output) {
         for (CmdArgs::const_iterator it = args.begin(); it != args.end();
              ++it) {
-            RunVerbose r(m_out);
+            RunVerbose r(modulemgr, m_out);
             r.start(*it);
             m_names[*it] = i;
             m_lst[i] = r.outputs();
@@ -54,7 +57,7 @@ bool JustRunMono::operator()(const CmdArgs& args)
     } else {
         for (CmdArgs::const_iterator it = args.begin();
              it != args.end(); ++it) {
-            RunQuiet r;
+            RunQuiet r(modulemgr);
             r.start(*it);
             m_names[*it] = i;
             m_lst[i] = r.outputs();
@@ -130,6 +133,8 @@ void JustRunThread::run()
     int instance = 0;
     oov::OutputMatrixViewList views;
 
+    utils::ModuleManager modulemgr;
+
     for (;;) {
         file = 0;
         {
@@ -149,7 +154,7 @@ void JustRunThread::run()
             filename.assign(file->filename());
             ostr.str("");
             instance = file->project().instance();
-            RunVerbose r(ostr);
+            RunVerbose r(modulemgr, ostr);
             r.start(file);
             m_success = (m_success and r.haveError()) ? false : m_success;
             views = r.outputs();

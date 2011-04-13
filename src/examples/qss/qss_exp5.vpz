@@ -122,10 +122,10 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_coupling" library="ladybirdplantlouse" model="DifferenceEquationAdaptor" type="local"  />
-<dynamic name="dyn_ladybirdpest" library="ladybirdplantlouse" model="ladybird2" type="local"  />
-<dynamic name="dyn_plantlousepest" library="ladybirdplantlouse" model="plantlouse" type="local"  />
-<dynamic name="dyn_smartgardener" library="ladybirdplantlouse" model="smartgardener" type="local"  />
+<dynamic name="dyn_coupling" library="QssDifferenceEquationAdaptor" type="local"  />
+<dynamic name="dyn_ladybirdpest" library="QssLadyBird2" type="local"  />
+<dynamic name="dyn_plantlousepest" library="QssPlantLouse" type="local"  />
+<dynamic name="dyn_smartgardener" library="QssSmartGardener" type="local"  />
 </dynamics>
 <experiment name="exp5" duration="10.000000000000000" begin="0.000000000000000" combination="linear" seed="123" >
 <conditions>

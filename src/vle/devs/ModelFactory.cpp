@@ -43,12 +43,14 @@
 
 namespace vle { namespace devs {
 
-ModelFactory::ModelFactory(const vpz::Dynamics& dyn,
+ModelFactory::ModelFactory(const utils::ModuleManager& modulemgr,
+                           const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
                            const vpz::AtomicModelList& atom,
                            RootCoordinator& root)
-    : mDynamics(dyn), mClasses(cls), mExperiment(exp), mAtoms(atom), mRoot(root)
+    : mModuleMgr(modulemgr), mDynamics(dyn), mClasses(cls), mExperiment(exp),
+    mAtoms(atom), mRoot(root)
 {
 }
 
@@ -136,8 +138,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
     switch(dyn.type()) {
     case vpz::Dynamic::LOCAL:
         try {
-            sim->addDynamics(attachDynamics(coordinator, sim, dyn, *getPlugin(dyn),
-                                            initValues));
+            sim->addDynamics(attachDynamics(coordinator, sim, dyn, initValues));
         } catch(const std::exception& /*e*/) {
             initValues.value().clear();
             throw;
@@ -229,186 +230,146 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
     return mdl;
 }
 
-utils::ModuleCache::iterator ModelFactory::getPlugin(const vpz::Dynamic& dyn)
+static devs::Dynamics* buildNewDynamicsWrapper(
+    devs::Simulator* atom,
+    utils::Rand& rnd,
+    const vpz::Dynamic& dyn,
+    const InitEventList& events,
+    const utils::ModuleManager& modulemgr)
 {
-    std::string path;
+    typedef Dynamics*(*fctdw)(const DynamicsWrapperInit&, const InitEventList&);
 
-    if (dyn.package().empty()) {
-        if (utils::Package::package().selected()) {
-            path = utils::Path::path().getPackageLibDir();
-        } else {
-            path = utils::Path::path().getSimulatorDir();
-        }
+    void* symbol;
+
+    if (not dyn.package().empty()) {
+        symbol = modulemgr.get(dyn.package(), dyn.library(),
+                               utils::MODULE_DYNAMICS_WRAPPER);
     } else {
-        path = utils::Path::path().getExternalPackageLibDir(dyn.package());
+        symbol = modulemgr.get(dyn.library(), utils::MODULE_DYNAMICS_WRAPPER);
     }
+
+    fctdw fct = utils::pointer_to_function < fctdw >(symbol);
 
     try {
-        return utils::ModuleCache::instance().load(path, dyn.library());
+        return fct(DynamicsWrapperInit(
+                *atom->getStructure(), rnd,
+                utils::Package::package().getId(dyn.package()),
+                dyn.library()), events);
     } catch(const std::exception& e) {
-        std::string error;
-
-        if (dyn.package().empty()) {
-            if (utils::Package::package().selected()) {
-                error = (fmt(_(
-                            "Error opening simulator '%1%' from current "
-                            "package: '%2%'")) % dyn.library() %
-                    utils::Path::path().getPackageLibDir()).str();
-            } else {
-                error = (fmt(_(
-                            "Error opening simulator '%1%' from global "
-                            "directory:")) % dyn.library()).str();
-            }
-        } else {
-            error = (fmt(_(
-                        "Error opening simulator '%1%' from package '%2%':")) %
-                dyn.library() % dyn.package()).str();
-        }
-
-        error += e.what();
-
-        throw utils::ArgError(error);
+        throw utils::ModellingError(
+            fmt(_("Atomic model wrapper `%1%:%2%' (from dynamics `%3%'"
+                  " library `%4%' package `%5%') throws error in"
+                  " constructor: `%6%'")) %
+            atom->getStructure()->getParentName() %
+            atom->getStructure()->getName() %
+            dyn.name() % dyn.library() % dyn.package() % e.what());
     }
 }
+
+static devs::Dynamics* buildNewDynamics(
+    devs::Simulator* atom,
+    utils::Rand& rnd,
+    const vpz::Dynamic& dyn,
+    const InitEventList& events,
+    const utils::ModuleManager& modulemgr)
+{
+    typedef Dynamics*(*fctdyn)(const DynamicsInit&, const InitEventList&);
+
+    void *symbol;
+
+    if (not dyn.package().empty()) {
+        symbol = modulemgr.get(dyn.package(), dyn.library(),
+                               utils::MODULE_DYNAMICS);
+    } else {
+        symbol = modulemgr.get(dyn.library(), utils::MODULE_DYNAMICS);
+    }
+
+    fctdyn fct = utils::pointer_to_function < fctdyn >(symbol);
+
+    try {
+        return fct(DynamicsInit(
+                *atom->getStructure(), rnd,
+                utils::Package::package().getId(dyn.package())),
+            events);
+    } catch(const std::exception& e) {
+        throw utils::ModellingError(
+            fmt(_("Atomic model `%1%:%2%' (from dynamics `%3%' library"
+                  " `%4%' package `%5%') throws error in constructor:"
+                  " `%6%'")) % atom->getStructure()->getParentName() %
+            atom->getStructure()->getName() % dyn.name() % dyn.library() %
+            dyn.package() % e.what());
+    }
+}
+
+static devs::Dynamics* buildNewExecutive(
+    Coordinator& coordinator,
+    devs::Simulator* atom,
+    utils::Rand& rnd,
+    const vpz::Dynamic& dyn,
+    const InitEventList& events,
+    const utils::ModuleManager& modulemgr)
+{
+    typedef Dynamics*(*fctexe)(const ExecutiveInit&, const InitEventList&);
+
+    void *symbol;
+
+    if (not dyn.package().empty()) {
+        symbol = modulemgr.get(dyn.package(), dyn.library(),
+                               utils::MODULE_EXECUTIVE);
+    } else {
+        symbol = modulemgr.get(dyn.library(), utils::MODULE_EXECUTIVE);
+    }
+
+    fctexe fct = utils::pointer_to_function < fctexe >(symbol);
+
+    try {
+        return fct(ExecutiveInit(
+                *atom->getStructure(), rnd,
+                utils::Package::package().getId(dyn.package()),
+                coordinator), events);
+    } catch(const std::exception& e) {
+        throw utils::ModellingError(
+            fmt(_("Executive model `%1%:%2%' (from dynamics `%3%'"
+                  " library `%4%' package `%5%') throws error in"
+                  " constructor: `%6%'")) %
+            atom->getStructure()->getParentName() %
+            atom->getStructure()->getName() % dyn.name() % dyn.library() %
+            dyn.package() % e.what());
+    }
+}
+
 
 devs::Dynamics* ModelFactory::attachDynamics(Coordinator& coordinator,
                                              devs::Simulator* atom,
                                              const vpz::Dynamic& dyn,
-                                             const utils::Module& module,
                                              const InitEventList& events)
 {
-    typedef Dynamics*(*fctdyn)(const DynamicsInit&, const InitEventList&);
-    typedef Dynamics*(*fctexe)(const ExecutiveInit&, const InitEventList&);
-    typedef Dynamics*(*fctdw)(const DynamicsWrapperInit&, const InitEventList&);
+    utils::ModuleType type;
 
-    std::string makeNewDynamics("makeNewDynamics");
-    std::string makeNewExecutive("makeNewExecutive");
-    std::string makeNewDynamicsWrapper("makeNewDynamicsWrapper");
-    void* symbol = NULL;
-
-    if (dyn.model().empty() or not dyn.language().empty()) {
-        if ((symbol = module.get(makeNewDynamics))) {
-            fctdyn fct = utils::pointer_to_function < fctdyn >(symbol);
-            try {
-                return fct(DynamicsInit(
-                        *atom->getStructure(), mRoot.rand(),
-                        utils::Package::package().getId(dyn.package())),
-                    events);
-            } catch(const std::exception& e) {
-                throw utils::ModellingError(
-                    fmt(_("Atomic model `%1%:%2%' (from library `%3%' dynamics"
-                          " `%4%' package `%5%') throws error in constructor:"
-                          " `%6%'")) % atom->getStructure()->getParentName() %
-                    atom->getStructure()->getName() % module.path() %
-                    dyn.name() % dyn.package() % e.what());
-            }
-        }
-
-        if ((symbol = module.get(makeNewExecutive))) {
-            fctexe fct = utils::pointer_to_function < fctexe >(symbol);
-            try {
-                return fct(ExecutiveInit(
-                        *atom->getStructure(), mRoot.rand(),
-                        utils::Package::package().getId(dyn.package()),
-                        coordinator), events);
-            } catch(const std::exception& e) {
-                throw utils::ModellingError(
-                    fmt(_("Executive model `%1%:%2%' (from library `%3%'"
-                          " dynamics `%4%' package `%5%') throws error in"
-                          " constructor: `%6%'")) %
-                    atom->getStructure()->getParentName() %
-                    atom->getStructure()->getName() % module.path() %
-                    dyn.name() % dyn.package() % e.what());
-            }
-        }
-
-        if ((symbol = module.get(makeNewDynamicsWrapper))) {
-            fctdw fct = utils::pointer_to_function < fctdw >(symbol);
-            try {
-                return fct(DynamicsWrapperInit(
-                        *atom->getStructure(), mRoot.rand(),
-                        utils::Package::package().getId(dyn.package()),
-                        dyn.library(), dyn.model()), events);
-            } catch(const std::exception& e) {
-                throw utils::ModellingError(
-                    fmt(_("Atomic model wrapper `%1%:%2%' (from library `%3%'"
-                          " dynamics `%4%' package `%5%') throws error in"
-                          " constructor: `%6%'")) %
-                    atom->getStructure()->getParentName() %
-                    atom->getStructure()->getName() % module.path() %
-                    dyn.name() % dyn.package() % e.what());
-            }
-        }
-
-        throw utils::ModellingError(fmt(
-                _("Dynamic library loading problem: cannot get any dynamics"
-                  " executive or wrapper '%1%' in module '%2%'. Have you"
-                  " used DECLARE_DYNAMICS, DECLARE_EXECUTIVE, "
-                  " DECLARE_DYNAMICSWRAPPER ?")) % dyn.name() % module.path());
+    if (not dyn.package().empty()) {
+        type = mModuleMgr.determine(dyn.package(), dyn.library(),
+                                    utils::MODULE_DYNAMICS);
     } else {
-        makeNewDynamics += dyn.model();
-        if ((symbol = module.get(makeNewDynamics))) {
-            fctdyn fct = utils::pointer_to_function < fctdyn >(symbol);
-            try {
-                return fct(DynamicsInit(
-                        *atom->getStructure(), mRoot.rand(),
-                        utils::Package::package().getId(dyn.package())),
-                    events);
-            } catch(const std::exception& e) {
-                throw utils::ModellingError(
-                    fmt(_("Atomic model `%1%:%2%' (from library `%3%' dynamics"
-                          " `%4%' model `%5%' package `%6%') throws error in"
-                          " constructor: `%7%'")) %
-                    atom->getStructure()->getParentName() %
-                    atom->getStructure()->getName() % module.path() %
-                    dyn.name() % dyn.model() % dyn.package() % e.what());
-            }
-        }
+        type = mModuleMgr.determine(dyn.library(), utils::MODULE_DYNAMICS);
+    }
 
-        makeNewExecutive += dyn.model();
-        if ((symbol = module.get(makeNewExecutive))) {
-            fctexe fct = utils::pointer_to_function < fctexe >(symbol);
-            try {
-                return fct(ExecutiveInit(
-                        *atom->getStructure(), mRoot.rand(),
-                        utils::Package::package().getId(dyn.package()),
-                        coordinator), events);
-            } catch(const std::exception& e) {
-                throw utils::ModellingError(
-                    fmt(_("Executive model `%1%:%2%' (from library `%3%'"
-                          " dynamics `%4%' model `%5%' package `%6%') throws"
-                          " error in constructor: `%7%'")) %
-                    atom->getStructure()->getParentName() %
-                    atom->getStructure()->getName() % module.path() %
-                    dyn.name() % dyn.model() % dyn.package() % e.what());
-            }
-        }
-
-        makeNewDynamicsWrapper += dyn.model();
-        if ((symbol = module.get(makeNewDynamicsWrapper))) {
-            fctdw fct = utils::pointer_to_function < fctdw >(symbol);
-            try {
-                return fct(DynamicsWrapperInit(
-                        *atom->getStructure(), mRoot.rand(),
-                        utils::Package::package().getId(dyn.package()),
-                        dyn.library(), dyn.model()), events);
-            } catch(const std::exception& e) {
-                throw utils::ModellingError(
-                    fmt(_("Atomic model wrapper `%1%:%2%' (from library `%3%'"
-                          " dynamics `%4%' model `%5%' package `%6%') throws"
-                          " error in constructor: `%7%'")) %
-                    atom->getStructure()->getParentName() %
-                    atom->getStructure()->getName() % module.path() %
-                    dyn.name() % dyn.model() % dyn.package() % e.what());
-            }
-        }
-
-        throw utils::ModellingError(fmt(
-                _("Dynamic library loading problem: cannot get any dynamics"
-                  " executive or wrapper '%1%' in module '%2%'. Have you"
-                  " used DECLARE_NAMED_DYNAMICS, DECLARE_NAMED_EXECUTIVE, "
-                  " DECLARE_NAMED_DYNAMICSWRAPPER ?")) % dyn.name() %
-            module.path());
+    switch (type) {
+        case utils::MODULE_DYNAMICS_WRAPPER:
+            return buildNewDynamicsWrapper(atom, mRoot.rand(), dyn, events,
+                                           mModuleMgr);
+        case utils::MODULE_DYNAMICS:
+            return buildNewDynamics(atom, mRoot.rand(), dyn, events,
+                                    mModuleMgr);
+        case utils::MODULE_EXECUTIVE:
+            return buildNewExecutive(coordinator, atom, mRoot.rand(), dyn,
+                                     events, mModuleMgr);
+        default:
+            throw utils::ModellingError(fmt(
+                    _("Dynamic library loading problem: cannot get any dynamics"
+                      " executive or wrapper '%1%' in library '%2%' package"
+                      " '%3%'. Have you used DECLARE_DYNAMICS,"
+                      " DECLARE_EXECUTIVE, DECLARE_DYNAMICSWRAPPER ?")) %
+                dyn.name() % dyn.library() % dyn.package());
     }
 }
 

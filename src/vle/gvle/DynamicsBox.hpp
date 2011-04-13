@@ -85,7 +85,6 @@ namespace vle { namespace gvle {
         Gtk::TreeView*                      mDynamics;
         Gtk::ComboBox*                      mPackage;
         Gtk::ComboBox*                      mLibrary;
-        Gtk::Entry*                         mModel;
         Gtk::Entry*                         mLocationHost;
         Gtk::SpinButton*                    mLocationPort;
         Gtk::ComboBox*                      mLanguage;
@@ -94,7 +93,6 @@ namespace vle { namespace gvle {
         int                                 mColumnName;
         int                                 mColumnPackage;
         int                                 mColumnLibrary;
-        int                                 mColumnModel;
         std::string                         mOldName;
         bool                                mValidateRetry;
         Glib::ustring                       mInvalidTextForRetry;
@@ -155,12 +153,11 @@ namespace vle { namespace gvle {
         struct DynamicsModelColumns : public Gtk::TreeModel::ColumnRecord
         {
             DynamicsModelColumns()
-            { add(mName); add(mPackage); add(mLibrary); add(mModel);}
+            { add(mName); add(mPackage); add(mLibrary); }
 
             Gtk::TreeModelColumn<Glib::ustring> mName;
             Gtk::TreeModelColumn<Glib::ustring> mPackage;
             Gtk::TreeModelColumn<Glib::ustring> mLibrary;
-            Gtk::TreeModelColumn<Glib::ustring> mModel;
         } mDynamicsColumns;
 
         struct PackageModelColumns : public Gtk::TreeModel::ColumnRecord

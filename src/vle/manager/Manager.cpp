@@ -33,7 +33,6 @@
 #include <vle/manager/Run.hpp>
 #include <vle/manager/TotalExperimentGenerator.hpp>
 #include <vle/manager/LinearExperimentGenerator.hpp>
-#include <vle/oov/PluginFactory.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/value/String.hpp>
@@ -70,13 +69,15 @@ void ManagerRunMono::operator()(const vpz::Vpz& file)
     m_exp->saveVPZinstance(m_writefile);
     m_exp->build(&m_matrix);
 
+    utils::ModuleManager modulemgr;
+
     std::ostringstream ostr;
 
     while (not m_exp->vpzInstances().empty()) {
         vpz::Vpz* file = m_exp->vpzInstances().front();
         int instance = file->project().instance();
         int replica = file->project().replica();
-        RunVerbose r(ostr);
+        RunVerbose r(modulemgr, ostr);
         r.start(file);
 
         if (r.haveError()) {
@@ -151,6 +152,8 @@ void ManagerRunThread::run()
     int replica = 0;
     oov::OutputMatrixViewList views;
 
+    utils::ModuleManager modulemgr;
+
     for (;;) {
         file = 0;
         {
@@ -170,7 +173,7 @@ void ManagerRunThread::run()
             ostr.str("");
             instance = file->project().instance();
             replica = file->project().replica();
-            RunVerbose r(ostr);
+            RunVerbose r(modulemgr, ostr);
             r.start(file);
 
             if (r.haveError()) {

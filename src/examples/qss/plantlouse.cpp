@@ -26,10 +26,28 @@
  */
 
 
-#include "plantlouse.hpp"
+#include <vle/extension/differential-equation/QSS.hpp>
 #include <cmath>
 
 namespace vle { namespace examples { namespace qss {
+
+class Plantlouse : public extension::QSS::Simple
+{
+public:
+    Plantlouse(const devs::DynamicsInit& model,
+	       const devs::InitEventList& events);
+
+    virtual ~Plantlouse();
+
+    virtual double compute(const devs::Time& time) const;
+
+private:
+    Var x;
+    Ext y;
+
+    double a;
+    double b;
+};
 
 Plantlouse::Plantlouse(const devs::DynamicsInit& model,
                        const devs::InitEventList& events) :
@@ -53,4 +71,4 @@ double Plantlouse::compute(const vle::devs::Time& /* time */) const
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(plantlouse, vle::examples::qss::Plantlouse)
+DECLARE_DYNAMICS(vle::examples::qss::Plantlouse)

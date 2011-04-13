@@ -28,16 +28,18 @@
 
 #include <vle/devs/NetStreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
+#include <vle/utils/Algo.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/oov/PluginFactory.hpp>
+#include <vle/oov/Plugin.hpp>
 #include <string>
 
 
 namespace vle { namespace devs {
 
-NetStreamWriter::NetStreamWriter()
-    : m_paramFrame(0), m_newObsFrame(0), m_delObsFrame(0), m_valueFrame(0),
-    m_closeFrame(0), m_refreshFrame(0), m_client(0)
+NetStreamWriter::NetStreamWriter(const utils::ModuleManager& modulemgr)
+    : StreamWriter(modulemgr), m_paramFrame(0), m_newObsFrame(0),
+    m_delObsFrame(0), m_valueFrame(0), m_closeFrame(0), m_refreshFrame(0),
+    m_client(0)
 {
 }
 
@@ -59,6 +61,10 @@ void NetStreamWriter::open(const std::string& plugin,
                            value::Value* parameters,
                            const devs::Time& time)
 {
+    m_pluginname = plugin;
+    m_package = package;
+    m_location = location;
+
     std::string host, directory, out;
     int port;
 
@@ -220,26 +226,32 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
         value::Set vals;
         value::Set::deserializeBinaryBuffer(vals, result);
 
-        const std::string& name(vals.getString(0));
-
-        utils::PathList lst(utils::Path::path().getStreamDirs());
-        utils::PathList::const_iterator it;
         oov::PluginPtr plugin;
-        std::string error;
 
-        for (it = lst.begin(); it != lst.end(); ++it) {
-            try {
-                oov::PluginFactory pf(name, *it);
-                plugin = pf.build("");
-            } catch(const std::exception& e) {
-                error += e.what();
+        try {
+            void *symbol = 0;
+            if (not m_package.empty()) {
+                symbol = getModuleManager().get(m_package, m_pluginname,
+                                                utils::MODULE_OOV);
+            } else {
+                symbol = getModuleManager().get(m_pluginname,
+                                                utils::MODULE_OOV);
             }
+
+            oov::OovPluginSlot fct(utils::pointer_to_function <
+                              oov::OovPluginSlot>(symbol));
+            oov::PluginPtr ptr(fct(m_location));
+            plugin = ptr;
+        } catch(const std::exception& e) {
+            throw utils::InternalError(fmt(
+                    _("Oov module: error when loading the module: %1%")) %
+                e.what());
         }
 
         if (not plugin.get()) {
-            throw utils::ArgError(error);
+            throw utils::ArgError();
         } else {
-            plugin->deserialize(*vals.get(1));
+            plugin->deserialize(*vals.get(0));
             return plugin;
         }
     }

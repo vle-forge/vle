@@ -36,7 +36,7 @@
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/utils/Module.hpp>
+#include <vle/utils/ModuleManager.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace vle { namespace devs {
@@ -61,7 +61,8 @@ public:
      * @param dyn the root dynamics of vpz::Dynamics to load.
      * @param cls the vpz::classes to parse vpz::Dynamics to load.
      */
-    ModelFactory(const vpz::Dynamics& dyn,
+    ModelFactory(const utils::ModuleManager& modulemgr,
+                 const vpz::Dynamics& dyn,
                  const vpz::Classes& cls,
                  const vpz::Experiment& experiment,
                  const vpz::AtomicModelList& atom,
@@ -226,20 +227,33 @@ public:
                                        const std::string& modelname);
 
 private:
-    vpz::Dynamics           mDynamics;
-    vpz::Classes            mClasses;
-    vpz::Experiment         mExperiment;
+    ModelFactory(const ModelFactory& other);
+    ModelFactory& operator=(const ModelFactory& other);
+
+    const utils::ModuleManager& mModuleMgr; /**< A reference to the
+                                              utils::ModuleManager. */
+
+    vpz::Dynamics           mDynamics; /**< List of available vpz::Dynamics. */
+    vpz::Classes            mClasses; /**< List of available vpz::Classes. */
+    vpz::Experiment         mExperiment; /**< A reference to the
+                                           vpz::Experiment. */
     vpz::AtomicModelList    mAtoms;
     RootCoordinator&        mRoot;
 
     /**
-     * @brief Load a new Glib::Module plugin from dynamic parameter in
-     * default model dir or user model dir.
-     * @param dyn A reference to the dynamic to load.
-     * @return a reference to a Glib::Module.
-     * @throw Exception::Internal if file is not found.
+     * Try to open the plug-in and return the type of opened plugin
+     * (MODULE_DYNAMICS, MODULE_DYNAMICS_WRAPPER or MODULE_EXECUTIVE).
+     *
+     * @param dyn
+     * @param path [out] assign the path of the plug-in.
+     *
+     * @throw utils::ArgError if an error occured during the loading of the
+     * shared library.
+     *
+     * @return Return a constant.
      */
-    utils::ModuleCache::iterator getPlugin(const vpz::Dynamic& dyn);
+    utils::ModuleType open(const vpz::Dynamic& dyn,
+                           std::string* path);
 
     /**
      * @brief Attach to the specified devs::Simulator reference a
@@ -254,7 +268,6 @@ private:
     devs::Dynamics* attachDynamics(Coordinator& coordinator,
                                    devs::Simulator* atom,
                                    const vpz::Dynamic& dyn,
-                                   const utils::Module& module,
                                    const InitEventList& events);
 };
 

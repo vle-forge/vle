@@ -25,25 +25,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <Beep.hpp>
+#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/DynamicsDbg.hpp>
 
 namespace vle { namespace examples { namespace gens {
 
-devs::Time Beep::init(const devs::Time& /* time */)
+class Beep : public devs::Dynamics
 {
-    return 0.0;
-}
+public:
+    Beep(const devs::DynamicsInit& model,
+         const devs::InitEventList& events) :
+        devs::Dynamics(model, events)
+    {
+    }
 
-devs::Time Beep::timeAdvance() const
-{
-    return 1.0;
-}
+    virtual ~Beep()
+    {
+    }
 
-void Beep::output(const devs::Time& /* time */,
-                  devs::ExternalEventList& output) const
-{
-    output.addEvent(buildEvent("out"));
-}
+    virtual devs::Time init(const devs::Time& /* time */)
+    {
+        return 0.0;
+    }
+
+    virtual devs::Time timeAdvance() const
+    {
+        return 1.0;
+    }
+
+    virtual void output(const devs::Time& /* time */,
+                        devs::ExternalEventList& output) const
+    {
+        output.addEvent(buildEvent("out"));
+    }
+};
 
 }}} // namespace vle examples gens
+
+DECLARE_DYNAMICS_DBG(vle::examples::gens::Beep)

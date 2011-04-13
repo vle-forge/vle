@@ -31,8 +31,8 @@
 
 #include <vle/oov/DllDefines.hpp>
 #include <vle/oov/Plugin.hpp>
+#include <vle/utils/ModuleManager.hpp>
 #include <boost/shared_ptr.hpp>
-#include <glibmm/module.h>
 #include <string>
 
 namespace vle { namespace oov {
@@ -48,7 +48,8 @@ namespace vle { namespace oov {
         /**
          * @brief Build a new StreamReader.
          */
-	StreamReader()
+	StreamReader(const utils::ModuleManager& modulemgr)
+            : m_modulemgr(modulemgr)
         {}
 
         /**
@@ -142,8 +143,15 @@ namespace vle { namespace oov {
          */
         PluginPtr plugin() const;
 
+        const utils::ModuleManager& getModuleManager() const
+        { return m_modulemgr; }
+
     private:
-        PluginPtr   m_plugin;
+        StreamReader(const StreamReader& other);
+        StreamReader& operator=(const StreamReader& other);
+
+        const utils::ModuleManager& m_modulemgr;
+        PluginPtr m_plugin;
 
         /**
          * @brief Load the specified output plugin from the StreamDirs location.
@@ -153,7 +161,8 @@ namespace vle { namespace oov {
          */
         virtual void initPlugin(const std::string& plugin,
                                 const std::string& package,
-                                const std::string& location);
+                                const std::string& location,
+                                const utils::ModuleManager& modulemgr);
 
     };
 

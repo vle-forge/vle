@@ -30,9 +30,29 @@
 #define VLE_GVLE_OUTPUTPLUGIN_HPP
 
 #include <vle/gvle/DllDefines.hpp>
-#include <gdkmm/pixbuf.h>
 #include <vle/vpz/Output.hpp>
 #include <vle/vpz/View.hpp>
+#include <vle/version.hpp>
+#include <gdkmm/pixbuf.h>
+
+#define DECLARE_GVLE_OUTPUTPLUGIN(x)                       \
+    extern "C" {                                           \
+        VLE_GVLE_EXPORT vle::gvle::OutputPlugin*           \
+        vle_make_new_gvle_output(const std::string& name)  \
+        {                                                  \
+            return new x(name);                            \
+        }                                                  \
+                                                           \
+        VLE_GVLE_EXPORT void                               \
+        vle_api_level(boost::uint32_t* major,              \
+                      boost::uint32_t* minor,              \
+                      boost::uint32_t* patch)              \
+        {                                                  \
+            *major = VLE_MAJOR_VERSION;                    \
+            *minor = VLE_MINOR_VERSION;                    \
+            *patch = VLE_PATCH_VERSION;                    \
+        }                                                  \
+    }
 
 namespace vle { namespace gvle {
 
@@ -87,14 +107,9 @@ private:
     std::string m_name;
 };
 
-}} // namespace vle gvle
+typedef OutputPlugin* (*GvleOutputPluginSlot)(const std::string&);
 
-#define DECLARE_GVLE_OUTPUTPLUGIN(x) \
-    extern "C" { \
-        vle::gvle::OutputPlugin* makeNewOutputPlugin( \
-            const std::string& name) \
-        { return new x(name); } \
-    }
+}} // namespace vle gvle
 
 #endif
 

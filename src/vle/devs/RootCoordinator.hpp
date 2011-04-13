@@ -34,6 +34,7 @@
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/oov/OutputMatrix.hpp>
+#include <vle/utils/ModuleManager.hpp>
 
 namespace vle { namespace graph {
 
@@ -44,7 +45,6 @@ namespace vle { namespace graph {
 namespace vle { namespace devs {
 
     class Coordinator;
-    class ModelFactory;
     class Dynamics;
 
     /**
@@ -55,7 +55,7 @@ namespace vle { namespace devs {
     class VLE_DEVS_EXPORT RootCoordinator
     {
     public:
-        RootCoordinator();
+        RootCoordinator(const utils::ModuleManager& modulemgr);
 
         ~RootCoordinator();
 
@@ -119,6 +119,9 @@ namespace vle { namespace devs {
         utils::Rand& rand() { return m_rand; }
 
     private:
+        RootCoordinator(const RootCoordinator& other);
+        RootCoordinator& operator=(const RootCoordinator& other);
+
         utils::Rand         m_rand;
 
         /** @brief Store the beginning of the simulation. */
@@ -131,8 +134,9 @@ namespace vle { namespace devs {
         devs::Time          m_end;
 
         Coordinator*        m_coordinator;
-        ModelFactory*       m_modelfactory;
         graph::Model*       m_root;
+
+        const utils::ModuleManager& m_modulemgr;
 
         ///! the output of the simulation if plugin are Storage.
         oov::OutputMatrixViewList m_outputs;

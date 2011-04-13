@@ -27,8 +27,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="m1" library="generator" model="" type="local"  />
-<dynamic name="m2" library="counter" model="" type="local"  />
+<dynamic name="m1" library="generator" type="local"  />
+<dynamic name="m2" library="counter" type="local"  />
 </dynamics>
 <experiment name="experimentcounter" duration="1000.000000000000000" begin="0.000000000000000" combination="linear" seed="123456789" >
 <conditions>

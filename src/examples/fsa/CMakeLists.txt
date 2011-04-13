@@ -11,214 +11,41 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-SET(SOURCES1_CPP Generator.cpp)
 
-ADD_LIBRARY(generator2 SHARED ${SOURCES1_CPP})
+DeclareModuleDynamics(FDDevs1 FDDevs1.cpp)
+DeclareModuleDynamics(FDDevs2 FDDevs2.cpp)
+DeclareModuleDynamics(Generator Generator.cpp)
+DeclareModuleDynamics(LinearEqLin LinearEqLin.cpp)
+DeclareModuleDynamics(LinearGenLin LinearGenLin.cpp)
+DeclareModuleDynamics(Mealy1 Mealy1.cpp)
+DeclareModuleDynamics(MealyCounter1 MealyCounter1.cpp)
+DeclareModuleDynamics(Meteo Meteo.cpp)
+DeclareModuleDynamics(Moore1 Moore1.cpp)
+DeclareModuleDynamics(MooreCounter2 MooreCounter2.cpp)
+DeclareModuleDynamics(Stage Stage.cpp Stage.hpp)
+DeclareModuleDynamics(Statechart1 Statechart1.cpp)
+DeclareModuleDynamics(Statechart2 Statechart2.cpp)
+DeclareModuleDynamics(Statechart3 Statechart3.cpp)
+DeclareModuleDynamics(Statechart4 Statechart4.cpp)
+DeclareModuleDynamics(Statechart5 Statechart5.cpp)
+DeclareModuleDynamics(Statechart6 Statechart6.cpp)
+DeclareModuleDynamics(Statechart7 Statechart7.cpp)
+DeclareModuleDynamics(Statechart8 Statechart8.cpp)
+DeclareModuleDynamics(Statechart9 Statechart9.cpp)
+DeclareModuleDynamics(StatechartListener StatechartListener.cpp)
+DeclareModuleDynamics(StatechartMultipleSend StatechartMultipleSend.cpp)
+DeclareModuleDynamics(StatechartThreshold StatechartThreshold.cpp)
 
-TARGET_LINK_LIBRARIES(generator2
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS generator2
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-SET(SOURCES2_CPP Moore.cpp)
-
-ADD_LIBRARY(moore SHARED ${SOURCES2_CPP})
-
-TARGET_LINK_LIBRARIES(moore
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS moore
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-SET(SOURCES3_CPP Mealy.cpp)
-
-ADD_LIBRARY(mealy SHARED ${SOURCES3_CPP})
-
-TARGET_LINK_LIBRARIES(mealy
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS mealy
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-####
-# Test statechartMultipleSend.vpz
-####
-
-ADD_LIBRARY(statechartMultipleSend SHARED StatechartMultipleSend.cpp)
-
-TARGET_LINK_LIBRARIES(statechartMultipleSend
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS statechartMultipleSend
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-INSTALL(FILES statechartMultipleSend.vpz
+INSTALL(FILES fddevs.vpz mealy2.vpz mealy.vpz moore2.vpz moore.vpz stage.vpz
+  statechart10.vpz statechart11.vpz statechart2.vpz statechart3.vpz
+  statechart4.vpz statechart5.vpz statechart6.vpz statechart7.vpz
+  statechart8.vpz statechart9.vpz statechartMultipleSend.vpz statechart.vpz
   DESTINATION "${VLE_SHARE_DIRS}/examples")
 
-## Fin test
-
-SET(SOURCES4_CPP Statechart.cpp)
-
-ADD_LIBRARY(statechart SHARED ${SOURCES4_CPP})
-
-TARGET_LINK_LIBRARIES(statechart
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS statechart
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-SET(SOURCES5_CPP FDDevs.cpp)
-
-ADD_LIBRARY(fddevs SHARED ${SOURCES5_CPP})
-
-TARGET_LINK_LIBRARIES(fddevs
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS fddevs
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-SET(SOURCES6_CPP Stage.cpp Stage.hpp Meteo.cpp)
-
-ADD_LIBRARY(stage SHARED ${SOURCES6_CPP})
-
-TARGET_LINK_LIBRARIES(stage
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS stage
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-SET(SOURCES7_CPP Linear.cpp)
-
-ADD_LIBRARY(linear SHARED ${SOURCES7_CPP})
-
-TARGET_LINK_LIBRARIES(linear
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS linear
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-INSTALL(FILES moore.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES moore2.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES mealy.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES mealy2.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart2.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart3.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart4.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart5.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart6.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart7.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart8.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart9.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart10.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES statechart11.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES fddevs.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES stage.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-
-INSTALL(FILES ${SOURCES1_CPP} ${SOURCES2_CPP} ${SOURCES3_CPP} ${SOURCES4_CPP}
-  ${SOURCES5_CPP} ${SOURCES6_CPP} ${SOURCES7_CPP} DESTINATION
-  "${VLE_SHARE_DIRS}/examples/sources/fsa")
+INSTALL(FILES FDDevs1.cpp FDDevs2.cpp Generator.cpp LinearEqLin.cpp
+  LinearGenLin.cpp Mealy1.cpp MealyCounter1.cpp Meteo.cpp Moore1.cpp
+  MooreCounter2.cpp Stage.cpp Stage.hpp Statechart1.cpp Statechart2.cpp
+  Statechart3.cpp Statechart4.cpp Statechart5.cpp Statechart6.cpp
+  Statechart7.cpp Statechart8.cpp Statechart9.cpp StatechartListener.cpp
+  StatechartMultipleSend.cpp StatechartThreshold.cpp
+  DESTINATION "${VLE_SHARE_DIRS}/examples/sources/fsa")

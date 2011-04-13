@@ -51,6 +51,6 @@ double I2::compute(const vle::devs::Time& /* time */) const
     return a * E() - (m + g) * I();
 }
 
-DECLARE_NAMED_DYNAMICS(I2, I2)
+DECLARE_DYNAMICS(I2)
 
 }}} // namespace vle examples dess

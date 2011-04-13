@@ -25,13 +25,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <vle/devs/Executive.hpp>
 #include <vle/devs/ExecutiveDbg.hpp>
 #include <vle/translator/GraphTranslator.hpp>
-#include <vle/utils.hpp>
-#include <vle/devs.hpp>
-#include <vle/vpz.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace vle { namespace examples { namespace gens {
 
@@ -73,4 +69,4 @@ public:
 
 }}} // namespace vle examples gens
 
-DECLARE_NAMED_EXECUTIVE_DBG(exegraph, vle::examples::gens::GenExecutiveGraph)
+DECLARE_EXECUTIVE_DBG(vle::examples::gens::GenExecutiveGraph)

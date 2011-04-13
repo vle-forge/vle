@@ -93,6 +93,8 @@ namespace vle { namespace manager {
         Glib::Mutex                     mMutex; /// mutex on list of works
         Glib::Cond                      mCondWait;
         Glib::Cond                      mCondRun;
+
+        utils::ModuleManager            mModulemgr;
     };
 
 }} // namespace vle manager

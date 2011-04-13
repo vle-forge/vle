@@ -46,9 +46,9 @@
   </model>
  </structures>
  <dynamics>
-  <dynamic name="beep" library="petrinet" model="Beep"/>
-  <dynamic name="petri" library="petrinet" model="Ordinary"/>
-  <dynamic name="counter" library="petrinet" model="Counter"/>
+  <dynamic name="beep" library="PetrinetBeep"/>
+  <dynamic name="petri" library="PetrinetOrdinary"/>
+  <dynamic name="counter" library="PetrinetCounter"/>
  </dynamics>
  <experiment name="PetriNetAnd" duration="1" seed="123">
   <conditions>

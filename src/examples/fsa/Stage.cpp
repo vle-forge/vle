@@ -115,6 +115,6 @@ Stage::Stage(const vd::DynamicsInit& init,
     STi = 0.0;
 }
 
-DECLARE_NAMED_DYNAMICS(Stage, Stage)
+DECLARE_DYNAMICS(Stage)
 
 }}} // namespace vle examples fsa

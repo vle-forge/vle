@@ -31,6 +31,7 @@
 
 #include <vle/manager/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -49,7 +50,7 @@ namespace vle { namespace manager {
         /**
          * @brief Default constructor.
          */
-        Run();
+        Run(const utils::ModuleManager& modulemgr);
 
         /**
          * @brief Return true if the simulation reports error.
@@ -83,8 +84,11 @@ namespace vle { namespace manager {
         oov::OutputMatrixViewList& outputs();
 
     protected:
-        bool                    m_error;
+        Run(const Run& other);
+        Run& operator=(const Run& other);
+
         devs::RootCoordinator   m_root;
+        bool                    m_error;
     };
 
 
@@ -97,7 +101,7 @@ namespace vle { namespace manager {
     class VLE_MANAGER_EXPORT RunVerbose : public Run
     {
     public:
-        RunVerbose(std::ostream& out);
+        RunVerbose(const utils::ModuleManager& modulemgr, std::ostream& out);
 
         /**
          * @brief Launch the simulation of the specified vpz::Vpz object. Be
@@ -142,6 +146,9 @@ namespace vle { namespace manager {
         void start(const vpz::Vpz& vpz);
 
     private:
+        RunVerbose(const RunVerbose& other);
+        RunVerbose& operator=(const RunVerbose& other);
+
         std::ostream&       m_out;
     };
 
@@ -155,6 +162,8 @@ namespace vle { namespace manager {
     class VLE_MANAGER_EXPORT RunQuiet : public Run
     {
     public:
+        RunQuiet(const utils::ModuleManager& modulemgr);
+
         /**
          * @brief Launch the simulation of the specified vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
@@ -206,13 +215,16 @@ namespace vle { namespace manager {
         const std::string& error() const;
 
     private:
+        RunQuiet(const RunQuiet& other);
+        RunQuiet& operator=(const RunQuiet& other);
+
         std::string m_stringerror;
     };
 
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-    inline Run::Run() :
-        m_error(false)
+    inline Run::Run(const utils::ModuleManager& modulemgr)
+        : m_root(modulemgr), m_error(false)
     {
     }
 
@@ -243,8 +255,9 @@ namespace vle { namespace manager {
 
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-    inline RunVerbose::RunVerbose(std::ostream& out) :
-        m_out(out)
+    inline RunVerbose::RunVerbose(const utils::ModuleManager& modulemgr,
+                                  std::ostream& out)
+        : Run(modulemgr), m_out(out)
     {
     }
 
@@ -264,6 +277,11 @@ namespace vle { namespace manager {
     }
 
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+    inline RunQuiet::RunQuiet(const utils::ModuleManager& modulemgr)
+        : Run(modulemgr)
+    {
+    }
 
     inline const std::string& RunQuiet::error() const
     {

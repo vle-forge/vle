@@ -26,116 +26,128 @@
  */
 
 
-#include <GenExecutiveClass.hpp>
-#include <vle/utils.hpp>
-#include <vle/devs.hpp>
-#include <vle/vpz.hpp>
+#include <vle/devs/Executive.hpp>
+#include <vle/devs/ExecutiveDbg.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <stack>
 
 namespace vle { namespace examples { namespace gens {
 
-GenExecutiveClass::GenExecutiveClass(const devs::ExecutiveInit& mdl,
-                                     const devs::InitEventList& events) :
-    devs::Executive(mdl, events)
+class GenExecutiveClass : public devs::Executive
 {
-}
+    enum state { INIT, IDLE, ADDMODEL, DELMODEL };
 
-devs::Time GenExecutiveClass::init(const devs::Time& /* time */)
-{
-    m_state = INIT;
-    m_buildbeepbeep = true;
-    return 0.0;
-}
+    std::stack < std::string >  m_stacknames;
+    state                       m_state;
+    bool                        m_buildbeepbeep;
 
-devs::Time GenExecutiveClass::timeAdvance() const
-{
-    switch (m_state) {
-    case INIT:
+public:
+    GenExecutiveClass(const devs::ExecutiveInit& mdl,
+                      const devs::InitEventList& events) :
+        devs::Executive(mdl, events)
+    {
+    }
+
+    virtual ~GenExecutiveClass()
+    {
+    }
+
+    virtual devs::Time init(const devs::Time& /* time */)
+    {
+        m_state = INIT;
+        m_buildbeepbeep = true;
         return 0.0;
-    case IDLE:
-        return 0.0;
-    case ADDMODEL:
-        return 1.0;
-    case DELMODEL:
-        return 1.0;
     }
-    throw utils::InternalError("GenExecutiveClass ta");
-}
 
-void GenExecutiveClass::internalTransition(const devs::Time& time)
-{
-    switch (m_state) {
-    case INIT:
-        m_state = IDLE;
-        break;
-    case IDLE:
-        if (time < 50.0) {
-            m_state = ADDMODEL;
+    virtual devs::Time timeAdvance() const
+    {
+        switch (m_state) {
+        case INIT:
+            return 0.0;
+        case IDLE:
+            return 0.0;
+        case ADDMODEL:
+            return 1.0;
+        case DELMODEL:
+            return 1.0;
         }
-        else {
-            m_state = DELMODEL;
+        throw utils::InternalError("GenExecutiveClass ta");
+    }
+
+    virtual void internalTransition(const devs::Time& time)
+    {
+        switch (m_state) {
+        case INIT:
+            m_state = IDLE;
+            break;
+        case IDLE:
+            if (time < 50.0) {
+                m_state = ADDMODEL;
+            }
+            else {
+                m_state = DELMODEL;
+            }
+            break;
+        case ADDMODEL:
+            add_new_model();
+            m_state = IDLE;
+            break;
+        case DELMODEL:
+            del_first_model();
+            m_state = IDLE;
+            break;
         }
-        break;
-    case ADDMODEL:
-        add_new_model();
-        m_state = IDLE;
-        break;
-    case DELMODEL:
-        del_first_model();
-        m_state = IDLE;
-        break;
-    }
-}
-
-value::Value* GenExecutiveClass::observation(const devs::ObservationEvent& ev)
-    const
-{
-    if (ev.onPort("nbmodel")) {
-        return value::Integer::create(get_nb_model());
-    } else if (ev.onPort("structure")) {
-        std::ostringstream out;
-        coupledmodel().writeXML(out);
-        return value::String::create(out.str());
-    } else {
-        return devs::Executive::observation(ev);
-    }
-}
-
-//
-///
-////
-///
-//
-
-void GenExecutiveClass::add_new_model()
-{
-    std::string name((fmt("beep-%1%") % m_stacknames.size()).str());
-    if (m_buildbeepbeep) {
-        createModelFromClass("beepbeep", name);
-    } else {
-        createModelFromClass("beepbeepbeep", name);
-    }
-    addConnection(name, "out", "counter", "in");
-
-    m_stacknames.push(name);
-    m_buildbeepbeep = not m_buildbeepbeep;
-}
-
-void GenExecutiveClass::del_first_model()
-{
-    if (m_stacknames.empty()) {
-        throw utils::InternalError(fmt(
-                "Cannot delete any model, the executive have no "
-                "element.").str());
     }
 
-    delModel(m_stacknames.top());
-    m_stacknames.pop();
-}
+    virtual value::Value* observation(const devs::ObservationEvent& ev)
+        const
+        {
+            if (ev.onPort("nbmodel")) {
+                return value::Integer::create(get_nb_model());
+            } else if (ev.onPort("structure")) {
+                std::ostringstream out;
+                coupledmodel().writeXML(out);
+                return value::String::create(out.str());
+            } else {
+                return devs::Executive::observation(ev);
+            }
+        }
 
-int GenExecutiveClass::get_nb_model() const
-{
-    return boost::numeric_cast < int >(coupledmodel().getModelList().size());
-}
+
+private:
+    void add_new_model()
+    {
+        std::string name((fmt("beep-%1%") % m_stacknames.size()).str());
+        if (m_buildbeepbeep) {
+            createModelFromClass("beepbeep", name);
+        } else {
+            createModelFromClass("beepbeepbeep", name);
+        }
+        addConnection(name, "out", "counter", "in");
+
+        m_stacknames.push(name);
+        m_buildbeepbeep = not m_buildbeepbeep;
+    }
+
+    void del_first_model()
+    {
+        if (m_stacknames.empty()) {
+            throw utils::InternalError(fmt(
+                    "Cannot delete any model, the executive have no "
+                    "element.").str());
+        }
+
+        delModel(m_stacknames.top());
+        m_stacknames.pop();
+    }
+
+    int get_nb_model() const
+    {
+        return boost::numeric_cast < int >(coupledmodel().getModelList().size());
+    }
+
+};
 
 }}} // namespace vle examples gens
+
+DECLARE_EXECUTIVE(vle::examples::gens::GenExecutiveClass)

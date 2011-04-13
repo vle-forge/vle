@@ -26,10 +26,29 @@
  */
 
 
-#include "ladybird.hpp"
+#include <vle/extension/differential-equation/QSS.hpp>
 #include <cmath>
 
 namespace vle { namespace examples { namespace qss {
+
+class Ladybird : public extension::QSS::Simple
+{
+public:
+    Ladybird(const devs::DynamicsInit& model,
+	     const devs::InitEventList& events);
+
+    virtual ~Ladybird();
+
+    virtual double compute(const devs::Time& time) const;
+
+private:
+    Ext x;
+    Var y;
+
+    double b;
+    double d;
+    double e;
+};
 
 Ladybird::Ladybird(const devs::DynamicsInit& model,
                    const devs::InitEventList& events):
@@ -54,4 +73,4 @@ double Ladybird::compute(const vle::devs::Time& /* time */) const
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(ladybird, vle::examples::qss::Ladybird)
+DECLARE_DYNAMICS(vle::examples::qss::Ladybird)

@@ -49,7 +49,7 @@ namespace vle { namespace oov {
          * @throw utils::InternalError if the building of the socket server
          * fail.
          */
-        NetStreamReader(int port);
+        NetStreamReader(const utils::ModuleManager& modulemgr, int port);
 
         /**
          * @brief Release the resources from the TCP/IP server and delete it.
@@ -175,10 +175,13 @@ namespace vle { namespace oov {
         bool dispatch(value::Set& trame);
 
     private:
-        int                 m_port;
-        utils::net::Server* m_server;
-        std::string         m_buffer;
-        unsigned int        m_image;
+        NetStreamReader(const NetStreamReader& other);
+        NetStreamReader& operator=(const NetStreamReader& other);
+
+        int                           m_port;
+        utils::net::Server*           m_server;
+        std::string                   m_buffer;
+        unsigned int                  m_image;
 
         void serializePlugin();
     };

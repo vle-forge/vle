@@ -3,13 +3,11 @@ INCLUDE_DIRECTORIES(
   ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS}
   ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS}
-  ${MODULE_INCLUDE_DIRS})
+  ${LIBXML_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR}
-  ${MODULE_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS})
 
 IF(WIN32)
@@ -23,13 +21,14 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL PathUnix.cpp)
 ENDIF(WIN32)
 
-SET(UTILS_CPP DateTime.cpp Host.cpp Module.cpp Package.cpp PackageTable.cpp
-  Parser.cpp Path.cpp Preferences.cpp Rand.cpp Remote.cpp Socket.cpp
-  SocketImpl.c Template.cpp Tools.cpp Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
+SET(UTILS_CPP DateTime.cpp Host.cpp ModuleManager.cpp Package.cpp
+  PackageTable.cpp Parser.cpp Path.cpp Preferences.cpp Rand.cpp Remote.cpp
+  Socket.cpp SocketImpl.c Template.cpp Tools.cpp Trace.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 SET(UTILS_HPP Algo.hpp DateTime.hpp Deprecated.hpp DllDefines.hpp Exception.hpp
-  Host.hpp i18n.hpp Module.hpp Package.hpp PackageTable.hpp Parser.hpp Path.hpp
-  Preferences.hpp Rand.hpp Remote.hpp Socket.hpp Template.hpp Tools.hpp
+  Host.hpp i18n.hpp ModuleManager.hpp Package.hpp PackageTable.hpp Parser.hpp
+  Path.hpp Preferences.hpp Rand.hpp Remote.hpp Socket.hpp Template.hpp Tools.hpp
   Trace.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
@@ -37,6 +36,10 @@ ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 SET_TARGET_PROPERTIES(vleutils PROPERTIES ${VLE_LIBRARY_PROPERTIES})
 SET_TARGET_PROPERTIES(vleutils PROPERTIES OUTPUT_NAME
   "vleutils-${VLE_VERSION_SHORT}")
+
+IF (NOT WIN32)
+  SET(OS_SPECIFIC_LIBRARIES ${OS_SPECIFIC_LIBRARIES} dl)
+ENDIF (NOT WIN32)
 
 TARGET_LINK_LIBRARIES(vleutils
   ${GLIBMM_LIBRARIES}

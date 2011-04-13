@@ -26,9 +26,27 @@
  */
 
 
-#include "plantlouse2.hpp"
+#include <vle/extension/difference-equation/Simple.hpp>
 
 namespace vle { namespace examples { namespace qss {
+
+class Plantlouse2 : public extension::DifferenceEquation::Simple
+{
+public:
+    Plantlouse2(const devs::DynamicsInit& model,
+		const devs::InitEventList& events);
+
+    virtual ~Plantlouse2();
+
+    virtual double compute(const vle::devs::Time& /* time */);
+
+private:
+    Var x;
+    Sync y;
+
+    double a;
+    double b;
+};
 
 Plantlouse2::Plantlouse2(const devs::DynamicsInit& model,
                          const devs::InitEventList& events) :
@@ -51,4 +69,4 @@ double Plantlouse2::compute(const vle::devs::Time& time)
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(plantlouse2, vle::examples::qss::Plantlouse2)
+DECLARE_DYNAMICS(vle::examples::qss::Plantlouse2)

@@ -44,10 +44,9 @@
 
 namespace vle { namespace oov {
 
-NetStreamReader::NetStreamReader(int port) :
-    m_port(port),
-    m_server(new utils::net::Server(port)),
-    m_image(0)
+NetStreamReader::NetStreamReader(const utils::ModuleManager& module, int port)
+    : StreamReader(module), m_port(port),
+    m_server(new utils::net::Server(port)), m_image(0)
 {
     setBufferSize(4096);
     TraceAlways(fmt(_("Build a NetStreamReader on port %1%")) % port);
@@ -199,7 +198,6 @@ void NetStreamReader::serializePlugin()
         m_server->recvString("vle");
 
         value::Set* vals = value::Set::create();
-        vals->add(value::String::create(plugin()->name()));
         vals->add(plugin()->serialize());
 
         std::string out;

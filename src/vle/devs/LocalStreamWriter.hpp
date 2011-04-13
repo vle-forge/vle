@@ -42,7 +42,8 @@ namespace vle { namespace devs {
     class VLE_DEVS_EXPORT LocalStreamWriter : public StreamWriter
     {
     public:
-        LocalStreamWriter()
+        LocalStreamWriter(const utils::ModuleManager& modulemgr)
+            : StreamWriter(modulemgr), m_reader(modulemgr)
         {}
 
         virtual ~LocalStreamWriter()
@@ -76,6 +77,9 @@ namespace vle { namespace devs {
         virtual oov::PluginPtr refreshPlugin();
 
     private:
+        LocalStreamWriter(const LocalStreamWriter& other);
+        LocalStreamWriter& operator=(const LocalStreamWriter& other);
+
         oov::LocalStreamReader      m_reader;
     };
 

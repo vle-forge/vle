@@ -58,7 +58,7 @@ double S2::compute(const vle::devs::Time& time) const
     return m * N - m * S() - b * S() * I();
 }
 
-DECLARE_NAMED_DYNAMICS(S2, S2)
+DECLARE_DYNAMICS(S2)
 
 }}} // namespace vle examples dess
 

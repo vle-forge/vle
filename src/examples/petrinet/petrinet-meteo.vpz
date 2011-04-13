@@ -42,9 +42,9 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="counter" library="petrinet" model="Counter" type="local"  />
-<dynamic name="meteo" library="petrinet" model="Meteo" type="local"  />
-<dynamic name="petri" library="petrinet" model="Trigger" type="local"  />
+<dynamic name="counter" library="PetrinetCounter" type="local"  />
+<dynamic name="meteo" library="PetrinetMeteo" type="local"  />
+<dynamic name="petri" library="PetrinetTrigger" type="local"  />
 </dynamics>
 <experiment name="PetriNetMeteo" duration="30.000000000000000" begin="0.000000000000000" seed="123" >
 <conditions>

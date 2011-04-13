@@ -72,7 +72,8 @@ int main(int argc, char* argv[])
         utils::printVersion(std::cerr);
     } else {
         try {
-            oov::NetStreamReader net(command.port());
+            utils::ModuleManager modulemgr;
+            oov::NetStreamReader net(modulemgr, command.port());
             net.setBufferSize(4096);
             net.process();
         } catch(const Glib::Exception& e) {

@@ -11,34 +11,19 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-SET(SOURCES_CPP Simple.cpp)
+DeclareModuleDynamics(PetrinetBeep PetrinetBeep.cpp)
+DeclareModuleDynamics(PetrinetConflict PetrinetConflict.cpp)
+DeclareModuleDynamics(PetrinetCounter PetrinetCounter.cpp)
+DeclareModuleDynamics(PetrinetInOut PetrinetInOut.cpp)
+DeclareModuleDynamics(PetrinetMeteo PetrinetMeteo.cpp)
+DeclareModuleDynamics(PetrinetOrdinary PetrinetOrdinary.cpp)
+DeclareModuleDynamics(PetrinetTrigger PetrinetTrigger.cpp)
 
-ADD_LIBRARY(petrinet SHARED ${SOURCES_CPP})
+INSTALL(FILES petrinet-and-timed.vpz petrinet-and.vpz petrinet-conflict.vpz
+  petrinet-inout.vpz petrinet-meteo.vpz petrinet-mult.vpz petrinet-nand1.vpz
+  petrinet-nand2.vpz petrinet-or-priority.vpz petrinet-or.vpz
+  petrinet-simple.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 
-TARGET_LINK_LIBRARIES(petrinet
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS petrinet
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-INSTALL(FILES petrinet-and.vpz petrinet-mult.vpz petrinet-or.vpz
-  petrinet-nand1.vpz petrinet-nand2.vpz petrinet-and-timed.vpz
-  petrinet-or-priority.vpz petrinet-simple.vpz petrinet-meteo.vpz
-  petrinet-inout.vpz petrinet-conflict.vpz DESTINATION
-  "${VLE_SHARE_DIRS}/examples")
-
-INSTALL(FILES ${SOURCES_CPP} DESTINATION
-  "${VLE_SHARE_DIRS}/examples/sources/petrinet")
+INSTALL(FILES PetrinetBeep.cpp PetrinetConflict.cpp PetrinetCounter.cpp
+  PetrinetInOut.cpp PetrinetMeteo.cpp PetrinetOrdinary.cpp PetrinetTrigger.cpp
+  DESTINATION "${VLE_SHARE_DIRS}/examples/sources/petrinet")

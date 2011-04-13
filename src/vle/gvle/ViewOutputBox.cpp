@@ -606,8 +606,7 @@ void ViewOutputBox::updateView(const std::string& name)
         PluginFactory::OutputPluginList list =
             m_GVLE->pluginFactory().outputPlugins();
         PluginFactory::OutputPluginList::iterator it =
-            list.find(PluginFactory::OutputPlg::generic(
-                    output.plugin(), output.package()));
+            list.find(PluginFactory::Key(output.plugin(), output.package()));
 
         if (it != list.end()) {
             m_editplugin->set_sensitive(true);

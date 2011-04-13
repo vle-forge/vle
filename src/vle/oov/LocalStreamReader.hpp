@@ -45,8 +45,8 @@ namespace vle { namespace oov {
         /**
          * @brief Build a new LocalStreamReader.
          */
-        LocalStreamReader() :
-            m_image(0)
+        LocalStreamReader(const utils::ModuleManager& modulemgr)
+            : StreamReader(modulemgr), m_image(0)
         {}
 
         /**
@@ -77,6 +77,9 @@ namespace vle { namespace oov {
                              value::Value* value);
 
     private:
+        LocalStreamReader(const LocalStreamReader& other);
+        LocalStreamReader& operator=(const LocalStreamReader& other);
+
         /**
          * @brief A counter of images.
          */

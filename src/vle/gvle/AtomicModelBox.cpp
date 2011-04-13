@@ -865,7 +865,6 @@ void AtomicModelBox::DynamicTreeView::build()
         row[mColumnsDyn.m_col_name] = it->first;
         row[mColumnsDyn.m_package] = it->second.package();
         row[mColumnsDyn.m_dyn] = it->second.library();
-	row[mColumnsDyn.m_model] = it->second.model();
         row[mColumnsDyn.m_sel] = false;
         ++it;
     }
@@ -952,11 +951,8 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
 	    row.get_value(mColumnsDyn.m_col_name));
 
 	std::string searchFile;
-	if (not dynamic.model().empty()) {
-            searchFile = dynamic.model();
-        } else {
-            searchFile = row.get_value(mColumnsDyn.m_dyn);
-        }
+        searchFile = row.get_value(mColumnsDyn.m_dyn);
+
 	std::transform(searchFile.begin(), searchFile.end(),
 		       searchFile.begin(), tolower);
 
@@ -1110,7 +1106,6 @@ void AtomicModelBox::DynamicTreeView::onRename()
                     vpz::Dynamic oldDynamic = mDynamics->get(oldName);
                     newDynamic->setLibrary(oldDynamic.library());
                     newDynamic->setPackage(oldDynamic.package());
-                    newDynamic->setModel(oldDynamic.model());
                     newDynamic->setLanguage(oldDynamic.language());
                     if (oldDynamic.location().empty()) {
                         newDynamic->setLocalDynamics();
@@ -1178,7 +1173,6 @@ void AtomicModelBox::DynamicTreeView::onEdition(
 	    vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
 	    vpz::Dynamic oldDynamic = mDynamics->get(mOldName);
 	    newDynamic->setLibrary(oldDynamic.library());
-	    newDynamic->setModel(oldDynamic.model());
 	    newDynamic->setLanguage(oldDynamic.language());
 	    if (oldDynamic.location().empty()) {
 		newDynamic->setLocalDynamics();

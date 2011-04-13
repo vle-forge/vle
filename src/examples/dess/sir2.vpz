@@ -53,10 +53,10 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="counter" library="sir" model="Counter" type="local"  />
-<dynamic name="dyn_I" library="sir" model="I" type="local"  />
-<dynamic name="dyn_R" library="sir" model="R" type="local"  />
-<dynamic name="dyn_S" library="sir" model="S" type="local"  />
+<dynamic name="counter" library="DessCounter" type="local"  />
+<dynamic name="dyn_I" library="DessI" type="local"  />
+<dynamic name="dyn_R" library="DessR" type="local"  />
+<dynamic name="dyn_S" library="DessS" type="local"  />
 </dynamics>
 <experiment name="exp" duration="20.000000000000000" begin="0.000000000000000" seed="12379843" >
 <conditions>

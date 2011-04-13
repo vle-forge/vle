@@ -36,22 +36,27 @@
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Observables.hpp>
+#include <vle/version.hpp>
 
-#define DECLARE_EXECUTIVE(mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewExecutive(const vle::devs::ExecutiveInit& init, \
-                         const vle::devs::InitEventList& events) \
-        { return new mdl(init, events); } \
-    }
-
-#define DECLARE_NAMED_EXECUTIVE(name, mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewExecutive##name(const vle::devs::ExecutiveInit& init, \
+#define DECLARE_EXECUTIVE(mdl)                                         \
+extern "C" {                                                           \
+    VLE_DEVS_EXPORT vle::devs::Dynamics*                               \
+        vle_make_new_executive(const vle::devs::ExecutiveInit& init,   \
                                const vle::devs::InitEventList& events) \
-        { return new mdl(init, events); } \
-    }
+        {                                                              \
+            return new mdl(init, events);                              \
+        }                                                              \
+                                                                       \
+        VLE_DEVS_EXPORT void                                           \
+        vle_api_level(boost::uint32_t* major,                          \
+                      boost::uint32_t* minor,                          \
+                      boost::uint32_t* patch)                          \
+        {                                                              \
+            *major = VLE_MAJOR_VERSION;                                \
+                *minor = VLE_MINOR_VERSION;                            \
+                *patch = VLE_PATCH_VERSION;                            \
+        }                                                              \
+}
 
 namespace vle { namespace devs {
 

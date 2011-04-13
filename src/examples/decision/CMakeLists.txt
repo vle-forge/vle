@@ -10,32 +10,18 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-SET(SOURCES_CPP Basic.cpp OnlyAgent.cpp SimpleAgent.cpp)
 
-ADD_LIBRARY(decision SHARED ${SOURCES_CPP})
+DeclareModuleDynamics(DecisionCounter DecisionCounter.cpp)
+DeclareModuleDynamics(DecisionRetarder DecisionRetarder.cpp)
+DeclareModuleDynamics(DecisionStart DecisionStart.cpp)
+DeclareModuleDynamics(OnlyAgent OnlyAgent.cpp)
+DeclareModuleDynamics(OnlyAgentPrecedenceConstraint OnlyAgentPrecedenceConstraint.cpp)
+DeclareModuleDynamics(OnlyAgentWakeUp OnlyAgentWakeUp.cpp)
+DeclareModuleDynamics(SimpleAgent SimpleAgent.cpp)
 
-TARGET_LINK_LIBRARIES(decision
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
+INSTALL(FILES agentonlyc.vpz agentonly.vpz agentonlywakeup.vpz DESTINATION
+  "${VLE_SHARE_DIRS}/examples")
 
-
-INSTALL(TARGETS decision
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-INSTALL(FILES agentonly.vpz agentonlyc.vpz agentonlywakeup.vpz agentsimple.vpz
-  DESTINATION "${VLE_SHARE_DIRS}/examples")
-
-INSTALL(FILES ${SOURCES_CPP} DESTINATION
-  "${VLE_SHARE_DIRS}/examples/sources/decision")
+INSTALL(FILES DecisionCounter.cpp DecisionRetarder.cpp DecisionStart.cpp
+  OnlyAgent.cpp OnlyAgentPrecedenceConstraint.cpp OnlyAgentWakeUp.cpp
+  SimpleAgent.cpp DESTINATION "${VLE_SHARE_DIRS}/examples/sources/decision")

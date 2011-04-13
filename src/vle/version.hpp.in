@@ -29,6 +29,8 @@
 #ifndef VLE_MAIN_VERSION_HPP
 #define VLE_MAIN_VERSION_HPP
 
+#include <boost/cstdint.hpp>
+
 /* compile time version */
 #define VLE_MAJOR_VERSION   (@VLE_MAJOR@)
 #define VLE_MINOR_VERSION   (@VLE_MINOR@)

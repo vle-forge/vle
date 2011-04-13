@@ -49,6 +49,7 @@ struct F
 
 BOOST_GLOBAL_FIXTURE(F)
 
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_dess1)
@@ -58,7 +59,8 @@ BOOST_AUTO_TEST_CASE(test_dess1)
     vpz::Output& o(file.project().experiment().views().outputs().get("o3"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -88,7 +90,8 @@ BOOST_AUTO_TEST_CASE(test_dess2)
     vpz::Output& o(file.project().experiment().views().outputs().get("o5"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);

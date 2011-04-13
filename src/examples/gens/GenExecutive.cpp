@@ -26,140 +26,152 @@
  */
 
 
-#include <GenExecutive.hpp>
-#include <vle/utils.hpp>
-#include <vle/devs.hpp>
-#include <vle/vpz.hpp>
+#include <vle/devs/Executive.hpp>
+#include <vle/devs/ExecutiveDbg.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <stack>
 
 namespace vle { namespace examples { namespace gens {
 
-GenExecutive::GenExecutive(const devs::ExecutiveInit& mdl,
-                           const devs::InitEventList& events) :
-    devs::Executive(mdl, events)
+class GenExecutive : public devs::Executive
 {
-}
+    enum state { INIT, IDLE, ADDMODEL, DELMODEL };
 
-devs::Time GenExecutive::init(const devs::Time& /* time */)
-{
-    vpz::Dynamic dyn("gensbeep");
-    dyn.setLibrary("gens");
-    dyn.setModel("beep");
-    dyn.setLocalDynamics();
-    dynamics().add(dyn);
+    std::stack < std::string >  m_stacknames;
+    state                       m_state;
 
-    m_state = INIT;
+public:
+    GenExecutive(const devs::ExecutiveInit& mdl,
+                 const devs::InitEventList& events) :
+        devs::Executive(mdl, events)
+    {
+    }
 
-    return 0.0;
-}
+    virtual ~GenExecutive()
+    {
+    }
 
-devs::Time GenExecutive::timeAdvance() const
-{
-    switch (m_state) {
-    case INIT:
+    virtual devs::Time init(const devs::Time& /* time */)
+    {
+        vpz::Dynamic dyn("gensbeep");
+        dyn.setLibrary("GensBeep");
+        dyn.setLocalDynamics();
+        dynamics().add(dyn);
+
+        m_state = INIT;
+
         return 0.0;
-    case IDLE:
-        return 0.0;
-    case ADDMODEL:
-        return 1.0;
-    case DELMODEL:
-        return 1.0;
-    }
-    throw utils::InternalError("GenExecutive ta");
-}
-
-void GenExecutive::internalTransition(const devs::Time& time)
-{
-    switch (m_state) {
-    case INIT:
-        m_state = IDLE;
-        break;
-    case IDLE:
-        if (time < 50.0) {
-            m_state = ADDMODEL;
-        }
-        else {
-            m_state = DELMODEL;
-        }
-        break;
-    case ADDMODEL:
-        add_new_model();
-        m_state = IDLE;
-        break;
-    case DELMODEL:
-        del_first_model();
-        m_state = IDLE;
-        break;
-    }
-}
-
-value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
-{
-    if (ev.onPort("nbmodel")) {
-        return value::Integer::create(get_nb_model());
-    } else if (ev.onPort("structure")) {
-        std::ostringstream out;
-        coupledmodel().writeXML(out);
-        return value::String::create(out.str());
-    } else if (ev.onPort("adjacency_matrix")) {
-        value::Set *set = value::Set::create();
-        set->add(value::Integer::create(1));
-        if(get_nb_model() > 0 and ev.getTime() < 50.0){
-            set->add(value::String::create("add"));
-            std::string name = (fmt("beep_%1%") % m_stacknames.size()).str();
-            set->add(value::String::create(name));
-            set->add(value::String::create("2"));
-            std::string edge =  name + std::string(" counter ");
-            set->add(value::String::create(edge));
-        }
-        else if(get_nb_model() > 0){
-            set->add(value::String::create("delete"));
-            std::string name = (fmt(
-                    "beep_%1%") % (get_nb_model())).str();
-            set->add(value::String::create(name));
-        }
-
-        return set;
-    } else if (ev.onPort("value"))
-        return value::Integer::create(1);
-
-    return devs::Executive::observation(ev);
-}
-
-//
-///
-////
-///
-//
-
-void GenExecutive::add_new_model()
-{
-    std::string name((fmt("beep_%1%") % m_stacknames.size()).str());
-
-    std::vector < std::string > outputs;
-    outputs.push_back("out");
-
-    createModel(name, std::vector < std::string >(), outputs, "gensbeep");
-    addConnection(name, "out", "counter", "in");
-
-    m_stacknames.push(name);
-}
-
-void GenExecutive::del_first_model()
-{
-    if (m_stacknames.empty()) {
-        throw utils::InternalError(fmt(
-                "Cannot delete any model, the executive have no "
-                "element.").str());
     }
 
-    delModel(m_stacknames.top());
-    m_stacknames.pop();
-}
+    virtual devs::Time timeAdvance() const
+    {
+        switch (m_state) {
+        case INIT:
+            return 0.0;
+        case IDLE:
+            return 0.0;
+        case ADDMODEL:
+            return 1.0;
+        case DELMODEL:
+            return 1.0;
+        }
+        throw utils::InternalError("GenExecutive ta");
+    }
 
-int GenExecutive::get_nb_model() const
-{
-    return boost::numeric_cast < int >(coupledmodel().getModelList().size()) - 1;
-}
+    virtual void internalTransition(const devs::Time& time)
+    {
+        switch (m_state) {
+        case INIT:
+            m_state = IDLE;
+            break;
+        case IDLE:
+            if (time < 50.0) {
+                m_state = ADDMODEL;
+            }
+            else {
+                m_state = DELMODEL;
+            }
+            break;
+        case ADDMODEL:
+            add_new_model();
+            m_state = IDLE;
+            break;
+        case DELMODEL:
+            del_first_model();
+            m_state = IDLE;
+            break;
+        }
+    }
+
+    virtual value::Value* observation(const devs::ObservationEvent& ev) const
+    {
+        if (ev.onPort("nbmodel")) {
+            return value::Integer::create(get_nb_model());
+        } else if (ev.onPort("structure")) {
+            std::ostringstream out;
+            coupledmodel().writeXML(out);
+            return value::String::create(out.str());
+        } else if (ev.onPort("adjacency_matrix")) {
+            value::Set *set = value::Set::create();
+            set->add(value::Integer::create(1));
+            if(get_nb_model() > 0 and ev.getTime() < 50.0){
+                set->add(value::String::create("add"));
+                std::string name = (fmt("beep_%1%") % m_stacknames.size()).str();
+                set->add(value::String::create(name));
+                set->add(value::String::create("2"));
+                std::string edge =  name + std::string(" counter ");
+                set->add(value::String::create(edge));
+            }
+            else if(get_nb_model() > 0){
+                set->add(value::String::create("delete"));
+                std::string name = (fmt(
+                        "beep_%1%") % (get_nb_model())).str();
+                set->add(value::String::create(name));
+            }
+
+            return set;
+        } else if (ev.onPort("value"))
+            return value::Integer::create(1);
+
+        return devs::Executive::observation(ev);
+    }
+
+    ///
+    ////
+    ///
+
+    void add_new_model()
+    {
+        std::string name((fmt("beep_%1%") % m_stacknames.size()).str());
+
+        std::vector < std::string > outputs;
+        outputs.push_back("out");
+
+        createModel(name, std::vector < std::string >(), outputs, "gensbeep");
+        addConnection(name, "out", "counter", "in");
+
+        m_stacknames.push(name);
+    }
+
+    void del_first_model()
+    {
+        if (m_stacknames.empty()) {
+            throw utils::InternalError(fmt(
+                    "Cannot delete any model, the executive have no "
+                    "element.").str());
+        }
+
+        delModel(m_stacknames.top());
+        m_stacknames.pop();
+    }
+
+    int get_nb_model() const
+    {
+        return boost::numeric_cast < int >(coupledmodel().getModelList().size()) - 1;
+    }
+
+};
 
 }}} // namespace vle examples gens
+
+DECLARE_EXECUTIVE_DBG(vle::examples::gens::GenExecutive)

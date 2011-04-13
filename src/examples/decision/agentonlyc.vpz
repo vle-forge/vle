@@ -24,8 +24,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="agent" library="decision" model="OnlyAgentPrecedenceConstraint" type="local"  />
-<dynamic name="counter" library="decision" model="Counter" type="local"  />
+<dynamic name="agent" library="OnlyAgentPrecedenceConstraint" type="local"  />
+<dynamic name="counter" library="DecisionCounter" type="local"  />
 </dynamics>
 <experiment name="Only" duration="10.000000000000000" begin="0.000000000000000" combination="linear" seed="10" >
 <views>

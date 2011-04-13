@@ -11,35 +11,14 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-SET(SOURCES_CPP Beep.cpp Beep.hpp Counter.cpp Counter.hpp GenExecutive.cpp
-  GenExecutive.hpp GenExecutiveClass.cpp GenExecutiveClass.hpp
-  GenExecutiveGraph.cpp)
+DeclareModuleDynamics(GensBeep Beep.cpp)
+DeclareModuleDynamics(GensCounter Counter.cpp)
+DeclareModuleDynamics(GensExecutive GenExecutive.cpp)
+DeclareModuleDynamics(GensExecutiveClass GenExecutiveClass.cpp)
+DeclareModuleDynamics(GensExecutiveGraph GenExecutiveGraph.cpp)
 
-ADD_LIBRARY(gens SHARED ${SOURCES_CPP})
+INSTALL(FILES gensdelete.vpz gensgraph.vpz gensnetview.vpz gens.vpz
+  genswithclass.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 
-TARGET_LINK_LIBRARIES(gens
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS gens
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-INSTALL(FILES gens.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES genswithclass.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES gensnetview.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES gensgraph.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES gensdelete.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES ${SOURCES_CPP} DESTINATION
-  "${VLE_SHARE_DIRS}/examples/sources/gens")
+INSTALL(FILES Beep.cpp Counter.cpp GenExecutiveClass.cpp GenExecutive.cpp
+  GenExecutiveGraph.cpp DESTINATION "${VLE_SHARE_DIRS}/examples/sources/gens")

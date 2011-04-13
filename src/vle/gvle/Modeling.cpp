@@ -529,13 +529,11 @@ std::string Modeling::getDynamicInfo(std::string dynamicName) const
 {
     std::string cardp = "";
 
-    if  (dynamics().exist(dynamicName))
-    {
+    if  (dynamics().exist(dynamicName)) {
         const vpz::Dynamic& dyn = dynamics().get(dynamicName);
 
         cardp += "\n<b>Project: </b>" + dyn.package();
         cardp += "\n<b>Library: </b>" + dyn.library();
-        cardp += "\n<b>Class: </b>" + dyn.model();
     } else {
         cardp += "<i> (missing)</i>";
     }

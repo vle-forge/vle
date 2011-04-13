@@ -16,7 +16,7 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_ladybirdplantlouse" library="ladybirdplantlouse" model="ladybirdplantlouse" type="local"  />
+<dynamic name="dyn_ladybirdplantlouse" library="QssLadyBirdPlantLouse" type="local"  />
 </dynamics>
 <experiment name="exp2" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
 <conditions>

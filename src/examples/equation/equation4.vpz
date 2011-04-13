@@ -57,9 +57,9 @@
   </model>
  </structures>
  <dynamics>
-  <dynamic name="dynD" library="equation1" model="D1" type="local"/>
-  <dynamic name="dynE" library="equation3" model="E2" type="local"/>
-  <dynamic name="dynSum" library="equation1" model="sum" type="local"/>
+  <dynamic name="dynD" library="EquationD1" type="local"/>
+  <dynamic name="dynE" library="EquationE2" type="local"/>
+  <dynamic name="dynSum" library="EquationSum" type="local"/>
  </dynamics>
  <experiment name="exp" duration="1" combination="linear" seed="12389">
   <conditions>

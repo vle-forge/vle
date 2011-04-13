@@ -55,9 +55,9 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_Stages" library="statechart" model="StagesThreshold" type="local"  />
-<dynamic name="dyn_gen" library="linear" model="GenLin" type="local"  />
-<dynamic name="dyn_lin" library="linear" model="EqLin" type="local"  />
+<dynamic name="dyn_Stages" library="StatechartThreshold" type="local"  />
+<dynamic name="dyn_gen" library="LinearGenLin" type="local"  />
+<dynamic name="dyn_lin" library="LinearEqLin" type="local"  />
 </dynamics>
 <experiment name="exp" duration="100.000000000000000" begin="0.000000000000000" combination="linear" seed="1" >
 <conditions>

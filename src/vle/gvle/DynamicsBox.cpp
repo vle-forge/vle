@@ -48,7 +48,6 @@ DynamicsBox::DynamicsBox(Modeling& modeling,
     mXml->get_widget("treeviewDialogDynamics", mDynamics);
     mXml->get_widget("comboboxPackage", mPackage);
     mXml->get_widget("comboboxLibrary", mLibrary);
-    mXml->get_widget("entryModel", mModel);
     mXml->get_widget("entryLocation", mLocationHost);
     mXml->get_widget("spinbuttonLocation", mLocationPort);
     mXml->get_widget("comboboxLanguage", mLanguage);
@@ -78,9 +77,6 @@ DynamicsBox::DynamicsBox(Modeling& modeling,
 
     mList.push_back(mLibrary->signal_changed().connect(
                         sigc::mem_fun(*this, &DynamicsBox::onChangedLibrary)));
-
-    mList.push_back(mModel->signal_changed().connect(
-                        sigc::mem_fun(*this, &DynamicsBox::onChangedModel)));
 }
 
 DynamicsBox::~DynamicsBox()
@@ -152,14 +148,6 @@ void DynamicsBox::initDynamics()
                                                  &DynamicsBox::onClickColumn),
                                    mColumnLibrary)));
 
-    mColumnModel = mDynamics->append_column(_("Model"),
-                                            mDynamicsColumns.mModel);
-    Gtk::TreeViewColumn* modelCol = mDynamics->get_column(mColumnModel - 1);
-    modelCol->set_clickable(true);
-
-    mList.push_back(modelCol->signal_clicked().connect(
-                        sigc::bind(sigc::mem_fun(*this, &DynamicsBox::onClickColumn), mColumnModel)));
-
     mDynamicsListStore->set_sort_column(0,Gtk::SORT_ASCENDING);
 }
 
@@ -173,7 +161,6 @@ void DynamicsBox::fillDynamics()
                 row[mDynamicsColumns.mName] = it->first;
                 row[mDynamicsColumns.mPackage] = it->second.package();
                 row[mDynamicsColumns.mLibrary] = it->second.library();
-                row[mDynamicsColumns.mModel] = it->second.model();
         }
     }
 
@@ -301,7 +288,6 @@ void DynamicsBox::onCopyDynamic()
             mDynsCopy.copy(name, copy);
             row[mDynamicsColumns.mName] = copy;
             row[mDynamicsColumns.mPackage] = mDynsCopy.get(name).package();
-            row[mDynamicsColumns.mModel] = mDynsCopy.get(name).model();
             updateDynamic(copy);
             mDynamics->set_cursor(mDynamicsListStore->get_path(iter));
             mDeletedDynamics.erase(copy);
@@ -361,7 +347,6 @@ void DynamicsBox::onEdition(
 void DynamicsBox::sensitive(bool active)
 {
     mPackage->set_sensitive(active);
-    mModel->set_sensitive(active);
     mLibrary->set_sensitive(active);
     mLocationHost->set_sensitive(active);
     mLocationPort->set_sensitive(active);
@@ -419,7 +404,6 @@ void DynamicsBox::onChangedModel()
 {
     if (mIter != mDynamicsListStore->children().end()) {
         Gtk::TreeModel::Row row = *mIter;
-        row[mDynamicsColumns.mModel] = mModel->get_text();
     }
 }
 
@@ -438,8 +422,6 @@ void DynamicsBox::assignDynamic(const std::string& name)
     vpz::Dynamic& dyn(mDynsCopy.get(name));
 
     dyn.setPackage(getPackageStr());
-
-    dyn.setModel(mModel->get_text());
 
     if (mLocationHost->get_text().empty()) {
         dyn.setLocalDynamics();
@@ -464,8 +446,6 @@ void DynamicsBox::updateDynamic(const std::string& name)
     vpz::Dynamic& dyn(mDynsCopy.get(name));
 
     setPackageStr(dyn.package());
-
-    mModel->set_text(dyn.model());
 
     fillLibrary();
     setLibraryStr(dyn.library());

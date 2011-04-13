@@ -38,18 +38,15 @@
 
 namespace vle { namespace devs {
 
-RootCoordinator::RootCoordinator() :
-    m_currentTime(0),
-    m_coordinator(0),
-    m_modelfactory(0),
-    m_root(0)
+RootCoordinator::RootCoordinator(const utils::ModuleManager& modulemgr)
+    : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0), m_coordinator(0),
+    m_root(0), m_modulemgr(modulemgr)
 {
 }
 
 RootCoordinator::~RootCoordinator()
 {
     delete m_coordinator;
-    delete m_modelfactory;
     delete m_root;
 }
 
@@ -57,7 +54,6 @@ void RootCoordinator::load(const vpz::Vpz& io)
 {
     if (m_coordinator) {
         delete m_coordinator;
-        delete m_modelfactory;
         delete m_root;
     }
 
@@ -71,13 +67,13 @@ void RootCoordinator::load(const vpz::Vpz& io)
     m_end = m_begin + io.project().experiment().duration();
     m_currentTime = m_begin;
 
-    m_modelfactory = new ModelFactory(io.project().dynamics(),
-                                      io.project().classes(),
-                                      io.project().experiment(),
-                                      io.project().model().atomicModels(),
-                                      *this);
+    m_coordinator = new Coordinator(m_modulemgr,
+                                    io.project().dynamics(),
+                                    io.project().classes(),
+                                    io.project().experiment(),
+                                    io.project().model().atomicModels(),
+                                    *this);
 
-    m_coordinator = new Coordinator(*m_modelfactory);
     m_coordinator->init(io.project().model(), m_currentTime, m_end);
 
     m_root = io.project().model().model();
@@ -109,11 +105,6 @@ void RootCoordinator::finish()
         m_outputs = m_coordinator->outputs();
         delete m_coordinator;
         m_coordinator = 0;
-    }
-
-    if (m_modelfactory) {
-        delete m_modelfactory;
-        m_modelfactory = 0;
     }
 
     if (m_root) {

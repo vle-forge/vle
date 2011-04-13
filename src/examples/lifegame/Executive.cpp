@@ -26,28 +26,42 @@
  */
 
 
-#include <Executive.hpp>
-#include <vle/value/XML.hpp>
+#include <vle/devs/Executive.hpp>
+#include <vle/translator/MatrixTranslator.hpp>
+#include <string>
+#include <vector>
 
 namespace vle { namespace examples { namespace lifegame {
 
-using namespace vle;
-
-Executive::Executive(const devs::ExecutiveInit& model,
-                     const devs::InitEventList& events) :
-    devs::Executive(model, events)
+class Executive : public devs::Executive
 {
-    m_buffer = events.get("translate")->clone();
-}
+public :
+    Executive(const devs::ExecutiveInit& model,
+              const devs::InitEventList& events) :
+        devs::Executive(model, events)
+    {
+        m_buffer = events.get("translate")->clone();
+    }
 
-devs::Time Executive::init(const devs::Time& /* time */)
-{
-    translator::MatrixTranslator tr(*this);
+    virtual ~Executive()
+    {
+    }
 
-    tr.translate(*m_buffer);
-    delete m_buffer;
+    virtual devs::Time init(const devs::Time& /*time*/)
+    {
+        translator::MatrixTranslator tr(*this);
 
-    return devs::Time::infinity;
-}
+        tr.translate(*m_buffer);
+        delete m_buffer;
+
+        return devs::Time::infinity;
+    }
+
+private:
+    value::Value* m_buffer;
+};
 
 }}} // namespace vle examples lifegame
+
+DECLARE_EXECUTIVE(vle::examples::lifegame::Executive)
+

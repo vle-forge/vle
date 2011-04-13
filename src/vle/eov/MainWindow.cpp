@@ -76,7 +76,7 @@ Gtk::Window& MainWindow::window()
 void MainWindow::addWindow()
 {
     Window* wnd = new Window(mMutex, mRefresh);
-    mNet = new NetStreamReader(mPort, *wnd);
+    mNet = new NetStreamReader(mModuleMgr, mPort, *wnd);
 
     wnd->signal_delete_event().connect(sigc::mem_fun(*this,
 		&MainWindow::onDeleteEventWindow));

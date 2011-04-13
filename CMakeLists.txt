@@ -89,7 +89,6 @@ ENDIF (COMMAND CMAKE_POLICY)
 PKG_CHECK_MODULES(GLIBMM REQUIRED glibmm-2.4)
 PKG_CHECK_MODULES(GTHREAD REQUIRED gthread-2.0)
 PKG_CHECK_MODULES(LIBXML REQUIRED libxml-2.0)
-PKG_CHECK_MODULES(MODULE REQUIRED gmodule-2.0)
 PKG_CHECK_MODULES(CAIROMM cairomm-1.0>=1.2)
 PKG_CHECK_MODULES(GLADEMM libglademm-2.4)
 PKG_CHECK_MODULES(GTKMM gtkmm-2.4)
@@ -229,6 +228,23 @@ ELSE(UNIX)
   INSTALL(FILES "README" DESTINATION "${VLE_SHARE_DIRS}" RENAME "Readme.txt")
   INSTALL(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}" RENAME "CopyRight.txt")
 ENDIF(UNIX)
+
+#
+ # Define function
+#
+
+FUNCTION(DeclareModuleDynamics name sources)
+  ADD_LIBRARY(${name} SHARED ${sources})
+
+  TARGET_LINK_LIBRARIES(${name}
+    ${GLIBMM_LIBRARIES} ${LIBXML_LIBRARIES} ${GTHREAD_LIBRARIES} vlegeometry
+    vleutils vlevalue vlegraph vlevpz vleoov vledevs vleextension vlemanager
+    vletranslator)
+
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+    LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+ENDFUNCTION(DeclareModuleDynamics)
 
 #
  # Browse the share subdirectory

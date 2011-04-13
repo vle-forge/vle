@@ -571,7 +571,6 @@ void ImportModelBox::rename_dynamic(vpz::Vpz* src, std::string old_name, std::st
     Dynamic& dyn = dyns.get(old_name);
     Dynamic* new_dyn = new Dynamic(new_name);
     new_dyn->setLibrary(dyn.library());
-    new_dyn->setModel(dyn.model());
     new_dyn->setLanguage(dyn.language());
     if (dyn.type() == Dynamic::LOCAL) {
         new_dyn->setLocalDynamics();
@@ -691,15 +690,6 @@ void ImportModelBox::rename_view(vpz::Vpz* src, std::string old_name,
 void ImportModelBox::rename_model(vpz::Vpz* src, graph::Model* old_model,
                                   std::string new_name)
 {
-    Dynamics& dyns = src->project().dynamics();
-    const DynamicList& list = dyns.dynamiclist();
-    DynamicList::const_iterator it = list.begin();
-    while (it != list.end()) {
-        if (it->second.model() == old_model->getName())
-            dyns.get(it->second.name()).setModel(new_name);
-
-        ++it;
-    }
     graph::Model::rename(old_model, new_name);
 }
 

@@ -61,32 +61,12 @@ LaunchSimulationBox::LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
     mDistant->set_sensitive(false);
 
     updateWidget();
-
-    mLoadedPlugin = utils::ModuleCache::instance().get();
 }
 
 LaunchSimulationBox::~LaunchSimulationBox()
 {
     mConnectionPlayButton.disconnect();
     mConnectionStopButton.disconnect();
-
-    using utils::ModuleCache;
-
-    ModuleCache::ModuleList plugins = ModuleCache::instance().get();
-
-    ModuleCache::ModuleList todelete;
-    ModuleCache::ModuleList::iterator it;
-
-    std::set_difference(plugins.begin(),
-                        plugins.end(),
-                        mLoadedPlugin.begin(),
-                        mLoadedPlugin.end(),
-                        std::inserter < ModuleCache::ModuleList >(
-                            todelete, todelete.end()));
-
-    for (it = todelete.begin(); it != todelete.end(); ++it) {
-        ModuleCache::instance().unload(it->path());
-    }
 }
 
 void LaunchSimulationBox::run()
@@ -138,7 +118,7 @@ void LaunchSimulationBox::runThread()
 {
     mThreadRun = true;
     vpz::Vpz exp(mVpz);
-    devs::RootCoordinator root;
+    devs::RootCoordinator root(mLoadedPlugin);
 
     try {
         root.load(exp);

@@ -58,6 +58,6 @@ double sir::compute(unsigned int i, const devs::Time& /* time */) const
     }
 }
 
-DECLARE_NAMED_DYNAMICS(sir, sir)
+DECLARE_DYNAMICS(sir)
 
 }}} // namespace vle examples dess

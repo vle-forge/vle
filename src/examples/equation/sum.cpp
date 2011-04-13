@@ -61,6 +61,6 @@ public:
 
 }}} // namespace vle examples equation
 
-DECLARE_NAMED_DYNAMICS(sum, vle::examples::equation::sum)
+DECLARE_DYNAMICS(vle::examples::equation::sum)
 
 #endif

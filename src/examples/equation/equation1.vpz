@@ -79,11 +79,11 @@
   </model>
  </structures>
  <dynamics>
-  <dynamic name="dynA" library="equation1" model="A1" type="local"/>
-  <dynamic name="dynB" library="equation1" model="B1" type="local"/>
-  <dynamic name="dynC" library="equation1" model="C1" type="local"/>
-  <dynamic name="dynD" library="equation1" model="D1" type="local"/>
-  <dynamic name="dynSum" library="equation1" model="sum" type="local"/>
+  <dynamic name="dynA" library="EquationA1" type="local"/>
+  <dynamic name="dynB" library="EquationB1" type="local"/>
+  <dynamic name="dynC" library="EquationC1" type="local"/>
+  <dynamic name="dynD" library="EquationD1" type="local"/>
+  <dynamic name="dynSum" library="EquationSum" type="local"/>
  </dynamics>
  <experiment name="exp" duration="1" combination="linear" seed="12389">
   <conditions>

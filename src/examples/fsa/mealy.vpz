@@ -52,9 +52,9 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn1" library="fddevs" model="devs1" type="local"  />
-<dynamic name="dyn2" library="fddevs" model="devs2" type="local"  />
-<dynamic name="dyn3" library="mealy" model="mealy1" type="local"  />
+<dynamic name="dyn1" library="FDDevs1" type="local"  />
+<dynamic name="dyn2" library="FDDevs2" type="local"  />
+<dynamic name="dyn3" library="Mealy1" type="local"  />
 </dynamics>
 <experiment name="exp3" duration="100.000000000000000" begin="0.000000000000000" seed="123456789" >
 <views>

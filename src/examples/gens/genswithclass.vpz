@@ -20,9 +20,9 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="counter" library="gens" model="counter" type="local"  />
-<dynamic name="executive" library="gens" model="executiveclass" type="local"  />
-<dynamic name="gensbeep" library="gens" model="beep" type="local"  />
+<dynamic name="counter" library="GensCounter" type="local"  />
+<dynamic name="executive" library="GensExecutiveClass" type="local"  />
+<dynamic name="gensbeep" library="GensBeep" type="local"  />
 </dynamics>
 <classes>
 <class name="beepbeep" >

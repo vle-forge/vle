@@ -59,7 +59,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_and)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -86,7 +87,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -113,7 +115,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand1)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -140,7 +143,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand2)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -167,7 +171,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_and_timed)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -194,7 +199,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or_priority)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -221,7 +227,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -252,7 +259,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_inout)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
@@ -281,7 +289,8 @@ BOOST_AUTO_TEST_CASE(test_petrinet_conflict)
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage", std::string());
 
-    manager::RunQuiet r;
+    utils::ModuleManager man;
+    manager::RunQuiet r(man);
     r.start(file);
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);

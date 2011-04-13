@@ -11,32 +11,13 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-SET(SOURCES_CPP Simple.cpp TwoTimesModel.cpp)
-  
-ADD_LIBRARY(recursives SHARED ${SOURCES_CPP})
-
-TARGET_LINK_LIBRARIES(recursives
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS recursives
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+DeclareModuleDynamics(RecursiveSimulation RecursiveSimulation.cpp)
+DeclareModuleDynamics(SimpleSimulation SimpleSimulation.cpp)
+DeclareModuleDynamics(TwoTimesModel TwoTimesModel.cpp)
 
 INSTALL(FILES recursive.vpz twotimesmodel.vpz DESTINATION
   "${VLE_SHARE_DIRS}/examples")
 
-INSTALL(FILES ${SOURCES_CPP} DESTINATION
-  "${VLE_SHARE_DIRS}/examples/sources/recursives")
+INSTALL(FILES RecursiveSimulation.cpp SimpleSimulation.cpp TwoTimesModel.cpp
+  DESTINATION "${VLE_SHARE_DIRS}/examples/sources/recursives")
 

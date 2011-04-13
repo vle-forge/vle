@@ -82,37 +82,6 @@ private:
     bool mTransit;
 };
 
-class StatechartListener: public vf::Statechart
-{
-public:
-    StatechartListener(const vd::DynamicsInit& init,
-                       const vd::InitEventList& events) :
-        vf::Statechart(init, events), mReceived(false)
-    {
-        //states
-        states(this) << 0;
-        //listened ports
-        eventInState(this, "in", &StatechartListener::listen) >> 0;
-        //init state
-        initialState(0);
-    }
-
-    virtual ~StatechartListener()
-    { }
-
-private:
-    void listen(const vd::Time& /*time*/, const vd::ExternalEvent* /*evt*/)
-    {
-        if (mReceived) {
-            throw "error";
-        }
-        mReceived = true;
-    }
-
-    bool mReceived;
-};
-
-DECLARE_NAMED_DYNAMICS(StatechartMultipleSend, StatechartMultipleSend)
-DECLARE_NAMED_DYNAMICS(StatechartListener, StatechartListener)
+DECLARE_DYNAMICS(StatechartMultipleSend)
 
 }}} // namespace vle examples fsa

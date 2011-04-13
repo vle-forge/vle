@@ -127,8 +127,6 @@ void DynamicBox::show(vpz::Dynamic* dyn)
         mLocationPort->set_value(0);
     }
 
-    mModel->set_text(dyn->model());
-
     if (dyn->language().empty()) {
         mLanguage->set_active_text("c++");
     } else {
@@ -221,7 +219,6 @@ void DynamicBox::on_apply()
         mDyn->setDistantDynamics(mLocationHost->get_text(), port);
     }
 
-    mDyn->setModel(mModel->get_text());
     if (mLanguage->get_active_text() == "c++") {
         mDyn->setLanguage("");
     } else {

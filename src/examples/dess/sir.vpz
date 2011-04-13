@@ -17,7 +17,7 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_sir" library="sir" model="sir" type="local"  />
+<dynamic name="dyn_sir" library="DessSir" type="local"  />
 </dynamics>
 <experiment name="exp" duration="20.000000000000000" begin="0.000000000000000" seed="12379843" >
 <conditions>

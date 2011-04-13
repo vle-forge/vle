@@ -24,8 +24,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dynStatechartListener" library="StatechartMultipleSend" model="statechartListener" type="local"  />
-<dynamic name="dynStatechartMultipleSend" library="StatechartMultipleSend" model="statechartMultipleSend" type="local"  />
+<dynamic name="dynStatechartListener" library="StatechartListener" type="local"  />
+<dynamic name="dynStatechartMultipleSend" library="StatechartMultipleSend" type="local"  />
 </dynamics>
 <experiment name="exp" duration="100.000000000000000" begin="0.000000000000000" combination="linear" seed="2147483648" >
 <replicas seed="581869302" number="1" />

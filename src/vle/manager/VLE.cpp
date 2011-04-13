@@ -92,8 +92,6 @@ bool Manager::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
 {
     mSuccess = true;
 
-    CmdArgs::const_iterator it = args.begin();
-
     try {
         if (allInLocal) {
             if (nbProcessor == 1) {

@@ -35,55 +35,55 @@
 
 namespace vle { namespace examples { namespace recursives {
 
-    class TwoTimesModel : public devs::Dynamics
+class TwoTimesModel : public devs::Dynamics
+{
+public:
+    TwoTimesModel(const devs::DynamicsInit& mdl,
+                  const devs::InitEventList& lst)
+        : devs::Dynamics(mdl, lst), m_root(m_manager), m_stop(false)
+    {}
+
+    virtual ~TwoTimesModel()
     {
-    public:
-        TwoTimesModel(const devs::DynamicsInit& mdl,
-                             const devs::InitEventList& lst)
-            : devs::Dynamics(mdl, lst), m_stop(false)
-        {}
+        m_root.finish();
+    }
 
-        virtual ~TwoTimesModel()
-        {
-            m_root.finish();
+    virtual devs::Time init(const devs::Time& /* t */)
+    {
+        // open a simulation
+        vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
+        m_root.load(file);          // and perform the initialization of
+        m_root.init();              // the root coordinator
+
+        return 0.0;
+    }
+
+    virtual void internalTransition(const devs::Time& /* t */)
+    {
+        // If the sub simulation thresh the date 50.0, we stop the sub
+        // simulation.
+        if (m_root.getCurrentTime() > 50.0) {
+            m_stop = true;
         }
 
-        virtual devs::Time init(const devs::Time& /* t */)
-        {
-            // open a simulation
-            vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
-            m_root.load(file);          // and perform the initialization of
-            m_root.init();              // the root coordinator
+        m_root.run();            // run one bag of event in the sub-simulation
+    }
 
-            return 0.0;
+    virtual devs::Time timeAdvance() const
+    {
+        if (not m_stop) {
+            return 0;
+        } else {
+            return devs::Time::infinity;
         }
+    }
 
-        virtual void internalTransition(const devs::Time& /* t */)
-        {
-            // If the sub simulation thresh the date 50.0, we stop the sub
-            // simulation.
-            if (m_root.getCurrentTime() > 50.0) {
-                m_stop = true;
-            }
-
-            m_root.run();            // run one bag of event in the sub-simulation
-        }
-
-        virtual devs::Time timeAdvance() const
-        {
-            if (not m_stop) {
-                return 0;
-            } else {
-                return devs::Time::infinity;
-            }
-        }
-
-    private:
-        devs::RootCoordinator m_root;
-        bool m_stop;
-    };
-
-    DECLARE_NAMED_DYNAMICS(twotimesmodel, TwoTimesModel)
+private:
+    utils::ModuleManager m_manager;
+    devs::RootCoordinator m_root;
+    bool m_stop;
+};
 
 }}} // namespace vle examples recursives
 
+DECLARE_DYNAMICS(vle::examples::recursives::TwoTimesModel)

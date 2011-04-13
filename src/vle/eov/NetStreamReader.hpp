@@ -42,10 +42,9 @@ class Window;
 class VLE_EOV_EXPORT NetStreamReader : public oov::NetStreamReader
 {
 public:
-    NetStreamReader(int port, Window& main) :
-        oov::NetStreamReader(port),
-        m_main(main),
-        m_finish(false)
+    NetStreamReader(const utils::ModuleManager& modulemgr,
+                    int port, Window& main)
+        : oov::NetStreamReader(modulemgr, port), m_main(main), m_finish(false)
     {}
 
     virtual ~NetStreamReader() {}
@@ -122,11 +121,11 @@ private:
      */
     virtual void onClose(const double& time);
 
-    void getGtkPlugin(const std::string& name);
+    void getPlugin(const std::string& plugin,
+                   const std::string& package);
 
-    void getDefaultPlugin();
-
-    void runWindow();
+    void runWindow(const std::string& plugin,
+                   const std::string& package);
 
     Window&             m_main;
     PluginPtr           m_plugin;

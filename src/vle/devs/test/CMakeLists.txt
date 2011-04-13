@@ -11,8 +11,8 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(unittest SHARED models.cpp)
-TARGET_LINK_LIBRARIES(unittest
+ADD_LIBRARY(DevsDeleteConnection SHARED DevsDeleteConnection.cpp)
+TARGET_LINK_LIBRARIES(DevsDeleteConnection
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -23,7 +23,23 @@ TARGET_LINK_LIBRARIES(unittest
   vlegraph
   vledevs)
 
-INSTALL(TARGETS unittest
+INSTALL(TARGETS DevsDeleteConnection
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+
+ADD_LIBRARY(DevsTransform SHARED DevsTransform.cpp)
+TARGET_LINK_LIBRARIES(DevsTransform
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vledevs)
+
+INSTALL(TARGETS DevsTransform
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 

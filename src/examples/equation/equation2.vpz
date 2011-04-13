@@ -62,10 +62,10 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dynA" library="equation2" model="A2" type="local"  />
-<dynamic name="dynB" library="equation2" model="B2" type="local"  />
-<dynamic name="dynC" library="equation2" model="C2" type="local"  />
-<dynamic name="dynD" library="equation2" model="D2" type="local"  />
+<dynamic name="dynA" library="EquationA2" type="local"  />
+<dynamic name="dynB" library="EquationB2" type="local"  />
+<dynamic name="dynC" library="EquationC2" type="local"  />
+<dynamic name="dynD" library="EquationD2" type="local"  />
 </dynamics>
 <experiment name="exp" duration="10.000000000000000" begin="0.000000000000000" seed="12389" >
 <conditions>

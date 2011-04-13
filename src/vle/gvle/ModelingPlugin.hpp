@@ -30,12 +30,32 @@
 #define VLE_GVLE_MODELINGPLUGIN_HPP
 
 #include <vle/gvle/DllDefines.hpp>
-#include <gdkmm/pixbuf.h>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/vpz/AtomicModels.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/version.hpp>
+#include <gdkmm/pixbuf.h>
 #include <string>
 #include <vector>
+
+#define DECLARE_GVLE_MODELINGPLUGIN(x)                      \
+    extern "C" {                                            \
+        VLE_GVLE_EXPORT vle::gvle::ModelingPlugin*          \
+        vle_make_new_gvle_modeling(const std::string& name) \
+        {                                                   \
+            return new x(name);                             \
+        }                                                   \
+                                                            \
+        VLE_GVLE_EXPORT void                                \
+        vle_api_level(boost::uint32_t* major,               \
+                      boost::uint32_t* minor,               \
+                      boost::uint32_t* patch)               \
+        {                                                   \
+            *major = VLE_MAJOR_VERSION;                     \
+            *minor = VLE_MINOR_VERSION;                     \
+            *patch = VLE_PATCH_VERSION;                     \
+        }                                                   \
+    }
 
 namespace vle { namespace gvle {
 
@@ -154,14 +174,9 @@ private:
     mutable Glib::RefPtr < Gdk::Pixbuf > m_icon;
 };
 
-}} // namespace vle gvle
+typedef ModelingPlugin* (*GvleModelingPluginSlot)(const std::string&);
 
-#define DECLARE_GVLE_MODELINGPLUGIN(x) \
-    extern "C" { \
-        vle::gvle::ModelingPlugin* makeNewModelingPlugin( \
-            const std::string& name) \
-        { return new x(name); } \
-    }
+}} // namespace vle gvle
 
 #endif
 

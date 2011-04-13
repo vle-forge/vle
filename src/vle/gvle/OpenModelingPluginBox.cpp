@@ -91,7 +91,7 @@ void OpenModelingPluginBox::build()
     for (PluginFactory::ModelingPluginList::const_iterator it = pll.begin();
          it != pll.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreeModelingPlugin->append());
-	row[mColumns.mName] = utils::Path::basename(it->first);
+	row[mColumns.mName] = utils::Path::basename(it->second.path());
     }
 }
 

@@ -23,11 +23,10 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp OutputMatrix.cpp
-  Plugin.cpp PluginFactory.cpp SimpleFile.cpp StreamReader.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
+  Plugin.cpp SimpleFile.cpp StreamReader.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(OOV_HPP DllDefines.hpp LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp
-  OutputMatrix.hpp Plugin.hpp PluginFactory.hpp SimpleFile.hpp StreamReader.hpp)
+  OutputMatrix.hpp Plugin.hpp SimpleFile.hpp StreamReader.hpp)
 
 IF (VLE_HAVE_CAIRO)
  SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)

@@ -31,31 +31,29 @@
 
 #include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/version.hpp>
 
-#define DECLARE_DYNAMICS_DBG(mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewDynamics(const vle::devs::DynamicsInit& init, \
-                        const vle::devs::InitEventList& events) \
-        { \
-            vle::devs::DynamicsDbg* x__ = new vle::devs::DynamicsDbg( \
-                init, events); \
-            x__->set(new mdl(init, events)); \
-            return x__; \
-        } \
-    }
-
-#define DECLARE_NAMED_DYNAMICS_DBG(name, mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewDynamics##name(const vle::devs::DynamicsInit& init, \
+#define DECLARE_DYNAMICS_DBG(mdl)                                     \
+    extern "C" {                                                      \
+        VLE_DEVS_EXPORT vle::devs::Dynamics*                          \
+        vle_make_new_dynamics(const vle::devs::DynamicsInit& init,    \
                               const vle::devs::InitEventList& events) \
-        { \
-            vle::devs::DynamicsDbg* x__ = new vle::devs::DynamicsDbg( \
-                init, events); \
-            x__->set(new mdl(init, events)); \
-            return x__; \
-        } \
+        {                                                             \
+            vle::devs::DynamicsDbg* x__;                              \
+            x__ = new vle::devs::DynamicsDbg( init, events);          \
+            x__->set(new mdl(init, events));                          \
+            return x__;                                               \
+        }                                                             \
+                                                                      \
+        VLE_DEVS_EXPORT void                                          \
+        vle_api_level(boost::uint32_t* major,                         \
+                      boost::uint32_t* minor,                         \
+                      boost::uint32_t* patch)                         \
+        {                                                             \
+            *major = VLE_MAJOR_VERSION;                               \
+            *minor = VLE_MINOR_VERSION;                               \
+            *patch = VLE_PATCH_VERSION;                               \
+        }                                                             \
     }
 
 namespace vle { namespace devs {

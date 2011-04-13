@@ -30,12 +30,33 @@
 #define VLE_EOV_PLUGIN_HPP
 
 #include <vle/eov/DllDefines.hpp>
+#include <vle/oov/CairoPlugin.hpp>
+#include <vle/version.hpp>
 #include <sigc++/trackable.h>
 #include <gdkmm/window.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/container.h>
 #include <glibmm/thread.h>
-#include <vle/oov/CairoPlugin.hpp>
+
+#define DECLARE_EOV_PLUGIN(x)                               \
+    extern "C" {                                            \
+        VLE_EOV_EXPORT vle::eov::Plugin*                    \
+        vle_make_new_eov(vle::oov::CairoPluginPtr cairoplg, \
+                         vle::eov::NetStreamReader* netsr)  \
+        {                                                   \
+            return new x(cairoplg, netsr);                  \
+        }                                                   \
+                                                            \
+        VLE_EOV_EXPORT void                                 \
+        vle_api_level(boost::uint32_t* major,               \
+                      boost::uint32_t* minor,               \
+                      boost::uint32_t* patch)               \
+        {                                                   \
+            *major = VLE_MAJOR_VERSION;                     \
+            *minor = VLE_MINOR_VERSION;                     \
+            *patch = VLE_PATCH_VERSION;                     \
+        }                                                   \
+    }
 
 namespace vle { namespace eov {
 
@@ -129,18 +150,13 @@ namespace vle { namespace eov {
      */
     typedef boost::shared_ptr < Plugin > PluginPtr ;
 
-
-#if defined(__WIN32__)
-#define DECLARE_EOV_PLUGIN(x) \
-    extern "C" { __declspec(dllexport) vle::eov::Plugin* makeNewEovPlugin( \
-        vle::oov::CairoPluginPtr cairoplg, vle::eov::NetStreamReader* netsr) { \
-            return new x(cairoplg, netsr); } }
-#else
-#define DECLARE_EOV_PLUGIN(x) \
-    extern "C" { vle::eov::Plugin* makeNewEovPlugin( \
-        vle::oov::CairoPluginPtr cairoplg, vle::eov::NetStreamReader* netsr) { \
-            return new x(cairoplg, netsr); } }
-#endif
+    /**
+     * @brief Define the pointer to function of the eov::Plugin plug-in.
+     * @param The reference to the oov::PluginPtr.
+     * @param The reference to the NetStreamReader.
+     * @return A pointer to the eov::Plugin newly build.
+     */
+    typedef Plugin* (*EovPluginSlot)(oov::PluginPtr, NetStreamReader*);
 
 }} // namespace vle eov
 

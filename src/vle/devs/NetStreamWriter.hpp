@@ -38,7 +38,7 @@ namespace vle { namespace devs {
     class VLE_DEVS_EXPORT NetStreamWriter : public StreamWriter
     {
     public:
-        NetStreamWriter();
+        NetStreamWriter(const utils::ModuleManager& modulemgr);
 
         virtual ~NetStreamWriter();
 
@@ -70,7 +70,14 @@ namespace vle { namespace devs {
         virtual oov::PluginPtr refreshPlugin();
 
     private:
+        NetStreamWriter(const NetStreamWriter& other);
+        NetStreamWriter& operator=(const NetStreamWriter& other);
+
         oov::PluginPtr getPlugin() const;
+
+        std::string m_pluginname;
+        std::string m_package;
+        std::string m_location;
 
         value::Set*      m_paramFrame;
         value::Set*      m_newObsFrame;

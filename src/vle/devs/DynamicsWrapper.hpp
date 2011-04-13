@@ -31,22 +31,27 @@
 
 #include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/version.hpp>
 #include <string>
 
-#define DECLARE_DYNAMICSWRAPPER(mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewDynamicsWrapper(const vle::devs::DynamicsWrapperInit& init, \
-                               const vle::devs::InitEventList& events) \
-        { return new mdl(init, events); } \
-    }
-
-#define DECLARE_NAMED_DYNAMICSWRAPPER(name, mdl) \
-    extern "C" { \
-        vle::devs::Dynamics* \
-        makeNewDynamicsWrapper##name(const vle::devs::DynamicsWrapperInit& init, \
-                                     const vle::devs::InitEventList& events) \
-        { return new mdl(init, events); } \
+#define DECLARE_DYNAMICSWRAPPER(mdl)                                              \
+    extern "C" {                                                                  \
+        VLE_DEVS_EXPORT vle::devs::Dynamics*                                      \
+        vle_make_new_dynamics_wrapper(const vle::devs::DynamicsWrapperInit& init, \
+                                      const vle::devs::InitEventList& events)     \
+        {                                                                         \
+            return new mdl(init, events);                                         \
+        }                                                                         \
+                                                                                  \
+        VLE_DEVS_EXPORT void                                                      \
+        vle_api_level(boost::uint32_t* major,                                     \
+                      boost::uint32_t* minor,                                     \
+                      boost::uint32_t* patch)                                     \
+        {                                                                         \
+            *major = VLE_MAJOR_VERSION;                                           \
+            *minor = VLE_MINOR_VERSION;                                           \
+            *patch = VLE_PATCH_VERSION;                                           \
+        }                                                                         \
     }
 
 namespace vle { namespace devs {
@@ -57,20 +62,16 @@ namespace vle { namespace devs {
         DynamicsWrapperInit(const graph::AtomicModel& atom,
                             utils::Rand& rnd,
                             PackageId packageid,
-                            const std::string& model,
                             const std::string& library)
-            : DynamicsInit(atom, rnd, packageid), m_model(model),
-            m_library(library)
+            : DynamicsInit(atom, rnd, packageid), m_library(library)
         {}
 
         virtual ~DynamicsWrapperInit()
         {}
 
-        const std::string& model() const { return m_model; }
         const std::string& library() const { return m_library; }
 
     private:
-        const std::string& m_model;
         const std::string& m_library;
     };
 

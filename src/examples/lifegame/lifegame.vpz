@@ -12,7 +12,7 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_executive" library="lifegame" model="executive" type="local"  />
+<dynamic name="dyn_executive" library="LifegameExecutive" type="local"  />
 </dynamics>
 <experiment name="exp1" duration="100.000000000000000" begin="0.000000000000000" seed="544" >
 <conditions>
@@ -26,7 +26,7 @@
 </condition>
 <condition name="cond_executive" >
  <port name="translate" >
-<map><key name="cells"><map><key name="connectivity"><string>von neumann</string></key><key name="library"><string>lifegame</string></key><key name="model"><string>cell</string></key><key name="prefix"><string>cell</string></key></map></key><key name="grid"><tuple>30.000000000000000 30.000000000000000</tuple></key></map>
+<map><key name="cells"><map><key name="connectivity"><string>von neumann</string></key><key name="library"><string>LifegameCell</string></key><key name="model"><string>cell</string></key><key name="prefix"><string>cell</string></key></map></key><key name="grid"><tuple>30.000000000000000 30.000000000000000</tuple></key></map>
 </port>
 </condition>
 </conditions>

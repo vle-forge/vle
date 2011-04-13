@@ -124,10 +124,10 @@ void ConditionsBox::ConditionsTreeView::makeMenuEdit()
          it != pll.end(); ++it) {
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-                it->first,
+                it->first.first + "/" + it->first.second,
                 sigc::bind<std::string>(sigc::mem_fun(
                         *this, &ConditionsBox::ConditionsTreeView::onEdit),
-                    it->first)));
+                    it->first.first + "/" + it->first.second)));
     }
 }
 
@@ -396,10 +396,10 @@ void ConditionsBox::PortsTreeView::makeMenuEdit()
          it != pll.end(); ++it) {
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		it->first,
+		it->first.first + "/" + it->first.second,
 		sigc::bind<std::string>(sigc::mem_fun(
                         *this, &ConditionsBox::PortsTreeView::onEdit),
-                    it->first)));
+                    it->first.first + "/" + it->first.second)));
     }
 }
 

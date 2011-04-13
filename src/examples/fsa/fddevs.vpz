@@ -34,8 +34,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn1" library="fsa" model="devs1" type="local"  />
-<dynamic name="dyn2" library="fsa" model="devs2" type="local"  />
+<dynamic name="dyn1" library="FDDevs1" type="local"  />
+<dynamic name="dyn2" library="FDDevs2" type="local"  />
 </dynamics>
 <experiment name="exp1" duration="100.000000000000000" begin="0.000000000000000" seed="123456789" >
 <views>

@@ -178,7 +178,6 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
         " </structures>\n"
         " <dynamics>\n"
         "  <dynamic name=\"dyn1\" library=\"celldevs\""
-        "           model=\"celldevs\""
         "           type=\"local\" />\n"
         " </dynamics>\n"
         "</vle_project>\n";
@@ -202,7 +201,6 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
 
     BOOST_REQUIRE_EQUAL(dyn.name(), "dyn1");
     BOOST_REQUIRE_EQUAL(dyn.library(), "celldevs");
-    BOOST_REQUIRE_EQUAL(dyn.model(), "celldevs");
     BOOST_REQUIRE_EQUAL(dyn.type(), vpz::Dynamic::LOCAL);
     BOOST_REQUIRE_EQUAL(dyn.language(), "");
 }

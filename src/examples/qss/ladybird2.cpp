@@ -26,9 +26,28 @@
  */
 
 
-#include "ladybird2.hpp"
+#include <vle/extension/difference-equation/Simple.hpp>
 
 namespace vle { namespace examples { namespace qss {
+
+class Ladybird2 : public vle::extension::DifferenceEquation::Simple
+{
+public:
+    Ladybird2(const vle::devs::DynamicsInit& model,
+	      const vle::devs::InitEventList& events);
+
+    virtual ~Ladybird2();
+
+    virtual double compute(const vle::devs::Time& /* time */);
+
+private:
+    Var y;
+    Sync x;
+
+    double b;
+    double d;
+    double e;
+};
 
 Ladybird2::Ladybird2(const devs::DynamicsInit& model,
                      const devs::InitEventList& events) :
@@ -52,4 +71,4 @@ double Ladybird2::compute(const vle::devs::Time& time)
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(ladybird2, vle::examples::qss::Ladybird2)
+DECLARE_DYNAMICS(vle::examples::qss::Ladybird2)

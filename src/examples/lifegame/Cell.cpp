@@ -26,83 +26,96 @@
  */
 
 
-#include <Cell.hpp>
-#include <vle/utils.hpp>
-
-using namespace vle::devs;
-using namespace vle::extension;
+#include <vle/extension/CellDevs.hpp>
+#include <vle/devs/Dynamics.hpp>
 
 namespace vle { namespace examples { namespace lifegame {
 
-//***********************************************************************
-//***********************************************************************
-//
-//  DEVS Methods
-//
-//***********************************************************************
-//***********************************************************************
-
-Time Cell::init(const vle::devs::Time& /* time */)
+class Cell : public extension::CellDevs
 {
-// Parameters
-    mTimeStep = vle::value::toDouble(m_parameters["TimeStep"]);
+private:
+    enum state { INIT, IDLE, NEWSTATE };
 
-// States
-    initBooleanNeighbourhood("s",false);
-    if (!existState("s")) {
-	double colour = rand().getDouble();
+    double mTimeStep;
+    state mState;
 
-	if (colour > 0.5) initBooleanState("s", true);
-	else initBooleanState("s", false);
+public:
+    Cell(const devs::DynamicsInit& model,
+         const devs::InitEventList& events) :
+        extension::CellDevs(model, events)
+    {
     }
 
-//     std::cout << getModelName() << " : " << getBooleanState("s") << std::endl;
-
-    mState = INIT;
-    neighbourModify();
-    setSigma(Time(0));
-    return Time(0);
-}
-
-void Cell::internalTransition(const Time& time)
-{
-    CellDevs::internalTransition(time);
-    switch (mState) {
-    case INIT:
-	mState = IDLE;
-	setSigma(Time(0));
-	break;
-    case IDLE:
-	setLastTime(time);
-	mState = NEWSTATE;
-	setSigma(Time(0));
-	break;
-    case NEWSTATE:
-	bool v_state = getBooleanState("s");
-	unsigned int n = getBooleanNeighbourStateNumber("s", true);
-
-// 	std::cout << "[" << time << "] " << getModelName() << " : " << getBooleanState("s")
-// 		  << " - " << n << std::endl;
-
-	if (v_state && (n < 2 || n > 3)) {
-	    setBooleanState("s",false);
-	    modify();
-	    mState = INIT;
-	    setSigma(mTimeStep);
-	}
-	else if (!v_state && (n == 3)) {
-	    setBooleanState("s",true);
-	    modify();
-	    mState = INIT;
-	    setSigma(mTimeStep);
-	}
-	else {
-	    mState = IDLE;
-	    setSigma(vle::devs::Time::infinity);
-	}
-	break;
+    virtual ~Cell()
+    {
     }
-}
+
+    virtual devs::Time init(const devs::Time& /* time */)
+    {
+        mTimeStep = value::toDouble(m_parameters["TimeStep"]);
+
+        initBooleanNeighbourhood("s",false);
+        if (!existState("s")) {
+            double colour = rand().getDouble();
+
+            if (colour > 0.5) initBooleanState("s", true);
+            else initBooleanState("s", false);
+        }
+
+        mState = INIT;
+        neighbourModify();
+        setSigma(devs::Time(0.0));
+        return devs::Time(0.0);
+    }
+
+    virtual void internalTransition(const devs::Time& time)
+    {
+        CellDevs::internalTransition(time);
+        switch (mState) {
+        case INIT:
+            mState = IDLE;
+            setSigma(devs::Time(0.0));
+            break;
+        case IDLE:
+            setLastTime(time);
+            mState = NEWSTATE;
+            setSigma(devs::Time(0.0));
+            break;
+        case NEWSTATE:
+            bool v_state = getBooleanState("s");
+            unsigned int n = getBooleanNeighbourStateNumber("s", true);
+
+            if (v_state && (n < 2 || n > 3)) {
+                setBooleanState("s",false);
+                modify();
+                mState = INIT;
+                setSigma(mTimeStep);
+            }
+            else if (!v_state && (n == 3)) {
+                setBooleanState("s",true);
+                modify();
+                mState = INIT;
+                setSigma(mTimeStep);
+            }
+            else {
+                mState = IDLE;
+                setSigma(devs::Time::infinity);
+            }
+            break;
+        }
+    }
+
+    virtual void processPerturbation(const vle::devs::ExternalEvent& /* event */)
+    {
+    }
+
+    virtual void updateSigma(devs::Event*)
+    {
+        setSigma(devs::Time(0.0));
+    }
+
+};
 
 }}} // namespace vle examples lifegame
 
+DECLARE_DYNAMICS(vle::examples::lifegame::Cell)

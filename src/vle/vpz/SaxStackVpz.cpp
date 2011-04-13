@@ -485,7 +485,6 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
     const xmlChar* name = 0;
     const xmlChar* package = 0;
     const xmlChar* library = 0;
-    const xmlChar* model = 0;
     const xmlChar* language = 0;
     const xmlChar* type = 0;
     const xmlChar* location = 0;
@@ -497,8 +496,6 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
             package = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"library") == 0) {
             library = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"model") == 0) {
-            model = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"language") == 0) {
             language = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"type") == 0) {
@@ -515,12 +512,6 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
 
     vpz::Dynamic dyn(xmlCharToString(name));
     dyn.setLibrary(xmlCharToString(library));
-
-    if (model) {
-        dyn.setModel(xmlCharToString(model));
-    } else {
-        dyn.setModel("");
-    }
 
     if (package) {
         dyn.setPackage(xmlCharToString(package));

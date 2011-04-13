@@ -32,8 +32,7 @@
 #include <vle/gvle/OutputPlugin.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/utils/Module.hpp>
-#include <boost/noncopyable.hpp>
+#include <vle/utils/ModuleManager.hpp>
 
 namespace vle { namespace gvle {
 
@@ -43,7 +42,7 @@ namespace vle { namespace gvle {
  * PluginFactory build a dictionary of available plug-ins. Use the
  * getModeling and getOutput to load plug-in.
  */
-class PluginFactory : public boost::noncopyable
+class PluginFactory
 {
 public:
     template < class T >
@@ -72,11 +71,15 @@ public:
         static std::string generic(const std::string& name,
                                    const std::string& package)
         {
-            std::string result(name);
+            std::string result;
 
-            result += " (";
-            result += (package.empty() ? "generic" : package);
-            result += ")";
+            if (package.empty()) {
+                result.assign(name);
+            } else {
+                result.assign(package);
+                result += '/';
+                result.append(name);
+            }
 
             return result;
         }
@@ -104,9 +107,24 @@ public:
     typedef Plugin < ModelingPlugin > ModelingPlg;
     typedef Plugin < oov::Plugin > OovPlg;
 
-    typedef std::map < std::string, OutputPlg > OutputPluginList;
-    typedef std::map < std::string, ModelingPlg > ModelingPluginList;
-    typedef std::map < std::string, OovPlg > OovPluginList;
+    typedef std::pair < std::string, std::string > Key;
+
+    struct CompareKey
+    {
+        bool operator()(const Key& x, const Key& y) const
+        {
+            if (x.first == y.first) {
+                return x.second < y.second;
+            } else {
+                return x.first < y.first;
+            }
+        }
+    };
+
+
+    typedef std::map < Key, OutputPlg, CompareKey > OutputPluginList;
+    typedef std::map < Key, ModelingPlg, CompareKey > ModelingPluginList;
+    typedef std::map < Key, OovPlg, CompareKey > OovPluginList;
 
     /**
      * @brief Fill the conditions and outputs plug-ins list with files
@@ -204,6 +222,11 @@ public:
     const OovPluginList& oovPlugins() const { return m_oov; }
 
 private:
+    PluginFactory(const PluginFactory& other);
+    PluginFactory& operator=(const PluginFactory& other);
+
+    utils::ModuleManager m_modulemgr;
+
     OutputPluginList m_outs;
     ModelingPluginList m_mods;
     OovPluginList m_oov;

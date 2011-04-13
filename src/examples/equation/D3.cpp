@@ -60,4 +60,4 @@ namespace vle { namespace examples { namespace equation {
 
 }}} // namespace vle examples equation
 
-DECLARE_NAMED_DYNAMICS(D3, vle::examples::equation::D3)
+DECLARE_DYNAMICS(vle::examples::equation::D3)

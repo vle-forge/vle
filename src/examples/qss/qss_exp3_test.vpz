@@ -52,8 +52,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_ladybirdplantlouse" library="ladybirdplantlouse" model="ladybirdplantlouse" type="local"  />
-<dynamic name="dyn_smartgardener" library="ladybirdplantlouse" model="smartgardener" type="local"  />
+<dynamic name="dyn_ladybirdplantlouse" library="QssLadyBirdPlantLouse" type="local"  />
+<dynamic name="dyn_smartgardener" library="QssSmartGardener" type="local"  />
 </dynamics>
 <experiment name="exp3" duration="25.000000000000000" begin="0.000000000000000" seed="123" >
 <conditions>

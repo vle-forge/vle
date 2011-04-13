@@ -26,10 +26,30 @@
  */
 
 
-#include "ladybirdplantlouse.hpp"
+#include <vle/extension/differential-equation/QSS.hpp>
 #include <cmath>
 
 namespace vle { namespace examples { namespace qss {
+
+class Ladybirdplantlouse : public extension::QSS::Multiple
+{
+public:
+    Ladybirdplantlouse(const devs::DynamicsInit& model,
+		       const devs::InitEventList& events);
+
+    virtual ~Ladybirdplantlouse();
+
+    virtual double compute(unsigned int i, const devs::Time& time) const;
+
+private:
+    double a;
+    double b;
+    double d;
+    double e;
+
+    Var x;
+    Var y;
+};
 
 Ladybirdplantlouse::Ladybirdplantlouse(const devs::DynamicsInit& model,
                                        const devs::InitEventList& events) :
@@ -64,6 +84,4 @@ double Ladybirdplantlouse::compute(unsigned int i,
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(ladybirdplantlouse,
-		       vle::examples::qss::Ladybirdplantlouse)
-
+DECLARE_DYNAMICS(vle::examples::qss::Ladybirdplantlouse)

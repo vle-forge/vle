@@ -27,8 +27,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dynMeteo" library="stage" model="Meteo" type="local"  />
-<dynamic name="dynStage" library="stage" model="Stage" type="local"  />
+<dynamic name="dynMeteo" library="Meteo" type="local"  />
+<dynamic name="dynStage" library="Stage" type="local"  />
 </dynamics>
 <experiment name="exp" duration="330" begin="2452884"
 	    combination="linear" seed="12389" >

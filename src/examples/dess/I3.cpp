@@ -47,6 +47,6 @@ double I3::compute(const vle::devs::Time& /* time */) const
     return r * S() * I() - a * I();
 }
 
-DECLARE_NAMED_DYNAMICS(I3, I3)
+DECLARE_DYNAMICS(I3)
 
 }}} // namespace vle examples dess

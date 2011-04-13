@@ -20,8 +20,8 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="counter" library="gens" model="counter" type="local"  />
-<dynamic name="executive" library="gens" model="executive" type="local"  />
+<dynamic name="counter" library="GensCounter" type="local"  />
+<dynamic name="executive" library="GensExecutive" type="local"  />
 </dynamics>
 <experiment name="generatorexecutive" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
 <views>

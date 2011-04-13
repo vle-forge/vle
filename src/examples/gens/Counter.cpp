@@ -25,66 +25,79 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <Counter.hpp>
-#include <iomanip>
+#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/DynamicsDbg.hpp>
 
 namespace vle { namespace examples { namespace gens {
 
-Counter::Counter(const devs::DynamicsInit& model,
-                 const devs::InitEventList& events) :
-    devs::Dynamics(model, events),
-    m_counter(0),
-    m_active(false)
+class Counter : public devs::Dynamics
 {
-}
-
-devs::Time Counter::init(const devs::Time& /* time */)
-{
-    m_counter = 0;
-    return devs::Time::infinity;
-}
-
-void Counter::output(const devs::Time& /* time */,
-                     devs::ExternalEventList& output) const
-{
-    output.addEvent(buildEvent("out"));
-}
-
-devs::Time Counter::timeAdvance() const
-{
-    if (m_active) {
-        return devs::Time(0.0);
+public:
+    Counter(const devs::DynamicsInit& model,
+            const devs::InitEventList& events) :
+        devs::Dynamics(model, events),
+        m_counter(0),
+        m_active(false)
+    {
     }
-    else {
+
+    virtual ~Counter()
+    {
+    }
+
+    virtual devs::Time init(const devs::Time& /* time */)
+    {
+        m_counter = 0;
         return devs::Time::infinity;
     }
-}
 
-void Counter::internalTransition(const devs::Time& /* event */)
-{
-    m_active = false;
-}
-
-void Counter::externalTransition(const devs::ExternalEventList& events,
-                                 const devs::Time& /* time */)
-{
-    m_counter += events.size();
-    m_active = true;
-}
-
-value::Value* Counter::observation(const devs::ObservationEvent&  ev) const
-{
-    if (ev.onPort("c")) {
-        if (m_counter > 100 and m_counter < 500) {
-            return 0;
-        } else {
-            return buildDouble(m_counter);
-        }
-    } else if (ev.onPort("value")) {
-        return buildInteger(0);
+    virtual void output(const devs::Time& /* time */,
+                        devs::ExternalEventList& output) const
+    {
+        output.addEvent(buildEvent("out"));
     }
-    return 0;
-}
+
+    virtual devs::Time timeAdvance() const
+    {
+        if (m_active) {
+            return devs::Time(0.0);
+        }
+        else {
+            return devs::Time::infinity;
+        }
+    }
+
+    virtual void internalTransition(const devs::Time& /* event */)
+    {
+        m_active = false;
+    }
+
+    virtual void externalTransition(const devs::ExternalEventList& events,
+                                    const devs::Time& /* time */)
+    {
+        m_counter += events.size();
+        m_active = true;
+    }
+
+    virtual value::Value* observation(const devs::ObservationEvent&  ev) const
+    {
+        if (ev.onPort("c")) {
+            if (m_counter > 100 and m_counter < 500) {
+                return 0;
+            } else {
+                return buildDouble(m_counter);
+            }
+        } else if (ev.onPort("value")) {
+            return buildInteger(0);
+        }
+        return 0;
+    }
+
+private:
+    long m_counter;
+    bool m_active;
+};
 
 }}} // namespace vle examples gens
+
+DECLARE_DYNAMICS_DBG(vle::examples::gens::Counter)

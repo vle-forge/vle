@@ -11,36 +11,21 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-SET(SOURCES_CPP ladybirdplantlouse.cpp ladybirdplantlouse.hpp plantlouse.cpp
-  plantlouse.hpp ladybird.hpp ladybird.cpp smartgardener.cpp smartgardener.hpp
-  plantlouse2.cpp plantlouse2.hpp ladybird2.hpp ladybird2.cpp smartgardener2.cpp
-  smartgardener2.hpp DifferenceEquationAdaptor.cpp)
 
-ADD_LIBRARY(ladybirdplantlouse SHARED ${SOURCES_CPP})
+DeclareModuleDynamics(QssDifferenceEquationAdaptor DifferenceEquationAdaptor.cpp)
+DeclareModuleDynamics(QssLadyBird2 ladybird2.cpp)
+DeclareModuleDynamics(QssLadyBird ladybird.cpp)
+DeclareModuleDynamics(QssLadyBirdPlantLouse ladybirdplantlouse.cpp)
+DeclareModuleDynamics(QssPlantLouse2 plantlouse2.cpp)
+DeclareModuleDynamics(QssPlantLouse plantlouse.cpp)
+DeclareModuleDynamics(QssSmartGardener2 smartgardener2.cpp)
+DeclareModuleDynamics(QssSmartGardener smartgardener.cpp)
 
-TARGET_LINK_LIBRARIES(ladybirdplantlouse
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
+INSTALL(FILES qss_exp1_test.vpz qss_exp1_txt.vpz qss_exp1.vpz qss_exp2_txt.vpz
+  qss_exp2.vpz qss_exp3_test.vpz qss_exp3_txt.vpz qss_exp3.vpz qss_exp4_txt.vpz
+  qss_exp4.vpz qss_exp5.vpz qss_exp6.vpz qss_exp7.vpz DESTINATION
+  "${VLE_SHARE_DIRS}/examples")
 
-INSTALL(TARGETS ladybirdplantlouse
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-
-INSTALL(FILES qss_exp1_txt.vpz qss_exp1_test.vpz qss_exp1.vpz
-  qss_exp2_txt.vpz qss_exp2.vpz qss_exp3_txt.vpz qss_exp3_test.vpz
-   qss_exp3.vpz qss_exp4_txt.vpz qss_exp4.vpz qss_exp5.vpz
-  qss_exp6.vpz qss_exp7.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-
-INSTALL(FILES ${SOURCES_CPP} DESTINATION
-  "${VLE_SHARE_DIRS}/examples/sources/qss")
+INSTALL(FILES DifferenceEquationAdaptor.cpp ladybird2.cpp ladybird.cpp
+  ladybirdplantlouse.cpp plantlouse2.cpp plantlouse.cpp smartgardener2.cpp
+  smartgardener.cpp DESTINATION "${VLE_SHARE_DIRS}/examples/sources/qss")

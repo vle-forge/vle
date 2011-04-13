@@ -97,6 +97,6 @@ private:
     double mValue;
 };
 
-DECLARE_NAMED_DYNAMICS(Meteo, Meteo)
+DECLARE_DYNAMICS(Meteo)
 
 }}} // namespace vle examples fsa

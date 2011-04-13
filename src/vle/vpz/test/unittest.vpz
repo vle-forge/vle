@@ -156,9 +156,9 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="a" library="liba" model="libua" language="python" type="distant"  location="192.168.1.1:324" />
-<dynamic name="b" library="libu" model="libub" language="python" type="local"  />
-<dynamic name="unittest" library="unittest" model="transform" type="local"  />
+<dynamic name="a" library="liba" language="python" type="distant"  location="192.168.1.1:324" />
+<dynamic name="b" library="libu" language="python" type="local"  />
+<dynamic name="unittest" library="DevsTransform" type="local"  />
 </dynamics>
 <classes>
 <class name="beepbeep" >

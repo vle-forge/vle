@@ -67,11 +67,11 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="counter" library="counter" model="" type="local"  />
-<dynamic name="dyn_E" library="sir" model="E" type="local"  />
-<dynamic name="dyn_I" library="sir" model="I2" type="local"  />
-<dynamic name="dyn_R" library="sir" model="R2" type="local"  />
-<dynamic name="dyn_S" library="sir" model="S2" type="local"  />
+<dynamic name="counter" library="DessCounter" type="local"  />
+<dynamic name="dyn_E" library="DessE" type="local"  />
+<dynamic name="dyn_I" library="DessI2" type="local"  />
+<dynamic name="dyn_R" library="DessR2" type="local"  />
+<dynamic name="dyn_S" library="DessS2" type="local"  />
 </dynamics>
 <experiment name="exp" duration="100.000000000000000" begin="0.000000000000000" seed="12379843" >
 <conditions>

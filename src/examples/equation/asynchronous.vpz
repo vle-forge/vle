@@ -78,11 +78,11 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dE0" library="asynchronous" model="E0" type="local"  />
-<dynamic name="dE1" library="asynchronous" model="E1" type="local"  />
-<dynamic name="dE2" library="asynchronous" model="E2" type="local"  />
-<dynamic name="dE3" library="asynchronous" model="E3" type="local"  />
-<dynamic name="dFSA" library="asynchronous" model="FSA" type="local"  />
+<dynamic name="dE0" library="EquationAsynchronousE0" type="local"  />
+<dynamic name="dE1" library="EquationAsynchronousE1" type="local"  />
+<dynamic name="dE2" library="EquationAsynchronousE2" type="local"  />
+<dynamic name="dE3" library="EquationAsynchronousE3" type="local"  />
+<dynamic name="dFSA" library="EquationAsynchronousFSA" type="local"  />
 </dynamics>
 <experiment name="asynchronous" duration="5.000000000000000" begin="0.000000000000000" combination="linear" seed="123456789" >
 <replicas seed="581869302" number="1" />

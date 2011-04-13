@@ -203,7 +203,7 @@ void SimulatorDistant::run()
     }
 
     std::ostringstream ostr;
-    RunVerbose r(ostr);
+    RunVerbose r(mModulemgr, ostr);
     vpz::Vpz* file = new vpz::Vpz(filename);
     instance = file->project().instance();
     replica = file->project().replica();
