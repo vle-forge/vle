@@ -206,10 +206,7 @@ void ConditionsBox::ConditionsTreeView::onRename()
 	   and list.find(newname) == list.end()) {
 	    mConditions->rename(oldname, newname);
 	    mParent->buildTreeConditions();
-
-	    vpz::AtomicModelList& atomlist(
-		mParent->getGVLE()->getModeling()->vpz().project().model().atomicModels());
-	    atomlist.updateCondition(oldname, newname);
+            mParent->setRenameList(std::make_pair(oldname, newname));
 	}
     }
 }
@@ -240,20 +237,20 @@ void ConditionsBox::ConditionsTreeView::onEdit(std::string pluginName)
 
     if (it) {
 
-    std::string conditionName = Glib::ustring((*it)[mColumns.m_col_name]);
+        std::string conditionName = Glib::ustring((*it)[mColumns.m_col_name]);
 
-    PluginFactory& plf = mParent->getGVLE()->pluginFactory();
+        PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
-    try {
-	PluginFactory::ModelingPlg& plugin = plf.getModeling(pluginName);
-	vpz::Condition& cond = mConditions->get(conditionName);
-	plugin.plugin()->start(cond);
+        try {
+            PluginFactory::ModelingPlg& plugin = plf.getModeling(pluginName);
+            vpz::Condition& cond = mConditions->get(conditionName);
+            plugin.plugin()->start(cond);
 
-	mParent->buildTreePorts(conditionName);
+            mParent->buildTreePorts(conditionName);
 
-    } catch(const std::exception& e) {
-	// Error(e.what());
-    }
+        } catch(const std::exception& e) {
+            // Error(e.what());
+        }
     }
 }
 
@@ -290,10 +287,7 @@ void ConditionsBox::ConditionsTreeView::onEdition(
     if (list.find(newName) == list.end() and not newName.empty()) {
 	mConditions->rename(mOldName, newName);
 	mParent->buildTreeConditions();
-
-        vpz::AtomicModelList& atomlist(
-            mParent->getGVLE()->getModeling()->vpz().project().model().atomicModels());
-	atomlist.updateCondition(mOldName, newName);
+        mParent->setRenameList(std::make_pair(mOldName, newName));
     }
     build();
 }
@@ -616,13 +610,14 @@ void ConditionsBox::buildTreeValues(const std::string& conditionName,
 
 int ConditionsBox::run(const vpz::Conditions& conditions)
 {
+    mRenameList.clear();
     mConditions = new vpz::Conditions(conditions);
     buildTreeConditions();
     mDialog->show_all();
     return mDialog->run();
 }
 
-void ConditionsBox::apply(vpz::Conditions& conditions)
+renameList ConditionsBox::apply(vpz::Conditions& conditions)
 {
     {
 	conditions.clear();
@@ -636,6 +631,8 @@ void ConditionsBox::apply(vpz::Conditions& conditions)
     }
     delete mConditions;
     mConditions = 0;
+
+    return mRenameList;
 }
 
 void ConditionsBox::on_apply()
@@ -647,6 +644,7 @@ void ConditionsBox::on_apply()
 
 void ConditionsBox::on_cancel()
 {
+    mRenameList.clear();
     delete mConditions;
     mConditions = 0;
     if (mDialog) {

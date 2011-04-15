@@ -66,6 +66,8 @@ class PackageBrowserWindow;
 
 typedef std::set < std::string > Depends;
 typedef std::map < std::string, Depends > AllDepends;
+typedef std::vector < std::pair < std::string,
+                                  std::string > > renameList;
 
 /**
  * @brief GVLE is a Gtk::Window use to build the main window with all button
@@ -651,9 +653,10 @@ public:
      *
      */
     void onConditionsBox();
+    void applyRemoved();
 
     int runConditionsBox(const vpz::Conditions& conditions);
-    void applyConditionsBox(vpz::Conditions& conditions);
+    renameList applyConditionsBox(vpz::Conditions& conditions);
 
     /**
      * When click on experiment box to define init, state etc.
@@ -732,6 +735,7 @@ public:
     void updateTitle();
 
 private:
+
     bool checkVpz();
     void fixSave();
     void saveVpz();

@@ -797,28 +797,70 @@ void GVLE::onConditionsBox()
     const Modeling* modeling = (const Modeling*)mModeling;
 
     if (runConditionsBox(modeling->conditions()) == 1) {
-        applyConditionsBox(mModeling->conditions());
-
+        renameList tmpRename= applyConditionsBox(mModeling->conditions());
         {
-            vpz::AtomicModelList& list =
-                mModeling->vpz().project().model().atomicModels();
-            vpz::AtomicModelList::iterator it = list.begin();
+            renameList::const_iterator it = tmpRename.begin();
 
-            while (it != list.end()) {
-                std::vector < std::string > mdlConditions =
-                    it->second.conditions();
-                std::vector < std::string >::const_iterator its =
-                    mdlConditions.begin();
+            while (it != tmpRename.end()) {
+                vpz::AtomicModelList& atomlist(
+                    mModeling->vpz().project().model().atomicModels());
+                atomlist.updateCondition(it->first, it->second);
 
-                while (its != mdlConditions.end()) {
-                    if (not mModeling->conditions().exist(*its)) {
-                        it->second.delCondition(*its);
-                    }
-                    ++its;
+                vpz::ClassList::iterator itc = mModeling->vpz().project().classes().begin();
+
+                while (itc != mModeling->vpz().project().classes().end()) {
+                    vpz::AtomicModelList& atomlist(
+                        itc->second.atomicModels());
+                    atomlist.updateCondition(it->first, it->second);
+                    itc++;
                 }
                 ++it;
             }
         }
+        applyRemoved();
+    }
+}
+
+void GVLE::applyRemoved()
+{
+    vpz::AtomicModelList& list =
+        mModeling->vpz().project().model().atomicModels();
+    vpz::AtomicModelList::iterator it = list.begin();
+
+    while (it != list.end()) {
+        std::vector < std::string > mdlConditions =
+            it->second.conditions();
+        std::vector < std::string >::const_iterator its =
+            mdlConditions.begin();
+
+        while (its != mdlConditions.end()) {
+            if (not mModeling->conditions().exist(*its)) {
+                it->second.delCondition(*its);
+            }
+            ++its;
+        }
+        ++it;
+    }
+
+    vpz::ClassList::iterator itc = mModeling->vpz().project().classes().begin();
+    while (itc != mModeling->vpz().project().classes().end()) {
+        vpz::AtomicModelList& atomlist( itc->second.atomicModels() );
+        vpz::AtomicModelList::iterator itl = atomlist.begin();
+
+        while (itl != atomlist.end()) {
+            std::vector < std::string > mdlConditions =
+                itl->second.conditions();
+            std::vector < std::string >::const_iterator its =
+                mdlConditions.begin();
+            while (its != mdlConditions.end()) {
+                if (not mModeling->conditions().exist(*its)) {
+                    itl->second.delCondition(*its);
+                }
+                ++its;
+            }
+            ++itl;
+        }
+        ++itc;
     }
 }
 
@@ -827,9 +869,9 @@ int GVLE::runConditionsBox(const vpz::Conditions& conditions)
     return mConditionsBox->run(conditions);
 }
 
-void GVLE::applyConditionsBox(vpz::Conditions& conditions)
+renameList GVLE::applyConditionsBox(vpz::Conditions& conditions)
 {
-    mConditionsBox->apply(conditions);
+    return mConditionsBox->apply(conditions);
 }
 
 void GVLE::onHostsBox()

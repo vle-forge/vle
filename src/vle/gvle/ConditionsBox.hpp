@@ -37,11 +37,13 @@
 
 namespace vle { namespace gvle {
 
+typedef std::vector < std::pair < std::string,
+                                  std::string > > renameList;
+
 class GVLE;
 
 class ConditionsBox
 {
-private:
     class ModelColumnsConditions : public Gtk::TreeModel::ColumnRecord
     {
     public:
@@ -192,13 +194,18 @@ public:
     ~ConditionsBox();
 
     int run(const vpz::Conditions& conditions);
-    void apply(vpz::Conditions& conditions);
+    renameList apply(vpz::Conditions& conditions);
 
     inline GVLE* getGVLE()
     { return m_gvle; }
 
+    inline void setRenameList(std::pair < std::string,
+                                          std::string >  newPair)
+    { mRenameList.push_back(newPair); }
 
 private:
+    renameList          mRenameList;
+
     GVLE*               m_gvle;
     vpz::Conditions*    mConditions;
 
