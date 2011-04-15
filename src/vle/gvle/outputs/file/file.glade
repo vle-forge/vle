@@ -128,11 +128,25 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
+                                    <property name="relief">none</property>
                                     <property name="active">True</property>
                                     <property name="draw_indicator">True</property>
                                   </widget>
                                   <packing>
                                     <property name="position">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckButton" id="checkbuttonJulianDay">
+                                    <property name="label" translatable="yes">Convert date into a Julian-Day</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="tooltip" translatable="yes">Convert the date into a Julian-Day double number</property>
+                                    <property name="draw_indicator">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="position">3</property>
                                   </packing>
                                 </child>
                               </widget>

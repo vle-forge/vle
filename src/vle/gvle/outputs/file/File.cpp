@@ -39,7 +39,8 @@ namespace vle { namespace gvle { namespace outputs {
 
 File::File(const std::string& name)
     : OutputPlugin(name), mDialog(0), mRadioFile(0), mRadioStdOut(0),
-    mRadioErrOut(0), mComboType(0), mComboFile(0), mHBoxFile(0), mHBoxLocale(0)
+      mRadioErrOut(0), mCheckJulianDay(0), mComboType(0), mComboFile(0),
+      mHBoxFile(0), mHBoxLocale(0)
 {
     std::string glade = utils::Path::path().getOutputGladeFile("file.glade");
     Glib::RefPtr < Gnome::Glade::Xml > ref = Gnome::Glade::Xml::create(glade);
@@ -48,6 +49,7 @@ File::File(const std::string& name)
     ref->get_widget("radiobuttonFileFileOutputPlugin", mRadioFile);
     ref->get_widget("radiobuttonStdOutFileOutputPlugin", mRadioStdOut);
     ref->get_widget("radiobuttonErrOutFileOutputPlugin", mRadioErrOut);
+    ref->get_widget("checkbuttonJulianDay", mCheckJulianDay);
 
     Gtk::RadioButton::Group group = mRadioFile->get_group();
     mRadioStdOut->set_group(group);
@@ -135,8 +137,18 @@ void File::init(vpz::Output& output)
                         type);
             }
         } else {
-           mRadioFile->set_active();
+            mRadioFile->set_active();
         }
+
+	if (map->exist("julian-day")) {
+            bool type = map->getBoolean("julian-day");
+
+            if (type) {
+                mCheckJulianDay->set_active(true);
+            } else {
+                mCheckJulianDay->set_active(false);
+            }
+	}
     }
 }
 
@@ -148,6 +160,13 @@ void File::assign(vpz::Output& output)
 
     if (not mRadioFile->get_active()) {
         map->addString("output", mRadioStdOut->get_active() ? "out" : "error");
+    }
+
+    if (mCheckJulianDay->get_active()) {
+        map->addBoolean("julian-day", true);
+    }
+    else {
+        map->addBoolean("julian-day", false);
     }
 
     output.setData(map);

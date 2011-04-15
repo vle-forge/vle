@@ -32,10 +32,13 @@
 #include <vle/gvle/OutputPlugin.hpp>
 #include <gtkmm/dialog.h>
 #include <gtkmm/radiobutton.h>
+#include <gtkmm/checkbutton.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/comboboxentrytext.h>
 
-namespace vle { namespace gvle { namespace outputs {
+namespace vle {
+namespace gvle {
+namespace outputs {
 
 class File : public OutputPlugin
 {
@@ -51,6 +54,7 @@ private:
     Gtk::RadioButton* mRadioFile;
     Gtk::RadioButton* mRadioStdOut;
     Gtk::RadioButton* mRadioErrOut;
+    Gtk::CheckButton* mCheckJulianDay;
     Gtk::ComboBoxText* mComboType;
     Gtk::ComboBoxEntryText* mComboFile;
     Gtk::HBox* mHBoxFile;
