@@ -219,6 +219,7 @@ private:
 	virtual ~ConditionTreeView();
 
 	void applyRenaming();
+        void applyRemoved();
 	void build();
 	void clearRenaming()
 	    { mRenameList.clear(); }

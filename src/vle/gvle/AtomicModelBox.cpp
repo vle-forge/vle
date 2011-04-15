@@ -520,9 +520,61 @@ void AtomicModelBox::ConditionTreeView::applyRenaming()
 	vpz::AtomicModelList& atomlist(
 	    mModeling->vpz().project().model().atomicModels());
 	atomlist.updateCondition(it->first, it->second);
-	++it;
+
+        vpz::ClassList::iterator itc = mModeling->vpz().project().classes().begin();
+
+        while (itc != mModeling->vpz().project().classes().end()) {
+            vpz::AtomicModelList& atomlist(
+                itc->second.atomicModels());
+            atomlist.updateCondition(it->first, it->second);
+            itc++;
+        }
+        ++it;
     }
     mRenameList.clear();
+}
+
+void AtomicModelBox::ConditionTreeView::applyRemoved()
+{
+    vpz::Conditions& conditions = mModeling->conditions();
+    vpz::AtomicModelList& list =
+        mModeling->vpz().project().model().atomicModels();
+    vpz::AtomicModelList::iterator it = list.begin();
+
+    while (it != list.end()) {
+        std::vector < std::string > mdlConditions = it->second.conditions();
+        std::vector < std::string >::const_iterator its =
+            mdlConditions.begin();
+
+        while (its != mdlConditions.end()) {
+            if (not conditions.exist(*its)) {
+                it->second.delCondition(*its);
+            }
+            ++its;
+        }
+        ++it;
+    }
+
+    vpz::ClassList::iterator itc = mModeling->vpz().project().classes().begin();
+    while (itc != mModeling->vpz().project().classes().end()) {
+        vpz::AtomicModelList& atomlist( itc->second.atomicModels() );
+        vpz::AtomicModelList::iterator itl = atomlist.begin();
+
+        while (itl != atomlist.end()) {
+            std::vector < std::string > mdlConditions =
+                itl->second.conditions();
+            std::vector < std::string >::const_iterator its =
+                mdlConditions.begin();
+            while (its != mdlConditions.end()) {
+                if (not mModeling->conditions().exist(*its)) {
+                    itl->second.delCondition(*its);
+                }
+                ++its;
+            }
+            ++itl;
+        }
+        ++itc;
+    }
 }
 
 void AtomicModelBox::ConditionTreeView::build()
@@ -530,7 +582,6 @@ void AtomicModelBox::ConditionTreeView::build()
     mRefTreeModel->clear();
 
     const std::vector < std::string >& cond = mModel->conditions();
-    std::vector < std::string >::const_iterator f;
     const vpz::ConditionList& list = mConditions->conditionlist();
     vpz::ConditionList::const_iterator it = list.begin();
     std::string selections("");
@@ -539,13 +590,14 @@ void AtomicModelBox::ConditionTreeView::build()
         Gtk::TreeModel::Row row = *(mRefTreeModel->append());
 
         row[mColumns.m_col_name] = it->first;
-        f = std::find(cond.begin(), cond.end(), it->first);
+        std::vector < std::string >::const_iterator f =
+            std::find(cond.begin(), cond.end(), it->first);
         if (f != cond.end()) {
             row[mColumns.m_col_activ] = true;
-	    selections += (it->first + " ");
-	} else {
+            selections += (it->first + " ");
+        } else {
             row[mColumns.m_col_activ] = false;
-	}
+        }
         it++;
     }
     mLabel->set_label(_("Selected conditions: ") + selections);
@@ -574,7 +626,21 @@ void AtomicModelBox::ConditionTreeView::on_row_activated(
     const Gtk::TreeModel::Path&, Gtk::TreeViewColumn* )
 {
     if (mModeling->runConditionsBox(*mConditions) == 1) {
-	mModeling->applyConditionsBox(*mConditions);
+        renameList tmpRename = mModeling->applyConditionsBox(*mConditions);
+
+        std::vector < std::string > selected = getConditions();
+        renameList::const_iterator it = tmpRename.begin();
+        while (it != tmpRename.end()) {
+            mRenameList.push_back(*it);
+            std::vector < std::string >::const_iterator its =
+                std::find(selected.begin(), selected.end(), it->first);
+
+            if(its != selected.end()) {
+                mModel->delCondition(it->first);
+                mModel->addCondition(it->second);
+            }
+            ++it;
+        }
 	build();
     }
 }
@@ -588,8 +654,23 @@ bool AtomicModelBox::ConditionTreeView::on_button_press_event(
     }
     if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
 	if (mModeling->runConditionsBox(*mConditions) == 1) {
-	    mModeling->applyConditionsBox(*mConditions);
-	    build();
+            renameList tmpRename = mModeling->applyConditionsBox(*mConditions);
+
+            std::vector < std::string > selected = getConditions();
+
+            renameList::const_iterator it = tmpRename.begin();
+            while (it != tmpRename.end()) {
+                mRenameList.push_back(*it);
+                std::vector < std::string >::const_iterator its =
+                    std::find(selected.begin(), selected.end(), it->first);
+
+                if(its != selected.end()) {
+                    mModel->delCondition(it->first);
+                    mModel->addCondition(it->second);
+                }
+                ++it;
+            }
+            build();
 	}
     }
     return return_value;
@@ -1630,27 +1711,7 @@ void AtomicModelBox::applyConditions()
     }
 
     mConditions->applyRenaming();
-
-    {
-	vpz::Conditions& conditions = mModeling->conditions();
-	vpz::AtomicModelList& list =
-	    mModeling->vpz().project().model().atomicModels();
-	vpz::AtomicModelList::iterator it = list.begin();
-
-	while (it != list.end()) {
-            std::vector < std::string > mdlConditions = it->second.conditions();
-            std::vector < std::string >::const_iterator its =
-                mdlConditions.begin();
-
-	    while (its != mdlConditions.end()) {
-		if (not conditions.exist(*its)) {
-		    it->second.delCondition(*its);
-		}
-		++its;
-	    }
-	    ++it;
-	}
-    }
+    mConditions->applyRemoved();
 
     mCurrentModel->setConditions(mConditions->getConditions());
     delete mCond;

@@ -62,6 +62,9 @@ class View;
  */
 class Modeling
 {
+private:
+    typedef std::vector < std::pair < std::string,
+                                      std::string > > renameList;
 public:
     /** define associative map from graph::model name and is reference. */
     typedef std::map < std::string, graph::Model * > MapStringModel;
@@ -353,8 +356,8 @@ public:
     inline int runConditionsBox(const vpz::Conditions& conditions)
 	{ return mGVLE->runConditionsBox(conditions); }
 
-    inline void applyConditionsBox(vpz::Conditions& conditions)
-	{ mGVLE->applyConditionsBox(conditions); }
+    inline renameList applyConditionsBox(vpz::Conditions& conditions)
+	{ return mGVLE->applyConditionsBox(conditions); }
 
     /********************************************************************
      *
@@ -752,6 +755,7 @@ public:
                                     graph::CoupledModel* mTop) const;
 
 private:
+
     vpz::Vpz                    mVpz;
     graph::CoupledModel*        mTop;
     std::string                 mCurrentClass;
