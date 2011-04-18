@@ -136,8 +136,13 @@ void ModelFactory::createModel(Coordinator& coordinator,
     const vpz::Dynamic& dyn = mDynamics.get(dynamics);
     switch(dyn.type()) {
     case vpz::Dynamic::LOCAL:
-        sim->addDynamics(attachDynamics(coordinator, sim, dyn, *getPlugin(dyn),
-                                        initValues));
+        try {
+            sim->addDynamics(attachDynamics(coordinator, sim, dyn, *getPlugin(dyn),
+                                            initValues));
+        } catch(const std::exception& /*e*/) {
+            initValues.value().clear();
+            throw;
+        }
         break;
     case vpz::Dynamic::DISTANT:
         throw utils::NotYetImplemented(_("Distant dynamics is not supported"));
