@@ -35,6 +35,7 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Module.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/PackageTable.hpp>
 #include <vle/utils/Path.hpp>
