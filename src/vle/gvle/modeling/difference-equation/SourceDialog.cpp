@@ -32,6 +32,7 @@
 namespace vle { namespace gvle { namespace modeling { namespace de {
 
 SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                           const std::string& includes,
                            const std::string& computeFunction,
                            const std::string& initValueFunction,
                            const std::string& userFunctions) :
@@ -40,10 +41,12 @@ SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget("DialogSourceBox", mDialog);
     xml->get_widget("NotebookSource", mNotebook);
 
+    mIncludes = Gtk::manage(new DocumentText(includes));
     mComputeFunction = Gtk::manage(new DocumentText(computeFunction));
     mInitValueFunction = Gtk::manage(new DocumentText(initValueFunction));
     mUserFunctions = Gtk::manage(new DocumentText(userFunctions));
 
+    mNotebook->append_page(*mIncludes, std::string("Includes"));
     mNotebook->append_page(*mInitValueFunction, std::string("InitValue"));
     mNotebook->append_page(*mComputeFunction, std::string("Compute"));
     mNotebook->append_page(*mUserFunctions, std::string("User"));
@@ -51,10 +54,16 @@ SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml,
 
 SourceDialog::~SourceDialog()
 {
+    mNotebook->remove_page(*mIncludes);
     mNotebook->remove_page(*mComputeFunction);
     mNotebook->remove_page(*mInitValueFunction);
     mNotebook->remove_page(*mUserFunctions);
     mDialog->hide_all();
+}
+
+std::string SourceDialog::getIncludes() const
+{
+    return mIncludes->getBuffer();
 }
 
 std::string SourceDialog::getComputeFunction() const

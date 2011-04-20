@@ -53,6 +53,7 @@ protected:
     std::string                 mOldMode;
     std::vector < std::string > mOldExternalVariables;
 
+    std::string mIncludes;
     std::string mComputeFunction;
     std::string mInitValueFunction;
     std::string mUserFunctions;

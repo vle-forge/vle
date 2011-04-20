@@ -44,11 +44,14 @@ class SourceDialog
 {
 public:
     SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                 const std::string& includes,
                  const std::string& computeFunction,
                  const std::string& initValueFunction,
                  const std::string& userFunctions);
+
     virtual ~SourceDialog();
 
+    std::string getIncludes() const;
     std::string getComputeFunction() const;
     std::string getInitValueFunction() const;
     std::string getUserFunctions() const;
@@ -62,6 +65,7 @@ private:
     //Notebook
     Gtk::Notebook*                  mNotebook;
     //Documents
+    DocumentText*                   mIncludes;
     DocumentText*                   mComputeFunction;
     DocumentText*                   mInitValueFunction;
     DocumentText*                   mUserFunctions;

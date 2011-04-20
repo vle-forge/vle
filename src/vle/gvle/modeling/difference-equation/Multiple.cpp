@@ -58,7 +58,7 @@ void Multiple::build(bool modeling)
 
         {
             m_buttonSource = Gtk::manage(
-                new Gtk::Button("Compute / InitValue / User section"));
+                new Gtk::Button("Includes / Compute / InitValue / User section"));
             m_buttonSource->show();
             vbox->pack_start(*m_buttonSource);
             mList.push_back(m_buttonSource->signal_clicked().connect(
@@ -87,6 +87,7 @@ bool Multiple::create(graph::AtomicModel& atom,
         Multiple::fillFields(conditions.get(conditionName));
     }
 
+    mIncludes = "";
     mComputeFunction =
         "virtual void compute(const vd::Time& /*time*/)\n"        \
         "{ }\n";
@@ -239,6 +240,9 @@ std::string Multiple::getTemplate() const
     "@@end tag@@\n"                                                     \
     "  */\n\n"                                                          \
     "#include <vle/extension/DifferenceEquation.hpp>\n\n"               \
+    "//@@begin:includes@@\n"                                            \
+    "{{includes}}"                                                      \
+    "//@@end:includes@@\n\n"                                            \
     "namespace vd = vle::devs;\n"                                       \
     "namespace ve = vle::extension;\n"                                  \
     "namespace vv = vle::value;\n\n"                                    \
