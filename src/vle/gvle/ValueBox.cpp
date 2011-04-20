@@ -28,10 +28,8 @@
 
 #include <vle/gvle/ValueBox.hpp>
 
-using namespace vle;
+namespace vle { namespace gvle {
 
-namespace vle {
-namespace gvle {
 ValueBox::ValueBox(value::Map* map) :
     Gtk::Dialog("Map", true, true),
     mTreeView(0),
@@ -41,6 +39,7 @@ ValueBox::ValueBox(value::Map* map) :
 
     mTreeView = new TreeViewValue();
     mTreeView->makeTreeView(*map);
+    set_default_size(200, 200);
     get_vbox()->pack_start(*mTreeView);
     makeDialog();
     show_all();
@@ -55,6 +54,7 @@ ValueBox::ValueBox(value::Set* set) :
 
     mTreeView = new TreeViewValue();
     mTreeView->makeTreeView(*set);
+    set_default_size(200, 200);
     get_vbox()->pack_start(*mTreeView);
     makeDialog();
     show_all();
@@ -101,5 +101,5 @@ void ValueBox::makeDialog()
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
 }
-}
-} // namespace vle gvle
+
+} } // namespace vle gvle

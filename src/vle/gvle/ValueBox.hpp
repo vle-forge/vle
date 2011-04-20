@@ -36,9 +36,7 @@
 #include <vle/vpz/Condition.hpp>
 #include <vle/gvle/TreeViewValue.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class ValueBox : public Gtk::Dialog
 {
@@ -57,7 +55,6 @@ private:
     void makeDialog();
 };
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle
 
 #endif
