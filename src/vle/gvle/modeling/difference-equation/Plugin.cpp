@@ -176,7 +176,8 @@ void Plugin::generateSource(const std::string& classname,
         }
     }
 
-// compute/initValue/user-functions
+// includes/compute/initValue/user-functions
+    tpl_.stringSymbol().append("includes", mIncludes);
     tpl_.stringSymbol().append("compute", mComputeFunction);
     tpl_.stringSymbol().append("initValue", mInitValueFunction);
     tpl_.stringSymbol().append("userFunctions", mUserFunctions);
@@ -189,10 +190,11 @@ void Plugin::generateSource(const std::string& classname,
 
 void Plugin::onSource()
 {
-    SourceDialog box(mXml, mComputeFunction, mInitValueFunction,
+    SourceDialog box(mXml, mIncludes, mComputeFunction, mInitValueFunction,
                      mUserFunctions);
 
     if (box.run() == Gtk::RESPONSE_ACCEPT) {
+        mIncludes = box.getIncludes();
         mComputeFunction = box.getComputeFunction();
         mInitValueFunction = box.getInitValueFunction();
         mUserFunctions = box.getUserFunctions();
@@ -290,6 +292,8 @@ std::string Plugin::parseFunction(const std::string& buffer,
 
 void Plugin::parseFunctions(const std::string& buffer)
 {
+    mIncludes.assign(parseFunction(buffer, "//@@begin:includes@@",
+                                          "//@@end:includes@@", "includes"));
     mComputeFunction.assign(parseFunction(buffer, "//@@begin:compute@@",
                                           "//@@end:compute@@", "compute"));
     mInitValueFunction.assign(parseFunction(buffer, "//@@begin:initValue@@",

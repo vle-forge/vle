@@ -61,7 +61,7 @@ void Generic::build(bool modeling)
         vbox->pack_start(mParameters.buildParameters(mXml));
 
         m_buttonSource = Gtk::manage(
-            new Gtk::Button("Compute / InitValue / User section"));
+            new Gtk::Button("Includes / Compute / InitValue / User section"));
         m_buttonSource->show();
         vbox->pack_start(*m_buttonSource);
         mList.push_back(m_buttonSource->signal_clicked().connect(
@@ -89,6 +89,7 @@ bool Generic::create(graph::AtomicModel& atom,
         Generic::fillFields(conditions.get(conditionName));
     }
 
+    mIncludes = "";
     mComputeFunction =
         "virtual double compute(const vd::Time& /*time*/)\n"        \
         "{ return 0; }\n";
@@ -212,17 +213,20 @@ std::string Generic::getTemplate() const
     "@@end tag@@\n"                                                     \
     "  */\n\n"                                                          \
     "#include <vle/extension/DifferenceEquation.hpp>\n\n"               \
+    "//@@begin:includes@@\n"                                            \
+    "{{includes}}"                                                      \
+    "//@@end:includes@@\n\n"                                            \
     "namespace vd = vle::devs;\n"                                       \
     "namespace ve = vle::extension;\n"                                  \
     "namespace vv = vle::value;\n\n"                                    \
     "namespace {{namespace}} {\n\n"                                     \
-    "class {{classname}} : public ve::DifferenceEquation::Generic\n"     \
+    "class {{classname}} : public ve::DifferenceEquation::Generic\n"    \
     "{\n"                                                               \
     "public:\n"                                                         \
     "    {{classname}}(\n"                                              \
     "       const vd::DynamicsInit& atom,\n"                            \
     "       const vd::InitEventList& evts)\n"                           \
-    "        : ve::DifferenceEquation::Generic(atom, evts)\n"            \
+    "        : ve::DifferenceEquation::Generic(atom, evts)\n"           \
     "    {\n"                                                           \
     "{{for i in par}}"                                                  \
     "        {{par^i}} = vv::toDouble(evts.get(\"{{par^i}}\"));\n"      \
@@ -238,7 +242,7 @@ std::string Generic::getTemplate() const
     "//@@end:compute@@\n\n"                                             \
     "//@@begin:initValue@@\n"                                           \
     "{{initValue}}"                                                     \
-    "//@@end:initValue@@\n\n"                                             \
+    "//@@end:initValue@@\n\n"                                           \
     "private:\n"                                                        \
     "//@@begin:user@@\n"                                                \
     "{{userFunctions}}"                                                 \

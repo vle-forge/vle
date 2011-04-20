@@ -88,6 +88,8 @@ bool Simple::create(graph::AtomicModel& atom,
     } else {
         Simple::fillFields(conditions.get(conditionName));
     }
+
+    mIncludes = "";
     mComputeFunction =
         "virtual double compute(const vd::Time& /*time*/)\n"        \
         "{ return 0; }\n";
@@ -222,6 +224,9 @@ std::string Simple::getTemplate() const
     "@@end tag@@\n"                                                     \
     "  */\n\n"                                                          \
     "#include <vle/extension/DifferenceEquation.hpp>\n\n"               \
+    "//@@begin:includes@@\n"                                            \
+    "{{includes}}"                                                      \
+    "//@@end:includes@@\n\n"                                            \
     "namespace vd = vle::devs;\n"                                       \
     "namespace ve = vle::extension;\n"                                  \
     "namespace vv = vle::value;\n\n"                                    \
@@ -254,7 +259,7 @@ std::string Simple::getTemplate() const
     "//@@end:compute@@\n\n"                                             \
     "//@@begin:initValue@@\n"                                           \
     "{{initValue}}"                                                     \
-    "//@@end:initValue@@\n\n"                                             \
+    "//@@end:initValue@@\n\n"                                           \
     "private:\n"                                                        \
     "//@@begin:user@@\n"                                                \
     "{{userFunctions}}"                                                 \
