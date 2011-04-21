@@ -2411,7 +2411,7 @@ the experimental frame</property>
     <property name="border_width">5</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
-    <property name="default_width">300</property>
+    <property name="default_width">302</property>
     <property name="default_height">1</property>
     <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
@@ -2427,8 +2427,6 @@ the experimental frame</property>
             <child>
               <widget class="GtkHBox" id="hbox26">
                 <property name="visible">True</property>
-                <property name="spacing">10</property>
-                <property name="homogeneous">True</property>
                 <child>
                   <widget class="GtkFrame" id="frame20">
                     <property name="visible">True</property>
@@ -2482,6 +2480,48 @@ the experimental frame</property>
                   </packing>
                 </child>
                 <child>
+                  <widget class="GtkVButtonBox" id="vbuttonbox1">
+                    <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
+                    <property name="homogeneous">True</property>
+                    <property name="layout_style">spread</property>
+                    <child>
+                      <widget class="GtkButton" id="ButtonAddViews">
+                        <property name="label" translatable="yes">&lt;--</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip" translatable="yes">Add selected Views in
+each selected Observables</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkButton" id="ButtonDelViews">
+                        <property name="label" translatable="yes">--&gt;</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip" translatable="yes">Remove selected Views in Observables</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
                   <widget class="GtkFrame" id="frame21">
                     <property name="visible">True</property>
                     <property name="label_xalign">0</property>
@@ -2530,28 +2570,12 @@ the experimental frame</property>
                     </child>
                   </widget>
                   <packing>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </widget>
               <packing>
                 <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="label62">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">&lt;span style="oblique" size="medium" foreground="grey50"&gt;
-Use the drag'n'drop from Views to Observables to attach
-to an observable a View.
-&lt;/span&gt;</property>
-                <property name="use_markup">True</property>
-                <property name="justify">fill</property>
-              </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
               </packing>
             </child>
           </widget>

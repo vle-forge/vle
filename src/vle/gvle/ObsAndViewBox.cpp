@@ -52,24 +52,21 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
     Glib::RefPtr<Gtk::TreeSelection> refTreeSelection =
         mTreeViewObs->get_selection();
 
-    mTreeViewObs->enable_model_drag_dest();
-
-    mTreeViewObs->signal_drag_data_received().connect(
-        sigc::mem_fun(*this, &ObsAndViewBox::on_data_received));
-
     //Views
     xml->get_widget("TreeViewViews", mTreeViewViews);
     mRefTreeViews = Gtk::TreeStore::create(mColumnsViews);
     mTreeViewViews->set_model(mRefTreeViews);
     mTreeViewViews->append_column("Views", mColumnsViews.m_col_name);
 
-    mTreeViewViews->enable_model_drag_source();
-
-    mTreeViewViews->signal_drag_end().connect(
-        sigc::mem_fun(*this, &ObsAndViewBox::on_drag_end)
-    );
-
     //Buttons
+    xml->get_widget("ButtonAddViews", mButtonAdd);
+    mButtonAdd->signal_clicked().connect(
+        sigc::mem_fun(*this, &ObsAndViewBox::on_add));
+
+    xml->get_widget("ButtonDelViews", mButtonDelete);
+    mButtonDelete->signal_clicked().connect(
+        sigc::mem_fun(*this, &ObsAndViewBox::on_del_view));
+
     xml->get_widget("ButtonObsAndViewApply", mButtonApply);
     mButtonApply->signal_clicked().connect(
         sigc::mem_fun(*this, &ObsAndViewBox::on_apply));
@@ -146,68 +143,33 @@ void ObsAndViewBox::on_button_press(GdkEventButton* event)
     }
 }
 
-void ObsAndViewBox::on_drag_end(const Glib::RefPtr<Gdk::DragContext >&)
+    void ObsAndViewBox::on_add() //on_drag_end(...)
 {
     using namespace Gtk;
     using namespace vpz;
 
-    int x, y;
-    mTreeViewObs->get_pointer(x, y);
-    if (mSelected and (0 <= x and x <= mTreeViewObs->get_width())
-        and (0 <= y and y <= mTreeViewObs->get_height())) {
-        Glib::RefPtr<TreeSelection> srcSelect(mTreeViewViews->get_selection());
-        Glib::RefPtr<TreeSelection> dstSelect(mTreeViewObs->get_selection());
 
-        srcSelect->set_mode(Gtk::SELECTION_SINGLE);
-        dstSelect->set_mode(Gtk::SELECTION_SINGLE);
+    Glib::RefPtr<TreeSelection> srcSelect(mTreeViewViews->get_selection());
+    Glib::RefPtr<TreeSelection> dstSelect(mTreeViewObs->get_selection());
 
-        if (srcSelect and dstSelect) {
-            TreeModel::iterator iter = srcSelect->get_selected();
-            TreeModel::iterator iter2 = dstSelect->get_selected();
-            if (iter and iter2) {
-                TreeModel::Row row_source = *iter;
-                TreeModel::Row row_dest = *iter2;
+    srcSelect->set_mode(Gtk::SELECTION_SINGLE);
+    dstSelect->set_mode(Gtk::SELECTION_SINGLE);
 
-                ObservablePort& port(
-                    mObs->get(row_dest.get_value(mColumnsObs.m_col_name)));
-                std::string view(row_source.get_value(mColumnsViews.m_col_name));
+    if (srcSelect and dstSelect) {
+        TreeModel::iterator iter = srcSelect->get_selected();
+        TreeModel::iterator iter2 = dstSelect->get_selected();
+        if (iter and iter2) {
+            TreeModel::Row row_source = *iter;
+            TreeModel::Row row_dest = *iter2;
 
-                if (not port.exist(view)) {
-                    port.add(view);
-                    makeObs();
-                }
+            ObservablePort& port(
+                mObs->get(row_dest.get_value(mColumnsObs.m_col_name)));
+            std::string view(row_source.get_value(mColumnsViews.m_col_name));
+
+            if (not port.exist(view)) {
+                port.add(view);
+                makeObs();
             }
-        }
-    }
-}
-
-void ObsAndViewBox::on_data_received(const Glib::RefPtr<Gdk::DragContext>&,
-				     int, int,
-                                     const Gtk::SelectionData&, guint, guint)
-{
-    using namespace Gtk;
-
-    int x,y;
-    mTreeViewObs->get_pointer(x, y);
-
-    TreeModel::Path path;
-    TreeViewDropPosition pos;
-
-    if (mTreeViewObs->get_dest_row_at_pos(x, y, path, pos)) {
-        if (!path.empty()) {
-            Gtk::TreeModel::iterator it =  mRefTreeObs->get_iter(path);
-            if (it) {
-                Gtk::TreeModel::Row row = *it;
-                TreeIter parent = row.parent();
-
-                if (parent) {
-                    row = *parent;
-                }
-                mSelected = true;
-                mTreeViewObs->set_cursor(TreePath(row));
-            }
-        } else  {
-            mSelected = false;
         }
     }
 }
@@ -279,6 +241,32 @@ void ObsAndViewBox::on_del_port()
         if (type == Base::VLE_VPZ_OBSERVABLEPORT) {
             mObs->del(data_name);
         } else if (type == Base::VLE_VPZ_VIEW) {
+            TreeModel::Row parent(*(row.parent()));
+            std::string port_name(parent.get_value(mColumnsObs.m_col_name));
+            if (mObs->exist(port_name)) {
+                mObs->get(port_name).del(data_name);
+            }
+        }
+    }
+    makeObs();
+}
+
+void ObsAndViewBox::on_del_view()
+{
+    using namespace Gtk;
+    using namespace vpz;
+
+    Glib::RefPtr<TreeSelection> tree_selection = mTreeViewObs->get_selection();
+    TreeSelection::ListHandle_Path lst = tree_selection->get_selected_rows();
+    Glib::RefPtr<TreeModel> model = mTreeViewObs->get_model();
+
+    for (TreeSelection::ListHandle_Path::iterator i = lst.begin();
+            i != lst.end(); ++i) {
+        TreeModel::Row row( *(model->get_iter(*i)));
+        std::string data_name(row.get_value(mColumnsObs.m_col_name));
+        Base::type type(row.get_value(mColumnsObs.m_col_type));
+
+        if (type == Base::VLE_VPZ_VIEW) {
             TreeModel::Row parent(*(row.parent()));
             std::string port_name(parent.get_value(mColumnsObs.m_col_name));
             if (mObs->exist(port_name)) {
