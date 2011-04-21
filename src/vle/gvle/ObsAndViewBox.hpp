@@ -104,6 +104,8 @@ namespace vle { namespace gvle {
         ModelColumnsView                      mColumnsViews;
 
         //Buttons
+        Gtk::Button*                          mButtonAdd;
+        Gtk::Button*                          mButtonDelete;
         Gtk::Button*                          mButtonApply;
         Gtk::Button*                          mButtonCancel;
 
@@ -114,11 +116,7 @@ namespace vle { namespace gvle {
         void on_cancel();
         void on_button_press(GdkEventButton* event);
 
-        void on_drag_end(const Glib::RefPtr<Gdk::DragContext >&);
-
-        void on_data_received(const Glib::RefPtr<Gdk::DragContext>&, int,
-                              int, const Gtk::SelectionData&,
-                              guint, guint);
+        void on_add();
 
         void makeObs();
         void makeViews();
