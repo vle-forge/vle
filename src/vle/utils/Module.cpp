@@ -157,7 +157,7 @@ void ModuleCache::fill(std::vector < ModuleCache::iterator >& output,
     if (fs::is_directory(path)) {
         fs::directory_iterator it(path), end;
         for (; it != end; ++it) {
-#ifdef BOOST_VERSION > 103600
+#if BOOST_VERSION > 103600
             if (fs::is_regular_file(it->status())) {
 #else
             if (fs::is_regular(it->status())) {

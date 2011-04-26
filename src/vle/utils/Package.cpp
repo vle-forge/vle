@@ -87,7 +87,6 @@ static std::string convertPathTo83Path(const std::string& path)
 
     return newvalue;
 }
-#endif
 
 static std::string buildEnvironmentVariable(const std::string& variable,
                                             const std::string& value,
@@ -113,6 +112,7 @@ static std::string buildEnvironmentVariable(const std::string& variable,
 
     return result;
 }
+#endif
 
 /**
  * @brief Build list of string which represents the 'VARIABLE=VALUE' environment
