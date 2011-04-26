@@ -1,6 +1,15 @@
 VLE 1.1.0-dev
 =============
 
+- libvleutils:
+  - Add a new RemoteMananger class to access remote repositories. The command
+    line interface is inspirited from the apt-get debian's command:
+          
+  $ vle --remote update
+  $ vle --remote install glue
+  $ vle --remote search '*gl*'
+  $ vle --remote show glue
+
 - libvlegeometry: removed
 
 

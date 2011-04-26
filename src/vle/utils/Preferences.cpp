@@ -31,6 +31,7 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/version.hpp>
 #include <boost/program_options.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <fstream>
@@ -67,7 +68,8 @@ public:
         : mFilename(filename),
         mGvleEditorOptions("gvle.editor"),
         mGvleGraphicsOptions("gvle.graphics"),
-        mVlePackageOptions("vle.packages")
+        mVlePackageOptions("vle.packages"),
+        mVleRemoteOptions("vle.remote")
     {
         mGvleEditorOptions.add_options()
             ("gvle.editor.auto-indent", po::value < bool >
@@ -145,9 +147,15 @@ public:
             ("vle.daemon.processes", po::value < std::string >
              (NULL)->default_value("1"));
 
+        mVleRemoteOptions.add_options()
+            ("vle.remote.url", po::value < std::string >
+             (NULL)->default_value((fmt(
+                         "http://www.vle-project.org/%1%.%2%") %
+                     VLE_MAJOR_VERSION % VLE_MINOR_VERSION).str()));
+
         mConfigFileOptions.add(mVlePackageOptions).
             add(mGvleEditorOptions).add(mGvleGraphicsOptions).
-            add(mVleDaemonOptions);
+            add(mVleDaemonOptions).add(mVleRemoteOptions);
 
         open();
     }
@@ -244,6 +252,7 @@ private:
     po::options_description mGvleGraphicsOptions;
     po::options_description mVlePackageOptions;
     po::options_description mVleDaemonOptions;
+    po::options_description mVleRemoteOptions;
 
     struct CopyVariableName
     {

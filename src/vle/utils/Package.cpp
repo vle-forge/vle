@@ -359,10 +359,13 @@ void Package::pack()
     }
 }
 
-void Package::unzip(const std::string& filename)
+void Package::unzip(const std::string& package, const std::string& filename)
 {
     Path& p = utils::Path::path();
-    fs::create_directory(p.getPackageBuildDir());
+
+    fs::path newdir = p.getPackageDir();
+    newdir /= package;
+    fs::create_directory(newdir);
 
     std::list < std::string > argv;
     buildCommandLine(mCommandUnzip, argv);
@@ -370,7 +373,7 @@ void Package::unzip(const std::string& filename)
     std::list < std::string > envp = prepareEnvironmentVariable();
 
     try {
-        process(p.getPackagesDir(), argv, envp);
+        process(newdir.string(), argv, envp);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg packaging error: unzip `%1%' failed %2%")) % filename %
@@ -621,7 +624,7 @@ void Package::refresh()
     prefs.get("vle.packages.build", &mCommandBuild);
     prefs.get("vle.packages.install", &mCommandInstall);
     prefs.get("vle.packages.clean", &mCommandClean);
-    prefs.get("vle.packages.pack", &mCommandPack);
+    prefs.get("vle.packages.package", &mCommandPack);
     prefs.get("vle.packages.unzip", &mCommandUnzip);
 }
 

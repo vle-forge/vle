@@ -9,7 +9,10 @@ vle \(em The simulator for VLE framework
 [\fB-?\fP,\fB\-h\fP,\fB\-\-help\fP]
 [\fB\-\-version\fP]
 [\fB\-i\fP,\fB\-\-infos\fP]
-[\fB\-P \fIname\fP,\fB\-\-package=\fIname\fP]
+[\fB\-P \fIname\fP,\fB\-\-package=\fIname\fP
+\fBconfigure\fP,\fBbuild\fP,\fBclean\fP,\fBpackage\fP,
+\fB\fIVPZ\fP files...\fR]
+[\fB\-R,\-\-remote \fBupdate\fP,\fBinstall\fP,\fBsearch\fP,\fBshow\fP remote_package]
 [\fB\-\-allinlocal\fP]
 [\fB-o \fIint\fP,\fB\-\-process=\fIint\fP\fR]
 [\fB-v \fIint\fP,\fB\-\-verbose=\fIint\fP\fR]
@@ -17,8 +20,7 @@ vle \(em The simulator for VLE framework
 [\fB-s\fP]
 [\fB-j\fP]
 [\fB-p \fIint\fP\fR]
-[\fBconfigure\fP,\fBbuild\fP,\fBclean\fP,\fBpackage\fP]
-[\fB\fIVPZ\fP or \fIVPZi\fP files...\fR]
+[\fB\fIVPZ\fP files...\fR]
 
 .SH "DESCRIPTION"
 .PP
@@ -28,15 +30,15 @@ This manual page documents briefly the \fBVLE\fR command.
 \fBVLE\fR. It addresses the reliability issue using recent developments in the
 theory of Modelling and Simulation proposed by Zeigler and open sources
 software. \fBVLE\fR is composed of five applications: \fIVLE\fR the simulator,
-\fIGVLE\fR the modelling tool, \fIAVLE\fR the analysis tools post-simulation
-and \fIEOV\fR a real time application to make observation and \fIOOV\fR the output
+\fIGVLE\fR the modelling tool, \fIAVLE\fR the analysis tools post-simulation and
+\fIEOV\fR a real time application to make observation and \fIOOV\fR the output
 stream manager.
 .PP
 \fBVLE\fR is a program that simulate the VPZ files. \fBVLE\fR use three modes:
 \fBmanager\fP, \fBsimulator\fP or just to run simulation. \fBManager\fP run
-experimentals frames to build VPZ instances files. \fBSimulator\fP is use to
-run VPZ or VPZi simulations in parallel. \fBJustRun\fP is the mode to run a VPZ
-or VPZi directly. This command is used by \fBSimulator\fP.
+experimentals frames to build VPZ instances files. \fBSimulator\fP is use to run
+VPZ simulations in parallel. \fBJustRun\fP is the mode to run a VPZ directly.
+This command is used by \fBSimulator\fP.
 
 .SH "OPTIONS"
 .PP
@@ -75,17 +77,13 @@ a list of VPZ files
         vle --package foo depends: list depends of foo package
         vle --package foo list: list vpz and library package
 
-.IP "\fB\-R \fIname\fP, \fB\-\-remote \fIname\fP" 10
-Switch to the remote access. After this command you can use:
-        vle --remote vle-project \fishow\fR
-        vle --remote vle-project \filist\fR
-        vle --remote vle-project \figet\fR Package
-
-.IP "\fB\-C \fIname\fP \fIvalue\fP, \fB\-\-config \fIname\fP \fIvalue\fP" 10
-Switch to the config access. After this command you can use:
-        vle --config vle-project http://www.vle-project.org
-        vle --config build make "make -j 2"
-        vle --config build install "make-mingw32.exe install"
+.IP "\fB\-R, \fB\-\-remote"
+Update the database, install a remote package, search package with regular
+expression of show information of a remote package.
+        vle --remote update
+        vle --remote install remote_package
+        vle --remote search 'regular expression'
+        vle --remote show remote_package
 
 .IP "\fB-m\fP" 10
 Run \fBVLE\fP in

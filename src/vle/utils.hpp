@@ -31,19 +31,25 @@
 
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DateTime.hpp>
+#include <vle/utils/Deprecated.hpp>
+#include <vle/utils/DllDefines.hpp>
+#include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/PackageTable.hpp>
+#include <vle/utils/Parser.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Rand.hpp>
-#include <vle/utils/Remote.hpp>
+#include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Socket.hpp>
+#include <vle/utils/Template.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Types.hpp>
 
 namespace vle {
 

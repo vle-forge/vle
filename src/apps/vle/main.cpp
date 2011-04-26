@@ -33,7 +33,7 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
-#include <vle/utils/Remote.hpp>
+#include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/version.hpp>
 #include <iostream>
@@ -112,16 +112,6 @@ void showDepends()
                 }
             }
         }
-    }
-}
-
-void unzip(const std::string& filename)
-{
-    utils::Package::package().unzip(filename);
-    utils::Package::package().wait(std::cerr, std::cerr);
-
-    if (utils::Package::package().isSuccess()) {
-        throw utils::InternalError(fmt(_("Failed to unzip `%1%'")) % filename);
     }
 }
 
@@ -251,77 +241,44 @@ void cliDirect(int argc, char* argv[], manager::CmdArgs& lst)
     }
 }
 
-void showRemoteList(const utils::RemoteList& list)
-{
-    typedef utils::RemoteList::const_iterator Iterator;
-
-    for (Iterator it = list.begin(); it != list.end(); ++it) {
-        std::cerr << it->first << " " << it->second << "\n";
-    }
-}
-
-void showPackageList(const utils::PackageList& list)
-{
-    typedef utils::PackageList::const_iterator Iterator;
-
-    for (Iterator it = list.begin(); it != list.end(); ++it) {
-        std::cerr << *it << "\n";
-    }
-}
-
 void cliRemote(int argc, char* argv[])
 {
-    using utils::Package;
-    using utils::Path;
-    using utils::PathList;
-    using utils::Remote;
-
-    Remote r;
-    bool error = false;
+    bool error = true;
 
     if (argc > 1) {
-        if (strcmp(argv[1], "list") == 0) {
-            showRemoteList(r.list());
-        } else {
-            if (argc > 2) {
-                char* host = argv[1];
-                char* command = argv[2];
-                char* package = 0;
+        utils::RemoteManager rm;
+        error = false;
 
-                if (argc > 3) {
-                    package = argv[3];
-                }
-
-                if (strcmp(command, "show") == 0) {
-                    if (package) {
-                        std::cerr << r.show(host, package);
-                    } else {
-                        showPackageList(r.show(host));
-                    }
-                } else if (strcmp(command, "get") == 0) {
-                    if (package == 0) {
-                        error = true;
-                    } else {
-                        unzip(r.get(host, package));
-                    }
-                } else {
-                    error = true;
-                }
-            } else {
-                error = true;
+        if (strcmp(argv[1], "update") == 0) {
+            rm.start(utils::REMOTE_MANAGER_UPDATE, std::string(), &std::cout);
+            rm.join();
+        } else if (argc > 1 and strcmp(argv[1], "install") == 0) {
+            for (int i = 2; i < argc; ++i) {
+                rm.start(utils::REMOTE_MANAGER_INSTALL, argv[i], &std::cout);
+                rm.join();
             }
+        } else if (argc > 1 and strcmp(argv[1], "show") == 0) {
+            for (int i = 2; i < argc; ++i) {
+                rm.start(utils::REMOTE_MANAGER_SHOW, argv[i], &std::cout);
+                rm.join();
+            }
+        } else if (argc > 1 and strcmp(argv[1], "search") == 0) {
+            for (int i = 2; i < argc; ++i) {
+                rm.start(utils::REMOTE_MANAGER_SEARCH, argv[i], &std::cout);
+                rm.join();
+            }
+        } else {
+            error = true;
         }
-    } else {
-        error = true;
     }
 
     if (error) {
         throw utils::ArgError(
             _("Bad argument:\n"
-              "\tvle --remote list\n"
-              "\tvle --remote vle-project.org show\n"
-              "\tvle --remote vle-project.org show glue\n"
-              "\tvle --remote vle-project.org get glue\n"));
+              "\tvle --remote update\n"
+              "\tvle --remote install glue-1.0\n"
+              "\tvle --remote show glue-1.0\n"
+              "\tvle --remote search 'glue*'\n"));
     }
 }
 

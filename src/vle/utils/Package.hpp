@@ -95,10 +95,12 @@ namespace vle { namespace utils {
         void pack();
 
         /**
-         * @brief Try to unzip the provided file.
+         * @brief Try to unzip the provided file into the \c package directory.
+         *
+         * @param package The name of the directory.
          * @param file The filename to unzip.
          */
-        void unzip(const std::string& file);
+        void unzip(const std::string& package, const std::string& file);
 
         /**
          * @brief Return true if the current process is finished.
