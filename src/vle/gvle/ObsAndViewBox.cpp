@@ -36,7 +36,7 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
         mXml(xml),
         mAll_Obs_backup(0),
         mViews_backup(0),
-	mSelected(false)
+        mSelected(false)
 {
     xml->get_widget("DialogObsAndView", mDialog);
 
@@ -58,6 +58,12 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
     mTreeViewViews->set_model(mRefTreeViews);
     mTreeViewViews->append_column("Views", mColumnsViews.m_col_name);
 
+    //Selections
+    mSrcSelect = mTreeViewViews->get_selection();
+    mDstSelect = mTreeViewObs->get_selection();
+    mSrcSelect->set_mode(Gtk::SELECTION_MULTIPLE);
+    mDstSelect->set_mode(Gtk::SELECTION_MULTIPLE);
+
     //Buttons
     xml->get_widget("ButtonAddViews", mButtonAdd);
     mButtonAdd->signal_clicked().connect(
@@ -77,7 +83,7 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
 
     //Fill popup menu:
     {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+        Gtk::Menu::MenuList& menulist = mMenuPopup.items();
 
         menulist.push_back(Gtk::Menu_Helpers::MenuElem(
                 "_Add", sigc::mem_fun(
@@ -143,35 +149,41 @@ void ObsAndViewBox::on_button_press(GdkEventButton* event)
     }
 }
 
-    void ObsAndViewBox::on_add() //on_drag_end(...)
+void ObsAndViewBox::on_add()
 {
     using namespace Gtk;
     using namespace vpz;
 
+    TreeSelection::ListHandle_Path lstDst = mDstSelect->get_selected_rows();
+    Glib::RefPtr<TreeModel> modelDst = mTreeViewObs->get_model();
 
-    Glib::RefPtr<TreeSelection> srcSelect(mTreeViewViews->get_selection());
-    Glib::RefPtr<TreeSelection> dstSelect(mTreeViewObs->get_selection());
+    for (TreeSelection::ListHandle_Path::iterator iDst = lstDst.begin();
+            iDst != lstDst.end(); ++iDst) {
+        TreeModel::Row rowDst( *(modelDst->get_iter(*iDst)));
+        std::string data_name(rowDst.get_value(mColumnsObs.m_col_name));
+        Base::type type(rowDst.get_value(mColumnsObs.m_col_type));
 
-    srcSelect->set_mode(Gtk::SELECTION_SINGLE);
-    dstSelect->set_mode(Gtk::SELECTION_SINGLE);
-
-    if (srcSelect and dstSelect) {
-        TreeModel::iterator iter = srcSelect->get_selected();
-        TreeModel::iterator iter2 = dstSelect->get_selected();
-        if (iter and iter2) {
-            TreeModel::Row row_source = *iter;
-            TreeModel::Row row_dest = *iter2;
+        if (type == Base::VLE_VPZ_OBSERVABLEPORT) {
 
             ObservablePort& port(
-                mObs->get(row_dest.get_value(mColumnsObs.m_col_name)));
-            std::string view(row_source.get_value(mColumnsViews.m_col_name));
+                mObs->get(rowDst.get_value(mColumnsObs.m_col_name)));
 
-            if (not port.exist(view)) {
-                port.add(view);
-                makeObs();
+            TreeSelection::ListHandle_Path lstSrc = mSrcSelect->get_selected_rows();
+            Glib::RefPtr<TreeModel> modelSrc = mTreeViewViews->get_model();
+
+            for (TreeSelection::ListHandle_Path::iterator iSrc = lstSrc.begin();
+                 iSrc != lstSrc.end(); ++iSrc) {
+                TreeModel::Row rowSrc( *(modelSrc->get_iter(*iSrc)));
+
+                std::string view(rowSrc.get_value(mColumnsViews.m_col_name));
+
+                if (not port.exist(view)) {
+                    port.add(view);
+                }
             }
         }
     }
+    makeObs();
 }
 
 void ObsAndViewBox::makeObs()

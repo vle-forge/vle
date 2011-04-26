@@ -96,12 +96,14 @@ namespace vle { namespace gvle {
         Gtk::TreeView*                        mTreeViewObs;
         Glib::RefPtr<Gtk::TreeStore>          mRefTreeObs;
         ModelColumnsObs                       mColumnsObs;
-	Gtk::Menu                             mMenuPopup;
+        Gtk::Menu                             mMenuPopup;
+        Glib::RefPtr<Gtk::TreeSelection>      mSrcSelect;
 
         //Views
         Gtk::TreeView*                        mTreeViewViews;
         Glib::RefPtr<Gtk::TreeStore>          mRefTreeViews;
         ModelColumnsView                      mColumnsViews;
+        Glib::RefPtr<Gtk::TreeSelection>      mDstSelect;
 
         //Buttons
         Gtk::Button*                          mButtonAdd;
