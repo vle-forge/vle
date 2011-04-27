@@ -1,3 +1,62 @@
+VLE 1.0.0-alpha5
+================
+
+A release to fix bug with a new Win32 environment variables system.
+
+
+Applications
+~~~~~~~~~~~~
+
+- gvle:
+  - Fix default size on value box. When the user create a new set or map value,
+    the dialog box is too small and the user must resize the dialog box if its
+    wants to add a new value (Closes: #3289724).
+  - Add a julian-day parameter on file output plugin (Closes: #3279408).
+  - Sort the library list in DynamicBox (Closes: #3010376).
+  - Fix source port in link tooltip information (Closes: #3279204).
+  - Fix the modeling plug-in launching.
+  - Fix the logo loading on win32.
+  - Fix segfault when adding new view (Closes: #3257511, #3240925, #3202834).
+
+- win32:
+  - Replace the win32 environment variable system: We remove the Win32
+    environment variable from the NSIS script. We add these variables
+    dynamically, before calling the Package methods' configure(), build(),
+    clean() etc.
+
+
+VFL (VLE Foundation Libraries)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- libdevs: fix crash when throwing exception in model's: Since the update of
+  the value::Map class, the experimental conditions are not cloned but just
+  referenced. Thus, we must to clear the experimental condition data instead of
+  deleting the data causing a double free memory. We fix the problem by
+  clearing the value::Map instead of deleting it (Closes: #3288773, #3184804).
+
+- libvleextension:
+  - ext/qss: fix bug on interaction with de
+    - If a variable of difference equation is in interaction with QSS model and
+      the QSS model have several continuous variables, the QSS model fails
+      because its waits the discrete variable at init state.
+    - Add a control on input port name: the possible names are 'update' and
+      'perturb'.
+  - ext/de:
+    - Fix test with tolerance
+
+- libvleutils:
+  - Fix missing header in utils.hpp
+  - Switch Trace singleton in thread-safe way: The utils::Trace singleon is not
+    thread safe. We transform the utils::Trace class into a static class which
+    manage a Pimpl class to ensure the thead-safe.
+
+- libvlevpz:
+  - Fix sax parser when dealing with Table The parsing of a value::Table was
+    not performed correctly and can throw an error. We fix the parsing of table
+    xml node element and we improve the runtime checking of table width and
+    height compared to the xml CDATA element.
+
+
 VLE 1.0.0-alpha4
 ================
 
