@@ -1,4 +1,227 @@
-vle-1.0.0-alpha4
+vle-1.0.0-alpha5
+
+commit 20dc8e81aa68e69778f0929d430356f5f73eeed3
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Apr 27 09:28:46 2011 +0200
+
+    vle: update NEWS
+
+commit c153538e60670247f40e1d83bdd664082323ec15
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Apr 26 10:40:33 2011 +0200
+
+    utils: fix warning for a private impl. function
+    
+    The buildEnvironmentVariable is a private implementation function only
+    used on the Win32 port of VLE. We fix this warning by hiding this
+    function on the other ports.
+
+commit 5bb81ff63b8e7c27abcf026f55dceda4ee00d861
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Apr 26 09:18:51 2011 +0200
+
+    utils: fix boost <= 1.36 compilation error
+
+commit b8c6d62dd02b6f170c973ff9ee90f73893e8b0b7
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Wed Apr 20 21:20:31 2011 +0200
+
+    gvle: fix default size on value box
+    
+    When the user create a new set or map value, the dialog box is too small
+    and the user must resize the dialog box if its wants to add a new value
+    (Closes: #3289724).
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 8d23ad2d4650796436fbc5637f00d49282382f54
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Fri Apr 15 11:35:14 2011 +0200
+
+    gvle: Add a julian-day parameter on file output plugin
+    
+    - Add a CheckButton in file's glade file.
+    - Add a julianDay CheckButton field that enable to set a boolean value
+    inside the parameter string of the File OutputPlugin.
+    (Closes: #3279408)
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit 4a2fe1c26390779963bc8ef3bd28d96a7c2222cf
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Apr 18 17:50:55 2011 +0200
+
+    vle: fix missing header in utils.hpp
+    
+    The global vle/utils.hpp header file does not include the
+    `vle/utils/Module.hpp' recently added.
+
+commit 6c36cd31a47e475db10cd7734d0518430a0b1823
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Apr 18 17:18:47 2011 +0200
+
+    devs: fix crash when throwing exception in model's
+    
+    Since the update of the value::Map class, the experimental conditions
+    are not cloned but just referenced. Thus, we must to clear the
+    experimental condition data instead of deleting the data causing a
+    double free memory. We fix the problem by clearing the value::Map
+    instead of deleting it(closes: #3288773, #3184804).
+
+commit 8414aa4af0bb8a0241910ee499c1d4c7c0784494
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Fri Apr 8 19:31:58 2011 +0200
+
+    ext/qss: fix bug on interaction with de
+    
+    - if a variable of difference equation is in interaction with QSS model
+      and the QSS model have several continuous variables, the QSS model
+      fails because its waits the discrete variable at init state.
+    - add a control on input port name: the possible names are 'update' and
+      'perturb'.
+
+commit 169e9ee3a9c55a9964e0b10a043252e7f1bc9b9d
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Fri Apr 8 17:56:19 2011 +0200
+
+    gvle: sort the library list in DynamicBox
+    
+    The underlying ListStore model of the ComboBoxText has been configured
+    in order to provide a sorted list of Libraries in the DynamicBox
+    window (Closes: #3010376).
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit 1626cb48ad9ac70aca32bbd890dced685be70824
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Thu Apr 7 18:47:27 2011 +0200
+
+    gvle: fix source port in link tooltip information
+    
+    - Change the object called in CompleteViewDrawingArea::
+      preComputeConnectInfo() to find the good source's port
+      (Closes: #3279204).
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit 6eb2b3a0fbb8d145af15ccf8bd5b924e1cff0a36
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Thu Apr 7 11:13:43 2011 +0200
+
+    vle: update AUTHORS
+    
+    - update the list contributors in AUTHORS and in GVLE about dialog box
+      (Closes: #3279083).
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit 779fe97db47d189fd3cffddb2bba112ea33f36cf
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Tue Apr 5 10:24:50 2011 +0200
+
+    gvle: fix the modeling plug-in launching
+    
+    The code generation and the code parsing was note done accordingly to
+    the new plug-in management system. From the AtomicModelBox, a modeling
+    dialog on an already dynamic could not be launched anymore. Each
+    template of each plug-in has been updated. The template tag parser has
+    been enhanced to read the new plug-in name convention, where the name of
+    the package is stored inside brackets.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 9e21b7948477775180e9290b601806aab0a30dc8
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Apr 6 14:03:08 2011 +0200
+
+    utils: switch Trace singleton in thread-safe way
+    
+    The utils::Trace singleon is not thread safe. We transform the
+    utils::Trace class into a static class which manage a Pimpl class to
+    ensure the thead-safe.
+    
+    - Break API by removing the template push(boost::format&). It was
+      replaced by two send function: send(const std::string&) and send(const
+      boost::format&).
+    - Remove the unwanted output() function and remove where is it used.
+    - Remove the instance() functions and replace with static function all
+      the API to a best control of thread-safe data.
+
+commit e7fa08a428d9277471069e2527f95537028181e3
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Apr 4 13:59:57 2011 +0200
+
+    gvle: fix the logo loading on win32
+    
+    The Win32 distribution of VLE does not integrate a Gdk svg loader. Thus,
+    the 'yellowvle.svg' can not  be loaded on this platform. We fix the
+    problem by loading the 'icon128x128.svg' file.
+    
+    - Add a preprocessor test to assign png or svg file depending on
+      platform.
+    - Switch the About dialog box using Pimpl idiom.
+
+commit d8c3806a1affc5c1c8da948293c725b669051bae
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Mar 23 17:16:47 2011 +0100
+
+    vle: replace the win32 environment variable system
+    
+    We remove the Win32 environment variable from the NSIS script. We
+    add these variables dynamically, before calling the Package methods'
+    configure(), build(), clean() etc.
+    
+    - update the NSIS.template.in script file by removing BOOST_LIBRARYDIR,
+      BOOST_INCLUDEDIR, BOOST_ROOT and PKG_CONFIG_PATH. Now, only the PATH
+      can be managed by NSIS script.
+    - update the vle::utils::Package to dynamically append the environment
+      variables before spawing the sub process.
+
+commit 8d211714afcb583caae94829da7589416da1a140
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Sat Apr 2 20:04:11 2011 +0200
+
+    gvle: fix segfault when adding new view
+    
+    The ViewOutputBox dialog searches an output plug-in instead of an oov
+    plug-in and consequently, ViewOutputBox does not recognized while adding
+    a view and crashes (Closes: #3257511, #3240925, #3202834).
+
+commit 3b95c319fa971903188c757a563650a8635d7b99
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Apr 1 17:21:45 2011 +0200
+
+    vpz: fixing sax parser when dealing with Table
+    
+    The parsing of a value::Table was not performed correctly and can throw
+    an error. We fix the parsing of table xml node element and we improve
+    the runtime checking of table width and height compared to the xml CDATA
+    element.
+
+commit 4a8c9570fc65b6225e4841f67b3f5bd3fcc17d09
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Mar 23 08:23:36 2011 +0100
+
+    vle: update the doxygen configuration
+    
+    We replace the old doxygen configuration file with a newest which
+    enables all graphics with graphiz,
+
+commit 84f8a1ac182ec15d346e08b62248b68220f2541f
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Mar 18 10:03:30 2011 +0100
+
+    test: fix test with tolerance
+    
+    The BOOST_REQUIRE_CLOSE macro needs three real parameters. On old GCC
+    compiler, the template uses in the macro failed to compile if a
+    parameter is an integer.
+
+commit 466abf0485a367e21ef164387ee2c38c850f2be7
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Mar 11 11:15:51 2011 +0100
+
+    vle-1.0.0-alpha4
 
 commit ce9038f0c8dbffe19d4592c2a17888489cbbb5f7
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
