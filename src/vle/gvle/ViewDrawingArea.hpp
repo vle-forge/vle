@@ -49,10 +49,10 @@ namespace vle { namespace gvle {
     class Color
     {
     public:
-	double m_r; double m_g; double m_b;
-	Color(double r = 0, double g = 0, double b = 0) :
-	    m_r(r), m_g(g), m_b(b)
-	    {}
+        double m_r; double m_g; double m_b;
+        Color(double r = 0, double g = 0, double b = 0) :
+            m_r(r), m_g(g), m_b(b)
+    {}
     };
 
     /**
@@ -86,7 +86,7 @@ namespace vle { namespace gvle {
 
         virtual void draw()=0;
 
-	graph::CoupledModel* getModel()
+        graph::CoupledModel* getModel()
         { return mCurrent; }
 
         //
@@ -117,12 +117,12 @@ namespace vle { namespace gvle {
         /** restore zoom to default value 1.0 */
         void restoreZoom();
 
-	/*
-	 * set a new coefficient to the zoom
-	 * @parm coef the new coefficient
-	 *
-	 */
-	void setCoefZoom(double coef);
+        /*
+         * set a new coefficient to the zoom
+         * @parm coef the new coefficient
+         *
+         */
+        void setCoefZoom(double coef);
 
 
         /**
@@ -141,23 +141,23 @@ namespace vle { namespace gvle {
 
         void calcRectSize();
 
-	/**
-	 * @brief search the size of the widest and highest model
-	 *
-	 */
-	void maxModelWidthHeight();
+        /**
+         * @brief search the size of the widest and highest model
+         *
+         */
+        void maxModelWidthHeight();
 
-	/**
-	 * Export the view in image
-	 */
-	void exportPng(const std::string& filename);
-	void exportPdf(const std::string& filename);
-	void exportSvg(const std::string& filename);
+        /**
+         * Export the view in image
+         */
+        void exportPng(const std::string& filename);
+        void exportPdf(const std::string& filename);
+        void exportSvg(const std::string& filename);
 
-	/**
-	 * Order the models
-	 */
-	virtual void onOrder()=0;
+        /**
+         * Order the models
+         */
+        virtual void onOrder()=0;
 
         /**
          * @brief Add to the Gdk stack a call to expose event function with the
@@ -166,13 +166,13 @@ namespace vle { namespace gvle {
         void queueRedraw()
         { mNeedRedraw = true; queue_draw(); }
 
-	bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+        bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
                             const Glib::RefPtr<Gtk::Tooltip>& tooltip);
 
     protected:
 
-	typedef std::pair < int, int > Point;
-	typedef std::vector < Point > StraightLine;
+        typedef std::pair < int, int > Point;
+        typedef std::vector < Point > StraightLine;
 
         class Connection
         {
@@ -187,10 +187,10 @@ namespace vle { namespace gvle {
             {}
         };
 
-	void drawCurrentCoupledModel();
+        void drawCurrentCoupledModel();
         void drawCurrentModelPorts();
 
-	virtual void preComputeConnection(graph::Model* src,
+        virtual void preComputeConnection(graph::Model* src,
                                   const std::string& srcport,
                                   graph::Model* dst,
                                   const std::string& dstport)=0;
@@ -212,13 +212,13 @@ namespace vle { namespace gvle {
         void drawConnection();
         void drawHighlightConnection();
         void drawChildrenModels();
-	virtual void drawChildrenModel(graph::Model* model,
-			       const Gdk::Color& color)=0;
-	void drawLines();
+        virtual void drawChildrenModel(graph::Model* model,
+                                       const Gdk::Color& color)=0;
+        void drawLines();
         void drawLink();
         void drawZoomFrame();
 
-	void setUndefinedModels();
+        void setUndefinedModels();
 
         bool on_configure_event(GdkEventConfigure* event);
         bool on_expose_event(GdkEventExpose* event);
@@ -238,12 +238,12 @@ namespace vle { namespace gvle {
         void addLinkOnMotion(int x, int y);
         void addLinkOnButtonRelease(int x, int y);
 
-	/**
-	 * Change the color of the drawing
-	 */
-	void setColor(const Gdk::Color& color);
+        /**
+         * Change the color of the drawing
+         */
+        void setColor(const Gdk::Color& color);
 
-	/**
+        /**
          * Return nearest connection between all connection and mouse position
          */
         void delConnection();
@@ -260,9 +260,9 @@ namespace vle { namespace gvle {
         int                             mRectHeight;
         int                             mRectWidth;
         double                          mZoom;
-	double                          mOffset;
+        double                          mOffset;
         Glib::RefPtr < Gdk::Pixmap >    mBuffer;
-	Cairo::RefPtr<Cairo::Context>   mContext;
+        Cairo::RefPtr<Cairo::Context>   mContext;
         Glib::RefPtr < Gdk::Window >    mWin;
         Glib::RefPtr < Gdk::GC >        mWingc;
         bool                            mIsRealized;
@@ -281,13 +281,13 @@ namespace vle { namespace gvle {
         std::vector < graph::Model* > mModelInfo;
         int mHighlightLine;
 
-	// Grid
-	std::list < std::string > mGrid;
-	int                       mCasesWidth;
-	int                       mCasesHeight;
+        // Grid
+        std::list < std::string > mGrid;
+        int                       mCasesWidth;
+        int                       mCasesHeight;
 
-	int                       mMaxWidth;
-	int                       mMaxHeight;
+        int                       mMaxWidth;
+        int                       mMaxHeight;
     };
 
 }} // namespace vle gvle

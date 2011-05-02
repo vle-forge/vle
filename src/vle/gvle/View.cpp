@@ -26,6 +26,7 @@
  */
 
 
+#include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/ConnectionBox.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Message.hpp>
@@ -83,7 +84,7 @@ void View::initAllOptions()
     switch (current) {
     case GVLE::VLE_GVLE_POINTER:
         mModeling->getGVLE()->
-	    get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
+            get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
         break;
     case GVLE::VLE_GVLE_ADDMODEL:
     case GVLE::VLE_GVLE_GRID:
@@ -93,11 +94,11 @@ void View::initAllOptions()
     case GVLE::VLE_GVLE_QUESTION:
     case GVLE::VLE_GVLE_PLUGINMODEL:
         mModeling->getGVLE()->
-	    get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
+            get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
         break;
     case GVLE::VLE_GVLE_DELETE:
         mModeling->getGVLE()->
-	    get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
+            get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
         break;
     }
 }
@@ -116,7 +117,7 @@ bool View::on_focus_in_event(GdkEventFocus* event)
 {
     if (event->in == TRUE) {
         mModeling->getGVLE()->
-	    showRowTreeBox(mCurrent->getName());
+            showRowTreeBox(mCurrent->getName());
     }
     return true;
 }
@@ -134,11 +135,18 @@ void View::addModelInListModel(graph::Model* model, bool shiftorcontrol)
 void View::addModelToSelectedModels(graph::Model* m)
 {
     if (not existInSelectedModels(m)) {
-	if (existInSelectedModels(mCurrent) or m == mCurrent) {
-	    clearSelectedModels();
-	}
+        if (existInSelectedModels(mCurrent) or m == mCurrent) {
+            clearSelectedModels();
+        }
         mSelectedModels[m->getName()] = m;
+        mModeling->getGVLE()->getMenu()->showCopyCut();
     }
+}
+
+void View::clearSelectedModels()
+{
+        mSelectedModels.clear();
+        mModeling->getGVLE()->getMenu()->hideCopyCut();
 }
 
 graph::Model* View::getFirstSelectedModels()
@@ -156,7 +164,7 @@ void View::clearCurrentModel()
     if (gvle::Question(_("All children model will be deleted, continue ?"))) {
         mCurrent->delAllConnection();
         mCurrent->delAllModel();
-	mModeling->vpz().project().model().atomicModels().clear();
+        mModeling->vpz().project().model().atomicModels().clear();
         mModeling->getGVLE()->redrawModelTreeBox();
     }
 }
@@ -164,7 +172,7 @@ void View::clearCurrentModel()
 void View::exportCurrentModel()
 {
     const vpz::Experiment& experiment = ((const Modeling*)mModeling)
-	->vpz().project().experiment();
+        ->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
         Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
         return;
@@ -228,9 +236,9 @@ void View::onCutModel()
 void View::onCopyModel()
 {
     if (existInSelectedModels(mCurrent)) {
-	mModeling->copy(mSelectedModels, mCurrent->getParent(), mCurrentClass);
+        mModeling->copy(mSelectedModels, mCurrent->getParent(), mCurrentClass);
     } else {
-	mModeling->copy(mSelectedModels, mCurrent, mCurrentClass);
+        mModeling->copy(mSelectedModels, mCurrent, mCurrentClass);
     }
     mSelectedModels.clear();
     redraw();
@@ -242,6 +250,12 @@ void View::onPasteModel()
     mModeling->paste(mCurrent, mCurrentClass);
     mModeling->getGVLE()->redrawModelTreeBox();
     mModeling->getGVLE()->redrawModelClassBox();
+    redraw();
+}
+
+void View::onSelectAll(graph::CoupledModel* cModel)
+{
+    mModeling->selectAll(mSelectedModels, cModel);
     redraw();
 }
 
@@ -265,16 +279,16 @@ void View::addAtomicModel(int x, int y)
 
         if (new_atom) {
             try {
-		if (mCurrentClass == "") {
-		    mModeling->vpz().project().model().atomicModels().add(
-			new_atom, vpz::AtomicModel("", "", ""));
-		} else {
-		    mModeling->addAtomicModelClass(mCurrentClass, new_atom);
-		}
+                if (mCurrentClass == "") {
+                    mModeling->vpz().project().model().atomicModels().add(
+                        new_atom, vpz::AtomicModel("", "", ""));
+                } else {
+                    mModeling->addAtomicModelClass(mCurrentClass, new_atom);
+                }
                 redraw();
-		mModeling->getGVLE()->redrawModelTreeBox();
-		mModeling->getGVLE()->redrawModelClassBox();
-		mModeling->setModified(true);
+                mModeling->getGVLE()->redrawModelTreeBox();
+                mModeling->getGVLE()->redrawModelClassBox();
+                mModeling->setModified(true);
             } catch (utils::SaxParserError& e) {
                 Error(e.what());
             }
@@ -308,7 +322,7 @@ void View::addCoupledModel(int x, int y)
             mModeling->getGVLE()->redrawModelTreeBox();
             mModeling->getGVLE()->redrawModelClassBox();
             mSelectedModels.clear();
-	    mModeling->setModified(true);
+            mModeling->setModified(true);
         } else {
             graph::Model* model = mCurrent->findModel(box->getName());
             bool select = false;
@@ -335,7 +349,7 @@ void View::addCoupledModel(int x, int y)
                 mModeling->getGVLE()->redrawModelTreeBox();
                 mModeling->getGVLE()->redrawModelClassBox();
                 mSelectedModels.clear();
-		mModeling->setModified(true);
+                mModeling->setModified(true);
             }
         }
     }
@@ -347,7 +361,7 @@ void View::showModel(graph::Model* model)
     if (not model) {
         mModeling->EditCoupledModel(mCurrent);
     } else {
-	if (mCurrentClass.empty()) {
+        if (mCurrentClass.empty()) {
             mModeling->addView(model);
         } else {
             mModeling->addViewClass(model, mCurrentClass);
@@ -365,8 +379,8 @@ void View::delModel(graph::Model* model)
             mModeling->delModel(model, mCurrentClass);
             mCurrent->delModel(model);
             mModeling->getGVLE()->redrawModelTreeBox();
-	    mModeling->getGVLE()->redrawModelClassBox();
-	    mModeling->setModified(true);
+           mModeling->getGVLE()->redrawModelClassBox();
+           mModeling->setModified(true);
             mSelectedModels.clear();
         }
     }
@@ -419,7 +433,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  src->getName()).str());
             return;
         }
-	mModeling->setModified(true);
+        mModeling->setModified(true);
     }
     if (dst == mCurrent and dst->getOutputPortList().empty()) {
         PortDialog box(dst, PortDialog::OUTPUT);
@@ -430,7 +444,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  dst->getName()).str());
             return;
         }
-	mModeling->setModified(true);
+        mModeling->setModified(true);
     }
     if (src != mCurrent and src->getOutputPortList().empty()) {
         PortDialog box(src, PortDialog::OUTPUT);
@@ -441,7 +455,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  src->getName()).str());
             return;
         }
-	mModeling->setModified(true);
+        mModeling->setModified(true);
     }
     if (dst != mCurrent and dst->getInputPortList().empty()) {
         PortDialog box(dst, PortDialog::INPUT);
@@ -452,7 +466,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  dst->getName()).str());
             return;
         }
-	mModeling->setModified(true);
+        mModeling->setModified(true);
     }
 
     ConnectionBox a(mCurrent, src, dst);
@@ -475,7 +489,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                     dst->getName(), dstPort))
                 mCurrent->addInternalConnection(src, srcPort, dst, dstPort);
         }
-	mModeling->setModified(true);
+        mModeling->setModified(true);
     }
 }
 

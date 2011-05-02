@@ -66,7 +66,7 @@ namespace vle { namespace gvle {
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 GVLE::GVLE(BaseObjectType* cobject,
-	   const Glib::RefPtr<Gnome::Glade::Xml> xml):
+           const Glib::RefPtr<Gnome::Glade::Xml> xml):
     Gtk::Window(cobject),
     mModeling(new Modeling(this)),
     mCurrentButton(VLE_GVLE_POINTER),
@@ -283,6 +283,11 @@ void GVLE::showRowTreeBox(const std::string& name)
 void GVLE::showRowModelClassBox(const std::string& name)
 {
     mModelClassBox->showRow(name);
+}
+
+bool GVLE::on_focus_in_event(GdkEventFocus* /*event*/) {
+    mEditor->refreshTab();
+    return true;
 }
 
 bool GVLE::on_delete_event(GdkEventAny* event)
@@ -843,6 +848,7 @@ void GVLE::applyRemoved()
     }
 
     vpz::ClassList::iterator itc = mModeling->vpz().project().classes().begin();
+
     while (itc != mModeling->vpz().project().classes().end()) {
         vpz::AtomicModelList& atomlist( itc->second.atomicModels() );
         vpz::AtomicModelList::iterator itl = atomlist.begin();
@@ -1484,6 +1490,31 @@ void GVLE::onPasteModel()
 
             if (doc) {
                 doc->paste();
+            }
+        }
+    }
+}
+
+void GVLE::onSelectAll()
+{
+    if (mCurrentTab >= 0) {
+        if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
+            ->isDrawingArea()) {
+            View* currentView = dynamic_cast<DocumentDrawingArea*>(
+                mEditor->get_nth_page(mCurrentTab))->getView();
+
+            if (currentView) {
+                graph::CoupledModel* cModel = currentView->getGCoupledModel();
+                currentView->onSelectAll(cModel);
+                mMenuAndToolbar->showCopyCut();
+            }
+        } else {
+            DocumentText* doc = dynamic_cast<DocumentText*>(
+                mEditor->get_nth_page(mCurrentTab));
+
+            if (doc) {
+                doc->selectAll();
+                mMenuAndToolbar->showCopyCut();
             }
         }
     }

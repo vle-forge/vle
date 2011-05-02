@@ -27,6 +27,7 @@
 
 
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
+#include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/GVLE.hpp>
@@ -35,7 +36,7 @@
 #include <iostream>
 
 #ifdef __WIN32__
-# ifdef DELETE 
+# ifdef DELETE
 #  undef DELETE
 # endif
 #endif
@@ -72,6 +73,7 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='Cut' />"
     "            <menuitem action='Copy' />"
     "            <menuitem action='Paste' />"
+    "            <menuitem action='Select All' />"
     "        </menu>"
     "        <menu action='MenuTools'>"
     "            <menuitem action='ArrowTool' />"
@@ -164,9 +166,9 @@ void GVLEMenuAndToolbar::init()
     createUI();
 
     mMenuBar = dynamic_cast<Gtk::MenuBar*>(
-	m_refUIManager->get_widget("/MenuBar"));
+        m_refUIManager->get_widget("/MenuBar"));
     mToolbar = dynamic_cast<Gtk::Toolbar*>(
-	m_refUIManager->get_widget("/Toolbar"));
+        m_refUIManager->get_widget("/Toolbar"));
 }
 
 void GVLEMenuAndToolbar::showMinimalMenu()
@@ -207,6 +209,18 @@ void GVLEMenuAndToolbar::hideOpenVpz()
 void GVLEMenuAndToolbar::showOpenVpz()
 {
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::hideCopyCut()
+{
+    m_refActionGroup->get_action("Copy")->set_sensitive(false);
+    m_refActionGroup->get_action("Cut")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showCopyCut()
+{
+    m_refActionGroup->get_action("Copy")->set_sensitive(true);
+    m_refActionGroup->get_action("Cut")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::hidePaste()
@@ -293,6 +307,7 @@ void GVLEMenuAndToolbar::hideEditMenu()
     m_refActionGroup->get_action("Cut")->set_sensitive(false);
     m_refActionGroup->get_action("Copy")->set_sensitive(false);
     m_refActionGroup->get_action("Paste")->set_sensitive(false);
+    m_refActionGroup->get_action("Select All")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::showEditMenu()
@@ -300,9 +315,10 @@ void GVLEMenuAndToolbar::showEditMenu()
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(true);
     m_refActionGroup->get_action("Undo")->set_sensitive(true);
     m_refActionGroup->get_action("Redo")->set_sensitive(true);
-    m_refActionGroup->get_action("Cut")->set_sensitive(true);
-    m_refActionGroup->get_action("Copy")->set_sensitive(true);
+    m_refActionGroup->get_action("Cut")->set_sensitive(false);
+    m_refActionGroup->get_action("Copy")->set_sensitive(false);
     m_refActionGroup->get_action("Paste")->set_sensitive(false);
+    m_refActionGroup->get_action("Select All")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::hideToolsMenu()
@@ -419,15 +435,15 @@ void GVLEMenuAndToolbar::createUI()
 {
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try {
-	m_refUIManager->add_ui_from_string(UI_DEFINITION);
+        m_refUIManager->add_ui_from_string(UI_DEFINITION);
     } catch(const Glib::Error& ex) {
-	std::cerr << "building menus failed: " <<  ex.what();
+        std::cerr << "building menus failed: " <<  ex.what();
     }
 #else
     std::auto_ptr<Glib::Error> ex;
     m_refUIManager->add_ui_from_string(UI_DEFINITION, ex);
     if(ex.get()) {
-	std::cerr << "building menus failed: " <<  ex->what();
+        std::cerr << "building menus failed: " <<  ex->what();
     }
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
@@ -437,72 +453,72 @@ void GVLEMenuAndToolbar::createFileActions()
     m_refActionGroup->add(Gtk::Action::create("MenuFile", _("_File")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("NewProject", Gtk::Stock::DIRECTORY,
-			    _("New Project"), _("Create a new project")),
-	Gtk::AccelKey("<control>n"),
-	sigc::mem_fun(mParent, &GVLE::onNewProject));
+        Gtk::Action::create("NewProject", Gtk::Stock::DIRECTORY,
+                            _("New Project"), _("Create a new project")),
+        Gtk::AccelKey("<control>n"),
+        sigc::mem_fun(mParent, &GVLE::onNewProject));
     m_refActionGroup->add(
-	Gtk::Action::create("NewVpz", Gtk::Stock::NEW,
-			    _("New _Vpz"), _("Create a new Vpz")),
-	Gtk::AccelKey("<control><shift>n"),
-	sigc::mem_fun(mParent, &GVLE::onNewVpz));
+        Gtk::Action::create("NewVpz", Gtk::Stock::NEW,
+                            _("New _Vpz"), _("Create a new Vpz")),
+        Gtk::AccelKey("<control><shift>n"),
+        sigc::mem_fun(mParent, &GVLE::onNewVpz));
     m_refActionGroup->add(
-	Gtk::Action::create("OpenProject", Gtk::Stock::OPEN,
-			    _("Open P_roject"), _("Open a Package")),
-	Gtk::AccelKey("<control>o"),
-	sigc::mem_fun(mParent, &GVLE::onOpenProject));
+        Gtk::Action::create("OpenProject", Gtk::Stock::OPEN,
+                            _("Open P_roject"), _("Open a Package")),
+        Gtk::AccelKey("<control>o"),
+        sigc::mem_fun(mParent, &GVLE::onOpenProject));
     m_refActionGroup->add(
-	Gtk::Action::create("OpenVpz", Gtk::Stock::OPEN,
-			    _("Open Vp_z"), _("Open a Vpz from package")),
-	Gtk::AccelKey("<control><shift>o"),
-	sigc::mem_fun(mParent, &GVLE::onOpenVpz));
+        Gtk::Action::create("OpenVpz", Gtk::Stock::OPEN,
+                            _("Open Vp_z"), _("Open a Vpz from package")),
+        Gtk::AccelKey("<control><shift>o"),
+        sigc::mem_fun(mParent, &GVLE::onOpenVpz));
     m_refActionGroup->add(
-	Gtk::Action::create("OpenGlobalVpz", Gtk::Stock::OPEN,
-			    _("Open Global Vpz"), _("Open a Vpz from "
-						    "filesystem")),
-	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::onOpenGlobalVpz));
+        Gtk::Action::create("OpenGlobalVpz", Gtk::Stock::OPEN,
+                            _("Open Global Vpz"), _("Open a Vpz from "
+                                                    "filesystem")),
+        Gtk::AccelKey(""),
+        sigc::mem_fun(mParent, &GVLE::onOpenGlobalVpz));
     m_refActionGroup->add(
-	Gtk::Action::create("SaveFile", Gtk::Stock::SAVE,
-			    _("Save File"), _("Save a file")),
-	sigc::mem_fun(mParent, &GVLE::onSave));
+        Gtk::Action::create("SaveFile", Gtk::Stock::SAVE,
+                            _("Save File"), _("Save a file")),
+        sigc::mem_fun(mParent, &GVLE::onSave));
     m_refActionGroup->add(
-	Gtk::Action::create("SaveFileAs", Gtk::Stock::SAVE_AS,
-			    _("Save File As"), _("Save a file as a "
-						 "different name")),
-	Gtk::AccelKey("<control><shift>s"),
-	sigc::mem_fun(mParent, &GVLE::onSaveAs));
+        Gtk::Action::create("SaveFileAs", Gtk::Stock::SAVE_AS,
+                            _("Save File As"), _("Save a file as a "
+                                                 "different name")),
+        Gtk::AccelKey("<control><shift>s"),
+        sigc::mem_fun(mParent, &GVLE::onSaveAs));
     m_refActionGroup->add(
-	Gtk::Action::create("ClearModel", _("_Clear Model"),
-			    _("Clear the current model")),
-	Gtk::AccelKey("<control>l"),
-	sigc::mem_fun(mParent, &GVLE::clearCurrentModel));
+        Gtk::Action::create("ClearModel", _("_Clear Model"),
+                            _("Clear the current model")),
+        Gtk::AccelKey("<control>l"),
+        sigc::mem_fun(mParent, &GVLE::clearCurrentModel));
     m_refActionGroup->add(
-	Gtk::Action::create("ImportModel", _("_Import Model"),
-			    _("Import a model")),
-	Gtk::AccelKey("<control>i"),
-	sigc::mem_fun(mParent, &GVLE::importModel));
+        Gtk::Action::create("ImportModel", _("_Import Model"),
+                            _("Import a model")),
+        Gtk::AccelKey("<control>i"),
+        sigc::mem_fun(mParent, &GVLE::importModel));
     m_refActionGroup->add(
-	Gtk::Action::create("ExportModel", _("_Export Model"),
-			    _("Create a new Package")),
-	sigc::mem_fun(mParent, &GVLE::exportCurrentModel));
+        Gtk::Action::create("ExportModel", _("_Export Model"),
+                            _("Create a new Package")),
+        sigc::mem_fun(mParent, &GVLE::exportCurrentModel));
     m_refActionGroup->add(
-	Gtk::Action::create("ExportGraphic", _("Export _Graphic"),
-			    _("Create a new Package")),
-	sigc::mem_fun(mParent, &GVLE::exportGraphic));
+        Gtk::Action::create("ExportGraphic", _("Export _Graphic"),
+                            _("Create a new Package")),
+        sigc::mem_fun(mParent, &GVLE::exportGraphic));
     m_refActionGroup->add(
-	Gtk::Action::create("CloseTab", Gtk::Stock::CLOSE,
-			    _("_Close Tab"), _("Close the current tab")),
-	sigc::mem_fun(mParent, &GVLE::onCloseTab));
+        Gtk::Action::create("CloseTab", Gtk::Stock::CLOSE,
+                            _("_Close Tab"), _("Close the current tab")),
+        sigc::mem_fun(mParent, &GVLE::onCloseTab));
     m_refActionGroup->add(
-	Gtk::Action::create("CloseProject", Gtk::Stock::CLOSE,
-			    _("_Close Project"), _("Close the project")),
-	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::onCloseProject));
+        Gtk::Action::create("CloseProject", Gtk::Stock::CLOSE,
+                            _("_Close Project"), _("Close the project")),
+        Gtk::AccelKey(""),
+        sigc::mem_fun(mParent, &GVLE::onCloseProject));
     m_refActionGroup->add(
-	Gtk::Action::create("Quit", Gtk::Stock::QUIT,
-			    _("_Quit"), _("Quit GVLE")),
-	sigc::mem_fun(mParent, &GVLE::onQuit));
+        Gtk::Action::create("Quit", Gtk::Stock::QUIT,
+                            _("_Quit"), _("Quit GVLE")),
+        sigc::mem_fun(mParent, &GVLE::onQuit));
 }
 
 void GVLEMenuAndToolbar::createEditActions()
@@ -510,22 +526,26 @@ void GVLEMenuAndToolbar::createEditActions()
     m_refActionGroup->add(Gtk::Action::create("MenuEdit", _("_Edit")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("Undo", Gtk::Stock::UNDO),
-    Gtk::AccelKey("<control>z"),
-	sigc::mem_fun(mParent->getEditor(), &Editor::onUndo));
+        Gtk::Action::create("Undo", Gtk::Stock::UNDO),
+        Gtk::AccelKey("<control>z"),
+        sigc::mem_fun(mParent->getEditor(), &Editor::onUndo));
     m_refActionGroup->add(
-	Gtk::Action::create("Redo", Gtk::Stock::REDO),
-    Gtk::AccelKey("<control>y"),
-	sigc::mem_fun(mParent->getEditor(), &Editor::onRedo));
+        Gtk::Action::create("Redo", Gtk::Stock::REDO),
+        Gtk::AccelKey("<control>y"),
+        sigc::mem_fun(mParent->getEditor(), &Editor::onRedo));
     m_refActionGroup->add(
-	Gtk::Action::create("Cut", Gtk::Stock::CUT),
-	sigc::mem_fun(mParent, &GVLE::onCutModel));
+        Gtk::Action::create("Cut", Gtk::Stock::CUT),
+        sigc::mem_fun(mParent, &GVLE::onCutModel));
     m_refActionGroup->add(
-	Gtk::Action::create("Copy", Gtk::Stock::COPY),
-	sigc::mem_fun(mParent, &GVLE::onCopyModel));
+        Gtk::Action::create("Copy", Gtk::Stock::COPY),
+        sigc::mem_fun(mParent, &GVLE::onCopyModel));
     m_refActionGroup->add(
-	Gtk::Action::create("Paste", Gtk::Stock::PASTE),
-	sigc::mem_fun(mParent, &GVLE::onPasteModel));
+        Gtk::Action::create("Paste", Gtk::Stock::PASTE),
+        sigc::mem_fun(mParent, &GVLE::onPasteModel));
+    m_refActionGroup->add(
+        Gtk::Action::create("Select All", Gtk::Stock::SELECT_ALL),
+        Gtk::AccelKey("<control>a"),
+        sigc::mem_fun(mParent, &GVLE::onSelectAll));
 }
 
 void GVLEMenuAndToolbar::createToolsActions()
@@ -534,54 +554,54 @@ void GVLEMenuAndToolbar::createToolsActions()
     Gtk::RadioAction::Group toolsGroup;
 
     m_refActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "ArrowTool", Gtk::Stock::INDEX,
-				 _("Select"), _("Move models, open coupled "
-						"models, show dynamics of "
-						"models. (F1)")),
-	Gtk::AccelKey("F1"),
-	sigc::mem_fun(mParent, &GVLE::onArrow));
+        Gtk::RadioAction::create(toolsGroup, "ArrowTool", Gtk::Stock::INDEX,
+                                 _("Select"), _("Move models, open coupled "
+                                                "models, show dynamics of "
+                                                "models. (F1)")),
+        Gtk::AccelKey("F1"),
+sigc::mem_fun(mParent, &GVLE::onArrow));
     m_refActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddModelsTool", Gtk::Stock::ADD,
-				 _("Add Models"), _("Add empty atomics models. "
-						    "You can specify inputs, "
-						    "outputs, inits and states "
-						    "ports. Select dynamics "
-						    "plugins file and XML write "
-						    "your XML Dynamics. (F2)")),
-	Gtk::AccelKey("F2"),
-	sigc::mem_fun(mParent, &GVLE::onAddModels));
+        Gtk::RadioAction::create(toolsGroup, "AddModelsTool", Gtk::Stock::ADD,
+                                 _("Add Models"), _("Add empty atomics models. "
+                                                    "You can specify inputs, "
+                                                    "outputs, inits and states "
+                                                    "ports. Select dynamics "
+                                                    "plugins file and XML write "
+                                                    "your XML Dynamics. (F2)")),
+        Gtk::AccelKey("F2"),
+        sigc::mem_fun(mParent, &GVLE::onAddModels));
     m_refActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddLinksTool",
-				 Gtk::Stock::DISCONNECT,
-				 _("Add Links"), _("Add connections between "
-						   "models. (F3)")),
-	Gtk::AccelKey("F3"),
-	sigc::mem_fun(mParent, &GVLE::onAddLinks));
+        Gtk::RadioAction::create(toolsGroup, "AddLinksTool",
+                                 Gtk::Stock::DISCONNECT,
+                                 _("Add Links"), _("Add connections between "
+                                                   "models. (F3)")),
+        Gtk::AccelKey("F3"),
+        sigc::mem_fun(mParent, &GVLE::onAddLinks));
     m_refActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddCoupledTool",
-				 Gtk::Stock::LEAVE_FULLSCREEN, _("Add Coupled"),
-				 _("Add coupled models. (F4)")),
-	Gtk::AccelKey("F4"),
-	sigc::mem_fun(mParent, &GVLE::onAddCoupled));
+        Gtk::RadioAction::create(toolsGroup, "AddCoupledTool",
+                                 Gtk::Stock::LEAVE_FULLSCREEN, _("Add Coupled"),
+                                 _("Add coupled models. (F4)")),
+        Gtk::AccelKey("F4"),
+        sigc::mem_fun(mParent, &GVLE::onAddCoupled));
     m_refActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "DeleteTool", Gtk::Stock::DELETE,
-				 _("Delete"), _("Delete models or connections. "
-						"(F5)")),
-	Gtk::AccelKey("F5"),
-	sigc::mem_fun(mParent, &GVLE::onDelete));
+        Gtk::RadioAction::create(toolsGroup, "DeleteTool", Gtk::Stock::DELETE,
+                                 _("Delete"), _("Delete models or connections. "
+                                                "(F5)")),
+        Gtk::AccelKey("F5"),
+        sigc::mem_fun(mParent, &GVLE::onDelete));
     m_refActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "ZoomTool", Gtk::Stock::ZOOM_FIT,
-				 _("Zoom"), _("Zoom. (F6)")),
-	Gtk::AccelKey("F6"),
-	sigc::mem_fun(mParent, &GVLE::onZoom));
+        Gtk::RadioAction::create(toolsGroup, "ZoomTool", Gtk::Stock::ZOOM_FIT,
+                                 _("Zoom"), _("Zoom. (F6)")),
+        Gtk::AccelKey("F6"),
+        sigc::mem_fun(mParent, &GVLE::onZoom));
     m_refActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "QuestionTool", Gtk::Stock::HELP,
-				 _("Question"), _("Show XML Dynamics if atomic "
-						  "model is selected, show XML "
-						  "Structures if coupled "
-						  "model. (F7)")),
-	Gtk::AccelKey("F7"),
-	sigc::mem_fun(mParent, &GVLE::onQuestion));
+        Gtk::RadioAction::create(toolsGroup, "QuestionTool", Gtk::Stock::HELP,
+                                 _("Question"), _("Show XML Dynamics if atomic "
+                                                  "model is selected, show XML "
+                                                  "Structures if coupled "
+                                                  "model. (F7)")),
+        Gtk::AccelKey("F7"),
+        sigc::mem_fun(mParent, &GVLE::onQuestion));
 }
 
 void GVLEMenuAndToolbar::createProjectActions()
@@ -589,35 +609,35 @@ void GVLEMenuAndToolbar::createProjectActions()
     m_refActionGroup->add(Gtk::Action::create("MenuProject", _("_Project")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("ConfigureProject", _("Configure Project"),
-			    _("Configure the project")),
-	Gtk::AccelKey("<control>g"),
-	sigc::mem_fun(mParent, &GVLE::configureProject));
+        Gtk::Action::create("ConfigureProject", _("Configure Project"),
+                            _("Configure the project")),
+        Gtk::AccelKey("<control>g"),
+        sigc::mem_fun(mParent, &GVLE::configureProject));
     m_refActionGroup->add(
-	Gtk::Action::create("BuildProject", _("Build Project"),
-			    _("Build the project")),
-	Gtk::AccelKey("<control>b"),
-	sigc::mem_fun(mParent, &GVLE::buildProject));
+        Gtk::Action::create("BuildProject", _("Build Project"),
+                            _("Build the project")),
+        Gtk::AccelKey("<control>b"),
+        sigc::mem_fun(mParent, &GVLE::buildProject));
     m_refActionGroup->add(
-	Gtk::Action::create("BuildAllProject", _("Build All Project"),
-			    _("Build the project & dependencies")),
-	sigc::mem_fun(mParent, &GVLE::makeAllProject));
+        Gtk::Action::create("BuildAllProject", _("Build All Project"),
+                            _("Build the project & dependencies")),
+        sigc::mem_fun(mParent, &GVLE::makeAllProject));
     m_refActionGroup->add(
-	Gtk::Action::create("ProjectDependencies", _("Project Dependencies"),
-			    _("Display the project Dependencies")),
-	sigc::mem_fun(mParent, &GVLE::displayDependencies));
+        Gtk::Action::create("ProjectDependencies", _("Project Dependencies"),
+                            _("Display the project Dependencies")),
+        sigc::mem_fun(mParent, &GVLE::displayDependencies));
     m_refActionGroup->add(
-	Gtk::Action::create("TestProject", _("Test Project"),
-			    _("Test the project")),
-	sigc::mem_fun(mParent, &GVLE::testProject));
+        Gtk::Action::create("TestProject", _("Test Project"),
+                            _("Test the project")),
+        sigc::mem_fun(mParent, &GVLE::testProject));
     m_refActionGroup->add(
-	Gtk::Action::create("CleanProject", _("Clean Project"),
-			    _("Clean the project")),
-	sigc::mem_fun(mParent, &GVLE::cleanProject));
+        Gtk::Action::create("CleanProject", _("Clean Project"),
+                            _("Clean the project")),
+        sigc::mem_fun(mParent, &GVLE::cleanProject));
     m_refActionGroup->add(
-	Gtk::Action::create("CreateProjectPackage", _("Create Project Package"),
-			    _("Create the project package")),
-	sigc::mem_fun(mParent, &GVLE::packageProject));
+        Gtk::Action::create("CreateProjectPackage", _("Create Project Package"),
+                            _("Create the project package")),
+        sigc::mem_fun(mParent, &GVLE::packageProject));
 }
 
 void GVLEMenuAndToolbar::createViewActions()
@@ -625,66 +645,65 @@ void GVLEMenuAndToolbar::createViewActions()
     m_refActionGroup->add(Gtk::Action::create("MenuView", _("_View")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("Order", _("Order"),
-			    _("Arrange the model with randomly")),
-	sigc::mem_fun(mParent, &GVLE::onOrder));
+        Gtk::Action::create("Order", _("Order"),
+                            _("Arrange the model with randomly")),
+        sigc::mem_fun(mParent, &GVLE::onOrder));
 
     m_refActionGroup->add(
-	Gtk::Action::create("Refresh", _("Refresh"),
-			    _("Refresh the package tree view")),
-	Gtk::AccelKey("<control>r"),
-	sigc::mem_fun(mParent, &GVLE::onRefresh));
+        Gtk::Action::create("Refresh", _("Refresh"),
+                            _("Refresh the package tree view")),
+        Gtk::AccelKey("<control>r"),
+        sigc::mem_fun(mParent, &GVLE::onRefresh));
 
     m_refActionGroup->add(
-	Gtk::Action::create("Complete View", _("Complete View"),
-			    _("Show models with ports")),
-	sigc::mem_fun(mParent, &GVLE::onShowCompleteView));
+        Gtk::Action::create("Complete View", _("Complete View"),
+                            _("Show models with ports")),
+        sigc::mem_fun(mParent, &GVLE::onShowCompleteView));
 
     m_refActionGroup->add(
-	Gtk::Action::create("Simple View", _("Simple View"),
-			    _("Show models without ports")),
-	sigc::mem_fun(mParent, &GVLE::onShowSimpleView));
-
+        Gtk::Action::create("Simple View", _("Simple View"),
+                            _("Show models without ports")),
+        sigc::mem_fun(mParent, &GVLE::onShowSimpleView));
 
     m_refActionGroup->add(
-	Gtk::Action::create("Preferences", Gtk::Stock::PREFERENCES,
-			    _("Preferences"), _("Create the project package")),
-	Gtk::AccelKey("<control>p"),
-	sigc::mem_fun(mParent, &GVLE::onPreferences));
+        Gtk::Action::create("Preferences", Gtk::Stock::PREFERENCES,
+                            _("Preferences"), _("Create the project package")),
+        Gtk::AccelKey("<control>p"),
+        sigc::mem_fun(mParent, &GVLE::onPreferences));
 }
 
 void GVLEMenuAndToolbar::createSimulationActions()
 {
     m_refActionGroup->add(Gtk::Action::create("MenuSimulation",
-					      _("_Simulation")));
+                                              _("_Simulation")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("Project", _("Project"),
-			    _("Configure _experiment")),
-	Gtk::AccelKey("<control><shift>e"),
-	sigc::mem_fun(mParent, &GVLE::onExperimentsBox));
+        Gtk::Action::create("Project", _("Project"),
+                            _("Configure _experiment")),
+        Gtk::AccelKey("<control><shift>e"),
+        sigc::mem_fun(mParent, &GVLE::onExperimentsBox));
     m_refActionGroup->add(
-	Gtk::Action::create("Views", _("Views"), _("Manage the _views")),
-	Gtk::AccelKey("<control><shift>v"),
-	sigc::mem_fun(mParent, &GVLE::onViewOutputBox));
+        Gtk::Action::create("Views", _("Views"), _("Manage the _views")),
+        Gtk::AccelKey("<control><shift>v"),
+        sigc::mem_fun(mParent, &GVLE::onViewOutputBox));
     m_refActionGroup->add(
-	Gtk::Action::create("Dynamics", _("Dynamics"), _("Manage the _dynamics")),
-	Gtk::AccelKey("<control><shift>d"),
-	sigc::mem_fun(mParent, &GVLE::onDynamicsBox));
+        Gtk::Action::create("Dynamics", _("Dynamics"), _("Manage the _dynamics")),
+        Gtk::AccelKey("<control><shift>d"),
+        sigc::mem_fun(mParent, &GVLE::onDynamicsBox));
     m_refActionGroup->add(
-	Gtk::Action::create("Conditions", _("Conditions"),
-			    _("Manage the conditions")),
-	Gtk::AccelKey("<control><shift>c"),
-	sigc::mem_fun(mParent, &GVLE::onConditionsBox));
+        Gtk::Action::create("Conditions", _("Conditions"),
+                            _("Manage the conditions")),
+        Gtk::AccelKey("<control><shift>c"),
+        sigc::mem_fun(mParent, &GVLE::onConditionsBox));
     m_refActionGroup->add(
-	Gtk::Action::create("Hosts", _("Hosts"), _("Manage hosts")),
-	Gtk::AccelKey("<control><shift>h"),
-	sigc::mem_fun(mParent, &GVLE::onHostsBox));
+        Gtk::Action::create("Hosts", _("Hosts"), _("Manage hosts")),
+        Gtk::AccelKey("<control><shift>h"),
+        sigc::mem_fun(mParent, &GVLE::onHostsBox));
     m_refActionGroup->add(
-	Gtk::Action::create("LaunchSimulation", _("Launch Simulation"),
-			    _("Launch the simulation")),
-	Gtk::AccelKey("<control><shift>l"),
-	sigc::mem_fun(mParent, &GVLE::onSimulationBox));
+        Gtk::Action::create("LaunchSimulation", _("Launch Simulation"),
+                            _("Launch the simulation")),
+        Gtk::AccelKey("<control><shift>l"),
+        sigc::mem_fun(mParent, &GVLE::onSimulationBox));
 }
 
 void GVLEMenuAndToolbar::createZoomActions()
@@ -692,26 +711,26 @@ void GVLEMenuAndToolbar::createZoomActions()
     m_refActionGroup->add(Gtk::Action::create("MenuZoom", _("_Zoom")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("ZoomPlus", Gtk::Stock::ZOOM_IN,
-			    _("Zoom +"), _("Zoom in")),
-	Gtk::AccelKey(GDK_plus, Gdk::CONTROL_MASK),
-	sigc::mem_fun(mParent, &GVLE::addCoefZoom));
+        Gtk::Action::create("ZoomPlus", Gtk::Stock::ZOOM_IN,
+                            _("Zoom +"), _("Zoom in")),
+        Gtk::AccelKey(GDK_plus, Gdk::CONTROL_MASK),
+        sigc::mem_fun(mParent, &GVLE::addCoefZoom));
     m_refActionGroup->add(
-	Gtk::Action::create("ZoomMinus", Gtk::Stock::ZOOM_OUT,
-			    _("Zoom -"), _("Zoom out")),
-	Gtk::AccelKey(GDK_minus, Gdk::CONTROL_MASK),
-	sigc::mem_fun(mParent, &GVLE::delCoefZoom));
+        Gtk::Action::create("ZoomMinus", Gtk::Stock::ZOOM_OUT,
+                            _("Zoom -"), _("Zoom out")),
+        Gtk::AccelKey(GDK_minus, Gdk::CONTROL_MASK),
+        sigc::mem_fun(mParent, &GVLE::delCoefZoom));
     m_refActionGroup->add(
-	Gtk::Action::create("Zoom11", Gtk::Stock::ZOOM_100,
-			    _("Zoom 1:1"), _("Restore standard zoom")),
-	Gtk::AccelKey("<control>1"),
-	sigc::bind(sigc::mem_fun(mParent, &GVLE::setCoefZoom), 1.0));
+        Gtk::Action::create("Zoom11", Gtk::Stock::ZOOM_100,
+                            _("Zoom 1:1"), _("Restore standard zoom")),
+        Gtk::AccelKey("<control>1"),
+        sigc::bind(sigc::mem_fun(mParent, &GVLE::setCoefZoom), 1.0));
     m_refActionGroup->add(
-	Gtk::Action::create("Zoom21", _("Zoom 2:1"), _("Zoom twice")),
-	sigc::bind(sigc::mem_fun(mParent, &GVLE::setCoefZoom), 2.0));
+        Gtk::Action::create("Zoom21", _("Zoom 2:1"), _("Zoom twice")),
+        sigc::bind(sigc::mem_fun(mParent, &GVLE::setCoefZoom), 2.0));
     m_refActionGroup->add(
-	Gtk::Action::create("Zoom12", _("Zoom 1:2"), _("Zoom half")),
-	sigc::bind(sigc::mem_fun(mParent, &GVLE::setCoefZoom), 0.5));
+        Gtk::Action::create("Zoom12", _("Zoom 1:2"), _("Zoom half")),
+        sigc::bind(sigc::mem_fun(mParent, &GVLE::setCoefZoom), 0.5));
 }
 
 void GVLEMenuAndToolbar::createHelpActions()
@@ -719,14 +738,21 @@ void GVLEMenuAndToolbar::createHelpActions()
     m_refActionGroup->add(Gtk::Action::create("MenuHelp", _("_Help")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("About", Gtk::Stock::ABOUT, _("About"), _("About")),
-	sigc::mem_fun(mParent, &GVLE::onShowAbout));
+        Gtk::Action::create("About", Gtk::Stock::ABOUT, _("About"), _("About")),
+        sigc::mem_fun(mParent, &GVLE::onShowAbout));
 }
 
 void GVLEMenuAndToolbar::onOpenFile()
 {
     hideImportExport();
     showEditMenu();
+    showCopyCut();
+
+    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
+    if(clipboard->wait_is_text_available()) {
+        showPaste();
+    }
+
     hideToolsMenu();
     hideViewMenu();
     hideSimulationMenu();
@@ -748,6 +774,10 @@ void GVLEMenuAndToolbar::onOpenVpz()
 {
     showImportExport();
     showEditMenu();
+
+    if(not mParent->getModeling()->paste_is_empty()) {
+        showPaste();
+    }
     showToolsMenu();
     showViewMenu();
     showSimulationMenu();
@@ -768,8 +798,8 @@ void GVLEMenuAndToolbar::onCloseTab(bool vpz, bool empty)
     if (empty) {
         hideSave();
         hideSaveAs();
-	hideEditMenu();
-	hideCloseTab();
+        hideEditMenu();
+        hideCloseTab();
     }
 }
 

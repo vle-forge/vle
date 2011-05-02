@@ -83,6 +83,8 @@ public:
      */
     void paste(graph::CoupledModel* gc, vpz::AtomicModelList& list);
 
+    bool paste_is_empty();
+
 private:
     /** delete list of GModel if present */
     void clear();

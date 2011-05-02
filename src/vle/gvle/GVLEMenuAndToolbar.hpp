@@ -60,6 +60,8 @@ public:
     { return mMenuBar; }
 
     // Menu item
+    void hideCopyCut();
+    void showCopyCut();
     void hidePaste();
     void showPaste();
     void hideOpenVpz();

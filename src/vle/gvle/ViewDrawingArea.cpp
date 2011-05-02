@@ -26,6 +26,7 @@
  */
 
 
+#include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/View.hpp>
@@ -87,41 +88,41 @@ void ViewDrawingArea::drawCurrentCoupledModel()
     mContext->stroke();
 
     if (mView->existInSelectedModels(mCurrent)) {
-	setColor(Settings::settings().getSelectedColor());
-	mContext->rectangle(0 + mOffset, 0 + mOffset,
-			    mRectWidth,
-			    mRectHeight);
-	mContext->fill();
-	mContext->stroke();
+        setColor(Settings::settings().getSelectedColor());
+        mContext->rectangle(0 + mOffset, 0 + mOffset,
+                            mRectWidth,
+                            mRectHeight);
+        mContext->fill();
+        mContext->stroke();
 
-	setColor(Settings::settings().getBackgroundColor());
-	mContext->rectangle(MODEL_PORT + mOffset,
-			    MODEL_PORT + mOffset,
-			    (mRectWidth - 2 * MODEL_PORT),
-			    (mRectHeight - 2 * MODEL_PORT));
-	mContext->fill();
-	mContext->stroke();
+        setColor(Settings::settings().getBackgroundColor());
+        mContext->rectangle(MODEL_PORT + mOffset,
+                            MODEL_PORT + mOffset,
+                            (mRectWidth - 2 * MODEL_PORT),
+                            (mRectHeight - 2 * MODEL_PORT));
+        mContext->fill();
+        mContext->stroke();
 
-	setColor(Settings::settings().getForegroundColor());
-	mContext->rectangle(MODEL_PORT + mOffset,
-			    MODEL_PORT + mOffset,
-			    (mRectWidth - 2 * MODEL_PORT),
-			    (mRectHeight - 2 * MODEL_PORT));
-	mContext->stroke();
+        setColor(Settings::settings().getForegroundColor());
+        mContext->rectangle(MODEL_PORT + mOffset,
+                            MODEL_PORT + mOffset,
+                            (mRectWidth - 2 * MODEL_PORT),
+                            (mRectHeight - 2 * MODEL_PORT));
+        mContext->stroke();
     } else {
-	setColor(Settings::settings().getBackgroundColor());
-	mContext->rectangle(0 + mOffset, 0 + mOffset,
-			    mRectWidth,
-			    mRectHeight);
-	mContext->fill();
-	mContext->stroke();
+        setColor(Settings::settings().getBackgroundColor());
+        mContext->rectangle(0 + mOffset, 0 + mOffset,
+                            mRectWidth,
+                            mRectHeight);
+        mContext->fill();
+        mContext->stroke();
 
-	setColor(Settings::settings().getForegroundColor());
-	mContext->rectangle(MODEL_PORT + mOffset,
-			    MODEL_PORT + mOffset,
-			    (mRectWidth - 2 * MODEL_PORT),
-			    (mRectHeight - 2 * MODEL_PORT));
-	mContext->stroke();
+        setColor(Settings::settings().getForegroundColor());
+        mContext->rectangle(MODEL_PORT + mOffset,
+                            MODEL_PORT + mOffset,
+                            (mRectWidth - 2 * MODEL_PORT),
+                            (mRectHeight - 2 * MODEL_PORT));
+        mContext->stroke();
     }
 }
 
@@ -138,8 +139,8 @@ void ViewDrawingArea::drawCurrentModelPorts()
     const size_t stepOutput = (int)(mRectHeight / (maxOutput + 1));
 
     mContext->select_font_face(Settings::settings().getFont(),
-			  Cairo::FONT_SLANT_OBLIQUE,
-			  Cairo::FONT_WEIGHT_NORMAL);
+                               Cairo::FONT_SLANT_OBLIQUE,
+                               Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     itl = ipl.begin();
@@ -147,66 +148,66 @@ void ViewDrawingArea::drawCurrentModelPorts()
     for (size_t i = 0; i < maxInput; ++i) {
 
         // to draw the port
-	setColor(Settings::settings().getForegroundColor());
-	mContext->move_to((MODEL_PORT),
-			  (stepInput * (i + 1) - MODEL_PORT));
-	mContext->line_to((MODEL_PORT),
-			  (stepInput * (i + 1) + MODEL_PORT));
-	mContext->line_to((MODEL_PORT + MODEL_PORT),
-			  (stepInput * (i + 1)));
-	mContext->line_to((MODEL_PORT),
-			  (stepInput * (i + 1) - MODEL_PORT));
-	mContext->fill();
-	mContext->stroke();
+        setColor(Settings::settings().getForegroundColor());
+        mContext->move_to((MODEL_PORT),
+                          (stepInput * (i + 1) - MODEL_PORT));
+        mContext->line_to((MODEL_PORT),
+                          (stepInput * (i + 1) + MODEL_PORT));
+        mContext->line_to((MODEL_PORT + MODEL_PORT),
+                          (stepInput * (i + 1)));
+        mContext->line_to((MODEL_PORT),
+                          (stepInput * (i + 1) - MODEL_PORT));
+        mContext->fill();
+        mContext->stroke();
 
-	setColor(Settings::settings().getForegroundColor());
-	mContext->move_to((MODEL_PORT),
-			  (stepInput * (i + 1) - MODEL_PORT));
-	mContext->line_to((MODEL_PORT),
-			  (stepInput * (i + 1) + MODEL_PORT));
-	mContext->line_to((MODEL_PORT + MODEL_PORT),
-			  (stepInput * (i + 1)));
-	mContext->line_to((MODEL_PORT),
-			  (stepInput * (i + 1) - MODEL_PORT));
-	mContext->fill();
-	mContext->stroke();
+        setColor(Settings::settings().getForegroundColor());
+        mContext->move_to((MODEL_PORT),
+                          (stepInput * (i + 1) - MODEL_PORT));
+        mContext->line_to((MODEL_PORT),
+                          (stepInput * (i + 1) + MODEL_PORT));
+        mContext->line_to((MODEL_PORT + MODEL_PORT),
+                          (stepInput * (i + 1)));
+        mContext->line_to((MODEL_PORT),
+                          (stepInput * (i + 1) - MODEL_PORT));
+        mContext->fill();
+        mContext->stroke();
 
         // to draw the label of the port
-	if (mZoom >= 1.0) {
-	    setColor(Settings::settings().getForegroundColor());
-	    mContext->move_to((MODEL_PORT + MODEL_PORT_SPACING_LABEL),
-			      (stepInput * (i + 1) + 10));
-	    mContext->show_text(itl->first);
-	    mContext->stroke();
-	}
-	itl++;
+        if (mZoom >= 1.0) {
+            setColor(Settings::settings().getForegroundColor());
+            mContext->move_to((MODEL_PORT + MODEL_PORT_SPACING_LABEL),
+                              (stepInput * (i + 1) + 10));
+            mContext->show_text(itl->first);
+            mContext->stroke();
+        }
+        itl++;
     }
 
     itl = opl.begin();
 
     for (guint i = 0; i < maxOutput; ++i) {
 
-	setColor(Settings::settings().getForegroundColor());
-	mContext->move_to((mRectWidth - MODEL_PORT),
-			  (stepOutput * (i + 1) - MODEL_PORT));
-	mContext->line_to((mRectWidth - MODEL_PORT),
-			  (stepOutput * (i + 1) + MODEL_PORT));
-	mContext->line_to((MODEL_PORT + mRectWidth - MODEL_PORT),
-			  (stepOutput * (i + 1)));
-	mContext->line_to((mRectWidth - MODEL_PORT),
-			  (stepOutput * (i + 1) - MODEL_PORT));
-	mContext->fill();
-	mContext->stroke();
+        setColor(Settings::settings().getForegroundColor());
+        mContext->move_to((mRectWidth - MODEL_PORT),
+                          (stepOutput * (i + 1) - MODEL_PORT));
+        mContext->line_to((mRectWidth - MODEL_PORT),
+                          (stepOutput * (i + 1) + MODEL_PORT));
+        mContext->line_to((MODEL_PORT + mRectWidth - MODEL_PORT),
+                          (stepOutput * (i + 1)));
+        mContext->line_to((mRectWidth - MODEL_PORT),
+                          (stepOutput * (i + 1) - MODEL_PORT));
+        mContext->fill();
+        mContext->stroke();
 
         // to draw the label of the port
-	if (mZoom >= 1.0) {
-	    mContext->move_to((mRectWidth),
-			      (stepOutput * (i + 1) + 10));
-	    mContext->show_text(itl->first);
-	    mContext->stroke();
-	}
+        if (mZoom >= 1.0) {
+            mContext->move_to((mRectWidth),
+                              (stepOutput * (i + 1) + 10));
+            mContext->show_text(itl->first);
+            mContext->stroke();
+        }
 
-	itl++;
+        itl++;
 
     }
 }
@@ -230,9 +231,9 @@ void ViewDrawingArea::preComputeConnection()
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 preComputeConnection(mCurrent, it->first,
-				     jt->first, jt->second);
-	    }
-	}
+                                     jt->first, jt->second);
+            }
+}
     }
 
     {
@@ -263,18 +264,18 @@ void ViewDrawingArea::drawLines()
 
     while (itl != mLines.end()) {
         if (i != mHighlightLine) {
-	    mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
-	    setColor(Settings::settings().getConnectionColor());
+            mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
+            setColor(Settings::settings().getConnectionColor());
         }
-	mContext->move_to(itl->begin()->first + mOffset,
+        mContext->move_to(itl->begin()->first + mOffset,
                           itl->begin()->second + mOffset);
-	std::vector <Point>::const_iterator iter = itl->begin();
-	while (iter != itl->end()) {
-	    mContext->line_to(iter->first + mOffset, iter->second + mOffset);
-	    ++iter;
-	}
+        std::vector <Point>::const_iterator iter = itl->begin();
+        while (iter != itl->end()) {
+            mContext->line_to(iter->first + mOffset, iter->second + mOffset);
+            ++iter;
+        }
 
-	mContext->stroke();
+mContext->stroke();
         ++i;
         ++itl;
     }
@@ -331,19 +332,18 @@ void ViewDrawingArea::drawHighlightConnection()
 {
     if (mHighlightLine != -1) {
 
-	mContext->set_line_width(Settings::settings().getLineWidth());
-	mContext->set_line_cap(Cairo::LINE_CAP_ROUND);
-	mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
-
-	Color color(0.41, 0.34, 0.35);
-	std::vector <Point>::const_iterator iter =
+        mContext->set_line_width(Settings::settings().getLineWidth());
+        mContext->set_line_cap(Cairo::LINE_CAP_ROUND);
+        mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
+        Color color(0.41, 0.34, 0.35);
+        std::vector <Point>::const_iterator iter =
             mLines[mHighlightLine].begin();
-	mContext->move_to(iter->first + mOffset, iter->second + mOffset);
-	while (iter != mLines[mHighlightLine].end()) {
-	    mContext->line_to(iter->first + mOffset, iter->second + mOffset);
-	    ++iter;
-	}
-	mContext->stroke();
+        mContext->move_to(iter->first + mOffset, iter->second + mOffset);
+        while (iter != mLines[mHighlightLine].end()) {
+            mContext->line_to(iter->first + mOffset, iter->second + mOffset);
+            ++iter;
+        }
+mContext->stroke();
     }
 }
 
@@ -375,9 +375,9 @@ void ViewDrawingArea::drawChildrenModels()
         ++it;
     }
     if (mView->getDestinationModel() != NULL and
-	mView->getDestinationModel() != mCurrent) {
+        mView->getDestinationModel() != mCurrent) {
         drawChildrenModel(mView->getDestinationModel(),
-			  Settings::settings().getAtomicColor());
+                          Settings::settings().getAtomicColor());
     }
 }
 
@@ -389,12 +389,12 @@ void ViewDrawingArea::drawLink()
     if (mView->getCurrentButton() == GVLE::VLE_GVLE_ADDLINK and
         mView->isEmptySelectedModels() == false) {
         graph::Model* src = mView->getFirstSelectedModels();
-	setColor(Settings::settings().getForegroundColor());
+        setColor(Settings::settings().getForegroundColor());
         if (src == mCurrent) {
-	    mContext->move_to(MODEL_PORT,
-			      (mHeight / 2));
-	    mContext->line_to(mMouse.get_x(),
-			      mMouse.get_y());
+            mContext->move_to(MODEL_PORT,
+                              (mHeight / 2));
+            mContext->line_to(mMouse.get_x(),
+                              mMouse.get_y());
 
         } else {
             int w = src->width();
@@ -402,31 +402,31 @@ void ViewDrawingArea::drawLink()
             int x = src->x();
             int y = src->y();
 
-	    mContext->move_to((x + w / 2) + mOffset,
-			      (y + h / 2) + mOffset);
-	    mContext->line_to(mMouse.get_x() + mOffset,
-			      mMouse.get_y() + mOffset);
+            mContext->move_to((x + w / 2) + mOffset,
+                              (y + h / 2) + mOffset);
+            mContext->line_to(mMouse.get_x() + mOffset,
+                              mMouse.get_y() + mOffset);
         }
-	mContext->stroke();
+        mContext->stroke();
     }
 }
 
 void ViewDrawingArea::drawZoomFrame()
 {
     if ((mView->getCurrentButton() == GVLE::VLE_GVLE_ZOOM
-	 or mView->getCurrentButton() == GVLE::VLE_GVLE_POINTER)
-	 and mPrecMouse.get_x() != -1 and mPrecMouse.get_y() != -1) {
+         or mView->getCurrentButton() == GVLE::VLE_GVLE_POINTER)
+        and mPrecMouse.get_x() != -1 and mPrecMouse.get_y() != -1) {
         int xmin = std::min(mMouse.get_x(), mPrecMouse.get_x());
         int xmax = std::max(mMouse.get_x(), mPrecMouse.get_x());
         int ymin = std::min(mMouse.get_y(), mPrecMouse.get_y());
         int ymax = std::max(mMouse.get_y(), mPrecMouse.get_y());
 
-	setColor(Settings::settings().getForegroundColor());
-	mContext->rectangle(xmin,
-			    ymin,
-			    (xmax - xmin),
-			    (ymax - ymin));
-	mContext->stroke();
+        setColor(Settings::settings().getForegroundColor());
+        mContext->rectangle(xmin,
+                            ymin,
+                            (xmax - xmin),
+                            (ymax - ymin));
+        mContext->stroke();
     }
 }
 
@@ -521,7 +521,7 @@ bool ViewDrawingArea::on_configure_event(GdkEventConfigure* event)
     }
 
     if (change and mIsRealized) {
-	set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
+        set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
         mBuffer = Gdk::Pixmap::create(mWin, (int)(mWidth * mZoom),
                                       (int)(mHeight * mZoom), -1);
         queueRedraw();
@@ -538,15 +538,15 @@ bool ViewDrawingArea::on_expose_event(GdkEventExpose*)
         }
         if (mBuffer) {
             if (mNeedRedraw) {
-		mContext = mBuffer->create_cairo_context();
-		mContext->set_line_width(Settings::settings().getLineWidth());
-		mOffset = (Settings::settings().getLineWidth() < 1.1)
+                mContext = mBuffer->create_cairo_context();
+                mContext->set_line_width(Settings::settings().getLineWidth());
+                mOffset = (Settings::settings().getLineWidth() < 1.1)
                     ? 0.5 : 0.0;
                 draw();
                 mNeedRedraw = false;
             }
             mWin->draw_drawable(mWingc, mBuffer, 0, 0, 0, 0, -1, -1);
-	}
+}
     }
     return true;
 }
@@ -568,19 +568,19 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
     switch (mView->getCurrentButton()) {
     case GVLE::VLE_GVLE_POINTER :
         if (button == 1) {
-	    if (not mView->isEmptySelectedModels()) {
+            if (not mView->isEmptySelectedModels()) {
                 mView->displaceModel(
                     mPrecMouse.get_x() == -1 ? 0 : mPrecMouse.get_x(),
                     mPrecMouse.get_y() == -1 ? 0 : mPrecMouse.get_y(),
                     mMouse.get_x(), mMouse.get_y());
-		mPrecMouse = mMouse;
-		queueRedraw();
-	    } else {
-		queueRedraw();
-	    }
+                mPrecMouse = mMouse;
+                queueRedraw();
+            } else {
+                queueRedraw();
+            }
         } else {
             highlightLine((int)mMouse.get_x(), (int)mMouse.get_y());
-	    mPrecMouse = mMouse;
+            mPrecMouse = mMouse;
         }
         break;
     case GVLE::VLE_GVLE_ZOOM:
@@ -671,9 +671,10 @@ void ViewDrawingArea::delUnderMouse(int x, int y)
         mView->delModel(model);
     } else {
         delConnection();
-	mModeling->setModified(true);
+        mModeling->setModified(true);
     }
 
+    mModeling->getGVLE()->getMenu()->showCopyCut();
     queueRedraw();
 }
 
@@ -688,31 +689,31 @@ void ViewDrawingArea::calcRectSize()
         int yMax = 0;
 
         for (it = children.begin() ; it != children.end() ; ++it) {
-	    if (it->second->x() + it->second->width() > xMax) {
-	        xMax = it->second->x() + it->second->width();
+            if (it->second->x() + it->second->width() > xMax) {
+                xMax = it->second->x() + it->second->width();
             }
             if ((it->second->y() + it->second->height()) > yMax) {
-		yMax = it->second->y() + it->second->height();
+                yMax = it->second->y() + it->second->height();
             }
 
             const graph::ConnectionList& opl =
-	        it->second->getOutputPortList();
+        it->second->getOutputPortList();
 
             graph::ConnectionList::const_iterator itl;
 
-	    for (itl = opl.begin() ; itl != opl.end() ; ++itl) {
-	        mContext->get_text_extents(itl->first, textExtents);
-		if (it->second->x() +
-		    it->second->width() +
-		    textExtents.width +
-		    MODEL_PORT
-		    > xMax) {
-	            xMax = it->second->x() +
-		            it->second->width() +
-		            textExtents.width + MODEL_PORT;
-	        }
-	    }
-	}
+            for (itl = opl.begin() ; itl != opl.end() ; ++itl) {
+                mContext->get_text_extents(itl->first, textExtents);
+                if (it->second->x() +
+                    it->second->width() +
+                    textExtents.width +
+                    MODEL_PORT
+                    > xMax) {
+                    xMax = it->second->x() +
+                        it->second->width() +
+                        textExtents.width + MODEL_PORT;
+                }
+            }
+}
         mRectWidth = xMax + mOffset + 15;
         mRectHeight = yMax + mOffset + SPACING_MODEL + 15;
     }
@@ -730,6 +731,7 @@ void ViewDrawingArea::addLinkOnButtonPress(int x, int y)
     } else {
         mView->addModelToSelectedModels(mCurrent);
     }
+
     queueRedraw();
 }
 
@@ -920,8 +922,8 @@ void ViewDrawingArea::exportPng(const std::string& filename)
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+                               Cairo::FONT_SLANT_NORMAL,
+                               Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     surface->write_to_png(filename + ".png");
@@ -934,8 +936,8 @@ void ViewDrawingArea::exportPdf(const std::string& filename)
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+                               Cairo::FONT_SLANT_NORMAL,
+                               Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
@@ -950,8 +952,8 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+                               Cairo::FONT_SLANT_NORMAL,
+                               Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
@@ -987,30 +989,30 @@ void ViewDrawingArea::setUndefinedModels()
     bool found = false;
 
     while (it != mCurrent->getModelList().end()) {
-	if (it->second->width() <= 0) {
-	    found = true;
-	    it->second->setWidth(100);
-	    if (mMaxWidth <= 0) {
-		mMaxWidth = 100;
-	    }
-	}
-	if (it->second->height() <= 0) {
-	    found = true;
-	    it->second->setHeight(MODEL_HEIGHT +
-				  std::max(it->second->getInputPortNumber(),
-					   it->second->getOutputPortNumber()) *
-				  (MODEL_SPACING_PORT + MODEL_PORT));
-	    if (mMaxHeight <= 0 or mMaxHeight < it->second->height()) {
-		mMaxHeight = it->second->height();
-	    }
-	}
-	++it;
+        if (it->second->width() <= 0) {
+            found = true;
+            it->second->setWidth(100);
+            if (mMaxWidth <= 0) {
+                mMaxWidth = 100;
+            }
+        }
+        if (it->second->height() <= 0) {
+            found = true;
+            it->second->setHeight(MODEL_HEIGHT +
+                                  std::max(it->second->getInputPortNumber(),
+                                           it->second->getOutputPortNumber()) *
+                                  (MODEL_SPACING_PORT + MODEL_PORT));
+    if (mMaxHeight <= 0 or mMaxHeight < it->second->height()) {
+        mMaxHeight = it->second->height();
+    }
+}
+++it;
     }
     if (found) {
-	mRectWidth = (mMaxWidth + SPACING_MODEL) *
-	    std::floor(std::sqrt(mCurrent->getModelList().size()) + 1);
-	mRectHeight = (mMaxHeight + SPACING_MODEL) *
-	    std::floor(std::sqrt(mCurrent->getModelList().size()) + 1);
+mRectWidth = (mMaxWidth + SPACING_MODEL) *
+    std::floor(std::sqrt(mCurrent->getModelList().size()) + 1);
+mRectHeight = (mMaxHeight + SPACING_MODEL) *
+    std::floor(std::sqrt(mCurrent->getModelList().size()) + 1);
     }
 }
 
@@ -1028,13 +1030,13 @@ void ViewDrawingArea::maxModelWidthHeight()
     mMaxHeight = 0;
 
     graph::ModelList::const_iterator it =
-	mCurrent->getModelList().begin();
+        mCurrent->getModelList().begin();
     while(it != mCurrent->getModelList().end()) {
-	if (it->second->width() > mMaxWidth)
-	    mMaxWidth = it->second->width();
-	if (it->second->height() > mMaxHeight)
-	    mMaxHeight = it->second->height();
-	++it;
+        if (it->second->width() > mMaxWidth)
+            mMaxWidth = it->second->width();
+        if (it->second->height() > mMaxHeight)
+            mMaxHeight = it->second->height();
+++it;
     }
 }
 

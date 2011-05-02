@@ -178,7 +178,7 @@ public:
      * class model doesn't exist.
      */
     inline graph::Model* getClassModel(const std::string& name)
-	{ return mVpz.project().classes().get(name).model(); }
+        { return mVpz.project().classes().get(name).model(); }
 
     /**
      * get the AtomicModelList associate to the class
@@ -194,12 +194,12 @@ public:
      * @param new_atom : the new list
      */
     inline void addAtomicModelClass(std::string className,
-				    graph::AtomicModel* new_atom)
-	{ vpz().project().classes().get(className).atomicModels().add(
-		new_atom, vpz::AtomicModel("", "", "")); }
+                                    graph::AtomicModel* new_atom)
+        { vpz().project().classes().get(className).atomicModels().add(
+                new_atom, vpz::AtomicModel("", "", "")); }
 
     void setSelectedClass(const std::string& name)
-	{ mSelectedClass = name; }
+        { mSelectedClass = name; }
 
     /********************************************************************
      *
@@ -334,7 +334,7 @@ public:
      * @return selected button.
      */
     inline GVLE::ButtonType getCurrentButton() const
-	{ return mGVLE->getCurrentButton(); }
+        { return mGVLE->getCurrentButton(); }
 
     /**
      * return a ptr to application GVLE.
@@ -342,22 +342,22 @@ public:
      * @return ptr to application GVLE.
      */
     inline const GVLE* getGVLE() const
-	{ return mGVLE; }
+        { return mGVLE; }
 
     inline GVLE* getGVLE()
-	{ setModified(true); return mGVLE; }
+        { setModified(true); return mGVLE; }
 
     inline void hideGVLE()
-	{ mGVLE->hide(); }
+        { mGVLE->hide(); }
 
     inline const Editor::Documents& getDocuments() const
-	{ return mGVLE->getEditor()->getDocuments(); }
+        { return mGVLE->getEditor()->getDocuments(); }
 
     inline int runConditionsBox(const vpz::Conditions& conditions)
-	{ return mGVLE->runConditionsBox(conditions); }
+        { return mGVLE->runConditionsBox(conditions); }
 
     inline renameList applyConditionsBox(vpz::Conditions& conditions)
-	{ return mGVLE->applyConditionsBox(conditions); }
+        { return mGVLE->applyConditionsBox(conditions); }
 
     /********************************************************************
      *
@@ -414,6 +414,14 @@ public:
      */
     void paste(graph::CoupledModel* gc, std::string className);
 
+    /**
+     * select all models in the current list GModel.
+     *
+     * @param lst list of selected GModel.
+     */
+    void selectAll(graph::ModelList& lst, graph::CoupledModel* gc);
+
+    bool paste_is_empty();
 
     /********************************************************************
      *
@@ -636,14 +644,14 @@ public:
     }
 
     vpz::AtomicModel& get_model(const graph::AtomicModel* atom,
-				const std::string& className = "")
+                                const std::string& className = "")
     {
-	if (className.empty()) {
-	    return mVpz.project().model().atomicModels().get(atom);
-	} else {
-	    return mVpz.project().classes().get(className)
-		.atomicModels().get(atom);
-	}
+        if (className.empty()) {
+            return mVpz.project().model().atomicModels().get(atom);
+        } else {
+            return mVpz.project().classes().get(className)
+                .atomicModels().get(atom);
+        }
     }
 
     const std::vector < std::string >* get_conditions(graph::AtomicModel* atom);

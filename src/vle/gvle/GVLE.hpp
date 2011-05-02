@@ -99,7 +99,7 @@ public:
      *
      */
     GVLE(BaseObjectType* cobject,
-		 const Glib::RefPtr<Gnome::Glade::Xml> xml);
+                 const Glib::RefPtr<Gnome::Glade::Xml> xml);
 
     /**
      * Delete all plugin and Modeling document class.
@@ -127,6 +127,7 @@ public:
     PluginFactory& pluginFactory()
     { return mPluginFactory; }
 
+    bool on_focus_in_event(GdkEventFocus* type);
     bool on_delete_event(GdkEventAny* event);
 
     /**
@@ -452,6 +453,9 @@ public:
     /** Paste selected model list from CutCopyPaste into this GCoupledModel.  */
     void onPasteModel();
 
+     /** Select all models in current VPZ */
+    void onSelectAll();
+
     /********************************************************************
      *
      * MENU PACKAGE
@@ -707,10 +711,10 @@ public:
 
 
     /*********************************************************************
-       *
-       * MENU HELP
-       *
-       *********************************************************************/
+     *
+     * MENU HELP
+     *
+     *********************************************************************/
 
 
     /**
