@@ -40,9 +40,7 @@
 #include <list>
 #include <map>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 class ViewMenu;
@@ -112,11 +110,11 @@ public:
     }
 
     inline CompleteViewDrawingArea* getCompleteArea() {
-	return mCompleteDrawing;
+        return mCompleteDrawing;
     }
 
     inline SimpleViewDrawingArea* getSimpleArea() {
-	return mSimpleDrawing;
+        return mSimpleDrawing;
     }
 
     //
@@ -174,9 +172,7 @@ public:
     }
 
     /** Clean selected models list. */
-    inline void clearSelectedModels() {
-        mSelectedModels.clear();
-    }
+    void clearSelectedModels();
 
     /**
      * @brief Get first selected models from list.
@@ -260,6 +256,9 @@ public:
      */
     void onPasteModel();
 
+     /** Select all models in VPZ. */
+    void onSelectAll(graph::CoupledModel* cModel);
+
     //
     //
     // MANAGE MODELS
@@ -273,7 +272,7 @@ public:
      */
     void removeFromSelectedModel(graph::Model* mdl);
 
-	/**
+     /**
      * Add a single atomic model in position x, y.
      *
      * @param x new position of atomic model
@@ -356,7 +355,6 @@ private:
     GVLE::ButtonType            mCurrentButton;
 };
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
 
 #endif

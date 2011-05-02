@@ -307,6 +307,16 @@ void DocumentText::cut()
     buffer->cut_clipboard(clipboard);
 }
 
+void DocumentText::selectAll()
+{
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+#else
+    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+#endif
+    buffer->select_range(buffer->begin(), buffer->end());
+}
+
 void DocumentText::onChanged()
 {
     if (not isModified()) {
@@ -510,8 +520,6 @@ Gtk::HBox* Editor::addLabel(const std::string& title,
 
 void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
 {
-
-
     if (mApp->getCurrentTab() != num) {
         Gtk::Widget* tab = get_nth_page(num);
         Documents::iterator it = mDocuments.begin();
@@ -539,6 +547,19 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
             }
             ++it;
         }
+    }
+}
+
+void Editor::refreshTab() {
+    Documents::iterator it = mDocuments.begin();
+
+    while (it != mDocuments.end()) {
+        if (it->second == get_nth_page(mApp->getCurrentTab()) and
+            utils::Path::extension(it->first) != ".vpz") 
+        {
+            mApp->getMenu()->onOpenFile();
+        }
+        ++it;
     }
 }
 

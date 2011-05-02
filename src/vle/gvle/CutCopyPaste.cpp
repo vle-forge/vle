@@ -175,6 +175,10 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
     }
 }
 
+bool CutCopyPaste::paste_is_empty() { 
+    return mList_graph.empty();
+}
+
 /*********************************************************************
  *
  * PRIVATE FUNCTION

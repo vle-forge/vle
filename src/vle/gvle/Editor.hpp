@@ -129,6 +129,7 @@ public:
     void paste();
     void copy();
     void cut();
+    void selectAll();
 
     std::string getBuffer();
 
@@ -233,6 +234,7 @@ public:
     void changeFile(const std::string& oldName, const std::string& newName);
 
     void changeTab(GtkNotebookPage* page, int num);
+    void refreshTab();
 
     void closeAllTab();
     void closeTab(const std::string& filepath);
