@@ -4,6 +4,39 @@ VLE 1.1.0-dev
 Nothing
 
 
+VLE 1.0.0-alpha6
+================
+
+A debug release
+
+Application
+~~~~~~~~~~~
+
+- gvle:
+  - Add multiple selection to the Observable Editor:
+    - Observables and Views columns are now multiple selectable in
+      ObsAndViewBox.
+    - Treatments have beed added to manage many rows selected in each columns.
+      (Closes: #3290348)
+  - Update the view selection mechanism:
+    - Remove the Drag'n Drop system of the ObsAndViewBox dialog.
+    - Add 2 buttons to add and delete Views in Observables. (Closes: #3290338)
+  - Add an include field in DE plug-in:
+    - Add an Include text field in DifferenceEquation.glade.
+    - Add a variable "mInclude" in "SourceDialog" class and linked treatments.
+    - Edit Generic, Multiple and Simple classes to manage "mInclude" in order
+      to insert it in the ".cpp" generated file. (Closes: #3285682)
+  - Fix editing experimental condition:
+    - The ConditionBox class manage and return a list of renamed experimental
+      condition.
+    - In AtomicModelBox and GVLE classes a treatment to manage the
+      ConditionBox's renameList has been added.
+    - When a experimental condition is renamed, a treatment to update all of
+      the project models and class models is provided.
+    - Add a method applyRemoved in AtomicModelBox and GVLE classes to manage
+      the removing condition case in all of project models and class models.
+      (Closes: #3009808)
+
 
 VLE 1.0.0-alpha5
 ================
