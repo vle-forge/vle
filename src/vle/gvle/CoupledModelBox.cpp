@@ -434,9 +434,10 @@ void CoupledModelBox::OutputPortTreeView::onEdition(
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-                                 Modeling* m):
+                                 Modeling* m, GVLE* gvle):
     mXml(xml),
     mModeling(m),
+    mGVLE(gvle),
     mGraphModel(0),
     mCurrentGraphModel(0)
 {
@@ -539,7 +540,7 @@ void CoupledModelBox::on_validate()
     applyPorts();
     mDialog->hide_all();
     delete mGraphModel;
-    mModeling->setModified(true);
+    mGVLE->setModified(true);
 }
 
 void CoupledModelBox::on_cancel()

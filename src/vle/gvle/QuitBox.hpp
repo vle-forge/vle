@@ -34,12 +34,13 @@
 
 namespace vle { namespace gvle {
 
-class Modeling;
+// class Modeling;
+class GVLE;
 
 class QuitBox
 {
 public:
-    QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* app);
     virtual ~QuitBox() { }
 
     void show();
@@ -64,7 +65,8 @@ private:
     FileTreeColumn                  mColumns;
     Gtk::TreeView*                  mTreeView;
     Glib::RefPtr<Gtk::TreeStore>    mRefTreeFile;
-    Modeling*                       mModeling;
+    // Modeling*                       mModeling;
+    GVLE*                           mApp;
 
     std::list < std::string >       mFileModified;
 

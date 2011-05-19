@@ -33,13 +33,10 @@
 #include <libglademm.h>
 #include <vle/utils/Path.hpp>
 
-class Modeling;
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
+class GVLE;
 
 /**
  * @brief A window to choice a vpz into a package
@@ -48,7 +45,7 @@ class SaveVpzBox
 {
 public:
 
-   SaveVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    SaveVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
     ~SaveVpzBox();
 
     void show();
@@ -59,6 +56,7 @@ protected:
     Glib::RefPtr<Gnome::Glade::Xml> mXml;
     Gtk::Dialog*                    mDialog;
     Modeling*                       mModeling;
+    GVLE*                           mGVLE;
 
     // Text Entry
     Gtk::Entry*                     mEntryName;
@@ -75,7 +73,6 @@ protected:
 
 };
 
-}
-}
+}} // namespace vle gvle
 
 #endif

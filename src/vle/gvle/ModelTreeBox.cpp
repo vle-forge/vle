@@ -79,7 +79,7 @@ bool ModelTreeBox::onSelect(
     const Gtk::TreeModel::iterator iter = model->get_iter(path);
 
     View* view =
-        m_modeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
+        m_gvle->getEditor()->getDocumentDrawingArea()->getView();
 
     graph::Model* mdl;
 
@@ -90,15 +90,14 @@ bool ModelTreeBox::onSelect(
             if (info) {
                 view->removeFromSelectedModel(mdl);
             } else {
-                m_modeling->getGVLE()->getModelClassBox()->selectNone();
+                m_gvle->getModelClassBox()->selectNone();
                 if (not view->existInSelectedModels(mdl)) {
                         if(mdl->getParent()) {
-                            m_modeling->addView(mdl->getParent());
+                            m_gvle->addView(mdl->getParent());
                         } else {
-                            m_modeling->addView(mdl);
+                            m_gvle->addView(mdl);
                         }
-                        view =
-                            m_modeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
+                        view = m_gvle->getEditor()->getDocumentDrawingArea()->getView();
                 }
                 view->clearSelectedModels();
                 view->addModelToSelectedModels(mdl);
@@ -148,13 +147,13 @@ void ModelTreeBox::onRenameModels()
 		try {
 		    row[m_modelsColumnRecord.name] = newname;
 		    graph::Model::rename(row[m_columns.mModel], newname);
-		    m_modeling->refreshViews();
-		    m_modeling->setModified(true);
-		} catch(utils::DevsGraphError dge) {
+		    m_gvle->refreshViews();
+                    m_gvle->setModified(true);
+                } catch(utils::DevsGraphError dge) {
 		    row[m_modelsColumnRecord.name] = oldname;
-		}
-	    }
-	}
+                }
+            }
+        }
     }
 }
 
@@ -302,7 +301,7 @@ void ModelTreeBox::row_activated(const Gtk::TreeModel::Path& path,
     if (column) {
         Gtk::TreeIter iter = m_refTreeModel->get_iter(path);
         Gtk::TreeRow row = (*iter);
-        m_modeling->addView(row.get_value(m_columns.mModel));
+        m_gvle->addView(row.get_value(m_columns.mModel));
     }
 }
 
@@ -354,8 +353,8 @@ void ModelTreeBox::onEdition(
 		try {
 		    row[m_modelsColumnRecord.name] = newName;
 		    graph::Model::rename(row[m_columns.mModel], newName);
-		    m_modeling->refreshViews();
-		    m_modeling->setModified(true);
+		    m_gvle->refreshViews();
+                    m_gvle->setModified(true);
 		} catch(utils::DevsGraphError dge) {
 		    row[m_modelsColumnRecord.name] = m_oldName;
 		}

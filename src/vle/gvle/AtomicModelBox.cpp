@@ -625,8 +625,8 @@ AtomicModelBox::ConditionTreeView::getConditions()
 void AtomicModelBox::ConditionTreeView::on_row_activated(
     const Gtk::TreeModel::Path&, Gtk::TreeViewColumn* )
 {
-    if (mModeling->runConditionsBox(*mConditions) == 1) {
-        renameList tmpRename = mModeling->applyConditionsBox(*mConditions);
+    if (mGVLE->runConditionsBox(*mConditions) == 1) {
+        renameList tmpRename = mGVLE->applyConditionsBox(*mConditions);
 
         std::vector < std::string > selected = getConditions();
         renameList::const_iterator it = tmpRename.begin();
@@ -653,8 +653,8 @@ bool AtomicModelBox::ConditionTreeView::on_button_press_event(
 	mMenuPopup.popup(event->button, event->time);
     }
     if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
-	if (mModeling->runConditionsBox(*mConditions) == 1) {
-            renameList tmpRename = mModeling->applyConditionsBox(*mConditions);
+	if (mGVLE->runConditionsBox(*mConditions) == 1) {
+            renameList tmpRename = mGVLE->applyConditionsBox(*mConditions);
 
             std::vector < std::string > selected = getConditions();
 
@@ -945,7 +945,7 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                 utils::Template tpl;
                 tpl.open(newTab);
                 tpl.tag(pluginname, conf);
-                PluginFactory& plf = mModeling->getGVLE()->pluginFactory();
+                PluginFactory& plf = mGVLE->pluginFactory();
                 PluginFactory::ModelingPlg& plugin(plf.getModeling(pluginname));
 
                 if (plugin.plugin()->modify(*mAtom, *mModel, dynamic,
@@ -970,7 +970,7 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                 }
             } catch(...) {
                 mParent->on_apply();
-                mModeling->getGVLE()->getEditor()->openTab(newTab);
+                mGVLE->getEditor()->openTab(newTab);
             }
 	} else {
             Error((fmt(_("The source file '%1%'.cpp does not exist")) %
@@ -991,7 +991,7 @@ void AtomicModelBox::DynamicTreeView::onAdd()
             Error((fmt(_("The Dynamics '%1%' already exists")) % name).str());
         } else {
             vpz::Dynamic dyn(name);
-            DynamicBox mDynamicBox(mXml, mModeling->getGVLE(),
+            DynamicBox mDynamicBox(mXml, mGVLE,
                                    *mAtom, *mModel, dyn, *mConditions,
                                    *mObservables);
             mDynamicBox.show(&dyn);
@@ -1025,7 +1025,7 @@ void AtomicModelBox::DynamicTreeView::onEdit()
         if (not dyn.empty()) {
             vpz::Dynamic& dynamic(mDynamics->get(dyn));
             DynamicBox mDynamicBox(mXml,
-                                   mModeling->getGVLE(),
+                                   mGVLE,
                                    *mAtom, *mModel, dynamic,
                                    *mConditions, *mObservables);
             mDynamicBox.show(&dynamic);
@@ -1534,9 +1534,10 @@ std::string AtomicModelBox::ObservableTreeView::getObservable()
 // AtomicModelBox
 
 AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-			       Modeling* m):
+			       Modeling* m, GVLE* gvle):
     mXml(xml),
     mModeling(m),
+    mGVLE(gvle),
     mModel(0),
     mGraphModel(0),
     mCond(0),
@@ -1603,6 +1604,7 @@ void AtomicModelBox::show(graph::AtomicModel* model,
 
     mConditions->setModel(mModel);
     mConditions->setModeling(mModeling);
+    mConditions->setGVLE(mGVLE);
     mConditions->setLabel(mLabelConditions);
     mConditions->setConditions(mCond);
     mConditions->clearRenaming();
@@ -1611,6 +1613,7 @@ void AtomicModelBox::show(graph::AtomicModel* model,
     mDynamics->setModel(mModel);
     mDynamics->setGraphModel(mGraphModel);
     mDynamics->setModeling(mModeling);
+    mDynamics->setGVLE(mGVLE);
     mDynamics->setLabel(mLabelDynamics);
     mDynamics->setDynamics(mDyn);
     mDynamics->setConditions(mCond);

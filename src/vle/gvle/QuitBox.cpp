@@ -26,15 +26,16 @@
  */
 
 
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/OpenPackageBox.hpp>
-#include <vle/gvle/Modeling.hpp>
+// #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
 
 namespace vle { namespace gvle {
 
-QuitBox::QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m) :
+QuitBox::QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* app) :
     mXml(xml),
-    mModeling(m)
+    mApp(app)
 {
     xml->get_widget("DialogQuit", mDialog);
 
@@ -75,13 +76,13 @@ void QuitBox::show()
 	mDialog->show_all();
 	mDialog->run();
     } else {
-	mModeling->hideGVLE();
+	mApp->hide();
     }
 }
 
 void QuitBox::build()
 {
-    const Editor::Documents& documents(mModeling->getDocuments());
+    const Editor::Documents& documents(mApp->getEditor()->getDocuments());
     Editor::Documents::const_iterator it = documents.begin();
 
     mRefTreeFile->clear();
@@ -102,15 +103,15 @@ void QuitBox::build()
 
 void QuitBox::onSave()
 {
-    Editor* editor = mModeling->getGVLE()->getEditor();
+    Editor* editor = mApp->getEditor();
     std::list < std::string >::iterator it = mFileModified.begin();
 
     while (it != mFileModified.end()) {
 	editor->focusTab(*it);
-        mModeling->getGVLE()->onSave();
+        mApp->onSave();
 	++it;
     }
-    mModeling->hideGVLE();
+    mApp->hide();
 }
 
 void QuitBox::onCancel()
@@ -120,7 +121,7 @@ void QuitBox::onCancel()
 
 void QuitBox::onClose()
 {
-    mModeling->hideGVLE();
+    mApp->hide();
 }
 
 }} // namespace vle gvle

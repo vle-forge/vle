@@ -41,7 +41,7 @@ class Modeling;
 class NewModelClassBox
 {
 public:
-    NewModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    NewModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
 
     ~NewModelClassBox();
 
@@ -63,6 +63,7 @@ class ModelColumns : public Gtk::TreeModel::ColumnRecord
 private:
     Glib::RefPtr<Gnome::Glade::Xml>        mXml;
     Modeling*                              mModeling;
+    GVLE*                                  mGVLE;
 
     Gtk::Dialog*                           mDialog;
     Gtk::Entry*                            mEntryClassName;

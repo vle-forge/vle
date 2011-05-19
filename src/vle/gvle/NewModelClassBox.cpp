@@ -35,9 +35,11 @@ namespace vle
 {
 namespace gvle {
 
-NewModelClassBox::NewModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
+NewModelClassBox::NewModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                                   Modeling* m, GVLE* gvle):
         mXml(xml),
-        mModeling(m)
+        mModeling(m),
+        mGVLE(gvle)
 {
     xml->get_widget("DialogNewModelClass", mDialog);
 
@@ -103,12 +105,13 @@ void NewModelClassBox::on_apply()
     if (model_type == "Atomic") {
         graph::Model* model = new graph::AtomicModel(model_name, NULL);
         new_class.setModel(model);
-        mModeling->vpz().project().classes().get(class_name).atomicModels().add(model, vpz::AtomicModel("", "", ""));
+        mModeling->vpz().project().classes().get(class_name).atomicModels().
+            add(model, vpz::AtomicModel("", "", ""));
     } else {
         new_class.setModel(new graph::CoupledModel(model_name, NULL));
     }
 
-    mModeling->getGVLE()->redrawModelClassBox();
+    mGVLE->redrawModelClassBox();
     mDialog->hide_all();
 }
 

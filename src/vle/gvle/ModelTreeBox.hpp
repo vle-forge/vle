@@ -44,6 +44,7 @@ class CoupledModel;
 namespace vle { namespace gvle {
 
 class Modeling;
+class GVLE;
 
 /**
  * @brief A Gtk::Window to show the graph::Model hierarchy into a window.
@@ -106,8 +107,8 @@ public:
      * @param modeling the new value
      *
      */
-    inline void setModeling(Modeling* modeling)
-	{ m_modeling = modeling; }
+    inline void setModelingGVLE(Modeling* modeling, GVLE* gvle)
+	{ m_modeling = modeling; m_gvle = gvle; }
 
     /**
      * @brief Clear the current Treeview
@@ -202,6 +203,7 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
     Glib::RefPtr<Gtk::TreeStore> m_refTreeModel;
     Gtk::Menu                    m_menu;
     Modeling*                    m_modeling;
+    GVLE*                        m_gvle;
     std::string                  m_search;
 
     // Cell

@@ -73,6 +73,7 @@ ViewDrawingArea::ViewDrawingArea(View* view)
     mView = view;
     mCurrent = view->getGCoupledModel();
     mModeling = view->getModeling();
+    mGVLE = view->getGVLE();
 
     set_has_tooltip();
     signal_query_tooltip().connect(
@@ -623,40 +624,42 @@ void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
             if (state == false) {
                 mView->clearSelectedModels();
                 if (mView->isClassView()) {
-                    mModeling->getGVLE()->getModelTreeBox()->selectNone();
-                    mModeling->getGVLE()->getModelClassBox()->showRow(mdl);
+                    mGVLE->getModelTreeBox()->selectNone();
+                    mGVLE->getModelClassBox()->showRow(mdl);
                 } else{
-                    mModeling->getGVLE()->getModelClassBox()->selectNone();
-                    mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+                    mGVLE->getModelClassBox()->selectNone();
+                    mGVLE->getModelTreeBox()->showRow(mdl);
                 }
             } else {
                 graph::Model* mod = mView->getFirstSelectedModels();
                 if (mod == 0) {
                     if (mView->isClassView()) {
-                        mModeling->getGVLE()->getModelTreeBox()->selectNone();
-                        mModeling->getGVLE()->getModelClassBox()->showRow(mdl);
+                        mGVLE->getModelTreeBox()->selectNone();
+                        mGVLE->getModelClassBox()->showRow(mdl);
                     } else{
-                        mModeling->getGVLE()->getModelClassBox()->selectNone();
-                        mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+                        mGVLE->getModelClassBox()->selectNone();
+                        mGVLE->getModelTreeBox()->showRow(mdl);
                     }
                 } else if (mView->getAllSelectedModels().size() == 1) {
                     if (mView->isClassView()) {
-                        mModeling->getGVLE()->getModelTreeBox()->selectNone();
-                        mModeling->getGVLE()->getModelClassBox()->selectNone();
+                        mGVLE->getModelTreeBox()->selectNone();
+                        mGVLE->getModelClassBox()->selectNone();
                     } else {
-                        mModeling->getGVLE()->getModelClassBox()->selectNone();
-                        mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                        mGVLE->getModelClassBox()->selectNone();
+                        mGVLE->getModelTreeBox()->selectNone();
                     }
                     mView->addModelToSelectedModels(mod);
                 }
             }
+            mGVLE->getMenu()->showCopyCut();
             mView->addModelToSelectedModels(mdl);
         }
     } else {
         if (mView->isClassView()) {
         } else {
-            mModeling->getGVLE()->getModelTreeBox()->selectNone();
+            mGVLE->getModelTreeBox()->selectNone();
         }
+        mGVLE->getMenu()->hideCopyCut();
         mView->clearSelectedModels();
         mPrecMouse = mMouse;
         queueRedraw();
@@ -671,10 +674,10 @@ void ViewDrawingArea::delUnderMouse(int x, int y)
         mView->delModel(model);
     } else {
         delConnection();
-        mModeling->setModified(true);
+        mGVLE->setModified(true);
     }
 
-    mModeling->getGVLE()->getMenu()->showCopyCut();
+    mGVLE->getMenu()->showCopyCut();
     queueRedraw();
 }
 
@@ -898,7 +901,7 @@ void ViewDrawingArea::selectZoom(int xmin, int ymin, int xmax, int ymax)
     mContext->set_font_size(Settings::settings().getFontSize());
     newSize();
 
-    mModeling->updateAdjustment(xmin * mZoom, ymin * mZoom);
+    mGVLE->updateAdjustment(xmin * mZoom, ymin * mZoom);
 }
 
 void ViewDrawingArea::setCoefZoom(double coef)

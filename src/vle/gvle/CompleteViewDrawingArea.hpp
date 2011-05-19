@@ -132,6 +132,7 @@ namespace vle { namespace gvle {
 	 * @param color the color to draw
 	 */
         void drawChildrenModel(graph::Model* model,
+
 			       const Gdk::Color& color);
 
 	/**

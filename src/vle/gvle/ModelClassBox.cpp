@@ -26,6 +26,7 @@
  */
 
 
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Message.hpp>
@@ -85,8 +86,7 @@ bool ModelClassBox::onSelect(
 {
     const Gtk::TreeModel::iterator iter = model->get_iter(path);
 
-    View* view =
-        mModeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
+    View* view = mGVLE->getEditor()->getDocumentDrawingArea()->getView();
 
     graph::Model* mdl;
 
@@ -97,24 +97,26 @@ bool ModelClassBox::onSelect(
             if (info) {
                 view->removeFromSelectedModel(mdl);
             } else {
-                mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                mGVLE->getModelTreeBox()->selectNone();
                 if (not view->existInSelectedModels(mdl)) {
                     if(mdl->getParent()) {
-                        mModeling->addViewClass(mdl->getParent(),
+                        mGVLE->addViewClass(mdl->getParent(),
                                                 getClassName(path));
+                        mGVLE->getEditor()->
+                            openTabVpz(mModeling->getFileName(), mdl->getParent());
                     } else {
-                        mModeling->addViewClass(mdl,
+                        mGVLE->addViewClass(mdl,
                                                 getClassName(path));
                     }
-                    view = mModeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
+                    view = mGVLE->getEditor()->getDocumentDrawingArea()->getView();
                 }
                 view->clearSelectedModels();
                 view->addModelToSelectedModels(mdl);
             }
             view->redraw();
         } else {
-            mModeling->getGVLE()->getModelTreeBox()->selectNone();
-            mModeling->addViewClass(mModeling->getClassModel(row.get_value(mColumns.mName)),
+            mGVLE->getModelTreeBox()->selectNone();
+            mGVLE->addViewClass(mModeling->getClassModel(row.get_value(mColumns.mName)),
                                     row.get_value(mColumns.mName));
         }
     }
@@ -173,10 +175,11 @@ void ModelClassBox::on_cursor_changed()
     }
 }
 
-void ModelClassBox::createNewModelBox(Modeling* m)
+void ModelClassBox::createNewModelBox(Modeling* m, GVLE* gvle)
 {
     mModeling = m;
-    mNewModelBox = new NewModelClassBox(mXml,m);
+    mGVLE = gvle;
+    mNewModelBox = new NewModelClassBox(mXml, m, gvle);
 }
 
 void ModelClassBox::initMenuPopupModels()
@@ -276,8 +279,8 @@ void ModelClassBox::onRemove()
                 row.get_value(mColumns.mName));
             if (class_.model()->isCoupled()) {
                 graph::CoupledModel* c_model = dynamic_cast<graph::CoupledModel*>(class_.model());
-                if (mModeling->existView(c_model)) {
-                    mModeling->delViewOnModel(c_model);
+                if (mGVLE->existView(c_model)) {
+                    mGVLE->delViewOnModel(c_model);
                 }
             }
             mModeling->vpz().project().classes().del(row.get_value(mColumns.mName));
@@ -309,7 +312,7 @@ void ModelClassBox::onRename()
                     try {
                         row[mColumns.mName] = newname;
                         graph::Model::rename(row[mColumns.mModel], newname);
-                        mModeling->setModified(true);
+                        mGVLE->setModified(true);
                     } catch(utils::DevsGraphError dge) {
                         row[mColumns.mName] = oldname;
                     }
@@ -334,9 +337,10 @@ void ModelClassBox::onRenameClass(const std::string& newName)
         graph::CoupledModel* c_model =
             dynamic_cast<graph::CoupledModel*>(oldClass.model());
 
-        if (mModeling->existView(c_model)) {
-            mModeling->delViewOnModel(c_model);
-            mModeling->addViewClass(c_model, newName);
+        if (mGVLE->existView(c_model)) {
+            mGVLE->delViewOnModel(c_model);
+            mGVLE->addViewClass(c_model, newName);
+            mGVLE->getEditor()->openTabVpz(mModeling->getFileName(), c_model);
         }
     }
     mModeling->vpz().project().classes().get(mOldName).setModel(0);
@@ -419,8 +423,8 @@ void ModelClassBox::onImportClassesFromVpz()
         std::string project_file = file.get_filename();
         try {
             vpz::Vpz* import = new vpz::Vpz(project_file);
-            mModeling->setModified(true);
-            mModeling->importClasses(import);
+            mGVLE->setModified(true);
+            mGVLE->importClasses(import);
             delete import;
         } catch (std::exception& E) {
             Error(E.what());
@@ -543,11 +547,11 @@ void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
         Gtk::TreeIter iter = mRefTreeModel->get_iter(path);
         Gtk::TreeRow row = (*iter);
         if (mRefTreeModel->iter_depth(iter) == 0) {
-            mModeling->addViewClass(
+            mGVLE->addViewClass(
                 mModeling->getClassModel(row.get_value(mColumns.mName)),
                 row.get_value(mColumns.mName));
         } else {
-            mModeling->addViewClass(row.get_value(mColumns.mModel),
+            mGVLE->addViewClass(row.get_value(mColumns.mModel),
                                     getClassName(path));
         }
     }
@@ -609,7 +613,7 @@ void ModelClassBox::onEdition(
                     try {
                         row[mColumns.mName] = newName;
                         graph::Model::rename(row[mColumns.mModel], newName);
-                        mModeling->setModified(true);
+                        mGVLE->setModified(true);
                     } catch(utils::DevsGraphError dge) {
                         row[mColumns.mName] = mOldName;
                     }

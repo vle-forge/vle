@@ -32,7 +32,6 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
-#include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -49,10 +48,6 @@
 
 namespace vle { namespace gvle {
 
-class AtomicModelBox;
-class ImportModelBox;
-class ImportClassesBox;
-class CoupledModelBox;
 class View;
 
 /**
@@ -69,9 +64,6 @@ public:
     /** define associative map from graph::model name and is reference. */
     typedef std::map < std::string, graph::Model * > MapStringModel;
 
-    /** define vector of current view. */
-    typedef std::vector < View * > ListView;
-
     /** define set of string represent current models names. */
     typedef std::set < std::string > SetString;
 
@@ -81,7 +73,7 @@ public:
      * @param gvle to get information on graphics interface.
      * @param filename project file to load.
      */
-    Modeling(GVLE* gvle, const std::string& filename = std::string());
+    Modeling(const std::string& filename = std::string());
 
     /**
      * delete all models and view.
@@ -100,25 +92,9 @@ public:
 
     /********************************************************************
      *
-     * START, XML LOADING AND SAVE
+     * XML LOADING AND SAVE
      *
      ********************************************************************/
-
-
-    /**
-     * @brief delete all models and views and restart with one view.
-     *
-     */
-    void start();
-
-    /**
-     * @brief delete all models and views and restart with one view.
-     *
-     * @param path path where the vpz file is wanted to be stored
-     * @param fileName vpz file name
-     *
-     */
-    void start(const std::string& path, const std::string& fileName);
 
     /**
      * parse XML project file to get filename of XML files structures and
@@ -185,7 +161,7 @@ public:
      *
      * @param name of class model to delete
      */
-    inline vpz::AtomicModelList& getAtomicModelClass(std::string className);
+    vpz::AtomicModelList& getAtomicModelClass(std::string className);
 
     /**
      * add a new list of atomic model for a class
@@ -197,6 +173,9 @@ public:
                                     graph::AtomicModel* new_atom)
         { vpz().project().classes().get(className).atomicModels().add(
                 new_atom, vpz::AtomicModel("", "", "")); }
+
+    std::string getSelectedClass()
+        { return mSelectedClass; }
 
     void setSelectedClass(const std::string& name)
         { mSelectedClass = name; }
@@ -241,130 +220,11 @@ public:
      */
     void showDynamics(const std::string& name);
 
-    /**
-     * add a view to modeling for the GModel model.
-     *
-     * @param model a ptr to the GModel to show.
-     */
-    void addView(graph::Model* model);
-
-    /**
-     * find a view in list view that reference a GCoupledModel.
-     * @param model reference to GCoupledModel to find.
-     * @return int index in list view for founded view or first index with
-     * null value
-     */
-    void addView(graph::CoupledModel* model);
-
-    /**
-     * add a view to the current class
-     *
-     * @param model to ptr to the GModel assiociate to the class
-     */
-    void addViewClass(graph::Model* model, std::string name);
-
-    /**
-     * find a view in list view that reference a GCoupledModel.
-     * @param model reference to GCoupledModel to find.
-     */
-
-    void addViewClass(graph::CoupledModel* model, std::string name);
-
-    /**
-     * Return True if a View of the parameter already exist.
-     * @param model reference to GCoupledModel to find.
-     * @return Return True if the View exist , False otherwise
-     */
-    bool existView(graph::CoupledModel* model);
-
-    /**
-     * Return the View that reference the model.
-     * @param model reference to GCoupledModel to find.
-     * @return Return the View if exist , NULL otherwise
-     */
-    View* findView(graph::CoupledModel* model);
-
-    /**
-     * delete a view from model view.
-     *
-     * @param index num of window to delete.
-     */
-    void delViewIndex(size_t index);
-
-    /**
-     * delete all view where coupled model is equal to cm.
-     *
-     * @param cm a ptr to graph::CoupledModel to delete view.
-     */
-    void delViewOnModel(const graph::CoupledModel* cm);
-
-    /**
-     * delete all view of modeling.
-     *
-     */
-    void delViews();
-
-
-    void refreshViews();
-
-    void EditCoupledModel(graph::CoupledModel* model);
-
-    /**
-     * @brief Assign a new titles to all gvle::View.
-     */
-    void setTitles();
-
-    /**
-     * @brief Assign a new titles to all gvle::View and an asterisk to inform
-     * that this model is modified.
-     */
-    void setModifiedTitles();
-
-
-    /********************************************************************
-     *
-     * MANAGE GVLE INTERFACE
-     *
-     ********************************************************************/
-
-
-    /**
-     * get current button selected in GVLE panel.
-     *
-     * @return selected button.
-     */
-    inline GVLE::ButtonType getCurrentButton() const
-        { return mGVLE->getCurrentButton(); }
-
-    /**
-     * return a ptr to application GVLE.
-     *
-     * @return ptr to application GVLE.
-     */
-    inline const GVLE* getGVLE() const
-        { return mGVLE; }
-
-    inline GVLE* getGVLE()
-        { setModified(true); return mGVLE; }
-
-    inline void hideGVLE()
-        { mGVLE->hide(); }
-
-    inline const Editor::Documents& getDocuments() const
-        { return mGVLE->getEditor()->getDocuments(); }
-
-    inline int runConditionsBox(const vpz::Conditions& conditions)
-        { return mGVLE->runConditionsBox(conditions); }
-
-    inline renameList applyConditionsBox(vpz::Conditions& conditions)
-        { return mGVLE->applyConditionsBox(conditions); }
-
     /********************************************************************
      *
      * OTHER USEFULL FUNCTION
      *
      ********************************************************************/
-
 
     /**
      * return true if a model with name 'name' already exist in tree.
@@ -382,46 +242,6 @@ public:
      */
     bool exist(const graph::Model* m) const;
 
-
-    /********************************************************************
-     *
-     * CUT COPY AND PASTE
-     *
-     ********************************************************************/
-
-
-    /**
-     * clone the ListGModel if has no connection with external model.
-     *
-     * @param lst list of selected GModel.
-     * @param gc parent of selected GModel.
-     */
-    void cut(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
-
-    /**
-     * detach the list of GModel of GCoupledModel parent.
-     *
-     * @param lst list of selected GModel.
-     * @param gc parent of selected GModel.
-     */
-    void copy(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
-
-    /**
-     * paste the current list GModel into GCoupledModel ; rename
-     * models to elimiante duplicated name.
-     *
-     * @param gc paste selected GModel under this GCoupledModel.
-     */
-    void paste(graph::CoupledModel* gc, std::string className);
-
-    /**
-     * select all models in the current list GModel.
-     *
-     * @param lst list of selected GModel.
-     */
-    void selectAll(graph::ModelList& lst, graph::CoupledModel* gc);
-
-    bool paste_is_empty();
 
     /********************************************************************
      *
@@ -453,7 +273,9 @@ public:
      *
      * @param modified true if document is modified, otherwise false.
      */
-    void setModified(bool modified);
+    inline void setModified(bool modified){
+        mIsModified = modified;
+    }
 
     /**
      * Set document save.
@@ -502,11 +324,9 @@ public:
 
     void exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst, std::string className);
 
-    void importModel(graph::CoupledModel* parent, vpz::Vpz* src);
+    void importModel(graph::Model* import, vpz::Vpz* src);
 
     void importModelToClass(vpz::Vpz* src, std::string& className);
-
-    void importClasses(vpz::Vpz* src);
 
     void exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst);
 
@@ -706,12 +526,6 @@ public:
         const std::string& description,
         int x, int y);
 
-    void renameModel(graph::Model* model,
-                     const std::string& name,
-                     const std::string& description);
-
-    void delModel(graph::Model* model, std::string className);
-
     inline const vpz::Vpz& vpz() const {
         return mVpz;
     }
@@ -726,9 +540,6 @@ public:
      * MANAGE THE DRAWING SETTINGS
      *
      ********************************************************************/
-
-    inline void updateAdjustment(double h, double v)
-    { return mGVLE->updateAdjustment(h, v); }
 
     inline utils::Rand* getRand() const
     { return mRand; }
@@ -768,20 +579,13 @@ private:
     graph::CoupledModel*        mTop;
     std::string                 mCurrentClass;
     std::string                 mSelectedClass;
-    GVLE*                       mGVLE;
     utils::Rand*                mRand;
-    ListView                    mListView;
-    CutCopyPaste                mCutCopyPaste;
     bool                        mIsModified;
     bool                        mIsSaved;
     bool                        mIsCompressed;
     std::string                 mFileName;
     SetString                   mModelsNames;
     int                         mSocketPort;
-    AtomicModelBox*             mAtomicBox;
-    ImportModelBox*             mImportModelBox;
-    ImportClassesBox*           mImportClassesBox;
-    CoupledModelBox*            mCoupledBox;
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
@@ -791,8 +595,6 @@ private:
     void import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom, std::string className = "");
     void import_coupled_model(vpz::Vpz* src, graph::CoupledModel* atom, std::string className = "");
 };
-
-void parse_model(vpz::AtomicModelList& list);
 
 } } // namespace vle gvle
 

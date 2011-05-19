@@ -37,6 +37,7 @@
 namespace vle { namespace gvle {
 
 class Modeling;
+class GVLE;
 
 /**
  * @brief A Gtk::Window to show the vpz::Class hierarchy into a window.
@@ -94,7 +95,7 @@ public:
      * @brief init the NewModelClassBox
      *
      */
-    void createNewModelBox(Modeling* m);
+    void createNewModelBox(Modeling* m, GVLE* GVLE);
 
     /**
      * @brief Clear the current Treeview
@@ -192,6 +193,7 @@ private:
 
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
+    GVLE*                                mGVLE;
     NewModelClassBox*                    mNewModelBox;
     Gtk::Menu                            mMenuPopup;
 

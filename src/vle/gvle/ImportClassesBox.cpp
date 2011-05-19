@@ -111,9 +111,10 @@ void ImportClassesBox::ClassesTreeView::on_drag_data_received(
  * ImportClassesBox
  */
 ImportClassesBox::ImportClassesBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-				   Modeling* modeling) :
+				   Modeling* modeling, GVLE* gvle) :
     mXml(xml),
-    mModeling(modeling)
+    mModeling(modeling),
+    mGVLE(gvle)
 {
     xml->get_widget("DialogImportClassesBox", mDialog);
 
@@ -198,7 +199,7 @@ void ImportClassesBox::add_coupled_model_to_class(graph::CoupledModel* model,
 void ImportClassesBox::onClose()
 {
     mDialog->hide_all();
-    mModeling->getGVLE()->redrawModelClassBox();
+    mGVLE->redrawModelClassBox();
 }
 
 }}

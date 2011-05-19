@@ -46,11 +46,12 @@
 namespace vle { namespace gvle {
 
     class Modeling;
+    class GVLE;
 
     class ViewOutputBox
     {
     public:
-        ViewOutputBox(Modeling& modeling,
+        ViewOutputBox(Modeling& modeling, GVLE* gvle,
                       Glib::RefPtr < Gnome::Glade::Xml > ref,
                       vpz::Views& views);
 
@@ -88,6 +89,7 @@ namespace vle { namespace gvle {
 
     private:
         Modeling&      m_modeling;
+        GVLE*          m_GVLE;
 
         /** A copy of the vpz::Views, filled when user modify datas */
         vpz::Views          m_viewscopy;

@@ -49,10 +49,11 @@ using std::vector;
 
 namespace vle { namespace gvle {
 
-View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
+View::View(Modeling* m, graph::CoupledModel* c, size_t index, GVLE* gvle) :
         mModeling(m),
         mCurrent(c),
         mIndex(index),
+        mGVLE(gvle),
         mDestinationModel(NULL)
 {
     assert(m);
@@ -83,8 +84,7 @@ void View::initAllOptions()
 
     switch (current) {
     case GVLE::VLE_GVLE_POINTER:
-        mModeling->getGVLE()->
-            get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
+        mGVLE->get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
         break;
     case GVLE::VLE_GVLE_ADDMODEL:
     case GVLE::VLE_GVLE_GRID:
@@ -93,12 +93,10 @@ void View::initAllOptions()
     case GVLE::VLE_GVLE_ZOOM:
     case GVLE::VLE_GVLE_QUESTION:
     case GVLE::VLE_GVLE_PLUGINMODEL:
-        mModeling->getGVLE()->
-            get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
+        mGVLE->get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
         break;
     case GVLE::VLE_GVLE_DELETE:
-        mModeling->getGVLE()->
-            get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
+        mGVLE->get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
         break;
     }
 }
@@ -106,7 +104,7 @@ void View::initAllOptions()
 bool View::on_delete_event(GdkEventAny* event)
 {
     if (event->type == GDK_DELETE) {
-        mModeling->delViewIndex(mIndex);
+        mGVLE->delViewIndex(mIndex);
         return true;
     }
     return false;
@@ -116,8 +114,7 @@ bool View::on_delete_event(GdkEventAny* event)
 bool View::on_focus_in_event(GdkEventFocus* event)
 {
     if (event->in == TRUE) {
-        mModeling->getGVLE()->
-            showRowTreeBox(mCurrent->getName());
+        mGVLE->showRowTreeBox(mCurrent->getName());
     }
     return true;
 }
@@ -139,14 +136,14 @@ void View::addModelToSelectedModels(graph::Model* m)
             clearSelectedModels();
         }
         mSelectedModels[m->getName()] = m;
-        mModeling->getGVLE()->getMenu()->showCopyCut();
+        mGVLE->getMenu()->showCopyCut();
     }
 }
 
 void View::clearSelectedModels()
 {
         mSelectedModels.clear();
-        mModeling->getGVLE()->getMenu()->hideCopyCut();
+        mGVLE->getMenu()->hideCopyCut();
 }
 
 graph::Model* View::getFirstSelectedModels()
@@ -164,8 +161,8 @@ void View::clearCurrentModel()
     if (gvle::Question(_("All children model will be deleted, continue ?"))) {
         mCurrent->delAllConnection();
         mCurrent->delAllModel();
-        mModeling->vpz().project().model().atomicModels().clear();
-        mModeling->getGVLE()->redrawModelTreeBox();
+	mModeling->vpz().project().model().atomicModels().clear();
+        mGVLE->redrawModelTreeBox();
     }
 }
 
@@ -201,34 +198,12 @@ void View::exportCurrentModel()
     }
 }
 
-void View::importModel()
-{
-    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
-    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    Gtk::FileFilter filter;
-    filter.set_name(_("Vle Project gZipped"));
-    filter.add_pattern("*.vpz");
-    file.add_filter(filter);
-
-    if (file.run() == Gtk::RESPONSE_OK) {
-        string project_file = file.get_filename();
-        try {
-            vpz::Vpz* import = new vpz::Vpz(project_file);
-            mModeling->importModel(mCurrent, import);
-            delete import;
-        } catch (std::exception& E) {
-            Error(E.what());
-        }
-    }
-}
-
 void View::onCutModel()
 {
-    mModeling->setModified(true);
-    mModeling->cut(mSelectedModels, mCurrent, mCurrentClass);
-    mModeling->getGVLE()->redrawModelTreeBox();
-    mModeling->getGVLE()->redrawModelClassBox();
+    mGVLE->setModified(true);
+    mGVLE->cut(mSelectedModels, mCurrent, mCurrentClass);
+    mGVLE->redrawModelTreeBox();
+    mGVLE->redrawModelClassBox();
     mSelectedModels.clear();
     redraw();
 }
@@ -236,9 +211,9 @@ void View::onCutModel()
 void View::onCopyModel()
 {
     if (existInSelectedModels(mCurrent)) {
-        mModeling->copy(mSelectedModels, mCurrent->getParent(), mCurrentClass);
+        mGVLE->copy(mSelectedModels, mCurrent->getParent(), mCurrentClass);
     } else {
-        mModeling->copy(mSelectedModels, mCurrent, mCurrentClass);
+        mGVLE->copy(mSelectedModels, mCurrent, mCurrentClass);
     }
     mSelectedModels.clear();
     redraw();
@@ -246,16 +221,16 @@ void View::onCopyModel()
 
 void View::onPasteModel()
 {
-    mModeling->setModified(true);
-    mModeling->paste(mCurrent, mCurrentClass);
-    mModeling->getGVLE()->redrawModelTreeBox();
-    mModeling->getGVLE()->redrawModelClassBox();
+    mGVLE->setModified(true);
+    mGVLE->paste(mCurrent, mCurrentClass);
+    mGVLE->redrawModelTreeBox();
+    mGVLE->redrawModelClassBox();
     redraw();
 }
 
 void View::onSelectAll(graph::CoupledModel* cModel)
 {
-    mModeling->selectAll(mSelectedModels, cModel);
+    mGVLE->selectAll(mSelectedModels, cModel);
     redraw();
 }
 
@@ -286,9 +261,9 @@ void View::addAtomicModel(int x, int y)
                     mModeling->addAtomicModelClass(mCurrentClass, new_atom);
                 }
                 redraw();
-                mModeling->getGVLE()->redrawModelTreeBox();
-                mModeling->getGVLE()->redrawModelClassBox();
-                mModeling->setModified(true);
+		mGVLE->redrawModelTreeBox();
+		mGVLE->redrawModelClassBox();
+                mGVLE->setModified(true);
             } catch (utils::SaxParserError& e) {
                 Error(e.what());
             }
@@ -316,13 +291,13 @@ void View::addCoupledModel(int x, int y)
             try {
                 mCurrent->displace(mSelectedModels, new_gc);
             } catch (const std::exception& e) {
-                mModeling->delViewOnModel(new_gc);
+                mGVLE->delViewOnModel(new_gc);
                 mCurrent->delModel(new_gc);
             }
-            mModeling->getGVLE()->redrawModelTreeBox();
-            mModeling->getGVLE()->redrawModelClassBox();
+            mGVLE->redrawModelTreeBox();
+            mGVLE->redrawModelClassBox();
             mSelectedModels.clear();
-            mModeling->setModified(true);
+            mGVLE->setModified(true);
         } else {
             graph::Model* model = mCurrent->findModel(box->getName());
             bool select = false;
@@ -339,17 +314,17 @@ void View::addCoupledModel(int x, int y)
                 try {
                     mCurrent->displace(mSelectedModels, new_gc);
                 } catch(const std::exception& e) {
-                    mModeling->delViewOnModel(new_gc);
+                    mGVLE->delViewOnModel(new_gc);
                     mCurrent->delModel(new_gc);
                 }
                 if (mCurrent) {
                     new_gc->setParent(mCurrent);
                     mCurrent->addModel(new_gc);
                 }
-                mModeling->getGVLE()->redrawModelTreeBox();
-                mModeling->getGVLE()->redrawModelClassBox();
+                mGVLE->redrawModelTreeBox();
+                mGVLE->redrawModelClassBox();
                 mSelectedModels.clear();
-                mModeling->setModified(true);
+                mGVLE->setModified(true);
             }
         }
     }
@@ -359,12 +334,12 @@ void View::addCoupledModel(int x, int y)
 void View::showModel(graph::Model* model)
 {
     if (not model) {
-        mModeling->EditCoupledModel(mCurrent);
+        mGVLE->EditCoupledModel(mCurrent);
     } else {
-        if (mCurrentClass.empty()) {
-            mModeling->addView(model);
+	if (mCurrentClass.empty()) {
+            mGVLE->addView(model);
         } else {
-            mModeling->addViewClass(model, mCurrentClass);
+            mGVLE->addViewClass(model, mCurrentClass);
         }
     }
 }
@@ -374,13 +349,13 @@ void View::delModel(graph::Model* model)
     if (model) {
         if (gvle::Question(_("Do you really want destroy model ?"))) {
             if (model->isCoupled()) {
-                mModeling->delViewOnModel((graph::CoupledModel*)model);
+                mGVLE->delViewOnModel((graph::CoupledModel*)model);
             }
-            mModeling->delModel(model, mCurrentClass);
+            mGVLE->delModel(model, mCurrentClass);
             mCurrent->delModel(model);
-            mModeling->getGVLE()->redrawModelTreeBox();
-           mModeling->getGVLE()->redrawModelClassBox();
-           mModeling->setModified(true);
+            mGVLE->redrawModelTreeBox();
+	    mGVLE->redrawModelClassBox();
+            mGVLE->setModified(true);
             mSelectedModels.clear();
         }
     }
@@ -388,7 +363,7 @@ void View::delModel(graph::Model* model)
 
 void View::displaceModel(int oldx, int oldy, int x, int y)
 {
-    mModeling->setModified(true);
+    mGVLE->setModified(true);
     if (isEmptySelectedModels() == false) {
         int dx = x - oldx;
         int dy = y - oldy;
@@ -433,7 +408,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  src->getName()).str());
             return;
         }
-        mModeling->setModified(true);
+        mGVLE->setModified(true);
     }
     if (dst == mCurrent and dst->getOutputPortList().empty()) {
         PortDialog box(dst, PortDialog::OUTPUT);
@@ -444,7 +419,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  dst->getName()).str());
             return;
         }
-        mModeling->setModified(true);
+        mGVLE->setModified(true);
     }
     if (src != mCurrent and src->getOutputPortList().empty()) {
         PortDialog box(src, PortDialog::OUTPUT);
@@ -455,7 +430,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  src->getName()).str());
             return;
         }
-        mModeling->setModified(true);
+        mGVLE->setModified(true);
     }
     if (dst != mCurrent and dst->getInputPortList().empty()) {
         PortDialog box(dst, PortDialog::INPUT);
@@ -466,7 +441,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  dst->getName()).str());
             return;
         }
-        mModeling->setModified(true);
+        mGVLE->setModified(true);
     }
 
     ConnectionBox a(mCurrent, src, dst);
@@ -489,7 +464,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                     dst->getName(), dstPort))
                 mCurrent->addInternalConnection(src, srcPort, dst, dstPort);
         }
-        mModeling->setModified(true);
+        mGVLE->setModified(true);
     }
 }
 

@@ -251,6 +251,7 @@ namespace vle { namespace gvle {
         View*                           mView;
         graph::CoupledModel*            mCurrent;
         Modeling*                       mModeling;
+        GVLE*                           mGVLE;
 
         Gdk::Point                      mMouse;
         Gdk::Point                      mPrecMouse;

@@ -44,6 +44,7 @@ namespace vle { namespace gvle {
 
 class Modeling;
 class ViewMenu;
+class GVLE;
 class CompleteViewDrawingArea;
 //class SimpleViewDrawingArea;
 
@@ -55,7 +56,7 @@ class CompleteViewDrawingArea;
 class View
 {
 public:
-    View(Modeling* m, graph::CoupledModel* c, size_t index);
+    View(Modeling* m, graph::CoupledModel* c, size_t index, GVLE* app);
 
     virtual ~View();
 
@@ -67,7 +68,7 @@ public:
      * @return a GVLE::ButtonType
      */
     inline GVLE::ButtonType getCurrentButton() const {
-        return mModeling->getCurrentButton();
+        return mGVLE->getCurrentButton();
     }
 
     /**
@@ -81,6 +82,15 @@ public:
     // GET FUNCTION
     //
     //
+
+    /**
+     * Get GVLE ptr.
+     *
+     * @return ptr to GVLE
+     */
+    inline GVLE* getGVLE() {
+        return mGVLE;
+    }
 
     /**
      * Get document Modeling ptr.
@@ -236,9 +246,6 @@ public:
     /** export the current model into XML file. */
     void exportCurrentModel();
 
-    /** import a model into current GCoupledModel. */
-    void importModel();
-
     //
     //
     // CUT / COPY / PASTE
@@ -346,6 +353,7 @@ private:
     graph::CoupledModel*        mCurrent;
     std::string                 mCurrentClass;
     size_t                      mIndex;
+    GVLE*                       mGVLE;
 
     CompleteViewDrawingArea*    mCompleteDrawing;
     SimpleViewDrawingArea*      mSimpleDrawing;

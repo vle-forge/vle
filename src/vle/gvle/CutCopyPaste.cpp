@@ -26,6 +26,7 @@
  */
 
 
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
