@@ -33,9 +33,10 @@
 
 namespace vle { namespace gvle {
 
-OpenVpzBox::OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m) :
+OpenVpzBox::OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle) :
     mXml(xml),
-    mModeling(m)
+    mModeling(m),
+    mGVLE(gvle)
 {
     xml->get_widget("DialogVpz", mDialog);
 
@@ -107,7 +108,9 @@ void OpenVpzBox::onApply()
 
 	    pathFile += ".vpz";
 
-	    mModeling->parseXML(pathFile);
+            mGVLE->parseXML(pathFile);
+            mGVLE->getEditor()->openTabVpz(mModeling->getFileName(),
+                                           mModeling->getTopModel());
             if (mModeling->getTopModel()) {
                 mDialog->response(Gtk::RESPONSE_OK);
             }

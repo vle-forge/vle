@@ -26,6 +26,7 @@
  */
 
 
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/Message.hpp>
@@ -43,10 +44,10 @@ namespace vu = vle::utils;
 
 namespace vle { namespace gvle {
 
-ViewOutputBox::ViewOutputBox(Modeling& modeling,
+ViewOutputBox::ViewOutputBox(Modeling& modeling, GVLE* gvle,
                              Glib::RefPtr < Gnome::Glade::Xml > ref,
                              vpz::Views& views)
-    : m_modeling(modeling), m_viewscopy(views), m_xml(ref),
+    : m_modeling(modeling), m_GVLE(gvle), m_viewscopy(views), m_xml(ref),
       m_type(0), m_format(0), m_plugin(0), m_views(0),
       m_validateRetry(false)
 {
@@ -222,7 +223,7 @@ void ViewOutputBox::onAddViews()
                 }
 
                 PluginFactory::OovPlg& plugin =
-                    m_modeling.getGVLE()->pluginFactory().getOov(
+                    m_GVLE->pluginFactory().getOov(
                         m_plugin->get_active_text());
 
                 m_viewscopy.addLocalStreamOutput(outputname, "",
@@ -445,7 +446,7 @@ void ViewOutputBox::onEditPlugin()
     }
 
     if (not name.empty()) {
-        PluginFactory& plf = m_modeling.getGVLE()->pluginFactory();
+        PluginFactory& plf = m_GVLE->pluginFactory();
 
         try {
             PluginFactory::OutputPlg& plugin =
@@ -477,7 +478,7 @@ void ViewOutputBox::onChangedPlugin()
             vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
             PluginFactory::OovPlg& plugin =
-                m_modeling.getGVLE()->pluginFactory().getOov(
+                m_GVLE->pluginFactory().getOov(
                     m_plugin->get_active_text());
 
             if (output.plugin() != plugin.name() or
@@ -532,7 +533,7 @@ void ViewOutputBox::fillCombobox()
     m_format->append_text("local");
 
     {
-        PluginFactory& plf = m_modeling.getGVLE()->pluginFactory();
+        PluginFactory& plf = m_GVLE->pluginFactory();
         const PluginFactory::OovPluginList& plugins = plf.oovPlugins();
 
         if (not plugins.empty()) {
@@ -560,7 +561,7 @@ void ViewOutputBox::assignView(const std::string& name)
     }
 
     PluginFactory::OovPlg& plugin =
-        m_modeling.getGVLE()->pluginFactory().getOov(
+        m_GVLE->pluginFactory().getOov(
             m_plugin->get_active_text());
 
     if (m_format->get_active_text() == "distant") {
@@ -603,7 +604,7 @@ void ViewOutputBox::updateView(const std::string& name)
 
     {
         PluginFactory::OutputPluginList list =
-            m_modeling.getGVLE()->pluginFactory().outputPlugins();
+            m_GVLE->pluginFactory().outputPlugins();
         PluginFactory::OutputPluginList::iterator it =
             list.find(PluginFactory::OutputPlg::generic(
                     output.plugin(), output.package()));

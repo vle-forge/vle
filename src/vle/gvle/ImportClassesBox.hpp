@@ -46,6 +46,7 @@ namespace vle {
 namespace gvle {
 
 class Modeling;
+class GVLE;
 
 class ImportClassesBox {
 private:
@@ -91,7 +92,7 @@ private:
     };
 
 public:
-    ImportClassesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
+    ImportClassesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling, GVLE* gvle);
 
     void show(vpz::Vpz* src);
     void importClass(std::string& className, std::string newClassName = "");
@@ -100,6 +101,7 @@ protected:
 private:
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
+    GVLE*                                mGVLE;
     vpz::Vpz*                            mSrc;
 
     Gtk::Dialog*                         mDialog;

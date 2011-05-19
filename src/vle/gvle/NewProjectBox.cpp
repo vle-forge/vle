@@ -36,8 +36,8 @@
 namespace vle { namespace gvle {
 
 NewProjectBox::NewProjectBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
-                             Modeling* m, GVLE* app)
-    : mXml(xml), mModeling(m), mApp(app)
+                             Modeling* m, GVLE* gvle)
+    : mXml(xml), mModeling(m), mGVLE(gvle)
 {
     xml->get_widget("DialogNewProject", mDialog);
     xml->get_widget("EntryNameProject", mEntryName);
@@ -65,13 +65,14 @@ void NewProjectBox::apply()
 {
     if (not mEntryName->get_text().empty()) {
 	if (not exist(mEntryName->get_text())) {
-	    mApp->getEditor()->closeAllTab();
+	    mGVLE->getEditor()->closeAllTab();
 	    mModeling->clearModeling();
+            mGVLE->setTitle(mModeling->getFileName());
             utils::Package::package().select(mEntryName->get_text());
-            mApp->pluginFactory().update();
+            mGVLE->pluginFactory().update();
 	    vle::utils::Package::package().create();
-	    mApp->buildPackageHierarchy();
-            mApp->getMenu()->onOpenProject();
+	    mGVLE->buildPackageHierarchy();
+            mGVLE->getMenu()->onOpenProject();
 	} else {
             Error(fmt(_("The project `%1%' already exists in VLE home "
                          "directory")) % mEntryName->get_text().raw());

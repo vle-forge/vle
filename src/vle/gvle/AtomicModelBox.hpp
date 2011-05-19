@@ -40,11 +40,12 @@
 namespace vle { namespace gvle {
 
 class Modeling;
+class GVLE;
 
 class AtomicModelBox
 {
 public:
-    AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
 
     virtual ~AtomicModelBox();
 
@@ -228,7 +229,9 @@ private:
 	    { mConditions = conditions; }
 	void setModeling(Modeling* modeling)
 	    { mModeling = modeling; }
-	void setModel(vpz::AtomicModel* model)
+        void setGVLE(GVLE* gvle)
+            { mGVLE = gvle; }
+        void setModel(vpz::AtomicModel* model)
 	    { mModel = model; }
 	void setLabel(Gtk::Label* label)
 	    { mLabel = label; }
@@ -257,6 +260,7 @@ private:
 	vpz::Conditions* mConditions;
 	renameList mRenameList;
 	Modeling* mModeling;
+        GVLE* mGVLE;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsCond mColumns;
 	Glib::RefPtr < Gtk::ListStore > mRefTreeModel;
@@ -286,6 +290,7 @@ private:
         void setObservables(vpz::Observables* observables)
         { mObservables = observables; }
         void setModeling(Modeling* modeling) { mModeling = modeling; }
+        void setGVLE(GVLE* gvle) { mGVLE = gvle; }
         void setModel(vpz::AtomicModel* model) { mModel = model; }
         void setGraphModel(graph::AtomicModel* atom) { mAtom = atom; }
         void setLabel(Gtk::Label* label) { mLabel = label; }
@@ -325,20 +330,21 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
         Glib::RefPtr<Gnome::Glade::Xml> mXml;
-	vpz::AtomicModel* mModel;
-	graph::AtomicModel* mAtom;
-	AtomicModelBox* mParent;
-	vpz::Dynamics* mDynamics;
-	vpz::Conditions* mConditions;
-	vpz::Observables* mObservables;
-	renameList mRenameList;
-	Modeling* mModeling;
-	Gtk::Menu mMenuPopup;
-	ModelColumnsDyn mColumnsDyn;
-	Glib::RefPtr<Gtk::ListStore> mRefListDyn;
+	vpz::AtomicModel*               mModel;
+	graph::AtomicModel*             mAtom;
+	AtomicModelBox*                 mParent;
+	vpz::Dynamics*                  mDynamics;
+	vpz::Conditions*                mConditions;
+	vpz::Observables*               mObservables;
+	renameList                      mRenameList;
+	Modeling*                       mModeling;
+        GVLE*                           mGVLE;
+	Gtk::Menu                       mMenuPopup;
+	ModelColumnsDyn                 mColumnsDyn;
+	Glib::RefPtr<Gtk::ListStore>    mRefListDyn;
 
 	//Label
-	Gtk::Label* mLabel;
+	Gtk::Label*              mLabel;
 
 	 //Cell
 	Gtk::CellRendererText*   mCellRenderer;
@@ -423,6 +429,7 @@ private:
 
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
+    GVLE*                                mGVLE;
 
     Gtk::Dialog*                         mDialog;
 

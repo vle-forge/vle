@@ -31,14 +31,13 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/utils/Package.hpp>
 
-namespace vle
-{
+namespace vle { namespace gvle {
 
-namespace gvle {
-
-SaveVpzBox::SaveVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m) :
+SaveVpzBox::SaveVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                       Modeling* m, GVLE* gvle) :
     mXml(xml),
-    mModeling(m)
+    mModeling(m),
+    mGVLE(gvle)
 {
     xml->get_widget("DialogSaveVpz", mDialog);
     xml->get_widget("EntryNameVpz", mEntryName);
@@ -79,10 +78,11 @@ void SaveVpzBox::onApply()
 	    vpz::Vpz::fixExtension(fileName);
 	    std::string pathFile = Glib::build_filename(
 		utils::Path::path().getPackageExpDir(), fileName);
-	    Editor::Documents::const_iterator it = modeling
+	    Editor::Documents::const_iterator it = mGVLE->getEditor()
 		->getDocuments().find(modeling->getFileName());
 	    mModeling->saveXML(pathFile);
-	    if (it != modeling->getDocuments().end()) {
+            mGVLE->setTitle(modeling->getFileName());
+	    if (it != mGVLE->getEditor()->getDocuments().end()) {
 		it->second->setTitle(pathFile, mModeling->getTopModel(), false);
 	    }
 	    mDialog->hide_all();
@@ -108,6 +108,5 @@ bool SaveVpzBox::exist(std::string name)
     return false;
 }
 
-}
-}
+}} // namespace vle gvle
 

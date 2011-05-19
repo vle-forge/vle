@@ -26,19 +26,14 @@
  */
 
 
-#include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/View.hpp>
-#include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/DialogString.hpp>
-#include <vle/gvle/CoupledModelBox.hpp>
-#include <vle/gvle/ImportModelBox.hpp>
-#include <vle/gvle/ImportClassesBox.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
@@ -51,24 +46,14 @@
 
 using std::string;
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-Modeling::Modeling(GVLE* gvle, const string& filename) :
+Modeling::Modeling(const string& filename) :
     mTop(0),
-    mGVLE(gvle),
-    mCutCopyPaste(gvle),
     mIsModified(false),
     mIsSaved(false),
-    mSocketPort(8000),
-    mAtomicBox(0),
-    mImportModelBox(0),
-    mImportClassesBox(0),
-    mCoupledBox(0)
+    mSocketPort(8000)
 {
-    assert(gvle);
-
     mRand = new utils::Rand();
     if (not filename.empty()) {
         mVpz.parseFile(filename);
@@ -79,25 +64,17 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
             mTop = newCoupledModel(0, "Top model", "", 0, 0);
             mVpz.project().model().setModel(mTop);
         } else if (mVpz.project().model().model()->isAtomic()) {
-            graph::CoupledModel* t = newCoupledModel(0, "Top model", "", 0,
-                                     0);
+            graph::CoupledModel* t = newCoupledModel(0, "Top model",
+                                                     "", 0, 0);
             t->addModel(mVpz.project().model().model());
             mVpz.project().model().setModel(t);
             mTop = t;
-            setTitles();
         }
-    } else {
-        setTitles();
     }
 }
 
 Modeling::~Modeling()
 {
-    delViews();
-    delete mAtomicBox;
-    delete mImportModelBox;
-    delete mImportClassesBox;
-    delete mCoupledBox;
     delete mRand;
     if (mTop) {
        delete mTop;
@@ -108,65 +85,23 @@ void Modeling::clearModeling()
 {
     setModified(false);
     mIsSaved = false;
-    mGVLE->getEditor()->closeVpzTab();
     mFileName.clear();
     mVpz.clear();
     if (mTop) {
        delete mTop;
     }
     mTop = 0;
-    setTitles();
 }
 
 void Modeling::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
 {
     mRefXML = xml;
-    mAtomicBox = new AtomicModelBox(xml, this);
-    mImportModelBox = new ImportModelBox(xml, this);
-    mImportClassesBox = new ImportClassesBox(xml, this);
-    mCoupledBox = new CoupledModelBox(xml, this);
 }
 
 Glib::RefPtr < Gnome::Glade::Xml > Modeling::getGlade() const
 {
     assert(mRefXML);
     return mRefXML;
-}
-
-void Modeling::start()
-{
-    clearModeling();
-    delNames();
-    mTop = newCoupledModel(0, "Top model", "", 0, 0);
-    mVpz.project().model().setModel(mTop);
-    mGVLE->redrawModelTreeBox();
-    mGVLE->redrawModelClassBox();
-    if (utils::Package::package().name().empty()) {
-        mFileName.assign("noname.vpz");
-    } else {
-        mFileName.assign(Glib::build_filename(
-                             utils::Path::path().getPackageExpDir(),
-                             "noname.vpz"));
-    }
-    mIsSaved = false;
-    setModified(true);
-    addView(mTop);
-    setModifiedTitles();
-}
-
-void Modeling::start(const std::string& path, const std::string& fileName)
-{
-    clearModeling();
-    delNames();
-    mTop = newCoupledModel(0, "Top model", "", 0, 0);
-    mVpz.project().model().setModel(mTop);
-    mGVLE->redrawModelTreeBox();
-    mGVLE->redrawModelClassBox();
-    mFileName = path + "/" + fileName;
-    mIsSaved = false;
-    setModified(true);
-    addView(mTop);
-    setModifiedTitles();
 }
 
 void Modeling::parseXML(const string& filename)
@@ -189,11 +124,6 @@ void Modeling::parseXML(const string& filename)
         } else {
             mTop = (graph::CoupledModel*)(mVpz.project().model().model());
         }
-        mFileName.assign(filename);
-        addView(mTop);
-        mIsSaved = true;
-        setModified(false);
-        setTitles();
     } catch (const utils::SaxParserError& e) {
         gvle::Error((fmt(_("Error parsing file, %1%")) %
                      e.what()).str(),false);
@@ -219,7 +149,6 @@ void Modeling::saveXML(const std::string& name)
         mFileName.assign(name);
         mIsSaved = true;
         setModified(false);
-        setTitles();
     } catch (const utils::FileError& file) {
         gvle::Error(
             (fmt(_("Project save problem. Check your file %1%. %2%")) % name %
@@ -258,143 +187,6 @@ void Modeling::showDynamics(const std::string& /* name */)
     Error(_("This function is not yet implemented"));
 }
 
-void Modeling::addView(graph::Model* model)
-{
-    if (model) {
-        if (model->isCoupled()) {
-            graph::CoupledModel* m = graph::Model::toCoupled(model);
-            addView(m);
-        } else if (model->isAtomic()) {
-            try {
-                mAtomicBox->show((graph::AtomicModel*)model);
-            } catch (utils::SaxParserError& /*e*/) {
-                parse_model(mVpz.project().model().atomicModels());
-            }
-        }
-    }
-    refreshViews();
-}
-
-void Modeling::addView(graph::CoupledModel* model)
-{
-    const size_t szView = mListView.size();
-
-    View* search = findView(model);
-    if (search != NULL) {
-        search->selectedWindow();
-    } else {
-        mListView.push_back(new View(this, model, szView));
-    }
-    mGVLE->getEditor()->openTabVpz(mFileName, model);
-}
-
-void Modeling::addViewClass(graph::Model* model, std::string name)
-{
-    assert(model);
-    if (model->isCoupled()) {
-        graph::CoupledModel* m = (graph::CoupledModel*)(model);
-        addViewClass(m, name);
-    } else if (model->isAtomic()) {
-        try {
-            mAtomicBox->show((graph::AtomicModel*)model, name);
-        } catch (utils::SaxParserError& E) {
-            parse_model(mVpz.project().classes().get(mCurrentClass).atomicModels());
-        }
-    }
-    refreshViews();
-}
-
-void Modeling::addViewClass(graph::CoupledModel* model, std::string name)
-{
-    const size_t szView = mListView.size();
-
-    View* search = findView(model);
-    if (search != NULL) {
-        search->selectedWindow();
-    } else {
-        View* v = new View(this, model, szView);
-        v->setCurrentClass(name);
-        mListView.push_back(v);
-    }
-    mGVLE->getEditor()->openTabVpz(mFileName, model);
-}
-
-bool Modeling::existView(graph::CoupledModel* model)
-{
-    assert(model);
-    ListView::const_iterator it = mListView.begin();
-    while (it != mListView.end()) {
-        if ((*it) && (*it)->getGCoupledModel() == model)
-            return true;
-        ++it;
-    }
-    return false;
-}
-
-View* Modeling::findView(graph::CoupledModel* model)
-{
-    assert(model);
-    ListView::const_iterator it = mListView.begin();
-    while (it != mListView.end()) {
-        if ((*it) && (*it)->getGCoupledModel() == model) {
-            return *it;
-        }
-        ++it;
-    }
-    return NULL;
-}
-
-void Modeling::delViewIndex(size_t index)
-{
-    assert(index < mListView.size());
-    delete mListView[index];
-    mListView[index] = NULL;
-}
-
-void Modeling::delViewOnModel(const graph::CoupledModel* cm)
-{
-    assert(cm);
-    const size_t sz = mListView.size();
-    for (size_t i = 0; i < sz; ++i) {
-        if (mListView[i] != 0 and mListView[i]->getGCoupledModel() == cm)
-            delViewIndex(i);
-    }
-}
-
-void Modeling::delViews()
-{
-    const size_t sz = mListView.size();
-    for (size_t i = 0; i < sz; ++i)
-        delViewIndex(i);
-}
-
-void Modeling::refreshViews()
-{
-    ListView::iterator it = mListView.begin();
-    while (it != mListView.end()) {
-        if (*it) {
-            (*it)->redraw();
-        }
-        ++it;
-    }
-}
-
-void Modeling::EditCoupledModel(graph::CoupledModel* model)
-{
-    assert(model);
-    mCoupledBox->show(model);
-}
-
-void Modeling::setTitles()
-{
-    mGVLE->setTitle(mFileName);
-}
-
-void Modeling::setModifiedTitles()
-{
-    mGVLE->setModifiedTitle(mFileName);
-}
-
 bool Modeling::exist(const std::string& name) const
 {
     return mTop->findModel(name) != 0;
@@ -403,78 +195,6 @@ bool Modeling::exist(const std::string& name) const
 bool Modeling::exist(const graph::Model* m) const
 {
     return (mTop->findModel(m->getName()) != 0);
-}
-
-void Modeling::cut(graph::ModelList& lst, graph::CoupledModel* gc,
-                   std::string className)
-{
-    if (className.empty()) {
-        mCutCopyPaste.cut(lst, gc, mVpz.project().model().atomicModels());
-    } else {
-        mCutCopyPaste.cut(lst, gc, mVpz.project().classes().get(className).atomicModels());
-    }
-}
-
-void Modeling::copy(graph::ModelList& lst, graph::CoupledModel* gc,
-                    std::string className)
-{
-    // the current view is not a class
-    if (className.empty()) {
-        // no model is selected in current view and a class is selected
-        // -> class instantiation
-        if (lst.empty() and not mSelectedClass.empty()) {
-            vpz::Class& currentClass = mVpz.project().classes()
-                .get(mSelectedClass);
-            graph::Model* model = currentClass.model();
-            graph::ModelList lst2;
-
-            lst2[model->getName()] = model;
-            mCutCopyPaste.copy(lst2, gc,
-                               mVpz.project().classes().get(mSelectedClass)
-                               .atomicModels(), true);
-        } else {
-            mCutCopyPaste.copy(lst, gc,
-                               mVpz.project().model().atomicModels(),
-                               false);
-        }
-    } else {
-        mCutCopyPaste.copy(lst, gc,
-                           mVpz.project().classes().get(className)
-                           .atomicModels(), false);
-    }
-}
-
-void Modeling::paste(graph::CoupledModel* gc, std::string className)
-{
-    if (className.empty()) {
-        mCutCopyPaste.paste(gc, mVpz.project().model().atomicModels());
-    } else {
-        mCutCopyPaste.paste(gc, mVpz.project().classes().
-                            get(className).atomicModels());
-    }
-}
-
-void Modeling::selectAll(graph::ModelList& lst, graph::CoupledModel* gc)
-{
-    lst = gc->getModelList();
-}
-
-bool Modeling::paste_is_empty() {
-    return mCutCopyPaste.paste_is_empty();
-}
-
-void Modeling::setModified(bool modified)
-{
-    if (mIsModified != modified) {
-        mIsModified = modified;
-
-        if (mIsModified) {
-            setModifiedTitles();
-            mGVLE->getMenu()->showSave();
-        } else {
-            mGVLE->getMenu()->hideSave();
-        }
-    }
 }
 
 void Modeling::exportCoupledModel(graph::CoupledModel* model,
@@ -597,70 +317,39 @@ void Modeling::export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* model, s
     }
 }
 
-void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
+void Modeling::importModel(graph::Model* import, vpz::Vpz* src)
 {
-    using namespace vpz;
-    assert(parent);
-    assert(src);
-
-    if (mImportModelBox) {
-        mImportModelBox->setGCoupled(parent);
-        if (mImportModelBox->show(src)) {
-            graph::Model* import = src->project().model().model();
-            parent->addModel(import);
-            if (import->isAtomic()) {
-                import_atomic_model(src, graph::Model::toAtomic(import));
-            } else {
-                import_coupled_model(src, graph::Model::toCoupled(import));
-            }
-            dynamics().add(src->project().dynamics());
-            conditions().add(src->project().experiment().conditions());
-            views().add(src->project().experiment().views());
-            mGVLE->redrawModelTreeBox();
-            refreshViews();
-            setModified(true);
-        }
+    if (import->isAtomic()) {
+        import_atomic_model(src, graph::Model::toAtomic(import));
+    } else {
+        import_coupled_model(src, graph::Model::toCoupled(import));
     }
+    dynamics().add(src->project().dynamics());
+    conditions().add(src->project().experiment().conditions());
+    views().add(src->project().experiment().views());
+    setModified(true);
 }
 
 void Modeling::importModelToClass(vpz::Vpz* src, std::string& className)
 {
     using namespace vpz;
-    assert(src);
-    boost::trim(className);
 
-    if (mImportModelBox) {
-        if (mImportModelBox->show(src)) {
-            Classes& classes = vpz().project().classes();
-            Class& new_class = classes.add(className);
-            graph::Model* import = src->project().model().model();
-            if (import->isAtomic()) {
-                new_class.setModel(graph::Model::toAtomic(import));
-                import_atomic_model(src, graph::Model::toAtomic(import),
-                                    className);
-            } else {
-                new_class.setModel(graph::Model::toCoupled(import));
-                import_coupled_model(src, graph::Model::toCoupled(import),
-                                     className);
-            }
-            dynamics().add(src->project().dynamics());
-            conditions().add(src->project().experiment().conditions());
-            views().add(src->project().experiment().views());
-            mGVLE->redrawModelClassBox();
-            refreshViews();
-            setModified(true);
-        }
+    Classes& classes = vpz().project().classes();
+    Class& new_class = classes.add(className);
+    graph::Model* import = src->project().model().model();
+    if (import->isAtomic()) {
+        new_class.setModel(graph::Model::toAtomic(import));
+        import_atomic_model(src, graph::Model::toAtomic(import),
+                            className);
+    } else {
+        new_class.setModel(graph::Model::toCoupled(import));
+        import_coupled_model(src, graph::Model::toCoupled(import),
+                             className);
     }
-}
-
-void Modeling::importClasses(vpz::Vpz* src)
-{
-    using namespace vpz;
-    assert(src);
-
-    if (mImportClassesBox) {
-        mImportClassesBox->show(src);
-    }
+    dynamics().add(src->project().dynamics());
+    conditions().add(src->project().experiment().conditions());
+    views().add(src->project().experiment().views());
+    setModified(true);
 }
 
 void Modeling::import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom, std::string className)
@@ -685,7 +374,6 @@ void Modeling::import_coupled_model(vpz::Vpz* src, graph::CoupledModel* model, s
             } else {
                 import_coupled_model(src, graph::Model::toCoupled(it->second), className);
             }
-
             ++it;
         }
     }
@@ -798,42 +486,6 @@ graph::AtomicModel* Modeling::newAtomicModel(graph::CoupledModel* parent,
     return 0;
 }
 
-void Modeling::renameModel(graph::Model* model,
-                           const string& name,
-                           const string& /* description */)
-{
-    setModified(true);
-
-    SetString::iterator it = mModelsNames.find(model->getName());
-    if (it != mModelsNames.end()) {
-        mModelsNames.erase(it);
-    }
-
-    mModelsNames.insert(name);
-    mGVLE->redrawModelTreeBox();
-}
-
-void Modeling::delModel(graph::Model* model, std::string className)
-{
-    if (model->isAtomic()) {
-        vpz::AtomicModelList& list = getAtomicModelClass(className);
-        list.del(model);
-        setModified(true);
-    } else {
-        graph::ModelList& graphlist =
-            graph::Model::toCoupled(model)->getModelList();
-        vpz::AtomicModelList& vpzlist = getAtomicModelClass(className);
-        graph::ModelList::iterator it;
-        for (it = graphlist.begin(); it!= graphlist.end(); ++it) {
-            if (it->second->isCoupled())
-                delModel(it->second, className);
-            else
-                vpzlist.del(it->second);
-        }
-        setModified(true);
-    }
-}
-
 void Modeling::vpz_is_correct(std::vector<std::string>& vec)
 {
     using namespace vpz;
@@ -872,20 +524,6 @@ void Modeling::vpz_is_correct(std::vector<std::string>& vec)
     }
 
 }
-
-void parse_model(vpz::AtomicModelList& list)
-{
-    vpz::AtomicModelList::iterator it = list.begin();
-    while (it != list.end()) {
-        if (it->first)
-            std::cout << "\t" << it->first << " : " << it->first->getName() << "\n";
-        else
-            std::cout << "\tNULL\n";
-
-        ++it;
-    }
-}
-
 
 std::string Modeling::getDynamicInfo(std::string dynamicName) const
 {

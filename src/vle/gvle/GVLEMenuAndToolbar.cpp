@@ -774,7 +774,7 @@ void GVLEMenuAndToolbar::onOpenVpz()
     showImportExport();
     showEditMenu();
 
-    if(not mParent->getModeling()->paste_is_empty()) {
+    if(not mParent->paste_is_empty()) {
         showPaste();
     }
     showToolsMenu();

@@ -34,6 +34,7 @@
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
+#include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
 #include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/ParameterExecutionBox.hpp>
@@ -61,13 +62,21 @@ class Editor;
 class FileTreeView;
 class GVLEMenuAndToolbar;
 class Modeling;
+class AtomicModelBox;
+class ImportModelBox;
+class ImportClassesBox;
+class CoupledModelBox;
 class PreferencesBox;
 class PackageBrowserWindow;
+class CutCopyPaste;
+class View;
 
 typedef std::set < std::string > Depends;
 typedef std::map < std::string, Depends > AllDepends;
 typedef std::vector < std::pair < std::string,
                                   std::string > > renameList;
+/** define vector of current view. */
+typedef std::vector < View * > ListView;
 
 /**
  * @brief GVLE is a Gtk::Window use to build the main window with all button
@@ -106,6 +115,8 @@ public:
      *
      */
     virtual ~GVLE();
+
+    void setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml);
 
     /**
      * @brief Used to erase the status bar.
@@ -161,6 +172,35 @@ public:
     void setFileName(std::string name);
 
     /**
+     * add a view to modeling for the GModel model.
+     *
+     * @param model a ptr to the GModel to show.
+     */
+    void addView(graph::Model* model);
+
+    /**
+     * find a view in list view that reference a GCoupledModel.
+     * @param model reference to GCoupledModel to find.
+     * @return int index in list view for founded view or first index with
+     * null value
+     */
+    void addView(graph::CoupledModel* model);
+
+    /**
+     * add a view to the current class
+     *
+     * @param model to ptr to the GModel assiociate to the class
+     */
+    void addViewClass(graph::Model* model, std::string name);
+
+    /**
+     * find a view in list view that reference a GCoupledModel.
+     * @param model reference to GCoupledModel to find.
+     */
+
+    void addViewClass(graph::CoupledModel* model, std::string name);
+
+    /**
      * @brief Insert text into Log area
      * @param text Text to insert into the log area
      */
@@ -171,6 +211,66 @@ public:
      * last line of the Gtk::Buffer.
      */
     void scrollLogToLastLine();
+
+     /**
+     * @brief delete all models and views and restart with one view.
+     *
+     */
+    void start();
+
+    /**
+     * @brief delete all models and views and restart with one view.
+     *
+     * @param path path where the vpz file is wanted to be stored
+     * @param fileName vpz file name
+     *
+     */
+    void start(const std::string& path, const std::string& fileName);
+
+     /**
+     * parse XML project file to get filename of XML files structures and
+     * graphics.
+     *
+     * @param name project file name to parse.
+     */
+    void parseXML(const std::string& name);
+
+    /**
+     * Return True if a View of the parameter already exist.
+     * @param model reference to GCoupledModel to find.
+     * @return Return True if the View exist , False otherwise
+     */
+    bool existView(graph::CoupledModel* model);
+
+    /**
+     * Return the View that reference the model.
+     * @param model reference to GCoupledModel to find.
+     * @return Return the View if exist , NULL otherwise
+     */
+    View* findView(graph::CoupledModel* model);
+
+    /**
+     * delete a view from model view.
+     *
+     * @param index num of window to delete.
+     */
+    void delViewIndex(size_t index);
+
+    /**
+     * delete all view where coupled model is equal to cm.
+     *
+     * @param cm a ptr to graph::CoupledModel to delete view.
+     */
+    void delViewOnModel(const graph::CoupledModel* cm);
+
+    /**
+     * delete all view of modeling.
+     *
+     */
+    void delViews();
+
+
+    void refreshViews();
 
     /**
      * Redraw the VPZ view
@@ -400,11 +500,15 @@ public:
      */
     void clearCurrentModel();
 
+    void delModel(graph::Model* model, std::string className);
+
     /**
      * When click on export as menu
      *
      */
     void exportCurrentModel();
+
+    void EditCoupledModel(graph::CoupledModel* model);
 
     /**
      * When click on export graphic as menu
@@ -417,6 +521,10 @@ public:
      *
      */
     void importModel();
+
+    void importModelToClass(vpz::Vpz* src, std::string& className);
+
+    void importClasses(vpz::Vpz* src);
 
     /**
      * When click on close tab menu
@@ -455,6 +563,53 @@ public:
 
      /** Select all models in current VPZ */
     void onSelectAll();
+
+    /********************************************************************
+     *
+     * CUT COPY AND PASTE
+     *
+     ********************************************************************/
+
+
+    /**
+     * clone the ListGModel if has no connection with external model.
+     *
+     * @param lst list of selected GModel.
+     * @param gc parent of selected GModel.
+     */
+    void cut(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
+
+    /**
+     * detach the list of GModel of GCoupledModel parent.
+     *
+     * @param lst list of selected GModel.
+     * @param gc parent of selected GModel.
+     */
+    void copy(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
+
+    /**
+     * paste the current list GModel into GCoupledModel ; rename
+     * models to elimiante duplicated name.
+     *
+     * @param gc paste selected GModel under this GCoupledModel.
+     */
+    void paste(graph::CoupledModel* gc, std::string className);
+
+    /**
+     * select all models in the current list GModel.
+     *
+     * @param lst list of selected GModel.
+     */
+    void selectAll(graph::ModelList& lst, graph::CoupledModel* gc);
+
+    bool paste_is_empty();
+
+    /**
+     * Set document modification.
+     *
+     * @param modified true if document is modified, otherwise false.
+     */
+    void setModified(bool modified);
 
     /********************************************************************
      *
@@ -773,7 +928,10 @@ private:
 
     /* class members */
     Modeling*                       mModeling;
+    std::string                     mCurrentClass;
+    ListView                        mListView;
     ButtonType                      mCurrentButton;
+    CutCopyPaste                    mCutCopyPaste;
     std::string                     mPackage;
     int                             mCurrentTab;
 
@@ -783,6 +941,10 @@ private:
                                     in global mode */
 
     /* Dialog boxes */
+    AtomicModelBox*                 mAtomicBox;
+    ImportModelBox*                 mImportModelBox;
+    CoupledModelBox*                mCoupledBox;
+    ImportClassesBox*               mImportClassesBox;
     ConditionsBox*                  mConditionsBox;
     PreferencesBox*                 mPreferencesBox;
     OpenVpzBox*                     mOpenVpzBox;
@@ -799,6 +961,7 @@ private:
 };
 
 std::string valuetype_to_string(value::Value::type type);
+void parse_model(vpz::AtomicModelList& list);
 
 }} // namespace vle gvle
 

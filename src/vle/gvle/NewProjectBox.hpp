@@ -55,7 +55,7 @@ private:
 
     Gtk::Dialog*                    mDialog;
     Modeling*                       mModeling;
-    GVLE*                           mApp;
+    GVLE*                           mGVLE;
 
     // Text Entry
     Gtk::Entry*                     mEntryName;

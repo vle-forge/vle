@@ -502,11 +502,11 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
         if (mView->getAllSelectedModels().size() == 1) {
             graph::Model* mod = mView->getFirstSelectedModels();
             if (mView->isClassView()) {
-                mModeling->getGVLE()->getModelTreeBox()->selectNone();
-                mModeling->getGVLE()->getModelClassBox()->showRow(mod);
+                mGVLE->getModelTreeBox()->selectNone();
+                mGVLE->getModelClassBox()->showRow(mod);
             } else{
-                mModeling->getGVLE()->getModelClassBox()->selectNone();
-                mModeling->getGVLE()->getModelTreeBox()->showRow(mod);
+                mGVLE->getModelClassBox()->selectNone();
+                mGVLE->getModelTreeBox()->showRow(mod);
             }
         }
 	mPrecMouse.set_x(-1);

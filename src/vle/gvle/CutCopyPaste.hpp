@@ -29,7 +29,6 @@
 #ifndef GUI_CUTCOPYPAST_HPP
 #define GUI_CUTCOPYPAST_HPP
 
-#include <vle/gvle/GVLE.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/vpz/Model.hpp>
 #include <list>
@@ -38,6 +37,8 @@
 namespace vle
 {
 namespace gvle {
+
+class GVLE;
 
 /**
  * A class to manage cut/copy/paste action on GVLE views.

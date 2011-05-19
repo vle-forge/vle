@@ -36,11 +36,12 @@
 namespace vle { namespace gvle {
 
 class Modeling;
+class GVLE;
 
 class CoupledModelBox : public Gtk::TreeView
 {
 public:
-    CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
 
     void show(graph::CoupledModel* model);
 
@@ -152,6 +153,7 @@ private:
 
     Glib::RefPtr<Gnome::Glade::Xml>        mXml;
     Modeling*                              mModeling;
+    GVLE*                                  mGVLE;
     graph::CoupledModel*                   mGraphModel;
     graph::CoupledModel*                   mCurrentGraphModel;
 

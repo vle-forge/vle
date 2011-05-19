@@ -300,7 +300,7 @@ public:
                         const std::string& oldFilePath);
 
     void setParent(GVLE* gvle)
-    { mApp = gvle; }
+    { mGVLE = gvle; }
 
     inline DocumentDrawingArea* getDocumentDrawingArea() const
     {
@@ -321,7 +321,7 @@ private:
     void onCloseTab(const std::string& filepath);
 
     Documents   mDocuments;
-    GVLE*       mApp;
+    GVLE*       mGVLE;
 
     /**
      * @brief add a label for a new tab
