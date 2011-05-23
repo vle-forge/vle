@@ -299,8 +299,14 @@ void Statechart::setSigma(const devs::Time& time)
         mValidAfterWhen = false;
     } else {
         mSigma = sigma;
-        mToProcessAfterWhen = std::make_pair(id, mNextStates[id]);
-        mValidAfterWhen = true;
+        if (id != -1) {
+            NextStatesIterator it =  mNextStates.find(id);
+
+            if (it != mNextStates.end()) {
+                mToProcessAfterWhen = std::make_pair(id, it->second);
+                mValidAfterWhen = true;
+            }
+        }
     }
 }
 
@@ -473,7 +479,7 @@ void Statechart::internalTransition(const devs::Time& time)
                 devs::ExternalEvent* event = events->front();
 		int transition = findTransition(event);
 
-		processIn(time, mNextStates[transition]);
+		processIn(time, mNextStates.at(transition));
 		removeProcessEvent(events, event);
                 if (mToProcessEvents.empty()) {
 		    if (not mValidGuard) {
