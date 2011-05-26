@@ -298,6 +298,15 @@ public:
         GuardAction_t<X> action(X action)
     { return GuardAction_t<X>(action); }
 
+protected:
+    virtual devs::Time init(const devs::Time& time);
+    virtual void output(const devs::Time& time,
+                        devs::ExternalEventList& output) const;
+    virtual void internalTransition(const devs::Time& time);
+    virtual void externalTransition(
+        const devs::ExternalEventList& event,
+        const devs::Time& time);
+
 private:
     typedef Actions::const_iterator ActionsIterator;
     typedef EventInStateActions::const_iterator EventInStateActionsIterator;
@@ -443,7 +452,7 @@ private:
     { return mWhens.find(transition) != mWhens.end() or
             mWhenFuncs.find(transition) != mWhenFuncs.end(); }
 
-    int findTransition(const devs::ExternalEvent* event) const;
+    Transitions findTransition(const devs::ExternalEvent* event) const;
     bool process(const devs::Time& time,
                  const devs::ExternalEvent* event);
     void process(const devs::Time& time,
@@ -464,14 +473,7 @@ private:
     void setSigma(const devs::Time& time);
     void updateSigma(const devs::Time& time);
 
-    virtual devs::Time init(const devs::Time& time);
-    virtual void output(const devs::Time& time,
-                        devs::ExternalEventList& output) const;
     virtual devs::Time timeAdvance() const;
-    virtual void internalTransition(const devs::Time& time);
-    virtual void externalTransition(
-        const devs::ExternalEventList& event,
-        const devs::Time& time);
     virtual void confluentTransitions(
         const devs::Time& time,
         const devs::ExternalEventList& extEventlist)
@@ -487,9 +489,10 @@ private:
     devs::Time mSigma;
     EventListLILO mToProcessEvents;
     std::pair < int, int > mToProcessGuard;
-    std::pair < int, int > mToProcessAfterWhen;
+    std::list < std::pair < int, int > > mToProcessAfterWhen;
     bool mValidGuard;
     bool mValidAfterWhen;
+    int mFiredTransition;
 
     template < typename I, typename X >
         friend StatechartTransition_t<I> operator<<(

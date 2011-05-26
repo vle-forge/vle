@@ -94,37 +94,50 @@ void Statechart::checkGuards(const devs::Time& time)
     }
 }
 
-int Statechart::findTransition(const devs::ExternalEvent* event) const
+Statechart::Transitions Statechart::findTransition(
+    const devs::ExternalEvent* event) const
 {
     TransitionsMapIterator it = mTransitionsMap.find(currentState());
-    int transition = -1;
+    Transitions transitions;
 
     if (it != mTransitionsMap.end()) {
         TransitionsIterator itt = it->second.begin();
 
-        while (transition == -1 and itt != it->second.end()) {
+        while (itt != it->second.end()) {
             EventsIterator ite = mEvents.find(*itt);
 
             if (ite != mEvents.end() and ite->second == event->getPortName()) {
-                transition = ite->first;
+                transitions.push_back(ite->first);
             }
             ++itt;
         }
     }
-    return transition;
+    return transitions;
 }
 
 bool Statechart::process(const devs::Time& time,
 			 const devs::ExternalEvent* event)
 {
     bool proceed = true;
-    int transition = findTransition(event);
+    Transitions transitions = findTransition(event);
 
-    if (transition != -1) {
-        if (checkGuard(transition, time)) {
-            processOutStateAction(time);
-            processEventTransitionAction(transition, time, event);
-            processGuardTransitionAction(transition, time);
+    mFiredTransition = -1;
+    if (not transitions.empty()) {
+        bool found = false;
+        TransitionsIterator it = transitions.begin();
+
+        while (not found and it != transitions.end()) {
+            if (checkGuard(*it, time)) {
+                processOutStateAction(time);
+                processEventTransitionAction(*it, time, event);
+                processGuardTransitionAction(*it, time);
+                mFiredTransition = *it;
+                found = true;
+            }
+            ++it;
+        }
+        if (not found) {
+            proceed = false;
         }
     } else {
         proceed = processEventInStateActions(time, event);
@@ -237,7 +250,7 @@ void Statechart::removeProcessEvent(devs::ExternalEventList* events,
 void Statechart::setSigma(const devs::Time& time)
 {
     devs::Time sigma = devs::Time::infinity;
-    int id = -1;
+    std::vector < int > id;
     TransitionsMapIterator it = mTransitionsMap.find(currentState());
 
     if (it != mTransitionsMap.end()) {
@@ -249,7 +262,10 @@ void Statechart::setSigma(const devs::Time& time)
             if (ita != mAfters.end()) {
                 if (ita->second < sigma) {
                     sigma = ita->second;
-                    id = *itt;
+                    id.clear();
+                    id.push_back(*itt);
+                } else if (ita->second == sigma) {
+                    id.push_back(*itt);
                 }
             } else {
                 AfterFuncsIterator itaf = mAfterFuncs.find(*itt);
@@ -259,7 +275,10 @@ void Statechart::setSigma(const devs::Time& time)
 
                     if (duration < sigma) {
                         sigma = duration;
-                        id = *itt;
+                        id.clear();
+                        id.push_back(*itt);
+                    } else if (duration == sigma) {
+                        id.push_back(*itt);
                     }
                 } else {
                     WhensIterator itw = mWhens.find(*itt);
@@ -269,7 +288,10 @@ void Statechart::setSigma(const devs::Time& time)
 
                         if (duration > 0 and duration < sigma) {
                             sigma = duration;
-                            id = *itt;
+                            id.clear();
+                            id.push_back(*itt);
+                        } else if (duration > 0 and duration == sigma) {
+                            id.push_back(*itt);
                         }
                     } else {
                         WhenFuncsIterator itwf = mWhenFuncs.find(*itt);
@@ -279,13 +301,17 @@ void Statechart::setSigma(const devs::Time& time)
 
                             if (duration > 0 and duration < sigma) {
                                 sigma = duration;
-                                id = *itt;
+                                id.clear();
+                                id.push_back(*itt);
+                            } else if (duration > 0 and duration == sigma) {
+                                id.push_back(*itt);
                             }
                         } else {
                             if (mEvents.find(*itt) == mEvents.end() and
                                 mGuards.find(*itt) == mGuards.end()) {
                                 sigma = 0;
-                                id = *itt;
+                                id.clear();
+                                id.push_back(*itt);
                             }
                         }
                     }
@@ -299,13 +325,19 @@ void Statechart::setSigma(const devs::Time& time)
         mValidAfterWhen = false;
     } else {
         mSigma = sigma;
-        if (id != -1) {
-            NextStatesIterator it =  mNextStates.find(id);
+        if (not id.empty()) {
+            std::vector < int >::const_iterator it = id.begin();
 
-            if (it != mNextStates.end()) {
-                mToProcessAfterWhen = std::make_pair(id, it->second);
-                mValidAfterWhen = true;
+            while (it != id.end()) {
+                NextStatesIterator itn = mNextStates.find(*it);
+
+                if (itn != mNextStates.end()) {
+                    mToProcessAfterWhen.push_back(
+                        std::make_pair(*it, itn->second));
+                }
+                ++it;
             }
+            mValidAfterWhen = true;
         }
     }
 }
@@ -322,16 +354,12 @@ void Statechart::output(const devs::Time& time,
 {
     if (mPhase == SEND) {
         if (not mToProcessEvents.empty()) {
-            const devs::ExternalEventList* events =
-                mToProcessEvents.front();
-            const devs::ExternalEvent* event = events->front();
-
-	    buildOutputs(findTransition(event), time, output);
+	    buildOutputs(mFiredTransition, time, output);
 	}
 	if (mValidGuard) {
 	    buildOutputs(mToProcessGuard.first, time, output);
 	} else if (mValidAfterWhen) {
-	    buildOutputs(mToProcessAfterWhen.first, time, output);
+	    buildOutputs(mToProcessAfterWhen.front().first, time, output);
 	}
     }
 }
@@ -415,7 +443,7 @@ void Statechart::internalTransition(const devs::Time& time)
                 devs::ExternalEvent* event = events->front();
 
                 if (process(time, event)) {
-                    if (findTransition(event) == -1) { // eventInState
+                    if (findTransition(event).empty()) { // eventInState
                         removeProcessEvent(events, event);
                         if (mToProcessEvents.empty()) {
                             if (mValidGuard) {
@@ -446,11 +474,20 @@ void Statechart::internalTransition(const devs::Time& time)
     case IDLE:
     {
         if (mValidAfterWhen) {
-            if (checkGuard(mToProcessAfterWhen.first, time)) {
-                process(time, mToProcessAfterWhen.first);
-                mPhase = SEND;
-            } else {
+            bool found = false;
+
+            while (not mToProcessAfterWhen.empty() and not found) {
+                if (checkGuard(mToProcessAfterWhen.front().first, time)) {
+                    found = true;
+                    process(time, mToProcessAfterWhen.front().first);
+                    mPhase = SEND;
+                } else {
+                    mToProcessAfterWhen.pop_front();
+                }
+            }
+            if (not found) {
                 mValidAfterWhen = false;
+                mToProcessAfterWhen.clear();
             }
         } else {
             processActivities(time);
@@ -477,9 +514,13 @@ void Statechart::internalTransition(const devs::Time& time)
             if (not mToProcessEvents.empty()) {
                 devs::ExternalEventList* events = mToProcessEvents.front();
                 devs::ExternalEvent* event = events->front();
-		int transition = findTransition(event);
 
-		processIn(time, mNextStates.at(transition));
+		processIn(time, mNextStates.at(mFiredTransition));
+
+                if (findTransition(event).empty()) { // eventInState
+                    process(time, event);
+                }
+
 		removeProcessEvent(events, event);
                 if (mToProcessEvents.empty()) {
 		    if (not mValidGuard) {
@@ -492,8 +533,9 @@ void Statechart::internalTransition(const devs::Time& time)
 		}
             } else {
 		if (mValidAfterWhen) {
-		    processIn(time, mToProcessAfterWhen.second);
+		    processIn(time, mToProcessAfterWhen.front().second);
 		    mValidAfterWhen = false;
+                    mToProcessAfterWhen.clear();
                     if (not mValidGuard) {
                         mPhase = IDLE;
                     }
