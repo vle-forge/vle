@@ -31,7 +31,7 @@ SET(EXT_FSA_CPP fsa/FSA.cpp fsa/Moore.cpp fsa/Mealy.cpp fsa/FDDevs.cpp
   fsa/Statechart.cpp)
 
 SET(EXT_FSA_HPP fsa/FSA.hpp fsa/Moore.hpp fsa/Mealy.hpp fsa/FDDevs.hpp
-  fsa/Statechart.hpp)
+  fsa/Statechart.hpp fsa/StatechartDbg.hpp)
 
 SET(EXT_DIFFERENCE_EQUATION_CPP difference-equation/Base.cpp
   difference-equation/Simple.cpp difference-equation/Multiple.cpp
