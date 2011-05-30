@@ -236,6 +236,9 @@ private:
 	void setLabel(Gtk::Label* label)
 	    { mLabel = label; }
 
+        bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                            const Glib::RefPtr<Gtk::Tooltip>& tooltip);
+
     protected:
 	virtual void onRename();
 

@@ -35,6 +35,7 @@
 #include <vle/vpz/Conditions.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
 
+
 namespace vle { namespace gvle {
 
 typedef std::vector < std::pair < std::string,
@@ -95,6 +96,9 @@ class ConditionsBox
 	virtual void onEdition(
 	    const Glib::ustring& pathString,
 	    const Glib::ustring& newName);
+
+        bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                            const Glib::RefPtr<Gtk::Tooltip>& tooltip);
 
     private:
 

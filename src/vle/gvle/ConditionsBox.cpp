@@ -32,12 +32,13 @@
 #include <vle/vpz/AtomicModels.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
+#include <gtkmm/tooltips.h>
 
 namespace vle { namespace gvle {
 
 ////
 //  ConditionsTreeView
-///
+////
 
 ConditionsBox::ConditionsTreeView::ConditionsTreeView(
     BaseObjectType* cobject,
@@ -68,6 +69,10 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
     mRefTreeSelection->signal_changed().connect(
         sigc::mem_fun(*this,
                       &ConditionsBox::ConditionsTreeView::on_select));
+
+    set_has_tooltip();
+    signal_query_tooltip().connect(
+        sigc::mem_fun(*this, &ConditionsBox::ConditionsTreeView::onQueryTooltip));
 
     //Fill popup menu:
     {
@@ -279,8 +284,8 @@ void ConditionsBox::ConditionsTreeView::onEditionStarted(
 }
 
 void ConditionsBox::ConditionsTreeView::onEdition(
-        const Glib::ustring& pathString,
-        const Glib::ustring& newName)
+    const Glib::ustring& pathString,
+    const Glib::ustring& newName)
 {
     Gtk::TreePath path(pathString);
 
@@ -294,6 +299,23 @@ void ConditionsBox::ConditionsTreeView::onEdition(
     build();
 }
 
+bool ConditionsBox::ConditionsTreeView::onQueryTooltip(
+    int wx,int wy, bool keyboard_tooltip,
+    const Glib::RefPtr<Gtk::Tooltip>& tooltip)
+{
+    Gtk::TreeModel::iterator iter;
+    Glib::ustring card;
+
+    if (get_tooltip_context_iter(wx, wy, keyboard_tooltip, iter)) {
+        Glib::ustring cond = (*iter).get_value(mColumns.m_col_name);
+        card = mParent->getGVLE()->getModeling()->getInfoCard(cond);
+        tooltip->set_markup(card);
+        set_tooltip_row(tooltip, Gtk::TreePath(iter));
+        return true;
+    } else {
+        return false;
+    }
+}
 
 ////
 //  PortsTreeView
