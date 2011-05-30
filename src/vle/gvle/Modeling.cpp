@@ -576,6 +576,51 @@ std::string Modeling::getIdCard(graph::CoupledModel* model) const
     return ("<b>Model: </b>" + model->getName() + " <i>(Coupled)</i>");
 }
 
+std::string Modeling::getInfoCard(std::string cond) const
+{
+    std::string card = "<b>Atomic Models:</b>\n";
+
+    vpz::AtomicModelList list =
+        vpz().project().model().atomicModels();
+    vpz::AtomicModelList::iterator it = list.begin();
+
+    while (it != list.end()) {
+        std::vector < std::string > mdlConditions =
+            it->second.conditions();
+        std::vector < std::string >::const_iterator its =
+            std::find(mdlConditions.begin(), mdlConditions.end(), cond);
+
+        if(its != mdlConditions.end()) {
+            card = card + it->first->getName() + "\n";
+        }
+        ++it;
+    }
+
+    vpz::ClassList::const_iterator itc = vpz().project().classes().begin();
+    card = card + "<b>Classes:</b>";
+
+    while (itc != vpz().project().classes().end()) {
+        vpz::AtomicModelList atomlist( itc->second.atomicModels() );
+        vpz::AtomicModelList::iterator itl = atomlist.begin();
+
+        while (itl != atomlist.end()) {
+            std::vector < std::string > mdlConditions =
+                itl->second.conditions();
+            std::vector < std::string >::const_iterator its =
+                std::find(mdlConditions.begin(), mdlConditions.end(), cond);
+
+            if(its != mdlConditions.end()) {
+                card = card + "\n" + itc->first;
+                break;
+            }
+            ++itl;
+        }
+        ++itc;
+    }
+
+    return card;
+}
+
 std::string Modeling::getClassIdCard(graph::Model* model,
                                      std::string className) const
 {

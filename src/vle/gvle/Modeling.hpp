@@ -34,7 +34,7 @@
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
-#include <vle/vpz/Vpz.hpp>
+#include <vle/vpz/Project.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -557,6 +557,8 @@ public:
     std::string getIdCard(graph::Model* model) const;
 
     std::string getIdCard(graph::CoupledModel* model) const;
+
+    std::string getInfoCard(std::string cond) const;
 
     std::string getClassIdCard(graph::Model* model,
                                std::string className) const;

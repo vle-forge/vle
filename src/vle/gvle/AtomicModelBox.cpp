@@ -490,6 +490,10 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
 		      &AtomicModelBox::ConditionTreeView::
 		      onEditionStarted) );
 
+    set_has_tooltip();
+    signal_query_tooltip().connect(
+        sigc::mem_fun(*this, &AtomicModelBox::ConditionTreeView::onQueryTooltip));
+
     mCellrendererValidated->signal_edited().connect(
 	sigc::mem_fun(*this,
 		      &AtomicModelBox::ConditionTreeView::
@@ -737,6 +741,24 @@ void AtomicModelBox::ConditionTreeView::onEdition(
 	    mRenameList.push_back(std::make_pair(mOldName, newName));
 	    build();
 	}
+    }
+}
+
+bool AtomicModelBox::ConditionTreeView::onQueryTooltip(
+    int wx,int wy, bool keyboard_tooltip,
+    const Glib::RefPtr<Gtk::Tooltip>& tooltip)
+{
+    Gtk::TreeModel::iterator iter;
+    Glib::ustring card;
+
+    if (get_tooltip_context_iter(wx, wy, keyboard_tooltip, iter)) {
+        Glib::ustring cond = (*iter).get_value(mColumns.m_col_name);
+        card = mModeling->getInfoCard(cond);
+        tooltip->set_markup(card);
+        set_tooltip_row(tooltip, Gtk::TreePath(iter));
+        return true;
+    } else {
+        return false;
     }
 }
 
