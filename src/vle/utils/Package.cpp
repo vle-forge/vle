@@ -664,7 +664,7 @@ void Package::process(const std::string& workingDir,
 
     m_stop = false;
 
-    if (utils::Trace::isInLevel(utils::Trace::DEVS)) {
+    if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
         std::list < std::string >::const_iterator it = envp.begin();
         std::list < std::string >::const_iterator et = envp.end();
 

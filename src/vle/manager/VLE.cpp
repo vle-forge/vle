@@ -130,7 +130,7 @@ bool Manager::runSimulator(int process, int port)
     try {
         std::cerr << _("Simulator start in daemon mode\n");
 
-        if (utils::Trace::getLevel() != utils::Trace::DEVS) {
+        if (utils::Trace::getLevel() != utils::TRACE_LEVEL_DEVS) {
             utils::buildDaemon();
         }
 

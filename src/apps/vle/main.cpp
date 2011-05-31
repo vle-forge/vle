@@ -359,8 +359,7 @@ int main(int argc, char* argv[])
     try {
         context.parse(argc, argv);
         command.check();
-        utils::Trace::setLevel(static_cast < utils::Trace::Level >(
-                command.verbose()));
+        utils::Trace::setLevel(utils::Trace::cast(command.verbose()));
         utils::Package::package().select(command.currentPackage());
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Command line error: %1%\n")) % e.what();

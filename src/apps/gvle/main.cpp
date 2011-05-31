@@ -97,8 +97,7 @@ int main(int argc, char** argv)
 
     vle::utils::Trace::setLogFile(
         vle::utils::Trace::getLogFilename("gvle.log"));
-    vle::utils::Trace::setLevel(
-        static_cast < vle::utils::Trace::Level >(group.mLevel));
+    vle::utils::Trace::setLevel(vle::utils::Trace::cast(group.mLevel));
 
     bool result = true;
     if (group.mInfo) {

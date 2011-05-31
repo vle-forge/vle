@@ -46,7 +46,7 @@ public:
     Pimpl()
         : mFilename(getDefaultLogFilename()),
         mFile(new std::ofstream(getDefaultLogFilename().c_str())),
-        mLevel(utils::Trace::ALWAYS), mWarnings(0)
+        mLevel(TRACE_LEVEL_ALWAYS), mWarnings(0)
     {
         if (not mFile->is_open()) {
             mFilename.clear();
@@ -86,30 +86,31 @@ public:
         return mFilename;
     }
 
-    void send(const std::string& str, Level level)
+    void send(const std::string& str, TraceLevelOptions level)
     {
         if (mFile) {
             (*mFile) << "---" << str << std::endl;
-            if (level != ALWAYS) {
+            if (level != utils::TRACE_LEVEL_ALWAYS) {
                 mWarnings++;
             }
         }
     }
 
-    Level getLevel()
+    TraceLevelOptions getLevel()
     {
         return mLevel;
     }
 
-    void setLevel(Level level)
+    void setLevel(TraceLevelOptions level)
     {
-        mLevel = (level < 0 or level > utils::Trace::DEVS) ?
-            utils::Trace::DEVS : level;
+        mLevel = (level < 0 or level > utils::TRACE_LEVEL_DEVS) ?
+            utils::TRACE_LEVEL_DEVS :
+            level;
     }
 
-    bool isInLevel(Level level)
+    bool isInLevel(TraceLevelOptions level)
     {
-        return Trace::ALWAYS <= level and level <= mLevel;
+        return TRACE_LEVEL_ALWAYS <= level and level <= mLevel;
     }
 
     bool haveWarning()
@@ -136,7 +137,7 @@ private:
 
     std::ofstream*  mFile; /**< A reference to the current ostream. */
 
-    Level           mLevel; /**< The current level of the singleton. */
+    TraceLevelOptions mLevel; /**< The current level of the singleton. */
 
     size_t          mWarnings; /**< Number of warning since the singleton
                                  exists. */
@@ -194,7 +195,7 @@ void Trace::setLogFile(const std::string& filename)
     Pimpl::mTrace->setLogFile(filename);
 }
 
-void Trace::send(const std::string& str, Level level)
+void Trace::send(const std::string& str, TraceLevelOptions level)
 {
     if (not Trace::Pimpl::mTrace) {
         Trace::init();
@@ -205,7 +206,7 @@ void Trace::send(const std::string& str, Level level)
     Pimpl::mTrace->send(str, level);
 }
 
-void Trace::send(const boost::format& str, Level level)
+void Trace::send(const boost::format& str, TraceLevelOptions level)
 {
     if (not Trace::Pimpl::mTrace) {
         Trace::init();
@@ -226,7 +227,7 @@ std::string Trace::getLogFilename(const std::string& filename)
     return Path::buildFilename(utils::Path::path().getHomeDir(), filename);
 }
 
-Trace::Level Trace::getLevel()
+TraceLevelOptions Trace::getLevel()
 {
     if (not Trace::Pimpl::mTrace) {
         Trace::init();
@@ -237,7 +238,7 @@ Trace::Level Trace::getLevel()
     return Pimpl::mTrace->getLevel();
 }
 
-void Trace::setLevel(Trace::Level level)
+void Trace::setLevel(TraceLevelOptions level)
 {
     if (not Trace::Pimpl::mTrace) {
         Trace::init();
@@ -248,7 +249,7 @@ void Trace::setLevel(Trace::Level level)
     Pimpl::mTrace->setLevel(level);
 }
 
-bool Trace::isInLevel(Trace::Level level)
+bool Trace::isInLevel(TraceLevelOptions level)
 {
     if (not Trace::Pimpl::mTrace) {
         Trace::init();
@@ -279,6 +280,22 @@ size_t Trace::warnings()
     boost::mutex::scoped_lock lock(Pimpl::mMutex);
 
     return Pimpl::mTrace->warnings();
+}
+
+TraceLevelOptions Trace::cast(int level) throw()
+{
+    switch (level) {
+    case 0:
+        return TRACE_LEVEL_ALWAYS;
+    case 1:
+        return TRACE_LEVEL_MODEL;
+    case 2:
+        return TRACE_LEVEL_EXTENSION;
+    case 3:
+        return TRACE_LEVEL_DEVS;
+    default:
+        return TRACE_LEVEL_ALWAYS;
+    }
 }
 
 }} // namespace vle utils
