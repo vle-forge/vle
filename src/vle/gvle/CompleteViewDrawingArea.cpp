@@ -26,8 +26,8 @@
  */
 
 
-#include <vle/gvle/Settings.hpp>
 #include <vle/gvle/CompleteViewDrawingArea.hpp>
+#include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/utils/Debug.hpp>

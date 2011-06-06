@@ -615,42 +615,19 @@ void Package::select(const std::string& name)
 void Package::refresh()
 {
     utils::Preferences prefs;
-    prefs.load();
 
-    prefs.assign("package", "configure", mCommandConfigure);
-    prefs.assign("package", "test", mCommandTest);
-    prefs.assign("package", "build", mCommandBuild);
-    prefs.assign("package", "install", mCommandInstall);
-    prefs.assign("package", "clean", mCommandClean);
-    prefs.assign("package", "pack", mCommandPack);
-    prefs.assign("package", "unzip", mCommandUnzip);
+    prefs.get("vle.packages.configure", &mCommandConfigure);
+    prefs.get("vle.packages.test", &mCommandTest);
+    prefs.get("vle.packages.build", &mCommandBuild);
+    prefs.get("vle.packages.install", &mCommandInstall);
+    prefs.get("vle.packages.clean", &mCommandClean);
+    prefs.get("vle.packages.pack", &mCommandPack);
+    prefs.get("vle.packages.unzip", &mCommandUnzip);
 }
 
 Package::Package()
     : m_stop(true), m_success(false), m_out(0), m_err(0), m_wait(0), m_pid(0)
 {
-#ifdef BOOST_WINDOWS
-    mCommandConfigure = "cmake.exe -G 'MinGW Makefiles' " \
-                       "-DCMAKE_INSTALL_PREFIX='%1%' " \
-                       "-DCMAKE_BUILD_TYPE=RelWithDebInfo ..";
-    mCommandTest = "mingw32-make.exe test";
-    mCommandBuild = "cmake --build .";
-    mCommandInstall = "mingw32-make.exe install";
-    mCommandClean = "mingw32-make.exe clean";
-    mCommandPack = "mingw32-make.exe package package_source";
-    mCommandUnzip = "unzip.exe";
-
-#else
-    mCommandConfigure = "cmake " \
-                       "-DCMAKE_INSTALL_PREFIX=%1% " \
-                       "-DCMAKE_BUILD_TYPE=RelWithDebInfo ..";
-    mCommandTest = "make test";
-    mCommandBuild = "make all";
-    mCommandInstall = "make install";
-    mCommandClean = "make clean";
-    mCommandPack = "make package package_source";
-    mCommandUnzip = "unzip";
-#endif
 }
                             /*   manage thread   */
 

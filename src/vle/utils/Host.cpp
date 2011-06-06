@@ -64,10 +64,10 @@ void Hosts::read()
 
     {
         Preferences prefs;
-        prefs.load();
-        hosts = prefs.getAttributes("vle.daemon", "hosts");
-        ports = prefs.getAttributes("vle.daemon", "ports");
-        processes = prefs.getAttributes("vle.daemon", "processes");
+
+        prefs.get("vle.daemon.hosts", &hosts);
+        prefs.get("vle.daemon.ports", &ports);
+        prefs.get("vle.daemon.processes", &processes);
     }
 
     std::vector < std::string > hostsl, portsl, processesl;
@@ -115,13 +115,10 @@ void Hosts::write()
     }
 
     Preferences prefs;
-    prefs.load();
 
-    prefs.setAttributes("vle.daemon", "host", hosts);
-    prefs.setAttributes("vle.daemon", "ports", ports);
-    prefs.setAttributes("vle.daemon", "processes", processes);
-
-    prefs.save();
+    prefs.set("vle.daemon.host", hosts);
+    prefs.set("vle.daemon.ports", ports);
+    prefs.set("vle.daemon.processes", processes);
 
     mIsModified = false;
 }

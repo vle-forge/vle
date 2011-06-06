@@ -326,25 +326,6 @@ void cliRemote(int argc, char* argv[])
     }
 }
 
-void cliConfig(int argc, char* argv[])
-{
-    utils::Preferences prefs;
-    prefs.load();
-
-    if ((argc - 1) % 3) {
-        throw utils::ArgError(
-            _("Bad argument: vle --config [section key value] ...\n"
-              "\tvle --config package make \"make -j 2\"\n"
-              "\tvle --config package install \"make-mingw32.exe install\"\n"));
-    }
-
-    for (int i = 1; i < argc; i += 3) {
-        prefs.setAttributes(argv[i], argv[i + 1], argv[i + 2]);
-    }
-
-    prefs.save();
-}
-
 } // namespace vle
 
 int main(int argc, char* argv[])
@@ -399,8 +380,6 @@ int main(int argc, char* argv[])
             cliPackage(argc, argv, lst);
         } else if (command.remote()) {
             cliRemote(argc, argv);
-        } else if (command.config()) {
-            cliConfig(argc, argv);
         } else {
             cliDirect(argc, argv, lst);
         }

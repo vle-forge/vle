@@ -39,13 +39,13 @@
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/PreferencesBox.hpp>
-#include <vle/gvle/Settings.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/NewProjectBox.hpp>
+#include <vle/gvle/Settings.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Debug.hpp>
@@ -75,8 +75,6 @@ GVLE::GVLE(BaseObjectType* cobject,
     mRefXML = xml;
     mModeling->setGlade(mRefXML);
 
-    Settings::settings().load();
-
     mGlobalVpzPrevDirPath = "";
 
     mConditionsBox = new ConditionsBox(mRefXML, this);
@@ -84,14 +82,6 @@ GVLE::GVLE(BaseObjectType* cobject,
     mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling);
     mSaveVpzBox = new SaveVpzBox(mRefXML, mModeling);
     mQuitBox = new QuitBox(mRefXML, mModeling);
-
-    if (Settings::settings().getFont().empty()) {
-        Settings::settings().setFont(mPreferencesBox->getGraphicsFont());
-    }
-
-    if (Settings::settings().getFontEditor().empty()) {
-        Settings::settings().setFontEditor(mPreferencesBox->getEditorFont());
-    }
 
     mRefXML->get_widget("MenuAndToolbarVbox", mMenuAndToolbarVbox);
     mRefXML->get_widget("StatusBarPackageBrowser", mStatusbar);
@@ -114,6 +104,10 @@ GVLE::GVLE(BaseObjectType* cobject,
     mMenuAndToolbar->getToolbar()->set_toolbar_style(Gtk::TOOLBAR_BOTH);
 
     mModeling->setModified(false);
+
+    Settings::settings(); /** Initialize the GVLE settings singleton to read
+                            colors, fonts, commands from the configuration file
+                            `vle.conf'. */
 
     Glib::signal_timeout().connect( sigc::mem_fun(*this, &GVLE::on_timeout), 1000 );
 
@@ -146,8 +140,6 @@ GVLE::~GVLE()
     delete mSaveVpzBox;
     delete mQuitBox;
     delete mMenuAndToolbar;
-
-    Settings::settings().kill();
 }
 
 bool GVLE::on_timeout()

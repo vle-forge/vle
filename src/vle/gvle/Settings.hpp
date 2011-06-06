@@ -30,214 +30,141 @@
 #define VLE_GVLE_SETTINGS_HPP
 
 #include <vle/gvle/DllDefines.hpp>
-#include <vle/utils/Preferences.hpp>
 #include <gdkmm/color.h>
+#include <string>
 
 namespace vle { namespace gvle {
 
-class VLE_GVLE_EXPORT EditorSettings
+/**
+ * @brief vle::gvle::Settings is a singleton class to store all the variable
+ * used in the GVLE graphical interface, font, font-size, colors of atomic and
+ * coupled models, size of connections etc.
+ *
+ * @code
+ * Settings::settings().setBackgroundColor(Gdk::Color("#ffff0000ffff");
+ *
+ * std::string font = Settings::settings().getFontEditor();
+ * assert(font, "Monospace 10");
+ * @endcode
+ */
+class VLE_GVLE_EXPORT Settings
 {
 public:
-    EditorSettings(const std::string& font)
-        : mFontEditor(font)
-    {}
+    /**
+     * @brief Access to the only instance of the Settings class.
+     *
+     * @return The only instance of Settings.
+     */
+    static Settings& settings();
 
-    void setDefault();
-    void load(vle::utils::Preferences& prefs);
-    virtual void operator=(const EditorSettings& src);
-    void save(vle::utils::Preferences& prefs);
+    /**
+     * @brief Delete the only instance of the Settings class.
+     */
+    static void kill();
 
-    void setHighlightSyntax(bool syntax)
-    { mHighlightSyntax = syntax; }
-
-    bool getHighlightSyntax()
-    { return mHighlightSyntax; }
-
-    void setHighlightBrackets(bool brackets)
-    { mHighlightBrackets = brackets; }
-
-    bool getHighlightBrackets()
-    { return mHighlightBrackets; }
-
-    void setHighlightLine(bool line)
-    { mHighlightLine = line; }
-
-    bool getHighlightLine()
-    { return mHighlightLine; }
-
-    void setLineNumbers(bool numbers)
-    { mLineNumbers = numbers; }
-
-     bool getLineNumbers()
-    { return mLineNumbers; }
-
-    void setRightMargin(bool margin)
-    { mRightMargin = margin; }
-
-    bool getRightMargin()
-    { return mRightMargin; }
-
-    void setAutoIndent(bool auto_indent)
-    { mAutoIndent = auto_indent; }
-
-    bool getAutoIndent()
-    { return mAutoIndent; }
-
-    void setIndentOnTab(bool indent_tab)
-    { mIndentOnTab = indent_tab; }
-
-    bool getIndentOnTab()
-    { return mIndentOnTab; }
-
-    void setIndentSize(int size)
-    { mIndentSize = size; }
-
-    int getIndentSize()
-    { return mIndentSize; }
-
-    void setSmartHomeEnd(bool smart)
-    { mSmartHomeEnd = smart; }
-
-    bool getSmartHomeEnd()
-    { return mSmartHomeEnd; }
-
-    void setFontEditor(const std::string& font)
-    { mFontEditor = font; }
-
-    const std::string& getFontEditor()
-    { return mFontEditor; }
-
-private:
-    bool mHighlightSyntax;
-    bool mHighlightBrackets;
-    bool mHighlightLine;
-    bool mLineNumbers;
-    bool mRightMargin;
-    bool mAutoIndent;
-    bool mIndentOnTab;
-    int  mIndentSize;
-    bool mSmartHomeEnd;
-    std::string mFontEditor;
-};
-
-class VLE_GVLE_EXPORT GraphicsSettings
-{
-public:
-    GraphicsSettings(const std::string& font)
-        : mFont(font)
-    {}
-
-    void setDefault();
-    void load(vle::utils::Preferences& prefs);
-    virtual void operator=(const GraphicsSettings& src);
-    void save(vle::utils::Preferences& prefs);
-
-    void setForegroundColor(const Gdk::Color& color)
-    { mForegroundColor = color; }
-
-    const Gdk::Color& getForegroundColor() const
-    { return mForegroundColor; }
-
-    void setBackgroundColor(const Gdk::Color& color)
-    { mBackgroundColor = color; }
-
-    const Gdk::Color& getBackgroundColor() const
-    { return mBackgroundColor; }
-
-    void setSelectedColor(const Gdk::Color& color)
-    { mSelectedColor = color; }
-
-    const Gdk::Color& getSelectedColor() const
-    { return mSelectedColor; }
-
-    void setCoupledColor(const Gdk::Color& color)
-    { mCoupledColor = color; }
-
-    const Gdk::Color& getCoupledColor() const
-    { return mCoupledColor; }
-
-    void setAtomicColor(const Gdk::Color& color)
-    { mAtomicColor = color; }
-
-    const Gdk::Color& getAtomicColor() const
-    { return mAtomicColor; }
-
-    void setConnectionColor(const Gdk::Color& color)
-    { mConnectionColor = color; }
-
-    const Gdk::Color& getConnectionColor() const
-    { return mConnectionColor; }
-
-    void setFont(const std::string& font)
-    { mFont = font; }
-
-    const std::string& getFont() const
-    { return mFont; }
-
-    void setFontSize(const double size)
-    { mFontSize = size; }
-
-    double getFontSize() const
-    { return mFontSize; }
-
-    void setLineWidth(double width)
-    { mLineWidth = width; }
-
-    double getLineWidth() const
-    { return mLineWidth; }
-
-private:
-    Gdk::Color makeColorFromString(const std::string& value);
-    std::string makeStringFromColor(const Gdk::Color& color);
-
-    Gdk::Color mBackgroundColor;
-    Gdk::Color mForegroundColor;
-    Gdk::Color mAtomicColor;
-    Gdk::Color mCoupledColor;
-    Gdk::Color mSelectedColor;
-    Gdk::Color mConnectionColor;
-    std::string mFont;
-    double mFontSize;
-    double mLineWidth;
-};
-
-class VLE_GVLE_EXPORT Settings : public EditorSettings, public GraphicsSettings
-{
-public:
-    Settings()
-        : EditorSettings(""), GraphicsSettings("")
-    {}
-
-    Settings(const std::string& editorFont,
-             const std::string& graphicsFont)
-        : EditorSettings(editorFont), GraphicsSettings(graphicsFont)
-    {}
-
+    /**
+     * @brief Assign a default value for all the variables of this class.
+     */
     void setDefault();
 
+    /**
+     * @brief Use the vle::utils::Preferences class to load the `vle.conf' file
+     * and assign all variables of this class.
+     */
     void load();
 
-    virtual void operator=(const Settings& src);
-
+    /**
+     * @brief use the vle::utils::Preferences class to store all variables of
+     * this class into the `vle.conf' file.
+     */
     void save();
 
-    static Settings& settings()
-    { if (mSettings == 0) mSettings = new Settings; return *mSettings; }
+    // get/set functions.
 
-    Settings& settings(const std::string& editorFont,
-                       const std::string& graphicsFont)
-    {
-        if (mSettings == 0) {
-            mSettings = new Settings(editorFont, graphicsFont);
-        }
-        return *mSettings;
-    }
+    void setHighlightSyntax(bool syntax);
 
-    void kill()
-    { if (mSettings) delete mSettings; }
+    bool getHighlightSyntax();
+
+    void setHighlightBrackets(bool brackets);
+
+    bool getHighlightBrackets();
+
+    void setHighlightLine(bool line);
+
+    bool getHighlightLine();
+
+    void setLineNumbers(bool numbers);
+
+    bool getLineNumbers();
+
+    void setRightMargin(bool margin);
+
+    bool getRightMargin();
+
+    void setAutoIndent(bool auto_indent);
+
+    bool getAutoIndent();
+
+    void setIndentOnTab(bool indent_tab);
+
+    bool getIndentOnTab();
+
+    void setIndentSize(int size);
+
+    int getIndentSize();
+
+    void setSmartHomeEnd(bool smart);
+
+    bool getSmartHomeEnd();
+
+    void setFontEditor(const std::string& font);
+
+    const std::string& getFontEditor();
+
+    void setForegroundColor(const Gdk::Color& color);
+
+    const Gdk::Color& getForegroundColor() const;
+
+    void setBackgroundColor(const Gdk::Color& color);
+
+    const Gdk::Color& getBackgroundColor() const;
+
+    void setSelectedColor(const Gdk::Color& color);
+
+    const Gdk::Color& getSelectedColor() const;
+
+    void setCoupledColor(const Gdk::Color& color);
+
+    const Gdk::Color& getCoupledColor() const;
+
+    void setAtomicColor(const Gdk::Color& color);
+
+    const Gdk::Color& getAtomicColor() const;
+
+    void setConnectionColor(const Gdk::Color& color);
+
+    const Gdk::Color& getConnectionColor() const;
+
+    void setFont(const std::string& font);
+
+    const std::string& getFont() const;
+
+    void setFontSize(const double size);
+
+    double getFontSize() const;
+
+    void setLineWidth(double width);
+
+    double getLineWidth() const;
 
 private:
-    static Settings* mSettings;
+    Settings();
+    ~Settings();
+    Settings(const Settings& other);
+    Settings& operator=(const Settings& other);
+
+    class Pimpl;
+    Pimpl* mPimpl;
 };
 
 }} // namespace vle gvle

@@ -27,270 +27,211 @@
 
 
 #include <vle/gvle/PreferencesBox.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
+#include <vle/gvle/Settings.hpp>
+#include <vle/utils/i18n.hpp>
+#include <gtkmm/dialog.h>
+#include <gtkmm/button.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/colorbutton.h>
+#include <gtkmm/fontbutton.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/scale.h>
 
 namespace vle { namespace gvle {
 
-PreferencesBox::PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
-    mXml(xml)
+class PreferencesBox::Pimpl
 {
-    xml->get_widget("DialogPreferences", mDialog);
+public:
+    Pimpl(Glib::RefPtr < Gnome::Glade::Xml > xml)
+        : mXml(xml)
+    {
+        xml->get_widget("DialogPreferences", mDialog);
 
-    // Graphics tab
-    xml->get_widget("ButtonPreferencesFgColor", mForegroundColor);
-    mForegroundColor->signal_color_set().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onButtonForegroundColorChange));
-    xml->get_widget("ButtonPreferencesBgColor", mBackgroundColor);
-    mBackgroundColor->signal_color_set().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onButtonBackgroundColorChange));
-    xml->get_widget("ButtonPreferencesAtomicColor", mAtomicColor);
-    mAtomicColor->signal_color_set().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onButtonAtomicColorChange));
-    xml->get_widget("ButtonPreferencesCoupledColor", mCoupledColor);
-    mCoupledColor->signal_color_set().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onButtonCoupledColorChange));
-    xml->get_widget("ButtonPreferencesSelectedColor", mSelectedColor);
-    mSelectedColor->signal_color_set().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onButtonSelectedColorChange));
-    xml->get_widget("ButtonPreferencesConnectionColor", mConnectionColor);
-    mConnectionColor->signal_color_set().connect(
-        sigc::mem_fun(*this, &PreferencesBox::onButtonConnectionColorChange));
-    xml->get_widget("ButtonPreferencesSelectFont", mFont);
-    mFont->signal_font_set().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onButtonFontChange));
-    xml->get_widget("HScalePreferencesLineWidth", mLineWidth);
-    mLineWidth->signal_value_changed().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onLineWidthChange));
+        xml->get_widget("ButtonPreferencesFgColor", mForegroundColor);
+        xml->get_widget("ButtonPreferencesBgColor", mBackgroundColor);
+        xml->get_widget("ButtonPreferencesAtomicColor", mAtomicColor);
+        xml->get_widget("ButtonPreferencesCoupledColor", mCoupledColor);
+        xml->get_widget("ButtonPreferencesSelectedColor", mSelectedColor);
+        xml->get_widget("ButtonPreferencesConnectionColor", mConnectionColor);
+        xml->get_widget("ButtonPreferencesSelectFont", mFont);
+        xml->get_widget("HScalePreferencesLineWidth", mLineWidth);
 
-    // Editor tab
-    xml->get_widget("CheckPreferencesHighlightSyntax", mHighlightSyntax);
-    mHighlightSyntax->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onHighlightSyntax));
-    xml->get_widget("CheckPreferencesHighlightMatchingBrackets", mHighlightMatchingBrackets);
-    mHighlightMatchingBrackets->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onHighlightMatchingBrackets));
-    xml->get_widget("CheckPreferencesHighlightCurrentLine", mHighlightCurrentLine);
-    mHighlightCurrentLine->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onHighlightCurrentLine));
-    xml->get_widget("CheckPreferencesLineNumbers", mLineNumbers);
-    mLineNumbers->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onShowLineNumbers));
-    xml->get_widget("CheckPreferencesRightMargin", mRightMargin);
-    mRightMargin->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onShowRightMargin));
-    xml->get_widget("CheckPreferencesAutoIndent", mAutoIndent);
-    mAutoIndent->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onAutoIndent));
-    xml->get_widget("CheckPreferencesIndentOnTab", mIndentOnTab);
-    mIndentOnTab->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onIndentOnTab));
-    xml->get_widget("SpinButtonPreferencesIndentSize", mIndentSize);
-    mIndentSize->signal_value_changed().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onIndentSizeChange));
-    xml->get_widget("CheckPreferencesSmartHomeEnd", mSmartHomeEnd);
-    mSmartHomeEnd->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onSmartHomeEnd));
-    xml->get_widget("FontButtonPreferencesEditor", mFontEditor);
-    mFontEditor->signal_font_set().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onEditorFontChange));
+        xml->get_widget("CheckPreferencesHighlightSyntax", mHighlightSyntax);
+        xml->get_widget("CheckPreferencesHighlightMatchingBrackets",
+                        mHighlightMatchingBrackets);
+        xml->get_widget("CheckPreferencesHighlightCurrentLine",
+                        mHighlightCurrentLine);
+        xml->get_widget("CheckPreferencesLineNumbers", mLineNumbers);
+        xml->get_widget("CheckPreferencesRightMargin", mRightMargin);
+        xml->get_widget("CheckPreferencesAutoIndent", mAutoIndent);
+        xml->get_widget("CheckPreferencesIndentOnTab", mIndentOnTab);
+        xml->get_widget("SpinButtonPreferencesIndentSize", mIndentSize);
+        xml->get_widget("CheckPreferencesSmartHomeEnd", mSmartHomeEnd);
+        xml->get_widget("FontButtonPreferencesEditor", mFontEditor);
+        xml->get_widget("ButtonPreferencesApply", mButtonApply);
+        xml->get_widget("ButtonPreferencesCancel", mButtonCancel);
+        xml->get_widget("ButtonPreferencesRestore", mButtonRestore);
 
-    // Action area
-    xml->get_widget("ButtonPreferencesApply", mButtonApply);
-    mButtonApply->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onApply));
-    xml->get_widget("ButtonPreferencesCancel", mButtonCancel);
-    mButtonCancel->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onCancel));
-    xml->get_widget("ButtonPreferencesRestore", mButtonRestore);
-    mButtonRestore->signal_clicked().connect(
-	sigc::mem_fun(*this, &PreferencesBox::onRestore));
+        mSigcConnections.push_back(mButtonApply->signal_clicked().connect(
+            sigc::mem_fun(*this, &PreferencesBox::Pimpl::onApply)));
+
+        mSigcConnections.push_back(mButtonCancel->signal_clicked().connect(
+            sigc::mem_fun(*this, &PreferencesBox::Pimpl::onCancel)));
+
+        mSigcConnections.push_back(mButtonRestore->signal_clicked().connect(
+                sigc::mem_fun(*this, &PreferencesBox::Pimpl::onRestore)));
+    }
+
+    ~Pimpl()
+    {
+        std::for_each(mSigcConnections.begin(), mSigcConnections.end(),
+                      DisconnectSignal());
+
+        if (mDialog) {
+            mDialog->hide_all();
+        }
+    }
+
+    struct DisconnectSignal {
+        void operator()(std::list < sigc::connection >::value_type& cnt) {
+            cnt.disconnect();
+        }
+    };
+
+    int run()
+    {
+        loadSettings();
+
+        mDialog->show_all();
+        return mDialog->run();
+    }
+
+    void onApply()
+    {
+        saveSettings();
+
+        mDialog->hide_all();
+        mDialog->response(Gtk::RESPONSE_OK);
+    }
+
+    void onCancel()
+    {
+        mDialog->hide_all();
+        mDialog->response(Gtk::RESPONSE_CANCEL);
+    }
+
+    void onRestore()
+    {
+        Settings::settings().setDefault();
+        updateWidgets();
+    }
+
+    void loadSettings()
+    {
+        Settings::settings().load();
+        updateWidgets();
+    }
+
+    void saveSettings()
+    {
+        Settings::settings().setBackgroundColor(mBackgroundColor->get_color());
+        Settings::settings().setForegroundColor(mForegroundColor->get_color());
+        Settings::settings().setAtomicColor(mAtomicColor->get_color());
+        Settings::settings().setCoupledColor(mCoupledColor->get_color());
+        Settings::settings().setSelectedColor(mSelectedColor->get_color());
+        Settings::settings().setConnectionColor(mConnectionColor->get_color());
+        Settings::settings().setFont(mFont->get_font_name());
+        Settings::settings().setLineWidth(mLineWidth->get_value());
+
+        Settings::settings().setHighlightSyntax(
+            mHighlightSyntax->get_active());
+        Settings::settings().setHighlightBrackets(
+            mHighlightMatchingBrackets->get_active());
+        Settings::settings().setHighlightLine(
+            mHighlightCurrentLine->get_active());
+        Settings::settings().setLineNumbers(mLineNumbers->get_active());
+        Settings::settings().setRightMargin(mRightMargin->get_active());
+        Settings::settings().setAutoIndent(mAutoIndent->get_active());
+        Settings::settings().setIndentOnTab(mIndentOnTab->get_active());
+        Settings::settings().setIndentSize(mIndentSize->get_value_as_int());
+        Settings::settings().setSmartHomeEnd(mSmartHomeEnd->get_active());
+        Settings::settings().setFontEditor(mFontEditor->get_font_name());
+
+        Settings::settings().save();
+    }
+
+    void updateWidgets()
+    {
+        mBackgroundColor->set_color(Settings::settings().getBackgroundColor());
+        mForegroundColor->set_color(Settings::settings().getForegroundColor());
+        mAtomicColor->set_color(Settings::settings().getAtomicColor());
+        mCoupledColor->set_color(Settings::settings().getCoupledColor());
+        mSelectedColor->set_color(Settings::settings().getSelectedColor());
+        mConnectionColor->set_color(Settings::settings().getConnectionColor());
+        mFont->set_font_name(Settings::settings().getFont());
+        mLineWidth->set_value(Settings::settings().getLineWidth());
+
+        mHighlightSyntax->set_active(
+            Settings::settings().getHighlightSyntax());
+        mHighlightMatchingBrackets->set_active(
+            Settings::settings().getHighlightBrackets());
+        mHighlightCurrentLine->set_active(
+            Settings::settings().getHighlightLine());
+        mLineNumbers->set_active(Settings::settings().getLineNumbers());
+        mRightMargin->set_active(Settings::settings().getRightMargin());
+        mAutoIndent->set_active(Settings::settings().getAutoIndent());
+        mIndentOnTab->set_active(Settings::settings().getIndentOnTab());
+        mIndentSize->set_value(Settings::settings().getIndentSize());
+        mSmartHomeEnd->set_active(Settings::settings().getSmartHomeEnd());
+        mFontEditor->set_font_name(Settings::settings().getFontEditor());
+    }
+
+    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Gtk::Dialog*                    mDialog;
+
+    //Dialog widgets - Action
+    Gtk::Button* mButtonApply;
+    Gtk::Button* mButtonCancel;
+    Gtk::Button* mButtonRestore;
+
+    //Dialog widgets - Graphics
+    Gtk::ColorButton* mBackgroundColor;
+    Gtk::ColorButton* mForegroundColor;
+    Gtk::ColorButton* mAtomicColor;
+    Gtk::ColorButton* mCoupledColor;
+    Gtk::ColorButton* mSelectedColor;
+    Gtk::ColorButton* mConnectionColor;
+    Gtk::FontButton*  mFont;
+    Gtk::HScale*      mLineWidth;
+
+    //Dialog widgets - Editor
+    Gtk::CheckButton* mHighlightSyntax;
+    Gtk::CheckButton* mHighlightMatchingBrackets;
+    Gtk::CheckButton* mHighlightCurrentLine;
+    Gtk::CheckButton* mLineNumbers;
+    Gtk::CheckButton* mRightMargin;
+    Gtk::CheckButton* mAutoIndent;
+    Gtk::CheckButton* mIndentOnTab;
+    Gtk::SpinButton*  mIndentSize;
+    Gtk::CheckButton* mSmartHomeEnd;
+    Gtk::FontButton*  mFontEditor;
+
+    std::list < sigc::connection > mSigcConnections;
+};
+
+PreferencesBox::PreferencesBox(Glib::RefPtr < Gnome::Glade::Xml > xml)
+    : mPimpl(new PreferencesBox::Pimpl(xml))
+{
 }
 
 PreferencesBox::~PreferencesBox()
 {
-    mDialog->hide_all();
+    delete mPimpl;
 }
 
 int PreferencesBox::run()
 {
-    init();
-    mDialog->show_all();
-    return mDialog->run();
-}
-
-std::string PreferencesBox::getGraphicsFont()
-{
-    return mFont->get_font_name();
-}
-
-std::string PreferencesBox::getEditorFont()
-{
-    return mFontEditor->get_font_name();
-}
-
-// Actions
-void PreferencesBox::onApply()
-{
-    saveSettings();
-    mDialog->hide_all();
-    mDialog->response(Gtk::RESPONSE_OK);
-}
-
-void PreferencesBox::onCancel()
-{
-    mDialog->hide_all();
-    mDialog->response(Gtk::RESPONSE_CANCEL);
-}
-
-void PreferencesBox::onRestore()
-{
-    mCurrentSettings.setDefault();
-    activate();
-}
-
-// Graphics
-void PreferencesBox::onButtonBackgroundColorChange()
-{
-    mCurrentSettings.setBackgroundColor(mBackgroundColor->get_color());
-}
-
-void PreferencesBox::onButtonForegroundColorChange()
-{
-    mCurrentSettings.setForegroundColor(mForegroundColor->get_color());
-}
-
-void PreferencesBox::onButtonAtomicColorChange()
-{
-    mCurrentSettings.setAtomicColor(mAtomicColor->get_color());
-}
-
-void PreferencesBox::onButtonCoupledColorChange()
-{
-    mCurrentSettings.setCoupledColor(mCoupledColor->get_color());
-}
-
-void PreferencesBox::onButtonSelectedColorChange()
-{
-    mCurrentSettings.setSelectedColor(mSelectedColor->get_color());
-}
-
-void PreferencesBox::onButtonConnectionColorChange()
-{
-    mCurrentSettings.setConnectionColor(mConnectionColor->get_color());
-}
-
-void PreferencesBox::onButtonFontChange()
-{
-    std::vector< std::string > splitVec;
-    mCurrentSettings.setFont(mFont->get_font_name());
-
-    boost::split(splitVec, mCurrentSettings.getFont(), boost::is_any_of(" "));
-
-    mCurrentSettings.setFontSize(boost::lexical_cast<double>(
-                                     splitVec[splitVec.size() -1]));
-}
-
-void PreferencesBox::onLineWidthChange()
-{
-    mCurrentSettings.setLineWidth(mLineWidth->get_value());
-}
-
-// Editor
-void PreferencesBox::onHighlightSyntax()
-{
-    mCurrentSettings.setHighlightSyntax(mHighlightSyntax->get_active());
-}
-
-void PreferencesBox::onHighlightMatchingBrackets()
-{
-    mCurrentSettings.setHighlightBrackets(
-        mHighlightMatchingBrackets->get_active());
-}
-
-void PreferencesBox::onHighlightCurrentLine()
-{
-    mCurrentSettings.setHighlightLine(mHighlightCurrentLine->get_active());
-}
-
-void PreferencesBox::onShowLineNumbers()
-{
-    mCurrentSettings.setLineNumbers(mLineNumbers->get_active());
-}
-
-void PreferencesBox::onShowRightMargin()
-{
-    mCurrentSettings.setRightMargin(mRightMargin->get_active());
-}
-
-void PreferencesBox::onAutoIndent()
-{
-    mCurrentSettings.setAutoIndent(mAutoIndent->get_active());
-}
-
-void PreferencesBox::onIndentOnTab()
-{
-    mCurrentSettings.setIndentOnTab(mIndentOnTab->get_active());
-}
-
-void PreferencesBox::onIndentSizeChange()
-{
-    mCurrentSettings.setIndentSize(mIndentSize->get_value_as_int());
-}
-
-void PreferencesBox::onSmartHomeEnd()
-{
-    mCurrentSettings.setSmartHomeEnd(mSmartHomeEnd->get_active());
-}
-
-void PreferencesBox::onEditorFontChange()
-{
-    mCurrentSettings.setFontEditor(mFontEditor->get_font_name());
-}
-
-// private
-void PreferencesBox::init()
-{
-    loadSettings();
-    activate();
-}
-
-void PreferencesBox::activate()
-{
-    // Graphics
-    mBackgroundColor->set_color(mCurrentSettings.getBackgroundColor());
-    mForegroundColor->set_color(mCurrentSettings.getForegroundColor());
-    mAtomicColor->set_color(mCurrentSettings.getAtomicColor());
-    mCoupledColor->set_color(mCurrentSettings.getCoupledColor());
-    mSelectedColor->set_color(mCurrentSettings.getSelectedColor());
-    mConnectionColor->set_color(mCurrentSettings.getConnectionColor());
-    mFont->set_font_name(mCurrentSettings.getFont());
-    mLineWidth->set_value(mCurrentSettings.getLineWidth());
-
-    // Editor
-    mHighlightSyntax->set_active(mCurrentSettings.getHighlightSyntax());
-    mHighlightMatchingBrackets->set_active(
-        mCurrentSettings.getHighlightBrackets());
-    mHighlightCurrentLine->set_active(mCurrentSettings.getHighlightLine());
-    mLineNumbers->set_active(mCurrentSettings.getLineNumbers());
-    mRightMargin->set_active(mCurrentSettings.getRightMargin());
-    mAutoIndent->set_active(mCurrentSettings.getAutoIndent());
-    mIndentOnTab->set_active(mCurrentSettings.getIndentOnTab());
-    mIndentSize->set_value(mCurrentSettings.getIndentSize());
-    mSmartHomeEnd->set_active(mCurrentSettings.getSmartHomeEnd());
-    mFontEditor->set_font_name(mCurrentSettings.getFontEditor());
-}
-
-void PreferencesBox::saveSettings()
-{
-    Settings::settings() = mCurrentSettings;
-    Settings::settings().save();
-}
-
-void PreferencesBox::loadSettings()
-{
-    Settings::settings().load();
-    mCurrentSettings = Settings::settings();
+    return mPimpl->run();
 }
 
 }} //namespace vle gvle

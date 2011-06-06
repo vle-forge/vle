@@ -29,88 +29,25 @@
 #ifndef VLE_GVLE_PREFERENCESBOX_HPP
 #define VLE_GVLE_PREFERENCESBOX_HPP
 
-#include <gtkmm.h>
 #include <libglademm.h>
-#include <vle/gvle/Settings.hpp>
 
 namespace vle { namespace gvle {
 
 class PreferencesBox
 {
 public:
-    PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+    PreferencesBox(Glib::RefPtr < Gnome::Glade::Xml > xml);
+
     ~PreferencesBox();
 
     int run();
 
-    std::string getGraphicsFont();
-    std::string getEditorFont();
-
-protected:
-    // Actions
-    void onApply();
-    void onCancel();
-    void onRestore();
-
-    // Graphics
-    void onButtonBackgroundColorChange();
-    void onButtonForegroundColorChange();
-    void onButtonAtomicColorChange();
-    void onButtonCoupledColorChange();
-    void onButtonSelectedColorChange();
-    void onButtonConnectionColorChange();
-    void onButtonFontChange();
-    void onLineWidthChange();
-
-    // Editor
-    void onHighlightSyntax();
-    void onHighlightMatchingBrackets();
-    void onHighlightCurrentLine();
-    void onShowLineNumbers();
-    void onShowRightMargin();
-    void onAutoIndent();
-    void onIndentOnTab();
-    void onIndentSizeChange();
-    void onSmartHomeEnd();
-    void onEditorFontChange();
-
 private:
-    void init();
-    void activate();
-    void saveSettings();
-    void loadSettings();
+    PreferencesBox(const PreferencesBox& other);
+    PreferencesBox& operator=(const PreferencesBox& other);
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
-    Gtk::Dialog*                    mDialog;
-    Settings                        mCurrentSettings;
-
-    //Dialog widgets - Action
-    Gtk::Button* mButtonApply;
-    Gtk::Button* mButtonCancel;
-    Gtk::Button* mButtonRestore;
-
-    //Dialog widgets - Graphics
-    Gtk::ColorButton* mBackgroundColor;
-    Gtk::ColorButton* mForegroundColor;
-    Gtk::ColorButton* mAtomicColor;
-    Gtk::ColorButton* mCoupledColor;
-    Gtk::ColorButton* mSelectedColor;
-    Gtk::ColorButton* mConnectionColor;
-    Gtk::FontButton*  mFont;
-    Gtk::HScale*      mLineWidth;
-
-    //Dialog widgets - Editor
-    Gtk::CheckButton* mHighlightSyntax;
-    Gtk::CheckButton* mHighlightMatchingBrackets;
-    Gtk::CheckButton* mHighlightCurrentLine;
-    Gtk::CheckButton* mLineNumbers;
-    Gtk::CheckButton* mRightMargin;
-    Gtk::CheckButton* mAutoIndent;
-    Gtk::CheckButton* mIndentOnTab;
-    Gtk::SpinButton*  mIndentSize;
-    Gtk::CheckButton* mSmartHomeEnd;
-    Gtk::FontButton*  mFontEditor;
-
+    class Pimpl;
+    Pimpl *mPimpl;
 };
 
 }} //namespace vle gvle

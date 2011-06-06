@@ -27,272 +27,428 @@
 
 
 #include <vle/gvle/Settings.hpp>
-#include <sstream>
+#include <vle/utils/Preferences.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/cast.hpp>
 
 namespace vle { namespace gvle {
 
-Settings* Settings::mSettings = 0;
-
-void EditorSettings::setDefault()
+class Settings::Pimpl
 {
-    mHighlightSyntax = true;
-    mHighlightBrackets = true;
-    mHighlightLine = true;
-    mLineNumbers = true;
-    mRightMargin = true;
-    mAutoIndent = true;
-    mIndentOnTab = true;
-    mIndentSize = 4;
-    mSmartHomeEnd = true;
-}
-
-void EditorSettings::load(vle::utils::Preferences& prefs)
-{
-    std::string value;
-
-    setDefault();
-
-    value = prefs.getAttributes("gvle.editor", "highlightSyntax");
-    if (not value.empty())
-        mHighlightSyntax = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "highlightBrackets");
-    if (not value.empty())
-        mHighlightBrackets = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "highlightLine");
-    if (not value.empty())
-        mHighlightLine = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "lineNumbers");
-    if (not value.empty())
-        mLineNumbers = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "rightMargin");
-    if (not value.empty())
-        mRightMargin = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "autoIndent");
-    if (not value.empty())
-        mAutoIndent = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "indentOnTab");
-    if (not value.empty())
-        mIndentOnTab = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "indentSize");
-    if (not value.empty())
-        mIndentSize = boost::lexical_cast<int>(value);
-
-    value = prefs.getAttributes("gvle.editor", "smartHomeEnd");
-    if (not value.empty())
-        mSmartHomeEnd = boost::lexical_cast<bool>(value);
-
-    value = prefs.getAttributes("gvle.editor", "fontEditor");
-    if (not value.empty()) mFontEditor = value;
-}
-
-void EditorSettings::operator=(const EditorSettings& src)
-{
-    mHighlightSyntax   = src.mHighlightSyntax;
-    mHighlightBrackets = src.mHighlightBrackets;
-    mHighlightLine     = src.mHighlightLine;
-    mLineNumbers       = src.mLineNumbers;
-    mRightMargin       = src.mRightMargin;
-    mAutoIndent        = src.mAutoIndent;
-    mIndentOnTab       = src.mIndentOnTab;
-    mIndentSize        = src.mIndentSize;
-    mSmartHomeEnd      = src.mSmartHomeEnd;
-    mFontEditor        = src.mFontEditor;
-}
-
-void EditorSettings::save(vle::utils::Preferences& prefs)
-{
-    prefs.setAttributes("gvle.editor",
-			"highlightSyntax",
-			mHighlightSyntax ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"highlightBrackets",
-			mHighlightBrackets ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"highlightLine",
-			mHighlightLine ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"lineNumbers",
-			mLineNumbers ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"rightMargin",
-			mRightMargin ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"autoIndent",
-			mAutoIndent ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"indentOnTab",
-			mIndentOnTab ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"indentSize",
-			boost::lexical_cast<std::string>(mIndentSize));
-    prefs.setAttributes("gvle.editor",
-			"smartHomeEnd",
-			mSmartHomeEnd ? "1" : "0");
-    prefs.setAttributes("gvle.editor",
-			"fontEditor",
-			mFontEditor);
-}
-
-void GraphicsSettings::setDefault()
-{
-    mBackgroundColor = makeColorFromString("1 1 1");
-    mForegroundColor = makeColorFromString("0 0 0");
-    mAtomicColor = makeColorFromString("0.666667 0.835294 0.698039");
-    mCoupledColor = makeColorFromString("0.666667 0.698024 0.835279");
-    mSelectedColor = makeColorFromString("0.835279 0.666667 0.698024");
-    mConnectionColor = makeColorFromString("0 0 0");
-    mFontSize = 10.0;
-    mLineWidth = 2.0;
-}
-
-void GraphicsSettings::load(vle::utils::Preferences& prefs)
-{
-    std::string value;
-
-    setDefault();
-
-    value = prefs.getAttributes("gvle.graphics", "background");
-    if (not value.empty())
-        mBackgroundColor = makeColorFromString(value);
-
-    value = prefs.getAttributes("gvle.graphics", "foreground");
-    if (not value.empty())
-        mForegroundColor = makeColorFromString(value);
-
-    value = prefs.getAttributes("gvle.graphics", "atomic");
-    if (not value.empty())
-        mAtomicColor = makeColorFromString(value);
-
-    value = prefs.getAttributes("gvle.graphics", "coupled");
-    if (not value.empty())
-        mCoupledColor = makeColorFromString(value);
-
-    value = prefs.getAttributes("gvle.graphics", "selected");
-    if (not value.empty())
-        mSelectedColor = makeColorFromString(value);
-
-    value = prefs.getAttributes("gvle.graphics", "connection");
-    if (not value.empty())
-        mConnectionColor = makeColorFromString(value);
-
-    value = prefs.getAttributes("gvle.graphics", "font");
-    if (not value.empty()) {
-        mFont = value;
+public:
+    Pimpl()
+    {
+        setDefault();
+        load();
     }
 
-    value = prefs.getAttributes("gvle.graphics", "fontSize");
-    if (not value.empty())
-        mFontSize = boost::lexical_cast<double>(value);
+    ~Pimpl()
+    {
+    }
 
-    value = prefs.getAttributes("gvle.graphics", "lineWidth");
-    if (not value.empty())
-        mLineWidth = boost::lexical_cast<double>(value);
-}
+    void setDefault()
+    {
+        mFontEditor = "Monospace 8";
+        mFont = "Sans 10";
 
-Gdk::Color GraphicsSettings::makeColorFromString(const std::string& value)
-{
-    std::vector< std::string > splitVec;
-    boost::split(splitVec, value, boost::is_any_of(" "));
-    double r = boost::lexical_cast<double>(splitVec[0]);
-    double g = boost::lexical_cast<double>(splitVec[1]);
-    double b = boost::lexical_cast<double>(splitVec[2]);
-    Gdk::Color color;
-    color.set_rgb_p(r, g, b);
-    return color;
-}
+        mHighlightSyntax = true;
+        mHighlightBrackets = true;
+        mHighlightLine = true;
+        mLineNumbers = true;
+        mRightMargin = true;
+        mAutoIndent = true;
+        mIndentOnTab = true;
+        mIndentSize = 4;
+        mSmartHomeEnd = true;
 
-std::string GraphicsSettings::makeStringFromColor(const Gdk::Color& color)
-{
-    std::ostringstream oss;
-    oss << color.get_red_p() << " "
-	<< color.get_green_p() << " "
-	<< color.get_blue_p();
-    return oss.str();
-}
+        mBackgroundColor.set("#ffffffffffff");
+        mForegroundColor.set("#000000000000");
+        mAtomicColor.set("#0000ffff0000");
+        mCoupledColor.set("#00000000ffff");
+        mSelectedColor.set("#ffff00000000");
+        mConnectionColor.set("#000000000000");
 
-void GraphicsSettings::operator=(const GraphicsSettings& src)
-{
-    mForegroundColor = src.mForegroundColor;
-    mBackgroundColor = src.mBackgroundColor;
-    mSelectedColor   = src.mSelectedColor;
-    mCoupledColor    = src.mCoupledColor;
-    mAtomicColor     = src.mAtomicColor;
-    mConnectionColor = src.mConnectionColor;
-    mFont            = src.mFont;
-    mFontSize        = src.mFontSize;
-    mLineWidth       = src.mLineWidth;
-}
+        mFontSize = 10.0;
+        mLineWidth = 2.0;
+    }
 
-void GraphicsSettings::save(vle::utils::Preferences& prefs)
-{
-    prefs.setAttributes("gvle.graphics",
-			"foreground",
-			makeStringFromColor(mForegroundColor));
-    prefs.setAttributes("gvle.graphics",
-			"background",
-			makeStringFromColor(mBackgroundColor));
-    prefs.setAttributes("gvle.graphics",
-			"atomic",
-			makeStringFromColor(mAtomicColor));
-    prefs.setAttributes("gvle.graphics",
-			"coupled",
-			makeStringFromColor(mCoupledColor));
-    prefs.setAttributes("gvle.graphics",
-			"selected",
-			makeStringFromColor(mSelectedColor));
-    prefs.setAttributes("gvle.graphics",
-			"connection",
-			makeStringFromColor(mConnectionColor));
-    prefs.setAttributes("gvle.graphics",
-			"font",
-			mFont);
-    std::ostringstream oss;
-    oss << mFontSize;
-    prefs.setAttributes("gvle.graphics", "fontSize", oss.str());
+    void load()
+    {
+        utils::Preferences prefs;
+        std::string s;
+        double d = 0.0;
+        boost::uint32_t i = 0;
 
-    oss.str("");
-    oss << mLineWidth;
-    prefs.setAttributes("gvle.graphics", "lineWidth", oss.str());
-}
+        prefs.get("gvle.editor.highlight-syntax", &mHighlightSyntax);
+        prefs.get("gvle.editor.highlight-brackets", &mHighlightBrackets);
+        prefs.get("gvle.editor.highlight-line", &mHighlightLine);
+        prefs.get("gvle.editor.show-line-numbers", &mLineNumbers);
+        prefs.get("gvle.editor.show-right-margin", &mRightMargin);
+        prefs.get("gvle.editor.auto-indent", &mAutoIndent);
+        prefs.get("gvle.editor.indent-on-tab", &mIndentOnTab);
+        prefs.get("gvle.editor.smart-home-end", &mSmartHomeEnd);
+
+        if (prefs.get("gvle.editor.indent-size", &i)) {
+            mIndentSize = boost::numeric_cast < int >(i);
+            i = 0;
+        }
+
+        if (prefs.get("gvle.editor.font", &s) and not s.empty()) {
+            mFontEditor = s;
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.background-color", &s) and not s.empty()) {
+            mBackgroundColor = convert(s);
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.foreground-color", &s) and not s.empty()) {
+            mForegroundColor = convert(s);
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.atomic-color", &s) and not s.empty()) {
+            mAtomicColor = convert(s);
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.coupled-color", &s) and not s.empty()) {
+            mCoupledColor = convert(s);
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.selected-color", &s) and not s.empty()) {
+            mSelectedColor = convert(s);
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.connection-color", &s) and not s.empty()) {
+            mConnectionColor = convert(s);
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.font", &s) and not s.empty()) {
+            mFont = s;
+            s.clear();
+        }
+
+        if (prefs.get("gvle.graphics.font-size", &d) and d > 0.0) {
+            mFontSize = d;
+            d = 0.0;
+        }
+
+        if (prefs.get("gvle.graphics.line-width", &d) and d > 0.0) {
+            mLineWidth = d;
+            d = 0.0;
+        }
+    }
+
+    void save()
+    {
+        utils::Preferences prefs;
+
+        prefs.set("gvle.editor.highlight-syntax", mHighlightSyntax);
+        prefs.set("gvle.editor.highlight-brackets", mHighlightBrackets);
+        prefs.set("gvle.editor.highlight-line", mHighlightLine);
+        prefs.set("gvle.editor.show-line-numbers", mLineNumbers);
+        prefs.set("gvle.editor.show-right-margin", mRightMargin);
+        prefs.set("gvle.editor.auto-indent", mAutoIndent);
+        prefs.set("gvle.editor.indent-on-tab", mIndentOnTab);
+        prefs.set("gvle.editor.indent-size",
+                  boost::numeric_cast < boost::uint32_t >(mIndentSize));
+        prefs.set("gvle.editor.smart-home-end", mSmartHomeEnd);
+        prefs.set("gvle.editor.font", mFontEditor);
+
+        prefs.set("gvle.graphics.background-color", convert(mBackgroundColor));
+        prefs.set("gvle.graphics.foreground-color", convert(mForegroundColor));
+        prefs.set("gvle.graphics.atomic-color", convert(mAtomicColor));
+        prefs.set("gvle.graphics.coupled-color", convert(mCoupledColor));
+        prefs.set("gvle.graphics.selected-color", convert(mSelectedColor));
+        prefs.set("gvle.graphics.connection-color", convert(mConnectionColor));
+
+        prefs.set("gvle.graphics.font", mFont);
+        prefs.set("gvle.graphics.font-size", mFontSize);
+        prefs.set("gvle.graphics.line-width", mLineWidth);
+    }
+
+    bool mHighlightSyntax;
+    bool mHighlightBrackets;
+    bool mHighlightLine;
+    bool mLineNumbers;
+    bool mRightMargin;
+    bool mAutoIndent;
+    bool mIndentOnTab;
+    bool mSmartHomeEnd;
+    int  mIndentSize;
+    std::string mFontEditor;
+
+    Gdk::Color mBackgroundColor;
+    Gdk::Color mForegroundColor;
+    Gdk::Color mAtomicColor;
+    Gdk::Color mCoupledColor;
+    Gdk::Color mSelectedColor;
+    Gdk::Color mConnectionColor;
+    std::string mFont;
+    double mFontSize;
+    double mLineWidth;
+
+    static std::string convert(const Gdk::Color& color)
+    {
+        std::string str = color.to_string();
+        if (not str.empty()) {
+            str.assign(str, 1, std::string::npos);
+        }
+
+        return str;
+    }
+
+    static Gdk::Color convert(const std::string& str)
+    {
+        std::string tmp = '#' + str;
+        Gdk::Color color(tmp);
+
+        return color;
+    }
+
+    static Settings* mSettings;
+};
+
+Settings *Settings::Pimpl::mSettings = 0;
 
 void Settings::load()
 {
-    vle::utils::Preferences prefs;
-    prefs.load();
-
-    EditorSettings::load(prefs);
-    GraphicsSettings::load(prefs);
-}
-
-void Settings::operator=(const Settings& src)
-{
-    EditorSettings::operator=(src);
-    GraphicsSettings::operator=(src);
+    mPimpl->load();
 }
 
 void Settings::save()
 {
-    vle::utils::Preferences prefs;
-    prefs.load();
-
-    EditorSettings::save(prefs);
-    GraphicsSettings::save(prefs);
-    prefs.save();
+    mPimpl->save();
 }
 
 void Settings::setDefault()
 {
-    EditorSettings::setDefault();
-    GraphicsSettings::setDefault();
+    mPimpl->setDefault();
+}
+
+Settings& Settings::settings()
+{
+    if (Settings::Pimpl::mSettings == 0) {
+        Settings::Pimpl::mSettings = new Settings();
+    }
+
+    return *Settings::Pimpl::mSettings;
+}
+
+void Settings::kill()
+{
+    if (Settings::Pimpl::mSettings == 0) {
+        Settings::Pimpl::mSettings->save();
+        delete Settings::Pimpl::mSettings;
+        Settings::Pimpl::mSettings = 0;
+    }
+}
+
+Settings::Settings()
+    : mPimpl(new Settings::Pimpl())
+{
+}
+
+Settings::~Settings()
+{
+    delete mPimpl;
+}
+
+void Settings::setHighlightSyntax(bool syntax)
+{
+    settings().mPimpl->mHighlightSyntax = syntax;
+}
+
+bool Settings:: getHighlightSyntax()
+{
+    return settings().mPimpl->mHighlightSyntax;
+}
+
+void Settings::setHighlightBrackets(bool brackets)
+{
+    settings().mPimpl->mHighlightBrackets = brackets;
+}
+
+bool Settings:: getHighlightBrackets()
+{
+    return settings().mPimpl->mHighlightBrackets;
+}
+
+void Settings::setHighlightLine(bool line)
+{
+    settings().mPimpl->mHighlightLine = line;
+}
+
+bool Settings:: getHighlightLine()
+{
+    return settings().mPimpl->mHighlightLine;
+}
+
+void Settings::setLineNumbers(bool numbers)
+{
+    settings().mPimpl->mLineNumbers = numbers;
+}
+
+bool Settings:: getLineNumbers()
+{
+    return settings().mPimpl->mLineNumbers;
+}
+
+void Settings::setRightMargin(bool margin)
+{
+    settings().mPimpl->mRightMargin = margin;
+}
+
+bool Settings:: getRightMargin()
+{
+    return settings().mPimpl->mRightMargin;
+}
+
+void Settings::setAutoIndent(bool auto_indent)
+{
+    settings().mPimpl->mAutoIndent = auto_indent;
+}
+
+bool Settings:: getAutoIndent()
+{
+    return settings().mPimpl->mAutoIndent;
+}
+
+void Settings::setIndentOnTab(bool indent_tab)
+{
+    settings().mPimpl->mIndentOnTab = indent_tab;
+}
+
+bool Settings:: getIndentOnTab()
+{
+    return settings().mPimpl->mIndentOnTab;
+}
+
+void Settings::setIndentSize(int size)
+{
+    settings().mPimpl->mIndentSize = size;
+}
+
+int Settings::getIndentSize()
+{
+    return settings().mPimpl->mIndentSize;
+}
+
+void Settings::setSmartHomeEnd(bool smart)
+{
+    settings().mPimpl->mSmartHomeEnd = smart;
+}
+
+bool Settings:: getSmartHomeEnd()
+{
+    return settings().mPimpl->mSmartHomeEnd;
+}
+
+void Settings::setFontEditor(const std::string& font)
+{
+    settings().mPimpl->mFontEditor = font;
+}
+
+const std::string& Settings::getFontEditor()
+{
+    return settings().mPimpl->mFontEditor;
+}
+
+void Settings::setForegroundColor(const Gdk::Color& color)
+{
+    settings().mPimpl->mForegroundColor = color;
+}
+
+const Gdk::Color& Settings::getForegroundColor() const
+{
+    return settings().mPimpl->mForegroundColor;
+}
+
+void Settings::setBackgroundColor(const Gdk::Color& color)
+{
+    settings().mPimpl->mBackgroundColor = color;
+}
+
+const Gdk::Color& Settings::getBackgroundColor() const
+{
+    return settings().mPimpl->mBackgroundColor;
+}
+
+void Settings::setSelectedColor(const Gdk::Color& color)
+{
+    settings().mPimpl->mSelectedColor = color;
+}
+
+const Gdk::Color& Settings::getSelectedColor() const
+{
+    return settings().mPimpl->mSelectedColor;
+}
+
+void Settings::setCoupledColor(const Gdk::Color& color)
+{
+    settings().mPimpl->mCoupledColor = color;
+}
+
+const Gdk::Color& Settings::getCoupledColor() const
+{
+    return settings().mPimpl->mCoupledColor;
+}
+
+void Settings::setAtomicColor(const Gdk::Color& color)
+{
+    settings().mPimpl->mAtomicColor = color;
+}
+
+const Gdk::Color& Settings::getAtomicColor() const
+{
+    return settings().mPimpl->mAtomicColor;
+}
+
+void Settings::setConnectionColor(const Gdk::Color& color)
+{
+    settings().mPimpl->mConnectionColor = color;
+}
+
+const Gdk::Color& Settings::getConnectionColor() const
+{
+    return settings().mPimpl->mConnectionColor;
+}
+
+void Settings::setFont(const std::string& font)
+{
+    settings().mPimpl->mFont = font;
+}
+
+const std::string& Settings::getFont() const
+{
+    return settings().mPimpl->mFont;
+}
+
+void Settings::setFontSize(const double size)
+{
+    settings().mPimpl->mFontSize = size;
+}
+
+double Settings::getFontSize() const
+{
+    return settings().mPimpl->mFontSize;
+}
+
+void Settings::setLineWidth(double width)
+{
+    settings().mPimpl->mLineWidth = width;
+}
+
+double Settings::getLineWidth() const
+{
+    return settings().mPimpl->mLineWidth;
 }
 
 }} // namespace vle gvle

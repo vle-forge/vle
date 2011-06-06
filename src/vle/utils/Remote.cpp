@@ -91,38 +91,44 @@ std::string Remote::get(const std::string& remote, const std::string& package)
 
 const std::string& Remote::getUrl(const std::string& remote) const
 {
-    if (mRemotes.empty()) {
-        Preferences prefs;
-        prefs.load();
-        mRemotes = prefs.getKeyValues("remotes");
-    }
+    throw utils::NotYetImplemented(fmt(
+            _("Remote::getUrl not yet implemented")));
+//    if (mRemotes.empty()) {
+//        Preferences prefs;
+//        prefs.load();
+//        mRemotes = prefs.getKeyValues("remotes");
+//    }
 
-    RemoteList::const_iterator it = mRemotes.find(remote);
-    if (it == mRemotes.end()) {
-        throw utils::InternalError(fmt(_(
-                    "Remote: unknown remote `%1%'")) % remote);
-    }
+//    RemoteList::const_iterator it = mRemotes.find(remote);
+//    if (it == mRemotes.end()) {
+//        throw utils::InternalError(fmt(_(
+//                    "Remote: unknown remote `%1%'")) % remote);
+//    }
 
-    return it->second;
+//    return it->second;
 }
 
 void Remote::refresh()
 {
-    Preferences prefs;
-    prefs.load();
+    throw utils::NotYetImplemented(fmt(
+            _("Remote::refresh not yet implemented")));
+//    Preferences prefs;
+//    prefs.load();
 
-    try {
-        mRemotes = prefs.getKeyValues("remotes");
-    } catch (const std::exception& /*e*/) {
-    }
+//    try {
+//        mRemotes = prefs.getKeyValues("remotes");
+//    } catch (const std::exception& /*e*/) {
+//    }
 }
 
 void Remote::config(const std::string& remote, const std::string& url)
 {
-    Preferences prefs;
-    prefs.load();
-    prefs.setAttributes("remotes", remote, url);
-    refresh();
+    throw utils::NotYetImplemented(fmt(
+            _("Remote::config not yet implemented")));
+//    Preferences prefs;
+//    prefs.load();
+//    prefs.setAttributes("remotes", remote, url);
+//    refresh();
 }
 
 std::string Remote::httpGet(const std::string& remote, const std::string& url)
