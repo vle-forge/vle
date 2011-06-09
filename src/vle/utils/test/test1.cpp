@@ -327,27 +327,30 @@ BOOST_AUTO_TEST_CASE(date_time)
 	vle::utils::DateTime::days(2), 2);
 
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::convertUnit("year"), vle::utils::DateTime::Year);
+        vle::utils::DateTime::convertUnit("year"),
+        vle::utils::DATE_TIME_UNIT_YEAR);
     BOOST_REQUIRE_EQUAL(
 	vle::utils::DateTime::convertUnit("month"),
-	vle::utils::DateTime::Month);
+	vle::utils::DATE_TIME_UNIT_MONTH);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::convertUnit("week"), vle::utils::DateTime::Week);
+        vle::utils::DateTime::convertUnit("week"),
+        vle::utils::DATE_TIME_UNIT_WEEK);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::convertUnit("day"), vle::utils::DateTime::Day);
+        vle::utils::DateTime::convertUnit("day"),
+        vle::utils::DATE_TIME_UNIT_DAY);
 
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::duration((2451545),
-				       1, vle::utils::DateTime::Year), 366);
+        vle::utils::DateTime::duration(
+            (2451545), 1, vle::utils::DATE_TIME_UNIT_YEAR), 366);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::duration((2451545),
-				       1, vle::utils::DateTime::Month), 31);
+        vle::utils::DateTime::duration(
+            (2451545), 1, vle::utils::DATE_TIME_UNIT_MONTH), 31);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::duration((2451545),
-				       1, vle::utils::DateTime::Week), 7);
+        vle::utils::DateTime::duration(
+            (2451545), 1, vle::utils::DATE_TIME_UNIT_WEEK), 7);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::duration((2451545),
-				       1, vle::utils::DateTime::Day), 1);
+        vle::utils::DateTime::duration(
+            (2451545), 1, vle::utils::DATE_TIME_UNIT_DAY), 1);
 }
 
 BOOST_AUTO_TEST_CASE(julian_date)

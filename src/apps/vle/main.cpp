@@ -38,6 +38,7 @@
 #include <vle/utils/i18n.hpp>
 #include <boost/version.hpp>
 #include <iostream>
+#include <fstream>
 
 namespace vle {
 

@@ -43,7 +43,7 @@ Base::Base(const DynamicsInit& model,
 	   bool control) :
     Dynamics(model, events),
     mTimeStep(0),
-    mTimeStepUnit(vle::utils::DateTime::None),
+    mTimeStepUnit(vle::utils::DATE_TIME_UNIT_NONE),
     mMode(NAME),
     mNosyncDependance(false),
     mControl(control),

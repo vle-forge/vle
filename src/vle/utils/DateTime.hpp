@@ -29,31 +29,35 @@
 #ifndef VLE_UTILS_DATETIME_HPP
 #define VLE_UTILS_DATETIME_HPP
 
-#include <boost/date_time.hpp>
 #include <vle/utils/DllDefines.hpp>
+#include <string>
 
 namespace vle { namespace utils {
+
+enum DateTimeUnitOptions
+{
+    DATE_TIME_UNIT_NONE,
+    DATE_TIME_UNIT_DAY,
+    DATE_TIME_UNIT_WEEK,
+    DATE_TIME_UNIT_MONTH,
+    DATE_TIME_UNIT_YEAR
+};
 
 class VLE_UTILS_EXPORT DateTime
 {
 public:
-    enum Unit { None, Day, Week, Month, Year };
-
     /**
      * @brief Write the current date and time conform to RFC 822.
+     * @code
+     * std::cout << "currentDate(): `"
+     *           << vle::utils::DateTime::currentDate()
+     *           << "'\n";
+     *
+     * // Display: currentDate(): `2011-Jun-09 12:13:21'
+     * @endcode
      * @return string representation of date.
      */
     static std::string currentDate();
-
-    /**
-     * @brief Write the current date and time in the format:
-     * @code
-     * std::cout << get_simple_current_date();
-     * // 20080306-1534
-     * @endcode
-     * @return string representation of the date.
-     */
-    static std::string simpleCurrentDate();
 
                                   /* * * * */
 
@@ -200,7 +204,7 @@ public:
      * @param unit The std::string unit to convert.
      * @return The convertion of Day if error.
      */
-    static DateTime::Unit convertUnit(const std::string& unit);
+    static DateTimeUnitOptions convertUnit(const std::string& unit);
 
     /**
      * @brief A easy function to call days(), weeks(), months() or years()
@@ -210,8 +214,9 @@ public:
      * @param unit The unit.
      * @return A number of day.
      */
-    static double duration(const double& time, double duration,
-                           DateTime::Unit unit);
+    static double duration(const double& time,
+                           double duration,
+                           DateTimeUnitOptions unit);
 
                                   /* * * * */
 

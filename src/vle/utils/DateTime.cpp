@@ -28,10 +28,10 @@
 
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
-#include <glibmm/date.h>
+#include <boost/date_time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <fstream>
+#include <sstream>
 #include <cmath>
 
 namespace vle { namespace utils {
@@ -45,13 +45,6 @@ std::string DateTime::currentDate()
     out << current;
 
     return out.str();
-}
-
-std::string DateTime::simpleCurrentDate()
-{
-    Glib::Date date;
-    date.set_time_current();
-    return date.format_string("%a, %d %b %Y");
 }
 
 unsigned int DateTime::year(const double& time)
@@ -152,23 +145,34 @@ double DateTime::months(const double& time, unsigned int n)
     return (int)((d + duration).julian_day() - d.julian_day());
 }
 
-DateTime::Unit DateTime::convertUnit(const std::string& unit)
+DateTimeUnitOptions DateTime::convertUnit(const std::string& unit)
 {
-    if (unit == "day") return Day;
-    if (unit == "week") return Week;
-    if (unit == "month") return Month;
-    if (unit == "year") return Year;
-    return Day;
+    if (unit == "day") {
+        return DATE_TIME_UNIT_DAY;
+    } else if (unit == "week") {
+        return DATE_TIME_UNIT_WEEK;
+    } else if (unit == "month") {
+        return DATE_TIME_UNIT_MONTH;
+    } else if (unit == "year") {
+        return DATE_TIME_UNIT_YEAR;
+    } else {
+        return DATE_TIME_UNIT_DAY;
+    }
 }
 
-double DateTime::duration(const double& time, double duration, Unit unit)
+double DateTime::duration(const double& time, double duration,
+                          DateTimeUnitOptions unit)
 {
     switch (unit) {
-    case None:
-    case Day: return days(duration);
-    case Week: return weeks(duration);
-    case Month: return months(time, duration);
-    case Year: return years(time, duration);
+    case DATE_TIME_UNIT_NONE:
+    case DATE_TIME_UNIT_DAY:
+        return days(duration);
+    case DATE_TIME_UNIT_WEEK:
+        return weeks(duration);
+    case DATE_TIME_UNIT_MONTH:
+        return months(time, duration);
+    case DATE_TIME_UNIT_YEAR:
+        return years(time, duration);
     }
     return 0;
 }

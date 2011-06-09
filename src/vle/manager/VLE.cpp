@@ -136,7 +136,7 @@ bool Manager::runSimulator(int process, int port)
 
         utils::Trace::setLogFile(
             utils::Trace::getLogFilename(boost::str(fmt(
-                    "distant-%1%") % utils::DateTime::simpleCurrentDate())));
+                    "distant-%1%") % utils::DateTime::currentDate())));
 
         SimulatorDistant sim(process, port);
         sim.start();

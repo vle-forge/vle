@@ -38,6 +38,7 @@
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <boost/lexical_cast.hpp>
+#include <fstream>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
 #include <gtkmm/clipboard.h>

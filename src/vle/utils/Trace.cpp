@@ -32,6 +32,7 @@
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/thread.hpp>
+#include <fstream>
 
 
 namespace vle { namespace utils {

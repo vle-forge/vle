@@ -227,7 +227,7 @@ public:
      */
     double timeStep(const devs::Time& time) const
     {
-        if (mTimeStepUnit == vle::utils::DateTime::None) {
+        if (mTimeStepUnit == vle::utils::DATE_TIME_UNIT_NONE) {
             return mTimeStep;
         } else {
             return vle::utils::DateTime::duration(
@@ -358,7 +358,7 @@ protected:
 
     state mState;
     double mTimeStep;
-    vle::utils::DateTime::Unit mTimeStepUnit;
+    vle::utils::DateTimeUnitOptions mTimeStepUnit;
 
     // external variable info section
     ValuesMap mExternalValues;
