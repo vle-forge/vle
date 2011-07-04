@@ -185,9 +185,7 @@ void Condition::fillWithFirstValues(value::MapValue& mapToFill) const
         if (it->second->size() > 0) {
             mapToFill[it->first] = it->second->get(0);
         } else {
-            throw(utils::ArgError(fmt(
-                "Build a empty first values for condition %1%.") %
-                m_name));
+            mapToFill[it->first] = 0;
         }
     }
 }
