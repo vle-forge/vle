@@ -38,7 +38,6 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/PackageTable.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Pool.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/Remote.hpp>

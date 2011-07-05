@@ -29,7 +29,7 @@ SET(UTILS_CPP DateTime.cpp Host.cpp Module.cpp Package.cpp PackageTable.cpp
 
 SET(UTILS_HPP Algo.hpp DateTime.hpp Deprecated.hpp DllDefines.hpp Exception.hpp
   Host.hpp i18n.hpp Module.hpp Package.hpp PackageTable.hpp Parser.hpp Path.hpp
-  Pool.hpp Preferences.hpp Rand.hpp Remote.hpp Socket.hpp Template.hpp Tools.hpp
+  Preferences.hpp Rand.hpp Remote.hpp Socket.hpp Template.hpp Tools.hpp
   Trace.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
