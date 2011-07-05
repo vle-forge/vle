@@ -15,7 +15,7 @@
  <port name="out_plantlouse" />
 </out>
 </model>
-<model name="bio" type="coupled" x="140" y="25" width="100" height="90"  >
+<model name="bio" type="coupled" x="140" y="25" width="1244" height="646"  >
 <in>
  <port name="in_ladybird" />
  <port name="in_plantlouse" />
@@ -26,7 +26,7 @@
  <port name="response" />
 </out>
 <submodels>
-<model name="ladybirdpest" type="atomic" conditions="cond_ladybirdpest" dynamics="dyn_ladybirdpest" observables="obs_ladybirdpest" >
+<model name="ladybirdpest" type="atomic" conditions="cond_ladybirdpest" dynamics="dyn_ladybirdpest" observables="obs_ladybirdpest" x="224" y="246" width="100" height="75" >
 <in>
  <port name="perturb" />
  <port name="request" />
@@ -37,7 +37,7 @@
  <port name="update" />
 </out>
 </model>
-<model name="plantlousepest" type="atomic" conditions="cond_plantlousepest" dynamics="dyn_plantlousepest" observables="obs_plantlousepest" >
+<model name="plantlousepest" type="atomic" conditions="cond_plantlousepest" dynamics="dyn_plantlousepest" observables="obs_plantlousepest" x="135" y="55" width="100" height="75" >
 <in>
  <port name="perturb" />
  <port name="request" />
@@ -51,11 +51,11 @@
 </submodels>
 <connections>
 <connection type="output">
- <origin model="plantlousepest" port="response" />
+ <origin model="ladybirdpest" port="response" />
  <destination model="bio" port="response" />
 </connection>
 <connection type="output">
- <origin model="ladybirdpest" port="response" />
+ <origin model="plantlousepest" port="response" />
  <destination model="bio" port="response" />
 </connection>
 <connection type="input">

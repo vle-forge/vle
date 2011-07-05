@@ -2,7 +2,7 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
 <vle_project version="0.1" date="Mon, 27 Dec 2010" author="PC">
 <structures>
-<model name="top" type="coupled" width="459" height="331"  >
+<model name="top" type="coupled" width="1452" height="711"  >
 <submodels>
 <model name="smartgardener" type="atomic" conditions="cond_smartgardener" dynamics="dyn_smartgardener" x="86" y="201" width="100" height="90" >
 <in>
@@ -26,7 +26,15 @@
  <port name="response" />
 </out>
 <submodels>
-<model name="ladybirdpest" type="atomic" conditions="cond_ladybirdpest" dynamics="dyn_ladybirdpest" observables="obs_ladybirdpest" >
+<model name="coupling" type="atomic" conditions="cond_time" dynamics="dyn_coupling" x="337" y="109" width="100" height="45" >
+<in>
+ <port name="y" />
+</in>
+<out>
+ <port name="y" />
+</out>
+</model>
+<model name="ladybirdpest" type="atomic" conditions="cond_ladybirdpest" dynamics="dyn_ladybirdpest" observables="obs_ladybirdpest" x="119" y="46" width="100" height="75" >
 <in>
  <port name="perturb" />
  <port name="request" />
@@ -37,7 +45,7 @@
  <port name="update" />
 </out>
 </model>
-<model name="plantlousepest" type="atomic" conditions="cond_plantlousepest" dynamics="dyn_plantlousepest" observables="obs_plantlousepest" >
+<model name="plantlousepest" type="atomic" conditions="cond_plantlousepest,cond_time" dynamics="dyn_plantlousepest" observables="obs_plantlousepest" x="269" y="277" width="100" height="75" >
 <in>
  <port name="perturb" />
  <port name="request" />
@@ -51,11 +59,11 @@
 </submodels>
 <connections>
 <connection type="output">
- <origin model="plantlousepest" port="response" />
+ <origin model="ladybirdpest" port="response" />
  <destination model="bio" port="response" />
 </connection>
 <connection type="output">
- <origin model="ladybirdpest" port="response" />
+ <origin model="plantlousepest" port="response" />
  <destination model="bio" port="response" />
 </connection>
 <connection type="input">
@@ -75,8 +83,12 @@
  <destination model="plantlousepest" port="request" />
 </connection>
 <connection type="internal">
- <origin model="ladybirdpest" port="update" />
+ <origin model="coupling" port="y" />
  <destination model="plantlousepest" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="ladybirdpest" port="update" />
+ <destination model="coupling" port="y" />
 </connection>
 <connection type="internal">
  <origin model="plantlousepest" port="update" />
@@ -110,11 +122,12 @@
 </model>
 </structures>
 <dynamics>
+<dynamic name="dyn_coupling" library="ladybirdplantlouse" model="DifferenceEquationAdaptor" type="local"  />
 <dynamic name="dyn_ladybirdpest" library="ladybirdplantlouse" model="ladybird" type="local"  />
 <dynamic name="dyn_plantlousepest" library="ladybirdplantlouse" model="plantlouse2" type="local"  />
 <dynamic name="dyn_smartgardener" library="ladybirdplantlouse" model="smartgardener" type="local"  />
 </dynamics>
-<experiment name="exp6" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
+<experiment name="exp6" duration="10.000000000000000" begin="0.000000000000000" combination="linear" seed="123" >
 <conditions>
 <condition name="cond_ladybirdpest" >
  <port name="b" >
@@ -152,9 +165,6 @@
  <port name="name" >
 <string>x</string>
 </port>
- <port name="time-step" >
-<double>0.100000000000000</double>
-</port>
  <port name="value" >
 <double>5000.000000000000000</double>
 </port>
@@ -173,6 +183,11 @@
 <double>2000.000000000000000</double>
 </port>
 </condition>
+<condition name="cond_time" >
+ <port name="time-step" >
+<double>0.000100000000000</double>
+</port>
+</condition>
 </conditions>
 <views>
 <outputs>
@@ -182,20 +197,20 @@
 <observables>
 <observable name="obs_ladybirdpest" >
 <port name="y" >
- <attachedview name="lavue" />
+ <attachedview name="qssview" />
 </port>
 
 </observable>
 
 <observable name="obs_plantlousepest" >
 <port name="x" >
- <attachedview name="lavue" />
+ <attachedview name="qssview" />
 </port>
 
 </observable>
 
 </observables>
-<view name="lavue" output="o" type="timed" timestep="0.010000000000000" />
+<view name="qssview" output="o" type="timed" timestep="0.010000000000000" />
 
 </views>
 </experiment>

@@ -103,3 +103,55 @@ BOOST_AUTO_TEST_CASE(test_qss2)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[1][2499]), 3121.71211, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][2499]), 30.34103, 10e-5);
 }
+
+BOOST_AUTO_TEST_CASE(test_qss3)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("qss_exp5.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage", std::string());
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["qssview"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)1001);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][1000]), 47.32797, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 511.02859, 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_qss4)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("qss_exp6.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage", std::string());
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["qssview"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)1001);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][1000]), 49.80635, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 536.87883, 10e-5);
+}

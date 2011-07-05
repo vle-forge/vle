@@ -249,6 +249,7 @@ void Multiple::output(const Time& time, ExternalEventList& output) const
         ExternalEvent* ee = new ExternalEvent(it->second);
         double e = (time - getLastTime(mCurrentModel)).getValue();
 
+        ee << attribute("name", it->second);
         ee << attribute("value", getValue(mCurrentModel) + e
                               * getGradient(mCurrentModel));
         ee << attribute("gradient", getGradient(mCurrentModel));
