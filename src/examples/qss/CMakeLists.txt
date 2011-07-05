@@ -14,7 +14,7 @@ LINK_DIRECTORIES(
 SET(SOURCES_CPP ladybirdplantlouse.cpp ladybirdplantlouse.hpp plantlouse.cpp
   plantlouse.hpp ladybird.hpp ladybird.cpp smartgardener.cpp smartgardener.hpp
   plantlouse2.cpp plantlouse2.hpp ladybird2.hpp ladybird2.cpp smartgardener2.cpp
-  smartgardener2.hpp)
+  smartgardener2.hpp DifferenceEquationAdaptor.cpp)
 
 ADD_LIBRARY(ladybirdplantlouse SHARED ${SOURCES_CPP})
 
