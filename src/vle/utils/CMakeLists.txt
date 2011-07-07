@@ -27,10 +27,10 @@ SET(UTILS_CPP DateTime.cpp Host.cpp Module.cpp Package.cpp PackageTable.cpp
   Parser.cpp Path.cpp Preferences.cpp Rand.cpp Remote.cpp Socket.cpp
   SocketImpl.c Template.cpp Tools.cpp Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
 
-SET(UTILS_HPP Algo.hpp DateTime.hpp Debug.hpp DllDefines.hpp Exception.hpp
-  Host.hpp i18n.hpp Module.hpp Package.hpp PackageTable.hpp Parser.hpp Path.hpp
-  Pool.hpp Preferences.hpp Rand.hpp Remote.hpp Socket.hpp Template.hpp
-  Tools.hpp Trace.hpp)
+SET(UTILS_HPP Algo.hpp DateTime.hpp Debug.hpp Deprecated.hpp DllDefines.hpp
+  Exception.hpp Host.hpp i18n.hpp Module.hpp Package.hpp PackageTable.hpp
+  Parser.hpp Path.hpp Pool.hpp Preferences.hpp Rand.hpp Remote.hpp Socket.hpp
+  Template.hpp Tools.hpp Trace.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 
