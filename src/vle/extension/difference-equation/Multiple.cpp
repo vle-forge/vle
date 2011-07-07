@@ -161,24 +161,6 @@ void Multiple::initValues(const Time& time)
     unset();
 }
 
-Time Multiple::init(const Time& time)
-{
-    Time t = Base::init(time);
-
-    {
-        std::vector < std::string >::const_iterator it = mVariableNames.begin();
-        bool ok = false;
-
-        while (not ok and it != mVariableNames.end()) {
-            ok = getModel().existOutputPort(*it);
-            ++it;
-        }
-        mActive = ok;
-    }
-    unset();
-    return t;
-}
-
 void Multiple::init(const Var& variable, double value)
 {
     if (mInitValues[variable.name()]) {
@@ -285,6 +267,45 @@ double Multiple::val(const std::string& name) const
                     " name: %2%")) % getModelName() % name);
     }
     return it->second.front();
+}
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+Time Multiple::init(const Time& time)
+{
+
+    {
+        MultipleValuesMap::const_iterator it = mValues.begin();
+        bool ok = true;
+
+        while (ok and it != mValues.end()) {
+            if (mSetValues.find(it->first) == mSetValues.end()) {
+                ok = false;
+            } else {
+                ++it;
+            }
+        }
+        if (not ok) {
+            throw utils::InternalError(
+                fmt(_("[%1%] DifferenceEquation::Multiple: undeclared " \
+                      "variable: %2%")) % getModelName() % it->first);
+        }
+    }
+
+    Time t = Base::init(time);
+
+    {
+        std::vector < std::string >::const_iterator it = mVariableNames.begin();
+        bool ok = false;
+
+        while (not ok and it != mVariableNames.end()) {
+            ok = getModel().existOutputPort(*it);
+            ++it;
+        }
+        mActive = ok;
+    }
+    unset();
+    return t;
 }
 
 void Multiple::output(const Time& /* time */,
