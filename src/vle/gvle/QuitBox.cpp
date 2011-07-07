@@ -29,6 +29,7 @@
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {
 

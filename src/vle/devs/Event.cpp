@@ -32,7 +32,6 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/RequestEvent.hpp>

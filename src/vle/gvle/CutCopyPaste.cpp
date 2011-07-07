@@ -30,7 +30,6 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Debug.hpp>
 #include <iostream>
 
 namespace vle { namespace gvle {

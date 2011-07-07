@@ -31,7 +31,6 @@
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Double.hpp>

@@ -27,10 +27,10 @@
 
 
 #include <vle/vpz/Views.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/value/Value.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace vpz {
 

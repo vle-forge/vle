@@ -27,7 +27,6 @@
 
 
 #include <vle/extension/PetriNet.hpp>
-#include <vle/utils/Debug.hpp>
 #include <boost/checked_delete.hpp>
 #include <algorithm>
 

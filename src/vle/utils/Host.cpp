@@ -27,9 +27,10 @@
 
 
 #include <vle/utils/Host.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/Preferences.hpp>
-#include <vle/utils/Debug.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
 

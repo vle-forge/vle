@@ -33,6 +33,8 @@
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Template.hpp>
 #include <gtkmm/treemodel.h>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {
 

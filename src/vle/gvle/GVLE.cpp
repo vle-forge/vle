@@ -48,7 +48,6 @@
 #include <vle/gvle/Settings.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/version.hpp>
 #include <sys/types.h>

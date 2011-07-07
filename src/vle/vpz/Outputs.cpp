@@ -27,8 +27,9 @@
 
 
 #include <vle/vpz/Outputs.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Exception.hpp>
+#include <iterator>
 
 namespace vle { namespace vpz {
 

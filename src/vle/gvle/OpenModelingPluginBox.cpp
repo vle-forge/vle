@@ -35,7 +35,6 @@
 #include <vle/vpz/Dynamic.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Observables.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {

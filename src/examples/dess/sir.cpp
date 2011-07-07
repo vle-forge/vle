@@ -28,7 +28,6 @@
 
 #include "sir.hpp"
 #include <vle/value/Double.hpp>
-#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace examples { namespace dess {
 

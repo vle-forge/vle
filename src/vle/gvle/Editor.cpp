@@ -34,7 +34,6 @@
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <boost/lexical_cast.hpp>

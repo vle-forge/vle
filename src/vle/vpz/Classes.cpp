@@ -27,8 +27,9 @@
 
 
 #include <vle/vpz/Classes.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace vpz {
 

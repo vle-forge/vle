@@ -40,6 +40,7 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Trace.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
 

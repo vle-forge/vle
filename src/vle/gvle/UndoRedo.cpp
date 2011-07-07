@@ -28,8 +28,9 @@
 
 #include <vle/gvle/UndoRedo.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/graph/Model.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 using namespace vle;
 

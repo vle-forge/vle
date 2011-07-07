@@ -30,6 +30,8 @@
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/vpz/AtomicModels.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {
 

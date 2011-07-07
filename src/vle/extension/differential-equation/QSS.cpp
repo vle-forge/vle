@@ -28,7 +28,6 @@
 
 #include <vle/extension/differential-equation/QSS.hpp>
 #include <vle/value/Map.hpp>
-#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 namespace vle { namespace extension { namespace QSS {

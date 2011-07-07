@@ -29,8 +29,8 @@
 #include <vle/gvle/ParameterExecutionBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Tools.hpp>
 #include <gtkmm/stock.h>
 #include <gtkmm/filechooserdialog.h>
 

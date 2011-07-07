@@ -28,9 +28,7 @@
 
 #include <vle/oov/PluginFactory.hpp>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Module.hpp>
-
 
 namespace vle { namespace oov {
 

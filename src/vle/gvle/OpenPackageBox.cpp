@@ -28,7 +28,6 @@
 
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 

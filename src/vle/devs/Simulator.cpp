@@ -33,7 +33,6 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/value/Null.hpp>
 
 namespace vle { namespace devs {

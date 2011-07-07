@@ -32,9 +32,6 @@
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/utils/Debug.hpp>
-
-
 
 namespace vle { namespace devs {
 

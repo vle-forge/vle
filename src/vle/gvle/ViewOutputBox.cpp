@@ -31,6 +31,7 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <boost/algorithm/string.hpp>

@@ -39,7 +39,6 @@
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Rand.hpp>
 #include <libglademm/xml.h>
 #include <map>

@@ -29,9 +29,9 @@
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/View.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/CoupledModel.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <queue>
 
 namespace vle { namespace gvle {

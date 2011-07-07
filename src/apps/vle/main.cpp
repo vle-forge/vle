@@ -34,7 +34,6 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Remote.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/version.hpp>
 #include <iostream>

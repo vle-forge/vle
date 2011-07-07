@@ -27,11 +27,12 @@
 
 
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Debug.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/Remote.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <glibmm/spawn.h>
 #include <glibmm/thread.h>
 #include <string>

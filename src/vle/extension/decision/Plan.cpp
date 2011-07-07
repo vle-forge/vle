@@ -29,7 +29,6 @@
 #include <vle/extension/decision/Plan.hpp>
 #include <vle/extension/decision/KnowledgeBase.hpp>
 #include <vle/utils/Parser.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/i18n.hpp>
 #include <string>
 #include <istream>

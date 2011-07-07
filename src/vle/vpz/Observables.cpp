@@ -28,7 +28,6 @@
 
 #include <vle/vpz/Observables.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Algo.hpp>
 #include <iterator>
 #include <algorithm>

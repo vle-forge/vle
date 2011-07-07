@@ -28,7 +28,6 @@
 
 #include <vle/devs/NetStreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/oov/PluginFactory.hpp>
 #include <string>

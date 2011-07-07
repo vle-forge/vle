@@ -30,12 +30,12 @@
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
-#include <vle/utils/Debug.hpp>
 #include <gdkmm/gc.h>
 #include <gdkmm/types.h>
 #include <gdkmm/pixbuf.h>
 #include <vector>
 #include <cmath>
+#include <boost/lexical_cast.hpp>
 #include <cairomm/scaledfont.h>
 
 namespace vle { namespace gvle {

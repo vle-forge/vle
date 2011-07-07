@@ -28,8 +28,9 @@
 
 #include <vle/gvle/ConnectionBox.hpp>
 #include <vle/graph/CoupledModel.hpp>
-#include <vle/utils/Debug.hpp>
+#include <vle/utils/i18n.hpp>
 #include <gtkmm/stock.h>
+#include <cassert>
 
 using std::list;
 using std::string;

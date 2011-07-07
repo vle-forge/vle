@@ -34,7 +34,6 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Algo.hpp>
 #include <boost/utility.hpp>
 

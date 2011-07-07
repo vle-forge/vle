@@ -27,7 +27,6 @@
 
 
 #include <vle/eov/Window.hpp>
-#include <vle/utils/Debug.hpp>
 #include <cassert>
 
 namespace vle { namespace eov {

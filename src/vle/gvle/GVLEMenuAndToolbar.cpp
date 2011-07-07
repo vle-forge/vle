@@ -30,7 +30,6 @@
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/GVLE.hpp>
-#include <vle/utils/Debug.hpp>
 #include <gtkmm/stock.h>
 #include <iostream>
 

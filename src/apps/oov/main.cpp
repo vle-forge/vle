@@ -30,7 +30,6 @@
 #include <apps/oov/OptionGroup.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/oov/OOV.hpp>
 #include <vle/oov/NetStreamReader.hpp>
 #include <iostream>

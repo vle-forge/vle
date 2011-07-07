@@ -28,7 +28,6 @@
 
 #include <vle/vpz/Project.hpp>
 #include <vle/utils/DateTime.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/version.hpp>
 
 namespace vle { namespace vpz {

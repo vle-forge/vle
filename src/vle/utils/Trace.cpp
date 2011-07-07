@@ -30,7 +30,6 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/DateTime.hpp>
-#include <vle/utils/Debug.hpp>
 #include <boost/thread.hpp>
 #include <fstream>
 

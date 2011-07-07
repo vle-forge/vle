@@ -36,7 +36,6 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/vpz/DllDefines.hpp>
 
 namespace vle { namespace vpz {

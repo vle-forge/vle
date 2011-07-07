@@ -28,7 +28,6 @@
 
 #include <vle/extension/differential-equation/DESS.hpp>
 #include <vle/value/Map.hpp>
-#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 namespace vle { namespace extension { namespace DifferentialEquation {

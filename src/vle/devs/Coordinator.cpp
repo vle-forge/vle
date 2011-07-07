@@ -44,7 +44,6 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/value/Value.hpp>
 

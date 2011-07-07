@@ -29,7 +29,6 @@
 #include <vle/manager/VLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/eov/Plugin.hpp>

@@ -36,6 +36,8 @@
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {
 

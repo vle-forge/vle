@@ -27,10 +27,10 @@
 
 
 #include <vle/value/Tuple.hpp>
-#include <vle/utils/Debug.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace value {
 

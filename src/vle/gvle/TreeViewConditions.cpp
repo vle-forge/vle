@@ -28,6 +28,7 @@
 
 #include <vle/gvle/TreeViewConditions.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 using namespace vle;
 

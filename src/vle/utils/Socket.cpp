@@ -27,11 +27,15 @@
 
 
 #include <vle/utils/Socket.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/SocketImpl.h>
-#include <vle/utils/Debug.hpp>
+#include <vle/utils/i18n.hpp>
 #include <glibmm/stringutils.h>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
+#include <vector>
 
 namespace vle { namespace utils { namespace net {
 

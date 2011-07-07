@@ -29,7 +29,6 @@
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 
 namespace vle

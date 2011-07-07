@@ -27,7 +27,6 @@
 
 
 #include <vle/extension/decision/Agent.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/value/String.hpp>
 #include <cassert>
 

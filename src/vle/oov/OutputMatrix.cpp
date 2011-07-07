@@ -27,7 +27,6 @@
 
 
 #include <vle/oov/OutputMatrix.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>

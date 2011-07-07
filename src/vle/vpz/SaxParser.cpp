@@ -30,7 +30,6 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Tuple.hpp>
@@ -43,6 +42,9 @@
 #include <vle/value/Null.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/cast.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <libxml/SAX2.h>
 #include <libxml/parser.h>
 #include <cerrno>
@@ -414,7 +416,10 @@ void SaxParser::onNull(const xmlChar**)
 
 void SaxParser::onVLEProject(const xmlChar** att)
 {
-    Assert < utils::SaxParserError >(not m_isValue);
+    if (m_isValue) {
+        throw utils::SaxParserError();
+    }
+
     m_isVPZ = true;
     m_vpzstack.pushVpz(att);
 }

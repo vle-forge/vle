@@ -27,7 +27,6 @@
 
 
 #include "ladybird.hpp"
-#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 namespace vle { namespace examples { namespace qss {

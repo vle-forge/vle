@@ -34,6 +34,10 @@
 #include <gtkmm/radioaction.h>
 #include <gtkmm/stock.h>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle {
 namespace gvle {

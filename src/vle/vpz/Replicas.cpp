@@ -27,7 +27,7 @@
 
 
 #include <vle/vpz/Replicas.hpp>
-#include <vle/utils/Debug.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/Rand.hpp>
 
 namespace vle { namespace vpz {

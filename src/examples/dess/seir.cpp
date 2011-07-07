@@ -28,7 +28,6 @@
 
 #include "seir.hpp"
 #include <vle/value/Double.hpp>
-#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 #ifndef M_PI

@@ -31,7 +31,6 @@
 
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DateTime.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/i18n.hpp>

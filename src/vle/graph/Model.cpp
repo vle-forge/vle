@@ -29,7 +29,10 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/utils/Debug.hpp>
+#include <vle/utils/Exception.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <algorithm>
 #include <stack>
 
 namespace vle { namespace graph {

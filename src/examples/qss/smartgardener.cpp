@@ -27,7 +27,6 @@
 
 
 #include "smartgardener.hpp"
-#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace examples { namespace qss {
 

@@ -29,7 +29,6 @@
 #include "OptionGroup.hpp"
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Debug.hpp>
 #include <glibmm/optioncontext.h>
 
 

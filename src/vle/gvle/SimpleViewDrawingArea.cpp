@@ -29,7 +29,6 @@
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
-#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 #ifndef M_PI

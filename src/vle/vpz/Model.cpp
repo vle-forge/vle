@@ -27,7 +27,7 @@
 
 
 #include <vle/vpz/Model.hpp>
-#include <vle/utils/Debug.hpp>
+#include <algorithm>
 
 namespace vle { namespace vpz {
 

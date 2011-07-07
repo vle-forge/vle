@@ -28,8 +28,7 @@
 
 #include <vle/graph/ModelPortList.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/utils/Debug.hpp>
-
+#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace graph {
 

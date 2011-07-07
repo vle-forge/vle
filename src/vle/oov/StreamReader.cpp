@@ -30,7 +30,6 @@
 #include <vle/oov/PluginFactory.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/value/String.hpp>
 #include <vle/version.hpp>
 

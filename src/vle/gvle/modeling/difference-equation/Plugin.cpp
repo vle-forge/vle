@@ -30,6 +30,9 @@
 #include <vle/gvle/modeling/difference-equation/SourceDialog.hpp>
 #include <vle/utils/Package.hpp>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle { namespace modeling { namespace de {
 

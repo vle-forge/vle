@@ -29,7 +29,8 @@
 #include <vle/gvle/PortDialog.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/utils/Debug.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/Exception.hpp>
 #include <gtkmm/stock.h>
 
 using namespace vle;

@@ -36,7 +36,6 @@
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Debug.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <gdkmm/cursor.h>
 #include <limits>

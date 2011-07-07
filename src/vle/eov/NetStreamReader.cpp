@@ -29,7 +29,6 @@
 #include <vle/eov/NetStreamReader.hpp>
 #include <vle/eov/PluginFactory.hpp>
 #include <vle/eov/Window.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/value/String.hpp>

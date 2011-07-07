@@ -28,7 +28,6 @@
 
 #include <vle/oov/LocalStreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/version.hpp>
 #include <boost/format.hpp>

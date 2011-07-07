@@ -30,7 +30,6 @@
 #include <vle/gvle/NewProjectBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
-#include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/i18n.hpp>
 
