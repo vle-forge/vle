@@ -39,9 +39,9 @@ void F1::compute(const devs::Time& /* time */)
 
 void F1::initValue(const devs::Time& /* time */)
 {
-    init(a, 0.0);
-    init(b, a(0) - 3);
-    init(c, 0.0);
+    a = 1.0;
+    b = a(0) - 3;
+//    c = 0.0; use default value
 }
 
 }}} // namespace vle examples equation
