@@ -80,6 +80,7 @@ class VLE_EXTENSION_EXPORT Multiple : public Base
     {
         MultipleValues* mMultipleValues;
         bool* mSetValues;
+        bool* mInitValues;
     };
 
 public:
@@ -121,6 +122,7 @@ public:
                     }
                 }
                 *mIterators.mSetValues = true;
+                *mIterators.mInitValues = true;
             }
         }
 
@@ -193,13 +195,6 @@ public:
      */
     Var createVar(const std::string& name)
     { return Var(name, this); }
-
-    /**
-     * @brief Initialize an internal variable.
-     * @param var the internal variable.
-     * @param value the initial value of the internal variable.
-     */
-    void init(const Var& variable, double value);
 
     /**
      * @brief Initialize the value of internal variable. This

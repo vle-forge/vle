@@ -57,7 +57,6 @@ Multiple::Multiple(const DynamicsInit& model,
                     double init = toDouble(tab.get(1));
 
                     mInitialValues[name] = init;
-                    mInitValues[name] = true;
                 } else {
                     if (tab.get(1)->isSet()) {
                         const Set& init = tab.getSet(1);
@@ -128,28 +127,58 @@ void Multiple::create(const std::string& name,
         size(name, DEFAULT_SIZE);
     }
     mSetValues.insert(std::make_pair(name, false)).first;
-    iterators.mSetValues = &mSetValues[name];
     iterators.mMultipleValues = &mValues[name];
+    iterators.mSetValues = &mSetValues[name];
+    iterators.mInitValues = &mInitValues[name];
 }
 
 void Multiple::initValue(const Time& /* time */)
 {
-    std::vector < std::string >::const_iterator it = mVariableNames.begin();
-
-    while (it != mVariableNames.end()) {
-        if (mInitValues[*it]) {
-            addValue(mInitialValues[*it], *it);
-        } else {
-            addValue(0.0, *it);
-        }
-        mInitValues[*it] = true;
-        ++it;
-    }
 }
 
 void Multiple::initValues(const Time& time)
 {
+    {
+        std::vector < std::string >::const_iterator it = mVariableNames.begin();
+
+        while (it != mVariableNames.end()) {
+            std::map < std::string, double >::const_iterator iti =
+                mInitialValues.find(*it);
+
+            if (iti != mInitialValues.end()) {
+                addValue(iti->second, *it);
+                mInitValues[*it] = true;
+                mSetValues[*it] = true;
+            }
+            ++it;
+        }
+    }
+
     initValue(time);
+
+    {
+        std::vector < std::string >::const_iterator it = mVariableNames.begin();
+
+        while (it != mVariableNames.end()) {
+            std::map < std::string, bool >::const_iterator itv =
+                mInitValues.find(*it);
+
+            if (not itv->second) {
+                std::map < std::string, double >::const_iterator iti =
+                    mInitialValues.find(*it);
+
+                if (iti != mInitialValues.end()) {
+                    addValue(iti->second, *it);
+                } else {
+                    addValue(0.0, *it);
+                }
+                mInitValues[*it] = true;
+                mSetValues[*it] = true;
+            }
+            ++it;
+        }
+    }
+
     {
         std::map < std::string, bool >::iterator it = mInitValues.begin();
 
@@ -159,17 +188,6 @@ void Multiple::initValues(const Time& time)
         }
     }
     unset();
-}
-
-void Multiple::init(const Var& variable, double value)
-{
-    if (mInitValues[variable.name()]) {
-        addValue(mInitialValues[variable.name()], variable.name());
-    } else {
-        addValue(value, variable.name());
-    }
-    mInitValues[variable.name()] = true;
-    mSetValues[variable.name()] = true;
 }
 
 void Multiple::invalidValues()
