@@ -366,6 +366,13 @@ void Multiple::output(const Time& /* time */,
 
 Value* Multiple::observation(const ObservationEvent& event) const
 {
+    if (mState == INIT) {
+        throw utils::InternalError(
+            fmt(_("[%1%] DifferenceEquation::Multiple: model not initialized" \
+                  " (perhaps, a cycle of synchronous variables)")) %
+            getModelName());
+    }
+
     if (event.getPortName() != "all") {
         return Double::create(val(event.getPortName()));
     } else {

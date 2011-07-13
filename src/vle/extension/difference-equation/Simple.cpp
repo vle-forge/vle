@@ -190,6 +190,13 @@ void Simple::output(const Time& /* time */,
 
 Value* Simple::observation(const ObservationEvent& event) const
 {
+    if (mState == INIT) {
+        throw utils::InternalError(
+            fmt(_("[%1%] DifferenceEquation::Simple: model not initialized" \
+                  " (perhaps, a cycle of synchronous variables)")) %
+            getModelName());
+    }
+
     if (event.getPortName() != mVariableName) {
         throw utils::InternalError(fmt(_(
                     "[%1%] DifferenceEquation::observation: invalid variable" \
