@@ -37,6 +37,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {
@@ -105,6 +106,11 @@ FileTreeView::FileTreeView(BaseObjectType* cobject,
     mMenuPopup.accelerate(*this);
 
     signal_event().connect(sigc::mem_fun(*this, &FileTreeView::onEvent));
+
+    Glib::RefPtr<Gtk::TreeSelection> selection = Gtk::TreeView::get_selection();
+    
+    selection->set_select_function(
+        sigc::mem_fun(*this, &FileTreeView::onSelect) );
 }
 
 FileTreeView::~FileTreeView()
@@ -203,6 +209,55 @@ void FileTreeView::build()
              sigc::mem_fun(*this, &FileTreeView::onEditionStarted));
 }
 
+Gtk::TreeModel::iterator FileTreeView::getFileRow(
+    std::vector <std::string> path,
+    Gtk::TreeModel::Children child)
+{
+    Gtk::TreeModel::iterator iter = child.begin();
+    std::vector <std::string>::iterator itPath = path.begin();
+
+    while (iter != child.end()) {
+        if ((*iter).get_value(mColumns.mColname) == *itPath) {
+            if ((itPath + 1) == path.end()){
+                return iter;
+            }
+            itPath++;
+            iter = (*iter).children().begin();
+        }
+        else {
+            iter++;
+        }
+    }
+    return iter;
+}
+
+void FileTreeView::showRow(std::string pathFile)
+{
+    std::string pathPackage = utils::Path::path().getPackageDir();
+    std::string path = pathFile.substr(pathPackage.size()+1,
+                                       pathFile.size());
+    std::vector <std::string> lst;
+
+    boost::algorithm::split(lst, path, boost::is_any_of("/"),
+                            boost::algorithm::token_compress_on);
+
+    Gtk::TreeModel::iterator iter = getFileRow(lst,
+                                               mTreeModel->children());
+
+    expand_to_path(Gtk::TreePath(iter));
+
+    Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = get_selection();
+
+    refTreeSelection->set_select_function(
+        sigc::mem_fun(*this, &FileTreeView::onSelectHighlightOnly));
+
+    refTreeSelection->unselect_all();
+    refTreeSelection->select(iter);
+
+    refTreeSelection->set_select_function(
+        sigc::mem_fun(*this, &FileTreeView::onSelect) );
+}
+
 bool FileTreeView::isDirectory(const std::string& dirname)
 {
     return Glib::file_test(dirname, Glib::FILE_TEST_IS_DIR);
@@ -210,19 +265,6 @@ bool FileTreeView::isDirectory(const std::string& dirname)
 
 bool FileTreeView::onEvent(GdkEvent* event)
 {
-    if (event->type == GDK_2BUTTON_PRESS) {
-        if (event->button.button == 1) {
-            mDelayTime = event->button.time;
-            Gtk::TreeModel::Path path;
-            Gtk::TreeViewColumn* column;
-            get_cursor(path, column);
-            mRecentSelectedPath = path;
-
-            on_row_activated(path, column);
-            return true;
-        }
-    }
-
     if (event->type == GDK_BUTTON_PRESS) {
         if (event->button.button == 1) {
             if (mDelayTime + 250 < event->button.time and
@@ -237,6 +279,36 @@ bool FileTreeView::onEvent(GdkEvent* event)
     }
 
     return false;
+}
+
+bool FileTreeView::onSelectHighlightOnly(
+    const Glib::RefPtr<Gtk::TreeModel>& /*model*/,
+    const Gtk::TreeModel::Path& /*path*/, bool /*info*/)
+{
+    return true;
+}
+
+bool FileTreeView::onSelect(
+    const Glib::RefPtr<Gtk::TreeModel>& /*model*/,
+    const Gtk::TreeModel::Path& path, bool /*info*/)
+{
+    Gtk::TreeModel::Path selectedpath(path);
+    Gtk::TreeModel::iterator it = mTreeModel->get_iter(selectedpath);
+    Gtk::TreeModel::Row row = *it;
+
+    std::list<std::string> lstpath;
+    projectFilePath(row, lstpath);
+
+    std::string absolute_path =
+	Glib::build_filename(mPackage, Glib::build_filename(lstpath));
+
+    if (not isDirectory(absolute_path)) {
+	if (mParent->getEditor()->existTab(absolute_path)) {
+	    mParent->getEditor()->focusAndSignal(absolute_path);
+        }
+    }
+
+    return true;
 }
 
 void FileTreeView::onEditionStarted(Gtk::CellEditable* /*cell*/,
