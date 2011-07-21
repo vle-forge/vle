@@ -234,6 +234,7 @@ public:
     void changeFile(const std::string& oldName, const std::string& newName);
 
     void changeTab(GtkNotebookPage* page, int num);
+    void changeAndSignal(GtkNotebookPage* page, int num);
     void refreshTab();
 
     void closeAllTab();
@@ -253,6 +254,7 @@ public:
     bool existVpzTab();
 
     void focusTab(const std::string& filepath);
+    void focusAndSignal(const std::string& filepath);
 
     const Documents& getDocuments() const
     { return mDocuments; }
@@ -322,6 +324,7 @@ private:
 
     Documents   mDocuments;
     GVLE*       mGVLE;
+    sigc::connection tabSignal;
 
     /**
      * @brief add a label for a new tab

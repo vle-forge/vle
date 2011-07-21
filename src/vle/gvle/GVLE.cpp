@@ -249,6 +249,31 @@ void GVLE::setFileName(std::string name)
     setModified(false);
 }
 
+void GVLE::modifications(std::string filepath, bool isModif)
+{
+    if (utils::Path::extension(filepath) == ".vpz") {
+        mMenuAndToolbar->onOpenVpz();
+        mModelTreeBox->set_sensitive(true);
+        mModelClassBox->set_sensitive(true);
+    } else {
+        mMenuAndToolbar->onOpenFile();
+        mModelTreeBox->set_sensitive(false);
+        mModelClassBox->set_sensitive(false);
+    }
+    if (isModif) {
+        mMenuAndToolbar->showSave();
+    } else {
+        mMenuAndToolbar->hideSave();
+    }
+    setTitle(utils::Path::basename(filepath) +
+                    utils::Path::extension(filepath));
+}
+
+void GVLE::focusRow(std::string filepath)
+{
+    mFileTreeView->showRow(filepath);
+}
+
 void GVLE::addView(graph::Model* model)
 {
     if (model) {

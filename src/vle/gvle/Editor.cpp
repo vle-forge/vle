@@ -31,6 +31,7 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
+#include <vle/gvle/FileTreeView.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
@@ -126,8 +127,6 @@ DocumentText::DocumentText(GVLE* gvle,
 
     add(mView);
 
-    mView.get_buffer()->signal_changed().connect(
-	sigc::mem_fun(this, &DocumentText::onChanged));
 }
 
 DocumentText::DocumentText(const std::string& buffer)
@@ -472,7 +471,7 @@ Editor::Editor(BaseObjectType* cobject,
                const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
     Gtk::Notebook(cobject)
 {
-    signal_switch_page().connect(sigc::mem_fun(this, &Editor::changeTab));
+    tabSignal = signal_switch_page().connect(sigc::mem_fun(this, &Editor::changeTab));
 }
 
 Editor::~Editor()
@@ -518,22 +517,8 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
         while (it != mDocuments.end()) {
             if (it->second == tab) {
                 mGVLE->setCurrentTab(num);
-                if (utils::Path::extension(it->first) == ".vpz") {
-                    mGVLE->getMenu()->onOpenVpz();
-                    mGVLE->getModelTreeBox()->set_sensitive(true);
-                    mGVLE->getModelClassBox()->set_sensitive(true);
-                } else {
-                    mGVLE->getMenu()->onOpenFile();
-                    mGVLE->getModelTreeBox()->set_sensitive(false);
-                    mGVLE->getModelClassBox()->set_sensitive(false);
-                }
-                if (it->second->isModified()) {
-                    mGVLE->getMenu()->showSave();
-                } else {
-                    mGVLE->getMenu()->hideSave();
-                }
-                mGVLE->setTitle(utils::Path::basename(it->first) +
-                               utils::Path::extension(it->first));
+                mGVLE->focusRow(it->first);
+                mGVLE->modifications(it->first, it->second->isModified());
                 break;
             }
             ++it;
@@ -541,7 +526,29 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
     }
 }
 
-void Editor::refreshTab() {
+void Editor::changeAndSignal(GtkNotebookPage* /*page*/, int num)
+{
+    if (mGVLE->getCurrentTab() != num) {
+        Gtk::Widget* tab = get_nth_page(num);
+        Documents::iterator it = mDocuments.begin();
+
+        while (it != mDocuments.end()) {
+            if (it->second == tab) {
+                mGVLE->setCurrentTab(num);
+                mGVLE->modifications(it->first, it->second->isModified());
+                break;
+            }
+            ++it;
+        }
+    }
+
+    tabSignal.disconnect();
+    tabSignal = signal_switch_page().connect(sigc::mem_fun(this,
+                                                   &Editor::changeTab));
+}
+
+void Editor::refreshTab()
+{
     Documents::iterator it = mDocuments.begin();
 
     while (it != mDocuments.end()) {
@@ -673,6 +680,15 @@ void Editor::focusTab(const std::string& filepath)
     int page = page_num(*(mDocuments.find(filepath)->second));
 
     set_current_page(page);
+}
+
+void Editor::focusAndSignal(const std::string& filepath)
+{
+    tabSignal.disconnect();
+    tabSignal = signal_switch_page().connect(sigc::mem_fun(this,
+                                                  &Editor::changeAndSignal));
+
+    focusTab(filepath);
 }
 
 void Editor::onUndo()

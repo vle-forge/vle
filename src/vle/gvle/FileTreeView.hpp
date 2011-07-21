@@ -69,6 +69,12 @@ public:
 
     void refresh();
 
+    Gtk::TreeModel::iterator getFileRow(
+        std::vector <std::string> path,
+        Gtk::TreeModel::Children child);
+
+    void showRow(std::string path);
+
     inline void setPackage(const std::string& package)
     { mPackage = package; }
 
@@ -77,6 +83,10 @@ public:
 
 protected:
     bool on_button_press_event(GdkEventButton* event);
+    bool onSelectHighlightOnly(const Glib::RefPtr<Gtk::TreeModel>& model,
+                               const Gtk::TreeModel::Path& path, bool info);
+    bool onSelect(const Glib::RefPtr<Gtk::TreeModel>& model,
+                  const Gtk::TreeModel::Path& path, bool info);
     bool on_foreach(const Gtk::TreeModel::Path&,
                     const Gtk::TreeModel::iterator& iter);
     void onEdition(const Glib::ustring& pathString,

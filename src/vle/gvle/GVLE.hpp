@@ -58,6 +58,7 @@
 
 namespace vle { namespace gvle {
 
+class Document;
 class Editor;
 class FileTreeView;
 class GVLEMenuAndToolbar;
@@ -170,6 +171,10 @@ public:
      * @param name the file name
      */
     void setFileName(std::string name);
+
+    void modifications(std::string filepath, bool isModif);
+
+    void focusRow(std::string filepath);
 
     /**
      * add a view to modeling for the GModel model.
@@ -325,6 +330,13 @@ public:
      */
     inline ModelClassBox* getModelClassBox()
     { return mModelClassBox; }
+
+    /**
+     * return the FileTreeView
+     * @return FileTreeView instance of FileTreeView
+     */
+    inline FileTreeView* getFileTreeView()
+    { return mFileTreeView; }
 
     /**
      * return the Modeling instance
