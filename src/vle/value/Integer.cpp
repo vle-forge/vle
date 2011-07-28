@@ -36,7 +36,7 @@ void Integer::writeFile(std::ostream& out) const
 {
     std::streamsize old = out.precision();
 
-    out << std::setprecision(std::numeric_limits < long >::digits10)
+    out << std::setprecision(std::numeric_limits < int32_t >::digits10)
         << m_value;
 
     out.precision(old);
@@ -46,7 +46,7 @@ void Integer::writeString(std::ostream& out) const
 {
     std::streamsize old = out.precision();
 
-    out << std::setprecision(std::numeric_limits < long >::digits10)
+    out << std::setprecision(std::numeric_limits < int32_t >::digits10)
         << m_value;
 
     out.precision(old);
@@ -57,7 +57,7 @@ void Integer::writeXml(std::ostream& out) const
     std::streamsize old = out.precision();
 
     out << "<integer>"
-        << std::setprecision(std::numeric_limits < long >::digits10)
+        << std::setprecision(std::numeric_limits < int32_t >::digits10)
         << m_value
         << "</integer>";
 

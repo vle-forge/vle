@@ -225,16 +225,8 @@ namespace vle { namespace devs {
          * @param name std::string name of integer to get.
          * @return an integer.
          */
-        inline int getIntegerAttributeValue(const std::string& name) const
+        inline int32_t getIntegerAttributeValue(const std::string& name) const
         { return attributes().getInt(name); }
-
-        /**
-         * Get an long attribute from this Event.
-         * @param name std::string name of integer to get.
-         * @return an integer.
-         */
-        inline long getLongAttributeValue(const std::string& name) const
-        { return attributes().getLong(name); }
 
         /**
          * Get a boolean attribute from this Event.

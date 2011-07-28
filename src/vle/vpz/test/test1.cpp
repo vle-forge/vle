@@ -99,9 +99,9 @@ BOOST_AUTO_TEST_CASE(value_integer)
     char t4[bufferSize];
 
     snprintf(t3, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-             utils::toString(std::numeric_limits< long >::max()).c_str());
+             utils::to < int32_t >(std::numeric_limits< int32_t >::max()).c_str());
     snprintf(t4, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-             utils::toString(std::numeric_limits< long >::min()).c_str());
+             utils::to < int32_t >(std::numeric_limits< int32_t >::min()).c_str());
 
     value::Value* v;
 
@@ -114,17 +114,17 @@ BOOST_AUTO_TEST_CASE(value_integer)
     delete v;
 
     v = vpz::Vpz::parseValue(t3);
-    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::max());
+    BOOST_CHECK_EQUAL(value::toInteger(v), std::numeric_limits < int32_t >::max());
     delete v;
 
     v = vpz::Vpz::parseValue(t4);
 
-    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::min());
+    BOOST_CHECK_EQUAL(value::toInteger(v), std::numeric_limits < int32_t >::min());
     std::string t5(v->writeToXml());
     delete v;
 
     v = vpz::Vpz::parseValue(t5);
-    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::min());
+    BOOST_CHECK_EQUAL(value::toInteger(v), std::numeric_limits < int32_t >::min());
     delete v;
 }
 

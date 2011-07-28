@@ -274,7 +274,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         const value::Double* real(value::toDoubleValue(set.get(0)));
         BOOST_REQUIRE_EQUAL(real->value(), 123.);
         const value::Integer* integer(value::toIntegerValue(set.get(1)));
-        BOOST_REQUIRE_EQUAL(integer->intValue(), 1);
+        BOOST_REQUIRE_EQUAL(integer->value(), 1);
     }
 
     {
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         const value::Double* real(value::toDoubleValue(set.get(0)));
         BOOST_REQUIRE_EQUAL(real->value(), 456.);
         const value::Integer* integer(value::toIntegerValue(set.get(1)));
-        BOOST_REQUIRE_EQUAL(integer->intValue(), 2);
+        BOOST_REQUIRE_EQUAL(integer->value(), 2);
     }
 
     {
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         const value::Double* real = value::toDoubleValue(set.get(0));
         BOOST_REQUIRE_EQUAL(real->value(), .123);
         const value::Integer* integer = value::toIntegerValue(set.get(1));
-        BOOST_REQUIRE_EQUAL(integer->intValue(), -1);
+        BOOST_REQUIRE_EQUAL(integer->value(), -1);
     }
 
     {
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         const value::Double* real = value::toDoubleValue(set.get(0));
         BOOST_REQUIRE_EQUAL(real->value(), .456);
         const value::Integer* integer = value::toIntegerValue(set.get(1));
-        BOOST_REQUIRE_EQUAL(integer->intValue(), -2);
+        BOOST_REQUIRE_EQUAL(integer->value(), -2);
     }
 
     {
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
 		BOOST_REQUIRE_EQUAL(real.value(), 123.);
                 const value::Integer&
                     integer(value::toIntegerValue(*set.get(1)));
-		BOOST_REQUIRE_EQUAL(integer.intValue(), 1);
+		BOOST_REQUIRE_EQUAL(integer.value(), 1);
 	    }
 
 	}

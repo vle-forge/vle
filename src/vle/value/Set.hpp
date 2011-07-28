@@ -451,7 +451,7 @@ public:
      * @throw utils::ArgError if the index 'i' is to big or if value at
      * index 'i' is not a Integer.
      */
-    const long& getInt(const size_type& i) const
+    const int32_t& getInt(const size_type& i) const
     { return value::toInteger(get(i)); }
 
     /**
@@ -461,35 +461,8 @@ public:
      * @throw utils::ArgError if the index 'i' is to big or if value at
      * index 'i' is not a Integer.
      */
-    long& getInt(const size_type& i)
+    int32_t& getInt(const size_type& i)
     { return value::toInteger(get(i)); }
-
-    /**
-     * @brief Add a IntegerValue into the set.
-     * @param value
-     */
-    void addLong(const long& value)
-    { m_value.push_back(new Integer(value)); }
-
-    /**
-     * @brief get a long from the specified index.
-     * @param i the index to get value.
-     * @return a value
-     * @throw utils::argerror if the index 'i' is to big or if value at
-     * index 'i' is not a integer.
-     */
-    const long& getLong(const size_type& i) const
-    { return value::toLong(get(i)); }
-
-    /**
-     * @brief get a long from the specified index.
-     * @param i the index to get value.
-     * @return a value
-     * @throw utils::argerror if the index 'i' is to big or if value at
-     * index 'i' is not a integer.
-     */
-    long& getLong(const size_type& i)
-    { return value::toLong(get(i)); }
 
     /**
      * @brief Add a StringValue into the set.

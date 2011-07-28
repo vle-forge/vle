@@ -32,6 +32,7 @@
 #include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/utils/DateTime.hpp>
+#include <deque>
 
 namespace vle { namespace extension { namespace DifferenceEquation {
 

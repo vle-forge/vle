@@ -468,49 +468,7 @@ public:
         add(name, new Boolean(value));
     }
 
-    /**
-     * @brief Get the long integer value objet from specified name.
-     * @param name The name of the Value in the map.
-     * @return a reference to the Value.
-     * @throw utils::ArgError if type is not Value::INTEGER or value do not
-     * exist.
-     */
-    const long& getLong(const std::string& name) const
-    {
-        return value::toLong(get(name));
-    }
-
-    /**
-     * @brief Get the long integer value objet from specified name.
-     * @param name The name of the Value in the map.
-     * @return a reference to the Value.
-     * @throw utils::ArgError if type is not Value::INTEGER or value do not
-     * exist.
-     */
-    long& getLong(const std::string& name)
-    {
-        return value::toLong(get(name));
-    }
-
-    /**
-     * @brief Set a long integer to the value of the specified key. If the
-     * key does not exist, it will be build.
-     * @param name The key of the map.
-     * @param value The value of the key.
-     */
-    void addLong(const std::string& name, const long& value)
-    {
-        add(name, new Integer(value));
-    }
-
-    /**
-     * @brief Get the integer value objet from specified name.
-     * @param name The name of the Value in the map.
-     * @return a reference to the Value.
-     * @throw utils::ArgError if type is not Value::INTEGER or value do not
-     * exist.
-     */
-    const long& getInt(const std::string& name) const
+    const int32_t& getInt(const std::string& name) const
     {
         return value::toInteger(get(name));
     }
@@ -522,7 +480,7 @@ public:
      * @throw utils::ArgError if type is not Value::INTEGER or value do not
      * exist.
      */
-    long& getInt(const std::string& name)
+    int32_t& getInt(const std::string& name)
     {
         return value::toInteger(get(name));
     }
@@ -533,7 +491,7 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    void addInt(const std::string& name, const int& value)
+    void addInt(const std::string& name, const int32_t& value)
     {
         add(name, new Integer(value));
     }

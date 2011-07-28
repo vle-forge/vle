@@ -95,7 +95,7 @@ void ParameterExecutionBox::buildInterface()
     Gtk::Label* port = Gtk::manage(new Gtk::Label(_("Network port:")));
     Gtk::HBox* HBoxRemote = Gtk::manage(new Gtk::HBox());
     mEntryPort = Gtk::manage(new Gtk::Entry());
-    mEntryPort->set_text(utils::toString(mModeling->getSocketPort()));
+    mEntryPort->set_text(utils::to < int32_t >(mModeling->getSocketPort()));
     HBoxRemote->pack_start(*port, false, false);
     HBoxRemote->pack_start(*mEntryPort, true, true);
     HBoxRemote->set_border_width(3);

@@ -29,93 +29,54 @@
 #ifndef VLE_UTILS_TOOLS_HPP
 #define VLE_UTILS_TOOLS_HPP
 
-#include <boost/format.hpp>
-#include <cstdarg>
-#include <string>
-#include <sstream>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/trim.hpp>
 #include <vle/utils/DllDefines.hpp>
+#include <vle/utils/Types.hpp>
+#include <string>
+
+#include <vle/utils/Exception.hpp>
+#include <boost/lexical_cast.hpp>
+#include <stdexcept>
 
 namespace vle { namespace utils {
 
     /**
-     * @brief Return true if str can be translate into a double.
-     * @param str string to test.
-     * @return true if str can be translate, otherwise false.
-     */
-    inline bool isDouble(const std::string& str)
-    {
-        try {
-            boost::lexical_cast < double >(str);
-            return true;
-        } catch(const boost::bad_lexical_cast& e) {
-            return false;
-        }
-    }
-
-    /**
-     * @brief Return true if str can be translate into an integer.
-     * @param str string to test.
-     * @return true if str can be translate, otherwise false.
-     */
-    inline bool isInt(const std::string& str)
-    {
-        try {
-            boost::lexical_cast < int >(str);
-            return true;
-        } catch(const boost::bad_lexical_cast& e) {
-            return false;
-        }
-    }
-
-    /**
-     * Return conversion from string into boolean.
+     * Return true if the string \c str can be translated the template type \c T.
+     * The template type \c T can be one of the following type: bool, float,
+     * double, int8_t, uint8_t, int16_t, uint16_t, int32_t or uint32_t.
      *
-     * @param str string to convert.
-     * @return true if str == TRUE or true, or a integer !0.
+     * @param str The string to convert.
+     *
+     * @return true if string can be translated into the type \c T.
      */
-    inline bool isBoolean(const std::string& str)
-    {
-        if (str == "true") {
-            return true;
-        } else if (str == "false") {
-            return false;
-        } else {
-            try {
-                return boost::lexical_cast < bool >(str);
-            } catch(const boost::bad_lexical_cast& e) {
-                return false;
-            }
-        }
-    }
+    template < typename T > bool is(const std::string& str);
+
+    /**
+     * Convert the template type \c T into the string representation.
+     * The template type \c T can be one of the following type: bool, float,
+     * double, int8_t, uint8_t, int16_t, uint16_t, int32_t or uint32_t.
+     *
+     * @param t An instance of the type \c T to convert.
+     *
+     * @return A string representation.
+     */
+    template < typename T > std::string to(const T t);
+
+    /**
+     * Convert the string \c str into the template type \c T. The template type
+     * \c T can be one of the following type: bool, float, double, int8_t,
+     * uint8_t, int16_t, uint16_t, int32_t or uint32_t.
+     *
+     * @param str The string to convert.
+     *
+     * @throw utils::ArgError If the string \c str can not be converted.
+     *
+     * @return A instance of the type \c T.
+     */
+    template < typename T > T to(const std::string& str);
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /**
-     * Return conversion from template into string.
-     *
-     * example :
-     * @code
-     * std::string v = toString(23243);
-     * std::string l = toString(141.12341);
-     * std::string e = toString("hello");
-     * @endcode
-     *
-     * @param c object to transform
-     * @return string representation of templace < class C >
-     */
-    template < class C > std::string toString(const C& c)
-    {
-        std::ostringstream o;
-        o << c;
-        return o.str();
-    }
 
     /**
      * @brief Check if the locale exists on this operating system.

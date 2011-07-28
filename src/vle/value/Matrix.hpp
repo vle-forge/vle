@@ -610,7 +610,7 @@ public:
      * @param row The row.
      * @param value The value of the int.
      */
-    void addInt(const size_type& column, const size_type& row, const int& value)
+    void addInt(const size_type& column, const size_type& row, const int32_t& value)
     {
         add(column, row, new Integer(value));
     }
@@ -621,7 +621,7 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    const long& getInt(const size_type& column, const size_type& row) const
+    const int32_t& getInt(const size_type& column, const size_type& row) const
     {
         return value::toInteger(get(column, row));
     }
@@ -632,43 +632,9 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    long& getInt(const size_type& column, const size_type& row)
+    int32_t& getInt(const size_type& column, const size_type& row)
     {
         return value::toInteger(get(column, row));
-    }
-
-    /**
-     * @brief Add a long integer into the matrix.
-     * @param column The column.
-     * @param row The row.
-     * @param value The value of the int.
-     */
-    void addLong(const size_type& column, const size_type& row,
-                 const long& value)
-    {
-        add(column, row, new Integer(value));
-    }
-
-    /**
-     * @brief Get a long integer from the matrix.
-     * @param column The column.
-     * @param row The row.
-     * @return The integer readed from the matrix.
-     */
-    const long& getLong(const size_type& column, const size_type& row) const
-    {
-        return value::toLong(get(column, row));
-    }
-
-    /**
-     * @brief Get a long integer from the matrix.
-     * @param column The column.
-     * @param row The row.
-     * @return The integer readed from the matrix.
-     */
-    long& getLong(const size_type& column, const size_type& row)
-    {
-        return value::toLong(get(column, row));
     }
 
     /**

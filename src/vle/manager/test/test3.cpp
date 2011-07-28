@@ -115,8 +115,8 @@ BOOST_AUTO_TEST_CASE(common_seed_test)
         for (unsigned int v = 0; v < vec1.size(); v++) {
             vle::value::Value* val0 = vec0[v];
             vle::value::Value* val1 = vec1[v];
-            BOOST_REQUIRE_EQUAL(val0->toInteger().intValue(),
-                                val1->toInteger().intValue());
+            BOOST_REQUIRE_EQUAL(val0->toInteger().value(),
+                                val1->toInteger().value());
         }
     }
     //option common_seed not activated
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(common_seed_test)
             vle::value::Value* val0 = vec0[v];
             vle::value::Value* val1 = vec1[v];
             equality = equality &&
-                       (val0->toInteger().intValue() == val1->toInteger().intValue());
+                       (val0->toInteger().value() == val1->toInteger().value());
         }
         BOOST_REQUIRE_EQUAL(equality, false);
     }

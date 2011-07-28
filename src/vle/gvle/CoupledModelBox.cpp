@@ -34,6 +34,7 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <gtkmm/stock.h>
+#include <boost/algorithm/string/trim.hpp>
 
 namespace vle { namespace gvle {
 
@@ -466,7 +467,7 @@ void CoupledModelBox::show(graph::CoupledModel* model)
 
     mModelName->set_text(mGraphModel->getName());
     mModelNbChildren->set_text(
-        utils::toString(mGraphModel->getModelList().size()));
+        utils::to < int32_t >(mGraphModel->getModelList().size()));
 
     mInputPorts->setModel(mGraphModel);
     mInputPorts->build();

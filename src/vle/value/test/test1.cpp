@@ -83,9 +83,9 @@ BOOST_AUTO_TEST_CASE(check_simple_value)
 
     {
         value::Integer* i = value::Integer::create(1234);
-        BOOST_REQUIRE_EQUAL(i->intValue(), 1234);
+        BOOST_REQUIRE_EQUAL(i->value(), 1234);
         i->set(4321);
-        BOOST_REQUIRE_EQUAL(i->intValue(), 4321);
+        BOOST_REQUIRE_EQUAL(i->value(), 4321);
         delete i;
     }
 

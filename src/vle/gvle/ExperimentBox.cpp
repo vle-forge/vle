@@ -131,7 +131,7 @@ void ExperimentBox::initExperiment()
 	    mEntryDate->set_text(vpz.project().date());
 	}
 
-        mEntryVersion->set_text(utils::toString(vpz.project().version()));
+        mEntryVersion->set_text(vpz.project().version());
     }
 
     // Experiment frame

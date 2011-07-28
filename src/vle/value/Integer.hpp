@@ -32,13 +32,13 @@
 #include <vle/value/Value.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Types.hpp>
 #include <vle/value/DllDefines.hpp>
-#include <numeric>
 
 namespace vle { namespace value {
 
 /**
- * @brief Integer Value encapsulate a C++ 'long' type into a class.
+ * @brief Integer Value encapsulate a C++ 'int32_t' type into a class.
  */
 class VLE_VALUE_EXPORT Integer : public Value
 {
@@ -54,7 +54,7 @@ public:
      * @brief Build an Integer object with a specified value.
      * @param value The value to copy.
      */
-    Integer(const long& value)
+    Integer(const int32_t& value)
         : m_value(value)
     {}
 
@@ -80,7 +80,7 @@ public:
      * @param value the value of the Integer.
      * @return A new Integer.
      */
-    static Integer* create(const long& value = 0)
+    static Integer* create(const int32_t& value = 0)
     { return new Integer(value); }
 
     ///
@@ -128,60 +128,28 @@ public:
     ///
 
     /**
-     * @brief Get the numeric int value from the long. This function ensure
-     * that the value returned is defined in the int range.
-     * @return The int representation of the long.
-     * @throw utils::ArgError if the long can not be represented in the
-     * int.
-     */
-    inline long& intValue()
-    {
-        if (m_value < std::numeric_limits < int >::min() or
-            m_value > std::numeric_limits < int >::max()) {
-            throw utils::ArgError(_("Can not convert long into int"));
-        }
-        return m_value;
-    }
-
-    /**
-     * @brief Get the numeric int value from the long. This function ensure
-     * that the value returned is defined in the int range.
-     * @return The int representation of the long.
-     * @throw utils::ArgError if the long can not be represented in the
-     * int.
-     */
-    inline const long& intValue() const
-    {
-        if (m_value < std::numeric_limits < int >::min() or
-            m_value > std::numeric_limits < int >::max()) {
-            throw utils::ArgError(_("Can not convert long into int"));
-        }
-        return m_value;
-    }
-
-    /**
      * @brief Get the value of the long.
      * @return An integer.
      */
-    inline const long& value() const
+    inline const int32_t& value() const
     { return m_value; }
 
     /**
      * @brief Get a reference to the encapsulated long.
      * @return A reference to the encapsulated long.
      */
-    inline long& value()
+    inline int32_t& value()
     { return m_value; }
 
     /**
      * @brief Assign a value to the encapsulated long.
      * @param value The value to set.
      */
-    inline void set(const long& value)
+    inline void set(const int32_t& value)
     { m_value = value; }
 
 private:
-    long m_value;
+    int32_t m_value;
 
     friend class boost::serialization::access;
     template < class Archive >
@@ -204,28 +172,16 @@ inline Integer& toIntegerValue(Value& value)
 inline Integer* toIntegerValue(Value* value)
 { return value ? &value->toInteger() : 0; }
 
-inline const long& toInteger(const Value& value)
-{ return value.toInteger().intValue(); }
-
-inline const long& toLong(const Value& value)
+inline const int32_t& toInteger(const Value& value)
 { return value.toInteger().value(); }
 
-inline long& toInteger(Value& value)
-{ return value.toInteger().intValue(); }
-
-inline long& toLong(Value& value)
+inline int32_t& toInteger(Value& value)
 { return value.toInteger().value(); }
 
-inline const long& toInteger(const Value* value)
-{ return value::reference(value).toInteger().intValue(); }
-
-inline const long& toLong(const Value* value)
+inline const int32_t& toInteger(const Value* value)
 { return value::reference(value).toInteger().value(); }
 
-inline long& toInteger(Value* value)
-{ return value::reference(value).toInteger().intValue(); }
-
-inline long& toLong(Value* value)
+inline int32_t& toInteger(Value* value)
 { return value::reference(value).toInteger().value(); }
 
 }} // namespace vle value

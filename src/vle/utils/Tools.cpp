@@ -73,6 +73,92 @@
 
 namespace vle { namespace utils {
 
+template < typename T >
+    bool is(const std::string& str)
+    {
+        try {
+            boost::lexical_cast < T >(str);
+            return true;
+        } catch (const boost::bad_lexical_cast& /*e*/) {
+            return false;
+        }
+    }
+
+template <>
+    bool is < bool >(const std::string& str)
+    {
+        if (str == "true") {
+            return true;
+        } else if (str == "false") {
+            return false;
+        } else {
+            try {
+                boost::lexical_cast < bool >(str);
+                return true;
+            } catch (const boost::bad_lexical_cast& /*e*/) {
+                return false;
+            }
+        }
+    }
+
+template bool is < bool >(const std::string& str);
+template bool is < int8_t >(const std::string& str);
+template bool is < int16_t >(const std::string& str);
+template bool is < int32_t >(const std::string& str);
+template bool is < uint8_t >(const std::string& str);
+template bool is < uint16_t >(const std::string& str);
+template bool is < uint32_t >(const std::string& str);
+template bool is < double >(const std::string& str);
+template bool is < float >(const std::string& str);
+
+template < typename T >
+    std::string to(const T t)
+    {
+        std::ostringstream o;
+        o << t;
+        return o.str();
+    }
+
+template <>
+    std::string to < bool >(const bool t)
+    {
+        if (t) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+template std::string to < bool >(const bool t);
+template std::string to < int8_t >(const int8_t t);
+template std::string to < int16_t >(const int16_t t);
+template std::string to < int32_t >(const int32_t t);
+template std::string to < uint8_t >(const uint8_t t);
+template std::string to < uint16_t >(const uint16_t t);
+template std::string to < uint32_t >(const uint32_t t);
+template std::string to < double >(const double t);
+template std::string to < float >(const float t);
+
+template < typename T >
+    T to(const std::string& str)
+    {
+        try {
+            return boost::lexical_cast < T >(str);
+        } catch (const boost::bad_lexical_cast& /*e*/) {
+            throw utils::ArgError(fmt(_("Can not convert `%1%'")) % str);
+        }
+    }
+
+template bool to < bool >(const std::string& str);
+template int8_t to < int8_t >(const std::string& str);
+template int16_t to < int16_t >(const std::string& str);
+template int32_t to < int32_t >(const std::string& str);
+template uint8_t to < uint8_t >(const std::string& str);
+template uint16_t to < uint16_t >(const std::string& str);
+template uint32_t to < uint32_t >(const std::string& str);
+template double to < double >(const std::string& str);
+template float to < float >(const std::string& str);
+
 std::string toScientificString(const double& v, bool locale)
 {
     std::ostringstream o;
