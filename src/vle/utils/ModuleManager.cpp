@@ -273,7 +273,7 @@ private:
         versionFunction fct;
 
         symbol = getSymbol("vle_api_level");
-        fct = utils::pointer_to_function < versionFunction >(symbol);
+        fct = utils::functionCast < versionFunction >(symbol);
         fct(&major, &minor, &patch);
 
         if (major != VLE_MAJOR_VERSION or minor != VLE_MINOR_VERSION) {

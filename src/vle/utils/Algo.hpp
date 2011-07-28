@@ -102,8 +102,8 @@ namespace vle { namespace utils {
      * equalent to:
      * @code
      * typename InputIterator, typename OutputIterator, typename Predicate >
-     * void copy_if(InputIterator first, InputIterator end,
-     *                     OutputIterator out, Predicate pred)
+     * void copyIf(InputIterator first, InputIterator end,
+     *             OutputIterator out, Predicate pred)
      * {
      *     while (first != end) {
      *         if (pred(*first)) {
@@ -146,8 +146,8 @@ namespace vle { namespace utils {
      */
     template <
         typename InputIterator, typename OutputIterator, typename Predicate >
-        void copy_if(InputIterator first, InputIterator end,
-                     OutputIterator out, Predicate pred)
+        void copyIf(InputIterator first, InputIterator end,
+                    OutputIterator out, Predicate pred)
         {
             for (; first != end; ++first) {
                 if (pred(*first)) {
@@ -161,7 +161,7 @@ namespace vle { namespace utils {
      * Predicate.
      * @code
      * template < typename Iterator, typename Predicate >
-     * Iterator find_if(Iterator first, Iterator end, Predicate pred)
+     * Iterator findIf(Iterator first, Iterator end, Predicate pred)
      * {
      *     for (; first != end; ++first) {
      *         if (pred((*first).second)) {
@@ -179,7 +179,7 @@ namespace vle { namespace utils {
      */
     template <
         typename Iterator, typename Predicate >
-        Iterator find_if(Iterator first, Iterator end, Predicate pred)
+        Iterator findIf(Iterator first, Iterator end, Predicate pred)
         {
             for (; first != end; ++first) {
                 if (pred((*first).second)) {
@@ -223,7 +223,7 @@ namespace vle { namespace utils {
      *     n["tati"] = "xu";
      *     n["tete"] = "re";
      *     n["tita"] = "nt";
-     *     append_string x = vle::for_each(n.begin(), n.end(), append_string());
+     *     append_string x = vle::forEach(n.begin(), n.end(), append_string());
      *     std::cout << "String: " << x.str << "\n"; // "ouxurent"
      * }
      * @endcode
@@ -236,8 +236,8 @@ namespace vle { namespace utils {
      */
     template <
         typename InputIterator, typename Function >
-        Function for_each(InputIterator first, InputIterator end,
-                          Function f)
+        Function forEach(InputIterator first, InputIterator end,
+                         Function f)
         {
             for (; first != end; ++first) {
                 f((*first).second);
@@ -286,7 +286,7 @@ namespace vle { namespace utils {
          */
         typename __vle_pair::first_type&
             operator()(__vle_pair& x)
-        { return x.first; }
+            { return x.first; }
     };
 
     /**
@@ -312,7 +312,7 @@ namespace vle { namespace utils {
          */
         typename __vle_pair::second_type&
             operator()(__vle_pair& x)
-        { return x.second; }
+            { return x.second; }
     };
 
     /**
@@ -328,13 +328,13 @@ namespace vle { namespace utils {
      *
      * y = (PF)x;  // Error.
      * y = reinterpret_cast < PF >(x); // Error.
-     * y = vle::utils::pointer_to_function(x); // Ok.
+     * y = vle::utils::functionCast(x); // Ok.
      * @endcode
      * @param x The void* to cast.
      * @return The pointer to fonction.
      */
     template < typename __v_result >
-        __v_result pointer_to_function(void* x)
+        __v_result functionCast(void* x)
         {
             union __vle_pointer_to_function
             {

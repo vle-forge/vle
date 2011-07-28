@@ -248,7 +248,7 @@ static devs::Dynamics* buildNewDynamicsWrapper(
         symbol = modulemgr.get(dyn.library(), utils::MODULE_DYNAMICS_WRAPPER);
     }
 
-    fctdw fct = utils::pointer_to_function < fctdw >(symbol);
+    fctdw fct = utils::functionCast < fctdw >(symbol);
 
     try {
         return fct(DynamicsWrapperInit(
@@ -284,7 +284,7 @@ static devs::Dynamics* buildNewDynamics(
         symbol = modulemgr.get(dyn.library(), utils::MODULE_DYNAMICS);
     }
 
-    fctdyn fct = utils::pointer_to_function < fctdyn >(symbol);
+    fctdyn fct = utils::functionCast < fctdyn >(symbol);
 
     try {
         return fct(DynamicsInit(
@@ -320,7 +320,7 @@ static devs::Dynamics* buildNewExecutive(
         symbol = modulemgr.get(dyn.library(), utils::MODULE_EXECUTIVE);
     }
 
-    fctexe fct = utils::pointer_to_function < fctexe >(symbol);
+    fctexe fct = utils::functionCast < fctexe >(symbol);
 
     try {
         return fct(ExecutiveInit(

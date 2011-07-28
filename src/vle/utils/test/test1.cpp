@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_algo)
     b[3] = 5;
     b[4] = 6;
 
-    utils::copy_if(b.begin(), b.end(), std::back_inserter(out), is_odd());
+    utils::copyIf(b.begin(), b.end(), std::back_inserter(out), is_odd());
 
     BOOST_REQUIRE_EQUAL(out.size(), (std::vector < int >::size_type)2);
     BOOST_REQUIRE_EQUAL(out[0], 1);
@@ -122,12 +122,12 @@ BOOST_AUTO_TEST_CASE(test_algo)
     n["tete"] = "re";
     n["tita"] = "nt";
 
-    append_string x = utils::for_each(n.begin(), n.end(), append_string());
+    append_string x = utils::forEach(n.begin(), n.end(), append_string());
     BOOST_REQUIRE_EQUAL(x.str, "xurentou");
 
 
     std::map < std::string, std::string >::iterator it;
-    it = utils::find_if(n.begin(), n.end(),
+    it = utils::findIf(n.begin(), n.end(),
                         std::bind1st(std::equal_to < std::string >(),
                                     std::string("ou")));
     BOOST_REQUIRE(it != n.end());

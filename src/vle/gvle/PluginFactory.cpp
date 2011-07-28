@@ -174,7 +174,7 @@ void PluginFactory::readOutputPlugins()
             void *symbol = m_modulemgr.get(it->first, it->second,
                                            utils::MODULE_GVLE_OUTPUT);
 
-            GvleOutputPluginSlot fct = utils::pointer_to_function <
+            GvleOutputPluginSlot fct = utils::functionCast <
                 GvleOutputPluginSlot >(symbol);
 
             OutputPlugin *plg = fct(it->second);
@@ -205,7 +205,7 @@ void PluginFactory::readModelingPlugins()
             void *symbol = m_modulemgr.get(it->first, it->second,
                                            utils::MODULE_GVLE_MODELING);
 
-            GvleModelingPluginSlot fct = utils::pointer_to_function <
+            GvleModelingPluginSlot fct = utils::functionCast <
                 GvleModelingPluginSlot >(symbol);
 
             ModelingPlugin *plg = fct(it->second);

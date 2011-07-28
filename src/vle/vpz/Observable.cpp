@@ -149,7 +149,7 @@ void Observable::del(const std::string& portname)
 
 bool Observable::hasView(const std::string& name) const
 {
-    return utils::find_if(m_list.begin(), m_list.end(), HasView(name))
+    return utils::findIf(m_list.begin(), m_list.end(), HasView(name))
         != m_list.end();
 }
 

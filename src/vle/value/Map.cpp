@@ -187,7 +187,7 @@ Matrix& Map::getMatrix(const std::string& name)
 
 void Map::clear()
 {
-    vle::utils::for_each(begin(), end(), boost::checked_deleter < Value >());
+    vle::utils::forEach(begin(), end(), boost::checked_deleter < Value >());
 
     m_value.clear();
 }

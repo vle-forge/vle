@@ -127,7 +127,7 @@ void Conditions::cleanNoPermanent()
 {
     iterator it = begin();
 
-    while ((it = utils::find_if(it, end(), Condition::IsPermanent())) != end()) {
+    while ((it = utils::findIf(it, end(), Condition::IsPermanent())) != end()) {
         iterator del = it++;
         m_list.erase(del);
     }
@@ -135,12 +135,12 @@ void Conditions::cleanNoPermanent()
 
 void Conditions::rebuildValueSet()
 {
-    utils::for_each(m_list.begin(), m_list.end(), Condition::RebuildValueSet());
+    utils::forEach(m_list.begin(), m_list.end(), Condition::RebuildValueSet());
 }
 
 void Conditions::deleteValueSet()
 {
-    utils::for_each(m_list.begin(), m_list.end(),
+    utils::forEach(m_list.begin(), m_list.end(),
         Condition::DeleteValueSet());
 }
 

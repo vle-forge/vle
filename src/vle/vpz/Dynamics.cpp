@@ -97,7 +97,7 @@ void Dynamics::cleanNoPermanent()
 {
     iterator it = begin();
 
-    while ((it = utils::find_if(it, end(), Dynamic::IsPermanent())) != end()) {
+    while ((it = utils::findIf(it, end(), Dynamic::IsPermanent())) != end()) {
         iterator del = it++;
         m_list.erase(del);
     }

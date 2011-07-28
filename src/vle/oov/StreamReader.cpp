@@ -63,7 +63,7 @@ void StreamReader::initPlugin(const std::string& plugin,
             symbol = modulemgr.get(plugin, utils::MODULE_OOV);
         }
 
-        OovPluginSlot fct(utils::pointer_to_function < OovPluginSlot>(symbol));
+        OovPluginSlot fct(utils::functionCast < OovPluginSlot>(symbol));
         PluginPtr ptr(fct(location));
         m_plugin = ptr;
     } catch(const std::exception& e) {

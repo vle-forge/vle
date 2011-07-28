@@ -143,7 +143,7 @@ void NetStreamReader::getPlugin(const std::string& pluginname,
             symbol = getModuleManager().get(pluginname, utils::MODULE_EOV);
         }
 
-        EovPluginSlot fct(utils::pointer_to_function < EovPluginSlot >(symbol));
+        EovPluginSlot fct(utils::functionCast < EovPluginSlot >(symbol));
         Plugin* ptr = fct(plugin(), this);
         PluginPtr plg(ptr);
         m_plugin = plg;

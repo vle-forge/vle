@@ -106,8 +106,8 @@ void Observables::cleanNoPermanent()
 {
     iterator it = m_list.begin();
 
-    while ((it = utils::find_if(it, end(),
-                                Observable::IsPermanent())) != end()) {
+    while ((it = utils::findIf(it, end(), Observable::IsPermanent())) != end())
+    {
         iterator del = it++;
         m_list.erase(del);
     }

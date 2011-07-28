@@ -238,7 +238,7 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
                                                 utils::MODULE_OOV);
             }
 
-            oov::OovPluginSlot fct(utils::pointer_to_function <
+            oov::OovPluginSlot fct(utils::functionCast <
                               oov::OovPluginSlot>(symbol));
             oov::PluginPtr ptr(fct(m_location));
             plugin = ptr;
