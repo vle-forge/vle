@@ -65,9 +65,15 @@ static std::string getLibraryName(const boost::filesystem::path& file)
     namespace fs = boost::filesystem;
     std::string library;
 
+#if BOOST_VERSION > 104500
     if (file.filename().string().compare(0, 3, "lib") == 0) {
         library.append(file.filename().string(), 3, std::string::npos);
     }
+#else
+    if (file.filename().compare(0, 3, "lib") == 0) {
+        library.append(file.filename(), 3, std::string::npos);
+    }
+#endif
 
 #ifdef BOOST_WINDOWS
     if (fs::extension(file) == ".dll") {
@@ -487,8 +493,12 @@ public:
             throw utils::InternalError();
         }
 
+#if BOOST_VERSION > 104500
         ss::error_code ec;
         if (fs::is_directory(path, ec)) {
+#else
+        if (fs::is_directory(path)) {
+#endif
             fs::directory_iterator it(path), end;
 
             for (; it != end; ++it) {
@@ -524,27 +534,47 @@ public:
         case MODULE_DYNAMICS_WRAPPER:
         case MODULE_EXECUTIVE:
             path = Path::path().getExternalPackageLibDir(
+#if BOOST_VERSION > 104500
                 package.filename().string());
+#else
+                package.filename());
+#endif
             break;
         case MODULE_OOV:
         case MODULE_EOV:
             path = Path::path().getExternalPackagePluginOutputDir(
+#if BOOST_VERSION > 104500
                 package.filename().string());
+#else
+                package.filename());
+#endif
             break;
         case MODULE_GVLE_MODELING:
             path = Path::path().getExternalPackagePluginGvleModelingDir(
+#if BOOST_VERSION > 104500
                 package.filename().string());
+#else
+                package.filename());
+#endif
             break;
         case MODULE_GVLE_OUTPUT:
             path = Path::path().getExternalPackagePluginGvleOutputDir(
+#if BOOST_VERSION > 104500
                 package.filename().string());
+#else
+                package.filename());
+#endif
             break;
         default:
             throw utils::InternalError();
         }
 
+#if BOOST_VERSION > 104500
         ss::error_code ec;
         if (fs::is_directory(path, ec)) {
+#else
+        if (fs::is_directory(path)) {
+#endif
             fs::directory_iterator it(path), end;
 
             for (; it != end; ++it) {
