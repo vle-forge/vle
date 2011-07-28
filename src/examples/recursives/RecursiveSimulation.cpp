@@ -30,6 +30,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/manager/Run.hpp>
 #include <vle/utils/Path.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace examples { namespace recursives {
 

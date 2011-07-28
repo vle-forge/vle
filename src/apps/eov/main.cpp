@@ -76,11 +76,21 @@ int main(int argc, char* argv[])
 
     bool result = true;
     if (command.infos()) {
-        std::cerr << _("EOV - the Eyes of VLE\n");
-        utils::printInformations(std::cerr);
+        std::cerr << fmt(_(
+                "EOV - the Eyes of VLE\n"
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n")) %
+            VLE_NAME_COMPLETE << "\n" << std::endl;
     } else if (command.version()) {
-        std::cerr << _("EOV - the Eyes of VLE\n");
-        utils::printVersion(std::cerr);
+        std::cerr << fmt(_(
+                "EOV - the Eyes of VLE\n"
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                "You may redistribute copies of VLE\n"
+                "under the terms of the GNU General Public License.\n"
+                "For more information about these matters, see the file named "
+                "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
     } else {
         try {
             Gtk::Main app(argc, argv);

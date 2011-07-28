@@ -45,6 +45,7 @@
 #include <numeric>
 #include <vle/utils/Template.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Exception.hpp>
 
 using namespace vle;
 

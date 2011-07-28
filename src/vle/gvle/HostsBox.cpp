@@ -29,6 +29,7 @@
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/Socket.hpp>
 #include <glibmm/thread.h>
 #include <gtkmm/stock.h>

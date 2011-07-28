@@ -31,7 +31,6 @@
 
 #include <vle/oov/LocalStreamReader.hpp>
 #include <vle/oov/NetStreamReader.hpp>
-#include <vle/oov/OOV.hpp>
 #include <vle/oov/PluginFactory.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/oov/SimpleFile.hpp>

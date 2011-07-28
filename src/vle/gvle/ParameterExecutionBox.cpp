@@ -64,7 +64,7 @@ bool ParameterExecutionBox::run()
     for (;;) {
         int response = Gtk::Dialog::run();
         if (response == Gtk::RESPONSE_OK) {
-            int port = utils::toInt(mEntryPort->get_text());
+            int port = utils::to < int32_t >(mEntryPort->get_text());
             if (0 < port and port < 65535) {
                 mModeling->setSocketPort(port);
                 return true;

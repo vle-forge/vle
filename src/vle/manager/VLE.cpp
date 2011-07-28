@@ -41,6 +41,7 @@
 #include <vle/value/Value.hpp>
 #include <vle/devs/Event.hpp>
 #include <vle/utils/Path.hpp>
+#include <glib/gstdio.h>
 
 #include <glibmm/optioncontext.h>
 #include <iostream>
@@ -129,7 +130,21 @@ bool Manager::runSimulator(int process, int port)
         std::cerr << _("Simulator start in daemon mode\n");
 
         if (utils::Trace::getLevel() != utils::TRACE_LEVEL_DEVS) {
-            utils::buildDaemon();
+#ifdef BOOST_WINDOWS
+            g_chdir("c://");
+#else
+            g_chdir("//");
+
+            if (::fork())
+                ::exit(0);
+
+            ::setsid();
+
+            if (::fork())
+                ::exit(0);
+#endif
+            for (int i = 0; i < FOPEN_MAX; ++i)
+                ::close(i);
         }
 
         utils::Trace::setLogFile(

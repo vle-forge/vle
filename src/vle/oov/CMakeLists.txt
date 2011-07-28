@@ -22,10 +22,10 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp OutputMatrix.cpp
+SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OutputMatrix.cpp
   Plugin.cpp SimpleFile.cpp StreamReader.cpp ${OS_SPECIFIC_PATH_IMPL})
 
-SET(OOV_HPP DllDefines.hpp LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp
+SET(OOV_HPP DllDefines.hpp LocalStreamReader.hpp NetStreamReader.hpp
   OutputMatrix.hpp Plugin.hpp SimpleFile.hpp StreamReader.hpp)
 
 IF (VLE_HAVE_CAIRO)

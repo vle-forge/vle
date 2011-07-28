@@ -32,6 +32,7 @@
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/utils/Tools.hpp>
 #include <iostream>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {
 

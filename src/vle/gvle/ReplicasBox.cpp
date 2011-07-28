@@ -30,6 +30,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/i18n.hpp>
 
 using namespace vle;
 

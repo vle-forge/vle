@@ -59,7 +59,7 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port)
                 std::string tmp(input, position + 1, input.size() - position +
                                 1);
                 if (utils::is < uint32_t >(tmp)) {
-                    port = utils::toInt(tmp);
+                    port = utils::to < uint32_t >(tmp);
                 }
             }
         }

@@ -30,6 +30,7 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/i18n.hpp>
 #include <gtkmm/main.h>
 #include <glibmm/optioncontext.h>
 #include <glibmm/thread.h>
@@ -101,11 +102,21 @@ int main(int argc, char** argv)
 
     bool result = true;
     if (group.mInfo) {
-        std::cerr << _("GVLE - the Gui of VLE\n");
-        vle::utils::printInformations(std::cerr);
+        std::cerr << vle::fmt(_(
+                "GVLE - the Gui of VLE\n"
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n")) %
+            VLE_NAME_COMPLETE << "\n" << std::endl;
     } else if (group.mVersion) {
-        std::cerr << _("GVLE - the Gui of VLE\n");
-	vle::utils::printVersion(std::cerr);
+        std::cerr << vle::fmt(_(
+                "GVLE - the Gui of VLE\n"
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                "You may redistribute copies of VLE\n"
+                "under the terms of the GNU General Public License.\n"
+                "For more information about these matters, see the file named "
+                "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
     } else {
 	try {
 	    Glib::RefPtr < Gnome::Glade::Xml >  mRefXML =

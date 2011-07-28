@@ -353,12 +353,22 @@ int main(int argc, char* argv[])
     }
 
     if (command.infos()) {
-        utils::printInformations(std::cerr);
+        std::cerr << fmt(_(
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n")) %
+            VLE_NAME_COMPLETE << "\n" << std::endl;
         return EXIT_SUCCESS;
     }
 
     if (command.version()) {
-        utils::printVersion(std::cerr);
+        std::cerr << fmt(_(
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                "You may redistribute copies of VLE\n"
+                "under the terms of the GNU General Public License.\n"
+                "For more information about these matters, see the file named "
+                "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
         return EXIT_SUCCESS;
     }
 
@@ -368,7 +378,14 @@ int main(int argc, char* argv[])
     }
 
     if (argc == 1) {
-        utils::printHelp(std::cerr);
+        std::cerr << fmt(_(
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                "VLE is a multi-modeling environment to build,\nsimulate "
+                "and analyse models of dynamic complex systems.\n"
+                "For more information, see manuals with 'man vle' or\n"
+                "the VLE website http://sourceforge.net/projects/vle/\n")) %
+            VLE_NAME_COMPLETE << std::endl;
         return EXIT_SUCCESS;
     }
 

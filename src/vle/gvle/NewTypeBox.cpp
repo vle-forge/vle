@@ -79,13 +79,13 @@ void NewTypeBox::run()
             mVal = Integer::create();
         } else if (m_Combo->get_active_text() == "Matrix") {
             SimpleTypeBox box("columns ?", "1");
-            int cols = utils::toInt(box.run());
+            int cols = utils::to < int32_t >(box.run());
             if (cols < 1) {
                 gvle::Error(_("The size can not be null or negative"));
                 return;
             }
             SimpleTypeBox box2("rows ?", "1");
-            int rows = utils::toInt(box2.run());
+            int rows = utils::to < int32_t >(box2.run());
             if (rows < 1) {
                 gvle::Error(_("The size can not be null or negative"));
                 return;
@@ -106,13 +106,13 @@ void NewTypeBox::run()
             mVal = String::create();
         } else if (m_Combo->get_active_text() == "Table") {
             SimpleTypeBox box("Width ?", "1");
-            int w = utils::toInt(box.run());
+            int w = utils::to < int32_t >(box.run());
             if (w < 1) {
                 gvle::Error(_("The size can not be null or negative"));
                 return;
             }
             SimpleTypeBox box2("Height ?", "1");
-            int h = utils::toInt(box2.run());
+            int h = utils::to < int32_t >(box2.run());
             if (h < 1) {
                 gvle::Error(_("The size can not be null or negative"));
                 return;

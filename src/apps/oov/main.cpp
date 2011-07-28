@@ -30,9 +30,9 @@
 #include <apps/oov/OptionGroup.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/oov/OOV.hpp>
 #include <vle/oov/NetStreamReader.hpp>
 #include <iostream>
+#include <glib/gstdio.h>
 
 using namespace vle;
 
@@ -60,16 +60,40 @@ int main(int argc, char* argv[])
     }
 
     if (command.isDaemon()) {
-        utils::buildDaemon();
+        #ifdef BOOST_WINDOWS
+        g_chdir("c://");
+        #else
+        g_chdir("//");
+
+        if (::fork())
+            ::exit(0);
+
+        ::setsid();
+
+        if (::fork())
+            ::exit(0);
+        #endif
+        for (int i = 0; i < FOPEN_MAX; ++i)
+            ::close(i);
     }
 
     bool result = true;
     if (command.infos()) {
-        std::cerr << _("Oov - the Output of VLE\n");
-        utils::printInformations(std::cerr);
+        std::cerr << fmt(_(
+                "Oov - the Output of VLE\n"
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n")) %
+            VLE_NAME_COMPLETE << "\n" << std::endl;
     } else if (command.version()) {
-        std::cerr << _("Oov - the Output of VLE\n");
-        utils::printVersion(std::cerr);
+        std::cerr << fmt(_(
+                "Oov - the Output of VLE\n"
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                "You may redistribute copies of VLE\n"
+                "under the terms of the GNU General Public License.\n"
+                "For more information about these matters, see the file named "
+                "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
     } else {
         try {
             utils::ModuleManager modulemgr;

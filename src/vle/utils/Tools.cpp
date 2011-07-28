@@ -27,6 +27,7 @@
 
 
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Path.hpp>
@@ -47,6 +48,8 @@
 #include <iostream>
 #include <libxml/parser.h>
 #include <cmath>
+
+#include <boost/lexical_cast.hpp>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -159,6 +162,82 @@ template uint32_t to < uint32_t >(const std::string& str);
 template double to < double >(const std::string& str);
 template float to < float >(const std::string& str);
 
+template < typename output > output convert(
+    const std::string& value,
+    bool locale,
+    const std::string& loc)
+{
+    std::stringstream s;
+
+    if (locale or not loc.empty()) {
+        if (not isLocaleAvailable(loc)) {
+            s.imbue(std::locale::classic());
+            locale = false;
+        } else {
+            s.imbue(std::locale(loc.c_str()));
+            locale = true;
+        }
+    }
+
+    s << value;
+
+    if (s.bad() or s.fail()) {
+        throw ArgError("failed to read the value");
+    }
+
+    output result;
+    s >> result;
+
+    if (s.bad()) {
+        throw ArgError("failed to write the value");
+    } else {
+        std::streambuf* buf = s.rdbuf();
+
+        if (buf->in_avail() > 0 and locale) {
+            s.imbue(std::locale::classic());
+            s.str(value);
+            s >> result;
+
+            if (s.bad()) {
+                throw ArgError("failed to write the value");
+            } else {
+                return result;
+            }
+        } else {
+            return result;
+        }
+    }
+}
+
+bool isLocaleAvailable(const std::string& locale)
+{
+    try {
+        std::locale tmp(locale.c_str());
+        return true;
+    } catch (const std::runtime_error& /*e*/) {
+        return false;
+    }
+}
+
+template bool convert < bool >(const std::string& value, bool locale,
+                               const std::string& loc);
+template int8_t convert < int8_t >(const std::string& value, bool locale,
+                                   const std::string& loc);
+template int16_t convert < int16_t >(const std::string& value, bool locale,
+                                     const std::string& loc);
+template int32_t convert < int32_t >(const std::string& value, bool locale,
+                                     const std::string& loc);
+template uint8_t convert < uint8_t >(const std::string& value, bool locale,
+                                     const std::string& loc);
+template uint16_t convert < uint16_t >(const std::string& value, bool locale,
+                                       const std::string& loc);
+template uint32_t convert < uint32_t >(const std::string& value, bool locale,
+                                       const std::string& loc);
+template double convert < double >(const std::string& value, bool locale,
+                                   const std::string& loc);
+template float convert < float >(const std::string& value, bool locale,
+                                 const std::string& loc);
+
 std::string toScientificString(const double& v, bool locale)
 {
     std::ostringstream o;
@@ -232,25 +311,6 @@ std::string getUserDirectory()
     return home;
 }
 
-void buildDaemon()
-{
-#ifdef G_OS_WIN32
-    g_chdir("c://");
-#else
-    g_chdir("//");
-
-    if (::fork())
-        ::exit(0);
-
-    ::setsid();
-
-    if (::fork())
-        ::exit(0);
-#endif
-    for (int i = 0; i < FOPEN_MAX; ++i)
-        ::close(i);
-}
-
 void init()
 {
     xmlDefaultSAXHandlerInit();
@@ -275,35 +335,6 @@ void finalize()
     utils::Path::kill();
     utils::Trace::kill();
     xmlCleanupParser();
-}
-
-void printHelp(std::ostream& out)
-{
-    out << fmt(_("Virtual Laboratory Environment - %1%\n"
-                 "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
-                 "VLE is a multi-modeling environment to build,\nsimulate "
-                 "and analyse models of dynamic complex systems.\n"
-                 "For more information, see manuals with 'man vle' or\n"
-                 "the VLE website http://sourceforge.net/projects/vle/\n")) %
-        VLE_NAME_COMPLETE << std::endl;
-}
-
-void printInformations(std::ostream& out)
-{
-    out << fmt(_("Virtual Laboratory Environment - %1%\n"
-                 "Copyright (C) 2003 - 2011 The VLE Development Team.\n")) %
-        VLE_NAME_COMPLETE << "\n" << std::endl;
-}
-
-void printVersion(std::ostream& out)
-{
-    out << fmt(_("Virtual Laboratory Environment - %1%\n"
-                 "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
-                 "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-                 "You may redistribute copies of VLE\n"
-                 "under the terms of the GNU General Public License.\n"
-                 "For more information about these matters, see the file named "
-                 "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
 }
 
 }} // namespace vle utils

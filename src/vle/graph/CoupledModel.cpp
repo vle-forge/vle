@@ -30,10 +30,11 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Exception.hpp>
 #include <cmath>
 #include <set>
-
-
+#include <cassert>
+#include <algorithm>
 
 namespace vle { namespace graph {
 
