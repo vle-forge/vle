@@ -17,7 +17,6 @@ TARGET_LINK_LIBRARIES(test_values
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue)
 
@@ -28,7 +27,6 @@ TARGET_LINK_LIBRARIES(test_values_serial
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   ${Boost_SERIALIZATION_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue)
 

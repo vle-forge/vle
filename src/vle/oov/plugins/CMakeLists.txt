@@ -18,7 +18,6 @@ TARGET_LINK_LIBRARIES(dummy
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -28,7 +27,6 @@ TARGET_LINK_LIBRARIES(file
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -38,7 +36,6 @@ TARGET_LINK_LIBRARIES(console
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -48,7 +45,6 @@ TARGET_LINK_LIBRARIES(storage
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

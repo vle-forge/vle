@@ -18,7 +18,6 @@ TARGET_LINK_LIBRARIES(test_algo
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   ${Boost_DATE_TIME_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -36,7 +35,6 @@ TARGET_LINK_LIBRARIES(test_template
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   ${Boost_DATE_TIME_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -54,7 +52,6 @@ TARGET_LINK_LIBRARIES(test_parser
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   ${Boost_DATE_TIME_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

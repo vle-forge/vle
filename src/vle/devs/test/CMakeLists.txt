@@ -17,7 +17,6 @@ TARGET_LINK_LIBRARIES(DevsDeleteConnection
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -33,7 +32,6 @@ TARGET_LINK_LIBRARIES(DevsTransform
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -49,7 +47,6 @@ TARGET_LINK_LIBRARIES(test_time
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

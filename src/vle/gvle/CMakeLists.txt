@@ -74,7 +74,6 @@ TARGET_LINK_LIBRARIES(vlegvle
   ${GTHREAD_LIBRARIES}
   ${OS_SPECIFIC_LIBRARIES}
   ${GTKSOURCEVIEWMM_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

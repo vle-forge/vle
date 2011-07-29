@@ -40,7 +40,6 @@ TARGET_LINK_LIBRARIES(vlevalue
   ${GTHREAD_LIBRARIES}
   ${Boost_SERIALIZATION_LIBRARY}
   ${OS_SPECIFIC_LIBRARIES}
-  vlegeometry
   vleutils)
 
 INSTALL(TARGETS vlevalue

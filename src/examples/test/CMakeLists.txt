@@ -17,7 +17,6 @@ TARGET_LINK_LIBRARIES(test_gens
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -31,7 +30,6 @@ TARGET_LINK_LIBRARIES(test_petrinet
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -45,7 +43,6 @@ TARGET_LINK_LIBRARIES(test_dess
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -59,7 +56,6 @@ TARGET_LINK_LIBRARIES(test_equation
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -73,7 +69,6 @@ TARGET_LINK_LIBRARIES(test_qss
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -87,7 +82,6 @@ TARGET_LINK_LIBRARIES(test_fsa
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -101,7 +95,6 @@ TARGET_LINK_LIBRARIES(test_decision
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

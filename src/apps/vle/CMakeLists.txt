@@ -30,7 +30,6 @@ TARGET_LINK_LIBRARIES(vle
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

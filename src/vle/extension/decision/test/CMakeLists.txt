@@ -21,7 +21,6 @@ TARGET_LINK_LIBRARIES(kb
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -35,7 +34,6 @@ TARGET_LINK_LIBRARIES(activity
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -49,7 +47,6 @@ TARGET_LINK_LIBRARIES(allenrelation
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -63,7 +60,6 @@ TARGET_LINK_LIBRARIES(parser
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -77,7 +73,6 @@ TARGET_LINK_LIBRARIES(modelsimple
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${VLE_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

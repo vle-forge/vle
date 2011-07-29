@@ -27,7 +27,6 @@ TARGET_LINK_LIBRARIES(oov
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(test_vpz_values
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -32,7 +31,6 @@ TARGET_LINK_LIBRARIES(test_vpz_project
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -45,7 +43,6 @@ TARGET_LINK_LIBRARIES(test_vpz_translator
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -58,7 +55,6 @@ TARGET_LINK_LIBRARIES(test_vpz_io
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -71,7 +67,6 @@ TARGET_LINK_LIBRARIES(test_vpz_oov
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -84,7 +79,6 @@ TARGET_LINK_LIBRARIES(test_vpz_classes
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -97,7 +91,6 @@ TARGET_LINK_LIBRARIES(test_vpz_graph
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

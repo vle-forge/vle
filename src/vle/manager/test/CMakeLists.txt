@@ -17,7 +17,6 @@ TARGET_LINK_LIBRARIES(test_experimentalframes
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -31,7 +30,6 @@ TARGET_LINK_LIBRARIES(test_combination_storage
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -45,7 +43,6 @@ TARGET_LINK_LIBRARIES(test_common_seed
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -59,7 +56,6 @@ TARGET_LINK_LIBRARIES(test_manager_thread
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

@@ -45,7 +45,6 @@ TARGET_LINK_LIBRARIES(vleoov
   ${GTHREAD_LIBRARIES}
   ${CAIROMM_LIBRARIES}
   ${OS_SPECIFIC_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph)

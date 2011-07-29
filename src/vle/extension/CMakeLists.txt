@@ -78,7 +78,6 @@ TARGET_LINK_LIBRARIES(vleextension
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${OS_SPECIFIC_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph

@@ -237,8 +237,8 @@ FUNCTION(DeclareModuleDynamics name sources)
   ADD_LIBRARY(${name} SHARED ${sources})
 
   TARGET_LINK_LIBRARIES(${name}
-    ${GLIBMM_LIBRARIES} ${LIBXML_LIBRARIES} ${GTHREAD_LIBRARIES} vlegeometry
-    vleutils vlevalue vlegraph vlevpz vleoov vledevs vleextension vlemanager
+    ${GLIBMM_LIBRARIES} ${LIBXML_LIBRARIES} ${GTHREAD_LIBRARIES} vleutils
+    vlevalue vlegraph vlevpz vleoov vledevs vleextension vlemanager
     vletranslator)
 
   INSTALL(TARGETS ${name}

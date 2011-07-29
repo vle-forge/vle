@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(counter
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
@@ -41,7 +40,6 @@ TARGET_LINK_LIBRARIES(generator
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  vlegeometry
   vleutils
   vlevalue
   vlegraph
