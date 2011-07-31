@@ -29,7 +29,6 @@
 #include <vle/utils/Template.hpp>
 #include <vle/utils/Exception.hpp>
 #include <boost/regex.hpp>
-#include <boost/cstdint.hpp>
 #include <fstream>
 #include <sstream>
 
@@ -324,8 +323,8 @@ std::string Template::processName(const std::string& buffer) const
 
         std::string str((*it)[0].second, (*jt)[0].first);
 
-        for (boost::uint32_t i = 0; i <
-             listSymbol().list().find(list)->second.size(); ++i) {
+        for (uint32_t i = 0; i < listSymbol().list().find(list)->second.size();
+             ++i) {
             boost::sregex_iterator vt(str.begin(), str.end(), var);
 
             while (vt != end) {

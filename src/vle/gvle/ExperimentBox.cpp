@@ -229,16 +229,16 @@ bool ExperimentBox::apply()
     }
 
     {
-        boost::uint32_t seed =
-            (boost::uint32_t)std::floor(std::abs(mSpinSimuSeed->get_value()));
+        uint32_t seed =
+            (uint32_t)std::floor(std::abs(mSpinSimuSeed->get_value()));
 	exp.setSeed(seed);
     }
 
     {
-        boost::uint32_t seed =
-            (boost::uint32_t)std::floor(std::abs(mSpinPlanSeed->get_value()));
-        boost::uint32_t number =
-            (boost::uint32_t)std::floor(std::abs(mButtonNumber->get_value()));
+        uint32_t seed =
+            (uint32_t)std::floor(std::abs(mSpinPlanSeed->get_value()));
+        uint32_t number =
+            (uint32_t)std::floor(std::abs(mButtonNumber->get_value()));
         exp.setCombination(mRadioButtonLinear->get_active()?"linear":"total");
 	rep.setSeed(seed);
 	rep.setNumber(number);

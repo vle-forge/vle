@@ -30,7 +30,7 @@
 #define VLE_UTILS_PREFERENCES_HPP 1
 
 #include <vle/utils/DllDefines.hpp>
-#include <boost/cstdint.hpp>
+#include <vle/utils/Types.hpp>
 #include <string>
 #include <vector>
 
@@ -131,7 +131,7 @@ public:
     bool set(const std::string& key, double value);
 
     /**
-     * @brief Insert an @c boost::uint32_t into the specified key.
+     * @brief Insert an @c uint32_t into the specified key.
      * @code
      * Preferences f;
      * f.set("section.key", 23485);
@@ -144,7 +144,7 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set(const std::string& key, boost::uint32_t value);
+    bool set(const std::string& key, uint32_t value);
 
     /**
      * @brief Insert an @c bool into the specified key.
@@ -228,10 +228,10 @@ public:
     bool get(const std::string& key, double* value) const;
 
     /**
-     * @brief Get a @c boost::uint32_t from specified key.
+     * @brief Get a @c uint32_t from specified key.
      * @code
      * Preferences f;
-     * boost::uint32_t value;
+     * uint32_t value;
      * f.get("section.key", &value);
      * assert(value == 12345);
      * [section]
@@ -245,7 +245,7 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value is
      * not an @c integer.
      */
-    bool get(const std::string& key, boost::uint32_t* value) const;
+    bool get(const std::string& key, uint32_t* value) const;
 
     /**
      * @brief Get a @c bool from specified key.

@@ -116,7 +116,7 @@ void SimulatorDistant::daemonSendNumberVpzi()
 
 void SimulatorDistant::daemonRecvFile()
 {
-    boost::int32_t sz = mServer->recvInteger("manager");
+    int32_t sz = mServer->recvInteger("manager");
     mServer->sendString("manager", "ok");
     std::string msg = mServer->recvBuffer("manager", sz);
     std::string filename(utils::Path::writeToTemp("vledae", msg));

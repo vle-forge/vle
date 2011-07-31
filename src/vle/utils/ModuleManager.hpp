@@ -52,7 +52,7 @@ enum ModuleType
  * return for each plug-in a pointer to a function associated to a ModuleType.
  *
  * ModuleManager checks the symbols:
- * - "vle_api_level": A function which returns three \c boost::uint32_t. This
+ * - "vle_api_level": A function which returns three \c uint32_t. This
  *   integers represent the version of VLE which build the plug-in.
  * - "vle_make_new_dynamics":
  * - "vle_make_new_dynamics_wrapper":

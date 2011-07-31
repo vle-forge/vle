@@ -88,7 +88,7 @@ public:
             ("gvle.editor.indent-on-tab", po::value < bool >
              (NULL)->default_value(true),
              ("Indent on tabulation"))
-            ("gvle.editor.indent-size", po::value < boost::uint32_t >
+            ("gvle.editor.indent-size", po::value < uint32_t >
              (NULL)->default_value(4),
              _("Indentation size"))
             ("gvle.editor.show-line-numbers", po::value < bool >
@@ -185,10 +185,10 @@ public:
                 } else if (boost::any_cast < double >(&it->second.value())) {
                     file << boost::any_cast
                         < double >(it->second.value());
-                } else if (boost::any_cast < boost::uint32_t
+                } else if (boost::any_cast < uint32_t
                            >(&it->second.value())) {
                     file << boost::any_cast
-                        < boost::uint32_t>(it->second.value());
+                        < uint32_t>(it->second.value());
                 } else {
                     TraceAlways(_("Preferences: unknown"));
                     assert(false);
@@ -272,7 +272,7 @@ bool Preferences::set(const std::string& key, double value)
     return mPimpl->set(key, value);
 }
 
-bool Preferences::set(const std::string& key, boost::uint32_t value)
+bool Preferences::set(const std::string& key, uint32_t value)
 {
     return mPimpl->set(key, value);
 }
@@ -313,12 +313,12 @@ bool Preferences::get(const std::string& key, double* value) const
     }
 }
 
-bool Preferences::get(const std::string& key, boost::uint32_t* value) const
+bool Preferences::get(const std::string& key, uint32_t* value) const
 {
     boost::any result = mPimpl->get(key);
 
     try {
-        (*value) = boost::any_cast < boost::uint32_t >(result);
+        (*value) = boost::any_cast < uint32_t >(result);
         return true;
     } catch (const boost::bad_any_cast& /*e*/) {
         TraceAlways((fmt(_("Preferences: %1% is not an integer")) % key));

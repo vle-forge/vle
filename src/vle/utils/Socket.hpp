@@ -29,10 +29,10 @@
 #ifndef VLE_UTILS_SOCKET_HPP
 #define VLE_UTILS_SOCKET_HPP
 
+#include <vle/utils/DllDefines.hpp>
+#include <vle/utils/Types.hpp>
 #include <string>
 #include <map>
-#include <boost/cstdint.hpp> // for boost::int32_t
-#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -150,7 +150,7 @@ namespace vle { namespace utils {
          * @param buffer integer to send.
          * @throw Internal if socket is close or network error.
          */
-        void sendInteger(int dst, boost::int32_t buffer);
+        void sendInteger(int dst, int32_t buffer);
 
         /**
          * Receive a buffer from specified socket.
@@ -184,14 +184,14 @@ namespace vle { namespace utils {
         std::string recvBuffer(int src, size_t size);
 
         /**
-         * Receive a boost::uint32_t from specified socket.
+         * Receive a uint32_t from specified socket.
          *
          * @param src socket source.
          * @return an integer.
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data.
          */
-        boost::uint32_t recvInteger(int src);
+        uint32_t recvInteger(int src);
 
     protected:
         bool    mRunning;
@@ -260,7 +260,7 @@ namespace vle { namespace utils {
          * @param buffer integer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0.
          */
-        void sendInteger(boost::uint32_t buffer)
+        void sendInteger(uint32_t buffer)
         { Base::sendInteger(mSocket, buffer); }
 
         /**
@@ -298,13 +298,13 @@ namespace vle { namespace utils {
 
 
         /**
-         * Receive a boost::uint32_t from server.
+         * Receive a uint32_t from server.
          *
          * @return an integer.
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data.
          */
-        boost::uint32_t recvInteger()
+        uint32_t recvInteger()
         { return Base::recvInteger(mSocket); }
 
         /**
@@ -410,7 +410,7 @@ namespace vle { namespace utils {
          * @throw Internal if socket is close, buffer is null or size equal 0,
          * if client destination is unknown.
          */
-        void sendInteger(const std::string& dest, boost::uint32_t buffer)
+        void sendInteger(const std::string& dest, uint32_t buffer)
         { Base::sendInteger(getSocketClient(dest), buffer); }
 
         /**
@@ -453,7 +453,7 @@ namespace vle { namespace utils {
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data or if client destination if unknown.
          */
-        boost::uint32_t recvInteger(const std::string& src)
+        uint32_t recvInteger(const std::string& src)
         { return Base::recvInteger(getSocketClient(src)); }
 
     private:

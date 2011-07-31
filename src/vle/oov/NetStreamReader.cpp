@@ -78,7 +78,7 @@ void NetStreamReader::readConnection()
 
     while (not stop) {
         try {
-            boost::int32_t val = m_server->recvInteger("vle");
+            int32_t val = m_server->recvInteger("vle");
 
             if (val <= 0) {
                 throw utils::InternalError(

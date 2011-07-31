@@ -43,9 +43,9 @@
         }                                             \
                                                       \
         VLE_OOV_EXPORT void                           \
-        vle_api_level(boost::uint32_t* major,         \
-                      boost::uint32_t* minor,         \
-                      boost::uint32_t* patch)         \
+        vle_api_level(vle::uint32_t* major,           \
+                      vle::uint32_t* minor,           \
+                      vle::uint32_t* patch)           \
         {                                             \
             *major = VLE_MAJOR_VERSION;               \
             *minor = VLE_MINOR_VERSION;               \

@@ -33,6 +33,7 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Types.hpp>
 #include <vle/version.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/filesystem.hpp>
@@ -265,9 +266,8 @@ private:
 
     void checkVersion()
     {
-
-        typedef void(*versionFunction)(
-            boost::uint32_t*, boost::uint32_t*, boost::uint32_t*);
+        typedef void(*versionFunction)(vle::uint32_t*, vle::uint32_t*,
+                                       vle::uint32_t*);
 
 #ifdef BOOST_WINDOWS
         FARPROC symbol;
@@ -275,7 +275,7 @@ private:
         void *symbol;
 #endif
 
-        boost::uint32_t major, minor, patch;
+        uint32_t major, minor, patch;
         versionFunction fct;
 
         symbol = getSymbol("vle_api_level");

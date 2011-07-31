@@ -182,9 +182,9 @@ void Base::sendBuffer(int dst, const std::string& buffer)
     vleSocketSend(dst, buffer.c_str(), buffer.size());
 }
 
-void Base::sendInteger(int dst, boost::int32_t buffer)
+void Base::sendInteger(int dst, int32_t buffer)
 {
-    vleSocketSend(dst, &buffer, sizeof(boost::int32_t));
+    vleSocketSend(dst, &buffer, sizeof(int32_t));
 }
 
 int  Base::recv(int src, void* buffer, size_t size)
@@ -275,17 +275,17 @@ std::string Base::recvBuffer(int src, size_t size)
     return finished_buffer;
 }
 
-boost::uint32_t Base::recvInteger(boost::int32_t src)
+uint32_t Base::recvInteger(int32_t src)
 {
     if (not mRunning) {
         throw InternalError(
             _("Socket cannot receive message, socket not initialised."));
     }
 
-    boost::uint32_t buffer;
-    int current = vleSocketReceive(src, &buffer, sizeof(boost::uint32_t));
+    uint32_t buffer;
+    int current = vleSocketReceive(src, &buffer, sizeof(uint32_t));
 
-    if (current != sizeof(boost::uint32_t)) {
+    if (current != sizeof(uint32_t)) {
         throw utils::InternalError(fmt(
                 _("Client cannot receive message, %1%\n")) %
             Glib::strerror(vleSocketErrno()));

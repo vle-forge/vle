@@ -79,7 +79,7 @@ public:
         utils::Preferences prefs;
         std::string s;
         double d = 0.0;
-        boost::uint32_t i = 0;
+        uint32_t i = 0;
 
         prefs.get("gvle.editor.highlight-syntax", &mHighlightSyntax);
         prefs.get("gvle.editor.highlight-brackets", &mHighlightBrackets);
@@ -158,7 +158,7 @@ public:
         prefs.set("gvle.editor.auto-indent", mAutoIndent);
         prefs.set("gvle.editor.indent-on-tab", mIndentOnTab);
         prefs.set("gvle.editor.indent-size",
-                  boost::numeric_cast < boost::uint32_t >(mIndentSize));
+                  boost::numeric_cast < uint32_t >(mIndentSize));
         prefs.set("gvle.editor.smart-home-end", mSmartHomeEnd);
         prefs.set("gvle.editor.font", mFontEditor);
 

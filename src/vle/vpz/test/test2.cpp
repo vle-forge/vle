@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     BOOST_REQUIRE_EQUAL(replicas.number(), (size_t)5);
 
 
-    experimentM.setSeed((boost::uint32_t) std::numeric_limits < boost::uint32_t >::max());
+    experimentM.setSeed((uint32_t) std::numeric_limits < uint32_t >::max());
     BOOST_REQUIRE_EQUAL(experimentM.seed(), std::numeric_limits < guint32 >::max());
 
     std::list < std::string > lst;

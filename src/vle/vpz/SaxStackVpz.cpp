@@ -34,7 +34,6 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Socket.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/cast.hpp>
 
 namespace vle { namespace vpz {
@@ -589,7 +588,7 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
     {
         unsigned long int t = xmlCharToUnsignedInt(seed);
         try {
-            boost::uint32_t res = boost::numeric_cast < boost::uint32_t >(t);
+            uint32_t res = boost::numeric_cast < uint32_t >(t);
             exp.setSeed(res);
         } catch (const std::exception& e) {
             throw utils::SaxParserError(fmt(
@@ -636,7 +635,7 @@ void SaxStackVpz::pushReplicas(const xmlChar** att)
         if (seed) {
             unsigned long int t = xmlCharToUnsignedInt(seed);
             try {
-                boost::uint32_t res = boost::numeric_cast < boost::uint32_t >(t);
+                uint32_t res = boost::numeric_cast < uint32_t >(t);
                 rep.setSeed(res);
             } catch (const std::exception& e) {
                 throw utils::SaxParserError(fmt(
