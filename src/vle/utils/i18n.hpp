@@ -40,15 +40,17 @@ namespace vle {
 
 
 #ifdef VLE_HAVE_NLS
-#   define ENABLE_NLS
-#   include <libintl.h>
-#   include <locale.h>
-#   define _(x) gettext(x)
-#   define gettext_noop(x) x
-#   define N_(x) gettext_noop(x)
+# ifndef ENABLE_NLS
+#  define ENABLE_NLS
+# endif
+#  include <libintl.h>
+#  include <locale.h>
+#  define _(x) gettext(x)
+#  define gettext_noop(x) x
+#  define N_(x) gettext_noop(x)
 #else
-#   define _(x) x
-#   define N_(x) x
+#  define _(x) x
+#  define N_(x) x
 #endif
 
 #endif
