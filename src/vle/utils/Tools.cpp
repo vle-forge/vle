@@ -33,25 +33,12 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
-
-#include <glibconfig.h>
-#include <glibmm/markup.h>
-#include <glibmm/stringutils.h>
-#include <glibmm/thread.h>
-#include <glibmm/miscutils.h>
-#include <glib/gstdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <cstring>
-#include <iomanip>
-#include <iostream>
-#include <libxml/parser.h>
-#include <cmath>
-
 #include <boost/lexical_cast.hpp>
+#include <iomanip>
 
-#include <glib.h>
+#include <libxml/parser.h> /** to the init and finalize functions which need to
+                             initialize and cleanup the libxml2 library. */
+#include <glibmm/thread.h>
 #include <glib/gstdio.h>
 
 #ifdef G_OS_WIN32
@@ -251,16 +238,6 @@ std::string toScientificString(const double& v, bool locale)
     return o.str();
 }
 
-bool isAlnumString(const std::string& str)
-{
-    const size_t sz = str.size();
-    for (size_t i = 0; i < sz; ++i) {
-        if (Glib::Ascii::isalpha(str[i]) == false)
-            return false;
-    }
-    return true;
-}
-
 std::string demangle(const std::type_info& in)
 {
     std::string result;
@@ -288,27 +265,6 @@ std::string demangle(const std::string& in)
     result.assign(in);
 #endif
     return result;
-}
-
-std::string getUserDirectory()
-{
-#ifdef G_OS_WIN32
-    std::string home(utils::Path::buildDirname(Glib::get_home_dir(), "vle"));
-#else
-    std::string home(utils::Path::buildDirname(Glib::get_home_dir(), ".vle"));
-#endif
-
-    if (not utils::Path::existDirectory(home)) {
-#ifdef G_OS_WIN32
-        if (_mkdir(home.c_str()) == -1) {
-#else
-        if (g_mkdir(home.c_str(), 0755) == -1) {
-#endif
-            throw utils::InternalError(fmt(
-                _("Error mkdir '%1%' directory user\n")) % home);
-        }
-    }
-    return home;
 }
 
 void init()

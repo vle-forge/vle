@@ -114,15 +114,6 @@ namespace vle { namespace utils {
         const double& v, bool locale = false);
 
     /**
-     * Return true if unicode string str is an ascii string with only
-     * character between A-Z and a-z and size not empty.
-     *
-     * @param str unicode string to test validity in VLE name
-     * @return true if str is correct, otherwise, false.
-     */
-    VLE_UTILS_EXPORT bool isAlnumString(const std::string& str);
-
-    /**
      * Demangle the input type info from C++ compiler.
      * http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/namespaceabi.html
      *
