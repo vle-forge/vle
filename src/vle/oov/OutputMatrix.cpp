@@ -56,18 +56,17 @@ OutputMatrix::~OutputMatrix()
 
 value::Value* OutputMatrix::serialize() const
 {
-    value::Set* result(value::Set::create());
+    value::Set* result = value::Set::create();
     result->add(m_values);
 
-    value::Set* id(value::Set::create());
+    value::Set* id = value::Set::create();
     for (MapPairIndex::const_iterator it = m_colAccess.begin();
          it != m_colAccess.end(); ++it) {
-        id->add(value::String::create(it->first.first));
-        id->add(value::String::create(it->first.second));
-        id->add(value::Integer::create(it->second));
+        id->addString(it->first.first);
+        id->addString(it->first.second);
+        id->addInt(it->second);
     }
     result->add(id);
-
     return result;
 }
 
@@ -80,7 +79,7 @@ void OutputMatrix::deserialize(const value::Value& vals)
     if (result.size() != 2) {
         throw utils::ArgError(_("Bad OutputMatrix deserialize flows"));
     }
-
+    delete m_values;
     m_values = value::toMatrixValue(result.get(0)->clone());
     const value::Set& id(result.get(1)->toSet());
 
