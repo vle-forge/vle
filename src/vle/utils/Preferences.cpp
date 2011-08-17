@@ -254,10 +254,17 @@ private:
     po::options_description mVleDaemonOptions;
     po::options_description mVleRemoteOptions;
 
+    /**
+     * A functor to get the variable name in the @c
+     * boost::program_options::variables_map.
+     */
     struct CopyVariableName
     {
-        const std::string& operator()(
-            const po::variables_map::value_type& v) const { return v.first; }
+        inline const std::string&
+            operator()(const po::variables_map::value_type& v) const
+            {
+                return v.first;
+            }
     };
 };
 

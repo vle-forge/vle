@@ -37,41 +37,41 @@
 namespace vle { namespace utils {
 
 /**
- * This class permit to read and write the resources files `$VLE_HOME/vle.conf'
- * and store them into internal structure. The resources file have an
- * classical ini syntax:
- * @code
- * [section A]
- * key1 = value1
- * key2 = value2
+ * This class permits to read and write the resources files `$VLE_HOME/vle.conf'
+ * and stores them into internal structures.
  *
- * [section B]
- * key = "string"
- * key = 123
- * key = true
- * key = false
- * key = 1.123
+ * The resources file have a classical ini syntax:
+ *
+ * @code
+ * sectionA.key1 = value1
+ * sectionA.key2 = value2
+ *
+ * sectionB.key1 = "string"
+ * sectionB.key2 = 123
+ * sectionB.key3 = true
+ * sectionB.key4 = false
+ * sectionB.key5 = 1.123
  * @endcode
  *
  * The @c section and @c key are string without space. The @c value are
  * integer, double, boolean or string. For example:
  *
  * @code
- * [package]
- * configure = "cmake %1% .."
- * test = "make test"
- * install = "make install"
- * clean = "make clean"
- * package = "make package"
+ * package.configure = "cmake %1% .."
+ * package.test = "make test"
+ * package.install = "make install"
+ * package.clean = "make clean"
+ * package.package = "make package"
  *
- * [gvle]
- * intx = 123
- * inty = 10
- * showb = true
- * boolhide = false
- * real = 1.12354
+ * gvle.intx = 123
+ * gvle.inty = 10
+ * gvle.showb = true
+ * gvle.boolhide = false
+ * gvle.real = 1.12354
  * @endcode
  *
+ * The @c Preferences class uses the pimpl idiom and can not be copyable and
+ * assignable.
  */
 class VLE_UTILS_EXPORT Preferences
 {
@@ -97,13 +97,11 @@ public:
     //
 
     /**
-     * @brief Insert an @c std::string into the specified key.
+     * Insert an @c std::string into the specified key.
+     *
      * @code
      * Preferences f;
      * f.set("section.key", "vle is wonderful");
-     * // [section]
-     * // key = "vle is wonderful"
-     *
      * // section.key = "vle is wonderful"
      * @endcode
      *
@@ -115,13 +113,13 @@ public:
     bool set(const std::string& key, const std::string& value);
 
     /**
-     * @brief Insert an @c double into the specified key.
+     * Insert an @c double into the specified key.
+     *
      * @code
      * Preferences f;
      * f.set("section.key", 1.123456789);
-     * // [section]
-     * // key = 1.123456789
-     * // @endcode
+     * // section.key = 1.123456789
+     * @endcode
      *
      * @param key The key.
      * @param value The value.
@@ -131,12 +129,12 @@ public:
     bool set(const std::string& key, double value);
 
     /**
-     * @brief Insert an @c uint32_t into the specified key.
+     * Insert an @c uint32_t into the specified key.
+     *
      * @code
      * Preferences f;
      * f.set("section.key", 23485);
-     * // [section]
-     * // key = 23485
+     * // section.key = 23485
      * @endcode
      *
      * @param key The key.
@@ -147,12 +145,12 @@ public:
     bool set(const std::string& key, uint32_t value);
 
     /**
-     * @brief Insert an @c bool into the specified key.
+     * Insert an @c bool into the specified key.
+     *
      * @code
      * Preferences f;
      * f.set("section.key", true);
-     * // [section]
-     * // key = true
+     * // section.key = true
      * @endcode
      *
      * @param key The key.
@@ -167,7 +165,8 @@ public:
     //
 
     /**
-     * @brief Get all the sections name.
+     * Get all the sections name.
+     *
      * @code
      * Preferences f;
      * std::vector < std::string > sections;
@@ -176,31 +175,29 @@ public:
      * assert(sections[0] == "section1");
      * assert(sections[1] == "section2");
      *
-     * // [section1]
-     * // key1 = v1
-     * // key2 = v2
-     * // [section2]
-     * // key3 = v4
+     * // section1.key1 = v1
+     * // section1.key2 = v2
+     * // section2.key3 = v4
      * @endcode
      *
-     * @param [out] sections Output parameter to store the name of the sections.
+     * @param[out] sections Output parameter to store the name of the sections.
      */
     void get(std::vector < std::string >* sections) const;
 
     /**
-     * @brief Get a @c std::string from specified key.
+     * Get an @c std::string from specified key.
+     *
      * @code
      * Preferences f;
      * std::string value;
      * f.get("section.key", &value);
      * assert(value == "azertyuiop";
-     * [section]
-     * // key = "azertyuiop"
-     * // @endcode
+     *
+     * // section.key = "azertyuiop"
      * @endcode
      *
-     * @param key The key.
-     * @param [out] value The value to fill.
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
      *
      * @throw utils::ArgError if section, key do not exist or if the value is
      * not an @c std::string.
@@ -208,19 +205,19 @@ public:
     bool get(const std::string& key, std::string* value) const;
 
     /**
-     * @brief Get a @c double from specified key.
+     * Get a @c double from specified key.
+     *
      * @code
      * Preferences f;
      * double value;
      * f.get("section.key", &value);
      * assert(value == 1.0);
-     * [section]
-     * // key = 1.0
-     * // @endcode
+     *
+     * // section1.key = 1.0
      * @endcode
      *
-     * @param key The key.
-     * @param [out] value The value to fill.
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
      *
      * @throw utils::ArgError if section, key do not exist or if the value is
      * not a @c real.
@@ -228,19 +225,19 @@ public:
     bool get(const std::string& key, double* value) const;
 
     /**
-     * @brief Get a @c uint32_t from specified key.
+     * Get a @c uint32_t from specified key.
+     *
      * @code
      * Preferences f;
      * uint32_t value;
      * f.get("section.key", &value);
      * assert(value == 12345);
-     * [section]
-     * // key = 12345
-     * // @endcode
+     *
+     * // section.key = 12345
      * @endcode
      *
-     * @param key The key.
-     * @param [out] value The value to fill.
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
      *
      * @throw utils::ArgError if section, key do not exist or if the value is
      * not an @c integer.
@@ -248,19 +245,19 @@ public:
     bool get(const std::string& key, uint32_t* value) const;
 
     /**
-     * @brief Get a @c bool from specified key.
+     * Get a @c bool from specified key.
+     *
      * @code
      * Preferences f;
      * bool value;
      * f.get("section.key", &value);
      * assert(value);
-     * [section]
-     * // key = true
-     * // @endcode
+     *
+     * // section.key = true
      * @endcode
      *
-     * @param key The key.
-     * @param [out] value The value to fill.
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
      *
      * @throw utils::ArgError if section, key do not exist or if the value is
      * not a @c boolean.
@@ -268,11 +265,18 @@ public:
     bool get(const std::string& key, bool* value) const;
 
 private:
+    /**
+     * Uncopyable class.
+     */
     Preferences(const Preferences& other);
+
+    /**
+     * Unassignable class.
+     */
     Preferences& operator=(const Preferences& other);
 
-    class Pimpl;
-    Pimpl* mPimpl;
+    class Pimpl; // @Preferences use the Pimpl idiom. We hide the
+    Pimpl* mPimpl; // implementation detail.
 };
 
 }} //namespace vle utils
