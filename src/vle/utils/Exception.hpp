@@ -32,7 +32,6 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
-#include <boost/format.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/DllDefines.hpp>
 
