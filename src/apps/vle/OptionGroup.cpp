@@ -90,6 +90,7 @@ OptionGroup::OptionGroup()
                 "\tvle --package foo test: start a unit test campaign\n"
                 "\tvle --package foo install: install libs\n"
                 "\tvle --package foo clean: clean up the build directory\n"
+                "\tvle --package foo rclean: delete binary directories\n"
                 "\tvle --package foo package: build package source and binary\n"
                 "\tvle --package foo all: build all depends of foo package\n"
                 "\tvle --package foo depends: list depends of foo package\n"

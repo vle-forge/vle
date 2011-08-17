@@ -145,6 +145,17 @@ namespace vle { namespace utils {
          */
         void removePackage(const std::string& package);
 
+        /**
+         * Remove the binary directory of the package:
+         * - $VLE_HOME/pkgs/package/build
+         * - $VLE_HOME/pkgs/package/lib
+         * - $VLE_HOME/pkgs/package/plugins
+         * - $VLE_HOME/pkgs/package/doc/html
+         *
+         * @param package The \c package to remove binary directories.
+         */
+        static void removePackageBinary(const std::string& package);
+
 
         /**
          * @brief Test if the specified package exists in the user directory.

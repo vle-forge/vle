@@ -208,6 +208,8 @@ void cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
                 Package::package().clean();
                 Package::package().wait(std::cerr, std::cerr);
                 stop = not Package::package().isSuccess();
+            } else if (strcmp(argv[i], "rclean") == 0) {
+                Package::removePackageBinary(Package::package().name());
             } else if (strcmp(argv[i], "package") == 0) {
                 Package::package().pack();
                 Package::package().wait(std::cerr, std::cerr);

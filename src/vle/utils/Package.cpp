@@ -317,27 +317,16 @@ void Package::clean()
     Path& p = utils::Path::path();
     fs::create_directory(p.getPackageBuildDir());
 
-    fs::path makefile = Path::path().getPackageBuildDir();
-    makefile /= "Makefile";
-    if (fs::exists(makefile)) {
-        std::list < std::string > argv;
-        buildCommandLine(mCommandClean, argv);
+    std::list < std::string > argv;
+    buildCommandLine(mCommandClean, argv);
 
-        std::list < std::string > envp = prepareEnvironmentVariable();
+    std::list < std::string > envp = prepareEnvironmentVariable();
 
-        try {
-            process(p.getPackageBuildDir(), argv, envp);
-        } catch(const Glib::SpawnError& e) {
-            throw utils::InternalError(fmt(
-                    _("Pkg clean error: clean failed %1%")) % e.what());
-        }
-        fs::remove(makefile);
-    }
-
-    fs::path cmakecache = Path::path().getPackageBuildDir();
-    cmakecache /= "CMakeCache.txt";
-    if (fs::exists(cmakecache)) {
-        fs::remove(cmakecache);
+    try {
+        process(p.getPackageBuildDir(), argv, envp);
+    } catch(const Glib::SpawnError& e) {
+        throw utils::InternalError(fmt(
+                _("Pkg clean error: clean failed %1%")) % e.what());
     }
 }
 
@@ -484,6 +473,53 @@ void Package::removePackage(const std::string& package)
         if (fs::exists(tmp)) {
             fs::remove_all(tmp);
             fs::remove(tmp);
+        }
+    }
+}
+
+void Package::removePackageBinary(const std::string& package)
+{
+    if (not package.empty()) {
+        fs::path tmp = Path::path().getPackagesDir();
+        tmp /= package;
+
+        if (fs::exists(tmp)) {
+            {
+                fs::path build = tmp;
+                build /= "build";
+
+                if (fs::exists(build)) {
+                    fs::remove_all(build);
+                }
+            }
+
+            {
+                fs::path lib = tmp;
+                lib /= "lib";
+
+                if (fs::exists(lib)) {
+                    fs::remove_all(lib);
+                }
+            }
+
+            {
+                fs::path plugins = tmp;
+                plugins /= "plugins";
+
+                if (fs::exists(plugins)) {
+                    fs::remove_all(plugins);
+                }
+            }
+
+            {
+                fs::path doc = tmp;
+                doc /= "doc";
+                doc /= "html";
+
+                if (fs::exists(doc)) {
+                    fs::remove_all(doc);
+                }
+            }
         }
     }
 }
