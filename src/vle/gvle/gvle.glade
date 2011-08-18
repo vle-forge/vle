@@ -163,7 +163,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -468,7 +467,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -723,7 +721,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -1414,7 +1411,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -1484,7 +1480,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -1761,7 +1756,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -2041,7 +2035,6 @@ the experimental frame</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -2354,7 +2347,6 @@ the experimental frame</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -2573,7 +2565,6 @@ each selected Observables</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -2835,7 +2826,6 @@ each selected Observables</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -2959,7 +2949,6 @@ each selected Observables</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -3489,7 +3478,6 @@ Retired Contributors
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -3551,7 +3539,6 @@ Retired Contributors
                 <property name="can_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -3683,7 +3670,6 @@ Retired Contributors
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -4056,7 +4042,6 @@ Retired Contributors
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -4709,7 +4694,6 @@ Retired Contributors
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -4868,7 +4852,6 @@ into your project.
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -4947,7 +4930,6 @@ into your project.
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -5011,7 +4993,6 @@ into your project.
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -5121,7 +5102,6 @@ into your project.
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -5223,7 +5203,6 @@ into your project.
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -5553,7 +5532,6 @@ into your project.
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -5626,7 +5604,6 @@ into your project.
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -5741,7 +5718,6 @@ into your project.
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -6127,7 +6103,6 @@ into your project.
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <accelerator key="Return" signal="clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
