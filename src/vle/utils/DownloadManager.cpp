@@ -27,10 +27,13 @@
 
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Path.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <libxml/nanohttp.h>
 #include <libxml/tree.h>
+#include <cstring>
+#include <fstream>
 
 namespace vle { namespace utils {
 
@@ -113,26 +116,24 @@ public:
         }
 
         xmlNanoHTTPClose(ctxt);
-        int resLength = xmlBufferLength(output);
-
-        std::string response(reinterpret_cast < const char* >
-                             (xmlBufferContent(output)),
-                             resLength);
         xmlBufferFree(output);
         xmlNanoHTTPCleanup();
 
-        char filename[16];
-        strncpy(filename, "vleremoteXXXXXX", 16);
+        std::ofstream file;
+        std::string filename(utils::Path::getTempFile("vle-remote-", &file));
 
-        {
-            boost::mutex::scoped_lock lock(mMutex);
-            mFilename.assign(filename);
-        }
+        if (not filename.empty() and file.is_open()) {
+            {
+                boost::mutex::scoped_lock lock(mMutex);
+                mFilename.assign(filename);
+            }
 
-        int fd = ::mkstemp(filename);
-        if (fd > 0) {
-            ::write(fd, static_cast < const void* >(response.c_str()),
-                    boost::numeric_cast < size_t >(response.size()));
+            file.write(
+                reinterpret_cast < const char* >(xmlBufferContent(output)),
+                xmlBufferLength(output));
+            xmlNanoHTTPClose(ctxt);
+            xmlBufferFree(output);
+            mHasError = false;
         } else {
             xmlNanoHTTPClose(ctxt);
             xmlBufferFree(output);
@@ -141,9 +142,7 @@ public:
             mErrorMessage = (fmt(
                     _("Remote access: failed to store in file `%1%'")) %
                 filename).str();
-            return;
         }
-        ::close(fd);
     }
 
     boost::mutex mMutex;

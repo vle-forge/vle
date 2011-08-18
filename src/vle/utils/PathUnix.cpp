@@ -27,6 +27,7 @@
 
 
 #include <list>
+#include <fstream>
 
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
@@ -60,6 +61,36 @@ void Path::initHomeDir()
 void Path::initPrefixDir()
 {
     m_prefix.assign(VLE_PREFIX_DIR);
+}
+
+std::string Path::getTempFile(const std::string& prefix,
+                              std::ofstream* file)
+{
+    if (file and not file->is_open()) {
+        char* buffer = new char[prefix.size() + 7];
+
+        strncpy(buffer, prefix.c_str(), prefix.size());
+        memset(static_cast < void* >(buffer + prefix.size() + 1), 'X', 6);
+        buffer[prefix.size() + 6] = '\0';
+
+        int fd = mkstemp(buffer);
+        if (fd != -1) {
+            file->open(buffer, std::ios_base::trunc | std::ios_base::out |
+                       std::ios_base::binary);
+            close(fd);
+
+            if (file->is_open()) {
+                std::string result(buffer, prefix.size() + 6);
+                delete[] buffer;
+
+                return result;
+            }
+        }
+
+        delete[] buffer;
+    }
+
+    return std::string();
 }
 
 }} // namespace vle utils

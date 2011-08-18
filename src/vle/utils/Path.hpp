@@ -31,7 +31,7 @@
 
 #include <string>
 #include <vector>
-#include <ostream>
+#include <iosfwd>
 #include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
@@ -492,6 +492,29 @@ namespace vle { namespace utils {
          * @return a portable temporary filename
          */
         static std::string buildTemp( const std::string& filename);
+
+        /**
+         * Get and open a temporary file.
+         *
+         * Get from the operating system a temporary directory, for example on
+         * Unix @c /tmp or @c c:\\windows\\temp on Win32 and build a file name
+         * from the template @c template.
+         *
+         * @code
+         * std::ofstream file;
+         * std::string result = utils::getTempFile("test-vle", &file);
+         * file << "Hello\n";
+         *
+         * std::cout << result; // For example, on Unix: /tmp/test-vle123251
+         * @endcode
+         *
+         * @param[in] prefix The prefix of the filename you want.
+         * @param[out] file A pointer to an existing std::ofstream not opened.
+         *
+         * @return The path name of the file.
+         */
+        static std::string getTempFile(const std::string& prefix,
+                                       std::ofstream* file);
 
         /**
          * @brief Write specified buffer to temporary file and return the

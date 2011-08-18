@@ -85,4 +85,36 @@ void Path::initPrefixDir()
     }
 }
 
+std::string Path::getTempFile(const std::string& prefix,
+                              std::ofstream* file)
+{
+    if (file and not file->is_open()) {
+        TCHAR filename[MAX_PATH];
+        TCHAR temp[MAX_PATH];
+        DWORD result;
+
+        result = ::GetTempPath(MAX_PATH, tmp);
+        if (result and result < MAX_PATH) {
+            result = ::GetTempFileName(tmp,
+                                       prefix.c_str(),
+                                       0,
+                                       filename);
+
+            if (result) {
+                file->open(static_cast < char* >(tmp),
+                           std::ios_base::truc | std::ios_base::out |
+                           std::ios_base::binary);
+
+                if (file->is_open()) {
+                    std::string result = tmp;
+
+                    return result;
+                }
+            }
+        }
+    }
+
+    return std::string();
+}
+
 }} // namespace vle utils
