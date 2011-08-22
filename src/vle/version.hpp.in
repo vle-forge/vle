@@ -38,6 +38,14 @@
 #define VLE_NAME_COMPLETE   ("@VLE_NAME_COMPLETE@")
 #define VLE_LOCALE_NAME     ("@VLE_LOCALE_NAME@")
 
+/*
+ * System information: name (Linux, Darwin; FreeBSD, Windows, ...) and the
+ * processor (i486, i686, x86_64 etc.). See the cmake documentation of
+ * CMAKE_SYSTEM_NAME and CMAKE_SYSTEM_PROCESSOR for more information.
+ */
+#define VLE_SYSTEM_NAME      ("@CMAKE_SYSTEM_NAME@")
+#define VLE_SYSTEM_PROCESSOR ("@CMAKE_SYSTEM_PROCESSOR@")
+
 /* install prefix */
 #define VLE_PREFIX_DIR      ("${CMAKE_INSTALL_PREFIX}")
 #define VLE_LIBRARY_DIRS    ("${VLE_LIBRARY_DIRS}")
@@ -59,12 +67,12 @@
 #cmakedefine VLE_HAVE_BOOST_SPIRIT2
 
 /**
- * @brief Check whether a VLE version equal to or greather than major.mino.patch
- * is present.
+ * Check whether a VLE version equal to or greather than major.mino.patch is
+ * present.
  */
 #define VLE_CHECK_VERSION(major, minor, patch) \
-    (VLE_MAJOR_VERSION > (major) || \
-     (VLE_MAJOR_VERSION == (major) && VLE_MINOR_VERSION > (minor)) || \
+    (VLE_MAJOR_VERSION > (major) || \
+     (VLE_MAJOR_VERSION == (major) && VLE_MINOR_VERSION > (minor)) || \
      (VLE_MAJOR_VERSION == (major) && VLE_MINOR_VERSION == (minor) && \
      VLE_PATCH_VERSION >= (patch)))
 
