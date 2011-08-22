@@ -79,10 +79,11 @@ a list of VPZ files
         vle --package foo list: list vpz and library package
 
 .IP "\fB\-R, \fB\-\-remote"
-Update the database, install a remote package, search package with regular
-expression of show information of a remote package.
+Update the database, install a source or a binary remote package, search
+package with regular expression of show information of a remote package.
         vle --remote update
         vle --remote install remote_package
+        vle --remote source remote_package
         vle --remote search 'regular expression'
         vle --remote show remote_package
 

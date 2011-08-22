@@ -34,6 +34,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/version.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -85,9 +86,9 @@ static bool isTags(const std::string& line)
     return boost::algorithm::starts_with(line, "Tags:");
 }
 
-static bool isFilename(const std::string& line)
+static bool isUrl(const std::string& line)
 {
-    return boost::algorithm::starts_with(line, "Filename:");
+    return boost::algorithm::starts_with(line, "Url:");
 }
 
 static bool isSize(const std::string& line)
@@ -114,7 +115,7 @@ class RemotePackage
 {
 public:
     RemotePackage(std::istream& is)
-        : mName(), mMaintainer(), mDescription(), mFilename(), mMD5sum(),
+        : mName(), mMaintainer(), mDescription(), mUrl(), mMD5sum(),
         mTags(), mDepends(), mVersionMajor(0), mVersionMinor(0),
         mVersionPatch(0), mSize(0)
     {
@@ -151,8 +152,8 @@ public:
                 setTags(std::string(line, 5));
                 std::getline(is, line);
             }
-            if (isFilename(line)) {
-                setMaintainer(std::string(line, 9));
+            if (isUrl(line)) {
+                setUrl(std::string(line, 4));
                 std::getline(is, line);
             }
             if (isSize(line)) {
@@ -160,8 +161,7 @@ public:
                 std::getline(is, line);
             }
             if (isMD5sum(line)) {
-                setMaintainer(std::string(line, 7));
-                std::getline(is, line);
+                setMD5sum(std::string(line, 7));
             }
         } catch (const std::ios_base::failure& /*e*/) {
         }
@@ -169,11 +169,12 @@ public:
 
     RemotePackage(const RemotePackage& other)
         : mName(other.mName), mMaintainer(other.mMaintainer),
-        mDescription(other.mDescription), mFilename(other.mFilename),
+        mDescription(other.mDescription), mUrl(other.mUrl),
         mMD5sum(other.mMD5sum), mTags(other.mTags), mDepends(other.mDepends),
         mVersionMajor(other.mVersionMajor), mVersionMinor(other.mVersionMinor),
         mVersionPatch(other.mVersionPatch), mSize(other.mSize)
-    {}
+    {
+    }
 
     ~RemotePackage()
     {
@@ -196,7 +197,7 @@ public:
         std::swap(mMaintainer, other.mMaintainer);
         std::swap(mDescription, other.mDescription);
         std::swap(mTags, other.mTags);
-        std::swap(mFilename, other.mFilename);
+        std::swap(mUrl, other.mUrl);
         std::swap(mSize, other.mSize);
         std::swap(mMD5sum, other.mMD5sum);
     }
@@ -348,14 +349,14 @@ public:
         }
     }
 
-    void setFilename(const std::string& filename)
+    void setUrl(const std::string& url)
     {
-        std::string tmp = boost::algorithm::trim_copy(filename);
+        std::string tmp = boost::algorithm::trim_copy(url);
 
         if (tmp.empty()) {
-            throw utils::ArgError(fmt(_("RemotePackage: empty filename")));
+            throw utils::ArgError(fmt(_("RemotePackage: empty url")));
         } else {
-            mFilename = tmp;
+            mUrl = tmp;
         }
     }
 
@@ -389,10 +390,24 @@ public:
         }
     }
 
+    std::string getSourcePackageUrl() const
+    {
+        return (fmt("%1%/%2%-%3%.%4%.%5%.zip") %
+                mUrl % mName % mVersionMajor % mVersionMinor %
+                mVersionPatch).str();
+    }
+
+    std::string getBinaryPackageUrl() const
+    {
+        return (fmt("%1%/%2%-%3%.%4%.%5%-%6%-%7%.zip") %
+                mUrl % mName % mVersionMajor % mVersionMinor %
+                mVersionPatch % VLE_SYSTEM_NAME % VLE_SYSTEM_PROCESSOR).str();
+    }
+
     std::string mName;
     std::string mMaintainer;
     std::string mDescription;
-    std::string mFilename;
+    std::string mUrl;
     std::string mMD5sum;
     std::vector < std::string > mTags;
     std::vector < std::string > mDepends;
@@ -486,6 +501,10 @@ public:
             case REMOTE_MANAGER_UPDATE:
                 mThread = boost::thread(
                     &RemoteManager::Pimpl::actionUpdate, this);
+                break;
+            case REMOTE_MANAGER_SOURCE:
+                mThread = boost::thread(
+                    &RemoteManager::Pimpl::actionSource, this);
                 break;
             case REMOTE_MANAGER_INSTALL:
                 mThread = boost::thread(
@@ -704,11 +723,49 @@ private:
         const_iterator it = mPackages.find(mArgs);
 
         if (it != mPackages.end()) {
-            std::string url = it->second.mFilename;
+            std::string url = it->second.getBinaryPackageUrl();
 
             DownloadManager dl;
 
-            out(fmt(_("Download %1%' at %2%")) % mArgs % url);
+            out(fmt(_("Download binary package `%1%' at %2%")) % mArgs % url);
+            dl.start(url);
+            dl.join();
+
+            if (not dl.hasError()) {
+                out(_("install"));
+                std::string filename = dl.filename();
+                std::string zipfilename = dl.filename();
+                zipfilename += ".zip";
+
+                boost::filesystem::rename(filename, zipfilename);
+
+                utils::Package::package().unzip(mArgs, zipfilename);
+                utils::Package::package().wait(*mStream, *mStream);
+                out(_(": ok\n"));
+            } else {
+                out(_(": failed\n"));
+            }
+        } else {
+            out(fmt(_("Unknown package `%1%'")) % mArgs);
+        }
+
+        mStream = 0;
+        mIsFinish = true;
+        mIsStarted = false;
+        mStop = false;
+        mHasError = false;
+    }
+
+    void actionSource() throw()
+    {
+        const_iterator it = mPackages.find(mArgs);
+
+        if (it != mPackages.end()) {
+            std::string url = it->second.getSourcePackageUrl();
+
+            DownloadManager dl;
+
+            out(fmt(_("Download source package `%1%' at %2%")) % mArgs % url);
             dl.start(url);
             dl.join();
 

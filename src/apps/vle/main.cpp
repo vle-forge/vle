@@ -259,6 +259,11 @@ void cliRemote(int argc, char* argv[])
                 rm.start(utils::REMOTE_MANAGER_INSTALL, argv[i], &std::cout);
                 rm.join();
             }
+        } else if (argc > 1 and strcmp(argv[1], "source") == 0) {
+            for (int i = 2; i < argc; ++i) {
+                rm.start(utils::REMOTE_MANAGER_SOURCE, argv[i], &std::cout);
+                rm.join();
+            }
         } else if (argc > 1 and strcmp(argv[1], "show") == 0) {
             for (int i = 2; i < argc; ++i) {
                 rm.start(utils::REMOTE_MANAGER_SHOW, argv[i], &std::cout);
@@ -279,6 +284,7 @@ void cliRemote(int argc, char* argv[])
             _("Bad argument:\n"
               "\tvle --remote update\n"
               "\tvle --remote install glue-1.0\n"
+              "\tvle --remote source glue-1.0\n"
               "\tvle --remote show glue-1.0\n"
               "\tvle --remote search 'glue*'\n"));
     }

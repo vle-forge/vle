@@ -44,6 +44,7 @@ namespace vle { namespace utils {
 enum RemoteManagerActions
 {
     REMOTE_MANAGER_UPDATE, /**< vle --remote update. */
+    REMOTE_MANAGER_SOURCE, /**< vle --remote source glue. */
     REMOTE_MANAGER_INSTALL, /**< vle --remove install glue. */
     REMOTE_MANAGER_SEARCH, /**< vle --remote search '*lu*'. */
     REMOTE_MANAGER_SHOW /**< vle --remote show glue. */
@@ -52,7 +53,7 @@ enum RemoteManagerActions
 /**
  * \c RemoteManager allow to manager ftp/http repositories.
  *
- * A class to access to the  \c RemoteManager repositories. By default, a file
+ * A class to access to the  \c RemoteManager repositories. By default, a file
  * in \c VLE_HOME/packages stores the packages availables. Each update will
  * rewrite this file with newly available packages.
  *
