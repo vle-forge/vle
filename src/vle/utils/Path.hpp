@@ -42,12 +42,12 @@ namespace vle { namespace utils {
     typedef std::vector < std::string > PathList;
 
     /**
-     * @brief Portable way, i.e. Linux/Unix/Windows to get VLE paths. Linux
-     * and Unix versions use compiled paths, Windows version uses registry to
-     * store path.
-     * And environment variable VLE_HOME is used to change the user home
-     * directory for simulators, streams, packages and other plug-ins. If this
-     * variable is not defined,
+     * Portable way to get and manage VLE's paths.
+     *
+     * Linux and Unix versions use compiled paths, Windows version uses
+     * registry to store path. And environment variable VLE_HOME is used to
+     * change the user home directory for simulators, streams, packages and
+     * other plug-ins. If this variable is not defined,
      *
      * This class is a singleton. To use it:
      * @code
@@ -61,7 +61,6 @@ namespace vle { namespace utils {
     class VLE_UTILS_EXPORT Path
     {
     public:
-
         /**
          * @brief Rebuild path lists of plug-ins directories (package mode,
          * global mode etc.).
@@ -207,6 +206,7 @@ namespace vle { namespace utils {
         std::string getPackageBuildDir() const;
         std::string getPackageOutputDir() const;
         std::string getPackagePluginDir() const;
+        std::string getPackagePluginSimulatorDir() const;
         std::string getPackagePluginOutputDir() const;
         std::string getPackagePluginGvleModelingDir() const;
         std::string getPackagePluginGvleOutputDir() const;
@@ -228,6 +228,7 @@ namespace vle { namespace utils {
         std::string getExternalPackageBuildDir(const std::string& name) const;
         std::string getExternalPackageOutputDir(const std::string& name) const;
         std::string getExternalPackagePluginDir(const std::string& name) const;
+        std::string getExternalPackagePluginSimulatorDir(const std::string& name) const;
         std::string getExternalPackagePluginOutputDir(const std::string& name) const;
         std::string getExternalPackagePluginGvleModelingDir(const std::string& name) const;
         std::string getExternalPackagePluginGvleOutputDir(const std::string& name) const;

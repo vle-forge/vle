@@ -544,8 +544,9 @@ void DynamicsBox::fillLibrary()
     if (getPackageStr().empty()) {
         paths = utils::Path::path().getSimulatorDirs();
     } else {
-        paths.push_back(utils::Path::path().getExternalPackageLibDir(
-                            getPackageStr()));
+        paths.push_back(
+            utils::Path::path().getExternalPackagePluginSimulatorDir(
+                getPackageStr()));
     }
 
     utils::PathList::iterator it = paths.begin();

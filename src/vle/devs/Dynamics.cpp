@@ -104,12 +104,13 @@ std::string Dynamics::getPackageDir() const
     }
 }
 
-std::string Dynamics::getPackageLibDir() const
+std::string Dynamics::getPackageSimulatorDir() const
 {
     if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageLibDir();
+        return utils::Path::path().getPackagePluginSimulatorDir();
     } else {
-        return utils::Path::path().getExternalPackageLibDir(*m_packageid);
+        return utils::Path::path().getExternalPackagePluginSimulatorDir(
+            *m_packageid);
     }
 }
 

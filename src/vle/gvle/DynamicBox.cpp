@@ -151,7 +151,8 @@ void DynamicBox::makeComboLibrary()
     if (mComboPackage->get_active_text().empty()) {
         paths = utils::Path::path().getSimulatorDirs();
     } else {
-        paths.push_back(utils::Path::path().getExternalPackageLibDir(
+        paths.push_back(
+            utils::Path::path().getExternalPackagePluginSimulatorDir(
                 mComboPackage->get_active_text()));
     }
     utils::PathList::iterator it = paths.begin();

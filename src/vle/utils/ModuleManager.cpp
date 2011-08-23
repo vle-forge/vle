@@ -533,7 +533,7 @@ public:
         case MODULE_DYNAMICS:
         case MODULE_DYNAMICS_WRAPPER:
         case MODULE_EXECUTIVE:
-            path = Path::path().getExternalPackageLibDir(
+            path = Path::path().getExternalPackagePluginSimulatorDir(
 #if BOOST_VERSION > 104500
                 package.filename().string());
 #else
@@ -795,7 +795,7 @@ std::string ModuleManager::buildModuleFilename(const std::string& package,
         case MODULE_DYNAMICS:
         case MODULE_DYNAMICS_WRAPPER:
         case MODULE_EXECUTIVE:
-            current = Path::path().getExternalPackageLibDir(
+            current = Path::path().getExternalPackagePluginSimulatorDir(
                 package);
             break;
         case MODULE_OOV:

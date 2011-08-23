@@ -401,7 +401,7 @@ namespace vle { namespace devs {
          * @brief Get the library package directory.
          * @return The library package path.
          */
-        std::string getPackageLibDir() const;
+        std::string getPackageSimulatorDir() const;
 
         /**
          * @brief Get the source package directory.

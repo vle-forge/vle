@@ -488,6 +488,11 @@ std::string Path::getPackagePluginDir() const
     return buildDirname(m_currentPackagePath, "plugins");
 }
 
+std::string Path::getPackagePluginSimulatorDir() const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "simulator");
+}
+
 std::string Path::getPackagePluginOutputDir() const
 {
     return buildDirname(m_currentPackagePath, "plugins", "output");
@@ -593,17 +598,26 @@ std::string Path::getExternalPackagePluginDir(const std::string& name) const
     return buildDirname(getPackagesDir(), name, "plugins");
 }
 
-std::string Path::getExternalPackagePluginOutputDir(const std::string& name) const
+std::string Path::getExternalPackagePluginSimulatorDir(
+    const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "plugins", "simulator");
+}
+
+std::string Path::getExternalPackagePluginOutputDir(
+    const std::string& name) const
 {
     return buildDirname(getPackagesDir(), name, "plugins", "output");
 }
 
-std::string Path::getExternalPackagePluginGvleModelingDir(const std::string& name) const
+std::string Path::getExternalPackagePluginGvleModelingDir(
+    const std::string& name) const
 {
     return buildDirname(getPackagesDir(), name, "plugins", "gvle", "output");
 }
 
-std::string Path::getExternalPackagePluginGvleOutputDir(const std::string& name) const
+std::string Path::getExternalPackagePluginGvleOutputDir(
+    const std::string& name) const
 {
     return buildDirname(getPackagesDir(), name, "plugins", "gvle", "modeling");
 }
@@ -613,6 +627,7 @@ std::string Path::getExternalPackageFile(const std::string& name,
 {
     return buildFilename(getPackagesDir(), name, file);
 }
+
 std::string Path::getExternalPackageLibFile(const std::string& name,
                                             const std::string& file) const
 {
@@ -969,7 +984,7 @@ void Path::initPackagePluginDirs()
     addOutputDir(getHomeOutputDir());
     addModelingDir(getHomeModelingDir());
 
-    addSimulatorDir(getPackageLibDir());
+    addSimulatorDir(getPackagePluginSimulatorDir());
 }
 
 std::ostream& operator<<(std::ostream& out, const PathList& paths)
@@ -1227,6 +1242,7 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "Package doc dir.......: " << p.getPackageDocDir() << "\n"
         << "Package exp dir.......: " << p.getPackageExpDir() << "\n"
         << "Package build dir.....: " << p.getPackageBuildDir() << "\n"
+        << "Package simulators....: " << p.getPackagePluginSimulatorDir() << "\n"
         << "Package stream........: " << p.getPackagePluginOutputDir() << "\n"
         << "Package gvle output...: " << p.getPackagePluginGvleOutputDir()
         << "\n"
