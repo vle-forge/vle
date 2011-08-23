@@ -55,17 +55,23 @@ OpenPackageBox::OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml)
 
     mMenuPopup.accelerate(*mDialog);
 
-    mConnections.push_back(mTreeView->signal_row_activated().connect(
+    mConnections.push_back(
+        mTreeView->signal_row_activated().connect(
             sigc::mem_fun(*this, &OpenPackageBox::onRowActivated)));
 
-    mConnections.push_back(mTreeView->signal_event().connect(
-            sigc::mem_fun(*this, &OpenPackageBox::onEvent)));
+    mConnections.push_back(
+        mTreeView->signal_button_press_event().connect_notify(
+            sigc::mem_fun(*this, &OpenPackageBox::onButtonPressEvent)));
+
+    mConnections.push_back(
+        mTreeSelection->signal_changed().connect(
+            sigc::mem_fun(*this, &OpenPackageBox::onSelectionChanged)));
 }
 
 OpenPackageBox::~OpenPackageBox()
 {
     if (mTreeView) {
-	mTreeView->remove_all_columns();
+        mTreeView->remove_all_columns();
     }
 
     for (std::list < sigc::connection >::iterator it = mConnections.begin();
@@ -79,10 +85,10 @@ bool OpenPackageBox::run()
     build();
 
     mDialog->set_title("Open Project");
-    mDialog->show_all();
+    mDialog->show();
 
     int result = mDialog->run();
-    mDialog->hide_all();
+    mDialog->hide();
 
     return result == Gtk::RESPONSE_OK and not mName.empty();
 }
@@ -96,8 +102,8 @@ void OpenPackageBox::build()
 
     std::sort(list.begin(), list.end());
     for (utils::PathList::const_iterator it = list.begin();
-	 it != list.end(); ++it) {
-	Gtk::TreeModel::Row row = *(mTreeModel->append());
+         it != list.end(); ++it) {
+        Gtk::TreeModel::Row row = *(mTreeModel->append());
         row[mColumns.mName] = utils::Path::filename(*it);
     }
 }
@@ -110,9 +116,7 @@ void OpenPackageBox::onRowActivated(const Gtk::TreeModel::Path& path,
     Gtk::TreeModel::Row row = *it;
 
     if (row) {
-        mName = row.get_value(mColumns.mName);
-        mDialog->response(Gtk::RESPONSE_OK);
-        mDialog->hide_all();
+        mDialog->activate_default();
     }
 }
 
@@ -155,33 +159,24 @@ void OpenPackageBox::onRemoveCallBack(const Gtk::TreeModel::iterator& it)
     }
 }
 
-bool OpenPackageBox::onEvent(GdkEvent* event)
+void OpenPackageBox::onButtonPressEvent(GdkEventButton* event)
 {
-    if (event->type == GDK_BUTTON_PRESS) {
-        if (event->button.button == 3) {
-            mMenuPopup.popup(event->button.button, event->button.time);
-            return true;
-        }
+    if (event->type == GDK_BUTTON_PRESS && event->button== 3) {
+        mMenuPopup.popup(event->button, event->time);
     }
+}
 
-    if (event->type == GDK_BUTTON_RELEASE) {
-        if (event->button.button == 1) {
-            Gtk::TreeModel::Path path;
-            Gtk::TreeViewColumn* column;
+void OpenPackageBox::onSelectionChanged()
+{
+    typedef std::list < Gtk::TreeModel::Path > paths_t;
 
-            mTreeView->get_cursor(path, column);
-            Gtk::TreeModel::iterator it = mTreeModel->get_iter(path);
-            Gtk::TreeModel::Row row = *it;
+    paths_t p = mTreeSelection->get_selected_rows();
 
-            if (row) {
-                mName = row.get_value(mColumns.mName);
-            } else {
-                mName.clear();
-            }
-        }
+    if (not p.empty()) {
+        paths_t::reverse_iterator it = p.rbegin();
+        Gtk::TreeModel::iterator jt = mTreeModel->get_iter(*it);
+        mName = (*jt).get_value(mColumns.mName);
     }
-
-    return false;
 }
 
 }} // namespace vle gvle

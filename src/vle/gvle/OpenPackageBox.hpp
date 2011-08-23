@@ -37,7 +37,9 @@
 namespace vle { namespace gvle {
 
 /**
- * @brief A window to choice a package.
+ * @brief A window to choose a package.
+ *
+ * This window also enables to remove a package
  */
 class OpenPackageBox
 {
@@ -82,12 +84,28 @@ private:
 
     void build();
     void onCancel();
+
+    /**
+     * @brief Select the row(=the package)
+     *
+     * this method is called when the user either double clicks, or
+     * press one of the keys Space, Shift+Space, Return or
+     * Enter. Except that while a shortcuts as been configured on the
+     * dialog, the Return can not launch this method. Nevertheless,
+     * this method just propagate the activation of the row by
+     * validating the dialog. This is what we want, there is only one
+     * thing to choose.
+     *
+     */
     void onRowActivated(const Gtk::TreeModel::Path& path,
                         Gtk::TreeViewColumn *column);
-    bool onEvent(GdkEvent* event);
+    void onButtonPressEvent(GdkEventButton* event);
 
     void onRemove();
+
     void onRemoveCallBack(const Gtk::TreeModel::iterator& it);
+
+    void onSelectionChanged();
 
     std::list < sigc::connection > mConnections;
 };
