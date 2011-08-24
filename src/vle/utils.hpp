@@ -45,6 +45,7 @@
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Template.hpp>
 #include <vle/utils/Tools.hpp>

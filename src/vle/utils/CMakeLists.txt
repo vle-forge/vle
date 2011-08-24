@@ -23,14 +23,14 @@ ENDIF(WIN32)
 
 SET(UTILS_CPP DateTime.cpp DownloadManager.cpp Host.cpp ModuleManager.cpp
   Package.cpp PackageTable.cpp Parser.cpp Path.cpp Preferences.cpp Rand.cpp
-  RemoteManager.cpp Socket.cpp SocketImpl.c Template.cpp Tools.cpp Trace.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
+  RemoteManager.cpp SharedLibraryManager.cpp Socket.cpp SocketImpl.c
+  Template.cpp Tools.cpp Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(UTILS_HPP Algo.hpp DateTime.hpp Deprecated.hpp DllDefines.hpp
   DownloadManager.hpp Exception.hpp Host.hpp i18n.hpp ModuleManager.hpp
   Package.hpp PackageTable.hpp Parser.hpp Path.hpp Preferences.hpp Rand.hpp
-  RemoteManager.hpp Socket.hpp SocketImpl.h Template.hpp Tools.hpp Trace.hpp
-  Types.hpp)
+  RemoteManager.hpp SharedLibraryManager.hpp Socket.hpp SocketImpl.h
+  Template.hpp Tools.hpp Trace.hpp Types.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 
