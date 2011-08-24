@@ -55,9 +55,11 @@
 namespace vle {
 
     /**
-     * @brief A complete library to provide tools like string utilities, dates,
-     * paths, XML parsing, debugging, exception, trace etc.
+     * A library to provide global functionalities.
      *
+     * The @c vle::utils namespace and library provides tools like string
+     * convertion, date-time wrapper, portable path, shared libraries and
+     * modules loading, debugging, exception, trace etc.
      */
     namespace utils {
 
