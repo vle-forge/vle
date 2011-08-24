@@ -45,6 +45,8 @@
 #include <vector>
 #include <set>
 
+#include <sigc++/sigc++.h>
+
 namespace vle { namespace gvle {
 
 class View;
@@ -66,6 +68,9 @@ public:
     /** define set of string represent current models names. */
     typedef std::set < std::string > SetString;
 
+    /** signal that something has been modified*/
+    typedef sigc::signal<void> SignalModified;
+
     /**
      * create a new Modeling with a ptr.
      *
@@ -78,6 +83,19 @@ public:
      * delete all models and view.
      */
     ~Modeling();
+
+    /**
+     * signal accessor.
+     */
+    inline SignalModified signalModified()
+    { return mSignalModified; }
+
+    /**
+     * to signal that a modification to GVLE.
+     */
+    inline void sendSignalModified()
+    { mSignalModified.emit(); }
+
 
     /**
      * delete all models, and view.
@@ -268,12 +286,18 @@ public:
     }
 
     /**
-     * Set document modification.
+     * Set the vpz modification status
      *
-     * @param modified true if document is modified, otherwise false.
+     * Also emit a correspondind  event if needed.
+     *
+     * @param modified a boolean status of the vpz modification
      */
-    inline void setModified(bool modified){
-        mIsModified = modified;
+    inline void setModified(bool modified) {
+        if (mIsModified != modified)
+        {
+            mIsModified = modified;
+            sendSignalModified();
+        }
     }
 
     /**
@@ -403,8 +427,6 @@ public:
      */
     const SetString& getNames() const;
 
-
-
     /********************************************************************
      *
      * MANAGE MEASURE - INTERFACE FOR MEASURES CLASS
@@ -439,27 +461,21 @@ public:
     { return mVpz.project().dynamics();  }
 
     vpz::Dynamics& dynamics()
-    {
-	setModified(true);
-	return mVpz.project().dynamics();
+    { setModified(true); return mVpz.project().dynamics();
     }
 
     const vpz::Observables& observables() const
     { return mVpz.project().experiment().views().observables(); }
 
     vpz::Observables& observables()
-    {
-        setModified(true);
-        return mVpz.project().experiment().views().observables();
+    { setModified(true); return mVpz.project().experiment().views().observables();
     }
 
     const vpz::Conditions& conditions() const
     { return mVpz.project().experiment().conditions(); }
 
     vpz::Conditions& conditions()
-    {
-        setModified(true);
-        return mVpz.project().experiment().conditions();
+    { setModified(true); return mVpz.project().experiment().conditions();
     }
 
     vpz::AtomicModel& get_model(const graph::AtomicModel* atom,
@@ -595,6 +611,10 @@ private:
 
     void import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom, std::string className = "");
     void import_coupled_model(vpz::Vpz* src, graph::CoupledModel* atom, std::string className = "");
+
+protected:
+        SignalModified mSignalModified;
+
 };
 
 } } // namespace vle gvle

@@ -202,6 +202,11 @@ void DocumentText::init(const std::string& buffer)
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     mView.set_source_buffer(buffer_);
 #endif
+
+    mView.get_buffer()->signal_changed().connect(
+	sigc::mem_fun(this, &DocumentText::onChanged));
+
+
 }
 
 std::string DocumentText::guessIdLanguage()
@@ -319,10 +324,10 @@ void DocumentText::selectAll()
 void DocumentText::onChanged()
 {
     if (not isModified()) {
-	setModified(true);
+        setModified(true);
         mGVLE->getMenu()->showSave();
-	mTitle = "* "+ mTitle;
-	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
+        mTitle = "* "+ mTitle;
+        mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
     }
 }
 
@@ -338,8 +343,8 @@ std::string DocumentText::getBuffer()
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
-					 const std::string& filepath,
-					 View* view, graph::Model* model) :
+                                         const std::string& filepath,
+                                         View* view, graph::Model* model) :
     Document(gvle, filepath),
     mView(view),
     mModel(model),
@@ -426,7 +431,7 @@ DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
     DocumentDrawingArea(gvle, filepath, view, model)
 {
     mTitle = filename() + utils::Path::extension(filepath)
-	+ " - " + model->getName();
+        + " - " + model->getName();
     mCompleteArea = mView->getCompleteArea();
     mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
     mViewport->add(*mCompleteArea);
@@ -449,12 +454,12 @@ DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(GVLE* gvle,
-					 const std::string& filepath,
-					 View* view, graph::Model* model) :
+                                                     const std::string& filepath,
+                                                     View* view, graph::Model* model) :
     DocumentDrawingArea(gvle, filepath, view, model)
 {
-    mTitle = filename() + utils::Path::extension(filepath)
-	+ " - " + model->getName();
+    mTitle = filename() + utils::Path::extension(filepath)+
+        " - " + model->getName();
     mSimpleArea = mView->getSimpleArea();
     mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
     mViewport->add(*mSimpleArea);
@@ -494,7 +499,7 @@ void Editor::onCloseTab(const std::string& filepath)
 }
 
 Gtk::HBox* Editor::addLabel(const std::string& title,
-			    const std::string& filepath)
+                            const std::string& filepath)
 {
     Gtk::HBox* tabLabel = new Gtk::HBox(false, 0);
     Gtk::Label* label = new Gtk::Label(title);
@@ -503,7 +508,7 @@ Gtk::HBox* Editor::addLabel(const std::string& title,
 
     Gtk::Button* closeButton = new Gtk::Button();
     Gtk::Image* imgButton = new Gtk::Image(Gtk::Stock::CLOSE,
-					   Gtk::IconSize(Gtk::ICON_SIZE_MENU));
+                                           Gtk::IconSize(Gtk::ICON_SIZE_MENU));
 
     closeButton->set_image(*imgButton);
     closeButton->set_focus_on_click(false);
@@ -562,7 +567,7 @@ void Editor::refreshTab()
 
     while (it != mDocuments.end()) {
         if (it->second == get_nth_page(mGVLE->getCurrentTab()) and
-            utils::Path::extension(it->first) != ".vpz") 
+            utils::Path::extension(it->first) != ".vpz")
         {
             mGVLE->getMenu()->onOpenFile();
         }
@@ -571,18 +576,18 @@ void Editor::refreshTab()
 }
 
 void Editor::changeFile(const std::string& oldName,
-			const std::string& newName)
+                        const std::string& newName)
 {
     Documents::iterator it = mDocuments.find(oldName);
 
     if (it != mDocuments.end()) {
-	graph::Model* model = 0;
+        graph::Model* model = 0;
 
-	if (utils::Path::extension(oldName) == ".vpz") {
-	    model = dynamic_cast < DocumentDrawingArea* >(
-		it->second)->getModel();
-	}
-	it->second->setTitle(newName, model, it->second->isModified());
+        if (utils::Path::extension(oldName) == ".vpz") {
+            model = dynamic_cast < DocumentDrawingArea* >(
+                it->second)->getModel();
+        }
+        it->second->setTitle(newName, model, it->second->isModified());
     }
 }
 
@@ -591,11 +596,11 @@ void Editor::closeAllTab()
     Documents::iterator it = mDocuments.begin();
 
     while (it != mDocuments.end()) {
-	int page = page_num(*it->second);
-	remove_page(page);
-	delete it->second;
-	mDocuments.erase(it->first);
-	it = mDocuments.begin();
+        int page = page_num(*it->second);
+        remove_page(page);
+        delete it->second;
+        mDocuments.erase(it->first);
+        it = mDocuments.begin();
     }
 }
 
@@ -638,23 +643,22 @@ void Editor::createBlankNewFile()
     int compteur = 0;
 
     do {
-	if (compteur != 0) {
-	    nameTmp = name + boost::lexical_cast < std::string >(compteur);
-	} else {
-	    nameTmp = name;
-	}
-	++compteur;
+        if (compteur != 0) {
+            nameTmp = name + boost::lexical_cast < std::string >(compteur);
+        } else {
+            nameTmp = name;
+        }
+        ++compteur;
     } while (existTab(nameTmp));
     name = nameTmp;
     try {
-	DocumentText* doc = new DocumentText(mGVLE, nameTmp, true);
-
-	mDocuments.insert(
-	    std::make_pair < std::string, DocumentText* >(nameTmp, doc));
-	append_page(*doc, *(addLabel(doc->filename(),
-				     nameTmp)));
+        DocumentText* doc = new DocumentText(mGVLE, nameTmp, true);
+        mDocuments.insert(
+            std::make_pair < std::string, DocumentText* >(nameTmp, doc));
+        append_page(*doc, *(addLabel(doc->filename(),
+                                     nameTmp)));
     } catch (std::exception& e) {
-	Error(e.what());
+        Error(e.what());
     }
     show_all_children();
 }
@@ -664,11 +668,11 @@ void Editor::closeVpzTab()
     Documents::iterator it = mDocuments.begin();
 
     while (it != mDocuments.end()) {
-	if (utils::Path::extension(it->first) == ".vpz") {
+        if (utils::Path::extension(it->first) == ".vpz") {
             closeTab(it->first);
             break;
         }
-	++it;
+        ++it;
     }
 }
 
@@ -677,9 +681,9 @@ bool Editor::existVpzTab()
     Documents::iterator it = mDocuments.begin();
 
     while (it != mDocuments.end()) {
-	if (utils::Path::extension(it->first) == ".vpz")
-	    return true;
-	++it;
+        if (utils::Path::extension(it->first) == ".vpz")
+            return true;
+        ++it;
     }
     return false;
 }
@@ -705,9 +709,8 @@ void Editor::onUndo()
     int page = get_current_page();
 
     if (page != -1) {
-	Document* doc = dynamic_cast < Document* >(get_nth_page(page));
-
-	doc->undo();
+        Document* doc = dynamic_cast < Document* >(get_nth_page(page));
+        doc->undo();
     }
 }
 
@@ -716,101 +719,100 @@ void Editor::onRedo()
     int page = get_current_page();
 
     if (page != -1) {
-	Document* doc = dynamic_cast < Document* >(get_nth_page(page));
-
-	doc->redo();
+        Document* doc = dynamic_cast < Document* >(get_nth_page(page));
+        doc->redo();
     }
 }
 
 void Editor::openTab(const std::string& filepath)
 {
     if (utils::Path::extension(filepath) != ".vpz") {
-	try {
-	    if (mDocuments.find(filepath) == mDocuments.end()) {
-		DocumentText* doc = new DocumentText(mGVLE, filepath);
-		int page = append_page(*doc,
-				       *(addLabel(doc->getTitle(), filepath)));
+try {
+    if (mDocuments.find(filepath) == mDocuments.end()) {
+        DocumentText* doc = new DocumentText(mGVLE, filepath);
+        int page = append_page(*doc,
+                               *(addLabel(doc->getTitle(), filepath)));
 
-                mDocuments.insert(std::pair <std::string,
-                                  DocumentText*>(filepath, doc));
-		show_all_children();
-		set_current_page(page);
-	    } else {
-		focusTab(filepath);
-	    }
-	} catch(utils::FileError& fe) {
-	    Error(fe.what());
-	} catch (std::exception& e) {
-	    mGVLE->insertLog(e.what());
-	}
+        mDocuments.insert(std::pair <std::string,
+                          DocumentText*>(filepath, doc));
+        show_all_children();
+        set_current_page(page);
     } else {
-	mGVLE->parseXML(filepath);
+        focusTab(filepath);
+    }
+} catch(utils::FileError& fe) {
+    Error(fe.what());
+} catch (std::exception& e) {
+    mGVLE->insertLog(e.what());
+}
+    } else {
+        mGVLE->parseXML(filepath);
         openTabVpz(mGVLE->getModeling()->getFileName(),
                    mGVLE->getModeling()->getTopModel());
     }
 }
 
 void Editor::openTabVpz(const std::string& filepath,
-			graph::CoupledModel* model)
+                        graph::CoupledModel* model)
 {
     Documents::iterator it = mDocuments.find(filepath);
     int page;
 
     if (it != mDocuments.end()) {
-	if (dynamic_cast<DocumentDrawingArea*>(it->second)->getModel()
-	    != model) {
-	    focusTab(filepath);
-	    page = get_current_page();
-	    DocumentDrawingArea* currentTab =
-            dynamic_cast<DocumentDrawingArea*>(get_nth_page(page));
-	    if (currentTab->isComplete()) {
-		showCompleteView(filepath, model);
-	    } else {
-		showSimpleView(filepath, model);
-	    }
-	} else {
-	    return;
-	}
+        if (dynamic_cast<DocumentDrawingArea*>(it->second)->getModel()
+            != model) {
+            focusTab(filepath);
+            page = get_current_page();
+            DocumentDrawingArea* currentTab =
+                dynamic_cast<DocumentDrawingArea*>(get_nth_page(page));
+            if (currentTab->isComplete()) {
+                showCompleteView(filepath, model);
+            } else {
+                showSimpleView(filepath, model);
+            }
+        } else {
+            return;
+        }
     } else {
-	showCompleteView(filepath, model);
+        showCompleteView(filepath, model);
     }
     getDocumentDrawingArea()->updateCursor();
 }
 
 void Editor::showCompleteView(const std::string& filepath,
-			      graph::CoupledModel* model)
+                              graph::CoupledModel* model)
 {
     Documents::iterator it = mDocuments.find(filepath);
     int page;
 
     if (it != mDocuments.end()) {
         focusTab(filepath);
-	page = get_current_page();
-	remove_page(page);
-	delete it->second;
-	mDocuments.erase(it->first);
-	DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
-	    mGVLE,
-	    filepath,
-	    mGVLE->findView(model),
-	    model);
-	doc->setTitle(filepath, model, mGVLE->getModeling()->isModified());
-	mDocuments.insert(
+        page = get_current_page();
+        remove_page(page);
+        delete it->second;
+        mDocuments.erase(it->first);
+        DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
+            mGVLE,
+            filepath,
+            mGVLE->findView(model),
+            model);
+        doc->setTitle(filepath, model, mGVLE->getModeling()->isModified());
+        mDocuments.insert(
             std::pair < std::string, DocumentDrawingArea* > (filepath,doc));
-	append_page(*doc, *(addLabel(doc->getTitle(),
-				     filepath)));
-	reorder_child(*doc, page);
+        append_page(*doc, *(addLabel(doc->getTitle(),
+                                     filepath)));
+        reorder_child(*doc, page);
     } else {
-	DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
-	    mGVLE,
-	    filepath,
-	    mGVLE->findView(model),
-	    model);
-	doc->setTitle(filepath, model, mGVLE->getModeling()->isModified());
-	mDocuments.insert(
+        DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
+            mGVLE,
+            filepath,
+            mGVLE->findView(model),
+            model);
+        doc->setTitle(filepath, model, mGVLE->getModeling()->isModified());
+        mDocuments.insert(
             std::pair < std::string, DocumentDrawingArea* >(filepath, doc));
-	page = append_page(*doc, *(addLabel(doc->getTitle(),
-	filepath)));
+        page = append_page(*doc, *(addLabel(doc->getTitle(),
+                                            filepath)));
     }
 
     show_all_children();
@@ -819,33 +821,33 @@ void Editor::showCompleteView(const std::string& filepath,
 }
 
 void Editor::showSimpleView(const std::string& filepath,
-			    graph::CoupledModel* model)
+                            graph::CoupledModel* model)
 {
     Documents::iterator it = mDocuments.find(filepath);
     int page;
 
     if (it != mDocuments.end()) {
-	focusTab(filepath);
-	page = get_current_page();
-	remove_page(page);
-	delete it->second;
-	mDocuments.erase(it->first);
+        focusTab(filepath);
+        page = get_current_page();
+        remove_page(page);
+        delete it->second;
+        mDocuments.erase(it->first);
 
-	DocumentSimpleDrawingArea* doc = new DocumentSimpleDrawingArea(
-	    mGVLE,
-	    filepath,
-	    mGVLE->findView(model),
-	    model);
-	doc->setTitle(filepath, model, mGVLE->getModeling()->isModified());
-	mDocuments.insert(
+        DocumentSimpleDrawingArea* doc = new DocumentSimpleDrawingArea(
+            mGVLE,
+            filepath,
+            mGVLE->findView(model),
+            model);
+        doc->setTitle(filepath, model, mGVLE->getModeling()->isModified());
+        mDocuments.insert(
             std::pair < std::string, DocumentDrawingArea* > (filepath, doc));
-	append_page(*doc, *(addLabel(doc->getTitle(),
-				     filepath)));
+        append_page(*doc, *(addLabel(doc->getTitle(),
+                                     filepath)));
 
-	reorder_child(*doc, page);
+        reorder_child(*doc, page);
 
     } else {
-	return;
+        return;
     }
     show_all_children();
     set_current_page(page);
@@ -855,30 +857,30 @@ void Editor::showSimpleView(const std::string& filepath,
 void Editor::refreshViews()
 {
     for (Documents::iterator it = mDocuments.begin();
-	 it != mDocuments.end(); ++it) {
-	it->second->updateView();
+         it != mDocuments.end(); ++it) {
+        it->second->updateView();
     }
 }
 
 void Editor::setModifiedTab(const std::string& title,
-			    const std::string& newFilePath,
-			    const std::string& oldFilePath)
+                            const std::string& newFilePath,
+                            const std::string& oldFilePath)
 {
     Documents::iterator it = mDocuments.find(oldFilePath);
 
     if (it != mDocuments.end()) {
-	Document* doc = it->second;
-	int page = page_num(*doc);
-	Gtk::Widget* tab = get_nth_page(page);
+        Document* doc = it->second;
+        int page = page_num(*doc);
+        Gtk::Widget* tab = get_nth_page(page);
 
-	set_tab_label(*tab, *(addLabel(title, newFilePath)));
-	if (utils::Path::basename(newFilePath) !=
-	    utils::Path::basename(oldFilePath)) {
-	    mDocuments.erase(it);
-	    mDocuments[newFilePath] = doc;
-	}
-	mGVLE->setTitle(utils::Path::basename(newFilePath) +
-		       utils::Path::extension(newFilePath));
+        set_tab_label(*tab, *(addLabel(title, newFilePath)));
+        if (utils::Path::basename(newFilePath) !=
+            utils::Path::basename(oldFilePath)) {
+            mDocuments.erase(it);
+            mDocuments[newFilePath] = doc;
+        }
+        mGVLE->setTitle(utils::Path::basename(newFilePath) +
+                        utils::Path::extension(newFilePath));
     }
 }
 
