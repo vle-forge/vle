@@ -79,6 +79,9 @@ GVLE::GVLE(BaseObjectType* cobject,
     mRefXML = xml;
     mModeling->setGlade(mRefXML);
 
+    mModeling->signalModified().connect(
+        sigc::mem_fun(*this, &GVLE::onSignalModified));
+
     Settings::settings().load();
 
     mGlobalVpzPrevDirPath = "";
@@ -121,13 +124,12 @@ GVLE::GVLE(BaseObjectType* cobject,
     mMenuAndToolbarVbox->pack_start(*mMenuAndToolbar->getToolbar());
     mMenuAndToolbar->getToolbar()->set_toolbar_style(Gtk::TOOLBAR_BOTH);
 
-    setModified(false);
-
     if (mModeling->vpz().project().model().model() != 0) {
         setTitle(mModeling->getFileName());
     }
 
-    Glib::signal_timeout().connect( sigc::mem_fun(*this, &GVLE::on_timeout), 1000 );
+    Glib::signal_timeout().connect(sigc::mem_fun(*this, &GVLE::on_timeout),
+                                   1000 );
 
     set_title(windowTitle());
     resize(900, 550);
@@ -183,6 +185,16 @@ bool GVLE::on_timeout()
     return false;
 }
 
+void GVLE::onSignalModified()
+{
+    if (mModeling->isModified()) {
+        setModifiedTitle(mModeling->getFileName());
+        getMenu()->showSave();
+    } else {
+        getMenu()->hideSave();
+    }
+}
+
 void GVLE::show()
 {
     buildPackageHierarchy();
@@ -201,10 +213,11 @@ void GVLE::showMessage(const std::string& message)
 void GVLE::setModifiedTitle(const std::string& name)
 {
     if (not name.empty() and utils::Path::extension(name) == ".vpz") {
-	Editor::Documents::const_iterator it =
-	    mEditor->getDocuments().find(name);
-	if (it != mEditor->getDocuments().end())
-	    it->second->setTitle(name ,getModeling()->getTopModel(), true);
+        Editor::Documents::const_iterator it =
+            mEditor->getDocuments().find(name);
+        if (it != mEditor->getDocuments().end()) {
+            it->second->setTitle(name ,getModeling()->getTopModel(), true);
+        }
     }
 }
 
@@ -227,7 +240,8 @@ void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
         mEditor->closeTab(Glib::build_filename(mPackage, oldName));
     } else {
         std::string filePath = utils::Path::buildFilename(mPackage, oldName);
-        std::string newFilePath = utils::Path::buildFilename(mPackage, newName);;
+        std::string newFilePath = utils::Path::buildFilename(mPackage,
+                                                             newName);
         mEditor->changeFile(filePath, newFilePath);
         mModeling->setFileName(newFilePath);
     }
@@ -246,7 +260,7 @@ void GVLE::setFileName(std::string name)
             redrawModelClassBox();
         }
     }
-    setModified(false);
+    mModeling->setModified(false);
 }
 
 void GVLE::modifications(std::string filepath, bool isModif)
@@ -365,20 +379,21 @@ void GVLE::start()
 {
     mModeling->clearModeling();
     mModeling->delNames();
-    mModeling->setTopModel(mModeling->newCoupledModel(0, "Top model", "", 0, 0));
+    mModeling->setTopModel(mModeling->newCoupledModel(0,
+                                                      "Top model", "", 0, 0));
     setTitle(mModeling->getFileName());
     mModeling->vpz().project().model().setModel(mModeling->getTopModel());
     redrawModelTreeBox();
     redrawModelClassBox();
     if (utils::Package::package().name().empty()) {
-	mModeling->setFileName("noname.vpz");
+        mModeling->setFileName("noname.vpz");
     } else {
-	mModeling->setFileName(Glib::build_filename(
+        mModeling->setFileName(Glib::build_filename(
                                    utils::Path::path().getPackageExpDir(),
                                    "noname.vpz"));
     }
     mModeling->setSaved(false);
-    setModified(true);
+    mModeling->setModified(true);
     addView(mModeling->getTopModel());
     getEditor()->openTabVpz(mModeling->getFileName(), mModeling->getTopModel());
     setModifiedTitle(mModeling->getFileName());
@@ -388,14 +403,15 @@ void GVLE::start(const std::string& path, const std::string& fileName)
 {
     mModeling->clearModeling();
     mModeling->delNames();
-    mModeling->setTopModel(mModeling->newCoupledModel(0, "Top model", "", 0, 0));
+    mModeling->setTopModel(mModeling->newCoupledModel(0,
+                                                      "Top model", "", 0, 0));
     setTitle(mModeling->getFileName());
     mModeling->vpz().project().model().setModel(mModeling->getTopModel());
     redrawModelTreeBox();
     redrawModelClassBox();
     mModeling->setFileName(path + "/" + fileName);
     mModeling->setSaved(false);
-    setModified(true);
+    mModeling->setModified(true);
     addView(mModeling->getTopModel());
     getEditor()->openTabVpz(mModeling->getFileName(), mModeling->getTopModel());
     setModifiedTitle(mModeling->getFileName());
@@ -408,7 +424,7 @@ void GVLE::parseXML(const std::string& filename)
     mModeling->setFileName(filename);
     addView(mModeling->getTopModel());
     mModeling->setSaved(true);
-    setModified(false);
+    mModeling->setModified(false);
     setTitle(mModeling->getFileName());
 }
 
@@ -475,7 +491,7 @@ void GVLE::refreshViews()
 void GVLE::redrawView()
 {
     View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getView();
+        mEditor->get_nth_page(mCurrentTab))->getView();
     currentView->redraw();
 }
 
@@ -518,8 +534,8 @@ bool GVLE::on_focus_in_event(GdkEventFocus* /*event*/) {
 bool GVLE::on_delete_event(GdkEventAny* event)
 {
     if (event->type == GDK_DELETE) {
-	onQuit();
-	return true;
+        onQuit();
+        return true;
     }
     return false;
 }
@@ -860,7 +876,8 @@ void GVLE::onSaveAs()
 
         // to provide a default filename
         // but also a default location
-        file.set_filename(dynamic_cast < Document* >(mEditor->get_nth_page(page))
+        file.set_filename(dynamic_cast < Document* >(mEditor->
+                                                     get_nth_page(page))
                           ->filepath());
 
         if (file.run() == Gtk::RESPONSE_OK) {
@@ -1051,7 +1068,8 @@ void GVLE::onConditionsBox()
                     mModeling->vpz().project().model().atomicModels());
                 atomlist.updateCondition(it->first, it->second);
 
-                vpz::ClassList::iterator itc = mModeling->vpz().project().classes().begin();
+                vpz::ClassList::iterator itc = mModeling->
+                    vpz().project().classes().begin();
 
                 while (itc != mModeling->vpz().project().classes().end()) {
                     vpz::AtomicModelList& atomlist(
@@ -1162,7 +1180,7 @@ void GVLE::saveVpz()
             mEditor->getDocuments().find(mModeling->getFileName());
 
         mModeling->saveXML(mModeling->getFileName());
-        setModified(false);
+        mModeling->setModified(false);
         setTitle(mModeling->getFileName());
         if (it != mEditor->getDocuments().end()) {
             it->second->setTitle(mModeling->getFileName(),
@@ -1522,7 +1540,8 @@ void GVLE::makeAllProject()
 
         Package::package().select(*itDependencies);
 
-        insertLog("configure package " + utils::Package::package().name() + "\n");
+        insertLog("configure package " +
+                  utils::Package::package().name() + "\n");
 
         Package::package().configure();
 
@@ -1539,9 +1558,11 @@ void GVLE::displayDependencies()
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
         if (it->second.empty()) {
-            dependsbuffer += "<b>" + utils::Path::basename(it->first) + "</b> : -\n";
+            dependsbuffer += "<b>" + utils::Path::basename(it->first) +
+                "</b> : -\n";
         } else {
-            dependsbuffer += "<b>" + utils::Path::basename(it->first) + "</b> : ";
+            dependsbuffer += "<b>" + utils::Path::basename(it->first) +
+                "</b> : ";
 
             Depends::const_iterator jt = it->second.begin();
             while (jt != it->second.end()) {
@@ -1673,7 +1694,8 @@ void parse_model(vpz::AtomicModelList& list)
     vpz::AtomicModelList::iterator it = list.begin();
     while (it != list.end()) {
         if (it->first)
-            std::cout << "\t" << it->first << " : " << it->first->getName() << "\n";
+            std::cout << "\t" << it->first << " : " <<
+                it->first->getName() << "\n";
         else
             std::cout << "\tNULL\n";
 
@@ -1780,7 +1802,8 @@ void GVLE::cut(graph::ModelList& lst, graph::CoupledModel* gc,
                    std::string className)
 {
     if (className.empty()) {
-        mCutCopyPaste.cut(lst, gc, mModeling->vpz().project().model().atomicModels());
+        mCutCopyPaste.cut(lst, gc, mModeling->vpz().
+                          project().model().atomicModels());
     } else {
         mCutCopyPaste.cut(lst, gc, mModeling->vpz().project().
                           classes().get(className).atomicModels());
@@ -1803,10 +1826,12 @@ void GVLE::copy(graph::ModelList& lst, graph::CoupledModel* gc,
             lst2[model->getName()] = model;
             mCutCopyPaste.copy(lst2, gc,
                                mModeling->vpz().project().classes()
-                               .get(mModeling->getSelectedClass()).atomicModels(), true);
+                               .get(mModeling->getSelectedClass())
+                               .atomicModels(), true);
         } else {
             mCutCopyPaste.copy(lst, gc,
-                               mModeling->vpz().project().model().atomicModels(),
+                               mModeling->vpz().project().model().
+                               atomicModels(),
                                false);
         }
     } else {
@@ -1819,7 +1844,8 @@ void GVLE::copy(graph::ModelList& lst, graph::CoupledModel* gc,
 void GVLE::paste(graph::CoupledModel* gc, std::string className)
 {
     if (className.empty()) {
-        mCutCopyPaste.paste(gc, mModeling->vpz().project().model().atomicModels());
+        mCutCopyPaste.paste(gc, mModeling->vpz().project().model().
+                            atomicModels());
     } else {
         mCutCopyPaste.paste(gc, mModeling->vpz().project().classes().
                             get(className).atomicModels());
@@ -1837,16 +1863,7 @@ bool GVLE::paste_is_empty() {
 
 void GVLE::setModified(bool modified)
 {
-    if (mModeling->isModified() != modified) {
-        mModeling->setModified(modified);
-
-        if (mModeling->isModified()) {
-            setModifiedTitle(mModeling->getFileName());
-            getMenu()->showSave();
-        } else {
-            getMenu()->hideSave();
-        }
-    }
+    mModeling->setModified(modified);
 }
 
 void GVLE::clearCurrentModel()
@@ -1930,7 +1947,7 @@ void GVLE::importModelToClass(vpz::Vpz* src, std::string& className)
     boost::trim(className);
 
     if (mImportModelBox) {
-	if (mImportModelBox->show(src)) {
+        if (mImportModelBox->show(src)) {
             mModeling->importModelToClass(src, className);
             redrawModelClassBox();
             refreshViews();
@@ -1944,7 +1961,7 @@ void GVLE::importClasses(vpz::Vpz* src)
     assert(src);
 
     if (mImportClassesBox) {
-	mImportClassesBox->show(src);
+        mImportClassesBox->show(src);
     }
 }
 
@@ -2094,7 +2111,7 @@ void GVLE::onOrder()
             mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
     }
     tab->onOrder();
-    setModified(true);
+    mModeling->setModified(true);
 }
 
 void GVLE::onTrouble()

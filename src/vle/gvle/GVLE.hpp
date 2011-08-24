@@ -56,6 +56,8 @@
 #include <list>
 #include <map>
 
+#include <sigc++/sigc++.h>
+
 namespace vle { namespace gvle {
 
 class Document;
@@ -118,6 +120,12 @@ public:
     virtual ~GVLE();
 
     void setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml);
+
+    /**
+     * @brief update the view when Modeling mention that the vpz is
+     * modified.
+     */
+    void onSignalModified();
 
     /**
      * @brief Used to erase the status bar.
@@ -589,7 +597,8 @@ public:
      * @param lst list of selected GModel.
      * @param gc parent of selected GModel.
      */
-    void cut(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
+    void cut(graph::ModelList& lst, graph::CoupledModel* gc,
+             std::string className);
 
     /**
      * detach the list of GModel of GCoupledModel parent.
@@ -597,7 +606,8 @@ public:
      * @param lst list of selected GModel.
      * @param gc parent of selected GModel.
      */
-    void copy(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
+    void copy(graph::ModelList& lst, graph::CoupledModel* gc,
+              std::string className);
 
     /**
      * paste the current list GModel into GCoupledModel ; rename

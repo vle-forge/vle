@@ -263,7 +263,6 @@ void View::addAtomicModel(int x, int y)
                 redraw();
 		mGVLE->redrawModelTreeBox();
 		mGVLE->redrawModelClassBox();
-                mGVLE->setModified(true);
             } catch (utils::SaxParserError& e) {
                 Error(e.what());
             }
@@ -297,7 +296,6 @@ void View::addCoupledModel(int x, int y)
             mGVLE->redrawModelTreeBox();
             mGVLE->redrawModelClassBox();
             mSelectedModels.clear();
-            mGVLE->setModified(true);
         } else {
             graph::Model* model = mCurrent->findModel(box->getName());
             bool select = false;
@@ -324,7 +322,6 @@ void View::addCoupledModel(int x, int y)
                 mGVLE->redrawModelTreeBox();
                 mGVLE->redrawModelClassBox();
                 mSelectedModels.clear();
-                mGVLE->setModified(true);
             }
         }
     }
