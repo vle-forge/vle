@@ -34,6 +34,7 @@
 #include <vle/manager/TotalExperimentGenerator.hpp>
 #include <vle/manager/LinearExperimentGenerator.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
@@ -69,6 +70,7 @@ void ManagerRunMono::operator()(const vpz::Vpz& file)
     m_exp->saveVPZinstance(m_writefile);
     m_exp->build(&m_matrix);
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager modulemgr;
 
     std::ostringstream ostr;
@@ -152,6 +154,7 @@ void ManagerRunThread::run()
     int replica = 0;
     oov::OutputMatrixViewList views;
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager modulemgr;
 
     for (;;) {

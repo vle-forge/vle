@@ -59,6 +59,7 @@ BOOST_AUTO_TEST_CASE(test_dess1)
     vpz::Output& o(file.project().experiment().views().outputs().get("o3"));
     o.setLocalStream("", "storage", std::string());
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager man;
     manager::RunQuiet r(man);
     r.start(file);
@@ -90,6 +91,7 @@ BOOST_AUTO_TEST_CASE(test_dess2)
     vpz::Output& o(file.project().experiment().views().outputs().get("o5"));
     o.setLocalStream("", "storage", std::string());
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager man;
     manager::RunQuiet r(man);
     r.start(file);

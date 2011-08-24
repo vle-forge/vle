@@ -30,6 +30,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/manager/Run.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace vle { namespace examples { namespace recursives {
@@ -63,6 +64,7 @@ public:
         graph::Model::rename(file.project().model().model(),
                              boost::lexical_cast < std::string >(nb + 1));
 
+        utils::SharedLibraryManager slm;
         utils::ModuleManager man;
         manager::RunQuiet r(man); // build a VLE manager
         r.start(file);       // execute the local file simulation

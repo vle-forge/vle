@@ -30,6 +30,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/manager/Run.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 
 namespace vle { namespace examples { namespace recursives {
 
@@ -48,6 +49,7 @@ public:
     {
         vpz::Vpz file(utils::Path::path().getExampleFile("counter.vpz"));
 
+        utils::SharedLibraryManager slm;
         utils::ModuleManager man;
         manager::RunQuiet r(man);    // build a VLE manager
         r.start(file);          // exacute the local file simulation

@@ -29,6 +29,7 @@
 #include <vle/manager/JustRun.hpp>
 #include <vle/manager/Run.hpp>
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 
 namespace vle { namespace manager {
 
@@ -42,6 +43,7 @@ bool JustRunMono::operator()(const CmdArgs& args)
     int i = 0;
     bool success = true;
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager modulemgr;
 
     if (m_output) {
@@ -133,6 +135,7 @@ void JustRunThread::run()
     int instance = 0;
     oov::OutputMatrixViewList views;
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager modulemgr;
 
     for (;;) {

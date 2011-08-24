@@ -30,6 +30,7 @@
 #define VLE_GVLE_LAUNCHSIMULATIONBOX_HPP
 
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 #include <libglademm.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/radiobutton.h>
@@ -62,6 +63,7 @@ private:
     /* The VPZ to execute */
     const vpz::Vpz& mVpz;
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager mLoadedPlugin; /**< Stores the loaded plug-ins before
                                           simulation. In the dtor of
                                           LaunchSimulationBox we erase all

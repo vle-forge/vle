@@ -33,6 +33,7 @@
 #include <glibmm/thread.h>
 #include <glibmm/threadpool.h>
 #include <queue>
+#include <vle/utils/SharedLibraryManager.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/manager/JustRun.hpp>
 
@@ -94,6 +95,7 @@ namespace vle { namespace manager {
         Glib::Cond                      mCondWait;
         Glib::Cond                      mCondRun;
 
+        utils::SharedLibraryManager slm;
         utils::ModuleManager            mModulemgr;
     };
 

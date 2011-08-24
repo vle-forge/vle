@@ -33,6 +33,7 @@
 #include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 
 namespace vle { namespace gvle {
 
@@ -225,6 +226,7 @@ private:
     PluginFactory(const PluginFactory& other);
     PluginFactory& operator=(const PluginFactory& other);
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager m_modulemgr;
 
     OutputPluginList m_outs;

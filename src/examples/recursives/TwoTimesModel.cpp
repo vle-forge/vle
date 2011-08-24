@@ -31,6 +31,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/manager/Run.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/SharedLibraryManager.hpp>
 #include <iostream>
 
 namespace vle { namespace examples { namespace recursives {
@@ -79,6 +80,7 @@ public:
     }
 
 private:
+    utils::SharedLibraryManager m_slm;
     utils::ModuleManager m_manager;
     devs::RootCoordinator m_root;
     bool m_stop;

@@ -82,7 +82,6 @@ class SharedLibraryManager::Pimpl
 #else
             if (fs::is_directory(lib)) {
 #endif
-
                 fs::directory_iterator it(lib), end;
                 for (; it != end; ++it) {
                     if (fs::is_regular_file(it->status())) {
@@ -120,6 +119,7 @@ public:
         fs::path path = utils::Path::path().getPackagesDir();
 #if BOOST_VERSION > 104500
         ss::error_code ec;
+
         if (fs::is_directory(path, ec)) {
 #else
         if (fs::is_directory(path)) {

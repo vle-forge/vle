@@ -56,6 +56,7 @@ BOOST_AUTO_TEST_CASE(test_agentonly)
 {
     vpz::Vpz file(utils::Path::path().getExampleFile("agentonly.vpz"));
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager man;
     manager::RunQuiet r(man);
     r.start(file);
@@ -91,6 +92,7 @@ BOOST_AUTO_TEST_CASE(test_agentonlyprecedenceconstraint)
 {
     vpz::Vpz file(utils::Path::path().getExampleFile("agentonlyc.vpz"));
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager man;
     manager::RunQuiet r(man);
     r.start(file);
@@ -126,6 +128,7 @@ BOOST_AUTO_TEST_CASE(test_agentonlywakeup)
 {
     vpz::Vpz file(utils::Path::path().getExampleFile("agentonlywakeup.vpz"));
 
+    utils::SharedLibraryManager slm;
     utils::ModuleManager man;
     manager::RunQuiet r(man);
     r.start(file);
