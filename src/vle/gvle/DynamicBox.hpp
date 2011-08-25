@@ -89,7 +89,6 @@ namespace vle { namespace gvle {
         Gtk::ComboBoxText*                  mComboPackage;
         Gtk::Entry*                         mLocationHost;
         Gtk::SpinButton*                    mLocationPort;
-        Gtk::Entry*                         mModel;
         Gtk::ComboBoxText*                  mLanguage;
         Gtk::Button*                        mButtonNew;
         vpz::Dynamic*                       mDyn;

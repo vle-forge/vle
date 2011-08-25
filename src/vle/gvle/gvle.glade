@@ -1590,49 +1590,6 @@
                         <property name="position">1</property>
                       </packing>
                     </child>
-                    <child>
-                      <widget class="GtkHBox" id="hbox18">
-                        <property name="visible">True</property>
-                        <child>
-                          <widget class="GtkLabel" id="label31">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Model</property>
-                          </widget>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="padding">10</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkEntry" id="EntryDynamicModel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                          </widget>
-                          <packing>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="padding">10</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label59">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;span style="oblique" size="medium" foreground="grey50"&gt;The Model corresponds to the 'xxx' from DECLARE_NAMED_DYNAMICS(xxx, yyy)
-in the C++ source code. Library is the name of the shared library which
-containts your devs::Dynamics source code&lt;/span&gt;</property>
-                        <property name="use_markup">True</property>
-                        <property name="justify">right</property>
-                      </widget>
-                      <packing>
-                        <property name="position">3</property>
-                      </packing>
-                    </child>
                   </widget>
                 </child>
               </widget>
@@ -5957,56 +5914,6 @@ into your project.
                                     <property name="expand">False</property>
                                     <property name="fill">False</property>
                                     <property name="position">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkHBox" id="hbox4">
-                                    <property name="visible">True</property>
-                                    <child>
-                                      <widget class="GtkLabel" id="label8">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">Model</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">False</property>
-                                        <property name="padding">5</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkEntry" id="entryModel">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="invisible_char">&#x25CF;</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="padding">5</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label5">
-                                    <property name="visible">True</property>
-                                    <property name="sensitive">False</property>
-                                    <property name="label" translatable="yes">The Model corresponds to the 'xxx' from DECLARE_NAMES_DYNAMICS(xxx,yyy)
-in the C++ source code. Library is the name of the shared library which
-contains your devs::Dynamics source code</property>
-                                    <property name="use_markup">True</property>
-                                    <property name="justify">right</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="padding">5</property>
-                                    <property name="position">3</property>
                                   </packing>
                                 </child>
                               </widget>

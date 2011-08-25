@@ -75,7 +75,6 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 
     xml->get_widget("EntryDynamicLocationHost", mLocationHost);
     xml->get_widget("SpinbuttonDynamicLocationPort", mLocationPort);
-    xml->get_widget("EntryDynamicModel", mModel);
 
     {
         xml->get_widget("HboxDynamicLanguage", mBoxDynamicLanguage);
@@ -248,7 +247,6 @@ void DynamicBox::onNewLibrary()
                 mComboPackage->set_active_text(box2.getNamespace());
                 mComboLibrary->append_text(box2.getClassName());
                 mComboLibrary->set_active_text(box2.getClassName());
-                mModel->set_text("");
             }
         }
     }
