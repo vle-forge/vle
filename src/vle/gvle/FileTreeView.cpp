@@ -105,7 +105,7 @@ FileTreeView::FileTreeView(BaseObjectType* cobject,
     signal_event().connect(sigc::mem_fun(*this, &FileTreeView::onEvent));
 
     Glib::RefPtr<Gtk::TreeSelection> selection = Gtk::TreeView::get_selection();
-    
+
     selection->set_select_function(
         sigc::mem_fun(*this, &FileTreeView::onSelect) );
 }
@@ -210,22 +210,29 @@ Gtk::TreeModel::iterator FileTreeView::getFileRow(
     std::vector <std::string> path,
     Gtk::TreeModel::Children child)
 {
-    Gtk::TreeModel::iterator iter = child.begin();
-    std::vector <std::string>::iterator itPath = path.begin();
+    typedef std::vector < std::string > PathList;
 
-    while (iter != child.end()) {
-        if ((*iter).get_value(mColumns.mColname) == *itPath) {
-            if ((itPath + 1) == path.end()){
-                return iter;
+    PathList::const_iterator jt = path.begin();
+    Gtk::TreeModel::iterator it;
+    Gtk::TreeModel::Children children = child;
+
+    while (jt != path.end()) {
+        it = children.begin();
+        while (it != children.end()) {
+            if ((*it).get_value(mColumns.mColname) == *jt) {
+                children = (*it).children();
+                jt++;
+                break;
+            } else {
+                it++;
             }
-            itPath++;
-            iter = (*iter).children().begin();
         }
-        else {
-            iter++;
-        }
+        return child.end(); /* An element of the path was not found in a sub
+                               model of TreeModel. We return the end iterator
+                               of child parameter. */
     }
-    return iter;
+    return it; /* Current iterator it reference the correct row in the
+                  TreeModel. */
 }
 
 void FileTreeView::showRow(std::string pathFile)
@@ -238,21 +245,22 @@ void FileTreeView::showRow(std::string pathFile)
     boost::algorithm::split(lst, path, boost::is_any_of("/"),
                             boost::algorithm::token_compress_on);
 
-    Gtk::TreeModel::iterator iter = getFileRow(lst,
-                                               mTreeModel->children());
+    Gtk::TreeModel::iterator it = getFileRow(lst, mTreeModel->children());
+    if (it != mTreeModel->children().end()) {
+        expand_to_path(Gtk::TreePath(it));
 
-    expand_to_path(Gtk::TreePath(iter));
+        Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = get_selection();
+        if (refTreeSelection) {
+            refTreeSelection->set_select_function(
+                sigc::mem_fun(*this, &FileTreeView::onSelectHighlightOnly));
 
-    Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = get_selection();
+            refTreeSelection->unselect_all();
+            refTreeSelection->select(it);
 
-    refTreeSelection->set_select_function(
-        sigc::mem_fun(*this, &FileTreeView::onSelectHighlightOnly));
-
-    refTreeSelection->unselect_all();
-    refTreeSelection->select(iter);
-
-    refTreeSelection->set_select_function(
-        sigc::mem_fun(*this, &FileTreeView::onSelect) );
+            refTreeSelection->set_select_function(
+                sigc::mem_fun(*this, &FileTreeView::onSelect) );
+        }
+    }
 }
 
 bool FileTreeView::isDirectory(const std::string& dirname)
@@ -312,9 +320,9 @@ void FileTreeView::onEditionStarted(Gtk::CellEditable* /*cell*/,
                                     const Glib::ustring& path)
 {
     Gtk::TreeModel::Path selectedpath(path);
-    Gtk::TreeModel::iterator iter = mTreeModel->get_iter(selectedpath);
+    Gtk::TreeModel::iterator it = mTreeModel->get_iter(selectedpath);
 
-    Gtk::TreeModel::Row row = *iter;
+    Gtk::TreeModel::Row row = *it;
     if (row) {
         mOldName = row.get_value(mColumns.mColname);
     } else {
@@ -610,9 +618,9 @@ void FileTreeView::onPaste()
 }
 
 bool FileTreeView::on_foreach(const Gtk::TreeModel::Path&,
-                              const Gtk::TreeModel::iterator& iter)
+                              const Gtk::TreeModel::iterator& it)
 {
-    const Gtk::TreeModel::Row row = *iter;
+    const Gtk::TreeModel::Row row = *it;
 
     std::list < std::string > lstpath;
     projectFilePath(row, lstpath);
@@ -623,7 +631,7 @@ bool FileTreeView::on_foreach(const Gtk::TreeModel::Path&,
     if (filePath == m_search) {
         mCellrenderer->property_editable() = true;
         Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
-        set_cursor(mTreeModel->get_path(iter),*nameCol,true);
+        set_cursor(mTreeModel->get_path(it),*nameCol,true);
         return true;
     }
     return false;
@@ -830,10 +838,10 @@ void FileTreeView::removeFiles(const Gtk::TreeModel::Row* parent,
 
     for (std::list < Gtk::TreeModel::RowReference >::iterator it =
              rows.begin(); it != rows.end(); ++it) {
-        Gtk::TreeModel::iterator treeiter =
+        Gtk::TreeModel::iterator treeit =
             mTreeModel->get_iter(it->get_path());
 
-        mTreeModel->erase(treeiter);
+        mTreeModel->erase(treeit);
     }
 }
 
