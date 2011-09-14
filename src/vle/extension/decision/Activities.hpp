@@ -181,7 +181,8 @@ public:
     {
         const_iterator it = m_lst.find(name);
         if (it == m_lst.end()) {
-            throw utils::ArgError("Decision: unknown activity");
+            throw utils::ArgError(
+                vle::fmt(_("Decision: unknown activity '%1%'")) % name);
         }
         return it;
     }
@@ -190,7 +191,8 @@ public:
     {
         iterator it = m_lst.find(name);
         if (it == m_lst.end()) {
-            throw utils::ArgError("Decision: unknown activity");
+            throw utils::ArgError(
+                vle::fmt(_("Decision: unknown activity '%1%'")) % name);
         }
         return it;
     }

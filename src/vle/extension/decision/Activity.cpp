@@ -36,8 +36,8 @@ namespace vle { namespace extension { namespace decision {
 bool Activity::validRules() const
 {
     if (not m_rules.empty()) {
-	Rules::result_t result = m_rules.apply();
-	return not result.empty();
+       Rules::result_t result = m_rules.apply();
+       return not result.empty();
     }
     return true;
 }
@@ -47,7 +47,9 @@ void Activity::initStartTimeFinishTime(const devs::Time& start,
 {
     if (start > finish) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint start before finish"));
+            vle::fmt(_("Decision: temporal constraint expected : "
+                    "start (%1%) before finish (%2%)"))
+            % start % finish);
     }
 
     m_date = (DateType)(Activity::START | Activity::FINISH);
@@ -61,8 +63,9 @@ void Activity::initStartTimeFinishRange(const devs::Time& start,
 {
     if (not (start < minfinish and minfinish < maxfinish)) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint start before "
-                    "minfinish before maxfinish"));
+            vle::fmt(_("Decision: temporal constraint expected : start (%1%) "
+                    "before minfinish (%2%) before maxfinish (%3%)"))
+            % start % minfinish % maxfinish);
     }
 
     m_date = (DateType)(Activity::START | Activity::MINF | Activity::MAXF);
@@ -77,8 +80,9 @@ void Activity::initStartRangeFinishTime(const devs::Time& minstart,
 {
     if (not (minstart < maxstart and maxstart < finish)) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint start before "
-                    "minfinish before maxfinish"));
+            vle::fmt(_("Decision: temporal constraint expected : minstart (%1%)"
+                    " before maxstart (%2%) before finish (%3%)"))
+            % minstart % maxstart % finish);
     }
 
     m_date = (DateType)(Activity::MINS | Activity::MAXS | Activity::FINISH);
@@ -95,9 +99,11 @@ void Activity::initStartRangeFinishRange(const devs::Time& minstart,
     if (not (minstart < maxstart and minstart < maxfinish
              and minfinish < maxfinish)) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint minstart before maxstart and "
-                    "minfinish before maxfinish and minstart before "
-                    "maxfinish"));
+            vle::fmt(_("Decision: temporal constraint expected : minstart (%1%)"
+                    " before maxstart (%2%) and minfinish (%3%) before"
+                    " maxfinish (%4%) and minstart (%1%) before"
+                    " maxfinish (%4%)"))
+            % minstart % maxstart % minfinish % maxfinish );
     }
 
     m_date = (DateType)(Activity::MINF | Activity::MAXF | Activity::MINS |

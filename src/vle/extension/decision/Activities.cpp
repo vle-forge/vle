@@ -40,7 +40,8 @@ Activity& Activities::add(const std::string& name, const Activity& act,
     iterator it(m_lst.find(name));
 
     if (it != m_lst.end()) {
-        throw utils::ArgError(_("Decision: activity already exist"));
+        throw utils::ArgError(
+            vle::fmt(_("Decision: activity '%1%' already exist")) % name);
     }
 
     Activity& a((*m_lst.insert(value_type(name, act)).first).second);
@@ -62,7 +63,8 @@ Activity& Activities::add(const std::string& name,
     iterator it(m_lst.find(name));
 
     if (it != m_lst.end()) {
-        throw utils::ArgError(_("Decision: activity already exist"));
+        throw utils::ArgError(
+            vle::fmt(_("Decision: activity '%1%' already exist")) % name);
     }
 
     Activity& a((*m_lst.insert(value_type(name, Activity())).first).second);

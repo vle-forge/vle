@@ -37,7 +37,8 @@ Rule& Rules::add(const std::string& name, const Rule& rule)
     const_iterator it(m_lst.find(name));
 
     if (it != m_lst.end()) {
-        throw utils::ArgError("Decision: rule already exist");
+        throw utils::ArgError(vle::fmt(_("Decision: rule '%1%' already exists"))
+            % name);
     }
 
     return (*m_lst.insert(value_type(name, rule)).first).second;
@@ -76,7 +77,8 @@ const Rule& Rules::get(const std::string& name) const
     const_iterator it = m_lst.find(name);
 
     if (it == m_lst.end()) {
-        throw utils::ArgError(_("Decision: rule does not exist"));
+        throw utils::ArgError(vle::fmt(_("Decision: rule '%1%' does not exist"))
+            % name);
     }
 
     return it->second;
