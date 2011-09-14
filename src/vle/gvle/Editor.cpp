@@ -56,7 +56,7 @@ Document::Document(GVLE* gvle, const std::string& filepath) :
 }
 
 Document::Document() :
-    Gtk::ScrolledWindow()
+    Gtk::ScrolledWindow(), mGVLE(0)
 {
     setModified(false);
 }
@@ -65,22 +65,24 @@ void Document::setTitle(const std::string& filePath,
 			graph::Model* model,
 			bool modified)
 {
-    if (utils::Path::extension(filePath) == ".vpz") {
-	mTitle = utils::Path::basename(filePath) +
-	    utils::Path::extension(filePath) + " - " +
-	    model->getName();
-    } else {
-	mTitle = utils::Path::basename(filePath) +
-	    utils::Path::extension(filePath);
+    if (mGVLE) {
+        if (utils::Path::extension(filePath) == ".vpz") {
+            mTitle = utils::Path::basename(filePath) +
+                utils::Path::extension(filePath) + " - " +
+                model->getName();
+        } else {
+            mTitle = utils::Path::basename(filePath) +
+                utils::Path::extension(filePath);
+        }
+        if (modified) {
+            mTitle = "* " + mTitle;
+            setModified(true);
+        } else {
+            setModified(false);
+        }
+        mGVLE->getEditor()->setModifiedTab(mTitle, filePath, mFilePath);
+        mFilePath = filePath;
     }
-    if (modified) {
-	mTitle = "* " + mTitle;
-	setModified(true);
-    } else {
-	setModified(false);
-    }
-    mGVLE->getEditor()->setModifiedTab(mTitle, filePath, mFilePath);
-    mFilePath = filePath;
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -130,6 +132,7 @@ DocumentText::DocumentText(GVLE* gvle,
 }
 
 DocumentText::DocumentText(const std::string& buffer)
+    : Document()
 {
     mIdLang = "cpp";
 
@@ -152,8 +155,10 @@ void DocumentText::save()
 	mNew = false;
 	setModified(false);
 	mTitle = filename() + utils::Path::extension(filepath());
-	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
-        mGVLE->getMenu()->hideSave();
+        if (mGVLE) {
+            mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
+            mGVLE->getMenu()->hideSave();
+        }
     } catch(std::exception& e) {
 	throw _("Error while saving file.");
     }
@@ -171,8 +176,11 @@ void DocumentText::saveAs(const std::string& newFilePath)
 	mNew = false;
 	setModified(false);
 	mTitle = filename() + utils::Path::extension(filepath());
-	mGVLE->getEditor()->setModifiedTab(mTitle, newFilePath, oldFilePath);
-        mGVLE->getMenu()->hideSave();
+        if (mGVLE) {
+            mGVLE->getEditor()->setModifiedTab(mTitle, newFilePath,
+                                               oldFilePath);
+            mGVLE->getMenu()->hideSave();
+        }
     } catch (const std::exception& /*e*/) {
 	throw _("Error while saving file.");
     }
@@ -316,9 +324,15 @@ void DocumentText::onChanged()
 {
     if (not isModified()) {
         setModified(true);
-        mGVLE->getMenu()->showSave();
-        mTitle = "* "+ mTitle;
-        mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
+
+        if (mGVLE) { /* We need to protect the following methods since the
+                        DocumentText class may be used into ModelingPlugin
+                        without any reference to the global context GVLE
+                        (closes #3405385). */
+            mGVLE->getMenu()->showSave();
+            mTitle = "* "+ mTitle;
+            mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
+        }
     }
 }
 
