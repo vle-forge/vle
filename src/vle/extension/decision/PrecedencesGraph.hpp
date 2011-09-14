@@ -47,7 +47,7 @@ public:
     typedef PrecedencesIn::iterator iteratorIn;
     typedef PrecedencesOut::iterator iteratorOut;
 
-    typedef std::pair < iteratorIn, iteratorOut > findIn;
+    typedef std::pair < iteratorIn, iteratorIn > findIn;
     typedef std::pair < iteratorOut, iteratorOut > findOut;
 
     void add(const PrecedenceConstraint& p);

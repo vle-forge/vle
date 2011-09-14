@@ -391,13 +391,20 @@ BOOST_AUTO_TEST_CASE(During1)
 
     base.processChanges(4.0);
     lst = base.endedActivities();
-    BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(1));
+    BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(0));
     lst = base.startedActivities();
+    BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(1));
+    lst = base.failedActivities();
     BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(1));
 
     base.processChanges(5.0);
-    lst = base.failedActivities();
+    lst = base.endedActivities();
     BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(0));
+    lst = base.startedActivities();
+    BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(1));
+    lst = base.failedActivities();
+    BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(1));
+
 }
 
 BOOST_AUTO_TEST_CASE(During2)
