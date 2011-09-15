@@ -1,3 +1,61 @@
+VLE 1.0.0
+=========
+
+A final release
+
+Application
+~~~~~~~~~~~
+
+- gvle:
+  - add the item "Select All" in to the "Edit" menu.
+  - use Modeling like the M of MVC.
+  - add a tooltip for the experimental conditions.
+  - select the file of the focused tab & vice versa.
+  - update the OpenPackageBox Dialog.
+  - fix segfault in FileTreeView::getFileRow.
+  - fix segfault in Editor when used by plugins.
+
+VFL (VLE Foundation Libraries)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- devs:
+  - fix double delete on a raised exception.
+
+- extension/decision:
+  - fix a FF constraint behavior.
+
+- extension/difference-equation:
+  - add a model for coupling DE and QSS/DESS models: DifferenceEquationAdaptor).
+    This model transforms an output of QSS or DESS models in order to the events
+    are compatible with DE extension. At each time step of DE model, the adaptor
+    model sends the last values of QSS/DESS model.
+  - add test on internal variable creation.
+  - fix bugs in initValue method: The initial phase of a multiple difference
+    equation model was not clear and some controls are not realized. Now, the
+    rules are :
+    - if any initial values are not defined and the initValue is not implemented
+      or the initValue method is implemented but some variables are not
+      initialized then the value of un-initialized variables are fixed to 0.
+    - if some variables have an initial value defined in conditions then this
+      value is used to initialize the variable.
+    - if any initial values are not defined in conditions and the initValue
+      method is defined, the variables are initialized by assignment.
+  - detect a cycle with synchronous variables: In a special case, when the
+    observation occurs, if model is not completely initialized then a cycle of
+    synchronous variables is detected.
+
+- extension/fsa:
+  - fix bug on after/when clause: when an after/when clause is defined.
+    just after an automatic transition, this clause is ignored.
+  - add debug class and fix bugs.
+  - fix: when two transitions are defined with same event and two different
+    guards are defined, only one guard is used. The same problem exists with
+    after/when clauses.
+
+- oov:
+  - fix memory leaks in OutputMatrix.
+
+
 VLE 1.0.0-alpha6
 ================
 
