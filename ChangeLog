@@ -1,4 +1,311 @@
-vle-1.0.0-alpha6
+vle-1.0.0
+
+commit bc92b3eb2c27a52b0efe04f6e15ad2b6e73a366e
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Sep 15 13:57:02 2011 +0200
+
+    vle: update NEWS
+
+commit 1957ffe38d12e9cfc3d1bbbcd8a17d3b7d2b34e2
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Wed Sep 14 18:48:13 2011 +0200
+
+    ext/dec: fix a FF constraint behavior
+    
+    - on a FF(A,B) constraint, B could succeed even if A was not done.
+    - on a SS(A,B) constraint, B was always failed if A was failed, but if A
+      was failed after Start, B could have been started before and should
+      not fail because of A.
+    - the unit test During1 has been fixed.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 624fed8ab960d68c8876c0e7fc0c0e7418100a63
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Sep 14 11:06:22 2011 +0200
+
+    gvle: fix segfault in Editor when used by plugins
+    
+    We need to protect the mGVLE access in the gvle::DocumentText class
+    since this class may be used into gvle::ModelingPlugin without any
+    reference to the global context GVLE. (Closes: #3405385)
+
+commit 525697da474e48002fc8be73c6da5e86db4f7da0
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Sep 12 23:09:25 2011 +0200
+
+    gvle: fix segfault in FileTreeView::getFileRow
+    
+    We rewrite the FileTreeView::getFileRow function. The previous code does
+    not recursively browse the file tree view to find the correct path and
+    can use invalid iterator. (Closes: #3405383).
+    (cherry picked from commit ccaba75319c6ac57915cd7694287a20d74b06a27)
+
+commit 1fffa87b0cf9a3b168c707facbd6dc6e7eb66621
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Wed Aug 24 17:18:38 2011 +0200
+
+    gvle: fix the modifications management bug
+    
+    In order to get closer to the MVC pattern, and to fix the
+    modification management bug, a communication by signal between Modeling
+    and Gvle has been provided.
+    - A signal has been added to the Modeling class. As soon as a
+      modification of the the vpz is detected, the Modeling class does
+      emit a dedicated signal. The GVLE class does observe this signal and
+      update the views that needed to be.
+    - And, the method that manage the edited modified text files has been
+      reconnected to the dedicated signal of TextView widget.
+    (Closes: #3385666)
+
+commit 2309bd66fb65a9c284bd2f6ad004107b280edc68
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Tue Aug 23 10:58:41 2011 +0200
+
+    gvle: update the OpenPackageBox Dialog
+    
+    When a package is selected using the keyboard arrows, this can be
+    validated by clicking the validation button. And a default validation
+    behavior when using the "Enter" key has been set at the Dialog Window
+    level. Some refactoring has been done:
+    - The selection system use the Selection object of the treeview.
+    - The contextual menu popup is connected to the button_press_event by
+      the connect_notify method.
+    - The onRowActivated method calls the default_activation of the dialog
+      widget.
+
+commit d691119645de5e605df2200807a04e446305892c
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Thu Aug 18 11:23:53 2011 +0200
+
+    gvle: Revert "gvle: add accelerator key "Return" ..."
+    
+    This reverts commit 0b09d79aeabda7d99667156429c67cd8aae4a5c9.
+    The accelerator key configured at the button level of the action box
+    of the dialog windows has been removed. This policy seems not reliable
+    enough.
+    (Closes: #3385678)
+
+commit ddd35f4d4f753b98263914793f0b1d8d6df4648f
+Author: Bruno Bonté <bruno.bonte@cirad.fr>
+Date:   Tue Aug 16 09:11:39 2011 +0200
+
+    oov: fix memory leaks in OutputMatrix
+    
+    Delete a pointer to avoid memory leak in OutputMatrix.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+    (cherry picked from commit a349833d4a29d1500e20fa7cd355b94b707460b0)
+
+commit b7f54c18680518ffdeef5b2f3000413c881518d2
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Mon Jul 4 18:28:36 2011 +0200
+
+    devs: fix double delete on a raised exception
+    
+    an empty value attached to a port of a condition is now allowed,
+    exception is raised when using it (eg. Dynamics constructor).
+    (Closes: #3346036)
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 6f43f4f37b566b5192d7e99b827497ce6f2f34ae
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Thu Jul 21 17:13:37 2011 +0200
+
+    gvle: select the file of the focused tab & vice versa
+    
+    - add showRow method to focus a row with the selected tab's name.
+    - add an event in FileTreeView to select the good tab if this file is
+      open.
+    (Closes: #3306246)
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit 0121ff2483e8db9eb38204e0c01bce5392feada9
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Mon May 30 18:17:11 2011 +0200
+
+    gvle: add a tooltip for the experimental conditions
+    
+    Add a tooltip who shows atomic models and classes linked with this
+    Condition in ConditionsBox and AtomicModelBox. (Closes: #2898368)
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit fe06e78f88fe9aa8e8eb302495318c1e6004f9c4
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Thu May 19 16:46:32 2011 +0200
+
+    gvle: refactoring task, Modeling like the M of MVC
+    
+    Remove widget members from the class Modeling. Remove also the getters
+    used by mGVLE attribute in the class Modeling, and add a mGVLE members
+    to the classes who used Modeling to access GVLE. And finally remove
+    mGVLE from Modeling.
+    
+    - mListView, mAtomicBox, mImportModelBox, mCoupledBox and
+      mImportClassesBox move from the Modeling class to the GVLE class.
+    - the setGlade method in GVLE and Modeling has been updated.
+    - Related methods move from Modeling to GVLE :
+      - start (2 methods)
+      - addView (2 methods)
+      - addViewClass (2 methods)
+      - existView
+      - findView
+      - delViewIndex
+      - delViewOnModel
+      - delViews
+      - refreshViews
+      - importClasses
+      - EditCoupledModel
+      - importModelToClass
+      - importModel
+      - setModified
+      - setTitles
+      - cut
+      - copy
+      - paste
+      - selectAll
+      - paste_is_empty
+      - renameModel
+      - delModel
+    - add a GVLE attribute in CoupledModelBox.
+    - add getSelectedclass attribute in Modeling.
+    - move the CutCopyPaste attribute from Modeling to GVLE class.
+    - add parseXML method in GVLE class.
+    - rename mApp attribute in mGVLE in some classes.
+    (Closes: #3303166, #3302880, #3299240)
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit 23f56b3922b7e2aceec0737a3435763c00c46313
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Mon May 2 15:36:03 2011 +0200
+
+    gvle: add the item "Select All" in to the "Edit" menu
+    
+    - A "Control - A" shortcut is provided.
+    - Treatments according with the type of editors who use the "Select
+      All" method, have are provided. For the vpz Editor, all models in
+      the current Coupled Model are selected.
+    - In order to check if something can be pasted, the clipboard is
+      tested.
+    (Closes: #3029920, #3297528)
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit 0b09d79aeabda7d99667156429c67cd8aae4a5c9
+Author: Gaetan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+Date:   Wed Apr 27 15:45:53 2011 +0200
+
+    gvle: add accelerator key "Return" on Dialog Windows
+    
+    - Add the deicated property for all the dialog boxes in the gvle glade
+      file. Now, if "Enter" is pressed, the DialogBox is closed with the
+      treatment associated to the validation button.
+    (Closes: #3289715)
+    
+    Signed-off-by: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+
+commit dccf0176cb20e0e1d85541f8a8735e70a5473b2c
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Wed Jul 13 17:45:35 2011 +0200
+
+    ext/de: detect a cycle with synchronous variables
+    
+    In a special case, when the observation occurs, if model is not completely
+    initialized then a cycle of synchronous variables is detected.
+
+commit 49f3d69ca4e72880f256d72fc88903e6c9faff9a
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Wed Jul 13 16:54:02 2011 +0200
+
+    ext/de: fix bugs in initValue method
+    
+    The initial phase of a multiple difference equation model was not clear and
+    some controls are not realized. Now, the rules are :
+     - if any initial values are not defined and the initValue is not implemented or
+       the initValue method is implemented but some variables are not initialized then
+       the value of un-initialized variables are fixed to 0.
+     - if some variables have an initial value defined in conditions then this value
+       is used to initialize the variable
+     - if any initial values are not defined in conditions and the initValue method is
+       defined, the variables are initialized by assignment
+
+commit bc3490aa087e36ffb6c045ee1002f8e5ce9ed1db
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Thu Jul 7 10:42:59 2011 +0200
+
+    ext/de: add test on internal variable creation
+    
+    When the number of variables declared in variables conditions is
+    different from the number of variables declared in constructor of model,
+    some problems appear in perturbation process.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit dcb2fcce51445cdcadd834758f51a35ff042c89b
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Tue Jul 5 09:59:24 2011 +0200
+
+    ext/de: add a model for coupling DE and QSS/DESS models
+    
+    - add a new model (DifferenceEquationAdaptor). This model transforms an
+      output of QSS or DESS models in order to the events are compatible
+      with DE extension. At each time step of DE model, the adaptor model
+      sends the last values of QSS/DESS model.
+    - add a new attribute name for external events in QSS multiple
+      extension.
+    - qss_exp5.vpz and qss_exp6.vpz have a new model for the coupling.
+    - add two new unit tests.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 4c22e99f5142ffe0771fe3547b43d9b26d37af8d
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Jun 1 15:04:42 2011 +0200
+
+    vle: update mailmap
+    
+    Update the mailmap file to assign a new mail address to Éric Ramat.
+    (cherry picked from commit ff6ea37f5fb2df9e3af33175bd165b19fb3f18e1)
+
+commit 9e80c8a9ebdeff3019c78eb29633ea7d409cb15c
+Author: Eric Ramat <ramat@lisic.univ-littoral.fr>
+Date:   Thu May 26 13:57:33 2011 +0200
+
+    ext/fsa: add debug class and fix bugs
+    
+    Add a new debug class for statechart models.
+    
+    - Display initial state, fired transition, events and outputs.
+    - The names of actions, activities, guards aren't processed. Perhaps, in
+      a future version.
+    
+    When two transitions are defined with same event and two different
+    guards are defined, only one guard is used. The same problem exists with
+    after/when clauses.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 3dc66fa1b8fec53780929e6786f291b64cbb7bcb
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Mon May 23 21:01:05 2011 +0200
+
+    ext/fsa: fix bug on after/when clause
+    
+    When an after/when clause is defined just after an automatic transition,
+    this clause is ignored.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit bb065696f7be272548beb612faff01b9a6784fda
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed May 18 10:53:07 2011 +0200
+
+    vle-1.0.0-alpha6
 
 commit 8236ed4a3542035226454404b0da649c7172415f
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
