@@ -126,6 +126,17 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
         case Activity::DONE:
             switch (j.state()) {
             case Activity::WAIT:
+                {
+                    devs::Time dmin = i.startedDate() + mintimelag();
+                    devs::Time dmax = i.startedDate() + maxtimelag();
+                    if((dmin <= time) && (time <= dmax)){
+                        return std::make_pair(Valid, devs::Time::infinity);
+                    } else if (time < dmin){
+                        return std::make_pair(Wait, dmin);
+                    } else if (dmax < time){
+                        return std::make_pair(Failed, devs::Time::infinity);
+                    }
+                }
             case Activity::STARTED:
             case Activity::FF:
             case Activity::DONE:
