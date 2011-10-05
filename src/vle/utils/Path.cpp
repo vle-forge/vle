@@ -613,13 +613,13 @@ std::string Path::getExternalPackagePluginOutputDir(
 std::string Path::getExternalPackagePluginGvleModelingDir(
     const std::string& name) const
 {
-    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "output");
+    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "modeling");
 }
 
 std::string Path::getExternalPackagePluginGvleOutputDir(
     const std::string& name) const
 {
-    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "modeling");
+    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "output");
 }
 
 std::string Path::getExternalPackageFile(const std::string& name,
