@@ -15,7 +15,7 @@ BEGIN
             VALUE "FileDescription", "Output Of VLE"
             VALUE "FileVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
             VALUE "InternalName", "oov"
-            VALUE "LegalCopyright", "2003-2010 VLE Development Team"
+            VALUE "LegalCopyright", "2003-2011 VLE Development Team"
             VALUE "ProductName", "oov"
             VALUE "ProductVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
         END

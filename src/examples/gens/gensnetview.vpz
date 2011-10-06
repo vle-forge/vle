@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
-<vle_project version="0.7" date="Mon, 27 Dec 2010" author="Gauthier Quesnel, Raphael Duboz">
+<vle_project version="0.7" date="Mon, 27 Dec 2011" author="Gauthier Quesnel, Raphael Duboz">
 <structures>
 <model name="top" type="coupled" width="459"  >
 <submodels>
