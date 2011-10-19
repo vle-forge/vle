@@ -644,8 +644,9 @@ void Base::internalTransition(const Time& time)
         mSigma = mSigma2;
         break;
     case POST3:
-        mState = POST;
-        mSigma = 0;
+        mState = PRE;
+        mSigma = timeStep(time);
+        break;
     }
 }
 

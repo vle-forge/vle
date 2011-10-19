@@ -107,7 +107,6 @@ TARGET_LINK_LIBRARIES(earlyPerturb
   vlemanager
   vletranslator)
 
-
 INSTALL(TARGETS equation1
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
@@ -136,3 +135,71 @@ INSTALL(FILES equation1.vpz equation2.vpz equation3.vpz equation4.vpz
 
 INSTALL(FILES ${SOURCES1_CPP} ${SOURCES2_CPP} ${SOURCES3_CPP} ${SOURCES4_CPP}
     ${SOURCES5_CPP} DESTINATION "${VLE_SHARE_DIRS}/examples/sources/equation")
+
+#Compile and install files for confluentNosync test
+
+ADD_LIBRARY(confluentNosync_x SHARED confluentNosync_x.cpp)
+
+TARGET_LINK_LIBRARIES(confluentNosync_x
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator)
+
+INSTALL(TARGETS confluentNosync_x
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+
+ADD_LIBRARY(confluentNosync_perturb SHARED confluentNosync_perturb.cpp)
+
+TARGET_LINK_LIBRARIES(confluentNosync_perturb
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator)
+
+INSTALL(TARGETS confluentNosync_perturb
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+
+ADD_LIBRARY(confluentNosync_output SHARED confluentNosync_output.cpp)
+
+TARGET_LINK_LIBRARIES(confluentNosync_output
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator)
+
+INSTALL(TARGETS confluentNosync_output
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+
+INSTALL(FILES confluentNosync.vpz
+  DESTINATION "${VLE_SHARE_DIRS}/examples")
