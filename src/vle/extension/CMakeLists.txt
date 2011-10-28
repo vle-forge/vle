@@ -23,7 +23,7 @@ ENDIF(WIN32)
 SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp PetriNet.cpp
   ${OS_SPECIFIC_PATH_IMPL})
 
-SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp Decision.hpp DllDefines.hpp
+SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DllDefines.hpp
   DifferentialEquation.hpp DSDevs.hpp FSA.hpp PetriNet.hpp)
 
 SET(EXT_FSA_CPP fsa/FSA.cpp fsa/Moore.cpp fsa/Mealy.cpp fsa/FDDevs.cpp
@@ -40,19 +40,8 @@ SET(EXT_DIFFERENTIAL_EQUATION_HPP differential-equation/DifferentialEquation.hpp
   differential-equation/DESS.hpp differential-equation/QSS.hpp
   differential-equation/QSS2.hpp)
 
-SET(EXT_DECISION_CPP decision/Activities.cpp decision/Activity.cpp
-  decision/Agent.cpp decision/KnowledgeBase.cpp decision/Library.cpp
-  decision/Plan.cpp decision/PrecedenceConstraint.cpp
-  decision/PrecedencesGraph.cpp decision/Predicates.cpp decision/Rules.cpp)
-
-SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
-  decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
-  decision/Library.hpp decision/Plan.hpp decision/PrecedenceConstraint.hpp
-  decision/PrecedencesGraph.hpp decision/Predicates.hpp decision/Rule.hpp
-  decision/Rules.hpp decision/Table.hpp)
-
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP};
-  ${EXT_DECISION_HPP};${EXT_DECISION_CPP};${EXT_FSA_HPP};${EXT_FSA_CPP};
+  ${EXT_FSA_HPP};${EXT_FSA_CPP};
   ${EXT_DIFFERENTIAL_EQUATION_HPP};${EXT_DIFFERENTIAL_EQUATION_CPP})
 
 SET_TARGET_PROPERTIES(vleextension PROPERTIES ${VLE_LIBRARY_PROPERTIES})
@@ -78,11 +67,7 @@ INSTALL(TARGETS vleextension
 
 INSTALL(FILES ${EXTENSION_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension)
-INSTALL(FILES ${EXT_DECISION_HPP} DESTINATION
-  ${VLE_INCLUDE_DIRS}/extension/decision)
 INSTALL(FILES ${EXT_FSA_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension/fsa)
 INSTALL(FILES ${EXT_DIFFERENTIAL_EQUATION_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension/differential-equation)
-
-ADD_SUBDIRECTORY(decision)
