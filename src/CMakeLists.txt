@@ -1,3 +1,5 @@
 ADD_SUBDIRECTORY(vle)
 ADD_SUBDIRECTORY(apps)
-ADD_SUBDIRECTORY(examples)
+
+## TODO We ne to reactivate examples and unit test.
+## ADD_SUBDIRECTORY(examples)
