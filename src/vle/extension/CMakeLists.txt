@@ -24,13 +24,7 @@ SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp PetriNet.cpp
   ${OS_SPECIFIC_PATH_IMPL})
 
 SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DllDefines.hpp
-  DifferentialEquation.hpp DSDevs.hpp FSA.hpp PetriNet.hpp)
-
-SET(EXT_FSA_CPP fsa/FSA.cpp fsa/Moore.cpp fsa/Mealy.cpp fsa/FDDevs.cpp
-  fsa/Statechart.cpp)
-
-SET(EXT_FSA_HPP fsa/FSA.hpp fsa/Moore.hpp fsa/Mealy.hpp fsa/FDDevs.hpp
-  fsa/Statechart.hpp fsa/StatechartDbg.hpp)
+  DifferentialEquation.hpp DSDevs.hpp PetriNet.hpp)
 
 SET(EXT_DIFFERENTIAL_EQUATION_CPP differential-equation/DifferentialEquation.cpp
   differential-equation/DESS.cpp differential-equation/QSS.cpp
@@ -41,7 +35,6 @@ SET(EXT_DIFFERENTIAL_EQUATION_HPP differential-equation/DifferentialEquation.hpp
   differential-equation/QSS2.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP};
-  ${EXT_FSA_HPP};${EXT_FSA_CPP};
   ${EXT_DIFFERENTIAL_EQUATION_HPP};${EXT_DIFFERENTIAL_EQUATION_CPP})
 
 SET_TARGET_PROPERTIES(vleextension PROPERTIES ${VLE_LIBRARY_PROPERTIES})
@@ -67,7 +60,5 @@ INSTALL(TARGETS vleextension
 
 INSTALL(FILES ${EXTENSION_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension)
-INSTALL(FILES ${EXT_FSA_HPP} DESTINATION
-  ${VLE_INCLUDE_DIRS}/extension/fsa)
 INSTALL(FILES ${EXT_DIFFERENTIAL_EQUATION_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension/differential-equation)
