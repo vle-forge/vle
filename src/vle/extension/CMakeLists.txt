@@ -24,25 +24,13 @@ SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp PetriNet.cpp
   ${OS_SPECIFIC_PATH_IMPL})
 
 SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp Decision.hpp DllDefines.hpp
-  DifferenceEquation.hpp DifferenceEquationDbg.hpp DifferentialEquation.hpp
-  DSDevs.hpp FSA.hpp PetriNet.hpp)
+  DifferentialEquation.hpp DSDevs.hpp FSA.hpp PetriNet.hpp)
 
 SET(EXT_FSA_CPP fsa/FSA.cpp fsa/Moore.cpp fsa/Mealy.cpp fsa/FDDevs.cpp
   fsa/Statechart.cpp)
 
 SET(EXT_FSA_HPP fsa/FSA.hpp fsa/Moore.hpp fsa/Mealy.hpp fsa/FDDevs.hpp
   fsa/Statechart.hpp fsa/StatechartDbg.hpp)
-
-SET(EXT_DIFFERENCE_EQUATION_CPP difference-equation/Base.cpp
-  difference-equation/Simple.cpp difference-equation/Multiple.cpp
-  difference-equation/Generic.cpp)
-
-SET(EXT_DIFFERENCE_EQUATION_HPP difference-equation/Base.hpp
-  difference-equation/Simple.hpp difference-equation/Multiple.hpp
-  difference-equation/Generic.hpp)
-
-SET(EXT_DIFFERENCE_EQUATION_DBG_HPP difference-equation/SimpleDbg.hpp
-  difference-equation/MultipleDbg.hpp difference-equation/GenericDbg.hpp)
 
 SET(EXT_DIFFERENTIAL_EQUATION_CPP differential-equation/DifferentialEquation.cpp
   differential-equation/DESS.cpp differential-equation/QSS.cpp
@@ -64,9 +52,7 @@ SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
   decision/Rules.hpp decision/Table.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP};
-  ${EXT_DECISION_HPP};${EXT_DECISION_CPP};${EXT_FSA_HPP};${EXT_FSA_CPP}
-  ${EXT_DIFFERENCE_EQUATION_HPP};${EXT_DIFFERENCE_EQUATION_CPP}
-  ${EXT_DIFFERENCE_EQUATION_DBG_HPP};
+  ${EXT_DECISION_HPP};${EXT_DECISION_CPP};${EXT_FSA_HPP};${EXT_FSA_CPP};
   ${EXT_DIFFERENTIAL_EQUATION_HPP};${EXT_DIFFERENTIAL_EQUATION_CPP})
 
 SET_TARGET_PROPERTIES(vleextension PROPERTIES ${VLE_LIBRARY_PROPERTIES})
@@ -96,10 +82,6 @@ INSTALL(FILES ${EXT_DECISION_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension/decision)
 INSTALL(FILES ${EXT_FSA_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension/fsa)
-INSTALL(FILES ${EXT_DIFFERENCE_EQUATION_HPP} DESTINATION
-  ${VLE_INCLUDE_DIRS}/extension/difference-equation)
-INSTALL(FILES ${EXT_DIFFERENCE_EQUATION_DBG_HPP} DESTINATION
-  ${VLE_INCLUDE_DIRS}/extension/difference-equation)
 INSTALL(FILES ${EXT_DIFFERENTIAL_EQUATION_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension/differential-equation)
 
