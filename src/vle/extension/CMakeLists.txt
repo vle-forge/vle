@@ -20,11 +20,11 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp PetriNet.cpp
+SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp
   ${OS_SPECIFIC_PATH_IMPL})
 
 SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DllDefines.hpp
-  DifferentialEquation.hpp DSDevs.hpp PetriNet.hpp)
+  DifferentialEquation.hpp DSDevs.hpp)
 
 SET(EXT_DIFFERENTIAL_EQUATION_CPP differential-equation/DifferentialEquation.cpp
   differential-equation/DESS.cpp differential-equation/QSS.cpp
