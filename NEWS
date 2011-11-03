@@ -1,3 +1,41 @@
+VLE 1.0.1
+=========
+
+A debug release
+
+Application
+~~~~~~~~~~~
+
+vle: switch to copyright to 2011
+
+
+VFL (VLE Foundation Libraries)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- extension:
+  - decision:
+    - Fix behavior of the SS constraint: A constraint SS(A,B,mintl,maxtl) could
+      lead to a start of the activity B when A is done. B should start only
+      mintl after A is done.
+    - Add parametrized error messages: To produce more explicit error messages,
+      the vle::fmt method is used to parametrize the modelling error messages.
+  - de:
+    - Fix a bug on confluent transition: When a Nosync variable arrives on
+      external transition, a useless transition to POST state with ta=0 is set,
+      even if all synchronous variables are available. The test example
+      confluentNosync is added. (Closes: #3409820).
+  - dess:
+    - Fix the example model sir4.vpz: Change of output name of the view (Closes:
+      #3425845).
+- utils:
+  - Fix the paths of external plug-ins: The Path API for external plug-ins of
+    GVLE output and modelling directories are wrongs. We fix it.
+    - Path::getExternalPackagePluginGvleOutputDir returns
+      $package/plugins/gvle/modeling
+    - Path::getExternalPackagePluginGvleModelingDir returns
+      $package/plugins/gvle/output
+
+
 VLE 1.0.0
 =========
 
