@@ -23,19 +23,9 @@ ENDIF(WIN32)
 SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp
   ${OS_SPECIFIC_PATH_IMPL})
 
-SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DllDefines.hpp
-  DifferentialEquation.hpp DSDevs.hpp)
+SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DllDefines.hpp DSDevs.hpp)
 
-SET(EXT_DIFFERENTIAL_EQUATION_CPP differential-equation/DifferentialEquation.cpp
-  differential-equation/DESS.cpp differential-equation/QSS.cpp
-  differential-equation/QSS2.cpp)
-
-SET(EXT_DIFFERENTIAL_EQUATION_HPP differential-equation/DifferentialEquation.hpp
-  differential-equation/DESS.hpp differential-equation/QSS.hpp
-  differential-equation/QSS2.hpp)
-
-ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP};
-  ${EXT_DIFFERENTIAL_EQUATION_HPP};${EXT_DIFFERENTIAL_EQUATION_CPP})
+ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP})
 
 SET_TARGET_PROPERTIES(vleextension PROPERTIES ${VLE_LIBRARY_PROPERTIES})
 SET_TARGET_PROPERTIES(vleextension PROPERTIES OUTPUT_NAME
@@ -60,5 +50,3 @@ INSTALL(TARGETS vleextension
 
 INSTALL(FILES ${EXTENSION_HPP} DESTINATION
   ${VLE_INCLUDE_DIRS}/extension)
-INSTALL(FILES ${EXT_DIFFERENTIAL_EQUATION_HPP} DESTINATION
-  ${VLE_INCLUDE_DIRS}/extension/differential-equation)
