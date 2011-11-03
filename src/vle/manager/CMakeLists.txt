@@ -44,8 +44,7 @@ TARGET_LINK_LIBRARIES(vlemanager
   vlegraph
   vleoov
   vlevpz
-  vledevs
-  vleextension)
+  vledevs)
 
 INSTALL(TARGETS vlemanager
   RUNTIME DESTINATION bin

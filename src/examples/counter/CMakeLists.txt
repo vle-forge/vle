@@ -25,7 +25,6 @@ TARGET_LINK_LIBRARIES(counter
   vlevpz
   vleoov
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 
@@ -46,7 +45,6 @@ TARGET_LINK_LIBRARIES(generator
   vlevpz
   vleoov
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 

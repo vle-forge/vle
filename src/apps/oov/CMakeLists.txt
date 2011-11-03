@@ -33,7 +33,6 @@ TARGET_LINK_LIBRARIES(oov
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 

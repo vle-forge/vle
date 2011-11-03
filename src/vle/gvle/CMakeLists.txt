@@ -80,7 +80,6 @@ TARGET_LINK_LIBRARIES(vlegvle
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 

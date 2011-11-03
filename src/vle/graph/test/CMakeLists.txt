@@ -23,7 +23,6 @@ TARGET_LINK_LIBRARIES(test_graph
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 

@@ -4,7 +4,6 @@ ADD_SUBDIRECTORY(graph)
 ADD_SUBDIRECTORY(oov)
 ADD_SUBDIRECTORY(vpz)
 ADD_SUBDIRECTORY(devs)
-ADD_SUBDIRECTORY(extension)
 ADD_SUBDIRECTORY(manager)
 ADD_SUBDIRECTORY(translator)
 
@@ -13,7 +12,7 @@ CONFIGURE_FILE(version.hpp.in ${VLE_BINARY_DIR}/src/vle/version.hpp)
 INSTALL(FILES ${VLE_BINARY_DIR}/src/vle/version.hpp DESTINATION
   ${VLE_INCLUDE_DIRS})
 
-INSTALL(FILES devs.hpp extension.hpp graph.hpp manager.hpp oov.hpp
+INSTALL(FILES devs.hpp graph.hpp manager.hpp oov.hpp
   translator.hpp utils.hpp value.hpp vpz.hpp DESTINATION ${VLE_INCLUDE_DIRS})
 
 IF (HAVE_EOV)

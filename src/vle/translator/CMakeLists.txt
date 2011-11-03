@@ -42,7 +42,6 @@ TARGET_LINK_LIBRARIES(vletranslator
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager)
 
 INSTALL(TARGETS vletranslator

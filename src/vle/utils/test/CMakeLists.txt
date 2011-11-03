@@ -24,7 +24,6 @@ TARGET_LINK_LIBRARIES(test_algo
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 
@@ -41,7 +40,6 @@ TARGET_LINK_LIBRARIES(test_template
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 
@@ -58,7 +56,6 @@ TARGET_LINK_LIBRARIES(test_parser
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager
   vletranslator)
 

@@ -34,7 +34,6 @@ TARGET_LINK_LIBRARIES(output-storage
   vleoov
   vlevpz
   vledevs
-  vleextension
   vlemanager
   vletranslator
   vlegvle)

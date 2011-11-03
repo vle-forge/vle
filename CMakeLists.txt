@@ -238,8 +238,7 @@ FUNCTION(DeclareModuleDynamics name sources)
 
   TARGET_LINK_LIBRARIES(${name}
     ${GLIBMM_LIBRARIES} ${LIBXML_LIBRARIES} ${GTHREAD_LIBRARIES} vleutils
-    vlevalue vlegraph vlevpz vleoov vledevs vleextension vlemanager
-    vletranslator)
+    vlevalue vlegraph vlevpz vleoov vledevs vlemanager vletranslator)
 
   INSTALL(TARGETS ${name}
     RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
