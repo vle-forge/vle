@@ -37,18 +37,18 @@ TARGET_LINK_LIBRARIES(test_combination_storage
   vlevpz
   vlemanager)
 
-ADD_EXECUTABLE(test_common_seed test3.cpp)
-TARGET_LINK_LIBRARIES(test_common_seed
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz
-  vlemanager)
+#ADD_EXECUTABLE(test_common_seed test3.cpp)
+#TARGET_LINK_LIBRARIES(test_common_seed
+  #${GLIBMM_LIBRARIES}
+  #${LIBXML_LIBRARIES}
+  #${GTHREAD_LIBRARIES}
+  #${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  #vleutils
+  #vlevalue
+  #vlegraph
+  #vledevs
+  #vlevpz
+  #vlemanager)
 
 ADD_EXECUTABLE(test_manager_thread test4.cpp)
 TARGET_LINK_LIBRARIES(test_manager_thread
@@ -65,5 +65,5 @@ TARGET_LINK_LIBRARIES(test_manager_thread
 
 ADD_TEST(manager_test_exp test_experimentalframes)
 ADD_TEST(manager_combination_storage test_combination_storage)
-ADD_TEST(manager_common_seed test_common_seed)
+#ADD_TEST(manager_common_seed test_common_seed)
 ADD_TEST(manager_thread test_manager_thread)
