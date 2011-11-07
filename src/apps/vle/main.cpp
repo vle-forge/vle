@@ -169,7 +169,7 @@ void appendToCommandLineList(const char* param, manager::CmdArgs& out)
     throw utils::ArgError(fmt(_("Filename '%1%' does not exist")) % param);
 }
 
-void cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
+bool cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
 {
     using utils::Package;
     using utils::Path;
@@ -229,21 +229,26 @@ void cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
             ++i;
         }
     }
-    if (stop == false) {
+
+    if (not stop) {
         for (; i < argc; ++i) {
             appendToCommandLineList(argv[i], lst);
         }
     }
+
+    return not stop;
 }
 
-void cliDirect(int argc, char* argv[], manager::CmdArgs& lst)
+bool cliDirect(int argc, char* argv[], manager::CmdArgs& lst)
 {
     for (int i = 1; i < argc; ++i) {
         appendToCommandLineList(argv[i], lst);
     }
+
+    return true;
 }
 
-void cliRemote(int argc, char* argv[])
+bool cliRemote(int argc, char* argv[])
 {
     bool error = true;
 
@@ -288,6 +293,8 @@ void cliRemote(int argc, char* argv[])
               "\tvle --remote show glue-1.0\n"
               "\tvle --remote search 'glue*'\n"));
     }
+
+    return not error;
 }
 
 } // namespace vle
@@ -356,13 +363,14 @@ int main(int argc, char* argv[])
 
     manager::CmdArgs lst;
 
+    bool success = true;
     try {
         if (not utils::Package::package().name().empty()) {
-            cliPackage(argc, argv, lst);
+            success = cliPackage(argc, argv, lst);
         } else if (command.remote()) {
-            cliRemote(argc, argv);
+            success = cliRemote(argc, argv);
         } else {
-            cliDirect(argc, argv, lst);
+            success = cliDirect(argc, argv, lst);
         }
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Error: %1%\n")) % e.what();
@@ -374,8 +382,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    bool success = true;
-    if (not lst.empty()) {
+    if (success and not lst.empty()) {
         manager::Manager manager(command.quiet());
         if (command.manager()) {
             success = manager.runManager(command.allInLocal(),
