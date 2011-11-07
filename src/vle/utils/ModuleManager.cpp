@@ -44,6 +44,8 @@
 
 #ifdef BOOST_WINDOWS
 #include <Winbase.h>
+#include <windows.h>
+#include <strsage.h>
 #else
 #include <dlfcn.h>
 #endif
@@ -257,8 +259,31 @@ private:
         void *handle = dlopen(mPath.c_str(), RTLD_LAZY);
 #endif
         if (not handle) {
+            std::string extra;
+#ifdef BOOST_WINDOWS
+            DWORD errorcode = ::GetLastError();
+            LPVOID msg;
+
+            ::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                            FORMAT_MESSAGE_FROM_SYSTEM |
+                            FORMAT_MESSAGE_IGNORE_INSERTS,
+                            NULL,
+                            errorcode,
+                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                            (LPTSTR) &msg,
+                            0, NULL);
+
+            extra = msg;
+            LocalFree(msg);
+#else
+            char *error = dlerror();
+            if (error) {
+                extra.assign(error);
+            }
+#endif
             throw utils::InternalError(fmt(
-                    _("Module can not open shared library `%1%'")) % mPath);
+                    _("Module can not open shared library `%1%': %2%")) % mPath
+                % extra);
         } else {
             mHandle = handle;
         }
