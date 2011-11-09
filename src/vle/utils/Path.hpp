@@ -115,7 +115,6 @@ namespace vle { namespace utils {
          */
 
         std::string getSimulatorDir() const;
-        std::string getHomeSimulatorDir() const;
 
         /*
          * examples
@@ -129,57 +128,39 @@ namespace vle { namespace utils {
          */
 
         std::string getOutputDir() const;
-        std::string getHomeOutputDir() const;
         std::string getOutputFile(const std::string& file) const;
-        std::string getHomeOutputFile(const std::string& file) const;
 
         std::string getOutputPixmapDir() const;
-        std::string getHomeOutputPixmapDir() const;
         std::string getOutputPixmapFile(const std::string& file) const;
-        std::string getHomeOutputPixmapFile(const std::string& file) const;
 
         std::string getOutputGladeDir() const;
-        std::string getHomeOutputGladeDir() const;
         std::string getOutputGladeFile(const std::string& file) const;
-        std::string getHomeOutputGladeFile(const std::string& file) const;
 
         std::string getOutputDocDir() const;
-        std::string getHomeOutputDocDir() const;
         std::string getOutputDocFile(const std::string& file) const;
-        std::string getHomeOutputDocFile(const std::string& file) const;
 
         /*
          * output paths (oov's output plug-ins
          */
 
         std::string getStreamDir() const;
-        std::string getHomeStreamDir() const;
         std::string getStreamFile(const std::string& file) const;
-        std::string getHomeStreamFile(const std::string& file) const;
 
         /*
          * modeling paths
          */
 
         std::string getModelingDir() const;
-        std::string getHomeModelingDir() const;
         std::string getModelingFile(const std::string& file) const;
-        std::string getHomeModelingFile(const std::string& file) const;
 
         std::string getModelingPixmapDir() const;
-        std::string getHomeModelingPixmapDir() const;
         std::string getModelingPixmapFile(const std::string& file) const;
-        std::string getHomeModelingPixmapFile(const std::string& file) const;
 
         std::string getModelingGladeDir() const;
-        std::string getHomeModelingGladeDir() const;
         std::string getModelingGladeFile(const std::string& file) const;
-        std::string getHomeModelingGladeFile(const std::string& file) const;
 
         std::string getModelingDocDir() const;
-        std::string getHomeModelingDocDir() const;
         std::string getModelingDocFile(const std::string& file) const;
-        std::string getHomeModelingDocFile(const std::string& file) const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -332,32 +313,28 @@ namespace vle { namespace utils {
         { return m_modeling; }
 
         /**
-         * @brief Get a PathList which contains getStreamDir() and
-         * getHomeStreamDir() if this directories exist.
+         * @brief Get a PathList which contains getStreamDir().
          *
          * @return A PathList with 0, 1 or 2 element.
          */
         PathList getGlobalStreamDirs();
 
         /**
-         * @brief Get a PathList which contains getOutputDir() and
-         * getHomeOutputDir() if this directories exist.
+         * @brief Get a PathList which contains getOutputDir().
          *
          * @return A PathList with 0, 1 or 2 element.
          */
         PathList getGlobalOutputDirs();
 
         /**
-         * @brief Get a PathList which contains getModelingDir() and
-         * getHomeModelingDir() if this directories exist.
+         * @brief Get a PathList which contains getModelingDir().
          *
          * @return A PathList with 0, 1 or 2 element.
          */
         PathList getGlobalModelingDirs();
 
         /**
-         * @brief Get a PathList which contains getSimulatorsDir() and
-         * getHomeSimulatorsDir() if this directories exist.
+         * @brief Get a PathList which contains getSimulatorsDir().
          *
          * @return A PathList with 0, 1 or 2 element.
          */
