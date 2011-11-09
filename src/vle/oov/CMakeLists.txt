@@ -23,10 +23,10 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OutputMatrix.cpp
-  Plugin.cpp SimpleFile.cpp StreamReader.cpp ${OS_SPECIFIC_PATH_IMPL})
+  Plugin.cpp StreamReader.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(OOV_HPP DllDefines.hpp LocalStreamReader.hpp NetStreamReader.hpp
-  OutputMatrix.hpp Plugin.hpp SimpleFile.hpp StreamReader.hpp)
+  OutputMatrix.hpp Plugin.hpp StreamReader.hpp)
 
 IF (VLE_HAVE_CAIRO)
  SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)
@@ -55,5 +55,3 @@ INSTALL(TARGETS vleoov
   ARCHIVE DESTINATION lib)
 
 INSTALL(FILES ${OOV_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/oov)
-
-ADD_SUBDIRECTORY(plugins)
