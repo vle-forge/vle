@@ -136,12 +136,7 @@ void NetStreamReader::getPlugin(const std::string& pluginname,
     void *symbol = 0;
 
     try {
-        if (not package.empty()) {
-            symbol = getModuleManager().get(package, pluginname,
-                                            utils::MODULE_EOV);
-        } else {
-            symbol = getModuleManager().get(pluginname, utils::MODULE_EOV);
-        }
+        symbol = getModuleManager().get(package, pluginname, utils::MODULE_EOV);
 
         EovPluginSlot fct(utils::functionCast < EovPluginSlot >(symbol));
         Plugin* ptr = fct(plugin(), this);

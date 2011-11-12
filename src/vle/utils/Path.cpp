@@ -57,21 +57,6 @@ namespace fs = boost::filesystem;
 
 Path* Path::mPath = 0;
 
-std::string Path::getSimulatorDir() const
-{
-    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "simulator");
-}
-
-std::string Path::getExamplesDir() const
-{
-    return buildDirname(m_prefix, "examples");
-}
-
-std::string Path::getExampleFile(const std::string& file) const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "examples", file);
-}
-
 std::string Path::getLocaleDir() const
 {
     return buildDirname(m_prefix, "share", "locale");
@@ -100,108 +85,6 @@ std::string Path::getGladeDir() const
 std::string Path::getGladeFile(const std::string& file) const
 {
     return buildFilename(m_prefix, VLE_SHARE_DIRS, "glade", file);
-}
-
-/*
- * outputs
- */
-
-std::string Path::getOutputDir() const
-{
-    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "outputs");
-}
-
-std::string Path::getOutputFile(const std::string& file) const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", file);
-}
-
-std::string Path::getOutputPixmapDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", "pixmaps");
-}
-
-std::string Path::getOutputPixmapFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "outputs", "pixmaps", file);
-}
-
-std::string Path::getOutputGladeDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", "glade");
-}
-
-std::string Path::getOutputGladeFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "outputs", "glade", file);
-}
-
-std::string Path::getOutputDocDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", "doc");
-}
-
-std::string Path::getOutputDocFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "outputs", "doc", file);
-}
-
-/*
- * stream
- */
-
-std::string Path::getStreamDir() const
-{
-    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "stream");
-}
-
-std::string Path::getStreamFile(const std::string& file) const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "stream", file);
-}
-
-/*
- * modeling
- */
-
-std::string Path::getModelingDir() const
-{
-    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "modeling");
-}
-
-std::string Path::getModelingFile(const std::string& file) const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", file);
-}
-
-std::string Path::getModelingPixmapDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", "pixmaps");
-}
-
-std::string Path::getModelingPixmapFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "modeling", "pixmaps", file);
-}
-
-std::string Path::getModelingGladeDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", "glade");
-}
-
-std::string Path::getModelingGladeFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "modeling", "glade", file);
-}
-
-std::string Path::getModelingDocDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", "doc");
-}
-
-std::string Path::getModelingDocFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "modeling", "doc", file);
 }
 
 /*
@@ -295,50 +178,6 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
                 e.what());
         }
     }
-}
-
-PathList Path::getGlobalStreamDirs()
-{
-    PathList result;
-
-    if (fs::is_directory(getStreamDir())) {
-        result.push_back(getStreamDir());
-    }
-
-    return result;
-}
-
-PathList Path::getGlobalOutputDirs()
-{
-    PathList result;
-
-    if (fs::is_directory(getOutputDir())) {
-        result.push_back(getOutputDir());
-    }
-
-    return result;
-}
-
-PathList Path::getGlobalModelingDirs()
-{
-    PathList result;
-
-    if (fs::is_directory(getModelingDir())) {
-        result.push_back(getModelingDir());
-    }
-
-    return result;
-}
-
-PathList Path::getGlobalSimulatorDirs()
-{
-    PathList result;
-
-    if (fs::is_directory(getSimulatorDir())) {
-        result.push_back(getSimulatorDir());
-    }
-
-    return result;
 }
 
 std::string Path::getPackageDir() const
@@ -439,6 +278,31 @@ std::string Path::getPackageOutputFile(const std::string& name) const
 std::string Path::getPackageDocFile(const std::string& name) const
 {
     return buildFilename(getPackageDocDir(), name);
+}
+
+std::string Path::getPackagePluginFile(const std::string& name) const
+{
+    return buildDirname(m_currentPackagePath, "plugins", name);
+}
+
+std::string Path::getPackagePluginSimulatorFile(const std::string& name) const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "simulator", name);
+}
+
+std::string Path::getPackagePluginOutputFile(const std::string& name) const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "output", name);
+}
+
+std::string Path::getPackagePluginGvleModelingFile(const std::string& name) const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "gvle", "modeling", name);
+}
+
+std::string Path::getPackagePluginGvleOutputFile(const std::string& name) const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "gvle", "output", name);
 }
 
 std::string Path::getExternalPackageDir(const std::string& name) const
@@ -804,11 +668,6 @@ void Path::initGlobalPluginDirs()
 
     clearPluginDirs();
     m_currentPackagePath.clear();
-
-    addStreamDir(getStreamDir());
-    addOutputDir(getOutputDir());
-    addModelingDir(getModelingDir());
-    addSimulatorDir(getSimulatorDir());
 }
 
 void Path::initPackagePluginDirs()
@@ -853,12 +712,6 @@ void Path::initPackagePluginDirs()
             }
         }
     }
-
-    addStreamDir(getStreamDir());
-    addOutputDir(getOutputDir());
-    addModelingDir(getModelingDir());
-
-    addSimulatorDir(getPackagePluginSimulatorDir());
 }
 
 std::ostream& operator<<(std::ostream& out, const PathList& paths)
@@ -1081,19 +934,8 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
 {
     out << "prefix................: " << p.getPrefixDir() << "\n"
         << "\n"
-        << "simulator.............: " << p.getSimulatorDir() << "\n"
-        << "output................: " << p.getOutputDir() << "\n"
-        << "modeling..............: " << p.getModelingDir() << "\n"
-        << "stream................: " << p.getStreamDir() << "\n"
         << "pixmap................: " << p.getPixmapDir() << "\n"
         << "glade.................: " << p.getGladeDir() << "\n"
-        << "examples..............: " << p.getExamplesDir() << "\n"
-        << "output pixmap.........: " << p.getOutputPixmapDir() << "\n"
-        << "outout glade..........: " << p.getOutputGladeDir() << "\n"
-        << "output doc............: " << p.getOutputDocDir() << "\n"
-        << "modeling pixmap.......: " << p.getModelingPixmapDir() << "\n"
-        << "modeling glade........: " << p.getModelingGladeDir() << "\n"
-        << "modeling doc..........: " << p.getModelingDocDir() << "\n"
         << "\n"
         << "vle home..............: " << p.getHomeDir() << "\n"
         << "packages..............: " << p.getPackagesDir() << "\n"

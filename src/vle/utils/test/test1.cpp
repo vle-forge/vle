@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE(show_path)
     using vle::utils::PathList;
 
     std::cout << Path::path();
-    BOOST_REQUIRE_EQUAL((PathList::size_type)1,
+    BOOST_REQUIRE_EQUAL((PathList::size_type)0,
                         Path::path().getSimulatorDirs().size());
 
     Package::package().select("x");

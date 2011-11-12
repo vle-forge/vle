@@ -106,20 +106,6 @@ class Module
 {
 public:
     /**
-     * Build a new Module for a specified path build from the global space path to a library but does not load
-     * the shared library. To read the shared library and get symbol, use the
-     * Module::get() function.
-     *
-     * @param path
-     * @param type
-     */
-    Module(const std::string& library, ModuleType type)
-        : mPath(ModuleManager::buildModuleFilename(library, type)),
-        mHandle(0), mFunction(0), mType(type), mIsGlobal(true)
-    {
-    }
-
-    /**
      * Build a new Module for a specified path build from the package name, the
      * library name and the type of the module. The shared library is not read.
      * To read the shared library and get symbol, use the Module::get()
@@ -432,33 +418,6 @@ public:
                       DeleteModule());
     }
 
-    Module *getModule(const std::string& library, ModuleType type)
-    {
-        switch (type) {
-        case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_WRAPPER:
-        case MODULE_EXECUTIVE:
-            return mTableSimulator.insert(
-                std::make_pair < std::string, Module* >(
-                    library, new Module(library, type))).first->second;
-        case MODULE_OOV:
-        case MODULE_EOV:
-            return mTableOov.insert(
-                std::make_pair < std::string, Module* >(
-                    library, new Module(library, type))).first->second;
-        case MODULE_GVLE_MODELING:
-            return mTableGvleModeling.insert(
-                std::make_pair < std::string, Module* >(
-                    library, new Module(library, type))).first->second;
-        case MODULE_GVLE_OUTPUT:
-            return mTableGvleOutput.insert(
-                std::make_pair < std::string, Module* >(
-                    library, new Module(library, type))).first->second;
-        default:
-            throw utils::InternalError();
-        }
-    }
-
     Module *getModule(const std::string& package,
                       const std::string& library,
                       ModuleType type)
@@ -489,62 +448,6 @@ public:
                     new Module(package, library, type))).first->second;
         default:
             throw utils::InternalError();
-        }
-    }
-
-    void fill(ModuleType type)
-    {
-        namespace fs = boost::filesystem;
-        namespace ss = boost::system;
-        std::string path;
-
-        switch (type) {
-        case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_WRAPPER:
-        case MODULE_EXECUTIVE:
-            path = Path::path().getSimulatorDir();
-            break;
-        case MODULE_OOV:
-        case MODULE_EOV:
-            path = Path::path().getStreamDir();
-            break;
-        case MODULE_GVLE_MODELING:
-            path = Path::path().getModelingDir();
-            break;
-        case MODULE_GVLE_OUTPUT:
-            path = Path::path().getOutputDir();
-            break;
-        default:
-            throw utils::InternalError();
-        }
-
-#if BOOST_VERSION > 104500
-        ss::error_code ec;
-        if (fs::is_directory(path, ec)) {
-#else
-        if (fs::is_directory(path)) {
-#endif
-            fs::directory_iterator it(path), end;
-
-            for (; it != end; ++it) {
-#if BOOST_VERSION > 103600
-                if (fs::is_regular_file(it->status())) {
-                    std::string library = getLibraryName(*it);
-
-                    if (not library.empty()) {
-                        getModule(library, type);
-                    }
-                }
-#else
-                if (fs::is_regular(it->status())) {
-                    std::string library = getLibraryName(*it);
-
-                    if (not library.empty()) {
-                        getModule(library, type);
-                    }
-                }
-#endif
-            }
         }
     }
 
@@ -608,7 +511,7 @@ public:
                     std::string library = getLibraryName(*it);
 
                     if (not library.empty()) {
-                        getModule(library, type);
+                        getModule(package.filename().string(), library, type);
                     }
                 }
 #else
@@ -616,7 +519,7 @@ public:
                     std::string library = getLibraryName(*it);
 
                     if (not library.empty()) {
-                        getModule(package, library, type);
+                        getModule(package.filename(), library, type);
                     }
                 }
 #endif
@@ -627,11 +530,6 @@ public:
     void fill()
     {
         namespace fs = boost::filesystem;
-
-        fill(MODULE_DYNAMICS);
-        fill(MODULE_OOV);
-        fill(MODULE_GVLE_MODELING);
-        fill(MODULE_GVLE_OUTPUT);
 
         {
             fs::path packages = Path::path().getPackagesDir();
@@ -721,13 +619,6 @@ ModuleManager::~ModuleManager()
     delete mPimpl;
 }
 
-void *ModuleManager::get(const std::string& path, ModuleType type) const
-{
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
-    return mPimpl->getModule(path, type)->get();
-}
-
 void *ModuleManager::get(const std::string& package,
                          const std::string& library,
                          ModuleType type) const
@@ -735,14 +626,6 @@ void *ModuleManager::get(const std::string& package,
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
     return mPimpl->getModule(package, library, type)->get();
-}
-
-ModuleType ModuleManager::determine(const std::string& path,
-                                    ModuleType type) const
-{
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
-    return mPimpl->getModule(path, type)->determine();
 }
 
 ModuleType ModuleManager::determine(const std::string& package,
@@ -768,44 +651,6 @@ void ModuleManager::browse(ModuleType type,
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
     mPimpl->browse(type, modules);
-}
-
-std::string ModuleManager::buildModuleFilename(const std::string& library,
-                                               ModuleType type)
-{
-    namespace fs = boost::filesystem;
-
-    fs::path current;
-
-    switch (type) {
-    case MODULE_DYNAMICS:
-    case MODULE_DYNAMICS_WRAPPER:
-    case MODULE_EXECUTIVE:
-        current = Path::path().getSimulatorDir();
-        break;
-    case MODULE_OOV:
-    case MODULE_EOV:
-        current = Path::path().getStreamDir();
-        break;
-    case MODULE_GVLE_MODELING:
-        current = Path::path().getModelingDir();
-        break;
-    case MODULE_GVLE_OUTPUT:
-        current = Path::path().getOutputDir();
-        break;
-    default:
-        throw utils::InternalError();
-    }
-
-#ifdef BOOST_WINDOWS
-    std::string filename = "lib" + library + ".dll";
-#else
-    std::string filename = "lib" + library + ".so";
-#endif
-
-    current /= filename;
-
-    return current.string();
 }
 
 std::string ModuleManager::buildModuleFilename(const std::string& package,

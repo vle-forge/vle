@@ -229,14 +229,9 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
         oov::PluginPtr plugin;
 
         try {
-            void *symbol = 0;
-            if (not m_package.empty()) {
-                symbol = getModuleManager().get(m_package, m_pluginname,
-                                                utils::MODULE_OOV);
-            } else {
-                symbol = getModuleManager().get(m_pluginname,
-                                                utils::MODULE_OOV);
-            }
+            void *symbol = getModuleManager().get(m_package,
+                                                  m_pluginname,
+                                                  utils::MODULE_OOV);
 
             oov::OovPluginSlot fct(utils::functionCast <
                               oov::OovPluginSlot>(symbol));

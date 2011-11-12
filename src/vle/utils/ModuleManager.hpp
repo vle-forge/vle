@@ -80,30 +80,6 @@ public:
     /**
      * Check the list of shared libraries already in the ModuleManager. If the
      * shared library exists, the symbol \c type is researched into the
-     * library. Otherwise, the ModuleManager try to load the shared library \c
-     * path.
-     *
-     * @code
-     * // try to load the shared library
-     * // $prefix/lib/vle-x.y/simulators/libcounter.so
-     * ModuleManager manager;
-     * manager.get("counter", MODULE_DYNAMICS);
-     * @endcode
-     *
-     * @param library
-     * @param type
-     *
-     * @throw utils::InternalError if shared library does not exists or if the
-     * symbols wanted does not exist.
-     *
-     * @return
-     */
-    void *get(const std::string& library,
-              ModuleType type) const;
-
-    /**
-     * Check the list of shared libraries already in the ModuleManager. If the
-     * shared library exists, the symbol \c type is researched into the
      * library. Otherwise, the ModuleManager try to load the shared library
      * named from the combination of \c package, \c library and \type.
      *
@@ -126,16 +102,6 @@ public:
     void *get(const std::string& package,
               const std::string& library,
               ModuleType type) const;
-
-    /**
-     * Determine the type of the global plug-in.
-     *
-     * @param path
-     *
-     * @return
-     */
-    ModuleType determine(const std::string& library,
-                         ModuleType type) const;
 
     /**
      * Determine the type of the plug-in in the patch builded from the
@@ -179,18 +145,6 @@ public:
        * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      */
-
-    /**
-     * Build a path from the combination of \c path (using the global simulator
-     * directory), and the \c library.
-     *
-     * @param path
-     * @param library
-     *
-     * @return
-     */
-    static std::string buildModuleFilename(const std::string& library,
-                                           ModuleType type);
 
     /**
      * Build a path from the combination of \c package, \c library and \c type.

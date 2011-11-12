@@ -57,12 +57,7 @@ void StreamReader::initPlugin(const std::string& plugin,
     void *symbol = 0;
 
     try {
-        if (not package.empty()) {
-            symbol = modulemgr.get(package, plugin, utils::MODULE_OOV);
-        } else {
-            symbol = modulemgr.get(plugin, utils::MODULE_OOV);
-        }
-
+        symbol = modulemgr.get(package, plugin, utils::MODULE_OOV);
         OovPluginSlot fct(utils::functionCast < OovPluginSlot>(symbol));
         PluginPtr ptr(fct(location));
         m_plugin = ptr;

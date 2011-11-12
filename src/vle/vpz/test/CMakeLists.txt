@@ -11,8 +11,6 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-INSTALL(FILES unittest.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-
 ADD_EXECUTABLE(test_vpz_values test1.cpp)
 TARGET_LINK_LIBRARIES(test_vpz_values
   ${GLIBMM_LIBRARIES}

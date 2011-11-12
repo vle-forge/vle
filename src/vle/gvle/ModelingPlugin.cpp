@@ -35,23 +35,23 @@ namespace vle { namespace gvle {
 
 Glib::RefPtr < Gdk::Pixbuf > ModelingPlugin::icon() const
 {
-    if (not m_icon) {
-        std::string file = utils::Path::path().getModelingPixmapFile(mName);
-        try {
-            m_icon = Gdk::Pixbuf::create_from_file(file);
-        } catch(const Glib::FileError& e) {
-            throw utils::FileError(fmt(_(
-                    "ModelingPlugin '%1%': FileError, %2%")) % mName %
-                e.what());
-        } catch(const Gdk::PixbufError& e) {
-            throw utils::FileError(fmt(_(
-                    "ModelingPlugin '%1%': PixbufError, %2%")) % mName %
-                e.what());
-        } catch(...) {
-            throw utils::FileError(fmt(_(
-                    "ModelingPlugin '%1%': Unknow error")) % mName);
-        }
-    }
+    //if (not m_icon) {
+        //std::string file = utils::Path::path().getModelingPixmapFile(mName);
+        //try {
+            //m_icon = Gdk::Pixbuf::create_from_file(file);
+        //} catch(const Glib::FileError& e) {
+            //throw utils::FileError(fmt(_(
+                    //"ModelingPlugin '%1%': FileError, %2%")) % mName %
+                //e.what());
+        //} catch(const Gdk::PixbufError& e) {
+            //throw utils::FileError(fmt(_(
+                    //"ModelingPlugin '%1%': PixbufError, %2%")) % mName %
+                //e.what());
+        //} catch(...) {
+            //throw utils::FileError(fmt(_(
+                    //"ModelingPlugin '%1%': Unknow error")) % mName);
+        //}
+    //}
     return m_icon;
 }
 

@@ -110,58 +110,6 @@ namespace vle { namespace utils {
         std::string getGladeDir() const;
         std::string getGladeFile(const std::string& file) const;
 
-        /*
-         * simulation paths
-         */
-
-        std::string getSimulatorDir() const;
-
-        /*
-         * examples
-         */
-
-        std::string getExamplesDir() const;
-        std::string getExampleFile(const std::string& file) const;
-
-        /*
-         * output paths (gvle's output plug-ins).
-         */
-
-        std::string getOutputDir() const;
-        std::string getOutputFile(const std::string& file) const;
-
-        std::string getOutputPixmapDir() const;
-        std::string getOutputPixmapFile(const std::string& file) const;
-
-        std::string getOutputGladeDir() const;
-        std::string getOutputGladeFile(const std::string& file) const;
-
-        std::string getOutputDocDir() const;
-        std::string getOutputDocFile(const std::string& file) const;
-
-        /*
-         * output paths (oov's output plug-ins
-         */
-
-        std::string getStreamDir() const;
-        std::string getStreamFile(const std::string& file) const;
-
-        /*
-         * modeling paths
-         */
-
-        std::string getModelingDir() const;
-        std::string getModelingFile(const std::string& file) const;
-
-        std::string getModelingPixmapDir() const;
-        std::string getModelingPixmapFile(const std::string& file) const;
-
-        std::string getModelingGladeDir() const;
-        std::string getModelingGladeFile(const std::string& file) const;
-
-        std::string getModelingDocDir() const;
-        std::string getModelingDocFile(const std::string& file) const;
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Manage package
@@ -199,6 +147,11 @@ namespace vle { namespace utils {
         std::string getPackageDocFile(const std::string& name) const;
         std::string getPackageExpFile(const std::string& name) const;
         std::string getPackageOutputFile(const std::string& name) const;
+        std::string getPackagePluginFile(const std::string& name) const;
+        std::string getPackagePluginSimulatorFile(const std::string& name) const;
+        std::string getPackagePluginOutputFile(const std::string& name) const;
+        std::string getPackagePluginGvleModelingFile(const std::string& name) const;
+        std::string getPackagePluginGvleOutputFile(const std::string& name) const;
 
         std::string getExternalPackageDir(const std::string& name) const;
         std::string getExternalPackageLibDir(const std::string& name) const;
@@ -267,7 +220,7 @@ namespace vle { namespace utils {
          * name.
          * @path The name of the template.
          * @return A string.
-         */
+        */
         std::string getTemplate(const std::string& name) const;
 
         /**
@@ -311,34 +264,6 @@ namespace vle { namespace utils {
          */
         const PathList& getModelingDirs() const
         { return m_modeling; }
-
-        /**
-         * @brief Get a PathList which contains getStreamDir().
-         *
-         * @return A PathList with 0, 1 or 2 element.
-         */
-        PathList getGlobalStreamDirs();
-
-        /**
-         * @brief Get a PathList which contains getOutputDir().
-         *
-         * @return A PathList with 0, 1 or 2 element.
-         */
-        PathList getGlobalOutputDirs();
-
-        /**
-         * @brief Get a PathList which contains getModelingDir().
-         *
-         * @return A PathList with 0, 1 or 2 element.
-         */
-        PathList getGlobalModelingDirs();
-
-        /**
-         * @brief Get a PathList which contains getSimulatorsDir().
-         *
-         * @return A PathList with 0, 1 or 2 element.
-         */
-        PathList getGlobalSimulatorDirs();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

@@ -241,12 +241,8 @@ static devs::Dynamics* buildNewDynamicsWrapper(
 
     void* symbol;
 
-    if (not dyn.package().empty()) {
-        symbol = modulemgr.get(dyn.package(), dyn.library(),
-                               utils::MODULE_DYNAMICS_WRAPPER);
-    } else {
-        symbol = modulemgr.get(dyn.library(), utils::MODULE_DYNAMICS_WRAPPER);
-    }
+    symbol = modulemgr.get(dyn.package(), dyn.library(),
+                           utils::MODULE_DYNAMICS_WRAPPER);
 
     fctdw fct = utils::functionCast < fctdw >(symbol);
 
@@ -277,12 +273,8 @@ static devs::Dynamics* buildNewDynamics(
 
     void *symbol;
 
-    if (not dyn.package().empty()) {
-        symbol = modulemgr.get(dyn.package(), dyn.library(),
-                               utils::MODULE_DYNAMICS);
-    } else {
-        symbol = modulemgr.get(dyn.library(), utils::MODULE_DYNAMICS);
-    }
+    symbol = modulemgr.get(dyn.package(), dyn.library(),
+                           utils::MODULE_DYNAMICS);
 
     fctdyn fct = utils::functionCast < fctdyn >(symbol);
 
@@ -313,12 +305,8 @@ static devs::Dynamics* buildNewExecutive(
 
     void *symbol;
 
-    if (not dyn.package().empty()) {
-        symbol = modulemgr.get(dyn.package(), dyn.library(),
-                               utils::MODULE_EXECUTIVE);
-    } else {
-        symbol = modulemgr.get(dyn.library(), utils::MODULE_EXECUTIVE);
-    }
+    symbol = modulemgr.get(dyn.package(), dyn.library(),
+                           utils::MODULE_EXECUTIVE);
 
     fctexe fct = utils::functionCast < fctexe >(symbol);
 
@@ -346,12 +334,8 @@ devs::Dynamics* ModelFactory::attachDynamics(Coordinator& coordinator,
 {
     utils::ModuleType type;
 
-    if (not dyn.package().empty()) {
-        type = mModuleMgr.determine(dyn.package(), dyn.library(),
-                                    utils::MODULE_DYNAMICS);
-    } else {
-        type = mModuleMgr.determine(dyn.library(), utils::MODULE_DYNAMICS);
-    }
+    type = mModuleMgr.determine(dyn.package(), dyn.library(),
+                                utils::MODULE_DYNAMICS);
 
     switch (type) {
         case utils::MODULE_DYNAMICS_WRAPPER:

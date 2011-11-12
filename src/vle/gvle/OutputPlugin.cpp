@@ -39,23 +39,23 @@ OutputPlugin::OutputPlugin(const std::string& name)
 
 Glib::RefPtr < Gdk::Pixbuf > OutputPlugin::icon() const
 {
-    if (not m_icon) {
-        std::string file = utils::Path::path().getOutputPixmapFile(m_name);
+    //if (not m_icon) {
+        //std::string file = utils::Path::path().getOutputPixmapFile(m_name);
 
-        try {
-            m_icon = Gdk::Pixbuf::create_from_file(file);
-        } catch(const Glib::FileError& e) {
-            throw utils::FileError(fmt(_(
-                    "OutputPlugin '%1%': FileError, %2%")) % m_name % e.what());
-        } catch(const Gdk::PixbufError& e) {
-            throw utils::FileError(fmt(_(
-                    "OutputPlugin '%1%': PixbufError, %2%")) % m_name %
-                e.what());
-        } catch(...) {
-            throw utils::FileError(fmt(_(
-                    "OutputPlugin '%1%': Unknow error")) % m_name);
-        }
-    }
+        //try {
+            //m_icon = Gdk::Pixbuf::create_from_file(file);
+        //} catch(const Glib::FileError& e) {
+            //throw utils::FileError(fmt(_(
+                    //"OutputPlugin '%1%': FileError, %2%")) % m_name % e.what());
+        //} catch(const Gdk::PixbufError& e) {
+            //throw utils::FileError(fmt(_(
+                    //"OutputPlugin '%1%': PixbufError, %2%")) % m_name %
+                //e.what());
+        //} catch(...) {
+            //throw utils::FileError(fmt(_(
+                    //"OutputPlugin '%1%': Unknow error")) % m_name);
+        //}
+    //}
     return m_icon;
 }
 
