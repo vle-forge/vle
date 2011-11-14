@@ -24,7 +24,7 @@ IF (WIN32)
   IF (HTML_HELP_COMPILER)
     SET(TMP "${VLE_BINARY_DIR}\\doxygen\\html\\index.hhp")
     STRING(REGEX REPLACE "[/]" "\\\\" HHP_FILE ${TMP} )
-    ADD_CUSTOM_TARGET(winhelp "${HTML_HELP_COMPILER}" "${HHP_FILE}")
+    ADD_CUSTOM_TARGET(winhelp ALL "${HTML_HELP_COMPILER}" "${HHP_FILE}")
     ADD_DEPENDENCIES (winhelp doc)
 
     IF (EXISTS "${VLE_BINARY_DIR}/doxygen/html/vle.chm")
