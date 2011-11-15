@@ -1,4 +1,90 @@
-vle-1.0.0
+vle-1.0.1
+
+commit a1f9aedc5490ce1bb5cf26d58ac937f5aaa26352
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Nov 14 16:04:07 2011 +0100
+
+    win32: fix the HTMLHelp target
+    
+    The doxygen.conf.in does not provided the correct variable to process
+    the HTMLHelp file vle.chm. We re-enable the HTMLHelp.
+
+commit f4300435f5d9b917cd12528290bae4cc3cedad3a
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Nov 3 09:42:40 2011 +0100
+
+    vle: update NEWS
+
+commit bf1db911612ef25b2dbdb25b4efa0c60e9e6508d
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Wed Sep 28 17:23:20 2011 +0200
+
+    ext/dec: fix behavior of the SS constraint
+    
+    A constraint SS(A,B,mintl,maxtl) could lead to a start of the activity B
+    when A is done. B should start only mintl after A is done.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit a304cca35e880b65dcfe933c10430d69bd17a041
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Wed Sep 14 08:54:19 2011 +0200
+
+    ext/dec: add parametrized error messages
+    
+    To produce more explicit error messages, the vle::fmt method is used to
+    parametrize the modelling error messages.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit b225801a748cba2a3014a6ee09fdb4c242d384ef
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Wed Oct 19 16:09:28 2011 +0200
+
+    ext/de: fix a bug on confluent transition
+    
+    When a Nosync variable arrives on external transition, a useless
+    transition to POST state with ta=0 is set, even if all synchronous variables are
+    available. The test example confluentNosync is added. (Closes: #3409820).
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 81da223a6ffc5c8286561cd3ba48f8bb8bc03b63
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Fri Oct 21 14:51:01 2011 +0200
+
+    ext/dess: fix the example model sir4.vpz
+    
+    Change of output name of the view (Closes: #3425845).
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit aa78842322fbea6ecaedd34821d0387a6ef816c5
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Oct 6 16:18:18 2011 +0200
+
+    vle: switch to 2011
+
+commit 5f577699c36466a20f6617e70f772913a6da3923
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Oct 5 10:23:30 2011 +0200
+
+    utils: fix the paths of external plug-ins
+    
+    The Path API for external plug-ins of GVLE output and modelling
+    directories are wrongs. We fix it.
+    
+    - Path::getExternalPackagePluginGvleOutputDir returns
+      $package/plugins/gvle/modeling
+    
+    - Path::getExternalPackagePluginGvleModelingDir returns
+      $package/plugins/gvle/output
+
+commit 848a80adb28de515c7d6e72b4e97ab610f7e1948
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Sep 15 14:09:05 2011 +0200
+
+    vle-1.0.0
 
 commit bc92b3eb2c27a52b0efe04f6e15ad2b6e73a366e
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
