@@ -50,10 +50,12 @@
 #include <dlfcn.h>
 #endif
 
-namespace vle { namespace utils {
+namespace fs = boost::filesystem;
+
+namespace vle { namespace utils { namespace pimpl {
 
 /**
- * Get the plug-in name of the filename provided.
+ * @brief Get the plug-in name of the filename provided.
  *
  * @code
  * // return "toto".
@@ -91,21 +93,26 @@ static std::string getLibraryName(const boost::filesystem::path& file)
     return library;
 }
 
-static std::string getKeyName(const std::string& package,
-                              const std::string& library)
-{
-    std::string result(package.size() + library.size() + 1, '/');
-
-    result.replace(0, package.size(), package);
-    result.replace(package.size() + 1, library.size(), library);
-
-    return result;
-}
-
 class Module
 {
 public:
+    std::string mPath;
+    std::string mPackage;
+    std::string mLibrary;
+
+#ifdef BOOST_WINDOWS
+    HMODULE mHandle;
+    FARPROC mFunction;
+#else
+    void *mHandle;
+    void *mFunction;
+#endif
+
+    ModuleType mType;
+
     /**
+     * @brief A Module store shared library and symbol.
+     *
      * Build a new Module for a specified path build from the package name, the
      * library name and the type of the module. The shared library is not read.
      * To read the shared library and get symbol, use the Module::get()
@@ -115,15 +122,15 @@ public:
      * @param library
      * @param type
      */
-    Module(const std::string& package, const std::string& library,
-          ModuleType type)
-        : mPath(ModuleManager::buildModuleFilename(package, library, type)),
-        mHandle(0), mFunction(0), mType(type), mIsGlobal(false)
+    Module(const std::string& path, const std::string& package, const
+           std::string& library, ModuleType type)
+        : mPath(path), mPackage(package), mLibrary(library), mHandle(0),
+        mFunction(0), mType(type)
     {
     }
 
     /**
-     * Delete the instance of the shared library.
+     * @brief Delete the instance of the shared library.
      */
     ~Module()
     {
@@ -137,8 +144,9 @@ public:
     }
 
     /**
-     * Get the symbol specified from the shared library. If the shared library
-     * was nether opened, it was open.
+     * @brief Get the symbol specified from the shared library.
+     *
+     * If the shared library was nether opened, it was open.
      *
      * @throw utils::ArgError if the type argument specify many Type.
      * @throw utils::InternalError if the shared library does not exists, does
@@ -153,96 +161,87 @@ public:
             checkVersion();
         }
 
-        if (mFunction) {
-            return mFunction;
-        } else {
+        if (not mFunction) {
             switch (mType) {
             case MODULE_DYNAMICS:
-                return mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_dynamics"));
+                if (not (mFunction = reinterpret_cast < void* >(
+                            getSymbol("vle_make_new_dynamics")))) {
+                    throw utils::InternalError(fmt(
+                            _("Module `%1%' is not a dynamic module"
+                              " (symbol vle_make_new_dynamics"
+                              " is not found)")) % mPath);
+                }
+                break;
+            case MODULE_DYNAMICS_EXECUTIVE:
+                if (not (mFunction = reinterpret_cast < void* >(
+                            getSymbol("vle_make_new_executive")))) {
+                    throw utils::InternalError(fmt(
+                            _("Module `%1%' is not an executive module"
+                              " (symbol vle_make_new_executive"
+                              " is not found)")) % mPath);
+                }
+                break;
             case MODULE_DYNAMICS_WRAPPER:
-                return mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_dynamics_wrapper"));
-            case MODULE_EXECUTIVE:
-                return mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_executive"));
+                if (not (mFunction = reinterpret_cast < void* >(
+                            getSymbol("vle_make_new_dynamics_wrapper")))) {
+                    throw utils::InternalError(fmt(
+                            _("Module `%1%' is not a dynamic wrapper module"
+                              "(symbol vle_make_new_dynamics_wrapper"
+                              " is not found)")) % mPath);
+                }
+                break;
             case MODULE_OOV:
-                return mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_oov"));
-            case MODULE_EOV:
-                return mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_eov"));
+                if (not (mFunction = reinterpret_cast < void* >(
+                            getSymbol("vle_make_new_oov")))) {
+                    throw utils::InternalError(fmt(
+                            _("Module `%1%' is not an oov module (symbol"
+                              " vle_make_new_oov not found)")) % mPath);
+                }
+                break;
             case MODULE_GVLE_MODELING:
-                return mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_gvle_modeling"));
+                if (not (mFunction = reinterpret_cast < void* >(
+                            getSymbol("vle_make_new_gvle_modeling")))) {
+                    throw utils::InternalError(fmt(
+                            _("Module: `%1%' is not a GVLE modeling module"
+                              " (symbol vle_make_new_gvle_modeling not found)"))
+                        % mPath);
+                }
+                break;
             case MODULE_GVLE_OUTPUT:
-                return mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_gvle_output"));
+                if (not (mFunction = reinterpret_cast < void* >(
+                    getSymbol("vle_make_new_gvle_output")))) {
+                    throw utils::InternalError(fmt(
+                            _("Module: `%1%' is not a GVLE output module"
+                              " (symbol vle_make_new_gvle_output not found)"))
+                        % mPath);
+                }
+                break;
             default:
-                throw utils::InternalError(fmt(
-                        _("Module `%1%' have not the wanted symbol (%2%)")) %
-                    mPath % static_cast < int >(mType));
-            };
+                throw utils::InternalError();
+            }
         }
+
+        return mFunction;
     }
 
-    ModuleType determine()
+    bool operator==(const Module& other) const
     {
-        if (not mHandle) {
-            init();
-            checkVersion();
-        }
-
-        if (existSymbol("vle_make_new_dynamics")) {
-            mType = MODULE_DYNAMICS;
-        } else if (existSymbol("vle_make_new_dynamics_wrapper")) {
-            mType = MODULE_DYNAMICS_WRAPPER;
-        } else if (existSymbol("vle_make_new_executive")) {
-            mType = MODULE_EXECUTIVE;
-        } else if (existSymbol("vle_make_new_oov")) {
-            mType = MODULE_OOV;
-        } else if (existSymbol("vle_make_new_eov")) {
-            mType = MODULE_EOV;
-        } else if (existSymbol("vle_make_new_gvle_modeling")) {
-            mType = MODULE_GVLE_MODELING;
-        } else if (existSymbol("vle_make_new_gvle_output")) {
-            mType = MODULE_GVLE_OUTPUT;
-        }
-
-        return mType;
+        return mPath == other.mPath;
     }
 
-    const std::string& path() const
+    bool operator<(const Module& other) const
     {
-        return mPath;
+        return mPath < other.mPath;
     }
-
-private:
-    std::string mPath;
-#ifdef BOOST_WINDOWS
-    HMODULE mHandle;
-#else
-    void *mHandle;
-#endif
-
-#ifdef BOOST_WINDOWS
-    FARPROC mFunction;
-#else
-    void *mFunction;
-#endif
-
-    ModuleType mType;
-    bool mIsGlobal;
-
 
     void init()
     {
         assert(not mHandle);
 
 #ifdef BOOST_WINDOWS
-        HMODULE handle = LoadLibrary(mPath.c_str());
+        HMODULE handle = ::LoadLibrary(mPath.c_str());
 #else
-        void *handle = dlopen(mPath.c_str(), RTLD_LAZY);
+        void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY);
 #endif
         if (not handle) {
             std::string extra;
@@ -260,9 +259,9 @@ private:
                             0, NULL);
 
             extra = msg;
-            LocalFree(msg);
+            ::LocalFree(msg);
 #else
-            char *error = dlerror();
+            char *error = ::dlerror();
             if (error) {
                 extra.assign(error);
             }
@@ -290,6 +289,13 @@ private:
         versionFunction fct;
 
         symbol = getSymbol("vle_api_level");
+
+        if (not symbol) {
+            throw utils::InternalError(fmt(
+                    _("Module `%1%' does not have a vle_api_level symbol. "
+                      "This module seems to be too old.")) % mPath);
+        }
+
         fct = utils::functionCast < versionFunction >(symbol);
         fct(&major, &minor, &patch);
 
@@ -308,292 +314,228 @@ private:
         }
     }
 
+    /**
+     * @brief Get a symbol in the opened shared library.
+     *
+     * @param dsymbol The symbol to get from the shared library.
+     *
+     * @return 0 if the symbol was not found, !0 otherwise.
+     */
 #ifdef BOOST_WINDOWS
     FARPROC getSymbol(const char *dsymbol)
+    {
+        FARPROC ptr = ::GetProcAddress(mHandle, symbol);
+        return ptr;
+    }
 #else
     void *getSymbol(const char *symbol)
-#endif
     {
-        assert(mHandle);
-
-#ifdef BOOST_WINDOWS
-        FARPROC ptr = GetProcAddress(mHandle, symbol);
-#else
-        void *ptr = dlsym(mHandle, symbol);
-#endif
-
-        if (not ptr) {
-            throw utils::InternalError(fmt(
-                    _("Module `%1%' have not the desired symbol (%2%)")) %
-                mPath % symbol);
-        }
-
+        void *ptr = ::dlsym(mHandle, symbol);
         return ptr;
     }
-
-    bool existSymbol(const char *symbol) const
-    {
-        assert(mHandle);
-
-#ifdef BOOST_WINDOWS
-        FARPROC ptr = GetProcAddress(mHandle, symbol);
-#else
-        void *ptr = dlsym(mHandle, symbol);
 #endif
-        return ptr;
-    }
 };
+
+class SymbolTable
+{
+public:
+    typedef std::map < std::string, void* > Container;
+    typedef std::map < std::string, void* >::const_iterator const_iterator;
+    typedef std::map < std::string, void* >::iterator iterator;
+    typedef std::map < std::string, void* >::size_type size_type;
+
+    SymbolTable()
+    {
+    }
+
+    ~SymbolTable()
+    {
+    }
+
+    void *get(const std::string& symbol)
+    {
+        const_iterator it = mLst.find(symbol);
+
+        if (it != mLst.end()) {
+            return it->second;
+        } else {
+            void *result = 0;
+#ifdef BOOST_WINDOWS
+            FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
+            result = static_cast < void* >(ptr);
+#else
+            result = ::dlsym(NULL, symbol.c_str());
+#endif
+
+            if (result) {
+                mLst.insert(
+                    std::make_pair < std::string, void* >(symbol, result));
+                return result;
+            } else {
+                throw utils::InternalError(fmt(
+                        _("Module: `%1%' not found in global space")) % symbol);
+            }
+        }
+    }
+
+    Container mLst;
+
+private:
+    SymbolTable(const SymbolTable&);
+    SymbolTable& operator=(const SymbolTable&);
+};
+
+} // namespace pimpl
 
 class ModuleManager::Pimpl
 {
 public:
-    typedef boost::unordered_map < std::string, Module* > ModuleTable;
+    typedef boost::unordered_map < std::string, pimpl::Module* > ModuleTable;
     typedef ModuleTable::value_type value_type;
     typedef ModuleTable::const_iterator const_iterator;
     typedef ModuleTable::iterator iterator;
+
+    typedef std::map < std::string, void* > MapSymbol;
+
+    struct ModuleDeleter
+    {
+        void operator()(value_type& x) const
+        {
+            delete x.second;
+            x.second = 0;
+        }
+    };
+
+    /**
+     * @brief An unary operator to convert pimpl::Module into Module.
+     */
+    struct ModuleConvert
+    {
+        Module operator()(const ModuleTable::value_type& module) const
+        {
+            return Module(module.second->mPackage, module.second->mLibrary,
+                          module.second->mPath, module.second->mType);
+        }
+    };
+
+    /**
+     * @brief A predicate to check if a pimpl::Module is in specified package.
+     */
+    struct ModuleIsInPackage
+    {
+        const std::string& mPackage;
+
+        ModuleIsInPackage(const std::string& package)
+            : mPackage(package)
+        {
+        }
+
+        bool operator()(const ModuleTable::value_type& module) const
+        {
+            return module.second->mPackage == mPackage;
+        }
+    };
 
     Pimpl()
     {
     }
 
-    struct DeleteModule
-    {
-        void operator()(value_type& tmp) {
-            delete tmp.second;
-            tmp.second = 0;
-        }
-    };
-
-    struct GetPackageAndLibraryName
-    {
-        std::multimap < std::string, std::string > *modules;
-
-        GetPackageAndLibraryName(
-            std::multimap < std::string, std::string > *modules) :
-            modules(modules)
-        {}
-
-        void operator()(const value_type& tmp) const
-        {
-            std::string::size_type pos = tmp.second->path().find('/');
-
-            if (pos == std::string::npos) {
-                modules->insert(std::make_pair(
-                        "",
-                        tmp.second->path()));
-            } else {
-                modules->insert(std::make_pair(
-                        tmp.second->path().substr(0, pos),
-                        tmp.second->path().substr(pos)));
-            }
-        }
-    };
-
     ~Pimpl()
     {
         std::for_each(mTableSimulator.begin(),
                       mTableSimulator.end(),
-                      DeleteModule());
+                      ModuleDeleter());
         std::for_each(mTableOov.begin(),
                       mTableOov.end(),
-                      DeleteModule());
+                      ModuleDeleter());
         std::for_each(mTableGvleModeling.begin(),
                       mTableGvleModeling.end(),
-                      DeleteModule());
+                      ModuleDeleter());
         std::for_each(mTableGvleOutput.begin(),
                       mTableGvleOutput.end(),
-                      DeleteModule());
-
-        std::for_each(mTablePackageSimulator.begin(),
-                      mTablePackageSimulator.end(),
-                      DeleteModule());
-        std::for_each(mTablePackageOov.begin(),
-                      mTablePackageOov.end(),
-                      DeleteModule());
-        std::for_each(mTablePackageGvleModeling.begin(),
-                      mTablePackageGvleModeling.end(),
-                      DeleteModule());
-        std::for_each(mTablePackageGvleOutput.begin(),
-                      mTablePackageGvleOutput.end(),
-                      DeleteModule());
+                      ModuleDeleter());
     }
 
-    Module *getModule(const std::string& package,
-                      const std::string& library,
-                      ModuleType type)
+    pimpl::Module *getModule(const std::string& package,
+                             const std::string& library,
+                             ModuleType type)
     {
+        std::string path = buildModuleFilename(package, library, type);
+        iterator it;
+
         switch (type) {
         case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_WRAPPER:
-        case MODULE_EXECUTIVE:
-            return mTablePackageSimulator.insert(
-                std::make_pair < std::string, Module* >(
-                    getKeyName(package, library),
-                    new Module(package, library, type))).first->second;
+            it = mTableSimulator.find(path);
+            if (it != mTableSimulator.end()) {
+                return it->second;
+            } else {
+                return mTableSimulator.insert(
+                    std::make_pair < std::string, pimpl::Module* >(
+                        path, new pimpl::Module(path, package, library,
+                                                type))).first->second;
+            }
         case MODULE_OOV:
-        case MODULE_EOV:
-            return mTablePackageOov.insert(
-                std::make_pair < std::string, Module* >(
-                    getKeyName(package, library),
-                    new Module(package, library, type))).first->second;
+            it = mTableOov.find(path);
+            if (it != mTableOov.end()) {
+                return it->second;
+            } else {
+                return mTableOov.insert(
+                    std::make_pair < std::string, pimpl::Module* >(
+                        path, new pimpl::Module(path, package, library,
+                                                type))).first->second;
+            }
         case MODULE_GVLE_MODELING:
-            return mTablePackageGvleModeling.insert(
-                std::make_pair < std::string, Module* >(
-                    getKeyName(package, library),
-                    new Module(package, library, type))).first->second;
+            it = mTableGvleModeling.find(path);
+            if (it != mTableGvleModeling.end()) {
+                return it->second;
+            } else {
+                return mTableGvleModeling.insert(
+                    std::make_pair < std::string, pimpl::Module* >(
+                        path, new pimpl::Module(path, package, library,
+                                                type))).first->second;
+            }
         case MODULE_GVLE_OUTPUT:
-            return mTablePackageGvleOutput.insert(
-                std::make_pair < std::string, Module* >(
-                    getKeyName(package, library),
-                    new Module(package, library, type))).first->second;
+            it = mTableGvleOutput.find(path);
+            if (it != mTableGvleOutput.end()) {
+                return it->second;
+            } else {
+                return mTableGvleOutput.insert(
+                    std::make_pair < std::string, pimpl::Module* >(
+                        path, new pimpl::Module(path, package, library,
+                                                type))).first->second;
+            }
         default:
             throw utils::InternalError();
         }
     }
 
-    void fill(const boost::filesystem::path& package, ModuleType type)
+    void *getSymbol(const std::string& symbol)
     {
-        namespace fs = boost::filesystem;
-        namespace ss = boost::system;
-        std::string path;
+        return mTableSymbols.get(symbol);
+    }
 
-        switch (type) {
-        case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_WRAPPER:
-        case MODULE_EXECUTIVE:
-            path = Path::path().getExternalPackagePluginSimulatorDir(
-#if BOOST_VERSION > 104500
-                package.filename().string());
-#else
-                package.filename());
-#endif
-            break;
-        case MODULE_OOV:
-        case MODULE_EOV:
-            path = Path::path().getExternalPackagePluginOutputDir(
-#if BOOST_VERSION > 104500
-                package.filename().string());
-#else
-                package.filename());
-#endif
-            break;
-        case MODULE_GVLE_MODELING:
-            path = Path::path().getExternalPackagePluginGvleModelingDir(
-#if BOOST_VERSION > 104500
-                package.filename().string());
-#else
-                package.filename());
-#endif
-            break;
-        case MODULE_GVLE_OUTPUT:
-            path = Path::path().getExternalPackagePluginGvleOutputDir(
-#if BOOST_VERSION > 104500
-                package.filename().string());
-#else
-                package.filename());
-#endif
-            break;
-        default:
-            throw utils::InternalError();
-        }
-
-#if BOOST_VERSION > 104500
-        ss::error_code ec;
-        if (fs::is_directory(path, ec)) {
-#else
+    /**
+     * @brief Browse a directory of a package.
+     *
+     * @param package
+     * @param package
+     * @param type
+     */
+    void browse(const boost::filesystem::path& path,
+                const std::string& package,
+                ModuleType type)
+    {
         if (fs::is_directory(path)) {
-#endif
             fs::directory_iterator it(path), end;
-
             for (; it != end; ++it) {
-#if BOOST_VERSION > 103600
-                if (fs::is_regular_file(it->status())) {
-                    std::string library = getLibraryName(*it);
-
-                    if (not library.empty()) {
-                        getModule(package.filename().string(), library, type);
-                    }
-                }
-#else
                 if (fs::is_regular(it->status())) {
-                    std::string library = getLibraryName(*it);
+                    std::string library = pimpl::getLibraryName(*it);
 
                     if (not library.empty()) {
-                        getModule(package.filename(), library, type);
-                    }
-                }
-#endif
-            }
-        }
-    }
-
-    void fill()
-    {
-        namespace fs = boost::filesystem;
-
-        {
-            fs::path packages = Path::path().getPackagesDir();
-
-            if (fs::is_directory(packages)) {
-                fs::directory_iterator it(packages), end;
-
-                for (; it != end; ++it) {
-                    if (fs::is_directory(it->status())) {
-                        fill(it->path(), MODULE_DYNAMICS);
-                        fill(it->path(), MODULE_OOV);
-                        fill(it->path(), MODULE_GVLE_MODELING);
-                        fill(it->path(), MODULE_GVLE_OUTPUT);
+                        getModule(package, library, type);
                     }
                 }
             }
-        }
-    }
-
-    void browse(ModuleType type,
-                std::multimap < std::string, std::string >* modules)
-    {
-        switch (type) {
-        case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_WRAPPER:
-        case MODULE_EXECUTIVE:
-            std::for_each(mTableSimulator.begin(),
-                          mTableSimulator.end(),
-                          GetPackageAndLibraryName(modules));
-            std::for_each(mTablePackageSimulator.begin(),
-                          mTablePackageSimulator.end(),
-                          GetPackageAndLibraryName(modules));
-            break;
-
-        case MODULE_OOV:
-        case MODULE_EOV:
-            std::for_each(mTableOov.begin(),
-                          mTableOov.end(),
-                          GetPackageAndLibraryName(modules));
-            std::for_each(mTablePackageOov.begin(),
-                          mTablePackageOov.end(),
-                          GetPackageAndLibraryName(modules));
-            break;
-
-        case MODULE_GVLE_MODELING:
-            std::for_each(mTableGvleModeling.begin(),
-                          mTableGvleModeling.end(),
-                          GetPackageAndLibraryName(modules));
-            std::for_each(mTablePackageGvleModeling.begin(),
-                          mTablePackageGvleModeling.end(),
-                          GetPackageAndLibraryName(modules));
-            break;
-
-        case MODULE_GVLE_OUTPUT:
-            std::for_each(mTableGvleOutput.begin(),
-                          mTableGvleOutput.end(),
-                          GetPackageAndLibraryName(modules));
-            std::for_each(mTablePackageGvleOutput.begin(),
-                          mTablePackageGvleOutput.end(),
-                          GetPackageAndLibraryName(modules));
-            break;
-
-        default:
-            break;
         }
     }
 
@@ -601,10 +543,8 @@ public:
     ModuleTable mTableOov;
     ModuleTable mTableGvleModeling;
     ModuleTable mTableGvleOutput;
-    ModuleTable mTablePackageSimulator;
-    ModuleTable mTablePackageOov;
-    ModuleTable mTablePackageGvleModeling;
-    ModuleTable mTablePackageGvleOutput;
+
+    pimpl::SymbolTable mTableSymbols;
 
     boost::mutex mMutex;
 };
@@ -628,48 +568,297 @@ void *ModuleManager::get(const std::string& package,
     return mPimpl->getModule(package, library, type)->get();
 }
 
-ModuleType ModuleManager::determine(const std::string& package,
-                                    const std::string& library,
-                                    ModuleType type) const
+void *ModuleManager::get(const std::string& symbol)
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    return mPimpl->getModule(package, library, type)->determine();
+    return mPimpl->getSymbol(symbol);
 }
 
-
-void ModuleManager::fill()
+void ModuleManager::browse()
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    mPimpl->fill();
+    fs::path packages = utils::Path::path().getPackagesDir();
+
+    fs::path pathsim = "plugins/simulator";
+    fs::path pathoov = "plugins/output";
+    fs::path pathgvlem = "plugins/gvle/modeling";
+    fs::path pathgvleo = "plugins/gvle/output";
+
+    if (fs::is_directory(packages)) {
+        fs::directory_iterator it(packages), end;
+
+        for (; it != end; ++it) { /* for each package */
+            if (fs::is_directory(it->status())) {
+                std::string package = it->path().filename().string();
+
+                {
+                    fs::path tmp = (*it) / pathsim;
+                    mPimpl->browse(tmp, package, MODULE_DYNAMICS);
+                }
+
+                {
+                    fs::path tmp = (*it) / pathoov;
+                    mPimpl->browse(tmp, package, MODULE_OOV);
+                }
+
+                {
+                    fs::path tmp = (*it) / pathgvlem;
+                    mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
+                }
+
+                {
+                    fs::path tmp = (*it) / pathgvleo;
+                    mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
+                }
+            }
+        }
+    }
 }
 
-void ModuleManager::browse(ModuleType type,
-                           std::multimap < std::string, std::string > *modules)
+void ModuleManager::browse(ModuleType type)
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    mPimpl->browse(type, modules);
+    fs::path packages = utils::Path::path().getPackagesDir();
+
+    fs::path pathtype;
+
+    switch (type) {
+    case MODULE_DYNAMICS:
+    case MODULE_DYNAMICS_EXECUTIVE:
+    case MODULE_DYNAMICS_WRAPPER:
+        pathtype = "plugins/simulator";
+        break;
+    case MODULE_OOV:
+        pathtype = "plugins/output";
+        break;
+    case MODULE_GVLE_MODELING:
+        pathtype = "plugins/gvle/modeling";
+        break;
+    case MODULE_GVLE_OUTPUT:
+        pathtype = "plugins/gvle/output";
+        break;
+    }
+
+    if (fs::is_directory(packages)) {
+        fs::directory_iterator it(packages), end;
+
+        for (; it != end; ++it) { /* for each package */
+            if (fs::is_directory(it->status())) {
+                fs::path pkg = (*it);
+                pkg /= pathtype;
+
+                mPimpl->browse(pkg, it->path().filename().string(), type);
+            }
+        }
+    }
+}
+
+void ModuleManager::browse(const std::string& package)
+{
+    boost::mutex::scoped_lock lock(mPimpl->mMutex);
+
+    fs::path pkg = utils::Path::path().getPackagesDir();
+    pkg /= package;
+    pkg /= "plugins";
+
+    {
+        fs::path tmp = pkg;
+        tmp /= "simulator";
+        mPimpl->browse(tmp, package, MODULE_DYNAMICS);
+    }
+
+    {
+        fs::path tmp = pkg;
+        tmp /= "output";
+        mPimpl->browse(tmp, package, MODULE_OOV);
+    }
+
+    {
+        fs::path tmp = pkg;
+        tmp /= "gvle/modeling";
+        mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
+    }
+
+    {
+        fs::path tmp = pkg;
+        tmp /= "gvle/output";
+        mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
+    }
+
+}
+
+void ModuleManager::browse(const std::string& package, ModuleType type)
+{
+    boost::mutex::scoped_lock lock(mPimpl->mMutex);
+
+    fs::path pkg = utils::Path::path().getPackagesDir();
+    pkg /= package;
+    pkg /= "plugins";
+
+    switch (type) {
+    case MODULE_DYNAMICS:
+    case MODULE_DYNAMICS_EXECUTIVE:
+    case MODULE_DYNAMICS_WRAPPER:
+        pkg /= "simulator";
+        break;
+    case MODULE_OOV:
+        pkg /= "output";
+        break;
+    case MODULE_GVLE_MODELING:
+        pkg /= "gvle/modeling";
+        break;
+    case MODULE_GVLE_OUTPUT:
+        pkg /= "gvle/output";
+        break;
+    }
+
+    mPimpl->browse(pkg, package, type);
+}
+
+void ModuleManager::fill(ModuleList *lst) const
+{
+    boost::mutex::scoped_lock lock(mPimpl->mMutex);
+
+    std::transform(mPimpl->mTableSimulator.begin(),
+                   mPimpl->mTableSimulator.end(),
+                   std::back_inserter(*lst),
+                   ModuleManager::Pimpl::ModuleConvert());
+
+    std::transform(mPimpl->mTableOov.begin(),
+                   mPimpl->mTableOov.end(),
+                   std::back_inserter(*lst),
+                   ModuleManager::Pimpl::ModuleConvert());
+
+    std::transform(mPimpl->mTableGvleModeling.begin(),
+                   mPimpl->mTableGvleModeling.end(),
+                   std::back_inserter(*lst),
+                   ModuleManager::Pimpl::ModuleConvert());
+
+    std::transform(mPimpl->mTableGvleOutput.begin(),
+                   mPimpl->mTableGvleOutput.end(),
+                   std::back_inserter(*lst),
+                   ModuleManager::Pimpl::ModuleConvert());
+}
+
+void ModuleManager::fill(ModuleType type, ModuleList *lst) const
+{
+    boost::mutex::scoped_lock lock(mPimpl->mMutex);
+
+    switch (type) {
+    case MODULE_DYNAMICS:
+    case MODULE_DYNAMICS_EXECUTIVE:
+    case MODULE_DYNAMICS_WRAPPER:
+        std::transform(mPimpl->mTableSimulator.begin(),
+                       mPimpl->mTableSimulator.end(),
+                       std::back_inserter(*lst),
+                       ModuleManager::Pimpl::ModuleConvert());
+        break;
+    case MODULE_OOV:
+        std::transform(mPimpl->mTableOov.begin(),
+                       mPimpl->mTableOov.end(),
+                       std::back_inserter(*lst),
+                       ModuleManager::Pimpl::ModuleConvert());
+        break;
+    case MODULE_GVLE_MODELING:
+        std::transform(mPimpl->mTableGvleModeling.begin(),
+                       mPimpl->mTableGvleModeling.end(),
+                       std::back_inserter(*lst),
+                       ModuleManager::Pimpl::ModuleConvert());
+        break;
+    case MODULE_GVLE_OUTPUT:
+        std::transform(mPimpl->mTableGvleOutput.begin(),
+                       mPimpl->mTableGvleOutput.end(),
+                       std::back_inserter(*lst),
+                       ModuleManager::Pimpl::ModuleConvert());
+        break;
+    }
+}
+
+void ModuleManager::fill(const std::string& package, ModuleList *lst) const
+{
+    boost::mutex::scoped_lock lock(mPimpl->mMutex);
+
+    transformIf(mPimpl->mTableSimulator.begin(),
+                mPimpl->mTableSimulator.end(),
+                std::back_inserter(*lst),
+                ModuleManager::Pimpl::ModuleIsInPackage(package),
+                ModuleManager::Pimpl::ModuleConvert());
+
+    transformIf(mPimpl->mTableOov.begin(),
+                mPimpl->mTableOov.end(),
+                std::back_inserter(*lst),
+                ModuleManager::Pimpl::ModuleIsInPackage(package),
+                ModuleManager::Pimpl::ModuleConvert());
+
+    transformIf(mPimpl->mTableGvleModeling.begin(),
+                mPimpl->mTableGvleModeling.end(),
+                std::back_inserter(*lst),
+                ModuleManager::Pimpl::ModuleIsInPackage(package),
+                ModuleManager::Pimpl::ModuleConvert());
+
+    transformIf(mPimpl->mTableGvleOutput.begin(),
+                mPimpl->mTableGvleOutput.end(),
+                std::back_inserter(*lst),
+                ModuleManager::Pimpl::ModuleIsInPackage(package),
+                ModuleManager::Pimpl::ModuleConvert());
+}
+
+void ModuleManager::fill(const std::string& package, ModuleType type,
+                         ModuleList *lst) const
+{
+    boost::mutex::scoped_lock lock(mPimpl->mMutex);
+
+    switch (type) {
+    case MODULE_DYNAMICS:
+    case MODULE_DYNAMICS_EXECUTIVE:
+    case MODULE_DYNAMICS_WRAPPER:
+        transformIf(mPimpl->mTableSimulator.begin(),
+                    mPimpl->mTableSimulator.end(),
+                    std::back_inserter(*lst),
+                    ModuleManager::Pimpl::ModuleIsInPackage(package),
+                    ModuleManager::Pimpl::ModuleConvert());
+        break;
+    case MODULE_OOV:
+        transformIf(mPimpl->mTableOov.begin(),
+                    mPimpl->mTableOov.end(),
+                    std::back_inserter(*lst),
+                    ModuleManager::Pimpl::ModuleIsInPackage(package),
+                    ModuleManager::Pimpl::ModuleConvert());
+        break;
+    case MODULE_GVLE_MODELING:
+        transformIf(mPimpl->mTableGvleModeling.begin(),
+                    mPimpl->mTableGvleModeling.end(),
+                    std::back_inserter(*lst),
+                    ModuleManager::Pimpl::ModuleIsInPackage(package),
+                    ModuleManager::Pimpl::ModuleConvert());
+        break;
+    case MODULE_GVLE_OUTPUT:
+        transformIf(mPimpl->mTableGvleOutput.begin(),
+                    mPimpl->mTableGvleOutput.end(),
+                    std::back_inserter(*lst),
+                    ModuleManager::Pimpl::ModuleIsInPackage(package),
+                    ModuleManager::Pimpl::ModuleConvert());
+        break;
+    }
 }
 
 std::string ModuleManager::buildModuleFilename(const std::string& package,
                                                const std::string& library,
                                                ModuleType type)
 {
-    namespace fs = boost::filesystem;
-
     fs::path current;
 
     switch (type) {
         case MODULE_DYNAMICS:
+        case MODULE_DYNAMICS_EXECUTIVE:
         case MODULE_DYNAMICS_WRAPPER:
-        case MODULE_EXECUTIVE:
             current = Path::path().getExternalPackagePluginSimulatorDir(
                 package);
             break;
         case MODULE_OOV:
-        case MODULE_EOV:
             current = Path::path().getExternalPackagePluginOutputDir(
                 package);
             break;

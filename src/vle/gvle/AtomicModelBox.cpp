@@ -32,6 +32,7 @@
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
+#include <vle/utils/Algo.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Template.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -964,13 +965,14 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                 utils::Template tpl;
                 tpl.open(newTab);
                 tpl.tag(pluginname, conf);
-                PluginFactory& plf = mGVLE->pluginFactory();
-                PluginFactory::ModelingPlg& plugin(plf.getModeling(pluginname));
 
-                if (plugin.plugin()->modify(*mAtom, *mModel, dynamic,
-                                            *mConditions, *mObservables, conf,
-                                            tpl.buffer())) {
-                    const std::string& buffer = plugin.plugin()->source();
+                ModelingPluginPtr plugin =
+                    mGVLE->pluginFactory().getModelingPlugin(
+                        "PACKAGE", pluginname);
+
+                if (plugin->modify(*mAtom, *mModel, dynamic, *mConditions,
+                                   *mObservables, conf, tpl.buffer())) {
+                    const std::string& buffer = plugin->source();
                     std::string filename = utils::Path::path()
                         .getPackageSrcFile(dynamic.library());
                     filename += ".cpp";

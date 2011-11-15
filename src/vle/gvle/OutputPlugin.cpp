@@ -32,8 +32,9 @@
 
 namespace vle { namespace gvle {
 
-OutputPlugin::OutputPlugin(const std::string& name)
-    : m_name(name)
+OutputPlugin::OutputPlugin(const std::string& package,
+                           const std::string& library)
+    : m_package(package), m_library(library)
 {
 }
 

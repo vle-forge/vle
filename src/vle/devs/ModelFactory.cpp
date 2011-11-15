@@ -235,14 +235,9 @@ static devs::Dynamics* buildNewDynamicsWrapper(
     utils::Rand& rnd,
     const vpz::Dynamic& dyn,
     const InitEventList& events,
-    const utils::ModuleManager& modulemgr)
+    void* symbol)
 {
     typedef Dynamics*(*fctdw)(const DynamicsWrapperInit&, const InitEventList&);
-
-    void* symbol;
-
-    symbol = modulemgr.get(dyn.package(), dyn.library(),
-                           utils::MODULE_DYNAMICS_WRAPPER);
 
     fctdw fct = utils::functionCast < fctdw >(symbol);
 
@@ -267,14 +262,9 @@ static devs::Dynamics* buildNewDynamics(
     utils::Rand& rnd,
     const vpz::Dynamic& dyn,
     const InitEventList& events,
-    const utils::ModuleManager& modulemgr)
+    void *symbol)
 {
     typedef Dynamics*(*fctdyn)(const DynamicsInit&, const InitEventList&);
-
-    void *symbol;
-
-    symbol = modulemgr.get(dyn.package(), dyn.library(),
-                           utils::MODULE_DYNAMICS);
 
     fctdyn fct = utils::functionCast < fctdyn >(symbol);
 
@@ -299,14 +289,9 @@ static devs::Dynamics* buildNewExecutive(
     utils::Rand& rnd,
     const vpz::Dynamic& dyn,
     const InitEventList& events,
-    const utils::ModuleManager& modulemgr)
+    void *symbol)
 {
     typedef Dynamics*(*fctexe)(const ExecutiveInit&, const InitEventList&);
-
-    void *symbol;
-
-    symbol = modulemgr.get(dyn.package(), dyn.library(),
-                           utils::MODULE_EXECUTIVE);
 
     fctexe fct = utils::functionCast < fctexe >(symbol);
 
@@ -326,34 +311,55 @@ static devs::Dynamics* buildNewExecutive(
     }
 }
 
-
 devs::Dynamics* ModelFactory::attachDynamics(Coordinator& coordinator,
                                              devs::Simulator* atom,
                                              const vpz::Dynamic& dyn,
                                              const InitEventList& events)
 {
-    utils::ModuleType type;
+    void *symbol = NULL;
+    utils::ModuleType type = utils::MODULE_DYNAMICS;
+    std::string error;
 
-    type = mModuleMgr.determine(dyn.package(), dyn.library(),
+    try {
+        symbol = mModuleMgr.get(dyn.package(), dyn.library(),
                                 utils::MODULE_DYNAMICS);
+        type = utils::MODULE_DYNAMICS;
+    } catch (const std::exception& e) {
+        error += e.what();
+        error += '\n';
+        try {
+            symbol = mModuleMgr.get(dyn.package(), dyn.library(),
+                                    utils::MODULE_DYNAMICS_EXECUTIVE);
+            type = utils::MODULE_DYNAMICS_EXECUTIVE;
+        } catch (const std::exception& e) {
+            error += e.what();
+            error += '\n';
+            try {
+                symbol = mModuleMgr.get(dyn.package(), dyn.library(),
+                                        utils::MODULE_DYNAMICS_WRAPPER);
+                type = utils::MODULE_DYNAMICS_WRAPPER;
+            } catch (const std::exception& e) {
+                error += e.what();
+                error += '\n';
+                throw utils::ModellingError(fmt(
+                        _("Dynamic library loading problem: cannot get any"
+                          " dynamics executive or wrapper '%1%' in library"
+                          " '%2%' package '%3%'\n:%4%")) % dyn.name() %
+                        dyn.library() % dyn.package() % error);
+            }
+        }
+    }
 
     switch (type) {
-        case utils::MODULE_DYNAMICS_WRAPPER:
-            return buildNewDynamicsWrapper(atom, mRoot.rand(), dyn, events,
-                                           mModuleMgr);
-        case utils::MODULE_DYNAMICS:
-            return buildNewDynamics(atom, mRoot.rand(), dyn, events,
-                                    mModuleMgr);
-        case utils::MODULE_EXECUTIVE:
-            return buildNewExecutive(coordinator, atom, mRoot.rand(), dyn,
-                                     events, mModuleMgr);
-        default:
-            throw utils::ModellingError(fmt(
-                    _("Dynamic library loading problem: cannot get any dynamics"
-                      " executive or wrapper '%1%' in library '%2%' package"
-                      " '%3%'. Have you used DECLARE_DYNAMICS,"
-                      " DECLARE_EXECUTIVE, DECLARE_DYNAMICSWRAPPER ?")) %
-                dyn.name() % dyn.library() % dyn.package());
+    case utils::MODULE_DYNAMICS:
+        return buildNewDynamics(atom, mRoot.rand(), dyn, events, symbol);
+    case utils::MODULE_DYNAMICS_EXECUTIVE:
+        return buildNewExecutive(coordinator, atom, mRoot.rand(), dyn, events,
+                                 symbol);
+    case utils::MODULE_DYNAMICS_WRAPPER:
+        return buildNewDynamicsWrapper(atom, mRoot.rand(), dyn, events, symbol);
+    default:
+        throw utils::ModellingError();
     }
 }
 

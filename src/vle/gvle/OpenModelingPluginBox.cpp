@@ -85,13 +85,14 @@ void OpenModelingPluginBox::build()
 {
     mRefTreeModelingPlugin->clear();
 
-    const PluginFactory& plf = mGVLE->pluginFactory();
-    const PluginFactory::ModelingPluginList& pll = plf.modelingPlugins();
+    utils::ModuleList lst;
+    utils::ModuleList::iterator it;
 
-    for (PluginFactory::ModelingPluginList::const_iterator it = pll.begin();
-         it != pll.end(); ++it) {
+    mGVLE->pluginFactory().getGvleModelingPlugins(&lst);
+
+    for (it = lst.begin(); it != lst.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreeModelingPlugin->append());
-	row[mColumns.mName] = utils::Path::basename(it->second.path());
+	row[mColumns.mName] = it->package + "/" + it->library;
     }
 }
 

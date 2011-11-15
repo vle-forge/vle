@@ -37,24 +37,26 @@
 #include <gdkmm/pixbuf.h>
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
-#define DECLARE_GVLE_MODELINGPLUGIN(x)                      \
-    extern "C" {                                            \
-        VLE_GVLE_EXPORT vle::gvle::ModelingPlugin*          \
-        vle_make_new_gvle_modeling(const std::string& name) \
-        {                                                   \
-            return new x(name);                             \
-        }                                                   \
-                                                            \
-        VLE_GVLE_EXPORT void                                \
-        vle_api_level(vle::uint32_t* major,                 \
-                      vle::uint32_t* minor,                 \
-                      vle::uint32_t* patch)                 \
-        {                                                   \
-            *major = VLE_MAJOR_VERSION;                     \
-            *minor = VLE_MINOR_VERSION;                     \
-            *patch = VLE_PATCH_VERSION;                     \
-        }                                                   \
+#define DECLARE_GVLE_MODELINGPLUGIN(x)                         \
+    extern "C" {                                               \
+	VLE_GVLE_EXPORT vle::gvle::ModelingPlugin*             \
+	vle_make_new_gvle_modeling(const std::string& package, \
+				   const std::string& library) \
+	{                                                      \
+	    return new x(package, library);                    \
+	}                                                      \
+                                                               \
+	VLE_GVLE_EXPORT void                                   \
+	vle_api_level(vle::uint32_t* major,                    \
+		      vle::uint32_t* minor,                    \
+		      vle::uint32_t* patch)                    \
+	{                                                      \
+	    *major = VLE_MAJOR_VERSION;                        \
+	    *minor = VLE_MINOR_VERSION;                        \
+	    *patch = VLE_PATCH_VERSION;                        \
+	}                                                      \
     }
 
 namespace vle { namespace gvle {
@@ -73,10 +75,12 @@ public:
 
     /**
      * @brief Build a new ModelingPlugin.
-     * @param name The name of the plug-in.
+     *
+     * @param package The name of the package.
+     * @param library The name of the plug-in.
      */
-    ModelingPlugin(const std::string& name)
-        : mName(name)
+    ModelingPlugin(const std::string& package, const std::string& library)
+        : mPackage(package), mLibrary(library)
     {}
 
     virtual ~ModelingPlugin()
@@ -163,8 +167,13 @@ public:
      */
     Glib::RefPtr < Gdk::Pixbuf > icon() const;
 
+    const std::string& getPackage() const { return mPackage; }
+
+    const std::string& getLibrary() const { return mLibrary; }
+
 protected:
-    std::string mName;
+    std::string mPackage;
+    std::string mLibrary;
     Source mSource;
 
 private:
@@ -174,7 +183,9 @@ private:
     mutable Glib::RefPtr < Gdk::Pixbuf > m_icon;
 };
 
-typedef ModelingPlugin* (*GvleModelingPluginSlot)(const std::string&);
+typedef boost::shared_ptr < ModelingPlugin > ModelingPluginPtr;
+typedef ModelingPlugin* (*GvleModelingPluginSlot)(const std::string&,
+						  const std::string&);
 
 }} // namespace vle gvle
 

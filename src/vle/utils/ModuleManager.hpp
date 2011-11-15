@@ -30,37 +30,83 @@
 #define VLE_UTILS_MODULEMANAGER_HPP 1
 
 #include <vle/utils/DllDefines.hpp>
+#include <vle/utils/Types.hpp>
 #include <string>
-#include <map>
+#include <vector>
 
 namespace vle { namespace utils {
 
+/**
+ * @brief A @e Module must have a type which determine the symbol to load.
+ */
 enum ModuleType
 {
-    MODULE_UNKNOWN,
-    MODULE_DYNAMICS,
-    MODULE_DYNAMICS_WRAPPER,
-    MODULE_EXECUTIVE,
-    MODULE_OOV,
-    MODULE_EOV,
-    MODULE_GVLE_MODELING,
-    MODULE_GVLE_OUTPUT
+    MODULE_DYNAMICS, /**< The @e Module is a simulator and it needs to have the
+                       following symbol: @c vle_make_new_dynamics. */
+    MODULE_DYNAMICS_WRAPPER, /**< The @e Module is a simulator and it needs to
+                               have the following symbols: @c
+                               vle_make_new_dynamics_wrapper. */
+    MODULE_DYNAMICS_EXECUTIVE, /**< The @e Module is a simulator and it needs
+                                 to have the following symbols: @c
+                                 vle_make_new_executive. */
+    MODULE_OOV, /**< The @e Module is an output (from oov library) and it needs
+                  to have the following symbol: @c vle_make_new_oov. */
+    MODULE_GVLE_MODELING, /**< The @e Module is a modeling module (from the vle
+                            library) and it needs to have the following symbol:
+                            @c vle_make_new_gvle_modeling. */
+    MODULE_GVLE_OUTPUT /**< The @e Module is a modeling output module (from the
+                         gvle library) and it needs to have the following
+                         symbol: @c vle_make_new_gvle_output. */
 };
 
 /**
- * ModuleManager permit to store a list of shared libraries or plug-ins and can
- * return for each plug-in a pointer to a function associated to a ModuleType.
+ * @brief A @e Module describes a dynamic loaded shared library.
+ *
+ * @e Module is a public representation of @e ModuleManager's internal Module
+ * which store an handle to the shared library and a pointer to the symbol
+ * referenced by the @e ModuleType.
+ */
+struct VLE_UTILS_EXPORT Module
+{
+    Module(const std::string& package,
+           const std::string& library,
+           const std::string& path,
+           ModuleType type)
+        : package(package), library(library), path(path), type(type)
+    {
+    }
+
+    Module()
+    {
+    }
+
+    std::string package;
+    std::string library;
+    std::string path;
+    ModuleType type;
+};
+
+/**
+ * @brief A @e ModuleList stored list of @e Module in public API.
+ */
+typedef std::vector < Module > ModuleList;
+
+/**
+ * @brief ModuleManager permit to store a list of shared libraries or modules.
+ *
+ * ModuleManager stores shared libraries of VLE (simulators, output, gvle's
+ * output and gvle's modeling modules). For each module, an handle is stored,
+ * a pointer to the associated function, a type and a version.
  *
  * ModuleManager checks the symbols:
- * - "vle_api_level": A function which returns three \c uint32_t. This
- *   integers represent the version of VLE which build the plug-in.
- * - "vle_make_new_dynamics":
- * - "vle_make_new_dynamics_wrapper":
- * - "vle_make_new_executive":
- * - "vle_make_new_oov":
- * - "vle_make_new_eov":
- * - "vle_make_new_gvle_modeling":
- * - "vle_make_new_gvle_output":
+ * - "vle_api_level": A function which returns three @c uint32_t. This
+ *   integers represent the version of VLE which build the module.
+ * - "vle_make_new_dynamics" (MODULE_DYNAMICS).
+ * - "vle_make_new_dynamics_wrapper" (MODULE_DYNAMICS).
+ * - "vle_make_new_executive" (MODULE_DYNAMICS).
+ * - "vle_make_new_oov" (MODULE_OOV).
+ * - "vle_make_new_gvle_modeling" (MODULE_GVLE_MODELING).
+ * - "vle_make_new_gvle_output" (MODULE_GVLE_OUTPUT).
  *
  * @code
  * vle::utils::ModuleManager mng;
@@ -73,21 +119,23 @@ public:
     ModuleManager();
 
     /**
-     * Delete all shared libarry load into the ModuleManager.
+     * Delete all shared library load into the ModuleManager.
      */
     ~ModuleManager();
 
     /**
+     * @brief Get a symbol from a shared library.
+     *
      * Check the list of shared libraries already in the ModuleManager. If the
-     * shared library exists, the symbol \c type is researched into the
+     * shared library exists, the symbol @c type is researched into the
      * library. Otherwise, the ModuleManager try to load the shared library
-     * named from the combination of \c package, \c library and \type.
+     * named from the combination of @c package, @c library and \type.
      *
      * @code
      * // try to load the shared library
      * // $VLE_HOME/.vle/pkgs/glue/lib/libcounter.so
      * ModuleManager manager;
-     * manager.get("glue", "counter", MODULE_DYNAMICS);
+     * manager.get("glue", "counter", MODULE_DYNAMICS, -1, -1, -1);
      * @endcode
      *
      * @param package
@@ -99,29 +147,45 @@ public:
      *
      * @return
      */
-    void *get(const std::string& package,
-              const std::string& library,
+    void *get(const std::string& package, const std::string& library,
               ModuleType type) const;
 
-    /**
-     * Determine the type of the plug-in in the patch builded from the
-     * combination of \c package, \c library and \type.
-     *
-     * @param package
-     * @param library
-     * @param type
-     *
-     * @return
-     */
-    ModuleType determine(const std::string& package,
-                         const std::string& library,
-                         ModuleType type) const;
 
     /**
-     * Browse all plug-ins directories, (global or from packages), for
-     * all type of plug-in and fill the ModuleManager.
+     * @brief Get a symbol directly in the executable.
+     *
+     * Try to get a symbol from the executable if it was never loaded. This
+     * function allows to build executable where we can store simulators,
+     * oov's modules, gvle's modules for instance in unit test.
+     *
+     * @code
+     * // try to get the symbol:
+     * ModuleManager manager;
+     * manager.get(utils::
+     * @endcode
+     *
+     * @param symbol The name of the symbol (be careful, it must be demangled).
+     *
+     * @throw utils::InternalError if the executable does not have a symbol of
+     * this name.
+     *
+     * @return A pointer to the founded symbol.
      */
-    void fill();
+    void *get(const std::string& symbol);
+
+    /*
+      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+
+    void browse();
+
+    void browse(ModuleType type);
+
+    void browse(const std::string& package);
+
+    void browse(const std::string& package, ModuleType type);
 
     /*
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -130,15 +194,37 @@ public:
      */
 
     /**
-     * Fill the cache of module of the ModuleManager with all module of type \c
-     * type readed from the packages distribution.
+     * @brief Retrieve the list of all modules.
      *
-     * @param type
-     * @param output [out] return a map of modules availabled from the packages
-     * of from global directory.
+     * @param[out] lst An output parameter, all modules are pushed backward.
      */
-    void browse(ModuleType type,
-                std::multimap < std::string, std::string >* modules);
+    void fill(ModuleList *lst) const;
+
+    /**
+     * @brief Retrieve the list of modules of the specified type.
+     *
+     * @param type The type of module to by retrieve.
+     * @param[out] lst An output parameter, all modules are pushed backward.
+     */
+    void fill(ModuleType type, ModuleList *lst) const;
+
+    /**
+     * @brief Retrieve the list of modules of the specified package.
+     *
+     * @param package The name of the package to by retrieve.
+     * @param[out] lst An output parameter, all modules are pushed backward.
+     */
+    void fill(const std::string& package, ModuleList *lst) const;
+
+    /**
+     * @brief Retrieve the list of modules of the specified package and type.
+     *
+     * @param package The name of the package to by retrieve.
+     * @param type The type of module to by retrieve.
+     * @param[out] lst An output parameter, all modules are pushed backward.
+     */
+    void fill(const std::string& package, ModuleType type,
+              ModuleList *lst) const;
 
     /*
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -147,9 +233,16 @@ public:
      */
 
     /**
-     * Build a path from the combination of \c package, \c library and \c type.
-     * If type is MODULE_DYNAMICS, MODULE_DYNAMICS_WRAPPER or MODULE_EXECUTIVE,
-     * the same filename is returned.
+     * @brief Build a path for a module.
+     *
+     * Build a path from the combination of @c package, @c library and @c type
+     * parameters.
+     *
+     * @code
+     * std::string path = buildModuleFilename("foo", "bar", MODULE_DYNAMICS);
+     *
+     * assert(path == "/home/user/.vle/pkgs/foo/modules/simulators/libbar.so");
+     * @endcode
      *
      * @param package
      * @param library
@@ -165,7 +258,7 @@ private:
     ModuleManager(const ModuleManager& other);
     ModuleManager& operator=(const ModuleManager& other);
 
-    class Pimpl;
+    class Pimpl; /**< We hide the implementation detail of this class. */
     Pimpl *mPimpl;
 };
 

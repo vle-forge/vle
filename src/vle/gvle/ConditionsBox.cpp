@@ -117,17 +117,17 @@ void ConditionsBox::ConditionsTreeView::makeMenuEdit()
 {
     Gtk::Menu::MenuList& menulist = mMenuEdit.items();
 
-    PluginFactory& plf = mParent->getGVLE()->pluginFactory();
-    const PluginFactory::ModelingPluginList& pll = plf.modelingPlugins();
+    utils::ModuleList lst;
+    utils::ModuleList::iterator it;
+    mParent->getGVLE()->pluginFactory().getGvleModelingPlugins(&lst);
 
-    for (PluginFactory::ModelingPluginList::const_iterator it = pll.begin();
-         it != pll.end(); ++it) {
+    for (it = lst.begin(); it != lst.end(); ++it) {
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-                it->first.first + "/" + it->first.second,
+                it->package + "/" + it->library,
                 sigc::bind<std::string>(sigc::mem_fun(
                         *this, &ConditionsBox::ConditionsTreeView::onEdit),
-                    it->first.first + "/" + it->first.second)));
+                    it->package + "/" + it->library)));
     }
 }
 
@@ -239,19 +239,16 @@ void ConditionsBox::ConditionsTreeView::onCopy()
 
 void ConditionsBox::ConditionsTreeView::onEdit(std::string pluginName)
 {
-
     Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
 
     if (it) {
-
         std::string conditionName = Glib::ustring((*it)[mColumns.m_col_name]);
 
-        PluginFactory& plf = mParent->getGVLE()->pluginFactory();
-
         try {
-            PluginFactory::ModelingPlg& plugin = plf.getModeling(pluginName);
+            PluginFactory& plf = mParent->getGVLE()->pluginFactory();
+            ModelingPluginPtr plugin = plf.getModelingPlugin(pluginName);
             vpz::Condition& cond = mConditions->get(conditionName);
-            plugin.plugin()->start(cond);
+            plugin->start(cond);
 
             mParent->buildTreePorts(conditionName);
 
@@ -389,17 +386,17 @@ void ConditionsBox::PortsTreeView::makeMenuEdit()
 {
     Gtk::Menu::MenuList& menulist = mMenuEdit.items();
 
-    PluginFactory& plf = mParent->getGVLE()->pluginFactory();
-    const PluginFactory::ModelingPluginList& pll = plf.modelingPlugins();
+    utils::ModuleList lst;
+    utils::ModuleList::iterator it;
+    mParent->getGVLE()->pluginFactory().getGvleModelingPlugins(&lst);
 
-    for (PluginFactory::ModelingPluginList::const_iterator it = pll.begin();
-         it != pll.end(); ++it) {
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		it->first.first + "/" + it->first.second,
-		sigc::bind<std::string>(sigc::mem_fun(
+    for (it = lst.begin(); it != lst.end(); ++it) {
+        menulist.push_back(
+            Gtk::Menu_Helpers::MenuElem(
+                it->package + "/" + it->library,
+                sigc::bind<std::string>(sigc::mem_fun(
                         *this, &ConditionsBox::PortsTreeView::onEdit),
-                    it->first.first + "/" + it->first.second)));
+                    it->package + "/" + it->library)));
     }
 }
 
@@ -510,11 +507,10 @@ void ConditionsBox::PortsTreeView::onEdit(std::string pluginName)
 	PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
 	try {
-	    PluginFactory::ModelingPlg& plugin = plf.getModeling(pluginName);
-	    plugin.plugin()->start(*mCondition, name);
+	    ModelingPluginPtr plugin = plf.getModelingPlugin(pluginName);
+	    plugin->start(*mCondition, name);
 	    mParent->buildTreeValues(mCondition->name(), name);
-	} catch(const std::exception& e) {
-	    // Error(e.what());
+	} catch(const std::exception& /*e*/) {
 	}
     }
 }

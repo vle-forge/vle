@@ -222,13 +222,13 @@ void ViewOutputBox::onAddViews()
                     m_plugin->set_active(0);
                 }
 
-                PluginFactory::OovPlg& plugin =
-                    m_GVLE->pluginFactory().getOov(
-                        m_plugin->get_active_text());
+                std::string package, library;
 
-                m_viewscopy.addLocalStreamOutput(outputname, "",
-                                                 plugin.name(),
-                                                 plugin.package());
+                PluginFactory::buildPackageLibraryNames(
+                    m_plugin->get_active_text(), &package, &library);
+
+                m_viewscopy.addLocalStreamOutput(outputname, "", library,
+                                                 package);
                 m_viewscopy.addTimedView(name, 1.0, outputname);
                 m_iter = iter;
                 updateView(name);
@@ -449,12 +449,12 @@ void ViewOutputBox::onEditPlugin()
         PluginFactory& plf = m_GVLE->pluginFactory();
 
         try {
-            PluginFactory::OutputPlg& plugin =
-                plf.getOutput(m_plugin->get_active_text());
+            OutputPluginPtr plugin =
+                plf.getOutputPlugin(m_plugin->get_active_text());
             vpz::View& view(m_viewscopy.get(name));
             vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
-            plugin.plugin()->start(output, view);
+            plugin->start(output, view);
             if (output.data()) {
                 m_data->get_buffer()->set_text(output.data()->writeToXml());
             }
@@ -477,20 +477,20 @@ void ViewOutputBox::onChangedPlugin()
             vpz::View& view(m_viewscopy.get(name));
             vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
-            PluginFactory::OovPlg& plugin =
-                m_GVLE->pluginFactory().getOov(
-                    m_plugin->get_active_text());
+            std::string package, library;
 
-            if (output.plugin() != plugin.name() or
-                output.package() != plugin.package()) {
+            PluginFactory::buildPackageLibraryNames(m_plugin->get_active_text(),
+                                                    &package,
+                                                    &library);
+
+            if (output.plugin() != library or
+                output.package() != package) {
                 if (m_format->get_active_text() == "distant") {
-                    output.setDistantStream(m_location->get_text(),
-                                            plugin.name(),
-                                            plugin.package());
+                    output.setDistantStream(m_location->get_text(), library,
+                                            package);
                 } else {
-                    output.setLocalStream(m_location->get_text(),
-                                          plugin.name(),
-                                          plugin.package());
+                    output.setLocalStream(m_location->get_text(), library,
+                                          package);
                 }
                 updateView(name);
             }
@@ -533,15 +533,12 @@ void ViewOutputBox::fillCombobox()
     m_format->append_text("local");
 
     {
-        PluginFactory& plf = m_GVLE->pluginFactory();
-        const PluginFactory::OovPluginList& plugins = plf.oovPlugins();
+        utils::ModuleList lst;
+        utils::ModuleList::iterator it;
+        m_GVLE->pluginFactory().getOutputPlugins(&lst);
 
-        if (not plugins.empty()) {
-            PluginFactory::OovPluginList::const_iterator it;
-
-            for (it = plugins.begin(); it != plugins.end(); ++it) {
-                m_plugin->append_text(it->second.string());
-            }
+        for (it = lst.begin(); it != lst.end(); ++it) {
+            m_plugin->append_text(it->package + "/" + it->library);
         }
     }
 }
@@ -560,18 +557,15 @@ void ViewOutputBox::assignView(const std::string& name)
         view.setTimestep(x);
     }
 
-    PluginFactory::OovPlg& plugin =
-        m_GVLE->pluginFactory().getOov(
-            m_plugin->get_active_text());
+    std::string package, library;
+
+    PluginFactory::buildPackageLibraryNames(m_plugin->get_active_text(),
+                                            &package, &library);
 
     if (m_format->get_active_text() == "distant") {
-        output.setDistantStream(m_location->get_text(),
-                                plugin.name(),
-                                plugin.package());
+        output.setDistantStream(m_location->get_text(), library, package);
     } else {
-        output.setLocalStream(m_location->get_text(),
-                              plugin.name(),
-                              plugin.package());
+        output.setLocalStream(m_location->get_text(), library, package);
     }
 
     if (not m_data->get_buffer()->get_text().empty()) {
@@ -599,16 +593,27 @@ void ViewOutputBox::updateView(const std::string& name)
     m_location->set_text(output.location());
     m_directory->set_sensitive(output.format() == vpz::Output::LOCAL);
 
-    m_plugin->set_active_text(PluginFactory::OovPlg::generic(
-            output.plugin(), output.package()));
+    std::string pluginname;
+
+    PluginFactory::buildPluginName(output.package(), output.plugin(),
+                                   &pluginname);
+
+    m_plugin->set_active_text(pluginname);
 
     {
-        PluginFactory::OutputPluginList list =
-            m_GVLE->pluginFactory().outputPlugins();
-        PluginFactory::OutputPluginList::iterator it =
-            list.find(PluginFactory::Key(output.plugin(), output.package()));
+        utils::ModuleList lst;
+        utils::ModuleList::iterator it;
 
-        if (it != list.end()) {
+        m_GVLE->pluginFactory().getGvleOutputPlugins(&lst);
+
+        for (it = lst.begin(); it != lst.end(); ++it) {
+            if (it->package == output.package() and
+                it->library == output.plugin()) {
+                break;
+            }
+        }
+
+        if (it != lst.end()) {
             m_editplugin->set_sensitive(true);
         } else {
             m_editplugin->set_sensitive(false);

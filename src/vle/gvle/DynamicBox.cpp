@@ -145,38 +145,16 @@ void DynamicBox::makeComboLibrary()
 {
     mComboLibrary->clear();
 
-    utils::PathList paths;
+    utils::ModuleList lst;
+    utils::ModuleList::iterator it;
 
-    if (mComboPackage->get_active_text().empty()) {
-        paths = utils::Path::path().getSimulatorDirs();
-    } else {
-        paths.push_back(
-            utils::Path::path().getExternalPackagePluginSimulatorDir(
-                mComboPackage->get_active_text()));
-    }
-    utils::PathList::iterator it = paths.begin();
+    std::string selectedPackage = mComboPackage->get_active_text();
+    mGVLE->pluginFactory().getDynamicsPlugins(selectedPackage, &lst);
 
-    while (it != paths.end()) {
-        if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
-            Glib::Dir rep(*it);
-            Glib::DirIterator in = rep.begin();
-            while (in != rep.end()) {
-#ifdef G_OS_WIN32
-                if (((*in).find("lib") == 0) &&
-                    ((*in).rfind(".dll") == (*in).size() - 4)) {
-                    mComboLibrary->append_text((*in).substr(3, (*in).size() - 7));
-                }
-#else
-                if (((*in).find("lib") == 0) &&
-                    ((*in).rfind(".so") == (*in).size() - 3)) {
-                    mComboLibrary->append_text((*in).substr(3, (*in).size() - 6));
-                }
-#endif
-                in++;
-            }
-        }
-        it++;
+    for (it = lst.begin(); it != lst.end(); ++it) {
+        mComboLibrary->append_text(it->library);
     }
+
     mComboLibrary->set_active_text(mDyn->library());
 }
 
@@ -256,12 +234,12 @@ int DynamicBox::execPlugin(const std::string& pluginname,
                            const std::string& classname,
                            const std::string& namespace_)
 {
-    PluginFactory& plf = mGVLE->pluginFactory();
-    PluginFactory::ModelingPlg& plugin = plf.getModeling(pluginname);
+    ModelingPluginPtr plugin =
+        mGVLE->pluginFactory().getModelingPlugin(pluginname);
 
-    if (plugin.plugin()->create(mAtom, mVAtom, mDynamic, mConditions,
-                                mObservables, classname, namespace_)) {
-        const std::string& buffer = plugin.plugin()->source();
+    if (plugin->create(mAtom, mVAtom, mDynamic, mConditions,
+                       mObservables, classname, namespace_)) {
+        const std::string& buffer = plugin->source();
         std::string filename = utils::Path::path().getPackageSrcFile(classname);
         filename += ".cpp";
 

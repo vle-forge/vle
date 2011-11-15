@@ -133,19 +133,20 @@ void NetStreamReader::onClose(const double& time)
 void NetStreamReader::getPlugin(const std::string& pluginname,
                                 const std::string& package)
 {
-    void *symbol = 0;
+    throw utils::NotYetImplemented("NetStreamReader::getPlugin");
+    //void *symbol = 0;
 
-    try {
-        symbol = getModuleManager().get(package, pluginname, utils::MODULE_EOV);
+    //try {
+        //symbol = getModuleManager().get(package, pluginname, utils::MODULE_EOV);
 
-        EovPluginSlot fct(utils::functionCast < EovPluginSlot >(symbol));
-        Plugin* ptr = fct(plugin(), this);
-        PluginPtr plg(ptr);
-        m_plugin = plg;
-    } catch (const std::exception& e) {
-        throw utils::InternalError(fmt(
-                _("Eov module: error when loadin the module: %1%")) % e.what());
-    }
+        //EovPluginSlot fct(utils::functionCast < EovPluginSlot >(symbol));
+        //Plugin* ptr = fct(plugin(), this);
+        //PluginPtr plg(ptr);
+        //m_plugin = plg;
+    //} catch (const std::exception& e) {
+        //throw utils::InternalError(fmt(
+                //_("Eov module: error when loadin the module: %1%")) % e.what());
+    //}
 }
 
 void NetStreamReader::runWindow(const std::string& pluginname,

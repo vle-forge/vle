@@ -179,6 +179,18 @@ namespace vle { namespace utils {
                                               const std::string& file) const;
         std::string getExternalPackageExpFile(const std::string& name,
                                               const std::string& file) const;
+        std::string getExternalPackageOutputFile(const std::string& package,
+                                                const std::string& file) const;
+        std::string getExternalPackagePluginFile(const std::string& package,
+                                                const std::string& file) const;
+        std::string getExternalPackagePluginSimulatorFile(const std::string& package,
+                                                         const std::string& file) const;
+        std::string getExternalPackagePluginOutputFile(const std::string& package,
+                                                      const std::string& file) const;
+        std::string getExternalPackagePluginGvleModelingFile(const std::string& package,
+                                                            const std::string& file) const;
+        std::string getExternalPackagePluginGvleOutputFile(const std::string& package,
+                                                          const std::string& file) const;
 
         PathList getInstalledPackages();
         PathList getInstalledExperiments();
@@ -442,6 +454,12 @@ namespace vle { namespace utils {
                                          const std::string& dir2,
                                          const std::string& dir3,
                                          const std::string& dir4,
+                                         const std::string& file);
+        static std::string buildFilename(const std::string& dir1,
+                                         const std::string& dir2,
+                                         const std::string& dir3,
+                                         const std::string& dir4,
+                                         const std::string& dir5,
                                          const std::string& file);
 
         static std::string buildDirname(const std::string& dir1,

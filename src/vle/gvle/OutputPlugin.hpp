@@ -34,24 +34,26 @@
 #include <vle/vpz/View.hpp>
 #include <vle/version.hpp>
 #include <gdkmm/pixbuf.h>
+#include <boost/shared_ptr.hpp>
 
-#define DECLARE_GVLE_OUTPUTPLUGIN(x)                       \
-    extern "C" {                                           \
-        VLE_GVLE_EXPORT vle::gvle::OutputPlugin*           \
-        vle_make_new_gvle_output(const std::string& name)  \
-        {                                                  \
-            return new x(name);                            \
-        }                                                  \
-                                                           \
-        VLE_GVLE_EXPORT void                               \
-        vle_api_level(vle::uint32_t* major,                \
-                      vle::uint32_t* minor,                \
-                      vle::uint32_t* patch)                \
-        {                                                  \
-            *major = VLE_MAJOR_VERSION;                    \
-            *minor = VLE_MINOR_VERSION;                    \
-            *patch = VLE_PATCH_VERSION;                    \
-        }                                                  \
+#define DECLARE_GVLE_OUTPUTPLUGIN(x)                         \
+    extern "C" {                                             \
+        VLE_GVLE_EXPORT vle::gvle::OutputPlugin*             \
+        vle_make_new_gvle_output(const std::string& package, \
+                                 const std::string& library) \
+        {                                                    \
+            return new x(package, library);                  \
+        }                                                    \
+                                                             \
+        VLE_GVLE_EXPORT void                                 \
+        vle_api_level(vle::uint32_t* major,                  \
+                      vle::uint32_t* minor,                  \
+                      vle::uint32_t* patch)                  \
+        {                                                    \
+            *major = VLE_MAJOR_VERSION;                      \
+            *minor = VLE_MINOR_VERSION;                      \
+            *patch = VLE_PATCH_VERSION;                      \
+        }                                                    \
     }
 
 namespace vle { namespace gvle {
@@ -74,7 +76,7 @@ namespace vle { namespace gvle {
 class VLE_GVLE_EXPORT OutputPlugin
 {
 public:
-    OutputPlugin(const std::string& name);
+    OutputPlugin(const std::string& package, const std::string& library);
 
     virtual ~OutputPlugin() {}
 
@@ -95,6 +97,11 @@ public:
      */
     Glib::RefPtr < Gdk::Pixbuf > icon() const;
 
+
+    const std::string& getPackage() const { return m_package; }
+
+    const std::string& getLibrary() const { return m_library; }
+
 private:
     /**
      * @brief Pointer to the icon.
@@ -102,12 +109,19 @@ private:
     mutable Glib::RefPtr < Gdk::Pixbuf > m_icon;
 
     /**
-     * @brief Name of the plug-in taken from library name.
+     * @brief Name of the package.
      */
-    std::string m_name;
+    std::string m_package;
+
+    /**
+     * @brief Name of the plug-in.
+     */
+    std::string m_library;
 };
 
-typedef OutputPlugin* (*GvleOutputPluginSlot)(const std::string&);
+typedef boost::shared_ptr < OutputPlugin > OutputPluginPtr;
+typedef OutputPlugin* (*GvleOutputPluginSlot)(const std::string&,
+                                              const std::string&);
 
 }} // namespace vle gvle
 

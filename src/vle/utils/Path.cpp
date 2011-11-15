@@ -410,6 +410,50 @@ std::string Path::getExternalPackageExpFile(const std::string& name,
     return buildFilename(getPackagesDir(), name, "exp", file);
 }
 
+std::string Path::getExternalPackageOutputFile(
+    const std::string& package,
+    const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), package, "output", file);
+}
+
+std::string Path::getExternalPackagePluginFile(
+    const std::string& package,
+    const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), package, "plugins", file);
+}
+
+std::string Path::getExternalPackagePluginSimulatorFile(
+    const std::string& package,
+    const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), package, "plugins", "simulator", file);
+}
+
+std::string Path::getExternalPackagePluginOutputFile(
+    const std::string& package,
+    const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), package, "plugins", "output", file);
+}
+
+std::string Path::getExternalPackagePluginGvleModelingFile(
+    const std::string& package,
+    const std::string& file) const
+{
+    return buildFilename(
+        getPackagesDir(), package, "plugins", "gvle", "modeling", file);
+}
+
+std::string Path::getExternalPackagePluginGvleOutputFile(
+    const std::string& package,
+    const std::string& file) const
+{
+    return buildFilename(
+        getPackagesDir(), package, "plugins", "gvle", "output", file);
+}
+
 PathList Path::getInstalledPackages()
 {
     fs::path pkgs(Path::path().getPackagesDir());
@@ -812,6 +856,23 @@ std::string Path::buildFilename(const std::string& dir1,
     f /= dir2;
     f /= dir3;
     f /= dir4;
+    f /= file;
+
+    return f.string();
+}
+
+std::string Path::buildFilename(const std::string& dir1,
+                                const std::string& dir2,
+                                const std::string& dir3,
+                                const std::string& dir4,
+                                const std::string& dir5,
+                                const std::string& file)
+{
+    fs::path f = dir1;
+    f /= dir2;
+    f /= dir3;
+    f /= dir4;
+    f /= dir5;
     f /= file;
 
     return f.string();
