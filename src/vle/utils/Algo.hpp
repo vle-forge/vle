@@ -72,7 +72,7 @@ namespace vle { namespace utils {
      * @param out An output stream.
      * @param middle The string to push between each element of the sequence.
      * @param last The string to push at the end of the sequence.
-     * @param around Sttrings to push around each element of the sequence.
+     * @param around Strings to push around each element of the sequence.
      */
     template < typename InputIterator >
         void formatCopy(InputIterator first, InputIterator end,
@@ -96,7 +96,7 @@ namespace vle { namespace utils {
      * @brief Copies the values of the elements in the range [first,last) to
      * the range positions beginning at result, except those for which pred is
      * false, which are not copied. The behavior of this function template is
-     * equalent to:
+     * equivalent to:
      * @code
      * typename InputIterator, typename OutputIterator, typename Predicate >
      * void copyIf(InputIterator first, InputIterator end,
@@ -109,7 +109,8 @@ namespace vle { namespace utils {
      *         ++first;
      *     }
      * }
-     * @encode
+     * @endcode
+     *
      * Example:
      * @code
      * using namespace std;
@@ -151,6 +152,61 @@ namespace vle { namespace utils {
                     *out++ = *first;
                 }
             }
+        }
+
+    /**
+     * @brief Apply a function @e op for all element if predicate @e pred valid.
+     *
+     * @e transformIf applies op to all the elements in the input range
+     * ([first,last)) and stores each returned value in the range beginning
+     * at result if the predicate @e pred is valid.
+     *
+     * @code
+     * template <
+     *     typename InputIterator, typename OutputIteraot, typename Predicate,
+     *              typename UnaryOperator >
+     *     OutputIterator transformIf(InputIterator first, InputIterator end,
+     *                                OutputIterator out, Predicate pred,
+     *                                UnaryOperator op)
+     *     {
+     *         for (; first != end; ++first) {
+     *             if (pred(*first)) {
+     *                 *out++ = op(*first++);
+     *             }
+     *         }
+     *         return out;
+     *     }
+     * @endcode
+     *
+     * @tparam InputIterator
+     * @tparam OutputIteraot
+     * @tparam Predicate
+     * @tparam UnaryOperator
+     * @param first Forward iterator to the initial position in a sequence.
+     * @param end Forward iterator to the final position in a sequence.
+     * @param out Output iterator to the initial position.
+     * @param pred Unary predicate taking an element in the range as argument,
+     * and returning a boolean.
+     * @param op Unary function taking one element as argument, and returning
+     * some result value.
+     *
+     * @return Output iterator to the initial position of the range where
+     * function results are stored. The range includes as many elements as
+     * [first1,last1) which valid @e pred.
+     */
+    template <
+        typename InputIterator, typename OutputIterator, typename Predicate,
+                 typename UnaryOperator >
+        OutputIterator transformIf(InputIterator first, InputIterator end,
+                                   OutputIterator out, Predicate pred,
+                                   UnaryOperator op)
+        {
+            for (; first != end; ++first) {
+                if (pred(*first)) {
+                    *out++ = op(*first);
+                }
+            }
+            return out;
         }
 
     /**
