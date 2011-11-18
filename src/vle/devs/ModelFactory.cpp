@@ -318,36 +318,16 @@ devs::Dynamics* ModelFactory::attachDynamics(Coordinator& coordinator,
 {
     void *symbol = NULL;
     utils::ModuleType type = utils::MODULE_DYNAMICS;
-    std::string error;
 
     try {
         symbol = mModuleMgr.get(dyn.package(), dyn.library(),
-                                utils::MODULE_DYNAMICS);
-        type = utils::MODULE_DYNAMICS;
+                                utils::MODULE_DYNAMICS, &type);
     } catch (const std::exception& e) {
-        error += e.what();
-        error += '\n';
-        try {
-            symbol = mModuleMgr.get(dyn.package(), dyn.library(),
-                                    utils::MODULE_DYNAMICS_EXECUTIVE);
-            type = utils::MODULE_DYNAMICS_EXECUTIVE;
-        } catch (const std::exception& e) {
-            error += e.what();
-            error += '\n';
-            try {
-                symbol = mModuleMgr.get(dyn.package(), dyn.library(),
-                                        utils::MODULE_DYNAMICS_WRAPPER);
-                type = utils::MODULE_DYNAMICS_WRAPPER;
-            } catch (const std::exception& e) {
-                error += e.what();
-                error += '\n';
-                throw utils::ModellingError(fmt(
-                        _("Dynamic library loading problem: cannot get any"
-                          " dynamics executive or wrapper '%1%' in library"
-                          " '%2%' package '%3%'\n:%4%")) % dyn.name() %
-                        dyn.library() % dyn.package() % error);
-            }
-        }
+        throw utils::ModellingError(fmt(
+                _("Dynamic library loading problem: cannot get any"
+                  " dynamics, executive or wrapper '%1%' in library"
+                  " '%2%' package '%3%'\n:%4%")) % dyn.name() %
+            dyn.library() % dyn.package() % e.what());
     }
 
     switch (type) {

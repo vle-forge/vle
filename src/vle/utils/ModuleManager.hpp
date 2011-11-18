@@ -129,18 +129,38 @@ public:
      * Check the list of shared libraries already in the ModuleManager. If the
      * shared library exists, the symbol @c type is researched into the
      * library. Otherwise, the ModuleManager try to load the shared library
-     * named from the combination of @c package, @c library and \type.
+     * named from the combination of @c package, @c library and @e type.
+     *
+     * This function return is @e newtype parameter the type of the module
+     * read. The @e type is MODULE_DYNAMICS, MODULE_DYNAMICS_EXECUTIVE or
+     * MODULE_DYNAMICS_WRAPPER the @e newtype check the type and if it
+     * does not corresponds it check the two other simulators (MODULE_DYNAMICS,
+     * MODULE_DYNAMICS_EXECUTIVE or MODULE_DYNAMICS_EXECUTIVE). If @e type is
+     * not MODULE_DYNAMICS, MODULE_DYNAMICS_WRAPPER,
+     * MODULE_DYNAMICS_EXECUTIVE , the @e newtype will be affected by the
+     * founded type.
      *
      * @code
      * // try to load the shared library
      * // $VLE_HOME/.vle/pkgs/glue/lib/libcounter.so
      * ModuleManager manager;
-     * manager.get("glue", "counter", MODULE_DYNAMICS, -1, -1, -1);
+     * ModuleType type;
+     * manager.get("glue", "counter", MODULE_DYNAMICS, &type);
+     * assert(type == MODULE_DYNAMICS || type == MODULE_DYNAMICS_WRAPPER ||
+     *        type == MODULE_DYNAMICS_WRAPPER);
+     *
+     * manager.get("glue", "counter", MODULE_DYNAMICS_WRAPPER, &type);
+     * assert(type == MODULE_DYNAMICS || type == MODULE_DYNAMICS_WRAPPER ||
+     *        type == MODULE_DYNAMICS_WRAPPER);
+     *
+     * manager.get("glue", "counter", MODULE_OOV, &type);
+     * assert(type == MODULE_OOV);
      * @endcode
      *
      * @param package
      * @param library
      * @param type
+     * @param[out] newtype If @e newtype is null, newtype will not be affected.
      *
      * @throw utils::InternalError if shared library does not exists or if the
      * symbols wanted does not exist.
@@ -148,7 +168,7 @@ public:
      * @return
      */
     void *get(const std::string& package, const std::string& library,
-              ModuleType type) const;
+              ModuleType type, ModuleType *newtype = 0) const;
 
 
     /**

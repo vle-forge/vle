@@ -164,30 +164,76 @@ public:
         if (not mFunction) {
             switch (mType) {
             case MODULE_DYNAMICS:
-                if (not (mFunction = reinterpret_cast < void* >(
-                            getSymbol("vle_make_new_dynamics")))) {
-                    throw utils::InternalError(fmt(
-                            _("Module `%1%' is not a dynamic module"
-                              " (symbol vle_make_new_dynamics"
-                              " is not found)")) % mPath);
+                if (not (mFunction = reinterpret_cast < void* >
+                         (getSymbol("vle_make_new_dynamics")))) {
+                    if (not (mFunction = reinterpret_cast < void* >
+                             (getSymbol("vle_make_new_executive")))) {
+                        if (not (mFunction = reinterpret_cast < void* >
+                                 (getSymbol(
+                                         "vle_make_new_dynamics_wrapper")))) {
+                            throw utils::InternalError(fmt(
+                                    _("Module `%1%' is not a dynamic module"
+                                      " (symbol vle_make_new_dynamics,"
+                                      " vle_make_new_executive or"
+                                      " vle_make_new_dynamics_wrapper are not"
+                                      " found")) % mPath);
+
+                        } else {
+                            mType = MODULE_DYNAMICS_WRAPPER;
+                        }
+                    } else {
+                        mType = MODULE_DYNAMICS_EXECUTIVE;
+                    }
+                } else {
+                    mType = MODULE_DYNAMICS;
                 }
                 break;
             case MODULE_DYNAMICS_EXECUTIVE:
-                if (not (mFunction = reinterpret_cast < void* >(
-                            getSymbol("vle_make_new_executive")))) {
-                    throw utils::InternalError(fmt(
-                            _("Module `%1%' is not an executive module"
-                              " (symbol vle_make_new_executive"
-                              " is not found)")) % mPath);
+                if (not (mFunction = reinterpret_cast < void* >
+                         (getSymbol("vle_make_new_executive")))) {
+                    if (not (mFunction = reinterpret_cast < void* >
+                             (getSymbol("vle_make_new_dynamics")))) {
+                        if (not (mFunction = reinterpret_cast < void* >
+                                 (getSymbol(
+                                         "vle_make_new_dynamics_wrapper")))) {
+                            throw utils::InternalError(fmt(
+                                    _("Module `%1%' is not a dynamic module"
+                                      " (symbol vle_make_new_dynamics,"
+                                      " vle_make_new_executive or"
+                                      " vle_make_new_dynamics_wrapper are not"
+                                      " found")) % mPath);
+
+                        } else {
+                            mType = MODULE_DYNAMICS_WRAPPER;
+                        }
+                    } else {
+                        mType = MODULE_DYNAMICS;
+                    }
+                } else {
+                    mType = MODULE_DYNAMICS_EXECUTIVE;
                 }
                 break;
             case MODULE_DYNAMICS_WRAPPER:
-                if (not (mFunction = reinterpret_cast < void* >(
-                            getSymbol("vle_make_new_dynamics_wrapper")))) {
-                    throw utils::InternalError(fmt(
-                            _("Module `%1%' is not a dynamic wrapper module"
-                              "(symbol vle_make_new_dynamics_wrapper"
-                              " is not found)")) % mPath);
+                if (not (mFunction = reinterpret_cast < void* >
+                         (getSymbol("vle_make_new_dynamics_wrapper")))) {
+                    if (not (mFunction = reinterpret_cast < void* >
+                             (getSymbol("vle_make_new_dynamics")))) {
+                        if (not (mFunction = reinterpret_cast < void* >
+                                 (getSymbol("vle_make_new_executive")))) {
+                            throw utils::InternalError(fmt(
+                                    _("Module `%1%' is not a dynamic module"
+                                      " (symbol vle_make_new_dynamics,"
+                                      " vle_make_new_executive or"
+                                      " vle_make_new_dynamics_wrapper are not"
+                                      " found")) % mPath);
+                        } else {
+                            mType = MODULE_DYNAMICS_EXECUTIVE;
+                        }
+                    } else {
+                        mType = MODULE_DYNAMICS;
+                    }
+                } else {
+                    mType = MODULE_DYNAMICS_WRAPPER;
                 }
                 break;
             case MODULE_OOV:
@@ -465,6 +511,8 @@ public:
 
         switch (type) {
         case MODULE_DYNAMICS:
+        case MODULE_DYNAMICS_WRAPPER:
+        case MODULE_DYNAMICS_EXECUTIVE:
             it = mTableSimulator.find(path);
             if (it != mTableSimulator.end()) {
                 return it->second;
@@ -474,6 +522,7 @@ public:
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
+            break;
         case MODULE_OOV:
             it = mTableOov.find(path);
             if (it != mTableOov.end()) {
@@ -484,6 +533,7 @@ public:
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
+            break;
         case MODULE_GVLE_MODELING:
             it = mTableGvleModeling.find(path);
             if (it != mTableGvleModeling.end()) {
@@ -494,6 +544,7 @@ public:
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
+            break;
         case MODULE_GVLE_OUTPUT:
             it = mTableGvleOutput.find(path);
             if (it != mTableGvleOutput.end()) {
@@ -504,6 +555,7 @@ public:
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
+            break;
         default:
             throw utils::InternalError();
         }
@@ -561,11 +613,21 @@ ModuleManager::~ModuleManager()
 
 void *ModuleManager::get(const std::string& package,
                          const std::string& library,
-                         ModuleType type) const
+                         ModuleType type,
+                         ModuleType *newtype) const
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    return mPimpl->getModule(package, library, type)->get();
+
+    if (not newtype) {
+        return mPimpl->getModule(package, library, type)->get();
+    } else {
+        pimpl::Module *module = mPimpl->getModule(package, library, type);
+        void *result = module->get();
+        *newtype = module->mType;
+
+        return result;
+    }
 }
 
 void *ModuleManager::get(const std::string& symbol)
