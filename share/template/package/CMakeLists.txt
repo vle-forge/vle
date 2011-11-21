@@ -1,17 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(emptyproject CXX C)
+PROJECT(MyProject CXX C)
 ENABLE_TESTING()
 
 SET(MODEL_MAJOR 0)
 SET(MODEL_MINOR 1)
 SET(MODEL_PATCH 0)
-SET(MODEL_EXTRA "-dev")
+SET(MODEL_NAME "${PROJECT_NAME}-${MODEL_MAJOR}.${MODEL_MINOR}.${MODEL_PATCH}")
+SET(VLE_NAME "${PROJECT_NAME}-${MODEL_MAJOR}.${MODEL_MINOR}")
 
-IF ("${MODEL_EXTRA}" STREQUAL "")
-  SET(MODEL_NAME "${PROJECT_NAME}-${MODEL_MAJOR}.${MODEL_MINOR}.${MODEL_PATCH}")
-ELSE ("${MODEL_EXTRA}" STREQUAL "")
-  SET(MODEL_NAME "${PROJECT_NAME}-${MODEL_MAJOR}.${MODEL_MINOR}.${MODEL_PATCH}${MODEL_EXTRA}")
-ENDIF ("${MODEL_EXTRA}" STREQUAL "")
 
 ##
 ## Modules
@@ -23,20 +19,51 @@ INCLUDE(CheckLibraryExists)
 INCLUDE(CMakeDetermineCCompiler)
 
 ##
-## Debug mode
-##
-
-IF(UNIX AND NOT WIN32)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
-ENDIF(UNIX AND NOT WIN32)
-
-##
 ## Check libraries with pkgconfig
 ##
 
 FIND_PACKAGE(PkgConfig REQUIRED)
-PKG_CHECK_MODULES(VLE vle-1.1)
+PKG_CHECK_MODULES(VLE vle-1.1 REQUIRED)
+
+
+##
+## Check VLE's packages
+##
+
+#FIND_PACKAGE(VleCheckPackage REQUIRED)
+#VLE_CHECK_PACKAGE(CELLDEVS vle.extension.celldevs)
+#VLE_CHECK_PACKAGE(CELLQSS vle.extension.cellqss)
+#VLE_CHECK_PACKAGE(DECISION vle.extension.decision)
+#VLE_CHECK_PACKAGE(DIFFERENCE_EQU vle.extension.difference-equation)
+#VLE_CHECK_PACKAGE(DIFFERENTIAL_EQU vle.extension.differential-equation)
+#VLE_CHECK_PACKAGE(DSDEVS vle.extension.dsdevs)
+#VLE_CHECK_PACKAGE(FSA vle.extension.fsa)
+#VLE_CHECK_PACKAGE(PETRINET vle.extension.petrinet)
+
+#if (NOT CELLDEVS_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.celldevs")
+#endif (NOT CELLDEVS_FOUND)
+#if (NOT CELLQSS_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.celldevs")
+#endif (NOT CELLQSS_FOUND)
+#if (NOT DECISION_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.decision")
+#endif (NOT DECISION_FOUND)
+#if (NOT DIFFERENCE_EQU_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.differential-equation")
+#endif (NOT DIFFERENCE_EQU_FOUND)
+#if (NOT DIFFERENTIAL_EQU_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.difference-equation")
+#endif (NOT DIFFERENTIAL_EQU_FOUND)
+#if (NOT DSDEVS_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.dsdevs")
+#endif (NOT DSDEVS_FOUND)
+#if (NOT FSA_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.fsa")
+#endif (NOT FSA_FOUND)
+#if (NOT PETRINET_FOUND)
+  #message(SEND_ERROR "Missing vle.extension.petrinet")
+#endif (NOT PETRINET_FOUND)
 
 ##
 ## Find boost
@@ -93,6 +120,91 @@ IF (DOXYGEN)
 ENDIF (DOXYGEN)
 
 ##
+## Define function to simplify the definition of simulations plugins.
+##
+
+#FUNCTION(DeclareDevsDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareDevsDynamics name sources)
+
+#FUNCTION(DeclareCellDevsDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${CELLDEVS_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareCellDevsDynamics name sources)
+
+#FUNCTION(DeclareCellQssDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${CELLQSS_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareCellQssDynamics name sources)
+
+#FUNCTION(DeclareDecisionDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DECISION_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareDecisionDynamics name sources)
+
+#FUNCTION(DeclareDifferenceEquationDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENCE_EQU_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareDifferenceEquationDynamics name sources)
+
+#FUNCTION(DeclareFsaDifferenceEquationDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENCE_EQU_LIBRARIES}
+    #${FSA_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareFsaDifferenceEquationDynamics name sources)
+
+#FUNCTION(DeclareDifferentialEquationDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENTIAL_EQU_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareDifferentialEquationDynamics name sources)
+
+#FUNCTION(DeclareDsDevsDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DSDEVS_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareDsDevsDynamics name sources)
+
+#FUNCTION(DeclareFsaDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${FSA_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclareFsaDynamics name sources)
+
+#FUNCTION(DeclarePetrinetDynamics name sources)
+  #ADD_LIBRARY(${name} MODULE ${sources})
+  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${PETRINET_LIBRARIES})
+  #INSTALL(TARGETS ${name}
+    #RUNTIME DESTINATION plugins/simulator
+    #LIBRARY DESTINATION plugins/simulator)
+#ENDFUNCTION(DeclarePetrinetDynamics name sources)
+
+##
 ## Subdirectory
 ##
 
@@ -105,19 +217,11 @@ IF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
   ADD_SUBDIRECTORY(test)
 ENDIF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
 
-
-MESSAGE(STATUS "- - - -")
-MESSAGE(STATUS "Package configured successfully.")
-MESSAGE(STATUS "Using ${CMAKE_INSTALL_PREFIX} for installation.")
-MESSAGE(STATUS "Using Building with ${CMAKE_C_FLAGS} for C compiler flags")
-MESSAGE(STATUS "Using Building with ${CMAKE_CXX_FLAGS} for C++ compiler flags")
-MESSAGE(STATUS "- - - -")
-
 ##
 ## CPack configuration
 ##
 
-INSTALL(FILES Authors.txt ChangeLog.txt License.txt News.txt Readme.txt
+INSTALL(FILES Authors.txt Description.txt License.txt News.txt Readme.txt
   DESTINATION .)
 
 INCLUDE(CMakeCPack.cmake)

@@ -1,0 +1,7 @@
+Changes from previous versions of the examples
+==============================================
+
+Initial version 0.1.0
+---------------------
+
+- initial packaging.
