@@ -31,10 +31,10 @@
 
 #include <vle/oov/LocalStreamReader.hpp>
 #include <vle/oov/NetStreamReader.hpp>
-#include <vle/oov/PluginFactory.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/oov/SimpleFile.hpp>
 #include <vle/oov/StreamReader.hpp>
+#include <vle/oov/OutputMatrix.hpp>
+#include <vle/oov/CairoPlugin.hpp>
 
 
 
