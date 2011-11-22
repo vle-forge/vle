@@ -29,11 +29,10 @@
 #ifndef VLE_MANAGER_TYPE_HPP
 #define VLE_MANAGER_TYPE_HPP
 
-#include <vle/manager/DllDefines.hpp>
-#include <vle/oov/Plugin.hpp>
 #include <vle/oov/OutputMatrix.hpp>
 #include <vector>
 #include <list>
+#include <map>
 
 namespace vle { namespace manager  {
 
@@ -57,34 +56,6 @@ namespace vle { namespace manager  {
      */
     typedef std::map < std::string,
             oov::OutputMatrixViewList::size_type > OutputSimulationNames;
-
-
-    //
-    // Distant simulation types
-    //
-
-    /**
-     * @brief
-     */
-    struct VLE_MANAGER_EXPORT OutputSimulationDistant
-    {
-        OutputSimulationDistant(int instance, int replica,
-                                const oov::OutputMatrixViewList& outputs) :
-            instance(instance),
-            replica(replica),
-            outputs(outputs)
-        {
-        }
-
-        int instance;
-        int replica;
-        oov::OutputMatrixViewList outputs;
-    };
-
-    /**
-     * @brief
-     */
-    typedef std::vector < OutputSimulationDistant > OutputSimulationDistantList;
 
 }} // namespace vle manager
 

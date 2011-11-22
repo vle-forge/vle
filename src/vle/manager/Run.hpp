@@ -30,10 +30,8 @@
 #define VLE_MANAGER_RUN_HPP
 
 #include <vle/manager/DllDefines.hpp>
-#include <vle/utils/Exception.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 

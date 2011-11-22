@@ -389,9 +389,9 @@ int main(int argc, char* argv[])
                                         command.savevpz(),
                                         command.processor(),
                                         lst);
-        } else if (command.simulator()) {
-            success = manager.runSimulator(command.processor(),
-                                          command.port());
+        //} else if (command.simulator()) {
+            //success = manager.runSimulator(command.processor(),
+                                          //command.port());
         } else if (command.justRun()) {
             success = manager.justRun(command.processor(), lst);
         }

@@ -28,8 +28,7 @@
 
 #include <vle/devs/Coordinator.hpp>
 #include <vle/manager/Run.hpp>
-#include <vle/manager/SimulatorDistant.hpp>
-#include <vle/manager/Manager.hpp>
+#include <vle/manager/RunManager.hpp>
 #include <vle/manager/JustRun.hpp>
 #include <vle/manager/VLE.hpp>
 #include <vle/utils/DateTime.hpp>
@@ -98,65 +97,20 @@ bool Manager::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
             if (nbProcessor == 1) {
                 std::cerr << fmt(_(
                     "Manager all simulations in one thread\n"));
-                ManagerRunMono r(std::cerr, savevpz);
-                r.start(args.front());
+                RunManager r;
+                r.run(args.front());
             } else {
                 std::cerr << fmt(_(
                     "Manager all simulations in %1% processor\n")) %
                     nbProcessor;
-                ManagerRunThread r(std::cerr, savevpz, nbProcessor);
-                r.start(args.front());
+                RunManager r(nbProcessor);
+                r.run(args.front());
             }
-        } else {
-            std::cerr << _("Manager with distant simulator\n");
-            ManagerRunDistant r(std::cerr, savevpz);
-            r.start(args.front());
         }
     } catch(const std::exception& e) {
         std::cerr << fmt(
             _("\n/!\\ vle manager error reported: %1%\n")) %
             utils::demangle(typeid(e)) << e.what();
-        mSuccess = false;
-    }
-
-    return mSuccess;
-}
-
-bool Manager::runSimulator(int process, int port)
-{
-    mSuccess = true;
-
-    try {
-        std::cerr << _("Simulator start in daemon mode\n");
-
-        if (utils::Trace::getLevel() != utils::TRACE_LEVEL_DEVS) {
-#ifdef BOOST_WINDOWS
-            g_chdir("c://");
-#else
-            g_chdir("//");
-
-            if (::fork())
-                ::exit(0);
-
-            ::setsid();
-
-            if (::fork())
-                ::exit(0);
-#endif
-            for (int i = 0; i < FOPEN_MAX; ++i)
-                ::close(i);
-        }
-
-        utils::Trace::setLogFile(
-            utils::Trace::getLogFilename(boost::str(fmt(
-                    "distant-%1%") % utils::DateTime::currentDate())));
-
-        SimulatorDistant sim(process, port);
-        sim.start();
-    } catch(const std::exception& e) {
-        std::cerr << fmt(_("\n/!\\ vle distant simulator error "
-                           " reported: %1%")) % utils::demangle(typeid(e)) <<
-                e.what();
         mSuccess = false;
     }
 

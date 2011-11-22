@@ -65,6 +65,7 @@
 #cmakedefine VLE_HAVE_NLS
 #cmakedefine VLE_HAVE_GTKSOURCEVIEWMM
 #cmakedefine VLE_HAVE_BOOST_SPIRIT2
+#cmakedefine VLE_HAVE_MPI
 
 /**
  * Check whether a VLE version equal to or greather than major.mino.patch is

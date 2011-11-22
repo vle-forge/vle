@@ -87,15 +87,6 @@ public:
                     const CmdArgs& args);
 
     /**
-     * @brief vle::Simulator: manage a number of processor and launch
-     * simulation on it. vle::Simulator run in localhost daemon.
-     * @param nbProcessor number of processor.
-     * @param port The port [0..65535] to listen.
-     * @return true if simulator is a success.
-     */
-    bool runSimulator(int nbProcessor, int port);
-
-    /**
      * @brief vle::JustRun: start a simulation without analysis of the
      * complete condition combinations, just take the fist and run
      * simulation.

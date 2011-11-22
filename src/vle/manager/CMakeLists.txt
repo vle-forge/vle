@@ -20,13 +20,9 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp
-  LinearExperimentGenerator.cpp Manager.cpp Run.cpp SimulatorDistant.cpp
-  TotalExperimentGenerator.cpp VLE.cpp ${OS_SPECIFIC_PATH_IMPL})
+SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp RunManager.cpp Run.cpp VLE.cpp ${OS_SPECIFIC_PATH_IMPL})
 
-SET(MANAGER_HPP DllDefines.hpp ExperimentGenerator.hpp JustRun.hpp
-  LinearExperimentGenerator.hpp Manager.hpp Run.hpp SimulatorDistant.hpp
-  TotalExperimentGenerator.hpp Types.hpp VLE.hpp)
+SET(MANAGER_HPP DllDefines.hpp ExperimentGenerator.hpp JustRun.hpp RunManager.hpp Run.hpp Types.hpp VLE.hpp)
 
 ADD_LIBRARY(vlemanager SHARED ${MANAGER_CPP};${MANAGER_HPP})
 
