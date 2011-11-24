@@ -639,16 +639,27 @@ int ConditionsBox::run(const vpz::Conditions& conditions)
 
 renameList ConditionsBox::apply(vpz::Conditions& conditions)
 {
-    {
-	conditions.clear();
-	const vpz::ConditionList& list = mConditions->conditionlist();
-	vpz::ConditionList::const_iterator it = list.begin();
+    conditions.clear();
+    const vpz::ConditionList& list = mConditions->conditionlist();
+    vpz::ConditionList::const_iterator it = list.begin();
 
-	while (it != list.end()) {
-	    conditions.add(it->second);
-	    ++it;
-	}
+    while (it != list.end()) {
+        conditions.add(it->second);
+
+        // in order to purge the list from already existing
+        // condition name
+        renameList::iterator jt = mRenameList.begin();
+
+        while (jt != mRenameList.end() && (*jt).second != it->first) {
+            jt++;
+        }
+        if (jt != mRenameList.end()) {
+            mRenameList.erase(jt);
+        }
+
+        ++it;
     }
+
     delete mConditions;
     mConditions = 0;
 
