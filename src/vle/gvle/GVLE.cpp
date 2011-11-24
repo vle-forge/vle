@@ -1054,6 +1054,8 @@ void GVLE::onConditionsBox()
     const Modeling* modeling = (const Modeling*)mModeling;
 
     if (runConditionsBox(modeling->conditions()) == 1) {
+        applyRemoved();
+
         renameList tmpRename= applyConditionsBox(mModeling->conditions());
         {
             renameList::const_iterator it = tmpRename.begin();
@@ -1075,7 +1077,6 @@ void GVLE::onConditionsBox()
                 ++it;
             }
         }
-        applyRemoved();
     }
 }
 
