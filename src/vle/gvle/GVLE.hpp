@@ -147,7 +147,6 @@ public:
     PluginFactory& pluginFactory()
     { return mPluginFactory; }
 
-    bool on_focus_in_event(GdkEventFocus* type);
     bool on_delete_event(GdkEventAny* event);
 
     /**

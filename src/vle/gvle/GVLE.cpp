@@ -520,11 +520,6 @@ void GVLE::showRowModelClassBox(const std::string& name)
     mModelClassBox->showRow(name);
 }
 
-bool GVLE::on_focus_in_event(GdkEventFocus* /*event*/) {
-    mEditor->refreshTab();
-    return true;
-}
-
 bool GVLE::on_delete_event(GdkEventAny* event)
 {
     if (event->type == GDK_DELETE) {
