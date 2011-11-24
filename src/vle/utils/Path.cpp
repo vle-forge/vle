@@ -473,9 +473,19 @@ std::string Path::getPackageDataDir() const
     return buildDirname(m_currentPackagePath, "data");
 }
 
+std::string Path::getPackageDocDir() const
+{
+    return buildDirname(m_currentPackagePath, "doc");
+}
+
 std::string Path::getPackageExpDir() const
 {
     return buildDirname(m_currentPackagePath, "exp");
+}
+
+std::string Path::getPackageBuildDir() const
+{
+    return buildDirname(m_currentPackagePath, "build");
 }
 
 std::string Path::getPackageOutputDir() const
@@ -503,16 +513,6 @@ std::string Path::getPackagePluginGvleOutputDir() const
     return buildDirname(m_currentPackagePath, "plugins", "gvle", "output");
 }
 
-std::string Path::getPackageBuildDir() const
-{
-    return buildDirname(m_currentPackagePath, "build");
-}
-
-std::string Path::getPackageDocDir() const
-{
-    return buildDirname(m_currentPackagePath, "doc");
-}
-
 std::string Path::getPackageFile(const std::string& name) const
 {
     return buildFilename(getPackageDir(), name);
@@ -533,6 +533,11 @@ std::string Path::getPackageDataFile(const std::string& name) const
     return buildFilename(getPackageDataDir(), name);
 }
 
+std::string Path::getPackageDocFile(const std::string& name) const
+{
+    return buildFilename(getPackageDocDir(), name);
+}
+
 std::string Path::getPackageExpFile(const std::string& name) const
 {
     return buildFilename(getPackageExpDir(), name);
@@ -543,9 +548,25 @@ std::string Path::getPackageOutputFile(const std::string& name) const
     return buildFilename(getPackageOutputDir(), name);
 }
 
-std::string Path::getPackageDocFile(const std::string& name) const
+std::string Path::getPackagePluginFile(const std::string& name) const
 {
-    return buildFilename(getPackageDocDir(), name);
+    return buildFilename(getPackagePluginDir(), name);
+}
+
+std::string Path::getPackagePluginOutputFile(const std::string& name) const
+{
+    return buildFilename(getPackagePluginOutputDir(), name);
+}
+
+std::string Path::getPackagePluginGvleModelingFile(const std::string& name)
+    const
+{
+    return buildFilename(getPackagePluginGvleModelingDir(), name);
+}
+
+std::string Path::getPackagePluginGvleOutputFile(const std::string& name) const
+{
+    return buildFilename(getPackagePluginGvleOutputDir(), name);
 }
 
 std::string Path::getExternalPackageDir(const std::string& name) const
@@ -585,7 +606,7 @@ std::string Path::getExternalPackageBuildDir(const std::string& name) const
 
 std::string Path::getExternalPackageOutputDir(const std::string& name) const
 {
-    return buildDirname(getPackagesDir(), name, "plugins");
+    return buildDirname(getPackagesDir(), name, "output");
 }
 
 std::string Path::getExternalPackagePluginDir(const std::string& name) const
@@ -611,36 +632,72 @@ std::string Path::getExternalPackagePluginGvleOutputDir(const std::string& name)
 std::string Path::getExternalPackageFile(const std::string& name,
                                          const std::string& file) const
 {
-    return buildFilename(getPackagesDir(), name, file);
+    return buildFilename(getExternalPackageDir(name), file);
 }
 std::string Path::getExternalPackageLibFile(const std::string& name,
                                             const std::string& file) const
 {
-    return buildFilename(getPackagesDir(), name, "lib", file);
+    return buildFilename(getExternalPackageLibDir(name), file);
 }
 
 std::string Path::getExternalPackageSrcFile(const std::string& name,
                                             const std::string& file) const
 {
-    return buildFilename(getPackagesDir(), name, "src", file);
+    return buildFilename(getExternalPackageSrcDir(name), file);
 }
 
 std::string Path::getExternalPackageDataFile(const std::string& name,
                                              const std::string& file) const
 {
-    return buildFilename(getPackagesDir(), name, "data", file);
+    return buildFilename(getExternalPackageDataDir(name), file);
 }
 
 std::string Path::getExternalPackageDocFile(const std::string& name,
                                             const std::string& file) const
 {
-    return buildFilename(getPackagesDir(), name, "doc", file);
+    return buildFilename(getExternalPackageDocDir(name), file);
 }
 
 std::string Path::getExternalPackageExpFile(const std::string& name,
                                             const std::string& file) const
 {
-    return buildFilename(getPackagesDir(), name, "exp", file);
+    return buildFilename(getExternalPackageExpDir(name), file);
+}
+
+std::string Path::getExternalPackageBuildFile(const std::string& name,
+                                              const std::string& file) const
+{
+    return buildFilename(getExternalPackageBuildDir(name), file);
+}
+
+std::string Path::getExternalPackageOutputFile(const std::string& name,
+                                               const std::string& file) const
+{
+    return buildFilename(getExternalPackageOutputDir(name), file);
+}
+
+std::string Path::getExternalPackagePluginFile(const std::string& name,
+                                               const std::string& file) const
+{
+    return buildFilename(getExternalPackagePluginDir(name), file);
+}
+
+std::string Path::getExternalPackagePluginOutputFile(
+    const std::string& name, const std::string& file) const
+{
+    return buildFilename(getExternalPackagePluginOutputDir(name), file);
+}
+
+std::string Path::getExternalPackagePluginGvleModelingFile(
+    const std::string& name, const std::string& file) const
+{
+    return buildFilename(getExternalPackagePluginGvleModelingDir(name), file);
+}
+
+std::string Path::getExternalPackagePluginGvleOutputFile(
+    const std::string& name, const std::string& file) const
+{
+    return buildFilename(getExternalPackagePluginGvleOutputDir(name), file);
 }
 
 PathList Path::getInstalledPackages()

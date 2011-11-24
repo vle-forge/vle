@@ -218,6 +218,10 @@ namespace vle { namespace utils {
         std::string getPackageDocFile(const std::string& name) const;
         std::string getPackageExpFile(const std::string& name) const;
         std::string getPackageOutputFile(const std::string& name) const;
+        std::string getPackagePluginFile(const std::string& name) const;
+        std::string getPackagePluginOutputFile(const std::string& name) const;
+        std::string getPackagePluginGvleModelingFile(const std::string& name) const;
+        std::string getPackagePluginGvleOutputFile(const std::string& name) const;
 
         std::string getExternalPackageDir(const std::string& name) const;
         std::string getExternalPackageLibDir(const std::string& name) const;
@@ -229,8 +233,10 @@ namespace vle { namespace utils {
         std::string getExternalPackageOutputDir(const std::string& name) const;
         std::string getExternalPackagePluginDir(const std::string& name) const;
         std::string getExternalPackagePluginOutputDir(const std::string& name) const;
-        std::string getExternalPackagePluginGvleModelingDir(const std::string& name) const;
-        std::string getExternalPackagePluginGvleOutputDir(const std::string& name) const;
+        std::string getExternalPackagePluginGvleModelingDir(
+            const std::string& name) const;
+        std::string getExternalPackagePluginGvleOutputDir(
+            const std::string& name) const;
 
         std::string getExternalPackageFile(const std::string& name,
                                            const std::string& file) const;
@@ -244,6 +250,18 @@ namespace vle { namespace utils {
                                               const std::string& file) const;
         std::string getExternalPackageExpFile(const std::string& name,
                                               const std::string& file) const;
+        std::string getExternalPackageBuildFile(const std::string& name,
+                                              const std::string& file) const;
+        std::string getExternalPackageOutputFile(const std::string& name,
+                                              const std::string& file) const;
+        std::string getExternalPackagePluginFile(const std::string& name,
+                                              const std::string& file) const;
+        std::string getExternalPackagePluginOutputFile(
+            const std::string& name, const std::string& file) const;
+        std::string getExternalPackagePluginGvleModelingFile(
+            const std::string& name, const std::string& file) const;
+        std::string getExternalPackagePluginGvleOutputFile(
+            const std::string& name, const std::string& file) const;
 
         PathList getInstalledPackages();
         PathList getInstalledExperiments();
