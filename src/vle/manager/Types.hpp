@@ -30,19 +30,12 @@
 #define VLE_MANAGER_TYPE_HPP
 
 #include <vle/manager/DllDefines.hpp>
-#include <boost/multi_array.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/oov/OutputMatrix.hpp>
-#include <vle/utils/Rand.hpp>
 #include <vector>
 #include <list>
 
 namespace vle { namespace manager  {
-
-    /**
-     * @brief A boost share_ptr around the vle::utils::Rand class.
-     */
-    typedef boost::shared_ptr < utils::Rand > RandPtr;
 
     /**
      * @brief Define a list of filename from command line arguments argv and
@@ -92,16 +85,6 @@ namespace vle { namespace manager  {
      * @brief
      */
     typedef std::vector < OutputSimulationDistant > OutputSimulationDistantList;
-
-    //
-    // Manager simulation types
-    //
-
-    /**
-     * @brief Define a two dimensional array of OutputSimulationList to store
-     * result of a ManagerRun.
-     */
-    typedef boost::multi_array < oov::OutputMatrixViewList, 2 > OutputSimulationMatrix;
 
 }} // namespace vle manager
 

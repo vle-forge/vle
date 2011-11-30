@@ -85,14 +85,9 @@ namespace vle { namespace gvle {
         Gtk::SpinButton*    mSpinBeginS;
         double              mBeginRealMin, mBeginRealMax;
         bool                mRealUpdated;
-        Gtk::SpinButton*    mSpinSimuSeed;
-        Gtk::Button*        mButtonSimuSeed;
         Gtk::HBox*          mHboxCombi;
 	Gtk::RadioButton*   mRadioButtonLinear;
 	Gtk::RadioButton*   mRadioButtonTotal;
-        Gtk::SpinButton*    mSpinPlanSeed;
-        Gtk::Button*        mButtonPlanSeed;
-        Gtk::SpinButton*    mButtonNumber;
 
         std::list < sigc::connection > mSigcConnection;
 

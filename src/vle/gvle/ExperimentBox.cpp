@@ -61,14 +61,9 @@ ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
     xml->get_widget("SpinBeginH", mSpinBeginH);
     xml->get_widget("SpinBeginM", mSpinBeginM);
     xml->get_widget("SpinBeginS", mSpinBeginS);
-    xml->get_widget("SpinSimuSeed", mSpinSimuSeed);
-    xml->get_widget("ButtonSimuSeed", mButtonSimuSeed);
     xml->get_widget("HBoxCombi", mHboxCombi);
     xml->get_widget("RadioButtonLinear", mRadioButtonLinear);
     xml->get_widget("RadioButtonTotal", mRadioButtonTotal);
-    xml->get_widget("SpinPlanSeed", mSpinPlanSeed);
-    xml->get_widget("ButtonPlanSeed", mButtonPlanSeed);
-    xml->get_widget("SpinButtonNumber", mButtonNumber);
 
     mBeginRealMin = utils::DateTime::toJulianDay("1400-01-01 00:00:00");
     mBeginRealMax = utils::DateTime::toJulianDay("9999-12-31 23:59:59");
@@ -79,10 +74,6 @@ ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
         sigc::mem_fun(*this, &ExperimentBox::on_calendar)));
     mSigcConnection.push_back(mButtonNow->signal_clicked().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_now)));
-    mSigcConnection.push_back(mButtonSimuSeed->signal_clicked().connect(
-        sigc::mem_fun(*this, &ExperimentBox::on_random_simu)));
-    mSigcConnection.push_back(mButtonPlanSeed->signal_clicked().connect(
-        sigc::mem_fun (*this, &ExperimentBox::on_random_plan)));
 
     mSigcConnection.push_back(mButtonCalendarBegin->signal_clicked().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_calendarBegin)));
@@ -148,12 +139,6 @@ void ExperimentBox::initExperiment()
         updateBeginTime();
     }
 
-    // Simulation frame
-    {
-        mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	    mSpinSimuSeed->set_value(experiment.seed());
-    }
-
     // Plan frame
     {
 	if (experiment.combination().empty() or
@@ -162,12 +147,6 @@ void ExperimentBox::initExperiment()
 	} else {
 	    mRadioButtonTotal->set_active();
 	}
-
-	mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	mSpinPlanSeed->set_value(experiment.replicas().seed());
-
-	mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
-	mButtonNumber->set_value(experiment.replicas().number());
     }
 }
 
@@ -214,7 +193,6 @@ bool ExperimentBox::apply()
     }
 
     vpz::Experiment& exp = mModeling->experiment();
-    vpz::Replicas& rep = exp.replicas();
 
     exp.setName(mEntryName->get_text());
 
@@ -229,31 +207,9 @@ bool ExperimentBox::apply()
     }
 
     {
-        uint32_t seed =
-            (uint32_t)std::floor(std::abs(mSpinSimuSeed->get_value()));
-	exp.setSeed(seed);
-    }
-
-    {
-        uint32_t seed =
-            (uint32_t)std::floor(std::abs(mSpinPlanSeed->get_value()));
-        uint32_t number =
-            (uint32_t)std::floor(std::abs(mButtonNumber->get_value()));
         exp.setCombination(mRadioButtonLinear->get_active()?"linear":"total");
-	rep.setSeed(seed);
-	rep.setNumber(number);
     }
     return true;
-}
-
-void ExperimentBox::on_random_simu()
-{
-    mSpinSimuSeed->set_value(mRand.getInt());
-}
-
-void ExperimentBox::on_random_plan()
-{
-    mSpinPlanSeed->set_value(mRand.getInt());
 }
 
 void ExperimentBox::on_calendar()

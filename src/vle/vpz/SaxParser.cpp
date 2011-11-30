@@ -489,11 +489,6 @@ void SaxParser::onExperiment(const xmlChar** att)
     m_vpzstack.pushExperiment(att);
 }
 
-void SaxParser::onReplicas(const xmlChar** att)
-{
-    m_vpzstack.pushReplicas(att);
-}
-
 void SaxParser::onConditions(const xmlChar**)
 {
     m_vpzstack.pushConditions();

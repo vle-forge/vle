@@ -60,10 +60,9 @@ namespace vle { namespace devs {
     {
     public:
         DynamicsWrapperInit(const graph::AtomicModel& atom,
-                            utils::Rand& rnd,
                             PackageId packageid,
                             const std::string& library)
-            : DynamicsInit(atom, rnd, packageid), m_library(library)
+            : DynamicsInit(atom, packageid), m_library(library)
         {}
 
         virtual ~DynamicsWrapperInit()

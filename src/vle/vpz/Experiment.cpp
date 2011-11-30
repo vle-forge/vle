@@ -42,9 +42,8 @@ void Experiment::write(std::ostream& out) const
             << "\" ";
     }
 
-    out << "seed=\"" << m_seed << "\" >\n";
+    out << " >\n";
 
-    m_replicas.write(out);
     m_conditions.write(out);
     m_views.write(out);
 
@@ -56,7 +55,6 @@ void Experiment::clear()
     m_name.clear();
     m_duration = 1.0;
     m_begin = 0;
-    m_seed = 1;
 
     m_conditions.clear();
     m_views.clear();

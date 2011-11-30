@@ -66,10 +66,9 @@ class VLE_DEVS_EXPORT ExecutiveInit : public DynamicsInit
 {
 public:
     ExecutiveInit(const graph::AtomicModel& model,
-                  utils::Rand& rnd,
                   PackageId packageid,
                   Coordinator& coordinator)
-        : DynamicsInit(model, rnd, packageid), m_coordinator(coordinator)
+        : DynamicsInit(model, packageid), m_coordinator(coordinator)
     {}
 
     virtual ~ExecutiveInit()

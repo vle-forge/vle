@@ -34,8 +34,7 @@ namespace vle { namespace vpz {
 
 Project::Project() :
     m_version(VLE_VERSION),
-    m_instance(-1),
-    m_replica(-1)
+    m_instance(-1)
 {
 }
 
@@ -48,10 +47,6 @@ void Project::write(std::ostream& out) const
 
     if (m_instance >= 0) {
         out << " instance=\"" << m_instance << "\"";
-    }
-
-    if (m_replica >= 0) {
-        out << " replica=\"" << m_replica << "\"";
     }
 
     out << ">\n"

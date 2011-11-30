@@ -211,8 +211,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\" duration=\"0.33\" seed=\"987\">\n"
-        "  <replicas seed=\"987456\" number=\"5\" />\n"
+        " <experiment name=\"test1\" duration=\"0.33\" >\n"
         "  <conditions>"
         "   <condition name=\"cond1\" >"
         "    <port name=\"init1\" >"
@@ -239,20 +238,10 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
 
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
-    const vpz::Replicas& replicas(project.experiment().replicas());
     const vpz::Conditions& cnds(project.experiment().conditions());
-    vpz::Experiment& experimentM(vpz.project().experiment());
 
     BOOST_REQUIRE_EQUAL(experiment.name(), "test1");
     BOOST_REQUIRE_EQUAL(experiment.duration(), 0.33);
-    BOOST_REQUIRE_EQUAL(experiment.seed(), (guint32)987);
-
-    BOOST_REQUIRE_EQUAL(replicas.seed(), (guint32)987456);
-    BOOST_REQUIRE_EQUAL(replicas.number(), (size_t)5);
-
-
-    experimentM.setSeed((uint32_t) std::numeric_limits < uint32_t >::max());
-    BOOST_REQUIRE_EQUAL(experimentM.seed(), std::numeric_limits < guint32 >::max());
 
     std::list < std::string > lst;
     cnds.conditionnames(lst);
@@ -331,8 +320,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\" duration=\"0.33\" seed=\"987\">\n"
-        "  <replicas seed=\"987456\" number=\"5\" />\n"
+        " <experiment name=\"test1\" duration=\"0.33\">\n"
         "  <views>\n"
         "   <outputs>\n"
         "    <output name=\"x\" format=\"local\" "

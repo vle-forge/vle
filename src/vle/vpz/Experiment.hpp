@@ -31,7 +31,6 @@
 
 #include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/Replicas.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Views.hpp>
 
@@ -39,17 +38,17 @@ namespace vle { namespace vpz {
 
     /**
      * @brief The experiment class stores information about experimental
-     * conditions (initials values), observations, replicas, etc.
+     * conditions (initials values), observations, etc.
      */
     class VLE_VPZ_EXPORT Experiment : public Base
     {
     public:
         /**
-         * @brief Build an empty experiment with 1 unit duration an beginning date
-         * and seed to 1.
+         * Build an empty experiment with time duration of 1.0 and beginning
+         * date at 0.0.
          */
         Experiment()
-            : m_duration(1.0), m_begin(0.0), m_seed(1)
+            : m_duration(1.0), m_begin(0.0)
         {}
 
         /**
@@ -63,7 +62,7 @@ namespace vle { namespace vpz {
          * including Replicas, ExperimentalCondition and Views.
          * @param out Output stream.
          * @code
-         * <experiment name="exp1" duration="0.33" begin="0.0" seed="65431">
+         * <experiment name="exp1" duration="0.33" begin="0.0" >
          *   [...]
          * </experiment>
          * @endcode
@@ -113,20 +112,6 @@ namespace vle { namespace vpz {
          * Get/Set functions
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        /**
-         * @brief Get a constant reference to the Replicas.
-         * @return Get a constant reference to the Replicas.
-         */
-        const Replicas& replicas() const
-        { return m_replicas; }
-
-        /**
-         * @brief Get a reference to the Replicas.
-         * @return Get a reference to the Replicas.
-         */
-        Replicas& replicas()
-        { return m_replicas; }
 
         /**
          * @brief Get a constant reference to the Conditions.
@@ -199,20 +184,6 @@ namespace vle { namespace vpz {
         { return m_begin; }
 
         /**
-         * @brief Set the seed of the Experiment file.
-         * @param seed The new seed to initialise the random generator.
-         */
-        void setSeed(uint32_t seed)
-        { m_seed = seed; }
-
-        /**
-         * @brief Get the seed of the Experiment file.
-         * @return The seed to initialise to random generator.
-         */
-        uint32_t seed() const
-        { return m_seed; }
-
-        /**
          * @brief Set the experimental design combination.
          * @param name The new name of experimental design combination.
          */
@@ -229,9 +200,7 @@ namespace vle { namespace vpz {
         std::string         m_name;
         double              m_duration;
         double              m_begin;
-        uint32_t            m_seed;
         std::string         m_combination;
-        Replicas            m_replicas;
         Conditions          m_conditions;
         Views               m_views;
     };

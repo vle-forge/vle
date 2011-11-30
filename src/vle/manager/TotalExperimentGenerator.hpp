@@ -47,8 +47,8 @@ namespace vle { namespace manager {
          *
          */
         TotalExperimentGenerator(const vpz::Vpz & file, std::ostream & out,
-                                 bool storecomb, bool commonseed, RandPtr rnd)
-            : ExperimentGenerator(file, out, storecomb, commonseed, rnd)
+                                 bool storecomb)
+            : ExperimentGenerator(file, out, storecomb)
         {
         }
 

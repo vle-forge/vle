@@ -53,11 +53,9 @@ ExperimentGenerator* ManagerRun::getCombinationPlan(const vpz::Vpz& file,
     const vpz::Experiment& exp = file.project().experiment();
 
     if (exp.combination() == "linear") {
-        return new LinearExperimentGenerator(file, out, m_storecomb,
-                                             m_commonseed, m_rand);
+        return new LinearExperimentGenerator(file, out, m_storecomb);
     } else {
-        return new TotalExperimentGenerator(file, out, m_storecomb,
-                                            m_commonseed, m_rand);
+        return new TotalExperimentGenerator(file, out, m_storecomb);
     }
 }
 
@@ -65,7 +63,6 @@ void ManagerRunMono::operator()(const vpz::Vpz& file)
 {
     m_out << _("Manager: run experimental frames in one thread\n");
 
-    initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
     m_exp->saveVPZinstance(m_writefile);
     m_exp->build(&m_matrix);
@@ -78,7 +75,6 @@ void ManagerRunMono::operator()(const vpz::Vpz& file)
     while (not m_exp->vpzInstances().empty()) {
         vpz::Vpz* file = m_exp->vpzInstances().front();
         int instance = file->project().instance();
-        int replica = file->project().replica();
         RunVerbose r(modulemgr, ostr);
         r.start(file);
 
@@ -86,7 +82,7 @@ void ManagerRunMono::operator()(const vpz::Vpz& file)
             m_out << ostr.str() << std::endl;
         }
 
-        m_matrix[replica][instance] = r.outputs();
+        m_matrix[instance] = r.outputs();
         m_exp->vpzInstances().pop_front();
     }
 }
@@ -108,7 +104,6 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
             _("ManagerRunThread cannot be started more than one time."));
     }
 
-    initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
     m_exp->saveVPZinstance(m_writefile);
 
@@ -151,7 +146,6 @@ void ManagerRunThread::run()
     std::string filename;
     std::ostringstream ostr;
     int instance = 0;
-    int replica = 0;
     oov::OutputMatrixViewList views;
 
     utils::SharedLibraryManager slm;
@@ -175,7 +169,6 @@ void ManagerRunThread::run()
             filename.assign(file->filename());
             ostr.str("");
             instance = file->project().instance();
-            replica = file->project().replica();
             RunVerbose r(modulemgr, ostr);
             r.start(file);
 
@@ -189,7 +182,7 @@ void ManagerRunThread::run()
         {
             Glib::Mutex::Lock lock(m_mutex);
             if (file) {
-                m_matrix[replica][instance] = views;
+                m_matrix[instance] = views;
             }
             if (m_finish and m_exp->vpzInstances().empty()) {
                 break;
@@ -199,8 +192,8 @@ void ManagerRunThread::run()
 }
 
 ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
-                                     bool storecomb, bool commonseed, RandPtr rnd) :
-    ManagerRun(out, writefile, storecomb, commonseed, rnd)
+                                     bool storecomb) :
+    ManagerRun(out, writefile, storecomb)
 {
     try {
         mHost.read();
@@ -210,9 +203,8 @@ ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
     }
 }
 
-ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
-                                     RandPtr rnd) :
-    ManagerRun(out, writefile, false, true, rnd)
+ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile) :
+    ManagerRun(out, writefile, false)
 {
     try {
         mHost.read();
@@ -267,7 +259,6 @@ void ManagerRunDistant::operator()(const std::string& filename)
 void ManagerRunDistant::operator()(const vpz::Vpz& file)
 {
     m_out << fmt(_("Manager: run experimental frames in distant\n"));
-    initRandomGenerator(file);
 
     m_exp = getCombinationPlan(file, m_out);
 
@@ -417,7 +408,6 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
             value::Set* vals = value::toSetValue(vpz::Vpz::parseValue(result));
             int nbview = value::toInteger(vals->get(0));
             int instance = value::toInteger(vals->get(1));
-            int replica = value::toInteger(vals->get(2));
             cl.sendString("ok");
 
             for (int j = 0; j < nbview; ++j) {
@@ -438,7 +428,7 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
 
                 {
                     Glib::Mutex::Lock lock(m_mutex);
-                    oov::OutputMatrixViewList& l(m_matrix[replica][instance]);
+                    oov::OutputMatrixViewList& l(m_matrix[instance]);
                     l[view] = m;
                 }
             }
@@ -459,20 +449,6 @@ void ManagerRunDistant::sendVpzi(utils::net::Client&  cl,
         cl.sendBuffer(file);
     } catch (const std::exception& e) {
         m_out << fmt(_("Manager: error send vpz %1%: %2%\n")) % file % e.what();
-    }
-}
-
-void ManagerRun::initRandomGenerator(const vpz::Vpz& file)
-{
-    if (m_rand.get() == 0) {
-        m_out << _("Use the seed from vpz::Vpz replicas tags\n");
-        m_rand = boost::shared_ptr < utils::Rand >(new utils::Rand());
-
-        if (file.project().experiment().replicas().number() <= 0) {
-            throw utils::ArgError(_("The replicas's tag does not defined"));
-        }
-
-        m_rand->seed(file.project().experiment().replicas().seed());
     }
 }
 

@@ -44,7 +44,6 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
-#include <vle/utils/Rand.hpp>
 #include <vle/utils/PackageTable.hpp>
 #include <vle/version.hpp>
 #include <string>
@@ -83,21 +82,18 @@ namespace vle { namespace devs {
     {
     public:
         DynamicsInit(const graph::AtomicModel& model,
-                     utils::Rand& rnd,
                      PackageId packageid)
-            : m_model(model), m_rand(rnd), m_packageid(packageid)
+            : m_model(model), m_packageid(packageid)
         {}
 
         virtual ~DynamicsInit()
         {}
 
         const graph::AtomicModel& model() const { return m_model; }
-        utils::Rand& rand() const { return m_rand; }
         PackageId packageid() const { return m_packageid; }
 
     private:
         const graph::AtomicModel&       m_model;
-        utils::Rand&                    m_rand;
         PackageId                       m_packageid;
     };
 
@@ -116,8 +112,7 @@ namespace vle { namespace devs {
          */
         Dynamics(const DynamicsInit& init,
                  const vle::devs::InitEventList&  /* events */)
-            : m_model(init.model()), m_rand(init.rand()),
-            m_packageid(init.packageid())
+            : m_model(init.model()), m_packageid(init.packageid())
         {}
 
 	/**
@@ -475,14 +470,7 @@ namespace vle { namespace devs {
          */
         std::string getPackageExpFile(const std::string& name) const;
 
-       /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-        /**
-         * @brief Return a reference to the RootCoordinator utils::Rand pseudo
-         * random generator.
-         * @return Return a reference to the utils::Rand object.
-         */
-        inline utils::Rand& rand() const { return m_rand; }
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         /**
          * @brief Get a constant reference to the element of the
@@ -495,9 +483,6 @@ namespace vle { namespace devs {
         const graph::AtomicModel& m_model; /**< A constant reference to the
                                              atomic model node of the graph.
                                                */
-
-        utils::Rand& m_rand; /**< A reference to the global random number
-                               generator. */
 
         PackageId m_packageid; /**< An iterator to std::set of the
                                  vle::utils::PackageTable. */

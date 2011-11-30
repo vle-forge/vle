@@ -192,21 +192,6 @@ namespace vle { namespace vpz {
         { m_instance = instance; }
 
         /**
-         * @brief Assig a new number of replica.
-         *
-         * @param replica
-         */
-        inline void setReplica(int replica)
-        { m_replica = replica; }
-
-        /**
-         * @brief Get the number of the replicas assigned to this project.
-         * @return the replica.
-         */
-        inline int replica() const
-        { return m_replica; }
-
-        /**
          * @brief Assign a new version to this project.
          * @param version the name of the version.
          */
@@ -225,7 +210,6 @@ namespace vle { namespace vpz {
         std::string     m_date;
         std::string     m_version;
         int             m_instance;
-        int             m_replica;
 
         Model           m_model;
         Dynamics        m_dynamics;

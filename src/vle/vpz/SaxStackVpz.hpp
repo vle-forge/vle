@@ -178,14 +178,6 @@ namespace vle {
         void pushExperiment(const xmlChar** att);
 
         /**
-         * @brief Push a Replicas into the stack.
-         * @param att The attribute list.
-         * @throw utils::SaxParserError if stack is empty or parent is not
-         * Experiment.
-         */
-        void pushReplicas(const xmlChar** att);
-
-        /**
          * @brief Push a Conditions into th stack.
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Experiment.

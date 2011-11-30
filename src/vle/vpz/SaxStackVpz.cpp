@@ -87,8 +87,6 @@ vpz::Vpz* SaxStackVpz::pushVpz(const xmlChar** att)
             m_vpz.project().setVersion(xmlCharToString(att[i + 1]));
         } else if (xmlStrcmp(att[i], (const xmlChar*)"instance") == 0) {
             m_vpz.project().setInstance(xmlCharToInt(att[i + 1]));
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"replica") == 0) {
-            m_vpz.project().setReplica(xmlCharToInt(att[i + 1]));
         }
     }
 
@@ -558,7 +556,6 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
 
     const xmlChar* name = 0;
     const xmlChar* duration = 0;
-    const xmlChar* seed = 0;
     const xmlChar* begin = 0;
     const xmlChar* combination = 0;
 
@@ -567,8 +564,6 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
             name = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"duration") == 0) {
             duration = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"seed") == 0) {
-            seed = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"begin") == 0) {
             begin = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"combination") == 0) {
@@ -576,25 +571,13 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
         }
     }
 
-    if (not name or not duration or not seed) {
+    if (not name or not duration) {
         throw utils::SaxParserError(
-            _("Experiment tag does not have 'name', 'duration' or 'seed'"
-              " attributes"));
+            _("Experiment tag does not have 'name' or 'duration' attributes"));
     }
 
     exp.setName(xmlCharToString(name));
     exp.setDuration(xmlCharToDouble(duration));
-
-    {
-        unsigned long int t = xmlCharToUnsignedInt(seed);
-        try {
-            uint32_t res = boost::numeric_cast < uint32_t >(t);
-            exp.setSeed(res);
-        } catch (const std::exception& e) {
-            throw utils::SaxParserError(fmt(
-                _("Experiment tag can not uses the seed '%1%'")) % seed);
-        }
-    }
 
     if (begin) {
         exp.setBegin(xmlCharToDouble(begin));
@@ -604,51 +587,6 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
 
     if (combination) {
         exp.setCombination(xmlCharToString(combination));
-    }
-}
-
-void SaxStackVpz::pushReplicas(const xmlChar** att)
-{
-    if (m_stack.empty() or not parent()->isExperiment()) {
-        throw utils::SaxParserError();
-    }
-
-    vpz::Replicas& rep(m_vpz.project().experiment().replicas());
-
-    const xmlChar* seed = 0;
-    const xmlChar* number = 0;
-
-    for (int i = 0; att[i] != 0; i += 2) {
-        if (xmlStrcmp(att[i], (const xmlChar*)"seed") == 0) {
-            seed = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"number") == 0) {
-            number = att[i + 1];
-        }
-    }
-
-    if (not seed or not number) {
-        throw utils::SaxParserError(
-            _("Replicas tag does not have 'seed' or 'number' attributes"));
-    }
-
-    try {
-        if (seed) {
-            unsigned long int t = xmlCharToUnsignedInt(seed);
-            try {
-                uint32_t res = boost::numeric_cast < uint32_t >(t);
-                rep.setSeed(res);
-            } catch (const std::exception& e) {
-                throw utils::SaxParserError(fmt(
-                        _("cannot convert '%1%' into a correct integer")) % seed);
-            }
-        }
-
-        if (number) {
-            rep.setNumber(xmlCharToInt(number));
-        }
-    } catch (const std::exception& e) {
-        throw utils::SaxParserError(fmt(
-                _("Replicas tag: error converting attribute: %1%")) % e.what());
     }
 }
 

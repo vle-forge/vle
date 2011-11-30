@@ -80,12 +80,10 @@ namespace vle { namespace manager {
          * @param out Where to send output.
          * @param storecomb stores simulated combinations in order to access to
          * the function getInputFromCombination.
-         * @param commonseed if true, the same seed is used for the simulation
-         * of different combinations of one replica
          * @param rnd A reference random number generator.
          */
         ExperimentGenerator(const vpz::Vpz & file, std::ostream & out,
-                            bool storecomb, bool commonseed, RandPtr rnd);
+                            bool storecomb);
 
         virtual ~ExperimentGenerator();
 
@@ -98,10 +96,10 @@ namespace vle { namespace manager {
             return mFileList;
         }
 
-        void build(OutputSimulationMatrix* matrix);
+        void build(OutputSimulationList* matrix);
 
         void build(Glib::Mutex* mutex, Glib::Cond* prod,
-                   OutputSimulationMatrix* matrix);
+                   OutputSimulationList* matrix);
 
         /**
          * @brief Save the generated VPZ instance file.
@@ -148,11 +146,6 @@ namespace vle { namespace manager {
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         /**
-         * @brief Build a list of replicas based on information of VPZ file.
-         */
-        void buildReplicasList();
-
-        /**
          * @brief Build a list of conditions based on information of VPZ file.
          */
         void buildConditionsList();
@@ -166,23 +159,15 @@ namespace vle { namespace manager {
          * it into the output list. This function use the Glib::Mutex and
          * Glib::Cond to protect the access to data.
          * @param cmbnumber the index of the combination.
-         * @param replnumber the number of the replicas.
          */
-        void writeInstanceThread(size_t cmbnumber, size_t replnumber);
+        void writeInstanceThread(size_t cmbnumber);
 
         /**
          * @brief Build an instance of the current specified vpz file and push
          * it into the output list.
          * @param cmbnumber the index of the combination.
-         * @param replnumber the number of the replicas.
          */
-        void writeInstance(size_t cmbnumber, size_t replnumber);
-
-        /**
-         * @brief Get the number of replicas from vpz file.
-         * @return A value greater than 0.
-         */
-        size_t getReplicasNumber() const;
+        void writeInstance(size_t cmbnumber);
 
     protected:
         /**
@@ -204,17 +189,14 @@ namespace vle { namespace manager {
         const vpz::Vpz& mFile;
         vpz::Vpz mTmpfile;
         std::ostream& mOut;
-        std::vector < guint32 > mReplicasTab;
         std::vector < cond_t > mCondition;
         std::vector < diff_t > mCombinationDiff;
         std::list < vpz::Vpz* > mFileList;
         bool mSaveVpz;
         bool mStoreComb;
-        bool mCommonSeed;
-        OutputSimulationMatrix* mMatrix;
+        OutputSimulationList* mMatrix;
         Glib::Mutex* mMutex;
         Glib::Cond* mProdcond;
-        RandPtr mRand;
     };
 
 }} // namespace vle manager

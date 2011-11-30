@@ -232,7 +232,6 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
 
 static devs::Dynamics* buildNewDynamicsWrapper(
     devs::Simulator* atom,
-    utils::Rand& rnd,
     const vpz::Dynamic& dyn,
     const InitEventList& events,
     void* symbol)
@@ -243,7 +242,7 @@ static devs::Dynamics* buildNewDynamicsWrapper(
 
     try {
         return fct(DynamicsWrapperInit(
-                *atom->getStructure(), rnd,
+                *atom->getStructure(),
                 utils::Package::package().getId(dyn.package()),
                 dyn.library()), events);
     } catch(const std::exception& e) {
@@ -259,7 +258,6 @@ static devs::Dynamics* buildNewDynamicsWrapper(
 
 static devs::Dynamics* buildNewDynamics(
     devs::Simulator* atom,
-    utils::Rand& rnd,
     const vpz::Dynamic& dyn,
     const InitEventList& events,
     void *symbol)
@@ -270,7 +268,7 @@ static devs::Dynamics* buildNewDynamics(
 
     try {
         return fct(DynamicsInit(
-                *atom->getStructure(), rnd,
+                *atom->getStructure(),
                 utils::Package::package().getId(dyn.package())),
             events);
     } catch(const std::exception& e) {
@@ -286,7 +284,6 @@ static devs::Dynamics* buildNewDynamics(
 static devs::Dynamics* buildNewExecutive(
     Coordinator& coordinator,
     devs::Simulator* atom,
-    utils::Rand& rnd,
     const vpz::Dynamic& dyn,
     const InitEventList& events,
     void *symbol)
@@ -297,7 +294,7 @@ static devs::Dynamics* buildNewExecutive(
 
     try {
         return fct(ExecutiveInit(
-                *atom->getStructure(), rnd,
+                *atom->getStructure(),
                 utils::Package::package().getId(dyn.package()),
                 coordinator), events);
     } catch(const std::exception& e) {
@@ -332,12 +329,11 @@ devs::Dynamics* ModelFactory::attachDynamics(Coordinator& coordinator,
 
     switch (type) {
     case utils::MODULE_DYNAMICS:
-        return buildNewDynamics(atom, mRoot.rand(), dyn, events, symbol);
+        return buildNewDynamics(atom, dyn, events, symbol);
     case utils::MODULE_DYNAMICS_EXECUTIVE:
-        return buildNewExecutive(coordinator, atom, mRoot.rand(), dyn, events,
-                                 symbol);
+        return buildNewExecutive(coordinator, atom, dyn, events, symbol);
     case utils::MODULE_DYNAMICS_WRAPPER:
-        return buildNewDynamicsWrapper(atom, mRoot.rand(), dyn, events, symbol);
+        return buildNewDynamicsWrapper(atom, dyn, events, symbol);
     default:
         throw utils::ModellingError();
     }

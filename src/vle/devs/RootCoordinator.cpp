@@ -62,7 +62,6 @@ void RootCoordinator::load(const vpz::Vpz& io)
                                 " vpz"));
     }
 
-    m_rand.seed(io.project().experiment().seed());
     m_begin = io.project().experiment().begin();
     m_end = m_begin + io.project().experiment().duration();
     m_currentTime = m_begin;

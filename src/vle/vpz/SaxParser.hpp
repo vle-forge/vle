@@ -324,7 +324,6 @@ namespace vle { namespace vpz {
             add("dynamic", &SaxParser::onDynamic, &SaxParser::onEndDynamic);
             add("experiment", &SaxParser::onExperiment,
                 &SaxParser::onEndExperiment);
-            add("replicas", &SaxParser::onReplicas, &SaxParser::onEndReplicas);
             add("conditions", &SaxParser::onConditions,
                 &SaxParser::onEndConditions);
             add("condition", &SaxParser::onCondition, &SaxParser::onEndCondition);

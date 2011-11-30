@@ -38,6 +38,7 @@
 #include <vle/utils/Host.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Rand.hpp>
+#include <vle/manager/Types.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/manager/DllDefines.hpp>
 #include <boost/noncopyable.hpp>
@@ -61,16 +62,13 @@ namespace vle { namespace manager {
          * @param writefile write all experimental frames file produced.
          * @param storecomb stores simulated combinations in order to access to
          * the function getInputFromCombination.
-         * @param commonseed if true, the same seed is used for the simulation
-         * of different combinations of one replica
          * @param rnd a pseudo random generator build by the user, if rnd is
          * empty then, a new random number generator will be build from the Vpz
          * file.
          */
-        ManagerRun(std::ostream & out, bool writefile, bool storecomb,
-                   bool commonseed, RandPtr rnd = RandPtr())
+        ManagerRun(std::ostream & out, bool writefile, bool storecomb)
             : m_out(out), m_writefile(writefile), m_storecomb(storecomb),
-            m_commonseed(commonseed), m_rand(rnd), m_exp(0)
+            m_exp(0)
         {
         }
 
@@ -83,10 +81,8 @@ namespace vle { namespace manager {
          * empty then, a new random number generator will be build from the Vpz
          * file.
          */
-        ManagerRun(std::ostream & out, bool writefile, RandPtr rnd =
-                   RandPtr())
-            : m_out(out), m_writefile(writefile), m_storecomb(false),
-            m_commonseed(true), m_rand(rnd), m_exp(0)
+        ManagerRun(std::ostream & out, bool writefile)
+            : m_out(out), m_writefile(writefile), m_storecomb(false), m_exp(0)
         {
         }
 
@@ -98,7 +94,7 @@ namespace vle { namespace manager {
          *
          * @return A reference to the oov::PluginPtr list.
          */
-        inline OutputSimulationMatrix& outputSimulationMatrix()
+        inline OutputSimulationList& outputSimulationList()
         {
             return m_matrix;
         }
@@ -109,7 +105,7 @@ namespace vle { namespace manager {
          *
          * @return A reference to the oov::PluginPtr list.
          */
-        inline const OutputSimulationMatrix& outputSimulationMatrix() const
+        inline const OutputSimulationList& outputSimulationList() const
         {
             return m_matrix;
         }
@@ -148,12 +144,10 @@ namespace vle { namespace manager {
         }
 
     protected:
-        OutputSimulationMatrix m_matrix;
+        OutputSimulationList m_matrix;
         std::ostream& m_out;
         bool m_writefile;
         bool m_storecomb;
-        bool m_commonseed;
-        RandPtr m_rand;
         ExperimentGenerator* m_exp;
 
         /**
@@ -165,16 +159,6 @@ namespace vle { namespace manager {
          */
         ExperimentGenerator* getCombinationPlan(const vpz::Vpz& file,
                                                 std::ostream&   out);
-
-        /**
-         * @brief Initialize a random number generator if the user does not
-         * call the constructor with a valid RandomNumberGenerator. The seed is
-         * provided by the vpz::Vpz file instance in the replicas tags. If the
-         * seed is not provided, the std::time(0) or /dev/urandom is used.
-         *
-         * @param file The vpz::Vpz file where get the seed.
-         */
-        void initRandomGenerator(const vpz::Vpz& file);
     };
 
     /**
@@ -190,16 +174,9 @@ namespace vle { namespace manager {
          * @param writefile write all experimental frames file produced.
          * @param storecomb stores simulated combinations in order to access to
          * the function getInputFromCombination.
-         * @param commonseed if true, the same seed is used for the simulation
-         * of different combinations of one replica
-         * @param rnd a pseudo random generator build by the user, if rnd is
-         * empty then, a new random number generator will be build from the Vpz
-         * file.
          */
-        ManagerRunMono(std::ostream & out, bool writefile,
-                       bool storecomb, bool commonseed,
-                       RandPtr rnd = RandPtr())
-            : ManagerRun(out, writefile, storecomb, commonseed, rnd)
+        ManagerRunMono(std::ostream & out, bool writefile, bool storecomb)
+            : ManagerRun(out, writefile, storecomb)
         {
         }
 
@@ -212,9 +189,8 @@ namespace vle { namespace manager {
          * empty then, a new random number generator will be build from the Vpz
          * file.
          */
-        ManagerRunMono(std::ostream & out, bool writefile,
-                       RandPtr rnd = RandPtr())
-            : ManagerRun(out, writefile, false, true, rnd)
+        ManagerRunMono(std::ostream & out, bool writefile)
+            : ManagerRun(out, writefile, false)
         {
         }
 
@@ -273,18 +249,12 @@ namespace vle { namespace manager {
          * @param writefile write all experimental frames file produced.
          * @param storecomb stores simulated combinations in order to access to
          * the function getInputFromCombination.
-         * @param commonseed if true, the same seed is used for the simulation
-         * of different combinations of one replica
          * @param process number of thread to use.
-         * @param rnd a pseudo random generator build by the user, if rnd is
-         * empty then, a new random number generator will be build from the Vpz
-         * file.
          */
         ManagerRunThread(std::ostream & out, bool writefile, int process,
-                         bool storecomb, bool commonseed,
-                         RandPtr rnd = RandPtr())
-            : ManagerRun(out, writefile, storecomb, commonseed, rnd),
-            m_process(process), m_finish(false)
+                         bool storecomb)
+            : ManagerRun(out, writefile, storecomb), m_process(process),
+            m_finish(false)
         {
         }
 
@@ -298,9 +268,8 @@ namespace vle { namespace manager {
          * empty then, a new random number generator will be build from the Vpz
          * file.
          */
-        ManagerRunThread(std::ostream & out, bool writefile, int process,
-                         RandPtr rnd = RandPtr())
-            : ManagerRun(out, writefile, false, true, rnd), m_process(process),
+        ManagerRunThread(std::ostream & out, bool writefile, int process)
+            : ManagerRun(out, writefile, false), m_process(process),
             m_finish(false)
         {
         }
@@ -379,15 +348,9 @@ namespace vle { namespace manager {
          * @param writefile write all experimental frames file produced.
          * @param storecomb stores simulated combinations in order to access to
          * the function getInputFromCombination.
-         * @param commonseed if true, the same seed is used for the simulation
-         * of different combinations of one replica
-         * @param rnd a pseudo random generator build by the user, if rnd is
-         * empty then, a new random number generator will be build from the Vpz
-         * file.
          */
         ManagerRunDistant(std::ostream & out, bool writefile,
-                          bool storecomb, bool commonseed,
-                          RandPtr rnd = RandPtr());
+                          bool storecomb);
 
         /**
          * @brief Build a ManagerRunDistant with default parameters.
@@ -397,8 +360,7 @@ namespace vle { namespace manager {
          * empty then, a new random number generator will be build from the Vpz
          * file.
          */
-        ManagerRunDistant(std::ostream & out, bool writefile,
-                          RandPtr rnd = RandPtr());
+        ManagerRunDistant(std::ostream & out, bool writefile);
 
         virtual ~ManagerRunDistant()
         {

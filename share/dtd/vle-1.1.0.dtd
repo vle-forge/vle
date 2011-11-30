@@ -12,7 +12,7 @@
 <!ELEMENT dynamic EMPTY >
 <!ELEMENT classes (class*) >
 <!ELEMENT class (model?) >
-<!ELEMENT experiment (replicas?, conditions?, views?) >
+<!ELEMENT experiment (conditions?, views?) >
 <!ELEMENT conditions (condition*) >
 <!ELEMENT condition (port*) >
 <!ELEMENT port ((attachedview*)|(integer|double|boolean|string|table|tuple|set|matrix|map|xml|null)*) >
@@ -82,12 +82,7 @@
   name CDATA #REQUIRED
   begin CDATA #IMPLIED
   duration CDATA #REQUIRED
-  seed CDATA #IMPLIED
   combination (linear|total) #IMPLIED >
-
-<!ATTLIST replicas
-  seed CDATA #REQUIRED
-  number CDATA #REQUIRED >
 
 <!ATTLIST condition
   name CDATA #REQUIRED >

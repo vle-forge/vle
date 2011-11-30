@@ -206,7 +206,6 @@ void SimulatorDistant::run()
     RunVerbose r(mModulemgr, ostr);
     vpz::Vpz* file = new vpz::Vpz(filename);
     instance = file->project().instance();
-    replica = file->project().replica();
 
     utils::Trace::send(fmt(_("Simulator: %1% %2% %3%\n")) % filename % instance
                        % replica);
