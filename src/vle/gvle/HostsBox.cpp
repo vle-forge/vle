@@ -96,7 +96,6 @@ bool HostInformation::run(utils::Host& host)
 
 void HostInformation::clear()
 {
-    mEntry->set_text("");
     mSpinButtonPort->set_value(8000);
     mSpinButtonProcess->set_value(1);
     mLabelConnection->set_text("Connection... waiting");

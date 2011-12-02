@@ -123,7 +123,6 @@ void DynamicBox::show(vpz::Dynamic* dyn)
         mLocationHost->set_text(ip);
         mLocationPort->set_value(port);
     } else {
-        mLocationHost->set_text("");
         mLocationPort->set_value(0);
     }
 
@@ -250,7 +249,6 @@ void DynamicBox::onNewLibrary()
                 mComboPackage->set_active_text(box2.getNamespace());
                 mComboLibrary->append_text(box2.getClassName());
                 mComboLibrary->set_active_text(box2.getClassName());
-                mModel->set_text("");
             }
         }
     }

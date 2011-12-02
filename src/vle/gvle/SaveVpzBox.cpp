@@ -62,7 +62,6 @@ SaveVpzBox::~SaveVpzBox()
 
 void SaveVpzBox::show()
 {
-    mEntryName->set_text("");
     mDialog->set_title("Save VPZ");
     mDialog->show_all();
     mDialog->run();

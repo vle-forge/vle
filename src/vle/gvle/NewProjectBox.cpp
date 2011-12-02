@@ -50,7 +50,6 @@ NewProjectBox::~NewProjectBox()
 
 void NewProjectBox::show()
 {
-    mEntryName->set_text("");
     mDialog->set_title("New Project");
     mDialog->show_all();
     mDialog->set_default_response(-3);
