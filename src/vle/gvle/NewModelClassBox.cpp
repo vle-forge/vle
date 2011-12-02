@@ -68,9 +68,6 @@ NewModelClassBox::~NewModelClassBox()
 
 void NewModelClassBox::run()
 {
-    mEntryClassName->set_text("");
-    mEntryModelName->set_text("");
-
     mDialog->show_all();
     mDialog->run();
 }

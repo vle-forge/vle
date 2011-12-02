@@ -270,7 +270,7 @@ void ExperimentBox::updateBeginTime()
         mSpinBeginH->set_value(0);
         mSpinBeginM->set_value(0);
         mSpinBeginS->set_value(0);
-        mEntryBeginDate->set_text("");
+        mEntryBeginDate->get_buffer()->set_text("");
     }
 }
 

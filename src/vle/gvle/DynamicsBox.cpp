@@ -459,7 +459,6 @@ void DynamicsBox::updateDynamic(const std::string& name)
         mLocationHost->set_text(ip);
         mLocationPort->set_value(port);
     } else {
-        mLocationHost->set_text("");
         mLocationPort->set_value(0);
     }
 

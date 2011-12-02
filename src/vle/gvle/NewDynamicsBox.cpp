@@ -61,7 +61,6 @@ void NewDynamicsBox::onCancel()
 
 int NewDynamicsBox::run()
 {
-    mEntryClassName->set_text("");
     mEntryNamespace->set_text(utils::Package::package().name());
     mDialog->show_all();
     return mDialog->run();

@@ -122,7 +122,6 @@ void DynamicBox::show(vpz::Dynamic* dyn)
         mLocationHost->set_text(ip);
         mLocationPort->set_value(port);
     } else {
-        mLocationHost->set_text("");
         mLocationPort->set_value(0);
     }
 
