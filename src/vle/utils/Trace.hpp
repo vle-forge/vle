@@ -204,45 +204,45 @@ private:
 }} // namespace vle utils
 
 #define TraceAlways(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_ALWAYS)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_ALWAYS); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_ALWAYS)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_ALWAYS); \
     } \
 }
 #define TraceModel(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_MODEL)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_MODEL); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_MODEL)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_MODEL); \
     } \
 }
 #define TraceExtension(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_EXTENSION)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_EXTENSION); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_EXTENSION)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_EXTENSION); \
     } \
 }
 #define TraceDevs(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_DEVS); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_DEVS)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_DEVS); \
     } \
 }
 
 #ifndef NDEBUG
 #define DTraceAlways(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_ALWAYS)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_ALWAYS); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_ALWAYS)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_ALWAYS); \
     } \
 }
 #define DTraceModel(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_MODEL)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_MODEL); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_MODEL)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_MODEL); \
     } \
 }
 #define DTraceExtension(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_EXTENSION)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_EXTENSION); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_EXTENSION)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_EXTENSION); \
     } \
 }
 #define DTraceDevs(x) { \
-    if (vle::utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) { \
-        vle::utils::Trace::send(x, utils::TRACE_LEVEL_DEVS); \
+    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_DEVS)) { \
+        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_DEVS); \
     } \
 }
 #else
