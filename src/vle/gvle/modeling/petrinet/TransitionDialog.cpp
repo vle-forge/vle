@@ -122,18 +122,12 @@ void TransitionDialog::onInput()
 {
     mInputEntry->set_sensitive(input());
     mPriorityEntry->set_sensitive(not input());
-    if (not(input())) {
-        mInputEntry->get_entry()->set_text("");
-    }
 }
 
 void TransitionDialog::onOutput()
 {
     mOutputEntry->set_sensitive(output());
     mPriorityEntry->set_sensitive(not output());
-    if (not(output())) {
-        mOutputEntry->get_entry()->set_text("");
-    }
 }
 
 int TransitionDialog::run()
@@ -189,13 +183,10 @@ int TransitionDialog::run()
         if (mTransition->delay()) {
             mDelayEntry->set_text((fmt("%1%") %
                                    mTransition->delayValue()).str());
-        } else {
-            mDelayEntry->set_text("");
         }
         mPriorityEntry->set_sensitive(not mTransition->output() and
             not mTransition->input());
     } else {
-        mNameEntry->set_text("");
         mInitialName = "";
         mPriorityEntry->set_text("0");
         mInputCheckbox->set_active(false);

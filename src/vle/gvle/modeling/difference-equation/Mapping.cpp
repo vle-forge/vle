@@ -103,8 +103,6 @@ bool Mapping::MappingTreeView::on_button_press_event(GdkEventButton* event)
 
 void Mapping::MappingTreeView::onAdd()
 {
-    m_port->set_text("");
-    m_id->set_text("");
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 	if (not m_port->get_text().empty() and
 	    not m_id->get_text().empty()) {

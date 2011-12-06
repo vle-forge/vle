@@ -278,8 +278,6 @@ void Variables::VariablesTreeView::onSelect()
 
 void Variables::VariablesTreeView::onAdd()
 {
-    m_name->set_text("");
-    m_value->set_text("");
     m_dialog->set_focus(*m_name);
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 	if (not m_name->get_text().empty()) {

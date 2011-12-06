@@ -116,7 +116,6 @@ void PlaceDialog::onOutput()
         mDelayEntry->set_sensitive(false);
         mDelayCheckbox->set_sensitive(false);
     } else {
-        mOutputEntry->get_entry()->set_text("");
         mDelayCheckbox->set_sensitive(true);
         mDelayEntry->set_sensitive(mDelayCheckbox->get_active());
     }
@@ -146,7 +145,6 @@ int PlaceDialog::run()
                 mOutputEntry->get_entry()->set_text(mPlace->outputPortName());
             }
             mDelayEntry->set_sensitive(false);
-            mDelayEntry->set_text("");
             mDelayCheckbox->set_sensitive(false);
             mDelayCheckbox->set_active(false);
         } else {
@@ -156,15 +154,12 @@ int PlaceDialog::run()
             if (mPlace->delay()) {
                 mDelayEntry->set_text((fmt("%1%") %
                                        mPlace->delayValue()).str());
-            } else {
-                mDelayEntry->set_text("");
             }
         }
         mMarkingEntry->set_text((fmt(
                                      "%1%") %
                                  mPlace->initialMarking()).str());
     } else {
-        mNameEntry->set_text("");
         mInitialName = "";
         mOutputCheckbox->set_active(false);
         mOutputEntry->set_sensitive(false);

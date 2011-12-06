@@ -77,7 +77,6 @@ void NewStateDialog::onChangeName()
 
 int NewStateDialog::run()
 {
-    mNameEntry->set_text("");
     mInitialCheckbox->set_active(false);
     mDialog->set_default_response(Gtk::RESPONSE_ACCEPT);
 
@@ -132,9 +131,9 @@ void EventInStateDialog::onEventActionSource()
 }
 
 int EventInStateDialog::run(const std::string& event,
-    const std::string& action)
+                            const std::string& action)
 {
-    mEventEntry->set_text(event);
+    mEventEntry->get_buffer()->set_text(event);
 
     mActionEntry->clear();
     for (buffers_t::const_iterator it = mStatechart->eventActions().begin();

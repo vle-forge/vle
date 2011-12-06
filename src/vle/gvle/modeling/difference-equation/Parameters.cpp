@@ -149,8 +149,6 @@ void Parameters::ParametersTreeView::onSelect()
 
 void Parameters::ParametersTreeView::onAdd()
 {
-    m_name->set_text("");
-    m_value->set_text("");
     m_dialog->set_focus(*m_name);
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 	if (not m_name->get_text().empty()) {
@@ -347,7 +345,6 @@ void Parameters::ExternalVariablesTreeView::onSelect()
 
 void Parameters::ExternalVariablesTreeView::onAdd()
 {
-    m_name->set_text("");
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 	if (not m_name->get_text().empty()) {
 	    try {
