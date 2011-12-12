@@ -57,8 +57,8 @@ bool Storage::start(vpz::Output& output, vpz::View& /* view */)
     ref->get_widget("dialog", m_dialog);
     ref->get_widget("spinbuttonRows", m_rows);
     ref->get_widget("spinbuttonColumns", m_columns);
-    ref->get_widget("spinbuttonResizeRows", m_rzcolumns);
-    ref->get_widget("spinbuttonResizeColumns", m_rzrows);
+    ref->get_widget("spinbuttonResizeRows", m_rzrows);
+    ref->get_widget("spinbuttonResizeColumns", m_rzcolumns);
 
     assert(m_dialog);
     assert(m_rows);
