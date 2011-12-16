@@ -252,6 +252,42 @@ namespace vle { namespace vpz {
         { return m_list; }
 
         /**
+         * @brief Get a reference to the ConditionValues.
+         * @return A constant reference to the ConditionValues.
+         */
+        inline ConditionValues& conditionvalues()
+        { return m_list; }
+
+        /**
+         * @brief Get a iterator the begin of the vpz::ConditionValues.
+         * @return Get a iterator the begin of the vpz::ConditionValues.
+         */
+        iterator begin()
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a iterator the end of the vpz::ConditionValues.
+         * @return Get a iterator the end of the vpz::ConditionValues.
+         */
+        iterator end()
+        { return m_list.end(); }
+
+        /**
+         * @brief Get a constant iterator the begin of the vpz::ConditionValues.
+         * @return Get a constant iterator the begin of the
+         * vpz::ConditionValues.
+         */
+        const_iterator begin() const
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a constant iterator the end of the vpz::ConditionValues.
+         * @return Get a constant iterator the end of the vpz::ConditionValues.
+         */
+        const_iterator end() const
+        { return m_list.end(); }
+
+        /**
          * @brief Return the name of the condition.
          * @return
          */
