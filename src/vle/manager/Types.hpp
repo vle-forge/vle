@@ -26,8 +26,8 @@
  */
 
 
-#ifndef VLE_MANAGER_TYPE_HPP
-#define VLE_MANAGER_TYPE_HPP
+#ifndef VLE_MANAGER_TYPES_HPP
+#define VLE_MANAGER_TYPES_HPP
 
 #include <vle/oov/OutputMatrix.hpp>
 #include <vector>

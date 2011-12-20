@@ -20,9 +20,11 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp RunManager.cpp Run.cpp VLE.cpp ${OS_SPECIFIC_PATH_IMPL})
+SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp Manager.cpp RunManager.cpp
+  Run.cpp ${OS_SPECIFIC_PATH_IMPL})
 
-SET(MANAGER_HPP DllDefines.hpp ExperimentGenerator.hpp JustRun.hpp RunManager.hpp Run.hpp Types.hpp VLE.hpp)
+SET(MANAGER_HPP DllDefines.hpp ExperimentGenerator.hpp JustRun.hpp Manager.hpp
+  RunManager.hpp Run.hpp Types.hpp )
 
 ADD_LIBRARY(vlemanager SHARED ${MANAGER_CPP};${MANAGER_HPP})
 

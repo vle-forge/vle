@@ -26,30 +26,50 @@
  */
 
 
-#ifndef VLE_MANAGER_MANAGER_HPP
-#define VLE_MANAGER_MANAGER_HPP
+#ifndef VLE_GLOBAL_MANAGER_MANAGER_HPP
+#define VLE_GLOBAL_MANAGER_MANAGER_HPP
 
+
+#ifndef VLE_MANAGER_DLLDEFINES_HPP
+#include <vle/manager/DllDefines.hpp>
+#endif
+
+#ifndef VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 #include <vle/manager/ExperimentGenerator.hpp>
+#endif
+
+#ifndef VLE_MANAGER_JUSTRUN_HPP
 #include <vle/manager/JustRun.hpp>
-#include <vle/manager/LinearExperimentGenerator.hpp>
+#endif
+
+#ifndef VLE_MANAGER_MANAGER_HPP
 #include <vle/manager/Manager.hpp>
+#endif
+
+#ifndef VLE_MANAGER_RUN_HPP
 #include <vle/manager/Run.hpp>
-#include <vle/manager/SimulatorDistant.hpp>
-#include <vle/manager/TotalExperimentGenerator.hpp>
+#endif
+
+#ifndef VLE_MANAGER_RUNMANAGER_HPP
+#include <vle/manager/RunManager.hpp>
+#endif
+
+#ifndef VLE_MANAGER_TYPES_HPP
 #include <vle/manager/Types.hpp>
-#include <vle/manager/VLE.hpp>
+#endif
 
 namespace vle {
 
     /**
-     * @brief Manager is use to run simulation, to run experimentales frames
-     * and to build instances of an experimental frame using generator (linear
-     * or total).
+     * Manager library wraps simulation loops into useful classes.
+     *
+     * The Manager library is use to run simulation, to run experimental frames
+     * using experiment generator.
      */
     namespace manager {
 
-    } // namespace manager
+    }
 
-} // namespace vle
+}
 
 #endif

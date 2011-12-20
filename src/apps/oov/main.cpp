@@ -26,7 +26,7 @@
  */
 
 
-#include <vle/manager/VLE.hpp>
+#include <vle/manager/Manager.hpp>
 #include <apps/oov/OptionGroup.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>

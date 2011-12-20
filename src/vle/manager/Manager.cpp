@@ -30,7 +30,7 @@
 #include <vle/manager/Run.hpp>
 #include <vle/manager/RunManager.hpp>
 #include <vle/manager/JustRun.hpp>
-#include <vle/manager/VLE.hpp>
+#include <vle/manager/Manager.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>

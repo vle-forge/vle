@@ -27,7 +27,7 @@
 
 
 #include <apps/vle/OptionGroup.hpp>
-#include <vle/manager/VLE.hpp>
+#include <vle/manager/Manager.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>

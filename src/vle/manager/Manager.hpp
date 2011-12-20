@@ -1,5 +1,5 @@
 /*
- * @file vle/manager/VLE.hpp
+ * @file vle/manager/Manager.hpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -26,8 +26,8 @@
  */
 
 
-#ifndef VLE_MANAGER_VLE_HPP
-#define VLE_MANAGER_VLE_HPP 1
+#ifndef VLE_MANAGER_MANAGER_HPP
+#define VLE_MANAGER_MANAGER_HPP
 
 #include <vle/manager/DllDefines.hpp>
 #include <vle/manager/Types.hpp>

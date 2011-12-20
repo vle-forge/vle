@@ -27,7 +27,7 @@
 
 
 #include <vle/manager/RunManager.hpp>
-#include <vle/manager/VLE.hpp>
+#include <vle/manager/Manager.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
