@@ -47,6 +47,14 @@ struct RunManagerMono
     OutputSimulationList *operator()(const std::string& vpz,
                                      utils::ModuleManager& modulemgr)
     {
+        vpz::Vpz exp(vpz);
+
+        return operator()(exp, modulemgr);
+    }
+
+    OutputSimulationList *operator()(const vpz::Vpz& vpz,
+                                     utils::ModuleManager& modulemgr)
+    {
         ExperimentGenerator expgen(vpz, 0, 1);
         OutputSimulationList *result = new OutputSimulationList(expgen.size());
 
@@ -69,6 +77,15 @@ struct RunManagerThread
                                      utils::ModuleManager& modulemgr,
                                      uint32_t threads)
     {
+        vpz::Vpz exp(vpz);
+
+        return operator()(exp, modulemgr, threads);
+    }
+
+    OutputSimulationList *operator()(const vpz::Vpz& vpz,
+                                     utils::ModuleManager& modulemgr,
+                                     uint32_t threads)
+    {
         ExperimentGenerator expgen(vpz, 0, 1);
         OutputSimulationList *result = new OutputSimulationList(expgen.size());
 
@@ -86,13 +103,13 @@ struct RunManagerThread
 
     struct worker
     {
-        const std::string& vpz;
+        const vpz::Vpz& vpz;
         utils::ModuleManager& modules;
         uint32_t rank;
         uint32_t world;
         OutputSimulationList *result;
 
-        worker(const std::string& vpz, utils::ModuleManager& modulemgr,
+        worker(const vpz::Vpz& vpz, utils::ModuleManager& modulemgr,
                uint32_t rank, uint32_t world, OutputSimulationList *result)
             : vpz(vpz), modules(modulemgr), rank(rank), world(world),
             result(result)
@@ -119,6 +136,16 @@ struct RunManagerThread
 struct RunManagerMpi
 {
     OutputSimulationList *operator()(const std::string& vpz,
+                                     utils::ModuleManager& modulemgr,
+                                     uint32_t rank,
+                                     uint32_t world)
+    {
+        vpz::Vpz exp(vpz);
+
+        return operator()(exp, modulemgr, rank, world);
+    }
+
+    OutputSimulationList *operator()(const vpz::Vpz& vpz,
                                      utils::ModuleManager& modulemgr,
                                      uint32_t rank,
                                      uint32_t world)
@@ -198,6 +225,28 @@ OutputSimulationList* RunManager::run(const std::string& filename)
     case RUN_MANAGER_MPI:
         return RunManagerMpi()(filename, modulemgr, mPimpl->mRank,
                                mPimpl->mWorld);
+        break;
+    };
+
+    return 0;
+}
+
+OutputSimulationList* RunManager::run(const vpz::Vpz& exp)
+{
+    utils::SharedLibraryManager slm;
+    utils::ModuleManager modulemgr;
+
+    switch (mPimpl->mType) {
+    case RUN_MANAGER_MONO:
+        return RunManagerMono()(exp, modulemgr);
+        break;
+
+    case RUN_MANAGER_THREAD:
+        return RunManagerThread()(exp, modulemgr, mPimpl->mThreads);
+        break;
+
+    case RUN_MANAGER_MPI:
+        return RunManagerMpi()(exp, modulemgr, mPimpl->mRank, mPimpl->mWorld);
         break;
     };
 

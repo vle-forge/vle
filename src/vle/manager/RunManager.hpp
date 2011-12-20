@@ -31,6 +31,7 @@
 
 #include <vle/manager/Types.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 namespace vle { namespace manager {
 
@@ -76,13 +77,22 @@ public:
     ~RunManager();
 
     /**
-     * Start the simulatons.
+     * Start the simulations.
      *
      * @param filename The VPZ to run.
      *
      * @return A pointer to a list of list of value matrix, can be NULL.
      */
     OutputSimulationList* run(const std::string& filename);
+
+    /**
+     * Start the simulations.
+     *
+     * @param exp An experiment file, cloned.
+     *
+     * @return A pointer to a list of list of value matrix, can be NULL.
+     */
+    OutputSimulationList* run(const vpz::Vpz& exp);
 
 protected:
     RunManager(const RunManager& other);
