@@ -26,40 +26,114 @@
  */
 
 
-#ifndef VLE_COMMON_VPZ_VPZ_HPP
-#define VLE_COMMON_VPZ_VPZ_HPP
+#ifndef VLE_GLOBAL_VPZ_VPZ_HPP
+#define VLE_GLOBAL_VPZ_VPZ_HPP
 
+#ifndef VLE_VPZ_ATOMICMODELS_HPP
 #include <vle/vpz/AtomicModels.hpp>
+#endif
+
+#ifndef VLE_VPZ_BASE_HPP
 #include <vle/vpz/Base.hpp>
+#endif
+
+#ifndef VLE_VPZ_CLASSES_HPP
 #include <vle/vpz/Classes.hpp>
+#endif
+
+#ifndef VLE_VPZ_CLASS_HPP
 #include <vle/vpz/Class.hpp>
+#endif
+
+#ifndef VLE_VPZ_CONDITION_HPP
 #include <vle/vpz/Condition.hpp>
+#endif
+
+#ifndef VLE_VPZ_CONDITIONS_HPP
 #include <vle/vpz/Conditions.hpp>
+#endif
+
+#ifndef VLE_VPZ_DLLDEFINES_HPP
+#include <vle/vpz/DllDefines.hpp>
+#endif
+
+#ifndef VLE_VPZ_DYNAMIC_HPP
 #include <vle/vpz/Dynamic.hpp>
+#endif
+
+#ifndef VLE_VPZ_DYNAMICS_HPP
 #include <vle/vpz/Dynamics.hpp>
+#endif
+
+#ifndef VLE_VPZ_EXPERIMENT_HPP
 #include <vle/vpz/Experiment.hpp>
+#endif
+
+#ifndef VLE_VPZ_MODEL_HPP
 #include <vle/vpz/Model.hpp>
+#endif
+
+#ifndef VLE_VPZ_OBSERVABLE_HPP
 #include <vle/vpz/Observable.hpp>
+#endif
+
+#ifndef VLE_VPZ_OBSERVABLES_HPP
 #include <vle/vpz/Observables.hpp>
+#endif
+
+#ifndef VLE_VPZ_OUTPUT_HPP
 #include <vle/vpz/Output.hpp>
+#endif
+
+#ifndef VLE_VPZ_OUTPUTS_HPP
 #include <vle/vpz/Outputs.hpp>
+#endif
+
+#ifndef VLE_VPZ_PORT_HPP
 #include <vle/vpz/Port.hpp>
+#endif
+
+#ifndef VLE_VPZ_PROJECT_HPP
 #include <vle/vpz/Project.hpp>
-#include <vle/vpz/Replicas.hpp>
+#endif
+
+#ifndef VLE_VPZ_SAXPARSER_HPP
 #include <vle/vpz/SaxParser.hpp>
+#endif
+
+#ifndef VLE_VPZ_SAXSTACKVALUE_HPP
 #include <vle/vpz/SaxStackValue.hpp>
+#endif
+
+#ifndef VLE_VPZ_SAXSTACKVPZ_HPP
 #include <vle/vpz/SaxStackVpz.hpp>
+#endif
+
+#ifndef VLE_VPZ_STRUCTURES_HPP
 #include <vle/vpz/Structures.hpp>
+#endif
+
+#ifndef VLE_VPZ_VIEW_HPP
 #include <vle/vpz/View.hpp>
+#endif
+
+#ifndef VLE_VPZ_VIEWS_HPP
 #include <vle/vpz/Views.hpp>
+#endif
+
+#ifndef VLE_VPZ_VPZ_HPP
 #include <vle/vpz/Vpz.hpp>
+#endif
+
 
 namespace vle {
 
     /**
-     * @brief The namespace vpz is use to parse and to write the VPZ (vle
-     * project file zipped) XML file. vpz uses the Sax parser of the libxml-2.0
-     * to read VPZ format, Value format and Trame format from a stream.
+     * The VPZ library is use to parse, modifiy, write experiment file VPZ.
+     *
+     * The namespace vpz is use to parse and to write the VPZ (vle project file
+     * zipped) XML file. vpz uses the Sax parser of the libxml-2.0 to read VPZ
+     * format and Value format.
      */
     namespace vpz {
 
