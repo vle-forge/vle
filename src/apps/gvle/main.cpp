@@ -25,120 +25,158 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/manager/Manager.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
 #include <gtkmm/main.h>
-#include <glibmm/optioncontext.h>
-#include <glibmm/thread.h>
-#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <cstdarg>
+#include <cstdlib>
+#include <cerrno>
 
 namespace vle { namespace gvle {
 
-class GVLEOptionGroup : public Glib::OptionGroup
+static void print_error(const char *fmt, ...)
 {
-public:
-    GVLEOptionGroup() :
-	Glib::OptionGroup("gvle_group", "description of GVLE options",
-			  "help description of GVLE group"),
-	mInfo(false),
-	mVersion(false),
-	mLevel(0)
-    {
-        Glib::OptionEntry entry1;
-        entry1.set_long_name("infos");
-        entry1.set_short_name('i');
-        entry1.set_description(_("Information on GVLE."));
-        add_entry(entry1, mInfo);
+    va_list ap;
 
-        Glib::OptionEntry entry2;
-        entry2.set_long_name("version");
-        entry2.set_short_name('v');
-        entry2.set_description(_("Version information."));
-        add_entry(entry2, mVersion);
+    va_start(ap, fmt);
+    std::fprintf(stderr, "GVLE error: ");
+    std::vfprintf(stderr, fmt, ap);
+    std::fprintf(stderr, "\n");
+    va_end(ap);
+}
 
-	Glib::OptionEntry entry3;
-	entry3.set_long_name("verbose level");
-	entry3.set_short_name('V');
-	entry3.set_description(_("[int] [0-3] min to max verbose."));
-	add_entry(entry3, mLevel);
+static bool compare(const char *arg, const char *shortname,
+                    const char *longname)
+{
+    return not std::strcmp(arg, shortname) or not std::strcmp(arg, longname);
+}
+static bool convert_int(const char *str, vle::uint32_t *value)
+{
+    char *end;
+    long int result;
+
+    result = std::strtol(str, &end, 10);
+
+    if ((errno == ERANGE and (result == LONG_MAX || result == LONG_MIN))
+        or (errno != 0 and result == 0)) {
+        return false;
+    } else {
+        *value = result;
+        return true;
+    }
+}
+
+static bool convert_verbose(const char *str, vle::uint32_t *level)
+{
+    bool success = false;
+
+    if (not str) {
+        print_error(_("-v or --verbose needs a integer argument"));
+    } else {
+        if (not convert_int(str, level)) {
+            print_error(_("Verbose: cannot convert `%s' to 0..3"), str);
+        } else {
+            if (*level > 3) {
+                print_error(_("Can not convert `%d' to normal level "
+                              "number"), *level);
+            } else {
+                return true;
+            }
+        }
     }
 
-    bool mInfo;    /// information on VLE program.
-    bool mVersion; /// information on VLE version.
-    int mLevel;    /// verbose level
-};
+    return success;
+}
+
+static void print_help()
+{
+    std::fprintf(stderr,
+                 _("GVLE - the Gui of VLE\n"
+                   "Virtual Laboratory Environment - %s\n"
+                   "Copyright (C) 2003 - 2011 The VLE Development Team.\n"),
+                 VLE_NAME_COMPLETE);
+}
+
+static void print_infos()
+{
+    std::fprintf(stderr,
+                 _("GVLE - the Gui of VLE\n"
+                   "Virtual Laboratory Environment - %s\n"
+                   "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                   "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                   "You may redistribute copies of VLE\n"
+                   "under the terms of the GNU General Public License.\n"
+                   "For more information about these matters, see the file "
+                   "named COPYING.\n"), VLE_NAME_COMPLETE);
+}
 
 }} // namespace vle gvle
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
+    vle::uint32_t verbose = 0;
+    bool stop = false;
+    bool end = false;
+    bool result = true;
+
     Gtk::Main application(&argc, &argv);
-    vle::manager::init();
 
-    Glib::OptionContext context;
-    vle::gvle::GVLEOptionGroup group;
-    context.set_main_group(group);
-    context.set_help_enabled(true);
-
-    try {
-        context.parse(argc, argv);
-    } catch (const Glib::Error& e) {
-        std::cerr << _("Error parsing command line: ") << e.what() << std::endl;
-        vle::utils::finalize();
-        return EXIT_FAILURE;
-    } catch (const std::exception& e) {
-        std::cerr << _("Error parsing command line: ") << e.what() << std::endl;
-        vle::utils::finalize();
-        return EXIT_FAILURE;
+    for (argv++; not stop and not end and *argv; argv++) {
+        if (vle::gvle::compare(*argv, "-v", "--verbose")) {
+            stop = not vle::gvle::convert_verbose(*(++argv), &verbose);
+            result = stop;
+        } else if (vle::gvle::compare(*argv, "-h", "--help")) {
+            vle::gvle::print_help();
+            stop = true;
+        } else if (vle::gvle::compare(*argv, "-i", "--infos")) {
+            vle::gvle::print_infos();
+            stop = true;
+        } else {
+            break;
+        }
     }
 
-    vle::utils::Trace::setLogFile(
-        vle::utils::Trace::getLogFilename("gvle.log"));
-    vle::utils::Trace::setLevel(vle::utils::Trace::cast(group.mLevel));
+    if (not stop) {
+        vle::gvle::GVLE* g = 0;
+        vle::manager::init();
 
-    bool result = true;
-    if (group.mInfo) {
-        std::cerr << vle::fmt(_(
-                "GVLE - the Gui of VLE\n"
-                "Virtual Laboratory Environment - %1%\n"
-                "Copyright (C) 2003 - 2011 The VLE Development Team.\n")) %
-            VLE_NAME_COMPLETE << "\n" << std::endl;
-    } else if (group.mVersion) {
-        std::cerr << vle::fmt(_(
-                "GVLE - the Gui of VLE\n"
-                "Virtual Laboratory Environment - %1%\n"
-                "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
-                "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-                "You may redistribute copies of VLE\n"
-                "under the terms of the GNU General Public License.\n"
-                "For more information about these matters, see the file named "
-                "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
-    } else {
 	try {
-	    Glib::RefPtr < Gnome::Glade::Xml >  mRefXML =
+            vle::utils::Trace::setLogFile(
+                vle::utils::Trace::getLogFilename("gvle.log"));
+            vle::utils::Trace::setLevel(
+                vle::utils::Trace::cast(verbose));
+
+	    Glib::RefPtr < Gnome::Glade::Xml > mRefXML =
 		Gnome::Glade::Xml::create(
 		    vle::utils::Path::path().getGladeFile("gvle.glade"));
-	    vle::gvle::GVLE* g = 0;
-	    mRefXML->get_widget_derived("WindowPackageBrowser", g);
-	    if (argc > 1)
-		g->setFileName(argv[1]);
+
+            mRefXML->get_widget_derived("WindowPackageBrowser", g);
+	    if (*argv) {
+		g->setFileName(*argv);
+            }
+
 	    application.run(*g);
 	    delete g;
         } catch(const Glib::Exception& e) {
             result = false;
-            std::cerr << _("\n/!\\ eov Glib error reported: ") <<
-                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            vle::gvle::print_error(_("\n/!\\ eov Glib error reported (%s): %s"),
+                                   vle::utils::demangle(typeid(e)).c_str(),
+                                   e.what().c_str());
+            delete g;
         } catch(const std::exception& e) {
             result = false;
-            std::cerr << _("\n/!\\ eov exception reported: ") <<
-                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            vle::gvle::print_error(_("\n/!\\ eov exception reported (%s): %s"),
+                                   vle::utils::demangle(typeid(e)).c_str(),
+                                   e.what());
+            delete g;
         }
+        vle::manager::finalize();
     }
 
-    vle::manager::finalize();
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
