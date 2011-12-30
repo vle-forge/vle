@@ -25,90 +25,193 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/manager/Manager.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Socket.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/eov/Plugin.hpp>
-#include <vle/eov/NetStreamReader.hpp>
 #include <vle/eov/MainWindow.hpp>
-#include <apps/eov/OptionGroup.hpp>
 #include <gtkmm/main.h>
-#include <gtkmm/messagedialog.h>
 #include <libglademm.h>
-#include <iostream>
+#include <cstdlib>
+#include <cstdarg>
+#include <cstdio>
+#include <cstring>
+#include <cerrno>
 
-using namespace vle;
+namespace vle { namespace eov {
 
-void eov_on_error(const std::string& type, const std::string& what)
+static void print_error(const char *fmt, ...)
 {
-    Gtk::MessageDialog box(
-        (fmt(_("eov reported: %1% (%2%)")) % what % type).str(), false,
-        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+    va_list ap;
 
-    box.run();
+    va_start(ap, fmt);
+    std::fprintf(stderr, "Eov error: ");
+    std::vfprintf(stderr, fmt, ap);
+    std::fprintf(stderr, "\n");
+    va_end(ap);
 }
 
-int main(int argc, char* argv[])
+static bool compare(const char *argv, const char *shortname,
+                    const char *longname)
 {
-    vle::manager::init();
+    return not std::strcmp(argv, shortname) or not std::strcmp(argv, longname);
+}
 
-    Glib::OptionContext context;
-    eov::CommandOptionGroup command;
-    context.set_main_group(command);
+static bool convert_int(const char *str, vle::uint32_t *value)
+{
+    char *end;
+    long int result;
 
-    try {
-        context.parse(argc, argv);
-        command.check();
-        utils::Trace::setLogFile(utils::Trace::getLogFilename("eov.log"));
-        utils::Trace::setLevel(utils::Trace::cast(command.verbose()));
-    } catch(const Glib::Error& e) {
-        std::cerr << _("Error parsing command line: ") << e.what() << std::endl;
-        utils::finalize();
-        return EXIT_FAILURE;
-    } catch(const std::exception& e) {
-        std::cerr << _("Command line error: ") << e.what() << std::endl;
-        utils::finalize();
-        return EXIT_FAILURE;
-    }
+    result = std::strtol(str, &end, 10);
 
-    bool result = true;
-    if (command.infos()) {
-        std::cerr << fmt(_(
-                "EOV - the Eyes of VLE\n"
-                "Virtual Laboratory Environment - %1%\n"
-                "Copyright (C) 2003 - 2011 The VLE Development Team.\n")) %
-            VLE_NAME_COMPLETE << "\n" << std::endl;
-    } else if (command.version()) {
-        std::cerr << fmt(_(
-                "EOV - the Eyes of VLE\n"
-                "Virtual Laboratory Environment - %1%\n"
-                "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
-                "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-                "You may redistribute copies of VLE\n"
-                "under the terms of the GNU General Public License.\n"
-                "For more information about these matters, see the file named "
-                "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
+    if ((errno == ERANGE and (result == LONG_MAX || result == LONG_MIN))
+        or (errno != 0 and result == 0)) {
+        return false;
     } else {
-        try {
-            Gtk::Main app(argc, argv);
-            Glib::RefPtr < Gnome::Glade::Xml > xml(
-                Gnome::Glade::Xml::create(
-                    utils::Path::path().getGladeFile("eov.glade")));
-            eov::MainWindow main(xml, command.port());
-            app.run(main.window());
-        } catch(const Glib::Exception& e) {
-            result = false;
-            eov_on_error(vle::utils::demangle(typeid(e)), e.what());
-        } catch(const std::exception& e) {
-            result = false;
-            eov_on_error(vle::utils::demangle(typeid(e)), e.what());
+        *value = result;
+        return true;
+    }
+}
+
+static bool convert_port(const char *str, vle::uint32_t *port)
+{
+    bool success = false;
+
+    if (not str) {
+        print_error(_("-p or --port needs a integer argument"));
+    } else {
+        if (not convert_int(str, port)) {
+            print_error(_("Port: Cannot convert `%s' to 0..65535"), str);
+        } else {
+            if (*port > 65535) {
+                print_error(_("Port: Cannot convert `%d' to a norrmal "
+                              "port number [0..65535]"), *port);
+            } else {
+                success = true;
+            }
         }
     }
 
-    vle::manager::finalize();
-    return result ? EXIT_SUCCESS : EXIT_FAILURE;
+    return success;
 }
 
+static bool convert_verbose(const char *str, vle::uint32_t *level)
+{
+    bool success = false;
+
+    if (not str) {
+        print_error(_("-v or --verbose needs a integer argument"));
+    } else {
+        if (not convert_int(str, level)) {
+            print_error(_("Verbose: cannot convert `%s' to 0..3"), str);
+        } else {
+            if (*level > 3) {
+                print_error(_("Can not convert `%d' to normal level "
+                              "number"), *level);
+            } else {
+                return true;
+            }
+        }
+    }
+
+    return success;
+}
+
+static void print_infos()
+{
+    std::fprintf(stderr,
+                 _("EOV - the Eyes of VLE\n"
+                   "Virtual Laboratory Environment - %s\n"
+                   "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                   "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                   "You may redistribute copies of VLE\n"
+                   "under the terms of the GNU General Public License.\n"
+                   "For more information about these matters, see the file"
+                   " named COPYING.\n"), VLE_NAME_COMPLETE);
+}
+
+static void print_help()
+{
+    std::fprintf(
+        stderr, _("EOV - the Eyes of VLE\n"
+                  "Virtual Laboratory Environment - %s\n"
+                  "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                  "\n"
+                  "  eov [--help|-h] [--infos|-i] [--verbose|-v level]"
+                  "[--port|-p port]\n"
+                  "\n"
+                  "    --help,-h\n\tShow summary of options.\n"
+                  "    --infos,-i\n\tShow some informations about Eov.\n"
+                  "    --verbose level,-v level\n\tSet the verbosity of "
+                  "Application. Default is 0.\n"
+                  "    --port port, -p port\n\tDefine the listening port"
+                  "for VLE application. Default is 8000.\n"),
+        VLE_NAME_COMPLETE);
+}
+
+}} // namespace vle eov
+
+int main(int argc, char* argv[])
+{
+    vle::uint32_t port = 8000;
+    vle::uint32_t verbose = 0;
+    bool stop = false;          /**< A boolean to stop the
+                                 * application. */
+    bool result = true;         /**< The state of the application at
+                                 * the end of the application. */
+
+    for (argv++; not stop and *argv; argv++) {
+        if (vle::eov::compare(*argv, "-p", "--port")) {
+            stop = not vle::eov::convert_port(*(++argv), &port);
+            result = stop;
+        } else if (vle::eov::compare(*argv, "-v", "--verbose")) {
+            stop = not vle::eov::convert_verbose(*(++argv), &verbose);
+            result = stop;
+        } else if (vle::eov::compare(*argv, "-h", "--help")) {
+            vle::eov::print_help();
+            stop = true;
+        } else if (vle::eov::compare(*argv, "-i", "--infos")) {
+            vle::eov::print_infos();
+            stop = true;
+        } else {
+            vle::eov::print_error(_("Unkwnow argument `%s'"), *argv);
+            stop = true;
+            result = false;
+        }
+    }
+
+    if (not stop and not *argv) {
+        vle::manager::init();
+
+        try {
+            vle::utils::Trace::setLogFile(
+                vle::utils::Trace::getLogFilename("eov.log"));
+            vle::utils::Trace::setLevel(
+                vle::utils::Trace::cast(verbose));
+
+            Gtk::Main app(argc, argv);
+
+            Glib::RefPtr < Gnome::Glade::Xml > xml =
+                Gnome::Glade::Xml::create(
+                    vle::utils::Path::path().getGladeFile("eov.glade"));
+
+            vle::eov::MainWindow main(xml, port);
+
+            app.run(main.window());
+        } catch(const Glib::Exception& e) {
+            result = false;
+            vle::eov::print_error(_("Eov failed (throws %s): %s"),
+                                  vle::utils::demangle(typeid(e)).c_str(),
+                                  e.what().c_str());
+        } catch(const std::exception& e) {
+            result = false;
+            vle::eov::print_error(_("Eov failed (throws %s): %s"),
+                                  vle::utils::demangle(typeid(e)).c_str(),
+                                  e.what());
+        }
+
+        vle::manager::finalize();
+    }
+
+    return result ? EXIT_SUCCESS : EXIT_FAILURE;
+}
