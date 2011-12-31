@@ -16,10 +16,9 @@ IF (WIN32)
     -i${CMAKE_BINARY_DIR}/share/oov.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/oov.o)
 
-  ADD_EXECUTABLE(oov main.cpp OptionGroup.cpp OptionGroup.hpp
-    ${CMAKE_CURRENT_BINARY_DIR}/oov.o)
+  ADD_EXECUTABLE(oov main.cpp ${CMAKE_CURRENT_BINARY_DIR}/oov.o)
 ELSE (WIN32)
-  ADD_EXECUTABLE(oov main.cpp OptionGroup.cpp OptionGroup.hpp)
+  ADD_EXECUTABLE(oov main.cpp)
   SET_TARGET_PROPERTIES(oov PROPERTIES ${VLE_APP_PROPERTIES})
 ENDIF (WIN32)
 
