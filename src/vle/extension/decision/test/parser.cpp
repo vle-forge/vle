@@ -6,8 +6,8 @@
  * http://www.vle-project.org
  *
  * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2011 INRA http://www.inra.fr
+ * Copyright (c) 2003-2012 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2012 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and contributors
  *
@@ -134,7 +134,7 @@ public:
 
 const char* Plan1 = \
 "# This file is a part of the VLE environment # http://www.vle-project.org\n"
-"# Copyright (C) 2011 INRA http://www.inra.fr\n"
+"# Copyright (C) 2012 INRA http://www.inra.fr\n"
 "#\n"
 "# This program is free software: you can redistribute it and/or modify\n"
 "# it under the terms of the GNU General Public License as published by\n"

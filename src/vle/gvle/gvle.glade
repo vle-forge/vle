@@ -3042,8 +3042,8 @@ each selected Observables</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">VLE</property>
     <property name="copyright" translatable="yes">Copyright &#xA9; 2003-2007 Gauthier Quesnel quesnel@users.sourceforge.net
-Copyright &#xA9; 2003-2011 ULCO http://www.univ-littoral.fr
-Copyright &#xA9; 2007-2011 INRA http://www.inra.fr</property>
+Copyright &#xA9; 2003-2012 ULCO http://www.univ-littoral.fr
+Copyright &#xA9; 2007-2012 INRA http://www.inra.fr</property>
     <property name="comments" translatable="yes">The Virtual Laboratory Environment</property>
     <property name="website">http://www.sourceforge.net/projects/vle</property>
     <property name="license" translatable="yes">VLE comes with ABSOLUTELY NO WARRANTY.

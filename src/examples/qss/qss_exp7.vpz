@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
-<vle_project version="0.1" date="Mon, 27 Dec 2011" author="PC">
+<vle_project version="0.1" date="Mon, 27 Dec 2012" author="PC">
 <structures>
 <model name="top" type="coupled" width="459"  >
 <submodels>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
-<vle_project version="1.0" date="mer., 19 oct. 2011" author="Trepos Ronan">
+<vle_project version="1.0" date="mer., 19 oct. 2012" author="Trepos Ronan">
 <structures>
 <model name="confluentNosync" type="coupled" x="0" y="0" width="1243" height="616"  >
 <submodels>

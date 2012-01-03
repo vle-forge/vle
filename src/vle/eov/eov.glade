@@ -256,7 +256,7 @@
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="program_name">Eov</property>
-    <property name="copyright" translatable="yes">Copyright (C) 2003 - 2008 The VLE Development Team.</property>
+    <property name="copyright" translatable="yes">Copyright (C) 2003 - 2012 The VLE Development Team.</property>
     <property name="comments" translatable="yes">Eyes of VLE
 The Virtual Laboratory Environment</property>
     <property name="website">http://vle.univ-littoral.fr</property>
