@@ -416,6 +416,7 @@ void GVLE::parseXML(const std::string& filename)
     getEditor()->closeVpzTab();
     mModeling->parseXML(filename);
     mModeling->setFileName(filename);
+    delViews();
     addView(mModeling->getTopModel());
     mModeling->setSaved(true);
     mModeling->setModified(false);
