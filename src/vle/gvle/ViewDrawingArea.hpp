@@ -82,7 +82,8 @@ namespace vle { namespace gvle {
 
         ViewDrawingArea(View* view);
 
-        virtual ~ViewDrawingArea() {}
+        virtual ~ViewDrawingArea()
+        { m_cntSignalQueryTooltip.disconnect(); }
 
         virtual void draw()=0;
 
@@ -289,6 +290,9 @@ namespace vle { namespace gvle {
 
         int                       mMaxWidth;
         int                       mMaxHeight;
+
+        sigc::connection m_cntSignalQueryTooltip;
+
     };
 
 }} // namespace vle gvle

@@ -76,7 +76,8 @@ ViewDrawingArea::ViewDrawingArea(View* view)
     mGVLE = view->getGVLE();
 
     set_has_tooltip();
-    signal_query_tooltip().connect(
+
+    m_cntSignalQueryTooltip = signal_query_tooltip().connect(
         sigc::mem_fun(*this, &ViewDrawingArea::onQueryTooltip));
 }
 
