@@ -543,7 +543,7 @@ bool ModelClassBox::onExposeEvent(GdkEvent* event)
 void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
                                   Gtk::TreeViewColumn* column)
 {
-    if (column) {
+    if (column && path) {
         Gtk::TreeIter iter = mRefTreeModel->get_iter(path);
         Gtk::TreeRow row = (*iter);
         if (mRefTreeModel->iter_depth(iter) == 0) {
@@ -552,7 +552,7 @@ void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
                 row.get_value(mColumns.mName));
         } else {
             mGVLE->addViewClass(row.get_value(mColumns.mModel),
-                                    getClassName(path));
+                                getClassName(path));
         }
     }
 }
