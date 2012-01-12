@@ -25,7 +25,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/utils/Tools.hpp>
@@ -212,12 +211,6 @@ void HostsBox::run()
     if (mDialog->run() == Gtk::RESPONSE_OK) {
         mHosts.write();
     }
-}
-
-int HostsBox::test_vle_existence(const Glib::ustring&, int)
-{
-    // FIXME
-    return -1;
 }
 
 Glib::ustring HostsBox::get_hosts_filename()

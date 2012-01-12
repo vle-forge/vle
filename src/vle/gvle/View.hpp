@@ -71,12 +71,6 @@ public:
         return mGVLE->getCurrentButton();
     }
 
-    /**
-     * Initialize all selected models, destination, and change mouse
-     * pointer type.
-     */
-    void initAllOptions();
-
     //
     //
     // GET FUNCTION
@@ -126,28 +120,6 @@ public:
     inline SimpleViewDrawingArea* getSimpleArea() {
         return mSimpleDrawing;
     }
-
-    //
-    //
-    // MANAGE GTK::WINDOW EVENT
-    //
-    //
-
-    /**
-     * When delete view, call modeling to delete window.
-     *
-     * @param event event structure
-     * @return true
-     */
-    bool on_delete_event(GdkEventAny* event);
-
-    /**
-     * When focus, call modeling to show current view.
-     *
-     * @param event focus event structure
-     * @return true
-     */
-    bool on_focus_in_event(GdkEventFocus* event);
 
     //
     //

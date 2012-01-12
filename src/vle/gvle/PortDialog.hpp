@@ -81,11 +81,6 @@ public:
     bool run();
 
 private:
-    /**
-     * @brief Get all inputs or outputs port from model and show it
-     *
-     */
-    void fillTreeView();
 
 class Column : public Gtk::TreeModel::ColumnRecord
     {

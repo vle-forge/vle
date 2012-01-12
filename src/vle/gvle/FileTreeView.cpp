@@ -391,6 +391,7 @@ void FileTreeView::on_row_activated(const Gtk::TreeModel::Path& path,
             if (utils::Path::extension(absolute_path) == ".vpz") {
                 Editor::Documents::const_iterator it =
                     mParent->getEditor()->getDocuments().begin();
+
                 bool found = false;
 
                 while (not found and
@@ -401,6 +402,7 @@ void FileTreeView::on_row_activated(const Gtk::TreeModel::Path& path,
                         ++it;
                     }
                 }
+
                 if (not found or (found and mParent->closeTab(it->first))) {
                     mParent->getEditor()->openTab(absolute_path);
                     if (mParent->getModeling()->getTopModel()) {
@@ -842,38 +844,6 @@ void FileTreeView::removeFiles(const Gtk::TreeModel::Row* parent,
             mTreeModel->get_iter(it->get_path());
 
         mTreeModel->erase(treeit);
-    }
-}
-
-void FileTreeView::openTab(std::string path)
-{
-    if (utils::Path::extension(path) == ".vpz") {
-        Editor::Documents::const_iterator it =
-            mParent->getEditor()->getDocuments().begin();
-        bool found = false;
-
-        while (not found and
-               it != mParent->getEditor()->getDocuments().end()) {
-            if (utils::Path::extension(it->first) == ".vpz") {
-                found = true;
-            } else {
-                ++it;
-            }
-        }
-
-        if (not found or (found and mParent->closeTab(it->first))) {
-            mParent->getEditor()->openTab(path);
-            if (mParent->getModeling()->getTopModel()) {
-                mParent->redrawModelTreeBox();
-                mParent->redrawModelClassBox();
-                mParent->getMenu()->onOpenVpz();
-                mParent->getModelTreeBox()->set_sensitive(true);
-                mParent->getModelClassBox()->set_sensitive(true);
-            }
-        }
-    } else {
-        mParent->getEditor()->openTab(path);
-        mParent->getMenu()->onOpenFile();
     }
 }
 

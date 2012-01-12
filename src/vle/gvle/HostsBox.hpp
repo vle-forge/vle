@@ -147,18 +147,6 @@ public:
     void run();
 
     /**
-     * Test VLE daemon existence for hostname using port.
-     *
-     * @param hostname name of host using IP address or name. Example:
-     * 193.49.192.226 or vle.univ-littoral.fr.
-     * @param port port number
-     * @return -1 if access error, 0 if VLE daemon not found, >= 1 for
-     * number of processor found.
-     */
-    static int test_vle_existence(const Glib::ustring& hostname,
-                                  int port);
-
-    /**
      * Return the user hosts filename.
      *
      * @return user hosts filename.

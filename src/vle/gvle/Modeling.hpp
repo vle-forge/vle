@@ -105,9 +105,6 @@ public:
 
     void setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml);
 
-    Glib::RefPtr < Gnome::Glade::Xml > getGlade() const;
-
-
     /********************************************************************
      *
      * XML LOADING AND SAVE
@@ -240,29 +237,6 @@ public:
 
     /********************************************************************
      *
-     * OTHER USEFULL FUNCTION
-     *
-     ********************************************************************/
-
-    /**
-     * return true if a model with name 'name' already exist in tree.
-     *
-     * @param name string to search.
-     * @return true if a model with name 'name' is found.
-     */
-    bool exist(const std::string& name) const;
-
-    /**
-     * return true if a model with ptr = m exist in tree.
-     *
-     * @param m model to find.
-     * @return true if a model with ptr equal to m is found.
-     */
-    bool exist(const graph::Model* m) const;
-
-
-    /********************************************************************
-     *
      * COMPRESSED, MODIFIED AND SAVED
      *
      ********************************************************************/
@@ -360,66 +334,10 @@ public:
      *
      ********************************************************************/
 
-
-    /**
-     * return true if model name exist in models names list.
-     *
-     * @param name name to test existing.
-     * @return true if model exist in list, otherwise false.
-     */
-    bool existModelName(const std::string& name) const;
-
-    /**
-     * test if name is a correct name i.e. only ascii char, only char:
-     * [[A-Z][a-z]]* and not exist in model name.
-     *
-     * @param name std::string to test validity.
-     * @return true if name is correct, false otherwise.
-     */
-    bool isCorrectName(const Glib::ustring& name) const;
-
-    /**
-     * get a new string using Gtk::Dialog class.
-     *
-     * @param name output parameter fill by correct new name.
-     * @return true if name is ok, false otherwise.
-     */
-    bool getNewName(std::string& name) const;
-
-    /**
-     * delete a string from list.
-     *
-     * @param name model name to delete.
-     */
-    void delName(const std::string& name);
-
     /**
      * delete all string from list.
      */
     void delNames();
-
-    /**
-     * add a model name into list.
-     *
-     * @param name a new name to add.
-     */
-    void addName(const std::string& name);
-
-    /**
-     * Get a model name with prefix name ; Name must include only ascii
-     * char.
-     * @code
-     * if name equal :
-     *    "toto" then, return "toto_"
-     *    "toto" and "toto_" exist, return "toto[A-z]_"
-     * if name is empty,
-     *    return "[A-z]*8_" minimum, add [A-z] if model exist
-     * @endcode
-     *
-     * @param name a prefix for model name.
-     * @return a prefix for a model like "toto_".
-     */
-    std::string getNameWithPrefix(const std::string& name);
 
     /**
      * return list of model name.
@@ -489,8 +407,6 @@ public:
                 .atomicModels().get(atom);
         }
     }
-
-    const std::vector < std::string >* get_conditions(graph::AtomicModel* atom);
 
     /********************************************************************
      *

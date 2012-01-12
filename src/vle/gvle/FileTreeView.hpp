@@ -139,7 +139,6 @@ private:
                               const std::string& dirname);
     void removeFiles(const Gtk::TreeModel::Row* parent,
                      const std::list < std::string >& entries);
-    void openTab(std::string path);
 
     GVLE*                            mParent;
     Gtk::Menu                        mMenuPopup;

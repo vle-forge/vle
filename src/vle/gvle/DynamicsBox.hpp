@@ -29,7 +29,8 @@
 #ifndef VLE_GVLE_DYNAMICSBOX_HPP
 #define VLE_GVLE_DYNAMICSBOX_HPP
 
-#include <vle/gvle/TreeViewConditions.hpp>
+#include <gtkmm.h>
+#include <vle/gvle/Modeling.hpp>
 
 namespace vle { namespace gvle {
 

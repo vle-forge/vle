@@ -54,8 +54,6 @@ public:
 
     ~ModelClassBox();
 
-    void hide();
-
     /**
      * Show in the TextView the class Tree
      */
@@ -81,7 +79,6 @@ public:
     virtual void onExportVpz();
     virtual void onImportModelAsClass();
     virtual void onImportClassesFromVpz();
-    void showRow(const std::string& model_name);
 
     // Signal handler for text area
     virtual void onEditionStarted(
@@ -130,15 +127,6 @@ protected:
      */
     Gtk::TreeModel::Row addSubModel(Gtk::TreeModel::Row tree,
                                     graph::Model* model);
-
-    /**
-     * slot call function to call set cursor on a row
-     *
-     * @param iter iterator to test
-     * @return true if found, otherwise false
-     */
-    bool on_foreach(const Gtk::TreeModel::Path&,
-                    const Gtk::TreeModel::iterator& iter);
 
     /**
      * When user clicks, an editable text area appears if it is not a

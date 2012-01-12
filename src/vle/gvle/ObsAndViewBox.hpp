@@ -30,7 +30,6 @@
 #define VLE_GVLE_OBSANDVIEWBOX_HPP
 
 #include <vle/gvle/ObsAndViewBox.hpp>
-#include <vle/gvle/TreeViewObservable.hpp>
 #include <vle/vpz/Observable.hpp>
 #include <vle/vpz/Views.hpp>
 #include <gtkmm.h>

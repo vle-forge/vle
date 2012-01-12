@@ -210,12 +210,6 @@ void ModelTreeBox::showRow(const graph::Model* mdl)
     set_cursor(Gtk::TreePath(iter));
 }
 
-void ModelTreeBox::showRow(const std::string& model_name)
-{
-    m_search.assign(model_name);
-    m_refTreeModel->foreach(sigc::mem_fun(*this, &ModelTreeBox::on_foreach));
-}
-
 void ModelTreeBox::clear()
 {
     m_refTreeModel->clear();
@@ -303,16 +297,6 @@ void ModelTreeBox::row_activated(const Gtk::TreeModel::Path& path,
         Gtk::TreeRow row = (*iter);
         m_gvle->addView(row.get_value(m_columns.mModel));
     }
-}
-
-bool ModelTreeBox::on_foreach(const Gtk::TreeModel::Path&,
-                              const Gtk::TreeModel::iterator& iter)
-{
-    if ((*iter).get_value(m_columns.mName) == m_search) {
-        set_cursor(m_refTreeModel->get_path(iter));
-        return true;
-    }
-    return false;
 }
 
 void ModelTreeBox::onEditionStarted(
