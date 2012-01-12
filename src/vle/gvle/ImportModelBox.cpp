@@ -101,11 +101,6 @@ void ImportWidget::set_state(bool state)
         mImage.set(Gtk::StockID(Gtk::Stock::NO), Gtk::IconSize(1));
 }
 
-bool ImportWidget::is_valid()
-{
-    return mState;
-}
-
 void ImportWidget::on_change()
 {
     bool new_state = evaluate();

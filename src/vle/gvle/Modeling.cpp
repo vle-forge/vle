@@ -33,7 +33,6 @@
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ModelDescriptionBox.hpp>
-#include <vle/gvle/DialogString.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
@@ -96,12 +95,6 @@ void Modeling::clearModeling()
 void Modeling::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
 {
     mRefXML = xml;
-}
-
-Glib::RefPtr < Gnome::Glade::Xml > Modeling::getGlade() const
-{
-    assert(mRefXML);
-    return mRefXML;
 }
 
 void Modeling::parseXML(const string& filename)
@@ -185,16 +178,6 @@ vpz::AtomicModelList& Modeling::getAtomicModelClass(std::string className)
 void Modeling::showDynamics(const std::string& /* name */)
 {
     Error(_("This function is not yet implemented"));
-}
-
-bool Modeling::exist(const std::string& name) const
-{
-    return mTop->findModel(name) != 0;
-}
-
-bool Modeling::exist(const graph::Model* m) const
-{
-    return (mTop->findModel(m->getName()) != 0);
 }
 
 void Modeling::exportCoupledModel(graph::CoupledModel* model,
@@ -379,84 +362,14 @@ void Modeling::import_coupled_model(vpz::Vpz* src, graph::CoupledModel* model, s
     }
 }
 
-bool Modeling::existModelName(const std::string& name) const
-{
-    return (mModelsNames.find(name) != mModelsNames.end());
-}
-
-bool Modeling::isCorrectName(const Glib::ustring& name) const
-{
-    return (name.empty() == false and name.is_ascii() == true and
-            existModelName(name) == false);
-}
-
-bool Modeling::getNewName(std::string& name) const
-{
-    std::list < Glib::ustring > lst(mModelsNames.begin(), mModelsNames.end());
-    gvle::DialogString box("Get a new name", "Name", lst);
-    Glib::ustring error = box.run();
-
-    if (error.empty() == true) {
-        name.assign(box.get_string());
-        return true;
-    } else {
-        gvle::Error(error);
-        return false;
-    }
-}
-
-void Modeling::delName(const std::string& name)
-{
-    mModelsNames.erase(name);
-}
-
 void Modeling::delNames()
 {
     mModelsNames.clear();
 }
 
-void Modeling::addName(const std::string& name)
-{
-    mModelsNames.insert(name);
-}
-
-std::string Modeling::getNameWithPrefix(const std::string& name)
-{
-    Glib::Rand prand;
-    std::string prefix(name);
-
-    if (name.empty()) {
-        for (int i=0; i < 8; ++i) {
-            char big = (char)prand.get_int_range('A', 'Z');
-            char sml = (char)prand.get_int_range('a', 'z');
-            prefix.push_back(prand.get_bool() ? big : sml);
-        }
-    }
-    prefix.push_back('_');
-    while (existModelName(prefix)) {
-        char big = (char)prand.get_int_range('A', 'Z');
-        char sml = (char)prand.get_int_range('a', 'z');
-        prefix.erase(prefix.end() - 1);
-        prefix.push_back(prand.get_bool() ? big : sml);
-        prefix.push_back('_');
-    }
-    return prefix;
-}
-
 const Modeling::SetString& Modeling::getNames() const
 {
     return mModelsNames;
-}
-
-
-const std::vector < std::string >*
-Modeling::get_conditions(graph::AtomicModel* atom)
-{
-    assert(atom);
-
-    vle::vpz::AtomicModelList& list = mVpz.project().model().atomicModels();
-    vle::vpz::AtomicModel& a = list.get(atom);
-    return &(a.conditions());
 }
 
 graph::CoupledModel* Modeling::newCoupledModel(graph::CoupledModel* parent,

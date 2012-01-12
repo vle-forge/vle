@@ -83,24 +83,6 @@ PortDialog::PortDialog(graph::Model* model, PortDialog::PortType type) :
     show_all();
 }
 
-void PortDialog::fillTreeView()
-{
-    throw utils::NotYetImplemented(_("PortDialog::fillTreeView"));
-    //const graph::MapStringPort& lst =
-    //(mPortType == PortDialog::INPUT) ? mModel->getInputPortList() :
-    //(mPortType == PortDialog::OUTPUT) ? mModel->getOutputPortList() :
-    //(mPortType == PortDialog::INIT) ? mModel->getInitPortList() :
-    //mModel->getStatePortList();
-    //
-    //graph::MapStringPort::const_iterator it = lst.begin();
-    //while (it != lst.end()) {
-    //Gtk::TreeModel::Row row = *(mListStore->append());
-    //mSet.insert((*it).first);
-    //row[mColumn.mName] = (*it).first;
-    //++it;
-    //}
-}
-
 bool PortDialog::run()
 {
     for (;;) {

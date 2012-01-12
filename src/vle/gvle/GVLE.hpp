@@ -37,7 +37,6 @@
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
 #include <vle/gvle/OpenVpzBox.hpp>
-#include <vle/gvle/ParameterExecutionBox.hpp>
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/value/Value.hpp>
@@ -118,8 +117,6 @@ public:
      *
      */
     virtual ~GVLE();
-
-    void setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml);
 
     /**
      * @brief update the view when Modeling mention that the vpz is
@@ -285,11 +282,6 @@ public:
     void refreshViews();
 
     /**
-     * Redraw the VPZ view
-     */
-    void redrawView();
-
-    /**
      * Redraw the TreeViews
      */
     void redrawModelTreeBox();
@@ -300,22 +292,6 @@ public:
      */
     void clearModelTreeBox();
     void clearModelClassBox();
-
-    /**
-     * active a row into TreeBox for a particular string, all activated row
-     * area hide.
-     *
-     * @param name model name to activate.
-     */
-    void showRowTreeBox(const std::string& name);
-
-    /**
-     * active a row into ModelClassBox for a particular string, all activated
-     * row area hide.
-     *
-     * @param name class name to activate.
-     */
-    void showRowModelClassBox(const std::string& name);
 
     /**
      * return the ConditionBox
@@ -444,13 +420,6 @@ public:
      *
      *********************************************************************/
 
-
-    /**
-     * When click on new file menu
-     *
-     */
-    void onNewFile();
-
     /**
      * @brief When asking for, from the project treeview, and after
      * the name has been choosen with a dialog.
@@ -476,12 +445,6 @@ public:
      *
      */
     void onNewProject();
-
-    /**
-     * When click on open file menu
-     *
-     */
-    void onOpenFile();
 
     /**
      * When click on open project menu
@@ -540,8 +503,6 @@ public:
      *
      */
     void importModel();
-
-    void importModelToClass(vpz::Vpz* src, std::string& className);
 
     void importClasses(vpz::Vpz* src);
 
@@ -666,14 +627,6 @@ public:
     bool packageBuildTimer();
 
     /**
-     * @brief configure the current project and connect a timer
-     *
-     * The launched timer used can manage the next operation to be
-     * done on the package: build. The build operation is expected.
-     */
-    void configureAllProject();
-
-    /**
      * @brief only configure the current project and connect a timer
      *
      */
@@ -781,7 +734,6 @@ public:
      */
     void onShowSimpleView();
 
-
     /**
      * @brief Show the PreferencesBox
      */
@@ -820,12 +772,6 @@ public:
      *
      */
     void onSimulationBox();
-
-    /**
-     * When click on parameter execution menu box.
-     *
-     */
-    void onParameterExecutionBox();
 
     /**
      * When click on conditions box to define initial conditions
@@ -891,13 +837,6 @@ public:
      * MENU HELP
      *
      *********************************************************************/
-
-
-    /**
-     * on menu HelpBox click.
-     *
-     */
-    void onHelpBox();
 
     /**
      * on menu About click.

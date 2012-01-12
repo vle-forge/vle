@@ -82,13 +82,6 @@ public:
     Gtk::TreeModel::iterator getModelRow(const graph::Model* mdl, Gtk::TreeModel::Children child);
 
     /**
-     * active a row for a particular string, all activated row are hide
-     *
-     * @param model_name model name to activate
-     */
-    void showRow(const std::string& model_name);
-
-    /**
      * @brief Rename a model with the specified name
      */
     void onRenameModels();
@@ -163,16 +156,6 @@ protected:
      */
     void row_activated(const Gtk::TreeModel::Path& path,
                        Gtk::TreeViewColumn* column);
-
-
-    /**
-     * slot call function to call set cursor on a row
-     *
-     * @param iter iterator to test
-     * @return true if found, otherwise false
-     */
-    bool on_foreach(const Gtk::TreeModel::Path&,
-                    const Gtk::TreeModel::iterator& iter);
 
     /**
      * When user clicks, an editable text area appears if it is not

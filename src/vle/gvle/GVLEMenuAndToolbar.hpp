@@ -62,9 +62,7 @@ public:
     // Menu item
     void hideCopyCut();
     void showCopyCut();
-    void hidePaste();
     void showPaste();
-    void hideOpenVpz();
     void showOpenVpz();
     void hideSave();
     void showSave();
@@ -76,7 +74,6 @@ public:
     void showCloseProject();
     void hideImportExport();
     void showImportExport();
-    void hideRefresh();
     void showRefresh();
 
     // Menu

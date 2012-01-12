@@ -28,7 +28,6 @@
 
 #include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/gvle/ObservableBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>

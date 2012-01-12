@@ -168,34 +168,6 @@ void ImportClassesBox::importClass(std::string& className,
 		  vpz::CopyAtomicModel(destClass.atomicModels(), *destClass.model()));
 }
 
-void ImportClassesBox::add_atomic_model_to_class(graph::AtomicModel* model,
-						 vpz::Class& srcClass,
-						 vpz::Class& destClass)
-{
-    const vpz::AtomicModel& vpz_model = srcClass.atomicModels().get(model);
-    destClass.atomicModels().add(model, vpz_model);
-}
-
-void ImportClassesBox::add_coupled_model_to_class(graph::CoupledModel* model,
-						  vpz::Class& srcClass,
-						  vpz::Class& destClass)
-{
-    graph::ModelList& list = model->getModelList();
-    if (!list.empty()) {
-	graph::ModelList::const_iterator it = list.begin();
-	while (it!= list.end()) {
-	    if (it->second->isAtomic()) {
-		add_atomic_model_to_class(graph::Model::toAtomic(it->second),
-					  srcClass, destClass);
-	    } else {
-		add_coupled_model_to_class(graph::Model::toCoupled(it->second),
-					   srcClass, destClass);
-	    }
-	    ++it;
-	}
-    }
-}
-
 void ImportClassesBox::onClose()
 {
     mDialog->hide_all();

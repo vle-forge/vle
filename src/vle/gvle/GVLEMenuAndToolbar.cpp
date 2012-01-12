@@ -200,11 +200,6 @@ void GVLEMenuAndToolbar::hideFileModel()
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
 }
 
-void GVLEMenuAndToolbar::hideOpenVpz()
-{
-    m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
-}
-
 void GVLEMenuAndToolbar::showOpenVpz()
 {
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(true);
@@ -220,11 +215,6 @@ void GVLEMenuAndToolbar::showCopyCut()
 {
     m_refActionGroup->get_action("Copy")->set_sensitive(true);
     m_refActionGroup->get_action("Cut")->set_sensitive(true);
-}
-
-void GVLEMenuAndToolbar::hidePaste()
-{
-    m_refActionGroup->get_action("Paste")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::showPaste()
@@ -270,11 +260,6 @@ void GVLEMenuAndToolbar::hideCloseProject()
 void GVLEMenuAndToolbar::showCloseProject()
 {
     m_refActionGroup->get_action("CloseProject")->set_sensitive(true);
-}
-
-void GVLEMenuAndToolbar::hideRefresh()
-{
-    m_refActionGroup->get_action("Refresh")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::showRefresh()

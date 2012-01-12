@@ -69,7 +69,6 @@ private:
     Gtk::Image                  mImage;
     bool                        mState;
 
-    bool is_valid();
     void on_change();
     bool evaluate();
 };

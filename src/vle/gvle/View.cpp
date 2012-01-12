@@ -74,50 +74,6 @@ void View::redraw()
     mSimpleDrawing->queueRedraw();
 }
 
-void View::initAllOptions()
-{
-    clearSelectedModels();
-    mDestinationModel = NULL;
-
-    GVLE::ButtonType current = getCurrentButton();
-
-    switch (current) {
-    case GVLE::VLE_GVLE_POINTER:
-        mGVLE->get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
-        break;
-    case GVLE::VLE_GVLE_ADDMODEL:
-    case GVLE::VLE_GVLE_GRID:
-    case GVLE::VLE_GVLE_ADDLINK:
-    case GVLE::VLE_GVLE_ADDCOUPLED:
-    case GVLE::VLE_GVLE_ZOOM:
-    case GVLE::VLE_GVLE_QUESTION:
-    case GVLE::VLE_GVLE_PLUGINMODEL:
-        mGVLE->get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
-        break;
-    case GVLE::VLE_GVLE_DELETE:
-        mGVLE->get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
-        break;
-    }
-}
-
-bool View::on_delete_event(GdkEventAny* event)
-{
-    if (event->type == GDK_DELETE) {
-        mGVLE->delViewIndex(mIndex);
-        return true;
-    }
-    return false;
-}
-
-
-bool View::on_focus_in_event(GdkEventFocus* event)
-{
-    if (event->in == TRUE) {
-        mGVLE->showRowTreeBox(mCurrent->getName());
-    }
-    return true;
-}
-
 void View::addModelInListModel(graph::Model* model, bool shiftorcontrol)
 {
     if (model) {

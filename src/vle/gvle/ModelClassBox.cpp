@@ -237,11 +237,6 @@ ModelClassBox::~ModelClassBox()
     delete mNewModelBox;
 }
 
-void ModelClassBox::hide()
-{
-    hide_all();
-}
-
 bool ModelClassBox::onButtonRealeaseModels(GdkEventButton* event)
 {
     Gtk::Menu::MenuList& menulist(mMenuPopup.items());
@@ -511,12 +506,6 @@ void ModelClassBox::parseModel(Gtk::TreeModel::Row row,
     }
 }
 
-void ModelClassBox::showRow(const std::string& model_name)
-{
-    mSearch.assign(model_name);
-    mRefTreeModel->foreach(sigc::mem_fun(*this, &ModelClassBox::on_foreach));
-}
-
 bool ModelClassBox::onExposeEvent(GdkEvent* event)
 {
     if (event->type == GDK_2BUTTON_PRESS) {
@@ -555,16 +544,6 @@ void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
                                 getClassName(path));
         }
     }
-}
-
-bool ModelClassBox::on_foreach(const Gtk::TreeModel::Path&,
-                               const Gtk::TreeModel::iterator& iter)
-{
-    if ((*iter).get_value(mColumns.mName) == mSearch) {
-        set_cursor(mRefTreeModel->get_path(iter));
-        return true;
-    }
-    return false;
 }
 
 void ModelClassBox::onEditionStarted(Gtk::CellEditable* cell_editable,

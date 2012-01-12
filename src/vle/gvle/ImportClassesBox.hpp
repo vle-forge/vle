@@ -110,12 +110,6 @@ private:
     ClassesTreeView*                     mProjectClasses;
     ClassesTreeView*                     mVpzClasses;
 
-    void add_atomic_model_to_class(graph::AtomicModel* model,
-				   vpz::Class& srcClass,
-				   vpz::Class& destClass);
-    void add_coupled_model_to_class(graph::CoupledModel* model,
-				    vpz::Class& srcClass,
-				    vpz::Class& destClass);
     void onClose();
 };
 

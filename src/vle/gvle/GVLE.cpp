@@ -38,7 +38,6 @@
 #include <vle/gvle/FileTreeView.hpp>
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/gvle/HelpBox.hpp>
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/PreferencesBox.hpp>
@@ -160,15 +159,6 @@ GVLE::~GVLE()
     delete mSaveVpzBox;
     delete mQuitBox;
     delete mMenuAndToolbar;
-}
-
-void GVLE::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
-{
-    mRefXML = xml;
-    mAtomicBox = new AtomicModelBox(xml, mModeling, this);
-    mImportModelBox = new ImportModelBox(xml, mModeling);
-    mCoupledBox = new CoupledModelBox(xml, mModeling, this);
-    mModeling->setGlade(xml);
 }
 
 bool GVLE::on_timeout()
@@ -483,13 +473,6 @@ void GVLE::refreshViews()
     }
 }
 
-void GVLE::redrawView()
-{
-    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-        mEditor->get_nth_page(mCurrentTab))->getView();
-    currentView->redraw();
-}
-
 void GVLE::redrawModelTreeBox()
 {
     assert(mModeling->getTopModel());
@@ -509,16 +492,6 @@ void GVLE::clearModelTreeBox()
 void GVLE::clearModelClassBox()
 {
     mModelClassBox->clear();
-}
-
-void GVLE::showRowTreeBox(const std::string& name)
-{
-    mModelTreeBox->showRow(name);
-}
-
-void GVLE::showRowModelClassBox(const std::string& name)
-{
-    mModelClassBox->showRow(name);
 }
 
 bool GVLE::on_delete_event(GdkEventAny* event)
@@ -577,13 +550,6 @@ void GVLE::onQuestion()
     mCurrentButton = VLE_GVLE_QUESTION;
     mEditor->getDocumentDrawingArea()->updateCursor();
     showMessage(_("Question"));
-}
-
-void GVLE::onNewFile()
-{
-    mEditor->createBlankNewFile();
-    mMenuAndToolbar->onOpenFile();
-    mMenuAndToolbar->showSave();
 }
 
 void GVLE::onNewFile(const std::string& path, const std::string& fileName)
@@ -646,21 +612,6 @@ void GVLE::onNewProject()
     clearModelClassBox();
     mFileTreeView->set_sensitive(true);
     onTrouble();
-}
-
-void GVLE::onOpenFile()
-{
-    Gtk::FileChooserDialog file(_("Choose a file"),
-                                Gtk::FILE_CHOOSER_ACTION_OPEN);
-    file.set_transient_for(*this);
-    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-
-    if (file.run() == Gtk::RESPONSE_OK) {
-        std::string selected_file = file.get_filename();
-        mEditor->openTab(selected_file);
-        mMenuAndToolbar->onOpenFile();
-    }
 }
 
 void GVLE::onOpenProject()
@@ -1032,12 +983,6 @@ void GVLE::onSimulationBox()
     }
 }
 
-void GVLE::onParameterExecutionBox()
-{
-    ParameterExecutionBox box(mModeling);
-    box.run();
-}
-
 void GVLE::onExperimentsBox()
 {
     ExperimentBox box(mRefXML, mModeling);
@@ -1133,10 +1078,6 @@ void GVLE::onHostsBox()
 {
     HostsBox box(mRefXML);
     box.run();
-}
-
-void GVLE::onHelpBox()
-{
 }
 
 void GVLE::onViewOutputBox()
@@ -1404,25 +1345,6 @@ bool GVLE::packageBuildTimer()
     } else {
         return true;
     }
-}
-
-void GVLE::configureAllProject()
-{
-    insertLog("configure package " + utils::Package::package().name() + "\n");
-    getMenu()->hideProjectMenu();
-    try {
-        utils::Package::package().configure();
-    } catch (const std::exception& e) {
-        getMenu()->showProjectMenu();
-        gvle::Error(e.what());
-        return;
-    } catch (const Glib::Exception& e) {
-        getMenu()->showProjectMenu();
-        gvle::Error(e.what());
-        return;
-    }
-    Glib::signal_timeout().connect(
-        sigc::mem_fun(*this, &GVLE::packageConfigureAllTimer), 250);
 }
 
 void GVLE::configureProject()
@@ -1927,21 +1849,6 @@ void GVLE::importModel()
             delete src;
         } catch (std::exception& E) {
             Error(E.what());
-        }
-    }
-}
-
-void GVLE::importModelToClass(vpz::Vpz* src, std::string& className)
-{
-    using namespace vpz;
-    assert(src);
-    boost::trim(className);
-
-    if (mImportModelBox) {
-        if (mImportModelBox->show(src)) {
-            mModeling->importModelToClass(src, className);
-            redrawModelClassBox();
-            refreshViews();
         }
     }
 }
