@@ -148,26 +148,6 @@ public:
         UserModel::confluentTransitions(time, extEventlist);
     }
 
-    void request(const RequestEvent& event,
-                 const Time& time,
-                 ExternalEventList& output) const
-    {
-        TraceDevs(fmt(_("%1$20.10g %2% [DEVS] request: [%3%]")) % time %
-                  mName % event);
-
-        UserModel::request(event, time, output);
-
-        if (output.empty()) {
-            TraceDevs(fmt(
-                    _("                .... %1% [DEVS] request returns empty "
-                      "output")) % mName);
-        } else {
-            TraceDevs(fmt(
-                    _("                .... %1% [DEVS] request returns %2%")) %
-                mName % output);
-        }
-    }
-
     vle::value::Value* observation(
         const ObservationEvent& event) const
     {

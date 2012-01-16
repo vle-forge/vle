@@ -187,22 +187,6 @@ namespace vle { namespace devs {
             externalTransition(extEventlist, time);
         }
 
-        /**
-         * @brief Process a request event: these functions occurs when an
-         * RequestEvent is push into an ExternalEventList by the
-         * output function.
-         * @param event RequestEvent to process.
-         * @param time the date of occurrence of this event.
-         * @param output the list of external events (output parameter).
-         * @return a response to the model. This bag can include External and
-         * Request event.
-         */
-        virtual void request(
-	    const vle::devs::RequestEvent& /* event */,
-            const vle::devs::Time& /* time */,
-            vle::devs::ExternalEventList& /* output */) const
-        { }
-
 	/**
          * @brief Process an observation event: compute the current state of the
          * model at a specified time and for a specified port.

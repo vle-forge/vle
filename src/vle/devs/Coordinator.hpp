@@ -332,9 +332,6 @@ private:
     void processConflictEvents(Simulator* sim,
                                const EventBagModel& modelbag);
 
-    void processRequestEvents(Simulator* sim,
-                              const EventBagModel& modelbag);
-
     /**
      * @brief Process for each ObservationEvent in the bag and observation
      * for the specified model. All ObservationEvent are destroyed by this

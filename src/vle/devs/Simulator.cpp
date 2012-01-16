@@ -238,12 +238,6 @@ InternalEvent* Simulator::externalTransitionConflict(
     return buildInternalEvent(event.getTime());
 }
 
-void Simulator::request(const RequestEvent& event, const Time& time,
-                        ExternalEventList& output)
-{
-    m_dynamics->request(event, time, output);
-}
-
 value::Value* Simulator::observation(const ObservationEvent& event) const
 {
     return m_dynamics->observation(event);

@@ -47,8 +47,6 @@
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/NetStreamWriter.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/devs/RequestEvent.hpp>
-#include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/StreamWriter.hpp>

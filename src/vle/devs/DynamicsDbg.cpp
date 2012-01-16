@@ -108,26 +108,6 @@ void DynamicsDbg::confluentTransitions(
     mDynamics->confluentTransitions(time, extEventlist);
 }
 
-void DynamicsDbg::request(const RequestEvent& event,
-                          const Time& time,
-                          ExternalEventList& output) const
-{
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] request: [%3%]")) % time %
-              mName % event);
-
-    mDynamics->request(event, time, output);
-
-    if (output.empty()) {
-        TraceDevs(fmt(
-                _("                .... %1% [DEVS] request returns empty "
-                  "output")) % mName);
-    } else {
-        TraceDevs(fmt(
-                _("                .... %1% [DEVS] request returns %2%")) %
-            mName % output);
-    }
-}
-
 vle::value::Value* DynamicsDbg::observation(
     const ObservationEvent& event) const
 {

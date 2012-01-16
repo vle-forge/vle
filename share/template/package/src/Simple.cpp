@@ -83,12 +83,6 @@ public:
         externalTransition(events, time);
     }
 
-    virtual void request(const vd::RequestEvent& /*event*/,
-                         const vd::Time& /*time*/,
-                         vd::ExternalEventList& /*output*/) const
-    {
-    }
-
     virtual vv::Value* observation(const vd::ObservationEvent& /*event*/) const
     {
         return 0;

@@ -30,7 +30,6 @@
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 
 namespace vle { namespace devs {
@@ -111,8 +110,7 @@ EventTable::~EventTable()
     {
 	for (ExternalEventModel::iterator it = mExternalEventModel.begin();
 	     it != mExternalEventModel.end(); ++it) {
-	    (*it).second.first.deleteAndClear();
-	    (*it).second.second.deleteAndClear();
+	    (*it).second.deleteAndClear();
 	}
     }
 }
@@ -123,7 +121,7 @@ size_t EventTable::getEventNumber() const
 
     for (ExternalEventModel::const_iterator it = mExternalEventModel.begin();
 	     it != mExternalEventModel.end(); ++it) {
-	sum += (*it).second.first.size() + (*it).second.second.size();
+	sum += (*it).second.size();
     }
 
     return sum;
@@ -186,8 +184,7 @@ CompleteEventBagModel& EventTable::popEvent()
         while (not mExternalEventModel.empty()) {
             Simulator* mdl = (*mExternalEventModel.begin()).first;
             EventBagModel& bagmodel = mCompleteEventBagModel.getBag(mdl);
-            bagmodel.addExternal((*mExternalEventModel.begin()).second.first);
-            bagmodel.addRequest((*mExternalEventModel.begin()).second.second);
+            bagmodel.addExternal((*mExternalEventModel.begin()).second);
 	    mExternalEventModel.erase(mExternalEventModel.begin());
 	}
 
@@ -222,22 +219,13 @@ bool EventTable::putExternalEvent(ExternalEvent* event)
     Simulator* mdl = event->getTarget();
     assert(mdl);
 
-    mExternalEventModel[mdl].first.addEvent(event);
+    mExternalEventModel[mdl].addEvent(event);
     InternalEventModel::iterator it = mInternalEventModel.find(mdl);
     if (it != mInternalEventModel.end() and (*it).second and
         (*it).second->getTime() > getCurrentTime()) {
 	(*it).second->invalidate();
 	(*it).second = 0;
     }
-    return true;
-}
-
-bool EventTable::putRequestEvent(RequestEvent* event)
-{
-    Simulator* mdl = event->getTarget();
-    assert(mdl);
-
-    mExternalEventModel[mdl].second.addEvent(event);
     return true;
 }
 
@@ -290,8 +278,7 @@ void EventTable::invalidateModel(Simulator* mdl)
     {
         ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
         if (it != mExternalEventModel.end()) {
-            (*it).second.first.deleteAndClear();
-            (*it).second.second.deleteAndClear();
+            (*it).second.deleteAndClear();
         }
     }
 
@@ -313,8 +300,7 @@ void EventTable::delModelEvents(Simulator* mdl)
     {
         ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
         if (it != mExternalEventModel.end()) {
-            (*it).second.first.deleteAndClear();
-            (*it).second.second.deleteAndClear();
+            (*it).second.deleteAndClear();
             mExternalEventModel.erase(it);
         }
     }

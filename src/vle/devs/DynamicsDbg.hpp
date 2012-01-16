@@ -142,21 +142,6 @@ namespace vle { namespace devs {
                                  const ExternalEventList& extEventlist);
 
         /**
-         * @brief Process a request event: these functions occurs when an
-         * RequestEvent is push into an ExternalEventList by the
-         * output function.
-         * @param event RequestEvent to process.
-         * @param time the date of occurrence of this event.
-         * @param output the list of external events (output parameter).
-         * @return a response to the model. This bag can include External and
-         * Request event.
-         */
-        virtual void
-            request(const RequestEvent& event,
-                    const Time& time,
-                    ExternalEventList& output) const;
-
-        /**
          * @brief Process an observation event: compute the current state of the
          * model at a specified time and for a specified port.
          * @param event the state event with of the port

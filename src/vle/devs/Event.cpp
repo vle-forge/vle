@@ -34,7 +34,6 @@
 #include <vle/value/String.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/devs/RequestEvent.hpp>
 
 namespace vle { namespace devs {
 

@@ -33,7 +33,6 @@
 #include <vle/devs/Event.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/RequestEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/ViewEvent.hpp>
 #include <vle/devs/EventList.hpp>
@@ -71,10 +70,8 @@ namespace vle { namespace devs {
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief Represent a bag of events for a specific model ie. the
-     * internal event if exist and external event list if exist and
-     * Request event if exist.
-     *
+     * @e EventBagModel represents a bag or a set of internal and
+     * external events for a specific model.
      */
     class VLE_DEVS_EXPORT EventBagModel
     {
@@ -111,24 +108,8 @@ namespace vle { namespace devs {
         { _extev.clear(); }
 
 
-        inline void addRequest(const RequestEventList& evs)
-        { _instev = evs; }
-
-        inline void addRequest(RequestEvent* evt)
-        { _instev.addEvent(evt); }
-
-        inline RequestEventList& Request()
-        { return _instev; }
-
-        inline const RequestEventList& Request() const
-        { return _instev; }
-
-        inline void delRequest()
-        { _instev.clear(); }
-
-
         inline bool empty() const
-        { return emptyInternal() and emptyExternal() and emptyRequest(); }
+        { return emptyInternal() and emptyExternal(); }
 
         inline bool emptyInternal() const
         { return _intev == 0; }
@@ -136,30 +117,21 @@ namespace vle { namespace devs {
         inline bool emptyExternal() const
         { return _extev.empty(); }
 
-        inline bool emptyRequest() const
-        { return _instev.empty(); }
-
         inline void clear()
         { delete _intev; _intev = 0;
-            _extev.deleteAndClear(); _extev.clear();
-            _instev.deleteAndClear(); _instev.clear(); }
+            _extev.deleteAndClear(); _extev.clear(); }
 
         friend std::ostream& operator<<(std::ostream& o, const EventBagModel& e)
         {
 	    o << "[Internal: " << e._intev << "][Externals: ";
 	    for (size_t i = 0; i < e._extev.size(); ++i)
 		o << e._extev.at(i) << " ";
-	    o << "] [Request: ";
-	    for (size_t i = 0; i < e._instev.size(); ++i)
-		o << e._instev.at(i) << " ";
-	    o << "]\n";
 	    return o;
 	}
 
     private:
 	InternalEvent*          _intev;
 	ExternalEventList       _extev;
-        RequestEventList        _instev;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -195,12 +167,6 @@ namespace vle { namespace devs {
 
         inline void addExternal(Simulator* m, const ExternalEventList& lst)
         { getBag(m).addExternal(lst); }
-
-        inline void addRequest(Simulator* m, const RequestEventList& lst)
-        { getBag(m).addRequest(lst); }
-
-        inline void addRequest(Simulator* m, RequestEvent* evt)
-        { getBag(m).addRequest(evt); }
 
 
         inline void addState(ViewEvent* ev)
@@ -333,15 +299,6 @@ namespace vle { namespace devs {
         bool putExternalEvent(ExternalEvent* event);
 
         /**
-         * Put an Request event into vector heap. Delete Internal event
-         * from same model source if present in vector heap.
-         *
-         * @param event ExternalEvent to put into vector heap.
-         * @return true.
-         */
-        bool putRequestEvent(RequestEvent* event);
-
-        /**
          * Put a state event into vector heap.
          *
          * @param event state event to push into vector heap.
@@ -372,9 +329,7 @@ namespace vle { namespace devs {
 
     private:
         typedef std::map < Simulator*, InternalEvent* > InternalEventModel;
-        typedef std::map < Simulator*,
-                std::pair < ExternalEventList, RequestEventList > >
-                    ExternalEventModel;
+        typedef std::map < Simulator*, ExternalEventList > ExternalEventModel;
 
 	/**
 	 * Delete the first event in Internal heap.

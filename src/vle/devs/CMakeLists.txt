@@ -24,16 +24,16 @@ ENDIF(WIN32)
 SET(DEVS_CPP Coordinator.cpp Dynamics.cpp DynamicsDbg.cpp Event.cpp
   EventTable.cpp Executive.cpp ExternalEvent.cpp InternalEvent.cpp
   LocalStreamWriter.cpp ModelFactory.cpp NetStreamWriter.cpp
-  ObservationEvent.cpp RequestEvent.cpp RootCoordinator.cpp Simulator.cpp
+  ObservationEvent.cpp RootCoordinator.cpp Simulator.cpp
   StreamWriter.cpp Time.cpp View.cpp ${OS_SPECIFIC_PATH_IMPL})
 
-SET(DEVS_HPP Attribute.hpp Coordinator.hpp DllDefines.hpp DynamicsDbg.hpp
-  Dynamics.hpp DynamicsWrapper.hpp Event.hpp EventList.hpp EventTable.hpp
-  ExecutiveDbg.hpp Executive.hpp ExternalEvent.hpp ExternalEventList.hpp
-  InternalEvent.hpp LocalStreamWriter.hpp ModelFactory.hpp NetStreamWriter.hpp
-  ObservationEvent.hpp RequestEvent.hpp RequestEventList.hpp
-  RootCoordinator.hpp Simulator.hpp StreamWriter.hpp Time.hpp ViewEvent.hpp
-  View.hpp)
+SET(DEVS_HPP Attribute.hpp Coordinator.hpp DllDefines.hpp
+  DynamicsDbg.hpp Dynamics.hpp DynamicsWrapper.hpp Event.hpp
+  EventList.hpp EventTable.hpp ExecutiveDbg.hpp Executive.hpp
+  ExternalEvent.hpp ExternalEventList.hpp InternalEvent.hpp
+  LocalStreamWriter.hpp ModelFactory.hpp NetStreamWriter.hpp
+  ObservationEvent.hpp RootCoordinator.hpp Simulator.hpp
+  StreamWriter.hpp Time.hpp ViewEvent.hpp View.hpp)
 
 ADD_LIBRARY(vledevs SHARED ${DEVS_CPP};${DEVS_HPP})
 

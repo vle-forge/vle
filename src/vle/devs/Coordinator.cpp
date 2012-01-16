@@ -122,9 +122,6 @@ ExternalEventList* Coordinator::run()
                 processExternalEvents(bag.first, bag.second);
             }
         }
-        if (not bag.second.emptyRequest()) {
-            processRequestEvents(bag.first, bag.second);
-        }
     }
 
     if (oldToDelete > 0) {
@@ -453,16 +450,8 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
                 Simulator* dst = jt->second.first;
                 const std::string& port(jt->second.second);
 
-                if ((*it)->isRequest()) {
-                    m_eventTable.putRequestEvent(
-                        new RequestEvent(
-                            reinterpret_cast < RequestEvent* >((*it)),
-                            dst, port, jt == x.first));
-                } else {
-                    m_eventTable.putExternalEvent(
-                        new ExternalEvent((*it), dst, port,
-                                          jt == x.first));
-                }
+                m_eventTable.putExternalEvent(
+                    new ExternalEvent((*it), dst, port, jt == x.first));
             }
         }
         delete (*it);
@@ -585,21 +574,6 @@ void Coordinator::processConflictEvents(
 
     if (internal) {
         m_eventTable.putInternalEvent(internal);
-    }
-}
-
-void Coordinator::processRequestEvents(
-    Simulator* sim,
-    const EventBagModel& modelbag)
-{
-    const RequestEventList& lst(modelbag.Request());
-
-    ExternalEventList result;
-    for (RequestEventList::const_iterator it = lst.begin(); it != lst.end();
-         ++it) {
-        sim->request(**it, m_currentTime, result);
-        dispatchExternalEvent(result, sim);
-        result.clear();
     }
 }
 

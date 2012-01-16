@@ -33,7 +33,6 @@
 #include <vle/devs/Time.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -201,10 +200,6 @@ namespace vle { namespace devs {
         InternalEvent* externalTransitionConflict(
             const InternalEvent& event,
             const ExternalEventList& events);
-
-        void request(const RequestEvent& event,
-                     const Time& time,
-                     ExternalEventList& output);
 
         value::Value* observation(const ObservationEvent& event) const;
 
