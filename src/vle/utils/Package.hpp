@@ -49,7 +49,7 @@ namespace vle { namespace utils {
      *
      * utils::Package::package().select("firemanqss");
      * utils::Package::Package().configure(std::cout, std::cerr);
-     * @encode
+     * @endcode
      */
     class VLE_UTILS_EXPORT Package
     {

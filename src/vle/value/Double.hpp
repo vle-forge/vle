@@ -118,6 +118,7 @@ public:
      * @code
      * <double>12.134</double>
      * <double>-0.7854e-123</double>
+     * @endcode
      * @param out The output stream.
      */
     virtual void writeXml(std::ostream& out) const;
