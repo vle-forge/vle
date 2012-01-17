@@ -267,6 +267,16 @@ void File::finalFlush(double trame_time)
 
     if (std::find(m_valid.begin(), m_valid.end(), true) != m_valid.end()) {
         m_file << trame_time;
+        if (m_julian) {
+        	m_filetype->writeSeparator(m_file);
+        	try {
+        		m_file << utils::DateTime::toJulianDay(m_time);
+        	} catch (const std::exception& /*e*/) {
+        		throw utils::ModellingError(
+        				_("Output plug-in: Year is out of valid range "
+        						"in julian day: 1400..10000"));
+        	}
+        }
         m_filetype->writeSeparator(m_file);
         for (Line::iterator it = m_buffer.begin(); it != m_buffer.end(); ++it) {
             if (*it) {
