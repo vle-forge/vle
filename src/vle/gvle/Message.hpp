@@ -45,7 +45,7 @@ void VLE_GVLE_EXPORT Debug(const std::string& str);
  * @brief Show a Gtk dialog box with warning icon and error message.
  * @code
  * vle::gvle::Debug(vle::fmt("%1% - %2%") % 1.23 % "a string");
- * @encode
+ * @endcode
  *
  * @param argv A boost::format argument.
  */
@@ -65,7 +65,7 @@ void VLE_GVLE_EXPORT Info(const std::string& str);
  * @brief Show a Gtk dialog box with warning icon and information message.
  * @code
  * vle::gvle::Debug(vle::fmt("%1% - %2%") % 1.23 % "a string");
- * @encode
+ * @endcode
  *
  * @param argv A boost::format argument.
  */
