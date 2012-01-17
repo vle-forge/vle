@@ -22,10 +22,10 @@ ENDIF(WIN32)
 
 
 SET(DEVS_CPP Coordinator.cpp Dynamics.cpp DynamicsDbg.cpp Event.cpp
-  EventTable.cpp Executive.cpp ExternalEvent.cpp InternalEvent.cpp
-  LocalStreamWriter.cpp ModelFactory.cpp NetStreamWriter.cpp
-  ObservationEvent.cpp RootCoordinator.cpp Simulator.cpp
-  StreamWriter.cpp Time.cpp View.cpp ${OS_SPECIFIC_PATH_IMPL})
+  EventTable.cpp Executive.cpp ExternalEvent.cpp LocalStreamWriter.cpp
+  ModelFactory.cpp NetStreamWriter.cpp ObservationEvent.cpp
+  RootCoordinator.cpp Simulator.cpp StreamWriter.cpp Time.cpp View.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 SET(DEVS_HPP Attribute.hpp Coordinator.hpp DllDefines.hpp
   DynamicsDbg.hpp Dynamics.hpp DynamicsWrapper.hpp Event.hpp
