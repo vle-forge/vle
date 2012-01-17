@@ -160,7 +160,7 @@ const Time& EventTable::topEvent()
             if (not mObservationEventList.empty()) {
                 return mObservationEventList.front()->getTime();
             } else {
-                return Time::infinity;
+                return infinity;
             }
         }
     }
@@ -170,7 +170,7 @@ CompleteEventBagModel& EventTable::popEvent()
 {
     mCurrentTime = topEvent();
 
-    if (mCurrentTime != Time::infinity) {
+    if (mCurrentTime != infinity) {
 	while (not mInternalEventList.empty() and
                mInternalEventList[0]->getTime() == mCurrentTime) {
             if (mInternalEventList[0]->isValid()) {

@@ -73,7 +73,7 @@ void NetStreamWriter::open(const std::string& plugin,
         m_client = new utils::net::Client(host, port);
 
         buildParameters(plugin, package, directory, file, parameters,
-                        time.getValue());
+                        time);
 
         value::Set::serializeBinaryBuffer(*m_paramFrame, out);
 
@@ -94,7 +94,7 @@ void NetStreamWriter::processNewObservable(Simulator* simulator,
                                            const std::string& view)
 {
     buildNewObs(simulator->getName(), simulator->getParent(), portname, view,
-                time.getValue());
+                time);
 
     std::string out;
     value::Set::serializeBinaryBuffer(*m_newObsFrame, out);
@@ -115,7 +115,7 @@ void NetStreamWriter::processRemoveObservable(Simulator* simulator,
                                               const std::string& view)
 {
     buildDelObs(simulator->getName(), simulator->getParent(), portname, view,
-                time.getValue());
+                time);
 
     std::string out;
     value::Set::serializeBinaryBuffer(*m_delObsFrame, out);
@@ -167,7 +167,7 @@ void NetStreamWriter::process(Simulator* simulator,
 
 oov::PluginPtr NetStreamWriter::close(const devs::Time& time)
 {
-    buildClose(time.getValue());
+    buildClose(time);
 
     std::string out;
     value::Set::serializeBinaryBuffer(*m_closeFrame, out);

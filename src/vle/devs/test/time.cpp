@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(compare)
     BOOST_REQUIRE(b > 1);
     BOOST_REQUIRE(2 > a);
 
-    devs::Time c(devs::Time::infinity);
+    devs::Time c = devs::infinity;
 
     BOOST_REQUIRE((a >= 2.0) == false);
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(compare)
     BOOST_REQUIRE(a <= 1.0);
     BOOST_REQUIRE(a <= 1);
 
-    BOOST_REQUIRE(a <= devs::Time(devs::Time::infinity));
+    BOOST_REQUIRE(a <= devs::Time(devs::infinity));
     BOOST_REQUIRE(a >= -1.0);
 }
 
@@ -118,44 +118,43 @@ BOOST_AUTO_TEST_CASE(modify_and_infinity)
 {
     devs::Time a(1.0);
 
-    BOOST_REQUIRE_EQUAL(a + devs::Time::infinity, devs::Time::infinity);
-    BOOST_REQUIRE_EQUAL(devs::Time::infinity + a, devs::Time::infinity);
-    BOOST_REQUIRE_EQUAL(devs::Time::infinity - a, devs::Time::infinity);
+    BOOST_REQUIRE_EQUAL(a + devs::infinity, devs::infinity);
+    BOOST_REQUIRE_EQUAL(devs::infinity + a, devs::infinity);
+    BOOST_REQUIRE_EQUAL(devs::infinity - a, devs::infinity);
 
     {
         devs::Time a(1.0);
-        devs::Time b(devs::Time::infinity);
+        devs::Time b(devs::infinity);
         a += b;
-        BOOST_REQUIRE_EQUAL(a, devs::Time::infinity);
+        BOOST_REQUIRE_EQUAL(a, devs::infinity);
     }
 
     {
-        devs::Time a(devs::Time::infinity);
+        devs::Time a(devs::infinity);
         devs::Time b(1.0);
         a += b;
-        BOOST_REQUIRE_EQUAL(a, devs::Time::infinity);
+        BOOST_REQUIRE_EQUAL(a, devs::infinity);
         BOOST_REQUIRE_EQUAL(b, 1.0);
     }
 
     {
-        devs::Time a(1.0);
-        devs::Time b(devs::Time::infinity);
-        BOOST_REQUIRE_EQUAL(b, devs::Time::infinity);
+        devs::Time b(devs::infinity);
+        BOOST_REQUIRE(devs::isInfinity(b));
     }
 
     {
-        devs::Time a(devs::Time::infinity);
+        devs::Time a(devs::infinity);
         devs::Time b(1.0);
         a -= b;
-        BOOST_REQUIRE_EQUAL(a, devs::Time::infinity);
+        BOOST_REQUIRE_EQUAL(a, devs::infinity);
         BOOST_REQUIRE_EQUAL(b, 1.0);
     }
 
     {
-        devs::Time a(devs::Time::infinity);
+        devs::Time a(devs::infinity);
         devs::Time b(1.0);
         a += b;
-        BOOST_REQUIRE_EQUAL(a, devs::Time::infinity);
+        BOOST_REQUIRE_EQUAL(a, devs::infinity);
         BOOST_REQUIRE_EQUAL(b, 1.0);
     }
 }

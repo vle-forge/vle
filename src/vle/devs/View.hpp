@@ -198,7 +198,7 @@ public:
 
     virtual Time getNextTime(const Time& /*current*/) const
     {
-        return Time::infinity;
+        return infinity;
     }
 };
 
@@ -221,7 +221,7 @@ public:
 
     virtual Time getNextTime(const Time& /*current*/) const
     {
-        return Time::infinity;
+        return infinity;
     }
 
 private:

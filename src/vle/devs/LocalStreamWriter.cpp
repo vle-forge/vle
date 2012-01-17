@@ -41,7 +41,7 @@ void LocalStreamWriter::open(const std::string& plugin,
                              const devs::Time& time)
 {
     m_reader.onParameter(plugin, package, location, file, parameters,
-                         time.getValue());
+                         time);
 }
 
 void LocalStreamWriter::processNewObservable(Simulator* simulator,
@@ -50,7 +50,7 @@ void LocalStreamWriter::processNewObservable(Simulator* simulator,
                                              const std::string& view)
 {
     m_reader.onNewObservable(simulator->getName(), simulator->getParent(),
-                             portname, view, time.getValue());
+                             portname, view, time);
 }
 
 void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
@@ -59,7 +59,7 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
                                                 const std::string& view)
 {
     m_reader.onDelObservable(simulator->getName(), simulator->getParent(),
-                             portname, view, time.getValue());
+                             portname, view, time);
 }
 
 void LocalStreamWriter::process(Simulator* simulator,
@@ -87,7 +87,7 @@ void LocalStreamWriter::process(Simulator* simulator,
 
 oov::PluginPtr LocalStreamWriter::close(const devs::Time& time)
 {
-    m_reader.onClose(time.getValue());
+    m_reader.onClose(time);
     return m_reader.plugin();
 }
 

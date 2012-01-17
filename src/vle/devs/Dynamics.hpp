@@ -133,7 +133,7 @@ namespace vle { namespace devs {
 	 * @return duration of the initial state.
 	 */
         virtual vle::devs::Time init(const vle::devs::Time& /* time */)
-        { return Time::infinity; }
+        { return infinity; }
 
 	/**
 	 * @brief Process the output function: compute the output function.
@@ -150,7 +150,7 @@ namespace vle { namespace devs {
          * @return duration of the current state.
 	 */
         virtual vle::devs::Time timeAdvance() const
-        { return Time::infinity; }
+        { return infinity; }
 
 	/**
          * @brief Process an internal transition: compute the new state of the

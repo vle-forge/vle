@@ -30,370 +30,96 @@
 #define VLE_DEVS_TIME_HPP
 
 #include <vle/devs/DllDefines.hpp>
-#include <vle/utils/Exception.hpp>
-#include <ostream>
-#include <limits>
+#include <string>
+#include <cmath>
 
 namespace vle { namespace devs {
 
 /**
- * @brief The definition of time in DEVS simulators. This class encapsulates
- * a real type in a double simple type.
- * - The infinity is represented by.
- *   @code
- *   std::numeric_limits < double >::max()
- *   @endcode
- * - The negative infinity is represented by:
- *   @code
- *   -1 * std::numeric_limits < double >::max().
- *   @endcode
- * - The infinity constant static object is used to simplify the source code.
+ * @e Time represents the definition of the simulation time.
+ *
+ * The @e Time is used internally in the coordinator scheduller and in
+ * the user's API in all the function of the @e Dynamics or @e
+ * Executive classes.
+ *
+ * The infinity is represented by the constant HUGE_VAL and the
+ * negative infinity by -HUGE_VAL. HUGE_VAL is the largest
+ * representable double value. This value is returned by many run-time
+ * math functions when an error occurs.
  */
-class VLE_DEVS_EXPORT Time
-{
-public:
-    /**
-     * @brief Constructor with  a real value.
-     * @param the double value to assign.
-     */
-    Time(const double& value = 0.0)
-        : m_value(value)
-    {}
+typedef double Time;
 
-    /**
-     * @brief Constructor with an integer value.
-     * @param the integer value to assign.
-     */
-    Time(const int& value)
-        : m_value(value)
-    {}
+static const Time infinity = HUGE_VAL; /**< Define the positive @e
+                                        * infinity as the cmath
+                                        * constant value HUGE_VAL. */
 
-    /**
-     * @brief Copy constructor.
-     * @param time the Time to copy.
-     */
-    Time(const Time& time)
-        : m_value(time.m_value)
-    {}
-
-    /**
-     * @brief Destructor, nothing to delete.
-     */
-    ~Time() {}
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /**
-     * @brief Test if the time represents the infinity.
-     * @return true if time is infinity, otherwise false.
-     */
-    inline bool isInfinity() const
-    { return m_value == std::numeric_limits < double >::max(); }
-
-    /**
-     * @brief Test if the time represents the infinity.
-     * @param value the value to ckeck.
-     * @return true if time is infinity, otherwise false.
-     */
-    inline static bool isInfinity(const double& value)
-    { return value == std::numeric_limits < double >::max(); }
-
-    /**
-     * @brief Test if the time represents the infinity.
-     * @return true if time is infinity, otherwise false.
-     */
-    inline bool isNegativeInfinity() const
-    { return m_value == - std::numeric_limits < double >::max(); }
-
-    /**
-     * @brief Test if the time represents the infinity.
-     * @param value the value to ckeck.
-     * @return true if time is infinity, otherwise false.
-     */
-    inline static bool isNegativeInfinity(const double& value)
-    { return value == - std::numeric_limits < double >::max(); }
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /**
-     * @brief Swap the content of the devs::Time object.
-     * @param other The other devs::Time of swap time.
-     */
-    inline void swap(Time& other)
-    { std::swap(m_value, other.m_value); }
-
-    /**
-     * @brief Assigment operator.
-     * @param other The devs::Time to assign.
-     * @return The newly allocated devs::Time.
-     */
-    inline Time operator=(const Time& other)
-    { Time tmp(other); swap(tmp); return *this; }
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /**
-     * @brief Cast operator for double. This operator automatically cast a
-     * vle::devs::Time into a double value.
-     * @code
-     * vle::devs::Time t(1.234);
-     * double y = 2.345;
-     * double z = x + y;
-     * @endcode
-     * @return The double representation of the vle::devs::Time.
-     */
-    inline operator double() const
-    { return m_value; }
-
-    /**
-     * @brief Get current value.
-     * @return double representation of Time.
-     */
-    inline const double& getValue() const
-    { return m_value; }
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    inline bool operator<(const Time& time) const
-    { return m_value < time.m_value; }
-
-    inline bool operator<(const double& time) const
-    { return m_value < time; }
-
-    inline bool operator<(const int& time) const
-    { return m_value < time; }
-
-
-    inline bool operator<=(const Time& time) const
-    { return m_value <= time.m_value; }
-
-    inline bool operator<=(const double& time) const
-    { return m_value <= time; }
-
-    inline bool operator<=(const int& time) const
-    { return m_value <= time; }
-
-
-    inline bool operator>(const Time& time) const
-    { return m_value > time.m_value; }
-
-    inline bool operator>(const double& time) const
-    { return m_value > time; }
-
-    inline bool operator>(const int& time) const
-    { return m_value > time; }
-
-
-    inline bool operator>=(const Time& time) const
-    { return m_value >= time.m_value; }
-
-    inline bool operator>=(const double& time) const
-    { return m_value >= time; }
-
-    inline bool operator>=(const int& time) const
-    { return m_value >= time; }
-
-
-    inline bool operator==(const Time& time) const
-    { return m_value == time.m_value; }
-
-    inline bool operator==(const double& time) const
-    { return m_value == time; }
-
-    inline bool operator==(const int& time) const
-    { return m_value == static_cast < double >(time); }
-
-
-    inline bool operator!=(const Time& time) const
-    { return m_value != time.m_value; }
-
-    inline bool operator!=(const double& time) const
-    { return m_value != time; }
-
-    inline bool operator!=(const int& time) const
-    { return m_value != static_cast < double >(time); }
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    inline Time operator++(int /*value*/)
-    {
-        Time t(*this);
-        ++(*this);
-        return t;
-    }
-
-    inline Time& operator++()
-    {
-        if (not isInfinity()) {
-            ++m_value;
-        }
-        return *this;
-    }
-
-    inline void operator+=(const Time& step)
-    {
-        if (not isInfinity() and not step.isInfinity()) {
-            m_value += step.m_value;
-        } else {
-            m_value = infinity;
-        }
-    }
-
-    inline void operator+=(const double& step)
-    {
-        if (not isInfinity()) {
-            m_value += step;
-        }
-    }
-
-    inline void operator+=(const int& step)
-    {
-        if (not isInfinity()) {
-            m_value += step;
-        }
-    }
-
-    inline Time operator+(const Time& step) const
-    {
-        if (not isInfinity() and not step.isInfinity()) {
-            return Time(m_value + step.m_value);
-        } else {
-            return infinity;
-        }
-    }
-
-    inline Time operator+(const double& step) const
-    {
-        if (not isInfinity()) {
-            return Time(m_value + step);
-        } else {
-            return infinity;
-        }
-    }
-
-    inline Time operator+(const int& step) const
-    {
-        if (not isInfinity()) {
-            return Time(m_value + step);
-        } else {
-            return infinity;
-        }
-    }
-
-    inline Time operator--(int /*value*/)
-    {
-        Time t(*this);
-        --(*this);
-        return t;
-    }
-
-    inline Time& operator--()
-    {
-        if (not isNegativeInfinity()) {
-            --m_value;
-        }
-        return *this;
-    }
-
-    inline void operator-=(const Time& step)
-    {
-        if (not isInfinity()) {
-            if (not step.isInfinity()) {
-                m_value -= step;
-            } else {
-                throw utils::ArgError(_(
-                        "Time: -infinity is not representable"));
-            }
-        } else {
-            if (step.isInfinity()) {
-                throw utils::ArgError(_(
-                        "Time: infinity -= infinity"));
-            }
-        }
-    }
-
-    inline void operator-=(const double& step)
-    {
-        if (not isInfinity()) {
-            m_value -= step;
-        }
-    }
-
-    inline void operator-=(const int& step)
-    {
-        if (not isInfinity()) {
-            m_value -= step;
-        }
-    }
-
-
-    inline Time operator-(const Time& step) const
-    {
-        if (not isInfinity()) {
-            if (not step.isInfinity()) {
-                return Time(m_value - step.m_value);
-            } else {
-                throw utils::ArgError(_(
-                        "Time: -infinity is not representable"));
-            }
-        } else {
-            if (not step.isInfinity()) {
-                return infinity;
-            } else {
-                throw utils::ArgError(_(
-                        "Time: infinity -= infinity"));
-            }
-        }
-    }
-
-    inline Time operator-(const double& step) const
-    {
-        if (not isInfinity()) {
-            return Time(m_value - step);
-        } else {
-            return infinity;
-        }
-    }
-
-    inline Time operator-(const int& step) const
-    {
-        if (not isInfinity()) {
-            return Time(m_value - step);
-        } else {
-            return infinity;
-        }
-    }
-
-
-    static const Time infinity;
-    static const Time negativeInfinity;
-
-    inline friend std::ostream& operator<<(std::ostream& out, const Time& t)
-    {
-        return out << t.m_value;
-    }
-
-    std::string toString() const;
-
-private:
-    double m_value;
-};
-
+static const Time negativeInfinity = -HUGE_VAL; /**< Define the
+                                                 * negative @e
+                                                 * infinity as the
+                                                 * cmath constant
+                                                 * value -HUGE_VAL. */
 
 /**
- * @brief Functor to check if the Time is infinity.
- * @code
- * it = std::find_if(c.begin(), c.end(), IsInfinity());
- * if (it != c.end()) {
- *     std::cout << "Infinity time found";
- * }
- * @endcode
+ * Test if the @e value is Nan.
+ *
+ * @param value The double to check.
+ *
+ * @return true if @e value is NaN.
  */
-struct VLE_DEVS_EXPORT IsInfinity
+inline static bool isNan(const Time& value)
 {
-    inline bool operator()(const Time& time) const
-    { return time.isInfinity(); }
-};
+    return isnan(value);
+}
+
+/**
+ * Test if the @e Time is infinity or -infinity.
+ *
+ * @param value The double to check.
+ *
+ * @return true if @e value is infinity or -infinity.
+ */
+inline static bool isInfinity(const Time& value)
+{
+    return isinf(value);
+}
+
+/**
+ * Test if the @e Time is infinity.
+ *
+ * @param value The double to check.
+ *
+ * @return true if @e value is infinity.
+ */
+inline static bool isPositiveInfinity(const Time& value)
+{
+    return isinf(value) == 1;
+}
+
+/**
+ * Test if the @e Time is -infinity.
+ *
+ * @param value The double to check.
+ *
+ * @return true if @e value is -infinity.
+ */
+inline static bool isNegativeInfinity(const Time& value)
+{
+    return isinf(value) == -1;
+}
+
+/**
+ * Transform the @e Time value into @e an std::string.
+ *
+ * If @e Time equals infinity, the toString function returns "+infinity",
+ * if @e time equals negative infinity, the toString fuction
+ * return "-infinity" else the string representation of the double
+ * value is returned using the C locale.
+ *
+ * @param time The @e time to convert.
+ *
+ * @return An @e std::string representation of the @e Time value.
+ */
+VLE_DEVS_EXPORT std::string convertTimeToString(const Time& time);
 
 }} // namespace vle devs
 

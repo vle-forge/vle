@@ -64,7 +64,7 @@ public:
                                   std::max(time, mAlarm));
 
        if (tmp < 0.1) {
-            mRemaining = devs::Time::infinity;
+            mRemaining = devs::infinity;
             removeConnection(mModelSource, mPortSource, mModelDest, mPortDest);
         } else {
             mRemaining = tmp;

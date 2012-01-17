@@ -87,7 +87,7 @@ bool RootCoordinator::run()
 {
     m_currentTime = m_coordinator->getNextTime();
 
-    if (m_currentTime == Time::infinity) {
+    if (isInfinity(m_currentTime)) {
         return false;
     } else if ((m_end - m_currentTime) < 0) {
         return false;

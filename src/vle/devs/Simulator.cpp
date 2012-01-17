@@ -158,7 +158,7 @@ InternalEvent * Simulator::buildInternalEvent(const Time& currentTime)
 {
     Time time(timeAdvance());
 
-    if (not time.isInfinity()) {
+    if (not isInfinity(time)) {
         return new InternalEvent(currentTime + time, this);
     } else {
         return 0;
@@ -190,7 +190,7 @@ InternalEvent* Simulator::init(const Time& currentTime)
 {
     Time time(m_dynamics->init(currentTime));
 
-    if (not time.isInfinity()) {
+    if (not isInfinity(time)) {
         return new InternalEvent(currentTime + time, this);
     } else {
         return 0;
