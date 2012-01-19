@@ -32,7 +32,7 @@
 
 namespace vle { namespace gvle {
 
-PreferencesBox::PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
+PreferencesBox::PreferencesBox(const Glib::RefPtr < Gtk::Builder >& xml):
     mXml(xml)
 {
     xml->get_widget("DialogPreferences", mDialog);

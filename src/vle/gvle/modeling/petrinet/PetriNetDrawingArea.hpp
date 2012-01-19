@@ -34,7 +34,7 @@
 #include <gtkmm.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/scrolledwindow.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
 namespace gvle {
@@ -50,7 +50,7 @@ public:
     };
 
     PetriNetDrawingArea(BaseObjectType* cobject,
-                        const Glib::RefPtr < Gnome::Glade::Xml >& xml);
+                        const Glib::RefPtr < Gtk::Builder >& xml);
     virtual ~PetriNetDrawingArea()
     {
     }
@@ -131,7 +131,7 @@ private:
     static const guint TRANSITION_WIDTH;
     static const guint PLACE_RADIUS;
 
-    Glib::RefPtr < Gnome::Glade::Xml > mXml;
+    Glib::RefPtr < Gtk::Builder > mXml;
     Glib::RefPtr < Gdk::Pixmap >       mBuffer;
     Cairo::RefPtr < Cairo::Context >   mContext;
     Glib::RefPtr < Gdk::Window >       mWin;

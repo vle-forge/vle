@@ -38,7 +38,6 @@
 #include <apps/eov/OptionGroup.hpp>
 #include <gtkmm/main.h>
 #include <gtkmm/messagedialog.h>
-#include <libglademm.h>
 #include <iostream>
 
 using namespace vle;
@@ -54,6 +53,7 @@ void eov_on_error(const std::string& type, const std::string& what)
 
 int main(int argc, char* argv[])
 {
+    Gtk::Main app(argc, argv);
     vle::manager::init();
 
     Glib::OptionContext context;
@@ -84,13 +84,18 @@ int main(int argc, char* argv[])
         std::cerr << _("EOV - the Eyes of VLE\n");
         utils::printVersion(std::cerr);
     } else {
+        Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
         try {
-            Gtk::Main app(argc, argv);
-            Glib::RefPtr < Gnome::Glade::Xml > xml(
-                Gnome::Glade::Xml::create(
-                    utils::Path::path().getGladeFile("eov.glade")));
-            eov::MainWindow main(xml, command.port());
+            refBuilder->add_from_file(vle::utils::Path::path()
+                                      .getGladeFile("eov.glade").c_str());
+            eov::MainWindow main(refBuilder, command.port());
             app.run(main.window());
+        } catch(const Glib::MarkupError& e) {
+            result = false;
+            eov_on_error(vle::utils::demangle(typeid(e)), e.what());
+        } catch(const Gtk::BuilderError& e) {
+            result = false;
+            eov_on_error(vle::utils::demangle(typeid(e)), e.what());
         } catch(const Glib::Exception& e) {
             result = false;
             eov_on_error(vle::utils::demangle(typeid(e)), e.what());

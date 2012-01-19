@@ -35,7 +35,7 @@ namespace vle { namespace gvle { namespace modeling { namespace de {
 
 Variables::ValuesTreeView::ValuesTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>&) :
+    const Glib::RefPtr<Gtk::Builder>&) :
     Gtk::TreeView(cobject)
 {
     m_refTreeValues = Gtk::ListStore::create(m_columnsValues);
@@ -138,7 +138,7 @@ void Variables::ValuesTreeView::onRemove()
 
 Variables::VariablesTreeView::VariablesTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& xml):
+    const Glib::RefPtr<Gtk::Builder>& xml):
     Gtk::TreeView(cobject)
 {
     xml->get_widget("DialogVariableBox", m_dialog);
@@ -371,7 +371,7 @@ bool Variables::VariablesTreeView::exist(const std::string& name)
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-Gtk::Widget& Variables::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
+Gtk::Widget& Variables::build(Glib::RefPtr<Gtk::Builder> ref)
 {
     ref->get_widget("VariablesFrame", m_frame);
     ref->get_widget_derived("VariablesTreeView", m_variablesTreeView);

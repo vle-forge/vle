@@ -41,7 +41,7 @@
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/image.h>
 #include <gdkmm/pixbuf.h>
-#include <libglademm/xml.h>
+#include <gtkmm/builder.h>
 
 namespace vle
 {
@@ -56,7 +56,7 @@ namespace gvle {
 class HostInformation : public sigc::trackable
 {
 public:
-    HostInformation(Glib::RefPtr < Gnome::Glade::Xml > ref);
+    HostInformation(const Glib::RefPtr < Gtk::Builder >& ref);
 
     ~HostInformation();
 
@@ -106,7 +106,7 @@ private:
     std::string         mIP;
     int                 mPort;
     sigc::connection    mTimer;
-    Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
+    Glib::RefPtr < Gtk::Builder >  mRefXML;
 };
 
 /**
@@ -132,7 +132,7 @@ public:
      *
      * @throw Exception::Parse when error during parsing hosts file.
      */
-    HostsBox(Glib::RefPtr < Gnome::Glade::Xml > ref);
+    HostsBox(const Glib::RefPtr < Gtk::Builder >& ref);
 
     /**
      * Delete dialog box and kill Thread
@@ -196,7 +196,7 @@ class Column : public Gtk::TreeModel::ColumnRecord
     HostInformation     mHostInformation;
     utils::Hosts   mHosts;
     Column              mColumn;
-    Glib::RefPtr < Gnome::Glade::Xml > mRefXML;
+    Glib::RefPtr < Gtk::Builder > mRefXML;
     Glib::RefPtr < Gtk::ListStore >     mListStore;
 };
 

@@ -48,7 +48,7 @@ public:
     void onSource();
 
 protected:
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr<Gtk::Builder> mXml;
 
     std::string                 mOldMode;
     std::vector < std::string > mOldExternalVariables;

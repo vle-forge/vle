@@ -34,7 +34,7 @@
 
 namespace vle { namespace gvle {
 
-SaveVpzBox::SaveVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+SaveVpzBox::SaveVpzBox(const Glib::RefPtr < Gtk::Builder >& xml,
                        Modeling* m, GVLE* gvle) :
     mXml(xml),
     mModeling(m),

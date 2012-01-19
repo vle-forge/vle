@@ -43,7 +43,7 @@ namespace vu = vle::utils;
 
 namespace vle { namespace gvle {
 
-ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+ExperimentBox::ExperimentBox(const Glib::RefPtr < Gtk::Builder >& xml,
                              Modeling* modeling)
     : mModeling(modeling), mXml(xml), mDialog(0)
 {

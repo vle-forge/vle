@@ -172,7 +172,9 @@ PluginFSA::PluginFSA(const std::string& name)
     std::string glade = utils::Path::path().getModelingGladeFile(
             "FSA.glade");
 
-    mXml = Gnome::Glade::Xml::create(glade);
+    mXml = Gtk::Builder::create();
+    mXml->add_from_file(glade.c_str());
+
     mXml->get_widget("StatechartDialog", mDialog);
     mDialog->set_title("FSA - Statechart");
 

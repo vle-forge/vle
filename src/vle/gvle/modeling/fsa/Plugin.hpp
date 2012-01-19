@@ -37,7 +37,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/uimanager.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
 namespace gvle {
@@ -113,7 +113,7 @@ private:
     static const Glib::ustring UI_DEFINITION;
     static const std::string TEMPLATE_DEFINITION;
 
-    Glib::RefPtr < Gnome::Glade::Xml > mXml;
+    Glib::RefPtr < Gtk::Builder > mXml;
     Gtk::Dialog* mDialog;
     StatechartDrawingArea* mView;
     Cairo::RefPtr < Cairo::Context >      mContext;

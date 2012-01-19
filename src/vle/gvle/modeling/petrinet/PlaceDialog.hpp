@@ -36,7 +36,7 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/image.h>
 #include <boost/algorithm/string.hpp>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
 namespace gvle {
@@ -46,7 +46,7 @@ namespace petrinet {
 class PlaceDialog
 {
 public:
-    PlaceDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    PlaceDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                 const PetriNet& petrinet, const Place* place = 0);
     virtual ~PlaceDialog();
 

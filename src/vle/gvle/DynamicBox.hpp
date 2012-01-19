@@ -29,7 +29,7 @@
 #ifndef VLE_GVLE_DYNAMICBOX_HPP
 #define VLE_GVLE_DYNAMICBOX_HPP
 
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/box.h>
 #include <gtkmm/comboboxtext.h>
@@ -57,7 +57,7 @@ namespace vle { namespace gvle {
     class DynamicBox : public sigc::trackable
     {
     public:
-        DynamicBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+        DynamicBox(const Glib::RefPtr < Gtk::Builder >& xml,
                    GVLE* gvle,
                    graph::AtomicModel& atom,
                    vpz::AtomicModel& vatom,
@@ -77,7 +77,7 @@ namespace vle { namespace gvle {
         bool valid() const { return mValid; }
 
     private:
-        Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+        Glib::RefPtr < Gtk::Builder >       mXml;
         GVLE*                               mGVLE;
         graph::AtomicModel&                 mAtom;
         vpz::AtomicModel&                   mVAtom;

@@ -30,7 +30,7 @@
 #define VLE_GVLE_IMPORTCLASSESBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
     namespace vpz {
@@ -64,7 +64,7 @@ private:
     {
     public:
 	ClassesTreeView(BaseObjectType* cobject,
-			const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			const Glib::RefPtr < Gtk::Builder > & /*refGlade*/);
 	virtual ~ClassesTreeView();
 
 	void build(vpz::Classes* classes);
@@ -92,14 +92,15 @@ private:
     };
 
 public:
-    ImportClassesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling, GVLE* gvle);
+    ImportClassesBox(const Glib::RefPtr < Gtk::Builder>& xml,
+                     Modeling* modeling, GVLE* gvle);
 
     void show(vpz::Vpz* src);
     void importClass(std::string& className, std::string newClassName = "");
 
 protected:
 private:
-    Glib::RefPtr<Gnome::Glade::Xml>      mXml;
+    Glib::RefPtr<Gtk::Builder>           mXml;
     Modeling*                            mModeling;
     GVLE*                                mGVLE;
     vpz::Vpz*                            mSrc;

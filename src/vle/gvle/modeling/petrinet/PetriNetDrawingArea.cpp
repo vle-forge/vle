@@ -56,7 +56,7 @@ const guint PetriNetDrawingArea::PLACE_RADIUS = 20;
 
 PetriNetDrawingArea::PetriNetDrawingArea(
     BaseObjectType* cobject,
-    const Glib::RefPtr < Gnome::Glade::Xml >& xml) :
+    const Glib::RefPtr < Gtk::Builder >& xml) :
     Gtk::DrawingArea(cobject),
     mXml(xml),
     mIsRealized(false),

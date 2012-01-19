@@ -38,7 +38,7 @@ namespace vle
 {
 namespace gvle {
 
-HostInformation::HostInformation(Glib::RefPtr < Gnome::Glade::Xml > ref):
+HostInformation::HostInformation(const Glib::RefPtr < Gtk::Builder >& ref):
         mThread(0),
         mThreadRun(false),
         mPing(false),
@@ -168,13 +168,10 @@ void HostInformation::close()
     }
 }
 
-HostsBox::HostsBox(Glib::RefPtr < Gnome::Glade::Xml > ref) :
+HostsBox::HostsBox(const Glib::RefPtr < Gtk::Builder >& ref) :
         mHostInformation(ref),
         mRefXML(ref)
 {
-    mRefXML = Gnome::Glade::Xml::create(
-                  utils::Path::path().getGladeFile("gvle.glade"));
-
     mRefXML->get_widget("DialogHosts", mDialog);
     mRefXML->get_widget("addButtonHost", mAdd);
     mRefXML->get_widget("delButtonHost", mDel);

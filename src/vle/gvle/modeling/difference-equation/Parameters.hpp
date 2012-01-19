@@ -30,7 +30,7 @@
 #define VLE_GVLE_MODELING_DIFFERENCEEQUATION_PARAMETERS_HPP
 
 #include <vle/vpz/Condition.hpp>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm/box.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/liststore.h>
@@ -53,8 +53,8 @@ public:
     typedef std::vector < std::pair < std::string, bool > > ExternalVariables_t;
 
     void assign(vpz::Condition& condition);
-    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
-    Gtk::Widget& buildParameters(Glib::RefPtr<Gnome::Glade::Xml> ref);
+    Gtk::Widget& build(Glib::RefPtr<Gtk::Builder> ref);
+    Gtk::Widget& buildParameters(Glib::RefPtr<Gtk::Builder> ref);
     void deletePorts(vpz::Condition& condition);
     void fillFields(const Parameters_t& parameters);
     void fillFields(const Parameters_t& parameters,
@@ -88,7 +88,7 @@ private:
     {
     public:
 	ParametersTreeView(BaseObjectType* cobject,
-                          const Glib::RefPtr<Gnome::Glade::Xml>& refGlade);
+                          const Glib::RefPtr<Gtk::Builder>& refGlade);
 	virtual ~ParametersTreeView();
 
 	Parameters_t getParameters() const;
@@ -141,7 +141,7 @@ private:
     public:
 	ExternalVariablesTreeView(
 	    BaseObjectType* cobject,
-	    const Glib::RefPtr<Gnome::Glade::Xml>& refGlade);
+	    const Glib::RefPtr<Gtk::Builder>& refGlade);
 	virtual ~ExternalVariablesTreeView();
 
 	ExternalVariables_t getExternalVariables() const;

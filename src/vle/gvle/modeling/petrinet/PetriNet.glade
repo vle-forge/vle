@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<glade-interface>
+<interface>
   <!-- interface-requires gtk+ 2.6 -->
   <!-- interface-naming-policy toplevel-contextual -->
-  <widget class="GtkDialog" id="PetriNetDialog">
+  <object class="GtkDialog" id="PetriNetDialog">
     <property name="border_width">5</property>
     <property name="title" translatable="yes">PetriNet</property>
     <property name="modal">True</property>
@@ -10,35 +10,33 @@
     <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox9">
+      <object class="GtkVBox" id="dialog-vbox9">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkHBox" id="PetriNetHBox">
+          <object class="GtkHBox" id="PetriNetHBox">
             <property name="visible">True</property>
             <child>
-              <widget class="GtkScrolledWindow" id="PetriNetScrolledWindow">
+              <object class="GtkScrolledWindow" id="PetriNetScrolledWindow">
                 <property name="width_request">500</property>
                 <property name="height_request">500</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hadjustment">0 0 164 16.400000000000002 147.59999999999999 164</property>
-                <property name="vadjustment">0 0 200 20 180 200</property>
                 <property name="hscrollbar_policy">automatic</property>
                 <property name="vscrollbar_policy">automatic</property>
                 <child>
-                  <widget class="GtkViewport" id="PetriNetViewport">
+                  <object class="GtkViewport" id="PetriNetViewport">
                     <property name="visible">True</property>
                     <property name="resize_mode">queue</property>
                     <child>
-                      <widget class="GtkDrawingArea" id="PetriNetDrawingArea">
+                      <object class="GtkDrawingArea" id="PetriNetDrawingArea">
                         <property name="visible">True</property>
-                      </widget>
+                      </object>
                     </child>
-                  </widget>
+                  </object>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">0</property>
               </packing>
@@ -46,24 +44,23 @@
             <child>
               <placeholder/>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="position">1</property>
           </packing>
         </child>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area9">
+          <object class="GtkHButtonBox" id="dialog-action_area9">
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <widget class="GtkButton" id="PetriNetCancelButton">
+              <object class="GtkButton" id="PetriNetCancelButton">
                 <property name="label">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
@@ -71,31 +68,34 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="PetriNetValidButton">
+              <object class="GtkButton" id="PetriNetValidButton">
                 <property name="label">gtk-ok</property>
-                <property name="response_id">-3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
-      </widget>
+      </object>
     </child>
-  </widget>
-  <widget class="GtkDialog" id="PlaceDialog">
+    <action-widgets>
+      <action-widget response="-6">PetriNetCancelButton</action-widget>
+      <action-widget response="-3">PetriNetValidButton</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="PlaceDialog">
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Place</property>
     <property name="resizable">False</property>
@@ -104,62 +104,62 @@
     <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox3">
+      <object class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkVBox" id="vbox1">
+          <object class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
             <property name="orientation">vertical</property>
             <child>
-              <widget class="GtkHBox" id="hbox1">
+              <object class="GtkHBox" id="hbox1">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="PlaceNameLabel">
+                  <object class="GtkLabel" id="PlaceNameLabel">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Name</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="PlaceNameEntry">
+                  <object class="GtkEntry" id="PlaceNameEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkImage" id="PlaceStatusImage">
+                  <object class="GtkImage" id="PlaceStatusImage">
                     <property name="visible">True</property>
                     <property name="stock">gtk-no</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">2</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="PlaceOutputHBox">
+              <object class="GtkHBox" id="PlaceOutputHBox">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkCheckButton" id="PlaceOutputCheckbox">
+                  <object class="GtkCheckButton" id="PlaceOutputCheckbox">
                     <property name="label" translatable="yes">Output</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="draw_indicator">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
@@ -167,49 +167,49 @@
                 <child>
                   <placeholder/>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="hbox4">
+              <object class="GtkHBox" id="hbox4">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="PlaceMarkingLabel">
+                  <object class="GtkLabel" id="PlaceMarkingLabel">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Initial marking</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="PlaceMarkingEntry">
+                  <object class="GtkEntry" id="PlaceMarkingEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">2</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="hbox2">
+              <object class="GtkHBox" id="hbox2">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkCheckButton" id="PlaceDelayCheckbox">
+                  <object class="GtkCheckButton" id="PlaceDelayCheckbox">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="draw_indicator">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
@@ -217,48 +217,47 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="PlaceDelayLabel">
+                  <object class="GtkLabel" id="PlaceDelayLabel">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Delay</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="PlaceDelayEntry">
+                  <object class="GtkEntry" id="PlaceDelayEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">2</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">3</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="position">1</property>
           </packing>
         </child>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area3">
+          <object class="GtkHButtonBox" id="dialog-action_area3">
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <widget class="GtkButton" id="PlaceCancelButton">
+              <object class="GtkButton" id="PlaceCancelButton">
                 <property name="label">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
@@ -266,9 +265,8 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="PlaceOkButton">
+              <object class="GtkButton" id="PlaceOkButton">
                 <property name="label">gtk-ok</property>
-                <property name="response_id">-3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_focus">True</property>
@@ -277,24 +275,28 @@
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
-      </widget>
+      </object>
     </child>
-  </widget>
-  <widget class="GtkDialog" id="TransitionDialog">
+    <action-widgets>
+      <action-widget response="-6">PlaceCancelButton</action-widget>
+      <action-widget response="-3">PlaceOkButton</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="TransitionDialog">
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Transition</property>
     <property name="resizable">False</property>
@@ -303,62 +305,62 @@
     <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox9">
+      <object class="GtkVBox" id="dialog-vbox9b">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkVBox" id="vbox1">
+          <object class="GtkVBox" id="vbox1b">
             <property name="visible">True</property>
             <property name="orientation">vertical</property>
             <child>
-              <widget class="GtkHBox" id="hbox1">
+              <object class="GtkHBox" id="hbox1b">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="TransitionNameLabel">
+                  <object class="GtkLabel" id="TransitionNameLabel">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Name</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="TransitionNameEntry">
+                  <object class="GtkEntry" id="TransitionNameEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkImage" id="TransitionStatusImage">
+                  <object class="GtkImage" id="TransitionStatusImage">
                     <property name="visible">True</property>
                     <property name="stock">gtk-no</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">2</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="TransitionInputHBox">
+              <object class="GtkHBox" id="TransitionInputHBox">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkCheckButton" id="TransitionInputCheckbox">
+                  <object class="GtkCheckButton" id="TransitionInputCheckbox">
                     <property name="label" translatable="yes">Input</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="draw_indicator">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
@@ -366,22 +368,22 @@
                 <child>
                   <placeholder/>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="TransitionOutputHBox">
+              <object class="GtkHBox" id="TransitionOutputHBox">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkCheckButton" id="TransitionOutputCheckbox">
+                  <object class="GtkCheckButton" id="TransitionOutputCheckbox">
                     <property name="label" translatable="yes">Output</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="draw_indicator">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
@@ -389,21 +391,21 @@
                 <child>
                   <placeholder/>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">2</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="hbox3">
+              <object class="GtkHBox" id="hbox3">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkCheckButton" id="TransitionDelayCheckbox">
+                  <object class="GtkCheckButton" id="TransitionDelayCheckbox">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="draw_indicator">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
@@ -411,76 +413,75 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="TransitionDelayLabel">
+                  <object class="GtkLabel" id="TransitionDelayLabel">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Delay</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="TransitionDelayEntry">
+                  <object class="GtkEntry" id="TransitionDelayEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">2</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">3</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="hbox2">
+              <object class="GtkHBox" id="hbox2b">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="TransitionPriorityLabel">
+                  <object class="GtkLabel" id="TransitionPriorityLabel">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Priority</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="TransitionPriorityEntry">
+                  <object class="GtkEntry" id="TransitionPriorityEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">4</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="position">1</property>
           </packing>
         </child>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area9">
+          <object class="GtkHButtonBox" id="dialog-action_area9b">
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <widget class="GtkButton" id="TransitionCancelButton">
+              <object class="GtkButton" id="TransitionCancelButton">
                 <property name="label">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
@@ -488,33 +489,36 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="TransitionOkButton">
+              <object class="GtkButton" id="TransitionOkButton">
                 <property name="label">gtk-ok</property>
-                <property name="response_id">-3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
-      </widget>
+      </object>
     </child>
-  </widget>
-  <widget class="GtkDialog" id="ArcDialog">
+    <action-widgets>
+      <action-widget response="-6">TransitionCancelButton</action-widget>
+      <action-widget response="-3">TransitionOkButton</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="ArcDialog">
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Arc</property>
     <property name="resizable">False</property>
@@ -523,73 +527,72 @@
     <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox11">
+      <object class="GtkVBox" id="dialog-vbox11">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkVBox" id="vbox1">
+          <object class="GtkVBox" id="vbox1c">
             <property name="visible">True</property>
             <property name="orientation">vertical</property>
             <child>
-              <widget class="GtkHBox" id="hbox1">
+              <object class="GtkHBox" id="hbox1c">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="ArcWeightLabel">
+                  <object class="GtkLabel" id="ArcWeightLabel">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Weight
 </property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="ArcWeightEntry">
+                  <object class="GtkEntry" id="ArcWeightEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="activates_default">True</property>
-                  </widget>
+                  </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
-              </widget>
+              </object>
               <packing>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkCheckButton" id="InhibitorArcCheckbox">
+              <object class="GtkCheckButton" id="InhibitorArcCheckbox">
                 <property name="label" translatable="yes">Inhibitor</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="draw_indicator">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="position">1</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="position">1</property>
           </packing>
         </child>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area11">
+          <object class="GtkHButtonBox" id="dialog-action_area11">
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <widget class="GtkButton" id="ArcCancelButton">
+              <object class="GtkButton" id="ArcCancelButton">
                 <property name="label">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
@@ -597,30 +600,33 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="ArcOkButton">
+              <object class="GtkButton" id="ArcOkButton">
                 <property name="label">gtk-ok</property>
-                <property name="response_id">-3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-              </widget>
+              </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
-      </widget>
+      </object>
     </child>
-  </widget>
-</glade-interface>
+    <action-widgets>
+      <action-widget response="-6">ArcCancelButton</action-widget>
+      <action-widget response="-3">ArcOkButton</action-widget>
+    </action-widgets>
+  </object>
+</interface>

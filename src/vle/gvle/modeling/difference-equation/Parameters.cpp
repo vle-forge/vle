@@ -36,7 +36,7 @@ namespace vle { namespace gvle { namespace modeling { namespace de {
 
 Parameters::ParametersTreeView::ParametersTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& xml):
+    const Glib::RefPtr<Gtk::Builder>& xml):
     Gtk::TreeView(cobject)
 {
     xml->get_widget("DialogParameterBox", m_dialog);
@@ -241,7 +241,7 @@ bool Parameters::ParametersTreeView::exist(const std::string& name)
 
 Parameters::ExternalVariablesTreeView::ExternalVariablesTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& xml):
+    const Glib::RefPtr<Gtk::Builder>& xml):
     Gtk::TreeView(cobject)
 {
     xml->get_widget("DialogExternalVariableBox", m_dialog);
@@ -431,7 +431,7 @@ void Parameters::assign(vpz::Condition& condition)
     }
 }
 
-Gtk::Widget& Parameters::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
+Gtk::Widget& Parameters::build(Glib::RefPtr<Gtk::Builder> ref)
 {
     Gtk::Frame* parametersFrame;
     Gtk::Frame* externalVariablesFrame;
@@ -450,7 +450,7 @@ Gtk::Widget& Parameters::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
     return *m_hbox;
 }
 
-Gtk::Widget& Parameters::buildParameters(Glib::RefPtr<Gnome::Glade::Xml> ref)
+Gtk::Widget& Parameters::buildParameters(Glib::RefPtr<Gtk::Builder> ref)
 {
     Gtk::Frame* parametersFrame;
 

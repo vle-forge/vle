@@ -34,7 +34,7 @@
 
 namespace vle { namespace gvle {
 
-OpenPackageBox::OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml)
+OpenPackageBox::OpenPackageBox(const Glib::RefPtr < Gtk::Builder >& xml)
     : mXml(xml)
 {
     xml->get_widget("DialogPackage", mDialog);

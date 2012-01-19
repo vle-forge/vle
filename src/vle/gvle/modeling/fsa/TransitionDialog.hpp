@@ -33,7 +33,7 @@
 #include <gtkmm/comboboxentrytext.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
 namespace gvle {
@@ -43,7 +43,7 @@ namespace fsa {
 class TransitionDialog
 {
 public:
-    TransitionDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    TransitionDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                      const Transition* transition, Statechart* statechart);
 
     virtual ~TransitionDialog();
@@ -128,7 +128,7 @@ private:
     void onWhen();
     void onWhenSource();
 
-    Glib::RefPtr < Gnome::Glade::Xml > mXml;
+    Glib::RefPtr < Gtk::Builder > mXml;
     const Transition* mTransition;
     Statechart* mStatechart;
 

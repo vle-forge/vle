@@ -48,7 +48,7 @@ void TimeStep::assign(vpz::Condition& condition)
     }
 }
 
-Gtk::Widget& TimeStep::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
+Gtk::Widget& TimeStep::build(Glib::RefPtr<Gtk::Builder> ref)
 {
     ref->get_widget("TimeStepFrame", m_frame);
     ref->get_widget("TimeStepSpinButton", m_spinTime);

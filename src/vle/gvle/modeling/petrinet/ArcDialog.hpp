@@ -33,7 +33,7 @@
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
 namespace gvle {
@@ -43,7 +43,7 @@ namespace petrinet {
 class ArcDialog
 {
 public:
-    ArcDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    ArcDialog(const Glib::RefPtr < Gtk::Builder >& xml,
               const Arc* arc = 0);
 
     virtual ~ArcDialog()

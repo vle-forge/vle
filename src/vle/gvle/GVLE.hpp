@@ -50,7 +50,7 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/table.h>
 #include <gtkmm/tooltips.h>
-#include <libglademm/xml.h>
+#include <gtkmm/builder.h>
 #include <string>
 #include <list>
 #include <map>
@@ -110,7 +110,7 @@ public:
      *
      */
     GVLE(BaseObjectType* cobject,
-                 const Glib::RefPtr<Gnome::Glade::Xml> xml);
+         const Glib::RefPtr < Gtk::Builder >& xml);
 
     /**
      * Delete all plugin and Modeling document class.
@@ -872,7 +872,7 @@ private:
      */
     bool signalTroubleTimer();
 
-    Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
+    Glib::RefPtr < Gtk::Builder >   mRefXML;
 
     sigc::connection                mConnectionTimeout;
     sigc::connection                mTroubleTimemout;

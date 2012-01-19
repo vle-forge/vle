@@ -34,7 +34,7 @@ namespace gvle {
 namespace modeling {
 namespace fsa {
 
-SourceDialog::SourceDialog(Glib::RefPtr < Gnome::Glade::Xml > xml) : mXml(
+SourceDialog::SourceDialog(Glib::RefPtr < Gtk::Builder > xml) : mXml(
         xml)
 {
     xml->get_widget("SourceDialog", mDialog);

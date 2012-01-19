@@ -34,7 +34,7 @@
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/spinbutton.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle { namespace gvle { namespace modeling { namespace de {
 
@@ -45,7 +45,7 @@ public:
     virtual ~TimeStep() { }
 
     void assign(vpz::Condition& condition);
-    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
+    Gtk::Widget& build(Glib::RefPtr<Gtk::Builder> ref);
     void deletePorts(vpz::Condition& condition);
     void fillFields(const vpz::Condition& condition);
 
@@ -54,7 +54,7 @@ private:
     {
     public:
 	UnitComboBoxText(BaseObjectType* cobject,
-		       const Glib::RefPtr<Gnome::Glade::Xml>&) :
+		       const Glib::RefPtr<Gtk::Builder>&) :
 	    Gtk::ComboBoxText(cobject) { }
 	virtual ~UnitComboBoxText() {}
     };

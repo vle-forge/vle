@@ -30,7 +30,7 @@
 #define GUI_CONDITIONSBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <vle/gvle/ValuesTreeView.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
@@ -60,7 +60,7 @@ class ConditionsBox
     {
     public:
         ConditionsTreeView(BaseObjectType* cobject,
-                           const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+                           const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
         virtual ~ConditionsTreeView();
 
         void build();
@@ -132,7 +132,7 @@ class ConditionsBox
     {
     public:
 	PortsTreeView(BaseObjectType* cobject,
-		      const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+		      const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~PortsTreeView();
 
 	void build();
@@ -193,7 +193,7 @@ public:
      * @param current, current model to show. If current equal NULL then,
      * the modeling top GCoupledModel is used.
      */
-    ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* gvle);
+    ConditionsBox(const Glib::RefPtr < Gtk::Builder >& xml, GVLE* gvle);
 
     ~ConditionsBox();
 
@@ -217,7 +217,7 @@ private:
     Gtk::Button*        mButtonCancel;
     Gtk::Button*        mButtonApply;
 
-    Glib::RefPtr<Gnome::Glade::Xml>  m_xml;
+    Glib::RefPtr < Gtk::Builder >  m_xml;
 
     ConditionsTreeView*                 m_treeConditions;
     PortsTreeView*                      m_treePorts;

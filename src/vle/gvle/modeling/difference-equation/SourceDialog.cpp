@@ -31,7 +31,7 @@
 
 namespace vle { namespace gvle { namespace modeling { namespace de {
 
-SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml,
+SourceDialog::SourceDialog(Glib::RefPtr<Gtk::Builder> xml,
                            const std::string& includes,
                            const std::string& computeFunction,
                            const std::string& initValueFunction,

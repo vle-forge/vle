@@ -29,6 +29,7 @@
 #ifndef VLE_GVLE_MODELINGPLUGIN_HPP
 #define VLE_GVLE_MODELINGPLUGIN_HPP
 
+#include <gtkmm/builder.h>
 #include <vle/gvle/DllDefines.hpp>
 #include <gdkmm/pixbuf.h>
 #include <vle/graph/AtomicModel.hpp>

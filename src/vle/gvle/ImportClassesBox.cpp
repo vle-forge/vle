@@ -40,7 +40,7 @@ namespace vle { namespace gvle {
  */
 ImportClassesBox::ClassesTreeView::ClassesTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject),
     mClasses(0)
 {
@@ -110,7 +110,7 @@ void ImportClassesBox::ClassesTreeView::on_drag_data_received(
 /**
  * ImportClassesBox
  */
-ImportClassesBox::ImportClassesBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+ImportClassesBox::ImportClassesBox(const Glib::RefPtr < Gtk::Builder >& xml,
 				   Modeling* modeling, GVLE* gvle) :
     mXml(xml),
     mModeling(modeling),

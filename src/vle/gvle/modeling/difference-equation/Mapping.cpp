@@ -36,7 +36,7 @@ namespace vle { namespace gvle { namespace modeling { namespace de {
 
 Mapping::MappingTreeView::MappingTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& xml):
+    const Glib::RefPtr<Gtk::Builder>& xml):
     Gtk::TreeView(cobject)
 {
     xml->get_widget("DialogMappingBox", m_dialog);
@@ -169,7 +169,7 @@ void Mapping::assign(vpz::Condition& condition)
     createMap(condition);
 }
 
-Gtk::Widget& Mapping::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
+Gtk::Widget& Mapping::build(Glib::RefPtr<Gtk::Builder> ref)
 {
     ref->get_widget("ModeExpander", m_expander);
     ref->get_widget("ModeHBox", m_hboxMode);

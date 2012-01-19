@@ -30,7 +30,7 @@
 #define VLE_GVLE_DIALOGSOURCE_HPP
 
 #include <vle/version.hpp>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm.h>
 #include <vle/gvle/Editor.hpp>
 
@@ -46,7 +46,7 @@ namespace fsa {
 class SourceDialog
 {
 public:
-    SourceDialog(Glib::RefPtr < Gnome::Glade::Xml > xml);
+    SourceDialog(Glib::RefPtr < Gtk::Builder > xml);
     virtual ~SourceDialog();
 
     void add(const std::string& name, const std::string& buffer);
@@ -55,7 +55,7 @@ public:
     int run();
 
 private:
-    Glib::RefPtr < Gnome::Glade::Xml > mXml;
+    Glib::RefPtr < Gtk::Builder > mXml;
 
     Gtk::Dialog* mDialog;
     Gtk::Notebook* mNotebook;

@@ -30,7 +30,7 @@
 #define VLE_GVLE_PREFERENCESBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <vle/gvle/Settings.hpp>
 
 namespace vle { namespace gvle {
@@ -38,7 +38,7 @@ namespace vle { namespace gvle {
 class PreferencesBox
 {
 public:
-    PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+    PreferencesBox(const Glib::RefPtr < Gtk::Builder >& xml);
     ~PreferencesBox();
 
     int run();
@@ -80,7 +80,7 @@ private:
     void saveSettings();
     void loadSettings();
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >   mXml;
     Gtk::Dialog*                    mDialog;
     Settings                        mCurrentSettings;
 

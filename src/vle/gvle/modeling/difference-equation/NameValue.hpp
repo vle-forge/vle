@@ -34,7 +34,7 @@
 #include <gtkmm/liststore.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle { namespace gvle { namespace modeling { namespace de {
 
@@ -47,7 +47,7 @@ public:
     std::string getVariableName() const
 	{ return m_entryName->get_text(); }
 
-    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
+    Gtk::Widget& build(Glib::RefPtr<Gtk::Builder> ref);
     void assign(vpz::Condition& condition);
     void deletePorts(vpz::Condition& condition);
     void fillFields(const vpz::Condition& condition);
@@ -67,7 +67,7 @@ protected:
     {
     public:
 	InitTreeView(BaseObjectType* cobject,
-		     const Glib::RefPtr<Gnome::Glade::Xml>& refGlade);
+		     const Glib::RefPtr<Gtk::Builder>& refGlade);
 	virtual ~InitTreeView();
 
 	const InitColumns& getColumns() const { return m_columnsInit; }

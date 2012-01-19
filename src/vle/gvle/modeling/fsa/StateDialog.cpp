@@ -38,7 +38,7 @@ namespace modeling {
 namespace fsa {
 
 NewStateDialog::NewStateDialog(
-    const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    const Glib::RefPtr < Gtk::Builder >& xml,
     const Statechart& statechart) : mStatechart(statechart)
 {
     xml->get_widget("NewStateDialog", mDialog);
@@ -87,7 +87,7 @@ int NewStateDialog::run()
 }
 
 EventInStateDialog::EventInStateDialog(
-    const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    const Glib::RefPtr < Gtk::Builder >& xml,
     Statechart* statechart, const eventInStates_t& eventInStates) :
     mXml(xml), mStatechart(statechart), mEventInStates(eventInStates)
 {
@@ -200,7 +200,7 @@ void StateDialog::EventInStateTreeView::onRemove()
     }
 }
 
-StateDialog::StateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+StateDialog::StateDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                          Statechart* statechart, const State* state) :
     mXml(xml), mStatechart(statechart), mState(state)
 {

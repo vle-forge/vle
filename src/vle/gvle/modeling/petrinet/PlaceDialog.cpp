@@ -37,7 +37,7 @@ namespace gvle {
 namespace modeling {
 namespace petrinet {
 
-PlaceDialog::PlaceDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+PlaceDialog::PlaceDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                          const PetriNet& petrinet,
                          const Place* place) : mPetriNet(petrinet),
     mPlace(place)

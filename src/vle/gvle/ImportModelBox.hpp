@@ -32,7 +32,7 @@
 #include <vle/graph/Model.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle
 {
@@ -78,7 +78,8 @@ class ImportModelBox
     typedef std::set<ImportWidget*> list_widget;
 
 public:
-    ImportModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
+    ImportModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
+                   Modeling* modeling);
 
     bool show(vpz::Vpz* src);
 
@@ -103,7 +104,7 @@ public:
 	{ return mParent; }
 
 private:
-    Glib::RefPtr<Gnome::Glade::Xml>      mXml;
+    Glib::RefPtr < Gtk::Builder >      mXml;
     Modeling*                            mModeling;
     vpz::Vpz*                            mSrc;
     graph::CoupledModel*                 mParent;

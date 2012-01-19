@@ -29,7 +29,7 @@
 #ifndef VLE_GVLE_VIEWOUTPUT_HPP
 #define VLE_GVLE_VIEWOUTPUT_HPP
 
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/button.h>
 #include <gtkmm/spinbutton.h>
@@ -52,7 +52,7 @@ namespace vle { namespace gvle {
     {
     public:
         ViewOutputBox(Modeling& modeling, GVLE* gvle,
-                      Glib::RefPtr < Gnome::Glade::Xml > ref,
+                      const Glib::RefPtr < Gtk::Builder >& ref,
                       vpz::Views& views);
 
         virtual ~ViewOutputBox();
@@ -94,7 +94,7 @@ namespace vle { namespace gvle {
         /** A copy of the vpz::Views, filled when user modify datas */
         vpz::Views          m_viewscopy;
 
-        Glib::RefPtr < Gnome::Glade::Xml > m_xml;
+        Glib::RefPtr < Gtk::Builder > m_xml;
         Gtk::Dialog*        m_dialog;
         Gtk::ComboBoxText*  m_type;
         Gtk::Entry*         m_timestep;

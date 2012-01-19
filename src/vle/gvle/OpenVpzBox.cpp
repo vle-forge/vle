@@ -34,7 +34,8 @@
 
 namespace vle { namespace gvle {
 
-OpenVpzBox::OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle) :
+OpenVpzBox::OpenVpzBox(const Glib::RefPtr < Gtk::Builder >& xml,
+                       Modeling* m, GVLE* gvle) :
     mXml(xml),
     mModeling(m),
     mGVLE(gvle)

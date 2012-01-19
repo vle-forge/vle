@@ -38,7 +38,7 @@ namespace modeling {
 namespace fsa {
 
 TransitionDialog::TransitionDialog(
-    const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    const Glib::RefPtr < Gtk::Builder >& xml,
     const Transition* transition, Statechart* statechart) : mXml(xml),
     mTransition(transition), mStatechart(statechart)
 {

@@ -57,7 +57,7 @@ public:
     };
 
     ValuesTreeView(BaseObjectType* cobject,
-		   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+		   const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
     virtual ~ValuesTreeView();
 
     void clear();

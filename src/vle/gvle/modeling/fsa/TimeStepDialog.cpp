@@ -34,7 +34,7 @@ namespace modeling {
 namespace fsa {
 
 TimeStepDialog::TimeStepDialog(
-    const Glib::RefPtr < Gnome::Glade::Xml >& xml)
+    const Glib::RefPtr < Gtk::Builder >& xml)
 {
     xml->get_widget("TimeStepDialog", mDialog);
     xml->get_widget("TimeStepEntry", mTimeStepEntry);

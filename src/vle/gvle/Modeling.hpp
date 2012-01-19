@@ -40,7 +40,7 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Rand.hpp>
-#include <libglademm/xml.h>
+#include <gtkmm/builder.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -102,8 +102,6 @@ public:
      * delete all models, and view.
      */
     void clearModeling();
-
-    void setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml);
 
     /********************************************************************
      *
@@ -509,25 +507,33 @@ public:
 
 private:
 
-    vpz::Vpz                    mVpz;
-    graph::CoupledModel*        mTop;
-    std::string                 mCurrentClass;
-    std::string                 mSelectedClass;
-    utils::Rand*                mRand;
-    bool                        mIsModified;
-    bool                        mIsSaved;
-    bool                        mIsCompressed;
-    std::string                 mFileName;
-    SetString                   mModelsNames;
-    int                         mSocketPort;
+    vpz::Vpz                       mVpz;
+    graph::CoupledModel*           mTop;
+    std::string                    mCurrentClass;
+    std::string                    mSelectedClass;
+    utils::Rand*                   mRand;
+    bool                           mIsModified;
+    bool                           mIsSaved;
+    bool                           mIsCompressed;
+    std::string                    mFileName;
+    SetString                      mModelsNames;
+    int                            mSocketPort;
 
-    Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
+    void export_atomic_model(vpz::Vpz* dst,
+                             graph::AtomicModel* atom,
+                             std::string className = "");
 
-    void export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* atom, std::string className = "");
-    void export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* atom, std::string className = "");
+    void export_coupled_model(vpz::Vpz* dst,
+                              graph::CoupledModel* atom,
+                              std::string className = "");
 
-    void import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom, std::string className = "");
-    void import_coupled_model(vpz::Vpz* src, graph::CoupledModel* atom, std::string className = "");
+    void import_atomic_model(vpz::Vpz* src,
+                             graph::AtomicModel* atom,
+                             std::string className = "");
+
+    void import_coupled_model(vpz::Vpz* src,
+                              graph::CoupledModel* atom,
+                              std::string className = "");
 
 protected:
         SignalModified mSignalModified;

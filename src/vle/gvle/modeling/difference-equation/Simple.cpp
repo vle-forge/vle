@@ -46,7 +46,9 @@ void Simple::build(bool modeling)
     std::string glade = utils::Path::path().
         getModelingGladeFile("DifferenceEquation.glade");
 
-    mXml = Gnome::Glade::Xml::create(glade);
+    mXml = Gtk::Builder::create();
+    mXml->add_from_file(glade.c_str());
+
     mXml->get_widget("DialogPluginSimpleBox", m_dialog);
     m_dialog->set_title("DifferenceEquation - Simple");
     mXml->get_widget("SimplePluginVBox", vbox);

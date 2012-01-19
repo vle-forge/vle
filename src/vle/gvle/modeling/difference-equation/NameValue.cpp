@@ -37,7 +37,7 @@ namespace vle { namespace gvle { namespace modeling { namespace de {
 
 NameValue::InitTreeView::InitTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>&):
+    const Glib::RefPtr<Gtk::Builder>&):
     Gtk::TreeView(cobject)
 {
     m_refTreeInit = Gtk::ListStore::create(m_columnsInit);
@@ -181,7 +181,7 @@ void NameValue::assign(vpz::Condition& condition)
     createSetInit(condition);
 }
 
-Gtk::Widget& NameValue::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
+Gtk::Widget& NameValue::build(Glib::RefPtr<Gtk::Builder> ref)
 {
     ref->get_widget("NameValueHBox", m_hbox);
     ref->get_widget("NameEntry", m_entryName);

@@ -32,7 +32,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/utils/Path.hpp>
 #include <gtkmm/filechooserdialog.h>
-#include <libglademm/xml.h>
+#include <gtkmm/builder.h>
 #include <cassert>
 
 namespace vle { namespace gvle { namespace outputs {
@@ -52,7 +52,9 @@ bool Storage::start(vpz::Output& output, vpz::View& /* view */)
     assert(output.plugin() == "storage");
 
     std::string glade = utils::Path::path().getOutputGladeFile("storage.glade");
-    Glib::RefPtr<Gnome::Glade::Xml> ref = Gnome::Glade::Xml::create(glade);
+
+    Glib::RefPtr<Gtk::Builder> ref = Gtk::Builder::create();
+    ref->add_from_file(glade.c_str());
 
     ref->get_widget("dialog", m_dialog);
     ref->get_widget("spinbuttonRows", m_rows);

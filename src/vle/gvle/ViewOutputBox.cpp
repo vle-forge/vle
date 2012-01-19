@@ -44,7 +44,7 @@ namespace vu = vle::utils;
 namespace vle { namespace gvle {
 
 ViewOutputBox::ViewOutputBox(Modeling& modeling, GVLE* gvle,
-                             Glib::RefPtr < Gnome::Glade::Xml > ref,
+                             const Glib::RefPtr < Gtk::Builder >& ref,
                              vpz::Views& views)
     : m_modeling(modeling), m_GVLE(gvle), m_viewscopy(views), m_xml(ref),
       m_type(0), m_format(0), m_plugin(0), m_views(0),

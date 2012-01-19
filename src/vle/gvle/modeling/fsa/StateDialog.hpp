@@ -37,7 +37,7 @@
 #include <gtkmm/menu.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/image.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 
@@ -49,7 +49,7 @@ namespace fsa {
 class NewStateDialog
 {
 public:
-    NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    NewStateDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                    const Statechart& statechart);
 
     virtual ~NewStateDialog()
@@ -96,7 +96,7 @@ private:
 class EventInStateDialog
 {
 public:
-    EventInStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    EventInStateDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                        Statechart* statechart,
                        const eventInStates_t& eventInStates);
 
@@ -126,7 +126,7 @@ private:
     void onAction();
     void onEventActionSource();
 
-    Glib::RefPtr < Gnome::Glade::Xml > mXml;
+    Glib::RefPtr < Gtk::Builder > mXml;
     Statechart* mStatechart;
     const eventInStates_t& mEventInStates;
     Gtk::Dialog* mDialog;
@@ -156,7 +156,7 @@ class StateDialog
     {
     public:
         EventInStateTreeView(BaseObjectType* cobject,
-                             const Glib::RefPtr < Gnome::Glade::Xml >& xml)
+                             const Glib::RefPtr < Gtk::Builder >& xml)
             :
             Gtk::TreeView(cobject), mXml(xml), mStatechart(0),
             mEventInStates(0)
@@ -216,7 +216,7 @@ class StateDialog
         void onEdit();
         void onRemove();
 
-        Glib::RefPtr < Gnome::Glade::Xml > mXml;
+        Glib::RefPtr < Gtk::Builder > mXml;
         Statechart* mStatechart;
         eventInStates_t* mEventInStates;
         EventInStateColumns mColumns;
@@ -225,7 +225,7 @@ class StateDialog
     };
 
 public:
-    StateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    StateDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                 Statechart* statechart, const State* state);
 
     virtual ~StateDialog()
@@ -314,7 +314,7 @@ private:
     void onOutAction();
     void onOutActionSource();
 
-    Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+    Glib::RefPtr < Gtk::Builder >  mXml;
     Statechart* mStatechart;
     const State* mState;
 

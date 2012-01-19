@@ -32,11 +32,11 @@
 
 namespace vle { namespace gvle {
 
-ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
-        mXml(xml),
-        mAll_Obs_backup(0),
-        mViews_backup(0),
-        mSelected(false)
+ObsAndViewBox::ObsAndViewBox(const Glib::RefPtr < Gtk::Builder >& xml):
+    mXml(xml),
+    mAll_Obs_backup(0),
+    mViews_backup(0),
+    mSelected(false)
 {
     xml->get_widget("DialogObsAndView", mDialog);
 

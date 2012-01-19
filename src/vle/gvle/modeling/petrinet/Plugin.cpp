@@ -127,7 +127,9 @@ PluginPetriNet::PluginPetriNet(const std::string& name)
     std::string glade = utils::Path::path().getModelingGladeFile(
             "PetriNet.glade");
 
-    mXml = Gnome::Glade::Xml::create(glade);
+    mXml = Gtk::Builder::create();
+    mXml->add_from_file(glade.c_str());
+
     mXml->get_widget("PetriNetDialog", mDialog);
     mDialog->set_title("PetriNet");
 

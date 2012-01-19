@@ -108,23 +108,31 @@ int main(int argc, char** argv)
         std::cerr << _("GVLE - the Gui of VLE\n");
 	vle::utils::printVersion(std::cerr);
     } else {
+        Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
 	try {
-	    Glib::RefPtr < Gnome::Glade::Xml >  mRefXML =
-		Gnome::Glade::Xml::create(
-		    vle::utils::Path::path().getGladeFile("gvle.glade"));
+            refBuilder->add_from_file(vle::utils::Path::path().
+                                      getGladeFile("gvle.glade").c_str());
 	    vle::gvle::GVLE* g = 0;
-	    mRefXML->get_widget_derived("WindowPackageBrowser", g);
+            refBuilder->get_widget_derived("WindowPackageBrowser", g);
 	    if (argc > 1)
 		g->setFileName(argv[1]);
 	    application.run(*g);
 	    delete g;
+        } catch(const Glib::MarkupError& e) {
+            result = false;
+            std::cerr << _("\n/!\\  gvle Glib::MarkupError reported: ") <<
+                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+        } catch(const Gtk::BuilderError& e) {
+            result = false;
+            std::cerr << _("\n/!\\  gvle  Gtk::BuilderError reported: ") <<
+                vle::utils::demangle(typeid(e)) << "\n" << e.what();
         } catch(const Glib::Exception& e) {
             result = false;
-            std::cerr << _("\n/!\\ eov Glib error reported: ") <<
+            std::cerr << _("\n/!\\  gvle Glib error reported: ") <<
                 vle::utils::demangle(typeid(e)) << "\n" << e.what();
         } catch(const std::exception& e) {
             result = false;
-            std::cerr << _("\n/!\\ eov exception reported: ") <<
+            std::cerr << _("\n/!\\ gvle exception reported: ") <<
                 vle::utils::demangle(typeid(e)) << "\n" << e.what();
         }
     }

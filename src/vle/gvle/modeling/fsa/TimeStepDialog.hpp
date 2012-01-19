@@ -31,7 +31,7 @@
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
 namespace gvle {
@@ -41,7 +41,7 @@ namespace fsa {
 class TimeStepDialog
 {
 public:
-    TimeStepDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml);
+    TimeStepDialog(const Glib::RefPtr < Gtk::Builder >& xml);
 
     virtual ~TimeStepDialog()
     {

@@ -34,7 +34,7 @@ namespace gvle {
 namespace modeling {
 namespace petrinet {
 
-ArcDialog::ArcDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+ArcDialog::ArcDialog(const Glib::RefPtr < Gtk::Builder >& xml,
                      const Arc* arc) : mArc(arc)
 {
     xml->get_widget("ArcDialog", mDialog);

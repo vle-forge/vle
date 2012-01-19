@@ -30,7 +30,7 @@
 #define GUI_OPENMODELINGPLUGINBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle {
     namespace graph {
@@ -55,7 +55,7 @@ class GVLE;
 class OpenModelingPluginBox
 {
 public:
-    OpenModelingPluginBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+    OpenModelingPluginBox(const Glib::RefPtr < Gtk::Builder >& xml,
                           GVLE* gvle);
 
     virtual ~OpenModelingPluginBox();
@@ -78,8 +78,8 @@ private:
         Gtk::TreeModelColumn <Glib::ustring> mName;
     };
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
-    GVLE* mGVLE;
+    Glib::RefPtr < Gtk::Builder >   mXml;
+    GVLE*                           mGVLE;
 
     Gtk::Dialog*                    mDialog;
     ModelingPluginTreeColumn        mColumns;
