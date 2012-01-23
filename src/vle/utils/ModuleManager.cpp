@@ -559,6 +559,7 @@ public:
         default:
             throw utils::InternalError();
         }
+        throw utils::InternalError();
     }
 
     void *getSymbol(const std::string& symbol)
@@ -653,25 +654,49 @@ void ModuleManager::browse()
 
         for (; it != end; ++it) { /* for each package */
             if (fs::is_directory(it->status())) {
+#if BOOST_VERSION > 104500
                 std::string package = it->path().filename().string();
+#else
+                std::string package = it->path().file_string();
+#endif
 
                 {
+#if BOOST_VERSION > 104500
                     fs::path tmp = (*it) / pathsim;
+#else
+                    fs::path tmp = (*it);
+                    tmp /= pathsim;
+#endif
                     mPimpl->browse(tmp, package, MODULE_DYNAMICS);
                 }
 
                 {
+#if BOOST_VERSION > 104500
                     fs::path tmp = (*it) / pathoov;
+#else
+                    fs::path tmp = (*it);
+                    tmp /= pathoov;
+#endif
                     mPimpl->browse(tmp, package, MODULE_OOV);
                 }
 
                 {
+#if BOOST_VERSION > 104500
                     fs::path tmp = (*it) / pathgvlem;
+#else
+                    fs::path tmp = (*it);
+                    tmp /= pathgvlem;
+#endif
                     mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
                 }
 
                 {
+#if BOOST_VERSION > 104500
                     fs::path tmp = (*it) / pathgvleo;
+#else
+                    fs::path tmp = (*it);
+                    tmp /= pathgvleo;
+#endif
                     mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
                 }
             }
@@ -712,7 +737,11 @@ void ModuleManager::browse(ModuleType type)
                 fs::path pkg = (*it);
                 pkg /= pathtype;
 
+#if BOOST_VERSION > 104500
                 mPimpl->browse(pkg, it->path().filename().string(), type);
+#else
+                mPimpl->browse(pkg, it->path().file_string(), type);
+#endif
             }
         }
     }
