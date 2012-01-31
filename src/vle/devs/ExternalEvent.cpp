@@ -31,9 +31,12 @@
 
 namespace vle { namespace devs {
 
-const std::string& ExternalEvent::getTargetModelName() const
+void ExternalEvent::putAttributes(const value::Map& mp)
 {
-    return m_target->getName();
+    for (value::MapValue::const_iterator it = mp.value().begin();
+         it != mp.value().end(); ++it) {
+        putAttribute((*it).first, (*it).second->clone());
+    }
 }
 
 }} // namespace vle devs

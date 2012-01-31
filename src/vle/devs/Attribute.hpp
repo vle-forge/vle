@@ -35,6 +35,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Boolean.hpp>
+#include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <utility>
 #include <string>

@@ -438,20 +438,21 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
 {
     for (ExternalEventList::iterator it = eventList.begin(); it !=
          eventList.end(); ++it) {
-        (*it)->setModel(sim);
 
         std::pair < Simulator::iterator, Simulator::iterator > x;
         x = sim->targets((*it)->getPortName(), m_modelList);
 
         if (x.first == x.second or x.first->second.first == 0) {
             (*it)->deleter(); // it must delete allocated values, else
-        } else {              // the first newly external manage values.
+                              // the first newly external manage
+                              // values.
+        } else {
             for (Simulator::iterator jt = x.first; jt != x.second; ++jt) {
-                Simulator* dst = jt->second.first;
-                const std::string& port(jt->second.second);
-
                 m_eventTable.putExternalEvent(
-                    new ExternalEvent((*it), dst, port, jt == x.first));
+                    new ExternalEvent(*(*it),
+                                      jt->second.first,
+                                      jt->second.second,
+                                      jt == x.first));
             }
         }
         delete (*it);

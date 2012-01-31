@@ -36,18 +36,20 @@
 
 namespace vle { namespace devs {
 
-    typedef EventList < ExternalEvent > ExternalEventList;
-    typedef value::Map InitEventList;
+typedef EventList < ExternalEvent > ExternalEventList;
+typedef value::Map InitEventList;
 
-    inline std::ostream& operator<<(std::ostream& o,
-                                    const ExternalEventList& evts)
-    {
-        for (ExternalEventList::const_iterator it = evts.begin();
-             it != evts.end(); ++it) {
-            o << " [" << *(*it) << "]";
-        }
-        return o;
+inline std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts)
+{
+    for (ExternalEventList::const_iterator it = evts.begin();
+         it != evts.end(); ++it) {
+        o << "port: '" << (*it)->getPortName() << "' value: '"
+          << ((*it)->haveAttributes() ?
+              (*it)->getAttributes().writeToString() : "") << "'";
     }
+
+    return o;
+}
 
 }} // namespace vle devs
 

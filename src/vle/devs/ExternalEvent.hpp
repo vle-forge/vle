@@ -30,77 +30,228 @@
 #define VLE_DEVS_EXTERNALEVENT_HPP
 
 #include <vle/devs/DllDefines.hpp>
-#include <vle/devs/Event.hpp>
+#include <vle/devs/Attribute.hpp>
 #include <string>
 
 namespace vle { namespace devs {
 
-    class Simulator;
+class Simulator;
+
+/**
+ * @brief External event based on the devs::Event class and are build by
+ * graph::Model when output function are called.
+ *
+ */
+class VLE_DEVS_EXPORT ExternalEvent
+{
+public:
+    ExternalEvent(const std::string& sourcePortName)
+        : m_target(0),
+        m_attributes(0),
+        m_port(sourcePortName),
+        m_delete(false)
+    {
+    }
+
+    ExternalEvent(ExternalEvent& event,
+                  Simulator* target,
+                  const std::string& targetPortName,
+                  bool needDeletion)
+        : m_target(target),
+        m_attributes(event.m_attributes),
+        m_port(targetPortName),
+        m_delete(needDeletion)
+    {
+    }
+
+    ~ExternalEvent()
+    {
+        if (m_delete) {
+            delete m_attributes;
+        }
+    }
+
+    const std::string& getPortName() const
+    { return m_port; }
+
+    Simulator* getTarget()
+    { return m_target; }
+
+    bool onPort(const std::string& portName) const
+    { return m_port == portName; }
+
+    void putAttributes(const value::Map& map);
 
     /**
-     * @brief External event based on the devs::Event class and are build by
-     * graph::Model when output function are called.
-     *
+     * Put an attribute on this Event.
+     * @param name std::string name of Value to add.
+     * @param value Value to add, not clone.
      */
-    class VLE_DEVS_EXPORT ExternalEvent : public Event
+    void putAttribute(const std::string& name, value::Value* value)
+    { attributes().add(name, value); }
+
+    /**
+     * Put an attribute on an event. The goal is to simplify building event.
+     * @code
+     * ExternalEvent* evt = new ExternalEvent(
+     *                              "free?", currenttime, getModel();
+     * evt << attribute("x", 5) << attribute("y", 7.0)
+     *     << attribute("msg", "hello world");
+     * @endcode
+     * @param event the event to put the attribute.
+     * @param attr the attribute to put into event.
+     * @return the current event.
+     */
+    friend ExternalEvent* operator<<(ExternalEvent* event, const Attribute& attr)
+    { event->putAttribute(attr.first, attr.second); return event;}
+
+    /**
+     * Put an attribute on an event. The goal is to simplify building event.
+     * @code
+     * ExternalEvent evt("free?", currenttime, getModel();
+     * evt << attribute("x", 5) << attribute("y", 7.0)
+     *     << attribute("msg", "hello world");
+     * @endcode
+     * @param event the event to put the attribute.
+     * @param attr the attribute to put into event.
+     * @return the current event.
+     */
+    friend ExternalEvent& operator<<(ExternalEvent& event, const Attribute& attr)
+    { event.putAttribute(attr.first, attr.second); return event;}
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @brief Test if the map have a Value with specified name.
+     * @param name the name of value to find.
+     * @return true if Value exist, false otherwise.
+     */
+    bool existAttributeValue(const std::string& name) const
+    { return haveAttributes() ? attributes().exist(name) : false; }
+
+    /**
+     * Get an attribute from this Event.
+     * @param name std::string name of Value to get.
+     * @return a reference to Value.
+     */
+    const value::Value& getAttributeValue(
+        const std::string& name) const
+    { return value::reference(attributes().get(name)); }
+
+    /**
+     * Get a double attribute from this Event.
+     * @param name std::string name of double to get.
+     * @return a double.
+     */
+    double getDoubleAttributeValue(const std::string& name) const
+    { return attributes().getDouble(name); }
+
+    /**
+     * Get an integer attribute from this Event.
+     * @param name std::string name of integer to get.
+     * @return an integer.
+     */
+    int32_t getIntegerAttributeValue(const std::string& name) const
+    { return attributes().getInt(name); }
+
+    /**
+     * Get a boolean attribute from this Event.
+     * @param name std::string name of boolean to get.
+     * @return a boolean.
+     */
+    bool getBooleanAttributeValue(const std::string& name) const
+    { return attributes().getBoolean(name); }
+
+    /**
+     * Get a string attribute from this Event.
+     * @param name std::string name of string to get.
+     * @return a string.
+     */
+    const std::string& getStringAttributeValue(
+        const std::string& name) const
+    { return attributes().getString(name); }
+
+    /**
+     * @brief Get a Set attribute from this event.
+     * @param name std::string name of Set to get.
+     * @return a Set
+     */
+    const value::Set& getSetAttributeValue(
+        const std::string& name) const
+    { return attributes().getSet(name); }
+
+    /**
+     * @brief Get a Map attribute from this event.
+     * @param name std::string name of Map to get.
+     * @return a Map.
+     */
+    const value::Map& getMapAttributeValue(
+        const std::string& name) const
+    { return attributes().getMap(name); }
+
+    /**
+     * @brief Return the map attached to the event.
+     * @return a reference to the attached map.
+     */
+    const value::Map& getAttributes() const
+    { return attributes(); }
+
+    /**
+     * @brief Return the map attached to the event.
+     * @return a reference to the attached map.
+     */
+    value::Map& getAttributes()
+    { return attributes(); }
+
+    /**
+     * @brief Check if attributes is present in the attributes lists.
+     * @return True if the attributes lists exists, false otherwise.
+     */
+    bool haveAttributes() const
+    { return m_attributes; }
+
+    value::Map& attributes()
     {
-    public:
-        ExternalEvent(const std::string& sourcePortName) :
-            Event(0),
-            m_portName(sourcePortName),
-            m_target(0)
-        {}
-
-        ExternalEvent(const std::string& sourcePortName,
-                      Simulator* source) :
-            Event(source),
-            m_portName(sourcePortName),
-            m_target(0)
-        {}
-
-	ExternalEvent(ExternalEvent* event,
-		      Simulator* target,
-                      const std::string& targetPortName,
-                      bool needDeletion) :
-	    Event(*event),
-	    m_portName(targetPortName),
-            m_target(target)
-        {
-            if (needDeletion) {
-                deleter();
-            }
+        if (m_attributes == 0) {
+            m_attributes = new value::Map();
         }
-
-	virtual ~ExternalEvent()
-        {}
-
-	inline const std::string& getPortName() const
-        { return m_portName; }
-
-	inline Simulator* getTarget()
-        { return m_target; }
-
-        const std::string& getTargetModelName() const;
-
-	inline bool onPort(const std::string& portName) const
-        { return m_portName == portName; }
-
-    protected:
-	std::string   m_portName;
-	Simulator*    m_target;
-    };
-
-    inline std::ostream& operator<<(std::ostream& o, const ExternalEvent& evt)
-    {
-        if (evt.getModel()) {
-            o << "from: '" << evt.getSourceModelName();
-        }
-
-        return o << "' value: '"
-            << (evt.haveAttributes() ? evt.getAttributes().writeToString() : "")
-            << "' to port: '" << evt.getPortName()
-            << "'";
+        return *m_attributes;
     }
+
+    const value::Map& attributes() const
+    {
+        if (m_attributes == 0) {
+            throw utils::ArgError(_("No attribute in this event"));
+        }
+        return *m_attributes;
+    }
+
+    /**
+     * @brief This function activate the deletion of all value::Value
+     * attached.
+     */
+    void deleter()
+    { m_delete = true; }
+
+    /**
+     * @brief True if the deletion of all value::Value attached is need.
+     * @return true if deletion is activated, false otherwise.
+     */
+    bool needDelete() const
+    { return m_delete; }
+
+private:
+    ExternalEvent();
+    ExternalEvent(const ExternalEvent& other);
+    ExternalEvent& operator=(const ExternalEvent& other);
+
+    Simulator*    m_target;
+    value::Map*   m_attributes;
+    std::string   m_port;
+    bool          m_delete;     /**< If m_delete is true, the
+                                 * m_attributes will be freed in the
+                                 * destructor. */
+};
 
 }} // namespace vle devs
 
