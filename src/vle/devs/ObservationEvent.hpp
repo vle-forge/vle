@@ -63,52 +63,23 @@ public:
         delete m_attributes;
     }
 
-    inline const std::string& getViewName() const
+    const std::string& getViewName() const
     { return m_viewName; }
 
-    inline const std::string& getPortName() const
+    const std::string& getPortName() const
     { return m_portName; }
 
     virtual bool isObservation() const
     { return true; }
 
-    inline bool onPort(std::string const& portName) const
+    bool onPort(std::string const& portName) const
     { return m_portName == portName; }
 
     /**
      * @return arrived time.
      */
-    inline const Time& getTime() const
+    const Time& getTime() const
     { return m_time; }
-
-    /**
-     * Inferior comparator use Time as key.
-     *
-     * @param event Event to test, no test on validity.
-     * @return true if this Event is inferior to event.
-     */
-    inline bool operator<(const ObservationEvent* event) const
-    { return m_time < event->m_time; }
-
-    /**
-     * Superior comparator use Time as key.
-     *
-     * @param event Event to test, no test on validity.
-     *
-     * @return true if this Event is superior to event.
-     */
-    inline bool operator>(const ObservationEvent* event) const
-    { return m_time > event->m_time; }
-
-    /**
-     * Equality comparator use Time as key.
-     *
-     * @param event Event to test, no test on validity.
-     *
-     * @return true if this Event is equal to  event.
-     */
-    inline bool operator==(const ObservationEvent * event) const
-    { return m_time == event->m_time; }
 
     void putAttributes(const value::Map& map);
 

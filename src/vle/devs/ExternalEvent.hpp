@@ -31,6 +31,7 @@
 
 #include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Attribute.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 
 namespace vle { namespace devs {
@@ -47,28 +48,21 @@ class VLE_DEVS_EXPORT ExternalEvent
 public:
     ExternalEvent(const std::string& sourcePortName)
         : m_target(0),
-        m_attributes(0),
-        m_port(sourcePortName),
-        m_delete(false)
+        m_port(sourcePortName)
     {
     }
 
     ExternalEvent(ExternalEvent& event,
                   Simulator* target,
-                  const std::string& targetPortName,
-                  bool needDeletion)
+                  const std::string& targetPortName)
         : m_target(target),
         m_attributes(event.m_attributes),
-        m_port(targetPortName),
-        m_delete(needDeletion)
+        m_port(targetPortName)
     {
     }
 
     ~ExternalEvent()
     {
-        if (m_delete) {
-            delete m_attributes;
-        }
     }
 
     const std::string& getPortName() const
@@ -208,49 +202,32 @@ public:
      * @return True if the attributes lists exists, false otherwise.
      */
     bool haveAttributes() const
-    { return m_attributes; }
+    { return m_attributes.get(); }
 
     value::Map& attributes()
     {
-        if (m_attributes == 0) {
-            m_attributes = new value::Map();
+        if (m_attributes.get() == 0) {
+            m_attributes = boost::shared_ptr < value::Map >(new value::Map());
         }
         return *m_attributes;
     }
 
     const value::Map& attributes() const
     {
-        if (m_attributes == 0) {
+        if (m_attributes.get() == 0) {
             throw utils::ArgError(_("No attribute in this event"));
         }
         return *m_attributes;
     }
-
-    /**
-     * @brief This function activate the deletion of all value::Value
-     * attached.
-     */
-    void deleter()
-    { m_delete = true; }
-
-    /**
-     * @brief True if the deletion of all value::Value attached is need.
-     * @return true if deletion is activated, false otherwise.
-     */
-    bool needDelete() const
-    { return m_delete; }
 
 private:
     ExternalEvent();
     ExternalEvent(const ExternalEvent& other);
     ExternalEvent& operator=(const ExternalEvent& other);
 
-    Simulator*    m_target;
-    value::Map*   m_attributes;
-    std::string   m_port;
-    bool          m_delete;     /**< If m_delete is true, the
-                                 * m_attributes will be freed in the
-                                 * destructor. */
+    Simulator                        *m_target;
+    boost::shared_ptr < value::Map >  m_attributes;
+    std::string                       m_port;
 };
 
 }} // namespace vle devs
