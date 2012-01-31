@@ -26,7 +26,6 @@
  */
 
 
-#include <vle/devs/Event.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/EventList.hpp>

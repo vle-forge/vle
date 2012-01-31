@@ -35,7 +35,6 @@
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
-#include <vle/devs/Event.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/ExecutiveDbg.hpp>

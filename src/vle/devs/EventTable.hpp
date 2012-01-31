@@ -30,7 +30,6 @@
 #define DEVS_EVENTTABLE_HPP
 
 #include <vle/devs/DllDefines.hpp>
-#include <vle/devs/Event.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>

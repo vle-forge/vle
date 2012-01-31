@@ -30,7 +30,6 @@
 #define DEVS_DYNAMICS_HPP
 
 #include <vle/devs/DllDefines.hpp>
-#include <vle/devs/Event.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>

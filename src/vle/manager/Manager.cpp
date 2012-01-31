@@ -38,7 +38,6 @@
 #include <vle/utils/Rand.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/devs/Event.hpp>
 #include <vle/utils/Path.hpp>
 #include <glib/gstdio.h>
 
@@ -169,7 +168,6 @@ void init()
 {
     value::init();
     utils::init();
-    devs::init();
 }
 
 void finalize()
@@ -177,7 +175,6 @@ void finalize()
     value::finalize();
     utils::finalize();
     value::finalize();
-    devs::finalize();
 }
 
 }} // namespace vle manager
