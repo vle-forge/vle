@@ -30,6 +30,12 @@
 
 namespace vle { namespace devs {
 
-
+void ObservationEvent::putAttributes(const value::Map& mp)
+{
+    for (value::MapValue::const_iterator it = mp.value().begin();
+         it != mp.value().end(); ++it) {
+        putAttribute((*it).first, (*it).second->clone());
+    }
+}
 
 }} // namespace vle devs

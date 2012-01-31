@@ -111,8 +111,9 @@ void DynamicsDbg::confluentTransitions(
 vle::value::Value* DynamicsDbg::observation(
     const ObservationEvent& event) const
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [%3%]")) %
-              event.getTime() % mName % event);
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
+                    " port: '%4%']")) % event.getTime() % mName
+              % event.getViewName() % event.getPortName());
 
     return mDynamics->observation(event);
 }
