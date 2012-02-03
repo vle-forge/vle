@@ -1,5 +1,5 @@
 /*
- * @file vle/graph/DllDefines.hpp
+ * @file vle/DllDefines.hpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -26,17 +26,17 @@
  */
 
 
-#ifndef VLE_GRAPH_DLLDEFINES_HPP
-#define VLE_GRAPH_DLLDEFINES_HPP
+#ifndef VLE_DLLDEFINES_HPP
+#define VLE_DLLDEFINES_HPP
 
 #if defined(__WIN32__)
-  #if defined(vlegraph_EXPORTS)
-    #define VLE_GRAPH_EXPORT __declspec(dllexport)
+  #if defined(vlelib_EXPORTS)
+    #define VLE_EXPORT __declspec(dllexport)
   #else
-    #define VLE_GRAPH_EXPORT __declspec(dllimport)
+    #define VLE_EXPORT __declspec(dllimport)
   #endif
 #else
- #define VLE_GRAPH_EXPORT
+ #define VLE_EXPORT
 #endif
 
 #endif

@@ -30,14 +30,14 @@
 #define VLE_VPZ_STRUCTURES_HPP
 
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace vpz {
 
     /**
      * @brief The Structure, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Structures : public Base
+    class VLE_EXPORT Structures : public Base
     {
     public:
         /**

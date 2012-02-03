@@ -35,7 +35,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Types.hpp>
-#include <vle/manager/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <glibmm/thread.h>
 #include <glibmm/threadpool.h>
 #include <queue>
@@ -48,7 +48,7 @@ namespace vle { namespace manager {
      * vpz files. Errors are log to specified output std::ostream. JustRun
      * provided access to the oov::PluginPtr object.
      */
-    class VLE_MANAGER_EXPORT JustRun
+    class VLE_EXPORT JustRun
     {
     public:
         /**
@@ -102,7 +102,7 @@ namespace vle { namespace manager {
      * @brief JustRunMono is the class for running simulation from specified vpz
      * files. All simulation are run on the same process.
      */
-    class VLE_MANAGER_EXPORT JustRunMono : public JustRun
+    class VLE_EXPORT JustRunMono : public JustRun
     {
     public:
         /**
@@ -129,7 +129,7 @@ namespace vle { namespace manager {
      * @brief JustRunThread is the class for running simulation from specified
      * vpz files. All simulation are run on the specified number of processor.
      */
-    class VLE_MANAGER_EXPORT JustRunThread : public JustRun
+    class VLE_EXPORT JustRunThread : public JustRun
     {
     public:
         /**

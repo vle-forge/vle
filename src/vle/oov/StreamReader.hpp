@@ -29,7 +29,7 @@
 #ifndef VLE_OOV_STREAMREADER_HPP
 #define VLE_OOV_STREAMREADER_HPP
 
-#include <vle/oov/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <boost/shared_ptr.hpp>
@@ -42,7 +42,7 @@ namespace vle { namespace oov {
      * information from the devs::StreamWriter classes add give this information
      * to the oov::Plugin.
      */
-    class VLE_OOV_EXPORT StreamReader
+    class VLE_EXPORT StreamReader
     {
     public:
         /**

@@ -1,57 +1,8 @@
-INCLUDE_DIRECTORIES(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS}
-  ${GLIBMM_INCLUDE_DIRS}
-  ${CAIROMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS})
+add_sources(vlelib CairoPlugin.cpp CairoPlugin.hpp
+  LocalStreamReader.cpp LocalStreamReader.hpp NetStreamReader.cpp
+  NetStreamReader.hpp OutputMatrix.cpp OutputMatrix.hpp Plugin.cpp
+  Plugin.hpp StreamReader.cpp StreamReader.hpp)
 
-LINK_DIRECTORIES(
-  ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIR}
-  ${CAIROMM_LIBRARY_DIR})
-
-IF(WIN32)
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
-    COMMAND ${CMAKE_RC_COMPILER}
-    -I${CMAKE_BINARY_DIR}/share
-    -i${CMAKE_BINARY_DIR}/share/vfl.rc
-    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-ELSE(WIN32)
-  SET(OS_SPECIFIC_PATH_IMPL)
-ENDIF(WIN32)
-
-SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OutputMatrix.cpp
-  Plugin.cpp StreamReader.cpp ${OS_SPECIFIC_PATH_IMPL})
-
-SET(OOV_HPP DllDefines.hpp LocalStreamReader.hpp NetStreamReader.hpp
-  OutputMatrix.hpp Plugin.hpp StreamReader.hpp)
-
-IF (VLE_HAVE_CAIRO)
- SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)
- SET(OOV_CPP ${OOV_CPP} CairoPlugin.cpp)
-ENDIF (VLE_HAVE_CAIRO)
-
-ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})
-
-SET_TARGET_PROPERTIES(vleoov PROPERTIES ${VLE_LIBRARY_PROPERTIES})
-SET_TARGET_PROPERTIES(vleoov PROPERTIES OUTPUT_NAME
-  "vleoov-${VLE_VERSION_SHORT}")
-
-TARGET_LINK_LIBRARIES(vleoov
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${CAIROMM_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES}
-  vleutils
-  vlevalue
-  vlegraph)
-
-INSTALL(TARGETS vleoov
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-INSTALL(FILES ${OOV_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/oov)
+install(FILES CairoPlugin.hpp LocalStreamReader.hpp
+  NetStreamReader.hpp OutputMatrix.hpp Plugin.hpp StreamReader.hpp
+  DESTINATION ${VLE_INCLUDE_DIRS}/oov)

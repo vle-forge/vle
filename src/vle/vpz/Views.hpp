@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_VIEWS_HPP
 #define VLE_VPZ_VIEWS_HPP
 
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Outputs.hpp>
 #include <vle/vpz/Observables.hpp>
@@ -47,7 +47,7 @@ namespace vle { namespace vpz {
      * using the View's name as key. The Views class store Outputs and
      * Observables objects too.
      */
-    class VLE_VPZ_EXPORT Views : public Base
+    class VLE_EXPORT Views : public Base
     {
     public:
         typedef ViewList::iterator iterator;

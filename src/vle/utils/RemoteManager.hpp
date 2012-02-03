@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_REMOTEMANAGER_HPP
 #define VLE_UTILS_REMOTEMANAGER_HPP
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <iosfwd>
 #include <string>
 
@@ -71,7 +71,7 @@ enum RemoteManagerActions
  * mgr.start(REMOTE_MANAGER_INSTALL, "glue-1.0", &std::cout);
  * @endcode
  */
-class VLE_UTILS_EXPORT RemoteManager
+class VLE_EXPORT RemoteManager
 {
 public:
     /**

@@ -30,7 +30,7 @@
 #define VLE_VALUE_STRING_HPP 1
 
 #include <vle/value/Value.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <boost/serialization/string.hpp>
 
 namespace vle { namespace value {
@@ -38,7 +38,7 @@ namespace vle { namespace value {
 /**
  * @brief String Value encapsulates a C++ std::string type into a class.
  */
-class VLE_VALUE_EXPORT String : public Value
+class VLE_EXPORT String : public Value
 {
 public:
     /**

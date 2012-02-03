@@ -38,7 +38,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/manager.hpp>
+#include <vle/manager/Manager.hpp>
+#include <vle/manager/ExperimentGenerator.hpp>
 
 struct F
 {

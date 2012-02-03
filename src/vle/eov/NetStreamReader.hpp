@@ -29,7 +29,7 @@
 #ifndef VLE_EOV_NETSTREAMREADER_HPP
 #define VLE_EOV_NETSTREAMREADER_HPP 1
 
-#include <vle/eov/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/oov/NetStreamReader.hpp>
 #include <vle/eov/Plugin.hpp>
 #include <glibmm/thread.h>
@@ -39,7 +39,7 @@ namespace vle { namespace eov {
 
 class Window;
 
-class VLE_EOV_EXPORT NetStreamReader : public oov::NetStreamReader
+class VLE_EXPORT NetStreamReader : public oov::NetStreamReader
 {
 public:
     NetStreamReader(const utils::ModuleManager& modulemgr,

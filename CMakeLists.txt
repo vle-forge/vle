@@ -1,336 +1,288 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(VLE CXX C)
-ENABLE_TESTING()
+cmake_minimum_required(VERSION 2.6)
+project(VLE CXX C)
+enable_testing()
 
-SET(VLE_MAJOR 1)
-SET(VLE_MINOR 1)
-SET(VLE_PATCH 0)
-SET(VLE_EXTRA "dev")
-SET(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")
-SET(VLE_VERSION_SHORT "${VLE_MAJOR}.${VLE_MINOR}")
-SET(VLE_NAME "vle")
-SET(VLE_NAME_VERSION "${VLE_NAME}-${VLE_VERSION}")
-SET(VLE_LOCALE_NAME "${VLE_NAME}-${VLE_MAJOR}-${VLE_MINOR}")
-IF ("${VLE_EXTRA}" STREQUAL "")
-  SET(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")
-ELSE ("${VLE_EXTRA}" STREQUAL "")
-  SET(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}-${VLE_EXTRA}")
-ENDIF ("${VLE_EXTRA}" STREQUAL "")
-SET(VLE_NAME_COMPLETE "${VLE_NAME}-${VLE_COMPLETE}")
+set(VLE_MAJOR 1)
+set(VLE_MINOR 1)
+set(VLE_PATCH 0)
+set(VLE_EXTRA "dev")
+set(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")
+set(VLE_VERSION_SHORT "${VLE_MAJOR}.${VLE_MINOR}")
+set(VLE_NAME "vle")
+set(VLE_LOCALE_NAME "${VLE_NAME}-${VLE_MAJOR}-${VLE_MINOR}")
 
-#
- # Installation variables
-#
+if ("${VLE_EXTRA}" STREQUAL "")
+  set(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")
+else ("${VLE_EXTRA}" STREQUAL "")
+  set(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}-${VLE_EXTRA}")
+endif ("${VLE_EXTRA}" STREQUAL "")
 
-SET(VLE_LIBRARY_DIRS "lib/vle-${VLE_VERSION_SHORT}")
-SET(VLE_INCLUDE_DIRS "include/vle-${VLE_VERSION_SHORT}/vle")
-SET(VLE_INCLUDE_DIR "include/vle-${VLE_VERSION_SHORT}")
-SET(VLE_MANPAGE_PATH "share/man/man1")
-SET(VLE_SHARE_DIRS "share/vle-${VLE_VERSION_SHORT}")
+set(VLE_NAME_COMPLETE "${VLE_NAME}-${VLE_COMPLETE}")
 
 #
- # Append the library version information to the library target
- # properties.
+# Installation variables
 #
 
-SET (VLE_LIBRARY_PROPERTIES VERSION 0)
-SET (VLE_APP_PROPERTIES SOVERSION "${VLE_MAJOR}.${VLE_MINOR}" VERSION
-  "${VLE_MAJOR}.${VLE_MINOR}")
+set(VLE_LIBRARY_DIRS "lib/vle-${VLE_VERSION_SHORT}")
+set(VLE_INCLUDE_DIRS "include/vle-${VLE_VERSION_SHORT}/vle")
+set(VLE_INCLUDE_DIR "include/vle-${VLE_VERSION_SHORT}")
+set(VLE_MANPAGE_PATH "share/man/man1")
+set(VLE_SHARE_DIRS "share/vle-${VLE_VERSION_SHORT}")
 
 #
- # CPack configuration
+# CPack configuration
 #
-
-INCLUDE(CMakeCPack.cmake)
-
-#
- # Debug mode
-#
-
-IF (CMAKE_COMPILER_IS_GNUCC AND CMAKE_COMPILER_IS_GNUCXX)
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
-  IF (UNIX)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
-  ENDIF (UNIX)
-ENDIF (CMAKE_COMPILER_IS_GNUCC AND CMAKE_COMPILER_IS_GNUCXX)
+include(CMakeCPack.cmake)
 
 #
-# Manage the Win32 port. TODO mingw32 port
+# Go to the sources of the library. To control the type of the library
+# (static or shared), use the CMake variable BUILD_SHARED_LIBS which
+# is set to true by default.
 #
-
-IF (WIN32)
-  SET(OS_SPECIFIC_LIBRARIES -shared-libgcc wsock32 netapi32)
-ELSE (WIN32)
-  SET(OS_SPECIFIC_LIBRARIES)
-ENDIF (WIN32)
+option(BUILD_SHARED_LIBS "Build shared libraries." ON)
 
 #
- # Modules
+# CMake modules
 #
-
-INCLUDE(CheckIncludeFileCXX)
-INCLUDE(CheckIncludeFile)
-INCLUDE(CheckLibraryExists)
-INCLUDE(CMakeDetermineCCompiler)
+include(CheckIncludeFileCXX)
+include(CheckIncludeFile)
+include(CheckLibraryExists)
+include(CMakeDetermineCCompiler)
 
 #
- # Check libraries with pkgconfig
+# append debug mode when compiler is GNU.
 #
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_COMPILER_IS_GNUCXX)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+endif ()
 
-FIND_PACKAGE(PkgConfig REQUIRED)
+#
+# Check libraries with pkgconfig
+#
+find_package(PkgConfig REQUIRED)
 
 # FIXME use old-style link directories for now
-IF (COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(SET CMP0003 OLD)
-ENDIF (COMMAND CMAKE_POLICY)
+if (COMMAND CMAKE_POLICY)
+  cmake_policy(SET CMP0003 OLD)
+endif (COMMAND CMAKE_POLICY)
 
-PKG_CHECK_MODULES(GLIBMM REQUIRED glibmm-2.4)
-PKG_CHECK_MODULES(GTHREAD REQUIRED gthread-2.0)
-PKG_CHECK_MODULES(LIBXML REQUIRED libxml-2.0)
-PKG_CHECK_MODULES(CAIROMM cairomm-1.0>=1.2)
-PKG_CHECK_MODULES(GTKMM gtkmm-2.4)
-IF (NOT WIN32)
-  PKG_CHECK_MODULES(GTKSOURCEVIEWMM gtksourceviewmm-2.0)
-ENDIF (NOT WIN32)
+pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
+pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
+pkg_check_modules(LIBXML REQUIRED libxml-2.0)
+pkg_check_modules(CAIROMM cairomm-1.0>=1.2)
+pkg_check_modules(GTKMM gtkmm-2.4)
+pkg_check_modules(GTKSOURCEVIEWMM gtksourceviewmm-2.0)
 
-OPTION(WITH_CAIRO "use the cairomm to build output plugin [default: on]" ON)
-IF (WITH_CAIRO AND CAIROMM_FOUND)
-    SET(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
-ELSE (WITH_CAIRO AND CAIROMM_FOUND)
-    SET(VLE_HAVE_CAIRO 0 CACHE INTERNAL "" FORCE)
-ENDIF (WITH_CAIRO AND CAIROMM_FOUND)
+option(WITH_CAIRO "use the cairomm to build output plugin [default: on]" ON)
+if (WITH_CAIRO AND CAIROMM_FOUND)
+    set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
+else (WITH_CAIRO AND CAIROMM_FOUND)
+    set(VLE_HAVE_CAIRO 0 CACHE INTERNAL "" FORCE)
+endif (WITH_CAIRO AND CAIROMM_FOUND)
 
-OPTION(WITH_EOV "use the gtkmm and cairo to build eov [default: on]" ON)
-IF (WITH_EOV AND GTKMM_FOUND AND VLE_HAVE_CAIRO)
-  SET(HAVE_EOV 1 CACHE INTERNAL "" FORCE)
-ELSE (WITH_EOV AND GTKMM_FOUND AND VLE_HAVE_CAIRO)
-  SET(HAVE_EOV 0 CACHE INTERNAL "" FORCE)
-ENDIF (WITH_EOV AND GTKMM_FOUND AND VLE_HAVE_CAIRO)
+option(WITH_EOV "use the gtkmm, and cairo to build eov [default: on]" ON)
+if (WITH_EOV AND GTKMM_FOUND AND VLE_HAVE_CAIRO)
+  set(HAVE_EOV 1 CACHE INTERNAL "" FORCE)
+else (WITH_EOV AND GTKMM_FOUND AND VLE_HAVE_CAIRO)
+  set(HAVE_EOV 0 CACHE INTERNAL "" FORCE)
+endif (WITH_EOV AND GTKMM_FOUND AND VLE_HAVE_CAIRO)
 
-OPTION(WITH_GVLE "use the gtkmm to build gvle [default: on]" ON)
-IF (WITH_GVLE AND GTKMM_FOUND)
-  SET(HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
-ELSE (WITH_GVLE GTKMM_FOUND)
-  SET(HAVE_GVLE 0 CACHE INTERNAL "" FORCE)
-ENDIF (WITH_GVLE AND GTKMM_FOUND)
+option(WITH_GVLE "use the gtkmm to build gvle [default: on]" ON)
+if (WITH_GVLE AND GTKMM_FOUND)
+  set(HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
+else (WITH_GVLE AND GTKMM_FOUND)
+  set(HAVE_GVLE 0 CACHE INTERNAL "" FORCE)
+endif (WITH_GVLE AND GTKMM_FOUND)
 
-IF (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
-   SET(VLE_HAVE_GTKSOURCEVIEWMM 1 CACHE INTERNAL "" FORCE)
-ELSE (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
-   SET(VLE_HAVE_GTKSOURCEVIEWMM 0 CACHE INTERNAL "" FORCE)
-ENDIF (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
+if (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
+   set(VLE_HAVE_GTKSOURCEVIEWMM 1 CACHE INTERNAL "" FORCE)
+else (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
+   set(VLE_HAVE_GTKSOURCEVIEWMM 0 CACHE INTERNAL "" FORCE)
+endif (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
 
 #
- # Test the libboost header and libboost-text library.
+# Test the libboost header and libboost-text library.
 #
 
-OPTION(WITH_TEST "use the libboost test unit library [default: on]" ON)
-OPTION(WITH_MPI "use an installed MPI library [default: on]" ON)
-SET(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_LIBS OFF)
-SET(Boost_NO_SYSTEM_PATHS OFF)
-SET(Boost_USE_STATIC_RUNTIME ON)
-IF (WIN32)
-  SET(Boost_THREADAPI "win32")
-ENDIF (WIN32)
-SET(Boost_DETAILED_FAILURE_MSG FALSE)
-SET(Boost_DEBUG FALSE)
+option(WITH_TEST "use the libboost test unit library [default: on]" ON)
+option(WITH_MPI "use an installed MPI library [default: on]" ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_NO_SYSTEM_PATHS OFF)
+set(Boost_USE_STATIC_RUNTIME ON)
+if (WIN32)
+  set(Boost_THREADAPI "win32")
+endif (WIN32)
+set(Boost_DETAILED_FAILURE_MSG FALSE)
+set(Boost_DEBUG FALSE)
 
-FIND_PACKAGE(Boost COMPONENTS unit_test_framework serialization filesystem
+find_package(Boost COMPONENTS unit_test_framework serialization filesystem
   system date_time regex thread program_options)
-IF (NOT Boost_SERIALIZATION_FOUND)
-  MESSAGE(FATAL_ERROR "The boost serialization library is required")
-ENDIF (NOT Boost_SERIALIZATION_FOUND)
-IF (NOT Boost_FILESYSTEM_FOUND)
-  MESSAGE(FATAL_ERROR "The boost filesystem library is required")
-ENDIF (NOT Boost_FILESYSTEM_FOUND)
-IF (NOT Boost_REGEX_FOUND)
-  MESSAGE(FATAL_ERROR "The boost regex library is required")
-ENDIF (NOT Boost_REGEX_FOUND)
-IF (NOT Boost_DATE_TIME_FOUND)
-  MESSAGE(FATAL_ERROR "The boost date_time library is required")
-ENDIF (NOT Boost_DATE_TIME_FOUND)
-IF (NOT Boost_THREAD_FOUND)
-  MESSAGE(FATAL_ERROR "The boost thread library is required")
-ENDIF (NOT Boost_THREAD_FOUND)
-IF (NOT Boost_PROGRAM_OPTIONS_FOUND)
-  MESSAGE(FATAL_ERROR "The boost program options library is required")
-ENDIF (NOT Boost_PROGRAM_OPTIONS_FOUND)
-IF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
-  SET(Boost_SYSTEM_LIBRARY "")
-ENDIF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
-IF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
-  SET(VLE_HAVE_BOOST_SPIRIT2 0 CACHE INTERNAL "" FORCE)
-ELSE (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
-  SET(VLE_HAVE_BOOST_SPIRIT2 1 CACHE INTERNAL "" FORCE)
-ENDIF (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
+if (NOT Boost_SERIALIZATION_FOUND)
+  message(FATAL_ERROR "The boost serialization library is required")
+endif (NOT Boost_SERIALIZATION_FOUND)
+if (NOT Boost_FILESYSTEM_FOUND)
+  message(FATAL_ERROR "The boost filesystem library is required")
+endif (NOT Boost_FILESYSTEM_FOUND)
+if (NOT Boost_REGEX_FOUND)
+  message(FATAL_ERROR "The boost regex library is required")
+endif (NOT Boost_REGEX_FOUND)
+if (NOT Boost_DATE_TIME_FOUND)
+  message(FATAL_ERROR "The boost date_time library is required")
+endif (NOT Boost_DATE_TIME_FOUND)
+if (NOT Boost_THREAD_FOUND)
+  message(FATAL_ERROR "The boost thread library is required")
+endif (NOT Boost_THREAD_FOUND)
+if (NOT Boost_PROGRAM_OPTIONS_FOUND)
+  message(FATAL_ERROR "The boost program options library is required")
+endif (NOT Boost_PROGRAM_OPTIONS_FOUND)
+if (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
+  set(Boost_SYSTEM_LIBRARY "")
+endif (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
+if (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
+  set(VLE_HAVE_BOOST_SPIRIT2 0 CACHE INTERNAL "" FORCE)
+else (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
+  set(VLE_HAVE_BOOST_SPIRIT2 1 CACHE INTERNAL "" FORCE)
+endif (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
 
-IF (WITH_TEST)
-  IF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
-  ENDIF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
-ENDIF (WITH_TEST)
+if (WITH_TEST)
+  if (Boost_UNIT_TEST_FRAMEWORK_FOUND)
+    set(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
+  endif (Boost_UNIT_TEST_FRAMEWORK_FOUND)
+endif (WITH_TEST)
 
-IF (WITH_MPI)
-  FIND_PACKAGE(MPI)
-  IF (MPI_FOUND)
-    MESSAGE(STATUS "mpi include ${MPI_INCLUDE_PATH}")
-    MESSAGE(STATUS "mpi lib ${MPI_LIBRARY}")
-    MESSAGE(STATUS "mpi extra lib ${MPI_EXTRA_LIBRARY}")
-    MESSAGE(STATUS "mpi link ${MPI_LINK_FLAGS}")
-    SET(VLE_HAVE_MPI 1 CACHE INTERNAL "" FORCE)
-  ENDIF (MPI_FOUND)
-ENDIF (WITH_MPI)
-
-
-#
- # Generate the config.h
-#
-
-CHECK_INCLUDE_FILE_CXX(cxxabi.h VLE_HAVE_GCC_ABI_DEMANGLE)
-CHECK_INCLUDE_FILE_CXX(execinfo.h VLE_HAVE_EXECINFO)
-CHECK_INCLUDE_FILE_CXX(signal.h VLE_HAVE_SIGNAL)
-INCLUDE_DIRECTORIES(${VLE_BINARY_DIR})
+if (WITH_MPI)
+  find_package(MPI REQUIRED)
+  if (MPI_FOUND)
+    message(STATUS "mpi include ${MPI_INCLUDE_PATH}")
+    message(STATUS "mpi lib ${MPI_LIBRARY}")
+    message(STATUS "mpi extra lib ${MPI_EXTRA_LIBRARY}")
+    message(STATUS "mpi link ${MPI_LINK_FLAGS}")
+    set(VLE_HAVE_MPI 1 CACHE INTERNAL "" FORCE)
+  endif (MPI_FOUND)
+endif (WITH_MPI)
 
 #
- # Generate the vle.pc pkg-config file.
- # Build some variable to build a correct Win32 pkg config file with:
- # prefix=/target to detect the DIRNAME
- # cflag=-Iboost_1_34_1 for the directory
+# Generate the config.h
 #
-
-IF(UNIX)
-  SET(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
-  SET(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
-  SET(VLE_PKGCONFIG_LIBDIR "lib")
-ELSE(UNIX)
-  SET(VLE_PKGCONFIG_PREFIXPATH "/target")
-  SET(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "\${includedir}")
-  SET(VLE_PKGCONFIG_LIBDIR "bin")
-ENDIF(UNIX)
-
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/vle/vle.pc.in
-  ${VLE_BINARY_DIR}/vle-${VLE_VERSION_SHORT}.pc @ONLY)
-INSTALL(FILES ${VLE_BINARY_DIR}/vle-${VLE_VERSION_SHORT}.pc DESTINATION
-  lib/pkgconfig)
-
-IF (HAVE_EOV)
-  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/vle/eov.pc.in
-    ${VLE_BINARY_DIR}/eov-${VLE_VERSION_SHORT}.pc @ONLY)
-  INSTALL(FILES ${VLE_BINARY_DIR}/eov-${VLE_VERSION_SHORT}.pc DESTINATION
-    lib/pkgconfig)
-ENDIF (HAVE_EOV)
-
-IF (HAVE_GVLE)
-  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/src/vle/gvle.pc.in
-    ${VLE_BINARY_DIR}/gvle-${VLE_VERSION_SHORT}.pc @ONLY)
-  INSTALL(FILES ${VLE_BINARY_DIR}/gvle-${VLE_VERSION_SHORT}.pc DESTINATION
-    lib/pkgconfig)
-ENDIF (HAVE_GVLE)
+check_include_file_cxx(cxxabi.h VLE_HAVE_GCC_ABI_DEMANGLE)
+check_include_file_cxx(execinfo.h VLE_HAVE_EXECINFO)
+check_include_file_cxx(signal.h VLE_HAVE_SIGNAL)
+include_directories(${VLE_BINARY_DIR})
 
 #
- # Install the README
+# generate the vle.pc pkg-config file.
+# Build some variable to build a correct Win32 pkg config file with:
+# prefix=/target to detect the DIRNAME
+# cflag=-Iboost_1_34_1 for the directory
 #
-
-IF(UNIX)
-  INSTALL(FILES "README" DESTINATION "${VLE_SHARE_DIRS}")
-  INSTALL(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}")
-ELSE(UNIX)
-  INSTALL(FILES "README" DESTINATION "${VLE_SHARE_DIRS}" RENAME "Readme.txt")
-  INSTALL(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}" RENAME "CopyRight.txt")
-ENDIF(UNIX)
+if (UNIX)
+  set(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
+  set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
+  set(VLE_PKGCONFIG_LIBDIR "lib")
+else (UNIX)
+  set(VLE_PKGCONFIG_PREFIXPATH "/target")
+  set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "\${includedir}")
+  set(VLE_PKGCONFIG_LIBDIR "bin")
+endif (UNIX)
 
 #
- # Define function
+# Install the README
 #
+if (UNIX)
+  install(FILES "README" DESTINATION "${VLE_SHARE_DIRS}")
+  install(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}")
+else (UNIX)
+  install(FILES "README" DESTINATION "${VLE_SHARE_DIRS}" RENAME "Readme.txt")
+  install(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}" RENAME "CopyRight.txt")
+endif (UNIX)
 
-FUNCTION(DeclareModuleDynamics name sources)
-  ADD_LIBRARY(${name} SHARED ${sources})
+#
+# Define function
+#
+function(DeclareModuleDynamics name sources)
+  add_library(${name} SHARED ${sources})
 
-  TARGET_LINK_LIBRARIES(${name}
+  target_link_libraries(${name}
     ${GLIBMM_LIBRARIES} ${LIBXML_LIBRARIES} ${GTHREAD_LIBRARIES} vleutils
     vlevalue vlegraph vlevpz vleoov vledevs vlemanager vletranslator)
 
-  INSTALL(TARGETS ${name}
+  install(TARGETS ${name}
     RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
     LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-ENDFUNCTION(DeclareModuleDynamics)
+endfunction(DeclareModuleDynamics)
 
 #
- # Browse the share subdirectory
+# Add sources for a target
+# add_sources(<target> <source1> [<source2> ...])
 #
+function(add_sources target)
+  get_property(prop_defined GLOBAL PROPERTY ${target}_SRCS DEFINED)
+  if(NOT prop_defined)
+    define_property(GLOBAL PROPERTY ${target}_SRCS
+      BRIEF_DOCS "Sources for the ${target} target"
+      FULL_DOCS "List of source files for the ${target} target")
+  endif()
 
-ADD_SUBDIRECTORY(share)
-
-#
- # Gettext utilities
-#
-
-FIND_PACKAGE(Gettext)
-IF (GETTEXT_FOUND)
-  SET(VLE_HAVE_NLS 1 CACHE INTERNAL "" FORCE)
-  ADD_SUBDIRECTORY(i18n)
-ELSE (GETTEXT_FOUND)
-  SET(VLE_HAVE_NLS 0 CACHE INTERNAL "" FORCE)
-ENDIF (GETTEXT_FOUND)
-
-#
- # Generating documentation with doxygen
-#
-
-OPTION(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
-IF (WITH_DOXYGEN)
-  FIND_PACKAGE(Doxygen)
-  IF (DOXYGEN)
-    ADD_SUBDIRECTORY(doxygen)
-  ELSE (DOXYGEN)
-    MESSAGE(STATUS "WARNING: Doxygen not found - No reference manual create")
-  ENDIF (DOXYGEN)
-ENDIF(WITH_DOXYGEN)
+  set(SRCS)
+  foreach(src IN LISTS ARGN)
+    if(NOT IS_ABSOLUTE "${src}")
+      get_filename_component(src "${src}" ABSOLUTE)
+    endif()
+    list(APPEND SRCS "${src}")
+  endforeach()
+  set_property(GLOBAL APPEND PROPERTY "${target}_SRCS" "${SRCS}")
+endfunction()
 
 #
- # Browse the src subdirectory
+# Browse the share subdirectory
 #
+add_subdirectory(share)
 
+#
+# Gettext utilities
+#
+find_package(Gettext)
+if (GETTEXT_FOUND)
+  set(VLE_HAVE_NLS 1 CACHE INTERNAL "" FORCE)
+  add_subdirectory(i18n)
+else (GETTEXT_FOUND)
+  set(VLE_HAVE_NLS 0 CACHE INTERNAL "" FORCE)
+endif (GETTEXT_FOUND)
+
+#
+# Generating documentation with doxygen
+#
+option(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
+if (WITH_DOXYGEN)
+  find_package(Doxygen)
+  if (DOXYGEN)
+    add_subdirectory(doxygen)
+  else (DOXYGEN)
+    message(STATUS "WARNING: Doxygen not found - No reference manual create")
+  endif (DOXYGEN)
+endif (WITH_DOXYGEN)
+
+#
+# Browse the src subdirectory
+#
 ADD_SUBDIRECTORY(src)
 
 #
- # Status
+# Status
 #
-
-MESSAGE(STATUS "- - - -")
-MESSAGE(STATUS "${VLE_NAME_COMPLETE} configured successfully")
-MESSAGE(STATUS "Using ${CMAKE_INSTALL_PREFIX} for installation")
-MESSAGE(STATUS "Build type ${CMAKE_BUILD_TYPE}")
-IF (VLE_HAVE_GCC_ABI_DEMANGLE)
-  MESSAGE(STATUS "Build with GCC ABI Demangle...: yes")
-ENDIF (VLE_HAVE_GCC_ABI_DEMANGLE)
-IF (VLE_HAVE_EXECINFO)
-  MESSAGE(STATUS "Build with execinfo.h.........: yes")
-ENDIF (VLE_HAVE_EXECINFO)
-IF (Boost_FOUND)
-  MESSAGE(STATUS "Build with boost..............: yes")
-ENDIF (Boost_FOUND)
-IF (HAVE_UNITTESTFRAMEWORK)
-  MESSAGE(STATUS "Build unit test...............: yes")
-ENDIF (HAVE_UNITTESTFRAMEWORK)
-IF (HAVE_EOV)
-  MESSAGE(STATUS "Build with eov................: yes")
-ENDIF (HAVE_EOV)
-IF (VLE_HAVE_CAIRO)
-  MESSAGE(STATUS "Build with cairo plugin.......: yes")
-ENDIF (VLE_HAVE_CAIRO)
-IF (HAVE_GVLE)
-  MESSAGE(STATUS "Build with gvle...............: yes")
-ENDIF (HAVE_GVLE)
-IF (VLE_HAVE_POOL)
-  MESSAGE(STATUS "Build with boost::pool........: yes")
-ENDIF (VLE_HAVE_POOL)
-IF (VLE_HAVE_MPI)
-  MESSAGE(STATUS "Build with MPI................: yes")
-ENDIF (VLE_HAVE_MPI)
-MESSAGE(STATUS "- - - -")
+message(STATUS "- - - -")
+message(STATUS "${VLE_NAME_COMPLETE} configured successfully")
+message(STATUS "Using ${CMAKE_INSTALL_PREFIX} for installation")
+message(STATUS "Build type ${CMAKE_BUILD_TYPE}")
+message(STATUS "Build with GCC ABI Demangle...: ${VLE_HAVE_GCC_ABI_DEMANGLE}")
+message(STATUS "Build with execinfo.h.........: ${VLE_HAVE_EXECINFO}")
+message(STATUS "Build unit test...............: ${HAVE_UNITTESTFRAMEWORK}")
+message(STATUS "Build with eov................: ${HAVE_EOV}")
+message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
+message(STATUS "Build with gvle...............: ${HAVE_GVLE}")
+message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
+message(STATUS "Build with MPI................: ${VLE_HAVE_MPI}")
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2

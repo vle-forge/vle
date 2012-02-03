@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_EXECUTIVEDBG_HPP
 #define VLE_DEVS_EXECUTIVEDBG_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/Executive.hpp>
 #include <vle/utils/i18n.hpp>
@@ -38,14 +38,14 @@
 
 #define DECLARE_EXECUTIVE_DBG(mdl)                                     \
     extern "C" {                                                       \
-        VLE_DEVS_EXPORT vle::devs::Dynamics*                           \
+        VLE_EXPORT vle::devs::Dynamics*                           \
         vle_make_new_executive(const vle::devs::ExecutiveInit& init,   \
                                const vle::devs::InitEventList& events) \
         {                                                              \
             return new vle::devs::ExecutiveDbg < mdl >(init, events);  \
         }                                                              \
                                                                        \
-        VLE_DEVS_EXPORT void                                           \
+        VLE_EXPORT void                                           \
         vle_api_level(vle::uint32_t* major,                            \
                       vle::uint32_t* minor,                            \
                       vle::uint32_t* patch)                            \

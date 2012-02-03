@@ -43,7 +43,7 @@
 #include <boost/random/geometric_distribution.hpp>
 #include <boost/random/cauchy_distribution.hpp>
 #include <boost/random/triangle_distribution.hpp>
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -76,7 +76,7 @@ namespace vle { namespace utils {
      * r.weibull(1.0, 1.0);
      * @endcode
      */
-    class VLE_UTILS_EXPORT Rand
+    class VLE_EXPORT Rand
     {
     public:
         typedef boost::mt19937::result_type result_type;

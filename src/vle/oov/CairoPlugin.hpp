@@ -29,7 +29,7 @@
 #ifndef VLE_OOV_CAIRO_PLUGIN_HPP
 #define VLE_OOV_CAIRO_PLUGIN_HPP
 
-#include <vle/oov/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/value/Map.hpp>
 #include <boost/shared_ptr.hpp>
@@ -44,7 +44,7 @@ namespace vle { namespace oov {
      * DECLARE_OOV_PLUGIN(Gnuplot);
      * @endcode
      */
-    class VLE_OOV_EXPORT CairoPlugin : public Plugin
+    class VLE_EXPORT CairoPlugin : public Plugin
     {
     public:
         /**

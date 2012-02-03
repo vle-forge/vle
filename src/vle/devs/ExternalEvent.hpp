@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_EXTERNALEVENT_HPP
 #define VLE_DEVS_EXTERNALEVENT_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Attribute.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -43,7 +43,7 @@ class Simulator;
  * graph::Model when output function are called.
  *
  */
-class VLE_DEVS_EXPORT ExternalEvent
+class VLE_EXPORT ExternalEvent
 {
 public:
     ExternalEvent(const std::string& sourcePortName)

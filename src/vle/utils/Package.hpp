@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_PACKAGE_HPP
 #define VLE_UTILS_PACKAGE_HPP
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/utils/PackageTable.hpp>
 #include <glibmm/spawn.h>
 #include <glibmm/thread.h>
@@ -51,7 +51,7 @@ namespace vle { namespace utils {
      * utils::Package::Package().configure(std::cout, std::cerr);
      * @endcode
      */
-    class VLE_UTILS_EXPORT Package
+    class VLE_EXPORT Package
     {
     public:
         /**

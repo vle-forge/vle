@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_DYNAMIC_HPP
 #define VLE_VPZ_DYNAMIC_HPP
 
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 
 namespace vle { namespace vpz {
@@ -50,7 +50,7 @@ namespace vle { namespace vpz {
      *
      * @endcode
      */
-    class VLE_VPZ_EXPORT Dynamic : public Base
+    class VLE_EXPORT Dynamic : public Base
     {
     public:
         /**

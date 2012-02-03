@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_EVENTLIST_HPP
 #define VLE_DEVS_EVENTLIST_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vector>
 #include <algorithm>
 #include <boost/checked_delete.hpp>
@@ -43,7 +43,7 @@ namespace vle { namespace devs {
      *
      */
     template < class Class >
-    class VLE_DEVS_EXPORT EventList : public std::vector < Class* >
+    class VLE_EXPORT EventList : public std::vector < Class* >
     {
     public:
         /**

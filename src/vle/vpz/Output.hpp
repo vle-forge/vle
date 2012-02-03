@@ -31,7 +31,7 @@
 
 #include <string>
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle {
 
@@ -49,7 +49,7 @@ namespace vle {
      * (local file system or internet address and the parametrization of the
      * plug-in).
      */
-    class VLE_VPZ_EXPORT Output : public Base
+    class VLE_EXPORT Output : public Base
     {
     public:
         /**

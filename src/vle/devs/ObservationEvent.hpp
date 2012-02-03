@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_OBSERVATION_EVENT_HPP
 #define VLE_DEVS_OBSERVATION_EVENT_HPP 1
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Attribute.hpp>
 #include <vle/devs/Time.hpp>
 #include <vector>
@@ -43,7 +43,7 @@ class Simulator;
  * TimedView or EventView.
  *
  */
-class VLE_DEVS_EXPORT ObservationEvent
+class VLE_EXPORT ObservationEvent
 {
 public:
     ObservationEvent(const Time& time,

@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_MODULEMANAGER_HPP
 #define VLE_UTILS_MODULEMANAGER_HPP 1
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
 #include <string>
 #include <vector>
@@ -66,7 +66,7 @@ enum ModuleType
  * which store an handle to the shared library and a pointer to the symbol
  * referenced by the @e ModuleType.
  */
-struct VLE_UTILS_EXPORT Module
+struct VLE_EXPORT Module
 {
     Module(const std::string& package,
            const std::string& library,
@@ -113,7 +113,7 @@ typedef std::vector < Module > ModuleList;
  * void* mng.get("foo", "sim", vle::utils::MODULE_DYNAMICS);
  * @endcode
  */
-class VLE_UTILS_EXPORT ModuleManager
+class VLE_EXPORT ModuleManager
 {
 public:
     ModuleManager();

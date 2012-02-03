@@ -1,59 +1,9 @@
-INCLUDE_DIRECTORIES(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS}
-  ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS}
-  ${GTKMM_INCLUDE_DIRS}
-  ${GTHREAD_INCLUDE_DIRS})
+add_sources(vlelib MainWindow.cpp MainWindow.hpp NetStreamReader.cpp
+  NetStreamReader.hpp Plugin.cpp Plugin.hpp Window.cpp Window.hpp)
 
-LINK_DIRECTORIES(
-  ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIR}
-  ${GTKMM_LIBRARY_DIRS}
-  ${GTHREAD_LIBRARY_DIRS})
+install(FILES MainWindow.hpp NetStreamReader.hpp Plugin.hpp Window.hpp
+  DESTINATION ${VLE_INCLUDE_DIRS}/eov)
 
-IF(WIN32)
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
-    COMMAND ${CMAKE_RC_COMPILER}
-    -I${CMAKE_BINARY_DIR}/share
-    -i${CMAKE_BINARY_DIR}/share/vfl.rc
-    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-ELSE(WIN32)
-  SET(OS_SPECIFIC_PATH_IMPL)
-ENDIF(WIN32)
+install(FILES eov.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
 
-SET(EOV_CPP NetStreamReader.cpp Plugin.cpp Window.cpp MainWindow.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
-
-SET(EOV_HPP DllDefines.hpp NetStreamReader.hpp Plugin.hpp Window.hpp
-  MainWindow.hpp)
-
-ADD_LIBRARY(vleeov SHARED ${EOV_CPP};${EOV_HPP})
-
-SET_TARGET_PROPERTIES(vleeov PROPERTIES ${VLE_LIBRARY_PROPERTIES})
-SET_TARGET_PROPERTIES(vleeov PROPERTIES OUTPUT_NAME
-  "vleeov-${VLE_VERSION_SHORT}")
-
-TARGET_LINK_LIBRARIES(vleeov
-  ${VLE_LIBRARIES}
-  ${GTKMM_LIBRARIES}
-  ${GLIBMM_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES}
-  vleutils
-  vlevalue
-  vlegraph
-  vlevpz
-  vleoov)
-
-INSTALL(TARGETS vleeov
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-INSTALL(FILES ${EOV_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/eov)
-INSTALL(FILES eov.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
-
-ADD_SUBDIRECTORY(plugins)
+add_subdirectory(plugins)

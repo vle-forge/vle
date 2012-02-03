@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_SIMULATOR_HPP
 #define VLE_DEVS_SIMULATOR_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
@@ -46,7 +46,7 @@ namespace vle { namespace devs {
      * represent the DEVS simulator.
      *
      */
-    class VLE_DEVS_EXPORT Simulator
+    class VLE_EXPORT Simulator
     {
     public:
         typedef std::pair < Simulator*, std::string > TargetSimulator;

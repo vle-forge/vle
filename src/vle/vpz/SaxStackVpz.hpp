@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_SAXSTACKVPZ_HPP
 #define VLE_VPZ_SAXSTACKVPZ_HPP
 
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 #include <libxml/xmlstring.h>
 #include <list>
@@ -51,7 +51,7 @@ namespace vle {
     /**
      * @brief The SaxStackVpz is used to construct the vpz::Base hierarchy.
      */
-    class VLE_VPZ_EXPORT SaxStackVpz
+    class VLE_EXPORT SaxStackVpz
     {
     public:
         /**

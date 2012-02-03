@@ -29,7 +29,7 @@
 #ifndef VLE_EOV_PLUGIN_HPP
 #define VLE_EOV_PLUGIN_HPP
 
-#include <vle/eov/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/oov/CairoPlugin.hpp>
 #include <vle/version.hpp>
 #include <sigc++/trackable.h>
@@ -40,14 +40,14 @@
 
 #define DECLARE_EOV_PLUGIN(x)                               \
     extern "C" {                                            \
-        VLE_EOV_EXPORT vle::eov::Plugin*                    \
+        VLE_EXPORT vle::eov::Plugin*                    \
         vle_make_new_eov(vle::oov::CairoPluginPtr cairoplg, \
                          vle::eov::NetStreamReader* netsr)  \
         {                                                   \
             return new x(cairoplg, netsr);                  \
         }                                                   \
                                                             \
-        VLE_EOV_EXPORT void                                 \
+        VLE_EXPORT void                                 \
         vle_api_level(vle::uint32_t* major,                 \
                       vle::uint32_t* minor,                 \
                       vle::uint32_t* patch)                 \
@@ -67,7 +67,7 @@ namespace vle { namespace eov {
      * interface around a vle::oov::CairoPlugin. Use the DECLARE_EOV_PLUGIN
      * macro to develop a plugin.
      */
-    class VLE_EOV_EXPORT Plugin : public sigc::trackable
+    class VLE_EXPORT Plugin : public sigc::trackable
     {
     public:
         /**

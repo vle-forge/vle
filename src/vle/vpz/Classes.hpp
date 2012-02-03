@@ -31,7 +31,7 @@
 
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Class.hpp>
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <map>
 
 namespace vle { namespace vpz {
@@ -45,7 +45,7 @@ namespace vle { namespace vpz {
      * @brief The class Classes is build on the ClassList typedef to construct a
      * list of class.
      */
-    class VLE_VPZ_EXPORT Classes : public Base
+    class VLE_EXPORT Classes : public Base
     {
     public:
         typedef ClassList::iterator         iterator;

@@ -29,7 +29,7 @@
 #ifndef VLE_EOV_MAINWINDOW_HPP
 #define VLE_EOV_MAINWINDOW_HPP
 
-#include <vle/eov/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/eov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/SharedLibraryManager.hpp>
@@ -51,7 +51,7 @@ namespace vle { namespace eov {
      * @brief A class to manage the Main Window of the Eov application. It use
      * libglademm to load graphical user interface.
      */
-    class VLE_EOV_EXPORT MainWindow : public sigc::trackable
+    class VLE_EXPORT MainWindow : public sigc::trackable
     {
     public:
         /**

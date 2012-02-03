@@ -1,10 +1,10 @@
-ADD_SUBDIRECTORY(vle)
-ADD_SUBDIRECTORY(oov)
+add_subdirectory(vle)
+add_subdirectory(oov)
 
-IF (HAVE_EOV)
-  ADD_SUBDIRECTORY(eov)
-ENDIF (HAVE_EOV)
+if (HAVE_EOV)
+  add_subdirectory(eov)
+endif (HAVE_EOV)
 
-IF (HAVE_GVLE)
-  ADD_SUBDIRECTORY(gvle)
-ENDIF (HAVE_GVLE)
+if (HAVE_GVLE)
+  add_subdirectory(gvle)
+endif (HAVE_GVLE)

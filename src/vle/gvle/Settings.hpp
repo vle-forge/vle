@@ -29,7 +29,7 @@
 #ifndef VLE_GVLE_SETTINGS_HPP
 #define VLE_GVLE_SETTINGS_HPP
 
-#include <vle/gvle/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <gdkmm/color.h>
 #include <string>
 
@@ -47,7 +47,7 @@ namespace vle { namespace gvle {
  * assert(font, "Monospace 10");
  * @endcode
  */
-class VLE_GVLE_EXPORT Settings
+class VLE_EXPORT Settings
 {
 public:
     /**

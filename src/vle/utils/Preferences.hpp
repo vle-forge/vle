@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_PREFERENCES_HPP
 #define VLE_UTILS_PREFERENCES_HPP 1
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
 #include <string>
 #include <vector>
@@ -73,7 +73,7 @@ namespace vle { namespace utils {
  * The @c Preferences class uses the pimpl idiom and can not be copyable and
  * assignable.
  */
-class VLE_UTILS_EXPORT Preferences
+class VLE_EXPORT Preferences
 {
 public:
     /**

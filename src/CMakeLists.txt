@@ -1,2 +1,2 @@
-ADD_SUBDIRECTORY(vle)
-ADD_SUBDIRECTORY(apps)
+add_subdirectory(vle)
+add_subdirectory(apps)

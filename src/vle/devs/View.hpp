@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_VIEW_HPP
 #define VLE_DEVS_VIEW_HPP 1
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Tools.hpp>
@@ -50,7 +50,7 @@ typedef std::map < std::string, View* > ViewList;
  * @brief Represent a View on a devs::Simulator and a port name.
  *
  */
-class VLE_DEVS_EXPORT View
+class VLE_EXPORT View
 {
 public:
     typedef ObservableList::iterator iterator;
@@ -156,7 +156,7 @@ protected:
  * @brief Define a Timed View base on devs::View class. This class
  * build state event with timed clock.
  */
-class VLE_DEVS_EXPORT TimedView : public View
+class VLE_EXPORT TimedView : public View
 {
 public:
     TimedView(const std::string& name, StreamWriter* stream,
@@ -183,7 +183,7 @@ private:
  * @brief Define a Event View base on devs::View class. This class
  * build state event when event are push.
  */
-class VLE_DEVS_EXPORT EventView : public View
+class VLE_EXPORT EventView : public View
 {
 public:
     EventView(const std::string& name, StreamWriter* stream)
@@ -206,7 +206,7 @@ public:
  * @brief Define a Finish view based on devs::View class. This class build
  * state event only at the end of the simulation.
  */
-class VLE_DEVS_EXPORT FinishView : public View
+class VLE_EXPORT FinishView : public View
 {
 public:
     FinishView(const std::string& name, StreamWriter* stream, const Time& last)

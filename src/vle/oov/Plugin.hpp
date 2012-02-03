@@ -29,20 +29,20 @@
 #ifndef VLE_OOV_PLUGIN_HPP
 #define VLE_OOV_PLUGIN_HPP
 
-#include <vle/oov/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/oov/OutputMatrix.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/version.hpp>
 
 #define DECLARE_OOV_PLUGIN(x)                         \
     extern "C" {                                      \
-        VLE_OOV_EXPORT vle::oov::Plugin*              \
+        VLE_EXPORT vle::oov::Plugin*              \
         vle_make_new_oov(const std::string& location) \
         {                                             \
             return new x(location);                   \
         }                                             \
                                                       \
-        VLE_OOV_EXPORT void                           \
+        VLE_EXPORT void                           \
         vle_api_level(vle::uint32_t* major,           \
                       vle::uint32_t* minor,           \
                       vle::uint32_t* patch)           \
@@ -70,7 +70,7 @@ namespace vle { namespace oov {
      * DECLARE_OOV_PLUGIN(Gnuplot);
      * @endcode
      */
-    class VLE_OOV_EXPORT Plugin
+    class VLE_EXPORT Plugin
     {
     public:
         /**

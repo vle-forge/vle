@@ -30,14 +30,14 @@
 #define VLE_VALUE_DOUBLE_HPP 1
 
 #include <vle/value/Value.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace value {
 
 /**
  * @brief Double Value encapsulate a C++ 'double' type into a class.
  */
-class VLE_VALUE_EXPORT Double : public Value
+class VLE_EXPORT Double : public Value
 {
 public:
     /**

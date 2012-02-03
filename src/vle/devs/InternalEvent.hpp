@@ -29,7 +29,7 @@
 #ifndef DEVS_INTERNALEVENT_HPP
 #define DEVS_INTERNALEVENT_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
 #include <vector>
 
@@ -43,7 +43,7 @@ class Simulator;
  * The @e InternalEvent is only used by the scheduler of VLE. To
  * speed-up the simulation an @e InternalEvent can be invalidate.
  */
-class VLE_DEVS_EXPORT InternalEvent
+class VLE_EXPORT InternalEvent
 {
 public:
     /**

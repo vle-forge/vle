@@ -25,7 +25,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/utils/SharedLibraryManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>

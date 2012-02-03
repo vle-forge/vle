@@ -29,21 +29,21 @@
 #ifndef DEVS_DYNAMICSWRAPPER_HPP
 #define DEVS_DYNAMICSWRAPPER_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/version.hpp>
 #include <string>
 
 #define DECLARE_DYNAMICSWRAPPER(mdl)                                              \
     extern "C" {                                                                  \
-        VLE_DEVS_EXPORT vle::devs::Dynamics*                                      \
+        VLE_EXPORT vle::devs::Dynamics*                                      \
         vle_make_new_dynamics_wrapper(const vle::devs::DynamicsWrapperInit& init, \
                                       const vle::devs::InitEventList& events)     \
         {                                                                         \
             return new mdl(init, events);                                         \
         }                                                                         \
                                                                                   \
-        VLE_DEVS_EXPORT void                                                      \
+        VLE_EXPORT void                                                      \
         vle_api_level(vle::uint32_t* major,                                       \
                       vle::uint32_t* minor,                                       \
                       vle::uint32_t* patch)                                       \
@@ -56,7 +56,7 @@
 
 namespace vle { namespace devs {
 
-    class VLE_DEVS_EXPORT DynamicsWrapperInit : public DynamicsInit
+    class VLE_EXPORT DynamicsWrapperInit : public DynamicsInit
     {
     public:
         DynamicsWrapperInit(const graph::AtomicModel& atom,
@@ -80,7 +80,7 @@ namespace vle { namespace devs {
      * programming language.
      *
      */
-    class VLE_DEVS_EXPORT DynamicsWrapper : public Dynamics
+    class VLE_EXPORT DynamicsWrapper : public Dynamics
     {
     public:
 	/**

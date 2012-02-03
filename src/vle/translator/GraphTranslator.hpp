@@ -29,7 +29,7 @@
 #ifndef VLE_TRANSLATOR_GRAPHTRANSLATOR_HPP
 #define VLE_TRANSLATOR_GRAPHTRANSLATOR_HPP
 
-#include <vle/translator/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Executive.hpp>
 #include <boost/multi_array.hpp>
 #include <string>
@@ -88,7 +88,7 @@ namespace vle { namespace translator {
  * </map>
  * @endcode
  */
-class VLE_TRANSLATOR_EXPORT GraphTranslator
+class VLE_EXPORT GraphTranslator
 {
 public:
     typedef boost::multi_array < bool, 2 > BoolArray;

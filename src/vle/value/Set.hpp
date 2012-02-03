@@ -38,7 +38,7 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <boost/serialization/vector.hpp>
 #include <vector>
 
@@ -52,7 +52,7 @@ typedef std::vector < Value* > VectorValue;
 /**
  * @brief The Set Value is a vector of pointer of value.
  */
-class VLE_VALUE_EXPORT Set : public Value
+class VLE_EXPORT Set : public Value
 {
 public:
     typedef VectorValue::size_type size_type;

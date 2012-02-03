@@ -1,93 +1,45 @@
-INCLUDE_DIRECTORIES(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS}
-  ${GLADEMM_INCLUDE_DIRS}
-  ${GTKMM_INCLUDE_DIRS}
-  ${GTHREAD_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS}
-  ${GTKSOURCEVIEWMM_INCLUDE_DIRS})
+add_sources(vlelib About.cpp About.hpp AtomicModelBox.cpp AtomicModelBox.hpp
+  BooleanBox.cpp BooleanBox.hpp CalendarBox.cpp CalendarBox.hpp
+  ComboboxString.hpp CompleteViewDrawingArea.cpp CompleteViewDrawingArea.hpp
+  ConditionsBox.cpp ConditionsBox.hpp ConnectionBox.cpp ConnectionBox.hpp
+  CoupledModelBox.cpp CoupledModelBox.hpp CutCopyPaste.cpp CutCopyPaste.hpp
+  DynamicBox.cpp DynamicBox.hpp DynamicsBox.cpp DynamicsBox.hpp Editor.cpp
+  Editor.hpp ExperimentBox.cpp ExperimentBox.hpp FileTreeView.cpp
+  FileTreeView.hpp GVLE.cpp GVLE.hpp GVLEMenuAndToolbar.cpp
+  GVLEMenuAndToolbar.hpp HostsBox.cpp HostsBox.hpp ImportClassesBox.cpp
+  ImportClassesBox.hpp ImportModelBox.cpp ImportModelBox.hpp
+  InteractiveTypeBox.cpp InteractiveTypeBox.hpp LaunchSimulationBox.cpp
+  LaunchSimulationBox.hpp MatrixBox.cpp MatrixBox.hpp Message.cpp Message.hpp
+  ModelClassBox.cpp ModelClassBox.hpp ModelDescriptionBox.cpp
+  ModelDescriptionBox.hpp Modeling.cpp Modeling.hpp ModelingPlugin.cpp
+  ModelingPlugin.hpp ModelTreeBox.cpp ModelTreeBox.hpp NewDynamicsBox.cpp
+  NewDynamicsBox.hpp NewModelClassBox.cpp NewModelClassBox.hpp NewProjectBox.cpp
+  NewProjectBox.hpp NewTypeBox.cpp NewTypeBox.hpp ObsAndViewBox.cpp
+  ObsAndViewBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.cpp
+  OpenModelingPluginBox.hpp OpenPackageBox.cpp OpenPackageBox.hpp OpenVpzBox.cpp
+  OpenVpzBox.hpp OutputPlugin.cpp OutputPlugin.hpp PluginFactory.cpp
+  PluginFactory.hpp PortDialog.cpp PortDialog.hpp PreferencesBox.cpp
+  PreferencesBox.hpp QuitBox.cpp QuitBox.hpp SaveVpzBox.cpp SaveVpzBox.hpp
+  Settings.cpp Settings.hpp SimpleTypeBox.cpp SimpleTypeBox.hpp
+  SimpleViewDrawingArea.cpp SimpleViewDrawingArea.hpp TableBox.cpp TableBox.hpp
+  TreeViewValue.cpp TreeViewValue.hpp TupleBox.cpp TupleBox.hpp ValueBox.cpp
+  ValueBox.hpp ValuesTreeView.cpp ValuesTreeView.hpp View.cpp
+  ViewDrawingArea.cpp ViewDrawingArea.hpp View.hpp ViewOutputBox.cpp
+  ViewOutputBox.hpp XmlTypeBox.cpp XmlTypeBox.hpp)
 
-LINK_DIRECTORIES(
-  ${GLADEMM_LIBRARY_DIRS}
-  ${GTKMM_LIBRARY_DIRS}
-  ${GTHREAD_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIR}
-  ${GTKSOURCEVIEWMM_LIBRARY_DIRS})
-
-IF(WIN32)
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
-    COMMAND ${CMAKE_RC_COMPILER}
-    -I${CMAKE_BINARY_DIR}/share
-    -i${CMAKE_BINARY_DIR}/share/vfl.rc
-    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-ELSE(WIN32)
-  SET(OS_SPECIFIC_PATH_IMPL)
-ENDIF(WIN32)
-
-SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
-  CalendarBox.hpp ComboboxString.hpp CompleteViewDrawingArea.hpp
-  ConditionsBox.hpp ConnectionBox.hpp CoupledModelBox.hpp
-  CutCopyPaste.hpp DllDefines.hpp DynamicBox.hpp DynamicsBox.hpp
-  Editor.hpp ExperimentBox.hpp FileTreeView.hpp GVLE.hpp
-  GVLEMenuAndToolbar.hpp HostsBox.hpp ImportClassesBox.hpp
-  ImportModelBox.hpp InteractiveTypeBox.hpp LaunchSimulationBox.hpp
-  MatrixBox.hpp Message.hpp ModelClassBox.hpp ModelDescriptionBox.hpp
-  ModelingPlugin.hpp ModelTreeBox.hpp Modeling.hpp NewDynamicsBox.hpp
-  NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp
-  ObsAndViewBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
+install(FILES About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
+  ComboboxString.hpp CompleteViewDrawingArea.hpp ConditionsBox.hpp
+  ConnectionBox.hpp CoupledModelBox.hpp CutCopyPaste.hpp DynamicBox.hpp
+  DynamicsBox.hpp Editor.hpp ExperimentBox.hpp FileTreeView.hpp GVLE.hpp
+  GVLEMenuAndToolbar.hpp HostsBox.hpp ImportClassesBox.hpp ImportModelBox.hpp
+  InteractiveTypeBox.hpp LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp
+  ModelClassBox.hpp ModelDescriptionBox.hpp Modeling.hpp ModelingPlugin.hpp
+  ModelTreeBox.hpp NewDynamicsBox.hpp NewModelClassBox.hpp NewProjectBox.hpp
+  NewTypeBox.hpp ObsAndViewBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
   OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp PluginFactory.hpp
-  PortDialog.hpp PreferencesBox.hpp QuitBox.hpp SaveVpzBox.hpp
-  Settings.hpp SimpleViewDrawingArea.hpp SimpleTypeBox.hpp
-  TableBox.hpp TupleBox.hpp TreeViewValue.hpp ValueBox.hpp
-  ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp ViewOutputBox.hpp
-  XmlTypeBox.hpp)
+  PortDialog.hpp PreferencesBox.hpp QuitBox.hpp SaveVpzBox.hpp Settings.hpp
+  SimpleTypeBox.hpp SimpleViewDrawingArea.hpp TableBox.hpp TreeViewValue.hpp
+  TupleBox.hpp ValueBox.hpp ValuesTreeView.hpp ViewDrawingArea.hpp View.hpp
+  ViewOutputBox.hpp XmlTypeBox.hpp DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
 
-SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp
-  CalendarBox.cpp CompleteViewDrawingArea.cpp ConditionsBox.cpp
-  ConnectionBox.cpp CoupledModelBox.cpp CutCopyPaste.cpp
-  DynamicBox.cpp DynamicsBox.cpp Editor.cpp ExperimentBox.cpp
-  FileTreeView.cpp GVLE.cpp GVLEMenuAndToolbar.cpp HostsBox.cpp
-  ImportClassesBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp
-  LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp ModelClassBox.cpp
-  ModelDescriptionBox.cpp ModelTreeBox.cpp Modeling.cpp
-  ModelingPlugin.cpp NewDynamicsBox.cpp NewModelClassBox.cpp
-  NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp
-  OpenModelingPluginBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp
-  OutputPlugin.cpp PortDialog.cpp PreferencesBox.cpp QuitBox.cpp
-  SaveVpzBox.cpp Settings.cpp SimpleViewDrawingArea.cpp
-  SimpleTypeBox.cpp TableBox.cpp TupleBox.cpp TreeViewValue.cpp
-  ValueBox.cpp ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp
-  ViewOutputBox.cpp XmlTypeBox.cpp ${OS_SPECIFIC_PATH_IMPL})
-
-ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
-
-SET_TARGET_PROPERTIES(vlegvle PROPERTIES ${VLE_LIBRARY_PROPERTIES})
-SET_TARGET_PROPERTIES(vlegvle PROPERTIES OUTPUT_NAME
-  "vlegvle-${VLE_VERSION_SHORT}")
-
-TARGET_LINK_LIBRARIES(vlegvle
-  ${GLADEMM_LIBRARIES}
-  ${GTKMM_LIBRARIES}
-  ${GLIBMM_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES}
-  ${GTKSOURCEVIEWMM_LIBRARIES}
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov
-  vlevpz
-  vledevs
-  vlemanager
-  vletranslator)
-
-INSTALL(TARGETS vlegvle DESTINATION
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-INSTALL(FILES gvle.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
-
-INSTALL(FILES ${GVLE_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
+install(FILES gvle.glade DESTINATION ${VLE_SHARE_DIRS}/glade)

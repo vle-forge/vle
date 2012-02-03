@@ -1,52 +1,5 @@
-INCLUDE_DIRECTORIES(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS}
-  ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS})
+add_sources(vlelib GraphTranslator.cpp GraphTranslator.hpp MatrixTranslator.cpp
+  MatrixTranslator.hpp)
 
-LINK_DIRECTORIES(
-  ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIR})
-
-IF(WIN32)
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
-    COMMAND ${CMAKE_RC_COMPILER}
-    -I${CMAKE_BINARY_DIR}/share
-    -i${CMAKE_BINARY_DIR}/share/vfl.rc
-    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-ELSE(WIN32)
-  SET(OS_SPECIFIC_PATH_IMPL)
-ENDIF(WIN32)
-
-SET(TRANSLATOR_HPP DllDefines.hpp GraphTranslator.hpp MatrixTranslator.hpp)
-
-SET(TRANSLATOR_CPP GraphTranslator.cpp MatrixTranslator.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
-
-ADD_LIBRARY(vletranslator SHARED ${TRANSLATOR_HPP};${TRANSLATOR_CPP})
-
-SET_TARGET_PROPERTIES(vletranslator PROPERTIES ${VLE_LIBRARY_PROPERTIES})
-SET_TARGET_PROPERTIES(vletranslator PROPERTIES OUTPUT_NAME
-  "vletranslator-${VLE_VERSION_SHORT}")
-
-TARGET_LINK_LIBRARIES(vletranslator
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES}
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov
-  vlevpz
-  vledevs
-  vlemanager)
-
-INSTALL(TARGETS vletranslator
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-INSTALL(FILES ${TRANSLATOR_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/translator)
+install(FILES GraphTranslator.hpp MatrixTranslator.hpp DESTINATION
+  ${VLE_INCLUDE_DIRS}/translator)

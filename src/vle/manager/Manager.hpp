@@ -29,7 +29,7 @@
 #ifndef VLE_MANAGER_MANAGER_HPP
 #define VLE_MANAGER_MANAGER_HPP
 
-#include <vle/manager/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <set>
@@ -46,7 +46,7 @@ typedef std::set < std::string > Depends;
  * launch experimental frames, to launch simulator in distant mode or to simply
  * launch simulations.
  */
-class VLE_MANAGER_EXPORT Manager
+class VLE_EXPORT Manager
 {
 public:
     /**
@@ -99,7 +99,7 @@ public:
      * experiment directory, we produce a list of dependencies.
      * @return The dictionnary.
      */
-    VLE_MANAGER_EXPORT static std::map < std::string, Depends > depends();
+    VLE_EXPORT static std::map < std::string, Depends > depends();
 
     //
     ///
@@ -143,7 +143,7 @@ private:
      * @brief A simple functor to produce a vpz::Vpz object from the
      * std::string filename. To use with std::transform for example.
      */
-    struct VLE_MANAGER_EXPORT BuildVPZ
+    struct VLE_EXPORT BuildVPZ
     {
         vpz::Vpz* operator()(const std::string& filename) const
         { return new vpz::Vpz(filename); }
@@ -166,7 +166,7 @@ private:
  * - initialize the singleton utils::Trace system.
  * - initialize the singleton \c boost::pool devs::Pools and value::Pools.
  */
-VLE_MANAGER_EXPORT void init();
+VLE_EXPORT void init();
 
 /**
  * @brief Delete all singleton from VLE system.
@@ -175,7 +175,7 @@ VLE_MANAGER_EXPORT void init();
  * - kill the value::Pools singleton.
  * - kill the devs::Pools singleton.
  */
-VLE_MANAGER_EXPORT void finalize();
+VLE_EXPORT void finalize();
 
 }} // namespace vle manager
 

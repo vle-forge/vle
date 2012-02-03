@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_TRACE_HPP
 #define VLE_UTILS_TRACE_HPP 1
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <boost/format/format_fwd.hpp>
 #include <string>
 
@@ -63,7 +63,7 @@ enum TraceLevelOptions
  * }
  * @endcode
  */
-class VLE_UTILS_EXPORT Trace
+class VLE_EXPORT Trace
 {
 public:
     /**

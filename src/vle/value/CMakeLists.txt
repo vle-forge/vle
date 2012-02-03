@@ -1,54 +1,12 @@
-INCLUDE_DIRECTORIES(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS}
-  ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS})
+add_sources(vlelib Boolean.cpp Boolean.hpp Double.cpp Double.hpp
+  Integer.cpp Integer.hpp Map.cpp Map.hpp Matrix.cpp Matrix.hpp
+  Null.cpp Null.hpp Set.cpp Set.hpp String.cpp String.hpp Table.cpp
+  Table.hpp Tuple.cpp Tuple.hpp Value.cpp Value.hpp XML.cpp XML.hpp)
 
-LINK_DIRECTORIES(
-  ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIR}
-  ${Boost_LIBRARY_DIRS})
+install(FILES Boolean.hpp Double.hpp Integer.hpp Map.hpp Matrix.hpp
+  Null.hpp Set.hpp String.hpp Table.hpp Tuple.hpp Value.hpp XML.hpp
+  DESTINATION ${VLE_INCLUDE_DIRS}/value)
 
-IF(WIN32)
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
-    COMMAND ${CMAKE_RC_COMPILER}
-    -I${CMAKE_BINARY_DIR}/share
-    -i${CMAKE_BINARY_DIR}/share/vfl.rc
-    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-ELSE(WIN32)
-  SET(OS_SPECIFIC_PATH_IMPL)
-ENDIF(WIN32)
-
-SET(VALUE_HPP Boolean.hpp DllDefines.hpp Double.hpp Integer.hpp Map.hpp
-  Matrix.hpp Null.hpp Set.hpp String.hpp Table.hpp Tuple.hpp Value.hpp XML.hpp)
-
-SET(VALUE_CPP Boolean.cpp Double.cpp Integer.cpp Map.cpp Matrix.cpp Null.cpp
-  Set.cpp String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
-
-ADD_LIBRARY(vlevalue SHARED ${VALUE_HPP};${VALUE_CPP})
-
-SET_TARGET_PROPERTIES(vlevalue PROPERTIES ${VLE_LIBRARY_PROPERTIES})
-SET_TARGET_PROPERTIES(vlevalue PROPERTIES OUTPUT_NAME
-  "vlevalue-${VLE_VERSION_SHORT}")
-
-TARGET_LINK_LIBRARIES(vlevalue
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_SERIALIZATION_LIBRARY}
-  ${OS_SPECIFIC_LIBRARIES}
-  vleutils)
-
-INSTALL(TARGETS vlevalue
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-INSTALL(FILES ${VALUE_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/value)
-
-IF (HAVE_UNITTESTFRAMEWORK)
-  ADD_SUBDIRECTORY(test)
-ENDIF (HAVE_UNITTESTFRAMEWORK)
+if (HAVE_UNITTESTFRAMEWORK)
+  add_subdirectory(test)
+endif (HAVE_UNITTESTFRAMEWORK)

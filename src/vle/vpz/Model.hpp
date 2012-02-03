@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_MODEL_HPP
 #define VLE_VPZ_MODEL_HPP
 
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/AtomicModels.hpp>
 #include <vle/graph/Model.hpp>
@@ -40,7 +40,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The vpz::Model is use to store the graph::Model hierarchy.
      */
-    class VLE_VPZ_EXPORT Model : public Base
+    class VLE_EXPORT Model : public Base
     {
     public:
         /**
@@ -137,7 +137,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Submodels, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Submodels : public Base
+    class VLE_EXPORT Submodels : public Base
     {
     public:
         /**
@@ -169,7 +169,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Connections, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Connections : public Base
+    class VLE_EXPORT Connections : public Base
     {
     public:
         /**
@@ -201,7 +201,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The InternalConnection, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT InternalConnection : public Base
+    class VLE_EXPORT InternalConnection : public Base
     {
     public:
         /**
@@ -233,7 +233,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The InputConnection, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT InputConnection : public Base
+    class VLE_EXPORT InputConnection : public Base
     {
     public:
         /**
@@ -265,7 +265,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The OutputConnection, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT OutputConnection : public Base
+    class VLE_EXPORT OutputConnection : public Base
     {
     public:
         /**
@@ -297,7 +297,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Origin, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Origin: public Base
+    class VLE_EXPORT Origin: public Base
     {
     public:
         /**
@@ -337,7 +337,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Destination, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Destination: public Base
+    class VLE_EXPORT Destination: public Base
     {
     public:
         /**

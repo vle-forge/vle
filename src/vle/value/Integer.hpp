@@ -33,14 +33,14 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Types.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace value {
 
 /**
  * @brief Integer Value encapsulate a C++ 'int32_t' type into a class.
  */
-class VLE_VALUE_EXPORT Integer : public Value
+class VLE_EXPORT Integer : public Value
 {
 public:
     /**

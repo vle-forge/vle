@@ -31,7 +31,7 @@
 
 #include <vle/vpz/Condition.hpp>
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <string>
 #include <list>
 
@@ -46,7 +46,7 @@ namespace vle { namespace vpz {
      * @brief This class describe a list of condition and allow loading and
      * writing a conditions and condition tags.
      */
-    class VLE_VPZ_EXPORT Conditions : public Base
+    class VLE_EXPORT Conditions : public Base
     {
     public:
         typedef ConditionList::iterator iterator;

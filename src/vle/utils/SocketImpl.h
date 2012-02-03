@@ -29,37 +29,37 @@
 #ifndef VLE_UTILS_SOCKETIMPL_HPP
 #define VLE_UTILS_SOCKETIMPL_HPP
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    void VLE_UTILS_EXPORT vleSocketInit(void);
+    void VLE_EXPORT vleSocketInit(void);
 
-    int VLE_UTILS_EXPORT vleSocketOpen(void);
+    int VLE_EXPORT vleSocketOpen(void);
 
-    int VLE_UTILS_EXPORT vleSocketOptLinger(int fd);
+    int VLE_EXPORT vleSocketOptLinger(int fd);
 
-    int VLE_UTILS_EXPORT vleSocketOptReuseAddr(int fd);
+    int VLE_EXPORT vleSocketOptReuseAddr(int fd);
 
-    int VLE_UTILS_EXPORT vleSocketConnect(int fd, const char* host, int port);
+    int VLE_EXPORT vleSocketConnect(int fd, const char* host, int port);
 
-    int VLE_UTILS_EXPORT vleSocketListen(int fd, int nb);
+    int VLE_EXPORT vleSocketListen(int fd, int nb);
 
-    int VLE_UTILS_EXPORT vleSocketBind(int fd, int port);
+    int VLE_EXPORT vleSocketBind(int fd, int port);
 
-    int VLE_UTILS_EXPORT vleSocketAccept(int fd);
+    int VLE_EXPORT vleSocketAccept(int fd);
 
-    int VLE_UTILS_EXPORT vleSocketClose(int fd);
+    int VLE_EXPORT vleSocketClose(int fd);
 
-    int VLE_UTILS_EXPORT vleSocketShutdown(int fd);
+    int VLE_EXPORT vleSocketShutdown(int fd);
 
-    int VLE_UTILS_EXPORT vleSocketSend(int fd, const void* buffer, int size);
+    int VLE_EXPORT vleSocketSend(int fd, const void* buffer, int size);
 
-    int VLE_UTILS_EXPORT vleSocketReceive(int fd, void* buffer, int size);
+    int VLE_EXPORT vleSocketReceive(int fd, void* buffer, int size);
 
-    int VLE_UTILS_EXPORT vleSocketErrno(void);
+    int VLE_EXPORT vleSocketErrno(void);
 
 #ifdef __cplusplus
 }

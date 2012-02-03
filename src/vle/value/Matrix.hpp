@@ -38,7 +38,7 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <boost/multi_array.hpp>
 
 namespace vle { namespace value {
@@ -63,7 +63,7 @@ typedef MatrixValue::const_array_view < 2 >::type ConstMatrixView;
  * Boost library (http://www.boost.org) class of two dimension of
  * value::Value.
  */
-class VLE_VALUE_EXPORT Matrix : public Value
+class VLE_EXPORT Matrix : public Value
 {
 public:
     /// Define indices of Matrix.
@@ -929,7 +929,7 @@ private:
  * @brief A functor to test is a Value is a Matrix. To use with algorithms
  * of test.
  */
-struct VLE_VALUE_EXPORT IsMatrixValue
+struct VLE_EXPORT IsMatrixValue
 {
     bool operator()(const value::Value& value) const
     { return value.getType() == Value::MATRIX; }

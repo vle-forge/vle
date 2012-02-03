@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_TEMPLATE_HPP
 #define VLE_UTILS_TEMPLATE_HPP
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <iostream>
 #include <string>
 #include <map>
@@ -37,7 +37,7 @@
 
 namespace vle { namespace utils {
 
-class VLE_UTILS_EXPORT SymbolString
+class VLE_EXPORT SymbolString
 {
 public:
     typedef std::map < std::string, std::string > symbols_t;
@@ -59,7 +59,7 @@ private:
     symbols_t lst_;
 };
 
-class VLE_UTILS_EXPORT SymbolBool
+class VLE_EXPORT SymbolBool
 {
 public:
     typedef std::map < std::string, bool > symbols_t;
@@ -81,7 +81,7 @@ private:
     symbols_t lst_;
 };
 
-class VLE_UTILS_EXPORT SymbolList
+class VLE_EXPORT SymbolList
 {
 public:
     typedef std::vector < std::string > value_t;
@@ -107,7 +107,7 @@ private:
     symbols_t lst_;
 };
 
-class VLE_UTILS_EXPORT Template
+class VLE_EXPORT Template
 {
 public:
     /**

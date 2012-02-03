@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_VIEWEVENT_HPP
 #define VLE_DEVS_VIEWEVENT_HPP 1
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/View.hpp>
 #include <vector>
 #include <cassert>
@@ -40,7 +40,7 @@ namespace vle { namespace devs {
  * ViewEvent is used in scheduller to store the date to launch observation of
  * atomic models.
  */
-class VLE_DEVS_EXPORT ViewEvent
+class VLE_EXPORT ViewEvent
 {
 public:
     /**

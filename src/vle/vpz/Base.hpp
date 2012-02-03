@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_BASE_HPP
 #define VLE_VPZ_BASE_HPP
 
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <ostream>
 
 namespace vle { namespace vpz {
@@ -38,7 +38,7 @@ namespace vle { namespace vpz {
      * @brief A base to class to force all inheritance classes to load and
      * write from an XML reference.
      */
-    class VLE_VPZ_EXPORT Base
+    class VLE_EXPORT Base
     {
     public:
         /**

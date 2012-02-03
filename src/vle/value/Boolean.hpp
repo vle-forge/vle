@@ -30,14 +30,14 @@
 #define VLE_VALUE_BOOLEAN_HPP 1
 
 #include <vle/value/Value.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace value {
 
 /**
  * @brief Boolean Value encapsulate a C++ 'bool' type into a class.
  */
-class VLE_VALUE_EXPORT Boolean : public Value
+class VLE_EXPORT Boolean : public Value
 {
 public:
     /**

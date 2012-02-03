@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_LOCALSTREAMWRITER_HPP
 #define VLE_DEVS_LOCALSTREAMWRITER_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/oov/LocalStreamReader.hpp>
 
@@ -39,7 +39,7 @@ namespace vle { namespace devs {
      * @brief Use a local communication to observe. LocalStreamWriter are just
      * a reference to the oov::LocalStreamReader.
      */
-    class VLE_DEVS_EXPORT LocalStreamWriter : public StreamWriter
+    class VLE_EXPORT LocalStreamWriter : public StreamWriter
     {
     public:
         LocalStreamWriter(const utils::ModuleManager& modulemgr)

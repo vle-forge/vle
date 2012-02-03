@@ -29,7 +29,7 @@
 #ifndef DEVS_MODELFACTORY_HPP
 #define DEVS_MODELFACTORY_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Model.hpp>
@@ -51,7 +51,7 @@ class Dynamics;
  * @brief Read simulations plugin from models directories and manage models
  * classes.
  */
-class VLE_DEVS_EXPORT ModelFactory : boost::noncopyable
+class VLE_EXPORT ModelFactory : boost::noncopyable
 {
 public:
     /**

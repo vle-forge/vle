@@ -38,7 +38,7 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <boost/serialization/map.hpp>
 #include <map>
 
@@ -53,7 +53,7 @@ typedef std::map < std::string, Value* > MapValue;
  * @brief Map Value a container to a pair of std::string, Value pointer. The
  * map can not contains null data.
  */
-class VLE_VALUE_EXPORT Map : public Value
+class VLE_EXPORT Map : public Value
 {
 public:
     typedef MapValue::size_type size_type;

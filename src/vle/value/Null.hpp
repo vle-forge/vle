@@ -30,7 +30,7 @@
 #define VLE_VALUE_NULL_HPP 1
 
 #include <vle/value/Value.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace value {
 
@@ -38,7 +38,7 @@ namespace vle { namespace value {
  * @brief A null Value. This class is uses to build empty value into
  * container. Can be useful on Map, Set etc.
  */
-class VLE_VALUE_EXPORT Null : public Value
+class VLE_EXPORT Null : public Value
 {
 public:
     /**
@@ -130,7 +130,7 @@ private:
  * it = std::find_if(v.begin(), v.end(), value::IsNullValue());
  * @endcode
  */
-struct VLE_VALUE_EXPORT IsNullValue
+struct VLE_EXPORT IsNullValue
 {
     /**
      * @brief Check if the value is a Null value.

@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_EXECUTIVE_HPP
 #define VLE_DEVS_EXECUTIVE_HPP 1
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -40,14 +40,14 @@
 
 #define DECLARE_EXECUTIVE(mdl)                                         \
 extern "C" {                                                           \
-    VLE_DEVS_EXPORT vle::devs::Dynamics*                               \
+    VLE_EXPORT vle::devs::Dynamics*                               \
         vle_make_new_executive(const vle::devs::ExecutiveInit& init,   \
                                const vle::devs::InitEventList& events) \
         {                                                              \
             return new mdl(init, events);                              \
         }                                                              \
                                                                        \
-        VLE_DEVS_EXPORT void                                           \
+        VLE_EXPORT void                                           \
         vle_api_level(vle::uint32_t* major,                            \
                       vle::uint32_t* minor,                            \
                       vle::uint32_t* patch)                            \
@@ -62,7 +62,7 @@ namespace vle { namespace devs {
 
 class Simulator;
 
-class VLE_DEVS_EXPORT ExecutiveInit : public DynamicsInit
+class VLE_EXPORT ExecutiveInit : public DynamicsInit
 {
 public:
     ExecutiveInit(const graph::AtomicModel& model,
@@ -86,7 +86,7 @@ private:
  * default, this model does nothing and it will be inherit to build
  * simulation components.
  */
-class VLE_DEVS_EXPORT Executive : public Dynamics
+class VLE_EXPORT Executive : public Dynamics
 {
 public:
     /**

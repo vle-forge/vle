@@ -1,56 +1,10 @@
-INCLUDE_DIRECTORIES(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS}
-  ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS})
+add_sources(vlelib ExperimentGenerator.cpp ExperimentGenerator.hpp
+  JustRun.cpp JustRun.hpp Manager.cpp Manager.hpp Run.cpp Run.hpp
+  RunManager.cpp RunManager.hpp Types.hpp)
 
-LINK_DIRECTORIES(
-  ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIR})
+install(FILES ExperimentGenerator.hpp JustRun.hpp Manager.hpp Run.hpp
+  RunManager.hpp Types.hpp DESTINATION ${VLE_INCLUDE_DIRS}/manager)
 
-IF(WIN32)
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
-    COMMAND ${CMAKE_RC_COMPILER}
-    -I${CMAKE_BINARY_DIR}/share
-    -i${CMAKE_BINARY_DIR}/share/vfl.rc
-    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-ELSE(WIN32)
-  SET(OS_SPECIFIC_PATH_IMPL)
-ENDIF(WIN32)
-
-SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp Manager.cpp RunManager.cpp
-  Run.cpp ${OS_SPECIFIC_PATH_IMPL})
-
-SET(MANAGER_HPP DllDefines.hpp ExperimentGenerator.hpp JustRun.hpp Manager.hpp
-  RunManager.hpp Run.hpp Types.hpp )
-
-ADD_LIBRARY(vlemanager SHARED ${MANAGER_CPP};${MANAGER_HPP})
-
-SET_TARGET_PROPERTIES(vlemanager PROPERTIES ${VLE_LIBRARY_PROPERTIES})
-SET_TARGET_PROPERTIES(vlemanager PROPERTIES OUTPUT_NAME
-  "vlemanager-${VLE_VERSION_SHORT}")
-
-TARGET_LINK_LIBRARIES(vlemanager
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES}
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov
-  vlevpz
-  vledevs)
-
-INSTALL(TARGETS vlemanager
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-INSTALL(FILES ${MANAGER_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/manager)
-
-IF (HAVE_UNITTESTFRAMEWORK)
-  ADD_SUBDIRECTORY(test)
-ENDIF (HAVE_UNITTESTFRAMEWORK)
+if (HAVE_UNITTESTFRAMEWORK)
+  add_subdirectory(test)
+endif (HAVE_UNITTESTFRAMEWORK)

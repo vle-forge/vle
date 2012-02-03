@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_VPZ_HPP
 #define VLE_VPZ_VPZ_HPP
 
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/vpz/Project.hpp>
 #include <vle/vpz/SaxParser.hpp>
 #include <set>
@@ -41,7 +41,7 @@ namespace vle { namespace vpz {
      * @brief The vpz::Vpz class is the complete representation of the Vpz XML
      * file. To get reference to these objects, uses the project functions.
      */
-    class VLE_VPZ_EXPORT Vpz : public Base
+    class VLE_EXPORT Vpz : public Base
     {
     public:
         /**

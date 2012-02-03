@@ -26,7 +26,7 @@
  */
 
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>

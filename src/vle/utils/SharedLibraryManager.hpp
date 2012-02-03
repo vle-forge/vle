@@ -28,7 +28,7 @@
 #ifndef VLE_UTILS_SHAREDLIBRARYMANAGER_HPP
 #define VLE_UTILS_SHAREDLIBRARYMANAGER_HPP
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <string>
 #include <vector>
 
@@ -68,7 +68,7 @@ namespace vle { namespace utils {
  *  // when exiting scope, mmg unload plug-ins, slm unload shared libray.
  * @endcode
  */
-class VLE_UTILS_EXPORT SharedLibraryManager
+class VLE_EXPORT SharedLibraryManager
 {
 public:
     /**

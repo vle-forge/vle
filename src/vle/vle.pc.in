@@ -7,10 +7,5 @@ Name: vle
 Description: VLE multimodelling and Simulation tools
 Requires: libxml-2.0 glibmm-2.4
 Version: @VLE_VERSION@
-Libs:	-L${libdir} \
-    -lvledevs-@VLE_VERSION_SHORT@ \
-    -lvlegraph-@VLE_VERSION_SHORT@ -lvlemanager-@VLE_VERSION_SHORT@ \
-    -lvleutils-@VLE_VERSION_SHORT@ -lvleoov-@VLE_VERSION_SHORT@ \
-    -lvlevalue-@VLE_VERSION_SHORT@ -lvlevpz-@VLE_VERSION_SHORT@ \
-    -lvletranslator-@VLE_VERSION_SHORT@
+Libs:	-L${libdir} -lvle-@VLE_VERSION_SHORT@
 Cflags: -I${includedir}/vle-@VLE_VERSION_SHORT@ -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@

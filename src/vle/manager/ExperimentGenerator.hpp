@@ -29,7 +29,7 @@
 #ifndef VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 #define VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 
-#include <vle/manager/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Conditions.hpp>
@@ -62,7 +62,7 @@ namespace vle { namespace manager {
  * The class ExperimentGenerator is no copyable and nonassignable and uses the
  * Pimpl idiom.
  */
-class VLE_MANAGER_EXPORT ExperimentGenerator
+class VLE_EXPORT ExperimentGenerator
 {
 public:
     /**

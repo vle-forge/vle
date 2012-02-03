@@ -1,21 +1,12 @@
-IF (VLE_HAVE_MPI)
-  INCLUDE_DIRECTORIES(
-    ${VLE_BINARY_DIR}/src
-    ${VLE_SOURCE_DIR}/src
-    ${MPI_INCLUDE_PATH}
-    ${Boost_INCLUDE_DIRS}
-    ${GLIBMM_INCLUDE_DIRS}
-    ${LIBXML_INCLUDE_DIRS})
-ELSE ()
-  INCLUDE_DIRECTORIES(
-    ${VLE_BINARY_DIR}/src
-    ${VLE_SOURCE_DIR}/src
-    ${Boost_INCLUDE_DIRS}
-    ${GLIBMM_INCLUDE_DIRS}
-    ${LIBXML_INCLUDE_DIRS})
-ENDIF ()
+include_directories(
+  ${VLE_BINARY_DIR}/src
+  ${VLE_SOURCE_DIR}/src
+  ${MPI_INCLUDE_PATH}
+  ${Boost_INCLUDE_DIRS}
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXML_INCLUDE_DIRS})
 
-LINK_DIRECTORIES(
+link_directories(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS})
@@ -35,11 +26,13 @@ IF (WIN32)
   ENDIF (VLE_HAVE_MPI)
 ELSE (WIN32)
   ADD_EXECUTABLE(vle main.cpp OptionGroup.cpp OptionGroup.hpp)
-  SET_TARGET_PROPERTIES(vle PROPERTIES ${VLE_APP_PROPERTIES})
+  SET_TARGET_PROPERTIES(vle PROPERTIES SOVERSION "${VLE_MAJOR}.${VLE_MINOR}"
+    VERSION "${VLE_MAJOR}.${VLE_MINOR}")
 
   IF (VLE_HAVE_MPI)
     ADD_EXECUTABLE(mvle mvle.cpp)
-    SET_TARGET_PROPERTIES(vle PROPERTIES ${VLE_APP_PROPERTIES})
+    SET_TARGET_PROPERTIES(vle PROPERTIES SOVERSION "${VLE_MAJOR}.${VLE_MINOR}"
+      VERSION "${VLE_MAJOR}.${VLE_MINOR}")
   ENDIF (VLE_HAVE_MPI)
 ENDIF (WIN32)
 
@@ -52,14 +45,7 @@ IF (VLE_HAVE_MPI)
     ${LIBXML_LIBRARIES}
     ${GTHREAD_LIBRARIES}
     ${Boost_FILESYSTEM_LIBRARY}
-    vleutils
-    vlevalue
-    vlegraph
-    vleoov
-    vlevpz
-    vledevs
-    vlemanager
-    vletranslator)
+    vlelib)
 ENDIF (VLE_HAVE_MPI)
 
 TARGET_LINK_LIBRARIES(vle
@@ -68,14 +54,7 @@ TARGET_LINK_LIBRARIES(vle
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov
-  vlevpz
-  vledevs
-  vlemanager
-  vletranslator)
+  vlelib)
 
 INSTALL(TARGETS vle DESTINATION bin)
 INSTALL(FILES vle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME

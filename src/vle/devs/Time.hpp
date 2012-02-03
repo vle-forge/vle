@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_TIME_HPP
 #define VLE_DEVS_TIME_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <string>
 #include <cmath>
 
@@ -119,7 +119,7 @@ inline static bool isNegativeInfinity(const Time& value)
  *
  * @return An @e std::string representation of the @e Time value.
  */
-VLE_DEVS_EXPORT std::string convertTimeToString(const Time& time);
+VLE_EXPORT std::string convertTimeToString(const Time& time);
 
 }} // namespace vle devs
 

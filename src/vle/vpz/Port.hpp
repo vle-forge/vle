@@ -30,14 +30,14 @@
 #define VLE_VPZ_PORT_HPP
 
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace vpz {
 
     /**
      * @brief The In port, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT In : public Base
+    class VLE_EXPORT In : public Base
     {
     public:
         /**
@@ -69,7 +69,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Out port, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Out : public Base
+    class VLE_EXPORT Out : public Base
     {
     public:
         /**
@@ -101,7 +101,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Init port, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Init : public Base
+    class VLE_EXPORT Init : public Base
     {
     public:
         /**
@@ -133,7 +133,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The State port, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT State : public Base
+    class VLE_EXPORT State : public Base
     {
     public:
         /**
@@ -165,7 +165,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Port, only used by the SaxParser.
      */
-    class VLE_VPZ_EXPORT Port : public Base
+    class VLE_EXPORT Port : public Base
     {
     public:
         /**

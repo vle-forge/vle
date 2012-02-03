@@ -29,7 +29,7 @@
 #ifndef DEVS_DYNAMICS_HPP
 #define DEVS_DYNAMICS_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
@@ -49,14 +49,14 @@
 
 #define DECLARE_DYNAMICS(mdl)                                         \
     extern "C" {                                                      \
-        VLE_DEVS_EXPORT vle::devs::Dynamics*                          \
+        VLE_EXPORT vle::devs::Dynamics*                          \
         vle_make_new_dynamics(const vle::devs::DynamicsInit& init,    \
                               const vle::devs::InitEventList& events) \
         {                                                             \
             return new mdl(init, events);                             \
         }                                                             \
                                                                       \
-        VLE_DEVS_EXPORT void                                          \
+        VLE_EXPORT void                                          \
         vle_api_level(vle::uint32_t* major,                           \
                       vle::uint32_t* minor,                           \
                       vle::uint32_t* patch)                           \
@@ -77,7 +77,7 @@ namespace vle { namespace devs {
      */
     typedef utils::PackageTable::index PackageId;
 
-    class VLE_DEVS_EXPORT DynamicsInit
+    class VLE_EXPORT DynamicsInit
     {
     public:
         DynamicsInit(const graph::AtomicModel& model,
@@ -100,7 +100,7 @@ namespace vle { namespace devs {
      * @brief Dynamics class represent a part of the DEVS simulator. This class
      * must be inherits to build simulation components.
      */
-    class VLE_DEVS_EXPORT Dynamics
+    class VLE_EXPORT Dynamics
     {
     public:
         /**

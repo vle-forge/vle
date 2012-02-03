@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_EXTERNALEVENTLIST_HPP
 #define VLE_DEVS_EXTERNALEVENTLIST_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/value/Map.hpp>

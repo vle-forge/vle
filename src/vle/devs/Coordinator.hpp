@@ -29,7 +29,7 @@
 #ifndef VLE_DEVS_COORDINATOR_HPP
 #define VLE_DEVS_COORDINATOR_HPP 1
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/View.hpp>
@@ -51,7 +51,7 @@ typedef std::map < graph::AtomicModel*, devs::Simulator* > SimulatorMap;
  * model.
  *
  */
-class VLE_DEVS_EXPORT Coordinator
+class VLE_EXPORT Coordinator
 {
 public:
     Coordinator(const utils::ModuleManager& modulemgr,

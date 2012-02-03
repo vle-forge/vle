@@ -29,13 +29,13 @@
 #ifndef VLE_UTILS_PACKAGETABLE_HPP
 #define VLE_UTILS_PACKAGETABLE_HPP
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <set>
 #include <string>
 
 namespace vle { namespace utils {
 
-    class VLE_UTILS_EXPORT PackageTable
+    class VLE_EXPORT PackageTable
     {
     public:
         typedef std::set < std::string > table_t;

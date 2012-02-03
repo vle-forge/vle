@@ -29,7 +29,7 @@
 #ifndef DEVS_STREAM_HPP
 #define DEVS_STREAM_HPP
 
-#include <vle/devs/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/value/Value.hpp>
@@ -49,7 +49,7 @@ namespace vle { namespace devs {
      * plugins.
      *
      */
-    class VLE_DEVS_EXPORT StreamWriter
+    class VLE_EXPORT StreamWriter
     {
     public:
         StreamWriter(const utils::ModuleManager& modulemgr)

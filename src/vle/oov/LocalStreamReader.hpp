@@ -30,7 +30,7 @@
 #define VLE_OOV_LOCALSTREAMREADER_HPP
 
 #include <vle/oov/StreamReader.hpp>
-#include <vle/oov/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace oov {
 
@@ -39,7 +39,7 @@ namespace vle { namespace oov {
      * a direct access to the observations information produced by models and
      * send via the devs::LocalStreamWriter.
      */
-    class VLE_OOV_EXPORT LocalStreamReader : public StreamReader
+    class VLE_EXPORT LocalStreamReader : public StreamReader
     {
     public:
         /**

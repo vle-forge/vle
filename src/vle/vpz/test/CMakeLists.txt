@@ -1,99 +1,37 @@
-INCLUDE_DIRECTORIES(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS}
-  ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS})
-
-LINK_DIRECTORIES(
-  ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIR}
-  ${Boost_LIBRARY_DIRS})
-
 ADD_EXECUTABLE(test_vpz_values test1.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_values
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
+
+TARGET_LINK_LIBRARIES(test_vpz_values vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ADD_EXECUTABLE(test_vpz_project test2.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_project
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
+
+TARGET_LINK_LIBRARIES(test_vpz_project vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ADD_EXECUTABLE(test_vpz_translator test3.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_translator
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
+
+TARGET_LINK_LIBRARIES(test_vpz_translator vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ADD_EXECUTABLE(test_vpz_io test4.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_io
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
+
+TARGET_LINK_LIBRARIES(test_vpz_io vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ADD_EXECUTABLE(test_vpz_oov test5.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_oov
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
+
+TARGET_LINK_LIBRARIES(test_vpz_oov vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ADD_EXECUTABLE(test_vpz_classes test6.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_classes
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
+
+TARGET_LINK_LIBRARIES(test_vpz_classes vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ADD_EXECUTABLE(test_vpz_graph test7.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_graph
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
+
+TARGET_LINK_LIBRARIES(test_vpz_graph vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 ADD_TEST(vpztest_values test_vpz_values)
 ADD_TEST(vpztest_project test_vpz_project)

@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_OBSERVABLE_HPP
 #define VLE_VPZ_OBSERVABLE_HPP
 
-#include <vle/vpz/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <map>
 #include <list>
@@ -57,7 +57,7 @@ namespace vle { namespace vpz {
      * </port>
      * @endcode
      */
-    class VLE_VPZ_EXPORT ObservablePort : public Base
+    class VLE_EXPORT ObservablePort : public Base
     {
     public:
         typedef ViewNameList::iterator iterator;
@@ -203,7 +203,7 @@ namespace vle { namespace vpz {
      * </observable>
      * @endcode
      */
-    class VLE_VPZ_EXPORT Observable : public Base
+    class VLE_EXPORT Observable : public Base
     {
     public:
         typedef ObservablePortList::iterator iterator;

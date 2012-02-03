@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_DATETIME_HPP
 #define VLE_UTILS_DATETIME_HPP
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <string>
 
 namespace vle { namespace utils {
@@ -43,7 +43,7 @@ enum DateTimeUnitOptions
     DATE_TIME_UNIT_YEAR
 };
 
-class VLE_UTILS_EXPORT DateTime
+class VLE_EXPORT DateTime
 {
 public:
     /**

@@ -31,7 +31,7 @@
 
 #include <vle/version.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/value/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -57,7 +57,7 @@ namespace vle { namespace value {
     /**
      * @brief Virtual class to assign Value into Event object.
      */
-    class VLE_VALUE_EXPORT Value
+    class VLE_EXPORT Value
     {
     public:
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
@@ -307,7 +307,7 @@ namespace vle { namespace value {
      * iterator it = std::find_if(begin(), end(), IsComposite());
      * @endcode
      */
-    struct VLE_VALUE_EXPORT IsComposite
+    struct VLE_EXPORT IsComposite
     {
         bool operator()(const Value& val) const
         { return Value::isComposite(&val); }
@@ -323,7 +323,7 @@ namespace vle { namespace value {
      * std::transform(vec.begin(), vec.end(), out.begin(), CloneValue());
      * @endcode
      */
-    struct VLE_VALUE_EXPORT CloneValue
+    struct VLE_EXPORT CloneValue
     {
 	Value* operator()(const Value& val) const
 	{ return val.clone(); }
@@ -335,12 +335,12 @@ namespace vle { namespace value {
     /**
      * @brief Initialize the boost::serialization object.
      */
-    VLE_VALUE_EXPORT void init();
+    VLE_EXPORT void init();
 
     /**
      * @brief Delete all singleton.
      */
-    VLE_VALUE_EXPORT void finalize();
+    VLE_EXPORT void finalize();
 
 }} // namespace vle
 

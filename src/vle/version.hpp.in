@@ -51,11 +51,6 @@
 #define VLE_LIBRARY_DIRS    ("${VLE_LIBRARY_DIRS}")
 #define VLE_SHARE_DIRS      ("${VLE_SHARE_DIRS}")
 
-/* compilation option */
-#define VLE_CXXFLAGS        ("${CMAKE_CXX_FLAGS}")
-#define VLE_CFLAGS          ("${CMAKE_C_FLAGS}")
-#define VLE_LDFLAGS         ("${CMAKE_LD_FLAGS}")
-
 /* cmake option/detection */
 #cmakedefine VLE_HAVE_GCC_ABI_DEMANGLE
 #cmakedefine VLE_HAVE_EXECINFO

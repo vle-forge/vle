@@ -29,7 +29,7 @@
 #ifndef VLE_UTILS_PARSER_HPP
 #define VLE_UTILS_PARSER_HPP 1
 
-#include <vle/utils/DllDefines.hpp>
+#include <vle/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
 #include <istream>
 #include <vector>
@@ -38,7 +38,7 @@
 
 namespace vle { namespace utils {
 
-struct VLE_UTILS_EXPORT Block
+struct VLE_EXPORT Block
 {
     typedef std::multimap < std::string, std::string > Strings;
     typedef std::multimap < std::string, double > Reals;
@@ -69,7 +69,7 @@ struct VLE_UTILS_EXPORT Block
     Blocks blocks;
 };
 
-class VLE_UTILS_EXPORT Parser
+class VLE_EXPORT Parser
 {
 public:
     /**
