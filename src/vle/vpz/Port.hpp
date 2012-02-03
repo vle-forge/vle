@@ -37,7 +37,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The In port, only used by the SaxParser.
      */
-    class VLE_EXPORT In : public Base
+    class VLE_API In : public Base
     {
     public:
         /**
@@ -69,7 +69,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Out port, only used by the SaxParser.
      */
-    class VLE_EXPORT Out : public Base
+    class VLE_API Out : public Base
     {
     public:
         /**
@@ -101,7 +101,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Init port, only used by the SaxParser.
      */
-    class VLE_EXPORT Init : public Base
+    class VLE_API Init : public Base
     {
     public:
         /**
@@ -133,7 +133,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The State port, only used by the SaxParser.
      */
-    class VLE_EXPORT State : public Base
+    class VLE_API State : public Base
     {
     public:
         /**
@@ -165,7 +165,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Port, only used by the SaxParser.
      */
-    class VLE_EXPORT Port : public Base
+    class VLE_API Port : public Base
     {
     public:
         /**

@@ -43,7 +43,7 @@ enum DateTimeUnitOptions
     DATE_TIME_UNIT_YEAR
 };
 
-class VLE_EXPORT DateTime
+class VLE_API DateTime
 {
 public:
     /**

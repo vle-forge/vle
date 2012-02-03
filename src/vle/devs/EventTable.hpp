@@ -72,7 +72,7 @@ namespace vle { namespace devs {
      * @e EventBagModel represents a bag or a set of internal and
      * external events for a specific model.
      */
-    class VLE_EXPORT EventBagModel
+    class VLE_API EventBagModel
     {
     public:
 	inline EventBagModel() :
@@ -139,7 +139,7 @@ namespace vle { namespace devs {
      * @brief Represent a set of event bags for all model.
      *
      */
-    class VLE_EXPORT CompleteEventBagModel
+    class VLE_API CompleteEventBagModel
     {
     public:
 	CompleteEventBagModel()
@@ -240,7 +240,7 @@ namespace vle { namespace devs {
      * @brief Scheduller class to manage internal, external and state events.
      *
      */
-    class VLE_EXPORT EventTable
+    class VLE_API EventTable
     {
     public:
         /**

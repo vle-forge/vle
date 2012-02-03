@@ -43,7 +43,7 @@ class Simulator;
  * graph::Model when output function are called.
  *
  */
-class VLE_EXPORT ExternalEvent
+class VLE_API ExternalEvent
 {
 public:
     ExternalEvent(const std::string& sourcePortName)

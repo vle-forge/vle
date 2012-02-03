@@ -40,7 +40,7 @@
 
 namespace vle { namespace gvle {
 
-    class VLE_EXPORT SimpleTypeBox : public Gtk::Dialog
+    class VLE_API SimpleTypeBox : public Gtk::Dialog
     {
     public:
         SimpleTypeBox(value::Value* base);

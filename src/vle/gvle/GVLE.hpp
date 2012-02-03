@@ -84,7 +84,7 @@ typedef std::vector < View * > ListView;
  * @brief GVLE is a Gtk::Window use to build the main window with all button
  * to control project.
  */
-class VLE_EXPORT GVLE : public Gtk::Window
+class VLE_API GVLE : public Gtk::Window
 {
 public:
     typedef std::multimap < std::string, std::string > MapCategory;

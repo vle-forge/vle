@@ -47,7 +47,7 @@ namespace vle { namespace gvle {
  * assert(font, "Monospace 10");
  * @endcode
  */
-class VLE_EXPORT Settings
+class VLE_API Settings
 {
 public:
     /**

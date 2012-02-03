@@ -37,7 +37,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Structure, only used by the SaxParser.
      */
-    class VLE_EXPORT Structures : public Base
+    class VLE_API Structures : public Base
     {
     public:
         /**

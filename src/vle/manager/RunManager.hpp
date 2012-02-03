@@ -40,7 +40,7 @@ namespace vle { namespace manager {
  *
  * The @e RunManager is no copyable and nonassignable and uses the Pimpl idiom.
  */
-class VLE_EXPORT RunManager
+class VLE_API RunManager
 {
 public:
     /**

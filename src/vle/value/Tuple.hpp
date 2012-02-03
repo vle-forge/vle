@@ -45,7 +45,7 @@ typedef std::vector < double > TupleValue;
  * @brief A Tuple Value is a container to store a list of double value into
  * an std::vector standard container.
  */
-class VLE_EXPORT Tuple : public Value
+class VLE_API Tuple : public Value
 {
 public:
     typedef TupleValue::size_type size_type;

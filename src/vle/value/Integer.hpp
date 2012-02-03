@@ -40,7 +40,7 @@ namespace vle { namespace value {
 /**
  * @brief Integer Value encapsulate a C++ 'int32_t' type into a class.
  */
-class VLE_EXPORT Integer : public Value
+class VLE_API Integer : public Value
 {
 public:
     /**

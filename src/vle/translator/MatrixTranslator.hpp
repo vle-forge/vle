@@ -116,7 +116,7 @@ namespace vle { namespace translator {
      * Mmoore = 4
      * @endcode
      */
-    class VLE_EXPORT MatrixTranslator
+    class VLE_API MatrixTranslator
     {
     public:
         MatrixTranslator(devs::Executive& exe)

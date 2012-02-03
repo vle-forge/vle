@@ -40,7 +40,7 @@ namespace vle { namespace oov {
      * an TCP/IP access to the observations information produced by models and
      * sends via the devs::NetStreamWriter.
      */
-    class VLE_EXPORT NetStreamReader : public StreamReader
+    class VLE_API NetStreamReader : public StreamReader
     {
     public:
         /**

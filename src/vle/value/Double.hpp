@@ -37,7 +37,7 @@ namespace vle { namespace value {
 /**
  * @brief Double Value encapsulate a C++ 'double' type into a class.
  */
-class VLE_EXPORT Double : public Value
+class VLE_API Double : public Value
 {
 public:
     /**

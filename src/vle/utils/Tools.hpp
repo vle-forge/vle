@@ -100,7 +100,7 @@ namespace vle { namespace utils {
      * @param locale The locale to check.
      * @return True if the locale exists, false otherwise.
      */
-    VLE_EXPORT bool isLocaleAvailable(const std::string& locale);
+    VLE_API bool isLocaleAvailable(const std::string& locale);
 
     /**
      * Return the a string version of v, in scientific notation
@@ -110,7 +110,7 @@ namespace vle { namespace utils {
      * @param locale  if true, use "," else use "."
      * @return the string representation of the double.
      */
-    VLE_EXPORT std::string toScientificString(
+    VLE_API std::string toScientificString(
         const double& v, bool locale = false);
 
     /**
@@ -121,7 +121,7 @@ namespace vle { namespace utils {
      *
      * @return the demangled string or the same if libcwd is not linked.
      */
-    VLE_EXPORT std::string demangle(const std::type_info& in);
+    VLE_API std::string demangle(const std::type_info& in);
 
     /**
      * Demangle the input string from C++ compiler.
@@ -131,7 +131,7 @@ namespace vle { namespace utils {
      *
      * @return the demangled string or the same if libcwd is not linked.
      */
-    VLE_EXPORT std::string demangle(const std::string& in);
+    VLE_API std::string demangle(const std::string& in);
 
     /**
      * Initialize the VLE system by:
@@ -141,12 +141,12 @@ namespace vle { namespace utils {
      * - initialize the WinSock
      * - initialize the thread system.
      */
-    VLE_EXPORT void init();
+    VLE_API void init();
 
     /**
      * Destroy all singleton and close systems.
      */
-    VLE_EXPORT void finalize();
+    VLE_API void finalize();
 
 }} // namespace vle utils
 

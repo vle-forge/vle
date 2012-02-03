@@ -52,11 +52,20 @@ else (WIN32)
 endif (WIN32)
 
 #
-# Build the shared or static library.
+# Build the shared or static library. If user assigns BUILD_SHARED_LIBS to ON,
+# then, we must define VLE_DLL to use correctly the DllDefines.hpp
 #
 
 add_library(vlelib
   DllDefines.hpp;${vlelib_SRCS};${OS_SPECIFIC_PATH_IMPL})
+
+if (BUILD_SHARED_LIBS)
+  set_target_properties(vlelib PROPERTIES DEFINE_SYMBOL
+    "VLE_DLL")
+
+  set_target_properties(vlelib PROPERTIES COMPILE_FLAGS
+    "-fvisibility=hidden -fvisibility-inlines-hidden")
+endif ()
 
 target_link_libraries(vlelib ${LIBXML2_LIBRAARIES} ${GLIBMM_LIBRARIES}
   ${GTKMM_LIBRARIES} ${LIBXML_LIBRARIES} ${GTHREAD_LIBRARIES}

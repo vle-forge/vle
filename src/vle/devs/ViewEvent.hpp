@@ -40,7 +40,7 @@ namespace vle { namespace devs {
  * ViewEvent is used in scheduller to store the date to launch observation of
  * atomic models.
  */
-class VLE_EXPORT ViewEvent
+class VLE_API ViewEvent
 {
 public:
     /**

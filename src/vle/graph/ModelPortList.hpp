@@ -37,7 +37,7 @@ namespace vle { namespace graph {
 
     class Model;
 
-    class VLE_EXPORT ModelPortList
+    class VLE_API ModelPortList
     {
     public:
         typedef std::multimap < Model*, std::string > Values;

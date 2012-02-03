@@ -51,7 +51,7 @@ class Dynamics;
  * @brief Read simulations plugin from models directories and manage models
  * classes.
  */
-class VLE_EXPORT ModelFactory : boost::noncopyable
+class VLE_API ModelFactory : boost::noncopyable
 {
 public:
     /**

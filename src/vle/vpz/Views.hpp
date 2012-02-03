@@ -47,7 +47,7 @@ namespace vle { namespace vpz {
      * using the View's name as key. The Views class store Outputs and
      * Observables objects too.
      */
-    class VLE_EXPORT Views : public Base
+    class VLE_API Views : public Base
     {
     public:
         typedef ViewList::iterator iterator;

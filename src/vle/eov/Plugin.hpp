@@ -38,24 +38,24 @@
 #include <gtkmm/container.h>
 #include <glibmm/thread.h>
 
-#define DECLARE_EOV_PLUGIN(x)                               \
-    extern "C" {                                            \
-        VLE_EXPORT vle::eov::Plugin*                    \
-        vle_make_new_eov(vle::oov::CairoPluginPtr cairoplg, \
-                         vle::eov::NetStreamReader* netsr)  \
-        {                                                   \
-            return new x(cairoplg, netsr);                  \
-        }                                                   \
-                                                            \
-        VLE_EXPORT void                                 \
-        vle_api_level(vle::uint32_t* major,                 \
-                      vle::uint32_t* minor,                 \
-                      vle::uint32_t* patch)                 \
-        {                                                   \
-            *major = VLE_MAJOR_VERSION;                     \
-            *minor = VLE_MINOR_VERSION;                     \
-            *patch = VLE_PATCH_VERSION;                     \
-        }                                                   \
+#define DECLARE_EOV_PLUGIN(x)                                   \
+    extern "C" {                                                \
+        VLE_API vle::eov::Plugin*                            \
+        vle_make_new_eov(vle::oov::CairoPluginPtr cairoplg,     \
+                         vle::eov::NetStreamReader* netsr)      \
+        {                                                       \
+            return new x(cairoplg, netsr);                      \
+        }                                                       \
+                                                                \
+        VLE_API void                                         \
+        vle_api_level(vle::uint32_t* major,                     \
+                      vle::uint32_t* minor,                     \
+                      vle::uint32_t* patch)                     \
+        {                                                       \
+            *major = VLE_MAJOR_VERSION;                         \
+            *minor = VLE_MINOR_VERSION;                         \
+            *patch = VLE_PATCH_VERSION;                         \
+        }                                                       \
     }
 
 namespace vle { namespace eov {
@@ -67,7 +67,7 @@ namespace vle { namespace eov {
      * interface around a vle::oov::CairoPlugin. Use the DECLARE_EOV_PLUGIN
      * macro to develop a plugin.
      */
-    class VLE_EXPORT Plugin : public sigc::trackable
+    class VLE_API Plugin : public sigc::trackable
     {
     public:
         /**

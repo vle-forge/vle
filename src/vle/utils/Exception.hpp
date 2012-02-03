@@ -41,7 +41,7 @@ namespace vle { namespace utils {
      * @brief Base class to manage exception in VLE application.
      *
      */
-    class VLE_EXPORT BaseError : public std::runtime_error
+    class VLE_API BaseError : public std::runtime_error
     {
     public:
         explicit BaseError(const std::string& argv = std::string())
@@ -55,7 +55,7 @@ namespace vle { namespace utils {
      * @brief Throw to report a bad file access (read, write, open).
      *
      */
-    class VLE_EXPORT FileError : public BaseError
+    class VLE_API FileError : public BaseError
     {
     public:
         explicit FileError(const std::string& argv = std::string())
@@ -69,7 +69,7 @@ namespace vle { namespace utils {
      * @brief Throw to report a bad XML file parsing.
      *
      */
-    class VLE_EXPORT ParseError : public BaseError
+    class VLE_API ParseError : public BaseError
     {
     public:
         explicit ParseError(const std::string& argv = std::string())
@@ -83,7 +83,7 @@ namespace vle { namespace utils {
      * @brief Throw to report a bad parameter.
      *
      */
-    class VLE_EXPORT ArgError : public BaseError
+    class VLE_API ArgError : public BaseError
     {
     public:
         explicit ArgError(const std::string& argv = std::string())
@@ -97,7 +97,7 @@ namespace vle { namespace utils {
      * @brief Throw to report a bad parameter.
      *
      */
-    class VLE_EXPORT CastError : public BaseError
+    class VLE_API CastError : public BaseError
     {
     public:
         explicit CastError(const std::string& argv = std::string())
@@ -111,7 +111,7 @@ namespace vle { namespace utils {
      * @brief Throw to report an internal error.
      *
      */
-    class VLE_EXPORT InternalError : public BaseError
+    class VLE_API InternalError : public BaseError
     {
     public:
         explicit InternalError(const std::string& argv = std::string())
@@ -124,7 +124,7 @@ namespace vle { namespace utils {
     /**
      * @brief Throw to report an modelling error.
      */
-    class VLE_EXPORT ModellingError : public BaseError
+    class VLE_API ModellingError : public BaseError
     {
     public:
         explicit ModellingError(const std::string& argv = std::string())
@@ -137,7 +137,7 @@ namespace vle { namespace utils {
     /**
      * @brief Throw to report an unimplemted feature.
      */
-    class VLE_EXPORT NotYetImplemented : public BaseError
+    class VLE_API NotYetImplemented : public BaseError
     {
     public:
         explicit NotYetImplemented(const std::string& argv = std::string())
@@ -150,7 +150,7 @@ namespace vle { namespace utils {
     /**
      * @brief Throw to report a DEVS graph library error.
      */
-    class VLE_EXPORT DevsGraphError : public BaseError
+    class VLE_API DevsGraphError : public BaseError
     {
     public:
         explicit DevsGraphError(const std::string& argv = std::string())
@@ -160,7 +160,7 @@ namespace vle { namespace utils {
             : BaseError(argv) {}
     };
 
-    class VLE_EXPORT VpzError : public BaseError
+    class VLE_API VpzError : public BaseError
     {
     public:
         explicit VpzError(const std::string& argv = std::string())
@@ -173,7 +173,7 @@ namespace vle { namespace utils {
     /**
      * @brief Throw to report an error in SaxParser.
      */
-    class VLE_EXPORT SaxParserError : public BaseError
+    class VLE_API SaxParserError : public BaseError
     {
     public:
         explicit SaxParserError(const std::string& argv = std::string())

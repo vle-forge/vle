@@ -48,7 +48,7 @@ namespace vle { namespace vpz {
      * @brief A condition define a couple model name, port name and a Value.
      * This class allow loading and writing a condition.
      */
-    class VLE_EXPORT Condition : public Base
+    class VLE_API Condition : public Base
     {
     public:
         typedef ConditionValues::iterator iterator;

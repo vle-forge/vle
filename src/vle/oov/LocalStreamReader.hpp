@@ -39,7 +39,7 @@ namespace vle { namespace oov {
      * a direct access to the observations information produced by models and
      * send via the devs::LocalStreamWriter.
      */
-    class VLE_EXPORT LocalStreamReader : public StreamReader
+    class VLE_API LocalStreamReader : public StreamReader
     {
     public:
         /**

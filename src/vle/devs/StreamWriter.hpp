@@ -49,7 +49,7 @@ namespace vle { namespace devs {
      * plugins.
      *
      */
-    class VLE_EXPORT StreamWriter
+    class VLE_API StreamWriter
     {
     public:
         StreamWriter(const utils::ModuleManager& modulemgr)

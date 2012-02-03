@@ -63,7 +63,7 @@ enum TraceLevelOptions
  * }
  * @endcode
  */
-class VLE_EXPORT Trace
+class VLE_API Trace
 {
 public:
     /**

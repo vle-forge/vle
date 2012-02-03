@@ -38,7 +38,7 @@ namespace vle { namespace vpz {
      * @brief A base to class to force all inheritance classes to load and
      * write from an XML reference.
      */
-    class VLE_EXPORT Base
+    class VLE_API Base
     {
     public:
         /**

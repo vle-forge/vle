@@ -38,7 +38,7 @@
 
 namespace vle { namespace utils {
 
-struct VLE_EXPORT Block
+struct VLE_API Block
 {
     typedef std::multimap < std::string, std::string > Strings;
     typedef std::multimap < std::string, double > Reals;
@@ -69,7 +69,7 @@ struct VLE_EXPORT Block
     Blocks blocks;
 };
 
-class VLE_EXPORT Parser
+class VLE_API Parser
 {
 public:
     /**

@@ -48,7 +48,7 @@ namespace vle { namespace vpz {
      * @brief Outputs is a container based on OutputList to build a list of
      * Output using the Output's name as key.
      */
-    class VLE_EXPORT Outputs : public Base
+    class VLE_API Outputs : public Base
     {
     public:
         typedef OutputList::iterator iterator;

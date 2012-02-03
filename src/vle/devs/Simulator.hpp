@@ -46,7 +46,7 @@ namespace vle { namespace devs {
      * represent the DEVS simulator.
      *
      */
-    class VLE_EXPORT Simulator
+    class VLE_API Simulator
     {
     public:
         typedef std::pair < Simulator*, std::string > TargetSimulator;

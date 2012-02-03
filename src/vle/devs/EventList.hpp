@@ -43,7 +43,7 @@ namespace vle { namespace devs {
      *
      */
     template < class Class >
-    class VLE_EXPORT EventList : public std::vector < Class* >
+    class VLE_API EventList : public std::vector < Class* >
     {
     public:
         /**

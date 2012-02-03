@@ -51,7 +51,7 @@ namespace vle { namespace utils {
      * utils::Package::Package().configure(std::cout, std::cerr);
      * @endcode
      */
-    class VLE_EXPORT Package
+    class VLE_API Package
     {
     public:
         /**

@@ -53,7 +53,7 @@ namespace vle { namespace graph {
      * @brief The DEVS model base class.
      *
      */
-    class VLE_EXPORT Model
+    class VLE_API Model
     {
     public:
         /**

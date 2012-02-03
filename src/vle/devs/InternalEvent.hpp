@@ -43,7 +43,7 @@ class Simulator;
  * The @e InternalEvent is only used by the scheduler of VLE. To
  * speed-up the simulation an @e InternalEvent can be invalidate.
  */
-class VLE_EXPORT InternalEvent
+class VLE_API InternalEvent
 {
 public:
     /**

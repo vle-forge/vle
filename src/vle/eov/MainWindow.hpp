@@ -51,7 +51,7 @@ namespace vle { namespace eov {
      * @brief A class to manage the Main Window of the Eov application. It use
      * libglademm to load graphical user interface.
      */
-    class VLE_EXPORT MainWindow : public sigc::trackable
+    class VLE_API MainWindow : public sigc::trackable
     {
     public:
         /**

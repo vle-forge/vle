@@ -49,7 +49,7 @@ namespace vle {
      * (local file system or internet address and the parametrization of the
      * plug-in).
      */
-    class VLE_EXPORT Output : public Base
+    class VLE_API Output : public Base
     {
     public:
         /**

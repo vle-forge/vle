@@ -119,7 +119,7 @@ inline static bool isNegativeInfinity(const Time& value)
  *
  * @return An @e std::string representation of the @e Time value.
  */
-VLE_EXPORT std::string convertTimeToString(const Time& time);
+VLE_API std::string convertTimeToString(const Time& time);
 
 }} // namespace vle devs
 

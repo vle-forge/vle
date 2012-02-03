@@ -48,7 +48,7 @@ namespace vle { namespace manager {
      * vpz files. Errors are log to specified output std::ostream. JustRun
      * provided access to the oov::PluginPtr object.
      */
-    class VLE_EXPORT JustRun
+    class VLE_API JustRun
     {
     public:
         /**
@@ -102,7 +102,7 @@ namespace vle { namespace manager {
      * @brief JustRunMono is the class for running simulation from specified vpz
      * files. All simulation are run on the same process.
      */
-    class VLE_EXPORT JustRunMono : public JustRun
+    class VLE_API JustRunMono : public JustRun
     {
     public:
         /**
@@ -129,7 +129,7 @@ namespace vle { namespace manager {
      * @brief JustRunThread is the class for running simulation from specified
      * vpz files. All simulation are run on the specified number of processor.
      */
-    class VLE_EXPORT JustRunThread : public JustRun
+    class VLE_API JustRunThread : public JustRun
     {
     public:
         /**

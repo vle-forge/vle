@@ -41,7 +41,7 @@ namespace vle { namespace vpz {
      * @brief The AtomicModel class is used by the AtomicModelList to attach an
      * atomic model to his conditions, observables and dynamics names.
      */
-    class VLE_EXPORT AtomicModel
+    class VLE_API AtomicModel
     {
     public:
         /**
@@ -143,7 +143,7 @@ namespace vle { namespace vpz {
      * @brief The AtomicModelList class is a dictionary used to attach atomic
      * model to conditions and dynamics names.
      */
-    class VLE_EXPORT AtomicModelList
+    class VLE_API AtomicModelList
     {
     public:
         typedef AtomicModels::iterator iterator;
@@ -341,7 +341,7 @@ namespace vle { namespace vpz {
      *               *newmygraph));
      * @endcode
      */
-    struct VLE_EXPORT CopyAtomicModel
+    struct VLE_API CopyAtomicModel
     {
         /**
          * @brief The constructor.

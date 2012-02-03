@@ -52,7 +52,7 @@ typedef std::vector < Value* > VectorValue;
 /**
  * @brief The Set Value is a vector of pointer of value.
  */
-class VLE_EXPORT Set : public Value
+class VLE_API Set : public Value
 {
 public:
     typedef VectorValue::size_type size_type;

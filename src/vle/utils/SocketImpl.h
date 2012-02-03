@@ -35,31 +35,31 @@
 extern "C" {
 #endif
 
-    void VLE_EXPORT vleSocketInit(void);
+    void VLE_API vleSocketInit(void);
 
-    int VLE_EXPORT vleSocketOpen(void);
+    int VLE_API vleSocketOpen(void);
 
-    int VLE_EXPORT vleSocketOptLinger(int fd);
+    int VLE_API vleSocketOptLinger(int fd);
 
-    int VLE_EXPORT vleSocketOptReuseAddr(int fd);
+    int VLE_API vleSocketOptReuseAddr(int fd);
 
-    int VLE_EXPORT vleSocketConnect(int fd, const char* host, int port);
+    int VLE_API vleSocketConnect(int fd, const char* host, int port);
 
-    int VLE_EXPORT vleSocketListen(int fd, int nb);
+    int VLE_API vleSocketListen(int fd, int nb);
 
-    int VLE_EXPORT vleSocketBind(int fd, int port);
+    int VLE_API vleSocketBind(int fd, int port);
 
-    int VLE_EXPORT vleSocketAccept(int fd);
+    int VLE_API vleSocketAccept(int fd);
 
-    int VLE_EXPORT vleSocketClose(int fd);
+    int VLE_API vleSocketClose(int fd);
 
-    int VLE_EXPORT vleSocketShutdown(int fd);
+    int VLE_API vleSocketShutdown(int fd);
 
-    int VLE_EXPORT vleSocketSend(int fd, const void* buffer, int size);
+    int VLE_API vleSocketSend(int fd, const void* buffer, int size);
 
-    int VLE_EXPORT vleSocketReceive(int fd, void* buffer, int size);
+    int VLE_API vleSocketReceive(int fd, void* buffer, int size);
 
-    int VLE_EXPORT vleSocketErrno(void);
+    int VLE_API vleSocketErrno(void);
 
 #ifdef __cplusplus
 }

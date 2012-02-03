@@ -37,7 +37,7 @@
 
 namespace vle { namespace utils {
 
-class VLE_EXPORT SymbolString
+class VLE_API SymbolString
 {
 public:
     typedef std::map < std::string, std::string > symbols_t;
@@ -59,7 +59,7 @@ private:
     symbols_t lst_;
 };
 
-class VLE_EXPORT SymbolBool
+class VLE_API SymbolBool
 {
 public:
     typedef std::map < std::string, bool > symbols_t;
@@ -81,7 +81,7 @@ private:
     symbols_t lst_;
 };
 
-class VLE_EXPORT SymbolList
+class VLE_API SymbolList
 {
 public:
     typedef std::vector < std::string > value_t;
@@ -107,7 +107,7 @@ private:
     symbols_t lst_;
 };
 
-class VLE_EXPORT Template
+class VLE_API Template
 {
 public:
     /**

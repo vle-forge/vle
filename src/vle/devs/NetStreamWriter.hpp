@@ -35,7 +35,7 @@
 
 namespace vle { namespace devs {
 
-    class VLE_EXPORT NetStreamWriter : public StreamWriter
+    class VLE_API NetStreamWriter : public StreamWriter
     {
     public:
         NetStreamWriter(const utils::ModuleManager& modulemgr);

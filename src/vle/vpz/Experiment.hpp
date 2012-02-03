@@ -40,7 +40,7 @@ namespace vle { namespace vpz {
      * @brief The experiment class stores information about experimental
      * conditions (initials values), observations, etc.
      */
-    class VLE_EXPORT Experiment : public Base
+    class VLE_API Experiment : public Base
     {
     public:
         /**

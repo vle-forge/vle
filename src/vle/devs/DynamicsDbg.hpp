@@ -33,27 +33,27 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/version.hpp>
 
-#define DECLARE_DYNAMICS_DBG(mdl)                                     \
-    extern "C" {                                                      \
-        VLE_EXPORT vle::devs::Dynamics*                          \
-        vle_make_new_dynamics(const vle::devs::DynamicsInit& init,    \
-                              const vle::devs::InitEventList& events) \
-        {                                                             \
-            vle::devs::DynamicsDbg* x__;                              \
-            x__ = new vle::devs::DynamicsDbg( init, events);          \
-            x__->set(new mdl(init, events));                          \
-            return x__;                                               \
-        }                                                             \
-                                                                      \
-        VLE_EXPORT void                                          \
-        vle_api_level(vle::uint32_t* major,                           \
-                      vle::uint32_t* minor,                           \
-                      vle::uint32_t* patch)                           \
-        {                                                             \
-            *major = VLE_MAJOR_VERSION;                               \
-            *minor = VLE_MINOR_VERSION;                               \
-            *patch = VLE_PATCH_VERSION;                               \
-        }                                                             \
+#define DECLARE_DYNAMICS_DBG(mdl)                                       \
+    extern "C" {                                                        \
+        VLE_API vle::devs::Dynamics*                                 \
+        vle_make_new_dynamics(const vle::devs::DynamicsInit& init,      \
+                              const vle::devs::InitEventList& events)   \
+        {                                                               \
+            vle::devs::DynamicsDbg* x__;                                \
+            x__ = new vle::devs::DynamicsDbg( init, events);            \
+            x__->set(new mdl(init, events));                            \
+            return x__;                                                 \
+        }                                                               \
+                                                                        \
+        VLE_API void                                                 \
+        vle_api_level(vle::uint32_t* major,                             \
+                      vle::uint32_t* minor,                             \
+                      vle::uint32_t* patch)                             \
+        {                                                               \
+            *major = VLE_MAJOR_VERSION;                                 \
+            *minor = VLE_MINOR_VERSION;                                 \
+            *patch = VLE_PATCH_VERSION;                                 \
+        }                                                               \
     }
 
 namespace vle { namespace devs {
@@ -62,7 +62,7 @@ namespace vle { namespace devs {
      * @brief A Dynamics debug class which wrap an another Dynamics to show
      * debug information. This class inherits the DEVS standard API.
      */
-    class VLE_EXPORT DynamicsDbg : public Dynamics
+    class VLE_API DynamicsDbg : public Dynamics
     {
     public:
         /**

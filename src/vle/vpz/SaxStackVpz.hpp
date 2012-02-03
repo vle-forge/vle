@@ -51,7 +51,7 @@ namespace vle {
     /**
      * @brief The SaxStackVpz is used to construct the vpz::Base hierarchy.
      */
-    class VLE_EXPORT SaxStackVpz
+    class VLE_API SaxStackVpz
     {
     public:
         /**

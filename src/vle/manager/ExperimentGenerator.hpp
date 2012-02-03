@@ -62,7 +62,7 @@ namespace vle { namespace manager {
  * The class ExperimentGenerator is no copyable and nonassignable and uses the
  * Pimpl idiom.
  */
-class VLE_EXPORT ExperimentGenerator
+class VLE_API ExperimentGenerator
 {
 public:
     /**

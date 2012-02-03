@@ -43,7 +43,7 @@ namespace vle { namespace vpz {
      * date, version and the hierachy of models, the list of dynamics, the
      * experiment conditions and observables, and the classes availables.
      */
-    class VLE_EXPORT Project : public Base
+    class VLE_API Project : public Base
     {
     public:
         /**

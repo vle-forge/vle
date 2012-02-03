@@ -45,7 +45,7 @@ namespace vle { namespace oov {
      * name) stored into a std::map to get the index of a value. The column 0 is
      * use for store a representation of the Time.
      */
-    class VLE_EXPORT OutputMatrix
+    class VLE_API OutputMatrix
     {
     public:
         ///! @brief define a list of string to define list of port.

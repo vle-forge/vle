@@ -60,7 +60,7 @@ namespace vle { namespace utils {
      * is localhost.
      * @param port output parameter to receive TCP/IP port. Default is 8000.
      */
-    VLE_EXPORT void explodeStringNet(const std::string& input,
+    VLE_API void explodeStringNet(const std::string& input,
                                            std::string& ip,
                                            int& port);
 
@@ -83,7 +83,7 @@ namespace vle { namespace utils {
      * @param port output parameter to receive TCP/IP port. Default is 8000.
      * @param directory output parameter to receive directory. Default is empty.
      */
-    VLE_EXPORT void explodeStringNet(const std::string& input,
+    VLE_API void explodeStringNet(const std::string& input,
                                            std::string& ip,
                                            int& port,
                                            std::string& directory);
@@ -91,7 +91,7 @@ namespace vle { namespace utils {
     /**
      * @brief Define base class of socket Client and Server classes.
      */
-    class VLE_EXPORT Base
+    class VLE_API Base
     {
     public:
         Base();
@@ -208,7 +208,7 @@ namespace vle { namespace utils {
      * utils::net::Client c("www.vle-project.org", 8000);
      * @endcode
      */
-    class VLE_EXPORT Client : public Base
+    class VLE_API Client : public Base
     {
     public:
         /**
@@ -323,7 +323,7 @@ namespace vle { namespace utils {
      * utils::net::Server s(8000);
      * @endcode
      */
-    class VLE_EXPORT Server : public Base
+    class VLE_API Server : public Base
     {
     public:
         Server(int port);

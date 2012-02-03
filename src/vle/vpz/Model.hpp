@@ -40,7 +40,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The vpz::Model is use to store the graph::Model hierarchy.
      */
-    class VLE_EXPORT Model : public Base
+    class VLE_API Model : public Base
     {
     public:
         /**
@@ -137,7 +137,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Submodels, only used by the SaxParser.
      */
-    class VLE_EXPORT Submodels : public Base
+    class VLE_API Submodels : public Base
     {
     public:
         /**
@@ -169,7 +169,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Connections, only used by the SaxParser.
      */
-    class VLE_EXPORT Connections : public Base
+    class VLE_API Connections : public Base
     {
     public:
         /**
@@ -201,7 +201,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The InternalConnection, only used by the SaxParser.
      */
-    class VLE_EXPORT InternalConnection : public Base
+    class VLE_API InternalConnection : public Base
     {
     public:
         /**
@@ -233,7 +233,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The InputConnection, only used by the SaxParser.
      */
-    class VLE_EXPORT InputConnection : public Base
+    class VLE_API InputConnection : public Base
     {
     public:
         /**
@@ -265,7 +265,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The OutputConnection, only used by the SaxParser.
      */
-    class VLE_EXPORT OutputConnection : public Base
+    class VLE_API OutputConnection : public Base
     {
     public:
         /**
@@ -297,7 +297,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Origin, only used by the SaxParser.
      */
-    class VLE_EXPORT Origin: public Base
+    class VLE_API Origin: public Base
     {
     public:
         /**
@@ -337,7 +337,7 @@ namespace vle { namespace vpz {
     /**
      * @brief The Destination, only used by the SaxParser.
      */
-    class VLE_EXPORT Destination: public Base
+    class VLE_API Destination: public Base
     {
     public:
         /**

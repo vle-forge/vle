@@ -36,24 +36,24 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/version.hpp>
 
-#define DECLARE_EXECUTIVE_DBG(mdl)                                     \
-    extern "C" {                                                       \
-        VLE_EXPORT vle::devs::Dynamics*                           \
-        vle_make_new_executive(const vle::devs::ExecutiveInit& init,   \
-                               const vle::devs::InitEventList& events) \
-        {                                                              \
-            return new vle::devs::ExecutiveDbg < mdl >(init, events);  \
-        }                                                              \
-                                                                       \
-        VLE_EXPORT void                                           \
-        vle_api_level(vle::uint32_t* major,                            \
-                      vle::uint32_t* minor,                            \
-                      vle::uint32_t* patch)                            \
-        {                                                              \
-            *major = VLE_MAJOR_VERSION;                                \
-            *minor = VLE_MINOR_VERSION;                                \
-            *patch = VLE_PATCH_VERSION;                                \
-        }                                                              \
+#define DECLARE_EXECUTIVE_DBG(mdl)                                      \
+    extern "C" {                                                        \
+        VLE_API vle::devs::Dynamics*                                 \
+        vle_make_new_executive(const vle::devs::ExecutiveInit& init,    \
+                               const vle::devs::InitEventList& events)  \
+        {                                                               \
+            return new vle::devs::ExecutiveDbg < mdl >(init, events);   \
+        }                                                               \
+                                                                        \
+        VLE_API void                                                 \
+        vle_api_level(vle::uint32_t* major,                             \
+                      vle::uint32_t* minor,                             \
+                      vle::uint32_t* patch)                             \
+        {                                                               \
+            *major = VLE_MAJOR_VERSION;                                 \
+            *minor = VLE_MINOR_VERSION;                                 \
+            *patch = VLE_PATCH_VERSION;                                 \
+        }                                                               \
     }
 
 namespace vle { namespace devs {

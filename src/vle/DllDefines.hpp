@@ -29,14 +29,43 @@
 #ifndef VLE_DLLDEFINES_HPP
 #define VLE_DLLDEFINES_HPP
 
-#if defined(__WIN32__)
-  #if defined(vlelib_EXPORTS)
-    #define VLE_EXPORT __declspec(dllexport)
-  #else
-    #define VLE_EXPORT __declspec(dllimport)
-  #endif
+/*
+ * See. http://gcc.gnu.org/wiki/Visibility
+ */
+
+#if defined _WIN32 || defined __CYGWIN__
+#  define VLE_HELPER_DLL_IMPORT __declspec(dllimport)
+#  define VLE_HELPER_DLL_EXPORT __declspec(dllexport)
+#  define VLE_HELPER_DLL_LOCAL
 #else
- #define VLE_EXPORT
+#  if __GNUC__ >= 4
+#    define VLE_HELPER_DLL_IMPORT __attribute__ ((visibility ("default")))
+#    define VLE_HELPER_DLL_EXPORT __attribute__ ((visibility ("default")))
+#    define VLE_HELPER_DLL_LOCAL  __attribute__ ((visibility ("hidden")))
+#else
+#    define VLE_HELPER_DLL_IMPORT
+#    define VLE_HELPER_DLL_EXPORT
+#    define VLE_HELPER_DLL_LOCAL
+#  endif
+#endif
+
+/*
+ * Now we use the generic helper definitions above to define VLE_API
+ * and VLE_LOCAL. VLE_API is used for the public API symbols. It
+ * either DLL imports or DLL exports (or does nothing for static
+ * build) VLE_LOCAL is used for non-api symbols.
+ */
+
+#ifdef VLE_DLL
+#  ifdef vlelib_EXPORTS
+#    define VLE_API VLE_HELPER_DLL_EXPORT
+#  else
+#    define VLE_API VLE_HELPER_DLL_IMPORT
+#  endif
+#  define VLE_LOCAL VLE_HELPER_DLL_LOCAL
+#else
+#  define VLE_API
+#  define VLE_LOCAL
 #endif
 
 #endif

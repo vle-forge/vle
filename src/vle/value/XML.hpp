@@ -38,7 +38,7 @@ namespace vle { namespace value {
 /**
  * @brief Xml Value encapsulates a C++ std::string type into a class.
  */
-class VLE_EXPORT Xml : public Value
+class VLE_API Xml : public Value
 {
 public:
     /**

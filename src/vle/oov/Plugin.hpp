@@ -34,23 +34,23 @@
 #include <vle/value/Set.hpp>
 #include <vle/version.hpp>
 
-#define DECLARE_OOV_PLUGIN(x)                         \
-    extern "C" {                                      \
-        VLE_EXPORT vle::oov::Plugin*              \
-        vle_make_new_oov(const std::string& location) \
-        {                                             \
-            return new x(location);                   \
-        }                                             \
-                                                      \
-        VLE_EXPORT void                           \
-        vle_api_level(vle::uint32_t* major,           \
-                      vle::uint32_t* minor,           \
-                      vle::uint32_t* patch)           \
-        {                                             \
-            *major = VLE_MAJOR_VERSION;               \
-            *minor = VLE_MINOR_VERSION;               \
-            *patch = VLE_PATCH_VERSION;               \
-        }                                             \
+#define DECLARE_OOV_PLUGIN(x)                           \
+    extern "C" {                                        \
+        VLE_API vle::oov::Plugin*                    \
+        vle_make_new_oov(const std::string& location)   \
+        {                                               \
+            return new x(location);                     \
+        }                                               \
+                                                        \
+        VLE_API void                                 \
+        vle_api_level(vle::uint32_t* major,             \
+                      vle::uint32_t* minor,             \
+                      vle::uint32_t* patch)             \
+        {                                               \
+            *major = VLE_MAJOR_VERSION;                 \
+            *minor = VLE_MINOR_VERSION;                 \
+            *patch = VLE_PATCH_VERSION;                 \
+        }                                               \
     }
 
 namespace vle { namespace oov {
@@ -70,7 +70,7 @@ namespace vle { namespace oov {
      * DECLARE_OOV_PLUGIN(Gnuplot);
      * @endcode
      */
-    class VLE_EXPORT Plugin
+    class VLE_API Plugin
     {
     public:
         /**

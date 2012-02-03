@@ -44,7 +44,7 @@ namespace vle { namespace oov {
      * DECLARE_OOV_PLUGIN(Gnuplot);
      * @endcode
      */
-    class VLE_EXPORT CairoPlugin : public Plugin
+    class VLE_API CairoPlugin : public Plugin
     {
     public:
         /**

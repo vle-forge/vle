@@ -45,7 +45,7 @@ namespace vle { namespace vpz {
      * @brief The class Classes is build on the ClassList typedef to construct a
      * list of class.
      */
-    class VLE_EXPORT Classes : public Base
+    class VLE_API Classes : public Base
     {
     public:
         typedef ClassList::iterator         iterator;

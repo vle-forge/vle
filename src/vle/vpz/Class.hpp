@@ -40,7 +40,7 @@ namespace vle { namespace vpz {
      * new graph::Model hierarchy and a vpz::AtomicModels class to build easily
      * new structure of models.
      */
-    class VLE_EXPORT Class : public Base
+    class VLE_API Class : public Base
     {
     public:
         /**

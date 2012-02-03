@@ -39,7 +39,7 @@ namespace vle { namespace eov {
 
 class Window;
 
-class VLE_EXPORT NetStreamReader : public oov::NetStreamReader
+class VLE_API NetStreamReader : public oov::NetStreamReader
 {
 public:
     NetStreamReader(const utils::ModuleManager& modulemgr,

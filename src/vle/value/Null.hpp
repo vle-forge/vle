@@ -38,7 +38,7 @@ namespace vle { namespace value {
  * @brief A null Value. This class is uses to build empty value into
  * container. Can be useful on Map, Set etc.
  */
-class VLE_EXPORT Null : public Value
+class VLE_API Null : public Value
 {
 public:
     /**
@@ -130,7 +130,7 @@ private:
  * it = std::find_if(v.begin(), v.end(), value::IsNullValue());
  * @endcode
  */
-struct VLE_EXPORT IsNullValue
+struct VLE_API IsNullValue
 {
     /**
      * @brief Check if the value is a Null value.

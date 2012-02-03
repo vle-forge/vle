@@ -45,7 +45,7 @@ namespace vle { namespace vpz {
      * more particulary, the complex value::Value like value::Set, value::Map,
      * value::Matrix.
      */
-    class VLE_EXPORT ValueStackSax
+    class VLE_API ValueStackSax
     {
     public:
         /**

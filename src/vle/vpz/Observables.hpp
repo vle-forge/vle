@@ -46,7 +46,7 @@ namespace vle { namespace vpz {
      * @brief Observables is a container based on ObservableList to build a list
      * of Observable using the Observable's name as key.
      */
-    class VLE_EXPORT Observables : public Base
+    class VLE_API Observables : public Base
     {
     public:
         typedef ObservableList::iterator iterator;

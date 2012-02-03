@@ -76,7 +76,7 @@ namespace vle { namespace utils {
      * r.weibull(1.0, 1.0);
      * @endcode
      */
-    class VLE_EXPORT Rand
+    class VLE_API Rand
     {
     public:
         typedef boost::mt19937::result_type result_type;

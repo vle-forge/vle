@@ -46,7 +46,7 @@ typedef std::set < std::string > Depends;
  * launch experimental frames, to launch simulator in distant mode or to simply
  * launch simulations.
  */
-class VLE_EXPORT Manager
+class VLE_API Manager
 {
 public:
     /**
@@ -99,7 +99,7 @@ public:
      * experiment directory, we produce a list of dependencies.
      * @return The dictionnary.
      */
-    VLE_EXPORT static std::map < std::string, Depends > depends();
+    VLE_API static std::map < std::string, Depends > depends();
 
     //
     ///
@@ -143,7 +143,7 @@ private:
      * @brief A simple functor to produce a vpz::Vpz object from the
      * std::string filename. To use with std::transform for example.
      */
-    struct VLE_EXPORT BuildVPZ
+    struct VLE_API BuildVPZ
     {
         vpz::Vpz* operator()(const std::string& filename) const
         { return new vpz::Vpz(filename); }
@@ -166,7 +166,7 @@ private:
  * - initialize the singleton utils::Trace system.
  * - initialize the singleton \c boost::pool devs::Pools and value::Pools.
  */
-VLE_EXPORT void init();
+VLE_API void init();
 
 /**
  * @brief Delete all singleton from VLE system.
@@ -175,7 +175,7 @@ VLE_EXPORT void init();
  * - kill the value::Pools singleton.
  * - kill the devs::Pools singleton.
  */
-VLE_EXPORT void finalize();
+VLE_API void finalize();
 
 }} // namespace vle manager
 

@@ -51,7 +51,7 @@ typedef std::map < graph::AtomicModel*, devs::Simulator* > SimulatorMap;
  * model.
  *
  */
-class VLE_EXPORT Coordinator
+class VLE_API Coordinator
 {
 public:
     Coordinator(const utils::ModuleManager& modulemgr,

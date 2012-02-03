@@ -63,7 +63,7 @@ typedef MatrixValue::const_array_view < 2 >::type ConstMatrixView;
  * Boost library (http://www.boost.org) class of two dimension of
  * value::Value.
  */
-class VLE_EXPORT Matrix : public Value
+class VLE_API Matrix : public Value
 {
 public:
     /// Define indices of Matrix.
@@ -929,7 +929,7 @@ private:
  * @brief A functor to test is a Value is a Matrix. To use with algorithms
  * of test.
  */
-struct VLE_EXPORT IsMatrixValue
+struct VLE_API IsMatrixValue
 {
     bool operator()(const value::Value& value) const
     { return value.getType() == Value::MATRIX; }

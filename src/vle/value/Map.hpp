@@ -53,7 +53,7 @@ typedef std::map < std::string, Value* > MapValue;
  * @brief Map Value a container to a pair of std::string, Value pointer. The
  * map can not contains null data.
  */
-class VLE_EXPORT Map : public Value
+class VLE_API Map : public Value
 {
 public:
     typedef MapValue::size_type size_type;

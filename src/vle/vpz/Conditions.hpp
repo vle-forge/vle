@@ -46,7 +46,7 @@ namespace vle { namespace vpz {
      * @brief This class describe a list of condition and allow loading and
      * writing a conditions and condition tags.
      */
-    class VLE_EXPORT Conditions : public Base
+    class VLE_API Conditions : public Base
     {
     public:
         typedef ConditionList::iterator iterator;

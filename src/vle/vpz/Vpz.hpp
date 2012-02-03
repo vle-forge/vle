@@ -41,7 +41,7 @@ namespace vle { namespace vpz {
      * @brief The vpz::Vpz class is the complete representation of the Vpz XML
      * file. To get reference to these objects, uses the project functions.
      */
-    class VLE_EXPORT Vpz : public Base
+    class VLE_API Vpz : public Base
     {
     public:
         /**

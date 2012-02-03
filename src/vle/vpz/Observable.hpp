@@ -57,7 +57,7 @@ namespace vle { namespace vpz {
      * </port>
      * @endcode
      */
-    class VLE_EXPORT ObservablePort : public Base
+    class VLE_API ObservablePort : public Base
     {
     public:
         typedef ViewNameList::iterator iterator;
@@ -203,7 +203,7 @@ namespace vle { namespace vpz {
      * </observable>
      * @endcode
      */
-    class VLE_EXPORT Observable : public Base
+    class VLE_API Observable : public Base
     {
     public:
         typedef ObservablePortList::iterator iterator;

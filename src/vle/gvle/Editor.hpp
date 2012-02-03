@@ -51,7 +51,7 @@ class View;
 /**
  * @brief Document class used within Gtk::Notebook
  */
-class VLE_EXPORT Document : public Gtk::ScrolledWindow
+class VLE_API Document : public Gtk::ScrolledWindow
 {
 public:
     Document(GVLE* gvle, const std::string& filepath);
@@ -102,7 +102,7 @@ private:
     std::string    mFileName;
 };
 
-class VLE_EXPORT DocumentText : public Document
+class VLE_API DocumentText : public Document
 {
 public:
     DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false,
@@ -151,7 +151,7 @@ private:
     void applyEditingProperties();
 };
 
-class VLE_EXPORT DocumentDrawingArea : public Document
+class VLE_API DocumentDrawingArea : public Document
 {
 public:
     DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
@@ -194,7 +194,7 @@ protected:
     Gtk::Adjustment     mAdjustHeight;
 };
 
-class VLE_EXPORT DocumentCompleteDrawingArea : public DocumentDrawingArea
+class VLE_API DocumentCompleteDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentCompleteDrawingArea(GVLE* gvle, const std::string& filePath,
@@ -207,7 +207,7 @@ public:
 private:
 };
 
-class VLE_EXPORT DocumentSimpleDrawingArea : public DocumentDrawingArea
+class VLE_API DocumentSimpleDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentSimpleDrawingArea(GVLE* gvle, const std::string& filePath,
@@ -219,7 +219,7 @@ public:
 
 };
 
-class VLE_EXPORT Editor : public Gtk::Notebook
+class VLE_API Editor : public Gtk::Notebook
 {
 public:
     typedef std::map < std::string, Document* > Documents;

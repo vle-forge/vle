@@ -73,7 +73,7 @@ namespace vle { namespace utils {
  * The @c Preferences class uses the pimpl idiom and can not be copyable and
  * assignable.
  */
-class VLE_EXPORT Preferences
+class VLE_API Preferences
 {
 public:
     /**

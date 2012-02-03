@@ -68,7 +68,7 @@ namespace vle { namespace utils {
  *  // when exiting scope, mmg unload plug-ins, slm unload shared libray.
  * @endcode
  */
-class VLE_EXPORT SharedLibraryManager
+class VLE_API SharedLibraryManager
 {
 public:
     /**

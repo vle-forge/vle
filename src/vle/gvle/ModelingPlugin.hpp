@@ -40,24 +40,24 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#define DECLARE_GVLE_MODELINGPLUGIN(x)                         \
-    extern "C" {                                               \
-	VLE_EXPORT vle::gvle::ModelingPlugin*             \
-	vle_make_new_gvle_modeling(const std::string& package, \
-				   const std::string& library) \
-	{                                                      \
-	    return new x(package, library);                    \
-	}                                                      \
-                                                               \
-	VLE_EXPORT void                                   \
-	vle_api_level(vle::uint32_t* major,                    \
-		      vle::uint32_t* minor,                    \
-		      vle::uint32_t* patch)                    \
-	{                                                      \
-	    *major = VLE_MAJOR_VERSION;                        \
-	    *minor = VLE_MINOR_VERSION;                        \
-	    *patch = VLE_PATCH_VERSION;                        \
-	}                                                      \
+#define DECLARE_GVLE_MODELINGPLUGIN(x)                          \
+    extern "C" {                                                \
+	VLE_API vle::gvle::ModelingPlugin*                   \
+	vle_make_new_gvle_modeling(const std::string& package,  \
+				   const std::string& library)  \
+	{                                                       \
+	    return new x(package, library);                     \
+	}                                                       \
+                                                                \
+	VLE_API void                                         \
+	vle_api_level(vle::uint32_t* major,                     \
+		      vle::uint32_t* minor,                     \
+		      vle::uint32_t* patch)                     \
+	{                                                       \
+	    *major = VLE_MAJOR_VERSION;                         \
+	    *minor = VLE_MINOR_VERSION;                         \
+	    *patch = VLE_PATCH_VERSION;                         \
+	}                                                       \
     }
 
 namespace vle { namespace gvle {
@@ -66,7 +66,7 @@ namespace vle { namespace gvle {
  * @brief Define a plug-in to build source code, DEVS atomic model and its
  * experiment infortion (dynamics, conditions, observations).
  */
-class VLE_EXPORT ModelingPlugin
+class VLE_API ModelingPlugin
 {
 public:
     /**

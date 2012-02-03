@@ -46,7 +46,7 @@ namespace vle { namespace utils {
      * The hostname value is a string and it accepts IP address or complete
      * hostname.
      */
-    class VLE_EXPORT Host
+    class VLE_API Host
     {
     public:
         /**
@@ -135,7 +135,7 @@ namespace vle { namespace utils {
      * class can write XML hosts file and add/remove host.
      *
      */
-    class VLE_EXPORT Hosts
+    class VLE_API Hosts
     {
     public:
         typedef std::set < Host > SetHosts;

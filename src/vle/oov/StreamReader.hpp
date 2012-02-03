@@ -42,7 +42,7 @@ namespace vle { namespace oov {
      * information from the devs::StreamWriter classes add give this information
      * to the oov::Plugin.
      */
-    class VLE_EXPORT StreamReader
+    class VLE_API StreamReader
     {
     public:
         /**

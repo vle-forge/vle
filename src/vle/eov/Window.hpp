@@ -37,7 +37,7 @@
 
 namespace vle { namespace eov {
 
-    class VLE_EXPORT Window : public Gtk::Window
+    class VLE_API Window : public Gtk::Window
     {
     public:
         Window(Glib::Mutex& mutex, int time);

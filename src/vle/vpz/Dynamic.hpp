@@ -50,7 +50,7 @@ namespace vle { namespace vpz {
      *
      * @endcode
      */
-    class VLE_EXPORT Dynamic : public Base
+    class VLE_API Dynamic : public Base
     {
     public:
         /**

@@ -52,7 +52,7 @@ namespace vle { namespace devs {
      * Coordinators.
      *
      */
-    class VLE_EXPORT RootCoordinator
+    class VLE_API RootCoordinator
     {
     public:
         RootCoordinator(const utils::ModuleManager& modulemgr);

@@ -40,7 +40,7 @@ namespace vle { namespace vpz {
      * plug-in. This View can be timed by a timestep, finish or completely
      * event and make link with Output by name.
      */
-    class VLE_EXPORT View : public Base
+    class VLE_API View : public Base
     {
     public:
         /**

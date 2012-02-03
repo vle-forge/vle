@@ -71,7 +71,7 @@ enum RemoteManagerActions
  * mgr.start(REMOTE_MANAGER_INSTALL, "glue-1.0", &std::cout);
  * @endcode
  */
-class VLE_EXPORT RemoteManager
+class VLE_API RemoteManager
 {
 public:
     /**

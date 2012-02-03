@@ -46,7 +46,7 @@ namespace vle { namespace vpz {
      * @brief The SaxParser is a C/C++ interface between the libxml-2.0 and the
      * VLE classes vpz.
      */
-    class VLE_EXPORT SaxParser
+    class VLE_API SaxParser
     {
     public:
         /**
@@ -357,7 +357,7 @@ namespace vle { namespace vpz {
      * boolean
      * @return The boolean.
      */
-    VLE_EXPORT bool xmlCharToBoolean(const xmlChar* str);
+    VLE_API bool xmlCharToBoolean(const xmlChar* str);
 
     /**
      * @brief Convert the xmlChar pointer to a long integer.
@@ -366,7 +366,7 @@ namespace vle { namespace vpz {
      * long integer.
      * @return The long integer.
      */
-    VLE_EXPORT long int xmlCharToInt(const xmlChar* str);
+    VLE_API long int xmlCharToInt(const xmlChar* str);
 
     /**
      * @brief Convert the xmlChar pointer to an unsigned long integer.
@@ -375,7 +375,7 @@ namespace vle { namespace vpz {
      * unsigned long integer.
      * @return The unsigned long integer.
      */
-    VLE_EXPORT unsigned long int xmlCharToUnsignedInt(const xmlChar* str);
+    VLE_API unsigned long int xmlCharToUnsignedInt(const xmlChar* str);
 
     /**
      * @brief Convert the xmlChar pointer to a double.
@@ -384,7 +384,7 @@ namespace vle { namespace vpz {
      * double
      * @return The double.
      */
-    VLE_EXPORT double xmlCharToDouble(const xmlChar* str);
+    VLE_API double xmlCharToDouble(const xmlChar* str);
 
 }} // namespace vle vpz
 

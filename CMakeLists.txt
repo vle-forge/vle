@@ -284,5 +284,6 @@ message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
 message(STATUS "Build with gvle...............: ${HAVE_GVLE}")
 message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
 message(STATUS "Build with MPI................: ${VLE_HAVE_MPI}")
+message(STATUS "Build shared library..........: ${BUILD_SHARED_LIBS}")
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2

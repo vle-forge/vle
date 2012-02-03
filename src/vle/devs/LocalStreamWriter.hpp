@@ -39,7 +39,7 @@ namespace vle { namespace devs {
      * @brief Use a local communication to observe. LocalStreamWriter are just
      * a reference to the oov::LocalStreamReader.
      */
-    class VLE_EXPORT LocalStreamWriter : public StreamWriter
+    class VLE_API LocalStreamWriter : public StreamWriter
     {
     public:
         LocalStreamWriter(const utils::ModuleManager& modulemgr)

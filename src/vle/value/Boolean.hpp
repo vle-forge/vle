@@ -37,7 +37,7 @@ namespace vle { namespace value {
 /**
  * @brief Boolean Value encapsulate a C++ 'bool' type into a class.
  */
-class VLE_EXPORT Boolean : public Value
+class VLE_API Boolean : public Value
 {
 public:
     /**

@@ -44,7 +44,7 @@ typedef boost::multi_array < double, 2 > TableValue;
  * @brief A table is a container for double value into an
  * boost::multi_array < double, 2 >. The XML format is:
  */
-class VLE_EXPORT Table : public Value
+class VLE_API Table : public Value
 {
 public:
     typedef TableValue::index index;

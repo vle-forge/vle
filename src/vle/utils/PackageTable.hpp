@@ -35,7 +35,7 @@
 
 namespace vle { namespace utils {
 
-    class VLE_EXPORT PackageTable
+    class VLE_API PackageTable
     {
     public:
         typedef std::set < std::string > table_t;

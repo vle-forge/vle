@@ -88,7 +88,7 @@ namespace vle { namespace translator {
  * </map>
  * @endcode
  */
-class VLE_EXPORT GraphTranslator
+class VLE_API GraphTranslator
 {
 public:
     typedef boost::multi_array < bool, 2 > BoolArray;

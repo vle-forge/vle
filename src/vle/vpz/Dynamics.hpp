@@ -45,7 +45,7 @@ namespace vle { namespace vpz {
      * @brief The vpz::Dynamics class wrap the DynamicList and provides
      * functions to access it.
      */
-    class VLE_EXPORT Dynamics : public Base
+    class VLE_API Dynamics : public Base
     {
     public:
         typedef DynamicList::iterator iterator;

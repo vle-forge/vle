@@ -38,7 +38,7 @@ namespace vle { namespace value {
 /**
  * @brief String Value encapsulates a C++ std::string type into a class.
  */
-class VLE_EXPORT String : public Value
+class VLE_API String : public Value
 {
 public:
     /**

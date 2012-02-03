@@ -57,7 +57,7 @@ namespace vle { namespace value {
     /**
      * @brief Virtual class to assign Value into Event object.
      */
-    class VLE_EXPORT Value
+    class VLE_API Value
     {
     public:
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
@@ -307,7 +307,7 @@ namespace vle { namespace value {
      * iterator it = std::find_if(begin(), end(), IsComposite());
      * @endcode
      */
-    struct VLE_EXPORT IsComposite
+    struct VLE_API IsComposite
     {
         bool operator()(const Value& val) const
         { return Value::isComposite(&val); }
@@ -323,7 +323,7 @@ namespace vle { namespace value {
      * std::transform(vec.begin(), vec.end(), out.begin(), CloneValue());
      * @endcode
      */
-    struct VLE_EXPORT CloneValue
+    struct VLE_API CloneValue
     {
 	Value* operator()(const Value& val) const
 	{ return val.clone(); }
@@ -335,12 +335,12 @@ namespace vle { namespace value {
     /**
      * @brief Initialize the boost::serialization object.
      */
-    VLE_EXPORT void init();
+    VLE_API void init();
 
     /**
      * @brief Delete all singleton.
      */
-    VLE_EXPORT void finalize();
+    VLE_API void finalize();
 
 }} // namespace vle
 

@@ -38,31 +38,31 @@
 #include <vle/vpz/Observables.hpp>
 #include <vle/version.hpp>
 
-#define DECLARE_EXECUTIVE(mdl)                                         \
-extern "C" {                                                           \
-    VLE_EXPORT vle::devs::Dynamics*                               \
-        vle_make_new_executive(const vle::devs::ExecutiveInit& init,   \
-                               const vle::devs::InitEventList& events) \
-        {                                                              \
-            return new mdl(init, events);                              \
-        }                                                              \
-                                                                       \
-        VLE_EXPORT void                                           \
-        vle_api_level(vle::uint32_t* major,                            \
-                      vle::uint32_t* minor,                            \
-                      vle::uint32_t* patch)                            \
-        {                                                              \
-            *major = VLE_MAJOR_VERSION;                                \
-                *minor = VLE_MINOR_VERSION;                            \
-                *patch = VLE_PATCH_VERSION;                            \
-        }                                                              \
-}
+#define DECLARE_EXECUTIVE(mdl)                                          \
+    extern "C" {                                                        \
+        VLE_API vle::devs::Dynamics*                                 \
+        vle_make_new_executive(const vle::devs::ExecutiveInit& init,    \
+                               const vle::devs::InitEventList& events)  \
+        {                                                               \
+            return new mdl(init, events);                               \
+        }                                                               \
+                                                                        \
+        VLE_API void                                                 \
+        vle_api_level(vle::uint32_t* major,                             \
+                      vle::uint32_t* minor,                             \
+                      vle::uint32_t* patch)                             \
+        {                                                               \
+            *major = VLE_MAJOR_VERSION;                                 \
+            *minor = VLE_MINOR_VERSION;                                 \
+            *patch = VLE_PATCH_VERSION;                                 \
+        }                                                               \
+    }
 
 namespace vle { namespace devs {
 
 class Simulator;
 
-class VLE_EXPORT ExecutiveInit : public DynamicsInit
+class VLE_API ExecutiveInit : public DynamicsInit
 {
 public:
     ExecutiveInit(const graph::AtomicModel& model,
@@ -86,7 +86,7 @@ private:
  * default, this model does nothing and it will be inherit to build
  * simulation components.
  */
-class VLE_EXPORT Executive : public Dynamics
+class VLE_API Executive : public Dynamics
 {
 public:
     /**

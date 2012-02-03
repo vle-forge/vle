@@ -66,7 +66,7 @@ enum ModuleType
  * which store an handle to the shared library and a pointer to the symbol
  * referenced by the @e ModuleType.
  */
-struct VLE_EXPORT Module
+struct VLE_API Module
 {
     Module(const std::string& package,
            const std::string& library,
@@ -113,7 +113,7 @@ typedef std::vector < Module > ModuleList;
  * void* mng.get("foo", "sim", vle::utils::MODULE_DYNAMICS);
  * @endcode
  */
-class VLE_EXPORT ModuleManager
+class VLE_API ModuleManager
 {
 public:
     ModuleManager();

@@ -43,7 +43,7 @@ class Simulator;
  * TimedView or EventView.
  *
  */
-class VLE_EXPORT ObservationEvent
+class VLE_API ObservationEvent
 {
 public:
     ObservationEvent(const Time& time,

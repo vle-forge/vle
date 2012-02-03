@@ -34,29 +34,29 @@
 #include <vle/version.hpp>
 #include <string>
 
-#define DECLARE_DYNAMICSWRAPPER(mdl)                                              \
-    extern "C" {                                                                  \
-        VLE_EXPORT vle::devs::Dynamics*                                      \
+#define DECLARE_DYNAMICSWRAPPER(mdl)                                    \
+    extern "C" {                                                        \
+        VLE_API vle::devs::Dynamics*                                 \
         vle_make_new_dynamics_wrapper(const vle::devs::DynamicsWrapperInit& init, \
-                                      const vle::devs::InitEventList& events)     \
-        {                                                                         \
-            return new mdl(init, events);                                         \
-        }                                                                         \
-                                                                                  \
-        VLE_EXPORT void                                                      \
-        vle_api_level(vle::uint32_t* major,                                       \
-                      vle::uint32_t* minor,                                       \
-                      vle::uint32_t* patch)                                       \
-        {                                                                         \
-            *major = VLE_MAJOR_VERSION;                                           \
-            *minor = VLE_MINOR_VERSION;                                           \
-            *patch = VLE_PATCH_VERSION;                                           \
-        }                                                                         \
+                                      const vle::devs::InitEventList& events) \
+        {                                                               \
+            return new mdl(init, events);                               \
+        }                                                               \
+                                                                        \
+        VLE_API void                                                 \
+        vle_api_level(vle::uint32_t* major,                             \
+                      vle::uint32_t* minor,                             \
+                      vle::uint32_t* patch)                             \
+        {                                                               \
+            *major = VLE_MAJOR_VERSION;                                 \
+            *minor = VLE_MINOR_VERSION;                                 \
+            *patch = VLE_PATCH_VERSION;                                 \
+        }                                                               \
     }
 
 namespace vle { namespace devs {
 
-    class VLE_EXPORT DynamicsWrapperInit : public DynamicsInit
+    class VLE_API DynamicsWrapperInit : public DynamicsInit
     {
     public:
         DynamicsWrapperInit(const graph::AtomicModel& atom,
@@ -80,7 +80,7 @@ namespace vle { namespace devs {
      * programming language.
      *
      */
-    class VLE_EXPORT DynamicsWrapper : public Dynamics
+    class VLE_API DynamicsWrapper : public Dynamics
     {
     public:
 	/**
