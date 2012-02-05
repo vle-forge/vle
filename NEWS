@@ -1,3 +1,58 @@
+VLE 1.0.2
+=========
+
+A debug release: major update in GVLE and Oov.
+
+- gvle:
+
+  - Migrate from libglade to GtkBuilder (Closes: #3476002).
+
+  - Expunge unreachable code: The source code, noticed as unreachable,
+    according to the gcc linker, has been removed.
+
+  - Fix the tootip bug on changing vpz:
+
+    - From now on, the list of Views is emptied before to parse a new
+      vpz.
+
+    - But also the query-tooltip-signal is disconnected when the
+      ViewDrawinArea is removed. (Closes: #3471475)
+
+  - Fix the empty class view double click bug: In order to prevent the
+    crash of the gui, when the user click inside the emptyb class tree
+    view, a control has been added. (Closes: #3471415)
+
+  - Fix the Gtk::Entry reset bug: As soon as a Gtk::Entry was reset to
+    an empty string, on the windows portage, an error occurs. There is
+    3 way to fix this, not to reset entries, reset entries with a
+    dummy string or reset to an empty string directly the buffer. We
+    decide to use first the first policy, and secondly the third
+    policy.  (Closes: #3448080)
+
+  - Fix the renaming of an Experimental Condition: The rename list of
+    the ConditionsBox is purged from the renaming action stored, where
+    the new name already exist. (Closes: #3441829).
+
+  - Fix the lack of the cursor of the text editors: The overriding of
+    the default signal handler "on_focus_in_event" has been
+    removed. (Closes: #3441738).
+
+- oov:
+
+  - Fix julian day option: For File oov plugin, if option julian-day
+    is checked, the last line now contains the date. (Closes: 3469412)
+
+  - Fix storage confusion between rows and columns: In the gvle plugin
+    for storage output, there was a confusion between the button that
+    configures the resize step of rows and columns.
+
+- libvleutils:
+
+  - Add missing functions in Path class: The Path class does not have
+    function to access files into local or external plug-ins (GVLE's
+    output and modeling plug-ins and OOV's plug-in).
+
+
 VLE 1.0.1
 =========
 
