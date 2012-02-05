@@ -27,7 +27,7 @@
 
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 #ifndef GUI_QUITBOX_HH
 #define GUI_QUITBOX_HH
@@ -40,7 +40,7 @@ class GVLE;
 class QuitBox
 {
 public:
-    QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* app);
+    QuitBox(const Glib::RefPtr < Gtk::Builder >& xml, GVLE* app);
     virtual ~QuitBox() { }
 
     void show();
@@ -59,13 +59,12 @@ protected:
     };
 
 private:
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >   mXml;
 
     Gtk::Dialog*                    mDialog;
     FileTreeColumn                  mColumns;
     Gtk::TreeView*                  mTreeView;
     Glib::RefPtr<Gtk::TreeStore>    mRefTreeFile;
-    // Modeling*                       mModeling;
     GVLE*                           mApp;
 
     std::list < std::string >       mFileModified;

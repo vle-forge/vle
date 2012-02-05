@@ -35,7 +35,7 @@
 
 namespace vle { namespace gvle {
 
-NewProjectBox::NewProjectBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+NewProjectBox::NewProjectBox(const Glib::RefPtr < Gtk::Builder >& xml,
                              Modeling* m, GVLE* gvle)
     : mXml(xml), mModeling(m), mGVLE(gvle)
 {

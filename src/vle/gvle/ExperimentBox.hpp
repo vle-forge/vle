@@ -37,7 +37,7 @@
 #include <gtkmm/frame.h>
 #include <gtkmm/box.h>
 #include <gtkmm/comboboxtext.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {
 
@@ -56,7 +56,7 @@ namespace vle { namespace gvle {
          * @param current, current model to show. If current equal NULL then,
          * the modeling top GCoupledModel is used.
          */
-        ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+        ExperimentBox(const Glib::RefPtr < Gtk::Builder >& xml,
 		      Modeling* modeling);
 
         ~ExperimentBox();
@@ -65,7 +65,7 @@ namespace vle { namespace gvle {
 
     private:
         Modeling*                           mModeling;
-        Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+        Glib::RefPtr < Gtk::Builder >  mXml;
 
 	Gtk::Entry*         mEntryAuthor;
 	Gtk::Entry*         mEntryDate;

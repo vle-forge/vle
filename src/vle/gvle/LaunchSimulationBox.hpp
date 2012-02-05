@@ -31,7 +31,8 @@
 
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/SharedLibraryManager.hpp>
-#include <libglademm.h>
+
+#include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/spinbutton.h>
@@ -50,7 +51,7 @@ namespace vle { namespace gvle {
 class LaunchSimulationBox
 {
 public:
-    LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+    LaunchSimulationBox(const Glib::RefPtr < Gtk::Builder >& xml,
 			const vpz::Vpz& file);
 
     ~LaunchSimulationBox();

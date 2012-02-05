@@ -39,7 +39,7 @@ namespace vle { namespace gvle {
 class About::Pimpl
 {
 public:
-    Pimpl(Glib::RefPtr < Gnome::Glade::Xml > refXml);
+    Pimpl(const Glib::RefPtr < Gtk::Builder >& refXml);
 
     ~Pimpl();
 
@@ -52,7 +52,7 @@ private:
     sigc::connection mConnectionResponse;
 };
 
-About::Pimpl::Pimpl(Glib::RefPtr < Gnome::Glade::Xml > refXml)
+About::Pimpl::Pimpl(const Glib::RefPtr < Gtk::Builder >& refXml)
 {
     refXml->get_widget("DialogAbout", mAbout);
 
@@ -91,7 +91,7 @@ Gtk::AboutDialog* About::Pimpl::dialog() const
     return mAbout;
 }
 
-About::About(Glib::RefPtr < Gnome::Glade::Xml > refXml)
+About::About(const Glib::RefPtr < Gtk::Builder >& refXml)
     : mImpl(new Pimpl(refXml))
 {
 }

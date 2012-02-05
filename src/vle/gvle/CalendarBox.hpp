@@ -31,20 +31,21 @@
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/calendar.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
+
 
 namespace vle { namespace gvle {
 
 class CalendarBox
 {
 public:
-    CalendarBox(Glib::RefPtr < Gnome::Glade::Xml > xml);
+    CalendarBox(const Glib::RefPtr < Gtk::Builder >& xml);
 
     void date(std::string& date);
     void dateBegin(std::string& date);
 
 private:
-    Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+    Glib::RefPtr < Gtk::Builder >       mXml;
 
     Gtk::Dialog*                        mDialog;
     Gtk::Calendar*                      mCalendar;

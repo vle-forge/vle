@@ -31,7 +31,6 @@
 #include <vle/utils/Path.hpp>
 #include <vle/eov/MainWindow.hpp>
 #include <gtkmm/main.h>
-#include <libglademm.h>
 #include <cstdlib>
 #include <cstdarg>
 #include <cstdio>
@@ -181,6 +180,7 @@ int main(int argc, char* argv[])
     }
 
     if (not stop and not *argv) {
+        Gtk::Main app(argc, argv);
         vle::manager::init();
 
         try {
@@ -189,15 +189,22 @@ int main(int argc, char* argv[])
             vle::utils::Trace::setLevel(
                 vle::utils::Trace::cast(verbose));
 
-            Gtk::Main app(argc, argv);
+	    Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
 
-            Glib::RefPtr < Gnome::Glade::Xml > xml =
-                Gnome::Glade::Xml::create(
-                    vle::utils::Path::path().getGladeFile("eov.glade"));
-
-            vle::eov::MainWindow main(xml, port);
-
+	    refBuilder->add_from_file(vle::utils::Path::path()
+                                      .getGladeFile("eov.glade").c_str());
+	    vle::eov::MainWindow main(refBuilder, port);
             app.run(main.window());
+        } catch(const Glib::MarkupError& e) {
+            result = false;
+            vle::eov::print_error(_("Eov failed (throws %s): %s"),
+                                  vle::utils::demangle(typeid(e)).c_str(),
+                                  e.what().c_str());
+        } catch(const Gtk::BuilderError& e) {
+            result = false;
+            vle::eov::print_error(_("Eov failed (throws %s): %s"),
+                                  vle::utils::demangle(typeid(e)).c_str(),
+                                  e.what().c_str());
         } catch(const Glib::Exception& e) {
             result = false;
             vle::eov::print_error(_("Eov failed (throws %s): %s"),

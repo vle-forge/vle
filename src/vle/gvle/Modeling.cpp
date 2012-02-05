@@ -92,11 +92,6 @@ void Modeling::clearModeling()
     mTop = 0;
 }
 
-void Modeling::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
-{
-    mRefXML = xml;
-}
-
 void Modeling::parseXML(const string& filename)
 {
     try {

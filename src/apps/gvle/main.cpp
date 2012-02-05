@@ -144,33 +144,39 @@ int main(int argc, char **argv)
     if (not stop) {
         vle::gvle::GVLE* g = 0;
         vle::manager::init();
-
+	Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
 	try {
             vle::utils::Trace::setLogFile(
                 vle::utils::Trace::getLogFilename("gvle.log"));
             vle::utils::Trace::setLevel(
                 vle::utils::Trace::cast(verbose));
 
-	    Glib::RefPtr < Gnome::Glade::Xml > mRefXML =
-		Gnome::Glade::Xml::create(
-		    vle::utils::Path::path().getGladeFile("gvle.glade"));
+	    refBuilder->add_from_file(vle::utils::Path::path().
+                                      getGladeFile("gvle.glade").c_str());
 
-            mRefXML->get_widget_derived("WindowPackageBrowser", g);
+	    refBuilder->get_widget_derived("WindowPackageBrowser", g);
 	    if (*argv) {
 		g->setFileName(*argv);
             }
-
 	    application.run(*g);
 	    delete g;
+	} catch(const Glib::MarkupError& e) {
+	    result = false;
+	    std::cerr << _("\n/!\\  gvle Glib::MarkupError reported: ") <<
+	      vle::utils::demangle(typeid(e)) << "\n" << e.what();
+        } catch(const Gtk::BuilderError& e) {
+	    result = false;
+	    std::cerr << _("\n/!\\  gvle  Gtk::BuilderError reported: ") <<
+	      vle::utils::demangle(typeid(e)) << "\n" << e.what();
         } catch(const Glib::Exception& e) {
             result = false;
-            vle::gvle::print_error(_("\n/!\\ eov Glib error reported (%s): %s"),
+            vle::gvle::print_error(_("\n/!\\ gvle Glib error reported (%s): %s"),
                                    vle::utils::demangle(typeid(e)).c_str(),
                                    e.what().c_str());
             delete g;
         } catch(const std::exception& e) {
             result = false;
-            vle::gvle::print_error(_("\n/!\\ eov exception reported (%s): %s"),
+            vle::gvle::print_error(_("\n/!\\ gvle exception reported (%s): %s"),
                                    vle::utils::demangle(typeid(e)).c_str(),
                                    e.what());
             delete g;

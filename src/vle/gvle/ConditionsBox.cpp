@@ -42,7 +42,7 @@ namespace vle { namespace gvle {
 
 ConditionsBox::ConditionsTreeView::ConditionsTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject),
     mConditions(0),
     mValidateRetry(false)
@@ -320,7 +320,7 @@ bool ConditionsBox::ConditionsTreeView::onQueryTooltip(
 
 ConditionsBox::PortsTreeView::PortsTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject),
     mCondition(0),
     mValidateRetry(false)
@@ -562,7 +562,7 @@ void ConditionsBox::PortsTreeView::onEdition(
 // ConditionsBox
 ////
 
-ConditionsBox::ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+ConditionsBox::ConditionsBox(const Glib::RefPtr < Gtk::Builder >& xml,
 			     GVLE* gvle) :
     m_gvle(gvle),
     mConditions(0),

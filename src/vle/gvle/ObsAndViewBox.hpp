@@ -33,7 +33,7 @@
 #include <vle/vpz/Observable.hpp>
 #include <vle/vpz/Views.hpp>
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {
 
@@ -42,7 +42,7 @@ namespace vle { namespace gvle {
     class ObsAndViewBox
     {
     public:
-        ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+        ObsAndViewBox(const Glib::RefPtr < Gtk::Builder >& xml);
 
         ~ObsAndViewBox();
 
@@ -79,7 +79,7 @@ namespace vle { namespace gvle {
         };
 
     private:
-        Glib::RefPtr<Gnome::Glade::Xml>       mXml;
+        Glib::RefPtr < Gtk::Builder >         mXml;
         Gtk::Dialog*                          mDialog;
 
         //Data

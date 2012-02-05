@@ -41,7 +41,7 @@
 namespace vle { namespace gvle {
 
 ModelClassBox::ModelClassBox(BaseObjectType* cobject,
-                             Glib::RefPtr < Gnome::Glade::Xml > xml):
+                             const Glib::RefPtr < Gtk::Builder >& xml):
     Gtk::TreeView(cobject),
     mXml(xml),
     mClasses_backup(0),

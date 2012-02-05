@@ -39,7 +39,7 @@
 namespace vle { namespace gvle {
 
 DynamicsBox::DynamicsBox(Modeling& modeling,
-                         Glib::RefPtr < Gnome::Glade::Xml > ref,
+                         Glib::RefPtr < Gtk::Builder > ref,
                          vpz::Dynamics& dynamics) :
     mModeling(modeling), mDynsCopy(dynamics), mXml(ref),
     mValidateRetry(false)

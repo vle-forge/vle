@@ -37,7 +37,7 @@
 #include <gtkmm.h>
 #include <gdkmm/gc.h>
 #include <gdkmm/types.h>
-#include <libglademm/xml.h>
+#include <gtkmm/builder.h>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
 #include <gtksourceviewmm-2.0/gtksourceviewmm.h>
@@ -225,7 +225,7 @@ public:
     typedef std::map < std::string, Document* > Documents;
 
     Editor(BaseObjectType* cobject,
-           const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+           const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
     virtual ~Editor();
 
     /**

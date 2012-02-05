@@ -29,18 +29,18 @@
 #ifndef VLE_GVLE_PREFERENCESBOX_HPP
 #define VLE_GVLE_PREFERENCESBOX_HPP
 
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {
 
 class PreferencesBox
 {
 public:
-    PreferencesBox(Glib::RefPtr < Gnome::Glade::Xml > xml);
+   PreferencesBox(Glib::RefPtr < Gtk::Builder >& xml);
 
-    ~PreferencesBox();
+   ~PreferencesBox();
 
-    int run();
+  int run();
 
 private:
     PreferencesBox(const PreferencesBox& other);

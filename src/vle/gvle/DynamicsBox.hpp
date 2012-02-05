@@ -40,7 +40,7 @@ namespace vle { namespace gvle {
     {
     public:
         DynamicsBox(Modeling& modeling,
-                    Glib::RefPtr < Gnome::Glade::Xml > ref,
+                    Glib::RefPtr < Gtk::Builder > ref,
 			        vpz::Dynamics& dynamics);
 
         virtual ~DynamicsBox();
@@ -81,7 +81,7 @@ namespace vle { namespace gvle {
         /** A copy of the vpz::Dynamics, filled when user modify datas */
         vpz::Dynamics                       mDynsCopy;
 
-        Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+        Glib::RefPtr < Gtk::Builder >  mXml;
         Gtk::Dialog*                        mDialog;
         Gtk::TreeView*                      mDynamics;
         Gtk::ComboBox*                      mPackage;

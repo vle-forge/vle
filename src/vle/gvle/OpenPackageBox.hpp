@@ -32,7 +32,7 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/treestore.h>
-#include <libglademm/xml.h>
+#include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {
 
@@ -44,7 +44,7 @@ namespace vle { namespace gvle {
 class OpenPackageBox
 {
 public:
-    OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+    OpenPackageBox(const Glib::RefPtr < Gtk::Builder >& xml);
 
     virtual ~OpenPackageBox();
 
@@ -70,7 +70,7 @@ private:
         Gtk::TreeModelColumn <Glib::ustring> mName;
     };
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >    mXml;
 
     Gtk::Dialog*                    mDialog;
     PackageTreeColumn               mColumns;

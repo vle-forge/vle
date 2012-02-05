@@ -42,7 +42,7 @@ namespace vle { namespace gvle {
 class PreferencesBox::Pimpl
 {
 public:
-    Pimpl(Glib::RefPtr < Gnome::Glade::Xml > xml)
+  Pimpl(Glib::RefPtr < Gtk::Builder > xml)
         : mXml(xml)
     {
         xml->get_widget("DialogPreferences", mDialog);
@@ -186,7 +186,7 @@ public:
         mFontEditor->set_font_name(Settings::settings().getFontEditor());
     }
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >   mXml;
     Gtk::Dialog*                    mDialog;
 
     //Dialog widgets - Action
@@ -219,8 +219,8 @@ public:
     std::list < sigc::connection > mSigcConnections;
 };
 
-PreferencesBox::PreferencesBox(Glib::RefPtr < Gnome::Glade::Xml > xml)
-    : mPimpl(new PreferencesBox::Pimpl(xml))
+PreferencesBox::PreferencesBox(Glib::RefPtr < Gtk::Builder >& xml)
+  : mPimpl(new PreferencesBox::Pimpl(xml))
 {
 }
 

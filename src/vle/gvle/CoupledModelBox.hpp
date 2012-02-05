@@ -30,7 +30,7 @@
 #define GUI_COUPLEDMODELBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <vle/graph/CoupledModel.hpp>
 
 namespace vle { namespace gvle {
@@ -41,7 +41,8 @@ class GVLE;
 class CoupledModelBox : public Gtk::TreeView
 {
 public:
-    CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
+    CoupledModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
+                    Modeling* m, GVLE* gvle);
 
     void show(graph::CoupledModel* model);
 
@@ -63,7 +64,7 @@ private:
     {
     public:
 	InputPortTreeView(BaseObjectType* cobject,
-			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			  const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~InputPortTreeView();
 
 	void applyRenaming(graph::CoupledModel* model);
@@ -107,7 +108,7 @@ private:
     {
     public:
 	OutputPortTreeView(BaseObjectType* cobject,
-			   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			   const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~OutputPortTreeView();
 
 	void applyRenaming(graph::CoupledModel* model);
@@ -151,7 +152,7 @@ private:
     void on_validate();
     void on_cancel();
 
-    Glib::RefPtr<Gnome::Glade::Xml>        mXml;
+    Glib::RefPtr < Gtk::Builder >          mXml;
     Modeling*                              mModeling;
     GVLE*                                  mGVLE;
     graph::CoupledModel*                   mGraphModel;

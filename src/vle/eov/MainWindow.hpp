@@ -38,9 +38,9 @@
 #include <gtkmm/aboutdialog.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/textview.h>
-#include <libglademm.h>
 #include <glibmm/thread.h>
 #include <glibmm/timer.h>
+#include <gtkmm/builder.h>
 #include <map>
 
 namespace vle { namespace eov {
@@ -59,7 +59,7 @@ namespace vle { namespace eov {
          * @param refXml A reference to the glade file.
          * @param port The default port.
          */
-        MainWindow(Glib::RefPtr < Gnome::Glade::Xml > refXml,
+        MainWindow(Glib::RefPtr < Gtk::Builder >& refXml,
                    int port);
 
         /**
@@ -108,7 +108,7 @@ namespace vle { namespace eov {
         Gtk::SpinButton* mSpinPort;
         Gtk::SpinButton* mSpinRefresh;
         Gtk::TextView* mTextview;
-        Glib::RefPtr < Gnome::Glade::Xml > mRefXml;
+        Glib::RefPtr < Gtk::Builder > mRefXml;
 	sigc::connection mConnection;
         utils::SharedLibraryManager slm;
         utils::ModuleManager mModuleMgr;

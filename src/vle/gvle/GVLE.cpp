@@ -68,7 +68,7 @@ namespace vle { namespace gvle {
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 GVLE::GVLE(BaseObjectType* cobject,
-           const Glib::RefPtr<Gnome::Glade::Xml> xml):
+           const Glib::RefPtr < Gtk::Builder >& xml):
     Gtk::Window(cobject),
     mModeling(new Modeling()),
     mCurrentButton(VLE_GVLE_POINTER),
@@ -76,7 +76,6 @@ GVLE::GVLE(BaseObjectType* cobject,
     mCurrentTab(-1)
 {
     mRefXML = xml;
-    mModeling->setGlade(mRefXML);
 
     mModeling->signalModified().connect(
         sigc::mem_fun(*this, &GVLE::onSignalModified));

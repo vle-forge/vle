@@ -40,7 +40,7 @@
 
 namespace vle { namespace eov {
 
-MainWindow::MainWindow(Glib::RefPtr < Gnome::Glade::Xml > refXml, int port)
+MainWindow::MainWindow(Glib::RefPtr < Gtk::Builder >& refXml, int port)
     : mPort(port), mRefresh(100), mMenuNew(0), mMenuQuit(0), mMenuAbout(0),
     mWindow(0), mPref(0), mAbout(0), mSpinPort(0), mSpinRefresh(0),
     mTextview(0), mRefXml(refXml), mNet(0), mThread(0)

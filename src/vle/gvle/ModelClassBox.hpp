@@ -29,7 +29,7 @@
 #ifndef GUI_MODELCLASSBOX_HPP
 #define GUI_MODELCLASSBOX_HPP
 
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm.h>
 #include <vle/vpz/Classes.hpp>
 #include <vle/gvle/NewModelClassBox.hpp>
@@ -50,7 +50,7 @@ public:
      *
      */
     ModelClassBox(BaseObjectType* cobject,
-		  Glib::RefPtr < Gnome::Glade::Xml > xml);
+		  const Glib::RefPtr < Gtk::Builder >& xml);
 
     ~ModelClassBox();
 
@@ -179,7 +179,7 @@ private:
     std::string getClassName(const Gtk::TreeModel::Path&);
 
 
-    Glib::RefPtr<Gnome::Glade::Xml>      mXml;
+    Glib::RefPtr < Gtk::Builder >        mXml;
     Modeling*                            mModeling;
     GVLE*                                mGVLE;
     NewModelClassBox*                    mNewModelBox;

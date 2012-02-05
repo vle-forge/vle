@@ -31,7 +31,7 @@
 
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <gtkmm/window.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm.h>
 
 namespace vle { namespace graph {
@@ -57,7 +57,7 @@ public:
      *
      */
     ModelTreeBox(BaseObjectType* cobject,
-		 const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+		 const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 
     /**
      * Show in the TextView the model tree with head 'top'

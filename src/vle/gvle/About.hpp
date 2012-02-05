@@ -27,9 +27,9 @@
 
 
 #ifndef VLE_GVLE_ABOUT_HPP
-#define VLE_GVLE_ABOUT_HPP 1
+#define VLE_GVLE_ABOUT_HPP
 
-#include <libglademm/xml.h>
+#include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {
 
@@ -43,7 +43,7 @@ public:
     /**
      * Buid a modal About dialog box.
      */
-    About(Glib::RefPtr < Gnome::Glade::Xml > refXml);
+    About(const Glib::RefPtr < Gtk::Builder >& refXml);
 
     /**
      * @brief Nothing to delete.

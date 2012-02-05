@@ -29,7 +29,7 @@
 #ifndef GUI_NEWMODELCLASSBOX_HPP
 #define GUI_NEWMODELCLASSBOX_HPP
 
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm.h>
 
 namespace vle
@@ -41,7 +41,8 @@ class Modeling;
 class NewModelClassBox
 {
 public:
-    NewModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
+    NewModelClassBox(const Glib::RefPtr < Gtk::Builder >& xml,
+                     Modeling* m, GVLE* gvle);
 
     ~NewModelClassBox();
 
@@ -61,7 +62,7 @@ class ModelColumns : public Gtk::TreeModel::ColumnRecord
     ModelColumns                           mColumns;
 
 private:
-    Glib::RefPtr<Gnome::Glade::Xml>        mXml;
+    Glib::RefPtr < Gtk::Builder >          mXml;
     Modeling*                              mModeling;
     GVLE*                                  mGVLE;
 

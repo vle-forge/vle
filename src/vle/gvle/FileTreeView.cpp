@@ -43,7 +43,7 @@
 namespace vle { namespace gvle {
 
 FileTreeView::FileTreeView(BaseObjectType* cobject,
-                           const Glib::RefPtr<Gnome::Glade::Xml>& /*ref*/)
+                           const Glib::RefPtr < Gtk::Builder >& /*ref*/)
     : Gtk::TreeView(cobject)
 {
     mTreeModel = Gtk::TreeStore::create(mColumns);

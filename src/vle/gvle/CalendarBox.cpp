@@ -32,7 +32,7 @@
 
 namespace vle { namespace gvle {
 
-CalendarBox::CalendarBox(Glib::RefPtr < Gnome::Glade::Xml > xml)
+CalendarBox::CalendarBox(const Glib::RefPtr < Gtk::Builder >& xml)
     : mXml(xml)
 {
     xml->get_widget("DialogCalendar", mDialog);

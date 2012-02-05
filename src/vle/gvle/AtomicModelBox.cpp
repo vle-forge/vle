@@ -45,7 +45,7 @@ namespace vle { namespace gvle {
 
 AtomicModelBox::InputPortTreeView::InputPortTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject),
     mValidateRetry(false)
 {
@@ -258,7 +258,7 @@ void AtomicModelBox::InputPortTreeView::onEdition(
 
 AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject),
     mValidateRetry(false)
 {
@@ -472,7 +472,7 @@ void AtomicModelBox::OutputPortTreeView::onEdition(
 
 AtomicModelBox::ConditionTreeView::ConditionTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject)
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
@@ -767,7 +767,7 @@ bool AtomicModelBox::ConditionTreeView::onQueryTooltip(
 
 AtomicModelBox::DynamicTreeView::DynamicTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr < Gnome::Glade::Xml >& refGlade)
+    const Glib::RefPtr < Gtk::Builder >& refGlade)
     : Gtk::TreeView(cobject), mXml(refGlade)
 {
     mRefListDyn = Gtk::ListStore::create(mColumnsDyn);
@@ -1251,7 +1251,7 @@ std::string AtomicModelBox::DynamicTreeView::getDynamic()
 
 AtomicModelBox::ObservableTreeView::ObservableTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& xml /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& xml /*refGlade*/) :
     Gtk::TreeView(cobject),
     mObsAndViewBox(xml)
 {
@@ -1551,7 +1551,7 @@ std::string AtomicModelBox::ObservableTreeView::getObservable()
 
 // AtomicModelBox
 
-AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+AtomicModelBox::AtomicModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
 			       Modeling* m, GVLE* gvle):
     mXml(xml),
     mModeling(m),

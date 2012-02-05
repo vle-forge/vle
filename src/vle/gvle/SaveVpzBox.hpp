@@ -30,7 +30,7 @@
 #define GUI_SAVEVPZBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {
@@ -45,7 +45,8 @@ class SaveVpzBox
 {
 public:
 
-    SaveVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
+    SaveVpzBox(const Glib::RefPtr < Gtk::Builder >& xml,
+               Modeling* m, GVLE* gvle);
     ~SaveVpzBox();
 
     void show();
@@ -53,7 +54,7 @@ public:
 protected:
 
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >   mXml;
     Gtk::Dialog*                    mDialog;
     Modeling*                       mModeling;
     GVLE*                           mGVLE;

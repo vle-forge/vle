@@ -496,7 +496,7 @@ DocumentSimpleDrawingArea::~DocumentSimpleDrawingArea()
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 Editor::Editor(BaseObjectType* cobject,
-               const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+               const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::Notebook(cobject)
 {
     tabSignal = signal_switch_page().connect(sigc::mem_fun(this, &Editor::changeTab));

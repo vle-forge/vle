@@ -31,7 +31,7 @@
 
 namespace vle { namespace gvle {
 
-NewDynamicsBox::NewDynamicsBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
+NewDynamicsBox::NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml):
     mXml(xml)
 {
     xml->get_widget("DialogNewDynamics", mDialog);

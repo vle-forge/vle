@@ -30,7 +30,7 @@
 #define VLE_GVLE_GVLEMENUANDTOOLBAR_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 
 #include <iostream>
 

@@ -44,7 +44,8 @@ class GVLE;
 class AtomicModelBox
 {
 public:
-    AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
+    AtomicModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
+                   Modeling* m, GVLE* gvle);
 
     virtual ~AtomicModelBox();
 
@@ -117,7 +118,7 @@ private:
     {
     public:
 	InputPortTreeView(BaseObjectType* cobject,
-			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			  const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~InputPortTreeView();
 
 	void applyRenaming(graph::AtomicModel* model);
@@ -166,7 +167,7 @@ private:
     {
     public:
 	OutputPortTreeView(BaseObjectType* cobject,
-			   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			   const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~OutputPortTreeView();
 
 	void applyRenaming(graph::AtomicModel* model);
@@ -215,7 +216,7 @@ private:
     {
     public:
 	ConditionTreeView(BaseObjectType* cobject,
-			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			  const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~ConditionTreeView();
 
 	void applyRenaming();
@@ -281,7 +282,7 @@ private:
     {
     public:
 	DynamicTreeView(BaseObjectType* cobject,
-			const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~DynamicTreeView();
 	void applyRenaming();
 	void build();
@@ -331,7 +332,7 @@ private:
     private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
-        Glib::RefPtr<Gnome::Glade::Xml> mXml;
+        Glib::RefPtr < Gtk::Builder >   mXml;
 	vpz::AtomicModel*               mModel;
 	graph::AtomicModel*             mAtom;
 	AtomicModelBox*                 mParent;
@@ -365,7 +366,7 @@ private:
     {
     public:
 	ObservableTreeView(BaseObjectType* cobject,
-			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			  const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~ObservableTreeView();
 	void applyRenaming();
 	void build();
@@ -429,7 +430,7 @@ private:
 	guint32                  mDelayTime;
     };
 
-    Glib::RefPtr<Gnome::Glade::Xml>      mXml;
+    Glib::RefPtr < Gtk::Builder >        mXml;
     Modeling*                            mModeling;
     GVLE*                                mGVLE;
 

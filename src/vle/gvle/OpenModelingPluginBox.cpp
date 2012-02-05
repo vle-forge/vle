@@ -40,7 +40,7 @@
 namespace vle { namespace gvle {
 
 OpenModelingPluginBox::OpenModelingPluginBox(
-    Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* gvle)
+    const Glib::RefPtr < Gtk::Builder >& xml, GVLE* gvle)
     : mXml(xml), mGVLE(gvle)
 {
     xml->get_widget("DialogModelingPlugin", mDialog);

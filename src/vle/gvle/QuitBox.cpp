@@ -34,7 +34,8 @@
 
 namespace vle { namespace gvle {
 
-QuitBox::QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* app) :
+QuitBox::QuitBox(const Glib::RefPtr < Gtk::Builder >& xml,
+                 GVLE* app) :
     mXml(xml),
     mApp(app)
 {
@@ -112,6 +113,7 @@ void QuitBox::onSave()
         mApp->onSave();
 	++it;
     }
+    mDialog->hide_all();
     mApp->hide();
 }
 
@@ -122,6 +124,7 @@ void QuitBox::onCancel()
 
 void QuitBox::onClose()
 {
+    mDialog->hide_all();
     mApp->hide();
 }
 

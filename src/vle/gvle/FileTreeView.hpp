@@ -27,12 +27,12 @@
 
 
 #ifndef VLE_GVLE_FILETREEVIEW_HPP
-#define VLE_GVLE_FILETREEVIEW_HPP 1
+#define VLE_GVLE_FILETREEVIEW_HPP
 
+#include <gtkmm/builder.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treestore.h>
 #include <glibmm/ustring.h>
-#include <libglademm/xml.h>
 
 namespace vle { namespace gvle {
 
@@ -59,7 +59,7 @@ class FileTreeView : public Gtk::TreeView
 {
 public:
     FileTreeView(BaseObjectType* cobject,
-                 const Glib::RefPtr<Gnome::Glade::Xml>& refGlade);
+                 const Glib::RefPtr < Gtk::Builder >& refGlade);
 
     virtual ~FileTreeView();
 

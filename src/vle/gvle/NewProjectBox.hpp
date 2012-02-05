@@ -30,7 +30,7 @@
 #define GUI_NEWPROJECTBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {
@@ -44,14 +44,15 @@ class GVLE;
 class NewProjectBox
 {
 public:
-    NewProjectBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* app);
+    NewProjectBox(const Glib::RefPtr < Gtk::Builder >& xml,
+                  Modeling* m, GVLE* app);
 
     ~NewProjectBox();
 
     void show();
 
 private:
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >   mXml;
 
     Gtk::Dialog*                    mDialog;
     Modeling*                       mModeling;

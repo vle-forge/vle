@@ -40,7 +40,7 @@ namespace vle { namespace gvle {
 
 CoupledModelBox::InputPortTreeView::InputPortTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>&):
+    const Glib::RefPtr < Gtk::Builder >&):
     Gtk::TreeView(cobject)
 {
     mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
@@ -237,7 +237,7 @@ void CoupledModelBox::InputPortTreeView::onEdition(
 
 CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject)
 {
     mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
@@ -434,7 +434,7 @@ void CoupledModelBox::OutputPortTreeView::onEdition(
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+CoupledModelBox::CoupledModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
                                  Modeling* m, GVLE* gvle):
     mXml(xml),
     mModeling(m),

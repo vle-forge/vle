@@ -142,7 +142,7 @@ bool ImportWidget::evaluate()
     }
 }
 
-ImportModelBox::ImportModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+ImportModelBox::ImportModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
                                Modeling* modeling)
   : mXml(xml), mModeling(modeling), mNbWidgetIncorrect(0)
 {

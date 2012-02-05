@@ -37,7 +37,7 @@
 namespace vle { namespace gvle {
 
 ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
-			   const Glib::RefPtr<Gnome::Glade::Xml>&) :
+			   const Glib::RefPtr < Gtk::Builder >&) :
     Gtk::TreeView(cobject), m_delayTime(0)
 {
     m_refTreeModel = Gtk::TreeStore::create(m_columns);

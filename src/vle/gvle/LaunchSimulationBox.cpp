@@ -34,7 +34,7 @@
 
 namespace vle { namespace gvle {
 
-LaunchSimulationBox::LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+LaunchSimulationBox::LaunchSimulationBox(const Glib::RefPtr < Gtk::Builder >& xml,
                                          const vpz::Vpz& vpz)
     : mVpz(vpz), mDialog(0), mMono(0), mMulti(0), mNbProcess(0), mDistant(0),
     mPlay(0), mStop(0), mProgressBar(0), mCurrentTimeLabel(0),mState(Wait),

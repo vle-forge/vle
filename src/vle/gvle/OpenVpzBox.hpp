@@ -30,7 +30,7 @@
 #define GUI_OPENVPZBOX_HPP
 
 #include <gtkmm.h>
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {
@@ -45,7 +45,8 @@ class OpenVpzBox
 {
 public:
 
-    OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* gvle);
+    OpenVpzBox(const Glib::RefPtr < Gtk::Builder >& xml,
+               Modeling* m, GVLE* gvle);
     virtual ~OpenVpzBox();
 
     int run();
@@ -63,7 +64,7 @@ private:
         Gtk::TreeModelColumn <Glib::ustring> mName;
     };
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >   mXml;
     Gtk::Dialog*                    mDialog;
     Modeling*                       mModeling;
     GVLE*                           mGVLE;

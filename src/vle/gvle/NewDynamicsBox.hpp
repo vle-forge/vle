@@ -29,7 +29,7 @@
 #ifndef VLE_GVLE__NEWDYNAMICSBOX_HPP
 #define VLE_GVLE__NEWDYNAMICSBOX_HPP
 
-#include <libglademm.h>
+#include <gtkmm/builder.h>
 #include <gtkmm.h>
 
 namespace vle { namespace gvle {
@@ -37,7 +37,7 @@ namespace vle { namespace gvle {
 class NewDynamicsBox
 {
 public:
-    NewDynamicsBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+    NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml);
     virtual ~NewDynamicsBox() { }
 
     std::string getClassName() const
@@ -52,7 +52,7 @@ private:
     void onApply();
     void onCancel();
 
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gtk::Builder >   mXml;
 
     Gtk::Dialog*                    mDialog;
     //Entry
