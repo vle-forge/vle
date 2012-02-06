@@ -1,10 +1,18 @@
 VLE 1.1.0-dev
 =============
 
+We merge all shared libraries of vle (libvleutils, libvlevpz,
+libvledevs etc.) into a uniq shared library libvle.so.
+
+We remove the Eov program and the libvleeov shared library. Now,
+graphical output are available into the GVLE application.
+
 - libvleutils:
-  - Add a new RemoteMananger class to access remote repositories. The command
-    line interface is inspirited from the apt-get debian's command:
-          
+
+  - Add a new RemoteMananger class to access remote repositories. The
+    command line interface is inspirited from the apt-get debian's
+    command:
+
   $ vle --remote update
   $ vle --remote install glue
   $ vle --remote search '*gl*'
@@ -12,6 +20,7 @@ VLE 1.1.0-dev
 
 - libvlegeometry: removed
 
+- libvleeov: removed
 
 VLE 1.0.1
 =========
