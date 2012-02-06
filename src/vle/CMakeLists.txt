@@ -94,6 +94,8 @@ configure_file(version.hpp.in ${VLE_BINARY_DIR}/src/vle/version.hpp)
 install(FILES ${VLE_BINARY_DIR}/src/vle/version.hpp DESTINATION
   ${VLE_INCLUDE_DIRS})
 
+install(FILES DllDefines.hpp DESTINATION ${VLE_INCLUDE_DIRS})
+
 #
 # Configure the file vle.pc.in to produce in the binary directory a
 # filled pkg-config script vle.pc.
