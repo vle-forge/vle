@@ -175,25 +175,30 @@ void Template::process(std::ostream& result) const
     result << buffer;
 }
 
-void Template::tag(std::string& pluginname, std::string& conf)
+void Template::tag(std::string& pluginname, std::string& packagename,
+                   std::string& conf)
 {
-    boost::regex tagbegin("@@tag [[:alnum:]]* ([[:alnum:]]*)@@", boost::regex::grep);
+    boost::regex tagbegin("@@tag [[:alnum:]]*@", boost::regex::grep);
+    boost::regex tagmiddle("@[[:word:]\\.\\-]* @@", boost::regex::grep);
     boost::regex tagend("@@end tag@@", boost::regex::grep);
 
     boost::sregex_iterator it(buffer_.begin(), buffer_.end(), tagbegin);
-    boost::sregex_iterator jt(buffer_.begin(), buffer_.end(), tagend);
+    boost::sregex_iterator jt(buffer_.begin(), buffer_.end(), tagmiddle);
+    boost::sregex_iterator kt(buffer_.begin(), buffer_.end(), tagend);
+
     boost::sregex_iterator end;
 
-    if (it == end or jt == end) {
+    if (it == end or jt == end or kt == end) {
         throw utils::ArgError(_("Template error, no begin or end tag"));
     }
 
-    if ((*it)[0].second >= (*jt)[0].first) {
+    if ((*jt)[0].second >= (*kt)[0].first) {
         throw utils::ArgError(_("Template error, bad tag"));
     }
 
-    pluginname.assign(it->str(), 6, it->str().size() - 8);
-    conf.assign((*it)[0].second, (*jt)[0].first);
+    pluginname.assign(it->str(), 6, it->str().size() - 7);
+    packagename.assign(jt->str(), 1, jt->str().size() - 4);
+    conf.assign((*jt)[0].second, (*kt)[0].first);
 }
 
 std::string Template::processIf(const std::string& buffer) const

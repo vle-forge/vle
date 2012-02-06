@@ -126,7 +126,6 @@ namespace vle { namespace gvle {
         void onCursorChangedDynamics();
         void onChangedPackage();
         void onChangedLibrary();
-        void onChangedModel();
 
         void assignDynamic(const std::string& name);
         void updateDynamic(const std::string& name);

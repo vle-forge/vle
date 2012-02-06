@@ -57,7 +57,7 @@ struct F
 
 BOOST_GLOBAL_FIXTURE(F)
 
-const char* tpl1 = "@@tag test1 (generic)@@" \
+const char* tpl1 = "@@tag test1@package.name-ext1_ext2 @@" \
                     "azertyuiop qsdfghjklm wxcvbn,;:!" \
                     "@@end tag@@" \
                     "a) My name is {{name}} and I am {{year}} old\n" \
@@ -127,7 +127,7 @@ const char* tpl3 = "class {{name}} : public DifferenceEquation::Multiple\n" \
                     "\n" \
                     "};\n";
 
-const char* tpl4 = "@tag test1@@" \
+const char* tpl4 = "@tag test1@package.name-ext1_ext2 @@" \
                     "azertyuiop qsdfghjklm wxcvbn,;:!" \
                     "@@end tag@@" \
                     "a) My name is {{name}} and I am {{year}} old\n" \
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(test_template_simple)
     std::string str = out.str();
 
     BOOST_REQUIRE_EQUAL(str,
-                        "@@tag test1 (generic)@@" \
+                        "@@tag test1@package.name-ext1_ext2 @@" \
                         "azertyuiop qsdfghjklm wxcvbn,;:!" \
                         "@@end tag@@" \
                         "a) My name is toto and I am 74 old\n"
@@ -318,23 +318,24 @@ BOOST_AUTO_TEST_CASE(test_template_for_ifnot)
 
 BOOST_AUTO_TEST_CASE(test_template_tag)
 {
-    std::string tag, conf;
+    std::string plugin, package, conf;
 
     {
         vle::utils::Template tpl(tpl1);
-        tpl.tag(tag, conf);
-        BOOST_REQUIRE_EQUAL(tag, "test1 (generic)");
+        tpl.tag(plugin, package, conf);
+        BOOST_REQUIRE_EQUAL(plugin, "test1");
+        BOOST_REQUIRE_EQUAL(package, "package.name-ext1_ext2");
         BOOST_REQUIRE_EQUAL(conf, "azertyuiop qsdfghjklm wxcvbn,;:!");
     }
 
     {
         vle::utils::Template tpl(tpl5);
-        BOOST_REQUIRE_THROW(tpl.tag(tag, conf), utils::ArgError);
+        BOOST_REQUIRE_THROW(tpl.tag(plugin, package, conf), utils::ArgError);
     }
 
     {
         vle::utils::Template tpl(tpl4);
-        BOOST_REQUIRE_THROW(tpl.tag(tag, conf), utils::ArgError);
+        BOOST_REQUIRE_THROW(tpl.tag(plugin, package, conf), utils::ArgError);
     }
 }
 

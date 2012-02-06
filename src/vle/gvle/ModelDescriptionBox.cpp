@@ -49,8 +49,8 @@ ModelDescriptionBox::ModelDescriptionBox(const set < string > & lst,
         m_model(model)
 {
     set_position(Gtk::WIN_POS_MOUSE);
-    Gtk::Button * cancelbutton, * okbutton;
-    cancelbutton = add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    Gtk::Button * okbutton;
+    add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     okbutton = add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 
     m_entry = Gtk::manage(new Gtk::Entry());

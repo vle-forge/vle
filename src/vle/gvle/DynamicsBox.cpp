@@ -400,13 +400,6 @@ void DynamicsBox::onChangedLibrary()
     }
 }
 
-void DynamicsBox::onChangedModel()
-{
-    if (mIter != mDynamicsListStore->children().end()) {
-        Gtk::TreeModel::Row row = *mIter;
-    }
-}
-
 void DynamicsBox::storePrevious()
 {
     if (mIter != mDynamicsListStore->children().end()) {

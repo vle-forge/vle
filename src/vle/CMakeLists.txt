@@ -116,3 +116,5 @@ configure_file(vle.pc.in
 
 install(FILES ${VLE_BINARY_DIR}/src/vle/vle-${VLE_VERSION_SHORT}.pc
   DESTINATION lib/pkgconfig)
+
+install(FILES DllDefines.hpp DESTINATION ${VLE_INCLUDE_DIRS})

@@ -960,14 +960,16 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
 	    utils::Path::path().getPackageSrcDir(), searchFile);
         if (not newTab.empty()) {
             try {
-                std::string pluginname, conf;
+                std::string pluginname, packagename, conf;
                 utils::Template tpl;
+
                 tpl.open(newTab);
-                tpl.tag(pluginname, conf);
+
+                tpl.tag(pluginname, packagename, conf);
 
                 ModelingPluginPtr plugin =
-                    mGVLE->pluginFactory().getModelingPlugin(
-                        "PACKAGE", pluginname);
+                    mGVLE->pluginFactory().getModelingPlugin(packagename,
+                                                             pluginname);
 
                 if (plugin->modify(*mAtom, *mModel, dynamic, *mConditions,
                                    *mObservables, conf, tpl.buffer())) {
@@ -1169,7 +1171,6 @@ void AtomicModelBox::DynamicTreeView::onEdition(
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
     if (refSelection and newName != mOldName) {
-	Gtk::TreeModel::iterator it = refSelection->get_selected();
 	if (not newName.empty() and not mDynamics->exist(newName)) {
 	    vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
 	    vpz::Dynamic oldDynamic = mDynamics->get(mOldName);
