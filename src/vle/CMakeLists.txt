@@ -20,12 +20,6 @@ add_subdirectory(devs)
 add_subdirectory(manager)
 add_subdirectory(translator)
 
-if (HAVE_EOV)
-  include_directories(${CAIROMM_INCLUDE_DIRS} ${GTKMM_INCLUDE_DIRS}
-    ${GLADEMM_INCLUDE_DIRS})
-  add_subdirectory(eov)
-endif (HAVE_EOV)
-
 if (HAVE_GVLE)
   include_directories(${CAIROMM_INCLUDE_DIRS} ${GTKMM_INCLUDE_DIRS}
     ${GLADEMM_INCLUDE_DIRS})

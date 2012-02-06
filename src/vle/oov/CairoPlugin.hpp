@@ -160,7 +160,7 @@ namespace vle { namespace oov {
         Cairo::RefPtr < Cairo::ImageSurface > m_img;
 
         /**
-         * @brief The public ImageSurface to show into eov or to write.
+         * @brief The public ImageSurface to write.
          */
         Cairo::RefPtr < Cairo::ImageSurface > m_store;
 

@@ -200,8 +200,7 @@ namespace vle {
         { return (m_format == LOCAL ? "local" : "distant"); }
 
         /**
-         * @brief Get the plugin of this Output. If format is not Output::Eov,
-         * this string is not cleared.
+         * @brief Get the plugin of this Output.
          * @return a string representation of plugin.
          */
         const std::string& plugin() const
