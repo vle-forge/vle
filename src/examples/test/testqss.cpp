@@ -152,6 +152,6 @@ BOOST_AUTO_TEST_CASE(test_qss4)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)1001);
 
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][1000]), 49.80635, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 536.87883, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][1000]), 49.80635, 10e-3);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 536.87883, 10e-3);
 }
