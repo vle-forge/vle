@@ -33,7 +33,7 @@ set(GVLE_SOURCES_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
   ValuesTreeView.hpp ViewDrawingArea.hpp View.hpp ViewOutputBox.hpp
   XmlTypeBox.hpp)
 
-if (win32)
+if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gvle.o
     COMMAND ${CMAKE_RC_COMPILER}
     -I${CMAKE_BINARY_DIR}/share
