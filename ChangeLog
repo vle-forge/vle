@@ -1,4 +1,149 @@
-vle-1.0.1
+vle-1.0.2
+
+commit 1d8c3c0f553ce5c65fff86c40c3405d344987381
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Sun Feb 5 20:41:15 2012 +0100
+
+    vle: update NEWS
+
+commit c59c08b871dc7b7391cf1eb5ff1ff1b372ed9c95
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Feb 9 11:31:37 2012 +0100
+
+    test: reduce the % in the floating point comparison
+    
+    The QSS unit test is too sensible to floating point comparison. We
+    reduce the percentage with a more flexible value.
+
+commit b5db4d84c0648e6da2fc06788ba9d01e026cb536
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Jan 17 17:38:43 2012 +0100
+
+    vle: fix bad doxygen tag
+    
+    Some "@code" and "@endcode" are malformed in source code of VLE. We
+    fix them.
+
+commit 3019d7633907e00b4631c6f112ffe6f6518f69d6
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Tue Jan 17 08:03:44 2012 +0100
+
+    oov: fix julian day option
+    
+    For File oov plugin, if option julian-day is checked,
+    the last line now contains the date. (Closes: 3469412)
+
+commit 7786df596a0ccb070c950b2c63e9b9b7f7613926
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Thu Jan 19 13:02:16 2012 +0100
+
+    gvle: migrate from libglade to GtkBuilder
+    
+    (Closes: #3476002)
+
+commit 732780c43b8335901188e830f0dcf3947492025a
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Thu Jan 12 13:17:40 2012 +0100
+
+    gvle: expunge unreachable code
+    
+    The source code, noticed as unreachable, according to the gcc linker,
+    has been removed.
+
+commit efb173eb2fb7b104d949c9c4e43a7c0bd8add9d5
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Mon Jan 9 18:55:09 2012 +0100
+
+    gvle: fix the tootip bug on changing vpz
+    
+    - From now on, the list of Views is emptied before to parse a new vpz.
+    - But also the query-tooltip-signal is disconnected when the
+    ViewDrawinArea is removed. (Closes: #3471475)
+
+commit 52f508e49935e06c5a9dccdcd4221eeed45f7e3a
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Mon Jan 9 16:49:41 2012 +0100
+
+    gvle: fix the empty class view double click bug
+    
+    In order to prevent the crash of the gui, when the user click inside
+    the emptyb class tree view, a control has been added.
+    (Closes: #3471415)
+
+commit bbcc9f28a129a71bc3d5b3a455f03b3770e14f58
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Jan 3 11:01:38 2012 +0100
+
+    Switch to 2012
+
+commit a2fd2ba0cf1f8fb4e4409b528c71bc5bf9358271
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Mon Dec 12 10:15:34 2011 +0100
+
+    oov: fix storage confusion between rows and columns
+    
+    In the gvle plugin for storage output, there was a confusion between the
+    button that configures the resize step of rows and columns.
+
+commit ee3c1f3cab57300d906c2b7a58a8a08d6c06ab7f
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Fri Dec 2 13:16:21 2011 +0100
+
+    gvle: fix the Gtk::Entry reset bug
+    
+    As soon as a Gtk::Entry was reset to an empty string, on the windows
+    portage, an error occurs. There is 3 way to fix this, not to reset
+    entries, reset entries with a dummy string or reset to an empty string
+    directly the buffer. We decide to use first the first policy, and
+    secondly the third policy.
+    (Closes: #3448080)
+
+commit de1bcc9a0e0b1491ef8259d422e411af788c191f
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Tue Dec 6 14:41:15 2011 +0100
+
+    gvle/modeling: fix the Gtk::Entry reset bug
+    
+    As soon as a Gtk::Entry was reset to an empty string, on the windows
+    portage, an error occurs. There is 3 way to fix this, not to reset
+    entries, reset entries with a dummy string or reset to an empty string
+    directly the buffer. We decide to use first the first policy and
+    secondly the third policy.
+    (Closes: #3448080)
+
+commit 33802b1378c74aaaa051b75a6705e94381cb75ce
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Thu Nov 24 17:05:41 2011 +0100
+
+    gvle: fix the renaming of an Experimental Condition
+    
+    The rename list of the ConditionsBox is purged from the renaming
+    action stored, where the new name already exist. (Closes: #3441829).
+
+commit 5af82340765a2aa1d13e6dade7a8e0df52025d2c
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Nov 24 12:25:53 2011 +0100
+
+    utils: add missing functions in Path class
+    
+    The Path class does not have function to access files into local or
+    external plug-ins (GVLE's output and modeling plug-ins and OOV's
+    plug-in).
+
+commit 6511b8d13a85665a66d133633baf45cf45570633
+Author: Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+Date:   Thu Nov 24 11:24:51 2011 +0100
+
+    gvle: fix the lack of the cursor of the text editors
+    
+    The overriding of the default signal handler "on_focus_in_event" has
+    been removed. (Closes: #3441738).
+
+commit 45a0556daab0d90e95d7c0bae13fd06da8a9c4eb
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Nov 15 15:20:36 2011 +0100
+
+    vle-1.0.1
 
 commit a1f9aedc5490ce1bb5cf26d58ac937f5aaa26352
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
