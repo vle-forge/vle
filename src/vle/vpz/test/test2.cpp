@@ -201,7 +201,6 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
 
     BOOST_REQUIRE_EQUAL(dyn.name(), "dyn1");
     BOOST_REQUIRE_EQUAL(dyn.library(), "celldevs");
-    BOOST_REQUIRE_EQUAL(dyn.type(), vpz::Dynamic::LOCAL);
     BOOST_REQUIRE_EQUAL(dyn.language(), "");
 }
 

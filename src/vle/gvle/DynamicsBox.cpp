@@ -416,13 +416,6 @@ void DynamicsBox::assignDynamic(const std::string& name)
 
     dyn.setPackage(getPackageStr());
 
-    if (mLocationHost->get_text().empty()) {
-        dyn.setLocalDynamics();
-    } else {
-        int port = (int)std::floor(std::abs(mLocationPort->get_value()));
-        dyn.setDistantDynamics(mLocationHost->get_text(), port);
-    }
-
     if (getLanguageStr() == "c++") {
         dyn.setLanguage("");
     } else {
@@ -442,18 +435,6 @@ void DynamicsBox::updateDynamic(const std::string& name)
 
     fillLibrary();
     setLibraryStr(dyn.library());
-
-    if (not dyn.location().empty()) {
-        std::string ip;
-        int port;
-
-        utils::net::explodeStringNet(dyn.location(), ip, port);
-
-        mLocationHost->set_text(ip);
-        mLocationPort->set_value(port);
-    } else {
-        mLocationPort->set_value(0);
-    }
 
     if (dyn.language().empty()) {
         setLanguageStr("c++");

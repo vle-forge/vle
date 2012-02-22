@@ -46,38 +46,14 @@ void Dynamic::write(std::ostream& out) const
         out << "language=\"" << m_language.c_str() << "\" ";
     }
 
-    if (m_type == LOCAL) {
-        out << "type=\"local\" ";
-    } else {
-        out << "type=\"distant\"  location=\"" << m_location.c_str() << "\"";
-    }
-
     out << " />";
-}
-
-void Dynamic::setDistantDynamics(const std::string& host, int port)
-{
-    if (port <= 0 and port > 65535) {
-        throw utils::ArgError(fmt(
-                _("Error in TCP/IP port for Dynamics distant model %1% "
-                  "(%2%:%3%)")) % m_name % host % port);
-    }
-
-    m_location = (fmt("%1%:%2%") % host % port).str();
-    m_type = DISTANT;
-}
-
-void Dynamic::setLocalDynamics()
-{
-    m_location.clear();
-    m_type = LOCAL;
 }
 
 bool Dynamic::operator==(const Dynamic& dynamic) const
 {
-    return m_name == dynamic.name() and m_library == dynamic.library()
+    return m_name == dynamic.name()
+        and m_library == dynamic.library()
 	and m_language == dynamic.language()
-	and m_location == dynamic.location() and m_type == dynamic.type()
 	and m_ispermanent == dynamic.isPermanent();
 }
 

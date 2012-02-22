@@ -18,6 +18,10 @@ graphical output are available into the GVLE application.
   $ vle --remote search '*gl*'
   $ vle --remote show glue
 
+- libvlevpz:
+
+  - Remove any reference to distant and local dynamics plugins.
+
 - libvlegeometry: removed
 
 - libvleeov: removed

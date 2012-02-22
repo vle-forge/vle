@@ -113,18 +113,6 @@ void DynamicBox::show(vpz::Dynamic* dyn)
     makeComboPackage();
     makeComboLibrary();
 
-    if (not mDyn->location().empty()) {
-        std::string ip;
-        int port;
-
-        utils::net::explodeStringNet(dyn->location(), ip, port);
-
-        mLocationHost->set_text(ip);
-        mLocationPort->set_value(port);
-    } else {
-        mLocationPort->set_value(0);
-    }
-
     if (dyn->language().empty()) {
         mLanguage->set_active_text("c++");
     } else {
@@ -188,13 +176,6 @@ void DynamicBox::on_apply()
 
     mDyn->setLibrary(mComboLibrary->get_active_text());
     mDyn->setPackage(mComboPackage->get_active_text());
-
-    if (mLocationHost->get_text().empty()) {
-        mDyn->setLocalDynamics();
-    } else {
-        int port = (int)std::floor(std::abs(mLocationPort->get_value()));
-        mDyn->setDistantDynamics(mLocationHost->get_text(), port);
-    }
 
     if (mLanguage->get_active_text() == "c++") {
         mDyn->setLanguage("");

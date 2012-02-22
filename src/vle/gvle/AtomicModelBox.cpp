@@ -1110,20 +1110,6 @@ void AtomicModelBox::DynamicTreeView::onRename()
                     newDynamic->setLibrary(oldDynamic.library());
                     newDynamic->setPackage(oldDynamic.package());
                     newDynamic->setLanguage(oldDynamic.language());
-                    if (oldDynamic.location().empty()) {
-                        newDynamic->setLocalDynamics();
-                    } else {
-                        std::vector<std::string> vec;
-                        boost::split(vec, oldDynamic.location(),
-                                     boost::is_any_of(":"));
-                        std::string location =
-                            oldDynamic.location().substr(
-                                0, oldDynamic.location().size()
-                                - vec[vec.size() - 1].size() - 1);
-                        int port = boost::lexical_cast<int>(vec[vec.size() - 1]);
-
-                        newDynamic->setDistantDynamics(location, port);
-                    }
                     mDynamics->add(*newDynamic);
                     mDynamics->del(oldName);
                     if ((*it)[mColumnsDyn.m_sel] == true) {
@@ -1176,21 +1162,6 @@ void AtomicModelBox::DynamicTreeView::onEdition(
 	    vpz::Dynamic oldDynamic = mDynamics->get(mOldName);
 	    newDynamic->setLibrary(oldDynamic.library());
 	    newDynamic->setLanguage(oldDynamic.language());
-	    if (oldDynamic.location().empty()) {
-		newDynamic->setLocalDynamics();
-	    } else {
-		std::vector<std::string> vec;
-		boost::split(vec, oldDynamic.location(),
-			     boost::is_any_of(":"));
-		std::string location =
-		    oldDynamic.location().substr(
-			0, oldDynamic.location().size()
-			- vec[vec.size() - 1].size() - 1);
-		int port = boost::lexical_cast<int>(vec[vec.size() - 1]);
-
-		newDynamic->setDistantDynamics(location, port);
-
-	    }
 	    mDynamics->add(*newDynamic);
 	    mDynamics->del(mOldName);
 

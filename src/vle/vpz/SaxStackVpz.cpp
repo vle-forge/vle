@@ -483,8 +483,6 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
     const xmlChar* package = 0;
     const xmlChar* library = 0;
     const xmlChar* language = 0;
-    const xmlChar* type = 0;
-    const xmlChar* location = 0;
 
     for (int i = 0; att[i] != 0; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
@@ -495,10 +493,6 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
             library = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"language") == 0) {
             language = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"type") == 0) {
-            type = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"location") == 0) {
-            location = att[i + 1];
         }
     }
 
@@ -520,25 +514,6 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
         dyn.setLanguage(xmlCharToString(language));
     } else {
         dyn.setLanguage("");
-    }
-
-    if (type) {
-        if (xmlStrcmp(type, (xmlChar*)"local") == 0) {
-            dyn.setLocalDynamics();
-        } else {
-            if (location == 0) {
-                throw utils::SaxParserError(
-                    _("Dynamic tag define distant dynamic without location"));
-            }
-
-            std::string loc(xmlCharToString(location));
-            std::string ip;
-            int port;
-            utils::net::explodeStringNet(loc, ip, port);
-            dyn.setDistantDynamics(ip, port);
-        }
-    } else {
-        dyn.setLocalDynamics();
     }
 
     vpz::Dynamics* dyns(static_cast < Dynamics* >(parent()));

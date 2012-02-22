@@ -217,20 +217,16 @@ void check_dynamics_unittest_vpz(const vpz::Dynamics& dynamics)
     vpz::Dynamic unittest(dynamics.get("unittest"));
     BOOST_REQUIRE_EQUAL(unittest.name(), "unittest");
     BOOST_REQUIRE_EQUAL(unittest.library(), "DevsTransform");
-    BOOST_REQUIRE_EQUAL(unittest.type(),  vpz::Dynamic::LOCAL);
 
     vpz::Dynamic b(dynamics.get("b"));
     BOOST_REQUIRE_EQUAL(b.name(), "b");
     BOOST_REQUIRE_EQUAL(b.library(), "libu");
     BOOST_REQUIRE_EQUAL(b.language(), "python");
-    BOOST_REQUIRE_EQUAL(b.type(),  vpz::Dynamic::LOCAL);
 
     vpz::Dynamic a(dynamics.get("a"));
     BOOST_REQUIRE_EQUAL(a.name(), "a");
     BOOST_REQUIRE_EQUAL(a.library(), "liba");
     BOOST_REQUIRE_EQUAL(a.language(), "python");
-    BOOST_REQUIRE_EQUAL(a.location(), "192.168.1.1:324");
-    BOOST_REQUIRE_EQUAL(a.type(),  vpz::Dynamic::DISTANT);
 }
 
 void check_experiment_unittest_vpz(const vpz::Experiment& exp)
