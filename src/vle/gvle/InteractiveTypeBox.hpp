@@ -40,11 +40,11 @@ namespace vle { namespace gvle {
     public:
         InteractiveTypeBox(const std::string& title,
 	                   vpz::Base* base = 0,
-			   std::string currentValue = "");
+			   const std::string& currentValue = std::string());
 
         InteractiveTypeBox(const std::string& title,
 	                   graph::CoupledModel* coupledModel = 0,
-			   std::string currentValue = "");
+			   const std::string& currentValue = std::string());
 
         virtual ~InteractiveTypeBox();
 
@@ -70,7 +70,7 @@ namespace vle { namespace gvle {
 	bool                     mState;
 	vpz::Base*               mBase;
 	graph::CoupledModel*     mCoupledModel;
-	std::string&             mCurrentValue;
+	std::string              mCurrentValue;
 
 	// Methods
         void makeDialog();
