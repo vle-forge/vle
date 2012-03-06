@@ -211,7 +211,7 @@ private:
 template < typename I >
 void operator>>(Internal_t<I> internal, int newState)
 {
-    insert(internal.obj->internals())(internal.state, newState);
+    boost::assign::insert(internal.obj->internals())(internal.state, newState);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -219,7 +219,7 @@ void operator>>(Internal_t<I> internal, int newState)
 template < typename I >
 void operator<<(Duration_t<I> duration, const devs::Time& value)
 {
-    insert(duration.obj->durations())(duration.state, value);
+    boost::assign::insert(duration.obj->durations())(duration.state, value);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -227,7 +227,7 @@ void operator<<(Duration_t<I> duration, const devs::Time& value)
 template < typename I >
 void operator>>(External_t<I> external, int state)
 {
-    insert(external.obj->externals(external.state))(external.input, state);
+    boost::assign::insert(external.obj->externals(external.state))(external.input, state);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -235,7 +235,7 @@ void operator>>(External_t<I> external, int state)
 template < typename I >
 void operator>>(FDDevsOutput_t<I> output, const std::string& port)
 {
-    insert(output.obj->outputs())(output.state, port);
+    boost::assign::insert(output.obj->outputs())(output.state, port);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */

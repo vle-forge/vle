@@ -184,7 +184,7 @@ private:
 template < typename I >
 void operator<<(MooreTransition_t<I> transition, Event_t event)
 {
-    insert(transition.obj->transitions(transition.state))(
+    boost::assign::insert(transition.obj->transitions(transition.state))(
         event.event, transition.nextState);
 }
 
@@ -203,7 +203,7 @@ MooreInAction_t<X,I> operator>>(MooreInAction_t<X,I> action, int state)
 template < typename I >
 void operator>>(MooreOutput_t<I> output, const std::string& port)
 {
-    insert(output.obj->outputs())(output.state, port);
+    boost::assign::insert(output.obj->outputs())(output.state, port);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
