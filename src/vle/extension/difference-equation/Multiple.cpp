@@ -126,7 +126,7 @@ void Multiple::create(const std::string& name,
         mInitValues[name] = false;
         size(name, DEFAULT_SIZE);
     }
-    mSetValues.insert(std::make_pair(name, false)).first;
+    mSetValues.insert(std::make_pair(name, false));
     iterators.mMultipleValues = &mValues[name];
     iterators.mSetValues = &mSetValues[name];
     iterators.mInitValues = &mInitValues[name];
