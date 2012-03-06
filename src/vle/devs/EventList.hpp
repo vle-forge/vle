@@ -67,7 +67,7 @@ namespace vle { namespace devs {
         inline void addEvent(Class* event)
         {
             if (event) {
-                push_back(event);
+                std::vector < Class* >::push_back(event);
             }
         }
 
