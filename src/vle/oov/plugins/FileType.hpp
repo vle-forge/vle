@@ -36,6 +36,8 @@ namespace vle { namespace oov { namespace plugin {
 class Rdata : public File::FileType
 {
 public:
+    virtual ~Rdata();
+
     virtual std::string extension() const;
 
     virtual void writeSeparator(std::ostream& out);
@@ -46,6 +48,8 @@ public:
 class CSV : public File::FileType
 {
 public:
+    virtual ~CSV();
+
     virtual std::string extension() const;
 
     virtual void writeSeparator(std::ostream& out);
@@ -56,6 +60,8 @@ public:
 class Text : public File::FileType
 {
 public:
+    virtual ~Text();
+
     virtual std::string extension() const;
 
     virtual void writeSeparator(std::ostream& out);

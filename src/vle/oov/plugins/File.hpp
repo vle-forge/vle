@@ -108,6 +108,8 @@ public:
     class FileType
     {
     public:
+        virtual ~FileType() {}
+
         virtual std::string extension() const = 0;
 
         virtual void writeSeparator(std::ostream& out) = 0;
