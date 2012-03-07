@@ -97,7 +97,8 @@ public:
                         (*it)->getAttributes().writeToString()));
             } else {
                 TraceExtension(
-                    fmt(_("%1$20.10g %2% [Statechart] event on %3%")));
+                    fmt(_("%1$20.10g %2% [Statechart] event on %3%"))
+                        % time % mName % (*it)->getPortName());
             }
             ++it;
         }
