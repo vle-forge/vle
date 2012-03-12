@@ -30,8 +30,6 @@
 #include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/vpz/AtomicModels.hpp>
 #include <vle/vpz/Dynamic.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Observables.hpp>

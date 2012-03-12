@@ -31,7 +31,7 @@
 
 #include <gtkmm.h>
 #include <gtkmm/builder.h>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 
 namespace vle { namespace gvle {
 
@@ -44,7 +44,7 @@ public:
     CoupledModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
                     Modeling* m, GVLE* gvle);
 
-    void show(graph::CoupledModel* model);
+    void show(vpz::CoupledModel* model);
 
 protected:
 class ModelColumns : public Gtk::TreeModelColumnRecord
@@ -67,11 +67,11 @@ private:
 			  const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~InputPortTreeView();
 
-	void applyRenaming(graph::CoupledModel* model);
+	void applyRenaming(vpz::CoupledModel* model);
 	void build();
 	void clearRenaming()
 	    { mRenameList.clear(); }
-	void setModel(graph::CoupledModel* model)
+	void setModel(vpz::CoupledModel* model)
 	    { mModel = model; }
 
     protected:
@@ -91,7 +91,7 @@ private:
     private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
-	graph::CoupledModel* mModel;
+	vpz::CoupledModel* mModel;
 	Gtk::Menu mMenuPopup;
 	ModelColumns mColumnsInputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelInputPort;
@@ -111,11 +111,11 @@ private:
 			   const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~OutputPortTreeView();
 
-	void applyRenaming(graph::CoupledModel* model);
+	void applyRenaming(vpz::CoupledModel* model);
 	void build();
 	void clearRenaming()
 	    { mRenameList.clear(); }
-	void setModel(graph::CoupledModel* model)
+	void setModel(vpz::CoupledModel* model)
 	    { mModel = model; }
     protected:
 	virtual bool on_button_press_event(GdkEventButton *ev);
@@ -135,7 +135,7 @@ private:
     private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
-	graph::CoupledModel* mModel;
+	vpz::CoupledModel* mModel;
 	Gtk::Menu mMenuPopup;
 	ModelColumns mColumnsOutputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelOutputPort;
@@ -155,8 +155,8 @@ private:
     Glib::RefPtr < Gtk::Builder >          mXml;
     Modeling*                              mModeling;
     GVLE*                                  mGVLE;
-    graph::CoupledModel*                   mGraphModel;
-    graph::CoupledModel*                   mCurrentGraphModel;
+    vpz::CoupledModel*                   mGraphModel;
+    vpz::CoupledModel*                   mCurrentGraphModel;
 
     Gtk::Dialog*                           mDialog;
     Gtk::Label*                            mModelName;

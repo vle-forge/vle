@@ -38,7 +38,7 @@
 #include <stdexcept>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 
 struct F
 {
@@ -214,11 +214,11 @@ BOOST_AUTO_TEST_CASE(single_class)
     const vpz::Class& classe(classes.get("xxx"));
     BOOST_REQUIRE(classe.model() != 0);
 
-    const graph::Model* mdl = classe.model();
+    const vpz::GraphModel* mdl = classe.model();
     BOOST_REQUIRE(mdl->isCoupled());
 
-    const graph::CoupledModel* cpl(dynamic_cast < const
-                                   graph::CoupledModel*>(mdl));
+    const vpz::CoupledModel* cpl(dynamic_cast < const
+                                   vpz::CoupledModel*>(mdl));
     BOOST_REQUIRE(cpl);
 
 
@@ -389,11 +389,11 @@ BOOST_AUTO_TEST_CASE(single_class_utf8)
     const vpz::Class& classe(classes.get("xx € ç x"));
     BOOST_REQUIRE(classe.model() != 0);
 
-    const graph::Model* mdl = classe.model();
+    const vpz::GraphModel* mdl = classe.model();
     BOOST_REQUIRE(mdl->isCoupled());
 
-    const graph::CoupledModel* cpl(dynamic_cast < const
-                                   graph::CoupledModel*>(mdl));
+    const vpz::CoupledModel* cpl(dynamic_cast < const
+                                   vpz::CoupledModel*>(mdl));
     BOOST_REQUIRE(cpl);
 
 

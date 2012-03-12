@@ -37,14 +37,14 @@ namespace vle { namespace vpz {
 
     /**
      * @brief The class Class is build on the vpz::Model structure. It stores a
-     * new graph::Model hierarchy and a vpz::AtomicModels class to build easily
+     * new vpz::GraphModel hierarchy and a vpz::AtomicModels class to build easily
      * new structure of models.
      */
     class VLE_API Class : public Base
     {
     public:
         /**
-         * @brief Build a new Class with a name but without graph::Model
+         * @brief Build a new Class with a name but without vpz::GraphModel
          * hierarchy.
          * @param name The name of this Class.
          */
@@ -54,14 +54,14 @@ namespace vle { namespace vpz {
         {}
 
         /**
-         * @brief Build a new Class by copying the parameter. The graph::Model
+         * @brief Build a new Class by copying the parameter. The vpz::GraphModel
          * hierarchy is clone in this function.
          * @param cls The class to copy.
          */
         Class(const Class& cls);
 
         /**
-         * @brief Delete the graph::Model hierarchy.
+         * @brief Delete the vpz::GraphModel hierarchy.
          */
         virtual ~Class()
         { delete m_model; }
@@ -88,7 +88,7 @@ namespace vle { namespace vpz {
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
-         * Manage the graph::Model hierarchy
+         * Manage the vpz::GraphModel hierarchy
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -96,14 +96,14 @@ namespace vle { namespace vpz {
          * @brief Get a constant reference to the stored Model.
          * @return Get a constant reference to the stored Model.
          */
-        inline const graph::Model* model() const
+        inline const vpz::GraphModel* model() const
         { return m_model; }
 
         /**
          * @brief Get a reference to the stored Model.
          * @return Get a reference to the stored Model.
          */
-        inline graph::Model* model()
+        inline vpz::GraphModel* model()
         { return m_model; }
 
         /**
@@ -111,7 +111,7 @@ namespace vle { namespace vpz {
          * carreful, the old one are not destroyed.
          * @param mdl The reference to the new model to set.
          */
-        inline void setModel(graph::Model* mdl)
+        inline void setModel(vpz::GraphModel* mdl)
         { m_model = mdl; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -162,10 +162,61 @@ namespace vle { namespace vpz {
         void setName(const std::string& newname)
         { m_name.assign(newname); }
 
+        /**
+	 * @brief Update the dynamics of the AtomicModels where an
+	 * oldname became newname, for the class graph model.
+	 * @param oldname the old name of the dynamics.
+	 * @param newname the new name of the dynamics.
+	 */
+	void updateDynamics(const std::string& oldname,
+                                    const std::string& newname);
+
+        /**
+	 * @brief purge the dymamics references of the model where the
+	 * dynamic is not present in the list
+	 * @param dynamicslist a list of dynamics name
+	 */
+
+	void purgeDynamics(const std::set < std::string >& dynamicslist);
+        /**
+	 * @brief Update the Observable of the AtomicModels where an
+	 * oldname became newname, for the graph model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	void updateObservable(const std::string& oldname,
+                                      const std::string& newname);
+
+        /**
+	 * @brief purge the observables references of the model where the
+	 * observable is not present in the list
+	 * @param observablelist a list of observable name
+	 */
+	void purgeObservable(const std::set < std::string >& observablelist);
+
+        /**
+	 * @brief Update the Conditions of the AtomicModels where an
+	 * oldname became newname, for the class graph model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	void updateConditions(const std::string& oldname,
+                              const std::string& newname);
+
+        /**
+	 * @brief purge the Conditions references of the model where the
+	 * Condition is not present in the list
+	 * @param conditionlist a list of condition name
+	 */
+	void purgeConditions(const std::set < std::string >& conditionlist);
+
+        void getAtomicModelList(std::vector < AtomicGraphModel* >& list) const
+        { list.clear(); m_model->getAtomicModelList(m_model, list); }
+
     private:
         AtomicModelList m_atomicmodels;
         std::string     m_name;
-        graph::Model*   m_model;
+        vpz::GraphModel*   m_model;
     };
 
 }} // namespace vle vpz

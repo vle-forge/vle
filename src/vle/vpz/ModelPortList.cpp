@@ -1,5 +1,5 @@
 /*
- * @file vle/graph/ModelPortList.cpp
+ * @file vle/vpz/ModelPortList.cpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -26,17 +26,17 @@
  */
 
 
-#include <vle/graph/ModelPortList.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/ModelPortList.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <vle/utils/Exception.hpp>
 
-namespace vle { namespace graph {
+namespace vle { namespace vpz {
 
 ModelPortList::~ModelPortList()
 {
 }
 
-void ModelPortList::add(Model* model, const std::string& portname)
+void ModelPortList::add(GraphModel* model, const std::string& portname)
 {
     if (not model) {
         throw utils::DevsGraphError(fmt(
@@ -47,7 +47,7 @@ void ModelPortList::add(Model* model, const std::string& portname)
     m_lst.insert(value_type(model, portname));
 }
 
-void ModelPortList::remove(Model* model, const std::string& portname)
+void ModelPortList::remove(GraphModel* model, const std::string& portname)
 {
     if (not model) {
         throw utils::DevsGraphError(fmt(
@@ -83,7 +83,7 @@ void ModelPortList::merge(ModelPortList& lst)
     }
 }
 
-bool ModelPortList::exist(Model* model, const std::string& portname) const
+bool ModelPortList::exist(GraphModel* model, const std::string& portname) const
 {
     std::pair < const_iterator, const_iterator > its(m_lst.equal_range(model));
     for (const_iterator it = its.first; it != its.second; ++it) {
@@ -94,10 +94,10 @@ bool ModelPortList::exist(Model* model, const std::string& portname) const
     return false;
 }
 
-bool ModelPortList::exist(const Model* model, const std::string& portname) const
+bool ModelPortList::exist(const GraphModel* model, const std::string& portname) const
 {
     std::pair < const_iterator, const_iterator > its;
-    its = m_lst.equal_range(const_cast < Model* >(model));
+    its = m_lst.equal_range(const_cast < GraphModel* >(model));
     for (const_iterator it = its.first; it != its.second; ++it) {
         if (it->second == portname) {
             return true;
@@ -115,4 +115,4 @@ std::ostream& operator<<(std::ostream& out, const ModelPortList& lst)
     return out;
 }
 
-}} // namespace vle graph
+}} // namespace vle vpz

@@ -33,9 +33,20 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Observable.hpp>
 #include <map>
+#include <set>
 #include <string>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
+
+    /**
+     * @brief A operator to retrieve the key
+     *
+     * @param pair the key Observable pair.
+     * @return a observable name
+     */
+    inline std::string observableKey(std::pair < std::string, Observable > pair)
+    { return pair.first; }
 
     /**
      * @brief A list of Observable.
@@ -65,6 +76,13 @@ namespace vle { namespace vpz {
          */
         virtual ~Observables()
         {}
+
+        /**
+         * @brief A operator to retrieve the list of keys
+         *
+         * @return vector of Observable names
+         */
+        std::set < std::string > getKeys();
 
         /**
          * @brief Write into the std::ostream, the XML reprensentation of

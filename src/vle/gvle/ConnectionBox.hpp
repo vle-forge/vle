@@ -38,10 +38,10 @@
 
 namespace vle
 {
-namespace graph {
+namespace vpz {
 
 class CoupledModel;
-class Model;
+class GraphModel;
 
 }
 } // namespace vle graph
@@ -56,8 +56,8 @@ namespace gvle {
 class ConnectionBox : public Gtk::Dialog
 {
 public:
-    ConnectionBox(graph::CoupledModel* parent, graph::Model* src,
-                  graph::Model* dst);
+    ConnectionBox(vpz::CoupledModel* parent, vpz::GraphModel* src,
+                  vpz::GraphModel* dst);
 
     /**
      * Assign to string name value of combobox input
@@ -82,21 +82,21 @@ private:
      * Assign to combo box all inputs ports of model src if src equal
      * parent or ouputs otherwise.
      *
-     * @param parent graph::CoupledModel parent of src or equal
+     * @param parent vpz::CoupledModel parent of src or equal
      * @param src children of parent
      */
-    void assingComboInputPort(graph::CoupledModel* parent,
-                              graph::Model* src);
+    void assingComboInputPort(vpz::CoupledModel* parent,
+                              vpz::GraphModel* src);
 
     /**
      * Assign to combo box all outputs ports of model dst if src equal
      * parent or inputs otherwise.
      *
-     * @param parent graph::CoupledModel parent of src or equal
+     * @param parent vpz::CoupledModel parent of src or equal
      * @param src children of parent
      */
-    void assingComboOutputPort(graph::CoupledModel* parent,
-                               graph::Model* dst);
+    void assingComboOutputPort(vpz::CoupledModel* parent,
+                               vpz::GraphModel* dst);
 
 private:
     Gtk::VBox                   m_vbox;

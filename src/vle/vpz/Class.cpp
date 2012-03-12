@@ -47,8 +47,40 @@ Class::Class(const Class& cls) :
 void Class::write(std::ostream& out) const
 {
     out << "<class name=\"" << m_name.c_str() << "\" >\n";
-    m_atomicmodels.writeModel(m_model, out);
+    m_model->write(out);
     out << "</class>\n";
 }
 
+void Class::updateDynamics(const std::string& oldname,
+                           const std::string& newname)
+{
+    m_model->updateDynamics(oldname,newname);
+}
+
+void Class::purgeDynamics(const std::set < std::string >& dynamicslist)
+{
+    m_model->purgeDynamics(dynamicslist);
+}
+
+void Class::updateObservable(const std::string& oldname,
+                             const std::string& newname)
+{
+    m_model->updateObservable(oldname, newname);
+}
+
+void Class::purgeObservable(const std::set < std::string >& observablelist)
+{
+    m_model->purgeObservable(observablelist);
+}
+
+void Class::updateConditions(const std::string& oldname,
+                             const std::string& newname)
+{
+    m_model->updateConditions(oldname, newname);
+}
+
+void Class::purgeConditions(const std::set < std::string >& conditionlist)
+{
+    m_model->purgeConditions(conditionlist);
+}
 }} // namespace vle vpz

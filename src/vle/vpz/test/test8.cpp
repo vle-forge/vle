@@ -1,5 +1,5 @@
 /*
- * @file vle/graph/test/test1.cpp
+ * @file vle/vpz/test/test8.cpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -37,8 +37,8 @@
 #include <stdexcept>
 #include <limits>
 #include <fstream>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/value/Value.hpp>
@@ -53,7 +53,7 @@ struct F
 BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
-using namespace graph;
+using namespace vpz;
 
 BOOST_AUTO_TEST_CASE(test_rename_model)
 {
@@ -62,38 +62,38 @@ BOOST_AUTO_TEST_CASE(test_rename_model)
     CoupledModel* top =
         dynamic_cast<CoupledModel*>(file.project().model().model());
     BOOST_REQUIRE(top);
-    BOOST_REQUIRE_NO_THROW(graph::Model::rename(top, "new_top"));
+    BOOST_REQUIRE_NO_THROW(vpz::GraphModel::rename(top, "new_top"));
 
-    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
-    BOOST_REQUIRE_THROW(graph::Model::rename(d, "e"), utils::DevsGraphError);
-    BOOST_REQUIRE_NO_THROW(graph::Model::rename(d, "new_d"));
+    AtomicGraphModel* d = dynamic_cast<AtomicGraphModel*>(top->findModel("d"));
+    BOOST_REQUIRE_THROW(vpz::GraphModel::rename(d, "e"), utils::DevsGraphError);
+    BOOST_REQUIRE_NO_THROW(vpz::GraphModel::rename(d, "new_d"));
 
     CoupledModel * top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
-    BOOST_REQUIRE_THROW(graph::Model::rename(top1, "top2"), utils::DevsGraphError);
-    BOOST_REQUIRE_NO_THROW(graph::Model::rename(top1, "new_top1"));
+    BOOST_REQUIRE_THROW(vpz::GraphModel::rename(top1, "top2"), utils::DevsGraphError);
+    BOOST_REQUIRE_NO_THROW(vpz::GraphModel::rename(top1, "new_top1"));
 }
 
 BOOST_AUTO_TEST_CASE(test_findModelFromPath)
 {
     vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz"));
-    Model* d = file.project().model().model()->findModelFromPath("d");
+    GraphModel* d = file.project().model().model()->findModelFromPath("d");
     bool found = (d != 0);
 
     BOOST_REQUIRE_EQUAL(found, true);
-    Model* top1 = file.project().model().model()->findModelFromPath("top1");
+    GraphModel* top1 = file.project().model().model()->findModelFromPath("top1");
     found = (top1 != 0);
     BOOST_REQUIRE_EQUAL(found, true);
-    Model* top2_g = file.project().model().model()->findModelFromPath("top2,g");
+    GraphModel* top2_g = file.project().model().model()->findModelFromPath("top2,g");
     found = (top2_g != 0);
     BOOST_REQUIRE_EQUAL(found, true);
-    Model* nomodel =
+    GraphModel* nomodel =
         file.project().model().model()->findModelFromPath("nomodel");
     found = (nomodel != 0);
     BOOST_REQUIRE_EQUAL(found, false);
-    Model* empty = file.project().model().model()->findModelFromPath("");
+    GraphModel* empty = file.project().model().model()->findModelFromPath("");
     found = (empty != 0);
     BOOST_REQUIRE_EQUAL(found, false);
-    Model* top1_a_nomodel =
+    GraphModel* top1_a_nomodel =
         file.project().model().model()->findModelFromPath("top1,a,nomodel");
     found = (top1_a_nomodel != 0);
     BOOST_REQUIRE_EQUAL(found, false);
@@ -103,11 +103,11 @@ BOOST_AUTO_TEST_CASE(test_del_all_connection)
 {
     CoupledModel* top = new CoupledModel("top", 0);
 
-    AtomicModel* a(top->addAtomicModel("a"));
+    AtomicGraphModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel* b(top->addAtomicModel("b"));
+    AtomicGraphModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
@@ -127,15 +127,15 @@ BOOST_AUTO_TEST_CASE(test_have_connection)
 {
     CoupledModel* top = new CoupledModel("top", 0);
 
-    AtomicModel* a(top->addAtomicModel("a"));
+    AtomicGraphModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel* b(top->addAtomicModel("b"));
+    AtomicGraphModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel* c(top->addAtomicModel("c"));
+    AtomicGraphModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -159,15 +159,15 @@ BOOST_AUTO_TEST_CASE(test_displace)
 {
     CoupledModel* top = new CoupledModel("top", 0);
 
-    AtomicModel* a(top->addAtomicModel("a"));
+    AtomicGraphModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel* b(top->addAtomicModel("b"));
+    AtomicGraphModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel* c(top->addAtomicModel("c"));
+    AtomicGraphModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -199,15 +199,15 @@ BOOST_AUTO_TEST_CASE(test_complex_displace)
 {
     CoupledModel* top = new CoupledModel("top", 0);
 
-    AtomicModel* a(top->addAtomicModel("a"));
+    AtomicGraphModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel* b(top->addAtomicModel("b"));
+    AtomicGraphModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel* c(top->addAtomicModel("c"));
+    AtomicGraphModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -243,15 +243,15 @@ BOOST_AUTO_TEST_CASE(test_delinput_port)
 {
     CoupledModel* top = new CoupledModel("top", 0);
 
-    AtomicModel* a(top->addAtomicModel("a"));
+    AtomicGraphModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel* b(top->addAtomicModel("b"));
+    AtomicGraphModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel* c(top->addAtomicModel("c"));
+    AtomicGraphModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE(test_del_port)
                                                      "in"), true);
 
     //Atomic Model
-    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
+    AtomicGraphModel* d = dynamic_cast<AtomicGraphModel*>(top->findModel("d"));
     BOOST_REQUIRE(d);
     BOOST_REQUIRE_EQUAL(d->existInputPort("in"), true);
     BOOST_REQUIRE_EQUAL(d->existOutputPort("out"), true);
@@ -344,11 +344,11 @@ BOOST_AUTO_TEST_CASE(test_clone1)
     top->addInputPort("in");
     top->addOutputPort("out");
 
-    AtomicModel* a(top->addAtomicModel("top"));
+    AtomicGraphModel* a(top->addAtomicModel("top"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel* b(top->addAtomicModel("b"));
+    AtomicGraphModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
@@ -364,9 +364,9 @@ BOOST_AUTO_TEST_CASE(test_clone1)
     BOOST_REQUIRE(newtop != 0);
     BOOST_REQUIRE(newtop->getModelList().size() == 2);
 
-    AtomicModel* newa = dynamic_cast < AtomicModel* >(newtop->findModel("top"));
+    AtomicGraphModel* newa = dynamic_cast < AtomicGraphModel* >(newtop->findModel("top"));
     BOOST_REQUIRE(newa != a);
-    AtomicModel* newb = dynamic_cast < AtomicModel* >(newtop->findModel("b"));
+    AtomicGraphModel* newb = dynamic_cast < AtomicGraphModel* >(newtop->findModel("b"));
     BOOST_REQUIRE(newb != b);
 
     BOOST_REQUIRE(newtop->existInternalConnection("top", "out", "b", "in"));
@@ -404,9 +404,9 @@ BOOST_AUTO_TEST_CASE(test_clone2)
                        >(top->findModel("top2")));
     BOOST_REQUIRE(top2);
 
-    AtomicModel* f(dynamic_cast < AtomicModel* >(top2->findModel("f")));
+    AtomicGraphModel* f(dynamic_cast < AtomicGraphModel* >(top2->findModel("f")));
     BOOST_REQUIRE(f);
-    AtomicModel* g(dynamic_cast < AtomicModel* >(top2->findModel("g")));
+    AtomicGraphModel* g(dynamic_cast < AtomicGraphModel* >(top2->findModel("g")));
     BOOST_REQUIRE(g);
 
     delete top;
@@ -429,15 +429,15 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
 
     AtomicModelVector lst1, lst2;
 
-    Model::getAtomicModelList(top1, lst1);
-    Model::getAtomicModelList(top2, lst2);
+    GraphModel::getAtomicModelList(top1, lst1);
+    GraphModel::getAtomicModelList(top2, lst2);
 
-    graph::AtomicModelVector intersection;
+    AtomicModelVector intersection;
 
     std::sort(lst1.begin(), lst1.end());
     std::sort(lst2.begin(), lst2.end());
 
-    graph::AtomicModelVector::iterator it;
+    AtomicModelVector::iterator it;
 
     it = std::search(lst1.begin(), lst1.end(), lst2.begin(), lst2.end());
 
@@ -463,7 +463,7 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
     BOOST_REQUIRE_EQUAL(top->getOutputPortList().size(),
                         (ConnectionList::size_type)0);
 
-    AtomicModel* e = dynamic_cast < AtomicModel*> (top->getModelList()["e"]);
+    AtomicGraphModel* e = dynamic_cast < AtomicGraphModel*> (top->getModelList()["e"]);
 
     BOOST_REQUIRE(e);
 
@@ -490,7 +490,7 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
                                                      "in"), true);
 
     //Atomic Model
-    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
+    AtomicGraphModel* d = dynamic_cast<AtomicGraphModel*>(top->findModel("d"));
     BOOST_REQUIRE(d);
     BOOST_REQUIRE_EQUAL(d->existInputPort("in"), true);
     BOOST_REQUIRE_EQUAL(d->existOutputPort("out"), true);
@@ -603,8 +603,8 @@ BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
         dynamic_cast<CoupledModel*>(file.project().model().model());
     BOOST_REQUIRE(top);
 
-    AtomicModel* atom1(top->addAtomicModel("atom1"));
-    AtomicModel* atom2(top->addAtomicModel("atom2"));
+    AtomicGraphModel* atom1(top->addAtomicModel("atom1"));
+    AtomicGraphModel* atom2(top->addAtomicModel("atom2"));
     CoupledModel* coupled = new CoupledModel("coupled", top);
     ModelList mSelectedModels;
 
@@ -636,12 +636,12 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
 
     CoupledModel* top((file.project().model().model())->toCoupled());
     BOOST_REQUIRE(top);
-    AtomicModel* e(top->findModel("e")->toAtomic());
+    AtomicGraphModel* e(top->findModel("e")->toAtomic());
     BOOST_REQUIRE(e);
-    AtomicModel* d(top->findModel("d")->toAtomic());
+    AtomicGraphModel* d(top->findModel("d")->toAtomic());
     BOOST_REQUIRE(d);
 
-    graph::ModelPortList result;
+    vpz::ModelPortList result;
     e->getAtomicModelsSource("in1", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
@@ -655,17 +655,17 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
     CoupledModel* top1(top->findModel("top1")->toCoupled());
     BOOST_REQUIRE(top1);
 
-    AtomicModel* a(top1->findModel("a")->toAtomic());
+    AtomicGraphModel* a(top1->findModel("a")->toAtomic());
     BOOST_REQUIRE(a);
     a->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
-    AtomicModel* b(top1->findModel("b")->toAtomic());
+    AtomicGraphModel* b(top1->findModel("b")->toAtomic());
     BOOST_REQUIRE(b);
     b->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
-    AtomicModel* c(top1->findModel("c")->toAtomic());
+    AtomicGraphModel* c(top1->findModel("c")->toAtomic());
     BOOST_REQUIRE(c);
     c->getAtomicModelsSource("in1", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
@@ -674,7 +674,7 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
 
-    AtomicModel* x(top1->findModel("x")->toAtomic());
+    AtomicGraphModel* x(top1->findModel("x")->toAtomic());
     BOOST_REQUIRE(x);
     x->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
@@ -683,9 +683,9 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
     CoupledModel* top2(top->findModel("top2")->toCoupled());
     BOOST_REQUIRE(top2);
 
-    AtomicModel* f(top2->findModel("f")->toAtomic());
+    AtomicGraphModel* f(top2->findModel("f")->toAtomic());
     BOOST_REQUIRE(f);
-    AtomicModel* g(top2->findModel("g")->toAtomic());
+    AtomicGraphModel* g(top2->findModel("g")->toAtomic());
     BOOST_REQUIRE(g);
 
     f->getAtomicModelsSource("in", result);
@@ -704,21 +704,21 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
     CoupledModel* top1(top->findModel("top1")->toCoupled());
     CoupledModel* top2(top->findModel("top2")->toCoupled());
 
-    AtomicModel* e(top->findModel("e")->toAtomic());
-    AtomicModel* d(top->findModel("d")->toAtomic());
+    AtomicGraphModel* e(top->findModel("e")->toAtomic());
+    AtomicGraphModel* d(top->findModel("d")->toAtomic());
 
-    AtomicModel* a(top1->findModel("a")->toAtomic());
-    AtomicModel* b(top1->findModel("b")->toAtomic());
-    AtomicModel* c(top1->findModel("c")->toAtomic());
-    AtomicModel* x(top1->findModel("x")->toAtomic());
+    AtomicGraphModel* a(top1->findModel("a")->toAtomic());
+    AtomicGraphModel* b(top1->findModel("b")->toAtomic());
+    AtomicGraphModel* c(top1->findModel("c")->toAtomic());
+    AtomicGraphModel* x(top1->findModel("x")->toAtomic());
 
-    AtomicModel* f(top2->findModel("f")->toAtomic());
-    AtomicModel* g(top2->findModel("g")->toAtomic());
+    AtomicGraphModel* f(top2->findModel("f")->toAtomic());
+    AtomicGraphModel* g(top2->findModel("g")->toAtomic());
 
     top2->addOutputConnection(f, "out", "out");
     top2->addOutputConnection(g, "out", "out");
 
-    graph::ModelPortList result;
+    vpz::ModelPortList result;
     e->getAtomicModelsSource("in1", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
@@ -760,7 +760,7 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
 
     CoupledModel* top((file.project().model().model())->toCoupled());
     CoupledModel* top2(top->findModel("top2")->toCoupled());
-    graph::ModelPortList result;
+    vpz::ModelPortList result;
 
     top2->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
@@ -769,7 +769,7 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
 BOOST_AUTO_TEST_CASE(test_name)
 {
     vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz"));
-    Model *a, *b;
+    GraphModel *a, *b;
 
     a = file.project().model().model()->findModelFromPath("top2,g");
     b = file.project().model().model()->findModelFromPath("top1,x");

@@ -1,5 +1,5 @@
 /*
- * @file vle/graph/CoupledModel.hpp
+ * @file vle/vpz/CoupledModel.hpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -9,7 +9,7 @@
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
- * See the AUTHORS or Authors.txt file for copyright owners and contributors
+ * See the AUTHORS or Authors.txt file for pyright owners and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,17 +29,17 @@
 #ifndef VLE_GRAPH_COUPLED_MODEL_HPP
 #define VLE_GRAPH_COUPLED_MODEL_HPP
 
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <vle/DllDefines.hpp>
 #include <vector>
 
-namespace vle { namespace graph {
+namespace vle { namespace vpz {
 
     /**
      * @brief Represent the DEVS coupled model. This class have a list of
      * children models, three list of input, output and state connections.
      */
-    class VLE_API CoupledModel : public Model
+    class VLE_API CoupledModel : public GraphModel
     {
     public:
         typedef std::vector < std::string > StringList;
@@ -58,7 +58,7 @@ namespace vle { namespace graph {
 
         CoupledModel& operator=(const CoupledModel& mdl);
 
-        virtual Model* clone() const
+        virtual GraphModel* clone() const
         { return new CoupledModel(*this); }
 
         /**
@@ -91,7 +91,7 @@ namespace vle { namespace graph {
          * @throw Exception::Internal if model is null or already exist in
          * hierarchy.
          */
-        void addModel(Model* model);
+        void addModel(GraphModel* model);
 
         /**
          * @brief Add a model into the model list. Parent is set to thie coupled
@@ -99,7 +99,7 @@ namespace vle { namespace graph {
          * @param model The model to add.
          * @param name The new name of the model.
          */
-        void addModel(Model* model, const std::string& name);
+        void addModel(GraphModel* model, const std::string& name);
 
         /**
          * @brief add a new atomic model to the list. Parent is set to this
@@ -107,12 +107,12 @@ namespace vle { namespace graph {
          *
          * @param name atomic model name to add.
          *
-         * @return The AtomicModel builded by this function.
+         * @return The AtomicGraphModel builded by this function.
          *
          * @throw Exception::Internal if name already exist in this
          * coupledmodel.
          */
-        AtomicModel* addAtomicModel(const std::string& name);
+        AtomicGraphModel* addAtomicModel(const std::string& name);
 
         /**
          * @brief add a new coupled model to the list. Parent is set to this
@@ -135,7 +135,7 @@ namespace vle { namespace graph {
          *
          * @throw Exception::Internal if model is null.
          */
-        void delModel(Model* model);
+        void delModel(GraphModel* model);
 
         /**
          * @brief Delete all model from this coupled model. If connection
@@ -148,7 +148,7 @@ namespace vle { namespace graph {
          * be informed and detached of this model.
          * @param model a model to attach.
          */
-        void attachModel(Model* model);
+        void attachModel(GraphModel* model);
 
         /**
          * @brief Attach a list of models into this coupled model. Parent will
@@ -163,7 +163,7 @@ namespace vle { namespace graph {
          *
          * @param model a model to detach.
          */
-        void detachModel(Model* model);
+        void detachModel(GraphModel* model);
 
         /**
          * @brief Detach a list of model from this coupled model. For each
@@ -179,24 +179,24 @@ namespace vle { namespace graph {
          * @return model founded, otherwise 0.
          * @deprecated
          */
-        Model* findModel(const std::string& modelname) const;
+        GraphModel* findModel(const std::string& modelname) const;
 
         /**
          * @brief Gets a model with the specified name
          * @param name the model name
          * @return A reference to the found model otherwise 0.
          */
-        Model* getModel(const std::string& name) const;
+        GraphModel* getModel(const std::string& name) const;
 
 
         void addInputConnection(const std::string& portSrc,
-                                Model* dst, const std::string& portDst);
+                                GraphModel* dst, const std::string& portDst);
 
-        void addOutputConnection(Model* src, const std::string& portSrc,
+        void addOutputConnection(GraphModel* src, const std::string& portSrc,
                                  const std::string& portDst);
 
-        void addInternalConnection(Model* src, const std::string& portSrc,
-                                   Model* dst, const std::string& portDst);
+        void addInternalConnection(GraphModel* src, const std::string& portSrc,
+                                   GraphModel* dst, const std::string& portDst);
 
         void addInputConnection(const std::string& portSrc,
                                 const std::string& dst,
@@ -212,11 +212,11 @@ namespace vle { namespace graph {
                                    const std::string& portDst);
 
         void delInputConnection(const std::string& portSrc,
-                                Model* dst, const std::string& portDst);
-        void delOutputConnection(Model* src, const std::string& portSrc,
+                                GraphModel* dst, const std::string& portDst);
+        void delOutputConnection(GraphModel* src, const std::string& portSrc,
                                  const std::string& portDst);
-        void delInternalConnection(Model* src, const std::string& portSrc,
-                                   Model* dst, const std::string& portDst);
+        void delInternalConnection(GraphModel* src, const std::string& portSrc,
+                                   GraphModel* dst, const std::string& portDst);
         void delInputConnection(const std::string& portSrc,
                                 const std::string& dst,
                                 const std::string& portDst);
@@ -225,7 +225,7 @@ namespace vle { namespace graph {
                                  const std::string& portDst);
         void delInternalConnection(const std::string& src,
                                    const std::string& portSrc,
-                                   const std::string& Model,
+                                   const std::string& GraphModel,
                                    const std::string& portDst);
 
         bool existInputConnection(const std::string& portsrc,
@@ -264,7 +264,7 @@ namespace vle { namespace graph {
          *
          * @param m model to delete connection.
          */
-        void delAllConnection(Model* m);
+        void delAllConnection(GraphModel* m);
 
         /**
          * @brief delete all connection (input, output and internal) into
@@ -284,7 +284,7 @@ namespace vle { namespace graph {
          * @throw Exception::Internal if old does not exist or if old or mdl
          * are null.
          */
-        void replace(Model* old, Model* mdl);
+        void replace(GraphModel* old, GraphModel* mdl);
 
         /**
          * @brief Return a string representation of internal connection for the
@@ -292,9 +292,9 @@ namespace vle { namespace graph {
          * (modelsource, portsource, modeldestination, portdestination). For
          * instance:
          * @code
-         * AtomicModel* a = addAtomicModel("a");
+         * AtomicGraphModel* a = addAtomicModel("a");
          * a->addOutputPort("out");
-         * AtomicModel* b = addAtomicModel("b");
+         * AtomicGraphModel* b = addAtomicModel("b");
          * b->addOutputPort("in");
          *
          * ModelList lst;
@@ -307,7 +307,7 @@ namespace vle { namespace graph {
          * @endcode
          * @param models The list of the models to get internal connections.
          * @return the string representation of the internal connections.
-         * @throw graph::DevsGraphError if a model does not belong this coupled
+         * @throw vpz::DevsGraphError if a model does not belong this coupled
          * model.
          */
         StringList getBasicConnections(const ModelList& models) const;
@@ -317,9 +317,9 @@ namespace vle { namespace graph {
          * is represented by 4-uples (modelsource, portsource, modeldestination,
          * portdestination). For instance:
          * @code
-         * AtomicModel* a = addAtomicModel("a");
+         * AtomicGraphModel* a = addAtomicModel("a");
          * a->addOutputPort("out");
-         * AtomicModel* b = addAtomicModel("b");
+         * AtomicGraphModel* b = addAtomicModel("b");
          * b->addOutputPort("in");
          *
          * StringList cnts;
@@ -399,7 +399,7 @@ namespace vle { namespace graph {
          * @param src the first model
          * @param dst the second model
          */
-        float distanceModels(Model* src, Model* dst);
+        float distanceModels(GraphModel* src, GraphModel* dst);
 
         /**
          * @brief calculate the repulsion force for all models
@@ -444,28 +444,28 @@ namespace vle { namespace graph {
         void writeConnections(std::ostream& out) const;
 
         /**
-         * @brief Return a reference to the children graph::Model under the
+         * @brief Return a reference to the children GraphModel under the
          * specified position.
          *
-         * @param x the position of graph::Model.
-         * @param y the position of graph::Model.
+         * @param x the position of GraphModel.
+         * @param y the position of GraphModel.
          *
          * @return A reference to the founded model otherwise null.
          */
-        Model* find(int x, int y) const;
+        GraphModel* find(int x, int y) const;
 
         /**
-         * @brief Return a reference to the children graph::Model under the
+         * @brief Return a reference to the children GraphModel under the
          * specified position.
          *
-         * @param x the position of graph::Model.
-         * @param y the position of graph::Model.
-         * @param width the width of the simple graph::Model
-         * @param height the height of the simple graph::Model
+         * @param x the position of GraphModel.
+         * @param y the position of GraphModel.
+         * @param width the width of the simple GraphModel
+         * @param height the height of the simple GraphModel
          *
          * @return A reference to the founded model otherwise null.
          */
-        Model* find(int x, int y, int width, int height) const;
+        GraphModel* find(int x, int y, int width, int height) const;
 
         /**
          * @brief Build a new string for model name. This function assert that
@@ -536,6 +536,108 @@ namespace vle { namespace graph {
         };
 
         /**
+         * @brief A functor to easily updateDynamics of ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct UpdateDynamics
+        {
+            UpdateDynamics(const std::string& oldname,
+                           const std::string& newname) :
+                oldname(oldname), newname(newname)
+            { }
+
+            inline void operator()(const ModelList::value_type& value)
+            { value.second->updateDynamics(oldname, newname); }
+
+            std::string oldname;
+            std::string newname;
+        };
+
+        /**
+         * @brief A functor to easily purgeDynamics of ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct PurgeDynamics
+        {
+            PurgeDynamics(const std::set < std::string > & dynamics) :
+                dynamics(dynamics)
+            { }
+
+            inline void operator()(const ModelList::value_type& value)
+            { value.second->purgeDynamics(dynamics); }
+
+            std::set < std::string > dynamics;
+        };
+
+        /**
+         * @brief A functor to easily updateObservable of ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct UpdateObservable
+        {
+            UpdateObservable(const std::string& oldname,
+                             const std::string& newname) :
+                oldname(oldname), newname(newname)
+            { }
+
+            inline void operator()(const ModelList::value_type& value)
+            { value.second->updateObservable(oldname, newname); }
+
+            std::string oldname;
+            std::string newname;
+        };
+
+        /**
+         * @brief A functor to easily purgeObservable of ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct PurgeObservable
+        {
+            PurgeObservable(const std::set < std::string > & observables) :
+                observables(observables)
+            { }
+
+            inline void operator()(const ModelList::value_type& value)
+            { value.second->purgeObservable(observables); }
+
+            std::set < std::string > observables;
+        };
+
+        /**
+         * @brief A functor to easily updateConditions of ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct UpdateConditions
+        {
+            UpdateConditions(const std::string& oldname,
+                             const std::string& newname) :
+                oldname(oldname), newname(newname)
+            { }
+
+            inline void operator()(const ModelList::value_type& value)
+            { value.second->updateConditions(oldname, newname); }
+
+            std::string oldname;
+            std::string newname;
+        };
+
+        /**
+         * @brief A functor to easily purgeConditions of ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct PurgeConditions
+        {
+            PurgeConditions(const std::set < std::string > & conditions) :
+                conditions(conditions)
+            { }
+
+            inline void operator()(const ModelList::value_type& value)
+            { value.second->purgeConditions(conditions); }
+
+            std::set < std::string > conditions;
+        };
+
+        /**
          * @brief A functor to easily detach ModelList::value_type. Use it with
          * std::for_each.
          */
@@ -597,9 +699,62 @@ namespace vle { namespace graph {
             { x.second = x.second->clone(); x.second->setParent(parent); }
         };
 
+        /**
+         * @brief Write the hierarchy of models into the output stream.
+         * @param out The output stream.
+         */
+        void write(std::ostream& out) const;
+
+        /**
+	 * @brief Update the dynamics of each AtomicModel
+	 * where an oldname became newname.
+	 * @param oldname the old name of the dynamics.
+	 * @param newname the new name of the dynamics.
+	 */
+        virtual void updateDynamics(const std::string& oldname,
+                                    const std::string& newname);
+
+        /**
+	 * @brief purge the dymamics not present in the list
+	 * @param dynamicslist a list of dynamics name
+	 */
+	virtual void purgeDynamics(const std::set < std::string >& dynamicslist);
+
+        /**
+	 * @brief Update the Observable of each AtomicModels where an
+	 * oldname became newname, for each model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	virtual void updateObservable(const std::string& oldname,
+                                      const std::string& newname);
+
+        /**
+	 * @brief purge the observables references of the AtomicModels
+	 * where the observable is not present in the list, for each model.
+	 * @param observablelist a list of observable name
+	 */
+	virtual void purgeObservable(const std::set < std::string >& observablelist);
+
+        /**
+	 * @brief Update the Conditions of the AtomicModel where an
+	 * oldname became newname, for each model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	virtual void updateConditions(const std::string& oldname,
+                                      const std::string& newname);
+
+        /**
+	 * @brief purge the Conditions references of the model where the
+	 * Condition is not present in the list, for each model.
+	 * @param conditionlist a list of condition name
+	 */
+	virtual void purgeConditions(const std::set < std::string >& conditionlist);
+
     private:
-        void delConnection(Model* src, const std::string& portSrc,
-                           Model* dst, const std::string& portDst);
+        void delConnection(GraphModel* src, const std::string& portSrc,
+                           GraphModel* dst, const std::string& portDst);
 
         /**
          * @brief Copy input and output connections list from src to dst. dst.
@@ -625,8 +780,8 @@ namespace vle { namespace graph {
          */
         void copyInternalConnection(const ConnectionList& src,
                                     ConnectionList& dst,
-                                    const Model& parentSrc,
-                                    Model& parentDst);
+                                    const GraphModel& parentSrc,
+                                    GraphModel& parentDst);
 
         /**
          * @brief Copy the connection from ModelPortList src to the
@@ -637,17 +792,19 @@ namespace vle { namespace graph {
          * @param parentDst Parent of dst's ModelPortList.
          */
         void copyInternalPort(const ModelPortList& src, ModelPortList& dst,
-                              const Model& parentSrc, Model& parentDst);
+                              const GraphModel& parentSrc, GraphModel& parentDst);
 
         ModelList       m_modelList;
         ConnectionList  m_internalInputList;
         ConnectionList  m_internalOutputList;
 
         /* Connections */
-        std::vector < Model* > m_srcConnections;
-        std::vector < Model* > m_dstConnections;
+        std::vector < GraphModel* > m_srcConnections;
+        std::vector < GraphModel* > m_dstConnections;
+
+        void writeConnection(std::ostream& out) const;
     };
 
-}} // namespace vle graph
+}} // namespace vle vpz
 
 #endif

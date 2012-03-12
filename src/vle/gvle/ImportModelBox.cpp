@@ -71,7 +71,7 @@ ImportWidget::ImportWidget(ImportModelBox* parent, vpz::Base* base):
     pack_start(mImage);
 }
 
-ImportWidget::ImportWidget(ImportModelBox* parent, graph::Model* atom):
+ImportWidget::ImportWidget(ImportModelBox* parent, vpz::GraphModel* atom):
         Gtk::HBox(),
         mParent(parent),
         mBase(0),
@@ -482,10 +482,12 @@ void ImportModelBox::makeModels()
         mListModels.clear();
     }
 
-    const AtomicModelList& model_list =  mSrc->project().model().atomicModels();
-    AtomicModelList::const_iterator it = model_list.begin();
-    while (it != model_list.end()) {
-        ImportWidget* widget = new ImportWidget(this, it->first);
+    vpz::AtomicModelVector list;
+    mSrc->project().model().getAtomicModelList(list);
+    vpz::AtomicModelVector::iterator it = list.begin();
+
+    while (it != list.end()) {
+        ImportWidget* widget = new ImportWidget(this, *it);
         mListModels.insert(widget);
         mVboxModels->pack_start(*widget, true, true);
 
@@ -538,7 +540,7 @@ void ImportModelBox::on_apply()
     for (it = mListModels.begin(); it != mListModels.end(); ++it) {
         widget = *it;
 	if (widget->get_model()->getName() != widget->get_text())
-	    rename_model(mSrc, widget->get_model(), widget->get_text());
+	    rename_model(widget->get_model(), widget->get_text());
     }
 
     mReturn = true;
@@ -553,11 +555,13 @@ void ImportModelBox::on_cancel()
 
 void ImportModelBox::rename_dynamic(vpz::Vpz* src, std::string old_name, std::string new_name)
 {
-    AtomicModelList& list = src->project().model().atomicModels();
-    AtomicModelList::iterator it = list.begin();
+    vpz::AtomicModelVector list;
+    src->project().model().getAtomicModelList(list);
+    vpz::AtomicModelVector::iterator it = list.begin();
+
     while (it != list.end()) {
-        if (it->second.dynamics() == old_name) {
-            it->second.setDynamics(new_name);
+        if ((*it)->dynamics() == old_name) {
+            (*it)->setDynamics(new_name);
         }
         ++it;
     }
@@ -574,16 +578,18 @@ void ImportModelBox::rename_dynamic(vpz::Vpz* src, std::string old_name, std::st
 
 void ImportModelBox::rename_condition(vpz::Vpz* src, std::string old_name, std::string new_name)
 {
-    vpz::AtomicModelList& list = src->project().model().atomicModels();
-    vpz::AtomicModelList::iterator it = list.begin();
+    vpz::AtomicModelVector list;
+    src->project().model().getAtomicModelList(list);
+    vpz::AtomicModelVector::iterator it = list.begin();
+
     while (it != list.end()) {
-        std::vector < std::string > vec = it->second.conditions();
+        std::vector < std::string > vec = (*it)->conditions();
         std::vector < std::string >::iterator it_vec = std::find(vec.begin(),
                                                                  vec.end(),
                                                                  old_name);
         if (it_vec != vec.end()) {
             *it_vec = new_name;
-            it->second.setConditions(vec);
+            (*it)->setConditions(vec);
         }
         ++it;
     }
@@ -612,11 +618,13 @@ void ImportModelBox::rename_output(vpz::Vpz* src, std::string old_name,
 void ImportModelBox::rename_observable(vpz::Vpz* src, std::string old_name,
                                        std::string new_name)
 {
-    vpz::AtomicModelList& list = src->project().model().atomicModels();
-    vpz::AtomicModelList::iterator it = list.begin();
+    vpz::AtomicModelVector list;
+    src->project().model().getAtomicModelList(list);
+    vpz::AtomicModelVector::iterator it = list.begin();
+
     while (it != list.end()) {
-        if (it->second.observables() == old_name)
-            it->second.setObservables(new_name);
+        if ((*it)->observables() == old_name)
+            (*it)->setObservables(new_name);
 
         ++it;
     }
@@ -675,10 +683,10 @@ void ImportModelBox::rename_view(vpz::Vpz* src, std::string old_name,
     }
 }
 
-void ImportModelBox::rename_model(vpz::Vpz* src, graph::Model* old_model,
+void ImportModelBox::rename_model(vpz::GraphModel* old_model,
                                   std::string new_name)
 {
-    graph::Model::rename(old_model, new_name);
+    vpz::GraphModel::rename(old_model, new_name);
 }
 
 }

@@ -35,7 +35,7 @@
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
-#include <vle/graph/AtomicModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 
 namespace vle { namespace devs {
 
@@ -59,11 +59,11 @@ namespace vle { namespace devs {
 
         /**
          * @brief Build a new devs::Simulator with an empty devs::Dynamics, a
-         * null last time but a graph::AtomicModel node.
+         * null last time but a vpz::AtomicModel node.
          * @param a The atomic model.
          * @throw utils::InternalError if the atomic model does not exist.
          */
-	Simulator(graph::AtomicModel* a);
+	Simulator(vpz::AtomicGraphModel* a);
 
         /**
          * @brief Delete the attached devs::Dynamics user's model.
@@ -78,16 +78,16 @@ namespace vle { namespace devs {
 	void addDynamics(Dynamics* dynamics);
 
         /**
-         * @brief Get the name of the graph::AtomicModel node.
-         * @return the name of the graph::AtomicModel.
+         * @brief Get the name of the vpz::AtomicGraphModel node.
+         * @return the name of the vpz::AtomicGraphModel.
          * @throw utils::InternalEvent if the model is destroyed.
          */
         const std::string& getName() const;
 
         /**
          * @brief Get a std::string which concatenate the names of the hierarchy
-         * of graph::CoupledModel parent. Use the function
-         * graph::Model::getParentName().
+         * of vpz::CoupledModel parent. Use the function
+         * vpz::GraphModel::getParentName().
          * @return The concatenated names of the parents or "Deleted model" if
          * the model is destroy before observed.
          */
@@ -97,11 +97,11 @@ namespace vle { namespace devs {
          * @brief Get the atomic model attached to the Simulator.
          * @return A reference.
          */
-        inline graph::AtomicModel* getStructure() const
+        inline vpz::AtomicGraphModel* getStructure() const
         { return m_atomicModel; }
 
         /**
-         * @brief Delete the dynamics and erase reference to the AtomicModel.
+         * @brief Delete the dynamics and erase reference to the AtomicGraphModel.
          */
         void clear();
 
@@ -124,7 +124,7 @@ namespace vle { namespace devs {
          */
         void updateSimulatorTargets(
             const std::string& port,
-            std::map < graph::AtomicModel*, devs::Simulator* >& simulators);
+            std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators);
 
         /**
          * @brief Get two iterators (begin, end) on TargetSimulator.
@@ -134,7 +134,7 @@ namespace vle { namespace devs {
          */
         std::pair < iterator, iterator > targets(
             const std::string& port,
-            std::map < graph::AtomicModel*, devs::Simulator* >& simulators);
+            std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators);
 
         /**
          * @brief Add an empty target port.
@@ -206,7 +206,7 @@ namespace vle { namespace devs {
     private:
         TargetSimulatorList mTargets;
         Dynamics*           m_dynamics;
-        graph::AtomicModel* m_atomicModel;
+        vpz::AtomicGraphModel* m_atomicModel;
         std::string         m_parents;
 
 	InternalEvent* buildInternalEvent(const Time& currentTime);

@@ -33,7 +33,7 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/utils/Rand.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <cmath>
 
 namespace vle { namespace devs {

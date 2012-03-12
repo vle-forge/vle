@@ -43,7 +43,7 @@ namespace vle { namespace devs {
 class Executive;
 
 typedef std::vector < Simulator* > SimulatorList;
-typedef std::map < graph::AtomicModel*, devs::Simulator* > SimulatorMap;
+typedef std::map < vpz::AtomicGraphModel*, devs::Simulator* > SimulatorMap;
 
 /**
  * @brief Represent the DEVS Coordinator class. This class provide a non
@@ -124,14 +124,14 @@ public:
     /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
      * to this model information of dynamics, condition and observable.
-     * @param model the graph::AtomicModel reference source of
+     * @param model the vpz::AtomicGraphModel reference source of
      * devs::Simulator.
      * @param dynamics the name of the dynamics to attach.
      * @param condition the name of the condition to attach.
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    void createModel(graph::AtomicModel* model,
+    void createModel(vpz::AtomicGraphModel* model,
                      const std::string& dynamics,
                      const std::vector < std::string >& conditions,
                      const std::string& observable);
@@ -143,8 +143,8 @@ public:
      * @param modelname the new name of the model.
      * @throw utils::badArg if modelname already exist.
      */
-    graph::Model* createModelFromClass(const std::string& classname,
-                                       graph::CoupledModel* parent,
+    vpz::GraphModel* createModelFromClass(const std::string& classname,
+                                       vpz::CoupledModel* parent,
                                        const std::string& modelname);
 
     /**
@@ -154,7 +154,7 @@ public:
      * @param portname the port of the model to attach.
      * @param view the view.
      */
-    void addObservableToView(graph::AtomicModel* model,
+    void addObservableToView(vpz::AtomicGraphModel* model,
                              const std::string& portname,
                              const std::string& view);
 
@@ -165,25 +165,25 @@ public:
      * @param parent the coupled model parent of model to delete.
      * @param modelname the name of model to delete.
      */
-    void delModel(graph::CoupledModel* parent,
+    void delModel(vpz::CoupledModel* parent,
                   const std::string& modelname);
 
     void getSimulatorsSource(
-        graph::Model* model,
+        vpz::GraphModel* model,
         std::vector < std::pair < Simulator*, std::string > >& lst);
 
     void getSimulatorsSource(
-        graph::Model* model,
+        vpz::GraphModel* model,
         const std::string& port,
         std::vector < std::pair < Simulator*, std::string > >& lst);
 
     void updateSimulatorsTarget(
         std::vector < std::pair < Simulator*, std::string > >& lst);
 
-    void addSimulatorTargetPort(graph::AtomicModel* model,
+    void addSimulatorTargetPort(vpz::AtomicGraphModel* model,
                                 const std::string& port);
 
-    void removeSimulatorTargetPort(graph::AtomicModel* model,
+    void removeSimulatorTargetPort(vpz::AtomicGraphModel* model,
                                    const std::string& port);
 
     //
@@ -193,20 +193,20 @@ public:
     //
 
     /**
-     * @brief Attach the specified simulator to the graph::AtomicModel and
+     * @brief Attach the specified simulator to the vpz::AtomicGraphModel and
      * install it on bus.
      * @param model
      * @param simulator
      */
-    void addModel(graph::AtomicModel* model, Simulator* simulator);
+    void addModel(vpz::AtomicGraphModel* model, Simulator* simulator);
 
     /**
-     * Return the devs::Simulator with a specified graph::AtomicModel.
+     * Return the devs::Simulator with a specified vpz::AtomicGraphModel.
      * Complexity: log O(log(n)).
      * @param model the atomicmodel reference to search.
      * @return A reference to the devs::Simulator or 0 if not found.
      */
-    Simulator* getModel(const graph::AtomicModel* model) const;
+    Simulator* getModel(const vpz::AtomicGraphModel* model) const;
 
     /**
      * Return the devs::Simulator with a specified atomic model name.
@@ -364,25 +364,25 @@ private:
     /**
      * @brief Delete the atomic model from Devs::Graph, the Simulator
      * from Coordinator and clean all events on devs::EventTable. Do not use
-     * the AtomicModel after this function, it is delete.
+     * the AtomicGraphModel after this function, it is delete.
      *
      * @param parent a reference to the parent.
      * @param atom the model to delete.
      */
-    void delAtomicModel(graph::CoupledModel* parent,
-                        graph::AtomicModel* atom);
+    void delAtomicModel(vpz::CoupledModel* parent,
+                        vpz::AtomicGraphModel* atom);
 
     /**
      * @brief Delete the coupled model from Devs::Graph. All the
      * Simulator from Coordinator and clean all events on
-     * devs::EventTable.  Do not use the AtomicModel child or CoupledModel
+     * devs::EventTable.  Do not use the AtomicGraphModel child or CoupledModel
      * after this function.  All are delete. This function is recursive.
      *
      * @param parent a reference to the parent.
      * @param mdl the model to delete.
      */
-    void delCoupledModel(graph::CoupledModel* parent,
-                         graph::CoupledModel* mdl);
+    void delCoupledModel(vpz::CoupledModel* parent,
+                         vpz::CoupledModel* mdl);
 
 
 

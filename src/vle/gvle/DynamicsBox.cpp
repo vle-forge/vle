@@ -448,11 +448,13 @@ void DynamicsBox::applyRenaming()
     renameList::const_iterator it = mRenameList.begin();
 
     while (it != mRenameList.end()) {
-        vpz::AtomicModelList& atomlist(
-            mModeling.vpz().project().model().atomicModels());
-        atomlist.updateDynamics(it->first, it->second);
+        mModeling.vpz().project().model().updateDynamics(it->first,
+                                                          it->second);
+        mModeling.vpz().project().classes().updateDynamics(it->first,
+                                                            it->second);
         ++it;
     }
+
     mRenameList.clear();
 }
 

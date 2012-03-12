@@ -59,7 +59,7 @@ namespace vle { namespace devs {
     class VLE_API DynamicsWrapperInit : public DynamicsInit
     {
     public:
-        DynamicsWrapperInit(const graph::AtomicModel& atom,
+        DynamicsWrapperInit(const vpz::AtomicGraphModel& atom,
                             PackageId packageid,
                             const std::string& library)
             : DynamicsInit(atom, packageid), m_library(library)

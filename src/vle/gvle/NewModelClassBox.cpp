@@ -100,12 +100,10 @@ void NewModelClassBox::on_apply()
 
     vpz::Class& new_class = classes.add(class_name);
     if (model_type == "Atomic") {
-        graph::Model* model = new graph::AtomicModel(model_name, NULL);
+        vpz::GraphModel* model = new vpz::AtomicGraphModel(model_name, NULL);
         new_class.setModel(model);
-        mModeling->vpz().project().classes().get(class_name).atomicModels().
-            add(model, vpz::AtomicModel("", "", ""));
     } else {
-        new_class.setModel(new graph::CoupledModel(model_name, NULL));
+        new_class.setModel(new vpz::CoupledModel(model_name, NULL));
     }
 
     mGVLE->redrawModelClassBox();

@@ -31,9 +31,9 @@
 
 #include <vle/gvle/ViewDrawingArea.hpp>
 
-namespace vle { namespace graph {
+namespace vle { namespace vpz {
 
-    class Model;
+    class GraphModel;
     class CoupledModel;
 
 }} // namespace vle graph
@@ -50,8 +50,8 @@ namespace vle { namespace gvle {
     public:
         typedef struct connexion
         {
-            graph::Model* source;
-            graph::Model* destination;
+            vpz::GraphModel* source;
+            vpz::GraphModel* destination;
         } Connexion;
 	static const gint MODEL_RADIUS;
         SimpleViewDrawingArea(View* view);
@@ -91,8 +91,8 @@ namespace vle { namespace gvle {
 	 * @param y the y coordinate
 	 */
         void getModelInPosition(int xs, int ys,
-				graph::Model* dst,
-				graph::Model* center,
+				vpz::GraphModel* dst,
+				vpz::GraphModel* center,
 				int&x, int& y);
 
 	/**
@@ -104,9 +104,9 @@ namespace vle { namespace gvle {
 	 * @param x the x coordinate
 	 * @param y the y coordinate
 	 */
-	void getModelOutPosition(graph::Model* src,
+	void getModelOutPosition(vpz::GraphModel* src,
 				 int xd, int yd,
-				 graph::Model* center,
+				 vpz::GraphModel* center,
 				 int&x, int& y);
 
 	/**
@@ -122,13 +122,13 @@ namespace vle { namespace gvle {
 
 	void preComputeConnection(int xs, int ys, int xd, int yd,
 	  int ytms, int ybms);
-        virtual void preComputeConnection(graph::Model* src,
+        virtual void preComputeConnection(vpz::GraphModel* src,
                                   const std::string& srcport,
-                                  graph::Model* dst,
+                                  vpz::GraphModel* dst,
                                   const std::string& dstport);
-	virtual void computeConnection(graph::Model* src,
+	virtual void computeConnection(vpz::GraphModel* src,
 				       const std::string& portsrc,
-				       graph::Model* dst,
+				       vpz::GraphModel* dst,
 				       const std::string& portdst, int index);
 	virtual StraightLine computeConnection(int xs, int ys,
 					       int xd, int yd,
@@ -177,7 +177,7 @@ namespace vle { namespace gvle {
 	 * @param model the model to draw
 	 * @param color the color to draw
 	 */
-        void drawChildrenModel(graph::Model* model,const Gdk::Color& color);
+        void drawChildrenModel(vpz::GraphModel* model,const Gdk::Color& color);
 
 	bool on_button_press_event(GdkEventButton* event);
 	bool on_button_release_event(GdkEventButton* event);

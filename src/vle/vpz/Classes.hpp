@@ -196,6 +196,54 @@ namespace vle { namespace vpz {
         ClassList& list()
         { return m_lst; }
 
+        /**
+	 * @brief Update the dynamics of the AtomicModels where an
+	 * oldname became newname, for each class graph model.
+	 * @param oldname the old name of the dynamics.
+	 * @param newname the new name of the dynamics.
+	 */
+	void updateDynamics(const std::string& oldname,
+                                    const std::string& newname);
+
+       /**
+	 * @brief purge the dymamics references of the model where the
+	 * dynamic is not present in the list for each class
+	 * @param dynamicslist a list of dynamics name
+	 */
+	void purgeDynamics(const std::set < std::string >& dynamicslist);
+
+        /**
+	 * @brief Update the Observable of the AtomicModels where an
+	 * oldname became newname, for the each class graph model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	void updateObservable(const std::string& oldname,
+                                      const std::string& newname);
+
+        /**
+	 * @brief purge the observables references of the model where the
+	 * observable is not present in the list for each class
+	 * @param observablelist a list of observable name
+	 */
+	void purgeObservable(const std::set < std::string >& observablelist);
+
+        /**
+	 * @brief Update the Conditions of the AtomicModels where an
+	 * oldname became newname, for each class graph model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	void updateConditions(const std::string& oldname,
+                              const std::string& newname);
+
+        /**
+	 * @brief purge the Conditions references for each class model
+	 * where the Condition is not present in the list.
+	 * @param conditionlist a list of condition name
+	 */
+	void purgeConditions(const std::set < std::string >& conditionlist);
+
     private:
         ClassList       m_lst;
     };

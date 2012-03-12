@@ -34,8 +34,8 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/output_test_stream.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>

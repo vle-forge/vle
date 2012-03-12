@@ -62,7 +62,7 @@ Document::Document() :
 }
 
 void Document::setTitle(const std::string& filePath,
-			graph::Model* model,
+			vpz::GraphModel* model,
 			bool modified)
 {
     if (mGVLE) {
@@ -358,7 +358,7 @@ std::string DocumentText::getBuffer()
 
 DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
                                          const std::string& filepath,
-                                         View* view, graph::Model* model) :
+                                         View* view, vpz::GraphModel* model) :
     Document(gvle, filepath),
     mView(view),
     mModel(model),
@@ -441,7 +441,7 @@ void DocumentDrawingArea::redo()
 DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
     GVLE* gvle,
     const std::string& filepath,
-    View* view, graph::Model* model) :
+    View* view, vpz::GraphModel* model) :
     DocumentDrawingArea(gvle, filepath, view, model)
 {
     mTitle = filename() + utils::Path::extension(filepath)
@@ -469,7 +469,7 @@ DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
 
 DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(GVLE* gvle,
                                                      const std::string& filepath,
-                                                     View* view, graph::Model* model) :
+                                                     View* view, vpz::GraphModel* model) :
     DocumentDrawingArea(gvle, filepath, view, model)
 {
     mTitle = filename() + utils::Path::extension(filepath)+
@@ -595,7 +595,7 @@ void Editor::changeFile(const std::string& oldName,
     Documents::iterator it = mDocuments.find(oldName);
 
     if (it != mDocuments.end()) {
-        graph::Model* model = 0;
+        vpz::GraphModel* model = 0;
 
         if (utils::Path::extension(oldName) == ".vpz") {
             model = dynamic_cast < DocumentDrawingArea* >(
@@ -767,7 +767,7 @@ try {
 }
 
 void Editor::openTabVpz(const std::string& filepath,
-                        graph::CoupledModel* model)
+                        vpz::CoupledModel* model)
 {
     Documents::iterator it = mDocuments.find(filepath);
     int page;
@@ -794,7 +794,7 @@ void Editor::openTabVpz(const std::string& filepath,
 }
 
 void Editor::showCompleteView(const std::string& filepath,
-                              graph::CoupledModel* model)
+                              vpz::CoupledModel* model)
 {
     Documents::iterator it = mDocuments.find(filepath);
     int page;
@@ -835,7 +835,7 @@ void Editor::showCompleteView(const std::string& filepath,
 }
 
 void Editor::showSimpleView(const std::string& filepath,
-                            graph::CoupledModel* model)
+                            vpz::CoupledModel* model)
 {
     Documents::iterator it = mDocuments.find(filepath);
     int page;

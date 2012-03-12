@@ -34,7 +34,7 @@ void Executive::addObservableToView(const std::string& model,
                                     const std::string& portname,
                                     const std::string& view)
 {
-    graph::Model* mdl = cpled()->findModel(model);
+    vpz::GraphModel* mdl = cpled()->findModel(model);
 
     if (mdl == 0) {
         throw utils::DevsGraphError(fmt(
@@ -47,12 +47,12 @@ void Executive::addObservableToView(const std::string& model,
                   "model %1%")) % model);
     }
 
-    graph::AtomicModel* atom = mdl->toAtomic();
+    vpz::AtomicGraphModel* atom = mdl->toAtomic();
 
     m_coordinator.addObservableToView(atom, portname, view);
 }
 
-const graph::AtomicModel*
+const vpz::AtomicGraphModel*
 Executive::createModel(const std::string& name,
                            const std::vector < std::string >& inputs,
                            const std::vector < std::string >& outputs,
@@ -60,7 +60,7 @@ Executive::createModel(const std::string& name,
                            const std::vector < std::string >& conditions,
                            const std::string& observable)
 {
-    graph::AtomicModel* model = new graph::AtomicModel(name, cpled());
+    vpz::AtomicGraphModel* model = new vpz::AtomicGraphModel(name, cpled());
     std::vector < std::string >::const_iterator it;
 
     for (it = inputs.begin(); it != inputs.end(); ++it) {
@@ -75,7 +75,7 @@ Executive::createModel(const std::string& name,
     return model;
 }
 
-const graph::Model*
+const vpz::GraphModel*
 Executive::createModelFromClass(const std::string& classname,
                                 const std::string& modelname)
 {
@@ -86,7 +86,7 @@ void Executive::delModel(const std::string& modelname)
 {
     std::vector < std::pair < Simulator*, std::string > > toupdate;
 
-    graph::Model* mdl = cpled()->findModel(modelname);
+    vpz::GraphModel* mdl = cpled()->findModel(modelname);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -103,7 +103,7 @@ void Executive::delModel(const std::string& modelname)
 void Executive::renameModel(const std::string& oldname,
                             const std::string& newname)
 {
-    graph::Model* mdl = cpled()->findModel(oldname);
+    vpz::GraphModel* mdl = cpled()->findModel(oldname);
     if (mdl == 0) {
         throw utils::DevsGraphError(
             fmt(_("Executive error: rename `%1%' into `%2%' failed, `%1%' "
@@ -117,7 +117,7 @@ void Executive::renameModel(const std::string& oldname,
     }
 
     try {
-        graph::Model::rename(mdl, newname);
+        vpz::GraphModel::rename(mdl, newname);
     } catch (const std::exception& e) {
         throw utils::DevsGraphError(
             fmt(_("Executive error: rename `%1%' into `%2%' failed: `%3%' ")) %
@@ -131,9 +131,9 @@ void Executive::addConnection(const std::string& srcModelName,
                               const std::string& dstPortName)
 {
     const std::string& modelName(coupledmodelName());
-    graph::Model* srcModel = (modelName == srcModelName)?
+    vpz::GraphModel* srcModel = (modelName == srcModelName)?
         cpled() : cpled()->findModel(srcModelName);
-    graph::Model* dstModel = (modelName == dstModelName)?
+    vpz::GraphModel* dstModel = (modelName == dstModelName)?
         cpled() : cpled()->findModel(dstModelName);
 
     if (srcModel and dstModel) {
@@ -144,10 +144,10 @@ void Executive::addConnection(const std::string& srcModelName,
             m_coordinator.getSimulatorsSource(srcModel, srcPortName, toupdate);
         } else if (modelName == dstModelName) {
             cpled()->addOutputConnection(srcModel, srcPortName, dstPortName);
-            graph::ModelPortList lst;
+            vpz::ModelPortList lst;
             cpled()->getAtomicModelsTarget(dstPortName, lst);
 
-            for (graph::ModelPortList::iterator it = lst.begin(); it !=
+            for (vpz::ModelPortList::iterator it = lst.begin(); it !=
                  lst.end(); ++it) {
                 m_coordinator.getSimulatorsSource(it->first, it->second,
                                                   toupdate);
@@ -173,8 +173,8 @@ void Executive::removeConnection(const std::string& srcModelName,
                                  const std::string& dstPortName)
 {
     const std::string& modelName(coupledmodelName());
-    graph::Model* srcModel = cpled()->findModel(srcModelName);
-    graph::Model* dstModel = cpled()->findModel(dstModelName);
+    vpz::GraphModel* srcModel = cpled()->findModel(srcModelName);
+    vpz::GraphModel* dstModel = cpled()->findModel(dstModelName);
 
     if (not srcModel and srcModelName == modelName) {
         srcModel = cpled();
@@ -209,7 +209,7 @@ void Executive::removeConnection(const std::string& srcModelName,
 void Executive::addInputPort(const std::string& modelName,
                              const std::string& portName)
 {
-    graph::Model* mdl = cpled()->findModel(modelName);
+    vpz::GraphModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -222,7 +222,7 @@ void Executive::addInputPort(const std::string& modelName,
 void Executive::addOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
-    graph::Model* mdl = cpled()->findModel(modelName);
+    vpz::GraphModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -235,7 +235,7 @@ void Executive::addOutputPort(const std::string& modelName,
 void Executive::removeInputPort(const std::string& modelName,
                                 const std::string& portName)
 {
-    graph::Model* mdl = cpled()->findModel(modelName);
+    vpz::GraphModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -251,7 +251,7 @@ void Executive::removeInputPort(const std::string& modelName,
 void Executive::removeOutputPort(const std::string& modelName,
                                  const std::string& portName)
 {
-    graph::Model* mdl = cpled()->findModel(modelName);
+    vpz::GraphModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -285,10 +285,10 @@ void Executive::dump(std::ostream& out, const std::string& name) const
         f.project().dynamics().add(vpz::Dynamic("unknow"));
     }
 
-    std::vector < graph::AtomicModel* > lst;
-    graph::Model::getAtomicModelList(f.project().model().model(), lst);
+    std::vector < vpz::AtomicGraphModel* > lst;
+    vpz::GraphModel::getAtomicModelList(f.project().model().model(), lst);
 
-    for (std::vector < graph::AtomicModel* >::iterator it = lst.begin();
+    for (std::vector < vpz::AtomicGraphModel* >::iterator it = lst.begin();
          it != lst.end(); ++it) {
         f.project().model().atomicModels().add(
             *it, vpz::AtomicModel("", "unknow", ""));

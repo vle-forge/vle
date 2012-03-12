@@ -37,7 +37,7 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/graph/AtomicModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -80,7 +80,7 @@ namespace vle { namespace devs {
     class VLE_API DynamicsInit
     {
     public:
-        DynamicsInit(const graph::AtomicModel& model,
+        DynamicsInit(const vpz::AtomicGraphModel& model,
                      PackageId packageid)
             : m_model(model), m_packageid(packageid)
         {}
@@ -88,11 +88,11 @@ namespace vle { namespace devs {
         virtual ~DynamicsInit()
         {}
 
-        const graph::AtomicModel& model() const { return m_model; }
+        const vpz::AtomicGraphModel& model() const { return m_model; }
         PackageId packageid() const { return m_packageid; }
 
     private:
-        const graph::AtomicModel&       m_model;
+        const vpz::AtomicGraphModel&       m_model;
         PackageId                       m_packageid;
     };
 
@@ -210,7 +210,7 @@ namespace vle { namespace devs {
         /**
          * @brief If this function return true, then a cast to an Executive
          * object is produce and the set_coordinator function is call. Executive
-         * permit to manipulate graph::CoupledModel and devs::Coordinator at
+         * permit to manipulate vpz::CoupledModel and devs::Coordinator at
          * runtime of the simulation.
          * @return false if Dynamics is not an Executive.
          */
@@ -234,7 +234,7 @@ namespace vle { namespace devs {
          * dynamics
 	 * @return pointer on the atomic model
 	 */
-        inline const vle::graph::AtomicModel& getModel() const
+        inline const vle::vpz::AtomicGraphModel& getModel() const
         { return m_model; }
 
 	/**
@@ -463,7 +463,7 @@ namespace vle { namespace devs {
         inline PackageId packageid() const { return m_packageid; }
 
     private:
-        const graph::AtomicModel& m_model; /**< A constant reference to the
+        const vpz::AtomicGraphModel& m_model; /**< A constant reference to the
                                              atomic model node of the graph.
                                                */
 

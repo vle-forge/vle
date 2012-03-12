@@ -32,7 +32,7 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/viewport.h>
 #include <algorithm>
@@ -56,7 +56,7 @@ class CompleteViewDrawingArea;
 class View
 {
 public:
-    View(Modeling* m, graph::CoupledModel* c, size_t index, GVLE* app);
+    View(Modeling* m, vpz::CoupledModel* c, size_t index, GVLE* app);
 
     virtual ~View();
 
@@ -100,7 +100,7 @@ public:
      *
      * @return ptr to GCoupledModel
      */
-    inline graph::CoupledModel* getGCoupledModel() {
+    inline vpz::CoupledModel* getGCoupledModel() {
         return mCurrent;
     }
 
@@ -128,21 +128,21 @@ public:
     //
 
     /**
-     * add a graph::Model under coordinate into Model selected list for
+     * add a GraphModel under coordinate into Model selected list for
      * coupling model into a GCoupledModel.
      *
      * @param model model to append into selected models
      * @param shiftorcontrol true if shift or control pressed during click
      * otherwise fale
      */
-    void addModelInListModel(graph::Model* model, bool shiftorcontrol);
+    void addModelInListModel(vpz::GraphModel* model, bool shiftorcontrol);
 
     /**
-     * add graph::Model into selected models lists.
+     * add GraphModel into selected models lists.
      *
      * @param model to append into selected models
      */
-    void addModelToSelectedModels(graph::Model* model);
+    void addModelToSelectedModels(vpz::GraphModel* model);
 
     /**
      * get selected models state.
@@ -160,20 +160,20 @@ public:
      * @brief Get first selected models from list.
      * @return first selected models from list, or null if empty list
      */
-    graph::Model* getFirstSelectedModels();
+    vpz::GraphModel* getFirstSelectedModels();
 
     /**
      * @brief test if model exist in selected modeds.
      * @param m model to test
      * @return true if found, otherwise false
      */
-    bool existInSelectedModels(graph::Model* m);
+    bool existInSelectedModels(vpz::GraphModel* m);
 
     /**
      * @brief return complete selected models.
      * @return get selected models list
      */
-    inline const graph::ModelList& getAllSelectedModels() const {
+    inline const vpz::ModelList& getAllSelectedModels() const {
         return mSelectedModels;
     }
 
@@ -183,11 +183,11 @@ public:
     //
     //
 
-    inline void addDestinationModel(graph::Model* m) {
+    inline void addDestinationModel(vpz::GraphModel* m) {
         mDestinationModel = m;
     }
 
-    inline graph::Model* getDestinationModel() {
+    inline vpz::GraphModel* getDestinationModel() {
         return mDestinationModel;
     }
 
@@ -236,7 +236,7 @@ public:
     void onPasteModel();
 
      /** Select all models in VPZ. */
-    void onSelectAll(graph::CoupledModel* cModel);
+    void onSelectAll(vpz::CoupledModel* cModel);
 
     //
     //
@@ -249,7 +249,7 @@ public:
      *
      * @param mdl model to unselect
      */
-    void removeFromSelectedModel(graph::Model* mdl);
+    void removeFromSelectedModel(vpz::GraphModel* mdl);
 
      /**
      * Add a single atomic model in position x, y.
@@ -278,23 +278,23 @@ public:
     /**
      * Show model information.
      *
-     * @param model graph::Model to show information
+     * @param model vpz::GraphModel to show information
      */
-    void showModel(graph::Model* model);
+    void showModel(vpz::GraphModel* model);
 
     /**
      * Delete Model after Message::Question.
      *
-     * @param model graph::Model to delete
+     * @param model vpz::GraphModel to delete
      */
-    void delModel(graph::Model* model);
+    void delModel(vpz::GraphModel* model);
 
     /**
      * Delete Connection after Message::Question.
      *
      * @param connection to delete
      */
-    //void delConnection(graph::Connection* connect);
+    //void delConnection(vpz::Connection* connect);
 
     /**
      * Displace all selected model to a new position in current view.
@@ -313,7 +313,7 @@ public:
      * @param src
      * @param dst
      */
-    void makeConnection(graph::Model* src, graph::Model* dst);
+    void makeConnection(vpz::GraphModel* src, vpz::GraphModel* dst);
 
     /**
      * To flash window, to inform user of this selected window.
@@ -322,7 +322,7 @@ public:
 
 private:
     Modeling*                   mModeling;
-    graph::CoupledModel*        mCurrent;
+    vpz::CoupledModel*        mCurrent;
     std::string                 mCurrentClass;
     size_t                      mIndex;
     GVLE*                       mGVLE;
@@ -330,8 +330,8 @@ private:
     CompleteViewDrawingArea*    mCompleteDrawing;
     SimpleViewDrawingArea*      mSimpleDrawing;
 
-    graph::ModelList            mSelectedModels;
-    graph::Model*               mDestinationModel;
+    vpz::ModelList            mSelectedModels;
+    vpz::GraphModel*               mDestinationModel;
     GVLE::ButtonType            mCurrentButton;
 };
 

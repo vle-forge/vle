@@ -35,7 +35,7 @@
 #include <vle/gvle/PortDialog.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <gdkmm/cursor.h>
@@ -48,7 +48,7 @@ using std::vector;
 
 namespace vle { namespace gvle {
 
-View::View(Modeling* m, graph::CoupledModel* c, size_t index, GVLE* gvle) :
+View::View(Modeling* m, vpz::CoupledModel* c, size_t index, GVLE* gvle) :
         mModeling(m),
         mCurrent(c),
         mIndex(index),
@@ -74,7 +74,7 @@ void View::redraw()
     mSimpleDrawing->queueRedraw();
 }
 
-void View::addModelInListModel(graph::Model* model, bool shiftorcontrol)
+void View::addModelInListModel(vpz::GraphModel* model, bool shiftorcontrol)
 {
     if (model) {
         if (shiftorcontrol == false) {
@@ -84,7 +84,7 @@ void View::addModelInListModel(graph::Model* model, bool shiftorcontrol)
     }
 }
 
-void View::addModelToSelectedModels(graph::Model* m)
+void View::addModelToSelectedModels(vpz::GraphModel* m)
 {
     if (not existInSelectedModels(m)) {
         if (existInSelectedModels(mCurrent) or m == mCurrent) {
@@ -101,12 +101,12 @@ void View::clearSelectedModels()
         mGVLE->getMenu()->hideCopyCut();
 }
 
-graph::Model* View::getFirstSelectedModels()
+vpz::GraphModel* View::getFirstSelectedModels()
 {
     return mSelectedModels.empty() ? 0 : mSelectedModels.begin()->second;
 }
 
-bool View::existInSelectedModels(graph::Model* m)
+bool View::existInSelectedModels(vpz::GraphModel* m)
 {
     return mSelectedModels.find(m->getName()) != mSelectedModels.end();
 }
@@ -183,15 +183,15 @@ void View::onPasteModel()
     redraw();
 }
 
-void View::onSelectAll(graph::CoupledModel* cModel)
+void View::onSelectAll(vpz::CoupledModel* cModel)
 {
     mGVLE->selectAll(mSelectedModels, cModel);
     redraw();
 }
 
-void View::removeFromSelectedModel(graph::Model* mdl)
+void View::removeFromSelectedModel(vpz::GraphModel* mdl)
 {
-    std :: map < std::string, graph::Model* >:: iterator it;
+    std :: map < std::string, vpz::GraphModel* >:: iterator it;
     it = mSelectedModels.find(mdl->getName());
     if (it != mSelectedModels.end ()) {
         mSelectedModels.erase(it++);
@@ -204,17 +204,11 @@ void View::addAtomicModel(int x, int y)
     ModelDescriptionBox* box = new
     ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
-        graph::AtomicModel* new_atom =
+        vpz::AtomicGraphModel* new_atom =
             mModeling->newAtomicModel(mCurrent, box->getName(), "", x, y);
 
         if (new_atom) {
             try {
-                if (mCurrentClass == "") {
-                    mModeling->vpz().project().model().atomicModels().add(
-                        new_atom, vpz::AtomicModel("", "", ""));
-                } else {
-                    mModeling->addAtomicModelClass(mCurrentClass, new_atom);
-                }
                 redraw();
 		mGVLE->redrawModelTreeBox();
 		mGVLE->redrawModelClassBox();
@@ -236,7 +230,7 @@ void View::addCoupledModel(int x, int y)
     box = new ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
         if (not mCurrent or not mCurrent->exist(box->getName())) {
-            graph::CoupledModel* new_gc =
+            vpz::CoupledModel* new_gc =
                 mModeling->newCoupledModel(mCurrent, box->getName(),
                                            "", x, y);
 
@@ -252,13 +246,13 @@ void View::addCoupledModel(int x, int y)
             mGVLE->redrawModelClassBox();
             mSelectedModels.clear();
         } else {
-            graph::Model* model = mCurrent->findModel(box->getName());
+            vpz::GraphModel* model = mCurrent->findModel(box->getName());
             bool select = false;
             if (model != 0)
                 select = mCurrent->isInList(
                     mSelectedModels, mCurrent->findModel(box->getName()));
             if (select) {
-                graph::CoupledModel* new_gc =
+                vpz::CoupledModel* new_gc =
                     mModeling->newCoupledModel(0, box->getName(),
                                                "", x, y);
 
@@ -283,7 +277,7 @@ void View::addCoupledModel(int x, int y)
     delete box;
 }
 
-void View::showModel(graph::Model* model)
+void View::showModel(vpz::GraphModel* model)
 {
     if (not model) {
         mGVLE->EditCoupledModel(mCurrent);
@@ -296,14 +290,13 @@ void View::showModel(graph::Model* model)
     }
 }
 
-void View::delModel(graph::Model* model)
+void View::delModel(vpz::GraphModel* model)
 {
     if (model) {
         if (gvle::Question(_("Do you really want destroy model ?"))) {
             if (model->isCoupled()) {
-                mGVLE->delViewOnModel((graph::CoupledModel*)model);
+                mGVLE->delViewOnModel((vpz::CoupledModel*)model);
             }
-            mGVLE->delModel(model, mCurrentClass);
             mCurrent->delModel(model);
             mGVLE->redrawModelTreeBox();
 	    mGVLE->redrawModelClassBox();
@@ -323,7 +316,7 @@ void View::displaceModel(int oldx, int oldy, int x, int y)
         int minx(std::numeric_limits < int >::max());
         int miny(std::numeric_limits < int >::max());
 
-        for (graph::ModelList::iterator it = mSelectedModels.begin();
+        for (vpz::ModelList::iterator it = mSelectedModels.begin();
              it != mSelectedModels.end(); ++it) {
             minx = std::min(minx, it->second->x());
             miny = std::min(miny, it->second->y());
@@ -337,14 +330,14 @@ void View::displaceModel(int oldx, int oldy, int x, int y)
             dy = 0;
         }
 
-        for (graph::ModelList::iterator it = mSelectedModels.begin();
+        for (vpz::ModelList::iterator it = mSelectedModels.begin();
              it != mSelectedModels.end(); ++it) {
             it->second->setPosition(it->second->x() + dx, it->second->y() + dy);
         }
     }
 }
 
-void View::makeConnection(graph::Model* src, graph::Model* dst)
+void View::makeConnection(vpz::GraphModel* src, vpz::GraphModel* dst)
 {
     assert(src and dst);
 

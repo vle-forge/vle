@@ -33,8 +33,19 @@
 #include <vle/vpz/Dynamic.hpp>
 #include <set>
 #include <map>
+#include <vector>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
+
+    /**
+     * @brief A operator to retrieve the key
+     *
+     * @param pair the key Dynamic pair.
+     * @return DYNAMICS.
+     */
+    inline std::string dynamicKey(std::pair < std::string, Dynamic > pair)
+    { return pair.first; }
 
     /**
      * @brief Define a list of Dynamcis.
@@ -64,6 +75,13 @@ namespace vle { namespace vpz {
          */
         virtual ~Dynamics()
         {}
+
+        /**
+         * @brief A operator to retrieve the list of keys
+         *
+         * @return vector of Dynamic names
+         */
+        std::set < std::string > getKeys();
 
         /**
          * @brief Write the Dynamics information into stream

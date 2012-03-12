@@ -62,7 +62,7 @@ void SimpleViewDrawingArea::draw()
     }
 }
 
-void SimpleViewDrawingArea::drawChildrenModel(graph::Model* model,
+void SimpleViewDrawingArea::drawChildrenModel(vpz::GraphModel* model,
 					      const Gdk::Color& color)
 {
     setColor(color);
@@ -173,9 +173,9 @@ void SimpleViewDrawingArea::preComputeConnection(int xs, int ys,
     mConnections.push_back(con);
 }
 
-void SimpleViewDrawingArea::preComputeConnection(graph::Model* src,
+void SimpleViewDrawingArea::preComputeConnection(vpz::GraphModel* src,
 						 const std::string& portsrc,
-						 graph::Model* dst,
+						 vpz::GraphModel* dst,
 						 const std::string& portdst)
 {
     int xs = 0, ys = 0, xd = 0, yd = 0;
@@ -198,9 +198,9 @@ void SimpleViewDrawingArea::preComputeConnection(graph::Model* src,
     }
 }
 
-void SimpleViewDrawingArea::computeConnection(graph::Model* src,
+void SimpleViewDrawingArea::computeConnection(vpz::GraphModel* src,
 					      const std::string& portsrc,
-					      graph::Model* dst,
+					      vpz::GraphModel* dst,
 					      const std::string& portdst,
 					      int index)
 {
@@ -278,8 +278,8 @@ void SimpleViewDrawingArea::getCurrentModelOutPosition(const std::string& port,
 }
 
 void SimpleViewDrawingArea::getModelInPosition(int xs, int ys,
-					       graph::Model* dst,
-					       graph::Model* center,
+					       vpz::GraphModel* dst,
+					       vpz::GraphModel* center,
 					       int&x, int& y)
 {
     int a = ((dst->x() - xs) * (dst->x() - xs))
@@ -301,9 +301,9 @@ void SimpleViewDrawingArea::getModelInPosition(int xs, int ys,
 }
 
 
-void SimpleViewDrawingArea::getModelOutPosition(graph::Model* src,
+void SimpleViewDrawingArea::getModelOutPosition(vpz::GraphModel* src,
 						int xd, int yd,
-						graph::Model* center,
+						vpz::GraphModel* center,
 						int&x, int& y)
 {
     int a = ((xd - src->x()) * (xd - src->x()))
@@ -325,17 +325,15 @@ void SimpleViewDrawingArea::getModelOutPosition(graph::Model* src,
 
 void SimpleViewDrawingArea::preComputeConnectInfo()
 {
-    using namespace graph;
-
     mConnectionInfo.clear();
 
     {
-        ConnectionList& outs(mCurrent->getInternalInputPortList());
-        ConnectionList::const_iterator it;
+        vpz::ConnectionList& outs(mCurrent->getInternalInputPortList());
+        vpz::ConnectionList::const_iterator it;
 
         for (it = outs.begin(); it != outs.end(); ++it) {
-            const ModelPortList& ports(it->second);
-            ModelPortList::const_iterator jt ;
+            const vpz::ModelPortList& ports(it->second);
+            vpz::ModelPortList::const_iterator jt ;
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 record.source = mCurrent;
@@ -346,16 +344,16 @@ void SimpleViewDrawingArea::preComputeConnectInfo()
     }
 
     {
-        const ModelList& children(mCurrent->getModelList());
-        ModelList::const_iterator it;
+        const vpz::ModelList& children(mCurrent->getModelList());
+        vpz::ModelList::const_iterator it;
 
         for (it = children.begin(); it != children.end(); ++it) {
-            const ConnectionList& outs(it->second->getOutputPortList());
-            ConnectionList::const_iterator jt;
+            const vpz::ConnectionList& outs(it->second->getOutputPortList());
+            vpz::ConnectionList::const_iterator jt;
 
             for (jt = outs.begin(); jt != outs.end(); ++jt) {
-                const ModelPortList&  ports(jt->second);
-                ModelPortList::const_iterator kt;
+                const vpz::ModelPortList&  ports(jt->second);
+                vpz::ModelPortList::const_iterator kt;
 
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
                     record.source = it->second;
@@ -406,7 +404,7 @@ bool SimpleViewDrawingArea::on_button_press_event(GdkEventButton* event)
     mMouse.set_y((int)(event->y / mZoom));
     bool shiftOrControl = (event->state & GDK_SHIFT_MASK) or(event->state &
                                                              GDK_CONTROL_MASK);
-    graph::Model* model = mCurrent->find(mMouse.get_x(), mMouse.get_y(),
+    vpz::GraphModel* model = mCurrent->find(mMouse.get_x(), mMouse.get_y(),
 					 2 * MODEL_RADIUS, 2 * MODEL_RADIUS);
 
     switch (currentbutton) {
@@ -485,7 +483,7 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
 		for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
 		     y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
 		     ++y) {
-		    graph::Model* model = mCurrent->find(x, y,
+		    vpz::GraphModel* model = mCurrent->find(x, y,
 							 2 * MODEL_RADIUS,
 							 2 * MODEL_RADIUS);
 		    if (model)
@@ -500,7 +498,7 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
         }
 
         if (mView->getAllSelectedModels().size() == 1) {
-            graph::Model* mod = mView->getFirstSelectedModels();
+            vpz::GraphModel* mod = mView->getFirstSelectedModels();
             if (mView->isClassView()) {
                 mGVLE->getModelTreeBox()->selectNone();
                 mGVLE->getModelClassBox()->showRow(mod);

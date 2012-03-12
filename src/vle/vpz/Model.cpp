@@ -27,7 +27,11 @@
 
 
 #include <vle/vpz/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <algorithm>
+#include <stack>
 
 namespace vle { namespace vpz {
 
@@ -46,7 +50,7 @@ Model::Model(const Model& mdl) :
 void Model::write(std::ostream& out) const
 {
     out << "<structures>\n";
-    m_atomicmodels.writeModel(m_graph, out);
+    m_graph->write(out);
     out << "</structures>\n";
 }
 
@@ -56,19 +60,52 @@ void Model::clear()
     m_graph = 0;
 }
 
-void Model::setModel(graph::Model* mdl)
+void Model::setModel(GraphModel* mdl)
 {
     m_graph = mdl;
 }
 
-graph::Model* Model::model()
+GraphModel* Model::model()
 {
     return m_graph;
 }
 
-graph::Model* Model::model() const
+GraphModel* Model::model() const
 {
     return m_graph;
+}
+
+void Model::updateDynamics(const std::string& oldname,
+                           const std::string& newname)
+{
+    m_graph->updateDynamics(oldname, newname);
+}
+
+void Model::purgeDynamics(const std::set < std::string >& dynamicslist)
+{
+    m_graph->purgeDynamics(dynamicslist);
+}
+
+void Model::updateObservable(const std::string& oldname,
+                             const std::string& newname)
+{
+    m_graph->updateObservable(oldname, newname);
+}
+
+void Model::purgeObservable(const std::set < std::string >& observablelist)
+{
+    m_graph->purgeObservable(observablelist);
+}
+
+void Model::updateConditions(const std::string& oldname,
+                             const std::string& newname)
+{
+    m_graph->updateConditions(oldname, newname);
+}
+
+void Model::purgeConditions(const std::set < std::string >& conditionlist)
+{
+    m_graph->purgeConditions(conditionlist);
 }
 
 }} // namespace vle vpz

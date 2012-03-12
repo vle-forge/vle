@@ -31,7 +31,7 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <gtkmm/stock.h>
 #include <boost/algorithm/string/trim.hpp>
@@ -92,7 +92,7 @@ CoupledModelBox::InputPortTreeView::~InputPortTreeView()
 }
 
 void CoupledModelBox::InputPortTreeView::applyRenaming(
-    graph::CoupledModel* model)
+    vpz::CoupledModel* model)
 {
     renameList::const_iterator it = mRenameList.begin();
 
@@ -119,12 +119,11 @@ bool CoupledModelBox::InputPortTreeView::on_button_press_event(
 void CoupledModelBox::InputPortTreeView::build()
 {
     assert(mModel);
-    using namespace graph;
 
     mRefTreeModelInputPort->clear();
 
-    ConnectionList list = mModel->getInputPortList();
-    ConnectionList::const_iterator it = list.begin();
+    vpz::ConnectionList list = mModel->getInputPortList();
+    vpz::ConnectionList::const_iterator it = list.begin();
     while (it != list.end()) {
         Gtk::TreeModel::Row row = *(mRefTreeModelInputPort->append());
         row[mColumnsInputPort.m_col_name] = it->first;
@@ -167,7 +166,7 @@ void CoupledModelBox::InputPortTreeView::onRename()
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string old_name = row.get_value(mColumnsInputPort.m_col_name);
 	    SimpleTypeBox box(_("New name of the input port ?"), old_name);
-	    graph::ConnectionList& list = mModel->getInputPortList();
+	    vpz::ConnectionList& list = mModel->getInputPortList();
 	    Glib::ustring new_name = boost::trim_copy(box.run());
 
 	    if (box.valid() and not new_name.empty()
@@ -213,7 +212,7 @@ void CoupledModelBox::InputPortTreeView::onEdition(
 {
     Gtk::TreePath path(pathString);
 
-    graph::ConnectionList& list = mModel->getInputPortList();
+    vpz::ConnectionList& list = mModel->getInputPortList();
 
     if (list.find(newName) == list.end() and newName != "") {
 	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
@@ -289,7 +288,7 @@ CoupledModelBox::OutputPortTreeView::~OutputPortTreeView()
 }
 
 void CoupledModelBox::OutputPortTreeView::applyRenaming(
-    graph::CoupledModel* model)
+    vpz::CoupledModel* model)
 {
     renameList::const_iterator it = mRenameList.begin();
 
@@ -317,12 +316,11 @@ bool CoupledModelBox::OutputPortTreeView::on_button_press_event(
 void CoupledModelBox::OutputPortTreeView::build()
 {
     assert(mModel);
-    using namespace graph;
 
     mRefTreeModelOutputPort->clear();
 
-    ConnectionList list = mModel->getOutputPortList();
-    ConnectionList::const_iterator it = list.begin();
+    vpz::ConnectionList list = mModel->getOutputPortList();
+    vpz::ConnectionList::const_iterator it = list.begin();
     while (it != list.end()) {
 	Gtk::TreeModel::Row row = *(mRefTreeModelOutputPort->append());
 	row[mColumnsOutputPort.m_col_name] = it->first;
@@ -365,7 +363,7 @@ void CoupledModelBox::OutputPortTreeView::onRename()
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string old_name = row.get_value(mColumnsOutputPort.m_col_name);
 	    SimpleTypeBox box(_("New name of the input port ?"), old_name);
-	    graph::ConnectionList& list = mModel->getOutputPortList();
+	    vpz::ConnectionList& list = mModel->getOutputPortList();
 	    Glib::ustring new_name = boost::trim_copy(box.run());
 
 	    if (box.valid() and not new_name.empty()
@@ -412,7 +410,7 @@ void CoupledModelBox::OutputPortTreeView::onEdition(
 {
     Gtk::TreePath path(pathString);
 
-    graph::ConnectionList& list = mModel->getOutputPortList();
+    vpz::ConnectionList& list = mModel->getOutputPortList();
 
     if (list.find(newName) == list.end() and newName != "") {
 	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
@@ -460,10 +458,10 @@ CoupledModelBox::CoupledModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
         sigc::mem_fun(*this, &CoupledModelBox::on_cancel));
 }
 
-void CoupledModelBox::show(graph::CoupledModel* model)
+void CoupledModelBox::show(vpz::CoupledModel* model)
 {
     mCurrentGraphModel = model;
-    mGraphModel = new graph::CoupledModel(*model);
+    mGraphModel = new vpz::CoupledModel(*model);
 
     mModelName->set_text(mGraphModel->getName());
     mModelNbChildren->set_text(
@@ -485,9 +483,9 @@ void CoupledModelBox::applyPorts()
 
     // Apply input ports
     {
-	graph::ConnectionList connec_in_list =
+	vpz::ConnectionList connec_in_list =
 	    mCurrentGraphModel->getInputPortList();
-	graph::ConnectionList::iterator it = connec_in_list.begin();
+	vpz::ConnectionList::iterator it = connec_in_list.begin();
 
 	while (it != connec_in_list.end()) {
 	    if (not mGraphModel->existInputPort(it->first)) {
@@ -497,9 +495,9 @@ void CoupledModelBox::applyPorts()
 	}
     }
     {
-     	graph::ConnectionList connec_in_list =
+	vpz::ConnectionList connec_in_list =
      	    mGraphModel->getInputPortList();
-     	graph::ConnectionList::iterator it = connec_in_list.begin();
+	vpz::ConnectionList::iterator it = connec_in_list.begin();
 
      	while (it != connec_in_list.end()) {
 	    if (not mCurrentGraphModel->existInputPort(it->first)) {
@@ -511,9 +509,9 @@ void CoupledModelBox::applyPorts()
 
     // Apply output ports
     {
-	graph::ConnectionList connec_out_list =
+	vpz::ConnectionList connec_out_list =
 	    mCurrentGraphModel->getOutputPortList();
-	graph::ConnectionList::iterator it = connec_out_list.begin();
+	vpz::ConnectionList::iterator it = connec_out_list.begin();
 
 	while (it != connec_out_list.end()) {
 	    if (not mGraphModel->existOutputPort(it->first)) {
@@ -523,9 +521,9 @@ void CoupledModelBox::applyPorts()
 	}
     }
     {
-     	graph::ConnectionList& connec_out_list =
+	vpz::ConnectionList& connec_out_list =
      	    mGraphModel->getOutputPortList();
-     	graph::ConnectionList::iterator it = connec_out_list.begin();
+	vpz::ConnectionList::iterator it = connec_out_list.begin();
 
      	while (it != connec_out_list.end()) {
 	    if (not mCurrentGraphModel->existOutputPort(it->first)) {

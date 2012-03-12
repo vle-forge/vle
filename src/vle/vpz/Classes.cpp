@@ -101,5 +101,62 @@ void Classes::rename(const std::string& oldname, const std::string& newname)
     m_lst.erase(it);
 }
 
+void Classes::updateDynamics(const std::string& oldname,
+                             const std::string& newname)
+{
+    vpz::ClassList::iterator it = m_lst.begin();
+    while (it != m_lst.end()) {
+        it->second.updateDynamics(oldname, newname);
+        ++it;
+    }
+}
+
+void Classes::purgeDynamics(const std::set < std::string >& dynamicslist)
+{
+    vpz::ClassList::iterator it = m_lst.begin();
+    while (it != m_lst.end()) {
+        it->second.purgeDynamics(dynamicslist);
+        ++it;
+    }
+}
+
+void Classes::updateObservable(const std::string& oldname,
+                               const std::string& newname)
+{
+    vpz::ClassList::iterator it = m_lst.begin();
+    while (it != m_lst.end()) {
+        it->second.updateObservable(oldname, newname);
+         ++it;
+    }
+}
+
+void Classes::purgeObservable(const std::set < std::string >& observablelist)
+{
+    vpz::ClassList::iterator it = m_lst.begin();
+    while (it != m_lst.end()) {
+        it->second.purgeObservable(observablelist);
+         ++it;
+    }
+}
+
+void Classes::updateConditions(const std::string& oldname,
+                              const std::string& newname)
+{
+    vpz::ClassList::iterator it = m_lst.begin();
+    while (it != m_lst.end()) {
+        it->second.updateConditions(oldname, newname);
+         ++it;
+    }
+}
+
+void Classes::purgeConditions(const std::set < std::string >& conditionlist)
+{
+    vpz::ClassList::iterator it = m_lst.begin();
+    while (it != m_lst.end()) {
+        it->second.purgeConditions(conditionlist);
+        ++it;
+    }
+}
+
 }} // namespace vle vpz
 

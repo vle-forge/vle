@@ -36,8 +36,8 @@
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
@@ -141,19 +141,19 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isCoupled(), true);
 
-    graph::CoupledModel* cpl = dynamic_cast < graph::CoupledModel*
+    vpz::CoupledModel* cpl = dynamic_cast < vpz::CoupledModel*
         >(mdl.model());
     BOOST_REQUIRE(cpl != 0);
     BOOST_REQUIRE(cpl->existOutputPort("o") != 0);
     BOOST_REQUIRE(cpl->existInputPort("i") != 0);
 
-    graph::Model* mdl1 = cpl->findModel("atom1");
-    graph::Model* mdl2 = cpl->findModel("atom2");
+    vpz::GraphModel* mdl1 = cpl->findModel("atom1");
+    vpz::GraphModel* mdl2 = cpl->findModel("atom2");
     BOOST_REQUIRE(mdl1 != 0);
     BOOST_REQUIRE(mdl2 != 0);
 
-    graph::AtomicModel* atom1 = dynamic_cast < graph::AtomicModel* >(mdl1);
-    graph::AtomicModel* atom2 = dynamic_cast < graph::AtomicModel* >(mdl2);
+    vpz::AtomicGraphModel* atom1 = dynamic_cast < vpz::AtomicGraphModel* >(mdl1);
+    vpz::AtomicGraphModel* atom2 = dynamic_cast < vpz::AtomicGraphModel* >(mdl2);
     BOOST_REQUIRE(atom1 != 0);
     BOOST_REQUIRE(atom1->existOutputPort("out"));
     BOOST_REQUIRE(atom1->existInputPort("in"));
@@ -189,8 +189,8 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
 
-    graph::AtomicModel* atom(
-        reinterpret_cast < graph::AtomicModel* >(mdl.model()));
+    vpz::AtomicGraphModel* atom(
+        reinterpret_cast < vpz::AtomicGraphModel* >(mdl.model()));
 
     const vpz::AtomicModel& vatom = mdl.atomicModels().get(atom);
     BOOST_REQUIRE_EQUAL(vatom.dynamics(), "dyn1");

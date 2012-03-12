@@ -27,7 +27,7 @@
 
 
 #include <vle/gvle/ConnectionBox.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/i18n.hpp>
 #include <gtkmm/stock.h>
 #include <cassert>
@@ -38,9 +38,9 @@ using namespace vle;
 
 namespace vle { namespace gvle {
 
-ConnectionBox::ConnectionBox(graph::CoupledModel* parent,
-                             graph::Model* src,
-                             graph::Model* dst) :
+ConnectionBox::ConnectionBox(vpz::CoupledModel* parent,
+                             vpz::GraphModel* src,
+                             vpz::GraphModel* dst) :
         Gtk::Dialog(_("Connection Box"), true, true),
         m_vbox(false),
         m_hbox(true),
@@ -79,19 +79,19 @@ ConnectionBox::ConnectionBox(graph::CoupledModel* parent,
     show_all();
 }
 
-void ConnectionBox::assingComboOutputPort(graph::CoupledModel* parent,
-        graph::Model* dst)
+void ConnectionBox::assingComboOutputPort(vpz::CoupledModel* parent,
+        vpz::GraphModel* dst)
 {
     if (dst == parent) {
-        const graph::ConnectionList& input = dst->getOutputPortList();
-        graph::ConnectionList::const_iterator it = input.begin();
+        const vpz::ConnectionList& input = dst->getOutputPortList();
+        vpz::ConnectionList::const_iterator it = input.begin();
         while (it != input.end()) {
             m_comboOutput.append_string((*it).first);
             ++it;
         }
     } else {
-        const graph::ConnectionList& input = dst->getInputPortList();
-        graph::ConnectionList::const_iterator it = input.begin();
+        const vpz::ConnectionList& input = dst->getInputPortList();
+        vpz::ConnectionList::const_iterator it = input.begin();
         while (it != input.end()) {
             m_comboOutput.append_string((*it).first);
             ++it;
@@ -99,19 +99,19 @@ void ConnectionBox::assingComboOutputPort(graph::CoupledModel* parent,
     }
 }
 
-void ConnectionBox::assingComboInputPort(graph::CoupledModel* parent,
-        graph::Model* src)
+void ConnectionBox::assingComboInputPort(vpz::CoupledModel* parent,
+        vpz::GraphModel* src)
 {
     if (src == parent) {
-        const graph::ConnectionList& output = src->getInputPortList();
-        graph::ConnectionList::const_iterator it = output.begin();
+        const vpz::ConnectionList& output = src->getInputPortList();
+        vpz::ConnectionList::const_iterator it = output.begin();
         while (it != output.end()) {
             m_comboInput.append_string((*it).first);
             ++it;
         }
     } else {
-        const graph::ConnectionList& output = src->getOutputPortList();
-        graph::ConnectionList::const_iterator it = output.begin();
+        const vpz::ConnectionList& output = src->getOutputPortList();
+        vpz::ConnectionList::const_iterator it = output.begin();
         while (it != output.end()) {
             m_comboInput.append_string((*it).first);
             ++it;

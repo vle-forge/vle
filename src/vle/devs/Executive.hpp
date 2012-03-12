@@ -32,7 +32,7 @@
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Observables.hpp>
@@ -65,7 +65,7 @@ class Simulator;
 class VLE_API ExecutiveInit : public DynamicsInit
 {
 public:
-    ExecutiveInit(const graph::AtomicModel& model,
+    ExecutiveInit(const vpz::AtomicGraphModel& model,
                   PackageId packageid,
                   Coordinator& coordinator)
         : DynamicsInit(model, packageid), m_coordinator(coordinator)
@@ -108,7 +108,7 @@ public:
     /**
      * @brief If this function return true, then a cast to an Executive object
      * is produce and the set_coordinator function is call. Executive permit to
-     * manipulate graph::CoupledModel and devs::Coordinator at runtime of the
+     * manipulate vpz::CoupledModel and devs::Coordinator at runtime of the
      * simulation.
      * @return false if Dynamics is not an Executive.
      */
@@ -187,7 +187,7 @@ public:
     /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
      * to this model information of dynamics, condition and observable.
-     * @param name the name of the graph::AtomicModel to create.
+     * @param name the name of the vpz::AtomicGraphModel to create.
      * @param inputs the list of input ports.
      * @param outputs the list of output ports.
      * @param dynamics the name of the dynamics to attach.
@@ -195,7 +195,7 @@ public:
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    virtual const graph::AtomicModel*
+    virtual const vpz::AtomicGraphModel*
         createModel(const std::string& name,
                     const std::vector < std::string >& inputs =
                         std::vector < std::string >(),
@@ -213,7 +213,7 @@ public:
      * @param modelname the new name of the model.
      * @throw utils::badArg if modelname already exist.
      */
-    virtual const graph::Model*
+    virtual const vpz::GraphModel*
         createModelFromClass(const std::string& classname,
                              const std::string& modelname);
 
@@ -340,7 +340,7 @@ public:
      * @brief Get a reference to the current coupled model.
      * @return A constant reference to the coupled model.
      */
-    const graph::CoupledModel& coupledmodel() const
+    const vpz::CoupledModel& coupledmodel() const
     { return *getModel().getParent(); }
 
     /**
@@ -359,7 +359,7 @@ private:
      * @brief Get a reference to the current coupled model.
      * @return A reference to the coupled model.
      */
-    graph::CoupledModel* cpled() { return getModel().getParent(); }
+    vpz::CoupledModel* cpled() { return getModel().getParent(); }
 };
 
 }} // namespace vle devs

@@ -27,8 +27,8 @@
 
 
 #include <vle/vpz/AtomicModels.hpp>
-#include <vle/graph/CoupledModel.hpp>
-#include <vle/graph/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Exception.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -70,7 +70,7 @@ void AtomicModelList::add(const AtomicModelList& atoms)
     }
 }
 
-AtomicModel& AtomicModelList::add(graph::Model* mdl,
+AtomicModel& AtomicModelList::add(GraphModel* mdl,
                                   const AtomicModel& atom)
 {
     const_iterator it = m_lst.find(mdl);
@@ -84,7 +84,7 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
     return (*m_lst.insert(value_type(mdl, atom)).first).second;
 }
 
-void AtomicModelList::del(graph::Model* mdl)
+void AtomicModelList::del(GraphModel* mdl)
 {
     iterator it = m_lst.find(mdl);
 
@@ -97,7 +97,7 @@ void AtomicModelList::del(graph::Model* mdl)
     m_lst.erase(it);
 }
 
-const AtomicModel& AtomicModelList::get(graph::Model* atom) const
+const AtomicModel& AtomicModelList::get(GraphModel* atom) const
 {
     const_iterator it = m_lst.find(atom);
     if (it == end()) {
@@ -108,7 +108,7 @@ const AtomicModel& AtomicModelList::get(graph::Model* atom) const
     return it->second;
 }
 
-AtomicModel& AtomicModelList::get(graph::Model* atom)
+AtomicModel& AtomicModelList::get(GraphModel* atom)
 {
     iterator it = m_lst.find(atom);
     if (it == end()) {
@@ -119,9 +119,9 @@ AtomicModel& AtomicModelList::get(graph::Model* atom)
     return it->second;
 }
 
-const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
+const AtomicModel& AtomicModelList::get(const GraphModel* atom) const
 {
-    const_iterator it = m_lst.find(const_cast < graph::Model* >(atom));
+    const_iterator it = m_lst.find(const_cast < GraphModel* >(atom));
     if (it == end()) {
         throw(utils::ArgError(fmt(_(
 		"The information about atomic model [%1%] does not exist")) %
@@ -130,9 +130,9 @@ const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
     return it->second;
 }
 
-AtomicModel& AtomicModelList::get(const graph::Model* atom)
+AtomicModel& AtomicModelList::get(const GraphModel* atom)
 {
-    iterator it = m_lst.find(const_cast < graph::Model* >(atom));
+    iterator it = m_lst.find(const_cast < GraphModel* >(atom));
     if (it == end()) {
         throw(utils::ArgError(fmt(_(
                 "The information about atomic model [%1%] does not exist")) %
@@ -188,20 +188,20 @@ void AtomicModelList::updateObservable(const std::string& oldname,
 ///
 //
 
-void AtomicModelList::writeModel(const graph::Model* mdl, std::ostream& out) const
+void AtomicModelList::writeModel(const GraphModel* mdl, std::ostream& out) const
 {
     if (mdl) {
         if (mdl->isAtomic()) {
-            writeAtomic(out, static_cast < const graph::AtomicModel* >(mdl));
+            writeAtomic(out, static_cast < const vpz::AtomicGraphModel* >(mdl));
         } else {
-            writeCoupled(out, static_cast < const graph::CoupledModel* > (mdl));
+            writeCoupled(out, static_cast < const vpz::CoupledModel* > (mdl));
         }
     }
 }
 
-void AtomicModelList::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) const
+void AtomicModelList::writeCoupled(std::ostream& out, const vpz::CoupledModel* mdl) const
 {
-    typedef std::stack < const graph::CoupledModel* > CoupledModelList;
+    typedef std::stack < const vpz::CoupledModel* > CoupledModelList;
     typedef std::stack < bool > IsWritedCoupledModel;
 
     CoupledModelList cms;
@@ -211,7 +211,7 @@ void AtomicModelList::writeCoupled(std::ostream& out, const graph::CoupledModel*
     writed.push(false);
 
     while (not cms.empty()) {
-        const graph::CoupledModel* top(cms.top());
+        const vpz::CoupledModel* top(cms.top());
 
         if (not writed.top()) {
             writed.top() = true;
@@ -222,14 +222,14 @@ void AtomicModelList::writeCoupled(std::ostream& out, const graph::CoupledModel*
             writePort(out, top);
             out << "<submodels>\n";
 
-            const graph::ModelList& childs(top->getModelList());
-            for (graph::ModelList::const_iterator it = childs.begin();
+            const vpz::ModelList& childs(top->getModelList());
+            for (vpz::ModelList::const_iterator it = childs.begin();
                  it != childs.end(); ++it) {
                 if (it->second->isCoupled()) {
-                    cms.push(static_cast < graph::CoupledModel* >(it->second));
+                    cms.push(static_cast < vpz::CoupledModel* >(it->second));
                     writed.push(false);
                 } else if (it->second->isAtomic()) {
-                    writeAtomic(out, static_cast < graph::AtomicModel* >
+                    writeAtomic(out, static_cast < vpz::AtomicGraphModel* >
                                 (it->second));
                 }
             }
@@ -243,7 +243,7 @@ void AtomicModelList::writeCoupled(std::ostream& out, const graph::CoupledModel*
     }
 }
 
-void AtomicModelList::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
+void AtomicModelList::writeAtomic(std::ostream& out, const vpz::AtomicGraphModel* mdl) const
 {
     const AtomicModel& vpzatom(get(mdl));
 
@@ -280,7 +280,7 @@ void AtomicModelList::writeAtomic(std::ostream& out, const graph::AtomicModel* m
     out << "</model>\n";
 }
 
-void AtomicModelList::writeGraphics(std::ostream& out, const graph::Model* mdl) const
+void AtomicModelList::writeGraphics(std::ostream& out, const GraphModel* mdl) const
 {
     if (mdl->x() >= 0) {
         out << "x=\"" << mdl->x() << "\" ";
@@ -296,22 +296,22 @@ void AtomicModelList::writeGraphics(std::ostream& out, const graph::Model* mdl) 
     }
 }
 
-void AtomicModelList::writePort(std::ostream& out, const graph::Model* mdl) const
+void AtomicModelList::writePort(std::ostream& out, const GraphModel* mdl) const
 {
-    const graph::ConnectionList& ins(mdl->getInputPortList());
+    const vpz::ConnectionList& ins(mdl->getInputPortList());
     if (not ins.empty()) {
         out << "<in>\n";
-        for (graph::ConnectionList::const_iterator it = ins.begin();
+        for (vpz::ConnectionList::const_iterator it = ins.begin();
              it != ins.end(); ++it) {
             out << " <port name=\"" << it->first.c_str() << "\" />\n";
         }
         out << "</in>\n";
     }
 
-    const graph::ConnectionList& outs(mdl->getOutputPortList());
+    const vpz::ConnectionList& outs(mdl->getOutputPortList());
     if (not outs.empty()) {
         out << "<out>\n";
-        for (graph::ConnectionList::const_iterator it = outs.begin();
+        for (vpz::ConnectionList::const_iterator it = outs.begin();
              it != outs.end(); ++it) {
             out << " <port name=\"" << it->first.c_str() << "\" />\n";
         }
@@ -320,7 +320,7 @@ void AtomicModelList::writePort(std::ostream& out, const graph::Model* mdl) cons
 
 }
 
-void AtomicModelList::writeConnection(std::ostream& out, const graph::CoupledModel* mdl) const
+void AtomicModelList::writeConnection(std::ostream& out, const vpz::CoupledModel* mdl) const
 {
     out << "<connections>\n";
     mdl->writeConnections(out);

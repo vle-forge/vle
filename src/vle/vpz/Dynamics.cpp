@@ -31,8 +31,27 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <iterator>
+#include <vector>
 
 namespace vle { namespace vpz {
+
+std::set < std::string > Dynamics::getKeys()
+{
+    std::vector< std::string> dynamicKeys;
+
+    dynamicKeys.resize(m_list.size());
+
+    std::transform (m_list.begin(),
+                    m_list.end(),
+                    dynamicKeys.begin(),
+                    dynamicKey);
+
+
+    std::set <std::string> dynamicKeysSet (dynamicKeys.begin(),
+                                           dynamicKeys.end());
+
+    return dynamicKeysSet;
+}
 
 void Dynamics::write(std::ostream& out) const
 {

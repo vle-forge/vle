@@ -35,9 +35,9 @@
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/vpz/Project.hpp>
-#include <vle/graph/Model.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Rand.hpp>
 #include <gtkmm/builder.h>
 #include <map>
@@ -53,7 +53,7 @@ class View;
 
 /**
  * @brief This class contains all information on the opened VLE project. It
- * store the graph::Model hierarchy, the gui::GModel hierarchy and all
+ * store the vpz::GraphModel hierarchy, the gui::GModel hierarchy and all
  * information on the project.
  */
 class Modeling
@@ -62,8 +62,8 @@ private:
     typedef std::vector < std::pair < std::string,
                                       std::string > > renameList;
 public:
-    /** define associative map from graph::model name and is reference. */
-    typedef std::map < std::string, graph::Model * > MapStringModel;
+    /** define associative map from GraphModel name and is reference. */
+    typedef std::map < std::string, vpz::GraphModel * > MapStringModel;
 
     /** define set of string represent current models names. */
     typedef std::set < std::string > SetString;
@@ -138,14 +138,14 @@ public:
      *
      * @param cp
      */
-    void setTopModel(graph::CoupledModel* cp);
+    void setTopModel(vpz::CoupledModel* cp);
 
     /**
      * return the top model.
      *
      * @return top model of tree.
      */
-    inline graph::CoupledModel* getTopModel() {
+    inline vpz::CoupledModel* getTopModel() {
         return mTop;
     }
 
@@ -159,32 +159,14 @@ public:
     }
 
     /**
-     * get a class model graph::CoupledModel with name.
+     * get a class model vpz::CoupledModel with name.
      *
-     * @param std::string name get graph::CoupledModel
-     * @return graph::CoupledModel reference to class model, NULL if
+     * @param std::string name get vpz::CoupledModel
+     * @return vpz::CoupledModel reference to class model, NULL if
      * class model doesn't exist.
      */
-    inline graph::Model* getClassModel(const std::string& name)
+    inline vpz::GraphModel* getClassModel(const std::string& name)
         { return mVpz.project().classes().get(name).model(); }
-
-    /**
-     * get the AtomicModelList associate to the class
-     *
-     * @param name of class model to delete
-     */
-    vpz::AtomicModelList& getAtomicModelClass(std::string className);
-
-    /**
-     * add a new list of atomic model for a class
-     *
-     * @param name of the class
-     * @param new_atom : the new list
-     */
-    inline void addAtomicModelClass(std::string className,
-                                    graph::AtomicModel* new_atom)
-        { vpz().project().classes().get(className).atomicModels().add(
-                new_atom, vpz::AtomicModel("", "", "")); }
 
     std::string getSelectedClass()
         { return mSelectedClass; }
@@ -206,7 +188,7 @@ public:
      * @param m model represent top of graph.
      * @return a map string model of all model in graph.
      */
-    MapStringModel buidMapString(graph::Model* m);
+    MapStringModel buidMapString(vpz::GraphModel* m);
 
     /**
      * This recursive function is call by parseStructures ; It parse graph
@@ -215,7 +197,7 @@ public:
      * @param m model node.
      * @param msm string model map.
      */
-    void parseStructures(graph::Model* m, MapStringModel& msm);
+    void parseStructures(vpz::GraphModel* m, MapStringModel& msm);
 
 
     /********************************************************************
@@ -317,13 +299,13 @@ public:
         mIsCompressed = compress;
     }
 
-    void exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst, std::string className);
+    void exportCoupledModel(vpz::CoupledModel* model, vpz::Vpz* dst, std::string className);
 
-    void importModel(graph::Model* import, vpz::Vpz* src);
+    void importModel(vpz::Vpz* src);
 
     void importModelToClass(vpz::Vpz* src, std::string& className);
 
-    void exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst);
+    void exportClass(vpz::GraphModel* model, vpz::Class classe, vpz::Vpz* dst);
 
     /********************************************************************
      *
@@ -394,17 +376,6 @@ public:
     { setModified(true); return mVpz.project().experiment().conditions();
     }
 
-    vpz::AtomicModel& get_model(const graph::AtomicModel* atom,
-                                const std::string& className = "")
-    {
-        if (className.empty()) {
-            return mVpz.project().model().atomicModels().get(atom);
-        } else {
-            return mVpz.project().classes().get(className)
-                .atomicModels().get(atom);
-        }
-    }
-
     /********************************************************************
      *
      * SOCKET INFORMATION
@@ -437,20 +408,20 @@ public:
      *
      ********************************************************************/
 
-    graph::CoupledModel* newCoupledModel(
-        graph::CoupledModel* parent,
+    vpz::CoupledModel* newCoupledModel(
+        vpz::CoupledModel* parent,
         const std::string& name,
         const std::string& description,
         int x, int y);
 
-    graph::AtomicModel* newAtomicModel(
-        graph::CoupledModel* parent,
+    vpz::AtomicGraphModel* newAtomicModel(
+        vpz::CoupledModel* parent,
         const std::string& name,
         const std::string& description,
         int x, int y);
 
-    graph::Model* newPluginModel(
-        graph::CoupledModel* parent,
+    vpz::GraphModel* newPluginModel(
+        vpz::CoupledModel* parent,
         const std::string& name,
         const std::string& description,
         int x, int y);
@@ -483,31 +454,30 @@ public:
 
     std::string getIdCard(std::string className) const;
 
-    std::string getIdCard(graph::Model* model) const;
+    std::string getIdCard(vpz::GraphModel* model) const;
 
-    std::string getIdCard(graph::CoupledModel* model) const;
+    std::string getIdCard(vpz::CoupledModel* model) const;
 
     std::string getInfoCard(std::string cond) const;
 
-    std::string getClassIdCard(graph::Model* model,
-                               std::string className) const;
+    std::string getClassIdCard(vpz::GraphModel* model) const;
 
-    std::string getClassIdCard(graph::CoupledModel* model) const;
+    std::string getClassIdCard(vpz::CoupledModel* model) const;
 
-    std::string getIdCardConnection(graph::Model* src,
-                                    graph::Model* dest,
-                                    graph::CoupledModel* mTop) const;
+    std::string getIdCardConnection(vpz::GraphModel* src,
+                                    vpz::GraphModel* dest,
+                                    vpz::CoupledModel* mTop) const;
 
-    std::string getIdCardConnection(graph::Model* src,
+    std::string getIdCardConnection(vpz::GraphModel* src,
                                     std::string srcport,
-                                    graph::Model* dest,
+                                    vpz::GraphModel* dest,
                                     std::string destport,
-                                    graph::CoupledModel* mTop) const;
+                                    vpz::CoupledModel* mTop) const;
 
 private:
 
     vpz::Vpz                       mVpz;
-    graph::CoupledModel*           mTop;
+    vpz::CoupledModel*             mTop;
     std::string                    mCurrentClass;
     std::string                    mSelectedClass;
     utils::Rand*                   mRand;
@@ -519,19 +489,10 @@ private:
     int                            mSocketPort;
 
     void export_atomic_model(vpz::Vpz* dst,
-                             graph::AtomicModel* atom,
-                             std::string className = "");
+                             vpz::AtomicGraphModel* atom);
 
     void export_coupled_model(vpz::Vpz* dst,
-                              graph::CoupledModel* atom,
-                              std::string className = "");
-
-    void import_atomic_model(vpz::Vpz* src,
-                             graph::AtomicModel* atom,
-                             std::string className = "");
-
-    void import_coupled_model(vpz::Vpz* src,
-                              graph::CoupledModel* atom,
+                              vpz::CoupledModel* atom,
                               std::string className = "");
 
 protected:

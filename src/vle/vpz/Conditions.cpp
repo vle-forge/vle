@@ -33,6 +33,24 @@
 
 namespace vle { namespace vpz {
 
+std::set < std::string > Conditions::getKeys()
+{
+    std::vector< std::string> conditionKeys;
+
+    conditionKeys.resize(m_list.size());
+
+    std::transform (m_list.begin(),
+                    m_list.end(),
+                    conditionKeys.begin(),
+                    conditionKey);
+
+
+    std::set <std::string> conditionKeysSet (conditionKeys.begin(),
+                                             conditionKeys.end());
+
+    return conditionKeysSet;
+}
+
 void Conditions::write(std::ostream& out) const
 {
     if (not m_list.empty()) {

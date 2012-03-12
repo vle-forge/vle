@@ -35,8 +35,8 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <boost/format.hpp>
 #include <boost/cast.hpp>
 
@@ -49,10 +49,10 @@ MatrixTranslator::~MatrixTranslator()
     }
 }
 
-const graph::AtomicModel*
+const vpz::AtomicGraphModel*
 MatrixTranslator::getModel(const std::string& name) const
 {
-    std::map < std::string, const graph::AtomicModel* >::const_iterator it;
+    std::map < std::string, const vpz::AtomicGraphModel* >::const_iterator it;
     it = m_models.find(name);
 
     if (it == m_models.end()) {
@@ -240,7 +240,7 @@ void MatrixTranslator::translate(const value::Value& buffer)
 void MatrixTranslator::translateModel(unsigned int i,
                                       unsigned int j)
 {
-    const graph::AtomicModel* atomicModel;
+    const vpz::AtomicGraphModel* atomicModel;
 
     if (not m_library.empty() or not m_libraries.empty()) {
         std::vector < std::string > conditions;
@@ -255,7 +255,7 @@ void MatrixTranslator::translateModel(unsigned int i,
                                         conditions, "obs_cell");
         m_models[getName(i,j)] = atomicModel;
     } else {
-        atomicModel = dynamic_cast < const graph::AtomicModel*>(
+        atomicModel = dynamic_cast < const vpz::AtomicGraphModel*>(
             m_exe.createModelFromClass(getClass(i, j), getName(i, j)));
     }
 
@@ -337,7 +337,7 @@ void MatrixTranslator::translateStructures()
             conditions.push_back("cond_cell");
             conditions.push_back((fmt("cond_%1%_%2%") % m_prefix %
                                   i).str());
-            const graph::AtomicModel* atomicModel = m_exe.createModel(
+            const vpz::AtomicGraphModel* atomicModel = m_exe.createModel(
                 getName(i), std::vector < std::string >(),
                 std::vector < std::string >(), getDynamics(i), conditions,
                 "obs_cell");

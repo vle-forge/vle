@@ -36,13 +36,10 @@
 
 namespace vle {
 
-    namespace graph {
-
-        class Model;
-
-    } // namespace graph
-
     namespace vpz {
+
+    class GraphModel;
+
 
     class Base;
     class Vpz;
@@ -394,7 +391,7 @@ namespace vle {
          * @param width
          * @param height
          */
-        void buildModelGraphics(graph::Model* mdl,
+        void buildModelGraphics(vpz::GraphModel* mdl,
                                 const std::string& x,
                                 const std::string& y,
                                 const std::string& width,

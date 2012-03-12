@@ -25,7 +25,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/vpz/Observables.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Algo.hpp>
@@ -34,6 +33,24 @@
 #include <algorithm>
 
 namespace vle { namespace vpz {
+
+std::set < std::string > Observables::getKeys()
+{
+    std::vector< std::string> observableKeys;
+
+    observableKeys.resize(m_list.size());
+
+    std::transform (m_list.begin(),
+                    m_list.end(),
+                    observableKeys.begin(),
+                    observableKey);
+
+
+    std::set <std::string> observableKeysSet (observableKeys.begin(),
+                                              observableKeys.end());
+
+    return observableKeysSet;
+}
 
 void Observables::write(std::ostream& out) const
 {

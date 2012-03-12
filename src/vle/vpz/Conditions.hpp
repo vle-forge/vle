@@ -35,7 +35,17 @@
 #include <string>
 #include <list>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
+
+    /**
+     * @brief A operator to retrieve the key
+     *
+     * @param pair the key Condition pair.
+     * @return CONDITION name.
+     */
+    inline std::string conditionKey(std::pair < std::string, Condition > pair)
+    { return pair.first; }
 
     /**
      * @brief Define a condition list like list of names, conditions.
@@ -65,6 +75,13 @@ namespace vle { namespace vpz {
          */
         virtual ~Conditions()
         {}
+
+        /**
+         * @brief A operator to retrieve the list of keys
+         *
+         * @return vector of Dynamic names
+         */
+        std::set < std::string > getKeys();
 
         /**
          * @brief Add Conditions informations to the stream.

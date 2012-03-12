@@ -29,7 +29,7 @@
 #ifndef GUI_IMPORTMODELBOX_HPP
 #define GUI_IMPORTMODELBOX_HPP
 
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <gtkmm.h>
 #include <gtkmm/builder.h>
@@ -46,13 +46,13 @@ class ImportWidget : public Gtk::HBox
 {
 public:
     ImportWidget(ImportModelBox* parent, vpz::Base* base);
-    ImportWidget(ImportModelBox* parent, graph::Model* atom);
+    ImportWidget(ImportModelBox* parent, vpz::GraphModel* atom);
 
     vpz::Base* get_base() {
         return mBase;
     }
 
-    graph::Model* get_model() {
+    vpz::GraphModel* get_model() {
         return mAtom;
     }
 
@@ -63,7 +63,7 @@ public:
 private:
     ImportModelBox*             mParent;
     vpz::Base*                  mBase;
-    graph::Model*               mAtom;
+    vpz::GraphModel*               mAtom;
 
     Gtk::Entry                  mEntry;
     Gtk::Image                  mImage;
@@ -97,17 +97,17 @@ public:
     void dec_nb_widget_incorrect();
     void inc_nb_widget_incorrect();
 
-    inline void setGCoupled(graph::CoupledModel* parent)
+    inline void setGCoupled(vpz::CoupledModel* parent)
 	{ mParent = parent; }
 
-    inline graph::CoupledModel* getGCoupled()
+    inline vpz::CoupledModel* getGCoupled()
 	{ return mParent; }
 
 private:
     Glib::RefPtr < Gtk::Builder >      mXml;
     Modeling*                            mModeling;
     vpz::Vpz*                            mSrc;
-    graph::CoupledModel*                 mParent;
+    vpz::CoupledModel*                 mParent;
 
     Gtk::Dialog*                         mDialog;
 
@@ -152,7 +152,7 @@ private:
     void rename_observable(vpz::Vpz* src, std::string old_name,
                            std::string new_name);
     void rename_view(vpz::Vpz* src, std::string old_name, std::string new_name);
-    void rename_model(vpz::Vpz* src, graph::Model* old_model,
+    void rename_model(vpz::GraphModel* old_model,
                       std::string new_name);
 
     void on_apply();

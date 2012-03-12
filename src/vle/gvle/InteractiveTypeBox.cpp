@@ -59,7 +59,7 @@ InteractiveTypeBox::InteractiveTypeBox(const std::string& title,
 }
 
 InteractiveTypeBox::InteractiveTypeBox(const std::string& title,
-				       graph::CoupledModel* coupledModel,
+				       vpz::CoupledModel* coupledModel,
 				       const std::string& currentValue) :
     Gtk::Dialog(title, true, true),
     mValid(false),

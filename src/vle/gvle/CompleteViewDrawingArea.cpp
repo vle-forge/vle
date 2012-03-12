@@ -142,9 +142,9 @@ void CompleteViewDrawingArea::preComputeConnection(int xs, int ys,
     mConnections.push_back(con);
 }
 
-void CompleteViewDrawingArea::preComputeConnection(graph::Model* src,
+void CompleteViewDrawingArea::preComputeConnection(vpz::GraphModel* src,
                                            const std::string& portsrc,
-                                           graph::Model* dst,
+                                           vpz::GraphModel* dst,
                                            const std::string& portdst)
 {
     int xs, ys, xd, yd;
@@ -209,9 +209,9 @@ ViewDrawingArea::StraightLine CompleteViewDrawingArea::computeConnection(
     return list;
 }
 
-void CompleteViewDrawingArea::computeConnection(graph::Model* src,
+void CompleteViewDrawingArea::computeConnection(vpz::GraphModel* src,
                                         const std::string& portsrc,
-                                        graph::Model* dst,
+                                        vpz::GraphModel* dst,
                                         const std::string& portdst,
                                         int index)
 {
@@ -232,7 +232,7 @@ void CompleteViewDrawingArea::computeConnection(graph::Model* src,
     }
 }
 
-void CompleteViewDrawingArea::drawChildrenModel(graph::Model* model,
+void CompleteViewDrawingArea::drawChildrenModel(vpz::GraphModel* model,
                                         const Gdk::Color& color)
 {
     setColor(color);
@@ -245,12 +245,12 @@ void CompleteViewDrawingArea::drawChildrenModel(graph::Model* model,
     drawChildrenPorts(model, color);
 }
 
-void CompleteViewDrawingArea::drawChildrenPorts(graph::Model* model,
+void CompleteViewDrawingArea::drawChildrenPorts(vpz::GraphModel* model,
                                         const Gdk::Color& color)
 {
-    const graph::ConnectionList ipl =  model->getInputPortList();
-    const graph::ConnectionList opl =  model->getOutputPortList();
-    graph::ConnectionList::const_iterator itl;
+    const vpz::ConnectionList ipl =  model->getInputPortList();
+    const vpz::ConnectionList opl =  model->getOutputPortList();
+    vpz::ConnectionList::const_iterator itl;
 
     const size_t maxInput = model->getInputPortList().size();
     const size_t maxOutput = model->getOutputPortList().size();
@@ -362,7 +362,7 @@ void CompleteViewDrawingArea::getCurrentModelOutPosition(const std::string& port
     (mCurrent->getOutputPortIndex(port) + 1);
 }
 
-void CompleteViewDrawingArea::getModelInPosition(graph::Model* model,
+void CompleteViewDrawingArea::getModelInPosition(vpz::GraphModel* model,
                                          const std::string& port,
                                          int& x, int& y)
 {
@@ -371,7 +371,7 @@ void CompleteViewDrawingArea::getModelInPosition(graph::Model* model,
         (model->getInputPortIndex(port) + 1);
 }
 
-void CompleteViewDrawingArea::getModelOutPosition(graph::Model* model,
+void CompleteViewDrawingArea::getModelOutPosition(vpz::GraphModel* model,
                                           const std::string& port,
                                           int& x, int& y)
 {
@@ -387,7 +387,7 @@ bool CompleteViewDrawingArea::on_button_press_event(GdkEventButton* event)
     mMouse.set_y((int)(event->y / mZoom));
     bool shiftOrControl = (event->state & GDK_SHIFT_MASK) or(event->state &
                                                              GDK_CONTROL_MASK);
-    graph::Model* model = mCurrent->find(mMouse.get_x(), mMouse.get_y());
+    vpz::GraphModel* model = mCurrent->find(mMouse.get_x(), mMouse.get_y());
 
     switch (currentbutton) {
     case GVLE::VLE_GVLE_POINTER:
@@ -465,7 +465,7 @@ bool CompleteViewDrawingArea::on_button_release_event(GdkEventButton* event)
                 for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
                      y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
                      ++y) {
-                    graph::Model* model = mCurrent->find(x, y);
+                    vpz::GraphModel* model = mCurrent->find(x, y);
                     if (model)
                         if (not mView->existInSelectedModels(model))
                             mView->addModelToSelectedModels(model);
@@ -478,7 +478,7 @@ bool CompleteViewDrawingArea::on_button_release_event(GdkEventButton* event)
         }
 
         if (mView->getAllSelectedModels().size() == 1) {
-            graph::Model* mod = mView->getFirstSelectedModels();
+            vpz::GraphModel* mod = mView->getFirstSelectedModels();
             if (mView->isClassView()) {
                 mGVLE->getModelTreeBox()->selectNone();
                 mGVLE->getModelClassBox()->showRow(mod);
@@ -533,7 +533,7 @@ void CompleteViewDrawingArea::onOrder()
     mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) / (mMaxWidth + 15);
     mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) / (mMaxHeight + 15);
 
-    graph::ModelList::const_iterator it = mCurrent->getModelList().begin();
+    vpz::ModelList::const_iterator it = mCurrent->getModelList().begin();
 
     while (it != mCurrent->getModelList().end()) {
         do {
@@ -564,17 +564,15 @@ void CompleteViewDrawingArea::onOrder()
 
 void CompleteViewDrawingArea::preComputeConnectInfo()
 {
-    using namespace graph;
-
     mConnectionInfo.clear();
 
     {
-        ConnectionList& outs(mCurrent->getInternalInputPortList());
-        ConnectionList::const_iterator it;
+        vpz::ConnectionList& outs(mCurrent->getInternalInputPortList());
+        vpz::ConnectionList::const_iterator it;
 
         for (it = outs.begin(); it != outs.end(); ++it) {
-            const ModelPortList& ports(it->second);
-            ModelPortList::const_iterator jt ;
+            const  vpz::ModelPortList& ports(it->second);
+            vpz::ModelPortList::const_iterator jt ;
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 record.src = mCurrent;
@@ -587,16 +585,16 @@ void CompleteViewDrawingArea::preComputeConnectInfo()
     }
 
     {
-        const ModelList& children(mCurrent->getModelList());
-        ModelList::const_iterator it;
+        const vpz::ModelList& children(mCurrent->getModelList());
+        vpz::ModelList::const_iterator it;
 
         for (it = children.begin(); it != children.end(); ++it) {
-            const ConnectionList& outs(it->second->getOutputPortList());
-            ConnectionList::const_iterator jt;
+            const vpz::ConnectionList& outs(it->second->getOutputPortList());
+            vpz::ConnectionList::const_iterator jt;
 
             for (jt = outs.begin(); jt != outs.end(); ++jt) {
-                const ModelPortList&  ports(jt->second);
-                ModelPortList::const_iterator kt;
+                const vpz::ModelPortList&  ports(jt->second);
+                vpz::ModelPortList::const_iterator kt;
 
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
                     record.src = it->second;

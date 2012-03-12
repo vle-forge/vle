@@ -29,8 +29,8 @@
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/View.hpp>
-#include <vle/graph/Model.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <queue>
 
@@ -81,11 +81,11 @@ bool ModelTreeBox::onSelect(
     View* view =
         m_gvle->getEditor()->getDocumentDrawingArea()->getView();
 
-    graph::Model* mdl;
+    vpz::GraphModel* mdl;
 
     if (iter) {
         Gtk::TreeModel::Row row = *iter;
-        mdl = (graph::Model*)row[m_columns.mModel];
+        mdl = (vpz::GraphModel*)row[m_columns.mModel];
         if (mdl) {
             if (info) {
                 view->removeFromSelectedModel(mdl);
@@ -146,7 +146,7 @@ void ModelTreeBox::onRenameModels()
 	    if (box.valid() and not newname.empty() and newname != m_oldName) {
 		try {
 		    row[m_modelsColumnRecord.name] = newname;
-		    graph::Model::rename(row[m_columns.mModel], newname);
+		    vpz::GraphModel::rename(row[m_columns.mModel], newname);
 		    m_gvle->refreshViews();
                     m_gvle->setModified(true);
                 } catch(utils::DevsGraphError dge) {
@@ -157,28 +157,28 @@ void ModelTreeBox::onRenameModels()
     }
 }
 
-void ModelTreeBox::parseModel(graph::Model* top)
+void ModelTreeBox::parseModel(vpz::GraphModel* top)
 {
     assert(top);
 
     m_refTreeModel->clear();
 
     Gtk::TreeModel::Row row = addModel(top);
-    const graph::CoupledModel* coupled = (graph::CoupledModel*)(top);
+    const vpz::CoupledModel* coupled = (vpz::CoupledModel*)(top);
 
-    const graph::ModelList& list = coupled->getModelList();
-    graph::ModelList::const_iterator it = list.begin();
+    const vpz::ModelList& list = coupled->getModelList();
+    vpz::ModelList::const_iterator it = list.begin();
     while (it != list.end()) {
         Gtk::TreeModel::Row row2 = addSubModel(row, it->second);
         if (it->second->isCoupled()) {
-            parseModel(row2, (graph::CoupledModel*)it->second);
+            parseModel(row2, (vpz::CoupledModel*)it->second);
         }
         it++;
     }
     expand_all();
 }
 
-Gtk::TreeModel::iterator ModelTreeBox::getModelRow(const graph::Model* mdl,
+Gtk::TreeModel::iterator ModelTreeBox::getModelRow(const vpz::GraphModel* mdl,
                                                    Gtk::TreeModel::Children child)
 {
     Gtk::TreeModel::iterator iter = child.begin();
@@ -198,7 +198,7 @@ Gtk::TreeModel::iterator ModelTreeBox::getModelRow(const graph::Model* mdl,
     return iter;
 }
 
-void ModelTreeBox::showRow(const graph::Model* mdl)
+void ModelTreeBox::showRow(const vpz::GraphModel* mdl)
 {
     if (mdl->getParent()) {
         Gtk::TreeModel::iterator iter = getModelRow(mdl->getParent(),
@@ -222,7 +222,7 @@ bool ModelTreeBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
     Glib::ustring card;
 
     if (get_tooltip_context_iter(wx, wy, keyboard_tooltip, iter)) {
-        graph::Model* mModel = (*iter).get_value(m_columns.mModel);
+        vpz::GraphModel* mModel = (*iter).get_value(m_columns.mModel);
         card = m_modeling->getIdCard(mModel);
         tooltip->set_markup(card);
         set_tooltip_row(tooltip, Gtk::TreePath(iter));
@@ -233,7 +233,7 @@ bool ModelTreeBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
 }
 
 Gtk::TreeModel::Row
-ModelTreeBox::addModel(graph::Model* model)
+ModelTreeBox::addModel(vpz::GraphModel* model)
 {
     Gtk::TreeModel::Row row = *(m_refTreeModel->append());
     row[m_columns.mName] = model->getName();
@@ -242,7 +242,7 @@ ModelTreeBox::addModel(graph::Model* model)
 }
 
 Gtk::TreeModel::Row
-ModelTreeBox::addSubModel(Gtk::TreeModel::Row tree, graph::Model* model)
+ModelTreeBox::addSubModel(Gtk::TreeModel::Row tree, vpz::GraphModel* model)
 {
     Gtk::TreeModel::Row row = *(m_refTreeModel->append(tree.children()));
     row[m_columns.mName] = model->getName();
@@ -251,15 +251,15 @@ ModelTreeBox::addSubModel(Gtk::TreeModel::Row tree, graph::Model* model)
 }
 
 void ModelTreeBox::parseModel(Gtk::TreeModel::Row row,
-                              const graph::CoupledModel* top)
+                              const vpz::CoupledModel* top)
 {
-    const graph::ModelList& list = top->getModelList();
-    graph::ModelList::const_iterator it = list.begin();
+    const vpz::ModelList& list = top->getModelList();
+    vpz::ModelList::const_iterator it = list.begin();
 
     while (it != list.end()) {
         Gtk::TreeModel::Row row2 = addSubModel(row, it->second);
         if (it->second->isCoupled() == true) {
-            parseModel(row2, (graph::CoupledModel*)it->second);
+            parseModel(row2, (vpz::CoupledModel*)it->second);
         }
         ++it;
     }
@@ -336,7 +336,7 @@ void ModelTreeBox::onEdition(
 	    if (not newName.empty() and newName != m_oldName) {
 		try {
 		    row[m_modelsColumnRecord.name] = newName;
-		    graph::Model::rename(row[m_columns.mModel], newName);
+		    vpz::GraphModel::rename(row[m_columns.mModel], newName);
 		    m_gvle->refreshViews();
                     m_gvle->setModified(true);
 		} catch(utils::DevsGraphError dge) {

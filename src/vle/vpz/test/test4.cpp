@@ -41,8 +41,8 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Path.hpp>
 
 struct F
@@ -54,6 +54,72 @@ struct F
 BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
+
+void check_remove_dyns_unittest_vpz(vpz::Project& project)
+{
+    vpz::Dynamics& dyns = project.dynamics();
+
+    BOOST_REQUIRE_NO_THROW(dyns.del(std::string("unittest")));
+
+    BOOST_REQUIRE(not project.dynamics().exist("new_unittest"));
+
+    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top1 = vpz::GraphModel::toCoupled(top->findModel("top1"));
+
+    std::set < std::string > dynamics = dyns.getKeys();
+
+    BOOST_REQUIRE_NO_THROW(top->purgeDynamics(dynamics));
+
+    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
+    vpz::AtomicGraphModel* e = vpz::GraphModel::toAtomic(top->findModel("e"));
+    vpz::AtomicGraphModel* a = vpz::GraphModel::toAtomic(top1->findModel("a"));
+
+    BOOST_REQUIRE_EQUAL(d->dynamics(), "");
+    BOOST_REQUIRE_EQUAL(e->dynamics(), "");
+    BOOST_REQUIRE_EQUAL(a->dynamics(), "");
+}
+
+void check_rename_dyns_unittest_vpz(vpz::Project& project)
+{
+    vpz::Dynamics& dyns = project.dynamics();
+
+    BOOST_REQUIRE_NO_THROW(
+	dyns.rename(std::string("unittest"), std::string("new_unittest")));
+
+    BOOST_REQUIRE(project.dynamics().exist("new_unittest"));
+
+    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+
+    BOOST_REQUIRE_NO_THROW(top->updateDynamics("unittest", "new_unittest"));
+
+    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
+
+    BOOST_REQUIRE_EQUAL(d->dynamics(), "new_unittest");
+}
+
+void check_remove_conds_unittest_vpz(vpz::Project& project)
+{
+    vpz::Conditions& cnds = project.experiment().conditions();
+
+    BOOST_REQUIRE_NO_THROW(cnds.del(std::string("cd")));
+
+    BOOST_REQUIRE(not cnds.exist("cd"));
+
+    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+
+    std::set < std::string > conditions = cnds.getKeys();
+
+    BOOST_REQUIRE_NO_THROW(top->purgeConditions(conditions));
+
+    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
+
+    std::vector < std::string > atomConditions = d->conditions();
+
+    BOOST_REQUIRE(
+        std::find(atomConditions.begin(),
+                  atomConditions.end(), "cd") == atomConditions.end());
+
+}
 
 void check_rename_conds_unittest_vpz(vpz::Project& project)
 {
@@ -100,7 +166,19 @@ void check_rename_conds_unittest_vpz(vpz::Project& project)
     BOOST_REQUIRE_THROW(
 	lst.updateCondition(std::string("ca"), std::string("new_cd")),
 	utils::ArgError);
-}
+
+    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+
+    BOOST_REQUIRE_NO_THROW(top->updateConditions("cd", "new_cd"));
+
+    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
+
+    std::vector < std::string > conditions = d->conditions();
+
+    BOOST_REQUIRE(
+        std::find(conditions.begin(),
+                  conditions.end(), "new_cd") != conditions.end());
+ }
 
 void check_rename_views_unittest_vpz(vpz::Views& views)
 {
@@ -123,6 +201,34 @@ void check_rename_views_unittest_vpz(vpz::Views& views)
 
     BOOST_CHECK(views.get("new_view1").output() == "new_view1");
     BOOST_CHECK(views.get("new_view2").output() == "new_view2");
+
+}
+
+void check_remove_obs_unittest_vpz(vpz::Project& project)
+{
+    vpz::Observables& obs_list = project.experiment().views().observables();
+
+    BOOST_REQUIRE_NO_THROW(obs_list.del(std::string("obs1")));
+    BOOST_REQUIRE_NO_THROW(obs_list.del(std::string("obs2")));
+
+    BOOST_REQUIRE(not obs_list.exist("obs1"));
+
+    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top1 = vpz::GraphModel::toCoupled(top->findModel("top1"));
+
+    std::set < std::string > obs = obs_list.getKeys();
+
+    BOOST_REQUIRE_NO_THROW(top->purgeObservable(obs));
+
+    vpz::AtomicGraphModel* a = vpz::GraphModel::toAtomic(top1->findModel("a"));
+    vpz::AtomicGraphModel* b = vpz::GraphModel::toAtomic(top1->findModel("b"));
+    vpz::AtomicGraphModel* c = vpz::GraphModel::toAtomic(top1->findModel("c"));
+    vpz::AtomicGraphModel* x = vpz::GraphModel::toAtomic(top1->findModel("x"));
+
+    BOOST_REQUIRE_EQUAL(a->observables(), "");
+    BOOST_REQUIRE_EQUAL(b->observables(), "");
+    BOOST_REQUIRE_EQUAL(c->observables(), "");
+    BOOST_REQUIRE_EQUAL(x->observables(), "");
 }
 
 void check_rename_observables_unittest_vpz(vpz::Project& project)
@@ -141,8 +247,8 @@ void check_rename_observables_unittest_vpz(vpz::Project& project)
     atom_list.updateObservable("obs1", "new_obs1");
     atom_list.updateObservable("obs2", "new_obs2");
 
-    graph::CoupledModel* top = graph::Model::toCoupled(project.model().model());
-    graph::CoupledModel* top1 = graph::Model::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top1 = vpz::GraphModel::toCoupled(top->findModel("top1"));
 
     BOOST_REQUIRE_EQUAL(atom_list.get(
 			    top1->findModel("x")).observables(), "new_obs1");
@@ -152,6 +258,16 @@ void check_rename_observables_unittest_vpz(vpz::Project& project)
 			    top1->findModel("b")).observables(), "new_obs2");
     BOOST_REQUIRE_EQUAL(atom_list.get(
 			    top1->findModel("c")).observables(), "new_obs2");
+
+
+    BOOST_REQUIRE_NO_THROW(top->updateObservable("obs2", "new_obs2"));
+    BOOST_REQUIRE_NO_THROW(top->updateObservable("obs1", "new_obs1"));
+
+    vpz::AtomicGraphModel* a = vpz::GraphModel::toAtomic(top1->findModel("a"));
+    vpz::AtomicGraphModel* x = vpz::GraphModel::toAtomic(top1->findModel("x"));
+
+    BOOST_REQUIRE_EQUAL(a->observables(), "new_obs2");
+    BOOST_REQUIRE_EQUAL(x->observables(), "new_obs1");
 }
 
 
@@ -160,7 +276,7 @@ void check_model_unittest_vpz(const vpz::Model& model)
     BOOST_REQUIRE(model.model());
     BOOST_REQUIRE(model.model()->isCoupled());
 
-    graph::CoupledModel* cpled((graph::CoupledModel*)model.model());
+    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.model());
     BOOST_REQUIRE_EQUAL(cpled->getName(), "top");
     BOOST_REQUIRE(cpled->exist("top1"));
     BOOST_REQUIRE(cpled->findModel("top1")->isCoupled());
@@ -172,7 +288,7 @@ void check_model_unittest_vpz(const vpz::Model& model)
     BOOST_REQUIRE(cpled->findModel("e")->isAtomic());
 
     {
-        graph::CoupledModel* top1((graph::CoupledModel*)cpled->findModel("top1"));
+        vpz::CoupledModel* top1((vpz::CoupledModel*)cpled->findModel("top1"));
         {
             BOOST_REQUIRE(top1->exist("x"));
             BOOST_REQUIRE(top1->findModel("x")->isAtomic());
@@ -191,7 +307,7 @@ void check_model_unittest_vpz(const vpz::Model& model)
             BOOST_REQUIRE(top1->existInternalConnection("x", "out", "c", "in2"));
             BOOST_REQUIRE(top1->existOutputConnection("x", "out", "out"));
         }
-        graph::CoupledModel* top2((graph::CoupledModel*)cpled->findModel("top2"));
+        vpz::CoupledModel* top2((vpz::CoupledModel*)cpled->findModel("top2"));
         {
             BOOST_REQUIRE(top2->exist("f"));
             BOOST_REQUIRE(top2->findModel("f")->isAtomic());
@@ -352,7 +468,7 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(c.model());
         BOOST_REQUIRE(c.model()->isCoupled());
         BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
 
         ptr1 = cpled;
 
@@ -373,7 +489,7 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(c.model());
         BOOST_REQUIRE(c.model()->isCoupled());
         BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
 
         ptr2 = cpled;
 
@@ -386,8 +502,8 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(cpled->exist("d"));
         BOOST_REQUIRE(cpled->findModel("d")->isCoupled());
         {
-            graph::CoupledModel* cpled_d(
-                graph::Model::toCoupled(cpled->findModel("d")));
+            vpz::CoupledModel* cpled_d(
+                vpz::GraphModel::toCoupled(cpled->findModel("d")));
 
             BOOST_REQUIRE(cpled_d->exist("a"));
             BOOST_REQUIRE(cpled_d->findModel("a")->isAtomic());
@@ -414,7 +530,7 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(c.model());
         BOOST_REQUIRE(c.model()->isCoupled());
         BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
 
         BOOST_REQUIRE(ptr1 != cpled);
 
@@ -435,7 +551,7 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(c.model());
         BOOST_REQUIRE(c.model()->isCoupled());
         BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
 
         BOOST_REQUIRE(ptr2 != cpled);
 
@@ -448,8 +564,8 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(cpled->exist("d"));
         BOOST_REQUIRE(cpled->findModel("d")->isCoupled());
         {
-            graph::CoupledModel* cpled_d(
-                graph::Model::toCoupled(cpled->findModel("d")));
+            vpz::CoupledModel* cpled_d(
+                vpz::GraphModel::toCoupled(cpled->findModel("d")));
 
             BOOST_REQUIRE(cpled_d->exist("a"));
             BOOST_REQUIRE(cpled_d->findModel("a")->isAtomic());
@@ -546,6 +662,60 @@ void check_equal_outputs_unittest_vpz(vpz::Outputs outputs)
     BOOST_REQUIRE_EQUAL(outputs.get("view1") == outputs.get("view1"), true);
 }
 
+BOOST_AUTO_TEST_CASE(test_remove_dyns)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Project proj(vpz.project());
+    check_remove_dyns_unittest_vpz(proj);
+
+    std::string str(vpz.writeToString());
+    delete vpz.project().model().model();
+    vpz.clear();
+
+    vpz.parseMemory(str);
+}
+
+BOOST_AUTO_TEST_CASE(test_rename_dyns)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Project proj(vpz.project());
+    check_rename_dyns_unittest_vpz(proj);
+
+    std::string str(vpz.writeToString());
+    delete vpz.project().model().model();
+    vpz.clear();
+
+    vpz.parseMemory(str);
+}
+
+BOOST_AUTO_TEST_CASE(test_remove_conds)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Project proj(vpz.project());
+    check_remove_conds_unittest_vpz(proj);
+
+    std::string str(vpz.writeToString());
+    delete vpz.project().model().model();
+    vpz.clear();
+
+    vpz.parseMemory(str);
+}
+
 BOOST_AUTO_TEST_CASE(test_rename_conds)
 {
     vpz::Vpz vpz;
@@ -578,6 +748,24 @@ BOOST_AUTO_TEST_CASE(test_rename_views)
     delete vpz.project().model().model();
 }
 
+BOOST_AUTO_TEST_CASE(test_remove_observables)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Project proj(vpz.project());
+    check_remove_obs_unittest_vpz(proj);
+
+    std::string str(vpz.writeToString());
+    delete vpz.project().model().model();
+    vpz.clear();
+
+    vpz.parseMemory(str);
+}
+
 BOOST_AUTO_TEST_CASE(test_rename_observables)
 {
     vpz::Vpz vpz;
@@ -606,20 +794,20 @@ BOOST_AUTO_TEST_CASE(test_connection)
     BOOST_REQUIRE(model.model());
     BOOST_REQUIRE(model.model()->isCoupled());
 
-    graph::CoupledModel* cpled((graph::CoupledModel*)model.model());
+    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.model());
     BOOST_REQUIRE_EQUAL(cpled->getName(), "top");
     BOOST_REQUIRE(cpled->exist("top1"));
     BOOST_REQUIRE(cpled->exist("top2"));
     BOOST_REQUIRE(cpled->exist("d"));
     BOOST_REQUIRE(cpled->exist("e"));
 
-    graph::CoupledModel* top1((graph::CoupledModel*)cpled->findModel("top1"));
-    graph::AtomicModel* x((graph::AtomicModel*)top1->findModel("x"));
+    vpz::CoupledModel* top1((vpz::CoupledModel*)cpled->findModel("top1"));
+    vpz::AtomicGraphModel* x((vpz::AtomicGraphModel*)top1->findModel("x"));
 
-    graph::ModelPortList out;
+    vpz::ModelPortList out;
     x->getAtomicModelsTarget("out", out);
 
-    BOOST_REQUIRE_EQUAL(out.size(), (graph::ModelPortList::size_type)10);
+    BOOST_REQUIRE_EQUAL(out.size(), (vpz::ModelPortList::size_type)10);
 
     delete vpz.project().model().model();
 }

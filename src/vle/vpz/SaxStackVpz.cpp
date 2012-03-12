@@ -30,8 +30,8 @@
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Port.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/graph/CoupledModel.hpp>
-#include <vle/graph/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Socket.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
@@ -107,16 +107,16 @@ void SaxStackVpz::pushModel(const xmlChar** att)
     checkNotEmptyStack();
     checkParentOfModel();
 
-    graph::CoupledModel* cplparent = 0;
+    vpz::CoupledModel* cplparent = 0;
 
     if (parent()->isSubmodels()) {
         vpz::Base* sub = pop();
         vpz::Model* tmp = static_cast < vpz::Model* >(parent());
-        cplparent = static_cast < graph::CoupledModel* >(tmp->model());
+        cplparent = static_cast < vpz::CoupledModel* >(tmp->model());
         push(sub);
     }
 
-    graph::Model* gmdl = 0;
+    vpz::GraphModel* gmdl = 0;
     const xmlChar* conditions = 0, *dynamics = 0, *observables = 0;
     const xmlChar* x = 0, *y = 0, *width = 0, *height = 0;
     const xmlChar* type = 0, *name = 0;
@@ -154,7 +154,12 @@ void SaxStackVpz::pushModel(const xmlChar** att)
 
     if (xmlStrcmp(type, (const xmlChar*)"atomic") == 0) {
         try {
-            gmdl = new graph::AtomicModel((const char*)name, cplparent);
+            gmdl = new vpz::AtomicGraphModel(
+                (const char*)name,
+                cplparent,
+                conditions ? xmlCharToString(conditions) : "",
+                dynamics ? xmlCharToString(dynamics) : "",
+                observables ? xmlCharToString(observables) : "");
         } catch(const utils::DevsGraphError& e) {
             throw(utils::SaxParserError(fmt(_(
                     "Error build atomic model '%1%' with error: %2%")) % name %
@@ -164,14 +169,14 @@ void SaxStackVpz::pushModel(const xmlChar** att)
         Class* clsparent(getLastClass());
         if (clsparent == 0) {
             vpz().project().model().atomicModels().add(
-                reinterpret_cast < graph::Model* >(gmdl),
+                reinterpret_cast < vpz::GraphModel* >(gmdl),
                 AtomicModel(
                     conditions ? xmlCharToString(conditions) : "",
                     dynamics ? xmlCharToString(dynamics) : "",
                     observables ? xmlCharToString(observables) : ""));
         } else {
             clsparent->atomicModels().add(
-                reinterpret_cast < graph::Model* >(gmdl),
+                reinterpret_cast < vpz::GraphModel* >(gmdl),
                 AtomicModel(
                     conditions ? xmlCharToString(conditions) : "",
                     dynamics ? xmlCharToString(dynamics) : "",
@@ -179,7 +184,7 @@ void SaxStackVpz::pushModel(const xmlChar** att)
         }
     } else if (xmlStrcmp(type, (const xmlChar*)"coupled") == 0) {
         try {
-            gmdl = new graph::CoupledModel((const char*)name, cplparent);
+            gmdl = new vpz::CoupledModel((const char*)name, cplparent);
         } catch(const utils::DevsGraphError& e) {
             throw(utils::SaxParserError(fmt(_(
                     "Error build coupled model '%1%' with error: %2%")) % name %
@@ -207,7 +212,7 @@ void SaxStackVpz::pushModel(const xmlChar** att)
     push(mdl);
 }
 
-void SaxStackVpz::buildModelGraphics(graph::Model* mdl,
+void SaxStackVpz::buildModelGraphics(vpz::GraphModel* mdl,
                                      const std::string& x,
                                      const std::string& y,
                                      const std::string& width,
@@ -258,7 +263,7 @@ void SaxStackVpz::pushPort(const xmlChar** att)
         }
 
         vpz::Model* mdl = static_cast < vpz::Model* >(parent());
-        graph::Model* gmdl = mdl->model();
+        vpz::GraphModel* gmdl = mdl->model();
         std::string name;
 
         for (int i = 0; att[i] != NULL; i += 2) {
@@ -446,7 +451,7 @@ void SaxStackVpz::buildConnection()
     }
     vpz::Model* model = static_cast < vpz::Model* >(parent());
 
-    graph::CoupledModel* cpl = static_cast < graph::CoupledModel*
+    vpz::CoupledModel* cpl = static_cast < vpz::CoupledModel*
         >(model->model());
 
     if (cnt->isInternalConnection()) {

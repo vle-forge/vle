@@ -29,7 +29,7 @@
 #ifndef GUI_CUTCOPYPAST_HPP
 #define GUI_CUTCOPYPAST_HPP
 
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Model.hpp>
 #include <list>
 #include <string>
@@ -57,32 +57,31 @@ public:
     ~CutCopyPaste();
 
     /**
-    * detach the list of GModel of graph::CoupledModel parent.
+    * detach the list of GModel of vpz::CoupledModel parent.
     *
     * @param l list of GModel to detach.
-    * @param gc graph::CoupledModel where list will be cut.
+    * @param gc vpz::CoupledModel where list will be cut.
     */
-    void cut(graph::ModelList & l, graph::CoupledModel* gc,
-             vpz::AtomicModelList& src);
+    void cut(vpz::ModelList & l, vpz::CoupledModel* gc);
 
     /**
-     * clone the graph::ModelList if has no connection with external
+     * clone the vpz::ModelList if has no connection with external
      * model.
      *
      * @param l list of GModel to copy.
-     * @param gc graph::CoupledModel where list will be copied.
+     * @param gc vpz::CoupledModel where list will be copied.
      */
-    void copy(graph::ModelList& l, graph::CoupledModel* gc,
-              vpz::AtomicModelList& src, bool isClass);
+    void copy(vpz::ModelList& l, vpz::CoupledModel* gc,
+              bool isClass);
 
     /**
-     * paste the current list GModel into graph::CoupledModel gc. Rename
+     * paste the current list GModel into vpz::CoupledModel gc. Rename
      * models to eliminate duplicated name.
      *
-     * @param gc graph::CoupledModel parent to attach list of model.
+     * @param gc vpz::CoupledModel parent to attach list of model.
      * passed with function copy or cut.
      */
-    void paste(graph::CoupledModel* gc, vpz::AtomicModelList& list);
+    void paste(vpz::CoupledModel* gc);
 
     bool paste_is_empty();
 
@@ -91,29 +90,21 @@ private:
     void clear();
 
     /**
-     * clone the internal graph::ModelList mList. If num == -1 then
+     * clone the internal vpz::ModelList mList. If num == -1 then
      * list is purely clone (parent is set to 0 and position move 5px).
      * Else, name is modified to add num
      *
      * @param lst_clone clone result
      * @param num number of clonage
      */
-    void clone(graph::ModelList& lst_graph_clone,
-               vpz::AtomicModelList& lst_vpz_clone, int num);
+    void clone(vpz::ModelList& lst_graph_clone, int num);
 
-    void cut_atomic(graph::Model* model, vpz::AtomicModelList& src);
-    void cut_coupled(graph::Model* model, vpz::AtomicModelList& src);
-
-    void copy_atomic(graph::Model* model, graph::Model* clone, vpz::AtomicModelList& src);
-    void copy_coupled(graph::Model* model, graph::Model* clone, vpz::AtomicModelList& src);
-
-    void clone_atomic(graph::Model* model, graph::Model* clone, vpz::AtomicModelList& vpz_list);
-    void clone_coupled(graph::Model* model, graph::Model* clone, vpz::AtomicModelList& vpz_list);
+    void clone_atomic(vpz::GraphModel* clone);
+    void clone_coupled(vpz::GraphModel* model, vpz::GraphModel* clone);
 
     GVLE*                       mGVLE;
 
-    graph::ModelList           mList_graph;
-    vpz::AtomicModelList       mList_vpz;
+    vpz::ModelList             mList_graph;
     int                        mNumero;
     Type                       mType;
 

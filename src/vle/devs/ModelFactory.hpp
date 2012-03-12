@@ -30,7 +30,7 @@
 #define DEVS_MODELFACTORY_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
@@ -191,7 +191,7 @@ public:
     /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
      * to this model information of dynamics, condition and observable.
-     * @param model the graph::AtomicModel reference source of
+     * @param model the vpz::AtomicGraphModel reference source of
      * devs::Simulator.
      * @param coordinator the coordinator where attach the simulator.
      * @param dynamics the name of the dynamics to attach.
@@ -200,7 +200,7 @@ public:
      * @throw utils::InternalError if dynamics not exist.
      */
     void createModel(Coordinator& coordinator,
-                     graph::AtomicModel* model,
+                     vpz::AtomicGraphModel* model,
                      const std::string& dynamics,
                      const std::vector < std::string >& conditions,
                      const std::string& observable);
@@ -221,8 +221,8 @@ public:
      * @throw utils::badArg if modelname already exist or if the classname
      * doest not exist.
      */
-    graph::Model* createModelFromClass(Coordinator& coordinator,
-                                       graph::CoupledModel* parent,
+    vpz::GraphModel* createModelFromClass(Coordinator& coordinator,
+                                       vpz::CoupledModel* parent,
                                        const std::string& classname,
                                        const std::string& modelname);
 

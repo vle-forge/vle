@@ -33,9 +33,9 @@
 #include <gtkmm/drawingarea.h>
 #include <gdkmm/color.h>
 
-namespace vle { namespace graph {
+namespace vle { namespace vpz {
 
-    class Model;
+    class GraphModel;
     class CoupledModel;
 
 }} // namespace vle graph
@@ -87,7 +87,7 @@ namespace vle { namespace gvle {
 
         virtual void draw()=0;
 
-        graph::CoupledModel* getModel()
+        vpz::CoupledModel* getModel()
         { return mCurrent; }
 
         //
@@ -191,9 +191,9 @@ namespace vle { namespace gvle {
         void drawCurrentCoupledModel();
         void drawCurrentModelPorts();
 
-        virtual void preComputeConnection(graph::Model* src,
+        virtual void preComputeConnection(vpz::GraphModel* src,
                                   const std::string& srcport,
-                                  graph::Model* dst,
+                                  vpz::GraphModel* dst,
                                   const std::string& dstport)=0;
         void preComputeConnection();
 
@@ -203,8 +203,8 @@ namespace vle { namespace gvle {
 
         virtual StraightLine computeConnection(int xs, int ys, int xd, int yd,
                                        int index)=0;
-        virtual void computeConnection(graph::Model* src, const std::string& srcport,
-                               graph::Model* dst, const std::string& dstport,
+        virtual void computeConnection(vpz::GraphModel* src, const std::string& srcport,
+                               vpz::GraphModel* dst, const std::string& dstport,
                                int index)=0;
         void computeConnection();
 
@@ -213,7 +213,7 @@ namespace vle { namespace gvle {
         void drawConnection();
         void drawHighlightConnection();
         void drawChildrenModels();
-        virtual void drawChildrenModel(graph::Model* model,
+        virtual void drawChildrenModel(vpz::GraphModel* model,
                                        const Gdk::Color& color)=0;
         void drawLines();
         void drawLink();
@@ -226,7 +226,7 @@ namespace vle { namespace gvle {
         bool on_motion_notify_event(GdkEventMotion* event);
         void on_realize();
 
-        void on_gvlepointer_button_1(graph::Model* mdl, bool state);
+        void on_gvlepointer_button_1(vpz::GraphModel* mdl, bool state);
         void delUnderMouse(int x, int y);
 
         /**
@@ -250,7 +250,7 @@ namespace vle { namespace gvle {
         void delConnection();
 
         View*                           mView;
-        graph::CoupledModel*            mCurrent;
+        vpz::CoupledModel*            mCurrent;
         Modeling*                       mModeling;
         GVLE*                           mGVLE;
 
@@ -280,7 +280,7 @@ namespace vle { namespace gvle {
         std::vector < Connection > mConnections;
         std::map < Point, bool > mDirect;
         std::vector < StraightLine > mLines;
-        std::vector < graph::Model* > mModelInfo;
+        std::vector < vpz::GraphModel* > mModelInfo;
         int mHighlightLine;
 
         // Grid

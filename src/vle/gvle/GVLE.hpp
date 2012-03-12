@@ -185,7 +185,7 @@ public:
      *
      * @param model a ptr to the GModel to show.
      */
-    void addView(graph::Model* model);
+    void addView(vpz::GraphModel* model);
 
     /**
      * find a view in list view that reference a GCoupledModel.
@@ -193,21 +193,21 @@ public:
      * @return int index in list view for founded view or first index with
      * null value
      */
-    void addView(graph::CoupledModel* model);
+    void addView(vpz::CoupledModel* model);
 
     /**
      * add a view to the current class
      *
      * @param model to ptr to the GModel assiociate to the class
      */
-    void addViewClass(graph::Model* model, std::string name);
+    void addViewClass(vpz::GraphModel* model, std::string name);
 
     /**
      * find a view in list view that reference a GCoupledModel.
      * @param model reference to GCoupledModel to find.
      */
 
-    void addViewClass(graph::CoupledModel* model, std::string name);
+    void addViewClass(vpz::CoupledModel* model, std::string name);
 
     /**
      * @brief Insert text into Log area
@@ -249,14 +249,14 @@ public:
      * @param model reference to GCoupledModel to find.
      * @return Return True if the View exist , False otherwise
      */
-    bool existView(graph::CoupledModel* model);
+    bool existView(vpz::CoupledModel* model);
 
     /**
      * Return the View that reference the model.
      * @param model reference to GCoupledModel to find.
      * @return Return the View if exist , NULL otherwise
      */
-    View* findView(graph::CoupledModel* model);
+    View* findView(vpz::CoupledModel* model);
 
     /**
      * delete a view from model view.
@@ -268,9 +268,9 @@ public:
     /**
      * delete all view where coupled model is equal to cm.
      *
-     * @param cm a ptr to graph::CoupledModel to delete view.
+     * @param cm a ptr to vpz::CoupledModel to delete view.
      */
-    void delViewOnModel(const graph::CoupledModel* cm);
+    void delViewOnModel(const vpz::CoupledModel* cm);
 
     /**
      * delete all view of modeling.
@@ -482,15 +482,13 @@ public:
      */
     void clearCurrentModel();
 
-    void delModel(graph::Model* model, std::string className);
-
     /**
      * When click on export as menu
      *
      */
     void exportCurrentModel();
 
-    void EditCoupledModel(graph::CoupledModel* model);
+    void EditCoupledModel(vpz::CoupledModel* model);
 
     /**
      * When click on export graphic as menu
@@ -557,7 +555,7 @@ public:
      * @param lst list of selected GModel.
      * @param gc parent of selected GModel.
      */
-    void cut(graph::ModelList& lst, graph::CoupledModel* gc,
+    void cut(vpz::ModelList& lst, vpz::CoupledModel* gc,
              std::string className);
 
     /**
@@ -566,7 +564,7 @@ public:
      * @param lst list of selected GModel.
      * @param gc parent of selected GModel.
      */
-    void copy(graph::ModelList& lst, graph::CoupledModel* gc,
+    void copy(vpz::ModelList& lst, vpz::CoupledModel* gc,
               std::string className);
 
     /**
@@ -575,14 +573,14 @@ public:
      *
      * @param gc paste selected GModel under this GCoupledModel.
      */
-    void paste(graph::CoupledModel* gc, std::string className);
+    void paste(vpz::CoupledModel* gc, std::string className);
 
     /**
      * select all models in the current list GModel.
      *
      * @param lst list of selected GModel.
      */
-    void selectAll(graph::ModelList& lst, graph::CoupledModel* gc);
+    void selectAll(vpz::ModelList& lst, vpz::CoupledModel* gc);
 
     bool paste_is_empty();
 
@@ -921,7 +919,6 @@ private:
 };
 
 std::string valuetype_to_string(value::Value::type type);
-void parse_model(vpz::AtomicModelList& list);
 
 }} // namespace vle gvle
 

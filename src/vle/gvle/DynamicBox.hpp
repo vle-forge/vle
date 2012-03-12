@@ -38,15 +38,13 @@
 #include <vle/vpz/Dynamic.hpp>
 
 namespace vle {
-    namespace graph {
-        class AtomicModel;
-    }
 
     namespace vpz {
         class AtomicModel;
         class Dynamic;
         class Conditions;
         class Observables;
+        class AtomicGraphModel;
     }
 }
 
@@ -59,8 +57,7 @@ namespace vle { namespace gvle {
     public:
         DynamicBox(const Glib::RefPtr < Gtk::Builder >& xml,
                    GVLE* gvle,
-                   graph::AtomicModel& atom,
-                   vpz::AtomicModel& vatom,
+                   vpz::AtomicGraphModel& atom,
                    vpz::Dynamic& dynamic,
                    vpz::Conditions& conditions,
                    vpz::Observables& observables);
@@ -79,8 +76,7 @@ namespace vle { namespace gvle {
     private:
         Glib::RefPtr < Gtk::Builder >       mXml;
         GVLE*                               mGVLE;
-        graph::AtomicModel&                 mAtom;
-        vpz::AtomicModel&                   mVAtom;
+        vpz::AtomicGraphModel&              mAtom;
         vpz::Dynamic&                       mDynamic;
         vpz::Conditions&                    mConditions;
         vpz::Observables&                   mObservables;

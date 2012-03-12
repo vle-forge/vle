@@ -29,8 +29,8 @@
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/graph/CoupledModel.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <boost/algorithm/string/trim.hpp>

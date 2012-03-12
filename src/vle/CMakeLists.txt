@@ -13,7 +13,6 @@ link_directories(${GLADEMM_LIBRARY_DIRS} ${GTKMM_LIBRARY_DIRS}
 
 add_subdirectory(utils)
 add_subdirectory(value)
-add_subdirectory(graph)
 add_subdirectory(oov)
 add_subdirectory(vpz)
 add_subdirectory(devs)

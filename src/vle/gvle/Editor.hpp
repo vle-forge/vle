@@ -30,7 +30,7 @@
 #define VLE_GVLE_EDITOR_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <vle/gvle/CompleteViewDrawingArea.hpp>
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/version.hpp>
@@ -85,7 +85,7 @@ public:
     { return mTitle; }
 
     void setTitle(const std::string& fileName,
-                  graph::Model* model,
+                  vpz::GraphModel* model,
                   bool modified);
 
     virtual void updateView() = 0;
@@ -155,7 +155,7 @@ class VLE_API DocumentDrawingArea : public Document
 {
 public:
     DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
-                        View* view, graph::Model* model);
+                        View* view, vpz::GraphModel* model);
     virtual ~DocumentDrawingArea();
 
     inline View* getView() const
@@ -167,7 +167,7 @@ public:
     inline SimpleViewDrawingArea* getSimpleDrawingArea() const
     { return mSimpleArea; }
 
-    inline graph::Model* getModel() const
+    inline vpz::GraphModel* getModel() const
     { return mModel; }
 
     virtual inline bool isDrawingArea() const
@@ -188,7 +188,7 @@ protected:
     View*                       mView;
     CompleteViewDrawingArea*    mCompleteArea;
     SimpleViewDrawingArea*      mSimpleArea;
-    graph::Model*       mModel;
+    vpz::GraphModel*       mModel;
     Gtk::Viewport*      mViewport;
     Gtk::Adjustment     mAdjustWidth;
     Gtk::Adjustment     mAdjustHeight;
@@ -198,7 +198,7 @@ class VLE_API DocumentCompleteDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentCompleteDrawingArea(GVLE* gvle, const std::string& filePath,
-                                View* view, graph::Model* model);
+                                View* view, vpz::GraphModel* model);
     virtual ~DocumentCompleteDrawingArea();
 
     virtual bool isComplete()
@@ -211,7 +211,7 @@ class VLE_API DocumentSimpleDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentSimpleDrawingArea(GVLE* gvle, const std::string& filePath,
-                              View* view, graph::Model* model);
+                              View* view, vpz::GraphModel* model);
     virtual ~DocumentSimpleDrawingArea();
 
     virtual bool isComplete()
@@ -263,7 +263,7 @@ public:
     void onUndo();
 
     void openTab(const std::string& filepath);
-    void openTabVpz(const std::string& filepath, graph::CoupledModel* model);
+    void openTabVpz(const std::string& filepath, vpz::CoupledModel* model);
 
     /**
      * @brief create a tab for the current vpz file with the complete
@@ -272,7 +272,7 @@ public:
      * @param model the current model
      */
     void showCompleteView(const::std::string& filepath,
-                          graph::CoupledModel* model);
+                          vpz::CoupledModel* model);
 
     /**
      * @brief create a tab for the current vpz file with the simple
@@ -281,7 +281,7 @@ public:
      * @param model the current model
      */
     void showSimpleView(const std::string& filepath,
-                        graph::CoupledModel* model);
+                        vpz::CoupledModel* model);
 
 
     /**

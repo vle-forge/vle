@@ -32,13 +32,13 @@
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/AtomicModels.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <string>
 
 namespace vle { namespace vpz {
 
     /**
-     * @brief The vpz::Model is use to store the graph::Model hierarchy.
+     * @brief The vpz::Model is use to store the GraphModel hierarchy.
      */
     class VLE_API Model : public Base
     {
@@ -51,7 +51,7 @@ namespace vle { namespace vpz {
         {}
 
         /**
-         * @brief Copy constructor. The hierarchy of graph::Model is cloned.
+         * @brief Copy constructor. The hierarchy of GraphModel is cloned.
          * @param mdl The model to copy.
          */
         Model(const Model& mdl);
@@ -88,32 +88,32 @@ namespace vle { namespace vpz {
 
         /**
          * @brief Just delete the complete list of graph::AtomicModelList and
-         * set to NULL the graph::Model hierarchy. Don't forget to delete it
+         * set to NULL the GraphModel hierarchy. Don't forget to delete it
          * yourself.
          */
         void clear();
 
         /**
-         * @brief Set a hierachy of graph::Model. If a previous hierarchy
+         * @brief Set a hierachy of GraphModel. If a previous hierarchy
          * already exist, it is not delete same if the new is empty. This
          * function is just an affectation, no clone is build.
-         * @param mdl the new graph::Model hierarchy to set.
+         * @param mdl the new GraphModel hierarchy to set.
          */
-        void setModel(graph::Model* mdl);
+        void setModel(GraphModel* mdl);
 
         /**
-         * @brief Get a reference to the graph::Model hierarchy.
-         * @return A reference to the graph::Model, be carreful, you can damage
+         * @brief Get a reference to the GraphModel hierarchy.
+         * @return A reference to the GraphModel, be carreful, you can damage
          * graph::Vpz instance.
          */
-        graph::Model* model();
+        GraphModel* model();
 
         /**
-         * @brief Get a reference to the graph::Model hierarchy.
-         * @return A reference to the graph::Model, be carreful, you can damage
+         * @brief Get a reference to the GraphModel hierarchy.
+         * @return A reference to the GraphModel, be carreful, you can damage
          * graph::Vpz instance.
          */
-        graph::Model* model() const;
+        GraphModel* model() const;
 
         /**
          * @brief Return a constant reference to the vpz::AtomicModelList.
@@ -129,9 +129,61 @@ namespace vle { namespace vpz {
         AtomicModelList& atomicModels()
         { return m_atomicmodels; }
 
+        /**
+	 * @brief Update the dynamics of the AtomicModels where an
+	 * oldname became newname, for the main graph model.
+	 * @param oldname the old name of the dynamics.
+	 * @param newname the new name of the dynamics.
+	 */
+	void updateDynamics(const std::string& oldname,
+                                    const std::string& newname);
+
+        /**
+	 * @brief purge the dymamics references of the model where the
+	 * dynamic is not present in the list
+	 * @param dynamicslist a list of dynamics name
+	 */
+	void purgeDynamics(const std::set < std::string >& dynamicslist);
+
+        /**
+	 * @brief Update the Observable of the AtomicModels where an
+	 * oldname became newname, for the main graph model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	void updateObservable(const std::string& oldname,
+                              const std::string& newname);
+
+        /**
+	 * @brief purge the observables references of the model where the
+	 * observable is not present in the list
+	 * @param observablelist a list of observable name
+	 */
+	void purgeObservable(const std::set < std::string >& observablelist);
+
+        /**
+	 * @brief Update the Conditions of the AtomicModels where an
+	 * oldname became newname, for the main graph model.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	void updateConditions(const std::string& oldname,
+                              const std::string& newname);
+
+        /**
+	 * @brief purge the Conditions references of the model where the
+	 * Condition is not present in the list
+	 * @param conditionlist a list of condition name
+	 */
+	void purgeConditions(const std::set < std::string >& conditionlist);
+
+        void getAtomicModelList(std::vector < AtomicGraphModel* >& list) const
+        { list.clear(); m_graph->getAtomicModelList(m_graph, list); }
+
+
     private:
-        AtomicModelList     m_atomicmodels;
-        graph::Model*       m_graph;
+        AtomicModelList   m_atomicmodels;
+        GraphModel*       m_graph;
     };
 
     /**

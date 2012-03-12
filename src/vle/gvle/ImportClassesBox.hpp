@@ -37,9 +37,7 @@ namespace vle {
 	class Class;
 	class Classes;
 	class Vpz;
-    }
-    namespace graph {
-	class AtomicModel;
+	class AtomicGraphModel;
 	class CoupledModel;
     }
 

@@ -30,7 +30,7 @@
 #define VLE_VPZ_ATOMICMODELS_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <iterator>
 #include <string>
 #include <list>
@@ -134,10 +134,10 @@ namespace vle { namespace vpz {
     };
 
     /**
-     * @brief Define a dictionary between a graph::Model* from the hierarchy of
+     * @brief Define a dictionary between a GraphModel* from the hierarchy of
      * models or from the classes.
      */
-    typedef std::map < graph::Model*, AtomicModel > AtomicModels;
+    typedef std::map < GraphModel*, AtomicModel > AtomicModels;
 
     /**
      * @brief The AtomicModelList class is a dictionary used to attach atomic
@@ -159,20 +159,20 @@ namespace vle { namespace vpz {
         void add(const AtomicModelList& atoms);
 
         /**
-         * @brief Add a new atomicmodel information to a graph::Model.
-         * @param mdl the graph::Model to attach atomic model information.
+         * @brief Add a new atomicmodel information to a GraphModel.
+         * @param mdl the GraphModel to attach atomic model information.
          * @param atom the vpz::AtomicModel information.
          * @return a reference to the builded atomicmodel.
          * @throw utils::ArgError if mdl already exist.
          */
-        AtomicModel& add(graph::Model* mdl, const AtomicModel& atom);
+        AtomicModel& add(GraphModel* mdl, const AtomicModel& atom);
 
         /**
          * @brief Delete the specified AtomicModel.
-         * @param mdl The graph::Model to find and delete.
+         * @param mdl The GraphModel to find and delete.
          * @throw utils::ArgError if mdl already exist.
          */
-        void del(graph::Model* mdl);
+        void del(GraphModel* mdl);
 
         /**
          * @brief Get an vpz::Model by his structural reference.
@@ -180,7 +180,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
-        const AtomicModel& get(graph::Model* atom) const;
+        const AtomicModel& get(GraphModel* atom) const;
 
         /**
          * @brief Get an vpz::Model by his structural reference.
@@ -188,7 +188,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
-        AtomicModel& get(graph::Model* atom);
+        AtomicModel& get(GraphModel* atom);
 
         /**
          * @brief Get an vpz::Model by his structural reference.
@@ -196,7 +196,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
-        const AtomicModel& get(const graph::Model* atom) const;
+        const AtomicModel& get(const GraphModel* atom) const;
 
         /**
          * @brief Get an vpz::Model by his structural reference.
@@ -204,7 +204,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
-        AtomicModel& get(const graph::Model* atom);
+        AtomicModel& get(const GraphModel* atom);
 
 	/**
 	 * @brief Update the conditions list of each AtomicModel
@@ -234,12 +234,12 @@ namespace vle { namespace vpz {
 			     const std::string& newname);
 
         /**
-         * @brief Check if the graph::AtomicModel exist into the
+         * @brief Check if the vpz::AtomicModel exist into the
          * AtomicModelList.
-         * @param atom The graph::AtomicModel to check.
+         * @param atom The vpz::AtomicModel to check.
          * @return true if found, false otherwise.
          */
-        bool exist(graph::Model* atom) const
+        bool exist(GraphModel* atom) const
         { return m_lst.find(atom) != m_lst.end(); }
 
         /**
@@ -313,23 +313,23 @@ namespace vle { namespace vpz {
          * @param mdl The top node of the hierarchy or a single atomic model.
          * @param out The output stream.
          */
-        void writeModel(const graph::Model* mdl, std::ostream& out) const;
+        void writeModel(const GraphModel* mdl, std::ostream& out) const;
 
     private:
         AtomicModels m_lst;
 
         void writeAtomic(std::ostream& out,
-                         const graph::AtomicModel* mdl) const;
+                         const vpz::AtomicGraphModel* mdl) const;
         void writeCoupled(std::ostream& out,
-                          const graph::CoupledModel* mdl) const;
-        void writePort(std::ostream& out, const graph::Model* mdl) const;
+                          const vpz::CoupledModel* mdl) const;
+        void writePort(std::ostream& out, const GraphModel* mdl) const;
         void writeConnection(std::ostream& out,
-                             const graph::CoupledModel* mdl) const;
-        void writeGraphics(std::ostream& out, const graph::Model* mdl) const;
+                             const vpz::CoupledModel* mdl) const;
+        void writeGraphics(std::ostream& out, const GraphModel* mdl) const;
     };
 
     /**
-     * @brief A functor to build an vpz::AtomicModelList from a graph::Model
+     * @brief A functor to build an vpz::AtomicModelList from a GraphModel
      * hierarchy of models.
      * @code
      * AtomicModelList lst;
@@ -348,7 +348,7 @@ namespace vle { namespace vpz {
          * @param lst The AtomicModelList to add new models.
          * @param top the hierarchy of models.
          */
-        CopyAtomicModel(AtomicModelList& lst, graph::Model& top) :
+        CopyAtomicModel(AtomicModelList& lst, GraphModel& top) :
             lst(lst), top(top)
         {}
 
@@ -358,15 +358,15 @@ namespace vle { namespace vpz {
          */
         void operator()(const AtomicModels::value_type& x)
         {
-            graph::CoupledModelVector vec;
+            vpz::CoupledModelVector vec;
             x.first->getParents(vec);
-            graph::Model* atom = top.getModel(vec, x.first->getName());
+            GraphModel* atom = top.getModel(vec, x.first->getName());
 
             lst.add(atom, x.second);
         }
 
         AtomicModelList& lst; //!< the output of this functor.
-        graph::Model& top; //!< the hierarchy of graph::Model.
+        GraphModel& top; //!< the hierarchy of GraphModel.
     };
 
 }} // namespace vle vpz

@@ -31,7 +31,7 @@
 
 #include <gtkmm.h>
 #include <vle/vpz/Base.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 
 namespace vle { namespace gvle {
 
@@ -43,8 +43,8 @@ namespace vle { namespace gvle {
 			   const std::string& currentValue = std::string());
 
         InteractiveTypeBox(const std::string& title,
-	                   graph::CoupledModel* coupledModel = 0,
-			   const std::string& currentValue = std::string());
+	                   vpz::CoupledModel* coupledModel = 0,
+			   const std::string& currentValue = "");
 
         virtual ~InteractiveTypeBox();
 
@@ -69,7 +69,8 @@ namespace vle { namespace gvle {
         bool                     mValid;
 	bool                     mState;
 	vpz::Base*               mBase;
-	graph::CoupledModel*     mCoupledModel;
+
+	vpz::CoupledModel*     mCoupledModel;
 	std::string              mCurrentValue;
 
 	// Methods

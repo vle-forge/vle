@@ -130,9 +130,9 @@ void ViewDrawingArea::drawCurrentCoupledModel()
 void ViewDrawingArea::drawCurrentModelPorts()
 {
 
-    const graph::ConnectionList ipl =  mCurrent->getInputPortList();
-    const graph::ConnectionList opl =  mCurrent->getOutputPortList();
-    graph::ConnectionList::const_iterator itl;
+    const vpz::ConnectionList ipl =  mCurrent->getInputPortList();
+    const vpz::ConnectionList opl =  mCurrent->getOutputPortList();
+    vpz::ConnectionList::const_iterator itl;
 
     const size_t maxInput = ipl.size();
     const size_t maxOutput = opl.size();
@@ -215,20 +215,18 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
 void ViewDrawingArea::preComputeConnection()
 {
-    using namespace graph;
-
     mConnections.clear();
     mDirect.clear();
     mInPts.clear();
     mOutPts.clear();
 
     {
-        ConnectionList& outs(mCurrent->getInternalInputPortList());
-        ConnectionList::const_iterator it;
+        vpz::ConnectionList& outs(mCurrent->getInternalInputPortList());
+        vpz::ConnectionList::const_iterator it;
 
         for (it = outs.begin(); it != outs.end(); ++it) {
-            const ModelPortList& ports(it->second);
-            ModelPortList::const_iterator jt ;
+            const vpz::ModelPortList& ports(it->second);
+            vpz::ModelPortList::const_iterator jt ;
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 preComputeConnection(mCurrent, it->first,
@@ -238,16 +236,16 @@ void ViewDrawingArea::preComputeConnection()
     }
 
     {
-        const ModelList& children(mCurrent->getModelList());
-        ModelList::const_iterator it;
+        const vpz::ModelList& children(mCurrent->getModelList());
+        vpz::ModelList::const_iterator it;
 
         for (it = children.begin(); it != children.end(); ++it) {
-            const ConnectionList& outs(it->second->getOutputPortList());
-            ConnectionList::const_iterator jt;
+            const vpz::ConnectionList& outs(it->second->getOutputPortList());
+            vpz::ConnectionList::const_iterator jt;
 
             for (jt = outs.begin(); jt != outs.end(); ++jt) {
-                const ModelPortList&  ports(jt->second);
-                ModelPortList::const_iterator kt;
+                const vpz::ModelPortList&  ports(jt->second);
+                vpz::ModelPortList::const_iterator kt;
 
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
                     preComputeConnection(it->second, jt->first,
@@ -284,19 +282,17 @@ mContext->stroke();
 
 void ViewDrawingArea::computeConnection()
 {
-    using namespace graph;
-
     int index = 0;
 
     mLines.clear();
 
     {
-        ConnectionList& outs(mCurrent->getInternalInputPortList());
-        ConnectionList::const_iterator it;
+        vpz::ConnectionList& outs(mCurrent->getInternalInputPortList());
+        vpz::ConnectionList::const_iterator it;
 
         for (it = outs.begin(); it != outs.end(); ++it) {
-            const ModelPortList& ports(it->second);
-            ModelPortList::const_iterator jt ;
+            const vpz::ModelPortList& ports(it->second);
+            vpz::ModelPortList::const_iterator jt ;
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 computeConnection(mCurrent, it->first, jt->first, jt->second,
@@ -307,16 +303,16 @@ void ViewDrawingArea::computeConnection()
     }
 
     {
-        const ModelList& children(mCurrent->getModelList());
-        ModelList::const_iterator it;
+        const vpz::ModelList& children(mCurrent->getModelList());
+        vpz::ModelList::const_iterator it;
 
         for (it = children.begin(); it != children.end(); ++it) {
-            const ConnectionList& outs(it->second->getOutputPortList());
-            ConnectionList::const_iterator jt;
+            const vpz::ConnectionList& outs(it->second->getOutputPortList());
+            vpz::ConnectionList::const_iterator jt;
 
             for (jt = outs.begin(); jt != outs.end(); ++jt) {
-                const ModelPortList&  ports(jt->second);
-                ModelPortList::const_iterator kt;
+                const vpz::ModelPortList&  ports(jt->second);
+                vpz::ModelPortList::const_iterator kt;
 
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
                     computeConnection(it->second, jt->first,
@@ -350,10 +346,10 @@ mContext->stroke();
 
 void ViewDrawingArea::drawChildrenModels()
 {
-    const graph::ModelList& children = mCurrent->getModelList();
-    graph::ModelList::const_iterator it = children.begin();
+    const vpz::ModelList& children = mCurrent->getModelList();
+    vpz::ModelList::const_iterator it = children.begin();
     while (it != children.end()) {
-        graph::Model* model = it->second;
+        vpz::GraphModel* model = it->second;
 
         if (model->isCoupled()) {
             model->setWidth(ViewDrawingArea::MODEL_WIDTH);
@@ -389,7 +385,7 @@ void ViewDrawingArea::drawLink()
 {
     if (mView->getCurrentButton() == GVLE::VLE_GVLE_ADDLINK and
         mView->isEmptySelectedModels() == false) {
-        graph::Model* src = mView->getFirstSelectedModels();
+        vpz::GraphModel* src = mView->getFirstSelectedModels();
         setColor(Settings::settings().getForegroundColor());
         if (src == mCurrent) {
             mContext->move_to(MODEL_PORT,
@@ -616,7 +612,7 @@ void ViewDrawingArea::on_realize()
     queueRedraw();
 }
 
-void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
+void ViewDrawingArea::on_gvlepointer_button_1(vpz::GraphModel* mdl,
                                               bool state)
 {
     if (mdl) {
@@ -631,7 +627,7 @@ void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
                     mGVLE->getModelTreeBox()->showRow(mdl);
                 }
             } else {
-                graph::Model* mod = mView->getFirstSelectedModels();
+                vpz::GraphModel* mod = mView->getFirstSelectedModels();
                 if (mod == 0) {
                     if (mView->isClassView()) {
                         mGVLE->getModelTreeBox()->selectNone();
@@ -669,7 +665,7 @@ void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
 
 void ViewDrawingArea::delUnderMouse(int x, int y)
 {
-    graph::Model* model = mCurrent->find(x, y);
+    vpz::GraphModel* model = mCurrent->find(x, y);
     if (model) {
         mView->delModel(model);
     } else {
@@ -684,8 +680,8 @@ void ViewDrawingArea::delUnderMouse(int x, int y)
 void ViewDrawingArea::calcRectSize()
 {
     if ((mCurrent->getModelList()).size() != 0) {
-        const graph::ModelList& children = mCurrent->getModelList();
-        graph::ModelList::const_iterator it;
+        const vpz::ModelList& children = mCurrent->getModelList();
+        vpz::ModelList::const_iterator it;
         Cairo::TextExtents textExtents;
 
         int xMax = 0;
@@ -699,10 +695,10 @@ void ViewDrawingArea::calcRectSize()
                 yMax = it->second->y() + it->second->height();
             }
 
-            const graph::ConnectionList& opl =
+            const vpz::ConnectionList& opl =
         it->second->getOutputPortList();
 
-            graph::ConnectionList::const_iterator itl;
+            vpz::ConnectionList::const_iterator itl;
 
             for (itl = opl.begin() ; itl != opl.end() ; ++itl) {
                 mContext->get_text_extents(itl->first, textExtents);
@@ -728,7 +724,7 @@ void ViewDrawingArea::addLinkOnButtonPress(int x, int y)
         mView->clearSelectedModels();
     }
 
-    graph::Model* mdl = mCurrent->find(x, y);
+    vpz::GraphModel* mdl = mCurrent->find(x, y);
     if (mdl) {
         mView->addModelToSelectedModels(mdl);
     } else {
@@ -741,7 +737,7 @@ void ViewDrawingArea::addLinkOnButtonPress(int x, int y)
 void ViewDrawingArea::addLinkOnMotion(int x, int y)
 {
     if (mView->isEmptySelectedModels() == false) {
-        graph::Model* mdl = mCurrent->find(x, y);
+        vpz::GraphModel* mdl = mCurrent->find(x, y);
         if (mdl == mView->getFirstSelectedModels()) {
             mMouse.set_x(mdl->x() + mdl->width() / 2);
             mMouse.set_y(mdl->y() + mdl->height() / 2);
@@ -762,7 +758,7 @@ void ViewDrawingArea::addLinkOnMotion(int x, int y)
 void ViewDrawingArea::addLinkOnButtonRelease(int x, int y)
 {
     if (mView->isEmptySelectedModels() == false) {
-        graph::Model* mdl = mCurrent->find(x, y);
+        vpz::GraphModel* mdl = mCurrent->find(x, y);
         if (mdl == NULL)
             mView->makeConnection(mView->getFirstSelectedModels(), mCurrent);
         else
@@ -776,21 +772,20 @@ void ViewDrawingArea::addLinkOnButtonRelease(int x, int y)
 
 void ViewDrawingArea::delConnection()
 {
-    using namespace graph;
-    Model* src = 0;
-    Model* dst = 0;
+    vpz::GraphModel* src = 0;
+    vpz::GraphModel* dst = 0;
     std::string portsrc, portdst;
     bool internal = false;
     bool external = false;
     int i = 0;
 
     {
-        ConnectionList& outs(mCurrent->getInternalInputPortList());
-        ConnectionList::const_iterator it;
+        vpz::ConnectionList& outs(mCurrent->getInternalInputPortList());
+        vpz::ConnectionList::const_iterator it;
 
         for (it = outs.begin(); it != outs.end(); ++it) {
-            const ModelPortList& ports(it->second);
-            ModelPortList::const_iterator jt ;
+            const vpz::ModelPortList& ports(it->second);
+            vpz::ModelPortList::const_iterator jt ;
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 if (i == mHighlightLine) {
@@ -805,16 +800,16 @@ void ViewDrawingArea::delConnection()
     }
 
     {
-        const ModelList& children(mCurrent->getModelList());
-        ModelList::const_iterator it;
+        const vpz::ModelList& children(mCurrent->getModelList());
+        vpz::ModelList::const_iterator it;
 
         for (it = children.begin(); it != children.end(); ++it) {
-            const ConnectionList& outs(it->second->getOutputPortList());
-            ConnectionList::const_iterator jt;
+            const vpz::ConnectionList& outs(it->second->getOutputPortList());
+            vpz::ConnectionList::const_iterator jt;
 
             for (jt = outs.begin(); jt != outs.end(); ++jt) {
-                const ModelPortList&  ports(jt->second);
-                ModelPortList::const_iterator kt;
+                const vpz::ModelPortList&  ports(jt->second);
+                vpz::ModelPortList::const_iterator kt;
 
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
                     if (i == mHighlightLine) {
@@ -966,7 +961,7 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
 bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool /* keyboard_tooltip */,
                                      const Glib::RefPtr<Gtk::Tooltip>& tooltip)
 {
-    graph::Model* model = mCurrent->find(wx/mZoom, wy/mZoom);
+    vpz::GraphModel* model = mCurrent->find(wx/mZoom, wy/mZoom);
     Glib::ustring card;
 
     if (mHighlightLine != -1) {
@@ -975,7 +970,7 @@ bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool /* keyboard_tooltip */,
         return true;
     } else if (model) {
         if (mView->isClassView()) {
-            card = mModeling->getClassIdCard(model, mView->getCurrentClass());
+            card = mModeling->getClassIdCard(model);
         } else {
             card = mModeling->getIdCard(model);
         }
@@ -988,7 +983,7 @@ bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool /* keyboard_tooltip */,
 
 void ViewDrawingArea::setUndefinedModels()
 {
-    graph::ModelList::const_iterator it = mCurrent->getModelList().begin();
+    vpz::ModelList::const_iterator it = mCurrent->getModelList().begin();
     bool found = false;
 
     while (it != mCurrent->getModelList().end()) {
@@ -1032,7 +1027,7 @@ void ViewDrawingArea::maxModelWidthHeight()
     mMaxWidth = 0;
     mMaxHeight = 0;
 
-    graph::ModelList::const_iterator it =
+    vpz::ModelList::const_iterator it =
         mCurrent->getModelList().begin();
     while(it != mCurrent->getModelList().end()) {
         if (it->second->width() > mMaxWidth)

@@ -1,5 +1,5 @@
 /*
- * @file vle/graph/ModelPortList.hpp
+ * @file vle/vpz/ModelPortList.hpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -33,14 +33,14 @@
 #include <string>
 #include <map>
 
-namespace vle { namespace graph {
+namespace vle { namespace vpz {
 
-    class Model;
+    class GraphModel;
 
     class VLE_API ModelPortList
     {
     public:
-        typedef std::multimap < Model*, std::string > Values;
+        typedef std::multimap < GraphModel*, std::string > Values;
         typedef Values::iterator iterator;
         typedef Values::const_iterator const_iterator;
         typedef Values::size_type size_type;
@@ -52,45 +52,45 @@ namespace vle { namespace graph {
         virtual ~ModelPortList();
 
         /**
-         * @brief Add a new graph::ModelPort to the vector. No check is
+         * @brief Add a new ModelPort to the vector. No check is
          * performed is a connection already exist.
          *
          * @param model The model to add.
          * @param portname The port of the model to add.
          */
-        void add(Model* model, const std::string& portname);
+        void add(GraphModel* model, const std::string& portname);
 
         /**
-         * @brief Remove a graph::ModelPort from the vector. Linear complexity.
+         * @brief Remove a ModelPort from the vector. Linear complexity.
          *
          * @param model The model to delete.
          * @param portname The port of the model to delete.
          */
-        void remove(Model* model, const std::string& portname);
+        void remove(GraphModel* model, const std::string& portname);
 
         /**
          * @brief Remove the specified model.
          *
          * @param model Model to be removed.
          */
-        void erase(Model* model) { m_lst.erase(model); }
+        void erase(GraphModel* model) { m_lst.erase(model); }
 
         /**
-         * @brief Remove all graph::ModelPort from the vector. Linear
+         * @brief Remove all ModelPort from the vector. Linear
          * complexity.
          */
         void clear() { m_lst.clear(); }
 
         /**
-         * @brief Merge the vector from graph::ModelPort vector. Linera
+         * @brief Merge the vector from ModelPort vector. Linera
          * complexity.
          *
-         * @param lst The vector of graph::ModelPort to merger.
+         * @param lst The vector of ModelPort to merger.
          */
         void merge(ModelPortList& lst);
 
         /**
-         * @brief Check if a graph::ModelPort already exist in the vector.
+         * @brief Check if a ModelPort already exist in the vector.
          * Linear complexity.
          *
          * @param model The model to check.
@@ -99,10 +99,10 @@ namespace vle { namespace graph {
          * @return True if the (model, portname) exist in vector, false
          * otherwise.
          */
-        bool exist(Model* model, const std::string& portname) const;
+        bool exist(GraphModel* model, const std::string& portname) const;
 
         /**
-         * @brief Check if a graph::ModelPort already exist in the vector.
+         * @brief Check if a ModelPort already exist in the vector.
          * Linear complexity.
          *
          * @param model The model to check.
@@ -111,7 +111,7 @@ namespace vle { namespace graph {
          * @return True if the (model, portname) exist in vector, false
          * otherwise.
          */
-        bool exist(const Model* model, const std::string& portname) const;
+        bool exist(const GraphModel* model, const std::string& portname) const;
 
         inline iterator begin() { return m_lst.begin(); }
         inline const_iterator begin() const { return m_lst.begin(); }
@@ -125,6 +125,6 @@ namespace vle { namespace graph {
 
     std::ostream& operator<<(std::ostream& out, const ModelPortList& lst);
 
-}} // namespace vle graph
+}} // namespace vpz graph
 
 #endif

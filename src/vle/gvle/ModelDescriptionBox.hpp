@@ -37,9 +37,9 @@
 
 namespace vle
 {
-namespace graph {
+namespace vpz {
 
-class Model;
+class GraphModel;
 
 }
 } // namespace graph
@@ -63,7 +63,7 @@ public :
      * @param model to assign new string or null if no model to affect
      */
     ModelDescriptionBox(const std::set < std::string > & lst,
-                        graph::Model * model = 0);
+                        vpz::GraphModel * model = 0);
 
     /**
      * return name written by user
@@ -83,7 +83,7 @@ public :
 private :
     const std::set < std::string >& m_lst;
     Gtk::Entry*                     m_entry;
-    graph::Model*                   m_model;
+    vpz::GraphModel*                   m_model;
 };
 
 }

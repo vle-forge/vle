@@ -31,8 +31,6 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/NewDynamicsBox.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/vpz/AtomicModels.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
@@ -44,12 +42,11 @@ namespace vle { namespace gvle {
 
 DynamicBox::DynamicBox(const Glib::RefPtr < Gtk::Builder >& xml,
                        GVLE* gvle,
-                       graph::AtomicModel& atom,
-                       vpz::AtomicModel& vatom,
+                       vpz::AtomicGraphModel& atom,
                        vpz::Dynamic& dynamic,
                        vpz::Conditions& conditions,
                        vpz::Observables& observables)
-    : mXml(xml), mGVLE(gvle), mAtom(atom), mVAtom(vatom), mDynamic(dynamic),
+    : mXml(xml), mGVLE(gvle), mAtom(atom), mDynamic(dynamic),
     mConditions(conditions), mObservables(observables)
 {
     xml->get_widget("DialogDynamic", mDialog);
@@ -217,7 +214,7 @@ int DynamicBox::execPlugin(const std::string& pluginname,
     ModelingPluginPtr plugin =
         mGVLE->pluginFactory().getModelingPlugin(pluginname);
 
-    if (plugin->create(mAtom, mVAtom, mDynamic, mConditions,
+    if (plugin->create(mAtom, mDynamic, mConditions,
                        mObservables, classname, namespace_)) {
         const std::string& buffer = plugin->source();
         std::string filename = utils::Path::path().getPackageSrcFile(classname);

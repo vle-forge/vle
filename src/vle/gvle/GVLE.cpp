@@ -275,24 +275,25 @@ void GVLE::focusRow(std::string filepath)
     mFileTreeView->showRow(filepath);
 }
 
-void GVLE::addView(graph::Model* model)
+void GVLE::addView(vpz::GraphModel* model)
 {
     if (model) {
         if (model->isCoupled()) {
-            graph::CoupledModel* m = graph::Model::toCoupled(model);
+            vpz::CoupledModel* m = vpz::GraphModel::toCoupled(model);
             addView(m);
         } else if (model->isAtomic()) {
             try {
-                mAtomicBox->show((graph::AtomicModel*)model);
-            } catch (utils::SaxParserError& /*e*/) {
-                parse_model(mModeling->vpz().project().model().atomicModels());
+                mAtomicBox->show((vpz::AtomicGraphModel*)model);
+            } catch (utils::SaxParserError& e) {
+                gvle::Error((fmt(_("Error showing model, %1%")) %
+                             e.what()).str(),false);
             }
         }
     }
     refreshViews();
 }
 
-void GVLE::addView(graph::CoupledModel* model)
+void GVLE::addView(vpz::CoupledModel* model)
 {
     const size_t szView = mListView.size();
 
@@ -305,24 +306,24 @@ void GVLE::addView(graph::CoupledModel* model)
     getEditor()->openTabVpz(mModeling->getFileName(), model);
 }
 
-void GVLE::addViewClass(graph::Model* model, std::string name)
+void GVLE::addViewClass(vpz::GraphModel* model, std::string name)
 {
     assert(model);
     if (model->isCoupled()) {
-        graph::CoupledModel* m = (graph::CoupledModel*)(model);
+        vpz::CoupledModel* m = (vpz::CoupledModel*)(model);
         addViewClass(m, name);
     } else if (model->isAtomic()) {
         try {
-            mAtomicBox->show((graph::AtomicModel*)model, name);
-        } catch (utils::SaxParserError& E) {
-            parse_model(mModeling->vpz().project().classes().
-                        get(mCurrentClass).atomicModels());
+            mAtomicBox->show((vpz::AtomicGraphModel*)model);
+        } catch (utils::SaxParserError& e) {
+            gvle::Error((fmt(_("Error showing model, %1%")) %
+                         e.what()).str(),false);
         }
     }
     refreshViews();
 }
 
-void GVLE::addViewClass(graph::CoupledModel* model, std::string name)
+void GVLE::addViewClass(vpz::CoupledModel* model, std::string name)
 {
     const size_t szView = mListView.size();
 
@@ -416,7 +417,7 @@ void GVLE::parseXML(const std::string& filename)
     setTitle(mModeling->getFileName());
 }
 
-bool GVLE::existView(graph::CoupledModel* model)
+bool GVLE::existView(vpz::CoupledModel* model)
 {
     assert(model);
     ListView::const_iterator it = mListView.begin();
@@ -428,7 +429,7 @@ bool GVLE::existView(graph::CoupledModel* model)
     return false;
 }
 
-View* GVLE::findView(graph::CoupledModel* model)
+View* GVLE::findView(vpz::CoupledModel* model)
 {
     assert(model);
     ListView::const_iterator it = mListView.begin();
@@ -448,7 +449,7 @@ void GVLE::delViewIndex(size_t index)
     mListView[index] = NULL;
 }
 
-void GVLE::delViewOnModel(const graph::CoupledModel* cm)
+void GVLE::delViewOnModel(const vpz::CoupledModel* cm)
 {
     assert(cm);
     const size_t sz = mListView.size();
@@ -711,7 +712,7 @@ void GVLE::onShowCompleteView()
 {
     DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
         mEditor->get_nth_page(mCurrentTab));
-    graph::CoupledModel* currentModel;
+    vpz::CoupledModel* currentModel;
     if (tab-> isComplete()) {
         currentModel = tab->getCompleteDrawingArea()->getModel();
     } else {
@@ -724,7 +725,7 @@ void GVLE::onShowSimpleView()
 {
     DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
         mEditor->get_nth_page(mCurrentTab));
-    graph::CoupledModel* currentModel;
+    vpz::CoupledModel* currentModel;
     if (tab-> isComplete()) {
         currentModel = tab->getCompleteDrawingArea()->getModel();
     } else {
@@ -1004,19 +1005,10 @@ void GVLE::onConditionsBox()
             renameList::const_iterator it = tmpRename.begin();
 
             while (it != tmpRename.end()) {
-                vpz::AtomicModelList& atomlist(
-                    mModeling->vpz().project().model().atomicModels());
-                atomlist.updateCondition(it->first, it->second);
-
-                vpz::ClassList::iterator itc = mModeling->
-                    vpz().project().classes().begin();
-
-                while (itc != mModeling->vpz().project().classes().end()) {
-                    vpz::AtomicModelList& atomlist(
-                        itc->second.atomicModels());
-                    atomlist.updateCondition(it->first, it->second);
-                    itc++;
-                }
+                mModeling->vpz().project().model().updateConditions(it->first,
+                                                                    it->second);
+                mModeling->vpz().project().classes().updateConditions(it->first,
+                                                                      it->second);
                 ++it;
             }
         }
@@ -1025,46 +1017,10 @@ void GVLE::onConditionsBox()
 
 void GVLE::applyRemoved()
 {
-    vpz::AtomicModelList& list =
-        mModeling->vpz().project().model().atomicModels();
-    vpz::AtomicModelList::iterator it = list.begin();
+    std::set < std::string > conditions = mModeling->conditions().getKeys();
 
-    while (it != list.end()) {
-        std::vector < std::string > mdlConditions =
-            it->second.conditions();
-        std::vector < std::string >::const_iterator its =
-            mdlConditions.begin();
-
-        while (its != mdlConditions.end()) {
-            if (not mModeling->conditions().exist(*its)) {
-                it->second.delCondition(*its);
-            }
-            ++its;
-        }
-        ++it;
-    }
-
-    vpz::ClassList::iterator itc = mModeling->vpz().project().classes().begin();
-
-    while (itc != mModeling->vpz().project().classes().end()) {
-        vpz::AtomicModelList& atomlist( itc->second.atomicModels() );
-        vpz::AtomicModelList::iterator itl = atomlist.begin();
-
-        while (itl != atomlist.end()) {
-            std::vector < std::string > mdlConditions =
-                itl->second.conditions();
-            std::vector < std::string >::const_iterator its =
-                mdlConditions.begin();
-            while (its != mdlConditions.end()) {
-                if (not mModeling->conditions().exist(*its)) {
-                    itl->second.delCondition(*its);
-                }
-                ++its;
-            }
-            ++itl;
-        }
-        ++itc;
-    }
+    mModeling->vpz().project().model().purgeConditions(conditions);
+    mModeling->vpz().project().classes().purgeConditions(conditions);
 }
 
 int GVLE::runConditionsBox(const vpz::Conditions& conditions)
@@ -1605,20 +1561,6 @@ void GVLE::packageProject()
         sigc::mem_fun(*this, &GVLE::packageTimer), 250);
 }
 
-void parse_model(vpz::AtomicModelList& list)
-{
-    vpz::AtomicModelList::iterator it = list.begin();
-    while (it != list.end()) {
-        if (it->first)
-            std::cout << "\t" << it->first << " : " <<
-                it->first->getName() << "\n";
-        else
-            std::cout << "\tNULL\n";
-
-        ++it;
-    }
-}
-
 void GVLE::onCutModel()
 {
     if (mCurrentTab >= 0) {
@@ -1698,7 +1640,7 @@ void GVLE::onSelectAll()
                 mEditor->get_nth_page(mCurrentTab))->getView();
 
             if (currentView) {
-                graph::CoupledModel* cModel = currentView->getGCoupledModel();
+                vpz::CoupledModel* cModel = currentView->getGCoupledModel();
                 currentView->onSelectAll(cModel);
                 mMenuAndToolbar->showCopyCut();
             }
@@ -1714,20 +1656,18 @@ void GVLE::onSelectAll()
     }
 }
 
-void GVLE::cut(graph::ModelList& lst, graph::CoupledModel* gc,
-                   std::string className)
+void GVLE::cut(vpz::ModelList& lst, vpz::CoupledModel* gc,
+               std::string className)
 {
     if (className.empty()) {
-        mCutCopyPaste.cut(lst, gc, mModeling->vpz().
-                          project().model().atomicModels());
+        mCutCopyPaste.cut(lst, gc);
     } else {
-        mCutCopyPaste.cut(lst, gc, mModeling->vpz().project().
-                          classes().get(className).atomicModels());
+        mCutCopyPaste.cut(lst, gc);
     }
 }
 
-void GVLE::copy(graph::ModelList& lst, graph::CoupledModel* gc,
-                    std::string className)
+void GVLE::copy(vpz::ModelList& lst, vpz::CoupledModel* gc,
+                std::string className)
 {
     // the current view is not a class
     if (className.empty()) {
@@ -1736,39 +1676,29 @@ void GVLE::copy(graph::ModelList& lst, graph::CoupledModel* gc,
         if (lst.empty() and not mModeling->getSelectedClass().empty()) {
             vpz::Class& currentClass = mModeling->vpz().project().classes()
                 .get(mModeling->getSelectedClass());
-            graph::Model* model = currentClass.model();
-            graph::ModelList lst2;
+            vpz::GraphModel* model = currentClass.model();
+            vpz::ModelList lst2;
 
             lst2[model->getName()] = model;
-            mCutCopyPaste.copy(lst2, gc,
-                               mModeling->vpz().project().classes()
-                               .get(mModeling->getSelectedClass())
-                               .atomicModels(), true);
+            mCutCopyPaste.copy(lst2, gc, true);
         } else {
-            mCutCopyPaste.copy(lst, gc,
-                               mModeling->vpz().project().model().
-                               atomicModels(),
-                               false);
+            mCutCopyPaste.copy(lst, gc, false);
         }
     } else {
-        mCutCopyPaste.copy(lst, gc,
-                           mModeling->vpz().project().classes().get(className)
-                           .atomicModels(), false);
+        mCutCopyPaste.copy(lst, gc, false);
     }
 }
 
-void GVLE::paste(graph::CoupledModel* gc, std::string className)
+void GVLE::paste(vpz::CoupledModel* gc, std::string className)
 {
     if (className.empty()) {
-        mCutCopyPaste.paste(gc, mModeling->vpz().project().model().
-                            atomicModels());
+        mCutCopyPaste.paste(gc);
     } else {
-        mCutCopyPaste.paste(gc, mModeling->vpz().project().classes().
-                            get(className).atomicModels());
+        mCutCopyPaste.paste(gc);
     }
 }
 
-void GVLE::selectAll(graph::ModelList& lst, graph::CoupledModel* gc)
+void GVLE::selectAll(vpz::ModelList& lst, vpz::CoupledModel* gc)
 {
     lst = gc->getModelList();
 }
@@ -1791,29 +1721,6 @@ void GVLE::clearCurrentModel()
         if (currentView) {
             currentView->clearCurrentModel();
         }
-    }
-}
-
-void GVLE::delModel(graph::Model* model, std::string className)
-{
-    if (model->isAtomic()) {
-        vpz::AtomicModelList& list = mModeling
-            ->getAtomicModelClass(className);
-        list.del(model);
-        setModified(true);
-    } else {
-        graph::ModelList& graphlist =
-            graph::Model::toCoupled(model)->getModelList();
-        vpz::AtomicModelList& vpzlist = mModeling
-            ->getAtomicModelClass(className);
-        graph::ModelList::iterator it;
-        for (it = graphlist.begin(); it!= graphlist.end(); ++it) {
-            if (it->second->isCoupled())
-                delModel(it->second, className);
-            else
-                vpzlist.del(it->second);
-        }
-        setModified(true);
     }
 }
 
@@ -1842,9 +1749,9 @@ void GVLE::importModel()
             if (mImportModelBox) {
                 mImportModelBox->setGCoupled(currentView->getGCoupledModel());
                 if (mImportModelBox->show(src)) {
-                    graph::Model* import = src->project().model().model();
+                    vpz::GraphModel* import = src->project().model().model();
                     currentView->getGCoupledModel()->addModel(import);
-                    mModeling->importModel(import, src);
+                    mModeling->importModel(src);
                     redrawModelTreeBox();
                     refreshViews();
                 }
@@ -1873,7 +1780,7 @@ void GVLE::exportCurrentModel()
     currentView->exportCurrentModel();
 }
 
-void GVLE::EditCoupledModel(graph::CoupledModel* model)
+void GVLE::EditCoupledModel(vpz::CoupledModel* model)
 {
     assert(model);
     mCoupledBox->show(model);

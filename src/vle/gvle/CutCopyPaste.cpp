@@ -56,8 +56,7 @@ CutCopyPaste::~CutCopyPaste()
  *
  *********************************************************************/
 
-void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
-                       vpz::AtomicModelList& src)
+void CutCopyPaste::cut(vpz::ModelList& l, vpz::CoupledModel* parent)
 {
     if (parent->hasConnectionProblem(l)) {
         mGVLE->showMessage(_("Selected model list have connection with " \
@@ -73,22 +72,12 @@ void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
 
         parent->detachModels(l);
         mList_graph = l;
-
-        for (graph::ModelList::const_iterator it = mList_graph.begin();
-             it !=  mList_graph.end(); ++it) {
-            if (it->second->isAtomic()) {
-                cut_atomic(it->second, src);
-            } else {
-                cut_coupled(it->second, src);
-            }
-        }
     } else {
         mGVLE->showMessage(_("Nothing to Cut - parent is ") + parent->getName());
     }
 }
 
-void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
-                        vpz::AtomicModelList& src, bool isClass)
+void CutCopyPaste::copy(vpz::ModelList& l, vpz::CoupledModel* parent, bool isClass)
 {
     if (not isClass and parent->hasConnectionProblem(l)) {
         mGVLE->showMessage(_("Selected model list have connection with " \
@@ -104,35 +93,27 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
 	    mCnts = parent->getBasicConnections(l);
 	}
 
-        for (graph::ModelList::iterator it = l.begin();
+        for (vpz::ModelList::iterator it = l.begin();
              it != l.end(); ++it) {
-            graph::Model* m = it->second->clone();
+            vpz::GraphModel* m = it->second->clone();
 
             m->setParent(NULL);
             mList_graph.insert(make_pair(m->getName(), m));
-            if (m->isAtomic()) {
-                copy_atomic(it->second, m, src);
-            } else {
-                copy_coupled(it->second, m, src);
-            }
         }
     }
 }
 
-void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
+void CutCopyPaste::paste(vpz::CoupledModel* gc)
 {
-    graph::ModelList list_graph_clone;
-    vpz::AtomicModelList list_vpz_clone;
+    vpz::ModelList list_graph_clone;
 
     if (gc) {
         if (mType == CUT) {
             clone(list_graph_clone,
-                  list_vpz_clone,
                   (mNumero == 0) ? -1 : mNumero - 1);
             ++mNumero;
         } else if (mType == COPY) {
             clone(list_graph_clone,
-                  list_vpz_clone,
                   mNumero);
             ++mNumero;
         }
@@ -141,7 +122,7 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
         std::vector <std::string> mwCnts= mCnts;
 
         // to avoid naming conflicts.
-        for (graph::ModelList::const_iterator itmls = list_graph_clone.begin();
+        for (vpz::ModelList::const_iterator itmls = list_graph_clone.begin();
              itmls != list_graph_clone.end(); ++itmls) {
             std::string mname = itmls->second->getName();
 
@@ -155,7 +136,7 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
                         boost::lexical_cast<std::string>(mcounter++) ;
                 }
 
-                graph::Model::rename(itmls->second, mnewname);
+                vpz::GraphModel::rename(itmls->second, mnewname);
 
                 //to update connections
                 std::vector <std::string>::iterator itc = mwCnts.begin();
@@ -171,13 +152,12 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
             gc->attachModel(itmls->second);
         }
         gc->setBasicConnections(mwCnts);
-        dst.add(list_vpz_clone);
     } else {
         mGVLE->showMessage(_("No Coupled Model"));
     }
 }
 
-bool CutCopyPaste::paste_is_empty() { 
+bool CutCopyPaste::paste_is_empty() {
     return mList_graph.empty();
 }
 
@@ -189,137 +169,70 @@ bool CutCopyPaste::paste_is_empty() {
 
 void CutCopyPaste::clear()
 {
-    for (graph::ModelList::iterator it = mList_graph.begin();
+    for (vpz::ModelList::iterator it = mList_graph.begin();
             it != mList_graph.end();
             ++it) {
         delete it->second;
     }
     mList_graph.clear();
-    mList_vpz.clear();
 
     mNumero = 0;
     mType = NOTHING;
 }
 
-void CutCopyPaste::clone(graph::ModelList& lst_graph_clone,
-                         vpz::AtomicModelList& lst_vpz_clone, int num)
+void CutCopyPaste::clone(vpz::ModelList& lst_graph_clone, int num)
 {
     lst_graph_clone.clear();
-    lst_vpz_clone.clear();
 
     if (num == -1) {
-        for (graph::ModelList::iterator it = mList_graph.begin();
+        for (vpz::ModelList::iterator it = mList_graph.begin();
                 it != mList_graph.end();
                 ++it) {
-            graph::Model* m = it->second->clone();
+            vpz::GraphModel* m = it->second->clone();
 
             lst_graph_clone.insert(make_pair(m->getName(), m));
             if (m->isCoupled()) {
-                clone_coupled(it->second, m, lst_vpz_clone);
+                clone_coupled(it->second, m);
             } else {
-                clone_atomic(it->second, m, lst_vpz_clone);
+                clone_atomic(m);
             }
         }
 
     } else {
         ++num;
-        for (graph::ModelList::iterator it = mList_graph.begin(); it !=
+        for (vpz::ModelList::iterator it = mList_graph.begin(); it !=
                 mList_graph.end();
                 ++it) {
-            graph::Model* m = it->second->clone();
+            vpz::GraphModel* m = it->second->clone();
             m->setParent(NULL);
             m->setPosition(m->x() + (num * 10), m->y() + (num * 10));
 
             lst_graph_clone.insert(make_pair(m->getName(), m));
             if (m->isCoupled()) {
-                clone_coupled(it->second, m, lst_vpz_clone);
+                clone_coupled(it->second, m);
             } else {
-                clone_atomic(it->second, m, lst_vpz_clone);
+                clone_atomic(m);
             }
         }
     }
 }
 
-void CutCopyPaste::cut_atomic(graph::Model* model, vpz::AtomicModelList& src)
+void CutCopyPaste::clone_atomic(vpz::GraphModel* clone)
 {
-    const vpz::AtomicModel& atom(src.get(model));
-    mList_vpz.add(model, atom);
-    src.del(model);
-}
-
-void CutCopyPaste::cut_coupled(graph::Model* model, vpz::AtomicModelList& src)
-{
-    graph::ModelList& list = dynamic_cast<graph::CoupledModel*>(model)->getModelList();
-    graph::ModelList::iterator it = list.begin();
-    while (it != list.end()) {
-        if (it->second->isAtomic()) {
-            cut_atomic(it->second, src);
-        } else {
-            cut_coupled(it->second, src);
-        }
-
-        ++it;
-    }
-}
-
-void CutCopyPaste::copy_atomic(graph::Model* model, graph::Model* clone,
-                               vpz::AtomicModelList& src)
-{
-    const vpz::AtomicModel& atom(src.get(model));
-    mList_vpz.add(clone, atom);
-    if (clone->width() < 0) {
-	clone->setWidth(ViewDrawingArea::MODEL_WIDTH);
-    }
-    if (clone->height() < 0) {
-	clone->setHeight(ViewDrawingArea::MODEL_HEIGHT +
-			 std::max(clone->getInputPortNumber(),
-				  clone->getOutputPortNumber()) *
-			 (ViewDrawingArea::MODEL_SPACING_PORT +
-			  ViewDrawingArea::MODEL_PORT));
-    }
-}
-
-void CutCopyPaste::copy_coupled(graph::Model* model, graph::Model* clone,
-                                vpz::AtomicModelList& src)
-{
-    graph::ModelList& list = dynamic_cast<graph::CoupledModel*>(model)->getModelList();
-    graph::ModelList::iterator it = list.begin();
-
-    graph::ModelList& list_clone = dynamic_cast<graph::CoupledModel*>(clone)->getModelList();
-    graph::ModelList::iterator it_clone = list_clone.begin();
-
-    while (it != list.end()) {
-        if (it->second->isAtomic()) {
-            copy_atomic(it->second, it_clone->second, src);
-        } else {
-            copy_coupled(it->second, it_clone->second, src);
-        }
-
-        ++it;
-        ++it_clone;
-    }
-}
-
-void CutCopyPaste::clone_atomic(graph::Model* model, graph::Model* clone,
-                                vpz::AtomicModelList& vpz_list)
-{
-    const vpz::AtomicModel& atom(mList_vpz.get(model));
     clone->setPosition(clone->x() + 10, clone->y() + 10);
-    vpz_list.add(clone, atom);
 }
 
-void CutCopyPaste::clone_coupled(graph::Model* model, graph::Model* clone,
-                                 vpz::AtomicModelList& vpz_list)
+void CutCopyPaste::clone_coupled(vpz::GraphModel* model, vpz::GraphModel* clone)
 {
-    graph::ModelList& list = dynamic_cast<graph::CoupledModel*>(model)->getModelList();
-    graph::ModelList& list_clone = dynamic_cast<graph::CoupledModel*>(clone)->getModelList();
-    graph::ModelList::iterator it = list.begin();
-    graph::ModelList::iterator it_clone = list_clone.begin();
+    vpz::ModelList& list = dynamic_cast<vpz::CoupledModel*>(model)->getModelList();
+    vpz::ModelList& list_clone = dynamic_cast<vpz::CoupledModel*>(clone)->getModelList();
+    vpz::ModelList::iterator it = list.begin();
+    vpz::ModelList::iterator it_clone = list_clone.begin();
     while (it != list.end()) {
         if (it->second->isAtomic()) {
-            clone_atomic(it->second, it_clone->second, vpz_list);
+            clone_atomic(it_clone->second);
         } else {
-            clone_coupled(it->second, it_clone->second, vpz_list);
+            clone_coupled(it->second, it_clone->second);
         }
 
         ++it;

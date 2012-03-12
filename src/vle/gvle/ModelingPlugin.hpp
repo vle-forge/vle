@@ -31,8 +31,6 @@
 
 #include <vle/DllDefines.hpp>
 #include <gtkmm/builder.h>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/vpz/AtomicModels.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/version.hpp>
 #include <gdkmm/pixbuf.h>
@@ -91,9 +89,8 @@ public:
      * @brief Call to produce a new atomic model, with input and output ports,
      * with its vpz::Dynamic, vpz::Conditions and vpz::Observables.
      *
-     * @param atom A reference to the graph::AtomicModel to modify its input or
+     * @param atom A reference to the vpz::AtomicGraphModel to modify its input or
      * output ports.
-     * @param model A reference to the vpz::AtomicModel to modify its dynamic,
      * conditions and observables.
      * @param dynamic A reference to the current vpz::Dynamic.
      * @param conditions A reference to the list of vpz::Conditions.
@@ -103,8 +100,7 @@ public:
      *
      * @return true if all is valid, false otherwise.
      */
-    virtual bool create(graph::AtomicModel& atom,
-                        vpz::AtomicModel& model,
+    virtual bool create(vpz::AtomicGraphModel& atom,
                         vpz::Dynamic& dynamic,
                         vpz::Conditions& conditions,
                         vpz::Observables& observables,
@@ -115,9 +111,8 @@ public:
      * @brief Call to rewrite an atomic model, with input and output ports,
      * with its vpz::Dynamic, vpz::Conditions and vpz::Observables.
      *
-     * @param atom A reference to the graph::AtomicModel to modify its input or
+     * @param atom A reference to the vpz::AtomicGraphModel to modify its input or
      * output ports.
-     * @param model A reference to the vpz::AtomicModel to modify its dynamic,
      * conditions and observables.
      * @param dynamic A reference to the current vpz::Dynamic.
      * @param conditions A reference to the list of vpz::Conditions.
@@ -127,8 +122,7 @@ public:
      *
      * @return true if all is valid, false otherwise.
      */
-    virtual bool modify(graph::AtomicModel& atom,
-                        vpz::AtomicModel& model,
+    virtual bool modify(vpz::AtomicGraphModel& atom,
                         vpz::Dynamic& dynamic,
                         vpz::Conditions& conditions,
                         vpz::Observables& observables,

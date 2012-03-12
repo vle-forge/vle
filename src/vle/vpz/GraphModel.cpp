@@ -1,5 +1,5 @@
 /*
- * @file vle/graph/Model.cpp
+ * @file vle/vpz/GraphModel.cpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -26,18 +26,18 @@
  */
 
 
-#include <vle/graph/CoupledModel.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/Model.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/GraphModel.hpp>
 #include <vle/utils/Exception.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <algorithm>
 #include <stack>
 
-namespace vle { namespace graph {
+namespace vle { namespace vpz {
 
-Model::Model(const std::string& name, CoupledModel* parent) :
+GraphModel::GraphModel(const std::string& name, CoupledModel* parent) :
     m_parent(parent),
     m_x(-1),
     m_y(-1),
@@ -50,7 +50,7 @@ Model::Model(const std::string& name, CoupledModel* parent) :
     }
 }
 
-Model::Model(const Model& mdl) :
+GraphModel::GraphModel(const GraphModel& mdl) :
     m_parent(0),
     m_inPortList(mdl.m_inPortList),
     m_outPortList(mdl.m_outPortList),
@@ -67,7 +67,7 @@ Model::Model(const Model& mdl) :
                   CopyWithoutConnection(m_outPortList));
 }
 
-void Model::swap(Model& mdl)
+void GraphModel::swap(GraphModel& mdl)
 {
     std::swap(m_parent, mdl.m_parent);
     std::swap(m_inPortList, mdl.m_inPortList);
@@ -79,22 +79,22 @@ void Model::swap(Model& mdl)
     std::swap(m_name, mdl.m_name);
 }
 
-void Model::getAtomicModelsSource(const std::string& portname,
+void GraphModel::getAtomicModelsSource(const std::string& portname,
                                   ModelPortList& result)
 {
-    std::stack < std::pair < ModelPortList*, Model* > > stack;
+    std::stack < std::pair < ModelPortList*, GraphModel* > > stack;
 
     stack.push(std::make_pair(&getInPort(portname), this));
 
     while (not stack.empty()) {
         ModelPortList* top = stack.top().first;
-        Model* source = stack.top().second;
+        GraphModel* source = stack.top().second;
         stack.pop();
 
         ModelPortList::iterator it, jt;
         for (it = top->begin(); it != top->end(); ++it) {
             const std::string& port(it->second);
-            Model* mdl(it->first);
+            GraphModel* mdl(it->first);
 
             if (mdl->isAtomic()) {
                 result.add(mdl, port);
@@ -112,22 +112,22 @@ void Model::getAtomicModelsSource(const std::string& portname,
     }
 }
 
-void Model::getAtomicModelsTarget(const std::string& portname,
+void GraphModel::getAtomicModelsTarget(const std::string& portname,
                                   ModelPortList& result)
 {
-    std::stack < std::pair < ModelPortList*, Model* > > stack;
+    std::stack < std::pair < ModelPortList*, GraphModel* > > stack;
 
     stack.push(std::make_pair(&getOutPort(portname), this));
 
     while (not stack.empty()) {
         ModelPortList* top = stack.top().first;
-        Model* source = stack.top().second;
+        GraphModel* source = stack.top().second;
         stack.pop();
 
         ModelPortList::iterator it, jt;
         for (it = top->begin(); it != top->end(); ++it) {
             const std::string& port(it->second);
-            Model* mdl(it->first);
+            GraphModel* mdl(it->first);
 
             if (mdl->isAtomic()) {
                 result.add(mdl, port);
@@ -145,7 +145,7 @@ void Model::getAtomicModelsTarget(const std::string& portname,
     }
 }
 
-void Model::rename(Model* mdl, const std::string& newname)
+void GraphModel::rename(GraphModel* mdl, const std::string& newname)
 {
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
@@ -176,7 +176,7 @@ void Model::rename(Model* mdl, const std::string& newname)
     }
 }
 
-std::string Model::getParentName() const
+std::string GraphModel::getParentName() const
 {
     std::list < std::string > lst;
     CoupledModel* parent = m_parent;
@@ -197,10 +197,10 @@ std::string Model::getParentName() const
     return result;
 }
 
-std::string Model::getCompleteName() const
+std::string GraphModel::getCompleteName() const
 {
-    std::list < const Model* > stack;
-    std::list < const Model* >::iterator it, jt;
+    std::list < const GraphModel* > stack;
+    std::list < const GraphModel* >::iterator it, jt;
     std::string result;
 
     stack.push_back(this);
@@ -221,7 +221,7 @@ std::string Model::getCompleteName() const
     return result;
 }
 
-void Model::getParents(CoupledModelVector& parents) const
+void GraphModel::getParents(CoupledModelVector& parents) const
 {
     CoupledModel* parent = m_parent;
 
@@ -231,8 +231,8 @@ void Model::getParents(CoupledModelVector& parents) const
     }
 }
 
-Model* Model::getModel(const CoupledModelVector& lst,
-                              const std::string& name)
+GraphModel* GraphModel::getModel(const CoupledModelVector& lst,
+                                 const std::string& name)
 {
     if (lst.empty()) {
         return findModel(name);
@@ -254,7 +254,7 @@ Model* Model::getModel(const CoupledModelVector& lst,
 
         while (it != lst.rend()) {
             other = *it;
-            Model* tmp = top->findModel(other->getName());
+            GraphModel* tmp = top->findModel(other->getName());
 
             if (not tmp) {
                 throw utils::DevsGraphError(fmt(
@@ -281,13 +281,13 @@ Model* Model::getModel(const CoupledModelVector& lst,
     }
 }
 
-Model* Model::findModelFromPath(const std::string& path) const
+GraphModel* GraphModel::findModelFromPath(const std::string& path) const
 {
     std::vector < std::string > splitVect;
     boost::split(splitVect, path, boost::is_any_of(","));
     std::vector < std::string >::const_iterator it = splitVect.begin();
     std::vector < std::string >::const_iterator ite = splitVect.end();
-    Model* currModel = 0;
+    GraphModel* currModel = 0;
     const CoupledModel* currCoupledModel = 0;
     for (; it != ite; it++) {
         if (currModel == 0) {
@@ -311,7 +311,7 @@ Model* Model::findModelFromPath(const std::string& path) const
     return currModel;
 }
 
-ModelPortList& Model::addInputPort(const std::string& name)
+ModelPortList& GraphModel::addInputPort(const std::string& name)
 {
     ConnectionList::iterator it(m_inPortList.find(name));
     if (it == m_inPortList.end()) {
@@ -328,7 +328,7 @@ ModelPortList& Model::addInputPort(const std::string& name)
     }
 }
 
-ModelPortList& Model::addOutputPort(const std::string& name)
+ModelPortList& GraphModel::addOutputPort(const std::string& name)
 {
     ConnectionList::iterator it(m_outPortList.find(name));
     if (it == m_outPortList.end()) {
@@ -345,7 +345,7 @@ ModelPortList& Model::addOutputPort(const std::string& name)
     }
 }
 
-void Model::delInputPort(const std::string& name)
+void GraphModel::delInputPort(const std::string& name)
 {
     ModelPortList& lst(getInPort(name));
     for (ModelPortList::iterator it = lst.begin(); it != lst.end(); ++it) {
@@ -372,7 +372,7 @@ void Model::delInputPort(const std::string& name)
     m_inPortList.erase(name);
 }
 
-void Model::delOutputPort(const std::string & name)
+void GraphModel::delOutputPort(const std::string & name)
 {
     ModelPortList& lst(getOutPort(name));
     for(ModelPortList::iterator it = lst.begin(); it != lst.end(); ++it) {
@@ -399,7 +399,7 @@ void Model::delOutputPort(const std::string & name)
     m_outPortList.erase(name);
 }
 
-void Model::addInPort(ModelPortList&  model, ModelPortList& intern,
+void GraphModel::addInPort(ModelPortList&  model, ModelPortList& intern,
 		      const std::string& name)
 {
     for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
@@ -418,7 +418,7 @@ void Model::addInPort(ModelPortList&  model, ModelPortList& intern,
     }
 }
 
-void Model::addOutPort(ModelPortList&  model, ModelPortList& intern,
+void GraphModel::addOutPort(ModelPortList&  model, ModelPortList& intern,
 			       const std::string& name)
 {
     for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
@@ -437,7 +437,7 @@ void Model::addOutPort(ModelPortList&  model, ModelPortList& intern,
     }
 }
 
-ModelPortList& Model::renameInputPort(const std::string& old_name,
+ModelPortList& GraphModel::renameInputPort(const std::string& old_name,
 				      const std::string& new_name)
 {
     ConnectionList::iterator iter = getInputPortList().find(old_name);
@@ -466,7 +466,7 @@ ModelPortList& Model::renameInputPort(const std::string& old_name,
     }
 }
 
-ModelPortList& Model::renameOutputPort(const std::string& old_name,
+ModelPortList& GraphModel::renameOutputPort(const std::string& old_name,
 				       const std::string& new_name)
 {
     ConnectionList::iterator iter = getOutputPortList().find(old_name);
@@ -495,17 +495,17 @@ ModelPortList& Model::renameOutputPort(const std::string& old_name,
     }
 }
 
-void Model::addInputPort(const std::list < std::string > & lst)
+void GraphModel::addInputPort(const std::list < std::string > & lst)
 {
     std::for_each(lst.begin(), lst.end(), AddInputPort(*this));
 }
 
-void Model::addOutputPort(const std::list < std::string > & lst)
+void GraphModel::addOutputPort(const std::list < std::string > & lst)
 {
     std::for_each(lst.begin(), lst.end(), AddOutputPort(*this));
 }
 
-const ModelPortList& Model::getInPort(const std::string& name) const
+const ModelPortList& GraphModel::getInPort(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
@@ -516,7 +516,7 @@ const ModelPortList& Model::getInPort(const std::string& name) const
     return it->second;
 }
 
-const ModelPortList& Model::getOutPort(const std::string& name) const
+const ModelPortList& GraphModel::getOutPort(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
@@ -527,7 +527,7 @@ const ModelPortList& Model::getOutPort(const std::string& name) const
     return it->second;
 }
 
-ModelPortList& Model::getInPort(const std::string& name)
+ModelPortList& GraphModel::getInPort(const std::string& name)
 {
     ConnectionList::iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
@@ -538,7 +538,7 @@ ModelPortList& Model::getInPort(const std::string& name)
     return it->second;
 }
 
-ModelPortList& Model::getOutPort(const std::string& name)
+ModelPortList& GraphModel::getOutPort(const std::string& name)
 {
     ConnectionList::iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
@@ -549,17 +549,17 @@ ModelPortList& Model::getOutPort(const std::string& name)
     return it->second;
 }
 
-bool Model::existInputPort(const std::string & name)
+bool GraphModel::existInputPort(const std::string & name)
 {
     return m_inPortList.find(name) != m_inPortList.end();
 }
 
-bool Model::existOutputPort(const std::string & name)
+bool GraphModel::existOutputPort(const std::string & name)
 {
     return m_outPortList.find(name) != m_outPortList.end();
 }
 
-int Model::getInputPortIndex(const std::string& name) const
+int GraphModel::getInputPortIndex(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_inPortList.find(name);
 
@@ -571,7 +571,7 @@ int Model::getInputPortIndex(const std::string& name) const
     return std::distance(m_inPortList.begin(), it);
 }
 
-int Model::getOutputPortIndex(const std::string& name) const
+int GraphModel::getOutputPortIndex(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_outPortList.find(name);
 
@@ -584,7 +584,7 @@ int Model::getOutputPortIndex(const std::string& name) const
     return std::distance(m_outPortList.begin(), it);
 }
 
-void Model::writePortListXML(std::ostream& out) const
+void GraphModel::writePortListXML(std::ostream& out) const
 {
     if (not m_inPortList.empty()) {
         out << "<in>\n";
@@ -606,15 +606,55 @@ void Model::writePortListXML(std::ostream& out) const
     }
 }
 
-AtomicModel* Model::toAtomic(Model* model)
+void GraphModel::writeGraphics(std::ostream& out) const
+{
+    if (x() >= 0) {
+        out << "x=\"" << x() << "\" ";
+    }
+    if (y() >= 0) {
+        out << "y=\"" << y() << "\" ";
+    }
+    if (width() >= 0) {
+        out << "width=\"" << width() << "\" ";
+    }
+    if (height() >= 0) {
+        out << "height=\"" << height() << "\" ";
+    }
+}
+
+void GraphModel::writePort(std::ostream& out) const
+{
+    const vpz::ConnectionList& ins(getInputPortList());
+    if (not ins.empty()) {
+        out << "<in>\n";
+        for (vpz::ConnectionList::const_iterator it = ins.begin();
+             it != ins.end(); ++it) {
+            out << " <port name=\"" << it->first.c_str() << "\" />\n";
+        }
+        out << "</in>\n";
+    }
+
+    const vpz::ConnectionList& outs(getOutputPortList());
+    if (not outs.empty()) {
+        out << "<out>\n";
+        for (vpz::ConnectionList::const_iterator it = outs.begin();
+             it != outs.end(); ++it) {
+            out << " <port name=\"" << it->first.c_str() << "\" />\n";
+        }
+        out << "</out>\n";
+    }
+
+}
+
+AtomicGraphModel* GraphModel::toAtomic(GraphModel* model)
 {
     if (model and model->isAtomic()) {
-        return static_cast<AtomicModel*>(model);
+        return static_cast<AtomicGraphModel*>(model);
     }
     return 0;
 }
 
-CoupledModel* Model::toCoupled(Model* model)
+CoupledModel* GraphModel::toCoupled(GraphModel* model)
 {
     if (model and model->isCoupled()) {
         return static_cast<CoupledModel*>(model);
@@ -622,11 +662,11 @@ CoupledModel* Model::toCoupled(Model* model)
     return 0;
 }
 
-void Model::getAtomicModelList(Model* model,
+void GraphModel::getAtomicModelList(GraphModel* model,
                                AtomicModelVector& list)
 {
     if (model->isAtomic()) {
-        list.push_back((AtomicModel*)model);
+        list.push_back((AtomicGraphModel*)model);
     } else {
 	std::list < CoupledModel* > coupledModelList;
 	coupledModelList.push_back((CoupledModel*)model);
@@ -635,9 +675,9 @@ void Model::getAtomicModelList(Model* model,
             ModelList& v(m->getModelList());
 
             for (ModelList::iterator it = v.begin(); it != v.end(); ++it) {
-		Model* n = it->second;
+		GraphModel* n = it->second;
                 if (n->isAtomic()) {
-                    list.push_back(static_cast < AtomicModel*>(n));
+                    list.push_back(static_cast < AtomicGraphModel*>(n));
                 } else {
                     coupledModelList.push_back(static_cast < CoupledModel*>(n));
                 }
@@ -647,24 +687,24 @@ void Model::getAtomicModelList(Model* model,
     }
 }
 
-bool Model::isInList(const ModelList& lst, graph::Model* m)
+bool GraphModel::isInList(const ModelList& lst, GraphModel* m)
 {
     return lst.find(m->getName()) != lst.end();
 }
 
-Model::Model() :
+GraphModel::GraphModel() :
     m_parent(0),
     m_x(-1),
     m_y(-1),
     m_width(-1),
     m_height(-1)
 {
-    throw utils::NotYetImplemented("Model::Model not developed");
+    throw utils::NotYetImplemented("GraphModel::GraphModel not developed");
 }
 
-Model& Model::operator=(const Model& /* mdl */)
+GraphModel& GraphModel::operator=(const GraphModel& /* mdl */)
 {
     throw utils::NotYetImplemented("Model::operator= not developed");
 }
 
-}} // namespace vle graph
+}} // namespace vle vpz

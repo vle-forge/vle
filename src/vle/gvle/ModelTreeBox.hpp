@@ -34,9 +34,9 @@
 #include <gtkmm/builder.h>
 #include <gtkmm.h>
 
-namespace vle { namespace graph {
+namespace vle { namespace vpz {
 
-class Model;
+class GraphModel;
 class CoupledModel;
 
 } } // namespace vle graph
@@ -47,7 +47,7 @@ class Modeling;
 class GVLE;
 
 /**
- * @brief A Gtk::Window to show the graph::Model hierarchy into a window.
+ * @brief A Gtk::Window to show the vpz::GraphModel hierarchy into a window.
  */
 class ModelTreeBox : public Gtk::TreeView
 {
@@ -64,14 +64,14 @@ public:
      *
      * @param top the head of tree to view
      */
-    void parseModel(graph::Model* top);
+    void parseModel(vpz::GraphModel* top);
 
     /**
      * active a row for a particular model
      *
      * @param mdl model to activate
      */
-    void showRow(const graph::Model* mdl);
+    void showRow(const vpz::GraphModel* mdl);
 
     /**
      * Get the treview row as an iterator from the selected model
@@ -79,7 +79,7 @@ public:
      * @param mdl selected model
      * @param current model child
      */
-    Gtk::TreeModel::iterator getModelRow(const graph::Model* mdl, Gtk::TreeModel::Children child);
+    Gtk::TreeModel::iterator getModelRow(const vpz::GraphModel* mdl, Gtk::TreeModel::Children child);
 
     /**
      * @brief Rename a model with the specified name
@@ -124,7 +124,7 @@ protected:
      * @param top
      */
     void parseModel(Gtk::TreeModel::Row row,
-                    const graph::CoupledModel* top);
+                    const vpz::CoupledModel* top);
 
     /**
      * Add a new row to top of the TreeView with model name
@@ -132,7 +132,7 @@ protected:
      * @param name model's name
      * @return A Row to the top of TreeView
      */
-    Gtk::TreeModel::Row addModel(graph::Model* model);
+    Gtk::TreeModel::Row addModel(vpz::GraphModel* model);
 
     /**
      * Add a new row to the child of row tree with model name and
@@ -143,13 +143,13 @@ protected:
      * @return A Row to the child of Row tree
      */
     Gtk::TreeModel::Row addSubModel(Gtk::TreeModel::Row tree,
-                                    graph::Model* model);
+                                    vpz::GraphModel* model);
 
 
     /**
      * on activated a row, Modeling is all to show a new View centered on
-     * graph::CoupledModel or AtomicModelBox if model is a
-     * graph::AtomicModel.
+     * vpz::CoupledModel or AtomicModelBox if model is a
+     * vpz::AtomicGraphModel.
      *
      * @param path
      * @param column
@@ -179,7 +179,7 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
         }
 
         Gtk::TreeModelColumn <Glib::ustring> mName;
-        Gtk::TreeModelColumn <graph::Model*> mModel;
+        Gtk::TreeModelColumn <vpz::GraphModel*> mModel;
     };
 
     ModelTreeColumn              m_columns;

@@ -31,13 +31,13 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/value/Null.hpp>
 
 namespace vle { namespace devs {
 
-Simulator::Simulator(graph::AtomicModel* atomic) :
+Simulator::Simulator(vpz::AtomicGraphModel* atomic) :
     m_dynamics(0),
     m_atomicModel(atomic)
 {
@@ -62,23 +62,23 @@ void Simulator::clear()
 void
 Simulator::updateSimulatorTargets(
         const std::string& port,
-        std::map < graph::AtomicModel*, devs::Simulator* >& simulators)
+        std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators)
 {
     mTargets.erase(port);
 
-    graph::ModelPortList result;
+    vpz::ModelPortList result;
     m_atomicModel->getAtomicModelsTarget(port, result);
 
     if (result.begin() == result.end()) {
         mTargets.insert(value_type(port, TargetSimulator(
                    (Simulator*)0, std::string())));
     } else {
-        for (graph::ModelPortList::iterator it = result.begin(); it !=
+        for (vpz::ModelPortList::iterator it = result.begin(); it !=
                 result.end(); ++it) {
 
-            std::map < graph::AtomicModel*, devs::Simulator* >::iterator target;
+            std::map < vpz::AtomicGraphModel*, devs::Simulator* >::iterator target;
             target = simulators.find(
-                    reinterpret_cast < graph::AtomicModel*>(it->first));
+                    reinterpret_cast < vpz::AtomicGraphModel*>(it->first));
 
             if (target == simulators.end()) {
                 mTargets.erase(port);
@@ -94,7 +94,7 @@ Simulator::updateSimulatorTargets(
 std::pair < Simulator::iterator, Simulator::iterator >
 Simulator::targets(
     const std::string& port,
-    std::map < graph::AtomicModel*, devs::Simulator* >& simulators)
+    std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators)
 {
     std::pair < iterator, iterator > x = mTargets.equal_range(port);
 
