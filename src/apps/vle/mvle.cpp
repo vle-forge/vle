@@ -255,6 +255,9 @@ int main(int argc, char **argv)
                             getPackageExpFile(argv[vpz]));
                         vpz++;
                     }
+
+                    mvle_print("MPI node %d/%d end\n", rank, world);
+
                 } catch (const std::exception& e) {
                     mvle_print_error("manager problem: %s", e.what());
                     result = false;
