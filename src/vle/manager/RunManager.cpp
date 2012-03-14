@@ -35,6 +35,21 @@
 
 namespace vle { namespace manager {
 
+static void setExperimentName(vpz::Vpz           *destination,
+                              const std::string&  name,
+                              uint32_t            number)
+{
+    std::string result(name.size() + 12, '-');
+
+    result.replace(0, name.size(), name);
+    result.replace(name.size() + 1, std::string::npos,
+                   utils::to < uint32_t >(number));
+
+
+    destination->project().setInstance(number);
+    destination->project().experiment().setName(result);
+}
+
 enum RunManagerType
 {
     RUN_MANAGER_MONO,
@@ -44,47 +59,55 @@ enum RunManagerType
 
 struct RunManagerMono
 {
-    OutputSimulationList *operator()(const std::string& vpz,
-                                     utils::ModuleManager& modulemgr)
-    {
-        vpz::Vpz exp(vpz);
-
-        return operator()(exp, modulemgr);
-    }
-
-    OutputSimulationList *operator()(const vpz::Vpz& vpz,
-                                     utils::ModuleManager& modulemgr)
+    OutputSimulationList * run(const vpz::Vpz&       vpz,
+                               utils::ModuleManager& modulemgr)
     {
         ExperimentGenerator expgen(vpz, 0, 1);
         OutputSimulationList *result = new OutputSimulationList(expgen.size());
+        std::string vpzname(vpz.project().experiment().name());
 
         for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
             vpz::Vpz file(vpz);
+            setExperimentName(&file, vpzname, i);
             expgen.get(i, &file.project().experiment().conditions());
 
-            RunVerbose r(modulemgr, std::cout);
+            RunQuiet r(modulemgr);
             r.start(file);
             result->operator[](i) = r.outputs();
         }
 
         return result;
     }
+
+    OutputSimulationList *operator()(const std::string&    vpz,
+                                     utils::ModuleManager& modulemgr)
+    {
+        vpz::Vpz exp(vpz);
+
+        return run(exp, modulemgr);
+    }
+
+    OutputSimulationList *operator()(const vpz::Vpz&       vpz,
+                                     utils::ModuleManager& modulemgr)
+    {
+        return run(vpz, modulemgr);
+    }
 };
 
 struct RunManagerThread
 {
-    OutputSimulationList *operator()(const std::string& vpz,
+    OutputSimulationList *operator()(const std::string&    vpz,
                                      utils::ModuleManager& modulemgr,
-                                     uint32_t threads)
+                                     uint32_t              threads)
     {
         vpz::Vpz exp(vpz);
 
         return operator()(exp, modulemgr, threads);
     }
 
-    OutputSimulationList *operator()(const vpz::Vpz& vpz,
+    OutputSimulationList *operator()(const vpz::Vpz&       vpz,
                                      utils::ModuleManager& modulemgr,
-                                     uint32_t threads)
+                                     uint32_t              threads)
     {
         ExperimentGenerator expgen(vpz, 0, 1);
         OutputSimulationList *result = new OutputSimulationList(expgen.size());
@@ -119,9 +142,11 @@ struct RunManagerThread
         void operator()()
         {
             ExperimentGenerator expgen(vpz, rank, world);
+            std::string vpzname(vpz.project().experiment().name());
 
             for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
                 vpz::Vpz file(vpz);
+                setExperimentName(&file, vpzname, i);
                 expgen.get(i, &file.project().experiment().conditions());
 
                 RunQuiet r(modules);
@@ -135,25 +160,17 @@ struct RunManagerThread
 
 struct RunManagerMpi
 {
-    OutputSimulationList *operator()(const std::string& vpz,
-                                     utils::ModuleManager& modulemgr,
-                                     uint32_t rank,
-                                     uint32_t world)
-    {
-        vpz::Vpz exp(vpz);
-
-        return operator()(exp, modulemgr, rank, world);
-    }
-
-    OutputSimulationList *operator()(const vpz::Vpz& vpz,
-                                     utils::ModuleManager& modulemgr,
-                                     uint32_t rank,
-                                     uint32_t world)
+    OutputSimulationList * run(const vpz::Vpz&       vpz,
+                               utils::ModuleManager& modulemgr,
+                               uint32_t              rank,
+                               uint32_t              world)
     {
         ExperimentGenerator expgen(vpz, rank, world);
+        std::string vpzname(vpz.project().experiment().name());
 
         for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
             vpz::Vpz file(vpz);
+            setExperimentName(&file, vpzname, i);
             expgen.get(i, &file.project().experiment().conditions());
 
             RunQuiet r(modulemgr);
@@ -161,6 +178,24 @@ struct RunManagerMpi
         }
 
         return NULL;
+    }
+
+    OutputSimulationList *operator()(const std::string&    vpz,
+                                     utils::ModuleManager& modulemgr,
+                                     uint32_t              rank,
+                                     uint32_t              world)
+    {
+        vpz::Vpz exp(vpz);
+
+        return run(exp, modulemgr, rank, world);
+    }
+
+    OutputSimulationList *operator()(const vpz::Vpz&       vpz,
+                                     utils::ModuleManager& modulemgr,
+                                     uint32_t              rank,
+                                     uint32_t              world)
+    {
+        return run(vpz, modulemgr, rank, world);
     }
 };
 
