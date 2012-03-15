@@ -633,7 +633,7 @@ public:
                   const Tuple::size_type& width = 0,
                   const double& value = 0.0)
     {
-        add(name, new Table(width, value));
+        add(name, new Tuple(width, value));
     }
 
     /**
