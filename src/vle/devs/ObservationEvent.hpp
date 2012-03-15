@@ -69,9 +69,6 @@ public:
     const std::string& getPortName() const
     { return m_portName; }
 
-    virtual bool isObservation() const
-    { return true; }
-
     bool onPort(std::string const& portName) const
     { return m_portName == portName; }
 
