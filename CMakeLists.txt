@@ -219,7 +219,7 @@ function(add_sources target)
   endif()
 
   set(SRCS)
-  foreach(src IN LISTS ARGN)
+  foreach(src ${ARGN})
     if(NOT IS_ABSOLUTE "${src}")
       get_filename_component(src "${src}" ABSOLUTE)
     endif()
