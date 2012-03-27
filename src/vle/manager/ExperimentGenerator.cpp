@@ -135,11 +135,13 @@ public:
 
     ~Pimpl()
     {
+        delete mVpz.project().model().model();
     }
 
     void get(uint32_t index, vpz::Conditions *conditions)
     {
         const vpz::Conditions& cnds(mVpz.project().experiment().conditions());
+        conditions->deleteValueSet();
         vpz::ConditionList& cdldst(conditions->conditionlist());
 
         vpz::ConditionList::const_iterator it;
@@ -169,6 +171,7 @@ public:
                         index % it->first % jt->first);
                 }
 
+                delete cnvdst[jt->first];
                 cnvdst[jt->first] = cpy;
             }
         }

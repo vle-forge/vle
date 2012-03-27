@@ -67,9 +67,9 @@ struct RunManagerMono
         std::string vpzname(vpz.project().experiment().name());
 
         for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
-            vpz::Vpz file(vpz);
-            setExperimentName(&file, vpzname, i);
-            expgen.get(i, &file.project().experiment().conditions());
+            vpz::Vpz *file = new vpz::Vpz(vpz);
+            setExperimentName(file, vpzname, i);
+            expgen.get(i, &file->project().experiment().conditions());
 
             RunQuiet r(modulemgr);
             r.start(file);
@@ -145,9 +145,9 @@ struct RunManagerThread
             std::string vpzname(vpz.project().experiment().name());
 
             for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
-                vpz::Vpz file(vpz);
-                setExperimentName(&file, vpzname, i);
-                expgen.get(i, &file.project().experiment().conditions());
+                vpz::Vpz *file = new vpz::Vpz(vpz);
+                setExperimentName(file, vpzname, i);
+                expgen.get(i, &file->project().experiment().conditions());
 
                 RunQuiet r(modules);
                 r.start(file);
@@ -169,9 +169,9 @@ struct RunManagerMpi
         std::string vpzname(vpz.project().experiment().name());
 
         for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
-            vpz::Vpz file(vpz);
-            setExperimentName(&file, vpzname, i);
-            expgen.get(i, &file.project().experiment().conditions());
+            vpz::Vpz *file = new vpz::Vpz(vpz);
+            setExperimentName(file, vpzname, i);
+            expgen.get(i, &file->project().experiment().conditions());
 
             RunQuiet r(modulemgr);
             r.start(file);
