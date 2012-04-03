@@ -27,139 +27,292 @@
 
 
 #include <vle/devs/Coordinator.hpp>
-#include <vle/manager/Run.hpp>
-#include <vle/manager/RunManager.hpp>
-#include <vle/manager/JustRun.hpp>
 #include <vle/manager/Manager.hpp>
-#include <vle/utils/DateTime.hpp>
-#include <vle/utils/Exception.hpp>
+#include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/manager/Simulation.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Rand.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/utils/Path.hpp>
-#include <glib/gstdio.h>
-
-#include <glibmm/optioncontext.h>
-#include <iostream>
-#include <fstream>
-#include <string>
+#include <boost/thread/thread.hpp>
 
 namespace vle { namespace manager {
 
-Manager::Manager(bool quiet)
-    : mQuiet(quiet), mSuccess(true)
+/**
+ * Assign an new name to the experiment.
+ *
+ * This function assign a new name to the experiment file.
+ *
+ * @param destination The experiment where change the name.
+ * @param name The base name of the experiment.
+ * @param number The combination number.
+ */
+static void setExperimentName(vpz::Vpz           *destination,
+                              const std::string&  name,
+                              uint32_t            number)
 {
-    if (quiet) {
-        mFilename = utils::Path::buildTemp("manager");
-        mFileError = new std::ofstream(mFilename.c_str());
+    std::string result(name.size() + 12, '-');
 
-        if (not mFileError->is_open()) {
-            delete mFileError;
+    result.replace(0, name.size(), name);
+    result.replace(name.size() + 1, std::string::npos,
+                   utils::to < uint32_t >(number));
 
-            throw utils::InternalError(
-                _("Manager can not build error file in quiet mode"));
+
+    destination->project().setInstance(number);
+    destination->project().experiment().setName(result);
+}
+
+struct Manager::Pimpl
+{
+    Pimpl(const std::string    &package,
+          LogOption             logoptions,
+          SimulationOption      simulationoptions,
+          std::ostream         *output)
+        : mPackage(package),
+          mLogOption(logoptions),
+          mSimulationOption(simulationoptions),
+          mOutputStream(output)
+    {
+    }
+
+    ~Pimpl()
+    {
+    }
+
+    template <typename T >
+    void writeSummaryLog(const T& fmt)
+    {
+        if (mLogOption & manager::LOG_SUMMARY) {
+            if (mOutputStream) {
+                *mOutputStream << fmt;
+            } else {
+                utils::Trace::send(fmt);
+            }
+        }
+    }
+
+    template <typename T >
+    void writeRunLog(const T& fmt)
+    {
+        if (mLogOption & manager::LOG_RUN) {
+            if (mOutputStream) {
+                *mOutputStream << fmt;
+            } else {
+                utils::Trace::send(fmt);
+            }
+        }
+    }
+
+    /**
+     * The @c worker is a boost thread functor to execute threaded
+     * source code.
+     *
+     */
+    struct worker
+    {
+        const vpz::Vpz       *vpz;
+        ExperimentGenerator  &expgen;
+        utils::ModuleManager &modulemgr;
+        LogOptions            mLogOption;
+        SimulationOptions     mSimulationOption;
+        uint32_t              index;
+        uint32_t              threads;
+        value::Matrix        *result;
+        Error                *error;
+
+        worker(const vpz::Vpz        *vpz,
+               ExperimentGenerator&   expgen,
+               utils::ModuleManager&  modulemgr,
+               LogOptions             logoptions,
+               SimulationOptions      simulationoptions,
+               uint32_t               index,
+               uint32_t               threads,
+               value::Matrix         *result,
+               Error                 *error)
+            : vpz(vpz), expgen(expgen), modulemgr(modulemgr),
+              mLogOption(logoptions), mSimulationOption(simulationoptions),
+              index(index), threads(threads), result(result), error(error)
+        {
         }
 
-        mStreamBufError = std::cerr.rdbuf();
-        std::cerr.rdbuf(mFileError->rdbuf());
+        ~worker()
+        {
+        }
+
+        void operator()()
+        {
+            std::string vpzname(vpz->project().experiment().name());
+
+            for (uint32_t i = expgen.min() + index; i <= expgen.max();
+                 i += threads) {
+                Simulation sim(mLogOption, mSimulationOption, NULL);
+                Error err;
+                vpz::Vpz *file = new vpz::Vpz(*vpz);
+                setExperimentName(file, vpzname, i);
+                expgen.get(i, &file->project().experiment().conditions());
+
+                SimulationResult *simresult = sim.run(file, modulemgr, &err);
+
+                if (err.code) {
+                    // writeRunLog(err.message);
+
+                    if (not error->code) {
+                        error->code = -1;
+                        error->message = _("Manager failure.");
+                    }
+                } else {
+                    result->add(i, 0, simresult);
+                }
+            }
+        }
+    };
+
+    ManagerResult * runManagerThread(vpz::Vpz              *vpz,
+                                     utils::ModuleManager&  modulemgr,
+                                     uint32_t               threads,
+                                     uint32_t               rank,
+                                     uint32_t               world,
+                                     Error                 *error)
+    {
+        ExperimentGenerator expgen(*vpz, rank, world);
+        std::string vpzname(vpz->project().experiment().name());
+        boost::thread_group gp;
+        value::Matrix *result = new value::Matrix(expgen.size(), 1, expgen.size(), 1);
+
+        for (uint32_t i = 0; i < threads; ++i) {
+            gp.create_thread(worker(vpz, expgen, modulemgr,
+                                    mLogOption, mSimulationOption,
+                                    i, threads, result, error));
+        }
+
+        gp.join_all();
+
+         delete vpz->project().model().model();
+         delete vpz;
+
+         return result;
     }
+
+    ManagerResult * runManagerMono(vpz::Vpz             *vpz,
+                                   utils::ModuleManager &modulemgr,
+                                   uint32_t              rank,
+                                   uint32_t              world,
+                                   Error                *error)
+    {
+        Simulation sim(mLogOption, mSimulationOption, NULL);
+        ExperimentGenerator expgen(*vpz, rank, world);
+        std::string vpzname(vpz->project().experiment().name());
+        ManagerResult *result = 0;
+
+        error->code = 0;
+        error->message.clear();
+
+        if (mSimulationOption & manager::SIMULATION_NO_RETURN) {
+            for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
+                Error err;
+                vpz::Vpz *file = new vpz::Vpz(*vpz);
+                setExperimentName(file, vpzname, i);
+                expgen.get(i, &file->project().experiment().conditions());
+
+                sim.run(file, modulemgr, &err);
+
+                if (err.code) {
+                    writeRunLog(err.message);
+
+                    if (not error->code) {
+                        error->code = -1;
+                        error->message = _("Manager failure.");
+                    }
+                }
+            }
+        } else {
+            result = new value::Matrix(expgen.size(), 1, expgen.size(), 1);
+
+            for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
+                Error err;
+                vpz::Vpz *file = new vpz::Vpz(*vpz);
+                setExperimentName(file, vpzname, i);
+                expgen.get(i, &file->project().experiment().conditions());
+
+                SimulationResult *simresult = sim.run(file, modulemgr, &err);
+
+                if (err.code) {
+                    writeRunLog(err.message);
+
+                    if (not error->code) {
+                        error->code = -1;
+                        error->message = _("Manager failure.");
+                    }
+                } else {
+                    result->add(i, 0, simresult);
+                }
+            }
+        }
+
+        delete vpz->project().model().model();
+        delete vpz;
+
+        return result;
+    }
+
+    std::string           mPackage;
+    LogOption             mLogOption;
+    SimulationOption      mSimulationOption;
+    std::ostream         *mOutputStream;
+    uint32_t              mCurrentTime;
+    uint32_t              mduration;
+};
+
+Manager::Manager(const std::string    &package,
+                 LogOption             logoptions,
+                 SimulationOption      simulationoptions,
+                 std::ostream         *output)
+    : mPimpl(new Manager::Pimpl(package, logoptions, simulationoptions, output))
+{
 }
 
 Manager::~Manager()
 {
-    close();
+    delete mPimpl;
 }
 
-void Manager::close()
+ManagerResult * Manager::run(vpz::Vpz             *exp,
+                             utils::ModuleManager &modulemgr,
+                             uint32_t              thread,
+                             uint32_t              rank,
+                             uint32_t              world,
+                             Error                *error)
 {
-    if (mQuiet) {
-        if (mStreamBufError) {
-            std::cerr.rdbuf(mStreamBufError);
-        }
-        delete mFileError;
+    ManagerResult *result = 0;
 
-        mQuiet = false;
-        mFileError = 0;
-        mStreamBufError = 0;
-    }
-}
-
-bool Manager::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
-                         CmdArgs& args)
-{
-    mSuccess = true;
-
-    try {
-        if (allInLocal) {
-            if (nbProcessor == 1) {
-                std::cerr << fmt(_(
-                    "Manager all simulations in one thread\n"));
-                RunManager r;
-                r.run(args.front());
-            } else {
-                std::cerr << fmt(_(
-                    "Manager all simulations in %1% processor\n")) %
-                    nbProcessor;
-                RunManager r(nbProcessor);
-                r.run(args.front());
-            }
-        }
-    } catch(const std::exception& e) {
-        std::cerr << fmt(
-            _("\n/!\\ vle manager error reported: %1%\n")) %
-            utils::demangle(typeid(e)) << e.what();
-        mSuccess = false;
+    if (thread <= 0) {
+        throw vle::utils::ArgError(
+            fmt(_("Manager error: thread must be superior to 0 (%1%)"))
+            % thread);
     }
 
-    return mSuccess;
-}
+    if (world <= rank) {
+        throw vle::utils::ArgError(
+            fmt(_("Manager error: rank (%1%) must be inferior"
+                  " to world (%2%)"))  % rank % world);
+    }
 
-bool Manager::justRun(int nbProcessor, const CmdArgs& args)
-{
-    mSuccess = true;
+    if (world <= 0) {
+        throw vle::utils::ArgError(
+            fmt(_("Manager error: world (%1%) must be superior to 0."))
+            % world);
+    }
 
-    if (nbProcessor == 1) {
-        try {
-            JustRunMono jrm(std::cerr);
-            mSuccess = jrm.operator()(args);
-        } catch(const std::exception& e) {
-            std::cerr << fmt(_(
-                    "\n/!\\ vle mono simulator error reported: %1%")) %
-                utils::demangle(typeid(e)) << e.what();
-            mSuccess = false;
-        }
+    mPimpl->writeSummaryLog(_("Manager started"));
+
+    if (thread > 1) {
+        result = mPimpl->runManagerThread(exp, modulemgr, thread, rank,
+                                          world, error);
     } else {
-        try {
-            JustRunThread jrt(std::cerr, nbProcessor);
-            mSuccess = jrt.operator()(args);
-        } catch(const std::exception& e) {
-            std::cerr << fmt(_("\n/!\\ vle thread simulator error reported: "
-                               " %1%")) % utils::demangle(typeid(e)) <<
-                e.what();
-            mSuccess = false;
-        }
+        result = mPimpl->runManagerMono(exp, modulemgr, rank, world, error);
     }
-    return mSuccess;
-}
 
-std::map < std::string, Depends > Manager::depends()
-{
-    std::map < std::string, Depends > result;
-
-    utils::PathList vpz(utils::Path::path().getInstalledExperiments());
-    std::sort(vpz.begin(), vpz.end());
-
-    for (utils::PathList::iterator it = vpz.begin(); it != vpz.end(); ++it) {
-        std::set < std::string > depends;
-        try {
-            vpz::Vpz vpz(*it);
-            depends = vpz.depends();
-        } catch (const std::exception& /*e*/) {
-        }
-        result[*it] = depends;
-    }
+    mPimpl->writeSummaryLog(_("Manager ended"));
 
     return result;
 }

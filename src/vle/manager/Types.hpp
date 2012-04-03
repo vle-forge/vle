@@ -29,33 +29,171 @@
 #ifndef VLE_MANAGER_TYPES_HPP
 #define VLE_MANAGER_TYPES_HPP
 
-#include <vle/oov/OutputMatrix.hpp>
-#include <vector>
-#include <list>
-#include <map>
+#include <vle/value/Matrix.hpp>
+#include <vle/value/Set.hpp>
+#include <string>
 
 namespace vle { namespace manager  {
 
-    /**
-     * @brief Define a list of filename from command line arguments argv and
-     * argc.
-     */
-    typedef std::list < std::string > CmdArgs;
+/**
+ * The @c vle::manager::Error structure permits to report error.
+ *
+ * The @c vle::manager::Error structure is used by the
+ * @c vle::manager::Simulation and the @c vle::manager::Manager
+ * classes to report error during the run of the simulation or the
+ * experimental frame.
+ *
+ * The @c vle::manager::Error is a structure with an error code (an
+ * integer different to 0 to indicate error) and string to store the
+ * message throws by the simulation or the experimental frames.
+ */
+struct Error
+{
+    int code;
+    std::string message;
+};
 
-    //
-    // JustRun output types
+/**
+ * Defines the result of a simulation.
+ *
+ * \c SimulationResult is a list of simulation results. Results are
+ * stored in \c vle::value::Matrix (time * observation). One \c
+ * vle::value::Matrix is builded by view.
+ */
+typedef vle::value::Set SimulationResult;
 
-    /**
-     * @brief Define a list of oov::OutputMatrixViewList.
-     */
-    typedef std::vector < oov::OutputMatrixViewList > OutputSimulationList;
+/**
+ * Defines the result of an experimental frame.
+ *
+ * \c ManagerResult is a matrix of \c SimulationResult. \c
+ * ManagerResult is indexed with replicas and combination indexes.
+ */
+typedef vle::value::Matrix ManagerResult;
 
-    /**
-     * @brief Define a dictionary of key vpz filename and index. Index is the
-     * index in the OutputSimulationList.
-     */
-    typedef std::map < std::string,
-            oov::OutputMatrixViewList::size_type > OutputSimulationNames;
+/**
+ * Defines the type of log
+ *
+ */
+enum LogOption {
+    LOG_NONE    = 0,            /**< Report nothing in output stream. */
+    LOG_SUMMARY = 1 << 0,       /**< Report summary of the experimental
+                                 * frame (size of the plan, number of
+                                 * replicas etc.). */
+    LOG_RUN     = 1 << 1,       /**< Report information. */
+};
+
+/**
+ * Defines the option to launch simulation.
+ *
+ */
+enum SimulationOption {
+    SIMULATION_NONE          = 0, /**< Default option. */
+    SIMULATION_SPAWN_PROCESS = 1 << 0, /**< Launch the simulation in a
+                                        * subprocess.  */
+    SIMULATION_NO_RETURN     = 1 << 1 /**< The simulation result are empty. */
+};
+
+inline LogOptions operator|(LogOptions lhs, LogOptions rhs)
+{
+    return static_cast<LogOptions>(
+        static_cast<unsigned>(lhs) |
+        static_cast<unsigned>(rhs));
+}
+
+inline LogOptions operator&(LogOptions lhs, LogOptions rhs)
+{
+    return static_cast<LogOptions>(
+        static_cast<unsigned>(lhs) &
+        static_cast<unsigned>(rhs));
+}
+
+inline LogOptions operator^(LogOptions lhs, LogOptions rhs)
+{
+    return static_cast<LogOptions>(
+        static_cast<unsigned>(lhs) ^
+        static_cast<unsigned>(rhs));
+}
+
+inline LogOptions operator~(LogOptions flags)
+{
+    return static_cast<LogOptions>(
+        ~static_cast<unsigned>(flags));
+}
+
+inline LogOptions& operator|=(LogOptions& lhs, LogOptions rhs)
+{
+    return (lhs = static_cast<LogOptions>(
+                static_cast<unsigned>(lhs) |
+                static_cast<unsigned>(rhs)));
+}
+
+inline LogOptions& operator&=(LogOptions& lhs, LogOptions rhs)
+{
+    return (lhs = static_cast<LogOptions>(
+                static_cast<unsigned>(lhs) &
+                static_cast<unsigned>(rhs)));
+}
+
+inline LogOptions& operator^=(LogOptions& lhs, LogOptions rhs)
+{
+    return (lhs = static_cast<LogOptions>(
+                static_cast<unsigned>(lhs) ^
+                static_cast<unsigned>(rhs)));
+}
+
+inline SimulationOptions operator|(SimulationOptions lhs,
+                                   SimulationOptions rhs)
+{
+    return static_cast<SimulationOptions>(
+        static_cast<unsigned>(lhs) |
+        static_cast<unsigned>(rhs));
+}
+
+inline SimulationOptions operator&(SimulationOptions lhs,
+                                   SimulationOptions rhs)
+{
+    return static_cast<SimulationOptions>(
+        static_cast<unsigned>(lhs) &
+        static_cast<unsigned>(rhs));
+}
+
+inline SimulationOptions operator^(SimulationOptions lhs,
+                                   SimulationOptions rhs)
+{
+    return static_cast<SimulationOptions>(
+        static_cast<unsigned>(lhs) ^
+        static_cast<unsigned>(rhs));
+}
+
+inline SimulationOptions operator~(SimulationOptions flags)
+{
+    return static_cast<SimulationOptions>(
+        ~static_cast<unsigned>(flags));
+}
+
+inline SimulationOptions& operator|=(SimulationOptions& lhs,
+                                     SimulationOptions rhs)
+{
+    return (lhs = static_cast<SimulationOptions>(
+                static_cast<unsigned>(lhs) |
+                static_cast<unsigned>(rhs)));
+}
+
+inline SimulationOptions& operator&=(SimulationOptions& lhs,
+                                     SimulationOptions rhs)
+{
+    return (lhs = static_cast<SimulationOptions>(
+                static_cast<unsigned>(lhs) &
+                static_cast<unsigned>(rhs)));
+}
+
+inline SimulationOptions& operator^=(SimulationOptions& lhs,
+                                     SimulationOptions rhs)
+{
+    return (lhs = static_cast<SimulationOptions>(
+                static_cast<unsigned>(lhs) ^
+                static_cast<unsigned>(rhs)));
+}
 
 }} // namespace vle manager
 

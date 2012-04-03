@@ -30,134 +30,72 @@
 #define VLE_MANAGER_MANAGER_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/Types.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <set>
 
 namespace vle { namespace manager {
 
 /**
- * @brief A std::set of package names.
- */
-typedef std::set < std::string > Depends;
-
-/**
- * @brief The main class of the libvlemanager. Manager provides functions to
- * launch experimental frames, to launch simulator in distant mode or to simply
- * launch simulations.
+ * @c manager::Manager permits to run experimental frames.
+ *
+ * The @c manager::Manager returns a @c value::Matrix. The lines are
+ * replicas and the columns are combination index from the @c
+ * manager::ExperimentGenerator. A cell of the @c value::Matrix is a
+ * @c value::Map.  The key is the name of the @c devs::View and the
+ * value is a @c value::Matrix or NULL if the @c value::Matrix is
+ * empty.
+ *
+ * @attention You are in charge to freed the manager result @c
+ * value::Set.
  */
 class VLE_API Manager
 {
 public:
-    /**
-     * @brief Build a Manager. If `quiet' is true, the Manager send all message
-     * error into a tempory file otherwise, it uses the standard output error
-     * stream.
-     *
-     * @param quiet If `quiet' is true, use a tempory file to store message,
-     * false to use the standard error output stream.
-     */
-    Manager(bool quiet = false);
+    Manager(const std::string    &package,
+            LogOption             logoptions,
+            SimulationOption      simulationoptions,
+            std::ostream         *output);
 
-    /**
-     * @brief Clean up the Manager: if in `quiet' mode, restore the std::cerr
-     * streambuf and delete the `quiet' mode.
-     */
     ~Manager();
 
     /**
-     * @brief If in `quiet' mode, restore the std::cerr streambuf and delete
-     * the `quiet' mode.
-     */
-    void close();
-
-    //
-    ///
-    //
-
-    /**
-     * @brief read an experimental frame VPZ, build the complete condition
-     * combinations and launch or connect to the vle::Simulator and send
-     * experimental frame instance VPZi. vle::Manager can listening on
-     * localhost port and wait for VPZ stream like a daemon.
-     * @param nbProcessor number of processor.
-     * @return true if manager is a success.
-     */
-    bool runManager(bool allInLocal, bool savevpz, int nbProcessor,
-                    const CmdArgs& args);
-
-    /**
-     * @brief vle::JustRun: start a simulation without analysis of the
-     * complete condition combinations, just take the fist and run
-     * simulation.
-     * @return true if justRun simulation is a success.
-     */
-    bool justRun(int nbProcessor, const CmdArgs& args);
-
-    /**
-     * @brief Build a dictonnary of dependencies. For each vpz file in
-     * experiment directory, we produce a list of dependencies.
-     * @return The dictionnary.
-     */
-    VLE_API static std::map < std::string, Depends > depends();
-
-    //
-    ///
-    //
-
-    /**
-     * @brief Get the mode of the Manager: quiet or not quiet.
+     * Run an part or a complete experimental frames with mono thread
+     * or multi-thread.
+     *
+     * @param exp
+     * @param modulemgr
+     * @param thread
+     * @param rank
+     * @param world
+     *
+     * (1, 0, 1) defines one thread for the complete experimental
+     * frame.  (4, 0, 1) defines four threads for the complete
+     * experimental frame. (1, 0, 2) defines one thread for half of
+     * the experimental frame. (4, 0, 2) defines four thread by half
+     * of experimental frame.
      *
      * @return
      */
-    bool quiet() const { return mQuiet; }
-
-    /**
-     * @brief Get the filename of the Manager's quiet mode.
-     *
-     * @return
-     */
-    const std::string& filename() const { return mFilename; }
-
-    /**
-     * @brief Get the success of the latest operation of this Manager.
-     *
-     * @return
-     */
-    bool success() const { return mSuccess; }
+    ManagerResult * run(vpz::Vpz             *exp,
+                        utils::ModuleManager &modulemgr,
+                        uint32_t              thread,
+                        uint32_t              rank,
+                        uint32_t              world,
+                        Error                *error);
 
 private:
-    bool mQuiet;
-    std::string mFilename; /**< The filename of the temporary file build in the
-                             constructor if the user selects the `quiet'
-                             mode. */
-    std::ofstream* mFileError; /**< The std::ofstream of the temporary file
-                                 build in the constructor if the user selects
-                                 the `quiet' mode. */
-    std::streambuf* mStreamBufError; /**< To store the streambuf of the
-                                       std::cerr output stream if the user
-                                       selects the `quiet' mode. */
-    bool mSuccess;
+    Manager(const Manager& other);
+    Manager& operator=(const Manager& other);
 
-    /**
-     * @brief A simple functor to produce a vpz::Vpz object from the
-     * std::string filename. To use with std::transform for example.
-     */
-    struct VLE_API BuildVPZ
-    {
-        vpz::Vpz* operator()(const std::string& filename) const
-        { return new vpz::Vpz(filename); }
-    };
+    class Pimpl;
+    Pimpl *mPimpl;
 };
 
-/*
- *
- * initialisation and finalize functions of the system
- *
- */
-
 /**
- * @brief Initialize the VLE system by:
+ * Initialize the VLE system by:
+ *
  * - installling signal (segmentation fault etc.) to standard error
  *   function.
  * - initialize the user directory ($HOME/.vle/ etc.).
@@ -169,7 +107,8 @@ private:
 VLE_API void init();
 
 /**
- * @brief Delete all singleton from VLE system.
+ * Delete all singleton from VLE system.
+ *
  * - kill the utils::Trace singleton.
  * - kill the utils::Path singleton.
  * - kill the value::Pools singleton.
