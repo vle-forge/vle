@@ -48,6 +48,9 @@ class KnowledgeBase;
  */
 class VLE_EXTENSION_EXPORT Plan
 {
+
+    typedef std::pair<bool, devs::Time> DateResult;
+
 public:
     Plan(KnowledgeBase& kb)
         : mKb(kb)
@@ -73,6 +76,14 @@ private:
     void fillTemporal(const utils::Block::BlocksResult& temporals,
                       Activity& activity);
     void fillPrecedences(const utils::Block::BlocksResult& precedences);
+    /**
+     * @brief Get a date into a block with real format (e.g. julian day 2452132)
+     * or a date format (e.g. 2001-08-10)
+     * @param dateName, the name of the date to search (e.g. start, maxfinish)
+     * @param block, the block where to seach
+     */
+    DateResult getDate(const std::string& dateName,
+                       const utils::Block& block) const;
 
     KnowledgeBase& mKb;
     Rules mRules;

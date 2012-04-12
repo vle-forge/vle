@@ -229,6 +229,20 @@ const char* Plan1 = \
 "        ack = \"ack function\";\n"
 "        output = \"output function\";\n"
 "    }\n"
+"    activity {\n"
+"        id = \"activity6\";\n"
+"        temporal {\n"
+"            start = 2451698;\n"
+"            finish = \"2000-06-03\";\n"
+"        }\n"
+"    }\n"
+"    activity {\n"
+"        id = \"activity7\";\n"
+"        temporal {\n"
+"            start = \"2000-06-02\";\n"
+"            finish = 2451699;\n"
+"        }\n"
+"    }\n"
 "}\n"
 "\n"
 "precedences {\n"
@@ -287,10 +301,26 @@ BOOST_AUTO_TEST_CASE(parser)
     std::cout << fmt("parser: %1%\n") % b;
     std::cout << fmt("graph: %1%\n") % b.activities().precedencesGraph();
 
-    BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)5);
+    BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)7);
     BOOST_REQUIRE_EQUAL(
         b.activities().get("activity2")->second.rules().size(), 2);
     BOOST_REQUIRE_EQUAL(
         b.activities().get("activity5")->second.rules().get("rule 4").isAvailable(),
         false);
+}
+
+BOOST_AUTO_TEST_CASE(test_stringdates)
+{
+    vle::value::init();
+
+    vmd::ex::KnowledgeBase b;
+    b.plan().fill(std::string(vmd::ex::Plan1));
+
+    const vmd::Activity& act6 = b.activities().get("activity6")->second;
+    const vmd::Activity& act7 = b.activities().get("activity7")->second;
+
+    BOOST_REQUIRE_EQUAL(act6.start(),act7.start());
+    BOOST_REQUIRE_EQUAL(act6.start(),2451698);
+    BOOST_REQUIRE_EQUAL(act6.finish(),act7.finish());
+    BOOST_REQUIRE_EQUAL(act6.finish(),2451699);
 }

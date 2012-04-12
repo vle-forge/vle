@@ -31,6 +31,7 @@
 #include <vle/utils/Parser.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <string>
 #include <istream>
 
@@ -182,70 +183,67 @@ void Plan::fillTemporal(const utils::Block::BlocksResult& temps,
     for (UBB::const_iterator it = temps.first; it != temps.second; ++it) {
         const utils::Block& block = it->second;
 
-        UB::RealsResult start = block.reals.equal_range("start");
-        UB::RealsResult mins = block.reals.equal_range("minstart");
-        UB::RealsResult maxs = block.reals.equal_range("maxstart");
-        UB::RealsResult finish = block.reals.equal_range("finish");
-        UB::RealsResult minf = block.reals.equal_range("minfinish");
-        UB::RealsResult maxf = block.reals.equal_range("maxfinish");
+        DateResult start = getDate("start",block);
+        DateResult mins = getDate("minstart",block);
+        DateResult maxs = getDate("maxstart",block);
+        DateResult finish = getDate("finish",block);
+        DateResult minf = getDate("minfinish",block);
+        DateResult maxf = getDate("maxfinish",block);
 
-        if (start.first != start.second) {
-            if (finish.first != finish.second) {
-                activity.initStartTimeFinishTime(
-                    start.first->second, finish.first->second);
+        if (start.first) {
+            if (finish.first) {
+                activity.initStartTimeFinishTime(start.second, finish.second);
             } else {
                 double vmin, vmax;
-                if (minf.first != minf.second) {
-                    if (maxf.first != maxf.second) {
-                        vmin = minf.first->second;
-                        vmax = maxf.first->second;
+                if (minf.first) {
+                    if (maxf.first) {
+                        vmin = minf.second;
+                        vmax = maxf.second;
                     } else {
-                        vmin = minf.first->second;
+                        vmin = minf.second;
                         vmax = devs::Time::infinity;
                     }
                 } else {
                     if (maxf.first != maxf.second) {
                         vmin = 0;
-                        vmax = maxf.first->second;
+                        vmax = maxf.second;
                     } else {
                         vmin = 0;
                         vmax = devs::Time::infinity;
                     }
                 }
-                activity.initStartTimeFinishRange(start.first->second, vmin,
-                                                  vmax);
+                activity.initStartTimeFinishRange(start.second,vmin,vmax);
             }
         } else {
             double vmin, vmax;
-            if (mins.first != mins.second) {
-                vmin = mins.first->second;
+            if (mins.first) {
+                vmin = mins.second;
             } else {
                 vmin = devs::Time::negativeInfinity;
             }
 
-            if (maxs.first != maxs.second) {
-                vmax = maxs.first->second;
+            if (maxs.first) {
+                vmax = maxs.second;
             } else {
                 vmax = devs::Time::infinity;
             }
 
-            if (finish.first != finish.second) {
-                activity.initStartRangeFinishTime(vmin, vmax,
-                                                  finish.first->second);
+            if (finish.first) {
+                activity.initStartRangeFinishTime(vmin, vmax,finish.second);
             } else {
                 double vminf, vmaxf;
-                if (minf.first != minf.second) {
-                    if (maxf.first != maxf.second) {
-                        vminf = minf.first->second;
-                        vmaxf = maxf.first->second;
+                if (minf.first) {
+                    if (maxf.first) {
+                        vminf = minf.second;
+                        vmaxf = maxf.second;
                     } else {
-                        vminf = minf.first->second;
+                        vminf = minf.second;
                         vmaxf = devs::Time::infinity;
                     }
                 } else {
-                    if (maxf.first != maxf.second) {
+                    if (maxf.first) {
                         vminf = 0;
-                        vmaxf = maxf.first->second;
+                        vmaxf = maxf.second;
                     } else {
                         vminf = 0;
                         vmaxf = devs::Time::infinity;
@@ -309,5 +307,28 @@ void Plan::fillPrecedences(const utils::Block::BlocksResult& preds)
         }
     }
 }
+
+Plan::DateResult Plan::getDate(const std::string& dateName,
+               const utils::Block& block) const
+{
+    UB::RealsResult dateReal = block.reals.equal_range(dateName);
+    UB::StringsResult dateString = block.strings.equal_range(dateName);
+    bool hasRealDate = dateReal.first != dateReal.second;
+    bool hasStringDate = dateString.first != dateString.second;
+    if(hasRealDate && hasStringDate){
+        throw utils::ArgError(fmt(_(
+         "Decision: date '%1%' should not be given twice ")) % dateName);
+    }
+    if (hasRealDate){
+        return DateResult(true,devs::Time((double) dateReal.first->second));
+    } else if (hasStringDate){
+        return DateResult(true,devs::Time(
+         (int) utils::DateTime::toJulianDayNumber(dateString.first->second)));
+    } else {
+        return DateResult(false,devs::Time::infinity);
+    }
+}
+
+
 
 }}} // namespace vle extension decision
