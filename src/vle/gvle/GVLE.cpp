@@ -118,6 +118,10 @@ GVLE::GVLE(BaseObjectType* cobject,
         setTitle(mModeling->getFileName());
     }
 
+    utils::Package::package().refresh(); /** Initialize the VLE
+                                          * settings commands from the
+                                          * configuration file `vle.conf'. */
+
     Settings::settings(); /** Initialize the GVLE settings singleton to read
                             colors, fonts, commands from the configuration file
                             `vle.conf'. */
