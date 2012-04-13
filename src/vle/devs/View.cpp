@@ -52,7 +52,7 @@ void View::addObservable(Simulator* model,
 
 void View::finish(const Time& time)
 {
-    m_plugin = m_stream->close(time);
+    m_stream->close(time);
 }
 
 void View::removeObservable(Simulator* sim)
@@ -105,18 +105,13 @@ void View::run(const Time& time)
     }
 }
 
-oov::PluginPtr View::plugin() const
+value::Matrix * View::matrix() const
 {
-    return m_plugin;
-}
-
-oov::PluginPtr View::updatePlugin()
-{
-    oov::PluginPtr out(m_stream->refreshPlugin());
-    if (out.get()) {
-        m_plugin = out;
+    if (m_stream->plugin()) {
+        return m_stream->plugin()->matrix();
     }
-    return m_plugin;
+
+    return NULL;
 }
 
 }} // namespace vle devs

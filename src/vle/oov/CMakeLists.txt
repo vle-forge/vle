@@ -1,17 +1,11 @@
 if (VLE_HAVE_CAIRO)
-  add_sources(vlelib CairoPlugin.cpp CairoPlugin.hpp
-    LocalStreamReader.cpp LocalStreamReader.hpp NetStreamReader.cpp
-    NetStreamReader.hpp OutputMatrix.cpp OutputMatrix.hpp Plugin.cpp
+  add_sources(vlelib CairoPlugin.cpp CairoPlugin.hpp Plugin.cpp
     Plugin.hpp StreamReader.cpp StreamReader.hpp)
-  install(FILES CairoPlugin.hpp LocalStreamReader.hpp
-    NetStreamReader.hpp OutputMatrix.hpp Plugin.hpp StreamReader.hpp
+  install(FILES CairoPlugin.hpp Plugin.hpp StreamReader.hpp
     DESTINATION ${VLE_INCLUDE_DIRS}/oov)
 else ()
-  add_sources(vlelib LocalStreamReader.cpp LocalStreamReader.hpp
-    NetStreamReader.cpp NetStreamReader.hpp OutputMatrix.cpp
-    OutputMatrix.hpp Plugin.cpp Plugin.hpp StreamReader.cpp
+  add_sources(vlelib Plugin.cpp Plugin.hpp StreamReader.cpp
     StreamReader.hpp)
-  install(FILES LocalStreamReader.hpp NetStreamReader.hpp
-    OutputMatrix.hpp Plugin.hpp StreamReader.hpp DESTINATION
+  install(FILES Plugin.hpp StreamReader.hpp DESTINATION
     ${VLE_INCLUDE_DIRS}/oov)
 endif()

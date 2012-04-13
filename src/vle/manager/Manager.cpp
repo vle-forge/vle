@@ -64,12 +64,10 @@ static void setExperimentName(vpz::Vpz           *destination,
 
 struct Manager::Pimpl
 {
-    Pimpl(const std::string    &package,
-          LogOption             logoptions,
-          SimulationOption      simulationoptions,
+    Pimpl(LogOptions            logoptions,
+          SimulationOptions     simulationoptions,
           std::ostream         *output)
-        : mPackage(package),
-          mLogOption(logoptions),
+        : mLogOption(logoptions),
           mSimulationOption(simulationoptions),
           mOutputStream(output)
     {
@@ -151,7 +149,7 @@ struct Manager::Pimpl
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                SimulationResult *simresult = sim.run(file, modulemgr, &err);
+                value::Map *simresult = sim.run(file, modulemgr, &err);
 
                 if (err.code) {
                     // writeRunLog(err.message);
@@ -167,7 +165,7 @@ struct Manager::Pimpl
         }
     };
 
-    ManagerResult * runManagerThread(vpz::Vpz              *vpz,
+    value::Matrix * runManagerThread(vpz::Vpz              *vpz,
                                      utils::ModuleManager&  modulemgr,
                                      uint32_t               threads,
                                      uint32_t               rank,
@@ -193,7 +191,7 @@ struct Manager::Pimpl
          return result;
     }
 
-    ManagerResult * runManagerMono(vpz::Vpz             *vpz,
+    value::Matrix * runManagerMono(vpz::Vpz             *vpz,
                                    utils::ModuleManager &modulemgr,
                                    uint32_t              rank,
                                    uint32_t              world,
@@ -202,7 +200,7 @@ struct Manager::Pimpl
         Simulation sim(mLogOption, mSimulationOption, NULL);
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
-        ManagerResult *result = 0;
+        value::Matrix *result = 0;
 
         error->code = 0;
         error->message.clear();
@@ -234,7 +232,7 @@ struct Manager::Pimpl
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                SimulationResult *simresult = sim.run(file, modulemgr, &err);
+                value::Map *simresult = sim.run(file, modulemgr, &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -255,19 +253,17 @@ struct Manager::Pimpl
         return result;
     }
 
-    std::string           mPackage;
-    LogOption             mLogOption;
-    SimulationOption      mSimulationOption;
+    LogOptions            mLogOption;
+    SimulationOptions     mSimulationOption;
     std::ostream         *mOutputStream;
     uint32_t              mCurrentTime;
     uint32_t              mduration;
 };
 
-Manager::Manager(const std::string    &package,
-                 LogOption             logoptions,
-                 SimulationOption      simulationoptions,
+Manager::Manager(LogOptions            logoptions,
+                 SimulationOptions     simulationoptions,
                  std::ostream         *output)
-    : mPimpl(new Manager::Pimpl(package, logoptions, simulationoptions, output))
+    : mPimpl(new Manager::Pimpl(logoptions, simulationoptions, output))
 {
 }
 
@@ -276,14 +272,14 @@ Manager::~Manager()
     delete mPimpl;
 }
 
-ManagerResult * Manager::run(vpz::Vpz             *exp,
+value::Matrix * Manager::run(vpz::Vpz             *exp,
                              utils::ModuleManager &modulemgr,
                              uint32_t              thread,
                              uint32_t              rank,
                              uint32_t              world,
                              Error                *error)
 {
-    ManagerResult *result = 0;
+    value::Matrix *result = 0;
 
     if (thread <= 0) {
         throw vle::utils::ArgError(

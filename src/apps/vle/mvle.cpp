@@ -26,8 +26,8 @@
  */
 
 
-#include <vle/manager/RunManager.hpp>
 #include <vle/manager/Manager.hpp>
+#include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
     uint32_t rank = 0;
     uint32_t world = 0;
     bool show = false;
-    bool result = true;
+    bool result;
 
     vle::manager::init();
 
@@ -246,13 +246,32 @@ int main(int argc, char **argv)
                 }
             } else {
                 try {
-                    vle::manager::RunManager man(rank, world);
+                    vle::manager::Manager man(vle::manager::LOG_SUMMARY,
+                                              vle::manager::SIMULATION_NONE |
+                                              vle::manager::SIMULATION_NO_RETURN,
+                                              &std::cout);
+                    vle::utils::ModuleManager modules;
+
                     mvle_print("MPI node %d/%d start\n", rank, world);
 
                     while (vpz < argc) {
-                        result = man.run(
-                            vle::utils::Path::path().
-                            getPackageExpFile(argv[vpz]));
+                        vle::manager::Error error;
+                        vle::value::Matrix *res = man.run(
+                            new vle::vpz::Vpz(vle::utils::Path::path().
+                                              getPackageExpFile(argv[vpz])),
+                            modules,
+                            1,
+                            rank,
+                            world,
+                            &error);
+
+                        if (error.code) {
+                            mvle_print_error("Experimental frames `%s' throws error %s",
+                                             argv[vpz], error.message.c_str());
+                        }
+
+                        delete res;
+
                         vpz++;
                     }
 
@@ -260,7 +279,6 @@ int main(int argc, char **argv)
 
                 } catch (const std::exception& e) {
                     mvle_print_error("manager problem: %s", e.what());
-                    result = false;
                 }
             }
         }

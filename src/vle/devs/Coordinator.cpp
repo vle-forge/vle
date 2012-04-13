@@ -37,8 +37,6 @@
 #include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/StreamWriter.hpp>
-#include <vle/devs/LocalStreamWriter.hpp>
-#include <vle/devs/NetStreamWriter.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -362,16 +360,6 @@ View* Coordinator::getView(const std::string& name) const
     return (it == m_viewList.end()) ? 0 : it->second;
 }
 
-oov::OutputMatrixViewList Coordinator::outputs() const
-{
-    oov::OutputMatrixViewList lst;
-
-    std::for_each(m_viewList.begin(), m_viewList.end(),
-                  GetOutputMatrixView(lst));
-
-    return lst;
-}
-
 ///
 /// Private functions.
 ///
@@ -496,20 +484,12 @@ void Coordinator::buildViews()
 StreamWriter* Coordinator::buildOutput(const vpz::View& view,
                                        const vpz::Output& output)
 {
-    StreamWriter* stream = 0;
-
-    switch (output.format()) {
-    case vpz::Output::LOCAL:
-        stream = new LocalStreamWriter(m_modulemgr);
-        break;
-    case vpz::Output::DISTANT:
-        stream = new NetStreamWriter(m_modulemgr);
-        break;
-    }
+    StreamWriter* stream = new StreamWriter(m_modulemgr);
 
     std::string file((fmt("%1%_%2%") %
                       m_modelFactory.experiment().name() %
                       view.name()).str());
+
     stream->open(output.plugin(), output.package(), output.location(), file,
                  (output.data()) ? output.data()->clone() : 0, m_currentTime);
 

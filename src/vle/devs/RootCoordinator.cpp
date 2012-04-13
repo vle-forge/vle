@@ -38,9 +38,42 @@
 
 namespace vle { namespace devs {
 
+/**
+ * Retrieves for all Views the \c vle::value::Matrix result.
+ *
+ * The \c getMatrixFromView is a private implementation function.
+ *
+ * @param views The \c vle::devs::ViewList to browse.
+ *
+ * @return NULL if the \c vle::devs::ViewList does not have storage
+ * plug-ins.
+ */
+static value::Map * getMatrixFromView(const ViewList &views)
+{
+    value::Map * result = 0;
+
+    ViewList::const_iterator it = views.begin();
+    while (it != views.end()) {
+        value::Matrix *matrix = it->second->matrix();
+
+        if (matrix) {
+            if (not result) {
+                result = new value::Map();
+            }
+            result->add(it->first, matrix);
+        }
+
+        ++it;
+    }
+
+    return result;
+}
+
+                       /* - - - - - - - - - -*/
+
 RootCoordinator::RootCoordinator(const utils::ModuleManager& modulemgr)
-    : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0), m_coordinator(0),
-    m_root(0), m_modulemgr(modulemgr)
+    : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0), m_result(0),
+      m_coordinator(0), m_root(0), m_modulemgr(modulemgr)
 {
 }
 
@@ -101,7 +134,9 @@ void RootCoordinator::finish()
 {
     if (m_coordinator) {
         m_coordinator->finish();
-        m_outputs = m_coordinator->outputs();
+
+        m_result = getMatrixFromView(m_coordinator->getViews());
+
         delete m_coordinator;
         m_coordinator = 0;
     }
@@ -110,11 +145,6 @@ void RootCoordinator::finish()
         delete m_root;
         m_root = 0;
     }
-}
-
-void RootCoordinator::refreshOutputs()
-{
-    m_outputs = m_coordinator->outputs();
 }
 
 }} // namespace vle devs

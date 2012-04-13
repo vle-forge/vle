@@ -125,31 +125,22 @@ public:
     { return m_stream; }
 
     /**
-     * @brief Get the current reference of the plugin.
-     * @return A reference to the plugin.
+     * Return a pointer to the \c value::Matrix.
+     *
+     * If the plug-in does not manage \c value::Matrix, this function
+     * returns NULL otherwise, this function return the \c
+     * value::Matrix manager by the plug-in.
+     *
+     * @attention You are in charge of freeing the value::Matrix after
+     * the end of the simulation.
      */
-    oov::PluginPtr plugin() const;
-
-    /**
-     * @brief Ask to the StreamWriter a new reference of the plugin and
-     * affect it to the local reference. If the plugin receive from the
-     * StreamWriter is null, then, the previous plugin is not modified.
-     * @return A reference ot the plugin.
-     */
-    oov::PluginPtr updatePlugin();
-
-    struct GetOovPlugin
-    {
-        oov::PluginPtr operator()(const ViewList::value_type& x)
-        { return x.second->plugin(); }
-    };
+    value::Matrix * matrix() const;
 
 protected:
     ObservableList      m_observableList;
     std::string         m_name;
     StreamWriter*       m_stream;
     size_t              m_size;
-    oov::PluginPtr      m_plugin;
 };
 
 /**

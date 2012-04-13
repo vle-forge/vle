@@ -28,6 +28,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Simulation.hpp>
@@ -64,7 +65,7 @@ public:
     void write(const T& t)
     {
         if (m_out) {
-            m_out << t;
+            (*m_out) << t;
         } else {
             utils::Trace::send(t);
         }
@@ -144,9 +145,6 @@ public:
         try {
             devs::RootCoordinator root(modulemgr);
 
-            const double duration = vpz->project().experiment().duration();
-            const double begin = vpz->project().experiment().begin();
-
             write(fmt(_("[%1%]\n")) % vpz->filename());
             write(_(" - Coordinator load models ......: "));
 
@@ -192,10 +190,10 @@ public:
                           const utils::ModuleManager &modulemgr,
                           Error                      *error)
     {
-        SimulationResult *result = 0;
+        value::Map *result = 0;
 
         try {
-            RootCoordinator root(modulemgr);
+            devs::RootCoordinator root(modulemgr);
             root.load(*vpz);
             vpz->clear();
             delete vpz;
@@ -220,8 +218,7 @@ public:
 Simulation::Simulation(LogOptions         logoptions,
                        SimulationOptions  simulationoptionts,
                        std::ostream      *output)
-    : mPimpl(new Simulation::Pimpl(package, logoptions,
-                                   simulationoptionts, output))
+    : mPimpl(new Simulation::Pimpl(logoptions, simulationoptionts, output))
 {
 }
 

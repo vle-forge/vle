@@ -28,6 +28,7 @@
 
 #include <apps/vle/OptionGroup.hpp>
 #include <vle/manager/Manager.hpp>
+#include <vle/manager/Simulation.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
@@ -41,12 +42,14 @@
 
 namespace vle {
 
+typedef std::list < std::string > CmdArgs;
+
 void makeAll()
 {
     typedef std::set < std::string > Depends;
     typedef std::map < std::string, Depends > AllDepends;
 
-    AllDepends deps = manager::Manager::depends();
+    AllDepends deps; // = manager::Manager::depends();
     Depends uniq;
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
@@ -93,7 +96,7 @@ void showDepends()
     typedef std::set < std::string > Depends;
     typedef std::map < std::string, Depends > AllDepends;
 
-    AllDepends deps = manager::Manager::depends();
+    AllDepends deps; // = manager::Manager::depends();
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
         if (it->second.empty()) {
@@ -141,7 +144,7 @@ void listPackages()
               std::ostream_iterator < std::string >(std::cerr, "\n"));
 }
 
-void appendToCommandLineList(const char* param, manager::CmdArgs& out)
+void appendToCommandLineList(const char* param, CmdArgs& out)
 {
     using utils::Path;
     using utils::Package;
@@ -169,7 +172,7 @@ void appendToCommandLineList(const char* param, manager::CmdArgs& out)
     throw utils::ArgError(fmt(_("Filename '%1%' does not exist")) % param);
 }
 
-bool cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
+bool cliPackage(int argc, char* argv[], CmdArgs& lst)
 {
     using utils::Package;
     using utils::Path;
@@ -239,7 +242,7 @@ bool cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
     return not stop;
 }
 
-bool cliDirect(int argc, char* argv[], manager::CmdArgs& lst)
+bool cliDirect(int argc, char* argv[], CmdArgs& lst)
 {
     for (int i = 1; i < argc; ++i) {
         appendToCommandLineList(argv[i], lst);
@@ -361,7 +364,7 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    manager::CmdArgs lst;
+    CmdArgs lst;
 
     bool success = true;
     try {
@@ -383,31 +386,56 @@ int main(int argc, char* argv[])
     }
 
     if (success and not lst.empty()) {
-        manager::Manager manager(command.quiet());
         if (command.manager()) {
-            success = manager.runManager(command.allInLocal(),
-                                        command.savevpz(),
-                                        command.processor(),
-                                        lst);
-        //} else if (command.simulator()) {
-            //success = manager.runSimulator(command.processor(),
-                                          //command.port());
+            vle::manager::Manager man(vle::manager::LOG_SUMMARY,
+                                      vle::manager::SIMULATION_NONE |
+                                      vle::manager::SIMULATION_NO_RETURN,
+                                      &std::cout);
+            vle::utils::ModuleManager modules;
+
+            while (not lst.empty()) {
+                vle::manager::Error error;
+                vle::value::Matrix *res = man.run(
+                    new vle::vpz::Vpz(vle::utils::Path::path().
+                                      getPackageExpFile(lst.front())),
+                    modules,
+                    command.processor(),
+                    0,
+                    1,
+                    &error);
+
+                if (error.code) {
+                    std::cerr << fmt(_("Experimental frames `%s' throws error %s")) %
+                        lst.front() % error.message.c_str();
+                    success = false;
+                }
+
+                delete res;
+                lst.pop_front();
+            }
         } else if (command.justRun()) {
-            success = manager.justRun(command.processor(), lst);
-        }
+            vle::manager::Simulation sim(vle::manager::LOG_SUMMARY,
+                                         vle::manager::SIMULATION_NONE |
+                                         vle::manager::SIMULATION_NO_RETURN,
+                                         &std::cout);
+            vle::utils::ModuleManager modules;
 
-        if (manager.quiet()) {
-            manager.close();
-        }
+            while (not lst.empty()) {
+                vle::manager::Error error;
+                vle::value::Map *res = sim.run(
+                    new vle::vpz::Vpz(
+                        vle::utils::Path::path().getPackageExpFile(lst.front())),
+                    modules,
+                    &error);
 
-        if (not success) {
-            if (not manager.filename().empty()) {
-                std::cerr << fmt(_(
-                        "\n/!\\ vle manager error reported in %1%\n")) %
-                    manager.filename();
-            } else {
-                std::cerr << fmt(_(
-                        "\n/!\\ vle manager error reported\n"));
+                if (error.code) {
+                    std::cerr << fmt(_("Simulator `%s' throws error %s")) %
+                        lst.front() % error.message.c_str();
+                    success = false;
+                }
+
+                delete res;
+                lst.pop_front();
             }
         }
 

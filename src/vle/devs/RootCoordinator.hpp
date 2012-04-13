@@ -33,7 +33,6 @@
 #include <vle/utils/Rand.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/oov/OutputMatrix.hpp>
 #include <vle/utils/ModuleManager.hpp>
 
 namespace vle { namespace graph {
@@ -93,24 +92,15 @@ namespace vle { namespace devs {
         { return m_currentTime; }
 
         /**
-         * @brief Return a constant reference to the list of view plugins.
+         * Return an allocated \c value::Map.
+         *
+         * This function build a new \c value::Matrix based on the
+         * observation of the simulation. This function can return
+         * NULL if tablea
+         constant reference to the list of view plugins.
          * @return  Return a constant reference to the list of view plugins.
          */
-        inline const oov::OutputMatrixViewList& outputs() const
-        { return m_outputs; }
-
-        /**
-         * @brief Return a reference to the list of view plugins.
-         * @return  Return a reference to the list of view plugins.
-         */
-        inline oov::OutputMatrixViewList& outputs()
-        { return m_outputs; }
-
-        /**
-         * @brief Update the output matrix of result in the RootCoordinator by
-         * getting from coordinator, all matrix of result.
-         */
-        void refreshOutputs();
+        value::Map * outputs() { return m_result; }
 
         /**
          * @brief Return a reference to the random generator.
@@ -133,13 +123,14 @@ namespace vle { namespace devs {
         /** @brief Store the end date of the simulation. */
         devs::Time          m_end;
 
+        /** @brief Stores the results of the simulation. */
+        value::Map          *m_result;
+
         Coordinator*        m_coordinator;
         graph::Model*       m_root;
 
-        const utils::ModuleManager& m_modulemgr;
 
-        ///! the output of the simulation if plugin are Storage.
-        oov::OutputMatrixViewList m_outputs;
+        const utils::ModuleManager& m_modulemgr;
     };
 
 }} // namespace vle devs

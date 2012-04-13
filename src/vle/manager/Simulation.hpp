@@ -36,11 +36,21 @@
 
 namespace vle { namespace manager {
 
+/**
+ * @c manager::Simulation permits to run single simulation.
+ *
+ * The @c manager::Simulation returns a @c value::Map. The key is the
+ * name of the @c devs::View and the value is a @c value::Matrix or
+ * NULL if the @c value::Matrix is empty.
+ *
+ * @attention You are in charge to freed the simulation result @c
+ * value::Map.
+ */
 class VLE_API Simulation
 {
 public:
-    Simulation(LogOption          logoptions,
-               SimulationOption   simulationoptionts,
+    Simulation(LogOptions         logoptions,
+               SimulationOptions  simulationoptionts,
                std::ostream      *output);
 
     ~Simulation();

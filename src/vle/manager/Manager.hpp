@@ -48,14 +48,13 @@ namespace vle { namespace manager {
  * empty.
  *
  * @attention You are in charge to freed the manager result @c
- * value::Set.
+ * value::Matrix.
  */
 class VLE_API Manager
 {
 public:
-    Manager(const std::string    &package,
-            LogOption             logoptions,
-            SimulationOption      simulationoptions,
+    Manager(LogOptions            logoptions,
+            SimulationOptions     simulationoptions,
             std::ostream         *output);
 
     ~Manager();
@@ -76,9 +75,9 @@ public:
      * the experimental frame. (4, 0, 2) defines four thread by half
      * of experimental frame.
      *
-     * @return
+     * @return A @c value::Matrix to freed.
      */
-    ManagerResult * run(vpz::Vpz             *exp,
+    value::Matrix * run(vpz::Vpz             *exp,
                         utils::ModuleManager &modulemgr,
                         uint32_t              thread,
                         uint32_t              rank,

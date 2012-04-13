@@ -40,113 +40,117 @@
 
 namespace vle { namespace devs {
 
-    class View;
-    class Observable;
+class View;
+class Observable;
+
+/**
+ * Base class of the Stream Writer of the VLE DEVS simulator. This class is
+ * the base of the MemoryStreamWriter and NetStreamWriter deployed as
+ * plugins.
+ *
+ */
+class VLE_API StreamWriter
+{
+public:
+    StreamWriter(const utils::ModuleManager& modulemgr)
+        : m_view(0), m_modulemgr(modulemgr)
+    {
+    }
+
+    ~StreamWriter()
+    {
+    }
+
+    ///
+    ////
+    ///
 
     /**
-     * Base class of the Stream Writer of the VLE DEVS simulator. This class is
-     * the base of the MemoryStreamWriter and NetStreamWriter deployed as
-     * plugins.
-     *
+     * @brief Initialise plugin with specified information.
+     * @param plugin the plugin's name.
+     * @param package the plugin's package.
+     * @param location where the plugin write data.
+     * @param file name of the file.
+     * @param parameters the value attached to the plug-in.
+     * @param time the date when the plug-in was opened.
      */
-    class VLE_API StreamWriter
-    {
-    public:
-        StreamWriter(const utils::ModuleManager& modulemgr)
-            : m_view(0), m_modulemgr(modulemgr)
-        {
-        }
+    void open(const std::string& plugin,
+              const std::string& package,
+              const std::string& location,
+              const std::string& file,
+              value::Value* parameters,
+              const devs::Time& time);
 
-        virtual ~StreamWriter()
-        {
-        }
+    void processNewObservable(Simulator* simulator,
+                              const std::string& portname,
+                              const devs::Time& time,
+                              const std::string& view);
 
-        ///
-        ////
-        ///
+    void processRemoveObservable(Simulator* simulator,
+                                 const std::string& portname,
+                                 const devs::Time& time,
+                                 const std::string& view);
 
-        /**
-         * @brief Initialise plugin with specified information.
-         * @param plugin the plugin's name.
-         * @param package the plugin's package.
-         * @param location where the plugin write data.
-         * @param file name of the file.
-         * @param parameters the value attached to the plug-in.
-         * @param time the date when the plug-in was opened.
-         */
-        virtual void open(const std::string& plugin,
-                          const std::string& package,
-                          const std::string& location,
-                          const std::string& file,
-                          value::Value* parameters,
-                          const devs::Time& time) = 0;
+    /**
+     * @brief Process the devs::ObservationEvent and write it to the Stream.
+     * @param event the devs::ObservationEvent to write.
+     */
+    void process(Simulator* simulator,
+                 const std::string& portname,
+                 const devs::Time& time,
+                 const std::string& view,
+                 value::Value* value);
 
-        virtual void processNewObservable(Simulator* simulator,
-                                          const std::string& portname,
-                                          const devs::Time& time,
-                                          const std::string& view) = 0;
+    /**
+     * Close the output stream.
+     * @return A reference to the oov::Plugin if the plugin is serializable.
+     */
+    void close(const devs::Time& time);
 
-        virtual void processRemoveObservable(Simulator* simulator,
-                                             const std::string& portname,
-                                             const devs::Time& time,
-                                             const std::string& view) = 0;
+    /**
+     * Return a pointer to the \c value::Matrix.
+     *
+     * If the plug-in does not manage \c value::Matrix, this function
+     * returns NULL otherwise, this function return the \c
+     * value::Matrix manager by the plug-in.
+     *
+     * @attention You are in charge of freeing the value::Matrix after
+     * the end of the simulation.
+     */
+    value::Matrix * matrix() const;
 
-        /**
-         * @brief Process the devs::ObservationEvent and write it to the Stream.
-         * @param event the devs::ObservationEvent to write.
-         */
-        virtual void process(Simulator* simulator,
-                             const std::string& portname,
-                             const devs::Time& time,
-                             const std::string& view,
-                             value::Value* value) = 0;
+    ///
+    ////
+    ///
 
-        /**
-         * Close the output stream.
-         * @return A reference to the oov::Plugin if the plugin is serializable.
-         */
-        virtual oov::PluginPtr close(const devs::Time& time) = 0;
+    /**
+     * @brief Get the current View.
+     * @return View attached or NULL if no attanchement.
+     */
+    inline devs::View* getView() const
+    { return m_view; }
 
-        /**
-         * @brief Refresh the output to get a oov::PluginPtr during the
-         * simulation.
-         * @return A reference to the oov::Plugin if the plugin is serializable.
-         */
-        virtual oov::PluginPtr refreshPlugin() = 0;
+    /**
+     * @brief Set the current View.
+     * @param View the new View to attach.
+     */
+    inline void setView(devs::View* View)
+    { m_view = View; }
 
-        ///
-        ////
-        ///
+    const utils::ModuleManager& getModuleManager() const
+    { return m_modulemgr; }
 
-        /**
-         * @brief Get the current View.
-         * @return View attached or NULL if no attanchement.
-         */
-        inline devs::View* getView() const
-        { return m_view; }
+    oov::PluginPtr plugin();
 
-        /**
-         * @brief Set the current View.
-         * @param View the new View to attach.
-         */
-        inline void setView(devs::View* View)
-        { m_view = View; }
+private:
+    StreamWriter(const StreamWriter& other);
+    StreamWriter& operator=(const StreamWriter& other);
 
-        const utils::ModuleManager& getModuleManager() const
-        { return m_modulemgr; }
-
-    private:
-        StreamWriter(const StreamWriter& other);
-        StreamWriter& operator=(const StreamWriter& other);
-
-        devs::View*        m_view;
-        const utils::ModuleManager& m_modulemgr;
-    };
+    devs::View*                 m_view;
+    const utils::ModuleManager& m_modulemgr;
+    oov::PluginPtr              m_plugin;
+};
 
 }} // namespace vle devs
-
-#define DECLARE_STREAMWRITER(x) \
-extern "C" { vle::devs::StreamWriter* makeNewStreamWriter(void) \
-    { return new x(); } }
 
 #endif

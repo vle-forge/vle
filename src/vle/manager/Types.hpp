@@ -49,32 +49,44 @@ namespace vle { namespace manager  {
  */
 struct Error
 {
+    Error()
+        : code(0)
+    {
+    }
+
+    Error(int code, const std::string& message)
+        : code(code), message(message)
+    {
+    }
+
+    Error(const Error &error)
+    : code(error.code), message(error.message)
+    {
+    }
+
+    Error& operator=(const Error &other)
+    {
+        Error tmp(other.code, other.message);
+
+        std::swap(code, tmp.code);
+        std::swap(message, tmp.message);
+
+        return *this;
+    }
+
+    ~Error()
+    {
+    }
+
     int code;
     std::string message;
 };
 
 /**
- * Defines the result of a simulation.
- *
- * \c SimulationResult is a list of simulation results. Results are
- * stored in \c vle::value::Matrix (time * observation). One \c
- * vle::value::Matrix is builded by view.
- */
-typedef vle::value::Set SimulationResult;
-
-/**
- * Defines the result of an experimental frame.
- *
- * \c ManagerResult is a matrix of \c SimulationResult. \c
- * ManagerResult is indexed with replicas and combination indexes.
- */
-typedef vle::value::Matrix ManagerResult;
-
-/**
  * Defines the type of log
  *
  */
-enum LogOption {
+enum LogOptions {
     LOG_NONE    = 0,            /**< Report nothing in output stream. */
     LOG_SUMMARY = 1 << 0,       /**< Report summary of the experimental
                                  * frame (size of the plan, number of
@@ -86,7 +98,7 @@ enum LogOption {
  * Defines the option to launch simulation.
  *
  */
-enum SimulationOption {
+enum SimulationOptions {
     SIMULATION_NONE          = 0, /**< Default option. */
     SIMULATION_SPAWN_PROCESS = 1 << 0, /**< Launch the simulation in a
                                         * subprocess.  */

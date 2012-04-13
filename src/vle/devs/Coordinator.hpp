@@ -285,9 +285,9 @@ public:
     vpz::Observables& observables()
     { return m_modelFactory.observables(); }
 
-    oov::OutputMatrixViewList outputs() const;
-
     bool isStarted() const { return m_isStarted; }
+
+    const ViewList& getViews() const { return m_viewList; }
 
 private:
     Coordinator(const Coordinator& other);
@@ -394,30 +394,6 @@ private:
      */
     inline void updateCurrentTime(const Time& time)
     { m_currentTime = time; }
-
-    /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-    /**
-     * @brief A functor to be use with std::for_each to facilitate
-     * transformation from an ViewList to the OutputMatrixViewList.
-     */
-    struct GetOutputMatrixView
-    {
-        oov::OutputMatrixViewList& lst;
-
-        GetOutputMatrixView(oov::OutputMatrixViewList& lst) : lst(lst) { }
-
-        inline void operator()(const ViewList::value_type& x)
-        {
-            x.second->updatePlugin();
-            if (x.second->plugin().get() and
-                x.second->plugin()->haveOutputMatrix()) {
-                lst.insert(
-                    std::make_pair(x.first,
-                                   x.second->plugin()->outputMatrix()));
-            }
-        }
-    };
 };
 
 }} // namespace vle devs
