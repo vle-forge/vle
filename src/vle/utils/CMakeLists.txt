@@ -10,16 +10,14 @@ add_sources(vlelib Algo.hpp DateTime.cpp DateTime.hpp Deprecated.hpp
   Package.hpp PackageTable.cpp PackageTable.hpp Parser.cpp Parser.hpp
   Path.cpp Path.hpp ${UTILS_SPECIFIC_PATH_IMPL} Preferences.cpp
   Preferences.hpp Rand.cpp Rand.hpp RemoteManager.cpp
-  RemoteManager.hpp SharedLibraryManager.cpp SharedLibraryManager.hpp
-  Socket.cpp Socket.hpp SocketImpl.c Template.cpp Template.hpp
-  Tools.cpp Tools.hpp Trace.cpp Trace.hpp Types.hpp)
+  RemoteManager.hpp Socket.cpp Socket.hpp SocketImpl.c Template.cpp
+  Template.hpp Tools.cpp Tools.hpp Trace.cpp Trace.hpp Types.hpp)
 
 install(FILES Algo.hpp DateTime.hpp Deprecated.hpp DownloadManager.hpp
   Exception.hpp Host.hpp i18n.hpp ModuleManager.hpp Package.hpp
   PackageTable.hpp Parser.hpp Path.hpp Preferences.hpp Rand.hpp
-  RemoteManager.hpp SharedLibraryManager.hpp Socket.hpp SocketImpl.h
-  Template.hpp Tools.hpp Trace.hpp Types.hpp DESTINATION
-  ${VLE_INCLUDE_DIRS}/utils)
+  RemoteManager.hpp Socket.hpp SocketImpl.h Template.hpp Tools.hpp
+  Trace.hpp Types.hpp DESTINATION ${VLE_INCLUDE_DIRS}/utils)
 
 if (HAVE_UNITTESTFRAMEWORK)
   add_subdirectory(test)

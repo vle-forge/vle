@@ -31,7 +31,6 @@
 #include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
-#include <vle/utils/SharedLibraryManager.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
