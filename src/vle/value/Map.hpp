@@ -340,6 +340,14 @@ public:
     { return m_value.empty(); }
 
     /**
+     * Return the number of element in the @c std::map.
+     *
+     * @return An integer [0..MAX_SIZE_T];
+     */
+    inline size_type size() const
+    { return m_value.size(); }
+
+    /**
      * @brief Get the first constant iterator from Map.
      * @return the first iterator.
      */
