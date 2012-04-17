@@ -246,6 +246,9 @@ public:
     const_iterator end() const
     { return m_matrix.end(); }
 
+    size_type size() const
+    { return columns() * rows() ; }
+
     /**
      * @brief Delete all element from the matrix. All value are deleted.
      */
