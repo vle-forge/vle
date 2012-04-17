@@ -396,8 +396,7 @@ int main(int argc, char* argv[])
             while (not lst.empty()) {
                 vle::manager::Error error;
                 vle::value::Matrix *res = man.run(
-                    new vle::vpz::Vpz(vle::utils::Path::path().
-                                      getPackageExpFile(lst.front())),
+                    new vle::vpz::Vpz(lst.front()),
                     modules,
                     command.processor(),
                     0,
@@ -423,8 +422,7 @@ int main(int argc, char* argv[])
             while (not lst.empty()) {
                 vle::manager::Error error;
                 vle::value::Map *res = sim.run(
-                    new vle::vpz::Vpz(
-                        vle::utils::Path::path().getPackageExpFile(lst.front())),
+                    new vle::vpz::Vpz(lst.front()),
                     modules,
                     &error);
 
