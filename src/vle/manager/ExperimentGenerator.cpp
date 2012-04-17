@@ -66,7 +66,8 @@ class ExperimentGenerator::Pimpl
                             throw utils::InternalError(
                                 fmt(_("ExperimentGenerator: bad combination "
                                       "size for the condition `%1%' port "
-                                      "`%2%'")) % it->first % jt->first);
+                                      "`%2%': %3%")) % it->first % jt->first %
+                                conditionsize);
                         }
                     }
                 }
