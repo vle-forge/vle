@@ -184,18 +184,20 @@ static std::list < std::string > prepareEnvironmentVariable()
 
     envp.push_back(buildEnvironmentVariable(
             "BOOST_INCLUDEDIR",
-            Path::buildFilename(Path::path().getPrefixDir(), "include",
-                                "boost"),
+            Path::buildFilename(
+                convertPathTo83Path(Path::path().getPrefixDir()),
+                "include", "boost"),
             false));
 
     envp.push_back(buildEnvironmentVariable(
             "BOOST_LIBRARYDIR",
-            Path::buildFilename(Path::path().getPrefixDir(), "lib"),
-            false));
+            Path::buildFilename(
+                convertPathTo83Path(Path::path().getPrefixDir()),
+                "lib"), false));
 
     envp.push_back(buildEnvironmentVariable(
             "BOOST_ROOT",
-            Path::path().getPrefixDir(),
+            convertPathTo83Path(Path::path().getPrefixDir()),
             false));
 #endif
 
