@@ -39,6 +39,7 @@
 #include <boost/assign.hpp>
 #include <vle/version.hpp>
 #include <vle/value/Double.hpp>
+#include <vle/devs/Time.hpp>
 #include <vle/extension/Decision.hpp>
 
 namespace vmd = vle::extension::decision;
@@ -243,6 +244,13 @@ const char* Plan1 = \
 "            finish = 2451699;\n"
 "        }\n"
 "    }\n"
+"    activity {\n"
+"        id = \"activity8\";\n"
+"        temporal {\n"
+"            start = +10;\n"
+"            finish = +23;\n"
+"        }\n"
+"    }\n"
 "}\n"
 "\n"
 "precedences {\n"
@@ -301,7 +309,7 @@ BOOST_AUTO_TEST_CASE(parser)
     std::cout << fmt("parser: %1%\n") % b;
     std::cout << fmt("graph: %1%\n") % b.activities().precedencesGraph();
 
-    BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)7);
+    BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)8);
     BOOST_REQUIRE_EQUAL(
         b.activities().get("activity2")->second.rules().size(), 2);
     BOOST_REQUIRE_EQUAL(
@@ -323,4 +331,23 @@ BOOST_AUTO_TEST_CASE(test_stringdates)
     BOOST_REQUIRE_EQUAL(act6.start(),2451698);
     BOOST_REQUIRE_EQUAL(act6.finish(),act7.finish());
     BOOST_REQUIRE_EQUAL(act6.finish(),2451699);
+}
+
+BOOST_AUTO_TEST_CASE(test_relativedates)
+{
+    vle::value::init();
+    {
+        vmd::ex::KnowledgeBase b;
+        b.plan().fill(std::string(vmd::ex::Plan1), 0);
+        const vmd::Activity& act8 = b.activities().get("activity8")->second;
+        BOOST_REQUIRE_EQUAL(act8.start(),10.0);
+        BOOST_REQUIRE_EQUAL(act8.finish(),23.0);
+    }
+    {
+        vmd::ex::KnowledgeBase b;
+        b.plan().fill(std::string(vmd::ex::Plan1), 5);
+        const vmd::Activity& act8 = b.activities().get("activity8")->second;
+        BOOST_REQUIRE_EQUAL(act8.start(),15.0);
+        BOOST_REQUIRE_EQUAL(act8.finish(),28.0);
+    }
 }

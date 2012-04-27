@@ -48,7 +48,7 @@ Plan::Plan(KnowledgeBase& kb, const std::string& buffer)
     try {
         std::istringstream in(buffer);
         utils::Parser parser(in);
-        fill(parser.root());
+        fill(parser.root(), 0);
     } catch (const std::exception& e) {
         throw utils::ArgError(fmt(_("Decision plan error in %1%")) % e.what());
     }
@@ -59,7 +59,28 @@ Plan::Plan(KnowledgeBase& kb, std::istream& stream)
 {
     try {
         utils::Parser parser(stream);
-        fill(parser.root());
+        fill(parser.root(), 0);
+    } catch (const std::exception& e) {
+        throw utils::ArgError(fmt(_("Decision plan error: %1%")) % e.what());
+    }
+}
+
+void Plan::fill(const std::string& buffer, const devs::Time& loadTime)
+{
+    try {
+        std::istringstream in(buffer);
+        utils::Parser parser(in);
+        fill(parser.root(), loadTime);
+    } catch (const std::exception& e) {
+        throw utils::ArgError(fmt(_("Decision plan error in %1%")) % e.what());
+    }
+}
+
+void Plan::fill(std::istream& stream, const devs::Time& loadTime)
+{
+    try {
+        utils::Parser parser(stream);
+        fill(parser.root(), loadTime);
     } catch (const std::exception& e) {
         throw utils::ArgError(fmt(_("Decision plan error: %1%")) % e.what());
     }
@@ -70,7 +91,7 @@ void Plan::fill(const std::string& buffer)
     try {
         std::istringstream in(buffer);
         utils::Parser parser(in);
-        fill(parser.root());
+        fill(parser.root(), 0);
     } catch (const std::exception& e) {
         throw utils::ArgError(fmt(_("Decision plan error in %1%")) % e.what());
     }
@@ -80,13 +101,13 @@ void Plan::fill(std::istream& stream)
 {
     try {
         utils::Parser parser(stream);
-        fill(parser.root());
+        fill(parser.root(), 0);
     } catch (const std::exception& e) {
         throw utils::ArgError(fmt(_("Decision plan error: %1%")) % e.what());
     }
 }
 
-void Plan::fill(const utils::Block& root)
+void Plan::fill(const utils::Block& root, const devs::Time& loadTime)
 {
     utils::Block::BlocksResult mainrules, mainactivities, mainprecedences;
 
@@ -99,23 +120,23 @@ void Plan::fill(const utils::Block& root)
     for (it = mainrules.first; it != mainrules.second; ++it) {
         utils::Block::BlocksResult rules;
         rules = it->second.blocks.equal_range("rule");
-        fillRules(rules);
+        fillRules(rules, loadTime);
     }
 
     for (it = mainactivities.first; it != mainactivities.second; ++it) {
         utils::Block::BlocksResult activities;
         activities = it->second.blocks.equal_range("activity");
-        fillActivities(activities);
+        fillActivities(activities, loadTime);
     }
 
     for (it = mainprecedences.first; it != mainprecedences.second; ++it) {
         utils::Block::BlocksResult precedences;
         precedences = it->second.blocks.equal_range("precedence");
-        fillPrecedences(precedences);
+        fillPrecedences(precedences, loadTime);
     }
 }
 
-void Plan::fillRules(const utils::Block::BlocksResult& rules)
+void Plan::fillRules(const utils::Block::BlocksResult& rules, const devs::Time&)
 {
     for (UBB::const_iterator it = rules.first; it != rules.second; ++it) {
         const utils::Block& block = it->second;
@@ -135,7 +156,8 @@ void Plan::fillRules(const utils::Block::BlocksResult& rules)
     }
 }
 
-void Plan::fillActivities(const utils::Block::BlocksResult& acts)
+void Plan::fillActivities(const utils::Block::BlocksResult& acts,
+        const devs::Time& loadTime)
 {
     for (UBB::const_iterator it = acts.first; it != acts.second; ++it) {
         const utils::Block& block = it->second;
@@ -144,6 +166,8 @@ void Plan::fillActivities(const utils::Block::BlocksResult& acts)
         if (id.first == id.second) {
             throw utils::ArgError(_("Decision: activity needs id"));
         }
+
+
 
         Activity& act = mActivities.add(id.first->second, Activity());
 
@@ -172,23 +196,24 @@ void Plan::fillActivities(const utils::Block::BlocksResult& acts)
 
         UB::BlocksResult temporal = block.blocks.equal_range("temporal");
         if (temporal.first != temporal.second) {
-            fillTemporal(temporal, act);
+            fillTemporal(temporal, act, loadTime);
         }
     }
 }
 
 void Plan::fillTemporal(const utils::Block::BlocksResult& temps,
-                        Activity& activity)
+                        Activity& activity,
+                        const devs::Time& loadTime)
 {
     for (UBB::const_iterator it = temps.first; it != temps.second; ++it) {
         const utils::Block& block = it->second;
 
-        DateResult start = getDate("start",block);
-        DateResult mins = getDate("minstart",block);
-        DateResult maxs = getDate("maxstart",block);
-        DateResult finish = getDate("finish",block);
-        DateResult minf = getDate("minfinish",block);
-        DateResult maxf = getDate("maxfinish",block);
+        DateResult start = getDate("start",block,loadTime);
+        DateResult mins = getDate("minstart",block,loadTime);
+        DateResult maxs = getDate("maxstart",block,loadTime);
+        DateResult finish = getDate("finish",block,loadTime);
+        DateResult minf = getDate("minfinish",block,loadTime);
+        DateResult maxf = getDate("maxfinish",block,loadTime);
 
         if (start.first) {
             if (finish.first) {
@@ -256,7 +281,8 @@ void Plan::fillTemporal(const utils::Block::BlocksResult& temps,
     }
 }
 
-void Plan::fillPrecedences(const utils::Block::BlocksResult& preds)
+void Plan::fillPrecedences(const utils::Block::BlocksResult& preds,
+        const devs::Time&)
 {
     for (UBB::const_iterator it = preds.first; it != preds.second; ++it) {
         const utils::Block& block = it->second;
@@ -309,13 +335,20 @@ void Plan::fillPrecedences(const utils::Block::BlocksResult& preds)
 }
 
 Plan::DateResult Plan::getDate(const std::string& dateName,
-               const utils::Block& block) const
+               const utils::Block& block, const devs::Time& loadTime) const
 {
+
     UB::RealsResult dateReal = block.reals.equal_range(dateName);
     UB::StringsResult dateString = block.strings.equal_range(dateName);
+    UB::RelativeRealsResult dateRelative =
+            block.relativeReals.equal_range(dateName);
+
     bool hasRealDate = dateReal.first != dateReal.second;
     bool hasStringDate = dateString.first != dateString.second;
-    if(hasRealDate && hasStringDate){
+    bool hasRelativeDate = dateRelative.first != dateRelative.second;
+    if((hasRealDate && hasStringDate) ||
+            (hasRealDate && hasRelativeDate) ||
+            (hasStringDate && hasRelativeDate)) {
         throw utils::ArgError(fmt(_(
          "Decision: date '%1%' should not be given twice ")) % dateName);
     }
@@ -324,6 +357,9 @@ Plan::DateResult Plan::getDate(const std::string& dateName,
     } else if (hasStringDate){
         return DateResult(true,devs::Time(
          (int) utils::DateTime::toJulianDayNumber(dateString.first->second)));
+    } else if (hasRelativeDate){
+        return DateResult(true,
+                loadTime + devs::Time((double) dateRelative.first->second));
     } else {
         return DateResult(false,devs::Time::infinity);
     }
