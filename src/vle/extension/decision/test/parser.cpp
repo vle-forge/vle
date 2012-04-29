@@ -248,7 +248,7 @@ const char* Plan1 = \
 "        id = \"activity8\";\n"
 "        temporal {\n"
 "            start = +10;\n"
-"            finish = +23;\n"
+"            finish = +23.5;\n"
 "        }\n"
 "    }\n"
 "}\n"
@@ -341,13 +341,13 @@ BOOST_AUTO_TEST_CASE(test_relativedates)
         b.plan().fill(std::string(vmd::ex::Plan1), 0);
         const vmd::Activity& act8 = b.activities().get("activity8")->second;
         BOOST_REQUIRE_EQUAL(act8.start(),10.0);
-        BOOST_REQUIRE_EQUAL(act8.finish(),23.0);
+        BOOST_REQUIRE_EQUAL(act8.finish(),23.5);
     }
     {
         vmd::ex::KnowledgeBase b;
         b.plan().fill(std::string(vmd::ex::Plan1), 5);
         const vmd::Activity& act8 = b.activities().get("activity8")->second;
         BOOST_REQUIRE_EQUAL(act8.start(),15.0);
-        BOOST_REQUIRE_EQUAL(act8.finish(),28.0);
+        BOOST_REQUIRE_EQUAL(act8.finish(),28.5);
     }
 }
