@@ -1,3 +1,87 @@
+VLE 1.0.3
+=========
+
+- vle
+
+  - win32: fix BOOST directory during package processes
+
+    The variable BOOST_ROOT, BOOST_LIBRARYDIR and BOOST_INCLUDEDIR are set via
+    setenv function to classical Win32 path (i.e. with whitespace). However, it
+    seems that we require 8.3 names to enforce the compatibility between Ming32
+    and CMake scripts.
+
+    Thus, we override the environment variables BOOST_ROOT, BOOST_LIBRARYDIR and
+    BOOST_INCLUDEDIR with 8.3 name instead of classical names.
+
+- libvledevs: fix warning in EventList push_back function
+
+    The EventList class inherits of the std::vector. CLang compiler needs to
+    specify completely the push_back function.
+
+- libvleextension:
+
+  - ext/de: remove an unused_value
+
+    We remove an expression result unused in the Multiple class.
+
+  - ext/dec: allow parsing real with dots
+
+    One can now specify reals with utils::Parser that are not integers:
+    temporal {
+      start = +10;
+      finish = +23.5;
+    }
+
+  - ext/dec: Add relative date to decision plans
+
+    In decision plans, dates can now be declared as relative to the time the
+    agent loads the plan. E.g, this following interval is equivalent to
+    [loadTime+10; loadTime+23] :
+        temporal {
+          start = +10;
+          finish = +23;
+        }
+
+  - ext/dec: String dates for decision files
+
+    The dates given in the decision file can now be given in string format. The
+    two following temporal blocks have the same behavior :
+    temporal {
+      start = 2451698;
+      finish =  "2000-06-03";
+    }
+    temporal {
+      start = "2000-06-02";
+      finish = 2451699;
+    }
+
+  - ext/dec: fix observation of decision agents
+
+    Observation of activities and rules in decision extension is fixed.
+
+  - ext/fsa: fix message in StatechartDbg
+
+    When receiving an empty event, a bad formated message was provided.
+    (Closes: #3496295)
+
+  - ext/fsa: assign a complete identifier to insert function
+
+    The boost::assign::insert function is used by many FDDevs and Moore
+    functions. CLang does not have the complete type during the compilation time
+    without the boost::assign namespace.
+
+- gvle: fix binding reference member to stack allocated
+
+  The std::string parameter of InteractiveTypeBox bind reference member
+  'mCurrentValue' to stack allocated parameter. We fix the problem by using
+  reference parameter.
+
+- oov: Add virtual destructor to FileType
+
+  The FileType class is an interface. The subclass Rdata, CSV and Text need to
+  have a virtual destructor.
+
+
 VLE 1.0.2
 =========
 
