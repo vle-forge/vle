@@ -37,7 +37,7 @@
 
 namespace vle { namespace devs {
 
-Simulator::Simulator(vpz::AtomicGraphModel* atomic) :
+Simulator::Simulator(vpz::AtomicModel* atomic) :
     m_dynamics(0),
     m_atomicModel(atomic)
 {
@@ -62,7 +62,7 @@ void Simulator::clear()
 void
 Simulator::updateSimulatorTargets(
         const std::string& port,
-        std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators)
+        std::map < vpz::AtomicModel*, devs::Simulator* >& simulators)
 {
     mTargets.erase(port);
 
@@ -76,9 +76,9 @@ Simulator::updateSimulatorTargets(
         for (vpz::ModelPortList::iterator it = result.begin(); it !=
                 result.end(); ++it) {
 
-            std::map < vpz::AtomicGraphModel*, devs::Simulator* >::iterator target;
+            std::map < vpz::AtomicModel*, devs::Simulator* >::iterator target;
             target = simulators.find(
-                    reinterpret_cast < vpz::AtomicGraphModel*>(it->first));
+                    reinterpret_cast < vpz::AtomicModel*>(it->first));
 
             if (target == simulators.end()) {
                 mTargets.erase(port);
@@ -94,7 +94,7 @@ Simulator::updateSimulatorTargets(
 std::pair < Simulator::iterator, Simulator::iterator >
 Simulator::targets(
     const std::string& port,
-    std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators)
+    std::map < vpz::AtomicModel*, devs::Simulator* >& simulators)
 {
     std::pair < iterator, iterator > x = mTargets.equal_range(port);
 

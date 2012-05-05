@@ -1,5 +1,5 @@
 /*
- * @file vle/vpz/GraphModel.hpp
+ * @file vle/vpz/Model.hpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -26,8 +26,8 @@
  */
 
 
-#ifndef VLE_GRAPH_MODEL_HPP
-#define VLE_GRAPH_MODEL_HPP
+#ifndef VLE_VPZ_BASEMODEL_HPP
+#define VLE_VPZ_BASEMODEL_HPP
 
 #include <vle/vpz/ModelPortList.hpp>
 #include <vle/DllDefines.hpp>
@@ -39,21 +39,21 @@
 
 namespace vle { namespace vpz {
 
-    class GraphModel;
-    class AtomicGraphModel;
+    class BaseModel;
+    class AtomicModel;
     class CoupledModel;
 
     typedef std::map < std::string, ModelPortList > ConnectionList;
     typedef std::set < std::string > PortList;
-    typedef std::vector < AtomicGraphModel * > AtomicModelVector;
+    typedef std::vector < AtomicModel * > AtomicModelVector;
     typedef std::vector < CoupledModel* > CoupledModelVector;
-    typedef std::map < std::string, GraphModel* > ModelList;
+    typedef std::map < std::string, BaseModel* > ModelList;
 
     /**
      * @brief The DEVS model base class.
      *
      */
-    class VLE_API GraphModel
+    class VLE_API BaseModel
     {
     public:
         /**
@@ -63,22 +63,22 @@ namespace vle { namespace vpz {
          * @param parent the parent of this model, can be null if parent does
          * not exist.
          */
-        GraphModel(const std::string& name, CoupledModel* parent);
+        BaseModel(const std::string& name, CoupledModel* parent);
 
-        GraphModel(const GraphModel& mdl);
+        BaseModel(const BaseModel& mdl);
 
-        void swap(GraphModel& mdl);
+        void swap(BaseModel& mdl);
 
-        virtual GraphModel* clone() const = 0;
+        virtual BaseModel* clone() const = 0;
 
-        virtual ~GraphModel() { }
+        virtual ~BaseModel() { }
 
         ////
         //// Base class.
         ////
 
         /**
-         * @brief Return true if this is AtomicGraphModel. Default is false.
+         * @brief Return true if this is AtomicModel. Default is false.
          * @return true if Model is atomic, false otherwise.
          */
         virtual bool isAtomic() const
@@ -86,7 +86,7 @@ namespace vle { namespace vpz {
 
         /**
          * @brief Return true if this is CoupledModel. Default is false.
-         * @return true if GraphModel is coupled, false otherwise.
+         * @return true if Model is coupled, false otherwise.
          */
         virtual bool isCoupled() const
         { return false; }
@@ -97,7 +97,7 @@ namespace vle { namespace vpz {
          * @return model founded, otherwise 0.
          * @deprecated
          */
-        virtual GraphModel* findModel(const std::string& name) const = 0;
+        virtual BaseModel* findModel(const std::string& name) const = 0;
 
         /**
          * Find a model, atomic or coupled, thanks to a formatted model path.
@@ -105,7 +105,7 @@ namespace vle { namespace vpz {
          * (use format "coupled1,coupled2,atomic")
          * @return model founded, otherwise 0.
          */
-        GraphModel* findModelFromPath(const std::string& pathname) const;
+        BaseModel* findModelFromPath(const std::string& pathname) const;
 
 
         /**
@@ -144,10 +144,10 @@ namespace vle { namespace vpz {
         /**
          * @brief change the name of the specified model to the new name. if mdl
          * have a parent, the this coupled model change is model list.
-         * @param mdl vpz::GraphModel to change.
+         * @param mdl vpz::Model to change.
          * @param newmane the new name.
          */
-        static void rename(GraphModel* mdl, const std::string& newmane);
+        static void rename(BaseModel* mdl, const std::string& newmane);
 
         /**
          * @brief build a std::string based on the construction of the
@@ -184,10 +184,10 @@ namespace vle { namespace vpz {
          * devs graph hierarchy.
          * @param lst the list of coupled model from the another devs graph.
          * @param name the model to find.
-         * @return A reference to the AtomicGraphModel found.
+         * @return A reference to the AtomicModel found.
          */
-        GraphModel* getModel(const CoupledModelVector& lst,
-                        const std::string& name);
+        BaseModel* getModel(const CoupledModelVector& lst,
+                            const std::string& name);
 
         /**
          * @brief Get the parent node of this model. Can be null if parent does
@@ -301,14 +301,14 @@ namespace vle { namespace vpz {
         void writePortListXML(std::ostream& out) const;
 
         /**
-         * return cast of a Model to an AtomicGraphModel. If Model is not an
-         * AtomicGraphModel, return NULL
+         * return cast of a Model to an AtomicModel. If Model is not an
+         * AtomicModel, return NULL
          *
-         * @param m Model to cast to AtomicGraphModel
+         * @param m Model to cast to AtomicModel
          *
-         * @return a cast AtomicGraphModel or NULL if error
+         * @return a cast AtomicModel or NULL if error
          */
-        static AtomicGraphModel* toAtomic(GraphModel* m);
+        static AtomicModel* toAtomic(BaseModel* m);
 
         /**
          * return cast of a Model to a CoupledModel. If Model is not a
@@ -318,10 +318,10 @@ namespace vle { namespace vpz {
          *
          * @return a cast CoupledModel or NULL if error
          */
-        static CoupledModel* toCoupled(GraphModel* m);
+        static CoupledModel* toCoupled(BaseModel* m);
 
         /**
-         * @brief Cast the current vpz::GraphModel to vpz::CoupledModel.
+         * @brief Cast the current vpz::Model to vpz::CoupledModel.
          *
          * @return A vpz::CoupledModel pointer or 0 if this model is not a
          * coupled model.
@@ -329,15 +329,15 @@ namespace vle { namespace vpz {
         CoupledModel* toCoupled() { return toCoupled(this); }
 
         /**
-         * @brief Cast the current GraphModel to AtomicGraphModel.
+         * @brief Cast the current Model to AtomicModel.
          *
-         * @return A vpz::AtomicGraphModel pointer of 0 if this model is not an
+         * @return A vpz::AtomicModel pointer of 0 if this model is not an
          * atomic model.
          */
-        AtomicGraphModel* toAtomic() { return toAtomic(this); }
+        AtomicModel* toAtomic() { return toAtomic(this); }
 
-        static void getAtomicModelList(GraphModel* model,
-                                       std::vector < AtomicGraphModel* >& list);
+        static void getAtomicModelList(BaseModel* model,
+                                       std::vector < AtomicModel* >& list);
 
         /**
          * return true if model m is present in Model List
@@ -347,7 +347,7 @@ namespace vle { namespace vpz {
          *
          * @return true if found, else false
          */
-        static bool isInList(const ModelList& lst, GraphModel* m);
+        static bool isInList(const ModelList& lst, BaseModel* m);
 
         ////
         //// Graphics position to replace GModel declaration.
@@ -454,22 +454,22 @@ namespace vle { namespace vpz {
 
         struct AddInputPort
         {
-            AddInputPort(GraphModel& mdl) : mdl(mdl) { }
+            AddInputPort(BaseModel& mdl) : mdl(mdl) { }
 
             inline void operator()(const std::string& name) const
             { mdl.addInputPort(name); }
 
-            GraphModel& mdl;
+            BaseModel& mdl;
         };
 
         struct AddOutputPort
         {
-            AddOutputPort(GraphModel& mdl) : mdl(mdl) { }
+            AddOutputPort(BaseModel& mdl) : mdl(mdl) { }
 
             inline void operator()(const std::string& name) const
             { mdl.addOutputPort(name); }
 
-            GraphModel& mdl;
+            BaseModel& mdl;
         };
 
         struct CopyWithoutConnection
@@ -555,9 +555,9 @@ namespace vle { namespace vpz {
          * @brief Default constructor, position (0,0) size (0,0) and parent to
          * null.
          */
-        GraphModel();
+        BaseModel();
 
-        GraphModel& operator=(const GraphModel& mdl);
+        BaseModel& operator=(const BaseModel& mdl);
 
         std::string     m_name;
     };

@@ -29,7 +29,7 @@
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <gtkmm/stock.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/scrolledwindow.h>
@@ -43,7 +43,7 @@ namespace vle
 namespace gvle {
 
 ModelDescriptionBox::ModelDescriptionBox(const set < string > & lst,
-        vpz::GraphModel * model) :
+        vpz::BaseModel * model) :
         Gtk::Dialog(_("Model Description"), true, true),
         m_lst(lst),
         m_model(model)

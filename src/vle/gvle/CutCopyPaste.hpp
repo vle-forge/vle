@@ -99,8 +99,8 @@ private:
      */
     void clone(vpz::ModelList& lst_graph_clone, int num);
 
-    void clone_atomic(vpz::GraphModel* clone);
-    void clone_coupled(vpz::GraphModel* model, vpz::GraphModel* clone);
+    void clone_atomic(vpz::BaseModel* clone);
+    void clone_coupled(vpz::BaseModel* model, vpz::BaseModel* clone);
 
     GVLE*                       mGVLE;
 

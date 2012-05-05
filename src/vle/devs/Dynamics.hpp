@@ -80,7 +80,7 @@ namespace vle { namespace devs {
     class VLE_API DynamicsInit
     {
     public:
-        DynamicsInit(const vpz::AtomicGraphModel& model,
+        DynamicsInit(const vpz::AtomicModel& model,
                      PackageId packageid)
             : m_model(model), m_packageid(packageid)
         {}
@@ -88,11 +88,11 @@ namespace vle { namespace devs {
         virtual ~DynamicsInit()
         {}
 
-        const vpz::AtomicGraphModel& model() const { return m_model; }
+        const vpz::AtomicModel& model() const { return m_model; }
         PackageId packageid() const { return m_packageid; }
 
     private:
-        const vpz::AtomicGraphModel&       m_model;
+        const vpz::AtomicModel&       m_model;
         PackageId                       m_packageid;
     };
 
@@ -234,7 +234,7 @@ namespace vle { namespace devs {
          * dynamics
 	 * @return pointer on the atomic model
 	 */
-        inline const vle::vpz::AtomicGraphModel& getModel() const
+        inline const vle::vpz::AtomicModel& getModel() const
         { return m_model; }
 
 	/**
@@ -463,7 +463,7 @@ namespace vle { namespace devs {
         inline PackageId packageid() const { return m_packageid; }
 
     private:
-        const vpz::AtomicGraphModel& m_model; /**< A constant reference to the
+        const vpz::AtomicModel& m_model; /**< A constant reference to the
                                              atomic model node of the graph.
                                                */
 

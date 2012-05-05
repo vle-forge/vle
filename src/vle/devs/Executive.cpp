@@ -34,7 +34,7 @@ void Executive::addObservableToView(const std::string& model,
                                     const std::string& portname,
                                     const std::string& view)
 {
-    vpz::GraphModel* mdl = cpled()->findModel(model);
+    vpz::BaseModel* mdl = cpled()->findModel(model);
 
     if (mdl == 0) {
         throw utils::DevsGraphError(fmt(
@@ -47,12 +47,12 @@ void Executive::addObservableToView(const std::string& model,
                   "model %1%")) % model);
     }
 
-    vpz::AtomicGraphModel* atom = mdl->toAtomic();
+    vpz::AtomicModel* atom = mdl->toAtomic();
 
     m_coordinator.addObservableToView(atom, portname, view);
 }
 
-const vpz::AtomicGraphModel*
+const vpz::AtomicModel*
 Executive::createModel(const std::string& name,
                            const std::vector < std::string >& inputs,
                            const std::vector < std::string >& outputs,
@@ -60,7 +60,7 @@ Executive::createModel(const std::string& name,
                            const std::vector < std::string >& conditions,
                            const std::string& observable)
 {
-    vpz::AtomicGraphModel* model = new vpz::AtomicGraphModel(name, cpled());
+    vpz::AtomicModel* model = new vpz::AtomicModel(name, cpled());
     std::vector < std::string >::const_iterator it;
 
     for (it = inputs.begin(); it != inputs.end(); ++it) {
@@ -75,7 +75,7 @@ Executive::createModel(const std::string& name,
     return model;
 }
 
-const vpz::GraphModel*
+const vpz::BaseModel*
 Executive::createModelFromClass(const std::string& classname,
                                 const std::string& modelname)
 {
@@ -86,7 +86,7 @@ void Executive::delModel(const std::string& modelname)
 {
     std::vector < std::pair < Simulator*, std::string > > toupdate;
 
-    vpz::GraphModel* mdl = cpled()->findModel(modelname);
+    vpz::BaseModel* mdl = cpled()->findModel(modelname);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -103,7 +103,7 @@ void Executive::delModel(const std::string& modelname)
 void Executive::renameModel(const std::string& oldname,
                             const std::string& newname)
 {
-    vpz::GraphModel* mdl = cpled()->findModel(oldname);
+    vpz::BaseModel* mdl = cpled()->findModel(oldname);
     if (mdl == 0) {
         throw utils::DevsGraphError(
             fmt(_("Executive error: rename `%1%' into `%2%' failed, `%1%' "
@@ -117,7 +117,7 @@ void Executive::renameModel(const std::string& oldname,
     }
 
     try {
-        vpz::GraphModel::rename(mdl, newname);
+        vpz::BaseModel::rename(mdl, newname);
     } catch (const std::exception& e) {
         throw utils::DevsGraphError(
             fmt(_("Executive error: rename `%1%' into `%2%' failed: `%3%' ")) %
@@ -131,9 +131,9 @@ void Executive::addConnection(const std::string& srcModelName,
                               const std::string& dstPortName)
 {
     const std::string& modelName(coupledmodelName());
-    vpz::GraphModel* srcModel = (modelName == srcModelName)?
+    vpz::BaseModel* srcModel = (modelName == srcModelName)?
         cpled() : cpled()->findModel(srcModelName);
-    vpz::GraphModel* dstModel = (modelName == dstModelName)?
+    vpz::BaseModel* dstModel = (modelName == dstModelName)?
         cpled() : cpled()->findModel(dstModelName);
 
     if (srcModel and dstModel) {
@@ -173,8 +173,8 @@ void Executive::removeConnection(const std::string& srcModelName,
                                  const std::string& dstPortName)
 {
     const std::string& modelName(coupledmodelName());
-    vpz::GraphModel* srcModel = cpled()->findModel(srcModelName);
-    vpz::GraphModel* dstModel = cpled()->findModel(dstModelName);
+    vpz::BaseModel* srcModel = cpled()->findModel(srcModelName);
+    vpz::BaseModel* dstModel = cpled()->findModel(dstModelName);
 
     if (not srcModel and srcModelName == modelName) {
         srcModel = cpled();
@@ -209,7 +209,7 @@ void Executive::removeConnection(const std::string& srcModelName,
 void Executive::addInputPort(const std::string& modelName,
                              const std::string& portName)
 {
-    vpz::GraphModel* mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -222,7 +222,7 @@ void Executive::addInputPort(const std::string& modelName,
 void Executive::addOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
-    vpz::GraphModel* mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -235,7 +235,7 @@ void Executive::addOutputPort(const std::string& modelName,
 void Executive::removeInputPort(const std::string& modelName,
                                 const std::string& portName)
 {
-    vpz::GraphModel* mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -251,7 +251,7 @@ void Executive::removeInputPort(const std::string& modelName,
 void Executive::removeOutputPort(const std::string& modelName,
                                  const std::string& portName)
 {
-    vpz::GraphModel* mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -285,14 +285,14 @@ void Executive::dump(std::ostream& out, const std::string& name) const
         f.project().dynamics().add(vpz::Dynamic("unknow"));
     }
 
-    std::vector < vpz::AtomicGraphModel* > lst;
-    vpz::GraphModel::getAtomicModelList(f.project().model().model(), lst);
+    // std::vector < vpz::AtomicModel* > lst;
+    // vpz::BaseModel::getAtomicModelList(f.project().model().model(), lst);
 
-    for (std::vector < vpz::AtomicGraphModel* >::iterator it = lst.begin();
-         it != lst.end(); ++it) {
-        f.project().model().atomicModels().add(
-            *it, vpz::AtomicModel("", "unknow", ""));
-    }
+    // for (std::vector < vpz::AtomicModel* >::iterator it = lst.begin();
+    //      it != lst.end(); ++it) {
+    //     f.project().model().atomicModels().add(
+    //         *it, vpz::AtomicModelTemp("", "unknow", ""));
+    // }
 
     f.write(out);
 

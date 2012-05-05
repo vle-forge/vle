@@ -142,9 +142,9 @@ void CompleteViewDrawingArea::preComputeConnection(int xs, int ys,
     mConnections.push_back(con);
 }
 
-void CompleteViewDrawingArea::preComputeConnection(vpz::GraphModel* src,
+void CompleteViewDrawingArea::preComputeConnection(vpz::BaseModel* src,
                                            const std::string& portsrc,
-                                           vpz::GraphModel* dst,
+                                           vpz::BaseModel* dst,
                                            const std::string& portdst)
 {
     int xs, ys, xd, yd;
@@ -209,9 +209,9 @@ ViewDrawingArea::StraightLine CompleteViewDrawingArea::computeConnection(
     return list;
 }
 
-void CompleteViewDrawingArea::computeConnection(vpz::GraphModel* src,
+void CompleteViewDrawingArea::computeConnection(vpz::BaseModel* src,
                                         const std::string& portsrc,
-                                        vpz::GraphModel* dst,
+                                        vpz::BaseModel* dst,
                                         const std::string& portdst,
                                         int index)
 {
@@ -232,7 +232,7 @@ void CompleteViewDrawingArea::computeConnection(vpz::GraphModel* src,
     }
 }
 
-void CompleteViewDrawingArea::drawChildrenModel(vpz::GraphModel* model,
+void CompleteViewDrawingArea::drawChildrenModel(vpz::BaseModel* model,
                                         const Gdk::Color& color)
 {
     setColor(color);
@@ -245,7 +245,7 @@ void CompleteViewDrawingArea::drawChildrenModel(vpz::GraphModel* model,
     drawChildrenPorts(model, color);
 }
 
-void CompleteViewDrawingArea::drawChildrenPorts(vpz::GraphModel* model,
+void CompleteViewDrawingArea::drawChildrenPorts(vpz::BaseModel* model,
                                         const Gdk::Color& color)
 {
     const vpz::ConnectionList ipl =  model->getInputPortList();
@@ -362,7 +362,7 @@ void CompleteViewDrawingArea::getCurrentModelOutPosition(const std::string& port
     (mCurrent->getOutputPortIndex(port) + 1);
 }
 
-void CompleteViewDrawingArea::getModelInPosition(vpz::GraphModel* model,
+void CompleteViewDrawingArea::getModelInPosition(vpz::BaseModel* model,
                                          const std::string& port,
                                          int& x, int& y)
 {
@@ -371,7 +371,7 @@ void CompleteViewDrawingArea::getModelInPosition(vpz::GraphModel* model,
         (model->getInputPortIndex(port) + 1);
 }
 
-void CompleteViewDrawingArea::getModelOutPosition(vpz::GraphModel* model,
+void CompleteViewDrawingArea::getModelOutPosition(vpz::BaseModel* model,
                                           const std::string& port,
                                           int& x, int& y)
 {
@@ -387,7 +387,7 @@ bool CompleteViewDrawingArea::on_button_press_event(GdkEventButton* event)
     mMouse.set_y((int)(event->y / mZoom));
     bool shiftOrControl = (event->state & GDK_SHIFT_MASK) or(event->state &
                                                              GDK_CONTROL_MASK);
-    vpz::GraphModel* model = mCurrent->find(mMouse.get_x(), mMouse.get_y());
+    vpz::BaseModel* model = mCurrent->find(mMouse.get_x(), mMouse.get_y());
 
     switch (currentbutton) {
     case GVLE::VLE_GVLE_POINTER:
@@ -465,7 +465,7 @@ bool CompleteViewDrawingArea::on_button_release_event(GdkEventButton* event)
                 for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
                      y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
                      ++y) {
-                    vpz::GraphModel* model = mCurrent->find(x, y);
+                    vpz::BaseModel* model = mCurrent->find(x, y);
                     if (model)
                         if (not mView->existInSelectedModels(model))
                             mView->addModelToSelectedModels(model);
@@ -478,7 +478,7 @@ bool CompleteViewDrawingArea::on_button_release_event(GdkEventButton* event)
         }
 
         if (mView->getAllSelectedModels().size() == 1) {
-            vpz::GraphModel* mod = mView->getFirstSelectedModels();
+            vpz::BaseModel* mod = mView->getFirstSelectedModels();
             if (mView->isClassView()) {
                 mGVLE->getModelTreeBox()->selectNone();
                 mGVLE->getModelClassBox()->showRow(mod);

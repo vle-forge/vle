@@ -71,7 +71,7 @@ ImportWidget::ImportWidget(ImportModelBox* parent, vpz::Base* base):
     pack_start(mImage);
 }
 
-ImportWidget::ImportWidget(ImportModelBox* parent, vpz::GraphModel* atom):
+ImportWidget::ImportWidget(ImportModelBox* parent, vpz::BaseModel* atom):
         Gtk::HBox(),
         mParent(parent),
         mBase(0),
@@ -683,10 +683,10 @@ void ImportModelBox::rename_view(vpz::Vpz* src, std::string old_name,
     }
 }
 
-void ImportModelBox::rename_model(vpz::GraphModel* old_model,
+void ImportModelBox::rename_model(vpz::BaseModel* old_model,
                                   std::string new_name)
 {
-    vpz::GraphModel::rename(old_model, new_name);
+    vpz::BaseModel::rename(old_model, new_name);
 }
 
 }

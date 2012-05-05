@@ -27,6 +27,7 @@
 
 
 #include <vle/vpz/Class.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 #include <algorithm>
 
 namespace vle { namespace vpz {
@@ -39,9 +40,12 @@ Class::Class(const Class& cls) :
         m_model = 0;
     } else {
         m_model = cls.m_model->clone();
-        std::for_each(cls.m_atomicmodels.begin(), cls.m_atomicmodels.end(),
-                      CopyAtomicModel(m_atomicmodels, *m_model));
     }
+}
+
+Class::~Class()
+{
+    delete m_model;
 }
 
 void Class::write(std::ostream& out) const
@@ -83,4 +87,12 @@ void Class::purgeConditions(const std::set < std::string >& conditionlist)
 {
     m_model->purgeConditions(conditionlist);
 }
+
+void Class::getAtomicModelList(std::vector < AtomicModel* >& list) const
+{
+    list.clear();
+
+    m_model->getAtomicModelList(m_model, list);
+}
+
 }} // namespace vle vpz

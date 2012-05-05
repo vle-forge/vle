@@ -32,18 +32,18 @@
 
 namespace vle { namespace vpz {
 
-AtomicGraphModel::AtomicGraphModel(const std::string& name,
+AtomicModel::AtomicModel(const std::string& name,
                                    CoupledModel* parent) :
-    GraphModel(name, parent)
+    BaseModel(name, parent)
 {
 }
 
-AtomicGraphModel::AtomicGraphModel(const std::string& name,
+AtomicModel::AtomicModel(const std::string& name,
                                    CoupledModel* parent,
                                    const std::string& condition,
                                    const std::string& dynamic,
                                    const std::string& observable) :
-    GraphModel(name, parent),
+    BaseModel(name, parent),
     m_dynamics(dynamic), m_observables(observable)
 {
     std::string conditionList(condition);
@@ -58,20 +58,20 @@ AtomicGraphModel::AtomicGraphModel(const std::string& name,
     }
 }
 
-AtomicGraphModel::AtomicGraphModel(const AtomicGraphModel& mdl) :
-    GraphModel(mdl), m_dynamics(mdl.dynamics()), m_observables(mdl.observables())
+AtomicModel::AtomicModel(const AtomicModel& mdl) :
+    BaseModel(mdl), m_dynamics(mdl.dynamics()), m_observables(mdl.observables())
 {
     m_conditions = mdl.m_conditions;
 }
 
-AtomicGraphModel& AtomicGraphModel::operator=(const AtomicGraphModel& mdl)
+AtomicModel& AtomicModel::operator=(const AtomicModel& mdl)
 {
-    AtomicGraphModel m(mdl);
+    AtomicModel m(mdl);
     swap(m);
     return *this;
 }
 
-void AtomicGraphModel::delCondition(const std::string& str)
+void AtomicModel::delCondition(const std::string& str)
 {
     std::vector < std::string >::iterator itfind =
 	std::find(m_conditions.begin(), m_conditions.end(), str);
@@ -79,14 +79,14 @@ void AtomicGraphModel::delCondition(const std::string& str)
     m_conditions.erase(itfind);
 }
 
-GraphModel* AtomicGraphModel::findModel(const std::string& name) const
+BaseModel* AtomicModel::findModel(const std::string& name) const
 {
     return (getName() == name) ?
-        const_cast < GraphModel* >(
-            reinterpret_cast < const GraphModel* >(this)) : 0;
+        const_cast < BaseModel* >(
+            reinterpret_cast < const BaseModel* >(this)) : 0;
 }
 
-void AtomicGraphModel::writeXML(std::ostream& out) const
+void AtomicModel::writeXML(std::ostream& out) const
 {
     out << "<model name=\"" << getName().c_str() << "\" type=\"atomic\""
         << ">\n";
@@ -94,7 +94,7 @@ void AtomicGraphModel::writeXML(std::ostream& out) const
     out << "</model>\n";
 }
 
-void AtomicGraphModel::write(std::ostream& out) const
+void AtomicModel::write(std::ostream& out) const
 {
     out << "<model name=\"" << getName().c_str() << "\" "
         << "type=\"atomic\" ";
@@ -130,7 +130,7 @@ void AtomicGraphModel::write(std::ostream& out) const
     out << "</model>\n";
 }
 
-void AtomicGraphModel::updateDynamics(const std::string& oldname,
+void AtomicModel::updateDynamics(const std::string& oldname,
                                       const std::string& newname)
 {
     if (dynamics() == oldname) {
@@ -138,7 +138,7 @@ void AtomicGraphModel::updateDynamics(const std::string& oldname,
     }
 }
 
-void AtomicGraphModel::purgeDynamics(const std::set < std::string >&
+void AtomicModel::purgeDynamics(const std::set < std::string >&
                                      dynamicslist)
 {
     if (dynamicslist.find(dynamics()) == dynamicslist.end()) {
@@ -146,7 +146,7 @@ void AtomicGraphModel::purgeDynamics(const std::set < std::string >&
     }
 }
 
-void AtomicGraphModel::updateObservable(const std::string& oldname,
+void AtomicModel::updateObservable(const std::string& oldname,
                                         const std::string& newname)
 {
     if (observables() == oldname) {
@@ -154,7 +154,7 @@ void AtomicGraphModel::updateObservable(const std::string& oldname,
     }
 }
 
-void AtomicGraphModel::purgeObservable(const std::set < std::string >&
+void AtomicModel::purgeObservable(const std::set < std::string >&
                                        observablelist)
 {
     if (observablelist.find(observables()) == observablelist.end()) {
@@ -162,14 +162,14 @@ void AtomicGraphModel::purgeObservable(const std::set < std::string >&
     }
 }
 
-void AtomicGraphModel::updateConditions(const std::string& oldname,
+void AtomicModel::updateConditions(const std::string& oldname,
                                         const std::string& newname)
 {
     std::replace(m_conditions.begin(),
                  m_conditions.end(), oldname, newname);
 }
 
-void AtomicGraphModel::purgeConditions(const std::set < std::string >&
+void AtomicModel::purgeConditions(const std::set < std::string >&
                                        conditionlist)
 {
     for (int i = m_conditions.size() - 1; i >= 0; --i) {

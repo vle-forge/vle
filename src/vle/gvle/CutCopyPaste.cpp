@@ -95,7 +95,7 @@ void CutCopyPaste::copy(vpz::ModelList& l, vpz::CoupledModel* parent, bool isCla
 
         for (vpz::ModelList::iterator it = l.begin();
              it != l.end(); ++it) {
-            vpz::GraphModel* m = it->second->clone();
+            vpz::BaseModel* m = it->second->clone();
 
             m->setParent(NULL);
             mList_graph.insert(make_pair(m->getName(), m));
@@ -136,7 +136,7 @@ void CutCopyPaste::paste(vpz::CoupledModel* gc)
                         boost::lexical_cast<std::string>(mcounter++) ;
                 }
 
-                vpz::GraphModel::rename(itmls->second, mnewname);
+                vpz::BaseModel::rename(itmls->second, mnewname);
 
                 //to update connections
                 std::vector <std::string>::iterator itc = mwCnts.begin();
@@ -188,7 +188,7 @@ void CutCopyPaste::clone(vpz::ModelList& lst_graph_clone, int num)
         for (vpz::ModelList::iterator it = mList_graph.begin();
                 it != mList_graph.end();
                 ++it) {
-            vpz::GraphModel* m = it->second->clone();
+            vpz::BaseModel* m = it->second->clone();
 
             lst_graph_clone.insert(make_pair(m->getName(), m));
             if (m->isCoupled()) {
@@ -203,7 +203,7 @@ void CutCopyPaste::clone(vpz::ModelList& lst_graph_clone, int num)
         for (vpz::ModelList::iterator it = mList_graph.begin(); it !=
                 mList_graph.end();
                 ++it) {
-            vpz::GraphModel* m = it->second->clone();
+            vpz::BaseModel* m = it->second->clone();
             m->setParent(NULL);
             m->setPosition(m->x() + (num * 10), m->y() + (num * 10));
 
@@ -217,12 +217,12 @@ void CutCopyPaste::clone(vpz::ModelList& lst_graph_clone, int num)
     }
 }
 
-void CutCopyPaste::clone_atomic(vpz::GraphModel* clone)
+void CutCopyPaste::clone_atomic(vpz::BaseModel* clone)
 {
     clone->setPosition(clone->x() + 10, clone->y() + 10);
 }
 
-void CutCopyPaste::clone_coupled(vpz::GraphModel* model, vpz::GraphModel* clone)
+void CutCopyPaste::clone_coupled(vpz::BaseModel* model, vpz::BaseModel* clone)
 {
     vpz::ModelList& list = dynamic_cast<vpz::CoupledModel*>(model)->getModelList();
     vpz::ModelList& list_clone = dynamic_cast<vpz::CoupledModel*>(clone)->getModelList();

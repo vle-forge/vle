@@ -116,7 +116,7 @@ void SaxStackVpz::pushModel(const xmlChar** att)
         push(sub);
     }
 
-    vpz::GraphModel* gmdl = 0;
+    vpz::BaseModel* gmdl = 0;
     const xmlChar* conditions = 0, *dynamics = 0, *observables = 0;
     const xmlChar* x = 0, *y = 0, *width = 0, *height = 0;
     const xmlChar* type = 0, *name = 0;
@@ -154,7 +154,7 @@ void SaxStackVpz::pushModel(const xmlChar** att)
 
     if (xmlStrcmp(type, (const xmlChar*)"atomic") == 0) {
         try {
-            gmdl = new vpz::AtomicGraphModel(
+            gmdl = new vpz::AtomicModel(
                 (const char*)name,
                 cplparent,
                 conditions ? xmlCharToString(conditions) : "",
@@ -164,23 +164,6 @@ void SaxStackVpz::pushModel(const xmlChar** att)
             throw(utils::SaxParserError(fmt(_(
                     "Error build atomic model '%1%' with error: %2%")) % name %
                 e.what()));
-        }
-
-        Class* clsparent(getLastClass());
-        if (clsparent == 0) {
-            vpz().project().model().atomicModels().add(
-                reinterpret_cast < vpz::GraphModel* >(gmdl),
-                AtomicModel(
-                    conditions ? xmlCharToString(conditions) : "",
-                    dynamics ? xmlCharToString(dynamics) : "",
-                    observables ? xmlCharToString(observables) : ""));
-        } else {
-            clsparent->atomicModels().add(
-                reinterpret_cast < vpz::GraphModel* >(gmdl),
-                AtomicModel(
-                    conditions ? xmlCharToString(conditions) : "",
-                    dynamics ? xmlCharToString(dynamics) : "",
-                    observables ? xmlCharToString(observables) : ""));
         }
     } else if (xmlStrcmp(type, (const xmlChar*)"coupled") == 0) {
         try {
@@ -212,7 +195,7 @@ void SaxStackVpz::pushModel(const xmlChar** att)
     push(mdl);
 }
 
-void SaxStackVpz::buildModelGraphics(vpz::GraphModel* mdl,
+void SaxStackVpz::buildModelGraphics(vpz::BaseModel* mdl,
                                      const std::string& x,
                                      const std::string& y,
                                      const std::string& width,
@@ -263,7 +246,7 @@ void SaxStackVpz::pushPort(const xmlChar** att)
         }
 
         vpz::Model* mdl = static_cast < vpz::Model* >(parent());
-        vpz::GraphModel* gmdl = mdl->model();
+        vpz::BaseModel* gmdl = mdl->model();
         std::string name;
 
         for (int i = 0; att[i] != NULL; i += 2) {

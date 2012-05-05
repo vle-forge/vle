@@ -33,7 +33,7 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
@@ -47,10 +47,9 @@ ModelFactory::ModelFactory(const utils::ModuleManager& modulemgr,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
-                           const vpz::AtomicModelList& atom,
                            RootCoordinator& root)
     : mModuleMgr(modulemgr), mDynamics(dyn), mClasses(cls), mExperiment(exp),
-    mAtoms(atom), mRoot(root)
+      mRoot(root)
 {
 }
 
@@ -96,7 +95,7 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
 }
 
 void ModelFactory::createModel(Coordinator& coordinator,
-                               vpz::AtomicGraphModel* model,
+                               vpz::AtomicModel* model,
                                const std::string& dynamics,
                                const std::vector < std::string >& conditions,
                                const std::string& observable)
@@ -178,47 +177,43 @@ void ModelFactory::createModels(Coordinator& coordinator,
                                 const vpz::Model& model)
 {
     vpz::AtomicModelVector atomicmodellist;
-    vpz::GraphModel* mdl = model.model();
+    vpz::BaseModel* mdl = model.model();
 
     if (mdl->isAtomic()) {
-        atomicmodellist.push_back((vpz::AtomicGraphModel*)mdl);
+        atomicmodellist.push_back((vpz::AtomicModel*)mdl);
     } else {
-        vpz::GraphModel::getAtomicModelList(mdl, atomicmodellist);
+        vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
     }
 
-    const vpz::AtomicModelList& atoms(model.atomicModels());
     for (vpz::AtomicModelVector::iterator it = atomicmodellist.begin();
          it != atomicmodellist.end(); ++it) {
-        const vpz::AtomicModel& atom(atoms.get(*it));
-        createModel(coordinator, *it, atom.dynamics(), atom.conditions(),
-                    atom.observables());
+        createModel(coordinator,
+                    *it,
+                    (*it)->dynamics(),
+                    (*it)->conditions(),
+                    (*it)->observables());
     }
 
 }
 
-vpz::GraphModel* ModelFactory::createModelFromClass(Coordinator& coordinator,
+vpz::BaseModel* ModelFactory::createModelFromClass(Coordinator& coordinator,
                                                  vpz::CoupledModel* parent,
                                                  const std::string& classname,
                                                  const std::string& modelname)
 {
     vpz::Class& classe(mClasses.get(classname));
-    vpz::GraphModel* mdl(classe.model()->clone());
-    vpz::AtomicModelList outlist;
-
-    std::for_each(classe.atomicModels().begin(), classe.atomicModels().end(),
-                  vpz::CopyAtomicModel(outlist, *mdl));
-
+    vpz::BaseModel* mdl(classe.model()->clone());
     vpz::AtomicModelVector atomicmodellist;
-    vpz::GraphModel::getAtomicModelList(mdl, atomicmodellist);
+    vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
     parent->addModel(mdl, modelname);
 
     for (vpz::AtomicModelVector::iterator it = atomicmodellist.begin();
          it != atomicmodellist.end(); ++it) {
-        vpz::AtomicModel& atominfo(outlist.get(*it));
         createModel(coordinator,
-                    static_cast < vpz::AtomicGraphModel* >(*it),
-                    atominfo.dynamics(),
-                    atominfo.conditions(), atominfo.observables());
+                    *it,
+                    (*it)->dynamics(),
+                    (*it)->conditions(),
+                    (*it)->observables());
     }
 
     return mdl;

@@ -32,7 +32,7 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/viewport.h>
 #include <algorithm>
@@ -128,21 +128,21 @@ public:
     //
 
     /**
-     * add a GraphModel under coordinate into Model selected list for
+     * add a Model under coordinate into Model selected list for
      * coupling model into a GCoupledModel.
      *
      * @param model model to append into selected models
      * @param shiftorcontrol true if shift or control pressed during click
      * otherwise fale
      */
-    void addModelInListModel(vpz::GraphModel* model, bool shiftorcontrol);
+    void addModelInListModel(vpz::BaseModel* model, bool shiftorcontrol);
 
     /**
-     * add GraphModel into selected models lists.
+     * add Model into selected models lists.
      *
      * @param model to append into selected models
      */
-    void addModelToSelectedModels(vpz::GraphModel* model);
+    void addModelToSelectedModels(vpz::BaseModel* model);
 
     /**
      * get selected models state.
@@ -160,14 +160,14 @@ public:
      * @brief Get first selected models from list.
      * @return first selected models from list, or null if empty list
      */
-    vpz::GraphModel* getFirstSelectedModels();
+    vpz::BaseModel* getFirstSelectedModels();
 
     /**
      * @brief test if model exist in selected modeds.
      * @param m model to test
      * @return true if found, otherwise false
      */
-    bool existInSelectedModels(vpz::GraphModel* m);
+    bool existInSelectedModels(vpz::BaseModel* m);
 
     /**
      * @brief return complete selected models.
@@ -183,11 +183,11 @@ public:
     //
     //
 
-    inline void addDestinationModel(vpz::GraphModel* m) {
+    inline void addDestinationModel(vpz::BaseModel* m) {
         mDestinationModel = m;
     }
 
-    inline vpz::GraphModel* getDestinationModel() {
+    inline vpz::BaseModel* getDestinationModel() {
         return mDestinationModel;
     }
 
@@ -249,7 +249,7 @@ public:
      *
      * @param mdl model to unselect
      */
-    void removeFromSelectedModel(vpz::GraphModel* mdl);
+    void removeFromSelectedModel(vpz::BaseModel* mdl);
 
      /**
      * Add a single atomic model in position x, y.
@@ -278,16 +278,16 @@ public:
     /**
      * Show model information.
      *
-     * @param model vpz::GraphModel to show information
+     * @param model vpz::Model to show information
      */
-    void showModel(vpz::GraphModel* model);
+    void showModel(vpz::BaseModel* model);
 
     /**
      * Delete Model after Message::Question.
      *
-     * @param model vpz::GraphModel to delete
+     * @param model vpz::Model to delete
      */
-    void delModel(vpz::GraphModel* model);
+    void delModel(vpz::BaseModel* model);
 
     /**
      * Delete Connection after Message::Question.
@@ -313,7 +313,7 @@ public:
      * @param src
      * @param dst
      */
-    void makeConnection(vpz::GraphModel* src, vpz::GraphModel* dst);
+    void makeConnection(vpz::BaseModel* src, vpz::BaseModel* dst);
 
     /**
      * To flash window, to inform user of this selected window.
@@ -331,7 +331,7 @@ private:
     SimpleViewDrawingArea*      mSimpleDrawing;
 
     vpz::ModelList            mSelectedModels;
-    vpz::GraphModel*               mDestinationModel;
+    vpz::BaseModel*               mDestinationModel;
     GVLE::ButtonType            mCurrentButton;
 };
 

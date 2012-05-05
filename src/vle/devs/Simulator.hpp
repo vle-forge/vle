@@ -63,7 +63,7 @@ namespace vle { namespace devs {
          * @param a The atomic model.
          * @throw utils::InternalError if the atomic model does not exist.
          */
-	Simulator(vpz::AtomicGraphModel* a);
+	Simulator(vpz::AtomicModel* a);
 
         /**
          * @brief Delete the attached devs::Dynamics user's model.
@@ -78,8 +78,8 @@ namespace vle { namespace devs {
 	void addDynamics(Dynamics* dynamics);
 
         /**
-         * @brief Get the name of the vpz::AtomicGraphModel node.
-         * @return the name of the vpz::AtomicGraphModel.
+         * @brief Get the name of the vpz::AtomicModel node.
+         * @return the name of the vpz::AtomicModel.
          * @throw utils::InternalEvent if the model is destroyed.
          */
         const std::string& getName() const;
@@ -87,7 +87,7 @@ namespace vle { namespace devs {
         /**
          * @brief Get a std::string which concatenate the names of the hierarchy
          * of vpz::CoupledModel parent. Use the function
-         * vpz::GraphModel::getParentName().
+         * vpz::Model::getParentName().
          * @return The concatenated names of the parents or "Deleted model" if
          * the model is destroy before observed.
          */
@@ -97,11 +97,11 @@ namespace vle { namespace devs {
          * @brief Get the atomic model attached to the Simulator.
          * @return A reference.
          */
-        inline vpz::AtomicGraphModel* getStructure() const
+        inline vpz::AtomicModel* getStructure() const
         { return m_atomicModel; }
 
         /**
-         * @brief Delete the dynamics and erase reference to the AtomicGraphModel.
+         * @brief Delete the dynamics and erase reference to the AtomicModel.
          */
         void clear();
 
@@ -124,7 +124,7 @@ namespace vle { namespace devs {
          */
         void updateSimulatorTargets(
             const std::string& port,
-            std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators);
+            std::map < vpz::AtomicModel*, devs::Simulator* >& simulators);
 
         /**
          * @brief Get two iterators (begin, end) on TargetSimulator.
@@ -134,7 +134,7 @@ namespace vle { namespace devs {
          */
         std::pair < iterator, iterator > targets(
             const std::string& port,
-            std::map < vpz::AtomicGraphModel*, devs::Simulator* >& simulators);
+            std::map < vpz::AtomicModel*, devs::Simulator* >& simulators);
 
         /**
          * @brief Add an empty target port.
@@ -206,7 +206,7 @@ namespace vle { namespace devs {
     private:
         TargetSimulatorList mTargets;
         Dynamics*           m_dynamics;
-        vpz::AtomicGraphModel* m_atomicModel;
+        vpz::AtomicModel*   m_atomicModel;
         std::string         m_parents;
 
 	InternalEvent* buildInternalEvent(const Time& currentTime);

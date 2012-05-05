@@ -155,17 +155,17 @@ void ImportClassesBox::importClass(std::string& className,
     vpz::Class& destClass =
 	mModeling->vpz().project().classes().add(newClassName);
 
-    vpz::GraphModel* import = srcClass.model();
+    vpz::BaseModel* import = srcClass.model();
     if (import->isCoupled()) {
-	vpz::CoupledModel* model = vpz::GraphModel::toCoupled(import->clone());
+	vpz::CoupledModel* model = vpz::BaseModel::toCoupled(import->clone());
 	destClass.setModel(model);
     } else {
-	vpz::AtomicGraphModel* model = vpz::GraphModel::toAtomic(import->clone());
+	vpz::AtomicModel* model = vpz::BaseModel::toAtomic(import->clone());
 	destClass.setModel(model);
     }
-    std::for_each(srcClass.atomicModels().begin(),
-		  srcClass.atomicModels().end(),
-		  vpz::CopyAtomicModel(destClass.atomicModels(), *destClass.model()));
+    // std::for_each(srcClass.atomicModels().begin(),
+    //     	  srcClass.atomicModels().end(),
+    //     	  vpz::CopyAtomicModel(destClass.atomicModels(), *destClass.model()));
 }
 
 void ImportClassesBox::onClose()

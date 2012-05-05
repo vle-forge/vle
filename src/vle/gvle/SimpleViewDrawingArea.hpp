@@ -33,7 +33,7 @@
 
 namespace vle { namespace vpz {
 
-    class GraphModel;
+    class BaseModel;
     class CoupledModel;
 
 }} // namespace vle graph
@@ -50,8 +50,8 @@ namespace vle { namespace gvle {
     public:
         typedef struct connexion
         {
-            vpz::GraphModel* source;
-            vpz::GraphModel* destination;
+            vpz::BaseModel* source;
+            vpz::BaseModel* destination;
         } Connexion;
 	static const gint MODEL_RADIUS;
         SimpleViewDrawingArea(View* view);
@@ -91,8 +91,8 @@ namespace vle { namespace gvle {
 	 * @param y the y coordinate
 	 */
         void getModelInPosition(int xs, int ys,
-				vpz::GraphModel* dst,
-				vpz::GraphModel* center,
+				vpz::BaseModel* dst,
+				vpz::BaseModel* center,
 				int&x, int& y);
 
 	/**
@@ -104,9 +104,9 @@ namespace vle { namespace gvle {
 	 * @param x the x coordinate
 	 * @param y the y coordinate
 	 */
-	void getModelOutPosition(vpz::GraphModel* src,
+	void getModelOutPosition(vpz::BaseModel* src,
 				 int xd, int yd,
-				 vpz::GraphModel* center,
+				 vpz::BaseModel* center,
 				 int&x, int& y);
 
 	/**
@@ -122,13 +122,13 @@ namespace vle { namespace gvle {
 
 	void preComputeConnection(int xs, int ys, int xd, int yd,
 	  int ytms, int ybms);
-        virtual void preComputeConnection(vpz::GraphModel* src,
+        virtual void preComputeConnection(vpz::BaseModel* src,
                                   const std::string& srcport,
-                                  vpz::GraphModel* dst,
+                                  vpz::BaseModel* dst,
                                   const std::string& dstport);
-	virtual void computeConnection(vpz::GraphModel* src,
+	virtual void computeConnection(vpz::BaseModel* src,
 				       const std::string& portsrc,
-				       vpz::GraphModel* dst,
+				       vpz::BaseModel* dst,
 				       const std::string& portdst, int index);
 	virtual StraightLine computeConnection(int xs, int ys,
 					       int xd, int yd,
@@ -177,7 +177,7 @@ namespace vle { namespace gvle {
 	 * @param model the model to draw
 	 * @param color the color to draw
 	 */
-        void drawChildrenModel(vpz::GraphModel* model,const Gdk::Color& color);
+        void drawChildrenModel(vpz::BaseModel* model,const Gdk::Color& color);
 
 	bool on_button_press_event(GdkEventButton* event);
 	bool on_button_release_event(GdkEventButton* event);

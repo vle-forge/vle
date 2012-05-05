@@ -33,7 +33,7 @@
 
 namespace vle { namespace vpz {
 
-    class GraphModel;
+    class BaseModel;
     class CoupledModel;
 
 }} // namespace vle vpz
@@ -50,9 +50,9 @@ namespace vle { namespace gvle {
     public:
         typedef struct connexion
         {
-            vpz::GraphModel* src;
+            vpz::BaseModel* src;
             std::string srcport;
-            vpz::GraphModel* dst;
+            vpz::BaseModel* dst;
             std::string dstport;
         } Connexion;
         CompleteViewDrawingArea(View* view);
@@ -89,7 +89,7 @@ namespace vle { namespace gvle {
 	 * @param x the x coordinate
 	 * @param y the y coordinate
 	 */
-        void getModelInPosition(vpz::GraphModel* model, const std::string& p,
+        void getModelInPosition(vpz::BaseModel* model, const std::string& p,
                                 int& x, int& y);
 
 	/**
@@ -99,7 +99,7 @@ namespace vle { namespace gvle {
 	 * @param x the x coordinate
 	 * @param y the y coordinate
 	 */
-        void getModelOutPosition(vpz::GraphModel* model, const std::string& p,
+        void getModelOutPosition(vpz::BaseModel* model, const std::string& p,
                                  int& x, int& y);
 	/**
 	 * Order the models
@@ -113,16 +113,16 @@ namespace vle { namespace gvle {
     private:
 	void preComputeConnection(int xs, int ys, int xd, int yd,
 				  int ytms, int ybms);
-        virtual void preComputeConnection(vpz::GraphModel* src,
+        virtual void preComputeConnection(vpz::BaseModel* src,
                                   const std::string& srcport,
-                                  vpz::GraphModel* dst,
+                                  vpz::BaseModel* dst,
                                   const std::string& dstport);
 
         virtual StraightLine computeConnection(int xs, int ys, int xd, int yd,
                                        int index);
-        virtual void computeConnection(vpz::GraphModel* src,
+        virtual void computeConnection(vpz::BaseModel* src,
 				       const std::string& srcport,
-				       vpz::GraphModel* dst,
+				       vpz::BaseModel* dst,
 				       const std::string& dstport,
 				       int index);
 
@@ -131,7 +131,7 @@ namespace vle { namespace gvle {
 	 * @param model the model to draw
 	 * @param color the color to draw
 	 */
-        void drawChildrenModel(vpz::GraphModel* model,
+        void drawChildrenModel(vpz::BaseModel* model,
 
 			       const Gdk::Color& color);
 
@@ -140,7 +140,7 @@ namespace vle { namespace gvle {
 	 * @param model the model to draw
 	 * @param color the color to draw
 	 */
-	void drawChildrenPorts(vpz::GraphModel* model,
+	void drawChildrenPorts(vpz::BaseModel* model,
 			       const Gdk::Color& color);
 
 	bool on_button_press_event(GdkEventButton* event);

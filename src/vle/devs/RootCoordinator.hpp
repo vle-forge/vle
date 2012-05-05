@@ -37,7 +37,7 @@
 
 namespace vle { namespace vpz {
 
-    class GraphModel;
+    class BaseModel;
 
 }} // namespace vle graph
 
@@ -127,7 +127,7 @@ namespace vle { namespace devs {
         value::Map          *m_result;
 
         Coordinator*        m_coordinator;
-        vpz::GraphModel*       m_root;
+        vpz::BaseModel*     m_root;
 
 
         const utils::ModuleManager& m_modulemgr;

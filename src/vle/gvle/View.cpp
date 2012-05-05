@@ -74,7 +74,7 @@ void View::redraw()
     mSimpleDrawing->queueRedraw();
 }
 
-void View::addModelInListModel(vpz::GraphModel* model, bool shiftorcontrol)
+void View::addModelInListModel(vpz::BaseModel* model, bool shiftorcontrol)
 {
     if (model) {
         if (shiftorcontrol == false) {
@@ -84,7 +84,7 @@ void View::addModelInListModel(vpz::GraphModel* model, bool shiftorcontrol)
     }
 }
 
-void View::addModelToSelectedModels(vpz::GraphModel* m)
+void View::addModelToSelectedModels(vpz::BaseModel* m)
 {
     if (not existInSelectedModels(m)) {
         if (existInSelectedModels(mCurrent) or m == mCurrent) {
@@ -101,12 +101,12 @@ void View::clearSelectedModels()
         mGVLE->getMenu()->hideCopyCut();
 }
 
-vpz::GraphModel* View::getFirstSelectedModels()
+vpz::BaseModel* View::getFirstSelectedModels()
 {
     return mSelectedModels.empty() ? 0 : mSelectedModels.begin()->second;
 }
 
-bool View::existInSelectedModels(vpz::GraphModel* m)
+bool View::existInSelectedModels(vpz::BaseModel* m)
 {
     return mSelectedModels.find(m->getName()) != mSelectedModels.end();
 }
@@ -116,7 +116,6 @@ void View::clearCurrentModel()
     if (gvle::Question(_("All children model will be deleted, continue ?"))) {
         mCurrent->delAllConnection();
         mCurrent->delAllModel();
-	mModeling->vpz().project().model().atomicModels().clear();
         mGVLE->redrawModelTreeBox();
     }
 }
@@ -189,9 +188,9 @@ void View::onSelectAll(vpz::CoupledModel* cModel)
     redraw();
 }
 
-void View::removeFromSelectedModel(vpz::GraphModel* mdl)
+void View::removeFromSelectedModel(vpz::BaseModel* mdl)
 {
-    std :: map < std::string, vpz::GraphModel* >:: iterator it;
+    std :: map < std::string, vpz::BaseModel* >:: iterator it;
     it = mSelectedModels.find(mdl->getName());
     if (it != mSelectedModels.end ()) {
         mSelectedModels.erase(it++);
@@ -204,7 +203,7 @@ void View::addAtomicModel(int x, int y)
     ModelDescriptionBox* box = new
     ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
-        vpz::AtomicGraphModel* new_atom =
+        vpz::AtomicModel* new_atom =
             mModeling->newAtomicModel(mCurrent, box->getName(), "", x, y);
 
         if (new_atom) {
@@ -246,7 +245,7 @@ void View::addCoupledModel(int x, int y)
             mGVLE->redrawModelClassBox();
             mSelectedModels.clear();
         } else {
-            vpz::GraphModel* model = mCurrent->findModel(box->getName());
+            vpz::BaseModel* model = mCurrent->findModel(box->getName());
             bool select = false;
             if (model != 0)
                 select = mCurrent->isInList(
@@ -277,7 +276,7 @@ void View::addCoupledModel(int x, int y)
     delete box;
 }
 
-void View::showModel(vpz::GraphModel* model)
+void View::showModel(vpz::BaseModel* model)
 {
     if (not model) {
         mGVLE->EditCoupledModel(mCurrent);
@@ -290,7 +289,7 @@ void View::showModel(vpz::GraphModel* model)
     }
 }
 
-void View::delModel(vpz::GraphModel* model)
+void View::delModel(vpz::BaseModel* model)
 {
     if (model) {
         if (gvle::Question(_("Do you really want destroy model ?"))) {
@@ -337,7 +336,7 @@ void View::displaceModel(int oldx, int oldy, int x, int y)
     }
 }
 
-void View::makeConnection(vpz::GraphModel* src, vpz::GraphModel* dst)
+void View::makeConnection(vpz::BaseModel* src, vpz::BaseModel* dst)
 {
     assert(src and dst);
 

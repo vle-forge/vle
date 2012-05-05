@@ -41,6 +41,7 @@
 namespace vle { namespace vpz {
 
     class Vpz;
+    class BaseModel;
 
     /**
      * @brief The SaxParser is a C/C++ interface between the libxml-2.0 and the

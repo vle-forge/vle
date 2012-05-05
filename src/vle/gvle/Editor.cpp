@@ -62,7 +62,7 @@ Document::Document() :
 }
 
 void Document::setTitle(const std::string& filePath,
-			vpz::GraphModel* model,
+			vpz::BaseModel* model,
 			bool modified)
 {
     if (mGVLE) {
@@ -358,7 +358,7 @@ std::string DocumentText::getBuffer()
 
 DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
                                          const std::string& filepath,
-                                         View* view, vpz::GraphModel* model) :
+                                         View* view, vpz::BaseModel* model) :
     Document(gvle, filepath),
     mView(view),
     mModel(model),
@@ -441,7 +441,7 @@ void DocumentDrawingArea::redo()
 DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
     GVLE* gvle,
     const std::string& filepath,
-    View* view, vpz::GraphModel* model) :
+    View* view, vpz::BaseModel* model) :
     DocumentDrawingArea(gvle, filepath, view, model)
 {
     mTitle = filename() + utils::Path::extension(filepath)
@@ -469,7 +469,7 @@ DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
 
 DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(GVLE* gvle,
                                                      const std::string& filepath,
-                                                     View* view, vpz::GraphModel* model) :
+                                                     View* view, vpz::BaseModel* model) :
     DocumentDrawingArea(gvle, filepath, view, model)
 {
     mTitle = filename() + utils::Path::extension(filepath)+
@@ -595,7 +595,7 @@ void Editor::changeFile(const std::string& oldName,
     Documents::iterator it = mDocuments.find(oldName);
 
     if (it != mDocuments.end()) {
-        vpz::GraphModel* model = 0;
+        vpz::BaseModel* model = 0;
 
         if (utils::Path::extension(oldName) == ".vpz") {
             model = dynamic_cast < DocumentDrawingArea* >(

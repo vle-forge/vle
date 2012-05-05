@@ -29,7 +29,7 @@
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/View.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <queue>
@@ -81,11 +81,11 @@ bool ModelTreeBox::onSelect(
     View* view =
         m_gvle->getEditor()->getDocumentDrawingArea()->getView();
 
-    vpz::GraphModel* mdl;
+    vpz::BaseModel* mdl;
 
     if (iter) {
         Gtk::TreeModel::Row row = *iter;
-        mdl = (vpz::GraphModel*)row[m_columns.mModel];
+        mdl = (vpz::BaseModel*)row[m_columns.mModel];
         if (mdl) {
             if (info) {
                 view->removeFromSelectedModel(mdl);
@@ -146,7 +146,7 @@ void ModelTreeBox::onRenameModels()
 	    if (box.valid() and not newname.empty() and newname != m_oldName) {
 		try {
 		    row[m_modelsColumnRecord.name] = newname;
-		    vpz::GraphModel::rename(row[m_columns.mModel], newname);
+		    vpz::BaseModel::rename(row[m_columns.mModel], newname);
 		    m_gvle->refreshViews();
                     m_gvle->setModified(true);
                 } catch(utils::DevsGraphError dge) {
@@ -157,7 +157,7 @@ void ModelTreeBox::onRenameModels()
     }
 }
 
-void ModelTreeBox::parseModel(vpz::GraphModel* top)
+void ModelTreeBox::parseModel(vpz::BaseModel* top)
 {
     assert(top);
 
@@ -178,7 +178,7 @@ void ModelTreeBox::parseModel(vpz::GraphModel* top)
     expand_all();
 }
 
-Gtk::TreeModel::iterator ModelTreeBox::getModelRow(const vpz::GraphModel* mdl,
+Gtk::TreeModel::iterator ModelTreeBox::getModelRow(const vpz::BaseModel* mdl,
                                                    Gtk::TreeModel::Children child)
 {
     Gtk::TreeModel::iterator iter = child.begin();
@@ -198,7 +198,7 @@ Gtk::TreeModel::iterator ModelTreeBox::getModelRow(const vpz::GraphModel* mdl,
     return iter;
 }
 
-void ModelTreeBox::showRow(const vpz::GraphModel* mdl)
+void ModelTreeBox::showRow(const vpz::BaseModel* mdl)
 {
     if (mdl->getParent()) {
         Gtk::TreeModel::iterator iter = getModelRow(mdl->getParent(),
@@ -222,7 +222,7 @@ bool ModelTreeBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
     Glib::ustring card;
 
     if (get_tooltip_context_iter(wx, wy, keyboard_tooltip, iter)) {
-        vpz::GraphModel* mModel = (*iter).get_value(m_columns.mModel);
+        vpz::BaseModel* mModel = (*iter).get_value(m_columns.mModel);
         card = m_modeling->getIdCard(mModel);
         tooltip->set_markup(card);
         set_tooltip_row(tooltip, Gtk::TreePath(iter));
@@ -233,7 +233,7 @@ bool ModelTreeBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
 }
 
 Gtk::TreeModel::Row
-ModelTreeBox::addModel(vpz::GraphModel* model)
+ModelTreeBox::addModel(vpz::BaseModel* model)
 {
     Gtk::TreeModel::Row row = *(m_refTreeModel->append());
     row[m_columns.mName] = model->getName();
@@ -242,7 +242,7 @@ ModelTreeBox::addModel(vpz::GraphModel* model)
 }
 
 Gtk::TreeModel::Row
-ModelTreeBox::addSubModel(Gtk::TreeModel::Row tree, vpz::GraphModel* model)
+ModelTreeBox::addSubModel(Gtk::TreeModel::Row tree, vpz::BaseModel* model)
 {
     Gtk::TreeModel::Row row = *(m_refTreeModel->append(tree.children()));
     row[m_columns.mName] = model->getName();
@@ -336,7 +336,7 @@ void ModelTreeBox::onEdition(
 	    if (not newName.empty() and newName != m_oldName) {
 		try {
 		    row[m_modelsColumnRecord.name] = newName;
-		    vpz::GraphModel::rename(row[m_columns.mModel], newName);
+		    vpz::BaseModel::rename(row[m_columns.mModel], newName);
 		    m_gvle->refreshViews();
                     m_gvle->setModified(true);
 		} catch(utils::DevsGraphError dge) {

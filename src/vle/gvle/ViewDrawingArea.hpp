@@ -35,7 +35,7 @@
 
 namespace vle { namespace vpz {
 
-    class GraphModel;
+    class BaseModel;
     class CoupledModel;
 
 }} // namespace vle graph
@@ -191,9 +191,9 @@ namespace vle { namespace gvle {
         void drawCurrentCoupledModel();
         void drawCurrentModelPorts();
 
-        virtual void preComputeConnection(vpz::GraphModel* src,
+        virtual void preComputeConnection(vpz::BaseModel* src,
                                   const std::string& srcport,
-                                  vpz::GraphModel* dst,
+                                  vpz::BaseModel* dst,
                                   const std::string& dstport)=0;
         void preComputeConnection();
 
@@ -203,8 +203,8 @@ namespace vle { namespace gvle {
 
         virtual StraightLine computeConnection(int xs, int ys, int xd, int yd,
                                        int index)=0;
-        virtual void computeConnection(vpz::GraphModel* src, const std::string& srcport,
-                               vpz::GraphModel* dst, const std::string& dstport,
+        virtual void computeConnection(vpz::BaseModel* src, const std::string& srcport,
+                               vpz::BaseModel* dst, const std::string& dstport,
                                int index)=0;
         void computeConnection();
 
@@ -213,7 +213,7 @@ namespace vle { namespace gvle {
         void drawConnection();
         void drawHighlightConnection();
         void drawChildrenModels();
-        virtual void drawChildrenModel(vpz::GraphModel* model,
+        virtual void drawChildrenModel(vpz::BaseModel* model,
                                        const Gdk::Color& color)=0;
         void drawLines();
         void drawLink();
@@ -226,7 +226,7 @@ namespace vle { namespace gvle {
         bool on_motion_notify_event(GdkEventMotion* event);
         void on_realize();
 
-        void on_gvlepointer_button_1(vpz::GraphModel* mdl, bool state);
+        void on_gvlepointer_button_1(vpz::BaseModel* mdl, bool state);
         void delUnderMouse(int x, int y);
 
         /**
@@ -280,7 +280,7 @@ namespace vle { namespace gvle {
         std::vector < Connection > mConnections;
         std::map < Point, bool > mDirect;
         std::vector < StraightLine > mLines;
-        std::vector < vpz::GraphModel* > mModelInfo;
+        std::vector < vpz::BaseModel* > mModelInfo;
         int mHighlightLine;
 
         // Grid

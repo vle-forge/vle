@@ -38,7 +38,7 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <gtkmm/stock.h>
 #include <iostream>
@@ -182,7 +182,7 @@ void Modeling::exportCoupledModel(vpz::CoupledModel* model,
     dst->write();
 }
 
-void Modeling::exportClass(vpz::GraphModel* model, vpz::Class classe,
+void Modeling::exportClass(vpz::BaseModel* model, vpz::Class classe,
                            vpz::Vpz* dst)
 {
     vpz::Project& project = dst->project();
@@ -199,13 +199,13 @@ void Modeling::exportClass(vpz::GraphModel* model, vpz::Class classe,
         export_coupled_model(dst, dynamic_cast<vpz::CoupledModel*>(model),
                              classeName);
     } else {
-	export_atomic_model(dst, dynamic_cast<vpz::AtomicGraphModel*>(model));
+	export_atomic_model(dst, dynamic_cast<vpz::AtomicModel*>(model));
     }
     dst->project().model().setModel(model);
     dst->write();
 }
 
-void Modeling::export_atomic_model(vpz::Vpz* dst, vpz::AtomicGraphModel* model)
+void Modeling::export_atomic_model(vpz::Vpz* dst, vpz::AtomicModel* model)
 {
     using namespace vpz;
 
@@ -261,7 +261,7 @@ void Modeling::export_coupled_model(vpz::Vpz* dst, vpz::CoupledModel* model, std
     vpz::ModelList::const_iterator it = list.begin();
     while (it!= list.end()) {
         if (it->second->isAtomic()) {
-            export_atomic_model(dst, dynamic_cast<vpz::AtomicGraphModel*>(it->second));
+            export_atomic_model(dst, dynamic_cast<vpz::AtomicModel*>(it->second));
         } else {
             export_coupled_model(dst, dynamic_cast<vpz::CoupledModel*>(it->second), className);
         }
@@ -284,11 +284,11 @@ void Modeling::importModelToClass(vpz::Vpz* src, std::string& className)
 
     Classes& classes = vpz().project().classes();
     Class& new_class = classes.add(className);
-    vpz::GraphModel* import = src->project().model().model();
+    vpz::BaseModel* import = src->project().model().model();
     if (import->isAtomic()) {
-        new_class.setModel(vpz::GraphModel::toAtomic(import));
+        new_class.setModel(vpz::BaseModel::toAtomic(import));
     } else {
-        new_class.setModel(vpz::GraphModel::toCoupled(import));
+        new_class.setModel(vpz::BaseModel::toCoupled(import));
     }
     dynamics().add(src->project().dynamics());
     conditions().add(src->project().experiment().conditions());
@@ -317,14 +317,14 @@ vpz::CoupledModel* Modeling::newCoupledModel(vpz::CoupledModel* parent,
     return tmp;
 }
 
-vpz::AtomicGraphModel* Modeling::newAtomicModel(vpz::CoupledModel* parent,
+vpz::AtomicModel* Modeling::newAtomicModel(vpz::CoupledModel* parent,
         const string& name,
         const string& /* description */,
         int x, int y)
 {
     if (not parent or not parent->exist(name)) {
         setModified(true);
-        vpz::AtomicGraphModel* tmp = new vpz::AtomicGraphModel(name, parent);
+        vpz::AtomicModel* tmp = new vpz::AtomicModel(name, parent);
         tmp->setPosition(x, y);
         tmp->setWidth(ViewDrawingArea::MODEL_WIDTH);
         tmp->setHeight(ViewDrawingArea::MODEL_HEIGHT);
@@ -394,16 +394,16 @@ std::string Modeling::getIdCard(std::string className) const
     return nclas;
 }
 
-std::string Modeling::getIdCard(vpz::GraphModel* model) const
+std::string Modeling::getIdCard(vpz::BaseModel* model) const
 {
     if (model->isCoupled()) {
-        vpz::CoupledModel* m = vpz::GraphModel::toCoupled(model);
+        vpz::CoupledModel* m = vpz::BaseModel::toCoupled(model);
         return getIdCard(m);
     } else if (model->isAtomic()) {
         Glib::ustring card = "<b>Model : </b>"+
             model->getName() + " <i>(Atomic)</i>";
 
-        const std::string nom_dyn = vpz::GraphModel::toAtomic(model)->dynamics();
+        const std::string nom_dyn = vpz::BaseModel::toAtomic(model)->dynamics();
 
         if (!nom_dyn.empty()) {
             card += "\n<b>Dynamic : </b>" + nom_dyn;
@@ -465,16 +465,16 @@ std::string Modeling::getInfoCard(std::string cond) const
     return card;
 }
 
-std::string Modeling::getClassIdCard(vpz::GraphModel* model) const
+std::string Modeling::getClassIdCard(vpz::BaseModel* model) const
 {
     if (model->isCoupled()) {
-        vpz::CoupledModel* m = vpz::GraphModel::toCoupled(model);
+        vpz::CoupledModel* m = vpz::BaseModel::toCoupled(model);
         return getClassIdCard(m);
     } else if (model->isAtomic()) {
         Glib::ustring card = "<b>Model : </b>" +
             model->getName() + " <i>(Atomic)</i>";
 
-        const std::string nom_dyn = vpz::GraphModel::toAtomic(model)->dynamics();
+        const std::string nom_dyn = vpz::BaseModel::toAtomic(model)->dynamics();
 
         if (!nom_dyn.empty()) {
             card += "\n<b>Dynamic : </b>" + nom_dyn;
@@ -491,8 +491,8 @@ std::string Modeling::getClassIdCard(vpz::CoupledModel* model) const
 }
 
 
-std::string Modeling::getIdCardConnection(vpz::GraphModel* src,
-                                          vpz::GraphModel* dest,
+std::string Modeling::getIdCardConnection(vpz::BaseModel* src,
+                                          vpz::BaseModel* dest,
                                           vpz::CoupledModel* mTop) const
 {
     Glib::ustring card;
@@ -523,9 +523,9 @@ std::string Modeling::getIdCardConnection(vpz::GraphModel* src,
     return card;
 }
 
-std::string Modeling::getIdCardConnection(vpz::GraphModel* src,
+std::string Modeling::getIdCardConnection(vpz::BaseModel* src,
                                           std::string srcport,
-                                          vpz::GraphModel* dest,
+                                          vpz::BaseModel* dest,
                                           std::string destport,
                                           vpz::CoupledModel* /* mTop */) const
 {

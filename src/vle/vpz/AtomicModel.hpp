@@ -28,7 +28,7 @@
 #ifndef VLE_GRAPH_ATOMIC_MODEL_HPP
 #define VLE_GRAPH_ATOMIC_MODEL_HPP
 
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/DllDefines.hpp>
 #include <iterator>
 #include <string>
@@ -40,7 +40,7 @@ namespace vle { namespace vpz {
      * @brief Represent the Atomic Model in DEVS formalism. This class just
      * represent the graph not the DEVS Simulator.
      */
-    class VLE_API AtomicGraphModel : public GraphModel
+    class VLE_API AtomicModel : public BaseModel
     {
     public:
         /**
@@ -50,11 +50,11 @@ namespace vle { namespace vpz {
          * @param parent the parent of this atomic model, can be null if parent
          * does not exist.
          */
-        AtomicGraphModel(const std::string& name,
+        AtomicModel(const std::string& name,
                          CoupledModel* parent);
 
         /**
-         * @brief Build a new AtomicGraphModel from specific conditions, dynamics and
+         * @brief Build a new AtomicModel from specific conditions, dynamics and
          * observables, initialize parent position (0,0), size (0,0)
          * and name.
          * @param name the new name of this atomic model.
@@ -63,26 +63,26 @@ namespace vle { namespace vpz {
          * @param dynamic The dynamics to attach.
          * @param observable The observable to attach.
          */
-        AtomicGraphModel(const std::string& name,
+        AtomicModel(const std::string& name,
                         CoupledModel* parent,
                         const std::string& condition,
                         const std::string& dynamic,
                         const std::string& observable);
 
-        AtomicGraphModel(const AtomicGraphModel& mdl);
+        AtomicModel(const AtomicModel& mdl);
 
-        AtomicGraphModel& operator=(const AtomicGraphModel& mdl);
+        AtomicModel& operator=(const AtomicModel& mdl);
 
-        virtual vpz::GraphModel* clone() const
-        { return new AtomicGraphModel(*this); }
+        virtual vpz::BaseModel* clone() const
+        { return new AtomicModel(*this); }
 
         /**
          * @brief Nothing to delete.
          */
-	virtual ~AtomicGraphModel() { }
+	virtual ~AtomicModel() { }
 
         /**
-         * @brief Return true, AtomicGraphModel is an atomic model.
+         * @brief Return true, AtomicModel is an atomic model.
          * @return true.
          */
         virtual bool isAtomic() const { return true; }
@@ -148,7 +148,7 @@ namespace vle { namespace vpz {
          * @return this if name is equal to the model's name, null otherwise.
          * @deprecated
          */
-        virtual GraphModel* findModel(const std::string & name) const;
+        virtual BaseModel* findModel(const std::string & name) const;
 
         /**
          * @brief Write the atomic model in the output stream.
@@ -162,7 +162,7 @@ namespace vle { namespace vpz {
          * @param a An AtomicModel.
          * @return the out parameter.
          */
-        friend std::ostream& operator<<(std::ostream& out, const AtomicGraphModel& a)
+        friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
         {
             out << "conditions: ";
             std::copy(a.m_conditions.begin(), a.m_conditions.end(),
@@ -225,7 +225,7 @@ namespace vle { namespace vpz {
 	virtual void purgeConditions(const std::set < std::string >& conditionlist);
 
     private:
-        //AtomicGraphModel() {}
+        //AtomicModel() {}
 
 	std::vector < std::string > m_conditions;
         std::string m_dynamics;

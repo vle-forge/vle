@@ -349,7 +349,7 @@ void ViewDrawingArea::drawChildrenModels()
     const vpz::ModelList& children = mCurrent->getModelList();
     vpz::ModelList::const_iterator it = children.begin();
     while (it != children.end()) {
-        vpz::GraphModel* model = it->second;
+        vpz::BaseModel* model = it->second;
 
         if (model->isCoupled()) {
             model->setWidth(ViewDrawingArea::MODEL_WIDTH);
@@ -385,7 +385,7 @@ void ViewDrawingArea::drawLink()
 {
     if (mView->getCurrentButton() == GVLE::VLE_GVLE_ADDLINK and
         mView->isEmptySelectedModels() == false) {
-        vpz::GraphModel* src = mView->getFirstSelectedModels();
+        vpz::BaseModel* src = mView->getFirstSelectedModels();
         setColor(Settings::settings().getForegroundColor());
         if (src == mCurrent) {
             mContext->move_to(MODEL_PORT,
@@ -612,7 +612,7 @@ void ViewDrawingArea::on_realize()
     queueRedraw();
 }
 
-void ViewDrawingArea::on_gvlepointer_button_1(vpz::GraphModel* mdl,
+void ViewDrawingArea::on_gvlepointer_button_1(vpz::BaseModel* mdl,
                                               bool state)
 {
     if (mdl) {
@@ -627,7 +627,7 @@ void ViewDrawingArea::on_gvlepointer_button_1(vpz::GraphModel* mdl,
                     mGVLE->getModelTreeBox()->showRow(mdl);
                 }
             } else {
-                vpz::GraphModel* mod = mView->getFirstSelectedModels();
+                vpz::BaseModel* mod = mView->getFirstSelectedModels();
                 if (mod == 0) {
                     if (mView->isClassView()) {
                         mGVLE->getModelTreeBox()->selectNone();
@@ -665,7 +665,7 @@ void ViewDrawingArea::on_gvlepointer_button_1(vpz::GraphModel* mdl,
 
 void ViewDrawingArea::delUnderMouse(int x, int y)
 {
-    vpz::GraphModel* model = mCurrent->find(x, y);
+    vpz::BaseModel* model = mCurrent->find(x, y);
     if (model) {
         mView->delModel(model);
     } else {
@@ -724,7 +724,7 @@ void ViewDrawingArea::addLinkOnButtonPress(int x, int y)
         mView->clearSelectedModels();
     }
 
-    vpz::GraphModel* mdl = mCurrent->find(x, y);
+    vpz::BaseModel* mdl = mCurrent->find(x, y);
     if (mdl) {
         mView->addModelToSelectedModels(mdl);
     } else {
@@ -737,7 +737,7 @@ void ViewDrawingArea::addLinkOnButtonPress(int x, int y)
 void ViewDrawingArea::addLinkOnMotion(int x, int y)
 {
     if (mView->isEmptySelectedModels() == false) {
-        vpz::GraphModel* mdl = mCurrent->find(x, y);
+        vpz::BaseModel* mdl = mCurrent->find(x, y);
         if (mdl == mView->getFirstSelectedModels()) {
             mMouse.set_x(mdl->x() + mdl->width() / 2);
             mMouse.set_y(mdl->y() + mdl->height() / 2);
@@ -758,7 +758,7 @@ void ViewDrawingArea::addLinkOnMotion(int x, int y)
 void ViewDrawingArea::addLinkOnButtonRelease(int x, int y)
 {
     if (mView->isEmptySelectedModels() == false) {
-        vpz::GraphModel* mdl = mCurrent->find(x, y);
+        vpz::BaseModel* mdl = mCurrent->find(x, y);
         if (mdl == NULL)
             mView->makeConnection(mView->getFirstSelectedModels(), mCurrent);
         else
@@ -772,8 +772,8 @@ void ViewDrawingArea::addLinkOnButtonRelease(int x, int y)
 
 void ViewDrawingArea::delConnection()
 {
-    vpz::GraphModel* src = 0;
-    vpz::GraphModel* dst = 0;
+    vpz::BaseModel* src = 0;
+    vpz::BaseModel* dst = 0;
     std::string portsrc, portdst;
     bool internal = false;
     bool external = false;
@@ -961,7 +961,7 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
 bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool /* keyboard_tooltip */,
                                      const Glib::RefPtr<Gtk::Tooltip>& tooltip)
 {
-    vpz::GraphModel* model = mCurrent->find(wx/mZoom, wy/mZoom);
+    vpz::BaseModel* model = mCurrent->find(wx/mZoom, wy/mZoom);
     Glib::ustring card;
 
     if (mHighlightLine != -1) {

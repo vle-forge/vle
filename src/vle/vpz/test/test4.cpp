@@ -63,16 +63,16 @@ void check_remove_dyns_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(not project.dynamics().exist("new_unittest"));
 
-    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
-    vpz::CoupledModel* top1 = vpz::GraphModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set < std::string > dynamics = dyns.getKeys();
 
     BOOST_REQUIRE_NO_THROW(top->purgeDynamics(dynamics));
 
-    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
-    vpz::AtomicGraphModel* e = vpz::GraphModel::toAtomic(top->findModel("e"));
-    vpz::AtomicGraphModel* a = vpz::GraphModel::toAtomic(top1->findModel("a"));
+    vpz::AtomicModel* d = vpz::BaseModel::toAtomic(top->findModel("d"));
+    vpz::AtomicModel* e = vpz::BaseModel::toAtomic(top->findModel("e"));
+    vpz::AtomicModel* a = vpz::BaseModel::toAtomic(top1->findModel("a"));
 
     BOOST_REQUIRE_EQUAL(d->dynamics(), "");
     BOOST_REQUIRE_EQUAL(e->dynamics(), "");
@@ -88,11 +88,11 @@ void check_rename_dyns_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(project.dynamics().exist("new_unittest"));
 
-    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
 
     BOOST_REQUIRE_NO_THROW(top->updateDynamics("unittest", "new_unittest"));
 
-    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
+    vpz::AtomicModel* d = vpz::BaseModel::toAtomic(top->findModel("d"));
 
     BOOST_REQUIRE_EQUAL(d->dynamics(), "new_unittest");
 }
@@ -105,13 +105,13 @@ void check_remove_conds_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(not cnds.exist("cd"));
 
-    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
 
     std::set < std::string > conditions = cnds.getKeys();
 
     BOOST_REQUIRE_NO_THROW(top->purgeConditions(conditions));
 
-    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
+    vpz::AtomicModel* d = vpz::BaseModel::toAtomic(top->findModel("d"));
 
     std::vector < std::string > atomConditions = d->conditions();
 
@@ -123,7 +123,6 @@ void check_remove_conds_unittest_vpz(vpz::Project& project)
 
 void check_rename_conds_unittest_vpz(vpz::Project& project)
 {
-    vpz::AtomicModelList &lst = project.model().atomicModels();
     vpz::Conditions& cnds = project.experiment().conditions();
 
     BOOST_REQUIRE_NO_THROW(
@@ -145,33 +144,11 @@ void check_rename_conds_unittest_vpz(vpz::Project& project)
     BOOST_CHECK(not project.experiment().conditions().exist("cc"));
     BOOST_CHECK(not project.experiment().conditions().exist("cd"));
 
-    BOOST_REQUIRE_NO_THROW(
-	lst.updateCondition(std::string("ca"), std::string("new_ca")));
-    BOOST_REQUIRE_NO_THROW(
-	lst.updateCondition(std::string("cb"), std::string("new_cb")));
-    BOOST_REQUIRE_NO_THROW(
-	lst.updateCondition(std::string("cc"), std::string("new_cc")));
-    BOOST_REQUIRE_NO_THROW(
-	lst.updateCondition(std::string("cd"), std::string("new_cd")));
-
-    BOOST_REQUIRE_THROW(
-	lst.updateCondition(std::string("ca"), std::string("new_cd")),
-	utils::ArgError);
-    BOOST_REQUIRE_THROW(
-	lst.updateCondition(std::string("ca"), std::string("new_cd")),
-	utils::ArgError);
-    BOOST_REQUIRE_THROW(
-	lst.updateCondition(std::string("ca"), std::string("new_cd")),
-	utils::ArgError);
-    BOOST_REQUIRE_THROW(
-	lst.updateCondition(std::string("ca"), std::string("new_cd")),
-	utils::ArgError);
-
-    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
 
     BOOST_REQUIRE_NO_THROW(top->updateConditions("cd", "new_cd"));
 
-    vpz::AtomicGraphModel* d = vpz::GraphModel::toAtomic(top->findModel("d"));
+    vpz::AtomicModel* d = vpz::BaseModel::toAtomic(top->findModel("d"));
 
     std::vector < std::string > conditions = d->conditions();
 
@@ -213,17 +190,17 @@ void check_remove_obs_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(not obs_list.exist("obs1"));
 
-    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
-    vpz::CoupledModel* top1 = vpz::GraphModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set < std::string > obs = obs_list.getKeys();
 
     BOOST_REQUIRE_NO_THROW(top->purgeObservable(obs));
 
-    vpz::AtomicGraphModel* a = vpz::GraphModel::toAtomic(top1->findModel("a"));
-    vpz::AtomicGraphModel* b = vpz::GraphModel::toAtomic(top1->findModel("b"));
-    vpz::AtomicGraphModel* c = vpz::GraphModel::toAtomic(top1->findModel("c"));
-    vpz::AtomicGraphModel* x = vpz::GraphModel::toAtomic(top1->findModel("x"));
+    vpz::AtomicModel* a = vpz::BaseModel::toAtomic(top1->findModel("a"));
+    vpz::AtomicModel* b = vpz::BaseModel::toAtomic(top1->findModel("b"));
+    vpz::AtomicModel* c = vpz::BaseModel::toAtomic(top1->findModel("c"));
+    vpz::AtomicModel* x = vpz::BaseModel::toAtomic(top1->findModel("x"));
 
     BOOST_REQUIRE_EQUAL(a->observables(), "");
     BOOST_REQUIRE_EQUAL(b->observables(), "");
@@ -243,28 +220,14 @@ void check_rename_observables_unittest_vpz(vpz::Project& project)
     BOOST_REQUIRE(not obs_list.exist("obs1"));
     BOOST_REQUIRE(not obs_list.exist("obs2"));
 
-    vpz::AtomicModelList& atom_list = project.model().atomicModels();
-    atom_list.updateObservable("obs1", "new_obs1");
-    atom_list.updateObservable("obs2", "new_obs2");
-
-    vpz::CoupledModel* top = vpz::GraphModel::toCoupled(project.model().model());
-    vpz::CoupledModel* top1 = vpz::GraphModel::toCoupled(top->findModel("top1"));
-
-    BOOST_REQUIRE_EQUAL(atom_list.get(
-			    top1->findModel("x")).observables(), "new_obs1");
-    BOOST_REQUIRE_EQUAL(atom_list.get(
-			    top1->findModel("a")).observables(), "new_obs2");
-    BOOST_REQUIRE_EQUAL(atom_list.get(
-			    top1->findModel("b")).observables(), "new_obs2");
-    BOOST_REQUIRE_EQUAL(atom_list.get(
-			    top1->findModel("c")).observables(), "new_obs2");
-
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     BOOST_REQUIRE_NO_THROW(top->updateObservable("obs2", "new_obs2"));
     BOOST_REQUIRE_NO_THROW(top->updateObservable("obs1", "new_obs1"));
 
-    vpz::AtomicGraphModel* a = vpz::GraphModel::toAtomic(top1->findModel("a"));
-    vpz::AtomicGraphModel* x = vpz::GraphModel::toAtomic(top1->findModel("x"));
+    vpz::AtomicModel* a = vpz::BaseModel::toAtomic(top1->findModel("a"));
+    vpz::AtomicModel* x = vpz::BaseModel::toAtomic(top1->findModel("x"));
 
     BOOST_REQUIRE_EQUAL(a->observables(), "new_obs2");
     BOOST_REQUIRE_EQUAL(x->observables(), "new_obs1");
@@ -503,7 +466,7 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(cpled->findModel("d")->isCoupled());
         {
             vpz::CoupledModel* cpled_d(
-                vpz::GraphModel::toCoupled(cpled->findModel("d")));
+                vpz::BaseModel::toCoupled(cpled->findModel("d")));
 
             BOOST_REQUIRE(cpled_d->exist("a"));
             BOOST_REQUIRE(cpled_d->findModel("a")->isAtomic());
@@ -565,7 +528,7 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
         BOOST_REQUIRE(cpled->findModel("d")->isCoupled());
         {
             vpz::CoupledModel* cpled_d(
-                vpz::GraphModel::toCoupled(cpled->findModel("d")));
+                vpz::BaseModel::toCoupled(cpled->findModel("d")));
 
             BOOST_REQUIRE(cpled_d->exist("a"));
             BOOST_REQUIRE(cpled_d->findModel("a")->isAtomic());
@@ -802,7 +765,7 @@ BOOST_AUTO_TEST_CASE(test_connection)
     BOOST_REQUIRE(cpled->exist("e"));
 
     vpz::CoupledModel* top1((vpz::CoupledModel*)cpled->findModel("top1"));
-    vpz::AtomicGraphModel* x((vpz::AtomicGraphModel*)top1->findModel("x"));
+    vpz::AtomicModel* x((vpz::AtomicModel*)top1->findModel("x"));
 
     vpz::ModelPortList out;
     x->getAtomicModelsTarget("out", out);

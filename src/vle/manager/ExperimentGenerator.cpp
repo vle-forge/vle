@@ -29,6 +29,8 @@
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/vpz/Condition.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/vpz/BaseModel.hpp>
+
 
 namespace vle { namespace manager {
 

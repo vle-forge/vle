@@ -36,7 +36,7 @@
 
 namespace vle { namespace vpz {
 
-class GraphModel;
+class BaseModel;
 class CoupledModel;
 
 } } // namespace vle graph
@@ -47,7 +47,7 @@ class Modeling;
 class GVLE;
 
 /**
- * @brief A Gtk::Window to show the vpz::GraphModel hierarchy into a window.
+ * @brief A Gtk::Window to show the vpz::Model hierarchy into a window.
  */
 class ModelTreeBox : public Gtk::TreeView
 {
@@ -64,14 +64,14 @@ public:
      *
      * @param top the head of tree to view
      */
-    void parseModel(vpz::GraphModel* top);
+    void parseModel(vpz::BaseModel* top);
 
     /**
      * active a row for a particular model
      *
      * @param mdl model to activate
      */
-    void showRow(const vpz::GraphModel* mdl);
+    void showRow(const vpz::BaseModel* mdl);
 
     /**
      * Get the treview row as an iterator from the selected model
@@ -79,7 +79,7 @@ public:
      * @param mdl selected model
      * @param current model child
      */
-    Gtk::TreeModel::iterator getModelRow(const vpz::GraphModel* mdl, Gtk::TreeModel::Children child);
+    Gtk::TreeModel::iterator getModelRow(const vpz::BaseModel* mdl, Gtk::TreeModel::Children child);
 
     /**
      * @brief Rename a model with the specified name
@@ -132,7 +132,7 @@ protected:
      * @param name model's name
      * @return A Row to the top of TreeView
      */
-    Gtk::TreeModel::Row addModel(vpz::GraphModel* model);
+    Gtk::TreeModel::Row addModel(vpz::BaseModel* model);
 
     /**
      * Add a new row to the child of row tree with model name and
@@ -143,13 +143,13 @@ protected:
      * @return A Row to the child of Row tree
      */
     Gtk::TreeModel::Row addSubModel(Gtk::TreeModel::Row tree,
-                                    vpz::GraphModel* model);
+                                    vpz::BaseModel* model);
 
 
     /**
      * on activated a row, Modeling is all to show a new View centered on
      * vpz::CoupledModel or AtomicModelBox if model is a
-     * vpz::AtomicGraphModel.
+     * vpz::AtomicModel.
      *
      * @param path
      * @param column
@@ -179,7 +179,7 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
         }
 
         Gtk::TreeModelColumn <Glib::ustring> mName;
-        Gtk::TreeModelColumn <vpz::GraphModel*> mModel;
+        Gtk::TreeModelColumn <vpz::BaseModel*> mModel;
     };
 
     ModelTreeColumn              m_columns;

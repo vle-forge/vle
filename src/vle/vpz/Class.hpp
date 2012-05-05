@@ -29,22 +29,26 @@
 #ifndef VLE_VPZ_CLASS_HPP
 #define VLE_VPZ_CLASS_HPP
 
-#include <vle/vpz/AtomicModels.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/DllDefines.hpp>
+#include <vector>
+#include <set>
 
 namespace vle { namespace vpz {
 
+    class BaseModel;
+    class AtomicModel;
+
     /**
      * @brief The class Class is build on the vpz::Model structure. It stores a
-     * new vpz::GraphModel hierarchy and a vpz::AtomicModels class to build easily
+     * new vpz::Model hierarchy and a vpz::AtomicModels class to build easily
      * new structure of models.
      */
     class VLE_API Class : public Base
     {
     public:
         /**
-         * @brief Build a new Class with a name but without vpz::GraphModel
+         * @brief Build a new Class with a name but without vpz::Model
          * hierarchy.
          * @param name The name of this Class.
          */
@@ -54,17 +58,16 @@ namespace vle { namespace vpz {
         {}
 
         /**
-         * @brief Build a new Class by copying the parameter. The vpz::GraphModel
+         * @brief Build a new Class by copying the parameter. The vpz::Model
          * hierarchy is clone in this function.
          * @param cls The class to copy.
          */
         Class(const Class& cls);
 
         /**
-         * @brief Delete the vpz::GraphModel hierarchy.
+         * @brief Delete the vpz::Model hierarchy.
          */
-        virtual ~Class()
-        { delete m_model; }
+        virtual ~Class();
 
         /**
          * @brief Write the class XML representation into the output stream.
@@ -88,7 +91,7 @@ namespace vle { namespace vpz {
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
-         * Manage the vpz::GraphModel hierarchy
+         * Manage the vpz::Model hierarchy
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -96,14 +99,14 @@ namespace vle { namespace vpz {
          * @brief Get a constant reference to the stored Model.
          * @return Get a constant reference to the stored Model.
          */
-        inline const vpz::GraphModel* model() const
+        inline const BaseModel* model() const
         { return m_model; }
 
         /**
          * @brief Get a reference to the stored Model.
          * @return Get a reference to the stored Model.
          */
-        inline vpz::GraphModel* model()
+        inline BaseModel* model()
         { return m_model; }
 
         /**
@@ -111,36 +114,9 @@ namespace vle { namespace vpz {
          * carreful, the old one are not destroyed.
          * @param mdl The reference to the new model to set.
          */
-        inline void setModel(vpz::GraphModel* mdl)
+        inline void setModel(BaseModel* mdl)
         { m_model = mdl; }
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * Manage the AtomicModelList informations.
-         *
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        /**
-         * @brief Return a constant reference to the vpz::AtomicModelList.
-         * @return a constant reference to the vpz::AtomicModelList.
-         */
-        const AtomicModelList& atomicModels() const
-        { return m_atomicmodels; }
-
-        /**
-         * @brief Return a reference to the vpz::AtomicModelList.
-         * @return a reference to the vpz::AtomicModelList.
-         */
-        AtomicModelList& atomicModels()
-        { return m_atomicmodels; }
-
-	/**
-	 * @Biref Set the current vpz::AtomicModelList by a new one
-	 * @param mdl The reference to the new AtomicModelList to set
-	 */
-
-	inline void setAtomicModel(AtomicModelList& mdl)
-        { m_atomicmodels = mdl; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -176,8 +152,8 @@ namespace vle { namespace vpz {
 	 * dynamic is not present in the list
 	 * @param dynamicslist a list of dynamics name
 	 */
-
 	void purgeDynamics(const std::set < std::string >& dynamicslist);
+
         /**
 	 * @brief Update the Observable of the AtomicModels where an
 	 * oldname became newname, for the graph model.
@@ -210,13 +186,11 @@ namespace vle { namespace vpz {
 	 */
 	void purgeConditions(const std::set < std::string >& conditionlist);
 
-        void getAtomicModelList(std::vector < AtomicGraphModel* >& list) const
-        { list.clear(); m_model->getAtomicModelList(m_model, list); }
+        void getAtomicModelList(std::vector < AtomicModel* >& list) const;
 
     private:
-        AtomicModelList m_atomicmodels;
         std::string     m_name;
-        vpz::GraphModel*   m_model;
+        BaseModel*      m_model;
     };
 
 }} // namespace vle vpz

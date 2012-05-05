@@ -37,7 +37,7 @@
 #include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/StreamWriter.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
@@ -56,18 +56,16 @@ Coordinator::Coordinator(const utils::ModuleManager& modulemgr,
                          const vpz::Dynamics& dyn,
                          const vpz::Classes& cls,
                          const vpz::Experiment& experiment,
-                         const vpz::AtomicModelList& atom,
                          RootCoordinator& root)
-    : m_currentTime(0.0), m_modelFactory(modulemgr, dyn, cls, experiment, atom,
-                                         root), m_modulemgr(modulemgr),
-    m_isStarted(false)
+    : m_currentTime(0.0), m_modelFactory(modulemgr, dyn, cls, experiment, root),
+      m_modulemgr(modulemgr), m_isStarted(false)
 {
 }
 
 Coordinator::~Coordinator()
 {
     {
-        std::map < vpz::AtomicGraphModel*, Simulator* >::iterator it;
+        std::map < vpz::AtomicModel*, Simulator* >::iterator it;
         for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
             delete it->second;
         }
@@ -196,7 +194,7 @@ void Coordinator::addPermanent(const vpz::Observable& observable)
     m_modelFactory.addPermanent(observable);
 }
 
-void Coordinator::createModel(vpz::AtomicGraphModel* model,
+void Coordinator::createModel(vpz::AtomicModel* model,
                               const std::string& dynamics,
                               const std::vector < std::string >& conditions,
                               const std::string& observable)
@@ -205,7 +203,7 @@ void Coordinator::createModel(vpz::AtomicGraphModel* model,
                                observable);
 }
 
-vpz::GraphModel* Coordinator::createModelFromClass(const std::string& classname,
+vpz::BaseModel* Coordinator::createModelFromClass(const std::string& classname,
                                                 vpz::CoupledModel* parent,
                                                 const std::string& modelname)
 {
@@ -213,7 +211,7 @@ vpz::GraphModel* Coordinator::createModelFromClass(const std::string& classname,
                                                classname, modelname);
 }
 
-void Coordinator::addObservableToView(vpz::AtomicGraphModel* model,
+void Coordinator::addObservableToView(vpz::AtomicModel* model,
                                       const std::string& portname,
                                       const std::string& view)
 {
@@ -240,7 +238,7 @@ void Coordinator::addObservableToView(vpz::AtomicGraphModel* model,
 void Coordinator::delModel(vpz::CoupledModel* parent,
                            const std::string& modelname)
 {
-    vpz::GraphModel* mdl = parent->findModel(modelname);
+    vpz::BaseModel* mdl = parent->findModel(modelname);
 
     if (not mdl) {
         throw utils::InternalError(fmt(_(
@@ -252,13 +250,13 @@ void Coordinator::delModel(vpz::CoupledModel* parent,
         parent->delAllConnection(mdl);
         parent->delModel(mdl);
     } else {
-        delAtomicModel(parent, (vpz::AtomicGraphModel*)mdl);
+        delAtomicModel(parent, (vpz::AtomicModel*)mdl);
         parent->delModel(mdl);
     }
 }
 
 void Coordinator::getSimulatorsSource(
-    vpz::GraphModel* model,
+    vpz::BaseModel* model,
     std::vector < std::pair < Simulator*, std::string > >& lst)
 {
     if (m_isStarted) {
@@ -273,7 +271,7 @@ void Coordinator::getSimulatorsSource(
 }
 
 void Coordinator::getSimulatorsSource(
-    vpz::GraphModel* model,
+    vpz::BaseModel* model,
     const std::string& port,
     std::vector < std::pair < Simulator*, std::string > >& lst)
 {
@@ -286,7 +284,7 @@ void Coordinator::getSimulatorsSource(
             lst.push_back(
                 std::make_pair(
                     getModel(
-                        reinterpret_cast < vpz::AtomicGraphModel* >(jt->first)),
+                        reinterpret_cast < vpz::AtomicModel* >(jt->first)),
                     jt->second));
         }
     }
@@ -305,13 +303,13 @@ void Coordinator::updateSimulatorsTarget(
     }
 }
 
-void Coordinator::addSimulatorTargetPort(vpz::AtomicGraphModel* model,
+void Coordinator::addSimulatorTargetPort(vpz::AtomicModel* model,
                                          const std::string& port)
 {
     getModel(model)->addTargetPort(port);
 }
 
-void Coordinator::removeSimulatorTargetPort(vpz::AtomicGraphModel* model,
+void Coordinator::removeSimulatorTargetPort(vpz::AtomicModel* model,
                                             const std::string& port)
 {
     getModel(model)->removeTargetPort(port);
@@ -323,7 +321,7 @@ void Coordinator::removeSimulatorTargetPort(vpz::AtomicGraphModel* model,
 //
 // / / / /
 
-void Coordinator::addModel(vpz::AtomicGraphModel* model, Simulator* simulator)
+void Coordinator::addModel(vpz::AtomicModel* model, Simulator* simulator)
 {
     std::pair < SimulatorMap::iterator, bool > r =
         m_modelList.insert(std::make_pair(model, simulator));
@@ -335,10 +333,10 @@ void Coordinator::addModel(vpz::AtomicGraphModel* model, Simulator* simulator)
     }
 }
 
-Simulator* Coordinator::getModel(const vpz::AtomicGraphModel* model) const
+Simulator* Coordinator::getModel(const vpz::AtomicModel* model) const
 {
     SimulatorMap::const_iterator it =
-        m_modelList.find( const_cast < vpz::AtomicGraphModel* >(model));
+        m_modelList.find( const_cast < vpz::AtomicModel* >(model));
     return (it == m_modelList.end()) ? 0 : it->second;
 }
 
@@ -365,7 +363,7 @@ View* Coordinator::getView(const std::string& name) const
 ///
 
 void Coordinator::delAtomicModel(vpz::CoupledModel* parent,
-                                 vpz::AtomicGraphModel* atom)
+                                 vpz::AtomicModel* atom)
 {
     if (not parent or not atom) {
         throw utils::DevsGraphError(_(
@@ -408,7 +406,7 @@ void Coordinator::delCoupledModel(vpz::CoupledModel* parent,
     for (vpz::ModelList::iterator it = lst.begin(); it != lst.end();
          ++it) {
         if (it->second->isAtomic()) {
-            delAtomicModel(mdl, (vpz::AtomicGraphModel*)(it->second));
+            delAtomicModel(mdl, (vpz::AtomicModel*)(it->second));
         } else if (it->second->isCoupled()) {
             delCoupledModel(mdl, (vpz::CoupledModel*)(it->second));
         }

@@ -39,8 +39,8 @@ using namespace vle;
 namespace vle { namespace gvle {
 
 ConnectionBox::ConnectionBox(vpz::CoupledModel* parent,
-                             vpz::GraphModel* src,
-                             vpz::GraphModel* dst) :
+                             vpz::BaseModel* src,
+                             vpz::BaseModel* dst) :
         Gtk::Dialog(_("Connection Box"), true, true),
         m_vbox(false),
         m_hbox(true),
@@ -80,7 +80,7 @@ ConnectionBox::ConnectionBox(vpz::CoupledModel* parent,
 }
 
 void ConnectionBox::assingComboOutputPort(vpz::CoupledModel* parent,
-        vpz::GraphModel* dst)
+        vpz::BaseModel* dst)
 {
     if (dst == parent) {
         const vpz::ConnectionList& input = dst->getOutputPortList();
@@ -100,7 +100,7 @@ void ConnectionBox::assingComboOutputPort(vpz::CoupledModel* parent,
 }
 
 void ConnectionBox::assingComboInputPort(vpz::CoupledModel* parent,
-        vpz::GraphModel* src)
+        vpz::BaseModel* src)
 {
     if (src == parent) {
         const vpz::ConnectionList& output = src->getInputPortList();

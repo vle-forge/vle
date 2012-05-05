@@ -29,7 +29,7 @@
 #ifndef GUI_IMPORTMODELBOX_HPP
 #define GUI_IMPORTMODELBOX_HPP
 
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <gtkmm.h>
 #include <gtkmm/builder.h>
@@ -46,13 +46,13 @@ class ImportWidget : public Gtk::HBox
 {
 public:
     ImportWidget(ImportModelBox* parent, vpz::Base* base);
-    ImportWidget(ImportModelBox* parent, vpz::GraphModel* atom);
+    ImportWidget(ImportModelBox* parent, vpz::BaseModel* atom);
 
     vpz::Base* get_base() {
         return mBase;
     }
 
-    vpz::GraphModel* get_model() {
+    vpz::BaseModel* get_model() {
         return mAtom;
     }
 
@@ -63,7 +63,7 @@ public:
 private:
     ImportModelBox*             mParent;
     vpz::Base*                  mBase;
-    vpz::GraphModel*               mAtom;
+    vpz::BaseModel*               mAtom;
 
     Gtk::Entry                  mEntry;
     Gtk::Image                  mImage;
@@ -152,7 +152,7 @@ private:
     void rename_observable(vpz::Vpz* src, std::string old_name,
                            std::string new_name);
     void rename_view(vpz::Vpz* src, std::string old_name, std::string new_name);
-    void rename_model(vpz::GraphModel* old_model,
+    void rename_model(vpz::BaseModel* old_model,
                       std::string new_name);
 
     void on_apply();

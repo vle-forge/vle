@@ -42,7 +42,7 @@ namespace vle { namespace gvle {
 
 DynamicBox::DynamicBox(const Glib::RefPtr < Gtk::Builder >& xml,
                        GVLE* gvle,
-                       vpz::AtomicGraphModel& atom,
+                       vpz::AtomicModel& atom,
                        vpz::Dynamic& dynamic,
                        vpz::Conditions& conditions,
                        vpz::Observables& observables)

@@ -31,14 +31,17 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/AtomicModels.hpp>
-#include <vle/vpz/GraphModel.hpp>
 #include <string>
+#include <set>
+#include <vector>
 
 namespace vle { namespace vpz {
 
+    class AtomicModel;
+    class BaseModel;
+
     /**
-     * @brief The vpz::Model is use to store the GraphModel hierarchy.
+     * @brief The vpz::Model is use to store the Model hierarchy.
      */
     class VLE_API Model : public Base
     {
@@ -51,7 +54,7 @@ namespace vle { namespace vpz {
         {}
 
         /**
-         * @brief Copy constructor. The hierarchy of GraphModel is cloned.
+         * @brief Copy constructor. The hierarchy of Model is cloned.
          * @param mdl The model to copy.
          */
         Model(const Model& mdl);
@@ -88,46 +91,32 @@ namespace vle { namespace vpz {
 
         /**
          * @brief Just delete the complete list of graph::AtomicModelList and
-         * set to NULL the GraphModel hierarchy. Don't forget to delete it
+         * set to NULL the Model hierarchy. Don't forget to delete it
          * yourself.
          */
         void clear();
 
         /**
-         * @brief Set a hierachy of GraphModel. If a previous hierarchy
+         * @brief Set a hierachy of Model. If a previous hierarchy
          * already exist, it is not delete same if the new is empty. This
          * function is just an affectation, no clone is build.
-         * @param mdl the new GraphModel hierarchy to set.
+         * @param mdl the new Model hierarchy to set.
          */
-        void setModel(GraphModel* mdl);
+        void setModel(BaseModel* mdl);
 
         /**
-         * @brief Get a reference to the GraphModel hierarchy.
-         * @return A reference to the GraphModel, be carreful, you can damage
+         * @brief Get a reference to the Model hierarchy.
+         * @return A reference to the Model, be carreful, you can damage
          * graph::Vpz instance.
          */
-        GraphModel* model();
+        BaseModel* model();
 
         /**
-         * @brief Get a reference to the GraphModel hierarchy.
-         * @return A reference to the GraphModel, be carreful, you can damage
+         * @brief Get a reference to the Model hierarchy.
+         * @return A reference to the Model, be carreful, you can damage
          * graph::Vpz instance.
          */
-        GraphModel* model() const;
-
-        /**
-         * @brief Return a constant reference to the vpz::AtomicModelList.
-         * @return a constant reference to the vpz::AtomicModelList.
-         */
-        const AtomicModelList& atomicModels() const
-        { return m_atomicmodels; }
-
-        /**
-         * @brief Return a reference to the vpz::AtomicModelList.
-         * @return a reference to the vpz::AtomicModelList.
-         */
-        AtomicModelList& atomicModels()
-        { return m_atomicmodels; }
+        BaseModel* model() const;
 
         /**
 	 * @brief Update the dynamics of the AtomicModels where an
@@ -177,13 +166,19 @@ namespace vle { namespace vpz {
 	 */
 	void purgeConditions(const std::set < std::string >& conditionlist);
 
-        void getAtomicModelList(std::vector < AtomicGraphModel* >& list) const
-        { list.clear(); m_graph->getAtomicModelList(m_graph, list); }
-
+        void getAtomicModelList(std::vector < AtomicModel* >& list) const;
 
     private:
-        AtomicModelList   m_atomicmodels;
-        GraphModel*       m_graph;
+        /**
+         * Private assign operator.
+         *
+         * @param other
+         *
+         * @return
+         */
+        Model& operator=(const Model& other);
+
+        BaseModel*       m_graph;
     };
 
     /**

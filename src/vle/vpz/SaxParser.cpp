@@ -28,7 +28,9 @@
 
 #include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/Model.hpp>
+#include <vle/vpz/BaseModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>

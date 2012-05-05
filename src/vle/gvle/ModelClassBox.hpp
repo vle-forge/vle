@@ -64,9 +64,9 @@ public:
      *
      * @param mdl model to activate
      */
-    void showRow(const vpz::GraphModel* mdl);
+    void showRow(const vpz::BaseModel* mdl);
 
-    Gtk::TreeModel::iterator getModelRow(const vpz::GraphModel* mdl,
+    Gtk::TreeModel::iterator getModelRow(const vpz::BaseModel* mdl,
                                          Gtk::TreeModel::Children child);
 
 
@@ -126,7 +126,7 @@ protected:
      * @return A Row to the child of Row tree
      */
     Gtk::TreeModel::Row addSubModel(Gtk::TreeModel::Row tree,
-                                    vpz::GraphModel* model);
+                                    vpz::BaseModel* model);
 
     /**
      * When user clicks, an editable text area appears if it is not a
@@ -139,7 +139,7 @@ protected:
     /**
      * on activated a row, Modeling is all to show a new View centered on
      * vpz::CoupledModel or AtomicModelBox if model is a
-     * vpz::AtomicGraphModel.
+     * vpz::AtomicModel.
      *
      * @param path
      * @param column
@@ -157,7 +157,7 @@ protected:
         }
 
         Gtk::TreeModelColumn<Glib::ustring> mName;
-	Gtk::TreeModelColumn <vpz::GraphModel*> mModel;
+	Gtk::TreeModelColumn <vpz::BaseModel*> mModel;
     };
 
     ModelColumns mColumns;

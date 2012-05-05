@@ -147,13 +147,13 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     BOOST_REQUIRE(cpl->existOutputPort("o") != 0);
     BOOST_REQUIRE(cpl->existInputPort("i") != 0);
 
-    vpz::GraphModel* mdl1 = cpl->findModel("atom1");
-    vpz::GraphModel* mdl2 = cpl->findModel("atom2");
+    vpz::BaseModel* mdl1 = cpl->findModel("atom1");
+    vpz::BaseModel* mdl2 = cpl->findModel("atom2");
     BOOST_REQUIRE(mdl1 != 0);
     BOOST_REQUIRE(mdl2 != 0);
 
-    vpz::AtomicGraphModel* atom1 = dynamic_cast < vpz::AtomicGraphModel* >(mdl1);
-    vpz::AtomicGraphModel* atom2 = dynamic_cast < vpz::AtomicGraphModel* >(mdl2);
+    vpz::AtomicModel* atom1 = dynamic_cast < vpz::AtomicModel* >(mdl1);
+    vpz::AtomicModel* atom2 = dynamic_cast < vpz::AtomicModel* >(mdl2);
     BOOST_REQUIRE(atom1 != 0);
     BOOST_REQUIRE(atom1->existOutputPort("out"));
     BOOST_REQUIRE(atom1->existInputPort("in"));
@@ -189,19 +189,10 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
 
-    vpz::AtomicGraphModel* atom(
-        reinterpret_cast < vpz::AtomicGraphModel* >(mdl.model()));
+    vpz::AtomicModel* atom(
+        reinterpret_cast < vpz::AtomicModel* >(mdl.model()));
 
-    const vpz::AtomicModel& vatom = mdl.atomicModels().get(atom);
-    BOOST_REQUIRE_EQUAL(vatom.dynamics(), "dyn1");
-    BOOST_REQUIRE_EQUAL(vatom.conditions().front(), "cnd1");
-
-    const vpz::Dynamics& dyns(vpz.project().dynamics());
-    const vpz::Dynamic& dyn(dyns.get(vatom.dynamics()));
-
-    BOOST_REQUIRE_EQUAL(dyn.name(), "dyn1");
-    BOOST_REQUIRE_EQUAL(dyn.library(), "celldevs");
-    BOOST_REQUIRE_EQUAL(dyn.language(), "");
+    BOOST_REQUIRE(atom);
 }
 
 BOOST_AUTO_TEST_CASE(experiment_vpz)

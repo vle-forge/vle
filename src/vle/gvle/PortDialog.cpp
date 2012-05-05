@@ -28,7 +28,7 @@
 
 #include <vle/gvle/PortDialog.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
 #include <gtkmm/stock.h>
@@ -37,7 +37,7 @@ namespace vle
 {
 namespace gvle {
 
-PortDialog::PortDialog(vpz::GraphModel* model, PortDialog::PortType type) :
+PortDialog::PortDialog(vpz::BaseModel* model, PortDialog::PortType type) :
     Gtk::Dialog(_("Port"), true, true),
     mLabelEntry(_("New port:")),
     mModel(model),

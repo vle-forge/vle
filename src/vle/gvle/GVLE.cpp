@@ -275,15 +275,15 @@ void GVLE::focusRow(std::string filepath)
     mFileTreeView->showRow(filepath);
 }
 
-void GVLE::addView(vpz::GraphModel* model)
+void GVLE::addView(vpz::BaseModel* model)
 {
     if (model) {
         if (model->isCoupled()) {
-            vpz::CoupledModel* m = vpz::GraphModel::toCoupled(model);
+            vpz::CoupledModel* m = vpz::BaseModel::toCoupled(model);
             addView(m);
         } else if (model->isAtomic()) {
             try {
-                mAtomicBox->show((vpz::AtomicGraphModel*)model);
+                mAtomicBox->show((vpz::AtomicModel*)model);
             } catch (utils::SaxParserError& e) {
                 gvle::Error((fmt(_("Error showing model, %1%")) %
                              e.what()).str(),false);
@@ -306,7 +306,7 @@ void GVLE::addView(vpz::CoupledModel* model)
     getEditor()->openTabVpz(mModeling->getFileName(), model);
 }
 
-void GVLE::addViewClass(vpz::GraphModel* model, std::string name)
+void GVLE::addViewClass(vpz::BaseModel* model, std::string name)
 {
     assert(model);
     if (model->isCoupled()) {
@@ -314,7 +314,7 @@ void GVLE::addViewClass(vpz::GraphModel* model, std::string name)
         addViewClass(m, name);
     } else if (model->isAtomic()) {
         try {
-            mAtomicBox->show((vpz::AtomicGraphModel*)model);
+            mAtomicBox->show((vpz::AtomicModel*)model);
         } catch (utils::SaxParserError& e) {
             gvle::Error((fmt(_("Error showing model, %1%")) %
                          e.what()).str(),false);
@@ -1676,7 +1676,7 @@ void GVLE::copy(vpz::ModelList& lst, vpz::CoupledModel* gc,
         if (lst.empty() and not mModeling->getSelectedClass().empty()) {
             vpz::Class& currentClass = mModeling->vpz().project().classes()
                 .get(mModeling->getSelectedClass());
-            vpz::GraphModel* model = currentClass.model();
+            vpz::BaseModel* model = currentClass.model();
             vpz::ModelList lst2;
 
             lst2[model->getName()] = model;
@@ -1749,7 +1749,7 @@ void GVLE::importModel()
             if (mImportModelBox) {
                 mImportModelBox->setGCoupled(currentView->getGCoupledModel());
                 if (mImportModelBox->show(src)) {
-                    vpz::GraphModel* import = src->project().model().model();
+                    vpz::BaseModel* import = src->project().model().model();
                     currentView->getGCoupledModel()->addModel(import);
                     mModeling->importModel(src);
                     redrawModelTreeBox();

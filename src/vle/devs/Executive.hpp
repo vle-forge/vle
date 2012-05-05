@@ -65,7 +65,7 @@ class Simulator;
 class VLE_API ExecutiveInit : public DynamicsInit
 {
 public:
-    ExecutiveInit(const vpz::AtomicGraphModel& model,
+    ExecutiveInit(const vpz::AtomicModel& model,
                   PackageId packageid,
                   Coordinator& coordinator)
         : DynamicsInit(model, packageid), m_coordinator(coordinator)
@@ -187,7 +187,7 @@ public:
     /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
      * to this model information of dynamics, condition and observable.
-     * @param name the name of the vpz::AtomicGraphModel to create.
+     * @param name the name of the vpz::AtomicModel to create.
      * @param inputs the list of input ports.
      * @param outputs the list of output ports.
      * @param dynamics the name of the dynamics to attach.
@@ -195,7 +195,7 @@ public:
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    virtual const vpz::AtomicGraphModel*
+    virtual const vpz::AtomicModel*
         createModel(const std::string& name,
                     const std::vector < std::string >& inputs =
                         std::vector < std::string >(),
@@ -213,7 +213,7 @@ public:
      * @param modelname the new name of the model.
      * @throw utils::badArg if modelname already exist.
      */
-    virtual const vpz::GraphModel*
+    virtual const vpz::BaseModel*
         createModelFromClass(const std::string& classname,
                              const std::string& modelname);
 

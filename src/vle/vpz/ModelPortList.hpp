@@ -35,12 +35,12 @@
 
 namespace vle { namespace vpz {
 
-    class GraphModel;
+    class BaseModel;
 
     class VLE_API ModelPortList
     {
     public:
-        typedef std::multimap < GraphModel*, std::string > Values;
+        typedef std::multimap < BaseModel*, std::string > Values;
         typedef Values::iterator iterator;
         typedef Values::const_iterator const_iterator;
         typedef Values::size_type size_type;
@@ -58,7 +58,7 @@ namespace vle { namespace vpz {
          * @param model The model to add.
          * @param portname The port of the model to add.
          */
-        void add(GraphModel* model, const std::string& portname);
+        void add(BaseModel* model, const std::string& portname);
 
         /**
          * @brief Remove a ModelPort from the vector. Linear complexity.
@@ -66,14 +66,14 @@ namespace vle { namespace vpz {
          * @param model The model to delete.
          * @param portname The port of the model to delete.
          */
-        void remove(GraphModel* model, const std::string& portname);
+        void remove(BaseModel* model, const std::string& portname);
 
         /**
          * @brief Remove the specified model.
          *
          * @param model Model to be removed.
          */
-        void erase(GraphModel* model) { m_lst.erase(model); }
+        void erase(BaseModel* model) { m_lst.erase(model); }
 
         /**
          * @brief Remove all ModelPort from the vector. Linear
@@ -99,7 +99,7 @@ namespace vle { namespace vpz {
          * @return True if the (model, portname) exist in vector, false
          * otherwise.
          */
-        bool exist(GraphModel* model, const std::string& portname) const;
+        bool exist(BaseModel* model, const std::string& portname) const;
 
         /**
          * @brief Check if a ModelPort already exist in the vector.
@@ -111,7 +111,7 @@ namespace vle { namespace vpz {
          * @return True if the (model, portname) exist in vector, false
          * otherwise.
          */
-        bool exist(const GraphModel* model, const std::string& portname) const;
+        bool exist(const BaseModel* model, const std::string& portname) const;
 
         inline iterator begin() { return m_lst.begin(); }
         inline const_iterator begin() const { return m_lst.begin(); }

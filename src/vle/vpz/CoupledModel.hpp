@@ -29,7 +29,7 @@
 #ifndef VLE_GRAPH_COUPLED_MODEL_HPP
 #define VLE_GRAPH_COUPLED_MODEL_HPP
 
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/DllDefines.hpp>
 #include <vector>
 
@@ -39,7 +39,7 @@ namespace vle { namespace vpz {
      * @brief Represent the DEVS coupled model. This class have a list of
      * children models, three list of input, output and state connections.
      */
-    class VLE_API CoupledModel : public GraphModel
+    class VLE_API CoupledModel : public BaseModel
     {
     public:
         typedef std::vector < std::string > StringList;
@@ -58,7 +58,7 @@ namespace vle { namespace vpz {
 
         CoupledModel& operator=(const CoupledModel& mdl);
 
-        virtual GraphModel* clone() const
+        virtual BaseModel* clone() const
         { return new CoupledModel(*this); }
 
         /**
@@ -91,7 +91,7 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if model is null or already exist in
          * hierarchy.
          */
-        void addModel(GraphModel* model);
+        void addModel(BaseModel* model);
 
         /**
          * @brief Add a model into the model list. Parent is set to thie coupled
@@ -99,7 +99,7 @@ namespace vle { namespace vpz {
          * @param model The model to add.
          * @param name The new name of the model.
          */
-        void addModel(GraphModel* model, const std::string& name);
+        void addModel(BaseModel* model, const std::string& name);
 
         /**
          * @brief add a new atomic model to the list. Parent is set to this
@@ -107,12 +107,12 @@ namespace vle { namespace vpz {
          *
          * @param name atomic model name to add.
          *
-         * @return The AtomicGraphModel builded by this function.
+         * @return The AtomicModel builded by this function.
          *
          * @throw Exception::Internal if name already exist in this
          * coupledmodel.
          */
-        AtomicGraphModel* addAtomicModel(const std::string& name);
+        AtomicModel* addAtomicModel(const std::string& name);
 
         /**
          * @brief add a new coupled model to the list. Parent is set to this
@@ -135,7 +135,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if model is null.
          */
-        void delModel(GraphModel* model);
+        void delModel(BaseModel* model);
 
         /**
          * @brief Delete all model from this coupled model. If connection
@@ -148,7 +148,7 @@ namespace vle { namespace vpz {
          * be informed and detached of this model.
          * @param model a model to attach.
          */
-        void attachModel(GraphModel* model);
+        void attachModel(BaseModel* model);
 
         /**
          * @brief Attach a list of models into this coupled model. Parent will
@@ -163,7 +163,7 @@ namespace vle { namespace vpz {
          *
          * @param model a model to detach.
          */
-        void detachModel(GraphModel* model);
+        void detachModel(BaseModel* model);
 
         /**
          * @brief Detach a list of model from this coupled model. For each
@@ -179,24 +179,24 @@ namespace vle { namespace vpz {
          * @return model founded, otherwise 0.
          * @deprecated
          */
-        GraphModel* findModel(const std::string& modelname) const;
+        BaseModel* findModel(const std::string& modelname) const;
 
         /**
          * @brief Gets a model with the specified name
          * @param name the model name
          * @return A reference to the found model otherwise 0.
          */
-        GraphModel* getModel(const std::string& name) const;
+        BaseModel* getModel(const std::string& name) const;
 
 
         void addInputConnection(const std::string& portSrc,
-                                GraphModel* dst, const std::string& portDst);
+                                BaseModel* dst, const std::string& portDst);
 
-        void addOutputConnection(GraphModel* src, const std::string& portSrc,
+        void addOutputConnection(BaseModel* src, const std::string& portSrc,
                                  const std::string& portDst);
 
-        void addInternalConnection(GraphModel* src, const std::string& portSrc,
-                                   GraphModel* dst, const std::string& portDst);
+        void addInternalConnection(BaseModel* src, const std::string& portSrc,
+                                   BaseModel* dst, const std::string& portDst);
 
         void addInputConnection(const std::string& portSrc,
                                 const std::string& dst,
@@ -212,11 +212,11 @@ namespace vle { namespace vpz {
                                    const std::string& portDst);
 
         void delInputConnection(const std::string& portSrc,
-                                GraphModel* dst, const std::string& portDst);
-        void delOutputConnection(GraphModel* src, const std::string& portSrc,
+                                BaseModel* dst, const std::string& portDst);
+        void delOutputConnection(BaseModel* src, const std::string& portSrc,
                                  const std::string& portDst);
-        void delInternalConnection(GraphModel* src, const std::string& portSrc,
-                                   GraphModel* dst, const std::string& portDst);
+        void delInternalConnection(BaseModel* src, const std::string& portSrc,
+                                   BaseModel* dst, const std::string& portDst);
         void delInputConnection(const std::string& portSrc,
                                 const std::string& dst,
                                 const std::string& portDst);
@@ -225,7 +225,7 @@ namespace vle { namespace vpz {
                                  const std::string& portDst);
         void delInternalConnection(const std::string& src,
                                    const std::string& portSrc,
-                                   const std::string& GraphModel,
+                                   const std::string& Model,
                                    const std::string& portDst);
 
         bool existInputConnection(const std::string& portsrc,
@@ -264,7 +264,7 @@ namespace vle { namespace vpz {
          *
          * @param m model to delete connection.
          */
-        void delAllConnection(GraphModel* m);
+        void delAllConnection(BaseModel* m);
 
         /**
          * @brief delete all connection (input, output and internal) into
@@ -284,7 +284,7 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if old does not exist or if old or mdl
          * are null.
          */
-        void replace(GraphModel* old, GraphModel* mdl);
+        void replace(BaseModel* old, BaseModel* mdl);
 
         /**
          * @brief Return a string representation of internal connection for the
@@ -292,9 +292,9 @@ namespace vle { namespace vpz {
          * (modelsource, portsource, modeldestination, portdestination). For
          * instance:
          * @code
-         * AtomicGraphModel* a = addAtomicModel("a");
+         * AtomicModel* a = addAtomicModel("a");
          * a->addOutputPort("out");
-         * AtomicGraphModel* b = addAtomicModel("b");
+         * AtomicModel* b = addAtomicModel("b");
          * b->addOutputPort("in");
          *
          * ModelList lst;
@@ -317,9 +317,9 @@ namespace vle { namespace vpz {
          * is represented by 4-uples (modelsource, portsource, modeldestination,
          * portdestination). For instance:
          * @code
-         * AtomicGraphModel* a = addAtomicModel("a");
+         * AtomicModel* a = addAtomicModel("a");
          * a->addOutputPort("out");
-         * AtomicGraphModel* b = addAtomicModel("b");
+         * AtomicModel* b = addAtomicModel("b");
          * b->addOutputPort("in");
          *
          * StringList cnts;
@@ -399,7 +399,7 @@ namespace vle { namespace vpz {
          * @param src the first model
          * @param dst the second model
          */
-        float distanceModels(GraphModel* src, GraphModel* dst);
+        float distanceModels(BaseModel* src, BaseModel* dst);
 
         /**
          * @brief calculate the repulsion force for all models
@@ -444,28 +444,28 @@ namespace vle { namespace vpz {
         void writeConnections(std::ostream& out) const;
 
         /**
-         * @brief Return a reference to the children GraphModel under the
+         * @brief Return a reference to the children Model under the
          * specified position.
          *
-         * @param x the position of GraphModel.
-         * @param y the position of GraphModel.
+         * @param x the position of Model.
+         * @param y the position of Model.
          *
          * @return A reference to the founded model otherwise null.
          */
-        GraphModel* find(int x, int y) const;
+        BaseModel* find(int x, int y) const;
 
         /**
-         * @brief Return a reference to the children GraphModel under the
+         * @brief Return a reference to the children Model under the
          * specified position.
          *
-         * @param x the position of GraphModel.
-         * @param y the position of GraphModel.
-         * @param width the width of the simple GraphModel
-         * @param height the height of the simple GraphModel
+         * @param x the position of Model.
+         * @param y the position of Model.
+         * @param width the width of the simple Model
+         * @param height the height of the simple Model
          *
          * @return A reference to the founded model otherwise null.
          */
-        GraphModel* find(int x, int y, int width, int height) const;
+        BaseModel* find(int x, int y, int width, int height) const;
 
         /**
          * @brief Build a new string for model name. This function assert that
@@ -753,8 +753,8 @@ namespace vle { namespace vpz {
 	virtual void purgeConditions(const std::set < std::string >& conditionlist);
 
     private:
-        void delConnection(GraphModel* src, const std::string& portSrc,
-                           GraphModel* dst, const std::string& portDst);
+        void delConnection(BaseModel* src, const std::string& portSrc,
+                           BaseModel* dst, const std::string& portDst);
 
         /**
          * @brief Copy input and output connections list from src to dst. dst.
@@ -780,8 +780,8 @@ namespace vle { namespace vpz {
          */
         void copyInternalConnection(const ConnectionList& src,
                                     ConnectionList& dst,
-                                    const GraphModel& parentSrc,
-                                    GraphModel& parentDst);
+                                    const BaseModel& parentSrc,
+                                    BaseModel& parentDst);
 
         /**
          * @brief Copy the connection from ModelPortList src to the
@@ -792,15 +792,15 @@ namespace vle { namespace vpz {
          * @param parentDst Parent of dst's ModelPortList.
          */
         void copyInternalPort(const ModelPortList& src, ModelPortList& dst,
-                              const GraphModel& parentSrc, GraphModel& parentDst);
+                              const BaseModel& parentSrc, BaseModel& parentDst);
 
         ModelList       m_modelList;
         ConnectionList  m_internalInputList;
         ConnectionList  m_internalOutputList;
 
         /* Connections */
-        std::vector < GraphModel* > m_srcConnections;
-        std::vector < GraphModel* > m_dstConnections;
+        std::vector < BaseModel* > m_srcConnections;
+        std::vector < BaseModel* > m_dstConnections;
 
         void writeConnection(std::ostream& out) const;
     };

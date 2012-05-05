@@ -100,7 +100,7 @@ void NewModelClassBox::on_apply()
 
     vpz::Class& new_class = classes.add(class_name);
     if (model_type == "Atomic") {
-        vpz::GraphModel* model = new vpz::AtomicGraphModel(model_name, NULL);
+        vpz::BaseModel* model = new vpz::AtomicModel(model_name, NULL);
         new_class.setModel(model);
     } else {
         new_class.setModel(new vpz::CoupledModel(model_name, NULL));

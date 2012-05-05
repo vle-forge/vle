@@ -30,10 +30,10 @@
 #define DEVS_MODELFACTORY_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/Classes.hpp>
-#include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
+#include <vle/vpz/Model.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/utils/ModuleManager.hpp>
@@ -65,7 +65,6 @@ public:
                  const vpz::Dynamics& dyn,
                  const vpz::Classes& cls,
                  const vpz::Experiment& experiment,
-                 const vpz::AtomicModelList& atom,
                  RootCoordinator& root);
 
     /**
@@ -200,7 +199,7 @@ public:
      * @throw utils::InternalError if dynamics not exist.
      */
     void createModel(Coordinator& coordinator,
-                     vpz::AtomicGraphModel* model,
+                     vpz::AtomicModel* model,
                      const std::string& dynamics,
                      const std::vector < std::string >& conditions,
                      const std::string& observable);
@@ -212,7 +211,7 @@ public:
      * @param coordinator the coordinator where attach the simulator.
      * @param model the hierachy of model (coupled model) or atomic model.
      */
-    void createModels(Coordinator& coordinator, const vpz::Model& mdl);
+    void createModels(Coordinator& coordinator, const vpz::Model& vpmdl);
 
     /**
      * @brief Build a new devs::Simulator from the vpz::Classes information.
@@ -221,7 +220,7 @@ public:
      * @throw utils::badArg if modelname already exist or if the classname
      * doest not exist.
      */
-    vpz::GraphModel* createModelFromClass(Coordinator& coordinator,
+    vpz::BaseModel* createModelFromClass(Coordinator& coordinator,
                                        vpz::CoupledModel* parent,
                                        const std::string& classname,
                                        const std::string& modelname);
@@ -237,7 +236,6 @@ private:
     vpz::Classes            mClasses; /**< List of available vpz::Classes. */
     vpz::Experiment         mExperiment; /**< A reference to the
                                            vpz::Experiment. */
-    vpz::AtomicModelList    mAtoms;
     RootCoordinator&        mRoot;
 
     /**

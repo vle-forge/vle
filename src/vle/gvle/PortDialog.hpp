@@ -40,7 +40,7 @@ namespace vle
 {
 namespace vpz {
 
-class GraphModel;
+class BaseModel;
 
 }
 } // namespace vle vpz
@@ -59,12 +59,12 @@ public:
 
     /**
      * @brief Create a new port dialog to insert a new port in a
-     * vpz::GraphModel automatically.
+     * vpz::Model automatically.
      *
-     * @param model vpz::GraphModel to insert a new port.
+     * @param model vpz::Model to insert a new port.
      * @param type dialog box string to put in label.
      */
-    PortDialog(vpz::GraphModel* model, PortDialog::PortType type);
+    PortDialog(vpz::BaseModel* model, PortDialog::PortType type);
 
     /**
      * @brief Nothing to delete
@@ -74,7 +74,7 @@ public:
 
     /**
      * @brief Run dialog and verify inputs of user and affect
-     * vpz::GraphModel if good inputs
+     * vpz::Model if good inputs
      *
      * @return true if successfull modification, otherwise false
      */
@@ -101,7 +101,7 @@ class Column : public Gtk::TreeModel::ColumnRecord
     Gtk::TreeView                   mTreeViewPorts;
     Glib::RefPtr < Gtk::ListStore > mListStore;
     Column                          mColumn;
-    vpz::GraphModel*              mModel;
+    vpz::BaseModel*                     mModel;
     std::set < std::string >        mSet;
     PortDialog::PortType            mPortType;
 };

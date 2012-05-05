@@ -88,11 +88,11 @@ bool ModelClassBox::onSelect(
 
     View* view = mGVLE->getEditor()->getDocumentDrawingArea()->getView();
 
-    vpz::GraphModel* mdl;
+    vpz::BaseModel* mdl;
 
     if (iter) {
         Gtk::TreeModel::Row row = *iter;
-        mdl = (vpz::GraphModel*)row[mColumns.mModel];
+        mdl = (vpz::BaseModel*)row[mColumns.mModel];
         if (mdl) {
             if (info) {
                 view->removeFromSelectedModel(mdl);
@@ -129,7 +129,7 @@ void ModelClassBox::selectNone()
     selection->unselect_all();
 }
 
-Gtk::TreeModel::iterator ModelClassBox::getModelRow(const vpz::GraphModel* mdl,
+Gtk::TreeModel::iterator ModelClassBox::getModelRow(const vpz::BaseModel* mdl,
                                                     Gtk::TreeModel::Children child)
 {
     Gtk::TreeModel::iterator iter = child.begin();
@@ -149,7 +149,7 @@ Gtk::TreeModel::iterator ModelClassBox::getModelRow(const vpz::GraphModel* mdl,
     return iter;
 }
 
-void ModelClassBox::showRow(const vpz::GraphModel* mdl)
+void ModelClassBox::showRow(const vpz::BaseModel* mdl)
 {
     if (mdl->getParent()) {
         Gtk::TreeModel::iterator iter = getModelRow(mdl->getParent(),
@@ -306,7 +306,7 @@ void ModelClassBox::onRename()
                 if (box.valid() and not newname.empty() and newname != oldname) {
                     try {
                         row[mColumns.mName] = newname;
-                        vpz::GraphModel::rename(row[mColumns.mModel], newname);
+                        vpz::BaseModel::rename(row[mColumns.mModel], newname);
                         mGVLE->setModified(true);
                     } catch(utils::DevsGraphError dge) {
                         row[mColumns.mName] = oldname;
@@ -321,12 +321,12 @@ void ModelClassBox::onRename()
 void ModelClassBox::onRenameClass(const std::string& newName)
 {
     vpz::Class& oldClass = mModeling->vpz().project().classes().get(mOldName);
-    vpz::GraphModel* model = oldClass.model();
-    vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
+    vpz::BaseModel* model = oldClass.model();
+    // vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
     mModeling->vpz().project().classes().add(newName);
     mModeling->vpz().project().classes().get(newName).setModel(model);
-    mModeling->vpz().project().classes().get(newName).
-        setAtomicModel(atomicModel);
+    // mModeling->vpz().project().classes().get(newName).
+    //     setAtomicModel(atomicModel);
 
     if (oldClass.model()->isCoupled()) {
         vpz::CoupledModel* c_model =
@@ -351,7 +351,7 @@ void ModelClassBox::onExportVpz()
             Gtk::TreeModel::Row row = *iter;
             vpz::Class& currentClass = mModeling->vpz().project().classes().get(
                 row.get_value(mColumns.mName));
-            vpz::GraphModel* model = currentClass.model();
+            vpz::BaseModel* model = currentClass.model();
 
             Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
             file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -436,9 +436,9 @@ void ModelClassBox::parseClass()
     while (iter != vpz.project().classes().end()) {
         Gtk::TreeModel::Row row = addClass(vpz.project().classes().get(
                                                iter->second.name()));
-        const vpz::GraphModel* top = vpz.project().classes()
+        const vpz::BaseModel* top = vpz.project().classes()
             .get(iter->second.name()).model();
-        Gtk::TreeModel::Row row2 = addSubModel(row, (vpz::GraphModel*)top);
+        Gtk::TreeModel::Row row2 = addSubModel(row, (vpz::BaseModel*)top);
         if (top->isCoupled()) {
             parseModel(row2, (vpz::CoupledModel*)top);
         }
@@ -482,7 +482,7 @@ Gtk::TreeModel::Row ModelClassBox::addClass(const vpz::Class& classe)
 }
 
 Gtk::TreeModel::Row ModelClassBox::addSubModel(Gtk::TreeModel::Row tree,
-                                               vpz::GraphModel* model)
+                                               vpz::BaseModel* model)
 {
     Gtk::TreeModel::Row row = *(mRefTreeModel->append(tree.children()));
     row[mColumns.mName] = model->getName();
@@ -590,7 +590,7 @@ void ModelClassBox::onEdition(
                     Gtk::TreeModel::Row row = *iter;
                     try {
                         row[mColumns.mName] = newName;
-                        vpz::GraphModel::rename(row[mColumns.mModel], newName);
+                        vpz::BaseModel::rename(row[mColumns.mModel], newName);
                         mGVLE->setModified(true);
                     } catch(utils::DevsGraphError dge) {
                         row[mColumns.mName] = mOldName;

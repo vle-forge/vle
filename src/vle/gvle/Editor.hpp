@@ -30,7 +30,7 @@
 #define VLE_GVLE_EDITOR_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/gvle/CompleteViewDrawingArea.hpp>
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/version.hpp>
@@ -85,7 +85,7 @@ public:
     { return mTitle; }
 
     void setTitle(const std::string& fileName,
-                  vpz::GraphModel* model,
+                  vpz::BaseModel* model,
                   bool modified);
 
     virtual void updateView() = 0;
@@ -155,7 +155,7 @@ class VLE_API DocumentDrawingArea : public Document
 {
 public:
     DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
-                        View* view, vpz::GraphModel* model);
+                        View* view, vpz::BaseModel* model);
     virtual ~DocumentDrawingArea();
 
     inline View* getView() const
@@ -167,7 +167,7 @@ public:
     inline SimpleViewDrawingArea* getSimpleDrawingArea() const
     { return mSimpleArea; }
 
-    inline vpz::GraphModel* getModel() const
+    inline vpz::BaseModel* getModel() const
     { return mModel; }
 
     virtual inline bool isDrawingArea() const
@@ -188,7 +188,7 @@ protected:
     View*                       mView;
     CompleteViewDrawingArea*    mCompleteArea;
     SimpleViewDrawingArea*      mSimpleArea;
-    vpz::GraphModel*       mModel;
+    vpz::BaseModel*       mModel;
     Gtk::Viewport*      mViewport;
     Gtk::Adjustment     mAdjustWidth;
     Gtk::Adjustment     mAdjustHeight;
@@ -198,7 +198,7 @@ class VLE_API DocumentCompleteDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentCompleteDrawingArea(GVLE* gvle, const std::string& filePath,
-                                View* view, vpz::GraphModel* model);
+                                View* view, vpz::BaseModel* model);
     virtual ~DocumentCompleteDrawingArea();
 
     virtual bool isComplete()
@@ -211,7 +211,7 @@ class VLE_API DocumentSimpleDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentSimpleDrawingArea(GVLE* gvle, const std::string& filePath,
-                              View* view, vpz::GraphModel* model);
+                              View* view, vpz::BaseModel* model);
     virtual ~DocumentSimpleDrawingArea();
 
     virtual bool isComplete()

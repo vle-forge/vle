@@ -48,7 +48,7 @@ public:
 
     virtual ~AtomicModelBox();
 
-    void show(vpz::AtomicGraphModel* model);
+    void show(vpz::AtomicModel* model);
 
     inline Modeling* getModeling()
     { return mModeling; }
@@ -119,11 +119,11 @@ private:
 			  const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~InputPortTreeView();
 
-	void applyRenaming(vpz::AtomicGraphModel* model);
+	void applyRenaming(vpz::AtomicModel* model);
 	void build();
 	void clearRenaming()
 	    { mRenameList.clear(); }
-	void setModel(vpz::AtomicGraphModel* model)
+	void setModel(vpz::AtomicModel* model)
 	    { mModel = model; }
 
     protected:
@@ -148,7 +148,7 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
 
-	vpz::AtomicGraphModel* mModel;
+	vpz::AtomicModel* mModel;
 	renameList mRenameList;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsPort mColumnsInputPort;
@@ -168,11 +168,11 @@ private:
 			   const Glib::RefPtr < Gtk::Builder >& /*refGlade*/);
 	virtual ~OutputPortTreeView();
 
-	void applyRenaming(vpz::AtomicGraphModel* model);
+	void applyRenaming(vpz::AtomicModel* model);
 	void build();
 	void clearRenaming()
 	    { mRenameList.clear(); }
-	void setModel(vpz::AtomicGraphModel* model)
+	void setModel(vpz::AtomicModel* model)
 	    { mModel = model; }
 
     protected:
@@ -197,7 +197,7 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
 
-	vpz::AtomicGraphModel* mModel;
+	vpz::AtomicModel* mModel;
 	renameList mRenameList;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsPort mColumnsOutputPort;
@@ -228,7 +228,7 @@ private:
         { mModeling = modeling; }
         void setGVLE(GVLE* gvle)
         { mGVLE = gvle; }
-        void setGraphModel(vpz::AtomicGraphModel* atom)
+        void setModel(vpz::AtomicModel* atom)
         { mAtom = atom; }
 	void setLabel(Gtk::Label* label)
         { mLabel = label; }
@@ -256,7 +256,7 @@ private:
 	virtual bool on_button_press_event(GdkEventButton* event);
 
 	// class members
-	vpz::AtomicGraphModel* mAtom;
+	vpz::AtomicModel* mAtom;
 	vpz::Conditions* mConditions;
 	renameList mRenameList;
 	Modeling* mModeling;
@@ -291,7 +291,7 @@ private:
         { mObservables = observables; }
         void setModeling(Modeling* modeling) { mModeling = modeling; }
         void setGVLE(GVLE* gvle) { mGVLE = gvle; }
-        void setGraphModel(vpz::AtomicGraphModel* atom) { mAtom = atom; }
+        void setModel(vpz::AtomicModel* atom) { mAtom = atom; }
         void setLabel(Gtk::Label* label) { mLabel = label; }
         void setParent(AtomicModelBox* parent) { mParent = parent; }
 
@@ -329,7 +329,7 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
         Glib::RefPtr < Gtk::Builder >   mXml;
-	vpz::AtomicGraphModel*          mAtom;
+	vpz::AtomicModel*          mAtom;
 	AtomicModelBox*                 mParent;
 	vpz::Dynamics*                  mDynamics;
 	vpz::Conditions*                mConditions;
@@ -371,7 +371,7 @@ private:
         { mObservables = observables; }
 	void setModeling(Modeling* modeling)
         { mModeling = modeling; }
-        void setGraphModel(vpz::AtomicGraphModel* atom)
+        void setModel(vpz::AtomicModel* atom)
         { mAtom = atom; }
 	void setLabel(Gtk::Label* label)
         { mLabel = label; }
@@ -404,7 +404,7 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
 
-        vpz::AtomicGraphModel*          mAtom;
+        vpz::AtomicModel*          mAtom;
 	vpz::Observables* mObservables;
 	renameList mRenameList;
 	Modeling* mModeling;
@@ -431,8 +431,8 @@ private:
 
     Gtk::Dialog*                         mDialog;
 
-    vpz::AtomicGraphModel*                  mCurrentGraphModel;
-    vpz::AtomicGraphModel*                  mGraphModel;
+    vpz::AtomicModel*                  mCurrentModel;
+    vpz::AtomicModel*                  mModel;
     vpz::Conditions*                     mCond;
     vpz::Dynamics*                       mDyn;
     vpz::Observables*                    mObs;

@@ -62,7 +62,7 @@ void SimpleViewDrawingArea::draw()
     }
 }
 
-void SimpleViewDrawingArea::drawChildrenModel(vpz::GraphModel* model,
+void SimpleViewDrawingArea::drawChildrenModel(vpz::BaseModel* model,
 					      const Gdk::Color& color)
 {
     setColor(color);
@@ -173,9 +173,9 @@ void SimpleViewDrawingArea::preComputeConnection(int xs, int ys,
     mConnections.push_back(con);
 }
 
-void SimpleViewDrawingArea::preComputeConnection(vpz::GraphModel* src,
+void SimpleViewDrawingArea::preComputeConnection(vpz::BaseModel* src,
 						 const std::string& portsrc,
-						 vpz::GraphModel* dst,
+						 vpz::BaseModel* dst,
 						 const std::string& portdst)
 {
     int xs = 0, ys = 0, xd = 0, yd = 0;
@@ -198,9 +198,9 @@ void SimpleViewDrawingArea::preComputeConnection(vpz::GraphModel* src,
     }
 }
 
-void SimpleViewDrawingArea::computeConnection(vpz::GraphModel* src,
+void SimpleViewDrawingArea::computeConnection(vpz::BaseModel* src,
 					      const std::string& portsrc,
-					      vpz::GraphModel* dst,
+					      vpz::BaseModel* dst,
 					      const std::string& portdst,
 					      int index)
 {
@@ -278,8 +278,8 @@ void SimpleViewDrawingArea::getCurrentModelOutPosition(const std::string& port,
 }
 
 void SimpleViewDrawingArea::getModelInPosition(int xs, int ys,
-					       vpz::GraphModel* dst,
-					       vpz::GraphModel* center,
+					       vpz::BaseModel* dst,
+					       vpz::BaseModel* center,
 					       int&x, int& y)
 {
     int a = ((dst->x() - xs) * (dst->x() - xs))
@@ -301,9 +301,9 @@ void SimpleViewDrawingArea::getModelInPosition(int xs, int ys,
 }
 
 
-void SimpleViewDrawingArea::getModelOutPosition(vpz::GraphModel* src,
+void SimpleViewDrawingArea::getModelOutPosition(vpz::BaseModel* src,
 						int xd, int yd,
-						vpz::GraphModel* center,
+						vpz::BaseModel* center,
 						int&x, int& y)
 {
     int a = ((xd - src->x()) * (xd - src->x()))
@@ -404,7 +404,7 @@ bool SimpleViewDrawingArea::on_button_press_event(GdkEventButton* event)
     mMouse.set_y((int)(event->y / mZoom));
     bool shiftOrControl = (event->state & GDK_SHIFT_MASK) or(event->state &
                                                              GDK_CONTROL_MASK);
-    vpz::GraphModel* model = mCurrent->find(mMouse.get_x(), mMouse.get_y(),
+    vpz::BaseModel* model = mCurrent->find(mMouse.get_x(), mMouse.get_y(),
 					 2 * MODEL_RADIUS, 2 * MODEL_RADIUS);
 
     switch (currentbutton) {
@@ -483,7 +483,7 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
 		for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
 		     y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
 		     ++y) {
-		    vpz::GraphModel* model = mCurrent->find(x, y,
+		    vpz::BaseModel* model = mCurrent->find(x, y,
 							 2 * MODEL_RADIUS,
 							 2 * MODEL_RADIUS);
 		    if (model)
@@ -498,7 +498,7 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
         }
 
         if (mView->getAllSelectedModels().size() == 1) {
-            vpz::GraphModel* mod = mView->getFirstSelectedModels();
+            vpz::BaseModel* mod = mView->getFirstSelectedModels();
             if (mView->isClassView()) {
                 mGVLE->getModelTreeBox()->selectNone();
                 mGVLE->getModelClassBox()->showRow(mod);

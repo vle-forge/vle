@@ -185,7 +185,7 @@ public:
      *
      * @param model a ptr to the GModel to show.
      */
-    void addView(vpz::GraphModel* model);
+    void addView(vpz::BaseModel* model);
 
     /**
      * find a view in list view that reference a GCoupledModel.
@@ -200,7 +200,7 @@ public:
      *
      * @param model to ptr to the GModel assiociate to the class
      */
-    void addViewClass(vpz::GraphModel* model, std::string name);
+    void addViewClass(vpz::BaseModel* model, std::string name);
 
     /**
      * find a view in list view that reference a GCoupledModel.

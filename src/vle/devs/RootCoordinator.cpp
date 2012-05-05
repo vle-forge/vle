@@ -33,7 +33,7 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/utils/Rand.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <cmath>
 
 namespace vle { namespace devs {
@@ -90,11 +90,6 @@ void RootCoordinator::load(const vpz::Vpz& io)
         delete m_root;
     }
 
-    if (io.project().model().atomicModels().empty()) {
-        throw utils::ArgError(_("RootCoordinator: no atomic model in this"
-                                " vpz"));
-    }
-
     m_begin = io.project().experiment().begin();
     m_end = m_begin + io.project().experiment().duration();
     m_currentTime = m_begin;
@@ -103,7 +98,6 @@ void RootCoordinator::load(const vpz::Vpz& io)
                                     io.project().dynamics(),
                                     io.project().classes(),
                                     io.project().experiment(),
-                                    io.project().model().atomicModels(),
                                     *this);
 
     m_coordinator->init(io.project().model(), m_currentTime, m_end);

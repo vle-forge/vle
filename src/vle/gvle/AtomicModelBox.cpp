@@ -117,7 +117,7 @@ bool AtomicModelBox::InputPortTreeView::on_button_press_event(
   return return_value;
 }
 
-void AtomicModelBox::InputPortTreeView::applyRenaming(vpz::AtomicGraphModel* model)
+void AtomicModelBox::InputPortTreeView::applyRenaming(vpz::AtomicModel* model)
 {
     renameList::const_iterator it = mRenameList.begin();
 
@@ -330,7 +330,7 @@ bool AtomicModelBox::OutputPortTreeView::on_button_press_event(
 }
 
 void AtomicModelBox::OutputPortTreeView::applyRenaming(
-    vpz::AtomicGraphModel* model)
+    vpz::AtomicModel* model)
 {
     renameList::const_iterator it = mRenameList.begin();
 
@@ -1483,7 +1483,7 @@ AtomicModelBox::AtomicModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
     mXml(xml),
     mModeling(m),
     mGVLE(gvle),
-    mGraphModel(0),
+    mModel(0),
     mCond(0),
     mDyn(0),
     mObs(0)
@@ -1523,27 +1523,27 @@ AtomicModelBox::~AtomicModelBox()
     mDialog->hide_all();
 }
 
-void AtomicModelBox::show(vpz::AtomicGraphModel* model)
+void AtomicModelBox::show(vpz::AtomicModel* model)
 {
     const Modeling& modeling = (*(const Modeling*)mModeling);
     mDialog->set_title("Atomic Model " + model->getName());
 
-    mCurrentGraphModel = model;
+    mCurrentModel = model;
 
-    mGraphModel = new vpz::AtomicGraphModel(*model);
+    mModel = new vpz::AtomicModel(*model);
     mCond = new vpz::Conditions(modeling.conditions());
     mDyn = new vpz::Dynamics(modeling.dynamics());
     mObs = new vpz::Observables(modeling.observables());
 
-    mInputPorts->setModel(mGraphModel);
+    mInputPorts->setModel(mModel);
     mInputPorts->clearRenaming();
     mInputPorts->build();
 
-    mOutputPorts->setModel(mGraphModel);
+    mOutputPorts->setModel(mModel);
     mOutputPorts->clearRenaming();
     mOutputPorts->build();
 
-    mConditions->setGraphModel(mGraphModel);
+    mConditions->setModel(mModel);
     mConditions->setModeling(mModeling);
     mConditions->setGVLE(mGVLE);
     mConditions->setLabel(mLabelConditions);
@@ -1551,7 +1551,7 @@ void AtomicModelBox::show(vpz::AtomicGraphModel* model)
     mConditions->clearRenaming();
     mConditions->build();
 
-    mDynamics->setGraphModel(mGraphModel);
+    mDynamics->setModel(mModel);
     mDynamics->setModeling(mModeling);
     mDynamics->setGVLE(mGVLE);
     mDynamics->setLabel(mLabelDynamics);
@@ -1562,7 +1562,7 @@ void AtomicModelBox::show(vpz::AtomicGraphModel* model)
     mDynamics->clearRenaming();
     mDynamics->build();
 
-    mObservables->setGraphModel(mGraphModel);
+    mObservables->setModel(mModel);
     mObservables->setModeling(mModeling);
     mObservables->setLabel(mLabelObservables);
     mObservables->setObservables(mObs);
@@ -1575,30 +1575,30 @@ void AtomicModelBox::show(vpz::AtomicGraphModel* model)
 
 void AtomicModelBox::applyPorts()
 {
-    mInputPorts->applyRenaming(mCurrentGraphModel);
-    mOutputPorts->applyRenaming(mCurrentGraphModel);
+    mInputPorts->applyRenaming(mCurrentModel);
+    mOutputPorts->applyRenaming(mCurrentModel);
 
     // Apply input ports
     {
 	vpz::ConnectionList connec_in_list =
-	    mCurrentGraphModel->getInputPortList();
+	    mCurrentModel->getInputPortList();
 	vpz::ConnectionList::iterator it = connec_in_list.begin();
 
 	while (it != connec_in_list.end()) {
-	    if (not mGraphModel->existInputPort(it->first)) {
-		mCurrentGraphModel->delInputPort(it->first);
+	    if (not mModel->existInputPort(it->first)) {
+		mCurrentModel->delInputPort(it->first);
 	    }
 	    ++it;
 	}
     }
     {
 	vpz::ConnectionList connec_in_list =
-     	    mGraphModel->getInputPortList();
+     	    mModel->getInputPortList();
 	vpz::ConnectionList::iterator it = connec_in_list.begin();
 
      	while (it != connec_in_list.end()) {
-	    if (not mCurrentGraphModel->existInputPort(it->first)) {
-		mCurrentGraphModel->addInputPort(it->first);
+	    if (not mCurrentModel->existInputPort(it->first)) {
+		mCurrentModel->addInputPort(it->first);
 	    }
      	    ++it;
      	}
@@ -1607,24 +1607,24 @@ void AtomicModelBox::applyPorts()
     // Apply output ports
     {
 	vpz::ConnectionList connec_out_list =
-	    mCurrentGraphModel->getOutputPortList();
+	    mCurrentModel->getOutputPortList();
 	vpz::ConnectionList::iterator it = connec_out_list.begin();
 
 	while (it != connec_out_list.end()) {
-	    if (not mGraphModel->existOutputPort(it->first)) {
-		mCurrentGraphModel->delOutputPort(it->first);
+	    if (not mModel->existOutputPort(it->first)) {
+		mCurrentModel->delOutputPort(it->first);
 	    }
 	    ++it;
 	}
     }
     {
 	vpz::ConnectionList& connec_out_list =
-     	    mGraphModel->getOutputPortList();
+     	    mModel->getOutputPortList();
 	vpz::ConnectionList::iterator it = connec_out_list.begin();
 
      	while (it != connec_out_list.end()) {
-	    if (not mCurrentGraphModel->existOutputPort(it->first)) {
-		mCurrentGraphModel->addOutputPort(it->first);
+	    if (not mCurrentModel->existOutputPort(it->first)) {
+		mCurrentModel->addOutputPort(it->first);
 	    }
      	    ++it;
      	}
@@ -1632,10 +1632,10 @@ void AtomicModelBox::applyPorts()
 
     // Apply height
     {
-        mCurrentGraphModel->setHeight(
+        mCurrentModel->setHeight(
             ViewDrawingArea::MODEL_HEIGHT +
-            std::max(mCurrentGraphModel->getInputPortNumber(),
-                     mCurrentGraphModel->getOutputPortNumber()) *
+            std::max(mCurrentModel->getInputPortNumber(),
+                     mCurrentModel->getOutputPortNumber()) *
             (ViewDrawingArea::MODEL_SPACING_PORT +
              ViewDrawingArea::MODEL_PORT));
     }
@@ -1660,7 +1660,7 @@ void AtomicModelBox::applyConditions()
     mModeling->vpz().project().model().purgeConditions(conditions);
     mModeling->vpz().project().classes().purgeConditions(conditions);
 
-    mCurrentGraphModel->setConditions(mConditions->getConditions());
+    mCurrentModel->setConditions(mConditions->getConditions());
 
     delete mCond;
     mCond = 0;
@@ -1689,7 +1689,7 @@ void AtomicModelBox::applyDynamics()
         mDynamics->get_selection();
 
     if (refSelection->get_selected()) {
-        mCurrentGraphModel->setDynamics(mDynamics->getDynamic());
+        mCurrentModel->setDynamics(mDynamics->getDynamic());
     }
 
     delete mDyn;
@@ -1719,7 +1719,7 @@ void AtomicModelBox::applyObservables()
         mObservables->get_selection();
 
     if (refSelection->get_selected()) {
-        mCurrentGraphModel->setObservables(mObservables->getObservable());
+        mCurrentModel->setObservables(mObservables->getObservable());
     }
 
     delete mObs;
@@ -1733,16 +1733,16 @@ void AtomicModelBox::on_apply()
     applyDynamics();
     applyObservables();
 
-    delete mGraphModel;
-    mGraphModel = 0;
+    delete mModel;
+    mModel = 0;
 
     mDialog->hide_all();
 }
 
 void AtomicModelBox::on_cancel()
 {
-    delete mGraphModel;
-    mGraphModel = 0;
+    delete mModel;
+    mModel = 0;
     delete mCond;
     mCond = 0;
     delete mDyn;

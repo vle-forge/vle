@@ -43,7 +43,7 @@
             return new mdl(init, events);                               \
         }                                                               \
                                                                         \
-        VLE_API void                                                 \
+        VLE_API void                                                    \
         vle_api_level(vle::uint32_t* major,                             \
                       vle::uint32_t* minor,                             \
                       vle::uint32_t* patch)                             \
@@ -59,7 +59,7 @@ namespace vle { namespace devs {
     class VLE_API DynamicsWrapperInit : public DynamicsInit
     {
     public:
-        DynamicsWrapperInit(const vpz::AtomicGraphModel& atom,
+        DynamicsWrapperInit(const vpz::AtomicModel& atom,
                             PackageId packageid,
                             const std::string& library)
             : DynamicsInit(atom, packageid), m_library(library)

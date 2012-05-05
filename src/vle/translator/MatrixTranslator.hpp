@@ -126,7 +126,7 @@ namespace vle { namespace translator {
         virtual ~MatrixTranslator();
 
 	std::string getName(unsigned int i, unsigned int j = 0) const;
-	const vpz::AtomicGraphModel* getModel(const std::string& name) const;
+	const vpz::AtomicModel* getModel(const std::string& name) const;
 	unsigned int getSize(unsigned int i) const;
         void translate(const value::Value& buffer);
 
@@ -153,7 +153,7 @@ namespace vle { namespace translator {
 
         std::string m_prefix;
         unsigned int* m_init;
-        std::map < std::string , const vpz::AtomicGraphModel* > m_models;
+        std::map < std::string , const vpz::AtomicModel* > m_models;
         bool m_symmetricport;
 
         bool existModel(unsigned int i, unsigned int j = 0);

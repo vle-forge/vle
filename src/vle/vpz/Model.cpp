@@ -27,7 +27,7 @@
 
 
 #include <vle/vpz/Model.hpp>
-#include <vle/vpz/GraphModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <algorithm>
@@ -42,8 +42,6 @@ Model::Model(const Model& mdl) :
         m_graph = 0;
     } else {
         m_graph = mdl.m_graph->clone();
-        std::for_each(mdl.m_atomicmodels.begin(), mdl.m_atomicmodels.end(),
-                      CopyAtomicModel(m_atomicmodels, *m_graph));
     }
 }
 
@@ -56,21 +54,21 @@ void Model::write(std::ostream& out) const
 
 void Model::clear()
 {
-    m_atomicmodels.clear();
+    // m_atomicmodels.clear();
     m_graph = 0;
 }
 
-void Model::setModel(GraphModel* mdl)
+void Model::setModel(BaseModel* mdl)
 {
     m_graph = mdl;
 }
 
-GraphModel* Model::model()
+BaseModel* Model::model()
 {
     return m_graph;
 }
 
-GraphModel* Model::model() const
+BaseModel* Model::model() const
 {
     return m_graph;
 }
@@ -107,5 +105,12 @@ void Model::purgeConditions(const std::set < std::string >& conditionlist)
 {
     m_graph->purgeConditions(conditionlist);
 }
+
+void Model::getAtomicModelList(std::vector < AtomicModel* >& list) const
+{
+    list.clear();
+    m_graph->getAtomicModelList(m_graph, list);
+}
+
 
 }} // namespace vle vpz
