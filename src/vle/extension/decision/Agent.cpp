@@ -192,14 +192,14 @@ value::Value* Agent::observation(
         std::stringstream out;
         out << activities();
         return new value::String(out.str());
-    } else if (port.compare(0, 9, "Activity_") and port.size() > 9) {
-        std::string activity(port, 10, std::string::npos);
+    } else if ((port.compare(0, 9, "Activity_") == 0) and port.size() > 9) {
+        std::string activity(port, 9, std::string::npos);
         const Activity& act(activities().get(activity)->second);
         std::stringstream out;
         out << act.state();
         return new value::String(out.str());
-    } else if (port.compare(0, 6, "Rules_") and port.size() > 6) {
-        std::string rule(port, 7, std::string::npos);
+    } else if ((port.compare(0, 6, "Rules_") == 0) and port.size() > 6) {
+        std::string rule(port, 6, std::string::npos);
         const Rule& ru(rules().get(rule));
         return new value::Boolean(ru.isAvailable());
     }
