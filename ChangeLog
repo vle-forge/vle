@@ -1,4 +1,136 @@
-vle-1.0.2
+vle-1.0.3
+
+commit 8ef7066f8d47cce3738d89abc12e203db81357d3
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu May 3 11:34:17 2012 +0200
+
+    vle: update NEWS
+
+commit bfe67f12e0014edf7946c66e29b7555e198cbcf4
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Tue May 15 10:06:53 2012 +0200
+
+    ext/dec: fix observation of decision agents
+    
+    Observation of activities and rules in decision extension is fixed.
+
+commit a1d8ee558a24920f7602b8cecfc899b0b64b44e1
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Apr 19 16:26:57 2012 +0200
+
+    win32: fix BOOST directory during package processes
+    
+    The variable BOOST_ROOT, BOOST_LIBRARYDIR and BOOST_INCLUDEDIR are set
+    via setenv function to classical Win32 path (i.e. with whitespace).
+    However, it seems that we require 8.3 names to enforce the compatibility
+    between Ming32 and CMake scripts.
+    
+    Thus, we override the environment variables BOOST_ROOT, BOOST_LIBRARYDIR
+    and BOOST_INCLUDEDIR with 8.3 name instead of classical names.
+
+commit 594a99236e6323062b447c78e42a32d15e27a96f
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Sun Apr 29 16:41:31 2012 +0200
+
+    ext/dec: allow parsing real with dots
+    
+    One can now specify reals with utils::Parser that are not integers
+    temporal {
+      start = +10;
+      finish = +23.5;
+    }
+
+commit 55a752659ac291db2c4a996fddf7e19e6d51297c
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Fri Apr 27 17:14:47 2012 +0200
+
+    ext/dec: Add relative date to decision plans
+    
+    In decision plans, dates can now be declared as relative to the time the
+    agent loads the plan. E.g, this following interval is equivalent to
+    [loadTime+10; loadTime+23] :
+        temporal {
+          start = +10;
+          finish = +23;
+        }
+
+commit aa45895355289bf04bc6e2cd8ef4dfb5c39aa70c
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Thu Apr 12 19:36:07 2012 +0200
+
+    ext/dec: String dates for decision files
+    
+    The dates given in the decision file can now be given in string format.
+    The two following temporal blocks have the same behavior :
+    temporal {
+      start = 2451698;
+      finish =  "2000-06-03";
+    }
+    temporal {
+      start = "2000-06-02";
+      finish = 2451699;
+    }
+
+commit 2f2616b77a20a16284bd61cc4e595de97ad81533
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Mar 7 08:59:19 2012 +0100
+
+    ext/fsa: fix message in StatechartDbg
+    
+    When receiving an empty event, a bad formated message was provided.
+    (Closes: #3496295)
+
+commit 7a59e5a1ca2828b4a5653209655345ebe7fc134c
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Mar 6 14:23:01 2012 +0100
+
+    ext/fsa: assign a complete identifier to insert function
+    
+    The boost::assign::insert function is used by many FDDevs and Moore
+    functions. CLang does not have the complete type during the compilation
+    time without the boost::assign namespace.
+
+commit 6aa854bdbd065a5f907fbd762f2bca7cfec30447
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Mar 6 12:01:08 2012 +0100
+
+    gvle: fix binding reference member to stack allocated
+    
+    The std::string parameter of InteractiveTypeBox bind reference member
+    'mCurrentValue' to stack allocated parameter. We fix the problem by
+    using reference parameter.
+
+commit c9a614449b2c0e691c96ee60d6e345b676840c80
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Mar 6 11:49:39 2012 +0100
+
+    ext/de: remove an unused_value
+    
+    We remove an expression result unused in the Multiple class.
+
+commit 15432dd70b78b0f690fc32e01b771f92c210be60
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Mar 6 11:46:41 2012 +0100
+
+    devs: fix warning in EventList push_back function
+    
+    The EventList class inherits of the std::vector. CLang compiler needs to
+    specify completely the push_back function.
+
+commit ac21d898cce53bfb4f9b234e8ff7d1bbb405bfca
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Mar 6 11:41:23 2012 +0100
+
+    oov: Add virtual destructor to FileType
+    
+    The FileType class is an interface. The subclass Rdata, CSV and Text
+    need to have a virtual destructor.
+
+commit 58db83e92bc3f706d7c8eddbcd7d0497c0933231
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Feb 16 12:25:26 2012 +0100
+
+    vle-1.0.2
 
 commit 1d8c3c0f553ce5c65fff86c40c3405d344987381
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
