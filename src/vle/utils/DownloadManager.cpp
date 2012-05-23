@@ -28,21 +28,40 @@
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Trace.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <libxml/nanohttp.h>
-#include <libxml/tree.h>
+#include <curl/curl.h>
 #include <cstring>
 #include <fstream>
 
 namespace vle { namespace utils {
 
+struct WrittenData
+{
+    std::ofstream *output;
+    size_t        *size;
+};
+
+static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
+{
+    WrittenData *wd = reinterpret_cast < WrittenData* >(userp);
+
+    if (buffer) {
+        wd->output->write((const char *)buffer, size * nmemb);
+        (*wd->size) += (size * nmemb);
+    }
+
+    return size * nmemb;
+}
+
 class DownloadManager::Pimpl
 {
 public:
     Pimpl()
-        : mUrl(), mFilename(), mErrorMessage(), mDownloadManageredSize(0),
-        mIsStarted(false), mIsFinish(false), mHasError(false)
+        : mHandle(NULL), mUrl(), mFilename(), mErrorMessage(),
+          mDownloadManageredSize(0), mIsStarted(false),
+          mIsFinish(false), mHasError(false)
     {
     }
 
@@ -53,12 +72,14 @@ public:
 
     void start(const std::string& url)
     {
-        mUrl.assign(url);
-
-        if (not mIsStarted) {
-            mIsStarted = true;
-            mThread = boost::thread(&DownloadManager::Pimpl::run, this);
+        if (mHandle or mIsStarted) {
+            throw utils::InternalError(
+                fmt(_("Download manager: already start")));
         }
+
+        mUrl.assign(url);
+        mIsStarted = true;
+        mThread = boost::thread(&DownloadManager::Pimpl::run, this);
     }
 
     void join()
@@ -73,84 +94,60 @@ public:
 
     void run()
     {
-        xmlNanoHTTPInit();
-
-        void* ctxt = xmlNanoHTTPMethod(mUrl.c_str(), "GET", NULL, NULL, NULL,
-                                       0);
-
-        if (not ctxt) {
-            boost::mutex::scoped_lock lock(mMutex);
-            mHasError = true;
-            mErrorMessage = (fmt(
-                    _("Remote access: no response from server `%1%'")) %
-                mUrl).str();
-            return;
+        if (mHandle or not mIsStarted) {
+            throw utils::InternalError(
+                fmt(_("Download manager: handle already initialized")));
         }
 
-        int code = xmlNanoHTTPReturnCode(ctxt);
-        if (code != 200) {
-            boost::mutex::scoped_lock lock(mMutex);
-            mHasError = true;
-            mErrorMessage = (fmt(
-                    _("Remote access: server `%1%' return bad access `%2%'")) %
-                mUrl % code).str();
-            return;
+        if (not (mHandle = curl_easy_init())) {
+            throw utils::InternalError(
+                fmt(_("Download manager: fail to initialized handle")));
         }
-
-        xmlBuffer* output = xmlBufferCreate();
-        xmlChar buf[1024];
-        int len;
-
-        while ((len = xmlNanoHTTPRead(ctxt, buf, sizeof(buf))) > 0) {
-            if(xmlBufferAdd(output, buf, len) != 0) {
-                xmlNanoHTTPClose(ctxt);
-                xmlBufferFree(output);
-
-                boost::mutex::scoped_lock lock(mMutex);
-                mHasError = true;
-                mErrorMessage = (fmt(
-                        _("Remote access: error during download at bytes %1%"))
-                    % (xmlBufferLength(output))).str();
-                return;
-            }
-        }
-
-        xmlNanoHTTPClose(ctxt);
-        xmlBufferFree(output);
-        xmlNanoHTTPCleanup();
 
         std::ofstream file;
         std::string filename(utils::Path::getTempFile("vle-remote-", &file));
 
-        if (not filename.empty() and file.is_open()) {
-            {
-                boost::mutex::scoped_lock lock(mMutex);
-                mFilename.assign(filename);
-            }
+        WrittenData wd;
+        wd.output = &file;
+        wd.size = &mDownloadManageredSize;
 
-            file.write(
-                reinterpret_cast < const char* >(xmlBufferContent(output)),
-                xmlBufferLength(output));
-            xmlNanoHTTPClose(ctxt);
-            xmlBufferFree(output);
-            mHasError = false;
-        } else {
-            xmlNanoHTTPClose(ctxt);
-            xmlBufferFree(output);
-            boost::mutex::scoped_lock lock(mMutex);
-            mHasError = true;
-            mErrorMessage = (fmt(
-                    _("Remote access: failed to store in file `%1%'")) %
-                filename).str();
+        if (filename.empty() or not file.is_open()) {
+            throw utils::InternalError(
+                fmt(_("Download manager: fail to build temporary file")));
         }
+
+        {
+            boost::mutex::scoped_lock lock(mMutex);
+            mFilename.assign(filename);
+        }
+
+        curl_easy_setopt(mHandle, CURLOPT_URL, mUrl.c_str());
+        curl_easy_setopt(mHandle, CURLOPT_WRITEFUNCTION, write_data);
+        curl_easy_setopt(mHandle, CURLOPT_WRITEDATA,
+                         reinterpret_cast < void* >(&wd));
+
+        if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
+            curl_easy_setopt(mHandle, CURLOPT_VERBOSE, 1);
+            curl_easy_setopt(mHandle, CURLOPT_NOPROGRESS, 1);
+        }
+
+        CURLcode result = curl_easy_perform(mHandle);
+
+        if (result) {
+            mHasError = true;
+            mErrorMessage = curl_easy_strerror(result);
+        }
+
+        curl_easy_cleanup(mHandle);
     }
 
     boost::mutex mMutex;
     boost::thread mThread;
+    CURL *mHandle;
     std::string mUrl;
     std::string mFilename;
     std::string mErrorMessage;
-    uint32_t mDownloadManageredSize;
+    size_t mDownloadManageredSize;
     bool mIsStarted;
     bool mIsFinish;
     bool mHasError;
