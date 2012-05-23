@@ -58,6 +58,15 @@ if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_COMPILER_IS_GNUCXX)
 endif ()
 
 #
+# Check the curl library
+#
+find_package(CURL REQUIRED)
+
+if (NOT CURL_FOUND)
+  message(FATAL_ERROR "The curl library is required")
+endif ()
+
+#
 # Check libraries with pkgconfig
 #
 find_package(PkgConfig REQUIRED)
