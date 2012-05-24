@@ -19,6 +19,8 @@ add_subdirectory(devs)
 add_subdirectory(manager)
 add_subdirectory(translator)
 
+add_sources(vlelib DllDefines.hpp vle.hpp vle.cpp)
+
 if (HAVE_GVLE)
   include_directories(${CAIROMM_INCLUDE_DIRS} ${GTKMM_INCLUDE_DIRS}
     ${GLADEMM_INCLUDE_DIRS})

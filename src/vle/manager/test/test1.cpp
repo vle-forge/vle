@@ -40,12 +40,16 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/vle.hpp>
 
 struct F
 {
-    F() { vle::manager::init(); }
-    ~F() { vle::manager::finalize(); }
+    vle::Init a;
+
+    F() : a() { }
+    ~F() { }
 };
+
 
 BOOST_GLOBAL_FIXTURE(F)
 

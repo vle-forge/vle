@@ -35,13 +35,16 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Parser.hpp>
+#include <vle/vle.hpp>
 
 using namespace vle;
 
 struct F
 {
-    F() { utils::init(); }
-    ~F() { utils::finalize(); }
+    vle::Init a;
+
+    F() : a() { }
+    ~F() { }
 };
 
 BOOST_GLOBAL_FIXTURE(F)

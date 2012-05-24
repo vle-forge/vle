@@ -33,6 +33,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
+#include <vle/vle.hpp>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -231,7 +232,7 @@ int main(int argc, char **argv)
     bool show = false;
     bool result;
 
-    vle::manager::init();
+    vle::Init app;
 
     if ((result = mvle_mpi_init(&argc, &argv, &rank, &world))) {
         int vpz;
@@ -283,8 +284,6 @@ int main(int argc, char **argv)
             }
         }
     }
-
-    vle::manager::finalize();
 
     MPI_Finalize();
 

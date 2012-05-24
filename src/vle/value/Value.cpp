@@ -244,8 +244,6 @@ Matrix& Value::toMatrix()
 
 void init()
 {
-    utils::init();
-
     boost::serialization::void_cast_register(
         static_cast<Boolean*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(

@@ -35,10 +35,6 @@
 #include <vle/version.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iomanip>
-
-#include <libxml/parser.h> /** to the init and finalize functions which need to
-                             initialize and cleanup the libxml2 library. */
-#include <glibmm/thread.h>
 #include <glib/gstdio.h>
 
 #ifdef G_OS_WIN32
@@ -282,32 +278,6 @@ std::string demangle(const std::string& in)
     result.assign(in);
 #endif
     return result;
-}
-
-void init()
-{
-    xmlDefaultSAXHandlerInit();
-
-    if (not Glib::thread_supported()) {
-        Glib::thread_init();
-    }
-
-    utils::Path::init();
-    utils::Trace::init();
-    utils::net::Base::init();
-
-#ifdef VLE_HAVE_NLS
-    setlocale(LC_ALL, "");
-    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().c_str());
-    textdomain(VLE_LOCALE_NAME);
-#endif
-}
-
-void finalize()
-{
-    utils::Path::kill();
-    utils::Trace::kill();
-    xmlCleanupParser();
 }
 
 }} // namespace vle utils

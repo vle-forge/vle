@@ -133,21 +133,6 @@ namespace vle { namespace utils {
      */
     VLE_API std::string demangle(const std::string& in);
 
-    /**
-     * Initialize the VLE system by:
-     * - installling signal (segmentation fault etc.) to standard error
-     *   function.
-     * - initialize the user directory ($HOME/.vle/ etc.).
-     * - initialize the WinSock
-     * - initialize the thread system.
-     */
-    VLE_API void init();
-
-    /**
-     * Destroy all singleton and close systems.
-     */
-    VLE_API void finalize();
-
 }} // namespace vle utils
 
 #endif

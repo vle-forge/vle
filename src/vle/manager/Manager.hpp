@@ -92,29 +92,6 @@ private:
     Pimpl *mPimpl;
 };
 
-/**
- * Initialize the VLE system by:
- *
- * - installling signal (segmentation fault etc.) to standard error
- *   function.
- * - initialize the user directory ($HOME/.vle/ etc.).
- * - initialize the WinSock
- * - initialize the thread system.
- * - initialize the singleton utils::Trace system.
- * - initialize the singleton \c boost::pool devs::Pools and value::Pools.
- */
-VLE_API void init();
-
-/**
- * Delete all singleton from VLE system.
- *
- * - kill the utils::Trace singleton.
- * - kill the utils::Path singleton.
- * - kill the value::Pools singleton.
- * - kill the devs::Pools singleton.
- */
-VLE_API void finalize();
-
 }} // namespace vle manager
 
 #endif

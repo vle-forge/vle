@@ -30,6 +30,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/vle.hpp>
 #include <gtkmm/main.h>
 #include <cstdio>
 #include <cstring>
@@ -124,6 +125,8 @@ int main(int argc, char **argv)
     bool end = false;
     bool result = true;
 
+    vle::Init app;
+
     Gtk::Main application(&argc, &argv);
 
     for (argv++; not stop and not end and *argv; argv++) {
@@ -143,7 +146,6 @@ int main(int argc, char **argv)
 
     if (not stop) {
         vle::gvle::GVLE* g = 0;
-        vle::manager::init();
 	Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
 	try {
             vle::utils::Trace::setLogFile(
@@ -181,7 +183,6 @@ int main(int argc, char **argv)
                                    e.what());
             delete g;
         }
-        vle::manager::finalize();
     }
 
     return result ? EXIT_SUCCESS : EXIT_FAILURE;

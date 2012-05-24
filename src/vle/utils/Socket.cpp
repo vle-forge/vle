@@ -104,11 +104,6 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port,
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void Base::init()
-{
-    vleSocketInit();
-}
-
 Base::Base() :
     mRunning(false),
     mSocket(-1)

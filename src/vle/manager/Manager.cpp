@@ -313,19 +313,4 @@ value::Matrix * Manager::run(vpz::Vpz             *exp,
     return result;
 }
 
-void init()
-{
-    value::init();
-    utils::init();
-}
-
-void finalize()
-{
-    value::finalize();
-    utils::finalize();
-    value::finalize();
-}
-
 }} // namespace vle manager
-
-

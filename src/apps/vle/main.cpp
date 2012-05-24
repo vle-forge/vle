@@ -36,6 +36,7 @@
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/vle.hpp>
 #include <boost/version.hpp>
 #include <iostream>
 #include <fstream>
@@ -306,7 +307,7 @@ int main(int argc, char* argv[])
 {
     using namespace vle;
 
-    manager::init();
+    vle::Init app;
 
     Glib::OptionContext context;
     apps::OptionGroup command;
@@ -319,11 +320,9 @@ int main(int argc, char* argv[])
         utils::Package::package().select(command.currentPackage());
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Command line error: %1%\n")) % e.what();
-        manager::finalize();
         return EXIT_FAILURE;
     } catch(const std::exception& e) {
         std::cerr << fmt(_("Command line error: %1%\n")) % e.what();
-        manager::finalize();
         return EXIT_FAILURE;
     }
 
@@ -377,11 +376,9 @@ int main(int argc, char* argv[])
         }
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Error: %1%\n")) % e.what();
-        manager::finalize();
         return EXIT_FAILURE;
     } catch (const std::exception& e) {
         std::cerr << fmt(_("Error: %1%\n")) % e.what();
-        manager::finalize();
         return EXIT_FAILURE;
     }
 
@@ -444,6 +441,5 @@ int main(int argc, char* argv[])
         }
     }
 
-    manager::finalize();
     return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
