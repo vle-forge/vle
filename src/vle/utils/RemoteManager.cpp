@@ -147,6 +147,8 @@ public:
                     appendDesciption(line);
                     std::getline(is, line);
                 }
+                std::getline(is, line);
+
             }
             if (isTags(line)) {
                 setTags(std::string(line, 5));
@@ -163,7 +165,13 @@ public:
             if (isMD5sum(line)) {
                 setMD5sum(std::string(line, 7));
             }
-        } catch (const std::ios_base::failure& /*e*/) {
+        } catch (const std::ios_base::failure &e) {
+            TraceAlways(
+                vle::fmt("Remote package (i/o) failure: %1%") % e.what());
+        } catch (const std::exception &e) {
+            TraceAlways(
+                vle::fmt("Remote package error: %1%") % e.what());
+            throw;
         }
     }
 
@@ -218,17 +226,21 @@ public:
         using boost::lexical_cast;
         using boost::numeric_cast;
 
+        std::string tmp = boost::algorithm::trim_copy(line);
+
         try {
-            std::string::size_type major = line.find('.');
-            if (major != std::string::npos and line.size() < major) {
-                std::string::size_type minor = line.find('.', major);
-                if (minor != std::string::npos and line.size() < minor) {
+            std::string::size_type major = tmp.find('.');
+
+            if (major != std::string::npos) {
+                std::string::size_type minor = tmp.find('.', major + 1);
+
+                if (minor != std::string::npos) {
                     long ma, mi, pa;
 
-                    ma = lexical_cast < long >(std::string(line, 0, major));
-                    mi = lexical_cast < long >(std::string(line, major + 1,
-                                                           minor));
-                    pa = lexical_cast < long >(std::string(line, minor + 1));
+                    ma = lexical_cast < long >(std::string(tmp, 0, major));
+                    mi = lexical_cast < long >(std::string(tmp, major + 1,
+                                                           minor - (major + 1)));
+                    pa = lexical_cast < long >(std::string(tmp, minor + 1));
 
                     uint32_t uma, umi, mpa;
 
@@ -241,7 +253,7 @@ public:
             }
         } catch (const std::exception& /*e*/) {
             throw utils::InternalError(fmt(
-                    _("Can not convert version `%1%'")) % line);
+                    _("Can not convert version `%1%'")) % tmp);
         }
     }
 
@@ -326,11 +338,16 @@ public:
 
     void setTags(const std::string& line)
     {
+        std::string tmp = boost::algorithm::trim_copy(line);
         std::vector < std::string > tags;
 
-        boost::algorithm::split(tags, line,
+        boost::algorithm::split(tags, tmp,
                                 boost::algorithm::is_any_of(","),
                                 boost::algorithm::token_compress_on);
+
+        if (tags.empty() && not tmp.empty()) {
+            tags.push_back(tmp);
+        }
 
         setTags(tags);
     }
@@ -362,11 +379,13 @@ public:
 
     void setSize(const std::string& size)
     {
+        std::string tmp = boost::algorithm::trim_copy(size);
+
         using boost::lexical_cast;
         using boost::numeric_cast;
 
         try {
-            long lsize = boost::lexical_cast < long >(size);
+            long lsize = boost::lexical_cast < long >(tmp);
             setSize(numeric_cast < uint32_t >(lsize));
         } catch (const std::exception& /*e*/) {
             throw utils::InternalError(fmt(
@@ -459,7 +478,7 @@ std::ostream& operator<<(std::ostream& os, const RemotePackage& b)
         << "Maintainer: " << b.mMaintainer << "\n"
         << "Description: " << b.mDescription << "\n" << " ." << "\n"
         << "Tags: " << join(b.mTags, ", ") << "\n"
-        << "Filename: " << b.mName << "\n"
+        << "Url: " << b.mUrl << "\n"
         << "Size: " << b.mSize << "\n"
         << "MD5sum: " << b.mMD5sum << "\n";
 }
@@ -612,7 +631,7 @@ private:
             file.exceptions(std::ios_base::eofbit | std::ios_base::failbit |
                             std::ios_base::badbit);
 
-            while (not file) {
+            while (file) {
                 RemotePackage pkg(file);
 
                 mPackages.insert(
