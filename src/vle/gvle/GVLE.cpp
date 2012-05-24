@@ -38,7 +38,6 @@
 #include <vle/gvle/FileTreeView.hpp>
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/PreferencesBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
@@ -1031,12 +1030,6 @@ int GVLE::runConditionsBox(const vpz::Conditions& conditions)
 renameList GVLE::applyConditionsBox(vpz::Conditions& conditions)
 {
     return mConditionsBox->apply(conditions);
-}
-
-void GVLE::onHostsBox()
-{
-    HostsBox box(mRefXML);
-    box.run();
 }
 
 void GVLE::onViewOutputBox()

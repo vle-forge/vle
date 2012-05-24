@@ -32,7 +32,6 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/utils/Socket.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
 

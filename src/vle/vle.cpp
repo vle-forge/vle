@@ -31,7 +31,6 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Socket.hpp>
 #include <glibmm/thread.h>
 #include <curl/curl.h>
 #include <libxml/parser.h>

@@ -34,7 +34,6 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Socket.hpp>
 #include <fstream>
 #include <cmath>
 

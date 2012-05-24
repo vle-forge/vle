@@ -31,6 +31,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
+#include <typeinfo>
 #include <string>
 
 namespace vle { namespace utils {

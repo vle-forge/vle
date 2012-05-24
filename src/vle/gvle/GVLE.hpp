@@ -789,12 +789,6 @@ public:
     void onExperimentsBox();
 
     /**
-     * When click on hosts box to define simulation hosts.
-     *
-     */
-    void onHostsBox();
-
-    /**
      * @brief When user select the gvle::ViewOutputBox.
      */
     void onViewOutputBox();

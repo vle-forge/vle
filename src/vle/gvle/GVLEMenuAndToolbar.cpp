@@ -106,7 +106,6 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='Dynamics' />"
     "            <menuitem action='Conditions' />"
     "            <separator />"
-    "            <menuitem action='Hosts' />"
     "            <menuitem action='LaunchSimulation' />"
     "        </menu>"
     "        <menu action='MenuZoom'>"
@@ -380,7 +379,6 @@ void GVLEMenuAndToolbar::hideSimulationMenu()
     m_refActionGroup->get_action("Conditions")->set_sensitive(false);
     m_refActionGroup->get_action("Views")->set_sensitive(false);
     m_refActionGroup->get_action("Dynamics")->set_sensitive(false);
-    m_refActionGroup->get_action("Hosts")->set_sensitive(false);
     m_refActionGroup->get_action("LaunchSimulation")->set_sensitive(false);
 }
 
@@ -391,7 +389,6 @@ void GVLEMenuAndToolbar::showSimulationMenu()
     m_refActionGroup->get_action("Conditions")->set_sensitive(true);
     m_refActionGroup->get_action("Views")->set_sensitive(true);
     m_refActionGroup->get_action("Dynamics")->set_sensitive(true);
-    m_refActionGroup->get_action("Hosts")->set_sensitive(true);
     m_refActionGroup->get_action("LaunchSimulation")->set_sensitive(true);
 }
 
@@ -679,10 +676,6 @@ void GVLEMenuAndToolbar::createSimulationActions()
                             _("Manage the conditions")),
         Gtk::AccelKey("<control><shift>c"),
         sigc::mem_fun(mParent, &GVLE::onConditionsBox));
-    m_refActionGroup->add(
-        Gtk::Action::create("Hosts", _("Hosts"), _("Manage hosts")),
-        Gtk::AccelKey("<control><shift>h"),
-        sigc::mem_fun(mParent, &GVLE::onHostsBox));
     m_refActionGroup->add(
         Gtk::Action::create("LaunchSimulation", _("Launch Simulation"),
                             _("Launch the simulation")),

@@ -30,7 +30,6 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/NewDynamicsBox.hpp>
 #include <vle/gvle/OpenModelingPluginBox.hpp>
-#include <vle/utils/Socket.hpp>
 #include <vle/utils/Template.hpp>
 #include <gtkmm/treemodel.h>
 #include <boost/algorithm/string/trim.hpp>

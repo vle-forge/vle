@@ -2,7 +2,7 @@ set(GVLE_SOURCES_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp
   CalendarBox.cpp CompleteViewDrawingArea.cpp ConditionsBox.cpp
   ConnectionBox.cpp CoupledModelBox.cpp CutCopyPaste.cpp
   DynamicBox.cpp DynamicsBox.cpp Editor.cpp ExperimentBox.cpp
-  FileTreeView.cpp GVLE.cpp GVLEMenuAndToolbar.cpp HostsBox.cpp
+  FileTreeView.cpp GVLE.cpp GVLEMenuAndToolbar.cpp
   ImportClassesBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp
   LaunchSimulationBox.cpp main.cpp MatrixBox.cpp Message.cpp
   ModelClassBox.cpp ModelDescriptionBox.cpp Modeling.cpp
@@ -20,18 +20,17 @@ set(GVLE_SOURCES_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
   ConditionsBox.hpp ConnectionBox.hpp CoupledModelBox.hpp
   CutCopyPaste.hpp DynamicBox.hpp DynamicsBox.hpp Editor.hpp
   ExperimentBox.hpp FileTreeView.hpp GVLE.hpp GVLEMenuAndToolbar.hpp
-  HostsBox.hpp ImportClassesBox.hpp ImportModelBox.hpp
-  InteractiveTypeBox.hpp LaunchSimulationBox.hpp MatrixBox.hpp
-  Message.hpp ModelClassBox.hpp ModelDescriptionBox.hpp Modeling.hpp
-  ModelingPlugin.hpp ModelTreeBox.hpp NewDynamicsBox.hpp
-  NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp
-  ObsAndViewBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
-  OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp PluginFactory.hpp
-  PortDialog.hpp PreferencesBox.hpp QuitBox.hpp SaveVpzBox.hpp
-  Settings.hpp SimpleTypeBox.hpp SimpleViewDrawingArea.hpp
-  TableBox.hpp TreeViewValue.hpp TupleBox.hpp ValueBox.hpp
-  ValuesTreeView.hpp ViewDrawingArea.hpp View.hpp ViewOutputBox.hpp
-  XmlTypeBox.hpp)
+  ImportClassesBox.hpp ImportModelBox.hpp InteractiveTypeBox.hpp
+  LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp ModelClassBox.hpp
+  ModelDescriptionBox.hpp Modeling.hpp ModelingPlugin.hpp
+  ModelTreeBox.hpp NewDynamicsBox.hpp NewModelClassBox.hpp
+  NewProjectBox.hpp NewTypeBox.hpp ObsAndViewBox.hpp
+  ObserverPlugin.hpp OpenModelingPluginBox.hpp OpenPackageBox.hpp
+  OpenVpzBox.hpp OutputPlugin.hpp PluginFactory.hpp PortDialog.hpp
+  PreferencesBox.hpp QuitBox.hpp SaveVpzBox.hpp Settings.hpp
+  SimpleTypeBox.hpp SimpleViewDrawingArea.hpp TableBox.hpp
+  TreeViewValue.hpp TupleBox.hpp ValueBox.hpp ValuesTreeView.hpp
+  ViewDrawingArea.hpp View.hpp ViewOutputBox.hpp XmlTypeBox.hpp)
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gvle.o
