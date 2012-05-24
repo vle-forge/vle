@@ -66,31 +66,34 @@ void Path::initPrefixDir()
 std::string Path::getTempFile(const std::string& prefix,
                               std::ofstream* file)
 {
+    std::string result;
+
     if (file and not file->is_open()) {
-        char* buffer = new char[prefix.size() + 7];
+        result = prefix + "XXXXXX";
 
-        strncpy(buffer, prefix.c_str(), prefix.size());
-        memset(static_cast < void* >(buffer + prefix.size() + 1), 'X', 6);
-        buffer[prefix.size() + 6] = '\0';
+        result = Glib::build_filename(Glib::get_tmp_dir(),
+                                      result);
 
-        int fd = mkstemp(buffer);
+        char *buffer = new char[result.size()];
+        std::strncpy(buffer, result.c_str(), result.size());
+
+        int fd = ::mkstemp(buffer);
         if (fd != -1) {
             file->open(buffer, std::ios_base::trunc | std::ios_base::out |
                        std::ios_base::binary);
             close(fd);
 
             if (file->is_open()) {
-                std::string result(buffer, prefix.size() + 6);
-                delete[] buffer;
-
-                return result;
+                result.assign(buffer, result.size());
+            } else {
+                result.clear();
             }
         }
 
         delete[] buffer;
     }
 
-    return std::string();
+    return result;
 }
 
 }} // namespace vle utils
