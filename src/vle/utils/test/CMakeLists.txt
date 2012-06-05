@@ -13,6 +13,12 @@ ADD_EXECUTABLE(test_parser test_parser.cpp)
 TARGET_LINK_LIBRARIES(test_parser vlelib
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
+ADD_EXECUTABLE(test_package test_package.cpp)
+
+TARGET_LINK_LIBRARIES(test_package vlelib
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
 ADD_TEST(utilstest_algo test_algo)
 ADD_TEST(utilstest_template test_template)
 ADD_TEST(utilstest_parser test_parser)
+ADD_TEST(utilstest_package test_package)

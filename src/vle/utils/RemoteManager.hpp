@@ -30,10 +30,74 @@
 #define VLE_UTILS_REMOTEMANAGER_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Types.hpp>
 #include <iosfwd>
 #include <string>
+#include <vector>
+
 
 namespace vle { namespace utils {
+
+/**
+ * @e PackageOperatorType defines the relation of an identified with
+ * package operator identified. Eg. the @c glue-1.0 package depends of
+ * vle.extension.difference-equation >= 1.0.x and
+ * vle.extension.difference-equation < 1.1.0
+ */
+enum PackageOperatorType
+{
+    PACKAGE_OPERATOR_EQUAL,     /**< = */
+    PACKAGE_OPERATOR_LESS,      /**< < */
+    PACKAGE_OPERATOR_LESS_OR_EQUAL, /**< <= */
+    PACKAGE_OPERATOR_GREATER,   /**< > */
+    PACKAGE_OPERATOR_GREATER_OR_EQUAL /**< >= */
+};
+
+/**
+ * @e PackageOperatorId is defines to package in the @c depends, @c
+ * buildDepends and @c conflicts lists. A @e PackageOperatorId have a
+ * name, an operator (equal, less, less or equal, greater or greater
+ * or equal) and a version numbers.
+ */
+struct PackageLinkId
+{
+    std::string name;           /**< Name of the package. */
+    int32_t major;              /**< -1 defines undefined major
+                                 * version. */
+    int32_t minor;              /**< -1 defines undefined minor
+                                 * version. */
+    int32_t patch;              /**< -1 defines undefined patch
+                                 * version. */
+    PackageOperatorType op;     /**< The relation between the
+                                   * identified package and this
+                                   * identified operator package. */
+};
+
+typedef std::vector < PackageLinkId > PackagesLinkId;
+
+typedef std::string Tag;
+
+typedef std::vector < Tag > Tags;
+
+struct PackageId
+{
+    uint64_t size;
+    std::string name;
+    std::string distribution;
+    std::string maintainer;
+    std::string description;
+    std::string url;
+    std::string md5sum;
+    Tags tags;
+    PackagesLinkId depends;
+    PackagesLinkId builddepends;
+    PackagesLinkId conflicts;
+    int32_t major;
+    int32_t minor;
+    int32_t patch;
+};
+
+typedef std::vector < PackageId > Packages;
 
 /**
  * \c RemoteManagerActions is available action for the \c RemoteManager class.
@@ -75,12 +139,20 @@ class VLE_API RemoteManager
 {
 public:
     /**
-     * Build a new RemoteManager object.
-     *
+     * Build a new RemoteManager object by reading packages list from
+     * the standard location:
      * - Read the \c VLE_HOME/vle.conf file to get the list of remote host.
      * - Read the \c VLE_HOME/package file to get the list of available package.
      */
     RemoteManager();
+
+    /**
+     * Build a new RemoteManager object by reading packages list from
+     * the standard input stream.
+     *
+     * @param in Standard input stream.
+     */
+    RemoteManager(std::istream& in);
 
     /**
      * If an action is running, \c join it otherwise do nothing.
@@ -125,6 +197,8 @@ public:
      * @endcode
      */
     void stop();
+
+    void getResult(Packages *out);
 
 private:
     /**
