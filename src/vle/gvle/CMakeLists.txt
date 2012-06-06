@@ -46,9 +46,26 @@ else (WIN32)
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
 endif (WIN32)
 
-TARGET_LINK_LIBRARIES(gvle ${VLE_LIBRARIES} ${GTKMM_LIBRARIES}
-  ${GTHREAD_LIBRARIES} ${OS_SPECIFIC_LIBRARIES}
-  ${GTKSOURCEVIEWMM_LIBRARIES} vlelib)
+# target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
+#   ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
+
+if (BUILD_SHARED_LIBS)
+  # if (WIN32)
+  #   target_link_libraries(gvle vlelib)
+  # else ()
+    target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
+      ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
+  # endif ()
+else ()
+  if (WIN32)
+    set_target_properties(gvle PROPERTIES LINK_FLAGS "-Wl,-static")
+  endif ()
+
+  # target_link_libraries(gvle ${VLEDEPS_STATIC_LIBRARIES}
+  #   ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib-static)
+
+  target_link_libraries(gvle vlelib-static)
+endif ()
 
 install(TARGETS gvle DESTINATION bin)
 
@@ -79,4 +96,3 @@ configure_file(gvle.pc.in
 
 install(FILES ${VLE_BINARY_DIR}/src/vle/gvle-${VLE_VERSION_SHORT}.pc
   DESTINATION lib/pkgconfig)
-

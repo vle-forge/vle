@@ -18,6 +18,6 @@ install(FILES Base.hpp Classes.hpp Class.hpp Condition.hpp
   CoupledModel.hpp BaseModel.hpp ModelPortList.hpp DESTINATION
   ${VLE_INCLUDE_DIRS}/vpz)
 
-if (HAVE_UNITTESTFRAMEWORK)
+if (VLE_HAVE_UNITTESTFRAMEWORK)
   add_subdirectory(test)
-endif (HAVE_UNITTESTFRAMEWORK)
+endif ()

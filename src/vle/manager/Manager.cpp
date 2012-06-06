@@ -26,6 +26,11 @@
  */
 
 
+#if defined _WIN32 || defined __CYGWIN__
+# define BOOST_THREAD_USE_LIB
+# define BOOST_THREAD_DONT_USE_CHRONO
+#endif
+
 #include <vle/devs/Coordinator.hpp>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>

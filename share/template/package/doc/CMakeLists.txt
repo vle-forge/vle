@@ -1,2 +1,2 @@
-INSTALL(FILES file.doc DESTINATION doc)
+install(FILES file.doc DESTINATION doc)
 

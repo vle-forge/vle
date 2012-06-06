@@ -31,40 +31,5 @@
 
 namespace vle { namespace utils {
 
-struct strdup_functor
-    : std::unary_function < std::string, char* >
-{
-    char * operator()(const std::string& str) const
-    {
-        return strdup(str.c_str());
-    }
-};
-
-void free_str_array(char **args)
-{
-    char **tmp;
-
-    for (tmp = args; *tmp; ++tmp) {
-        free(*tmp);
-    }
-
-    delete[] args;
-}
-
-char ** convert_string_str_array(const std::vector < std::string >& args)
-{
-    char **result = 0;
-
-    result = new char*[args.size() + 1];
-
-    std::transform(args.begin(),
-                   args.end(),
-                   result,
-                   strdup_functor());
-
-    result[args.size()] = 0;
-
-    return result;
-}
 
 }}

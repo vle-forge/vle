@@ -35,13 +35,6 @@ set(VLE_SHARE_DIRS "share/vle-${VLE_VERSION_SHORT}")
 include(CMakeCPack.cmake)
 
 #
-# Go to the sources of the library. To control the type of the library
-# (static or shared), use the CMake variable BUILD_SHARED_LIBS which
-# is set to true by default.
-#
-option(BUILD_SHARED_LIBS "Build shared libraries." ON)
-
-#
 # CMake modules
 #
 include(CheckIncludeFileCXX)
@@ -55,15 +48,12 @@ include(CMakeDetermineCCompiler)
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-endif ()
 
-#
-# Check the curl library
-#
-find_package(CURL REQUIRED)
-
-if (NOT CURL_FOUND)
-  message(FATAL_ERROR "The curl library is required")
+  if ("${CMAKE_BUILD_TYPE}" EQUAL "Debug" OR
+      "${CMAKE_BUILD_TYPE}" EQUAL "RelWithDebInfo")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ggdb3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb3")
+  endif ()
 endif ()
 
 #
@@ -76,53 +66,70 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
 endif (COMMAND CMAKE_POLICY)
 
-pkg_check_modules(LIBARCHIVE REQUIRED libarchive)
-pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
-pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
-pkg_check_modules(LIBXML REQUIRED libxml-2.0)
-pkg_check_modules(CAIROMM cairomm-1.0>=1.2)
-pkg_check_modules(GTKMM gtkmm-2.4)
-pkg_check_modules(GTKSOURCEVIEWMM gtksourceviewmm-2.0)
+option(WITH_CAIRO "use cairomm to build output plugin [default: on]" ON)
+option(WITH_GTK "use gtkmm to build gvle [default: on]" ON)
+option(WITH_GTKSOURCEVIEW "use gtksourcevieww to build gvle [default: on]" ON)
 
-option(WITH_CAIRO "use the cairomm to build output plugin [default: on]" ON)
-if (WITH_CAIRO AND CAIROMM_FOUND)
+if (WITH_CAIRO AND WITH_GTK AND WITH_GTKSOURCEVIEW)
+  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
+    # hogweed libcrypto nettle openssl libarchive libcurl glibmm-2.4
+    libcrypto nettle openssl libarchive libcurl glibmm-2.4
+    gthread-2.0 libxml-2.0 cairomm-1.0>=1.2 gtkmm-2.4
+    gtksourceviewmm-2.0)
+elseif (WITH_CAIRO AND WITH_GTK)
+  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
+    hogweed libcrypto nettle openssl libarchive libcurl glibmm-2.4
+    gthread-2.0 libxml-2.0 cairomm-1.0>=1.2 gtkmm-2.4)
+elseif (WITH_CAIRO)
+  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
+    hogweed libcrypto nettle openssl libarchive libcurl glibmm-2.4
+    gthread-2.0 libxml-2.0 cairomm-1.0>=1.2)
+else ()
+  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
+    hogweed libcrypto nettle openssl libarchive libcurl glibmm-2.4
+    gthread-2.0 libxml-2.0)
+endif()
+
+if (NOT VLEDEPS_FOUND)
+  message(FATAL_ERROR "Missing dependencies")
+endif ()
+
+if (WITH_CAIRO)
     set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
-else (WITH_CAIRO AND CAIROMM_FOUND)
-    set(VLE_HAVE_CAIRO 0 CACHE INTERNAL "" FORCE)
-endif (WITH_CAIRO AND CAIROMM_FOUND)
+endif ()
 
-option(WITH_GVLE "use the gtkmm to build gvle [default: on]" ON)
-if (WITH_GVLE AND GTKMM_FOUND)
-  set(HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
-else (WITH_GVLE AND GTKMM_FOUND)
-  set(HAVE_GVLE 0 CACHE INTERNAL "" FORCE)
-endif (WITH_GVLE AND GTKMM_FOUND)
+if (WITH_GTK)
+  set(VLE_HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
+endif ()
 
-if (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
-   set(VLE_HAVE_GTKSOURCEVIEWMM 1 CACHE INTERNAL "" FORCE)
-else (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
-   set(VLE_HAVE_GTKSOURCEVIEWMM 0 CACHE INTERNAL "" FORCE)
-endif (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
-
+if (WITH_GTKSOURCEVIEW)
+  set(VLE_HAVE_GTKSOURCEVIEWMM 1 CACHE INTERNAL "" FORCE)
+endif ()
 
 #
 # Test the libboost header and libboost-text library.
 #
 
 option(WITH_TEST "use the libboost test unit library [default: on]" ON)
-option(WITH_MPI "use an installed MPI library [default: on]" ON)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_NO_SYSTEM_PATHS OFF)
-set(Boost_USE_STATIC_RUNTIME ON)
+
+if (BUILD_SHARED_LIBS)
+  set(Boost_USE_STATIC_LIBS OFF)
+  set(Boost_USE_STATIC_RUNTIME OFF)
+else ()
+  set(Boost_USE_STATIC_LIBS ON)
+  set(Boost_USE_STATIC_RUNTIME ON)
+endif ()
+
 if (WIN32)
   set(Boost_THREADAPI "win32")
 endif (WIN32)
 set(Boost_DETAILED_FAILURE_MSG FALSE)
 set(Boost_DEBUG FALSE)
 
-find_package(Boost COMPONENTS unit_test_framework serialization filesystem
-  system date_time regex thread program_options)
+find_package(Boost COMPONENTS unit_test_framework thread serialization
+  filesystem system chrono date_time regex program_options)
+
 if (NOT Boost_SERIALIZATION_FOUND)
   message(FATAL_ERROR "The boost serialization library is required")
 endif (NOT Boost_SERIALIZATION_FOUND)
@@ -141,9 +148,7 @@ endif (NOT Boost_THREAD_FOUND)
 if (NOT Boost_PROGRAM_OPTIONS_FOUND)
   message(FATAL_ERROR "The boost program options library is required")
 endif (NOT Boost_PROGRAM_OPTIONS_FOUND)
-if (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
-  set(Boost_SYSTEM_LIBRARY "")
-endif (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "35")
+
 if (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
   set(VLE_HAVE_BOOST_SPIRIT2 0 CACHE INTERNAL "" FORCE)
 else (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
@@ -152,20 +157,25 @@ endif (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
 
 if (WITH_TEST)
   if (Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    set(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
+    set(VLE_HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
   endif (Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif (WITH_TEST)
 
+#
+# Check for an MPI implementation.
+#
+
+option(WITH_MPI "use an installed MPI library [default: on]" ON)
 if (WITH_MPI)
   find_package(MPI REQUIRED)
-  if (MPI_FOUND)
-    message(STATUS "mpi include ${MPI_INCLUDE_PATH}")
-    message(STATUS "mpi lib ${MPI_LIBRARY}")
-    message(STATUS "mpi extra lib ${MPI_EXTRA_LIBRARY}")
-    message(STATUS "mpi link ${MPI_LINK_FLAGS}")
-    set(VLE_HAVE_MPI 1 CACHE INTERNAL "" FORCE)
-  endif (MPI_FOUND)
-endif (WITH_MPI)
+  message(STATUS "mpi include ${MPI_INCLUDE_PATH}")
+  message(STATUS "mpi lib ${MPI_LIBRARY}")
+  message(STATUS "mpi extra lib ${MPI_EXTRA_LIBRARY}")
+  message(STATUS "mpi link ${MPI_LINK_FLAGS}")
+  set(VLE_HAVE_MPI 1 CACHE INTERNAL "" FORCE)
+else ()
+  set(VLE_HAVE_MPI 0 CACHE INTERNAL "" FORCE)
+endif ()
 
 #
 # Generate the config.h
@@ -185,11 +195,11 @@ if (UNIX)
   set(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
   set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
   set(VLE_PKGCONFIG_LIBDIR "lib")
-else (UNIX)
+else ()
   set(VLE_PKGCONFIG_PREFIXPATH "/target")
   set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "\${includedir}")
   set(VLE_PKGCONFIG_LIBDIR "bin")
-endif (UNIX)
+endif ()
 
 #
 # Install the README
@@ -197,25 +207,10 @@ endif (UNIX)
 if (UNIX)
   install(FILES "README" DESTINATION "${VLE_SHARE_DIRS}")
   install(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}")
-else (UNIX)
+else ()
   install(FILES "README" DESTINATION "${VLE_SHARE_DIRS}" RENAME "Readme.txt")
   install(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}" RENAME "CopyRight.txt")
-endif (UNIX)
-
-#
-# Define function
-#
-function(DeclareModuleDynamics name sources)
-  add_library(${name} SHARED ${sources})
-
-  target_link_libraries(${name}
-    ${GLIBMM_LIBRARIES} ${LIBXML_LIBRARIES} ${GTHREAD_LIBRARIES} vleutils
-    vlevalue vlegraph vlevpz vleoov vledevs vlemanager vletranslator)
-
-  install(TARGETS ${name}
-    RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
-    LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
-endfunction(DeclareModuleDynamics)
+endif ()
 
 #
 # Add sources for a target
@@ -282,9 +277,9 @@ message(STATUS "Using ${CMAKE_INSTALL_PREFIX} for installation")
 message(STATUS "Build type ${CMAKE_BUILD_TYPE}")
 message(STATUS "Build with GCC ABI Demangle...: ${VLE_HAVE_GCC_ABI_DEMANGLE}")
 message(STATUS "Build with execinfo.h.........: ${VLE_HAVE_EXECINFO}")
-message(STATUS "Build unit test...............: ${HAVE_UNITTESTFRAMEWORK}")
+message(STATUS "Build unit test...............: ${VLE_HAVE_UNITTESTFRAMEWORK}")
 message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
-message(STATUS "Build with gvle...............: ${HAVE_GVLE}")
+message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
 message(STATUS "Build with MPI................: ${VLE_HAVE_MPI}")
 message(STATUS "Build shared library..........: ${BUILD_SHARED_LIBS}")

@@ -33,6 +33,8 @@
 
 namespace vle { namespace utils {
 
+typedef std::vector < std::pair < std::string, std::string > > Envp;
+
 /**
  * @e Spawn use fork, exec and pipe function (unix) or CreateProcess,
  * CreatePipe functions (Win32) to execute a process and get its
@@ -98,7 +100,7 @@ public:
     bool start(const std::string& exe,
                const std::string& workingdir,
                const std::vector < std::string > &args,
-               const std::vector < std::string > &envp,
+               const std::vector < std::pair < std::string, std::string > > &envp,
                unsigned int waitchildtimeout = 50000u);
 
     /**

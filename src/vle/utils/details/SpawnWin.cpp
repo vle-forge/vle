@@ -25,31 +25,130 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/utils/details/Spawn.hpp>
+#include <vle/utils/i18n.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <string>
+#include <algorithm>
+#include <functional>
+#include <fstream>
 #include <windows.h>
 
-namespace vle { namespace utils
+namespace vle { namespace utils {
 
 // Max default size of command line buffer. See the CreateProcess
 // function in msdn.
 const unsigned long int Spawn::default_buffer_size = 32768;
 
-struct append_arg_functor
-    : std::unary_function < std::string, void >
+static std::string win32_quote(const std::string& arg)
 {
-    std::string *cmdline;
+    std::string result;
 
-    append_arg_functor(std::string *cmdline)
-        : cmdline(cmdline)
+    if (not arg.empty() and arg.find_first_of(" \t\n\v\"") == arg.npos) {
+        result.append(arg);
+    } else {
+        result.push_back('"');
+
+        for (std::string::const_iterator it = arg.begin() ; ; ++it) {
+            unsigned NumberBackslashes = 0;
+
+            while (it != arg.end () and *it == '\\') {
+                ++it;
+                ++NumberBackslashes;
+            }
+
+            if (it == arg.end ()) {
+                result.append(NumberBackslashes * 2, '\\');
+                break;
+            } else if (*it == '"') {
+                result.append(NumberBackslashes * 2 + 1, '\\');
+                result.push_back(*it);
+            } else {
+                result.append(NumberBackslashes, '\\');
+                result.push_back(*it);
+            }
+        }
+
+        result.push_back('"');
+    }
+
+    return result;
+}
+
+struct win32_argv_quote
+    : public std::unary_function < std::string, void >
+{
+    std::string *cmd;
+    char separator;
+
+    win32_argv_quote(std::string *cmd, char separator)
+        : cmd(cmd), separator(separator)
     {}
 
-    ~append_arg_functor()
+    ~win32_argv_quote()
     {}
 
     void operator()(const std::string& arg)
     {
-        cmdline->append(arg);
-        cmdline->append(" ");
+        cmd->append(win32_quote(arg));
+        cmd->push_back(separator);
     }
+};
+
+struct win32_envp_quote
+    : public std::unary_function < Envp::value_type, void >
+{
+    std::string *cmd;
+
+    win32_envp_quote(std::string *cmd)
+        : cmd(cmd)
+    {}
+
+    ~win32_envp_quote()
+    {}
+
+    void operator()(const Envp::value_type& arg)
+    {
+        if (not arg.first.empty()) {
+            std::vector < std::string > tokens;
+
+            boost::algorithm::split(tokens, arg.second,
+                                    boost::algorithm::is_any_of(";"),
+                                    boost::algorithm::token_compress_on);
+
+            cmd->append(arg.first);
+            cmd->push_back('=');
+
+            std::for_each(tokens.begin(), tokens.end(),
+                          win32_argv_quote(cmd, ';'));
+
+            cmd->operator[](cmd->size() - 1) = '\0'; /**< remove the
+                                                      * last `;' to
+                                                      * avoid bad
+                                                      * environment. */
+        }
+    }
+};
+
+static std::string build_win32_error_message(DWORD errorcode)
+{
+    LPVOID msg;
+
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                  FORMAT_MESSAGE_FROM_SYSTEM |
+                  FORMAT_MESSAGE_IGNORE_INSERTS,
+                  NULL, errorcode,
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                  (LPTSTR)&msg,
+                  0, NULL);
+
+    MessageBox(NULL, (LPCTSTR)msg, "Error", MB_OK | MB_ICONINFORMATION);
+
+    std::string result((char*)msg);
+    LocalFree(msg);
+
+    return result;
 }
 
 static char* build_command_line(const std::string& exe,
@@ -59,10 +158,22 @@ static char* build_command_line(const std::string& exe,
     char *buf;
 
     cmd.reserve(Spawn::default_buffer_size);
-    cmd += exe;
-    cmd += ' ';
 
-    std::copy(args.begin(), args.end(), append_arg_functor(cmd));
+    // char *pEnvCMD = getenv("COMSPEC");
+    // if (pEnvCMD) {
+    //     cmd.append(win32_quote(pEnvCMD));
+    // } else {
+    //     cmd.append("CMD.EXE");
+    // }
+
+    // cmd.push_back(' ');
+    // cmd.append(" /c ");
+
+
+    cmd.append(win32_quote(exe));
+    cmd.push_back(' ');
+
+    std::for_each(args.begin(), args.end(), win32_argv_quote(&cmd, ' '));
 
     buf = (char*)malloc(cmd.size() + 1);
     if (buf) {
@@ -73,110 +184,46 @@ static char* build_command_line(const std::string& exe,
     return buf;
 }
 
-// struct win32_spawn_t
-// {
-//     PROCESS_INFORMATION pi;
-//     HANDLE              outread;
-//     HANDLE              outwrite;
-//     HANDLE              errread;
-//     HANDLE              errwrite;
-// };
+static std::string build_envp_line(const Envp& envp)
+{
+    std::string cmd;
 
-// static int spawn_command(const char *command,
-//                          const char *dirname,
-//                          win32_spawn_t *spawn)
-// {
-//     SECURITY_ATTRIBUTES sa;
-//     STARTUPINFO si;
-//     char *cmdline = NULL;
+    cmd.reserve(Spawn::default_buffer_size);
 
-//     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-//     sa.lpSecurityDescriptor = NULL;
-//     sa.bInheritHandle = TRUE;
-
-//     if (!(CreatePipe(&spawn->outread, &spawn->outwrite, &sa, 0)) &&
-//         (SetHandleInformation(spawn->outread, HANDLE_FLAG_INHERIT, 0)))
-//         goto pipe_out_failure;
-
-//     if (!(CreatePipe(&spawn->errread, &spawn->errwrite, &sa, 0)) &&
-//         (SetHandleInformation(spawn->errread, HANDLE_FLAG_INHERIT, 0)))
-//         goto pipe_err_failure;
-
-//     ZeroMemory(&si, sizeof(STARTUPINFO));
-//     si.cb = sizeof(STARTUPINFO);
-//     si.dwFlags |= STARTF_USESTHANDLES | STARTF_USESHOWWINDOW;
-//     si.hStdOutput = spawn->outread;
-//     si.hStdError = spawn->errread;
-//     si.wShowWindow = SW_SHOWDEFAULT; /* must be SW_HIDE ? */
-//     GetStartupInfo(&si);
-
-//     cmdline = (char*)malloc(32768);
-//     if (!cmdline)
-//         goto malloc_failure;
-
-//     strncpy(cmdline, 32768, command);
-//     ZeroMemory(&spawn->pi, sizeof(PROCESS_INFORMATION));
-
-//     if (!(CreateProcess(NULL, command, NULL, NULL, TRUE,
-//                         0, NULL, dirname, &si, &spawn->pi)))
-//         goto create_process_failure;
-
-//     free(cmdline);
-
-//     return 0;
-
-// create_process_failure:
-//     free(cmdline);
-
-// malloc_failure:
-//     CloseHandle(spawn->outwrite);
-//     CloseHandle(spawn->outread);
-
-// pipe_err_failure:
-//     CloseHandle(spawn->errwrite);
-//     CloseHandle(spawn->errread);
-
-// pipe_out_failure:
-//     return -1;
-// }
+    std::for_each(envp.begin(), envp.end(), win32_envp_quote(&cmd));
+    cmd.push_back('\0');
 
 
-// int main()
-// {
-//     win32_spawn_t spawn;
-//     DWORD exitcode;
+    std::string cpy(cmd);
 
-//     if (!spawn_command("cmake.exe", "c:\\", &spawn))
-//         return -1;
+    for (std::string::iterator it = cpy.begin(); it != cpy.end(); ++it) {
+        if ((*it) == '\0') {
+            *it = '\n';
+        }
+    }
 
-//     WaitForSingleObject(spawn.pi.hProcess, INFINITE);
-//     GetExitCodeProcess(pi.hProcess, &exitcode);
-
-//     CloseHandle(spawn.pi.hThread);
-//     CloseHandle(spawn.pi.hProcess);
-//     CloseHandle(spawn.outwrite);
-//     CloseHandle(spawn.outread);
-//     CloseHandle(spawn.errwrite);
-//     CloseHandle(spawn.errread);
-
-//     return 0;
-// }
-
-#define PIPE_OUTPUT_READ 0
-#define PIPE_OUTPUT_WRITE 1
-#define PIPE_ERROR_READ 2
-#define PIPE_ERROR_WIRTE 3
+    return cmd;
+}
 
 struct Spawn::Pimpl
 {
-    HANDLE              m_handle[4];
+    HANDLE hOutputRead;
+    HANDLE hErrorRead;
+
     PROCESS_INFORMATION m_pi;
     DWORD               m_status;
-    bool                m_finish;
     std::string         m_msg;
+    unsigned int        m_waitchildtimeout;
+    bool                m_finish;
 
-    Pimpl()
-        : m_finish(false)
+    std::ofstream out__, err__;
+
+
+    Pimpl(unsigned int waitchildtimeout)
+        : hOutputRead(INVALID_HANDLE_VALUE),
+          hErrorRead(INVALID_HANDLE_VALUE),
+          m_status(0), m_waitchildtimeout(waitchildtimeout),
+          m_finish(false), out__("c:/out.txt"), err__("c:/err.txt")
     {
     }
 
@@ -193,16 +240,17 @@ struct Spawn::Pimpl
 
         if (GetExitCodeProcess(m_pi.hProcess, &m_status)) {
             if (m_status == STILL_ACTIVE) {
-                m_finish = true;
+                m_finish = false;
+
                 return true;
             }
         }
 
-        m_finish = false;
+        m_finish = true;
         return false;
     }
 
-    int get(std::string *output, std::string *error)
+    bool get(std::string *output, std::string *error)
     {
         if (m_finish) {
             return false;
@@ -210,141 +258,207 @@ struct Spawn::Pimpl
 
         is_running();
 
-        HANDLE signaled = NULL;
+        std::vector < char > buffer(4096, '\0');
+        unsigned long bread;
+        unsigned long avail;
 
-        DWORD result = WaitForMultipleObjects(4, m_handle, FALSE, INFINITE);
-        if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + 4) {
-            signaled = m_handle[result - WAIT_OBJECT_0];
-        } else if (result == WAIT_FAILED) {
-            *msg = Win32ErrorMessage(GetLastError());
-            return false;
-        } else {
-            return false;
-        }
+        {
+            PeekNamedPipe(hOutputRead, &buffer[0], buffer.size() - 1,
+                          &bread, &avail, NULL);
 
-        DWORD size;
-        std::vector < char > buffer;
-        buffer.resize(4096);
-        if (!ReadFile(signaled, &buffer[0], buffer.size(), &size, NULL)) {
-            *msg = Win32ErrorMessage(GetLastError());
-            return false;
-        } else {
-            if (signaled == m_handle[PIPE_ERROR_READ]) {
-                error->append(&buffer[0], size);
-            } else {
-                output->append(&buffer[0], size);
+            if (bread) {
+                out__ << "get PeekNamedPipe success " << bread << " " <<  avail << "\n";
+
+                std::fill(buffer.begin(), buffer.end(), '\0');
+                if (avail > buffer.size() - 1) {
+                    out__ << "get PeekNamedPipe " << avail << "\n"
+                           << buffer.size() - 1 << "\n";
+                    while (bread >= buffer.size() - 1) {
+                        ReadFile(hOutputRead, &buffer[0],
+                                 buffer.size() - 1, &bread, NULL);
+
+                    out__ << "get: " << bread << "\n";
+
+                        if (bread > 0) {
+                            unsigned long sz = std::min(
+                                bread,
+                                static_cast < unsigned long >(
+                                    buffer.size() - 1));
+
+                            output->append(&buffer[0], sz);
+                            out__.write(&buffer[0], sz);
+                        }
+
+                        std::fill(buffer.begin(), buffer.end(), '\0');
+                    }
+                } else {
+                out__ << "get PeekNamedPipe success (else) " << bread << " " <<  avail << "\n";
+
+                    ReadFile(hOutputRead, &buffer[0],
+                             buffer.size() - 1, &bread, NULL);
+
+                    out__ << "get: " << bread << "\n";
+
+                    if (bread > 0) {
+                        unsigned long sz = std::min(
+                            bread,
+                            static_cast < unsigned long >(
+                                buffer.size() - 1));
+
+                        output->append(&buffer[0], sz);
+                        out__.write(&buffer[0], sz);
+                    }
+                }
             }
         }
 
-        return 0;
+        {
+            PeekNamedPipe(hErrorRead, &buffer[0], buffer.size() - 1,
+                          &bread, &avail, NULL);
+
+            if (bread) {
+                err__ << "[err] get PeekNamedPipe success " <<  avail << "\n";
+
+                std::fill(buffer.begin(), buffer.end(), '\0');
+                if (avail > buffer.size() - 1) {
+                    while (bread >= buffer.size() - 1) {
+                        ReadFile(hErrorRead, &buffer[0],
+                                 buffer.size() - 1, &bread, NULL);
+
+                        if (bread > 0) {
+                            unsigned long sz = std::min(
+                                bread,
+                                static_cast < unsigned long >(
+                                    buffer.size() - 1));
+
+                            error->append(&buffer[0], sz);
+                            err__.write(&buffer[0], sz);
+                        }
+
+                        std::fill(buffer.begin(), buffer.end(), '\0');
+                    }
+                } else {
+                    ReadFile(hErrorRead, &buffer[0],
+                             buffer.size() - 1, &bread, NULL);
+
+                    if (bread > 0) {
+                        unsigned long sz = std::min(
+                            bread,
+                            static_cast < unsigned long >(
+                                buffer.size() - 1));
+
+                        error->append(&buffer[0], sz);
+                        err__.write(&buffer[0], sz);
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
-    // int initchild(const std::string& exe,
-    //               const std::string& workingdir,
-    //               const std::vector < std::string > &args,
-    //               const std::vector < std::string > &envp)
-    // {
-    //     ::dup2(m_pipeout[1], STDOUT_FILENO);
-    //     ::dup2(m_pipeerr[1], STDERR_FILENO);
-
-    //     ::close(m_pipeout[1]);
-    //     ::close(m_pipeerr[1]);
-    //     ::close(m_pipeout[0]);
-    //     ::close(m_pipeerr[0]);
-
-    //     ::chdir(workingdir.c_str());
-
-    //     char **localenvp = convert_string_str_array(envp);
-    //     char **localargv = convert_string_str_array(args);
-
-    //     if (::execve(exe.c_str(), localargv, localenvp) == -1) {
-    //         free_str_array(localargv);
-    //         free_str_array(localenvp);
-    //         exit(-1); /* Kill the child. */
-    //     }
-
-    //     return true;
-    // }
-
-    // int initparent(pid_t localpid)
-    // {
-    //     ::close(m_pipeout[1]);
-    //     ::close(m_pipeerr[1]);
-    //     m_pid = localpid;
-
-    //     usleep(50000);
-
-    //     return is_running();
-    // }
-
-    int start(const std::string& exe,
-              const std::string& workingdir,
-              const std::vector < std::string > &args,
-              const std::vector < std::string > &envp)
+    bool start(const std::string& exe,
+               const std::string& workingdir,
+               const std::vector < std::string > &args,
+               const Envp &envp)
     {
-        SECURITY_ATTRIBUTES sa;
-        STARTUPINFO si;
+        HANDLE hOutputReadTmp = INVALID_HANDLE_VALUE;
+        HANDLE hErrorReadTmp = INVALID_HANDLE_VALUE;
+        HANDLE hOutputWrite = INVALID_HANDLE_VALUE;
+        HANDLE hErrorWrite = INVALID_HANDLE_VALUE;
+        STARTUPINFO startupinfo;
+        SECURITY_ATTRIBUTES securityatt;
+        SECURITY_DESCRIPTOR securitydescriptor;
+        char *cmdline = NULL;
 
-        sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-        sa.lpSecurityDescriptor = NULL;
-        sa.bInheritHandle = TRUE;
+        InitializeSecurityDescriptor(&securitydescriptor,
+                                     SECURITY_DESCRIPTOR_REVISION);
 
-        if (!(CreatePipe(&m_handle[PIPE_OUTPUT_READ], &m_handle[PIPE_OUTPUT_WRITE], &sa, 0)) &&
-            (SetHandleInformation(m_handle[PIPE_OUTPUT_READ], HANDLE_FLAG_INHERIT, 0)))
+        SetSecurityDescriptorDacl(&securitydescriptor, TRUE, NULL, FALSE);
+        securityatt.lpSecurityDescriptor = &securitydescriptor;
+        securityatt.nLength = sizeof(SECURITY_ATTRIBUTES);
+        securityatt.bInheritHandle = TRUE;
+
+        if (!CreatePipe(&hOutputReadTmp, &hOutputWrite, &securityatt, 0) ||
+            !DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,
+                             GetCurrentProcess(), &hOutputRead, 0,
+                             FALSE, DUPLICATE_SAME_ACCESS))
             goto pipe_out_failure;
 
-        if (!(CreatePipe(&m_handle[PIPE_ERROR_READ], &m_handle[PIPE_ERROR_WRITE], &sa, 0)) &&
-            (SetHandleInformation(m_handle[PIPE_ERROR_READ], HANDLE_FLAG_INHERIT, 0)))
+        if (!CreatePipe(&hErrorReadTmp, &hErrorWrite, &securityatt, 0) ||
+            !DuplicateHandle(GetCurrentProcess(), hErrorReadTmp,
+                             GetCurrentProcess(), &hErrorRead, 0,
+                             TRUE, DUPLICATE_SAME_ACCESS))
             goto pipe_err_failure;
 
-        ZeroMemory(&si, sizeof(STARTUPINFO));
-        si.cb = sizeof(STARTUPINFO);
-        si.dwFlags |= STARTF_USESTHANDLES | STARTF_USESHOWWINDOW;
-        si.hStdOutput = m_handle[PIPE_OUTPUT_READ];
-        si.hStdError = m_handle[PIPE_ERROR_READ];
-        si.wShowWindow = SW_SHOWDEFAULT; /* must be SW_HIDE ? */
-        GetStartupInfo(&si);
+        CloseHandle(hOutputReadTmp);
+        CloseHandle(hErrorReadTmp);
 
-        char *cmdline = build_command_line(exe, args);
+        GetStartupInfo(&startupinfo);
+        startupinfo.cb = sizeof(STARTUPINFO);
+        startupinfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+        startupinfo.hStdOutput = hOutputWrite;
+        startupinfo.hStdInput  = GetStdHandle(STD_INPUT_HANDLE);
+        startupinfo.hStdError = hErrorWrite;
+        startupinfo.wShowWindow = SW_SHOWDEFAULT;
+
+        cmdline = build_command_line(exe, args);
         if (!cmdline)
             goto malloc_failure;
 
+        out__ << "Cmd: [" << cmdline << "]\n";
+        err__ << "Cmd: [" << cmdline << "]\n";
+
         ZeroMemory(&m_pi, sizeof(PROCESS_INFORMATION));
-
-        if (!(CreateProcess(NULL, command, NULL, NULL, TRUE,
-                            0, NULL, dirname, &si, &m_pi)))
+        if (!(CreateProcess(NULL, cmdline, NULL, NULL, TRUE,
+                            CREATE_NO_WINDOW,
+                            (LPVOID)(build_envp_line(envp).c_str()),
+                            workingdir.c_str(), &startupinfo, &m_pi)))
             goto create_process_failure;
-
-
-
 
         free(cmdline);
 
-        return 0;
+        CloseHandle(hOutputWrite);
+        CloseHandle(hErrorWrite);
+
+        Sleep(25);
+
+        out__ << "CreateProcess success\n";
+        err__ << "CreateProcess success\n";
+
+        return true;
 
     create_process_failure:
         free(cmdline);
 
     malloc_failure:
-        CloseHandle(m_handle[PIPE_OUTPUT_WRITE]);
-        CloseHandle(m_handle[PIPE_OUTPUT_READ]);
+        CloseHandle(hErrorReadTmp);
+        CloseHandle(hErrorRead);
+        CloseHandle(hErrorWrite);
 
     pipe_err_failure:
-        CloseHandle(m_handle[PIPE_ERROR_WRITE]);
-        CloseHandle(m_handle[PIPE_ERROR_READ]);
+        CloseHandle(hOutputReadTmp);
+        CloseHandle(hOutputRead);
+        CloseHandle(hOutputWrite);
 
     pipe_out_failure:
-        return -1;
+        return false;
     }
 
-    int wait()
+    bool wait()
     {
         if (m_finish)
-            return -1;
+            return true;
 
-        if (WaitForSingleObject(m_pi.hProcess, INFINITE)) {
+        if (WaitForSingleObject(m_pi.hProcess, 50000)) {
             if (GetExitCodeProcess(m_pi.hProcess, &m_status)) {
                 m_finish = true;
+
+                CloseHandle(hErrorRead);
+                CloseHandle(hOutputRead);
+
+                CloseHandle(m_pi.hThread);
+                CloseHandle(m_pi.hProcess);
             }
         }
 
@@ -363,23 +477,6 @@ struct Spawn::Pimpl
             *success = false;
         }
 
-        // if (WIFEXITED(m_status)) {
-        //     printf("[%s] (%d) exited, status=%d\n", m_command.c_str(),
-        //            m_pid, WEXITSTATUS(m_status));
-        //     *success = true;
-        // } else if (WIFSIGNALED(m_status)) {
-        //     printf("[%s] (%d) killed by signal %d\n", m_command.c_str(),
-        //            m_pid, WTERMSIG(m_status));
-        //     *success = false;
-        // } else if (WIFSTOPPED(m_status)) {
-        //     printf("[%s] (%d) stopped by signal %d\n", m_command.c_str(),
-        //            m_pid, WSTOPSIG(m_status));
-        //     *success = false;
-        // } else if (WIFCONTINUED(m_status)) {
-        //     printf("[%s] (%d) continued\n", m_command.c_str(), m_pid);
-        //     *success = false;
-        // }
-
         return true;
     }
 };
@@ -394,21 +491,22 @@ Spawn::~Spawn()
     delete m_pimpl;
 }
 
-int Spawn::start(const std::string& exe,
-                 const std::string& workingdir,
-                 const std::vector < std::string > &args,
-                 const std::vector < std::string > &envp)
+bool Spawn::start(const std::string& exe,
+                  const std::string& workingdir,
+                  const std::vector < std::string > &args,
+                  const Envp &envp,
+                  unsigned int waitchildtimeout)
 {
     if (m_pimpl) {
         delete m_pimpl;
     }
 
-    m_pimpl = new Spawn::Pimpl;
+    m_pimpl = new Spawn::Pimpl(waitchildtimeout);
 
     return m_pimpl->start(exe, workingdir, args, envp);
 }
 
-int Spawn::wait()
+bool Spawn::wait()
 {
     if (not m_pimpl)
         return false;
@@ -416,7 +514,15 @@ int Spawn::wait()
     return m_pimpl->wait();
 }
 
-int Spawn::isfinish()
+bool Spawn::isstart()
+{
+    if (not m_pimpl)
+        return false;
+
+    return not m_pimpl->m_finish;
+}
+
+bool Spawn::isfinish()
 {
     if (not m_pimpl)
         return false;
@@ -424,17 +530,17 @@ int Spawn::isfinish()
     return m_pimpl->m_finish;
 }
 
-int Spawn::get(std::string *output, std::string *error)
+bool Spawn::get(std::string *output, std::string *error)
 {
     if (not m_pimpl and not isfinish())
-        return -1;
+        return false;
 
     return m_pimpl->get(output, error);
 }
 
 bool Spawn::status(std::string *msg, bool *success)
 {
-    if (not m_pimpl and not m_pimpl->m_finish)
+    if (not m_pimpl or not m_pimpl->m_finish)
         return false;
 
     return m_pimpl->status(msg, success);

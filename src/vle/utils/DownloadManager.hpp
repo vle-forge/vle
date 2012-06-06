@@ -25,6 +25,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef VLE_UTILS_DOWNLOAD_MANAGER_HPP
+#define VLE_UTILS_DOWNLOAD_MANAGER_HPP
+
+#include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
 #include <string>
 
@@ -128,3 +132,5 @@ private:
 };
 
 }} // namespace vle utils
+
+#endif

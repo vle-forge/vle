@@ -43,9 +43,7 @@
 #include <algorithm>
 
 #ifdef BOOST_WINDOWS
-#include <Winbase.h>
 #include <windows.h>
-#include <strsage.h>
 #else
 #include <dlfcn.h>
 #endif
@@ -102,12 +100,11 @@ public:
 
 #ifdef BOOST_WINDOWS
     HMODULE mHandle;
-    FARPROC mFunction;
 #else
     void *mHandle;
-    void *mFunction;
 #endif
 
+    void *mFunction;
     ModuleType mType;
 
     /**
@@ -164,13 +161,9 @@ public:
         if (not mFunction) {
             switch (mType) {
             case MODULE_DYNAMICS:
-                if (not (mFunction = reinterpret_cast < void* >
-                         (getSymbol("vle_make_new_dynamics")))) {
-                    if (not (mFunction = reinterpret_cast < void* >
-                             (getSymbol("vle_make_new_executive")))) {
-                        if (not (mFunction = reinterpret_cast < void* >
-                                 (getSymbol(
-                                         "vle_make_new_dynamics_wrapper")))) {
+                if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
+                    if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
+                        if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
                             throw utils::InternalError(fmt(
                                     _("Module `%1%' is not a dynamic module"
                                       " (symbol vle_make_new_dynamics,"
@@ -189,13 +182,9 @@ public:
                 }
                 break;
             case MODULE_DYNAMICS_EXECUTIVE:
-                if (not (mFunction = reinterpret_cast < void* >
-                         (getSymbol("vle_make_new_executive")))) {
-                    if (not (mFunction = reinterpret_cast < void* >
-                             (getSymbol("vle_make_new_dynamics")))) {
-                        if (not (mFunction = reinterpret_cast < void* >
-                                 (getSymbol(
-                                         "vle_make_new_dynamics_wrapper")))) {
+                if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
+                    if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
+                        if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
                             throw utils::InternalError(fmt(
                                     _("Module `%1%' is not a dynamic module"
                                       " (symbol vle_make_new_dynamics,"
@@ -214,12 +203,9 @@ public:
                 }
                 break;
             case MODULE_DYNAMICS_WRAPPER:
-                if (not (mFunction = reinterpret_cast < void* >
-                         (getSymbol("vle_make_new_dynamics_wrapper")))) {
-                    if (not (mFunction = reinterpret_cast < void* >
-                             (getSymbol("vle_make_new_dynamics")))) {
-                        if (not (mFunction = reinterpret_cast < void* >
-                                 (getSymbol("vle_make_new_executive")))) {
+                if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
+                    if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
+                        if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
                             throw utils::InternalError(fmt(
                                     _("Module `%1%' is not a dynamic module"
                                       " (symbol vle_make_new_dynamics,"
@@ -237,16 +223,14 @@ public:
                 }
                 break;
             case MODULE_OOV:
-                if (not (mFunction = reinterpret_cast < void* >(
-                            getSymbol("vle_make_new_oov")))) {
+                if (not (mFunction = (getSymbol("vle_make_new_oov")))) {
                     throw utils::InternalError(fmt(
                             _("Module `%1%' is not an oov module (symbol"
                               " vle_make_new_oov not found)")) % mPath);
                 }
                 break;
             case MODULE_GVLE_MODELING:
-                if (not (mFunction = reinterpret_cast < void* >(
-                            getSymbol("vle_make_new_gvle_modeling")))) {
+                if (not (mFunction = (getSymbol("vle_make_new_gvle_modeling")))) {
                     throw utils::InternalError(fmt(
                             _("Module: `%1%' is not a GVLE modeling module"
                               " (symbol vle_make_new_gvle_modeling not found)"))
@@ -254,8 +238,7 @@ public:
                 }
                 break;
             case MODULE_GVLE_OUTPUT:
-                if (not (mFunction = reinterpret_cast < void* >(
-                    getSymbol("vle_make_new_gvle_output")))) {
+                if (not (mFunction = (getSymbol("vle_make_new_gvle_output")))) {
                     throw utils::InternalError(fmt(
                             _("Module: `%1%' is not a GVLE output module"
                               " (symbol vle_make_new_gvle_output not found)"))
@@ -304,7 +287,7 @@ public:
                             (LPTSTR) &msg,
                             0, NULL);
 
-            extra = msg;
+            extra.assign((LPTSTR)msg);
             ::LocalFree(msg);
 #else
             char *error = ::dlerror();
@@ -324,12 +307,7 @@ public:
     {
         typedef void(*versionFunction)(vle::uint32_t*, vle::uint32_t*,
                                        vle::uint32_t*);
-
-#ifdef BOOST_WINDOWS
-        FARPROC symbol;
-#else
         void *symbol;
-#endif
 
         uint32_t major, minor, patch;
         versionFunction fct;
@@ -342,7 +320,11 @@ public:
                       "This module seems to be too old.")) % mPath);
         }
 
+#ifdef BOOST_WINDOWS
+        fct = (versionFunction)symbol;
+#else
         fct = utils::functionCast < versionFunction >(symbol);
+#endif
         fct(&major, &minor, &patch);
 
         if (major != VLE_MAJOR_VERSION or minor != VLE_MINOR_VERSION) {
@@ -367,19 +349,14 @@ public:
      *
      * @return 0 if the symbol was not found, !0 otherwise.
      */
-#ifdef BOOST_WINDOWS
-    FARPROC getSymbol(const char *dsymbol)
-    {
-        FARPROC ptr = ::GetProcAddress(mHandle, symbol);
-        return ptr;
-    }
-#else
     void *getSymbol(const char *symbol)
     {
-        void *ptr = ::dlsym(mHandle, symbol);
-        return ptr;
-    }
+#ifdef BOOST_WINDOWS
+        return (void*)::GetProcAddress(mHandle, symbol);
+#else
+        return ::dlsym(mHandle, symbol);
 #endif
+    }
 };
 
 class SymbolTable
@@ -408,7 +385,7 @@ public:
             void *result = 0;
 #ifdef BOOST_WINDOWS
             FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
-            result = static_cast < void* >(ptr);
+            result = (void*)ptr;
 #else
             result = ::dlsym(NULL, symbol.c_str());
 #endif

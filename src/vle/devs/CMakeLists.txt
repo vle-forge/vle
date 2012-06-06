@@ -16,6 +16,6 @@ install(FILES Attribute.hpp Coordinator.hpp DynamicsDbg.hpp
   StreamWriter.hpp Time.hpp ViewEvent.hpp View.hpp DESTINATION
   ${VLE_INCLUDE_DIRS}/devs)
 
-if (HAVE_UNITTESTFRAMEWORK)
+if (VLE_HAVE_UNITTESTFRAMEWORK)
   add_subdirectory(test)
-endif (HAVE_UNITTESTFRAMEWORK)
+endif ()

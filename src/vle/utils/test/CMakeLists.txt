@@ -1,24 +1,20 @@
-ADD_EXECUTABLE(test_algo test1.cpp)
+add_executable(test_algo test1.cpp)
 
-TARGET_LINK_LIBRARIES(test_algo vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_algo vlelib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-ADD_EXECUTABLE(test_template test_template.cpp)
+add_executable(test_template test_template.cpp)
 
-TARGET_LINK_LIBRARIES(test_template vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_template vlelib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-ADD_EXECUTABLE(test_parser test_parser.cpp)
+add_executable(test_parser test_parser.cpp)
 
-TARGET_LINK_LIBRARIES(test_parser vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_parser vlelib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-ADD_EXECUTABLE(test_package test_package.cpp)
+add_executable(test_package test_package.cpp)
 
-TARGET_LINK_LIBRARIES(test_package vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_package vlelib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-ADD_TEST(utilstest_algo test_algo)
-ADD_TEST(utilstest_template test_template)
-ADD_TEST(utilstest_parser test_parser)
-ADD_TEST(utilstest_package test_package)
+add_test(utilstest_algo test_algo)
+add_test(utilstest_template test_template)
+add_test(utilstest_parser test_parser)
+add_test(utilstest_package test_package)

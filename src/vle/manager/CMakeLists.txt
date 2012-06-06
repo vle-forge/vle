@@ -4,6 +4,6 @@ add_sources(vlelib ExperimentGenerator.cpp ExperimentGenerator.hpp
 install(FILES ExperimentGenerator.hpp Manager.hpp Simulation.hpp
   Types.hpp DESTINATION ${VLE_INCLUDE_DIRS}/manager)
 
-if (HAVE_UNITTESTFRAMEWORK)
+if (VLE_HAVE_UNITTESTFRAMEWORK)
   add_subdirectory(test)
-endif (HAVE_UNITTESTFRAMEWORK)
+endif ()

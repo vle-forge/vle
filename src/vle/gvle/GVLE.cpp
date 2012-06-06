@@ -1290,6 +1290,12 @@ bool GVLE::packageBuildTimer()
         scrollLogToLastLine();
 
         if (utils::Package::package().isFinish()) {
+            if (utils::Package::package().get(&o, &e)) {
+                insertLog(o);
+                insertLog(e);
+                scrollLogToLastLine();
+            }
+
             if (utils::Package::package().isSuccess()) {
                 installProject();
             } else {

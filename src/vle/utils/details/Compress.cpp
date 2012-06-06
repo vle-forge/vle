@@ -73,7 +73,11 @@ static int copy_data(struct archive *ar, struct archive *aw)
     int r;
     const void *buff;
     size_t size;
+#ifdef __unix__
     off_t offset;
+#else
+    off64_t offset;
+#endif
 
     for (;;) {
         r = archive_read_data_block(ar, &buff, &size, &offset);

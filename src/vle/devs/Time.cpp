@@ -35,9 +35,9 @@ namespace vle { namespace devs {
 
 std::string convertTimeToString(const Time& time)
 {
-    if (isinf(time) == 1) {
+    if (std::isinf(time) == 1) {
         return std::string("+infinity");
-    } else if (isinf(time) == -1) {
+    } else if (std::isinf(time) == -1) {
         return std::string("-infinity");
     } else {
         std::ostringstream out;

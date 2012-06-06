@@ -38,22 +38,24 @@
 
 #ifdef BOOST_WINDOWS
 #define VLE_PACKAGE_COMMAND_CONFIGURE "cmake.exe -G 'MinGW Makefiles' " \
-                              "-DCMAKE_INSTALL_PREFIX='%1%' " \
-                              "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
-#define VLE_PACKAGE_COMMAND_TEST "mingw32-make.exe test"
-#define VLE_PACKAGE_COMMAND_BUILD "mingw32-make.exe all"
-#define VLE_PACKAGE_COMMAND_INSTALL "mingw32-make.exe install"
-#define VLE_PACKAGE_COMMAND_CLEAN "mingw32-make.exe clean"
-#define VLE_PACKAGE_COMMAND_PACKAGE "mingw32-make.exe package package_source"
+    "-DCMAKE_INSTALL_PREFIX='%1%' "                                     \
+    "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
+
+#define VLE_PACKAGE_COMMAND_TEST "cmake.exe --build '%1%' --target test"
+#define VLE_PACKAGE_COMMAND_BUILD "cmake.exe --build '%1%' --target all"
+#define VLE_PACKAGE_COMMAND_INSTALL "cmake.exe --build '%1%' --target install"
+#define VLE_PACKAGE_COMMAND_CLEAN "cmake.exe --build '%1%' --target clean"
+#define VLE_PACKAGE_COMMAND_PACKAGE "cmake.exe --build '%1%' "  \
+    "--target package_source"
 #define VLE_PACKAGE_COMMAND_UNZIP "unzip.exe"
 #else
-#define VLE_PACKAGE_COMMAND_CONFIGURE "cmake -DCMAKE_INSTALL_PREFIX=%1% " \
-                                       "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
-#define VLE_PACKAGE_COMMAND_TEST "make test"
-#define VLE_PACKAGE_COMMAND_BUILD "make all"
-#define VLE_PACKAGE_COMMAND_INSTALL "make install"
-#define VLE_PACKAGE_COMMAND_CLEAN "make clean"
-#define VLE_PACKAGE_COMMAND_PACKAGE "make package package_source"
+#define VLE_PACKAGE_COMMAND_CONFIGURE "cmake -DCMAKE_INSTALL_PREFIX='%1%' " \
+    "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
+#define VLE_PACKAGE_COMMAND_TEST "cmake --build '%1%' --target test"
+#define VLE_PACKAGE_COMMAND_BUILD "cmake --build '%1%' --target all"
+#define VLE_PACKAGE_COMMAND_INSTALL "cmake --build '%1%' --target install"
+#define VLE_PACKAGE_COMMAND_CLEAN "cmake --build '%1%' --target clean"
+#define VLE_PACKAGE_COMMAND_PACKAGE "cmake --build '%1%' --target package_source"
 #define VLE_PACKAGE_COMMAND_UNZIP "unzip"
 #endif
 

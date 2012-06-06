@@ -51,6 +51,10 @@
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace fs = boost::filesystem;
 
 namespace vle { namespace utils {
@@ -76,6 +80,7 @@ static void buildCommandLine(const std::string& cmd,
     }
 
     exe = Glib::find_program_in_path(argv.front());
+
     argv.erase(argv.begin());
 }
 
@@ -112,21 +117,22 @@ static std::string convertPathTo83Path(const std::string& path)
  *
  * @return
  */
-static std::string replaceEnvironmentVariable(const std::string& variable,
-                                              const std::string& value,
-                                              bool append)
+static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
+                                                   const std::string& value,
+                                                   bool append)
 {
-    std::string result(variable);
-    result += "=";
-    result += value;
+    Envp::value_type result;
+
+    result.first = variable;
+    result.second = value;
 
     if (append) {
         char* env = std::getenv(variable.c_str());
 
         if (env != NULL) {
             std::string old(env, std::strlen(env));
-            result += ";";
-            result += old;
+            result.second += ";";
+            result.second += old;
         }
     }
 
@@ -145,9 +151,9 @@ static std::string replaceEnvironmentVariable(const std::string& variable,
  *
  * @return A list of string.
  */
-static std::vector < std::string > prepareEnvironmentVariable()
+static Envp prepareEnvironmentVariable()
 {
-    std::vector < std::string > envp;
+    Envp envp;
     gchar** allenv = g_listenv();
     gchar** it = allenv;
 
@@ -162,19 +168,13 @@ static std::vector < std::string > prepareEnvironmentVariable()
 
             const gchar* res = g_getenv(*it);
             if (res) {
-                std::string buffer(*it);
-                buffer += "=";
-                buffer += res;
-                envp.push_back(buffer);
+                envp.push_back(Envp::value_type(*it, res));
             }
         }
 #else
         const gchar* res = g_getenv(*it);
         if (res) {
-            std::string buffer(*it);
-            buffer += "=";
-            buffer += res;
-            envp.push_back(buffer);
+            envp.push_back(Envp::value_type(*it, res));
         }
 #endif
 
@@ -189,34 +189,34 @@ static std::vector < std::string > prepareEnvironmentVariable()
      * PKG_CONFIG_PATH and update four others environment variables.
      */
     envp.push_back(replaceEnvironmentVariable(
-            "PATH",
-            Path::buildFilename(
-                convertPathTo83Path(Path::path().getPrefixDir()),
-                "bin"),
-            true));
+                       "PATH",
+                       Path::buildFilename(
+                           convertPathTo83Path(Path::path().getPrefixDir()),
+                           "bin"),
+                       true));
 
     envp.push_back(replaceEnvironmentVariable(
-            "PKG_CONFIG_PATH",
-            Path::buildFilename(
-                convertPathTo83Path(Path::path().getPrefixDir()),
-                "lib", "pkgconfig"),
-            true));
+                       "PKG_CONFIG_PATH",
+                       Path::buildFilename(
+                           convertPathTo83Path(Path::path().getPrefixDir()),
+                           "lib", "pkgconfig"),
+                       false));
 
     envp.push_back(replaceEnvironmentVariable(
-            "BOOST_INCLUDEDIR",
-            Path::buildFilename(Path::path().getPrefixDir(), "include",
-                                "boost"),
-            false));
+                       "BOOST_INCLUDEDIR",
+                       Path::buildFilename(Path::path().getPrefixDir(),
+                                           "include", "boost"),
+                       false));
 
     envp.push_back(replaceEnvironmentVariable(
-            "BOOST_LIBRARYDIR",
-            Path::buildFilename(Path::path().getPrefixDir(), "lib"),
-            false));
+                       "BOOST_LIBRARYDIR",
+                       Path::buildFilename(Path::path().getPrefixDir(), "lib"),
+                       false));
 
     envp.push_back(replaceEnvironmentVariable(
-            "BOOST_ROOT",
-            Path::path().getPrefixDir(),
-            false));
+                       "BOOST_ROOT",
+                       Path::path().getPrefixDir(),
+                       false));
 #endif
 
     return envp;
@@ -243,6 +243,39 @@ struct Package::Pimpl
     std::string  mCommandPack;
     std::string  mCommandUnzip;
     bool         m_issuccess;
+
+    void process(const std::string& exe,
+                 const std::string& workingDir,
+                 const std::vector < std::string >& argv,
+                 const Envp& envp)
+    {
+        if (not m_spawn.isfinish()) {
+            if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
+                utils::Trace::send(
+                    fmt("-[%1%] Need to wait old process before") % exe);
+            }
+
+            m_spawn.wait();
+            m_spawn.status(&m_message, &m_issuccess);
+        }
+
+        if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
+            utils::Trace::send(fmt("-[%1%] Try to start") % exe);
+
+            Envp::const_iterator it = envp.begin();
+            Envp::const_iterator et = envp.end();
+
+            for (; it != et; ++it) {
+                utils::Trace::send((fmt("-[%1%=%2%]")
+                                    % it->first % it->second).str());
+            }
+        }
+
+        if (not m_spawn.start(exe, workingDir, argv, envp)) {
+            throw utils::ArgError(fmt(_("Failed to start `%1%'")) % exe);
+        }
+    }
+
 };
 
 
@@ -279,10 +312,10 @@ void Package::configure()
 
     buildCommandLine(cmd, exe, argv);
 
-    std::vector < std::string > envp = prepareEnvironmentVariable();
+    Envp envp = prepareEnvironmentVariable();
 
     try {
-        process(exe, p.getPackageBuildDir(), argv, envp);
+        m_pimpl->process(exe, p.getPackageBuildDir(), argv, envp);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg configure error: configure failed %1%")) % e.what());
@@ -295,14 +328,15 @@ void Package::test()
     fs::create_directory(p.getPackageBuildDir());
 
     std::vector < std::string > argv;
-    std::string exe;
+    std::string exe, cmd;
 
-    buildCommandLine(m_pimpl->mCommandTest, exe, argv);
+    cmd = (vle::fmt(m_pimpl->mCommandTest) % p.getPackageBuildDir()).str();
+    buildCommandLine(cmd, exe, argv);
 
-    std::vector < std::string > envp = prepareEnvironmentVariable();
+    Envp envp = prepareEnvironmentVariable();
 
     try {
-        process(exe, p.getPackageBuildDir(), argv, envp);
+        m_pimpl->process(exe, p.getPackageBuildDir(), argv, envp);
     } catch (const std::exception& e) {
         throw utils::InternalError(
             fmt(_("Pkg error: test launch failed %1%")) % e.what());
@@ -315,14 +349,15 @@ void Package::build()
     fs::create_directory(p.getPackageBuildDir());
 
     std::vector < std::string > argv;
-    std::string exe;
+    std::string exe, cmd;
 
-    buildCommandLine(m_pimpl->mCommandBuild, exe, argv);
+    cmd = (vle::fmt(m_pimpl->mCommandBuild) % p.getPackageBuildDir()).str();
+    buildCommandLine(cmd, exe, argv);
 
-    std::vector < std::string > envp = prepareEnvironmentVariable();
+    Envp envp = prepareEnvironmentVariable();
 
     try {
-        process(exe, p.getPackageBuildDir(), argv, envp);
+        m_pimpl->process(exe, p.getPackageBuildDir(), argv, envp);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg build error: build failed %1%")) % e.what());
@@ -335,9 +370,10 @@ void Package::install()
     fs::create_directory(p.getPackageBuildDir());
 
     std::vector < std::string > argv;
-    std::string exe;
+    std::string exe, cmd;
 
-    buildCommandLine(m_pimpl->mCommandInstall, exe, argv);
+    cmd = (vle::fmt(m_pimpl->mCommandInstall) % p.getPackageBuildDir()).str();
+    buildCommandLine(cmd, exe, argv);
 
     fs::path builddir = p.getPackageBuildDir();
 
@@ -361,10 +397,10 @@ void Package::install()
 #endif
     }
 
-    std::vector < std::string > envp = prepareEnvironmentVariable();
+    Envp envp = prepareEnvironmentVariable();
 
     try {
-        process(exe, p.getPackageBuildDir(), argv, envp);
+        m_pimpl->process(exe, p.getPackageBuildDir(), argv, envp);
     } catch(const std::exception& e) {
         throw utils::InternalError(
             fmt(_("Pkg build error: install lib failed %1%")) % e.what());
@@ -377,13 +413,15 @@ void Package::clean()
     fs::create_directory(p.getPackageBuildDir());
 
     std::vector < std::string > argv;
-    std::string exe;
-    buildCommandLine(m_pimpl->mCommandClean, exe, argv);
+    std::string exe, cmd;
 
-    std::vector < std::string > envp = prepareEnvironmentVariable();
+    cmd = (vle::fmt(m_pimpl->mCommandClean) % p.getPackageBuildDir()).str();
+    buildCommandLine(cmd, exe, argv);
+
+    Envp envp = prepareEnvironmentVariable();
 
     try {
-        process(exe, p.getPackageBuildDir(), argv, envp);
+        m_pimpl->process(exe, p.getPackageBuildDir(), argv, envp);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg clean error: clean failed %1%")) % e.what());
@@ -396,13 +434,15 @@ void Package::pack()
     fs::create_directory(p.getPackageBuildDir());
 
     std::vector < std::string > argv;
-    std::string exe;
-    buildCommandLine(m_pimpl->mCommandPack, exe, argv);
+    std::string exe, cmd;
 
-    std::vector < std::string > envp = prepareEnvironmentVariable();
+    cmd = (vle::fmt(m_pimpl->mCommandPack) % p.getPackageBuildDir()).str();
+    buildCommandLine(cmd, exe, argv);
+
+    Envp envp = prepareEnvironmentVariable();
 
     try {
-        process(exe, p.getPackageBuildDir(), argv, envp);
+        m_pimpl->process(exe, p.getPackageBuildDir(), argv, envp);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg packaging error: package failed %1%")) % e.what());
@@ -440,7 +480,7 @@ bool Package::wait(std::ostream& out, std::ostream& err)
             err << error;
 
             output.clear();
-            err.clear();
+            error.clear();
 
             Glib::usleep(1000);
         } else {
@@ -698,37 +738,6 @@ void Package::refresh()
 PackageTable::index Package::getId(const std::string& package)
 {
     return m_pimpl->m_table.get(package);
-}
-
-void Package::process(const std::string& exe,
-                      const std::string& workingDir,
-                      const std::vector < std::string >& argv,
-                      const std::vector < std::string >& envp)
-{
-    if (not m_pimpl->m_spawn.isfinish()) {
-        if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
-            utils::Trace::send(
-                fmt("-[%1%] Need to wait old process before") % exe);
-        }
-
-        m_pimpl->m_spawn.wait();
-        m_pimpl->m_spawn.status(&m_pimpl->m_message, &m_pimpl->m_issuccess);
-    }
-
-    if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
-        utils::Trace::send(fmt("-[%1%] Try to start") % exe);
-
-        std::vector < std::string >::const_iterator it = envp.begin();
-        std::vector < std::string >::const_iterator et = envp.end();
-
-        for (; it != et; ++it) {
-            utils::Trace::send((fmt("-[%1%]") % (*it)).str());
-        }
-    }
-
-    if (not m_pimpl->m_spawn.start(exe, workingDir, argv, envp)) {
-        throw utils::ArgError(fmt(_("Failed to start `%1%'")) % exe);
-    }
 }
 
 }} // namespace vle utils

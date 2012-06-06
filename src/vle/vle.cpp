@@ -43,7 +43,7 @@ Init::Init()
 
     xmlInitParser(); /**< Initialize the libxml2 library. */
 
-#ifdef BOOST_WIN32
+#ifdef _WIN32
     error = curl_global_init(CURL_GLOBAL_WIN32); /**< Initialize the
                                                   * libcurl library
                                                   * for WIN32. */

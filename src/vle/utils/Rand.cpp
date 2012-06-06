@@ -27,9 +27,8 @@
 
 
 #include <cmath>
-#include <glib/gtypes.h>
 #include <vle/utils/Rand.hpp>
-
+#include <vle/utils/Types.hpp>
 
 
 namespace vle { namespace utils {
@@ -38,7 +37,7 @@ double Rand::vonMises(const double kappa, const double mu)
 {
     // FIXME: get_double_included instead of getDouble()
     if (kappa <= 1e-6){
-        return 2. * G_PI * getDouble();
+        return 2. * M_PI * getDouble();
     }
 
     double a = 1.0 + sqrt(1.0 + 4.0 * kappa * kappa);
@@ -48,7 +47,7 @@ double Rand::vonMises(const double kappa, const double mu)
 
     for (;;) {
         double u1 = getDouble();
-        double z = cos(G_PI * u1);
+        double z = cos(M_PI * u1);
 
         f = (1.0 + r * z)/(r + z);
         double c = kappa * (r - f);

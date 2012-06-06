@@ -1,6 +1,5 @@
-ADD_EXECUTABLE(test_manager test1.cpp)
+add_executable(test_manager test1.cpp)
 
-TARGET_LINK_LIBRARIES(test_manager vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_manager vlelib ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-ADD_TEST(manager_test test_manager)
+add_test(manager_test test_manager)

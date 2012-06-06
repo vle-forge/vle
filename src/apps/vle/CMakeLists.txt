@@ -1,67 +1,33 @@
-include_directories(
-  ${VLE_BINARY_DIR}/src
-  ${VLE_SOURCE_DIR}/src
-  ${MPI_INCLUDE_PATH}
-  ${Boost_INCLUDE_DIRS}
-  ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXML_INCLUDE_DIRS})
+include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
+  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS})
 
-link_directories(
-  ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXML_LIBRARY_DIRS}
-  ${Boost_LIBRARY_DIRS})
+link_directories(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 
-IF (WIN32)
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vle.o
+if (WIN32)
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vle.o
     COMMAND ${CMAKE_RC_COMPILER}
     -I${CMAKE_BINARY_DIR}/share
     -i${CMAKE_BINARY_DIR}/share/vle.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/vle.o)
-
-  ADD_EXECUTABLE(vle main.cpp OptionGroup.cpp OptionGroup.hpp
+  add_executable(vle main.cpp OptionGroup.cpp OptionGroup.hpp
     ${CMAKE_CURRENT_BINARY_DIR}/vle.o)
+else ()
+  add_executable(vle main.cpp OptionGroup.cpp OptionGroup.hpp)
+  set_target_properties(vle PROPERTIES SOVERSION
+    "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
+endif ()
 
-  IF (VLE_HAVE_MPI)
-    ADD_EXECUTABLE(mvle mvle.cpp ${CMAKE_CURRENT_BINARY_DIR}/vle.o)
-  ENDIF (VLE_HAVE_MPI)
-ELSE (WIN32)
-  ADD_EXECUTABLE(vle main.cpp OptionGroup.cpp OptionGroup.hpp)
-  SET_TARGET_PROPERTIES(vle PROPERTIES SOVERSION "${VLE_MAJOR}.${VLE_MINOR}"
-    VERSION "${VLE_MAJOR}.${VLE_MINOR}")
+if (BUILD_SHARED_LIBS)
+  target_link_libraries(vle ${VLEDEPS_LIBRARIES}
+    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
+else ()
+  if (WIN32)
+    set_target_properties(vle PROPERTIES LINK_FLAGS "-Wl,-static")
+  endif ()
+  target_link_libraries(vle vlelib-static)
+endif ()
 
-  IF (VLE_HAVE_MPI)
-    ADD_EXECUTABLE(mvle mvle.cpp)
-    SET_TARGET_PROPERTIES(vle PROPERTIES SOVERSION "${VLE_MAJOR}.${VLE_MINOR}"
-      VERSION "${VLE_MAJOR}.${VLE_MINOR}")
-  ENDIF (VLE_HAVE_MPI)
-ENDIF (WIN32)
+install(TARGETS vle DESTINATION bin)
 
-IF (VLE_HAVE_MPI)
-  TARGET_LINK_LIBRARIES(mvle
-    ${VLE_LIBRARIES}
-    ${MPI_LIBRARY}
-    ${MPI_EXTRA_LIBRARY}
-    ${GLIBMM_LIBRARIES}
-    ${LIBXML_LIBRARIES}
-    ${GTHREAD_LIBRARIES}
-    ${Boost_FILESYSTEM_LIBRARY}
-    vlelib)
-ENDIF (VLE_HAVE_MPI)
-
-TARGET_LINK_LIBRARIES(vle
-  ${VLE_LIBRARIES}
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_FILESYSTEM_LIBRARY}
-  vlelib)
-
-INSTALL(TARGETS vle DESTINATION bin)
-INSTALL(FILES vle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
-  vle-${VLE_VERSION_SHORT}.1)
-
-IF (VLE_HAVE_MPI)
-  INSTALL(TARGETS mvle DESTINATION bin)
-  INSTALL(FILES mvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
-    mvle-${VLE_VERSION_SHORT}.1)
-ENDIF (VLE_HAVE_MPI)
+install(FILES vle.1 DESTINATION ${VLE_MANPAGE_PATH}
+  RENAME "vle-${VLE_VERSION_SHORT}.1")

@@ -34,6 +34,7 @@
 #include <boost/algorithm/string.hpp>
 #include <windows.h>
 #include <winreg.h>
+#include <fstream>
 
 namespace vle { namespace utils {
 
@@ -90,7 +91,7 @@ std::string Path::getTempFile(const std::string& prefix,
 {
     if (file and not file->is_open()) {
         TCHAR filename[MAX_PATH];
-        TCHAR temp[MAX_PATH];
+        TCHAR tmp[MAX_PATH];
         DWORD result;
 
         result = ::GetTempPath(MAX_PATH, tmp);
@@ -102,7 +103,7 @@ std::string Path::getTempFile(const std::string& prefix,
 
             if (result) {
                 file->open(static_cast < char* >(tmp),
-                           std::ios_base::truc | std::ios_base::out |
+                           std::ios_base::trunc | std::ios_base::out |
                            std::ios_base::binary);
 
                 if (file->is_open()) {

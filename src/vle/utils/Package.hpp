@@ -299,25 +299,6 @@ private:
 
     struct Pimpl;
     Pimpl *m_pimpl;
-
-    /**
-     * Start the process taken from the list of argument in the
-     * working directory. Launch the process asynchronously an start
-     * two threads to read output and error standard stream and move
-     * data into stream.
-     *
-     * @param exe Executable to execute.
-     * @param workingDir The directory to start the process.
-     * @param argv The command line argument.
-     * @param envp The environment variable.
-     */
-    void process(const std::string& exe,
-                 const std::string& workingDir,
-                 const std::vector < std::string >& argv,
-                 const std::vector < std::string >& envp);
-
-
-    void waitProcess();
 };
 
 }} // namespace vle utils

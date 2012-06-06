@@ -1,19 +1,19 @@
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_SOURCE_DIR}/src
   ${VLE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS})
 
-LINK_DIRECTORIES(
+link_directories(
   ${VLE_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(Simple SHARED Simple.cpp)
+add_library(Simple SHARED Simple.cpp)
 
-TARGET_LINK_LIBRARIES(Simple
+target_link_libraries(Simple
   ${VLE_LIBRARIES}
   ${Boost_LIBRARIES})
 
-INSTALL(TARGETS Simple
+install(TARGETS Simple
   RUNTIME DESTINATION plugins/simulator
   LIBRARY DESTINATION plugins/simulator
   ARCHIVE DESTINATION plugins/simulator)
