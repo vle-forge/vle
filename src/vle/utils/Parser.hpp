@@ -42,10 +42,13 @@ struct VLE_API Block
 {
     typedef std::multimap < std::string, std::string > Strings;
     typedef std::multimap < std::string, double > Reals;
+    typedef std::multimap < std::string, double > RelativeReals;
     typedef std::multimap < std::string, Block > Blocks;
 
     typedef std::pair < Reals::const_iterator,
             Reals::const_iterator > RealsResult;
+    typedef std::pair < RelativeReals::const_iterator,
+            RelativeReals::const_iterator > RelativeRealsResult;
     typedef std::pair < Strings::const_iterator,
             Strings::const_iterator > StringsResult;
     typedef std::pair < Blocks::const_iterator,
@@ -59,12 +62,15 @@ struct VLE_API Block
 
     void addReal(const std::string& key, const double& val);
 
+    void addRelativeReal(const std::string& key, const double& val);
+
     Block& addBlock(const std::string& name);
 
     const Block& getBlock(const std::string& name) const;
 
     std::string name;
     Strings strings;
+    RelativeReals relativeReals;
     Reals reals;
     Blocks blocks;
 };
@@ -150,6 +156,7 @@ private:
         Comma,
         Equal,
         Real,
+        RelativeReal,
         Semicolon,
         Number,
         Error
@@ -162,6 +169,8 @@ private:
     std::string readString();
 
     double readReal();
+
+    double readRelativeReal();
 
     std::string readQuotedString();
 

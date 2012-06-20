@@ -48,6 +48,11 @@ void Block::addReal(const std::string& key, const double& val)
     reals.insert(std::make_pair(key, val));
 }
 
+void Block::addRelativeReal(const std::string& key, const double& val)
+{
+    relativeReals.insert(std::make_pair(key, val));
+}
+
 Block& Block::addBlock(const std::string& name)
 {
     std::multimap < std::string, Block >::iterator it =
@@ -196,6 +201,12 @@ double Parser::readReal()
     }
 }
 
+double Parser::readRelativeReal()
+{
+    readChar('+');
+    return readReal();
+}
+
 std::string Parser::readQuotedString()
 {
     readChar('"');
@@ -250,6 +261,9 @@ Parser::Token Parser::nextToken()
         } else if (std::isdigit(c)) {
             unget();
             return Parser::Real;
+        } else if (c == '+') {
+            unget();
+            return Parser::RelativeReal;
         } else if (c == '"') {
             unget();
             return Parser::QuoteStr;
@@ -303,6 +317,12 @@ void Parser::readBlock(Block& block)
                 while (nextToken() == Parser::Comma) {
                     readComma();
                     block.addReal(str, readReal());
+                }
+            } else if (nextToken() == RelativeReal) {
+                block.addRelativeReal(str, readRelativeReal());
+                while (nextToken() == Parser::Comma) {
+                    readComma();
+                    block.addRelativeReal(str, readRelativeReal());
                 }
             } else if (nextToken() == Str) {
                 block.addString(str, readString());
