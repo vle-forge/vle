@@ -191,6 +191,12 @@ double Parser::readReal()
                 break;
             } else if (isdigit(c)) {
                 result += c;
+            } else if (c == '.') {
+                if (result.find(".") != std::string::npos){
+                    throw utils::ParseError(fmt(
+                       _("Multiple '.' while parsing real `%1%.' ")) % result);
+                }
+                result += c;
             } else {
                 unget();
                 break;
