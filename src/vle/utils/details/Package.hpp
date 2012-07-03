@@ -37,25 +37,50 @@
 
 namespace vle { namespace utils {
 
+/**
+ * A functor to hash @c PackageId.
+ *
+ */
 struct PackageIdHash
     : public std::unary_function < PackageId, std::size_t >
 {
     std::size_t operator()(const PackageId& lhs) const
     {
-        std::size_t seed = 0;
-
-        boost::hash_combine(seed, lhs.name);
-
-        return seed;
+        return boost::hash_value(lhs.name);
     }
 };
 
+/**
+ * A functor to detect equal packages.
+ *
+ * A package is equal it tow @c PackageId have the same name.
+ */
 struct PackageIdEqual
     : public std::binary_function < PackageId, PackageId, bool >
 {
     bool operator()(const PackageId& lhs, const PackageId& rhs) const
     {
         return lhs.name == rhs.name;
+    }
+};
+
+/**
+ * A functor to detect updated packages.
+ *
+ * A package is updated if two @c PackageId have the same name but at least one
+ * version number is different.
+ */
+struct PackageIdUpdate
+    : public std::binary_function < PackageId, PackageId, bool >
+{
+    bool operator()(const PackageId& lhs, const PackageId& rhs) const
+    {
+        if (lhs.name == rhs.name) {
+            return lhs.major != rhs.major or lhs.minor != rhs.minor or
+                lhs.patch != rhs.patch;
+        }
+
+        return false;
     }
 };
 

@@ -52,6 +52,8 @@
 #include <ostream>
 #include <string>
 
+#define PACKAGESID_VECTOR_RESERVED_SIZE 100u
+
 namespace vle { namespace utils {
 
 namespace fs = boost::filesystem;
@@ -93,8 +95,10 @@ class RemoteManager::Pimpl
 public:
     Pimpl()
         : mStream(0), mIsStarted(false), mIsFinish(false), mStop(false),
-        mHasError(false)
+          mHasError(false)
     {
+        mPackages.reserve(PACKAGESID_VECTOR_RESERVED_SIZE);
+
         if (!LoadPackages(buildLocalPackageFilename(), std::string(), &local)) {
             BuildLocalPackage(&local);
         }
@@ -106,6 +110,8 @@ public:
         : mStream(0), mIsStarted(false), mIsFinish(false), mStop(false),
           mHasError(false)
     {
+        mPackages.reserve(PACKAGESID_VECTOR_RESERVED_SIZE);
+
         LoadPackages(in, std::string(), &local);
     }
 
@@ -124,6 +130,7 @@ public:
             mHasError = false;
             mArgs = arg;
             mStream = out;
+            mPackages.clear();
 
             switch (action) {
             case REMOTE_MANAGER_UPDATE:
@@ -180,49 +187,44 @@ public:
         }
     }
 
-    // /**
-    //  * A functor to check if a @c Packages::value_type corresponds to the
-    //  * regular expression provided in constructor.
-    //  */
-    // struct HaveExpression
-    // {
-    //     HaveExpression(const boost::regex& expression,
-    //                    std::ostream& stream)
-    //         : expression(expression), stream(stream)
-    //     {
-    //     }
-
-    //     void operator()(const Pkgs::value_type& value) const
-    //     {
-    //         boost::sregex_iterator it(value.first.begin(),
-    //                                   value.first.end(),
-    //                                   expression);
-    //         boost::sregex_iterator end;
-
-    //         if (it != end) {
-    //             stream << value.first << "\n";
-    //         } else {
-    //             const std::string desc = value.second.description();
-
-    //             boost::sregex_iterator jt(desc.begin(),
-    //                                       desc.end(),
-    //                                       expression);
-
-    //             if (jt != end) {
-    //                 stream << value.first << "\n";
-    //             }
-    //         }
-    //     }
-
-    //     const boost::regex& expression;
-    //     std::ostream& stream;
-    // };
-
     /**
-     * Read the package file \c filename.
-     *
-     * @param[in] The filename to read.
+     * A functor to check if a @c Packages::value_type corresponds to the
+     * regular expression provided in constructor.
      */
+    struct NotHaveExpression
+        : std::unary_function < PackageId, bool >
+    {
+        const boost::regex& expression;
+
+        NotHaveExpression(const boost::regex& expression)
+            : expression(expression)
+        {
+        }
+
+        bool operator()(const PackageId& pkg) const
+        {
+            boost::match_results < std::string::const_iterator > what;
+
+            if (boost::regex_match(pkg.name,
+                                   what,
+                                   expression,
+                                   boost::match_default |
+                                   boost::match_partial)) {
+                return false;
+            }
+
+            if (boost::regex_match(pkg.description,
+                                   what,
+                                   expression,
+                                   boost::match_default |
+                                   boost::match_partial)) {
+                return false;
+            }
+
+            return true;
+        }
+    };
+
     void read(const std::string& filename)
     {
         PackagesIdSet tmpremote;
@@ -230,39 +232,65 @@ public:
         if (not LoadPackages(filename, "distant", &tmpremote)) {
             TraceAlways(fmt(_("Failed to open package file `%1%'")) % filename);
         }
-
-
     }
 
-    /**
-     * Write the default package \c VLE_HOME/packages.
-     */
     void save() const throw()
     {
-        // std::ofstream file(buildPackageFilename().c_str());
+        try {
+            {
+                std::ofstream file(buildLocalPackageFilename().c_str());
+                file.exceptions(std::ios_base::eofbit |
+                                std::ios_base::failbit |
+                                std::ios_base::badbit);
 
-        // if (file) {
-        //     file.exceptions(std::ios_base::eofbit | std::ios_base::failbit |
-        //                     std::ios_base::badbit);
+                file << local << std::endl;
+            }
 
-        //     try {
-        //         std::transform(
-        //             mPackages.begin(), mPackages.end(),
-        //             std::ostream_iterator < RemotePackage >( file, "\n"),
-        //             select2nd < Pkgs::value_type >());
-        //     } catch (const std::exception& /*e*/) {
-        //         TraceAlways(fmt(_("Failed to write package file `%1%'")) %
-        //                     buildPackageFilename());
-        //     }
-        // } else {
-        //     TraceAlways(fmt(_("Failed to open package file `%1%'")) %
-        //                 buildPackageFilename());
-        // }
+            {
+                std::ofstream file(buildRemotePackageFilename().c_str());
+                file.exceptions(std::ios_base::eofbit |
+                                std::ios_base::failbit |
+                                std::ios_base::badbit);
+
+                file << remote << std::endl;
+            }
+        } catch (const std::exception& e) {
+            TraceAlways(fmt(_("Failed to write package file `%1%' or `%2%'")) %
+                        buildLocalPackageFilename() %
+                        buildRemotePackageFilename());
+        }
     }
 
     //
     // threaded slot
     //
+
+    struct Download
+        : public std::unary_function < std::string, void >
+    {
+        PackagesIdSet* pkgs;
+
+        Download(PackagesIdSet* pkgs)
+        : pkgs(pkgs)
+        {
+            assert(pkgs);
+        }
+
+        void operator()(const std::string& url) const
+        {
+            DownloadManager dl;
+
+            std::string pkgurl(url);
+            pkgurl += "/packages";
+
+            dl.start(pkgurl);
+            dl.join();
+
+            if (not dl.hasError()) {
+                LoadPackages(dl.filename(), url, pkgs);
+            }
+        }
+    };
 
     void actionUpdate() throw()
     {
@@ -280,45 +308,18 @@ public:
             TraceAlways(_("Failed to read preferences file"));
         }
 
-        out(_("Update database\n"));
+        PackagesIdSet updated;
+        std::for_each(urls.begin(), urls.end(),
+                      Download(&updated));
 
-        std::vector < std::string >::const_iterator it, end = urls.end();
-        for (it = urls.begin(); it != end; ++it) {
-            try {
-                DownloadManager dl;
-
-                std::string url = *it;
-                url += '/';
-                url += "packages";
-
-                out(fmt(_("Download %1% ...")) % url);
-
-                dl.start(url);
-                dl.join();
-
-                if (not dl.hasError()) {
-                    out(_("ok"));
-                    std::string filename(dl.filename());
-
-                    try {
-                        out(_("(merged: "));
-                        read(filename);
-                        out(_("ok)"));
-                    } catch (...) {
-                        out(_("failed)"));
-                    }
-                } else {
-                    out(_("failed"));
-                }
-                out("\n");
-            } catch (const std::exception& e) {
-                out(fmt(_("failed `%1%'")) % e.what());
-            }
+        if (not updated.empty()) {
+            std::set_intersection(local.begin(),
+                                  local.end(),
+                                  updated.begin(),
+                                  updated.end(),
+                                  std::back_inserter(mPackages),
+                                  PackageIdUpdate());
         }
-
-        out(_("Database updated\n"));
-
-        save();
 
         mStream = 0;
         mIsFinish = true;
@@ -405,19 +406,23 @@ public:
 
     void actionSearch() throw()
     {
-        // if (mStream) {
-        //     boost::regex expression(mArgs, boost::regex::grep);
+        boost::regex expression(mArgs, boost::regex::grep);
 
-        //     std::for_each(mPackages.begin(),
-        //                   mPackages.end(),
-        //                   HaveExpression(expression, *mStream));
-        // }
+        std::remove_copy_if(local.begin(),
+                            local.end(),
+                            std::back_inserter(mPackages),
+                            NotHaveExpression(expression));
 
-        // mStream = 0;
-        // mIsFinish = true;
-        // mIsStarted = false;
-        // mStop = false;
-        // mHasError = false;
+        std::remove_copy_if(remote.begin(),
+                            remote.end(),
+                            std::back_inserter(mPackages),
+                            NotHaveExpression(expression));
+
+        mStream = 0;
+        mIsFinish = true;
+        mIsStarted = false;
+        mStop = false;
+        mHasError = false;
     }
 
     void actionShow() throw()
@@ -428,9 +433,6 @@ public:
                                 boost::algorithm::is_any_of(" "),
                                 boost::algorithm::token_compress_on);
 
-        mPackages.clear();
-        mPackages.reserve(20);
-
         std::vector < std::string >::iterator it, end;
 
         for (it = args.begin(), end = args.end(); it != end; ++it) {
@@ -439,7 +441,7 @@ public:
             tmp.name = *it;
 
             std::pair < PackagesIdSet::iterator,
-                        PackagesIdSet::iterator > found;
+                PackagesIdSet::iterator > found;
 
             found = local.equal_range(tmp);
 
@@ -508,14 +510,14 @@ void RemoteManager::stop()
 
 void RemoteManager::getResult(Packages *out)
 {
-    assert(out);
+    if (out) {
+        out->clear();
+        out->reserve(mPimpl->mPackages.size());
 
-    out->clear();
-    out->reserve(mPimpl->mPackages.size());
-
-    std::copy(mPimpl->mPackages.begin(),
-              mPimpl->mPackages.end(),
-              std::back_inserter(*out));
+        std::copy(mPimpl->mPackages.begin(),
+                  mPimpl->mPackages.end(),
+                  std::back_inserter(*out));
+    }
 }
 
 }} // namespace vle utils

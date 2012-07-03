@@ -51,19 +51,6 @@ struct isTrimmedStringEmpty
     }
 };
 
-
-static bool longintToInt32(long int value,
-                           int32_t *newint)
-{
-    try {
-        *newint = boost::numeric_cast < int32_t >(value);
-
-        return true;
-    } catch (const std::exception& /*e*/) {
-        return false;
-    }
-}
-
 static bool stringToPackageOperator(const std::string& str,
                                     PackageOperatorType  *type)
 {
@@ -155,11 +142,10 @@ static std::string getName(const std::string& name)
     }
 }
 
-static boost::tuple < uint32_t, uint32_t, uint32_t >
+static boost::tuple < int32_t, int32_t, int32_t >
 getVersion(const std::string& line)
 {
     using boost::lexical_cast;
-    using boost::numeric_cast;
 
     std::string tmp = ba::trim_copy(line);
 
@@ -167,21 +153,19 @@ getVersion(const std::string& line)
         std::string::size_type major = tmp.find('.');
 
         if (major != std::string::npos) {
-            long ma, mi, pa;
             std::string::size_type minor = tmp.find('.', major + 1);
 
             if (minor != std::string::npos) {
-                ma = lexical_cast < long >(
+                int32_t ma, mi, pa;
+
+                ma = lexical_cast < int32_t  >(
                     std::string(tmp, 0, major));
-                mi = lexical_cast < long >(
+                mi = lexical_cast < int32_t >(
                     std::string(tmp, major + 1, minor - (major + 1)));
-                pa = lexical_cast < long >(
+                pa = lexical_cast < int32_t >(
                     std::string(tmp, minor + 1));
 
-                return boost::tuple < uint32_t, uint32_t, uint32_t >(
-                    numeric_cast < uint32_t >(ma),
-                    numeric_cast < uint32_t >(mi),
-                    numeric_cast < uint32_t >(pa));
+                return boost::tuple < int32_t, int32_t, int32_t >(ma, mi, pa);
             }
         }
     } catch (const std::exception& /*e*/) {
@@ -206,9 +190,9 @@ struct GetDepend
         std::string::size_type para = depend.find("(");
         std::string name(depend, 0, para);
         std::string opera;
-        long int major = -1;
-        long int minor = -1;
-        long int patch = -1;
+        int32_t major = -1;
+        int32_t minor = -1;
+        int32_t patch = -1;
         ba::trim(name);
 
         if (para != std::string::npos) {
@@ -225,17 +209,19 @@ struct GetDepend
                     std::string vers(version, op + 1, std::string::npos);
                     ba::trim(vers);
 
-                    std::vector < std::string > verst;
+                    std::vector < std::string > vec;
 
-                    ba::split(verst, vers, ba::is_any_of("."),
+                    ba::split(vec, vers, ba::is_any_of("."),
                               ba::token_compress_on);
 
-                    if (verst.size() >= 1) {
-                        major = std::strtol(verst[0].c_str(), NULL, 10);
-                        if (verst.size() >= 2) {
-                            minor = std::strtol(verst[1].c_str(), NULL, 10);
-                            if (verst.size() >= 3) {
-                                patch = std::strtol(verst[2].c_str(), NULL, 10);
+                    if (vec.size() >= 1) {
+                        using boost::lexical_cast;
+
+                        major = lexical_cast < int32_t >(vec[0].c_str());
+                        if (vec.size() >= 2) {
+                            minor = lexical_cast < int32_t >(vec[1].c_str());
+                            if (vec.size() >= 3) {
+                                patch = lexical_cast < int32_t >(vec[2].c_str());
                             }
                         }
                     }
@@ -248,13 +234,11 @@ struct GetDepend
         tmp.name = name;
 
         if (stringToPackageOperator(opera, &tmp.op)) {
-            if (longintToInt32(major, &tmp.major)) {
-                if (longintToInt32(minor, &tmp.minor)) {
-                    if (longintToInt32(patch, &tmp.patch)) {
-                        dep->push_back(tmp);
-                    }
-                }
-            }
+            tmp.major = major;
+            tmp.minor = minor;
+            tmp.patch = patch;
+
+            dep->push_back(tmp);
         }
     }
 };
@@ -310,9 +294,9 @@ static void getTags(const std::string& line,
     std::vector < std::string > strings;
 
     ba::split(strings,
-                            line,
-                            ba::is_any_of(","),
-                            ba::token_compress_on);
+              line,
+              ba::is_any_of(","),
+              ba::token_compress_on);
 
     tags->reserve(strings.size());
     tags->clear();
@@ -334,16 +318,12 @@ static std::string getUrl(const std::string& url)
     return tmp;
 }
 
-static uint32_t getSize(const std::string& size)
+static uint64_t getSize(const std::string& size)
 {
     std::string tmp = ba::trim_copy(size);
 
-    using boost::lexical_cast;
-    using boost::numeric_cast;
-
     try {
-        long lsize = boost::lexical_cast < long >(tmp);
-        return numeric_cast < uint32_t >(lsize);
+        return boost::lexical_cast < uint64_t >(tmp);
     } catch (const std::exception& /*e*/) {
         throw utils::InternalError(
             fmt(_("Can not convert size `%1%'")) % size);
@@ -375,7 +355,7 @@ static bool fillPackage(std::istream& in,
 
         if (std::getline(in, line)) {
             if (isVersion(line)) {
-                boost::tuple < uint32_t, uint32_t, uint32_t > r;
+                boost::tuple < int32_t, int32_t, int32_t > r;
                 r = getVersion(std::string(line, 8));
 
                 pkg->major = r.get < 0 >();
@@ -492,7 +472,6 @@ bool LoadPackages(std::istream&       stream,
 
     return false;
 }
-
 
 bool LoadPackages(const std::string&  filename,
                   const std::string&  distribution,

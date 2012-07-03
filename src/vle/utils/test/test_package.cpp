@@ -80,6 +80,18 @@ BOOST_AUTO_TEST_CASE(remote_package_read)
         "Tags: test\n"                                          \
         "Url: http://www.vle-project.org/1.1/toto/toto.zip\n"   \
         "Size: 4096\n"                                          \
+        "MD5sum: xxx\n"                                         \
+        "Package: tata\n"                                       \
+        "Version: 1.2.3\n"                                      \
+        "Depends: vle\n"                                        \
+        "Build-Depends:\n"                                      \
+        "Conflicts:\n"                                          \
+        "Maintainer: quesnel@users.sourceforge.net\n"           \
+        "Description: None2\n"                                  \
+        " .\n"                                                  \
+        "Tags: test\n"                                          \
+        "Url: http://www.vle-project.org/1.1/tata/tata.zip\n"   \
+        "Size: 4096\n"                                          \
         "MD5sum: xxx\n";
 
     std::istringstream oss(data);
@@ -103,11 +115,40 @@ BOOST_AUTO_TEST_CASE(remote_package_read)
     BOOST_REQUIRE_EQUAL(pkgs[0].major, 12);
     BOOST_REQUIRE_EQUAL(pkgs[0].minor, 21);
     BOOST_REQUIRE_EQUAL(pkgs[0].patch, 30);
+    BOOST_REQUIRE_EQUAL(pkgs[0].description, "None");
 
-    // BOOST_REQUIRE_EQUAL(rmt.name(), std::string("toto"));
-    // BOOST_REQUIRE_EQUAL(rmt.maintainer(), std::string("quesnel@users.sourceforge.net"));
-    // BOOST_REQUIRE_EQUAL(rmt.description(), std::string("None"));
-    // BOOST_REQUIRE_EQUAL(rmt.url(), std::string("http://www.vle-project.org/1.1/toto/toto.zip"));
-    // BOOST_REQUIRE_EQUAL(rmt.MD5sum(), std::string("xxx"));
-    // BOOST_REQUIRE_EQUAL(rmt.size(), (size_t)4096);
+    pkgs.clear();
+    rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "t.*", &output);
+    rmt.join();
+    rmt.getResult(&pkgs);
+    BOOST_REQUIRE_EQUAL(pkgs.size(), 2u);
+
+    pkgs.clear();
+    rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, ".*ta", &output);
+    rmt.join();
+    rmt.getResult(&pkgs);
+    BOOST_REQUIRE_EQUAL(pkgs.size(), 1u);
+
+    pkgs.clear();
+    rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, ".*", &output);
+    rmt.join();
+    rmt.getResult(&pkgs);
+    BOOST_REQUIRE_EQUAL(pkgs.size(), 2u);
+
+    pkgs.clear();
+    rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "t[a-z]ta", &output);
+    rmt.join();
+    rmt.getResult(&pkgs);
+    BOOST_REQUIRE_EQUAL(pkgs.size(), 1u);
+
+    BOOST_REQUIRE_EQUAL(pkgs[0].name, "tata");
+    BOOST_REQUIRE_EQUAL(pkgs[0].size, 4096u);
+    BOOST_REQUIRE_EQUAL(pkgs[0].md5sum, "xxx");
+    BOOST_REQUIRE_EQUAL(pkgs[0].url,
+                        "http://www.vle-project.org/1.1/tata/tata.zip");
+    BOOST_REQUIRE_EQUAL(pkgs[0].maintainer, "quesnel@users.sourceforge.net");
+    BOOST_REQUIRE_EQUAL(pkgs[0].major, 1);
+    BOOST_REQUIRE_EQUAL(pkgs[0].minor, 2);
+    BOOST_REQUIRE_EQUAL(pkgs[0].patch, 3);
+    BOOST_REQUIRE_EQUAL(pkgs[0].description, "None2");
 }

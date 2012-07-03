@@ -169,8 +169,8 @@ public:
      * @param[out] os The output stream of the action.
      */
     void start(RemoteManagerActions action,
-               const std::string& arg,
-               std::ostream* os);
+               const std::string&   arg,
+               std::ostream*        os);
 
     /**
      * Join the current thread: wait until the thread stop.
