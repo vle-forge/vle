@@ -125,10 +125,6 @@ ImportClassesBox::ImportClassesBox(const Glib::RefPtr < Gtk::Builder >& xml,
     xml->get_widget_derived("TreeViewVpzClasses", mVpzClasses);
     mVpzClasses->setParent(this);
 
-    //Buttons
-    xml->get_widget("ButtonImportClassesClose", mButtonClose);
-    mButtonClose->signal_clicked().connect(
-        sigc::mem_fun(*this, &ImportClassesBox::onClose));
 }
 
 void ImportClassesBox::show(vpz::Vpz* src)
@@ -142,6 +138,10 @@ void ImportClassesBox::show(vpz::Vpz* src)
 
     mDialog->show_all();
     mDialog->run();
+    mDialog->hide();
+
+    mGVLE->redrawModelClassBox();
+
 }
 
 void ImportClassesBox::importClass(std::string& className,
@@ -166,12 +166,6 @@ void ImportClassesBox::importClass(std::string& className,
     // std::for_each(srcClass.atomicModels().begin(),
     //     	  srcClass.atomicModels().end(),
     //     	  vpz::CopyAtomicModel(destClass.atomicModels(), *destClass.model()));
-}
-
-void ImportClassesBox::onClose()
-{
-    mDialog->hide_all();
-    mGVLE->redrawModelClassBox();
 }
 
 }}

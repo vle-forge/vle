@@ -104,12 +104,9 @@ private:
     vpz::Vpz*                            mSrc;
 
     Gtk::Dialog*                         mDialog;
-    Gtk::Button*                         mButtonClose;
 
     ClassesTreeView*                     mProjectClasses;
     ClassesTreeView*                     mVpzClasses;
-
-    void onClose();
 };
 
 }} // namespace vle gvle

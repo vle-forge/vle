@@ -402,6 +402,7 @@ void ModelClassBox::onImportModelAsClass()
             Error(E.what());
         }
     }
+    parseClass();
 }
 
 void ModelClassBox::onImportClassesFromVpz()
@@ -425,6 +426,7 @@ void ModelClassBox::onImportClassesFromVpz()
             Error(E.what());
         }
     }
+    parseClass();
 }
 
 void ModelClassBox::parseClass()
