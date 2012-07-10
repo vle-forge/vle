@@ -202,11 +202,11 @@ public:
      * it exists.
      * @code
      * // return toto if /home/foo/bar/ corresponds to VLE_HOME.
-     * getPackageFromPath("/home/foo/bar/pkgs/toto/lib/tutu.so");
+     * getPackageFromPath("/home/foo/bar/pkgs-x.y/toto/lib/tutu.so");
      * // return empty string.
      * getPackageFromPath("/home/foo/tutu.so");
      * // return foo if /home/bar/ corresponds to VLE_HOME.
-     * getPackageFromPath("/home/bar/pkgs/tutu.so");
+     * getPackageFromPath("/home/bar/pkgs-x.y/tutu.so");
      * @endcode
      * @param path The path to get the package.
      * @return The package founded into the string `path' or an empty

@@ -53,6 +53,8 @@
 
 namespace vle { namespace utils {
 
+static const char *pkgdirname = "pkgs-" VLE_ABI_VERSION;
+
 namespace fs = boost::filesystem;
 
 Path* Path::mPath = 0;
@@ -93,7 +95,7 @@ std::string Path::getGladeFile(const std::string& file) const
 
 std::string Path::getPackagesDir() const
 {
-    return buildDirname(m_home, "pkgs");
+    return buildDirname(m_home, pkgdirname);
 }
 
 std::string Path::getTemplateDir() const
@@ -721,7 +723,7 @@ void Path::initPackagePluginDirs()
     clearPluginDirs();
 
     m_currentPackagePath.assign(buildDirname(
-            m_home, "pkgs", utils::Package::package().name()));
+            m_home, pkgdirname, utils::Package::package().name()));
 
     PathList result;
     for (fs::directory_iterator it(getPackagesDir()), end; it != end; ++it) {

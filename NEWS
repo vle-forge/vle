@@ -18,6 +18,17 @@ graphical output are available into the GVLE application.
   $ vle --remote search '*gl*'
   $ vle --remote show glue
 
+  - Change the packages directory name. To allow the use of VLE 1.0
+    and 1.1 on the same ``$VLE_HOME`` directory, we need to clearly
+    split the packages from the two versions. We add in the VLE's
+    version.hpp file, a macro ``VLE_ABI_VERSION`` equal to
+    ``VLE_VERSION_MAJOR.VLE_VERSION_MINOR``. We use this macro to
+    define the name of the pkgs directory. For example, in VLE 1.1,
+    the package directory is defined as ``vle/pkgs-1.1`` and in VLE
+    1.2, the package directory is defined as ``vle/pkgs-1.2``. The
+    current stable version of VLE is not change and use packages in
+    ``vle/pkgs`` directory.
+
 - libvlevpz:
 
   - Remove any reference to distant and local dynamics plugins.
