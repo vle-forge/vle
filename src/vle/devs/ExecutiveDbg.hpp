@@ -169,14 +169,14 @@ public:
     /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
      * to this model information of dynamics, condition and observable.
-     * @param model the vpz::AtomicGraphModel reference source of
+     * @param model the vpz::AtomicModel reference source of
      * devs::Simulator.
      * @param dynamics the name of the dynamics to attach.
      * @param condition the name of the condition to attach.
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    virtual const vpz::AtomicGraphModel* createModel(
+    virtual const vpz::AtomicModel* createModel(
         const std::string& name,
         const std::vector < std::string >& inputs,
         const std::vector < std::string >& outputs,
@@ -234,7 +234,7 @@ public:
      * @param modelname the new name of the model.
      * @throw utils::badArg if modelname already exist.
      */
-    virtual const vpz::GraphModel* createModelFromClass(
+    virtual const vpz::BaseModel* createModelFromClass(
         const std::string& classname,
         const std::string& modelname)
     {
