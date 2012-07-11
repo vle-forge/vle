@@ -1,12 +1,12 @@
 # VleCheckPackageConfig.cmake
 # ===========================
 #
-# Check the dependencies of VLE's packages
+# Check the dependencies of VLE's packages
 #
-# Copyright (c) 2011 INRA
+# Copyright (c) 2011-2012 INRA
 # Gauthier Quesnel <quesnel@users.sourceforge.net>
-# 
-# Distributed under the OS-approved BSD License (the "License");
+#
+# Distributed under the OS-approved BSD License (the "License");
 # This software is distributed WITHOUT ANY WARRANTY; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the License for more information.
@@ -16,7 +16,15 @@
 # Changelog
 # ---------
 #
-# 1 Initial version.
+# 1.2 - Check the VLE_ABI_VERSION to try `pkgs-x.y' directory instead
+#       of the classical ̀pkgs' directory.
+#     - Improve message status.
+#
+# 1.1 - Update the copyright year
+#     - Remove the status message
+#     - Search static library instead of shared library
+#
+# 1.0  Initial version.
 #
 # ===========================================================================
 #
@@ -24,6 +32,7 @@
 # -----
 #
 # FIND_PACKAGE(VleCheckPackage REQUIRED)
+# SET(VLE_ABI_VERSION 1.1)
 # VLE_CHECK_PACKAGE(PREFIX package)
 #
 # The script sets the following variables:
@@ -67,37 +76,46 @@ endmacro(_vle_check_package_unset)
 
 macro(vle_check_package _prefix _module)
   file(TO_CMAKE_PATH "$ENV{VLE_HOME}" _vle_home)
-  MESSAGE(STATUS "vle home: [${_vle_home}]")
 
   if (NOT _vle_home)
-    message(STATUS "The VLE_HOME directory not assigned try default")
     if (CMAKE_HOST_WIN32)
       file(TO_CMAKE_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}/vle" _vle_home)
-    else (CMAKE_HOST_WIN32)
+    else ()
       file(TO_CMAKE_PATH "$ENV{HOME}/.vle" _vle_home)
-    endif (CMAKE_HOST_WIN32)
-  endif (NOT _vle_home)
+    endif ()
+    message(STATUS "The VLE_HOME undefined, try default ${_vle_home}")
+  else ()
+    message(STATUS "The VLE_HOME defined: ${_vle_home}")
+  endif ()
+
+  if (NOT VLE_ABI_VERSION)
+    set(_vle_package_dir "pkgs")
+    message(STATUS "VLE_ABI_VERSION undefined for package directory, try default ${_vle_package_dir}")
+  else ()
+    set(_vle_package_dir "pkgs-${VLE_ABI_VERSION}")
+    message(STATUS "VLE_ABI_VERSION defined for package directory: ${_vle_package_dir}")
+  endif ()
 
   if (EXISTS ${_vle_home})
-    set(_vle_include_dirs "${_vle_home}/pkgs/${_module}/src")
-    set(_vle_lib_dirs "${_vle_home}/pkgs/${_module}/lib")
+    set(_vle_include_dirs "${_vle_home}/${_vle_package_dir}/${_module}/src")
+    set(_vle_lib_dirs "${_vle_home}/${_vle_package_dir}/${_module}/lib")
 
     if (EXISTS "${_vle_include_dirs}" AND EXISTS "${_vle_lib_dirs}")
-
       if (CMAKE_HOME_WIN32)
-        file(GLOB _vle_libraries "${_vle_lib_dirs}/*.dll")
+        file(GLOB _vle_libraries "${_vle_lib_dirs}/*.lib" "${_vle_lib_dirs}/*.dll.a")
       else (CMAKE_HOME_WIN32)
-        file(GLOB _vle_libraries "${_vle_lib_dirs}/*.so")
+        file(GLOB _vle_libraries "${_vle_lib_dirs}/*.a")
       endif (CMAKE_HOME_WIN32)
 
       _vle_check_package_set(${_prefix}_FOUND 1)
       _vle_check_package_set(${_prefix}_INCLUDE_DIRS ${_vle_include_dirs})
       _vle_check_package_set(${_prefix}_LIBRARIES ${_vle_libraries})
+      message(STATUS "Found `${_module}': ${_vle_libraries} and ${_vle_include_dirs}")
     else (EXISTS "${_vle_include_dirs}" AND EXISTS "${_vle_lib_dirs}")
       message(SEND_ERROR "Package `${_module}' not found")
     endif (EXISTS "${_vle_include_dirs}" AND EXISTS "${_vle_lib_dirs}")
-  else (EXISTS ${_vle_home})
-    message(SEND_ERROR "Environment variable VLE_HOME not found")
-  endif (EXISTS ${_vle_home})
+  else ()
+    message(SEND_ERROR "VLE_HOME was not found")
+  endif ()
 
 endmacro(vle_check_package)
