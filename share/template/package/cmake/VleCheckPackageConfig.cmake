@@ -109,7 +109,7 @@ macro(vle_check_package _prefix _module)
 
       _vle_check_package_set(${_prefix}_FOUND 1)
       _vle_check_package_set(${_prefix}_INCLUDE_DIRS ${_vle_include_dirs})
-      _vle_check_package_set(${_prefix}_LIBRARIES ${_vle_libraries})
+      _vle_check_package_set(${_prefix}_LIBRARIES "${_vle_libraries}")
       message(STATUS "Found `${_module}': ${_vle_libraries} and ${_vle_include_dirs}")
     else (EXISTS "${_vle_include_dirs}" AND EXISTS "${_vle_lib_dirs}")
       message(SEND_ERROR "Package `${_module}' not found")

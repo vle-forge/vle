@@ -32,6 +32,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <vle/value/Value.hpp>
 #include <vle/devs/Dynamics.hpp>
 
 namespace vd = vle::devs;
