@@ -52,11 +52,14 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
+#include <vle/vle.hpp>
 
 struct F
 {
-    F() { vle::value::init(); }
-    ~F() { vle::value::finalize(); }
+    vle::Init a;
+
+    F() : a() { }
+    ~F() { }
 };
 
 BOOST_GLOBAL_FIXTURE(F)

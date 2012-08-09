@@ -39,11 +39,14 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
+#include <vle/vle.hpp>
 
 struct F
 {
-    F() { vle::value::init(); }
-    ~F() { vle::value::finalize(); }
+    vle::Init a;
+
+    F() : a() { }
+    ~F() { }
 };
 
 BOOST_GLOBAL_FIXTURE(F)

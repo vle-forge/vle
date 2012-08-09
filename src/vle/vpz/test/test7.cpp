@@ -35,12 +35,16 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/vle.hpp>
 #include <stdexcept>
+
 
 struct F
 {
-    F() { vle::value::init(); }
-    ~F() { vle::value::finalize(); }
+    vle::Init a;
+
+    F() : a() { }
+    ~F() { }
 };
 
 BOOST_GLOBAL_FIXTURE(F)

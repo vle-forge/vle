@@ -43,11 +43,15 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/vpz/Vpz.hpp>
+#include <vle/vle.hpp>
 
 struct F
 {
-    F() { vle::value::init(); }
-    ~F() { vle::value::finalize(); }
+    vle::Init a;
+
+    F() : a() { }
+    ~F() { }
 };
 
 BOOST_GLOBAL_FIXTURE(F)
