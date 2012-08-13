@@ -30,7 +30,8 @@ PKG_CHECK_MODULES(VLE vle-1.1 REQUIRED)
 ## Check VLE's packages
 ##
 
-#FIND_PACKAGE(VleCheckPackage REQUIRED)
+FIND_PACKAGE(VleCheckPackage REQUIRED)
+FIND_PACKAGE(VleCheckAndDeclareGeneratedModels REQUIRED)
 #VLE_CHECK_PACKAGE(CELLDEVS vle.extension.celldevs)
 #VLE_CHECK_PACKAGE(CELLQSS vle.extension.cellqss)
 #VLE_CHECK_PACKAGE(DECISION vle.extension.decision)
@@ -123,86 +124,86 @@ ENDIF (DOXYGEN)
 ## Define function to simplify the definition of simulations plugins.
 ##
 
-#FUNCTION(DeclareDevsDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareDevsDynamics name sources)
+FUNCTION(DeclareDevsDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareDevsDynamics name sources)
 
-#FUNCTION(DeclareCellDevsDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${CELLDEVS_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareCellDevsDynamics name sources)
+FUNCTION(DeclareCellDevsDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${CELLDEVS_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareCellDevsDynamics name sources)
 
-#FUNCTION(DeclareCellQssDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${CELLQSS_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareCellQssDynamics name sources)
+FUNCTION(DeclareCellQssDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${CELLQSS_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareCellQssDynamics name sources)
 
-#FUNCTION(DeclareDecisionDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DECISION_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareDecisionDynamics name sources)
+FUNCTION(DeclareDecisionDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DECISION_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareDecisionDynamics name sources)
 
-#FUNCTION(DeclareDifferenceEquationDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENCE_EQU_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareDifferenceEquationDynamics name sources)
+FUNCTION(DeclareDifferenceEquationDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENCE_EQU_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareDifferenceEquationDynamics name sources)
 
-#FUNCTION(DeclareFsaDifferenceEquationDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENCE_EQU_LIBRARIES}
-    #${FSA_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareFsaDifferenceEquationDynamics name sources)
+FUNCTION(DeclareFsaDifferenceEquationDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENCE_EQU_LIBRARIES}
+    ${FSA_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareFsaDifferenceEquationDynamics name sources)
 
-#FUNCTION(DeclareDifferentialEquationDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENTIAL_EQU_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareDifferentialEquationDynamics name sources)
+FUNCTION(DeclareDifferentialEquationDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DIFFERENTIAL_EQU_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareDifferentialEquationDynamics name sources)
 
-#FUNCTION(DeclareDsDevsDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DSDEVS_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareDsDevsDynamics name sources)
+FUNCTION(DeclareDsDevsDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${DSDEVS_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareDsDevsDynamics name sources)
 
-#FUNCTION(DeclareFsaDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${FSA_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclareFsaDynamics name sources)
+FUNCTION(DeclareFsaDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${FSA_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareFsaDynamics name sources)
 
-#FUNCTION(DeclarePetrinetDynamics name sources)
-  #ADD_LIBRARY(${name} MODULE ${sources})
-  #TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${PETRINET_LIBRARIES})
-  #INSTALL(TARGETS ${name}
-    #RUNTIME DESTINATION plugins/simulator
-    #LIBRARY DESTINATION plugins/simulator)
-#ENDFUNCTION(DeclarePetrinetDynamics name sources)
+FUNCTION(DeclarePetrinetDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES} ${PETRINET_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclarePetrinetDynamics name sources)
 
 ##
 ## Subdirectory
