@@ -108,6 +108,42 @@ private:
 
 BOOST_GLOBAL_FIXTURE(F)
 
+BOOST_AUTO_TEST_CASE(show_path)
+{
+    using vle::utils::Package;
+    using vle::utils::Path;
+    using vle::utils::PathList;
+
+    std::cout << Path::path();
+    BOOST_REQUIRE_EQUAL((PathList::size_type)0,
+                        Path::path().getSimulatorDirs().size());
+
+    Package::package().select("x");
+    std::cout << Path::path();
+}
+
+BOOST_AUTO_TEST_CASE(show_package)
+{
+    using vle::utils::Path;
+    using vle::utils::PathList;
+    using vle::utils::Package;
+
+    std::ostringstream out, err;
+
+    vle::utils::Package::package().select("tmp");
+    vle::utils::Package::package().create();
+
+    std::cout << "Packages:\n";
+    PathList lst = Path::path().getInstalledPackages();
+    std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
+           std::cout, "\n"));
+
+    std::cout << "Vpz:\n";
+    PathList vpz = Path::path().getInstalledExperiments();
+    std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
+           std::cout, "\n"));
+}
+
 BOOST_AUTO_TEST_CASE(remote_package_read)
 {
     const std::string data =                                    \

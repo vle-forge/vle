@@ -249,42 +249,6 @@ BOOST_AUTO_TEST_CASE(test_normal)
                         (double)szmax, 1.0, 10);
 }
 
-BOOST_AUTO_TEST_CASE(show_path)
-{
-    using vle::utils::Package;
-    using vle::utils::Path;
-    using vle::utils::PathList;
-
-    std::cout << Path::path();
-    BOOST_REQUIRE_EQUAL((PathList::size_type)0,
-                        Path::path().getSimulatorDirs().size());
-
-    Package::package().select("x");
-    std::cout << Path::path();
-}
-
-BOOST_AUTO_TEST_CASE(show_package)
-{
-    using vle::utils::Path;
-    using vle::utils::PathList;
-    using vle::utils::Package;
-
-    std::ostringstream out, err;
-
-    vle::utils::Package::package().select("tmp");
-    vle::utils::Package::package().create();
-
-    std::cout << "Packages:\n";
-    PathList lst = Path::path().getInstalledPackages();
-    std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
-           std::cout, "\n"));
-
-    std::cout << "Vpz:\n";
-    PathList vpz = Path::path().getInstalledExperiments();
-    std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
-           std::cout, "\n"));
-}
-
 BOOST_AUTO_TEST_CASE(date_time)
 {
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::year((2451545)),
