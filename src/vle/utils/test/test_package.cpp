@@ -35,6 +35,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/config.hpp>
+#include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <limits>
 #include <fstream>
@@ -58,10 +59,51 @@ using namespace vle;
 
 struct F
 {
-    vle::Init a;
+    vle::Init *a;
+    std::string oldname;
 
-    F() : a() { }
-    ~F() { }
+    F() : a(0), oldname()
+    {
+        printf("1\n");
+        namespace fs = boost::filesystem;
+
+        try {
+            printf("2\n");
+            fs::path tmp = fs::temp_directory_path();
+
+            printf("3\n");
+            printf("4\n");
+
+            {
+                char *env = ::getenv("VLE_HOME");
+                printf("5\n");
+                if (env) {
+                    oldname.assign(env);
+                }
+                printf("6\n");
+            }
+
+            ::setenv("VLE_HOME", tmp.string().c_str(), 1);
+
+        } catch (const std::exception&) {
+
+        }
+
+        a = new vle::Init();
+    }
+
+    ~F()
+    {
+        delete a;
+
+        if (not oldname.empty()) {
+            ::setenv("VLE_HOME", oldname.c_str(), 1);
+        }
+    }
+
+private:
+    F(const F&);
+    F& operator=(const F&);
 };
 
 BOOST_GLOBAL_FIXTURE(F)
@@ -151,4 +193,50 @@ BOOST_AUTO_TEST_CASE(remote_package_read)
     BOOST_REQUIRE_EQUAL(pkgs[0].minor, 2);
     BOOST_REQUIRE_EQUAL(pkgs[0].patch, 3);
     BOOST_REQUIRE_EQUAL(pkgs[0].description, "None2");
+}
+
+
+BOOST_AUTO_TEST_CASE(test_compress_filepath)
+{
+    namespace fs = boost::filesystem;
+
+    std::string filepath;
+    std::string uniquepath;
+    try {
+        fs::path unique = fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+
+        vle::utils::Package::package().select(unique.string());
+        vle::utils::Package::package().create();
+
+        filepath = vle::utils::Path::path().getPackageDir();
+        uniquepath = unique.string();
+    } catch (...) {
+        BOOST_REQUIRE(false);
+    }
+
+    BOOST_REQUIRE(not filepath.empty());
+
+    fs::path tarfile(fs::temp_directory_path());
+    tarfile /= "check.tar.bz2";
+
+
+    fs::current_path(vle::utils::Path::path().getPackagesDir());
+
+    BOOST_REQUIRE_NO_THROW(utils::Path::path().compress(uniquepath,
+                                                        tarfile.string()));
+    BOOST_REQUIRE(fs::exists(fs::path(tarfile)));
+
+    fs::path tmpfile(fs::temp_directory_path());
+    tmpfile /= "unique";
+
+    fs::create_directory(tmpfile);
+    fs::current_path(tmpfile);
+
+    BOOST_REQUIRE_NO_THROW(utils::Path::path().decompress(tarfile.string(),
+                                                          tmpfile.string()));
+    BOOST_REQUIRE(fs::exists(fs::path(tmpfile)));
+
+    tmpfile /= uniquepath;
+
+    BOOST_REQUIRE(fs::exists(fs::path(tmpfile)));
 }

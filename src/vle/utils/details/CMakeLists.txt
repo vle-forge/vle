@@ -1,1 +1,2 @@
-add_sources(vlelib Package.hpp PackageParser.cpp PackageParser.hpp)
+add_sources(vlelib Compress.cpp Package.hpp PackageParser.cpp
+  PackageParser.hpp)

@@ -314,6 +314,12 @@ public:
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    static void compress(const std::string& filepath,
+                         const std::string& compressedfilepath);
+
+    static void decompress(const std::string& compressedfilepath,
+                           const std::string& directorypath);
+
     /**
      * Get the current path of the process.
      *
