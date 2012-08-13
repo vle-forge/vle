@@ -76,6 +76,7 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
 endif (COMMAND CMAKE_POLICY)
 
+pkg_check_modules(LIBARCHIVE REQUIRED libarchive)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
 pkg_check_modules(LIBXML REQUIRED libxml-2.0)
@@ -102,6 +103,7 @@ if (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
 else (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
    set(VLE_HAVE_GTKSOURCEVIEWMM 0 CACHE INTERNAL "" FORCE)
 endif (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
+
 
 #
 # Test the libboost header and libboost-text library.

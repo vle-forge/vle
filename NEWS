@@ -28,6 +28,10 @@ Add a dependency to the Curl library. Now, VLE depends to the Curl
 library (http://curl.haxx.se/) to download and upload data over http
 and ftp protocol.
 
+Add a dependency to the libarchive library
+(http://libarchive.github.com/) to extract gzip, bzip2 tarball and Zip
+archives from the remote repositories.
+
 Add an MPI mode with the command line interface MPI. For MPI, VLE
 depends of an MPI library.
 
