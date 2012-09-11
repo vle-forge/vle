@@ -553,8 +553,12 @@ void ViewOutputBox::assignView(const std::string& name)
                  vpz::View::FINISH);
 
     {
-        double x = vu::convert < double >(m_timestep->get_text(), true);
-        view.setTimestep(x);
+        try {
+            double x = vu::convert < double >(m_timestep->get_text(), true);
+            view.setTimestep(x);
+        } catch(const std::exception& e) {
+            Error(e.what());
+        }
     }
 
     std::string package, library;
