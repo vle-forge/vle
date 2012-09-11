@@ -37,11 +37,22 @@ namespace vle { namespace utils {
 
 enum TraceLevelOptions
 {
-    TRACE_LEVEL_ALWAYS, /**< Corresponds to vle --verbose=0-3 or vle without
-                          any argument. */
-    TRACE_LEVEL_MODEL, /**< Corresponds to vle --verbose=1-3. */
-    TRACE_LEVEL_EXTENSION, /**< Corresponds to vle --verbose=2-3. */
-    TRACE_LEVEL_DEVS /**< Corresponds to vle --verbose=3. */
+    TRACE_LEVEL_ALWAYS,         /**< Corresponds to vle --verbose=0-3
+                                   or vle without any argument. */
+    TRACE_LEVEL_MODEL,          /**< Corresponds to vle
+                                 * --verbose=1-3. */
+    TRACE_LEVEL_EXTENSION,      /**< Corresponds to vle
+                                 * --verbose=2-3. */
+    TRACE_LEVEL_DEVS            /**< Corresponds to vle
+                                 * --verbose=3. */
+};
+
+enum TraceStreamType
+{
+    TRACE_STREAM_STANDARD_ERROR, /**< Uses the std::cerr to
+                                       * log. Default value */
+    TRACE_STREAM_STANDARD_OUTPUT, /**< Uses the std::cout to log. */
+    TRACE_STREAM_FILE      /**< Use a specific file to log */
 };
 
 /**
@@ -60,6 +71,11 @@ enum TraceLevelOptions
  *
  *     TraceAlways(utils::fmt("Send event at time %1%", time));
  *     DTraceAlways("Clear file");
+ *
+ *     utils::Trace::setLogFile("check.log");
+ *     TraceAlway(utils::fmt("Yeah!"));
+ *
+ *     utils::Trace::kill();
  * }
  * @endcode
  */
@@ -67,31 +83,43 @@ class VLE_API Trace
 {
 public:
     /**
-     * @brief Initialize the Trace singleton.
+     * Initialize the Trace singleton.
      */
     static void init();
 
     /**
-     * @brief Delete Trace object instantiate from function Trace::init().
+     * Delete Trace object instantiate from function Trace::init().
      */
     static void kill();
 
     /**
-     * @brief Get the current log filename.
+     * Get the current log filename.
      *
-     * @return current log filename.
+     * @return current log filename or empty if not open.
      */
     static std::string getLogFile();
 
     /**
-     * @brief Set a new filename to the current log file.
+     * Set a new filename to the current log file.
      *
      * @param filename the new filename.
      */
     static void setLogFile(const std::string& filename);
 
     /**
-     * @brief Send a message to the log file.
+     * Set the std::cout stream to the current log.
+     *
+     */
+    static void setStandardOutput();
+
+    /**
+     * Set the std::cerr stream to the current log.
+     *
+     */
+    static void setStandardError();
+
+    /**
+     * Send a message to the log file.
      *
      * @param str The string to send.
      * @param level The Level of the message.
@@ -100,7 +128,7 @@ public:
                      TraceLevelOptions level = TRACE_LEVEL_ALWAYS);
 
     /**
-     * @brief Send a message to the log file using a boost::format object.
+     * Send a message to the log file using a boost::format object.
      *
      * @param str The boost::format message to send.
      * @param level The Level of the message.
@@ -109,7 +137,7 @@ public:
                      TraceLevelOptions level = TRACE_LEVEL_ALWAYS);
 
     /**
-     * @brief Return the default log file position. $VLE_HOME/vle.log under Unix
+     * Return the default log file position. $VLE_HOME/vle.log under Unix
      * system, %VLE_HOME%/vle.log under Win32.
      *
      * @return the default log filename.
@@ -117,7 +145,7 @@ public:
     static std::string getDefaultLogFilename();
 
     /**
-     * @brief Return a specific log file position. $VLE_HOME/.vle/[filename].log
+     * Return a specific log file position. $VLE_HOME/.vle/[filename].log
      * under Unix system, $VLE_HOME/[filename].log under windows.
      *
      * @param filename the filename without extension.
@@ -127,21 +155,29 @@ public:
     static std::string getLogFilename(const std::string& filename);
 
     /**
-     * @brief Return the current level.
+     * Return the current level.
      *
      * @return current level.
      */
     static TraceLevelOptions getLevel();
 
     /**
-     * @brief Set the current level.
+     * Return the current log type (standard output, error output or file).
+     *
+     *
+     * @return the type.
+     */
+    static TraceStreamType getType();
+
+    /**
+     * Set the current level.
      *
      * @param level the new level to set.
      */
     static void setLevel(TraceLevelOptions level);
 
     /**
-     * @brief Return true if the specified level is between [ALWAYS, current
+     * Return true if the specified level is between [ALWAYS, current
      * level].
      *
      * @param level the specified level to test.
@@ -152,21 +188,21 @@ public:
     static bool isInLevel(TraceLevelOptions level);
 
     /**
-     * @brief Return true if warnings are send in the stream.
+     * Return true if warnings are send in the stream.
      *
      * @return true if one or more warning are sent.
      */
     static bool haveWarning();
 
     /**
-     * @brief Return the number of warnings.
+     * Return the number of warnings.
      *
      * @return the number of warnings.
      */
     static size_t warnings();
 
     /**
-     * @brief Cast the integer into a TraceLevelOptions option.
+     * Cast the integer into a TraceLevelOptions option.
      *
      * Try to cast the integer into a TraceLevelOptions. If integer is equal to
      * 0, the function returns TRACE_LEVEL_ALWAYS, if integer is equal to 1,

@@ -44,25 +44,27 @@ namespace vle { namespace utils {
 
 class Trace::Pimpl
 {
+    void cleanup__()
+    {
+        if (mType == TRACE_STREAM_FILE) {
+            delete mStream;
+            mStream = 0;
+            mFilename.clear();
+        }
+    }
+
 public:
     Pimpl()
-        : mFilename(getDefaultLogFilename()),
-        mFile(new std::ofstream(getDefaultLogFilename().c_str())),
-        mLevel(TRACE_LEVEL_ALWAYS), mWarnings(0)
+        : mFilename(), mStream(&std::cerr), mWarnings(0),
+          mLevel(TRACE_LEVEL_ALWAYS), mType(TRACE_STREAM_STANDARD_ERROR)
     {
-        if (not mFile->is_open()) {
-            mFilename.clear();
-            delete mFile;
-            mFile = 0;
-        } else {
-            (*mFile) << _("Start log at ") << utils::DateTime::currentDate()
-                << "\n\n" << std::flush;
-        }
     }
 
     ~Pimpl()
     {
-        delete mFile;
+        if (mType == TRACE_STREAM_FILE) {
+            delete mStream;
+        }
     }
 
     void setLogFile(const std::string& filename)
@@ -72,33 +74,53 @@ public:
         if (not tmp->is_open()) {
             delete tmp;
         } else {
-            if (mFile) {
-                mFile->close();
-                delete mFile;
-            }
+            cleanup__();
+
             mFilename.assign(filename);
-            mFile = tmp;
-            (*mFile) << _("Start log at ") <<
+            mStream = tmp;
+            (*mStream) << _("Start log at ") <<
                 utils::DateTime::currentDate() << "\n\n" << std::flush;
+            mType = TRACE_STREAM_FILE;
         }
     }
 
-    std::string getLogFile()
+    void setStandardOutput()
+    {
+        cleanup__();
+
+        mStream = &std::cout;
+        mType = TRACE_STREAM_STANDARD_OUTPUT;
+    }
+
+    void setStandardError()
+    {
+        cleanup__();
+
+        mStream = &std::cerr;
+        mType = TRACE_STREAM_STANDARD_ERROR;
+    }
+
+    std::string getLogFile() const
     {
         return mFilename;
     }
 
     void send(const std::string& str, TraceLevelOptions level)
     {
-        if (mFile) {
-            (*mFile) << "---" << str << std::endl;
+        if (mStream) {
+            (*mStream) << "---" << str << std::endl;
             if (level != utils::TRACE_LEVEL_ALWAYS) {
                 mWarnings++;
             }
         }
     }
 
-    TraceLevelOptions getLevel()
+    TraceStreamType getType() const
+    {
+        return mType;
+    }
+
+    TraceLevelOptions getLevel() const
     {
         return mLevel;
     }
@@ -110,39 +132,43 @@ public:
             level;
     }
 
-    bool isInLevel(TraceLevelOptions level)
+    bool isInLevel(TraceLevelOptions level) const
     {
         return TRACE_LEVEL_ALWAYS <= level and level <= mLevel;
     }
 
-    bool haveWarning()
+    bool haveWarning() const
     {
         return mWarnings > 0;
     }
 
-    size_t warnings()
+    size_t warnings() const
     {
         return mWarnings;
     }
 
-    static boost::mutex mMutex; /**< Store the instance of the mutex to
-                                  implemend a thread-safe single design
-                                  pattern. */
+    static boost::mutex mMutex; /**< Store the instance of the mutex
+                                  to implemend a thread-safe single
+                                  design pattern. */
 
-    static Pimpl* mTrace; /**< The singleton static variable, to be sure to
-                            avoid all multithread problem, call the
-                            Trace::init() function before using macro or
-                            utils::Trace API. */
+    static Pimpl* mTrace;       /**< The singleton static variable, to
+                                   be sure to avoid all multithread
+                                   problem, call the Trace::init()
+                                   function before using macro or
+                                   utils::Trace API. */
 
 private:
-    std::string     mFilename; /**< The current filename of the singleton. */
+    std::string mFilename;      /**< The current filename of the singleton. */
 
-    std::ofstream*  mFile; /**< A reference to the current ostream. */
+    std::ostream* mStream;      /**< A reference to the current ostream. */
 
-    TraceLevelOptions mLevel; /**< The current level of the singleton. */
+    size_t mWarnings;           /**< Number of warning since the singleton
+                                   exists. */
 
-    size_t          mWarnings; /**< Number of warning since the singleton
-                                 exists. */
+    TraceLevelOptions mLevel;   /**< The current level of the
+                                 * singleton. */
+
+    TraceStreamType mType;      /**< The current stream. */
 };
 
 boost::mutex Trace::Pimpl::mMutex;
@@ -197,6 +223,28 @@ void Trace::setLogFile(const std::string& filename)
     Pimpl::mTrace->setLogFile(filename);
 }
 
+void Trace::setStandardOutput()
+{
+    if (not Trace::Pimpl::mTrace) {
+        Trace::init();
+    }
+
+    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+
+    Pimpl::mTrace->setStandardOutput();
+}
+
+void Trace::setStandardError()
+{
+    if (not Trace::Pimpl::mTrace) {
+        Trace::init();
+    }
+
+    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+
+    Pimpl::mTrace->setStandardError();
+}
+
 void Trace::send(const std::string& str, TraceLevelOptions level)
 {
     if (not Trace::Pimpl::mTrace) {
@@ -227,6 +275,17 @@ std::string Trace::getDefaultLogFilename()
 std::string Trace::getLogFilename(const std::string& filename)
 {
     return Path::buildFilename(utils::Path::path().getHomeDir(), filename);
+}
+
+TraceStreamType Trace::getType()
+{
+    if (not Trace::Pimpl::mTrace) {
+        Trace::init();
+    }
+
+    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+
+    return Pimpl::mTrace->getType();
 }
 
 TraceLevelOptions Trace::getLevel()
