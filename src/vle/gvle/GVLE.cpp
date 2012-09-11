@@ -997,20 +997,21 @@ void GVLE::onConditionsBox()
     const Modeling* modeling = (const Modeling*)mModeling;
 
     if (runConditionsBox(modeling->conditions()) == 1) {
-        applyRemoved();
 
         renameList tmpRename= applyConditionsBox(mModeling->conditions());
-        {
-            renameList::const_iterator it = tmpRename.begin();
 
-            while (it != tmpRename.end()) {
-                mModeling->vpz().project().model().updateConditions(it->first,
-                                                                    it->second);
-                mModeling->vpz().project().classes().updateConditions(it->first,
-                                                                      it->second);
-                ++it;
-            }
+        renameList::const_iterator it = tmpRename.begin();
+
+        while (it != tmpRename.end()) {
+
+            mModeling->vpz().project().model().updateConditions(it->first,
+                                                                it->second);
+            mModeling->vpz().project().classes().updateConditions(it->first,
+                                                                  it->second);
+            ++it;
         }
+
+        applyRemoved();
     }
 }
 
