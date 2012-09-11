@@ -84,89 +84,45 @@ struct PackageIdUpdate
     }
 };
 
+inline void cleanup(PackageId& pkg)
+{
+    pkg.size = 0;
+    pkg.name.clear();
+    pkg.distribution.clear();
+    pkg.maintainer.clear();
+    pkg.description.clear();
+    pkg.url.clear();
+    pkg.md5sum.clear();
+    pkg.tags.clear();
+    pkg.depends.clear();
+    pkg.builddepends.clear();
+    pkg.conflicts.clear();
+    pkg.major = -1;
+    pkg.minor = -1;
+    pkg.patch = -1;
+}
+
+inline void cleanup(PackageLinkId& pkglinkid)
+{
+    pkglinkid.name.clear();
+    pkglinkid.major = -1;
+    pkglinkid.minor = -1;
+    pkglinkid.patch = -1;
+    pkglinkid.op = PACKAGE_OPERATOR_EQUAL;
+}
+
 struct PackageIdClear
     : public std::unary_function < PackageId, void >
 {
     void operator()(PackageId& lhs) const
     {
-        lhs.size = 0;
-        lhs.name.clear();
-        lhs.distribution.clear();
-        lhs.maintainer.clear();
-        lhs.description.clear();
-        lhs.url.clear();
-        lhs.md5sum.clear();
-        lhs.tags.clear();
-        lhs.depends.clear();
-        lhs.builddepends.clear();
-        lhs.conflicts.clear();
-        lhs.major = -1;
-        lhs.minor = -1;
-        lhs.patch = -1;
+        cleanup(lhs);
     }
 };
 
 typedef boost::unordered_multiset < PackageId,
                                     PackageIdHash,
                                     PackageIdEqual > PackagesIdSet;
-
-inline std::ostream& operator<<(std::ostream& os, const PackageLinkId& b)
-{
-    static const char *sym[5] = { "=", "<", "<=", ">", ">=" };
-
-    os << b.name;
-
-    if (b.major >= 0) {
-        os << " (" << sym[static_cast < unsigned >(b.op)] << " " << b.major;
-
-        if (b.minor >= 0) {
-            os << "." << b.minor;
-
-            if (b.patch >= 0) {
-                os << "." << b.patch;
-            }
-        }
-
-        os << ")";
-    }
-
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const PackagesLinkId& b)
-{
-    std::copy(b.begin(),
-              b.end(),
-              std::ostream_iterator < PackageLinkId >(os, ","));
-
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const Tags& b)
-{
-    std::copy(b.begin(),
-              b.end(),
-              std::ostream_iterator < std::string >(os, ","));
-
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const PackageId& b)
-{
-    return os << "Package: " <<  b.name << "\n"
-              << "Version: " << b.major
-              << "." << b.minor
-              << "." << b.patch << "\n"
-              << "Depends: " << b.depends << "\n"
-              << "Build-Depends: " << b.builddepends << "\n"
-              << "Conflicts: " << b.conflicts << "\n"
-              << "Maintainer: " << b.maintainer << "\n"
-              << "Description: " << b.description << "\n" << " ." << "\n"
-              << "Tags: " << b.tags << "\n"
-              << "Url: " << b.url << "\n"
-              << "Size: " << b.size << "\n"
-              << "MD5sum: " << b.md5sum << "\n";
-}
 
 inline std::ostream& operator<<(std::ostream& os, const PackagesIdSet& b)
 {

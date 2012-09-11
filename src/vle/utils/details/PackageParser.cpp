@@ -40,475 +40,526 @@
 
 namespace vle { namespace utils {
 
-namespace ba = boost::algorithm;
-
-struct isTrimmedStringEmpty
-    : std::unary_function < std::string, bool >
+class DescriptionParser
 {
-    bool operator()(const std::string& str) const
+    const std::string& filepath;
+    std::istream&      in;
+    unsigned int       line;
+    unsigned int       oldline;
+    unsigned int       column;
+    unsigned int       oldcolumn;
+    char               last;
+
+    char get()
     {
-        return ba::trim_copy(str).empty();
-    }
-};
+        last = in.get();
 
-static bool stringToPackageOperator(const std::string& str,
-                                    PackageOperatorType  *type)
-{
-    if (str == "=") {
-        *type = PACKAGE_OPERATOR_EQUAL;
-    } else if (str == "<") {
-        *type = PACKAGE_OPERATOR_LESS;
-    } else if (str == "<=") {
-        *type = PACKAGE_OPERATOR_LESS_OR_EQUAL;
-    } else if (str == ">") {
-        *type = PACKAGE_OPERATOR_GREATER;
-    } else if (str == ">=") {
-        *type = PACKAGE_OPERATOR_GREATER_OR_EQUAL;
-    } else {
-        return false;
-    }
-
-    return true;
-}
-
-static bool isName(const std::string& line)
-{
-    return ba::starts_with(line, "Package:");
-}
-
-static bool isVersion(const std::string& line)
-{
-    return ba::starts_with(line, "Version:");
-}
-
-static bool isDepends(const std::string& line)
-{
-    return ba::starts_with(line, "Depends:");
-}
-
-static bool isBuildDepends(const std::string& line)
-{
-    return ba::starts_with(line, "Build-Depends:");
-}
-
-static bool isConflicts(const std::string& line)
-{
-    return ba::starts_with(line, "Conflicts:");
-}
-
-static bool isMaintainer(const std::string& line)
-{
-    return ba::starts_with(line, "Maintainer:");
-}
-
-static bool isDescription(const std::string& line)
-{
-    return ba::starts_with(line, "Description:");
-}
-
-static bool isEndDescription(const std::string& line)
-{
-    return line == " .";
-}
-
-static bool isTags(const std::string& line)
-{
-    return ba::starts_with(line, "Tags:");
-}
-
-static bool isUrl(const std::string& line)
-{
-    return ba::starts_with(line, "Url:");
-}
-
-static bool isSize(const std::string& line)
-{
-    return ba::starts_with(line, "Size:");
-}
-
-static bool isMD5sum(const std::string& line)
-{
-    return ba::starts_with(line, "MD5sum:");
-}
-
-static std::string getName(const std::string& name)
-{
-    std::string tmp = ba::trim_copy(name);
-
-    if (tmp.empty()) {
-        throw utils::ArgError(fmt(_("RemotePackage: empty name")));
-    } else {
-        return tmp;
-    }
-}
-
-static boost::tuple < int32_t, int32_t, int32_t >
-getVersion(const std::string& line)
-{
-    using boost::lexical_cast;
-
-    std::string tmp = ba::trim_copy(line);
-
-    try {
-        std::string::size_type major = tmp.find('.');
-
-        if (major != std::string::npos) {
-            std::string::size_type minor = tmp.find('.', major + 1);
-
-            if (minor != std::string::npos) {
-                int32_t ma, mi, pa;
-
-                ma = lexical_cast < int32_t  >(
-                    std::string(tmp, 0, major));
-                mi = lexical_cast < int32_t >(
-                    std::string(tmp, major + 1, minor - (major + 1)));
-                pa = lexical_cast < int32_t >(
-                    std::string(tmp, minor + 1));
-
-                return boost::tuple < int32_t, int32_t, int32_t >(ma, mi, pa);
-            }
+        if (last == '\n') {
+            oldline = line++;
+            oldcolumn = column;
+            column = 0;
+        } else {
+            oldcolumn = column++;
         }
-    } catch (const std::exception& /*e*/) {
-        throw utils::InternalError(
-            fmt(_("Can not convert version `%1%'")) % tmp);
+
+        // std::cout << "+[" << last << "]";
+
+        return last;
     }
 
-    throw utils::InternalError(fmt(_("Can convert version `%1%'")) % tmp);
-}
-
-struct GetDepend
-    : public std::unary_function < std::string, void >
-{
-    PackagesLinkId *dep;
-
-    GetDepend(PackagesLinkId *dep) : dep(dep) {}
-
-    void operator()(std::string depend)
+    void unget()
     {
-        ba::trim(depend);
+        if (last == '\n') {
+            line = oldline;
+            column = oldcolumn;
+        } else {
+            column = oldcolumn;
+        }
 
-        std::string::size_type para = depend.find("(");
-        std::string name(depend, 0, para);
-        std::string opera;
-        int32_t major = -1;
-        int32_t minor = -1;
-        int32_t patch = -1;
-        ba::trim(name);
+        // std::cout << "-[" << last << "]";
 
-        if (para != std::string::npos) {
-            std::string version(depend, para, std::string::npos);
+        in.unget();
+    }
 
-            if (version.size() > 2) {
-                version.assign(version, 1, version.size() - 2);
+    bool read_newline()
+    {
+        while (in and isblank(get()));
 
-                std::string::size_type op = version.find(" ");
-                if (op != std::string::npos) {
-                    opera.assign(version, 0, op);
-                    ba::trim(opera);
+        if (not in)
+            return false;
 
-                    std::string vers(version, op + 1, std::string::npos);
-                    ba::trim(vers);
+        unget();
 
-                    std::vector < std::string > vec;
+        return get() == '\n';
+    }
 
-                    ba::split(vec, vers, ba::is_any_of("."),
-                              ba::token_compress_on);
+    bool read_blank()
+    {
+        while (in and isblank(get())); /* read all space or tab
+                                        * characters */
 
-                    if (vec.size() >= 1) {
-                        using boost::lexical_cast;
+        if (not in)
+            return false;
 
-                        major = lexical_cast < int32_t >(vec[0].c_str());
-                        if (vec.size() >= 2) {
-                            minor = lexical_cast < int32_t >(vec[1].c_str());
-                            if (vec.size() >= 3) {
-                                patch = lexical_cast < int32_t >(vec[2].c_str());
-                            }
-                        }
+        unget();
+
+        return true;
+    }
+
+    bool read_space()
+    {
+        while (in and isspace(get()));
+
+        if (not in)
+            return false;
+
+        unget();
+
+        return true;
+    }
+
+    bool read_word(const char *str)
+    {
+        if (not read_blank())
+            return false;
+
+        while (in and *str != '\0') {
+            if (get() != *str)
+                return false;
+
+            ++str;
+        }
+
+        return *str == '\0';
+    }
+
+    bool read_identifier(std::string *output)
+    {
+        if (not read_blank())
+            return false;
+
+        char c = get();
+        if (!isalpha(c)) /* check if the first character is an alpha
+                            character */
+            return false;
+
+        output->append(1, c);
+
+        do {
+            c = get();
+
+            if (not (isalnum(c) or c == '_' or c == '.' or c == '-'))
+                break;
+
+            output->append(1, c);
+        } while (in);
+
+        unget();
+
+        return true;
+    }
+
+    bool read_integer(int32_t *value)
+    {
+        if (not read_blank())
+            return false;
+
+        std::string str;
+        str.reserve(std::numeric_limits <int32_t>::digits10 + 2);
+
+        do {
+            char c = get();
+
+            if (not isdigit(c))
+                break;
+
+            str.append(1, c);
+        } while (in);
+
+        unget();
+
+        try {
+            *value = boost::lexical_cast < int32_t >(str);
+
+            // std::cout << "read_integer " << *value << "\n";
+
+            return true;
+        } catch (const std::exception &e) {
+            (void)e;
+
+            // std::cout << "read_integer bad cast\n";
+
+            return false;
+        }
+    }
+
+    bool read_version(int32_t *major, int32_t *minor, int32_t *patch)
+    {
+        if (not read_blank())
+            return false;
+
+        return read_integer(major) and read_word(".") and
+            read_integer(minor) and read_word(".") and
+            read_integer(patch) and read_newline();
+    }
+
+    bool read_operator(PackageOperatorType *type)
+    {
+        if (not read_blank())
+            return false;
+
+        std::string str;
+        str.reserve(3);
+        char c;
+
+        c = get();
+
+        if (not (c == '=' or c == '<' or c == '>'))
+            return false;
+
+        str.append(1, c);
+
+        if (c == '<' or c == '>') {
+            c = get();
+
+            if (c == '=' or c == '=')
+                str.append(1, c);
+            else
+                unget();
+        }
+
+        *type = (str == "=") ? PACKAGE_OPERATOR_EQUAL :
+            (str == "<") ? PACKAGE_OPERATOR_LESS :
+            (str == "<=") ? PACKAGE_OPERATOR_LESS_OR_EQUAL :
+            (str == ">") ? PACKAGE_OPERATOR_GREATER :
+            (str == ">=") ? PACKAGE_OPERATOR_GREATER_OR_EQUAL :
+            PACKAGE_OPERATOR_EQUAL;
+
+        // std::cout << vle::fmt("Readed operator: %1% %2%\n") % *type % str;
+
+        return true;
+    }
+
+    bool read_linkid(PackagesLinkId *pkgs)
+    {
+        if (not read_blank())
+            return false;
+
+        if (read_newline())     /* depends, build-depends and
+                                 * conflicts can be empty. */
+            return true;
+
+        unget();
+
+        do {
+            PackageLinkId pkg;
+            cleanup(pkg);
+
+            if (not read_identifier(&pkg.name))
+                return false;
+
+            if (read_word("(")) {
+                if (not read_operator(&pkg.op))
+                    return false;
+
+                if (not read_integer(&pkg.major))
+                    return false;
+
+                if (not read_word(".")) {
+                    pkg.minor = -1;
+                    pkg.patch = -1;
+                } else {
+                    if (not read_integer(&pkg.minor))
+                        return false;
+
+                    if (not read_word(".")) {
+                        pkg.patch = -1;
+                    } else {
+                        if (not read_integer(&pkg.patch))
+                            return false;
                     }
                 }
+
+                if (not read_word(")"))
+                    return false;
+            } else {
+                unget();
+            }
+
+            pkgs->push_back(pkg);
+
+            if (read_word(",")) {
+                continue;
+            } else {
+                unget();
+                if (read_newline()) {
+                    break;
+                } else {
+                    unget();
+                }
+            }
+
+        } while (in);
+
+        return true;
+    }
+
+    bool read_maintainer(std::string *maintainer)
+    {
+        if (not read_blank())
+            return false;
+
+        do {
+            char c = get();
+
+            if (c == '\n' or c == '\r')
+                break;
+
+            maintainer->append(1, c);
+        } while (in);
+
+        boost::trim(*maintainer);
+
+        return not maintainer->empty();
+    }
+
+    bool read_description(std::string *description)
+    {
+        if (not read_blank())
+            return false;
+
+        do {
+            char c = get();
+
+            if (c == '\n' or c == '\r') {
+                if (in) {
+                    char c2 = get();
+                    if (in and c2 == ' ') {
+                        char c3 = get();
+                        if (in and c3 == '.') {
+                            break;
+                        } else {
+                            description->append(1, c3);
+                        }
+                    } else {
+                        description->append(1, c2);
+                    }
+                } else {
+                    description->append(1, c);
+                }
+            }
+
+            description->append(1, c);
+        } while (in);
+
+        boost::trim(*description);
+
+        if (not read_newline())
+            return false;
+
+        return true;
+    }
+
+    bool read_tags(Tags *tags)
+    {
+        if (not read_blank())
+            return false;
+
+        do {
+            std::string str;
+            str.reserve(32);
+
+            do {
+                char c = get();
+
+                if (c == ',' or c == '\n') {
+                    if (not str.empty()) {
+                        boost::trim(str);
+                        if (not str.empty()) {
+                            tags->push_back(str);
+                        }
+                    }
+
+                    if (c == '\n')
+                        return true;
+
+                    break;
+                }
+                str.append(1, c);
+            } while (in);
+        } while (in);
+
+        return false;
+    }
+
+    bool read_size(uint64_t *value)
+    {
+        if (not read_blank())
+            return false;
+
+        std::string str;
+        str.reserve(std::numeric_limits <uint64_t>::digits10 + 1);
+
+        do {
+            char c = get();
+
+            if (not isdigit(c))
+                break;
+
+            str.append(1, c);
+        } while (in);
+
+        try {
+            *value = boost::lexical_cast < uint64_t >(str);
+
+            return true;
+        } catch (const std::exception &e) {
+            (void)e;
+
+            return false;
+        }
+    }
+
+    int read_package(PackageId *pkg)
+    {
+        if (not read_space()) {
+            if (in.eof()) {
+                return 1;
             }
         }
 
-        PackageLinkId tmp;
+        // if (in.eof())
+        //     return 1;
 
-        tmp.name = name;
+        // if (in) {
+        //     if (not read_newline()) {
+        //         unget();
+        //     } else {
+        //         read_blank();
+        //     }
+        // }
 
-        if (stringToPackageOperator(opera, &tmp.op)) {
-            tmp.major = major;
-            tmp.minor = minor;
-            tmp.patch = patch;
+        if (not (read_word("Package:") and
+                 read_identifier(&pkg->name) and
+                 read_newline()))
+            return -1;
 
-            dep->push_back(tmp);
-        }
+        if (not (read_word("Version:") and
+                 read_version(&pkg->major, &pkg->minor, &pkg->patch)))
+            return -2;
+
+        if (not (read_word("Depends:") and
+                 read_linkid(&pkg->depends)))
+            return -3;
+
+        // std::cout << vle::fmt("********** ok depends\n");
+        // std::cerr << *pkg << "\n";
+
+        if (not (read_word("Build-Depends:") and
+                 read_linkid(&pkg->builddepends)))
+            return -4;
+
+        // std::cout << vle::fmt("********** ok build-depends\n");
+
+        if (not (read_word("Conflicts:") and
+                 read_linkid(&pkg->conflicts)))
+            return -5;
+
+        // std::cout << vle::fmt("********** ok conflicts\n");
+
+        if (not (read_word("Maintainer:") and
+                 read_maintainer(&pkg->maintainer)))
+            return -6;
+
+        // std::cout << vle::fmt("********** ok maintainer\n");
+
+        if (not (read_word("Description:") and
+                 read_description(&pkg->description)))
+            return -7;
+
+        // std::cout << vle::fmt("********** ok description\n");
+
+        if (not (read_word("Tags:") and
+                 read_tags(&pkg->tags)))
+            return -8;
+
+        // std::cout << vle::fmt("********** ok tags\n");
+
+        if (not (read_word("Url:") and
+                 read_maintainer(&pkg->url)))
+            return -9;
+
+        // std::cout << vle::fmt("********** ok url\n");
+
+        if (not (read_word("Size:") and
+                 read_size(&pkg->size)))
+            return -10;
+
+        // std::cout << vle::fmt("********** ok size\n");
+
+        if (not (read_word("MD5sum:") and
+                 read_maintainer(&pkg->md5sum)))
+            return -11;
+
+        // std::cout << vle::fmt("********** ok Md5sum\n");
+
+        return 0;
+    }
+
+public:
+    DescriptionParser(std::istream& in, const std::string& filepath)
+        : filepath(filepath), in(in), line(0), oldline(0),
+          column(0), oldcolumn(0)
+    {}
+
+    ~DescriptionParser()
+    {}
+
+    bool read_packages(const std::string& distribution, Packages *pkgs)
+    {
+        do {
+            PackageId p;
+            cleanup(p);
+            p.distribution = distribution;
+
+            int result = read_package(&p);
+
+            switch (result) {
+            case 0:
+                pkgs->push_back(p);
+                break;
+            case 1:
+                return true;
+            default:
+                TraceAlways(
+                    fmt(_("Remote Manager: Syntax error in file `%1%' "
+                          "l. %2% c. %3%: %4%")) % filepath % line %
+                    column % result);
+                return false;
+            }
+        } while (in);
+
+        return false;
     }
 };
 
-static void getDepends(const std::string& line,
-                       PackagesLinkId *depends)
+bool PackageParser::extract(const std::string& filepath,
+                            const std::string& distribution)
 {
-    std::vector < std::string > strings(20);
+    DTraceAlways(fmt(_("Remote manager extract %1%")) % filepath);
 
-    ba::split(strings,
-              line,
-              ba::is_any_of(","),
-              ba::token_compress_on);
+    std::ifstream ifs(filepath.c_str());
 
-    depends->clear();
-    depends->reserve(strings.size());
+    if (ifs) {
+        DescriptionParser parser(ifs, filepath);
 
-    std::for_each(strings.begin(), strings.end(),
-                  GetDepend(depends));
-}
-
-static std::string getMaintainer(const std::string& maintainer)
-{
-    std::string tmp = ba::trim_copy(maintainer);
-
-    if (tmp.empty()) {
-        throw utils::ArgError(fmt(_("RemotePackage: empty maintainer")));
+        if (not parser.read_packages(distribution, &m_packages)) {
+            TraceAlways(fmt(_("Remote Manager: Failed to parser %1%"))
+                        % filepath);
+            return false;
+        }
     }
-
-    return tmp;
-}
-
-static std::string getDescription(const std::string& description)
-{
-    std::string tmp = ba::trim_copy(description);
-
-    if (tmp.empty()) {
-        throw utils::ArgError(fmt(_("RemotePackage: empty description")));
-    }
-
-    return tmp;
-}
-
-static std::string appendDesciption(const std::string& description)
-{
-    return ba::trim_copy(description);
-}
-
-
-static void getTags(const std::string& line,
-                    std::vector < std::string > *tags)
-{
-    std::vector < std::string > strings;
-
-    ba::split(strings,
-              line,
-              ba::is_any_of(","),
-              ba::token_compress_on);
-
-    tags->reserve(strings.size());
-    tags->clear();
-
-    std::remove_copy_if(strings.begin(),
-                        strings.end(),
-                        std::back_inserter(*tags),
-                        std::not1(isTrimmedStringEmpty()));
-}
-
-static std::string getUrl(const std::string& url)
-{
-    std::string tmp = ba::trim_copy(url);
-
-    if (tmp.empty()) {
-        throw utils::ArgError(fmt(_("RemotePackage: empty url")));
-    }
-
-    return tmp;
-}
-
-static uint64_t getSize(const std::string& size)
-{
-    std::string tmp = ba::trim_copy(size);
-
-    try {
-        return boost::lexical_cast < uint64_t >(tmp);
-    } catch (const std::exception& /*e*/) {
-        throw utils::InternalError(
-            fmt(_("Can not convert size `%1%'")) % size);
-    }
-}
-
-static std::string getMD5sum(const std::string& md5sum)
-{
-    std::string tmp = ba::trim_copy(md5sum);
-
-    if (tmp.empty()) {
-        throw utils::ArgError(fmt(_("RemotePackage: empty md5sum")));
-    }
-
-    return tmp;
-}
-
-static bool fillPackage(std::istream& in,
-                        PackageId *pkg)
-{
-    std::string line;
-
-    try {
-        if (std::getline(in, line)) {
-            if (isName(line)) {
-                pkg->name = getName(std::string(line, 8));
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isVersion(line)) {
-                boost::tuple < int32_t, int32_t, int32_t > r;
-                r = getVersion(std::string(line, 8));
-
-                pkg->major = r.get < 0 >();
-                pkg->minor = r.get < 1 >();
-                pkg->patch = r.get < 2 >();
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isDepends(line)) {
-                getDepends(std::string(line, 8), &pkg->depends);
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isBuildDepends(line)) {
-                getDepends(std::string(line, 8), &pkg->builddepends);
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isConflicts(line)) {
-                getDepends(std::string(line, 8), &pkg->conflicts);
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isMaintainer(line)) {
-                pkg->maintainer = getMaintainer(std::string(line, 11));
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isDescription(line)) {
-                pkg->description = getDescription(std::string(line, 12));
-
-                while (std::getline(in, line) &&  !isEndDescription(line)) {
-                    pkg->description += appendDesciption(line);
-                }
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isTags(line)) {
-                getTags(std::string(line, 5), &pkg->tags);
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isUrl(line)) {
-                pkg->url = getUrl(std::string(line, 4));
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isSize(line)) {
-                pkg->size = getSize(std::string(line, 5));
-            }
-        }
-
-        if (std::getline(in, line)) {
-            if (isMD5sum(line)) {
-                pkg->md5sum = getMD5sum(std::string(line, 7));
-            }
-        }
-    } catch (const std::ios_base::failure &e) {
-        TraceAlways(vle::fmt("Remote package (i/o) failure: %1%") % e.what());
-        return false;
-    } catch (const std::exception &e) {
-        TraceAlways(vle::fmt("Remote package error: %1%") % e.what());
-        return false;
-    }
-
-    return in;
-}
-
-static bool fillPackagesSet(std::istream& in,
-                            const std::string& distribution,
-                            PackagesIdSet *pkgs)
-{
-    std::string line;
-    PackageId p;
-
-    PackageIdClear()(p);
-    p.distribution = distribution;
-
-    try {
-        while (fillPackage(in, &p)) {
-            pkgs->insert(p);
-
-            PackageIdClear()(p);
-            p.distribution = distribution;
-        }
-    } catch (const std::ios_base::failure &e) {
-        TraceAlways(
-            vle::fmt("Remote package (i/o) failure: %1%") % e.what());
-    } catch (const std::exception &e) {
-        TraceAlways(
-            vle::fmt("Remote package error: %1%") % e.what());
-    }
-
-    return not pkgs->empty();
-}
-
-bool LoadPackages(std::istream&       stream,
-                  const std::string&  distribution,
-                  PackagesIdSet      *pkgs) throw()
-{
-    assert(pkgs);
-
-    if (stream) {
-        return fillPackagesSet(stream, distribution, pkgs);
-    }
-
-    return false;
-}
-
-bool LoadPackages(const std::string&  filename,
-                  const std::string&  distribution,
-                  PackagesIdSet      *pkgs) throw()
-{
-    assert(pkgs);
-
-    std::ifstream ifs(filename.c_str());
-
-    return LoadPackages(ifs, distribution, pkgs);
-}
-
-bool LoadPackage(std::istream&       stream,
-                 const std::string&  distribution,
-                 PackageId          *pkg) throw()
-{
-    assert(pkg);
-
-    if (stream) {
-        PackageIdClear()(*pkg);
-        pkg->distribution = distribution;
-
-        return fillPackage(stream, pkg);
-    }
-
-    return false;
-}
-
-bool LoadPackage(const std::string&  filename,
-                 const std::string&  distribution,
-                 PackageId          *pkg) throw()
-{
-    assert(pkg);
-
-    std::ifstream ifs(filename.c_str());
-
-    return LoadPackage(ifs, distribution, pkg);
+    return true;
 }
 
 }} // namespace vle utils

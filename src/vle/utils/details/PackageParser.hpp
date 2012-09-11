@@ -31,80 +31,116 @@
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/details/Package.hpp>
 #include <string>
-#include <iosfwd>
-
 
 namespace vle { namespace utils {
 
 /**
- * @c LoadPackages loads from stream and extracts all packages to fill
- * the set variable @e pkgs.
+ * A class to parse and extract packages from package files.
  *
- * @param[in] stream to read.
- * @param[in] distribution The distribution to assign for each
- * package.
- * @param[out] pkgs The @e PackagesIdSet to be filled.
+ * @code
+ * #include <iostream>
+ * #include <iterator>
+ * #include <vle/utils/PackageParser.hpp>
  *
- * @throw Nothing
+ * int main(int argc, char *argv[])
+ * {
+ *     (void)argc;
+ *     (void)argv;
  *
- * @return True if success, false otherwise (and log with @c
- * utils::Trace subsytem).
+ *     vle::utils::PackageParser parser;
+ *
+ *     parser.extract("/home/homer/.vle/package.1.1");
+ *     parser.extract("/home/homer/.vle/package.1.1.vle");
+ *     parser.extract("/home/homer/.vle/package.1.1.record");
+ *
+ *     std::copy(parser.begin(),
+ *               parser.end(),
+ *               std::iostream_iterator < vle::utils::Package >(
+ *                        std::cout, "\n"));
+ * }
+ * @endcode
  */
-bool LoadPackages(std::istream&       stream,
-                  const std::string&  distribution,
-                  PackagesIdSet      *pkgs) throw();
+class PackageParser
+{
+public:
+    typedef Packages::value_type value_type;
+    typedef Packages::iterator iterator;
+    typedef Packages::const_iterator const_iterator;
+    typedef Packages::size_type size_type;
 
-/**
- * @c LoadPackages loads the specified file and extracts all packages
- * to fill the set variable @e pkgs.
- *
- * @param[in] filename The file to open and read.
- * @param[in] distribution The distribution to assign for each
- * package.
- * @param[out] pkgs The @e PackagesIdSet to be filled.
- *
- * @throw Nothing
- *
- * @return True if success, false otherwise (and log with @c
- * utils::Trace subsytem).
- */
-bool LoadPackages(const std::string&  filename,
-                  const std::string&  distribution,
-                  PackagesIdSet      *pkgs) throw();
+    PackageParser();
 
-/**
- * @c LoadPackage loads from stream and extracts a package to the the
- * variable @e pkg.
- *
- * @param[in] stream to read.
- * @param[in] distribution The distribution to assign for package.
- * @param[out] pkg The @e PackageId to be filled.
- *
- * @throw Nothing
- *
- * @return true if success, false otherwise (and log with @c
- * utils::Trace subsystem).
- */
-bool LoadPackage(std::istream&       stream,
-                 const std::string&  distribution,
-                 PackageId          *pkg) throw();
+    ~PackageParser();
 
-/**
- * @c LoadPackage loads the specified file and extracts a package to
- * the the variable @e pkg.
- *
- * @param[in] filename The file to open and read.
- * @param[in] distribution The distribution to assign for package.
- * @param[out] pkg The @e PackageId to be filled.
- *
- * @throw Nothing
- *
- * @return true if success, false otherwise (and log with @c
- * utils::Trace subsystem).
- */
-bool LoadPackage(const std::string&  filename,
-                 const std::string&  distribution,
-                 PackageId          *pkg) throw();
+    /**
+     * Extracts from the specified filepath string, all packages.
+     *
+     * @param filepath The file to open.
+     * @param distribution The distribution to assign for package.
+     *
+     * @throw std::exception if failure.
+     *
+     * @return True if success, false otherwise (and log with @c
+     * utils::Trace subsytem).
+     */
+    bool extract(const std::string& filepath, const std::string& distribution);
+
+    iterator begin();
+
+    const_iterator begin() const;
+
+    iterator end();
+
+    const_iterator end() const;
+
+    size_type size() const;
+
+    bool empty() const;
+
+private:
+    PackageParser(const PackageParser&);
+    PackageParser& operator=(const PackageParser&);
+
+    Packages m_packages; /** The list of extracted packages. */
+};
+
+inline PackageParser::PackageParser()
+{
+}
+
+inline PackageParser::~PackageParser()
+{
+}
+
+inline Packages::iterator PackageParser::begin()
+{
+    return m_packages.begin();
+}
+
+inline Packages::const_iterator PackageParser::begin() const
+{
+    return m_packages.begin();
+}
+
+inline Packages::iterator PackageParser::end()
+{
+    return m_packages.end();
+}
+
+inline Packages::const_iterator PackageParser::end() const
+{
+    return m_packages.end();
+}
+
+inline Packages::size_type PackageParser::size() const
+{
+    return m_packages.size();
+}
+
+inline bool PackageParser::empty() const
+{
+    return m_packages.empty();
+}
 
 }} // namespace vle utils
 

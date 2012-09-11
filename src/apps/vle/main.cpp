@@ -252,6 +252,28 @@ bool cliDirect(int argc, char* argv[], CmdArgs& lst)
     return true;
 }
 
+struct ShowPackageResult
+    : public std::unary_function < vle::utils::PackageId, void >
+{
+    void operator()(const vle::utils::PackageId& pkg) const
+    {
+        std::cout << pkg.name << "\n";
+    }
+};
+
+void showResults(vle::utils::RemoteManager& manager)
+{
+    utils::Packages results;
+
+    manager.getResult(&results);
+
+    std::cout << "results: " << results.size() << "\n";
+
+    std::for_each(results.begin(),
+                  results.end(),
+                  ShowPackageResult());
+}
+
 bool cliRemote(int argc, char* argv[])
 {
     bool error = true;
@@ -263,6 +285,7 @@ bool cliRemote(int argc, char* argv[])
         if (strcmp(argv[1], "update") == 0) {
             rm.start(utils::REMOTE_MANAGER_UPDATE, std::string(), &std::cout);
             rm.join();
+            showResults(rm);
         } else if (argc > 1 and strcmp(argv[1], "install") == 0) {
             for (int i = 2; i < argc; ++i) {
                 rm.start(utils::REMOTE_MANAGER_INSTALL, argv[i], &std::cout);
@@ -277,11 +300,13 @@ bool cliRemote(int argc, char* argv[])
             for (int i = 2; i < argc; ++i) {
                 rm.start(utils::REMOTE_MANAGER_SHOW, argv[i], &std::cout);
                 rm.join();
+                showResults(rm);
             }
         } else if (argc > 1 and strcmp(argv[1], "search") == 0) {
             for (int i = 2; i < argc; ++i) {
                 rm.start(utils::REMOTE_MANAGER_SEARCH, argv[i], &std::cout);
                 rm.join();
+                showResults(rm);
             }
         } else {
             error = true;

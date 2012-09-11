@@ -1,7 +1,13 @@
 Package: MyProject
 Version: 0.1.0
 Depends: vle.output, vle.extension.celldevs, vle.extension.cellqss, vle.extension.decision, vle.extension.difference-equation, vle.extension.differential-equation, vle.extension.dsdevs, vle.extension.fsa, vle.extension.petrinet
+Build-Depends:
+Conflicts:
 Maintainer: Gauthier Quesnel <quesnel@users.sourceforge.net>
 Description: Still in progress
  .
-Tag: examples
+Tags: examples
+Url: http://www.vle-project.org/1.1
+Size: 0
+MD5sum: xxxx
+

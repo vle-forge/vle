@@ -97,8 +97,6 @@ struct PackageId
     int32_t patch;
 };
 
-typedef std::vector < PackageId > Packages;
-
 /**
  * \c RemoteManagerActions is available action for the \c RemoteManager class.
  *
@@ -107,12 +105,17 @@ typedef std::vector < PackageId > Packages;
  */
 enum RemoteManagerActions
 {
-    REMOTE_MANAGER_UPDATE, /**< vle --remote update. */
-    REMOTE_MANAGER_SOURCE, /**< vle --remote source glue. */
-    REMOTE_MANAGER_INSTALL, /**< vle --remove install glue. */
-    REMOTE_MANAGER_SEARCH, /**< vle --remote search '*lu*'. */
-    REMOTE_MANAGER_SHOW /**< vle --remote show glue. */
+    REMOTE_MANAGER_UPDATE,      /**< vle --remote update. */
+    REMOTE_MANAGER_SOURCE,      /**< vle --remote source glue. */
+    REMOTE_MANAGER_INSTALL,     /**< vle --remove install glue. */
+    REMOTE_MANAGER_LOCAL_SEARCH, /**< vle --remote localsearch '.*' */
+    REMOTE_MANAGER_SEARCH,      /**< vle --remote search '*lu*'. */
+    REMOTE_MANAGER_SHOW         /**< vle --remote show glue. */
 };
+
+VLE_API std::ostream& operator<<(std::ostream& os, const PackageId& b);
+
+typedef std::vector < PackageId > Packages;
 
 /**
  * \c RemoteManager allow to manager ftp/http repositories.
@@ -145,14 +148,6 @@ public:
      * - Read the \c VLE_HOME/package file to get the list of available package.
      */
     RemoteManager();
-
-    /**
-     * Build a new RemoteManager object by reading packages list from
-     * the standard input stream.
-     *
-     * @param in Standard input stream.
-     */
-    RemoteManager(std::istream& in);
 
     /**
      * If an action is running, \c join it otherwise do nothing.
@@ -199,6 +194,22 @@ public:
     void stop();
 
     void getResult(Packages *out);
+
+    /**
+     * Return the path @e "$VLE_HOME/local.pkg".
+     *
+     *
+     * @return The path @e "$VLE_HOME/local.pkg."
+     */
+    static std::string getLocalPackageFilename();
+
+    /**
+     * Return the path @e "$VLE_HOME/remote.pkg".
+     *
+     *
+     * @return The path @e "$VLE_HOME/remote.pkg."
+     */
+    static std::string getRemotePackageFilename();
 
 private:
     /**

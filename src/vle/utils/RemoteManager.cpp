@@ -36,6 +36,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/details/Package.hpp>
 #include <vle/utils/details/PackageParser.hpp>
+#include <vle/utils/details/PackageManager.hpp>
 #include <vle/version.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -56,39 +57,70 @@
 
 namespace vle { namespace utils {
 
-namespace fs = boost::filesystem;
-
-static std::string buildLocalPackageFilename()
+static std::ostream& operator<<(std::ostream& os, const PackageLinkId& b)
 {
-    return utils::Path::path().getHomeFile("packages.local");
-}
+    static const char *sym[5] = { "=", "<", "<=", ">", ">=" };
 
-static std::string buildRemotePackageFilename()
-{
-    return utils::Path::path().getHomeFile("packages.remote");
-}
+    os << b.name;
 
-static void BuildLocalPackage(PackagesIdSet *pkgs)
-{
-    fs::path pkgsdir(utils::Path::path().getPackageDir());
+    if (b.major >= 0) {
+        assert((unsigned)b.op < 5);
 
-    if (fs::exists(pkgsdir) and fs::is_directory(pkgsdir)) {
-        for (fs::directory_iterator it(pkgsdir), end; it != end; ++it) {
-            if (fs::is_directory(it->status())) {
-                fs::path descfile = *it;
-                descfile /= "Description.txt";
+        os << " (" << sym[static_cast < unsigned >(b.op)] << " " << b.major;
 
-                if (fs::exists(descfile)) {
-                    PackageId p;
-                    if (LoadPackage(descfile.filename().string(),
-                                    std::string(), &p)) {
-                        pkgs->insert(p);
-                    }
-                }
+        if (b.minor >= 0) {
+            os << "." << b.minor;
+
+            if (b.patch >= 0) {
+                os << "." << b.patch;
             }
         }
+
+        os << ")";
     }
+
+    return os;
 }
+
+static std::ostream& operator<<(std::ostream& os, const PackagesLinkId& b)
+{
+    utils::formatCopy(b.begin(),
+                      b.end(),
+                      os,
+                      ", ",
+                      std::string(),
+                      std::string());
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const PackageId& b)
+{
+    os << "Package: " <<  b.name << "\n"
+       << "Version: " << b.major
+       << "." << b.minor
+       << "." << b.patch << "\n"
+       << "Depends: " << b.depends << "\n"
+       << "Build-Depends: " << b.builddepends << "\n"
+       << "Conflicts: " << b.conflicts << "\n"
+       << "Maintainer: " << b.maintainer << "\n"
+       << "Description: " << b.description << "\n" << " ." << "\n"
+       << "Tags: ";
+
+    utils::formatCopy(b.tags.begin(),
+                      b.tags.end(),
+                      os,
+                      ", ",
+                      std::string(),
+                      std::string());
+
+    return os << "\n"
+              << "Url: " << b.url << "\n"
+              << "Size: " << b.size << "\n"
+              << "MD5sum: " << b.md5sum << "\n";
+}
+
+namespace fs = boost::filesystem;
 
 class RemoteManager::Pimpl
 {
@@ -97,27 +129,29 @@ public:
         : mStream(0), mIsStarted(false), mIsFinish(false), mStop(false),
           mHasError(false)
     {
-        mPackages.reserve(PACKAGESID_VECTOR_RESERVED_SIZE);
+        {
+            Packages tmp;
 
-        if (!LoadPackages(buildLocalPackageFilename(), std::string(), &local)) {
-            BuildLocalPackage(&local);
+            LocalPackageManager::rebuild(&tmp);
+            local.insert(tmp.begin(), tmp.end());
         }
 
-        LoadPackages(buildRemotePackageFilename(), "distant", &remote);
-    }
+        {
+            Packages tmp;
 
-    Pimpl(std::istream& in)
-        : mStream(0), mIsStarted(false), mIsFinish(false), mStop(false),
-          mHasError(false)
-    {
-        mPackages.reserve(PACKAGESID_VECTOR_RESERVED_SIZE);
+            RemotePackageManager::extract(&tmp);
+            remote.insert(tmp.begin(), tmp.end());
+        }
 
-        LoadPackages(in, std::string(), &local);
+        TraceAlways(fmt(_("Remote manager: %1% local / %2% remote"))
+                    % local.size() % remote.size());
     }
 
     ~Pimpl()
     {
         join();
+
+        save();
     }
 
     void start(RemoteManagerActions action, const std::string& arg,
@@ -144,6 +178,10 @@ public:
             case REMOTE_MANAGER_INSTALL:
                 mThread = boost::thread(
                     &RemoteManager::Pimpl::actionInstall, this);
+                break;
+            case REMOTE_MANAGER_LOCAL_SEARCH:
+                mThread = boost::thread(
+                    &RemoteManager::Pimpl::actionLocalSearch, this);
                 break;
             case REMOTE_MANAGER_SEARCH:
                 mThread = boost::thread(
@@ -225,39 +263,36 @@ public:
         }
     };
 
-    void read(const std::string& filename)
-    {
-        PackagesIdSet tmpremote;
-
-        if (not LoadPackages(filename, "distant", &tmpremote)) {
-            TraceAlways(fmt(_("Failed to open package file `%1%'")) % filename);
-        }
-    }
-
     void save() const throw()
     {
         try {
-            {
-                std::ofstream file(buildLocalPackageFilename().c_str());
-                file.exceptions(std::ios_base::eofbit |
-                                std::ios_base::failbit |
-                                std::ios_base::badbit);
+            std::ofstream file;
+            file.exceptions(std::ios_base::eofbit |
+                            std::ios_base::failbit |
+                            std::ios_base::badbit);
 
-                file << local << std::endl;
-            }
-
-            {
-                std::ofstream file(buildRemotePackageFilename().c_str());
-                file.exceptions(std::ios_base::eofbit |
-                                std::ios_base::failbit |
-                                std::ios_base::badbit);
-
-                file << remote << std::endl;
-            }
+            file.open(RemoteManager::getLocalPackageFilename().c_str());
+            file << local << std::endl;
         } catch (const std::exception& e) {
-            TraceAlways(fmt(_("Failed to write package file `%1%' or `%2%'")) %
-                        buildLocalPackageFilename() %
-                        buildRemotePackageFilename());
+            TraceAlways(
+                fmt(_("Remote manager: failed to write local package "
+                      "`%1%': %2%")) % RemoteManager::getLocalPackageFilename()
+                % e.what());
+        }
+
+        try  {
+            std::ofstream file;
+            file.exceptions(std::ios_base::eofbit |
+                            std::ios_base::failbit |
+                            std::ios_base::badbit);
+
+            file.open(RemoteManager::getRemotePackageFilename().c_str());
+            file << remote << std::endl;
+        } catch (const std::exception& e) {
+            TraceAlways(
+                fmt(_("Remote manager: failed to write remote package "
+                      "`%1%': %2%")) % RemoteManager::getRemotePackageFilename()
+                % e.what());
         }
     }
 
@@ -268,12 +303,12 @@ public:
     struct Download
         : public std::unary_function < std::string, void >
     {
-        PackagesIdSet* pkgs;
+        PackageParser* parser;
 
-        Download(PackagesIdSet* pkgs)
-        : pkgs(pkgs)
+        Download(PackageParser *parser)
+            : parser(parser)
         {
-            assert(pkgs);
+            assert(parser);
         }
 
         void operator()(const std::string& url) const
@@ -286,8 +321,13 @@ public:
             dl.start(pkgurl);
             dl.join();
 
+            std::cout << vle::fmt("%1% %2%\n") % pkgurl % dl.hasError();
+
             if (not dl.hasError()) {
-                LoadPackages(dl.filename(), url, pkgs);
+                std::cout << vle::fmt("%1% %2%\n") % dl.filename() % url;
+                parser->extract(dl.filename(), url);
+            } else {
+                std::cout << vle::fmt("failed: %1%\n") % dl.getErrorMessage();
             }
         }
     };
@@ -308,15 +348,15 @@ public:
             TraceAlways(_("Failed to read preferences file"));
         }
 
-        PackagesIdSet updated;
+        PackageParser parser;
         std::for_each(urls.begin(), urls.end(),
-                      Download(&updated));
+                      Download(&parser));
 
-        if (not updated.empty()) {
+        if (not parser.empty()) {
             std::set_intersection(local.begin(),
                                   local.end(),
-                                  updated.begin(),
-                                  updated.end(),
+                                  parser.begin(),
+                                  parser.end(),
                                   std::back_inserter(mPackages),
                                   PackageIdUpdate());
         }
@@ -404,7 +444,7 @@ public:
         // mHasError = false;
     }
 
-    void actionSearch() throw()
+    void actionLocalSearch() throw ()
     {
         boost::regex expression(mArgs, boost::regex::grep);
 
@@ -412,6 +452,17 @@ public:
                             local.end(),
                             std::back_inserter(mPackages),
                             NotHaveExpression(expression));
+
+        mStream = 0;
+        mIsFinish = true;
+        mIsStarted = false;
+        mStop = false;
+        mHasError = false;
+    }
+
+    void actionSearch() throw()
+    {
+        boost::regex expression(mArgs, boost::regex::grep);
 
         std::remove_copy_if(remote.begin(),
                             remote.end(),
@@ -481,11 +532,6 @@ RemoteManager::RemoteManager()
 {
 }
 
-RemoteManager::RemoteManager(std::istream& in)
-    : mPimpl(new RemoteManager::Pimpl(in))
-{
-}
-
 RemoteManager::~RemoteManager()
 {
     delete mPimpl;
@@ -518,6 +564,16 @@ void RemoteManager::getResult(Packages *out)
                   mPimpl->mPackages.end(),
                   std::back_inserter(*out));
     }
+}
+
+std::string RemoteManager::getLocalPackageFilename()
+{
+    return utils::Path::path().getHomeFile("local.pkg");
+}
+
+std::string RemoteManager::getRemotePackageFilename()
+{
+    return utils::Path::path().getHomeFile("remote.pkg");
 }
 
 }} // namespace vle utils
