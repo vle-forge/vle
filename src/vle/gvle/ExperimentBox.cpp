@@ -215,8 +215,13 @@ bool ExperimentBox::apply()
 void ExperimentBox::on_calendar()
 {
     std::string date;
+    long year, month, day;
+
+    utils::DateTime::currentDate(year, month, day);
 
     CalendarBox cal(mXml);
+    cal.selectDate((int)day, (int)month, (int)year);
+
     cal.date(date);
     if (not date.empty()) {
         mEntryDate->set_text(date);
@@ -289,6 +294,20 @@ void ExperimentBox::on_calendarBegin()
     std::string date;
 
     CalendarBox cal(mXml);
+
+    double x = vu::convert < double >(mEntryBeginReal->get_text(),true);
+
+    if (utils::DateTime::isValidYear(x)) {
+        long year, month, day, hours, minutes, seconds;
+        double remain;
+
+        remain = utils::DateTime::toTime(x, year, month, day, hours,
+                                         minutes, seconds);
+
+        cal.selectDate((int)day, (int)month, (int)year);
+    }
+
+
     cal.dateBegin(date);
     if (not date.empty()) {
         mEntryBeginDate->set_text(date);

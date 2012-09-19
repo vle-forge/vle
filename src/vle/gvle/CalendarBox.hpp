@@ -42,6 +42,7 @@ public:
     CalendarBox(const Glib::RefPtr < Gtk::Builder >& xml);
 
     void date(std::string& date);
+    void selectDate(int day, int month, int year);
     void dateBegin(std::string& date);
 
 private:

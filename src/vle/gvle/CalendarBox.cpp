@@ -60,6 +60,12 @@ void CalendarBox::date(std::string& date)
     mDialog->hide();
 }
 
+void CalendarBox::selectDate(int day, int month, int year)
+{
+    mCalendar->select_month((guint)month - 1, (guint)year);
+    mCalendar->select_day((guint) day);
+}
+
 void CalendarBox::dateBegin(std::string& date)
 {
     if (mDialog->run() == Gtk::RESPONSE_OK) {
