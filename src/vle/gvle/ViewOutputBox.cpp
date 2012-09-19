@@ -591,7 +591,7 @@ void ViewOutputBox::updateView(const std::string& name)
 
     m_type->set_active_text(view.streamtype());
     m_timestep->set_sensitive(view.type() == vpz::View::TIMED);
-    m_timestep->set_text(utils::toScientificString(view.timestep()));
+    m_timestep->set_text(utils::toScientificString(view.timestep(), true));
 
     m_format->set_active_text(output.streamformat());
     m_location->set_text(output.location());
