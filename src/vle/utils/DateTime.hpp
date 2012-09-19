@@ -294,6 +294,19 @@ public:
                          long& hours,
                          long& minutes,
                          long& seconds);
+
+    /**
+     * @brief Explode current date to year, month, day in the
+     * month, hours, minutes and seconds.
+     *
+     * @param year Output parameter to represent year.
+     * @param month Output parameter to represent month.
+     * @param day Output parameter to represent day in a month (1..31).
+     *
+     */
+    static void currentDate(long& year,
+                            long& month,
+                            long& day);
 };
 
 }} // namespace vle utils

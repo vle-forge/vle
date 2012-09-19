@@ -335,4 +335,16 @@ double DateTime::toTime(const double& date, long& year,
     return 0.0;
 }
 
+void DateTime::currentDate(long& year,
+                           long& month,
+                           long& day)
+{
+    namespace bg = boost::gregorian;
+
+    bg::date d(bg::day_clock::local_day());
+
+    year = d.year();
+    month = d.month();
+    day = d.day();
+}
 }} // namespace vle utils
