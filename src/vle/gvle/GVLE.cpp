@@ -1184,118 +1184,124 @@ std::string valuetype_to_string(value::Value::type type)
 bool GVLE::packageAllTimer()
 {
     std::string o, e;
-    utils::Package::package().getOutputAndClear(o);
-    utils::Package::package().getErrorAndClear(e);
-    Glib::RefPtr < Gtk::TextBuffer > ref = mLog->get_buffer();
 
-    insertLog(o);
-    insertLog(e);
-    scrollLogToLastLine();
-
-    if (utils::Package::package().isFinish()) {
-        ++itDependencies;
-        if (itDependencies != mDependencies.end()) {
-            utils::Package::package().select(*itDependencies);
-            buildAllProject();
-        } else {
-            utils::Package::package().select(utils::Path::filename(mPackage));
-            insertLog("package " +
-                      utils::Package::package().name() +
-                      " & first level dependencies built\n");
-            getMenu()->showProjectMenu();
-        }
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
         scrollLogToLastLine();
-        return false;
-    } else {
-        return true;
+
+        if (utils::Package::package().isFinish()) {
+            ++itDependencies;
+
+            if (itDependencies != mDependencies.end()) {
+                utils::Package::package().select(*itDependencies);
+                buildAllProject();
+            } else {
+                utils::Package::package().select(utils::Path::filename(mPackage));
+                insertLog("package " +
+                          utils::Package::package().name() +
+                          " & first level dependencies built\n");
+                getMenu()->showProjectMenu();
+            }
+            scrollLogToLastLine();
+            return false;
+        } else {
+            return true;
+        }
     }
+    return false;
 }
 
 bool GVLE::packageTimer()
 {
     std::string o, e;
-    utils::Package::package().getOutputAndClear(o);
-    utils::Package::package().getErrorAndClear(e);
-    Glib::RefPtr < Gtk::TextBuffer > ref = mLog->get_buffer();
 
-    insertLog(o);
-    insertLog(e);
-    scrollLogToLastLine();
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
+        scrollLogToLastLine();
 
-    if (utils::Package::package().isFinish()) {
-        getMenu()->showProjectMenu();
-        return false;
-    } else {
-        return true;
+        if (utils::Package::package().isFinish()) {
+            getMenu()->showProjectMenu();
+            return false;
+        } else {
+            return true;
+        }
     }
+
+    return false;
 }
 
 bool GVLE::packageConfigureAllTimer()
 {
     std::string o, e;
-    utils::Package::package().getOutputAndClear(o);
-    utils::Package::package().getErrorAndClear(e);
 
-    insertLog(o);
-    insertLog(e);
-    scrollLogToLastLine();
-
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().isSuccess()) {
-            buildAllProject();
-        } else {
-            getMenu()->showProjectMenu();
-        }
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
         scrollLogToLastLine();
-        return false;
-    } else {
-        return true;
+
+        if (utils::Package::package().isFinish()) {
+            if (utils::Package::package().isSuccess()) {
+                buildAllProject();
+            } else {
+                getMenu()->showProjectMenu();
+            }
+            scrollLogToLastLine();
+            return false;
+        } else {
+            return true;
+        }
     }
+    return false;
 }
 
 bool GVLE::packageBuildAllTimer()
 {
     std::string o, e;
-    utils::Package::package().getOutputAndClear(o);
-    utils::Package::package().getErrorAndClear(e);
 
-    insertLog(o);
-    insertLog(e);
-    scrollLogToLastLine();
-
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().isSuccess()) {
-            installAllProject();
-        } else {
-            getMenu()->showProjectMenu();
-        }
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
         scrollLogToLastLine();
-        return false;
-    } else {
-        return true;
+
+        if (utils::Package::package().isFinish()) {
+            if (utils::Package::package().isSuccess()) {
+                installAllProject();
+            } else {
+                getMenu()->showProjectMenu();
+            }
+            scrollLogToLastLine();
+            return false;
+        } else {
+            return true;
+        }
     }
+    return false;
 }
 
 bool GVLE::packageBuildTimer()
 {
     std::string o, e;
-    utils::Package::package().getOutputAndClear(o);
-    utils::Package::package().getErrorAndClear(e);
 
-    insertLog(o);
-    insertLog(e);
-    scrollLogToLastLine();
-
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().isSuccess()) {
-            installProject();
-        } else {
-            getMenu()->showProjectMenu();
-        }
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
         scrollLogToLastLine();
-        return false;
+
+        if (utils::Package::package().isFinish()) {
+            if (utils::Package::package().isSuccess()) {
+                installProject();
+            } else {
+                getMenu()->showProjectMenu();
+            }
+            scrollLogToLastLine();
+            return false;
+        } else {
+            return true;
+        }
     } else {
-        return true;
+        return false;
     }
 }
 
