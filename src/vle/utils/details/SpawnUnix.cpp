@@ -26,6 +26,7 @@
  */
 
 #include <vle/utils/details/Spawn.hpp>
+#include <vle/utils/details/Misc.hpp>
 #include <vle/utils/i18n.hpp>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -41,42 +42,6 @@
 namespace vle { namespace utils {
 
 const unsigned long int Spawn::default_buffer_size = BUFSIZ;
-
-struct strdup_functor
-    : std::unary_function < std::string, char* >
-{
-    char * operator()(const std::string& str) const
-    {
-        return strdup(str.c_str());
-    }
-};
-
-static void free_str_array(char **args)
-{
-    char **tmp;
-
-    for (tmp = args; *tmp; ++tmp) {
-        free(*tmp);
-    }
-
-    delete[] args;
-}
-
-static char ** convert_string_str_array(const std::vector < std::string >& args)
-{
-    char **result = 0;
-
-    result = new char*[args.size() + 1];
-
-    std::transform(args.begin(),
-                   args.end(),
-                   result,
-                   strdup_functor());
-
-    result[args.size()] = 0;
-
-    return result;
-}
 
 /**
  * @e input_timeout function blocks the calling process until input is
