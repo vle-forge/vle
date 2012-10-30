@@ -78,22 +78,29 @@ char ** convert_string_str_array(const std::vector < std::string >& args)
     return result;
 }
 
-static char ** convert_string_str_array(const Envp& env)
+static char ** prepare_environment_variable(void)
 {
+    char **it = ::environ;
+    char **jt = NULL;
     char **result = NULL;
-    int i = 0;
+    int size = 0;
 
-    result = (char**)malloc((env.size() + 1) * sizeof(char *));
-
-    for (Envp::const_iterator it = env.begin(); it != env.end();
-         ++i, ++it) {
-        result[i] = (char*)malloc(it->first.size() + it->second.size() + 2);
-
-        snprintf(result[i], it->first.size() + it->second.size() + 2, "%s=%s",
-                 it->first.c_str(), it->second.c_str());
+    while (*it++) {
+        size++;
     }
 
-    result[env.size()] = 0;
+    result = (char **)malloc((size + 1) * sizeof(char *));
+    if (!result) {
+        return NULL;
+    }
+
+    it = ::environ;
+    jt = result;
+    while (*it) {
+        *jt++ = strdup(*it++);
+    }
+
+    result[size] = 0;
 
     return result;
 }
@@ -209,11 +216,8 @@ struct Spawn::Pimpl
 
     bool initchild(const std::string& exe,
                    const std::string& workingdir,
-                   std::vector < std::string > args,
-                   const Envp &envp)
+                   std::vector < std::string > args)
     {
-        (void)envp;
-
         ::dup2(m_pipeout[1], STDOUT_FILENO);
         ::dup2(m_pipeerr[1], STDERR_FILENO);
 
@@ -226,7 +230,7 @@ struct Spawn::Pimpl
 
         args.insert(args.begin(), exe);
 
-        char **localenvp = convert_string_str_array(envp);
+        char **localenvp = prepare_environment_variable();
         char **localargv = convert_string_str_array(args);
 
         if (::execve(exe.c_str(), localargv, localenvp) == -1) {
@@ -251,8 +255,7 @@ struct Spawn::Pimpl
 
     bool start(const std::string& exe,
                const std::string& workingdir,
-               const std::vector < std::string > &args,
-               const Envp &envp)
+               const std::vector < std::string > &args)
     {
         if (m_pid != -1)
             return false;
@@ -280,7 +283,7 @@ struct Spawn::Pimpl
         ::chdir(workingdir.c_str());
 
         if (localpid == 0) {
-            return initchild(exe, workingdir, args, envp);
+            return initchild(exe, workingdir, args);
         } else {
             return initparent(localpid);
         }
@@ -355,7 +358,6 @@ Spawn::~Spawn()
 bool Spawn::start(const std::string& exe,
                   const std::string& workingdir,
                   const std::vector < std::string > &args,
-                  const Envp &envp,
                   unsigned int waitchildtimeout)
 {
     if (m_pimpl) {
@@ -364,7 +366,7 @@ bool Spawn::start(const std::string& exe,
 
     m_pimpl = new Spawn::Pimpl(waitchildtimeout);
 
-    return m_pimpl->start(exe, workingdir, args, envp);
+    return m_pimpl->start(exe, workingdir, args);
 }
 
 bool Spawn::wait()

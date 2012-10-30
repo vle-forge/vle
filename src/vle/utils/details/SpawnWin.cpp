@@ -27,6 +27,7 @@
 
 #include <vle/utils/details/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <string>
@@ -34,12 +35,137 @@
 #include <functional>
 #include <fstream>
 #include <windows.h>
+#include <glib.h>
+
 
 namespace vle { namespace utils {
 
 // Max default size of command line buffer. See the CreateProcess
 // function in msdn.
 const unsigned long int Spawn::default_buffer_size = 32768;
+
+typedef std::vector < std::pair < std::string, std::string > > Envp;
+
+/**
+ * A specific \b Win32 function to convert a path into a 8.3 path.
+ * Attention, the file must exists instead the parameter is returned.
+ */
+static std::string convertPathTo83Path(const std::string& path)
+{
+    std::string newvalue(path);
+    DWORD lenght;
+
+    lenght = GetShortPathName(path.c_str(), NULL, 0);
+    if (lenght > 0) {
+        TCHAR* buffer = new TCHAR[lenght];
+        lenght = GetShortPathName(path.c_str(), buffer, lenght);
+        if (lenght > 0) {
+            newvalue.assign(static_cast < char* >(buffer));
+        }
+        delete [] buffer;
+    }
+
+    return newvalue;
+}
+
+/**
+ * A specific \b Win32 function to build a new environment
+ * variable.
+ *
+ * @param variable
+ * @param value
+ * @param append
+ *
+ * @return
+ */
+static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
+                                                   const std::string& value,
+                                                   bool append)
+{
+    Envp::value_type result;
+
+    result.first = variable;
+    result.second = value;
+
+    if (append) {
+        char* env = std::getenv(variable.c_str());
+
+        if (env != NULL) {
+            std::string old(env, std::strlen(env));
+            result.second += ";";
+            result.second += old;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Build list of string which represents the 'VARIABLE=VALUE'
+ * environment variable.
+ *
+ * @attention @b Win32: the PKG_CONFIG_FILE is path is update with the
+ * vle's pkgconfig directory. The BOOST_ROOT, BOOST_INCLUDEDIR and
+ * BOOST_LIBRARYDIR are assigned with the vle's patch to avoid
+ * conflict with different boost version.
+ *
+ * @return A list of string.
+ */
+static Envp prepareEnvironmentVariable()
+{
+    Envp envp;
+    gchar** allenv = g_listenv();
+    gchar** it = allenv;
+
+    while (*it != NULL) {
+        if (strcasecmp(*it, "PATH") and
+            strcasecmp(*it, "PKG_CONFIG_PATH") and
+            strcasecmp(*it, "BOOST_ROOT") and
+            strcasecmp(*it, "BOOST_INCLUDEDIR") and
+            strcasecmp(*it, "BOOST_LIBRARYDIR")) {
+
+            const gchar* res = g_getenv(*it);
+            if (res) {
+                envp.push_back(Envp::value_type(*it, res));
+            }
+        }
+
+        it++;
+    }
+
+    g_strfreev(allenv);
+
+    envp.push_back(replaceEnvironmentVariable(
+                       "PATH",
+                       Path::buildFilename(
+                           convertPathTo83Path(Path::path().getPrefixDir()),
+                           "bin"),
+                       true));
+
+    envp.push_back(replaceEnvironmentVariable(
+                       "PKG_CONFIG_PATH",
+                       Path::buildFilename(
+                           convertPathTo83Path(Path::path().getPrefixDir()),
+                           "lib", "pkgconfig"),
+                       false));
+
+    envp.push_back(replaceEnvironmentVariable(
+                       "BOOST_INCLUDEDIR",
+                       Path::buildFilename(Path::path().getPrefixDir(),
+                                           "include", "boost"),
+                       false));
+
+    envp.push_back(replaceEnvironmentVariable(
+                       "BOOST_LIBRARYDIR",
+                       Path::buildFilename(Path::path().getPrefixDir(), "lib"),
+                       false));
+
+    envp.push_back(replaceEnvironmentVariable(
+                       "BOOST_ROOT",
+                       Path::path().getPrefixDir(),
+                       false));
+    return envp;
+}
 
 static std::string win32_quote(const std::string& arg)
 {
@@ -131,26 +257,6 @@ struct win32_envp_quote
     }
 };
 
-static std::string build_win32_error_message(DWORD errorcode)
-{
-    LPVOID msg;
-
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                  FORMAT_MESSAGE_FROM_SYSTEM |
-                  FORMAT_MESSAGE_IGNORE_INSERTS,
-                  NULL, errorcode,
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                  (LPTSTR)&msg,
-                  0, NULL);
-
-    MessageBox(NULL, (LPCTSTR)msg, "Error", MB_OK | MB_ICONINFORMATION);
-
-    std::string result((char*)msg);
-    LocalFree(msg);
-
-    return result;
-}
-
 static char* build_command_line(const std::string& exe,
                                 const std::vector < std::string >&args)
 {
@@ -158,18 +264,6 @@ static char* build_command_line(const std::string& exe,
     char *buf;
 
     cmd.reserve(Spawn::default_buffer_size);
-
-    // char *pEnvCMD = getenv("COMSPEC");
-    // if (pEnvCMD) {
-    //     cmd.append(win32_quote(pEnvCMD));
-    // } else {
-    //     cmd.append("CMD.EXE");
-    // }
-
-    // cmd.push_back(' ');
-    // cmd.append(" /c ");
-
-
     cmd.append(win32_quote(exe));
     cmd.push_back(' ');
 
@@ -184,25 +278,21 @@ static char* build_command_line(const std::string& exe,
     return buf;
 }
 
-static std::string build_envp_line(const Envp& envp)
+static char * prepare_environment_variable(void)
 {
-    std::string cmd;
+    Envp envp = prepareEnvironmentVariable();
 
+    std::string cmd;
     cmd.reserve(Spawn::default_buffer_size);
 
     std::for_each(envp.begin(), envp.end(), win32_envp_quote(&cmd));
     cmd.push_back('\0');
 
+    char *result = (char*)malloc(sizeof(char) * (cmd.size() + 1));
 
-    std::string cpy(cmd);
+    std::copy(cmd.begin(), cmd.end(), result);
 
-    for (std::string::iterator it = cpy.begin(); it != cpy.end(); ++it) {
-        if ((*it) == '\0') {
-            *it = '\n';
-        }
-    }
-
-    return cmd;
+    return result;
 }
 
 struct Spawn::Pimpl
@@ -359,8 +449,7 @@ struct Spawn::Pimpl
 
     bool start(const std::string& exe,
                const std::string& workingdir,
-               const std::vector < std::string > &args,
-               const Envp &envp)
+               const std::vector < std::string > &args)
     {
         HANDLE hOutputReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hErrorReadTmp = INVALID_HANDLE_VALUE;
@@ -370,6 +459,7 @@ struct Spawn::Pimpl
         SECURITY_ATTRIBUTES securityatt;
         SECURITY_DESCRIPTOR securitydescriptor;
         char *cmdline = NULL;
+        LPVOID envp;
 
         InitializeSecurityDescriptor(&securitydescriptor,
                                      SECURITY_DESCRIPTOR_REVISION);
@@ -406,13 +496,17 @@ struct Spawn::Pimpl
         if (!cmdline)
             goto malloc_failure;
 
+        envp = prepare_environment_variable();
+        if (!envp)
+            goto malloc_failure;
+
         out__ << "Cmd: [" << cmdline << "]\n";
         err__ << "Cmd: [" << cmdline << "]\n";
 
         ZeroMemory(&m_pi, sizeof(PROCESS_INFORMATION));
         if (!(CreateProcess(NULL, cmdline, NULL, NULL, TRUE,
                             CREATE_NO_WINDOW,
-                            (LPVOID)(build_envp_line(envp).c_str()),
+                            envp,
                             workingdir.c_str(), &startupinfo, &m_pi)))
             goto create_process_failure;
 
@@ -494,7 +588,6 @@ Spawn::~Spawn()
 bool Spawn::start(const std::string& exe,
                   const std::string& workingdir,
                   const std::vector < std::string > &args,
-                  const Envp &envp,
                   unsigned int waitchildtimeout)
 {
     if (m_pimpl) {
@@ -503,7 +596,7 @@ bool Spawn::start(const std::string& exe,
 
     m_pimpl = new Spawn::Pimpl(waitchildtimeout);
 
-    return m_pimpl->start(exe, workingdir, args, envp);
+    return m_pimpl->start(exe, workingdir, args);
 }
 
 bool Spawn::wait()
