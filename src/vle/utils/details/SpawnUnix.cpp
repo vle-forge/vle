@@ -215,7 +215,6 @@ struct Spawn::Pimpl
     }
 
     bool initchild(const std::string& exe,
-                   const std::string& workingdir,
                    std::vector < std::string > args)
     {
         ::dup2(m_pipeout[1], STDOUT_FILENO);
@@ -225,8 +224,6 @@ struct Spawn::Pimpl
         ::close(m_pipeerr[1]);
         ::close(m_pipeout[0]);
         ::close(m_pipeerr[0]);
-
-        ::chdir(workingdir.c_str());
 
         args.insert(args.begin(), exe);
 
@@ -280,15 +277,19 @@ struct Spawn::Pimpl
             goto fork_failed;
         }
 
-        ::chdir(workingdir.c_str());
+        if (!::chdir(workingdir.c_str())) {
+            err = errno;
+            goto chdir_failed;
+        }
 
         if (localpid == 0) {
-            return initchild(exe, workingdir, args);
+            return initchild(exe, args);
         } else {
             return initparent(localpid);
         }
 
     fork_failed:
+    chdir_failed:
         ::close(m_pipeerr[0]);
         ::close(m_pipeerr[1]);
     m_pipeerr_failed:
