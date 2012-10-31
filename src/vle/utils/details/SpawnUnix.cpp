@@ -277,7 +277,7 @@ struct Spawn::Pimpl
             goto fork_failed;
         }
 
-        if (!::chdir(workingdir.c_str())) {
+        if (::chdir(workingdir.c_str())) {
             err = errno;
             goto chdir_failed;
         }
