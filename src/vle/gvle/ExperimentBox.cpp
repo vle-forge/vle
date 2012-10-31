@@ -299,10 +299,8 @@ void ExperimentBox::on_calendarBegin()
 
     if (utils::DateTime::isValidYear(x)) {
         long year, month, day, hours, minutes, seconds;
-        double remain;
 
-        remain = utils::DateTime::toTime(x, year, month, day, hours,
-                                         minutes, seconds);
+        utils::DateTime::toTime(x, year, month, day, hours, minutes, seconds);
 
         cal.selectDate((int)day, (int)month, (int)year);
     }
