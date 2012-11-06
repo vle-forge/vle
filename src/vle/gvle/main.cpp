@@ -1,25 +1,24 @@
 /*
- * @file apps/gvle/main.cpp
- *
  * This file is part of VLE, a framework for multi-modeling, simulation
- * and analysis of complex dynamical systems
+ * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2011 INRA http://www.inra.fr
+ * Copyright (c) 2003-2012 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2012 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2012 INRA http://www.inra.fr
  *
- * See the AUTHORS or Authors.txt file for copyright owners and contributors
+ * See the AUTHORS or Authors.txt file for copyright owners and
+ * contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -99,7 +98,7 @@ static void print_help()
     std::fprintf(stderr,
                  _("GVLE - the Gui of VLE\n"
                    "Virtual Laboratory Environment - %s\n"
-                   "Copyright (C) 2003 - 2011 The VLE Development Team.\n"),
+                   "Copyright (C) 2003 - 2012 The VLE Development Team.\n"),
                  VLE_NAME_COMPLETE);
 }
 
@@ -108,7 +107,7 @@ static void print_infos()
     std::fprintf(stderr,
                  _("GVLE - the Gui of VLE\n"
                    "Virtual Laboratory Environment - %s\n"
-                   "Copyright (C) 2003 - 2011 The VLE Development Team.\n"
+                   "Copyright (C) 2003 - 2012 The VLE Development Team.\n"
                    "VLE comes with ABSOLUTELY NO WARRANTY.\n"
                    "You may redistribute copies of VLE\n"
                    "under the terms of the GNU General Public License.\n"

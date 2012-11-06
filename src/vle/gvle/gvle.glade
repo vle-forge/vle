@@ -11,7 +11,7 @@
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">VLE</property>
-    <property name="copyright" translatable="yes">Copyright © 2003-2007 Gauthier Quesnel quesnel@users.sourceforge.net
+    <property name="copyright" translatable="yes">Copyright © 2003-2012 Gauthier Quesnel quesnel@users.sourceforge.net
 Copyright © 2003-2012 ULCO http://www.univ-littoral.fr
 Copyright © 2007-2012 INRA http://www.inra.fr</property>
     <property name="comments" translatable="yes">The Virtual Laboratory Environment</property>
