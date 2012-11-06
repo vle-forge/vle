@@ -35,12 +35,10 @@
 #include <vle/utils/Module.hpp>
 #include <vle/version.hpp>
 
-#include <glibconfig.h>
 #include <glibmm/markup.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/thread.h>
 #include <glibmm/miscutils.h>
-#include <glib/gstdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>

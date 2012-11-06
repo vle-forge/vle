@@ -29,7 +29,7 @@
 #ifndef VLE_VPZ_REPLICAS_HPP
 #define VLE_VPZ_REPLICAS_HPP
 
-#include <glib/gtypes.h>
+#include <glib.h>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/DllDefines.hpp>
 

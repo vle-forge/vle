@@ -27,7 +27,7 @@
 
 
 #include <cmath>
-#include <glib/gtypes.h>
+#include <glib.h>
 #include <vle/utils/Rand.hpp>
 
 

@@ -28,7 +28,7 @@
 
 #include <NormalGenerator.hpp>
 #include <vle/utils.hpp>
-#include <glib/gtypes.h>
+#include <glib.h>
 #include <cmath>
 
 namespace vle { namespace examples { namespace generator {
