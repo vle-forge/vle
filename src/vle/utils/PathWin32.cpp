@@ -30,12 +30,34 @@
 #include <vle/version.hpp>
 #include <glibmm/miscutils.h>
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <windows.h>
 #include <winreg.h>
 #include <fstream>
 
 namespace vle { namespace utils {
+
+static void ErrorMessage(LPCSTR description)
+{
+    LPVOID msg;
+
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                  FORMAT_MESSAGE_FROM_SYSTEM |
+                  FORMAT_MESSAGE_IGNORE_INSERTS,
+                  NULL,
+                  GetLastError(),
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                  (LPTSTR) &msg,
+                  0, NULL);
+
+    std::string finalmsg = (vle::fmt("%1%: %2%") % description % msg).str();
+
+    MessageBox(NULL, (LPCTSTR)finalmsg.c_str(), TEXT("Error"), MB_ICONERROR);
+
+    LocalFree(msg);
+    ExitProcess(1);
+}
 
 void Path::initHomeDir()
 {
@@ -51,38 +73,78 @@ void Path::initHomeDir()
     }
 }
 
+static bool win32_RegQueryValue(HKEY hkey, std::string *path)
+{
+    DWORD sz;
+    std::vector < TCHAR > buf(MAX_PATH, '\0');
+
+    if (RegQueryValueEx(hkey, (LPCTSTR)"", NULL, NULL,
+                        (LPBYTE)&buf[0], &sz) == ERROR_SUCCESS) {
+        buf[sz] = '\0';
+        path->assign(&buf[0]);
+
+        return true;
+    } else {
+        sz = MAX_PATH;
+        if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
+                            (LPBYTE)&buf[0], &sz) == ERROR_SUCCESS) {
+            buf[sz] = '\0';
+            path->assign(&buf[0]);
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Path::initPrefixDir()
 {
     m_prefix.clear();
 
-    LONG result;
     HKEY hkey;
+    bool result;
     std::string key(boost::str(fmt("%1% %2%.%3%.0") %
                                "SOFTWARE\\VLE Development Team\\VLE" %
                                VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
 
-    if ((result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(), 0,
-                               KEY_QUERY_VALUE, &hkey)) != ERROR_SUCCESS) {
-        result = RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
-                              0, KEY_QUERY_VALUE, &hkey);
-    }
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
+                     0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+        result = win32_RegQueryValue(hkey, &m_prefix);
+        RegCloseKey(hkey);
 
-    if (result == ERROR_SUCCESS) {
-        DWORD sz = 256;
-        char* buf = new char[sz];
-
-        if (RegQueryValueEx(hkey, (LPCTSTR)"", NULL, NULL,
-                            (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
-            m_prefix.assign(buf);
-        } else {
-            sz = 256;
-            if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
-                                (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
-                m_prefix.assign(buf);
-            }
+        if (result) {
+            return;
         }
-        delete[] buf;
     }
+
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
+                     0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS) {
+        result = win32_RegQueryValue(hkey, &m_prefix);
+        RegCloseKey(hkey);
+
+        if (result) {
+            return;
+        }
+    }
+
+    DWORD size;
+    std::vector < TCHAR > filepath(MAX_PATH, '\0');
+
+    if ((size = GetModuleFileName(NULL, &filepath[0], MAX_PATH))) {
+        std::vector < TCHAR > buf(MAX_PATH, '\0');
+
+        boost::filesystem::path path(&filepath[0]);
+        boost::filesystem::path result(path.parent_path().parent_path());
+
+        boost::system::error_code ec;
+        if (boost::filesystem::exists(result, ec)) {
+            m_prefix.assign(result.string());
+            return;
+        }
+    }
+
+    ErrorMessage("Failed to initialized prefix. Please, re-install VLE.");
 }
 
 std::string Path::getTempFile(const std::string& prefix,
