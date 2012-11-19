@@ -35,6 +35,8 @@ archives from the remote repositories.
 Add an MPI mode with the command line interface MPI. For MPI, VLE
 depends of an MPI library.
 
+Switch VLE to Github.
+
 Details
 =======
 
