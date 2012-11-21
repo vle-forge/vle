@@ -121,6 +121,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
 		 itv != vl.end(); ++itv) {
 
                 if (initValues.exist(itv->first)) {
+                    initValues.value().clear();
                     throw utils::InternalError(fmt(_(
                             "Multiples condition with the same init port " \
                             "name '%1%'")) % itv->first);
@@ -153,6 +154,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
                 View* view = coordinator.getView(*jt);
 
                 if (not view) {
+                    initValues.value().clear();
                     throw utils::InternalError(fmt(_(
                                 "The view '%1%' is unknow of coordinator "
                                 "view list")) % *jt);
