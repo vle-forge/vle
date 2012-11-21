@@ -68,18 +68,6 @@ DynamicBox::DynamicBox(const Glib::RefPtr < Gtk::Builder >& xml,
         mBoxDynamicPackage->pack_start(*mComboPackage);
     }
 
-    xml->get_widget("EntryDynamicLocationHost", mLocationHost);
-    xml->get_widget("SpinbuttonDynamicLocationPort", mLocationPort);
-
-    {
-        xml->get_widget("HboxDynamicLanguage", mBoxDynamicLanguage);
-        mLanguage = Gtk::manage(new Gtk::ComboBoxText());
-        mBoxDynamicLanguage->pack_start(*mLanguage);
-        mLanguage->show();
-        mLanguage->append_text("c++");
-        mLanguage->append_text("python");
-    }
-
     xml->get_widget("buttonNewDynamicLibrary", mButtonNew);
 
     mList.push_back(mButtonNew->signal_clicked().connect(
@@ -97,7 +85,6 @@ DynamicBox::~DynamicBox()
 
     mBoxDynamicLibrary->remove(*mComboLibrary);
     mBoxDynamicPackage->remove(*mComboPackage);
-    mBoxDynamicLanguage->remove(*mLanguage);
 }
 
 void DynamicBox::show(vpz::Dynamic* dyn)
@@ -107,12 +94,6 @@ void DynamicBox::show(vpz::Dynamic* dyn)
     mDialog->set_title((fmt(_("Dynamics: %1%")) % dyn->name()).str());
     makeComboPackage();
     makeComboLibrary();
-
-    if (dyn->language().empty()) {
-        mLanguage->set_active_text("c++");
-    } else {
-        mLanguage->set_active_text(dyn->language());
-    }
 
     if (mDialog->run() == Gtk::RESPONSE_OK) {
         mDialog->hide();
@@ -171,12 +152,6 @@ void DynamicBox::on_apply()
 
     mDyn->setLibrary(mComboLibrary->get_active_text());
     mDyn->setPackage(mComboPackage->get_active_text());
-
-    if (mLanguage->get_active_text() == "c++") {
-        mDyn->setLanguage("");
-    } else {
-        mDyn->setLanguage(mLanguage->get_active_text());
-    }
 }
 
 void DynamicBox::on_cancel()

@@ -82,15 +82,11 @@ namespace vle { namespace gvle {
         Gtk::Dialog*                        mDialog;
         Gtk::ComboBoxText*                  mComboLibrary;
         Gtk::ComboBoxText*                  mComboPackage;
-        Gtk::Entry*                         mLocationHost;
-        Gtk::SpinButton*                    mLocationPort;
-        Gtk::ComboBoxText*                  mLanguage;
         Gtk::Button*                        mButtonNew;
         vpz::Dynamic*                       mDyn;
 
         Gtk::HBox* mBoxDynamicLibrary;
         Gtk::HBox* mBoxDynamicPackage;
-        Gtk::HBox* mBoxDynamicLanguage;
 
         std::list < sigc::connection >      mList;
 
