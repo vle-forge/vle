@@ -85,9 +85,6 @@ namespace vle { namespace gvle {
         Gtk::TreeView*                      mDynamics;
         Gtk::ComboBox*                      mPackage;
         Gtk::ComboBox*                      mLibrary;
-        Gtk::Entry*                         mLocationHost;
-        Gtk::SpinButton*                    mLocationPort;
-        Gtk::ComboBox*                      mLanguage;
 
         Gtk::CellRendererText*              mCellRenderer;
         int                                 mColumnName;
@@ -101,10 +98,8 @@ namespace vle { namespace gvle {
 
         Glib::RefPtr<Gtk::ListStore>        mDynamicsListStore;
         Glib::RefPtr<Gtk::ListStore>        mPackageListStore;
-        Glib::RefPtr<Gtk::ListStore>        mLanguageListStore;
         Glib::RefPtr<Gtk::ListStore>        mLibraryListStore;
 
-        Gtk::TreeModel::Row                 mRowLanguage;
         Gtk::TreeModel::Row                 mRowPackage;
         Gtk::TreeModel::Row                 mRowLibrary;
 
@@ -136,11 +131,6 @@ namespace vle { namespace gvle {
         void setPackageStr(Glib::ustring str);
         Glib::ustring getPackageStr();
 
-        void initLanguage();
-        void fillLanguage();
-        void setLanguageStr(Glib::ustring str);
-        Glib::ustring getLanguageStr();
-
         void initLibrary();
         void fillLibrary();
         void setLibraryStr(Glib::ustring str);
@@ -166,14 +156,6 @@ namespace vle { namespace gvle {
 
             Gtk::TreeModelColumn<Glib::ustring> mContent;
         } mPackageColumns;
-
-        struct LanguageModelColumns : public Gtk::TreeModel::ColumnRecord
-        {
-            LanguageModelColumns()
-            { add(mContent); }
-
-            Gtk::TreeModelColumn<Glib::ustring> mContent;
-        } mLanguageColumns;
 
         struct LibraryModelColumns : public Gtk::TreeModel::ColumnRecord
         {
