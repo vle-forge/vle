@@ -46,9 +46,6 @@ DynamicsBox::DynamicsBox(Modeling& modeling,
     mXml->get_widget("treeviewDialogDynamics", mDynamics);
     mXml->get_widget("comboboxPackage", mPackage);
     mXml->get_widget("comboboxLibrary", mLibrary);
-    mXml->get_widget("entryLocation", mLocationHost);
-    mXml->get_widget("spinbuttonLocation", mLocationPort);
-    mXml->get_widget("comboboxLanguage", mLanguage);
 
     initDynamics();
     fillDynamics();
@@ -57,9 +54,6 @@ DynamicsBox::DynamicsBox(Modeling& modeling,
     fillPackage();
 
     initLibrary();
-
-    initLanguage();
-    fillLanguage();
 
     initMenuPopupDynamics();
 
@@ -346,9 +340,6 @@ void DynamicsBox::sensitive(bool active)
 {
     mPackage->set_sensitive(active);
     mLibrary->set_sensitive(active);
-    mLocationHost->set_sensitive(active);
-    mLocationPort->set_sensitive(active);
-    mLanguage->set_sensitive(active);
 }
 
 bool DynamicsBox::onButtonRealeaseDynamics(GdkEventButton* event)
@@ -414,12 +405,6 @@ void DynamicsBox::assignDynamic(const std::string& name)
 
     dyn.setPackage(getPackageStr());
 
-    if (getLanguageStr() == "c++") {
-        dyn.setLanguage("");
-    } else {
-        dyn.setLanguage(getLanguageStr());
-    }
-
     dyn.setLibrary(getLibraryStr());
 }
 
@@ -434,11 +419,6 @@ void DynamicsBox::updateDynamic(const std::string& name)
     fillLibrary();
     setLibraryStr(dyn.library());
 
-    if (dyn.language().empty()) {
-        setLanguageStr("c++");
-    } else {
-        setLanguageStr(dyn.language());
-    }
 }
 
 void DynamicsBox::applyRenaming()
@@ -548,6 +528,9 @@ void DynamicsBox::fillLibrary()
         }
         it++;
     }
+
+    mLibraryListStore->set_sort_column(0, Gtk::SORT_ASCENDING);
+
     mLibrary->pack_start(mLibraryColumns.mContent);
 }
 
@@ -571,50 +554,6 @@ Glib::ustring DynamicsBox::getLibraryStr()
         Gtk::TreeModel::Row row = *iter;
         if(row)
             return row[mLibraryColumns.mContent];
-    }
-    return "";
-}
-
-void DynamicsBox::initLanguage()
-{
-    mLanguageListStore = Gtk::ListStore::create(mLanguageColumns);
-    mLanguage->set_model(mLanguageListStore);
-}
-
-void DynamicsBox::fillLanguage()
-{
-    mLanguage->clear();
-    mLanguageListStore->clear();
-
-    mRowLanguage = *(mLanguageListStore->append());
-    mRowLanguage[mLanguageColumns.mContent] = "c++";
-
-    mRowLanguage = *(mLanguageListStore->append());
-    mRowLanguage[mLanguageColumns.mContent] = "python";
-
-    mLanguage->pack_start(mLanguageColumns.mContent);
-}
-
-void DynamicsBox::setLanguageStr(Glib::ustring str)
-{
-    const Gtk::TreeModel::Children& child = mLanguageListStore->children();
-    Gtk::TreeModel::Children::const_iterator it = child.begin();
-    while (it != child.end()) {
-        if (it and (*it)[mLanguageColumns.mContent] == str) {
-            mLanguage->set_active(it);
-        }
-        ++it;
-    }
-}
-
-Glib::ustring DynamicsBox::getLanguageStr()
-{
-    Gtk::TreeModel::iterator iter = mLanguage->get_active();
-    if (iter)
-    {
-        Gtk::TreeModel::Row row = *iter;
-        if (row)
-            return row[mLanguageColumns.mContent];
     }
     return "";
 }
