@@ -180,21 +180,22 @@ void ModelFactory::createModels(Coordinator& coordinator,
     vpz::AtomicModelVector atomicmodellist;
     vpz::BaseModel* mdl = model.model();
 
-    if (mdl->isAtomic()) {
-        atomicmodellist.push_back((vpz::AtomicModel*)mdl);
-    } else {
-        vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
-    }
+    if (mdl) {
+        if (mdl->isAtomic()) {
+            atomicmodellist.push_back((vpz::AtomicModel*)mdl);
+        } else {
+            vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
+        }
 
-    for (vpz::AtomicModelVector::iterator it = atomicmodellist.begin();
-         it != atomicmodellist.end(); ++it) {
-        createModel(coordinator,
-                    *it,
-                    (*it)->dynamics(),
-                    (*it)->conditions(),
-                    (*it)->observables());
+        for (vpz::AtomicModelVector::iterator it = atomicmodellist.begin();
+             it != atomicmodellist.end(); ++it) {
+            createModel(coordinator,
+                        *it,
+                        (*it)->dynamics(),
+                        (*it)->conditions(),
+                        (*it)->observables());
+        }
     }
-
 }
 
 vpz::BaseModel* ModelFactory::createModelFromClass(Coordinator& coordinator,
