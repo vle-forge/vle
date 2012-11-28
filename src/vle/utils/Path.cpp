@@ -611,7 +611,17 @@ std::string Path::getPackageFromPath(const std::string& path)
 
 void Path::initVleHomeDirectory()
 {
-    fs::create_directory(getPackagesDir());
+    boost::system::error_code ec;
+
+    fs::path pkgs = getPackagesDir();
+
+    if (not fs::exists(pkgs, ec)) {
+        if (not fs::create_directories(getPackagesDir(), ec)) {
+            throw FileError(fmt(
+                    _("Failed to build VLE_HOME directory (%1%):\n%2%")) %
+                pkgs.string() % ec.message());
+        }
+    }
 }
 
 /*
