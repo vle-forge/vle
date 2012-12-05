@@ -32,6 +32,8 @@ FIND_PACKAGE(VLE REQUIRED)
 
 FIND_PACKAGE(VleCheckPackage REQUIRED)
 FIND_PACKAGE(VleCheckAndDeclareGeneratedModels REQUIRED)
+SET(VLE_ABI_VERSION 1.1)
+
 #VLE_CHECK_PACKAGE(CELLDEVS vle.extension.celldevs)
 #VLE_CHECK_PACKAGE(CELLQSS vle.extension.cellqss)
 #VLE_CHECK_PACKAGE(DECISION vle.extension.decision)
