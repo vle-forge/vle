@@ -241,9 +241,15 @@ void Coordinator::delModel(vpz::CoupledModel* parent,
 
     if (not mdl) {
         throw utils::InternalError(fmt(_(
-                "Cannot delete an unknow model '%1%'")) % modelname);
+                "Cannot delete an unknown model '%1%'")) % modelname);
     }
 
+    delModel(parent, mdl);
+}
+
+void Coordinator::delModel(vpz::CoupledModel *parent,
+                           vpz::BaseModel *mdl)
+{
     if (mdl->isCoupled()) {
         delCoupledModel(parent, (vpz::CoupledModel*)mdl);
         parent->delAllConnection(mdl);
@@ -384,7 +390,7 @@ void Coordinator::delAtomicModel(vpz::CoupledModel* parent,
         View* View = (*it2).second;
         View->removeObservable(satom);
     }
-    m_eventTable.invalidateModel(satom);
+    m_eventTable.delModelEvents(satom);
     satom->clear();
     m_deletedSimulator.push_back(satom);
 
@@ -404,11 +410,7 @@ void Coordinator::delCoupledModel(vpz::CoupledModel* parent,
     vpz::ModelList& lst = mdl->getModelList();
     for (vpz::ModelList::iterator it = lst.begin(); it != lst.end();
          ++it) {
-        if (it->second->isAtomic()) {
-            delAtomicModel(mdl, (vpz::AtomicModel*)(it->second));
-        } else if (it->second->isCoupled()) {
-            delCoupledModel(mdl, (vpz::CoupledModel*)(it->second));
-        }
+        delModel(parent, it->second);
     }
 }
 

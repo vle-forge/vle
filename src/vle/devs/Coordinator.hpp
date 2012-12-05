@@ -360,6 +360,15 @@ private:
                                Simulator* sim);
 
     /**
+     * @brief Delete the model from Devs::Graph. Use this function instead of
+     * using directly the delAtomicModel or delCoupledModel.
+     *
+     * @param parent a reference to the parent.
+     * @param atom the model to delete.
+     */
+    void delModel(vpz::CoupledModel *parent, vpz::BaseModel *atom);
+
+    /**
      * @brief Delete the atomic model from Devs::Graph, the Simulator
      * from Coordinator and clean all events on devs::EventTable. Do not use
      * the AtomicModel after this function, it is delete.

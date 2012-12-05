@@ -58,29 +58,19 @@ std::map < Simulator*, EventBagModel >::value_type&
     throw utils::InternalError(_("Top bag problem"));
 }
 
-void CompleteEventBagModel::invalidateModel(Simulator* mdl)
+void CompleteEventBagModel::delModel(Simulator* mdl)
 {
     std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
     if (it != _bags.end()) {
         it->second.clear();
+
+        if (it == _itbags)
+            _itbags++;
+
+        _bags.erase(it);
     }
 
     _states.remove(mdl);
-}
-
-void CompleteEventBagModel::delModel(Simulator* mdl)
-{
-    {
-        std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
-        if (it != _bags.end()) {
-            it->second.clear();
-            _bags.erase(it);
-        }
-    }
-
-    std::for_each(_states.begin(),
-                  _states.end(),
-                  ViewEventList::RemoveSimulator(mdl));
 }
 
 EventTable::EventTable(size_t sz)
@@ -262,29 +252,6 @@ void EventTable::popObservationEvent()
     }
 }
 
-void EventTable::invalidateModel(Simulator* mdl)
-{
-    {
-        InternalEventModel::iterator it = mInternalEventModel.find(mdl);
-        if (it != mInternalEventModel.end()) {
-            if ((*it).second) {
-                (*it).second->invalidate();
-                (*it).second = 0;
-            }
-        }
-    }
-
-    {
-        ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
-        if (it != mExternalEventModel.end()) {
-            (*it).second.deleteAndClear();
-        }
-    }
-
-    mObservationEventList.remove(mdl);
-    mCompleteEventBagModel.invalidateModel(mdl);
-}
-
 void EventTable::delModelEvents(Simulator* mdl)
 {
     {
@@ -292,6 +259,7 @@ void EventTable::delModelEvents(Simulator* mdl)
         if (it != mInternalEventModel.end()) {
             if ((*it).second)
                 (*it).second->invalidate();
+
             mInternalEventModel.erase(it);
         }
     }
