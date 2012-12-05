@@ -587,12 +587,6 @@ ConditionsBox::ConditionsBox(const Glib::RefPtr < Gtk::Builder >& xml,
         mButtonCancel->signal_clicked().connect(
 	    sigc::mem_fun
 	    (*this, &ConditionsBox::on_cancel));
-
-    xml->get_widget("ButtonConditionsApply", mButtonApply);
-    if (mButtonApply)
-        mButtonApply->signal_clicked().connect(
-	    sigc::mem_fun
-	    (*this, &ConditionsBox::on_apply));
 }
 
 ConditionsBox::~ConditionsBox()
@@ -629,10 +623,14 @@ void ConditionsBox::buildTreeValues(const std::string& conditionName,
 int ConditionsBox::run(const vpz::Conditions& conditions)
 {
     mRenameList.clear();
+    mDialog->hide();
+
     mConditions = new vpz::Conditions(conditions);
     buildTreeConditions();
     mDialog->show_all();
-    return mDialog->run();
+    int response = mDialog->run();
+    mDialog->hide();
+    return response;
 }
 
 renameList ConditionsBox::apply(vpz::Conditions& conditions)
@@ -653,21 +651,11 @@ renameList ConditionsBox::apply(vpz::Conditions& conditions)
     return mRenameList;
 }
 
-void ConditionsBox::on_apply()
-{
-    if (mDialog) {
-        mDialog->hide();
-    }
-}
-
 void ConditionsBox::on_cancel()
 {
     mRenameList.clear();
     delete mConditions;
     mConditions = 0;
-    if (mDialog) {
-        mDialog->hide();
-    }
 }
 
 } } // namespace vle gvle

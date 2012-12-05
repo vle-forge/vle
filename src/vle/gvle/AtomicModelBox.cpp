@@ -958,7 +958,7 @@ void AtomicModelBox::DynamicTreeView::onAdd()
 
     std::string name = box.run();
     if (box.valid()) {
-	box.hide_all();
+	box.hide();
         name = boost::trim_copy(name);
         if (mDynamics->exist(name)) {
             Error((fmt(_("The Dynamics '%1%' already exists")) % name).str());
@@ -1049,7 +1049,7 @@ void AtomicModelBox::DynamicTreeView::onRename()
 
             std::string newName = box.run();
             if (box.valid() and not newName.empty()) {
-                box.hide_all();
+                box.hide();
                 newName = boost::trim_copy(newName);
                 if (mDynamics->exist(newName)) {
                     Error(
@@ -1381,7 +1381,7 @@ void AtomicModelBox::ObservableTreeView::onRename()
                                    oldName);
             std::string newName = box.run();
             if (box.valid() and not newName.empty()) {
-                box.hide_all();
+                box.hide();
                 newName = boost::trim_copy(newName);
                 if ((*it)[mColumnsObs.m_col_sel] == true) {
                     mAtom->setObservables(newName);
@@ -1519,7 +1519,7 @@ AtomicModelBox::AtomicModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
 
 AtomicModelBox::~AtomicModelBox()
 {
-    mDialog->hide_all();
+    mDialog->hide();
 }
 
 void AtomicModelBox::show(vpz::AtomicModel* model)
@@ -1570,6 +1570,7 @@ void AtomicModelBox::show(vpz::AtomicModel* model)
 
     mDialog->show_all();
     mDialog->run();
+    mDialog->hide();
 }
 
 void AtomicModelBox::applyPorts()
@@ -1734,8 +1735,6 @@ void AtomicModelBox::on_apply()
 
     delete mModel;
     mModel = 0;
-
-    mDialog->hide_all();
 }
 
 void AtomicModelBox::on_cancel()
@@ -1748,8 +1747,6 @@ void AtomicModelBox::on_cancel()
     mDyn = 0;
     delete mObs;
     mObs = 0;
-
-    mDialog->hide_all();
 }
 
 void AtomicModelBox::refresh()
