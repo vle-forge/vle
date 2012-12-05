@@ -241,6 +241,9 @@ namespace vle { namespace devs {
         inline void deleteStates()
         { _states.erase(); }
 
+        /*
+         * @deprecated Do not use this function.
+         */
         void invalidateModel(Simulator*);
 
         void delModel(Simulator*);
@@ -360,6 +363,8 @@ namespace vle { namespace devs {
          * @brief Delete all event from Simulator.
          *
          * @param mdl the model to delete events.
+         *
+         * @deprecated Do not use this function.
          */
         void invalidateModel(Simulator* mdl);
 

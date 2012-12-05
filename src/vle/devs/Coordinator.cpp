@@ -245,9 +245,15 @@ void Coordinator::delModel(graph::CoupledModel* parent,
 
     if (not mdl) {
         throw utils::InternalError(fmt(_(
-                "Cannot delete an unknow model '%1%'")) % modelname);
+                "Cannot delete an unknown model '%1%'")) % modelname);
     }
 
+    delModel(parent, mdl);
+}
+
+void Coordinator::delModel(graph::CoupledModel *parent,
+                           graph::Model *mdl)
+{
     if (mdl->isCoupled()) {
         delCoupledModel(parent, (graph::CoupledModel*)mdl);
         parent->delAllConnection(mdl);
@@ -398,7 +404,7 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
         View* View = (*it2).second;
         View->removeObservable(satom);
     }
-    m_eventTable.invalidateModel(satom);
+    m_eventTable.delModelEvents(satom);
     satom->clear();
     m_deletedSimulator.push_back(satom);
 
@@ -418,11 +424,7 @@ void Coordinator::delCoupledModel(graph::CoupledModel* parent,
     graph::ModelList& lst = mdl->getModelList();
     for (graph::ModelList::iterator it = lst.begin(); it != lst.end();
          ++it) {
-        if (it->second->isAtomic()) {
-            delAtomicModel(mdl, (graph::AtomicModel*)(it->second));
-        } else if (it->second->isCoupled()) {
-            delCoupledModel(mdl, (graph::CoupledModel*)(it->second));
-        }
+        delModel(parent, it->second);
     }
 }
 

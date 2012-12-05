@@ -355,6 +355,9 @@ namespace vle { namespace devs {
         void dispatchExternalEvent(ExternalEventList& eventList,
                                    Simulator* sim);
 
+        void delModel(graph::CoupledModel *parent,
+                      graph::Model *atom);
+
         /**
          * @brief Delete the atomic model from Devs::Graph, the Simulator
          * from Coordinator and clean all events on devs::EventTable. Do not use

@@ -65,27 +65,26 @@ std::map < Simulator*, EventBagModel >::value_type&
 
 void CompleteEventBagModel::invalidateModel(Simulator* mdl)
 {
-    std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
-    if (it != _bags.end()) {
-        it->second.clear();
-    }
+    (void)mdl;
 
-    _states.remove(mdl);
+    throw utils::InternalError(
+        _("Do not use CompleteEventBagModel::invalidateModel, consider using "
+          "CompleteEventBagModel::delModel"));
 }
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
-    {
-        std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
-        if (it != _bags.end()) {
-            it->second.clear();
-            _bags.erase(it);
-        }
+    std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
+    if (it != _bags.end()) {
+        it->second.clear();
+
+        if (it == _itbags)
+            _itbags++;
+
+        _bags.erase(it);
     }
 
-    std::for_each(_states.begin(),
-                  _states.end(),
-                  ViewEventList::RemoveSimulator(mdl));
+    _states.remove(mdl);
 }
 
 EventTable::EventTable(size_t sz)
@@ -280,26 +279,11 @@ void EventTable::popObservationEvent()
 
 void EventTable::invalidateModel(Simulator* mdl)
 {
-    {
-        InternalEventModel::iterator it = mInternalEventModel.find(mdl);
-        if (it != mInternalEventModel.end()) {
-            if ((*it).second) {
-                (*it).second->invalidate();
-                (*it).second = 0;
-            }
-        }
-    }
+    (void)mdl;
 
-    {
-        ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
-        if (it != mExternalEventModel.end()) {
-            (*it).second.first.deleteAndClear();
-            (*it).second.second.deleteAndClear();
-        }
-    }
-
-    mObservationEventList.remove(mdl);
-    mCompleteEventBagModel.invalidateModel(mdl);
+    throw utils::InternalError(
+        _("Do not use EventTable::invalidateModel, consider using "
+          "EventTable::delModelEvents"));
 }
 
 void EventTable::delModelEvents(Simulator* mdl)
@@ -309,6 +293,7 @@ void EventTable::delModelEvents(Simulator* mdl)
         if (it != mInternalEventModel.end()) {
             if ((*it).second)
                 (*it).second->invalidate();
+
             mInternalEventModel.erase(it);
         }
     }
