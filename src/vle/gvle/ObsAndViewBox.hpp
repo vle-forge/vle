@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_GVLE_OBSANDVIEWBOX_HPP
 #define VLE_GVLE_OBSANDVIEWBOX_HPP
 

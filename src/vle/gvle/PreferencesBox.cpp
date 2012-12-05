@@ -87,7 +87,7 @@ public:
                       DisconnectSignal());
 
         if (mDialog) {
-            mDialog->hide_all();
+            mDialog->hide();
         }
     }
 
@@ -102,20 +102,20 @@ public:
         loadSettings();
 
         mDialog->show_all();
-        return mDialog->run();
+        int response = mDialog->run();
+        mDialog->hide();
+        return response;
     }
 
     void onApply()
     {
         saveSettings();
 
-        mDialog->hide_all();
         mDialog->response(Gtk::RESPONSE_OK);
     }
 
     void onCancel()
     {
-        mDialog->hide_all();
         mDialog->response(Gtk::RESPONSE_CANCEL);
     }
 

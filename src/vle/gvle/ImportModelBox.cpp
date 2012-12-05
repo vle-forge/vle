@@ -169,7 +169,7 @@ bool ImportModelBox::show(vpz::Vpz* src)
     mButtonApply->set_sensitive(true);
     mButtonCancel->set_sensitive(true);
     mNbWidgetIncorrect = 0;
-    mReturn = true;
+    mReturn = false;
 
     makeDynamics();
     makeConditions();
@@ -180,6 +180,8 @@ bool ImportModelBox::show(vpz::Vpz* src)
 
     mDialog->show_all();
     mDialog->run();
+    mDialog->hide();
+
 
     return mReturn;
 }
@@ -496,8 +498,6 @@ void ImportModelBox::makeModels()
 
 void ImportModelBox::on_apply()
 {
-    mDialog->hide_all();
-
     ImportWidget* widget;
     list_widget::iterator it;
 
@@ -547,7 +547,6 @@ void ImportModelBox::on_apply()
 
 void ImportModelBox::on_cancel()
 {
-    mDialog->hide_all();
     mReturn = false;
     mNbWidgetIncorrect = 0;
 }
