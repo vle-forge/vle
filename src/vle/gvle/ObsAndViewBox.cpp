@@ -116,12 +116,12 @@ void ObsAndViewBox::show(vpz::Observables& obs, std::string name,
     mDialog->set_title(_("Observable ")+name);
     mDialog->show_all();
     mDialog->run();
+    mDialog->hide();
 }
 
 void ObsAndViewBox::on_apply()
 {
     mValid = true;
-    mDialog->hide_all();
     delete mAll_Obs_backup;
     delete mViews_backup;
 }
@@ -129,7 +129,6 @@ void ObsAndViewBox::on_apply()
 void ObsAndViewBox::on_cancel()
 {
     mValid = false;
-    mDialog->hide_all();
 
     mAll_Obs->clear();
     mAll_Obs->add(*mAll_Obs_backup);

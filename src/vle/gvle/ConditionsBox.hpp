@@ -150,7 +150,6 @@ class ConditionsBox
 	// Override Signal handler:
 	// Alternatively, use signal_button_press_event().connect_notify()
 	virtual bool on_button_press_event(GdkEventButton *ev);
-
 	void on_select();
 	//Signal handler for popup menu items:
 	virtual void on_add();
@@ -227,7 +226,6 @@ private:
     void buildTreeValues(const std::string& conditionName,
 			 const std::string& port_name);
 
-    void on_apply();
     void on_cancel();
 };
 

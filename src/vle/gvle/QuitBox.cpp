@@ -50,11 +50,6 @@ QuitBox::QuitBox(const Glib::RefPtr < Gtk::Builder >& xml,
     xml->get_widget("ButtonQuitSaved", mButtonSave);
     mButtonSave->signal_clicked().connect(
 	sigc::mem_fun(*this, &QuitBox::onSave));
-
-    xml->get_widget("ButtonQuitCancel", mButtonCancel);
-    mButtonCancel->signal_clicked().connect(
-	sigc::mem_fun(*this, &QuitBox::onCancel));
-
     xml->get_widget("ButtonQuitNotSaved", mButtonClose);
     mButtonClose->signal_clicked().connect(
 	sigc::mem_fun(*this, &QuitBox::onClose));
@@ -75,7 +70,8 @@ void QuitBox::show()
 	}
 	mDialog->set_title("Open Package");
 	mDialog->show_all();
-	mDialog->run();
+        mDialog->run();
+        mDialog->hide();
     } else {
 	mApp->hide();
     }
@@ -116,14 +112,8 @@ void QuitBox::onSave()
     mApp->hide();
 }
 
-void QuitBox::onCancel()
-{
-    mDialog->hide_all();
-}
-
 void QuitBox::onClose()
 {
-    mDialog->hide_all();
     mApp->hide();
 }
 

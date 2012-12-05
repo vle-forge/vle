@@ -1739,7 +1739,10 @@ void GVLE::importModel()
     filter.add_pattern("*.vpz");
     file.add_filter(filter);
 
-    if (file.run() == Gtk::RESPONSE_OK) {
+    int response = file.run();
+    file.hide();
+
+    if (response == Gtk::RESPONSE_OK) {
         std::string project_file = file.get_filename();
         try {
             using namespace vpz;
