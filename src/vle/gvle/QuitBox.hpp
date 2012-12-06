@@ -76,7 +76,6 @@ private:
     Gtk::Label*                     mMessage;
 
     void onSave();
-    void onCancel();
     void onClose();
 };
 
