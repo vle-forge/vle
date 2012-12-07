@@ -37,14 +37,14 @@
 
 #define DECLARE_EXECUTIVE_DBG(mdl)                                      \
     extern "C" {                                                        \
-        VLE_API vle::devs::Dynamics*                                 \
+        VLE_MODULE vle::devs::Dynamics*                                 \
         vle_make_new_executive(const vle::devs::ExecutiveInit& init,    \
                                const vle::devs::InitEventList& events)  \
         {                                                               \
             return new vle::devs::ExecutiveDbg < mdl >(init, events);   \
         }                                                               \
                                                                         \
-        VLE_API void                                                 \
+        VLE_MODULE void                                                 \
         vle_api_level(vle::uint32_t* major,                             \
                       vle::uint32_t* minor,                             \
                       vle::uint32_t* patch)                             \

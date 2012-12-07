@@ -62,9 +62,11 @@
 #    define VLE_API VLE_HELPER_DLL_IMPORT
 #  endif
 #  define VLE_LOCAL VLE_HELPER_DLL_LOCAL
+#  define VLE_MODULE VLE_HELPER_DLL_EXPORT
 #else
 #  define VLE_API
 #  define VLE_LOCAL
+#  define VLE_MODULE VLE_HELPER_DLL_EXPORT
 #endif
 
 #endif

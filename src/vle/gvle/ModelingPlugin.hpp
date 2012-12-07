@@ -39,22 +39,22 @@
 
 #define DECLARE_GVLE_MODELINGPLUGIN(x)                          \
     extern "C" {                                                \
-	VLE_API vle::gvle::ModelingPlugin*                   \
-	vle_make_new_gvle_modeling(const std::string& package,  \
-				   const std::string& library)  \
-	{                                                       \
-	    return new x(package, library);                     \
-	}                                                       \
+        VLE_MODULE vle::gvle::ModelingPlugin*                   \
+        vle_make_new_gvle_modeling(const std::string& package,  \
+                                   const std::string& library)  \
+        {                                                       \
+            return new x(package, library);                     \
+        }                                                       \
                                                                 \
-	VLE_API void                                         \
-	vle_api_level(vle::uint32_t* major,                     \
-		      vle::uint32_t* minor,                     \
-		      vle::uint32_t* patch)                     \
-	{                                                       \
-	    *major = VLE_MAJOR_VERSION;                         \
-	    *minor = VLE_MINOR_VERSION;                         \
-	    *patch = VLE_PATCH_VERSION;                         \
-	}                                                       \
+        VLE_MODULE void                                         \
+        vle_api_level(vle::uint32_t* major,                     \
+                      vle::uint32_t* minor,                     \
+                      vle::uint32_t* patch)                     \
+        {                                                       \
+            *major = VLE_MAJOR_VERSION;                         \
+            *minor = VLE_MINOR_VERSION;                         \
+            *patch = VLE_PATCH_VERSION;                         \
+        }                                                       \
     }
 
 namespace vle { namespace gvle {
