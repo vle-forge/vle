@@ -1,3 +1,4 @@
+
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
@@ -111,11 +112,14 @@ struct Package::Pimpl
             m_spawn.status(&m_message, &m_issuccess);
         }
 
-        if (not m_spawn.start(exe, workingDir, argv)) {
+        bool started = m_spawn.start(exe, workingDir, argv);
+
+        utils::Package::package().changeToOutputDirectory();
+
+        if (not started) {
             throw utils::ArgError(fmt(_("Failed to start `%1%'")) % exe);
         }
     }
-
 };
 
 
