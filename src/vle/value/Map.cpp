@@ -26,15 +26,10 @@
 
 
 #include <vle/value/Map.hpp>
-#include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Boolean.hpp>
 #include <vle/value/Matrix.hpp>
-#include <vle/value/XML.hpp>
 #include <vle/utils/Algo.hpp>
-#include <boost/utility.hpp>
+#include <boost/checked_delete.hpp>
 
 namespace vle { namespace value {
 

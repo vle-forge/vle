@@ -29,7 +29,6 @@
 #define VLE_UTILS_TOOLS_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/utils/Types.hpp>
 #include <typeinfo>
 #include <string>
 

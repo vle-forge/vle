@@ -27,8 +27,6 @@
 
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Trace.hpp>
-#include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
 #include <boost/lexical_cast.hpp>

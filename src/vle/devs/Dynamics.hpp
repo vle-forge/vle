@@ -31,8 +31,6 @@
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/EventList.hpp>
-#include <vle/devs/EventTable.hpp>
-#include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/ObservationEvent.hpp>

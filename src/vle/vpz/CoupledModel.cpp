@@ -27,7 +27,6 @@
 
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
 #include <cmath>
 #include <set>

@@ -28,8 +28,6 @@
 #ifndef VLE_MANAGER_TYPES_HPP
 #define VLE_MANAGER_TYPES_HPP
 
-#include <vle/value/Matrix.hpp>
-#include <vle/value/Set.hpp>
 #include <string>
 
 namespace vle { namespace manager  {

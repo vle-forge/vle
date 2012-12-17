@@ -25,7 +25,6 @@
  */
 
 #include <vle/vpz/Observables.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <iterator>

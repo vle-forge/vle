@@ -29,7 +29,6 @@
 #define VLE_OOV_PLUGIN_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/value/Set.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/version.hpp>
 #include <boost/shared_ptr.hpp>

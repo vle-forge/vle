@@ -30,7 +30,6 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <boost/thread.hpp>
 

@@ -29,8 +29,6 @@
 #define VLE_DEVS_EXECUTIVEDBG_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/devs/DynamicsDbg.hpp>
-#include <vle/devs/Executive.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/version.hpp>

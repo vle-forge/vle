@@ -37,7 +37,6 @@
 #include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
 #include <vle/value/Matrix.hpp>
-#include <vle/utils/Tools.hpp>
 #include <sstream>
 #include <boost/serialization/export.hpp>
 

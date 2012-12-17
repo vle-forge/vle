@@ -26,6 +26,7 @@
 
 
 #include <vle/devs/Executive.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 namespace vle { namespace devs {
 

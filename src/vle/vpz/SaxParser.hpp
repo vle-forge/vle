@@ -34,8 +34,7 @@
 #include <vle/vpz/SaxStackVpz.hpp>
 #include <vle/DllDefines.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/Map.hpp>
+#include <map>
 
 namespace vle { namespace vpz {
 

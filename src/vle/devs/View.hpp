@@ -29,12 +29,11 @@
 #define VLE_DEVS_VIEW_HPP 1
 
 #include <vle/DllDefines.hpp>
+#include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/oov/Plugin.hpp>
-#include <vle/utils/Tools.hpp>
+#include <vle/value/Matrix.hpp>
 #include <string>
 #include <map>
-#include <vector>
 
 namespace vle { namespace devs {
 

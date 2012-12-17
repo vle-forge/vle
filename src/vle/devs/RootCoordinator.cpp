@@ -27,13 +27,6 @@
 
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Coordinator.hpp>
-#include <vle/devs/ModelFactory.hpp>
-#include <vle/devs/Dynamics.hpp>
-#include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/Time.hpp>
-#include <vle/utils/Rand.hpp>
-#include <vle/vpz/BaseModel.hpp>
-#include <cmath>
 
 namespace vle { namespace devs {
 

@@ -31,7 +31,6 @@
 #include <vle/DllDefines.hpp>
 #include <vle/devs/View.hpp>
 #include <vector>
-#include <cassert>
 
 namespace vle { namespace devs {
 

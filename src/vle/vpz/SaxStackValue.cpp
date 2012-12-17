@@ -26,6 +26,9 @@
 
 
 #include <vle/vpz/SaxStackValue.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Set.hpp>
+
 
 namespace vle { namespace vpz {
 

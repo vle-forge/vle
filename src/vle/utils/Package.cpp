@@ -29,7 +29,6 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/details/Spawn.hpp>
 #include <boost/filesystem.hpp>

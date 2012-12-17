@@ -26,17 +26,10 @@
 
 
 #include <vle/translator/MatrixTranslator.hpp>
-#include <vle/devs/Coordinator.hpp>
-#include <vle/utils/Rand.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/value/Boolean.hpp>
-#include <vle/value/Double.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
-#include <vle/value/XML.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/vpz/CoupledModel.hpp>
-#include <boost/format.hpp>
 #include <boost/cast.hpp>
 
 namespace vle { namespace translator {

@@ -28,21 +28,15 @@
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/Executive.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/ObservationEvent.hpp>
-#include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/value/Value.hpp>
 
 using std::vector;
 using std::map;

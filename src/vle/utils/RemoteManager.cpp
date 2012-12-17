@@ -33,7 +33,7 @@
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DownloadManager.hpp>
-#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
@@ -43,15 +43,11 @@
 #include <vle/utils/details/PackageManager.hpp>
 #include <vle/version.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/regex.hpp>
 #include <fstream>
 #include <ostream>

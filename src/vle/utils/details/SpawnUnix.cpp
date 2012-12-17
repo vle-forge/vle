@@ -26,8 +26,6 @@
 
 #include <vle/utils/details/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
-#include <sys/types.h>
-#include <sys/time.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <cerrno>

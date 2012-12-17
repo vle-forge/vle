@@ -26,7 +26,6 @@
 
 
 #include <vle/oov/CairoPlugin.hpp>
-#include <iostream>
 
 namespace vle { namespace oov {
 

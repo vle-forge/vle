@@ -27,12 +27,8 @@
 
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/devs/Dynamics.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/vpz/CoupledModel.hpp>
-#include <vle/value/Null.hpp>
 
 namespace vle { namespace devs {
 

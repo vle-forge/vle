@@ -28,9 +28,6 @@
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/vpz/CoupledModel.hpp>
-#include <algorithm>
-#include <stack>
 
 namespace vle { namespace vpz {
 

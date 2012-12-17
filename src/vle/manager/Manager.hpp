@@ -30,7 +30,6 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/ModuleManager.hpp>
-#include <vle/utils/Types.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
 

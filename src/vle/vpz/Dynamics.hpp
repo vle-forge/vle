@@ -32,7 +32,6 @@
 #include <vle/vpz/Dynamic.hpp>
 #include <set>
 #include <map>
-#include <vector>
 
 namespace vle {
 namespace vpz {

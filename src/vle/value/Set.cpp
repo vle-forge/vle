@@ -37,7 +37,6 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
-#include <boost/utility.hpp>
 #include <fstream>
 #include <sstream>
 

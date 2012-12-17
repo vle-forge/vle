@@ -30,10 +30,7 @@
 
 #include <stack>
 #include <vle/value/Value.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/Map.hpp>
 #include <vle/value/Matrix.hpp>
-#include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/DllDefines.hpp>
 

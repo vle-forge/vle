@@ -27,7 +27,6 @@
 
 #include <vle/vpz/Conditions.hpp>
 #include <vle/utils/Algo.hpp>
-#include <vle/value/Value.hpp>
 #include <algorithm>
 
 namespace vle { namespace vpz {

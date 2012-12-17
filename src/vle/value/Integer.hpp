@@ -29,9 +29,6 @@
 #define VLE_VALUE_INTEGER_HPP 1
 
 #include <vle/value/Value.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/utils/Types.hpp>
 #include <vle/DllDefines.hpp>
 
 namespace vle { namespace value {
