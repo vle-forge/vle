@@ -28,7 +28,6 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
-#include <boost/utility.hpp>
 
 namespace vle { namespace value {
 

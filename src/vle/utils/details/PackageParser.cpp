@@ -26,14 +26,10 @@
 
 #include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/details/Package.hpp>
-#include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/cast.hpp>
 #include <fstream>
 #include <cassert>
 

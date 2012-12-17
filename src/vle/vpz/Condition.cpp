@@ -30,7 +30,6 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
-#include <boost/utility.hpp>
 
 namespace vle { namespace vpz {
 

@@ -25,16 +25,12 @@
  */
 
 
-#include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/EventList.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/Simulator.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 

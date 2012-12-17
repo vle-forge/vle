@@ -25,15 +25,13 @@
  */
 
 
-#include <vle/utils//Parser.hpp>
+#include <vle/utils/Parser.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
-#include <iterator>
 
 namespace vle { namespace utils {
 

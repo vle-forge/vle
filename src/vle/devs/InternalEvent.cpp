@@ -26,7 +26,6 @@
 
 
 #include <vle/devs/InternalEvent.hpp>
-#include <string>
 
 namespace vle { namespace devs {
 

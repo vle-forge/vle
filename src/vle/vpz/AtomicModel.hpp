@@ -31,7 +31,7 @@
 #include <vle/DllDefines.hpp>
 #include <iterator>
 #include <string>
-#include <list>
+#include <set>
 
 namespace vle { namespace vpz {
 

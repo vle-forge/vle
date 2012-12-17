@@ -31,7 +31,6 @@
 #include <vle/DllDefines.hpp>
 #include <vle/utils/PackageTable.hpp>
 #include <string>
-#include <vector>
 
 namespace vle { namespace utils {
 

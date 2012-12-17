@@ -29,6 +29,7 @@
 #define VLE_VALUE_VALUE_HPP 1
 
 #include <vle/version.hpp>
+#include <vle/utils/Types.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/DllDefines.hpp>
 #include <boost/archive/text_iarchive.hpp>

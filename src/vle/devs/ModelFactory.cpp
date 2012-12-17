@@ -35,8 +35,6 @@
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Algo.hpp>
 

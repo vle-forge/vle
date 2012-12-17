@@ -28,8 +28,6 @@
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/ObservationEvent.hpp>
 
 namespace vle { namespace devs {
 

@@ -28,7 +28,6 @@
 #define VLE_UTILS_DETAILS_PACKAGEPARSER_HPP
 
 #include <vle/utils/RemoteManager.hpp>
-#include <vle/utils/details/Package.hpp>
 #include <string>
 
 namespace vle { namespace utils {

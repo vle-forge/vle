@@ -31,6 +31,7 @@
 #include <vle/utils/i18n.hpp>
 #include <iterator>
 #include <vector>
+#include <set>
 
 namespace vle { namespace vpz {
 

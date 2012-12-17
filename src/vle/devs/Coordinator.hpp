@@ -34,8 +34,6 @@
 #include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/ModelFactory.hpp>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/oov/Plugin.hpp>
 
 namespace vle { namespace devs {
 

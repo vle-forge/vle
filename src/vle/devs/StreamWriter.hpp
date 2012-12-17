@@ -30,12 +30,11 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/devs/View.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
-#include <map>
-#include <vector>
 
 namespace vle { namespace devs {
 

@@ -26,7 +26,6 @@
 
 
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/Simulator.hpp>
 
 namespace vle { namespace devs {
 

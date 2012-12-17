@@ -28,14 +28,11 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Types.hpp>
 #include <ostream>
 #include <fstream>
 #include <archive.h>
 #include <archive_entry.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 namespace vle { namespace utils {
 

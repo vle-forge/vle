@@ -27,7 +27,6 @@
 
 #include <vle/vpz/Class.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <algorithm>
 
 namespace vle { namespace vpz {
 

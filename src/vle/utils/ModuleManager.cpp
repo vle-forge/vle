@@ -25,21 +25,17 @@
  */
 
 
-#include <vle/DllDefines.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Types.hpp>
 #include <vle/version.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
-#include <boost/checked_delete.hpp>
 #include <boost/version.hpp>
-#include <algorithm>
 
 #ifdef BOOST_WINDOWS
 #include <windows.h>

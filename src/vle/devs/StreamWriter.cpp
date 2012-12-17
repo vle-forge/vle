@@ -28,9 +28,11 @@
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/oov/CairoPlugin.hpp>
+#ifdef VLE_HAVE_CAIRO
+  #include <vle/oov/CairoPlugin.hpp>
+  #include <vle/utils/Path.hpp>
+#endif
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/Path.hpp>
 #include <vle/version.hpp>
 
 namespace vle { namespace devs {

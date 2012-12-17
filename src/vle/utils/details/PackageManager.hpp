@@ -27,7 +27,7 @@
 #ifndef VLE_UTILS_DETAILS_LOCALPACKAGEMANAGER_HPP
 #define VLE_UTILS_DETAILS_LOCALPACKAGEMANAGER_HPP
 
-#include <vle/utils/details/Package.hpp>
+#include <vle/utils/RemoteManager.hpp>
 
 namespace vle { namespace utils {
 

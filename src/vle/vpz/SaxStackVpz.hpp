@@ -29,7 +29,7 @@
 #define VLE_VPZ_SAXSTACKVPZ_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/value/Value.hpp>
+#include <vle/value/Set.hpp>
 #include <libxml/xmlstring.h>
 #include <list>
 

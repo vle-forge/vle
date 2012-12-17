@@ -29,7 +29,7 @@
 #define VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/utils/Types.hpp>
+
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <string>

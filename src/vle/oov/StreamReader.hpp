@@ -31,7 +31,6 @@
 #include <vle/DllDefines.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
-#include <boost/shared_ptr.hpp>
 #include <string>
 
 namespace vle { namespace oov {

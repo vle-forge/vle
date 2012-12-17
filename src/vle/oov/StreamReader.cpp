@@ -28,8 +28,6 @@
 #include <vle/oov/StreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/value/String.hpp>
 #include <vle/version.hpp>
 
 #ifdef VLE_HAVE_CAIRO

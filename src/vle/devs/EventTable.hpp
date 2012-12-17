@@ -31,13 +31,8 @@
 #include <vle/DllDefines.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/ViewEvent.hpp>
-#include <vle/devs/EventList.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/devs/Dynamics.hpp>
-#include <string>
-#include <vector>
 #include <list>
 #include <set>
 

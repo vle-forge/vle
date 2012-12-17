@@ -31,7 +31,6 @@
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
 #include <istream>
-#include <vector>
 #include <string>
 #include <map>
 

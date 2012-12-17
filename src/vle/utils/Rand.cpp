@@ -27,8 +27,6 @@
 
 #include <cmath>
 #include <vle/utils/Rand.hpp>
-#include <vle/utils/Types.hpp>
-
 
 namespace vle { namespace utils {
 

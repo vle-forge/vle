@@ -30,14 +30,13 @@
 # define BOOST_THREAD_DONT_USE_CHRONO
 #endif
 
-#include <vle/devs/Coordinator.hpp>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/manager/Simulation.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/value/Value.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <boost/thread/thread.hpp>
 
 namespace vle { namespace manager {

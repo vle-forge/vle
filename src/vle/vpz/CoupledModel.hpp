@@ -30,6 +30,7 @@
 
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/DllDefines.hpp>
+#include <map>
 #include <vector>
 
 namespace vle { namespace vpz {
