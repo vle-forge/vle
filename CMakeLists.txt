@@ -112,7 +112,7 @@ endif ()
 option(WITH_TEST "use the libboost test unit library [default: on]" ON)
 set(Boost_USE_MULTITHREADED ON)
 
-if (BUILD_SHARED_LIBS)
+if (VLE_BUILD_SHARED_LIBS)
   set(Boost_USE_STATIC_LIBS OFF)
   set(Boost_USE_STATIC_RUNTIME OFF)
 else ()
@@ -281,6 +281,6 @@ message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
 message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
 message(STATUS "Build with MPI................: ${VLE_HAVE_MPI}")
-message(STATUS "Build shared library..........: ${BUILD_SHARED_LIBS}")
+message(STATUS "Build shared library..........: ${VLE_BUILD_SHARED_LIBS}")
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2
