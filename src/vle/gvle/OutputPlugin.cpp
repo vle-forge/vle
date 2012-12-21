@@ -26,8 +26,6 @@
 
 
 #include <vle/gvle/OutputPlugin.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace gvle {
 

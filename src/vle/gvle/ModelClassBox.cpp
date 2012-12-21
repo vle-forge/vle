@@ -25,17 +25,19 @@
  */
 
 
-#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/View.hpp>
+#include <vle/gvle/SimpleTypeBox.hpp>
+#include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/detail/trim.hpp>
 #include <boost/algorithm/string.hpp>
-#include <vle/gvle/InteractiveTypeBox.hpp>
-#include <iostream>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/stock.h>
 
 namespace vle { namespace gvle {
 

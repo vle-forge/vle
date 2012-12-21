@@ -33,9 +33,11 @@
 #include <vle/gvle/CompleteViewDrawingArea.hpp>
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/version.hpp>
-#include <gtkmm.h>
-#include <gdkmm/gc.h>
-#include <gdkmm/types.h>
+#include <gtkmm/textview.h>
+#include <gtkmm/viewport.h>
+#include <gtkmm/box.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/notebook.h>
 #include <gtkmm/builder.h>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM

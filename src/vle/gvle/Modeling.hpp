@@ -28,17 +28,9 @@
 #ifndef GUI_MODELING_HPP
 #define GUI_MODELING_HPP
 
-#include <vle/gvle/GVLE.hpp>
-#include <vle/gvle/ModelTreeBox.hpp>
-#include <vle/gvle/ModelClassBox.hpp>
-#include <vle/gvle/Editor.hpp>
-#include <vle/gvle/ViewDrawingArea.hpp>
-#include <vle/vpz/Project.hpp>
-#include <vle/vpz/BaseModel.hpp>
+#include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Rand.hpp>
-#include <gtkmm/builder.h>
 #include <map>
 #include <string>
 #include <vector>

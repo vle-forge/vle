@@ -32,8 +32,6 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/box.h>
 #include <gtkmm/comboboxtext.h>
-#include <gtkmm/spinbutton.h>
-#include <gtkmm/entry.h>
 #include <vle/vpz/Dynamic.hpp>
 
 namespace vle {

@@ -25,13 +25,14 @@
  */
 
 
+#include <vle/gvle/ValuesTreeView.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/BooleanBox.hpp>
 #include <vle/gvle/MatrixBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/TableBox.hpp>
 #include <vle/gvle/TupleBox.hpp>
-#include <vle/gvle/TreeViewValue.hpp>
 #include <vle/gvle/ValueBox.hpp>
 #include <vle/gvle/XmlTypeBox.hpp>
 #include <vle/utils/Tools.hpp>

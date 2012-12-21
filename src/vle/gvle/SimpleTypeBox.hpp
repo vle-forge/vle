@@ -28,14 +28,10 @@
 #ifndef VLE_GVLE_SIMPLETYPEBOX_HPP
 #define VLE_GVLE_SIMPLETYPEBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
 #include <vle/DllDefines.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Tuple.hpp>
-#include <vle/value/Table.hpp>
 
 namespace vle { namespace gvle {
 

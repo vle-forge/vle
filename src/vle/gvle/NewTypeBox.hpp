@@ -28,18 +28,8 @@
 #ifndef GUI_NEWTYPEBOX_HPP
 #define GUI_NEWTYPEBOX_HPP
 
-#include <gtkmm.h>
-#include <vle/value/Boolean.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/value/Matrix.hpp>
-#include <vle/value/Null.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Table.hpp>
-#include <vle/value/Tuple.hpp>
-#include <vle/value/XML.hpp>
+#include <gtkmm/dialog.h>
+#include <gtkmm/comboboxtext.h>
 #include <vle/value/Value.hpp>
 
 using namespace vle;

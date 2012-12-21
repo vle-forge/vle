@@ -26,17 +26,16 @@
 
 
 #include <vle/gvle/AtomicModelBox.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/utils/Algo.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Template.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/lexical_cast.hpp>
 #include <fstream>
 
 namespace vle { namespace gvle {

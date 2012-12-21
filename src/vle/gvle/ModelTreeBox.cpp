@@ -26,12 +26,12 @@
 
 
 #include <vle/gvle/ModelTreeBox.hpp>
-#include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/SimpleTypeBox.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <queue>
 
 namespace vle { namespace gvle {
 

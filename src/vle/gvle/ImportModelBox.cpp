@@ -27,7 +27,9 @@
 
 #include <vle/gvle/ImportModelBox.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/utils/Tools.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/Vpz.hpp>
+#include <gtkmm/stock.h>
 #include <boost/algorithm/string/trim.hpp>
 
 namespace vle

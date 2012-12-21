@@ -26,10 +26,8 @@
 
 
 #include <vle/gvle/DynamicsBox.hpp>
-#include <vle/gvle/Message.hpp>
-#include <vle/gvle/NewDynamicsBox.hpp>
-#include <vle/gvle/OpenModelingPluginBox.hpp>
-#include <vle/utils/Template.hpp>
+#include <vle/gvle/SimpleTypeBox.hpp>
+#include <vle/utils/Path.hpp>
 #include <gtkmm/treemodel.h>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>

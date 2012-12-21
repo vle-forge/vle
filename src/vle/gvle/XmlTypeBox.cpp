@@ -26,6 +26,7 @@
 
 
 #include <vle/gvle/XmlTypeBox.hpp>
+#include <gtkmm/stock.h>
 
 using namespace vle;
 

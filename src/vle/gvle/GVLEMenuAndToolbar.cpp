@@ -26,11 +26,10 @@
 
 
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
-#include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
-#include <vle/gvle/Message.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <gtkmm/stock.h>
+#include <gtkmm/radioaction.h>
 #include <iostream>
 
 #ifdef __WIN32__

@@ -25,6 +25,7 @@
  */
 
 
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/BooleanBox.hpp>
 #include <vle/gvle/MatrixBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
@@ -33,7 +34,6 @@
 #include <vle/gvle/ValueBox.hpp>
 #include <vle/gvle/XmlTypeBox.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 using namespace vle;

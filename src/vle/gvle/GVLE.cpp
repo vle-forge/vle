@@ -46,18 +46,17 @@
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/NewProjectBox.hpp>
 #include <vle/gvle/Settings.hpp>
-#include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/version.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <sstream>
-#include <gtkmm/filechooserdialog.h>
 #include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
 #include <gtkmm/stock.h>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/messagedialog.h>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
 

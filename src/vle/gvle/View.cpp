@@ -34,12 +34,11 @@
 #include <vle/gvle/PortDialog.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
+#include <vle/gvle/CompleteViewDrawingArea.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/utils/Tools.hpp>
+#include <vle/utils/Path.hpp>
 #include <gtkmm/filechooserdialog.h>
-#include <gdkmm/cursor.h>
-#include <limits>
-#include <iostream>
+#include <gtkmm/stock.h>
 
 using std::string;
 using std::list;

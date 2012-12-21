@@ -31,9 +31,8 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/label.h>
 #include <gtkmm/frame.h>
+#include <gtkmm/box.h>
 #include <vle/gvle/ComboboxString.hpp>
-
-
 
 namespace vle
 {

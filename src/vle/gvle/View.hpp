@@ -32,12 +32,7 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/vpz/BaseModel.hpp>
-#include <gtkmm/window.h>
-#include <gtkmm/viewport.h>
-#include <algorithm>
 #include <string>
-#include <list>
-#include <map>
 
 namespace vle { namespace gvle {
 

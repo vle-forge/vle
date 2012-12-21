@@ -31,7 +31,6 @@
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/gvle/OutputPlugin.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace vle { namespace gvle {
 

@@ -25,8 +25,12 @@
  */
 
 
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treestore.h>
+#include <gtkmm/button.h>
+#include <gtkmm/label.h>
+#include <gtkmm/dialog.h>
 
 #ifndef GUI_QUITBOX_HH
 #define GUI_QUITBOX_HH

@@ -28,8 +28,10 @@
 #ifndef GUI_NEWPROJECTBOX_HPP
 #define GUI_NEWPROJECTBOX_HPP
 
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {

@@ -28,10 +28,11 @@
 #ifndef VLE_GVLE_GVLEMENUANDTOOLBAR_HPP
 #define VLE_GVLE_GVLEMENUANDTOOLBAR_HPP
 
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
-
-#include <iostream>
+#include <gtkmm/toolbar.h>
+#include <gtkmm/menubar.h>
+#include <gtkmm/uimanager.h>
+#include <gtkmm/actiongroup.h>
 
 namespace vle { namespace gvle {
 

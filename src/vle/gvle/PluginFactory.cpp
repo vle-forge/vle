@@ -28,12 +28,8 @@
 #include <vle/gvle/PluginFactory.hpp>
 #include <vle/gvle/OutputPlugin.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
-#include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/utils/i18n.hpp>
-#include <cassert>
 
 namespace vle { namespace gvle {
 

@@ -26,9 +26,7 @@
 
 
 #include <vle/gvle/Message.hpp>
-#include <vle/utils/Tools.hpp>
 #include <gtkmm/messagedialog.h>
-#include <gtkmmconfig.h>
 
 namespace vle { namespace gvle {
 

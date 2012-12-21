@@ -27,6 +27,7 @@
 
 #include <vle/gvle/TupleBox.hpp>
 #include <vle/utils/Tools.hpp>
+#include <gtkmm/stock.h>
 
 namespace vle {
 namespace gvle {

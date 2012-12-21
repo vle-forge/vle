@@ -28,7 +28,8 @@
 #ifndef GUI_BOOLEANBOX_HPP
 #define GUI_BOOLEANBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/comboboxtext.h>
 #include <vle/value/Boolean.hpp>
 
 namespace vle

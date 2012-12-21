@@ -26,9 +26,12 @@
 
 
 #include <vle/gvle/ImportClassesBox.hpp>
-#include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/GVLE.hpp>
+#include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Vpz.hpp>
 
