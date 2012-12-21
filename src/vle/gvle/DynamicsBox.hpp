@@ -28,7 +28,11 @@
 #ifndef VLE_GVLE_DYNAMICSBOX_HPP
 #define VLE_GVLE_DYNAMICSBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/liststore.h>
 #include <vle/gvle/Modeling.hpp>
 
 namespace vle { namespace gvle {

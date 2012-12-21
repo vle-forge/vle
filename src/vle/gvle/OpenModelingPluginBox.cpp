@@ -28,11 +28,6 @@
 #include <vle/gvle/OpenModelingPluginBox.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/gvle/GVLE.hpp>
-#include <vle/gvle/Modeling.hpp>
-#include <vle/vpz/Dynamic.hpp>
-#include <vle/vpz/Conditions.hpp>
-#include <vle/vpz/Observables.hpp>
-#include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {
 

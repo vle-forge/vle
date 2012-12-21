@@ -29,11 +29,10 @@
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/View.hpp>
-#include <gdkmm/gc.h>
-#include <gdkmm/types.h>
-#include <gdkmm/pixbuf.h>
+#include <vle/gvle/GVLE.hpp>
 #include <vector>
 #include <cmath>
+#include <cassert>
 #include <cairomm/scaledfont.h>
 
 namespace vle { namespace gvle {

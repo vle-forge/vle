@@ -30,8 +30,12 @@
 
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/box.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/button.h>
+#include <gtkmm/image.h>
 
 namespace vle
 {

@@ -29,7 +29,9 @@
 #define VLE_GVLE__NEWDYNAMICSBOX_HPP
 
 #include <gtkmm/builder.h>
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/button.h>
 
 namespace vle { namespace gvle {
 

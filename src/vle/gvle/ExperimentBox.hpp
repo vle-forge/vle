@@ -29,13 +29,9 @@
 #define VLE_GVLE_EXPERIMENTBOX_HPP
 
 #include <vle/utils/Rand.hpp>
-#include <vle/gvle/CalendarBox.hpp>
 #include <gtkmm/dialog.h>
 #include <gtkmm/spinbutton.h>
-#include <gtkmm/button.h>
-#include <gtkmm/frame.h>
 #include <gtkmm/box.h>
-#include <gtkmm/comboboxtext.h>
 #include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {

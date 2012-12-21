@@ -28,8 +28,12 @@
 #ifndef VLE_GVLE_IMPORTCLASSESBOX_HPP
 #define VLE_GVLE_IMPORTCLASSESBOX_HPP
 
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/treeselection.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/treeview.h>
 
 namespace vle {
     namespace vpz {

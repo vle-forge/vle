@@ -30,18 +30,18 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
-#include <vle/gvle/FileTreeView.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/vpz/Vpz.hpp>
-#include <boost/lexical_cast.hpp>
-#include <fstream>
-
+#include <gtkmm/stock.h>
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
 #include <gtkmm/clipboard.h>
 #endif
+#include <gdkmm/cursor.h>
+#include <boost/lexical_cast.hpp>
+#include <fstream>
+
 
 namespace vle { namespace gvle {
 

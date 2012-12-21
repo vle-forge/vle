@@ -29,7 +29,6 @@
 #define VLE_GVLE_MODELINGPLUGIN_HPP
 
 #include <vle/DllDefines.hpp>
-#include <gtkmm/builder.h>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/version.hpp>
 #include <gdkmm/pixbuf.h>

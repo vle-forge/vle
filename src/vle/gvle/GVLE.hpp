@@ -39,19 +39,13 @@
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/gvle/ComboboxString.hpp>
-#include <vle/utils/Path.hpp>
 #include <gtkmm/window.h>
+#include <gtkmm/textview.h>
 #include <gtkmm/box.h>
-#include <gtkmm/separator.h>
-#include <gtkmm/radiobutton.h>
 #include <gtkmm/statusbar.h>
-#include <gtkmm/scrolledwindow.h>
-#include <gtkmm/table.h>
-#include <gtkmm/tooltips.h>
 #include <gtkmm/builder.h>
 #include <string>
-#include <list>
+#include <vector>
 #include <map>
 
 #include <sigc++/sigc++.h>

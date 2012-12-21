@@ -27,9 +27,6 @@
 
 #include <vle/gvle/Settings.hpp>
 #include <vle/utils/Preferences.hpp>
-#include <vle/utils/i18n.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
 
 namespace vle { namespace gvle {

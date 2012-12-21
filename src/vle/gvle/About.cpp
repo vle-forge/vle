@@ -25,9 +25,7 @@
  */
 
 
-#include <boost/config.hpp>
 #include <gtkmm/aboutdialog.h>
-#include <gdkmm/pixbuf.h>
 #include <vle/gvle/About.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>

@@ -28,7 +28,10 @@
 #ifndef GUI_TUPLEBOX_HPP
 #define GUI_TUPLEBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/table.h>
 #include <vle/value/Tuple.hpp>
 #include <boost/multi_array.hpp>
 

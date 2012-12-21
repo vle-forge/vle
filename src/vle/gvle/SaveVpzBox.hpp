@@ -28,9 +28,10 @@
 #ifndef GUI_SAVEVPZBOX_HPP
 #define GUI_SAVEVPZBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
 #include <gtkmm/builder.h>
-#include <vle/utils/Path.hpp>
+#include <gtkmm/entry.h>
+#include <gtkmm/button.h>
 
 namespace vle { namespace gvle {
 

@@ -32,9 +32,11 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
+#include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
+#include <gtkmm/treerowreference.h>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>

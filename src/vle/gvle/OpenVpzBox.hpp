@@ -28,9 +28,10 @@
 #ifndef GUI_OPENVPZBOX_HPP
 #define GUI_OPENVPZBOX_HPP
 
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
-#include <vle/utils/Path.hpp>
+#include <gtkmm/dialog.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treestore.h>
 
 namespace vle { namespace gvle {
 

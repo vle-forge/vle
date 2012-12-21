@@ -28,10 +28,14 @@
 #ifndef GUI_MODELCLASSBOX_HPP
 #define GUI_MODELCLASSBOX_HPP
 
-#include <gtkmm/builder.h>
-#include <gtkmm.h>
-#include <vle/vpz/Classes.hpp>
 #include <vle/gvle/NewModelClassBox.hpp>
+#include <vle/vpz/Classes.hpp>
+#include <vle/vpz/BaseModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <gtkmm/builder.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treestore.h>
 
 namespace vle { namespace gvle {
 

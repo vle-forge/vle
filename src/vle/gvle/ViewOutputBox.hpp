@@ -31,8 +31,6 @@
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/button.h>
-#include <gtkmm/spinbutton.h>
-#include <gtkmm/frame.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/textview.h>

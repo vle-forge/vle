@@ -27,7 +27,6 @@
 
 #include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {

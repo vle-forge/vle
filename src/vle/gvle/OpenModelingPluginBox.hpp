@@ -28,8 +28,12 @@
 #ifndef GUI_OPENMODELINGPLUGINBOX_HPP
 #define GUI_OPENMODELINGPLUGINBOX_HPP
 
-#include <gtkmm.h>
+
 #include <gtkmm/builder.h>
+#include <gtkmm/button.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treestore.h>
 
 namespace vle {
     namespace graph {

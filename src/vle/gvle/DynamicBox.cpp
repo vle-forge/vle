@@ -30,11 +30,8 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/NewDynamicsBox.hpp>
-#include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Tools.hpp>
 #include <fstream>
-#include <cmath>
 
 namespace vle { namespace gvle {
 

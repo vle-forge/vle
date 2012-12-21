@@ -28,11 +28,10 @@
 #ifndef GUI_VALUEBOX_HPP
 #define GUI_VALUEBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
 #include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
-#include <vle/vpz/Condition.hpp>
 #include <vle/gvle/TreeViewValue.hpp>
 
 namespace vle { namespace gvle {

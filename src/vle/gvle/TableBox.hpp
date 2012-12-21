@@ -28,7 +28,10 @@
 #ifndef GUI_TABLEBOX_HPP
 #define GUI_TABLEBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/table.h>
+#include <gtkmm/entry.h>
 #include <vle/value/Table.hpp>
 #include <boost/multi_array.hpp>
 

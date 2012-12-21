@@ -26,21 +26,11 @@
 
 
 #include <vle/gvle/Modeling.hpp>
-#include <vle/gvle/Editor.hpp>
-#include <vle/gvle/GVLE.hpp>
-#include <vle/gvle/GVLEMenuAndToolbar.hpp>
-#include <vle/gvle/View.hpp>
+#include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/gvle/ModelDescriptionBox.hpp>
-#include <vle/utils/Package.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Path.hpp>
 #include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/BaseModel.hpp>
-#include <vle/vpz/CoupledModel.hpp>
-#include <gtkmm/stock.h>
-#include <iostream>
 
 using std::string;
 

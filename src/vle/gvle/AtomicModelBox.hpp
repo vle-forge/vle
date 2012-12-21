@@ -28,9 +28,9 @@
 #ifndef GUI_ATOMICMODELBOX_HPP
 #define GUI_ATOMICMODELBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/liststore.h>
 #include <vle/gvle/DynamicBox.hpp>
-#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/ObsAndViewBox.hpp>
 

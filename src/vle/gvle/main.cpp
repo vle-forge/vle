@@ -24,10 +24,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/manager/Manager.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
 #include <gtkmm/main.h>

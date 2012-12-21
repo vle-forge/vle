@@ -28,6 +28,10 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/NewModelClassBox.hpp>
+#include <vle/gvle/GVLE.hpp>
+#include <vle/vpz/Classes.hpp>
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 namespace vle

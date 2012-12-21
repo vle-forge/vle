@@ -28,8 +28,6 @@
 #include <vle/gvle/PortDialog.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/vpz/BaseModel.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/Exception.hpp>
 #include <gtkmm/stock.h>
 
 namespace vle

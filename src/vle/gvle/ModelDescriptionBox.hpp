@@ -30,7 +30,6 @@
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/textview.h>
 #include <string>
 #include <set>
 

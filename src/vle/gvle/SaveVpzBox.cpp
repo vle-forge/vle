@@ -26,9 +26,12 @@
 
 
 #include <vle/gvle/SaveVpzBox.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {
 

@@ -28,7 +28,10 @@
 #ifndef GUI_XMLTYPEBOX_HPP
 #define GUI_XMLTYPEBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/textview.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/textbuffer.h>
 #include <vle/value/XML.hpp>
 
 namespace vle

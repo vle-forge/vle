@@ -27,11 +27,9 @@
 
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <gtkmm/stock.h>
 #include <gtkmm/frame.h>
-#include <gtkmm/scrolledwindow.h>
 
 using std::string;
 using std::set;

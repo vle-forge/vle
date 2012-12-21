@@ -26,13 +26,12 @@
 
 
 #include <vle/gvle/CoupledModelBox.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/PortDialog.hpp>
-#include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
-#include <gtkmm/stock.h>
 #include <boost/algorithm/string/trim.hpp>
 
 namespace vle { namespace gvle {
