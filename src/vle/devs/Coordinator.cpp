@@ -247,11 +247,11 @@ void Coordinator::delModel(vpz::CoupledModel *parent,
     if (mdl->isCoupled()) {
         delCoupledModel(parent, (vpz::CoupledModel*)mdl);
         parent->delAllConnection(mdl);
-        parent->delModel(mdl);
     } else {
         delAtomicModel(parent, (vpz::AtomicModel*)mdl);
-        parent->delModel(mdl);
     }
+
+    parent->delModel(mdl);
 }
 
 void Coordinator::getSimulatorsSource(
@@ -401,13 +401,12 @@ void Coordinator::delCoupledModel(vpz::CoupledModel* parent,
             "Cannot delete an atomic model without parent"));
     }
 
-    vpz::ModelList& lst = mdl->getModelList();
-    for (vpz::ModelList::iterator it = lst.begin(); it != lst.end();
-         ++it) {
-        delModel(parent, it->second);
-    }
-}
+    vpz::ModelList::iterator b = mdl->getModelList().begin();
+    vpz::ModelList::iterator e = mdl->getModelList().end();
 
+    for (; b != e; ++b)
+        delModel(mdl, b->second);
+}
 
 void Coordinator::addModels(const vpz::Model& model)
 {
