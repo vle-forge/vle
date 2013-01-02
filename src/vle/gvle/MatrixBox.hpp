@@ -28,14 +28,13 @@
 #ifndef GUI_MATRIXBOX_HPP
 #define GUI_MATRIXBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/tooltips.h>
+#include <gtkmm/table.h>
 #include <vle/value/Matrix.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/value/Boolean.hpp>
 #include <vle/value/Table.hpp>
 #include <boost/multi_array.hpp>
-#include <vle/gvle/GVLE.hpp>
 
 namespace vle
 {

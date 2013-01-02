@@ -28,12 +28,10 @@
 #ifndef GUI_CONDITIONSBOX_HPP
 #define GUI_CONDITIONSBOX_HPP
 
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/dialog.h>
 #include <vle/gvle/ValuesTreeView.hpp>
 #include <vle/vpz/Conditions.hpp>
-#include <vle/gvle/ModelingPlugin.hpp>
-
 
 namespace vle { namespace gvle {
 

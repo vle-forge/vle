@@ -29,8 +29,6 @@
 #define GUI_CUTCOPYPAST_HPP
 
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/vpz/Model.hpp>
-#include <list>
 #include <string>
 
 namespace vle

@@ -27,6 +27,7 @@
 
 #include <vle/gvle/TableBox.hpp>
 #include <vle/utils/Tools.hpp>
+#include <gtkmm/stock.h>
 
 using namespace vle;
 

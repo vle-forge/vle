@@ -25,12 +25,8 @@
  */
 
 
-#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
-#include <vle/gvle/Message.hpp>
-#include <vle/gvle/ViewDrawingArea.hpp>
-#include <vle/utils/Tools.hpp>
-#include <iostream>
+#include <vle/gvle/GVLE.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {

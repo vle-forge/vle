@@ -26,9 +26,6 @@
 
 
 #include <vle/gvle/ModelingPlugin.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace gvle {
 

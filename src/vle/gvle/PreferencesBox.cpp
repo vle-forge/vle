@@ -27,7 +27,6 @@
 
 #include <vle/gvle/PreferencesBox.hpp>
 #include <vle/gvle/Settings.hpp>
-#include <vle/utils/i18n.hpp>
 #include <gtkmm/dialog.h>
 #include <gtkmm/button.h>
 #include <gtkmm/checkbutton.h>

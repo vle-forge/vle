@@ -28,7 +28,8 @@
 #ifndef VLE_GVLE_INTERACTIVETYPEBOX_HPP
 #define VLE_GVLE_INTERACTIVETYPEBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 

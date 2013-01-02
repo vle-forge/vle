@@ -26,14 +26,10 @@
 
 
 #include <vle/gvle/CompleteViewDrawingArea.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
-#include <gdkmm/gc.h>
-#include <gdkmm/types.h>
-#include <gdkmm/pixbuf.h>
-#include <vector>
-#include <cmath>
 #include <boost/lexical_cast.hpp>
 #include <cairomm/scaledfont.h>
 

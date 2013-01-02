@@ -28,14 +28,10 @@
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/vpz/CoupledModel.hpp>
-#include <vle/vpz/BaseModel.hpp>
+#include <vle/gvle/CalendarBox.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/DateTime.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/lexical_cast.hpp>
 #include <glibmm/miscutils.h>
-#include <limits>
 
 namespace vz = vle::vpz;
 namespace vu = vle::utils;

@@ -26,7 +26,6 @@
 
 
 #include <vle/gvle/CalendarBox.hpp>
-#include <gtkmmconfig.h>
 #include <cassert>
 
 namespace vle { namespace gvle {

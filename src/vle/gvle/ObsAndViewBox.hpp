@@ -30,7 +30,12 @@
 #include <vle/gvle/ObsAndViewBox.hpp>
 #include <vle/vpz/Observable.hpp>
 #include <vle/vpz/Views.hpp>
-#include <gtkmm.h>
+
+#include <gtkmm/treeview.h>
+#include <gtkmm/button.h>
+#include <gtkmm/treeselection.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/treestore.h>
 #include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {

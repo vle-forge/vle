@@ -29,13 +29,18 @@
 #define GUI_NEWMODELCLASSBOX_HPP
 
 #include <gtkmm/builder.h>
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/button.h>
+#include <gtkmm/liststore.h>
 
 namespace vle
 {
 namespace gvle {
 
 class Modeling;
+class GVLE;
 
 class NewModelClassBox
 {

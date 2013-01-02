@@ -27,7 +27,6 @@
 
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Dynamics.hpp>
@@ -35,7 +34,7 @@
 #include <vle/vpz/Observables.hpp>
 #include <vle/vpz/Outputs.hpp>
 #include <vle/vpz/Views.hpp>
-#include <iostream>
+#include <gtkmm/stock.h>
 
 namespace vle { namespace gvle {
 

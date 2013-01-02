@@ -28,10 +28,9 @@
 #ifndef GUI_MODELTREEBOX_HPP
 #define GUI_MODELTREEBOX_HPP
 
-#include <vle/gvle/SimpleTypeBox.hpp>
-#include <gtkmm/window.h>
 #include <gtkmm/builder.h>
-#include <gtkmm.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treestore.h>
 
 namespace vle { namespace vpz {
 

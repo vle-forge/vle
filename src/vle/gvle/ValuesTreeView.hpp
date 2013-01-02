@@ -28,7 +28,10 @@
 #ifndef GUI_VALUESTREEVIEW_HPP
 #define GUI_VALUESTREEVIEW_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/builder.h>
 #include <vle/value/Value.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>

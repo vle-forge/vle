@@ -26,6 +26,9 @@
 
 
 #include <vle/gvle/BooleanBox.hpp>
+#include <gtkmm/stock.h>
+#include <gtkmm/comboboxtext.h>
+
 
 using namespace vle;
 

@@ -25,6 +25,7 @@
  */
 
 
+#include <gtkmm/stock.h>
 #include <vle/gvle/ValueBox.hpp>
 
 namespace vle { namespace gvle {

@@ -28,9 +28,10 @@
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/PluginFactory.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
-#include <gtkmm/tooltips.h>
 
 namespace vle { namespace gvle {
 

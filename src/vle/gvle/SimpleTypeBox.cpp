@@ -24,11 +24,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <gtkmm/stock.h>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/Table.hpp>
+
 
 namespace vu = vle::utils;
 

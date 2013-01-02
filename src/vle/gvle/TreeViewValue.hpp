@@ -28,7 +28,9 @@
 #ifndef GUI_TREEVIEW_CONDITION_HPP
 #define GUI_TREEVIEW_CONDITION_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/liststore.h>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Boolean.hpp>

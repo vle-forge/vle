@@ -28,8 +28,13 @@
 #ifndef GUI_COUPLEDMODELBOX_HPP
 #define GUI_COUPLEDMODELBOX_HPP
 
-#include <gtkmm.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/celleditable.h>
+#include <gtkmm/menu.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/dialog.h>
 #include <vle/vpz/CoupledModel.hpp>
 
 namespace vle { namespace gvle {
