@@ -50,10 +50,12 @@ add_library(vlelib SHARED
 set_target_properties(vlelib PROPERTIES VERSION 0)
 set_target_properties(vlelib PROPERTIES OUTPUT_NAME
   "vle-${VLE_VERSION_SHORT}")
-set_target_properties(vlelib PROPERTIES DEFINE_SYMBOL
-  "vlelib_EXPORTS")
+set_target_properties(vlelib PROPERTIES COMPILE_DEFINITIONS
+   "vlelib_EXPORTS")
+set_target_properties(vlelib PROPERTIES COMPILE_DEFINITIONS
+   "VLE_DLL")
 set_target_properties(vlelib PROPERTIES COMPILE_FLAGS
-  "-fvisibility=hidden -fvisibility-inlines-hidden -DVLE_DLL")
+  "-fvisibility=hidden -fvisibility-inlines-hidden")
 set_target_properties(vlelib PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 if (WIN32)

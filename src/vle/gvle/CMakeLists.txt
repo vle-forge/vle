@@ -49,7 +49,7 @@ endif (WIN32)
 # target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
 #   ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
 
-if (BUILD_SHARED_LIBS)
+if (VLE_BUILD_SHARED_LIBS)
   # if (WIN32)
   #   target_link_libraries(gvle vlelib)
   # else ()

@@ -17,7 +17,7 @@ else ()
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
 endif ()
 
-if (BUILD_SHARED_LIBS)
+if (VLE_BUILD_SHARED_LIBS)
   target_link_libraries(vle ${VLEDEPS_LIBRARIES}
     ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
 else ()
