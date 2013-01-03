@@ -253,6 +253,29 @@ static int run_simulation(CmdArgs::const_iterator it,
     return success;
 }
 
+static bool init_current_package(const std::string &packagename,
+        const CmdArgs &args)
+{
+    if (not vle::utils::Package::package().existsPackage(packagename)) {
+        if (std::find(args.begin(), args.end(), "create") == args.end()) {
+            std::cerr << vle::fmt(_("Package `%1%' does not exist. Use the"
+                        " create command before other command.\n")) %
+                packagename;
+
+            return false;
+        }
+
+        vle::utils::Package::package().refresh();
+        vle::utils::Package::package().select(packagename);
+        vle::utils::Package::package().create();
+    } else {
+        vle::utils::Package::package().refresh();
+        vle::utils::Package::package().select(packagename);
+    }
+
+    return true;
+}
+
 static int manage_package_mode(const std::string &packagename, bool manager,
                                int processor, const CmdArgs &args)
 {
@@ -260,8 +283,8 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     CmdArgs::const_iterator end = args.end();
     bool stop = false;
 
-    vle::utils::Package::package().refresh();
-    vle::utils::Package::package().select(packagename);
+    if (not init_current_package(packagename, args))
+        return EXIT_FAILURE;
 
     for (; not stop and it != end; ++it) {
         if (*it == "create") {
