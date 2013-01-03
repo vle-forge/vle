@@ -50,10 +50,10 @@ public:
           m_logoptions(logoptions),
           m_simulationoptions(simulationoptionts)
     {
-        if (m_logoptions & manager::SIMULATION_SPAWN_PROCESS) {
+        if (m_simulationoptions & manager::SIMULATION_SPAWN_PROCESS)
             TraceAlways(
-                _("Simulation: SIMULATION_SPAWN_PROCESS is not yet implemented"));
-        }
+                _("Simulation: SIMULATION_SPAWN_PROCESS is not yet"
+                    " implemented"));
     }
 
     ~Pimpl()
