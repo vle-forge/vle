@@ -169,10 +169,24 @@ static std::string search_vpz(const std::string &param)
     return std::string();
 }
 
+static vle::manager::LogOptions convert_log_mode()
+{
+    switch (vle::utils::Trace::getLevel()) {
+    case vle::utils::TRACE_LEVEL_DEVS:
+        return vle::manager::LOG_SUMMARY & vle::manager::LOG_RUN;
+    case vle::utils::TRACE_LEVEL_EXTENSION:
+    case vle::utils::TRACE_LEVEL_MODEL:
+        return vle::manager::LOG_SUMMARY;
+    case vle::utils::TRACE_LEVEL_ALWAYS:
+    default:
+        return vle::manager::LOG_NONE;
+    }
+}
+
 static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
         int processor)
 {
-    vle::manager::Manager man(vle::manager::LOG_SUMMARY,
+    vle::manager::Manager man(convert_log_mode(),
                               vle::manager::SIMULATION_NONE |
                               vle::manager::SIMULATION_NO_RETURN,
                               &std::cout);
@@ -204,7 +218,7 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
 static int run_simulation(CmdArgs::const_iterator it,
         CmdArgs::const_iterator end)
 {
-    vle::manager::Simulation sim(vle::manager::LOG_SUMMARY,
+    vle::manager::Simulation sim(convert_log_mode(),
                                  vle::manager::SIMULATION_NONE |
                                  vle::manager::SIMULATION_NO_RETURN,
                                  &std::cout);
