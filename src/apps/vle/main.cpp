@@ -47,16 +47,25 @@ struct VLE
 {
     vle::Init app;
 
-    VLE(int verbose)
+    VLE(int verbose, int trace)
     {
         vle::utils::Trace::setLevel(vle::utils::Trace::cast(verbose));
+
+        if (trace < 0)
+            vle::utils::Trace::setStandardError();
+        else if (trace > 0)
+            vle::utils::Trace::setStandardOutput();
+        else
+            vle::utils::Trace::setLogFile(
+                    vle::utils::Trace::getDefaultLogFilename());
     }
 
     ~VLE()
     {
-        if (vle::utils::Trace::haveWarning())
+        if (vle::utils::Trace::haveWarning() &&
+                vle::utils::Trace::getType() == vle::utils::TRACE_STREAM_FILE)
             std::cerr << vle::fmt(
-                "\n/!\\ Some warnings during run: See file %1%\n") %
+                    "\n/!\\ Some warnings during run: See file %1%\n") %
                 vle::utils::Trace::getLogFile() << std::endl;
     }
 };
@@ -386,13 +395,13 @@ enum ProgramOptionsCode
 
 struct ProgramOptions
 {
-    ProgramOptions(int *verbose, int *processor, bool *manager_mode,
-            std::string *packagename, std::string *remotecmd, std::string
-            *configvar, CmdArgs *args)
+    ProgramOptions(int *verbose, int *trace, int *processor,
+            bool *manager_mode, std::string *packagename,
+            std::string *remotecmd, std::string *configvar, CmdArgs *args)
         : generic(_("Allowed options")), hidden(_("Hidden options")),
-        verbose(verbose), processor(processor), manager_mode(manager_mode),
-        packagename(packagename), remotecmd(remotecmd), configvar(configvar),
-        args(args)
+        verbose(verbose), trace(trace), processor(processor),
+        manager_mode(manager_mode), packagename(packagename),
+        remotecmd(remotecmd), configvar(configvar), args(args)
     {
         generic.add_options()
             ("help,h", _("Produce help message"))
@@ -400,6 +409,10 @@ struct ProgramOptions
             ("infos", _("Informations of VLE"))
             ("restart", _("Remove configuration file of VLE"))
             ("list", _("Show the list of installed package"))
+            ("log-file", _("Trace of simulation(s) are reported to the standard"
+                         " file ($VLE_HOME/vle.log"))
+            ("log-stdout", _("Trace of the simulation(s) are reported to the"
+                         " standard output"))
             ("manager,m", _("Use the manager mode to run experimental frames"))
             ("processor,o", po::value < int >(processor)->default_value(1),
              _("Select number of processor in manager mode [>= 0]"))
@@ -465,6 +478,12 @@ struct ProgramOptions
             if (vm.count("input"))
                 *args = vm["input"].as < CmdArgs >();
 
+            if (vm.count("log-file"))
+                *trace = 0;
+
+            if (vm.count("log-stdout"))
+                *trace = 1;
+
             if (vm.count("help"))
                 return show_help(generic);
 
@@ -502,7 +521,7 @@ struct ProgramOptions
 
     po::options_description desc, generic, hidden;
     po::variables_map vm;
-    int *verbose, *processor;
+    int *verbose, *trace, *processor;
     bool *manager_mode;
     std::string *packagename, *remotecmd, *configvar;
     CmdArgs *args;
@@ -513,12 +532,13 @@ int main(int argc, char *argv[])
     int ret;
     int verbose = 0;
     int processor = 1;
+    int trace = -1; /* < 0 = stderr, 0 = file and > 0 = stdout */
     bool manager_mode = false;
     std::string packagename, remotecmd, configvar;
     CmdArgs args;
 
     {
-        ProgramOptions prgs(&verbose, &processor, &manager_mode,
+        ProgramOptions prgs(&verbose, &trace, &processor, &manager_mode,
                 &packagename, &remotecmd, &configvar, &args);
 
         ret = prgs.run(argc, argv);
@@ -529,8 +549,8 @@ int main(int argc, char *argv[])
             return EXIT_SUCCESS;
     }
 
-    VLE app(verbose); /* We are in package, remote or configuration mode, we
-                         need to initialize VLE's API. */
+    VLE app(verbose, trace); /* We are in package, remote or configuration
+                                mode, we need to initialize VLE's API. */
 
     switch (ret) {
     case PROGRAM_OPTIONS_PACKAGE:
