@@ -9,10 +9,9 @@ if (WIN32)
     -I${CMAKE_BINARY_DIR}/share
     -i${CMAKE_BINARY_DIR}/share/vle.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/vle.o)
-  add_executable(vle main.cpp OptionGroup.cpp OptionGroup.hpp
-    ${CMAKE_CURRENT_BINARY_DIR}/vle.o)
+  add_executable(vle main.cpp ${CMAKE_CURRENT_BINARY_DIR}/vle.o)
 else ()
-  add_executable(vle main.cpp OptionGroup.cpp OptionGroup.hpp)
+  add_executable(vle main.cpp)
   set_target_properties(vle PROPERTIES SOVERSION
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
 endif ()
