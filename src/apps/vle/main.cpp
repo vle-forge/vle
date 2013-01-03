@@ -36,6 +36,7 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
 #include <iostream>
+#include <fstream>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -100,6 +101,37 @@ static int show_package_list()
               std::ostream_iterator < std::string >(std::cout, "\n"));
 
     return EXIT_SUCCESS;
+}
+
+static int remove_configuration_file()
+{
+    std::cout << vle::fmt(_("Remove configuration files\n"));
+    int ret = EXIT_SUCCESS;
+
+    try {
+        std::string filepath;
+
+        filepath = vle::utils::Path::path().getHomeFile("vle.conf");
+        if (vle::utils::Path::existFile(filepath))
+            std::ofstream ofs(filepath.c_str());
+
+        filepath = vle::utils::Path::path().getHomeFile("vle.log");
+        if (vle::utils::Path::existFile(filepath))
+            std::ofstream ofs(filepath.c_str());
+
+        filepath = vle::utils::Path::path().getHomeFile("gvle.log");
+        if (vle::utils::Path::existFile(filepath))
+            std::ofstream ofs(filepath.c_str());
+
+        vle::utils::Preferences prefs("vle.conf");
+    } catch (const std::exception &e) {
+        std::cerr << vle::fmt(_("Failed to remove configuration file: %1%\n"))
+            % e.what();
+
+        ret = EXIT_FAILURE;
+    }
+
+    return ret;
 }
 
 static void show_package_content()
@@ -352,6 +384,7 @@ struct ProgramOptions
             ("help,h", _("Produce help message"))
             ("version,v", _("Print version string"))
             ("infos", _("Informations of VLE"))
+            ("restart", _("Remove configuration file of VLE"))
             ("list", _("Show the list of installed package"))
             ("manager,m", _("Use the manager mode to run experimental frames"))
             ("processor,o", po::value < int >(processor)->default_value(1),
@@ -429,6 +462,9 @@ struct ProgramOptions
 
             if (vm.count("list"))
                 return show_package_list();
+
+            if (vm.count("restart"))
+                return remove_configuration_file();
 
             if (vm.count("package"))
                 return PROGRAM_OPTIONS_PACKAGE;
