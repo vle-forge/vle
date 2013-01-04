@@ -31,158 +31,178 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
 #include <gtkmm/main.h>
-#include <cstdio>
-#include <cstring>
-#include <cstdarg>
-#include <cstdlib>
-#include <cerrno>
+#include <boost/program_options.hpp>
 
-namespace vle { namespace gvle {
+namespace po = boost::program_options;
 
-static void print_error(const char *fmt, ...)
+typedef std::vector < std::string > CmdArgs;
+
+struct GVLE
 {
-    va_list ap;
+    vle::Init app;
 
-    va_start(ap, fmt);
-    std::fprintf(stderr, "GVLE error: ");
-    std::vfprintf(stderr, fmt, ap);
-    std::fprintf(stderr, "\n");
-    va_end(ap);
-}
-
-static bool compare(const char *arg, const char *shortname,
-                    const char *longname)
-{
-    return not std::strcmp(arg, shortname) or not std::strcmp(arg, longname);
-}
-static bool convert_int(const char *str, vle::uint32_t *value)
-{
-    char *end;
-    long int result;
-
-    result = std::strtol(str, &end, 10);
-
-    if ((errno == ERANGE and (result == LONG_MAX || result == LONG_MIN))
-        or (errno != 0 and result == 0)) {
-        return false;
-    } else {
-        *value = result;
-        return true;
+    GVLE(int verbose)
+    {
+        vle::utils::Trace::setLogFile(
+                vle::utils::Trace::getLogFilename("gvle.log"));
+        vle::utils::Trace::setLevel(vle::utils::Trace::cast(verbose));
     }
+
+    ~GVLE()
+    {}
+};
+
+static int show_infos()
+{
+    std::cout << vle::fmt(
+            _("GVLE - The GUI of VLE\n"
+                "Virtual Laboratory Environment - %1%\n"
+                "Copyright (C) 2003 - 2012 The VLE Development Team.\n"
+                "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                "You may redistribute copies of VLE\n"
+                "under the terms of the GNU General Public License.\n"
+                "For more information about these matters, see the file named "
+                "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
+
+    return EXIT_SUCCESS;
 }
 
-static bool convert_verbose(const char *str, vle::uint32_t *level)
+static int show_help(const po::options_description &desc)
 {
-    bool success = false;
+    std::cout << desc << std::endl;
 
-    if (not str) {
-        print_error(_("-v or --verbose needs a integer argument"));
-    } else {
-        if (not convert_int(str, level)) {
-            print_error(_("Verbose: cannot convert `%s' to 0..3"), str);
-        } else {
-            if (*level > 3) {
-                print_error(_("Can not convert `%d' to normal level "
-                              "number"), *level);
-            } else {
-                return true;
-            }
+    return EXIT_SUCCESS;
+}
+
+static int show_version()
+{
+    std::cout << vle::fmt(_("%1%\n")) % VLE_NAME_COMPLETE << std::endl;
+
+    return EXIT_SUCCESS;
+}
+
+enum ProgramOptionsCode
+{
+    PROGRAM_OPTIONS_FAILURE = -1,
+    PROGRAM_OPTIONS_END = 0,
+    PROGRAM_OPTIONS_RUN = 1
+};
+
+struct ProgramOptions
+{
+    ProgramOptions(int *verbose, std::string *packagename, CmdArgs *args)
+        : generic(_("Allowed options")), hidden(_("Hidden options")),
+        verbose(verbose), packagename(packagename), args(args)
+    {
+        generic.add_options()
+            ("help,h", _("Produce help message"))
+            ("version,v", _("Print version string"))
+            ("infos", _("Informations of VLE"))
+            ("verbose,V", po::value < int >(verbose)->default_value(0),
+             ("Verbose mode 0 - 3. [default 0]\n"
+              "0 no trace and no long exception\n"
+              "1 small simulation trace and long exception\n"
+              "2 long simulation trace\n"
+              "3 all simulation trace"))
+            ("package,P", po::value < std::string >(packagename),
+             ("Select a package"));
+
+        hidden.add_options()
+            ("input", po::value < CmdArgs >(), _("input"));
+
+        desc.add(generic).add(hidden);
+    }
+
+    ~ProgramOptions()
+    {}
+
+    int run(int argc, char *argv[])
+    {
+        po::positional_options_description p;
+        p.add("input", -1);
+
+        try {
+            po::store(po::command_line_parser(argc,
+                        argv).options(desc).positional(p).run(), vm);
+            po::notify(vm);
+
+            if (vm.count("input"))
+                *args = vm["input"].as < CmdArgs >();
+
+            if (vm.count("help"))
+                return show_help(generic);
+
+            if (vm.count("version"))
+                return show_version();
+
+            if (vm.count("infos"))
+                return show_infos();
+        } catch (const std::exception &e) {
+            std::cerr << e.what() << std::endl;
+
+            return PROGRAM_OPTIONS_FAILURE;
         }
+
+        return PROGRAM_OPTIONS_RUN;
     }
 
-    return success;
-}
-
-static void print_help()
-{
-    std::fprintf(stderr,
-                 _("GVLE - the Gui of VLE\n"
-                   "Virtual Laboratory Environment - %s\n"
-                   "Copyright (C) 2003 - 2012 The VLE Development Team.\n"),
-                 VLE_NAME_COMPLETE);
-}
-
-static void print_infos()
-{
-    std::fprintf(stderr,
-                 _("GVLE - the Gui of VLE\n"
-                   "Virtual Laboratory Environment - %s\n"
-                   "Copyright (C) 2003 - 2012 The VLE Development Team.\n"
-                   "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-                   "You may redistribute copies of VLE\n"
-                   "under the terms of the GNU General Public License.\n"
-                   "For more information about these matters, see the file "
-                   "named COPYING.\n"), VLE_NAME_COMPLETE);
-}
-
-}} // namespace vle gvle
+    po::options_description desc, generic, hidden;
+    po::variables_map vm;
+    int *verbose;
+    std::string *packagename;
+    CmdArgs *args;
+};
 
 int main(int argc, char **argv)
 {
-    vle::uint32_t verbose = 0;
-    bool stop = false;
-    bool end = false;
-    bool result = true;
+    int ret;
+    int verbose = 0;
+    std::string packagename;
+    CmdArgs args;
 
-    vle::Init app;
+    {
+       ProgramOptions prgs(&verbose, &packagename, &args);
+       ret = prgs.run(argc, argv); 
 
+       if (ret == PROGRAM_OPTIONS_END)
+           return EXIT_SUCCESS;
+       else if (ret == PROGRAM_OPTIONS_FAILURE)
+           return EXIT_FAILURE;
+    }
+
+    ret = EXIT_FAILURE;
+
+    GVLE app(verbose);
     Gtk::Main application(&argc, &argv);
+    vle::gvle::GVLE* g = 0;
 
-    for (argv++; not stop and not end and *argv; argv++) {
-        if (vle::gvle::compare(*argv, "-v", "--verbose")) {
-            stop = not vle::gvle::convert_verbose(*(++argv), &verbose);
-            result = stop;
-        } else if (vle::gvle::compare(*argv, "-h", "--help")) {
-            vle::gvle::print_help();
-            stop = true;
-        } else if (vle::gvle::compare(*argv, "-i", "--infos")) {
-            vle::gvle::print_infos();
-            stop = true;
-        } else {
-            break;
-        }
+    Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
+
+    try {
+        refBuilder->add_from_file(vle::utils::Path::path().
+                getGladeFile("gvle.glade").c_str());
+
+        refBuilder->get_widget_derived("WindowPackageBrowser", g);
+
+        if (packagename.empty() and not args.empty())
+            g->setFileName(args.front());
+
+        application.run(*g);
+    } catch(const Glib::MarkupError& e) {
+        std::cerr << _("\n/!\\ gvle Glib::MarkupError reported: ") <<
+            vle::utils::demangle(typeid(e)) << "\n" << e.what();
+    } catch(const Gtk::BuilderError& e) {
+        std::cerr << _("\n/!\\ gvle Gtk::BuilderError reported: ") <<
+            vle::utils::demangle(typeid(e)) << "\n" << e.what();
+    } catch(const Glib::Exception& e) {
+        std::cerr << _("\n/!\\ gvle Glib error reported: ") <<
+            vle::utils::demangle(typeid(e)) << "\n" << e.what();
+    } catch(const std::exception& e) {
+        std::cerr << _("\n/!\\ gvle Exception reported: ") <<
+            vle::utils::demangle(typeid(e)) << "\n" << e.what();
     }
 
-    if (not stop) {
-        vle::gvle::GVLE* g = 0;
-	Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
-	try {
-            vle::utils::Trace::setLogFile(
-                vle::utils::Trace::getLogFilename("gvle.log"));
-            vle::utils::Trace::setLevel(
-                vle::utils::Trace::cast(verbose));
+    delete g;
 
-	    refBuilder->add_from_file(vle::utils::Path::path().
-                                      getGladeFile("gvle.glade").c_str());
-
-	    refBuilder->get_widget_derived("WindowPackageBrowser", g);
-	    if (*argv) {
-		g->setFileName(*argv);
-            }
-	    application.run(*g);
-	    delete g;
-	} catch(const Glib::MarkupError& e) {
-	    result = false;
-	    std::cerr << _("\n/!\\  gvle Glib::MarkupError reported: ") <<
-	      vle::utils::demangle(typeid(e)) << "\n" << e.what();
-        } catch(const Gtk::BuilderError& e) {
-	    result = false;
-	    std::cerr << _("\n/!\\  gvle  Gtk::BuilderError reported: ") <<
-	      vle::utils::demangle(typeid(e)) << "\n" << e.what();
-        } catch(const Glib::Exception& e) {
-            result = false;
-            vle::gvle::print_error(_("\n/!\\ gvle Glib error reported (%s): %s"),
-                                   vle::utils::demangle(typeid(e)).c_str(),
-                                   e.what().c_str());
-            delete g;
-        } catch(const std::exception& e) {
-            result = false;
-            vle::gvle::print_error(_("\n/!\\ gvle exception reported (%s): %s"),
-                                   vle::utils::demangle(typeid(e)).c_str(),
-                                   e.what());
-            delete g;
-        }
-    }
-
-    return result ? EXIT_SUCCESS : EXIT_FAILURE;
+    return ret;
 }
