@@ -145,9 +145,10 @@ public:
         return mWarnings;
     }
 
-    static boost::mutex mMutex; /**< Store the instance of the mutex
-                                  to implemend a thread-safe single
-                                  design pattern. */
+    boost::mutex& getMutex()
+    {
+        return mMutex;
+    }
 
     static Pimpl* mTrace;       /**< The singleton static variable, to
                                    be sure to avoid all multithread
@@ -167,9 +168,12 @@ private:
                                  * singleton. */
 
     TraceStreamType mType;      /**< The current stream. */
+
+    boost::mutex mMutex;        /**< Store the instance of the mutex
+                                  to implement a thread-safe single
+                                  design pattern. */
 };
 
-boost::mutex Trace::Pimpl::mMutex;
 Trace::Pimpl* Trace::Pimpl::mTrace = 0;
 
 /*
@@ -179,23 +183,15 @@ Trace::Pimpl* Trace::Pimpl::mTrace = 0;
 void Trace::init()
 {
     if (not Trace::Pimpl::mTrace) {
-        boost::mutex::scoped_lock lock(Trace::Pimpl::mMutex);
-
-        if (not Trace::Pimpl::mTrace) {
-            Trace::Pimpl::mTrace = new Trace::Pimpl();
-        }
+        Trace::Pimpl::mTrace = new Trace::Pimpl();
     }
 }
 
 void Trace::kill()
 {
-    if (Trace::Pimpl::mTrace) {
-        boost::mutex::scoped_lock lock(Pimpl::mMutex);
-
-        if (Trace::Pimpl::mTrace) {
-            delete Trace::Pimpl::mTrace;
-            Trace::Pimpl::mTrace = 0;
-        }
+	if (Trace::Pimpl::mTrace) {
+		delete Trace::Pimpl::mTrace;
+		Trace::Pimpl::mTrace = 0;
     }
 }
 
@@ -205,7 +201,7 @@ std::string Trace::getLogFile()
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     return Pimpl::mTrace->getLogFile();
 }
@@ -216,7 +212,7 @@ void Trace::setLogFile(const std::string& filename)
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     Pimpl::mTrace->setLogFile(filename);
 }
@@ -227,7 +223,7 @@ void Trace::setStandardOutput()
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     Pimpl::mTrace->setStandardOutput();
 }
@@ -238,7 +234,7 @@ void Trace::setStandardError()
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     Pimpl::mTrace->setStandardError();
 }
@@ -249,7 +245,7 @@ void Trace::send(const std::string& str, TraceLevelOptions level)
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     Pimpl::mTrace->send(str, level);
 }
@@ -260,7 +256,7 @@ void Trace::send(const boost::format& str, TraceLevelOptions level)
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     Pimpl::mTrace->send(str.str(), level);
 }
@@ -281,7 +277,7 @@ TraceStreamType Trace::getType()
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     return Pimpl::mTrace->getType();
 }
@@ -292,7 +288,7 @@ TraceLevelOptions Trace::getLevel()
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     return Pimpl::mTrace->getLevel();
 }
@@ -303,7 +299,7 @@ void Trace::setLevel(TraceLevelOptions level)
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     Pimpl::mTrace->setLevel(level);
 }
@@ -314,7 +310,7 @@ bool Trace::isInLevel(TraceLevelOptions level)
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     return Pimpl::mTrace->isInLevel(level);
 }
@@ -325,7 +321,7 @@ bool Trace::haveWarning()
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     return Pimpl::mTrace->haveWarning();
 }
@@ -336,7 +332,7 @@ size_t Trace::warnings()
         Trace::init();
     }
 
-    boost::mutex::scoped_lock lock(Pimpl::mMutex);
+    boost::mutex::scoped_lock lock(Trace::Pimpl::mTrace->getMutex());
 
     return Pimpl::mTrace->warnings();
 }
