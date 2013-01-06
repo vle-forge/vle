@@ -52,8 +52,10 @@ set_target_properties(vlelib PROPERTIES OUTPUT_NAME
   "vle-${VLE_VERSION_SHORT}")
 set_target_properties(vlelib PROPERTIES DEFINE_SYMBOL
   "vlelib_EXPORTS")
+set_target_properties(vlelib PROPERTIES COMPILE_DEFINITIONS
+   "VLE_DLL")
 set_target_properties(vlelib PROPERTIES COMPILE_FLAGS
-  "-fvisibility=hidden -fvisibility-inlines-hidden -DVLE_DLL")
+  "-fvisibility=hidden -fvisibility-inlines-hidden")
 set_target_properties(vlelib PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 if (WIN32)
@@ -69,26 +71,6 @@ endif ()
 
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
-
-#
-# Build the static library.
-#
-
-add_library(vlelib-static STATIC
-  DllDefines.hpp;${vlelib_SRCS};${OS_SPECIFIC_PATH_IMPL})
-
-set_target_properties(vlelib-static PROPERTIES VERSION 0)
-set_target_properties(vlelib-static PROPERTIES OUTPUT_NAME
-  "vle-${VLE_VERSION_SHORT}")
-set_target_properties(vlelib-static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(vlelib-static PROPERTIES COMPILE_FLAGS
-  "-DCURL_STATICLIB")
-
-target_link_libraries(vlelib-static ${VLEDEPS_STATIC_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
-
-install(TARGETS vlelib-static RUNTIME DESTINATION bin LIBRARY
-  DESTINATION lib ARCHIVE DESTINATION lib)
 
 #
 # Configure the version.h.in file to produce in the binary directory a
