@@ -16,18 +16,12 @@ else ()
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
 endif ()
 
-if (BUILD_SHARED_LIBS)
-  target_link_libraries(mvle ${VLEDEPS_LIBRARIES}
-    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} ${MPI_LIBRARY}
-    ${MPI_EXTRA_LIBRARY} vlelib)
-else ()
-  if (WIN32)
-    set_target_properties(mvle PROPERTIES LINK_FLAGS "-Wl,-static")
-  endif ()
-
-  target_link_libraries(mvle ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY}
-    vlelib-static)
+if (WIN32)
+  set_target_properties(mvle PROPERTIES LINK_FLAGS "-Wl,-static")
 endif ()
+target_link_libraries(mvle ${VLEDEPS_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} ${MPI_LIBRARY}
+  ${MPI_EXTRA_LIBRARY} vlelib)
 
 install(TARGETS mvle DESTINATION bin)
 

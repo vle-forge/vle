@@ -16,15 +16,11 @@ else ()
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
 endif ()
 
-if (BUILD_SHARED_LIBS)
-  target_link_libraries(vle ${VLEDEPS_LIBRARIES}
-    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
-else ()
-  if (WIN32)
-    set_target_properties(vle PROPERTIES LINK_FLAGS "-Wl,-static")
-  endif ()
-  target_link_libraries(vle vlelib-static)
+if (WIN32)
+  set_target_properties(vle PROPERTIES LINK_FLAGS "-Wl,-static")
 endif ()
+target_link_libraries(vle ${VLEDEPS_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
 
 install(TARGETS vle DESTINATION bin)
 

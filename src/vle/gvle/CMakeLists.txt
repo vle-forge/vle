@@ -46,26 +46,13 @@ else (WIN32)
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
 endif (WIN32)
 
-# target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
-#   ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
 
-if (BUILD_SHARED_LIBS)
-  # if (WIN32)
-  #   target_link_libraries(gvle vlelib)
-  # else ()
-    target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
-      ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
-  # endif ()
-else ()
-  if (WIN32)
-    set_target_properties(gvle PROPERTIES LINK_FLAGS "-Wl,-static")
-  endif ()
-
-  # target_link_libraries(gvle ${VLEDEPS_STATIC_LIBRARIES}
-  #   ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib-static)
-
-  target_link_libraries(gvle vlelib-static)
+if (WIN32)
+  set_target_properties(gvle PROPERTIES LINK_FLAGS "-Wl,-static")
 endif ()
+
+target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
 
 install(TARGETS gvle DESTINATION bin)
 
@@ -76,6 +63,32 @@ install(FILES gvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
 
 install(FILES gvle.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
 
+
+#
+# Build the shared library for win32
+#
+if (WIN32)
+  add_library(gvlelib SHARED
+    ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP})
+  set_target_properties(gvlelib PROPERTIES VERSION 0)
+  set_target_properties(gvlelib PROPERTIES OUTPUT_NAME
+    "gvle-${VLE_VERSION_SHORT}")
+  set_target_properties(gvlelib PROPERTIES DEFINE_SYMBOL
+    "vlelib_EXPORTS")
+  set_target_properties(gvlelib PROPERTIES COMPILE_DEFINITIONS
+    "VLE_DLL")
+  set_target_properties(gvlelib PROPERTIES COMPILE_FLAGS
+    "-fvisibility=hidden -fvisibility-inlines-hidden")
+  set_target_properties(gvlelib PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+  set_target_properties(gvlelib PROPERTIES COMPILE_FLAGS
+      "-DCURL_STATICLIB")
+  set_target_properties(gvlelib PROPERTIES LINK_FLAGS "-Wl,-static")
+  target_link_libraries(gvlelib vlelib ${VLEDEPS_STATIC_LIBRARIES}
+      ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
+  install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
+    lib ARCHIVE DESTINATION lib)
+endif (WIN32)
+
 #
 # Configure the file gvle.pc.in to produce in the binary directory a
 # filled pkg-config script gvle.pc.
@@ -85,10 +98,12 @@ if (WIN32)
   set(VLE_PKGCONFIG_PREFIXPATH "/target")
   set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "\${includedir}")
   set(VLE_PKGCONFIG_LIBDIR "bin")
+  set(VLE_GVLE_LIBRARY "-lgvle-${VLE_VERSION_SHORT}")
 else()
   set(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
   set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
   set(VLE_PKGCONFIG_LIBDIR "lib")
+  set(VLE_GVLE_LIBRARY "")
 endif()
 
 configure_file(gvle.pc.in
