@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2012 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2012 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2012 INRA http://www.inra.fr
+ * Copyright (c) 2003-2013 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2013 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2013 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,153 +24,171 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_GVLE_DYNAMICSBOX_HPP
 #define VLE_GVLE_DYNAMICSBOX_HPP
 
+#include <gtkmm/treemodel.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/treeview.h>
-#include <gtkmm/combobox.h>
+#include <gtkmm/cellrenderercombo.h>
 #include <gtkmm/liststore.h>
+
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/PluginFactory.hpp>
 
 namespace vle { namespace gvle {
 
-    class Modeling;
+class Modeling;
 
-    class DynamicsBox
+class DynamicsBox
+{
+public:
+    DynamicsBox(Modeling& modeling,
+                vle::gvle::PluginFactory&,
+                Glib::RefPtr < Gtk::Builder > ref,
+                vpz::Dynamics& dynamics);
+
+    virtual ~DynamicsBox();
+
+    void run();
+
+    /**
+     * @brief When a choice is made using a combo.
+     */
+    void onCellrendererChoiceEditedPackage(
+        const Glib::ustring& pathstring,
+        const Glib::ustring& newtext);
+    /**
+     * @brief When a choice is made using a combo.
+     */
+    void onCellrendererChoiceEditedLibrary(
+        const Glib::ustring& pathstring,
+        const Glib::ustring& newtext);
+
+    /**
+     * @brief To add a vpz::Dynamic.
+     */
+    void onAddDynamic();
+
+    /**
+     * @brief To delete a vpz::Dynamic.
+     */
+    void onRemoveDynamic();
+
+    /**
+     * @brief To rename a vpz::Dynamic.
+     */
+    void onRenameDynamic();
+
+    /**
+     * @brief To copy a vpz::Dynamic
+     */
+    void onCopyDynamic();
+
+    // Signal handler for text cell
+    virtual void onEditionStarted(
+        Gtk::CellEditable* celleditatble,
+        const Glib::ustring& path);
+    virtual void onEdition(
+        const Glib::ustring& path,
+        const Glib::ustring& newstring);
+
+private:
+    typedef std::vector < std::pair <std::string, std::string> > renameList;
+    typedef std::map< std::string, Glib::RefPtr<Gtk::ListStore> > listStoreList;
+
+    struct DynamicsModelColumns : public Gtk::TreeModel::ColumnRecord
     {
-    public:
-        DynamicsBox(Modeling& modeling,
-                    Glib::RefPtr < Gtk::Builder > ref,
-			        vpz::Dynamics& dynamics);
+        DynamicsModelColumns()
+        { add(mName); add(mPackage); add(mLibrary);
+            add(mPackages); add(mLibraries); }
 
-        virtual ~DynamicsBox();
+        Gtk::TreeModelColumn<Glib::ustring> mName;
+        Gtk::TreeModelColumn<Glib::ustring> mPackage;
+        Gtk::TreeModelColumn< Glib::RefPtr<Gtk::TreeModel> > mPackages;
+        Gtk::TreeModelColumn<Glib::ustring> mLibrary;
+        Gtk::TreeModelColumn< Glib::RefPtr<Gtk::TreeModel> > mLibraries;
 
-        void run();
+    } mDynamicsColumns;
 
-        /**
-         * @brief Call when user want to add a vpz::Dynamic.
-         */
-        void onAddDynamic();
+    struct PackageModelColumns : public Gtk::TreeModel::ColumnRecord
+    {
+        PackageModelColumns()
+        { add(mContent); }
 
-        /**
-         * @brief Call when user want to delete a vpz::Dynamic.
-         */
-        void onRemoveDynamic();
+        Gtk::TreeModelColumn<Glib::ustring> mContent;
+    } mPackageColumns;
 
-        /**
-         * @brief Call when user want to rename a vpz::Dynamic.
-         */
-        void onRenameDynamic();
+    struct LibraryModelColumns : public Gtk::TreeModel::ColumnRecord
+    {
+        LibraryModelColumns()
+        { add(mContent); }
 
-        /**
-         * @brief Call when user want to copy a vpz::Dynamic
-         */
-        void onCopyDynamic();
+        Gtk::TreeModelColumn<Glib::ustring> mContent;
+    } mLibraryColumns;
 
-        // Signal handler for text area
-        virtual void onEditionStarted(
-            Gtk::CellEditable* cellEditatble,
-            const Glib::ustring& path);
-        virtual void onEdition(
-            const Glib::ustring& pathString,
-            const Glib::ustring& newName);
+    Modeling&                           mModeling;
+    PluginFactory&                      mPluginFactory;
 
-    private:
-        Modeling&                           mModeling;
+    vpz::Dynamics                       mDynsCopy;
 
-        /** A copy of the vpz::Dynamics, filled when user modify datas */
-        vpz::Dynamics                       mDynsCopy;
+    Glib::RefPtr < Gtk::Builder >       mXml;
+    Gtk::Dialog*                        mDialog;
+    Gtk::TreeView*                      mDynamics;
 
-        Glib::RefPtr < Gtk::Builder >  mXml;
-        Gtk::Dialog*                        mDialog;
-        Gtk::TreeView*                      mDynamics;
-        Gtk::ComboBox*                      mPackage;
-        Gtk::ComboBox*                      mLibrary;
+    int                                 mColumnName;
+    int                                 mColumnPackage;
+    int                                 mColumnLibrary;
+    Glib::ustring                       mOldName;
 
-        Gtk::CellRendererText*              mCellRenderer;
-        int                                 mColumnName;
-        int                                 mColumnPackage;
-        int                                 mColumnLibrary;
-        std::string                         mOldName;
-        bool                                mValidateRetry;
-        Glib::ustring                       mInvalidTextForRetry;
+    std::list < sigc::connection >      mList;
 
-        std::list < sigc::connection >      mList;
+    Glib::RefPtr<Gtk::ListStore>        mDynamicsListStore;
+    Glib::RefPtr<Gtk::ListStore>        mPackagesListStore;
+    listStoreList                       mLibrariesListStore;
 
-        Glib::RefPtr<Gtk::ListStore>        mDynamicsListStore;
-        Glib::RefPtr<Gtk::ListStore>        mPackageListStore;
-        Glib::RefPtr<Gtk::ListStore>        mLibraryListStore;
+    Gtk::TreeModel::Row                 mRowPackage;
+    Gtk::TreeModel::Row                 mRowLibrary;
 
-        Gtk::TreeModel::Row                 mRowPackage;
-        Gtk::TreeModel::Row                 mRowLibrary;
+    Gtk::Menu                           mMenu;
 
-        Gtk::Menu                           mMenu;
-
-        Gtk::TreeModel::Children::iterator  mIter;
-
-        typedef std::vector < std::pair < std::string,
-                                          std::string > > renameList;
-        renameList                          mRenameList;
-
-        void initDynamics();
-        void fillDynamics();
-        void initMenuPopupDynamics();
-        void sensitive(bool active);
-        bool onButtonRealeaseDynamics(GdkEventButton*
-                                      event);
-        void onCursorChangedDynamics();
-        void onChangedPackage();
-        void onChangedLibrary();
-
-        void assignDynamic(const std::string& name);
-        void updateDynamic(const std::string& name);
-        void storePrevious();
-        void applyRenaming();
-
-        void initPackage();
-        void fillPackage();
-        void setPackageStr(Glib::ustring str);
-        Glib::ustring getPackageStr();
-
-        void initLibrary();
-        void fillLibrary();
-        void setLibraryStr(Glib::ustring str);
-        Glib::ustring getLibraryStr();
-
-        void onClickColumn(int numColum);
+    Gtk::TreeModel::Children::iterator  mIter;
 
 
-        struct DynamicsModelColumns : public Gtk::TreeModel::ColumnRecord
-        {
-            DynamicsModelColumns()
-            { add(mName); add(mPackage); add(mLibrary); }
+    renameList                          mRenameList;
 
-            Gtk::TreeModelColumn<Glib::ustring> mName;
-            Gtk::TreeModelColumn<Glib::ustring> mPackage;
-            Gtk::TreeModelColumn<Glib::ustring> mLibrary;
-        } mDynamicsColumns;
+    std::set < std::string >            mDeletedDynamics;
 
-        struct PackageModelColumns : public Gtk::TreeModel::ColumnRecord
-        {
-            PackageModelColumns()
-            { add(mContent); }
+    void fillLibrariesListStore();
+    void initDynamicsColumnName();
+    void initDynamicsColumnPackage();
+    void initDynamicsColumnLibrary();
+    void fillDynamics();
 
-            Gtk::TreeModelColumn<Glib::ustring> mContent;
-        } mPackageColumns;
+    void initMenuPopupDynamics();
 
-        struct LibraryModelColumns : public Gtk::TreeModel::ColumnRecord
-        {
-            LibraryModelColumns()
-            { add(mContent); }
+    bool onButtonRealeaseDynamics(GdkEventButton*
+                                  event);
+    void applyRenaming();
 
-            Gtk::TreeModelColumn<Glib::ustring> mContent;
-        } mLibraryColumns;
+    void onClickColumn(int numColum);
 
-        std::set < std::string >mDeletedDynamics;
-    };
+    bool isValidName(std::string name)
+    {
+        size_t i = 0;
+        while (i < name.length()) {
+            if (!isalnum(name[i])) {
+                if (name[i] != '_') {
+                    return false;
+                }
+            }
+            i++;
+        }
+        return true;
+    }
+};
+
 }} // namespace vle gvle
 
 #endif

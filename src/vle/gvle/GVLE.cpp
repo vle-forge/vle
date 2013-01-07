@@ -1043,7 +1043,7 @@ void GVLE::onDynamicsBox()
 {
     const Modeling* modeling((const Modeling*)mModeling);
     vpz::Dynamics dynamics(modeling->dynamics());
-    DynamicsBox box(*mModeling, mRefXML, dynamics);
+    DynamicsBox box(*mModeling, mPluginFactory, mRefXML, dynamics);
     box.run();
 }
 
