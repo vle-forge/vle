@@ -30,12 +30,12 @@
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
-#include <vle/DllDefines.hpp>
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 
 namespace vle { namespace gvle {
 
-    class VLE_API SimpleTypeBox : public Gtk::Dialog
+    class GVLE_API SimpleTypeBox : public Gtk::Dialog
     {
     public:
         SimpleTypeBox(value::Value* base);

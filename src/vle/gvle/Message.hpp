@@ -28,7 +28,7 @@
 #ifndef VLE_GVLE_WIDGETS_MESSAGE_HPP
 #define VLE_GVLE_WIDGETS_MESSAGE_HPP 1
 
-#include <vle/DllDefines.hpp>
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/utils/i18n.hpp>
 
 namespace vle { namespace gvle {
@@ -38,7 +38,7 @@ namespace vle { namespace gvle {
  *
  * @param str a string representation of debugging message.
  */
-void VLE_API Debug(const std::string& str);
+void GVLE_API Debug(const std::string& str);
 
 /**
  * @brief Show a Gtk dialog box with warning icon and error message.
@@ -58,7 +58,7 @@ inline void Debug(const boost::format& str)
  *
  * @param str a string representation of information message.
  */
-void VLE_API Info(const std::string& str);
+void GVLE_API Info(const std::string& str);
 
 /**
  * @brief Show a Gtk dialog box with warning icon and information message.
@@ -80,7 +80,7 @@ inline void Info(const boost::format& str)
  * @param use_markup to enhance or not the text presentation by
  * inserting html tags inside the message string.
  */
-void VLE_API Error(const std::string& msg, bool use_markup = true);
+void GVLE_API Error(const std::string& msg, bool use_markup = true);
 
 /**
  * @brief Show a Gtk dialog box with error icon and error message.
@@ -103,7 +103,7 @@ inline void Error(const boost::format& msg,
  *
  * @return true if user have clicked on YES, otherwise false.
  */
-bool VLE_API Question(const std::string& str);
+bool GVLE_API Question(const std::string& str);
 
 /**
  * @brief Show a Gtk dialog box with a question. User have two choices, YES or

@@ -28,7 +28,7 @@
 #ifndef VLE_GVLE_MODELINGPLUGIN_HPP
 #define VLE_GVLE_MODELINGPLUGIN_HPP
 
-#include <vle/DllDefines.hpp>
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/version.hpp>
 #include <gdkmm/pixbuf.h>
@@ -38,14 +38,14 @@
 
 #define DECLARE_GVLE_MODELINGPLUGIN(x)                          \
     extern "C" {                                                \
-        VLE_MODULE vle::gvle::ModelingPlugin*                   \
+        GVLE_MODULE vle::gvle::ModelingPlugin*                  \
         vle_make_new_gvle_modeling(const std::string& package,  \
                                    const std::string& library)  \
         {                                                       \
             return new x(package, library);                     \
         }                                                       \
                                                                 \
-        VLE_MODULE void                                         \
+        GVLE_MODULE void                                        \
         vle_api_level(vle::uint32_t* major,                     \
                       vle::uint32_t* minor,                     \
                       vle::uint32_t* patch)                     \
@@ -62,7 +62,7 @@ namespace vle { namespace gvle {
  * @brief Define a plug-in to build source code, DEVS atomic model and its
  * experiment infortion (dynamics, conditions, observations).
  */
-class VLE_API ModelingPlugin
+class GVLE_API ModelingPlugin
 {
 public:
     /**

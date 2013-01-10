@@ -4,7 +4,7 @@ set(GVLE_SOURCES_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp
   DynamicBox.cpp DynamicsBox.cpp Editor.cpp ExperimentBox.cpp
   FileTreeView.cpp GVLE.cpp GVLEMenuAndToolbar.cpp
   ImportClassesBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp
-  LaunchSimulationBox.cpp main.cpp MatrixBox.cpp Message.cpp
+  LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp
   ModelClassBox.cpp ModelDescriptionBox.cpp Modeling.cpp
   ModelingPlugin.cpp ModelTreeBox.cpp NewDynamicsBox.cpp
   NewModelClassBox.cpp NewProjectBox.cpp NewTypeBox.cpp
@@ -18,7 +18,7 @@ set(GVLE_SOURCES_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp
 set(GVLE_SOURCES_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
   CalendarBox.hpp ComboboxString.hpp CompleteViewDrawingArea.hpp
   ConditionsBox.hpp ConnectionBox.hpp CoupledModelBox.hpp
-  CutCopyPaste.hpp DynamicBox.hpp DynamicsBox.hpp Editor.hpp
+  CutCopyPaste.hpp DllDefines.hpp DynamicBox.hpp DynamicsBox.hpp Editor.hpp
   ExperimentBox.hpp FileTreeView.hpp GVLE.hpp GVLEMenuAndToolbar.hpp
   ImportClassesBox.hpp ImportModelBox.hpp InteractiveTypeBox.hpp
   LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp ModelClassBox.hpp
@@ -32,62 +32,49 @@ set(GVLE_SOURCES_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
   TreeViewValue.hpp TupleBox.hpp ValueBox.hpp ValuesTreeView.hpp
   ViewDrawingArea.hpp View.hpp ViewOutputBox.hpp XmlTypeBox.hpp)
 
-if (WIN32)
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gvle.o
-    COMMAND ${CMAKE_RC_COMPILER}
-    -I${CMAKE_BINARY_DIR}/share
-    -i${CMAKE_BINARY_DIR}/share/gvle.rc
-    -o${CMAKE_CURRENT_BINARY_DIR}/gvle.o)
-  add_executable(gvle WIN32 ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP};
-    ${CMAKE_CURRENT_BINARY_DIR}/gvle.o)
-else (WIN32)
-  add_executable(gvle ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP})
-  set_target_properties(gvle PROPERTIES SOVERSION
-    "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
-endif (WIN32)
-
-
-if (WIN32)
-  set_target_properties(gvle PROPERTIES LINK_FLAGS "-Wl,-static")
-endif ()
-
-target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
-
-install(TARGETS gvle DESTINATION bin)
 
 install(FILES ${GVLE_SOURCES_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
 
-install(FILES gvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
-  gvle-${VLE_VERSION_SHORT}.1)
-
 install(FILES gvle.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
 
-
-#
-# Build the shared library for win32
-#
 if (WIN32)
-  add_library(gvlelib SHARED
-    ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP})
-  set_target_properties(gvlelib PROPERTIES VERSION 0)
-  set_target_properties(gvlelib PROPERTIES OUTPUT_NAME
-    "gvle-${VLE_VERSION_SHORT}")
-  set_target_properties(gvlelib PROPERTIES DEFINE_SYMBOL
-    "vlelib_EXPORTS")
-  set_target_properties(gvlelib PROPERTIES COMPILE_DEFINITIONS
-    "VLE_DLL")
-  set_target_properties(gvlelib PROPERTIES COMPILE_FLAGS
-    "-fvisibility=hidden -fvisibility-inlines-hidden")
-  set_target_properties(gvlelib PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-  set_target_properties(gvlelib PROPERTIES COMPILE_FLAGS
-      "-DCURL_STATICLIB")
-  set_target_properties(gvlelib PROPERTIES LINK_FLAGS "-Wl,-static")
-  target_link_libraries(gvlelib vlelib ${VLEDEPS_STATIC_LIBRARIES}
-      ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
-  install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
-    lib ARCHIVE DESTINATION lib)
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND ${CMAKE_RC_COMPILER}
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  set(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  set(OS_SPECIFIC_LIBRARIES -Wl,--allow-multiple-definition)
+else (WIN32)
+  set(OS_SPECIFIC_PATH_IMPL)
+  set(OS_SPECIFIC_LIBRARIES dl)
 endif (WIN32)
+
+add_library(gvlelib SHARED
+    ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP};${OS_SPECIFIC_PATH_IMPL})
+
+set_target_properties(gvlelib PROPERTIES
+  VERSION 0
+  OUTPUT_NAME "gvle-${VLE_VERSION_SHORT}"
+  DEFINE_SYMBOL "gvlelib_EXPORTS"
+  COMPILE_DEFINITIONS "GVLE_DLL"
+  COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
+  CLEAN_DIRECT_OUTPUT 1)
+
+if (WIN32)
+  set_target_properties(gvlelib PROPERTIES
+    COMPILE_FLAGS "-DCURL_STATICLIB"
+    LINK_FLAGS "-Wl,-static -mwindows")
+
+  target_link_libraries(gvlelib ${VLEDEPS_STATIC_LIBRARIES}
+    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
+else ()
+  target_link_libraries(gvlelib ${VLEDEPS_LIBRARIES}
+    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
+endif ()
+
+install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
+  lib ARCHIVE DESTINATION lib)
 
 #
 # Configure the file gvle.pc.in to produce in the binary directory a

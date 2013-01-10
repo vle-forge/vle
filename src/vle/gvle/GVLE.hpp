@@ -28,7 +28,7 @@
 #ifndef GUI_GVLE_HH
 #define GUI_GVLE_HH
 
-#include <vle/DllDefines.hpp>
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/gvle/PluginFactory.hpp>
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
@@ -77,7 +77,7 @@ typedef std::vector < View * > ListView;
  * @brief GVLE is a Gtk::Window use to build the main window with all button
  * to control project.
  */
-class VLE_API GVLE : public Gtk::Window
+class GVLE_API GVLE : public Gtk::Window
 {
 public:
     typedef std::multimap < std::string, std::string > MapCategory;

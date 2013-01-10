@@ -28,7 +28,7 @@
 #ifndef VLE_GVLE_OUTPUTPLUGIN_HPP
 #define VLE_GVLE_OUTPUTPLUGIN_HPP
 
-#include <vle/DllDefines.hpp>
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/vpz/Output.hpp>
 #include <vle/vpz/View.hpp>
 #include <vle/version.hpp>
@@ -37,14 +37,14 @@
 
 #define DECLARE_GVLE_OUTPUTPLUGIN(x)                            \
     extern "C" {                                                \
-        VLE_MODULE vle::gvle::OutputPlugin*                     \
+        GVLE_MODULE vle::gvle::OutputPlugin*                    \
         vle_make_new_gvle_output(const std::string& package,    \
                                  const std::string& library)    \
         {                                                       \
             return new x(package, library);                     \
         }                                                       \
                                                                 \
-        VLE_MODULE void                                         \
+        GVLE_MODULE void                                        \
         vle_api_level(vle::uint32_t* major,                     \
                       vle::uint32_t* minor,                     \
                       vle::uint32_t* patch)                     \
@@ -72,7 +72,7 @@ namespace vle { namespace gvle {
  * };
  * @endcode
  */
-class VLE_API OutputPlugin
+class GVLE_API OutputPlugin
 {
 public:
     OutputPlugin(const std::string& package, const std::string& library);

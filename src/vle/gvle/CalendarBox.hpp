@@ -28,7 +28,7 @@
 #ifndef GUI_CALENDARBOX_HPP
 #define GUI_CALENDARBOX_HPP
 
-#include <vle/DllDefines.hpp>
+#include <vle/gvle/DllDefines.hpp>
 #include <gtkmm/dialog.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/builder.h>
@@ -36,7 +36,7 @@
 
 namespace vle { namespace gvle {
 
-class VLE_API CalendarBox
+class GVLE_API CalendarBox
 {
 public:
     CalendarBox(const Glib::RefPtr < Gtk::Builder >& xml);

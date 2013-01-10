@@ -33,7 +33,6 @@ if (WIN32)
     -i${CMAKE_BINARY_DIR}/share/vfl.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
   set(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  # set(OS_SPECIFIC_LIBRARIES -shared-libgcc -Wl,--allow-multiple-definition)
   set(OS_SPECIFIC_LIBRARIES -Wl,--allow-multiple-definition)
 else (WIN32)
   set(OS_SPECIFIC_PATH_IMPL)
@@ -47,21 +46,21 @@ endif (WIN32)
 add_library(vlelib SHARED
   DllDefines.hpp;${vlelib_SRCS};${OS_SPECIFIC_PATH_IMPL})
 
-set_target_properties(vlelib PROPERTIES VERSION 0)
-set_target_properties(vlelib PROPERTIES OUTPUT_NAME
-  "vle-${VLE_VERSION_SHORT}")
-set_target_properties(vlelib PROPERTIES DEFINE_SYMBOL
-  "vlelib_EXPORTS")
-set_target_properties(vlelib PROPERTIES COMPILE_DEFINITIONS
-   "VLE_DLL")
-set_target_properties(vlelib PROPERTIES COMPILE_FLAGS
-  "-fvisibility=hidden -fvisibility-inlines-hidden")
-set_target_properties(vlelib PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(vlelib PROPERTIES
+  VERSION 0
+  OUTPUT_NAME "vle-${VLE_VERSION_SHORT}"
+  DEFINE_SYMBOL "vlelib_EXPORTS"
+  COMPILE_DEFINITIONS "VLE_DLL"
+  COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
+  CLEAN_DIRECT_OUTPUT 1)
 
 if (WIN32)
-  set_target_properties(vlelib PROPERTIES COMPILE_FLAGS
-    "-DCURL_STATICLIB")
-  set_target_properties(vlelib PROPERTIES LINK_FLAGS "-Wl,-static")
+  set_target_properties(vlelib PROPERTIES
+    LINK_FLAGS "-Wl,-static")
+
+  set_property(TARGET vlelib APPEND_STRING PROPERTY
+    COMPILE_FLAGS " -DCURL_STATICLIB")
+
   target_link_libraries(vlelib ${VLEDEPS_STATIC_LIBRARIES}
     ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
 else ()
