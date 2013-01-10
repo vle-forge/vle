@@ -57,10 +57,33 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
+#include <gtkmm/main.h>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 namespace vle { namespace gvle {
+
+void GVLE::start(int argc, char *argv[],
+        const std::string &packagename,
+        const std::string &filename)
+{
+    Gtk::Main application(&argc, &argv);
+    vle::gvle::GVLE* g = 0;
+
+    Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
+
+    refBuilder->add_from_file(vle::utils::Path::path().
+            getGladeFile("gvle.glade").c_str());
+
+    refBuilder->get_widget_derived("WindowPackageBrowser", g);
+
+    if (packagename.empty() and not filename.empty())
+        g->setFileName(filename);
+
+    application.run(*g);
+
+    delete g;
+}
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 

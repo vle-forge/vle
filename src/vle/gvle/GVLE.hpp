@@ -80,6 +80,16 @@ typedef std::vector < View * > ListView;
 class GVLE_API GVLE : public Gtk::Window
 {
 public:
+    /**
+     * @attention With mingw32, gvle.exe and libgvle.dll, the Gtk::Window is
+     * not displayed if the Gtk::Main loop is in gvle.exe and the GVLE is in
+     * libgvle.dll. To fix the problem, we introduce the start function which
+     * wraps the Gtk::Main loop into the libgvle.dll. The gvle.exe application
+     * have only a call to this function.
+     */
+    static void start(int argc, char *argv[], const std::string &package,
+            const std::string &filename);
+
     typedef std::multimap < std::string, std::string > MapCategory;
     typedef std::multimap < std::string, std::string > MapObserverCategory;
     typedef std::map < std::string, ObserverPlugin * > MapObserverPlugin;

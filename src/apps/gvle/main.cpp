@@ -30,7 +30,6 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
-#include <gtkmm/main.h>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -162,7 +161,7 @@ int main(int argc, char **argv)
 
     {
        ProgramOptions prgs(&verbose, &packagename, &args);
-       ret = prgs.run(argc, argv); 
+       ret = prgs.run(argc, argv);
 
        if (ret == PROGRAM_OPTIONS_END)
            return EXIT_SUCCESS;
@@ -170,39 +169,8 @@ int main(int argc, char **argv)
            return EXIT_FAILURE;
     }
 
-    ret = EXIT_FAILURE;
+    vle::gvle::GVLE::start(argc, argv, packagename,
+           args.empty() ? std::string() : args.front());
 
-    GVLE app(verbose);
-    Gtk::Main application(&argc, &argv);
-    vle::gvle::GVLE* g = 0;
-
-    Glib::RefPtr< Gtk::Builder > refBuilder = Gtk::Builder::create();
-
-    try {
-        refBuilder->add_from_file(vle::utils::Path::path().
-                getGladeFile("gvle.glade").c_str());
-
-        refBuilder->get_widget_derived("WindowPackageBrowser", g);
-
-        if (packagename.empty() and not args.empty())
-            g->setFileName(args.front());
-
-        application.run(*g);
-    } catch(const Glib::MarkupError& e) {
-        std::cerr << _("\n/!\\ gvle Glib::MarkupError reported: ") <<
-            vle::utils::demangle(typeid(e)) << "\n" << e.what();
-    } catch(const Gtk::BuilderError& e) {
-        std::cerr << _("\n/!\\ gvle Gtk::BuilderError reported: ") <<
-            vle::utils::demangle(typeid(e)) << "\n" << e.what();
-    } catch(const Glib::Exception& e) {
-        std::cerr << _("\n/!\\ gvle Glib error reported: ") <<
-            vle::utils::demangle(typeid(e)) << "\n" << e.what();
-    } catch(const std::exception& e) {
-        std::cerr << _("\n/!\\ gvle Exception reported: ") <<
-            vle::utils::demangle(typeid(e)) << "\n" << e.what();
-    }
-
-    delete g;
-
-    return ret;
+    return EXIT_SUCCESS;
 }
