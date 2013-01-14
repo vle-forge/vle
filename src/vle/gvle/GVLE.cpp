@@ -611,6 +611,7 @@ void GVLE::onNewProject()
     mMenuAndToolbar->onOpenProject();
     clearModelTreeBox();
     clearModelClassBox();
+    setTitle("");
     mFileTreeView->set_sensitive(true);
     onTrouble();
 }
