@@ -46,12 +46,20 @@ endif (WIN32)
 add_library(vlelib SHARED
   DllDefines.hpp;${vlelib_SRCS};${OS_SPECIFIC_PATH_IMPL})
 
+add_library(vlelib-static STATIC
+  DllDefines.hpp;${vlelib_SRCS};${OS_SPECIFIC_PATH_IMPL})
+
 set_target_properties(vlelib PROPERTIES
   VERSION 0
   OUTPUT_NAME "vle-${VLE_VERSION_SHORT}"
   DEFINE_SYMBOL "vlelib_EXPORTS"
   COMPILE_DEFINITIONS "VLE_DLL"
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
+  CLEAN_DIRECT_OUTPUT 1)
+
+set_target_properties(vlelib-static PROPERTIES
+  VERSION 0
+  OUTPUT_NAME "vle-${VLE_VERSION_SHORT}"
   CLEAN_DIRECT_OUTPUT 1)
 
 if (WIN32)
@@ -70,6 +78,9 @@ endif ()
 
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
+
+install(TARGETS vlelib-static RUNTIME DESTINATION bin LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
 
 #
 # Configure the version.h.in file to produce in the binary directory a

@@ -53,12 +53,20 @@ endif (WIN32)
 add_library(gvlelib SHARED
     ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP};${OS_SPECIFIC_PATH_IMPL})
 
+add_library(gvlelib-static STATIC
+    ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP};${OS_SPECIFIC_PATH_IMPL})
+
 set_target_properties(gvlelib PROPERTIES
   VERSION 0
   OUTPUT_NAME "gvle-${VLE_VERSION_SHORT}"
   DEFINE_SYMBOL "gvlelib_EXPORTS"
   COMPILE_DEFINITIONS "GVLE_DLL"
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
+  CLEAN_DIRECT_OUTPUT 1)
+
+set_target_properties(gvlelib-static PROPERTIES
+  VERSION 0
+  OUTPUT_NAME "gvle-${VLE_VERSION_SHORT}"
   CLEAN_DIRECT_OUTPUT 1)
 
 if (WIN32)
@@ -74,6 +82,9 @@ else ()
 endif ()
 
 install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
+  lib ARCHIVE DESTINATION lib)
+
+install(TARGETS gvlelib-static RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
 
 #
