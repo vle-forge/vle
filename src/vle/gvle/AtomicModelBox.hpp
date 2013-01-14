@@ -236,6 +236,7 @@ private:
                             const Glib::RefPtr<Gtk::Tooltip>& tooltip);
 
     protected:
+	virtual void onConditionsEditor();
 	virtual void onRename();
 
 	// Signal handler for text area
