@@ -611,6 +611,7 @@ void GVLE::onNewProject()
     mMenuAndToolbar->onOpenProject();
     clearModelTreeBox();
     clearModelClassBox();
+    setTitle("");
     mFileTreeView->set_sensitive(true);
     onTrouble();
 }
@@ -1043,7 +1044,7 @@ void GVLE::onDynamicsBox()
 {
     const Modeling* modeling((const Modeling*)mModeling);
     vpz::Dynamics dynamics(modeling->dynamics());
-    DynamicsBox box(*mModeling, mRefXML, dynamics);
+    DynamicsBox box(*mModeling, mPluginFactory, mRefXML, dynamics);
     box.run();
 }
 

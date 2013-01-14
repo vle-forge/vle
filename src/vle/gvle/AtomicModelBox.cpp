@@ -505,6 +505,12 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::ConditionTreeView::onRename)));
+
+        menulist.push_back(Gtk::Menu_Helpers::MenuElem(
+		_("_Conditions Editor"),
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ConditionTreeView::onConditionsEditor)));
     }
     mMenuPopup.accelerate(*this);
 
@@ -597,6 +603,8 @@ void AtomicModelBox::ConditionTreeView::on_row_activated(
     }
 }
 
+
+
 bool AtomicModelBox::ConditionTreeView::on_button_press_event(
     GdkEventButton* event)
 {
@@ -605,25 +613,7 @@ bool AtomicModelBox::ConditionTreeView::on_button_press_event(
 	mMenuPopup.popup(event->button, event->time);
     }
     if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
-	if (mGVLE->runConditionsBox(*mConditions) == 1) {
-            renameList tmpRename = mGVLE->applyConditionsBox(*mConditions);
-
-            std::vector < std::string > selected = getConditions();
-
-            renameList::const_iterator it = tmpRename.begin();
-            while (it != tmpRename.end()) {
-                mRenameList.push_back(*it);
-                std::vector < std::string >::const_iterator its =
-                    std::find(selected.begin(), selected.end(), it->first);
-
-                if(its != selected.end()) {
-                    mAtom->delCondition(it->first);
-                    mAtom->addCondition(it->second);
-                }
-                ++it;
-            }
-            build();
-	}
+        onConditionsEditor();
     }
     return return_value;
 }
@@ -650,6 +640,29 @@ void AtomicModelBox::ConditionTreeView::onRename()
     }
 }
 
+void AtomicModelBox::ConditionTreeView::onConditionsEditor()
+{
+    if (mGVLE->runConditionsBox(*mConditions) == 1) {
+        renameList tmpRename = mGVLE->applyConditionsBox(*mConditions);
+
+        std::vector < std::string > selected = getConditions();
+
+        renameList::const_iterator it = tmpRename.begin();
+        while (it != tmpRename.end()) {
+            mRenameList.push_back(*it);
+            std::vector < std::string >::const_iterator its =
+                std::find(selected.begin(), selected.end(), it->first);
+
+            if(its != selected.end()) {
+                mAtom->delCondition(it->first);
+                mAtom->addCondition(it->second);
+            }
+            ++it;
+        }
+        build();
+    }
+}
+
 void AtomicModelBox::ConditionTreeView::onEditionStarted(
     Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
 {
@@ -673,10 +686,9 @@ void AtomicModelBox::ConditionTreeView::onEditionStarted(
 }
 
 void AtomicModelBox::ConditionTreeView::onEdition(
-        const Glib::ustring& pathString,
-        const Glib::ustring& newName)
+    const Glib::ustring& /*pathString*/,
+    const Glib::ustring& newName)
 {
-    Gtk::TreePath path(pathString);
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator it = refSelection->get_selected();
 
@@ -751,10 +763,6 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
     mColumnDyn = append_column(_("Library"), mColumnsDyn.m_dyn);
     Gtk::TreeViewColumn* dynCol = get_column(mColumnDyn - 1);
     dynCol->set_sort_column(mColumnsDyn.m_dyn);
-
-    mColumnModel = append_column(_("Model"), mColumnsDyn.m_model);
-    Gtk::TreeViewColumn* modelCol = get_column(mColumnModel - 1);
-    modelCol->set_sort_column(mColumnsDyn.m_model);
 
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
