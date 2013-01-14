@@ -72,14 +72,12 @@ protected:
             add(m_col_name);
             add(m_package);
 	    add(m_dyn);
-	    add(m_model);
             add(m_sel);
         }
 
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
         Gtk::TreeModelColumn<Glib::ustring> m_package;
         Gtk::TreeModelColumn<Glib::ustring> m_dyn;
-	Gtk::TreeModelColumn<Glib::ustring> m_model;
         Gtk::TreeModelColumn<bool> m_sel;
     };
 

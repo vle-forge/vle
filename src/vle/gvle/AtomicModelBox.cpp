@@ -764,10 +764,6 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
     Gtk::TreeViewColumn* dynCol = get_column(mColumnDyn - 1);
     dynCol->set_sort_column(mColumnsDyn.m_dyn);
 
-    mColumnModel = append_column(_("Model"), mColumnsDyn.m_model);
-    Gtk::TreeViewColumn* modelCol = get_column(mColumnModel - 1);
-    modelCol->set_sort_column(mColumnsDyn.m_model);
-
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
 
