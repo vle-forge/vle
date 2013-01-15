@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2012 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2012 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2012 INRA http://www.inra.fr
+ * Copyright (c) 2003-2013 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2013 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2013 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -74,7 +74,7 @@ static int show_infos()
 {
     std::cout << vle::fmt(
         _("Virtual Laboratory Environment - %1%\n"
-          "Copyright (C) 2003 - 2012 The VLE Development Team.\n"
+          "Copyright (C) 2003 - 2013 The VLE Development Team.\n"
           "VLE comes with ABSOLUTELY NO WARRANTY.\n"
           "You may redistribute copies of VLE\n"
           "under the terms of the GNU General Public License.\n"

@@ -15,7 +15,7 @@ BEGIN
             VALUE "FileDescription", "Command line interface for VLE"
             VALUE "FileVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
             VALUE "InternalName", "vle"
-            VALUE "LegalCopyright", "2003-2010 VLE Development Team"
+            VALUE "LegalCopyright", "2003-2013 VLE Development Team"
             VALUE "ProductName", "vle"
             VALUE "ProductVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
         END

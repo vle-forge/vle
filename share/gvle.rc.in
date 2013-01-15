@@ -15,7 +15,7 @@ BEGIN
             VALUE "FileDescription", "GUI For VLE"
             VALUE "FileVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
             VALUE "InternalName", "Gvle"
-            VALUE "LegalCopyright", "2003-2010 VLE Development Team"
+            VALUE "LegalCopyright", "2003-2013 VLE Development Team"
             VALUE "ProductName", "Gvle"
             VALUE "ProductVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
         END
