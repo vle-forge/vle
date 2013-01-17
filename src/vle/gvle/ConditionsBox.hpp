@@ -153,6 +153,7 @@ class ConditionsBox
 	virtual void on_add();
 	virtual void on_remove();
 	virtual void onRename();
+	virtual void onDuplicate();
 	void onEdit(std::string pluginName);
 
 	// Signal handler for text area
