@@ -88,6 +88,7 @@ private:
                           Gtk::TreeViewColumn*  column);
     void on_menu_insert(value::Value::type);
     void on_menu_remove();
+    void on_menu_duplicate();
 
 };
 

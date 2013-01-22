@@ -39,11 +39,19 @@ NewDynamicsBox::NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml):
     xml->get_widget("ButtonOkNewDynamics", mButtonApply);
     xml->get_widget("ButtonCancelNewDynamics", mButtonCancel);
 
-    mButtonApply->signal_clicked().connect(
-	sigc::mem_fun(*this, &NewDynamicsBox::onApply));
+     mList.push_back(mButtonApply->signal_clicked().connect(
+                         sigc::mem_fun(*this, &NewDynamicsBox::onApply)));
 
-    mButtonCancel->signal_clicked().connect(
-	sigc::mem_fun(*this, &NewDynamicsBox::onCancel));
+     mList.push_back(mButtonCancel->signal_clicked().connect(
+                         sigc::mem_fun(*this, &NewDynamicsBox::onCancel)));
+}
+
+NewDynamicsBox::~NewDynamicsBox()
+{
+    for (std::list < sigc::connection >::iterator it = mList.begin();
+         it != mList.end(); ++it) {
+        it->disconnect();
+    }
 }
 
 void NewDynamicsBox::onApply()

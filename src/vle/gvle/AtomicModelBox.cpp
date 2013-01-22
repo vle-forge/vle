@@ -27,8 +27,11 @@
 
 #include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/GVLE.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
+#include <vle/gvle/OpenModelingPluginBox.hpp>
+#include <vle/gvle/NewDynamicsBox.hpp>
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/Editor.hpp>
@@ -777,6 +780,10 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
                     *this, &AtomicModelBox::DynamicTreeView::onEdit)));
 	menulist.push_back(
             Gtk::Menu_Helpers::MenuElem(
+                _("_New"), sigc::mem_fun(
+                    *this, &AtomicModelBox::DynamicTreeView::onNewLibrary)));
+	menulist.push_back(
+            Gtk::Menu_Helpers::MenuElem(
                 _("_Remove"), sigc::mem_fun(
                     *this, &AtomicModelBox::DynamicTreeView::onRemove)));
 	menulist.push_back(
@@ -1023,6 +1030,77 @@ void AtomicModelBox::DynamicTreeView::onEdit()
                 ++it;
             }
         }
+    }
+}
+
+void AtomicModelBox::DynamicTreeView::onNewLibrary()
+{
+
+    SimpleTypeBox box(_("Name of the Dynamic ?"), "");
+
+    std::string name = box.run();
+    if (box.valid()) {
+	box.hide();
+        name = boost::trim_copy(name);
+        if (mDynamics->exist(name)) {
+            Error((fmt(_("The Dynamics '%1%' already exists")) % name).str());
+        } else {
+            vpz::Dynamic dyn(name);
+
+            OpenModelingPluginBox box1(mXml, mGVLE);
+
+            if (box1.run() == Gtk::RESPONSE_OK) {
+                NewDynamicsBox box2(mXml);
+
+                if (box2.run() == Gtk::RESPONSE_OK and
+                    not box2.getClassName().empty() and
+                    not box2.getNamespace().empty()) {
+                    if (execPlugin(
+                            dyn,
+                            box1.pluginName(),
+                            box2.getClassName(),
+                            box2.getNamespace()) == Gtk::RESPONSE_OK) {
+                        dyn.setLibrary(box2.getClassName());
+                        dyn.setPackage(
+                            vle::utils::Package::package().name());
+                        mDynamics->add(dyn);
+                        build();
+
+                        mParent->refresh();
+                    }
+                }
+            }
+        }
+    }
+}
+
+int AtomicModelBox::DynamicTreeView::execPlugin(
+    vpz::Dynamic& dynamic,
+    const std::string& pluginname,
+    const std::string& classname,
+    const std::string& namespace_)
+{
+    ModelingPluginPtr plugin =
+        mGVLE->pluginFactory().getModelingPlugin(pluginname);
+
+    if (plugin->create(*mAtom, dynamic, *mConditions,
+                       *mObservables, classname, namespace_)) {
+        const std::string& buffer = plugin->source();
+        std::string filename = utils::Path::path().getPackageSrcFile(classname);
+        filename += ".cpp";
+
+        try {
+            std::ofstream f(filename.c_str());
+            f.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+            f << buffer;
+        } catch(const std::ios_base::failure& e) {
+            throw utils::ArgError(fmt(
+                    _("Cannot store buffer in file '%1%'")) % filename);
+        }
+
+        return Gtk::RESPONSE_OK;
+    } else {
+        return Gtk::RESPONSE_CANCEL;
     }
 }
 

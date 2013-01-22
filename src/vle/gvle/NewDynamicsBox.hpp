@@ -39,7 +39,7 @@ class NewDynamicsBox
 {
 public:
     NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml);
-    virtual ~NewDynamicsBox() { }
+    ~NewDynamicsBox();
 
     std::string getClassName() const
     { return mEntryClassName->get_text(); }
@@ -62,6 +62,8 @@ private:
     //Button
     Gtk::Button*                    mButtonApply;
     Gtk::Button*                    mButtonCancel;
+
+    std::list < sigc::connection >      mList;
 };
 
 }} // namespace vle gvle

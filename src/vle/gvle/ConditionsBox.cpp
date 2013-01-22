@@ -372,6 +372,12 @@ ConditionsBox::PortsTreeView::PortsTreeView(
 		    &ConditionsBox::PortsTreeView::onRename)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
+		_("_Duplicate"),
+		sigc::mem_fun(
+		    *this,
+		    &ConditionsBox::PortsTreeView::onDuplicate)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
 		_("_Edit"), mMenuEdit));
     }
     mMenuPopup.accelerate(*this);
@@ -491,6 +497,41 @@ void ConditionsBox::PortsTreeView::onRename()
             mCondition->rename(oldname, newname);
             mParent->buildTreePorts(mCondition->name());
         }
+    }
+}
+
+void ConditionsBox::PortsTreeView::onDuplicate()
+{
+    Gtk::TreeModel::iterator it_select = mRefTreeSelection->get_selected();
+    std::list < std::string > list;
+    mCondition->portnames(list);
+    if (it_select) {
+	Glib::ustring name = (*it_select)[mColumns.m_col_name];
+        int number = 1;
+        std::string copy;
+        std::list < std::string >::const_iterator it_find;
+
+        do {
+            copy = name
+                + "_"
+                + boost::lexical_cast< std::string >(number);
+            ++number;
+            it_find =
+                std::find(list.begin(), list.end(), copy);
+        } while (it_find != list.end());
+
+        mCondition->add(copy);
+
+        value::Set& set = mCondition->getSetValues(name);
+        value::VectorValue& vector = set.value();
+
+        value::VectorValue::iterator it = vector.begin();
+        while (it != vector.end()) {
+            mCondition->addValueToPort(copy, (*it)->clone());
+            it++;
+        }
+
+        mParent->buildTreePorts(mCondition->name());
     }
 }
 
