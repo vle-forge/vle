@@ -177,7 +177,7 @@ void Template::process(std::ostream& result) const
 void Template::tag(std::string& pluginname, std::string& packagename,
                    std::string& conf)
 {
-    boost::regex tagbegin("@@tag [[:alnum:]]*@", boost::regex::grep);
+    boost::regex tagbegin("@@tag [[:alnum:]_]*@", boost::regex::grep);
     boost::regex tagmiddle("@[[:word:]\\.\\-]* @@", boost::regex::grep);
     boost::regex tagend("@@end tag@@", boost::regex::grep);
 
@@ -202,7 +202,7 @@ void Template::tag(std::string& pluginname, std::string& packagename,
 
 std::string Template::processIf(const std::string& buffer) const
 {
-    boost::regex expif("{{if [[:alnum:]]*}}", boost::regex::grep);
+    boost::regex expif("{{if [[:alnum:]_]*}}", boost::regex::grep);
     boost::regex expendif("{{end if}}", boost::regex::grep);
 
     boost::sregex_iterator it(buffer.begin(), buffer.end(), expif);
@@ -241,7 +241,7 @@ std::string Template::processIf(const std::string& buffer) const
 
 std::string Template::processIfnot(const std::string& buffer) const
 {
-    boost::regex expifnot("{{ifnot [[:alnum:]]*}}", boost::regex::grep);
+    boost::regex expifnot("{{ifnot [[:alnum:]_]*}}", boost::regex::grep);
     boost::regex expendifnot("{{end ifnot}}", boost::regex::grep);
 
     boost::sregex_iterator it(buffer.begin(), buffer.end(), expifnot);
@@ -280,7 +280,7 @@ std::string Template::processIfnot(const std::string& buffer) const
 
 std::string Template::processFor(const std::string& buffer) const
 {
-    boost::regex expression("{{[[:alnum:]]*}}", boost::regex::grep);
+    boost::regex expression("{{[[:alnum:]_]*}}", boost::regex::grep);
 
     boost::sregex_iterator it(buffer.begin(), buffer.end(), expression);
     boost::sregex_iterator end, current;
@@ -307,9 +307,9 @@ std::string Template::processFor(const std::string& buffer) const
 
 std::string Template::processName(const std::string& buffer) const
 {
-    boost::regex expfor("{{for [[:alnum:]] in [[:alnum:]]*}}", boost::regex::grep);
+    boost::regex expfor("{{for [[:alnum:]_] in [[:alnum:]_]*}}", boost::regex::grep);
     boost::regex expendfor("{{end for}}", boost::regex::grep);
-    boost::regex var("{{[[:alnum:]]*\\^[[:alnum:]]}}", boost::regex::grep);
+    boost::regex var("{{[[:alnum:]_]*\\^[[:alnum:]_]}}", boost::regex::grep);
 
     boost::sregex_iterator it(buffer.begin(), buffer.end(), expfor);
     boost::sregex_iterator jt(buffer.begin(), buffer.end(), expendfor);
