@@ -35,6 +35,7 @@
 #include <vle/gvle/XmlTypeBox.hpp>
 #include <vle/utils/Tools.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace vle;
 
@@ -56,6 +57,9 @@ TreeViewValue::TreeViewValue()
         items.push_back(Gtk::Menu_Helpers::MenuElem(
                 _("Remove"), sigc::mem_fun(
                     *this, &TreeViewValue::on_menu_remove)));
+        items.push_back(Gtk::Menu_Helpers::MenuElem(
+                _("Duplicate"), sigc::mem_fun(
+                    *this, &TreeViewValue::on_menu_duplicate)));
 
         Gtk::Menu_Helpers::MenuList& insert = mSubmenuInsert.items();
         insert.push_back(Gtk::Menu_Helpers::MenuElem(
@@ -449,6 +453,48 @@ void TreeViewValue::on_menu_remove()
                     refresh();
                 }
 
+            }
+        }
+    }
+}
+
+void TreeViewValue::on_menu_duplicate()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection) {
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            value::Value* base = &*row.get_value(m_Columns.m_col_value);
+
+            if (mValue->getType() ==  value::Value::SET) {
+                value::Set& set = mValue->toSet();
+                value::VectorValue& vector = set.value();
+                value::VectorValue::iterator it = vector.end();
+
+                vector.insert(it, base->clone());
+
+                refresh();
+            } else if (mValue->getType() ==  value::Value::MAP) {
+                value::Map& mp = mValue->toMap();
+                value::MapValue& map = mp.value();
+                std::string name = "" + row[m_Columns.m_col_name];
+                int number = 1;
+                std::string copy;
+                value::MapValue::iterator it;
+                do {
+                    copy = name
+                        + "_"
+                        + boost::lexical_cast< std::string >(number);
+                    ++number;
+                    it = map.find(copy);
+                } while (it != map.end());
+
+                map[copy] = base->clone();
+
+                refresh();
             }
         }
     }

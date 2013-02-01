@@ -308,8 +308,14 @@ private:
 	//Signal handler for popup menu items:
 	virtual void onAdd();
 	virtual void onEdit();
+	virtual void onNewLibrary();
 	virtual void onRemove();
 	virtual void onRename();
+        int execPlugin(vpz::Dynamic& dynamic,
+                       const std::string& pluginname,
+                       const std::string& classname,
+                       const std::string& namespace_);
+
 
 	// Signal handler for text area
 	virtual void onEditionStarted(
@@ -327,7 +333,7 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
         Glib::RefPtr < Gtk::Builder >   mXml;
-	vpz::AtomicModel*          mAtom;
+	vpz::AtomicModel*               mAtom;
 	AtomicModelBox*                 mParent;
 	vpz::Dynamics*                  mDynamics;
 	vpz::Conditions*                mConditions;
