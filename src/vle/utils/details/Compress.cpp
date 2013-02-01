@@ -70,7 +70,11 @@ static int copy_data(struct archive *ar, struct archive *aw)
     int r;
     const void *buff;
     size_t size;
+#if ARCHIVE_VERSION_NUMBER >= 3000000
     int64_t offset;
+#else
+    off_t offset;
+#endif
 
     for (;;) {
         r = archive_read_data_block(ar, &buff, &size, &offset);
@@ -103,7 +107,11 @@ static void extract_archive(const char *filename, const char *output)
     flags = ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_SECURE_NODOTDOT;
 
     a = archive_read_new();
+#if ARCHIVE_VERSION_NUMBER < 4000000
+    archive_read_support_compression_bzip2(a);
+#else
     archive_read_support_filter_bzip2(a);
+#endif
     archive_read_support_format_tar(a);
 
     ext = archive_write_disk_new();
@@ -116,7 +124,11 @@ static void extract_archive(const char *filename, const char *output)
         std::string msg = extract_archive_error(filename, output, a);
 
 	archive_read_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+        archive_read_finish(a);
+#else
 	archive_read_free(a);
+#endif
 
         throw utils::InternalError(msg);
     }
@@ -131,9 +143,18 @@ static void extract_archive(const char *filename, const char *output)
             std::string msg = extract_archive_error(filename, output, a);
 
             archive_read_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_read_finish(a);
+#else
             archive_read_free(a);
+#endif
+
             archive_write_close(ext);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_write_finish(ext);
+#else
             archive_write_free(ext);
+#endif
 
             throw utils::InternalError(msg);
         }
@@ -148,9 +169,17 @@ static void extract_archive(const char *filename, const char *output)
             std::string msg = extract_archive_error(filename, output, a);
 
             archive_read_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_read_finish(a);
+#else
             archive_read_free(a);
+#endif
             archive_write_close(ext);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_write_finish(ext);
+#else
             archive_write_free(ext);
+#endif
 
             throw utils::InternalError(msg);
         } else {
@@ -160,9 +189,18 @@ static void extract_archive(const char *filename, const char *output)
                 std::string msg = extract_archive_error(filename, output, a);
 
                 archive_read_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+                archive_read_finish(a);
+#else
                 archive_read_free(a);
+#endif
                 archive_write_close(ext);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+                archive_write_finish(ext);
+#else
                 archive_write_free(ext);
+#endif
+
 
                 throw utils::InternalError(msg);
             }
@@ -170,9 +208,18 @@ static void extract_archive(const char *filename, const char *output)
     }
 
     archive_read_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+    archive_read_finish(a);
+#else
     archive_read_free(a);
+#endif
     archive_write_close(ext);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+    archive_write_finish(ext);
+#else
     archive_write_free(ext);
+#endif
+
 }
 
 static void create_archive(const char *filepath, const char *tarfile)
@@ -208,9 +255,17 @@ static void create_archive(const char *filepath, const char *tarfile)
             std::string msg = create_archive_error(filepath, tarfile, disk);
 
             archive_read_close(disk);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_read_finish(disk);
+#else
             archive_read_free(disk);
+#endif
             archive_write_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_write_finish(a);
+#else
             archive_write_free(a);
+#endif
 
             throw utils::InternalError(msg);
         }
@@ -223,9 +278,17 @@ static void create_archive(const char *filepath, const char *tarfile)
 
             archive_entry_free(entry);
             archive_read_close(disk);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_read_finish(disk);
+#else
             archive_read_free(disk);
+#endif
             archive_write_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+            archive_write_finish(a);
+#else
             archive_write_free(a);
+#endif
 
             throw utils::InternalError(msg);
         }
@@ -260,10 +323,19 @@ static void create_archive(const char *filepath, const char *tarfile)
     }
 
     archive_read_close(disk);
+
+#if ARCHIVE_VERSION_NUMBER < 4000000
+    archive_read_finish(disk);
+#else
     archive_read_free(disk);
+#endif
 
     archive_write_close(a);
+#if ARCHIVE_VERSION_NUMBER < 4000000
+    archive_write_finish(a);
+#else
     archive_write_free(a);
+#endif
 }
 
 void Path::compress(const std::string& filepath,
