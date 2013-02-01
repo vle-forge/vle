@@ -94,9 +94,9 @@ else ()
     gthread-2.0 libxml-2.0)
 endif()
 
-if (NOT VLEDEPS_FOUND)
-  message(FATAL_ERROR "Missing dependencies")
-endif ()
+#if (NOT VLEDEPS_FOUND)
+  #message(FATAL_ERROR "Missing dependencies")
+#endif ()
 
 if (WITH_CAIRO)
     set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
