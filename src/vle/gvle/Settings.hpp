@@ -213,6 +213,8 @@ public:
         : EditorSettings(editorFont), GraphicsSettings(graphicsFont)
     {}
 
+    virtual ~Settings();
+
     void setDefault();
 
     void load();

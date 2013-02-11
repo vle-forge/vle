@@ -626,7 +626,16 @@ void SaxParser::onEndTable()
     boost::algorithm::split(result, cpy,
                             boost::algorithm::is_any_of(" \n\t\r"));
 
-    if (result.size() != (table.width() * table.height())) {
+    std::vector < std::string >::size_type sz = 0;
+
+    try {
+        sz = boost::numeric_cast < std::vector < std::string >::size_type >
+            (table.width() * table.height());
+    } catch (const std::exception &e) {
+        sz = 0;
+    }
+
+    if (result.size() != sz) {
         throw utils::SaxParserError(
             _("VPZ parser: bad height or width for number of real in table"));
     }

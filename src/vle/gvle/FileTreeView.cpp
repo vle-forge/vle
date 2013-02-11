@@ -688,8 +688,6 @@ void FileTreeView::onRename()
 {
     Gtk::TreeModel::iterator it = mTreeModel->get_iter(mRecentSelectedPath);
     if (*it) {
-        const Gtk::TreeModel::Row row = *it;
-
         Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
 
         mCellrenderer->property_editable() =  true;

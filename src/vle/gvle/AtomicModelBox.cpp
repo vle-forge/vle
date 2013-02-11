@@ -1171,7 +1171,6 @@ void AtomicModelBox::DynamicTreeView::onEdition(
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
     if (refSelection and newName != mOldName) {
-	Gtk::TreeModel::iterator it = refSelection->get_selected();
 	if (not newName.empty() and not mDynamics->exist(newName)) {
 	    vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
 	    vpz::Dynamic oldDynamic = mDynamics->get(mOldName);

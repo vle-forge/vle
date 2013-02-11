@@ -72,6 +72,8 @@ public:
                              value::Value* parameters,
                              const double& /*time*/)
     {
+        (void)plugin;
+
         if (parameters and parameters->isMap()) {
             const value::Map& map = parameters->toMap();
             if (map.exist("locale")) {

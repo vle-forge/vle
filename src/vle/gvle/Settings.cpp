@@ -264,6 +264,10 @@ void GraphicsSettings::save(vle::utils::Preferences& prefs)
     prefs.setAttributes("gvle.graphics", "lineWidth", oss.str());
 }
 
+Settings::~Settings()
+{
+}
+
 void Settings::load()
 {
     vle::utils::Preferences prefs;
