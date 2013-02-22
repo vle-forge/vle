@@ -125,6 +125,9 @@ namespace vle { namespace devs {
         inline void deleter()
         { m_delete = true; }
 
+        inline void notDeleter()
+        { m_delete = false; }
+
         /**
          * @brief True if the deletion of all value::Value attached is need.
          * @return true if deletion is activated, false otherwise.

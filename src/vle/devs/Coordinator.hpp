@@ -355,6 +355,10 @@ namespace vle { namespace devs {
         void dispatchExternalEvent(ExternalEventList& eventList,
                                    Simulator* sim);
 
+        /**
+         * @attention Deprecated.
+         * @deprecated
+         */
         void delModel(graph::CoupledModel *parent,
                       graph::Model *atom);
 

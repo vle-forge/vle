@@ -279,6 +279,25 @@ void EventTable::invalidateModel(Simulator* mdl)
           "EventTable::delModelEvents"));
 }
 
+struct SetDeleter : std::unary_function < Event *, void >
+{
+    SetDeleter(std::list < Event * > *lst)
+        : m_lst(lst)
+    {}
+
+    inline void operator()(Event *evt)
+    {
+        if (evt && evt->needDelete()) {
+            evt->notDeleter();
+            m_lst->push_front(new Event(*evt));
+            m_lst->front()->deleter();
+        }
+    }
+
+private:
+    std::list < Event* > *m_lst;
+};
+
 void EventTable::delModelEvents(Simulator* mdl)
 {
     {
@@ -294,8 +313,19 @@ void EventTable::delModelEvents(Simulator* mdl)
     {
         ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
         if (it != mExternalEventModel.end()) {
+
+            std::for_each((*it).second.first.begin(),
+                          (*it).second.first.end(),
+                          SetDeleter(&m_toDeleteEvents));
+
             (*it).second.first.deleteAndClear();
+
+            std::for_each((*it).second.second.begin(),
+                          (*it).second.second.end(),
+                          SetDeleter(&m_toDeleteEvents));
+
             (*it).second.second.deleteAndClear();
+
             mExternalEventModel.erase(it);
         }
     }

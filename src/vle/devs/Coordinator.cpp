@@ -105,6 +105,8 @@ ExternalEventList* Coordinator::run()
         updateCurrentTime(m_eventTable.getCurrentTime());
     }
 
+    long int nbevents = m_eventTable.getDeleteEventsList().size();
+
     while (not bags.emptyBag()) {
         std::map < Simulator*, EventBagModel >::value_type& bag(bags.topBag());
         if (not bag.second.emptyInternal()) {
@@ -124,6 +126,12 @@ ExternalEventList* Coordinator::run()
     }
 
     if (oldToDelete > 0) {
+        while (nbevents >= 0 && !m_eventTable.getDeleteEventsList().empty()) {
+            delete m_eventTable.getDeleteEventsList().front();
+            m_eventTable.getDeleteEventsList().pop_front();
+            nbevents--;
+        }
+
         for (SimulatorList::iterator it = m_deletedSimulator.begin();
              it != m_deletedSimulator.begin() + oldToDelete; ++it) {
             m_eventTable.delModelEvents(*it);
@@ -248,20 +256,22 @@ void Coordinator::delModel(graph::CoupledModel* parent,
                 "Cannot delete an unknown model '%1%'")) % modelname);
     }
 
-    delModel(parent, mdl);
-}
-
-void Coordinator::delModel(graph::CoupledModel *parent,
-                           graph::Model *mdl)
-{
     if (mdl->isCoupled()) {
         delCoupledModel(parent, (graph::CoupledModel*)mdl);
-        parent->delAllConnection(mdl);
     } else {
         delAtomicModel(parent, (graph::AtomicModel*)mdl);
     }
 
     parent->delModel(mdl);
+}
+
+void Coordinator::delModel(graph::CoupledModel *parent,
+                           graph::Model *mdl)
+{
+    (void)parent;
+    (void)mdl;
+
+    DTraceDevs("delModel deprecated.");
 }
 
 void Coordinator::getSimulatorsSource(
@@ -381,12 +391,12 @@ oov::OutputMatrixViewList Coordinator::outputs() const
 /// Private functions.
 ///
 
-void Coordinator::delAtomicModel(graph::CoupledModel* parent,
+void Coordinator::delAtomicModel(graph::CoupledModel* /*parent*/,
                                  graph::AtomicModel* atom)
 {
-    if (not parent or not atom) {
-        throw utils::DevsGraphError(_(
-            "Cannot delete an atomic model without parent"));
+    if (not atom) {
+        throw utils::DevsGraphError(
+            _("Cannot delete an atomic model"));
     }
 
     SimulatorMap::iterator it = m_modelList.find(atom);
@@ -416,16 +426,14 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
 void Coordinator::delCoupledModel(graph::CoupledModel* parent,
                                   graph::CoupledModel* mdl)
 {
-    if (not parent or not mdl) {
-        throw utils::DevsGraphError(_(
-            "Cannot delete an atomic model without parent"));
-    }
+    (void)parent;
 
-    graph::ModelList::iterator b = mdl->getModelList().begin();
-    graph::ModelList::iterator e = mdl->getModelList().end();
+    std::vector < graph::AtomicModel * > lst;
+    graph::Model::getAtomicModelList(mdl, lst);
 
-    for (; b != e; ++b)
-        delModel(mdl, b->second);
+    std::vector < graph::AtomicModel * >::iterator it;
+    for (it = lst.begin(); it != lst.end(); ++it)
+        delAtomicModel(NULL, *it);
 }
 
 void Coordinator::addModels(const vpz::Model& model)

@@ -375,6 +375,9 @@ namespace vle { namespace devs {
          */
         void delModelEvents(Simulator* mdl);
 
+        std::list < Event* > & getDeleteEventsList()
+        { return m_toDeleteEvents; }
+
     private:
         typedef std::map < Simulator*, InternalEvent* > InternalEventModel;
         typedef std::map < Simulator*,
@@ -415,6 +418,8 @@ namespace vle { namespace devs {
 
 	/// current time.
         Time                                mCurrentTime;
+
+        std::list < Event* > m_toDeleteEvents;
     };
 
 }} // namespace vle devs
