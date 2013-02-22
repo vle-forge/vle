@@ -74,16 +74,9 @@ void CompleteEventBagModel::invalidateModel(Simulator* mdl)
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
-    std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
-    if (it != _bags.end()) {
-        it->second.clear();
-
-        if (it == _itbags)
-            _itbags++;
-
-        _bags.erase(it);
-    }
-
+    assert(_itbags == _bags.end()); // normal all mdl are destroyed
+                                    // after internal or external
+                                    // transition.
     _states.remove(mdl);
 }
 
