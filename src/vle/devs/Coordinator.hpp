@@ -358,36 +358,24 @@ private:
                                Simulator* sim);
 
     /**
-     * @brief Delete the model from Devs::Graph. Use this function instead of
-     * using directly the delAtomicModel or delCoupledModel.
+     * @brief Delete the atomic model from Graph, the Simulator from
+     * Coordinator and clean all events on devs::EventTable. Do not
+     * use the AtomicModel after this function, it is delete.
      *
-     * @param parent a reference to the parent.
      * @param atom the model to delete.
      */
-    void delModel(vpz::CoupledModel *parent, vpz::BaseModel *atom);
-
-    /**
-     * @brief Delete the atomic model from Devs::Graph, the Simulator
-     * from Coordinator and clean all events on devs::EventTable. Do not use
-     * the AtomicModel after this function, it is delete.
-     *
-     * @param parent a reference to the parent.
-     * @param atom the model to delete.
-     */
-    void delAtomicModel(vpz::CoupledModel* parent,
-                        vpz::AtomicModel* atom);
+    void delAtomicModel(vpz::AtomicModel* atom);
 
     /**
      * @brief Delete the coupled model from Devs::Graph. All the
      * Simulator from Coordinator and clean all events on
-     * devs::EventTable.  Do not use the AtomicModel child or CoupledModel
-     * after this function.  All are delete. This function is recursive.
+     * devs::EventTable. Do not use the CoupledModel child or
+     * CoupledModel after this function.  All are delete. This
+     * function is recursive.
      *
-     * @param parent a reference to the parent.
      * @param mdl the model to delete.
      */
-    void delCoupledModel(vpz::CoupledModel* parent,
-                         vpz::CoupledModel* mdl);
+    void delCoupledModel(vpz::CoupledModel* mdl);
 
 
 

@@ -37,6 +37,7 @@
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Trace.hpp>
+#include <functional>
 
 using std::vector;
 using std::map;
@@ -238,20 +239,14 @@ void Coordinator::delModel(vpz::CoupledModel* parent,
                 "Cannot delete an unknown model '%1%'")) % modelname);
     }
 
-    delModel(parent, mdl);
-}
-
-void Coordinator::delModel(vpz::CoupledModel *parent,
-                           vpz::BaseModel *mdl)
-{
     if (mdl->isCoupled()) {
-        delCoupledModel(parent, (vpz::CoupledModel*)mdl);
-        parent->delAllConnection(mdl);
+        delCoupledModel(static_cast < vpz::CoupledModel* >(mdl));
     } else {
-        delAtomicModel(parent, (vpz::AtomicModel*)mdl);
+        delAtomicModel(static_cast < vpz::AtomicModel* >(mdl));
     }
 
-    parent->delModel(mdl);
+    parent->delModel(mdl); // finally, we remove the model from the
+                           // vpz::CoupledModel object.
 }
 
 void Coordinator::getSimulatorsSource(
@@ -361,18 +356,17 @@ View* Coordinator::getView(const std::string& name) const
 /// Private functions.
 ///
 
-void Coordinator::delAtomicModel(vpz::CoupledModel* parent,
-                                 vpz::AtomicModel* atom)
+void Coordinator::delAtomicModel(vpz::AtomicModel* atom)
 {
-    if (not parent or not atom) {
-        throw utils::DevsGraphError(_(
-            "Cannot delete an atomic model without parent"));
+    if (not atom) {
+        throw utils::DevsGraphError(
+            _("Cannot delete undefined atomic model"));
     }
 
     SimulatorMap::iterator it = m_modelList.find(atom);
     if (it == m_modelList.end()) {
-        throw utils::ModellingError(_(
-            "Cannot delete an unknow atomic model"));
+        throw utils::ModellingError(
+            _("Cannot delete an unknown atomic model"));
     }
 
     Simulator* satom = (*it).second;
@@ -393,19 +387,21 @@ void Coordinator::delAtomicModel(vpz::CoupledModel* parent,
     ++m_toDelete;
 }
 
-void Coordinator::delCoupledModel(vpz::CoupledModel* parent,
-                                  vpz::CoupledModel* mdl)
+void Coordinator::delCoupledModel(vpz::CoupledModel* mdl)
 {
-    if (not parent or not mdl) {
-        throw utils::DevsGraphError(_(
-            "Cannot delete an atomic model without parent"));
+    if (not mdl) {
+        throw utils::DevsGraphError(
+            _("Cannot delete undefined coupled model"));
     }
 
-    vpz::ModelList::iterator b = mdl->getModelList().begin();
-    vpz::ModelList::iterator e = mdl->getModelList().end();
+    std::vector < vpz::AtomicModel* > lst;
+    lst.reserve(16);
 
-    for (; b != e; ++b)
-        delModel(mdl, b->second);
+    vpz::BaseModel::getAtomicModelList(mdl, lst);
+
+    std::for_each(lst.begin(), lst.end(),
+                  std::bind1st(
+                      std::mem_fun(&Coordinator::delAtomicModel), this));
 }
 
 void Coordinator::addModels(const vpz::Model& model)
