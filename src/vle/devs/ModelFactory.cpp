@@ -97,6 +97,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
                                const std::vector < std::string >& conditions,
                                const std::string& observable)
 {
+    const vpz::Dynamic& dyn = mDynamics.get(dynamics);
+
     const SimulatorMap& result(coordinator.modellist());
     if (result.find(model) != result.end()) {
         throw utils::InternalError(fmt(_(
@@ -131,7 +133,6 @@ void ModelFactory::createModel(Coordinator& coordinator,
 	}
     }
 
-    const vpz::Dynamic& dyn = mDynamics.get(dynamics);
     try {
         sim->addDynamics(attachDynamics(coordinator, sim, dyn, initValues));
     } catch(const std::exception& /*e*/) {
