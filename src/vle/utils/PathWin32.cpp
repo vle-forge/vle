@@ -163,14 +163,12 @@ std::string Path::getTempFile(const std::string& prefix,
                                        filename);
 
             if (result) {
-                file->open(static_cast < char* >(tmp),
+                file->open(static_cast < char* >(filename),
                            std::ios_base::trunc | std::ios_base::out |
                            std::ios_base::binary);
 
                 if (file->is_open()) {
-                    std::string result = tmp;
-
-                    return result;
+                    return filename;
                 }
             }
         }
