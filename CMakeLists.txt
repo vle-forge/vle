@@ -45,6 +45,11 @@ include(CMakeDetermineCCompiler)
 #
 # append debug mode when compiler is GNU.
 #
+
+if (CMAKE_BUILD_TYPE STREQUAL "")
+  SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build" FORCE)
+endif ()
+
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
