@@ -71,7 +71,6 @@ set_target_properties(gvlelib-static PROPERTIES
 
 if (WIN32)
   set_target_properties(gvlelib PROPERTIES
-    COMPILE_FLAGS "-DCURL_STATICLIB"
     LINK_FLAGS "-Wl,-static -mwindows")
 
   target_link_libraries(gvlelib ${VLEDEPS_STATIC_LIBRARIES}

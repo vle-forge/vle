@@ -66,9 +66,6 @@ if (WIN32)
   set_target_properties(vlelib PROPERTIES
     LINK_FLAGS "-Wl,-static")
 
-  set_property(TARGET vlelib APPEND_STRING PROPERTY
-    COMPILE_FLAGS " -DCURL_STATICLIB")
-
   target_link_libraries(vlelib ${VLEDEPS_STATIC_LIBRARIES}
     ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES})
 else ()

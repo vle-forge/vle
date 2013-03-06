@@ -316,13 +316,10 @@ public:
         {
             DownloadManager dl;
 
-            std::string pkgurl(url);
-            pkgurl += "/packages";
-
-            dl.start(pkgurl);
+            dl.start(url, "packages");
             dl.join();
 
-            std::cout << vle::fmt("%1% %2%\n") % pkgurl % dl.hasError();
+            std::cout << vle::fmt("%1% %2%\n") % url % dl.hasError();
 
             if (not dl.hasError()) {
                 std::cout << vle::fmt("%1% %2%\n") % dl.filename() % url;

@@ -36,7 +36,6 @@ namespace vle {
  * Initialize the VLE subsystems:
  *
  * - libxml2 library
- * - libcurl library
  * - Glib::thread
  * - VLE's singleton
  *

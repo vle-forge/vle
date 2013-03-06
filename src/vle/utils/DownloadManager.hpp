@@ -34,15 +34,15 @@
 namespace vle { namespace utils {
 
 /**
- * @brief An http/ftp file download process.
+ * @brief An http file download process.
  *
  * \c DownloadManager is thread-safe and multi-threaded class which allows to
- * download via http or ftp protocols files. \c DownloadManager can not be
+ * download files via http protocol. \c DownloadManager can not be
  * copied or assigned to another \c DownloadManager.
  *
  * @code
  * vle::utils::DownloadManager dl;
- * down.start("http://www.vle-project.org/vle-1.0.0.dtd");
+ * down.start("www.vle-project.org","vle-1.0.0.dtd");
  *
  * while (not down.isFinish()) {
  *     std::cout << "Size...... :" << down.getDownloadedSize();
@@ -74,9 +74,11 @@ public:
      * Start the download of the specified \c url in a thread. If a previous
      * thread is already alive, this function does nothing.
      *
-     * @param url The resource to download.
+     * @param url The url of the server (e.g. "www.vle-project.org").
+     * @param serverfile The resource to download (e.g. "vle-1.0.0.dtd").
      */
-    void start(const std::string& url);
+    void start(const std::string& url,
+            const std::string& serverfile);
 
     /**
      * A blocking function while the download is not finish.

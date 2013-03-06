@@ -24,9 +24,8 @@ archive called ``vle-1.1.a`` or ``vle-1.1.lib``. Under the Win32 port,
 We remove the Eov program and the libvleeov shared library. Now,
 graphical output are available into the GVLE application.
 
-Add a dependency to the Curl library. Now, VLE depends to the Curl
-library (http://curl.haxx.se/) to download and upload data over http
-and ftp protocol.
+Add a dependency to the Boost::Asio library. Now, VLE depends on Asio
+library to download data over http protocol.
 
 Add a dependency to the libarchive library
 (http://libarchive.github.com/) to extract gzip, bzip2 tarball and Zip

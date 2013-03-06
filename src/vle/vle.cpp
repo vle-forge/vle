@@ -31,33 +31,12 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
 #include <glibmm/thread.h>
-#include <curl/curl.h>
 #include <libxml/parser.h>
 
 namespace vle {
 
 Init::Init()
 {
-    CURLcode error;
-
-    xmlInitParser(); /**< Initialize the libxml2 library. */
-
-#ifdef _WIN32
-    error = curl_global_init(CURL_GLOBAL_WIN32); /**< Initialize the
-                                                  * libcurl library
-                                                  * for WIN32. */
-#else
-    error = curl_global_init(CURL_GLOBAL_NOTHING); /**< Initialize the
-                                                    * libcurl library
-                                                    * for other OS. */
-#endif
-
-    if (error != CURLE_OK) {
-        const char *msg = curl_easy_strerror(error);
-
-        throw utils::InternalError(fmt(_("Fail to initialize curl: %1%")) % msg);
-    }
-
     if (not Glib::thread_supported()) {
         Glib::thread_init();
     }
@@ -76,8 +55,6 @@ Init::~Init()
 {
     utils::Path::kill();
     utils::Trace::kill();
-
-    curl_global_cleanup();
 
     xmlCleanupParser();
 }
