@@ -34,6 +34,7 @@
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Experiment.hpp>
+#include <vle/devs/InitEventList.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <boost/noncopyable.hpp>

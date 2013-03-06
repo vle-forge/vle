@@ -25,20 +25,21 @@
  */
 
 
-#ifndef VLE_DEVS_EXTERNALEVENTLIST_HPP
-#define VLE_DEVS_EXTERNALEVENTLIST_HPP
-
-#include <vector>
-#include <ostream>
+#include <vle/devs/ExternalEventList.hpp>
+#include <vle/devs/ExternalEvent.hpp>
 
 namespace vle { namespace devs {
 
-class ExternalEvent;
+std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts)
+{
+    for (ExternalEventList::const_iterator it = evts.begin();
+         it != evts.end(); ++it) {
+        o << "port: '" << (*it)->getPortName() << "' value: '"
+          << ((*it)->haveAttributes() ?
+              (*it)->getAttributes().writeToString() : "") << "'";
+    }
 
-typedef std::vector < ExternalEvent* > ExternalEventList;
-
-std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts);
+    return o;
+}
 
 }} // namespace vle devs
-
-#endif

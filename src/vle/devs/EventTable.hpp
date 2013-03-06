@@ -111,8 +111,14 @@ namespace vle { namespace devs {
         { return _extev.empty(); }
 
         inline void clear()
-        { delete _intev; _intev = 0;
-            _extev.deleteAndClear(); _extev.clear(); }
+        {
+            delete _intev;
+            _intev = 0;
+
+            std::for_each(_extev.begin(), _extev.end(),
+                          boost::checked_deleter < ExternalEvent >());
+            _extev.clear();
+        }
 
         friend std::ostream& operator<<(std::ostream& o, const EventBagModel& e)
         {
@@ -137,7 +143,10 @@ namespace vle { namespace devs {
     {
     public:
 	CompleteEventBagModel()
-        { }
+        { init(); }
+
+        ~CompleteEventBagModel()
+        { clear(); }
 
 	/**
 	 * Return the bag for a specified model.

@@ -78,26 +78,21 @@ EventTable::EventTable(size_t sz)
 
 EventTable::~EventTable()
 {
-    {
-	InternalEventList::iterator it = mInternalEventList.begin();
-	while (it != mInternalEventList.end()) {
-	    delete (*it);
-	    ++it;
-	}
-    }
+    std::for_each(mInternalEventList.begin(),
+                  mInternalEventList.end(),
+                  boost::checked_deleter < InternalEvent >());
 
-    {
-        ViewEventList::iterator it = mObservationEventList.begin();
-	while (it != mObservationEventList.end()) {
-	    delete (*it);
-	    ++it;
-	}
-    }
+    std::for_each(mObservationEventList.begin(),
+                  mObservationEventList.end(),
+                  boost::checked_deleter < ViewEvent >());
 
     {
 	for (ExternalEventModel::iterator it = mExternalEventModel.begin();
 	     it != mExternalEventModel.end(); ++it) {
-	    (*it).second.deleteAndClear();
+
+            std::for_each((*it).second.begin(),
+                          (*it).second.end(),
+                          boost::checked_deleter < ExternalEvent >());
 	}
     }
 }
@@ -206,7 +201,7 @@ bool EventTable::putExternalEvent(ExternalEvent* event)
     Simulator* mdl = event->getTarget();
     assert(mdl);
 
-    mExternalEventModel[mdl].addEvent(event);
+    mExternalEventModel[mdl].push_back(event);
     InternalEventModel::iterator it = mInternalEventModel.find(mdl);
     if (it != mInternalEventModel.end() and (*it).second and
         (*it).second->getTime() > getCurrentTime()) {
@@ -265,7 +260,11 @@ void EventTable::delModelEvents(Simulator* mdl)
     {
         ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
         if (it != mExternalEventModel.end()) {
-            (*it).second.deleteAndClear();
+            std::for_each((*it).second.begin(),
+                          (*it).second.end(),
+                          boost::checked_deleter < ExternalEvent >());
+
+            (*it).second.clear();
             mExternalEventModel.erase(it);
         }
     }

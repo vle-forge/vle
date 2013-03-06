@@ -25,19 +25,14 @@
  */
 
 
-#ifndef VLE_DEVS_EXTERNALEVENTLIST_HPP
-#define VLE_DEVS_EXTERNALEVENTLIST_HPP
+#ifndef VLE_DEVS_INITEVENTLIST_HPP
+#define VLE_DEVS_INITEVENTLIST_HPP
 
-#include <vector>
-#include <ostream>
+#include <vle/value/Map.hpp>
 
 namespace vle { namespace devs {
 
-class ExternalEvent;
-
-typedef std::vector < ExternalEvent* > ExternalEventList;
-
-std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts);
+typedef value::Map InitEventList;
 
 }} // namespace vle devs
 

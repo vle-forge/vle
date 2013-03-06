@@ -30,7 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/devs/EventList.hpp>
+#include <vle/devs/InitEventList.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/ObservationEvent.hpp>
