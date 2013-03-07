@@ -88,7 +88,7 @@ enum LogOptions {
     LOG_SUMMARY = 1 << 0,       /**< Report summary of the experimental
                                  * frame (size of the plan, number of
                                  * replicas etc.). */
-    LOG_RUN     = 1 << 1,       /**< Report information. */
+    LOG_RUN     = 1 << 1        /**< Report information. */
 };
 
 /**
