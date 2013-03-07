@@ -36,7 +36,8 @@ DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
     : Dynamics(init, events), mDynamics(0),
     mName(init.model().getCompleteName())
 {
-    TraceDevs(fmt(_("                     %1% [DEVS] constructor")) % mName); }
+    TraceDevs(fmt(_("                     %1% [DEVS] constructor")) % mName);
+}
 
 Time DynamicsDbg::init(const Time& time)
 {

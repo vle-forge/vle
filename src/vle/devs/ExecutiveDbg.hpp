@@ -73,7 +73,7 @@ public:
     virtual ~ExecutiveDbg()
     {}
 
-    Time init(const Time& time)
+    virtual Time init(const Time& time)
     {
         mCurrentTime = time;
 
@@ -83,7 +83,7 @@ public:
         return UserModel::init(time);
     }
 
-    void output(const Time& time, ExternalEventList& output) const
+    virtual void output(const Time& time, ExternalEventList& output) const
     {
         TraceDevs(fmt(_("%1$20.10g %2% [DEVS] output")) % time %
                   mName);
@@ -101,7 +101,7 @@ public:
         }
     }
 
-    Time timeAdvance() const
+    virtual Time timeAdvance() const
     {
         TraceDevs(fmt(_("                     %1% [DEVS] ta")) %
                   mName);
@@ -114,7 +114,7 @@ public:
         return time;
     }
 
-    void internalTransition(const Time& time)
+    virtual void internalTransition(const Time& time)
     {
         mCurrentTime = time;
 
@@ -124,7 +124,8 @@ public:
         UserModel::internalTransition(time);
     }
 
-    void externalTransition(const ExternalEventList& event, const Time& time)
+    virtual void externalTransition(const ExternalEventList& event,
+            const Time& time)
     {
         mCurrentTime = time;
 
@@ -134,7 +135,7 @@ public:
         UserModel::externalTransition(event, time);
     }
 
-    void confluentTransitions(
+    virtual void confluentTransitions(
         const Time& time,
         const ExternalEventList& extEventlist)
     {
@@ -145,7 +146,7 @@ public:
         UserModel::confluentTransitions(time, extEventlist);
     }
 
-    vle::value::Value* observation(
+    virtual vle::value::Value* observation(
         const ObservationEvent& event) const
     {
         TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
@@ -155,7 +156,7 @@ public:
         return UserModel::observation(event);
     }
 
-    void finish()
+    virtual void finish()
     {
         TraceDevs(fmt(_("                     %1% [DEVS] finish")) %
                   mName);
