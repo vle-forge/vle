@@ -126,6 +126,9 @@ public:
      */
     ~Module()
     {
+        DTraceModel(vle::fmt("ModuleManager unload: %1%:%2%") % mHandle %
+                mPath);
+
         if (mHandle) {
 #ifdef BOOST_WINDOWS
             FreeLibrary(mHandle);
@@ -265,8 +268,11 @@ public:
 #ifdef BOOST_WINDOWS
         HMODULE handle = ::LoadLibrary(mPath.c_str());
 #else
-        void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY);
+        void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
+
+        DTraceModel(vle::fmt("ModuleManager load: %1%:%2%") % handle % mPath);
+
         if (not handle) {
             std::string extra;
 #ifdef BOOST_WINDOWS
