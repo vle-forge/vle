@@ -29,6 +29,11 @@
 
 namespace vle { namespace devs {
 
+#ifndef NDEBUG
+unsigned long int ExternalEvent::allocated = 0;
+unsigned long int ExternalEvent::deallocated = 0;
+#endif
+
 void ExternalEvent::putAttributes(const value::Map& mp)
 {
     for (value::MapValue::const_iterator it = mp.value().begin();

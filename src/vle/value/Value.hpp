@@ -60,6 +60,11 @@ namespace vle { namespace value {
     class VLE_API Value
     {
     public:
+#ifndef NDEBUG
+        static unsigned long int allocated;
+        static unsigned long int deallocated;
+#endif
+
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
             XMLTYPE, NIL, MATRIX };
 
@@ -70,18 +75,33 @@ namespace vle { namespace value {
          * Value* val2 = new value::Integer(13);
 	 * @endcode
 	 */
-	Value() {}
+	Value()
+        {
+#ifndef NDEBUG
+            Value::allocated++;
+#endif
+        }
 
         /**
          * @brief Copy constructor. In subclass, all datas are cloned.
          * @param value The value to clone;
          */
-        Value(const Value& /* value */) {}
+        Value(const Value& /* value */)
+        {
+#ifndef NDEBUG
+            Value::allocated++;
+#endif
+        }
 
         /**
 	 * @brief Nothing to delete.
 	 */
-	virtual ~Value() {}
+	virtual ~Value()
+        {
+#ifndef NDEBUG
+            Value::deallocated++;
+#endif
+        }
 
         ///
         //// Abstract functions

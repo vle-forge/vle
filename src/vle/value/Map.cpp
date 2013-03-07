@@ -201,4 +201,3 @@ const Value* Map::getPointer(const std::string& name) const
 }
 
 }} // namespace vle value
-

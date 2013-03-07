@@ -45,10 +45,18 @@ class Simulator;
 class VLE_API ExternalEvent
 {
 public:
+#ifndef NDEBUG
+    static unsigned long int allocated;
+    static unsigned long int deallocated;
+#endif
+
     ExternalEvent(const std::string& sourcePortName)
         : m_target(0),
         m_port(sourcePortName)
     {
+#ifndef NDEBUG
+        ExternalEvent::allocated++;
+#endif
     }
 
     ExternalEvent(ExternalEvent& event,
@@ -58,10 +66,16 @@ public:
         m_attributes(event.m_attributes),
         m_port(targetPortName)
     {
+#ifndef NDEBUG
+        ExternalEvent::allocated++;
+#endif
     }
 
     ~ExternalEvent()
     {
+#ifndef NDEBUG
+        ExternalEvent::deallocated++;
+#endif
     }
 
     const std::string& getPortName() const
@@ -95,8 +109,12 @@ public:
      * @param attr the attribute to put into event.
      * @return the current event.
      */
-    friend ExternalEvent* operator<<(ExternalEvent* event, const Attribute& attr)
-    { event->putAttribute(attr.first, attr.second); return event;}
+    friend ExternalEvent* operator<<(ExternalEvent* event,
+            const Attribute& attr)
+    {
+        event->putAttribute(attr.first, attr.second);
+        return event;
+    }
 
     /**
      * Put an attribute on an event. The goal is to simplify building event.
@@ -109,8 +127,12 @@ public:
      * @param attr the attribute to put into event.
      * @return the current event.
      */
-    friend ExternalEvent& operator<<(ExternalEvent& event, const Attribute& attr)
-    { event.putAttribute(attr.first, attr.second); return event;}
+    friend ExternalEvent& operator<<(ExternalEvent& event,
+            const Attribute& attr)
+    {
+        event.putAttribute(attr.first, attr.second);
+        return event;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

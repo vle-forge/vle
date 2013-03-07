@@ -251,4 +251,3 @@ void Set::deserializeBinaryBuffer(Set& set, const std::string& buffer)
 }
 
 }} // namespace vle value
-
