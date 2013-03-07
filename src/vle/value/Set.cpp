@@ -122,9 +122,7 @@ void Set::del(const size_type i)
 
 void Set::clear()
 {
-    for (iterator it = begin(); it != end(); ++it) {
-        delete *it;
-    }
+    std::for_each(begin(), end(), boost::checked_deleter < Value >());
 
     m_value.clear();
 }

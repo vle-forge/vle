@@ -58,15 +58,9 @@ std::map < Simulator*, EventBagModel >::value_type&
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
-    std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
-    if (it != _bags.end()) {
-        it->second.clear();
-
-        if (it == _itbags)
-            _itbags++;
-
-        _bags.erase(it);
-    }
+    assert(_itbags == _bags.end()); // Normally, _itbags equals _bags.end since
+                                    // all dynamics are already executed. Now,
+                                    // it's time to Executive.
 
     _states.remove(mdl);
 }

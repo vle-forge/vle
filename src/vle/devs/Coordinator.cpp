@@ -38,6 +38,7 @@
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Trace.hpp>
 #include <functional>
+#include <boost/bind.hpp>
 
 using std::vector;
 using std::map;
@@ -58,19 +59,17 @@ Coordinator::Coordinator(const utils::ModuleManager& modulemgr,
 
 Coordinator::~Coordinator()
 {
-    {
-        std::map < vpz::AtomicModel*, Simulator* >::iterator it;
-        for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
-            delete it->second;
-        }
-    }
+    std::for_each(m_modelList.begin(),
+                  m_modelList.end(),
+                  boost::bind(
+                      boost::checked_deleter < Simulator >(),
+                      boost::bind(&SimulatorMap::value_type::second, _1)));
 
-    {
-        std::map < std::string , devs::View* >::iterator it;
-        for (it = m_viewList.begin(); it != m_viewList.end(); ++it) {
-            delete it->second;
-        }
-    }
+    std::for_each(m_viewList.begin(),
+                  m_viewList.end(),
+                  boost::bind(
+                      boost::checked_deleter < View >(),
+                      boost::bind(&ViewList::value_type::second, _1)));
 }
 
 void Coordinator::init(const vpz::Model& mdls, const Time& current,
@@ -151,19 +150,16 @@ void Coordinator::run()
 
 void Coordinator::finish()
 {
-    {
-        SimulatorMap::iterator it;
-        for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
-            (*it).second->finish();
-        }
-    }
+    std::for_each(m_modelList.begin(), m_modelList.end(),
+                  boost::bind(
+                      &Simulator::finish,
+                      boost::bind(&SimulatorMap::value_type::second, _1)));
 
-    {
-        ViewList::iterator it;
-        for (it = m_viewList.begin(); it != m_viewList.end(); ++it) {
-            (*it).second->finish(m_currentTime);
-        }
-    }
+    std::for_each(m_viewList.begin(), m_viewList.end(),
+                  boost::bind(
+                      &View::finish,
+                      boost::bind(&ViewList::value_type::second, _1),
+                      m_currentTime));
 }
 
 //
