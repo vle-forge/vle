@@ -89,7 +89,7 @@ const Time& Coordinator::getNextTime()
     return m_eventTable.topEvent();
 }
 
-ExternalEventList* Coordinator::run()
+void Coordinator::run()
 {
     DTraceDevs(_("-------- BAG --------"));
     SimulatorList::size_type oldToDelete(m_toDelete);
@@ -147,7 +147,6 @@ ExternalEventList* Coordinator::run()
     }
 
     bags.clear();
-    return 0;
 }
 
 void Coordinator::finish()

@@ -82,7 +82,7 @@ public:
      * devs::EventTable and call devs::Simulator function.
      * @return 0.
      */
-    ExternalEventList* run();
+    void run();
 
     /**
      * @brief Delete all devs::Simulator and all devs::View of this
