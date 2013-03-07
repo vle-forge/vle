@@ -140,6 +140,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
         throw;
     }
 
+    initValues.value().clear();
+
     if (not observable.empty()) {
         vpz::Observable& ob(mExperiment.views().observables().get(observable));
         const vpz::ObservablePortList& lst(ob.observableportlist());
@@ -153,7 +155,6 @@ void ModelFactory::createModel(Coordinator& coordinator,
                 View* view = coordinator.getView(*jt);
 
                 if (not view) {
-                    initValues.value().clear();
                     throw utils::InternalError(fmt(_(
                                 "The view '%1%' is unknow of coordinator "
                                 "view list")) % *jt);
@@ -164,8 +165,6 @@ void ModelFactory::createModel(Coordinator& coordinator,
             }
         }
     }
-
-    initValues.value().clear();
 
     InternalEvent* evt = sim->init(coordinator.getCurrentTime());
     if (evt) {
