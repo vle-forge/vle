@@ -169,13 +169,6 @@ void Condition::clearValueOfPort(const std::string& portname)
     it->second->clear();
 }
 
-value::Map* Condition::firstValues() const
-{
-    throw utils::InternalError("vpz::Condition::firstValues : "
-            " deprecated function");
-    return 0;
-}
-
 void Condition::fillWithFirstValues(value::MapValue& mapToFill) const
 {
     mapToFill.clear();
@@ -238,14 +231,6 @@ value::Set& Condition::lastAddedPort()
     return *it->second;
 }
 
-
-void Condition::rebuildValueSet()
-{
-    for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
-         ++it) {
-        it->second->value().clear();
-    }
-}
 
 void Condition::deleteValueSet()
 {

@@ -160,16 +160,6 @@ namespace vle { namespace vpz {
         void clearValueOfPort(const std::string& portname);
 
         /**
-         * @brief Build a new Map with the first values of each port of this
-         * condition. Be carrefull, dont delete the value::Map directly, you
-         * don't delete value::Value from the value::Map.
-         *
-         * @return A new value::Map, but don't delete the content, just clear
-         * the value::Map::MapValue.
-         */
-        value::Map* firstValues() const;
-
-        /**
          * @brief Fill a MapValue with the first value::Value of each port
          * of this condition. Be careful, values contained in the value::Map
          * are not copies.
@@ -222,13 +212,6 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if port does not exist.
          */
         value::Set& lastAddedPort();
-
-        /**
-         * @brief This function initialise every, to each port, a new
-         * value::Set.
-         *
-         */
-        void rebuildValueSet();
 
         /**
          * @brief This function deletes on each port the values stored
@@ -344,19 +327,6 @@ namespace vle { namespace vpz {
             { return x.isPermanent(); }
         };
 
-        /**
-         * @brief Unary function to rebuild the value set (ie. restore all Set
-         * with empty vector). To use with std::for_each or vle::for_each.
-         */
-        struct RebuildValueSet
-        {
-            /**
-             * @brief Rebuild the Value of the specified Condition.
-             * @param x the Condition to rebuild the Value.
-             */
-            void operator()(Condition& x) const
-            { x.rebuildValueSet(); }
-        };
         /**
          * @brief Unary function to delete the value set.
          * To use with std::for_each

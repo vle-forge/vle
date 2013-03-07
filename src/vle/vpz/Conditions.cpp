@@ -149,11 +149,6 @@ void Conditions::cleanNoPermanent()
     }
 }
 
-void Conditions::rebuildValueSet()
-{
-    utils::forEach(m_list.begin(), m_list.end(), Condition::RebuildValueSet());
-}
-
 void Conditions::deleteValueSet()
 {
     utils::forEach(m_list.begin(), m_list.end(),
