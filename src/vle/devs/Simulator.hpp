@@ -172,34 +172,6 @@ namespace vle { namespace devs {
         InternalEvent* externalTransition(const ExternalEventList& event,
                                           const Time& time);
 
-        /**
-         * @brief Call to produce the conflict function with a priority to the
-         * external event.
-         * \f[
-         * \delta_{conf}=\delta_{ext}(..,\delta_{int}, ..)
-         * \f]
-         * @param event the internal event.
-         * @param events the externals events.
-         * @return the new internal event.
-         */
-        InternalEvent* internalTransitionConflict(
-            const InternalEvent& event,
-            const ExternalEventList& events);
-
-        /**
-         * @brief Call to produce the conflict function with a priority to the
-         * internal event.
-         * \f[
-         * \delta_{conf}=\delta_{int}(..,\delta_{ext}, ..)
-         * \f]
-         * @param event the internal event.
-         * @param events the externals events.
-         * @return the new internal event.
-         */
-        InternalEvent* externalTransitionConflict(
-            const InternalEvent& event,
-            const ExternalEventList& events);
-
         value::Value* observation(const ObservationEvent& event) const;
 
     private:

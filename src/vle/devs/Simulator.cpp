@@ -214,25 +214,6 @@ InternalEvent* Simulator::externalTransition(
     return buildInternalEvent(time);
 }
 
-InternalEvent* Simulator::internalTransitionConflict(
-    const InternalEvent& event,
-    const ExternalEventList& events)
-{
-    m_dynamics->internalTransition(event.getTime());
-    m_dynamics->externalTransition(events, event.getTime());
-    return buildInternalEvent(event.getTime());
-}
-
-InternalEvent* Simulator::externalTransitionConflict(
-    const InternalEvent& event,
-    const ExternalEventList& events)
-{
-    m_dynamics->externalTransition(events, event.getTime());
-    m_dynamics->internalTransition(event.getTime());
-
-    return buildInternalEvent(event.getTime());
-}
-
 value::Value* Simulator::observation(const ObservationEvent& event) const
 {
     return m_dynamics->observation(event);
