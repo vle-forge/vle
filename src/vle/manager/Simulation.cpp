@@ -34,12 +34,6 @@
 #include <boost/timer.hpp>
 #include <boost/progress.hpp>
 
-#ifndef NDEBUG
-#include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/InternalEvent.hpp>
-#include <vle/value/Value.hpp>
-#endif
-
 namespace vle { namespace manager {
 
 struct Simulation::Pimpl
@@ -82,15 +76,6 @@ public:
     {
         value::Map   *result = 0;
         boost::timer  timer;
-
-#ifndef NDEBUG
-        devs::ExternalEvent::allocated = 0;
-        devs::ExternalEvent::deallocated = 0;
-        devs::InternalEvent::allocated = 0;
-        devs::InternalEvent::deallocated = 0;
-        value::Value::allocated = 0;
-        value::Value::deallocated = 0;
-#endif
 
         try {
             devs::RootCoordinator root(modulemgr);
@@ -138,20 +123,6 @@ public:
             write(fmt(_(" - Time spent in kernel .........: %1% s"))
                   % timer.elapsed());
 
-#ifndef NDEBUG
-            write(fmt(_("\n - Debug mode:\n"
-                        "                       allocated   deallocated\n"
-                        "   - External events: %=12d/%=12d\n"
-                        "   - Internal events: %=12d/%=12d\n"
-                        "   - Values         : %=12d/%=12d\n")) %
-                  devs::ExternalEvent::allocated %
-                  devs::ExternalEvent::deallocated %
-                  devs::InternalEvent::allocated %
-                  devs::InternalEvent::deallocated %
-                  value::Value::allocated %
-                  value::Value::deallocated);
-#endif
-
             error->code    = 0;
         } catch(const std::exception& e) {
             error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%"))
@@ -169,15 +140,6 @@ public:
     {
         value::Map   *result = 0;
         boost::timer  timer;
-
-#ifndef NDEBUG
-        devs::ExternalEvent::allocated = 0;
-        devs::ExternalEvent::deallocated = 0;
-        devs::InternalEvent::allocated = 0;
-        devs::InternalEvent::deallocated = 0;
-        value::Value::allocated = 0;
-        value::Value::deallocated = 0;
-#endif
 
         try {
             devs::RootCoordinator root(modulemgr);
@@ -211,20 +173,6 @@ public:
 
             write(fmt(_(" - Time spent in kernel .........: %1% s"))
                   % timer.elapsed());
-
-#ifndef NDEBUG
-            write(fmt(_("\n - Debug mode:\n"
-                        "                       allocated   deallocated\n"
-                        "   - External events: %=12d/%=12d\n"
-                        "   - Internal events: %=12d/%=12d\n"
-                        "   - Values         : %=12d/%=12d\n")) %
-                  devs::ExternalEvent::allocated %
-                  devs::ExternalEvent::deallocated %
-                  devs::InternalEvent::allocated %
-                  devs::InternalEvent::deallocated %
-                  value::Value::allocated %
-                  value::Value::deallocated);
-#endif
 
             error->code    = 0;
         } catch(const std::exception& e) {

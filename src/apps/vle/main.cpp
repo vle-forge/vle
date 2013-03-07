@@ -39,6 +39,12 @@
 #include <fstream>
 #include <boost/program_options.hpp>
 
+#ifndef NDEBUG
+# include <vle/devs/ExternalEvent.hpp>
+# include <vle/devs/InternalEvent.hpp>
+# include <vle/value/Value.hpp>
+#endif
+
 namespace po = boost::program_options;
 
 typedef std::vector < std::string > CmdArgs;
@@ -282,9 +288,10 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     CmdArgs::const_iterator it = args.begin();
     CmdArgs::const_iterator end = args.end();
     bool stop = false;
+    int ret = EXIT_FAILURE;
 
     if (not init_current_package(packagename, args))
-        return EXIT_FAILURE;
+        return ret;
 
     for (; not stop and it != end; ++it) {
         if (*it == "create") {
@@ -334,13 +341,35 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     }
 
     if (not stop and it != end) {
+#ifndef NDEBUG
+        vle::devs::ExternalEvent::allocated = 0;
+        vle::devs::ExternalEvent::deallocated = 0;
+        vle::devs::InternalEvent::allocated = 0;
+        vle::devs::InternalEvent::deallocated = 0;
+        vle::value::Value::allocated = 0;
+        vle::value::Value::deallocated = 0;
+#endif
         if (manager)
-            return run_manager(it, end, processor);
+            ret = run_manager(it, end, processor);
         else
-            return run_simulation(it, end);
+            ret = run_simulation(it, end);
+
+#ifndef NDEBUG
+        std::cerr << vle::fmt(_("\n - Debug mode:\n"
+                    "                       allocated   deallocated\n"
+                    "   - External events: %=12d/%=12d\n"
+                    "   - Internal events: %=12d/%=12d\n"
+                    "   - Values         : %=12d/%=12d\n")) %
+            vle::devs::ExternalEvent::allocated %
+            vle::devs::ExternalEvent::deallocated %
+            vle::devs::InternalEvent::allocated %
+            vle::devs::InternalEvent::deallocated %
+            vle::value::Value::allocated %
+            vle::value::Value::deallocated;
+#endif
     }
 
-    return EXIT_SUCCESS;
+    return ret;
 }
 
 static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
