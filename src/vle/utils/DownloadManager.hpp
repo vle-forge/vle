@@ -57,7 +57,7 @@ namespace vle { namespace utils {
  * }                                         // join() is in destructor.
  * @endcode
  */
-class DownloadManager
+class VLE_API DownloadManager
 {
 public:
     /**
