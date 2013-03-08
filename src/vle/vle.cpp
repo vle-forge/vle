@@ -37,6 +37,8 @@ namespace vle {
 
 Init::Init()
 {
+    xmlInitParser(); /**< Initialize the libxml2 library. */
+
     if (not Glib::thread_supported()) {
         Glib::thread_init();
     }
