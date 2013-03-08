@@ -137,19 +137,19 @@ public:
         response_stream >> status_code;
         std::string status_message;
         std::getline(response_stream, status_message);
-        if (!response_stream || http_version.substr(0, 5) != "HTTP/")
-        {
+        if (!response_stream || http_version.substr(0, 5) != "HTTP/") {
             std::ostringstream errorStream;
             errorStream << vle::fmt("[DownloadManager] Invalid response "
                           " while downloading '%1%'") % mCompletePath;
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
         }
+
         if (mHasError) {
             return ;
         }
-        if (status_code != 200)
-        {
+
+        if (status_code != 200) {
             std::ostringstream errorStream;
             errorStream << vle::fmt("[DownloadManager] Response returned with "
                     " status code %1%  while downloading '%2%' ")
@@ -157,9 +157,11 @@ public:
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
         }
+
         if (mHasError) {
             return ;
         }
+
         boost::asio::read_until(socket, response, "\r\n\r\n");
 
         // Process the response headers.
@@ -178,12 +180,14 @@ public:
 
         if (response.size() > 0) {
             file << &response ;
-         }
+        }
+
         boost::system::error_code error;
         while (boost::asio::read(socket, response,
                 boost::asio::transfer_at_least(1), error)) {
             file << &response;
         }
+
         if (error != boost::asio::error::eof) {
             std::ostringstream errorStream;
             errorStream << vle::fmt("[DownloadManager] Unexpected end of"
