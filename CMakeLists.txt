@@ -76,22 +76,16 @@ option(WITH_GTK "use gtkmm to build gvle [default: on]" ON)
 option(WITH_GTKSOURCEVIEW "use gtksourcevieww to build gvle [default: on]" ON)
 
 if (WITH_CAIRO AND WITH_GTK AND WITH_GTKSOURCEVIEW)
-  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
-    hogweed libcrypto nettle openssl libarchive glibmm-2.4
-    gthread-2.0 libxml-2.0 cairomm-1.0>=1.2 gtkmm-2.4
-    gtksourceviewmm-2.0)
+  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
+    cairomm-1.0>=1.2 gtkmm-2.4 gtksourceviewmm-2.0)
 elseif (WITH_CAIRO AND WITH_GTK)
-  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
-    hogweed libcrypto nettle openssl libarchive glibmm-2.4
-    gthread-2.0 libxml-2.0 cairomm-1.0>=1.2 gtkmm-2.4)
+  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
+    cairomm-1.0>=1.2 gtkmm-2.4)
 elseif (WITH_CAIRO)
-  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
-    hogweed libcrypto nettle openssl libarchive glibmm-2.4
-    gthread-2.0 libxml-2.0 cairomm-1.0>=1.2)
+  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
+    cairomm-1.0>=1.2)
 else ()
-  pkg_check_modules(VLEDEPS openssl libssh2 libssl libidn gnutls
-    hogweed libcrypto nettle openssl libarchive glibmm-2.4
-    gthread-2.0 libxml-2.0)
+  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
 endif()
 
 #if (NOT VLEDEPS_FOUND)
