@@ -55,6 +55,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/DownloadManager.hpp>
 #include <vle/vle.hpp>
 
 using namespace vle;
@@ -114,6 +115,19 @@ private:
 };
 
 BOOST_GLOBAL_FIXTURE(F)
+
+BOOST_AUTO_TEST_CASE(download_dtd)
+{
+    vle::utils::DownloadManager dm;
+
+    dm.start("www.vle-project.org", "vle-1.0.0.dtd");
+    dm.join();
+
+    BOOST_CHECK(dm.isFinish());
+    BOOST_CHECK(not dm.hasError());
+
+    BOOST_CHECK_EQUAL(dm.size(), 3315u);
+}
 
 BOOST_AUTO_TEST_CASE(show_path)
 {
