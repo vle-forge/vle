@@ -288,10 +288,9 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     CmdArgs::const_iterator it = args.begin();
     CmdArgs::const_iterator end = args.end();
     bool stop = false;
-    int ret = EXIT_FAILURE;
 
     if (not init_current_package(packagename, args))
-        return ret;
+        return EXIT_FAILURE;
 
     for (; not stop and it != end; ++it) {
         if (*it == "create") {
@@ -340,7 +339,11 @@ static int manage_package_mode(const std::string &packagename, bool manager,
         }
     }
 
-    if (not stop and it != end) {
+    int ret = EXIT_SUCCESS;
+
+    if (stop)
+        ret = EXIT_FAILURE;
+    else if (it != end) {
 #ifndef NDEBUG
         vle::devs::ExternalEvent::allocated = 0;
         vle::devs::ExternalEvent::deallocated = 0;
