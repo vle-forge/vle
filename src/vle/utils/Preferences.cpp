@@ -37,6 +37,8 @@
 
 #ifdef BOOST_WINDOWS
 #define VLE_PACKAGE_COMMAND_CONFIGURE "cmake.exe -G 'MinGW Makefiles' " \
+    "-DWITH_DOC=OFF "                                                   \
+    "-DWITH_TEST=ON "                                                   \
     "-DCMAKE_INSTALL_PREFIX='%1%' "                                     \
     "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 
@@ -49,6 +51,8 @@
 #define VLE_PACKAGE_COMMAND_UNZIP "unzip.exe"
 #else
 #define VLE_PACKAGE_COMMAND_CONFIGURE "cmake -DCMAKE_INSTALL_PREFIX='%1%' " \
+    "-DWITH_DOC=OFF "                                                       \
+    "-DWITH_TEST=ON "                                                       \
     "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 #define VLE_PACKAGE_COMMAND_TEST "cmake --build '%1%' --target test"
 #define VLE_PACKAGE_COMMAND_BUILD "cmake --build '%1%' --target all"
