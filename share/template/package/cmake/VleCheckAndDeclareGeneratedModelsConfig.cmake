@@ -117,9 +117,9 @@ MACRO(CheckAndDeclareGeneratedModels)
 	# DIFFRERENTIAL
       ELSEIF(${cleanEXT} STREQUAL "Forrester")
 
-	VLE_CHECK_PACKAGE(DIFFERENTIAL_EQU vle.extension.differentialEquation)
+	VLE_CHECK_PACKAGE(DIFFERENTIAL_EQU vle.extension.differential-equation)
 	if (NOT DIFFERENTIAL_EQU_FOUND)
-	  message(SEND_ERROR "Missing vle.extension.differentialEequation")
+	  message(SEND_ERROR "Missing vle.extension.differential-equation")
 	endif (NOT DIFFERENTIAL_EQU_FOUND)
 
 	DeclareDifferentialEquationDynamics(${BASEName} ${SHORTName})
