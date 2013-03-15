@@ -24,7 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/details/Spawn.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
