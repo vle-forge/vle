@@ -5,5 +5,5 @@ else ()
 endif ()
 
 add_sources(vlelib Compress.cpp Package.hpp PackageManager.hpp
-  PackageManager.cpp PackageParser.cpp PackageParser.hpp Spawn.hpp
+  PackageManager.cpp PackageParser.cpp PackageParser.hpp
   ${UTILS_SPECIFIC_SPAWN_IMPL})

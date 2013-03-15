@@ -27,6 +27,7 @@
 #ifndef VLE_UTILS_DETAILS_SPAWN_HPP
 #define VLE_UTILS_DETAILS_SPAWN_HPP
 
+#include <vle/DllDefines.hpp>
 #include <string>
 #include <vector>
 
@@ -64,7 +65,7 @@ namespace vle { namespace utils {
  * }
  * @endcode
  */
-class Spawn
+class VLE_API Spawn
 {
 public:
     static const unsigned long int default_buffer_size;
