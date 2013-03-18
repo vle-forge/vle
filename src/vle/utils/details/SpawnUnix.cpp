@@ -388,6 +388,11 @@ bool Spawn::isfinish()
     if (not m_pimpl)
         return false;
 
+    if (m_pimpl->m_finish)
+        return true;
+    else
+        m_pimpl->is_running();
+
     return m_pimpl->m_finish;
 }
 
