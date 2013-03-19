@@ -38,6 +38,7 @@
 #include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
+#include <vle/gvle/SpawnPool.hpp>
 #include <vle/value/Value.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/textview.h>
@@ -848,6 +849,15 @@ public:
 
     void updateTitle();
 
+    /*********************************************************************
+     *
+     * SPAWNPOOL ACCES
+     *
+     *********************************************************************/
+
+    SpawnPool& spawnPool()
+    { return mSpawnPool; }
+
 private:
 
     bool checkVpz();
@@ -913,6 +923,9 @@ private:
     /* Project managment */
     Depends mDependencies;
     Depends::const_iterator itDependencies;
+
+    /* Spawn managment */
+    SpawnPool mSpawnPool;
 };
 
 std::string valuetype_to_string(value::Value::type type);

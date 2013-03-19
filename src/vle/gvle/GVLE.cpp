@@ -93,7 +93,8 @@ GVLE::GVLE(BaseObjectType* cobject,
     mModeling(new Modeling()),
     mCurrentButton(VLE_GVLE_POINTER),
     mCutCopyPaste(this),
-    mCurrentTab(-1)
+    mCurrentTab(-1),
+    mSpawnPool()
 {
     mRefXML = xml;
 
