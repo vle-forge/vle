@@ -30,7 +30,7 @@
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/details/Spawn.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 #include <glibmm/timer.h>

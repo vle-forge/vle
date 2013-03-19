@@ -36,6 +36,7 @@
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <gtkmm/treerowreference.h>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -467,21 +468,22 @@ void FileTreeView::onOpen()
 
         if (box.valid() and not prg.empty()) {
             Gtk::TreeModel::Row row = *it;
-            std::list < std::string > argv;
-            std::list<std::string> lstpath;
-            argv.push_back(prg);
+            std::vector< std::string > argv;
+            std::list< std::string > lstpath;
             projectFilePath(row, lstpath);
             std::string filepath = Glib::build_filename(
                 mPackage, Glib::build_filename(lstpath));
             argv.push_back(filepath);
 
             try {
-                Glib::spawn_async(utils::Path::path().getParentPath(filepath),
-                                  argv,
-                                  Glib::SpawnFlags(0),
-                                  sigc::slot < void >());
-            } catch(const Glib::SpawnError& e) {
-                Error(_("The program can not be lanched"));
+                vle::utils::Spawn& spawn = mParent->spawnPool().addSpawn();
+
+                spawn.start(prg,
+                            utils::Path::path().getParentPath(filepath),
+                            argv);
+
+            } catch(const std::exception& e) {
+                Error(_("The program can not be launched"));
             }
         }
     }

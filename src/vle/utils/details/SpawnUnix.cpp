@@ -24,7 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/details/Spawn.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -387,6 +387,11 @@ bool Spawn::isfinish()
 {
     if (not m_pimpl)
         return false;
+
+    if (m_pimpl->m_finish)
+        return true;
+    else
+        m_pimpl->is_running();
 
     return m_pimpl->m_finish;
 }
