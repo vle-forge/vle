@@ -49,20 +49,36 @@ namespace vle {
  * }
  * @endexample
  */
-class VLE_API Init
+struct VLE_API Init
 {
-public:
     /**
-     * Initialize all VLE's subsystems.
+     * Initialize all subsystems. Use the default locale according to the
+     * environment variables.
      *
+     * @code
+     * vle::Init app; // to use the default locale according to the environment
+     *                // variables.
+     * environment variables.
+     * @endcode
      */
     Init();
 
     /**
-     * Cleanup all VLE's subsystems.
+     * Initialize all subsystems. Use the @e localname as local for
+     * the current application.
      *
-     *
-     * @return
+     * @code
+     * vle::Init app("POSIX"); // to use the POSIX version.
+     * vle::Init app("C"); // to use the POSIX version.
+     * vle::Init app("fr_FR"); // to switch to the French locale.
+     * vle::Init app(""); // to use the default locale according to the
+     *                    // environment variables.
+     * @endcode
+     */
+    Init(const char *localname);
+
+    /**
+     * Cleanup all subsystems.
      */
     ~Init();
 };

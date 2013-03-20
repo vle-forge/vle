@@ -35,7 +35,7 @@
 
 namespace vle {
 
-Init::Init()
+static void __vle_init()
 {
     xmlInitParser(); /**< Initialize the libxml2 library. */
 
@@ -45,9 +45,28 @@ Init::Init()
 
     utils::Path::init();
     utils::Trace::init();
+}
+
+Init::Init()
+{
+    __vle_init();
+
+    setlocale(LC_ALL, "");
 
 #ifdef VLE_HAVE_NLS
-    setlocale(LC_ALL, "");
+    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().c_str());
+    textdomain(VLE_LOCALE_NAME);
+#endif
+}
+
+Init::Init(const char *localname)
+{
+    __vle_init();
+
+    if (!setlocale(LC_ALL, localname == NULL ? "" : localname))
+        setlocale(LC_ALL, "C");
+
+#ifdef VLE_HAVE_NLS
     bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().c_str());
     textdomain(VLE_LOCALE_NAME);
 #endif
