@@ -125,13 +125,14 @@ public:
      * Return the $VLE_HOME/packages/current_package dirname.
      * @return A string.
      */
-    std::string getPackageDir() const;
+    std::string getPackageSourceDir() const; // TODO returns source directory : current path + package
+    std::string getPackageBinaryDir() const; // TODO returns binary directory : $VLE_HOME/pkgs-1.1 + package
     std::string getPackageLibDir() const;
     std::string getPackageSrcDir() const;
     std::string getPackageDataDir() const;
     std::string getPackageDocDir() const;
     std::string getPackageExpDir() const;
-    std::string getPackageBuildDir() const;
+    std::string getPackageBuildDir() const; // TODO check current path + package + buildvle
     std::string getPackageOutputDir() const;
     std::string getPackagePluginDir() const;
     std::string getPackagePluginSimulatorDir() const;
@@ -531,7 +532,8 @@ private:
 
     std::string m_prefix; /*!< the $prefix of installation */
     std::string m_home; /*!< the $VLE_HOME */
-    std::string m_currentPackagePath; /*< the current package path */
+    std::string m_currentPackagePath; /*< the current binary package path */
+    std::string m_currentPackageSourcePath; /*< the current source path */
 
     /**
      * Build the paths from environment variables.

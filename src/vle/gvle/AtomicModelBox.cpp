@@ -907,7 +907,7 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
     Gtk::TreeViewColumn* column)
 {
     if (column
-	and not vle::utils::Path::path().getPackageDir().empty()
+	and not vle::utils::Path::path().getPackageSourceDir().empty()
         and utils::Path::exist(vle::utils::Path::path().getPackageSrcDir())) {
 
         Gtk::TreeRow row = (*mRefListDyn->get_iter(path));

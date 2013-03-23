@@ -181,7 +181,12 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
     }
 }
 
-std::string Path::getPackageDir() const
+std::string Path::getPackageSourceDir() const
+{
+    return m_currentPackageSourcePath;
+}
+
+std::string Path::getPackageBinaryDir() const
 {
     return m_currentPackagePath;
 }
@@ -238,7 +243,7 @@ std::string Path::getPackagePluginGvleOutputDir() const
 
 std::string Path::getPackageBuildDir() const
 {
-    return buildDirname(m_currentPackagePath, "build");
+    return buildDirname(m_currentPackageSourcePath, "buildvle");
 }
 
 std::string Path::getPackageDocDir() const
@@ -248,7 +253,7 @@ std::string Path::getPackageDocDir() const
 
 std::string Path::getPackageFile(const std::string& name) const
 {
-    return buildFilename(getPackageDir(), name);
+    return buildFilename(getPackageSourceDir(), name);
 }
 
 std::string Path::getPackageLibFile(const std::string& name) const
@@ -723,6 +728,7 @@ void Path::initGlobalPluginDirs()
 
     clearPluginDirs();
     m_currentPackagePath.clear();
+    m_currentPackageSourcePath.clear();
 }
 
 void Path::initPackagePluginDirs()
@@ -731,8 +737,20 @@ void Path::initPackagePluginDirs()
 
     clearPluginDirs();
 
-    m_currentPackagePath.assign(buildDirname(
-            m_home, pkgdirname, utils::Package::package().name()));
+    {
+        fs::path binary = m_home;
+        binary /= pkgdirname;
+        binary /= utils::Package::package().name();
+
+        m_currentPackagePath = binary.string();
+    }
+
+    {
+        fs::path src = fs::current_path();
+        src /= utils::Package::package().name();
+
+        m_currentPackageSourcePath = src.string();
+    }
 
     PathList result;
     for (fs::directory_iterator it(getPackagesDir()), end; it != end; ++it) {
@@ -1013,7 +1031,8 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "packages..............: " << p.getPackagesDir() << "\n"
         << "\n";
 
-    out << "Package dir...........: " << p.getPackageDir() << "\n"
+    out << "Package dir...........: " << p.getPackageSourceDir() << "\n"
+        << "Package binary dir....: " << p.getPackageBinaryDir() << "\n"
         << "Package lib dir.......: " << p.getPackageLibDir() << "\n"
         << "Package scr dir.......: " << p.getPackageSrcDir() << "\n"
         << "Package data dir......: " << p.getPackageDataDir() << "\n"

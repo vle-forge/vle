@@ -152,7 +152,7 @@ static int remove_configuration_file()
 static void show_package_content()
 {
     std::cout << vle::fmt(_("Package content from: `%1%'\n")) %
-        vle::utils::Path::path().getPackageDir();
+        vle::utils::Path::path().getPackageBinaryDir();
 
     vle::utils::PathList tmp;
 
@@ -263,12 +263,14 @@ static bool init_current_package(const std::string &packagename,
         const CmdArgs &args)
 {
     if (not vle::utils::Package::package().existsPackage(packagename)) {
-        if (std::find(args.begin(), args.end(), "create") == args.end()) {
-            std::cerr << vle::fmt(_("Package `%1%' does not exist. Use the"
-                        " create command before other command.\n")) %
-                packagename;
+        if (not vle::utils::Path::existDirectory(packagename)) {
+            if (std::find(args.begin(), args.end(), "create") == args.end()) {
+                std::cerr << vle::fmt(
+                    _("Package `%1%' does not exist. Use the create command"
+                      " before other command.\n")) % packagename;
 
-            return false;
+                return false;
+            }
         }
 
         vle::utils::Package::package().refresh();

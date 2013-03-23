@@ -134,29 +134,26 @@ Package::~Package()
 
 void Package::create()
 {
-    Path& p = utils::Path::path();
-
-    fs::create_directory(p.getPackageDir());
-    p.copyTemplate("package", p.getPackageDir());
+    fs::create_directory(Path::path().getPackageSourceDir());
+    Path::path().copyTemplate("package", Path::path().getPackageSourceDir());
 
     m_pimpl->m_strout.append(_("Package creating - done\n"));
 }
 
 void Package::configure()
 {
-    Path& p = utils::Path::path();
-
-    fs::create_directory(p.getPackageBuildDir());
+    fs::create_directory(Path::path().getPackageBuildDir());
 
     std::vector < std::string > argv;
     std::string exe, cmd;
 
-    cmd = (vle::fmt(m_pimpl->mCommandConfigure) % p.getPackageDir()).str();
+    cmd = (vle::fmt(m_pimpl->mCommandConfigure) %
+           Path::path().getPackageBinaryDir()).str();
 
     buildCommandLine(cmd, exe, argv);
 
     try {
-        m_pimpl->process(exe, p.getPackageBuildDir(), argv);
+        m_pimpl->process(exe, Path::path().getPackageBuildDir(), argv);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg configure error: configure failed %1%")) % e.what());
@@ -165,17 +162,17 @@ void Package::configure()
 
 void Package::test()
 {
-    Path& p = utils::Path::path();
-    fs::create_directory(p.getPackageBuildDir());
+    fs::create_directory(Path::path().getPackageBuildDir());
 
     std::vector < std::string > argv;
     std::string exe, cmd;
 
-    cmd = (vle::fmt(m_pimpl->mCommandTest) % p.getPackageBuildDir()).str();
+    cmd = (vle::fmt(m_pimpl->mCommandTest) %
+           Path::path().getPackageBuildDir()).str();
     buildCommandLine(cmd, exe, argv);
 
     try {
-        m_pimpl->process(exe, p.getPackageBuildDir(), argv);
+        m_pimpl->process(exe, Path::path().getPackageBuildDir(), argv);
     } catch (const std::exception& e) {
         throw utils::InternalError(
             fmt(_("Pkg error: test launch failed %1%")) % e.what());
@@ -184,17 +181,17 @@ void Package::test()
 
 void Package::build()
 {
-    Path& p = utils::Path::path();
-    fs::create_directory(p.getPackageBuildDir());
+    fs::create_directory(Path::path().getPackageBuildDir());
 
     std::vector < std::string > argv;
     std::string exe, cmd;
 
-    cmd = (vle::fmt(m_pimpl->mCommandBuild) % p.getPackageBuildDir()).str();
+    cmd = (vle::fmt(m_pimpl->mCommandBuild) %
+           Path::path().getPackageBuildDir()).str();
     buildCommandLine(cmd, exe, argv);
 
     try {
-        m_pimpl->process(exe, p.getPackageBuildDir(), argv);
+        m_pimpl->process(exe, Path::path().getPackageBuildDir(), argv);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg build error: build failed %1%")) % e.what());
@@ -203,16 +200,16 @@ void Package::build()
 
 void Package::install()
 {
-    Path& p = utils::Path::path();
-    fs::create_directory(p.getPackageBuildDir());
+    fs::create_directory(Path::path().getPackageBuildDir());
 
     std::vector < std::string > argv;
     std::string exe, cmd;
 
-    cmd = (vle::fmt(m_pimpl->mCommandInstall) % p.getPackageBuildDir()).str();
+    cmd = (vle::fmt(m_pimpl->mCommandInstall) %
+           Path::path().getPackageBuildDir()).str();
     buildCommandLine(cmd, exe, argv);
 
-    fs::path builddir = p.getPackageBuildDir();
+    fs::path builddir = Path::path().getPackageBuildDir();
 
     if (not fs::exists(builddir)) {
         throw utils::ArgError(
@@ -235,7 +232,7 @@ void Package::install()
     }
 
     try {
-        m_pimpl->process(exe, p.getPackageBuildDir(), argv);
+        m_pimpl->process(exe, Path::path().getPackageBuildDir(), argv);
     } catch(const std::exception& e) {
         throw utils::InternalError(
             fmt(_("Pkg build error: install lib failed %1%")) % e.what());
@@ -244,17 +241,17 @@ void Package::install()
 
 void Package::clean()
 {
-    Path& p = utils::Path::path();
-    fs::create_directory(p.getPackageBuildDir());
+    fs::create_directory(Path::path().getPackageBuildDir());
 
     std::vector < std::string > argv;
     std::string exe, cmd;
 
-    cmd = (vle::fmt(m_pimpl->mCommandClean) % p.getPackageBuildDir()).str();
+    cmd = (vle::fmt(m_pimpl->mCommandClean) %
+           Path::path().getPackageBuildDir()).str();
     buildCommandLine(cmd, exe, argv);
 
     try {
-        m_pimpl->process(exe, p.getPackageBuildDir(), argv);
+        m_pimpl->process(exe, Path::path().getPackageBuildDir(), argv);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg clean error: clean failed %1%")) % e.what());
@@ -263,17 +260,17 @@ void Package::clean()
 
 void Package::pack()
 {
-    Path& p = utils::Path::path();
-    fs::create_directory(p.getPackageBuildDir());
+    fs::create_directory(Path::path().getPackageBuildDir());
 
     std::vector < std::string > argv;
     std::string exe, cmd;
 
-    cmd = (vle::fmt(m_pimpl->mCommandPack) % p.getPackageBuildDir()).str();
+    cmd = (vle::fmt(m_pimpl->mCommandPack) %
+           Path::path().getPackageBuildDir()).str();
     buildCommandLine(cmd, exe, argv);
 
     try {
-        m_pimpl->process(exe, p.getPackageBuildDir(), argv);
+        m_pimpl->process(exe, Path::path().getPackageBuildDir(), argv);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg packaging error: package failed %1%")) % e.what());
@@ -358,61 +355,19 @@ void Package::changeToOutputDirectory()
 
 void Package::removePackage(const std::string& package)
 {
-    if (not package.empty()) {
-        fs::path tmp = Path::path().getPackagesDir();
-        tmp /= package;
-
-        if (fs::exists(tmp)) {
-            fs::remove_all(tmp);
-            fs::remove(tmp);
-        }
-    }
+    Package::removePackageBinary(package);
 }
 
 void Package::removePackageBinary(const std::string& package)
 {
-    if (not package.empty()) {
-        fs::path tmp = Path::path().getPackagesDir();
-        tmp /= package;
+    (void)package;
 
-        if (fs::exists(tmp)) {
-            {
-                fs::path build = tmp;
-                build /= "build";
+    if (Path::path().getPackageBinaryDir().empty())
+        return;
 
-                if (fs::exists(build)) {
-                    fs::remove_all(build);
-                }
-            }
-
-            {
-                fs::path lib = tmp;
-                lib /= "lib";
-
-                if (fs::exists(lib)) {
-                    fs::remove_all(lib);
-                }
-            }
-
-            {
-                fs::path plugins = tmp;
-                plugins /= "plugins";
-
-                if (fs::exists(plugins)) {
-                    fs::remove_all(plugins);
-                }
-            }
-
-            {
-                fs::path doc = tmp;
-                doc /= "doc";
-                doc /= "html";
-
-                if (fs::exists(doc)) {
-                    fs::remove_all(doc);
-                }
-            }
-        }
+    if (fs::exists(Path::path().getPackageBinaryDir())) {
+        fs::remove_all(Path::path().getPackageBinaryDir());
+        fs::remove(Path::path().getPackageBinaryDir());
     }
 }
 
@@ -431,7 +386,7 @@ bool Package::existsPackage(const std::string& package)
 void Package::addFile(const std::string& path, const std::string& name)
 {
     if (Package::package().selected()) {
-        fs::path tmp = Path::path().getPackageDir();
+        fs::path tmp = Path::path().getPackageSourceDir();
         tmp /= path;
         tmp /= name;
 
@@ -448,7 +403,7 @@ void Package::addFile(const std::string& path, const std::string& name)
 bool Package::existsFile(const std::string& path)
 {
     if (Package::package().selected()) {
-        fs::path tmp = Path::path().getPackageDir();
+        fs::path tmp = Path::path().getPackageSourceDir();
         tmp /= path;
 
 #if BOOST_VERSION > 103600
@@ -464,7 +419,7 @@ bool Package::existsFile(const std::string& path)
 void Package::addDirectory(const std::string& path, const std::string& name)
 {
     if (Package::package().selected()) {
-        fs::path tmp(Path::path().getPackageDir());
+        fs::path tmp(Path::path().getPackageSourceDir());
         tmp /= path;
         tmp /= name;
 
@@ -477,7 +432,7 @@ void Package::addDirectory(const std::string& path, const std::string& name)
 bool Package::existsDirectory(const std::string& path)
 {
     if (Package::package().selected()) {
-        fs::path tmp = Path::path().getPackageDir();
+        fs::path tmp = Path::path().getPackageSourceDir();
         tmp /= path;
 
         return fs::exists(tmp) and fs::is_directory(tmp);
@@ -488,7 +443,7 @@ bool Package::existsDirectory(const std::string& path)
 
 void Package::remove(const std::string& path)
 {
-    fs::path tmp = Path::path().getPackageDir();
+    fs::path tmp = Path::path().getPackageSourceDir();
     tmp /= path;
 
     fs::remove_all(tmp);
@@ -498,7 +453,7 @@ void Package::remove(const std::string& path)
 std::string Package::rename(const std::string& oldname,
                             const std::string& newname)
 {
-    fs::path oldfilepath = Path::path().getPackageDir();
+    fs::path oldfilepath = Path::path().getPackageSourceDir();
     oldfilepath /= oldname;
 
 #if BOOST_VERSION > 103600

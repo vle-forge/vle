@@ -138,6 +138,15 @@ BOOST_AUTO_TEST_CASE(show_path)
     BOOST_REQUIRE_EQUAL((PathList::size_type)0,
                         Path::path().getSimulatorDirs().size());
 
+    bs::error_code ec;
+    fs::path tmp = fs::temp_directory_path(ec);
+    tmp /= fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+    fs::create_directory(tmp, ec);
+
+    BOOST_CHECK(fs::exists(tmp, ec) && fs::is_directory(tmp, ec));
+
+    fs::current_path(tmp, ec);
+
     Package::package().select("x");
     vle::utils::Package::package().create();
 }
@@ -150,18 +159,44 @@ BOOST_AUTO_TEST_CASE(show_package)
 
     std::ostringstream out, err;
 
+    bs::error_code ec;
+    fs::path tmp = fs::temp_directory_path(ec);
+    tmp /= fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+    fs::create_directory(tmp, ec);
+
+    BOOST_CHECK(fs::exists(tmp, ec) && fs::is_directory(tmp, ec));
+
+    fs::current_path(tmp, ec);
+
+    std::cout << "Current path: " << fs::current_path() << "\n";
+    vle::utils::Package::package().refresh();
     vle::utils::Package::package().select("tmp");
     vle::utils::Package::package().create();
+    std::cout << "package configure\n";
+    vle::utils::Package::package().configure();
+    std::cout << "package build\n";
+    vle::utils::Package::package().build();
+    std::cout << "package install\n";
+    vle::utils::Package::package().install();
 
-    std::cout << "Packages:\n";
+    /* We need to ensure each file really installed. */
+#ifdef _WIN32
+    ::Sleep(1000);
+#else
+    ::sleep(1);
+#endif
+
+    std::cout << "Installed packages:\n";
     PathList lst = Path::path().getInstalledPackages();
     std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
                   std::cout, "\n"));
 
-    std::cout << "Vpz:\n";
-    PathList vpz = Path::path().getInstalledExperiments();
-    std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
-                  std::cout, "\n"));
+    if (not fs::exists(Path::path().getPackageExpDir())) {
+        std::cout << "Installed vpz:\n";
+        PathList vpz = Path::path().getInstalledExperiments();
+        std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
+                std::cout, "\n"));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(remote_package_check_2_package_tmp_and_x)
@@ -182,7 +217,8 @@ BOOST_AUTO_TEST_CASE(remote_package_check_2_package_tmp_and_x)
         rmt.join();
         rmt.getResult(&results);
         BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 2u);
+        BOOST_REQUIRE_EQUAL(results.size(), 1u); /* We only build the tmp
+                                                    package, not x. */
 
         BOOST_REQUIRE(results[0].name == "MyProject");
     }
@@ -251,10 +287,10 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
         rmt.join();
         rmt.getResult(&results);
         BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 2u);
+        BOOST_REQUIRE_EQUAL(results.size(), 1u); /* We only build the tmp
+                                                    package not x. */
 
         BOOST_REQUIRE(results[0].name == "MyProject");
-        BOOST_REQUIRE(results[1].name == "MyProject");
     }
 }
 
@@ -409,7 +445,7 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
         vle::utils::Package::package().select(unique.string());
         vle::utils::Package::package().create();
 
-        filepath = vle::utils::Path::path().getPackageDir();
+        filepath = vle::utils::Path::path().getPackageSourceDir();
         uniquepath = unique.string();
     } catch (...) {
         BOOST_REQUIRE(false);

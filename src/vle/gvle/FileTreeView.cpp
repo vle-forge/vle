@@ -242,7 +242,7 @@ Gtk::TreeModel::iterator FileTreeView::getFileRow(
 
 void FileTreeView::showRow(std::string pathFile)
 {
-    std::string pathPackage = utils::Path::path().getPackageDir();
+    std::string pathPackage = utils::Path::path().getPackageSourceDir();
     std::string path = pathFile.substr(pathPackage.size()+1,
                                        pathFile.size());
     std::vector <std::string> lst;
@@ -363,7 +363,7 @@ void FileTreeView::onEdition(const Glib::ustring& path,
                 Glib::path_get_dirname(newPath), oldFilename));
 
         if (not utils::Path::exist(Glib::build_filename(
-                    utils::Path::path().getPackageDir(), newPath))) {
+                    utils::Path::path().getPackageSourceDir(), newPath))) {
 
             utils::Package::package().rename(oldFilePath, newFilename);
             mParent->refreshEditor(oldFilePath, newPath);
@@ -444,7 +444,7 @@ void FileTreeView::projectFilePath(const Gtk::TreeRow& row,
 bool FileTreeView::on_button_press_event(GdkEventButton* event)
 {
     if (event->type == GDK_BUTTON_PRESS and event->button == 3
-	and not vle::utils::Path::path().getPackageDir().empty()) {
+	and not vle::utils::Path::path().getPackageSourceDir().empty()) {
 
         Gtk::TreeModel::Path path;
         Gtk::TreeViewColumn* column;
@@ -568,7 +568,7 @@ void FileTreeView::onCopy()
         mFilePath = Glib::build_filename(lstpath);
 
         mAbsolutePath =
-            Glib::build_filename(utils::Path::path().getPackageDir(),
+            Glib::build_filename(utils::Path::path().getPackageSourceDir(),
                                  mFilePath);
     }
 }
@@ -597,14 +597,14 @@ void FileTreeView::onPaste()
             newFileName = mFileName;
             newFileName.insert(newFileName.find_last_of("."),suffixe);
 
-            if (isDirectory(Glib::build_filename(utils::Path::path().getPackageDir(),Glib::build_filename(lstpath)))) {
+            if (isDirectory(Glib::build_filename(utils::Path::path().getPackageSourceDir(),Glib::build_filename(lstpath)))) {
                 newFilePath = Glib::build_filename(lstpath) + "/" + newFileName;
             } else {
                 newFilePath = Glib::path_get_dirname(Glib::build_filename(lstpath)) + "/" + newFileName;
             }
 
             newAbsolutePath =
-                Glib::build_filename(utils::Path::path().getPackageDir(),
+                Glib::build_filename(utils::Path::path().getPackageSourceDir(),
                                      newFilePath);
             copyNumber++;
 

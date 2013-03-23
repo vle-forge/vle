@@ -403,12 +403,6 @@ namespace vle { namespace devs {
         std::string getPackageExpDir() const;
 
         /**
-         * @brief Get the build package directory.
-         * @return The build package path.
-         */
-        std::string getPackageBuildDir() const;
-
-        /**
          * @brief Get the path of a package file.
          * @param name The name of the file.
          * @return The patch of the file.

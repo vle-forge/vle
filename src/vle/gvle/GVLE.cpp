@@ -58,6 +58,7 @@
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/main.h>
+#include <glib/gstdio.h>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
@@ -231,7 +232,7 @@ void GVLE::setModifiedTitle(const std::string& name)
 
 void GVLE::buildPackageHierarchy()
 {
-    mPackage = vle::utils::Path::path().getPackageDir();
+    mPackage = vle::utils::Path::path().getPackageSourceDir();
     mFileTreeView->clear();
     mFileTreeView->setPackage(mPackage);
     mFileTreeView->build();
@@ -642,20 +643,41 @@ void GVLE::onNewProject()
 
 void GVLE::onOpenProject()
 {
-    OpenPackageBox box(mRefXML);
+    Gtk::FileChooserDialog box(*this, "Open project",
+                               Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    box.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    box.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+    box.set_response_sensitive(Gtk::RESPONSE_ACCEPT, true);
+    box.set_default_response(Gtk::RESPONSE_ACCEPT);
+    box.set_create_folders(true);
 
-    if (box.run()) {
-        onCloseProject();
-        utils::Package::package().select(box.name());
-        mPluginFactory.update();
-        buildPackageHierarchy();
-        mMenuAndToolbar->onOpenProject();
-        setTitle("");
-        mFileTreeView->set_sensitive(true);
-        onTrouble();
-    } else if (not utils::Package::package().existsPackage(
-            utils::Package::package().name())) {
-        onCloseProject();
+    int result = box.run();
+    switch (result) {
+    case Gtk::RESPONSE_ACCEPT:
+        {
+            std::string dirname = Glib::path_get_dirname(box.get_filename());
+            std::string basename = Glib::path_get_basename(box.get_filename());
+
+            if (not basename.empty()) {
+                if (g_chdir(dirname.c_str()) == 0) {
+                    onCloseProject();
+                    utils::Package::package().select(basename);
+                    mPluginFactory.update();
+                    buildPackageHierarchy();
+                    mMenuAndToolbar->onOpenProject();
+                    setTitle("");
+                    mFileTreeView->set_sensitive(true);
+                    onTrouble();
+                }
+            }
+        }
+        break;
+    default:
+        if (not utils::Package::package().existsPackage(
+                utils::Package::package().name())) {
+            onCloseProject();
+        }
+        break;
     }
 }
 
@@ -795,7 +817,7 @@ void GVLE::onSave()
 
                 file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
                 file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-                file.set_current_folder(utils::Path::path().getPackageDir());
+                file.set_current_folder(utils::Path::path().getPackageSourceDir());
                 if (file.run() == Gtk::RESPONSE_OK) {
                     std::string filename(file.get_filename());
 

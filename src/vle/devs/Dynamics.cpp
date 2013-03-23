@@ -92,7 +92,7 @@ ExternalEvent* Dynamics::buildEventWithAString(
 std::string Dynamics::getPackageDir() const
 {
     if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageDir();
+        return utils::Path::path().getPackageBinaryDir();
     } else {
         return utils::Path::path().getExternalPackageDir(*m_packageid);
     }
@@ -139,15 +139,6 @@ std::string Dynamics::getPackageExpDir() const
 {
     if (utils::Package::package().name() == *m_packageid) {
         return utils::Path::path().getPackageExpDir();
-    } else {
-        return utils::Path::path().getExternalPackageExpDir(*m_packageid);
-    }
-}
-
-std::string Dynamics::getPackageBuildDir() const
-{
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageDir();
     } else {
         return utils::Path::path().getExternalPackageExpDir(*m_packageid);
     }
