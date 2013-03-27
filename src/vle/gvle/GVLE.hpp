@@ -918,6 +918,7 @@ private:
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
     QuitBox*                        mQuitBox;
+
     PluginFactory                   mPluginFactory;
 
     /* Project managment */

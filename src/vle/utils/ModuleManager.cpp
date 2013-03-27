@@ -227,6 +227,14 @@ public:
                               " vle_make_new_oov not found)")) % mPath);
                 }
                 break;
+            case MODULE_GVLE_GLOBAL:
+                if (not (mFunction = (getSymbol("vle_make_new_gvle_global")))) {
+                    throw utils::InternalError(fmt(
+                            _("Module: `%1%' is not a GVLE global module"
+                              " (symbol vle_make_new_gvle_global not found)"))
+                        % mPath);
+                }
+                break;
             case MODULE_GVLE_MODELING:
                 if (not (mFunction = (getSymbol("vle_make_new_gvle_modeling")))) {
                     throw utils::InternalError(fmt(
@@ -472,6 +480,9 @@ public:
         std::for_each(mTableOov.begin(),
                       mTableOov.end(),
                       ModuleDeleter());
+        std::for_each(mTableGvleGlobal.begin(),
+                      mTableGvleGlobal.end(),
+                      ModuleDeleter());
         std::for_each(mTableGvleModeling.begin(),
                       mTableGvleModeling.end(),
                       ModuleDeleter());
@@ -507,6 +518,17 @@ public:
                 return it->second;
             } else {
                 return mTableOov.insert(
+                    std::make_pair < std::string, pimpl::Module* >(
+                        path, new pimpl::Module(path, package, library,
+                                                type))).first->second;
+            }
+            break;
+        case MODULE_GVLE_GLOBAL:
+            it = mTableGvleGlobal.find(path);
+            if (it != mTableGvleGlobal.end()) {
+                return it->second;
+            } else {
+                return mTableGvleGlobal.insert(
                     std::make_pair < std::string, pimpl::Module* >(
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
@@ -572,6 +594,7 @@ public:
 
     ModuleTable mTableSimulator;
     ModuleTable mTableOov;
+    ModuleTable mTableGvleGlobal;
     ModuleTable mTableGvleModeling;
     ModuleTable mTableGvleOutput;
 
@@ -624,6 +647,7 @@ void ModuleManager::browse()
 
     fs::path pathsim = "plugins/simulator";
     fs::path pathoov = "plugins/output";
+    fs::path pathgvleg = "plugins/gvle/global";
     fs::path pathgvlem = "plugins/gvle/modeling";
     fs::path pathgvleo = "plugins/gvle/output";
 
@@ -656,6 +680,16 @@ void ModuleManager::browse()
                     tmp /= pathoov;
 #endif
                     mPimpl->browse(tmp, package, MODULE_OOV);
+                }
+
+                {
+#if BOOST_VERSION > 104500
+                    fs::path tmp = (*it) / pathgvleg;
+#else
+                    fs::path tmp = (*it);
+                    tmp /= pathgvleg;
+#endif
+                    mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
                 }
 
                 {
@@ -698,6 +732,9 @@ void ModuleManager::browse(ModuleType type)
         break;
     case MODULE_OOV:
         pathtype = "plugins/output";
+        break;
+    case MODULE_GVLE_GLOBAL:
+        pathtype = "plugins/gvle/global";
         break;
     case MODULE_GVLE_MODELING:
         pathtype = "plugins/gvle/modeling";
@@ -747,6 +784,12 @@ void ModuleManager::browse(const std::string& package)
 
     {
         fs::path tmp = pkg;
+        tmp /= "gvle/global";
+        mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
+    }
+
+    {
+        fs::path tmp = pkg;
         tmp /= "gvle/modeling";
         mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
     }
@@ -776,6 +819,9 @@ void ModuleManager::browse(const std::string& package, ModuleType type)
     case MODULE_OOV:
         pkg /= "output";
         break;
+    case MODULE_GVLE_GLOBAL:
+        pkg /= "gvle/global";
+        break;
     case MODULE_GVLE_MODELING:
         pkg /= "gvle/modeling";
         break;
@@ -798,6 +844,11 @@ void ModuleManager::fill(ModuleList *lst) const
 
     std::transform(mPimpl->mTableOov.begin(),
                    mPimpl->mTableOov.end(),
+                   std::back_inserter(*lst),
+                   ModuleManager::Pimpl::ModuleConvert());
+
+    std::transform(mPimpl->mTableGvleGlobal.begin(),
+                   mPimpl->mTableGvleGlobal.end(),
                    std::back_inserter(*lst),
                    ModuleManager::Pimpl::ModuleConvert());
 
@@ -831,6 +882,12 @@ void ModuleManager::fill(ModuleType type, ModuleList *lst) const
                        std::back_inserter(*lst),
                        ModuleManager::Pimpl::ModuleConvert());
         break;
+    case MODULE_GVLE_GLOBAL:
+        std::transform(mPimpl->mTableGvleGlobal.begin(),
+                       mPimpl->mTableGvleGlobal.end(),
+                       std::back_inserter(*lst),
+                       ModuleManager::Pimpl::ModuleConvert());
+        break;
     case MODULE_GVLE_MODELING:
         std::transform(mPimpl->mTableGvleModeling.begin(),
                        mPimpl->mTableGvleModeling.end(),
@@ -858,6 +915,12 @@ void ModuleManager::fill(const std::string& package, ModuleList *lst) const
 
     transformIf(mPimpl->mTableOov.begin(),
                 mPimpl->mTableOov.end(),
+                std::back_inserter(*lst),
+                ModuleManager::Pimpl::ModuleIsInPackage(package),
+                ModuleManager::Pimpl::ModuleConvert());
+
+    transformIf(mPimpl->mTableGvleGlobal.begin(),
+                mPimpl->mTableGvleGlobal.end(),
                 std::back_inserter(*lst),
                 ModuleManager::Pimpl::ModuleIsInPackage(package),
                 ModuleManager::Pimpl::ModuleConvert());
@@ -897,6 +960,13 @@ void ModuleManager::fill(const std::string& package, ModuleType type,
                     ModuleManager::Pimpl::ModuleIsInPackage(package),
                     ModuleManager::Pimpl::ModuleConvert());
         break;
+    case MODULE_GVLE_GLOBAL:
+        transformIf(mPimpl->mTableGvleGlobal.begin(),
+                    mPimpl->mTableGvleGlobal.end(),
+                    std::back_inserter(*lst),
+                    ModuleManager::Pimpl::ModuleIsInPackage(package),
+                    ModuleManager::Pimpl::ModuleConvert());
+        break;
     case MODULE_GVLE_MODELING:
         transformIf(mPimpl->mTableGvleModeling.begin(),
                     mPimpl->mTableGvleModeling.end(),
@@ -929,6 +999,10 @@ std::string ModuleManager::buildModuleFilename(const std::string& package,
             break;
         case MODULE_OOV:
             current = Path::path().getExternalPackagePluginOutputDir(
+                package);
+            break;
+        case MODULE_GVLE_GLOBAL:
+            current = Path::path().getExternalPackagePluginGvleGlobalDir(
                 package);
             break;
         case MODULE_GVLE_MODELING:

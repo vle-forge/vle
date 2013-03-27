@@ -94,8 +94,7 @@ GVLE::GVLE(BaseObjectType* cobject,
     mModeling(new Modeling()),
     mCurrentButton(VLE_GVLE_POINTER),
     mCutCopyPaste(this),
-    mCurrentTab(-1),
-    mSpawnPool()
+    mCurrentTab(-1)
 {
     mRefXML = xml;
 
@@ -150,6 +149,22 @@ GVLE::GVLE(BaseObjectType* cobject,
 
     Glib::signal_timeout().connect(sigc::mem_fun(*this, &GVLE::on_timeout),
                                    1000 );
+
+
+    mPluginFactory.update();
+
+    utils::ModuleList lst;
+    utils::ModuleList::iterator it;
+
+    mPluginFactory.getGvleGlobalPlugins(&lst);
+    GlobalPluginPtr plugin;
+
+    for (it = lst.begin(); it != lst.end(); ++it) {
+
+        std::string pluginName(it->package + "/" + it->library);
+        GlobalPluginPtr plugin = mPluginFactory.getGlobalPlugin(pluginName, this);
+        plugin->run();
+    }
 
     set_title(windowTitle());
     resize(900, 550);

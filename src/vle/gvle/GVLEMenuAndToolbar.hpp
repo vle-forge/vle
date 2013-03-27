@@ -31,6 +31,7 @@
 #include <gtkmm/builder.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/menubar.h>
+#include <gtkmm/menu.h>
 #include <gtkmm/uimanager.h>
 #include <gtkmm/actiongroup.h>
 
@@ -58,6 +59,12 @@ public:
 
     Gtk::MenuBar* getMenuBar()
     { return mMenuBar; }
+
+    Glib::RefPtr<Gtk::UIManager> getUIManager()
+    { return m_refUIManager; }
+
+    Glib::RefPtr<Gtk::ActionGroup> getActionGroup()
+    { return  m_refActionGroup; }
 
     // Menu item
     void hideCopyCut();
