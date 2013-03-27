@@ -31,7 +31,10 @@ FIND_PACKAGE(VLE_DEPS REQUIRED)
 ## Check VLE's packages
 ##
 
+set (VleCheckPackage_DIR "${CMAKE_SOURCE_DIR}/cmake")
 FIND_PACKAGE(VleCheckPackage REQUIRED)
+set (VleCheckAndDeclareGeneratedModels_DIR
+  "${CMAKE_SOURCE_DIR}/cmake")
 FIND_PACKAGE(VleCheckAndDeclareGeneratedModels REQUIRED)
 SET(VLE_ABI_VERSION 1.1)
 
