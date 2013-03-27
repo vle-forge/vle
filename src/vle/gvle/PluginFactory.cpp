@@ -26,12 +26,15 @@
 
 
 #include <vle/gvle/PluginFactory.hpp>
-#include <vle/gvle/OutputPlugin.hpp>
-#include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Algo.hpp>
+#include <map>
 
 namespace vle { namespace gvle {
+
+typedef std::map < void *, GlobalPluginPtr > GlobalPluginList;
+typedef std::map < void *, ModelingPluginPtr > ModelingPluginList;
+typedef std::map < void *, OutputPluginPtr > OutputPluginList;
 
 class PluginFactory::Pimpl
 {
@@ -47,6 +50,10 @@ public:
     }
 
     utils::ModuleManager mManager;
+
+    GlobalPluginList mGlobalPluginList;
+    ModelingPluginList mModelingPluginList;
+    OutputPluginList mOutputPluginList;
 
 private:
     Pimpl(const Pimpl&);
@@ -68,18 +75,69 @@ void PluginFactory::update()
     mPimpl->mManager.browse();
 }
 
+GlobalPluginPtr PluginFactory::getGlobalPlugin(const std::string& package,
+					       const std::string& library,
+					       GVLE* gvle)
+{
+    GlobalPluginPtr globalPluginPtr;
+    GlobalPluginList::iterator it;
+
+    void *symbol = NULL;
+
+    symbol = mPimpl->mManager.get(package, library,
+				  utils::MODULE_GVLE_GLOBAL);
+
+    it = mPimpl->mGlobalPluginList.find(symbol);
+
+    if (it != mPimpl->mGlobalPluginList.end()) {
+        globalPluginPtr = it->second;
+    } else {
+        GvleGlobalPluginSlot fct = NULL;
+
+        fct = utils::functionCast < GvleGlobalPluginSlot >(symbol);
+
+        globalPluginPtr = GlobalPluginPtr(fct(package, library, gvle));
+        mPimpl->mGlobalPluginList[symbol] = globalPluginPtr;
+    }
+
+    return globalPluginPtr;
+}
+
+GlobalPluginPtr PluginFactory::getGlobalPlugin(const std::string& pluginname,
+					       GVLE* gvle)
+{
+    std::string package, library;
+
+    buildPackageLibraryNames(pluginname, &package, &library);
+
+    return getGlobalPlugin(package, library, gvle);
+}
+
 ModelingPluginPtr PluginFactory::getModelingPlugin(const std::string& package,
                                                    const std::string& library)
 {
+    ModelingPluginPtr modelingPluginPtr;
+    ModelingPluginList::iterator it;
+
     void *symbol = NULL;
-    GvleModelingPluginSlot fct = NULL;
 
     symbol = mPimpl->mManager.get(package, library,
                                   utils::MODULE_GVLE_MODELING);
 
-    fct = utils::functionCast < GvleModelingPluginSlot >(symbol);
+    it = mPimpl->mModelingPluginList.find(symbol);
 
-    return ModelingPluginPtr(fct(package, library));
+    if (it != mPimpl->mModelingPluginList.end()) {
+        modelingPluginPtr = it->second;
+    } else {
+        GvleModelingPluginSlot fct = NULL;
+
+        fct = utils::functionCast < GvleModelingPluginSlot >(symbol);
+
+        modelingPluginPtr = ModelingPluginPtr(fct(package, library));
+        mPimpl->mModelingPluginList[symbol] = modelingPluginPtr;
+    }
+
+    return modelingPluginPtr;
 }
 
 ModelingPluginPtr PluginFactory::getModelingPlugin(const std::string& pluginname)
@@ -91,6 +149,33 @@ ModelingPluginPtr PluginFactory::getModelingPlugin(const std::string& pluginname
     return getModelingPlugin(package, library);
 }
 
+OutputPluginPtr PluginFactory::getOutputPlugin(const std::string& package,
+                                               const std::string& library)
+{
+    OutputPluginPtr outputPluginPtr;
+    OutputPluginList::iterator it;
+
+    void *symbol = NULL;
+
+    symbol = mPimpl->mManager.get(package, library,
+				  utils::MODULE_GVLE_OUTPUT);
+
+    it = mPimpl->mOutputPluginList.find(symbol);
+
+    if (it != mPimpl->mOutputPluginList.end()) {
+        outputPluginPtr = it->second;
+    } else {
+        GvleOutputPluginSlot fct = NULL;
+
+        fct = utils::functionCast < GvleOutputPluginSlot >(symbol);
+
+        outputPluginPtr = OutputPluginPtr(fct(package, library));
+        mPimpl->mOutputPluginList[symbol] = outputPluginPtr;
+    }
+
+    return outputPluginPtr;
+}
+
 OutputPluginPtr PluginFactory::getOutputPlugin(const std::string& pluginname)
 {
     std::string package, library;
@@ -99,18 +184,9 @@ OutputPluginPtr PluginFactory::getOutputPlugin(const std::string& pluginname)
 
     return getOutputPlugin(package, library);
 }
-
-OutputPluginPtr PluginFactory::getOutputPlugin(const std::string& package,
-                                               const std::string& library)
+void PluginFactory::getGvleGlobalPlugins(utils::ModuleList *lst)
 {
-    void *symbol = NULL;
-    GvleOutputPluginSlot fct = NULL;
-
-    symbol = mPimpl->mManager.get(package, library, utils::MODULE_GVLE_OUTPUT);
-
-    fct = utils::functionCast < GvleOutputPluginSlot >(symbol);
-
-    return OutputPluginPtr(fct(package, library));
+    mPimpl->mManager.fill(utils::MODULE_GVLE_GLOBAL, lst);
 }
 
 void PluginFactory::getGvleModelingPlugins(utils::ModuleList *lst)

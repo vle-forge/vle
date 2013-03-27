@@ -136,6 +136,7 @@ public:
     std::string getPackagePluginDir() const;
     std::string getPackagePluginSimulatorDir() const;
     std::string getPackagePluginOutputDir() const;
+    std::string getPackagePluginGvleGlobalDir() const;
     std::string getPackagePluginGvleModelingDir() const;
     std::string getPackagePluginGvleOutputDir() const;
 
@@ -163,6 +164,7 @@ public:
     std::string getExternalPackagePluginDir(const std::string& name) const;
     std::string getExternalPackagePluginSimulatorDir(const std::string& name) const;
     std::string getExternalPackagePluginOutputDir(const std::string& name) const;
+    std::string getExternalPackagePluginGvleGlobalDir(const std::string& name) const;
     std::string getExternalPackagePluginGvleModelingDir(const std::string& name) const;
     std::string getExternalPackagePluginGvleOutputDir(const std::string& name) const;
 

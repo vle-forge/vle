@@ -29,6 +29,7 @@
 #define VLE_GVLE_PLUGINFACTORY_HPP 1
 
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/gvle/GlobalPlugin.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
 #include <vle/gvle/OutputPlugin.hpp>
 
@@ -45,7 +46,7 @@ class PluginFactory
 public:
     /**
      * @brief Build a cache with all installed modules.
-     * 
+     *
      * Use the @e vle::utils::ModuleManager to browse all installed modules in
      * simulators, output, gvle's modeling and gvle's output directory.
      */
@@ -61,6 +62,13 @@ public:
      */
     void update();
 
+    GlobalPluginPtr getGlobalPlugin(const std::string& package,
+				    const std::string& library,
+				    GVLE* gvle);
+
+    GlobalPluginPtr getGlobalPlugin(const std::string& pluginname,
+				    GVLE* gvle);
+
     ModelingPluginPtr getModelingPlugin(const std::string& package,
                                         const std::string& library);
 
@@ -70,6 +78,8 @@ public:
                                     const std::string& library);
 
     OutputPluginPtr getOutputPlugin(const std::string& pluginname);
+
+    void getGvleGlobalPlugins(utils::ModuleList *lst);
 
     void getGvleModelingPlugins(utils::ModuleList *lst);
 
