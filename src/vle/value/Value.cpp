@@ -38,7 +38,6 @@
 #include <vle/value/Null.hpp>
 #include <vle/value/Matrix.hpp>
 #include <sstream>
-#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -244,48 +243,5 @@ Matrix& Value::toMatrix()
     return static_cast < Matrix& >(*this);
 }
 
-void init()
-{
-    boost::serialization::void_cast_register(
-        static_cast<Boolean*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Double*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Map*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Integer*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<String*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Set*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Tuple*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Table*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Xml*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Null*>(0), static_cast<Value*>(0));
-    boost::serialization::void_cast_register(
-        static_cast<Matrix*>(0), static_cast<Value*>(0));
-}
-
-void finalize()
-{
-}
-
 }} // namespace vle value
 
-#ifndef __WIN32__
-BOOST_CLASS_EXPORT(vle::value::Boolean)
-BOOST_CLASS_EXPORT(vle::value::Double)
-BOOST_CLASS_EXPORT(vle::value::Map)
-BOOST_CLASS_EXPORT(vle::value::Integer)
-BOOST_CLASS_EXPORT(vle::value::String)
-BOOST_CLASS_EXPORT(vle::value::Set)
-BOOST_CLASS_EXPORT(vle::value::Tuple)
-BOOST_CLASS_EXPORT(vle::value::Table)
-BOOST_CLASS_EXPORT(vle::value::Xml)
-BOOST_CLASS_EXPORT(vle::value::Null)
-BOOST_CLASS_EXPORT(vle::value::Matrix)
-#endif

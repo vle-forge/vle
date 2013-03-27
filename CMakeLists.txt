@@ -132,12 +132,9 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_DETAILED_FAILURE_MSG FALSE)
 set(Boost_DEBUG FALSE)
 
-find_package(Boost COMPONENTS unit_test_framework thread serialization
-  filesystem system chrono date_time regex program_options)
+find_package(Boost COMPONENTS unit_test_framework thread filesystem system
+  chrono date_time regex program_options)
 
-if (NOT Boost_SERIALIZATION_FOUND)
-  message(FATAL_ERROR "The boost serialization library is required")
-endif (NOT Boost_SERIALIZATION_FOUND)
 if (NOT Boost_FILESYSTEM_FOUND)
   message(FATAL_ERROR "The boost filesystem library is required")
 endif (NOT Boost_FILESYSTEM_FOUND)

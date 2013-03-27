@@ -38,7 +38,6 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/DllDefines.hpp>
-#include <boost/serialization/vector.hpp>
 #include <vector>
 
 namespace vle { namespace value {
@@ -644,56 +643,6 @@ public:
      */
     const Matrix& getMatrix(const size_type& i) const;
 
-    ///
-    ////
-    ///
-
-    /**
-     * @brief Serialize the value::Set into a binary file using the
-     * binary format archive of the boost::serialization library.
-     * @param set The value::Set to serialize.
-     * @param filename The output file.
-     */
-    static void serializeBinaryFile(
-        const Set& set, const std::string& filename);
-
-    /**
-     * @brief Serialize the value::Set into a std::string buffer using the
-     * binary format archive of the boost::serialization library.
-     * @param set The value::Set to serialize.
-     * @param filename The output file.
-     */
-    static void serializeBinaryBuffer(
-        const Set& set, std::string& buffer);
-
-    /**
-     * @brief Deserialize the binary file into a value::Set.
-     * @code
-     * value::Set set;
-     * value::Set::deserializeBinaryFile(set, "file.dat");
-     * @endcode
-     * @param set An output parameter to fill the Set.
-     * @param filename The filename.
-     */
-    static void deserializeBinaryFile(
-        Set& set, const std::string& filename);
-
-    /**
-     * @brief Deserialize the string binary buffer into a value::Set.
-     * @code
-     * value::Set set;
-     * [...] // fill the value::Set.
-     * std::string buffer;
-     * value::Set::serializeBinaryBuffer(set, buffer);
-     * [...]
-     * value::Set::deserializeBinaryBuffer(set, buffer);
-     * @endcode
-     * @param set An output parameter to fill the Set.
-     * @param filename The filename.
-     */
-    static void deserializeBinaryBuffer(
-        Set& set, const std::string& buffer);
-
 private:
     VectorValue m_value;
 
@@ -704,14 +653,6 @@ private:
      * @throw utils::ArgError if index 'i' is too big.
      */
     void del(const size_type i);
-
-    friend class boost::serialization::access;
-    template < class Archive >
-        void serialize(Archive& ar, const unsigned int /* version */)
-        {
-            ar & boost::serialization::base_object < Value >(*this);
-            ar & m_value;
-        }
 };
 
 inline const Set& toSetValue(const Value& value)

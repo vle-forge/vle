@@ -30,7 +30,6 @@
 
 #include <vle/value/Value.hpp>
 #include <vle/DllDefines.hpp>
-#include <boost/serialization/vector.hpp>
 #include <vector>
 
 namespace vle { namespace value {
@@ -228,14 +227,6 @@ public:
 
 private:
     TupleValue              m_value;
-
-    friend class boost::serialization::access;
-    template < class Archive >
-        void serialize(Archive& ar, const unsigned int /* version */)
-        {
-            ar & boost::serialization::base_object < Value >(*this);
-            ar & m_value;
-        }
 };
 
 inline const Tuple& toTupleValue(const Value& value)

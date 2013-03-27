@@ -32,12 +32,6 @@
 #include <vle/utils/Types.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/DllDefines.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/utility.hpp>
 
 namespace vle { namespace value {
 
@@ -249,40 +243,6 @@ namespace vle { namespace value {
         friend std::ostream& operator<<(std::ostream& out, const Value& obj)
         { obj.writeString(out); return out; }
 
-	friend class boost::serialization::access;
-
-	/**
-	 * @brief Boost serialization operator to permit a text, xml or binary
-	 * stream of the value value.
-	 * @param ar The archive where writting the values.
-	 * @param version The version of the serialization.
-	 */
-	template < class Archive >
-	    void serialize(Archive& /* ar */, const unsigned int /* version */)
-	    {}
-
-        /**
-         * @brief Register the vle::Values for the specified boost::archive. Use
-         * it to allow writing null pointer into value::Set, value::Map or
-         * value::Matrix.
-         * @param ar The archive to register value::Value types.
-         */
-        template < class Archive >
-            static void registerValues(Archive& ar)
-            {
-                ar.register_type(static_cast < Boolean* > (0));
-                ar.register_type(static_cast < Integer* > (0));
-                ar.register_type(static_cast < Double* > (0));
-                ar.register_type(static_cast < String* > (0));
-                ar.register_type(static_cast < Set* > (0));
-                ar.register_type(static_cast < Map* > (0));
-                ar.register_type(static_cast < Tuple* > (0));
-                ar.register_type(static_cast < Table* > (0));
-                ar.register_type(static_cast < Xml* > (0));
-                ar.register_type(static_cast < Null* > (0));
-                ar.register_type(static_cast < Matrix* > (0));
-            }
-
     private:
         Value& operator=(const Value& /* value */) { return *this; }
     };
@@ -351,16 +311,6 @@ namespace vle { namespace value {
 	Value* operator()(const Value* val) const
 	{ return (not val) ? 0 : val->clone(); }
     };
-
-    /**
-     * @brief Initialize the boost::serialization object.
-     */
-    VLE_API void init();
-
-    /**
-     * @brief Delete all singleton.
-     */
-    VLE_API void finalize();
 
 }} // namespace vle
 

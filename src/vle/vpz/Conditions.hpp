@@ -33,6 +33,7 @@
 #include <vle/DllDefines.hpp>
 #include <string>
 #include <list>
+#include <set>
 
 namespace vle {
 namespace vpz {

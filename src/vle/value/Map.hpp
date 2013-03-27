@@ -38,7 +38,6 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/DllDefines.hpp>
-#include <boost/serialization/map.hpp>
 #include <map>
 
 namespace vle { namespace value {
@@ -724,14 +723,6 @@ private:
     Value* getPointer(const std::string& name);
 
     const Value* getPointer(const std::string& name) const;
-
-    friend class boost::serialization::access;
-    template < class Archive >
-        void serialize(Archive& ar, const unsigned int /* version */)
-        {
-            ar & boost::serialization::base_object < Value >(*this);
-            ar & m_value;
-        }
 };
 
 inline const Map& toMapValue(const Value& value)

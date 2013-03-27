@@ -882,49 +882,6 @@ private:
     size_type m_steprow; /// @brief the row when resize.
     size_type m_lastX; /// @brief the last columns set.
     size_type m_lastY; /// @brief the last row set.
-
-    friend class boost::serialization::access;
-    template < class Archive >
-        void load(Archive& ar, const unsigned int /* version */)
-        {
-            ar & boost::serialization::base_object < Value >(*this);
-            ar & m_nbcol;
-            ar & m_nbrow;
-            ar & m_stepcol;
-            ar & m_steprow;
-            ar & m_lastX;
-            ar & m_lastY;
-
-            m_matrix.resize(boost::extents[m_nbcol][m_nbrow]);
-            for (size_type j = 0; j < m_nbrow; ++j) {
-                for (size_type i = 0; i < m_nbcol; ++i) {
-                    ar & m_matrix[i][j];
-                }
-            }
-        }
-
-    template < class Archive >
-        void save(Archive& ar, const unsigned int /* version */) const
-        {
-            ar & boost::serialization::base_object < Value >(*this);
-            ar & m_nbcol;
-            ar & m_nbrow;
-            ar & m_stepcol;
-            ar & m_steprow;
-            ar & m_lastX;
-            ar & m_lastY;
-
-            for (size_type j = 0; j < m_nbrow; ++j) {
-                for (size_type i = 0; i < m_nbcol; ++i) {
-                    ar & m_matrix[i][j];
-                }
-            }
-        }
-
-    /* Boost function to call save or load depending on whether the archive
-     * is used.
-     */
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
 /**

@@ -259,41 +259,6 @@ private:
     TableValue      m_value;
     index           m_width;
     index           m_height;
-
-    friend class boost::serialization::access;
-    template < class Archive >
-        void load(Archive& ar, const unsigned int /* version */)
-        {
-            ar & boost::serialization::base_object < Value >(*this);
-            ar & m_width;
-            ar & m_height;
-
-            m_value.resize(boost::extents[m_width][m_height]);
-            for (index j = 0; j < m_height; ++j) {
-                for(index i = 0; i < m_width; ++i) {
-                    ar & m_value[i][j];
-                }
-            }
-        }
-
-    template < class Archive >
-        void save(Archive& ar, const unsigned int /* version */) const
-        {
-            ar & boost::serialization::base_object < Value >(*this);
-            ar & m_width;
-            ar & m_height;
-
-            for (index j = 0; j < m_height; ++j) {
-                for(index i = 0; i < m_width; ++i) {
-                    ar & m_value[i][j];
-                }
-            }
-        }
-
-    /* Boost function to call save or load depending on whether the archive
-     * is used.
-     */
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
 inline const Table& toTableValue(const Value& value)
