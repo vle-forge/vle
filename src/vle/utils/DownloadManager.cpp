@@ -112,9 +112,17 @@ public:
         bip::tcp::resolver::query query(proxyip, proxyport);
         bip::tcp::resolver::iterator endpoint_iterator =
                 resolver.resolve(query);
+        bip::tcp::resolver::iterator end;
 
         bip::tcp::socket socket(io_service);
-        boost::asio::connect(socket, endpoint_iterator);
+	boost::system::error_code error = boost::asio::error::host_not_found;
+
+	while (error and endpoint_iterator != end) {
+        // boost::asio::connect(socket, endpoint_iterator);
+	    socket.close();
+	    socket.connect(*endpoint_iterator++, error);
+	}
+
 
         boost::asio::streambuf request;
         std::ostream request_stream(&request);
@@ -182,7 +190,6 @@ public:
             file << &response ;
         }
 
-        boost::system::error_code error;
         while (boost::asio::read(socket, response,
                 boost::asio::transfer_at_least(1), error)) {
             file << &response;

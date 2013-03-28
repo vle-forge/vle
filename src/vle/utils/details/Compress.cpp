@@ -25,6 +25,7 @@
  */
 
 #include <boost/filesystem.hpp>
+#include <boost/version.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Exception.hpp>
@@ -33,6 +34,9 @@
 #include <archive.h>
 #include <archive_entry.h>
 #include <fcntl.h>
+#include <cstring>
+#include <list>
+#include <vector>
 
 namespace vle { namespace utils {
 
@@ -47,20 +51,6 @@ static std::string extract_archive_error(const char *filepath,
                             % archive_error_string(a)).str());
     } else {
         return std::string((fmt(_("decompress failure: `%1%' in %2%"))
-                            % filepath % tarfile).str());
-    }
-}
-
-static std::string create_archive_error(const char *filepath,
-                                        const char *tarfile,
-                                        struct archive *a)
-{
-    if (a) {
-        return std::string((fmt(_("compress failure: `%1%' in %2% failed: %3%"))
-                            % filepath % tarfile
-                            % archive_error_string(a)).str());
-    } else {
-        return std::string((fmt(_("compress failure: `%1%' in %2%"))
                             % filepath % tarfile).str());
     }
 }
@@ -222,114 +212,111 @@ static void extract_archive(const char *filename, const char *output)
 
 }
 
+struct strdup_functor
+    : std::unary_function < std::string, char* >
+{
+    char * operator()(const std::string& str) const
+    {
+        return strdup(str.c_str());
+    }
+};
+
+
+static char ** convert_string_str_array(const std::vector < std::string >& args)
+{
+    char **result = 0;
+
+    result = new char*[args.size() + 1];
+
+    std::transform(args.begin(),
+                   args.end(),
+                   result,
+                   strdup_functor());
+
+    result[args.size()] = 0;
+
+    return result;
+}
+
+static char ** list_filenames(const char *filepath)
+{
+    namespace fs = boost::filesystem;
+
+    std::list < fs::path > stack;
+    std::vector < std::string > result;
+
+    stack.push_back(filepath);
+
+    try {
+        do {
+            fs::path current = stack.front();
+            stack.pop_front();
+
+            if (fs::exists(current)) {
+                if (fs::is_directory(current)) {
+                    std::copy(fs::directory_iterator(current),
+                              fs::directory_iterator(),
+                              std::back_inserter(stack));
+                }
+                result.push_back(current.string());
+            }
+        } while (not stack.empty());
+    } catch (const fs::filesystem_error &e) {
+	throw utils::InternalError(e.what());
+    }
+
+    return convert_string_str_array(result);
+}
+
+static void free_str_array(char **args)
+{
+    char **tmp;
+
+    for (tmp = args; *tmp; ++tmp) {
+        free(*tmp);
+    }
+
+    delete[] args;
+}
+
+
 static void create_archive(const char *filepath, const char *tarfile)
 {
     struct archive *a;
-    struct archive *disk;
     struct archive_entry *entry;
-    int r;
+    struct stat st;
+    char buff[8192];
+    int len;
+    int fd;
+    char **filenames, **filename;
 
-    a = archive_write_new();    /**< build the output tarball file. */
+    filenames = list_filenames(filepath);
+    filename = filenames;
+
+    a = archive_write_new();
     archive_write_set_compression_bzip2(a);
     archive_write_set_format_ustar(a);
-    archive_write_open_file(a, tarfile);
-
-    disk = archive_read_disk_new(); /**< build the input stream. */
-    archive_read_disk_set_standard_lookup(disk);
-
-    r = archive_read_disk_open(disk, filepath);
-    if (r != ARCHIVE_OK) {
-        std::string msg = create_archive_error(filepath, tarfile, disk);
-        throw utils::InternalError(msg);
+    archive_write_open_filename(a, tarfile);
+    while (*filename) {
+	stat(*filename, &st);
+	entry = archive_entry_new();
+	archive_entry_set_pathname(entry, *filename);
+	archive_entry_set_size(entry, st.st_size);
+	archive_entry_set_filetype(entry, AE_IFREG);
+	archive_entry_set_perm(entry, 0644);
+	archive_write_header(a, entry);
+	fd = open(*filename, O_RDONLY);
+	len = read(fd, buff, sizeof(buff));
+	while ( len > 0 ) {
+	    archive_write_data(a, buff, len);
+	    len = read(fd, buff, sizeof(buff));
+	}
+	close(fd);
+	archive_entry_free(entry);
+	filename++;
     }
 
-    for (;;) {
-        entry = archive_entry_new();
-        r = archive_read_next_header2(disk, entry);
-
-        if (r == ARCHIVE_EOF) {
-            break;
-        }
-
-        if (r != ARCHIVE_OK) {
-            std::string msg = create_archive_error(filepath, tarfile, disk);
-
-            archive_read_close(disk);
-#if ARCHIVE_VERSION_NUMBER < 4000000
-            archive_read_finish(disk);
-#else
-            archive_read_free(disk);
-#endif
-            archive_write_close(a);
-#if ARCHIVE_VERSION_NUMBER < 4000000
-            archive_write_finish(a);
-#else
-            archive_write_free(a);
-#endif
-
-            throw utils::InternalError(msg);
-        }
-
-        archive_read_disk_descend(disk);
-        r = archive_write_header(a, entry);
-
-        if (r == ARCHIVE_FATAL) {
-            std::string msg = create_archive_error(filepath, tarfile, disk);
-
-            archive_entry_free(entry);
-            archive_read_close(disk);
-#if ARCHIVE_VERSION_NUMBER < 4000000
-            archive_read_finish(disk);
-#else
-            archive_read_free(disk);
-#endif
-            archive_write_close(a);
-#if ARCHIVE_VERSION_NUMBER < 4000000
-            archive_write_finish(a);
-#else
-            archive_write_free(a);
-#endif
-
-            throw utils::InternalError(msg);
-        }
-
-        if (r > ARCHIVE_FAILED) {
-            char buff[1024];
-#ifdef _WIN32
-            int fd = ::_open(archive_entry_sourcepath(entry), O_RDONLY);
-            int len = ::_read(fd, buff, sizeof(buff));
-
-            while (len > 0) {
-                archive_write_data(a, buff, len);
-                len = ::_read(fd, buff, sizeof(buff));
-            }
-
-            ::_close(fd);
-#else
-            int fd = ::open(archive_entry_sourcepath(entry), O_RDONLY);
-            int len = ::read(fd, buff, sizeof(buff));
-
-            while (len > 0) {
-                archive_write_data(a, buff, len);
-                len = ::read(fd, buff, sizeof(buff));
-            }
-
-            ::close(fd);
-#endif
-
-        }
-
-        archive_entry_free(entry);
-    }
-
-    archive_read_close(disk);
-
-#if ARCHIVE_VERSION_NUMBER < 4000000
-    archive_read_finish(disk);
-#else
-    archive_read_free(disk);
-#endif
-
+    free_str_array(filenames);
     archive_write_close(a);
 #if ARCHIVE_VERSION_NUMBER < 4000000
     archive_write_finish(a);
@@ -337,6 +324,121 @@ static void create_archive(const char *filepath, const char *tarfile)
     archive_write_free(a);
 #endif
 }
+
+//{
+//    struct archive *a;
+//    struct archive *disk;
+//    struct archive_entry *entry;
+//    int r;
+//
+//    a = archive_write_new();    /**< build the output tarball file. */
+//    archive_write_set_compression_bzip2(a);
+//    archive_write_set_format_ustar(a);
+//    archive_write_open_file(a, tarfile);
+//
+//    disk = archive_read_disk_new(); /**< build the input stream. */
+//    archive_read_disk_set_standard_lookup(disk);
+//
+//    r = archive_read_disk_open(disk, filepath);
+//    if (r != ARCHIVE_OK) {
+//        std::string msg = create_archive_error(filepath, tarfile, disk);
+//        throw utils::InternalError(msg);
+//    }
+//
+//    for (;;) {
+//        entry = archive_entry_new();
+//        r = archive_read_next_header2(disk, entry);
+//
+//        if (r == ARCHIVE_EOF) {
+//            break;
+//        }
+//
+//        if (r != ARCHIVE_OK) {
+//            std::string msg = create_archive_error(filepath, tarfile, disk);
+//
+//            archive_read_close(disk);
+//#if ARCHIVE_VERSION_NUMBER < 4000000
+//            archive_read_finish(disk);
+//#else
+//            archive_read_free(disk);
+//#endif
+//            archive_write_close(a);
+//#if ARCHIVE_VERSION_NUMBER < 4000000
+//            archive_write_finish(a);
+//#else
+//            archive_write_free(a);
+//#endif
+//
+//            throw utils::InternalError(msg);
+//        }
+//
+//        archive_read_disk_descend(disk);
+//        r = archive_write_header(a, entry);
+//
+//        if (r == ARCHIVE_FATAL) {
+//            std::string msg = create_archive_error(filepath, tarfile, disk);
+//
+//            archive_entry_free(entry);
+//            archive_read_close(disk);
+//#if ARCHIVE_VERSION_NUMBER < 4000000
+//            archive_read_finish(disk);
+//#else
+//            archive_read_free(disk);
+//#endif
+//            archive_write_close(a);
+//#if ARCHIVE_VERSION_NUMBER < 4000000
+//            archive_write_finish(a);
+//#else
+//            archive_write_free(a);
+//#endif
+//
+//            throw utils::InternalError(msg);
+//        }
+//
+//        if (r > ARCHIVE_FAILED) {
+//            char buff[1024];
+//#ifdef _WIN32
+//            int fd = ::_open(archive_entry_sourcepath(entry), O_RDONLY);
+//            int len = ::_read(fd, buff, sizeof(buff));
+//
+//            while (len > 0) {
+//                archive_write_data(a, buff, len);
+//                len = ::_read(fd, buff, sizeof(buff));
+//            }
+//
+//            ::_close(fd);
+//#else
+//            int fd = ::open(archive_entry_sourcepath(entry), O_RDONLY);
+//            int len = ::read(fd, buff, sizeof(buff));
+//
+//            while (len > 0) {
+//                archive_write_data(a, buff, len);
+//                len = ::read(fd, buff, sizeof(buff));
+//            }
+//
+//            ::close(fd);
+//#endif
+//
+//        }
+//
+//        archive_entry_free(entry);
+//    }
+//
+//    archive_read_close(disk);
+//
+//#if ARCHIVE_VERSION_NUMBER < 4000000
+//    archive_read_finish(disk);
+//#else
+//    archive_read_free(disk);
+//#endif
+//
+//    archive_write_close(a);
+//#if ARCHIVE_VERSION_NUMBER < 4000000
+//    archive_write_finish(a);
+//#else
+//    archive_write_free(a);
+//#endif
+//}
 
 void Path::compress(const std::string& filepath,
                     const std::string& compressedfilepath)
@@ -362,6 +464,7 @@ void Path::decompress(const std::string& compressedfilepath,
     fs::path path(directorypath);
 
     if (fs::exists(path) and fs::is_directory(path)) {
+#if BOOST_VERSION > 104500
         fe::error_code ec;
         fs::current_path(path, ec);
 
@@ -369,6 +472,19 @@ void Path::decompress(const std::string& compressedfilepath,
             extract_archive(compressedfilepath.c_str(),
                             directorypath.c_str());
         }
+#else
+        try {
+            fs::current_path(path);
+
+            if (fs::current_path() == path) {
+                extract_archive(compressedfilepath.c_str(),
+                                directorypath.c_str());
+            }
+        } catch (const std::exception &e) {
+	    throw utils::InternalError(fmt(_("Failed de extract archive: %1%"))
+			    % e.what());
+        }
+#endif
     }
 }
 

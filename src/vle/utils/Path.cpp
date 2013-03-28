@@ -620,6 +620,7 @@ void Path::initVleHomeDirectory()
 
     fs::path pkgs = getPackagesDir();
 
+#if BOOST_VERSION > 104500
     if (not fs::exists(pkgs, ec)) {
         if (not fs::create_directories(getPackagesDir(), ec)) {
             throw FileError(fmt(
@@ -627,6 +628,15 @@ void Path::initVleHomeDirectory()
                 pkgs.string() % ec.message());
         }
     }
+#else
+    if (not fs::exists(pkgs)) {
+        if (not fs::create_directories(getPackagesDir())) {
+            throw FileError(fmt(
+                    _("Failed to build VLE_HOME directory (%1%):\n%2%")) %
+                pkgs.string() % ec.message());
+        }
+    }
+#endif
 }
 
 /*

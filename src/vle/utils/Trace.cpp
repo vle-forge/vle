@@ -25,6 +25,7 @@
  */
 
 
+#include <iostream>
 #include <fstream>
 #include <locale>
 #include <vle/utils/Trace.hpp>
