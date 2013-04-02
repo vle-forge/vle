@@ -30,6 +30,7 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/value/Value.hpp>
 #include <boost/lexical_cast.hpp>
+#include <iterator>
 
 namespace vle { namespace vpz {
 
