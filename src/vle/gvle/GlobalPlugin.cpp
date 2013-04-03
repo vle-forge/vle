@@ -23,40 +23,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <vle/gvle/SpawnPool.hpp>
-#include <glibmm/main.h>
+
+
+#include <vle/gvle/GlobalPlugin.hpp>
 
 namespace vle { namespace gvle {
 
-SpawnPool::SpawnPool()
-    : mSpawnList()
+Glib::RefPtr < Gdk::Pixbuf > GlobalPlugin::icon() const
 {
-    Glib::signal_timeout().connect(sigc::mem_fun(*this, &SpawnPool::spawnTimer),
-                                   1000);
-}
-
-utils::Spawn& SpawnPool::addSpawn()
-{
-    SpawnPtr ptr(new utils::Spawn());
-
-    mSpawnList.push_back(ptr);
-
-    return *(mSpawnList.back().get());
-}
-
-bool SpawnPool::spawnTimer()
-{
-    SpawnList::iterator it;
-
-    it = mSpawnList.begin();
-    while (it != mSpawnList.end()) {
-        if ((*it)->isfinish()) {
-            it = mSpawnList.erase(it);
-        } else {
-            ++it;
-        }
-    }
-    return true;
+    //if (not m_icon) {
+        //std::string file = utils::Path::path().getGlobalPixmapFile(mName);
+        //try {
+            //m_icon = Gdk::Pixbuf::create_from_file(file);
+        //} catch(const Glib::FileError& e) {
+            //throw utils::FileError(fmt(_(
+                    //"GlobalPlugin '%1%': FileError, %2%")) % mName %
+                //e.what());
+        //} catch(const Gdk::PixbufError& e) {
+            //throw utils::FileError(fmt(_(
+                    //"GlobalPlugin '%1%': PixbufError, %2%")) % mName %
+                //e.what());
+        //} catch(...) {
+            //throw utils::FileError(fmt(_(
+                    //"GlobalPlugin '%1%': Unknow error")) % mName);
+        //}
+    //}
+    return m_icon;
 }
 
 }} // namespace vle gvle

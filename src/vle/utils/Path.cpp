@@ -231,6 +231,11 @@ std::string Path::getPackagePluginOutputDir() const
     return buildDirname(m_currentPackagePath, "plugins", "output");
 }
 
+std::string Path::getPackagePluginGvleGlobalDir() const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "gvle", "global");
+}
+
 std::string Path::getPackagePluginGvleModelingDir() const
 {
     return buildDirname(m_currentPackagePath, "plugins", "gvle", "modeling");
@@ -301,11 +306,6 @@ std::string Path::getPackagePluginOutputFile(const std::string& name) const
     return buildDirname(m_currentPackagePath, "plugins", "output", name);
 }
 
-std::string Path::getPackagePluginGvleModelingFile(const std::string& name) const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "gvle", "modeling", name);
-}
-
 std::string Path::getPackagePluginGvleOutputFile(const std::string& name) const
 {
     return buildDirname(m_currentPackagePath, "plugins", "gvle", "output", name);
@@ -366,6 +366,12 @@ std::string Path::getExternalPackagePluginOutputDir(
     const std::string& name) const
 {
     return buildDirname(getPackagesDir(), name, "plugins", "output");
+}
+
+std::string Path::getExternalPackagePluginGvleGlobalDir(
+    const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "global");
 }
 
 std::string Path::getExternalPackagePluginGvleModelingDir(

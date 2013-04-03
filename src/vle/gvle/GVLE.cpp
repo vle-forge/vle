@@ -94,8 +94,7 @@ GVLE::GVLE(BaseObjectType* cobject,
     mModeling(new Modeling()),
     mCurrentButton(VLE_GVLE_POINTER),
     mCutCopyPaste(this),
-    mCurrentTab(-1),
-    mSpawnPool()
+    mCurrentTab(-1)
 {
     mRefXML = xml;
 
@@ -150,6 +149,22 @@ GVLE::GVLE(BaseObjectType* cobject,
 
     Glib::signal_timeout().connect(sigc::mem_fun(*this, &GVLE::on_timeout),
                                    1000 );
+
+
+    mPluginFactory.update();
+
+    utils::ModuleList lst;
+    utils::ModuleList::iterator it;
+
+    mPluginFactory.getGvleGlobalPlugins(&lst);
+    GlobalPluginPtr plugin;
+
+    for (it = lst.begin(); it != lst.end(); ++it) {
+
+        std::string pluginName(it->package + "/" + it->library);
+        GlobalPluginPtr plugin = mPluginFactory.getGlobalPlugin(pluginName, this);
+        plugin->run();
+    }
 
     set_title(windowTitle());
     resize(900, 550);
@@ -1235,27 +1250,26 @@ bool GVLE::packageAllTimer()
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
-
-        if (utils::Package::package().isFinish()) {
-            ++itDependencies;
-
-            if (itDependencies != mDependencies.end()) {
-                utils::Package::package().select(*itDependencies);
-                buildAllProject();
-            } else {
-                utils::Package::package().select(utils::Path::filename(mPackage));
-                insertLog("package " +
-                          utils::Package::package().name() +
-                          " & first level dependencies built\n");
-                getMenu()->showProjectMenu();
-            }
-            scrollLogToLastLine();
-            return false;
-        } else {
-            return true;
-        }
     }
-    return false;
+
+    if (utils::Package::package().isFinish()) {
+        ++itDependencies;
+
+        if (itDependencies != mDependencies.end()) {
+            utils::Package::package().select(*itDependencies);
+            buildAllProject();
+        } else {
+            utils::Package::package().select(utils::Path::filename(mPackage));
+            insertLog("package " +
+                      utils::Package::package().name() +
+                      " & first level dependencies built\n");
+            getMenu()->showProjectMenu();
+        }
+        scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
 }
 
 bool GVLE::packageTimer()
@@ -1266,16 +1280,14 @@ bool GVLE::packageTimer()
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
-
-        if (utils::Package::package().isFinish()) {
-            getMenu()->showProjectMenu();
-            return false;
-        } else {
-            return true;
-        }
     }
 
-    return false;
+    if (utils::Package::package().isFinish()) {
+        getMenu()->showProjectMenu();
+        return false;
+    } else {
+        return true;
+    }
 }
 
 bool GVLE::packageConfigureAllTimer()
@@ -1286,20 +1298,19 @@ bool GVLE::packageConfigureAllTimer()
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
-
-        if (utils::Package::package().isFinish()) {
-            if (utils::Package::package().isSuccess()) {
-                buildAllProject();
-            } else {
-                getMenu()->showProjectMenu();
-            }
-            scrollLogToLastLine();
-            return false;
-        } else {
-            return true;
-        }
     }
-    return false;
+
+    if (utils::Package::package().isFinish()) {
+        if (utils::Package::package().isSuccess()) {
+            buildAllProject();
+        } else {
+            getMenu()->showProjectMenu();
+        }
+        scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
 }
 
 bool GVLE::packageBuildAllTimer()
@@ -1310,20 +1321,19 @@ bool GVLE::packageBuildAllTimer()
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
-
-        if (utils::Package::package().isFinish()) {
-            if (utils::Package::package().isSuccess()) {
-                installAllProject();
-            } else {
-                getMenu()->showProjectMenu();
-            }
-            scrollLogToLastLine();
-            return false;
-        } else {
-            return true;
-        }
     }
-    return false;
+
+    if (utils::Package::package().isFinish()) {
+        if (utils::Package::package().isSuccess()) {
+            installAllProject();
+        } else {
+            getMenu()->showProjectMenu();
+        }
+        scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
 }
 
 bool GVLE::packageBuildTimer()
@@ -1334,26 +1344,24 @@ bool GVLE::packageBuildTimer()
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
+    }
 
-        if (utils::Package::package().isFinish()) {
-            if (utils::Package::package().get(&o, &e)) {
-                insertLog(o);
-                insertLog(e);
-                scrollLogToLastLine();
-            }
-
-            if (utils::Package::package().isSuccess()) {
-                installProject();
-            } else {
-                getMenu()->showProjectMenu();
-            }
+    if (utils::Package::package().isFinish()) {
+        if (utils::Package::package().get(&o, &e)) {
+            insertLog(o);
+            insertLog(e);
             scrollLogToLastLine();
-            return false;
-        } else {
-            return true;
         }
-    } else {
+
+        if (utils::Package::package().isSuccess()) {
+            installProject();
+        } else {
+            getMenu()->showProjectMenu();
+        }
+        scrollLogToLastLine();
         return false;
+    } else {
+        return true;
     }
 }
 

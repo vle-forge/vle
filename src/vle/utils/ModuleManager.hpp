@@ -50,6 +50,9 @@ enum ModuleType
                                  vle_make_new_executive. */
     MODULE_OOV, /**< The @e Module is an output (from oov library) and it needs
                   to have the following symbol: @c vle_make_new_oov. */
+    MODULE_GVLE_GLOBAL, /**< The @e Module is a global module (from the vle
+                            library) and it needs to have the following symbol:
+                            @c vle_make_new_gvle_global. */
     MODULE_GVLE_MODELING, /**< The @e Module is a modeling module (from the vle
                             library) and it needs to have the following symbol:
                             @c vle_make_new_gvle_modeling. */
@@ -104,6 +107,7 @@ typedef std::vector < Module > ModuleList;
  * - "vle_make_new_dynamics_wrapper" (MODULE_DYNAMICS).
  * - "vle_make_new_executive" (MODULE_DYNAMICS).
  * - "vle_make_new_oov" (MODULE_OOV).
+ * - "vle_make_new_gvle_global" (MODULE_GVLE_GLOBAL).
  * - "vle_make_new_gvle_modeling" (MODULE_GVLE_MODELING).
  * - "vle_make_new_gvle_output" (MODULE_GVLE_OUTPUT).
  *
