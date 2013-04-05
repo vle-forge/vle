@@ -129,11 +129,17 @@ else (WIN32)
 endif (WIN32)
 
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_DETAILED_FAILURE_MSG FALSE)
-set(Boost_DEBUG FALSE)
+set(Boost_DETAILED_FAILURE_MSG ON)
+set(Boost_DEBUG ON)
 
 find_package(Boost COMPONENTS unit_test_framework thread filesystem system
   chrono date_time regex program_options)
+
+if (NOT Boost_FOUND)
+  message(STATUS "Boost is not founded. Try without chrono")
+  find_package(Boost COMPONENTS unit_test_framework thread filesystem system
+    date_time regex program_options)
+endif ()
 
 if (NOT Boost_FILESYSTEM_FOUND)
   message(FATAL_ERROR "The boost filesystem library is required")
