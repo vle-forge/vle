@@ -1,5 +1,5 @@
-Virtual Laboratory Environment
-==============================
+Virtual Laboratory Environment 1.1.0
+====================================
 
 See AUTHORS and COPYRIGHT for the list of contributors.
 
@@ -8,65 +8,39 @@ complex dynamical systems. It addresses the reliability issue by using recent
 developments in the theory of modeling and simulation proposed by B. Zeigler
 with the Discrete Event System Specification formalism (DEVS).
 
-
 Requirements
 ------------
 
-For the simulator and API only:
-    glibmm	2.10.0 http://www.gtkmm.org
-    libxml-2.0  2.0.0 http://xmlsoft.org
-    boost	1.34  http://www.boost.org
+For the VFL API:
 
-For the complete environment:
-    glibmm	2.10.0 http://www.gtkmm.org
-    gtkmm       2.12.0 http://www.gtkmm.org
-    libglademm  2.4.0 http://www.gtkmm.org
-    libcairomm  1.2.0 http://www.cairographics.org
-    libxml-2.0  2.0.0 http://xmlsoft.org
-    boost	1.34  http://www.boost.org
+* glibmm (>= 2.22)
+* libxml2 (>= 2.8)
+* libarchive (>= 2.0)
+* boost (>= 1.41)
+* cmake (>= 2.8.0)
+* make (>= 1.8)
+* g++ (>= 4.4) or intel icc (>= 11.0)
 
-To build VLE you need:
-    cmake	2.6.0 http://www.cmake.org
-    make	1.8
-    gcc, g++	3.4 minimum
+For the MPI command line:
 
+* Any MPI 2 library as OpenMpi, mpich 
+
+For the GUI:
+
+* gtkmm (>= 2.22.0) http://www.gtkmm.org
 
 Getting the code
 ----------------
 
-The source tree is currently hosted on Sourceforge. To view the repository
-online :
-    http://vle.git.sourceforge.net/git/gitweb.cgi?p=vle/vle
+The source tree is currently hosted on Github and Sourceforge. To view the
+repository online: https://github.com/vle-forge/vle The URL to clone it:
+git://github.com/vle-forge/vle.git
 
-The URL to clone it:
-    git://vle.git.sourceforge.net/gitroot/vle/vle
+Once you have met requirements, compiling and installing is simple:
 
-
-Reporting bug
--------------
-
-Please, report bugs into the VLE sourceforge trackers :
-    http://sourceforge.net/tracker/?group_id=94199
-
-
-Translations
-------------
-
-If you want to translate VLE, please contact the VLE development team:
-    vle-users@lists.sourceforge.net
-
-
-Mailing lists
--------------
-
-
-There is three mailing lists for VLE. More info here:
-    http://sourceforge.net/mail/?group_id=94199
-
-    * vle-tracker: all commit and tracker information.
-    * vle-users: users and developper list.
-    * vle-news: to keep news on vle, (release, etc.).
-
+  cmake source_directory
+  make
+  make install
 
 License
 -------
@@ -74,76 +48,11 @@ License
 This software in GPLv3 or later. See the file COPYING. Some files are under a
 different license. Check the headers for the copyright info.
 
-
-Installation
-------------
-
-Several approaches are possible:
-
-1. The following commands configure and build a package for your distribution,
-   the best way to use VLE:
-
-  $ tar zxf vle-0.9.0.tar.gz
-  or
-  $ git clone git://vle.git.sourceforge.net/gitroot/vle/vle
-
-  $ cd vle
-  $ mkdir build
-  $ cd build
-  $ cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-  $ make
-
-  $ # for deb distribution (debian, ubuntu etc.)
-  $ cpack -G DEB
-  $ dpkg -i vle-0.8.7-Linux-i686.deb
-
-  $ # for rpm distribution (redhat, mandrike, suse etc.)
-  $ cpack -G RPM
-  $ rpm -i vle-0.8.7-Linux-i686.rpm
-
-2. The following commands configure, build and install VLE into your account
-   ($HOME directory):
-
-  $ tar zxf vle-0.9.0.tar.gz
-  or
-  $ git clone git://vle.git.sourceforge.net/gitroot/vle/vle
-
-  $ cd vle
-  $ mkdir build
-  $ cd build
-  $ cmake -DCMAKE_INSTALL_PREFIX=$HOME/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-  $ make
-  $ make install
-
-  Add the following line into your bashrc (if you use bash as shell).:
-
-  export PATH=$PATH:$HOME/usr/bin
-  export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/usr/lib/pkgconfig
-  export LD_LIBRARY_PATH=$LD_LIRABRY_PATH:$HOME/usr/lib
-  export MANPATH=$HOME/usr/share/man
-
-
 Usage
 -----
 
 VLE is a multi-modeling environment to build model, to simulate and analys them.
 To more information, see the VLE website (http://www.vle-projet.org).
-
-- To start a simulation:
-$ vle file.vpz
-
-- To start n simulations:
-$ vle file1.vpz file2.vpz [...]
-
-- To start an experimental frame and run all simulations on the local host
-$ vle -m -l experimentalframe.vpz
-
-- To start an experimental frame and run all simulations on the local host
-  using four thread:
-$ vle -m -l -o 4 experimentalframe.vpz
-
-- To start an experimental frame and run all simulations on a grid computi
-$ vle -m experimentalframe.vpz
 
 - To build a new package
 $ vle -P mypackage create
