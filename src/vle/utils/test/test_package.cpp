@@ -63,6 +63,22 @@ using namespace vle;
 namespace bs = boost::system;
 namespace fs = boost::filesystem;
 
+inline const char *get_temporary_path()
+{
+    const char *names[] = { "/tmp", "TMPDIR", "TMP", "TEMP" };
+    const int names_size = sizeof(names) / sizeof(names[0]);
+
+    for (int i = 0; i != names_size; ++i)
+        if (fs::exists(names[i]) && fs::is_directory(names[i]))
+            return names[i];
+
+#ifdef __WIN32__
+    return "c:/tmp";
+#else
+    return "/tmp";
+#endif
+}
+
 struct F
 {
     vle::Init *a;
@@ -73,12 +89,25 @@ struct F
     {
         bs::error_code ec;
 
+#if BOOST_VERSION > 104500
         fs::path tmp = fs::temp_directory_path(ec);
         tmp /= fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+#else
+	fs::path tmp = get_temporary_path();
+	tmp /= "check";
+#endif
 
+#if BOOST_VERSION > 104500
         fs::create_directory(tmp, ec);
+#else
+        fs::create_directory(tmp);
+#endif
 
+#if BOOST_VERSION > 104500
         if (fs::exists(tmp, ec) && fs::is_directory(tmp, ec)) {
+#else
+        if (fs::exists(tmp) && fs::is_directory(tmp)) {
+#endif
             char *env = ::getenv("VLE_HOME");
             if (env) {
                 oldname.assign(env);
@@ -98,11 +127,19 @@ struct F
         delete a;
 
         fs::path tmp(newname);
+#if BOOST_VERSION > 104500
         if (fs::exists(tmp, ec) && fs::is_directory(tmp, ec)) {
             fs::remove_all(tmp, ec); /**< comment this line if you
                                       * want to conserve the temporary
                                       * VLE_HOME directory. */
         }
+#else
+        if (fs::exists(tmp) && fs::is_directory(tmp)) {
+            fs::remove_all(tmp); /**< comment this line if you
+                                      * want to conserve the temporary
+                                      * VLE_HOME directory. */
+        }
+#endif
 
         if (not oldname.empty()) {
             ::setenv("VLE_HOME", oldname.c_str(), 1);
@@ -139,13 +176,25 @@ BOOST_AUTO_TEST_CASE(show_path)
                         Path::path().getSimulatorDirs().size());
 
     bs::error_code ec;
+
+#if BOOST_VERSION > 104500
     fs::path tmp = fs::temp_directory_path(ec);
     tmp /= fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+#else
+    fs::path tmp = get_temporary_path();
+    tmp /= "check";
+#endif
+
+#if BOOST_VERSION > 104500
     fs::create_directory(tmp, ec);
-
     BOOST_CHECK(fs::exists(tmp, ec) && fs::is_directory(tmp, ec));
-
     fs::current_path(tmp, ec);
+#else
+    fs::create_directory(tmp);
+    BOOST_CHECK(fs::exists(tmp) && fs::is_directory(tmp));
+    fs::current_path(tmp);
+#endif
+
 
     Package::package().select("x");
     vle::utils::Package::package().create();
@@ -160,13 +209,23 @@ BOOST_AUTO_TEST_CASE(show_package)
     std::ostringstream out, err;
 
     bs::error_code ec;
+#if BOOST_VERSION > 104500
     fs::path tmp = fs::temp_directory_path(ec);
     tmp /= fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+#else
+    fs::path tmp = get_temporary_path();
+    tmp /= "check";
+#endif
+
+#if BOOST_VERSION > 104500
     fs::create_directory(tmp, ec);
-
     BOOST_CHECK(fs::exists(tmp, ec) && fs::is_directory(tmp, ec));
-
     fs::current_path(tmp, ec);
+#else
+    fs::create_directory(tmp);
+    BOOST_CHECK(fs::exists(tmp) && fs::is_directory(tmp));
+    fs::current_path(tmp);
+#endif
 
     std::cout << "Current path: " << fs::current_path() << "\n";
     vle::utils::Package::package().refresh();
@@ -440,7 +499,11 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
     std::string filepath;
     std::string uniquepath;
     try {
+#if BOOST_VERSION > 104500
         fs::path unique = fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+#else
+        fs::path unique = "check";
+#endif
 
         vle::utils::Package::package().select(unique.string());
         vle::utils::Package::package().create();
@@ -453,7 +516,11 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
 
     BOOST_REQUIRE(not filepath.empty());
 
+#if BOOST_VERSION > 104500
     fs::path tarfile(fs::temp_directory_path());
+#else
+    fs::path tarfile("vle_tar_file");
+#endif
     tarfile /= "check.tar.bz2";
 
 
@@ -463,7 +530,11 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
                                                         tarfile.string()));
     BOOST_REQUIRE(fs::exists(fs::path(tarfile)));
 
+#if BOOST_VERSION > 104500
     fs::path tmpfile(fs::temp_directory_path());
+#else
+    fs::path tmpfile = get_temporary_path();
+#endif
     tmpfile /= "unique";
 
     fs::create_directory(tmpfile);

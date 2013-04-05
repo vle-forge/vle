@@ -33,6 +33,7 @@
 #include <vle/vpz/AtomicModel.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
+#include <cstring>
 
 namespace vle { namespace vpz {
 
@@ -274,13 +275,13 @@ void SaxStackVpz::pushPortType(const char* att)
 
     vpz::Base* prt = 0;
 
-    if (strcmp(att, "in") == 0) {
+    if (std::strcmp(att, "in") == 0) {
         prt = new vpz::In();
-    } else if (strcmp(att, "out") == 0) {
+    } else if (std::strcmp(att, "out") == 0) {
         prt = new vpz::Out();
-    } else if (strcmp(att, "state") == 0) {
+    } else if (std::strcmp(att, "state") == 0) {
         prt = new vpz::State();
-    } else if (strcmp(att, "init") == 0) {
+    } else if (std::strcmp(att, "init") == 0) {
         prt = new vpz::Init();
     } else {
         throw(utils::SaxParserError(fmt(_(

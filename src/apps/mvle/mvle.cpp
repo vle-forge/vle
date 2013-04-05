@@ -33,6 +33,7 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
 #include <vle/vle.hpp>
+#include <iostream>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
