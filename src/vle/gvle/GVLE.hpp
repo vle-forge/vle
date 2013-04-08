@@ -39,6 +39,7 @@
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/gvle/SpawnPool.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/value/Value.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/textview.h>
@@ -133,6 +134,19 @@ public:
      * @return a boolean
      */
     bool on_timeout();
+
+    /**
+     * @brief Get a complete source file name.
+     * @return A string
+     */
+    std::string getPackageSrcFile(const std::string& file) const
+    { return utils::Path::path().buildFilename(mPkgDirName, "src", file); }
+    /**
+     * @brief Get a complete source dir  name.
+     * @return A string
+     */
+    std::string getPackageSrcDir() const
+    { return utils::Path::path().buildDirname(mPkgDirName, "src"); }
 
     /**
      * @brief Get a constant reference to the PluginFactory.
@@ -894,6 +908,7 @@ private:
     /* class members */
     Modeling*                       mModeling;
     std::string                     mCurrentClass;
+    std::string                     mPkgDirName;
     ListView                        mListView;
     ButtonType                      mCurrentButton;
     CutCopyPaste                    mCutCopyPaste;

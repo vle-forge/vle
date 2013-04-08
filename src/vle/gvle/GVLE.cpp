@@ -675,6 +675,7 @@ void GVLE::onOpenProject()
 
             if (not basename.empty()) {
                 if (g_chdir(dirname.c_str()) == 0) {
+                    mPkgDirName = utils::Path::path().buildDirname(dirname, basename);
                     onCloseProject();
                     utils::Package::package().select(basename);
                     mPluginFactory.update();

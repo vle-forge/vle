@@ -895,7 +895,7 @@ std::string AtomicModelBox::DynamicTreeView::pathFileSearch(
 	    if (utils::Path::basename(name) == filename
 		and utils::Path::extension(name) == ".cpp") {
 		return Glib::build_filename(
-		  utils::Path::path().getPackageSrcDir(), (*it));
+		  mGVLE->getPackageSrcDir(), (*it));
 	    }
 	}
     }
@@ -906,12 +906,10 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
     const Gtk::TreeModel::Path& path,
     Gtk::TreeViewColumn* column)
 {
-    if (column
-	and not vle::utils::Path::path().getPackageSourceDir().empty()
-        and utils::Path::exist(vle::utils::Path::path().getPackageSrcDir())) {
+    if (column and
+        utils::Path::exist(mGVLE->getPackageSrcDir())) {
 
         Gtk::TreeRow row = (*mRefListDyn->get_iter(path));
-
 	vpz::Dynamic& dynamic = mDynamics->get(
 	    row.get_value(mColumnsDyn.m_col_name));
 
@@ -922,7 +920,7 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
 		       searchFile.begin(), tolower);
 
 	std::string newTab = pathFileSearch(
-	    utils::Path::path().getPackageSrcDir(), searchFile);
+	    mGVLE->getPackageSrcDir(), searchFile);
         if (not newTab.empty()) {
             try {
                 std::string pluginname, packagename, conf;
@@ -931,7 +929,6 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                 tpl.open(newTab);
 
                 tpl.tag(pluginname, packagename, conf);
-
                 ModelingPluginPtr plugin =
                     mGVLE->pluginFactory().getModelingPlugin(packagename,
                                                              pluginname);
@@ -939,10 +936,8 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                 if (plugin->modify(*mAtom, dynamic, *mConditions,
                                    *mObservables, conf, tpl.buffer())) {
                     const std::string& buffer = plugin->source();
-                    std::string filename = utils::Path::path()
-                        .getPackageSrcFile(dynamic.library());
-                    filename += ".cpp";
-
+                    std::string filename = mGVLE->getPackageSrcFile(dynamic.library() +
+                        ".cpp");
                     try {
                         std::ofstream f(filename.c_str());
                         f.exceptions(std::ofstream::failbit |
@@ -1086,8 +1081,8 @@ int AtomicModelBox::DynamicTreeView::execPlugin(
     if (plugin->create(*mAtom, dynamic, *mConditions,
                        *mObservables, classname, namespace_)) {
         const std::string& buffer = plugin->source();
-        std::string filename = utils::Path::path().getPackageSrcFile(classname);
-        filename += ".cpp";
+        std::string filename = mGVLE->getPackageSrcFile(classname + ".cpp");
+        //filename += ".cpp";
 
         try {
             std::ofstream f(filename.c_str());
