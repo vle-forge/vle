@@ -782,6 +782,12 @@ public:
      *
      *********************************************************************/
 
+    void configureToSimulate();
+    bool configureToSimulateTimer();
+    void buildToSimulate();
+    bool buildToSimulateTimer();
+    void installtoSimulate();
+    bool installtoSimulateTimer();
 
     /**
      * When click on Execution menu.

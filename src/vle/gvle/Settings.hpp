@@ -80,6 +80,10 @@ public:
 
     // get/set functions.
 
+    void setAutoBuild(bool auto_build);
+
+    bool getAutoBuild()
+;
     void setHighlightSyntax(bool syntax);
 
     bool getHighlightSyntax();
