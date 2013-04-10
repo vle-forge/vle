@@ -10,17 +10,21 @@ if (WIN32)
     -i${CMAKE_BINARY_DIR}/share/vle.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/vle.o)
   add_executable(vle main.cpp ${CMAKE_CURRENT_BINARY_DIR}/vle.o)
-else ()
-  add_executable(vle main.cpp)
-  set_target_properties(vle PROPERTIES SOVERSION
-    "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
-endif ()
 
-if (WIN32)
-  set_target_properties(vle PROPERTIES LINK_FLAGS "-Wl,-static")
-endif ()
-target_link_libraries(vle ${VLEDEPS_LIBRARIES}
-  ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
+  set_target_properties(vle PROPERTIES
+    COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
+
+else (WIN32)
+  add_executable(vle main.cpp)
+
+  set_target_properties(vle PROPERTIES
+     SOVERSION "${VLE_MAJOR}.${VLE_MINOR}"
+     VERSION "${VLE_MAJOR}.${VLE_MINOR}"
+     COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
+endif (WIN32)
+
+target_link_libraries(vle vlelib ${VLEDEPS_LIBRARIES}
+  ${Boost_LIBRARIES}  ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vle DESTINATION bin)
 

@@ -12,8 +12,7 @@ if (WIN32)
   add_executable(gvle WIN32 main.cpp ${CMAKE_CURRENT_BINARY_DIR}/gvle.o)
 
   set_target_properties(gvle PROPERTIES
-    COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
-    LINK_FLAGS "-Wl,-static")
+    COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
 else (WIN32)
   add_executable(gvle WIN32 main.cpp)
@@ -24,8 +23,8 @@ else (WIN32)
     COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 endif (WIN32)
 
-target_link_libraries(gvle ${VLEDEPS_LIBRARIES}
-    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib gvlelib)
+target_link_libraries(gvle gvlelib vlelib ${VLEDEPS_LIBRARIES}
+     ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS gvle DESTINATION bin)
 
