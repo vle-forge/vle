@@ -71,11 +71,17 @@ class Preferences::Pimpl
 public:
     Pimpl(const std::string& filename)
         : mFilename(filename),
-        mGvleEditorOptions("gvle.editor"),
-        mGvleGraphicsOptions("gvle.graphics"),
-        mVlePackageOptions("vle.packages"),
-        mVleRemoteOptions("vle.remote")
+          mGvlePackagesOptions("gvle.packages"),
+          mGvleEditorOptions("gvle.editor"),
+          mGvleGraphicsOptions("gvle.graphics"),
+          mVlePackageOptions("vle.packages"),
+          mVleRemoteOptions("vle.remote")
     {
+         mGvleEditorOptions.add_options()
+            ("gvle.packages.auto-build", po::value < bool >
+             (NULL)->default_value(true),
+             _("Auto build"));
+
         mGvleEditorOptions.add_options()
             ("gvle.editor.auto-indent", po::value < bool >
              (NULL)->default_value(true),
@@ -256,6 +262,7 @@ private:
                                    parameters in a std::map < std::string,
                                    po::variable_value >. */
 
+    po::options_description mGvlePackagesOptions;
     po::options_description mConfigFileOptions;
     po::options_description mGvleEditorOptions;
     po::options_description mGvleGraphicsOptions;

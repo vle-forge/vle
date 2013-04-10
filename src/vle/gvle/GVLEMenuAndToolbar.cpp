@@ -678,7 +678,7 @@ void GVLEMenuAndToolbar::createSimulationActions()
         Gtk::Action::create("LaunchSimulation", _("Launch Simulation"),
                             _("Launch the simulation")),
         Gtk::AccelKey("<control><shift>l"),
-        sigc::mem_fun(mParent, &GVLE::onSimulationBox));
+        sigc::mem_fun(mParent, &GVLE::configureToSimulate));
 }
 
 void GVLEMenuAndToolbar::createZoomActions()

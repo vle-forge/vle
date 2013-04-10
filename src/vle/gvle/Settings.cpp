@@ -49,6 +49,7 @@ public:
         mFontEditor = "Monospace 8";
         mFont = "Sans 10";
 
+        mAutoBuild = true;
         mHighlightSyntax = true;
         mHighlightBrackets = true;
         mHighlightLine = true;
@@ -77,6 +78,7 @@ public:
         double d = 0.0;
         uint32_t i = 0;
 
+        prefs.get("gvle.packages.auto-build", &mAutoBuild);
         prefs.get("gvle.editor.highlight-syntax", &mHighlightSyntax);
         prefs.get("gvle.editor.highlight-brackets", &mHighlightBrackets);
         prefs.get("gvle.editor.highlight-line", &mHighlightLine);
@@ -146,6 +148,7 @@ public:
     {
         utils::Preferences prefs;
 
+        prefs.set("gvle.packages.auto-build", mAutoBuild);
         prefs.set("gvle.editor.highlight-syntax", mHighlightSyntax);
         prefs.set("gvle.editor.highlight-brackets", mHighlightBrackets);
         prefs.set("gvle.editor.highlight-line", mHighlightLine);
@@ -170,6 +173,7 @@ public:
         prefs.set("gvle.graphics.line-width", mLineWidth);
     }
 
+    bool mAutoBuild;
     bool mHighlightSyntax;
     bool mHighlightBrackets;
     bool mHighlightLine;
@@ -305,6 +309,16 @@ void Settings::setRightMargin(bool margin)
 bool Settings:: getRightMargin()
 {
     return settings().mPimpl->mRightMargin;
+}
+
+void Settings::setAutoBuild(bool auto_build)
+{
+    settings().mPimpl->mAutoBuild = auto_build;
+}
+
+bool Settings:: getAutoBuild()
+{
+    return settings().mPimpl->mAutoBuild;
 }
 
 void Settings::setAutoIndent(bool auto_indent)

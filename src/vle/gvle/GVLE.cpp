@@ -675,6 +675,7 @@ void GVLE::onOpenProject()
 
             if (not basename.empty()) {
                 if (g_chdir(dirname.c_str()) == 0) {
+                    mPkgDirName = utils::Path::path().buildDirname(dirname, basename);
                     onCloseProject();
                     utils::Package::package().select(basename);
                     mPluginFactory.update();
@@ -1359,6 +1360,154 @@ bool GVLE::packageBuildTimer()
             getMenu()->showProjectMenu();
         }
         scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+void GVLE::configureToSimulate()
+{
+    if (Settings::settings().getAutoBuild()) {
+        insertLog("configure package\n");
+        getMenu()->hideProjectMenu();
+        getMenu()->hideSimulationMenu();
+
+        try {
+            utils::Package::package().configure();
+        } catch (const std::exception& e) {
+            getMenu()->showProjectMenu();
+            getMenu()->showSimulationMenu();
+            gvle::Error(e.what());
+            return;
+        } catch (const Glib::Exception& e) {
+            getMenu()->showProjectMenu();
+            getMenu()->showSimulationMenu();
+            gvle::Error(e.what());
+            return;
+        }
+        Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &GVLE::configureToSimulateTimer), 250);
+    } else {
+        onSimulationBox();
+    }
+}
+
+bool GVLE::configureToSimulateTimer()
+{
+    std::string o, e;
+
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
+        scrollLogToLastLine();
+    }
+
+    if (utils::Package::package().isFinish()) {
+        if (utils::Package::package().get(&o, &e)) {
+            insertLog(o);
+            insertLog(e);
+            scrollLogToLastLine();
+        }
+
+        if (utils::Package::package().isSuccess()) {
+            buildToSimulate();
+        } else {
+            getMenu()->showProjectMenu();
+            getMenu()->showSimulationMenu();
+        }
+        scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+void GVLE::buildToSimulate()
+{
+    insertLog("build package\n");
+    getMenu()->hideProjectMenu();
+    try {
+        utils::Package::package().build();
+    } catch (const std::exception& e) {
+        getMenu()->showProjectMenu();
+        getMenu()->showSimulationMenu();
+        gvle::Error(e.what());
+        return;
+    } catch (const Glib::Exception& e) {
+        getMenu()->showProjectMenu();
+        getMenu()->showSimulationMenu();
+        gvle::Error(e.what());
+        return;
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::buildToSimulateTimer), 250);
+}
+
+bool GVLE::buildToSimulateTimer()
+{
+    std::string o, e;
+
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
+        scrollLogToLastLine();
+    }
+
+    if (utils::Package::package().isFinish()) {
+        if (utils::Package::package().get(&o, &e)) {
+            insertLog(o);
+            insertLog(e);
+            scrollLogToLastLine();
+        }
+
+        if (utils::Package::package().isSuccess()) {
+            installtoSimulate();
+        } else {
+            getMenu()->showProjectMenu();
+            getMenu()->showSimulationMenu();
+        }
+        scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
+}
+void GVLE::installtoSimulate()
+{
+    insertLog("install package\n");
+    getMenu()->hideProjectMenu();
+    try {
+        utils::Package::package().install();
+    } catch (const std::exception& e) {
+        getMenu()->showProjectMenu();
+        getMenu()->showSimulationMenu();
+        gvle::Error(e.what());
+        return;
+    } catch (const Glib::Exception& e) {
+        getMenu()->showProjectMenu();
+        getMenu()->showSimulationMenu();
+        gvle::Error(e.what());
+        return;
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::installtoSimulateTimer), 250);
+}
+
+bool GVLE::installtoSimulateTimer()
+{
+    std::string o, e;
+
+    if (utils::Package::package().get(&o, &e)) {
+        insertLog(o);
+        insertLog(e);
+        scrollLogToLastLine();
+    }
+
+    if (utils::Package::package().isFinish()) {
+        onSimulationBox();
+        getMenu()->showProjectMenu();
+        getMenu()->showSimulationMenu();
         return false;
     } else {
         return true;

@@ -187,8 +187,7 @@ int DynamicBox::execPlugin(const std::string& pluginname,
     if (plugin->create(mAtom, mDynamic, mConditions,
                        mObservables, classname, namespace_)) {
         const std::string& buffer = plugin->source();
-        std::string filename = utils::Path::path().getPackageSrcFile(classname);
-        filename += ".cpp";
+        std::string filename = mGVLE->getPackageSrcFile(classname + ".cpp");
 
         try {
             std::ofstream f(filename.c_str());
