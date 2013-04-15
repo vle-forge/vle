@@ -58,6 +58,10 @@
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/vle.hpp>
 
+#ifdef __WIN32__
+  #include <windows.h>
+#endif
+
 using namespace vle;
 
 namespace bs = boost::system;
@@ -115,8 +119,11 @@ struct F
         }
 
         newname = tmp.string();
+#ifdef __WIN32__
+//TODO
+#else
         ::setenv("VLE_HOME", newname.c_str(), 1);
-
+#endif
         a = new vle::Init();
     }
 
@@ -140,10 +147,14 @@ struct F
                                       * VLE_HOME directory. */
         }
 #endif
-
+#ifdef __WIN32__
+//TODO
+#else
         if (not oldname.empty()) {
             ::setenv("VLE_HOME", oldname.c_str(), 1);
         }
+#endif
+
     }
 
 private:
