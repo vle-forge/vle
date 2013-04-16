@@ -30,6 +30,8 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
+#include <cstdlib>
+#include <iostream>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;

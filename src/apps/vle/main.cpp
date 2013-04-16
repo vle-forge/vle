@@ -35,6 +35,7 @@
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <boost/program_options.hpp>
