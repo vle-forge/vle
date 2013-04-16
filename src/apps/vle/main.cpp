@@ -272,11 +272,13 @@ static bool init_current_package(const std::string &packagename,
 
                 return false;
             }
+            vle::utils::Package::package().refresh();
+            vle::utils::Package::package().select(packagename);
+            vle::utils::Package::package().create();
+        } else {
+            vle::utils::Package::package().refresh();
+            vle::utils::Package::package().select(packagename);
         }
-
-        vle::utils::Package::package().refresh();
-        vle::utils::Package::package().select(packagename);
-        vle::utils::Package::package().create();
     } else {
         vle::utils::Package::package().refresh();
         vle::utils::Package::package().select(packagename);
