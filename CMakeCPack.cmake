@@ -59,7 +59,7 @@ set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simul
 set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
 
-# CPack RPM configuration
+#CPack RPM configuration
 set(CPACK_RPM_PACKAGE_SUMMARY "VLE, a framework for multi-modeling, simulation and analysis of complex dynamical systems.")
 set(CPACK_RPM_PACKAGE_NAME ${VLE_NAME}-${VLE_MAJOR}.${VLE_MINOR})
 set(CPACK_RPM_PACKAGE_VERSION ${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH})
@@ -70,28 +70,43 @@ set(CPACK_RPM_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simulati
 
 # CPack NSIS configuration
 if (CPACK_GENERATOR MATCHES "NSIS")
+
   set(CMAKE_MODULE_PATH "share")
-  set(MXE_PATH CACHE PATH "MXE directory")
+  set(VLE_MINGW_PATH CACHE PATH "Mingw Boost directory")
+  set(VLE_BOOST_INCLUDE_PATH CACHE PATH "Boost include path")
+  set(VLE_BOOST_LIBRARIES_PATH CACHE PATH "Boost libraries path")
+  set(VLE_GTK_PATH CACHE PATH "Gtk directory")
   set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/share)
 
-  install(FILES "${PKG_CONFIG_EXE_PATH}/pkg-config.exe" DESTINATION bin)
+  install(FILES "${VLE_MINGW_PATH}/bin\\\\mingwm10.dll" DESTINATION bin)
 
-  install(DIRECTORY "${MXE_PATH}/etc/" DESTINATION etc)
-  install(DIRECTORY "${MXE_PATH}/include/" DESTINATION include)
-  install(DIRECTORY "${MXE_PATH}/lib/" DESTINATION lib)
-  install(DIRECTORY "${MXE_PATH}/share/" DESTINATION share)
-  install(DIRECTORY "${MXE_PATH}/ssl/" DESTINATION ssl)
-  install(DIRECTORY "${MXE_PATH}/var/" DESTINATION var)
+  install(DIRECTORY "${VLE_BOOST_INCLUDE_PATH}" DESTINATION include)
+  install(DIRECTORY "${VLE_BOOST_LIBRARIES_PATH}/" DESTINATION bin
+    FILES_MATCHING PATTERN "libboost*.dll")
+  install(DIRECTORY "${VLE_BOOST_LIBRARIES_PATH}/" DESTINATION lib
+    FILES_MATCHING PATTERN "libboost*.a")
+
+  install(FILES "${VLE_GTK_PATH}/bin\\\\pkg-config.exe" DESTINATION bin)
+  install(DIRECTORY "${VLE_GTK_PATH}/etc\\\\gtk-2.0" DESTINATION etc)
+  install(DIRECTORY "${VLE_GTK_PATH}/etc\\\\pango" DESTINATION etc)
+  install(DIRECTORY "${VLE_GTK_PATH}/share\\\\doc" DESTINATION share)
+  install(DIRECTORY "${VLE_GTK_PATH}/share\\\\locale" DESTINATION share)
+  install(DIRECTORY "${VLE_GTK_PATH}/share\\\\themes" DESTINATION share)
+  install(DIRECTORY "${VLE_GTK_PATH}/include/" DESTINATION include)
+  install(DIRECTORY "${VLE_GTK_PATH}/redist/" DESTINATION bin)
+  install(DIRECTORY "${VLE_GTK_PATH}/lib/" DESTINATION lib
+    PATTERN "*.def" EXCLUDE
+    PATTERN "*.lib" EXCLUDE)
 
   set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
   set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
   set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\logo.bmp")
-  set(CPACK_NSIS_MENU_LINKS "${VLE_SHARE_DIRS}/doc/vle.chm" "VLE API" "http://www.sourceforge.net/projects/vle" "VLE Web Site")
+  set(CPACK_NSIS_MENU_LINKS "${VLE_SHARE_DIRS}/doc/vle.chm" "VLE API" "http://www.vle-project.org" "VLE Web Site")
   set(CPACK_CREATE_DESKTOP_LINKS gvle)
   set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
   set(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboratory Environment")
-  set(CPACK_NSIS_HELP_LINK "http://www.sourceforge.net/projects/vle")
-  set(CPACK_NSIS_URL_INFO_ABOUT "http://www.sourceforge.net/projects/vle")
+  set(CPACK_NSIS_HELP_LINK "http://www.vle-project.org")
+  set(CPACK_NSIS_URL_INFO_ABOUT "http://www.vle-project.org")
   set(CPACK_NSIS_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${VLE_VERSION_SHORT}.0")
   set(CPACK_NSIS_MODIFY_PATH ON)
