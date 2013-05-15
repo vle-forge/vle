@@ -30,6 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/PackageTable.hpp>
+#include <vle/utils/Path.hpp>
 #include <string>
 
 namespace vle { namespace utils {
@@ -47,10 +48,31 @@ namespace vle { namespace utils {
  * utils::Package::Package().configure(std::cout, std::cerr);
  * @endcode
  */
+
+enum VLE_PACKAGE_TYPE {
+    PKG_BINARY,
+    PKG_SOURCE
+};
+
+VLE_API std::ostream& operator<<(std::ostream& out,
+        const VLE_PACKAGE_TYPE& type);
+
 class VLE_API Package
 {
 public:
+
+    Package();
+
+    Package(const std::string& pkgname);
+
     ~Package();
+
+    const std::string& name() const;
+
+    /**
+     * Selects the package
+     */
+    void select(const std::string& name);
 
     /**
      * Build the package.
@@ -81,13 +103,18 @@ public:
     void install();
 
     /**
-     * Clean the package by running the 'make clean' command and
-     * remove the CMakeCache.txt file.
+     * Clean the package by running removing the "buildvle"
+     * directory of the source package
      */
     void clean();
 
     /**
-     * Pack the package by runngin the 'make package' and 'make
+     * Remove the binary package
+     */
+    void rclean();
+
+    /**
+     * Pack the package by running the 'make package' and 'make
      * package_source' command.
      */
     void pack();
@@ -125,31 +152,6 @@ public:
      */
     bool get(std::string *out, std::string *err);
 
-    /**
-     * Change the current directory to the output directory. If we
-     * are in package mode, the output directory will be create. If a file
-     * named output directory exists, nothing is done.
-     */
-    void changeToOutputDirectory();
-
-    /**
-     * Remove the specified package from the user directory.
-     *
-     * @param package The package to remove (recursively).
-     */
-    void removePackage(const std::string& package);
-
-    /**
-     * Remove the binary directory of the package:
-     * - $VLE_HOME/pkgs/package/build
-     * - $VLE_HOME/pkgs/package/lib
-     * - $VLE_HOME/pkgs/package/plugins
-     * - $VLE_HOME/pkgs/package/doc/html
-     *
-     * @param package The \c package to remove binary directories.
-     */
-    static void removePackageBinary(const std::string& package);
-
 
     /**
      * Test if the specified package exists in the user directory.
@@ -158,27 +160,84 @@ public:
      *
      * @return true if the package already exist, false otherwise.
      */
-    bool existsPackage(const std::string& package);
+    bool existsSource() const;
 
     /**
-     * Add an empty file into the current Package.
+     * Test if the specified package exists as a binary package.
      *
-     * @param path The path, for example: "data" to build a new file
-     * "PKG/data/name".
-     * @param name The name of the file.
+     * @param package The package to test.
+     *
+     * @return true if the package already exist, false otherwise.
      */
-    void addFile(const std::string& path, const std::string& name);
+    bool existsBinary() const;
+
+    std::string getParentDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getLibDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getSrcDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getDataDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getDocDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getExpDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getBuildDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getOutputDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginSimulatorDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginOutputDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleGlobalDir(
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleModelingDir(
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleOutputDir(
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+
+    std::string getFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getLibFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getSrcFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getDataFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getDocFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getExpFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getOutputFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginSimulatorFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginOutputFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleModelingFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleOutputFile(const std::string& file,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+
+    PathList getExperiments(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+
+    PathList getPluginsSimulator() const;
+    PathList getPluginsOutput() const;
+    PathList getPluginsGvleGlobal() const;
+    PathList getPluginsGvleModeling() const;
+    PathList getPluginsGvleOutput() const;
+
 
     /**
      * Return true if a file package/path/to/file exists in the
      * package package.
      *
+     *
      * @param path The path, for example: "data/input1.dat" to test a file
      * "PKG/data/input1.dat".
+     * @param type The type of package
      *
      * @return true if file exists, false otherwise.
      */
-    bool existsFile(const std::string& path);
+    bool existsFile(const std::string& path,
+            VLE_PACKAGE_TYPE type = PKG_BINARY);
+
 
     /**
      * Add an empty directgory into the current Package.
@@ -186,26 +245,32 @@ public:
      * @param path The path, for example: "data" to build a new directory
      * "PKG/data/name".
      * @param name The name of the directory.
+     * @param type The type of package
      */
-    void addDirectory(const std::string& path, const std::string& name);
+    void addDirectory(const std::string& path, const std::string& name,
+            VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Return true if a directory package/path/to/file exists in the
      * package package.
      *
+     * @param type The type of package
      * @param path The path, for example: "data/input1.dat" to test a file
      * "PKG/data/input1.dat".
      *
      * @return true if directory exists, false otherwise.
      */
-    bool existsDirectory(const std::string& path);
+    bool existsDirectory(const std::string& path,
+            VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Remove file or directory and (recursively) the specified path.
      *
-     * @param path The name of the file or the directory.
+     * @param toremove The name of the file or the directory.
+     * @param type The type of package
      */
-    void remove(const std::string& path);
+    void remove(const std::string& toremove,
+            VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Rename the path oldname to the new name newname.
@@ -217,14 +282,15 @@ public:
      *
      * @param oldname The path, in PKG, of the file to rename.
      * @param newname The new name.
+     * @param type The type of package
      *
      * @return The string representation of the path of the new file.
      *
      * @throw utils::ArgError if the file already exists or if the old file
      * does not exist.
      */
-    std::string rename(const std::string& oldname,
-                       const std::string& newname);
+    std::string rename(const std::string& oldname, const std::string& newname,
+            VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Copy the file.
@@ -235,69 +301,30 @@ public:
     void copy(const std::string& source, std::string& target);
 
     /**
-     * Get the name of the current selected Package. Get the current
-     * selected Package. If the name is empty, no package is selected.
-     * @return The current selected Package.
+     * Refresh the command line option from the `vle.conf' file.
      */
-    const std::string& name() const;
-
-    /**
-     * Is a package selected.
-     * @return Return true if a Package is selected, false otherwise.
-     */
-    bool selected() const;
-
-    /**
-     * Select a new Package.
-     * @param name The new Package.
-     */
-    void select(const std::string& name);
+    void refreshCommands();
 
     /**
      * Refresh the command line option from the `vle.conf' file.
      */
-    void refresh();
+    void refreshPath();
 
-    /**
-     * Get an identifiant for the specified package. If the name is
-     * not defined in the table list, it will be add.
-     *
-     * @param name The package to get an Id.
-     * @return An id.
-     */
-    PackageTable::index getId(const std::string& package);
-
-    /*   manage singleton   */
-
-    /**
-     * Return a instance of Package using the singleton system.
-     * @return A reference to the singleton object.
-     */
-    inline static Package& package()
-    { if (m_package == 0) m_package = new Package; return *m_package; }
-
-    /**
-     * Initialise the Package singleton.
-     */
-    inline static void init()
-    { package(); }
-
-    /**
-     * Delete the Package singleton.
-     */
-    inline static void kill()
-    { delete m_package; m_package = 0; }
+    friend std::ostream& operator<<(std::ostream& out, const Package& pkg);
 
 private:
-    Package();
     Package(const Package&);
     Package& operator=(const Package&);
 
-    static Package* m_package; ///< singleton attribute.
+
+    PathList listLibraries(const std::string& path) const;
 
     struct Pimpl;
     Pimpl *m_pimpl;
+
 };
+
+VLE_API std::ostream& operator<<(std::ostream& out, const Package& pkg);
 
 }} // namespace vle utils
 

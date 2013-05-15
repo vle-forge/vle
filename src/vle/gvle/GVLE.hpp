@@ -39,7 +39,7 @@
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/gvle/SpawnPool.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/value/Value.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/textview.h>
@@ -140,13 +140,15 @@ public:
      * @return A string
      */
     std::string getPackageSrcFile(const std::string& file) const
-    { return utils::Path::path().buildFilename(mPkgDirName, "src", file); }
+    { return utils::Path::path().buildFilename(
+            mCurrPackage.getDir(vle::utils::PKG_SOURCE), "src", file); }
     /**
      * @brief Get a complete source dir  name.
      * @return A string
      */
     std::string getPackageSrcDir() const
-    { return utils::Path::path().buildDirname(mPkgDirName, "src"); }
+    { return utils::Path::path().buildDirname(
+            mCurrPackage.getDir(vle::utils::PKG_SOURCE), "src"); }
 
     /**
      * @brief Get a constant reference to the PluginFactory.
@@ -722,6 +724,11 @@ public:
      */
     void packageProject();
 
+    inline vle::utils::Package& currentPackage()
+    {
+        return mCurrPackage;
+    }
+
 
 
     /********************************************************************
@@ -914,11 +921,9 @@ private:
     /* class members */
     Modeling*                       mModeling;
     std::string                     mCurrentClass;
-    std::string                     mPkgDirName;
     ListView                        mListView;
     ButtonType                      mCurrentButton;
     CutCopyPaste                    mCutCopyPaste;
-    std::string                     mPackage;
     int                             mCurrentTab;
 
     /* File chooser */
@@ -939,6 +944,7 @@ private:
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
     QuitBox*                        mQuitBox;
+    utils::Package                  mCurrPackage;
 
     PluginFactory                   mPluginFactory;
 

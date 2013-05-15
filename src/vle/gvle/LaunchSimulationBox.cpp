@@ -33,11 +33,12 @@
 
 namespace vle { namespace gvle {
 
-LaunchSimulationBox::LaunchSimulationBox(const Glib::RefPtr < Gtk::Builder >& xml,
-                                         const vpz::Vpz& vpz)
+LaunchSimulationBox::LaunchSimulationBox(
+        const Glib::RefPtr < Gtk::Builder >& xml, const vpz::Vpz& vpz,
+        const vle::utils::Package& curr_pack)
     : mVpz(vpz), mDialog(0), mMono(0), mMulti(0), mNbProcess(0), mDistant(0),
     mPlay(0), mStop(0), mProgressBar(0), mCurrentTimeLabel(0),mState(Wait),
-    mThread(0), mThreadRun(false)
+    mThread(0), mThreadRun(false), mCurrPackage(curr_pack)
 {
     xml->get_widget("DialogSimulation", mDialog);
     xml->get_widget("RadioSimuMono", mMono);
@@ -117,6 +118,20 @@ void LaunchSimulationBox::runThread()
 {
     mThreadRun = true;
     vpz::Vpz exp(mVpz);
+
+    //set default location of outputs
+    vle::vpz::Outputs::iterator itb =
+            exp.project().experiment().views().outputs().begin();
+    vle::vpz::Outputs::iterator ite =
+            exp.project().experiment().views().outputs().end();
+    for (; itb!=ite; itb++) {
+        vle::vpz::Output& output = itb->second;
+        if (output.location().empty()) {
+            output.setLocalStream(mCurrPackage.getOutputDir(
+                    vle::utils::PKG_SOURCE), output.plugin(), output.package());
+        }
+    }
+
     devs::RootCoordinator root(mLoadedPlugin);
 
     try {

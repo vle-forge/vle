@@ -71,23 +71,25 @@ void SaveVpzBox::show()
 void SaveVpzBox::onApply()
 {
     if (not mEntryName->get_text().empty()) {
-	if (not exist(mEntryName->get_text()) or
-	    gvle::Question(_("Do you want to replace the file ") +
-		    static_cast<std::string>(mEntryName->get_text()))) {
-	    const Modeling* modeling = (const Modeling*)(mModeling);
-	    std::string fileName = mEntryName->get_text();
-	    vpz::Vpz::fixExtension(fileName);
-	    std::string pathFile = Glib::build_filename(
-		utils::Path::path().getPackageExpDir(), fileName);
-	    Editor::Documents::const_iterator it = mGVLE->getEditor()
-		->getDocuments().find(modeling->getFileName());
-	    mModeling->saveXML(pathFile);
+        if (not exist(mEntryName->get_text()) or
+                gvle::Question(_("Do you want to replace the file ") +
+                        static_cast<std::string>(mEntryName->get_text()))) {
+            const Modeling* modeling = (const Modeling*)(mModeling);
+            std::string fileName = mEntryName->get_text();
+            vpz::Vpz::fixExtension(fileName);
+            std::string pathFile = Glib::build_filename(
+                    mGVLE->currentPackage().getExpDir(
+                            vle::utils::PKG_SOURCE), fileName);
+            Editor::Documents::const_iterator it =
+                    mGVLE->getEditor()->getDocuments().find(
+                            modeling->getFileName());
+            mModeling->saveXML(pathFile);
             mGVLE->setTitle(modeling->getFileName());
-	    if (it != mGVLE->getEditor()->getDocuments().end()) {
-		it->second->setTitle(pathFile, mModeling->getTopModel(), false);
-	    }
-	    mDialog->hide_all();
-	}
+            if (it != mGVLE->getEditor()->getDocuments().end()) {
+                it->second->setTitle(pathFile, mModeling->getTopModel(), false);
+            }
+            mDialog->hide_all();
+        }
     }
 }
 
@@ -98,13 +100,13 @@ void SaveVpzBox::onCancel()
 
 bool SaveVpzBox::exist(std::string name)
 {
-    utils::PathList list = utils::Path::path().getInstalledExperiments();
+    utils::PathList list =  mGVLE->currentPackage().getExperiments();
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
-	if (utils::Path::basename(*it) == name) {
-	    return true;
-	}
-	++it;
+        if (utils::Path::basename(*it) == name) {
+            return true;
+        }
+        ++it;
     }
     return false;
 }

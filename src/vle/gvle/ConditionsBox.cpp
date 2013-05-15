@@ -245,7 +245,8 @@ void ConditionsBox::ConditionsTreeView::onEdit(std::string pluginName)
 
         try {
             PluginFactory& plf = mParent->getGVLE()->pluginFactory();
-            ModelingPluginPtr plugin = plf.getModelingPlugin(pluginName);
+            ModelingPluginPtr plugin = plf.getModelingPlugin(pluginName,
+                    mParent->getGVLE()->currentPackage().name());
             vpz::Condition& cond = mConditions->get(conditionName);
             plugin->start(cond);
 
@@ -547,7 +548,8 @@ void ConditionsBox::PortsTreeView::onEdit(std::string pluginName)
 	PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
 	try {
-	    ModelingPluginPtr plugin = plf.getModelingPlugin(pluginName);
+	    ModelingPluginPtr plugin = plf.getModelingPlugin(pluginName,
+	            mParent->getGVLE()->currentPackage().name());
 	    plugin->start(*mCondition, name);
 	    mParent->buildTreeValues(mCondition->name(), name);
 	} catch(const std::exception& /*e*/) {

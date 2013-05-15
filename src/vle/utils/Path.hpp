@@ -60,11 +60,6 @@ typedef std::vector < std::string > PathList;
 class VLE_API Path
 {
 public:
-    /**
-     * Rebuild path lists of plug-ins directories (package mode,
-     * global mode etc.).
-     */
-    void updateDirs();
 
     /**
      * Return the prefix of the compilation on Unix or installation
@@ -119,84 +114,12 @@ public:
      * Return the $VLE_HOME/packages dirname.
      * @return A string.
      */
-    std::string getPackagesDir() const;
 
-    /**
-     * Return the $VLE_HOME/packages/current_package dirname.
-     * @return A string.
-     */
-    std::string getPackageSourceDir() const; // TODO returns source directory : current path + package
-    std::string getPackageBinaryDir() const; // TODO returns binary directory : $VLE_HOME/pkgs-1.1 + package
-    std::string getPackageLibDir() const;
-    std::string getPackageSrcDir() const;
-    std::string getPackageDataDir() const;
-    std::string getPackageDocDir() const;
-    std::string getPackageExpDir() const;
-    std::string getPackageBuildDir() const; // TODO check current path + package + buildvle
-    std::string getPackageOutputDir() const;
-    std::string getPackagePluginDir() const;
-    std::string getPackagePluginSimulatorDir() const;
-    std::string getPackagePluginOutputDir() const;
-    std::string getPackagePluginGvleGlobalDir() const;
-    std::string getPackagePluginGvleModelingDir() const;
-    std::string getPackagePluginGvleOutputDir() const;
+    std::string getBinaryPackagesDir() const;
+    std::string getCurrentDir() const;
 
-    std::string getPackageFile(const std::string& name) const;
-    std::string getPackageLibFile(const std::string& name) const;
-    std::string getPackageSrcFile(const std::string& name) const;
-    std::string getPackageDataFile(const std::string& name) const;
-    std::string getPackageDocFile(const std::string& name) const;
-    std::string getPackageExpFile(const std::string& name) const;
-    std::string getPackageOutputFile(const std::string& name) const;
-    std::string getPackagePluginFile(const std::string& name) const;
-    std::string getPackagePluginSimulatorFile(const std::string& name) const;
-    std::string getPackagePluginOutputFile(const std::string& name) const;
-    std::string getPackagePluginGvleModelingFile(const std::string& name) const;
-    std::string getPackagePluginGvleOutputFile(const std::string& name) const;
-
-    std::string getExternalPackageDir(const std::string& name) const;
-    std::string getExternalPackageLibDir(const std::string& name) const;
-    std::string getExternalPackageSrcDir(const std::string& name) const;
-    std::string getExternalPackageDataDir(const std::string& name) const;
-    std::string getExternalPackageDocDir(const std::string& name) const;
-    std::string getExternalPackageExpDir(const std::string& name) const;
-    std::string getExternalPackageBuildDir(const std::string& name) const;
-    std::string getExternalPackageOutputDir(const std::string& name) const;
-    std::string getExternalPackagePluginDir(const std::string& name) const;
-    std::string getExternalPackagePluginSimulatorDir(const std::string& name) const;
-    std::string getExternalPackagePluginOutputDir(const std::string& name) const;
-    std::string getExternalPackagePluginGvleGlobalDir(const std::string& name) const;
-    std::string getExternalPackagePluginGvleModelingDir(const std::string& name) const;
-    std::string getExternalPackagePluginGvleOutputDir(const std::string& name) const;
-
-    std::string getExternalPackageFile(const std::string& name,
-                                       const std::string& file) const;
-    std::string getExternalPackageLibFile(const std::string& name,
-                                          const std::string& file) const;
-    std::string getExternalPackageSrcFile(const std::string& name,
-                                          const std::string& file) const;
-    std::string getExternalPackageDataFile(const std::string& name,
-                                           const std::string& file) const;
-    std::string getExternalPackageDocFile(const std::string& name,
-                                          const std::string& file) const;
-    std::string getExternalPackageExpFile(const std::string& name,
-                                          const std::string& file) const;
-    std::string getExternalPackageOutputFile(const std::string& package,
-                                             const std::string& file) const;
-    std::string getExternalPackagePluginFile(const std::string& package,
-                                             const std::string& file) const;
-    std::string getExternalPackagePluginSimulatorFile(const std::string& package,
-                                                      const std::string& file) const;
-    std::string getExternalPackagePluginOutputFile(const std::string& package,
-                                                   const std::string& file) const;
-    std::string getExternalPackagePluginGvleModelingFile(const std::string& package,
-                                                         const std::string& file) const;
-    std::string getExternalPackagePluginGvleOutputFile(const std::string& package,
-                                                       const std::string& file) const;
-
-    PathList getInstalledPackages();
-    PathList getInstalledExperiments();
-    PathList getInstalledLibraries();
+    PathList getBinaryPackages();
+    PathList getBinaryLibraries();
 
 
     /**
@@ -534,8 +457,6 @@ private:
 
     std::string m_prefix; /*!< the $prefix of installation */
     std::string m_home; /*!< the $VLE_HOME */
-    std::string m_currentPackagePath; /*< the current binary package path */
-    std::string m_currentPackageSourcePath; /*< the current source path */
 
     /**
      * Build the paths from environment variables.
@@ -579,18 +500,6 @@ private:
      * Clear all plug-ins lists.
      */
     void clearPluginDirs();
-
-    /**
-     * Assign to the plug-ins directories lists paths from prefix and
-     * home directory.
-     */
-    void initGlobalPluginDirs();
-
-    /**
-     * Assign the current package path and simulator packages lists
-     * paths from prefix or vle user dir.
-     */
-    void initPackagePluginDirs();
 
     static Path* mPath; /**< The static variable Path for singleton
                            design pattern. */

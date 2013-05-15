@@ -451,7 +451,6 @@ void Path::compress(const std::string& filepath,
     if (fs::exists(path)) {
         create_archive(filepath.c_str(), compressedfilepath.c_str());
     }
-
 }
 
 void Path::decompress(const std::string& compressedfilepath,

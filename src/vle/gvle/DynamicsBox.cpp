@@ -221,7 +221,7 @@ void DynamicsBox::initDynamicsColumnLibrary()
 
 void DynamicsBox::fillLibrariesListStore()
 {
-    utils::PathList paths = utils::Path::path().getInstalledPackages();
+    utils::PathList paths = utils::Path::path().getBinaryPackages();
     std::sort(paths.begin(), paths.end());
     for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
          i != e; ++i) {
@@ -249,7 +249,7 @@ void DynamicsBox::fillDynamics()
 
     mPackagesListStore = Gtk::ListStore::create(mPackageColumns);
 
-    utils::PathList paths = utils::Path::path().getInstalledPackages();
+    utils::PathList paths = utils::Path::path().getBinaryPackages();
     std::sort(paths.begin(), paths.end());
     for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
          i != e; ++i) {

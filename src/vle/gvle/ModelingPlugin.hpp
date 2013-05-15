@@ -36,24 +36,25 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#define DECLARE_GVLE_MODELINGPLUGIN(x)                          \
-    extern "C" {                                                \
-        GVLE_MODULE vle::gvle::ModelingPlugin*                  \
-        vle_make_new_gvle_modeling(const std::string& package,  \
-                                   const std::string& library)  \
-        {                                                       \
-            return new x(package, library);                     \
-        }                                                       \
-                                                                \
-        GVLE_MODULE void                                        \
-        vle_api_level(vle::uint32_t* major,                     \
-                      vle::uint32_t* minor,                     \
-                      vle::uint32_t* patch)                     \
-        {                                                       \
-            *major = VLE_MAJOR_VERSION;                         \
-            *minor = VLE_MINOR_VERSION;                         \
-            *patch = VLE_PATCH_VERSION;                         \
-        }                                                       \
+#define DECLARE_GVLE_MODELINGPLUGIN(x)                              \
+    extern "C" {                                                    \
+        GVLE_MODULE vle::gvle::ModelingPlugin*                      \
+        vle_make_new_gvle_modeling(const std::string& package,      \
+                                   const std::string& library,      \
+                                   const std::string& currPackage)  \
+        {                                                           \
+            return new x(package, library, currPackage);            \
+        }                                                           \
+                                                                    \
+        GVLE_MODULE void                                            \
+        vle_api_level(vle::uint32_t* major,                         \
+                      vle::uint32_t* minor,                         \
+                      vle::uint32_t* patch)                         \
+        {                                                           \
+            *major = VLE_MAJOR_VERSION;                             \
+            *minor = VLE_MINOR_VERSION;                             \
+            *patch = VLE_PATCH_VERSION;                             \
+        }                                                           \
     }
 
 namespace vle { namespace gvle {
@@ -73,12 +74,16 @@ public:
     /**
      * @brief Build a new ModelingPlugin.
      *
-     * @param package The name of the package.
+     * @param package The name of the package containing the plugin
      * @param library The name of the plug-in.
+     * @param curr_package the name of the current package
+     *
      */
-    ModelingPlugin(const std::string& package, const std::string& library)
-        : mPackage(package), mLibrary(library)
-    {}
+    ModelingPlugin(const std::string& package, const std::string& library,
+            const std::string& curr_package)
+        : mPackage(package), mLibrary(library), mCurrPackage(curr_package)
+    {
+    }
 
     virtual ~ModelingPlugin()
     {}
@@ -164,9 +169,13 @@ public:
 
     const std::string& getLibrary() const { return mLibrary; }
 
+    const std::string& getCurrPackage() const { return mCurrPackage; }
+
 protected:
     std::string mPackage;
     std::string mLibrary;
+    std::string mCurrPackage;
+
     Source mSource;
 
 private:
@@ -178,7 +187,8 @@ private:
 
 typedef boost::shared_ptr < ModelingPlugin > ModelingPluginPtr;
 typedef ModelingPlugin* (*GvleModelingPluginSlot)(const std::string&,
-						  const std::string&);
+                                                  const std::string&,
+                                                  const std::string&);
 
 }} // namespace vle gvle
 

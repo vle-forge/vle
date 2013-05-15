@@ -139,7 +139,7 @@ GVLE::GVLE(BaseObjectType* cobject,
         setTitle(mModeling->getFileName());
     }
 
-    utils::Package::package().refresh(); /** Initialize the VLE
+    mCurrPackage.refreshPath(); /** Initialize the VLE
                                           * settings commands from the
                                           * configuration file `vle.conf'. */
 
@@ -247,9 +247,8 @@ void GVLE::setModifiedTitle(const std::string& name)
 
 void GVLE::buildPackageHierarchy()
 {
-    mPackage = vle::utils::Path::path().getPackageSourceDir();
     mFileTreeView->clear();
-    mFileTreeView->setPackage(mPackage);
+    mFileTreeView->setPackage(mCurrPackage.name());
     mFileTreeView->build();
 }
 
@@ -261,11 +260,12 @@ void GVLE::refreshPackageHierarchy()
 void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
 {
     if (newName.empty()) { // the file is removed
-        mEditor->closeTab(Glib::build_filename(mPackage, oldName));
+        mEditor->closeTab(Glib::build_filename(mCurrPackage.name(), oldName));
     } else {
-        std::string filePath = utils::Path::buildFilename(mPackage, oldName);
-        std::string newFilePath = utils::Path::buildFilename(mPackage,
-                                                             newName);
+        std::string filePath = utils::Path::buildFilename(mCurrPackage.name(),
+                oldName);
+        std::string newFilePath = utils::Path::buildFilename(
+                mCurrPackage.name(), newName);
         mEditor->changeFile(filePath, newFilePath);
         mModeling->setFileName(newFilePath);
     }
@@ -410,12 +410,12 @@ void GVLE::start()
     mModeling->vpz().project().model().setModel(mModeling->getTopModel());
     redrawModelTreeBox();
     redrawModelClassBox();
-    if (utils::Package::package().name().empty()) {
+    if (mCurrPackage.name().empty()) {
         mModeling->setFileName("noname.vpz");
     } else {
         mModeling->setFileName(Glib::build_filename(
-                                   utils::Path::path().getPackageExpDir(),
-                                   "noname.vpz"));
+                                 mCurrPackage.getExpDir(vle::utils::PKG_SOURCE),
+                                 "noname.vpz"));
     }
     mModeling->setSaved(false);
     mModeling->setModified(true);
@@ -675,9 +675,8 @@ void GVLE::onOpenProject()
 
             if (not basename.empty()) {
                 if (g_chdir(dirname.c_str()) == 0) {
-                    mPkgDirName = utils::Path::path().buildDirname(dirname, basename);
                     onCloseProject();
-                    utils::Package::package().select(basename);
+                    mCurrPackage.select(basename);
                     mPluginFactory.update();
                     buildPackageHierarchy();
                     mMenuAndToolbar->onOpenProject();
@@ -689,8 +688,7 @@ void GVLE::onOpenProject()
         }
         break;
     default:
-        if (not utils::Package::package().existsPackage(
-                utils::Package::package().name())) {
+        if (not mCurrPackage.existsSource()) {
             onCloseProject();
         }
         break;
@@ -717,7 +715,7 @@ void GVLE::onOpenVpz()
             }
         } catch(utils::InternalError) {
             Error((fmt(_("No experiments in the package '%1%'")) %
-                   utils::Package::package().name()).str());
+                   mCurrPackage.name()).str());
         }
     }
 }
@@ -743,9 +741,8 @@ void GVLE::onOpenGlobalVpz()
         if (file.run() == Gtk::RESPONSE_OK) {
             mGlobalVpzPrevDirPath = file.get_current_folder();
             mEditor->closeAllTab();
-            utils::Package::package().select("");
+            mCurrPackage.select("");
             mPluginFactory.update();
-            mPackage = "";
             parseXML(file.get_filename());
             getEditor()->openTabVpz(mModeling->getFileName(),
                                     mModeling->getTopModel());
@@ -833,7 +830,8 @@ void GVLE::onSave()
 
                 file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
                 file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-                file.set_current_folder(utils::Path::path().getPackageSourceDir());
+                file.set_current_folder(mCurrPackage.getSrcDir(
+                        vle::utils::PKG_SOURCE));
                 if (file.run() == Gtk::RESPONSE_OK) {
                     std::string filename(file.get_filename());
 
@@ -1014,7 +1012,7 @@ void GVLE::onCloseProject()
     clearModelClassBox();
     mModelTreeBox->set_sensitive(false);
     mModelClassBox->set_sensitive(false);
-    utils::Package::package().select("");
+    mCurrPackage.select("");
     mPluginFactory.update();
     buildPackageHierarchy();
     mMenuAndToolbar->showMinimalMenu();
@@ -1039,7 +1037,8 @@ void GVLE::onPreferences()
 void GVLE::onSimulationBox()
 {
     if (mModeling->isSaved()) {
-        LaunchSimulationBox box(mRefXML, ((const Modeling*)mModeling)->vpz());
+        LaunchSimulationBox box(mRefXML, ((const Modeling*)mModeling)->vpz(),
+                mCurrPackage);
         box.run();
         refreshPackageHierarchy();
     } else {
@@ -1140,7 +1139,7 @@ void GVLE::saveVpz()
 
 void GVLE::saveFirstVpz()
 {
-    if (not utils::Package::package().name().empty()) {
+    if (not mCurrPackage.name().empty()) {
         mSaveVpzBox->show();
     } else {
         Gtk::FileChooserDialog file(_("VPZ file"),
@@ -1172,8 +1171,8 @@ void GVLE::setTitle(const Glib::ustring& name)
 {
     Glib::ustring title(windowTitle());
 
-    if (utils::Package::package().selected()) {
-        title += " - " + utils::Package::package().name();
+    if (not mCurrPackage.name().empty()) {
+        title += " - " + mCurrPackage.name();
     }
 
     if (not name.empty()) {
@@ -1247,22 +1246,21 @@ bool GVLE::packageAllTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
+    if (mCurrPackage.isFinish()) {
         ++itDependencies;
 
         if (itDependencies != mDependencies.end()) {
-            utils::Package::package().select(*itDependencies);
+            mCurrPackage.select(*itDependencies);
             buildAllProject();
         } else {
-            utils::Package::package().select(utils::Path::filename(mPackage));
             insertLog("package " +
-                      utils::Package::package().name() +
+                      mCurrPackage.name() +
                       " & first level dependencies built\n");
             getMenu()->showProjectMenu();
         }
@@ -1277,13 +1275,13 @@ bool GVLE::packageTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
+    if (mCurrPackage.isFinish()) {
         getMenu()->showProjectMenu();
         return false;
     } else {
@@ -1295,14 +1293,14 @@ bool GVLE::packageConfigureAllTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().isSuccess()) {
+    if (mCurrPackage.isFinish()) {
+        if (mCurrPackage.isSuccess()) {
             buildAllProject();
         } else {
             getMenu()->showProjectMenu();
@@ -1318,14 +1316,14 @@ bool GVLE::packageBuildAllTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().isSuccess()) {
+    if (mCurrPackage.isFinish()) {
+        if (mCurrPackage.isSuccess()) {
             installAllProject();
         } else {
             getMenu()->showProjectMenu();
@@ -1341,20 +1339,20 @@ bool GVLE::packageBuildTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.isFinish()) {
+        if (mCurrPackage.get(&o, &e)) {
             insertLog(o);
             insertLog(e);
             scrollLogToLastLine();
         }
 
-        if (utils::Package::package().isSuccess()) {
+        if (mCurrPackage.isSuccess()) {
             installProject();
         } else {
             getMenu()->showProjectMenu();
@@ -1374,7 +1372,7 @@ void GVLE::configureToSimulate()
         getMenu()->hideSimulationMenu();
 
         try {
-            utils::Package::package().configure();
+            mCurrPackage.configure();
         } catch (const std::exception& e) {
             getMenu()->showProjectMenu();
             getMenu()->showSimulationMenu();
@@ -1397,20 +1395,20 @@ bool GVLE::configureToSimulateTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.isFinish()) {
+        if (mCurrPackage.get(&o, &e)) {
             insertLog(o);
             insertLog(e);
             scrollLogToLastLine();
         }
 
-        if (utils::Package::package().isSuccess()) {
+        if (mCurrPackage.isSuccess()) {
             buildToSimulate();
         } else {
             getMenu()->showProjectMenu();
@@ -1428,7 +1426,7 @@ void GVLE::buildToSimulate()
     insertLog("build package\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().build();
+        mCurrPackage.build();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         getMenu()->showSimulationMenu();
@@ -1448,20 +1446,20 @@ bool GVLE::buildToSimulateTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
-        if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.isFinish()) {
+        if (mCurrPackage.get(&o, &e)) {
             insertLog(o);
             insertLog(e);
             scrollLogToLastLine();
         }
 
-        if (utils::Package::package().isSuccess()) {
+        if (mCurrPackage.isSuccess()) {
             installtoSimulate();
         } else {
             getMenu()->showProjectMenu();
@@ -1478,7 +1476,7 @@ void GVLE::installtoSimulate()
     insertLog("install package\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().install();
+        mCurrPackage.install();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         getMenu()->showSimulationMenu();
@@ -1498,13 +1496,13 @@ bool GVLE::installtoSimulateTimer()
 {
     std::string o, e;
 
-    if (utils::Package::package().get(&o, &e)) {
+    if (mCurrPackage.get(&o, &e)) {
         insertLog(o);
         insertLog(e);
         scrollLogToLastLine();
     }
 
-    if (utils::Package::package().isFinish()) {
+    if (mCurrPackage.isFinish()) {
         onSimulationBox();
         getMenu()->showProjectMenu();
         getMenu()->showSimulationMenu();
@@ -1519,7 +1517,7 @@ void GVLE::configureProject()
     insertLog("configure package\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().configure();
+        mCurrPackage.configure();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -1535,9 +1533,9 @@ void GVLE::configureProject()
 
 void GVLE::buildAllProject()
 {
-    insertLog("build package " + utils::Package::package().name() + "\n");
+    insertLog("build package " + mCurrPackage.name() + "\n");
     try {
-        utils::Package::package().build();
+        mCurrPackage.build();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -1556,7 +1554,7 @@ void GVLE::buildProject()
     insertLog("build package\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().build();
+        mCurrPackage.build();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -1574,7 +1572,7 @@ std::map < std::string, Depends > GVLE::depends()
 {
     std::map < std::string, Depends > result;
 
-    utils::PathList vpz(utils::Path::path().getInstalledExperiments());
+    utils::PathList vpz(mCurrPackage.getExperiments(vle::utils::PKG_BINARY));
     std::sort(vpz.begin(), vpz.end());
 
     for (utils::PathList::iterator it = vpz.begin(); it != vpz.end(); ++it) {
@@ -1595,7 +1593,7 @@ void GVLE::makeAllProject()
     AllDepends deps = depends();
 
     insertLog("\nbuild package "  +
-              utils::Package::package().name() +
+            mCurrPackage.name() +
               " & first level of dependencies\n");
 
     getMenu()->hideProjectMenu();
@@ -1609,7 +1607,7 @@ void GVLE::makeAllProject()
         }
     }
 
-    mDependencies.insert(utils::Package::package().name());
+    mDependencies.insert(mCurrPackage.name());
 
     using utils::Path;
     using utils::Package;
@@ -1618,12 +1616,12 @@ void GVLE::makeAllProject()
 
     if (itDependencies != mDependencies.end()) {
 
-        Package::package().select(*itDependencies);
+        mCurrPackage.select(*itDependencies);
 
         insertLog("configure package " +
-                  utils::Package::package().name() + "\n");
+                  mCurrPackage.name() + "\n");
 
-        Package::package().configure();
+        mCurrPackage.configure();
 
         Glib::signal_timeout().connect(
             sigc::mem_fun(*this, &GVLE::packageConfigureAllTimer), 250);
@@ -1658,7 +1656,7 @@ void GVLE::displayDependencies()
     }
 
     const std::string title =
-        utils::Path::filename(mPackage) +
+        utils::Path::filename(mCurrPackage.name()) +
         _(" - Package Dependencies");
 
     Gtk::MessageDialog* box;
@@ -1676,7 +1674,7 @@ void GVLE::testProject()
     insertLog("test package\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().test();
+        mCurrPackage.test();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -1694,10 +1692,10 @@ void GVLE::testProject()
 void GVLE::installAllProject()
 {
     insertLog("install package : " +
-              utils::Package::package().name() +
+            mCurrPackage.name() +
               "\n");
     try {
-        utils::Package::package().install();
+        mCurrPackage.install();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -1717,7 +1715,7 @@ void GVLE::installProject()
     insertLog("install package\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().install();
+        mCurrPackage.install();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -1736,7 +1734,7 @@ void GVLE::cleanProject()
     insertLog("clean package\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().clean();
+        mCurrPackage.clean();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -1755,7 +1753,7 @@ void GVLE::packageProject()
     insertLog("make source and binary packages\n");
     getMenu()->hideProjectMenu();
     try {
-        utils::Package::package().pack();
+        mCurrPackage.pack();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
@@ -2135,8 +2133,8 @@ void GVLE::onOrder()
 
 void GVLE::onTrouble()
 {
-    if (utils::Package::package().selected()) {
-        std::string package = utils::Package::package().name();
+    if (not mCurrPackage.name().empty()) {
+        std::string package = mCurrPackage.name();
         boost::algorithm::to_lower(package);
 
         if (package == "canabis" and not mTroubleTimemout.connected()) {
@@ -2150,11 +2148,11 @@ bool GVLE::signalTroubleTimer()
 {
     static int nb = 0;
 
-    if (not utils::Package::package().selected()) {
+    if (mCurrPackage.name().empty()) {
         return false;
     }
 
-    std::string package = utils::Package::package().name();
+    std::string package = mCurrPackage.name();
     if (package.empty()) {
         return false;
     }

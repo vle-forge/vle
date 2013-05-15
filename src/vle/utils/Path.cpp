@@ -34,7 +34,7 @@
 #endif
 
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Package.hpp>
+//#include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
@@ -92,7 +92,7 @@ std::string Path::getGladeFile(const std::string& file) const
  * packages path
  */
 
-std::string Path::getPackagesDir() const
+std::string Path::getBinaryPackagesDir() const
 {
     return buildDirname(m_home, pkgdirname);
 }
@@ -181,299 +181,19 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
     }
 }
 
-std::string Path::getPackageSourceDir() const
+std::string Path::getCurrentDir() const
 {
-    return m_currentPackageSourcePath;
+    return fs::current_path().string();
 }
 
-std::string Path::getPackageBinaryDir() const
+PathList Path::getBinaryPackages()
 {
-    return m_currentPackagePath;
-}
-
-std::string Path::getPackageLibDir() const
-{
-    return buildDirname(m_currentPackagePath, "lib");
-}
-
-std::string Path::getPackageSrcDir() const
-{
-    return buildDirname(m_currentPackagePath, "src");
-}
-
-std::string Path::getPackageDataDir() const
-{
-    return buildDirname(m_currentPackagePath, "data");
-}
-
-std::string Path::getPackageExpDir() const
-{
-    return buildDirname(m_currentPackagePath, "exp");
-}
-
-std::string Path::getPackageOutputDir() const
-{
-    return buildDirname(m_currentPackagePath, "output");
-}
-
-std::string Path::getPackagePluginDir() const
-{
-    return buildDirname(m_currentPackagePath, "plugins");
-}
-
-std::string Path::getPackagePluginSimulatorDir() const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "simulator");
-}
-
-std::string Path::getPackagePluginOutputDir() const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "output");
-}
-
-std::string Path::getPackagePluginGvleGlobalDir() const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "gvle", "global");
-}
-
-std::string Path::getPackagePluginGvleModelingDir() const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "gvle", "modeling");
-}
-
-std::string Path::getPackagePluginGvleOutputDir() const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "gvle", "output");
-}
-
-std::string Path::getPackageBuildDir() const
-{
-    return buildDirname(m_currentPackageSourcePath, "buildvle");
-}
-
-std::string Path::getPackageDocDir() const
-{
-    return buildDirname(m_currentPackagePath, "doc");
-}
-
-std::string Path::getPackageFile(const std::string& name) const
-{
-    return buildFilename(getPackageSourceDir(), name);
-}
-
-std::string Path::getPackageLibFile(const std::string& name) const
-{
-    return buildFilename(getPackageLibDir(), name);
-}
-
-std::string Path::getPackageSrcFile(const std::string& name) const
-{
-    return buildFilename(getPackageSrcDir(), name);
-}
-
-std::string Path::getPackageDataFile(const std::string& name) const
-{
-    return buildFilename(getPackageDataDir(), name);
-}
-
-std::string Path::getPackageExpFile(const std::string& name) const
-{
-    return buildFilename(getPackageExpDir(), name);
-}
-
-std::string Path::getPackageOutputFile(const std::string& name) const
-{
-    return buildFilename(getPackageOutputDir(), name);
-}
-
-std::string Path::getPackageDocFile(const std::string& name) const
-{
-    return buildFilename(getPackageDocDir(), name);
-}
-
-std::string Path::getPackagePluginFile(const std::string& name) const
-{
-    return buildDirname(m_currentPackagePath, "plugins", name);
-}
-
-std::string Path::getPackagePluginSimulatorFile(const std::string& name) const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "simulator", name);
-}
-
-std::string Path::getPackagePluginOutputFile(const std::string& name) const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "output", name);
-}
-
-std::string Path::getPackagePluginGvleOutputFile(const std::string& name) const
-{
-    return buildDirname(m_currentPackagePath, "plugins", "gvle", "output", name);
-}
-
-std::string Path::getExternalPackageDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name);
-}
-
-std::string Path::getExternalPackageLibDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "lib");
-}
-
-std::string Path::getExternalPackageSrcDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "src");
-}
-
-std::string Path::getExternalPackageDataDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "data");
-}
-
-std::string Path::getExternalPackageDocDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "doc");
-}
-
-std::string Path::getExternalPackageExpDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "exp");
-}
-
-std::string Path::getExternalPackageBuildDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "build");
-}
-
-std::string Path::getExternalPackageOutputDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "plugins");
-}
-
-std::string Path::getExternalPackagePluginDir(const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "plugins");
-}
-
-std::string Path::getExternalPackagePluginSimulatorDir(
-    const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "plugins", "simulator");
-}
-
-std::string Path::getExternalPackagePluginOutputDir(
-    const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "plugins", "output");
-}
-
-std::string Path::getExternalPackagePluginGvleGlobalDir(
-    const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "global");
-}
-
-std::string Path::getExternalPackagePluginGvleModelingDir(
-    const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "modeling");
-}
-
-std::string Path::getExternalPackagePluginGvleOutputDir(
-    const std::string& name) const
-{
-    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "output");
-}
-
-std::string Path::getExternalPackageFile(const std::string& name,
-                                         const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), name, file);
-}
-
-std::string Path::getExternalPackageLibFile(const std::string& name,
-                                            const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), name, "lib", file);
-}
-
-std::string Path::getExternalPackageSrcFile(const std::string& name,
-                                            const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), name, "src", file);
-}
-
-std::string Path::getExternalPackageDataFile(const std::string& name,
-                                             const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), name, "data", file);
-}
-
-std::string Path::getExternalPackageDocFile(const std::string& name,
-                                            const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), name, "doc", file);
-}
-
-std::string Path::getExternalPackageExpFile(const std::string& name,
-                                            const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), name, "exp", file);
-}
-
-std::string Path::getExternalPackageOutputFile(
-    const std::string& package,
-    const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), package, "output", file);
-}
-
-std::string Path::getExternalPackagePluginFile(
-    const std::string& package,
-    const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), package, "plugins", file);
-}
-
-std::string Path::getExternalPackagePluginSimulatorFile(
-    const std::string& package,
-    const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), package, "plugins", "simulator", file);
-}
-
-std::string Path::getExternalPackagePluginOutputFile(
-    const std::string& package,
-    const std::string& file) const
-{
-    return buildFilename(getPackagesDir(), package, "plugins", "output", file);
-}
-
-std::string Path::getExternalPackagePluginGvleModelingFile(
-    const std::string& package,
-    const std::string& file) const
-{
-    return buildFilename(
-        getPackagesDir(), package, "plugins", "gvle", "modeling", file);
-}
-
-std::string Path::getExternalPackagePluginGvleOutputFile(
-    const std::string& package,
-    const std::string& file) const
-{
-    return buildFilename(
-        getPackagesDir(), package, "plugins", "gvle", "output", file);
-}
-
-PathList Path::getInstalledPackages()
-{
-    fs::path pkgs(Path::path().getPackagesDir());
+    fs::path pkgs(Path::path().getBinaryPackagesDir());
 
     if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
         throw utils::InternalError(fmt(
                 _("Package error: '%1%' is not a directory")) %
-            Path::path().getPackagesDir());
+            Path::path().getBinaryPackagesDir());
     }
 
     PathList result;
@@ -492,55 +212,9 @@ PathList Path::getInstalledPackages()
     return result;
 }
 
-PathList Path::getInstalledExperiments()
-{
-    fs::path pkgs(Path::path().getPackageExpDir());
 
-    if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
-        throw utils::InternalError(fmt(
-                _("Pkg list error: '%1%' is not an experiments directory")) %
-#if BOOST_VERSION > 104500
-            pkgs.string());
-#else
-            pkgs.file_string());
-#endif
-    }
 
-    PathList result;
-    std::stack < fs::path > stack;
-    stack.push(pkgs);
-
-    while (not stack.empty()) {
-        fs::path dir = stack.top();
-        stack.pop();
-
-        for (fs::directory_iterator it(dir), end; it != end; ++it) {
-#if BOOST_VERSION > 104500
-            if (fs::is_regular_file(it->status())) {
-                std::string ext = it->path().extension().string();
-#elif BOOST_VERSION > 103600
-            if (fs::is_regular_file(it->status())) {
-                fs::path::string_type ext = it->path().extension();
-#else
-            if (fs::is_regular(it->status())) {
-                fs::path::string_type ext = fs::extension(it->path());
-#endif
-                if (ext == ".vpz") {
-#if BOOST_VERSION > 104500
-                    result.push_back(it->path().string());
-#else
-                    result.push_back(it->path().file_string());
-#endif
-                }
-            } else if (fs::is_directory(it->status())) {
-                stack.push(it->path());
-            }
-        }
-    }
-    return result;
-}
-
-PathList Path::getInstalledLibraries()
+PathList Path::getBinaryLibraries()
 {
     PathList result;
     const PathList& dirs = Path::path().getSimulatorDirs();
@@ -595,7 +269,7 @@ PathList Path::getInstalledLibraries()
 std::string Path::getPackageFromPath(const std::string& path)
 {
     fs::path source(path);
-    fs::path package(utils::Path::path().getPackagesDir());
+    fs::path package(vle::utils::Path::path().getBinaryPackagesDir());
 
     fs::path::iterator it = source.begin();
     fs::path::iterator jt = package.begin();
@@ -624,11 +298,11 @@ void Path::initVleHomeDirectory()
 {
     boost::system::error_code ec;
 
-    fs::path pkgs = getPackagesDir();
+    fs::path pkgs = getBinaryPackagesDir();
 
 #if BOOST_VERSION > 104500
     if (not fs::exists(pkgs, ec)) {
-        if (not fs::create_directories(getPackagesDir(), ec)) {
+        if (not fs::create_directories(getBinaryPackagesDir(), ec)) {
             throw FileError(fmt(
                     _("Failed to build VLE_HOME directory (%1%):\n%2%")) %
                 pkgs.string() % ec.message());
@@ -715,19 +389,7 @@ Path::Path()
 {
     initHomeDir();
     initPrefixDir();
-
-    updateDirs();
-
     initVleHomeDirectory();
-}
-
-void Path::updateDirs()
-{
-    if (utils::Package::package().name().empty()) {
-        initGlobalPluginDirs();
-    } else {
-        initPackagePluginDirs();
-    }
 }
 
 void Path::clearPluginDirs()
@@ -736,71 +398,6 @@ void Path::clearPluginDirs()
     m_stream.clear();
     m_output.clear();
     m_modeling.clear();
-}
-
-void Path::initGlobalPluginDirs()
-{
-    assert(utils::Package::package().name().empty());
-
-    clearPluginDirs();
-    m_currentPackagePath.clear();
-    m_currentPackageSourcePath.clear();
-}
-
-void Path::initPackagePluginDirs()
-{
-    assert(not utils::Package::package().name().empty());
-
-    clearPluginDirs();
-
-    {
-        fs::path binary = m_home;
-        binary /= pkgdirname;
-        binary /= utils::Package::package().name();
-
-        m_currentPackagePath = binary.string();
-    }
-
-    {
-        fs::path src = fs::current_path();
-        src /= utils::Package::package().name();
-
-        m_currentPackageSourcePath = src.string();
-    }
-
-    PathList result;
-    for (fs::directory_iterator it(getPackagesDir()), end; it != end; ++it) {
-        if (fs::is_directory(it->status())) {
-            fs::path package(*it);
-            package /= "plugins";
-            if (fs::is_directory(package)) {
-                {
-                    fs::path oov(package);
-                    oov = oov /  "output";
-
-                    if (fs::is_directory(oov)) {
-                        addStreamDir(oov.string());
-                    }
-                }
-                {
-                    fs::path gvleout(package);
-                    gvleout = gvleout / "gvle" / "output";
-
-                    if (fs::is_directory(gvleout)) {
-                        addOutputDir(gvleout.string());
-                    }
-                }
-                {
-                    fs::path gvlemod(package);
-                    gvlemod = gvlemod / "gvle" /  "output";
-
-                    if (fs::is_directory(gvlemod)) {
-                        addModelingDir(gvlemod.string());
-                    }
-                }
-            }
-        }
-    }
 }
 
 std::ostream& operator<<(std::ostream& out, const PathList& paths)
@@ -1044,24 +641,8 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "glade.................: " << p.getGladeDir() << "\n"
         << "\n"
         << "vle home..............: " << p.getHomeDir() << "\n"
-        << "packages..............: " << p.getPackagesDir() << "\n"
+        << "packages..............: " << p.getBinaryPackagesDir() << "\n"
         << "\n";
-
-    out << "Package dir...........: " << p.getPackageSourceDir() << "\n"
-        << "Package binary dir....: " << p.getPackageBinaryDir() << "\n"
-        << "Package lib dir.......: " << p.getPackageLibDir() << "\n"
-        << "Package scr dir.......: " << p.getPackageSrcDir() << "\n"
-        << "Package data dir......: " << p.getPackageDataDir() << "\n"
-        << "Package doc dir.......: " << p.getPackageDocDir() << "\n"
-        << "Package exp dir.......: " << p.getPackageExpDir() << "\n"
-        << "Package build dir.....: " << p.getPackageBuildDir() << "\n"
-        << "Package simulators....: " << p.getPackagePluginSimulatorDir() << "\n"
-        << "Package stream........: " << p.getPackagePluginOutputDir() << "\n"
-        << "Package gvle output...: " << p.getPackagePluginGvleOutputDir()
-        << "\n"
-        << "Package gvle modeling.: " << p.getPackagePluginGvleModelingDir()
-        << "\n" << "\n";
-
     out << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
         << "Real output list......:\n" << p.getOutputDirs() << "\n"
         << "Real modeling list....:\n" << p.getModelingDirs() << "\n"

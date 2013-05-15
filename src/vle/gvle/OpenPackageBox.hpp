@@ -32,6 +32,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/builder.h>
+#include <vle/utils/Package.hpp>
 
 namespace vle { namespace gvle {
 
@@ -43,7 +44,8 @@ namespace vle { namespace gvle {
 class OpenPackageBox
 {
 public:
-    OpenPackageBox(const Glib::RefPtr < Gtk::Builder >& xml);
+    OpenPackageBox(const Glib::RefPtr < Gtk::Builder >& xml,
+            vle::utils::Package& curr_pack);
 
     virtual ~OpenPackageBox();
 
@@ -80,6 +82,7 @@ private:
     Glib::RefPtr < Gtk::TreeSelection > mTreeSelection;
 
     std::string                     mName;
+    vle::utils::Package&            mCurrentPackage;
 
     void build();
     void onCancel();

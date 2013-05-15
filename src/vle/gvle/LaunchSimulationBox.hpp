@@ -29,6 +29,7 @@
 #define VLE_GVLE_LAUNCHSIMULATIONBOX_HPP
 
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/Package.hpp>
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/radiobutton.h>
@@ -49,7 +50,7 @@ class LaunchSimulationBox
 {
 public:
     LaunchSimulationBox(const Glib::RefPtr < Gtk::Builder >& xml,
-			const vpz::Vpz& file);
+			const vpz::Vpz& file, const vle::utils::Package& curr_pack);
 
     ~LaunchSimulationBox();
 
@@ -92,6 +93,8 @@ private:
     Glib::Thread* mThread;
     Glib::Mutex   mMutex;
     bool          mThreadRun;
+
+    const vle::utils::Package&      mCurrPackage;
 
     /* accessors to the protected variables */
     void setState(State state);

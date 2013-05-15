@@ -70,9 +70,11 @@ public:
 				    GVLE* gvle);
 
     ModelingPluginPtr getModelingPlugin(const std::string& package,
-                                        const std::string& library);
+                                        const std::string& library,
+                                        const std::string& curr_package);
 
-    ModelingPluginPtr getModelingPlugin(const std::string& pluginname);
+    ModelingPluginPtr getModelingPlugin(const std::string& pluginname,
+                                        const std::string& curr_package);
 
     OutputPluginPtr getOutputPlugin(const std::string& package,
                                     const std::string& library);

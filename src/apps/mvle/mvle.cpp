@@ -157,14 +157,15 @@ bool mvle_mpi_init(int *argc, char ***argv, uint32_t *rank, uint32_t *world)
     return result;
 }
 
-bool mvle_parse_arg(int argc, char **argv, int *vpz, bool *show)
+bool mvle_parse_arg(int argc, char **argv, int *vpz, bool *show,
+        vle::utils::Package& pack)
 {
     int i = 1;
 
     while (i < argc) {
         if ((std::strcmp(argv[i], "-P") == 0 or
              std::strcmp(argv[i], "--package") == 0) and i + 1 <= argc) {
-            vle::utils::Package::package().select(argv[++i]);
+            pack.select(argv[++i]);
         } else if (std::strcmp(argv[i], "-h") == 0 or
                    std::strcmp(argv[i], "--help") == 0) {
             mvle_show_help();
@@ -182,7 +183,7 @@ bool mvle_parse_arg(int argc, char **argv, int *vpz, bool *show)
         ++i;
     }
 
-    return *vpz < argc and not vle::utils::Package::package().name().empty();
+    return *vpz < argc and not pack.name().empty();
 }
 
 void mvle_show(const std::string& vpz)
@@ -236,13 +237,12 @@ int main(int argc, char **argv)
 
     if ((result = mvle_mpi_init(&argc, &argv, &rank, &world))) {
         int vpz;
-
-        if ((result = mvle_parse_arg(argc, argv, &vpz, &show))) {
+        vle::utils::Package pack;
+        if ((result = mvle_parse_arg(argc, argv, &vpz, &show, pack))) {
             if (show) {
                 while (vpz < argc) {
                     mvle_show(
-                        vle::utils::Path::path().
-                        getPackageExpFile(argv[vpz]));
+                        pack.getExpFile(argv[vpz], vle::utils::PKG_BINARY));
                     vpz++;
                 }
             } else {
@@ -258,8 +258,8 @@ int main(int argc, char **argv)
                     while (vpz < argc) {
                         vle::manager::Error error;
                         vle::value::Matrix *res = man.run(
-                            new vle::vpz::Vpz(vle::utils::Path::path().
-                                              getPackageExpFile(argv[vpz])),
+                            new vle::vpz::Vpz(pack.getExpFile(argv[vpz],
+                                    vle::utils::PKG_BINARY)),
                             modules,
                             1,
                             rank,

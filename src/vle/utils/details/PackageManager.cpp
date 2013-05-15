@@ -58,7 +58,7 @@ static bool rebuild__(Packages *out)
 {
     namespace fs = boost::filesystem;
 
-    fs::path pkgsdir(utils::Path::path().getPackagesDir());
+    fs::path pkgsdir(utils::Path::path().getBinaryPackagesDir());
     PackageParser parser;
 
     if (fs::exists(pkgsdir) and fs::is_directory(pkgsdir)) {

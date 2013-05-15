@@ -230,9 +230,10 @@ static devs::Dynamics* buildNewDynamicsWrapper(
     fctdw fct = utils::functionCast < fctdw >(symbol);
 
     try {
+        utils::PackageTable pkg_table;
         return fct(DynamicsWrapperInit(
                 *atom->getStructure(),
-                utils::Package::package().getId(dyn.package()),
+                pkg_table.get(dyn.package()),
                 dyn.library()), events);
     } catch(const std::exception& e) {
         throw utils::ModellingError(
@@ -256,9 +257,10 @@ static devs::Dynamics* buildNewDynamics(
     fctdyn fct = utils::functionCast < fctdyn >(symbol);
 
     try {
+        utils::PackageTable pkg_table;
         return fct(DynamicsInit(
                 *atom->getStructure(),
-                utils::Package::package().getId(dyn.package())),
+                pkg_table.get(dyn.package())),
             events);
     } catch(const std::exception& e) {
         throw utils::ModellingError(
@@ -282,9 +284,10 @@ static devs::Dynamics* buildNewExecutive(
     fctexe fct = utils::functionCast < fctexe >(symbol);
 
     try {
+        utils::PackageTable pkg_table;
         return fct(ExecutiveInit(
                 *atom->getStructure(),
-                utils::Package::package().getId(dyn.package()),
+                pkg_table.get(dyn.package()),
                 coordinator), events);
     } catch(const std::exception& e) {
         throw utils::ModellingError(
