@@ -32,13 +32,15 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/button.h>
+#include <vle/utils/Package.hpp>
 
 namespace vle { namespace gvle {
 
 class NewDynamicsBox
 {
 public:
-    NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml);
+    NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml,
+            const vle::utils::Package& curr_pack);
     ~NewDynamicsBox();
 
     std::string getClassName() const
@@ -64,6 +66,8 @@ private:
     Gtk::Button*                    mButtonCancel;
 
     std::list < sigc::connection >      mList;
+
+    const vle::utils::Package&      mCurrPackage;
 };
 
 }} // namespace vle gvle

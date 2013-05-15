@@ -122,7 +122,7 @@ void DynamicBox::makeComboPackage()
 {
     mComboPackage->clear();
 
-    utils::PathList paths = utils::Path::path().getInstalledPackages();
+    utils::PathList paths = utils::Path::path().getBinaryPackages();
 
     std::sort(paths.begin(), paths.end());
     for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
@@ -161,7 +161,7 @@ void DynamicBox::onNewLibrary()
     OpenModelingPluginBox box(mXml, mGVLE);
 
     if (box.run() == Gtk::RESPONSE_OK) {
-        NewDynamicsBox box2(mXml);
+        NewDynamicsBox box2(mXml, mGVLE->currentPackage());
 
         if (box2.run() == Gtk::RESPONSE_OK and
             not box2.getClassName().empty() and
@@ -182,8 +182,8 @@ int DynamicBox::execPlugin(const std::string& pluginname,
                            const std::string& namespace_)
 {
     ModelingPluginPtr plugin =
-        mGVLE->pluginFactory().getModelingPlugin(pluginname);
-
+        mGVLE->pluginFactory().getModelingPlugin(pluginname,
+                mGVLE->currentPackage().name());
     if (plugin->create(mAtom, mDynamic, mConditions,
                        mObservables, classname, namespace_)) {
         const std::string& buffer = plugin->source();

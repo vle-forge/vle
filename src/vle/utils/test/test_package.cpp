@@ -195,9 +195,8 @@ BOOST_AUTO_TEST_CASE(show_path)
     fs::current_path(tmp);
 #endif
 
-
-    Package::package().select("x");
-    vle::utils::Package::package().create();
+    Package pkg("x");
+    pkg.create();
 }
 
 BOOST_AUTO_TEST_CASE(show_package)
@@ -227,16 +226,12 @@ BOOST_AUTO_TEST_CASE(show_package)
     fs::current_path(tmp);
 #endif
 
-    std::cout << "Current path: " << fs::current_path() << "\n";
-    vle::utils::Package::package().refresh();
-    vle::utils::Package::package().select("tmp");
-    vle::utils::Package::package().create();
-    std::cout << "package configure\n";
-    vle::utils::Package::package().configure();
-    std::cout << "package build\n";
-    vle::utils::Package::package().build();
-    std::cout << "package install\n";
-    vle::utils::Package::package().install();
+    Package pkg("tmp");
+
+    pkg.create();
+    pkg.configure();
+    pkg.build();
+    pkg.install();
 
     /* We need to ensure each file really installed. */
 #ifdef _WIN32
@@ -246,13 +241,14 @@ BOOST_AUTO_TEST_CASE(show_package)
 #endif
 
     std::cout << "Installed packages:\n";
-    PathList lst = Path::path().getInstalledPackages();
+    PathList lst = Path::path().getBinaryPackages();
     std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
                   std::cout, "\n"));
 
-    if (not fs::exists(Path::path().getPackageExpDir())) {
-        std::cout << "Installed vpz:\n";
-        PathList vpz = Path::path().getInstalledExperiments();
+
+    if (not fs::exists(pkg.getExpDir(vle::utils::PKG_BINARY))) {
+        std::cout << "Installed vpz  :\n";
+        PathList vpz = pkg.getExperiments();
         std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
                 std::cout, "\n"));
     }
@@ -275,6 +271,7 @@ BOOST_AUTO_TEST_CASE(remote_package_check_2_package_tmp_and_x)
         rmt.start(utils::REMOTE_MANAGER_LOCAL_SEARCH, ".*", NULL);
         rmt.join();
         rmt.getResult(&results);
+
         BOOST_REQUIRE_EQUAL(results.empty(), false);
         BOOST_REQUIRE_EQUAL(results.size(), 1u); /* We only build the tmp
                                                     package, not x. */
@@ -505,10 +502,10 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
         fs::path unique = "check";
 #endif
 
-        vle::utils::Package::package().select(unique.string());
-        vle::utils::Package::package().create();
+        vle::utils::Package pkg(unique.string());
+        pkg.create();
 
-        filepath = vle::utils::Path::path().getPackageSourceDir();
+        filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
         uniquepath = unique.string();
     } catch (...) {
         BOOST_REQUIRE(false);
@@ -523,8 +520,7 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
 #endif
     tarfile /= "check.tar.bz2";
 
-
-    fs::current_path(vle::utils::Path::path().getPackagesDir());
+    fs::current_path(vle::utils::Path::path().getBinaryPackagesDir());
 
     BOOST_REQUIRE_NO_THROW(utils::Path::path().compress(uniquepath,
                                                         tarfile.string()));

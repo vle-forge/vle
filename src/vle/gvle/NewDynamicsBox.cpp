@@ -26,12 +26,12 @@
 
 
 #include <vle/gvle/NewDynamicsBox.hpp>
-#include <vle/utils/Package.hpp>
 
 namespace vle { namespace gvle {
 
-NewDynamicsBox::NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml):
-    mXml(xml)
+NewDynamicsBox::NewDynamicsBox(const Glib::RefPtr < Gtk::Builder >& xml,
+        const vle::utils::Package& curr_pack):
+    mXml(xml), mCurrPackage(curr_pack)
 {
     xml->get_widget("DialogNewDynamics", mDialog);
     xml->get_widget("EntryClassName", mEntryClassName);
@@ -68,7 +68,7 @@ void NewDynamicsBox::onCancel()
 
 int NewDynamicsBox::run()
 {
-    mEntryNamespace->set_text(utils::Package::package().name());
+    mEntryNamespace->set_text(mCurrPackage.name());
     mDialog->show_all();
     return mDialog->run();
 }

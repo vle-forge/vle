@@ -108,9 +108,9 @@ static int show_version()
 static int show_package_list()
 {
     std::cout << vle::fmt(_("Packages from: `%1%'\n")) %
-        vle::utils::Path::path().getPackagesDir();
+        vle::utils::Path::path().getBinaryPackagesDir();
 
-    vle::utils::PathList vpz = vle::utils::Path::path().getInstalledPackages();
+    vle::utils::PathList vpz = vle::utils::Path::path().getBinaryPackages();
     std::sort(vpz.begin(), vpz.end());
 
     std::copy(vpz.begin(), vpz.end(),
@@ -150,37 +150,75 @@ static int remove_configuration_file()
     return ret;
 }
 
-static void show_package_content()
+static void show_package_content(vle::utils::Package& pkg)
 {
+
     std::cout << vle::fmt(_("Package content from: `%1%'\n")) %
-        vle::utils::Path::path().getPackageBinaryDir();
+            pkg.getDir(vle::utils::PKG_BINARY);
 
     vle::utils::PathList tmp;
 
-    tmp = vle::utils::Path::path().getInstalledExperiments();
+    vle::utils::Package pack(pkg.name());
+    try {
+        tmp = pack.getExperiments();
+    } catch (const std::exception &e) {
+        std::cerr << vle::fmt(_("Show package content error: %1%\n")) % e.what();
+        return;
+    }
+    std::cout << "-- experiments : " << std::endl;
     std::sort(tmp.begin(), tmp.end());
     std::copy(tmp.begin(), tmp.end(),
               std::ostream_iterator < std::string >(std::cout, "\n"));
 
-    tmp = vle::utils::Path::path().getInstalledLibraries();
+    tmp = pkg.getPluginsSimulator();
+
+    std::cout << "-- simulator plugins : " << std::endl;
+    std::sort(tmp.begin(), tmp.end());
+    std::copy(tmp.begin(), tmp.end(),
+              std::ostream_iterator < std::string >(std::cout, "\n"));
+
+    tmp = pkg.getPluginsOutput();
+
+    std::cout << "-- output plugins : " << std::endl;
+    std::sort(tmp.begin(), tmp.end());
+    std::copy(tmp.begin(), tmp.end(),
+              std::ostream_iterator < std::string >(std::cout, "\n"));
+
+    tmp = pkg.getPluginsGvleGlobal();
+
+    std::cout << "-- gvle global plugins : " << std::endl;
+    std::sort(tmp.begin(), tmp.end());
+    std::copy(tmp.begin(), tmp.end(),
+              std::ostream_iterator < std::string >(std::cout, "\n"));
+
+    tmp = pkg.getPluginsGvleModeling();
+
+    std::cout << "-- gvle modeling plugins : " << std::endl;
+    std::sort(tmp.begin(), tmp.end());
+    std::copy(tmp.begin(), tmp.end(),
+              std::ostream_iterator < std::string >(std::cout, "\n"));
+
+    tmp = pkg.getPluginsGvleOutput();
+
+    std::cout << "-- gvle output plugins : " << std::endl;
     std::sort(tmp.begin(), tmp.end());
     std::copy(tmp.begin(), tmp.end(),
               std::ostream_iterator < std::string >(std::cout, "\n"));
 }
 
-static std::string search_vpz(const std::string &param)
+static std::string search_vpz(const std::string &param,
+        vle::utils::Package& pkg)
 {
-    assert(not vle::utils::Package::package().name().empty());
-
+    assert(not pkg.name().empty());
     if (vle::utils::Path::existFile(param))
         return param;
 
-    std::string np = vle::utils::Path::path().getPackageExpFile(param);
+    std::string np = pkg.getExpFile(param, vle::utils::PKG_BINARY);
 
     if (vle::utils::Path::existFile(np))
         return np;
 
-    std::cerr << vle::fmt(_("Filename '%1%' does not existi")) % param;
+    std::cerr << vle::fmt(_("Filename '%1%' does not exist")) % param;
 
     return std::string();
 }
@@ -200,7 +238,7 @@ static vle::manager::LogOptions convert_log_mode()
 }
 
 static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
-        int processor)
+        int processor, vle::utils::Package& pkg)
 {
     vle::manager::Manager man(convert_log_mode(),
                               vle::manager::SIMULATION_NONE |
@@ -211,7 +249,8 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
 
     for (; it != end; ++it) {
         vle::manager::Error error;
-        vle::value::Matrix *res = man.run(new vle::vpz::Vpz(search_vpz(*it)),
+        vle::value::Matrix *res = man.run(new vle::vpz::Vpz(
+                                               search_vpz(*it, pkg)),
                 modules,
                 processor,
                 0,
@@ -232,7 +271,7 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
 }
 
 static int run_simulation(CmdArgs::const_iterator it,
-        CmdArgs::const_iterator end)
+        CmdArgs::const_iterator end, vle::utils::Package& pkg)
 {
     vle::manager::Simulation sim(convert_log_mode(),
                                  vle::manager::SIMULATION_NONE |
@@ -243,7 +282,7 @@ static int run_simulation(CmdArgs::const_iterator it,
 
     for (; it != end; ++it) {
         vle::manager::Error error;
-        vle::value::Map *res = sim.run(new vle::vpz::Vpz(search_vpz(*it)),
+        vle::value::Map *res = sim.run(new vle::vpz::Vpz(search_vpz(*it, pkg)),
                                        modules,
                                        &error);
 
@@ -260,28 +299,20 @@ static int run_simulation(CmdArgs::const_iterator it,
     return success;
 }
 
-static bool init_current_package(const std::string &packagename,
-        const CmdArgs &args)
+static bool init_package(vle::utils::Package& pkg, const CmdArgs &args)
 {
-    if (not vle::utils::Package::package().existsPackage(packagename)) {
-        if (not vle::utils::Path::existDirectory(packagename)) {
+
+    if (not pkg.existsBinary()) {
+        if (not pkg.existsSource()) {
             if (std::find(args.begin(), args.end(), "create") == args.end()) {
                 std::cerr << vle::fmt(
                     _("Package `%1%' does not exist. Use the create command"
-                      " before other command.\n")) % packagename;
+                      " before other command.\n")) % pkg.name();
 
                 return false;
             }
         }
-
-        vle::utils::Package::package().refresh();
-        vle::utils::Package::package().select(packagename);
-        vle::utils::Package::package().create();
-    } else {
-        vle::utils::Package::package().refresh();
-        vle::utils::Package::package().select(packagename);
     }
-
     return true;
 }
 
@@ -292,43 +323,45 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     CmdArgs::const_iterator end = args.end();
     bool stop = false;
 
-    if (not init_current_package(packagename, args))
+    vle::utils::Package pkg(packagename);
+
+    if (not init_package(pkg, args))
         return EXIT_FAILURE;
+
 
     for (; not stop and it != end; ++it) {
         if (*it == "create") {
-            vle::utils::Package::package().create();
+            pkg.create();
         } else if (*it == "configure") {
-            vle::utils::Package::package().configure();
-            vle::utils::Package::package().wait(std::cerr, std::cerr);
-            stop = not vle::utils::Package::package().isSuccess();
+            pkg.configure();
+            pkg.wait(std::cerr, std::cerr);
+            stop = not pkg.isSuccess();
         } else if (*it == "build") {
-            vle::utils::Package::package().build();
-            vle::utils::Package::package().wait(std::cerr, std::cerr);
-            if (vle::utils::Package::package().isSuccess()) {
-                vle::utils::Package::package().install();
-                vle::utils::Package::package().wait(std::cerr, std::cerr);
+            pkg.build();
+            pkg.wait(std::cerr, std::cerr);
+            if (pkg.isSuccess()) {
+                pkg.install();
+                pkg.wait(std::cerr, std::cerr);
             }
-            stop = not vle::utils::Package::package().isSuccess();
+            stop = not pkg.isSuccess();
         } else if (*it == "test") {
-            vle::utils::Package::package().test();
-            vle::utils::Package::package().wait(std::cerr, std::cerr);
-            stop = not vle::utils::Package::package().isSuccess();
+            pkg.test();
+            pkg.wait(std::cerr, std::cerr);
+            stop = not pkg.isSuccess();
         } else if (*it == "install") {
-            vle::utils::Package::package().install();
-            vle::utils::Package::package().wait(std::cerr, std::cerr);
-            stop = not vle::utils::Package::package().isSuccess();
+            pkg.install();
+            pkg.wait(std::cerr, std::cerr);
+            stop = not pkg.isSuccess();
         } else if (*it == "clean") {
-            vle::utils::Package::package().clean();
-            vle::utils::Package::package().wait(std::cerr, std::cerr);
-            stop = not vle::utils::Package::package().isSuccess();
+            pkg.clean();
+            pkg.wait(std::cerr, std::cerr);
+            stop = not pkg.isSuccess();
         } else if (*it == "rclean") {
-            vle::utils::Package::removePackageBinary(
-                vle::utils::Package::package().name());
+            pkg.rclean();
         } else if (*it == "package") {
-            vle::utils::Package::package().pack();
-            vle::utils::Package::package().wait(std::cerr, std::cerr);
-            stop = not vle::utils::Package::package().isSuccess();
+            pkg.pack();
+            pkg.wait(std::cerr, std::cerr);
+            stop = not pkg.isSuccess();
         } else if (*it == "all") {
             std::cerr << "all is not yet implemented\n";
             stop = true;
@@ -336,7 +369,7 @@ static int manage_package_mode(const std::string &packagename, bool manager,
             std::cerr << "Depends is not yet implemented\n";
             stop = true;
         } else if (*it == "list") {
-            show_package_content();
+            show_package_content(pkg);
         } else {
             break;
         }
@@ -356,9 +389,9 @@ static int manage_package_mode(const std::string &packagename, bool manager,
         vle::value::Value::deallocated = 0;
 #endif
         if (manager)
-            ret = run_manager(it, end, processor);
+            ret = run_manager(it, end, processor, pkg);
         else
-            ret = run_simulation(it, end);
+            ret = run_simulation(it, end, pkg);
 
 #ifndef NDEBUG
         std::cerr << vle::fmt(_("\n - Debug mode:\n"

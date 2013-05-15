@@ -35,12 +35,6 @@ PackageTable::PackageTable()
     m_current = m_table.insert(std::string()).first;
 }
 
-void PackageTable::current(const std::string& package)
-{
-    std::pair < const_iterator, bool > r = m_table.insert(package);
-    m_current = r.first;
-}
-
 PackageTable::index PackageTable::get(const std::string& package)
 {
     return m_table.insert(package).first;

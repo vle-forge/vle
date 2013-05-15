@@ -70,15 +70,16 @@ void OpenVpzBox::build()
 {
     mRefTreeVpz->clear();
 
-    utils::PathList list = utils::Path::path().getInstalledExperiments();
+    utils::PathList list = mGVLE->currentPackage().getExperiments(
+            vle::utils::PKG_SOURCE);
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
-	Gtk::TreeModel::Row row(*mRefTreeVpz->append());
-        size_t begin = utils::Path::path().getPackageExpDir().size() + 1;
+        Gtk::TreeModel::Row row(*mRefTreeVpz->append());
+        size_t begin = mGVLE->currentPackage().getDir(
+                vle::utils::PKG_SOURCE).size() + 1;
         std::string name(*it, begin, it->size() - begin - 4);
-
-	row[mColumns.mName] = name;
-	++it;
+        row[mColumns.mName] = name;
+        ++it;
     }
 }
 
@@ -95,19 +96,20 @@ OpenVpzBox::~OpenVpzBox()
 
 void OpenVpzBox::onApply()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection
-	= mTreeView->get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
+            mTreeView->get_selection();
 
     if (refSelection) {
-	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
 
-	if (iter) {
-	    Gtk::TreeModel::Row row = *iter;
-	    std::string name = row.get_value(mColumns.mName);
-	    std::string pathFile = Glib::build_filename(
-		utils::Path::path().getPackageExpDir(), name);
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            std::string name = row.get_value(mColumns.mName);
+            std::string pathFile = Glib::build_filename(
+                    mGVLE->currentPackage().getDir(
+                            vle::utils::PKG_SOURCE), name);
 
-	    pathFile += ".vpz";
+            pathFile += ".vpz";
 
             mGVLE->parseXML(pathFile);
             mGVLE->getEditor()->openTabVpz(mModeling->getFileName(),

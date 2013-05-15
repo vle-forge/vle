@@ -27,13 +27,13 @@
 
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {
 
-OpenPackageBox::OpenPackageBox(const Glib::RefPtr < Gtk::Builder >& xml)
-    : mXml(xml)
+OpenPackageBox::OpenPackageBox(const Glib::RefPtr < Gtk::Builder >& xml,
+        vle::utils::Package& curr_pack)
+    : mXml(xml), mCurrentPackage(curr_pack)
 {
     xml->get_widget("DialogPackage", mDialog);
     xml->get_widget("TreeViewPackage", mTreeView);
@@ -97,7 +97,7 @@ void OpenPackageBox::build()
     mTreeModel->clear();
     mName.clear();
 
-    utils::PathList list = utils::Path::path().getInstalledPackages();
+    utils::PathList list = utils::Path::path().getBinaryPackages();
 
     std::sort(list.begin(), list.end());
     for (utils::PathList::const_iterator it = list.begin();
@@ -154,7 +154,7 @@ void OpenPackageBox::onRemoveCallBack(const Gtk::TreeModel::iterator& it)
 
     if (row) {
         Glib::ustring package = row[mColumns.mName];
-        utils::Package::package().removePackage(package.raw());
+        mCurrentPackage.remove(package.raw(), vle::utils::PKG_SOURCE);
     }
 }
 

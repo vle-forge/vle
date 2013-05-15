@@ -91,115 +91,133 @@ ExternalEvent* Dynamics::buildEventWithAString(
 
 std::string Dynamics::getPackageDir() const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageBinaryDir();
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getDir(vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageDir(*m_packageid);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageSimulatorDir() const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackagePluginSimulatorDir();
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getPluginSimulatorDir(vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackagePluginSimulatorDir(
-            *m_packageid);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageSrcDir() const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageSrcDir();
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getSrcDir(vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageSrcDir(*m_packageid);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageDataDir() const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageDataDir();
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getDataDir(vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageDataDir(*m_packageid);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageDocDir() const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageDocDir();
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getDocDir(vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageDocDir(*m_packageid);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageExpDir() const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageExpDir();
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getExpDir(vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageExpDir(*m_packageid);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageFile(const std::string& name) const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageFile(name);
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getFile(name, vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageFile(*m_packageid, name);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageLibFile(const std::string& name) const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageLibFile(name);
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getLibFile(name, vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageLibFile(*m_packageid,
-                                                             name);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageSrcFile(const std::string& name) const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageSrcFile(name);
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getSrcFile(name, vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageSrcFile(*m_packageid,
-                                                             name);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageDataFile(const std::string& name) const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageDataFile(name);
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getDataFile(name, vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageDataFile(*m_packageid,
-                                                              name);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageDocFile(const std::string& name) const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageDocFile(name);
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getDocFile(name, vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageDocFile(*m_packageid,
-                                                             name);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 
 std::string Dynamics::getPackageExpFile(const std::string& name) const
 {
-    if (utils::Package::package().name() == *m_packageid) {
-        return utils::Path::path().getPackageExpFile(name);
+    vle::utils::Package pkg(*m_packageid);
+    if (pkg.existsBinary()) {
+        return pkg.getExpFile(name, vle::utils::PKG_BINARY);
     } else {
-        return utils::Path::path().getExternalPackageExpFile(*m_packageid,
-                                                             name);
+        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
+                "installed")) % *m_packageid);
     }
 }
 

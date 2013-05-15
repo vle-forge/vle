@@ -113,8 +113,10 @@ GlobalPluginPtr PluginFactory::getGlobalPlugin(const std::string& pluginname,
     return getGlobalPlugin(package, library, gvle);
 }
 
-ModelingPluginPtr PluginFactory::getModelingPlugin(const std::string& package,
-                                                   const std::string& library)
+ModelingPluginPtr PluginFactory::getModelingPlugin(
+        const std::string& package,
+        const std::string& library,
+        const std::string& curr_package)
 {
     ModelingPluginPtr modelingPluginPtr;
     ModelingPluginList::iterator it;
@@ -133,20 +135,23 @@ ModelingPluginPtr PluginFactory::getModelingPlugin(const std::string& package,
 
         fct = utils::functionCast < GvleModelingPluginSlot >(symbol);
 
-        modelingPluginPtr = ModelingPluginPtr(fct(package, library));
+        modelingPluginPtr = ModelingPluginPtr(
+                fct(package, library, curr_package));
         mPimpl->mModelingPluginList[symbol] = modelingPluginPtr;
     }
 
     return modelingPluginPtr;
 }
 
-ModelingPluginPtr PluginFactory::getModelingPlugin(const std::string& pluginname)
+ModelingPluginPtr PluginFactory::getModelingPlugin(
+        const std::string& pluginname,
+        const std::string& curr_package)
 {
     std::string package, library;
 
     buildPackageLibraryNames(pluginname, &package, &library);
 
-    return getModelingPlugin(package, library);
+    return getModelingPlugin(package, library, curr_package);
 }
 
 OutputPluginPtr PluginFactory::getOutputPlugin(const std::string& package,

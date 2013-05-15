@@ -63,16 +63,16 @@ void NewProjectBox::show()
 void NewProjectBox::apply()
 {
     if (not mEntryName->get_text().empty()) {
-	if (not exist(mEntryName->get_text())) {
-	    mGVLE->getEditor()->closeAllTab();
-	    mModeling->clearModeling();
-            mGVLE->setTitle(mModeling->getFileName());
-            utils::Package::package().select(mEntryName->get_text());
-            mGVLE->pluginFactory().update();
-	    vle::utils::Package::package().create();
-	    mGVLE->buildPackageHierarchy();
-            mGVLE->getMenu()->onOpenProject();
-	} else {
+    if (not exist(mEntryName->get_text())) {
+        mGVLE->getEditor()->closeAllTab();
+        mModeling->clearModeling();
+        mGVLE->setTitle(mModeling->getFileName());
+        mGVLE->currentPackage().select(mEntryName->get_text());
+        mGVLE->pluginFactory().update();
+        mGVLE->currentPackage().create();
+        mGVLE->buildPackageHierarchy();
+        mGVLE->getMenu()->onOpenProject();
+    } else {
             Error(fmt(_("The project `%1%' already exists in VLE home "
                          "directory")) % mEntryName->get_text().raw());
 	}
@@ -81,13 +81,13 @@ void NewProjectBox::apply()
 
 bool NewProjectBox::exist(const std::string& name)
 {
-    utils::PathList list = utils::Path::path().getInstalledPackages();
+    utils::PathList list = utils::Path::path().getBinaryPackages();
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
-	if (utils::Path::basename(*it) == name) {
-	    return true;
-	}
-	++it;
+        if (utils::Path::basename(*it) == name) {
+            return true;
+        }
+        ++it;
     }
     return false;
 }

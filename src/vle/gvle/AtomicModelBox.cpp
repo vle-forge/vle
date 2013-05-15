@@ -931,7 +931,8 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                 tpl.tag(pluginname, packagename, conf);
                 ModelingPluginPtr plugin =
                     mGVLE->pluginFactory().getModelingPlugin(packagename,
-                                                             pluginname);
+                                      pluginname,
+                                      mGVLE->currentPackage().name());
 
                 if (plugin->modify(*mAtom, dynamic, *mConditions,
                                    *mObservables, conf, tpl.buffer())) {
@@ -1045,7 +1046,7 @@ void AtomicModelBox::DynamicTreeView::onNewLibrary()
             OpenModelingPluginBox box1(mXml, mGVLE);
 
             if (box1.run() == Gtk::RESPONSE_OK) {
-                NewDynamicsBox box2(mXml);
+                NewDynamicsBox box2(mXml, mGVLE->currentPackage());
 
                 if (box2.run() == Gtk::RESPONSE_OK and
                     not box2.getClassName().empty() and
@@ -1056,8 +1057,7 @@ void AtomicModelBox::DynamicTreeView::onNewLibrary()
                             box2.getClassName(),
                             box2.getNamespace()) == Gtk::RESPONSE_OK) {
                         dyn.setLibrary(box2.getClassName());
-                        dyn.setPackage(
-                            vle::utils::Package::package().name());
+                        dyn.setPackage(mGVLE->currentPackage().name());
                         mDynamics->add(dyn);
                         build();
 
@@ -1076,7 +1076,8 @@ int AtomicModelBox::DynamicTreeView::execPlugin(
     const std::string& namespace_)
 {
     ModelingPluginPtr plugin =
-        mGVLE->pluginFactory().getModelingPlugin(pluginname);
+        mGVLE->pluginFactory().getModelingPlugin(pluginname,
+                mGVLE->currentPackage().name());
 
     if (plugin->create(*mAtom, dynamic, *mConditions,
                        *mObservables, classname, namespace_)) {

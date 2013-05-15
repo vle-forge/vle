@@ -46,19 +46,6 @@ namespace vle { namespace utils {
         PackageTable();
 
         /**
-         * @brief Assign a new current package.
-         * @param package The new package. Can be null if no package is
-         * defined.
-         */
-        void current(const std::string& package);
-
-        /**
-         * @brief Get the current selected package.
-         * @return A constant reference to the selected package.
-         */
-        const std::string& current() const { return *m_current; }
-
-        /**
          * @brief Get an index to the specified package, if package does not
          * exist it is added.
          * @param package The package to get or add.

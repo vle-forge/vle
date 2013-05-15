@@ -29,7 +29,7 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/version.hpp>
 #include <boost/unordered_map.hpp>
@@ -643,7 +643,7 @@ void ModuleManager::browse()
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    fs::path packages = utils::Path::path().getPackagesDir();
+    fs::path packages = utils::Path::path().getBinaryPackagesDir();
 
     fs::path pathsim = "plugins/simulator";
     fs::path pathoov = "plugins/output";
@@ -720,7 +720,7 @@ void ModuleManager::browse(ModuleType type)
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    fs::path packages = utils::Path::path().getPackagesDir();
+    fs::path packages = utils::Path::path().getBinaryPackagesDir();
 
     fs::path pathtype;
 
@@ -766,7 +766,7 @@ void ModuleManager::browse(const std::string& package)
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    fs::path pkg = utils::Path::path().getPackagesDir();
+    fs::path pkg = utils::Path::path().getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 
@@ -806,7 +806,7 @@ void ModuleManager::browse(const std::string& package, ModuleType type)
 {
     boost::mutex::scoped_lock lock(mPimpl->mMutex);
 
-    fs::path pkg = utils::Path::path().getPackagesDir();
+    fs::path pkg = utils::Path::path().getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 
@@ -989,29 +989,25 @@ std::string ModuleManager::buildModuleFilename(const std::string& package,
                                                ModuleType type)
 {
     fs::path current;
+    vle::utils::Package pkg(package);
 
     switch (type) {
         case MODULE_DYNAMICS:
         case MODULE_DYNAMICS_EXECUTIVE:
         case MODULE_DYNAMICS_WRAPPER:
-            current = Path::path().getExternalPackagePluginSimulatorDir(
-                package);
+            current = pkg.getPluginSimulatorDir(PKG_BINARY);
             break;
         case MODULE_OOV:
-            current = Path::path().getExternalPackagePluginOutputDir(
-                package);
+            current = pkg.getPluginOutputDir(PKG_BINARY);
             break;
         case MODULE_GVLE_GLOBAL:
-            current = Path::path().getExternalPackagePluginGvleGlobalDir(
-                package);
+            current = pkg.getPluginGvleGlobalDir(PKG_BINARY);
             break;
         case MODULE_GVLE_MODELING:
-            current = Path::path().getExternalPackagePluginGvleModelingDir(
-                package);
+            current = pkg.getPluginGvleModelingDir(PKG_BINARY);
             break;
         case MODULE_GVLE_OUTPUT:
-            current = Path::path().getExternalPackagePluginGvleOutputDir(
-                package);
+            current = pkg.getPluginGvleOutputDir(PKG_BINARY);
             break;
         default:
             throw utils::InternalError();
