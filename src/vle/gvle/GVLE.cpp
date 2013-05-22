@@ -44,7 +44,6 @@
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/gvle/OpenPackageBox.hpp>
-#include <vle/gvle/NewProjectBox.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -103,15 +102,12 @@ GVLE::GVLE(BaseObjectType* cobject,
 
     Settings::settings().load();
 
-    mGlobalVpzPrevDirPath = "";
-
     mConditionsBox = new ConditionsBox(mRefXML, this);
     mPreferencesBox = new PreferencesBox(mRefXML);
     mAtomicBox = new AtomicModelBox(mRefXML, mModeling, this);
     mImportModelBox = new ImportModelBox(mRefXML, mModeling);
     mCoupledBox = new CoupledModelBox(xml, mModeling, this);
     mImportClassesBox = new ImportClassesBox(xml, mModeling, this);
-    mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling, this);
     mSaveVpzBox = new SaveVpzBox(mRefXML, mModeling, this);
     mQuitBox = new QuitBox(mRefXML, this);
 
@@ -195,7 +191,6 @@ GVLE::~GVLE()
     delete mImportClassesBox;
     delete mConditionsBox;
     delete mPreferencesBox;
-    delete mOpenVpzBox;
     delete mSaveVpzBox;
     delete mQuitBox;
     delete mMenuAndToolbar;
@@ -646,8 +641,40 @@ void GVLE::onNewNamedVpz(const std::string& path, const std::string& filename)
 
 void GVLE::onNewProject()
 {
-    NewProjectBox box(mRefXML, mModeling, this);
-    box.show();
+    Gtk::FileChooserDialog box(*this, "New project",
+                               Gtk::FILE_CHOOSER_ACTION_SAVE);
+    box.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    box.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
+    box.set_response_sensitive(Gtk::RESPONSE_ACCEPT, true);
+    box.set_default_response(Gtk::RESPONSE_ACCEPT);
+    box.set_create_folders(true);
+
+    int result = box.run();
+    switch (result) {
+    case Gtk::RESPONSE_ACCEPT:
+        {
+            std::string dirname = Glib::path_get_dirname(box.get_filename());
+            std::string basename = Glib::path_get_basename(box.get_filename());
+            if (not basename.empty()) {
+                if (g_chdir(dirname.c_str()) == 0) {
+                    getEditor()->closeAllTab();
+                    mModeling->clearModeling();
+                    setTitle(mModeling->getFileName());
+                    currentPackage().select(basename);
+                    pluginFactory().update();
+                    currentPackage().create();
+                    buildPackageHierarchy();
+                    getMenu()->onOpenProject();
+                }
+            }
+        }
+        break;
+    default:
+        if (not mCurrPackage.existsSource()) {
+            onCloseProject();
+        }
+        break;
+    }
     mMenuAndToolbar->onOpenProject();
     clearModelTreeBox();
     clearModelClassBox();
@@ -701,63 +728,39 @@ void GVLE::onOpenVpz()
         (mModeling->isModified() and
          gvle::Question(_("Do you really want load a new Model ?\nCurrent "
                           "model will be destroy and not save")))) {
-        try {
-            if (mOpenVpzBox->run() == Gtk::RESPONSE_OK) {
-                redrawModelTreeBox();
-                redrawModelClassBox();
-                mMenuAndToolbar->onOpenVpz();
-                mModelTreeBox->set_sensitive(true);
-                mModelClassBox->set_sensitive(true);
-                mEditor->getDocumentDrawingArea()->updateCursor();
-                if (mCurrentButton == VLE_GVLE_POINTER){
-                    showMessage(_("Selection"));
-                }
-            }
-        } catch(utils::InternalError) {
-            Error((fmt(_("No experiments in the package '%1%'")) %
-                   mCurrPackage.name()).str());
-        }
-    }
-}
 
-void GVLE::onOpenGlobalVpz()
-{
-    if (not mModeling->isModified() or mModeling->getFileName().empty() or
-        (mModeling->isModified() and
-         gvle::Question(_("Do you really want load a new Model ?\nCurrent "
-                          "model will be destroy and not save")))) {
-        Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
-        file.set_transient_for(*this);
+        Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
+
         file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
         file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
         Gtk::FileFilter filter;
         filter.set_name(_("Vle Project gZipped"));
         filter.add_pattern("*.vpz");
         file.add_filter(filter);
-        if (mGlobalVpzPrevDirPath != "") {
-            file.set_current_folder(mGlobalVpzPrevDirPath);
-        }
+        std::string expDir = currentPackage().getExpDir(vle::utils::PKG_SOURCE);
+        file.set_current_folder(expDir);
 
-        if (file.run() == Gtk::RESPONSE_OK) {
-            mGlobalVpzPrevDirPath = file.get_current_folder();
-            mEditor->closeAllTab();
-            mCurrPackage.select("");
-            mPluginFactory.update();
-            parseXML(file.get_filename());
+        int response = file.run();
+        file.hide();
+
+        if (response == Gtk::RESPONSE_OK) {
+            std::string vpz_file = file.get_filename();
+
+            parseXML(vpz_file);
             getEditor()->openTabVpz(mModeling->getFileName(),
                                     mModeling->getTopModel());
-            if (mModeling->getTopModel()) {
-                redrawModelTreeBox();
-                redrawModelClassBox();
-                mModelTreeBox->set_sensitive(true);
-                mModelClassBox->set_sensitive(true);
-                mMenuAndToolbar->onOpenVpz();
-                mMenuAndToolbar->hideCloseProject();
-                mFileTreeView->clear();
+
+            redrawModelTreeBox();
+            redrawModelClassBox();
+            mMenuAndToolbar->onOpenVpz();
+            mModelTreeBox->set_sensitive(true);
+            mModelClassBox->set_sensitive(true);
+            mEditor->getDocumentDrawingArea()->updateCursor();
+            if (mCurrentButton == VLE_GVLE_POINTER){
+                showMessage(_("Selection"));
             }
         }
     }
-
 }
 
 void GVLE::onRefresh()

@@ -35,7 +35,6 @@
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
-#include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/gvle/SpawnPool.hpp>
@@ -479,12 +478,6 @@ public:
     void onOpenVpz();
 
     /**
-     * When click on open global vpz menu.
-     *
-     */
-    void onOpenGlobalVpz();
-
-    /**
      * When click on save menu.
      *
      */
@@ -926,11 +919,6 @@ private:
     CutCopyPaste                    mCutCopyPaste;
     int                             mCurrentTab;
 
-    /* File chooser */
-    Glib::ustring                   mGlobalVpzPrevDirPath; /* the previous
-                                    directory where a vpz was chosen
-                                    in global mode */
-
     /* Dialog boxes */
     AtomicModelBox*                 mAtomicBox;
     ImportModelBox*                 mImportModelBox;
@@ -938,7 +926,6 @@ private:
     ImportClassesBox*               mImportClassesBox;
     ConditionsBox*                  mConditionsBox;
     PreferencesBox*                 mPreferencesBox;
-    OpenVpzBox*                     mOpenVpzBox;
     PackageBrowserWindow*           mPackageBrowserWindow;
     SaveVpzBox*                     mSaveVpzBox;
     ModelTreeBox*                   mModelTreeBox;

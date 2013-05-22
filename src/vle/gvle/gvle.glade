@@ -2263,7 +2263,7 @@ Retired Contributors
                           </object>
                           <packing>
                             <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                         <child>
@@ -2277,7 +2277,7 @@ Retired Contributors
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
                             <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                         <child>
@@ -2291,7 +2291,7 @@ Retired Contributors
                             <property name="top_attach">2</property>
                             <property name="bottom_attach">3</property>
                             <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                         <child>
@@ -2306,7 +2306,7 @@ Retired Contributors
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="right_attach">2</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                         <child>
@@ -2324,7 +2324,7 @@ Retired Contributors
                             <property name="right_attach">2</property>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                         <child>
@@ -2342,7 +2342,7 @@ Retired Contributors
                             <property name="right_attach">2</property>
                             <property name="top_attach">2</property>
                             <property name="bottom_attach">3</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                       </object>
@@ -3609,133 +3609,6 @@ into your project.
       <action-widget response="0">ButtonOkNewModelClass</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkDialog" id="DialogNewProject">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="type_hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox28">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area28">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="ButtonNewProjectCancel">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="ButtonNewProjectApply">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFrame" id="frame29">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label_xalign">0</property>
-            <property name="shadow_type">etched-out</property>
-            <child>
-              <object class="GtkAlignment" id="alignment38">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="top_padding">5</property>
-                <property name="bottom_padding">5</property>
-                <property name="left_padding">10</property>
-                <property name="right_padding">10</property>
-                <child>
-                  <object class="GtkHBox" id="hbox13">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkLabel" id="label81">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Name </property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkEntry" id="EntryNameProject">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="activates_default">True</property>
-                        <property name="primary_icon_activatable">False</property>
-                        <property name="secondary_icon_activatable">False</property>
-                        <property name="primary_icon_sensitive">True</property>
-                        <property name="secondary_icon_sensitive">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child type="label">
-              <object class="GtkLabel" id="label82">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">&lt;b&gt;New Project&lt;/b&gt;</property>
-                <property name="use_markup">True</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">ButtonNewProjectCancel</action-widget>
-      <action-widget response="-3">ButtonNewProjectApply</action-widget>
-    </action-widgets>
-  </object>
   <object class="GtkDialog" id="DialogObsAndView">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -4966,7 +4839,7 @@ into your project.
                           </object>
                           <packing>
                             <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                         <child>
@@ -4982,7 +4855,7 @@ into your project.
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="right_attach">2</property>
-                            <property name="y_options"></property>
+                            <property name="y_options"/>
                           </packing>
                         </child>
                       </object>
@@ -6115,79 +5988,6 @@ the experimental frame</property>
     <action-widgets>
       <action-widget response="-6">buttonCancelDialogViewOutput</action-widget>
       <action-widget response="-5">buttonOkDialogViewOutput</action-widget>
-    </action-widgets>
-  </object>
-  <object class="GtkDialog" id="DialogVpz">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="default_width">200</property>
-    <property name="default_height">300</property>
-    <property name="type_hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox27">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area27">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="ButtonVpzCancel">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="ButtonVpzApply">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkTreeView" id="TreeViewVpz">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="0">ButtonVpzCancel</action-widget>
-      <action-widget response="0">ButtonVpzApply</action-widget>
     </action-widgets>
   </object>
   <object class="GtkWindow" id="WindowModelClass">

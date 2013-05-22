@@ -7,14 +7,13 @@ set(GVLE_SOURCES_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp
   LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp ModelClassBox.cpp
   ModelDescriptionBox.cpp Modeling.cpp GlobalPlugin.cpp
   ModelingPlugin.cpp ModelTreeBox.cpp NewDynamicsBox.cpp
-  NewModelClassBox.cpp NewProjectBox.cpp NewTypeBox.cpp
-  ObsAndViewBox.cpp OpenModelingPluginBox.cpp OpenPackageBox.cpp
-  OpenVpzBox.cpp OutputPlugin.cpp PluginFactory.cpp PortDialog.cpp
-  PreferencesBox.cpp QuitBox.cpp SaveVpzBox.cpp Settings.cpp
-  SimpleTypeBox.cpp SimpleViewDrawingArea.cpp TableBox.cpp
-  TreeViewValue.cpp TupleBox.cpp ValueBox.cpp ValuesTreeView.cpp
-  View.cpp ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp
-  SpawnPool.cpp)
+  NewModelClassBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp
+  OpenModelingPluginBox.cpp OpenPackageBox.cpp OutputPlugin.cpp
+  PluginFactory.cpp PortDialog.cpp PreferencesBox.cpp QuitBox.cpp
+  SaveVpzBox.cpp Settings.cpp SimpleTypeBox.cpp
+  SimpleViewDrawingArea.cpp TableBox.cpp TreeViewValue.cpp
+  TupleBox.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp
+  ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp SpawnPool.cpp)
 
 set(GVLE_SOURCES_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
   CalendarBox.hpp ComboboxString.hpp CompleteViewDrawingArea.hpp
@@ -25,14 +24,14 @@ set(GVLE_SOURCES_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
   InteractiveTypeBox.hpp LaunchSimulationBox.hpp MatrixBox.hpp
   Message.hpp ModelClassBox.hpp ModelDescriptionBox.hpp Modeling.hpp
   GlobalPlugin.hpp ModelingPlugin.hpp ModelTreeBox.hpp
-  NewDynamicsBox.hpp NewModelClassBox.hpp NewProjectBox.hpp
-  NewTypeBox.hpp ObsAndViewBox.hpp ObserverPlugin.hpp
-  OpenModelingPluginBox.hpp OpenPackageBox.hpp OpenVpzBox.hpp
-  OutputPlugin.hpp PluginFactory.hpp PortDialog.hpp PreferencesBox.hpp
-  QuitBox.hpp SaveVpzBox.hpp Settings.hpp SimpleTypeBox.hpp
-  SimpleViewDrawingArea.hpp TableBox.hpp TreeViewValue.hpp
-  TupleBox.hpp ValueBox.hpp ValuesTreeView.hpp ViewDrawingArea.hpp
-  View.hpp ViewOutputBox.hpp XmlTypeBox.hpp SpawnPool.hpp)
+  NewDynamicsBox.hpp NewModelClassBox.hpp NewTypeBox.hpp
+  ObsAndViewBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
+  OpenPackageBox.hpp OutputPlugin.hpp PluginFactory.hpp PortDialog.hpp
+  PreferencesBox.hpp QuitBox.hpp SaveVpzBox.hpp Settings.hpp
+  SimpleTypeBox.hpp SimpleViewDrawingArea.hpp TableBox.hpp
+  TreeViewValue.hpp TupleBox.hpp ValueBox.hpp ValuesTreeView.hpp
+  ViewDrawingArea.hpp View.hpp ViewOutputBox.hpp XmlTypeBox.hpp
+  SpawnPool.hpp)
 
 install(FILES ${GVLE_SOURCES_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
 
