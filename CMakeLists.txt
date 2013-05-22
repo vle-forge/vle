@@ -121,16 +121,13 @@ option(WITH_TEST "use the libboost test unit library [default: on]" ON)
 
 if (WIN32)
   set(Boost_THREADAPI "win32")
-  set(Boost_USE_STATIC_LIBS ON)
-  set(Boost_USE_STATIC_RUNTIME ON)
-else (WIN32)
-  set(Boost_USE_STATIC_LIBS OFF)
-  set(Boost_USE_STATIC_RUNTIME OFF)
 endif (WIN32)
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_RUNTIME OFF)
 
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_DETAILED_FAILURE_MSG ON)
-set(Boost_DEBUG ON)
+set(Boost_DEBUG OFF)
 
 find_package(Boost COMPONENTS unit_test_framework thread filesystem system
   chrono date_time regex program_options)
