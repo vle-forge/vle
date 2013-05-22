@@ -49,7 +49,6 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <separator/>"
     "            <menuitem action='OpenProject'/>"
     "            <menuitem action='OpenVpz'/>"
-    "            <menuitem action='OpenGlobalVpz'/>"
     "            <separator/>"
     "            <menuitem action='SaveFile'/>"
     "            <menuitem action='SaveFileAs'/>"
@@ -174,7 +173,6 @@ void GVLEMenuAndToolbar::showMinimalMenu()
     m_refActionGroup->get_action("NewProject")->set_sensitive(true);
     m_refActionGroup->get_action("OpenProject")->set_sensitive(true);
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
-    m_refActionGroup->get_action("OpenGlobalVpz")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
     hideFileModel();
@@ -451,12 +449,6 @@ void GVLEMenuAndToolbar::createFileActions()
                             _("Open Vp_z"), _("Open a Vpz from package")),
         Gtk::AccelKey("<control><shift>o"),
         sigc::mem_fun(mParent, &GVLE::onOpenVpz));
-    m_refActionGroup->add(
-        Gtk::Action::create("OpenGlobalVpz", Gtk::Stock::OPEN,
-                            _("Open Global Vpz"), _("Open a Vpz from "
-                                                    "filesystem")),
-        Gtk::AccelKey(""),
-        sigc::mem_fun(mParent, &GVLE::onOpenGlobalVpz));
     m_refActionGroup->add(
         Gtk::Action::create("SaveFile", Gtk::Stock::SAVE,
                             _("Save File"), _("Save a file")),
