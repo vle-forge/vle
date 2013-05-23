@@ -35,7 +35,7 @@ namespace vle { namespace gvle {
 
 LaunchSimulationBox::LaunchSimulationBox(
         const Glib::RefPtr < Gtk::Builder >& xml, const vpz::Vpz& vpz,
-        const vle::utils::Package& curr_pack)
+        vle::utils::Package& curr_pack)
     : mVpz(vpz), mDialog(0), mMono(0), mMulti(0), mNbProcess(0), mDistant(0),
     mPlay(0), mStop(0), mProgressBar(0), mCurrentTimeLabel(0),mState(Wait),
     mThread(0), mThreadRun(false), mCurrPackage(curr_pack)
@@ -127,6 +127,7 @@ void LaunchSimulationBox::runThread()
     for (; itb!=ite; itb++) {
         vle::vpz::Output& output = itb->second;
         if (output.location().empty()) {
+            mCurrPackage.addDirectory("","output",vle::utils::PKG_SOURCE);
             output.setLocalStream(mCurrPackage.getOutputDir(
                     vle::utils::PKG_SOURCE), output.plugin(), output.package());
         }
