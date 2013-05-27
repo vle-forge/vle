@@ -23,8 +23,8 @@ INCLUDE(CMakeDetermineCCompiler)
 ## Check libraries with pkgconfig
 ##
 
-FIND_PACKAGE(VLE REQUIRED)
-FIND_PACKAGE(VLE_DEPS REQUIRED)
+set(VLE_DEBUG 0)
+find_package(VLE REQUIRED)
 
 
 ##
@@ -75,17 +75,10 @@ SET(VLE_ABI_VERSION 1.1)
 ##
 ## Find boost
 ##
-if (WIN32)
- SET(Boost_USE_STATIC_LIBS ON)
-else (WIN32)
- SET(Boost_USE_STATIC_LIBS OFF)
-endif (WIN32)
-SET(Boost_USE_MULTITHREAD ON)
-FIND_PACKAGE(Boost COMPONENTS unit_test_framework date_time)
 
-IF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
-  SET(VLE_HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
-ENDIF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREAD ON)
+find_package(Boost COMPONENTS unit_test_framework date_time)
 
 ##
 ## Generate the doxygen
@@ -232,10 +225,6 @@ FUNCTION(DeclareVleTest name sources)
     ${VLE_DEPS_LIBRARY_DIRS}
     ${Boost_LIBRARY_DIRS})
   ADD_EXECUTABLE(${name} ${sources})
-  if (NOT WIN32)
-    set_target_properties(${name} PROPERTIES COMPILE_DEFINITIONS
-      "BOOST_TEST_DYN_LINK")
-  endif (NOT WIN32)
   TARGET_LINK_LIBRARIES(${name}
     ${VLE_LIBRARIES}
     ${VLE_DEPS_LIBRARIES}
@@ -249,14 +238,16 @@ ENDFUNCTION(DeclareVleTest name sources)
 ## Subdirectory
 ##
 
-ADD_SUBDIRECTORY(data)
-ADD_SUBDIRECTORY(doc)
-ADD_SUBDIRECTORY(exp)
-ADD_SUBDIRECTORY(src)
+add_subdirectory(data)
+if(WITH_DOC)
+  add_subdirectory(doc)
+endif()
+add_subdirectory(exp)
+add_subdirectory(src)
 
-IF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
-  ADD_SUBDIRECTORY(test)
-ENDIF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
+if (Boost_UNIT_TEST_FRAMEWORK_FOUND AND WITH_TEST)
+  add_subdirectory(test)
+endif (Boost_UNIT_TEST_FRAMEWORK_FOUND AND WITH_TEST)
 
 ##
 ## CPack configuration
