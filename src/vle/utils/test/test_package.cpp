@@ -29,6 +29,7 @@
 #define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE utils_library_test
+#include <boost/version.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -506,6 +507,10 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
         pkg.create();
 
         filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
+
+        pkg.configure();
+        pkg.build();
+        pkg.install();
         uniquepath = unique.string();
     } catch (...) {
         BOOST_REQUIRE(false);

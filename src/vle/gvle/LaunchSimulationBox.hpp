@@ -50,7 +50,7 @@ class LaunchSimulationBox
 {
 public:
     LaunchSimulationBox(const Glib::RefPtr < Gtk::Builder >& xml,
-			const vpz::Vpz& file, const vle::utils::Package& curr_pack);
+			const vpz::Vpz& file, vle::utils::Package& curr_pack);
 
     ~LaunchSimulationBox();
 
@@ -94,7 +94,7 @@ private:
     Glib::Mutex   mMutex;
     bool          mThreadRun;
 
-    const vle::utils::Package&      mCurrPackage;
+    vle::utils::Package&      mCurrPackage;
 
     /* accessors to the protected variables */
     void setState(State state);

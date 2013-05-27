@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <ostream>
+#include <vle/DllDefines.hpp>
 
 namespace vle { namespace devs {
 
@@ -37,7 +38,7 @@ class ExternalEvent;
 
 typedef std::vector < ExternalEvent* > ExternalEventList;
 
-std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts);
+VLE_API std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts);
 
 }} // namespace vle devs
 

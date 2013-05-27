@@ -119,7 +119,7 @@ void Path::initPrefixDir()
     }
 
     if (RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
-                     0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS) {
+                     0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
         result = win32_RegQueryValue(hkey, &m_prefix);
         RegCloseKey(hkey);
 
@@ -144,7 +144,8 @@ void Path::initPrefixDir()
         }
     }
 
-    ErrorMessage("Failed to initialized prefix. Please, re-install VLE.");
+    ErrorMessage("Failed to initialized prefix. Please, re-install VLE or "
+            "define a variable into the the register editor");
 }
 
 std::string Path::getTempFile(const std::string& prefix,

@@ -45,16 +45,13 @@ if (WIN32)
     -i${CMAKE_BINARY_DIR}/share/vfl.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
   set(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  set(OS_SPECIFIC_LIBRARIES -Wl,--allow-multiple-definition)
+  set(OS_SPECIFIC_LIBRARIES ws2_32)
 else (WIN32)
   set(OS_SPECIFIC_PATH_IMPL)
   set(OS_SPECIFIC_LIBRARIES dl)
 endif (WIN32)
 
 add_library(gvlelib SHARED
-    ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP};${OS_SPECIFIC_PATH_IMPL})
-
-add_library(gvlelib-static STATIC
     ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP};${OS_SPECIFIC_PATH_IMPL})
 
 set_target_properties(gvlelib PROPERTIES
@@ -65,26 +62,15 @@ set_target_properties(gvlelib PROPERTIES
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
   CLEAN_DIRECT_OUTPUT 1)
 
-set_target_properties(gvlelib-static PROPERTIES
-  VERSION 0
-  OUTPUT_NAME "gvle-${VLE_VERSION_SHORT}"
-  CLEAN_DIRECT_OUTPUT 1)
-
 if (WIN32)
   set_target_properties(gvlelib PROPERTIES
-    LINK_FLAGS "-Wl,-static -mwindows")
-
-  target_link_libraries(gvlelib ${VLEDEPS_STATIC_LIBRARIES}
-    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
-else ()
-  target_link_libraries(gvlelib ${VLEDEPS_LIBRARIES}
-    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} vlelib)
+    LINK_FLAGS " -mwindows")
 endif ()
 
-install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
-  lib ARCHIVE DESTINATION lib)
+target_link_libraries(gvlelib vlelib ${VLEDEPS_LIBRARIES}
+  ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
-install(TARGETS gvlelib-static RUNTIME DESTINATION bin LIBRARY DESTINATION
+install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
 
 #
