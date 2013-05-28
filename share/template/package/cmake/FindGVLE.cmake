@@ -1,26 +1,26 @@
 # FindGVLE.cmake
-# =============
+# ==============
 #
 # Try to find GVLE
 #
 # Copyright 2012-2013 INRA
 # Gauthier Quesnel <quesnel@users.sourceforge.net>
-# Ronan Tr�pos <ronan.trepos@toulouse.inra.fr>
+# Ronan Trépos <ronan.trepos@toulouse.inra.fr>
 #
 # Distributed under the OS-approved BSD License (the "License");
 # This software is distributed WITHOUT ANY WARRANTY; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the License for more information.
 #
-# ------- Once done this will define
+# Once done this will define:
 #
 #  GVLE_FOUND            - The system has GVLE
 #  GVLE_INCLUDE_DIR      - The GVLE include directory
 #  GVLE_LIBRARY_DIRS     - Directories containing libraries to link
 #  GVLE_LIBRARIES        - Link these to use shared libraries of GVLE
 #
-# ------- Cmake variables used by this module :
-#  
+# CMake variables used by this module:
+#
 #  GVLE_DEBUG            - If true, prints debug traces
 #                          (default OFF)
 #  GVLE_USING_CMAKE      - If true, on windows, use cmake for finding GVLE,
@@ -29,7 +29,7 @@
 #  VLE_BASEPATH_LOCAL    - cmake variable for base path of vle
 #                          (default NOT_DEFINED)
 #
-# -------- Environment variables used by this module :
+# Environment variables used by this module:
 #
 #  VLE_BASEPATH          - environment variable for base path of vle
 #
@@ -52,6 +52,7 @@
 #
 # find_package(GVLE REQUIRED)
 #
+#=============================================================================
 
 #
 # Set default behavior of find gvle
@@ -78,10 +79,6 @@ endif ()
 #
 
 if (${_find_gvle_using_cmake})
-########################
-### find gvle using cmake
-########################
-
   find_path(_gvle_base_include zlib.h PATHS
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
@@ -135,22 +132,14 @@ if (${_find_gvle_using_cmake})
     gtk-win32-2.0 cairomm-1.0 gdk-win32-2.0 atk-1.0 gio-2.0 pangowin32-1.0
     gdi32 pangocairo-1.0 gdk_pixbuf-2.0 png14 pango-1.0 gmodule-2.0 cairo
     xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
-
-else ()
-########################
-### find gvle using pkg-config
-########################
-
+else () # find gvle using pkg-config
   include(FindPackageHandleStandardArgs)
   find_package(PkgConfig REQUIRED)
   PKG_CHECK_MODULES(GVLE gvle-1.1 REQUIRED)
-
 endif ()
 
-########################
-# handle the QUIETLY and REQUIRED arguments and set GVLE_FOUND to TRUE if
-# all listed variables are TRUE
-########################
+# handle the QUIETLY and REQUIRED arguments and set GVLE_FOUND to TRUE if all
+# listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(GVLE REQUIRED_VARS
   GVLE_INCLUDE_DIRS  GVLE_LIBRARY_DIRS GVLE_LIBRARIES)
@@ -161,4 +150,4 @@ if (${_gvle_debug})
   message (" gvle_debug GVLE_LIBRARIES ${GVLE_LIBRARIES}")
 endif ()
 
-    
+#mark_as_advanced(GVLE_INCLUDE_DIRS GVLE_LIBRARIES GVLE_LIBRARY_DIRS)

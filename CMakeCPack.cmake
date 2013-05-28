@@ -59,7 +59,7 @@ set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simul
 set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
 
-#CPack RPM configuration
+# CPack RPM configuration
 set(CPACK_RPM_PACKAGE_SUMMARY "VLE, a framework for multi-modeling, simulation and analysis of complex dynamical systems.")
 set(CPACK_RPM_PACKAGE_NAME ${VLE_NAME}-${VLE_MAJOR}.${VLE_MINOR})
 set(CPACK_RPM_PACKAGE_VERSION ${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH})

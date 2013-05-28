@@ -239,9 +239,9 @@ ENDFUNCTION(DeclareVleTest name sources)
 ##
 
 add_subdirectory(data)
-if(WITH_DOC)
+if (WITH_DOC)
   add_subdirectory(doc)
-endif()
+endif ()
 add_subdirectory(exp)
 add_subdirectory(src)
 

@@ -5,21 +5,21 @@
 #
 # Copyright 2012-2013 INRA
 # Gauthier Quesnel <quesnel@users.sourceforge.net>
-# Ronan Tr�pos <ronan.trepos@toulouse.inra.fr>
+# Ronan Trépos <ronan.trepos@toulouse.inra.fr>
 #
 # Distributed under the OS-approved BSD License (the "License");
 # This software is distributed WITHOUT ANY WARRANTY; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the License for more information.
 #
-# ------- Once done this will define
+# Once done this will define:
 #
 #  VLE_FOUND             - The system has VLE
 #  VLE_INCLUDE_DIRS      - The VLE include directory
 #  VLE_LIBRARY_DIRS      - Directories containing libraries to link
 #  VLE_LIBRARIES         - Link these to use shared libraries of VLE
 #
-# ------- Cmake variables used by this module :
+# CMake variables used by this module:
 #  
 #  VLE_DEBUG             - If true, prints debug traces
 #                          (default OFF)
@@ -29,7 +29,7 @@
 #  VLE_BASEPATH_LOCAL    - cmake variable for base path of vle
 #                          (default NOT_DEFINED)
 #
-# -------- Environment variables used by this module :
+# Environment variables used by this module:
 #
 #  VLE_BASEPATH          - environment variable for base path of vle
 #
@@ -80,10 +80,6 @@ endif ()
 #
 
 if (${_find_vle_using_cmake})
-########################
-### find vle using cmake
-########################
-
   find_path(_vle_base_include zlib.h PATHS
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
@@ -121,22 +117,14 @@ if (${_find_vle_using_cmake})
 
   set (VLE_LIBRARIES
     vle-1.1 xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
-
 else (${_find_vle_using_cmake})
-########################
-### find vle using pkg-config
-########################
-
   find_package(PkgConfig REQUIRED)
   PKG_CHECK_MODULES(VLE vle-1.1 REQUIRED)
-
 endif (${_find_vle_using_cmake})
 
 
-########################
-# handle the QUIETLY and REQUIRED arguments and set VLE_FOUND to TRUE if
-# all listed variables are TRUE
-########################
+# handle the QUIETLY and REQUIRED arguments and set VLE_FOUND to TRUE if all
+# listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(VLE REQUIRED_VARS VLE_INCLUDE_DIRS
                         VLE_LIBRARY_DIRS VLE_LIBRARIES)
