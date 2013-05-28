@@ -81,8 +81,7 @@ struct Package::Pimpl
     }
 
     Pimpl(const std::string& pkgname) :
-        m_pkgname(pkgname), m_pkgbinarypath(""),
-        m_pkgsourcepath("")
+        m_pkgname(pkgname), m_pkgbinarypath(), m_pkgsourcepath()
     {
         refreshPath();
     }
@@ -129,8 +128,9 @@ struct Package::Pimpl
 
     void refreshPath()
     {
-        m_pkgbinarypath = "";
-        m_pkgsourcepath = "";
+        m_pkgbinarypath.clear();
+        m_pkgsourcepath.clear();
+
         if (not m_pkgname.empty()) {
             fs::path  path_binary = Path::path().getBinaryPackagesDir();
             path_binary /= m_pkgname;
@@ -148,8 +148,6 @@ struct Package::Pimpl
     void select(const std::string& name)
     {
         m_pkgname = name;
-        m_pkgbinarypath = "";
-        m_pkgsourcepath = "";
         refreshPath();
     }
 };
