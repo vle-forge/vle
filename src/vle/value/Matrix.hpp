@@ -590,7 +590,7 @@ public:
      * @param row The row.
      * @return The double readed from the matrix.
      */
-    const double& getDouble(const size_type& column, const size_type& row) const
+    double getDouble(const size_type& column, const size_type& row) const
     {
         return value::toDouble(get(column, row));
     }
@@ -623,7 +623,7 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    const int32_t& getInt(const size_type& column, const size_type& row) const
+    int32_t getInt(const size_type& column, const size_type& row) const
     {
         return value::toInteger(get(column, row));
     }

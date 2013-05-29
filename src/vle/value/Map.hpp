@@ -474,7 +474,7 @@ public:
         add(name, new Boolean(value));
     }
 
-    const int32_t& getInt(const std::string& name) const
+    int32_t getInt(const std::string& name) const
     {
         return value::toInteger(get(name));
     }
@@ -509,7 +509,7 @@ public:
      * @throw utils::ArgError if type is not Value::DOUBLE or value do not
      * exist.
      */
-    const double& getDouble(const std::string& name) const
+    double getDouble(const std::string& name) const
     {
         return value::toDouble(get(name));
     }

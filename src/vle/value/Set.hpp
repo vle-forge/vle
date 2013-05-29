@@ -422,7 +422,7 @@ public:
      * @throw utils::ArgError if the index 'i' is to big or if value at
      * index 'i' is not a Double.
      */
-    const double& getDouble(const size_type& i) const
+    double getDouble(const size_type& i) const
     { return value::toDouble(get(i)); }
 
     /**
@@ -449,7 +449,7 @@ public:
      * @throw utils::ArgError if the index 'i' is to big or if value at
      * index 'i' is not a Integer.
      */
-    const int32_t& getInt(const size_type& i) const
+    int32_t getInt(const size_type& i) const
     { return value::toInteger(get(i)); }
 
     /**
