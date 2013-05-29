@@ -59,6 +59,10 @@
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/vle.hpp>
 
+#ifdef _WIN32
+#  include <Windows.h>
+#endif
+
 using namespace vle;
 
 namespace bs = boost::system;
@@ -73,7 +77,7 @@ inline const char *get_temporary_path()
         if (fs::exists(names[i]) && fs::is_directory(names[i]))
             return names[i];
 
-#ifdef __WIN32__
+#ifdef _WIN32
     return "c:/tmp";
 #else
     return "/tmp";
@@ -116,7 +120,11 @@ struct F
         }
 
         newname = tmp.string();
+#ifdef _WIN32
+        ::_putenv((vle::fmt("VLE_HOME=%1%") % newname).str().c_str());
+#else
         ::setenv("VLE_HOME", newname.c_str(), 1);
+#endif
 
         a = new vle::Init();
     }
@@ -143,7 +151,11 @@ struct F
 #endif
 
         if (not oldname.empty()) {
+#ifdef _WIN32
+            ::_putenv((vle::fmt("VLE_HOME=%1%") % oldname).str().c_str());
+#else
             ::setenv("VLE_HOME", oldname.c_str(), 1);
+#endif
         }
     }
 
