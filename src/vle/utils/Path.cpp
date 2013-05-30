@@ -310,7 +310,7 @@ void Path::initVleHomeDirectory()
     }
 #else
     if (not fs::exists(pkgs)) {
-        if (not fs::create_directories(getPackagesDir())) {
+        if (not fs::create_directories(getBinaryPackagesDir())) {
             throw FileError(fmt(
                     _("Failed to build VLE_HOME directory (%1%):\n%2%")) %
                 pkgs.string() % ec.message());
