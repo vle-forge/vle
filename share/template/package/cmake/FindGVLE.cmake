@@ -133,9 +133,8 @@ if (${_find_gvle_using_cmake})
     gdi32 pangocairo-1.0 gdk_pixbuf-2.0 png14 pango-1.0 gmodule-2.0 cairo
     xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
 else () # find gvle using pkg-config
-  include(FindPackageHandleStandardArgs)
   find_package(PkgConfig REQUIRED)
-  PKG_CHECK_MODULES(GVLE gvle-1.1 REQUIRED)
+  PKG_CHECK_MODULES(GVLE gvle-1.1)
 endif ()
 
 # handle the QUIETLY and REQUIRED arguments and set GVLE_FOUND to TRUE if all

@@ -119,7 +119,7 @@ if (${_find_vle_using_cmake})
     vle-1.1 xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
 else (${_find_vle_using_cmake})
   find_package(PkgConfig REQUIRED)
-  PKG_CHECK_MODULES(VLE vle-1.1 REQUIRED)
+  PKG_CHECK_MODULES(VLE vle-1.1)
 endif (${_find_vle_using_cmake})
 
 
