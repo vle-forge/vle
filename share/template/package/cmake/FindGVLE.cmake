@@ -104,7 +104,7 @@ if (${_find_gvle_using_cmake})
   endif ()
 
   if(NOT _gvle_base_include OR NOT _gvle_base_bin OR NOT _gvle_base_lib)
-     message (FATAL_ERROR "Missing vle dependencies")
+     message (FATAL_ERROR "Missing gvle dependencies")
   endif ()
 
   set(GVLE_INCLUDE_DIRS
