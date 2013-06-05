@@ -132,7 +132,8 @@ struct F
 #endif
 
 #ifdef _WIN32
-            ::_putenv((vle::fmt("VLE_HOME=%1%") % current_path).str().c_str());
+            ::_putenv((vle::fmt("VLE_HOME=%1%")
+                    % current_path.string()).str().c_str());
 #else
 #  if BOOST_VERSION > 104500
             ::setenv("VLE_HOME", current_path.c_str(), 1);
