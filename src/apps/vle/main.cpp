@@ -331,7 +331,15 @@ static int manage_package_mode(const std::string &packagename, bool manager,
 
     for (; not stop and it != end; ++it) {
         if (*it == "create") {
-            pkg.create();
+            try {
+                pkg.create();
+            } catch (const std::exception &e) {
+                std::cerr << vle::fmt("Cannot create package: %1%")
+                                  % e.what()
+                          << std::endl;
+                stop = true;
+            }
+
         } else if (*it == "configure") {
             pkg.configure();
             pkg.wait(std::cerr, std::cerr);

@@ -763,9 +763,9 @@ PathList Package::listLibraries(const std::string& path) const
                     fs::path::string_type ext = fs::extension(it->path());
 #endif
 
-#ifdef G_OS_WINDOWS
+#if defined _WIN32
                     if (ext == ".dll") {
-#elif G_OS_MACOS
+#elif defined __APPLE__
                     if (ext == ".dylib") {
 #else
                     if (ext == ".so") {

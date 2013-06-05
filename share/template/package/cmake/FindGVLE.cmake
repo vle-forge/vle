@@ -82,17 +82,23 @@ if (${_find_gvle_using_cmake})
   find_path(_gvle_base_include zlib.h PATHS
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/include")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/include")
 
   find_path(_gvle_base_bin zlib1.dll PATHS
     $ENV{VLE_BASEPATH}/bin
     ${VLE_BASEPATH_LOCAL}/bin
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/bin")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/bin")
 
   find_path(_gvle_base_lib libz.dll.a PATHS
     $ENV{VLE_BASEPATH}/lib
     ${VLE_BASEPATH_LOCAL}/lib
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/lib")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/lib")
 
   if (${_gvle_debug})
     message (" gvle_debug _gvle_base_include ${_gvle_base_include}")
@@ -101,7 +107,7 @@ if (${_find_gvle_using_cmake})
   endif ()
 
   if(NOT _gvle_base_include OR NOT _gvle_base_bin OR NOT _gvle_base_lib)
-     message (FATAL_ERROR "Missing vle dependencies")
+     message (FATAL_ERROR "Missing gvle dependencies")
   endif ()
 
   set(GVLE_INCLUDE_DIRS
@@ -141,7 +147,7 @@ endif ()
 # listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(GVLE REQUIRED_VARS
-  GVLE_INCLUDE_DIRS  GVLE_LIBRARY_DIRS GVLE_LIBRARIES)
+  GVLE_INCLUDE_DIRS GVLE_LIBRARIES)
 
 if (${_gvle_debug})
   message (" gvle_debug GVLE_INCLUDE_DIRS ${GVLE_INCLUDE_DIRS}")

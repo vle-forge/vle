@@ -79,6 +79,10 @@ if (CPACK_GENERATOR MATCHES "NSIS")
   set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/share)
 
   install(FILES "${VLE_MINGW_PATH}/bin\\\\mingwm10.dll" DESTINATION bin)
+  install(FILES "${VLE_MINGW_PATH}/bin\\\\libarchive-2.dll" DESTINATION bin)
+  install(FILES "${VLE_MINGW_PATH}/bin\\\\libbz2-2.dll" DESTINATION bin)
+  install(FILES "${VLE_MINGW_PATH}/bin\\\\liblzma-1.dll" DESTINATION bin)
+  install(FILES "${VLE_MINGW_PATH}/bin\\\\libz-1.dll" DESTINATION bin)
 
   install(DIRECTORY "${VLE_BOOST_INCLUDE_PATH}" DESTINATION include)
   install(DIRECTORY "${VLE_BOOST_LIBRARIES_PATH}/" DESTINATION bin
