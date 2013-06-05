@@ -144,7 +144,7 @@ endif ()
 # listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(GVLE REQUIRED_VARS
-  GVLE_INCLUDE_DIRS  GVLE_LIBRARY_DIRS GVLE_LIBRARIES)
+  GVLE_INCLUDE_DIRS GVLE_LIBRARIES)
 
 if (${_gvle_debug})
   message (" gvle_debug GVLE_INCLUDE_DIRS ${GVLE_INCLUDE_DIRS}")

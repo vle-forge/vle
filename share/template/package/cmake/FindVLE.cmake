@@ -130,7 +130,7 @@ endif (${_find_vle_using_cmake})
 # listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(VLE REQUIRED_VARS VLE_INCLUDE_DIRS
-                        VLE_LIBRARY_DIRS VLE_LIBRARIES)
+                        VLE_LIBRARIES)
 
 if (${_vle_debug})
   message (" vle_debug VLE_INCLUDE_DIRS ${VLE_INCLUDE_DIRS}")
