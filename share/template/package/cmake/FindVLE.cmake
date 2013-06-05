@@ -84,19 +84,22 @@ if (${_find_vle_using_cmake})
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/include")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/include")
 
   find_path(_vle_base_bin zlib1.dll PATHS
     $ENV{VLE_BASEPATH}/bin
     ${VLE_BASEPATH_LOCAL}/bin
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/bin")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/bin")
 
   find_path(_vle_base_lib libz.dll.a PATHS
     $ENV{VLE_BASEPATH}/lib
     ${VLE_BASEPATH_LOCAL}/lib
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/lib")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/lib")
 
   if (${_vle_debug})
     message (" vle_debug _vle_base_include ${_vle_base_include}")
