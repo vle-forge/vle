@@ -62,6 +62,19 @@ target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
 
+add_library(vlelibstatic STATIC
+  DllDefines.hpp;${vlelib_SRCS};${OS_SPECIFIC_PATH_IMPL})
+
+set_target_properties(vlelibstatic PROPERTIES
+  VERSION 0
+  OUTPUT_NAME "vle-${VLE_VERSION_SHORT}"
+  DEFINE_SYMBOL "vlelib_EXPORTS"
+  COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
+  CLEAN_DIRECT_OUTPUT 1)
+
+install(TARGETS vlelibstatic RUNTIME DESTINATION bin LIBRARY
+  DESTINATION lib ARCHIVE DESTINATION lib)
+
 #
 # Configure the version.h.in file to produce in the binary directory a
 # filled header version.hpp.
