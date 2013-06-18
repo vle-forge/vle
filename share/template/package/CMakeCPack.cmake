@@ -14,7 +14,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${VLE_NAME}")
 SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${VLE_NAME}")
 SET(CPACK_PACKAGE_FILE_NAME "${VLE_NAME}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-SET(CPACK_SOURCE_IGNORE_FILES "\\\\.swp$;/\\\\.gitignore;/build/;/plugins/;/lib/;/doc/html/;/output/;/\\\\.git/")
+SET(CPACK_SOURCE_IGNORE_FILES "\\\\.swp$;/\\\\.gitignore;/build/;/buildvle/;/plugins/;/lib/;/doc/html/;/output/;/\\\\.git/")
 
 INCLUDE(CPack)
 
