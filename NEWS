@@ -2,6 +2,21 @@
 VLE 1.1.0-dev
 =============
 
+Changes from vle-1.1.0-beta1
+============================
+
+- cli: fix uncaught exception
+- cmake: fix the error message in gvle
+- cmake: library dirs in FindVLE and FindGVLE
+- cmake win32: fix FindVle and FindGVLE for 64 bits
+- package: fix the extension detection of libraries
+- template: remove the REQUIRED keyword in pkg-config
+- vle: build a static library libvle
+- win32: fix missing libarchive dependencies
+- win32: fix the search path using HKEYs in cmake
+- win32: fix the predefined variables for Boost
+- win32: fix the test_package test
+
 Release highlights
 ==================
 
@@ -45,7 +60,7 @@ VLE
 We replace the init and finalize functions in old libvleutils,
 libvlevalue, libvlemanager with a new classical object.
 
-utils
+Utils
 -----
 
 - Add a new RemoteMananger class to access remote repositories. The
@@ -87,29 +102,19 @@ Rewrite the Manager system:
   and, or, xor, equal and different between SimulationOptions and
   LogOptions to ensure correct type casting.
 
-vpz
+Vpz
 ---
 
 - Remove any reference to distant and local dynamics plugins.
 
 - Merge the libgraph.
 
-extension
+Extension
 ---------
 
-Removed
+We move the extension into the repository `packages`.
 
-geometry
---------
+Geometry, Eov and Graph
+-----------------------
 
-Removed
-
-eov
----
-
-Removed
-
-graph
------
-
-Removed
+These three librarires are removed.
