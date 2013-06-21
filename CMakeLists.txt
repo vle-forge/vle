@@ -210,7 +210,7 @@ endif ()
 # Install the README
 #
 if (UNIX)
-  install(FILES "README" DESTINATION "${VLE_SHARE_DIRS}")
+  install(FILES "README.rst" DESTINATION "${VLE_SHARE_DIRS}")
   install(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}")
 else ()
   install(FILES "README" DESTINATION "${VLE_SHARE_DIRS}" RENAME "Readme.txt")
