@@ -1,3 +1,4 @@
+====================================
 Virtual Laboratory Environment 1.1.0
 ====================================
 
@@ -19,26 +20,34 @@ For the VFL API:
 * boost (>= 1.41)
 * cmake (>= 2.8.0)
 * make (>= 1.8)
-* g++ (>= 4.4) or intel icc (>= 11.0)
+* c++ compiler (gcc >= 4.4, clang >= 3.1, intel icc (>= 11.0)
 
 For the MPI command line:
 
-* Any MPI 2 library as OpenMpi, mpich 
+* Any MPI 2 library as OpenMpi, mpich
 
 For the GUI:
 
-* gtkmm (>= 2.22.0) http://www.gtkmm.org
+* gtkmm (>= 2.22.0)
 
 Getting the code
 ----------------
 
 The source tree is currently hosted on Github and Sourceforge. To view the
 repository online: https://github.com/vle-forge/vle The URL to clone it:
-git://github.com/vle-forge/vle.git
+
+::
+
+ git clone git://github.com/vle-forge/vle.git
 
 Once you have met requirements, compiling and installing is simple:
 
-  cmake source_directory
+::
+
+  cd vle
+  mkdir build
+  cd build
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
   make
   make install
 
@@ -54,11 +63,14 @@ Usage
 VLE is a multi-modeling environment to build model, to simulate and analys them.
 To more information, see the VLE website (http://www.vle-projet.org).
 
-- To build a new package
-$ vle -P mypackage create
+To build a new package::
 
-- To configure, build a package
-$ vle -P mypackage configure build
+ vle -P mypackage create
+ 
+To configure, build a package::
 
-- To run vpz in a package
-$ vle -P mypackage file.vpz
+ vle -P mypackage configure build
+ 
+To run vpz in a package::
+
+ vle -P mypackage file.vpz
