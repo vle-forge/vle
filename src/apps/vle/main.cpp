@@ -388,32 +388,10 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     if (stop)
         ret = EXIT_FAILURE;
     else if (it != end) {
-#ifndef NDEBUG
-        vle::devs::ExternalEvent::allocated = 0;
-        vle::devs::ExternalEvent::deallocated = 0;
-        vle::devs::InternalEvent::allocated = 0;
-        vle::devs::InternalEvent::deallocated = 0;
-        vle::value::Value::allocated = 0;
-        vle::value::Value::deallocated = 0;
-#endif
         if (manager)
             ret = run_manager(it, end, processor, pkg);
         else
             ret = run_simulation(it, end, pkg);
-
-#ifndef NDEBUG
-        std::cerr << vle::fmt(_("\n - Debug mode:\n"
-                    "                       allocated   deallocated\n"
-                    "   - External events: %=12d/%=12d\n"
-                    "   - Internal events: %=12d/%=12d\n"
-                    "   - Values         : %=12d/%=12d\n")) %
-            vle::devs::ExternalEvent::allocated %
-            vle::devs::ExternalEvent::deallocated %
-            vle::devs::InternalEvent::allocated %
-            vle::devs::InternalEvent::deallocated %
-            vle::value::Value::allocated %
-            vle::value::Value::deallocated;
-#endif
     }
 
     return ret;

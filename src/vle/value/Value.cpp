@@ -41,11 +41,6 @@
 
 namespace vle { namespace value {
 
-#ifndef NDEBUG
-unsigned long int Value::allocated = 0;
-unsigned long int Value::deallocated = 0;
-#endif
-
 std::string Value::writeToFile() const
 {
     std::ostringstream out;

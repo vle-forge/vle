@@ -45,11 +45,6 @@ class Simulator;
 class VLE_API InternalEvent
 {
 public:
-#ifndef NDEBUG
-    static unsigned long int allocated;
-    static unsigned long int deallocated;
-#endif
-
     /**
      * InternalEvent constructor.
      *
@@ -59,9 +54,6 @@ public:
     InternalEvent(const Time& time, Simulator* simulator)
         : m_simulator(simulator), m_time(time), m_isvalid(true)
     {
-#ifndef NDEBUG
-        InternalEvent::allocated++;
-#endif
     }
 
     /**
@@ -70,9 +62,6 @@ public:
      */
     ~InternalEvent()
     {
-#ifndef NDEBUG
-        InternalEvent::deallocated++;
-#endif
     }
 
     /**

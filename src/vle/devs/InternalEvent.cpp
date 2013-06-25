@@ -29,9 +29,4 @@
 
 namespace vle { namespace devs {
 
-#ifndef NDEBUG
-unsigned long int InternalEvent::allocated = 0;
-unsigned long int InternalEvent::deallocated = 0;
-#endif
-
 }} // namespace vle devs

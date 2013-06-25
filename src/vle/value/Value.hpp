@@ -54,11 +54,6 @@ namespace vle { namespace value {
     class VLE_API Value
     {
     public:
-#ifndef NDEBUG
-        static unsigned long int allocated;
-        static unsigned long int deallocated;
-#endif
-
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
             XMLTYPE, NIL, MATRIX };
 
@@ -71,9 +66,6 @@ namespace vle { namespace value {
 	 */
 	Value()
         {
-#ifndef NDEBUG
-            Value::allocated++;
-#endif
         }
 
         /**
@@ -82,9 +74,6 @@ namespace vle { namespace value {
          */
         Value(const Value& /* value */)
         {
-#ifndef NDEBUG
-            Value::allocated++;
-#endif
         }
 
         /**
@@ -92,9 +81,6 @@ namespace vle { namespace value {
 	 */
 	virtual ~Value()
         {
-#ifndef NDEBUG
-            Value::deallocated++;
-#endif
         }
 
         ///
