@@ -87,19 +87,41 @@ option(WITH_GTKSOURCEVIEW "use gtksourcevieww to build gvle [default: on]" ON)
 if (WITH_CAIRO AND WITH_GTK AND WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
     cairomm-1.0>=1.2 gtkmm-2.4 gtksourceviewmm-2.0)
-elseif (WITH_CAIRO AND WITH_GTK)
+
+  if (NOT VLEDEPS_FOUND)
+    message(STATUS "Failed to find gtksourceviewmm-2.0")
+    set (WITH_GTKSOURCEVIEW OFF)
+  endif ()
+endif ()
+
+if (WITH_CAIRO AND WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
     cairomm-1.0>=1.2 gtkmm-2.4)
-elseif (WITH_CAIRO)
+
+  if (NOT VLEDEPS_FOUND)
+    message(STATUS "Failed to find gtkmm-2.4")
+    set (WITH_GTK OFF)
+  endif ()
+endif ()
+
+if (WITH_CAIRO AND NOT WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
     cairomm-1.0>=1.2)
-else ()
-  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
-endif()
 
-#if (NOT VLEDEPS_FOUND)
-  #message(FATAL_ERROR "Missing dependencies")
-#endif ()
+  if (NOT VLEDEPS_FOUND)
+    message(STATUS "Failed to find cairomm-1.0")
+    set (WITH_CAIRO OFF)
+  endif ()
+endif ()
+
+if (NOT WITH_CAIRO AND NOT WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
+  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
+
+  if (NOT VLEDEPS_FOUND)
+    message(FATAL_ERROR "Failed to find minimal dependencies: libarchive,"
+      "glibmm-2.4, gthread-2.0 and libxml-2.0")
+  endif ()
+endif()
 
 if (WITH_CAIRO)
     set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
