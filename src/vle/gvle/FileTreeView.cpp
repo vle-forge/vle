@@ -616,6 +616,10 @@ void FileTreeView::onPaste()
         if (utils::Path::extension(newFileName) == "") {
             newFileName += utils::Path::extension(mAbsolutePath);
         }
+        if (not isDirectory(mAbsolutePath)){
+            utils::Package pack;
+            pack.copy(mAbsolutePath, newAbsolutePath);
+        }
 
         mParent->refreshPackageHierarchy();
 
