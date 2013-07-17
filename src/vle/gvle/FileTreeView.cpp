@@ -368,7 +368,7 @@ void FileTreeView::onEdition(const Glib::ustring& path,
         if (not utils::Path::exist(Glib::build_filename(
                     mParent->currentPackage().getDir(vle::utils::PKG_SOURCE),
                     newPath))) {
-            mParent->currentPackage().rename(oldFilename, newFilename,
+            mParent->currentPackage().rename(oldFilePath, newFilename,
                     vle::utils::PKG_SOURCE);
             mParent->refreshEditor(oldFilePath, newPath);
         } else {
