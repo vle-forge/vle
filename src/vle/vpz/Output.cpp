@@ -116,6 +116,12 @@ void Output::setLocalStream(const std::string& location,
     clearData();
 }
 
+void Output::setLocalStreamLocation(const std::string& location)
+{
+    m_location.assign(location);
+    m_format = Output::LOCAL;
+}
+
 void Output::setLocalStream(const std::string& location,
                             const std::string& plugin)
 {

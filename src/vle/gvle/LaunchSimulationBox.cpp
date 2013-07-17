@@ -128,8 +128,8 @@ void LaunchSimulationBox::runThread()
         vle::vpz::Output& output = itb->second;
         if (output.location().empty()) {
             mCurrPackage.addDirectory("","output",vle::utils::PKG_SOURCE);
-            output.setLocalStream(mCurrPackage.getOutputDir(
-                    vle::utils::PKG_SOURCE), output.plugin(), output.package());
+            output.setLocalStreamLocation(mCurrPackage.getOutputDir(
+                    vle::utils::PKG_SOURCE));
         }
     }
 
