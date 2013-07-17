@@ -591,6 +591,10 @@ void FileTreeView::onPaste()
 
         int copyNumber = 1;
         std::string suffixe;
+        if (mFileName.find_last_of(".") == std::string::npos) {
+            return;
+        }
+
         do {
             suffixe = "_" + boost::lexical_cast < std::string >(copyNumber);
 
