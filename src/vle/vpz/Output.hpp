@@ -145,6 +145,12 @@ namespace vle {
                             const std::string& plugin);
 
         /**
+         * @brief Set the location of the output plugin.
+         * @param location the file name.
+         */
+        void setLocalStreamLocation(const std::string& location);
+
+        /**
          * @brief Set the output with the sdml stream information. The name is
          * obligatory, the location defines a filename.
          * @param location the file name.

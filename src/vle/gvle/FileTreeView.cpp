@@ -368,7 +368,7 @@ void FileTreeView::onEdition(const Glib::ustring& path,
         if (not utils::Path::exist(Glib::build_filename(
                     mParent->currentPackage().getDir(vle::utils::PKG_SOURCE),
                     newPath))) {
-            mParent->currentPackage().rename(oldFilename, newFilename,
+            mParent->currentPackage().rename(oldFilePath, newFilename,
                     vle::utils::PKG_SOURCE);
             mParent->refreshEditor(oldFilePath, newPath);
         } else {
@@ -591,6 +591,10 @@ void FileTreeView::onPaste()
 
         int copyNumber = 1;
         std::string suffixe;
+        if (mFileName.find_last_of(".") == std::string::npos) {
+            return;
+        }
+
         do {
             suffixe = "_" + boost::lexical_cast < std::string >(copyNumber);
 
@@ -615,6 +619,10 @@ void FileTreeView::onPaste()
 
         if (utils::Path::extension(newFileName) == "") {
             newFileName += utils::Path::extension(mAbsolutePath);
+        }
+        if (not isDirectory(mAbsolutePath)){
+            utils::Package pack;
+            pack.copy(mAbsolutePath, newAbsolutePath);
         }
 
         mParent->refreshPackageHierarchy();
