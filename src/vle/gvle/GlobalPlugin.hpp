@@ -25,7 +25,7 @@
  */
 
 
-#ifndef VLE_GVLE_CLOBALPLUGIN_HPP
+#ifndef VLE_GVLE_GLOBALPLUGIN_HPP
 #define VLE_GVLE_GLOBALPLUGIN_HPP
 
 #include <vle/DllDefines.hpp>
