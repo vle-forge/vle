@@ -100,7 +100,7 @@ void SaveVpzBox::onCancel()
 
 bool SaveVpzBox::exist(std::string name)
 {
-    utils::PathList list =  mGVLE->currentPackage().getExperiments();
+    utils::PathList list =  mGVLE->currentPackage().getExperiments(vle::utils::PKG_SOURCE);
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
         if (utils::Path::basename(*it) == name) {
