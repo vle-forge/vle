@@ -122,6 +122,8 @@ DocumentText::DocumentText(GVLE* gvle,
         } else {
 	    Error(std::string("cannot open: " + filename()));
 	}
+    } else {
+         init("");
     }
 
     applyEditingProperties();
