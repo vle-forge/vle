@@ -35,6 +35,9 @@
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/scale.h>
 
+#define MIN_LINE_WIDTH 1
+#define MAX_LINE_WIDTH 10
+
 namespace vle { namespace gvle {
 
 class PreferencesBox::Pimpl
@@ -53,6 +56,8 @@ public:
         xml->get_widget("ButtonPreferencesConnectionColor", mConnectionColor);
         xml->get_widget("ButtonPreferencesSelectFont", mFont);
         xml->get_widget("HScalePreferencesLineWidth", mLineWidth);
+
+        mLineWidth->set_range(MIN_LINE_WIDTH, MAX_LINE_WIDTH);
 
         xml->get_widget("CheckPreferencesHighlightSyntax", mHighlightSyntax);
         xml->get_widget("CheckPreferencesHighlightMatchingBrackets",
@@ -121,7 +126,9 @@ public:
     void onRestore()
     {
         Settings::settings().setDefault();
-        updateWidgets();
+        Settings::settings().save();
+
+        mDialog->response(Gtk::RESPONSE_OK);
     }
 
     void loadSettings()
