@@ -269,6 +269,7 @@ class DescriptionParser
 
                     if (not read_word(".")) {
                         pkg.patch = -1;
+                        unget();
                     } else {
                         if (not read_integer(&pkg.patch))
                             return false;
