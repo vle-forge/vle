@@ -417,7 +417,15 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
 
     try {
         vle::utils::RemoteManager rm;
-        rm.start(act, args.front(), &std::cout);
+        switch (act) {
+        case vle::utils::REMOTE_MANAGER_UPDATE:
+            rm.start(act, "", &std::cout);
+            break;
+        default:
+            rm.start(act, args.front(), &std::cout);
+            break;
+        }
+
         rm.join();
     } catch (const std::exception &e) {
         std::cerr << vle::fmt(_("Remote error: %1%\n")) % e.what();
@@ -622,7 +630,8 @@ int main(int argc, char *argv[])
 
         if (ret == PROGRAM_OPTIONS_FAILURE)
             return EXIT_FAILURE;
-        else if (ret == PROGRAM_OPTIONS_END or args.empty())
+        else if (ret == PROGRAM_OPTIONS_END
+                or (ret != PROGRAM_OPTIONS_REMOTE and args.empty()))
             return EXIT_SUCCESS;
     }
 
