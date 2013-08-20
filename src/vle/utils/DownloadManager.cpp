@@ -36,6 +36,8 @@
 #include <vle/utils/Preferences.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/asio.hpp>
 #include <cstring>
 #include <fstream>
@@ -67,10 +69,27 @@ public:
             throw utils::InternalError(
                 fmt(_("Download manager: already start")));
         }
+        if ( url.substr(0,7) != "http://") {
+            mUrl.assign(url);
+            mServerFile.assign("/");
+            mServerFile.append(serverfile);
+        } else {
+            mUrl.assign(url.substr(7));
+            std::vector < std::string > subUrl;
+            boost::algorithm::split(subUrl, mUrl,
+                    boost::algorithm::is_any_of("/"),
+                    boost::algorithm::token_compress_on);
+            mUrl.assign(subUrl[0]);
+            mServerFile.assign("");
+            for (unsigned int i=1; i<subUrl.size(); i++) {
+                mServerFile.append("/");
+                mServerFile.append(subUrl[i]);
+            }
+            mServerFile.append("/");
+            mServerFile.append(serverfile);
 
-        mUrl.assign(url);
-        mServerFile.assign("/");
-        mServerFile.append(serverfile);
+        }
+
         mCompletePath.assign("http://");
         mCompletePath.append(mUrl);
         mCompletePath.append(mServerFile);
