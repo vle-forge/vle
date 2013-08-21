@@ -161,7 +161,7 @@ public:
         mVleRemoteOptions.add_options()
             ("vle.remote.url", po::value < std::string >
              (NULL)->default_value((fmt(
-                         "http://www.vle-project.org/%1%.%2%") %
+                         "http://www.vle-project.org/pub/%1%.%2%") %
                      VLE_MAJOR_VERSION % VLE_MINOR_VERSION).str()))
             ("vle.remote.proxy_ip", po::value < std::string >
              (NULL)->default_value(""))

@@ -316,7 +316,7 @@ public:
         {
             DownloadManager dl;
 
-            dl.start(url, "packages");
+            dl.start(url, "packages.pkg");
             dl.join();
 
             std::cout << vle::fmt("%1% %2%\n") % url % dl.hasError();
@@ -566,12 +566,16 @@ void RemoteManager::getResult(Packages *out)
 
 std::string RemoteManager::getLocalPackageFilename()
 {
-    return utils::Path::path().getHomeFile("local.pkg");
+    return utils::Path::path().buildFilename(
+            utils::Path::path().getBinaryPackagesDir(),
+            "local.pkg");
 }
 
 std::string RemoteManager::getRemotePackageFilename()
 {
-    return utils::Path::path().getHomeFile("remote.pkg");
+    return utils::Path::path().buildFilename(
+            utils::Path::path().getBinaryPackagesDir(),
+            "remote.pkg");
 }
 
 }} // namespace vle utils
