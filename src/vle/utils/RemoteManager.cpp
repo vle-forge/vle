@@ -354,6 +354,12 @@ public:
         PackageParser parser;
         std::for_each(urls.begin(), urls.end(),
                       Download(&parser));
+        remote.clear();
+        PackageParser::const_iterator itb = parser.begin();
+        PackageParser::const_iterator ite = parser.end();
+        for (; itb!=ite; itb++) {
+            remote.insert(*itb);
+        }
 
         if (not parser.empty()) {
             std::set_intersection(local.begin(),
