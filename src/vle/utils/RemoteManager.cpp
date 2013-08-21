@@ -165,7 +165,7 @@ public:
             mHasError = false;
             mArgs = arg;
             mStream = out;
-            mPackages.clear();
+            mResults.clear();
 
             switch (action) {
             case REMOTE_MANAGER_UPDATE:
@@ -330,6 +330,11 @@ public:
         }
     };
 
+    /**
+     * @brief Update the remote.pkg and local.pkg files,
+     * the result of this command is the set of packages for which a new version
+     * is available on remotes.
+     */
     void actionUpdate() throw()
     {
         std::vector < std::string > urls;
@@ -355,7 +360,7 @@ public:
                                   local.end(),
                                   parser.begin(),
                                   parser.end(),
-                                  std::back_inserter(mPackages),
+                                  std::back_inserter(mResults),
                                   PackageIdUpdate());
         }
 
@@ -366,6 +371,10 @@ public:
         mHasError = false;
     }
 
+    /**
+     * @brief Install one or more packages. The result of this command
+     * is the set of packages that have been installed
+     */
     void actionInstall() throw()
     {
         // const_iterator it = mPackages.find(mArgs);
@@ -442,13 +451,18 @@ public:
         // mHasError = false;
     }
 
+
+    /**
+     * @brief Search for packages installed on local machine. The result of
+     * this command is the set of packages found.
+     */
     void actionLocalSearch() throw ()
     {
         boost::regex expression(mArgs, boost::regex::grep);
 
         std::remove_copy_if(local.begin(),
                             local.end(),
-                            std::back_inserter(mPackages),
+                            std::back_inserter(mResults),
                             NotHaveExpression(expression));
 
         mStream = 0;
@@ -458,13 +472,17 @@ public:
         mHasError = false;
     }
 
+    /**
+     * @brief Search for packages available on remotes. The result of
+     * this command is the set of packages found.
+     */
     void actionSearch() throw()
     {
         boost::regex expression(mArgs, boost::regex::grep);
 
         std::remove_copy_if(remote.begin(),
                             remote.end(),
-                            std::back_inserter(mPackages),
+                            std::back_inserter(mResults),
                             NotHaveExpression(expression));
 
         mStream = 0;
@@ -496,13 +514,13 @@ public:
 
             std::copy(found.first,
                       found.second,
-                      std::back_inserter(mPackages));
+                      std::back_inserter(mResults));
 
             found = remote.equal_range(tmp);
 
             std::copy(found.first,
                       found.second,
-                      std::back_inserter(mPackages));
+                      std::back_inserter(mResults));
         }
 
         mStream = 0;
@@ -514,7 +532,10 @@ public:
 
     PackagesIdSet local;
     PackagesIdSet remote;
-    Packages mPackages;
+    /**
+     * @brief The set of packages resulting form the last command
+     */
+    Packages mResults;
     boost::mutex mMutex;
     boost::thread mThread;
     std::string mArgs;
@@ -556,10 +577,10 @@ void RemoteManager::getResult(Packages *out)
 {
     if (out) {
         out->clear();
-        out->reserve(mPimpl->mPackages.size());
+        out->reserve(mPimpl->mResults.size());
 
-        std::copy(mPimpl->mPackages.begin(),
-                  mPimpl->mPackages.end(),
+        std::copy(mPimpl->mResults.begin(),
+                  mPimpl->mResults.end(),
                   std::back_inserter(*out));
     }
 }
