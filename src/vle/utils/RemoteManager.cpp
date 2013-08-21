@@ -419,42 +419,40 @@ public:
         // mHasError = false;
     }
 
+    /**
+     * @brief Dowload a package form a remote. The zip file is stored into the
+     * current directory. The result of the command is the set of one element :
+     * the package that has been dowloaded
+     */
     void actionSource() throw()
     {
-        // const_iterator it = mPackages.find(mArgs);
-
-        // if (it != mPackages.end()) {
-        //     std::string url = it->second.getSourcePackageUrl();
-
-        //     DownloadManager dl;
-
-        //     out(fmt(_("Download source package `%1%' at %2%")) % mArgs % url);
-        //     dl.start(url);
-        //     dl.join();
-
-        //     if (not dl.hasError()) {
-        //         out(_("install"));
-        //         std::string filename = dl.filename();
-        //         std::string zipfilename = dl.filename();
-        //         zipfilename += ".zip";
-
-        //         boost::filesystem::rename(filename, zipfilename);
-
-        //         utils::Package::package().unzip(mArgs, zipfilename);
-        //         utils::Package::package().wait(*mStream, *mStream);
-        //         out(_(": ok\n"));
-        //     } else {
-        //         out(_(": failed\n"));
-        //     }
-        // } else {
-        //     out(fmt(_("Unknown package `%1%'")) % mArgs);
-        // }
-
-        // mStream = 0;
-        // mIsFinish = true;
-        // mIsStarted = false;
-        // mStop = false;
-        // mHasError = false;
+        PackageId pkgid;
+        pkgid.name = mArgs;
+        PackagesIdSet::const_iterator it = remote.find(pkgid);
+        if (it != remote.end()) {
+            DownloadManager dl;
+            std::string url = it->url;
+            std::string zipfilename = mArgs;
+            zipfilename.append(".zip");
+            out(fmt(_("Download source package `%1%' at %2%")) % mArgs % url);
+            dl.start(url, zipfilename);
+            dl.join();
+            if (not dl.hasError()) {
+                std::string filename = dl.filename();
+                boost::filesystem::rename(filename, zipfilename);
+                out(_(": ok\n"));
+            } else {
+                out(_(": failed\n"));
+            }
+         } else {
+             out(fmt(_("Unknown package `%1%'")) % mArgs);
+         }
+        mResults.push_back(pkgid);
+        mStream = 0;
+        mIsFinish = true;
+        mIsStarted = false;
+        mStop = false;
+        mHasError = false;
     }
 
 
