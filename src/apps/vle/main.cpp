@@ -525,8 +525,8 @@ struct ProgramOptions
                 "\tvle -R update: update the database\n"
                 "\tvle -R search expression: search in database \n"
                 "\tvle -R local_search expression: search in local\n"
-                "\tvle -R install packages: download package\n"
-                "\tvle -R install source: download source package\n"
+                "\tvle -R install : install package\n"
+                "\tvle -R source: download source package\n"
                 "\tvle -R show package: show package"))
             ("config,C", po::value < std::string >(configvar),
              _("Select configuration mode,\n  config variable value\n"
