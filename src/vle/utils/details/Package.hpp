@@ -64,21 +64,34 @@ struct PackageIdEqual
 };
 
 /**
- * A functor to detect updated packages.
+ * A functor to detect packages to update
  *
- * A package is updated if two @c PackageId have the same name but at least one
- * version number is different.
+ * A package can be updated if the two @c PackageId have the same name and if
+ * the second @c PackageId has a more recent version
  */
 struct PackageIdUpdate
     : public std::binary_function < PackageId, PackageId, bool >
 {
     bool operator()(const PackageId& lhs, const PackageId& rhs) const
     {
-        if (lhs.name == rhs.name) {
-            return lhs.major != rhs.major or lhs.minor != rhs.minor or
-                lhs.patch != rhs.patch;
+        if (lhs.name != rhs.name) {
+            return false;
         }
-
+        if (rhs.major > lhs.major) {
+            return true;
+        } else if (rhs.major < lhs.major) {
+            return false;
+        }
+        if (rhs.minor > lhs.minor) {
+            return true;
+        } else if (rhs.minor < lhs.minor) {
+            return false;
+        }
+        if (rhs.patch > lhs.patch) {
+            return true;
+        } else if (rhs.patch < lhs.patch) {
+            return false;
+        }
         return false;
     }
 };

@@ -342,8 +342,9 @@ public:
      */
     void actionUpdate() throw()
     {
-        std::vector < std::string > urls;
+        mHasError = false;
 
+        std::vector < std::string > urls;
         try {
             utils::Preferences prefs;
             std::string tmp;
@@ -353,33 +354,54 @@ public:
                                     boost::algorithm::is_any_of(","),
                                     boost::algorithm::token_compress_on);
         } catch(const std::exception& /*e*/) {
-            TraceAlways(_("Failed to read preferences file"));
+            std::ostringstream errorStream;
+            errorStream << _("Failed to read preferences file");
+            mErrorMessage.assign(errorStream.str());
+            mHasError = true;
+            return;
         }
 
         PackageParser parser;
         std::for_each(urls.begin(), urls.end(),
                       Download(&parser, &mHasError, &mErrorMessage));
         remote.clear();
-        PackageParser::const_iterator itb = parser.begin();
-        PackageParser::const_iterator ite = parser.end();
-        for (; itb!=ite; itb++) {
-            remote.insert(*itb);
+        {
+            PackageParser::const_iterator itb = parser.begin();
+            PackageParser::const_iterator ite = parser.end();
+            for (; itb!=ite; itb++) {
+                remote.insert(*itb);
+            }
         }
+        {
+            PackagesIdSet::const_iterator itb = remote.begin();
+            PackagesIdSet::const_iterator ite = remote.end();
 
-        if (not parser.empty()) {
-            std::set_intersection(local.begin(),
-                                  local.end(),
-                                  parser.begin(),
-                                  parser.end(),
-                                  std::back_inserter(mResults),
-                                  PackageIdUpdate());
+            PackagesIdSet::const_iterator itlb = local.begin();
+            PackagesIdSet::const_iterator itle = local.end();
+            bool found;
+            PackageIdUpdate pkgUpdateOp;
+            std::pair<PackagesIdSet::const_iterator,
+                      PackagesIdSet::const_iterator> pkgs_range;
+
+            for (; itlb!=itle; itlb++) {
+                const PackageId& ploc = *itlb;
+                pkgs_range = remote.equal_range(ploc);
+                found = false;
+                while ((!found) && (pkgs_range.first != pkgs_range.second)) {
+                    const PackageId& premote = *(pkgs_range.first);
+                    if (pkgUpdateOp(ploc, premote)) {
+                        found = true;
+                        mResults.push_back(premote);
+                    }
+                    pkgs_range.first++;
+                }
+            }
         }
 
         mStream = 0;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
-        mHasError = false;
     }
 
     /**
