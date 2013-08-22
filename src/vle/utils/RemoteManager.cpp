@@ -416,43 +416,63 @@ public:
         pkgid.name = mArgs;
         std::string archname = pkgid.name;
         archname.append(".tar.bz2");
-        PackagesIdSet::const_iterator it = remote.find(pkgid);
-        if (it != remote.end()) {
-            DownloadManager dl;
-            std::string url = it->url;
-            dl.start(url, archname);
-            dl.join();
-            if (not dl.hasError()) {
-                out(_("install"));
-                std::string archfile = vle::utils::Path::buildTemp(archname);
-                boost::filesystem::rename(dl.filename(), archfile);
-                std::string tempDir = vle::utils::Path::path().getParentPath(
-                        archfile);
-                std::string oldDir = vle::utils::Path::path().getCurrentDir();
-                boost::filesystem::path archpath(archfile);
-                boost::filesystem::path dearchpath(tempDir);
-                boost::filesystem::current_path(boost::filesystem::path(tempDir));
-                vle::utils::Path::path().decompress(archpath.string(),
-                        dearchpath.string());
-                vle::utils::Package pkg(pkgid.name);
-                pkg.configure();
-                pkg.build();
-                pkg.install();
-                boost::filesystem::current_path(boost::filesystem::path(oldDir));
-                mResults.push_back(pkgid);
-            } else {
-                std::ostringstream errorStream;
-                errorStream << fmt(_("Error while downloading package "
-                        "`%1%'\n")) % mArgs;
-                mErrorMessage.assign(errorStream.str());
-                mHasError = true;
+        std::pair<PackagesIdSet::const_iterator,
+                  PackagesIdSet::const_iterator> pkgs_range;
+        pkgs_range = remote.equal_range(pkgid);
+        if (pkgs_range.first == remote.end()) {
+            std::ostringstream errorStream;
+            errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
+            mErrorMessage.assign(errorStream.str());
+            mHasError = true;
+            return;
+        }
+
+
+        PackagesIdSet::const_iterator it = pkgs_range.first;
+        PackageIdUpdate pkgUpdateOp;
+        while (pkgs_range.first != pkgs_range.second) {
+            if (pkgUpdateOp(*it, *pkgs_range.first)) {
+                it = pkgs_range.first;
             }
-         } else {
-             std::ostringstream errorStream;
-             errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
-             mErrorMessage.assign(errorStream.str());
-             mHasError = true;
-         }
+            pkgs_range.first++;
+        }
+
+        PackagesIdSet::const_iterator locPkg = local.find(*it);
+        if ((locPkg != local.end()) && (!pkgUpdateOp(*locPkg, *it))) {
+            out(fmt(_("Package `%1%` is already uptodate\n"))% pkgid.name);
+            return;
+        }
+
+
+        DownloadManager dl;
+        std::string url = it->url;
+        dl.start(url, archname);
+        dl.join();
+        if (not dl.hasError()) {
+            out(_("install"));
+            std::string archfile = vle::utils::Path::buildTemp(archname);
+            boost::filesystem::rename(dl.filename(), archfile);
+            std::string tempDir = vle::utils::Path::path().getParentPath(
+                    archfile);
+            std::string oldDir = vle::utils::Path::path().getCurrentDir();
+            boost::filesystem::path archpath(archfile);
+            boost::filesystem::path dearchpath(tempDir);
+            boost::filesystem::current_path(boost::filesystem::path(tempDir));
+            vle::utils::Path::path().decompress(archpath.string(),
+                    dearchpath.string());
+            vle::utils::Package pkg(pkgid.name);
+            pkg.configure();
+            pkg.build();
+            pkg.install();
+            boost::filesystem::current_path(boost::filesystem::path(oldDir));
+            mResults.push_back(*it);
+        } else {
+            std::ostringstream errorStream;
+            errorStream << fmt(_("Error while downloading package "
+                    "`%1%'\n")) % mArgs;
+            mErrorMessage.assign(errorStream.str());
+            mHasError = true;
+        }
     }
 
     /**
