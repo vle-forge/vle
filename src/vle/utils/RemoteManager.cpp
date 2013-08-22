@@ -33,11 +33,13 @@
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DownloadManager.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <vle/utils/details/Package.hpp>
 #include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/details/PackageManager.hpp>
@@ -383,40 +385,40 @@ public:
      */
     void actionInstall() throw()
     {
-        // const_iterator it = mPackages.find(mArgs);
-
-        // if (it != mPackages.end()) {
-        //     std::string url = it->second.getBinaryPackageUrl();
-
-        //     DownloadManager dl;
-
-        //     out(fmt(_("Download binary package `%1%' at %2%")) % mArgs % url);
-        //     dl.start(url);
-        //     dl.join();
-
-        //     if (not dl.hasError()) {
-        //         out(_("install"));
-        //         std::string filename = dl.filename();
-        //         std::string zipfilename = dl.filename();
-        //         zipfilename += ".zip";
-
-        //         boost::filesystem::rename(filename, zipfilename);
-
-        //         utils::Package::package().unzip(mArgs, zipfilename);
-        //         utils::Package::package().wait(*mStream, *mStream);
-        //         out(_(": ok\n"));
-        //     } else {
-        //         out(_(": failed\n"));
-        //     }
-        // } else {
-        //     out(fmt(_("Unknown package `%1%'")) % mArgs);
-        // }
-
-        // mStream = 0;
-        // mIsFinish = true;
-        // mIsStarted = false;
-        // mStop = false;
-        // mHasError = false;
+        PackageId pkgid;
+        pkgid.name = mArgs;
+        std::string archname = pkgid.name;
+        archname.append(".tar.bz2");
+        PackagesIdSet::const_iterator it = remote.find(pkgid);
+        if (it != remote.end()) {
+            DownloadManager dl;
+            std::string url = it->url;
+            out(fmt(_("Download source package `%1%' at %2%")) % mArgs % url);
+            dl.start(url, archname);
+            dl.join();
+            if (not dl.hasError()) {
+                out(_("install"));
+                std::string archfile = vle::utils::Path::buildTemp(archname);
+                boost::filesystem::rename(dl.filename(), archfile);
+                std::string tempDir = vle::utils::Path::path().getParentPath(
+                        archfile);
+                std::string oldDir = vle::utils::Path::path().getCurrentDir();
+                boost::filesystem::path archpath(archfile);
+                boost::filesystem::path dearchpath(tempDir);
+                boost::filesystem::current_path(boost::filesystem::path(tempDir));
+                vle::utils::Path::path().decompress(archpath.string(),
+                        dearchpath.string());
+                vle::utils::Package pkg(pkgid.name);
+                pkg.configure();
+                pkg.build();
+                pkg.install();
+                boost::filesystem::current_path(boost::filesystem::path(oldDir));
+                mResults.push_back(pkgid);
+                out(_(": ok\n"));
+            } else {
+                out(_(": failed\n"));
+            }
+        }
     }
 
     /**
@@ -432,14 +434,14 @@ public:
         if (it != remote.end()) {
             DownloadManager dl;
             std::string url = it->url;
-            std::string zipfilename = mArgs;
-            zipfilename.append(".zip");
+            std::string archname = mArgs;
+            archname.append(".tar.bz2");
             out(fmt(_("Download source package `%1%' at %2%")) % mArgs % url);
-            dl.start(url, zipfilename);
+            dl.start(url, archname);
             dl.join();
             if (not dl.hasError()) {
                 std::string filename = dl.filename();
-                boost::filesystem::rename(filename, zipfilename);
+                boost::filesystem::rename(filename, archname);
                 out(_(": ok\n"));
             } else {
                 out(_(": failed\n"));
