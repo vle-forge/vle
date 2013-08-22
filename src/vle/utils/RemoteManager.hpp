@@ -194,6 +194,9 @@ public:
 
     void getResult(Packages *out);
 
+    bool hasError();
+    const std::string& messageError();
+
     /**
      * Return the path @e "$VLE_HOME/local.pkg".
      *

@@ -145,9 +145,6 @@ public:
             RemotePackageManager::extract(&tmp);
             remote.insert(tmp.begin(), tmp.end());
         }
-
-        TraceAlways(fmt(_("Remote manager: %1% local / %2% remote"))
-                    % local.size() % remote.size());
     }
 
     ~Pimpl()
@@ -307,9 +304,14 @@ public:
         : public std::unary_function < std::string, void >
     {
         PackageParser* parser;
+        bool* remoteHasError;
+        std::string* remoteMessageError;
 
-        Download(PackageParser *parser)
-            : parser(parser)
+
+        Download(PackageParser *parser, bool *remoteHasError,
+                std::string* remoteMessageError)
+            : parser(parser), remoteHasError(remoteHasError),
+              remoteMessageError(remoteMessageError)
         {
             assert(parser);
         }
@@ -321,13 +323,14 @@ public:
             dl.start(url, "packages.pkg");
             dl.join();
 
-            std::cout << vle::fmt("%1% %2%\n") % url % dl.hasError();
-
             if (not dl.hasError()) {
-                std::cout << vle::fmt("%1% %2%\n") % dl.filename() % url;
                 parser->extract(dl.filename(), url);
             } else {
-                std::cout << vle::fmt("failed: %1%\n") % dl.getErrorMessage();
+                if (!(*remoteHasError)) {
+                    *remoteHasError = true;
+                    remoteMessageError->assign((vle::fmt("failed: %1%\n")
+                    % dl.getErrorMessage()).str());
+                }
             }
         }
     };
@@ -355,7 +358,7 @@ public:
 
         PackageParser parser;
         std::for_each(urls.begin(), urls.end(),
-                      Download(&parser));
+                      Download(&parser, &mHasError, &mErrorMessage));
         remote.clear();
         PackageParser::const_iterator itb = parser.begin();
         PackageParser::const_iterator ite = parser.end();
@@ -385,6 +388,8 @@ public:
      */
     void actionInstall() throw()
     {
+        mHasError = false;
+
         PackageId pkgid;
         pkgid.name = mArgs;
         std::string archname = pkgid.name;
@@ -393,7 +398,6 @@ public:
         if (it != remote.end()) {
             DownloadManager dl;
             std::string url = it->url;
-            out(fmt(_("Download source package `%1%' at %2%")) % mArgs % url);
             dl.start(url, archname);
             dl.join();
             if (not dl.hasError()) {
@@ -414,11 +418,19 @@ public:
                 pkg.install();
                 boost::filesystem::current_path(boost::filesystem::path(oldDir));
                 mResults.push_back(pkgid);
-                out(_(": ok\n"));
             } else {
-                out(_(": failed\n"));
+                std::ostringstream errorStream;
+                errorStream << fmt(_("Error while downloading package "
+                        "`%1%'\n")) % mArgs;
+                mErrorMessage.assign(errorStream.str());
+                mHasError = true;
             }
-        }
+         } else {
+             std::ostringstream errorStream;
+             errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
+             mErrorMessage.assign(errorStream.str());
+             mHasError = true;
+         }
     }
 
     /**
@@ -426,8 +438,10 @@ public:
      * current directory. The result of the command is the set of one element :
      * the package that has been dowloaded
      */
-    void actionSource() throw()
+    void actionSource()
     {
+        mHasError = false;
+
         PackageId pkgid;
         pkgid.name = mArgs;
         PackagesIdSet::const_iterator it = remote.find(pkgid);
@@ -436,25 +450,29 @@ public:
             std::string url = it->url;
             std::string archname = mArgs;
             archname.append(".tar.bz2");
-            out(fmt(_("Download source package `%1%' at %2%")) % mArgs % url);
             dl.start(url, archname);
             dl.join();
             if (not dl.hasError()) {
                 std::string filename = dl.filename();
                 boost::filesystem::rename(filename, archname);
-                out(_(": ok\n"));
             } else {
-                out(_(": failed\n"));
+                std::ostringstream errorStream;
+                errorStream << fmt(_("Error while downloading "
+                        "source package `%1%'\n")) % mArgs;
+                mErrorMessage.assign(errorStream.str());
+                mHasError = true;
             }
          } else {
-             out(fmt(_("Unknown package `%1%'")) % mArgs);
+             std::ostringstream errorStream;
+             errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
+             mErrorMessage.assign(errorStream.str());
+             mHasError = true;
          }
         mResults.push_back(pkgid);
         mStream = 0;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
-        mHasError = false;
     }
 
 
@@ -550,6 +568,8 @@ public:
     bool mIsFinish;
     bool mStop;
     bool mHasError;
+    std::string mErrorMessage;
+
 };
 
 RemoteManager::RemoteManager()
@@ -589,6 +609,16 @@ void RemoteManager::getResult(Packages *out)
                   mPimpl->mResults.end(),
                   std::back_inserter(*out));
     }
+}
+
+bool RemoteManager::hasError()
+{
+    return mPimpl->mHasError;
+}
+
+const std::string& RemoteManager::messageError()
+{
+    return mPimpl->mErrorMessage;
 }
 
 std::string RemoteManager::getLocalPackageFilename()
