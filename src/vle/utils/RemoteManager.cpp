@@ -450,10 +450,11 @@ public:
 
         DownloadManager dl;
         std::string url = it->url;
+        out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
         dl.start(url, archname);
         dl.join();
         if (not dl.hasError()) {
-            out(_("install"));
+            out(fmt(_("ok\n")));
             std::string archfile = vle::utils::Path::buildTemp(archname);
             boost::filesystem::rename(dl.filename(), archfile);
             std::string tempDir = vle::utils::Path::path().getParentPath(
@@ -465,12 +466,19 @@ public:
             vle::utils::Path::path().decompress(archpath.string(),
                     dearchpath.string());
             vle::utils::Package pkg(pkgid.name);
+            out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %
+                    dearchpath.string());
             pkg.configure();
+            pkg.wait(std::cerr, std::cerr);
             pkg.build();
+            pkg.wait(std::cerr, std::cerr);
             pkg.install();
+            pkg.wait(std::cerr, std::cerr);
+            out(fmt(_("ok\n")));
             boost::filesystem::current_path(boost::filesystem::path(oldDir));
             mResults.push_back(*it);
         } else {
+            out(fmt(_("failed\n")));
             std::ostringstream errorStream;
             errorStream << fmt(_("Error while downloading package "
                     "`%1%'\n")) % mArgs;
