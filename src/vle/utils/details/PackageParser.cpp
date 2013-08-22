@@ -542,8 +542,6 @@ public:
 bool PackageParser::extract(const std::string& filepath,
                             const std::string& distribution)
 {
-    DTraceAlways(fmt(_("Remote manager extract %1%")) % filepath);
-
     std::ifstream ifs(filepath.c_str());
 
     if (ifs) {

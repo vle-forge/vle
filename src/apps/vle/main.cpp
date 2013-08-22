@@ -414,6 +414,12 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
         act = vle::utils::REMOTE_MANAGER_SEARCH;
     else if (remotecmd == "show")
         act = vle::utils::REMOTE_MANAGER_SHOW;
+    else {
+        std::cerr << vle::fmt(_("Remote error: remote command "
+                "'%1%' unrecognised \n")) % remotecmd;
+        ret = EXIT_FAILURE;
+        return ret;
+    }
 
     try {
         vle::utils::RemoteManager rm;
@@ -427,7 +433,82 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
         }
 
         rm.join();
+
+        if (rm.hasError()) {
+            std::cerr << vle::fmt(_("Remote error: %1%\n")) % rm.messageError();
+            ret = EXIT_FAILURE;
+            return ret;
+        }
+
+        vle::utils::Packages res;
+        rm.getResult(&res);
+        vle::utils::Packages::const_iterator itb = res.begin();
+        vle::utils::Packages::const_iterator ite = res.end();
+        switch (act) {
+        case vle::utils::REMOTE_MANAGER_UPDATE:
+            if (itb == ite) {
+                std::cout << "No package has to be updated"
+                        << std::endl;
+            } else {
+                std::cout << "Packages to update (re-install them):"
+                        << std::endl;
+                for (; itb != ite; itb++) {
+                    std::cout << itb->name << "\t from " << itb->url
+                            << "\t (new version:  " << itb->major << "."
+                            << itb->minor << "." << itb->patch << ")"
+                            << std::endl;
+                }
+            }
+            break;
+        case vle::utils::REMOTE_MANAGER_SOURCE:
+            if (itb == ite) {
+                std::cout << "No package has been dowloaded" << std::endl;
+            } else {
+                std::cout << "Package downloaded:" << std::endl;
+                for (; itb != ite; itb++) {
+                    std::cout << itb->name << "\t from " << itb->url
+                            << std::endl;
+                }
+            }
+            break;
+        case vle::utils::REMOTE_MANAGER_INSTALL:
+            if (itb == ite) {
+                std::cout << "No package has been installed" << std::endl;
+            } else {
+                std::cout << "Package installed:" << std::endl;
+                for (; itb != ite; itb++) {
+                    std::cout << itb->name << "\t from " << itb->url << std::endl;
+                }
+            }
+            break;
+        case vle::utils::REMOTE_MANAGER_LOCAL_SEARCH:
+            if (itb == ite) {
+                std::cout << "No local package has been found" << std::endl;
+            } else {
+                std::cout << "Found local packages:" << std::endl;
+                for (; itb != ite; itb++) {
+                    std::cout << itb->name << std::endl;
+                }
+            }
+            break;
+        case vle::utils::REMOTE_MANAGER_SEARCH:
+            if (itb == ite) {
+                std::cout << "No remote package has been found" << std::endl;
+            } else {
+                std::cout << "Found remote packages:" << std::endl;
+                for (; itb != ite; itb++) {
+                    std::cout << itb->name << "\t from " << itb->url << std::endl;
+                }
+            }
+            break;
+        case vle::utils::REMOTE_MANAGER_SHOW:
+            break;
+        }
+
     } catch (const std::exception &e) {
+
+        std::cout << " DBG passe par recup " << std::endl;
+
         std::cerr << vle::fmt(_("Remote error: %1%\n")) % e.what();
         ret = EXIT_FAILURE;
     }
