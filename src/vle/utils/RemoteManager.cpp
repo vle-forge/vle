@@ -191,6 +191,10 @@ public:
                 mThread = boost::thread(
                     &RemoteManager::Pimpl::actionShow, this);
                 break;
+            case REMOTE_MANAGER_LOCAL_SHOW:
+                mThread = boost::thread(
+                    &RemoteManager::Pimpl::actionLocalShow, this);
+                break;
             default:
                 break;
             }
@@ -558,42 +562,75 @@ public:
         mHasError = false;
     }
 
+
+    /**
+     * @brief Show multiple versions of a package available on remotes.
+     * The result of this command is the set of remote packages found.
+     */
     void actionShow() throw()
     {
-        std::vector < std::string > args;
 
-        boost::algorithm::split(args, mArgs,
-                                boost::algorithm::is_any_of(" "),
-                                boost::algorithm::token_compress_on);
+        mHasError = false;
 
-        std::vector < std::string >::iterator it, end;
+        PackageId pkgid;
+        pkgid.name = mArgs;
 
-        for (it = args.begin(), end = args.end(); it != end; ++it) {
-            PackageId tmp;
+        std::pair < PackagesIdSet::iterator,
+                    PackagesIdSet::iterator > found;
 
-            tmp.name = *it;
+        found = remote.equal_range(pkgid);
 
-            std::pair < PackagesIdSet::iterator,
-                PackagesIdSet::iterator > found;
-
-            found = local.equal_range(tmp);
-
-            std::copy(found.first,
-                      found.second,
-                      std::back_inserter(mResults));
-
-            found = remote.equal_range(tmp);
-
-            std::copy(found.first,
-                      found.second,
-                      std::back_inserter(mResults));
+        if (found.first == remote.end()) {
+            std::ostringstream errorStream;
+            errorStream << fmt(_("Unknown remote package `%1%'\n")) % mArgs;
+            mErrorMessage.assign(errorStream.str());
+            mHasError = true;
+            return;
         }
+
+        std::copy(found.first,
+                  found.second,
+                  std::back_inserter(mResults));
 
         mStream = 0;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
+    }
+
+    /**
+     * @brief Show multiple versions of a package available on remotes.
+     * The result of this command is the set of remote packages found.
+     */
+    void actionLocalShow() throw()
+    {
+
         mHasError = false;
+
+        PackageId pkgid;
+        pkgid.name = mArgs;
+
+        std::pair < PackagesIdSet::iterator,
+                    PackagesIdSet::iterator > found;
+
+        found = local.equal_range(pkgid);
+
+        if (found.first == remote.end()) {
+            std::ostringstream errorStream;
+            errorStream << fmt(_("Unknown local package `%1%'\n")) % mArgs;
+            mErrorMessage.assign(errorStream.str());
+            mHasError = true;
+            return;
+        }
+
+        std::copy(found.first,
+                  found.second,
+                  std::back_inserter(mResults));
+
+        mStream = 0;
+        mIsFinish = true;
+        mIsStarted = false;
+        mStop = false;
     }
 
     PackagesIdSet local;

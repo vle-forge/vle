@@ -414,6 +414,8 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
         act = vle::utils::REMOTE_MANAGER_SEARCH;
     else if (remotecmd == "show")
         act = vle::utils::REMOTE_MANAGER_SHOW;
+    else if (remotecmd == "localshow")
+        act = vle::utils::REMOTE_MANAGER_LOCAL_SHOW;
     else {
         std::cerr << vle::fmt(_("Remote error: remote command "
                 "'%1%' unrecognised \n")) % remotecmd;
@@ -502,6 +504,22 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
             }
             break;
         case vle::utils::REMOTE_MANAGER_SHOW:
+            if (itb == ite) {
+                std::cout << "No remote package has been found" << std::endl;
+            } else {
+                for (; itb != ite; itb++) {
+                    std::cout << *itb << std::endl;
+                }
+            }
+            break;
+        case vle::utils::REMOTE_MANAGER_LOCAL_SHOW:
+            if (itb == ite) {
+                std::cout << "No local package has been found" << std::endl;
+            } else {
+                for (; itb != ite; itb++) {
+                    std::cout << *itb << std::endl;
+                }
+            }
             break;
         }
 
@@ -606,9 +624,10 @@ struct ProgramOptions
                 "\tvle -R update: update the database\n"
                 "\tvle -R search expression: search in database \n"
                 "\tvle -R local_search expression: search in local\n"
-                "\tvle -R install : install package\n"
-                "\tvle -R source: download source package\n"
-                "\tvle -R show package: show package"))
+                "\tvle -R install package: install package\n"
+                "\tvle -R source package: download source package\n"
+                "\tvle -R show package: show package in database\n"
+                "\tvle -R localshow package: show package in local"))
             ("config,C", po::value < std::string >(configvar),
              _("Select configuration mode,\n  config variable value\n"
                 "Update the vle.conf configuration file. Assign `value' to the"

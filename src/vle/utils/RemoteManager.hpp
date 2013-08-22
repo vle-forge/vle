@@ -109,7 +109,8 @@ enum RemoteManagerActions
     REMOTE_MANAGER_INSTALL,     /**< vle --remove install glue. */
     REMOTE_MANAGER_LOCAL_SEARCH, /**< vle --remote localsearch '.*' */
     REMOTE_MANAGER_SEARCH,      /**< vle --remote search '*lu*'. */
-    REMOTE_MANAGER_SHOW         /**< vle --remote show glue. */
+    REMOTE_MANAGER_SHOW,         /**< vle --remote show glue. */
+    REMOTE_MANAGER_LOCAL_SHOW    /**< vle --remote localshow glue. */
 };
 
 VLE_API std::ostream& operator<<(std::ostream& os, const PackageId& b);
