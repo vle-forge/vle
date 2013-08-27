@@ -370,7 +370,6 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
 
 DocumentDrawingArea::~DocumentDrawingArea()
 {
-
 }
 
 void DocumentDrawingArea::setHadjustment(double h)
@@ -448,6 +447,7 @@ DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
     mTitle = filename() + utils::Path::extension(filepath)
         + " - " + model->getName();
     mCompleteArea = mView->getCompleteArea();
+
     mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
     mViewport->add(*mCompleteArea);
     mViewport->set_shadow_type(Gtk::SHADOW_NONE);
@@ -462,6 +462,11 @@ DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
 
 DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
 {
+    Gtk::Adjustment* vAdjust =  get_vadjustment();
+    Gtk::Adjustment* hAdjust =  get_hadjustment();
+
+    mCompleteArea->set(vAdjust, hAdjust);
+
     remove();
     delete mViewport;
 }
@@ -490,6 +495,11 @@ DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(GVLE* gvle,
 
 DocumentSimpleDrawingArea::~DocumentSimpleDrawingArea()
 {
+    Gtk::Adjustment* vAdjust =  get_vadjustment();
+    Gtk::Adjustment* hAdjust =  get_hadjustment();
+
+    mSimpleArea->set(vAdjust, hAdjust);
+
     remove();
     delete mViewport;
 }
@@ -801,6 +811,17 @@ void Editor::showCompleteView(const std::string& filepath,
     int page;
 
     if (it != mDocuments.end()) {
+        ViewDrawingArea* previousvda;
+        ViewDrawingArea* newvda;
+        DocumentDrawingArea* dda = dynamic_cast<DocumentDrawingArea*>(it->second);
+        bool prevIsSimple = false;
+        if (dda->isComplete()) {
+            previousvda = dynamic_cast<ViewDrawingArea*>(dda->getCompleteDrawingArea());
+        } else {
+            prevIsSimple = true;
+            previousvda = dynamic_cast<ViewDrawingArea*>(dda->getSimpleDrawingArea());
+        }
+
         focusTab(filepath);
         page = get_current_page();
         remove_page(page);
@@ -816,7 +837,24 @@ void Editor::showCompleteView(const std::string& filepath,
             std::pair < std::string, DocumentDrawingArea* > (filepath,doc));
         append_page(*doc, *(addLabel(doc->getTitle(),
                                      filepath)));
+
+        newvda = dynamic_cast<ViewDrawingArea*>(doc->getCompleteDrawingArea());
+        if (prevIsSimple) {
+            newvda->setZoom(previousvda->getZoom());
+        }
+
         reorder_child(*doc, page);
+        show_all_children();
+        set_current_page(page);
+        getDocumentDrawingArea()->updateCursor();
+
+        Gtk::Adjustment* vAdjust =  doc->get_vadjustment();
+        Gtk::Adjustment* hAdjust =  doc->get_hadjustment();
+        if (prevIsSimple) {
+            previousvda->reset(vAdjust, hAdjust);
+        } else {
+            newvda->reset(vAdjust, hAdjust);
+        }
     } else {
         DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
             mGVLE,
@@ -828,11 +866,10 @@ void Editor::showCompleteView(const std::string& filepath,
             std::pair < std::string, DocumentDrawingArea* >(filepath, doc));
         page = append_page(*doc, *(addLabel(doc->getTitle(),
                                             filepath)));
+        show_all_children();
+        set_current_page(page);
+        getDocumentDrawingArea()->updateCursor();
     }
-
-    show_all_children();
-    set_current_page(page);
-    getDocumentDrawingArea()->updateCursor();
 }
 
 void Editor::showSimpleView(const std::string& filepath,
@@ -842,8 +879,21 @@ void Editor::showSimpleView(const std::string& filepath,
     int page;
 
     if (it != mDocuments.end()) {
+
+        ViewDrawingArea* previousvda;
+        ViewDrawingArea* newvda;
+        DocumentDrawingArea* dda = dynamic_cast<DocumentDrawingArea*>(it->second);
+        bool prevIsComplete = false;
+        if (dda->isComplete()) {
+            prevIsComplete = true;
+            previousvda = dynamic_cast<ViewDrawingArea*>(dda->getCompleteDrawingArea());
+        } else {
+            previousvda = dynamic_cast<ViewDrawingArea*>(dda->getSimpleDrawingArea());
+        }
+
         focusTab(filepath);
         page = get_current_page();
+
         remove_page(page);
         delete it->second;
         mDocuments.erase(it->first);
@@ -859,14 +909,26 @@ void Editor::showSimpleView(const std::string& filepath,
         append_page(*doc, *(addLabel(doc->getTitle(),
                                      filepath)));
 
-        reorder_child(*doc, page);
+        newvda = dynamic_cast<ViewDrawingArea*>(doc->getSimpleDrawingArea());
+        if (prevIsComplete) {
+            newvda->setZoom(previousvda->getZoom());
+        }
 
+        reorder_child(*doc, page);
+        show_all_children();
+        set_current_page(page);
+        getDocumentDrawingArea()->updateCursor();
+        Gtk::Adjustment* vAdjust=  doc->get_vadjustment();
+        Gtk::Adjustment* hAdjust=  doc->get_hadjustment();
+        if (prevIsComplete) {
+            previousvda->reset(vAdjust, hAdjust);
+        } else {
+            newvda->reset(vAdjust, hAdjust);
+        }
     } else {
         return;
     }
-    show_all_children();
-    set_current_page(page);
-    getDocumentDrawingArea()->updateCursor();
+
 }
 
 void Editor::refreshViews()
