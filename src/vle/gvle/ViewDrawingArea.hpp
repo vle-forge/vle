@@ -30,6 +30,7 @@
 
 #include <gtkmm/drawingarea.h>
 #include <gdkmm/color.h>
+#include <gtkmm/adjustment.h>
 
 namespace vle { namespace vpz {
 
@@ -43,6 +44,37 @@ namespace vle { namespace gvle {
     class GVLE;
     class View;
     class Modeling;
+
+    class Adjustment
+    {
+    public:
+        void set(Gtk::Adjustment* adjust)
+        {
+             mValue = adjust->get_value();
+             mLower = adjust->get_lower();
+             mUpper = adjust->get_upper();
+             mStep_increment = adjust->get_step_increment();
+             mPage_increment = adjust->get_page_increment();
+             mPage_size = adjust->get_page_size();
+        }
+
+        void reset(Gtk::Adjustment* adjust)
+        {
+            adjust->configure(mValue,
+                              mLower,
+                              mUpper,
+                              mStep_increment,
+                              mPage_increment,
+                              mPage_size);
+        }
+    private:
+        double mValue;
+        double mLower;
+        double mUpper;
+        double mStep_increment;
+        double mPage_increment;
+        double mPage_size;
+    };
 
     class Color
     {
@@ -61,6 +93,7 @@ namespace vle { namespace gvle {
     class ViewDrawingArea : public Gtk::DrawingArea
     {
     public:
+
         static const guint MODEL_WIDTH;
         static const guint MODEL_DECAL;
         static const guint MODEL_PORT;
@@ -106,6 +139,14 @@ namespace vle { namespace gvle {
          * @return zoom value
          */
         inline double getZoom() const { return mZoom; }
+
+        /**
+         * Get current zoom value
+         *
+         * @return zoom value
+         */
+        inline void setZoom(double zoom)
+        { mZoom = zoom; }
 
         /** Add a constant to zoom limit by 4.0 */
         void addCoefZoom();
@@ -167,6 +208,19 @@ namespace vle { namespace gvle {
 
         bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
                             const Glib::RefPtr<Gtk::Tooltip>& tooltip);
+
+
+        void set(Gtk::Adjustment* vadjust, Gtk::Adjustment* hadjust)
+        {
+            mVAdjustment.set(vadjust);
+            mHAdjustment.set(hadjust);
+        }
+
+        void reset(Gtk::Adjustment* vadjust, Gtk::Adjustment* hadjust)
+        {
+            mVAdjustment.reset(vadjust);
+            mHAdjustment.reset(hadjust);
+        }
 
     protected:
 
@@ -248,7 +302,7 @@ namespace vle { namespace gvle {
         void delConnection();
 
         View*                           mView;
-        vpz::CoupledModel*            mCurrent;
+        vpz::CoupledModel*              mCurrent;
         Modeling*                       mModeling;
         GVLE*                           mGVLE;
 
@@ -291,6 +345,9 @@ namespace vle { namespace gvle {
 
         sigc::connection m_cntSignalQueryTooltip;
 
+        // Adjusment
+        Adjustment mVAdjustment;
+        Adjustment mHAdjustment;
     };
 
 }} // namespace vle gvle

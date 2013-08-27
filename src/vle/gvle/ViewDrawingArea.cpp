@@ -607,6 +607,7 @@ void ViewDrawingArea::on_realize()
     assert(mWin);
     mWingc = Gdk::GC::create(mWin);
     mIsRealized = true;
+    newSize();
     queueRedraw();
 }
 
