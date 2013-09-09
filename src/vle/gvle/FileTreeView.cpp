@@ -526,6 +526,7 @@ void FileTreeView::onNewFile()
 
 void FileTreeView::onNewDirectory()
 {
+
     std::list < Gtk::TreeModel::Path > lst(mTreeSelection->get_selected_rows());
 
     SimpleTypeBox box(_("Name of the Directory ?"), "");
@@ -533,12 +534,10 @@ void FileTreeView::onNewDirectory()
 
     if (box.valid() and not name.empty()) {
         std::string path;
-
+        std::list < std::string > lstpath;
         if (not lst.empty()) {
             Gtk::TreeModel::iterator it = mTreeModel->get_iter(lst.front());
             if (*it) {
-                std::list < std::string > lstpath;
-
                 do {
                     Gtk::TreeModel::Row row = *it;
                     lstpath.push_front(row.get_value(mColumns.mColname));
@@ -547,6 +546,11 @@ void FileTreeView::onNewDirectory()
 
                 path = Glib::build_filename(lstpath);
             }
+        }
+        if (mParent->currentPackage().existsFile(path,
+                vle::utils::PKG_SOURCE)) {
+            lstpath.pop_back();
+            path.assign(Glib::build_filename(lstpath));
         }
         mParent->currentPackage().addDirectory(path, name,
                 vle::utils::PKG_SOURCE);
