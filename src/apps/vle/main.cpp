@@ -301,7 +301,6 @@ static int run_simulation(CmdArgs::const_iterator it,
 
 static bool init_package(vle::utils::Package& pkg, const CmdArgs &args)
 {
-
     if (not pkg.existsBinary()) {
         if (not pkg.existsSource()) {
             if (std::find(args.begin(), args.end(), "create") == args.end()) {
@@ -327,7 +326,6 @@ static int manage_package_mode(const std::string &packagename, bool manager,
 
     if (not init_package(pkg, args))
         return EXIT_FAILURE;
-
 
     for (; not stop and it != end; ++it) {
         if (*it == "create") {
@@ -464,7 +462,7 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
             break;
         case vle::utils::REMOTE_MANAGER_SOURCE:
             if (itb == ite) {
-                std::cout << "No package has been dowloaded" << std::endl;
+                std::cout << "No package has been downloaded" << std::endl;
             } else {
                 std::cout << "Package downloaded:" << std::endl;
                 for (; itb != ite; itb++) {
@@ -479,7 +477,8 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
             } else {
                 std::cout << "Package installed:" << std::endl;
                 for (; itb != ite; itb++) {
-                    std::cout << itb->name << "\t from " << itb->url << std::endl;
+                    std::cout << itb->name << "\t from " << itb->url
+                        << std::endl;
                 }
             }
             break;
@@ -499,7 +498,8 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
             } else {
                 std::cout << "Found remote packages:" << std::endl;
                 for (; itb != ite; itb++) {
-                    std::cout << itb->name << "\t from " << itb->url << std::endl;
+                    std::cout << itb->name << "\t from " << itb->url
+                        << std::endl;
                 }
             }
             break;
@@ -522,11 +522,7 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
             }
             break;
         }
-
     } catch (const std::exception &e) {
-
-        std::cout << " DBG passe par recup " << std::endl;
-
         std::cerr << vle::fmt(_("Remote error: %1%\n")) % e.what();
         ret = EXIT_FAILURE;
     }
