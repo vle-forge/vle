@@ -83,10 +83,10 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "        <menu action='MenuProject'>"
     "            <menuitem action='ConfigureProject' />"
     "            <menuitem action='BuildProject' />"
-    "            <menuitem action='BuildAllProject' />"
     "            <menuitem action='ProjectDependencies' />"
     "            <menuitem action='TestProject' />"
-    "            <menuitem action='CleanProject' />"
+    "            <menuitem action='CleanSourceProject' />"
+    "            <menuitem action='RemoveBinaryProject' />"
     "            <menuitem action='CreateProjectPackage' />"
     "        </menu>"
     "        <menu action='MenuView'>"
@@ -329,10 +329,10 @@ void GVLEMenuAndToolbar::hideProjectMenu()
     m_refActionGroup->get_action("MenuProject")->set_sensitive(false);
     m_refActionGroup->get_action("ConfigureProject")->set_sensitive(false);
     m_refActionGroup->get_action("BuildProject")->set_sensitive(false);
-    m_refActionGroup->get_action("BuildAllProject")->set_sensitive(false);
     m_refActionGroup->get_action("ProjectDependencies")->set_sensitive(false);
     m_refActionGroup->get_action("TestProject")->set_sensitive(false);
-    m_refActionGroup->get_action("CleanProject")->set_sensitive(false);
+    m_refActionGroup->get_action("CleanSourceProject")->set_sensitive(false);
+    m_refActionGroup->get_action("RemoveBinaryProject")->set_sensitive(false);
     m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(false);
 }
 
@@ -341,10 +341,10 @@ void GVLEMenuAndToolbar::showProjectMenu()
     m_refActionGroup->get_action("MenuProject")->set_sensitive(true);
     m_refActionGroup->get_action("ConfigureProject")->set_sensitive(true);
     m_refActionGroup->get_action("BuildProject")->set_sensitive(true);
-    m_refActionGroup->get_action("BuildAllProject")->set_sensitive(true);
     m_refActionGroup->get_action("ProjectDependencies")->set_sensitive(true);
     m_refActionGroup->get_action("TestProject")->set_sensitive(true);
-    m_refActionGroup->get_action("CleanProject")->set_sensitive(true);
+    m_refActionGroup->get_action("CleanSourceProject")->set_sensitive(true);
+    m_refActionGroup->get_action("RemoveBinaryProject")->set_sensitive(true);
     m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(true);
 }
 
@@ -590,10 +590,6 @@ void GVLEMenuAndToolbar::createProjectActions()
         Gtk::AccelKey("<control>b"),
         sigc::mem_fun(mParent, &GVLE::buildProject));
     m_refActionGroup->add(
-        Gtk::Action::create("BuildAllProject", _("Build All Project"),
-                            _("Build the project & dependencies")),
-        sigc::mem_fun(mParent, &GVLE::makeAllProject));
-    m_refActionGroup->add(
         Gtk::Action::create("ProjectDependencies", _("Project Dependencies"),
                             _("Display the project Dependencies")),
         sigc::mem_fun(mParent, &GVLE::displayDependencies));
@@ -602,9 +598,13 @@ void GVLEMenuAndToolbar::createProjectActions()
                             _("Test the project")),
         sigc::mem_fun(mParent, &GVLE::testProject));
     m_refActionGroup->add(
-        Gtk::Action::create("CleanProject", _("Clean Project"),
-                            _("Clean the project")),
+        Gtk::Action::create("CleanSourceProject", _("Clean Project"),
+                            _("Clean the source project")),
         sigc::mem_fun(mParent, &GVLE::cleanProject));
+    m_refActionGroup->add(
+        Gtk::Action::create("RemoveBinaryProject", _("Remove Binary  Project"),
+                            _("Remove the binary project")),
+        sigc::mem_fun(mParent, &GVLE::removeProject));
     m_refActionGroup->add(
         Gtk::Action::create("CreateProjectPackage", _("Create Project Package"),
                             _("Create the project package")),
