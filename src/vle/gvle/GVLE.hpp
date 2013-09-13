@@ -658,18 +658,6 @@ public:
     void buildProject();
 
     /**
-     * @brief build the project and the first level of
-     * dependencies.
-     *
-     * After gathered the list of dependencies. The chain of operation
-     * is started by launching the first operation: the configure on
-     * the first package.
-     *
-     * @warning This code is close from makeAll() of the CLI application.
-     */
-    void makeAllProject();
-
-    /**
      * @brief get all the dependencies generated from each experiment
      *
      * @warning This code is duplicated from the main of the CLI application.
@@ -710,6 +698,12 @@ public:
      *
      */
     void cleanProject();
+
+    /**
+     * When click on remove project menu
+     *
+     */
+    void removeProject();
 
     /**
      * When click on create project menu

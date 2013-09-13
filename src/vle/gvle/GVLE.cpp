@@ -1591,46 +1591,6 @@ std::map < std::string, Depends > GVLE::depends()
     return result;
 }
 
-void GVLE::makeAllProject()
-{
-    AllDepends deps = depends();
-
-    insertLog("\nbuild package "  +
-            mCurrPackage.name() +
-              " & first level of dependencies\n");
-
-    getMenu()->hideProjectMenu();
-
-    mDependencies.clear();
-
-    for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
-        for (Depends::const_iterator jt = it->second.begin(); jt !=
-             it->second.end(); ++jt) {
-            mDependencies.insert(*jt);
-        }
-    }
-
-    mDependencies.insert(mCurrPackage.name());
-
-    using utils::Path;
-    using utils::Package;
-
-    itDependencies = mDependencies.begin();
-
-    if (itDependencies != mDependencies.end()) {
-
-        mCurrPackage.select(*itDependencies);
-
-        insertLog("configure package " +
-                  mCurrPackage.name() + "\n");
-
-        mCurrPackage.configure();
-
-        Glib::signal_timeout().connect(
-            sigc::mem_fun(*this, &GVLE::packageConfigureAllTimer), 250);
-    }
-}
-
 void GVLE::displayDependencies()
 {
     std::string dependsbuffer;
@@ -1738,6 +1698,24 @@ void GVLE::cleanProject()
     getMenu()->hideProjectMenu();
     try {
         mCurrPackage.clean();
+    } catch (const std::exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    } catch (const Glib::Exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageTimer), 250);
+}
+void GVLE::removeProject()
+{
+    insertLog("remove the binary package\n");
+    getMenu()->hideProjectMenu();
+    try {
+        mCurrPackage.rclean();
     } catch (const std::exception& e) {
         getMenu()->showProjectMenu();
         gvle::Error(e.what());
