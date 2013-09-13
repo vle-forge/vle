@@ -134,7 +134,7 @@ class DescriptionParser
             return false;
 
         char c = get();
-        if (!isalpha(c)) /* check if the first character is an alpha
+        if (!isalnum(c)) /* check if the first character is an alphanum
                             character */
             return false;
 
