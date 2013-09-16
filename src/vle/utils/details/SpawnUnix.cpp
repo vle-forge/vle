@@ -322,7 +322,7 @@ struct Spawn::Pimpl
         if (WIFEXITED(m_status)) {
             m_msg += (fmt("[%1%] (%2%) exited, status=%3%\n") %
                       m_command % m_pid % WEXITSTATUS(m_status)).str();
-            *success = true;
+            *success = !WEXITSTATUS(m_status);
         } else if (WIFSIGNALED(m_status)) {
             m_msg += (fmt("[%1%] (%2%) killed by signal %3%\n") %
                       m_command % m_pid % WTERMSIG(m_status)).str();
