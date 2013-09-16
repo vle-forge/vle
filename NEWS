@@ -2,6 +2,48 @@
 VLE 1.1.0-dev
 =============
 
+Changes from vle-1.1.0-beta2
+============================
+
+- README: switch to rst
+- cli: add user messages in RemoteManager
+- cli: fix help for remote manager
+- cli: fix the remote commands
+- cmake: best detection pkg-config dependencies
+- cmake: update to README.rst instead of README
+- ctest: add CTest scripts
+- debug: remove the (de)allocated debug variables
+- gvle: add the adjustment and zoom management
+- gvle: fix file copy into the FileTreeView
+- gvle: fix header guard fail
+- gvle: fix the "new file" feature
+- gvle: fix the Preferences Dialog
+- gvle: fix the configuration of oov
+- gvle: fix the creation of a new directory
+- gvle: fix the rename function of the FileTreeView
+- gvle: fix the saving of a new vpz file
+- gvle: fix the unhandled copies
+- gvle: update the Project menu
+- template: fix CMake script
+- template: fix the root CMakeLists.txt
+- utils: add messages and log on install in RemoteManager
+- utils: fill the actionSource function in RemoteManager
+- utils: fix actionUpdate results in RemoteManager
+- utils: fix install in RemoteManager
+- utils: fix names and urls in RemoteManager
+- utils: fix the package parser
+- utils: fix the update action in RemoteManager
+- utils: format of the Description.txt file
+- utils: get the correct status after Spwan process
+- utils: improve download manager
+- utils: rename the mPackages member in RemoteManager.
+- utils: update show commands in RemoteManager
+- utils: use tar.bz2 and fill actionInstall in RemoteManager
+- vle: improve error message with std::exception
+- vle: remove debug message
+- vle: update the clean command behaviour
+- win32: fix cmake install command
+
 Changes from vle-1.1.0-beta1
 ============================
 
