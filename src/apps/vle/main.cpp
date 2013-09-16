@@ -360,8 +360,6 @@ static int manage_package_mode(const std::string &packagename, bool manager,
             stop = not pkg.isSuccess();
         } else if (*it == "clean") {
             pkg.clean();
-            pkg.wait(std::cerr, std::cerr);
-            stop = not pkg.isSuccess();
         } else if (*it == "rclean") {
             pkg.rclean();
         } else if (*it == "package") {

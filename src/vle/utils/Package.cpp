@@ -372,7 +372,6 @@ void Package::clean()
     }
 }
 
-
 void Package::rclean()
 {
     fs::path pkg_buildir = getDir(PKG_BINARY);
@@ -381,7 +380,6 @@ void Package::rclean()
         fs::remove(pkg_buildir);
     }
 }
-
 
 void Package::pack()
 {
