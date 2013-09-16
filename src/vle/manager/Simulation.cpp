@@ -204,7 +204,8 @@ public:
             error->code    = 0;
             result         = root.outputs();
         } catch(const std::exception& e) {
-            error->message = (fmt(_("/!\\ vle error reported: %1%\n"))
+            error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%"))
+                              % utils::demangle(typeid(e))
                               % e.what()).str();
             error->code    = -1;
         }
