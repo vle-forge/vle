@@ -426,6 +426,13 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
             rm.start(act, "", &std::cout);
             break;
         default:
+            if (args.size() != 1) {
+                std::cerr << vle::fmt(_("Remote error: command '%1%' expects "
+                        "1 argument (got %2%)\n")) %
+                        remotecmd % args.size();
+                ret = EXIT_FAILURE;
+                return ret;
+            }
             rm.start(act, args.front(), &std::cout);
             break;
         }

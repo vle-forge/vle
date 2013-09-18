@@ -144,6 +144,7 @@ ENDFUNCTION(DeclareDevsDynamics name sources)
 FUNCTION(DeclareCellDevsDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${CELLDEVS_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
@@ -160,6 +161,7 @@ ENDFUNCTION(DeclareCellDevsDynamics name sources)
 FUNCTION(DeclareCellQssDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${CELLQSS_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
@@ -176,6 +178,7 @@ ENDFUNCTION(DeclareCellQssDynamics name sources)
 FUNCTION(DeclareDecisionDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${DECISION_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
@@ -192,6 +195,7 @@ ENDFUNCTION(DeclareDecisionDynamics name sources)
 FUNCTION(DeclareDifferenceEquationDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${DIFFERENCE_EQU_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
@@ -224,6 +228,7 @@ ENDFUNCTION(DeclareFsaDifferenceEquationDynamics name sources)
 FUNCTION(DeclareDifferentialEquationDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${DIFFERENTIAL_EQU_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
@@ -240,6 +245,7 @@ ENDFUNCTION(DeclareDifferentialEquationDynamics name sources)
 FUNCTION(DeclareDsDevsDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${DSDEVS_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
@@ -256,6 +262,7 @@ ENDFUNCTION(DeclareDsDevsDynamics name sources)
 FUNCTION(DeclareFsaDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${FSA_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
@@ -272,6 +279,7 @@ ENDFUNCTION(DeclareFsaDynamics name sources)
 FUNCTION(DeclarePetrinetDynamics name sources)
   INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${PETRINET_INCLUDE_DIRS}
     ${VLE_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
   LINK_DIRECTORIES(
