@@ -183,13 +183,17 @@ Time Simulator::timeAdvance()
 
 InternalEvent* Simulator::init(const Time& currentTime)
 {
-    Time time(m_dynamics->init(currentTime));
+    Time time = m_dynamics->init(currentTime);
 
-    if (not isInfinity(time)) {
-        return new InternalEvent(currentTime + time, this);
-    } else {
+    if (time < 0.0)
+        throw utils::ModellingError(
+            fmt(_("Negative init function in '%1%' (%2%)")) % getName() %
+            time);
+
+    if (isInfinity(time))
         return 0;
-    }
+
+    return new InternalEvent(currentTime + time, this);
 }
 
 InternalEvent* Simulator::confluentTransitions(
