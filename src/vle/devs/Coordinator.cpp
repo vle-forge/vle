@@ -452,8 +452,7 @@ void Coordinator::buildViews()
             m_eventViewList[it->second.name()] = v;
             obs = v;
         } else if (it->second.type() == vpz::View::FINISH) {
-            FinishView* v = new devs::FinishView(it->second.name(), stream,
-                                                 m_durationTime);
+            FinishView* v = new devs::FinishView(it->second.name(), stream);
             m_finishViewList[it->second.name()] = v;
             obs = v;
             m_eventTable.putObservationEvent(

@@ -198,8 +198,8 @@ public:
 class VLE_API FinishView : public View
 {
 public:
-    FinishView(const std::string& name, StreamWriter* stream, const Time& last)
-        : View(name, stream), mLast(last)
+    FinishView(const std::string& name, StreamWriter* stream)
+        : View(name, stream)
     {}
 
     virtual ~FinishView()
@@ -212,9 +212,6 @@ public:
     {
         return infinity;
     }
-
-private:
-    Time mLast;
 };
 
 typedef std::map < std::string, FinishView* > FinishViewList;
