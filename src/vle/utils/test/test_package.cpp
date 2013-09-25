@@ -68,6 +68,7 @@ using namespace vle;
 namespace bs = boost::system;
 namespace fs = boost::filesystem;
 
+#if BOOST_VERSION <= 104500
 /*
  * Build a temporary directory path name.
  */
@@ -87,6 +88,7 @@ static std::string get_temporary_path()
     return "/tmp";
 #endif
 }
+#endif
 
 /*
  * We need to ensure each file really installed.
