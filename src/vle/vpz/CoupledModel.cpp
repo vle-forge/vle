@@ -722,7 +722,9 @@ void CoupledModel::addModel(BaseModel* model)
 {
     if (exist(model->getName())) {
         throw utils::DevsGraphError(
-            _("Cannot add an empty model in the coupled model"));
+            vle::fmt(_("Cannot add the model '%1%' into the coupled model "
+                    "'%2%' (it already exists)"))
+                    % model->getName() % getName());
     }
 
     model->setParent(this);
@@ -733,7 +735,9 @@ void CoupledModel::addModel(BaseModel* model, const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-            _("Cannot add an empty model in the coupled model"));
+                vle::fmt(_("Cannot add the model '%1%' into the coupled model "
+                        "'%2%' (it already exists)"))
+                        % name % getName());
     }
 
     BaseModel::rename(model, name);
@@ -745,7 +749,9 @@ AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-            _("Cannot add an atomic model with an existing name"));
+                vle::fmt(_("Cannot add the model '%1%' into the coupled model "
+                        "'%2%' (it already exists)"))
+                        % name % getName());
     }
 
     AtomicModel* x = new AtomicModel(name, this);
@@ -757,7 +763,9 @@ CoupledModel* CoupledModel::addCoupledModel(const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-            _("Cannot add a coupled model with an existing name"));
+                vle::fmt(_("Cannot add the model '%1%' into the coupled model "
+                        "'%2%' (it already exists)"))
+                        % name % getName());
     }
 
     CoupledModel* x = new CoupledModel(name, this);
