@@ -65,8 +65,9 @@ static void setExperimentName(vpz::Vpz           *destination,
     destination->project().experiment().setName(result);
 }
 
-struct Manager::Pimpl
+class Manager::Pimpl
 {
+public:
     Pimpl(LogOptions            logoptions,
           SimulationOptions     simulationoptions,
           std::ostream         *output)

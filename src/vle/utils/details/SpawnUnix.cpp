@@ -131,8 +131,9 @@ static int input_timeout(int fd, unsigned int microseconds)
     return result;
 }
 
-struct Spawn::Pimpl
+class Spawn::Pimpl
 {
+public:
     pid_t m_pid;
     unsigned int m_waitchildtimeout;
     int m_pipeout[2];

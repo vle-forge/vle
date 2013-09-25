@@ -36,13 +36,13 @@
 
 namespace vle { namespace manager {
 
-struct Simulation::Pimpl
+class Simulation::Pimpl
 {
+public:
     std::ostream      *m_out;
     LogOptions         m_logoptions;
     SimulationOptions  m_simulationoptions;
 
-public:
     Pimpl(LogOptions         logoptions,
           SimulationOptions  simulationoptionts,
           std::ostream      *output)
