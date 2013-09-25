@@ -91,7 +91,7 @@ inline static bool isInfinity(const Time& value)
  */
 inline static bool isPositiveInfinity(const Time& value)
 {
-    return std::isinf(value) == 1;
+    return std::isinf(value) > 0;
 }
 
 /**
@@ -103,7 +103,7 @@ inline static bool isPositiveInfinity(const Time& value)
  */
 inline static bool isNegativeInfinity(const Time& value)
 {
-    return std::isinf(value) == -1;
+    return std::isinf(value) < 0;
 }
 
 /**
