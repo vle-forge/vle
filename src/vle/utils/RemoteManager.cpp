@@ -377,9 +377,6 @@ public:
             }
         }
         {
-            PackagesIdSet::const_iterator itb = remote.begin();
-            PackagesIdSet::const_iterator ite = remote.end();
-
             PackagesIdSet::const_iterator itlb = local.begin();
             PackagesIdSet::const_iterator itle = local.end();
             bool found;
