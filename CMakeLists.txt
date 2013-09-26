@@ -104,7 +104,7 @@ if (WITH_CAIRO AND WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
   endif ()
 endif ()
 
-if (WITH_CAIRO AND NOT WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
+if (WITH_CAIRO AND NOT WITH_GTK)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
     cairomm-1.0>=1.2)
 
@@ -114,7 +114,7 @@ if (WITH_CAIRO AND NOT WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
   endif ()
 endif ()
 
-if (NOT WITH_CAIRO AND NOT WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
+if (NOT WITH_CAIRO AND NOT WITH_GTK)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
 
   if (NOT VLEDEPS_FOUND)
