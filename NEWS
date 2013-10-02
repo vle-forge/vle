@@ -2,6 +2,21 @@
 VLE 1.1.0-dev
 =============
 
+Changes from vle-1.1.0-beta3
+============================
+
+- devs: fix Dynamics::init() with negative Time
+- devs: improve the positive and negative infinity test
+- devs: remove unused variable
+- template: fix missing INCLUDE_DIRS for extensions
+- test: hide declaration of get_temporary_path
+- utils: fix error on remote command call
+- utils: remove unused variables
+- vle : fix compilation options handling
+- vle: add CXX and CC flags for Clang
+- vle: use class instead of struct with Pimpl
+- vpz: fix an error message
+
 Changes from vle-1.1.0-beta2
 ============================
 
