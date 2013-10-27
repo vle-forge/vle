@@ -41,7 +41,7 @@ using namespace vle;
 namespace vle {
 namespace gvle {
 MatrixBox::MatrixBox(value::Matrix* m) :
-    Gtk::Dialog(_("Matrix"), true, true),
+    Gtk::Dialog(_("Matrix"), true),
     mValue(m)
 {
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -53,7 +53,8 @@ MatrixBox::MatrixBox(value::Matrix* m) :
     mScroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     get_vbox()->pack_start(*mScroll);
 
-    mTable = new Gtk::Table(m->rows(), m->columns(), true);
+    //mTable = new Gtk::Table(m->rows(), m->columns(), true);
+    mTable = new Gtk::Grid();
     mScroll->add(*mTable);
     makeTable();
     resize(300, 200);
@@ -63,7 +64,8 @@ MatrixBox::MatrixBox(value::Matrix* m) :
 
 MatrixBox::~MatrixBox()
 {
-    hide_all();
+    // gtk 3 : plus de hide_all
+    hide ();
 
     delete mScroll;
     delete mTable;
@@ -71,7 +73,6 @@ MatrixBox::~MatrixBox()
     for (unsigned int i = 0; i != mValue->rows(); ++i) {
         for (unsigned int j = 0; j != mValue->columns(); ++j) {
             delete (*mArray)[j][i].first;
-            delete (*mArray)[j][i].second;
         }
     }
     delete mArray;
@@ -106,6 +107,7 @@ void MatrixBox::makeTable()
     for (unsigned int i = 0; i != mValue->rows(); ++i) {
         for (unsigned int j = 0; j != mValue->columns(); ++j) {
             (*mArray)[j][i].first = new Gtk::Button();
+            (*mArray)[j][i].second = NULL;  // ne sert jamais, mais top complexe a enlever pour moi ...
             if (matrix[j][i] != 0) {
                 (*mArray)[j][i].first->set_label(
                     boost::trim_copy(matrix[j][i]->writeToString()));
@@ -117,21 +119,17 @@ void MatrixBox::makeTable()
                            j,
                            j + 1,
                            i,
-                           i + 1,
+                           i + 1 /*,
                            Gtk::FILL,
-                           Gtk::FILL);
+                           Gtk::FILL */ );
             (*mArray)[j][i].first->signal_clicked().connect(
                 sigc::bind(
                     sigc::mem_fun(*this, &MatrixBox::on_click), i, j));
 
             if (matrix[j][i] != 0) {
-                (*mArray)[j][i].second = new Gtk::Tooltips();
-#if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION > 10
                 (*mArray)[j][i].first->set_has_tooltip();
-#endif
-                (*mArray)[j][i].second->set_tip(*(*mArray)[j][i].first,
-                                                gvle::valuetype_to_string(
-                                                    matrix[j][i]->getType()));
+                (*mArray)[j][i].first->set_tooltip_text(
+                    gvle::valuetype_to_string(matrix[j][i]->getType()));
             }
         }
     }
@@ -147,16 +145,9 @@ void MatrixBox::on_click(unsigned int i, unsigned int j)
         v = box.launch();
         if (v != 0) {
             view[j][i] = v;
-
-            (*mArray)[j][i].first->set_label(
-                boost::trim_copy(view[j][i]->writeToString()));
-            (*mArray)[j][i].second = new Gtk::Tooltips();
-#if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION > 10
+            (*mArray)[j][i].first->set_label(gvle::valuetype_to_string(view[j][i]->getType()));
             (*mArray)[j][i].first->set_has_tooltip();
-#endif
-            (*mArray)[j][i].second->set_tip(
-                *(*mArray)[j][i].first,
-                gvle::valuetype_to_string(view[j][i]->getType()));
+            (*mArray)[j][i].first->set_tooltip_text(boost::trim_copy(view[j][i]->writeToString()));
         }
     }
 
@@ -216,7 +207,7 @@ void MatrixBox::on_click(unsigned int i, unsigned int j)
         default:
             break;
         }
-        (*mArray)[j][i].first->set_label(boost::trim_copy(v->writeToString()));
+        (*mArray)[j][i].first->set_tooltip_text(boost::trim_copy(v->writeToString()));
     }
 }
 }

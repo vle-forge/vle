@@ -97,15 +97,15 @@ private:
                                vpz::BaseModel* dst);
 
 private:
-    Gtk::VBox                   m_vbox;
-    Gtk::HBox                   m_hbox;
+    Gtk::Box                   m_vbox;
+    Gtk::Box                   m_hbox;
     Gtk::Label                  m_label;
     Gtk::Frame                  m_left;
-    Gtk::VBox                   m_left2;
+    Gtk::Box                   m_left2;
     Gtk::Label                  m_labelInput;
     gvle::ComboBoxString     m_comboInput;
     Gtk::Frame                  m_right;
-    Gtk::VBox                   m_right2;
+    Gtk::Box                   m_right2;
     Gtk::Label                  m_labelOutput;
     gvle::ComboBoxString     m_comboOutput;
 };

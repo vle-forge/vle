@@ -38,9 +38,10 @@
 #include <gtkmm/stock.h>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-#   include <gtksourceview/gtksourceview.h>
-#   include <gtksourceview/gtksourcelanguagemanager.h>
-#   include <gtkmm/clipboard.h>
+#include <gtksourceview/gtksourceview.h>
+#include <gtksourceview/gtksourcebuffer.h>
+#include <gtksourceview/gtksourcelanguagemanager.h>
+#include <gtkmm/clipboard.h>
 
 void gvle_gtksourceview_init()
 {
@@ -304,11 +305,11 @@ void DocumentText::applyEditingProperties()
         Pango::FontDescription(Settings::settings().getFontEditor());
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtk_widget_modify_font(
+    gtk_widget_override_font(
         &(GTK_SOURCE_VIEW(mView)->parent.parent_instance.widget),
         font.gobj());
 #else
-    gtk_widget_modify_font(&(
+    gtk_widget_override_font(&(
             GTK_TEXT_VIEW(mView)->parent_instance.widget), font.gobj());
 #endif
 }
@@ -406,10 +407,12 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
                                          View* view, vpz::BaseModel* model) :
     Document(gvle, filepath),
     mView(view),
-    mModel(model),
-    mAdjustWidth(0,0,1),
-    mAdjustHeight(0,0,1)
+    mModel(model) //,
+//    mAdjustWidth(0,0,1),
+//    mAdjustHeight(0,0,1)
 {
+	mAdjustWidth  = Gtk::Adjustment::create (0, 0, 1);
+	mAdjustHeight = Gtk::Adjustment::create (0, 0, 1);
 }
 
 DocumentDrawingArea::~DocumentDrawingArea()
@@ -445,28 +448,28 @@ void DocumentDrawingArea::updateCursor()
 
     switch(Document::mGVLE->getCurrentButton()) {
     case GVLE::VLE_GVLE_POINTER :
-        daw->set_cursor(Gdk::Cursor(Gdk::HAND2));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::HAND2));
         break;
     case GVLE::VLE_GVLE_ADDMODEL :
-        daw->set_cursor(Gdk::Cursor(Gdk::CROSS));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::CROSS));
         break;
     case GVLE::VLE_GVLE_ADDLINK :
-        daw->set_cursor(Gdk::Cursor(Gdk::PENCIL));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::PENCIL));
         break;
     case GVLE::VLE_GVLE_DELETE :
-        daw->set_cursor(Gdk::Cursor(Gdk::X_CURSOR));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::X_CURSOR));
         break;
     case GVLE::VLE_GVLE_ADDCOUPLED :
-        daw->set_cursor(Gdk::Cursor(Gdk::DRAPED_BOX));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::DRAPED_BOX));
         break;
     case GVLE::VLE_GVLE_ZOOM :
-        daw->set_cursor(Gdk::Cursor(Gdk::SIZING));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::SIZING));
         break;
     case GVLE::VLE_GVLE_QUESTION :
-        daw->set_cursor(Gdk::Cursor(Gdk::QUESTION_ARROW));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::QUESTION_ARROW));
         break;
     default :
-        daw->set_cursor(Gdk::Cursor(Gdk::ARROW));
+        daw->set_cursor(Gdk::Cursor::create(Gdk::ARROW));
     }
 }
 
@@ -498,7 +501,7 @@ DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
     mViewport->set_border_width(0);
 
     set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
-    set_flags(Gtk::CAN_FOCUS);
+    set_can_focus();
     add(*mViewport);
     set_shadow_type(Gtk::SHADOW_NONE);
     set_border_width(0);
@@ -506,8 +509,8 @@ DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
 
 DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
 {
-    Gtk::Adjustment* vAdjust =  get_vadjustment();
-    Gtk::Adjustment* hAdjust =  get_hadjustment();
+    Glib::RefPtr<Gtk::Adjustment> vAdjust =  get_vadjustment();
+    Glib::RefPtr<Gtk::Adjustment> hAdjust =  get_hadjustment();
 
     mCompleteArea->set(vAdjust, hAdjust);
 
@@ -532,7 +535,7 @@ DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(
     mViewport->set_border_width(0);
 
     set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
-    set_flags(Gtk::CAN_FOCUS);
+    set_can_focus();
     add(*mViewport);
     set_shadow_type(Gtk::SHADOW_NONE);
     set_border_width(0);
@@ -540,8 +543,8 @@ DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(
 
 DocumentSimpleDrawingArea::~DocumentSimpleDrawingArea()
 {
-    Gtk::Adjustment* vAdjust =  get_vadjustment();
-    Gtk::Adjustment* hAdjust =  get_hadjustment();
+    Glib::RefPtr<Gtk::Adjustment> vAdjust =  get_vadjustment();
+    Glib::RefPtr<Gtk::Adjustment> hAdjust =  get_hadjustment();
 
     mSimpleArea->set(vAdjust, hAdjust);
 
@@ -569,10 +572,11 @@ void Editor::onCloseTab(const std::string& filepath)
     mGVLE->closeTab(filepath);
 }
 
-Gtk::HBox* Editor::addLabel(const std::string& title,
+Gtk::Box* Editor::addLabel(const std::string& title,
                             const std::string& filepath)
 {
-    Gtk::HBox* tabLabel = new Gtk::HBox(false, 0);
+    Gtk::Box* tabLabel = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 0);
+    tabLabel->set_homogeneous (false);
     Gtk::Label* label = new Gtk::Label(title);
 
     tabLabel->pack_start(*label, true, true, 0);
@@ -593,7 +597,7 @@ Gtk::HBox* Editor::addLabel(const std::string& title,
     return tabLabel;
 }
 
-void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
+void Editor::changeTab(Gtk::Widget * /*page*/, gint num)
 {
     if (mGVLE->getCurrentTab() != num) {
         Gtk::Widget* tab = get_nth_page(num);
@@ -611,7 +615,7 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
     }
 }
 
-void Editor::changeAndSignal(GtkNotebookPage* /*page*/, int num)
+void Editor::changeAndSignal(Gtk::Widget * /*page*/, gint num)
 {
     if (mGVLE->getCurrentTab() != num) {
         Gtk::Widget* tab = get_nth_page(num);
@@ -894,9 +898,10 @@ void Editor::showCompleteView(const std::string& filepath,
         set_current_page(page);
         getDocumentDrawingArea()->updateCursor();
 
-        Gtk::Adjustment* vAdjust =  doc->get_vadjustment();
-        Gtk::Adjustment* hAdjust =  doc->get_hadjustment();
-        if (prevIsSimple) {
+        Glib::RefPtr<Gtk::Adjustment> vAdjust =  doc->get_vadjustment();
+        Glib::RefPtr<Gtk::Adjustment> hAdjust =  doc->get_hadjustment();
+        
+	if (prevIsSimple) {
             previousvda->reset(vAdjust, hAdjust);
         } else {
             newvda->reset(vAdjust, hAdjust);
@@ -964,8 +969,10 @@ void Editor::showSimpleView(const std::string& filepath,
         show_all_children();
         set_current_page(page);
         getDocumentDrawingArea()->updateCursor();
-        Gtk::Adjustment* vAdjust=  doc->get_vadjustment();
-        Gtk::Adjustment* hAdjust=  doc->get_hadjustment();
+	
+        Glib::RefPtr<Gtk::Adjustment> vAdjust=  doc->get_vadjustment();
+        Glib::RefPtr<Gtk::Adjustment> hAdjust=  doc->get_hadjustment();
+	
         if (prevIsComplete) {
             previousvda->reset(vAdjust, hAdjust);
         } else {

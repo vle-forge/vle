@@ -41,7 +41,7 @@ namespace vle { namespace gvle {
 InteractiveTypeBox::InteractiveTypeBox(const std::string& title,
 				       vpz::Base* base,
 				       const std::string& currentValue) :
-    Gtk::Dialog(title, true, true),
+    Gtk::Dialog(title, true),
     mValid(false),
     mState(false),
     mBase(base),
@@ -53,13 +53,15 @@ InteractiveTypeBox::InteractiveTypeBox(const std::string& title,
     set_default_response(Gtk::RESPONSE_OK);
     makeDialog();
     mHBox->pack_start(mImage);
+    
+    // Passage GTK-3 mettre show, parceque plus le hide_all n'exite plus ???
     show_all();
 }
 
 InteractiveTypeBox::InteractiveTypeBox(const std::string& title,
 				       vpz::CoupledModel* coupledModel,
 				       const std::string& currentValue) :
-    Gtk::Dialog(title, true, true),
+    Gtk::Dialog(title, true),
     mValid(false),
     mState(false),
     mBase(0),
@@ -71,18 +73,21 @@ InteractiveTypeBox::InteractiveTypeBox(const std::string& title,
     set_default_response(Gtk::RESPONSE_OK);
     makeDialog();
     mHBox->pack_start(mImage);
+    
+    // Passage GTK-3 mettre show, parceque plus le hide_all n'exite plus ???
     show_all();
 }
 
 InteractiveTypeBox::~InteractiveTypeBox()
 {
-    hide_all();
+    // Passage gtk 3 : hide_all n'existe plus !
+    hide();
     delete mEntry;
 }
 
 void InteractiveTypeBox::makeDialog()
 {
-    mHBox = new Gtk::HBox();
+    mHBox = new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
     mEntry = new Gtk::Entry();
     mEntry->set_editable(true);
     mEntry->set_activates_default(true);

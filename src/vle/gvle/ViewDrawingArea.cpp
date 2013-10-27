@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
@@ -57,7 +56,7 @@ const guint ViewDrawingArea::SPACING_MODEL_PORT = 10;
 
 ViewDrawingArea::ViewDrawingArea(View* view)
     : mMouse(-1, -1), mPrecMouse(-1, -1), mHeight(300), mWidth(450),
-    mRectHeight(300), mRectWidth(450), mZoom(1.0), mIsRealized(false),
+    mRectHeight(300), mRectWidth(450), mZoom(1.0), 
     mHighlightLine(-1)
 {
     assert(view);
@@ -127,7 +126,6 @@ void ViewDrawingArea::drawCurrentCoupledModel()
 
 void ViewDrawingArea::drawCurrentModelPorts()
 {
-
     const vpz::ConnectionList ipl =  mCurrent->getInputPortList();
     const vpz::ConnectionList opl =  mCurrent->getOutputPortList();
     vpz::ConnectionList::const_iterator itl;
@@ -338,7 +336,7 @@ void ViewDrawingArea::drawHighlightConnection()
             mContext->line_to(iter->first + mOffset, iter->second + mOffset);
             ++iter;
         }
-mContext->stroke();
+        mContext->stroke();
     }
 }
 
@@ -515,34 +513,26 @@ bool ViewDrawingArea::on_configure_event(GdkEventConfigure* event)
         mCurrent->setHeight(mHeight);
     }
 
-    if (change and mIsRealized) {
+    if (change) {
         set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
-        mBuffer = Gdk::Pixmap::create(mWin, (int)(mWidth * mZoom),
-                                      (int)(mHeight * mZoom), -1);
         queueRedraw();
     }
     return true;
 }
 
-bool ViewDrawingArea::on_expose_event(GdkEventExpose*)
-{
-    if (mIsRealized) {
-        if (!mBuffer) {
-            mBuffer = Gdk::Pixmap::create(mWin, (int)(mWidth * mZoom),
-                                          (int)(mHeight * mZoom), -1);
-        }
-        if (mBuffer) {
-            if (mNeedRedraw) {
-                mContext = mBuffer->create_cairo_context();
-                mContext->set_line_width(Settings::settings().getLineWidth());
-                mOffset = (Settings::settings().getLineWidth() < 1.1)
-                    ? 0.5 : 0.0;
-                draw();
-                mNeedRedraw = false;
-            }
-            mWin->draw_drawable(mWingc, mBuffer, 0, 0, 0, 0, -1, -1);
+void ViewDrawingArea::queueRedraw()
+{ 
+	queue_draw(); 
 }
-    }
+
+bool ViewDrawingArea::on_draw(const Cairo::RefPtr<Cairo::Context>& context)
+{
+    mContext = context;
+    mContext->set_line_width(Settings::settings().getLineWidth());
+    mOffset = (Settings::settings().getLineWidth() < 1.1)
+        ? 0.5 : 0.0;
+    draw();
+    
     return true;
 }
 
@@ -605,8 +595,7 @@ void ViewDrawingArea::on_realize()
     Gtk::DrawingArea::on_realize();
     mWin = get_window();
     assert(mWin);
-    mWingc = Gdk::GC::create(mWin);
-    mIsRealized = true;
+    
     newSize();
     queueRedraw();
 }
@@ -841,7 +830,6 @@ void ViewDrawingArea::newSize()
     int tWidth = (int)(mWidth * mZoom);
     int tHeight = (int)(mHeight * mZoom);
     set_size_request(tWidth, tHeight);
-    mBuffer = Gdk::Pixmap::create(mWin, tWidth, tHeight, -1);
     queueRedraw();
 }
 
@@ -860,7 +848,7 @@ void ViewDrawingArea::onZoom(int button)
 
 void ViewDrawingArea::addCoefZoom()
 {
-    mZoom = (mZoom >= ZOOM_MAX) ? ZOOM_MAX : mZoom + ZOOM_FACTOR_SUP;
+   mZoom = (mZoom >= ZOOM_MAX) ? ZOOM_MAX : mZoom + ZOOM_FACTOR_SUP;
     mContext->set_font_size(Settings::settings().getFontSize() * mZoom);
     newSize();
 }
@@ -913,7 +901,6 @@ void ViewDrawingArea::setColor(const Gdk::Color& color)
 
 void ViewDrawingArea::exportPng(const std::string& filename)
 {
-
     Cairo::RefPtr<Cairo::ImageSurface> surface =
         Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
@@ -957,7 +944,7 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
     surface->finish();
 }
 
-bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool /* keyboard_tooltip */,
+bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool,  // keyboard_tooltip
                                      const Glib::RefPtr<Gtk::Tooltip>& tooltip)
 {
     vpz::BaseModel* model = mCurrent->find(wx/mZoom, wy/mZoom);

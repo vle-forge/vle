@@ -162,7 +162,7 @@ void ModelClassBox::showRow(const vpz::BaseModel* mdl)
     set_cursor(Gtk::TreePath(iter));
 }
 
-void ModelClassBox::on_cursor_changed()
+void ModelClassBox::onCursorChanged()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     if (refSelection) {
@@ -185,73 +185,75 @@ void ModelClassBox::createNewModelBox(Modeling* m, GVLE* gvle)
 
 void ModelClassBox::initMenuPopupModels()
 {
-    Gtk::Menu::MenuList& menulist(mMenuPopup.items());
+    mPopupActionGroup = Gtk::ActionGroup::create("initMenuPopupModels");
+    mPopupActionGroup->add(Gtk::Action::create("ModelCB_ContextMenu", _("Context Menu")));
+    
+    mPopupActionGroup->add(Gtk::Action::create("ModelCB_ContextAdd", _("_Add")),
+        sigc::mem_fun(*this, &ModelClassBox::onAdd));
+    
+    mPopupActionGroup->add(Gtk::Action::create("ModelCB_ContextRemove", _("_Remove")),
+        sigc::mem_fun(*this, &ModelClassBox::onRemove));
+    
+    mPopupActionGroup->add(Gtk::Action::create("ModelCB_ContextRename", _("_Rename")),
+        sigc::mem_fun(*this, &ModelClassBox::onRename));
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Add"),
-            sigc::mem_fun(
-                *this,
-                &ModelClassBox::onAdd)));
+    mPopupActionGroup->add(Gtk::Action::create("ModelCB_ContextExportClass", _("_Export Class")),
+        sigc::mem_fun(*this, &ModelClassBox::onExportVpz));
+    
+    mPopupActionGroup->add(Gtk::Action::create("ModelCB_ContextImportClass", _("Import Model as _Class")),
+        sigc::mem_fun(*this, &ModelClassBox::onImportModelAsClass));
+    
+    mPopupActionGroup->add(Gtk::Action::create("ModelCB_ContextImportVpz", _("Import Classes from Vpz")),
+        sigc::mem_fun(*this, &ModelClassBox::onImportClassesFromVpz));
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Remove"),
-            sigc::mem_fun(
-                *this,
-                &ModelClassBox::onRemove)));
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Rename"),
-            sigc::mem_fun(
-                *this,
-                &ModelClassBox::onRename)));
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='ModelCB_Popup'>"
+        "      <menuitem action='ModelCB_ContextAdd'/>"
+        "      <menuitem action='ModelCB_ContextRemove'/>"
+        "      <menuitem action='ModelCB_ContextRename'/>"
+        "      <menuitem action='ModelCB_ContextExportClass'/>"
+        "      <menuitem action='ModelCB_ContextImportClass'/>"
+        "      <menuitem action='ModelCB_ContextImportVpz'/>"
+        "  </popup>"
+        "</ui>";
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Export Class"),
-            sigc::mem_fun(
-                *this,
-                &ModelClassBox::onExportVpz)));
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/ModelCB_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: ModelCB_Popup " <<  ex.what();
+    }
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("Import Model as _Class"),
-            sigc::mem_fun(
-                *this,
-                &ModelClassBox::onImportModelAsClass)));
-
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("Import Classes from Vpz"),
-            sigc::mem_fun(
-                *this,
-                &ModelClassBox::onImportClassesFromVpz)));
-
-    mMenuPopup.accelerate(*this);
+    if (!mMenuPopup)
+        std::cerr << "menu not found : ModelCB_Popup\n";
 }
 
 ModelClassBox::~ModelClassBox()
 {
-    hide_all();
+    // Seleument hide sur gtk 3
+    hide();
     delete mNewModelBox;
 }
 
 bool ModelClassBox::onButtonRealeaseModels(GdkEventButton* event)
 {
-    Gtk::Menu::MenuList& menulist(mMenuPopup.items());
+    Glib::RefPtr <Gtk::Action> action  = mPopupActionGroup->get_action ("ModelCB_ContextRemove");
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator iter = refSelection->get_selected();
 
     if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
-        menulist[1].set_sensitive(true);
+        action->set_sensitive(true);
     } else {
-        menulist[1].set_sensitive(false);
+        action->set_sensitive(false);
     }
 
     if (event->button == 3) {
-        mMenuPopup.popup(event->button, event->time);
+        mMenuPopup->popup(event->button, event->time);
     }
 
     return true;
@@ -357,9 +359,9 @@ void ModelClassBox::onExportVpz()
             Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
             file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
             file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-            Gtk::FileFilter filter;
-            filter.set_name(_("Vle Project gZipped"));
-            filter.add_pattern("*.vpz");
+            Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create ();
+            filter->set_name(_("Vle Project gZipped"));
+            filter->add_pattern("*.vpz");
             file.add_filter(filter);
 
             if (file.run() == Gtk::RESPONSE_OK) {
@@ -384,9 +386,9 @@ void ModelClassBox::onImportModelAsClass()
     Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    Gtk::FileFilter filter;
-    filter.set_name(_("Vle Project gZipped"));
-    filter.add_pattern("*.vpz");
+    Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create ();
+    filter->set_name(_("Vle Project gZipped"));
+    filter->add_pattern("*.vpz");
     file.add_filter(filter);
 
     if (file.run() == Gtk::RESPONSE_OK) {
@@ -411,9 +413,9 @@ void ModelClassBox::onImportClassesFromVpz()
     Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    Gtk::FileFilter filter;
-    filter.set_name(_("Vle Project gZipped"));
-    filter.add_pattern("*.vpz");
+    Glib::RefPtr<Gtk::FileFilter> filter =  Gtk::FileFilter::create ();
+    filter->set_name(_("Vle Project gZipped"));
+    filter->add_pattern("*.vpz");
     file.add_filter(filter);
 
     if (file.run() == Gtk::RESPONSE_OK) {

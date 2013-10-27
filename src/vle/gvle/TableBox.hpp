@@ -30,7 +30,7 @@
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/scrolledwindow.h>
-#include <gtkmm/table.h>
+#include <gtkmm/grid.h>
 #include <gtkmm/entry.h>
 #include <vle/value/Table.hpp>
 #include <boost/multi_array.hpp>
@@ -51,7 +51,7 @@ private:
     typedef array_type::index index;
 
     Gtk::ScrolledWindow* mScroll;
-    Gtk::Table* mTable;
+    Gtk::Grid* mTable;
     array_type* mArray;
 
     value::Table* mValue;

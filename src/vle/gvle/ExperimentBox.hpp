@@ -32,6 +32,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/box.h>
+#include <gtkmm/radiobutton.h>
 #include <gtkmm/builder.h>
 
 namespace vle { namespace gvle {
@@ -80,7 +81,7 @@ namespace vle { namespace gvle {
         Gtk::SpinButton*    mSpinBeginS;
         double              mBeginRealMin, mBeginRealMax;
         bool                mRealUpdated;
-        Gtk::HBox*          mHboxCombi;
+        Gtk::Box*          mHboxCombi;
 	Gtk::RadioButton*   mRadioButtonLinear;
 	Gtk::RadioButton*   mRadioButtonTotal;
 

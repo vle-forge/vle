@@ -30,7 +30,9 @@
 
 #include <gtkmm/drawingarea.h>
 #include <gdkmm/color.h>
+#include <gdkmm/pixbuf.h>
 #include <gtkmm/adjustment.h>
+#include <map>
 
 namespace vle { namespace vpz {
 
@@ -48,7 +50,7 @@ namespace vle { namespace gvle {
     class Adjustment
     {
     public:
-        void set(Gtk::Adjustment* adjust)
+        void set(Glib::RefPtr<Gtk::Adjustment> adjust)
         {
              mValue = adjust->get_value();
              mLower = adjust->get_lower();
@@ -58,7 +60,7 @@ namespace vle { namespace gvle {
              mPage_size = adjust->get_page_size();
         }
 
-        void reset(Gtk::Adjustment* adjust)
+        void reset(Glib::RefPtr<Gtk::Adjustment> adjust)
         {
             adjust->configure(mValue,
                               mLower,
@@ -203,20 +205,19 @@ namespace vle { namespace gvle {
          * @brief Add to the Gdk stack a call to expose event function with the
          * need to redraw the buffer with the draw() function.
          */
-        void queueRedraw()
-        { mNeedRedraw = true; queue_draw(); }
+        void queueRedraw();
 
         bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
                             const Glib::RefPtr<Gtk::Tooltip>& tooltip);
 
 
-        void set(Gtk::Adjustment* vadjust, Gtk::Adjustment* hadjust)
+        void set(Glib::RefPtr<Gtk::Adjustment> vadjust, Glib::RefPtr<Gtk::Adjustment> hadjust)
         {
             mVAdjustment.set(vadjust);
             mHAdjustment.set(hadjust);
         }
 
-        void reset(Gtk::Adjustment* vadjust, Gtk::Adjustment* hadjust)
+        void reset(Glib::RefPtr<Gtk::Adjustment> vadjust, Glib::RefPtr<Gtk::Adjustment> hadjust)
         {
             mVAdjustment.reset(vadjust);
             mHAdjustment.reset(hadjust);
@@ -274,7 +275,9 @@ namespace vle { namespace gvle {
         void setUndefinedModels();
 
         bool on_configure_event(GdkEventConfigure* event);
-        bool on_expose_event(GdkEventExpose* event);
+//        bool on_expose_event(GdkEventExpose* event);   No in GTK3
+	bool on_draw(const Cairo::RefPtr<Cairo::Context>& context);
+	
         bool on_motion_notify_event(GdkEventMotion* event);
         void on_realize();
 
@@ -315,17 +318,8 @@ namespace vle { namespace gvle {
         int                             mRectWidth;
         double                          mZoom;
         double                          mOffset;
-        Glib::RefPtr < Gdk::Pixmap >    mBuffer;
         Cairo::RefPtr<Cairo::Context>   mContext;
         Glib::RefPtr < Gdk::Window >    mWin;
-        Glib::RefPtr < Gdk::GC >        mWingc;
-        bool                            mIsRealized;
-
-        /**
-         * @brief True if, in the expose event, the buffer must be completely
-         * redraw by calling the draw() function. False, just switch buffer.
-         */
-        bool                            mNeedRedraw;
 
         std::map < int, Point > mInPts;
         std::map < int, Point > mOutPts;

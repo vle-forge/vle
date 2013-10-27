@@ -105,7 +105,7 @@ void ImportClassesBox::ClassesTreeView::on_drag_data_received(
     }
     build(mClasses);
 
-    if (context->get_action() == Gdk::ACTION_MOVE)
+    if ((context->get_actions () & Gdk::ACTION_MOVE) != 0)
 	context->drag_finish(true, false, time);
 }
 

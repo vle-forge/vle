@@ -282,14 +282,14 @@ void LaunchSimulationBox::updateWidget()
 void LaunchSimulationBox::changeToWatchCursor()
 {
     if (mDialog->get_window()) {
-        mDialog->get_window()->set_cursor(Gdk::Cursor(Gdk::WATCH));
+        mDialog->get_window()->set_cursor(Gdk::Cursor::create(Gdk::WATCH));
     }
 }
 
 void LaunchSimulationBox::resetCursor()
 {
     if (mDialog->get_window()) {
-        mDialog->get_window()->set_cursor(Gdk::Cursor(Gdk::LEFT_PTR));
+        mDialog->get_window()->set_cursor(Gdk::Cursor::create(Gdk::LEFT_PTR));
     }
 }
 

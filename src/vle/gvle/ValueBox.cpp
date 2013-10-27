@@ -31,7 +31,7 @@
 namespace vle { namespace gvle {
 
 ValueBox::ValueBox(value::Map* map) :
-    Gtk::Dialog("Map", true, true),
+    Gtk::Dialog("Map", true),
     mTreeView(0),
     mValue(map)
 {
@@ -46,7 +46,7 @@ ValueBox::ValueBox(value::Map* map) :
 }
 
 ValueBox::ValueBox(value::Set* set) :
-    Gtk::Dialog("Set", true, true),
+    Gtk::Dialog("Set", true),
     mTreeView(0),
     mValue(set)
 {
@@ -62,7 +62,8 @@ ValueBox::ValueBox(value::Set* set) :
 
 ValueBox::~ValueBox()
 {
-    hide_all();
+    // No hide_all in GTK 3
+    hide();
     delete mTreeView;
 }
 

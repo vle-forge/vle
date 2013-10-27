@@ -32,6 +32,7 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/treestore.h>
 #include <glibmm/ustring.h>
+#include <gtkmm/uimanager.h>
 
 namespace vle { namespace gvle {
 
@@ -140,7 +141,7 @@ private:
                      const std::list < std::string >& entries);
 
     GVLE*                            mParent;
-    Gtk::Menu                        mMenuPopup;
+    Gtk::Menu*                       mMenuPopup;
     FileModelColumns                 mColumns;
     std::string                      mPackage;
     Glib::RefPtr<Gtk::TreeStore>     mTreeModel;
@@ -160,6 +161,9 @@ private:
     Gtk::CellRendererText*           mCellrenderer;
     Glib::ustring                    mInvalidTextForRetry;
     guint32                          mDelayTime;
+    
+    Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+    Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
 };
 
 }} // namespace vle gvle

@@ -40,6 +40,7 @@
 #include <vle/utils/Template.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <fstream>
+#include <glibmm.h>
 
 namespace vle { namespace gvle {
 
@@ -49,53 +50,64 @@ AtomicModelBox::InputPortTreeView::InputPortTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject),
+    mMenuPopup(0),
     mValidateRetry(false)
 {
     mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
     set_model(mRefTreeModelInputPort);
 
     mColumnName = append_column_editable(_("Name"),
-					 mColumnsInputPort.m_col_name);
+                                         mColumnsInputPort.m_col_name);
     Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
     nameCol->set_sort_column(mColumnsInputPort.m_col_name);
 
     mCellrendererValidated = dynamic_cast<Gtk::CellRendererText*>(
-	get_column_cell_renderer(mColumnName - 1));
+        get_column_cell_renderer(mColumnName - 1));
     mCellrendererValidated->property_editable() = true;
     mCellrendererValidated->signal_editing_started().connect(
-	sigc::mem_fun(*this,
-		      &AtomicModelBox::InputPortTreeView::
-		      onEditionStarted) );
+        sigc::mem_fun(*this,
+                      &AtomicModelBox::InputPortTreeView::
+                      onEditionStarted) );
 
     mCellrendererValidated->signal_edited().connect(
-	sigc::mem_fun(*this,
-		      &AtomicModelBox::InputPortTreeView::
-		      onEdition) );
+        sigc::mem_fun(*this,
+                      &AtomicModelBox::InputPortTreeView::
+                      onEdition) );
 
-    //Fill popup menu:
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    mPopupActionGroup = Gtk::ActionGroup::create("InputPortTreeView");
+    mPopupActionGroup->add(Gtk::Action::create("IPTV_ContextMenu", _("Context Menu")));
+    
+    mPopupActionGroup->add(Gtk::Action::create("IPTV_ContextAdd", _("_Add")),
+        sigc::mem_fun(*this, &AtomicModelBox::InputPortTreeView::onAdd));
+    
+    mPopupActionGroup->add(Gtk::Action::create("IPTV_ContextRemove", _("_Remove")),
+        sigc::mem_fun(*this, &AtomicModelBox::InputPortTreeView::onRemove));
+    
+    mPopupActionGroup->add(Gtk::Action::create("IPTV_ContextRename", _("_Rename")),
+        sigc::mem_fun(*this, &AtomicModelBox::InputPortTreeView::onRename));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Add"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::InputPortTreeView::onAdd)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::InputPortTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::InputPortTreeView::onRename)));
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
+
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='IPTView_Popup'>"
+        "      <menuitem action='IPTV_ContextAdd'/>"
+        "      <menuitem action='IPTV_ContextRemove'/>"
+        "      <menuitem action='IPTV_ContextRename'/>"
+        "  </popup>"
+        "</ui>";
+
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/IPTView_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: IPTView_Popup " <<  ex.what();
     }
-    mMenuPopup.accelerate(*this);
+
+    if (!mMenuPopup)
+        std::cerr << "menu not found : IPTView_Popup\n";
 }
 
 AtomicModelBox::InputPortTreeView::~InputPortTreeView()
@@ -110,9 +122,9 @@ bool AtomicModelBox::InputPortTreeView::on_button_press_event(
   bool return_value = TreeView::on_button_press_event(event);
 
   //Then do our custom stuff:
-  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
-  {
-      mMenuPopup.popup(event->button, event->time);
+  if ((event->type == GDK_BUTTON_PRESS) && (event->button == 3)) {
+      if (mMenuPopup)
+          mMenuPopup->popup(event->button, event->time);
   }
 
   return return_value;
@@ -261,6 +273,7 @@ AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::TreeView(cobject),
+    mMenuPopup(0),
     mValidateRetry(false)
 {
     mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
@@ -284,30 +297,40 @@ AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
 		      &AtomicModelBox::OutputPortTreeView::
 		      onEdition) );
 
-    //Fill popup menu:
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    mPopupActionGroup = Gtk::ActionGroup::create("OutputPortTreeView");
+    mPopupActionGroup->add(Gtk::Action::create("OPTV_ContextMenu", _("Context Menu")));
+    mPopupActionGroup->add(
+        Gtk::Action::create("OPTV_ContextAdd", _("Add")),
+        sigc::mem_fun(*this, &AtomicModelBox::OutputPortTreeView::onAdd));
+    mPopupActionGroup->add(
+        Gtk::Action::create("OPTV_ContextRemove", _("Remove")),
+        sigc::mem_fun(*this, &AtomicModelBox::OutputPortTreeView::onRemove));
+    mPopupActionGroup->add(
+        Gtk::Action::create("OPTV_ContextRename", _("Rename")),
+        sigc::mem_fun(*this, &AtomicModelBox::OutputPortTreeView::onRename));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Add"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::OutputPortTreeView::onAdd)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::OutputPortTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::OutputPortTreeView::onRename)));
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
+
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='OPTView_Popup'>"
+        "      <menuitem action='OPTV_ContextAdd'/>"
+        "      <menuitem action='OPTV_ContextRemove'/>"
+        "      <menuitem action='OPTV_ContextRename'/>"
+        "  </popup>"
+        "</ui>";
+
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/OPTView_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: OPTView_Popup " <<  ex.what();
     }
-    mMenuPopup.accelerate(*this);
+
+    if (!mMenuPopup)
+        std::cerr << "menu not found : OPTView_Popup\n";
 }
 
 AtomicModelBox::OutputPortTreeView::~OutputPortTreeView()
@@ -322,9 +345,9 @@ bool AtomicModelBox::OutputPortTreeView::on_button_press_event(
   bool return_value = TreeView::on_button_press_event(event);
 
   //Then do our custom stuff:
-  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
-  {
-    mMenuPopup.popup(event->button, event->time);
+  if ((event->type == GDK_BUTTON_PRESS) && (event->button == 3)) {
+      if (mMenuPopup)
+          mMenuPopup->popup(event->button, event->time);
   }
 
   return return_value;
@@ -473,7 +496,8 @@ void AtomicModelBox::OutputPortTreeView::onEdition(
 AtomicModelBox::ConditionTreeView::ConditionTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
-    Gtk::TreeView(cobject)
+    Gtk::TreeView(cobject),
+    mMenuPopup(0)
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
@@ -499,24 +523,38 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
 	sigc::mem_fun(*this,
 		      &AtomicModelBox::ConditionTreeView::
 		      onEdition) );
-    //Fill popup menu
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
 
-	menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ConditionTreeView::onRename)));
+    mPopupActionGroup = Gtk::ActionGroup::create("ConditionTreeView");
+    mPopupActionGroup->add(Gtk::Action::create("CondTV_ContextMenu", _("Context Menu")));
+    mPopupActionGroup->add(
+        Gtk::Action::create("CondTV_ContextRename", _("_Rename")),
+        sigc::mem_fun(*this, &AtomicModelBox::ConditionTreeView::onRename));
+    mPopupActionGroup->add(
+        Gtk::Action::create("CondTV_ContextEditor", _("Conditions Editor")),
+        sigc::mem_fun(*this,
+                      &AtomicModelBox::ConditionTreeView::onConditionsEditor));
 
-        menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-		_("_Conditions Editor"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ConditionTreeView::onConditionsEditor)));
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
+
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='CondTV_Popup'>"
+        "      <menuitem action='CondTV_ContextRename'/>"
+        "      <menuitem action='CondTV_ContextEditor'/>"
+        "  </popup>"
+        "</ui>";
+
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/CondTV_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: CondTV_Popup " <<  ex.what();
     }
-    mMenuPopup.accelerate(*this);
 
+    if (!mMenuPopup)
+        std::cerr << "menu not found : CondTV_Popup\n";
 }
 
 AtomicModelBox::ConditionTreeView::~ConditionTreeView()
@@ -613,7 +651,8 @@ bool AtomicModelBox::ConditionTreeView::on_button_press_event(
 {
     bool return_value = TreeView::on_button_press_event(event);
     if (event->type == GDK_BUTTON_PRESS and event->button == 3) {
-	mMenuPopup.popup(event->button, event->time);
+        if (mMenuPopup)
+            mMenuPopup->popup(event->button, event->time);
     }
     if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
         onConditionsEditor();
@@ -767,31 +806,52 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
     Gtk::TreeViewColumn* dynCol = get_column(mColumnDyn - 1);
     dynCol->set_sort_column(mColumnsDyn.m_dyn);
 
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    mPopupActionGroup = Gtk::ActionGroup::create();
+    mPopupActionGroup->add(Gtk::Action::create("DynTV_ContextMenu", _("Context Menu")));
+    mPopupActionGroup->add(
+        Gtk::Action::create("DynTV_ContextAdd", _("_Add")),
+        sigc::mem_fun(*this, &AtomicModelBox::DynamicTreeView::onAdd));
+    mPopupActionGroup->add(
+        Gtk::Action::create("DynTV_ContextEdit", _("_Edit")),
+        sigc::mem_fun(
+            *this, &AtomicModelBox::DynamicTreeView::onEdit));
+    mPopupActionGroup->add(
+        Gtk::Action::create("DynTV_ContextNewLibrary", _("_New")),
+        sigc::mem_fun(
+            *this, &AtomicModelBox::DynamicTreeView::onNewLibrary));
+    mPopupActionGroup->add(
+        Gtk::Action::create("DynTV_ContextRemove", _("_Remove")),
+        sigc::mem_fun(
+            *this, &AtomicModelBox::DynamicTreeView::onRemove));
+    mPopupActionGroup->add(
+        Gtk::Action::create("DynTV_ContextRename", _("_Rename")),
+        sigc::mem_fun(
+            *this, &AtomicModelBox::DynamicTreeView::onRename));
 
-	menulist.push_back(
-            Gtk::Menu_Helpers::MenuElem(
-                _("_Add"), sigc::mem_fun(
-                    *this, &AtomicModelBox::DynamicTreeView::onAdd)));
-	menulist.push_back(
-            Gtk::Menu_Helpers::MenuElem(
-                _("_Edit"), sigc::mem_fun(
-                    *this, &AtomicModelBox::DynamicTreeView::onEdit)));
-	menulist.push_back(
-            Gtk::Menu_Helpers::MenuElem(
-                _("_New"), sigc::mem_fun(
-                    *this, &AtomicModelBox::DynamicTreeView::onNewLibrary)));
-	menulist.push_back(
-            Gtk::Menu_Helpers::MenuElem(
-                _("_Remove"), sigc::mem_fun(
-                    *this, &AtomicModelBox::DynamicTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-                _("_Rename"), sigc::mem_fun(
-                    *this, &AtomicModelBox::DynamicTreeView::onRename)));
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
+
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='DynTV_Popup'>"
+        "      <menuitem action='DynTV_ContextAdd'/>"
+        "      <menuitem action='DynTV_ContextEdit'/>"
+        "      <menuitem action='DynTV_ContextNewLibrary'/>"
+        "      <menuitem action='DynTV_ContextRemove'/>"
+        "      <menuitem action='DynTV_ContextRename'/>"
+        "  </popup>"
+        "</ui>";
+
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/DynTV_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: DynTV_Popup " <<  ex.what();
     }
-    mMenuPopup.accelerate(*this);
+
+    if (!mMenuPopup)
+        std::cerr << "menu not found DynTV_Popup \n";
 }
 
 AtomicModelBox::DynamicTreeView::~DynamicTreeView()
@@ -856,7 +916,8 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(
 
   //Then do our custom stuff:
   if ((event->type == GDK_BUTTON_PRESS) and (event->button == 3)) {
-      mMenuPopup.popup(event->button, event->time);
+      if (mMenuPopup)
+          mMenuPopup->popup(event->button, event->time);
   }
 
   if (event->type == GDK_2BUTTON_PRESS) {
@@ -1257,6 +1318,7 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr < Gtk::Builder >& xml /*refGlade*/) :
     Gtk::TreeView(cobject),
+    mMenuPopup(0),
     mObsAndViewBox(xml)
 {
     mRefTreeModelObs = Gtk::ListStore::create(mColumnsObs);
@@ -1290,36 +1352,44 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 		      &AtomicModelBox::ObservableTreeView::
 		      onEdition) );
 
-    //Fill popup menu:
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    mPopupActionGroup = Gtk::ActionGroup::create();
+    mPopupActionGroup->add(Gtk::Action::create("ObsTV_ContextMenu", _("Context Menu")));
+    mPopupActionGroup->add(
+        Gtk::Action::create("ObsTV_ContextAdd", _("_Add")),
+        sigc::mem_fun(*this, &AtomicModelBox::ObservableTreeView::onAdd));
+    mPopupActionGroup->add(
+        Gtk::Action::create("ObsTV_ContextEdit", _("_Edit")),
+        sigc::mem_fun(*this, &AtomicModelBox::ObservableTreeView::onEdit));
+    mPopupActionGroup->add(
+        Gtk::Action::create("ObsTV_ContextRemove", _("_Remove")),
+        sigc::mem_fun(*this, &AtomicModelBox::ObservableTreeView::onRemove));
+    mPopupActionGroup->add(
+        Gtk::Action::create("ObsTV_ContextRename", _("_Rename")),
+        sigc::mem_fun(*this, &AtomicModelBox::ObservableTreeView::onRename));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Add"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ObservableTreeView::onAdd)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Edit"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ObservableTreeView::onEdit)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ObservableTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ObservableTreeView::onRename)));
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
+
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='ObsTV_Popup'>"
+        "      <menuitem action='ObsTV_ContextAdd'/>"
+        "      <menuitem action='ObsTV_ContextEdit'/>"
+        "      <menuitem action='ObsTV_ContextRemove'/>"
+        "      <menuitem action='ObsTV_ContextRename'/>"
+        "  </popup>"
+        "</ui>";
+
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/ObsTV_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: ObsTV_Popup " <<  ex.what();
     }
-    mMenuPopup.accelerate(*this);
+
+    if (!mMenuPopup)
+        std::cerr << "menu not found ObsTV_Popup \n";
 }
 
 AtomicModelBox::ObservableTreeView::~ObservableTreeView()
@@ -1382,7 +1452,8 @@ bool AtomicModelBox::ObservableTreeView::on_button_press_event(
 
     //Then do our custom stuff:
     if ((event->type == GDK_BUTTON_PRESS) and (event->button == 3)) {
-	mMenuPopup.popup(event->button, event->time);
+        if (mMenuPopup)
+            mMenuPopup->popup(event->button, event->time);
     }
     return return_value;
 }

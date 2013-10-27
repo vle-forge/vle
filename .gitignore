@@ -56,3 +56,9 @@ src/vle/vpz/test/test_vpz_project
 src/vle/vpz/test/test_vpz_translator
 src/vle/vpz/test/test_vpz_values
 version.hpp
+debian
+.pc
+obj-x86_64-linux-gnu
+git-push
+build
+GNUmakefile

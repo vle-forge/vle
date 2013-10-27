@@ -50,65 +50,92 @@ TreeViewValue::TreeViewValue()
 
     {
         using namespace Gtk::Menu_Helpers;
-        using namespace value;
-
-        Gtk::Menu::MenuList& items = mMenu.items();
-        items.push_back(MenuElem(_("Insert")));
-        items.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Remove"), sigc::mem_fun(
-                    *this, &TreeViewValue::on_menu_remove)));
-        items.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Duplicate"), sigc::mem_fun(
-                    *this, &TreeViewValue::on_menu_duplicate)));
-
-        Gtk::Menu_Helpers::MenuList& insert = mSubmenuInsert.items();
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Boolean"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::BOOLEAN)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Double"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::DOUBLE)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Integer"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::INTEGER)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Map"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::MAP)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Matrix"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::MATRIX)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Null"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::NIL)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Set"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::SET)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("String"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::STRING)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Table"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::TABLE)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Tuple"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::TUPLE)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem(
-                _("Xml"), sigc::bind(
-                    sigc::mem_fun(*this, &TreeViewValue::on_menu_insert),
-                    Value::XMLTYPE)));
-
-        items[0].set_submenu(mSubmenuInsert);
-        mMenu.show_all();
+        using namespace value;        
+        
+        mMenuActionGroup = Gtk::ActionGroup::create("TreeViewValue");
+        
+        /* Partie Menu Principal */
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextMenu", _("Context Menu")));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextRemove", _("_Remove")),
+            sigc::mem_fun(*this, &TreeViewValue::on_menu_remove));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextRename", _("_Duplicate")),
+            sigc::mem_fun(*this, &TreeViewValue::on_menu_duplicate));
+        
+        /* Partie Sous Menu */
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextInsert", _("_Insert")));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextBoolean", _("_Boolean")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::BOOLEAN));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextDouble", _("_Double")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::DOUBLE));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextInteger", _("_Integer")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::INTEGER));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextMap", _("_Map")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::MAP));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextMatrix", _("_Matrix")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::MATRIX));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextNull", _("_Null")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::NIL));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextSet", _("_Set")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::SET));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextString", _("_String")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::STRING));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextTable", _("_Table")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::TABLE));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextTuple", _("_Tuple")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::TUPLE));
+        
+        mMenuActionGroup->add(Gtk::Action::create("TVV_ContextXml", _("_Xml")),
+            sigc::bind(sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::XMLTYPE));
+        
+        
+        mUIManager = Gtk::UIManager::create();
+        mUIManager->insert_action_group(mMenuActionGroup);
+        
+        Glib::ustring ui_info =
+            "<ui>"
+            "  <popup name='TVV_Popup'>"
+            "      <menu action='TVV_ContextInsert'>"
+            "        <menuitem action='TVV_ContextBoolean'/>"
+            "        <menuitem action='TVV_ContextDouble'/>"
+            "        <menuitem action='TVV_ContextInteger'/>"
+            "        <menuitem action='TVV_ContextMap'/>"
+            "        <menuitem action='TVV_ContextMatrix'/>"
+            "        <menuitem action='TVV_ContextNull'/>"
+            "        <menuitem action='TVV_ContextSet'/>"
+            "        <menuitem action='TVV_ContextString'/>"
+            "        <menuitem action='TVV_ContextTable'/>"
+            "        <menuitem action='TVV_ContextTuple'/>"
+            "        <menuitem action='TVV_ContextXml'/>"
+            "      </menu>"
+            "      <menuitem action='TVV_ContextRemove'/>"
+            "      <menuitem action='TVV_ContextRename'/>"
+            "  </popup>"
+            "</ui>";
+    
+        try {
+            mUIManager->add_ui_from_string(ui_info);
+            mMenu = (Gtk::Menu *) (
+                mUIManager->get_widget("/TVV_Popup"));
+        } catch(const Glib::Error& ex) {
+            std::cerr << "building menus failed: TVV_Popup " <<  ex.what();
+        }
+        
+        if (!mMenu)
+            std::cerr << "menu not found : TVV_Popup\n";
+        
+        mMenu->show_all();
     }
 }
 
@@ -241,7 +268,7 @@ void TreeViewValue::makeTreeView(value::Map& map)
 bool TreeViewValue::on_button_press_event(GdkEventButton* event)
 {
     if ((event->type == GDK_BUTTON_PRESS) && (event->button == 3)) {
-        mMenu.popup(event->button, event->time);
+        mMenu->popup(event->button, event->time);
     }
     return TreeView::on_button_press_event(event);
 }

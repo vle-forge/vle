@@ -37,6 +37,8 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/uimanager.h>
+#include <iostream>
 
 namespace vle { namespace gvle {
 
@@ -98,7 +100,10 @@ namespace vle { namespace gvle {
         Gtk::TreeView*                        mTreeViewObs;
         Glib::RefPtr<Gtk::TreeStore>          mRefTreeObs;
         ModelColumnsObs                       mColumnsObs;
-        Gtk::Menu                             mMenuPopup;
+        Gtk::Menu*                            mMenuPopup;
+	Glib::RefPtr <Gtk::UIManager>         mPopupUIManager;
+	Glib::RefPtr <Gtk::ActionGroup>       mPopupActionGroup;
+	
         Glib::RefPtr<Gtk::TreeSelection>      mSrcSelect;
 
         //Views

@@ -32,7 +32,10 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/uimanager.h>
 #include <vle/utils/Package.hpp>
+#include <gtkmm/treepath.h>
+#include <iostream>
 
 namespace vle { namespace gvle {
 
@@ -76,8 +79,10 @@ private:
     Gtk::Dialog*                    mDialog;
     PackageTreeColumn               mColumns;
     Gtk::TreeView*                  mTreeView;
-    Gtk::Menu                       mMenuPopup;
-
+    Gtk::Menu*                      mMenuPopup;
+    Glib::RefPtr <Gtk::UIManager>   mPopupUIManager;
+    Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+    
     Glib::RefPtr < Gtk::TreeStore >     mTreeModel;
     Glib::RefPtr < Gtk::TreeSelection > mTreeSelection;
 

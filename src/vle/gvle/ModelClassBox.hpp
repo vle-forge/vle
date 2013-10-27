@@ -36,6 +36,7 @@
 #include <gtkmm/builder.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treestore.h>
+#include <gtkmm/uimanager.h>
 
 namespace vle { namespace gvle {
 
@@ -172,7 +173,7 @@ private:
         const Glib::RefPtr<Gtk::TreeModel>& model,
         const Gtk::TreeModel::Path& path, bool);
     bool onButtonRealeaseModels(GdkEventButton *event);
-    void on_cursor_changed();
+    void onCursorChanged();
 
     /**
      * @brief the Class name of a model
@@ -186,8 +187,10 @@ private:
     Modeling*                            mModeling;
     GVLE*                                mGVLE;
     NewModelClassBox*                    mNewModelBox;
-    Gtk::Menu                            mMenuPopup;
-
+    Gtk::Menu*                           mMenuPopup;
+    Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+    Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+    
     //Backup
     vpz::ClassList*                      mClasses_backup;
     Glib::RefPtr<Gtk::TreeStore>         mRefTreeModel;

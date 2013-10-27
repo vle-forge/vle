@@ -174,28 +174,44 @@ void ViewOutputBox::fillViews()
 
 void ViewOutputBox::initMenuPopupViews()
 {
-    Gtk::Menu::MenuList& menulist(m_menu.items());
+    mPopupActionGroup = Gtk::ActionGroup::create("initMenuPopupViews");
+    mPopupActionGroup->add(Gtk::Action::create("VOBox_ContextMenu", _("Context Menu")));
+    
+    mPopupActionGroup->add(Gtk::Action::create("VOBox_ContextAdd", _("_Add")),
+        sigc::mem_fun(*this, &ViewOutputBox::onAddViews));
+    
+    mPopupActionGroup->add(Gtk::Action::create("VOBox_ContextCopy", _("_Copy")),
+        sigc::mem_fun(*this, &ViewOutputBox::onCopyViews));
+    
+    mPopupActionGroup->add(Gtk::Action::create("VOBox_ContextRemove", _("_Remove")),
+        sigc::mem_fun(*this, &ViewOutputBox::onRemoveViews));
+    
+    mPopupActionGroup->add(Gtk::Action::create("VOBox_ContextRename", _("_Rename")),
+        sigc::mem_fun(*this, &ViewOutputBox::onRenameViews));
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Add"), sigc::mem_fun(
-                *this, &ViewOutputBox::onAddViews)));
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
 
-    menulist.push_back(
-	Gtk::Menu_Helpers::MenuElem(
-	    _("_Copy"), sigc::mem_fun(
-		*this, &ViewOutputBox::onCopyViews)));
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='VOBox_Popup'>"
+        "      <menuitem action='VOBox_ContextAdd'/>"
+        "      <menuitem action='VOBox_ContextCopy'/>"
+        "      <menuitem action='VOBox_ContextRemove'/>"
+        "      <menuitem action='VOBox_ContextRename'/>"
+        "  </popup>"
+        "</ui>";
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Remove"), sigc::mem_fun(
-                *this, &ViewOutputBox::onRemoveViews)));
-    menulist.push_back(
-	Gtk::Menu_Helpers::MenuElem(
-            _("_Rename"), sigc::mem_fun(
-                *this, &ViewOutputBox::onRenameViews)));
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        m_menu = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/VOBox_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: VOBox_Popup" <<  ex.what();
+    }
 
-    m_menu.accelerate(*m_views);
+    if (!m_menu)
+        std::cerr << "menu not found : VOBox_Popup\n";
 }
 
 void ViewOutputBox::onAddViews()
@@ -376,7 +392,7 @@ void ViewOutputBox::sensitive(bool active)
 bool ViewOutputBox::onButtonRealeaseViews(GdkEventButton* event)
 {
     if (event->button == 3) {
-        m_menu.popup(event->button, event->time);
+        m_menu->popup(event->button, event->time);
     }
     return true;
 }
@@ -506,7 +522,7 @@ void ViewOutputBox::storePrevious()
 
 void ViewOutputBox::fillCombobox()
 {
-    Gtk::HBox* box;
+    Gtk::Box* box;
     m_xml->get_widget(("comboboxTypeDialogViewOutput"), box);
     m_type = new Gtk::ComboBoxText();
     m_type->show_all();
@@ -522,11 +538,11 @@ void ViewOutputBox::fillCombobox()
     m_plugin->show_all();
     box->pack_start(*m_plugin, true, true, 0);
 
-    m_type->append_text("finish");
-    m_type->append_text("event");
-    m_type->append_text("timed");
-    m_format->append_text("distant");
-    m_format->append_text("local");
+    m_type->append ("finish");
+    m_type->append ("event");
+    m_type->append ("timed");
+    m_format->append ("distant");
+    m_format->append ("local");
 
     {
         utils::ModuleList lst;
@@ -534,7 +550,7 @@ void ViewOutputBox::fillCombobox()
         m_GVLE->pluginFactory().getOutputPlugins(&lst);
 
         for (it = lst.begin(); it != lst.end(); ++it) {
-            m_plugin->append_text(it->package + "/" + it->library);
+            m_plugin->append (it->package + "/" + it->library);
         }
     }
 }

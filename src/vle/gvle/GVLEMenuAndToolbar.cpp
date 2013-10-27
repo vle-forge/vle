@@ -134,7 +134,7 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
 GVLEMenuAndToolbar::GVLEMenuAndToolbar(GVLE* gvle) :
     mParent(gvle)
 {
-    m_refActionGroup = Gtk::ActionGroup::create();
+    m_refActionGroup = Gtk::ActionGroup::create("GVLEMenuAndToolbar");
     m_refUIManager = Gtk::UIManager::create();
     init();
     showMinimalMenu();
@@ -160,9 +160,9 @@ void GVLEMenuAndToolbar::init()
 
     createUI();
 
-    mMenuBar = dynamic_cast<Gtk::MenuBar*>(
+    mMenuBar = (Gtk::MenuBar *) (
         m_refUIManager->get_widget("/MenuBar"));
-    mToolbar = dynamic_cast<Gtk::Toolbar*>(
+    mToolbar = (Gtk::Toolbar *) (
         m_refUIManager->get_widget("/Toolbar"));
 }
 

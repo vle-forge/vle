@@ -107,7 +107,9 @@ void QuitBox::onSave()
         mApp->onSave();
 	++it;
     }
-    mDialog->hide_all();
+    
+    // no hide_all in GTK 3
+    mDialog->hide();
     mApp->hide();
 }
 

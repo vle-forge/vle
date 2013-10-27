@@ -41,11 +41,12 @@ const gint SimpleViewDrawingArea::MODEL_RADIUS = 22;
 SimpleViewDrawingArea::SimpleViewDrawingArea(View* view) :
     ViewDrawingArea(view)
 {
+
 }
 
 void SimpleViewDrawingArea::draw()
 {
-    if (mIsRealized and mBuffer) {
+    if (mContext) {
 	mContext->save();
 	mContext->scale(mZoom, mZoom);
 	calcRectSize();

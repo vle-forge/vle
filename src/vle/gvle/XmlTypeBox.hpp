@@ -51,7 +51,7 @@ public:
 private:
     Glib::RefPtr<Gtk::TextBuffer> mBuff;
     Gtk::TextView* mView;
-    Gtk::ScrolledWindow mScrolledWindow;
+//    Gtk::ScrolledWindow mScrolledWindow;
 
     value::Xml* mValue;
     std::string* mXml;

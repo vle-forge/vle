@@ -45,15 +45,33 @@ OpenPackageBox::OpenPackageBox(const Glib::RefPtr < Gtk::Builder >& xml,
     mTreeSelection = mTreeView->get_selection();
     mTreeSelection->set_mode(Gtk::SELECTION_MULTIPLE);
 
-    Gtk::Menu::MenuList& menulist = mMenuPopup.items();
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Remove"),
-            sigc::mem_fun(
-                *this, &OpenPackageBox::onRemove)));
+    mPopupActionGroup = Gtk::ActionGroup::create("OpenPackageBox");
+    mPopupActionGroup->add(Gtk::Action::create("OpenPB_ContextMenu", _("Context Menu")));
+    
+    mPopupActionGroup->add(Gtk::Action::create("OpenPB_ContextRemove", _("_Remove")),
+        sigc::mem_fun(*this, &OpenPackageBox::onRemove));
+    
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
 
-    mMenuPopup.accelerate(*mDialog);
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='OpenPB_Popup'>"
+        "      <menuitem action='OpenPB_ContextRemove'/>"
+        "  </popup>"
+        "</ui>";
 
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/OpenPB_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: OpenPB_Popup " <<  ex.what();
+    }
+
+    if (!mMenuPopup)
+        std::cerr << "menu not found : OpenPB_Popup\n";
+    
     mConnections.push_back(
         mTreeView->signal_row_activated().connect(
             sigc::mem_fun(*this, &OpenPackageBox::onRowActivated)));
@@ -123,7 +141,9 @@ void OpenPackageBox::onRemove()
 {
     typedef std::list < Gtk::TreeModel::Path > paths_t;
 
-    paths_t p = mTreeSelection->get_selected_rows();
+    std::vector<Gtk::TreePath> v1 = mTreeSelection->get_selected_rows();
+    std::list<Gtk::TreePath> p (v1.begin(), v1.end());
+    //paths_t p = mTreeSelection->get_selected_rows();
 
     if (not p.empty()) {
         std::string result;
@@ -161,7 +181,7 @@ void OpenPackageBox::onRemoveCallBack(const Gtk::TreeModel::iterator& it)
 void OpenPackageBox::onButtonPressEvent(GdkEventButton* event)
 {
     if (event->type == GDK_BUTTON_PRESS && event->button== 3) {
-        mMenuPopup.popup(event->button, event->time);
+        mMenuPopup->popup(event->button, event->time);
     }
 }
 
@@ -169,7 +189,9 @@ void OpenPackageBox::onSelectionChanged()
 {
     typedef std::list < Gtk::TreeModel::Path > paths_t;
 
-    paths_t p = mTreeSelection->get_selected_rows();
+    std::vector<Gtk::TreePath> v1 = mTreeSelection->get_selected_rows();
+    std::list<Gtk::TreePath> p (v1.begin(), v1.end());
+    //paths_t p = mTreeSelection->get_selected_rows();
 
     if (not p.empty()) {
         paths_t::reverse_iterator it = p.rbegin();

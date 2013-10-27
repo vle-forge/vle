@@ -32,6 +32,7 @@
 #include <gtkmm/treemodelcolumn.h>
 #include <gtkmm/celleditable.h>
 #include <gtkmm/menu.h>
+#include <gtkmm/uimanager.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/dialog.h>
@@ -96,7 +97,7 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
 	vpz::CoupledModel* mModel;
-	Gtk::Menu mMenuPopup;
+	Gtk::Menu* mMenuPopup;
 	ModelColumns mColumnsInputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelInputPort;
 
@@ -106,6 +107,9 @@ private:
 	Gtk::CellRendererText* mCellRenderer;
 	Glib::ustring mInvalidTextForRetry;
 	renameList mRenameList;
+	
+	Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
     };
 
     class OutputPortTreeView : public Gtk::TreeView
@@ -140,7 +144,7 @@ private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
 	vpz::CoupledModel* mModel;
-	Gtk::Menu mMenuPopup;
+	Gtk::Menu* mMenuPopup;
 	ModelColumns mColumnsOutputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelOutputPort;
 
@@ -150,6 +154,9 @@ private:
 	Gtk::CellRendererText* mCellRenderer;
 	Glib::ustring mInvalidTextForRetry;
 	renameList mRenameList;
+	
+	Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
     };
 
     void applyPorts();
@@ -177,7 +184,6 @@ private:
 
     Gtk::Button*                           mOkButton;
     Gtk::Button*                           mCancelButton;
-
 };
 
 } } // namespace vle gvle

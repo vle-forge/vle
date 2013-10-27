@@ -33,7 +33,7 @@ namespace vle {
 namespace gvle {
 
 TupleBox::TupleBox(value::Tuple* t) :
-    Gtk::Dialog("Tuple", true, true),
+    Gtk::Dialog("Tuple", true),
     mValue(t)
 {
     add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
@@ -43,7 +43,8 @@ TupleBox::TupleBox(value::Tuple* t) :
     mScroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     get_vbox()->pack_start(*mScroll);
 
-    mTable = new Gtk::Table(mValue->size(), 1, true);
+    //mTable = new Gtk::Table(mValue->size(), 1, true);
+    mTable = new Gtk::Grid();
     mScroll->add(*mTable);
     makeTable();
     resize(300, 200);
@@ -53,7 +54,8 @@ TupleBox::TupleBox(value::Tuple* t) :
 
 TupleBox::~TupleBox()
 {
-    hide_all();
+    // No hide_all in GTK 3
+    hide();
 }
 
 void TupleBox::run()

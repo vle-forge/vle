@@ -30,6 +30,7 @@
 
 #include <vle/gvle/DllDefines.hpp>
 #include <vle/utils/i18n.hpp>
+#include <glibmm.h>
 
 namespace vle { namespace gvle {
 

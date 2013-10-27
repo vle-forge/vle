@@ -88,14 +88,17 @@ void SaveVpzBox::onApply()
             if (it != mGVLE->getEditor()->getDocuments().end()) {
                 it->second->setTitle(pathFile, mModeling->getTopModel(), false);
             }
-            mDialog->hide_all();
+            
+            // no hide_all in Gtk 3
+            mDialog->hide();
         }
     }
 }
 
 void SaveVpzBox::onCancel()
 {
-    mDialog->hide_all();
+    // no hide_all in Gtk 3
+    mDialog->hide();
 }
 
 bool SaveVpzBox::exist(std::string name)

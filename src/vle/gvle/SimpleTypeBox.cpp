@@ -41,7 +41,7 @@ namespace vu = vle::utils;
 namespace vle { namespace gvle {
 
 SimpleTypeBox::SimpleTypeBox(value::Value* b):
-    Gtk::Dialog("?",true,true),
+    Gtk::Dialog("?",true),
     mBase(b),
     mValid(false)
 {
@@ -65,7 +65,7 @@ SimpleTypeBox::SimpleTypeBox(value::Value* b):
 
 SimpleTypeBox::SimpleTypeBox(const std::string& title,
 			     const std::string& value) :
-    Gtk::Dialog(title,true,true),
+    Gtk::Dialog(title,true),
     mBase(0),
     mValid(false)
 {
@@ -79,7 +79,8 @@ SimpleTypeBox::SimpleTypeBox(const std::string& title,
 
 SimpleTypeBox::~SimpleTypeBox()
 {
-    hide_all();
+    // No hide_all in Gtk 3
+    hide ();
     delete mEntry;
 }
 

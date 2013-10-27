@@ -35,7 +35,7 @@ using namespace vle;
 namespace vle {
 namespace gvle {
 BooleanBox::BooleanBox(value::Boolean* boolean) :
-    Gtk::Dialog(_("Boolean"), true, true),
+    Gtk::Dialog(_("Boolean"), true),
     mValue(boolean)
 {
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -44,15 +44,15 @@ BooleanBox::BooleanBox(value::Boolean* boolean) :
     m_Combo = new Gtk::ComboBoxText();
     get_vbox()->pack_start(*m_Combo);
 
-    m_Combo->append_text("true");
-    m_Combo->append_text("false");
+    m_Combo->append("true");
+    m_Combo->append("false");
     m_Combo->set_active_text(boolean->writeToString());
     show_all();
 }
 
 BooleanBox::~BooleanBox()
 {
-    hide_all();
+    hide();
     delete m_Combo;
 }
 

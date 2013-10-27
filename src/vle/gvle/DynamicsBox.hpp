@@ -33,6 +33,7 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/cellrenderercombo.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/uimanager.h>
 
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/PluginFactory.hpp>
@@ -151,8 +152,10 @@ private:
     Gtk::TreeModel::Row                 mRowPackage;
     Gtk::TreeModel::Row                 mRowLibrary;
 
-    Gtk::Menu                           mMenu;
-
+    Gtk::Menu*                          mMenu;
+    Glib::RefPtr <Gtk::UIManager> mUIManager;
+    Glib::RefPtr <Gtk::ActionGroup> mActionGroup;
+	
     Gtk::TreeModel::Children::iterator  mIter;
 
 

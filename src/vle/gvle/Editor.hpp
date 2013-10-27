@@ -185,8 +185,8 @@ protected:
     SimpleViewDrawingArea*      mSimpleArea;
     vpz::BaseModel*       mModel;
     Gtk::Viewport*      mViewport;
-    Gtk::Adjustment     mAdjustWidth;
-    Gtk::Adjustment     mAdjustHeight;
+    Glib::RefPtr<Gtk::Adjustment>     mAdjustWidth;
+    Glib::RefPtr<Gtk::Adjustment>     mAdjustHeight;
 };
 
 class GVLE_API DocumentCompleteDrawingArea : public DocumentDrawingArea
@@ -228,8 +228,8 @@ public:
      */
     void changeFile(const std::string& oldName, const std::string& newName);
 
-    void changeTab(GtkNotebookPage* page, int num);
-    void changeAndSignal(GtkNotebookPage* page, int num);
+    void changeTab(Gtk::Widget *page, gint num);
+    void changeAndSignal(Gtk::Widget *page, gint num);
     void refreshTab();
 
     void closeAllTab();
@@ -329,7 +329,7 @@ private:
      *
      * @return a pointeur of the new label
      */
-    Gtk::HBox* addLabel(const std::string& title,
+    Gtk::Box* addLabel(const std::string& title,
                         const std::string& filepath);
 };
 

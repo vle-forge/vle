@@ -41,7 +41,7 @@ namespace gvle {
 
 ModelDescriptionBox::ModelDescriptionBox(const set < string > & lst,
         vpz::BaseModel * model) :
-        Gtk::Dialog(_("Model Description"), true, true),
+        Gtk::Dialog(_("Model Description"), true),
         m_lst(lst),
         m_model(model)
 {
@@ -57,14 +57,15 @@ ModelDescriptionBox::ModelDescriptionBox(const set < string > & lst,
     frameNorth->set_shadow_type(Gtk::SHADOW_NONE);
     frameNorth->add(*m_entry);
 
-    Gtk::VBox *vbox1 = Gtk::manage(new class Gtk::VBox(false, 0));
+    Gtk::Box *vbox1 = Gtk::manage(new class Gtk::Box(Gtk::ORIENTATION_VERTICAL, 0));
+    vbox1->set_homogeneous (false);
     vbox1->pack_start(*frameNorth, Gtk::PACK_SHRINK, 0);
 
     get_vbox()->add(*vbox1);
     get_vbox()->set_homogeneous(false);
     get_vbox()->set_spacing(0);
 
-    okbutton->set_flags(Gtk::CAN_DEFAULT);
+    okbutton->set_can_default (true);
     okbutton->grab_default();
     m_entry->set_activates_default();
 

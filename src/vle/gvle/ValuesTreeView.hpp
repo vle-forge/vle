@@ -32,6 +32,7 @@
 #include <gtkmm/treemodel.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/uimanager.h>
 #include <vle/value/Value.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
@@ -76,8 +77,10 @@ private:
     vpz::Condition* mCondition;
     ModelColumns m_Columns;
     Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
-    Gtk::Menu mMenu;
-    Gtk::Menu mSubmenuAdd;
+    
+    Gtk::Menu* mMenu;
+    Glib::RefPtr <Gtk::UIManager> mUIManager;
+    Glib::RefPtr <Gtk::ActionGroup> mMenuActionGroup;
 
     value::Value* mValue;
 

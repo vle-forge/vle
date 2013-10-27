@@ -47,7 +47,7 @@ namespace vle {
 namespace gvle {
 
 NewTypeBox::NewTypeBox() :
-    Gtk::Dialog("?", true, true),
+    Gtk::Dialog("?", true),
     mVal(0)
 {
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -56,23 +56,24 @@ NewTypeBox::NewTypeBox() :
     m_Combo = new Gtk::ComboBoxText();
     get_vbox()->pack_start(*m_Combo);
 
-    m_Combo->append_text("Boolean");
-    m_Combo->append_text("Double");
-    m_Combo->append_text("Integer");
-    m_Combo->append_text("Matrix");
-    m_Combo->append_text("Map");
-    m_Combo->append_text("Null");
-    m_Combo->append_text("Set");
-    m_Combo->append_text("String");
-    m_Combo->append_text("Table");
-    m_Combo->append_text("Tuple");
-    m_Combo->append_text("Xml");
+    m_Combo->append("Boolean");
+    m_Combo->append("Double");
+    m_Combo->append("Integer");
+    m_Combo->append("Matrix");
+    m_Combo->append("Map");
+    m_Combo->append("Null");
+    m_Combo->append("Set");
+    m_Combo->append("String");
+    m_Combo->append("Table");
+    m_Combo->append("Tuple");
+    m_Combo->append("Xml");
     show_all();
 }
 
 NewTypeBox::~NewTypeBox()
 {
-    hide_all();
+    // No hide_all in Gtk 3
+    hide();
     delete m_Combo;
 }
 

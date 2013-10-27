@@ -42,7 +42,7 @@ CompleteViewDrawingArea::CompleteViewDrawingArea(View* view) :
 
 void CompleteViewDrawingArea::draw()
 {
-    if (mIsRealized and mBuffer) {
+    if (mContext) {
         maxModelWidthHeight();
         calcRectSize();
         mContext->save();

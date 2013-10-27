@@ -28,10 +28,8 @@
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/oov/Plugin.hpp>
-#ifdef VLE_HAVE_CAIRO
-  #include <vle/oov/CairoPlugin.hpp>
-  #include <vle/utils/Path.hpp>
-#endif
+#include <vle/oov/CairoPlugin.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/version.hpp>
 
@@ -68,7 +66,6 @@ void StreamWriter::open(const std::string& pluginname,
             e.what());
     }
 
-#ifdef VLE_HAVE_CAIRO
     /*
      * For cairo plug-ins, we build the cairo graphics context via the
      * CairoPlugin::init function.
@@ -77,7 +74,6 @@ void StreamWriter::open(const std::string& pluginname,
         oov::CairoPluginPtr plg = oov::toCairoPlugin(plugin());
         plg->init();
     }
-#endif
 
     plugin()->onParameter(pluginname, location, file, parameters, time);
 }
@@ -115,7 +111,6 @@ void StreamWriter::process(Simulator* simulator,
         parent = simulator->getParent();
     }
 
-#ifdef VLE_HAVE_CAIRO
     if (plugin()->isCairo()) {
         oov::CairoPluginPtr plg = oov::toCairoPlugin(plugin());
         plg->needCopy();
@@ -135,12 +130,9 @@ void StreamWriter::process(Simulator* simulator,
             }
         }
     } else {
-#endif
         plugin()->onValue(name, parent, portname, view, time, val);
 
-#ifdef VLE_HAVE_CAIRO
     }
-#endif
 }
 
 void StreamWriter::close(const devs::Time& time)

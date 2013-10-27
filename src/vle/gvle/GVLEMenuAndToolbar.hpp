@@ -34,6 +34,8 @@
 #include <gtkmm/menu.h>
 #include <gtkmm/uimanager.h>
 #include <gtkmm/actiongroup.h>
+#include <gtkmm/actiongroup.h>
+#include <gdk/gdkkeysyms-compat.h>
 
 namespace vle { namespace gvle {
 

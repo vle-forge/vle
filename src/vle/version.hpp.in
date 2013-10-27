@@ -55,7 +55,6 @@
 #cmakedefine VLE_HAVE_GCC_ABI_DEMANGLE
 #cmakedefine VLE_HAVE_EXECINFO
 #cmakedefine VLE_HAVE_SIGNAL
-#cmakedefine VLE_HAVE_CAIRO
 #cmakedefine VLE_HAVE_POOL
 #cmakedefine VLE_HAVE_NLS
 #cmakedefine VLE_HAVE_GTKSOURCEVIEWMM

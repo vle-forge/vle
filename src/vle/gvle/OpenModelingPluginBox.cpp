@@ -103,13 +103,15 @@ void OpenModelingPluginBox::onApply()
             mDialog->response(Gtk::RESPONSE_OK);
 	}
     }
-    mDialog->hide_all();
+    // Gtk 3 no hide_all
+    mDialog->hide();
 }
 
 void OpenModelingPluginBox::onCancel()
 {
     mDialog->response(Gtk::RESPONSE_CANCEL);
-    mDialog->hide_all();
+    // Gtk 3 no hide_all
+    mDialog->hide();
 }
 
 void OpenModelingPluginBox::onRowActivated(

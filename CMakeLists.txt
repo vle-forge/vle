@@ -80,41 +80,29 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
 endif (COMMAND CMAKE_POLICY)
 
-option(WITH_CAIRO "use cairomm to build output plugin [default: on]" ON)
 option(WITH_GTK "use gtkmm to build gvle [default: on]" ON)
 option(WITH_GTKSOURCEVIEW "use gtksourceview to build gvle [default: on]" ON)
 
-if (WITH_CAIRO AND WITH_GTK AND WITH_GTKSOURCEVIEW)
+if (WITH_GTK AND WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
-    cairomm-1.0>=1.2 gtkmm-2.4 gtksourceview-2.0)
+    gtkmm-3.0 gtksourceview-3.0 cairomm-1.0)
 
   if (NOT VLEDEPS_FOUND)
-    message(STATUS "Failed to find gtksourceview-2.0")
+    message(STATUS "Failed to find gtksourceview-3.0")
     set (WITH_GTKSOURCEVIEW OFF)
   endif ()
 endif ()
 
-if (WITH_CAIRO AND WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
+if (WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
-    cairomm-1.0>=1.2 gtkmm-2.4)
+    gtkmm-3.0)
 
   if (NOT VLEDEPS_FOUND)
-    message(STATUS "Failed to find gtkmm-2.4")
     set (WITH_GTK OFF)
   endif ()
 endif ()
 
-if (WITH_CAIRO AND NOT WITH_GTK)
-  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
-    cairomm-1.0>=1.2)
-
-  if (NOT VLEDEPS_FOUND)
-    message(STATUS "Failed to find cairomm-1.0")
-    set (WITH_CAIRO OFF)
-  endif ()
-endif ()
-
-if (NOT WITH_CAIRO AND NOT WITH_GTK)
+if (NOT WITH_GTK)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
 
   if (NOT VLEDEPS_FOUND)
@@ -122,10 +110,6 @@ if (NOT WITH_CAIRO AND NOT WITH_GTK)
       "glibmm-2.4, gthread-2.0 and libxml-2.0")
   endif ()
 endif()
-
-if (WITH_CAIRO)
-    set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
-endif ()
 
 if (WITH_GTK)
   set(VLE_HAVE_GVLE 1 CACHE INTERNAL "" FORCE)

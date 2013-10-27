@@ -57,63 +57,91 @@ ValuesTreeView::~ValuesTreeView()
 
 void ValuesTreeView::buildMenu()
 {
-    Gtk::Menu::MenuList& items(mMenu.items());
-    items.push_back(Gtk::Menu_Helpers::MenuElem(_("Add")));
-    items.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Remove"), sigc::mem_fun(
-                *this, &ValuesTreeView::on_menu_remove)));
-    items.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Duplicate"), sigc::mem_fun(
-                *this, &ValuesTreeView::on_menu_duplicate)));
-
-    Gtk::Menu_Helpers::MenuList& insert = mSubmenuAdd.items();
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Boolean"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::BOOLEAN)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Double"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::DOUBLE)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Integer"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::INTEGER)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Map"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::MAP)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Matrix"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::MATRIX)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Null"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::NIL)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Set"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::SET)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("String"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::STRING)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Table"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::TABLE)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Tuple"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::TUPLE)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-            _("Xml"), sigc::bind(
-                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
-                value::Value::XMLTYPE)));
-
-    items[0].set_submenu(mSubmenuAdd);
-    mMenu.show_all();
+    mMenuActionGroup = Gtk::ActionGroup::create("buildMenu");
+        
+        /* Partie Menu Principal */
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextMenu", _("Context Menu")));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextRemove", _("_Remove")),
+            sigc::mem_fun(*this, &ValuesTreeView::on_menu_remove));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextRename", _("_Duplicate")),
+            sigc::mem_fun(*this, &ValuesTreeView::on_menu_duplicate));
+        
+        /* Partie Sous Menu */
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextInsert", _("Insert")));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextBoolean", _("_Boolean")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::BOOLEAN));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextDouble", _("_Double")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::DOUBLE));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextInteger", _("_Integer")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::INTEGER));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextMap", _("_Map")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::MAP));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextMatrix", _("_Matrix")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::MATRIX));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextNull", _("_Null")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::NIL));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextSet", _("_Set")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::SET));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextString", _("_String")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::STRING));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextTable", _("_Table")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::TABLE));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextTuple", _("_Tuple")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::TUPLE));
+        
+        mMenuActionGroup->add(Gtk::Action::create("VTView_ContextXml", _("_Xml")),
+            sigc::bind(sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert), value::Value::XMLTYPE));
+        
+        
+        mUIManager = Gtk::UIManager::create();
+        mUIManager->insert_action_group(mMenuActionGroup);
+        
+        Glib::ustring ui_info =
+            "<ui>"
+            "  <popup name='VTView_Popup'>"
+            "      <menu action='VTView_ContextInsert'>"
+            "        <menuitem action='VTView_ContextBoolean'/>"
+            "        <menuitem action='VTView_ContextDouble'/>"
+            "        <menuitem action='VTView_ContextInteger'/>"
+            "        <menuitem action='VTView_ContextMap'/>"
+            "        <menuitem action='VTView_ContextMatrix'/>"
+            "        <menuitem action='VTView_ContextNull'/>"
+            "        <menuitem action='VTView_ContextSet'/>"
+            "        <menuitem action='VTView_ContextString'/>"
+            "        <menuitem action='VTView_ContextTable'/>"
+            "        <menuitem action='VTView_ContextTuple'/>"
+            "        <menuitem action='VTView_ContextXml'/>"
+            "      </menu>"
+            "      <menuitem action='VTView_ContextRemove'/>"
+            "      <menuitem action='VTView_ContextRename'/>"
+            "  </popup>"
+            "</ui>";
+    
+        try {
+            mUIManager->add_ui_from_string(ui_info);
+            mMenu = (Gtk::Menu *) (
+                mUIManager->get_widget("/VTView_Popup"));
+        } catch(const Glib::Error& ex) {
+            std::cerr << "building menus failed: VTView_Popup \n" <<  ex.what() << "\n\n";
+        } 
+	
+        if (!mMenu)
+            std::cerr << "menu not found : VTView_Popup \n\n";
+        
+    
+    mMenu->show_all();
 }
 
 void ValuesTreeView::clear()
@@ -249,7 +277,7 @@ void ValuesTreeView::makeTreeView(value::Map& map)
 bool ValuesTreeView::on_button_press_event(GdkEventButton* event)
 {
     if (mCondition and event->type == GDK_BUTTON_PRESS and event->button == 3) {
-        mMenu.popup(event->button, event->time);
+        mMenu->popup(event->button, event->time);
     }
     return TreeView::on_button_press_event(event);
 }

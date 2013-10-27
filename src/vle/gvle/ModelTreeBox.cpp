@@ -115,19 +115,38 @@ void ModelTreeBox::selectNone()
 
 void ModelTreeBox::initMenuPopupModels()
 {
-    Gtk::Menu::MenuList& menuList(m_menu.items());
+    mActionGroup = Gtk::ActionGroup::create("initMenuPopupModels");
+    mActionGroup->add(Gtk::Action::create("ModelTB_ContextMenu", _("Context Menu")));
+    
+    mActionGroup->add(Gtk::Action::create("ModelTB_ContextRename", _("_Rename")),
+        sigc::mem_fun(*this, &ModelTreeBox::onRenameModels));
+    
+    mUIManager = Gtk::UIManager::create();
+    mUIManager->insert_action_group(mActionGroup);
 
-    menuList.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Rename"), sigc::mem_fun(
-		*this, &ModelTreeBox::onRenameModels)));
-    m_menu.accelerate(*this);
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='ModelTB_Popup'>"
+        "      <menuitem action='ModelTB_ContextRename'/>"
+        "  </popup>"
+        "</ui>";
+
+    try {
+        mUIManager->add_ui_from_string(ui_info);
+        m_menu = (Gtk::Menu *) (
+            mUIManager->get_widget("/ModelTB_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: ModelTB_Popup \n" <<  ex.what();
+    }
+
+    if (!m_menu)
+        std::cerr << "menu not found : ModelTB_Popupu\n";
 }
 
 bool ModelTreeBox::onButtonRealeaseModels(GdkEventButton* event)
 {
     if (event->button == 3) {
-        m_menu.popup(event->button, event->time);
+        m_menu->popup(event->button, event->time);
     }
     return true;
 }
@@ -170,7 +189,7 @@ void ModelTreeBox::parseModel(vpz::BaseModel* top)
     while (it != list.end()) {
         Gtk::TreeModel::Row row2 = addSubModel(row, it->second);
         if (it->second->isCoupled()) {
-            parseModel(row2, (vpz::CoupledModel*)it->second);
+           parseModel(row2, (vpz::CoupledModel*)it->second);
         }
         it++;
     }

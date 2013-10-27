@@ -35,6 +35,7 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/textview.h>
 #include <gtkmm/comboboxtext.h>
+#include <gtkmm/uimanager.h>
 #include <gtkmm/liststore.h>
 #include <vle/vpz/Views.hpp>
 #include <set>
@@ -118,8 +119,10 @@ namespace vle { namespace gvle {
 	sigc::connection m_cntPluginClicked;
 
         Glib::RefPtr < Gtk::ListStore > m_model;
-        Gtk::Menu           m_menu;
-
+        Gtk::Menu*          m_menu;
+	Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+        
         Gtk::TreeModel::iterator m_iter;
 
         void initViews();

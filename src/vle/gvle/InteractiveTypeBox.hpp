@@ -60,7 +60,7 @@ namespace vle { namespace gvle {
 
     private:
 	// Gtk widgets
-	Gtk::HBox*               mHBox;
+	Gtk::Box*               mHBox;
         Gtk::Entry*              mEntry;
 	Gtk::Button*             mButtonOk;
 	Gtk::Image               mImage;

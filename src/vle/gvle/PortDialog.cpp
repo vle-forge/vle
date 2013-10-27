@@ -35,7 +35,7 @@ namespace vle
 namespace gvle {
 
 PortDialog::PortDialog(vpz::BaseModel* model, PortDialog::PortType type) :
-    Gtk::Dialog(_("Port"), true, true),
+    Gtk::Dialog(_("Port"), true),
     mLabelEntry(_("New port:")),
     mModel(model),
     mPortType(type)
@@ -70,7 +70,7 @@ PortDialog::PortDialog(vpz::BaseModel* model, PortDialog::PortType type) :
     get_vbox()->pack_start(mLabelModelName, false, true, 10);
     get_vbox()->pack_start(mHBox, false, true, 0);
 
-    ok->set_flags(Gtk::CAN_DEFAULT);
+    ok->set_can_default (true);
     ok->grab_default();
     mEntryPortName.set_activates_default();
 

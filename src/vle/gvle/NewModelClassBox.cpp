@@ -110,7 +110,8 @@ void NewModelClassBox::on_apply()
     }
 
     mGVLE->redrawModelClassBox();
-    mDialog->hide_all();
+    // No hide_all in gtk 3
+    mDialog->hide();
 }
 
 }

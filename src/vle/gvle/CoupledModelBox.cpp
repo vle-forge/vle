@@ -58,31 +58,41 @@ CoupledModelBox::InputPortTreeView::InputPortTreeView(
 	sigc::mem_fun(*this,
 		      &CoupledModelBox::InputPortTreeView::
 		      onEdition));
+    
+    mPopupActionGroup = Gtk::ActionGroup::create("Coupled_InputPortTreeView");
+    mPopupActionGroup->add(Gtk::Action::create("CoupledIPTV_ContextMenu", _("Context Menu")));
+    
+    mPopupActionGroup->add(Gtk::Action::create("CoupledIPTV_ContextAdd", _("_Add")),
+	sigc::mem_fun(*this, &CoupledModelBox::InputPortTreeView::onAdd));
 
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    mPopupActionGroup->add(Gtk::Action::create("CoupledIPTV_ContextRemove", _("_Remove")),
+	sigc::mem_fun(*this, &CoupledModelBox::InputPortTreeView::onRemove));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Add"),
-		sigc::mem_fun(
-		    *this,
-		    &CoupledModelBox::InputPortTreeView::onAdd)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &CoupledModelBox::InputPortTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &CoupledModelBox::InputPortTreeView::onRename)));
+    mPopupActionGroup->add(Gtk::Action::create("CoupledIPTV_ContextRename", _("_Rename")),
+	sigc::mem_fun(*this, &CoupledModelBox::InputPortTreeView::onRename));
+
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
+    
+    Glib::ustring ui_info =
+	"<ui>"
+	"  <popup name='CoupledIPTV_Popup'>"
+        "      <menuitem action='CoupledIPTV_ContextAdd'/>"
+	"      <menuitem action='CoupledIPTV_ContextRemove'/>"
+	"      <menuitem action='CoupledIPTV_ContextRename'/>"
+	"  </popup>"
+	"</ui>";
+
+    try {
+	mPopupUIManager->add_ui_from_string(ui_info);
+	mMenuPopup = (Gtk::Menu *) (
+	mPopupUIManager->get_widget("/CoupledIPTV_Popup"));
+    } catch(const Glib::Error& ex) {
+	std::cerr << "building menus failed: CoupledIPTV_Popup \n" <<  ex.what();
     }
-
-    mMenuPopup.accelerate(*this);
+        
+    if (!mMenuPopup)
+        std::cerr << "menu not found : CoupledIPTV_Popup\n";
 }
 
 CoupledModelBox::InputPortTreeView::~InputPortTreeView()
@@ -108,7 +118,7 @@ bool CoupledModelBox::InputPortTreeView::on_button_press_event(
 {
     bool return_value = TreeView::on_button_press_event(event);
     if ( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
-	mMenuPopup.popup(event->button, event->time);
+	mMenuPopup->popup(event->button, event->time);
     }
 
     return return_value;
@@ -254,31 +264,41 @@ CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
 	sigc::mem_fun(*this,
 		      &CoupledModelBox::OutputPortTreeView::
 		      onEdition) );
+    
+    mPopupActionGroup = Gtk::ActionGroup::create("Coupled_OutputPortTreeView");
+    mPopupActionGroup->add(Gtk::Action::create("CoupledOPTV_ContextMenu", _("Context Menu")));
+    
+    mPopupActionGroup->add(Gtk::Action::create("CoupledOPTV_ContextAdd", _("_Add")),
+	sigc::mem_fun(*this, &CoupledModelBox::OutputPortTreeView::onAdd));
 
-    //Fill popup menu:
-    {
-	Gtk::Menu::Menu::MenuList& menulist = mMenuPopup.items();
+    mPopupActionGroup->add(Gtk::Action::create("CoupledOPTV_ContextRemove", _("_Remove")),
+	sigc::mem_fun(*this, &CoupledModelBox::OutputPortTreeView::onRemove));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Add"),
-		sigc::mem_fun(
-		    *this,
-		    &CoupledModelBox::OutputPortTreeView::onAdd)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &CoupledModelBox::OutputPortTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &CoupledModelBox::OutputPortTreeView::onRename)));
+    mPopupActionGroup->add(Gtk::Action::create("CoupledOPTV_ContextRename", _("_Rename")),
+	sigc::mem_fun(*this, &CoupledModelBox::OutputPortTreeView::onRename));
+
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
+    
+    Glib::ustring ui_info =
+	"<ui>"
+	"  <popup name='CoupledOPTV_Popup'>"
+        "      <menuitem action='CoupledOPTV_ContextAdd'/>"
+	"      <menuitem action='CoupledOPTV_ContextRemove'/>"
+	"      <menuitem action='CoupledOPTV_ContextRename'/>"
+	"  </popup>"
+	"</ui>";
+
+    try {
+	mPopupUIManager->add_ui_from_string(ui_info);
+	mMenuPopup = (Gtk::Menu *) (
+	mPopupUIManager->get_widget("/CoupledOPTV_Popup"));
+    } catch(const Glib::Error& ex) {
+	std::cerr << "building menus failed: CoupledOPTV_Popup \n" <<  ex.what();
     }
-    mMenuPopup.accelerate(*this);
+        
+    if (!mMenuPopup)
+        std::cerr << "menu not found : CoupledOPTV_Popup\n";
 }
 
 CoupledModelBox::OutputPortTreeView::~OutputPortTreeView()
@@ -305,7 +325,7 @@ bool CoupledModelBox::OutputPortTreeView::on_button_press_event(
     bool return_value = TreeView::on_button_press_event(event);
 
     if ( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
-	mMenuPopup.popup(event->button, event->time);
+	mMenuPopup->popup(event->button, event->time);
     }
 
     return return_value;
@@ -535,14 +555,14 @@ void CoupledModelBox::applyPorts()
 void CoupledModelBox::on_validate()
 {
     applyPorts();
-    mDialog->hide_all();
+    mDialog->hide();
     delete mGraphModel;
     mGVLE->setModified(true);
 }
 
 void CoupledModelBox::on_cancel()
 {
-    mDialog->hide_all();
+    mDialog->hide();
     delete mGraphModel;
 }
 

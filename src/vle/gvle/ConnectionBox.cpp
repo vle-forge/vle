@@ -40,14 +40,19 @@ namespace vle { namespace gvle {
 ConnectionBox::ConnectionBox(vpz::CoupledModel* parent,
                              vpz::BaseModel* src,
                              vpz::BaseModel* dst) :
-        Gtk::Dialog(_("Connection Box"), true, true),
-        m_vbox(false),
-        m_hbox(true),
+        Gtk::Dialog(_("Connection Box"), true),
+        m_vbox(Gtk::ORIENTATION_VERTICAL),
+        m_hbox(Gtk::ORIENTATION_HORIZONTAL),
         m_left(_("Source model")),
-        m_left2(false),
+        m_left2(Gtk::ORIENTATION_VERTICAL),
         m_right(_("Destination model")),
-        m_right2(false)
+        m_right2(Gtk::ORIENTATION_VERTICAL)
 {
+    m_vbox.set_homogeneous(false);
+    m_right2.set_homogeneous(false);
+    m_left2.set_homogeneous(false);
+    m_hbox.set_homogeneous(true);
+     	
     assert(parent and src and dst);
 
     m_label.set_markup(_("<big><b>Connection</b></big>"));

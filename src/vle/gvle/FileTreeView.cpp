@@ -60,53 +60,59 @@ FileTreeView::FileTreeView(BaseObjectType* cobject,
     mIgnoredFilesList.push_front("build");
 
     {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+	mPopupActionGroup = Gtk::ActionGroup::create("FileTreeView");
+	mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextMenu", _("Context Menu")));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Open with..."),
-		sigc::mem_fun(
-		    *this,
-		    &FileTreeView::onOpen)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("New _Directory"),
-		sigc::mem_fun(
-		    *this,
-		    &FileTreeView::onNewDirectory)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("New _File"),
-		sigc::mem_fun(
-		    *this,
-		    &FileTreeView::onNewFile)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Copy"),
-		sigc::mem_fun(
-		    *this,
-		    &FileTreeView::onCopy)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Paste"),
-		sigc::mem_fun(
-		    *this,
-		    &FileTreeView::onPaste)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &FileTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &FileTreeView::onRename)));
+	mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextOpen", _("_Open with...")),
+	  sigc::mem_fun(*this, &FileTreeView::onOpen));
+
+	mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextDir", _("New _Directory")),
+	  sigc::mem_fun(*this, &FileTreeView::onNewDirectory));
+
+	mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextFile", _("New _File")),
+	  sigc::mem_fun(*this, &FileTreeView::onNewFile));
+
+	mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextCopy", _("_Copy")),
+	  sigc::mem_fun(*this, &FileTreeView::onCopy));
+        
+        mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextPaste", _("_Paste")),
+	  sigc::mem_fun(*this, &FileTreeView::onPaste));
+
+	mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextRemove", _("_Remove")),
+	  sigc::mem_fun(*this, &FileTreeView::onRemove));
+
+	mPopupActionGroup->add(Gtk::Action::create("FileTV_ContextRename", _("_Rename")),
+	  sigc::mem_fun(*this, &FileTreeView::onRename));
+
+	mPopupUIManager = Gtk::UIManager::create();
+	mPopupUIManager->insert_action_group(mPopupActionGroup);
+
+	Glib::ustring ui_info =
+	"<ui>"
+	"  <popup name='FileTV_Popup'>"
+	"      <menuitem action='FileTV_ContextOpen'/>"
+	"      <menuitem action='FileTV_ContextDir'/>"
+	"      <menuitem action='FileTV_ContextFile'/>"
+	"      <menuitem action='FileTV_ContextCopy'/>"
+	"      <menuitem action='FileTV_ContextPaste'/>"
+	"      <menuitem action='FileTV_ContextRemove'/>"
+	"      <menuitem action='FileTV_ContextRename'/>"
+        "  </popup>"
+	"</ui>";
+
+	try {
+		mPopupUIManager->add_ui_from_string(ui_info);
+		mMenuPopup = (Gtk::Menu *) (
+	    	mPopupUIManager->get_widget("/FileTV_Popup"));
+	} catch(const Glib::Error& ex) {
+		std::cerr << "building menus failed: FileTV_Popup " <<  ex.what();
+	}
+        
+        if (!mMenuPopup)
+            std::cerr << "menu not found FileTV_Popup\n";
+	
     }
-    mMenuPopup.accelerate(*this);
-
+    
     signal_event().connect(sigc::mem_fun(*this, &FileTreeView::onEvent));
 
     Glib::RefPtr<Gtk::TreeSelection> selection = Gtk::TreeView::get_selection();
@@ -455,7 +461,7 @@ bool FileTreeView::on_button_press_event(GdkEventButton* event)
         get_cursor(path, column);
         mRecentSelectedPath = path;
 
-	mMenuPopup.popup(event->button, event->time);
+	mMenuPopup->popup(event->button, event->time);
         return true;
     } else {
         return TreeView::on_button_press_event(event);
@@ -526,8 +532,8 @@ void FileTreeView::onNewFile()
 
 void FileTreeView::onNewDirectory()
 {
-
-    std::list < Gtk::TreeModel::Path > lst(mTreeSelection->get_selected_rows());
+    std::vector < Gtk::TreeModel::Path > v = mTreeSelection->get_selected_rows();
+    std::list < Gtk::TreeModel::Path > lst(v.begin(), v.end());
 
     SimpleTypeBox box(_("Name of the Directory ?"), "");
     std::string name(boost::trim_copy(box.run()));
@@ -658,8 +664,9 @@ bool FileTreeView::on_foreach(const Gtk::TreeModel::Path&,
 
 void FileTreeView::onRemove()
 {
-    std::list < Gtk::TreeModel::Path > lst =
-        mTreeSelection->get_selected_rows();
+    std::vector < Gtk::TreeModel::Path > v = mTreeSelection->get_selected_rows();
+    std::list < Gtk::TreeModel::Path > lst(v.begin(), v.end());
+
     std::list < Gtk::TreeModel::Path >::const_iterator it;
     std::string files;
 

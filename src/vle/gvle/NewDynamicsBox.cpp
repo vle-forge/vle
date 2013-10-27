@@ -57,13 +57,15 @@ NewDynamicsBox::~NewDynamicsBox()
 void NewDynamicsBox::onApply()
 {
     mDialog->response(Gtk::RESPONSE_OK);
-    mDialog->hide_all();
+    // No hide_all in gtk 3
+    mDialog->hide();
 }
 
 void NewDynamicsBox::onCancel()
 {
     mDialog->response(Gtk::RESPONSE_CANCEL);
-    mDialog->hide_all();
+    // No hide_all in gtk 3
+    mDialog->hide();
 }
 
 int NewDynamicsBox::run()

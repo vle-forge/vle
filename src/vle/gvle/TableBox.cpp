@@ -37,7 +37,7 @@ namespace vle {
 namespace gvle {
 
 TableBox::TableBox(value::Table* t) :
-    Gtk::Dialog("Table", true, true),
+    Gtk::Dialog("Table", true),
     mValue(t)
 {
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -47,7 +47,8 @@ TableBox::TableBox(value::Table* t) :
     mScroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     get_vbox()->pack_start(*mScroll);
 
-    mTable = new Gtk::Table(t->height(), t->width(), true);
+    //mTable = new Gtk::Table(t->height(), t->width(), true);
+    mTable = new Gtk::Grid();
     mScroll->add(*mTable);
     makeTable();
     resize(300, 200);
@@ -57,7 +58,8 @@ TableBox::TableBox(value::Table* t) :
 
 TableBox::~TableBox()
 {
-    hide_all();
+    // No hide_all in Gtk 3
+    hide();
     delete mScroll;
     delete mTable;
 
@@ -100,9 +102,9 @@ void TableBox::makeTable()
                 j,
                 j + 1,
                 i,
-                i + 1,
+                i + 1 /*,
                 Gtk::FILL,
-                Gtk::FILL);
+                Gtk::FILL */);
         }
     }
 }

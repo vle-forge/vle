@@ -93,7 +93,7 @@ class Column : public Gtk::TreeModel::ColumnRecord
 
     Gtk::Label                      mLabelDialogName;
     Gtk::Label                      mLabelModelName;
-    Gtk::HBox                       mHBox;
+    Gtk::Box                       mHBox;
     Gtk::Label                      mLabelEntry;
     Gtk::Entry                      mEntryPortName;
     Gtk::ScrolledWindow             mScrolledWindow;

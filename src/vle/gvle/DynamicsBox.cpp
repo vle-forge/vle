@@ -276,29 +276,45 @@ void DynamicsBox::fillDynamics()
 
 void DynamicsBox::initMenuPopupDynamics()
 {
-    Gtk::Menu::MenuList& menulist(mMenu.items());
+    mActionGroup = Gtk::ActionGroup::create("initMenuPopupDynamics");
+    mActionGroup->add(Gtk::Action::create("DynBox_ContextMenu", _("Context Menu")));
+    
+    mActionGroup->add(Gtk::Action::create("DynBox_ContextNew", _("_New")),
+	sigc::mem_fun(*this, &DynamicsBox::onAddDynamic));
+    
+    mActionGroup->add(Gtk::Action::create("DynBox_ContextDuplicate", _("_Duplicate")),
+	sigc::mem_fun(*this, &DynamicsBox::onCopyDynamic));
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_New"), sigc::mem_fun(
-                *this, &DynamicsBox::onAddDynamic)));
+    mActionGroup->add(Gtk::Action::create("DynBox_ContextRemove", _("_Remove")),
+	sigc::mem_fun(*this, &DynamicsBox::onRemoveDynamic));
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Duplicate"), sigc::mem_fun(
-                *this, &DynamicsBox::onCopyDynamic)));
+    mActionGroup->add(Gtk::Action::create("DynBox_ContextRename", _("_Rename")),
+	sigc::mem_fun(*this, &DynamicsBox::onRenameDynamic));
 
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Remove"), sigc::mem_fun(
-                *this, &DynamicsBox::onRemoveDynamic)));
-    menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem(
-            _("_Rename"), sigc::mem_fun(
-                *this, &DynamicsBox::onRenameDynamic)));
+    mUIManager = Gtk::UIManager::create();
+    mUIManager->insert_action_group(mActionGroup);
+    
+    Glib::ustring ui_info =
+	"<ui>"
+	"  <popup name='DynBox_Popup'>"
+        "      <menuitem action='DynBox_ContextNew'/>"
+	"      <menuitem action='DynBox_ContextDuplicate'/>"
+	"      <menuitem action='DynBox_ContextRemove'/>"
+	"      <menuitem action='DynBox_ContextRename'/>"
+	"  </popup>"
+	"</ui>";
 
-    mMenu.accelerate(*mDynamics);
-
+    try {
+	mUIManager->add_ui_from_string(ui_info);
+	mMenu = (Gtk::Menu *) (
+	mUIManager->get_widget("/DynBox_Popup"));
+    } catch(const Glib::Error& ex) {
+	std::cerr << "building menus failed: DynBox_Popup " <<  ex.what();
+    }
+        
+    if (!mMenu)
+        std::cerr << "menu not found : DynBox_Popup \n";
+    
     mList.push_back(mDynamics->signal_button_release_event().connect(
                         sigc::mem_fun(*this,
                                       &DynamicsBox::onButtonRealeaseDynamics)));
@@ -439,7 +455,7 @@ void DynamicsBox::onEdition(
 bool DynamicsBox::onButtonRealeaseDynamics(GdkEventButton* event)
 {
     if(event->button == 3) {
-        mMenu.popup(event->button, event->time);
+        mMenu->popup(event->button, event->time);
     }
     return true;
 }

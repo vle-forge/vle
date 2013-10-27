@@ -80,18 +80,37 @@ ObsAndViewBox::ObsAndViewBox(const Glib::RefPtr < Gtk::Builder >& xml):
     mButtonCancel->signal_clicked().connect(
         sigc::mem_fun(*this, &ObsAndViewBox::on_cancel));
 
-    //Fill popup menu:
-    {
-        Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    
+    mPopupActionGroup = Gtk::ActionGroup::create("ObsAndViewBox");
+    mPopupActionGroup->add(Gtk::Action::create("OaVB_ContextMenu", _("Context Menu")));
+    
+    mPopupActionGroup->add(Gtk::Action::create("OaVB_ContextAdd", _("_Add")),
+        sigc::mem_fun(*this, &ObsAndViewBox::on_add_port));
+    
+    mPopupActionGroup->add(Gtk::Action::create("OaVB_ContextRemove", _("_Remove")),
+        sigc::mem_fun(*this, &ObsAndViewBox::on_del_port));
+    
+    mPopupUIManager = Gtk::UIManager::create();
+    mPopupUIManager->insert_action_group(mPopupActionGroup);
 
-        menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-                "_Add", sigc::mem_fun(
-                    *this, &ObsAndViewBox::on_add_port)));
-        menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-                "_Remove", sigc::mem_fun(
-                    *this, &ObsAndViewBox::on_del_port)));
+    Glib::ustring ui_info =
+        "<ui>"
+        "  <popup name='OaVB_Popup'>"
+        "    <menuitem action='OaVB_ContextAdd'/>"
+        "    <menuitem action='OaVB_ContextRemove'/>"
+        "  </popup>"
+        "</ui>";
+
+    try {
+        mPopupUIManager->add_ui_from_string(ui_info);
+        mMenuPopup = (Gtk::Menu *) (
+            mPopupUIManager->get_widget("/OaVB_Popup"));
+    } catch(const Glib::Error& ex) {
+        std::cerr << "building menus failed: OaVB_Popup " <<  ex.what();
     }
-    mMenuPopup.accelerate(*mTreeViewObs);
+
+    if (!mMenuPopup)
+        std::cerr << "menu not found : OaVB_Popup\n";
 }
 
 ObsAndViewBox::~ObsAndViewBox()
@@ -143,7 +162,7 @@ void ObsAndViewBox::on_cancel()
 void ObsAndViewBox::on_button_press(GdkEventButton* event)
 {
     if (event->type == GDK_BUTTON_PRESS and event->button == 3) {
-        mMenuPopup.popup(event->button, event->time);
+        mMenuPopup->popup(event->button, event->time);
     }
 }
 
@@ -151,11 +170,13 @@ void ObsAndViewBox::on_add()
 {
     using namespace Gtk;
     using namespace vpz;
-
-    TreeSelection::ListHandle_Path lstDst = mDstSelect->get_selected_rows();
+    
+    std::vector<TreePath> v1 = mDstSelect->get_selected_rows();
+    std::list<TreePath> lstDst (v1.begin(), v1.end());
+//    TreeSelection::ListHandle_Path lstDst = mDstSelect->get_selected_rows();
     Glib::RefPtr<TreeModel> modelDst = mTreeViewObs->get_model();
 
-    for (TreeSelection::ListHandle_Path::iterator iDst = lstDst.begin();
+    for (std::list<TreePath>::iterator iDst = lstDst.begin();
             iDst != lstDst.end(); ++iDst) {
         TreeModel::Row rowDst( *(modelDst->get_iter(*iDst)));
         std::string data_name(rowDst.get_value(mColumnsObs.m_col_name));
@@ -166,10 +187,12 @@ void ObsAndViewBox::on_add()
             ObservablePort& port(
                 mObs->get(rowDst.get_value(mColumnsObs.m_col_name)));
 
-            TreeSelection::ListHandle_Path lstSrc = mSrcSelect->get_selected_rows();
+            std::vector<TreePath> v2 = mSrcSelect->get_selected_rows();
+            std::list<TreePath> lstSrc (v2.begin(), v2.end());
+            //TreeSelection::ListHandle_Path lstSrc = mSrcSelect->get_selected_rows();
             Glib::RefPtr<TreeModel> modelSrc = mTreeViewViews->get_model();
 
-            for (TreeSelection::ListHandle_Path::iterator iSrc = lstSrc.begin();
+            for (std::list<TreePath>::iterator iSrc = lstSrc.begin();
                  iSrc != lstSrc.end(); ++iSrc) {
                 TreeModel::Row rowSrc( *(modelSrc->get_iter(*iSrc)));
 
@@ -239,10 +262,12 @@ void ObsAndViewBox::on_del_port()
     using namespace vpz;
 
     Glib::RefPtr<TreeSelection> tree_selection = mTreeViewObs->get_selection();
-    TreeSelection::ListHandle_Path lst = tree_selection->get_selected_rows();
+    std::vector<TreePath> v1 = tree_selection->get_selected_rows();
+    std::list<TreePath> lst (v1.begin(), v1.end());
+    //TreeSelection::ListHandle_Path lst = tree_selection->get_selected_rows();
     Glib::RefPtr<TreeModel> model = mTreeViewObs->get_model();
 
-    for (TreeSelection::ListHandle_Path::iterator i = lst.begin();
+    for (std::list<TreePath>::iterator i = lst.begin();
             i != lst.end(); ++i) {
         TreeModel::Row row( *(model->get_iter(*i)));
         std::string data_name(row.get_value(mColumnsObs.m_col_name));
@@ -267,10 +292,12 @@ void ObsAndViewBox::on_del_view()
     using namespace vpz;
 
     Glib::RefPtr<TreeSelection> tree_selection = mTreeViewObs->get_selection();
-    TreeSelection::ListHandle_Path lst = tree_selection->get_selected_rows();
+    std::vector<TreePath> v1 = tree_selection->get_selected_rows();
+    std::list<TreePath> lst (v1.begin(), v1.end());
+    //TreeSelection::ListHandle_Path lst = tree_selection->get_selected_rows();
     Glib::RefPtr<TreeModel> model = mTreeViewObs->get_model();
 
-    for (TreeSelection::ListHandle_Path::iterator i = lst.begin();
+    for (std::list<TreePath>::iterator i = lst.begin();
             i != lst.end(); ++i) {
         TreeModel::Row row( *(model->get_iter(*i)));
         std::string data_name(row.get_value(mColumnsObs.m_col_name));

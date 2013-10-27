@@ -37,6 +37,7 @@
 #include <gtkmm/button.h>
 #include <gtkmm/progressbar.h>
 #include <gtkmm/label.h>
+#include <glibmm.h>
 
 namespace vle { namespace vpz {
 

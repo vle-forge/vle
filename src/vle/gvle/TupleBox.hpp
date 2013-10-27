@@ -31,7 +31,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/scrolledwindow.h>
-#include <gtkmm/table.h>
+#include <gtkmm/grid.h>
 #include <vle/value/Tuple.hpp>
 #include <boost/multi_array.hpp>
 
@@ -49,7 +49,7 @@ private:
     typedef boost::multi_array<Gtk::Entry*, 1> array_type;
 
     Gtk::ScrolledWindow* mScroll;
-    Gtk::Table* mTable;
+    Gtk::Grid* mTable;
     value::Tuple* mValue;
     array_type* mArray;
 

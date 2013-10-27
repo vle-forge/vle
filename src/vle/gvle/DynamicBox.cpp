@@ -112,7 +112,7 @@ void DynamicBox::makeComboLibrary()
     mGVLE->pluginFactory().getDynamicsPlugins(selectedPackage, &lst);
 
     for (it = lst.begin(); it != lst.end(); ++it) {
-        mComboLibrary->append_text(it->library);
+        mComboLibrary->append(it->library);
     }
 
     mComboLibrary->set_active_text(mDyn->library());
@@ -127,7 +127,7 @@ void DynamicBox::makeComboPackage()
     std::sort(paths.begin(), paths.end());
     for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
          i != e; ++i) {
-        mComboPackage->append_text(*i);
+        mComboPackage->append(*i);
     }
 
     mComboPackage->set_active_text(mDyn->package());
@@ -169,9 +169,9 @@ void DynamicBox::onNewLibrary()
             if (execPlugin(box.pluginName(),
                            box2.getClassName(),
                            box2.getNamespace()) == Gtk::RESPONSE_OK) {
-                mComboPackage->append_text(box2.getNamespace());
+                mComboPackage->append(box2.getNamespace());
                 mComboPackage->set_active_text(box2.getNamespace());
-                mComboLibrary->append_text(box2.getClassName());
+                mComboLibrary->append(box2.getClassName());
                 mComboLibrary->set_active_text(box2.getClassName());
             }
         }

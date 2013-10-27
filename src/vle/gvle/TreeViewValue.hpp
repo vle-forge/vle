@@ -31,13 +31,14 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/uimanager.h>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/value/Null.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/gvle/SimpleTypeBox.hpp>
+#include <iostream>
 
 namespace vle
 {
@@ -79,9 +80,10 @@ private:
     //The Tree model:
     Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
 
-    Gtk::Menu mMenu;
-    Gtk::Menu mSubmenuInsert;
-
+    Gtk::Menu* mMenu;
+    Glib::RefPtr <Gtk::UIManager> mUIManager;
+    Glib::RefPtr <Gtk::ActionGroup> mMenuActionGroup;
+    
     value::Value* mValue;
 
     void on_row_activated(const Gtk::TreeModel::Path& path,

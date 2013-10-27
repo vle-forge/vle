@@ -30,6 +30,8 @@
 
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
+#include <gtkmm/menu.h>
+#include <gtkmm/uimanager.h>
 #include <vle/gvle/ValuesTreeView.hpp>
 #include <vle/vpz/Conditions.hpp>
 
@@ -71,7 +73,7 @@ class ConditionsBox
         void setParent(ConditionsBox* parent)
         { mParent = parent; }
 
-	void makeMenuEdit();
+	void makeMenus();
 
     protected:
 	// Override Signal handler:
@@ -96,13 +98,15 @@ class ConditionsBox
 
         bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
                             const Glib::RefPtr<Gtk::Tooltip>& tooltip);
+	
+	
 
     private:
 
 	ConditionsBox* mParent;
 	vpz::Conditions* mConditions;
-	Gtk::Menu mMenuEdit;
-	Gtk::Menu mMenuPopup;
+//	Gtk::Menu* mMenuEdit;   Devenu inutile ! (Mikaël)
+	Gtk::Menu* mMenuPopup;
 	ModelColumnsConditions mColumns;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
@@ -112,6 +116,10 @@ class ConditionsBox
 	Glib::ustring mOldName;
 	Gtk::CellRendererText* mCellRenderer;
 	Glib::ustring mInvalidTextForRetry;
+	
+	Glib::RefPtr <Gtk::UIManager> mUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+        Glib::RefPtr <Gtk::ActionGroup> mEditActionGroup;
     };
 
     class ModelColumnsPorts : public Gtk::TreeModel::ColumnRecord
@@ -142,7 +150,7 @@ class ConditionsBox
 	void setParent(ConditionsBox* parent)
 	    { mParent = parent; }
 
-	void makeMenuEdit();
+	void makeMenus();
 
     protected:
 	// Override Signal handler:
@@ -167,8 +175,8 @@ class ConditionsBox
     private:
 	ConditionsBox* mParent;
 	vpz::Condition* mCondition;
-	Gtk::Menu mMenuEdit;
-	Gtk::Menu mMenuPopup;
+	Gtk::Menu* mMenuEdit;
+	Gtk::Menu* mMenuPopup;
 	ModelColumnsPorts mColumns;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
@@ -178,6 +186,9 @@ class ConditionsBox
 	Glib::ustring mOldName;
 	Gtk::CellRendererText* mCellRenderer;
 	Glib::ustring mInvalidTextForRetry;
+	
+	Glib::RefPtr <Gtk::UIManager> mUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
     };
 
 public:

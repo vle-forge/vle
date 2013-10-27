@@ -31,6 +31,7 @@
 #include <gtkmm/builder.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treestore.h>
+#include <gtkmm/uimanager.h>
 
 namespace vle { namespace vpz {
 
@@ -182,7 +183,10 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
 
     ModelTreeColumn              m_columns;
     Glib::RefPtr<Gtk::TreeStore> m_refTreeModel;
-    Gtk::Menu                    m_menu;
+    Gtk::Menu*                   m_menu;
+    Glib::RefPtr <Gtk::UIManager> mUIManager;
+    Glib::RefPtr <Gtk::ActionGroup> mActionGroup;
+    
     Modeling*                    m_modeling;
     GVLE*                        m_gvle;
     std::string                  m_search;

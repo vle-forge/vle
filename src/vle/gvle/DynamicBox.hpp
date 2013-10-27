@@ -83,8 +83,8 @@ namespace vle { namespace gvle {
         Gtk::Button*                        mButtonNew;
         vpz::Dynamic*                       mDyn;
 
-        Gtk::HBox* mBoxDynamicLibrary;
-        Gtk::HBox* mBoxDynamicPackage;
+        Gtk::Box* mBoxDynamicLibrary;
+        Gtk::Box* mBoxDynamicPackage;
 
         std::list < sigc::connection >      mList;
 

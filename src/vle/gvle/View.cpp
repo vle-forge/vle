@@ -130,9 +130,9 @@ void View::exportCurrentModel()
     Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    Gtk::FileFilter filter;
-    filter.set_name(_("Vle Project gZipped"));
-    filter.add_pattern("*.vpz");
+    Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create ();
+    filter->set_name(_("Vle Project gZipped"));
+    filter->add_pattern("*.vpz");
     file.add_filter(filter);
 
     if (file.run() == Gtk::RESPONSE_OK) {
@@ -201,7 +201,7 @@ void View::addAtomicModel(int x, int y)
     ModelDescriptionBox* box = new
     ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
-        vpz::AtomicModel* new_atom =
+       vpz::AtomicModel* new_atom =
             mModeling->newAtomicModel(mCurrent, box->getName(), "", x, y);
 
         if (new_atom) {

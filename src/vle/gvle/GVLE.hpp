@@ -898,7 +898,7 @@ private:
 
 
     /* Widgets */
-    Gtk::VBox*                      mMenuAndToolbarVbox;
+    Gtk::Box*                      mMenuAndToolbarVbox;
     GVLEMenuAndToolbar*             mMenuAndToolbar;
     Gtk::TextView*                  mLog;
     Gtk::Statusbar*                 mStatusbar;

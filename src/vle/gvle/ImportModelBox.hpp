@@ -45,7 +45,7 @@ class Modeling;
 
 class ImportModelBox;
 
-class ImportWidget : public Gtk::HBox
+class ImportWidget : public Gtk::Box
 {
 public:
     ImportWidget(ImportModelBox* parent, vpz::Base* base);
@@ -114,22 +114,22 @@ private:
 
     Gtk::Dialog*                         mDialog;
 
-    Gtk::VBox*                           mVboxDyns;
+    Gtk::Box*                           mVboxDyns;
     list_widget                          mListDyns;
 
-    Gtk::VBox*                           mVboxConds;
+    Gtk::Box*                           mVboxConds;
     list_widget                          mListConds;
 
-    Gtk::VBox*                           mVboxOutputs;
+    Gtk::Box*                           mVboxOutputs;
     list_widget                          mListOutputs;
 
-    Gtk::VBox*                           mVboxObs;
+    Gtk::Box*                           mVboxObs;
     list_widget                          mListObs;
 
-    Gtk::VBox*                           mVboxViews;
+    Gtk::Box*                           mVboxViews;
     list_widget                          mListViews;
 
-    Gtk::VBox*                           mVboxModels;
+    Gtk::Box*                           mVboxModels;
     list_widget                          mListModels;
 
 

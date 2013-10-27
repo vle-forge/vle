@@ -30,6 +30,8 @@
 
 #include <gtkmm/builder.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/menu.h>
+#include <gtkmm/uimanager.h>
 #include <vle/gvle/DynamicBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/ObsAndViewBox.hpp>
@@ -108,7 +110,6 @@ protected:
     };
 
 private:
-
     class InputPortTreeView : public Gtk::TreeView
     {
     public:
@@ -147,7 +148,11 @@ private:
 
 	vpz::AtomicModel* mModel;
 	renameList mRenameList;
-	Gtk::Menu mMenuPopup;
+
+        Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+	Gtk::Menu *mMenuPopup;
+
 	ModelColumnsPort mColumnsInputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelInputPort;
 
@@ -196,7 +201,9 @@ private:
 
 	vpz::AtomicModel* mModel;
 	renameList mRenameList;
-	Gtk::Menu mMenuPopup;
+        Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+	Gtk::Menu *mMenuPopup;
 	ModelColumnsPort mColumnsOutputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelOutputPort;
 
@@ -259,7 +266,9 @@ private:
 	renameList mRenameList;
 	Modeling* mModeling;
         GVLE* mGVLE;
-	Gtk::Menu mMenuPopup;
+        Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+	Gtk::Menu *mMenuPopup;
 	ModelColumnsCond mColumns;
 	Glib::RefPtr < Gtk::ListStore > mRefTreeModel;
 	//Label
@@ -341,7 +350,9 @@ private:
 	renameList                      mRenameList;
 	Modeling*                       mModeling;
         GVLE*                           mGVLE;
-	Gtk::Menu                       mMenuPopup;
+        Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+	Gtk::Menu *mMenuPopup;
 	ModelColumnsDyn                 mColumnsDyn;
 	Glib::RefPtr<Gtk::ListStore>    mRefListDyn;
 
@@ -412,7 +423,9 @@ private:
 	vpz::Observables* mObservables;
 	renameList mRenameList;
 	Modeling* mModeling;
-	Gtk::Menu mMenuPopup;
+        Glib::RefPtr <Gtk::UIManager> mPopupUIManager;
+        Glib::RefPtr <Gtk::ActionGroup> mPopupActionGroup;
+	Gtk::Menu *mMenuPopup;
 	ModelColumnsObs mColumnsObs;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelObs;
 	//Dialog Box

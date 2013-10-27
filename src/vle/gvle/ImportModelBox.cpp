@@ -38,7 +38,7 @@ namespace gvle {
 using namespace vpz;
 
 ImportWidget::ImportWidget(ImportModelBox* parent, vpz::Base* base):
-        Gtk::HBox(),
+        Gtk::Box(Gtk::ORIENTATION_HORIZONTAL),
         mParent(parent),
         mBase(base),
         mAtom(0)
@@ -73,7 +73,7 @@ ImportWidget::ImportWidget(ImportModelBox* parent, vpz::Base* base):
 }
 
 ImportWidget::ImportWidget(ImportModelBox* parent, vpz::BaseModel* atom):
-        Gtk::HBox(),
+        Gtk::Box(Gtk::ORIENTATION_HORIZONTAL),
         mParent(parent),
         mBase(0),
         mAtom(atom)

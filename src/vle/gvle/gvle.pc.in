@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: gvle
 Description: GVLE the gui for VLE the multimodelling and Simulation tools
-Requires: gtkmm-2.4 cairomm-1.0 vle-@VLE_VERSION_SHORT@
+Requires: gtkmm-3.0 cairomm-1.0 vle-@VLE_VERSION_SHORT@
 Version: @VLE_VERSION@
 Libs:	-L${libdir} @VLE_GVLE_LIBRARY@ -lvle-@VLE_VERSION_SHORT@
 Cflags: -I${includedir}/vle-@VLE_VERSION_SHORT@ -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@
