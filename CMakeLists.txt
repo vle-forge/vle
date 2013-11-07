@@ -151,6 +151,11 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_DETAILED_FAILURE_MSG ON)
 set(Boost_DEBUG OFF)
 
+if (VLE_BOOST_INCLUDE_PATH AND VLE_BOOST_LIBRARIES_PATH)
+ set (BOOST_LIBRARYDIR ${VLE_BOOST_LIBRARIES_PATH})
+ set (BOOST_INCLUDEDIR ${VLE_BOOST_INCLUDE_PATH})
+endif ()
+
 find_package(Boost COMPONENTS unit_test_framework thread filesystem system
   chrono date_time regex program_options)
 
