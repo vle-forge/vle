@@ -84,6 +84,16 @@ namespace vle { namespace devs {
         void finish();
 
         /**
+         * Return an allocated \c value::Map.
+         *
+         * This function build a new \c value::Matrix based on the
+         * observation of the simulation. This function can return
+         * NULL if there is no storage view.
+         * @return  Return a constant reference to the list of view plugins.
+         */
+        value::Map * runtimeOutputs();
+
+        /**
          * @brief Return the current time of the simulation.
          * @return A constant reference to the current time.
          */
@@ -95,8 +105,7 @@ namespace vle { namespace devs {
          *
          * This function build a new \c value::Matrix based on the
          * observation of the simulation. This function can return
-         * NULL if tablea
-         constant reference to the list of view plugins.
+         * NULL if there is no storage view.
          * @return  Return a constant reference to the list of view plugins.
          */
         value::Map * outputs() { return m_result; }

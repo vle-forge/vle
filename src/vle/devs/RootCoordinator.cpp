@@ -133,4 +133,13 @@ void RootCoordinator::finish()
     }
 }
 
+value::Map * RootCoordinator::runtimeOutputs()
+{
+     if (m_coordinator) {
+         return getMatrixFromView(m_coordinator->getViews());
+     }
+
+     return 0;
+}
+
 }} // namespace vle devs
