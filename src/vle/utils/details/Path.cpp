@@ -568,6 +568,22 @@ std::string Path::buildDirname(const std::string& dir1,
     return f.string();
 }
 
+void Path::fillBinaryPackagesList(std::vector<std::string>& pkglist)
+{
+    std::string header = "Packages from: ";
+    header += path().getBinaryPackagesDir();
+    pkglist.clear();
+    pkglist.push_back(header);
+    PathList pkgs = path().getBinaryPackages();
+    std::sort(pkgs.begin(), pkgs.end());
+    PathList::const_iterator itb = pkgs.begin();
+    PathList::const_iterator ite = pkgs.end();
+    for (; itb!=ite; itb++){
+        pkglist.push_back(*itb);
+    }
+    return;
+}
+
 std::string Path::getCurrentPath()
 {
     fs::path current = fs::current_path();

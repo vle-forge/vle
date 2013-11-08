@@ -310,6 +310,12 @@ public:
      */
     void refreshPath();
 
+    /**
+     * @brief fills a vector of string with the binary content
+     * @param pkgcontent, the vector of string to fill
+     */
+    void fillBinaryContent(std::vector<std::string>& pkgcontent);
+
     friend std::ostream& operator<<(std::ostream& out, const Package& pkg);
 
 private:

@@ -867,6 +867,72 @@ void Package::refreshPath()
     m_pimpl->refreshPath();
 }
 
+void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
+{
+    std::string header = "Package content from: ";
+    header += getDir(vle::utils::PKG_BINARY);
+
+    pkgcontent.clear();
+    pkgcontent.push_back(header);
+
+    vle::utils::PathList tmp;
+
+    tmp = getExperiments();
+    pkgcontent.push_back("-- experiments : ");
+    std::sort(tmp.begin(), tmp.end());
+    std::vector<std::string>::const_iterator itb = tmp.begin();
+    std::vector<std::string>::const_iterator ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsSimulator();
+    pkgcontent.push_back("-- simulator plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsOutput();
+    pkgcontent.push_back("-- output plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsGvleGlobal();
+    pkgcontent.push_back("-- gvle global plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsGvleModeling();
+    pkgcontent.push_back("-- gvle modeling plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsGvleOutput();
+    pkgcontent.push_back("-- gvle output plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+    return;
+}
+
 VLE_API std::ostream& operator<<(std::ostream& out,
         const VLE_PACKAGE_TYPE& type)
 {
