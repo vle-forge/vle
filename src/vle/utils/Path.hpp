@@ -426,6 +426,14 @@ public:
                                     const std::string& dir4,
                                     const std::string& dir5);
 
+    /**
+     * @brief fill a vector of string with the list of binary packages
+     * @param pkglist, the vector to fill
+     */
+    static void fillBinaryPackagesList(std::vector<std::string>& pkglist);
+
+
+
 
 private:
     void addSimulatorDir(const std::string& dirname);
