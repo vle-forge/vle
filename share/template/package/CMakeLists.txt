@@ -9,6 +9,32 @@ SET(MODEL_PATCH 0)
 SET(MODEL_NAME "${PROJECT_NAME}-${MODEL_MAJOR}.${MODEL_MINOR}.${MODEL_PATCH}")
 SET(VLE_NAME "${PROJECT_NAME}-${MODEL_MAJOR}.${MODEL_MINOR}")
 
+##
+## Options for compilation of package
+##
+
+OPTION(WITH_TEST "will build the test [default: ON]" ON)
+OPTION(WITH_DOC "will compile doc and install it [default: OFF]" OFF)
+OPTION(WITH_WARNINGS "will compile with g++ warnings [default: ON]" ON)
+
+if (CMAKE_BUILD_TYPE STREQUAL "")
+  SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build" FORCE)
+endif ()
+
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_COMPILER_IS_GNUCXX)
+  if (NOT WITH_WARNINGS)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+  else (NOT WITH_WARNINGS)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+  endif (NOT WITH_WARNINGS)
+  if ("${CMAKE_BUILD_TYPE}" EQUAL "Debug" OR "${CMAKE_BUILD_TYPE}" EQUAL "RelWithDebInfo")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ggdb3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb3")
+  endif ()
+endif ()
+
 
 ##
 ## Modules
@@ -25,7 +51,6 @@ INCLUDE(CMakeDetermineCCompiler)
 
 set(VLE_DEBUG 0)
 find_package(VLE REQUIRED)
-
 
 ##
 ## Check VLE's packages
