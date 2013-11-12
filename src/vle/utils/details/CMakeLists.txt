@@ -1,9 +1,10 @@
 if (WIN32)
-  set (UTILS_SPECIFIC_SPAWN_IMPL SpawnWin.cpp)
+  set (SPECIFIC_UTILS_DETAILS UtilsWin.hpp UtilsWin.cpp
+       PathWin32.cpp SpawnWin.cpp)
 else ()
-  set (UTILS_SPECIFIC_SPAWN_IMPL SpawnUnix.cpp)
+  set (SPECIFIC_UTILS_DETAILS PathUnix.cpp SpawnUnix.cpp)
 endif ()
 
 add_sources(vlelib Compress.cpp Package.hpp PackageManager.hpp
-  PackageManager.cpp PackageParser.cpp PackageParser.hpp
-  ${UTILS_SPECIFIC_SPAWN_IMPL})
+  PackageManager.cpp PackageParser.cpp PackageParser.hpp Path.cpp
+  ${SPECIFIC_UTILS_DETAILS})

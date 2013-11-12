@@ -26,6 +26,7 @@
 
 
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
@@ -33,13 +34,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 #include <glibmm/timer.h>
-#include <glibmm/stringutils.h>
-#include <glibmm/miscutils.h>
 #include <glibmm/shell.h>
 #include <fstream>
 #include <ostream>
 #include <cstring>
-#include <glib/gstdio.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/constants.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -68,8 +66,7 @@ static void buildCommandLine(const std::string& cmd,
         throw utils::ArgError(fmt(_(
                     "Package command line: error in command `%1%'")) % cmd);
     }
-
-    exe = Glib::find_program_in_path(argv.front());
+    exe = Path::findProgram(argv.front());
 
     argv.erase(argv.begin());
 }

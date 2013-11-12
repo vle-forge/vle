@@ -36,6 +36,13 @@
 
 namespace vle { namespace utils {
 
+std::string Path::findProgram(const std::string& exe)
+{
+    std::string res("");
+    res = Glib::find_program_in_path(exe);
+    return res;
+}
+
 void Path::initHomeDir()
 {
     m_home.clear();
