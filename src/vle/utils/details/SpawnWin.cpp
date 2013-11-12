@@ -101,12 +101,13 @@ static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
 
 /**
  * A specific \b Win32 function to build a new environment
- * variable. Two arguments are given to this function corresponding to
- * two paths to add
+ * variable. Three arguments are given to this function corresponding to
+ * three paths to add
  *
  * @param variable
  * @param value1
  * @param value2
+ * @param value3
  * @param append
  *
  * @return
@@ -114,6 +115,7 @@ static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
 static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
                                                    const std::string& value1,
                                                    const std::string& value2,
+                                                   const std::string& value3,
                                                    bool append)
 {
     Envp::value_type result;
@@ -122,6 +124,8 @@ static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
     result.second = value1;
     result.second += ";";
     result.second += value2;
+    result.second += ";";
+    result.second += value3;
 
     if (append) {
         char* env = std::getenv(variable.c_str());
@@ -179,6 +183,9 @@ static Envp prepareEnvironmentVariable()
                        Path::buildFilename(
                            convertPathTo83Path(Path::path().getPrefixDir()),
                            "MinGW","bin"),
+                       Path::buildFilename(
+                           convertPathTo83Path(Path::path().getPrefixDir()),
+                                                      "CMake","bin"),
                        true));
 
     envp.push_back(replaceEnvironmentVariable(

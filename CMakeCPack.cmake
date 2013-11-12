@@ -76,6 +76,7 @@ if (CPACK_GENERATOR MATCHES "NSIS")
   set(VLE_BOOST_INCLUDE_PATH CACHE PATH "Boost include path")
   set(VLE_BOOST_LIBRARIES_PATH CACHE PATH "Boost libraries path")
   set(VLE_GTK_PATH CACHE PATH "Gtk directory")
+  set(VLE_CMAKE_PATH CACHE PATH "CMake directory")
   set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/share)
 
   install(DIRECTORY "${VLE_MINGW_PATH}/bin" DESTINATION MinGW)
@@ -114,6 +115,9 @@ if (CPACK_GENERATOR MATCHES "NSIS")
     PATTERN "*.def" EXCLUDE
     PATTERN "*.lib" EXCLUDE)
 
+  install(DIRECTORY "${VLE_CMAKE_PATH}/bin" DESTINATION CMake)
+  install(DIRECTORY "${VLE_CMAKE_PATH}/share" DESTINATION CMake)
+  
   set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
   set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
   set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\logo.bmp")

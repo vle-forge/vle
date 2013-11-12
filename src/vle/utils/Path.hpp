@@ -362,6 +362,23 @@ public:
     static std::string getTempFile(const std::string& prefix,
                                    std::ofstream* file);
 
+
+    /**
+     * Find the absolute path to a program
+     * @param the program name
+     * @param the absolute path to a program
+     */
+    static std::string findProgram(const std::string& exe);
+
+    /**
+     * A specific \b Win32 function to convert a path into a 8.3 path.
+     * On Linux, this function simply returns the argument
+     * @param path, the path to convert
+     * @return the path converted into 8.3 path on windows, or directly
+     * the path given in argument
+     */
+    static std::string convertPathTo83Path(const std::string& path);
+
     /**
      * Write specified buffer to temporary file and return the
      * filename. The file is created in the temporary directory.
