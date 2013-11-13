@@ -1,0 +1,131 @@
+
+*******************************************
+** Build VLE natively on WIN32, using MinGW
+*******************************************
+
+1) Declare a build environment (for the script, see section 3):
+--------------------------------------------------------------
+
+set VLE_BUILD_ENV=c:\buildenv
+
+2) Downloads and pre install
+----------------------------
+
+Download Boost  into %VLE_BUILD_ENV%         **** boost_1_54_0
+git clone vle sources into %VLE_BUILD_ENV%   **** dev
+Install Mingw                                **** mingw-get-inst-20120426.exe
+Install gtkmm                                **** gtkmm-win32-devel-2.22 .0-1.exe
+Install cmake                                **** cmake-2.8.12-2
+
+**** Download and install mingw : mingw-get-inst-20120426 
+** You can find it here : 
+**   http://www.vle-project.org/pub/3rd-party
+** During install: 
+**   1) use pre-packaged repository catalogues; 
+**   2) select C, C++, Fortran compilers, Msys (Msys is for rvle build only)
+**   3) install into the default directory C:\MinGW
+**   4) Do NOT Add C:\MinGW\bin to the path
+
+**** Download and install CMake-2.8
+** You can find it here :  
+**   http://www.cmake.org/files/v2.8/cmake-2.8.11-win32-x86.exe
+**   or  http://www.vle-project.org/pub/3rd-party
+** During install: 
+**   1) choose install path c:\CMake
+**   2) Do NOT Add C:\CMake\bin to the path 
+
+
+**** Install gtkmm binaries
+**  You can fing it here
+**    http://ftp.gnome.org/pub/GNOME/binaries/win32/gtkmm/2.22/gtkmm-win32-devel-2.22.0-2.exe
+**  During install, install into the default directory C:\gtkmm
+
+**** Download boost_1_54_0.zip and unzip into %VLE_BUILD_ENV%\boost_1_54_0
+
+**** git clone vle into %VLE_BUILD_ENV%\vle
+
+3) Building script
+------------------
+
+set VLE_BUILD_ENV=c:\natifvle
+set PKG_CONFIG_PATH=c:\gtkmm\lib\pkgconfig;C:\MinGW\lib\pkgconfig
+set boostversion=1_54
+
+set builddir="%VLE_BUILD_ENV%\build"
+set sourcedir="%VLE_BUILD_ENV%\vle"
+set installdir=%VLE_BUILD_ENV%\install
+set boost_src="%VLE_BUILD_ENV%\boost_%boostversion%_0"
+set boost_root="%VLE_BUILD_ENV%\install\boost"
+set boost_include_path="%boost_root%\include"
+set boost_library_path="%boost_root%\lib"
+set vlepathtestbin=%installdir%\vle\bin
+set cmakepath=c:\CMake
+set OLDPATH=%PATH%
+set PATH=c:\mingw\bin;%PATH%
+set PATH=c:\gtkmm\bin;%PATH%
+set PATH=%cmakepath%\bin;%PATH%
+set PATH=%vlepathtestbin%;%PATH%
+
+mkdir %builddir%\vle
+mkdir %installdir%\vle
+
+mingw-get install libarchive
+mingw-get install gettext
+
+cd %boost_src%\tools\build\v2
+bootstrap.bat gcc
+b2 toolset=gcc install --prefix=%boost_src%\b2
+cd %boost_src%
+b2\bin\b2 --toolset=gcc --with-date_time --with-filesystem --with-program_options --with-random --with-regex --with-system --with-test --with-thread --with-timer variant=release threading=multi link=shared runtime-link=shared stage
+mkdir %boost_root%
+mkdir %boost_include_path%
+mkdir %boost_include_path%\boost
+xcopy /E %boost_src%\boost %boost_include_path%\boost
+xcopy /E %boost_src%\stage\lib %boost_library_path%\
+
+cd %builddir%\vle
+cmake.exe -G "MinGW Makefiles" -DWITH_MPI=OFF -DWITH_GTKSOURCEVIEW=OFF -DWITH_DOXYGEN=ON -DCMAKE_INSTALL_PREFIX=%installdir%\vle -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="c:\cmake" -DVLE_MINGW_PATH="c:\mingw" -DVLE_GTK_PATH="c:\gtkmm" -DVLE_BOOST_INCLUDE_PATH=%boost_include_path% -DVLE_BOOST_LIBRARIES_PATH=%boost_library_path% %sourcedir%
+mingw32-make install
+mingw32-make test
+
+cpack.exe -G NSIS
+set PATH=%OLDPATH%
+
+
+*******************************************
+** Build RVLE natively on WIN32, using MinGW
+*******************************************
+
+1) Downloads and pre install
+----------------------------
+
+git clone rvle sources into %VLE_BUILD_ENV%  **** dev
+Download and install R                       **** R-3.0.2
+Download and install Rtools                  **** Rtools for R-3.0
+
+**** Install mingw autotools (in a windows cmd)
+
+mingw-get install autoconf
+mingw-get install automake
+mingw-get install libtool
+
+**** Install rvle dependance : RUnit, and build rvle (in a MinGW shell, and R prompt)
+
+export PATH=/C/MinGW/msys/1.0/bin:/c/Program\ Files/R/R-3.0.2/bin/:/c/Rtools/bin:/c/gtkmm/bin:/c/natifvle/install/vle/bin:$PATH
+export PKG_CONFIG_PATH=/c/gtkmm/lib/pkgconfig:/C/MinGW/lib/pkgconfig:/c/natifvle/install/vle/lib/pkgconfig
+export BOOST_ROOT=/C/natifvle/install/boost
+
+R
+> install.packages("RUnit")
+> q()
+
+cd /c/natifvle/rvle
+echo "Running aclocal..." ; aclocal -I m4 $ACLOCAL_FLAGS
+echo "Running autoheader..." ; autoheader
+echo "Running autoconf..." ; autoconf
+echo "Running libtoolize..." ; (libtoolize --copy --automake || glibtoolize --automake)
+echo "Running automake..." ; automake --add-missing --copy --gnu
+./configure
+cd ..
+R CMD INSTALL --build rvle
+

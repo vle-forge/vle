@@ -107,13 +107,9 @@ static int show_version()
 
 static int show_package_list()
 {
-    std::cout << vle::fmt(_("Packages from: `%1%'\n")) %
-        vle::utils::Path::path().getBinaryPackagesDir();
-
-    vle::utils::PathList vpz = vle::utils::Path::path().getBinaryPackages();
-    std::sort(vpz.begin(), vpz.end());
-
-    std::copy(vpz.begin(), vpz.end(),
+    std::vector<std::string> pkglist;
+    vle::utils::Path::path().fillBinaryPackagesList(pkglist);
+    std::copy(pkglist.begin(), pkglist.end(),
               std::ostream_iterator < std::string >(std::cout, "\n"));
 
     return EXIT_SUCCESS;
@@ -153,56 +149,17 @@ static int remove_configuration_file()
 static void show_package_content(vle::utils::Package& pkg)
 {
 
-    std::cout << vle::fmt(_("Package content from: `%1%'\n")) %
-            pkg.getDir(vle::utils::PKG_BINARY);
 
-    vle::utils::PathList tmp;
-
-    vle::utils::Package pack(pkg.name());
+    std::vector<std::string> pkgcontent;
     try {
-        tmp = pack.getExperiments();
+        pkg.fillBinaryContent(pkgcontent);
     } catch (const std::exception &e) {
-        std::cerr << vle::fmt(_("Show package content error: %1%\n")) % e.what();
+        std::cerr << vle::fmt(_("Show package content error: %1% \n"))
+                              % e.what();
         return;
     }
-    std::cout << "-- experiments : " << std::endl;
-    std::sort(tmp.begin(), tmp.end());
-    std::copy(tmp.begin(), tmp.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
 
-    tmp = pkg.getPluginsSimulator();
-
-    std::cout << "-- simulator plugins : " << std::endl;
-    std::sort(tmp.begin(), tmp.end());
-    std::copy(tmp.begin(), tmp.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
-
-    tmp = pkg.getPluginsOutput();
-
-    std::cout << "-- output plugins : " << std::endl;
-    std::sort(tmp.begin(), tmp.end());
-    std::copy(tmp.begin(), tmp.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
-
-    tmp = pkg.getPluginsGvleGlobal();
-
-    std::cout << "-- gvle global plugins : " << std::endl;
-    std::sort(tmp.begin(), tmp.end());
-    std::copy(tmp.begin(), tmp.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
-
-    tmp = pkg.getPluginsGvleModeling();
-
-    std::cout << "-- gvle modeling plugins : " << std::endl;
-    std::sort(tmp.begin(), tmp.end());
-    std::copy(tmp.begin(), tmp.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
-
-    tmp = pkg.getPluginsGvleOutput();
-
-    std::cout << "-- gvle output plugins : " << std::endl;
-    std::sort(tmp.begin(), tmp.end());
-    std::copy(tmp.begin(), tmp.end(),
+    std::copy(pkgcontent.begin(), pkgcontent.end(),
               std::ostream_iterator < std::string >(std::cout, "\n"));
 }
 
