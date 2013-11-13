@@ -59,20 +59,6 @@ static void ErrorMessage(LPCSTR description)
     ExitProcess(1);
 }
 
-void Path::initHomeDir()
-{
-    m_home.clear();
-
-    readHomeDir();
-
-    /*
-     * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
-     */
-    if (m_home.empty()) {
-        m_home = utils::Path::buildDirname(Glib::get_home_dir(), "vle");
-    }
-}
-
 static bool win32_RegQueryValue(HKEY hkey, std::string *path)
 {
     DWORD sz;
@@ -96,6 +82,51 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     }
 
     return false;
+}
+
+std::string Path::findProgram(const std::string& exe)
+{
+    std::string res("");
+    if (exe == "cmake" or exe == "cmake.exe") {
+        res =  Path::buildFilename(
+                Path::convertPathTo83Path(Path::path().getPrefixDir()),
+                                   "CMake","bin", "cmake.exe");
+    } else {
+        res = Glib::find_program_in_path(exe);
+    }
+    return res;
+}
+
+std::string Path::convertPathTo83Path(const std::string& path)
+{
+    std::string newvalue(path);
+    DWORD lenght;
+
+    lenght = GetShortPathName(path.c_str(), NULL, 0);
+    if (lenght > 0) {
+        TCHAR* buffer = new TCHAR[lenght];
+        lenght = GetShortPathName(path.c_str(), buffer, lenght);
+        if (lenght > 0) {
+            newvalue.assign(static_cast < char* >(buffer));
+        }
+        delete [] buffer;
+    }
+
+    return newvalue;
+}
+
+void Path::initHomeDir()
+{
+    m_home.clear();
+
+    readHomeDir();
+
+    /*
+     * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
+     */
+    if (m_home.empty()) {
+        m_home = utils::Path::buildDirname(Glib::get_home_dir(), "vle");
+    }
 }
 
 void Path::initPrefixDir()

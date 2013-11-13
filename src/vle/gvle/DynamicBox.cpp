@@ -169,6 +169,7 @@ void DynamicBox::onNewLibrary()
             if (execPlugin(box.pluginName(),
                            box2.getClassName(),
                            box2.getNamespace()) == Gtk::RESPONSE_OK) {
+                mComboPackage->append_text(box2.getNamespace());
                 mComboPackage->set_active_text(box2.getNamespace());
                 mComboLibrary->append_text(box2.getClassName());
                 mComboLibrary->set_active_text(box2.getClassName());
