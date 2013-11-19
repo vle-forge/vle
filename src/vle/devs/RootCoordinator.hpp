@@ -49,6 +49,16 @@ namespace vle { namespace devs {
      * @brief Define the DEVS root coordinator. Manage a lot of DEVS
      * Coordinators.
      *
+     * @example
+     * utils::ModuleManager mm;
+     * vle::RootCoordinator rc(mm);
+     *
+     * m.load(...);
+     * ...
+     * value::Map *res = rc.outputs();
+     * delete res;
+     * @endexample
+     *
      */
     class VLE_API RootCoordinator
     {
@@ -91,15 +101,18 @@ namespace vle { namespace devs {
         { return m_currentTime; }
 
         /**
-         * Return an allocated \c value::Map.
+         * Return the simulation results.
          *
-         * This function build a new \c value::Matrix based on the
-         * observation of the simulation. This function can return
-         * NULL if tablea
-         constant reference to the list of view plugins.
-         * @return  Return a constant reference to the list of view plugins.
+         * This function build a new \c value::Map based on the observation of
+         * the simulation. This function can return NULL lists of view is empty
+         * or no storage are used.
+         *
+         * @attention You need to delete the value::Map and after the
+         * destruction of the RootCoordinator..
+         *
+         * @return Return a pointer to the data of the list of plug-ins.
          */
-        value::Map * outputs() { return m_result; }
+        value::Map * outputs();
 
         /**
          * @brief Return a reference to the random generator.

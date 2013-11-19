@@ -121,7 +121,8 @@ void RootCoordinator::finish()
     if (m_coordinator) {
         m_coordinator->finish();
 
-        m_result = getMatrixFromView(m_coordinator->getViews());
+        if (!m_result)
+            m_result = getMatrixFromView(m_coordinator->getViews());
 
         delete m_coordinator;
         m_coordinator = 0;
@@ -131,6 +132,14 @@ void RootCoordinator::finish()
         delete m_root;
         m_root = 0;
     }
+}
+
+value::Map * RootCoordinator::outputs()
+{
+    if (!m_result && m_coordinator)
+        m_result = getMatrixFromView(m_coordinator->getViews());
+
+    return m_result;
 }
 
 }} // namespace vle devs
