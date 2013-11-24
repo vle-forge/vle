@@ -26,6 +26,7 @@
 
 
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
@@ -33,13 +34,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 #include <glibmm/timer.h>
-#include <glibmm/stringutils.h>
-#include <glibmm/miscutils.h>
 #include <glibmm/shell.h>
 #include <fstream>
 #include <ostream>
 #include <cstring>
-#include <glib/gstdio.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/constants.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -68,8 +66,7 @@ static void buildCommandLine(const std::string& cmd,
         throw utils::ArgError(fmt(_(
                     "Package command line: error in command `%1%'")) % cmd);
     }
-
-    exe = Glib::find_program_in_path(argv.front());
+    exe = Path::findProgram(argv.front());
 
     argv.erase(argv.begin());
 }
@@ -868,6 +865,72 @@ void Package::refreshCommands()
 void Package::refreshPath()
 {
     m_pimpl->refreshPath();
+}
+
+void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
+{
+    std::string header = "Package content from: ";
+    header += getDir(vle::utils::PKG_BINARY);
+
+    pkgcontent.clear();
+    pkgcontent.push_back(header);
+
+    vle::utils::PathList tmp;
+
+    tmp = getExperiments();
+    pkgcontent.push_back("-- experiments : ");
+    std::sort(tmp.begin(), tmp.end());
+    std::vector<std::string>::const_iterator itb = tmp.begin();
+    std::vector<std::string>::const_iterator ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsSimulator();
+    pkgcontent.push_back("-- simulator plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsOutput();
+    pkgcontent.push_back("-- output plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsGvleGlobal();
+    pkgcontent.push_back("-- gvle global plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsGvleModeling();
+    pkgcontent.push_back("-- gvle modeling plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+
+    tmp = getPluginsGvleOutput();
+    pkgcontent.push_back("-- gvle output plugins : ");
+    std::sort(tmp.begin(), tmp.end());
+    itb = tmp.begin();
+    ite = tmp.end();
+    for (; itb!=ite; itb++){
+        pkgcontent.push_back(*itb);
+    }
+    return;
 }
 
 VLE_API std::ostream& operator<<(std::ostream& out,

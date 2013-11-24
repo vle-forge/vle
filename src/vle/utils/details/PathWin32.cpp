@@ -26,6 +26,7 @@
 
 
 #include <vle/utils/Path.hpp>
+#include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
 #include <glibmm/miscutils.h>
@@ -59,20 +60,6 @@ static void ErrorMessage(LPCSTR description)
     ExitProcess(1);
 }
 
-void Path::initHomeDir()
-{
-    m_home.clear();
-
-    readHomeDir();
-
-    /*
-     * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
-     */
-    if (m_home.empty()) {
-        m_home = utils::Path::buildDirname(Glib::get_home_dir(), "vle");
-    }
-}
-
 static bool win32_RegQueryValue(HKEY hkey, std::string *path)
 {
     DWORD sz;
@@ -96,6 +83,35 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     }
 
     return false;
+}
+
+std::string Path::findProgram(const std::string& exe)
+{
+    std::string res("");
+    if (exe == "cmake" or exe == "cmake.exe") {
+        res =  Path::buildFilename(
+                UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
+                                   "CMake","bin", "cmake.exe");
+    } else {
+        res = Glib::find_program_in_path(exe);
+    }
+    return res;
+}
+
+void Path::initHomeDir()
+{
+    m_home.clear();
+
+    readHomeDir();
+
+    /*
+     * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
+     */
+    if (m_home.empty()) {
+        std::string homedrive(Glib::getenv("HOMEDRIVE"));
+        std::string homepath(Glib::getenv("HOMEPATH"));
+        m_home = utils::Path::buildDirname(homedrive, homepath, "vle");
+    }
 }
 
 void Path::initPrefixDir()

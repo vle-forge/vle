@@ -62,6 +62,10 @@ target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
 
+#
+# Build the static library.
+#
+
 add_library(vlelibstatic STATIC
   DllDefines.hpp;${vlelib_SRCS};${OS_SPECIFIC_PATH_IMPL})
 
