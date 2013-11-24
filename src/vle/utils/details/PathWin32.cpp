@@ -108,7 +108,9 @@ void Path::initHomeDir()
      * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
      */
     if (m_home.empty()) {
-        m_home = utils::Path::buildDirname(Glib::get_home_dir(), "vle");
+        std::string homedrive(Glib::getenv("HOMEDRIVE"));
+        std::string homepath(Glib::getenv("HOMEPATH"));
+        m_home = utils::Path::buildDirname(homedrive, homepath, "vle");
     }
 }
 
