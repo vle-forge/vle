@@ -25,6 +25,7 @@
  */
 
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -46,28 +47,6 @@ const unsigned long int Spawn::default_buffer_size = 32768;
 typedef std::vector < std::pair < std::string, std::string > > Envp;
 
 /**
- * A specific \b Win32 function to convert a path into a 8.3 path.
- * Attention, the file must exists instead the parameter is returned.
- */
-static std::string convertPathTo83Path(const std::string& path)
-{
-    std::string newvalue(path);
-    DWORD lenght;
-
-    lenght = GetShortPathName(path.c_str(), NULL, 0);
-    if (lenght > 0) {
-        TCHAR* buffer = new TCHAR[lenght];
-        lenght = GetShortPathName(path.c_str(), buffer, lenght);
-        if (lenght > 0) {
-            newvalue.assign(static_cast < char* >(buffer));
-        }
-        delete [] buffer;
-    }
-
-    return newvalue;
-}
-
-/**
  * A specific \b Win32 function to build a new environment
  * variable.
  *
@@ -85,6 +64,47 @@ static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
 
     result.first = variable;
     result.second = value;
+
+    if (append) {
+        char* env = std::getenv(variable.c_str());
+
+        if (env != NULL) {
+            std::string old(env, std::strlen(env));
+            result.second += ";";
+            result.second += old;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * A specific \b Win32 function to build a new environment
+ * variable. Three arguments are given to this function corresponding to
+ * three paths to add
+ *
+ * @param variable
+ * @param value1
+ * @param value2
+ * @param value3
+ * @param append
+ *
+ * @return
+ */
+static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
+                                                   const std::string& value1,
+                                                   const std::string& value2,
+                                                   const std::string& value3,
+                                                   bool append)
+{
+    Envp::value_type result;
+
+    result.first = variable;
+    result.second = value1;
+    result.second += ";";
+    result.second += value2;
+    result.second += ";";
+    result.second += value3;
 
     if (append) {
         char* env = std::getenv(variable.c_str());
@@ -137,35 +157,42 @@ static Envp prepareEnvironmentVariable()
     envp.push_back(replaceEnvironmentVariable(
                        "PATH",
                        Path::buildFilename(
-                           convertPathTo83Path(Path::path().getPrefixDir()),
-                           "bin"),
+                           UtilsWin::convertPathTo83Path(
+                                   Path::path().getPrefixDir()), "bin"),
+                       Path::buildFilename(
+                           UtilsWin::convertPathTo83Path(
+                                   Path::path().getPrefixDir()), "MinGW","bin"),
+                       Path::buildFilename(
+                           UtilsWin::convertPathTo83Path(
+                                   Path::path().getPrefixDir()), "CMake","bin"),
                        true));
 
     envp.push_back(replaceEnvironmentVariable(
                        "PKG_CONFIG_PATH",
                        Path::buildFilename(
-                           convertPathTo83Path(Path::path().getPrefixDir()),
-                           "lib", "pkgconfig"),
+                           UtilsWin::convertPathTo83Path(
+                                   Path::path().getPrefixDir()), "lib",
+                                   "pkgconfig"),
                        false));
 
     envp.push_back(replaceEnvironmentVariable(
                        "BOOST_INCLUDEDIR",
                        Path::buildFilename(
-                               convertPathTo83Path(Path::path().getPrefixDir()),
-                               "include"),
+                               UtilsWin::convertPathTo83Path(
+                                       Path::path().getPrefixDir()), "include"),
                        false));
 
     envp.push_back(replaceEnvironmentVariable(
                        "BOOST_LIBRARYDIR",
                        Path::buildFilename(
-                               convertPathTo83Path(Path::path().getPrefixDir()),
-                               "lib"),
+                               UtilsWin::convertPathTo83Path(
+                                       Path::path().getPrefixDir()), "lib"),
                        false));
 
     envp.push_back(replaceEnvironmentVariable(
                        "BOOST_ROOT",
-                       convertPathTo83Path(Path::path().getPrefixDir()),
-                       false));
+                       UtilsWin::convertPathTo83Path(
+                               Path::path().getPrefixDir()), false));
     return envp;
 }
 
