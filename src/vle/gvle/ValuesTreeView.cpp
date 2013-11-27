@@ -396,6 +396,8 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
             vector.insert(it, matrix);
         }
             break;
+        default:
+            break;
         }
         refresh();
     } else if (mValue->getType() ==  value::Value::MAP) {
@@ -453,6 +455,8 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
                                             cols / 5, rows / 5);
             map->add(name, matrix);
         }
+        break;
+        default:
         break;
         }
         refresh();

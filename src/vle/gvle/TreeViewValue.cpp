@@ -339,6 +339,8 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
             int h = utils::to < int32_t >(box2.run());
             vector.insert(it, Table::create(w, h));
         }
+        default:
+            break;
         break;
         case(Value::XMLTYPE):
         vector.insert(it, Xml::create());
@@ -411,6 +413,8 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
                                             rows/5);
             map->add(name, matrix);
         }
+        break;
+        default:
         break;
         }
         refresh();
