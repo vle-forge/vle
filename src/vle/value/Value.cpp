@@ -37,6 +37,7 @@
 #include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
 #include <vle/value/Matrix.hpp>
+#include <vle/value/User.hpp>
 #include <sstream>
 
 namespace vle { namespace value {
@@ -150,6 +151,14 @@ const Matrix& Value::toMatrix() const
     return static_cast < const Matrix& >(*this);
 }
 
+const User& Value::toUser() const
+{
+    if (not isUser()) {
+        throw utils::CastError(_("Value is not a user value"));
+    }
+    return static_cast < const User& >(*this);
+}
+
 Boolean& Value::toBoolean()
 {
     if (not isBoolean()) {
@@ -236,6 +245,14 @@ Matrix& Value::toMatrix()
         throw utils::CastError(_("Value is not a matrix"));
     }
     return static_cast < Matrix& >(*this);
+}
+
+User& Value::toUser()
+{
+    if (not isUser()) {
+        throw utils::CastError(_("Value is not a user value"));
+    }
+    return static_cast < User& >(*this);
 }
 
 }} // namespace vle value

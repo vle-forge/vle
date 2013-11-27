@@ -47,6 +47,7 @@ namespace vle { namespace value {
     class Xml;
     class Null;
     class Matrix;
+    class User;
 
     /**
      * @brief Virtual class to assign Value into Event object.
@@ -55,7 +56,7 @@ namespace vle { namespace value {
     {
     public:
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
-            XMLTYPE, NIL, MATRIX };
+            XMLTYPE, NIL, MATRIX, USER };
 
 	/**
 	 * @brief Default constructor.
@@ -176,6 +177,9 @@ namespace vle { namespace value {
 	inline bool isMatrix() const
 	{ return getType() == Value::MATRIX; }
 
+        inline bool isUser() const
+        { return getType() == Value::USER; }
+
         const Boolean& toBoolean() const;
         const Integer& toInteger() const;
         const Double& toDouble() const;
@@ -187,6 +191,7 @@ namespace vle { namespace value {
         const Xml& toXml() const;
         const Null& toNull() const;
         const Matrix& toMatrix() const;
+        const User& toUser() const;
 
         /**
          * @brief Check if the Value is a composite value, ie., a Map, a Set or
@@ -217,6 +222,7 @@ namespace vle { namespace value {
         Xml& toXml();
         Null& toNull();
         Matrix& toMatrix();
+        User& toUser();
 
         /**
          * @brief Stream operator for the value classes. This operator call the
