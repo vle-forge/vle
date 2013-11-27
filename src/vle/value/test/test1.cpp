@@ -49,6 +49,7 @@
 #include <vle/value/String.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
+#include <vle/value/User.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/vle.hpp>
@@ -251,4 +252,83 @@ BOOST_AUTO_TEST_CASE(check_matrix)
 
     delete(mx);
     delete(cpy);
+}
+
+namespace test {
+
+    class MyData : public vle::value::User
+    {
+    public:
+        double x, y, z;
+        std::string name;
+
+        MyData()
+            : vle::value::User(), x(0.0), y(0.0), z(0.0)
+        {}
+
+        MyData(double x, double y, double z, const std::string &name)
+            : vle::value::User(), x(x), y(y), z(z), name(name)
+        {}
+
+        MyData(const MyData &value)
+            : vle::value::User(value), x(value.x), y(value.y), z(value.z),
+            name(value.name)
+        {}
+
+        virtual ~MyData() {}
+
+        virtual size_t id() const { return 15978462u; }
+
+        virtual Value* clone() const { return new MyData(*this); }
+
+        virtual void writeFile(std::ostream& out) const
+        {
+            out << "(" << name << ": " << x << ", " << y <<  ", " << z << ")";
+        }
+
+        virtual void writeString(std::ostream& out) const
+        {
+            writeFile(out);
+        }
+
+        virtual void writeXml(std::ostream& out) const
+        {
+            out << "<set><string>" << name << "</string><double>" << x <<
+                "</double><double>" << y << "</double> <double>" << z <<
+                "</double></set>";
+        }
+    };
+}
+
+void check_user_value(vle::value::Value *to_check)
+{
+    BOOST_REQUIRE(to_check);
+    BOOST_REQUIRE_EQUAL(to_check->getType(), vle::value::Value::USER);
+
+    vle::value::User *user = vle::value::toUserValue(to_check);
+    BOOST_REQUIRE(user);
+    BOOST_REQUIRE_EQUAL(user->getType(), vle::value::Value::USER);
+    BOOST_REQUIRE_EQUAL(user->id(), 15978462u);
+
+    test::MyData *mydata = dynamic_cast <test::MyData*>(user);
+    BOOST_REQUIRE(mydata);
+
+    BOOST_REQUIRE_EQUAL(mydata->x, 1.);
+    BOOST_REQUIRE_EQUAL(mydata->y, 2.);
+    BOOST_REQUIRE_EQUAL(mydata->z, 3.);
+    BOOST_REQUIRE_EQUAL(mydata->name, "test-vle");
+}
+
+BOOST_AUTO_TEST_CASE(test_user_value)
+{
+    vle::value::Value *data = new test::MyData(1., 2., 3., "test-vle");
+    check_user_value(data);
+
+    vle::value::Value *cloned_data = data->clone();
+    check_user_value(cloned_data);
+
+    BOOST_REQUIRE(data != cloned_data);
+
+    delete data;
+    delete cloned_data;
 }
