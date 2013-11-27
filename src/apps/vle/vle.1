@@ -6,20 +6,16 @@ vle \(em The simulator for VLE framework
 .SH "SYNOPSIS"
 .PP
 \fBvle\fR
-[\fB-?\fP,\fB\-h\fP,\fB\-\-help\fP]
-[\fB\-\-version\fP]
-[\fB\-i\fP,\fB\-\-infos\fP]
+[\fB\-h\fP,\fB\-\-help\fP]
+[\fB-v\fP,\fB\-\-version\fP]
+[\fB\-\-infos\fP]
 [\fB\-P \fIname\fP,\fB\-\-package=\fIname\fP
-\fBconfigure\fP,\fBbuild\fP,\fBclean\fP,\fBpackage\fP,
-\fB\fIVPZ\fP files...\fR]
-[\fB\-R,\-\-remote \fBupdate\fP,\fBinstall\fP,\fBsearch\fP,\fBshow\fP remote_package]
-[\fB\-\-allinlocal\fP]
+\fBcreate\fP,\fBconfigure\fP,\fBbuild\fP,\fBtest\fP,\fBinstall\fP,\fBclean\fP,
+\fBrclean\fP,\fBpackage\fP,\fBall\fP,\fBdepends\fP,\fBlist\fP,\fB\fIVPZ\fP files...\fR]
+[\fB\-R,\-\-remote \fBupdate\fP,\fBinstall\fP,\fBsearch\fP,\fBshow\fI remote_package]
 [\fB-o \fIint\fP,\fB\-\-process=\fIint\fP\fR]
-[\fB-v \fIint\fP,\fB\-\-verbose=\fIint\fP\fR]
+[\fB-V \fIint\fP,\fB\-\-verbose=\fIint\fP\fR]
 [\fB-m\fP]
-[\fB-s\fP]
-[\fB-j\fP]
-[\fB-p \fIint\fP\fR]
 [\fB\fIVPZ\fP files...\fR]
 
 .SH "DESCRIPTION"
@@ -29,47 +25,43 @@ This manual page documents briefly the \fBVLE\fR command.
 \fBVLE\fR is a part of a multi-modelling and simulation framework call
 \fBVLE\fR. It addresses the reliability issue using recent developments in the
 theory of Modelling and Simulation proposed by Zeigler and open sources
-software. \fBVLE\fR is composed of five applications: \fIVLE\fR the simulator,
-\fIGVLE\fR the modelling tool, \fIAVLE\fR the analysis tools post-simulation and
+software. \fBVLE\fR is composed of 3 applications: \fIVLE\fR the simulator,
+\fIGVLE\fR the modelling tool, \fIMVLE\fR the MPI simulation manager
 .PP
-\fBVLE\fR is a program that simulate the VPZ files. \fBVLE\fR use three modes:
-\fBmanager\fP, \fBsimulator\fP or just to run simulation. \fBManager\fP run
-experimentals frames to build VPZ instances files. \fBSimulator\fP is use to run
-VPZ simulations in parallel. \fBJustRun\fP is the mode to run a VPZ directly.
-This command is used by \fBSimulator\fP.
+\fBVLE\fR is a program that simulate the VPZ files. \fBVLE\fR use two modes:
+\fBmanager\fP or just to run simulation. \fBManager\fP run
+experimentals frames to build VPZ instances files. \fBJustRun\fP is the mode to run a VPZ directly.
 
 .SH "OPTIONS"
 .PP
 These programs follow the usual GNU command line syntax, with long options
 starting with two dashes (`\-'). A summary of options is included below.
 
-.IP "\fB-?\fP, \fB-h\fP, \fB\-\-help\fP" 10
+.IP "\fB-h\fP, \fB\-\-help\fP" 10
 Show summary of options.
 
-.IP "\fB-i\fP, \fB\-\-info\fP" 10
-Show somes informations for vle framework.
-
-.IP "\fB\-\-version\fP" 10
+.IP "\fB-v\fP, \fB\-\-version\fP" 10
 Show version of program.
 
-.IP "\fB\-\-quiet\fP" 10
-Hide all console output into a temporary file.
+.IP "\fB\-\-info\fP" 10
+Show somes informations for vle framework.
 
-.IP "\fB-v\fI int\fR\fP, \fB\-\-verbose\fI int \fR\fP"
+.IP "\fB-V\fI int\fR\fP, \fB\-\-verbose\fI int \fR\fP"
 Set the verbosity of this application. Default is \fI0\fR, only problem in VLE,
 \fI1\fR trace users' models problem, \fI2\fR trace extension process and
 \fI3\fR trace all DEVS API. Logs are stored in $VLE_HOME/vle.log.
 
 .IP "\fB\-P \fIname\fP, \fB\-\-package \fIname\fP" 10
 Select a package (in $VLE_HOME/pkgs). After this command you can use:
-\fIcreate\fR, \fIconfigure\fR, \fIbuild\fR, \fIlist\fR and \fIpackage\fR and/or
+\fIcreate\fR, \fIconfigure\fR, \fIbuild\fR, \fItest\fR, \fIinstall\fR, \fIclean\fR, 
+\fIrclean\fR, \fIpackage\fR, \fIall\fR, \fIdepends\fR, \fIlist\fR and/or
 a list of VPZ files
         vle --package foo create: build new foo package
         vle --package foo configure: configure the foo package
         vle --package foo build: build the foo package
         vle --package foo test: start a unit test campaign
         vle --package foo install: install libs
-        vle --package foo clean: clean up the build directory
+        vle --package foo clean: clean up the buildvle directory
         vle --package foo rclean: remove binary directories
         vle --package foo package: build package source and binary
         vle --package foo all: build all depends of foo package
@@ -89,31 +81,11 @@ package with regular expression of show information of a remote package.
 Run \fBVLE\fP in
 \fBmanager\fP mode.
 
-.IP "\fB-s\fP" 10
-Run \fBVLE\fP in
-\fBsimulator\fP mode.
-
-.IP "\fB-j\fP" 10
-Run \fBVLE\fP directly on all specified files (default mode).
-
-.IP "\fB-l\fP, \fB\-\-allinlocal\fP"
-Run all instances of the experimental frame on the same computer. This option
-is only available for the \fBManager\fP application.
-
 .IP "\fB-o\fI int\fR\fP, \fB\-\-process\fI int \fR\fP
 Number of process available for this computer. Default is only one. This option
 is only available for the \fBsimulator\fP application.
 
-.IP "\fB-p\fI int\fR\fP, \fB\-\-port\fI int \fR\fP
-Define the listening port for vle application. Default is 8888. This option is
-only available for the mode \fBManager\fP and \fBSimulator\fP.
-
 .SH "EXAMPLES"
-.PP
-Run the simulator in just mode for a global Vpz files:
-.PP
-$ vle file.vpz
-
 .PP
 Create a new package firemaqss:
 .PP
@@ -131,36 +103,20 @@ Run the simulator in just mode in for the package firemanqss for a vpz file:
 $ vle -P firemanqss file.vpz
 
 .PP
-Run the simulator with multiple vpz files:
-.PP
-$ vle file.vpz file2.vpz file3.vpz
-
-.PP
 Run the simulator with four threads for multiple vpz files:
 .PP
-$ vle -o 4 file.vpz file2.vpz file3.vpz file4.vpz file5.vpz file6.vpz
-
-.PP
-Run the manager to build experimental frames on localhost with one thread:
-.PP
-$ vle -m -l file.vpz
+$ vle -o 4 -P firemanqss file.vpz file2.vpz file3.vpz file4.vpz file5.vpz file6.vpz
 
 .PP
 Run the manager to build experimental frames on localhost with one thread in
 the package firemanqss:
 .PP
-$ vle --package firemanqss -m -l file.vpz
+$ vle --package firemanqss -m file.vpz
 
 .PP
 Run the manager to build experimental frames on localhost with four threads:
 .PP
-$ vle -o 4 -m -l file.vpz
-
-.PP
-Run the manager to build experimental frames on distributed simulator. In this
-mode, the $HOME/.vle/hosts.xml is use to get distributed simulator:
-.PP
-$ vle -m file.vpz
+$ vle -o 4 -m -P firemanqss file.vpz
 
 .SH "ENVIRONMENTS"
 .IP VLE_HOME
@@ -168,11 +124,14 @@ A path where you push models packages (ie. simulators, vpz files, data, etc.),
 and the outputs, streams and conditions plug-ins.
 
 .SH "FILES"
+.IP $VLE_HOME/vle.conf 10
+VLE and GVLE configuration file.
+
 .IP $VLE_HOME/vle.log 10
 All log of the last call of VLE.
 
 .IP $VLE_HOME/gvle.log 10
-All log of the last call of VLE.
+All log of the last call of GVLE.
 
 .SH "SEE ALSO"
 .PP
