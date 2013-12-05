@@ -204,8 +204,16 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\" duration=\"0.33\" >\n"
+        " <experiment name=\"test1\" duration=\"0.33\">\n"
         "  <conditions>"
+        "   <condition name=\"simulation_engine\" >"
+        "    <port name=\"begin\" >"
+        "     <double>123.</double>"
+        "    </port>"
+        "    <port name=\"duration\" >"
+        "     <double>0.33</double><integer>2</integer>"
+        "    </port>"
+        "   </condition>"
         "   <condition name=\"cond1\" >"
         "    <port name=\"init1\" >"
         "     <double>123.</double><integer>1</integer>"
@@ -238,9 +246,9 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
 
     std::list < std::string > lst;
     cnds.conditionnames(lst);
-    BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)2);
+    BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)3);
     BOOST_REQUIRE_EQUAL(*lst.begin(), "cond1");
-    BOOST_REQUIRE_EQUAL(*lst.rbegin(), "cond2");
+    BOOST_REQUIRE_EQUAL(*lst.rbegin(), "simulation_engine");
     lst.clear();
 
     cnds.portnames("cond1", lst);

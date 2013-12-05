@@ -136,10 +136,8 @@ namespace vpz {
         /**
          * @brief Add a condition into the conditions list.
          * @param condition the condition to add into the map. Condition is
-         * copied.
+         * copied, replace the condition if it already exists
          * @return the newly created Condition.
-         * @throw utils::ArgError if condition with same name and port already
-         * exist.
          */
         Condition& add(const Condition& condition);
 

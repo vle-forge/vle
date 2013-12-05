@@ -42,20 +42,14 @@ ExperimentBox::ExperimentBox(const Glib::RefPtr < Gtk::Builder >& xml,
                              Modeling* modeling)
     : mModeling(modeling), mXml(xml), mDialog(0)
 {
-    xml->get_widget("DialogExperiment", mDialog);
+    xml->get_widget("EntryName", mEntryName);
     xml->get_widget("EntryAuthor", mEntryAuthor);
+    xml->get_widget("DialogExperiment", mDialog);
+
     xml->get_widget("EntryDate", mEntryDate);
     xml->get_widget("ButtonCalendar", mButtonCalendar);
     xml->get_widget("ButtonNow", mButtonNow);
     xml->get_widget("EntryVersion", mEntryVersion);
-    xml->get_widget("EntryName", mEntryName);
-    xml->get_widget("EntryDuration", mEntryDuration);
-    xml->get_widget("EntryBeginReal", mEntryBeginReal);
-    xml->get_widget("EntryBeginDate", mEntryBeginDate);
-    xml->get_widget("ButtonCalendarBegin", mButtonCalendarBegin);
-    xml->get_widget("SpinBeginH", mSpinBeginH);
-    xml->get_widget("SpinBeginM", mSpinBeginM);
-    xml->get_widget("SpinBeginS", mSpinBeginS);
     xml->get_widget("HBoxCombi", mHboxCombi);
     xml->get_widget("RadioButtonLinear", mRadioButtonLinear);
     xml->get_widget("RadioButtonTotal", mRadioButtonTotal);
@@ -69,18 +63,6 @@ ExperimentBox::ExperimentBox(const Glib::RefPtr < Gtk::Builder >& xml,
         sigc::mem_fun(*this, &ExperimentBox::on_calendar)));
     mSigcConnection.push_back(mButtonNow->signal_clicked().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_now)));
-
-    mSigcConnection.push_back(mButtonCalendarBegin->signal_clicked().connect(
-        sigc::mem_fun(*this, &ExperimentBox::on_calendarBegin)));
-    mSigcConnection.push_back(mSpinBeginH->signal_value_changed().connect(
-        sigc::mem_fun(*this, &ExperimentBox::on_time_changed)));
-    mSigcConnection.push_back(mSpinBeginM->signal_value_changed().connect(
-        sigc::mem_fun(*this, &ExperimentBox::on_time_changed)));
-    mSigcConnection.push_back(mSpinBeginS->signal_value_changed().connect(
-        sigc::mem_fun(*this, &ExperimentBox::on_time_changed)));
-
-    mSigcConnection.push_back(mEntryBeginReal->signal_changed().connect(
-        sigc::mem_fun(*this, &ExperimentBox::on_julianDate_changed)));
 
     mDialog->show_all();
 }
@@ -99,10 +81,18 @@ void ExperimentBox::initExperiment()
     const vle::vpz::Vpz& vpz(modeling.vpz());
     const vle::vpz::Experiment& experiment(modeling.experiment());
 
+    // Experiment frame
+    {
+        if (experiment.name().empty()) {
+            mEntryName->set_text("exp");
+        } else {
+            mEntryName->set_text(experiment.name());
+        }
+    }
+
     // Project frame
     {
         std::string name(vpz.project().author());
-
         if (name.empty()) {
             name = Glib::get_real_name();
             if (name.empty()) {
@@ -110,38 +100,17 @@ void ExperimentBox::initExperiment()
             }
         }
         mEntryAuthor->set_text(name);
-
-	if (vpz.project().date().empty()) {
-	    on_now();
-	} else {
-	    mEntryDate->set_text(vpz.project().date());
-	}
-
         mEntryVersion->set_text(vpz.project().version());
-    }
-
-    // Experiment frame
-    {
-        if (experiment.name().empty()) {
-	    mEntryName->set_text("exp");
-	} else {
-	    mEntryName->set_text(experiment.name());
-	}
-
-	mEntryDuration->set_text(utils::toScientificString(experiment.duration(),true));
-
-        mEntryBeginReal->set_text(utils::toScientificString(experiment.begin(),true));
-        updateBeginTime();
     }
 
     // Plan frame
     {
-	if (experiment.combination().empty() or
-	    experiment.combination() == "linear") {
-	    mRadioButtonLinear->set_active();
-	} else {
-	    mRadioButtonTotal->set_active();
-	}
+        if (experiment.combination().empty() or
+                experiment.combination() == "linear") {
+            mRadioButtonLinear->set_active();
+        } else {
+            mRadioButtonTotal->set_active();
+        }
     }
 }
 
@@ -192,16 +161,6 @@ bool ExperimentBox::apply()
     exp.setName(mEntryName->get_text());
 
     {
-        double x = vu::convert < double >(mEntryDuration->get_text(),true);
-        exp.setDuration(x <= 0.0 ? 1 : x);
-    }
-
-    {
-        double x =  vu::convert < double >(mEntryBeginReal->get_text(),true);
-        exp.setBegin(x);
-    }
-
-    {
         exp.setCombination(mRadioButtonLinear->get_active()?"linear":"total");
     }
     return true;
@@ -223,90 +182,7 @@ void ExperimentBox::on_calendar()
     }
 }
 
-void ExperimentBox::updateBeginReal()
-{
-    std::string date = mEntryBeginDate->get_text();
 
-    if (date.empty()) {
-        mEntryBeginDate->set_text("1400-01-01");
-        date = mEntryBeginDate->get_text();
-    }
-
-    try {
-        double begin = utils::DateTime::toJulianDayNumber(date);
-
-        begin += (mSpinBeginH->get_value() * 1 / 24);
-        begin += (mSpinBeginM->get_value() * 1 / (24 * 60));
-        begin += (mSpinBeginS->get_value() * 1 / (24 * 60 * 60));
-
-        mEntryBeginReal->set_text(utils::toScientificString(begin));
-    } catch (...) {
-    }
-}
-
-void ExperimentBox::updateBeginTime()
-{
-    double x = vu::convert < double >(mEntryBeginReal->get_text(),true);
-
-    if (utils::DateTime::isValidYear(x)) {
-        long year, month, day, hours, minutes, seconds;
-        double remain;
-
-        remain = utils::DateTime::toTime(x, year, month, day, hours,
-                                         minutes, seconds);
-
-        mSpinBeginH->set_value(hours);
-        mSpinBeginM->set_value(minutes);
-
-        if (remain > .5) {
-            mSpinBeginS->set_value(seconds + 1);
-        } else {
-            mSpinBeginS->set_value(seconds);
-        }
-
-        mEntryBeginDate->set_text(
-            utils::DateTime::toJulianDayNumber(x));
-    } else {
-        mSpinBeginH->set_value(0);
-        mSpinBeginM->set_value(0);
-        mSpinBeginS->set_value(0);
-        mEntryBeginDate->get_buffer()->set_text("");
-    }
-}
-
-void ExperimentBox::on_julianDate_changed()
-{
-    updateBeginTime();
-}
-
-void ExperimentBox::on_time_changed()
-{
-    updateBeginReal();
-}
-
-void ExperimentBox::on_calendarBegin()
-{
-    std::string date;
-
-    CalendarBox cal(mXml);
-
-    double x = vu::convert < double >(mEntryBeginReal->get_text(),true);
-
-    if (utils::DateTime::isValidYear(x)) {
-        long year, month, day, hours, minutes, seconds;
-
-        utils::DateTime::toTime(x, year, month, day, hours, minutes, seconds);
-
-        cal.selectDate((int)day, (int)month, (int)year);
-    }
-
-
-    cal.dateBegin(date);
-    if (not date.empty()) {
-        mEntryBeginDate->set_text(date);
-        updateBeginReal();
-    }
-}
 
 void ExperimentBox::on_now()
 {
