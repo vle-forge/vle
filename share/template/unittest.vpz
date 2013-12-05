@@ -278,8 +278,16 @@
    </model>
   </class>
  </classes>
- <experiment name="graphtester" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
+ <experiment name="graphtester" seed="123" >
   <conditions>
+   <condition name="simulation_engine" >
+    <port name="begin" >
+     <double>0.0</double>
+    </port>
+    <port name="duration" >
+     <double>100.0</double>
+    </port>
+   </condition>
    <condition name="ca" >
     <port name="x" >
      <double>1.200000000000000</double>

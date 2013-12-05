@@ -513,39 +513,23 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
         throw utils::SaxParserError();
     }
 
+
+
     vpz::Experiment& exp(m_vpz.project().experiment());
     push(&exp);
 
     const xmlChar* name = 0;
-    const xmlChar* duration = 0;
-    const xmlChar* begin = 0;
     const xmlChar* combination = 0;
 
     for (int i = 0; att[i] != 0; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
             name = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"duration") == 0) {
-            duration = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"begin") == 0) {
-            begin = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"combination") == 0) {
             combination = att[i + 1];
         }
     }
 
-    if (not name or not duration) {
-        throw utils::SaxParserError(
-            _("Experiment tag does not have 'name' or 'duration' attributes"));
-    }
-
     exp.setName(xmlCharToString(name));
-    exp.setDuration(xmlCharToDouble(duration));
-
-    if (begin) {
-        exp.setBegin(xmlCharToDouble(begin));
-    } else {
-        exp.setBegin(0.0);
-    }
 
     if (combination) {
         exp.setCombination(xmlCharToString(combination));

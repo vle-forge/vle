@@ -42,13 +42,13 @@ namespace vle { namespace vpz {
     class VLE_API Experiment : public Base
     {
     public:
+
         /**
          * Build an empty experiment with time duration of 1.0 and beginning
          * date at 0.0.
+         * Add the default condition for simulation engine
          */
-        Experiment()
-            : m_duration(1.0), m_begin(0.0)
-        {}
+        Experiment();
 
         /**
          * @brief Nothing to delete.
@@ -165,22 +165,19 @@ namespace vle { namespace vpz {
          * @brief Get the duration of the Experiment file.
          * @return The duration.
          */
-        double duration() const
-        { return m_duration; }
+        double duration() const;
 
         /**
          * @brief Assign a new beginning date to the simulation.
          * @param begin The new beginning date of the simulation.
          */
-        void setBegin(const double& begin)
-        { m_begin = begin; }
+        void setBegin(double begin);
 
         /**
          * @brief Get the beginning date of the simulation.
          * @return A real [0.0..max double[
          */
-        const double& begin() const
-        { return m_begin; }
+        double begin() const;
 
         /**
          * @brief Set the experimental design combination.
@@ -196,9 +193,17 @@ namespace vle { namespace vpz {
         { return m_combination; }
 
     private:
+
+        /**
+         * @brief get the default engine simulation condition name
+         * @return the default engine simulation condition name
+         */
+        static std::string defaultSimulationEngineCondName()
+        {
+            return "simulation_engine";
+        }
+
         std::string         m_name;
-        double              m_duration;
-        double              m_begin;
         std::string         m_combination;
         Conditions          m_conditions;
         Views               m_views;

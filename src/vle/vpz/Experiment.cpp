@@ -26,15 +26,23 @@
 
 
 #include <vle/vpz/Experiment.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Set.hpp>
 
 namespace vle { namespace vpz {
+
+Experiment::Experiment()
+{
+    Condition cond(defaultSimulationEngineCondName());
+    cond.addValueToPort("begin", new vle::value::Double(0));
+    cond.addValueToPort("duration", new vle::value::Double(1));
+    conditions().add(cond);
+}
 
 void Experiment::write(std::ostream& out) const
 {
     out << "<experiment "
-        << "name=\"" << m_name.c_str() << "\" "
-        << "duration=\"" << m_duration << "\" "
-        << "begin=\"" << m_begin << "\" ";
+        << "name=\"" << m_name.c_str() << "\" ";
 
     if (not m_combination.empty()) {
         out << "combination=\"" << m_combination.c_str()
@@ -52,8 +60,6 @@ void Experiment::write(std::ostream& out) const
 void Experiment::clear()
 {
     m_name.clear();
-    m_duration = 1.0;
-    m_begin = 0;
 
     m_conditions.clear();
     m_views.clear();
@@ -78,20 +84,58 @@ void Experiment::setName(const std::string& name)
     m_name.assign(name);
 }
 
+void Experiment::setDuration(double duration)
+{
+    if (not conditions().exist(defaultSimulationEngineCondName())) {
+        throw utils::ArgError(_("The simulation engine condition"
+                "does not exist"));
+    }
+    vle::vpz::Condition& condSim = conditions().get(
+            defaultSimulationEngineCondName());
+    vle::value::Set& dur = condSim.getSetValues("duration");
+    dur.clear();
+    dur.add(new vle::value::Double(duration));
+}
+
+double Experiment::duration() const
+{
+    if (not conditions().exist(defaultSimulationEngineCondName())) {
+        throw utils::ArgError(_("The simulation engine condition"
+                "does not exist"));
+    }
+    const vle::vpz::Condition& condSim = conditions().get(
+            defaultSimulationEngineCondName());
+    return condSim.getSetValues("duration").getDouble(0);
+}
+
+void Experiment::setBegin(double begin)
+{
+    if (not conditions().exist(defaultSimulationEngineCondName())) {
+        throw utils::ArgError(_("The simulation engine condition"
+                "does not exist"));
+    }
+    vle::vpz::Condition& condSim = conditions().get(
+            defaultSimulationEngineCondName());
+    vle::value::Set& dur = condSim.getSetValues("begin");
+    dur.clear();
+    dur.add(new vle::value::Double(begin));
+}
+
+double Experiment::begin() const
+{
+    if (not conditions().exist(defaultSimulationEngineCondName())) {
+        throw utils::ArgError(_("The simulation engine condition"
+                "does not exist"));
+    }
+    const vle::vpz::Condition& condSim = conditions().get(
+            defaultSimulationEngineCondName());
+    return condSim.getSetValues("begin").getDouble(0);
+}
+
 void Experiment::cleanNoPermanent()
 {
     m_conditions.cleanNoPermanent();
     m_views.observables().cleanNoPermanent();
-}
-
-void Experiment::setDuration(double duration)
-{
-    if (duration <= 0.0) {
-        throw utils::ArgError(fmt(
-                _("Experiment duration error: %1% (must be > 0)")) % duration);
-    }
-
-    m_duration = duration;
 }
 
 void Experiment::setCombination(const std::string& name)
