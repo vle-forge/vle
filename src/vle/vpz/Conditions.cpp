@@ -82,14 +82,9 @@ void Conditions::add(const Conditions& cdts)
 
 Condition& Conditions::add(const Condition& condition)
 {
+    del(condition.name());
     std::pair < iterator, bool > x;
     x = m_list.insert(value_type(condition.name(), condition));
-
-    if (not x.second) {
-        throw utils::ArgError(fmt(
-                _("The condition '%1%' already exists")) % condition.name());
-    }
-
     return x.first->second;
 }
 

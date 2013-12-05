@@ -5,6 +5,16 @@
  </structures>
  <dynamics>
  </dynamics>
-  <experiment name="test" begin="0.0" duration="1.0" seed="123456789">
+  <experiment name="test" seed="123456789">
+   <conditions>
+    <condition name="simulation_engine" >
+     <port name="begin" >
+      <double>0.0</double>
+     </port>
+     <port name="duration" >
+      <double>1.0</double>
+     </port>"
+    </condition>
+   </conditions>
   </experiment>
 </vle_project>

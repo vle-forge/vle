@@ -639,6 +639,7 @@ BOOST_AUTO_TEST_CASE(test_remove_dyns)
     check_remove_dyns_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
+
     delete vpz.project().model().model();
     vpz.clear();
 
