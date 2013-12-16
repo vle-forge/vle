@@ -82,14 +82,14 @@ endif (COMMAND CMAKE_POLICY)
 
 option(WITH_CAIRO "use cairomm to build output plugin [default: on]" ON)
 option(WITH_GTK "use gtkmm to build gvle [default: on]" ON)
-option(WITH_GTKSOURCEVIEW "use gtksourcevieww to build gvle [default: on]" ON)
+option(WITH_GTKSOURCEVIEW "use gtksourceview to build gvle [default: on]" ON)
 
 if (WITH_CAIRO AND WITH_GTK AND WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
-    cairomm-1.0>=1.2 gtkmm-2.4 gtksourceviewmm-2.0)
+    cairomm-1.0>=1.2 gtkmm-2.4 gtksourceview-2.0)
 
   if (NOT VLEDEPS_FOUND)
-    message(STATUS "Failed to find gtksourceviewmm-2.0")
+    message(STATUS "Failed to find gtksourceview-2.0")
     set (WITH_GTKSOURCEVIEW OFF)
   endif ()
 endif ()

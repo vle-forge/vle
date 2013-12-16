@@ -41,8 +41,12 @@
 #include <gtkmm/builder.h>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-#include <gtksourceviewmm-2.0/gtksourceviewmm.h>
+#include <gtksourceview/gtksourceview.h>
+#include <gtksourceview/gtksourcelanguagemanager.h>
 #endif
+
+#include <glibmm.h>
+#include <gtkmm/private/textview_p.h>
 
 namespace vle { namespace gvle {
 
@@ -111,7 +115,12 @@ public:
 
     DocumentText(const std::string& buffer);
 
-    virtual ~DocumentText() { }
+    virtual ~DocumentText()
+    {
+        if (mView)
+            gtk_container_remove(&(this->gobj()->container.container),
+                                 GTK_WIDGET(mView));
+    }
 
     void save();
     void saveAs(const std::string& filename);
@@ -136,9 +145,9 @@ public:
 
 private:
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtksourceview::SourceView mView;
+    GtkSourceView *mView;
 #else
-    Gtk::TextView  mView;
+    GtkTextView  *mView;
 #endif
 
     bool           mModified;
@@ -148,6 +157,7 @@ private:
 
     void init(const std::string& buffer);
     void onChanged();
+    static void on_changed(GtkWidget *widget, gpointer label);
     std::string guessIdLanguage();
     void applyEditingProperties();
 };

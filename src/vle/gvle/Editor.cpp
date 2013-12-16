@@ -42,6 +42,16 @@
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+void gvle_gtksourceview_init()
+{
+    static bool s_init = false;
+    if (!s_init) {
+        Glib::init();
+        s_init = true;
+    }
+}
+#endif
 
 namespace vle { namespace gvle {
 
@@ -61,8 +71,8 @@ Document::Document() :
 }
 
 void Document::setTitle(const std::string& filePath,
-			vpz::BaseModel* model,
-			bool modified)
+                        vpz::BaseModel* model,
+                        bool modified)
 {
     if (mGVLE) {
         if (utils::Path::extension(filePath) == ".vpz") {
@@ -87,8 +97,8 @@ void Document::setTitle(const std::string& filePath,
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 DocumentText::DocumentText(GVLE* gvle,
-			   const std::string& filepath,
-			   bool newfile, bool hasFullName) :
+                           const std::string& filepath,
+                           bool newfile, bool hasFullName) :
     Document(gvle, filepath),
     mNew(newfile),
     mHasFullName(hasFullName)
@@ -98,17 +108,22 @@ DocumentText::DocumentText(GVLE* gvle,
     mIdLang = guessIdLanguage();
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtksourceview::init();
+    gvle_gtksourceview_init();
+    GtkWidget *m = gtk_source_view_new();
+    mView = (GtkSourceView *)m;
+#else
+    GtkWidget *m = gtk_text_view_new();
+    mView = (GtkTextView *)m;
 #endif
 
     if (not mNew) {
-	std::ifstream file(filepath.c_str());
-	if (file) {
-	    std::stringstream filecontent;
-	    filecontent << file.rdbuf();
-	    file.close();
-	    Glib::ustring buffer_content = filecontent.str();
-	    if (not buffer_content.validate()) {
+        std::ifstream file(filepath.c_str());
+        if (file) {
+            std::stringstream filecontent;
+            filecontent << file.rdbuf();
+            file.close();
+            Glib::ustring buffer_content = filecontent.str();
+            if (not buffer_content.validate()) {
                 try {
                     buffer_content = Glib::locale_to_utf8(buffer_content);
                 }
@@ -117,105 +132,132 @@ DocumentText::DocumentText(GVLE* gvle,
                                              " and convert from locale"
                                              " encoding failed."));
                 }
-	    }
+            }
             init(buffer_content);
         } else {
-	    Error(std::string("cannot open: " + filename()));
-	}
+            Error(std::string("cannot open: " + filename()));
+        }
     } else {
-         init("");
+        init("");
     }
 
+    gtk_container_add(GTK_CONTAINER(this->gobj ()), m);
     applyEditingProperties();
-
-    add(mView);
-
 }
 
 DocumentText::DocumentText(const std::string& buffer)
-    : Document()
+: Document()
 {
     mIdLang = "cpp";
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtksourceview::init();
+    gvle_gtksourceview_init();
+    GtkWidget *m = gtk_source_view_new();
+    mView = GTK_SOURCE_VIEW(m);
+#else
+    GtkWidget *m = gtk_text_view_new();
+    mView = GTK_TEXT_VIEW(m);
 #endif
+
+    gtk_container_add(GTK_CONTAINER(this->gobj ()), m);
     init(buffer);
-
-    add(mView);
-
     applyEditingProperties();
 }
 
 void DocumentText::save()
 {
     try {
-	std::ofstream file(filepath().c_str());
-	file << mView.get_buffer()->get_text();
-	file.close();
-	mNew = false;
-	setModified(false);
-	mTitle = filename() + utils::Path::extension(filepath());
+        std::ofstream file(filepath().c_str());
+
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+        GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
+#else
+        GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
+#endif
+
+        GtkTextIter start, end;
+        gtk_text_buffer_get_start_iter (buffer, &start);
+        gtk_text_buffer_get_end_iter(buffer, &end);
+        file <<  gtk_text_buffer_get_text (buffer, &start, &end, true);
+
+        file.close();
+        mNew = false;
+        setModified(false);
+        mTitle = filename() + utils::Path::extension(filepath());
         if (mGVLE) {
             mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
             mGVLE->getMenu()->hideSave();
         }
     } catch(std::exception& e) {
-	throw _("Error while saving file.");
+        throw _("Error while saving file.");
     }
 }
 
 void DocumentText::saveAs(const std::string& newFilePath)
 {
     try {
-	std::string oldFilePath(filepath().c_str());
-	setFilePath(newFilePath);
-	setFileName(utils::Path::basename(newFilePath));
-	std::ofstream file(filepath().c_str());
-	file << mView.get_buffer()->get_text();
-	file.close();
-	mNew = false;
-	setModified(false);
-	mTitle = filename() + utils::Path::extension(filepath());
+        std::string oldFilePath(filepath().c_str());
+        setFilePath(newFilePath);
+        setFileName(utils::Path::basename(newFilePath));
+        std::ofstream file(filepath().c_str());
+
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+        GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
+#else
+        GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
+#endif
+
+        GtkTextIter start, end;
+        gtk_text_buffer_get_start_iter (buffer, &start);
+        gtk_text_buffer_get_end_iter(buffer, &end);
+        file <<  gtk_text_buffer_get_text (buffer, &start, &end, true);
+
+        file.close();
+        mNew = false;
+        setModified(false);
+        mTitle = filename() + utils::Path::extension(filepath());
         if (mGVLE) {
             mGVLE->getEditor()->setModifiedTab(mTitle, newFilePath,
                                                oldFilePath);
             mGVLE->getMenu()->hideSave();
         }
     } catch (const std::exception& /*e*/) {
-	throw _("Error while saving file.");
+        throw _("Error while saving file.");
     }
+}
+
+void DocumentText::on_changed(GtkWidget *widget, gpointer label)
+{
+    (void)widget;
+
+    ((DocumentText *)label)->onChanged();
 }
 
 void DocumentText::init(const std::string& buffer)
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceLanguageManager> manager
-	= gtksourceview::SourceLanguageManager::create();
-    Glib::RefPtr<gtksourceview::SourceLanguage> language =
-	manager->get_language(mIdLang);
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer_ =
-	gtksourceview::SourceBuffer::create(language);
+    GtkSourceLanguageManager *manager = gtk_source_language_manager_new();
+    GtkSourceLanguage *language =
+        gtk_source_language_manager_get_language(manager, mIdLang.c_str());
+    GtkSourceBuffer *buffer_ = gtk_source_buffer_new_with_language(language);
 #else
-    Glib::RefPtr<Gtk::TextBuffer> buffer_ = mView.get_buffer();
+    GtkTextBuffer *buffer_ = gtk_text_view_get_buffer(mView);
 #endif
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    buffer_->begin_not_undoable_action();
-    buffer_->insert(buffer_->end(), buffer);
-    buffer_->end_not_undoable_action();
+    gtk_source_buffer_begin_not_undoable_action (buffer_);
+    gtk_text_buffer_insert_at_cursor(&buffer_->parent_instance,
+                                     buffer.c_str (), buffer.size ());
+    gtk_source_buffer_end_not_undoable_action (buffer_);
 #else
-    buffer_->insert(buffer_->end(), buffer);
+    gtk_text_buffer_insert_at_cursor(buffer_, buffer.c_str (), buffer.size ());
 #endif
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.set_source_buffer(buffer_);
+    gtk_text_view_set_buffer(&(mView->parent), &(buffer_->parent_instance));
 #endif
-
-    mView.get_buffer()->signal_changed().connect(
-	sigc::mem_fun(this, &DocumentText::onChanged));
-
-
+    g_signal_connect(buffer_, "changed",
+                     G_CALLBACK(DocumentText::on_changed), this);
 }
 
 std::string DocumentText::guessIdLanguage()
@@ -224,11 +266,11 @@ std::string DocumentText::guessIdLanguage()
     std::string idLang;
 
     if ((ext == ".cpp") or (ext == ".hpp") or (ext == ".cc"))
-	idLang = "cpp";
+        idLang = "cpp";
     else if (ext == ".py")
-	idLang = "python";
+        idLang = "python";
     else
-	idLang = "cmake";
+        idLang = "cmake";
 
     return idLang;
 }
@@ -236,32 +278,42 @@ std::string DocumentText::guessIdLanguage()
 void DocumentText::applyEditingProperties()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->set_highlight_syntax(
-        Settings::settings().getHighlightSyntax());
-    mView.get_source_buffer()->set_highlight_matching_brackets(
-        Settings::settings().getHighlightBrackets());
-    mView.set_highlight_current_line(
-        Settings::settings().getHighlightLine());
-    mView.set_show_line_numbers(
-        Settings::settings().getLineNumbers());
-    mView.set_show_right_margin(
-        Settings::settings().getRightMargin());
-    mView.set_auto_indent(
-        Settings::settings().getAutoIndent());
-    mView.set_indent_on_tab(
-        Settings::settings().getIndentOnTab());
-    mView.set_indent_width(
-        Settings::settings().getIndentSize());
+    GtkSourceBuffer *buffer = GTK_SOURCE_BUFFER(
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView)));
+    GtkSourceView   *source = mView;
+
+    gtk_source_buffer_set_highlight_syntax(
+        buffer, Settings::settings().getHighlightSyntax());
+    gtk_source_buffer_set_highlight_matching_brackets(
+        buffer, Settings::settings().getHighlightBrackets());
+    gtk_source_view_set_highlight_current_line(
+        source, Settings::settings().getHighlightLine());
+    gtk_source_view_set_show_line_numbers(
+        source, Settings::settings().getLineNumbers());
+    gtk_source_view_set_show_right_margin(
+        source, Settings::settings().getRightMargin());
+    gtk_source_view_set_auto_indent(
+        source, Settings::settings().getAutoIndent());
+    gtk_source_view_set_indent_on_tab(
+        source, Settings::settings().getIndentOnTab());
+    gtk_source_view_set_indent_width(
+        source, Settings::settings().getIndentSize());
+
     if (Settings::settings().getSmartHomeEnd()) {
-        mView.set_smart_home_end(
-            gtksourceview::SOURCE_SMART_HOME_END_ALWAYS);
+        gtk_source_view_set_smart_home_end(
+            source, GTK_SOURCE_SMART_HOME_END_ALWAYS);
     }
 #endif
 
     Pango::FontDescription font =
         Pango::FontDescription(Settings::settings().getFontEditor());
 
-    mView.modify_font(font);
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    gtk_widget_modify_font(&(mView->parent.parent_instance.widget),
+                           font.gobj ());
+#else
+    gtk_widget_modify_font(&(mView->parent_instance.widget), font.gobj ());
+#endif
 }
 
 void DocumentText::updateView()
@@ -272,62 +324,72 @@ void DocumentText::updateView()
 void DocumentText::undo()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->undo();
+    gtk_source_buffer_undo (GTK_SOURCE_BUFFER
+                            (gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView))));
 #endif
 }
 
 void DocumentText::redo()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->redo();
+    gtk_source_buffer_redo (GTK_SOURCE_BUFFER
+                            (gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView))));
 #endif
 }
 
 void DocumentText::paste()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
+    GtkTextView   view = mView->parent;
 #else
-    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
+    GtkTextView   view = *(mView);
 #endif
+    GtkClipboard *clipboard = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
+    gtk_text_buffer_paste_clipboard	(buffer, clipboard, NULL, true);
 
-    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
-    buffer->paste_clipboard(clipboard, true);
-    mView.scroll_to_mark(buffer->get_insert(), 0.02);
+    gtk_text_view_scroll_to_mark (&view, gtk_text_buffer_get_insert(buffer),
+                                  0.02, true, 0, 0);
 }
 
 void DocumentText::copy()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
 #else
-    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
 #endif
 
-    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
-    buffer->copy_clipboard(clipboard);
+    GtkClipboard *clipboard = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
+    gtk_text_buffer_copy_clipboard (buffer, clipboard);
 }
 
 void DocumentText::cut()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
 #else
-    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
 #endif
 
-    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
-    buffer->cut_clipboard(clipboard);
+    GtkClipboard *clipboard = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
+    gtk_text_buffer_cut_clipboard (buffer, clipboard, true);
 }
 
 void DocumentText::selectAll()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
 #else
-    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
 #endif
-    buffer->select_range(buffer->begin(), buffer->end());
+
+    GtkTextIter start, end;
+    gtk_text_buffer_get_start_iter (buffer, &start);
+    gtk_text_buffer_get_end_iter(buffer, &end);
+
+    gtk_text_buffer_select_range (buffer, &start, &end);
 }
 
 void DocumentText::onChanged()
@@ -349,10 +411,14 @@ void DocumentText::onChanged()
 std::string DocumentText::getBuffer()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    return mView.get_source_buffer()->get_text();
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
 #else
-    return mView.get_buffer()->get_text();
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
 #endif
+    GtkTextIter start, end;
+    gtk_text_buffer_get_selection_bounds (buffer, &start, &end);
+
+    return gtk_text_buffer_get_text (buffer, &start, &end, true);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -400,25 +466,25 @@ void DocumentDrawingArea::updateCursor()
     }
 
     switch(Document::mGVLE->getCurrentButton()) {
-        case GVLE::VLE_GVLE_POINTER :
+    case GVLE::VLE_GVLE_POINTER :
         daw->set_cursor(Gdk::Cursor(Gdk::HAND2));
         break;
-        case GVLE::VLE_GVLE_ADDMODEL :
+    case GVLE::VLE_GVLE_ADDMODEL :
         daw->set_cursor(Gdk::Cursor(Gdk::CROSS));
         break;
-        case GVLE::VLE_GVLE_ADDLINK :
+    case GVLE::VLE_GVLE_ADDLINK :
         daw->set_cursor(Gdk::Cursor(Gdk::PENCIL));
         break;
-        case GVLE::VLE_GVLE_DELETE :
+    case GVLE::VLE_GVLE_DELETE :
         daw->set_cursor(Gdk::Cursor(Gdk::X_CURSOR));
         break;
-        case GVLE::VLE_GVLE_ADDCOUPLED :
+    case GVLE::VLE_GVLE_ADDCOUPLED :
         daw->set_cursor(Gdk::Cursor(Gdk::DRAPED_BOX));
         break;
-        case GVLE::VLE_GVLE_ZOOM :
+    case GVLE::VLE_GVLE_ZOOM :
         daw->set_cursor(Gdk::Cursor(Gdk::SIZING));
         break;
-        case GVLE::VLE_GVLE_QUESTION :
+    case GVLE::VLE_GVLE_QUESTION :
         daw->set_cursor(Gdk::Cursor(Gdk::QUESTION_ARROW));
         break;
     default :
@@ -473,10 +539,11 @@ DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(GVLE* gvle,
-                                                     const std::string& filepath,
-                                                     View* view, vpz::BaseModel* model) :
-    DocumentDrawingArea(gvle, filepath, view, model)
+DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(
+    GVLE* gvle,
+    const std::string& filepath,
+    View* view, vpz::BaseModel* model)
+    : DocumentDrawingArea(gvle, filepath, view, model)
 {
     mTitle = filename() + utils::Path::extension(filepath)+
         " - " + model->getName();
@@ -510,7 +577,8 @@ Editor::Editor(BaseObjectType* cobject,
                const Glib::RefPtr < Gtk::Builder >& /*refGlade*/) :
     Gtk::Notebook(cobject)
 {
-    tabSignal = signal_switch_page().connect(sigc::mem_fun(this, &Editor::changeTab));
+    tabSignal = signal_switch_page().connect(
+        sigc::mem_fun(this, &Editor::changeTab));
 }
 
 Editor::~Editor()
@@ -583,7 +651,7 @@ void Editor::changeAndSignal(GtkNotebookPage* /*page*/, int num)
 
     tabSignal.disconnect();
     tabSignal = signal_switch_page().connect(sigc::mem_fun(this,
-                                                   &Editor::changeTab));
+                                                           &Editor::changeTab));
 }
 
 void Editor::refreshTab()
@@ -723,8 +791,8 @@ void Editor::focusTab(const std::string& filepath)
 void Editor::focusAndSignal(const std::string& filepath)
 {
     tabSignal.disconnect();
-    tabSignal = signal_switch_page().connect(sigc::mem_fun(this,
-                                                  &Editor::changeAndSignal));
+    tabSignal = signal_switch_page().connect(
+        sigc::mem_fun(this, &Editor::changeAndSignal));
 
     focusTab(filepath);
 }
@@ -752,24 +820,24 @@ void Editor::onRedo()
 void Editor::openTab(const std::string& filepath)
 {
     if (utils::Path::extension(filepath) != ".vpz") {
-try {
-    if (mDocuments.find(filepath) == mDocuments.end()) {
-        DocumentText* doc = new DocumentText(mGVLE, filepath);
-        int page = append_page(*doc,
-                               *(addLabel(doc->getTitle(), filepath)));
+        try {
+            if (mDocuments.find(filepath) == mDocuments.end()) {
+                DocumentText* doc = new DocumentText(mGVLE, filepath);
+                int page = append_page(*doc,
+                                       *(addLabel(doc->getTitle(), filepath)));
 
-        mDocuments.insert(std::pair <std::string,
-                          DocumentText*>(filepath, doc));
-        show_all_children();
-        set_current_page(page);
-    } else {
-        focusTab(filepath);
-    }
-} catch(utils::FileError& fe) {
-    Error(fe.what());
-} catch (std::exception& e) {
-    mGVLE->insertLog(e.what());
-}
+                mDocuments.insert(std::pair <std::string,
+                                  DocumentText*>(filepath, doc));
+                show_all_children();
+                set_current_page(page);
+            } else {
+                focusTab(filepath);
+            }
+        } catch(utils::FileError& fe) {
+            Error(fe.what());
+        } catch (std::exception& e) {
+            mGVLE->insertLog(e.what());
+        }
     } else {
         mGVLE->parseXML(filepath);
         openTabVpz(mGVLE->getModeling()->getFileName(),
