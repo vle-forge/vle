@@ -29,6 +29,7 @@ For the MPI command line:
 For the GUI:
 
 * gtkmm (>= 2.22.0)
+* gtksourceview (>= 2.0.0)
 
 Getting the code
 ----------------
