@@ -2,6 +2,25 @@
 VLE 1.1.0-dev
 =============
 
+Changes from vle-1.1.0-beta4
+============================
+
+README: adding Gtksourceview dependency
+devs: add a runtime access to the simulation results
+gvle: fix package text of the box Dynamic
+gvle: fix warnings about new value type
+gvle: replace GtkSourceViewmm with GtkSourceView
+utils: add Package configure option WITH_WARNINGS
+utils: add exception handling in DownloadManager
+utils: transfer CLI options into utils
+value: add a User value type
+value: add unit test for the value::User
+vle : update vle man page
+vle: update authors
+win32: embedding cmake
+win32: embedding of the compiler, use boost 1_54
+win32: fix the default VLE_HOME
+
 Changes from vle-1.1.0-beta3
 ============================
 
