@@ -34,15 +34,14 @@
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/version.hpp>
 #include <gtkmm/stock.h>
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-#include <gtkmm/clipboard.h>
-#endif
-#include <gdkmm/cursor.h>
-#include <boost/lexical_cast.hpp>
-#include <fstream>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
+#   include <gtksourceview/gtksourceview.h>
+#   include <gtksourceview/gtksourcelanguagemanager.h>
+#   include <gtkmm/clipboard.h>
+
 void gvle_gtksourceview_init()
 {
     static bool s_init = false;
@@ -52,6 +51,10 @@ void gvle_gtksourceview_init()
     }
 }
 #endif
+
+#include <gdkmm/cursor.h>
+#include <boost/lexical_cast.hpp>
+#include <fstream>
 
 namespace vle { namespace gvle {
 
@@ -99,7 +102,7 @@ void Document::setTitle(const std::string& filePath,
 DocumentText::DocumentText(GVLE* gvle,
                            const std::string& filepath,
                            bool newfile, bool hasFullName) :
-    Document(gvle, filepath),
+    Document(gvle, filepath), mView(NULL),
     mNew(newfile),
     mHasFullName(hasFullName)
 {
@@ -109,11 +112,9 @@ DocumentText::DocumentText(GVLE* gvle,
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gvle_gtksourceview_init();
-    GtkWidget *m = gtk_source_view_new();
-    mView = (GtkSourceView *)m;
+    mView = gtk_source_view_new();
 #else
-    GtkWidget *m = gtk_text_view_new();
-    mView = (GtkTextView *)m;
+    mView = gtk_text_view_new();
 #endif
 
     if (not mNew) {
@@ -141,40 +142,38 @@ DocumentText::DocumentText(GVLE* gvle,
         init("");
     }
 
-    gtk_container_add(GTK_CONTAINER(this->gobj ()), m);
+    gtk_container_add(GTK_CONTAINER(this->gobj()), mView);
     applyEditingProperties();
 }
 
 DocumentText::DocumentText(const std::string& buffer)
-: Document()
+: Document(), mView(NULL)
 {
     mIdLang = "cpp";
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gvle_gtksourceview_init();
-    GtkWidget *m = gtk_source_view_new();
-    mView = GTK_SOURCE_VIEW(m);
+    mView = gtk_source_view_new();
 #else
-    GtkWidget *m = gtk_text_view_new();
-    mView = GTK_TEXT_VIEW(m);
+    mView = gtk_text_view_new();
 #endif
 
-    gtk_container_add(GTK_CONTAINER(this->gobj ()), m);
+    gtk_container_add(GTK_CONTAINER(this->gobj()), mView);
     init(buffer);
     applyEditingProperties();
+}
+
+DocumentText::~DocumentText()
+{
+    if (mView)
+        gtk_container_remove(GTK_CONTAINER(this->gobj()), mView);
 }
 
 void DocumentText::save()
 {
     try {
         std::ofstream file(filepath().c_str());
-
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
         GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
-#else
-        GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
-#endif
-
         GtkTextIter start, end;
         gtk_text_buffer_get_start_iter (buffer, &start);
         gtk_text_buffer_get_end_iter(buffer, &end);
@@ -201,12 +200,7 @@ void DocumentText::saveAs(const std::string& newFilePath)
         setFileName(utils::Path::basename(newFilePath));
         std::ofstream file(filepath().c_str());
 
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
         GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
-#else
-        GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
-#endif
-
         GtkTextIter start, end;
         gtk_text_buffer_get_start_iter (buffer, &start);
         gtk_text_buffer_get_end_iter(buffer, &end);
@@ -241,7 +235,7 @@ void DocumentText::init(const std::string& buffer)
         gtk_source_language_manager_get_language(manager, mIdLang.c_str());
     GtkSourceBuffer *buffer_ = gtk_source_buffer_new_with_language(language);
 #else
-    GtkTextBuffer *buffer_ = gtk_text_view_get_buffer(mView);
+    GtkTextBuffer *buffer_ = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
 #endif
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
@@ -254,7 +248,8 @@ void DocumentText::init(const std::string& buffer)
 #endif
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtk_text_view_set_buffer(&(mView->parent), &(buffer_->parent_instance));
+    gtk_text_view_set_buffer(&(GTK_SOURCE_VIEW(mView)->parent),
+                             &(buffer_->parent_instance));
 #endif
     g_signal_connect(buffer_, "changed",
                      G_CALLBACK(DocumentText::on_changed), this);
@@ -280,7 +275,7 @@ void DocumentText::applyEditingProperties()
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     GtkSourceBuffer *buffer = GTK_SOURCE_BUFFER(
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView)));
-    GtkSourceView   *source = mView;
+    GtkSourceView *source = GTK_SOURCE_VIEW(mView);
 
     gtk_source_buffer_set_highlight_syntax(
         buffer, Settings::settings().getHighlightSyntax());
@@ -309,10 +304,12 @@ void DocumentText::applyEditingProperties()
         Pango::FontDescription(Settings::settings().getFontEditor());
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtk_widget_modify_font(&(mView->parent.parent_instance.widget),
-                           font.gobj ());
+    gtk_widget_modify_font(
+        &(GTK_SOURCE_VIEW(mView)->parent.parent_instance.widget),
+        font.gobj());
 #else
-    gtk_widget_modify_font(&(mView->parent_instance.widget), font.gobj ());
+    gtk_widget_modify_font(&(
+            GTK_TEXT_VIEW(mView)->parent_instance.widget), font.gobj());
 #endif
 }
 
@@ -339,52 +336,33 @@ void DocumentText::redo()
 
 void DocumentText::paste()
 {
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
-    GtkTextView   view = mView->parent;
-#else
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
-    GtkTextView   view = *(mView);
-#endif
-    GtkClipboard *clipboard = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
-    gtk_text_buffer_paste_clipboard	(buffer, clipboard, NULL, true);
+    GtkTextView *view = GTK_TEXT_VIEW(mView);
+    GtkClipboard *clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
 
-    gtk_text_view_scroll_to_mark (&view, gtk_text_buffer_get_insert(buffer),
-                                  0.02, true, 0, 0);
+    gtk_text_buffer_paste_clipboard(buffer, clipboard, NULL, true);
+
+    gtk_text_view_scroll_to_mark(view, gtk_text_buffer_get_insert(buffer),
+                                 0.02, true, 0, 0);
 }
 
 void DocumentText::copy()
 {
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
-#else
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
-#endif
-
     GtkClipboard *clipboard = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
     gtk_text_buffer_copy_clipboard (buffer, clipboard);
 }
 
 void DocumentText::cut()
 {
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
-#else
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
-#endif
-
     GtkClipboard *clipboard = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
     gtk_text_buffer_cut_clipboard (buffer, clipboard, true);
 }
 
 void DocumentText::selectAll()
 {
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
-#else
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
-#endif
-
     GtkTextIter start, end;
     gtk_text_buffer_get_start_iter (buffer, &start);
     gtk_text_buffer_get_end_iter(buffer, &end);
@@ -410,15 +388,15 @@ void DocumentText::onChanged()
 
 std::string DocumentText::getBuffer()
 {
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mView));
-#else
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(mView);
-#endif
     GtkTextIter start, end;
-    gtk_text_buffer_get_selection_bounds (buffer, &start, &end);
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
 
-    return gtk_text_buffer_get_text (buffer, &start, &end, true);
+    gchar *result = gtk_text_buffer_get_text(buffer, &start, &end, true);
+    std::string ret(result);
+    g_free(result);
+
+    return ret;
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */

@@ -39,14 +39,7 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/builder.h>
-
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-#include <gtksourceview/gtksourceview.h>
-#include <gtksourceview/gtksourcelanguagemanager.h>
-#endif
-
 #include <glibmm.h>
-#include <gtkmm/private/textview_p.h>
 
 namespace vle { namespace gvle {
 
@@ -115,12 +108,7 @@ public:
 
     DocumentText(const std::string& buffer);
 
-    virtual ~DocumentText()
-    {
-        if (mView)
-            gtk_container_remove(&(this->gobj()->container.container),
-                                 GTK_WIDGET(mView));
-    }
+    virtual ~DocumentText();
 
     void save();
     void saveAs(const std::string& filename);
@@ -144,11 +132,7 @@ public:
     std::string getBuffer();
 
 private:
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    GtkSourceView *mView;
-#else
-    GtkTextView  *mView;
-#endif
+    GtkWidget *mView;
 
     bool           mModified;
     bool           mNew;

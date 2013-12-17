@@ -9,6 +9,7 @@ README: adding Gtksourceview dependency
 devs: add a runtime access to the simulation results
 gvle: fix package text of the box Dynamic
 gvle: fix warnings about new value type
+gvle: improve the use of Gtk{Text|Source}view in Editor
 gvle: replace GtkSourceViewmm with GtkSourceView
 utils: add Package configure option WITH_WARNINGS
 utils: add exception handling in DownloadManager
