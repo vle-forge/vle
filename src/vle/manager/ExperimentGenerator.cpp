@@ -30,7 +30,6 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/BaseModel.hpp>
 
-
 namespace vle { namespace manager {
 
 //
@@ -84,25 +83,12 @@ class ExperimentGenerator::Pimpl
         mCompleteSize = computeMaximumValue();
 
         uint32_t number = mCompleteSize / mWorld;
+        uint32_t modulo = mCompleteSize % mWorld;
 
-        if (number > 0) {
-            mMin = number * mRank;
-            mMax = number * (mRank + 1) - 1;
-
-            if (mMax > mCompleteSize) {
-                mMax = mCompleteSize;
-            }
-        } else {
-            uint32_t modulo = mCompleteSize % mWorld;
-
-            if (modulo > mRank) {
-                mMin = mRank;
-                mMax = mRank + 1;
-            } else {
-                mMin = modulo;
-                mMax = modulo;
-            }
-        }
+        mMin = (number+1) * std::min(mRank, modulo) + number *
+                uint32_t(std::max((int32_t) 0, int32_t(mRank-modulo)));
+        mMax = std::min(mCompleteSize,
+                mMin + number + 1 * uint32_t(mRank < modulo));
     }
 
 public:

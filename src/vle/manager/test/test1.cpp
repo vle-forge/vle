@@ -122,17 +122,17 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_lower_than_exp)
 
     manager::ExperimentGenerator expgen1(vpz, 0, 100);
     BOOST_CHECK_EQUAL(expgen1.min(), 0);
-    BOOST_CHECK_EQUAL(expgen1.max(), 99);
+    BOOST_CHECK_EQUAL(expgen1.max(), 100);
     BOOST_CHECK_EQUAL(expgen1.size(), 10000);
 
     manager::ExperimentGenerator expgen2(vpz, 99, 100);
     BOOST_CHECK_EQUAL(expgen2.min(), 9900);
-    BOOST_CHECK_EQUAL(expgen2.max(), 9999);
+    BOOST_CHECK_EQUAL(expgen2.max(), 10000);
     BOOST_CHECK_EQUAL(expgen2.size(), 10000);
 
     manager::ExperimentGenerator expgen3(vpz, 50, 100);
     BOOST_CHECK_EQUAL(expgen3.min(), 5000);
-    BOOST_CHECK_EQUAL(expgen3.max(), 5099);
+    BOOST_CHECK_EQUAL(expgen3.max(), 5100);
     BOOST_CHECK_EQUAL(expgen3.size(), 10000);
 }
 
@@ -221,6 +221,6 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_max_1_max_1)
 
     manager::ExperimentGenerator expgen1(vpz, 0, 1);
     BOOST_CHECK_EQUAL(expgen1.min(), 0);
-    BOOST_CHECK_EQUAL(expgen1.max(), 6);
+    BOOST_CHECK_EQUAL(expgen1.max(), 7);
     BOOST_CHECK_EQUAL(expgen1.size(), 7);
 }

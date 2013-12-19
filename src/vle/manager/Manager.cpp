@@ -145,7 +145,7 @@ public:
         {
             std::string vpzname(vpz->project().experiment().name());
 
-            for (uint32_t i = expgen.min() + index; i <= expgen.max();
+            for (uint32_t i = expgen.min() + index; i < expgen.max();
                  i += threads) {
                 Simulation sim(mLogOption, mSimulationOption, NULL);
                 Error err;
@@ -209,8 +209,8 @@ public:
         error->code = 0;
         error->message.clear();
 
-        if (mSimulationOption & manager::SIMULATION_NO_RETURN) {
-            for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
+        if (mSimulationOption == manager::SIMULATION_NO_RETURN) {
+            for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
                 vpz::Vpz *file = new vpz::Vpz(*vpz);
                 setExperimentName(file, vpzname, i);
@@ -230,7 +230,7 @@ public:
         } else {
             result = new value::Matrix(expgen.size(), 1, expgen.size(), 1);
 
-            for (uint32_t i = expgen.min(); i <= expgen.max(); ++i) {
+            for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
                 vpz::Vpz *file = new vpz::Vpz(*vpz);
                 setExperimentName(file, vpzname, i);
