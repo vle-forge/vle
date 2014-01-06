@@ -1,6 +1,40 @@
-=============
-VLE 1.1.0-dev
-=============
+=========
+VLE 1.1.0
+=========
+
+Release highlights
+==================
+
+From VLE 1.1, the extension (FSA, Petri net, Difference Equation,
+etc.) are provided into packages. A package can provides simulators,
+data, documentation, headers and static libraries. A package can
+depends of another package to be build and to be use at runtime of the
+simulation.
+
+The package can now be installed from remote repositories with the
+command line interface or via GVLE. Packages and thiers build
+dependencies and runtime dependencies are automatically downloaded and
+builded.
+
+To improve the stability of VLE, We merge all shared libraries of vle
+(libvleutils, libvlevpz, libvledevs etc.) into an unique shared
+library called ``libvle-1.1.so`` or ``vle-1.1.dll``. We provide a
+archive called ``vle-1.1.a`` or ``vle-1.1.lib``. Under the Win32 port,
+
+We remove the Eov program and the libvleeov shared library. Now,
+graphical output are available into the GVLE application.
+
+Add a dependency to the Boost::Asio library. Now, VLE depends on Asio
+library to download data over http protocol.
+
+Add a dependency to the libarchive library
+(http://libarchive.github.com/) to extract gzip, bzip2 tarball and Zip
+archives from the remote repositories.
+
+Add an MPI mode with the command line interface MPI. For MPI, VLE
+depends of an MPI library.
+
+Switch VLE to Github.
 
 Changes from vle-1.1.0-beta4
 ============================
@@ -14,6 +48,7 @@ gvle: replace GtkSourceViewmm with GtkSourceView
 utils: add Package configure option WITH_WARNINGS
 utils: add exception handling in DownloadManager
 utils: transfer CLI options into utils
+manager: fix the experiment generator
 value: add a User value type
 value: add unit test for the value::User
 vle : update vle man page
@@ -96,40 +131,6 @@ Changes from vle-1.1.0-beta1
 - win32: fix the search path using HKEYs in cmake
 - win32: fix the predefined variables for Boost
 - win32: fix the test_package test
-
-Release highlights
-==================
-
-From VLE 1.1, the extension (FSA, Petri net, Difference Equation,
-etc.) are provided into packages. A package can provides simulators,
-data, documentation, headers and static libraries. A package can
-depends of another package to be build and to be use at runtime of the
-simulation.
-
-The package can now be installed from remote repositories with the
-command line interface or via GVLE. Packages and thiers build
-dependencies and runtime dependencies are automatically downloaded and
-builded.
-
-To improve the stability of VLE, We merge all shared libraries of vle
-(libvleutils, libvlevpz, libvledevs etc.) into an unique shared
-library called ``libvle-1.1.so`` or ``vle-1.1.dll``. We provide a
-archive called ``vle-1.1.a`` or ``vle-1.1.lib``. Under the Win32 port,
-
-We remove the Eov program and the libvleeov shared library. Now,
-graphical output are available into the GVLE application.
-
-Add a dependency to the Boost::Asio library. Now, VLE depends on Asio
-library to download data over http protocol.
-
-Add a dependency to the libarchive library
-(http://libarchive.github.com/) to extract gzip, bzip2 tarball and Zip
-archives from the remote repositories.
-
-Add an MPI mode with the command line interface MPI. For MPI, VLE
-depends of an MPI library.
-
-Switch VLE to Github.
 
 Details
 =======
