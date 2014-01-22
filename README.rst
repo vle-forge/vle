@@ -2,6 +2,8 @@
 Virtual Laboratory Environment 1.1.0
 ====================================
 
+.. image:: https://travis-ci.org/vle-forge/vle.png?branch=master   :target: https://travis-ci.org/vle-forge/vle
+
 See AUTHORS and COPYRIGHT for the list of contributors.
 
 VLE is an operational framework for multi-modeling, simulation and analysis of
