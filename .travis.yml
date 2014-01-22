@@ -1,0 +1,30 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+before_install:
+  - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ precise main universe"
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq cmake g++ libgtkmm-2.4-dev libglademm-2.4-dev libgtksourceview2.0-dev libboost1.48-dev libboost1.48-all-dev libopenmpi-dev libarchive-dev 
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script: make
+
+notifications:
+  recipients:
+    - vle-devel@lists.sourceforge.net
+  email:
+    on_success: change
+    on_failure: always
+  irc:
+    channels:
+      - "chat.freenode.net#vle"
+    template:
+      - "%{repository} (%{commit}) : %{message} %{foo} "
+      - "Build details: %{build_url}"
