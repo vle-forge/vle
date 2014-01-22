@@ -1,0 +1,28 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq cmake g++ libgtkmm-2.4-dev libglademm-2.4-dev libgtksourceviewmm-2.0-dev libboost-dev libboost-serialization-dev libboost-date-time-dev libboost-filesystem-dev libboost-test-dev  libboost-regex-dev libboost-program-options-dev libboost-thread-dev libboost-chrono-dev libarchive-dev libasio-dev libopenmpi-dev openmpi-bin
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script: make
+
+notifications:
+  recipients:
+    - gauthier.quesnel@toulouse.inra.fr
+  email:
+    on_success: change
+    on_failure: always
+  irc:
+    channels:
+      - "chat.freenode.net#vle"
+    template:
+      - "%{repository}/%{branch} (%{commit} - %{author}): %{message}"
