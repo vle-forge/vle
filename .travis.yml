@@ -6,7 +6,7 @@ compiler:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake g++ libgtkmm-2.4-dev libglademm-2.4-dev libgtksourceviewmm-2.0-dev libboost-dev libboost-serialization-dev libboost-date-time-dev libboost-filesystem-dev libboost-test-dev  libboost-regex-dev libboost-program-options-dev libboost-thread-dev libboost-chrono-dev libarchive-dev libasio-dev libopenmpi-dev openmpi-bin
+  - sudo apt-get install -qq cmake g++ libgtkmm-2.4-dev libglademm-2.4-dev libgtksourceview2.0-dev libboost1.48-dev libboost-serialization1.48-dev libboost-date-time1.48-dev libboost-filesystem1.48-dev libboost-test1.48-dev libboost-regex1.48-dev libboost-program-options1.48-dev libboost-thread1.48-dev libboost-chrono1.48-dev  libasio-dev libopenmpi-dev openmpi-bin libarchive-dev 
 
 before_script:
   - mkdir build
@@ -25,4 +25,5 @@ notifications:
     channels:
       - "chat.freenode.net#vle"
     template:
-      - "%{repository}/%{branch} (%{commit} - %{author}): %{message}"
+      - "%{repository} (%{commit}) : %{message} %{foo} "
+      - "Build details: %{build_url}"
