@@ -4,7 +4,7 @@ enable_testing()
 
 set(VLE_MAJOR 1)
 set(VLE_MINOR 1)
-set(VLE_PATCH 0)
+set(VLE_PATCH 999)
 set(VLE_EXTRA "")
 set(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")
 set(VLE_VERSION_SHORT "${VLE_MAJOR}.${VLE_MINOR}")
@@ -237,10 +237,10 @@ endif ()
 # Install the README
 #
 if (UNIX)
-  install(FILES "README.rst" DESTINATION "${VLE_SHARE_DIRS}")
+  install(FILES "README.md" DESTINATION "${VLE_SHARE_DIRS}")
   install(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}")
 else ()
-  install(FILES "README.rst" DESTINATION "${VLE_SHARE_DIRS}" RENAME "Readme.txt")
+  install(FILES "README.md" DESTINATION "${VLE_SHARE_DIRS}" RENAME "Readme.txt")
   install(FILES "COPYING" DESTINATION "${VLE_SHARE_DIRS}" RENAME "CopyRight.txt")
 endif ()
 
