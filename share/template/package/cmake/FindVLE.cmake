@@ -3,7 +3,7 @@
 #
 # Try to find VLE
 #
-# Copyright 2012-2013 INRA
+# Copyright 2012-2014 INRA
 # Gauthier Quesnel <quesnel@users.sourceforge.net>
 # Ronan Trépos <ronan.trepos@toulouse.inra.fr>
 #
