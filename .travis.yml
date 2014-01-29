@@ -4,6 +4,11 @@ compiler:
   - gcc
   - clang
 
+env:
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=RelWithDebInfo
+  - BUILD_TYPE=Release
+
 before_install:
   - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ precise main universe"
   - sudo apt-get update -qq
@@ -12,9 +17,13 @@ before_install:
 before_script:
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+  - make
+  - cd ..
 
-script: make
+script:
+  - cd build
+  - ctest -V
 
 notifications:
   recipients:
