@@ -62,22 +62,14 @@ namespace vle { namespace gvle {
         Modeling*                           mModeling;
         Glib::RefPtr < Gtk::Builder >  mXml;
 
-	Gtk::Entry*         mEntryAuthor;
-	Gtk::Entry*         mEntryDate;
-	Gtk::Button*        mButtonNow;
-	Gtk::Button*        mButtonCalendar;
-	Gtk::Entry*         mEntryVersion;
-	std::string         mBackupDate;
-
+        Gtk::Entry*         mEntryAuthor;
+        Gtk::Entry*         mEntryDate;
+        Gtk::Button*        mButtonNow;
+        Gtk::Button*        mButtonCalendar;
+        Gtk::Entry*         mEntryVersion;
+        std::string         mBackupDate;
         Gtk::Dialog*        mDialog;
         Gtk::Entry*         mEntryName;
-        Gtk::Entry*         mEntryDuration;
-        Gtk::Entry*         mEntryBeginReal;
-        Gtk::Entry*         mEntryBeginDate;
-        Gtk::Button*        mButtonCalendarBegin;
-        Gtk::SpinButton*    mSpinBeginH;
-        Gtk::SpinButton*    mSpinBeginM;
-        Gtk::SpinButton*    mSpinBeginS;
         double              mBeginRealMin, mBeginRealMax;
         bool                mRealUpdated;
         Gtk::HBox*          mHboxCombi;
@@ -97,8 +89,6 @@ namespace vle { namespace gvle {
         void on_calendarBegin();
         void on_julianDate_changed();
         void on_time_changed();
-        void updateBeginReal();
-        void updateBeginTime();
 
         void on_random_simu();
         void on_random_plan();

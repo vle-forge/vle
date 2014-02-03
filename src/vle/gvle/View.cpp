@@ -122,8 +122,8 @@ void View::exportCurrentModel()
 {
     const vpz::Experiment& experiment = ((const Modeling*)mModeling)
         ->vpz().project().experiment();
-    if (experiment.name().empty() || experiment.duration() == 0) {
-        Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
+    if (experiment.name().empty()) {
+        Error(_("Set a Value to the name of the experiment before exportation."));
         return;
     }
 
