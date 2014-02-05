@@ -1,0 +1,11 @@
+prefix=@VLE_PKGCONFIG_PREFIXPATH@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/@VLE_PKGCONFIG_LIBDIR@
+includedir=${prefix}/include
+
+Name: gvle2
+Description: GVLE2 the other gui for VLE the multimodelling and Simulation tools
+Requires: QtCore QtXml vle-@VLE_VERSION_SHORT@
+Version: @VLE_VERSION@
+Libs:	-L${libdir} @VLE2_GVLE_LIBRARY@ -lvle-@VLE_VERSION_SHORT@
+Cflags: -I${includedir}/vle-@VLE_VERSION_SHORT@ -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@

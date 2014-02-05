@@ -8,3 +8,6 @@ if (VLE_HAVE_GVLE)
   add_subdirectory(gvle)
 endif ()
 
+if (VLE_HAVE_GVLE2)
+  add_subdirectory(gvle2)
+endif ()

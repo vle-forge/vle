@@ -30,11 +30,6 @@ set(VLE_MANPAGE_PATH "share/man/man1")
 set(VLE_SHARE_DIRS "share/vle-${VLE_VERSION_SHORT}")
 
 #
-# CPack configuration
-#
-include(CMakeCPack.cmake)
-
-#
 # CMake modules
 #
 include(CheckIncludeFileCXX)
@@ -83,6 +78,7 @@ endif (COMMAND CMAKE_POLICY)
 option(WITH_CAIRO "use cairomm to build output plugin [default: on]" ON)
 option(WITH_GTK "use gtkmm to build gvle [default: on]" ON)
 option(WITH_GTKSOURCEVIEW "use gtksourceview to build gvle [default: on]" ON)
+option(WITH_QT "use qt to build gvle2 [default: on]" ON)
 
 if (WITH_CAIRO AND WITH_GTK AND WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
@@ -123,6 +119,13 @@ if (NOT WITH_CAIRO AND NOT WITH_GTK)
   endif ()
 endif()
 
+if (WITH_QT)
+  find_package(Qt4 REQUIRED)
+  if (NOT QT_FOUND)
+    message(FATAL_ERROR "Qt is required")
+  endif (NOT QT_FOUND)
+endif ()
+
 if (WITH_CAIRO)
     set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
 endif ()
@@ -134,6 +137,17 @@ endif ()
 if (WITH_GTKSOURCEVIEW)
   set(VLE_HAVE_GTKSOURCEVIEWMM 1 CACHE INTERNAL "" FORCE)
 endif ()
+
+if (WITH_QT)
+  set(VLE_HAVE_QT 1 CACHE INTERNAL "" FORCE)
+  set(VLE_HAVE_GVLE2 1 CACHE INTERNAL "" FORCE)
+  SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
+endif ()
+
+#
+# CPack configuration
+#
+include(CMakeCPack.cmake)
 
 #
 # Test the libboost header and libboost-text library.
@@ -314,5 +328,7 @@ message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
 message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
 message(STATUS "Build with MPI................: ${VLE_HAVE_MPI}")
+message(STATUS "Build with Qt.................: ${VLE_HAVE_QT}")
+message(STATUS "Build with gvle2..............: ${VLE_HAVE_GVLE2}")
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2

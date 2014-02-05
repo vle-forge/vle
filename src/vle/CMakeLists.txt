@@ -21,6 +21,10 @@ if (VLE_HAVE_GVLE)
   add_subdirectory(gvle)
 endif ()
 
+if (VLE_HAVE_GVLE2)
+  add_subdirectory(gvle2)
+endif ()
+
 add_sources(vlelib DllDefines.hpp vle.hpp vle.cpp)
 get_property(vlelib_SRCS GLOBAL PROPERTY vlelib_SRCS)
 

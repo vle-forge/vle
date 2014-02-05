@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+     <namespace>vle.gvle2</namespace>
+     <virtualFolder>doc</virtualFolder>
+     <filterSection>
+         <keywords>
+             <keyword name="index" id="index" ref="index.html"/>
+             <keyword name="vpz"   id="vpz"   ref="vpz.html"/>
+         </keywords>
+         <files>
+             <file>index.html</file>
+             <file>vpz.html</file>
+             <file>vle.png</file>
+         </files>
+     </filterSection>
+</QtHelpProject>

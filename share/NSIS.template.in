@@ -834,6 +834,19 @@ Section "-Core installation"
   SetOutPath "$INSTDIR"
   @CPACK_NSIS_FULL_INSTALL@
 
+  ;to manage the qt install
+  FileOpen $0 "$INSTDIR\Qt\4.8.5\bin\qt.conf" w
+
+!define TMPATH $INSTDIR
+${StrReplace} $TMPATH "\" "\\" $TMPATH
+
+  ;write the string "hello world!" to the output file
+  FileWrite $0 "[Paths]\n"
+  FileWrite $0 "prefix = $TMPATH\\Qt\\4.8.5"
+
+  ; close the file
+  FileClose $0
+
   ;Store installation folder
   WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "" $INSTDIR
 
@@ -1024,6 +1037,10 @@ Section "Uninstall"
   ReadRegStr $INSTALL_DESKTOP SHCTX \
     "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@" "InstallToDesktop"
   DetailPrint "Install to desktop: $INSTALL_DESKTOP "
+
+
+  ;Remove the Qt conf
+  Delete "$INSTDIR\Qt\4.8.5\bin\qt.conf"
 
 @CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS@
 

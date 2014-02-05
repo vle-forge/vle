@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>resources/folder.png</file>
+        <file>resources/page_white.png</file>
+        <file>resources/arrow_undo.png</file>
+        <file>resources/arrow_redo.png</file>
+        <file>resources/arrow_up_bw.png</file>
+        <file>resources/arrow_up_blue.png</file>
+        <file>resources/map_color.png</file>
+        <file>resources/magnifier.png</file>
+        <file>resources/comment.png</file>
+        <file>resources/control_play_blue.png</file>
+        <file>resources/control_pause_blue.png</file>
+        <file>resources/disk.png</file>
+        <file>resources/vpz_inport.png</file>
+        <file>resources/bricks.png</file>
+        <file>resources/cog.png</file>
+    </qresource>
+    <qresource prefix="/logo">
+        <file>resources/logo.png</file>
+    </qresource>
+    <qresource prefix="/help">
+        <file>help/index</file>
+        <file>help/index-fr</file>
+    </qresource>
+</RCC>
