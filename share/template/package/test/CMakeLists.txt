@@ -1,1 +1,1 @@
-DeclareVleTest(test_template test.cpp)
+VleBuildTest(test_template test.cpp)
