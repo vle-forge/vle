@@ -46,9 +46,9 @@ using namespace vle;
 namespace vle {
 namespace gvle {
 
-NewTypeBox::NewTypeBox(value::Value* val) :
+NewTypeBox::NewTypeBox() :
     Gtk::Dialog("?", true, true),
-    mVal(val)
+    mVal(0)
 {
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
@@ -76,12 +76,13 @@ NewTypeBox::~NewTypeBox()
     delete m_Combo;
 }
 
-void NewTypeBox::run()
+value::Value* NewTypeBox::launch()
 {
     using namespace value;
     int ret = Gtk::Dialog::run();
     if (ret == Gtk::RESPONSE_APPLY) {
         if (m_Combo->get_active_text() == "Boolean") {
+
             mVal = Boolean::create();
         } else if (m_Combo->get_active_text() == "Double") {
             mVal = Double::create();
@@ -92,13 +93,13 @@ void NewTypeBox::run()
             int cols = utils::to < int32_t >(box.run());
             if (cols < 1) {
                 gvle::Error(_("The size can not be null or negative"));
-                return;
+                return mVal;
             }
             SimpleTypeBox box2("rows ?", "1");
             int rows = utils::to < int32_t >(box2.run());
             if (rows < 1) {
                 gvle::Error(_("The size can not be null or negative"));
-                return;
+                return mVal;
             }
             mVal = Matrix::create(cols,
                     rows,
@@ -119,13 +120,13 @@ void NewTypeBox::run()
             int w = utils::to < int32_t >(box.run());
             if (w < 1) {
                 gvle::Error(_("The size can not be null or negative"));
-                return;
+                return mVal;
             }
             SimpleTypeBox box2("Height ?", "1");
             int h = utils::to < int32_t >(box2.run());
             if (h < 1) {
                 gvle::Error(_("The size can not be null or negative"));
-                return;
+                return mVal;
             }
             mVal = Table::create(w, h);
         } else if (m_Combo->get_active_text() == "Tuple") {
@@ -134,7 +135,7 @@ void NewTypeBox::run()
             mVal = Xml::create();
         }
     }
+    return mVal;
 }
-
 }
 } // namespace vle gvle

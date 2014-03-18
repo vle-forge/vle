@@ -41,11 +41,11 @@ namespace gvle {
 class NewTypeBox : public Gtk::Dialog
 {
 public:
-    NewTypeBox(value::Value*);
+    NewTypeBox();
 
-    virtual ~NewTypeBox();
+    ~NewTypeBox();
 
-    void run();
+    value::Value* launch();
 
 private:
     Gtk::ComboBoxText* m_Combo;
