@@ -15,3 +15,5 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/vle.rc.in
   ${CMAKE_CURRENT_BINARY_DIR}/vle.rc @ONLY)
 
+install(FILES convert-vpz11-vpz12.py DESTINATION
+  "${VLE_SHARE_DIRS}/scripts")
