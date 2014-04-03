@@ -1,6 +1,6 @@
-=========
-VLE 1.1.0
-=========
+=======
+VLE 1.1
+=======
 
 Release highlights
 ==================
@@ -35,6 +35,15 @@ Add an MPI mode with the command line interface MPI. For MPI, VLE
 depends of an MPI library.
 
 Switch VLE to Github.
+
+Changes from vle-1.1.0
+======================
+
+AUTHORS: update
+Switch to 2014
+gvle: update AUTHORS
+gvle: update website
+gvle: fix the matrix value editor
 
 Changes from vle-1.1.0-beta4
 ============================
