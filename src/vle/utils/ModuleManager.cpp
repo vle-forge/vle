@@ -338,15 +338,15 @@ public:
 
         if (major != VLE_MAJOR_VERSION or minor != VLE_MINOR_VERSION) {
             throw utils::InternalError(fmt(
-                    _("Module: `%1%' was produced with VLE %1%.%2%.%3% and is"
+                    _("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
                       " not API/ABI compatible with the current VLE"
-                      " %1%.%2%.%3%")) % mPath % major % minor % patch %
+                      " %5%.%6%.%7%")) % mPath % major % minor % patch %
                 VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION);
         } else if (patch != VLE_PATCH_VERSION) {
             utils::Trace::send(fmt(
-                    _("Module: `%1%' was produced with VLE %1%.%2%.%3% and may"
+                    _("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
                       " not be API/ABI compatible with the current VLE"
-                      " %1%.%2%.%3%")) % mPath % major % minor % patch %
+                      " %5%.%6%.%7%")) % mPath % major % minor % patch %
                 VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION);
         }
     }
