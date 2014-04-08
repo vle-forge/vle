@@ -461,13 +461,9 @@ bool Package::get(std::string *out, std::string *err)
     out->reserve(Spawn::default_buffer_size);
     err->reserve(Spawn::default_buffer_size);
 
-    if (not m_pimpl->m_spawn.isfinish()) {
-        if (m_pimpl->m_spawn.get(out, err)) {
-            return true;
-        }
-    }
-
-    return false;
+    m_pimpl->m_spawn.get(out, err);
+    TraceAlways(" Package::get spawn get ");
+    return true;
 }
 
 void Package::select(const std::string& name)

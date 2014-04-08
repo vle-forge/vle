@@ -1,6 +1,6 @@
 Package: MyProject
 Version: 0.1.0
-Depends: vle.output, vle.extension.celldevs, vle.extension.cellqss, vle.extension.decision, vle.extension.difference-equation, vle.extension.differential-equation, vle.extension.dsdevs, vle.extension.fsa, vle.extension.petrinet
+Depends:
 Build-Depends:
 Conflicts:
 Maintainer: Gauthier Quesnel <quesnel@users.sourceforge.net>
