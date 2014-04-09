@@ -61,7 +61,7 @@ FIND_PACKAGE(VleCheckPackage REQUIRED)
 set (VleCheckAndDeclareGeneratedModels_DIR
   "${CMAKE_SOURCE_DIR}/cmake")
 FIND_PACKAGE(VleCheckAndDeclareGeneratedModels REQUIRED)
-SET(VLE_ABI_VERSION 1.1)
+SET(VLE_ABI_VERSION 1.2)
 
 #VLE_CHECK_PACKAGE(CELLDEVS vle.extension.celldevs)
 #VLE_CHECK_PACKAGE(CELLQSS vle.extension.cellqss)

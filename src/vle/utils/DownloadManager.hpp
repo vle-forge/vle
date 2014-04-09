@@ -77,10 +77,10 @@ public:
      * Note: there are two possibilities for dwoloading a file :
      * 1) set the protocol and the directory on server into the url and set
      * the serverfile to file name
-     * eg: url="http://www.vle-project.org/pub/1.1" and serverfile="packages.pkg"
+     * eg: url="http://www.vle-project.org/pub/1.2" and serverfile="packages.pkg"
      * 2) set only the url into the url and the directory/filename into server
      * serverfile.
-     * eg: url="www.vle-project.org" and serverfile="pub/1.1/packages"
+     * eg: url="www.vle-project.org" and serverfile="pub/1.2/packages"
      *
      * @param url The url of the server (e.g. "www.vle-project.org").
      * @param serverfile The resource to download (e.g. "vle-1.0.0.dtd").

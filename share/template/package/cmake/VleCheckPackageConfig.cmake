@@ -32,7 +32,7 @@
 # -----
 #
 # FIND_PACKAGE(VleCheckPackage REQUIRED)
-# SET(VLE_ABI_VERSION 1.1)
+# SET(VLE_ABI_VERSION 1.2)
 # VLE_CHECK_PACKAGE(PREFIX package)
 #
 # The script sets the following variables:

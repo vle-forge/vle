@@ -15,7 +15,7 @@ set(CTEST_SOURCE_DIRECTORY "/tmp/dashboards/vle/source")
 set(CTEST_BINARY_DIRECTORY "/tmp/dashboards/vle/build")
 set(CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
 
-set(CTEST_PROJECT_NAME "vle-1.1")
+set(CTEST_PROJECT_NAME "vle-1.2")
 set(CTEST_SITE "github.org/vle-forge")
 set(CTEST_BUILD_NAME "debian-x86_64-sid-linux-gcc-4.8.1")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")

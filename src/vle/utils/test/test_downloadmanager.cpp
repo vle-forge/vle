@@ -80,7 +80,7 @@ BOOST_FIXTURE_TEST_CASE(download_package, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("www.vle-project.org", "pub/1.1/packages.pkg");
+    dm.start("www.vle-project.org", "pub/1.2/packages.pkg");
     dm.join();
 
     BOOST_CHECK(dm.isFinish());
@@ -95,7 +95,7 @@ BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("http://www.vle-project.org/pub/1.1", "packages.pkg");
+    dm.start("http://www.vle-project.org/pub/1.2", "packages.pkg");
     dm.join();
 
     BOOST_CHECK(dm.isFinish());

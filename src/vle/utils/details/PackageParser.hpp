@@ -47,9 +47,9 @@ namespace vle { namespace utils {
  *
  *     vle::utils::PackageParser parser;
  *
- *     parser.extract("/home/homer/.vle/package.1.1");
- *     parser.extract("/home/homer/.vle/package.1.1.vle");
- *     parser.extract("/home/homer/.vle/package.1.1.record");
+ *     parser.extract("/home/homer/.vle/package.1.2");
+ *     parser.extract("/home/homer/.vle/package.1.2.vle");
+ *     parser.extract("/home/homer/.vle/package.1.2.record");
  *
  *     std::copy(parser.begin(),
  *               parser.end(),

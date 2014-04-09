@@ -83,23 +83,23 @@ if (${_find_vle_using_cmake})
   find_path(_vle_base_include zlib.h PATHS
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/include")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;Path]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.2.0;]/include")
 
   find_path(_vle_base_bin zlib1.dll PATHS
     $ENV{VLE_BASEPATH}/bin
     ${VLE_BASEPATH_LOCAL}/bin
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/bin")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;Path]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.2.0;]/bin")
 
   find_path(_vle_base_lib libz.dll.a PATHS
     $ENV{VLE_BASEPATH}/lib
     ${VLE_BASEPATH_LOCAL}/lib
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;Path]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.1.0;]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.1.0;]/lib")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;Path]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.2.0;]/lib")
 
   if (${_vle_debug})
     message (" vle_debug _vle_base_include ${_vle_base_include}")
@@ -112,7 +112,7 @@ if (${_find_vle_using_cmake})
   endif ()
 
   set(VLE_INCLUDE_DIRS
-    ${_vle_base_include}/vle-1.1;
+    ${_vle_base_include}/vle-1.2;
     ${_vle_base_include}; ${_vle_base_include}/libxml2;
     ${_vle_base_include}/glibmm-2.4;${_vle_base_lib}/glibmm-2.4/include;
     ${_vle_base_include}/sigc++-2.0;${_vle_base_lib}/sigc++-2.0/include;
@@ -122,10 +122,10 @@ if (${_find_vle_using_cmake})
     ${_vle_base_bin};${_vle_base_lib})
 
   set (VLE_LIBRARIES
-    vle-1.1 xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
+    vle-1.2 xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
 else (${_find_vle_using_cmake})
   find_package(PkgConfig REQUIRED)
-  PKG_CHECK_MODULES(VLE vle-1.1)
+  PKG_CHECK_MODULES(VLE vle-1.2)
 endif (${_find_vle_using_cmake})
 
 
