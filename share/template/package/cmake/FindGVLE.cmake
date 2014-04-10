@@ -21,6 +21,8 @@
 #
 # CMake variables used by this module:
 #
+#  VLE_ABI_VERSION       - gives the VLE version to search for (e.g 1.1, 1.2)
+#                          (REQUIRED)
 #  GVLE_DEBUG            - If true, prints debug traces
 #                          (default OFF)
 #  GVLE_USING_CMAKE      - If true, on windows, use cmake for finding GVLE,
@@ -42,17 +44,21 @@
 #
 #=============================================================================
 #
-# Changelog
-# ---------
-#
-# 1.0 Initial version.
-#
 # Usage
 # -----
 #
+# set(VLE_ABI_VERSION 1.2)
 # find_package(GVLE REQUIRED)
 #
 #=============================================================================
+
+#
+# Check VLE_ABI_VERSION
+#
+
+if (NOT DEFINED VLE_ABI_VERSION)
+  message (FATAL_ERROR "Cmake variable VLE_ABI_VERSION is not set")
+endif ()
 
 #
 # Set default behavior of find gvle
@@ -82,23 +88,23 @@ if (${_find_gvle_using_cmake})
   find_path(_gvle_base_include zlib.h PATHS
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;Path]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.2.0;]/include")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/include")
 
   find_path(_gvle_base_bin zlib1.dll PATHS
     $ENV{VLE_BASEPATH}/bin
     ${VLE_BASEPATH_LOCAL}/bin
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;Path]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.2.0;]/bin")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/bin")
 
   find_path(_gvle_base_lib libz.dll.a PATHS
     $ENV{VLE_BASEPATH}/lib
     ${VLE_BASEPATH_LOCAL}/lib
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;Path]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE 1.2.0;]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE 1.2.0;]/lib")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/lib")
 
   if (${_gvle_debug})
     message (" gvle_debug _gvle_base_include ${_gvle_base_include}")
@@ -111,7 +117,7 @@ if (${_find_gvle_using_cmake})
   endif ()
 
   set(GVLE_INCLUDE_DIRS
-    ${_gvle_base_include}/vle-1.2; ${_gvle_base_include};
+    ${_gvle_base_include}/vle-${VLE_ABI_VERSION}; ${_gvle_base_include};
     ${_gvle_base_include}/gtkmm-2.4;${_gvle_base_lib}/gtkmm-2.4/include;
     ${_gvle_base_include}/cairomm-1.0;${_gvle_base_lib}/cairomm-1.0/include;
     ${_gvle_base_include}/atkmm-1.6;
@@ -134,13 +140,14 @@ if (${_find_gvle_using_cmake})
     c:/devel/dist/win32/lipng-1.4.3-1/lib)
 
   set (GVLE_LIBRARIES
-    gvle-1.2 gtkmm-2.4 vle-1.2 atkmm-1.6 gdkmm-2.4 giomm-2.4 pangomm-1.4
-    gtk-win32-2.0 cairomm-1.0 gdk-win32-2.0 atk-1.0 gio-2.0 pangowin32-1.0
-    gdi32 pangocairo-1.0 gdk_pixbuf-2.0 png14 pango-1.0 gmodule-2.0 cairo
-    xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
+    gvle-${VLE_ABI_VERSION} gtkmm-2.4 vle-${VLE_ABI_VERSION} atkmm-1.6
+    gdkmm-2.4 giomm-2.4 pangomm-1.4 gtk-win32-2.0 cairomm-1.0 gdk-win32-2.0
+    atk-1.0 gio-2.0 pangowin32-1.0 gdi32 pangocairo-1.0 gdk_pixbuf-2.0 png14
+    pango-1.0 gmodule-2.0 cairo xml2 glibmm-2.4 gobject-2.0 sigc-2.0
+    gthread-2.0 glib-2.0 intl)
 else () # find gvle using pkg-config
   find_package(PkgConfig REQUIRED)
-  PKG_CHECK_MODULES(GVLE gvle-1.2)
+  PKG_CHECK_MODULES(GVLE gvle-${VLE_ABI_VERSION})
 endif ()
 
 # handle the QUIETLY and REQUIRED arguments and set GVLE_FOUND to TRUE if all
