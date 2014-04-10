@@ -26,6 +26,11 @@
  * IN THE SOFTWARE.
  */
 
+/*
+ * @@tagdynamic@@
+ * @@tagdepends:@@endtagdepends
+ */
+
 #include <vle/value/Value.hpp>
 #include <vle/devs/Dynamics.hpp>
 
