@@ -134,7 +134,7 @@ if (${_find_gvle_using_cmake})
     c:/devel/dist/win32/lipng-1.4.3-1/lib)
 
   set (GVLE_LIBRARIES
-    gvle-1.2 gtkmm-2.4 vle-1.1 atkmm-1.6 gdkmm-2.4 giomm-2.4 pangomm-1.4
+    gvle-1.2 gtkmm-2.4 vle-1.2 atkmm-1.6 gdkmm-2.4 giomm-2.4 pangomm-1.4
     gtk-win32-2.0 cairomm-1.0 gdk-win32-2.0 atk-1.0 gio-2.0 pangowin32-1.0
     gdi32 pangocairo-1.0 gdk_pixbuf-2.0 png14 pango-1.0 gmodule-2.0 cairo
     xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0 glib-2.0 intl)
