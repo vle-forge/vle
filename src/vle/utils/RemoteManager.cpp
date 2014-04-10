@@ -247,19 +247,19 @@ public:
         {
             boost::match_results < std::string::const_iterator > what;
 
-            if (boost::regex_match(pkg.name,
-                                   what,
-                                   expression,
-                                   boost::match_default |
-                                   boost::match_partial)) {
+            if (boost::regex_search(pkg.name,
+                                    what,
+                                    expression,
+                                    boost::match_default |
+                                    boost::match_partial)) {
                 return false;
             }
 
-            if (boost::regex_match(pkg.description,
-                                   what,
-                                   expression,
-                                   boost::match_default |
-                                   boost::match_partial)) {
+            if (boost::regex_search(pkg.description,
+                                    what,
+                                    expression,
+                                    boost::match_default |
+                                    boost::match_partial)) {
                 return false;
             }
 
