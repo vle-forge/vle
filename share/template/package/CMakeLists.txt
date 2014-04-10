@@ -46,18 +46,13 @@ INCLUDE(CheckLibraryExists)
 INCLUDE(CMakeDetermineCCompiler)
 
 ##
-## Check libraries with pkgconfig
+## Check VLE and package dependencies
 ##
 
 set(VLE_DEBUG 0)
-find_package(VLE REQUIRED)
-
-##
-## Check VLE's packages
-##
-
-set (VleUtils_DIR "${CMAKE_SOURCE_DIR}/cmake")
 set(VLE_ABI_VERSION 1.2)
+find_package(VLE REQUIRED)
+set (VleUtils_DIR "${CMAKE_SOURCE_DIR}/cmake")
 find_package(VleUtils REQUIRED)
 VleCheckDependencies()
 
