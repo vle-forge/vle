@@ -443,6 +443,14 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
 
     {
         vle::utils::Packages pkgs;
+        rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, ".*", &output);
+        rmt.join();
+        rmt.getResult(&pkgs);
+        BOOST_REQUIRE_EQUAL(pkgs.size(), 10u);
+    }
+
+    {
+        vle::utils::Packages pkgs;
         rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "name.*", &output);
         rmt.join();
         rmt.getResult(&pkgs);
@@ -451,11 +459,10 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
 
     {
         vle::utils::Packages pkgs;
-        rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, ".*0", &output);
+        rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "0$", &output);
         rmt.join();
         rmt.getResult(&pkgs);
         BOOST_REQUIRE_EQUAL(pkgs.size(), 1u);
-
     }
 
     {
@@ -468,7 +475,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
 
     {
         vle::utils::Packages pkgs;
-        rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, ".*[1|2]", &output);
+        rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "[1|2]$", &output);
         rmt.join();
         rmt.getResult(&pkgs);
         BOOST_REQUIRE_EQUAL(pkgs.size(), 2u);
