@@ -1504,8 +1504,6 @@ void CoupledModel::order()
     int iteration = 0;
 
     while (correct == false and iteration <= 5000) {
-        correct = true;
-
         for (ModelList::iterator it = m_modelList.begin();
              it != m_modelList.end(); ++it) {
             it->second->setForce(0.0, 0.0);
