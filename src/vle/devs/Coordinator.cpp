@@ -216,7 +216,7 @@ void Coordinator::addObservableToView(vpz::AtomicModel* model,
     if (not simulator) {
         throw utils::InternalError(fmt(_(
                 "The simulator of the model '%1%' does not exist")) %
-            simulator->getStructure()->getName());
+            model->getName());
     }
 
     View* obs = it->second;
