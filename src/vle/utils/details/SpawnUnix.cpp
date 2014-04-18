@@ -86,10 +86,7 @@ static char ** prepare_environment_variable(void)
         size++;
     }
 
-    result = (char **)malloc((size + 1) * sizeof(char *));
-    if (!result) {
-        return NULL;
-    }
+    result = new char*[size + 1];
 
     it = ::environ;
     jt = result;
