@@ -225,11 +225,10 @@ public:
         char **localenvp = prepare_environment_variable();
         char **localargv = convert_string_str_array(args);
 
-        if (::execve(exe.c_str(), localargv, localenvp) == -1) {
-            free_str_array(localargv);
-            free_str_array(localenvp);
-            exit(-1); /* Kill the child. */
-        }
+        ::execve(exe.c_str(), localargv, localenvp);
+        free_str_array(localargv);
+        free_str_array(localenvp);
+        std::abort();
 
         return false;
     }
