@@ -236,7 +236,7 @@ int main(int argc, char **argv)
     vle::Init app;
 
     if ((result = mvle_mpi_init(&argc, &argv, &rank, &world))) {
-        int vpz;
+        int vpz = 0;
         vle::utils::Package pack;
         if ((result = mvle_parse_arg(argc, argv, &vpz, &show, pack))) {
             if (show) {
