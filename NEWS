@@ -36,6 +36,25 @@ depends of an MPI library.
 
 Switch VLE to Github.
 
+Changes from vle-1.1.1
+======================
+
+Gauthier Quesnel (8):
+
+- github: add travis hooks config
+- utils: fix regular expression in unit test package
+- utils: fix deallocated memory in SpawnUnix
+- devs: fix a potential segfault in Coordinator
+- vpz: remove useless assignment in CoupledModel
+- mvle: assign a default value to the number of VPZ
+- utils: simplify source in SpawnUnix
+- cpack: fix installation of gtksourceview directory
+
+Ronan Trépos (2):
+
+- utils: fix messages in ModuleManager
+- utils: remove extra test of finished spawn
+
 Changes from vle-1.1.0
 ======================
 
