@@ -109,6 +109,7 @@ if (CPACK_GENERATOR MATCHES "NSIS")
   install(DIRECTORY "${VLE_GTK_PATH}/etc\\\\pango" DESTINATION etc)
   install(DIRECTORY "${VLE_GTK_PATH}/share\\\\locale" DESTINATION share)
   install(DIRECTORY "${VLE_GTK_PATH}/share\\\\themes" DESTINATION share)
+  install(DIRECTORY "${VLE_GTK_PATH}/share\\\\gtksourceview-2.0" DESTINATION share)
   install(DIRECTORY "${VLE_GTK_PATH}/include/" DESTINATION include)
   install(DIRECTORY "${VLE_GTK_PATH}/redist/" DESTINATION bin)
   install(DIRECTORY "${VLE_GTK_PATH}/lib/" DESTINATION lib
