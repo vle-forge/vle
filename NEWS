@@ -1,9 +1,52 @@
-VLE 1.2.0-dev
-=============
-
+VLE 1.2.0
+=========
 
 ## Release highlights
 
+- The begin and duration simulation parameters are availables as conditions
+  (into a global condition named simulation\_engine). They can be used into
+  experimental frames with VLE, MVLE, GVLE, RVLE and PyVLE. However, these
+  changes break the compatibility between VLE 1.1 and VLE 1.2. So, we provide a
+  script to convert your old VPZ 1.1 to the new syntax. This script is
+  available in the source of VLE or in the the scripts directory in your
+  installation.
+
+   Usage: convert-vpz11-vpz12.py [[file.vpz] ...]
+          convert-vpz11-vpz12.py vle.examples/exp/*.vpz
 
 
 ## Changes from vle-1.1
+
+Gauthier Quesnel (16):
+
+- github: add travis hooks config
+- github: update travis configuration
+- github: add universe repository to travis
+- switch to vle 1.1.999
+- AUTHORS: update
+- Switch to 2014
+- gvle: update AUTHORS
+- gvle: update website
+- scripts: adding script to convert vpz 1.1 to 1.2
+- vle: switch API/ABI to 1.2
+- utils: fix regular expression in unit test package
+- utils: fix deallocated memory in SpawnUnix
+- devs: fix a potential segfault in Coordinator
+- vpz: remove useless assignment in CoupledModel
+- mvle: assign a default value to the number of VPZ
+- utils: simplify source in SpawnUnix
+
+Patrick Chabrier (1):
+
+- gvle: fix the matrix value editor
+
+Ronan Trépos (8):
+
+- vpz: set duration and begin into the conditions
+- utils: fix messages in ModuleManager
+- utils: remove extra test of finished spawn
+- template package: generalize the compilation
+- template: fix  FindGVLE.cmake
+- template: generalize Find*VLE.cmake files
+- win32: fix the VleUtilsConfig.cmake file
+- template: fix VleUtilsConfig.cmake script
