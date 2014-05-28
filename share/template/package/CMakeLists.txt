@@ -50,7 +50,7 @@ INCLUDE(CMakeDetermineCCompiler)
 ##
 
 set(VLE_DEBUG 0)
-set(VLE_ABI_VERSION 1.2)
+set(VLE_ABI_VERSION 1.3)
 find_package(VLE REQUIRED)
 set (VleUtils_DIR "${CMAKE_SOURCE_DIR}/cmake")
 find_package(VleUtils REQUIRED)
