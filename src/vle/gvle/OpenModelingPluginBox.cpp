@@ -70,7 +70,11 @@ int OpenModelingPluginBox::run()
     build();
     mDialog->set_title("Modeling plugin list");
     mDialog->show_all();
-    return mDialog->run();
+
+    int result = mDialog->run();
+    mDialog->hide();
+
+    return result;
 }
 
 void OpenModelingPluginBox::build()
