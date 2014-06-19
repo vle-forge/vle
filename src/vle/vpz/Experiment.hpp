@@ -192,8 +192,6 @@ namespace vle { namespace vpz {
         const std::string& combination() const
         { return m_combination; }
 
-    private:
-
         /**
          * @brief get the default engine simulation condition name
          * @return the default engine simulation condition name
@@ -203,6 +201,7 @@ namespace vle { namespace vpz {
             return "simulation_engine";
         }
 
+    private:
         std::string         m_name;
         std::string         m_combination;
         Conditions          m_conditions;

@@ -26,10 +26,19 @@
 
 
 #include <vle/vpz/Conditions.hpp>
+#include <vle/vpz/Experiment.hpp>
 #include <vle/utils/Algo.hpp>
 #include <algorithm>
 
 namespace vle { namespace vpz {
+
+Conditions::Conditions()
+{
+    Condition& def= add(Experiment::defaultSimulationEngineCondName());
+
+    def.addValueToPort("begin", new value::Double(0.0));
+    def.addValueToPort("duration", new value::Double(100.0));
+}
 
 std::set < std::string > Conditions::getKeys()
 {
@@ -90,16 +99,20 @@ Condition& Conditions::add(const Condition& condition)
 
 void Conditions::del(const std::string& condition)
 {
-    m_list.erase(condition);
+    if (condition != Experiment::defaultSimulationEngineCondName())
+        m_list.erase(condition);
 }
 
 void Conditions::rename(const std::string& oldconditionname,
                         const std::string& newconditionname)
 {
-    Condition c = get(oldconditionname);
-    c.setName(newconditionname);
-    add(c);
-    del(oldconditionname);
+    if ((oldconditionname != Experiment::defaultSimulationEngineCondName())
+        && newconditionname != Experiment::defaultSimulationEngineCondName()) {
+        Condition c = get(oldconditionname);
+        c.setName(newconditionname);
+        add(c);
+        del(oldconditionname);
+    }
 }
 
 void Conditions::copy(const std::string& conditionname,
@@ -108,6 +121,25 @@ void Conditions::copy(const std::string& conditionname,
     Condition c = get(conditionname);
     c.setName(copyconditionname);
     add(c);
+}
+
+void Conditions::clear()
+{
+    iterator it = m_list.begin();
+
+    if (it == m_list.end()) {
+        Condition& def= add(Experiment::defaultSimulationEngineCondName());
+        def.addValueToPort("begin", new value::Double(0.0));
+        def.addValueToPort("duration", new value::Double(100.0));
+    } else {
+        do {
+            iterator tmp = it;
+            ++it;
+
+            if (tmp->first != Experiment::defaultSimulationEngineCondName())
+                m_list.erase(tmp);
+        } while (it != m_list.end());
+    }
 }
 
 const Condition& Conditions::get(const std::string& condition) const

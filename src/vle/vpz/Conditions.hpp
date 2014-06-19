@@ -65,10 +65,10 @@ namespace vpz {
         typedef ConditionList::value_type value_type;
 
         /**
-         * @brief Build a new vpz::Conditions.
+         * @brief Build a new @e vpz::Conditions with the default simulation
+         * engine condition to manage the @c begin and @c duration ports.
          */
-        Conditions()
-        {}
+        Conditions();
 
         /**
          * @brief Nothing to delete.
@@ -79,7 +79,7 @@ namespace vpz {
         /**
          * @brief A operator to retrieve the list of keys
          *
-         * @return vector of Dynamic names
+         * @return vector of Dynamic nam:e es
          */
         std::set < std::string > getKeys();
 
@@ -166,8 +166,7 @@ namespace vpz {
         /**
          * @brief Clear the ConditionList object.
          */
-        inline void clear()
-        { m_list.clear(); }
+        void clear();
 
         /**
          * @brief Return true if the name already exist in the ConditionList.
