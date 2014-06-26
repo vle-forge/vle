@@ -48,7 +48,7 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
-    
+
     mColumn = append_column_editable(_("Initial conditions"),
 				     mColumns.m_col_name);
     mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
@@ -72,28 +72,28 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
     set_has_tooltip();
     signal_query_tooltip().connect(
         sigc::mem_fun(*this, &ConditionsBox::ConditionsTreeView::onQueryTooltip));
-    
+
 }
 
 void ConditionsBox::ConditionsTreeView::makeMenus () {
     mPopupActionGroup = Gtk::ActionGroup::create("ConditionsTreeView");
     mPopupActionGroup->add(Gtk::Action::create("CTV_ContextMenu", _("Context Menu")));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("CTV_ContextAdd", _("_Add")),
         sigc::mem_fun(*this, &ConditionsBox::ConditionsTreeView::on_add));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("CTV_ContextRemove", _("_Remove")),
         sigc::mem_fun(*this, &ConditionsBox::ConditionsTreeView::on_remove));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("CTV_ContextRename", _("_Rename")),
         sigc::mem_fun(*this, &ConditionsBox::ConditionsTreeView::onRename));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("CTV_ContextCopy", _("_Copy")),
         sigc::mem_fun(*this, &ConditionsBox::ConditionsTreeView::onCopy));
-    
+
     mUIManager = Gtk::UIManager::create();
     mUIManager->insert_action_group(mPopupActionGroup);
-    
+
     Glib::ustring name_item = "";
     Glib::ustring ui_info =
           "<ui>"
@@ -108,21 +108,21 @@ void ConditionsBox::ConditionsTreeView::makeMenus () {
     utils::ModuleList lst;
     utils::ModuleList::iterator it;
     mParent->getGVLE()->pluginFactory().getGvleModelingPlugins(&lst);
-    
+
     mPopupActionGroup->add(Gtk::Action::create("CTV_ContextEdit", _("_Edit")));
     for (it = lst.begin(); it != lst.end(); ++it) {
-        name_item ="CTV_Edit_" + it->package + "_" + it->library; 
-         
+        name_item ="CTV_Edit_" + it->package + "_" + it->library;
+
         mPopupActionGroup->add(Gtk::Action::create(name_item, it->package + "/" + it->library),
             sigc::bind<std::string>(sigc::mem_fun(
                     *this, &ConditionsBox::ConditionsTreeView::onEdit),
                     it->package + "/" + it->library));
-        
+
         ui_info = ui_info + ""
 	  "      <menuitem action='" + name_item + "'/>";
     }
     //// Fin Partie importer depuis ex ConditionsBox::ConditionsTreeView::makeMenuEdit
-    
+
     ui_info = ui_info + ""
           "    </menu>"
           "  </popup>"
@@ -135,7 +135,7 @@ void ConditionsBox::ConditionsTreeView::makeMenus () {
     } catch(const Glib::Error& ex) {
         std::cerr << "building menus failed: CTView_Popup " <<  ex.what();
     }
-    
+
     if (!mMenuPopup)
         std::cerr << "not a menu : CTView_Popup\n" ;
 }
@@ -366,22 +366,22 @@ ConditionsBox::PortsTreeView::PortsTreeView(
 void ConditionsBox::PortsTreeView::makeMenus () {
     mPopupActionGroup = Gtk::ActionGroup::create("PortsTreeView");
     mPopupActionGroup->add(Gtk::Action::create("PTV_ContextMenu", _("Context Menu")));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("PTV_ContextAdd", _("_Add")),
         sigc::mem_fun(*this, &ConditionsBox::PortsTreeView::on_add));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("PTV_ContextRemove", _("_Remove")),
         sigc::mem_fun(*this, &ConditionsBox::PortsTreeView::on_remove));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("PTV_ContextRename", _("_Rename")),
         sigc::mem_fun(*this, &ConditionsBox::PortsTreeView::onRename));
-    
+
     mPopupActionGroup->add(Gtk::Action::create("PTV_ContextDuplicate", _("_Duplicate")),
         sigc::mem_fun(*this, &ConditionsBox::PortsTreeView::onDuplicate));
-    
+
     mUIManager = Gtk::UIManager::create();
     mUIManager->insert_action_group(mPopupActionGroup);
-    
+
     Glib::ustring name_item = "";
     Glib::ustring ui_info =
           "<ui>"
@@ -391,12 +391,12 @@ void ConditionsBox::PortsTreeView::makeMenus () {
           "    <menuitem action='PTV_ContextRename'/>"
           "    <menuitem action='PTV_ContextDuplicate'/>"
           "    <menu action='PTV_ContextEdit'>";
-    
+
     //// Partie importer depuis ex ConditionsBox::PortsTreeView::makeMenuEdit
     utils::ModuleList lst;
     utils::ModuleList::iterator it;
     mParent->getGVLE()->pluginFactory().getGvleModelingPlugins(&lst);
-    
+
     mPopupActionGroup->add(Gtk::Action::create("PTV_ContextEdit", _("_Edit")));
     for (it = lst.begin(); it != lst.end(); ++it) {
         name_item ="PTV_Edit_" + it->package + "_" + it->library;
@@ -404,12 +404,12 @@ void ConditionsBox::PortsTreeView::makeMenus () {
             sigc::bind<std::string>(sigc::mem_fun(
                     *this, &ConditionsBox::PortsTreeView::onEdit),
                     it->package + "/" + it->library));
-	       
+
         ui_info = ui_info + ""
 	  "      <menuitem action='" + name_item + "'/>";
     }
     //// Fin Partie importer depuis ex ConditionsBox::PortsTreeView::makeMenuEdit
-    
+
     ui_info = ui_info + ""
           "    </menu>"
           "  </popup>"
@@ -422,7 +422,7 @@ void ConditionsBox::PortsTreeView::makeMenus () {
     } catch(const Glib::Error& ex) {
         std::cerr << "building menus failed: PTView_Popup" <<  ex.what();
     }
-    
+
     if (!mMenuPopup)
         std::cerr << "menu not found : PTView_Popup\n";
 }
@@ -646,7 +646,7 @@ ConditionsBox::ConditionsBox(const Glib::RefPtr < Gtk::Builder >& xml,
     m_xml->get_widget_derived("simuTreePorts", m_treePorts);
     m_treePorts->setParent(this);
     m_treePorts->makeMenus ();
-    
+
     m_xml->get_widget_derived("simuTreeValues", m_treeValues);
 
     xml->get_widget("ButtonConditionsCancel", mButtonCancel);
@@ -681,10 +681,17 @@ void ConditionsBox::buildTreePorts(const std::string& conditionName)
 void ConditionsBox::buildTreeValues(const std::string& conditionName,
 				    const std::string& portName)
 {
-    value::Set& values(mConditions->get(conditionName).getSetValues(portName));
+    const vpz::ConditionValues& list =
+        mConditions->get(conditionName).conditionvalues();
 
-    m_treeValues->setCondition(&mConditions->get(conditionName));
-    m_treeValues->makeTreeView(values);
+    if (list.find(portName) != list.end()) {
+
+        value::Set& values(mConditions->get(
+                               conditionName).getSetValues(portName));
+
+        m_treeValues->setCondition(&mConditions->get(conditionName));
+        m_treeValues->makeTreeView(values);
+    }
 }
 
 int ConditionsBox::run(const vpz::Conditions& conditions)
