@@ -103,7 +103,7 @@ void DynamicBox::show(vpz::Dynamic* dyn)
 
 void DynamicBox::makeComboLibrary()
 {
-    mComboLibrary->clear();
+    mComboLibrary->remove_all();
 
     utils::ModuleList lst;
     utils::ModuleList::iterator it;
@@ -120,7 +120,7 @@ void DynamicBox::makeComboLibrary()
 
 void DynamicBox::makeComboPackage()
 {
-    mComboPackage->clear();
+    mComboPackage->remove_all();
 
     utils::PathList paths = utils::Path::path().getBinaryPackages();
 
