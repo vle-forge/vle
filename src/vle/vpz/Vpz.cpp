@@ -64,6 +64,7 @@ void Vpz::write(std::ostream& out) const
 
 void Vpz::parseFile(const std::string& filename)
 {
+    project().experiment().conditions().deleteValueSet();
     m_filename.assign(filename);
     vpz::SaxParser saxparser(*this);
 
@@ -79,10 +80,17 @@ void Vpz::parseFile(const std::string& filename)
         }
         throw utils::SaxParserError(sax.what());
     }
+    Condition& cond_sim = project().experiment().conditions().get(
+            Experiment::defaultSimulationEngineCondName());
+    if (cond_sim.getSetValues("begin").empty()) {
+        cond_sim.getSetValues("begin").add(value::Double(0));
+        cond_sim.getSetValues("duration").add(value::Double(100));
+    }
 }
 
 void Vpz::parseMemory(const std::string& buffer)
 {
+    project().experiment().conditions().deleteValueSet();
     m_filename.clear();
 
     vpz::SaxParser saxparser(*this);
@@ -96,6 +104,12 @@ void Vpz::parseMemory(const std::string& buffer)
                                         sax.what());
         }
         throw utils::SaxParserError(sax.what());
+    }
+    Condition& cond_sim = project().experiment().conditions().get(
+                Experiment::defaultSimulationEngineCondName());
+    if (cond_sim.getSetValues("begin").empty()) {
+        cond_sim.getSetValues("begin").add(value::Double(0));
+        cond_sim.getSetValues("duration").add(value::Double(100));
     }
 }
 
