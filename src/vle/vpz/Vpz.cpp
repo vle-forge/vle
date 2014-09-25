@@ -38,7 +38,15 @@ namespace vle { namespace vpz {
 Vpz::Vpz(const std::string& filename) :
     m_filename(filename)
 {
+    project().experiment().conditions().deleteValueSet();
     parseFile(filename);
+    Condition& cond_sim = project().experiment().conditions().get(
+            Experiment::defaultSimulationEngineCondName());
+    if (cond_sim.getSetValues("begin").empty()) {
+        cond_sim.getSetValues("begin").add(value::Double(0));
+        cond_sim.getSetValues("duration").add(value::Double(100));
+    }
+
 }
 
 Vpz::Vpz(const Vpz& vpz) :

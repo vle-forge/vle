@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\" duration=\"0.33\">\n"
+        " <experiment name=\"test1\">\n"
         "  <conditions>"
         "   <condition name=\"simulation_engine\" >"
         "    <port name=\"begin\" >"
@@ -235,6 +235,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         "</vle_project>\n";
 
     vpz::Vpz vpz;
+    vpz.project().experiment().conditions().deleteValueSet();
     vpz.parseMemory(xml);
 
     const vpz::Project& project(vpz.project());
@@ -321,7 +322,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\" duration=\"0.33\">\n"
+        " <experiment name=\"test1\">\n"
         "  <views>\n"
         "   <outputs>\n"
         "    <output name=\"x\" format=\"local\" "
