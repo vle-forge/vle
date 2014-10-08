@@ -36,8 +36,8 @@ TupleBox::TupleBox(value::Tuple* t) :
     Gtk::Dialog("Tuple", true, true),
     mValue(t)
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
-    add_button(Gtk::Stock::OK, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
 
     mScroll = new Gtk::ScrolledWindow();
     mScroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
