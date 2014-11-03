@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(check_null)
         *it = 0;
     }
     it = std::remove_if(st->value().begin(), st->value().end(),
-                        std::bind2nd(std::equal_to <value::Value*>(), 0));
+                        std::bind2nd(std::equal_to <value::Value*>(), NULL));
 
     st->value().erase(it, st->value().end());
 

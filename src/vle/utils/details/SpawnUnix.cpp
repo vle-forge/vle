@@ -35,6 +35,11 @@
 #include <cstdlib>
 #include <algorithm>
 
+#ifdef __APPLE__
+ #include <crt_externs.h>
+ extern "C" char ** environ = *_NSGetEnviron();
+#endif
+
 namespace vle { namespace utils {
 
 const unsigned long int Spawn::default_buffer_size = BUFSIZ;
