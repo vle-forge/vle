@@ -529,8 +529,8 @@ namespace vle { namespace vpz {
         {
             AttachModel(CoupledModel* model) : model(model) { }
 
-            inline void operator()(const ModelList::value_type& value)
-            { model->attachModel(value.second); }
+            inline void operator()(const ModelList::value_type& val)
+            { model->attachModel(val.second); }
 
             CoupledModel*   model;
         };
