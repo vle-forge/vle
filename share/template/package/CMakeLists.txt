@@ -111,15 +111,25 @@ ENDIF (DOXYGEN AND WITH_DOC)
 ## Subdirectory
 ##
 
-add_subdirectory(data)
-if (WITH_DOC)
-  add_subdirectory(doc)
+if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data")
+  add_subdirectory(data)
 endif ()
-add_subdirectory(exp)
-add_subdirectory(src)
+if (WITH_DOC)
+  if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+    add_subdirectory(doc)
+  endif ()
+endif ()
+if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/exp")
+  add_subdirectory(exp)
+endif ()
+if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src")
+  add_subdirectory(src)
+endif ()
 
 if (Boost_UNIT_TEST_FRAMEWORK_FOUND AND WITH_TEST)
-  add_subdirectory(test)
+  if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test")
+    add_subdirectory(test)
+  endif ()
 endif (Boost_UNIT_TEST_FRAMEWORK_FOUND AND WITH_TEST)
 
 ##
