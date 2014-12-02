@@ -1,7 +1,13 @@
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS})
+if (VLE_HAVE_CAIRO) 
+  include_directories(${VLE_CAIROMM_DEP_INCLUDE_DIRS})
+endif ()
 
 link_directories(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+if (VLE_HAVE_CAIRO) 
+  link_directories(${VLE_CAIROMM_DEP_LIBRARY_DIRS})
+endif ()
 
 
 
@@ -55,9 +61,14 @@ set_target_properties(vlelib PROPERTIES
   COMPILE_DEFINITIONS "VLE_DLL"
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
   CLEAN_DIRECT_OUTPUT 1)
+if (VLE_HAVE_CAIRO) 
+  target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
+    ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES} ${VLE_CAIROMM_DEP_LIBRARIES})
+else ()
+  target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
+    ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
+endif ()
 
-target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
-  ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
