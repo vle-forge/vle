@@ -384,7 +384,11 @@ macro (VleBuildDynamic _dynname _cppfiles)
                                "package into the Description.txt file")
         endif ()
         set(__include_dirs "${__include_dirs};${${__vle_pkg_dep}_INCLUDE_DIRS}")
-        set(__libraries "${__libraries};${${__vle_pkg_dep}_LIBRARIES}")
+        if (NOT ${__libraries} STREQUAL "")
+          set(__libraries "${__libraries};${${__vle_pkg_dep}_LIBRARIES}")
+        else ()
+          set(__libraries "${${__vle_pkg_dep}_LIBRARIES}")
+        endif ()
       endif ()    
     endforeach ()
     if (_vle_debug)
@@ -397,11 +401,17 @@ macro (VleBuildDynamic _dynname _cppfiles)
   endif ()
   link_directories(${VLE_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
   add_library(${_dynname} MODULE ${__cppfilesarg})
-  target_include_directories(${_dynname} PUBLIC
+  if (CMAKE_VERSION VERSION_LESS 2.8.12)
+    include_directories(
+      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};"
+      "${Boost_INCLUDE_DIRS};${__include_dirs}")
+  else ()
+    target_include_directories(${_dynname} PUBLIC
      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};"
      "${Boost_INCLUDE_DIRS};${__include_dirs}")
-  target_link_libraries(${_dynname} "${__libraries};${VLE_LIBRARIES};"
-                                    "${Boost_LIBRARIES}")
+  endif ()
+  target_link_libraries(${_dynname} ${__libraries} ${VLE_LIBRARIES}
+                                    ${Boost_LIBRARIES})
   install(TARGETS ${_dynname}
                  RUNTIME DESTINATION plugins/simulator
                  LIBRARY DESTINATION plugins/simulator)
@@ -414,8 +424,13 @@ macro (VleBuildTest _testname _cppfile)
     ${VLE_LIBRARY_DIRS}
     ${Boost_LIBRARY_DIRS})
   add_executable(${_testname} ${_cppfile})
-  target_include_directories(${_testname} PUBLIC
-    "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
+  if (CMAKE_VERSION VERSION_LESS 2.8.12)
+    include_directories(
+      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
+  else ()
+    target_include_directories(${_testname} PUBLIC
+      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
+  endif ()
   target_link_libraries(${_testname}
     ${VLE_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -429,9 +444,16 @@ endmacro (VleBuildTest)
 macro (VleBuildOovPlugin _pluginname _cppfile)
   link_directories(${VLE_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
   add_library(${_pluginname} SHARED ${_cppfile})
-  target_include_directories(${_pluginname} PUBLIC 
-         "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS};"
-         "${CMAKE_BINARY_DIR}/src")
+  if (CMAKE_VERSION VERSION_LESS 2.8.12)
+    include_directories(
+       "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS};"
+       "${CMAKE_BINARY_DIR}/src")
+  else ()
+    target_include_directories(${_pluginname} PUBLIC
+       "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS};"
+       "${CMAKE_BINARY_DIR}/src")
+  endif ()
+
   target_link_libraries(${_pluginname} ${VLE_LIBRARIES})
   INSTALL(TARGETS ${_pluginname}
     RUNTIME DESTINATION plugins/output
