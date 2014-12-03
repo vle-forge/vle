@@ -52,7 +52,7 @@ INCLUDE(CMakeDetermineCCompiler)
 set(VLE_DEBUG 0)
 set(VLE_ABI_VERSION 1.3)
 find_package(VLE REQUIRED)
-set (VleUtils_DIR "${CMAKE_SOURCE_DIR}/cmake")
+set (VleUtils_DIR "${VLE_SHARE_DIR}/cmake")
 find_package(VleUtils REQUIRED)
 VleCheckDependencies()
 

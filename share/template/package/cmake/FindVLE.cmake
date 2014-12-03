@@ -18,6 +18,7 @@
 #  VLE_INCLUDE_DIRS      - The VLE include directory
 #  VLE_LIBRARY_DIRS      - Directories containing libraries to link
 #  VLE_LIBRARIES         - Link these to use shared libraries of VLE
+#  VLE_SHARE_DIR         - Base directory for VLE shared files
 #
 # CMake variables used by this module:
 #  VLE_ABI_VERSION       - gives the VLE version to search for (e.g 1.1, 1.2)
@@ -131,9 +132,12 @@ if (${_find_vle_using_cmake})
     vle-${VLE_ABI_VERSION} xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0
     glib-2.0 intl)
 
+  set (VLE_SHARE_DIR "${_vle_base_include}/../share/vle-${VLE_ABI_VERSION}")
+
 else (${_find_vle_using_cmake})
   find_package(PkgConfig REQUIRED)
   PKG_CHECK_MODULES(VLE vle-${VLE_ABI_VERSION})
+  set (VLE_SHARE_DIR "${VLE_LIBRARY_DIRS}/../share/vle-${VLE_ABI_VERSION}")
 endif (${_find_vle_using_cmake})
 
 
@@ -141,7 +145,7 @@ endif (${_find_vle_using_cmake})
 # listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(VLE REQUIRED_VARS VLE_INCLUDE_DIRS
-                        VLE_LIBRARIES)
+                        VLE_LIBRARIES VLE_SHARE_DIR)
 
 if (${_vle_debug})
   message (" vle_debug VLE_INCLUDE_DIRS ${VLE_INCLUDE_DIRS}")
