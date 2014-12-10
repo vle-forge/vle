@@ -307,6 +307,55 @@ function(IntVleInstalledPkgVersion in out)
   endforeach () 
 endfunction()
 
+###
+# Get additional dependencies based on @@tagdepends.
+# From cpp file, check the the dependencies and set the additional
+# include dirs and libraries declared in @@tagdepends
+#   in: myFile.cpp
+#   out1: include directories computed from the @@tagdepends into myFile.cpp
+#   out2: libraries computed from the @@tagdepends into myFile.cpp
+###
+
+function(IntVleComputeDependencies in out1 out2)
+  if (DEFINED VLE_DEBUG)
+    set (_vle_debug  ${VLE_DEBUG})
+  else ()
+    set (_vle_debug 0)
+  endif ()
+  file(READ "${in}" __cppcontent)
+  string(REGEX MATCH "@@tagdepends:(.+)@@endtagdepends" __tag_depends ${__cppcontent})
+  set(__include_dirs "")
+  set(__libraries "")
+  if(NOT ${__tag_depends} STREQUAL "")
+    set (__tag_depends ${CMAKE_MATCH_1})
+    string(REGEX REPLACE "," ";" __tag_depends ${CMAKE_MATCH_1})
+    foreach(__vle_pkg_dep IN LISTS __tag_depends)
+      _vle_str_remove_blanks(${__vle_pkg_dep} __vle_pkg_dep)
+      if (NOT ${__vle_pkg_dep} STREQUAL "")
+        if (NOT ${__vle_pkg_dep}_FOUND)
+          message (FATAL_ERROR "Missing pkg '${__vle_pkg_dep}' for building "
+                               "'${__cppfile1}', maybe you forgot to add this "
+                               "package into the Description.txt file")
+        endif ()
+        set(__include_dirs "${__include_dirs};${${__vle_pkg_dep}_INCLUDE_DIRS}")
+        if (NOT ${__libraries} STREQUAL "")
+          set(__libraries "${__libraries};${${__vle_pkg_dep}_LIBRARIES}")
+        else ()
+          set(__libraries "${${__vle_pkg_dep}_LIBRARIES}")
+        endif ()
+      endif ()
+    endforeach ()
+    if (_vle_debug)
+      message(STATUS "Additional include dir for `${_dynname}': "
+                     "${__include_dirs}")
+      message(STATUS "Additional libs to link for `${_dynname}': "
+                     "${__libraries}")
+    endif ()
+  endif ()
+  set (${out1} "${__include_dirs}" PARENT_SCOPE)
+  set (${out2} "${__libraries}" PARENT_SCOPE)
+endfunction()
+
 ######################
 ## user visible macros
 ######################
@@ -368,37 +417,7 @@ macro (VleBuildDynamic _dynname _cppfiles)
   endif ()
   set (__cppfilesarg "${_cppfiles}")
   list(GET __cppfilesarg 0 __cppfile1)
-  file(READ "${__cppfile1}" __cppcontent)
-  string(REGEX MATCH "@@tagdepends:(.+)@@endtagdepends" __tag_depends ${__cppcontent})
-  set(__include_dirs "")
-  set(__libraries "")
-  if(NOT ${__tag_depends} STREQUAL "")
-    set (__tag_depends ${CMAKE_MATCH_1})
-    string(REGEX REPLACE "," ";" __tag_depends ${CMAKE_MATCH_1})
-    foreach(__vle_pkg_dep IN LISTS __tag_depends)
-      _vle_str_remove_blanks(${__vle_pkg_dep} __vle_pkg_dep)
-      if (NOT ${__vle_pkg_dep} STREQUAL "")
-        if (NOT ${__vle_pkg_dep}_FOUND)
-          message (FATAL_ERROR "Missing pkg '${__vle_pkg_dep}' for building "
-                               "'${__cppfile1}', maybe you forgot to add this " 
-                               "package into the Description.txt file")
-        endif ()
-        set(__include_dirs "${__include_dirs};${${__vle_pkg_dep}_INCLUDE_DIRS}")
-        if (NOT ${__libraries} STREQUAL "")
-          set(__libraries "${__libraries};${${__vle_pkg_dep}_LIBRARIES}")
-        else ()
-          set(__libraries "${${__vle_pkg_dep}_LIBRARIES}")
-        endif ()
-      endif ()    
-    endforeach ()
-    if (_vle_debug)
-      message(STATUS "Additional include dir for `${_dynname}': "
-                     "${__include_dirs}")
-      message(STATUS "Additional libs to link for `${_dynname}': "
-                     "${__libraries}")
-    endif ()
-
-  endif ()
+  IntVleComputeDependencies("${__cppfile1}"  __include_dirs __libraries)
   link_directories(${VLE_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
   add_library(${_dynname} MODULE ${__cppfilesarg})
   if (CMAKE_VERSION VERSION_LESS 2.8.12)
