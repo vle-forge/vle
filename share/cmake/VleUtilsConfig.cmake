@@ -81,6 +81,10 @@
 #> find_package(VleUtils REQUIRED)
 #> VleBuildTest(test_pkg "test.cpp")
 #
+# The test.cpp can contain the 'tagdepends', of the form  
+#
+#// @@tagdepends: pkg1,pkg2 @@endtagdepends
+#
 #####
 #
 # VleBuildOovPlugin: it builds a oov plugin from a cpp file
@@ -94,6 +98,16 @@
 # VleBuildAllDyn: for all the cpp files into the current directory,
 #     if the tag "@@tagdynamic@@" is present then it builds a vle dynamic
 #     using VleBuildDynamic.
+#
+#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VleUtils REQUIRED)
+#> VleBuildAllDyn()
+#
+#####
+#
+# VleBuildAllTest: for all the cpp files into the current directory,
+#     if the tag "@@tagtest@@" is present then it builds a vle test
+#     using VleBuildTest.
 #
 #> set(VLE_ABI_VERSION 1.2)
 #> find_package(VleUtils REQUIRED)
@@ -346,10 +360,10 @@ function(IntVleComputeDependencies in out1 out2)
       endif ()
     endforeach ()
     if (_vle_debug)
-      message(STATUS "Additional include dir for `${_dynname}': "
-                     "${__include_dirs}")
-      message(STATUS "Additional libs to link for `${_dynname}': "
-                     "${__libraries}")
+      message(STATUS "IntVleComputeDependencies additional dir for `${in}':
+                        ${__include_dirs}")
+      message(STATUS "IntVleComputeDependencies additional libs for `${in}':
+                        ${__libraries}")
     endif ()
   endif ()
   set (${out1} "${__include_dirs}" PARENT_SCOPE)
@@ -438,23 +452,32 @@ endmacro(VleBuildDynamic)
 
 ##
 
-macro (VleBuildTest _testname _cppfile)
-  link_directories(
-    ${VLE_LIBRARY_DIRS}
-    ${Boost_LIBRARY_DIRS})
-  add_executable(${_testname} ${_cppfile})
+macro (VleBuildTest _testname _cppfiles)
+  if (DEFINED VLE_DEBUG)
+    set (_vle_debug  ${VLE_DEBUG})
+  else ()
+    set (_vle_debug 0)
+  endif ()
+  set (__cppfilesarg "${_cppfiles}")
+  list(GET __cppfilesarg 0 __cppfile1)
+  IntVleComputeDependencies("${__cppfile1}"  __include_dirs __libraries)
+  link_directories(${VLE_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+  add_executable(${_testname} ${_cppfiles})
   if (CMAKE_VERSION VERSION_LESS 2.8.12)
     include_directories(
-      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
+      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};"
+      "${Boost_INCLUDE_DIRS};${__include_dirs}")
   else ()
     target_include_directories(${_testname} PUBLIC
-      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
+     "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};"
+     "${Boost_INCLUDE_DIRS};${__include_dirs}")
   endif ()
   target_link_libraries(${_testname}
-    ${VLE_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-    ${Boost_DATE_TIME_LIBRARY})
+      ${__libraries}
+      ${VLE_LIBRARIES}
+      ${Boost_LIBRARIES}
+      ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+      ${Boost_DATE_TIME_LIBRARY})
   add_test(${_testname} ${_testname})
 endmacro (VleBuildTest)
 
@@ -502,4 +525,32 @@ macro (VleBuildAllDyn)
   endforeach ()
 endmacro (VleBuildAllDyn)
 
+##
 
+macro (VleBuildAllTest)
+  if (DEFINED VLE_DEBUG)
+    set (_vle_debug  ${VLE_DEBUG})
+  else ()
+    set (_vle_debug 0)
+  endif ()
+  file(GLOB __cpp_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
+  if (_vle_debug)
+    message(STATUS "VleBuildAllTest search cpp files into: 
+                    ${CMAKE_CURRENT_SOURCE_DIR}")
+  endif ()
+  foreach(__cppfile ${__cpp_files})
+    if (_vle_debug)
+      message (STATUS "VleBuildAllTest found cpp ${__cppfile}")
+    endif ()
+    file(READ "${__cppfile}" __cppcontent)
+    string(REGEX MATCH "@@tagtest@@+" __tag_test ${__cppcontent})
+    if(NOT ${__tag_test} STREQUAL "")
+      string(REGEX MATCH "(.+).cpp" __libname ${__cppfile})
+      set (__libname ${CMAKE_MATCH_1})
+      if (_vle_debug)
+        message(STATUS "VleBuildAllTest detected test to build: `${__libname}'")
+      endif ()
+      VleBuildTest(${__libname} "${__cppfile}")
+    endif()
+  endforeach ()
+endmacro (VleBuildAllTest)
