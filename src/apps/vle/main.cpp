@@ -244,7 +244,7 @@ static int run_simulation(CmdArgs::const_iterator it,
                                        &error);
 
         if (error.code) {
-            std::cerr << vle::fmt(_("Simulator `%s' throws error %s")) %
+            std::cerr << vle::fmt(_("Simulator `%s' throws error %s \n")) %
                 (*it) % error.message.c_str();
 
             success = EXIT_FAILURE;
