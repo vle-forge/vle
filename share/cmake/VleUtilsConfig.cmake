@@ -398,7 +398,9 @@ macro(VleCheckPackage _prefix _module_with_version)
   IntVleHomePkgs(_vle_package_dir)
   set(_vle_include_dirs "${_vle_package_dir}/${_module}/src")
   set(_vle_lib_dirs "${_vle_package_dir}/${_module}/lib")
-  if (EXISTS "${_vle_include_dirs}" OR EXISTS "${_vle_lib_dirs}")
+  set(_vle_plugin_dirs "${_vle_package_dir}/${_module}/plugins")
+  if (EXISTS "${_vle_include_dirs}" OR EXISTS "${_vle_lib_dirs}"
+      OR EXISTS "${_vle_plugin_dirs}")
     if (WIN32)
       file(GLOB _vle_libraries "${_vle_lib_dirs}/*.a" "${_vle_lib_dirs}/*.dll")
     else ()
@@ -411,9 +413,9 @@ macro(VleCheckPackage _prefix _module_with_version)
       message(STATUS "Found `${_module}': ${_vle_libraries} and "
                        "${_vle_include_dirs}")
     endif ()
-  else (EXISTS "${_vle_include_dirs}" OR EXISTS "${_vle_lib_dirs}")
+  else ()
     message(FATAL_ERROR "Package `${_module}' not found")
-  endif (EXISTS "${_vle_include_dirs}" OR EXISTS "${_vle_lib_dirs}")
+  endif ()
 endmacro(VleCheckPackage)
 
 ## 
