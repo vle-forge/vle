@@ -29,8 +29,9 @@
 #define VLE_DEVS_TIME_HPP
 
 #include <vle/DllDefines.hpp>
+#include <limits>
 #include <string>
-#include <cmath>
+#include <cmath> /* for isnan */
 
 namespace vle { namespace devs {
 
@@ -48,15 +49,8 @@ namespace vle { namespace devs {
  */
 typedef double Time;
 
-static const Time infinity = HUGE_VAL; /**< Define the positive @e
-                                        * infinity as the cmath
-                                        * constant value HUGE_VAL. */
-
-static const Time negativeInfinity = -HUGE_VAL; /**< Define the
-                                                 * negative @e
-                                                 * infinity as the
-                                                 * cmath constant
-                                                 * value -HUGE_VAL. */
+static const Time infinity = std::numeric_limits <Time>::infinity();
+static const Time negativeInfinity = -1 * std::numeric_limits <Time>::infinity();
 
 /**
  * Test if the @e value is Nan.
@@ -79,7 +73,7 @@ inline static bool isNan(const Time& value)
  */
 inline static bool isInfinity(const Time& value)
 {
-    return std::isinf(value);
+    return value == infinity or value == negativeInfinity;
 }
 
 /**
@@ -91,7 +85,7 @@ inline static bool isInfinity(const Time& value)
  */
 inline static bool isPositiveInfinity(const Time& value)
 {
-    return std::isinf(value) > 0;
+    return value == infinity;
 }
 
 /**
@@ -103,7 +97,7 @@ inline static bool isPositiveInfinity(const Time& value)
  */
 inline static bool isNegativeInfinity(const Time& value)
 {
-    return std::isinf(value) < 0;
+    return value == negativeInfinity;
 }
 
 /**
