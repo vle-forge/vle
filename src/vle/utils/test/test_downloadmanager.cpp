@@ -50,7 +50,7 @@ struct F
         : a(0)
     {
         a = new vle::Init();
-        vle::utils::Preferences prefs("vle.conf");
+        vle::utils::Preferences prefs(false, "vle.conf");
     }
 
     ~F() throw()

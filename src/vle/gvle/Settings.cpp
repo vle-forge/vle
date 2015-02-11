@@ -73,7 +73,7 @@ public:
 
     void load()
     {
-        utils::Preferences prefs;
+        utils::Preferences prefs(true);
         std::string s;
         double d = 0.0;
         uint32_t i = 0;
@@ -146,7 +146,7 @@ public:
 
     void save()
     {
-        utils::Preferences prefs;
+        utils::Preferences prefs(false);
 
         prefs.set("gvle.packages.auto-build", mAutoBuild);
         prefs.set("gvle.editor.highlight-syntax", mHighlightSyntax);

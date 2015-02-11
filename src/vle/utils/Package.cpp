@@ -847,7 +847,7 @@ const std::string& Package::name() const
 
 void Package::refreshCommands()
 {
-    utils::Preferences prefs;
+    utils::Preferences prefs(true);
 
     prefs.get("vle.packages.configure", &m_pimpl->mCommandConfigure);
     prefs.get("vle.packages.test", &m_pimpl->mCommandTest);

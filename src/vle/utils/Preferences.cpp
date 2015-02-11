@@ -71,8 +71,9 @@ namespace vle { namespace utils {
 class Preferences::Pimpl
 {
 public:
-    Pimpl(const std::string& filename)
-        : mFilename(filename),
+    Pimpl(bool readOnly, const std::string& filename)
+        : mreadOnly(readOnly),
+          mFilename(filename),
           mGvlePackagesOptions("gvle.packages"),
           mGvleEditorOptions("gvle.editor"),
           mGvleGraphicsOptions("gvle.graphics"),
@@ -179,7 +180,9 @@ public:
 
     ~Pimpl()
     {
-        save();
+        if (! mreadOnly) {
+            save();
+        }
     }
 
     void open()
@@ -257,6 +260,8 @@ public:
     }
 
 private:
+    bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
+
     std::string mFilename; /**< The filename of the resources file in \c
                              `VLE_HOME/vle.conf'. */
 
@@ -287,8 +292,16 @@ private:
 };
 
 Preferences::Preferences(const std::string& file)
-    : mPimpl(new Preferences::Pimpl(utils::Path::path().getHomeFile(file)))
+    : mPimpl(new Preferences::Pimpl(false,
+            utils::Path::path().getHomeFile(file)))
 {
+}
+
+Preferences::Preferences(bool readOnly, const std::string& file)
+    : mPimpl(new Preferences::Pimpl(readOnly,
+            utils::Path::path().getHomeFile(file)))
+{
+
 }
 
 Preferences::~Preferences()

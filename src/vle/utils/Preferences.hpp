@@ -87,6 +87,19 @@ public:
     Preferences(const std::string& filename = std::string("vle.conf"));
 
     /**
+     * Build a new Preferences object with a specified filename, read the
+     * content of the resources file and fill internal structures.
+     *
+     * @param readOnly If TRUE, the file is not saved at destruction
+     * @param file The filename to open.
+     *
+     * @throw utils::ArgError if the opening of the resources file failed
+     * or during the reading of the file.
+     */
+    Preferences(bool readOnly,
+            const std::string& filename = std::string("vle.conf"));
+
+    /**
      * Write the resources files if an @c insert function is called.
      */
     ~Preferences();

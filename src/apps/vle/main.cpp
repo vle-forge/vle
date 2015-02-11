@@ -135,7 +135,7 @@ static int remove_configuration_file()
         if (vle::utils::Path::existFile(filepath))
             std::ofstream ofs(filepath.c_str());
 
-        vle::utils::Preferences prefs("vle.conf");
+        vle::utils::Preferences prefs(false, "vle.conf");
     } catch (const std::exception &e) {
         std::cerr << vle::fmt(_("Failed to remove configuration file: %1%\n"))
             % e.what();
@@ -509,7 +509,7 @@ static int manage_config_mode(const std::string &configvar, const CmdArgs &args)
     int ret = EXIT_SUCCESS;
 
     try {
-        vle::utils::Preferences prefs("vle.conf");
+        vle::utils::Preferences prefs(false, "vle.conf");
 
         std::string concat = std::accumulate(args.begin(), args.end(),
                 std::string(), Comma());
