@@ -140,7 +140,7 @@ public:
         }
 
         try {
-            utils::Preferences prefs;
+            utils::Preferences prefs(true);
             prefs.get("vle.remote.proxy_ip", &proxyip);
             prefs.get("vle.remote.proxy_port", &proxyport);
             if (proxyip.empty()) {
