@@ -350,7 +350,7 @@ public:
 
         std::vector < std::string > urls;
         try {
-            utils::Preferences prefs;
+            utils::Preferences prefs(true);
             std::string tmp;
             prefs.get("vle.remote.url", &tmp);
 
