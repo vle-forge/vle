@@ -28,6 +28,7 @@
 #ifndef VLE_GVLE_FILETREEVIEW_HPP
 #define VLE_GVLE_FILETREEVIEW_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <gtkmm/builder.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treestore.h>
@@ -54,7 +55,7 @@ public:
 /**
  * @brief FileTreeView used for display file hierarchy.
  */
-class FileTreeView : public Gtk::TreeView
+class GVLE_API FileTreeView : public Gtk::TreeView
 {
 public:
     FileTreeView(BaseObjectType* cobject,
@@ -79,6 +80,12 @@ public:
 
     void setParent(GVLE* parent)
     { mParent = parent; }
+
+    Gtk::Menu& getMenuPopup(){
+        return mMenuPopup;
+    }
+
+    std::string getSelected();
 
 protected:
     bool on_button_press_event(GdkEventButton* event);

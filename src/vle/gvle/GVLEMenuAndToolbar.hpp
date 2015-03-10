@@ -28,6 +28,7 @@
 #ifndef VLE_GVLE_GVLEMENUANDTOOLBAR_HPP
 #define VLE_GVLE_GVLEMENUANDTOOLBAR_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <gtkmm/builder.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/menubar.h>
@@ -42,7 +43,7 @@ class GVLE;
 /**
  * @brief A class to manage the GVLE main menu window.
  */
-class GVLEMenuAndToolbar
+class GVLE_API GVLEMenuAndToolbar
 {
 public:
     static const Glib::ustring UI_DEFINITION;

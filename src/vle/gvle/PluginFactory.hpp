@@ -28,6 +28,7 @@
 #ifndef VLE_GVLE_PLUGINFACTORY_HPP
 #define VLE_GVLE_PLUGINFACTORY_HPP 1
 
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/gvle/GlobalPlugin.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
@@ -41,7 +42,7 @@ namespace vle { namespace gvle {
  * The @vle::utils::ModuleManager is a no-copyable and no-assignable class to
  * avoid modules problems.
  */
-class PluginFactory
+class GVLE_API PluginFactory
 {
 public:
     /**

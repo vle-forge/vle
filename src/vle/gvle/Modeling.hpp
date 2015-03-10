@@ -28,6 +28,7 @@
 #ifndef GUI_MODELING_HPP
 #define GUI_MODELING_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Rand.hpp>
@@ -47,7 +48,7 @@ class View;
  * store the vpz::Model hierarchy, the gui::GModel hierarchy and all
  * information on the project.
  */
-class Modeling
+class GVLE_API Modeling
 {
 private:
     typedef std::vector < std::pair < std::string,

@@ -862,4 +862,10 @@ void FileTreeView::removeFiles(const Gtk::TreeModel::Row* parent,
     }
 }
 
+std::string FileTreeView::getSelected()
+{
+    Gtk::TreeModel::iterator it = mTreeModel->get_iter(mRecentSelectedPath);
+    return mParent->currentPackage().
+        getExpFile((*it).get_value(mColumns.mColname), vle::utils::PKG_SOURCE);
+}
 }} // namespace vle gvle
