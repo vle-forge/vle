@@ -722,19 +722,26 @@ void vleVpz::xReadDom()
             mClassesRaw = new QDomNode(n);
     }
 }
+
 void vleVpz::xReadDomStructures(const QDomNode &baseNode)
 {
     QDomNodeList list = baseNode.childNodes();
-    for (unsigned int i=0; i < list.length(); i++)
-    {
-        QDomNode item = list.item(i);
-        if (item.nodeName() != "model")
-            continue;
-
+    if (list.isEmpty()) {
         vleVpzModel *model = new vleVpzModel(this);
-        model->xLoadNode(item);
+        model->setName("Top Model");
         mRootModel = model;
-        break;
+    } else {
+        for (unsigned int i=0; i < list.length(); i++)
+        {
+            QDomNode item = list.item(i);
+            if (item.nodeName() != "model")
+                continue;
+
+            vleVpzModel *model = new vleVpzModel(this);
+            model->xLoadNode(item);
+            mRootModel = model;
+            break;
+        }
     }
 }
 

@@ -40,6 +40,7 @@
 #include "simulation.h"
 #include "vlevpz.h"
 #include <QtDebug>
+#include <QDebug>
 
 namespace vu = vle::utils;
 
