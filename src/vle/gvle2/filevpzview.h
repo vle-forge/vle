@@ -31,11 +31,15 @@
 #include <QTreeWidgetItem>
 #include <QListWidgetItem>
 #include <QTableWidgetItem>
+#include <QUndoStack>
+#include <QUndoView>
+
 #include "ui_filevpzrtool.h"
 #include "vlevpz.h"
 #include "widgetvpzproperty.h"
 #include "filevpzdynamics.h"
 #include "filevpzexpcond.h"
+#include "filevpzproject.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif
@@ -87,12 +91,16 @@ private:
     Ui::fileVpzRtool*uiTool;
     FileVpzDynamics *mDynamicsTab;
     FileVpzExpCond  *mExpCondTab;
+    FileVpzProject  *mProjectTab;
     vleVpz          *mVpz;
     QWidget         *mWidgetTool;
     QList<QTreeWidgetItem *> mViewsItems;
     vleVpzModel     *mCurrentModel;
 
 private:
+    QUndoStack      *mUndoStack;
+    QUndoView       *undoView;
+
     QGraphicsScene   mScene;
 };
 

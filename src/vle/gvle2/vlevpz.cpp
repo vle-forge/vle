@@ -37,13 +37,14 @@ vleVpz::vleVpz()
     mViewsRaw   = 0;
 }
 
-vleVpz::vleVpz(const QString &filename)
+vleVpz::vleVpz(const QString &filename) :
+    mFilename(filename), mFile(mFilename), mDoc("vle_project")
 {
     mRootModel = 0;
     mClassesRaw = 0;
     mViewsRaw   = 0;
 
-    mFilename = filename;
+//    mFilename = filename;
 
     xReadDom();
 
@@ -51,18 +52,156 @@ vleVpz::vleVpz(const QString &filename)
         mRootModel = new vleVpzModel();
     }
 }
+
+const QDomDocument& vleVpz::getDomDoc() const
+{
+    return mDoc;
+}
+
+QDomDocument& vleVpz::getDomDoc()
+{
+    emit sigChanged(mFilename);
+    return mDoc;
+}
+
 QString vleVpz::getFilename()
 {
     return mFilename;
 }
-QString vleVpz::getBasePath(void)
+QString vleVpz::getBasePath()
 {
     return mPath;
 }
+
+QString vleVpz::getAuthor() const
+{
+    QDomElement docElem = getDomDoc().documentElement();
+
+    QDomNamedNodeMap attrMap = docElem.attributes();
+
+    if (attrMap.contains("author"))
+    {
+        QDomNode xAuthor = attrMap.namedItem("author");
+        return xAuthor.nodeValue();
+    }
+    return QString("");
+}
+
+void vleVpz::setAuthor(const QString author)
+{
+    QDomElement docElem = getDomDoc().documentElement();
+    docElem.setAttribute("author", author);
+}
+
+QString vleVpz::getDate() const
+{
+    QDomElement docElem = getDomDoc().documentElement();
+
+    QDomNamedNodeMap attrMap = docElem.attributes();
+
+    if (attrMap.contains("date"))
+    {
+        QDomNode xDate = attrMap.namedItem("date");
+        return xDate.nodeValue();
+    }
+    return QString("");
+}
+
+void vleVpz::setDate(const QString date)
+{
+    QDomElement docElem = getDomDoc().documentElement();
+    docElem.setAttribute("date", date);
+}
+
+QString vleVpz::getVersion() const
+{
+    QDomElement docElem = getDomDoc().documentElement();
+
+    QDomNamedNodeMap attrMap = docElem.attributes();
+
+    if (attrMap.contains("version"))
+    {
+        QDomNode xVersion = attrMap.namedItem("version");
+        return xVersion.nodeValue();
+    }
+    return QString("");
+}
+
+void vleVpz::setVersion(const QString version)
+{
+    QDomElement docElem = getDomDoc().documentElement();
+    docElem.setAttribute("version", version);
+}
+
+QString vleVpz::getExpName() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement docElem = nodeList.item(0).toElement();
+    QDomNamedNodeMap attrMap = docElem.attributes();
+
+    if (attrMap.contains("name"))
+    {
+        QDomNode xName = attrMap.namedItem("name");
+        return xName.nodeValue();
+    }
+    return QString("");
+}
+
+void vleVpz::setExpName(const QString name)
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement docElem = nodeList.item(0).toElement();
+    docElem.setAttribute("name", name);
+}
+
+
+QString vleVpz::getExpDuration() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement docElem = nodeList.item(0).toElement();
+    QDomNamedNodeMap attrMap = docElem.attributes();
+
+    if (attrMap.contains("duration"))
+    {
+        QDomNode xDuration = attrMap.namedItem("duration");
+        return xDuration.nodeValue();
+    }
+    return QString("");
+}
+
+void vleVpz::setExpDuration(const QString duration)
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement docElem = nodeList.item(0).toElement();
+    docElem.setAttribute("duration", duration);
+}
+
+QString vleVpz::getExpBegin() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement docElem = nodeList.item(0).toElement();
+    QDomNamedNodeMap attrMap = docElem.attributes();
+
+    if (attrMap.contains("begin"))
+    {
+        QDomNode xBegin = attrMap.namedItem("begin");
+        return xBegin.nodeValue();
+    }
+    return QString("");
+}
+
+void vleVpz::setExpBegin(const QString begin)
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement docElem = nodeList.item(0).toElement();
+    docElem.setAttribute("begin", begin);
+}
+
 void vleVpz::setBasePath(const QString path)
 {
     mPath = path;
 }
+
 
 vlePackage *vleVpz::getPackage()
 {
@@ -433,13 +572,11 @@ void vleVpz::xSaveDom(QDomDocument *doc)
 
     QDomElement vpzRoot = doc->createElement("vle_project");
     // Save VPZ file revision
-    if (mVleVersion != "")
-        vpzRoot.setAttribute("version", mVleVersion);
-    else
-        vpzRoot.setAttribute("version", "1.x");
-    // Save the author name (if known)
-    if (mAuthor != "")
-        vpzRoot.setAttribute("author", mAuthor);
+    vpzRoot.setAttribute("version", getVersion());
+
+    vpzRoot.setAttribute("author", getAuthor());
+    vpzRoot.setAttribute("date", getDate());
+    vpzRoot.setAttribute("version", getVersion());
 
     QDomElement xStruct = doc->createElement("structures");
     if ( xSaveStructures(doc, &xStruct) )
@@ -624,14 +761,13 @@ bool vleVpz::xSaveDynamics(QDomDocument *doc, QDomNode *baseNode)
  */
 bool vleVpz::xSaveExperiments(QDomDocument *doc, QDomElement *baseNode)
 {
-    if (mExpBegin != "")
-        baseNode->setAttribute("begin", mExpBegin);
-    if (mExpDuration != "")
-        baseNode->setAttribute("duration", mExpDuration);
+    baseNode->setAttribute("begin", getExpBegin());
+    baseNode->setAttribute("duration", getExpDuration());
+
     if (mExpCombination != "")
         baseNode->setAttribute("combination", mExpCombination);
-    if (mExpName != "")
-        baseNode->setAttribute("name", mExpName);
+
+    baseNode->setAttribute("name", getExpName());
 
     if ( (mConditions.length() == 0) && (mViewsRaw == 0))
         return false;
@@ -679,31 +815,8 @@ bool vleVpz::xSaveExpCondition(QDomDocument *doc, QDomNode *baseNode, vpzExpCond
 
 void vleVpz::xReadDom()
 {
-    QFile file(mFilename);
-    QDomDocument doc("vle_project");
-    doc.setContent(&file);
-    QDomElement docElem = doc.documentElement();
-
-    QDomNamedNodeMap attrMap = docElem.attributes();
-    if (attrMap.contains("version"))
-    {
-        QDomNode xVersion = attrMap.namedItem("version");
-        mVleVersion = xVersion.nodeValue();
-        attrMap.removeNamedItem("version");
-    }
-    if (attrMap.contains("author"))
-    {
-        QDomNode xAuthor = attrMap.namedItem("author");
-        mAuthor = xAuthor.nodeValue();
-        attrMap.removeNamedItem("author");
-    }
-    if (attrMap.contains("date"))
-    {
-        QDomNode xDate = attrMap.namedItem("date");
-        mDate = xDate.nodeValue();
-        attrMap.removeNamedItem("date");
-    }
-    // ToDo : Save the unused attributes
+    mDoc.setContent(&mFile);
+    QDomElement docElem = mDoc.documentElement();
 
     // First try to load Dynamics and Conditions
     for(QDomNode n = docElem.firstChild(); !n.isNull(); n = n.nextSibling())
@@ -792,14 +905,9 @@ void vleVpz::xReadDomDynamics(const QDomNode &baseNode)
 void vleVpz::xReadDomExperiments(const QDomNode &baseNode)
 {
     QDomNamedNodeMap attrMap = baseNode.attributes();
-    if (attrMap.contains("begin"))
-        mExpBegin = attrMap.namedItem("begin").nodeValue();
-    if (attrMap.contains("duration"))
-        mExpDuration = attrMap.namedItem("duration").nodeValue();
+
     if (attrMap.contains("combination"))
         mExpCombination = attrMap.namedItem("combination").nodeValue();
-    if (attrMap.contains("name"))
-        mExpName = attrMap.namedItem("name").nodeValue();
 
     QDomNodeList list = baseNode.childNodes();
     for (unsigned int i=0; i < list.length(); i++)

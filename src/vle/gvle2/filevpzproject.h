@@ -22,51 +22,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FILEVPZDYNAMICS_H
-#define FILEVPZDYNAMICS_H
+#ifndef FILEVPZPROJECT_H
+#define FILEVPZPROJECT_H
 
 #include <QWidget>
 #include <QUndoStack>
+#include <QTabWidget>
+#include <QDateTime>
 #include "vlevpz.h"
+#include "vpzActions.h"
 
 namespace Ui {
-class FileVpzDynamics;
+class FileVpzProject;
 }
 
-class FileVpzDynamics : public QWidget
+class FileVpzProject : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit FileVpzDynamics(QWidget *parent = 0);
-    ~FileVpzDynamics();
-    void setVpz(vleVpz *vpz);
+    explicit FileVpzProject(QWidget *parent = 0);
+    ~FileVpzProject();
+    void setVpz(vleVpz *vpz)
+    {mVpz = vpz;};
     void setUndo(QUndoStack *undo);
+    void setTabId(int i)
+    {mId = i;};
+    void setTab(QTabWidget *tab)
+    {mTab = tab;};
     void reload();
 
 public slots:
-    void onSelected(int cr, int cc, int pr, int pc);
-    void onSelectPackage(int index);
-    void onSelectLibrary(int index);
-    void onAddButton();
-    void onCloneButton();
-    void onRemoveButton();
-    void onSaveButton();
+    void setAuthorToVpz();
+    void setDateToVpz();
+    void setVersionToVpz();
+    void setExpNameToVpz();
+    void setExpDurationToVpz();
+    void setExpBeginToVpz();
 
 protected:
-    void updatePackageList(QString name = "");
-    void updateLibraryList(QString package = "", QString name = "");
 
 private:
-    vleVpzDynamic *getSelected();
 
 private:
-    Ui::FileVpzDynamics *ui;
+    Ui::FileVpzProject *ui;
 
     QUndoStack *mUndoStack;
+    QTabWidget *mTab;
+    int mId;
+
+    QLineEdit *mAuthor;
+    QDateTimeEdit *mDate;
+    QLineEdit *mVersion;
+    QLineEdit *mName;
+    QLineEdit *mDuration;
+    QLineEdit *mBegin;
 
     vleVpz  *mVpz;
-    bool     mPackageLoaded;
 };
 
-#endif // FILEVPZDYNAMICS_H
+#endif // FILEVPZPROJECT_H

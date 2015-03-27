@@ -40,10 +40,20 @@ fileVpzView::fileVpzView(QWidget *parent) :
     uiTool(new Ui::fileVpzRtool)
 {
     ui->setupUi(this);
+
+    mUndoStack = new QUndoStack();
+
+    // createundoview
+    undoView = new QUndoView(mUndoStack);
+    undoView->setWindowTitle(tr("Command List"));
+    undoView->show();
+    undoView->setAttribute(Qt::WA_QuitOnClose, false);
+
     mVpz       = 0;
     mUseSim    = false;
     mDynamicsTab         = 0;
     mExpCondTab          = 0;
+    mProjectTab          = 0;
 
     // Init the right column toolbox UI
     mWidgetTool = new QWidget();
@@ -77,12 +87,20 @@ fileVpzView::fileVpzView(QWidget *parent) :
     mDynamicsTab = new FileVpzDynamics();
     int dynTabId = ui->tabWidget->addTab(mDynamicsTab, tr("Dynamics"));
 
+    // Configure Project tab
+    mProjectTab = new FileVpzProject();
+    int projectTabId = ui->tabWidget->addTab(mProjectTab, tr("Project"));
+    mProjectTab->setTabId(projectTabId);
+    mProjectTab->setTab(ui->tabWidget);
+
     ui->tabWidget->setTabsClosable(true);
     QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
     tabBar->setTabButton(0, QTabBar::RightSide, 0);
     tabBar->setTabButton(1, QTabBar::RightSide, 0);
+    tabBar->setTabButton(2, QTabBar::RightSide, 0);
     tabBar->setTabButton(dynTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(expTabId, QTabBar::RightSide, 0);
+    tabBar->setTabButton(projectTabId, QTabBar::RightSide, 0);
     QObject::connect(ui->tabWidget,   SIGNAL(tabCloseRequested(int)),
                      this,            SLOT  (onTabClose(int)));
 }
@@ -99,6 +117,9 @@ fileVpzView::~fileVpzView()
 
     if (mExpCondTab)
         delete mExpCondTab;
+
+    if (mProjectTab)
+        delete mProjectTab;
 
     delete ui;
 }
@@ -173,6 +194,7 @@ void fileVpzView::setVpz(vleVpz *vpz)
     if (mDynamicsTab)
     {
         mDynamicsTab->setVpz(mVpz);
+        mDynamicsTab->setUndo(mUndoStack);
         mDynamicsTab->reload();
     }
 
@@ -181,6 +203,14 @@ void fileVpzView::setVpz(vleVpz *vpz)
     {
         mExpCondTab->setVpz(mVpz);
         mExpCondTab->reload();
+    }
+
+    // ---- Experimental Conditions Tab ----
+    if (mProjectTab)
+    {
+        mProjectTab->setVpz(mVpz);
+        mProjectTab->setUndo(mUndoStack);
+        mProjectTab->reload();
     }
 }
 

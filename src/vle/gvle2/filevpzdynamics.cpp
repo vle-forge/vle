@@ -23,6 +23,7 @@
  */
 
 #include <QMessageBox>
+#include <QUndoCommand>
 #include "filevpzdynamics.h"
 #include "ui_filevpzdynamics.h"
 
@@ -49,12 +50,10 @@ FileVpzDynamics::FileVpzDynamics(QWidget *parent) :
 
     QObject::connect(dynList, SIGNAL(currentCellChanged(int, int, int, int)),
                      this,    SLOT  (onSelected(int, int, int, int)));
-
     QObject::connect(ui->dynPackageList, SIGNAL(currentRowChanged(int)),
                      this,        SLOT  (onSelectPackage(int)) );
     QObject::connect(ui->dynLibraryList, SIGNAL(currentRowChanged(int)),
                      this,        SLOT  (onSelectLibrary(int)) );
-
     QObject::connect(ui->dynAdd ,   SIGNAL(clicked()),
                      this,          SLOT  (onAddButton()) );
     QObject::connect(ui->dynClone,  SIGNAL(clicked()),
@@ -63,6 +62,7 @@ FileVpzDynamics::FileVpzDynamics(QWidget *parent) :
                      this,          SLOT  (onRemoveButton()) );
     QObject::connect(ui->dynSave,   SIGNAL(clicked()),
                      this,          SLOT  (onSaveButton()) );
+
 }
 
 /**
@@ -83,6 +83,19 @@ FileVpzDynamics::~FileVpzDynamics()
 void FileVpzDynamics::setVpz(vleVpz *vpz)
 {
     mVpz = vpz;
+}
+
+void FileVpzDynamics::setUndo(QUndoStack *undo)
+{
+    mUndoStack = undo;
+    QAction *undoAction = mUndoStack->createUndoAction(this, tr("&Undo"));
+    undoAction->setShortcuts(QKeySequence::Undo);
+
+    QAction *redoAction = mUndoStack->createRedoAction(this, tr("&Redo"));
+    redoAction->setShortcuts(QKeySequence::Redo);
+
+    addAction(undoAction);
+    addAction(redoAction);
 }
 
 /**

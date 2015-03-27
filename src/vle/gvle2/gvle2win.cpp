@@ -109,6 +109,7 @@ GVLE2Win::GVLE2Win(QWidget *parent) :
 
     loadPlugins();
     ui->menuSelectSimulator->setEnabled(true);
+
 }
 
 GVLE2Win::~GVLE2Win()
@@ -1139,6 +1140,9 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
         ui->tabWidget->setCurrentIndex(n);
         newTab->show();
 
+        QObject::connect(selVpz, SIGNAL(sigChanged(QString)),
+                         this,  SLOT  (setChangedVpz(QString)));
+
         // Create a new toolbox for the right column
         int nid;
         QWidget *newRTool = newTab->getTool();
@@ -1152,6 +1156,18 @@ void GVLE2Win::onRefreshFiles()
 {
     qDebug() << "GVLE2Win::onRefreshFiles()";
     treeProjectUpdate();
+}
+
+void GVLE2Win::setChangedVpz(QString filename)
+{
+    for (int i = (ui->tabWidget->count() - 1); i >= 0; i--)
+    {
+        if (ui->tabWidget->tabText(i) == filename)
+        {
+            ui->tabWidget->setTabText(i, "* "+ filename);
+            break;
+        }
+    }
 }
 
 /**

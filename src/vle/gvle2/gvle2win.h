@@ -101,6 +101,7 @@ private slots:
     void onOpenModeler();
     void onNewModelerClass();
     void onRefreshFiles();
+    void setChangedVpz(QString filename);
 
 private:
     Ui::GVLE2Win *ui;

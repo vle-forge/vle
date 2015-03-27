@@ -23,10 +23,10 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${VLE_SOURCE_DIR}/src/apps/gvle2)
 
 SET(GVLE2_SOURCES_CPP gvle2win.cpp aboutbox.cpp help.cpp helpbrowser.cpp
-  filevpzview.cpp filevpzdynamics.cpp filevpzexpcond.cpp
+  filevpzview.cpp filevpzdynamics.cpp filevpzproject.cpp filevpzexpcond.cpp
   simulation.cpp widgetprojecttree.cpp logger.cpp
   sourcecpp.cpp sourcecpptemplate.cpp
-  vlepackage.cpp
+  vlepackage.cpp vpzActions.cpp
   vlevpz.cpp vlevpzconn.cpp vlevpzdynamic.cpp vlevpzport.cpp vpzexpcond.cpp
   widgetvpzproperty.cpp
   plugin_modeler.cpp pluginmodelerview.cpp pluginmodelersummary.cpp )
@@ -36,6 +36,7 @@ QT4_WRAP_UI(aboutbox_h aboutbox.ui)
 QT4_WRAP_UI(help_h help.ui)
 QT4_WRAP_UI(filevpzview_h     filevpzview.ui)
 QT4_WRAP_UI(filevpzdynamics_h filevpzdynamics.ui)
+QT4_WRAP_UI(filevpzproject_h filevpzproject.ui)
 QT4_WRAP_UI(filevpzexpcond_h  filevpzexpcond.ui)
 QT4_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
 QT4_WRAP_UI(filevpzrtool_h   filevpzrtool.ui)
@@ -47,14 +48,15 @@ QT4_WRAP_UI(pluginmodelerview_h pluginmodelerview.ui)
 QT4_WRAP_UI(pluginmodelersummary_h pluginmodelersummary.ui)
 
 SET(GVLE2_SOURCES_HPP ${ui_gvle2win_h} ${aboutbox_h} ${help_h}
-  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzexpcond_h}
+  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzproject_h}
+  ${filevpzexpcond_h}
   ${filevpztooltip_h} ${filevpzrtool_h}
   ${simulationview_h} ${simulationrtool_h} simulation.h logger.h
   sourcecpp.h sourcecpptemplate.h
   ${pluginmodelerview_h} pluginmodelerview.h
   ${pluginmodelersummary_h} pluginmodelersummary.h
   plugin_cond.h plugin_modeler.h plugin_sim.h
-  vlepackage.h
+  vlepackage.h vpzActions.h
   vlevpz.h vlevpzconn.h vlevpzdynamic.h vlevpzport.h vpzexpcond.h
   widgetvpzproperty.h
   ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h} )

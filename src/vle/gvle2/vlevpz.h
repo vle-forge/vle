@@ -37,6 +37,7 @@
 #include <QDomElement>
 #include <QDomNamedNodeMap>
 #include <QXmlDefaultHandler>
+#include <QDateTimeEdit>
 #include "vlepackage.h"
 #include "vlevpzconn.h"
 #include "vlevpzdynamic.h"
@@ -60,7 +61,23 @@ public:
     vleVpz();
     vleVpz(const QString &filename);
     QString        getFilename();
+    const QDomDocument& getDomDoc() const;
+    QDomDocument& getDomDoc();
     QString        getBasePath();
+
+    QString        getAuthor() const;
+    void           setAuthor(const QString author);
+    QString        getDate() const;
+    void           setDate(const QString date);
+    QString        getVersion() const;
+    void           setVersion(const QString version);
+    QString        getExpName() const;
+    void           setExpName(const QString name);
+    QString        getExpDuration() const;
+    void           setExpDuration(const QString duration);
+    QString        getExpBegin() const;
+    void           setExpBegin(const QString begin);
+
     void           setBasePath(const QString path);
     vlePackage    *getPackage();
     void           setPackage(vlePackage *package);
@@ -87,6 +104,7 @@ signals:
     void sigConditionsChanged();
     void sigDynamicsChanged();
     void sigOpenModeler(vleVpzModel *model);
+    void sigChanged(QString filename);
 
 protected:
     bool startElement(const QString &namespaceURI,
@@ -126,13 +144,11 @@ public:
 private:
     QString mFilename;
     QString mPath;
-    QString mVleVersion;
-    QString mAuthor;
-    QString mDate;
-    QString mExpBegin;
-    QString mExpDuration;
+
+    QFile mFile;
+    QDomDocument mDoc;
+
     QString mExpCombination;
-    QString mExpName;
     vlePackage *mPackage;
     int                     mConditionIteratorIndex;
     QList <vleVpzDynamic *> mDynamics;
