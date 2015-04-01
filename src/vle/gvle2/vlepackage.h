@@ -30,6 +30,7 @@
 #include <QString>
 
 #include "plugin_modeler.h"
+#include "plugin_output.h"
 #include "sourcecpp.h"
 
 #ifndef Q_MOC_RUN
@@ -38,6 +39,7 @@
 
 class PluginModeler;
 class PluginExpCond;
+class PluginOutput;
 
 class vlePackage
 {
@@ -70,6 +72,8 @@ public: // Functions used by Experimental Conditions plugins
     PluginExpCond *getExpPlugin(QString name);
     QString getExpPluginName(int index);
     int     expPluginCount();
+    void addOutputPlugin(QString name, QString fileName);
+    PluginOutput *getOutputPlugin(QString name);
 
 protected:
     void    refreshModelerClass();
@@ -85,6 +89,7 @@ private:
     QMap <QString, QPluginLoader*> mModelerLoader;
 private:
     QMap <QString,QString> mExpPlugins;
+    QMap <QString,QString> mOutputPlugins;
 };
 
 #endif // VLEPACKAGE_H

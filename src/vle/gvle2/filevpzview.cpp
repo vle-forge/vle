@@ -93,13 +93,19 @@ fileVpzView::fileVpzView(QWidget *parent) :
     mProjectTab->setTabId(projectTabId);
     mProjectTab->setTab(ui->tabWidget);
 
+    // Configure View tab
+    mExpViewTab = new FileVpzExpView();
+    int viewTabId = ui->tabWidget->addTab(mExpViewTab, tr("Views"));
+
     ui->tabWidget->setTabsClosable(true);
     QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
     tabBar->setTabButton(0, QTabBar::RightSide, 0);
     tabBar->setTabButton(1, QTabBar::RightSide, 0);
     tabBar->setTabButton(2, QTabBar::RightSide, 0);
+    tabBar->setTabButton(3, QTabBar::RightSide, 0);
     tabBar->setTabButton(dynTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(expTabId, QTabBar::RightSide, 0);
+    tabBar->setTabButton(viewTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(projectTabId, QTabBar::RightSide, 0);
     QObject::connect(ui->tabWidget,   SIGNAL(tabCloseRequested(int)),
                      this,            SLOT  (onTabClose(int)));
@@ -211,6 +217,13 @@ void fileVpzView::setVpz(vleVpz *vpz)
         mProjectTab->setVpz(mVpz);
         mProjectTab->setUndo(mUndoStack);
         mProjectTab->reload();
+    }
+
+    // ---- View Tab ----
+    if (mProjectTab)
+    {
+        mExpViewTab->setVpz(mVpz);
+        mExpViewTab->reload();
     }
 }
 

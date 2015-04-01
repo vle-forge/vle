@@ -41,6 +41,7 @@
 #include "plugin_cond.h"
 #include "plugin_modeler.h"
 #include "plugin_sim.h"
+#include "plugin_output.h"
 
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
@@ -69,6 +70,7 @@ protected:
     void loadExpCondPlugins   (PluginExpCond   *plugin, QString fileName);
     void loadModelerPlugins   (PluginModeler   *plugin, QString fileName);
     void loadSimulationPlugins(PluginSimulator *plugin, QString fileName);
+    void loadOutputPlugins(PluginOutput *out, QString fileName);
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
     pluginModelerView *openModeler(QString filename);
@@ -122,6 +124,8 @@ private:
     QList<QPluginLoader *> mModelerPlugins;
 private:
     QMap <QString,QString> mExpPlugins;
+    QMap <QString,QString> mOutputPlugins;
+
 
 protected:
     void newProject(QString pathName);

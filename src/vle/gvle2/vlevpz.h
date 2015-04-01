@@ -43,6 +43,7 @@
 #include "vlevpzdynamic.h"
 #include "vlevpzport.h"
 #include "vpzexpcond.h"
+#include <vle/value/Value.hpp>
 #include "vle/gvle2/ui_filevpztooltip.h"
 
 #undef USE_GRAPHICVIEW
@@ -77,6 +78,128 @@ public:
     void           setExpDuration(const QString duration);
     QString        getExpBegin() const;
     void           setExpBegin(const QString begin);
+    /**
+     * @brief get <views> tag from Vpz doc
+     */
+    QDomNode viewsFromDoc() const;
+    /**
+     * @brief get <outputs> tag from <views> tag
+     */
+    QDomNode outputsFromViews(QDomNode node);
+    /**
+     * @brief get <output> tag from <outputs> tag
+     * which name is outputName
+     */
+    QDomNode outputFromOutputs(QDomNode node, const QString& outputName);
+    /**
+     * @brief get the list of attribute values of 'name' of different <output>
+     * in <experiment>/<views>/<outputs>
+     * @param the values to fill
+     */
+    void viewOutputNames(std::vector<std::string>& v) const;
+    /**
+     * @brief get the list of attribute values of 'name' of different <view>
+     * in <experiment>/<views>
+     * @param the values to fill
+     */
+    void viewNames(std::vector<std::string>& v) const;
+    /**
+     * @brief get <view> tag from <views> tag
+     * which name is viewName
+     */
+    QDomNode viewFromViews(QDomNode node, const QString& viewName) const;
+    /**
+     * @brief get attribute 'type' from a tag <view>
+     */
+     QString viewTypeFromView(QDomNode node) const;
+     /**
+      * @brief set attribute 'type' to a tag <view>
+      */
+     void setViewTypeFromView(QDomNode node, const QString& viewType);
+     /**
+      * @brief get attribute 'timestep' from a tag <view>
+      */
+     double timeStepFromView(QDomNode node) const;
+     /**
+      * @brief set attribute 'timestep' to a tag <view>
+      */
+     void setTimeStepFromView(QDomNode node, double ts);
+     /**
+      * @brief set output plugin to a tag <output>
+      * plugin name has to be of the form :
+      *   package/plugin
+      */
+     bool setOutputPlugin(QDomNode node, const QString& outputPlugin);
+     /**
+     * @brief get output plugin from a tag <output>
+     * plugin name has the form :
+     *   package/plugin
+     */
+    QString getOutputPlugin(QDomNode node);
+
+    /**
+     * @brief get map from tag <output> (configuration of output)
+     */
+    QDomNode mapFromOutput(QDomNode node);
+
+    /**
+     * @brief build a vle value from either tag
+     * <integer>, <string>, <map> etc..
+     * @note: result is a new allocated vle value.
+     */
+    vle::value::Value* buildValue(const QDomNode& node) const;
+
+    /**
+     * @brief Fill a Node from a value
+     * @note: the main tag should corresponds to the value type ie:
+     * <integer>, <string>, <map> etc..
+     * @note: the map is first cleared
+     */
+    bool fillWithValue(QDomNode node, const vle::value::Value& val);
+
+    /**
+     * @brief tells if a node is an integer from undefined tag
+     */
+    bool isInteger(QDomNode node);
+    /**
+     * @brief get an integer vle value from tag <integer>
+     */
+    int getInteger(QDomNode node);
+    /**
+     * @brief get the integer vle value from tag <map> at a specified key
+     */
+    int getIntegerFromMap(QDomNode node, QString key);
+    /**
+     * @brief tells the key name has an integer from tag <map>
+     */
+    bool existIntegerKeyInMap(QDomNode node, QString key);
+    /**
+     * @brief add an integer key in a <map>
+     */
+    void addIntegerKeyInMap(QDomNode* node, const QString& key,
+            int val);
+    /**
+     * @brief clear a map from a tag <map>
+     */
+    void clearMap(QDomNode* node);
+    /**
+     * @brief get <output>  from a tag <views>
+     * @note : combine outputsFromViews, outputFromOutput
+     */
+    QDomNode getOutputFromViews(QDomNode node,
+            const QString& outputName);
+    /**
+     * @brief get output plugin from a tag <views>
+     * plugin name has the form :
+     *   package/plugin
+     */
+    QString getOutputPluginFromViews(QDomNode node,
+            const QString& outputName);
+    /**
+     * @brief get a QString representation of a QDomNode
+     */
+    QString toQString(const QDomNode& node) const;
+
 
     void           setBasePath(const QString path);
     vlePackage    *getPackage();
@@ -87,18 +210,18 @@ public:
     void           addDynamic(vleVpzDynamic *dynamic);
     void           removeDynamic(vleVpzDynamic *dynamic);
     QList <vleVpzDynamic *> *getDynamicsList()
-    {
+            {
         return &mDynamics;
-    }
+            }
 
-public slots:
+    public slots:
     void focusChange(vleVpzModel *model);
     void enterModel(vleVpzModel *model);
     void addModeler(QString name);
     void addModelerDynamic(vleVpzModel *model, QString lib);
     void openModeler();
 
-signals:
+    signals:
     void sigFocus(vleVpzModel *model);
     void sigEnterModel(vleVpzModel *model);
     void sigConditionsChanged();
@@ -106,14 +229,14 @@ signals:
     void sigOpenModeler(vleVpzModel *model);
     void sigChanged(QString filename);
 
-protected:
+    protected:
     bool startElement(const QString &namespaceURI,
-                      const QString &localName,
-                      const QString &qName,
-                      const QXmlAttributes &attributes);
-public:
+            const QString &localName,
+            const QString &qName,
+            const QXmlAttributes &attributes);
+    public:
     QByteArray xGetXml();
-private:
+    private:
     void xReadDom();
     void xReadDomStructures(const QDomNode &baseNode);
     void xReadDomDynamics(const QDomNode &baseNode);
@@ -128,7 +251,7 @@ private:
     bool xSaveExpCondValue(QDomDocument *doc, QDomNode *baseNode, vpzExpCondValue *value);
     int  removeModelDynamic(vleVpzModel *model, vleVpzDynamic *dynamic, bool recurse = false);
 
-public:
+    public:
     vpzExpCond *     addCondition(QString name = "");
     bool             removeCondition(vpzExpCond *cond);
     vpzExpCondValue *addConditionValue(vpzExpCondPort *port, vpzExpCondValue::ValueType type = vpzExpCondValue::TypeUnknown);
@@ -137,11 +260,11 @@ public:
     vpzExpCond *     getFirstCondition();
     vpzExpCond *     getNextCondition();
     QList <vpzExpCond *> *getConditions()
-    {
+            {
         return &mConditions;
-    }
+            }
 
-private:
+    private:
     QString mFilename;
     QString mPath;
 
@@ -155,8 +278,7 @@ private:
     QList <vpzExpCond    *> mConditions;
     QList <void          *> mViews;
     QDomNode               *mClassesRaw;
-    QDomNode               *mViewsRaw;
-public:
+    public:
     vleVpzModel * mRootModel;
 };
 
@@ -178,21 +300,21 @@ public:
         return mSubmodels.at(i);
     }
     QList <vleVpzModel *> *getSubmodels()
-    {
+            {
         return &mSubmodels;
-    }
+            }
     QList <vleVpzPort  *> *getInPorts()
-    {
+            {
         return &mInPorts;
-    }
+            }
     QList <vleVpzPort  *> *getOutPorts()
-    {
+            {
         return &mOutPorts;
-    }
+            }
     QList <vleVpzConn  *> *getConnections()
-    {
+            {
         return &mConnections;
-    }
+            }
     vleVpzDynamic *getDynamic();
     void setDynamic(QString dynamicName);
     void removeDynamic();
@@ -251,27 +373,27 @@ protected:
     void mouseMoveEvent(QMouseEvent *evt);
     void mouseDoubleClickEvent(QMouseEvent * event);
 
-signals:
-     void sigFocus(vleVpzModel *model);
-     void sigDblClick(vleVpzModel *model);
-     void sigAddModeler(QString name);
-     void sigOpenModeler();
+    signals:
+    void sigFocus(vleVpzModel *model);
+    void sigDblClick(vleVpzModel *model);
+    void sigAddModeler(QString name);
+    void sigOpenModeler();
 
-public slots:
-     void contextMenu(const QPoint & pos);
-     void contextMenu(const QPoint & pos, vleVpzPort *port);
-     void portConnect(vleVpzPort *port);
-     void portDisconnect(vleVpzPort *port);
+    public slots:
+    void contextMenu(const QPoint & pos);
+    void contextMenu(const QPoint & pos, vleVpzPort *port);
+    void portConnect(vleVpzPort *port);
+    void portDisconnect(vleVpzPort *port);
 
-public:
+    public:
     void xLoadNode(const QDomNode &baseNode);
-private:
+    private:
     void xreadSubmodels(const QDomNode &baseNode);
     void xReadInputs(const QDomNode &baseNode);
     void xReadOutputs(const QDomNode &baseNode);
     void xReadConnections(const QDomNode &baseNode);
     bool xgetXml(QDomDocument *doc, QDomElement *base);
-private:
+    private:
     QString mName;
     vleVpz *mVpz;
     bool    mIsAltered;
@@ -302,17 +424,17 @@ private:
     // Used for port selection/connection
     vleVpzPort *mPortInSel;
     vleVpzPort *mPortOutSel;
-private:
+    private:
     QFont   mPainterFont;
-private:
+    private:
     int     mSettingLine;
     int     mSettingCorner;
     int     mSettingFontSize;
 
-public:
+    public:
     sourceCpp *getModelerClass();
 
-private:
+    private:
     sourceCpp *mModelerClass;
 };
 

@@ -39,6 +39,7 @@
 #include "widgetvpzproperty.h"
 #include "filevpzdynamics.h"
 #include "filevpzexpcond.h"
+#include "filevpzexpview.h"
 #include "filevpzproject.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
@@ -91,6 +92,7 @@ private:
     Ui::fileVpzRtool*uiTool;
     FileVpzDynamics *mDynamicsTab;
     FileVpzExpCond  *mExpCondTab;
+    FileVpzExpView  *mExpViewTab;
     FileVpzProject  *mProjectTab;
     vleVpz          *mVpz;
     QWidget         *mWidgetTool;

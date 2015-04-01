@@ -22,6 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <QPluginLoader>
+#include <QtCore/qdebug.h>
 #include "vlepackage.h"
 #include "plugin_modeler.h"
 #include "plugin_cond.h"
@@ -250,7 +251,6 @@ PluginExpCond *vlePackage::getExpPlugin(QString name)
 {
     // Search the library file of the plugin
     QString pluginFile = mExpPlugins.value(name.toLower());
-
     // Load the QT plugin library
     QPluginLoader *loader = new QPluginLoader(pluginFile);
     // Get an instance of the GVLE2 plugin
@@ -270,3 +270,32 @@ QString vlePackage::getExpPluginName(int index)
     QList<QString> names = mExpPlugins.keys();
     return names.at(index);
 }
+
+
+/* --------------- Output Plugins Functions --------------- */
+
+void vlePackage::addOutputPlugin(QString name, QString fileName)
+{
+    if (mOutputPlugins.key(name).isEmpty())
+    {
+        mOutputPlugins.insert(name.toLower(), fileName);
+    }
+}
+
+PluginOutput *vlePackage::getOutputPlugin(QString name)
+{
+    // Search the library file of the plugin
+    QString pluginFile = mOutputPlugins.value(name.toLower());
+    // Load the QT plugin library
+    QPluginLoader *loader = new QPluginLoader(pluginFile);
+    // Get an instance of the GVLE2 plugin
+    QObject *plugin = loader->instance();
+
+    PluginOutput *outPlugin = 0;
+    if (plugin)
+        outPlugin = qobject_cast<PluginOutput *>(plugin);
+
+    delete loader;
+    return outPlugin;
+}
+

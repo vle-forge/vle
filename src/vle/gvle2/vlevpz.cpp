@@ -22,19 +22,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "vlevpz.h"
 #include <QClipboard>
 #include <QFlags>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPalette>
 #include <QtDebug>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/String.hpp>
+#include "vlevpz.h"
+
 
 vleVpz::vleVpz()
 {
     mRootModel = 0;
     mClassesRaw = 0;
-    mViewsRaw   = 0;
 }
 
 vleVpz::vleVpz(const QString &filename) :
@@ -42,7 +46,6 @@ vleVpz::vleVpz(const QString &filename) :
 {
     mRootModel = 0;
     mClassesRaw = 0;
-    mViewsRaw   = 0;
 
 //    mFilename = filename;
 
@@ -196,6 +199,482 @@ void vleVpz::setExpBegin(const QString begin)
     QDomElement docElem = nodeList.item(0).toElement();
     docElem.setAttribute("begin", begin);
 }
+
+
+QDomNode
+vleVpz::outputsFromViews(QDomNode node)
+{
+    if (node.nodeName() != "views") {
+
+        qDebug() << ("Internal error in outputsFromView (wrong main tag)");
+        return QDomNode();
+    }
+    QDomNodeList childs = node.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if (child.nodeName() == "outputs") {
+            return child;
+        }
+    }
+    qDebug() << ("Internal error in outputsFromView (outputs not found)");
+    return QDomNode();
+}
+
+QDomNode
+vleVpz::viewsFromDoc() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement expElem = nodeList.item(0).toElement();
+    nodeList = expElem.elementsByTagName("views");
+    return nodeList.item(0);
+}
+
+QDomNode
+vleVpz::outputFromOutputs(QDomNode node, const QString& outputName)
+{
+    if (node.nodeName() != "outputs") {
+        qDebug() << ("Internal error in outputFromOutputs (wrong main tag)");
+        return QDomNode();
+    }
+    QDomNodeList childs = node.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if ((child.nodeName() == "output") and
+                (child.attributes().contains("name")) and
+                (child.attributes().namedItem("name").nodeValue()
+                        == outputName)){
+            return child;
+        }
+    }
+    qDebug() << ("Internal error in outputFromOutputs (output not found)");
+    return QDomNode();
+}
+
+void
+vleVpz::viewOutputNames(std::vector<std::string>& v) const
+{
+    v.clear();
+    QDomNode outputs = viewsFromDoc();
+    QDomNodeList outputList = outputs.toElement().elementsByTagName("output");
+    for (unsigned int i =0; i < outputList.length(); i++) {
+        QDomNode output = outputList.item(i);
+        QString o = output.attributes().namedItem("name").nodeValue();
+        v.push_back(o.toStdString());
+    }
+}
+
+void
+vleVpz::viewNames(std::vector<std::string>& v) const
+{
+    v.clear();
+    QDomNode outputs = viewsFromDoc();
+    QDomNodeList outputList = outputs.toElement().elementsByTagName("view");
+    for (unsigned int i =0; i < outputList.length(); i++) {
+        QDomNode output = outputList.item(i);
+        QString o = output.attributes().namedItem("name").nodeValue();
+        v.push_back(o.toStdString());
+    }
+}
+
+QDomNode
+vleVpz::viewFromViews(QDomNode node, const QString& viewName) const
+{
+    if (node.nodeName() != "views") {
+        qDebug() << ("Internal error in viewFromViews (wrong main tag)");
+        return QDomNode();
+    }
+    QDomNodeList childs = node.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if ((child.nodeName() == "view") and
+                (child.attributes().contains("name")) and
+                (child.attributes().namedItem("name").nodeValue() == viewName)){
+            return child;
+        }
+    }
+    qDebug() << ("Internal error in viewFromViews (view not found)");
+    return QDomNode();
+
+}
+
+QString
+vleVpz::viewTypeFromView(QDomNode node) const
+{
+    if (node.nodeName() != "view") {
+        qDebug() << ("Internal error in viewTypeFromView (wrong main tag)");
+        return QString();
+    }
+    return node.attributes().namedItem("type").nodeValue();
+}
+
+void
+vleVpz::setViewTypeFromView(QDomNode node, const QString& viewType)
+{
+    if (node.nodeName() != "view") {
+        qDebug() << ("Internal error in setViewTypeFromView (wrong main tag)");
+        return;
+    }
+    node.attributes().namedItem("type").setNodeValue(viewType);
+}
+
+double
+vleVpz::timeStepFromView(QDomNode node) const
+{
+    if (node.nodeName() != "view") {
+        qDebug() << ("Internal error in viewTypeFromView (wrong main tag)");
+        return -1.0;
+    }
+    QVariant qv(node.attributes().namedItem("timestep").nodeValue());
+    return qv.toDouble();
+}
+
+void
+vleVpz::setTimeStepFromView(QDomNode node, double ts)
+{
+    if (node.nodeName() != "view") {
+        qDebug() << ("Internal error in setTimeStepFromView (wrong main tag)");
+        return;
+    }
+    if (viewTypeFromView(node) == "timed" and ts > 0.0) {
+        if (not node.attributes().contains("timestep")) {
+            QDomAttr a = getDomDoc().createAttribute("timestep");
+            node.appendChild(a);
+        }
+        node.attributes().namedItem("timestep").setNodeValue(
+                                QVariant(ts).toString());
+    }
+}
+
+bool
+vleVpz::setOutputPlugin(QDomNode node, const QString& outputPlugin)
+{
+    if (node.nodeName() != "output") {
+        qDebug() << ("Internal error in setOutputPlugin (wrong main tag)");
+        return false;
+    }
+    QDomNode pkg = node.attributes().namedItem("package");
+    QDomNode plugin = node.attributes().namedItem("plugin");
+    QStringList ll = outputPlugin.split("/");
+    pkg.setNodeValue(ll.at(0));
+    plugin.setNodeValue(ll.at(1));
+    return true;
+}
+
+
+QString
+vleVpz::getOutputPlugin(QDomNode node)
+{
+    if (node.nodeName() != "output") {
+        QString mess = "Internal error in getOutputPlugin (wrong main tag)";
+        mess += "\n got : ";
+        mess += node.nodeName();
+        qDebug() << (mess);
+        return QString();
+    }
+    QString plug = node.attributes().namedItem("package").nodeValue();
+    plug += "/";
+    plug += node.attributes().namedItem("plugin").nodeValue();
+    return plug;
+}
+
+
+
+QDomNode
+vleVpz::mapFromOutput(QDomNode node)
+{
+    if (node.nodeName() != "output") {
+        QString mess = "Internal error in mapFromOutput (wrong main tag)";
+        mess += "\n got : ";
+        mess += node.nodeName();
+        qDebug() << (mess);
+        return QDomNode();
+    }
+    QDomNodeList childs = node.childNodes();
+    if (childs.length() != 1) {
+        QString mess = "Internal error in mapFromOutput (wrong nb of childs)";
+        qDebug() << (mess);
+        return QDomNode();
+    }
+    QDomNode child = childs.item(0);
+    if (child.nodeName() != "map") {
+        QString mess = "Internal error in mapFromOutput (unexpected node type)";
+        qDebug() << (mess);
+        return QDomNode();
+    }
+    return child;
+}
+
+vle::value::Value*
+vleVpz::buildValue(const QDomNode& node) const
+{
+//    BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
+//                XMLTYPE, NIL, MATRIX, USER
+    if (node.nodeName() == "boolean") {
+        if (node.childNodes().length() != 1){
+            qDebug() << "Internal error in buildValue (6)";
+            return 0;
+        }
+        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
+        return new vle::value::Boolean(qv.toBool());
+    }
+    if (node.nodeName() == "integer") {
+        if (node.childNodes().length() != 1){
+            qDebug() << "Internal error in buildValue (5)";
+            return 0;
+        }
+        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
+        return new vle::value::Integer(qv.toInt());
+    }
+    if (node.nodeName() == "string") {
+        if (node.childNodes().length() != 1){
+            qDebug() << "Internal error in buildValue (4)";
+            return 0;
+        }
+        QString qv = node.childNodes().item(0).toText().nodeValue();
+        return new vle::value::String(qv.toStdString());
+    }
+    if (node.nodeName() == "map") {
+        QDomNodeList childs = node.childNodes();
+        vle::value::Map* res = new vle::value::Map();
+        for (unsigned int i=0; i < childs.length(); i++) {
+            QDomNode child = childs.item(i);
+            if (child.nodeName() != "key") {
+                qDebug() << "Internal error in buildValue (1)";
+                return res;
+            }
+            if (not child.attributes().contains("name")) {
+                qDebug() << "Internal error in buildValue (2)";
+                return res;
+            }
+            res->add(
+                 child.attributes().namedItem("name").nodeValue().toStdString(),
+                 buildValue(child.childNodes().item(0)));
+
+        }
+        return res;
+    }
+    qDebug() << "Internal error in buildValue (3)";
+    return 0;
+}
+
+bool
+vleVpz::fillWithValue(QDomNode node, const vle::value::Value& val)
+{
+    switch (val.getType()) {
+    case vle::value::Value::BOOLEAN: {
+            if (node.nodeName() != "boolean") {
+                return false;
+            }
+            QDomText elemVal = getDomDoc().createTextNode(
+                    val.writeToString().c_str());
+            node.appendChild(elemVal);
+            break;
+    } case vle::value::Value::INTEGER: {
+        if (node.nodeName() != "integer") {
+            return false;
+        }
+        QDomText elemVal = getDomDoc().createTextNode(
+                val.writeToString().c_str());
+        node.appendChild(elemVal);
+        break;
+    } case vle::value::Value::STRING: {
+        if (node.nodeName() != "string") {
+            return false;
+        }
+        QDomText elemVal = getDomDoc().createTextNode(
+                val.writeToString().c_str());
+        node.appendChild(elemVal);
+        break;
+    } case vle::value::Value::MAP: {
+        if (node.nodeName() != "map") {
+            return false;
+        }
+        clearMap(&node);
+        vle::value::Map::const_iterator itb = val.toMap().begin();
+        vle::value::Map::const_iterator ite = val.toMap().end();
+        for (; itb != ite; itb++) {
+            QDomElement elem = getDomDoc().createElement("key");
+            elem.setAttribute("name", QString(itb->first.c_str()));
+            QDomElement elemVal;
+            switch (itb->second->getType()) {
+            case vle::value::Value::BOOLEAN: {
+                elemVal = getDomDoc().createElement("boolean");
+                break;
+            } case vle::value::Value::INTEGER: {
+                elemVal = getDomDoc().createElement("integer");
+                break;
+            } case vle::value::Value::STRING: {
+                elemVal = getDomDoc().createElement("string");
+                break;
+            } case vle::value::Value::MAP: {
+                elemVal = getDomDoc().createElement("map");
+                break;
+            } default: {
+                qDebug() << "Internal error in fillWithValue (nnnII)";
+                return false;
+            }}
+
+            fillWithValue(elemVal, *(itb->second));
+            elem.appendChild(elemVal);
+            node.appendChild(elem);
+
+        }
+        break;
+    } default: {
+        qDebug() << "Internal error in fillWithValue (nnn)";
+        return false;
+    }}
+    return true;
+}
+
+bool
+vleVpz::isInteger(QDomNode node)
+{
+    return node.nodeName() == "integer";
+}
+
+int
+vleVpz::getInteger(QDomNode node)
+{
+    if (node.nodeName() != "integer") {
+        QString mess = "Internal error in getInteger (wrong main tag)";
+        mess += "\n got : ";
+        mess += node.nodeName();
+        qDebug() << (mess);
+        return -1;
+    }
+    QVariant qv = node.nodeValue();
+    return qv.toInt();
+}
+
+int
+vleVpz::getIntegerFromMap(QDomNode node, QString key)
+{
+    if (node.nodeName() != "map") {
+        QString mess = "Internal error in getIntegerFromMap (wrong main tag)";
+        mess += "\n got : ";
+        mess += node.nodeName();
+        qDebug() << (mess);
+        return -1;
+    }
+    QDomNodeList childs = node.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if ((child.nodeName() == "key") and
+                (child.attributes().contains("name")) and
+                (child.attributes().namedItem("name").nodeValue() == key)){
+            if (child.childNodes().length() > 0) {
+                return getInteger(child.childNodes().item(0));
+            }
+        }
+    }
+    qDebug() << ("Internal error in getIntegerFromMap (key not found)");
+    return -1;
+}
+
+bool
+vleVpz::existIntegerKeyInMap(QDomNode node, QString key)
+{
+    if (node.nodeName() != "map") {
+        QString mess = "Internal error in existIntegerKeyInMap (wrong main tag)";
+        mess += "\n got : ";
+        mess += node.nodeName();
+        qDebug() << (mess);
+        return -1;
+    }
+    QDomNodeList childs = node.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if ((child.nodeName() == "key") and
+                (child.attributes().contains("name")) and
+                (child.attributes().namedItem("name").nodeValue() == key)){
+            QDomNodeList childsKey = child.childNodes();
+            return (childsKey.length() > 0 and
+                    isInteger(childsKey.item(0)));
+        }
+    }
+    return false;
+}
+
+void
+vleVpz::addIntegerKeyInMap(QDomNode* node, const QString& key, int val)
+{
+    if (node->nodeName() != "map") {
+        QString mess = "Internal error in addIntegerKeyInMap (wrong main tag)";
+        mess += "\n got : ";
+        mess += node->nodeName();
+        qDebug() << (mess);
+        return;
+    }
+    QString qv = QVariant(val).toString();
+
+    //update key if present
+    QDomNodeList childs = node->childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if ((child.nodeName() == "key") and
+                (child.attributes().contains("name")) and
+                (child.attributes().namedItem("name").nodeValue() == key)){
+            QDomElement newInt  = child.toDocument().createElement("integer");
+            QDomText newIntVal  = newInt.toDocument().createTextNode(qv);
+            newInt.appendChild(newIntVal);
+            child.toElement().appendChild(newInt);
+            return ;
+        }
+    }
+    //add key if required
+    QDomElement newKey = node->toDocument().createElement("key");
+    newKey.setTagName("key");
+    newKey.setAttribute("name", key);
+    QDomElement newInt  = newKey.toDocument().createElement("integer");
+    QDomText newIntVal  = newInt.toDocument().createTextNode(qv);
+    newInt.appendChild(newIntVal);
+    newKey.appendChild(newInt);
+    node->appendChild(newKey);
+}
+
+void
+vleVpz::clearMap(QDomNode* node)
+{
+    if (node->nodeName() != "map") {
+        QString mess = "Internal error in clearMap (wrong main tag)";
+        mess += "\n got : ";
+        mess += node->nodeName();
+        qDebug() << (mess);
+        return;
+    }
+    QDomNodeList childs = node->childNodes();
+    while(node->hasChildNodes()) {
+        node->removeChild(childs.item(0));
+    }
+}
+
+QDomNode
+vleVpz::getOutputFromViews(QDomNode node,
+        const QString& outputName)
+{
+    QDomNode outputs = outputsFromViews(node);
+    QDomNode output = outputFromOutputs(outputs, outputName);
+    return output;
+}
+
+QString
+vleVpz::getOutputPluginFromViews(QDomNode node,
+        const QString& outputName)
+{
+    QDomNode output = getOutputFromViews(node, outputName);
+    return getOutputPlugin(output);
+}
+
+QString
+vleVpz::toQString(const QDomNode& node) const
+{
+    QString str;
+    QTextStream stream(&str);
+    node.save(stream, node.nodeType());
+    return str;
+}
+
 
 void vleVpz::setBasePath(const QString path)
 {
@@ -769,7 +1248,7 @@ bool vleVpz::xSaveExperiments(QDomDocument *doc, QDomElement *baseNode)
 
     baseNode->setAttribute("name", getExpName());
 
-    if ( (mConditions.length() == 0) && (mViewsRaw == 0))
+    if (mConditions.length() == 0)
         return false;
 
     if (mConditions.length())
@@ -794,7 +1273,7 @@ bool vleVpz::xSaveExperiments(QDomDocument *doc, QDomElement *baseNode)
         baseNode->appendChild(xExpCnd);
     }
 
-    baseNode->appendChild(*mViewsRaw);
+    baseNode->appendChild(viewsFromDoc());
 
     return true;
 }
@@ -916,8 +1395,6 @@ void vleVpz::xReadDomExperiments(const QDomNode &baseNode)
 
         if (item.nodeName() == "conditions")
             xReadDomExpConditions(item);
-        if (item.nodeName() == "views")
-            mViewsRaw = new QDomNode(item);
     }
 }
 

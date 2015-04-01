@@ -154,6 +154,7 @@ void GVLE2Win::loadPlugins()
     QString pathgvlec = "plugins/gvle2/condition";
     QString pathgvles = "plugins/gvle2/simulating";
     QString pathgvlem = "plugins/gvle2/modeling";
+    QString pathgvleo = "plugins/gvle2/output";
 
     QString packagesDir = vu::Path::path().getBinaryPackagesDir().c_str();
 
@@ -211,6 +212,24 @@ void GVLE2Win::loadPlugins()
                 loader.unload();
             }
         }
+
+        if (QDir(it.filePath() + "/" + pathgvleo).exists()) {
+            QDirIterator itbis(it.filePath() + "/" + pathgvleo, QDir::Files);
+
+            while (itbis.hasNext()) {
+                QString libName =  itbis.next();
+                QPluginLoader loader(libName);
+                QObject *plugin = loader.instance();
+                if ( ! loader.isLoaded()) {
+                    continue;
+                }
+                PluginOutput *simulating = qobject_cast<PluginOutput *>(plugin);
+                if (simulating) {
+                    loadOutputPlugins(simulating, libName);
+                }
+                loader.unload();
+            }
+        }
     }
 }
 
@@ -253,6 +272,12 @@ void GVLE2Win::loadSimulationPlugins(PluginSimulator *sim, QString fileName)
     newAct->setObjectName(sim->getname());
     newAct->setData(fileName);
     QObject::connect(newAct, SIGNAL(toggled(bool)), this, SLOT(onSelectSimulator(bool)));
+}
+
+void GVLE2Win::loadOutputPlugins(PluginOutput *out, QString fileName)
+{
+    qDebug() << " - Found output plugin: " << out->getname();
+    mOutputPlugins.insert(out->getname(), fileName);
 }
 
 /**
@@ -375,6 +400,14 @@ void GVLE2Win::openProject(QString pathName)
     {
         QString name = expNames.at(i);
         mPackage->addExpPlugin(name, mExpPlugins.value(name));
+    }
+
+    // Register Output plugins
+    QList <QString> outNames = mOutputPlugins.keys();
+    for (int i = 0; i < mOutputPlugins.count(); i++)
+    {
+        QString name = outNames.at(i);
+        mPackage->addOutputPlugin(name, mOutputPlugins.value(name));
     }
 
     mLogger->log(QString("Open Project %1").arg(mPackage->getName()));
