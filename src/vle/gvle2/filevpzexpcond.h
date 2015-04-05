@@ -28,6 +28,7 @@
 #include <QMenu>
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
+#include <QTableWidgetItem>
 #include "vlevpz.h"
 #include "plugin_cond.h"
 
@@ -40,47 +41,101 @@ class FileVpzExpCond : public QWidget
     Q_OBJECT
 
 public:
-    enum ExpCondTreeType { ECondNone, ECondCondition, ECondParameter };
+    enum ExpCondTreeType { ECondNone, ECondCondition, ECondPort,
+                           ECondValue };
+    enum ValueDisplayType {TypeOnly, Insight};
+
+//    BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
+//                XMLTYPE, NIL, MATRIX, USER
+
+    enum PageEditType {PageBoolean, PageInteger, PageDouble,
+         PageString, PageSet, PageMap, PageTuple, PageTable,
+         PageMatrix, PageBlank};
+    enum eCondMenuActions { EMenuCondAdd, EMenuCondRename, EMenuCondRemove,
+      EMenuPortAdd, EMenuPortRename, EMenuPortRemove, EMenuPlugins,
+      EMenuValueAddBoolean, EMenuValueAddInteger, EMenuValueAddDouble,
+      EMenuValueAddString, EMenuValueAddSet, EMenuValueAddMap,
+      EMenuValueAddTuple, EMenuValueAddTable, EMenuValueAddMatrix,
+      EMenuValueRemove };
+
+    enum eMapMenuActions { EMapBooleanAdd, EMapValueRename, EMapValueRemove};
 
 public:
     explicit FileVpzExpCond(QWidget *parent = 0);
     ~FileVpzExpCond();
     void setVpz(vleVpz *vpz);
     void reload();
-    void refresh(vpzExpCond *exp, QTreeWidgetItem *expItem = 0);
+    void refresh(const QString& condName, QTreeWidgetItem *expItem = 0);
 
 public slots:
-    void onConditionTreeRefresh();
     void onConditionTreeMenu(const QPoint pos);
+    void onMapTreeMenu(const QPoint pos);
+    void tupleMenu(const QPoint&);
+    void setMenu(const QPoint&);
     void onConditionChanged(QTreeWidgetItem *item, int column);
+    void onMapTreeChanged(QTreeWidgetItem *item, int column);
     void onConditionTreeSelected();
     void onCondParamTreeSelected();
-    void onCondParamListDblClick(QListWidgetItem *item);
-    void onParamTableChange();
-    void onCondParamTableDblClick(int row, int col);
-    void onCondParamTableMenu(const QPoint pos);
-    void onCondParamTreeMenu(const QPoint pos);
-    void onCondParamListMenu(const QPoint pos);
-    void onParamTextChange();
+
     void onCondParamCancel();
-    void onCondParamSave();
-    void onPluginChanges(vpzExpCond *cond);
+    void onPluginChanges(const QString& condName);
+    void boolEdited(const QString&);
+    void intEdited(int v);
+    void doubleEdited(double);
+    void stringEdited();
+    void tupleEdited(QListWidgetItem*);
+    void tableEdited(int, int);
+    void tableDimButtonClicked(bool);
+    void mapDoubleClicked(QTreeWidgetItem* item, int column);
+    void setDoubleClicked(QListWidgetItem* item);
+    void matrixDoubleClicked(QTableWidgetItem* item);
+    void matrixDimButtonClicked(bool b);
+    void upStackButonClicked(bool b);
 
 private:
-    void condParamTreeSelectByValue(vpzExpCondValue *reqValue, QTreeWidgetItem *base = 0);
-    void condUpdateTree(QList <vpzExpCondValue *> *valueList, QList<QTreeWidgetItem *> *widList);
-    void condValueShowDetail(vpzExpCondValue *value);
-    void condShowPlugin(vpzExpCond *cond);
+    void buildAddValueMenu(QMenu& menu);
+    vle::value::Value* buildDefaultValue(eCondMenuActions act);
+    void condUpdateTree(const std::vector<vle::value::Value*>& values,
+            QList<QTreeWidgetItem *> *widList);
+    void condValueShowDetail();
+    void condShowPlugin(const QString& condName);
     void condHidePlugin();
-    void paramTreeUpdateList(vpzExpCondValue *value);
-    void paramTreeUpdateTable(vpzExpCondValue *value);
-    void paramTreeUpdateText(vpzExpCondValue *value);
+    QString getValueDisplay(const vle::value::Value& v,
+            ValueDisplayType displayType) const;
 
 private:
-    Ui::FileVpzExpCond *ui;
-    vleVpz  *mVpz;
-    QTreeWidgetItem *mCondEdition;
-    PluginExpCond   *mPlugin;
+    Ui::FileVpzExpCond* ui;
+    vleVpz*             mVpz;
+    QString             mCurrCondName;
+    QString             mCurrPortName;
+    int                 mCurrValIndex;
+    //QTreeWidgetItem *mCondEdition;
+    PluginExpCond*      mPlugin;
+    struct value_stack {
+        value_stack();
+        ~value_stack();
+        vle::value::Value* startValue;
+        typedef  std::vector<vle::value::Value*> cont;
+        cont stack;
+        void delStartValue();
+        void setStartValue(vle::value::Value* val);
+        /*
+         * @brief push a vle::value::Map key
+         */
+        void push(const std::string& key);
+        /*
+         * @brief push a vle::value::Set index
+         */
+        void push(int index);
+        /*
+         * @brief push a vle::value::Matrix index (row column)
+         */
+        void push(int row, int col);
+
+        vle::value::Value* editingValue();
+        std::string toString();
+    };
+    value_stack         mValueStack;
 };
 
 #endif // FILEVPZEXPCOND_H

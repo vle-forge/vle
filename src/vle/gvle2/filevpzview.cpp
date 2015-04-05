@@ -535,28 +535,28 @@ void fileVpzView::onViewTreeMenu(const QPoint pos)
                 parentModel->addSubmodel(newModel);
                 treeInsertModel(newModel, item->parent());
                 diagSelectModel(mCurrentModel, true);
-
-                if (model->hasModeler())
-                {
-                    // Get informations about the Experimental Condition of the source model
-                    vpzExpCond * srcExp = model->getModelerExpCond();
-                    QString srcExpName = srcExp->getName();
-                    QString srcClass = srcExpName.left(srcExpName.length() - model->getName().length());
-                    // Create a new Experimental Condition
-                    QString newExpName = srcClass;
-                    newExpName += newModel->getName();
-                    vpzExpCond *newCond = mVpz->addCondition( newExpName );
-                    newCond->copyFromExpCond(srcExp);
-                    // Add this new condition to the new model
-                    newModel->addCondition(newCond);
-                    // Then, reload the Experimental Condition tab
-                    mExpCondTab->reload();
-
-                    // Get the Dynamic used by the source model
-                    vleVpzDynamic *dyn = model->getDynamic();
-                    // Then, configure the new model to use the same Dynamic
-                    newModel->setDynamic(dyn->getName());
-                }
+                //Todo: a modeler does not edit directly a condition: to see when a plugin available
+//                if (model->hasModeler())
+//                {
+//                    // Get informations about the Experimental Condition of the source model
+//                    vpzExpCond * srcExp = model->getModelerExpCond();
+//                    QString srcExpName = srcExp->getName();
+//                    QString srcClass = srcExpName.left(srcExpName.length() - model->getName().length());
+//                    // Create a new Experimental Condition
+//                    QString newExpName = srcClass;
+//                    newExpName += newModel->getName();
+//                    vpzExpCond *newCond = mVpz->addCondition( newExpName );
+//                    newCond->copyFromExpCond(srcExp);
+//                    // Add this new condition to the new model
+//                    newModel->addCondition(newCond);
+//                    // Then, reload the Experimental Condition tab
+//                    mExpCondTab->reload();
+//
+//                    // Get the Dynamic used by the source model
+//                    vleVpzDynamic *dyn = model->getDynamic();
+//                    // Then, configure the new model to use the same Dynamic
+//                    newModel->setDynamic(dyn->getName());
+//                }
             }
         }
     }
@@ -668,22 +668,24 @@ void fileVpzView::onPropertyChanged(QTableWidgetItem *item)
         if (newName == oldName)
             return;
 
-        // If the model use a modeler plugin, associated experimental condition must be renamed
-        if (model->hasModeler())
-        {
-            // Get the experimental condition used by plugin
-            vpzExpCond *exp = model->getModelerExpCond();
-            // Search the class name from exp cond name
-            QString expName = exp->getName();
-            QString className = expName.left( expName.length() - oldName.length() );
-            // Build the new exp cond name
-            QString newExpName = className;
-            newExpName += newName;
+        //Todo a modeler does not have condition attached to
 
-            // Update the experimental condition, and refresh UI
-            exp->setName( newExpName );
-            mExpCondTab->reload();
-        }
+// If the model use a modeler plugin, associated experimental condition must be renamed
+//        if (model->hasModeler())
+//        {
+//            // Get the experimental condition used by plugin
+//            vpzExpCond *exp = model->getModelerExpCond();
+//            // Search the class name from exp cond name
+//            QString expName = exp->getName();
+//            QString className = expName.left( expName.length() - oldName.length() );
+//            // Build the new exp cond name
+//            QString newExpName = className;
+//            newExpName += newName;
+//
+//            // Update the experimental condition, and refresh UI
+//            exp->setName( newExpName );
+//            mExpCondTab->reload();
+//        }
 
         // Set the new name to the model ...
         model->setName(newName);
@@ -775,10 +777,7 @@ void fileVpzView::onTabClose(int index)
  *        Called when an experimental condition has been changed by plugin
  *
  */
-void fileVpzView::onExpCondChanged(vpzExpCond *exp)
+void fileVpzView::onExpCondChanged(const QString& condName)
 {
-    if (exp == 0)
-        return;
-
-    mExpCondTab->refresh(exp);
+    mExpCondTab->refresh(condName);
 }

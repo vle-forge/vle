@@ -29,10 +29,12 @@
 #include <QSettings>
 #include <QString>
 #include <QWidget>
+#include <QString>
 #include <vle/gvle2/logger.h>
 #include <vle/gvle2/sourcecpp.h>
 #include <vle/gvle2/vlevpz.h>
-#include <vle/gvle2/vpzexpcond.h>
+
+class vleVpzModel;
 
 class PluginModeler: public QObject
 {
@@ -50,7 +52,7 @@ public:
     virtual QWidget *getEditClass(sourceCpp *src);
     virtual void     closeEditClass(sourceCpp *src);
     virtual QWidget *addEditModel(vleVpzModel *model) = 0;
-    virtual void     initExpCond(vpzExpCond *exp, sourceCpp *src) = 0;
+    virtual void     initExpCond(const QString& condName, sourceCpp *src) = 0;
     virtual void     rename(QString oldName, QString newName) = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;

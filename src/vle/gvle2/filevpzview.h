@@ -84,7 +84,7 @@ public slots:
     void onPropertyMode(bool isSelected);
     void onTabClose(int index);
     void onAddModelerTab(vleVpzModel *model);
-    void onExpCondChanged(vpzExpCond *exp);
+    void onExpCondChanged(const QString& condName);
 
 private:
     bool             mUseSim;

@@ -42,8 +42,8 @@ public:
     virtual void     delWidgetToolbar() = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  setExpCond(vpzExpCond *cond) = 0;
-    virtual void  setVpz(vleVpz *vpz) = 0;
+    virtual void  setExpCond(const QString& condName) = 0;
+    virtual void  setVpz(vleVpz* vpz) = 0;
     virtual void *getVpz() = 0;
 //signals:
 //    virtual void  valueChanged() = 0;

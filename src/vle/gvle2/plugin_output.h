@@ -31,6 +31,8 @@
 #include <vle/gvle2/logger.h>
 #include <vle/gvle2/vlevpz.h>
 
+class vleVpz;
+
 class PluginOutput: public QObject
 {
     Q_OBJECT

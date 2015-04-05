@@ -42,7 +42,6 @@
 #include "vlevpzconn.h"
 #include "vlevpzdynamic.h"
 #include "vlevpzport.h"
-#include "vpzexpcond.h"
 #include <vle/value/Value.hpp>
 #include "vle/gvle2/ui_filevpztooltip.h"
 
@@ -87,6 +86,79 @@ public:
      */
     QDomNode condsFromDoc() const;
     /**
+     * @brief build an empty node corresponding to the value type from Vpz doc
+     */
+    QDomElement buildEmptyValueFromDoc(vle::value::Value::type vleType);
+    /**
+     * @brief tells if a condition exists
+     */
+    bool existCondFromDoc(const QString& condName) const;
+    /**
+     * @brief tells if the port portName exists in condition condName
+     */
+    bool existPortFromDoc(const QString& condName,
+            const QString& portName) const;
+    /**
+     * @brief set the 'name' attribute of tag <condition> to a new value
+     */
+    void renameConditionToDoc(const QString& oldName, const QString& newName);
+    /**
+     * @brief set the 'name' attribute of tag <port> to a new value
+     */
+    void renameCondPortToDoc(const QString& condName, const QString& oldName,
+            const QString& newName);
+    /**
+     * @brief get a new condition name not already in tag <conditions>
+     * from the Vpz doc
+     */
+     QString newCondNameToDoc() const;
+     /**
+      * @brief get a new port name for condition condName not already in tag
+      * <condition> from the Vpz doc
+      */
+     QString newCondPortNameToDoc(const QString& condName) const;
+    /**
+     * @brief get list of node with tag <port> tag from Vpz doc,
+     * for condition of name 'condName'
+     */
+    QDomNodeList portsListFromDoc(const QString& condName) const;
+    /**
+     * @brief get <port> tag from Vpz Doc into condition condName
+     * which attribute 'name' is portName
+     */
+    QDomNode portFromDoc(const QString& condName, const QString& portName) const;
+    /**
+     * @brief add a <condition> tag to a Vpz Doc
+     * whith attribute 'name'  condName
+     */
+    QDomNode addConditionToDoc(const QString& condName);
+    /**
+     * @brief add a <port> tag to a Vpz Doc
+     * whith attribute 'name'  portName for condition condName
+     */
+    QDomNode addCondPortToDoc(const QString& condName, const QString& portName);
+    /**
+     * @brief remove a <condition> tag to a Vpz Doc
+     * whith attribute 'name'  condName
+     */
+    void rmConditionToDoc(const QString& condName);
+    /**
+     * @brief remove <port> tag from a condition to a Vpz doc
+     * which attribute 'name' is portName
+     */
+    void rmCondPortToDoc(const QString& condName, const QString& portName);
+    /**
+     * @brief add a value to a tag <port> tag from a condition into a Vpz doc
+     */
+    void addValuePortCondToDoc(const QString& condName, const QString& portName,
+            const vle::value::Value& val);
+    /**
+     * @brief rm a value from a tag <port> tag from a condition into a Vpz doc
+     * 'index' is the index of value in port
+     */
+    void rmValuePortCondToDoc(const QString& condName, const QString& portName,
+            int index);
+    /**
      * @brief get atomic model tag <model> from a tag <model>,
      * which name is atom
      */
@@ -97,10 +169,12 @@ public:
      * @brief get list of node with tag <condition> tag from tag <conditions>
      */
     QDomNodeList condsListFromConds(const QDomNode& node) const;
+
     /**
      * @brief get list of node with tag <port> tag from tag <condition>
      */
     QDomNodeList portsListFromCond(const QDomNode& node) const;
+
     /**
      * @brief get <condition> tag from  tag <conditions>
      * which attribute 'name' is condName
@@ -125,7 +199,7 @@ public:
      * @brief add a <condition> tag to <conditions>
      * whith attribute 'name'  condName
      */
-    QDomNode addCondition(QDomNode& node, const QString& condName);
+    QDomNode addCondition(QDomNode node, const QString& condName);
     /**
      * @brief attach a condition to an anatomic model
      * @param atom, atomic model name
@@ -149,7 +223,7 @@ public:
      * @brief add a <port> tag to <condition>
      * whith attribute 'name'  portName
      */
-    QDomNode addPort(QDomNode& node, const QString& portName);
+    QDomNode addPort(QDomNode node, const QString& portName);
     /**
      * @brief get attribute value of a node which name is attrName
      */
@@ -158,7 +232,7 @@ public:
      * @brief set attribute value of a node which name is attrName
      * and value is val
      */
-    void setAttributeValue(QDomNode node, const QString& attrName,
+    void setAttributeValue(QDomElement node, const QString& attrName,
             const QString& val);
 
     /**
@@ -222,12 +296,24 @@ public:
     QDomNode mapFromOutput(QDomNode node);
 
     /**
+     * @brief Build a value from given index  of <port> portName of
+     * <condtion> condName
+     * @note: result is a new allocated vle value.
+     */
+    vle::value::Value* buildValue(const QString& condName,
+            const QString& portName, int index) const;
+    /**
      * @brief build a vle value from either tag
      * <integer>, <string>, <map> etc..
      * @note: result is a new allocated vle value.
      */
     vle::value::Value* buildValue(const QDomNode& node) const;
-
+    /**
+     * @brief Fill a value at index of <port> portName of <condtion> condName
+     * @note: the map is first cleared
+     */
+    bool fillWithValue(const QString& condName, const QString& portName,
+            int index, const vle::value::Value& val);
     /**
      * @brief Fill a Node from a value
      * @note: the main tag should corresponds to the value type ie:
@@ -258,9 +344,9 @@ public:
     void addIntegerKeyInMap(QDomNode* node, const QString& key,
             int val);
     /**
-     * @brief clear a map from a tag <map>
+     * @brief Remove all childs from a QDomNode (keep attributes)
      */
-    void clearMap(QDomNode* node);
+    void removeAllChilds(QDomNode node);
     /**
      * @brief get <output>  from a tag <views>
      * @note : combine outputsFromViews, outputFromOutput
@@ -313,37 +399,21 @@ public:
             const QString &localName,
             const QString &qName,
             const QXmlAttributes &attributes);
-    public:
+public:
     QByteArray xGetXml();
-    private:
+private:
     void xReadDom();
     void xReadDomStructures(const QDomNode &baseNode);
     void xReadDomDynamics(const QDomNode &baseNode);
     void xReadDomExperiments(const QDomNode &baseNode);
-    void xReadDomExpConditions(const QDomNode &baseNode);
     void xSaveDom(QDomDocument *doc);
     bool xSaveStructures(QDomDocument *doc, QDomNode *baseNode);
     bool xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *model);
     bool xSaveDynamics(QDomDocument *doc, QDomNode *baseNode);
     bool xSaveExperiments(QDomDocument *doc, QDomElement *baseNode);
-    bool xSaveExpCondition(QDomDocument *doc, QDomNode *baseNode, vpzExpCond *cond);
-    bool xSaveExpCondValue(QDomDocument *doc, QDomNode *baseNode, vpzExpCondValue *value);
     int  removeModelDynamic(vleVpzModel *model, vleVpzDynamic *dynamic, bool recurse = false);
 
-    public:
-    vpzExpCond *     addCondition(QString name = "");
-    bool             removeCondition(vpzExpCond *cond);
-    vpzExpCondValue *addConditionValue(vpzExpCondPort *port, vpzExpCondValue::ValueType type = vpzExpCondValue::TypeUnknown);
-    bool             delConditionValue(vpzExpCondPort *port, vpzExpCondValue *value);
-    vpzExpCond *     getCondition(QString name);
-    vpzExpCond *     getFirstCondition();
-    vpzExpCond *     getNextCondition();
-    QList <vpzExpCond *> *getConditions()
-            {
-        return &mConditions;
-            }
-
-    private:
+private:
     QString mFilename;
     QString mPath;
 
@@ -353,12 +423,11 @@ public:
     QString mExpCombination;
     vlePackage *mPackage;
     int                     mConditionIteratorIndex;
-    QList <vleVpzDynamic *> mDynamics;
-    QList <vpzExpCond    *> mConditions;
-    QList <void          *> mViews;
-    QDomNode               *mClassesRaw;
+    QList <vleVpzDynamic*> mDynamics;
+    QList <void*>           mViews;
+    QDomNode*              mClassesRaw;
     public:
-    vleVpzModel * mRootModel;
+    vleVpzModel*           mRootModel;
 };
 
 class vleVpzModel : public QWidget
@@ -398,19 +467,18 @@ public:
     void setDynamic(QString dynamicName);
     void removeDynamic();
 
-    void addCondition(vpzExpCond *cond);
-    void removeCondition(vpzExpCond *cond);
+    void addCondition(const QString& cond);
+    void removeCondition(const QString& cond);
     QString getConditionStringList();
-    bool hasCondition(vpzExpCond *cond);
     bool hasCondition(const QString& condName);
 
     QString getObservables()
     {
         return mObservables;
     }
-
-    bool hasModeler();
-    vpzExpCond *getModelerExpCond();
+    //Todo a modeler does not have cond
+//    bool hasModeler();
+//    vpzExpCond *getModelerExpCond();
 
     bool isAltered();
     void fixWidgetSize(bool doResize = false);
@@ -479,7 +547,7 @@ protected:
     QList <vleVpzPort  *> mOutPorts;
     QList <vleVpzConn  *> mConnections;
     vleVpzDynamic *mDynamic;
-    QList <vpzExpCond *>  mConditions;
+    QList <QString>  mConditions;
     QString               mObservables;
     QLabel  mTitle;
     bool    mIsMaximized;
