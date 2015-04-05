@@ -698,44 +698,18 @@ void fileVpzView::onPropertyChanged(QTableWidgetItem *item)
  *        Called when a property is selected into right column list
  *
  */
-void fileVpzView::onPropertySelected(int cr, int cc, int pr, int pc)
+void
+fileVpzView::onPropertySelected(int cr, int cc, int pr, int pc)
 {
     (void)cc;
     (void)pc;
 
-    QWidget *oldWidget = uiTool->modelProperty->cellWidget(pr, 1);
-    WidgetVpzProperty *owp = qobject_cast<WidgetVpzProperty *>(oldWidget);
-    if (owp)
-    {
-        WidgetVpzPropertyDynamics *wpd = qobject_cast<WidgetVpzPropertyDynamics *>(owp);
-        if (wpd)
-            wpd->setMaximized(false);
-
-        WidgetVpzPropertyExpCond *wpec =  qobject_cast<WidgetVpzPropertyExpCond *>(owp);
-        if (wpec)
-            wpec->setMaximized(false);
-
-        // Update row size (if needed)
-        uiTool->modelProperty->resizeRowToContents(pr);
-    }
-
-    QWidget *newWidget = uiTool->modelProperty->cellWidget(cr, 1);
-    WidgetVpzProperty *nwp = qobject_cast<WidgetVpzProperty *>(newWidget);
-    if (nwp)
-    {
-        WidgetVpzPropertyDynamics *wpd = qobject_cast<WidgetVpzPropertyDynamics *>(nwp);
-        if (wpd)
-            wpd->setMaximized(true);
-
-        WidgetVpzPropertyExpCond *wpec =  qobject_cast<WidgetVpzPropertyExpCond *>(nwp);
-        if (wpec)
-            wpec->setMaximized(true);
-
-        // Update row size (if needed)
-        uiTool->modelProperty->resizeRowToContents(cr);
-    }
+    uiTool->modelProperty->resizeRowToContents(pr);
+    uiTool->modelProperty->resizeRowToContents(cr);
 }
-void fileVpzView::onPropertyMode(bool isSelected)
+
+void
+fileVpzView::onPropertyMode(bool isSelected)
 {
     (void)isSelected;
 

@@ -32,27 +32,7 @@ class WidgetVpzPropertyDynamics;
 class WidgetVpzPropertyExpCond;
 }
 
-class WidgetVpzProperty : public QWidget
-{
-    Q_OBJECT
-
-public:
-    enum propertyMode { ModeSimple, ModeExtend, ModeEdit };
-
-public:
-    explicit WidgetVpzProperty(QWidget *parent = 0);
-    ~WidgetVpzProperty();
-    void setMaximized(bool isMax);
-    void setModel(vleVpzModel *model);
-
-protected:
-    vleVpzModel *mModel;
-
-private:
-    bool isMaximized;
-};
-
-class WidgetVpzPropertyDynamics : public WidgetVpzProperty
+class WidgetVpzPropertyDynamics : public QWidget
 {
     Q_OBJECT
 
@@ -60,11 +40,6 @@ public:
     explicit WidgetVpzPropertyDynamics(QWidget *parent = 0);
     ~WidgetVpzPropertyDynamics();
     void setModel(vleVpzModel *model);
-    void setMaximized(bool isMax);
-
-protected:
-    // From QWidget
-    void mouseDoubleClickEvent (QMouseEvent *event);
 
 signals:
     void sigActivated(bool isActive);
@@ -74,26 +49,26 @@ private slots:
 
 private:
     Ui::WidgetVpzPropertyDynamics *ui;
-    propertyMode mMode;
+    vleVpzModel *mModel;
 };
 
-class WidgetVpzPropertyExpCond : public WidgetVpzProperty
+class WidgetVpzPropertyExpCond : public QWidget
 {
     Q_OBJECT
 public:
     explicit WidgetVpzPropertyExpCond(QWidget *parent = 0);
     ~WidgetVpzPropertyExpCond();
     void setModel(vleVpzModel *model);
-    void setMaximized(bool isMax);
 
-protected:
-    void mouseDoubleClickEvent (QMouseEvent *event);
+//protected:
+//    void mouseDoubleClickEvent (QMouseEvent *event);
 
 private slots:
     void onCheckboxToggle(bool checked);
 
 private:
     Ui::WidgetVpzPropertyExpCond *ui;
+    vleVpzModel *mModel;
 };
 
 #endif // WIDGETVPZPROPERTY_H

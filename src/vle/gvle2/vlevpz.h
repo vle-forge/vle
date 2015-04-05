@@ -83,6 +83,85 @@ public:
      */
     QDomNode viewsFromDoc() const;
     /**
+     * @brief get <conditions> tag from Vpz doc
+     */
+    QDomNode condsFromDoc() const;
+    /**
+     * @brief get atomic model tag <model> from a tag <model>,
+     * which name is atom
+     */
+    QDomNode atomicModelFromModel(const QDomNode& node,
+            const QString& atom) const;
+
+    /**
+     * @brief get list of node with tag <condition> tag from tag <conditions>
+     */
+    QDomNodeList condsListFromConds(const QDomNode& node) const;
+    /**
+     * @brief get list of node with tag <port> tag from tag <condition>
+     */
+    QDomNodeList portsListFromCond(const QDomNode& node) const;
+    /**
+     * @brief get <condition> tag from  tag <conditions>
+     * which attribute 'name' is condName
+     */
+    QDomNode condFromConds(const QDomNode& node, const QString& condName) const;
+    /**
+     * @brief get <port> tag from  tag <condition>
+     * which attribute 'name' is portName
+     */
+    QDomNode portFromCond(const QDomNode& node, const QString& portName) const;
+    /**
+     * @brief remove <condition> tag from <conditions>
+     * which attribute 'name' is condName
+     */
+    void rmCondFromConds(QDomNode node, const QString& condName);
+    /**
+     * @brief remove <port> tag from <condition>
+     * which attribute 'name' is portName
+     */
+    void rmPortFromCond(QDomNode node, const QString& portName);
+    /**
+     * @brief add a <condition> tag to <conditions>
+     * whith attribute 'name'  condName
+     */
+    QDomNode addCondition(QDomNode& node, const QString& condName);
+    /**
+     * @brief attach a condition to an anatomic model
+     * @param atom, atomic model name
+     * @param condName, condition name
+     *
+     * TODO: atomic model is given without the full name, this is due to
+     * vleVpzModel API that does not provide this intel => to fix
+     */
+    void attachCondToAtomicModel(const QString& atom, const QString& condName);
+    /**
+     * @brief detach a condition to an anatomic model
+     * @param atom, atomic model name
+     * @param condName, condition name
+     *
+     * TODO: atomic model is given without the full name, this is due to
+     * vleVpzModel API that does not provide this intel => to fix
+     */
+    void detachCondToAtomicModel(const QString& atom, const QString& condName);
+
+    /**
+     * @brief add a <port> tag to <condition>
+     * whith attribute 'name'  portName
+     */
+    QDomNode addPort(QDomNode& node, const QString& portName);
+    /**
+     * @brief get attribute value of a node which name is attrName
+     */
+    QString attributeValue(const QDomNode& node, const QString& attrName) const;
+    /**
+     * @brief set attribute value of a node which name is attrName
+     * and value is val
+     */
+    void setAttributeValue(QDomNode node, const QString& attrName,
+            const QString& val);
+
+    /**
      * @brief get <outputs> tag from <views> tag
      */
     QDomNode outputsFromViews(QDomNode node);
@@ -322,16 +401,8 @@ public:
     void addCondition(vpzExpCond *cond);
     void removeCondition(vpzExpCond *cond);
     QString getConditionStringList();
-    bool hasCondition(vpzExpCond *cond)
-    {
-        int i;
-        for (i = 0; i < mConditions.count(); i++)
-        {
-            if (mConditions.at(i) == cond)
-                return true;
-        }
-        return false;
-    }
+    bool hasCondition(vpzExpCond *cond);
+    bool hasCondition(const QString& condName);
 
     QString getObservables()
     {

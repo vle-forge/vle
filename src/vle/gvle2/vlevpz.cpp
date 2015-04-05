@@ -230,6 +230,228 @@ vleVpz::viewsFromDoc() const
 }
 
 QDomNode
+vleVpz::condsFromDoc() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement expElem = nodeList.item(0).toElement();
+    nodeList = expElem.elementsByTagName("conditions");
+    return nodeList.item(0);
+}
+
+QDomNode
+vleVpz::atomicModelFromModel(const QDomNode& node, const QString& atom) const
+{
+    QDomNode res;
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in atomicModelFromModel (wrong main tag)");
+
+        return res;
+    }
+    QDomNode currSubModelTag = node.firstChildElement("submodels");
+    if (currSubModelTag.nodeName() != "submodels") {
+        if ((attributeValue(node, "type") == "atomic")
+                and (attributeValue(node, "name") == atom)) {
+            return node;
+        }
+        return res;
+    }
+    QDomNodeList currSubModels = currSubModelTag.childNodes();
+    bool found = false;
+    for (unsigned int i =0; i < currSubModels.length(); i++) {
+        QDomNode child = currSubModels.at(i);
+        if (child.nodeName() == "model") {
+            QDomNode n = atomicModelFromModel(currSubModels.at(i), atom);
+            if (not n.isNull()) {
+                if (found) {
+                    qDebug() << ("Internal error in atomicModelFromModel "
+                            "(ambiguous)");
+                    return QDomNode();
+                }
+                found = true;
+                res = n;
+            }
+        }
+    }
+    return res;
+}
+
+
+QDomNodeList
+vleVpz::condsListFromConds(const QDomNode& node) const
+{
+    if (node.nodeName() != "conditions") {
+        qDebug() << ("Internal error in condsListFromConds (wrong main tag)");
+        return QDomNodeList();
+    }
+    return node.toElement().elementsByTagName("condition");
+}
+
+QDomNodeList
+vleVpz::portsListFromCond(const QDomNode& node) const
+{
+    if (node.nodeName() != "condition") {
+        qDebug() << ("Internal error in portsListFromCond (wrong main tag)");
+        return QDomNodeList();
+    }
+    return node.toElement().elementsByTagName("port");
+}
+
+
+QDomNode
+vleVpz::condFromConds(const QDomNode& node, const QString& condName) const
+{
+    QDomNodeList conds = condsListFromConds(node);
+    for (unsigned int i=0; i < conds.length(); i++){
+        QDomNode child = conds.item(i);
+        if ((child.attributes().contains("name")) and
+            (child.attributes().namedItem("name").nodeValue() == condName)){
+            return child;
+        }
+    }
+    qDebug() << ("Internal error in condFromConds (not found)");
+    return QDomNode();
+}
+
+QDomNode
+vleVpz::portFromCond(const QDomNode& node, const QString& portName) const
+{
+    QDomNodeList conds = portsListFromCond(node);
+    for (unsigned int i=0; i < conds.length(); i++) {
+        QDomNode child = conds.item(i);
+        if ((child.attributes().contains("name")) and
+            (child.attributes().namedItem("name").nodeValue() == portName)){
+            return child;
+        }
+    }
+    qDebug() << ("Internal error in portFromCond (not found)");
+    return QDomNode();
+}
+
+void
+vleVpz::rmCondFromConds(QDomNode node, const QString& condName)
+{
+    QDomNode toRm = condFromConds(node, condName);
+    node.removeChild(toRm);
+}
+
+void
+vleVpz::rmPortFromCond(QDomNode node, const QString& portName)
+{
+    QDomNode toRm = portFromCond(node, portName);
+    node.removeChild(toRm);
+}
+
+
+QDomNode
+vleVpz::addCondition(QDomNode& node, const QString& condName)
+{
+    QDomNodeList conds = condsListFromConds(node);
+    for (unsigned int i=0; i < conds.length(); i++) {
+        QDomNode child = conds.item(i);
+        if ((child.attributes().contains("name")) and
+            (child.attributes().namedItem("name").nodeValue() == condName)){
+            qDebug() << ("Internal error in addCondition (already here)");
+            return QDomNode();
+        }
+    }
+    QDomElement elem = getDomDoc().createElement("condition");
+    QDomAttr attr = getDomDoc().createAttribute("name");
+    attr.setNodeValue(condName);
+    node.appendChild(elem);
+    return elem;
+}
+
+void
+vleVpz::attachCondToAtomicModel(const QString& atom, const QString& condName)
+{
+    QDomNode structures =
+            getDomDoc().documentElement().elementsByTagName("structures").at(0);
+    QDomNode currModel =
+            structures.toElement().elementsByTagName("model").at(0);
+    QDomNode atomMod = atomicModelFromModel(currModel, atom);
+    QString attachedConds = attributeValue(atomMod, "conditions");
+    QStringList condSplit = attachedConds.split(",");
+    if (not condSplit.contains(condName)) {
+        condSplit.append(condName);
+        QString res ="";
+        for (int i=0; i<condSplit.length(); i++) {
+            if (i > 0){
+                res += ",";
+            }
+            res += condSplit.at(i);
+        }
+        setAttributeValue(atomMod, "conditions", res);
+    }
+    qDebug() << " DBG attachCondToAtomicModel "  << attributeValue(atomMod, "conditions");
+}
+
+void
+vleVpz::detachCondToAtomicModel(const QString& atom, const QString& condName)
+{
+    QDomNode structures =
+            getDomDoc().documentElement().elementsByTagName("structures").at(0);
+    QDomNode currModel =
+            structures.toElement().elementsByTagName("model").at(0);
+    QDomNode atomMod = atomicModelFromModel(currModel, atom);
+    QString attachedConds = attributeValue(atomMod, "conditions");
+    QStringList condSplit = attachedConds.split(",");
+    if (condSplit.contains(condName)) {
+        condSplit.removeOne(condName);
+        QString res ="";
+        for (int i=0; i<condSplit.length(); i++) {
+            if (i > 0){
+                res += ",";
+            }
+            res += condSplit.at(i);
+        }
+        setAttributeValue(atomMod, "conditions", res);
+    }
+
+    qDebug() << " DBG detachCondToAtomicModel "  << attributeValue(atomMod, "conditions");
+}
+
+QDomNode
+vleVpz::addPort(QDomNode& node, const QString& portName)
+{
+    QDomNodeList conds = portsListFromCond(node);
+    for (unsigned int i=0; i < conds.length(); i++) {
+        QDomNode child = conds.item(i);
+        if ((child.attributes().contains("name")) and
+            (child.attributes().namedItem("name").nodeValue() == portName)){
+            qDebug() << ("Internal error in addPort (already here)");
+            return QDomNode();
+        }
+    }
+    QDomElement elem = getDomDoc().createElement("port");
+    QDomAttr attr = getDomDoc().createAttribute("name");
+    attr.setNodeValue(portName);
+    node.appendChild(elem);
+    return elem;
+}
+
+QString
+vleVpz::attributeValue(const QDomNode& node, const QString& attrName) const
+{
+    if (node.attributes().contains(attrName)) {
+        return node.attributes().namedItem(attrName).nodeValue();
+    }
+    return "";
+}
+
+void
+vleVpz::setAttributeValue(QDomNode node, const QString& attrName,
+        const QString& val)
+{
+    if (node.attributes().contains(attrName)) {
+         node.attributes().namedItem(attrName).setNodeValue(val);
+    } else {
+        QDomAttr att = getDomDoc().createAttribute(attrName);
+        att.setNodeValue(val);
+        node.appendChild(att);
+    }
+}
+
+QDomNode
 vleVpz::outputFromOutputs(QDomNode node, const QString& outputName)
 {
     if (node.nodeName() != "outputs") {
@@ -1684,7 +1906,6 @@ void vleVpzModel::removeDynamic()
     mDynamic = 0;
 }
 
-
 void vleVpzModel::addCondition(vpzExpCond *cond)
 {
     if (cond == 0)
@@ -1692,6 +1913,7 @@ void vleVpzModel::addCondition(vpzExpCond *cond)
     mConditions.append(cond);
     cond->registerModel(this);
 }
+
 
 void vleVpzModel::removeCondition(vpzExpCond *cond)
 {
@@ -1711,6 +1933,30 @@ QString vleVpzModel::getConditionStringList()
         result.append(mConditions.at(i)->getName());
     }
     return result;
+}
+
+bool
+vleVpzModel::hasCondition(vpzExpCond *cond)
+{
+    int i;
+    for (i = 0; i < mConditions.count(); i++)
+    {
+        if (mConditions.at(i) == cond)
+            return true;
+    }
+    return false;
+}
+
+bool
+vleVpzModel::hasCondition(const QString& condName)
+{
+    int i;
+    for (i = 0; i < mConditions.count(); i++)
+    {
+        if (mConditions.at(i)->getName() == condName)
+            return true;
+    }
+    return false;
 }
 
 /**
