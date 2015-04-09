@@ -185,7 +185,28 @@ const Matrix& Matrix::getMatrix(const size_type& column,
 
 void Matrix::resize(const size_type& columns, const size_type& rows)
 {
+    if (columns < m_nbcol) {
+        for (unsigned int r=0; r < m_nbrow; r++) {
+            for (unsigned int c=columns; c < m_nbcol; c++ ) {
+                delete get(c,r);
+            }
+        }
+    }
+    if (rows < m_nbrow) {
+        for (unsigned int r=rows; r < m_nbrow; r++) {
+            for (unsigned int c=0; c < m_nbcol; c++ ) {
+                delete get(c,r);
+            }
+        }
+    }
     m_matrix.resize(m_extents[columns][rows]);
+    if (columns < m_nbcol) {
+        m_nbcol = columns;
+    }
+    if (rows < m_nbrow) {
+        m_nbrow = rows;
+    }
+
 }
 
 void Matrix::addColumn()
@@ -195,7 +216,9 @@ void Matrix::addColumn()
             m_extents[m_matrix.shape()[0] + m_stepcol]
             [m_matrix.shape()[1]]);
     }
-    ++m_nbcol;
+    if (m_stepcol > 0) {
+        ++m_nbcol;
+    }
 }
 
 void Matrix::addRow()
@@ -205,7 +228,9 @@ void Matrix::addRow()
             m_extents[m_matrix.shape()[0]]
             [m_matrix.shape()[1] + m_steprow]);
     }
-    ++m_nbrow;
+    if (m_steprow > 0) {
+        ++m_nbrow;
+    }
 }
 
 void Matrix::moveLastCell()
