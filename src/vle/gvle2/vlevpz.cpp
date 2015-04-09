@@ -564,6 +564,19 @@ vleVpz::portFromCond(const QDomNode& node, const QString& portName) const
     return QDomNode();
 }
 
+bool
+vleVpz::existPortFromCond(const QDomNode& node, const QString& portName) const
+{
+    QDomNodeList portList = portsListFromCond(node);
+    for (unsigned int i=0; i< portList.length(); i++) {
+       QDomNode port = portList.at(i);
+       if (attributeValue(port, "name") == portName) {
+           return true;
+       }
+    }
+    return false;
+}
+
 void
 vleVpz::rmCondFromConds(QDomNode node, const QString& condName)
 {
@@ -865,11 +878,47 @@ vleVpz::buildValue(const QString& condName, const QString& portName,
     return buildValue(valNode);
 }
 
+//enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
+//    XMLTYPE, NIL, MATRIX, USER };
+
+vle::value::Value::type
+vleVpz::valueType(const QString& condName,
+        const QString& portName, int index) const
+{
+    //    BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
+    //                XMLTYPE, NIL, MATRIX, USER
+    QDomNode port = portFromDoc(condName, portName);
+    QDomNode valNode = port.childNodes().at(index);
+    if (valNode.nodeName() == "boolean") {
+        return vle::value::Value::BOOLEAN;
+    } else if(valNode.nodeName() == "integer") {
+        return vle::value::Value::INTEGER;
+    } else if(valNode.nodeName() == "double") {
+        return vle::value::Value::DOUBLE;
+    } else if(valNode.nodeName() == "string") {
+        return vle::value::Value::STRING;
+    } else if(valNode.nodeName() == "set") {
+        return vle::value::Value::SET;
+    } else if(valNode.nodeName() == "map") {
+        return vle::value::Value::MAP;
+    } else if(valNode.nodeName() == "tuple") {
+        return vle::value::Value::TUPLE;
+    } else if(valNode.nodeName() == "table") {
+        return vle::value::Value::TABLE;
+    } else if(valNode.nodeName() == "xml") {
+        return vle::value::Value::XMLTYPE;
+    } else if(valNode.nodeName() == "null") {
+        return vle::value::Value::NIL;
+    } else if(valNode.nodeName() == "matrix") {
+        return vle::value::Value::MATRIX;
+    }
+    return vle::value::Value::USER;
+}
+
 vle::value::Value*
 vleVpz::buildValue(const QDomNode& node) const
 {
-//    BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
-//                XMLTYPE, NIL, MATRIX, USER
+
     if (node.nodeName() == "boolean") {
         if (node.childNodes().length() != 1){
             qDebug() << "Internal error in buildValue (6)";

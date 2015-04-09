@@ -134,12 +134,12 @@ public:
     QDomNode addConditionToDoc(const QString& condName);
     /**
      * @brief add a <port> tag to a Vpz Doc
-     * whith attribute 'name'  portName for condition condName
+     * with attribute 'name'  portName for condition condName
      */
     QDomNode addCondPortToDoc(const QString& condName, const QString& portName);
     /**
      * @brief remove a <condition> tag to a Vpz Doc
-     * whith attribute 'name'  condName
+     * with attribute 'name'  condName
      */
     void rmConditionToDoc(const QString& condName);
     /**
@@ -185,6 +185,11 @@ public:
      * which attribute 'name' is portName
      */
     QDomNode portFromCond(const QDomNode& node, const QString& portName) const;
+    /**
+     * @brief tells if there is a <port> wich attribute 'name' equals
+     * portName in a <condition> node
+     */
+    bool existPortFromCond(const QDomNode& node, const QString& portName) const;
     /**
      * @brief remove <condition> tag from <conditions>
      * which attribute 'name' is condName
@@ -299,8 +304,14 @@ public:
      * @brief Build a value from given index  of <port> portName of
      * <condtion> condName
      * @note: result is a new allocated vle value.
+     * @note index > 0 is for multi simulation
      */
     vle::value::Value* buildValue(const QString& condName,
+            const QString& portName, int index) const;
+    /**
+     * @brief gives the type of a value of
+     */
+    vle::value::Value::type valueType(const QString& condName,
             const QString& portName, int index) const;
     /**
      * @brief build a vle value from either tag
