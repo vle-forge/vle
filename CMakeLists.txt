@@ -150,7 +150,7 @@ if (VLE_BOOST_INCLUDE_PATH AND VLE_BOOST_LIBRARIES_PATH)
 endif ()
 
 find_package(Boost COMPONENTS unit_test_framework thread filesystem system
-  chrono date_time regex program_options)
+  chrono date_time regex program_options serialization mpi)
 
 if (NOT Boost_FOUND)
   message(STATUS "Boost is not founded. Try without chrono")
@@ -174,6 +174,13 @@ if (NOT Boost_PROGRAM_OPTIONS_FOUND)
   message(FATAL_ERROR "The boost program options library is required")
 endif (NOT Boost_PROGRAM_OPTIONS_FOUND)
 
+if (NOT Boost_SERIALIZATION_FOUND)
+  message(STATUS "The boost serialization was not found, MPI disabled")
+endif ()
+if (NOT Boost_MPI_FOUND)
+  message(STATUS "The boost mpi was not found, MPI disabled")
+endif ()
+
 if (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
   set(VLE_HAVE_BOOST_SPIRIT2 0 CACHE INTERNAL "" FORCE)
 else (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
@@ -191,7 +198,7 @@ endif (WITH_TEST)
 #
 
 option(WITH_MPI "use an installed MPI library [default: on]" ON)
-if (WITH_MPI)
+if (WITH_MPI AND Boost_SERIALIZATION_FOUND AND Boost_MPI_FOUND)
   find_package(MPI REQUIRED)
   message(STATUS "mpi include ${MPI_INCLUDE_PATH}")
   message(STATUS "mpi lib ${MPI_LIBRARY}")

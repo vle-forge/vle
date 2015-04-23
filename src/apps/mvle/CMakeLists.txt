@@ -27,3 +27,21 @@ install(TARGETS mvle DESTINATION bin)
 
 install(FILES mvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
   "mvle-${VLE_VERSION_SHORT}.1")
+
+#
+# For the moment, cvle in only available for Linux
+#
+
+if (Boost_MPI_FOUND AND VLE_HAVE_MPI)
+  add_executable(cvle cvle.cpp)
+  set_target_properties(cvle PROPERTIES SOVERSION
+    "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
+  target_link_libraries(cvle ${VLEDEPS_LIBRARIES}
+    ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} ${MPI_LIBRARY}
+    ${MPI_EXTRA_LIBRARY} vlelib)
+
+  install(TARGETS cvle DESTINATION bin)
+  install(FILES cvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
+    "mvle-${VLE_VERSION_SHORT}.1")
+endif()
+
