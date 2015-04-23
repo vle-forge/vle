@@ -148,8 +148,6 @@ static int remove_configuration_file()
 
 static void show_package_content(vle::utils::Package& pkg)
 {
-
-
     std::vector<std::string> pkgcontent;
     try {
         pkg.fillBinaryContent(pkgcontent);
@@ -710,4 +708,3 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
-
