@@ -1,6 +1,4 @@
-=======
-VLE 1.1
-=======
+= VLE 1.1 =
 
 Release highlights
 ==================
@@ -36,6 +34,26 @@ depends of an MPI library.
 
 Switch VLE to Github.
 
+Changes from vle-1.1.2
+======================
+
+Gauthier Quesnel (10):
+
+- github: add travis hooks config
+- utils: fix regular expression in unit test package
+- utils: fix deallocated memory in SpawnUnix
+- devs: fix a potential segfault in Coordinator
+- vpz: remove useless assignment in CoupledModel
+- mvle: assign a default value to the number of VPZ
+- utils: simplify source in SpawnUnix
+- cpack: fix installation of gtksourceview directory
+- NEWS: update
+
+Ronan Trépos (2):
+
+- utils: fix messages in ModuleManager
+- utils: remove extra test of finished spawn
+
 Changes from vle-1.1.1
 ======================
 
@@ -58,32 +76,32 @@ Ronan Trépos (2):
 Changes from vle-1.1.0
 ======================
 
-AUTHORS: update
-Switch to 2014
-gvle: update AUTHORS
-gvle: update website
-gvle: fix the matrix value editor
+- AUTHORS: update
+- Switch to 2014
+- gvle: update AUTHORS
+- gvle: update website
+- gvle: fix the matrix value editor
 
 Changes from vle-1.1.0-beta4
 ============================
 
-README: adding Gtksourceview dependency
-devs: add a runtime access to the simulation results
-gvle: fix package text of the box Dynamic
-gvle: fix warnings about new value type
-gvle: improve the use of Gtk{Text|Source}view in Editor
-gvle: replace GtkSourceViewmm with GtkSourceView
-utils: add Package configure option WITH_WARNINGS
-utils: add exception handling in DownloadManager
-utils: transfer CLI options into utils
-manager: fix the experiment generator
-value: add a User value type
-value: add unit test for the value::User
-vle : update vle man page
-vle: update authors
-win32: embedding cmake
-win32: embedding of the compiler, use boost 1_54
-win32: fix the default VLE_HOME
+- README: adding Gtksourceview dependency
+- devs: add a runtime access to the simulation results
+- gvle: fix package text of the box Dynamic
+- gvle: fix warnings about new value type
+- gvle: improve the use of Gtk{Text|Source}view in Editor
+- gvle: replace GtkSourceViewmm with GtkSourceView
+- utils: add Package configure option WITH_WARNINGS
+- utils: add exception handling in DownloadManager
+- utils: transfer CLI options into utils
+- manager: fix the experiment generator
+- value: add a User value type
+- value: add unit test for the value::User
+- vle : update vle man page
+- vle: update authors
+- win32: embedding cmake
+- win32: embedding of the compiler, use boost 1_54
+- win32: fix the default VLE_HOME
 
 Changes from vle-1.1.0-beta3
 ============================
