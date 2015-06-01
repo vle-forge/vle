@@ -29,7 +29,6 @@
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
-#include <glibmm/miscutils.h>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -92,8 +91,10 @@ std::string Path::findProgram(const std::string& exe)
         res =  Path::buildFilename(
                 UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
                                    "CMake","bin", "cmake.exe");
-    } else {
-        res = Glib::find_program_in_path(exe);
+    } else if (exe == "vle" or exe == "vle.exe"){
+        res =  Path::buildFilename(
+                UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
+                                   "bin", "vle.exe");
     }
     return res;
 }
@@ -108,8 +109,8 @@ void Path::initHomeDir()
      * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
      */
     if (m_home.empty()) {
-        std::string homedrive(Glib::getenv("HOMEDRIVE"));
-        std::string homepath(Glib::getenv("HOMEPATH"));
+        std::string homedrive(std::getenv("HOMEDRIVE"));
+        std::string homepath(std::getenv("HOMEPATH"));
         m_home = utils::Path::buildDirname(homedrive, homepath, "vle");
     }
 }

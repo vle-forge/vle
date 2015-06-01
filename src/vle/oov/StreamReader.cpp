@@ -29,7 +29,6 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/version.hpp>
-#include <vle/oov/CairoPlugin.hpp>
 
 namespace vle { namespace oov {
 
@@ -71,14 +70,6 @@ void StreamReader::onParameter(const std::string& pluginname,
 {
     initPlugin(pluginname, package, location, m_modulemgr);
 
-    /*
-     * For cairo plug-ins, we build the cairo graphics context via the
-     * CairoPlugin::init function.
-     */
-    if (plugin()->isCairo()) {
-        CairoPluginPtr plg = toCairoPlugin(plugin());
-        plg->init();
-    }
 
     plugin()->onParameter(pluginname, location, file, parameters, time);
 }

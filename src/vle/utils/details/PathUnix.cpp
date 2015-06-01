@@ -30,17 +30,31 @@
 
 #include <vle/utils/Path.hpp>
 #include <vle/version.hpp>
-#include <glibmm/miscutils.h>
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 namespace vle { namespace utils {
 
+
 std::string Path::findProgram(const std::string& exe)
 {
-    std::string res("");
-    res = Glib::find_program_in_path(exe);
-    return res;
+    char* env_p = std::getenv("PATH");
+
+    std::vector<std::string> splitVec;
+    boost::split(splitVec, env_p, boost::is_any_of(":"),
+            boost::token_compress_on);
+
+    std::vector<std::string>::const_iterator itb = splitVec.begin();
+    std::vector<std::string>::const_iterator ite = splitVec.end();
+    for (; itb != ite; itb++) {
+        boost::filesystem::path p(*itb);
+        p /= exe;
+        if (boost::filesystem::exists(p)) {
+            return p.native();
+        }
+    }
+    return "";
 }
 
 void Path::initHomeDir()
@@ -53,10 +67,8 @@ void Path::initHomeDir()
      * If no VLE_HOME directory, we build $HOME/.vle directory.
      */
     if (m_home.empty()) {
-        std::list < std::string > lst;
-        lst.push_back(Glib::get_home_dir());
-        lst.push_back(".vle");
-        m_home = Glib::build_path(G_DIR_SEPARATOR_S, lst);
+        std::string homepath(std::getenv("HOME"));
+        m_home = utils::Path::buildDirname(homepath, ".vle");
     }
 }
 
@@ -72,9 +84,10 @@ std::string Path::getTempFile(const std::string& prefix,
 
     if (file and not file->is_open()) {
         result = prefix + "XXXXXX";
-
-        result = Glib::build_filename(Glib::get_tmp_dir(),
-                                      result);
+        boost::system::error_code ec;
+        result =  utils::Path::buildFilename(
+                boost::filesystem::temp_directory_path(ec).string(),
+                result);
 
         char *buffer = new char[result.size()];
         std::strncpy(buffer, result.c_str(), result.size());

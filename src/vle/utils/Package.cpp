@@ -25,6 +25,9 @@
  */
 
 
+#include <fstream>
+#include <ostream>
+#include <cstring>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
@@ -33,17 +36,12 @@
 #include <vle/utils/Spawn.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
-#include <glibmm/timer.h>
-#include <glibmm/shell.h>
-#include <fstream>
-#include <ostream>
-#include <cstring>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/constants.hpp>
-#include <boost/algorithm/string/classification.hpp>
+#include <boost/program_options.hpp>
 #include <boost/cast.hpp>
 #include <boost/version.hpp>
 #include <boost/config.hpp>
+#include <boost/thread/thread.hpp>
+#include "details/ShellUtils.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -60,14 +58,15 @@ static void buildCommandLine(const std::string& cmd,
                              std::string& exe,
                              std::vector < std::string >& argv)
 {
-    argv = Glib::shell_parse_argv(cmd);
+    details::ShellUtils su;
+    int argcp;
+    su.g_shell_parse_argv(cmd, argcp, argv);
 
     if (argv.empty()) {
         throw utils::ArgError(fmt(_(
-                    "Package command line: error in command `%1%'")) % cmd);
+                    "Package command line: error, empty command `%1%'")) % cmd);
     }
     exe = Path::findProgram(argv.front());
-
     argv.erase(argv.begin());
 }
 
@@ -111,11 +110,9 @@ struct Package::Pimpl
                 utils::Trace::send(
                     fmt("-[%1%] Need to wait old process before") % exe);
             }
-
             m_spawn.wait();
             m_spawn.status(&m_message, &m_issuccess);
         }
-
         bool started = m_spawn.start(exe, workingDir, argv);
 
         if (not started) {
@@ -263,6 +260,7 @@ void Package::build()
     if (m_pimpl->mCommandBuild.empty()) {
         refreshCommands();
     }
+
     if (pkg_buildir.empty()) {
         refreshPath();
     }
@@ -321,13 +319,11 @@ void Package::install()
     }
     fs::path old_dir = fs::current_path();
     fs::current_path(pkg_buildir);
-
     std::vector < std::string > argv;
     std::string exe, cmd;
 
     cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
     buildCommandLine(cmd, exe, argv);
-
     fs::path builddir = pkg_buildir;
 
     if (not fs::exists(builddir)) {
@@ -444,8 +440,7 @@ bool Package::wait(std::ostream& out, std::ostream& err)
 
             output.clear();
             error.clear();
-
-            Glib::usleep(1000);
+            boost::this_thread::sleep(boost::posix_time::microseconds(1000));
         } else {
             break;
         }

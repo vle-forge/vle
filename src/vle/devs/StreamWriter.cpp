@@ -28,7 +28,6 @@
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/oov/CairoPlugin.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/version.hpp>
@@ -64,15 +63,6 @@ void StreamWriter::open(const std::string& pluginname,
         throw utils::InternalError(
             fmt(_("Oov: Can not open the plug-in `%1%': %2%")) % pluginname %
             e.what());
-    }
-
-    /*
-     * For cairo plug-ins, we build the cairo graphics context via the
-     * CairoPlugin::init function.
-     */
-    if (plugin()->isCairo()) {
-        oov::CairoPluginPtr plg = oov::toCairoPlugin(plugin());
-        plg->init();
     }
 
     plugin()->onParameter(pluginname, location, file, parameters, time);
@@ -111,28 +101,7 @@ void StreamWriter::process(Simulator* simulator,
         parent = simulator->getParent();
     }
 
-    if (plugin()->isCairo()) {
-        oov::CairoPluginPtr plg = oov::toCairoPlugin(plugin());
-        plg->needCopy();
-        plg->onValue(name, parent, portname, view, time, val);
-
-        if (plg->isCopyDone()) {
-            std::string file(
-                utils::Path::buildFilename(
-                    plg->location(), (fmt("img-%1$08d.png") %
-                                      plg->getNextFrameNumber()).str()));
-
-            try {
-                plg->stored()->write_to_png(file);
-            } catch(const std::exception& /*e*/) {
-                throw utils::InternalError(
-                    fmt(_("oov: cannot write image '%1%'")) % file);
-            }
-        }
-    } else {
-        plugin()->onValue(name, parent, portname, view, time, val);
-
-    }
+    plugin()->onValue(name, parent, portname, view, time, val);
 }
 
 void StreamWriter::close(const devs::Time& time)

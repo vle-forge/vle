@@ -6,7 +6,6 @@ enable_testing()
 # Options
 #
 
-option(WITH_CAIRO "use cairomm to build output plugin [default: on]" ON)
 option(WITH_GVLE "use qt to build gvle [default: on]" ON)
 option(WITH_TEST "use the libboost test unit library [default: on]" ON)
 option(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
@@ -95,16 +94,6 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
 endif (COMMAND CMAKE_POLICY)
 
-
-if (WITH_CAIRO)
-  pkg_check_modules(VLE_CAIROMM_DEP cairomm-1.0)
-  if (VLE_CAIROMM_DEP_FOUND) 
-    set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
-  else ()
-    set(VLE_HAVE_CAIRO 0 CACHE INTERNAL "" FORCE)
-  endif ()
-endif()
-
 if (WITH_GVLE)
   find_package(Qt4 REQUIRED)
   if (NOT QT_FOUND)
@@ -115,17 +104,13 @@ if (WITH_GVLE)
   SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
 endif ()
 
-pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
-
+pkg_check_modules(VLEDEPS libarchive libxml-2.0)
 
 
 if (NOT VLEDEPS_FOUND)
-    message(FATAL_ERROR "Failed to find minimal dependencies: libarchive,"
-      "glibmm-2.4, gthread-2.0 and libxml-2.0")
-  endif ()
-endif()
-
-pkg_check_modules(VLE_CAIROMM_DEP cairomm-1.0)
+    message(FATAL_ERROR "Failed to find minimal dependencies: libarchive "
+      " and libxml-2.0")
+endif ()
 
 # Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
 # #seems to be a CMake'list. So we replace ';' with ' '.
@@ -139,17 +124,10 @@ if (WITH_QT)
   endif (NOT QT_FOUND)
 endif ()
 
-if (VLE_CAIROMM_DEP_FOUND) 
-  set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
-else ()
-  set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
-endif ()
 
 #
 # Test the libboost header and libboost-text library.
 #
-
-
 
 if (WIN32)
   set(Boost_THREADAPI "win32")
@@ -344,7 +322,6 @@ message(STATUS "Build type ${CMAKE_BUILD_TYPE}")
 message(STATUS "Build with GCC ABI Demangle...: ${VLE_HAVE_GCC_ABI_DEMANGLE}")
 message(STATUS "Build with execinfo.h.........: ${VLE_HAVE_EXECINFO}")
 message(STATUS "Build unit test...............: ${VLE_HAVE_UNITTESTFRAMEWORK}")
-message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
 message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with mvle...............: ${VLE_HAVE_MVLE}")
 message(STATUS "Build with cvle...............: ${VLE_HAVE_CVLE}")

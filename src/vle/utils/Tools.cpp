@@ -32,7 +32,6 @@
 #include <vle/version.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iomanip>
-#include <glib/gstdio.h>
 
 #ifdef G_OS_WIN32
 #include <io.h>

@@ -26,23 +26,16 @@
 
 
 #include <list>
-#include <glib.h>
-#include <glib/gstdio.h>
+#include <stdlib.h>
 
 #ifdef G_OS_WIN32
 #include <io.h>
 #endif
 
 #include <vle/utils/Path.hpp>
-//#include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
-
-#include <glibmm/miscutils.h>
-#include <glibmm/fileutils.h>
-
-#include <iostream>
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
@@ -353,7 +346,7 @@ void Path::addModelingDir(const std::string& dirname)
 
 bool Path::readEnv(const std::string& variable, PathList& out)
 {
-    std::string path(Glib::getenv(variable));
+    std::string path(std::getenv(variable.c_str()));
     if (not path.empty()) {
         PathList result;
         boost::algorithm::split(result, path, boost::is_any_of(":"),
@@ -372,7 +365,8 @@ bool Path::readEnv(const std::string& variable, PathList& out)
 
 void Path::readHomeDir()
 {
-    std::string path(Glib::getenv("VLE_HOME"));
+
+    std::string path(std::getenv("VLE_HOME"));
     if (not path.empty()) {
         if (fs::is_directory(path)) {
             m_home = path;
@@ -412,7 +406,12 @@ std::ostream& operator<<(std::ostream& out, const PathList& paths)
 
 std::string Path::buildTemp(const std::string& filename)
 {
-    return utils::Path::buildFilename(Glib::get_tmp_dir(), filename);
+
+    boost::filesystem::path tmp_path;
+    boost::system::error_code ec;
+    tmp_path = fs::temp_directory_path(ec);
+
+    return utils::Path::buildFilename(tmp_path.string(), filename);
 }
 
 std::string Path::writeToTemp(const std::string& prefix,
@@ -421,11 +420,10 @@ std::string Path::writeToTemp(const std::string& prefix,
     std::string filename;
     int fd;
 
-    if (prefix.size()) {
-        fd = Glib::file_open_tmp(filename, prefix);
-    } else {
-        fd = Glib::file_open_tmp(filename);
-    }
+    boost::filesystem::path temp = boost::filesystem::unique_path();
+    std::string tempstr    = temp.native();
+
+    fd = ::fileno(std::fopen(tempstr.c_str(), "+wb"));
 
     if (fd == -1) {
         throw utils::InternalError(fmt(

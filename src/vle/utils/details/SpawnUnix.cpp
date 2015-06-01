@@ -34,6 +34,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
+#include <iostream>
 
 #ifdef __APPLE__
  #include <crt_externs.h>
@@ -217,6 +218,7 @@ public:
     bool initchild(const std::string& exe,
                    std::vector < std::string > args)
     {
+
         ::dup2(m_pipeout[1], STDOUT_FILENO);
         ::dup2(m_pipeerr[1], STDERR_FILENO);
 
@@ -231,6 +233,7 @@ public:
         char **localargv = convert_string_str_array(args);
 
         ::execve(exe.c_str(), localargv, localenvp);
+
         free_str_array(localargv);
         free_str_array(localenvp);
         std::abort();
@@ -296,7 +299,6 @@ public:
         ::close(m_pipeout[1]);
     m_pipeout_failed:
         m_msg.assign(strerror(err));
-
         return false;
     }
 
@@ -305,13 +307,15 @@ public:
         if (m_finish) {
             return true;
         }
-
         switch (waitpid(m_pid, &m_status, 0)) {
         case -1:
+            std::cout.flush();
             return true;
         case 0:
+            std::cout.flush();
             assert(false);
         default:
+            std::cout.flush();
             m_finish = true;
             return false;
         }
@@ -387,14 +391,15 @@ bool Spawn::isstart()
 
 bool Spawn::isfinish()
 {
-    if (not m_pimpl)
+    if (not m_pimpl) {
         return false;
+    }
 
-    if (m_pimpl->m_finish)
+    if (m_pimpl->m_finish) {
         return true;
-    else
+    } else {
         m_pimpl->is_running();
-
+    }
     return m_pimpl->m_finish;
 }
 

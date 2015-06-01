@@ -30,7 +30,6 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
-#include <glibmm/thread.h>
 #include <libxml/parser.h>
 
 namespace vle {
@@ -38,10 +37,6 @@ namespace vle {
 static void __vle_init()
 {
     xmlInitParser(); /**< Initialize the libxml2 library. */
-
-    if (not Glib::thread_supported()) {
-        Glib::thread_init();
-    }
 
     utils::Path::init();
     utils::Trace::init();
