@@ -115,9 +115,14 @@ if (CPACK_GENERATOR MATCHES "NSIS")
   install(FILES "${VLE_QT_PATH}\\\\mingwm10.dll"  DESTINATION bin)
   install(FILES "${VLE_QT_PATH}\\\\qwt.dll"      DESTINATION bin)
   install(FILES "${VLE_QT_PATH}\\\\Qwtd.dll"     DESTINATION bin)
+  
+  install(FILES "${VLE_QT_PATH}\\\\qmake.exe"     DESTINATION bin)
+  install(FILES "${VLE_QT_PATH}\\\\moc.exe"     DESTINATION bin)
+  install(FILES "${VLE_QT_PATH}\\\\rcc.exe"     DESTINATION bin)
+  install(FILES "${VLE_QT_PATH}\\\\uic.exe"     DESTINATION bin)
 
-  install(DIRECTORY "${QT_INSTALL_PATH}/include/" DESTINATION include/Qt)
-  install(DIRECTORY "${QT_INSTALL_PATH}" DESTINATION Qt)
+  install(DIRECTORY "${QT_INSTALL_PATH}/include/" DESTINATION include)
+  install(DIRECTORY "${QT_INSTALL_PATH}/src/" DESTINATION src)
 
   install(DIRECTORY "${VLE_BOOST_INCLUDE_PATH}/boost" DESTINATION include)
   install(DIRECTORY "${VLE_BOOST_LIBRARIES_PATH}/" DESTINATION bin
