@@ -197,33 +197,28 @@ void fileVpzView::setVpz(vleVpz *vpz)
                      this, SLOT(onAddModelerTab(vleVpzModel*)));
 
     // ---- Dynamics Tab ----
-    if (mDynamicsTab)
-    {
+    if (mDynamicsTab) {
         mDynamicsTab->setVpz(mVpz);
         mDynamicsTab->setUndo(mUndoStack);
         mDynamicsTab->reload();
     }
 
     // ---- Experimental Conditions Tab ----
-    if (mExpCondTab)
-    {
+    if (mExpCondTab) {
         mExpCondTab->setVpz(mVpz);
         mExpCondTab->reload();
     }
 
     // ---- Experimental Conditions Tab ----
-    if (mProjectTab)
-    {
+    if (mProjectTab) {
         mProjectTab->setVpz(mVpz);
         mProjectTab->setUndo(mUndoStack);
         mProjectTab->reload();
     }
 
     // ---- View Tab ----
-    if (mProjectTab)
-    {
+    if (mExpViewTab) {
         mExpViewTab->setVpz(mVpz);
-        mExpViewTab->reload();
     }
 }
 

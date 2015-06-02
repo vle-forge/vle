@@ -147,10 +147,10 @@ void FileVpzExpView::reloadViews()
         throw vle::utils::InternalError(
                 " gvle2: error in FileVpzExpView::reloadViews");
     }
-
     // Initiate the view/port tree by adding the View list
     std::vector<std::string> outputNames;
     mVpz->viewOutputNames(outputNames);
+    ui->vleViewList->clear();
     std::vector<std::string>::iterator itb = outputNames.begin();
     std::vector<std::string>::iterator ite = outputNames.end();
     for ( ; itb != ite; itb++)
