@@ -22,14 +22,14 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${GVLE2_SOURCE_DIR}
   ${VLE_SOURCE_DIR}/src/apps/gvle2)
 
-SET(GVLE2_SOURCES_CPP gvle2win.cpp aboutbox.cpp help.cpp helpbrowser.cpp
-  filevpzview.cpp filevpzdynamics.cpp filevpzproject.cpp filevpzexpcond.cpp
+SET(GVLE2_SOURCES_CPP gvle2win.cpp aboutbox.cpp help.cpp
+  helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp
+  filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
   filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
-  sourcecpp.cpp sourcecpptemplate.cpp
-  vlepackage.cpp vpzActions.cpp
+  sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp vpzActions.cpp
   vlevpz.cpp vlevpzconn.cpp vlevpzdynamic.cpp vlevpzport.cpp
-  widgetvpzproperty.cpp
-  plugin_modeler.cpp pluginmodelerview.cpp pluginmodelersummary.cpp )
+  widgetvpzproperty.cpp plugin_modeler.cpp pluginmodelerview.cpp
+  pluginmodelersummary.cpp )
 
 QT4_WRAP_UI(ui_gvle2win_h gvle2win.ui)
 QT4_WRAP_UI(aboutbox_h aboutbox.ui)
@@ -37,6 +37,7 @@ QT4_WRAP_UI(help_h help.ui)
 QT4_WRAP_UI(filevpzview_h     filevpzview.ui)
 QT4_WRAP_UI(filevpzdynamics_h filevpzdynamics.ui)
 QT4_WRAP_UI(filevpzproject_h filevpzproject.ui)
+QT4_WRAP_UI(filevpzobservables_h filevpzobservables.ui)
 QT4_WRAP_UI(filevpzexpcond_h  filevpzexpcond.ui)
 QT4_WRAP_UI(filevpzexpview_h  filevpzexpview.ui)
 QT4_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
@@ -45,21 +46,21 @@ QT4_WRAP_UI(simulationview_h simulationview.ui)
 QT4_WRAP_UI(simulationrtool_h simulationrtool.ui)
 QT4_WRAP_UI(widgetvpzpropertydynamics_h widgetvpzpropertydynamics.ui)
 QT4_WRAP_UI(widgetvpzpropertyexpcond_h  widgetvpzpropertyexpcond.ui)
+QT4_WRAP_UI(widgetvpzpropertyobservables_h  widgetvpzpropertyobservables.ui)
 QT4_WRAP_UI(pluginmodelerview_h pluginmodelerview.ui)
 QT4_WRAP_UI(pluginmodelersummary_h pluginmodelersummary.ui)
 
 SET(GVLE2_SOURCES_HPP ${ui_gvle2win_h} ${aboutbox_h} ${help_h}
-  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzproject_h}
-  ${filevpzexpcond_h} ${filevpzexpview_h}
-  ${filevpztooltip_h} ${filevpzrtool_h}
-  ${simulationview_h} ${simulationrtool_h} simulation.h logger.h
-  sourcecpp.h sourcecpptemplate.h
-  ${pluginmodelerview_h} pluginmodelerview.h
-  ${pluginmodelersummary_h} pluginmodelersummary.h
-  plugin_cond.h plugin_modeler.h plugin_sim.h plugin_output.h
-  vlepackage.h vlevpz.h vlevpzconn.h vlevpzdynamic.h vlevpzport.h
-  widgetvpzproperty.h ${widgetvpzpropertydynamics_h}
-  ${widgetvpzpropertyexpcond_h} )
+  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
+  ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h}
+  ${filevpztooltip_h} ${filevpzrtool_h} ${simulationview_h}
+  ${simulationrtool_h} simulation.h logger.h sourcecpp.h
+  sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
+  ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
+  plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h vlevpz.h
+  vlevpzconn.h vlevpzdynamic.h vlevpzport.h widgetvpzproperty.h
+  ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h}
+  ${widgetvpzpropertyobservables_h})
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o

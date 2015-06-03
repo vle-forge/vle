@@ -49,11 +49,12 @@ fileVpzView::fileVpzView(QWidget *parent) :
     undoView->show();
     undoView->setAttribute(Qt::WA_QuitOnClose, false);
 
-    mVpz       = 0;
-    mUseSim    = false;
-    mDynamicsTab         = 0;
-    mExpCondTab          = 0;
-    mProjectTab          = 0;
+    mVpz = 0;
+    mUseSim = false;
+    mDynamicsTab = 0;
+    mExpCondTab = 0;
+    mObservablesTab = 0;
+    mProjectTab = 0;
 
     // Init the right column toolbox UI
     mWidgetTool = new QWidget();
@@ -86,6 +87,11 @@ fileVpzView::fileVpzView(QWidget *parent) :
     // Configure Dynamics tab
     mDynamicsTab = new FileVpzDynamics();
     int dynTabId = ui->tabWidget->addTab(mDynamicsTab, tr("Dynamics"));
+
+    // Configure Observables tab
+    mObservablesTab = new FileVpzObservables();
+    int observablesTabId = ui->tabWidget->addTab(mObservablesTab, tr("Observables"));
+
 
     // Configure Project tab
     mProjectTab = new FileVpzProject();
@@ -123,6 +129,9 @@ fileVpzView::~fileVpzView()
 
     if (mExpCondTab)
         delete mExpCondTab;
+
+    if (mObservablesTab)
+        delete mObservablesTab;
 
     if (mProjectTab)
         delete mProjectTab;
@@ -210,6 +219,11 @@ void fileVpzView::setVpz(vleVpz *vpz)
     }
 
     // ---- Experimental Conditions Tab ----
+    if (mObservablesTab) {
+        mObservablesTab->setVpz(mVpz);
+    }
+
+    // ---- Experimental Conditions Tab ----
     if (mProjectTab) {
         mProjectTab->setVpz(mVpz);
         mProjectTab->setUndo(mUndoStack);
@@ -219,6 +233,7 @@ void fileVpzView::setVpz(vleVpz *vpz)
     // ---- View Tab ----
     if (mExpViewTab) {
         mExpViewTab->setVpz(mVpz);
+        mExpViewTab->reload();
     }
 }
 
@@ -605,7 +620,6 @@ void fileVpzView::onFocusChanged(vleVpzModel *model)
         }
     }
 
-
     QTableWidgetItem *newItem = new QTableWidgetItem(model->getName());
     newItem->setData(Qt::UserRole, ROW_NAME);
     newItem->setData(Qt::UserRole+1, QVariant::fromValue((void*)model));
@@ -624,6 +638,14 @@ void fileVpzView::onFocusChanged(vleVpzModel *model)
     wpec->setModel(model);
     uiTool->modelProperty->setCellWidget(ROW_EXP, 1, wpec);
     uiTool->modelProperty->resizeRowToContents(ROW_EXP);
+
+    WidgetVpzPropertyObservables *wpo = new WidgetVpzPropertyObservables();
+    wpo->setModel(model);
+    uiTool->modelProperty->setCellWidget(ROW_OBS, 1, wpo);
+    uiTool->modelProperty->resizeRowToContents(ROW_OBS);
+
+    QObject::connect(mVpz, SIGNAL(observablesUpdated()),
+                     wpo, SLOT(refresh()));
 
     uiTool->stackProperty->setCurrentIndex(1);
 }

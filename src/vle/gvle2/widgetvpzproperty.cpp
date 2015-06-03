@@ -24,7 +24,10 @@
 #include "widgetvpzproperty.h"
 #include "ui_widgetvpzpropertydynamics.h"
 #include "ui_widgetvpzpropertyexpcond.h"
+#include "ui_widgetvpzpropertyobservables.h"
 #include <QCheckBox>
+#include <QRadioButton>
+#include <QVBoxLayout>
 #include <QDebug>
 
 WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget *parent) :
@@ -123,7 +126,7 @@ WidgetVpzPropertyExpCond::setModel(vleVpzModel *model)
             ui->listCond->addItem(wi);
             QCheckBox *cb = new QCheckBox(this);
             cb->setText( condName);
-            if ( mModel->hasCondition(condName) ) {
+            if (mModel->hasCondition(condName)) {
                 cb->setCheckState( Qt::Checked );
             } else {
                 cb->setCheckState( Qt::Unchecked );
@@ -152,5 +155,85 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
         vpz->attachCondToAtomicModel(mModel->getFullName(), cb->text());
     } else {
         vpz->detachCondToAtomicModel(mModel->getFullName(), cb->text());
+    }
+}
+
+WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget *parent) :
+        QWidget(parent), ui(new Ui::WidgetVpzPropertyObservables),
+        mModel(0)
+{
+    ui->setupUi(this);
+    ui->listObs->setVisible(true);
+}
+
+WidgetVpzPropertyObservables::~WidgetVpzPropertyObservables()
+{
+    delete ui;
+}
+
+void
+WidgetVpzPropertyObservables::refresh()
+{
+    setModel(mModel);
+}
+
+void
+WidgetVpzPropertyObservables::setModel(vleVpzModel *model)
+{
+    mModel = model;
+    vleVpz* vpz = mModel->getVpz();
+    ui->listObs->clear();
+
+    vleVpzDynamic* dyn = mModel->getDynamic();
+    if (dyn) {
+
+        QDomNodeList obss = vpz->obssListFromObss(
+            vpz->obsFromViews(vpz->viewsFromDoc()));
+
+        for (unsigned int i=0; i< obss.length(); i++) {
+            QDomNode obs = obss.at(i);
+            QString obsName = vpz->attributeValue(obs, "name");
+            QListWidgetItem *wi = new QListWidgetItem(ui->listObs);
+            ui->listObs->addItem(wi);
+            QCheckBox *cb = new QCheckBox(this);
+            cb->setText(obsName);
+            if (vpz->modelObsFromDoc(mModel->getFullName()) == obsName) {
+                cb->setCheckState( Qt::Checked );
+            } else {
+                cb->setCheckState( Qt::Unchecked );
+            }
+            QObject::connect(cb, SIGNAL(clicked(bool)),
+                             this, SLOT(onCheckboxClick(bool)));
+            ui->listObs->setItemWidget(wi, cb);
+        }
+    }
+}
+
+void
+WidgetVpzPropertyObservables::onCheckboxClick(bool checked)
+{
+    QObject *sender = QObject::sender();
+    QCheckBox *cb = qobject_cast<QCheckBox *>(sender);
+
+    if ( (mModel == 0) || (cb == 0) )
+        return;
+
+    vleVpz* vpz = mModel->getVpz();
+
+    if (checked) {
+        vpz->setObsToAtomicModel(mModel->getFullName(), cb->text());
+
+        for(int row = 0; row <  ui->listObs->count(); row++)
+        {
+            QListWidgetItem *item = ui->listObs->item(row);
+            QCheckBox *cbi = qobject_cast<QCheckBox *>(ui->listObs->itemWidget(item));
+            if (cbi->text() != cb->text()) {
+                cbi->setCheckState(Qt::Unchecked );
+            } else {
+                cbi->setCheckState(Qt::Checked );
+            }
+        }
+    } else {
+        vpz->unsetObsFromAtomicModel(mModel->getFullName());
     }
 }

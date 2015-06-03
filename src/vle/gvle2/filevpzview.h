@@ -40,6 +40,7 @@
 #include "filevpzdynamics.h"
 #include "filevpzexpcond.h"
 #include "filevpzexpview.h"
+#include "filevpzobservables.h"
 #include "filevpzproject.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
@@ -48,6 +49,7 @@
 #define ROW_NAME 0
 #define ROW_DYN  1
 #define ROW_EXP  2
+#define ROW_OBS  3
 
 namespace Ui {
 class fileVpzView;
@@ -93,6 +95,7 @@ private:
     FileVpzDynamics *mDynamicsTab;
     FileVpzExpCond  *mExpCondTab;
     FileVpzExpView  *mExpViewTab;
+    FileVpzObservables  *mObservablesTab;
     FileVpzProject  *mProjectTab;
     vleVpz          *mVpz;
     QWidget         *mWidgetTool;

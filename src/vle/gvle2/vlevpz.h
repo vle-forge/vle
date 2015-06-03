@@ -77,6 +77,206 @@ public:
     void           setExpDuration(const QString duration);
     QString        getExpBegin() const;
     void           setExpBegin(const QString begin);
+
+    // Observables primitives
+
+    /**
+     * @brief tells if there is a <port> wich attribute 'name' equals
+     * portName in a <observable> node
+     */
+    bool existPortFromObs(const QDomNode& node, const QString& portName) const;
+    /**
+     * @brief tells if a observable exists
+     */
+    bool existObsFromDoc(const QString& obsName) const;
+    /**
+     * @brief tells if the port portName exists in observable obsName
+     */
+    bool existObsPortFromDoc(const QString& condName,
+			     const QString& portName) const;
+    /*
+     * @brief tells if a observable port already has a view
+     */
+    bool existViewFromObsPort(const QDomNode node, const QString& obsPort,
+			      const QString& viewName) const;
+    /**
+     * @brief tells if a observable port already has a view
+     */
+    bool existViewFromObsPortDoc(const QString& obsName, const QString& obsPort,
+				 const QString& viewName) const;
+    /**
+     * @brief get <observables> tag from Vpz doc
+     */
+    QDomNode observablesFromDoc() const;
+    /**
+     * @brief get list of node with tag <port> tag from Vpz doc,
+     * for observable of name 'obsName'
+     */
+    QDomNodeList obsPortsListFromDoc(const QString& obsName) const;
+    /**
+     * @brief get list of node with tag <observable> tag from tag <observables>
+     */
+    QDomNodeList obssListFromObss(const QDomNode& node) const;
+    /**
+     * @brief get list of node with tag <port> tag from tag <observable>
+     */
+    QDomNodeList portsListFromObs(const QDomNode& node) const;
+    /**
+     * @brief get <observable> tag from  tag <observables>
+     * which attribute 'name' is obsName
+     */
+    QDomNode obsFromObss(const QDomNode& node, const QString& obsName) const;
+    /**
+     * @brief get list of <attachedview> from an observable port
+     */
+    QDomNodeList viewsListFromObsPort(const QDomNode& node) const;
+    /**
+     * @brief get <port> tag from  tag <observable>
+     * which attribute 'name' is portName
+     */
+    QDomNode portFromObs(const QDomNode& node, const QString& portName) const;
+    /**
+     * @brief get <observables> tag from Vpz doc
+     */
+    QDomNode obsFromDoc() const;
+    /**
+     * @brief get <observables> tag from <views> tag
+     */
+    QDomNode obsFromViews(QDomNode node) const;
+    /**
+     * @brief set the 'name' attribute of tag <Observable> to a new value
+     * by the way also update models that do use this renamed obs.
+     */
+    void renameObservableToDoc(const QString& oldName, const QString& newName);
+    /**
+     * @brief set the 'name' attribute of tag <Observable> to a new value
+     * for the models configuration that needs that
+     */
+    void renameObservableFromModel(QDomNode &node,
+				   const QString &oldName, const QString &newName);
+    /**
+     * @brief set the 'name' attribute of tag <Observable> to a new value
+     */
+    void renameObsFromObss(QDomNode node,
+			   const QString& oldName, const QString& newName);
+    /**
+     * @brief rm a view from a observable port
+     */
+    void rmViewToObsPort(const QDomNode node, const QString& obsPort,
+			 const QString& viewName);
+    /**
+     * @brief rm a view from a observable port
+     */
+    void rmViewToObsPortDoc(const QString& obsName, const QString& obsPort,
+			    const QString& viewName);
+    /**
+     * @brief remove a <observable> tag from a Vpz Doc
+     * with attribute 'name'  condName
+     */
+    void rmObservableFromDoc(const QString& obsName);
+    /**
+     * @brief remove a <observable> tag from a QDomNode
+     * and sub node
+     * with attribute 'name' obsName
+     * with attribute 'node' QDomNode model
+     */
+    void rmObservableFromModel(QDomNode &node, const QString &obsName);
+    /**
+     * @brief remove <port> tag from a observable to a Vpz doc
+     * which attribute 'name' is portName
+     */
+    void rmObsPortToDoc(const QString& condName, const QString& portName);
+    /**
+     * @brief remove <observable> tag from <observabless>
+     * which attribute 'name' is obsName
+     */
+    void rmObsFromObss(QDomNode node, const QString& obsName);
+    /**
+     * @brief remove <port> tag from <observable>
+     * which attribute 'name' is portName
+     */
+    void rmObsPortFromCond(QDomNode node, const QString& portName);
+    /**
+     * @brief remove <port> tag from <observable>
+     * which attribute 'name' is obsName
+     */
+    void rmPortFromObs(QDomNode node, const QString& obsName);
+    /**
+     * @brief unset a observable from a atomic model only if the model
+     * is observed by
+     * @param atom, atomic model node
+     */
+    void unsetObsFromAtomicModel(QDomNode &node, const QString& obsName);
+    /**
+     * @brief unset a observable from a atomic model
+     * @param atom, atomic model name
+     * @param obsName, obs name
+     */
+    void unsetObsFromAtomicModel(const QString& atomFullName);
+    /**
+     * @brief get a new port name for obs obsName not already in tag
+     * <observable> from the Vpz doc
+     */
+    QString newObsPortNameToDoc(const QString& obsName) const;
+    /**
+     * @brief get a new observable name not already in tag <observables>
+     * from the Vpz doc
+     */
+    QString newObsNameToDoc() const;
+    /**
+     * @brief add a <observable> tag to a Vpz Doc
+     * whith attribute 'name' obsName
+     */
+    QDomNode addObservableToDoc(const QString& obsName);
+    /**
+     * @brief add a <port> tag to a Vpz Doc
+     * with attribute 'name'  portName for condition condName
+     */
+    QDomNode addObsPortToDoc(const QString& obsName, const QString& portName);
+    /**
+     * @brief add an <attachedview> to an observable port
+     */
+    void attachViewToObsPortDoc(const QString& obsName, const QString& portName,
+				const QString& viewName);
+    /**
+     * @brief add an <attachedview> to an observable port
+     */
+    void attachViewToObsPort(QDomNode node, const QString& portName,
+			     const QString& viewName);
+    /**
+     * @brief add a <observable> tag to <observabless>
+     * whith attribute 'name' obsName
+     */
+    QDomNode addObservable(QDomNode node, const QString& obsName);
+    /**
+     * @brief get the observable
+     * @param atomFullName, atomic model name
+     *
+     */
+    QString modelObsFromDoc(const QString& atomFullName);
+    /**
+     * @brief set an observable to an anatomic model
+     * @param atom, atomic model
+     * @param obsName, observable name
+     *
+     */
+    void setObsToAtomicModel(QDomNode &node, const QString& obsName);
+    /**
+     * @brief set an observable to an anatomic model
+     * @param atom, atomic model full name
+     * @param obsName, observable name
+     *
+     */
+    void setObsToAtomicModel(const QString& atomFullName, const QString& obsName);
+
+    /**
+     * @brief add a <port> tag to <Observable>
+     * whith attribute 'name'  portName
+     */
+    QDomNode addObsPort(QDomNode node, const QString& portName);
+
+    // other primitives
+
     /**
      * @brief get <views> tag from Vpz doc
      */
@@ -89,15 +289,16 @@ public:
      * @brief build an empty node corresponding to the value type from Vpz doc
      */
     QDomElement buildEmptyValueFromDoc(vle::value::Value::type vleType);
-    /**
+     /**
      * @brief tells if a condition exists
      */
     bool existCondFromDoc(const QString& condName) const;
+
     /**
      * @brief tells if the port portName exists in condition condName
      */
     bool existPortFromDoc(const QString& condName,
-            const QString& portName) const;
+			  const QString& portName) const;
     /**
      * @brief set the 'name' attribute of tag <condition> to a new value
      */
@@ -107,16 +308,18 @@ public:
      */
     void renameCondPortToDoc(const QString& condName, const QString& oldName,
             const QString& newName);
+
     /**
      * @brief get a new condition name not already in tag <conditions>
      * from the Vpz doc
      */
-     QString newCondNameToDoc() const;
-     /**
-      * @brief get a new port name for condition condName not already in tag
-      * <condition> from the Vpz doc
-      */
-     QString newCondPortNameToDoc(const QString& condName) const;
+    QString newCondNameToDoc() const;
+    /**
+     * @brief get a new port name for condition condName not already in tag
+     * <condition> from the Vpz doc
+     */
+    QString newCondPortNameToDoc(const QString& condName) const;
+
     /**
      * @brief get list of node with tag <port> tag from Vpz doc,
      * for condition of name 'condName'
@@ -127,6 +330,7 @@ public:
      * which attribute 'name' is portName
      */
     QDomNode portFromDoc(const QString& condName, const QString& portName) const;
+
     /**
      * @brief add a <condition> tag to a Vpz Doc
      * whith attribute 'name'  condName
@@ -137,6 +341,7 @@ public:
      * with attribute 'name'  portName for condition condName
      */
     QDomNode addCondPortToDoc(const QString& condName, const QString& portName);
+
     /**
      * @brief remove a <condition> tag to a Vpz Doc
      * with attribute 'name'  condName
@@ -184,41 +389,46 @@ public:
      * which attribute 'name' is condName
      */
     QDomNode condFromConds(const QDomNode& node, const QString& condName) const;
+
     /**
      * @brief get <port> tag from  tag <condition>
      * which attribute 'name' is portName
      */
     QDomNode portFromCond(const QDomNode& node, const QString& portName) const;
+
     /**
      * @brief tells if there is a <port> wich attribute 'name' equals
      * portName in a <condition> node
      */
     bool existPortFromCond(const QDomNode& node, const QString& portName) const;
+
     /**
      * @brief remove <condition> tag from <conditions>
      * which attribute 'name' is condName
      */
     void rmCondFromConds(QDomNode node, const QString& condName);
+
     /**
      * @brief remove <port> tag from <condition>
      * which attribute 'name' is portName
      */
     void rmPortFromCond(QDomNode node, const QString& portName);
+
     /**
      * @brief add a <condition> tag to <conditions>
      * whith attribute 'name'  condName
      */
     QDomNode addCondition(QDomNode node, const QString& condName);
+
     /**
-     * @brief get a condition List
+     * @brief get the string list of condition "," separated
      * @param atomFullName, atomic model name
-     *
      */
     QString modelCondsFromDoc(const QString& atomFullName);
+
     /**
-     * @brief attach a condition to an anatomic model
-     * @param atom, atomic model name
-     * @param condName, condition name
+     * @brief attach a condition to an an atomic model
+     * @param atom, atomic model full name
      *
      */
     void attachCondToAtomicModel(const QString& atomFullName, const QString& condName);
@@ -229,6 +439,7 @@ public:
      *
      */
     void detachCondToAtomicModel(const QString& atomFullName, const QString& condName);
+
     /**
      * @brief add a <port> tag to <condition>
      * whith attribute 'name'  portName
@@ -243,7 +454,8 @@ public:
      * and value is val
      */
     void setAttributeValue(QDomElement node, const QString& attrName,
-            const QString& val);
+			   const QString& val);
+
     /**
      * @brief get <outputs> tag from <views> tag
      */
@@ -259,6 +471,12 @@ public:
      * @param the values to fill
      */
     void viewOutputNames(std::vector<std::string>& v) const;
+    /**
+     * @brief get the list of attribute values of 'name' of different <observable>
+     * in <experiment>/<views>/<observables>
+     * @param the values to fill
+     */
+    void viewObservableNames(std::vector<std::string>& v) const;
     /**
      * @brief get the list of attribute values of 'name' of different <view>
      * in <experiment>/<views>
@@ -416,6 +634,10 @@ public:
             const QXmlAttributes &attributes);
 public:
     QByteArray xGetXml();
+
+signals:
+    void observablesUpdated();
+
 private:
     void xReadDom();
     void xReadDomStructures(const QDomNode &baseNode);
@@ -488,10 +710,8 @@ public:
     void removeCondition(const QString& cond);
     bool hasCondition(const QString& condName);
 
-    QString getObservables()
-    {
-        return mObservables;
-    }
+    void setObservable(QString obsName);
+
     //Todo a modeler does not have cond
 //    bool hasModeler();
 //    vpzExpCond *getModelerExpCond();
@@ -565,7 +785,6 @@ protected:
     QList <vleVpzConn  *> mConnections;
     vleVpzDynamic *mDynamic;
     QList <QString>  mConditions;
-    QString               mObservables;
     QLabel  mTitle;
     bool    mIsMaximized;
     QPoint  mOldPos, mStartPos;
