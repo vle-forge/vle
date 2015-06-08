@@ -169,6 +169,8 @@ public:
 
     const std::string& getLibrary() const { return mLibrary; }
 
+    void setCurrPackage(const std::string& curr_package) { mCurrPackage = curr_package;}
+
     const std::string& getCurrPackage() const { return mCurrPackage; }
 
 protected:
@@ -193,4 +195,3 @@ typedef ModelingPlugin* (*GvleModelingPluginSlot)(const std::string&,
 }} // namespace vle gvle
 
 #endif
-

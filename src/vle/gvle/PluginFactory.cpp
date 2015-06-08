@@ -130,6 +130,7 @@ ModelingPluginPtr PluginFactory::getModelingPlugin(
 
     if (it != mPimpl->mModelingPluginList.end()) {
         modelingPluginPtr = it->second;
+        modelingPluginPtr->setCurrPackage(curr_package);
     } else {
         GvleModelingPluginSlot fct = NULL;
 
