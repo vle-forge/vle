@@ -149,8 +149,8 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
     // Search the vleExpCond associated with the checkbox
     vleVpz* vpz   = mModel->getVpz();
     if (checked) {
-        vpz->attachCondToAtomicModel(mModel->getName(), cb->text());
+        vpz->attachCondToAtomicModel(mModel->getFullName(), cb->text());
     } else {
-        vpz->detachCondToAtomicModel(mModel->getName(), cb->text());
+        vpz->detachCondToAtomicModel(mModel->getFullName(), cb->text());
     }
 }

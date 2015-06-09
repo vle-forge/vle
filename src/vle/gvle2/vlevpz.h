@@ -160,11 +160,15 @@ public:
             int index);
     /**
      * @brief get atomic model tag <model> from a tag <model>,
+     * which full name is modelFullName
+     */
+    QDomNode modelFromDoc(const QString& modelFullName) const;
+    /**
+     * @brief get atomic model tag <model> from a tag <model>,
      * which name is atom
      */
     QDomNode atomicModelFromModel(const QDomNode& node,
             const QString& atom) const;
-
     /**
      * @brief get list of node with tag <condition> tag from tag <conditions>
      */
@@ -206,24 +210,25 @@ public:
      */
     QDomNode addCondition(QDomNode node, const QString& condName);
     /**
+     * @brief get a condition List
+     * @param atomFullName, atomic model name
+     *
+     */
+    QString modelCondsFromDoc(const QString& atomFullName);
+    /**
      * @brief attach a condition to an anatomic model
      * @param atom, atomic model name
      * @param condName, condition name
      *
-     * TODO: atomic model is given without the full name, this is due to
-     * vleVpzModel API that does not provide this intel => to fix
      */
-    void attachCondToAtomicModel(const QString& atom, const QString& condName);
+    void attachCondToAtomicModel(const QString& atomFullName, const QString& condName);
     /**
      * @brief detach a condition to an anatomic model
      * @param atom, atomic model name
      * @param condName, condition name
      *
-     * TODO: atomic model is given without the full name, this is due to
-     * vleVpzModel API that does not provide this intel => to fix
      */
-    void detachCondToAtomicModel(const QString& atom, const QString& condName);
-
+    void detachCondToAtomicModel(const QString& atomFullName, const QString& condName);
     /**
      * @brief add a <port> tag to <condition>
      * whith attribute 'name'  portName
@@ -239,7 +244,6 @@ public:
      */
     void setAttributeValue(QDomElement node, const QString& attrName,
             const QString& val);
-
     /**
      * @brief get <outputs> tag from <views> tag
      */
@@ -447,9 +451,11 @@ class vleVpzModel : public QWidget
 public:
     vleVpzModel(vleVpz *parent = 0);
     ~vleVpzModel();
-    QString getName();
+    QString getName() const;
+    QString getFullName() const;
     vleVpz *getVpz();
     void setName(QString name);
+    void setFullName(QString name);
     void copyFromModel(vleVpzModel *model);
     void addSubmodel(vleVpzModel *model);
     void delSubmodel(vleVpzModel *model);
@@ -480,7 +486,6 @@ public:
 
     void addCondition(const QString& cond);
     void removeCondition(const QString& cond);
-    QString getConditionStringList();
     bool hasCondition(const QString& condName);
 
     QString getObservables()
@@ -536,7 +541,7 @@ protected:
     void portDisconnect(vleVpzPort *port);
 
     public:
-    void xLoadNode(const QDomNode &baseNode);
+    void xLoadNode(const QDomNode &baseNode, const vleVpzModel *parent=0);
     private:
     void xreadSubmodels(const QDomNode &baseNode);
     void xReadInputs(const QDomNode &baseNode);
@@ -545,6 +550,7 @@ protected:
     bool xgetXml(QDomDocument *doc, QDomElement *base);
     private:
     QString mName;
+    QString mFullName;
     vleVpz *mVpz;
     bool    mIsAltered;
     int     mWidgetHeight;

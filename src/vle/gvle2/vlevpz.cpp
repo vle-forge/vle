@@ -476,6 +476,43 @@ vleVpz::rmValuePortCondToDoc(const QString& condName, const QString& portName,
 }
 
 QDomNode
+vleVpz::modelFromDoc(const QString& modelFullName) const
+{
+    // controls to be added
+
+    QDomNode structures =
+        getDomDoc().documentElement().elementsByTagName("structures").at(0);
+    QDomNode currModel =
+        structures.toElement().elementsByTagName("model").at(0);
+    QStringList pathSplit = modelFullName.split(".");
+    QString currName = attributeValue(currModel, "name");
+
+    for (int i = 1; i < pathSplit.length(); i++) {
+        QDomNodeList list = currModel.childNodes();
+        for (unsigned int j = 0; j < list.length(); j++) {
+            QDomNode item = list.item(j);
+            if (item.nodeName() == "submodels") {
+                QDomNodeList list = item.childNodes();
+                for (unsigned int k = 0; k < list.length(); k++) {
+                    QDomNode item = list.item(k);
+                    if (item.nodeName() == "model" &&
+                        attributeValue(item, "name") == pathSplit[i])
+                    {
+                        currModel = item;
+                    }
+                }
+            }
+        }
+    }
+
+    if  (attributeValue(currModel, "name") != pathSplit[pathSplit.length() - 1]) {
+        qDebug() << "model " << modelFullName << "<>" << attributeValue(currModel, "name") << " not Found!";
+    }
+
+    return currModel;
+}
+
+QDomNode
 vleVpz::atomicModelFromModel(const QDomNode& node, const QString& atom) const
 {
     QDomNode res;
@@ -610,49 +647,52 @@ vleVpz::addCondition(QDomNode node, const QString& condName)
     return elem;
 }
 
-void
-vleVpz::attachCondToAtomicModel(const QString& atom, const QString& condName)
+QString
+vleVpz::modelCondsFromDoc(const QString& atomFullName)
 {
-    QDomNode structures =
-            getDomDoc().documentElement().elementsByTagName("structures").at(0);
-    QDomNode currModel =
-            structures.toElement().elementsByTagName("model").at(0);
-    QDomNode atomMod = atomicModelFromModel(currModel, atom);
-    QString attachedConds = attributeValue(atomMod, "conditions");
+    QDomNode atom = modelFromDoc(atomFullName);
+    return attributeValue(atom, "conditions");
+}
+
+void
+vleVpz::attachCondToAtomicModel(const QString& atomFullName, const QString& condName)
+{
+    QDomNode atom = modelFromDoc(atomFullName);
+    QString attachedConds = attributeValue(atom, "conditions");
     QStringList condSplit = attachedConds.split(",");
     if (not condSplit.contains(condName)) {
         condSplit.append(condName);
         QString res ="";
-        for (int i=0; i<condSplit.length(); i++) {
+        for (int i = 0; i < condSplit.length(); i++) {
+            qDebug() << "i " << i;
             if (i > 0){
                 res += ",";
             }
             res += condSplit.at(i);
         }
-        setAttributeValue(atomMod.toElement(), "conditions", res);
+
+        qDebug() << atomFullName << " + " << condName << "=" << res;
+
+        setAttributeValue(atom.toElement(), "conditions", res);
     }
 }
 
 void
-vleVpz::detachCondToAtomicModel(const QString& atom, const QString& condName)
+vleVpz::detachCondToAtomicModel(const QString& atomFullName, const QString& condName)
 {
-    QDomNode structures =
-            getDomDoc().documentElement().elementsByTagName("structures").at(0);
-    QDomNode currModel =
-            structures.toElement().elementsByTagName("model").at(0);
-    QDomNode atomMod = atomicModelFromModel(currModel, atom);
-    QString attachedConds = attributeValue(atomMod, "conditions");
+    QDomNode atom = modelFromDoc(atomFullName);
+    QString attachedConds = attributeValue(atom, "conditions");
     QStringList condSplit = attachedConds.split(",");
     if (condSplit.contains(condName)) {
         condSplit.removeOne(condName);
         QString res ="";
-        for (int i=0; i<condSplit.length(); i++) {
+        for (int i = 0; i < condSplit.length(); i++) {
             if (i > 0){
                 res += ",";
             }
             res += condSplit.at(i);
         }
-        setAttributeValue(atomMod.toElement(), "conditions", res);
+        setAttributeValue(atom.toElement(), "conditions", res);
     }
 }
 
@@ -1702,9 +1742,7 @@ bool vleVpz::xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *m
     if (model->getDynamic())
         baseNode->setAttribute("dynamics", model->getDynamic()->getName());
 
-    // Insert Condition attribute if used
-    if (model->getConditionStringList() != "")
-        baseNode->setAttribute("conditions", model->getConditionStringList());
+    baseNode->setAttribute("conditions", modelCondsFromDoc(model->getFullName()));
 
     // Insert Observables attribute if used
     if (model->getObservables() != "")
@@ -2081,9 +2119,14 @@ bool vleVpzModel::isAltered()
     return mIsAltered;
 }
 
-QString vleVpzModel::getName()
+QString vleVpzModel::getName() const
 {
     return mName;
+}
+
+QString vleVpzModel::getFullName() const
+{
+    return mFullName;
 }
 
 vleVpz *vleVpzModel::getVpz()
@@ -2182,21 +2225,14 @@ void vleVpzModel::removeCondition(const QString& cond)
     //cond->unRegisterModel(this);
 }
 
-QString vleVpzModel::getConditionStringList()
-{
-    QString result;
-    for (int i=0; i<mConditions.length(); i++) {
-        if (i)
-            result.append(",");
-        result.append(mConditions.at(i));
-    }
-    return result;
-}
-
 bool
 vleVpzModel::hasCondition(const QString& condName)
 {
-    return mConditions.contains(condName);
+    QString conditionString = mVpz->modelCondsFromDoc(mFullName);
+
+    QStringList conditionsList = conditionString.split(",");
+
+    return conditionsList.contains(condName);
 }
 
 /**
@@ -2204,13 +2240,19 @@ vleVpzModel::hasCondition(const QString& condName)
  *        Load the model from the
  *
  */
-void vleVpzModel::xLoadNode(const QDomNode &node)
+void vleVpzModel::xLoadNode(const QDomNode &node, const vleVpzModel *parent)
 {
     QDomNamedNodeMap attrMap = node.attributes();
     if (attrMap.contains("name")) // Attribute Required !
     {
         QDomNode name = attrMap.namedItem("name");
         mName = name.nodeValue();
+        if (parent) { mFullName = parent->getFullName() +
+                "." + mName;
+        } else {
+            mFullName = mName;
+        }
+
         mTitle.setText(mName);
     }
     if (attrMap.contains("x")) // Optional
@@ -2278,7 +2320,6 @@ void vleVpzModel::xLoadNode(const QDomNode &node)
         else if (item.nodeName() == "submodels")
             xreadSubmodels(item);
     }
-
     fixWidgetSize(true);
 }
 
@@ -2297,7 +2338,7 @@ void vleVpzModel::xreadSubmodels(const QDomNode &baseNode)
             continue;
 
         vleVpzModel *model = new vleVpzModel(mVpz);
-        model->xLoadNode(item);
+        model->xLoadNode(item, this);
         addSubmodel(model);
     }
 }
@@ -2606,6 +2647,10 @@ void vleVpzModel::setName(QString name)
     mIsAltered = true;
 }
 
+void vleVpzModel::setFullName(QString name)
+{
+    mFullName = name;
+}
 //vpzExpCond *vleVpzModel::getModelerExpCond()
 //{
 //    QList<QString> expNameCandidate;
