@@ -1,6 +1,6 @@
 add_subdirectory(vle)
 
-if (VLE_HAVE_MPI)
+if (VLE_HAVE_MVLE OR VLE_HAVE_CVLE)
   add_subdirectory(mvle)
 endif ()
 

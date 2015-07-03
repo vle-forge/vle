@@ -194,19 +194,36 @@ if (WITH_TEST)
 endif (WITH_TEST)
 
 #
-# Check for an MPI implementation.
+# Check for an MPI implementation. building mvle and/or cvle
 #
 
-option(WITH_MPI "use an installed MPI library [default: on]" ON)
-if (WITH_MPI AND Boost_SERIALIZATION_FOUND AND Boost_MPI_FOUND)
+option(WITH_MVLE "build mvle [default: on]" ON)
+option(WITH_CVLE "build cvle [default: on]" ON)
+
+if (WITH_MVLE OR WITH_CVLE)
   find_package(MPI REQUIRED)
   message(STATUS "mpi include ${MPI_INCLUDE_PATH}")
   message(STATUS "mpi lib ${MPI_LIBRARY}")
   message(STATUS "mpi extra lib ${MPI_EXTRA_LIBRARY}")
   message(STATUS "mpi link ${MPI_LINK_FLAGS}")
-  set(VLE_HAVE_MPI 1 CACHE INTERNAL "" FORCE)
+  if (WITH_MVLE)
+    set(VLE_HAVE_MVLE 1 CACHE INTERNAL "" FORCE)
+  else ()
+    set(VLE_HAVE_MVLE 0 CACHE INTERNAL "" FORCE)
+  endif ()
+  if (WITH_CVLE)
+    if (Boost_SERIALIZATION_FOUND AND Boost_MPI_FOUND)
+      set(VLE_HAVE_CVLE 1 CACHE INTERNAL "" FORCE)
+    else ()
+      message(WARNING "boost mpi or boost serialization not found to build cvle") 
+      set(VLE_HAVE_CVLE 0 CACHE INTERNAL "" FORCE)
+    endif ()
+  else ()
+    set(VLE_HAVE_CVLE 0 CACHE INTERNAL "" FORCE)
+  endif ()
 else ()
-  set(VLE_HAVE_MPI 0 CACHE INTERNAL "" FORCE)
+  set(VLE_HAVE_MVLE 0 CACHE INTERNAL "" FORCE)
+  set(VLE_HAVE_CVLE 0 CACHE INTERNAL "" FORCE)
 endif ()
 
 #
@@ -313,6 +330,7 @@ message(STATUS "Build unit test...............: ${VLE_HAVE_UNITTESTFRAMEWORK}")
 message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
 message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
-message(STATUS "Build with MPI................: ${VLE_HAVE_MPI}")
+message(STATUS "Build with mvle...............: ${VLE_HAVE_MVLE}")
+message(STATUS "Build with cvle...............: ${VLE_HAVE_CVLE}")
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2

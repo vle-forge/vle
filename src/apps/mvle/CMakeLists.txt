@@ -32,7 +32,7 @@ install(FILES mvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
 # For the moment, cvle in only available for Linux
 #
 
-if (Boost_MPI_FOUND AND VLE_HAVE_MPI)
+if (Boost_MPI_FOUND AND VLE_HAVE_CVLE)
   add_executable(cvle cvle.cpp)
   set_target_properties(cvle PROPERTIES SOVERSION
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
