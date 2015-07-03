@@ -247,7 +247,7 @@ int main(int argc, char **argv)
                 }
             } else {
                 try {
-                    vle::manager::Manager man(vle::manager::LOG_SUMMARY,
+                    vle::manager::Manager man(vle::manager::LOG_NONE,
                                               vle::manager::SIMULATION_NONE |
                                               vle::manager::SIMULATION_NO_RETURN,
                                               &std::cout);
