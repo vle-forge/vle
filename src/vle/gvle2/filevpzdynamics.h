@@ -58,7 +58,7 @@ protected:
     void updateLibraryList(QString package = "", QString name = "");
 
 private:
-    vleVpzDynamic *getSelected();
+    QString getSelected();
 
 private:
     Ui::FileVpzDynamics *ui;

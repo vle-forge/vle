@@ -40,7 +40,6 @@
 #include <QDateTimeEdit>
 #include "vlepackage.h"
 #include "vlevpzconn.h"
-#include "vlevpzdynamic.h"
 #include "vlevpzport.h"
 #include <vle/value/Value.hpp>
 #include "vle/gvle2/ui_filevpztooltip.h"
@@ -60,9 +59,68 @@ class vleVpz : public QObject /*, public QXmlDefaultHandler */
 public:
     vleVpz();
     vleVpz(const QString &filename);
-    QString        getFilename();
+
+    /******************************************************
+     * Access to specific nodes in the vpz from Doc
+     ******************************************************/
     const QDomDocument& getDomDoc() const;
     QDomDocument& getDomDoc();
+    /**
+     * @brief get <observables> tag from Vpz doc
+     */
+    QDomNode obsFromDoc() const;
+    /**
+     * @brief get <views> tag from Vpz doc
+     */
+    QDomNode viewsFromDoc() const;
+    /**
+     * @brief get <conditions> tag from Vpz doc
+     */
+    QDomNode condsFromDoc() const;
+    /**
+     * @brief get node with tag <dynamics> tag from Vpz doc,
+     */
+    QDomNode dynamicsFromDoc() const;
+    /**
+     * @brief get list of node with tag <dynamic> tag from Vpz doc,
+     */
+    QDomNodeList dynListFromDoc() const;
+    /**
+     * @brief get <dynamic> tag from Vpz doc
+     */
+    QDomNode dynamicFromDoc(const QString& dyn) const;
+    /**
+     * @brief get list of node with tag <port> tag from Vpz doc,
+     * for condition of name 'condName'
+     */
+    QDomNodeList portsListFromDoc(const QString& condName) const;
+    /**
+     * @brief get <port> tag from Vpz Doc into condition condName
+     * which attribute 'name' is portName
+     */
+    QDomNode portFromDoc(const QString& condName, const QString& portName) const;
+
+    /******************************************************
+     * Access to specific nodes in the vpz from internal nodes
+     ******************************************************/
+    /**
+     * @brief get <observables> tag from <views> tag
+     */
+    QDomNode obsFromViews(QDomNode node) const;
+    /**
+     * @brief get <outputs> tag from <views> tag
+     */
+    QDomNode outputsFromViews(QDomNode node);
+    /**
+     * @brief get map from tag <output> (configuration of output)
+     */
+    QDomNode mapFromOutput(QDomNode node);
+
+
+    /*****************************************************
+     * TODO A TRIER
+     *****************************************************/
+    QString        getFilename() const;
     QString        getBasePath();
 
     QString        getAuthor() const;
@@ -135,14 +193,8 @@ public:
      * which attribute 'name' is portName
      */
     QDomNode portFromObs(const QDomNode& node, const QString& portName) const;
-    /**
-     * @brief get <observables> tag from Vpz doc
-     */
-    QDomNode obsFromDoc() const;
-    /**
-     * @brief get <observables> tag from <views> tag
-     */
-    QDomNode obsFromViews(QDomNode node) const;
+
+
     /**
      * @brief set the 'name' attribute of tag <Observable> to a new value
      * by the way also update models that do use this renamed obs.
@@ -248,12 +300,7 @@ public:
      * whith attribute 'name' obsName
      */
     QDomNode addObservable(QDomNode node, const QString& obsName);
-    /**
-     * @brief get the observable
-     * @param atomFullName, atomic model name
-     *
-     */
-    QString modelObsFromDoc(const QString& atomFullName);
+
     /**
      * @brief set an observable to an anatomic model
      * @param atom, atomic model
@@ -277,14 +324,8 @@ public:
 
     // other primitives
 
-    /**
-     * @brief get <views> tag from Vpz doc
-     */
-    QDomNode viewsFromDoc() const;
-    /**
-     * @brief get <conditions> tag from Vpz doc
-     */
-    QDomNode condsFromDoc() const;
+
+
     /**
      * @brief build an empty node corresponding to the value type from Vpz doc
      */
@@ -321,21 +362,33 @@ public:
     QString newCondPortNameToDoc(const QString& condName) const;
 
     /**
-     * @brief get list of node with tag <port> tag from Vpz doc,
-     * for condition of name 'condName'
-     */
-    QDomNodeList portsListFromDoc(const QString& condName) const;
-    /**
-     * @brief get <port> tag from Vpz Doc into condition condName
-     * which attribute 'name' is portName
-     */
-    QDomNode portFromDoc(const QString& condName, const QString& portName) const;
-
-    /**
      * @brief add a <condition> tag to a Vpz Doc
      * whith attribute 'name'  condName
      */
     QDomNode addConditionToDoc(const QString& condName);
+
+    /**
+     * @brief add a <dynamic> tag to a Vpz Doc
+     * whith dyn, attribute 'name'  set to dyn
+     */
+    QDomNode addDynamicToDoc(const QString& dyn);
+
+    /**
+     * @brief add a <dynamic> tag to a Vpz Doc
+     * @param dyn, attribute 'name'  set to dyn
+     * @param pkgName, attribute 'package'  set to pkgName
+     * @param libName, attribute 'library'  set to libName
+     */
+    QDomNode addDynamicToDoc(const QString& dyn, const QString& pkgName,
+            const QString& libName);
+
+    /**
+     * @brief Copy a dynamic
+     * @param dyn, the name of the dynamic to copy
+     * @param newDyn, the new name for the copy
+     */
+    QDomNode copyDynamicToDoc(const QString& dyn, const QString& newDyn);
+
     /**
      * @brief add a <port> tag to a Vpz Doc
      * with attribute 'name'  portName for condition condName
@@ -424,11 +477,46 @@ public:
      * @brief get the string list of condition "," separated
      * @param atomFullName, atomic model name
      */
-    QString modelCondsFromDoc(const QString& atomFullName);
+    QString modelCondsFromDoc(const QString& atomFullName) const;
+
+    /**
+     * @brief Tells if a condition is attached to an atomic model
+     * @param atomFullName, atomic model name
+     * @param condName, the condition name
+     * @return true if condName is attached to atomFullName
+     */
+    bool isAttachedCond(const QString& atomFullName,
+            const QString& condName) const;
+
+    /**
+     * @brief get the dynamics of an atomic model
+     * @param atomFullName, atomic model name
+     */
+    QString modelDynFromDoc(const QString& atomFullName) const;
+
+    /**
+     * @brief get the observable
+     * @param atomFullName, atomic model name
+     *
+     */
+    QString modelObsFromDoc(const QString& atomFullName) const;
+
+    /**
+     * @brief sets a dynamic to an an atomic model
+     * @param atomFullName, atomic model full name
+     *
+     */
+    void setDynToAtomicModel(const QString& atomFullName, const QString& dyn);
+
+    /**
+     * @brief Removes a dynamic
+     * @param dyn, the dynamic to remove
+     */
+    void removeDyn(const QString& dyn);
 
     /**
      * @brief attach a condition to an an atomic model
-     * @param atom, atomic model full name
+     * @param atomFullName, atomic model full name
      *
      */
     void attachCondToAtomicModel(const QString& atomFullName, const QString& condName);
@@ -456,10 +544,7 @@ public:
     void setAttributeValue(QDomElement node, const QString& attrName,
 			   const QString& val);
 
-    /**
-     * @brief get <outputs> tag from <views> tag
-     */
-    QDomNode outputsFromViews(QDomNode node);
+
     /**
      * @brief get <output> tag from <outputs> tag
      * which name is outputName
@@ -517,10 +602,7 @@ public:
      */
     QString getOutputPlugin(QDomNode node);
 
-    /**
-     * @brief get map from tag <output> (configuration of output)
-     */
-    QDomNode mapFromOutput(QDomNode node);
+
 
     /**
      * @brief Build a value from given index  of <port> portName of
@@ -598,19 +680,48 @@ public:
      */
     QString toQString(const QDomNode& node) const;
 
+    /**
+     * @brief Fill a QList with names of the dynamics
+     * @param toFill, the QList to fill with names of dynamics
+     */
+    void fillWithDynamicsList(QList <QString>& toFill) const;
+
+    /**
+     * @brief Tells if a dynamic exists
+     * @param dyn, the dynamic to search for
+     * @return true if the dynamic dyn exists, false otherwise
+     */
+    bool existDynamicIntoDoc(const QString& dyn) const;
+
+    /**
+     * @brief Tells if a dynamic exists
+     * @param dyn, the dynamic to search for
+     * @return true if the dynamic dyn exists, false otherwise
+     */
+    bool existDynamicIntoDynList(const QString& dyn,
+            const QDomNodeList& dynList) const;
+
+    /**
+     * @brief Get the name of the package containing a dynamic
+     * @param dyn, the dynamic to look for
+     * @return the name of the package containing dyn
+     *
+     */
+    QString getDynamicPackage(const QString& dyn) const;
+
+    /**
+     * @brief Get the name of the library containing a dynamic
+     * @param dyn, the dynamic to look for
+     * @return the name of the library containing dyn
+     */
+    QString getDynamicLibrary(const QString& dyn) const;
 
     void           setBasePath(const QString path);
     vlePackage    *getPackage();
     void           setPackage(vlePackage *package);
     bool           isAltered();
     void           save();
-    vleVpzDynamic *getDynamic(QString name);
-    void           addDynamic(vleVpzDynamic *dynamic);
-    void           removeDynamic(vleVpzDynamic *dynamic);
-    QList <vleVpzDynamic *> *getDynamicsList()
-            {
-        return &mDynamics;
-            }
+    void           removeDynamic(const QString& dynamic);
 
     public slots:
     void focusChange(vleVpzModel *model);
@@ -641,14 +752,12 @@ signals:
 private:
     void xReadDom();
     void xReadDomStructures(const QDomNode &baseNode);
-    void xReadDomDynamics(const QDomNode &baseNode);
     void xReadDomExperiments(const QDomNode &baseNode);
     void xSaveDom(QDomDocument *doc);
     bool xSaveStructures(QDomDocument *doc, QDomNode *baseNode);
     bool xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *model);
-    bool xSaveDynamics(QDomDocument *doc, QDomNode *baseNode);
     bool xSaveExperiments(QDomDocument *doc, QDomElement *baseNode);
-    int  removeModelDynamic(vleVpzModel *model, vleVpzDynamic *dynamic, bool recurse = false);
+    int  removeModelDynamic(vleVpzModel *model, const QString& dynamic, bool recurse = false);
 
 private:
     QString mFilename;
@@ -660,7 +769,6 @@ private:
     QString mExpCombination;
     vlePackage *mPackage;
     int                     mConditionIteratorIndex;
-    QList <vleVpzDynamic*> mDynamics;
     QList <void*>           mViews;
     QDomNode*              mClassesRaw;
     public:
@@ -702,7 +810,7 @@ public:
             {
         return &mConnections;
             }
-    vleVpzDynamic *getDynamic();
+    QString getDynamic();
     void setDynamic(QString dynamicName);
     void removeDynamic();
 
@@ -783,7 +891,7 @@ protected:
     QList <vleVpzPort  *> mInPorts;
     QList <vleVpzPort  *> mOutPorts;
     QList <vleVpzConn  *> mConnections;
-    vleVpzDynamic *mDynamic;
+    QString mDynamic;
     QList <QString>  mConditions;
     QLabel  mTitle;
     bool    mIsMaximized;

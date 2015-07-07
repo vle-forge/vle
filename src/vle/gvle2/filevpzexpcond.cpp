@@ -34,6 +34,8 @@
 #include "filevpzexpcond.h"
 #include "ui_filevpzexpcond.h"
 
+#include <QDebug>
+
 FileVpzExpCond::FileVpzExpCond(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzExpCond), mVpz(0), mCurrCondName(""),
     mCurrPortName(""), mCurrValIndex(-1), mPlugin(0),

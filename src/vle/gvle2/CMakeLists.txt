@@ -27,7 +27,7 @@ SET(GVLE2_SOURCES_CPP gvle2win.cpp aboutbox.cpp help.cpp
   filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
   filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
   sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp vpzActions.cpp
-  vlevpz.cpp vlevpzconn.cpp vlevpzdynamic.cpp vlevpzport.cpp
+  vlevpz.cpp vlevpzconn.cpp vlevpzport.cpp
   widgetvpzproperty.cpp plugin_modeler.cpp pluginmodelerview.cpp
   pluginmodelersummary.cpp )
 
@@ -58,7 +58,7 @@ SET(GVLE2_SOURCES_HPP ${ui_gvle2win_h} ${aboutbox_h} ${help_h}
   sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
   ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
   plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h vlevpz.h
-  vlevpzconn.h vlevpzdynamic.h vlevpzport.h widgetvpzproperty.h
+  vlevpzconn.h vlevpzport.h widgetvpzproperty.h
   ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h}
   ${widgetvpzpropertyobservables_h})
 

@@ -22,10 +22,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/utils/ModuleManager.hpp>
 #include <QMessageBox>
 #include <QUndoCommand>
 #include "filevpzdynamics.h"
 #include "ui_filevpzdynamics.h"
+
+#include <QDebug>
 
 /**
  * @brief FileVpzDynamics::FileVpzDynamics
@@ -110,23 +113,23 @@ void FileVpzDynamics::reload()
     ui->tabDynamics->setRowCount(0);
 
     // Get the dynamics list from VPZ
-    QList <vleVpzDynamic *> *dynList = mVpz->getDynamicsList();
-
-    for (int i = 0; i < dynList->length(); i++)
-    {
-        vleVpzDynamic *dyn = dynList->at(i);
+    QList<QString> ddynList;
+    mVpz->fillWithDynamicsList(ddynList);
+    for (int i = 0; i < ddynList.length(); i++) {
+        const QString& dyn = ddynList.at(i);
+        QString dynPkg = mVpz->getDynamicPackage(dyn);
+        QString dynLib = mVpz->getDynamicLibrary(dyn);
         ui->tabDynamics->insertRow(i);
-
         QLabel *dlabName = new QLabel(ui->tabDynamics);
-        dlabName->setText( dyn->getName() );
+        dlabName->setText( dyn );
         ui->tabDynamics->setCellWidget(i, 0, dlabName);
 
         QLabel *dlabpkg = new QLabel(ui->tabDynamics);
-        dlabpkg->setText( dyn->getPackage() );
+        dlabpkg->setText( dynPkg );
         ui->tabDynamics->setCellWidget(i, 1, dlabpkg);
 
         QLabel *dlabLibrary = new QLabel(ui->tabDynamics);
-        dlabLibrary->setText( dyn->getLibrary() );
+        dlabLibrary->setText( dynLib );
         ui->tabDynamics->setCellWidget(i, 2, dlabLibrary);
     }
 
@@ -243,14 +246,7 @@ void FileVpzDynamics::onSelectLibrary(int index)
  */
 void FileVpzDynamics::onAddButton()
 {
-    // Create a new Dynamic
-    vleVpzDynamic *dyn = new vleVpzDynamic();
-    // Set a default name, but no default package/library
-    dyn->setName(tr("A_New_Dynamic"));
-    // Insert it to the current VPZ
-    mVpz->addDynamic(dyn);
-
-    // Reload the Dynamics list to show the newly created dynamic
+    mVpz->addDynamicToDoc(tr("A_New_Dynamic"));
     reload();
 }
 
@@ -261,16 +257,8 @@ void FileVpzDynamics::onAddButton()
  */
 void FileVpzDynamics::onCloneButton()
 {
-    vleVpzDynamic *dynamic = getSelected();
-
-    // Make a new Dynamic with the same values
-    vleVpzDynamic *newDynamic = new vleVpzDynamic(dynamic);
-    // Update his name
-    newDynamic->setName( QString(dynamic->getName()).append("Clone") );
-    // Insert it to the current VPZ
-    mVpz->addDynamic(newDynamic);
-
-    // Reload the Dynamics list to show the newly created dynamic
+    QString dynamic = getSelected();
+    mVpz->copyDynamicToDoc(dynamic, QString(dynamic).append("Clone"));
     reload();
 }
 
@@ -281,10 +269,7 @@ void FileVpzDynamics::onCloneButton()
  */
 void FileVpzDynamics::onRemoveButton()
 {
-    vleVpzDynamic *dynamic = getSelected();
-    mVpz->removeDynamic(dynamic);
-
-    // Reload the Dynamics list to show the newly created dynamic
+    mVpz->removeDynamic(getSelected());
     reload();
 }
 
@@ -300,10 +285,9 @@ void FileVpzDynamics::onSaveButton()
     int cr = ui->tabDynamics->currentRow();
     QWidget *widgetName  = ui->tabDynamics->cellWidget(cr, 0);
     QLabel  *labelName   = qobject_cast<QLabel *>(widgetName);
-    QString  selName     = labelName->text();
+    QString  dynamicName     = labelName->text();
 
-    vleVpzDynamic *dynamic = mVpz->getDynamic(selName);
-    if (dynamic == 0)
+    if (dynamicName == "")
         throw tr("Save on an unknown dynamic");
 
     // Get the dynamic name from lineedit widget
@@ -339,21 +323,21 @@ void FileVpzDynamics::onSaveButton()
         return;
     }
 
-    if (newName != dynamic->getName())
+    if (newName != dynamicName)
     {
-        dynamic->setName(newName);
+//        dynamic->setName(newName); //TODO ?
         altered = true;
     }
 
-    if (pkgName != dynamic->getPackage())
+    if (pkgName != mVpz->getDynamicPackage(dynamicName))
     {
-        dynamic->setPackage(pkgName);
+//        dynamic->setPackage(pkgName); //TODO?
         altered = true;
     }
 
-    if (libName != dynamic->getLibrary())
+    if (libName !=  mVpz->getDynamicLibrary(dynamicName))
     {
-        dynamic->setLibrary(libName);
+//        dynamic->setLibrary(libName);
         altered = true;
     }
 
@@ -366,18 +350,14 @@ void FileVpzDynamics::onSaveButton()
  *        Search and return the Dynamic object of the current selection
  *
  */
-vleVpzDynamic *FileVpzDynamics::getSelected()
+QString FileVpzDynamics::getSelected()
 {
     int cr = ui->tabDynamics->currentRow();
     QWidget *widgetName  = ui->tabDynamics->cellWidget(cr, 0);
     QLabel  *labelName   = qobject_cast<QLabel *>(widgetName);
     if (labelName == 0)
         return 0;
-    QString  selName     = labelName->text();
-
-    vleVpzDynamic *dynamic = mVpz->getDynamic(selName);
-
-    return dynamic;
+    return (labelName->text());
 }
 
 /**
@@ -387,19 +367,28 @@ vleVpzDynamic *FileVpzDynamics::getSelected()
  */
 void FileVpzDynamics::updatePackageList(QString name)
 {
-    vleVpzDynamic *vpzDynamic = new vleVpzDynamic();
-
     // Get list of known/installed packages
-    QList<QString> *pkgList = vpzDynamic->getPackageList();
+    vle::utils::PathList pathList;
+    QList <QString> pkgList;
+
+    pathList = vle::utils::Path::path().getBinaryPackages();
+    for (vle::utils::PathList::const_iterator i = pathList.begin(), e = pathList.end();
+             i != e; ++i)
+    {
+        std::string name = *i;
+        QString pkgName = QString( name.c_str() );
+        pkgList.append(pkgName);
+    }
+
     // Sort results
-    qSort(pkgList->begin(), pkgList->end());
+    qSort(pkgList.begin(), pkgList.end());
 
     // Clear current widget content
     ui->dynPackageList->clear();
 
-    for (int i=0; i < pkgList->count(); i++)
+    for (int i=0; i < pkgList.count(); i++)
     {
-        QString pkgName = pkgList->at(i);
+        QString pkgName = pkgList.at(i);
 
         QListWidgetItem *lwiName = new QListWidgetItem( pkgName );
         ui->dynPackageList->addItem(lwiName);
@@ -407,8 +396,6 @@ void FileVpzDynamics::updatePackageList(QString name)
         if (pkgName == name)
             ui->dynPackageList->setCurrentItem(lwiName);
     }
-
-    delete vpzDynamic;
 }
 
 /**
@@ -418,20 +405,37 @@ void FileVpzDynamics::updatePackageList(QString name)
  */
 void FileVpzDynamics::updateLibraryList(QString package, QString name)
 {
-    vleVpzDynamic *vpzDynamic = new vleVpzDynamic();
 
-    // Get list of libraries available into the specified package
-    QList<QString> *libList = vpzDynamic->getLibraryList(package);
+    vle::utils::ModuleList lst;
+    vle::utils::ModuleManager manager;
+    QList <QString> libList;
+
+    // Convert package name argument to VLE string format
+    std::string stdPackage = package.toLocal8Bit().constData();
+
+    // Call VLE to get the Library list for the specified package
+    manager.browse();
+    manager.fill(stdPackage, vle::utils::MODULE_DYNAMICS, &lst);
+
+    // Read and save results
+    vle::utils::ModuleList::iterator it;
+    for (it = lst.begin(); it != lst.end(); ++it)
+    {
+        std::string name = it->library;
+        QString libName = QString( name.c_str() );
+        libList.append(libName);
+    }
+
     // Sort results
-    qSort(libList->begin(), libList->end());
+    qSort(libList.begin(), libList.end());
 
     // Clear current widget content
     ui->dynLibraryList->clear();
 
     // Parse the list
-    for (int i=0; i < libList->count(); i++)
+    for (int i=0; i < libList.count(); i++)
     {
-        QString libName = libList->at(i);
+        QString libName = libList.at(i);
 
         QListWidgetItem *lwiName = new QListWidgetItem( libName );
         ui->dynLibraryList->addItem(lwiName);
@@ -439,5 +443,4 @@ void FileVpzDynamics::updateLibraryList(QString package, QString name)
             ui->dynLibraryList->setCurrentItem(lwiName);
     }
 
-    delete vpzDynamic;
 }

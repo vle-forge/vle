@@ -40,7 +40,7 @@ class WidgetVpzPropertyDynamics : public QWidget
 public:
     explicit WidgetVpzPropertyDynamics(QWidget *parent = 0);
     ~WidgetVpzPropertyDynamics();
-    void setModel(vleVpzModel *model);
+    void setModel(vleVpz *model, const QString& fullPath);
 
 signals:
     void sigActivated(bool isActive);
@@ -50,7 +50,8 @@ private slots:
 
 private:
     Ui::WidgetVpzPropertyDynamics *ui;
-    vleVpzModel *mModel;
+    vleVpz *mVpz;
+    QString mFullPath;
 };
 
 class WidgetVpzPropertyExpCond : public QWidget
@@ -59,7 +60,7 @@ class WidgetVpzPropertyExpCond : public QWidget
 public:
     explicit WidgetVpzPropertyExpCond(QWidget *parent = 0);
     ~WidgetVpzPropertyExpCond();
-    void setModel(vleVpzModel *model);
+    void setModel(vleVpz *model, const QString& fullPath);
 
 //protected:
 //    void mouseDoubleClickEvent (QMouseEvent *event);
@@ -69,7 +70,8 @@ private slots:
 
 private:
     Ui::WidgetVpzPropertyExpCond *ui;
-    vleVpzModel *mModel;
+    vleVpz *mVpz;
+    QString mFullPath;
 };
 
 class WidgetVpzPropertyObservables : public QWidget
@@ -78,7 +80,7 @@ class WidgetVpzPropertyObservables : public QWidget
 public:
     explicit WidgetVpzPropertyObservables(QWidget *parent = 0);
     ~WidgetVpzPropertyObservables();
-    void setModel(vleVpzModel *model);
+    void setModel(vleVpz *model, const QString& fullPath);
 
 public slots:
     void refresh();
@@ -88,6 +90,7 @@ private slots:
 
 private:
     Ui::WidgetVpzPropertyObservables *ui;
-    vleVpzModel *mModel;
+    vleVpz *mVpz;
+    QString mFullPath;
 };
 #endif // WIDGETVPZPROPERTY_H

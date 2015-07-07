@@ -628,19 +628,19 @@ void fileVpzView::onFocusChanged(vleVpzModel *model)
     uiTool->modelProperty->setCurrentCell(ROW_NAME, 0);
 
     WidgetVpzPropertyDynamics *wpd = new WidgetVpzPropertyDynamics();
-    wpd->setModel(model);
+    wpd->setModel(mVpz, model->getFullName());
     uiTool->modelProperty->setCellWidget(ROW_DYN, 1, wpd);
     uiTool->modelProperty->resizeRowToContents(ROW_DYN);
     QObject::connect(wpd,  SIGNAL(sigActivated(bool)),
                      this, SLOT  (onPropertyMode(bool)));
 
     WidgetVpzPropertyExpCond *wpec = new WidgetVpzPropertyExpCond();
-    wpec->setModel(model);
+    wpec->setModel(mVpz, model->getFullName());
     uiTool->modelProperty->setCellWidget(ROW_EXP, 1, wpec);
     uiTool->modelProperty->resizeRowToContents(ROW_EXP);
 
     WidgetVpzPropertyObservables *wpo = new WidgetVpzPropertyObservables();
-    wpo->setModel(model);
+    wpo->setModel(mVpz, model->getFullName());
     uiTool->modelProperty->setCellWidget(ROW_OBS, 1, wpo);
     uiTool->modelProperty->resizeRowToContents(ROW_OBS);
 

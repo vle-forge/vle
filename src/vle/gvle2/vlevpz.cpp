@@ -36,6 +36,8 @@
 #include <vle/value/Matrix.hpp>
 #include "vlevpz.h"
 
+#include <QDebug>
+
 
 vleVpz::vleVpz()
 {
@@ -58,18 +60,161 @@ vleVpz::vleVpz(const QString &filename) :
     }
 }
 
-const QDomDocument& vleVpz::getDomDoc() const
+/******************************************************
+ * Access to specific nodes in the vpz from Doc
+ ******************************************************/
+
+const QDomDocument&
+vleVpz::getDomDoc() const
 {
     return mDoc;
 }
 
-QDomDocument& vleVpz::getDomDoc()
+QDomDocument&
+vleVpz::getDomDoc()
 {
     emit sigChanged(mFilename);
     return mDoc;
 }
 
-QString vleVpz::getFilename()
+QDomNode
+vleVpz::obsFromDoc() const
+{
+    return obsFromViews(viewsFromDoc());
+}
+
+QDomNode
+vleVpz::viewsFromDoc() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement expElem = nodeList.item(0).toElement();
+    nodeList = expElem.elementsByTagName("views");
+    return nodeList.item(0);
+}
+
+QDomNode
+vleVpz::condsFromDoc() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    QDomElement expElem = nodeList.item(0).toElement();
+
+    nodeList = expElem.elementsByTagName("conditions");
+    return nodeList.item(0);
+}
+
+QDomNode
+vleVpz::dynamicsFromDoc() const
+{
+    QDomNodeList dynList = getDomDoc().elementsByTagName("dynamics");
+    return dynList.item(0);
+}
+
+QDomNodeList
+vleVpz::dynListFromDoc() const
+{
+    QDomNodeList dynList = getDomDoc().elementsByTagName("dynamics");
+    QDomElement dynElem = dynamicsFromDoc().toElement();
+    dynList = dynElem.elementsByTagName("dynamic");
+    return dynList;
+}
+
+QDomNode
+vleVpz::dynamicFromDoc(const QString& dyn) const
+{
+    QDomNodeList dynList = dynListFromDoc();
+    for (unsigned int i=0; i < dynList.length(); i++) {
+       if (attributeValue(dynList.at(i), "name") == dyn) {
+           return dynList.at(i);
+       }
+    }
+    qDebug() << ("Internal error in dynamicFromDoc (dyn not found): ") << dyn;
+    return QDomNode();
+}
+
+QDomNodeList
+vleVpz::portsListFromDoc(const QString& condName) const
+{
+    return portsListFromCond(condFromConds(condsFromDoc(), condName));
+}
+
+QDomNode
+vleVpz::portFromDoc(const QString& condName, const QString& portName) const
+{
+    return portFromCond(condFromConds(condsFromDoc(), condName), portName);
+}
+
+/******************************************************
+ * Access to specific nodes in the vpz from internal nodes
+ ******************************************************/
+
+QDomNode
+vleVpz::obsFromViews(QDomNode node) const
+{
+    if (node.nodeName() != "views") {
+
+        qDebug() << ("Internal error in obsFromView (wrong main tag)");
+        return QDomNode();
+    }
+    QDomNodeList childs = node.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if (child.nodeName() == "observables") {
+            return child;
+        }
+    }
+    qDebug() << ("Internal error in obsFromView (observables not found)");
+    return QDomNode();
+}
+
+QDomNode
+vleVpz::outputsFromViews(QDomNode node)
+{
+    if (node.nodeName() != "views") {
+
+        qDebug() << ("Internal error in outputsFromView (wrong main tag)");
+        return QDomNode();
+    }
+    QDomNodeList childs = node.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomNode child = childs.item(i);
+        if (child.nodeName() == "outputs") {
+            return child;
+        }
+    }
+    qDebug() << ("Internal error in outputsFromView (outputs not found)");
+    return QDomNode();
+}
+
+QDomNode
+vleVpz::mapFromOutput(QDomNode node)
+{
+    if (node.nodeName() != "output") {
+        QString mess = "Internal error in mapFromOutput (wrong main tag)";
+        mess += "\n got : ";
+        mess += node.nodeName();
+        qDebug() << (mess);
+        return QDomNode();
+    }
+    QDomNodeList childs = node.childNodes();
+    if (childs.length() != 1) {
+        QString mess = "Internal error in mapFromOutput (wrong nb of childs)";
+        qDebug() << (mess);
+        return QDomNode();
+    }
+    QDomNode child = childs.item(0);
+    if (child.nodeName() != "map") {
+        QString mess = "Internal error in mapFromOutput (unexpected node type)";
+        qDebug() << (mess);
+        return QDomNode();
+    }
+    return child;
+}
+
+/*****************************************************
+ * TODO A TRIER
+ *****************************************************/
+
+QString vleVpz::getFilename() const
 {
     return mFilename;
 }
@@ -214,67 +359,9 @@ void vleVpz::setExpBegin(const QString begin)
     QDomElement docElem = nodeList.item(0).toElement();
     docElem.setAttribute("begin", begin);
 }
-QDomNode
-vleVpz::obsFromDoc() const
-{
-    return obsFromViews(viewsFromDoc());
-}
 
-QDomNode
-vleVpz::obsFromViews(QDomNode node) const
-{
-    if (node.nodeName() != "views") {
 
-        qDebug() << ("Internal error in obsFromView (wrong main tag)");
-        return QDomNode();
-    }
-    QDomNodeList childs = node.childNodes();
-    for (unsigned int i=0; i < childs.length(); i++) {
-        QDomNode child = childs.item(i);
-        if (child.nodeName() == "observables") {
-            return child;
-        }
-    }
-    qDebug() << ("Internal error in obsFromView (observables not found)");
-    return QDomNode();
-}
 
-QDomNode
-vleVpz::outputsFromViews(QDomNode node)
-{
-    if (node.nodeName() != "views") {
-
-        qDebug() << ("Internal error in outputsFromView (wrong main tag)");
-        return QDomNode();
-    }
-    QDomNodeList childs = node.childNodes();
-    for (unsigned int i=0; i < childs.length(); i++) {
-        QDomNode child = childs.item(i);
-        if (child.nodeName() == "outputs") {
-            return child;
-        }
-    }
-    qDebug() << ("Internal error in outputsFromView (outputs not found)");
-    return QDomNode();
-}
-
-QDomNode
-vleVpz::viewsFromDoc() const
-{
-    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
-    QDomElement expElem = nodeList.item(0).toElement();
-    nodeList = expElem.elementsByTagName("views");
-    return nodeList.item(0);
-}
-
-QDomNode
-vleVpz::condsFromDoc() const
-{
-    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
-    QDomElement expElem = nodeList.item(0).toElement();
-    nodeList = expElem.elementsByTagName("conditions");
-    return nodeList.item(0);
-}
 
 QDomElement
 vleVpz::buildEmptyValueFromDoc(vle::value::Value::type vleType)
@@ -485,18 +572,6 @@ vleVpz::obsPortsListFromDoc(const QString& obsName) const
                                         obsName));
 }
 
-QDomNodeList
-vleVpz::portsListFromDoc(const QString& condName) const
-{
-    return portsListFromCond(condFromConds(condsFromDoc(), condName));
-}
-
-QDomNode
-vleVpz::portFromDoc(const QString& condName, const QString& portName) const
-{
-    return portFromCond(condFromConds(condsFromDoc(), condName), portName);
-}
-
 QDomNode
 vleVpz::addObservableToDoc(const QString& obsName)
 {
@@ -509,6 +584,43 @@ QDomNode
 vleVpz::addConditionToDoc(const QString& condName)
 {
     return addCondition(condsFromDoc(),condName);
+}
+
+
+QDomNode
+vleVpz::addDynamicToDoc(const QString& dyn)
+{
+    QDomNodeList dynList = dynListFromDoc();
+    if (existDynamicIntoDynList(dyn, dynList)) {
+        qDebug() << ("Internal error in addDynamicToDoc (already here)");
+        return QDomNode();
+    }
+    QDomElement elem = getDomDoc().createElement("dynamic");
+    elem.setAttribute("name", dyn);
+    dynamicsFromDoc().appendChild(elem);
+    return elem;
+}
+
+QDomNode
+vleVpz::addDynamicToDoc(const QString& dyn, const QString& pkgName,
+        const QString& libName)
+{
+    QDomNode newNode = addDynamicToDoc(dyn);
+    setAttributeValue(newNode.toElement(), "package", pkgName);
+    setAttributeValue(newNode.toElement(), "library", libName);
+    return newNode;
+}
+
+QDomNode
+vleVpz::copyDynamicToDoc(const QString& dyn, const QString& newDyn)
+{
+    QDomNode dynNode = dynamicFromDoc(dyn);
+    QString pkg = attributeValue(dynNode, "package");
+    QString lib = attributeValue(dynNode, "library");
+    QDomNode newNode = addDynamicToDoc(newDyn);
+    setAttributeValue(newNode.toElement(),"package", pkg);
+    setAttributeValue(newNode.toElement(),"library", lib);
+    return newNode;
 }
 
 QDomNode
@@ -787,6 +899,7 @@ vleVpz::condsListFromConds(const QDomNode& node) const
 {
     if (node.nodeName() != "conditions") {
         qDebug() << ("Internal error in condsListFromConds (wrong main tag)");
+        qDebug() << toQString(node);
         return QDomNodeList();
     }
     return node.toElement().elementsByTagName("condition");
@@ -1031,49 +1144,49 @@ vleVpz::addCondition(QDomNode node, const QString& condName)
 }
 
 QString
-vleVpz::modelObsFromDoc(const QString& atomFullName)
-{
-    QDomNode atom = modelFromDoc(atomFullName);
-    return attributeValue(atom, "observables");
-}
-
-QString
-vleVpz::modelCondsFromDoc(const QString& atomFullName)
+vleVpz::modelCondsFromDoc(const QString& atomFullName) const
 {
     QDomNode atom = modelFromDoc(atomFullName);
     return attributeValue(atom, "conditions");
 }
 
-void
-vleVpz::setObsToAtomicModel(QDomNode &node, const QString& obsName)
-{
-     setAttributeValue(node.toElement(), "observables", obsName);
-}
-
-void
-vleVpz::setObsToAtomicModel(const QString& atomFullName, const QString& obsName)
-{
-   QDomNode atom = modelFromDoc(atomFullName);
-   setAttributeValue(atom.toElement(), "observables", obsName);
-}
-
-void
-vleVpz::unsetObsFromAtomicModel(const QString& atomFullName)
+bool
+vleVpz::isAttachedCond(const QString& atomFullName,
+        const QString& condName) const
 {
     QDomNode atom = modelFromDoc(atomFullName);
-    setAttributeValue(atom.toElement(), "observables","");
+    QString attachedConds = attributeValue(atom, "conditions");
+    QStringList condSplit = attachedConds.split(",");
+    return condSplit.contains(condName);
+}
+
+QString
+vleVpz::modelDynFromDoc(const QString& atomFullName) const
+{
+    QDomNode atom = modelFromDoc(atomFullName);
+    return attributeValue(atom, "dynamics");
+}
+
+QString
+vleVpz::modelObsFromDoc(const QString& atomFullName) const
+{
+    QDomNode atom = modelFromDoc(atomFullName);
+    return attributeValue(atom, "observables");
 }
 
 void
-vleVpz::unsetObsFromAtomicModel(QDomNode& node, const QString& obsName)
+vleVpz::setDynToAtomicModel(const QString& atomFullName, const QString& dyn)
 {
-    if (node.nodeName() != "model") {
-        qDebug() << ("Internal error in unsetObsFromAtomicModel (wrong main tag)");
-        return;
-    }
-    if(attributeValue(node, "observables") == obsName) {
-        setAttributeValue(node.toElement(), "observables","");
-    }
+    QDomNode atom = modelFromDoc(atomFullName);
+    setAttributeValue(atom.toElement(), "dynamics", dyn);
+}
+
+void
+vleVpz::removeDyn(const QString& dyn)
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("dynamics");
+    QDomElement dynamics = nodeList.item(0).toElement();
+    dynamics.removeChild(dynamicFromDoc(dyn));
 }
 
 void
@@ -1111,6 +1224,38 @@ vleVpz::detachCondToAtomicModel(const QString& atomFullName, const QString& cond
             res += condSplit.at(i);
         }
         setAttributeValue(atom.toElement(), "conditions", res);
+    }
+}
+
+void
+vleVpz::setObsToAtomicModel(QDomNode &node, const QString& obsName)
+{
+     setAttributeValue(node.toElement(), "observables", obsName);
+}
+
+void
+vleVpz::setObsToAtomicModel(const QString& atomFullName, const QString& obsName)
+{
+   QDomNode atom = modelFromDoc(atomFullName);
+   setAttributeValue(atom.toElement(), "observables", obsName);
+}
+
+void
+vleVpz::unsetObsFromAtomicModel(const QString& atomFullName)
+{
+    QDomNode atom = modelFromDoc(atomFullName);
+    setAttributeValue(atom.toElement(), "observables","");
+}
+
+void
+vleVpz::unsetObsFromAtomicModel(QDomNode& node, const QString& obsName)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in unsetObsFromAtomicModel (wrong main tag)");
+        return;
+    }
+    if(attributeValue(node, "observables") == obsName) {
+        setAttributeValue(node.toElement(), "observables","");
     }
 }
 
@@ -1333,30 +1478,7 @@ vleVpz::getOutputPlugin(QDomNode node)
 
 
 
-QDomNode
-vleVpz::mapFromOutput(QDomNode node)
-{
-    if (node.nodeName() != "output") {
-        QString mess = "Internal error in mapFromOutput (wrong main tag)";
-        mess += "\n got : ";
-        mess += node.nodeName();
-        qDebug() << (mess);
-        return QDomNode();
-    }
-    QDomNodeList childs = node.childNodes();
-    if (childs.length() != 1) {
-        QString mess = "Internal error in mapFromOutput (wrong nb of childs)";
-        qDebug() << (mess);
-        return QDomNode();
-    }
-    QDomNode child = childs.item(0);
-    if (child.nodeName() != "map") {
-        QString mess = "Internal error in mapFromOutput (unexpected node type)";
-        qDebug() << (mess);
-        return QDomNode();
-    }
-    return child;
-}
+
 
 vle::value::Value*
 vleVpz::buildValue(const QString& condName, const QString& portName,
@@ -1833,6 +1955,78 @@ vleVpz::toQString(const QDomNode& node) const
     return str;
 }
 
+void
+vleVpz::fillWithDynamicsList(QList <QString>& toFill) const
+{
+    toFill.clear();
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("dynamics");
+    QDomElement dynamics = nodeList.item(0).toElement();
+    QDomNodeList childs = dynamics.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomElement child = childs.item(i).toElement();
+        if ((child.nodeName() == "dynamic") and
+                (child.attributes().contains("name"))){
+            toFill.append(child.attributes().namedItem("name").nodeValue());
+        }
+    }
+}
+
+bool
+vleVpz::existDynamicIntoDoc(const QString& dyn) const
+{
+    QDomNodeList dynList = dynListFromDoc();
+    return existDynamicIntoDynList(dyn, dynList);
+}
+
+bool
+vleVpz::existDynamicIntoDynList(const QString& dyn,
+        const QDomNodeList& dynList) const
+{
+    for (unsigned int i=0; i < dynList.length(); i++) {
+        QDomElement child = dynList.item(i).toElement();
+        if ((child.nodeName() == "dynamic") and
+                (child.attributes().contains("name")) and
+                (child.attributes().namedItem("name").nodeValue() == dyn)){
+            return true;
+        }
+    }
+    return false;
+}
+
+QString
+vleVpz::getDynamicPackage(const QString& dyn) const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("dynamics");
+    QDomElement dynamics = nodeList.item(0).toElement();
+    QDomNodeList childs = dynamics.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomElement child = childs.item(i).toElement();
+        if ((child.nodeName() == "dynamic") and
+                (child.attributes().contains("package")) and
+                (child.attributes().namedItem("name").nodeValue() == dyn)){
+            return child.attributes().namedItem("package").nodeValue();
+        }
+    }
+    return "";
+}
+
+QString
+vleVpz::getDynamicLibrary(const QString& dyn) const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("dynamics");
+    QDomElement dynamics = nodeList.item(0).toElement();
+    QDomNodeList childs = dynamics.childNodes();
+    for (unsigned int i=0; i < childs.length(); i++) {
+        QDomElement child = childs.item(i).toElement();
+        if ((child.nodeName() == "dynamic") and
+                (child.attributes().contains("library")) and
+                (child.attributes().namedItem("name").nodeValue() == dyn)){
+            return child.attributes().namedItem("library").nodeValue();
+        }
+    }
+    return "";
+}
+
 
 void vleVpz::setBasePath(const QString path)
 {
@@ -1886,50 +2080,37 @@ bool vleVpz::isAltered()
     return false;
 }
 
-/**
- * @brief vleVpz::getDynamic
- *        Search and return a loaded Dynamic, identified by his name
- *
- */
-vleVpzDynamic *vleVpz::getDynamic(QString name)
-{
-    QListIterator<vleVpzDynamic*> items(mDynamics);
-    while( items.hasNext() )
-    {
-        vleVpzDynamic *dyn = items.next();
-        if (dyn->getName() == name)
-            return dyn;
-    }
+///**
+// * @brief vleVpz::getDynamic
+// *        Search and return a loaded Dynamic, identified by his name
+// *
+// */
+//vleVpzDynamic *vleVpz::getDynamic(QString name)
+//{
+//    QListIterator<vleVpzDynamic*> items(mDynamics);
+//    while( items.hasNext() )
+//    {
+//        vleVpzDynamic *dyn = items.next();
+//        if (dyn->getName() == name)
+//            return dyn;
+//    }
+//
+//    return 0;
+//}
 
-    return 0;
-}
-
-/**
- * @brief vleVpz::addDynamic
- *        Add a new Dynamic
- *
- */
-void vleVpz::addDynamic(vleVpzDynamic *dynamic)
-{
-    if (dynamic)
-        mDynamics.prepend(dynamic);
-}
 
 /**
  * @brief vleVpz::removeDynamic
  *        Remove an existing Dynamic
  *
  */
-void vleVpz::removeDynamic(vleVpzDynamic *dynamic)
+void vleVpz::removeDynamic(const QString& dynamic)
 {
     // Remove the links of models with the dyncmic
     removeModelDynamic(mRootModel, dynamic, true);
 
     // Remove from the VPZ
-    mDynamics.removeAll(dynamic);
-
-    // Then delete it
-    delete dynamic;
+    removeDyn(dynamic);
 }
 
 /**
@@ -1937,7 +2118,7 @@ void vleVpz::removeDynamic(vleVpzDynamic *dynamic)
  *        Remove  link(s) of model(s) with a dynamic before deleting it
  *
  */
-int vleVpz::removeModelDynamic(vleVpzModel *model, vleVpzDynamic *dynamic, bool recurse)
+int vleVpz::removeModelDynamic(vleVpzModel *model, const QString& dynamic, bool recurse)
 {
     int count = 0;
 
@@ -2015,12 +2196,10 @@ void vleVpz::addModeler(QString name)
 void vleVpz::addModelerDynamic(vleVpzModel *model, QString lib)
 {
     // First, check if the model has already a dynamic
-    vleVpzDynamic *dyn = model->getDynamic();
-    if (dyn)
-    {
+    if (model->getDynamic() != ""){
         // Test if the current dynamic can be used with this modeler
-        if ((dyn->getPackage() == mPackage->getName()) &&
-            (dyn->getLibrary() == lib))
+        if ((getDynamicPackage(model->getDynamic()) == mPackage->getName()) &&
+            (getDynamicLibrary(model->getDynamic()) == lib))
             // Yes, model has already a valid dynamic, nothing to do
             return;
 
@@ -2037,13 +2216,15 @@ void vleVpz::addModelerDynamic(vleVpzModel *model, QString lib)
     }
 
     // Second, search into the existing dynamics if one can be used
-    vleVpzDynamic *newDyn = 0;
-    for (int i = 0; i < mDynamics.count(); i++)
+    QString newDyn("");
+    QList<QString> dynList;
+    fillWithDynamicsList(dynList);
+    for (int i = 0; i < dynList.count(); i++)
     {
-        vleVpzDynamic *existingDyn = mDynamics.at(i);
-        if (existingDyn->getPackage() != mPackage->getName())
+        QString existingDyn = dynList.at(i);
+        if (getDynamicPackage(existingDyn) != mPackage->getName())
             continue;
-        if (existingDyn->getLibrary() != lib)
+        if (getDynamicLibrary(existingDyn) != lib)
             continue;
 
         // A dynamic with good Library and Package values found ! :)
@@ -2052,16 +2233,13 @@ void vleVpz::addModelerDynamic(vleVpzModel *model, QString lib)
     }
 
     // If no dynamic available, create a new one
-    if (newDyn == 0)
+    if (newDyn == "")
     {
-        QString dynName = "dyn_" + model->getName();
+        newDyn = "dyn_" + model->getName();
         QString pkgName = mPackage->getName();
-
-        newDyn = new vleVpzDynamic(dynName, lib, pkgName);
-        addDynamic(newDyn);
+        addDynamicToDoc(newDyn, pkgName, lib);
     }
-
-    model->setDynamic(newDyn->getName());
+    model->setDynamic(newDyn);
 }
 
 /**
@@ -2139,9 +2317,8 @@ void vleVpz::xSaveDom(QDomDocument *doc)
     if ( xSaveStructures(doc, &xStruct) )
         vpzRoot.appendChild(xStruct);
 
-    QDomElement xDyn = doc->createElement("dynamics");
-    if ( xSaveDynamics(doc, &xDyn) )
-        vpzRoot.appendChild(xDyn);
+    vpzRoot.appendChild(dynamicsFromDoc());
+
 
     if (mClassesRaw)
         vpzRoot.appendChild(*mClassesRaw);
@@ -2188,8 +2365,8 @@ bool vleVpz::xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *m
     }
 
     // Insert Dynamic attribute if used
-    if (model->getDynamic())
-        baseNode->setAttribute("dynamics", model->getDynamic()->getName());
+    if (model->getDynamic() != "")
+        baseNode->setAttribute("dynamics", model->getDynamic());
 
     baseNode->setAttribute("conditions", modelCondsFromDoc(model->getFullName()));
 
@@ -2283,31 +2460,6 @@ bool vleVpz::xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *m
 }
 
 /**
- * @brief vleVpz::xSaveDynamics
- *        Save the loaded Dynamics into the DomDocument
- *
- */
-bool vleVpz::xSaveDynamics(QDomDocument *doc, QDomNode *baseNode)
-{
-    if (mDynamics.length() == 0)
-        return false;
-
-    QListIterator<vleVpzDynamic*> items(mDynamics);
-    while( items.hasNext() )
-    {
-        vleVpzDynamic *dyn = items.next();
-
-        QDomElement xDyn = doc->createElement("dynamic");
-        xDyn.setAttribute("package", dyn->getPackage());
-        xDyn.setAttribute("library", dyn->getLibrary());
-        xDyn.setAttribute("name",    dyn->getName());
-        baseNode->appendChild(xDyn);
-    }
-
-    return true;
-}
-
-/**
  * @brief vleVpz::xSaveExperiments
  *        Save the loaded Experiments into the DomDocument
  *
@@ -2335,8 +2487,6 @@ void vleVpz::xReadDom()
     // First try to load Dynamics and Conditions
     for(QDomNode n = docElem.firstChild(); !n.isNull(); n = n.nextSibling())
     {
-        if (n.nodeName() == "dynamics")
-            xReadDomDynamics(n);
         if (n.nodeName() == "experiment")
             xReadDomExperiments(n);
     }
@@ -2369,45 +2519,6 @@ void vleVpz::xReadDomStructures(const QDomNode &baseNode)
             mRootModel = model;
             break;
         }
-    }
-}
-
-void vleVpz::xReadDomDynamics(const QDomNode &baseNode)
-{
-    QString dynName;
-    QString dynLib;
-    QString dynPackage;
-
-    QDomNodeList list = baseNode.childNodes();
-
-    for (unsigned int i=0; i < list.length(); i++)
-    {
-        QDomNode item = list.item(i);
-        if (item.nodeName() != "dynamic")
-            continue;
-
-        QDomNamedNodeMap attrMap = item.attributes();
-        if (attrMap.contains("name"))
-        {
-            QDomNode xName = attrMap.namedItem("name");
-            dynName = xName.nodeValue();
-        }
-        if (attrMap.contains("library"))
-        {
-            QDomNode xLib = attrMap.namedItem("library");
-            dynLib = xLib.nodeValue();
-        }
-        if (attrMap.contains("package"))
-        {
-            QDomNode xPkg = attrMap.namedItem("package");
-            dynPackage = xPkg.nodeValue();
-        }
-
-        vleVpzDynamic *dyn = new vleVpzDynamic();
-        dyn->setName(dynName);
-        dyn->setLibrary(dynLib);
-        dyn->setPackage(dynPackage);
-        mDynamics.append(dyn);
     }
 }
 
@@ -2459,7 +2570,7 @@ vleVpzModel::vleVpzModel(vleVpz *parent)
     mConditions.clear();
 
     mIsAltered = false;
-    mDynamic   = 0;
+    mDynamic   = "";
 
     mTooltip = 0;
 
@@ -2623,7 +2734,7 @@ int vleVpzModel::countSubmodels()
  *        Accessor for the Dynamic attribute of the model
  *
  */
-vleVpzDynamic *vleVpzModel::getDynamic()
+QString vleVpzModel::getDynamic()
 {
     return mDynamic;
 }
@@ -2635,12 +2746,9 @@ vleVpzDynamic *vleVpzModel::getDynamic()
  */
 void vleVpzModel::setDynamic(QString dynamicName)
 {
-    // Search the Dynamic into VPZ using specified name
-    vleVpzDynamic *dynamic = mVpz->getDynamic(dynamicName);
-
     // If found, update the model
-    if (dynamic)
-        mDynamic = dynamic;
+    if (dynamicName != "")
+        mDynamic = dynamicName;
     else
         qDebug() << "Model " << mName << " try to use an unknown dynamic : " << dynamicName;
 }
@@ -2652,7 +2760,7 @@ void vleVpzModel::setDynamic(QString dynamicName)
  */
 void vleVpzModel::removeDynamic()
 {
-    mDynamic = 0;
+    mDynamic = "";
 }
 
 void vleVpzModel::addCondition(const QString& cond)
