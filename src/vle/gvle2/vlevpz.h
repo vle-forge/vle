@@ -99,6 +99,26 @@ public:
      * which attribute 'name' is portName
      */
     QDomNode portFromDoc(const QString& condName, const QString& portName) const;
+    /**
+     * @brief get atomic model tag <model> from a tag <model>,
+     * which full name is modelFullName
+     */
+    QDomNode modelFromDoc(const QString& modelFullPath) const;
+    /**
+     * @brief get <connections> node from Vpz Doc into a <model>
+     * which modelFullPath, the full path to the model
+     */
+    QDomNode modelConnectionsFromDoc(const QString& modelFullPath) const;
+    /**
+     * @brief get <connection> node from Vpz Doc into a <connections>
+     * @param sourceFullPath, the full path to the source model
+     * @param destinationFullPath, the full path to the dest model
+     * @param sourcePort, the name of the source port
+     * @param destinationPort, the name of the dest port
+     */
+    QDomNode modelConnectionFromDoc(const QString& sourceFullPath,
+            const QString& destinationFullPath, const QString& sourcePort,
+            const QString& destinationPort) const;
 
     /******************************************************
      * Access to specific nodes in the vpz from internal nodes
@@ -120,6 +140,7 @@ public:
     /*****************************************************
      * TODO A TRIER
      *****************************************************/
+
     QString        getFilename() const;
     QString        getBasePath();
 
@@ -416,11 +437,6 @@ public:
      */
     void rmValuePortCondToDoc(const QString& condName, const QString& portName,
             int index);
-    /**
-     * @brief get atomic model tag <model> from a tag <model>,
-     * which full name is modelFullName
-     */
-    QDomNode modelFromDoc(const QString& modelFullName) const;
     /**
      * @brief get atomic model tag <model> from a tag <model>,
      * which name is atom

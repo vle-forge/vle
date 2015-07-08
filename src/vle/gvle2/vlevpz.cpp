@@ -143,6 +143,116 @@ vleVpz::portFromDoc(const QString& condName, const QString& portName) const
     return portFromCond(condFromConds(condsFromDoc(), condName), portName);
 }
 
+QDomNode
+vleVpz::modelFromDoc(const QString& modelFullPath) const
+{
+    // controls to be added
+
+    QDomNode structures =
+        getDomDoc().documentElement().elementsByTagName("structures").at(0);
+    QDomNode currModel =
+        structures.toElement().elementsByTagName("model").at(0);
+    QStringList pathSplit = modelFullPath.split(".");
+    QString currName = attributeValue(currModel, "name");
+
+    for (int i = 1; i < pathSplit.length(); i++) {
+        QDomNodeList list = currModel.childNodes();
+        for (unsigned int j = 0; j < list.length(); j++) {
+            QDomNode item = list.item(j);
+            if (item.nodeName() == "submodels") {
+                QDomNodeList list = item.childNodes();
+                for (unsigned int k = 0; k < list.length(); k++) {
+                    QDomNode item = list.item(k);
+                    if (item.nodeName() == "model" &&
+                        attributeValue(item, "name") == pathSplit[i])
+                    {
+                        currModel = item;
+                    }
+                }
+            }
+        }
+    }
+
+    if  (attributeValue(currModel, "name") != pathSplit[pathSplit.length() - 1]) {
+        qDebug() << "model " << modelFullPath << "<>" << attributeValue(currModel, "name") << " not Found!";
+    }
+
+    return currModel;
+}
+
+QDomNode
+vleVpz::modelConnectionsFromDoc(const QString& modelFullPath) const
+{
+    QDomNode mod = modelFromDoc(modelFullPath);
+    QDomNodeList childList = mod.childNodes();
+    for (unsigned int i=0; i<childList.length(); i++) {
+        QDomNode item = childList.item(i);
+        if (item.nodeName() == "connections") {
+            return item;
+        }
+    }
+    qDebug() << "Internal Error in modelConnectionsFromDoc\n";
+    return QDomNode();
+}
+
+QDomNode
+vleVpz::modelConnectionFromDoc(const QString& sourceFullPath,
+        const QString& destinationFullPath, const QString& sourcePort,
+        const QString& destinationPort) const
+{
+    QString coupledModel("");
+    QStringList sourcePathSplit = sourceFullPath.split(".");
+    QStringList destinationPathSplit = destinationFullPath.split(".");
+    if (sourcePathSplit.length() == destinationPathSplit.length()-1) {
+        //source is a coupled
+        for (int i =0; i< sourcePathSplit.length(); i++) {
+            if (i > 0) {
+                coupledModel += ".";
+            }
+            coupledModel += sourcePathSplit[i];
+        }
+    } else if (sourcePathSplit.length()-1 == destinationPathSplit.length()) {
+        //destination is the coupled
+        for (int i =0; i< destinationPathSplit.length(); i++) {
+            if (i > 0) {
+                coupledModel += ".";
+            }
+            coupledModel += destinationPathSplit[i];
+        }
+    } else if (sourcePathSplit.length() == destinationPathSplit.length()) {
+        //the two are in common coupled model
+        for (int i =0; i< destinationPathSplit.length()-1; i++) {
+            if (i > 0) {
+                coupledModel += ".";
+            }
+            coupledModel += destinationPathSplit[i];
+        }
+    } else {
+        qDebug() << "Internal error in modelConnectionFromDoc 1";
+        return QDomNode();
+    }
+    QString sourceModel = sourcePathSplit[sourcePathSplit.length()-1];
+    QString destModel = destinationPathSplit[destinationPathSplit.length()-1];
+    QDomNode connexions = modelConnectionsFromDoc(coupledModel);
+    QDomNodeList conList =
+            connexions.toElement().elementsByTagName("connection");
+    for (unsigned int j=0; j<conList.length(); j++) {
+        QDomNode con = conList.at(j);
+        if ((attributeValue(con.toElement().elementsByTagName("origin")
+                .item(0), "model") == sourceModel) and
+            (attributeValue(con.toElement().elementsByTagName("origin")
+                .item(0), "port") == sourcePort) and
+            (attributeValue(con.toElement().elementsByTagName("destination")
+                .item(0), "model") == destModel) and
+            (attributeValue(con.toElement().elementsByTagName("destination")
+                .item(0), "port") == destinationPort)) {
+            return con;
+        }
+    }
+    qDebug() << "Internal error in modelConnectionFromDoc 2";
+    return QDomNode();
+}
+
 /******************************************************
  * Access to specific nodes in the vpz from internal nodes
  ******************************************************/
@@ -209,6 +319,7 @@ vleVpz::mapFromOutput(QDomNode node)
     }
     return child;
 }
+
 
 /*****************************************************
  * TODO A TRIER
@@ -813,43 +924,6 @@ vleVpz::renameObservableFromModel(QDomNode &node, const QString &oldName, const 
             }
         }
     }
-}
-
-QDomNode
-vleVpz::modelFromDoc(const QString& modelFullName) const
-{
-    // controls to be added
-
-    QDomNode structures =
-        getDomDoc().documentElement().elementsByTagName("structures").at(0);
-    QDomNode currModel =
-        structures.toElement().elementsByTagName("model").at(0);
-    QStringList pathSplit = modelFullName.split(".");
-    QString currName = attributeValue(currModel, "name");
-
-    for (int i = 1; i < pathSplit.length(); i++) {
-        QDomNodeList list = currModel.childNodes();
-        for (unsigned int j = 0; j < list.length(); j++) {
-            QDomNode item = list.item(j);
-            if (item.nodeName() == "submodels") {
-                QDomNodeList list = item.childNodes();
-                for (unsigned int k = 0; k < list.length(); k++) {
-                    QDomNode item = list.item(k);
-                    if (item.nodeName() == "model" &&
-                        attributeValue(item, "name") == pathSplit[i])
-                    {
-                        currModel = item;
-                    }
-                }
-            }
-        }
-    }
-
-    if  (attributeValue(currModel, "name") != pathSplit[pathSplit.length() - 1]) {
-        qDebug() << "model " << modelFullName << "<>" << attributeValue(currModel, "name") << " not Found!";
-    }
-
-    return currModel;
 }
 
 QDomNode
@@ -1482,10 +1556,6 @@ vleVpz::getOutputPlugin(QDomNode node)
     plug += node.attributes().namedItem("plugin").nodeValue();
     return plug;
 }
-
-
-
-
 
 vle::value::Value*
 vleVpz::buildValue(const QString& condName, const QString& portName,
@@ -2438,6 +2508,7 @@ bool vleVpz::xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *m
         baseNode->setAttribute("type", "atomic");
 
     // If the model has connections ... save them
+
     if (model->getConnections()->length())
     {
         QDomElement xConns = doc->createElement("connections");
@@ -3267,6 +3338,8 @@ void vleVpzModel::dispNormal()
  *        Set model display maximized (and show submodels into)
  *
  */
+
+
 void vleVpzModel::dispMaximize()
 {
     int newHeight = mWidgetHeight;
