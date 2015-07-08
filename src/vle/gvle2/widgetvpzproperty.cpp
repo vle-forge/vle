@@ -94,6 +94,8 @@ WidgetVpzPropertyDynamics::onChange(int index)
     }
 }
 
+/****************************************************************************/
+
 WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget *parent) :
         QWidget(parent), ui(new Ui::WidgetVpzPropertyExpCond),
         mVpz(0), mFullPath("")
@@ -111,7 +113,16 @@ void
 WidgetVpzPropertyExpCond::setModel(vleVpz *model, const QString& fullPath)
 {
     mVpz = model;
+    QObject::connect(mVpz,   SIGNAL(conditionsUpdated()),
+                     this, SLOT(refresh()));
+
     mFullPath = fullPath;
+    refresh();
+}
+
+void
+WidgetVpzPropertyExpCond::refresh()
+{
     // First, clear the current list content
     ui->listCond->clear();
     QString dyn = mVpz->modelDynFromDoc(mFullPath);
@@ -155,6 +166,8 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
         mVpz->detachCondToAtomicModel(mFullPath, cb->text());
     }
 }
+
+/****************************************************************************/
 
 WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget *parent) :
         QWidget(parent), ui(new Ui::WidgetVpzPropertyObservables),

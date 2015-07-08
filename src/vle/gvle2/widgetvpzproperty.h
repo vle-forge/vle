@@ -67,6 +67,7 @@ public:
 
 private slots:
     void onCheckboxToggle(bool checked);
+    void refresh();
 
 private:
     Ui::WidgetVpzPropertyExpCond *ui;

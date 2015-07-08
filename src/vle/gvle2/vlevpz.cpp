@@ -468,6 +468,7 @@ vleVpz::renameConditionToDoc(const QString& oldName, const QString& newName)
         QDomNode cond = condList.at(i);
         if (attributeValue(cond, "name") == oldName) {
             setAttributeValue(cond.toElement(), "name", newName);
+            emit conditionsUpdated();
             return;
         }
     }
@@ -483,6 +484,7 @@ vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
         QDomNode port = portList.at(i);
         if (attributeValue(port, "name") == oldName) {
             setAttributeValue(port.toElement(), "name", newName);
+            emit conditionsUpdated();
             return;
         }
     }
@@ -583,7 +585,9 @@ vleVpz::addObservableToDoc(const QString& obsName)
 QDomNode
 vleVpz::addConditionToDoc(const QString& condName)
 {
-    return addCondition(condsFromDoc(),condName);
+    QDomNode cond = addCondition(condsFromDoc(),condName);
+    emit conditionsUpdated();
+    return cond;
 }
 
 
@@ -1041,6 +1045,7 @@ vleVpz::rmCondFromConds(QDomNode node, const QString& condName)
 {
     QDomNode toRm = condFromConds(node, condName);
     node.removeChild(toRm);
+    emit conditionsUpdated();
 }
 
 bool
@@ -1205,6 +1210,7 @@ vleVpz::attachCondToAtomicModel(const QString& atomFullName, const QString& cond
             res += condSplit.at(i);
         }
         setAttributeValue(atom.toElement(), "conditions", res);
+        emit conditionsUpdated();
     }
 }
 
@@ -1224,6 +1230,7 @@ vleVpz::detachCondToAtomicModel(const QString& atomFullName, const QString& cond
             res += condSplit.at(i);
         }
         setAttributeValue(atom.toElement(), "conditions", res);
+        emit conditionsUpdated();
     }
 }
 
@@ -2123,10 +2130,9 @@ int vleVpz::removeModelDynamic(vleVpzModel *model, const QString& dynamic, bool 
     int count = 0;
 
     // If the specified model use the dynamic
-    if (model->getDynamic() == dynamic)
-    {
+    if (modelDynFromDoc(model->getFullName()) == dynamic) {
         // Remove it
-        model->removeDynamic();
+        setDynToAtomicModel(model->getFullName(), "");
         count ++;
     }
 
@@ -2176,7 +2182,7 @@ void vleVpz::addModeler(QString name)
     QString condName = name + model->getName();
 
     modeler->initExpCond(condName, classFile);
-    model->addCondition(condName);
+    attachCondToAtomicModel(model->getFullName(),condName);
 
     // Inform upper layers that a new condition has been created
     emit sigConditionsChanged();
@@ -2195,11 +2201,12 @@ void vleVpz::addModeler(QString name)
  */
 void vleVpz::addModelerDynamic(vleVpzModel *model, QString lib)
 {
+    QString modDyn =  modelDynFromDoc(model->getFullName());
     // First, check if the model has already a dynamic
-    if (model->getDynamic() != ""){
+    if (modDyn != ""){
         // Test if the current dynamic can be used with this modeler
-        if ((getDynamicPackage(model->getDynamic()) == mPackage->getName()) &&
-            (getDynamicLibrary(model->getDynamic()) == lib))
+        if ((getDynamicPackage(modDyn) == mPackage->getName()) &&
+            (getDynamicLibrary(modDyn) == lib))
             // Yes, model has already a valid dynamic, nothing to do
             return;
 
@@ -2212,7 +2219,7 @@ void vleVpz::addModelerDynamic(vleVpzModel *model, QString lib)
         if (ret == QMessageBox::No)
             return;
 
-        model->removeDynamic();
+        setDynToAtomicModel(model->getFullName(), "");
     }
 
     // Second, search into the existing dynamics if one can be used
@@ -2239,7 +2246,7 @@ void vleVpz::addModelerDynamic(vleVpzModel *model, QString lib)
         QString pkgName = mPackage->getName();
         addDynamicToDoc(newDyn, pkgName, lib);
     }
-    model->setDynamic(newDyn);
+    setDynToAtomicModel(model->getFullName(), newDyn);
 }
 
 /**
@@ -2365,8 +2372,10 @@ bool vleVpz::xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *m
     }
 
     // Insert Dynamic attribute if used
-    if (model->getDynamic() != "")
-        baseNode->setAttribute("dynamics", model->getDynamic());
+    QString modDyn = modelDynFromDoc(model->getFullName());
+    if (modDyn != "") {
+        baseNode->setAttribute("dynamics", modDyn);
+    }
 
     baseNode->setAttribute("conditions", modelCondsFromDoc(model->getFullName()));
 
@@ -2567,10 +2576,7 @@ vleVpzModel::vleVpzModel(vleVpz *parent)
                          mVpz, SLOT  (openModeler()) );
     }
 
-    mConditions.clear();
-
     mIsAltered = false;
-    mDynamic   = "";
 
     mTooltip = 0;
 
@@ -2730,67 +2736,6 @@ int vleVpzModel::countSubmodels()
 }
 
 /**
- * @brief vleVpzModel::getDynamic
- *        Accessor for the Dynamic attribute of the model
- *
- */
-QString vleVpzModel::getDynamic()
-{
-    return mDynamic;
-}
-
-/**
- * @brief vleVpzModel::setDynamic
- *        Set the current Dynamic of the model (selected by his name)
- *
- */
-void vleVpzModel::setDynamic(QString dynamicName)
-{
-    // If found, update the model
-    if (dynamicName != "")
-        mDynamic = dynamicName;
-    else
-        qDebug() << "Model " << mName << " try to use an unknown dynamic : " << dynamicName;
-}
-
-/**
- * @brief vleVpzModel::removeDynamic
- *        Remove the current Dynamic (if any)
- *
- */
-void vleVpzModel::removeDynamic()
-{
-    mDynamic = "";
-}
-
-void vleVpzModel::addCondition(const QString& cond)
-{
-    if (not mConditions.contains(cond)) {
-        mConditions.append(cond);
-    }
-    //Todo registering
-    //cond->registerModel(this);
-}
-
-
-void vleVpzModel::removeCondition(const QString& cond)
-{
-    mConditions.removeOne(cond);
-    //Todo registering
-    //cond->unRegisterModel(this);
-}
-
-bool
-vleVpzModel::hasCondition(const QString& condName)
-{
-    QString conditionString = mVpz->modelCondsFromDoc(mFullName);
-
-    QStringList conditionsList = conditionString.split(",");
-
-    return conditionsList.contains(condName);
-}
-
-/**
  * @brief vleVpzModel::xLoadNode
  *        Load the model from the
  *
@@ -2834,8 +2779,9 @@ void vleVpzModel::xLoadNode(const QDomNode &node, const vleVpzModel *parent)
     {
         QDomNode xDyn = attrMap.namedItem("dynamics");
         QString dynName = xDyn.nodeValue();
-        if (mVpz)
-            setDynamic(dynName);
+        if (mVpz) {
+            mVpz->setDynToAtomicModel(getFullName(), dynName);
+        }
     }
     if (attrMap.contains("conditions")) // Optional)
     {
@@ -2848,7 +2794,7 @@ void vleVpzModel::xLoadNode(const QDomNode &node, const vleVpzModel *parent)
             while (condListIt.hasNext())
             {
                 QString condName = condListIt.next();
-                addCondition(condName);
+                mVpz->attachCondToAtomicModel(mFullName, condName);
             }
         }
     }

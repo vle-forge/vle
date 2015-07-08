@@ -730,13 +730,15 @@ public:
     void addModelerDynamic(vleVpzModel *model, QString lib);
     void openModeler();
 
-    signals:
+signals:
     void sigFocus(vleVpzModel *model);
     void sigEnterModel(vleVpzModel *model);
     void sigConditionsChanged();
     void sigDynamicsChanged();
     void sigOpenModeler(vleVpzModel *model);
     void sigChanged(QString filename);
+    void observablesUpdated();
+    void conditionsUpdated();
 
     protected:
     bool startElement(const QString &namespaceURI,
@@ -745,9 +747,6 @@ public:
             const QXmlAttributes &attributes);
 public:
     QByteArray xGetXml();
-
-signals:
-    void observablesUpdated();
 
 private:
     void xReadDom();
@@ -810,13 +809,10 @@ public:
             {
         return &mConnections;
             }
-    QString getDynamic();
-    void setDynamic(QString dynamicName);
-    void removeDynamic();
 
-    void addCondition(const QString& cond);
-    void removeCondition(const QString& cond);
-    bool hasCondition(const QString& condName);
+//    void addCondition(const QString& cond);
+//    void removeCondition(const QString& cond);
+//    bool hasCondition(const QString& condName);
 
     void setObservable(QString obsName);
 
@@ -891,8 +887,6 @@ protected:
     QList <vleVpzPort  *> mInPorts;
     QList <vleVpzPort  *> mOutPorts;
     QList <vleVpzConn  *> mConnections;
-    QString mDynamic;
-    QList <QString>  mConditions;
     QLabel  mTitle;
     bool    mIsMaximized;
     QPoint  mOldPos, mStartPos;
