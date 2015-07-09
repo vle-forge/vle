@@ -66,6 +66,10 @@ public:
     const QDomDocument& getDomDoc() const;
     QDomDocument& getDomDoc();
     /**
+     * @brief get <experiment> tag from Vpz doc
+     */
+    QDomNode experimentFromDoc() const;
+    /**
      * @brief get <observables> tag from Vpz doc
      */
     QDomNode obsFromDoc() const;
@@ -135,6 +139,11 @@ public:
      * @brief get map from tag <output> (configuration of output)
      */
     QDomNode mapFromOutput(QDomNode node);
+
+    /*******************************************************
+     * Utils Functions QDom
+     ******************************************************/
+    std::vector<QDomNode> childNodesWithoutText(QDomNode node) const;
 
 
     /*****************************************************
@@ -617,17 +626,6 @@ public:
      *   package/plugin
      */
     QString getOutputPlugin(QDomNode node);
-
-
-
-    /**
-     * @brief Build a value from given index  of <port> portName of
-     * <condtion> condName
-     * @note: result is a new allocated vle value.
-     * @note index > 0 is for multi simulation
-     */
-    vle::value::Value* buildValue(const QString& condName,
-            const QString& portName, int index) const;
     /**
      * @brief gives the type of a value of
      */
@@ -636,15 +634,57 @@ public:
     /**
      * @brief build a vle value from either tag
      * <integer>, <string>, <map> etc..
+     * @param node correponding to a vle value
+     * @param buildText, build vle::value::String for QDomText
      * @note: result is a new allocated vle value.
      */
-    vle::value::Value* buildValue(const QDomNode& node) const;
+    vle::value::Value* buildValue(const QDomNode& valNode,
+            bool buildText) const;
+    /**
+     * @brief build a vle value at a given index from a port
+     * @param condName, the condition name: tag <condition>
+     * @param portName, the port name: tag <port>
+     * @param valIndex, index of the value to build from
+     * the set of values attached to the port
+     */
+    vle::value::Value* buildValueFromDoc(const QString& condName,
+            const QString& portName, int valIndex) const;
+    /**
+     * @brief build a vle value at a given index from a port
+     * @param portNode, the node containing the port values: tag <port>
+     * @param valIndex, index of the value to build from
+     * the set of values attached to the port
+     */
+    vle::value::Value* buildValue(const QDomNode& portNode, int valIndex) const;
+
+    /**
+     * @brief Fill a vector of vle values with the multipl values contained by
+     * a condition port
+     * @param condName, the name of the cond: tag <condtion>
+     * @param portName, the name of the port of condName: tag <port>
+     * @param values, the vector of values to fill
+     * @note: values is first cleared
+     */
+    bool fillWithMultipleValueFromDoc(const QString& condName,
+         const QString& portName, std::vector<vle::value::Value*>& values) const;
+    /**
+     * @brief Fill a vector of vle values with the multipl values contained by
+     * a condition port
+     * @param port, containing the multiple values: tag <port>
+     * @param values, the vector of values to fill
+     * @note: values is first cleared
+     */
+    bool fillWithMultipleValue(QDomNode port,
+            std::vector<vle::value::Value*>& values) const;
     /**
      * @brief Fill a value at index of <port> portName of <condtion> condName
      * @note: the map is first cleared
      */
     bool fillWithValue(const QString& condName, const QString& portName,
             int index, const vle::value::Value& val);
+
+
+
     /**
      * @brief Fill a Node from a value
      * @note: the main tag should corresponds to the value type ie:

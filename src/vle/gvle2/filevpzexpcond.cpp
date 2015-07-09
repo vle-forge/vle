@@ -138,6 +138,7 @@ FileVpzExpCond::reload()
     ui->expTree->setColumnCount(1);
 
     QList<QTreeWidgetItem *> condItems;
+
     QDomNodeList condList = mVpz->condsListFromConds(mVpz->condsFromDoc());
     for (unsigned int i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
@@ -192,9 +193,12 @@ FileVpzExpCond::refresh(const QString& condName, QTreeWidgetItem *expItem)
 
         expItem->addChild(newPortItem);
 
-        QDomNodeList valueList = port.childNodes();
-        for (unsigned int k = 0; k < valueList.length(); k++) {
-            vle::value::Value* val = mVpz->buildValue(valueList.at(k));
+        std::vector<vle::value::Value*> valuesToFill;
+        mVpz->fillWithMultipleValue(port, valuesToFill);
+
+        for (unsigned int k = 0; k < valuesToFill.size(); k++) {
+
+            vle::value::Value* val = valuesToFill[k];
 
             QString sDisp = getValueDisplay(*val, TypeOnly);
 
@@ -203,6 +207,12 @@ FileVpzExpCond::refresh(const QString& condName, QTreeWidgetItem *expItem)
             newValueItem->setData(0, Qt::UserRole, FileVpzExpCond::ECondValue);
             newPortItem->addChild(newValueItem);
         }
+        std::vector<vle::value::Value*>::iterator itb = valuesToFill.begin();
+        std::vector<vle::value::Value*>::iterator ite = valuesToFill.end();
+        for (; itb != ite; itb++) {
+            delete *itb;
+        }
+        valuesToFill.clear();
     }
 }
 
@@ -640,7 +650,7 @@ FileVpzExpCond::onConditionTreeSelected()
         mCurrValIndex = item->parent()->indexOfChild(item);
         mValueStack.delStartValue();
         mValueStack.setStartValue(mVpz->buildValue(mVpz->portFromDoc(
-                mCurrCondName,mCurrPortName).childNodes().at(mCurrValIndex)));
+                mCurrCondName,mCurrPortName), mCurrValIndex));
         condValueShowDetail();
         break;
     }}
@@ -662,8 +672,7 @@ FileVpzExpCond::onCondParamTreeSelected()
         QString condName = itemCond->parent()->text(0);
         QString portName = itemCond->text(0);
         QDomNode portNode = mVpz->portFromDoc(condName, portName);
-        QDomNode valueDom = portNode.childNodes().at(0);//TODO index on value index
-        value = mVpz->buildValue(valueDom);
+        value = mVpz->buildValue(portNode, 0);//TODO index on value index
     }
     if (value == 0) {
 //        ui->editValuesStack->setCurrentIndex(0);
