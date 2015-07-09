@@ -77,6 +77,133 @@ vleVpz::getDomDoc()
     return mDoc;
 }
 
+QDomNode
+vleVpz::classesFromDoc() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("classes");
+    QDomNode classesElem = nodeList.item(0);
+    return classesElem;
+}
+
+QDomNode
+vleVpz::classFromDoc(const QString& className) const
+{
+    QDomNode classesElem = classesFromDoc();
+    QDomNodeList list = classesElem.toElement().elementsByTagName("class");
+    for (unsigned int i=0; i<list.length(); i++) {
+        if (attributeValue(list.at(i), "name") == className) {
+            return list.at(i);
+        }
+    }
+    qDebug() << ("Internal error in classFromDoc (class not found): ") << className;
+    return QDomNode();
+}
+
+QDomNode
+vleVpz::classModelFromDoc(const QString& className) const
+{
+    QDomNode classNode = classFromDoc(className);
+    QDomNodeList list = classNode.toElement().elementsByTagName("model");
+    return list.at(0);
+}
+
+bool
+vleVpz::existClassFromDoc(const QString& className) const
+{
+    QDomNode classesElem = classesFromDoc();
+    QDomNodeList list = classesElem.toElement().elementsByTagName("class");
+    for (unsigned int i=0; i<list.length(); i++) {
+        if (attributeValue(list.at(i), "name") == className) {
+            return true;
+        }
+    }
+    return false;
+}
+
+QString
+vleVpz::addClassToDoc(bool atomic)
+{
+    QDomNode classesElem = classesFromDoc();
+    QString prefix = "NewClass";
+    QString name;
+    int k = 0;
+    bool found = false;
+    while (not found) {
+        name = prefix;
+        if (k > 0) {
+            name += "_";
+            name += QVariant(k).toString();
+        }
+        if (existClassFromDoc(name)) {
+            k++;
+        } else {
+            found =true;
+        }
+    }
+    QDomNode newClass = getDomDoc().createElement("class");
+    setAttributeValue(newClass.toElement(), "name", name);
+    QDomNode newModel = getDomDoc().createElement("model");
+    setAttributeValue(newModel.toElement(), "name", "NewModel");
+    if (atomic) {
+        setAttributeValue(newModel.toElement(), "type", "atomic");
+        setAttributeValue(newModel.toElement(), "conditions", "");
+        setAttributeValue(newModel.toElement(), "dynamics", "");
+        setAttributeValue(newModel.toElement(), "observables", "");
+    } else {
+        setAttributeValue(newModel.toElement(), "type", "coupled");
+    }
+    setAttributeValue(newModel.toElement(), "x", "0");
+    setAttributeValue(newModel.toElement(), "y", "0");
+    setAttributeValue(newModel.toElement(), "width", "50");
+    setAttributeValue(newModel.toElement(), "height", "50");
+    newClass.appendChild(newModel);
+    classesElem.appendChild(newClass);
+    return name;
+}
+
+void
+vleVpz::renameClassToDoc(const QString& oldClass, const QString& newClass)
+{
+    QDomNode cl = classFromDoc(oldClass);
+    if (cl.isNull()) {
+        qDebug() << "Internal error in renameClassToDoc (class not found)";
+        return;
+    }
+    setAttributeValue(cl.toElement(),"name", newClass);
+}
+
+QString
+vleVpz::copyClassToDoc(const QString& className)
+{
+    QDomNode classesElem = classesFromDoc();
+    QDomNode classNode = classFromDoc(className);
+    QDomNode copy = classNode.cloneNode(true);
+    QString name_prefix = className;
+    QString name;
+    int k = 1;
+    bool found = false;
+    while(not found) {
+        name = name_prefix;
+        name += "_";
+        name += QVariant(k).toString();
+        if (existClassFromDoc(name)) {
+            k++;
+        } else {
+            found = true;
+        }
+    }
+    setAttributeValue(copy.toElement(), "name", name);
+    classesElem.appendChild(copy);
+    return name;
+}
+
+void
+vleVpz::removeClassToDoc(const QString& className)
+{
+    QDomNode classesElem = classesFromDoc();
+    QDomNode classNode = classFromDoc(className);
+    classesElem.removeChild(classNode);
+}
 
 QDomNode
 vleVpz::experimentFromDoc() const
@@ -261,6 +388,7 @@ vleVpz::modelConnectionFromDoc(const QString& sourceFullPath,
     return QDomNode();
 }
 
+
 /******************************************************
  * Access to specific nodes in the vpz from internal nodes
  ******************************************************/
@@ -328,20 +456,163 @@ vleVpz::mapFromOutput(QDomNode node)
     return child;
 }
 
+QDomNode
+vleVpz::atomicModelFromModel(const QDomNode& node, const QString& atom) const
+{
+    QDomNode res;
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in atomicModelFromModel (wrong main tag)");
+        return res;
+    }
+    QDomNode currSubModelTag = node.firstChildElement("submodels");
+    if (currSubModelTag.nodeName() != "submodels") {
+        if ((attributeValue(node, "type") == "atomic")
+                and (attributeValue(node, "name") == atom)) {
+            return node;
+        }
+        return res;
+    }
+    QDomNodeList currSubModels = currSubModelTag.childNodes();
+    bool found = false;
+    for (unsigned int i =0; i < currSubModels.length(); i++) {
+        QDomNode child = currSubModels.at(i);
+        if (child.nodeName() == "model") {
+            QDomNode n = atomicModelFromModel(currSubModels.at(i), atom);
+            if (not n.isNull()) {
+                if (found) {
+                    qDebug() << ("Internal error in atomicModelFromModel "
+                            "(ambiguous)");
+                    return QDomNode();
+                }
+                found = true;
+                res = n;
+            }
+        }
+    }
+    return res;
+}
+
+QDomNode
+vleVpz::connectionsFromModel(const QDomNode& node) const
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in connectionsFromModel (wrong main tag)");
+        return QDomNode();
+    }
+    QDomNodeList children = node.toElement().childNodes();
+    for (unsigned int i =0; i < children.length(); i++) {
+        QDomNode conns = children.at(i);
+        if (conns.nodeName() == "connections") {
+            return conns;
+        }
+    }
+    return QDomNode();
+}
+
+QDomNode
+vleVpz::submodelsFromModel(const QDomNode& node) const
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in connectionsFromModel (wrong main tag)");
+        return QDomNode();
+    }
+    QDomNodeList children = node.toElement().childNodes();
+    for (unsigned int i =0; i < children.length(); i++) {
+        QDomNode conns = children.at(i);
+        if (conns.nodeName() == "submodels") {
+            return conns;
+        }
+    }
+    return QDomNode();
+}
 
 std::vector<QDomNode>
-vleVpz::childNodesWithoutText(QDomNode node) const
+vleVpz::childNodesWithoutText(QDomNode node, const QString& nodeName) const
 {
     QDomNodeList childs = node.childNodes();
     std::vector<QDomNode> childsWithoutText;
     for (unsigned int i=0; i<childs.length();i++) {
         QDomNode ch = childs.at(i);
         if (not ch.isText()) {
-            childsWithoutText.push_back(ch);
+            if (nodeName == "") {
+                childsWithoutText.push_back(ch);
+            } else if (ch.nodeName() == nodeName) {
+                childsWithoutText.push_back(ch);
+            }
         }
     }
     return childsWithoutText;
 }
+
+void
+vleVpz::removeTextChilds(QDomNode node, bool recursively)
+{
+    QDomNodeList chs;
+    std::vector<QDomNode> torm;
+    bool stop = false;
+    bool first = true;
+    while(not stop) {
+        torm.clear();
+        chs = node.childNodes();
+        for (unsigned int i=0; i<chs.length(); i++) {
+            QDomNode ch = chs.at(i);
+            if (ch.nodeName() == "#text" or ch.isText()) {
+                torm.push_back(ch);
+            }
+            if (first and recursively) {
+                removeTextChilds(ch);
+            }
+        }
+        first = false;
+        if (torm.size() == 0) {
+            stop = true;
+        } else {
+            for (unsigned int i=0; i<torm.size(); i++) {
+                QDomNode ch = torm[i];
+                node.removeChild(ch);
+            }
+        }
+    }
+}
+
+QString
+vleVpz::attributeValue(const QDomNode& node, const QString& attrName) const
+{
+    if (node.attributes().contains(attrName)) {
+        return node.attributes().namedItem(attrName).nodeValue();
+    }
+    return "";
+}
+
+void
+vleVpz::setAttributeValue(QDomElement node, const QString& attrName,
+        const QString& val)
+{
+    if (node.attributes().contains(attrName)) {
+         node.attributes().namedItem(attrName).setNodeValue(val);
+    } else {
+        node.toElement().setAttribute(attrName, val);
+    }
+}
+
+QDomNode
+vleVpz::obtainChild(QDomNode node, const QString& nodeName, bool addIfNot)
+{
+    QDomNodeList chs = node.childNodes();
+    for(int i = 0; i<chs.size(); i++) {
+        QDomNode ch = chs.at(i);
+        if (ch.nodeName() == nodeName) {
+            return ch;
+        }
+    }
+    if (not addIfNot) {
+        return QDomNode();
+    }
+    QDomNode res = getDomDoc().createElement(nodeName);
+    node.appendChild(res);
+    return res;
+}
+
 
 /*****************************************************
  * TODO A TRIER
@@ -954,41 +1225,7 @@ vleVpz::renameObservableFromModel(QDomNode &node, const QString &oldName, const 
     }
 }
 
-QDomNode
-vleVpz::atomicModelFromModel(const QDomNode& node, const QString& atom) const
-{
-    QDomNode res;
-    if (node.nodeName() != "model") {
-        qDebug() << ("Internal error in atomicModelFromModel (wrong main tag)");
-        return res;
-    }
-    QDomNode currSubModelTag = node.firstChildElement("submodels");
-    if (currSubModelTag.nodeName() != "submodels") {
-        if ((attributeValue(node, "type") == "atomic")
-                and (attributeValue(node, "name") == atom)) {
-            return node;
-        }
-        return res;
-    }
-    QDomNodeList currSubModels = currSubModelTag.childNodes();
-    bool found = false;
-    for (unsigned int i =0; i < currSubModels.length(); i++) {
-        QDomNode child = currSubModels.at(i);
-        if (child.nodeName() == "model") {
-            QDomNode n = atomicModelFromModel(currSubModels.at(i), atom);
-            if (not n.isNull()) {
-                if (found) {
-                    qDebug() << ("Internal error in atomicModelFromModel "
-                            "(ambiguous)");
-                    return QDomNode();
-                }
-                found = true;
-                res = n;
-            }
-        }
-    }
-    return res;
-}
+
 
 QDomNodeList
 vleVpz::obssListFromObss(const QDomNode& node) const
@@ -1135,6 +1372,615 @@ vleVpz::renameObsFromObss(QDomNode node, const QString& oldName, const QString& 
     QDomNode toRename = obsFromObss(node, oldName);
     QDomElement docElem = toRename.toElement();
     docElem.setAttribute("name", newName);
+}
+
+
+void
+vleVpz::renameModel(QDomNode node, const QString& newName)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in renameModel (wrong main tag)");
+        return;
+    }
+    QString oldName = attributeValue(node, "name");
+    //rename connections at the coupled level
+    if (node.parentNode().parentNode().nodeName() == "model") {
+        QDomNode parent = node.parentNode().parentNode();
+        std::vector<QDomNode> consTag =
+                childNodesWithoutText(parent, "connections");
+        if (consTag.size() == 1) {
+            std::vector<QDomNode> cons =
+                    childNodesWithoutText(consTag.at(0), "model");
+            for (unsigned int i=0; i<cons.size();i++) {
+                QDomNode con = cons.at(i);
+                QDomNode orig = con.toElement()
+                        .elementsByTagName("origin").at(0);
+                QDomNode dest = con.toElement()
+                        .elementsByTagName("destination").at(0);
+                if (attributeValue(con, "type") == "input") {
+                    if (attributeValue(dest, "model") == oldName) {
+                        setAttributeValue(dest.toElement(), "model", newName);
+                    }
+                } else if (attributeValue(con, "type") == "output") {
+                    if (attributeValue(orig, "model") == oldName) {
+                        setAttributeValue(orig.toElement(), "model", newName);
+                    }
+                } else if (attributeValue(con, "type") == "internal") {
+                    if (attributeValue(dest, "model") == oldName) {
+                        setAttributeValue(dest.toElement(), "model", newName);
+                    }
+                    if (attributeValue(orig, "model") == oldName) {
+                        setAttributeValue(orig.toElement(), "model", newName);
+                    }
+                }
+            }
+        }
+    }
+    //rename connections at the submodels level
+    {
+        std::vector<QDomNode> consTag =
+                childNodesWithoutText(node, "connections");
+        if (consTag.size() == 1) {
+            std::vector<QDomNode> cons =
+                    childNodesWithoutText(consTag.at(0), "model");
+            for (unsigned int i=0; i<cons.size();i++) {
+                QDomNode con = cons.at(i);
+                QDomNode orig = con.toElement()
+                                            .elementsByTagName("origin").at(0);
+                QDomNode dest = con.toElement()
+                                            .elementsByTagName("destination").at(0);
+                if (attributeValue(con, "type") == "input") {
+                    if (attributeValue(dest, "model") == oldName) {
+                        setAttributeValue(dest.toElement(), "model", newName);
+                    }
+                } else if (attributeValue(con, "type") == "output") {
+                    if (attributeValue(orig, "model") == oldName) {
+                        setAttributeValue(orig.toElement(), "model", newName);
+                    }
+                } else if (attributeValue(con, "type") == "internal") {
+                    if (attributeValue(dest, "model") == oldName) {
+                        setAttributeValue(dest.toElement(), "model", newName);
+                    }
+                    if (attributeValue(orig, "model") == oldName) {
+                        setAttributeValue(orig.toElement(), "model", newName);
+                    }
+                }
+            }
+        }
+    }
+    setAttributeValue(node.toElement(), "name", newName);
+}
+
+void
+vleVpz::rmModel(QDomNode node)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in rmModel (wrong main tag)");
+        return;
+    }
+    QString modelName = attributeValue(node, "name");
+    QDomNode parent = node.parentNode();//either structures, class or submodels
+    QDomNode conTag = connectionsFromModel(parent.parentNode());
+    QList<QDomNode> toRemove;
+    if (not conTag.isNull()) {
+        //remove connections at the coupled level
+        QDomNodeList conList = conTag.toElement()
+                .elementsByTagName("connection");
+        for (unsigned int i=0; i< conList.length(); i++) {
+            QDomNode con = conList.at(i);
+            QDomNode orig = con.toElement().elementsByTagName("origin").at(0);
+            QDomNode dest = con.toElement()
+                                .elementsByTagName("destination").at(0);
+             if ((attributeValue(con, "type") == "input")  and
+                (attributeValue(dest, "model") == modelName)) {
+                toRemove.append(con);
+            } else if ((attributeValue(con, "type") == "output")  and
+                (attributeValue(orig, "model") == modelName)) {
+                toRemove.append(con);
+            } else if ((attributeValue(con, "type") == "internal")  and
+                    ((attributeValue(orig, "model") == modelName) or
+                     (attributeValue(dest, "model") == modelName))) {
+                toRemove.append(con);
+            }
+        }
+    }
+    for (int i=0; i< toRemove.length(); i++) {
+        toRemove.at(i).parentNode().removeChild(toRemove.at(i));
+    }
+    node.parentNode().removeChild(node);
+    removeTextChilds(parent);
+    removeTextChilds(parent.parentNode());
+}
+
+void
+vleVpz::rmModelConnection(QDomNode node)
+{
+    if (node.nodeName() != "connection") {
+        qDebug() << ("Internal error in rmModelConnection (wrong main tag)");
+        return;
+    }
+    QDomNode parent = node.parentNode();
+    parent.removeChild(node);
+    removeTextChilds(parent);
+}
+
+bool
+vleVpz::existSubModel(QDomNode node, const QString& modName)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in addModel (wrong main tag)");
+        return false;
+    }
+    std::vector<QDomNode> chs = childNodesWithoutText(node, "submodels");
+    if (chs.size() == 1) {
+        std::vector<QDomNode> mods = childNodesWithoutText(chs[0], "model");
+        for (unsigned int i=0; i<mods.size(); i++) {
+
+            if (attributeValue(mods[i], "name") == modName) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void
+vleVpz::addModel(QDomNode node, const QString& type, QPointF pos)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in addModel (wrong main tag)");
+        return;
+    }
+    QDomElement subModels;
+    QDomNodeList subTag = node.toElement().elementsByTagName("submodels");
+    if (subTag.length() == 0) {
+        subModels = getDomDoc().createElement("submodels");
+        node.appendChild(subModels);
+    } else {
+        subModels = subTag.at(0).toElement();
+    }
+
+    QDomNodeList subList = subModels.elementsByTagName("model");
+    QString newModelName = "NewModel";
+    bool found = false;
+    unsigned int idInPort = 0;
+    while (not found) {
+        found = true;
+        for (unsigned int i=0; i< subList.length(); i++) {
+            if (attributeValue(subList.at(i), "name") == newModelName) {
+                found = false;
+            }
+        }
+        if (not found) {
+            idInPort++;
+            newModelName = "NewModel";
+            newModelName += "_";
+            newModelName += QVariant(idInPort).toString();
+        }
+    }
+    QDomNode newModel = getDomDoc().createElement("model");
+    if (type == "coupled") {
+        setAttributeValue(newModel.toElement(),"height","50");
+        setAttributeValue(newModel.toElement(),"width","50");
+        setAttributeValue(newModel.toElement(),"y",
+                QVariant(pos.y()).toString());
+        setAttributeValue(newModel.toElement(),"x",
+                QVariant(pos.x()).toString());
+        setAttributeValue(newModel.toElement(),"type","coupled");
+        setAttributeValue(newModel.toElement(),"name",newModelName);
+    } else {
+        setAttributeValue(newModel.toElement(),"height","50");
+        setAttributeValue(newModel.toElement(),"width","50");
+        setAttributeValue(newModel.toElement(),"y",
+                QVariant(pos.y()).toString());
+        setAttributeValue(newModel.toElement(),"x",
+                QVariant(pos.x()).toString());
+        setAttributeValue(newModel.toElement(),"observables","");
+        setAttributeValue(newModel.toElement(),"dynamics","");
+        setAttributeValue(newModel.toElement(),"conditions","");
+        setAttributeValue(newModel.toElement(),"type","atomic");
+        setAttributeValue(newModel.toElement(),"name",newModelName);
+    }
+    QDomNode inPort = getDomDoc().createElement("in");
+    QDomNode outPort = getDomDoc().createElement("out");
+    newModel.appendChild(inPort);
+    newModel.appendChild(outPort);
+    subModels.appendChild(newModel);
+}
+
+
+void
+vleVpz::copyModelsToModel(QList<QDomNode> modsToCopy, QDomNode modDest,
+        qreal xtranslation, qreal ytranslation)
+{
+    QDomNode parent;
+    //check all parents of modsToCopy are the same
+    for (int i =0; i<modsToCopy.size(); i++) {
+        if (i == 0) {
+            parent = modsToCopy.at(i).parentNode().parentNode();
+        } else {
+            if (not (modsToCopy.at(i).parentNode().parentNode() ==
+                    parent)) {
+                qDebug() << ("Internal error in copyModelsToModel");
+                return;
+            }
+        }
+    }
+    //check destination is a coupled model
+    if (modDest.nodeName() != "model" or
+            attributeValue(modDest, "type") != "coupled") {
+        qDebug() << ("Internal error in copyModelsToModel (wrong main tag)");
+        return;
+    }
+    //build copies of models
+    QList<QString> storeCopyNames;
+    QList<QString> storeOrigNames;
+    {
+        for (int i=0; i<modsToCopy.size(); i++) {
+            QDomNode sub = modsToCopy.at(i).cloneNode(true);
+            QString subNamePrefix = attributeValue(sub, "name");
+            storeOrigNames.append(subNamePrefix);
+            QString subName;
+            int k = 0;
+            bool found = false;
+            while (not found) {
+                subName = subNamePrefix;
+                if (k >0) {
+                    subName += "_";
+                    subName += QVariant(k).toString();
+                }
+                if (not existSubModel(modDest, subName)) {
+                    found = true;
+                    renameModel(sub, subName);
+                    setAttributeValue(sub.toElement(), "x",
+                            QVariant(attributeValue(sub, "x").toDouble()
+                                    + xtranslation).toString());
+                    setAttributeValue(sub.toElement(), "y",
+                            QVariant(attributeValue(sub, "y").toDouble()
+                                    + ytranslation).toString());
+                } else {
+                    k ++;
+                }
+            }
+            storeCopyNames.append(subName);
+            QDomNode subs = submodelsFromModel(modDest);
+            if (subs.isNull()) {
+                subs = getDomDoc().createElement("submodels");
+                modDest.appendChild(subs);
+            }
+            subs.appendChild(sub);
+        }
+    }
+    //add Internal connections to destination model
+    {
+        QDomNode consTagDest = connectionsFromModel(modDest);
+        if (consTagDest.isNull()) {
+            consTagDest = getDomDoc().createElement("connections");
+            modDest.appendChild(consTagDest);
+        }
+        QDomNode consTagOrig = connectionsFromModel(parent);
+        if (consTagOrig.isNull()) {
+            consTagOrig = getDomDoc().createElement("connections");
+            parent.appendChild(consTagOrig);
+        }
+        std::vector<QDomNode> consOrig =
+                childNodesWithoutText(consTagOrig, "connection");
+        for (unsigned i =0; i<consOrig.size(); i++) {
+            QDomNode con = consOrig[i];
+            if (attributeValue(con, "type") == "internal") {
+                QDomNode origPort = con.toElement()
+                        .elementsByTagName("origin").at(0);
+                QDomNode destPort = con.toElement()
+                        .elementsByTagName("destination").at(0);
+                if (storeOrigNames.contains(attributeValue(origPort, "model"))
+                    and storeOrigNames.contains(
+                            attributeValue(destPort, "model"))){
+                    QDomNode conClone = con.cloneNode(true);
+                    origPort = conClone.toElement()
+                            .elementsByTagName("origin").at(0);
+                    destPort = conClone.toElement()
+                            .elementsByTagName("destination").at(0);
+                    int idOrig = storeOrigNames.indexOf(
+                            attributeValue(origPort, "model"), 0);
+                    int idDest = storeOrigNames.indexOf(
+                            attributeValue(destPort, "model"), 0);
+                    setAttributeValue(origPort.toElement(), "model",
+                            storeCopyNames[idOrig]);
+                    setAttributeValue(destPort.toElement(), "model",
+                            storeCopyNames[idDest]);
+                    consTagDest.appendChild(conClone);
+                }
+            }
+        }
+
+    }
+}
+void
+vleVpz::renameModelPort(QDomNode node, const QString& newName)
+{
+    if (node.nodeName() != "port") {
+        qDebug() << ("Internal error in renamePort (wrong main tag)");
+        return;
+    }
+    QString oldName = attributeValue(node, "name");
+    QString portType = node.parentNode().nodeName();
+    QDomNode mod = node.parentNode().parentNode();
+    if (mod.nodeName() != "model") {
+        qDebug() << ("Internal error in renamePort (wrong parent)");
+        return;
+    }
+    QString modName = attributeValue(mod, "name" );
+    if (mod.parentNode().nodeName() == "submodels") {
+        //adapt connections at the coupled level
+        QDomNode parConns = connectionsFromModel(mod.parentNode().parentNode());
+        if (not parConns.isNull()) {
+            std::vector<QDomNode>  conList = childNodesWithoutText(
+                    parConns,"connection");
+            for (unsigned int i=0; i< conList.size(); i++) {
+                QDomNode con = conList[i];
+                if (portType == "in" ) {
+                    if ((attributeValue(con, "type") == "input") or
+                            (attributeValue(con, "type") == "internal")) {
+                        QDomNode dest = con.toElement()
+                                                .elementsByTagName("destination").at(0);
+                        if ((attributeValue(dest, "model") == modName) and
+                                (attributeValue(dest, "port") == oldName)) {
+                            setAttributeValue(dest.toElement(), "port", newName);
+                        }
+                    }
+                } else if (portType == "out") {
+                    if ((attributeValue(con, "type") == "output") or
+                            (attributeValue(con, "type") == "internal")) {
+                        QDomNode orig = con.toElement()
+                                                .elementsByTagName("origin").at(0);
+                        if ((attributeValue(orig, "model") == modName) and
+                                (attributeValue(orig, "port") == oldName)) {
+                            setAttributeValue(orig.toElement(), "port", newName);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (not connectionsFromModel(mod).isNull()){
+        //adapt the connections at internal level (if submodels)
+        std::vector<QDomNode> conList = childNodesWithoutText(
+                connectionsFromModel(mod),"connection");
+        for (unsigned int i=0; i< conList.size(); i++) {
+            QDomNode con = conList[i];
+            if (portType == "in" ) {
+                if (attributeValue(con, "type") == "input") {
+                    QDomNode orig = con.toElement()
+                                       .elementsByTagName("origin").at(0);
+                    if ((attributeValue(orig, "model") == modName) and
+                            (attributeValue(orig, "port") == oldName)) {
+                        setAttributeValue(orig.toElement(), "port", newName);
+                    }
+                }
+            } else if (portType == "out") {
+                if (attributeValue(con, "type") == "output") {
+                    QDomNode dest = con.toElement()
+                                       .elementsByTagName("destination").at(0);
+                    if ((attributeValue(dest, "model") == modName) and
+                            (attributeValue(dest, "port") == oldName)) {
+                        setAttributeValue(dest.toElement(), "port", newName);
+                    }
+                }
+            }
+        }
+    }
+    setAttributeValue(node.toElement(), "name", newName);
+}
+
+void
+vleVpz::rmModelPort(QDomNode node)
+{
+    if (node.nodeName() != "port") {
+        qDebug() << ("Internal error in removePort (wrong main tag)");
+        return;
+    }
+    QString oldName = attributeValue(node, "name");
+    QString portType = node.parentNode().nodeName();
+    QDomNode parent = node.parentNode().parentNode();
+    if (parent.nodeName() != "model") {
+        qDebug() << ("Internal error in removePort (wrong parent)");
+        return;
+    }
+    QString ownerModel = attributeValue(parent, "name" );
+    if (parent.parentNode().nodeName() == "submodels") {
+        //adapt connections at the coupled level
+        QDomNodeList conList = parent.parentNode().parentNode().toElement()
+                    .elementsByTagName("connections").at(0)
+                    .toElement().elementsByTagName("connection");
+        for (unsigned int i=0; i< conList.length(); i++) {
+            QDomNode con = conList.at(i);
+            if (portType == "in" ) {
+                if ((attributeValue(con, "type") == "input") or
+                    (attributeValue(con, "type") == "internal")) {
+                    QDomNode dest = con.toElement()
+                            .elementsByTagName("destination").at(0);
+                    if ((attributeValue(dest, "model") == ownerModel) and
+                            (attributeValue(dest, "port") == oldName)) {
+                        rmModelConnection(con);
+                    }
+                }
+            } else if (portType == "out") {
+
+                if ((attributeValue(con, "type") == "output") or
+                    (attributeValue(con, "type") == "internal")) {
+                    QDomNode orig = con.toElement()
+                            .elementsByTagName("origin").at(0);
+                    if ((attributeValue(orig, "model") == ownerModel) and
+                            (attributeValue(orig, "port") == oldName)) {
+                        rmModelConnection(con);
+                    }
+                }
+            }
+        }
+    }
+    QDomNodeList connSubModels = parent.toElement()
+            .elementsByTagName("connections");
+    if (connSubModels.length() == 1){
+        //adapt the connections at internal level (if submodels)
+        QDomNodeList conList = connSubModels.at(0).toElement()
+                .elementsByTagName("connection");
+        for (unsigned int i=0; i< conList.length(); i++) {
+            QDomNode con = conList.at(i);
+            if (portType == "in" ) {
+                if (attributeValue(con, "type") == "input") {
+                    QDomNode orig = con.toElement()
+                                       .elementsByTagName("origin").at(0);
+                    if ((attributeValue(orig, "model") == ownerModel) and
+                            (attributeValue(orig, "port") == oldName)) {
+                        rmModelConnection(con);
+                    }
+                }
+            } else if (portType == "out") {
+                if (attributeValue(con, "type") == "output") {
+                    QDomNode dest = con.toElement()
+                                       .elementsByTagName("destination").at(0);
+                    if ((attributeValue(dest, "model") == ownerModel) and
+                            (attributeValue(dest, "port") == oldName)) {
+                        rmModelConnection(con);
+                    }
+                }
+            }
+        }
+    }
+    QDomNode outsTag = node.parentNode();
+    outsTag.removeChild(node);
+    removeTextChilds(outsTag);
+}
+
+void
+vleVpz::addModelPort(QDomNode node, const QString& type)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in addModelInputPort (wrong main tag)");
+        return;
+    }
+    QString newPortName = "NewPort";
+
+    QDomNode portsType = obtainChild(node, type);
+    QDomNodeList ports = portsType.toElement().elementsByTagName("port");
+    bool found = false;
+    unsigned int idInPort = 0;
+    while (not found) {
+        found = true;
+        for (unsigned int i=0; i< ports.length(); i++) {
+            if (attributeValue(ports.at(i), "name") == newPortName) {
+                found = false;
+            }
+        }
+        if (not found) {
+            idInPort++;
+            newPortName = "NewPort";
+            newPortName += "_";
+            newPortName += QVariant(idInPort).toString();
+        }
+    }
+    QDomElement inPort = getDomDoc().createElement("port");
+    inPort.setAttribute("name", newPortName);
+    portsType.appendChild(inPort);
+}
+
+void
+vleVpz::addModelInputPort(QDomNode node)
+{
+    addModelPort(node, "in");
+}
+
+void
+vleVpz::addModelOutputPort(QDomNode node)
+{
+    addModelPort(node, "out");
+}
+
+void
+vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
+{
+    if (node1.nodeName() != "port") {
+        qDebug() << ("Internal error in addModelConnection (wrong main tag)");
+        return;
+    }
+    if (node2.nodeName() != "port") {
+        qDebug() << ("Internal error in addModelConnection (wrong main tag)");
+        return;
+    }
+    QString node1type = node1.parentNode().nodeName();
+    QString node2type = node2.parentNode().nodeName();
+    QDomNode model1 = node1.parentNode().parentNode();
+    QDomNode model2 = node2.parentNode().parentNode();
+    QString model1name = attributeValue(model1, "name");
+    QString model2name = attributeValue(model2, "name");
+    QDomNode coupled1;
+    QDomNode coupled2;
+    if (model1.parentNode().nodeName() == "submodels") {
+         coupled1 = model1.parentNode().parentNode();
+    }
+    if (model2.parentNode().nodeName() == "submodels") {
+        coupled2 = model2.parentNode().parentNode();
+    }
+    if ((coupled1 == coupled2) and (node1type == "out")
+            and (node2type == "in")) {
+        QDomNode cons = connectionsFromModel(coupled1);
+        if (cons.isNull()) {
+            QDomElement c = getDomDoc().createElement("connections");
+            coupled1.appendChild(c);
+        }
+        cons = connectionsFromModel(coupled1);
+        QDomElement con = getDomDoc().createElement("connection");
+        con.setAttribute("type", "internal");
+        QDomElement orig = getDomDoc().createElement("origin");
+        orig.setAttribute("model",model1name);
+        orig.setAttribute("port",attributeValue(node1,"name"));
+        con.appendChild(orig);
+        QDomElement dest = getDomDoc().createElement("destination");
+        dest.setAttribute("model",model2name);
+        dest.setAttribute("port",attributeValue(node2,"name"));
+        con.appendChild(dest);
+        cons.appendChild(con);
+    } else if ((model1 == coupled2) and (node1type == "in")
+            and (node2type == "in")) {
+        QDomNode cons = connectionsFromModel(coupled2);
+        if (cons.isNull()) {
+            QDomElement c = getDomDoc().createElement("connections");
+            coupled2.appendChild(c);
+        }
+        cons = connectionsFromModel(coupled2);
+        QDomElement con = getDomDoc().createElement("connection");
+        con.setAttribute("type", "input");
+        QDomElement orig = getDomDoc().createElement("origin");
+        orig.setAttribute("model",model1name);
+        orig.setAttribute("port",attributeValue(node1,"name"));
+        con.appendChild(orig);
+        QDomElement dest = getDomDoc().createElement("destination");
+        dest.setAttribute("model",model2name);
+        dest.setAttribute("port",attributeValue(node2,"name"));
+        con.appendChild(dest);
+        cons.appendChild(con);
+    } else if ((coupled1 == model2)  and (node1type == "out")
+            and (node2type == "out")) {
+        QDomNode cons = connectionsFromModel(coupled1);
+        if (cons.isNull()) {
+            QDomElement c = getDomDoc().createElement("connections");
+            coupled1.appendChild(c);
+        }
+        cons = connectionsFromModel(coupled1);
+        QDomElement con = getDomDoc().createElement("connection");
+        con.setAttribute("type", "output");
+        QDomElement orig = getDomDoc().createElement("origin");
+        orig.setAttribute("model",model1name);
+        orig.setAttribute("port",attributeValue(node1,"name"));
+        con.appendChild(orig);
+        QDomElement dest = getDomDoc().createElement("destination");
+        dest.setAttribute("model",model2name);
+        dest.setAttribute("port",attributeValue(node2,"name"));
+        con.appendChild(dest);
+        cons.appendChild(con);
+    }
+
+
 }
 
 void
@@ -1408,26 +2254,6 @@ vleVpz::addPort(QDomNode node, const QString& portName)
     elem.setAttribute("name", portName);
     node.appendChild(elem);
     return elem;
-}
-
-QString
-vleVpz::attributeValue(const QDomNode& node, const QString& attrName) const
-{
-    if (node.attributes().contains(attrName)) {
-        return node.attributes().namedItem(attrName).nodeValue();
-    }
-    return "";
-}
-
-void
-vleVpz::setAttributeValue(QDomElement node, const QString& attrName,
-        const QString& val)
-{
-    if (node.attributes().contains(attrName)) {
-         node.attributes().namedItem(attrName).setNodeValue(val);
-    } else {
-        node.toElement().setAttribute(attrName, val);
-    }
 }
 
 QDomNode
@@ -1825,6 +2651,17 @@ vleVpz::fillWithMultipleValue(QDomNode portNode,
         }
     }
     return true;
+}
+
+void
+vleVpz::fillWithClassesFromDoc(std::vector<std::string>& toFill) const
+{
+    toFill.clear();
+    QDomNode classes = classesFromDoc();
+    std::vector<QDomNode> classNodes = childNodesWithoutText(classes);
+    for (unsigned int i=0; i< classNodes.size(); i++) {
+        toFill.push_back(attributeValue(classNodes[i], "name").toStdString());
+    }
 }
 
 bool
@@ -2498,10 +3335,11 @@ void vleVpz::xSaveDom(QDomDocument *doc)
         vpzRoot.appendChild(xStruct);
 
     vpzRoot.appendChild(dynamicsFromDoc());
+    vpzRoot.appendChild(classesFromDoc());
 
-
-    if (mClassesRaw)
-        vpzRoot.appendChild(*mClassesRaw);
+//
+//    if (mClassesRaw)
+//        vpzRoot.appendChild(*mClassesRaw);
 
     QDomElement xExp = doc->createElement("experiment");
     if ( xSaveExperiments(doc, &xExp) )

@@ -23,11 +23,11 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${VLE_SOURCE_DIR}/src/apps/gvle2)
 
 SET(GVLE2_SOURCES_CPP gvle2win.cpp aboutbox.cpp help.cpp
-  helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp
+  helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp  filevpzclasses.cpp
   filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
   filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
   sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp vpzActions.cpp
-  vlevpz.cpp vlevpzconn.cpp vlevpzport.cpp
+  vlevpz.cpp vlevpzconn.cpp vlevpzport.cpp vpzDiagScene.cpp
   widgetvpzproperty.cpp plugin_modeler.cpp pluginmodelerview.cpp
   pluginmodelersummary.cpp )
 
@@ -40,6 +40,7 @@ QT4_WRAP_UI(filevpzproject_h filevpzproject.ui)
 QT4_WRAP_UI(filevpzobservables_h filevpzobservables.ui)
 QT4_WRAP_UI(filevpzexpcond_h  filevpzexpcond.ui)
 QT4_WRAP_UI(filevpzexpview_h  filevpzexpview.ui)
+QT4_WRAP_UI(filevpzclasses_h  filevpzclasses.ui)
 QT4_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
 QT4_WRAP_UI(filevpzrtool_h   filevpzrtool.ui)
 QT4_WRAP_UI(simulationview_h simulationview.ui)
@@ -52,13 +53,13 @@ QT4_WRAP_UI(pluginmodelersummary_h pluginmodelersummary.ui)
 
 SET(GVLE2_SOURCES_HPP ${ui_gvle2win_h} ${aboutbox_h} ${help_h}
   ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
-  ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h}
-  ${filevpztooltip_h} ${filevpzrtool_h} ${simulationview_h}
+  ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h} 
+  ${filevpzclasses_h} ${filevpztooltip_h} ${filevpzrtool_h} ${simulationview_h}
   ${simulationrtool_h} simulation.h logger.h sourcecpp.h
   sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
   ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
   plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h vlevpz.h
-  vlevpzconn.h vlevpzport.h widgetvpzproperty.h
+  vlevpzconn.h vlevpzport.h widgetvpzproperty.h vpzDiagScene.h
   ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h}
   ${widgetvpzpropertyobservables_h})
 

@@ -55,6 +55,7 @@ fileVpzView::fileVpzView(QWidget *parent) :
     mExpCondTab = 0;
     mObservablesTab = 0;
     mProjectTab = 0;
+    mClassesTab = 0;
 
     // Init the right column toolbox UI
     mWidgetTool = new QWidget();
@@ -103,16 +104,22 @@ fileVpzView::fileVpzView(QWidget *parent) :
     mExpViewTab = new FileVpzExpView();
     int viewTabId = ui->tabWidget->addTab(mExpViewTab, tr("Views"));
 
+    // Configure View tab
+    mClassesTab = new vle::gvle2::FileVpzClasses();
+    int classesTabId = ui->tabWidget->addTab(mClassesTab, tr("Classes"));
+
     ui->tabWidget->setTabsClosable(true);
     QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
     tabBar->setTabButton(0, QTabBar::RightSide, 0);
     tabBar->setTabButton(1, QTabBar::RightSide, 0);
     tabBar->setTabButton(2, QTabBar::RightSide, 0);
     tabBar->setTabButton(3, QTabBar::RightSide, 0);
+    tabBar->setTabButton(4, QTabBar::RightSide, 0);
     tabBar->setTabButton(dynTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(expTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(viewTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(projectTabId, QTabBar::RightSide, 0);
+    tabBar->setTabButton(classesTabId, QTabBar::RightSide, 0);
     QObject::connect(ui->tabWidget,   SIGNAL(tabCloseRequested(int)),
                      this,            SLOT  (onTabClose(int)));
 }
@@ -135,6 +142,9 @@ fileVpzView::~fileVpzView()
 
     if (mProjectTab)
         delete mProjectTab;
+
+    if (mClassesTab)
+        delete mClassesTab;
 
     delete ui;
 }
@@ -234,6 +244,12 @@ void fileVpzView::setVpz(vleVpz *vpz)
     if (mExpViewTab) {
         mExpViewTab->setVpz(mVpz);
         mExpViewTab->reload();
+    }
+
+    // ---- View Tab ----
+    if (mClassesTab) {
+        mClassesTab->setVpz(mVpz);
+       //mClassesTab->reload();
     }
 }
 

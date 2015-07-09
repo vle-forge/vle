@@ -66,6 +66,48 @@ public:
     const QDomDocument& getDomDoc() const;
     QDomDocument& getDomDoc();
     /**
+     * @brief get <classes> tag from Vpz doc
+     */
+    QDomNode classesFromDoc() const;
+    /**
+     * @brief get <class> tag from Vpz doc
+     * @param className, attribute 'name' of <class>
+     */
+    QDomNode classFromDoc(const QString& className) const;
+    /**
+     * @brief get first <model> tag into a <class> tag
+     * @param className, attribute 'name' of <class>
+     */
+    QDomNode classModelFromDoc(const QString& className) const;
+    /**
+     * @brief tells if a class exists
+     * @param className: name of the class
+     */
+    bool existClassFromDoc(const QString& className) const;
+    /**
+     * @brief add a class to a doc
+     * @param atomic: if true add a class with an atomic model
+     * @return the name otf the class
+     */
+    QString addClassToDoc(bool atomic);
+    /**
+     * @brief Renames the class of the doc
+     * @param oldClass: name of the class
+     * @param newClass: new name to set to the class
+     */
+    void renameClassToDoc(const QString& oldClass, const QString& newClass);
+    /**
+     * @brief copy a class
+     * @param className: the name of the class to copy
+     * @return the name of the copy
+     */
+    QString copyClassToDoc(const QString& className);
+    /**
+     * @brief removes a class
+     * @param className: the name of the class to remove
+     */
+    void removeClassToDoc(const QString& className);
+    /**
      * @brief get <experiment> tag from Vpz doc
      */
     QDomNode experimentFromDoc() const;
@@ -124,6 +166,7 @@ public:
             const QString& destinationFullPath, const QString& sourcePort,
             const QString& destinationPort) const;
 
+
     /******************************************************
      * Access to specific nodes in the vpz from internal nodes
      ******************************************************/
@@ -139,12 +182,48 @@ public:
      * @brief get map from tag <output> (configuration of output)
      */
     QDomNode mapFromOutput(QDomNode node);
+    /**
+     * @brief get atomic model tag <model> from a tag <model>,
+     * which name is atom
+     */
+    QDomNode atomicModelFromModel(const QDomNode& node,
+            const QString& atom) const;
+    /**
+     * @brief get <connections> tag  from a tag <model>,
+     * @param node: QDomNode <model> with xpath = //model
+     */
+    QDomNode connectionsFromModel(const QDomNode& node) const;
+    /**
+     * @brief get <submodels> tag  from a tag <model>,
+     * @param node: QDomNode <model> with xpath = //model
+     */
+    QDomNode submodelsFromModel(const QDomNode& node) const;
 
     /*******************************************************
      * Utils Functions QDom
      ******************************************************/
-    std::vector<QDomNode> childNodesWithoutText(QDomNode node) const;
-
+    std::vector<QDomNode> childNodesWithoutText(QDomNode node,
+            const QString& nodeName = "") const;
+    /**
+     * @brief remove children that are QDomText to a node
+     */
+    void removeTextChilds(QDomNode node, bool recursively=true);
+    /**
+     * @brief get attribute value of a node which name is attrName
+     */
+    QString attributeValue(const QDomNode& node, const QString& attrName) const;
+    /**
+     * @brief set attribute value of a node which name is attrName
+     * and value is val
+     */
+    void setAttributeValue(QDomElement node, const QString& attrName,
+               const QString& val);
+    /**
+     * @brief get the first child corresponding to the name and add it
+     * if not present
+     */
+    QDomNode obtainChild(QDomNode node, const QString& nodeName,
+            bool addIfNot=true);
 
     /*****************************************************
      * TODO A TRIER
@@ -235,12 +314,96 @@ public:
      * for the models configuration that needs that
      */
     void renameObservableFromModel(QDomNode &node,
-				   const QString &oldName, const QString &newName);
+            const QString &oldName, const QString &newName);
     /**
      * @brief set the 'name' attribute of tag <Observable> to a new value
      */
     void renameObsFromObss(QDomNode node,
-			   const QString& oldName, const QString& newName);
+            const QString& oldName, const QString& newName);
+
+    /**
+     * @brief rename a model xpath = //model
+     * @param node, tag <model> to rename
+     * @param newName, the new name to assign to node
+     * @note all connections are renamed also.
+     */
+    void renameModel(QDomNode node, const QString& newName);
+
+    /**
+     * @brief remove a model
+     * @param node: QDomNode <model> with xpath = //model
+     * @note: update connections by getting ancestor node
+     */
+    void rmModel(QDomNode node);
+    /**
+     * @brief remove a model connection
+     * @param node: QDomNode <connection>
+     *     with xpath = //model/connections/connection
+     */
+    void rmModelConnection(QDomNode node);
+
+    /**
+     * @brief return true if modName is a submodel of node
+     * @param node, which node name is <model>
+     * @param modName, the submodel name to check
+     */
+    bool existSubModel(QDomNode node, const QString& modName);
+
+    /**
+     * @brief add a submodel to a model
+     * @param node: QDomNode <model> with xpath = //model
+     * @param type: "coupled" or "atomic"
+     * @param pos: position x, y
+     * @note: add submodels tag is required
+     */
+    void addModel(QDomNode node, const QString& type, QPointF pos);
+
+    /**
+     * @brief copy a list of models to a coupled model (rename if necessary)
+     * @param modsToCopy: list of QDomNode <model> to copy
+     * it is required that all models have the same ancestor (part of the same
+     * coupled model)
+     * @param modDest: destination model with xpath=//model[@type=coupled]
+     * @param xtranslation:
+     * @param ytranslation:
+     */
+    void copyModelsToModel(QList<QDomNode> modsToCopy, QDomNode modDest,
+            qreal xtranslation, qreal ytranslation);
+    /**
+     * @brief set the 'name' attribute of tag <port> to a new value
+     * @param node: QDomNode <port> with xpath = //model//in//port
+     * @param newName: new name
+     * @note: update connections by getting ancestor nodes
+     */
+    void renameModelPort(QDomNode node, const QString& newName);
+    /**
+     * @brief remove a port to a model, ie. tag <port>
+     * @param node: QDomNode with xpath = //model//in//port
+     * @note: remove all conections associated to
+     */
+    void rmModelPort(QDomNode node);
+    /**
+     * @brief add a port to a model; ie tag <model>
+     * @param node: QDomNode <model> with xpath = //model
+     * @param type: "in" or "out"
+     */
+    void addModelPort(QDomNode node, const QString& type);
+    /**
+     * @brief add an input port to a model; ie tag <model>
+     * @param node: QDomNode <model> with xpath = //model
+     */
+    void addModelInputPort(QDomNode node);
+    /**
+     * @brief add an output port to a model; ie tag <model>
+     * @param node: QDomNode <model> with xpath = //model
+     */
+    void addModelOutputPort(QDomNode node);
+    /**
+     * @brief add a connection between two port
+     * @param node1: QDomNode <port> with xpath = //model//port
+     * @param node2: QDomNode <port> with xpath = //model//port
+     */
+    void addModelConnection(QDomNode node1, QDomNode node2);
     /**
      * @brief rm a view from a observable port
      */
@@ -352,10 +515,6 @@ public:
      */
     QDomNode addObsPort(QDomNode node, const QString& portName);
 
-    // other primitives
-
-
-
     /**
      * @brief build an empty node corresponding to the value type from Vpz doc
      */
@@ -446,12 +605,6 @@ public:
      */
     void rmValuePortCondToDoc(const QString& condName, const QString& portName,
             int index);
-    /**
-     * @brief get atomic model tag <model> from a tag <model>,
-     * which name is atom
-     */
-    QDomNode atomicModelFromModel(const QDomNode& node,
-            const QString& atom) const;
     /**
      * @brief get list of node with tag <condition> tag from tag <conditions>
      */
@@ -558,16 +711,7 @@ public:
      * whith attribute 'name'  portName
      */
     QDomNode addPort(QDomNode node, const QString& portName);
-    /**
-     * @brief get attribute value of a node which name is attrName
-     */
-    QString attributeValue(const QDomNode& node, const QString& attrName) const;
-    /**
-     * @brief set attribute value of a node which name is attrName
-     * and value is val
-     */
-    void setAttributeValue(QDomElement node, const QString& attrName,
-			   const QString& val);
+
 
 
     /**
@@ -683,7 +827,11 @@ public:
     bool fillWithValue(const QString& condName, const QString& portName,
             int index, const vle::value::Value& val);
 
-
+    /**
+     * @brief fill a vector of strings with classes names
+     * @param the vector to fill
+     */
+    void fillWithClassesFromDoc(std::vector<std::string>& toFill) const;
 
     /**
      * @brief Fill a Node from a value

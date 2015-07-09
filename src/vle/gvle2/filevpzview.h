@@ -42,6 +42,7 @@
 #include "filevpzexpview.h"
 #include "filevpzobservables.h"
 #include "filevpzproject.h"
+#include "filevpzclasses.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif
@@ -97,6 +98,7 @@ private:
     FileVpzExpView  *mExpViewTab;
     FileVpzObservables  *mObservablesTab;
     FileVpzProject  *mProjectTab;
+    vle::gvle2::FileVpzClasses  *mClassesTab;
     vleVpz          *mVpz;
     QWidget         *mWidgetTool;
     QList<QTreeWidgetItem *> mViewsItems;
