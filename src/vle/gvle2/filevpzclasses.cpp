@@ -41,7 +41,7 @@ namespace gvle2 {
 
 
 FileVpzClasses::FileVpzClasses(QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzClasses), mVpz(0), mScene(0),
+    QWidget(parent), mScene(), ui(new Ui::FileVpzClasses), mVpz(0),
     mSelClass("<None>")
 {
 
@@ -118,7 +118,6 @@ FileVpzClasses::onNewAtomicTriggered(bool /*checked*/)
     QString name = mVpz->addClassToDoc(true);
     ui->classesList->addItem(name);
     ui->classesList->setCurrentIndex(ui->classesList->count()-1);
-
 }
 
 void
@@ -174,17 +173,14 @@ FileVpzClasses::onCurrentIndexChanged(const QString & /*text*/)
         mSelClass = ui->classesList->currentText();
         if (mSelClass != "<None>") {
             //vpz get first model of class
-            QDomNode selModelNode =  mVpz->classModelFromDoc(mSelClass);
-            delete mScene;
-            mScene = new VpzDiagScene(mVpz, selModelNode);
+            mScene.init(mVpz, mSelClass);
             ui->graphicsView->setSceneRect(QRect(0,0,0,0));
-            ui->graphicsView->setScene(mScene);
-            mScene->update();
+            ui->graphicsView->setScene(&mScene);
+            mScene.update();
             ui->pushCopy->setEnabled(true);
             ui->pushDelete->setEnabled(true);
         } else {
-            delete mScene;
-            mScene = 0;
+            mScene.clear();
             ui->pushCopy->setEnabled(false);
             ui->pushDelete->setEnabled(false);
         }

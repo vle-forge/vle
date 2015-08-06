@@ -23,6 +23,7 @@
  */
 
 #include "vpzActions.h"
+#include <QLineEdit>
 
 namespace Ui {
 

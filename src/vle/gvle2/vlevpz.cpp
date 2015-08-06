@@ -41,23 +41,23 @@
 
 vleVpz::vleVpz()
 {
-    mRootModel = 0;
-    mClassesRaw = 0;
+    //mRootModel = 0;
+  //  mClassesRaw = 0;
 }
 
 vleVpz::vleVpz(const QString &filename) :
     mFilename(filename), mFile(mFilename), mDoc("vle_project")
 {
-    mRootModel = 0;
-    mClassesRaw = 0;
+    //mRootModel = 0;
+    //mClassesRaw = 0;
 
 //    mFilename = filename;
 
     xReadDom();
 
-    if (!mRootModel){
-        mRootModel = new vleVpzModel();
-    }
+//    if (!mRootModel){
+//        mRootModel = new vleVpzModel();
+//    }
 }
 
 /******************************************************
@@ -78,7 +78,7 @@ vleVpz::getDomDoc()
 }
 
 QDomNode
-vleVpz::classesFromDoc() const
+vleVpz::classesFromDoc()
 {
     QDomNodeList nodeList = getDomDoc().elementsByTagName("classes");
     QDomNode classesElem = nodeList.item(0);
@@ -86,7 +86,7 @@ vleVpz::classesFromDoc() const
 }
 
 QDomNode
-vleVpz::classFromDoc(const QString& className) const
+vleVpz::classFromDoc(const QString& className)
 {
     QDomNode classesElem = classesFromDoc();
     QDomNodeList list = classesElem.toElement().elementsByTagName("class");
@@ -100,15 +100,19 @@ vleVpz::classFromDoc(const QString& className) const
 }
 
 QDomNode
-vleVpz::classModelFromDoc(const QString& className) const
+vleVpz::classModelFromDoc(const QString& className)
 {
-    QDomNode classNode = classFromDoc(className);
-    QDomNodeList list = classNode.toElement().elementsByTagName("model");
-    return list.at(0);
+    if (className.isEmpty()) {
+        return modelFromDoc();
+    } else {
+        QDomNode classNode = classFromDoc(className);
+        QDomNodeList list = classNode.toElement().elementsByTagName("model");
+        return list.at(0);
+    }
 }
 
 bool
-vleVpz::existClassFromDoc(const QString& className) const
+vleVpz::existClassFromDoc(const QString& className)
 {
     QDomNode classesElem = classesFromDoc();
     QDomNodeList list = classesElem.toElement().elementsByTagName("class");
@@ -123,7 +127,8 @@ vleVpz::existClassFromDoc(const QString& className) const
 QString
 vleVpz::addClassToDoc(bool atomic)
 {
-    QDomNode classesElem = classesFromDoc();
+    QDomNode classesElem = obtainChild(vleProjectFromDoc(), "classes");
+
     QString prefix = "NewClass";
     QString name;
     int k = 0;
@@ -158,6 +163,7 @@ vleVpz::addClassToDoc(bool atomic)
     setAttributeValue(newModel.toElement(), "height", "50");
     newClass.appendChild(newModel);
     classesElem.appendChild(newClass);
+    emit modelsUpdated();
     return name;
 }
 
@@ -206,6 +212,13 @@ vleVpz::removeClassToDoc(const QString& className)
 }
 
 QDomNode
+vleVpz::vleProjectFromDoc() const
+{
+    QDomNodeList nodeList = getDomDoc().elementsByTagName("vle_project");
+    return nodeList.item(0);
+}
+
+QDomNode
 vleVpz::experimentFromDoc() const
 {
     QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
@@ -216,15 +229,25 @@ vleVpz::experimentFromDoc() const
 QDomNode
 vleVpz::obsFromDoc() const
 {
-    return obsFromViews(viewsFromDoc());
+    QDomNode views = viewsFromDoc();
+    if (views.isNull()) {
+        return QDomNode();
+    }
+    return obsFromViews(views);
 }
 
 QDomNode
 vleVpz::viewsFromDoc() const
 {
     QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
+    if (nodeList.size() == 0) {
+        return QDomNode();
+    }
     QDomElement expElem = nodeList.item(0).toElement();
     nodeList = expElem.elementsByTagName("views");
+    if (nodeList.size() == 0) {
+        return QDomNode();
+    }
     return nodeList.item(0);
 }
 
@@ -235,6 +258,13 @@ vleVpz::condsFromDoc() const
     QDomElement expElem = nodeList.item(0).toElement();
     nodeList = expElem.elementsByTagName("conditions");
     return nodeList.item(0);
+}
+
+QDomNode
+vleVpz::structuresFromDoc() const
+{
+    QDomNodeList dynList = getDomDoc().elementsByTagName("structures");
+    return dynList.item(0);
 }
 
 QDomNode
@@ -279,17 +309,29 @@ vleVpz::portFromDoc(const QString& condName, const QString& portName) const
 }
 
 QDomNode
-vleVpz::modelFromDoc(const QString& modelFullPath) const
+vleVpz::modelFromDoc(const QString& modelFullPath)
 {
     // controls to be added
-
-    QDomNode structures =
-        getDomDoc().documentElement().elementsByTagName("structures").at(0);
-    QDomNode currModel =
-        structures.toElement().elementsByTagName("model").at(0);
-    QStringList pathSplit = modelFullPath.split(".");
+    QStringList pathSplit = modelFullPath.split("/");
+    if (pathSplit.size() != 2) {
+        qDebug() << "Internal error modelFromDoc (modelFullPath wrong format) " << modelFullPath << "\n";
+        return QDomNode();
+    }
+    QDomNode currModel;
+    if (pathSplit.at(0).isEmpty()) {
+        //find in the root model
+        QDomNode structures =
+            getDomDoc().documentElement().elementsByTagName("structures").at(0);
+        currModel =
+            structures.toElement().elementsByTagName("model").at(0);
+    } else {
+        //find into a class
+        classFromDoc(pathSplit[0]);
+        currModel = classFromDoc(pathSplit[0]).toElement()
+                .elementsByTagName("model").at(0);
+    }
+    pathSplit = pathSplit[1].split(".");
     QString currName = attributeValue(currModel, "name");
-
     for (int i = 1; i < pathSplit.length(); i++) {
         QDomNodeList list = currModel.childNodes();
         for (unsigned int j = 0; j < list.length(); j++) {
@@ -316,7 +358,15 @@ vleVpz::modelFromDoc(const QString& modelFullPath) const
 }
 
 QDomNode
-vleVpz::modelConnectionsFromDoc(const QString& modelFullPath) const
+vleVpz::modelFromDoc()
+{
+    QDomNode structures =
+        getDomDoc().documentElement().elementsByTagName("structures").at(0);
+    return obtainChild(structures, "model");
+}
+
+QDomNode
+vleVpz::modelConnectionsFromDoc(const QString& modelFullPath)
 {
     QDomNode mod = modelFromDoc(modelFullPath);
     QDomNodeList childList = mod.childNodes();
@@ -333,7 +383,7 @@ vleVpz::modelConnectionsFromDoc(const QString& modelFullPath) const
 QDomNode
 vleVpz::modelConnectionFromDoc(const QString& sourceFullPath,
         const QString& destinationFullPath, const QString& sourcePort,
-        const QString& destinationPort) const
+        const QString& destinationPort)
 {
     QString coupledModel("");
     QStringList sourcePathSplit = sourceFullPath.split(".");
@@ -393,11 +443,34 @@ vleVpz::modelConnectionFromDoc(const QString& sourceFullPath,
  * Access to specific nodes in the vpz from internal nodes
  ******************************************************/
 
+QString
+vleVpz::getFullPathModel(QDomNode node) const
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in getFullPathModel (wrong main tag)");
+        return "";
+    }
+    QString fullPath = attributeValue(node, "name");
+    QString tagParent = node.parentNode().nodeName();
+    if (tagParent == "structures") {
+        return QString("/")+fullPath;
+    } else if (tagParent == "class") {
+        return attributeValue(node.parentNode(), "name")+"/"+fullPath;
+    } else if (tagParent == "submodels") {
+        return getFullPathModel(node.parentNode().parentNode())+"."+fullPath;
+    } else {
+        qDebug() << ("Internal error in getFullPathModel (unexpected)");
+    }
+    return "";
+}
+
 QDomNode
 vleVpz::obsFromViews(QDomNode node) const
 {
+    if (node.isNull()) {
+        return QDomNode();
+    }
     if (node.nodeName() != "views") {
-
         qDebug() << ("Internal error in obsFromView (wrong main tag)");
         return QDomNode();
     }
@@ -509,21 +582,15 @@ vleVpz::connectionsFromModel(const QDomNode& node) const
     return QDomNode();
 }
 
-QDomNode
-vleVpz::submodelsFromModel(const QDomNode& node) const
+std::vector<QDomNode>
+vleVpz::submodelsFromModel(const QDomNode& node)
 {
-    if (node.nodeName() != "model") {
-        qDebug() << ("Internal error in connectionsFromModel (wrong main tag)");
-        return QDomNode();
+    QDomNode sub = obtainChild(node, "submodels", false);
+    if (sub.isNull()) {
+        return std::vector<QDomNode>();
+    } else {
+        return childNodesWithoutText(sub, "model");
     }
-    QDomNodeList children = node.toElement().childNodes();
-    for (unsigned int i =0; i < children.length(); i++) {
-        QDomNode conns = children.at(i);
-        if (conns.nodeName() == "submodels") {
-            return conns;
-        }
-    }
-    return QDomNode();
 }
 
 std::vector<QDomNode>
@@ -810,6 +877,9 @@ bool
 vleVpz::existObsFromDoc(const QString& obsName) const
 {
     QDomNode obss = obsFromViews(viewsFromDoc());
+    if (obss.isNull()) {
+        return false;
+    }
     QDomNodeList obsList = obss.childNodes();
     for (unsigned int i = 0; i < obsList.length(); i++) {
         QDomNode obs = obsList.at(i);
@@ -981,7 +1051,10 @@ vleVpz::obsPortsListFromDoc(const QString& obsName) const
 QDomNode
 vleVpz::addObservableToDoc(const QString& obsName)
 {
-    QDomNode newObs = addObservable(obsFromDoc(), obsName);
+    QDomNode obs = obtainChild(obtainChild(obtainChild(obtainChild
+            (getDomDoc(), "vle_project", true), "experiment", true),
+            "views", true), "observables", true) ;
+    QDomNode newObs = addObservable(obs, obsName);
     emit observablesUpdated();
     return newObs;
 }
@@ -1081,7 +1154,6 @@ vleVpz::attachViewToObsPortDoc(const QString& obsName, const QString& portName,
 void
 vleVpz::rmObsPortToDoc(const QString& obsName, const QString& portName)
 {
-
     rmPortFromObs(obsFromObss(obsFromDoc(), obsName), portName);
 }
 
@@ -1230,6 +1302,9 @@ vleVpz::renameObservableFromModel(QDomNode &node, const QString &oldName, const 
 QDomNodeList
 vleVpz::obssListFromObss(const QDomNode& node) const
 {
+    if (node.isNull()) {
+        return QDomNodeList();
+    }
     if (node.nodeName() != "observables") {
         qDebug() << ("Internal error in obssListFromObss (wrong main tag)");
         return QDomNodeList();
@@ -1291,7 +1366,8 @@ vleVpz::obsFromObss(const QDomNode& node, const QString& obsName) const
             return child;
         }
     }
-    qDebug() << ("Internal error in condFromConds (not found)");
+    qDebug() << ("Internal error in obsFromObss (not found)") ;
+
     return QDomNode();
 }
 
@@ -1390,7 +1466,7 @@ vleVpz::renameModel(QDomNode node, const QString& newName)
                 childNodesWithoutText(parent, "connections");
         if (consTag.size() == 1) {
             std::vector<QDomNode> cons =
-                    childNodesWithoutText(consTag.at(0), "model");
+                    childNodesWithoutText(consTag.at(0), "connection");
             for (unsigned int i=0; i<cons.size();i++) {
                 QDomNode con = cons.at(i);
                 QDomNode orig = con.toElement()
@@ -1422,7 +1498,7 @@ vleVpz::renameModel(QDomNode node, const QString& newName)
                 childNodesWithoutText(node, "connections");
         if (consTag.size() == 1) {
             std::vector<QDomNode> cons =
-                    childNodesWithoutText(consTag.at(0), "model");
+                    childNodesWithoutText(consTag.at(0), "connection");
             for (unsigned int i=0; i<cons.size();i++) {
                 QDomNode con = cons.at(i);
                 QDomNode orig = con.toElement()
@@ -1449,6 +1525,7 @@ vleVpz::renameModel(QDomNode node, const QString& newName)
         }
     }
     setAttributeValue(node.toElement(), "name", newName);
+    emit modelsUpdated();
 }
 
 void
@@ -1490,6 +1567,7 @@ vleVpz::rmModel(QDomNode node)
     node.parentNode().removeChild(node);
     removeTextChilds(parent);
     removeTextChilds(parent.parentNode());
+    emit modelsUpdated();
 }
 
 void
@@ -1586,6 +1664,7 @@ vleVpz::addModel(QDomNode node, const QString& type, QPointF pos)
     newModel.appendChild(inPort);
     newModel.appendChild(outPort);
     subModels.appendChild(newModel);
+    emit modelsUpdated();
 }
 
 
@@ -1643,11 +1722,7 @@ vleVpz::copyModelsToModel(QList<QDomNode> modsToCopy, QDomNode modDest,
                 }
             }
             storeCopyNames.append(subName);
-            QDomNode subs = submodelsFromModel(modDest);
-            if (subs.isNull()) {
-                subs = getDomDoc().createElement("submodels");
-                modDest.appendChild(subs);
-            }
+            QDomNode subs = obtainChild(modDest, "submodels");
             subs.appendChild(sub);
         }
     }
@@ -1692,8 +1767,8 @@ vleVpz::copyModelsToModel(QList<QDomNode> modsToCopy, QDomNode modDest,
                 }
             }
         }
-
     }
+    emit modelsUpdated();
 }
 void
 vleVpz::renameModelPort(QDomNode node, const QString& newName)
@@ -1770,6 +1845,7 @@ vleVpz::renameModelPort(QDomNode node, const QString& newName)
         }
     }
     setAttributeValue(node.toElement(), "name", newName);
+    emit modelsUpdated();
 }
 
 void
@@ -1850,6 +1926,7 @@ vleVpz::rmModelPort(QDomNode node)
     QDomNode outsTag = node.parentNode();
     outsTag.removeChild(node);
     removeTextChilds(outsTag);
+    emit modelsUpdated();
 }
 
 void
@@ -1882,6 +1959,7 @@ vleVpz::addModelPort(QDomNode node, const QString& type)
     QDomElement inPort = getDomDoc().createElement("port");
     inPort.setAttribute("name", newPortName);
     portsType.appendChild(inPort);
+    emit modelsUpdated();
 }
 
 void
@@ -1979,6 +2057,7 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
         con.appendChild(dest);
         cons.appendChild(con);
     }
+    emit modelsUpdated();
 
 
 }
@@ -2103,7 +2182,7 @@ vleVpz::addCondition(QDomNode node, const QString& condName)
 }
 
 QString
-vleVpz::modelCondsFromDoc(const QString& atomFullName) const
+vleVpz::modelCondsFromDoc(const QString& atomFullName)
 {
     QDomNode atom = modelFromDoc(atomFullName);
     return attributeValue(atom, "conditions");
@@ -2111,7 +2190,7 @@ vleVpz::modelCondsFromDoc(const QString& atomFullName) const
 
 bool
 vleVpz::isAttachedCond(const QString& atomFullName,
-        const QString& condName) const
+        const QString& condName)
 {
     QDomNode atom = modelFromDoc(atomFullName);
     QString attachedConds = attributeValue(atom, "conditions");
@@ -2120,14 +2199,14 @@ vleVpz::isAttachedCond(const QString& atomFullName,
 }
 
 QString
-vleVpz::modelDynFromDoc(const QString& atomFullName) const
+vleVpz::modelDynFromDoc(const QString& atomFullName)
 {
     QDomNode atom = modelFromDoc(atomFullName);
     return attributeValue(atom, "dynamics");
 }
 
 QString
-vleVpz::modelObsFromDoc(const QString& atomFullName) const
+vleVpz::modelObsFromDoc(const QString& atomFullName)
 {
     QDomNode atom = modelFromDoc(atomFullName);
     return attributeValue(atom, "observables");
@@ -2654,7 +2733,7 @@ vleVpz::fillWithMultipleValue(QDomNode portNode,
 }
 
 void
-vleVpz::fillWithClassesFromDoc(std::vector<std::string>& toFill) const
+vleVpz::fillWithClassesFromDoc(std::vector<std::string>& toFill)
 {
     toFill.clear();
     QDomNode classes = classesFromDoc();
@@ -3061,226 +3140,18 @@ void vleVpz::setPackage(vlePackage *package)
     mPackage = package;
 }
 
-/**
- * @brief vleVpz::focusChange (slot)
- *        Called when a model emit a focus signal
- *
- */
-void vleVpz::focusChange(vleVpzModel *model)
-{
-    // re-emit the signal for the upper layers (filevpzview)
-    emit sigFocus(model);
-}
-
-/**
- * @brief vleVpz::enterModel (slot)
- *        Called when a model emit an "enter" signal (ex: double-click)
- *
- */
-void vleVpz::enterModel(vleVpzModel *model)
-{
-    // re-emit the signal for the upper layers (filevpzview)
-    emit sigEnterModel(model);
-}
-
-/**
- * @brief vleVpz::isAltered
- *        Test if the VPZ has been modified since the last save
- *
- */
 bool vleVpz::isAltered()
 {
-    if (mRootModel)
-    {
-        return mRootModel->isAltered();
-    }
     return false;
 }
 
-///**
-// * @brief vleVpz::getDynamic
-// *        Search and return a loaded Dynamic, identified by his name
-// *
-// */
-//vleVpzDynamic *vleVpz::getDynamic(QString name)
-//{
-//    QListIterator<vleVpzDynamic*> items(mDynamics);
-//    while( items.hasNext() )
-//    {
-//        vleVpzDynamic *dyn = items.next();
-//        if (dyn->getName() == name)
-//            return dyn;
-//    }
-//
-//    return 0;
-//}
-
-
-/**
- * @brief vleVpz::removeDynamic
- *        Remove an existing Dynamic
- *
- */
 void vleVpz::removeDynamic(const QString& dynamic)
 {
-    // Remove the links of models with the dyncmic
-    removeModelDynamic(mRootModel, dynamic, true);
-
-    // Remove from the VPZ
     removeDyn(dynamic);
 }
 
-/**
- * @brief vleVpz::removeModelDynamic
- *        Remove  link(s) of model(s) with a dynamic before deleting it
- *
- */
-int vleVpz::removeModelDynamic(vleVpzModel *model, const QString& dynamic, bool recurse)
-{
-    int count = 0;
 
-    // If the specified model use the dynamic
-    if (modelDynFromDoc(model->getFullName()) == dynamic) {
-        // Remove it
-        setDynToAtomicModel(model->getFullName(), "");
-        count ++;
-    }
 
-    // If the recurse flag is set, call this method for all submodels
-    if (recurse)
-    {
-        for (int i = 0; i < model->countSubmodels(); i++)
-            count += removeModelDynamic(model->getSubmodelAt(i), dynamic, recurse);
-    }
-
-    return count;
-}
-
-/**
- * @brief vleVpz::addCondition
- *        Create a new Condition (experiment) and register it into current VPZ
- *
- */
-
-/**
- * @brief vleVpz::addModeler (slot)
- *        Called when a model must be linked with a modeler
- *
- */
-void vleVpz::addModeler(QString name)
-{
-    // Search the sender model
-    QObject *senderObject = QObject::sender();
-    vleVpzModel *model = qobject_cast<vleVpzModel *>(senderObject);
-    if (model == 0)
-        return;
-
-    sourceCpp *classFile = model->getModelerClass();
-    if (classFile == 0)
-        return;
-
-    PluginModeler *modeler = classFile->getModeler();
-    if (modeler == 0)
-    {
-        QMessageBox msgBox;
-
-        msgBox.setText(tr("The modeler plugin could not be loaded (%1) !").arg(classFile->getModelerName()));
-        msgBox.exec();
-        return;
-    }
-
-    QString condName = name + model->getName();
-
-    modeler->initExpCond(condName, classFile);
-    attachCondToAtomicModel(model->getFullName(),condName);
-
-    // Inform upper layers that a new condition has been created
-    emit sigConditionsChanged();
-
-    addModelerDynamic(model, name);
-    // Inform upper layers that dynamic has been changed
-    emit sigDynamicsChanged();
-
-    emit sigOpenModeler(model);
-}
-
-/**
- * @brief vleVpz::addModelerDynamic
- *        Part of the add-modeler process - Update the model Dynamic
- *
- */
-void vleVpz::addModelerDynamic(vleVpzModel *model, QString lib)
-{
-    QString modDyn =  modelDynFromDoc(model->getFullName());
-    // First, check if the model has already a dynamic
-    if (modDyn != ""){
-        // Test if the current dynamic can be used with this modeler
-        if ((getDynamicPackage(modDyn) == mPackage->getName()) &&
-            (getDynamicLibrary(modDyn) == lib))
-            // Yes, model has already a valid dynamic, nothing to do
-            return;
-
-        QMessageBox msgBox;
-        msgBox.setText(tr("The current model Dynamic will be removed. Continue ?"));
-        msgBox.addButton(QMessageBox::Yes);
-        msgBox.addButton(QMessageBox::No);
-        int ret = msgBox.exec();
-        // If the user say "No", current dynamic stay unchanged
-        if (ret == QMessageBox::No)
-            return;
-
-        setDynToAtomicModel(model->getFullName(), "");
-    }
-
-    // Second, search into the existing dynamics if one can be used
-    QString newDyn("");
-    QList<QString> dynList;
-    fillWithDynamicsList(dynList);
-    for (int i = 0; i < dynList.count(); i++)
-    {
-        QString existingDyn = dynList.at(i);
-        if (getDynamicPackage(existingDyn) != mPackage->getName())
-            continue;
-        if (getDynamicLibrary(existingDyn) != lib)
-            continue;
-
-        // A dynamic with good Library and Package values found ! :)
-        newDyn = existingDyn;
-        break;
-    }
-
-    // If no dynamic available, create a new one
-    if (newDyn == "")
-    {
-        newDyn = "dyn_" + model->getName();
-        QString pkgName = mPackage->getName();
-        addDynamicToDoc(newDyn, pkgName, lib);
-    }
-    setDynToAtomicModel(model->getFullName(), newDyn);
-}
-
-/**
- * @brief vleVpz::openModeler (slot)
- *        Connected to vleVpzModels and called by them to open modeler
- *
- */
-void vleVpz::openModeler()
-{
-    // Search the origin of the signal
-    QObject *senderObject = QObject::sender();
-    vleVpzModel *model = qobject_cast<vleVpzModel *>(senderObject);
-    if (model == 0)
-        return;
-
-    // Forward the event as signal (mainly to fileVpzView)
-    emit sigOpenModeler(model);
-}
-
-/**
- * @brief vleVpz::save
- *        Entry point of the save process - Write current VPZ to a file
- *
- */
 void vleVpz::save()
 {
     QFile file(mFilename);
@@ -3311,11 +3182,6 @@ QByteArray vleVpz::xGetXml()
     return xml;
 }
 
-/**
- * @brief vleVpz::xSaveDom
- *        Create VPZ root entries and call specific methods to save parts
- *
- */
 void vleVpz::xSaveDom(QDomDocument *doc)
 {
     QDomProcessingInstruction pi;
@@ -3330,175 +3196,16 @@ void vleVpz::xSaveDom(QDomDocument *doc)
     vpzRoot.setAttribute("date", getDate());
     vpzRoot.setAttribute("version", getVersion());
 
-    QDomElement xStruct = doc->createElement("structures");
-    if ( xSaveStructures(doc, &xStruct) )
-        vpzRoot.appendChild(xStruct);
-
+    vpzRoot.appendChild(structuresFromDoc());
     vpzRoot.appendChild(dynamicsFromDoc());
     vpzRoot.appendChild(classesFromDoc());
-
-//
-//    if (mClassesRaw)
-//        vpzRoot.appendChild(*mClassesRaw);
-
-    QDomElement xExp = doc->createElement("experiment");
-    if ( xSaveExperiments(doc, &xExp) )
-        vpzRoot.appendChild(xExp);
+    vpzRoot.appendChild(experimentFromDoc());
+    vpzRoot.appendChild(classesFromDoc());
 
     doc->appendChild(vpzRoot);
 }
 
-/**
- * @brief vleVpz::xSaveStructures
- *        Add strucures elements to a DomDocument (mainly insert models)
- *
- */
-bool vleVpz::xSaveStructures(QDomDocument *doc, QDomNode *baseNode)
-{
-    if (mRootModel == 0)
-        return false;
 
-    QDomElement xModel = doc->createElement("model");
-    if (xSaveModel(doc, &xModel, mRootModel))
-        baseNode->appendChild(xModel);
-
-    return true;
-}
-
-/**
- * @brief vleVpz::xSaveModel
- *        Insert the content of a specific model (or submodel) to "structures"
- *
- */
-bool vleVpz::xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *model)
-{
-    // First, add general attributes
-    baseNode->setAttribute("name", model->getName());
-    if (model->getX())
-    {
-        baseNode->setAttribute("width",  model->getWidth());
-        baseNode->setAttribute("height", model->getHeight());
-        baseNode->setAttribute("x",      model->getX());
-        baseNode->setAttribute("y",      model->getY());
-    }
-
-    // Insert Dynamic attribute if used
-    QString modDyn = modelDynFromDoc(model->getFullName());
-    if (modDyn != "") {
-        baseNode->setAttribute("dynamics", modDyn);
-    }
-
-    baseNode->setAttribute("conditions", modelCondsFromDoc(model->getFullName()));
-
-    baseNode->setAttribute("observables", modelObsFromDoc(model->getFullName()));
-
-    // If the model has Input port(s) ... save them
-    if (model->getInPorts()->length())
-    {
-        QDomElement xIn = doc->createElement("in");
-
-        QListIterator<vleVpzPort*> items(*model->getInPorts());
-        while( items.hasNext() )
-        {
-            vleVpzPort *port = items.next();
-
-            QDomElement xPort = doc->createElement("port");
-            xPort.setAttribute("name", port->getName());
-            xIn.appendChild(xPort);
-        }
-        baseNode->appendChild(xIn);
-    }
-
-    // If the model has Output port(s) ... save them
-    if (model->getOutPorts()->length())
-    {
-        QDomElement xOut = doc->createElement("out");
-
-        QListIterator<vleVpzPort*> items(*model->getOutPorts());
-        while( items.hasNext() )
-        {
-            vleVpzPort *port = items.next();
-
-            QDomElement xPort = doc->createElement("port");
-            xPort.setAttribute("name", port->getName());
-            xOut.appendChild(xPort);
-        }
-        baseNode->appendChild(xOut);
-    }
-
-    // If the model has sub-models .. recursivly save them
-    if (model->countSubmodels())
-    {
-        baseNode->setAttribute("type", "coupled");
-
-        QDomElement xSubs = doc->createElement("submodels");
-
-        QListIterator<vleVpzModel*> items(*model->getSubmodels());
-        while( items.hasNext() )
-        {
-            vleVpzModel *submodel = items.next();
-
-            QDomElement xSubmodel = doc->createElement("model");
-            if (xSaveModel(doc, &xSubmodel, submodel))
-                xSubs.appendChild(xSubmodel);
-        }
-
-        baseNode->appendChild(xSubs);
-    }
-    else
-        baseNode->setAttribute("type", "atomic");
-
-    // If the model has connections ... save them
-
-    if (model->getConnections()->length())
-    {
-        QDomElement xConns = doc->createElement("connections");
-
-        QListIterator<vleVpzConn*> items(*model->getConnections());
-        while( items.hasNext() )
-        {
-            vleVpzConn *conn = items.next();
-
-            QDomElement xConn = doc->createElement("connection");
-            xConn.setAttribute("type", conn->typeName());
-
-            QDomElement xConnSrc = doc->createElement("origin");
-            xConnSrc.setAttribute("model", conn->getSourceModelName());
-            xConnSrc.setAttribute("port", conn->getSourcePortName());
-            xConn.appendChild(xConnSrc);
-
-            QDomElement xConnDst = doc->createElement("destination");
-            xConnDst.setAttribute("model", conn->getDestinationModelName());
-            xConnDst.setAttribute("port", conn->getDestinationPortName());
-            xConn.appendChild(xConnDst);
-
-            xConns.appendChild(xConn);
-        }
-        baseNode->appendChild(xConns);
-    }
-
-    return true;
-}
-
-/**
- * @brief vleVpz::xSaveExperiments
- *        Save the loaded Experiments into the DomDocument
- *
- */
-bool vleVpz::xSaveExperiments(QDomDocument */*doc*/, QDomElement *baseNode)
-{
-    baseNode->setAttribute("begin", getExpBegin());
-    baseNode->setAttribute("duration", getExpDuration());
-
-    if (mExpCombination != "")
-        baseNode->setAttribute("combination", mExpCombination);
-
-    baseNode->setAttribute("name", getExpName());
-    baseNode->appendChild(condsFromDoc());
-    baseNode->appendChild(viewsFromDoc());
-
-    return true;
-}
 
 void vleVpz::xReadDom()
 {
@@ -3507,1542 +3214,5 @@ void vleVpz::xReadDom()
     mDoc.setContent(&source, &reader);
     QDomElement docElem = mDoc.documentElement();
 
-
-    // First try to load Dynamics and Conditions
-    for(QDomNode n = docElem.firstChild(); !n.isNull(); n = n.nextSibling())
-    {
-        if (n.nodeName() == "experiment")
-            xReadDomExperiments(n);
-    }
-
-    for(QDomNode n = docElem.firstChild(); !n.isNull(); n = n.nextSibling())
-    {
-        if (n.nodeName() == "structures")
-            xReadDomStructures(n);
-        if (n.nodeName() == "classes")
-            mClassesRaw = new QDomNode(n);
-    }
 }
 
-void vleVpz::xReadDomStructures(const QDomNode &baseNode)
-{
-    QDomNodeList list = baseNode.childNodes();
-    if (list.isEmpty()) {
-        vleVpzModel *model = new vleVpzModel(this);
-        model->setName("Top Model");
-        mRootModel = model;
-    } else {
-        for (unsigned int i=0; i < list.length(); i++)
-        {
-            QDomNode item = list.item(i);
-            if (item.nodeName() != "model")
-                continue;
-
-            vleVpzModel *model = new vleVpzModel(this);
-            model->xLoadNode(item);
-            mRootModel = model;
-            break;
-        }
-    }
-}
-
-/**
- * @brief vleVpz::xReadDomExperiments
- *        Read and parse the "Experiments" section of the VPZ file
- *
- */
-void vleVpz::xReadDomExperiments(const QDomNode &baseNode)
-{
-    QDomNamedNodeMap attrMap = baseNode.attributes();
-
-    if (attrMap.contains("combination"))
-        mExpCombination = attrMap.namedItem("combination").nodeValue();
-
-    QDomNodeList list = baseNode.childNodes();
-    for (unsigned int i=0; i < list.length(); i++)
-    {
-        QDomNode item = list.item(i);
-    }
-}
-
-/* ------------------------------ Models ------------------------------ */
-
-/**
- * @brief vleVpzModel::vleVpzModel
- *        Constructor that load model from a XML node
- *
- */
-vleVpzModel::vleVpzModel(vleVpz *parent)
-                      : QWidget(0)
-{
-    mVpz = 0;
-
-    if (parent)
-    {
-        mVpz = parent;
-        QObject::connect(this, SIGNAL(sigFocus(vleVpzModel*)),
-                         mVpz, SLOT(focusChange(vleVpzModel*)));
-        QObject::connect(this, SIGNAL(sigDblClick(vleVpzModel*)),
-                         mVpz, SLOT(enterModel(vleVpzModel*)));
-
-        QObject::connect(this, SIGNAL(sigAddModeler(QString)),
-                         mVpz, SLOT  (addModeler(QString)) );
-        QObject::connect(this, SIGNAL(sigOpenModeler()),
-                         mVpz, SLOT  (openModeler()) );
-    }
-
-    mIsAltered = false;
-
-    mTooltip = 0;
-
-    mWidgetX = 10;
-    mWidgetY = 10;
-    mWidgetHeight = 50;
-    mWidgetWidth  = 50;
-    mWidInPortY   = 0;
-    mWidOutPortY  = 8;
-
-    mSettingLine     = 3;
-    mSettingCorner   = 10;
-    mSettingFontSize = 6;
-
-    mPainterFont.setPointSize(mSettingFontSize);
-
-    mIsMaximized= false;
-    mIsFocus    = false;
-    mIsSelected = false;
-    mSelect     = false;
-
-    mPortInSel  = 0;
-    mPortOutSel = 0;
-
-    mModelerClass = 0;
-
-    setToolTip("Model");
-
-    // Configure a custom context menu (called on right-click on model)
-    setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
-                     this, SLOT  (contextMenu(const QPoint&)));
-
-    setStyleSheet("background-color: transparent; color: rgb(0, 0, 255);");
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    mTitle.setParent(this);
-}
-
-/**
- * @brief vleVpzModel::~vleVpzModel
- *        Default destructor
- *
- */
-vleVpzModel::~vleVpzModel()
-{
-    // Clean all the inter-model connections
-    QListIterator<vleVpzConn*> connItems(mConnections);
-    while( connItems.hasNext() )
-        delete connItems.next();
-    // Clean all the allocated sub-models
-    QListIterator<vleVpzModel*> items(mSubmodels);
-    while( items.hasNext() )
-        delete items.next();
-    // Clean Input ports objects
-    QListIterator<vleVpzPort*> inItems(mInPorts);
-    while( inItems.hasNext() )
-        delete inItems.next();
-    // Clean output ports objects
-    QListIterator<vleVpzPort*> outItems(mOutPorts);
-    while( outItems.hasNext() )
-        delete outItems.next();
-}
-
-/**
- * @brief vleVpzModel::copyFromModel
- *        Configure local model with values take from another model
- *
- */
-void vleVpzModel::copyFromModel(vleVpzModel *model)
-{
-    // Copy input ports
-    QListIterator<vleVpzPort*> items(*model->getInPorts());
-    while( items.hasNext() )
-    {
-        vleVpzPort *port = items.next();
-
-        vleVpzPort *localPort = new vleVpzPort(this);
-        localPort->setName(port->getName());
-        localPort->setType(vleVpzPort::TypeInput);
-        localPort->move(2, nextInPosY());
-        mInPorts.append(localPort);
-    }
-
-    // Copy output ports
-    QListIterator<vleVpzPort*> portsOut(*model->getOutPorts());
-    while( portsOut.hasNext() )
-    {
-        vleVpzPort *port = portsOut.next();
-
-        vleVpzPort *localPort = new vleVpzPort(this);
-        localPort->setName(port->getName());
-        localPort->setType(vleVpzPort::TypeOutput);
-        localPort->move(2, nextOutPosY());
-        mOutPorts.append(localPort);
-    }
-
-    // Update the widget size, according to new ports lists
-    fixWidgetSize(true);
-}
-
-bool vleVpzModel::isAltered()
-{
-    return mIsAltered;
-}
-
-QString vleVpzModel::getName() const
-{
-    return mName;
-}
-
-QString vleVpzModel::getFullName() const
-{
-    return mFullName;
-}
-
-vleVpz *vleVpzModel::getVpz()
-{
-    return mVpz;
-}
-
-void vleVpzModel::addSubmodel(vleVpzModel *model)
-{
-    mSubmodels.append(model);
-}
-
-void vleVpzModel::delSubmodel(vleVpzModel *model)
-{
-    int idx;
-
-    if (model == 0)
-        return;
-
-    // Search the specified model into sub-models list
-    idx = mSubmodels.indexOf(model);
-    if (idx < 0)
-        return;
-
-    mSubmodels.removeAt(idx);
-
-    for (int i = 0; i < mConnections.length(); i++)
-    {
-        vleVpzConn *conn = mConnections.at(i);
-        if ( (conn->getSource()      == model) ||
-             (conn->getDestination() == model) )
-        {
-            mConnections.removeAt(i);
-            delete conn;
-            i--;
-        }
-    }
-}
-
-int vleVpzModel::countSubmodels()
-{
-    return mSubmodels.length();
-}
-
-/**
- * @brief vleVpzModel::xLoadNode
- *        Load the model from the
- *
- */
-void vleVpzModel::xLoadNode(const QDomNode &node, const vleVpzModel *parent)
-{
-    QDomNamedNodeMap attrMap = node.attributes();
-    if (attrMap.contains("name")) // Attribute Required !
-    {
-        QDomNode name = attrMap.namedItem("name");
-        mName = name.nodeValue();
-        if (parent) { mFullName = parent->getFullName() +
-                "." + mName;
-        } else {
-            mFullName = mName;
-        }
-
-        mTitle.setText(mName);
-    }
-    if (attrMap.contains("x")) // Optional
-    {
-        QDomNode name = attrMap.namedItem("x");
-        mWidgetX = name.nodeValue().toInt();
-    }
-    if (attrMap.contains("y")) // Optional
-    {
-        QDomNode name = attrMap.namedItem("y");
-        mWidgetY = name.nodeValue().toInt();
-    }
-    if (attrMap.contains("height")) // Optional
-    {
-        QDomNode name = attrMap.namedItem("height");
-        mWidgetHeight = name.nodeValue().toInt();
-    }
-    if (attrMap.contains("width")) // Optional
-    {
-        QDomNode name = attrMap.namedItem("width");
-        mWidgetWidth = name.nodeValue().toInt();
-    }
-    if (attrMap.contains("dynamics")) // Optional
-    {
-        QDomNode xDyn = attrMap.namedItem("dynamics");
-        QString dynName = xDyn.nodeValue();
-        if (mVpz) {
-            mVpz->setDynToAtomicModel(getFullName(), dynName);
-        }
-    }
-    if (attrMap.contains("conditions")) // Optional)
-    {
-        QDomNode xCondList = attrMap.namedItem("conditions");
-        QString condFlatList = xCondList.nodeValue();
-        QStringList condList = condFlatList.split(",");
-        if (mVpz)
-        {
-            QStringListIterator condListIt(condList);
-            while (condListIt.hasNext())
-            {
-                QString condName = condListIt.next();
-                mVpz->attachCondToAtomicModel(mFullName, condName);
-            }
-        }
-    }
-#ifdef X_DEBUG
-    qDebug() << "VpzModel Name=" << mName << "H="<<mWidgetHeight<<" W="<<mWidgetWidth<<" x="<<mWidgetX<<" y="<<mWidgetY<< " this="<<this;
-#endif
-
-    QDomNodeList list = node.childNodes();
-    for (unsigned int i=0; i < list.length(); i++)
-    {
-        QDomNode item = list.item(i);
-        if (item.nodeName() == "connections")
-            xReadConnections(item);
-        else if (item.nodeName() == "in")
-            xReadInputs(item);
-        else if (item.nodeName() == "out")
-            xReadOutputs(item);
-        else if (item.nodeName() == "submodels")
-            xreadSubmodels(item);
-    }
-    fixWidgetSize(true);
-}
-
-/**
- * @brief vleVpzModel::xreadSubmodels
- *        Load a submodel of the current object from an XML node
- *
- */
-void vleVpzModel::xreadSubmodels(const QDomNode &baseNode)
-{
-    QDomNodeList list = baseNode.childNodes();
-    for (unsigned int i=0; i < list.length(); i++)
-    {
-        QDomNode item = list.item(i);
-        if (item.nodeName() != "model")
-            continue;
-
-        vleVpzModel *model = new vleVpzModel(mVpz);
-        model->xLoadNode(item, this);
-        addSubmodel(model);
-    }
-}
-
-/**
- * @brief vleVpzModel::xreadConnections
- *        Load the list of sub-models connections
- *
- */
-void vleVpzModel::xReadConnections(const QDomNode &baseNode)
-{
-    unsigned int i,j;
-    vleVpzConn *newConn;
-    QDomNodeList connNodes = baseNode.childNodes();
-    for (i=0; i < connNodes.length(); i++)
-    {
-        QDomNode conn = connNodes.item(i);
-        if (conn.nodeName() != "connection")
-            continue;
-
-        // Instanciate a new Connection object for this item
-        newConn = new vleVpzConn(this);
-
-        QDomNamedNodeMap connAttrMap = conn.attributes();
-        if (connAttrMap.contains("type"))
-        {
-            QString type = connAttrMap.namedItem("type").nodeValue();
-            if (type == "internal")
-                newConn->setType(vleVpzConn::Internal);
-            else if (type == "input")
-                newConn->setType(vleVpzConn::In);
-            else if (type == "output")
-                newConn->setType(vleVpzConn::Out);
-            else
-                qDebug() << "xReadConnections() Unknown type " << type;
-        }
-
-        QDomNodeList connParams = conn.childNodes();
-        for (j = 0; j < connParams.length(); j++)
-        {
-            QDomNode item = connParams.item(j);
-            QDomNamedNodeMap attrMap = item.attributes();
-            if ( ! attrMap.contains("model"))
-                continue;
-            if ( ! attrMap.contains("port"))
-                continue;
-            QString name = attrMap.namedItem("model").nodeValue();
-            QString portName = attrMap.namedItem("port").nodeValue();
-
-            // Search the specified model into loaded submodels
-            vleVpzModel *submodel;
-            submodel = getSubmodelByName(&name);
-            // Save it to src or dst according to vpz tag name
-            if (item.nodeName() == "destination")
-            {
-                vleVpzPort *port = 0;
-
-                if (submodel && (newConn->type() == vleVpzConn::Internal))
-                    port = submodel->getInPortByName(&portName);
-                else if (submodel && (newConn->type() == vleVpzConn::In))
-                    port = submodel->getInPortByName(&portName);
-                else if ((submodel == 0) && (newConn->type() == vleVpzConn::Out))
-                    port = getOutPortByName(&portName);
-                else
-                    qDebug() << "xReadConnections(" << mName << ") bad dest " << name << ":" << portName;
-
-                if (port)
-                    newConn->setDestination(port);
-#ifdef X_DEBUG
-                qDebug() << "xReadConnections(" << mName << ") D type=" << newConn->type() << name << ":" << portName;
-#endif
-            }
-            else if (item.nodeName() == "origin")
-            {
-                vleVpzPort *port = 0;
-
-                if (submodel && (newConn->type() == vleVpzConn::Internal))
-                    port = submodel->getOutPortByName(&portName);
-                else if (submodel && (newConn->type() == vleVpzConn::Out))
-                    port = submodel->getOutPortByName(&portName);
-                else if ((submodel == 0) && (newConn->type() == vleVpzConn::In))
-                    port = getInPortByName(&portName);
-                else
-                    qDebug() << "xReadConnections(" << mName << ") type="<<newConn->type() << "bad orig " << name << ":" << portName;
-
-                if (port)
-                    newConn->setSource(port);
-#ifdef X_DEBUG
-                qDebug() << "xReadConnections(" << mName << ") O type="<<newConn->type() << name << ":" << portName;
-#endif
-            }
-        }
-        if (newConn->isValid())
-            mConnections.append(newConn);
-        else
-        {
-            qDebug() << "xReadConnections(" << mName << ") got invalid connection from vpz";
-            delete newConn;
-        }
-    }
-#ifdef X_DEBUG
-    qDebug() << "xReadConnections(" << mName << ") " << mConnections.length() << " connections readed";
-#endif
-}
-
-void vleVpzModel::xReadInputs(const QDomNode &baseNode)
-{
-    QDomNodeList list = baseNode.childNodes();
-    for (unsigned int i=0; i < list.length(); i++)
-    {
-        QDomNode item = list.item(i);
-        // Only "port" tags are readed
-        if (item.nodeName() != "port")
-            continue;
-        // Read tag attributes
-        QDomNamedNodeMap attrMap = item.attributes();
-        if ( ! attrMap.contains("name"))
-            continue;
-        // Get the value of "name" attribute
-        QDomNode xName = attrMap.namedItem("name");
-        QString name = xName.nodeValue();
-
-        // Allocate a new port
-        vleVpzPort *port = new vleVpzPort();
-        port->setParent(this);
-        port->setName(name);
-        port->setType(vleVpzPort::TypeInput);
-        port->move(2, nextInPosY());
-        mInPorts.append(port);
-    }
-}
-
-void vleVpzModel::xReadOutputs(const QDomNode &baseNode)
-{
-    QDomNodeList list = baseNode.childNodes();
-    for (unsigned int i=0; i < list.length(); i++)
-    {
-        QDomNode item = list.item(i);
-        // Only "port" tags are readed
-        if (item.nodeName() != "port")
-            continue;
-        // Read tag attributes
-        QDomNamedNodeMap attrMap = item.attributes();
-        if ( ! attrMap.contains("name"))
-            continue;
-        // Get the value of "name" attribute
-        QDomNode xName = attrMap.namedItem("name");
-        QString name = xName.nodeValue();
-
-        // Allocate a new port
-        vleVpzPort *port = new vleVpzPort();
-        port->setParent(this);
-        port->setName(name);
-        port->setType(vleVpzPort::TypeOutput);
-        port->move(50, nextOutPosY()); // 50 is an arbitrary value
-        mOutPorts.append(port);
-    }
-}
-
-bool vleVpzModel::xgetXml(QDomDocument *doc, QDomElement *base)
-{
-    QDomElement xModel = doc->createElement("model");
-    xModel.setAttribute("name", mName);
-    if (mSubmodels.length())
-        xModel.setAttribute("type", "coupled");
-    else
-        xModel.setAttribute("type", "atomic");
-    // Save the X-Y coordinates
-    xModel.setAttribute("x", mWidgetX);
-    xModel.setAttribute("y", mWidgetY);
-
-    base->appendChild(xModel);
-
-    return true;
-}
-
-void vleVpzModel::fixWidgetSize(bool doResize)
-{
-    // Test widget size and update if if needed
-    int szTitleText   = 0;
-    int szInPortText  = 0;
-    int szOutPortText = 0;
-    int szInPortHeight  = 0;
-    int szOutPortHeight = 0;
-    int itemHeight;
-
-    // Compute the model name length (in pixels)
-    QFontMetrics fmTitle = QFontMetrics( mTitle.font() );
-    szTitleText = fmTitle.width( mName );
-
-    QFontMetrics fmPorts = QFontMetrics(mPainterFont);
-
-    // Compute the text length (in pixels) of the longest input port name
-    QListIterator<vleVpzPort*> inItems(mInPorts);
-    while( inItems.hasNext() )
-    {
-        vleVpzPort *item = inItems.next();
-        int size = fmPorts.width( item->getName() );
-        if (size > szInPortText)
-            szInPortText = size;
-        // Compute port height
-        itemHeight = item->y() + item->height();
-        if (itemHeight > szInPortHeight)
-            szInPortHeight = itemHeight;
-    }
-    // Compute the text length (in pixels) of the longest output port name
-    QListIterator<vleVpzPort*> outItems(mOutPorts);
-    while( outItems.hasNext() )
-    {
-        vleVpzPort *item = outItems.next();
-        int size = fmPorts.width( item->getName() );
-        if (size > szOutPortText)
-            szOutPortText = size;
-        // Compute port height
-        itemHeight = item->y() + item->height();
-        if (itemHeight > szOutPortHeight)
-            szOutPortHeight = itemHeight;
-    }
-    // Update widget width if in or out port name is too large
-    if (mWidgetWidth < (szTitleText + 12) )
-        mWidgetWidth = szTitleText + 12;
-    if (mWidgetWidth < (szInPortText + 12 + 20) )
-        mWidgetWidth = szInPortText + 34;
-    if (mWidgetWidth < (szOutPortText + 12 + 20) )
-        mWidgetWidth = szOutPortText + 34;
-
-    // Update widget height if in or out port is outside widget
-    if ((szInPortHeight + 15)  > mWidgetHeight)
-        mWidgetHeight = szInPortHeight + 15;
-    if ((szOutPortHeight + 15) > mWidgetHeight)
-        mWidgetHeight = szOutPortHeight + 15;
-
-    if (doResize)
-    {
-        setGeometry(mWidgetX-2, mWidgetY-2, mWidgetWidth+2, mWidgetHeight+16);
-        mTitle.setGeometry(mSettingCorner, mWidgetHeight+3, mWidgetWidth, 12);
-    }
-}
-
-/**
- * @brief vleVpzModel::getSubmodelByName
- *        Get a pointer on a specific submodel, finded by his name
- *
- */
-vleVpzModel* vleVpzModel::getSubmodelByName(QString *name)
-{
-    vleVpzModel *model = 0;
-
-    QListIterator<vleVpzModel*> subItems(mSubmodels);
-    while( subItems.hasNext() )
-    {
-        vleVpzModel *modelItem = subItems.next();
-        if (modelItem->getName() == name)
-        {
-            model = modelItem;
-            break;
-        }
-    }
-    return model;
-}
-vleVpzPort * vleVpzModel::getInPortByName(QString *name)
-{
-    vleVpzPort *port = 0;
-
-    QListIterator<vleVpzPort*> portItems(mInPorts);
-    while( portItems.hasNext() )
-    {
-        vleVpzPort *item = portItems.next();
-        if (item->getName() == name)
-        {
-            port = item;
-            break;
-        }
-    }
-    return port;
-}
-vleVpzPort * vleVpzModel::getOutPortByName(QString *name)
-{
-    vleVpzPort *port = 0;
-
-    QListIterator<vleVpzPort*> portItems(mOutPorts);
-    while( portItems.hasNext() )
-    {
-        vleVpzPort *item = portItems.next();
-        if (item->getName() == name)
-        {
-            port = item;
-            break;
-        }
-    }
-    return port;
-}
-
-/**
- * @brief vleVpzModel::setName
- *        Change the name of the current model
- *
- */
-void vleVpzModel::setName(QString name)
-{
-    mName = name;
-    // Update the title Label
-    mTitle.setText(mName);
-    fixWidgetSize(true);
-    // Mark the model as altered
-    mIsAltered = true;
-}
-
-void vleVpzModel::setFullName(QString name)
-{
-    mFullName = name;
-}
-//vpzExpCond *vleVpzModel::getModelerExpCond()
-//{
-//    QList<QString> expNameCandidate;
-//    vlePackage * pkg = mVpz->getPackage();
-//    int nb = pkg->getModelerClassCount();
-//    for (int i = 0; i < nb; i++)
-//    {
-//        QString expName = pkg->getModelerClass(i);
-//        expName += mName;
-//        expNameCandidate.append(expName);
-//    }
-//
-//    for (int i = 0; i < mConditions.count(); i++)
-//    {
-//        vpzExpCond *cond = mConditions.at(i);
-//        if (expNameCandidate.contains( cond->getName() ) )
-//        {
-//            if (mModelerClass == 0)
-//            {
-//                // As candidate list is based on getModelerClass() ... list id are equals "n"
-//                int n = expNameCandidate.indexOf( cond->getName() );
-//                QString className = pkg->getModelerClass(n);
-//
-//                QString classFileName =  mVpz->getPackage()->getSrcFilePath(className + ".cpp");
-//                mModelerClass = mVpz->getPackage()->openSourceCpp(classFileName);
-//            }
-//
-//            return cond;
-//        }
-//    }
-//    return 0;
-//}
-//
-//bool vleVpzModel::hasModeler()
-//{
-//    if (getModelerExpCond() == 0)
-//        return false;
-//
-//    return true;
-//}
-
-/**
- * @brief vleVpzModel::select
- *        Mark the model as selected (this will change colors, style, ...)
- *
- */
-void vleVpzModel::select(bool setFocus)
-{
-    mIsSelected = true;
-    mTitle.setStyleSheet("color: rgb(255, 0, 0);");
-    update();
-    if (setFocus)
-    {
-        mIsFocus = true;
-        emit sigFocus(this);
-    }
-}
-
-/**
- * @brief vleVpzModel::deselect
- *        Clear the selected flag (see select() )
- *
- */
-void vleVpzModel::deselect()
-{
-    mIsFocus = false;
-    mIsSelected = false;
-    mTitle.setStyleSheet("color: rgb(0, 0, 255);");
-    update();
-}
-
-/**
- * @brief vleVpzModel::isSelected
- *        Read the select flag (true if currently selected)
- *
- */
-bool vleVpzModel::isSelected()
-{
-    return mIsSelected;
-}
-
-void vleVpzModel::deselectSub()
-{
-    QListIterator<vleVpzModel*> items(mSubmodels);
-    while( items.hasNext() )
-    {
-        vleVpzModel *sbm = items.next();
-        sbm->deselect();
-    }
-}
-
-/**
- * @brief vleVpzModel::dispNormal
- *        Set model display with his default size
- *
- */
-void vleVpzModel::dispNormal()
-{
-    // Hide all the sub-models (or other included widgets)
-    QObjectList childs = children();
-    for (int i = 0; i < childs.count(); i++)
-    {
-        QWidget *c = (QWidget *)childs.at(i);
-        c->hide();
-    }
-
-    // Resize widget to his default value
-    setMinimumSize(mWidgetWidth, mWidgetHeight);
-    setGeometry(mWidgetX-2, mWidgetY-2, mWidgetWidth+2, mWidgetHeight+16);
-
-    // Put the title at the bottom
-    mTitle.setGeometry(0, mWidgetHeight+3, mWidgetWidth, 12);
-
-    // Clear the maximized flag
-    mIsMaximized = false;
-}
-/**
- * @brief vleVpzModel::dispMaximize
- *        Set model display maximized (and show submodels into)
- *
- */
-
-
-void vleVpzModel::dispMaximize()
-{
-    int newHeight = mWidgetHeight;
-    int newWidth  = mWidgetWidth;
-
-    // Get the size and position of each submodel widgets
-    QListIterator<vleVpzModel*> subItems(mSubmodels);
-    while( subItems.hasNext() )
-    {
-        vleVpzModel *submodel = subItems.next();
-        // Update root model width to show submodel
-        int subMaxX = submodel->getX() + submodel->getWidth();
-        if (newWidth < (subMaxX + 10))
-            newWidth = subMaxX + 10;
-        // Update root model height to show submodel
-        int subMaxY = submodel->getY() + submodel->getHeight();
-        if (newHeight < (subMaxY + 30))
-            newHeight = subMaxY + 30;
-    }
-
-    // Refresh routing - First time, for internal wires
-    QListIterator<vleVpzConn*> connItems(mConnections);
-    while( connItems.hasNext() )
-    {
-        vleVpzConn *conn = connItems.next();
-        conn->route();
-    }
-
-    // Get the position of each routing wire
-    QListIterator<vleVpzConn*> conns(mConnections);
-    while( conns.hasNext() )
-    {
-        vleVpzConn *conn = conns.next();
-        if (newWidth < (conn->getMaxX() + 10))
-            newWidth = conn->getMaxX() + 10;
-    }
-    setGeometry(0, 0, newWidth, newHeight);
-    setMinimumSize(newWidth, newHeight);
-
-    // Refresh routing - second time, tu update in/out
-    connItems.toFront();
-    while( connItems.hasNext() )
-    {
-        vleVpzConn *conn = connItems.next();
-        conn->route();
-    }
-
-
-    mTitle.setGeometry(0, newHeight-12, newWidth, 12);
-    mIsMaximized = true;
-}
-
-/**
- * @brief vleVpzModel::isMaximized
- *        Return true is the model is currently maximized
- *
- */
-bool vleVpzModel::isMaximized()
-{
-    return mIsMaximized;
-}
-
-int vleVpzModel::getRealWidth()
-{
-    QRect curGeo = geometry();
-    return curGeo.width();
-}
-
-bool vleVpzModel::mouseMultipleSelect()
-{
-    bool result = false;
-    int startX, endX;
-    int startY, endY;
-    if (mSelectCurrent.x() > mSelectStart.x())
-    {
-        startX = mSelectStart.x();
-        endX   = mSelectCurrent.x();
-    } else {
-        startX = mSelectCurrent.x();
-        endX   = mSelectStart.x();
-    }
-    if (mSelectCurrent.y() > mSelectStart.y())
-    {
-        startY = mSelectStart.y();
-        endY   = mSelectCurrent.y();
-    } else {
-        startY = mSelectCurrent.y();
-        endY   = mSelectStart.y();
-    }
-    QListIterator<vleVpzModel*> items(mSubmodels);
-    while( items.hasNext() )
-    {
-        vleVpzModel *sbm = items.next();
-        if ((sbm->getX() > startX) &&
-            (sbm->getX() < endX)   &&
-            (sbm->getY() > startY) &&
-            (sbm->getY() < endY)   )
-        {
-            sbm->select();
-            result = true;
-        }
-    }
-
-    return result;
-}
-
-/**
- * @brief vleVpzModel::event (extends QWidget)
- *        Catch all events, used to implement custom tooltip
- *
- */
-bool vleVpzModel::event(QEvent *event)
-{
-    if (event->type() != QEvent::ToolTip)
-        QWidget::event(event);
-
-    if (event->type() == QEvent::MouseButtonPress)
-    {
-        event->accept();
-    }
-    else if (event->type() == QEvent::ToolTip)
-    {
-        if (! mIsMaximized)
-        {
-            if (! mTooltip)
-            {
-                mTooltip = new QWidget(this->window());
-                uiTooltip = new Ui::fileVpzTooltip();
-                uiTooltip->setupUi(mTooltip);
-                uiTooltip->labelModelName->setText(mName);
-            }
-            QPoint mousePos = window()->mapFromGlobal(QCursor::pos());
-            mTooltip->move(mousePos.x()+10,mousePos.y()+10);
-            mTooltip->show();
-        }
-    }
-    else if (event->type() == QEvent::Leave)
-    {
-        if (mTooltip)
-        {
-            mTooltip->hide();
-        }
-    }
-    return true;
-}
-void vleVpzModel::enterEvent(QEvent *event)
-{
-    (void)event;
-    // Do nothing
-}
-
-/**
- * @brief vleVpzModel::hideEvent (extends QWidget)
- *        Called when the widget is hidden
- *
- */
-void vleVpzModel::hideEvent(QHideEvent *event)
-{
-    QWidget::hideEvent(event);
-}
-
-/**
- * @brief vleVpzModel::showEvent (extends QWidget)
- *        Called when the widget is displayed
- *
- */
-void vleVpzModel::showEvent (QShowEvent * event)
-{
-    QWidget::showEvent(event);
-    mTitle.show();
-    //
-    QListIterator<vleVpzPort*> inItems(mInPorts);
-    while( inItems.hasNext() )
-    {
-        vleVpzPort *item = inItems.next();
-        item->show();
-    }
-    //
-    QListIterator<vleVpzPort*> outItems(mOutPorts);
-    while( outItems.hasNext() )
-    {
-        vleVpzPort *item = outItems.next();
-        item->show();
-    }
-}
-
-void vleVpzModel::keyPressEvent(QKeyEvent *event)
-{
-    if (event->modifiers() == Qt::ControlModifier)
-    {
-        if (event->key() == 67)
-        {
-            QClipboard *clipboard = QApplication::clipboard();
-
-            // Create the root document
-            QDomDocument doc("vle_project");
-            QDomElement root = doc.createElement("vle_project");
-            doc.appendChild(root);
-            // Insert base structure
-            QDomElement sbmE = doc.createElement("structures");
-
-            QListIterator<vleVpzModel*> items(mSubmodels);
-            while( items.hasNext() )
-            {
-                vleVpzModel *sbm = items.next();
-                if (sbm->isSelected())
-                    sbm->xgetXml(&doc, &sbmE);
-            }
-            root.appendChild(sbmE);
-
-            QString dat = doc.toString();
-            clipboard->setText(dat);
-        }
-    }
-}
-
-/**
- * @brief vleVpzModel::mousePressEvent (extends QWidget)
- *        Called at the begining of a mouse click inside the widget
- *
- */
-void vleVpzModel::mousePressEvent(QMouseEvent *evt)
-{
-    // Widget is movable only if not maximized
-    if (mIsMaximized)
-    {
-        // Start mouse selection
-        mSelect = true;
-        // Save
-        mSelectStart   = evt->pos();
-        mSelectCurrent = evt->pos();
-    }
-    else
-    {
-        // Save the current position
-        mOldPos = QPoint(evt->globalPos());
-        mStartPos = mOldPos;
-    }
-}
-
-/**
- * @brief vleVpzModel::mouseReleaseEvent (extends QWidget)
- *        Called when the mouse button is released
- *
- */
-void vleVpzModel::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (mIsMaximized)
-    {
-        emit sigFocus(0);
-        if (mSelect)
-        {
-            // Deselect all currently selected sub-models
-            deselectSub();
-            // Select submodels included into mouse region
-            mouseMultipleSelect();
-            // End of mouse selection
-            mSelect = false;
-
-            // Refresh display
-            repaint();
-        }
-    }
-    else
-    {
-        if (event->globalPos() == mStartPos)
-        {
-            // Clear previous selection (if any)
-            vleVpzModel *parent = (vleVpzModel *)parentWidget();
-            parent->deselectSub();
-            // Set the focus on the selected widget
-            select(true);
-        }
-    }
-}
-
-/**
- * @brief vleVpzModel::mouseMoveEvent (extends QWidget)
- *        Called when the mouse is moved
- *
- */
-void vleVpzModel::mouseMoveEvent(QMouseEvent *evt)
-{
-    // Widget is movable only if not maximized
-    if (mIsMaximized)
-    {
-        if (mSelect)
-        {
-            mSelectCurrent = evt->pos();
-            repaint();
-        }
-        return;
-    }
-
-    // Compute move length and direction
-    const QPoint delta = evt->globalPos() - mOldPos;
-
-    // Compute new X position
-    int newX = x() + delta.x();
-    if (newX < 5)
-        newX = 5;
-    mWidgetX = newX;
-    // Compute new Y position
-    int newY = y() + delta.y();
-    if (newY < 5)
-        newY = 5;
-    mWidgetY = newY;
-    // Move the widget
-    move(mWidgetX, mWidgetY);
-    // Save the new position as reference
-    mOldPos = evt->globalPos();
-
-    // Update parent size if needed
-    vleVpzModel *parent = (vleVpzModel *)parentWidget();
-    if (parent)
-        parent->dispMaximize();
-
-    // Update connections trace if needed
-    if (parent)
-    {
-        bool refresh = false;
-        QListIterator<vleVpzConn*> connItems(*parent->getConnections());
-        while( connItems.hasNext() )
-        {
-            vleVpzConn *conn = connItems.next();
-            if (conn->isLinkedWith(this))
-            {
-                conn->route();
-                refresh = true;
-            }
-        }
-        if (refresh)
-            parent->repaint();
-    }
-}
-
-/**
- * @brief vleVpzModel::mouseDoubleClickEvent (extends QWidget)
- *        Called when a mouse double-click is sent to the widget
- *
- */
-void vleVpzModel::mouseDoubleClickEvent(QMouseEvent * event)
-{
-    (void)event;
-
-    if ( ! mIsMaximized)
-    {
-        if (countSubmodels() > 0)
-            emit sigDblClick(this);
-    }
-}
-
-void vleVpzModel::portConnect(vleVpzPort *port)
-{
-    // Connections can be made only into the maximized model
-    if ( ! mIsMaximized)
-    {
-        vleVpzModel *p = (vleVpzModel *)parent();
-
-        // Forward the event to parent
-        p->portConnect(port);
-        return;
-    }
-
-    if (port->getModel() == this)
-    {
-        // Note: For Input or Output connection, variable
-        //       are inverted !
-
-        // If the port is an Input of model, use it as output
-        if (port->getType() == vleVpzPort::TypeInput)
-        {
-            if (mPortOutSel)
-                mPortOutSel->select(false);
-
-            if (mPortOutSel != port)
-            {
-                mPortOutSel = port;
-                mPortOutSel->select(true);
-            }
-            else
-                mPortOutSel = 0;
-        }
-
-        // If the port is an Output of model, use it as input
-        if (port->getType() == vleVpzPort::TypeOutput)
-        {
-            if (mPortInSel)
-                mPortInSel->select(false);
-
-            if (mPortInSel != port)
-            {
-                mPortInSel = port;
-                mPortInSel->select(true);
-            }
-            else
-                mPortInSel = 0;
-        }
-    }
-    // Else, the port is owned by a submodel
-    else
-    {
-        if (port->getType() == vleVpzPort::TypeInput)
-        {
-            if (mPortInSel)
-                mPortInSel->select(false);
-
-            if (mPortInSel != port)
-            {
-                mPortInSel = port;
-                mPortInSel->select(true);
-            }
-            else
-                mPortInSel = 0;
-        }
-        if (port->getType() == vleVpzPort::TypeOutput)
-        {
-            if (mPortOutSel)
-                mPortOutSel->select(false);
-
-            if (mPortOutSel != port)
-            {
-                mPortOutSel = port;
-                mPortOutSel->select(true);
-            }
-            else
-                mPortOutSel = 0;
-        }
-    }
-
-    // If one Input and one Output has been selected ... connect them
-    if (mPortInSel && mPortOutSel)
-    {
-        vleVpzConn *newConn = 0;
-
-        if ( (mPortInSel->getModel()  == this) &&
-             (mPortOutSel->getModel() == this) )
-        {
-            //
-        }
-        else
-        {
-            // Instanciate a new Connection object
-            newConn = new vleVpzConn(this);
-
-            if (mPortOutSel->getModel() == this)
-                newConn->setType(vleVpzConn::In);
-            else if (mPortInSel->getModel() == this)
-                newConn->setType(vleVpzConn::Out);
-            else
-                newConn->setType(vleVpzConn::Internal);
-
-            newConn->setSource     (mPortOutSel);
-            newConn->setDestination(mPortInSel);
-
-            if (newConn->isValid())
-            {
-                newConn->route();
-                mConnections.append(newConn);
-                // Refresh widget to show new connection
-                repaint();
-            }
-            else
-                delete newConn;
-        }
-
-        // De-select ports after connection established
-        mPortInSel->select(false);
-        mPortInSel = 0;
-        mPortOutSel->select(false);
-        mPortOutSel = 0;
-    }
-}
-
-/**
- * @brief vleVpzModel::portDisconnect
- *        Remove the connection(s) associated to a port
- *
- */
-void vleVpzModel::portDisconnect(vleVpzPort *port)
-{
-    // Connections can be removed only into the maximized model
-    if ( ! mIsMaximized)
-    {
-        vleVpzModel *p = (vleVpzModel *)parent();
-
-        // Forward the event to parent
-        p->portDisconnect(port);
-        return;
-    }
-
-    for (int i = 0; i < mConnections.length(); i++)
-    {
-        vleVpzConn *conn = mConnections.at(i);
-        if (port->isConnected(conn))
-        {
-            mConnections.removeAt(i);
-            delete conn;
-            i--;
-        }
-    }
-
-    // Refresh widget to remove connection lines
-    repaint();
-}
-
-void vleVpzModel::contextMenu(const QPoint & pos)
-{
-    // Forward call, no port selected
-    contextMenu(pos, 0);
-}
-
-void vleVpzModel::contextMenu(const QPoint & pos, vleVpzPort *port)
-{
-    // Get the global mouse position
-    QPoint globalPos = mapToGlobal(pos);
-
-    QAction *lastAction;
-
-    QMenu ctxMenu;
-
-    if (isMaximized())
-    {
-        lastAction = ctxMenu.addAction(tr("Connect"));    lastAction->setData(11);
-        if (port == 0)
-            lastAction->setEnabled(false);
-        lastAction = ctxMenu.addAction(tr("Disconnect")); lastAction->setData(12);
-        if ((port == 0) || (port->getConn() == 0))
-            lastAction->setEnabled(false);
-    }
-    else
-    {
-        //TODO don't understand
-//        if ( ! hasModeler())
-//        {
-//            QMenu *modelerMenu = ctxMenu.addMenu(tr("Add Modeler"));
-//
-//            int nb = mVpz->getPackage()->getModelerClassCount();
-//            for (int i = 0; i < nb; i++)
-//            {
-//                QString className = mVpz->getPackage()->getModelerClass(i);
-//                QString pluginName = mVpz->getPackage()->getModelerClassPlugin(className);
-//
-//                QString menuLabel;
-//                menuLabel = className + " (" + pluginName + ")";
-//
-//                lastAction = modelerMenu->addAction(menuLabel);
-//                lastAction->setData(40 + i);
-//            }
-//        }
-//        else
-//        {
-            lastAction = ctxMenu.addAction(tr("Open Modeler"));
-            lastAction->setData(4);
-//        }
-        ctxMenu.addSeparator();
-        lastAction = ctxMenu.addAction(tr("Add input port"));  lastAction->setData(1);
-        lastAction = ctxMenu.addAction(tr("Add output port")); lastAction->setData(2);
-        lastAction = ctxMenu.addAction(tr("Remove port"));     lastAction->setData(3);
-        if (port == 0)
-            lastAction->setEnabled(false);
-        ctxMenu.addSeparator();
-        lastAction = ctxMenu.addAction(tr("Connect"));    lastAction->setData(11);
-        if (port == 0)
-            lastAction->setEnabled(false);
-        lastAction = ctxMenu.addAction(tr("Disconnect")); lastAction->setData(12);
-        if ((port == 0) || (port->getConn() == 0))
-            lastAction->setEnabled(false);
-        lastAction = ctxMenu.addAction(tr("Rename"));     lastAction->setData(13);
-        if (port == 0)
-            lastAction->setEnabled(false);
-    }
-
-    QAction* selectedItem = ctxMenu.exec(globalPos);
-
-    if (selectedItem)
-    {
-        int actCode = selectedItem->data().toInt();
-        switch (actCode)
-        {
-            case 1:
-            case 2:
-            {
-                // Allocate a new port
-                vleVpzPort *newPort = new vleVpzPort();
-                // Configure new port
-                newPort->setParent(this);
-                newPort->setName(tr("New port"));
-                if (actCode == 1)
-                {
-                    newPort->setType(vleVpzPort::TypeInput);
-                    newPort->move(2, nextInPosY());
-                    // Insert new port to the model
-                    mInPorts.append(newPort);
-                }
-                if (actCode == 2)
-                {
-                    newPort->setType(vleVpzPort::TypeOutput);
-                    newPort->move(2, nextOutPosY());
-                    // Insert new port to the model
-                    mOutPorts.append(newPort);
-                }
-                // ... and display it :)
-                fixWidgetSize(true);
-                newPort->show();
-                repaint();
-                break;
-            }
-
-            // Menu "Remove port"
-            case 3:
-            {
-                portDisconnect(port);
-                vleVpzPort::portType pType = port->getType();
-                if ( (pType == vleVpzPort::TypeInput)  && (mInPorts.contains(port)) )
-                        mInPorts.removeOne(port);
-                if ( (pType == vleVpzPort::TypeOutput) && (mOutPorts.contains(port)) )
-                        mOutPorts.removeOne(port);
-                delete port;
-                repaint();
-                break;
-            }
-
-            // Menu "Modeler"
-            case 4:
-            {
-                emit sigOpenModeler();
-                break;
-            }
-
-            case 40 ... 50:
-            {
-                QString className = mVpz->getPackage()->getModelerClass(actCode - 40);
-                QString classFileName =  mVpz->getPackage()->getSrcFilePath(className + ".cpp");
-                mModelerClass = mVpz->getPackage()->openSourceCpp(classFileName);
-
-                emit sigAddModeler(className);
-                break;
-            }
-
-            case 11:
-                portConnect(port);
-                break;
-            case 12:
-                portDisconnect(port);
-                break;
-            case 13:
-                port->raise();
-                port->edit(true);
-                break;
-        }
-    }
-}
-
-sourceCpp *vleVpzModel::getModelerClass()
-{
-    return 0;
-    //Todo Don't understande the code below
-//    if (mModelerClass == 0)
-//        hasModeler();
-//
-//    return mModelerClass;
-}
-
-/**
- * @brief vleVpzModel::paintEvent (extends QWidget)
- *        Called when widget content must be refresh
- *
- */
-void vleVpzModel::paintEvent(QPaintEvent *event)
-{
-    QWidget::paintEvent(event);
-
-#ifndef USE_GRAPHICVIEW
-    QStyleOption opt;
-    opt.init(this);
-    QPainter p(this);
-    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
-#endif
-
-    QRect curSize = geometry();
-    int curWidth  = curSize.width();
-    int curHeight = curSize.height();
-
-    QColor drawColor;
-    if (mIsFocus || mIsSelected)
-        drawColor = QColor(255, 0, 0);
-    else if (mSubmodels.length())
-        drawColor = QColor(0, 0, 255);
-    else
-        drawColor = QColor(0, 255, 0);
-
-    // Instantiate a pen, used to draw lines
-    QPen myPen(drawColor, mSettingLine, Qt::SolidLine);
-    // Instantiate a brush
-    QBrush myBrush(Qt::white);
-
-    QPainter pRect(this);
-    pRect.setPen(myPen);
-    pRect.setBrush(myBrush);
-    if (mSettingCorner)
-        pRect.drawRoundedRect(1,1, curWidth-2, curHeight-16, mSettingCorner,mSettingCorner);
-    else
-        pRect.drawRect(1,1, curWidth-2, curHeight-16);
-    pRect.end();
-
-#ifndef USE_GRAPHICVIEW
-    if (mConnections.length() && mIsMaximized)
-    {
-        QPen myPen(QColor(127,127,127), mSettingLine, Qt::SolidLine);
-        QPen hlPen(QColor(0,  127,  0), mSettingLine, Qt::SolidLine);
-        QPainter pLines(this);
-        pLines.setPen(myPen);
-        pLines.setBrush(myBrush);
-        QListIterator<vleVpzConn*> connItems(mConnections);
-        while( connItems.hasNext() )
-        {
-            vleVpzConn *conn = connItems.next();
-            if (conn->isHighlighted())
-            {
-                pLines.setPen(hlPen);
-                pLines.drawPolyline(conn->mLines);
-            }
-            else
-            {
-                pLines.setPen(myPen);
-                pLines.drawPolyline(conn->mLines);
-            }
-        }
-        pLines.end();
-    }
-#endif
-
-    QListIterator<vleVpzPort*> outItems(mOutPorts);
-    while( outItems.hasNext() )
-    {
-        vleVpzPort *item = outItems.next();
-        int posX = width() - item->width() - 2;
-        if (posX != item->x())
-            item->move(posX, item->getPosY());
-    }
-
-#ifndef USE_GRAPHICVIEW
-    // In case of a mouse selection, draw the rect of current region
-    if (mSelect)
-    {
-        QPainter pRect(this);
-
-        QPen selPen = QPen(QColor(drawColor));
-        selPen.setWidth(2);
-        pRect.setPen(selPen);
-
-        pRect.setBrush(QBrush(QColor(200, 255, 220), Qt::SolidPattern));
-
-        int selWidth  = mSelectCurrent.x() - mSelectStart.x();
-        int selHeight = mSelectCurrent.y() - mSelectStart.y();
-        pRect.drawRect(mSelectStart.x(),mSelectStart.y(), selWidth, selHeight);
-
-        pRect.end();
-    }
-#endif
-}

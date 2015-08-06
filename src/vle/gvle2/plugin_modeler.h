@@ -51,7 +51,7 @@ public:
     virtual QWidget *openEditClass(sourceCpp *src) = 0;
     virtual QWidget *getEditClass(sourceCpp *src);
     virtual void     closeEditClass(sourceCpp *src);
-    virtual QWidget *addEditModel(vleVpzModel *model) = 0;
+//    virtual QWidget *addEditModel(vleVpzModel *model) = 0;//TODO update modeling plugin
     virtual void     initExpCond(const QString& condName, sourceCpp *src) = 0;
     virtual void     rename(QString oldName, QString newName) = 0;
     virtual void  setSettings(QSettings *s) = 0;

@@ -103,13 +103,10 @@ public:
     QString getPortName();
     QGraphicsTextItem* getTextItem() const;
     QGraphicsPixmapItem* getPixItem() const;
-    void setPortNameEdition(bool val);
+    void setNameEdition(bool val);
     int type() const;
     void hoverEnterEvent(QGraphicsSceneHoverEvent * evt);
 
-
-public slots:
-    void onContentsChanged();
 public:
     vleVpz* mVpz;
     QDomNode mnode;
@@ -135,7 +132,7 @@ public:
     double widthInputPorts();
     double widthOutputPorts();
     double heightPort();
-    void setPortNameEdition(bool val);
+    void setNameEdition(bool val);
 
     vleVpz* mVpz;
     QDomNode mnode;
@@ -195,8 +192,8 @@ public:
 
     QRectF subModelsBoundingRect(bool onlySelected);
     VpzSubModelItem* getSubModel(const QString& subMod);
-    QList<VpzSubModelItem *> getSubModels();
-    QList<VpzSubModelItem *> getSelectedSubModels();
+    QList<VpzSubModelItem*> getSubModels();
+    QList<VpzSubModelItem*> getSelectedSubModels();
     QList<VpzConnectionLineItem *> getConnLines();
     void removeNameEditionMode();
     bool isAtomic();
@@ -208,7 +205,10 @@ class VpzDiagScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    VpzDiagScene(vleVpz* vpz, QDomNode selModelNode);
+    VpzDiagScene();
+    void init(vleVpz* vpz, const QString& className = "");
+    void setFocus(QDomNode selModelNode);
+    void clear();
     void update(const QRectF & rect = QRectF());
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
     void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
@@ -220,8 +220,8 @@ public:
     void dropEvent(QGraphicsSceneDragDropEvent * event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent);
 
-    VpzPortItem* getPort(const QString& portName, const QString& subMod);
-    void unselectAllSubModels();
+
+
     QBrush getBrushAtomicModel();
     QBrush getBrushCoupledModel();
     QPen getPenNotSelectedModel();
@@ -233,12 +233,23 @@ public:
     QColor getColorModelNameSelected();
     QColor getColorModelNameNotSelected();
 
+    QString getClassOfOriginModel();
+    QString getFullPathOfTheSelectedModel();
+    VpzPortItem* getPort(const QString& portName, const QString& subMod);
+    QStringList getSelectedModels();
+    void unselectAllSubModels();
+    void selectSubModel(const QString& nameSub);
+
+
     static bool isVpzPort(QGraphicsItem* item);
     static bool isVpzInputPort(QGraphicsItem* item);
     static bool isVpzOutputPort(QGraphicsItem* item);
     static bool isVpzSubModel(QGraphicsItem* item);
     static bool isVpzMainModel(QGraphicsItem* item);
     static bool isVpzConnectionLine(QGraphicsItem* item);
+signals:
+    void enterCoupledModel(QDomNode node);
+    void initializationDone(VpzDiagScene* scene);
 
 public slots:
     void onDragDestroyed(QObject *obj =0);
@@ -254,9 +265,7 @@ public:
     SEL_TYPE               mModelSelType;
     bool                   mIsEnteringCoupled;
     QList<QDomNode>        mModelsCopies;
-
-    QPointF m_rubberbandP1;
-
+    QDomNode               mOrigModel;
 };
 
 }}//namespaces

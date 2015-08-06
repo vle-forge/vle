@@ -141,7 +141,7 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
             foreach(QTreeWidgetItem *item, ui->obsTree->selectedItems()) {
                 if (itemType(item) == FileVpzObservables::EObsPort) {
                     QTreeWidgetItem *obs = item->parent();
-                    mVpz->rmObsPortToDoc(itemName(item), item->text(0));
+                    mVpz->rmObsPortToDoc(itemName(item->parent()), item->text(0));
                     obs->removeChild(item);
                     delete item;
                 }
@@ -279,15 +279,12 @@ void FileVpzObservables::reloadPorts(const QString& obsName,
     QDomNodeList portList = mVpz->obsPortsListFromDoc(obsName);
     for (unsigned int j = 0; j < portList.length(); j++) {
         QDomNode port = portList.at(j);
-
         QTreeWidgetItem *newPortItem = newItem(FileVpzObservables::EObsPort,
                                                mVpz->attributeValue(port, "name"));
-
         obsItem->addChild(newPortItem);
-        QDomNodeList OutList = port.childNodes();
-        for (unsigned int k = 0; k < OutList.length(); k++) {
-            QDomNode attachedView = OutList.at(k);
-
+        std::vector<QDomNode> OutList = mVpz->childNodesWithoutText(port,"attachedview");
+        for (unsigned int k = 0; k < OutList.size(); k++) {
+            QDomNode& attachedView = OutList[k];
             QTreeWidgetItem *newValueItem = newItem(FileVpzObservables::EObsOut,
                                                     mVpz->attributeValue(attachedView, "name"));
 

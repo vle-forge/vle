@@ -43,6 +43,8 @@
 #include "filevpzobservables.h"
 #include "filevpzproject.h"
 #include "filevpzclasses.h"
+#include "filevpzrtool.h"
+#include "vpzDiagScene.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif
@@ -73,26 +75,26 @@ public:
     void usedBySim(bool isUsed);
     void save();
     QWidget *getTool();
-    void treeInsertModel(vleVpzModel *model, QTreeWidgetItem *base);
-    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
-    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
+//    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
+//    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
 
 public slots:
-    void onTreeModelSelected();
-    void onViewTreeMenu(const QPoint pos);
-    void onFocusChanged(vleVpzModel *model);
-    void onModelDblClick(vleVpzModel *model);
-    void onPropertyChanged(QTableWidgetItem *item);
-    void onPropertySelected(int cr, int cc, int pr, int pc);
-    void onPropertyMode(bool isSelected);
     void onTabClose(int index);
-    void onAddModelerTab(vleVpzModel *model);
-    void onExpCondChanged(const QString& condName);
+    void onCurrentChanged(int index);
+//    void onViewTreeMenu(const QPoint pos);
+//    void onFocusChanged(vleVpzModel *model);
+//    void onModelDblClick(vleVpzModel *model);
+//    void onPropertyChanged(QTableWidgetItem *item);
+//    void onPropertySelected(int cr, int cc, int pr, int pc);
+//    void onPropertyMode(bool isSelected);
+
+//    void onAddModelerTab(vleVpzModel *model);
+//    void onExpCondChanged(const QString& condName);
 
 private:
     bool             mUseSim;
     Ui::fileVpzView *ui;
-    Ui::fileVpzRtool*uiTool;
+    vle::gvle2::FileVpzRtool*    mRtool;
     FileVpzDynamics *mDynamicsTab;
     FileVpzExpCond  *mExpCondTab;
     FileVpzExpView  *mExpViewTab;
@@ -100,15 +102,15 @@ private:
     FileVpzProject  *mProjectTab;
     vle::gvle2::FileVpzClasses  *mClassesTab;
     vleVpz          *mVpz;
-    QWidget         *mWidgetTool;
+    //QWidget         *mWidgetTool;
     QList<QTreeWidgetItem *> mViewsItems;
-    vleVpzModel     *mCurrentModel;
+//    vleVpzModel     *mCurrentModel;
 
 private:
     QUndoStack      *mUndoStack;
     QUndoView       *undoView;
 
-    QGraphicsScene   mScene;
+    vle::gvle2::VpzDiagScene       mScene;
 };
 
 #endif // FILEVPZVIEW_H

@@ -91,10 +91,11 @@ public slots:
 //    void onAddModelerTab(vleVpzModel *model);
 //    void onExpCondChanged(const QString& condName);
 
+public:
+    VpzDiagScene        mScene;
 private:
     Ui::FileVpzClasses* ui;
     vleVpz*             mVpz;
-    VpzDiagScene*       mScene;
     QString             mSelClass;
 
 //    bool             mUseSim;

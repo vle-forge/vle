@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VLEVPZ_H
-#define VLEVPZ_H
+#ifndef GVLE2_VLEVPZ_H
+#define GVLE2_VLEVPZ_H
 
 #include <QLabel>
 #include <QMouseEvent>
@@ -39,12 +39,9 @@
 #include <QXmlDefaultHandler>
 #include <QDateTimeEdit>
 #include "vlepackage.h"
-#include "vlevpzconn.h"
-#include "vlevpzport.h"
 #include <vle/value/Value.hpp>
 #include "vle/gvle2/ui_filevpztooltip.h"
 
-#undef USE_GRAPHICVIEW
 
 class vleVpzModel;
 class vlePackage;
@@ -68,22 +65,22 @@ public:
     /**
      * @brief get <classes> tag from Vpz doc
      */
-    QDomNode classesFromDoc() const;
+    QDomNode classesFromDoc();
     /**
      * @brief get <class> tag from Vpz doc
      * @param className, attribute 'name' of <class>
      */
-    QDomNode classFromDoc(const QString& className) const;
+    QDomNode classFromDoc(const QString& className);
     /**
      * @brief get first <model> tag into a <class> tag
      * @param className, attribute 'name' of <class>
      */
-    QDomNode classModelFromDoc(const QString& className) const;
+    QDomNode classModelFromDoc(const QString& className);
     /**
      * @brief tells if a class exists
      * @param className: name of the class
      */
-    bool existClassFromDoc(const QString& className) const;
+    bool existClassFromDoc(const QString& className);
     /**
      * @brief add a class to a doc
      * @param atomic: if true add a class with an atomic model
@@ -108,6 +105,10 @@ public:
      */
     void removeClassToDoc(const QString& className);
     /**
+     * @brief get <vle_project> tag from Vpz doc
+     */
+    QDomNode vleProjectFromDoc() const;
+    /**
      * @brief get <experiment> tag from Vpz doc
      */
     QDomNode experimentFromDoc() const;
@@ -123,6 +124,10 @@ public:
      * @brief get <conditions> tag from Vpz doc
      */
     QDomNode condsFromDoc() const;
+    /**
+     * @brief get node with tag <structures> tag from Vpz doc,
+     */
+    QDomNode structuresFromDoc() const;
     /**
      * @brief get node with tag <dynamics> tag from Vpz doc,
      */
@@ -147,14 +152,19 @@ public:
     QDomNode portFromDoc(const QString& condName, const QString& portName) const;
     /**
      * @brief get atomic model tag <model> from a tag <model>,
-     * which full name is modelFullName
+     * @param modelFullPath as the format given in getFullPathModel function
      */
-    QDomNode modelFromDoc(const QString& modelFullPath) const;
+    QDomNode modelFromDoc(const QString& modelFullPath);
+    /**
+     * @brief get the root model
+     */
+    QDomNode modelFromDoc();
+
     /**
      * @brief get <connections> node from Vpz Doc into a <model>
      * which modelFullPath, the full path to the model
      */
-    QDomNode modelConnectionsFromDoc(const QString& modelFullPath) const;
+    QDomNode modelConnectionsFromDoc(const QString& modelFullPath);
     /**
      * @brief get <connection> node from Vpz Doc into a <connections>
      * @param sourceFullPath, the full path to the source model
@@ -164,12 +174,19 @@ public:
      */
     QDomNode modelConnectionFromDoc(const QString& sourceFullPath,
             const QString& destinationFullPath, const QString& sourcePort,
-            const QString& destinationPort) const;
+            const QString& destinationPort);
 
 
     /******************************************************
      * Access to specific nodes in the vpz from internal nodes
      ******************************************************/
+    /**
+     * @brief get full name of the model
+     * @param node: with xpath //model
+     * @return "/mymod1.myMod2..." if main model
+     * or "myclass/mymod1.myMod2..." if node is a model from a class
+     */
+    QString getFullPathModel(QDomNode node) const;
     /**
      * @brief get <observables> tag from <views> tag
      */
@@ -194,10 +211,10 @@ public:
      */
     QDomNode connectionsFromModel(const QDomNode& node) const;
     /**
-     * @brief get <submodels> tag  from a tag <model>,
+     * @brief get <model> tag from a tag <model> into <submodels>,
      * @param node: QDomNode <model> with xpath = //model
      */
-    QDomNode submodelsFromModel(const QDomNode& node) const;
+    std::vector<QDomNode> submodelsFromModel(const QDomNode& node);
 
     /*******************************************************
      * Utils Functions QDom
@@ -655,7 +672,7 @@ public:
      * @brief get the string list of condition "," separated
      * @param atomFullName, atomic model name
      */
-    QString modelCondsFromDoc(const QString& atomFullName) const;
+    QString modelCondsFromDoc(const QString& atomFullName);
 
     /**
      * @brief Tells if a condition is attached to an atomic model
@@ -664,20 +681,20 @@ public:
      * @return true if condName is attached to atomFullName
      */
     bool isAttachedCond(const QString& atomFullName,
-            const QString& condName) const;
+            const QString& condName);
 
     /**
      * @brief get the dynamics of an atomic model
      * @param atomFullName, atomic model name
      */
-    QString modelDynFromDoc(const QString& atomFullName) const;
+    QString modelDynFromDoc(const QString& atomFullName);
 
     /**
      * @brief get the observable
      * @param atomFullName, atomic model name
      *
      */
-    QString modelObsFromDoc(const QString& atomFullName) const;
+    QString modelObsFromDoc(const QString& atomFullName);
 
     /**
      * @brief sets a dynamic to an an atomic model
@@ -831,7 +848,7 @@ public:
      * @brief fill a vector of strings with classes names
      * @param the vector to fill
      */
-    void fillWithClassesFromDoc(std::vector<std::string>& toFill) const;
+    void fillWithClassesFromDoc(std::vector<std::string>& toFill);
 
     /**
      * @brief Fill a Node from a value
@@ -927,22 +944,11 @@ public:
     void           save();
     void           removeDynamic(const QString& dynamic);
 
-    public slots:
-    void focusChange(vleVpzModel *model);
-    void enterModel(vleVpzModel *model);
-    void addModeler(QString name);
-    void addModelerDynamic(vleVpzModel *model, QString lib);
-    void openModeler();
-
 signals:
-    void sigFocus(vleVpzModel *model);
-    void sigEnterModel(vleVpzModel *model);
-    void sigConditionsChanged();
-    void sigDynamicsChanged();
-    void sigOpenModeler(vleVpzModel *model);
     void sigChanged(QString filename);
     void observablesUpdated();
     void conditionsUpdated();
+    void modelsUpdated();
 
     protected:
     bool startElement(const QString &namespaceURI,
@@ -954,13 +960,7 @@ public:
 
 private:
     void xReadDom();
-    void xReadDomStructures(const QDomNode &baseNode);
-    void xReadDomExperiments(const QDomNode &baseNode);
     void xSaveDom(QDomDocument *doc);
-    bool xSaveStructures(QDomDocument *doc, QDomNode *baseNode);
-    bool xSaveModel(QDomDocument *doc, QDomElement *baseNode, vleVpzModel *model);
-    bool xSaveExperiments(QDomDocument *doc, QDomElement *baseNode);
-    int  removeModelDynamic(vleVpzModel *model, const QString& dynamic, bool recurse = false);
 
 private:
     QString mFilename;
@@ -969,154 +969,7 @@ private:
     QFile mFile;
     QDomDocument mDoc;
 
-    QString mExpCombination;
     vlePackage *mPackage;
-    int                     mConditionIteratorIndex;
-    QList <void*>           mViews;
-    QDomNode*              mClassesRaw;
-    public:
-    vleVpzModel*           mRootModel;
 };
 
-class vleVpzModel : public QWidget
-{
-    Q_OBJECT
-public:
-    vleVpzModel(vleVpz *parent = 0);
-    ~vleVpzModel();
-    QString getName() const;
-    QString getFullName() const;
-    vleVpz *getVpz();
-    void setName(QString name);
-    void setFullName(QString name);
-    void copyFromModel(vleVpzModel *model);
-    void addSubmodel(vleVpzModel *model);
-    void delSubmodel(vleVpzModel *model);
-    int  countSubmodels();
-    vleVpzModel *getSubmodelAt(int i)
-    {
-        return mSubmodels.at(i);
-    }
-    QList <vleVpzModel *> *getSubmodels()
-            {
-        return &mSubmodels;
-            }
-    QList <vleVpzPort  *> *getInPorts()
-            {
-        return &mInPorts;
-            }
-    QList <vleVpzPort  *> *getOutPorts()
-            {
-        return &mOutPorts;
-            }
-    QList <vleVpzConn  *> *getConnections()
-            {
-        return &mConnections;
-            }
-
-//    void addCondition(const QString& cond);
-//    void removeCondition(const QString& cond);
-//    bool hasCondition(const QString& condName);
-
-    void setObservable(QString obsName);
-
-    //Todo a modeler does not have cond
-//    bool hasModeler();
-//    vpzExpCond *getModelerExpCond();
-
-    bool isAltered();
-    void fixWidgetSize(bool doResize = false);
-    int getWidth()  { return mWidgetWidth; }
-    int getHeight() { return mWidgetHeight; }
-    int getRealWidth();
-    int getX()      { return mWidgetX; }
-    int getY()      { return mWidgetY; }
-    int nextInPosY() { mWidInPortY += 16;  return mWidInPortY;  }
-    int nextOutPosY(){ mWidOutPortY += 16; return mWidOutPortY; }
-    void dispNormal();
-    void dispMaximize();
-    bool isMaximized();
-    void select(bool setFocus = 0);
-    void deselect();
-    bool isSelected();
-    void deselectSub();
-    bool mouseMultipleSelect();
-    vleVpzModel* getSubmodelByName(QString *name);
-    vleVpzPort * getInPortByName(QString *name);
-    vleVpzPort * getOutPortByName(QString *name);
-protected:
-    bool event(QEvent *event);
-    void enterEvent(QEvent *event);
-    void paintEvent(QPaintEvent *event);
-    void hideEvent (QHideEvent * event);
-    void showEvent (QShowEvent * event);
-    void keyPressEvent(QKeyEvent *event);
-    void mousePressEvent(QMouseEvent *evt);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *evt);
-    void mouseDoubleClickEvent(QMouseEvent * event);
-
-    signals:
-    void sigFocus(vleVpzModel *model);
-    void sigDblClick(vleVpzModel *model);
-    void sigAddModeler(QString name);
-    void sigOpenModeler();
-
-    public slots:
-    void contextMenu(const QPoint & pos);
-    void contextMenu(const QPoint & pos, vleVpzPort *port);
-    void portConnect(vleVpzPort *port);
-    void portDisconnect(vleVpzPort *port);
-
-    public:
-    void xLoadNode(const QDomNode &baseNode, const vleVpzModel *parent=0);
-    private:
-    void xreadSubmodels(const QDomNode &baseNode);
-    void xReadInputs(const QDomNode &baseNode);
-    void xReadOutputs(const QDomNode &baseNode);
-    void xReadConnections(const QDomNode &baseNode);
-    bool xgetXml(QDomDocument *doc, QDomElement *base);
-    private:
-    QString mName;
-    QString mFullName;
-    vleVpz *mVpz;
-    bool    mIsAltered;
-    int     mWidgetHeight;
-    int     mWidgetWidth;
-    int     mWidgetX;
-    int     mWidgetY;
-    int     mWidInPortY;
-    int     mWidOutPortY;
-    QList <vleVpzModel *> mSubmodels;
-    QList <vleVpzPort  *> mInPorts;
-    QList <vleVpzPort  *> mOutPorts;
-    QList <vleVpzConn  *> mConnections;
-    QLabel  mTitle;
-    bool    mIsMaximized;
-    QPoint  mOldPos, mStartPos;
-    bool    mIsFocus;
-    QWidget *mTooltip;
-    Ui::fileVpzTooltip *uiTooltip;
-    bool    mIsSelected;
-    // Used for mouse selection into maximized model
-    bool    mSelect;
-    QPoint  mSelectStart;
-    QPoint  mSelectCurrent;
-    // Used for port selection/connection
-    vleVpzPort *mPortInSel;
-    vleVpzPort *mPortOutSel;
-    private:
-    QFont   mPainterFont;
-    private:
-    int     mSettingLine;
-    int     mSettingCorner;
-    int     mSettingFontSize;
-
-    public:
-    sourceCpp *getModelerClass();
-
-    private:
-    sourceCpp *mModelerClass;
-};
-
-#endif // VLEVPZ_H
+#endif
