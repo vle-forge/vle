@@ -1132,6 +1132,7 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
 #ifdef QTVPZ
     vleVpz *selVpz;
     selVpz = new vleVpz(fileName);
+    selVpz->setLogger(mLogger);
     selVpz->setBasePath(mPackage->getName());
     selVpz->setPackage(mPackage);
 #else

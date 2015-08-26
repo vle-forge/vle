@@ -536,6 +536,11 @@ public:
      * @brief build an empty node corresponding to the value type from Vpz doc
      */
     QDomElement buildEmptyValueFromDoc(vle::value::Value::type vleType);
+
+    /**
+    * @brief tells if a view exists
+    */
+    bool existViewFromDoc(const QString& viewName) const;
      /**
      * @brief tells if a condition exists
      */
@@ -545,7 +550,11 @@ public:
      * @brief tells if the port portName exists in condition condName
      */
     bool existPortFromDoc(const QString& condName,
-			  const QString& portName) const;
+            const QString& portName) const;
+    /**
+     * @brief set the 'name' attribute of tag <view> to a new value
+     */
+    void renameViewToDoc(const QString& oldName, const QString& newName);
     /**
      * @brief set the 'name' attribute of tag <condition> to a new value
      */
@@ -557,6 +566,11 @@ public:
             const QString& newName);
 
     /**
+     * @brief get a new view name not already in tag <views>
+     * from the Vpz doc
+     */
+    QString newViewNameToDoc() const;
+    /**
      * @brief get a new condition name not already in tag <conditions>
      * from the Vpz doc
      */
@@ -566,7 +580,16 @@ public:
      * <condition> from the Vpz doc
      */
     QString newCondPortNameToDoc(const QString& condName) const;
-
+    /**
+     * @brief add a <view> tag to a Vpz Doc
+     * whith attribute 'name'  viewName
+     */
+    QDomNode addViewToDoc(const QString& viewName);
+    /**
+     * @brief rm a <view> tag to a Vpz Doc
+     * whith attribute 'name'  viewName
+     */
+    void rmViewToDoc(const QString& viewName);
     /**
      * @brief add a <condition> tag to a Vpz Doc
      * whith attribute 'name'  condName
@@ -661,7 +684,12 @@ public:
      * which attribute 'name' is portName
      */
     void rmPortFromCond(QDomNode node, const QString& portName);
-
+    /**
+     * @brief add a <view> tag to <views>
+     * whith attribute 'name'  viewName
+     * NOTE: add also an output and configure it with vle.output/file.
+     */
+    QDomNode addView(QDomNode node, const QString& viewName);
     /**
      * @brief add a <condition> tag to <conditions>
      * whith attribute 'name'  condName
@@ -947,6 +975,7 @@ public:
 signals:
     void sigChanged(QString filename);
     void observablesUpdated();
+    void viewsUpdated();
     void conditionsUpdated();
     void modelsUpdated();
 
@@ -957,6 +986,14 @@ signals:
             const QXmlAttributes &attributes);
 public:
     QByteArray xGetXml();
+    void setLogger(Logger *logger)
+    {
+        mLogger = logger;
+    }
+    Logger* logger()
+    {
+        return mLogger;
+    }
 
 private:
     void xReadDom();
@@ -970,6 +1007,7 @@ private:
     QDomDocument mDoc;
 
     vlePackage *mPackage;
+    Logger           * mLogger;
 };
 
 #endif

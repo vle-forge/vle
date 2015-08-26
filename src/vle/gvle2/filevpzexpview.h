@@ -35,6 +35,15 @@ namespace Ui {
 class FileVpzExpView;
 }
 
+namespace vle {
+namespace gvle2 {
+
+enum FILE_VPZ_EXP_VIEW_MENU {
+    FVEVM_add_view,
+    FVEVM_remove_view,
+    FVEVM_rename_view
+};
+
 class FileVpzExpView : public QWidget
 {
     Q_OBJECT
@@ -53,6 +62,8 @@ public slots:
     void onOutputSelected(const QString& item);
     void onViewTypeSelected(const QString& item);
     void onTimeStepChanged(double v);
+    void onViewListMenu(const QPoint&);
+    void onItemChanged(QListWidgetItem* );
 
 private:
     void reloadViews();
@@ -62,12 +73,14 @@ private:
     QString getSelectedOutputPlugin();
     void updatePlugin(const QString& plug);
 
+
     Ui::FileVpzExpView *ui;
     vleVpz             *mVpz;
     PluginOutput       *mPlugin;
     QString currView;
     QString currOutput;
+    QString oldViewName;
 
 };
-
+}}//namespaces
 #endif // FILEVPZEXPVIEW_H

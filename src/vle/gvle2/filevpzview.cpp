@@ -83,7 +83,7 @@ fileVpzView::fileVpzView(QWidget *parent) :
     mProjectTab->setTab(ui->tabWidget);
 
     // Configure View tab
-    mExpViewTab = new FileVpzExpView();
+    mExpViewTab = new vle::gvle2::FileVpzExpView();
     int viewTabId = ui->tabWidget->addTab(mExpViewTab, tr("Views"));
 
     // Configure View tab

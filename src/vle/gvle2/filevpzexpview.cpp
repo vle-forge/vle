@@ -74,6 +74,9 @@ static std::string TMPgetLibraryName(const boost::filesystem::path& file)
     return library;
 }
 
+namespace vle {
+namespace gvle2 {
+
 FileVpzExpView::FileVpzExpView(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzExpView),mVpz(0), mPlugin(0),
     currView(""), currOutput("")
@@ -85,6 +88,11 @@ FileVpzExpView::FileVpzExpView(QWidget *parent) :
     ui->viewTypes->setEnabled(false);
     ui->listVleOOV->setEditable(false);
     ui->listVleOOV->setEnabled(false);
+
+    ui->vleViewList->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(ui->vleViewList,
+            SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(onViewListMenu(const QPoint&)));
 }
 
 FileVpzExpView::~FileVpzExpView()
@@ -98,12 +106,15 @@ void FileVpzExpView::setVpz(vleVpz *vpz)
     reload();
     QObject::connect(ui->vleViewList, SIGNAL(itemPressed (QListWidgetItem *)),
                      this, SLOT(onViewSelected(QListWidgetItem *)));
+    QObject::connect(ui->vleViewList, SIGNAL(itemChanged(QListWidgetItem *)),
+                         this, SLOT(onItemChanged(QListWidgetItem *)));
     QObject::connect(ui->listVleOOV, SIGNAL(currentIndexChanged(const QString&)),
                      this, SLOT(onOutputSelected(const QString&)));
     QObject::connect(ui->viewTypes, SIGNAL(currentIndexChanged(const QString&)),
                      this, SLOT(onViewTypeSelected(const QString&)));
     QObject::connect(ui->timeStep, SIGNAL(valueChanged (double)),
                          this, SLOT(onTimeStepChanged(double)));
+
 
 }
 
@@ -155,7 +166,9 @@ void FileVpzExpView::reloadViews()
     std::vector<std::string>::iterator ite = outputNames.end();
     for ( ; itb != ite; itb++)
     {
-        ui->vleViewList->addItem(QString(itb->c_str()));
+        QListWidgetItem* item = new QListWidgetItem(QString(itb->c_str()));
+        item->setFlags (item->flags () | Qt::ItemIsEditable);
+        ui->vleViewList->addItem(item);
     }
 }
 
@@ -196,10 +209,8 @@ void FileVpzExpView::updatePlugin(const QString& plug)
 
             if (plugin == 0)
             {
-                QString msg = QString("Output plugin cannot be loaded %1").arg(pluginName);
-                QMessageBox msgBox;
-                msgBox.setText(msg);
-                msgBox.exec();
+                mVpz->logger()->log(QString("Output plugin cannot be loaded %1")
+                        .arg(pluginName));
                 return;
             }
             mPlugin = plugin;
@@ -309,3 +320,68 @@ FileVpzExpView::onTimeStepChanged(double v)
         mVpz->setTimeStepFromView(viewNode, v);
     }
 }
+
+void
+FileVpzExpView::onViewListMenu(const QPoint& pos)
+{
+    QPoint globalPos = ui->vleViewList->mapToGlobal(pos);
+    //QModelIndex index = ui->vleViewList->indexAt(pos);
+    QListWidgetItem* item = ui->vleViewList->itemAt(pos);
+
+    QAction* action;
+    QMenu myMenu;
+    action = myMenu.addAction("Add view");
+    action->setData(FVEVM_add_view);
+    action->setEnabled(true);
+    action = myMenu.addAction("Remove view");
+    action->setData(FVEVM_remove_view);
+    action->setEnabled(item);
+    action = myMenu.addAction("Rename view");
+    action->setData(FVEVM_rename_view);
+    action->setEnabled(item);
+
+
+    QAction* selectedItem = myMenu.exec(globalPos);
+    if (selectedItem) {
+        int actCode = selectedItem->data().toInt();
+        if (actCode == FVEVM_add_view) {
+            QString viewName =mVpz->newViewNameToDoc();
+            mVpz->addViewToDoc(viewName);
+            QListWidgetItem* item = new QListWidgetItem(viewName);
+            item->setFlags (item->flags () | Qt::ItemIsEditable);
+            ui->vleViewList->addItem(item);
+        }
+        if (actCode == FVEVM_remove_view) {
+            if (item) {
+                mVpz->rmViewToDoc(item->text());
+                delete item;
+            }
+        }
+        if (actCode == FVEVM_rename_view) {
+            if (item) {
+                oldViewName = item->text();
+                ui->vleViewList->editItem(item);
+            }
+        }
+
+    }
+}
+
+void
+FileVpzExpView::onItemChanged(QListWidgetItem * item)
+{
+    if (not oldViewName.isEmpty())  {
+        QString newName = item->text();
+        if (mVpz->existViewFromDoc(newName)) {
+            bool save = ui->vleViewList->blockSignals(true);
+            item->setText(oldViewName);
+            ui->vleViewList->blockSignals(save);
+        } else if (oldViewName != newName) {
+            mVpz->renameViewToDoc(oldViewName, newName);
+        }
+        oldViewName = "";
+    }
+
+}
+
+}}//namespaces

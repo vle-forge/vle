@@ -891,6 +891,20 @@ vleVpz::existObsFromDoc(const QString& obsName) const
 }
 
 bool
+vleVpz::existViewFromDoc(const QString& viewName) const
+{
+    QDomNode views = viewsFromDoc();
+    QDomNodeList viewList = views.childNodes();
+    for (unsigned int i = 0; i < viewList.length(); i++) {
+        QDomNode view = viewList.at(i);
+        if (attributeValue(view, "name") == viewName) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool
 vleVpz::existCondFromDoc(const QString& condName) const
 {
     QDomNode conds = condsFromDoc();
@@ -935,6 +949,27 @@ vleVpz::existPortFromDoc(const QString& condName,
 }
 
 void
+vleVpz::renameViewToDoc(const QString& oldName, const QString& newName)
+{
+    QDomNode views = viewsFromDoc();
+    std::vector<QDomNode> viewList = childNodesWithoutText(views, "view");
+    for (unsigned int i =0; i< viewList.size(); i++) {
+        QDomNode v = viewList[i];
+        if (attributeValue(v,"name") == oldName) {
+            setAttributeValue(v.toElement(), "name", newName);
+        }
+    }
+    QDomNode outputs = obtainChild(views, "outputs", true);
+    std::vector<QDomNode> outList = childNodesWithoutText(outputs, "output");
+    for (unsigned int i =0; i< outList.size(); i++) {
+        QDomNode o = outList[i];
+        if (attributeValue(o,"name") == oldName) {
+            setAttributeValue(o.toElement(), "name", newName);
+        }
+    }
+}
+
+void
 vleVpz::renameConditionToDoc(const QString& oldName, const QString& newName)
 {
     QDomNodeList condList = condsListFromConds(condsFromDoc());
@@ -963,6 +998,25 @@ vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
         }
     }
     qDebug() << "Internal error in renameCondPortToDoc (not found)";
+}
+
+QString
+vleVpz::newViewNameToDoc() const
+{
+    QString condView = "NewView";
+    unsigned int idView = 0;
+    bool viewNameFound = false;
+    while (not viewNameFound) {
+        if (existViewFromDoc(condView)) {
+            idView ++;
+            condView = "NewView";
+            condView += "_";
+            condView += QVariant(idView).toString();
+        } else {
+            viewNameFound = true;
+        }
+    }
+    return condView;
 }
 
 QString
@@ -1058,6 +1112,49 @@ vleVpz::addObservableToDoc(const QString& obsName)
     emit observablesUpdated();
     return newObs;
 }
+
+QDomNode
+vleVpz::addViewToDoc(const QString& viewName)
+{
+    QDomNode views = viewsFromDoc();
+    if (views.isNull()) {
+        QDomNode exp = experimentFromDoc();
+        QDomElement viewsTag = getDomDoc().createElement("views");
+        exp.appendChild(viewsTag);
+    }
+    QDomNode view = addView(viewsFromDoc(),viewName);
+    emit viewsUpdated();
+    return view;
+}
+
+void
+vleVpz::rmViewToDoc(const QString& viewName)
+{
+    QDomNode views = viewsFromDoc();
+    if (views.isNull()) {
+        return;
+    }
+    std::vector<QDomNode> viewList = childNodesWithoutText(views, "view");
+    for (unsigned int i=0; i<viewList.size(); i++) {
+        QDomNode v = viewList[i];
+        if (attributeValue(v,"name") == viewName) {
+            views.removeChild(v);
+        }
+    }
+    QDomNode outputs = obtainChild(views, "outputs", false);
+    if (outputs.isNull()) {
+        return;
+    }
+    std::vector<QDomNode> outList = childNodesWithoutText(outputs, "output");
+    for (unsigned int i=0; i<outList.size(); i++) {
+        QDomNode o = outList[i];
+        if (attributeValue(o,"name") == viewName) {
+            outputs.removeChild(o);
+        }
+    }
+}
+
+
 
 QDomNode
 vleVpz::addConditionToDoc(const QString& condName)
@@ -2155,6 +2252,37 @@ vleVpz::addObservable(QDomNode node, const QString& obsName)
     }
     QDomElement elem = getDomDoc().createElement("observable");
     elem.setAttribute("name", obsName);
+    node.appendChild(elem);
+    return elem;
+}
+
+QDomNode
+vleVpz::addView(QDomNode node, const QString& viewName)
+{
+    if (node.isNull()) {
+        qDebug() << ("Internal error in addView (null conds)");
+        return QDomNode();
+    }
+    if (existViewFromDoc(viewName)) {
+        qDebug() << ("Internal error in addView (already here)");
+        return QDomNode();
+    }
+    QDomElement elem = getDomDoc().createElement("view");
+    elem.setAttribute("name", viewName);
+    //add output and configure it with vle.output/storage
+    elem.setAttribute("output", viewName);
+    elem.setAttribute("type","timed");
+    elem.setAttribute("timestep", "1");
+    QDomNode outputsNode = obtainChild(obtainChild(obtainChild(obtainChild(
+            getDomDoc(), "vle_project", true), "experiment", true),
+            "views", true), "outputs", true);
+    QDomElement elemOut = getDomDoc().createElement("output");
+    elemOut.setAttribute("name", viewName);
+    elemOut.setAttribute("location", "");
+    elemOut.setAttribute("format", "local");
+    elemOut.setAttribute("plugin", "file");
+    elemOut.setAttribute("package", "vle.output");
+    outputsNode.appendChild(elemOut);
     node.appendChild(elem);
     return elem;
 }

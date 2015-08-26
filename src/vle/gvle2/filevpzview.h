@@ -97,7 +97,7 @@ private:
     vle::gvle2::FileVpzRtool*    mRtool;
     FileVpzDynamics *mDynamicsTab;
     FileVpzExpCond  *mExpCondTab;
-    FileVpzExpView  *mExpViewTab;
+    vle::gvle2::FileVpzExpView  *mExpViewTab;
     FileVpzObservables  *mObservablesTab;
     FileVpzProject  *mProjectTab;
     vle::gvle2::FileVpzClasses  *mClassesTab;
