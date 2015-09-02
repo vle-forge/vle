@@ -26,6 +26,7 @@
 #define FILEVPZDYNAMICS_H
 
 #include <QWidget>
+#include <QComboBox>
 #include <QUndoStack>
 #include "vlevpz.h"
 
@@ -33,10 +34,52 @@ namespace Ui {
 class FileVpzDynamics;
 }
 
+
+/**
+ * Required to identify which combo is pressed (id is the name of the dynamic)
+ * reimplement mousePressEvent(QMouseEvent * e)
+ * send
+ */
+class AdhocCombo : public QComboBox
+{
+    Q_OBJECT
+public:
+    AdhocCombo(QWidget *parent);
+    ~AdhocCombo();
+    void setId(const QString& text);
+    void  mousePressEvent(QMouseEvent * e);
+    QString combo_id;
+signals:
+    void comboSelected(const QString& name);
+};
+
+
+/**
+ * Required for setting a new value only on lost focus (not on all changes)
+ * reimplement focusOutEvent
+ * send textUpdated on lost focus
+ */
+class AdhocQTextEdit: public QPlainTextEdit
+{
+    Q_OBJECT
+public:
+    AdhocQTextEdit(QWidget *parent = 0);
+    ~AdhocQTextEdit();
+    void setText(const QString& text);
+    void setTextEdition(bool val);
+    void focusOutEvent(QFocusEvent *e);
+    QString saved_value;
+signals:
+    void textUpdated(const QString& oldval, const QString& newVal);
+
+};
+
 class FileVpzDynamics : public QWidget
 {
     Q_OBJECT
 
+public:
+    enum FVD_MENU { FVD_add_dynamic, FVD_rename_dynamic, FVD_remove_dynamic };
 public:
     explicit FileVpzDynamics(QWidget *parent = 0);
     ~FileVpzDynamics();
@@ -45,13 +88,12 @@ public:
     void reload();
 
 public slots:
-    void onSelected(int cr, int cc, int pr, int pc);
-    void onSelectPackage(int index);
-    void onSelectLibrary(int index);
-    void onAddButton();
-    void onCloneButton();
-    void onRemoveButton();
-    void onSaveButton();
+    void onComboSelected(const QString& dyn);
+    void onSelectPackage(const QString & text);
+    void onSelectLibrary(const QString& text);
+    void onDynamicsTableMenu(const QPoint&);
+    void onUndoRedoVpz(QDomNode, QDomNode);
+    void onTextUpdated(const QString&, const QString&);
 
 protected:
     void updatePackageList(QString name = "");
@@ -59,6 +101,7 @@ protected:
 
 private:
     QString getSelected();
+    QString curr_dyn;
 
 private:
     Ui::FileVpzDynamics *ui;

@@ -656,13 +656,15 @@ vleVpz::getXQuery(QDomNode node)
         (name == "in") or
         (name == "out") or
         (name == "connections") or
-        (name == "classes")) {
+        (name == "classes") or
+        (name == "dynamics")) {
         return getXQuery(node.parentNode())+"/"+name;
     }
     //element identified wy attribute name
     if ((name == "port") or
         (name == "model") or
-        (name == "class")){
+        (name == "class") or
+        (name == "dynamic")){
         return getXQuery(node.parentNode())+"/"+name+"[@name=\""
                 +attributeValue(node,"name")+"\"]";
     }
@@ -761,7 +763,8 @@ vleVpz::getNodeFromXQuery(const QString& query, QDomNode d)
         (curr == "in") or
         (curr == "out") or
         (curr == "connections") or
-        (curr == "classes")){
+        (curr == "classes") or
+        (curr == "dynamics")){
         return getNodeFromXQuery(rest, obtainChild(d, curr, true));
     }
     //handle recursion with nodes identified by name
@@ -769,6 +772,7 @@ vleVpz::getNodeFromXQuery(const QString& query, QDomNode d)
     nodeByNames.push_back(QString("model"));
     nodeByNames.push_back(QString("port"));
     nodeByNames.push_back(QString("class"));
+    nodeByNames.push_back(QString("dynamic"));
     QString selNodeByName ="";
     for (unsigned int i=0; i< nodeByNames.size(); i++) {
         if (curr.startsWith(nodeByNames[i])) {
@@ -1008,6 +1012,20 @@ vleVpz::existViewFromDoc(const QString& viewName) const
 }
 
 bool
+vleVpz::existDynamicFromDoc(const QString& dynName) const
+{
+    QDomNode dyns = dynamicsFromDoc();
+    QDomNodeList dynList = dyns.childNodes();
+    for (unsigned int i = 0; i < dynList.length(); i++) {
+        QDomNode view = dynList.at(i);
+        if (attributeValue(view, "name") == dynName) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool
 vleVpz::existCondFromDoc(const QString& condName) const
 {
     QDomNode conds = condsFromDoc();
@@ -1088,6 +1106,28 @@ vleVpz::renameConditionToDoc(const QString& oldName, const QString& newName)
 }
 
 void
+vleVpz::renameDynamicToDoc(const QString& oldName, const QString& newName)
+{
+    QDomNode dyn = childWhithNameAttr(dynamicsFromDoc(),"dynamic",oldName);
+    if (dyn.isNull()) {
+        qDebug() << "Internal error in renameDynamicToDoc (not found)";
+        return;
+    }
+    undoStack->snapshot(vleProjectFromDoc());
+    setAttributeValue(dyn.toElement(), "name", newName);
+
+    QDomNodeList mods = getDomDoc().elementsByTagName("model");
+    for (int i=0; i<mods.size(); i++) {
+        QDomNode mod = mods.at(i);
+        if ((attributeValue(mod,"type") == "atomic") and
+                (attributeValue(mod,"dynamics") == oldName)) {
+            setAttributeValue(mod.toElement(),"dynamics",newName);
+        }
+    }
+    emit dynamicsUpdated();
+}
+
+void
 vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
         const QString& newName)
 {
@@ -1101,6 +1141,25 @@ vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
         }
     }
     qDebug() << "Internal error in renameCondPortToDoc (not found)";
+}
+
+QString
+vleVpz::newDynamicNameToDoc() const
+{
+    QString condName = "NewDynamic";
+    unsigned int idCond = 0;
+    bool condNameFound = false;
+    while (not condNameFound) {
+        if (existDynamicFromDoc(condName)) {
+            idCond ++;
+            condName = "NewDynamic";
+            condName += "_";
+            condName += QVariant(idCond).toString();
+        } else {
+            condNameFound = true;
+        }
+    }
+    return condName;
 }
 
 QString
@@ -1292,10 +1351,25 @@ QDomNode
 vleVpz::addDynamicToDoc(const QString& dyn, const QString& pkgName,
         const QString& libName)
 {
+    undoStack->snapshot(dynamicsFromDoc());
     QDomNode newNode = addDynamicToDoc(dyn);
     setAttributeValue(newNode.toElement(), "package", pkgName);
     setAttributeValue(newNode.toElement(), "library", libName);
     return newNode;
+}
+
+void
+vleVpz::configDynamicToDoc(const QString& dyn, const QString& pkgName,
+        const QString& libName)
+{
+    QDomNode dynNode = dynamicFromDoc(dyn);
+    if (dynNode.isNull()) {
+        qDebug() << "Internal error in configDynamicToDoc (not found)";
+        return ;
+    }
+    undoStack->snapshot(dynNode);
+    setAttributeValue(dynNode.toElement(), "package", pkgName);
+    setAttributeValue(dynNode.toElement(), "library", libName);
 }
 
 QDomNode
@@ -2568,18 +2642,32 @@ vleVpz::modelObsFromDoc(const QString& model_query)
 }
 
 void
-vleVpz::setDynToAtomicModel(const QString& model_query, const QString& dyn)
+vleVpz::setDynToAtomicModel(const QString& model_query, const QString& dyn,
+        bool undo)
 {
     QDomNode atom = getNodeFromXQuery(model_query);
+    if (undo) {
+        undoStack->snapshot(atom);
+    }
     setAttributeValue(atom.toElement(), "dynamics", dyn);
 }
 
 void
 vleVpz::removeDyn(const QString& dyn)
 {
+    qDebug() << " vleVpz::removeDyn " << getXQuery(getDomDoc()) << " " << dyn;
+    undoStack->snapshot(vleProjectFromDoc());
     QDomNodeList nodeList = getDomDoc().elementsByTagName("dynamics");
     QDomElement dynamics = nodeList.item(0).toElement();
     dynamics.removeChild(dynamicFromDoc(dyn));
+    QDomNodeList mods = getDomDoc().elementsByTagName("model");
+    for (int i=0; i<mods.size(); i++) {
+        QDomNode mod = mods.at(i);
+        if ((attributeValue(mod,"type") == "atomic") and
+            (attributeValue(mod,"dynamics") == dyn)) {
+            setAttributeValue(mod.toElement(),"dynamics","");
+        }
+    }
 }
 
 void
@@ -3576,7 +3664,7 @@ void
 vleDomDiffStack::init(QDomNode node)
 {
     diffs.resize(300);
-    diffs[0] = DomDiff(node);
+    diffs[0].node_before = node.cloneNode();
     curr = 0;
 }
 
@@ -3593,7 +3681,6 @@ vleDomDiffStack::snapshot (QDomNode node,
         vleDomDiffStack::DomDiffType mergeType,
         vle::value::Map* mergeArgs)
 {
-    qDebug() << " DBG add snapshot " << mVpz->getXQuery(node);
     //check if it is possibly mergeable to top undo command
     bool isMerged = false;
     if ((curr > 0) and (mergeType != vleDomDiffStack::DDF_null)
@@ -3647,6 +3734,7 @@ vleDomDiffStack::snapshot (QDomNode node,
         diffs[curr].node_before = node.cloneNode();
         diffs[curr].merge_type = mergeType;
         diffs[curr].merge_args = mergeArgs;
+        diffs[curr].source = current_source;
 
         //unvalidate all undo stack
         for (unsigned int i = curr+1; i<diffs.size(); i++) {
@@ -3662,27 +3750,33 @@ vleDomDiffStack::undo()
     if (curr <= 0) {
         return;
     }
-    diffs[curr].node_after =
-            mVpz->getNodeFromXQuery(diffs[curr].query).cloneNode();
+    if ((diffs[curr].source == current_source)
+            or (diffs[curr].source.isEmpty())){
+        diffs[curr].node_after =
+                mVpz->getNodeFromXQuery(diffs[curr].query).cloneNode();
 
-    QDomNode currN = mVpz->getNodeFromXQuery(diffs[curr].query);
-    QDomNode parent = currN.parentNode();
-    parent.replaceChild(diffs[curr].node_before, currN);
-    //diffs[curr].reset();
-    emit undoRedoVpz(currN, diffs[curr].node_before);
-    curr --;
+        QDomNode currN = mVpz->getNodeFromXQuery(diffs[curr].query);
+        QDomNode parent = currN.parentNode();
+        parent.replaceChild(diffs[curr].node_before, currN);
+        //diffs[curr].reset();
+        emit undoRedoVpz(currN, diffs[curr].node_before);
+        curr --;
+    }
 }
 
 void
 vleDomDiffStack::redo()
 {
     if (not diffs[curr+1].query.isEmpty()) {
-        curr++;
-        QDomNode currN = mVpz->getNodeFromXQuery(diffs[curr].query);
-        QDomNode parent = currN.parentNode();
-        parent.replaceChild(diffs[curr].node_after, currN);
+        if ((diffs[curr+1].source == current_source) or
+                (diffs[curr+1].source.isEmpty())){
+            curr++;
+            QDomNode currN = mVpz->getNodeFromXQuery(diffs[curr].query);
+            QDomNode parent = currN.parentNode();
+            parent.replaceChild(diffs[curr].node_after, currN);
 
-        emit undoRedoVpz(currN, diffs[curr].node_after);
+            emit undoRedoVpz(currN, diffs[curr].node_after);
+        }
 
     }
 

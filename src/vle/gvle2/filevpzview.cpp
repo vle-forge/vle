@@ -162,7 +162,8 @@ void fileVpzView::setVpz(vleVpz *vpz)
     QObject::connect(mVpz, SIGNAL(modelsUpdated()),
                      mRtool, SLOT (onModelsUpdated()));
 
-
+    mVpz->undoStack->current_source = ui->tabWidget->tabText(
+            ui->tabWidget->currentIndex());
 
     if (mRtool) {
         mRtool->setVpz(mVpz);
@@ -171,7 +172,7 @@ void fileVpzView::setVpz(vleVpz *vpz)
     // ---- Dynamics Tab ----
     if (mDynamicsTab) {
         mDynamicsTab->setVpz(mVpz);
-        mDynamicsTab->setUndo(mUndoStack);
+        //mDynamicsTab->setUndo(mUndoStack);
         mDynamicsTab->reload();
     }
 
@@ -210,6 +211,8 @@ void fileVpzView::setVpz(vleVpz *vpz)
     ui->graphicView->setSceneRect(QRect(0,0,0,0));
     ui->graphicView->setScene(&mScene);
     mScene.update();
+
+
 }
 
 void fileVpzView::save()
@@ -355,6 +358,7 @@ fileVpzView::onCurrentChanged(int index)
     } else if (tab == "Classes") {
         mRtool->onInitializationDone(&(mClassesTab->mScene));
     }
+    vpz()->undoStack->current_source = tab;
 }
 
 //

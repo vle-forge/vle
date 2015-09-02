@@ -567,6 +567,9 @@ public:
     * @brief tells if a view exists
     */
     bool existViewFromDoc(const QString& viewName) const;
+
+    bool existDynamicFromDoc(const QString& dynName) const;
+
      /**
      * @brief tells if a condition exists
      */
@@ -585,12 +588,15 @@ public:
      * @brief set the 'name' attribute of tag <condition> to a new value
      */
     void renameConditionToDoc(const QString& oldName, const QString& newName);
+    void renameDynamicToDoc(const QString& oldName, const QString& newName);
     /**
      * @brief set the 'name' attribute of tag <port> to a new value
      */
     void renameCondPortToDoc(const QString& condName, const QString& oldName,
             const QString& newName);
 
+
+    QString newDynamicNameToDoc() const;
     /**
      * @brief get a new view name not already in tag <views>
      * from the Vpz doc
@@ -628,6 +634,7 @@ public:
      */
     QDomNode addDynamicToDoc(const QString& dyn);
 
+
     /**
      * @brief add a <dynamic> tag to a Vpz Doc
      * @param dyn, attribute 'name'  set to dyn
@@ -636,6 +643,10 @@ public:
      */
     QDomNode addDynamicToDoc(const QString& dyn, const QString& pkgName,
             const QString& libName);
+
+    void configDynamicToDoc(const QString& dyn, const QString& pkgName,
+            const QString& libName);
+
 
     /**
      * @brief Copy a dynamic
@@ -755,7 +766,8 @@ public:
      * @param model_query, a Xquery that points to a model
      *
      */
-    void setDynToAtomicModel(const QString& model_query, const QString& dyn);
+    void setDynToAtomicModel(const QString& model_query, const QString& dyn,
+            bool undo=true);
 
     /**
      * @brief Removes a dynamic
@@ -1004,6 +1016,7 @@ signals:
     void viewsUpdated();
     void conditionsUpdated();
     void modelsUpdated();
+    void dynamicsUpdated();
 
     protected:
     bool startElement(const QString &namespaceURI,
@@ -1050,16 +1063,13 @@ public:
         QString query;
         DomDiffType merge_type;
         vle::value::Map* merge_args;
+        QString source;
 
         DomDiff():node_before(), node_after(), query(""),
-                merge_type(DDF_null), merge_args(0)
+                merge_type(DDF_null), merge_args(0), source("")
         {
         }
-        DomDiff(QDomNode n):node_before(), node_after(), query(""),
-                merge_type(DDF_null), merge_args(0)
-        {
-            node_before = n.cloneNode(true);
-        }
+
         ~DomDiff()
         {
             if (merge_args) {
@@ -1077,14 +1087,17 @@ public:
                 delete merge_args;
                 merge_args = 0;
             }
+            source = "";
         }
     };
 
     std::vector<DomDiff> diffs;
     unsigned int curr;
     vleVpz* mVpz;
+    QString current_source;
 
-    vleDomDiffStack(vleVpz* vpz): diffs(), curr(0), mVpz(vpz)
+    vleDomDiffStack(vleVpz* vpz): diffs(), curr(0), mVpz(vpz),
+            current_source("")
     {
     }
 
