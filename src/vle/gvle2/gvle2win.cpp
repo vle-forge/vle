@@ -76,6 +76,8 @@ GVLE2Win::GVLE2Win(QWidget *parent) :
     QObject::connect(ui->actionRecent5,      SIGNAL(triggered()), this, SLOT(onProjectRecent5()));
     QObject::connect(ui->actionCloseProject, SIGNAL(triggered()), this, SLOT(onCloseProject()));
     QObject::connect(ui->actionQuit,         SIGNAL(triggered()), this, SLOT(onQuit()));
+    QObject::connect(ui->actionUndo,         SIGNAL(triggered()), this, SLOT(onUndo()));
+    QObject::connect(ui->actionRedo,         SIGNAL(triggered()), this, SLOT(onRedo()));
     QObject::connect(ui->actionConfigureProject, SIGNAL(triggered()), this, SLOT(onProjectConfigure()));
     QObject::connect(ui->actionBuildProject, SIGNAL(triggered()), this, SLOT(onProjectBuild()));
     QObject::connect(ui->actionLaunchSimulation, SIGNAL(triggered()), this, SLOT(onLaunchSimulation()));
@@ -722,6 +724,24 @@ void GVLE2Win::onLaunchSimulation()
     mSimOpened = true;
 }
 
+void
+GVLE2Win::onUndo()
+{
+    QWidget *w = ui->tabWidget->currentWidget();
+    fileVpzView *tabVpz = (fileVpzView *)w;
+    tabVpz->vpz()->undoStack->undo();
+
+}
+
+void
+GVLE2Win::onRedo()
+{
+    QWidget *w = ui->tabWidget->currentWidget();
+    fileVpzView *tabVpz = (fileVpzView *)w;
+    tabVpz->vpz()->undoStack->redo();
+
+}
+
 void GVLE2Win::onSelectSimulator(bool isChecked)
 {
     QAction *act = (QAction *)sender();
@@ -1183,6 +1203,9 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
         nid = ui->rightStack->addWidget(newRTool);
         ui->rightStack->setCurrentWidget(newRTool);
         newTab->setProperty("wTool", nid);
+        //set undo redo enabled
+        ui->actionUndo->setEnabled(true);
+        ui->actionRedo->setEnabled(true);
     }
 }
 

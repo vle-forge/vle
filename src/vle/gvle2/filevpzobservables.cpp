@@ -282,8 +282,8 @@ void FileVpzObservables::reloadPorts(const QString& obsName,
         QTreeWidgetItem *newPortItem = newItem(FileVpzObservables::EObsPort,
                                                mVpz->attributeValue(port, "name"));
         obsItem->addChild(newPortItem);
-        std::vector<QDomNode> OutList = mVpz->childNodesWithoutText(port,"attachedview");
-        for (unsigned int k = 0; k < OutList.size(); k++) {
+        QList<QDomNode> OutList = mVpz->childNodesWithoutText(port,"attachedview");
+        for (int k = 0; k < OutList.size(); k++) {
             QDomNode& attachedView = OutList[k];
             QTreeWidgetItem *newValueItem = newItem(FileVpzObservables::EObsOut,
                                                     mVpz->attributeValue(attachedView, "name"));

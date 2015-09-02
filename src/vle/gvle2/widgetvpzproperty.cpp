@@ -32,7 +32,7 @@
 
 WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget *parent) :
     QWidget(parent), ui(new Ui::WidgetVpzPropertyDynamics),
-    mVpz(0), mFullPath("")
+    mVpz(0), mModQuery("")
 {
     ui->setupUi(this);
     setFocusPolicy(Qt::ClickFocus);
@@ -52,18 +52,18 @@ WidgetVpzPropertyDynamics::~WidgetVpzPropertyDynamics()
 }
 
 void
-WidgetVpzPropertyDynamics::setModel(vleVpz* model, const QString& fullPath)
+WidgetVpzPropertyDynamics::setModel(vleVpz* model, const QString& mod_query)
 {
     int index = 0;
     int count = 1;
     mVpz = model;
-    mFullPath = fullPath;
+    mModQuery = mod_query;
 
     if (not mVpz)
         return;
 
     // Get the Dynamic of the model
-    QString dyn = mVpz->modelDynFromDoc(mFullPath);
+    QString dyn = mVpz->modelDynFromDoc(mModQuery);
     // Clear the current list
     while(ui->comboBox->count())
         ui->comboBox->removeItem(0);
@@ -91,9 +91,9 @@ WidgetVpzPropertyDynamics::onChange(int index)
     // If the selected Dynamic exists
     if (mVpz->existDynamicIntoDoc(selectedName)) {
         // Update the model with the selected Dynamic
-        mVpz->setDynToAtomicModel(mFullPath, selectedName);
+        mVpz->setDynToAtomicModel(mModQuery, selectedName);
     } else if (selectedName == "<none>") {
-        mVpz->setDynToAtomicModel(mFullPath, "");
+        mVpz->setDynToAtomicModel(mModQuery, "");
     }
 }
 
@@ -101,7 +101,7 @@ WidgetVpzPropertyDynamics::onChange(int index)
 
 WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget *parent) :
         QWidget(parent), ui(new Ui::WidgetVpzPropertyExpCond),
-        mVpz(0), mFullPath("")
+        mVpz(0), mModQuery("")
 {
     ui->setupUi(this);
     ui->listCond->setVisible(true);
@@ -113,13 +113,13 @@ WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
 }
 
 void
-WidgetVpzPropertyExpCond::setModel(vleVpz *model, const QString& fullPath)
+WidgetVpzPropertyExpCond::setModel(vleVpz *model, const QString& model_query)
 {
     mVpz = model;
     QObject::connect(mVpz,   SIGNAL(conditionsUpdated()),
                      this, SLOT(refresh()));
 
-    mFullPath = fullPath;
+    mModQuery = model_query;
     refresh();
 }
 
@@ -128,7 +128,7 @@ WidgetVpzPropertyExpCond::refresh()
 {
     // First, clear the current list content
     ui->listCond->clear();
-    QString dyn = mVpz->modelDynFromDoc(mFullPath);
+    QString dyn = mVpz->modelDynFromDoc(mModQuery);
 //    if (dyn != "") {
         //TODO only way to see if it is an atomic model ??
         QDomNodeList conds = mVpz->condsListFromConds(mVpz->condsFromDoc());
@@ -139,7 +139,7 @@ WidgetVpzPropertyExpCond::refresh()
             ui->listCond->addItem(wi);
             QCheckBox *cb = new QCheckBox(this);
             cb->setText( condName);
-            if (mVpz->isAttachedCond(mFullPath, condName)) {
+            if (mVpz->isAttachedCond(mModQuery, condName)) {
                 cb->setCheckState( Qt::Checked );
             } else {
                 cb->setCheckState( Qt::Unchecked );
@@ -165,9 +165,9 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
     // Search the vleExpCond associated with the checkbox
     bool oldBlock = mVpz->blockSignals(true);
     if (checked) {
-        mVpz->attachCondToAtomicModel(mFullPath, cb->text());
+        mVpz->attachCondToAtomicModel(mModQuery, cb->text());
     } else {
-        mVpz->detachCondToAtomicModel(mFullPath, cb->text());
+        mVpz->detachCondToAtomicModel(mModQuery, cb->text());
     }
     mVpz->blockSignals(oldBlock);
 
@@ -177,7 +177,7 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
 
 WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget *parent) :
         QWidget(parent), ui(new Ui::WidgetVpzPropertyObservables),
-        mVpz(0), mFullPath("")
+        mVpz(0), mModQuery("")
 {
     ui->setupUi(this);
     ui->listObs->setVisible(true);
@@ -192,7 +192,7 @@ void
 WidgetVpzPropertyObservables::refresh()
 {
     ui->listObs->clear();
-    QString dyn = mVpz->modelDynFromDoc(mFullPath);
+    QString dyn = mVpz->modelDynFromDoc(mModQuery);
     QDomNodeList obss = mVpz->obssListFromObss(mVpz->obsFromDoc());
     for (unsigned int i=0; i< obss.length(); i++) {
         QDomNode obs = obss.at(i);
@@ -201,7 +201,7 @@ WidgetVpzPropertyObservables::refresh()
         ui->listObs->addItem(wi);
         QCheckBox *cb = new QCheckBox(this);
         cb->setText(obsName);
-        if (mVpz->modelObsFromDoc(mFullPath) == obsName) {
+        if (mVpz->modelObsFromDoc(mModQuery) == obsName) {
             cb->setCheckState( Qt::Checked );
         } else {
             cb->setCheckState( Qt::Unchecked );
@@ -213,14 +213,15 @@ WidgetVpzPropertyObservables::refresh()
 }
 
 void
-WidgetVpzPropertyObservables::setModel(vleVpz *model, const QString& fullPath)
+WidgetVpzPropertyObservables::setModel(vleVpz *model,
+        const QString& model_query)
 {
     mVpz = model;
 
     QObject::connect(mVpz, SIGNAL(observablesUpdated()),
             this, SLOT(refresh()));
 
-    mFullPath = fullPath;
+    mModQuery = model_query;
     refresh();
 }
 
@@ -235,7 +236,7 @@ WidgetVpzPropertyObservables::onCheckboxClick(bool checked)
 
     bool oldBlock = mVpz->blockSignals(true);
     if (checked) {
-        mVpz->setObsToAtomicModel(mFullPath, cb->text());
+        mVpz->setObsToAtomicModel(mModQuery, cb->text());
 
         for(int row = 0; row <  ui->listObs->count(); row++)
         {
@@ -248,7 +249,7 @@ WidgetVpzPropertyObservables::onCheckboxClick(bool checked)
             }
         }
     } else {
-        mVpz->unsetObsFromAtomicModel(mFullPath);
+        mVpz->unsetObsFromAtomicModel(mModQuery);
     }
     mVpz->blockSignals(oldBlock);
 }

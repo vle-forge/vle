@@ -97,9 +97,11 @@ fileVpzView::fileVpzView(QWidget *parent) :
     tabBar->setTabButton(2, QTabBar::RightSide, 0);
     tabBar->setTabButton(3, QTabBar::RightSide, 0);
     tabBar->setTabButton(4, QTabBar::RightSide, 0);
+    tabBar->setTabButton(5, QTabBar::RightSide, 0);
     tabBar->setTabButton(dynTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(expTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(viewTabId, QTabBar::RightSide, 0);
+    tabBar->setTabButton(observablesTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(projectTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(classesTabId, QTabBar::RightSide, 0);
 

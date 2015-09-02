@@ -90,6 +90,8 @@ private slots:
     void onProjectBuild();
     void projectInstall();
     void onLaunchSimulation();
+    void onUndo();
+    void onRedo();
     void onSelectSimulator(bool isChecked);
     void onHelp();
     void onAbout();

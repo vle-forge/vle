@@ -25,6 +25,9 @@
 #ifndef GVLE2_VLEVPZ_H
 #define GVLE2_VLEVPZ_H
 
+#include <QDebug>
+
+
 #include <QLabel>
 #include <QMouseEvent>
 #include <QString>
@@ -40,15 +43,20 @@
 #include <QDateTimeEdit>
 #include "vlepackage.h"
 #include <vle/value/Value.hpp>
+#include <vle/value/Map.hpp>
 #include "vle/gvle2/ui_filevpztooltip.h"
 
 
 class vleVpzModel;
 class vlePackage;
+class vleDomDiffStack;
 
 namespace Ui {
 class fileVpzTooltip;
 }
+
+
+
 
 class vleVpz : public QObject /*, public QXmlDefaultHandler */
 {
@@ -151,42 +159,33 @@ public:
      */
     QDomNode portFromDoc(const QString& condName, const QString& portName) const;
     /**
-     * @brief get atomic model tag <model> from a tag <model>,
-     * @param modelFullPath as the format given in getFullPathModel function
-     */
-    QDomNode modelFromDoc(const QString& modelFullPath);
-    /**
      * @brief get the root model
      */
     QDomNode modelFromDoc();
 
     /**
      * @brief get <connections> node from Vpz Doc into a <model>
-     * which modelFullPath, the full path to the model
+     * which model_query, a Xquery that points to the model
      */
-    QDomNode modelConnectionsFromDoc(const QString& modelFullPath);
+    QDomNode modelConnectionsFromDoc(const QString& model_query);
     /**
      * @brief get <connection> node from Vpz Doc into a <connections>
-     * @param sourceFullPath, the full path to the source model
+     * @param model_query, a Xquery that points to the model
      * @param destinationFullPath, the full path to the dest model
      * @param sourcePort, the name of the source port
      * @param destinationPort, the name of the dest port
      */
-    QDomNode modelConnectionFromDoc(const QString& sourceFullPath,
+    QDomNode modelConnectionFromDoc(const QString& model_query,
             const QString& destinationFullPath, const QString& sourcePort,
             const QString& destinationPort);
+
+
+    QDomNode baseModelFromModelQuery(const QString& model_query);
 
 
     /******************************************************
      * Access to specific nodes in the vpz from internal nodes
      ******************************************************/
-    /**
-     * @brief get full name of the model
-     * @param node: with xpath //model
-     * @return "/mymod1.myMod2..." if main model
-     * or "myclass/mymod1.myMod2..." if node is a model from a class
-     */
-    QString getFullPathModel(QDomNode node) const;
     /**
      * @brief get <observables> tag from <views> tag
      */
@@ -214,13 +213,16 @@ public:
      * @brief get <model> tag from a tag <model> into <submodels>,
      * @param node: QDomNode <model> with xpath = //model
      */
-    std::vector<QDomNode> submodelsFromModel(const QDomNode& node);
+    QList<QDomNode> submodelsFromModel(const QDomNode& node);
 
     /*******************************************************
      * Utils Functions QDom
      ******************************************************/
-    std::vector<QDomNode> childNodesWithoutText(QDomNode node,
+    QList<QDomNode> childNodesWithoutText(QDomNode node,
             const QString& nodeName = "") const;
+
+    QDomNode childWhithNameAttr(QDomNode node,
+            const QString& nodeName, const QString& nameValue) const;
     /**
      * @brief remove children that are QDomText to a node
      */
@@ -241,6 +243,16 @@ public:
      */
     QDomNode obtainChild(QDomNode node, const QString& nodeName,
             bool addIfNot=true);
+
+    QString getXQuery(QDomNode node);
+
+    QString mergeQueries(const QString& query1, const QString& query2);
+    QString subQuery(const QString& query, int begin, int end);
+
+
+
+
+    QDomNode getNodeFromXQuery(const QString& query, QDomNode d=QDomNode());
 
     /*****************************************************
      * TODO A TRIER
@@ -357,7 +369,7 @@ public:
      * @param node: QDomNode <connection>
      *     with xpath = //model/connections/connection
      */
-    void rmModelConnection(QDomNode node);
+    void rmModelConnection(QDomNode node, bool undo=true);
 
     /**
      * @brief return true if modName is a submodel of node
@@ -471,10 +483,10 @@ public:
     void unsetObsFromAtomicModel(QDomNode &node, const QString& obsName);
     /**
      * @brief unset a observable from a atomic model
-     * @param atom, atomic model name
+     * @param model_query, a Xquery that points to model
      * @param obsName, obs name
      */
-    void unsetObsFromAtomicModel(const QString& atomFullName);
+    void unsetObsFromAtomicModel(const QString& model_query);
     /**
      * @brief get a new port name for obs obsName not already in tag
      * <observable> from the Vpz doc
@@ -512,19 +524,33 @@ public:
     QDomNode addObservable(QDomNode node, const QString& obsName);
 
     /**
+     * @brief set width of a model
+     * @param node, model node
+     * @param width
+     */
+    void setWidthToModel(QDomNode node, double width);
+
+    void setHeightToModel(QDomNode node, double height);
+
+    void setPositionToModel(QDomNode node, double x, double y);
+
+    void setPositionToModel(QList<QDomNode>& nodes, QList<double> xs,
+            QList<double> ys);
+
+    /**
      * @brief set an observable to an anatomic model
-     * @param atom, atomic model
+     * @param node, atomic model
      * @param obsName, observable name
      *
      */
     void setObsToAtomicModel(QDomNode &node, const QString& obsName);
     /**
      * @brief set an observable to an anatomic model
-     * @param atom, atomic model full name
+     * @param model_query, a Xquery that points to a model
      * @param obsName, observable name
      *
      */
-    void setObsToAtomicModel(const QString& atomFullName, const QString& obsName);
+    void setObsToAtomicModel(const QString& model_query, const QString& obsName);
 
     /**
      * @brief add a <port> tag to <Observable>
@@ -698,38 +724,38 @@ public:
 
     /**
      * @brief get the string list of condition "," separated
-     * @param atomFullName, atomic model name
+     * @param model_query, a Xquery that points to a model
      */
-    QString modelCondsFromDoc(const QString& atomFullName);
+    QString modelCondsFromDoc(const QString& model_query);
 
     /**
      * @brief Tells if a condition is attached to an atomic model
-     * @param atomFullName, atomic model name
+     * @param model_query, a Xquery that points to a model
      * @param condName, the condition name
-     * @return true if condName is attached to atomFullName
+     * @return true if condName is attached to model_query
      */
-    bool isAttachedCond(const QString& atomFullName,
+    bool isAttachedCond(const QString& model_query,
             const QString& condName);
 
     /**
      * @brief get the dynamics of an atomic model
-     * @param atomFullName, atomic model name
+     * @param model_query, a Xquery that points to a model
      */
-    QString modelDynFromDoc(const QString& atomFullName);
+    QString modelDynFromDoc(const QString& model_query);
 
     /**
      * @brief get the observable
-     * @param atomFullName, atomic model name
+     * @param model_query, a Xquery that points to a model
      *
      */
-    QString modelObsFromDoc(const QString& atomFullName);
+    QString modelObsFromDoc(const QString& model_query);
 
     /**
      * @brief sets a dynamic to an an atomic model
-     * @param atomFullName, atomic model full name
+     * @param model_query, a Xquery that points to a model
      *
      */
-    void setDynToAtomicModel(const QString& atomFullName, const QString& dyn);
+    void setDynToAtomicModel(const QString& model_query, const QString& dyn);
 
     /**
      * @brief Removes a dynamic
@@ -739,25 +765,25 @@ public:
 
     /**
      * @brief attach a condition to an an atomic model
-     * @param atomFullName, atomic model full name
+     * @param model_query, a Xquery that points to a model
      *
      */
-    void attachCondToAtomicModel(const QString& atomFullName, const QString& condName);
+    void attachCondToAtomicModel(const QString& model_query,
+            const QString& condName);
     /**
      * @brief detach a condition to an anatomic model
-     * @param atom, atomic model name
+     * @param model_query, a Xquery that points to a model
      * @param condName, condition name
      *
      */
-    void detachCondToAtomicModel(const QString& atomFullName, const QString& condName);
+    void detachCondToAtomicModel(const QString& model_query,
+            const QString& condName);
 
     /**
      * @brief add a <port> tag to <condition>
      * whith attribute 'name'  portName
      */
     QDomNode addPort(QDomNode node, const QString& portName);
-
-
 
     /**
      * @brief get <output> tag from <outputs> tag
@@ -1008,6 +1034,76 @@ private:
 
     vlePackage *mPackage;
     Logger           * mLogger;
+public:
+    vleDomDiffStack* undoStack;
 };
+
+class vleDomDiffStack : public QObject
+{
+    Q_OBJECT
+public:
+    enum DomDiffType {DDF_setHeightToModel, DDF_setWidthToModel,
+        DDF_setPositionToModel, DDF_null};
+    struct DomDiff {
+        QDomNode node_before;
+        QDomNode node_after;
+        QString query;
+        DomDiffType merge_type;
+        vle::value::Map* merge_args;
+
+        DomDiff():node_before(), node_after(), query(""),
+                merge_type(DDF_null), merge_args(0)
+        {
+        }
+        DomDiff(QDomNode n):node_before(), node_after(), query(""),
+                merge_type(DDF_null), merge_args(0)
+        {
+            node_before = n.cloneNode(true);
+        }
+        ~DomDiff()
+        {
+            if (merge_args) {
+                delete merge_args;
+                merge_args = 0;
+            }
+        }
+        void reset()
+        {
+            node_before = QDomNode();
+            node_after = QDomNode();
+            query == "";
+            merge_type = DDF_null;
+            if (merge_args) {
+                delete merge_args;
+                merge_args = 0;
+            }
+        }
+    };
+
+    std::vector<DomDiff> diffs;
+    unsigned int curr;
+    vleVpz* mVpz;
+
+    vleDomDiffStack(vleVpz* vpz): diffs(), curr(0), mVpz(vpz)
+    {
+    }
+
+    void init (QDomNode node);
+
+    void snapshot (QDomNode node);
+
+    void snapshot (QDomNode node, DomDiffType mergeType,
+            vle::value::Map* mergeArgs);
+
+
+
+    void undo();
+    void redo();
+
+signals:
+    void undoRedoVpz(QDomNode oldVal, QDomNode newVal);
+
+};
+
 
 #endif

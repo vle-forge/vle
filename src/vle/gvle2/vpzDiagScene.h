@@ -233,8 +233,7 @@ public:
     QColor getColorModelNameSelected();
     QColor getColorModelNameNotSelected();
 
-    QString getClassOfOriginModel();
-    QString getFullPathOfTheSelectedModel();
+    QString getXQueryOfTheSelectedModel();
     VpzPortItem* getPort(const QString& portName, const QString& subMod);
     QStringList getSelectedModels();
     void unselectAllSubModels();
@@ -253,6 +252,7 @@ signals:
 
 public slots:
     void onDragDestroyed(QObject *obj =0);
+    void onUndoRedoVpz(QDomNode oldVal, QDomNode newVal);
 
 public:
     vleVpz*                mVpz;
@@ -265,7 +265,6 @@ public:
     SEL_TYPE               mModelSelType;
     bool                   mIsEnteringCoupled;
     QList<QDomNode>        mModelsCopies;
-    QDomNode               mOrigModel;
 };
 
 }}//namespaces

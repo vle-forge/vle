@@ -73,9 +73,9 @@ public:
     void updateTree();
     vleVpz* vpz();
     QWidget *getTool();
-    QString getFullPathModel(QTreeWidgetItem* base);
-    QTreeWidgetItem* getTreeWidgetItem(const QString& modellFullPath);
-    void updateModelProperty();
+    QString getModelQuery(QTreeWidgetItem* base);
+    QTreeWidgetItem* getTreeWidgetItem(const QString& model_query);
+    void updateModelProperty(const QString& model_query);
     QTreeWidgetItem* treeInsertModel(QDomNode mode, QTreeWidgetItem *base);
 //    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
 //    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
