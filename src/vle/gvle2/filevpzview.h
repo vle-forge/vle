@@ -95,8 +95,8 @@ private:
     bool             mUseSim;
     Ui::fileVpzView *ui;
     vle::gvle2::FileVpzRtool*    mRtool;
-    FileVpzDynamics *mDynamicsTab;
-    FileVpzExpCond  *mExpCondTab;
+    vle::gvle2::FileVpzDynamics *mDynamicsTab;
+    vle::gvle2::FileVpzExpCond  *mExpCondTab;
     vle::gvle2::FileVpzExpView  *mExpViewTab;
     FileVpzObservables  *mObservablesTab;
     FileVpzProject  *mProjectTab;

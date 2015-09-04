@@ -22,7 +22,7 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${GVLE2_SOURCE_DIR}
   ${VLE_SOURCE_DIR}/src/apps/gvle2)
 
-SET(GVLE2_SOURCES_CPP gvle2win.cpp aboutbox.cpp help.cpp
+SET(GVLE2_SOURCES_CPP gvle2_widgets.cpp gvle2win.cpp aboutbox.cpp help.cpp
   helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp  filevpzclasses.cpp
   filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
   filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
@@ -54,7 +54,7 @@ SET(GVLE2_SOURCES_HPP ${ui_gvle2win_h} ${aboutbox_h} ${help_h}
   ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
   ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h} 
   ${filevpzclasses_h} ${filevpztooltip_h} ${filevpzrtool_h} ${simulationview_h}
-  ${simulationrtool_h} simulation.h logger.h sourcecpp.h
+  ${simulationrtool_h} gvle2_widgets.h simulation.h logger.h sourcecpp.h
   sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
   ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
   plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h vlevpz.h

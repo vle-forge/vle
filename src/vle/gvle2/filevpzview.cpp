@@ -64,11 +64,11 @@ fileVpzView::fileVpzView(QWidget *parent) :
     mRtool = new vle::gvle2::FileVpzRtool();
 
     // Configure Experimental Conditions tab
-    mExpCondTab = new FileVpzExpCond();
+    mExpCondTab = new vle::gvle2::FileVpzExpCond();
     int expTabId = ui->tabWidget->addTab(mExpCondTab, tr("Conditions"));
 
     // Configure Dynamics tab
-    mDynamicsTab = new FileVpzDynamics();
+    mDynamicsTab = new vle::gvle2::FileVpzDynamics();
     int dynTabId = ui->tabWidget->addTab(mDynamicsTab, tr("Dynamics"));
 
     // Configure Observables tab

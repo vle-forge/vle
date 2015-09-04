@@ -792,12 +792,6 @@ public:
             const QString& condName);
 
     /**
-     * @brief add a <port> tag to <condition>
-     * whith attribute 'name'  portName
-     */
-    QDomNode addPort(QDomNode node, const QString& portName);
-
-    /**
      * @brief get <output> tag from <outputs> tag
      * which name is outputName
      */
@@ -883,6 +877,10 @@ public:
      * the set of values attached to the port
      */
     vle::value::Value* buildValue(const QDomNode& portNode, int valIndex) const;
+
+    unsigned int nbValuesInPortFromDoc(const QString& condName,
+            const QString& portName);
+
 
     /**
      * @brief Fill a vector of vle values with the multipl values contained by

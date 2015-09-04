@@ -21,20 +21,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef FILEVPZEXPCOND_H
-#define FILEVPZEXPCOND_H
+#ifndef GVLE2_FILEVPZEXPCOND_H
+#define GVLE2_FILEVPZEXPCOND_H
 
-#include <QWidget>
-#include <QMenu>
-#include <QListWidgetItem>
-#include <QTreeWidgetItem>
-#include <QTableWidgetItem>
 #include "vlevpz.h"
 #include "plugin_cond.h"
+#include "gvle2_widgets.h"
+
+#include <iostream>
 
 namespace Ui {
 class FileVpzExpCond;
 }
+
+namespace vle {
+namespace gvle2 {
+
 
 class FileVpzExpCond : public QWidget
 {
@@ -43,11 +45,6 @@ class FileVpzExpCond : public QWidget
 public:
     enum ExpCondTreeType { ECondNone, ECondCondition, ECondPort,
                            ECondValue };
-    enum ValueDisplayType {TypeOnly, Insight};
-
-//    BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
-//                XMLTYPE, NIL, MATRIX, USER
-
     enum PageEditType {PageBoolean, PageInteger, PageDouble,
          PageString, PageSet, PageMap, PageTuple, PageTable,
          PageMatrix, PageBlank};
@@ -62,46 +59,33 @@ public:
 
 public:
     explicit FileVpzExpCond(QWidget *parent = 0);
+
     ~FileVpzExpCond();
     void setVpz(vleVpz *vpz);
-    void reload();
-    void refresh(const QString& condName, QTreeWidgetItem *expItem = 0);
+    void resizeTable();
+    void reload(bool resize=true);
+    void showValueEdit(vle::value::Value* val);
 
 public slots:
-    void onConditionTreeMenu(const QPoint pos);
-    void onMapTreeMenu(const QPoint pos);
-    void tupleMenu(const QPoint&);
-    void setMenu(const QPoint&);
-    void onConditionChanged(QTreeWidgetItem *item, int column);
-    void onMapTreeChanged(QTreeWidgetItem *item, int column);
-    void onConditionTreeSelected();
-    void onCondParamTreeSelected();
-
-    void onCondParamCancel();
-    void onPluginChanges(const QString& condName);
-    void boolEdited(const QString&);
-    void intEdited(int v);
-    void doubleEdited(double);
-    void stringEdited();
-    void tupleEdited(QListWidgetItem*);
-    void tableEdited(int, int);
-    void tableDimButtonClicked(bool);
-    void mapDoubleClicked(QTreeWidgetItem* item, int column);
-    void setDoubleClicked(QListWidgetItem* item);
-    void matrixDoubleClicked(QTableWidgetItem* item);
-    void matrixDimButtonClicked(bool b);
-    void upStackButonClicked(bool b);
+    void onCellDoubleClicked(int row, int column);
+    void onConditionMenu(const QPoint&);
+    void onUndoRedoVpz(QDomNode oldVal, QDomNode newVal);
+    void onTextUpdated(const QString& id, const QString& oldVal,
+            const QString& newVal);
+    void onIntUpdated(const QString& id, int newVal);
+    void onDoubleUpdated(const QString& id, double newVal);
+    void onBoolUpdated(const QString& id, const QString& newVal);
+    void onValUpdated(const vle::value::Value& newVal);
+    void onSelected(const QString& id);
 
 private:
-    void buildAddValueMenu(QMenu& menu);
-    vle::value::Value* buildDefaultValue(eCondMenuActions act);
-    void condUpdateTree(const std::vector<vle::value::Value*>& values,
-            QList<QTreeWidgetItem *> *widList);
-    void condValueShowDetail();
-    void condShowPlugin(const QString& condName);
-    void condHidePlugin();
-    QString getValueDisplay(const vle::value::Value& v,
-            ValueDisplayType displayType) const;
+    QMenu* buildAddValueMenu(QMenu& menu, const QString& setOrAdd);
+    vle::value::Value* buildDefaultValue(eCondMenuActions type);
+    void insertTextEdit(int row, int col, const QString& val);
+    void insertSpinBox(int row, int col, int val);
+    void insertDoubleSpinBox(int row, int col, double val);
+    void insertBooleanCombo(int row, int col, bool val);
+    VleTextEdit* getTextEdit(int row, int col);
 
 private:
     Ui::FileVpzExpCond* ui;
@@ -109,33 +93,9 @@ private:
     QString             mCurrCondName;
     QString             mCurrPortName;
     int                 mCurrValIndex;
-    //QTreeWidgetItem *mCondEdition;
+    VleValueWidget*     mValWidget;
     PluginExpCond*      mPlugin;
-    struct value_stack {
-        value_stack();
-        ~value_stack();
-        vle::value::Value* startValue;
-        typedef  std::vector<vle::value::Value*> cont;
-        cont stack;
-        void delStartValue();
-        void setStartValue(vle::value::Value* val);
-        /*
-         * @brief push a vle::value::Map key
-         */
-        void push(const std::string& key);
-        /*
-         * @brief push a vle::value::Set index
-         */
-        void push(int index);
-        /*
-         * @brief push a vle::value::Matrix index (row column)
-         */
-        void push(int row, int col);
-
-        vle::value::Value* editingValue();
-        std::string toString();
-    };
-    value_stack         mValueStack;
 };
 
-#endif // FILEVPZEXPCOND_H
+}}//namespaces
+#endif

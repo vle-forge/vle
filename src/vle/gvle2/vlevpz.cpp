@@ -657,14 +657,17 @@ vleVpz::getXQuery(QDomNode node)
         (name == "out") or
         (name == "connections") or
         (name == "classes") or
-        (name == "dynamics")) {
+        (name == "dynamics") or
+        (name == "conditions") or
+        (name == "experiment")) {
         return getXQuery(node.parentNode())+"/"+name;
     }
     //element identified wy attribute name
     if ((name == "port") or
         (name == "model") or
         (name == "class") or
-        (name == "dynamic")){
+        (name == "dynamic") or
+        (name == "condition")){
         return getXQuery(node.parentNode())+"/"+name+"[@name=\""
                 +attributeValue(node,"name")+"\"]";
     }
@@ -764,7 +767,9 @@ vleVpz::getNodeFromXQuery(const QString& query, QDomNode d)
         (curr == "out") or
         (curr == "connections") or
         (curr == "classes") or
-        (curr == "dynamics")){
+        (curr == "dynamics") or
+        (curr == "conditions") or
+        (curr == "experiment")){
         return getNodeFromXQuery(rest, obtainChild(d, curr, true));
     }
     //handle recursion with nodes identified by name
@@ -773,6 +778,7 @@ vleVpz::getNodeFromXQuery(const QString& query, QDomNode d)
     nodeByNames.push_back(QString("port"));
     nodeByNames.push_back(QString("class"));
     nodeByNames.push_back(QString("dynamic"));
+    nodeByNames.push_back(QString("condition"));
     QString selNodeByName ="";
     for (unsigned int i=0; i< nodeByNames.size(); i++) {
         if (curr.startsWith(nodeByNames[i])) {
@@ -1097,6 +1103,7 @@ vleVpz::renameConditionToDoc(const QString& oldName, const QString& newName)
     for (unsigned int i =0; i < condList.length(); i++) {
         QDomNode cond = condList.at(i);
         if (attributeValue(cond, "name") == oldName) {
+            undoStack->snapshot(condsFromDoc());
             setAttributeValue(cond.toElement(), "name", newName);
             emit conditionsUpdated();
             return;
@@ -1131,7 +1138,9 @@ void
 vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
         const QString& newName)
 {
-    QDomNodeList portList = portsListFromDoc(condName);
+    QDomNode cond = condFromConds(condsFromDoc(), condName);
+    undoStack->snapshot(cond);
+    QDomNodeList portList = portsListFromCond(cond);
     for (unsigned int i =0; i < portList.length(); i++) {
         QDomNode port = portList.at(i);
         if (attributeValue(port, "name") == oldName) {
@@ -1322,6 +1331,7 @@ QDomNode
 vleVpz::addConditionToDoc(const QString& condName)
 {
     QDomNode conds = condsFromDoc();
+    undoStack->snapshot(conds);
     if (conds.isNull()) {
         QDomNode exp = experimentFromDoc();
         QDomElement conditionsTag = getDomDoc().createElement("conditions");
@@ -1393,13 +1403,29 @@ vleVpz::addObsPortToDoc(const QString& obsName, const QString& portName)
 QDomNode
 vleVpz::addCondPortToDoc(const QString& condName, const QString& portName)
 {
-    return addPort(condFromConds(condsFromDoc(), condName), portName);
+    QDomNode node = condFromConds(condsFromDoc(), condName);
+    undoStack->snapshot(node);
+    QDomNodeList conds = portsListFromCond(node);
+    for (unsigned int i=0; i < conds.length(); i++) {
+        QDomNode child = conds.item(i);
+        if ((child.attributes().contains("name")) and
+            (child.attributes().namedItem("name").nodeValue() == portName)){
+            qDebug() << ("Internal error in addPort (already here)");
+            return QDomNode();
+        }
+    }
+    QDomElement elem = getDomDoc().createElement("port");
+    elem.setAttribute("name", portName);
+    node.appendChild(elem);
+    return elem;
 }
 
 void
 vleVpz::rmConditionToDoc(const QString& condName)
 {
-    rmCondFromConds(condsFromDoc(), condName);
+    QDomNode conds = condsFromDoc();
+    undoStack->snapshot(conds);
+    rmCondFromConds(conds, condName);
 }
 
 bool
@@ -2762,24 +2788,6 @@ vleVpz::addObsPort(QDomNode node, const QString& portName)
 }
 
 QDomNode
-vleVpz::addPort(QDomNode node, const QString& portName)
-{
-    QDomNodeList conds = portsListFromCond(node);
-    for (unsigned int i=0; i < conds.length(); i++) {
-        QDomNode child = conds.item(i);
-        if ((child.attributes().contains("name")) and
-            (child.attributes().namedItem("name").nodeValue() == portName)){
-            qDebug() << ("Internal error in addPort (already here)");
-            return QDomNode();
-        }
-    }
-    QDomElement elem = getDomDoc().createElement("port");
-    elem.setAttribute("name", portName);
-    node.appendChild(elem);
-    return elem;
-}
-
-QDomNode
 vleVpz::outputFromOutputs(QDomNode node, const QString& outputName)
 {
     if (node.nodeName() != "outputs") {
@@ -3144,6 +3152,12 @@ vleVpz::buildValue(const QDomNode& portNode, int valIndex) const
     return 0;
 }
 
+unsigned int
+vleVpz::nbValuesInPortFromDoc(const QString& condName, const QString& portName)
+{
+    QDomNode port = portFromDoc(condName, portName);
+    return childNodesWithoutText(port).size();
+}
 
 bool
 vleVpz::fillWithMultipleValueFromDoc(const QString& condName,
@@ -3192,8 +3206,15 @@ vleVpz::fillWithValue(const QString& condName, const QString& portName,
         int index, const vle::value::Value& val)
 {
     QDomNode port = portFromDoc(condName, portName);
+    undoStack->snapshot(port);
     QList<QDomNode> chs = childNodesWithoutText(port);
     QDomNode valNode = chs[index];
+    if (val.getType() != valueType(condName, portName, index)) {
+        QDomNode parent = valNode.parentNode();
+        parent.replaceChild(buildEmptyValueFromDoc(val.getType()), valNode);
+        chs = childNodesWithoutText(port);
+        valNode = chs[index];
+    }
     fillWithValue(valNode, val);
     return true;
 }
@@ -3757,8 +3778,10 @@ vleDomDiffStack::undo()
 
         QDomNode currN = mVpz->getNodeFromXQuery(diffs[curr].query);
         QDomNode parent = currN.parentNode();
+        if (parent.isNull()) {
+            qDebug() << " Internal error vleDomDiffStack::undo() " << diffs[curr].query;
+        }
         parent.replaceChild(diffs[curr].node_before, currN);
-        //diffs[curr].reset();
         emit undoRedoVpz(currN, diffs[curr].node_before);
         curr --;
     }

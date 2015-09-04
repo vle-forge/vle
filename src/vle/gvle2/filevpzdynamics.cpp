@@ -27,79 +27,14 @@
 #include <QComboBox>
 #include <QMenu>
 #include <QUndoCommand>
+#include "gvle2_widgets.h"
 #include "filevpzdynamics.h"
 #include "ui_filevpzdynamics.h"
 
 #include <QDebug>
 
-
-
-AdhocCombo::AdhocCombo(QWidget *parent): QComboBox(parent)
-{
-
-}
-AdhocCombo::~AdhocCombo()
-{
-
-}
-void
-AdhocCombo::setId(const QString& text)
-{
-    combo_id = text;
-}
-
-void
-AdhocCombo::mousePressEvent(QMouseEvent * e)
-{
-    emit comboSelected(combo_id);
-    //file_vpz_dyn->onComboSelected(combo_id);
-    QComboBox::mousePressEvent(e);
-}
-
-
-AdhocQTextEdit::AdhocQTextEdit(QWidget *parent): QPlainTextEdit(parent)
-{
-    this->setLineWrapMode(QPlainTextEdit::NoWrap);
-    this->setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
-    this->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
-//    this->setTextInteractionFlags(Qt::TextEditorInteraction);
-//    this->setTextInteractionFlags(Qt::TextEditable);
-    this->setTextInteractionFlags(Qt::NoTextInteraction);
-    this->setContextMenuPolicy(Qt::NoContextMenu);
-}
-AdhocQTextEdit::~AdhocQTextEdit()
-{
-
-}
-
-void
-AdhocQTextEdit::setTextEdition(bool val)
-{
-    if (val and this->textInteractionFlags() == Qt::NoTextInteraction) {
-        saved_value = document()->toPlainText();
-        this->setTextInteractionFlags(Qt::TextEditorInteraction);
-        this->setFocus(Qt::ActiveWindowFocusReason); // this gives the item keyboard focus
-    } else {
-        this->setTextInteractionFlags(Qt::NoTextInteraction);
-        this->clearFocus();
-        if (document()->toPlainText() != saved_value) {
-            emit textUpdated(saved_value, document()->toPlainText());
-        }
-    }
-}
-
-void
-AdhocQTextEdit::setText(const QString& text)
-{
-    this->document()->setPlainText(text);
-    saved_value = text;
-}
-
-void
-AdhocQTextEdit::focusOutEvent(QFocusEvent *e)
-{
-   setTextEdition(false);
-}
+namespace vle {
+namespace gvle2 {
 
 /**
  * @brief FileVpzDynamics::FileVpzDynamics
@@ -111,7 +46,6 @@ FileVpzDynamics::FileVpzDynamics(QWidget *parent) :
     ui(new Ui::FileVpzDynamics)
 {
     mVpz = 0;
-    mPackageLoaded = false;
 
     ui->setupUi(this);
     QStringList headers;
@@ -119,8 +53,6 @@ FileVpzDynamics::FileVpzDynamics(QWidget *parent) :
     headers.append("Package");
     headers.append("Library");
     ui->tabDynamics->setHorizontalHeaderLabels(headers);
-
-//    ui->dynDetailBox->setVisible(false);
 
     QTableWidget* dynList = ui->tabDynamics;
 
@@ -209,89 +141,47 @@ void FileVpzDynamics::reload()
 
         QString dynLib = mVpz->getDynamicLibrary(dyn);
         ui->tabDynamics->insertRow(i);
-        AdhocQTextEdit* dlabName = new AdhocQTextEdit(ui->tabDynamics);
-        dlabName->setText(dyn);
-        QObject::connect(dlabName,
-                SIGNAL(textUpdated(const QString&, const QString&)),
-                this, SLOT(onTextUpdated(const QString&, const QString&)));
+        VleTextEdit* dlabName = new VleTextEdit(ui->tabDynamics, dyn, "", true);
+        QObject::connect(dlabName,SIGNAL(
+          textUpdated(const QString&, const QString&, const QString&)),
+          this, SLOT(
+          onTextUpdated(const QString&, const QString&, const QString&)));
         ui->tabDynamics->setCellWidget(i, 0, dlabName);
 
-        AdhocCombo* dlabpkg = new AdhocCombo(ui->tabDynamics);
+        VleCombo* dlabpkg = new VleCombo(ui->tabDynamics, dyn);
         dlabpkg->addItems(pkgList);
         dlabpkg->setCurrentIndex(dlabpkg->findText(dynPkg));
-        dlabpkg->setId(dyn);
         ui->tabDynamics->setCellWidget(i, 1, dlabpkg);
         QObject::connect(dlabpkg,
-                        SIGNAL(currentIndexChanged(const QString&)),
-                        this, SLOT(onSelectPackage(const QString&)));
-        QObject::connect(dlabpkg,
-                        SIGNAL(comboSelected(const QString&)),
-                        this, SLOT(onComboSelected(const QString&)));
+                        SIGNAL(valUpdated(const QString&,const QString&)),
+                        this,
+                        SLOT(onSelectPackage(const QString&, const QString&)));
 
 
-        AdhocCombo* dlabLibrary = new AdhocCombo(ui->tabDynamics);
+        VleCombo* dlabLibrary = new VleCombo(ui->tabDynamics,
+                QString("%1,%2").arg(dyn).arg(dynPkg));
         dlabLibrary->addItems(libList);
         dlabLibrary->setCurrentIndex(dlabLibrary->findText(dynLib));
-        dlabLibrary->setId(dyn);
         QObject::connect(dlabLibrary,
-                        SIGNAL(currentIndexChanged(const QString&)),
-                        this, SLOT(onSelectLibrary(const QString&)));
-        QObject::connect(dlabLibrary,
-                        SIGNAL(comboSelected(const QString&)),
-                        this, SLOT(onComboSelected(const QString&)));
+                        SIGNAL(valUpdated(const QString&,const QString&)),
+                        this,
+                        SLOT(onSelectLibrary(const QString&, const QString&)));
         ui->tabDynamics->setCellWidget(i, 2, dlabLibrary);
     }
     ui->tabDynamics->resizeColumnToContents(0);
 }
 
 void
-FileVpzDynamics::onComboSelected(const QString& dyn)
+FileVpzDynamics::onSelectPackage(const QString& id, const QString& text)
 {
-    curr_dyn = dyn;
-}
-
-void
-FileVpzDynamics::onSelectPackage(const QString& text)
-{
-
-    mVpz->configDynamicToDoc(curr_dyn, text, "<Node>");
+    mVpz->configDynamicToDoc(id.split(",").at(0), text, "<Node>");
     reload();
-
-//    if ( ! mPackageLoaded)
-//        return;
-//
-//    // Get the name of the selected package
-//    QString pkgName = ui->dynPackageList->item(index)->text();
-//    // Reload the Library list for this package
-//    updateLibraryList(pkgName, "");
-//
-//    // Change the background color of the Package into Dynamics list
-//    int cr = ui->tabDynamics->currentRow();
-//    QWidget *widgetPackage = ui->tabDynamics->cellWidget(cr, 1);
-//    widgetPackage->setStyleSheet("background-color: rgb(255, 180, 180);");
 }
 
-/**
- * @brief FileVpzDynamics::onSelectLibrary (slot)
- *        Called when a library is selected from widget
- *
- */
-void FileVpzDynamics::onSelectLibrary(const QString& text)
+void FileVpzDynamics::onSelectLibrary(const QString& id, const QString& text)
 {
-
-    QString pkgName = "";
-    int i=0;
-    bool found = false;
-    for (; (i<ui->tabDynamics->rowCount() and not found);i++) {
-        QString dyni = (qobject_cast<AdhocQTextEdit*>(
-                ui->tabDynamics->cellWidget(i,0)))->toPlainText();
-        if (dyni == curr_dyn) {
-            pkgName = (qobject_cast<AdhocCombo*>(
-                    ui->tabDynamics->cellWidget(i,1)))->currentText();
-        }
-
-    }
-    mVpz->configDynamicToDoc(curr_dyn, pkgName, text);
+    QStringList l = id.split(",");
+    mVpz->configDynamicToDoc(l.at(0), l.at(1), text);
     reload();
 }
 
@@ -324,11 +214,11 @@ FileVpzDynamics::onDynamicsTableMenu(const QPoint& pos)
             reload();
             break;
         } case FVD_rename_dynamic: {
-            AdhocQTextEdit* itemText = qobject_cast<AdhocQTextEdit*>(item);
+            VleTextEdit* itemText = qobject_cast<VleTextEdit*>(item);
             itemText->setTextEdition(true);
             break;
         } case FVD_remove_dynamic: {
-            mVpz->removeDyn((qobject_cast<AdhocQTextEdit*>(item))->toPlainText());
+            mVpz->removeDyn((qobject_cast<VleTextEdit*>(item))->toPlainText());
             reload();
             break;
         }}
@@ -336,13 +226,14 @@ FileVpzDynamics::onDynamicsTableMenu(const QPoint& pos)
 }
 
 void
-FileVpzDynamics::onUndoRedoVpz(QDomNode oldVal, QDomNode newVal)
+FileVpzDynamics::onUndoRedoVpz(QDomNode /*oldVal*/, QDomNode /*newVal*/)
 {
     reload();
 }
 
 void
-FileVpzDynamics::onTextUpdated(const QString& old, const QString& newval)
+FileVpzDynamics::onTextUpdated(const QString& /*id*/, const QString& old,
+        const QString& newval)
 {
     mVpz->renameDynamicToDoc(old, newval);
     reload();
@@ -357,7 +248,7 @@ QString FileVpzDynamics::getSelected()
 {
     int cr = ui->tabDynamics->currentRow();
     QWidget *widgetName  = ui->tabDynamics->cellWidget(cr, 0);
-    AdhocQTextEdit  *labelName   = qobject_cast<AdhocQTextEdit *>(widgetName);
+    VleTextEdit  *labelName   = qobject_cast<VleTextEdit *>(widgetName);
     if (labelName == 0)
         return 0;
     return (labelName->toPlainText());
@@ -368,7 +259,7 @@ QString FileVpzDynamics::getSelected()
  *        Refresh the package list widget
  *
  */
-void FileVpzDynamics::updatePackageList(QString name)
+void FileVpzDynamics::updatePackageList(QString /*name*/)
 {
 //    // Get list of known/installed packages
 //    vle::utils::PathList pathList;
@@ -406,7 +297,7 @@ void FileVpzDynamics::updatePackageList(QString name)
  *        Refresh the library list widget for the specific package
  *
  */
-void FileVpzDynamics::updateLibraryList(QString package, QString name)
+void FileVpzDynamics::updateLibraryList(QString /*package*/, QString /*name*/)
 {
 
 //    vle::utils::ModuleList lst;
@@ -447,3 +338,5 @@ void FileVpzDynamics::updateLibraryList(QString package, QString name)
 //    }
 
 }
+
+}}//namespaces

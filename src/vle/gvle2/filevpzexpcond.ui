@@ -10,393 +10,83 @@
     <height>481</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
-  <widget class="QStackedWidget" name="valueEdit">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>60</y>
-     <width>431</width>
-     <height>361</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>200</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>100</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="currentIndex">
-    <number>6</number>
-   </property>
-   <widget class="QWidget" name="booleanEdit">
-    <widget class="QComboBox" name="boolComboBox">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>40</y>
-       <width>81</width>
-       <height>31</height>
-      </rect>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <item>
-      <property name="text">
-       <string>false</string>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QTableWidget" name="table">
+      <property name="baseSize">
+       <size>
+        <width>19</width>
+        <height>0</height>
+       </size>
       </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>true</string>
+      <column>
+       <property name="text">
+        <string>Condition</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Port</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="minimumSize">
+       <size>
+        <width>238</width>
+        <height>0</height>
+       </size>
       </property>
-     </item>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="integerEdit">
-    <widget class="QSpinBox" name="intSpinBox">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>40</y>
-       <width>81</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="doubleEdit">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>40</y>
-       <width>81</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="stringEdit">
-    <widget class="QPlainTextEdit" name="stringTextEdit">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>40</y>
-       <width>121</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="setEdit">
-    <widget class="QListWidget" name="setListWidget">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>371</width>
-       <height>351</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="mapEdit">
-    <widget class="QTreeWidget" name="mapTreeWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>401</width>
-       <height>341</height>
-      </rect>
-     </property>
-     <property name="contextMenuPolicy">
-      <enum>Qt::CustomContextMenu</enum>
-     </property>
-     <column>
-      <property name="text">
-       <string>keys</string>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>values</string>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
-     </column>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tupleEdit">
-    <widget class="QListWidget" name="tupleListWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>331</width>
-       <height>311</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tableEdit">
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>431</width>
-       <height>321</height>
-      </rect>
-     </property>
-     <row>
-      <property name="text">
-       <string>1</string>
+      <property name="widgetResizable">
+       <bool>true</bool>
       </property>
-     </row>
-     <row>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </row>
-     <column>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </column>
+      <widget class="QWidget" name="value">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>236</width>
+         <height>461</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
     </widget>
-    <widget class="QSpinBox" name="tableRowsSpin">
-     <property name="geometry">
-      <rect>
-       <x>160</x>
-       <y>330</y>
-       <width>48</width>
-       <height>27</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="tableColsSpin">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>330</y>
-       <width>48</width>
-       <height>27</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="tableDimButton">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>330</y>
-       <width>99</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Change dim</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="tableRowsLabel">
-     <property name="geometry">
-      <rect>
-       <x>116</x>
-       <y>336</y>
-       <width>41</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>rows</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="tableColsLabel">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>336</y>
-       <width>31</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>cols</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="matrixEdit">
-    <widget class="QLabel" name="matrixColsLabel">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>336</y>
-       <width>31</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>cols</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="matrixRowslabel">
-     <property name="geometry">
-      <rect>
-       <x>116</x>
-       <y>336</y>
-       <width>41</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>rows</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="matrixColsSpin">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>330</y>
-       <width>48</width>
-       <height>27</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="matrixRowsSpin">
-     <property name="geometry">
-      <rect>
-       <x>160</x>
-       <y>330</y>
-       <width>48</width>
-       <height>27</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="matrixDimButton">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>330</y>
-       <width>99</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Change dim</string>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="matrixWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>431</width>
-       <height>321</height>
-      </rect>
-     </property>
-     <row>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </row>
-     <row>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </row>
-     <column>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </column>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="pageBlank"/>
-  </widget>
-  <widget class="QLabel" name="labelValue">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>20</y>
-     <width>441</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>No value edition</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="upStackButton">
-   <property name="geometry">
-    <rect>
-     <x>650</x>
-     <y>430</y>
-     <width>31</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Up</string>
-   </property>
-  </widget>
-  <widget class="QTreeWidget" name="expTree">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>9</y>
-     <width>200</width>
-     <height>433</height>
-    </rect>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>200</width>
-     <height>16777215</height>
-    </size>
-   </property>
-   <column>
-    <property name="text">
-     <string notr="true">Conditions tree</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QLabel" name="labelValueStack">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>440</y>
-     <width>361</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
