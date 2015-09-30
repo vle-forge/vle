@@ -151,6 +151,26 @@ Matrix& Set::addMatrix()
     return *value;
 }
 
+void
+Set::resize(int newSize, const Value& fill)
+{
+    if ((int) size() == newSize) {
+        return;
+    }
+    if ((int) size() > newSize) {
+        for (int i=(int) size()-1; i>newSize; i--) {
+            delete m_value[i];
+        }
+        m_value.resize(newSize);
+    } else {
+        int oldSize = (int) size();
+        m_value.resize(newSize);
+        for (int i=oldSize; i<(int) size(); i++) {
+            m_value[i] = fill.clone();
+        }
+    }
+}
+
 Set& Set::getSet(const size_type& i)
 {
     value::Value& value = value::reference(get(i));
@@ -191,6 +211,11 @@ const Matrix& Set::getMatrix(const size_type& i) const
     const value::Value& value = value::reference(get(i));
 
     return value::toMatrixValue(value);
+}
+
+void Set::remove(const size_type& i)
+{
+    del(i);
 }
 
 }} // namespace vle value

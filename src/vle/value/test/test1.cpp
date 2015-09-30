@@ -250,6 +250,20 @@ BOOST_AUTO_TEST_CASE(check_matrix)
     BOOST_REQUIRE_EQUAL(value::toInteger(*mx->value()[0][0]), 10);
     BOOST_REQUIRE_EQUAL(value::toInteger(*cpy->value()[0][0]), 20);
 
+    BOOST_REQUIRE_EQUAL(cpy->rows(), 101);
+    BOOST_REQUIRE_EQUAL(cpy->columns(), 101);
+
+    cpy->resize(3, 4);
+
+    BOOST_REQUIRE_EQUAL(cpy->rows(), 4);
+    BOOST_REQUIRE_EQUAL(cpy->columns(), 3);
+
+    cpy->resize(5, 3, vle::value::Boolean(true));
+
+    BOOST_REQUIRE_EQUAL(cpy->rows(), 3);
+    BOOST_REQUIRE_EQUAL(cpy->columns(), 5);
+    BOOST_REQUIRE(cpy->getBoolean(4,2));
+
     delete(mx);
     delete(cpy);
 }

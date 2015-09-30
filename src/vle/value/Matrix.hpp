@@ -257,9 +257,27 @@ public:
      * @brief Resize the current matrix.
      * @param columns The number of columns of the matrix.
      * @param rows The number of rows of the matrix.
-     * @throw utils::ArgError if data are loss.
      */
     void resize(const size_type& columns, const size_type& rows);
+
+    /**
+     * @brief Resize only the size of allocated matrix . Content of the matrix
+     * is not modified.
+     * @param columns The number of columns of the allocated matrix. Has to be
+     * greater the m_nbcol and m_matrix.shape[0], otherwise nothing happens.
+     * @param rows The number of rows of the matrix. Has to be
+     * greater the m_nbrow and m_matrix.shape[1], otherwise nothing happens.
+     */
+    void increaseAllocation(const size_type& columns, const size_type& rows);
+
+    /**
+     * @brief Resize the current matrix.
+     * @param columns The number of columns of the matrix.
+     * @param rows The number of rows of the matrix.
+     * @param def The default Value used to fill new cells
+     */
+    void resize(const size_type& columns, const size_type& rows,
+            const vle::value::Value& def);
 
     /**
      * @brief Add a new column to the Matrix.
@@ -877,7 +895,10 @@ private:
     Indices m_indices;  /// @brief indices for the matrix.
     Extents m_extents; /// @brief to extents matrix.
     size_type m_nbcol;  /// @brief to store the column number.
-    size_type m_nbrow;  /// @brief to store the row number.
+    size_type m_nbrow;  /// @brief to store the row number. Note: m_nbrow
+    //represents the real number of rows, m_matrix.shape[1] is the number
+    //of rows allocated. It can be greater than m_nbrow,
+    //especially if m_steprow > 1
     size_type m_stepcol; /// @brief the column when resize.
     size_type m_steprow; /// @brief the row when resize.
     size_type m_lastX; /// @brief the last columns set.
