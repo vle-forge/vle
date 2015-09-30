@@ -30,6 +30,7 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/utils/Algo.hpp>
 #include <boost/checked_delete.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace value {
 
@@ -89,6 +90,31 @@ Matrix& Map::addMatrix(const std::string& name)
     add(name, value);
 
     return *value;
+}
+
+void
+Map::addMultilpleValues(int toadd, const vle::value::Value& fill)
+{
+    if (toadd <= 0) {
+        return;
+    }
+    std::string key;
+    bool found;
+    for (int i=0; i<toadd; i++) {
+        key.assign("NewKey");
+        int current = 0;
+        found = false;
+        while (not found) {
+            found = not exist(key);
+            if (not found) {
+                current ++;
+                key.assign("NewKey");
+                key += "_";
+                key += boost::lexical_cast<std::string>(current);
+            }
+        }
+        add(key, fill.clone());
+    }
 }
 
 Set& Map::addSet(const std::string& name)

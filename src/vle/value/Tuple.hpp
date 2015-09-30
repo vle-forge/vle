@@ -225,6 +225,12 @@ public:
      */
     void fill(const std::string& str);
 
+    /**
+     * @brief Remove an elemet of the tuple
+     * @param i index of double to remove
+     */
+    void remove(const size_type& i);
+
 private:
     TupleValue              m_value;
 };

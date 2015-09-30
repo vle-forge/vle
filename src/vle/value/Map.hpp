@@ -664,6 +664,14 @@ public:
     Matrix& addMatrix(const std::string& name);
 
     /**
+     * @brief Add directly multiple values to a map
+     * @param toadd, the number of values to add
+     * @param fill, the default value for filling new elements
+     * @note: new keys are generated for added values
+     */
+    void addMultilpleValues(int toadd, const vle::value::Value& fill);
+
+    /**
      * @brief Get the Map value objet from specified name.
      * @param name The name of the Value in the map.
      * @return a reference to the Value.

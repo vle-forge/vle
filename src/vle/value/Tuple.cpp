@@ -95,5 +95,10 @@ void Tuple::fill(const std::string& str)
     }
 }
 
+void Tuple::remove(const size_type& i)
+{
+    m_value.erase(m_value.begin() + i);
+}
+
 }} // namespace vle value
 

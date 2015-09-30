@@ -590,6 +590,13 @@ public:
     Matrix& addMatrix();
 
     /**
+     * @brief Resize the set
+     * @param newSize, the new size
+     * @param fill, the default value for filling new elements
+     */
+    void resize(int newSize, const Value& fill);
+
+    /**
      * @brief Get a Set from the specified index.
      * @param i The index to get Value.
      * @return A Set.
@@ -642,6 +649,12 @@ public:
      * the value a 'i' is null or is not an Matrix.
      */
     const Matrix& getMatrix(const size_type& i) const;
+
+    /**
+     * @brief Remove an elemet of the set
+     * @param i index of value to remove
+     */
+    void remove(const size_type& i);
 
 private:
     VectorValue m_value;
