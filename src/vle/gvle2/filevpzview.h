@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FILEVPZVIEW_H
-#define FILEVPZVIEW_H
+#ifndef GVLE2_FILEVPZVIEW_H
+#define GVLE2_FILEVPZVIEW_H
 
 #include <QGraphicsScene>
 #include <QWidget>
@@ -59,6 +59,9 @@ class fileVpzView;
 class fileVpzRTool;
 }
 
+namespace vle {
+namespace gvle2 {
+
 class fileVpzView : public QWidget
 {
     Q_OBJECT
@@ -67,6 +70,10 @@ public:
     enum ExpCondTreeType { ECondNone, ECondCondition, ECondParameter };
 
 public:
+    /**
+     * @brief fileVpzView::fileVpzView
+     *        Default constructor for VPZ tab
+     */
     explicit fileVpzView(QWidget *parent = 0);
     ~fileVpzView();
     void setVpz(vleVpz *v);
@@ -94,13 +101,13 @@ public slots:
 private:
     bool             mUseSim;
     Ui::fileVpzView *ui;
-    vle::gvle2::FileVpzRtool*    mRtool;
-    vle::gvle2::FileVpzDynamics *mDynamicsTab;
-    vle::gvle2::FileVpzExpCond  *mExpCondTab;
-    vle::gvle2::FileVpzExpView  *mExpViewTab;
+    FileVpzRtool*    mRtool;
+    FileVpzDynamics *mDynamicsTab;
+    FileVpzExpCond  *mExpCondTab;
+    FileVpzExpView  *mExpViewTab;
     FileVpzObservables  *mObservablesTab;
     FileVpzProject  *mProjectTab;
-    vle::gvle2::FileVpzClasses  *mClassesTab;
+    FileVpzClasses  *mClassesTab;
     vleVpz          *mVpz;
     //QWidget         *mWidgetTool;
     QList<QTreeWidgetItem *> mViewsItems;
@@ -110,7 +117,9 @@ private:
     QUndoStack      *mUndoStack;
     QUndoView       *undoView;
 
-    vle::gvle2::VpzDiagScene       mScene;
+    VpzDiagScene       mScene;
 };
+
+}}  //namespaces
 
 #endif // FILEVPZVIEW_H

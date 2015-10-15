@@ -22,11 +22,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef GVLE2_LOGGER_H
+#define GVLE2_LOGGER_H
 
 #include <QTime>
 #include <QPlainTextEdit>
+
+namespace vle {
+namespace gvle2 {
+
 
 class Logger
 {
@@ -39,5 +43,7 @@ public:
 private:
     QPlainTextEdit *mWidget;
 };
+
+}}//namespaces
 
 #endif // LOGGER_H

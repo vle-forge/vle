@@ -24,6 +24,10 @@
 
 #include "plugin_modeler.h"
 
+
+namespace vle {
+namespace gvle2 {
+
 /**
  * @brief PluginModeler::PluginModeler
  *        Default constructor of PluginModeler object
@@ -89,3 +93,5 @@ void PluginModeler::closeEditClass(sourceCpp *src)
     (void) src;
     return;
 }
+
+}} //namespaces

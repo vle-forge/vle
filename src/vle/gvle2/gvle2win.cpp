@@ -44,10 +44,14 @@
 
 namespace vu = vle::utils;
 
+namespace vle {
+namespace gvle2 {
+
 GVLE2Win::GVLE2Win(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::GVLE2Win)
 {
+
     mVpz = 0;
     mTimer = 0;
     mLogger = 0;
@@ -629,7 +633,7 @@ void GVLE2Win::onLaunchSimulation()
 {
     QWidget *w = ui->tabWidget->currentWidget();
 
-    fileVpzView *vpzView = qobject_cast<fileVpzView *>(w);
+    vle::gvle2::fileVpzView *vpzView = qobject_cast<vle::gvle2::fileVpzView *>(w);
     if (vpzView == 0)
         return;
 
@@ -1151,7 +1155,7 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
 
 #ifdef QTVPZ
     vleVpz *selVpz;
-    selVpz = new vleVpz(fileName);
+    selVpz = new vleVpz(fileName, true);
     selVpz->setLogger(mLogger);
     selVpz->setBasePath(mPackage->getName());
     selVpz->setPackage(mPackage);
@@ -1363,3 +1367,5 @@ void GVLE2Win::onNewModelerClass()
 
     tab->addNewTab();
 }
+
+}} //namespaces

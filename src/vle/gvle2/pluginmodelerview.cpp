@@ -27,6 +27,10 @@
 #include "ui_pluginmodelerview.h"
 #include "pluginmodelersummary.h"
 
+
+namespace vle {
+namespace gvle2 {
+
 /**
  * @brief pluginModelerView::pluginModelerView
  *        Default constructor
@@ -406,3 +410,5 @@ void pluginModelerView::onDuplicateClass(QString srcFile, QString dst)
 
     tab->endDuplicate();
 }
+
+}}//namespaces

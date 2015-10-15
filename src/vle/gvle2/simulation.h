@@ -51,6 +51,10 @@ class simulationView;
 class simulationRTool;
 }
 
+namespace vle {
+namespace gvle2 {
+
+
 class simulationThread : public QObject
 {
     Q_OBJECT
@@ -158,5 +162,7 @@ public slots:
 private slots:
     void onButtonGo();
 };
+
+}}//namepsaces
 
 #endif // SIMULATIONVIEW_H

@@ -21,8 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef SOURCECPP_H
-#define SOURCECPP_H
+#ifndef GVLE2_SOURCECPP_H
+#define GVLE2_SOURCECPP_H
 
 #include <QObject>
 #include <QString>
@@ -30,8 +30,14 @@
 #include "vlepackage.h"
 #include "plugin_modeler.h"
 
+
+namespace vle {
+namespace gvle2 {
+
 class PluginModeler;
 class vlePackage;
+
+
 
 class sourceCpp : public QObject
 {
@@ -57,5 +63,7 @@ private:
     PluginModeler     *mModeler;
     QString            mContent;
 };
+
+}}//namespaces
 
 #endif // SOURCECPP_H

@@ -802,6 +802,28 @@ PathList Package::getPluginsGvleOutput() const
     return listLibraries(getPluginGvleOutputDir(PKG_BINARY));
 }
 
+std::string
+Package::getMetadataExpDir(
+        VLE_PACKAGE_TYPE type) const
+{
+    boost::filesystem::path f = getDir(type);
+    f /= "metadata";
+    f /= "exp";
+    return f.string();
+
+}
+
+std::string
+Package::getMetadataExpFile(const std::string& expName,
+        VLE_PACKAGE_TYPE type) const
+{
+    boost::filesystem::path f = getDir(type);
+    f /= "metadata";
+    f /= "exp";
+    f /= (expName+".vpm");
+    return f.string();
+}
+
 std::string Package::rename(const std::string& oldname,
         const std::string& newname,
         VLE_PACKAGE_TYPE type)

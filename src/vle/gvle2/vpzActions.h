@@ -34,7 +34,7 @@ namespace Ui {
 class ChangeAuthor : public QUndoCommand
 {
 public:
-    ChangeAuthor(QString newAuthor, vleVpz  *vpz,
+    ChangeAuthor(QString newAuthor, vle::gvle2::vleVpz  *vpz,
 		 QLineEdit *line, QTabWidget *tab, int id,
 		 QUndoCommand *parent = 0);
 
@@ -42,7 +42,7 @@ public:
     void redo();
 
 private:
-    vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpz;
     QString mAuthor;
     QString mPreviousAuthor;
     QLineEdit *mLine;
@@ -53,7 +53,7 @@ private:
 class ChangeDate : public QUndoCommand
 {
 public:
-    ChangeDate(QString newDate, vleVpz  *vpz,
+    ChangeDate(QString newDate, vle::gvle2::vleVpz  *vpz,
 	       QDateTimeEdit *line, QTabWidget *tab, int id,
 	       QUndoCommand *parent = 0);
 
@@ -61,7 +61,7 @@ public:
     void redo();
 
 private:
-    vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpz;
     QString mDate;
     QString mPreviousDate;
     QDateTimeEdit *mLine;
@@ -72,7 +72,7 @@ private:
 class ChangeVersion : public QUndoCommand
 {
 public:
-    ChangeVersion(QString newVersion, vleVpz  *vpz,
+    ChangeVersion(QString newVersion, vle::gvle2::vleVpz  *vpz,
 		  QLineEdit *line, QTabWidget *tab, int id,
 		  QUndoCommand *parent = 0);
 
@@ -80,7 +80,7 @@ public:
     void redo();
 
 private:
-    vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpz;
     QString mVersion;
     QString mPreviousVersion;
     QLineEdit *mLine;
@@ -91,7 +91,7 @@ private:
 class ChangeExpName : public QUndoCommand
 {
 public:
-    ChangeExpName(QString newName, vleVpz  *vpz,
+    ChangeExpName(QString newName, vle::gvle2::vleVpz  *vpz,
 		  QLineEdit *line, QTabWidget *tab, int id,
 		  QUndoCommand *parent = 0);
 
@@ -99,7 +99,7 @@ public:
     void redo();
 
 private:
-    vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpz;
     QString mName;
     QString mPreviousName;
     QLineEdit *mLine;
@@ -110,7 +110,7 @@ private:
 class ChangeExpDuration : public QUndoCommand
 {
 public:
-    ChangeExpDuration(QString newDuration, vleVpz  *vpz,
+    ChangeExpDuration(QString newDuration, vle::gvle2::vleVpz  *vpz,
 		      QLineEdit *line, QTabWidget *tab, int id,
 		      QUndoCommand *parent = 0);
 
@@ -118,7 +118,7 @@ public:
     void redo();
 
 private:
-    vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpz;
     QString mDuration;
     QString mPreviousDuration;
     QLineEdit *mLine;
@@ -129,7 +129,7 @@ private:
 class ChangeExpBegin : public QUndoCommand
 {
 public:
-    ChangeExpBegin(QString newBegin, vleVpz  *vpz,
+    ChangeExpBegin(QString newBegin, vle::gvle2::vleVpz  *vpz,
 		   QLineEdit *line, QTabWidget *tab, int id,
 		   QUndoCommand *parent = 0);
 
@@ -137,7 +137,7 @@ public:
     void redo();
 
 private:
-    vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpz;
     QString mBegin;
     QString mPreviousBegin;
     QLineEdit *mLine;

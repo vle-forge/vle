@@ -33,6 +33,9 @@
 #include "vle/vpz/AtomicModel.hpp"
 #include <iostream>
 
+namespace vle {
+namespace gvle2 {
+
 simulationView::simulationView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::simulationView),
@@ -582,3 +585,4 @@ void simulationThread::finish()
         throw 3;
     }
 }
+}}//namepsaces

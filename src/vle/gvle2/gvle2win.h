@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GVLE2WIN_H
-#define GVLE2WIN_H
+#ifndef GVLE2_GVLE2WIN_H
+#define GVLE2_GVLE2WIN_H
 
 #include "vle/gvle2/logger.h"
 #include "widgetprojecttree.h"
@@ -56,6 +56,9 @@
 namespace Ui {
 class GVLE2Win;
 }
+
+namespace vle {
+namespace gvle2 {
 
 class GVLE2Win : public QMainWindow
 {
@@ -108,25 +111,22 @@ private slots:
     void setChangedVpz(QString filename);
 
 private:
-    Ui::GVLE2Win *ui;
-    Logger           * mLogger;
-    QTimer           * mTimer;
-    WidgetProjectTree* mProjectTree;
-    QSettings        * mSettings;
-    vle::vpz::Vpz    * mVpz;
-    bool               mSimOpened;
-    QActionGroup     * mMenuSimGroup;
-private:
-    QMap <QString,QString> mSimulatorPlugins;
-    QString            mCurrentSimName;
-    PluginSimulator  * mCurrentSim;
-    QPluginLoader    * mCurrentSimPlugin;
-private:
-    QList <QString>    mModelers;
-    QList<QPluginLoader *> mModelerPlugins;
-private:
-    QMap <QString,QString> mExpPlugins;
-    QMap <QString,QString> mOutputPlugins;
+    Ui::GVLE2Win*         ui;
+    Logger*               mLogger;
+    QTimer*               mTimer;
+    WidgetProjectTree*    mProjectTree;
+    QSettings*            mSettings;
+    vle::vpz::Vpz*        mVpz;
+    bool                  mSimOpened;
+    QActionGroup*         mMenuSimGroup;
+    QMap<QString,QString> mSimulatorPlugins;
+    QString               mCurrentSimName;
+    PluginSimulator*      mCurrentSim;
+    QPluginLoader*        mCurrentSimPlugin;
+    QList <QString>       mModelers;
+    QList<QPluginLoader*> mModelerPlugins;
+    QMap<QString,QString> mExpPlugins;
+    QMap<QString,QString> mOutputPlugins;
 
 
 protected:
@@ -146,5 +146,7 @@ private:
     vlePackage         *mPackage;
     vle::utils::Package mCurrPackage;
 };
+
+}}//namespaces
 
 #endif // GVLE2WIN_H

@@ -21,8 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef VLEPACKAGE_H
-#define VLEPACKAGE_H
+#ifndef GVLE2_VLEPACKAGE_H
+#define GVLE2_VLEPACKAGE_H
 
 #include <QDir>
 #include <QMap>
@@ -31,15 +31,16 @@
 
 #include "plugin_modeler.h"
 #include "plugin_output.h"
+#include "plugin_cond.h"
+#include "plugin_modeler.h"
 #include "sourcecpp.h"
 
 #ifndef Q_MOC_RUN
 #include <vle/utils/Package.hpp>
 #endif
 
-class PluginModeler;
-class PluginExpCond;
-class PluginOutput;
+namespace vle {
+namespace gvle2 {
 
 class vlePackage
 {
@@ -47,7 +48,8 @@ public:
     vlePackage();
     vlePackage(QString path);
     QString getName();
-    void    setStdPackage(vle::utils::Package *pkg);
+    void    setStdPackage(vle::utils::Package* pkg);
+    vle::utils::Package* getStdPackage();
     QString getSrcFilePath(QString name);
 
     // Functions used to manage cpp source files
@@ -58,18 +60,19 @@ private slots:
     void       sourceDestroyed(QObject *obj);
 
 public: // Functions used for modeler plugins
-    void    addModeler(QString filename);
-    PluginModeler *getModelerByPlugin(QString pluginName);
-    PluginModeler *getModelerByClass(QString className);
-    int     getModelerCount();
-    QString getModelerName(int pos);
-    int     getModelerClassCount();
-    QString getModelerClass(int pos);
-    QString getModelerClassPlugin(QString className);
+    QStringList    getListOfCondPlugins();
+    void           addModeler(QString filename);
+    PluginModeler* getModelerByPlugin(QString pluginName);
+    PluginModeler* getModelerByClass(QString className);
+    int            getModelerCount();
+    QString        getModelerName(int pos);
+    int            getModelerClassCount();
+    QString        getModelerClass(int pos);
+    QString        getModelerClassPlugin(QString className);
 
 public: // Functions used by Experimental Conditions plugins
     void    addExpPlugin(QString name, QString fileName);
-    PluginExpCond *getExpPlugin(QString name);
+    PluginExpCond* getCondPlugin(QString name);
     QString getExpPluginName(int index);
     int     expPluginCount();
     void addOutputPlugin(QString name, QString fileName);
@@ -79,17 +82,16 @@ protected:
     void    refreshModelerClass();
 private:
     QDir mDir;
-private:
-    QMap<QString,sourceCpp *> mSourceCpp;
-    QMap<sourceCpp *,int>     mSourceCppUsage;
-private:
-    vle::utils::Package *mStdPackage;
-    QMap <QString,QString> mModelers;
-    QMap <QString,QString> mModelerClass;
-    QMap <QString, QPluginLoader*> mModelerLoader;
-private:
-    QMap <QString,QString> mExpPlugins;
-    QMap <QString,QString> mOutputPlugins;
+    QMap<QString,sourceCpp*>      mSourceCpp;
+    QMap<sourceCpp*,int>          mSourceCppUsage;
+    vle::utils::Package*          mStdPackage;
+    QMap <QString,QString>        mModelers;
+    QMap <QString,QString>        mModelerClass;
+    QMap <QString,QPluginLoader*> mModelerLoader;
+    QMap <QString,QString>        mCondPlugins;
+    QMap <QString,QString>        mOutputPlugins;
 };
+
+}} // namespaces
 
 #endif // VLEPACKAGE_H

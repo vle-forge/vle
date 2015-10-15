@@ -28,10 +28,11 @@
 #include <QObject>
 #include <QString>
 #include <QWidget>
-#include <vle/gvle2/logger.h>
-#include <vle/gvle2/vlevpz.h>
+#include "logger.h"
+#include "vlevpz.h"
 
-class vleVpz;
+namespace vle {
+namespace gvle2 {
 
 class PluginOutput: public QObject
 {
@@ -44,6 +45,8 @@ public:
     virtual void  init(vleVpz* vpz, const QString& viewName) = 0;
 };
 
-Q_DECLARE_INTERFACE(PluginOutput, "fr.inra.vle.gvle2.PluginOutput/1.0")
+}}//namespaces
+
+Q_DECLARE_INTERFACE(vle::gvle2::PluginOutput, "fr.inra.vle.gvle2.PluginOutput/1.0")
 
 #endif

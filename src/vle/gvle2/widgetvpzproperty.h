@@ -21,8 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef WIDGETVPZPROPERTY_H
-#define WIDGETVPZPROPERTY_H
+#ifndef GVLE2_WIDGETVPZPROPERTY_H
+#define GVLE2_WIDGETVPZPROPERTY_H
 
 #include <QWidget>
 #include "vlevpz.h"
@@ -32,6 +32,10 @@ class WidgetVpzPropertyDynamics;
 class WidgetVpzPropertyExpCond;
 class WidgetVpzPropertyObservables;
 }
+
+namespace vle {
+namespace gvle2 {
+
 
 class WidgetVpzPropertyDynamics : public QWidget
 {
@@ -94,4 +98,7 @@ private:
     vleVpz *mVpz;
     QString mModQuery;
 };
+
+}}//namepsaces
+
 #endif // WIDGETVPZPROPERTY_H

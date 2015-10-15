@@ -21,17 +21,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef SOURCECPPTEMPLATE_H
-#define SOURCECPPTEMPLATE_H
+#ifndef GVLE2_SOURCECPPTEMPLATE_H
+#define GVLE2_SOURCECPPTEMPLATE_H
 
 #include <QMap>
 #include <QString>
 
-class sourceCpp;
-
 #ifndef Q_MOC_RUN
 #include <vle/utils/Template.hpp>
 #endif
+
+
+namespace vle {
+namespace gvle2 {
+
+class sourceCpp;
 
 class sourceCppTemplate
 {
@@ -54,5 +58,7 @@ private:
     QMap<QString,QString> mTagConf;
     QMap<QString,QString> mTagConfValue;
 };
+
+}}//namepsaces
 
 #endif // SOURCECPPTEMPLATE_H

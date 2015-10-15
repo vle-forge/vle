@@ -28,6 +28,9 @@
 #include "plugin_cond.h"
 #include "sourcecpp.h"
 
+namespace vle {
+namespace gvle2 {
+
 /**
  * @brief vlePackage::vlePackage
  *        Default constructor for a VLE package
@@ -94,6 +97,12 @@ void vlePackage::setStdPackage(vle::utils::Package *pkg)
     mStdPackage->select( mDir.dirName().toStdString() );
 }
 
+vle::utils::Package*
+vlePackage::getStdPackage()
+{
+    return mStdPackage;
+}
+
 /* ------------------------ Sources files Functions ------------------------ */
 
 sourceCpp *vlePackage::openSourceCpp(QString filename)
@@ -131,6 +140,12 @@ void vlePackage::sourceDestroyed(QObject *obj)
 }
 
 /* ----------------------- Modeler Plugins Functions ----------------------- */
+
+QStringList
+vlePackage::getListOfCondPlugins()
+{
+    return mCondPlugins.keys();
+}
 
 void vlePackage::addModeler(QString filename)
 {
@@ -234,23 +249,26 @@ void vlePackage::refreshModelerClass()
 
 /* --------------- Experimental Conditions Plugins Functions --------------- */
 
-void vlePackage::addExpPlugin(QString name, QString fileName)
+void
+vlePackage::addExpPlugin(QString name, QString fileName)
 {
-    if (mExpPlugins.key(name).isEmpty())
+    if (mCondPlugins.key(name).isEmpty())
     {
-        mExpPlugins.insert(name.toLower(), fileName);
+        mCondPlugins.insert(name.toLower(), fileName);
     }
 }
 
-int vlePackage::expPluginCount()
+int
+vlePackage::expPluginCount()
 {
-    return mExpPlugins.count();
+    return mCondPlugins.count();
 }
 
-PluginExpCond *vlePackage::getExpPlugin(QString name)
+PluginExpCond*
+vlePackage::getCondPlugin(QString name)
 {
     // Search the library file of the plugin
-    QString pluginFile = mExpPlugins.value(name.toLower());
+    QString pluginFile = mCondPlugins.value(name.toLower());
     // Load the QT plugin library
     QPluginLoader *loader = new QPluginLoader(pluginFile);
     // Get an instance of the GVLE2 plugin
@@ -265,9 +283,10 @@ PluginExpCond *vlePackage::getExpPlugin(QString name)
     return expPlugin;
 }
 
-QString vlePackage::getExpPluginName(int index)
+QString
+vlePackage::getExpPluginName(int index)
 {
-    QList<QString> names = mExpPlugins.keys();
+    QList<QString> names = mCondPlugins.keys();
     return names.at(index);
 }
 
@@ -299,3 +318,4 @@ PluginOutput *vlePackage::getOutputPlugin(QString name)
     return outPlugin;
 }
 
+}} //namespaces

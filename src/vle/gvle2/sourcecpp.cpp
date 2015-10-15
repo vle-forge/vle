@@ -24,6 +24,9 @@
 
 #include "sourcecpp.h"
 
+namespace vle {
+namespace gvle2 {
+
 /**
  * @brief sourceCpp::sourceCpp
  *        Default constructor
@@ -156,3 +159,5 @@ QString sourceCpp::getModelerName()
     return tpl->getPluginName();
 }
 /* EOF */
+
+}}//namespaces

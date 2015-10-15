@@ -35,38 +35,32 @@
 #include <vle/value/Map.hpp>
 #include <vle/value/Matrix.hpp>
 #include "vlevpz.h"
+#include "vlepackage.h"
 
 #include <QDebug>
 
+namespace vle {
+namespace gvle2 {
 
-vleVpz::vleVpz()
+
+vleVpz::vleVpz():
+  mFilename(), mPath(), mFile(), mDoc(),
+  mWithMetadata(false), mMetadata(0), mPackage(0), mLogger(0), undoStack(0)
 {
-    //mRootModel = 0;
-  //  mClassesRaw = 0;
     undoStack = new vleDomDiffStack(this);
 }
 
-vleVpz::vleVpz(const QString &filename) :
-    mFilename(filename), mFile(mFilename), mDoc("vle_project")
+vleVpz::vleVpz(const QString &filename, bool withMetadata) :
+    mFilename(filename), mPath(), mFile(mFilename), mDoc("vle_project"),
+    mWithMetadata(withMetadata), mMetadata(0), mPackage(0), mLogger(0),
+    undoStack(0)
+
 {
-    //mRootModel = 0;
-    //mClassesRaw = 0;
-
-//    mFilename = filename;
-
     xReadDom();
-
-//    if (!mRootModel){
-//        mRootModel = new vleVpzModel();
-//    }
 
     undoStack = new vleDomDiffStack(this);
     undoStack->init(getDomDoc());
 }
-
-/******************************************************
- * Access to specific nodes in the vpz from Doc
- ******************************************************/
 
 const QDomDocument&
 vleVpz::getDomDoc() const
@@ -3595,14 +3589,25 @@ void vleVpz::setBasePath(const QString path)
 }
 
 
-vlePackage *vleVpz::getPackage()
+vlePackage*
+vleVpz::getPackage()
 {
     return mPackage;
 }
 
-void vleVpz::setPackage(vlePackage *package)
+void
+vleVpz::setPackage(vlePackage* package)
 {
     mPackage = package;
+    if (mWithMetadata) {
+       QString expName = mFilename;
+       expName.remove(mPath+"/exp/");
+       expName.remove(".vpz");
+       mMetadata = new vpzVpm(QString(mPackage->getStdPackage()
+               ->getMetadataExpFile(expName.toStdString(),
+                       vle::utils::PKG_SOURCE).c_str()));
+
+    }
 }
 
 bool vleVpz::isAltered()
@@ -3804,3 +3809,5 @@ vleDomDiffStack::redo()
     }
 
 }
+
+}}//namespaces

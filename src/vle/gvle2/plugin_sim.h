@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLUGIN_SIM_H
-#define PLUGIN_SIM_H
+#ifndef GVLE2_PLUGIN_SIM_H
+#define GVLE2_PLUGIN_SIM_H
 
 #include <QObject>
 #include <QString>
@@ -35,6 +35,10 @@
 #include <vle/utils/Package.hpp>
 #include <vle/vpz/Vpz.hpp>
 #endif
+
+namespace vle {
+namespace gvle2 {
+
 
 class PluginSimulator
 {
@@ -51,6 +55,8 @@ public:
     virtual void  setPackage(vle::utils::Package *pkg) = 0;
 };
 
-Q_DECLARE_INTERFACE(PluginSimulator, "fr.inra.vle.gvle2.PluginSimulator/1.0")
+}} //namespaces
+
+Q_DECLARE_INTERFACE(vle::gvle2::PluginSimulator, "fr.inra.vle.gvle2.PluginSimulator/1.0")
 
 #endif // PLUGIN_SIM_H

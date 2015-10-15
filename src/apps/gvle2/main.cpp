@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     }
     a.installTranslator(&qtTranslator);
 
-    GVLE2Win w;
+    vle::gvle2::GVLE2Win w;
 
     w.show();
 

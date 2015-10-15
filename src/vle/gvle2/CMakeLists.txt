@@ -27,8 +27,9 @@ SET(GVLE2_SOURCES_CPP gvle2_widgets.cpp gvle2win.cpp aboutbox.cpp help.cpp
   filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
   filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
   sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp vpzActions.cpp
-  vlevpz.cpp vpzDiagScene.cpp widgetvpzproperty.cpp plugin_modeler.cpp 
-  pluginmodelerview.cpp pluginmodelersummary.cpp filevpzrtool.cpp)
+  vlevpz.cpp vlevpm.cpp vpzDiagScene.cpp widgetvpzproperty.cpp
+  plugin_modeler.cpp pluginmodelerview.cpp pluginmodelersummary.cpp
+  filevpzrtool.cpp gvle2plugins.cpp)
 
 QT4_WRAP_UI(ui_gvle2win_h gvle2win.ui)
 QT4_WRAP_UI(aboutbox_h aboutbox.ui)
@@ -57,8 +58,8 @@ SET(GVLE2_SOURCES_HPP ${ui_gvle2win_h} ${aboutbox_h} ${help_h}
   ${simulationrtool_h} gvle2_widgets.h simulation.h logger.h sourcecpp.h
   sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
   ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
-  plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h vlevpz.h
-  widgetvpzproperty.h vpzDiagScene.h
+  plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h vlevpz.h vlevpm.h
+  widgetvpzproperty.h vpzDiagScene.h gvle2plugins.h
   ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h}
   ${widgetvpzpropertyobservables_h})
 

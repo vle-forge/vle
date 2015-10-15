@@ -32,6 +32,9 @@
 #include "filevpzproject.h"
 #include "ui_filevpzproject.h"
 
+namespace vle {
+namespace gvle2 {
+
 FileVpzProject::FileVpzProject(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FileVpzProject)
@@ -152,3 +155,5 @@ void FileVpzProject::setExpBeginToVpz()
         mUndoStack->push(changeBegin);
     }
 }
+
+}} //namespaces

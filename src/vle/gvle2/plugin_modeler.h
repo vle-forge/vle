@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLUGIN_MODELER_H
-#define PLUGIN_MODELER_H
+#ifndef GVLE2_PLUGIN_MODELER_H
+#define GVLE2_PLUGIN_MODELER_H
 
 #include <QObject>
 #include <QSettings>
@@ -31,10 +31,11 @@
 #include <QWidget>
 #include <QString>
 #include <vle/gvle2/logger.h>
-#include <vle/gvle2/sourcecpp.h>
-#include <vle/gvle2/vlevpz.h>
 
-class vleVpzModel;
+namespace vle {
+namespace gvle2 {
+
+class sourceCpp;
 
 class PluginModeler: public QObject
 {
@@ -46,13 +47,13 @@ public:
     virtual QString  getData(QString className) = 0;
 public:
     virtual bool     useCustomMainTab();
-    virtual QWidget *getMainTabWidget();
-    virtual QWidget *openNewClass()  = 0;
-    virtual QWidget *openEditClass(sourceCpp *src) = 0;
-    virtual QWidget *getEditClass(sourceCpp *src);
-    virtual void     closeEditClass(sourceCpp *src);
+    virtual QWidget* getMainTabWidget();
+    virtual QWidget* openNewClass()  = 0;
+    virtual QWidget* openEditClass(sourceCpp* src) = 0;
+    virtual QWidget* getEditClass(sourceCpp* src);
+    virtual void     closeEditClass(sourceCpp* src);
 //    virtual QWidget *addEditModel(vleVpzModel *model) = 0;//TODO update modeling plugin
-    virtual void     initExpCond(const QString& condName, sourceCpp *src) = 0;
+    virtual void     initExpCond(const QString& condName, sourceCpp* src) = 0;
     virtual void     rename(QString oldName, QString newName) = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
@@ -60,6 +61,8 @@ protected:
     QWidget *mMainTabWidget;
 };
 
-Q_DECLARE_INTERFACE(PluginModeler, "fr.inra.vle.gvle2.PluginModeler/1.0")
+}}//namespaces
+
+Q_DECLARE_INTERFACE(vle::gvle2::PluginModeler, "fr.inra.vle.gvle2.PluginModeler/1.0")
 
 #endif // PLUGIN_MODELER_H

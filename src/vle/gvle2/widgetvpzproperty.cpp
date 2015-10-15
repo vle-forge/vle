@@ -30,6 +30,10 @@
 #include <QVBoxLayout>
 #include <QDebug>
 
+namespace vle {
+namespace gvle2 {
+
+
 WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget *parent) :
     QWidget(parent), ui(new Ui::WidgetVpzPropertyDynamics),
     mVpz(0), mModQuery("")
@@ -253,3 +257,5 @@ WidgetVpzPropertyObservables::onCheckboxClick(bool checked)
     }
     mVpz->blockSignals(oldBlock);
 }
+
+}}//namepsaces

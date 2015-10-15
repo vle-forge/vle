@@ -35,6 +35,8 @@
 #include <vle/value/Matrix.hpp>
 
 
+#include "vlepackage.h"
+#include "gvle2plugins.h"
 
 #include "filevpzexpcond.h"
 #include "ui_filevpzexpcond.h"
@@ -47,16 +49,16 @@ namespace gvle2 {
 
 FileVpzExpCond::FileVpzExpCond(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzExpCond), mVpz(0), mCurrCondName(""),
-    mCurrPortName(""), mCurrValIndex(-1), mValWidget(), mPlugin(0)
+    mCurrPortName(""), mCurrValIndex(-1),  mPlugin(0)
 {
     ui->setupUi(this);
 
     QList<int> sizes;
-    sizes << 1000 << 0;
+    sizes << 700 << 300;
     ui->splitter->setSizes(sizes);
+
     ui->table->setAutoScroll(false);
     ui->table->setContextMenuPolicy(Qt::CustomContextMenu);
-    mValWidget = new VleValueWidget(ui->value);
 
     QObject::connect(ui->table,
             SIGNAL(cellDoubleClicked(int, int)),
@@ -64,9 +66,7 @@ FileVpzExpCond::FileVpzExpCond(QWidget *parent) :
     QObject::connect(ui->table,
                 SIGNAL(customContextMenuRequested(const QPoint&)),
                 this, SLOT(onConditionMenu(const QPoint&)));
-    QObject::connect(mValWidget,
-            SIGNAL(valUpdated(const vle::value::Value&)),
-            this, SLOT(onValUpdated(const vle::value::Value&)));
+
 }
 
 FileVpzExpCond::~FileVpzExpCond()
@@ -121,53 +121,57 @@ FileVpzExpCond::reload(bool resize)
         QDomNode cond = condList.item(i);
         QString name = mVpz->attributeValue(cond, "name");
         QDomNodeList portList = mVpz->portsListFromDoc(name);
-
-        if (portList.length() == 0) {
-            //add a line with empty port
+        if (mVpz->mMetadata->getCondPlugin(name) != ""){
+            insertTextEdit(rows, 0, name);
+            insertTextEdit(rows, 1, QString("[plugin:%1]").arg(
+                    mVpz->mMetadata->getCondPlugin(name)));
+            rows++;
+        } else if (portList.length() == 0) {
             insertTextEdit(rows, 0, name);
             insertTextEdit(rows, 1, "<Click here to add a port>");
             rows++;
+        } else  {
+            // Then for each port, add an item into the tree
+            for (unsigned int j = 0; j < portList.length(); j++) {
+                QDomNode port = portList.at(j);
+                insertTextEdit(rows, 0, name);
+                insertTextEdit(rows, 1, mVpz->attributeValue(port, "name"));
+                std::vector<vle::value::Value*> valuesToFill;
+                mVpz->fillWithMultipleValue(port, valuesToFill);
+                for (unsigned int k = 0; k < valuesToFill.size(); k++) {
+                    vle::value::Value* val = valuesToFill[k];
+                    switch(val->getType()) {
+                    case vle::value::Value::BOOLEAN: {
+                        insertBooleanCombo(rows, k+2, val->toBoolean().value());
+                        break;
+                    } case vle::value::Value::INTEGER: {
+                        insertSpinBox(rows, k+2, val->toInteger().value());
+                        break;
+                    } case vle::value::Value::DOUBLE: {
+                        insertDoubleSpinBox(rows, k+2, val->toDouble().value());
+                        break;
+                    } case vle::value::Value::STRING: {
+                        insertTextEdit(rows, k+2, val->toString().value().c_str());
+                        break;
+                    } case vle::value::Value::SET:
+                    case vle::value::Value::MAP:
+                    case vle::value::Value::TUPLE:
+                    case vle::value::Value::TABLE:
+                    case vle::value::Value::XMLTYPE:
+                    case vle::value::Value::NIL:
+                    case vle::value::Value::MATRIX: {
+                        insertTextEdit(rows, k+2, VleValueWidget::getValueDisplay(
+                                *val, VleValueWidget::Insight));
+                        break;
+                    } case vle::value::Value::USER: {
+                        //TODO
+                        break;
+                    }}
+                }
+                rows++;
+            }
         }
 
-        // Then for each port, add an item into the tree
-        for (unsigned int j = 0; j < portList.length(); j++) {
-            QDomNode port = portList.at(j);
-            insertTextEdit(rows, 0, name);
-            insertTextEdit(rows, 1, mVpz->attributeValue(port, "name"));
-            std::vector<vle::value::Value*> valuesToFill;
-            mVpz->fillWithMultipleValue(port, valuesToFill);
-            for (unsigned int k = 0; k < valuesToFill.size(); k++) {
-                vle::value::Value* val = valuesToFill[k];
-                switch(val->getType()) {
-                case vle::value::Value::BOOLEAN: {
-                    insertBooleanCombo(rows, k+2, val->toBoolean().value());
-                    break;
-                } case vle::value::Value::INTEGER: {
-                    insertSpinBox(rows, k+2, val->toInteger().value());
-                    break;
-                } case vle::value::Value::DOUBLE: {
-                    insertDoubleSpinBox(rows, k+2, val->toDouble().value());
-                    break;
-                } case vle::value::Value::STRING: {
-                    insertTextEdit(rows, k+2, val->toString().value().c_str());
-                    break;
-                } case vle::value::Value::SET:
-                case vle::value::Value::MAP:
-                case vle::value::Value::TUPLE:
-                case vle::value::Value::TABLE:
-                case vle::value::Value::XMLTYPE:
-                case vle::value::Value::NIL:
-                case vle::value::Value::MATRIX: {
-                    insertTextEdit(rows, k+2, VleValueWidget::getValueDisplay(
-                            *val, VleValueWidget::Insight));
-                    break;
-                } case vle::value::Value::USER: {
-                    //TODO
-                    break;
-                }}
-            }
-            rows++;
-        }
     }
     if (resize) {
         ui->table->resizeColumnsToContents();
@@ -178,20 +182,23 @@ FileVpzExpCond::reload(bool resize)
 void
 FileVpzExpCond::showValueEdit(vle::value::Value* val)
 {
-    if (not val) {
-        mValWidget->setHidden(true);
-        QList<int> sizes = ui->splitter->sizes();
-        sizes[0] = (sizes[0]+sizes[1]);
-        sizes[1] = 0;
-        ui->splitter->setSizes(sizes);
+    while (QWidget* w = ui->value->findChild<QWidget*>() )
+        delete w;
+    if (mPlugin) {
+        mPlugin->getWidget()->setParent(ui->value);
+        mPlugin->getWidget()->show();
+    } else if (val) {
+        VleValueWidget* valWidget = new VleValueWidget(ui->value);
+                QObject::connect(valWidget,
+                            SIGNAL(valUpdated(const vle::value::Value&)),
+                            this, SLOT(onValUpdated(const vle::value::Value&)));
+                valWidget->setValue(val);
+                valWidget->show();
     } else {
-        QList<int> sizes = ui->splitter->sizes();
-        sizes[0] = (sizes[0]+sizes[1])/2;
-        sizes[1] = sizes[0];
-        ui->splitter->setSizes(sizes);
-        mValWidget->setValue(val);
-        mValWidget->show();
+        QLabel* lab = new QLabel("Nothing to edit", ui->value);
+        lab->show();
     }
+    ui->value->show();
 }
 
 
@@ -250,21 +257,34 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
     QModelIndex index = ui->table->indexAt(pos);
     QAction* action;
     QMenu menu;
-    action = menu.addAction("Add condition");
-    action->setData(EMenuCondAdd);
-    action->setEnabled(index.column() <= 0);
+
+    QMenu* subMenu = menu.addMenu("Add condition");
+    action = subMenu->addAction("default");
+    action->setData("EMenuCondAdd");
+    action->setEnabled(true);
+
+    //check plugins
+    gvle2plugins plugs;
+    plugs.loadPlugins();
+    QStringList plugList = plugs.getCondPluginsList();
+    for (int i =0; i<plugList.size(); i++) {
+        action = subMenu->addAction(plugList.at(i)+" (plugin)");
+        action->setEnabled(true);
+        action->setData(plugList.at(i));
+    }
+
     action = menu.addAction("Remove condition");
-    action->setData(EMenuCondRemove);
+    action->setData("EMenuCondRemove");
     action->setEnabled(index.column() == 0);
     menu.addSeparator();
     action = menu.addAction("Add port");
-    action->setData(EMenuPortAdd);
+    action->setData("EMenuPortAdd");
     action->setEnabled(index.column() == 1);
     action = menu.addAction("Remove port");
-    action->setData(EMenuPortRemove);
+    action->setData("EMenuPortRemove");
     action->setEnabled(index.column() == 1);
     menu.addSeparator();
-    QMenu* subMenu = buildAddValueMenu(menu, "Add");
+    subMenu = buildAddValueMenu(menu, "Add");
     subMenu->setEnabled((index.column() == 1) and
             (getTextEdit(index.row(), index.column())->getCurrentText() !=
                     "<Click here to add a port>"));
@@ -274,37 +294,32 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
 
     QAction* act = menu.exec(globalPos);
     if (act) {
-        eCondMenuActions actCode = (eCondMenuActions) act->data().toInt();
-        switch(actCode) {
-        case EMenuCondAdd: {
+        QString actCode = act->data().toString();
+        if (actCode == "EMenuCondAdd") {
             mVpz->addConditionToDoc(mVpz->newCondNameToDoc());
             reload(false);
-            break;
-        } case EMenuCondRemove: {
+        } else if (actCode == "EMenuCondRemove") {
             QString cond = getTextEdit(index.row(),0)->getCurrentText();
             mVpz->rmConditionToDoc(cond);
             reload(false);
-            break;
-        } case EMenuPortAdd: {
+        } else if (actCode == "EMenuPortAdd") {
             QString cond = getTextEdit(index.row(),0)->getCurrentText();
             mVpz->addCondPortToDoc(cond, mVpz->newCondPortNameToDoc(cond));
             reload(false);
-            break;
-        } case EMenuPortRemove: {
+        } else if (actCode == "EMenuPortRemove") {
             QString cond = getTextEdit(index.row(),0)->getCurrentText();
             QString port = getTextEdit(index.row(),1)->getCurrentText();
             mVpz->rmCondPortToDoc(cond, port);
             reload(false);
-            break;
-        } case EMenuValueAddBoolean:
-          case EMenuValueAddInteger:
-          case EMenuValueAddDouble:
-          case EMenuValueAddString:
-          case EMenuValueAddSet:
-          case EMenuValueAddMap:
-          case EMenuValueAddTuple:
-          case EMenuValueAddTable:
-          case EMenuValueAddMatrix: {
+        } else if ((actCode == "EMenuValueAddBoolean") or
+                (actCode == "EMenuValueAddInteger") or
+                (actCode == "EMenuValueAddDouble") or
+                (actCode == "EMenuValueAddString") or
+                (actCode == "EMenuValueAddSet") or
+                (actCode == "EMenuValueAddMap") or
+                (actCode == "EMenuValueAddTuple") or
+                (actCode == "EMenuValueAddTable") or
+                (actCode == "EMenuValueAddMatrix")) {
             QString cond = getTextEdit(index.row(),0)->getCurrentText();
             QString port = getTextEdit(index.row(),1)->getCurrentText();
             vle::value::Value* v = buildDefaultValue(actCode);
@@ -315,10 +330,21 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             }
             delete v;
             reload(false);
-            break;
-        } default: {
-            break;
-        }}
+        } else {//add from plugin
+            QString newCond = mVpz->newCondNameToDoc();
+            mVpz->addConditionToDoc(newCond);
+            mVpz->mMetadata->setCondPlugin(newCond, actCode);
+            reload(false);
+
+            QString libName = plugs.getCondPluginPath(actCode);
+            QPluginLoader loader(libName);
+            QObject* plugin = loader.instance();
+            delete mPlugin;
+            mPlugin = qobject_cast<PluginExpCond*>(plugin);
+            mPlugin->setVpz(mVpz);
+            mPlugin->setExpCond(newCond);
+            showValueEdit(0);
+        }
     }
 }
 
@@ -439,60 +465,49 @@ FileVpzExpCond::buildAddValueMenu(QMenu& menu, const QString& setOrAdd)
     QAction* lastAction;
     QMenu* subMenu  = menu.addMenu(setOrAdd +" value");
     lastAction = subMenu->addAction("boolean");
-    lastAction->setData(EMenuValueAddBoolean);
+    lastAction->setData("EMenuValueAddBoolean");
     lastAction = subMenu->addAction("integer");
-    lastAction->setData(EMenuValueAddInteger);
+    lastAction->setData("EMenuValueAddInteger");
     lastAction = subMenu->addAction("double");
-    lastAction->setData(EMenuValueAddDouble);
+    lastAction->setData("EMenuValueAddDouble");
     lastAction = subMenu->addAction("string");
-    lastAction->setData(EMenuValueAddString);
+    lastAction->setData("EMenuValueAddString");
     lastAction = subMenu->addAction("set");
-    lastAction->setData(EMenuValueAddSet);
+    lastAction->setData("EMenuValueAddSet");
     lastAction = subMenu->addAction("map");
-    lastAction->setData(EMenuValueAddMap);
+    lastAction->setData("EMenuValueAddMap");
     lastAction = subMenu->addAction("tuple");
-    lastAction->setData(EMenuValueAddTuple);
+    lastAction->setData("EMenuValueAddTuple");
     lastAction = subMenu->addAction("table");
-    lastAction->setData(EMenuValueAddTable);
+    lastAction->setData("EMenuValueAddTable");
     lastAction = subMenu->addAction("matrix");
-    lastAction->setData(EMenuValueAddMatrix);
+    lastAction->setData("EMenuValueAddMatrix");
     return subMenu;
 }
 
 vle::value::Value*
-FileVpzExpCond::buildDefaultValue(eCondMenuActions type)
+FileVpzExpCond::buildDefaultValue(QString type)
 {
-    switch(type) {
-    case EMenuValueAddBoolean: {
+    if (type == "EMenuValueAddBoolean") {
         return new vle::value::Boolean();
-        break;
-    } case EMenuValueAddInteger: {
+    } else if (type == "EMenuValueAddInteger") {
         return new vle::value::Integer();
-        break;
-    } case EMenuValueAddDouble: {
+    } else if(type == "EMenuValueAddDouble") {
         return new vle::value::Double();
-        break;
-    } case EMenuValueAddString: {
+    } else if(type == "EMenuValueAddString") {
         return new vle::value::String();
-        break;
-    } case EMenuValueAddSet: {
+    } else if(type == "EMenuValueAddSet") {
         return new vle::value::Set();
-        break;
-    } case EMenuValueAddMap: {
+    } else if(type == "EMenuValueAddMap") {
         return new vle::value::Map();
-        break;
-    } case EMenuValueAddTuple: {
+    } else if(type == "EMenuValueAddTuple") {
         return new vle::value::Tuple();
-        break;
-    } case EMenuValueAddTable: {
+    } else if(type == "EMenuValueAddTable") {
         return new vle::value::Table();
-        break;
-    } case EMenuValueAddMatrix: {
+    } else if(type == "EMenuValueAddMatrix") {
         return new vle::value::Matrix();
-        break;
-    } default: {
-        return 0;
-    }}
+    }
+    return 0;
 }
 
 void

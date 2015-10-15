@@ -22,39 +22,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GVLE2_PLUGIN_COND_H
-#define GVLE2_PLUGIN_COND_H
+#ifndef GVLE2_VLEVPM_H
+#define GVLE2_VLEVPM_H
 
-#include <QObject>
+#include <QDebug>
+
+
+#include <QLabel>
+#include <QMouseEvent>
 #include <QString>
 #include <QWidget>
-#include <QSettings>
-#include <vle/gvle2/logger.h>
-#include <vle/gvle2/vlevpz.h>
+#include <QPainter>
+#include <QPoint>
+#include <QStaticText>
+#include <QStyleOption>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QDomNamedNodeMap>
+#include <QXmlDefaultHandler>
+#include <QDateTimeEdit>
+#include <vle/value/Value.hpp>
+#include <vle/value/Map.hpp>
+
 
 namespace vle {
 namespace gvle2 {
 
-class PluginExpCond: public QObject
+class vpzVpm : public QObject
 {
     Q_OBJECT
 public:
-    virtual QString  getname()   = 0;
-    virtual QWidget *getWidget() = 0;
-    virtual void     delWidget() = 0;
-    virtual QWidget *getWidgetToolbar() = 0;
-    virtual void     delWidgetToolbar() = 0;
-    virtual void  setSettings(QSettings *s) = 0;
-    virtual void  setLogger(Logger *logger) = 0;
-    virtual void  setExpCond(const QString& condName) = 0;
-    virtual void  setVpz(vleVpz* vpz) = 0;
-    virtual void *getVpz() = 0;
-//signals:
-//    virtual void  valueChanged() = 0;
+    vpzVpm();
+    vpzVpm(const QString& filename);
+    QString toQString(const QDomNode& node) const;
+    void xCreateDom();
+    void xReadDom();
+    void xSaveDom();
+    void setCondPlugin(const QString& condName, const QString& name);
+    QString getCondPlugin(const QString& condName);
+
+
+    QDomDocument* mDoc;
+    QString       mFileName;
 };
 
-}} //namepsaces
-
-Q_DECLARE_INTERFACE(vle::gvle2::PluginExpCond, "fr.inra.vle.gvle2.PluginExpCond/1.0")
+}}//namespaces
 
 #endif

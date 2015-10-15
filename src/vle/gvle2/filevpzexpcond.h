@@ -80,7 +80,7 @@ public slots:
 
 private:
     QMenu* buildAddValueMenu(QMenu& menu, const QString& setOrAdd);
-    vle::value::Value* buildDefaultValue(eCondMenuActions type);
+    vle::value::Value* buildDefaultValue(QString type);
     void insertTextEdit(int row, int col, const QString& val);
     void insertSpinBox(int row, int col, int val);
     void insertDoubleSpinBox(int row, int col, double val);
@@ -93,7 +93,6 @@ private:
     QString             mCurrCondName;
     QString             mCurrPortName;
     int                 mCurrValIndex;
-    VleValueWidget*     mValWidget;
     PluginExpCond*      mPlugin;
 };
 

@@ -22,7 +22,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef Q_MOC_RUN
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/Path.hpp>
+#endif
+
 #include <QMessageBox>
 #include <QComboBox>
 #include <QMenu>

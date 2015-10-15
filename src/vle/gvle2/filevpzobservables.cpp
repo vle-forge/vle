@@ -26,6 +26,10 @@
 #include "filevpzobservables.h"
 #include "ui_filevpzobservables.h"
 
+namespace vle {
+namespace gvle2 {
+
+
 FileVpzObservables::FileVpzObservables(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzObservables), mVpz(0)
 {
@@ -292,3 +296,5 @@ void FileVpzObservables::reloadPorts(const QString& obsName,
         }
     }
 }
+
+}} //namespaces

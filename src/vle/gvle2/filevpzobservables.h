@@ -21,8 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef FILEVPZOBSERVABLES_H
-#define FILEVPZOBSERVABLES_H
+#ifndef GVLE2_FILEVPZOBSERVABLES_H
+#define GVLE2_FILEVPZOBSERVABLES_H
 
 #include <QWidget>
 #include <QMenu>
@@ -33,6 +33,10 @@
 namespace Ui {
     class FileVpzObservables;
 }
+
+namespace vle {
+namespace gvle2 {
+
 
 class FileVpzObservables : public QWidget
 {
@@ -65,5 +69,7 @@ private:
     Ui::FileVpzObservables* ui;
     vleVpz* mVpz;
 };
+
+}} //namespaces
 
 #endif // FILEVPZOBSERVABLES_H

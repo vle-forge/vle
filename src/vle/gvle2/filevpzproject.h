@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FILEVPZPROJECT_H
-#define FILEVPZPROJECT_H
+#ifndef GVLE2_FILEVPZPROJECT_H
+#define GVLE2_FILEVPZPROJECT_H
 
 #include <QWidget>
 #include <QUndoStack>
@@ -35,6 +35,9 @@
 namespace Ui {
 class FileVpzProject;
 }
+
+namespace vle {
+namespace gvle2 {
 
 class FileVpzProject : public QWidget
 {
@@ -80,5 +83,7 @@ private:
 
     vleVpz  *mVpz;
 };
+
+}} //namepsaces
 
 #endif // FILEVPZPROJECT_H

@@ -24,6 +24,9 @@
 
 #include "logger.h"
 
+namespace vle {
+namespace gvle2 {
+
 Logger::Logger()
 {
     mWidget = 0;
@@ -60,3 +63,5 @@ void Logger::logExt(QString message, bool isError)
     mWidget->appendHtml(logLine);
     mWidget->moveCursor(QTextCursor::End);
 }
+
+}}//namepsaces

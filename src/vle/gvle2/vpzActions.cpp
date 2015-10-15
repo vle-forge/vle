@@ -27,6 +27,8 @@
 
 namespace Ui {
 
+using namespace vle::gvle2;
+
 ChangeAuthor::ChangeAuthor(QString newAuthor, vleVpz  *vpz,
                            QLineEdit *line, QTabWidget *tab, int id,
                            QUndoCommand *parent) :

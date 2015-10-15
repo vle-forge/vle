@@ -22,39 +22,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GVLE2_PLUGIN_COND_H
-#define GVLE2_PLUGIN_COND_H
+#ifndef GVLE2_GVLE2PLUGINS_H
+#define GVLE2_GVLE2PLUGINS_H
 
 #include <QObject>
-#include <QString>
-#include <QWidget>
-#include <QSettings>
-#include <vle/gvle2/logger.h>
-#include <vle/gvle2/vlevpz.h>
+#include <QMap>
+#include <QStringList>
+#include <QPluginLoader>
+
 
 namespace vle {
 namespace gvle2 {
 
-class PluginExpCond: public QObject
+struct gvle2plug
 {
-    Q_OBJECT
-public:
-    virtual QString  getname()   = 0;
-    virtual QWidget *getWidget() = 0;
-    virtual void     delWidget() = 0;
-    virtual QWidget *getWidgetToolbar() = 0;
-    virtual void     delWidgetToolbar() = 0;
-    virtual void  setSettings(QSettings *s) = 0;
-    virtual void  setLogger(Logger *logger) = 0;
-    virtual void  setExpCond(const QString& condName) = 0;
-    virtual void  setVpz(vleVpz* vpz) = 0;
-    virtual void *getVpz() = 0;
-//signals:
-//    virtual void  valueChanged() = 0;
+    gvle2plug();
+    gvle2plug(QString pkg, QString libPath);
+
+    QString package;
+    QString libPath;
 };
 
-}} //namepsaces
+class gvle2plugins : public QObject
+{
+    Q_OBJECT
 
-Q_DECLARE_INTERFACE(vle::gvle2::PluginExpCond, "fr.inra.vle.gvle2.PluginExpCond/1.0")
+public:
+    gvle2plugins();
+    ~gvle2plugins();
 
-#endif
+    void loadPlugins();
+    QStringList getCondPluginsList();
+    QString getCondPluginPath(QString name);
+    QString getCondPluginPackage(QString name);
+
+private:
+    QList<QPluginLoader*> mModelerPlugins;
+    QMap<QString,QString> mSimulatorPlugins;
+    QMap<QString,gvle2plug>      mCondPlugins;
+    QMap<QString,QString> mOutputPlugins;
+};
+
+}}//namespaces
+
+#endif // GVLE2WIN_H

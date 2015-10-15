@@ -41,21 +41,17 @@
 #include <QDomNamedNodeMap>
 #include <QXmlDefaultHandler>
 #include <QDateTimeEdit>
-#include "vlepackage.h"
 #include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
-#include "vle/gvle2/ui_filevpztooltip.h"
+#include "vlevpm.h"
+#include "logger.h"
 
 
-class vleVpzModel;
+namespace vle {
+namespace gvle2 {
+
 class vlePackage;
 class vleDomDiffStack;
-
-namespace Ui {
-class fileVpzTooltip;
-}
-
-
 
 
 class vleVpz : public QObject /*, public QXmlDefaultHandler */
@@ -63,7 +59,7 @@ class vleVpz : public QObject /*, public QXmlDefaultHandler */
     Q_OBJECT
 public:
     vleVpz();
-    vleVpz(const QString &filename);
+    vleVpz(const QString& filename, bool withMetadata);
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
@@ -1002,8 +998,8 @@ public:
     QString getDynamicLibrary(const QString& dyn) const;
 
     void           setBasePath(const QString path);
-    vlePackage    *getPackage();
-    void           setPackage(vlePackage *package);
+    vlePackage*    getPackage();
+    void           setPackage(vlePackage* package);
     bool           isAltered();
     void           save();
     void           removeDynamic(const QString& dynamic);
@@ -1035,16 +1031,17 @@ public:
 private:
     void xReadDom();
     void xSaveDom(QDomDocument *doc);
-
 private:
-    QString mFilename;
-    QString mPath;
-
-    QFile mFile;
+    QString      mFilename;
+    QString      mPath;
+    QFile        mFile;
     QDomDocument mDoc;
-
-    vlePackage *mPackage;
-    Logger           * mLogger;
+    bool         mWithMetadata;
+public:
+    vpzVpm*      mMetadata;
+private:
+    vlePackage*  mPackage;
+    Logger*      mLogger;
 public:
     vleDomDiffStack* undoStack;
 };
@@ -1116,5 +1113,6 @@ signals:
 
 };
 
+}}//namepsaces
 
 #endif

@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLUGINMODELERVIEW_H
-#define PLUGINMODELERVIEW_H
+#ifndef GVLE2_PLUGINMODELERVIEW_H
+#define GVLE2_PLUGINMODELERVIEW_H
 
 #include <QPluginLoader>
 #include <QTextStream>
@@ -35,6 +35,10 @@
 namespace Ui {
 class pluginModelerView;
 }
+
+namespace vle {
+namespace gvle2 {
+
 
 class pluginModelerView : public QWidget
 {
@@ -74,5 +78,7 @@ private:
     vlePackage            *mPackage;
     QList<sourceCpp *>     mListSources;
 };
+
+}}//namepsaces
 
 #endif // PLUGINMODELERVIEW_H

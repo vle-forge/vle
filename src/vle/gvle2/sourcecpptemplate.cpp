@@ -27,6 +27,10 @@
 #include "sourcecpp.h"
 #include "sourcecpptemplate.h"
 
+namespace vle {
+namespace gvle2 {
+
+
 /**
  * @brief sourceCppTemplate::sourceCppTemplate
  *        Default constructor
@@ -166,3 +170,5 @@ void sourceCppTemplate::tagLoad()
         // ToDo : handle error
     }
 }
+
+}}//namespaces
