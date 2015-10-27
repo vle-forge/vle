@@ -68,10 +68,10 @@ class FileVpzRtool : public QWidget
 public:
     explicit FileVpzRtool(QWidget *parent = 0);
     ~FileVpzRtool();
-    void setVpz(vleVpz *v);
+    void setVpm(vleVpm* v);
     void clear();
     void updateTree();
-    vleVpz* vpz();
+    vleVpm* vpm();
     QWidget *getTool();
     QString getModelQuery(QTreeWidgetItem* base);
     QTreeWidgetItem* getTreeWidgetItem(const QString& model_query);
@@ -92,7 +92,7 @@ public:
     Ui::fileVpzRtool*  ui;
     QWidget         *mWidgetTool;
 private:
-    vleVpz          *mVpz;
+    vleVpm*          mVpm;
     VpzDiagScene*    mCurrScene;
     bool             mExternalSelection;
 };

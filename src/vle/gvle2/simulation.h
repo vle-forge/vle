@@ -41,7 +41,7 @@
 #include <vle/utils/ModuleManager.hpp>
 #endif
 
-#include <vle/gvle2/vlevpz.h>
+#include <vle/gvle2/vlevpm.h>
 
 #include "logger.h"
 #include "ui_simulationrtool.h"
@@ -59,8 +59,8 @@ class simulationThread : public QObject
 {
     Q_OBJECT
 public:
-    simulationThread(vle::vpz::Vpz *vpz = 0);
-    simulationThread(vleVpz *vpz = 0);
+    simulationThread(vleVpm* vpm = 0);
+    simulationThread(vle::vpz::Vpz* vpz = 0);
     ~simulationThread();
     QString getError()
     {
@@ -93,7 +93,7 @@ private:
     QString                     mErrorMessage;
     QString                     mOutputPath;
     QMutex                      mValueMutex;
-    vle::vpz::Vpz              *mVpz;
+    vle::vpz::Vpz              *mVpm;
     vle::devs::RootCoordinator *mRoot;
     vle::value::Map            *mOutputs;
     vle::utils::ModuleManager   mLoadedPlugin;
@@ -105,7 +105,7 @@ class simulationView : public QWidget
 public:
     explicit simulationView(QWidget *parent = 0);
     ~simulationView();
-    void setVpz(vleVpz *vpz);
+    void setVpm(vleVpm* vpm);
     void setPackage(vle::utils::Package *pkg)
     {
         mCurrPackage = pkg;
@@ -144,7 +144,7 @@ private:
     QWidget               *  mWidgetTool;
     simulationThread      *  mSimThread;
     QList<QTreeWidgetItem *> mViewsItems;
-    vle::vpz::Vpz         *  mVpz;
+    vle::vpz::Vpz         *  mVpm;
     vle::utils::Package   *  mCurrPackage;
     vle::utils::ModuleManager mLoadedPlugin;
     vle::value::Map       *  mOutputs;

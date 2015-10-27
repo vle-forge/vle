@@ -78,6 +78,7 @@ gvle2plugins::loadPlugins()
                 QPluginLoader loader(libName);
                 QObject *plugin = loader.instance();
                 if ( ! loader.isLoaded()) {
+                    qDebug() << " WARNING cannot load plugin " << libName;
                     continue;
                 }
                 PluginExpCond *expcond = qobject_cast<PluginExpCond *>(plugin);

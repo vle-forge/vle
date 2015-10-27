@@ -51,7 +51,7 @@ class FileVpzExpView : public QWidget
 public:
     explicit FileVpzExpView(QWidget *parent = 0);
     ~FileVpzExpView();
-    void setVpz(vleVpz *vpz);
+    void setVpm(vleVpm* vpm);
     void reload();
 
 signals:
@@ -74,12 +74,12 @@ private:
     void updatePlugin(const QString& plug);
 
 
-    Ui::FileVpzExpView *ui;
-    vleVpz             *mVpz;
-    PluginOutput       *mPlugin;
-    QString currView;
-    QString currOutput;
-    QString oldViewName;
+    Ui::FileVpzExpView* ui;
+    vleVpm*             mVpm;
+    PluginOutput*       mPlugin;
+    QString             currView;
+    QString             currOutput;
+    QString             oldViewName;
 
 };
 }}//namespaces

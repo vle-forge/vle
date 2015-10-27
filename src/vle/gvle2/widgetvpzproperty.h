@@ -54,7 +54,7 @@ private slots:
 
 private:
     Ui::WidgetVpzPropertyDynamics *ui;
-    vleVpz *mVpz;
+    vleVpz *mVpm;
     QString mModQuery;
 };
 
@@ -75,7 +75,7 @@ private slots:
 
 private:
     Ui::WidgetVpzPropertyExpCond *ui;
-    vleVpz *mVpz;
+    vleVpz *mVpm;
     QString mModQuery;
 };
 
@@ -95,7 +95,7 @@ private slots:
 
 private:
     Ui::WidgetVpzPropertyObservables *ui;
-    vleVpz *mVpz;
+    vleVpz *mVpm;
     QString mModQuery;
 };
 

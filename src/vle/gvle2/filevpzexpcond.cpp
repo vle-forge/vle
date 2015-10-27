@@ -48,7 +48,7 @@ namespace vle {
 namespace gvle2 {
 
 FileVpzExpCond::FileVpzExpCond(QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzExpCond), mVpz(0), mCurrCondName(""),
+    QWidget(parent), ui(new Ui::FileVpzExpCond), mVpm(0), mCurrCondName(""),
     mCurrPortName(""), mCurrValIndex(-1),  mPlugin(0)
 {
     ui->setupUi(this);
@@ -76,11 +76,13 @@ FileVpzExpCond::~FileVpzExpCond()
 
 
 void
-FileVpzExpCond::setVpz(vleVpz *vpz)
+FileVpzExpCond::setVpm(vleVpm* vpm)
 {
-    mVpz = vpz;
-    QObject::connect(mVpz->undoStack, SIGNAL(undoRedoVpz(QDomNode, QDomNode)),
-            this, SLOT(onUndoRedoVpz(QDomNode, QDomNode)));
+    mVpm = vpm;
+    QObject::connect(mVpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            this,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 
 }
 
@@ -89,19 +91,23 @@ FileVpzExpCond::resizeTable()
 {
     int nbRows = 0;
     int nbCols = 0;
-    QDomNodeList condList = mVpz->condsListFromConds(mVpz->condsFromDoc());
+    QDomNodeList condList = mVpm->condsListFromConds(mVpm->condsFromDoc());
     for (unsigned int i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
-        QString name = mVpz->attributeValue(cond, "name");
-        QDomNodeList portList = mVpz->portsListFromDoc(name);
-        if (portList.length() == 0) {
+        QString name = mVpm->vdo()->attributeValue(cond, "name");
+        if (mVpm->getCondPlugin(name) != "") {
             nbRows++;
-        }
-        for (unsigned int j = 0; j < portList.length(); j++) {
-            nbRows++;
-            QDomNode port = portList.at(j);
-            nbCols = std::max(nbCols,
-                    (int) mVpz->childNodesWithoutText(port).size());
+        } else {
+            QDomNodeList portList = mVpm->portsListFromDoc(name);
+            if (portList.length() == 0) {
+                nbRows++;
+            }
+            for (unsigned int j = 0; j < portList.length(); j++) {
+                nbRows++;
+                QDomNode port = portList.at(j);
+                nbCols = std::max(nbCols,
+                        (int) mVpm->childNodesWithoutText(port).size());
+            }
         }
     }
     nbCols = nbCols+2;
@@ -114,59 +120,74 @@ FileVpzExpCond::reload(bool resize)
 {
     ui->table->clearContents();
     resizeTable();
-    QDomNodeList condList = mVpz->condsListFromConds(mVpz->condsFromDoc());
+    QDomNodeList condList = mVpm->condsListFromConds(mVpm->condsFromDoc());
 
     int rows = 0;
     for (unsigned int i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
-        QString name = mVpz->attributeValue(cond, "name");
-        QDomNodeList portList = mVpz->portsListFromDoc(name);
-        if (mVpz->mMetadata->getCondPlugin(name) != ""){
+        QString name = mVpm->vdo()->attributeValue(cond, "name");
+        QDomNodeList portList = mVpm->portsListFromDoc(name);
+        if (mVpm->getCondPlugin(name) != ""){
             insertTextEdit(rows, 0, name);
             insertTextEdit(rows, 1, QString("[plugin:%1]").arg(
-                    mVpz->mMetadata->getCondPlugin(name)));
+                    mVpm->getCondPlugin(name)));
+            for (int j=2; j < ui->table->columnCount(); j++) {
+                insertNullWidget(rows, j);
+            }
             rows++;
         } else if (portList.length() == 0) {
             insertTextEdit(rows, 0, name);
             insertTextEdit(rows, 1, "<Click here to add a port>");
+            for (int j=2; j < ui->table->columnCount(); j++) {
+                insertNullWidget(rows, j);
+            }
             rows++;
         } else  {
             // Then for each port, add an item into the tree
             for (unsigned int j = 0; j < portList.length(); j++) {
                 QDomNode port = portList.at(j);
                 insertTextEdit(rows, 0, name);
-                insertTextEdit(rows, 1, mVpz->attributeValue(port, "name"));
+                insertTextEdit(rows, 1, mVpm->vdo()->attributeValue(port,
+                        "name"));
                 std::vector<vle::value::Value*> valuesToFill;
-                mVpz->fillWithMultipleValue(port, valuesToFill);
-                for (unsigned int k = 0; k < valuesToFill.size(); k++) {
-                    vle::value::Value* val = valuesToFill[k];
-                    switch(val->getType()) {
-                    case vle::value::Value::BOOLEAN: {
-                        insertBooleanCombo(rows, k+2, val->toBoolean().value());
-                        break;
-                    } case vle::value::Value::INTEGER: {
-                        insertSpinBox(rows, k+2, val->toInteger().value());
-                        break;
-                    } case vle::value::Value::DOUBLE: {
-                        insertDoubleSpinBox(rows, k+2, val->toDouble().value());
-                        break;
-                    } case vle::value::Value::STRING: {
-                        insertTextEdit(rows, k+2, val->toString().value().c_str());
-                        break;
-                    } case vle::value::Value::SET:
-                    case vle::value::Value::MAP:
-                    case vle::value::Value::TUPLE:
-                    case vle::value::Value::TABLE:
-                    case vle::value::Value::XMLTYPE:
-                    case vle::value::Value::NIL:
-                    case vle::value::Value::MATRIX: {
-                        insertTextEdit(rows, k+2, VleValueWidget::getValueDisplay(
-                                *val, VleValueWidget::Insight));
-                        break;
-                    } case vle::value::Value::USER: {
-                        //TODO
-                        break;
-                    }}
+                mVpm->fillWithMultipleValue(port, valuesToFill);
+                for (int k = 0; k < ui->table->columnCount()-2; k++) {
+                    if (k < (int) valuesToFill.size()) {
+                        vle::value::Value* val = valuesToFill[k];
+                        switch(val->getType()) {
+                        case vle::value::Value::BOOLEAN: {
+                            insertBooleanCombo(rows, k+2,
+                                    val->toBoolean().value());
+                            break;
+                        } case vle::value::Value::INTEGER: {
+                            insertSpinBox(rows, k+2, val->toInteger().value());
+                            break;
+                        } case vle::value::Value::DOUBLE: {
+                            insertDoubleSpinBox(rows, k+2,
+                                    val->toDouble().value());
+                            break;
+                        } case vle::value::Value::STRING: {
+                            insertTextEdit(rows, k+2,
+                                    val->toString().value().c_str());
+                            break;
+                        } case vle::value::Value::SET:
+                        case vle::value::Value::MAP:
+                        case vle::value::Value::TUPLE:
+                        case vle::value::Value::TABLE:
+                        case vle::value::Value::XMLTYPE:
+                        case vle::value::Value::NIL:
+                        case vle::value::Value::MATRIX: {
+                            insertTextEdit(rows, k+2,
+                                    VleValueWidget::getValueDisplay(
+                                            *val, VleValueWidget::Insight));
+                            break;
+                        } case vle::value::Value::USER: {
+                            //TODO
+                            break;
+                        }}
+                    } else {
+                        insertNullWidget(rows, k+2);
+                    }
                 }
                 rows++;
             }
@@ -176,61 +197,69 @@ FileVpzExpCond::reload(bool resize)
     if (resize) {
         ui->table->resizeColumnsToContents();
     }
+    showEditPlace();
 }
 
 
 void
-FileVpzExpCond::showValueEdit(vle::value::Value* val)
+FileVpzExpCond::showEditPlace()
 {
-    while (QWidget* w = ui->value->findChild<QWidget*>() )
-        delete w;
     if (mPlugin) {
-        mPlugin->getWidget()->setParent(ui->value);
-        mPlugin->getWidget()->show();
-    } else if (val) {
-        VleValueWidget* valWidget = new VleValueWidget(ui->value);
-                QObject::connect(valWidget,
-                            SIGNAL(valUpdated(const vle::value::Value&)),
-                            this, SLOT(onValUpdated(const vle::value::Value&)));
-                valWidget->setValue(val);
-                valWidget->show();
+        mPlugin->delWidget();
+        mPlugin->delWidgetToolbar();
+        delete mPlugin;
+        mPlugin = 0;
     } else {
+        while (QWidget* w = ui->value->findChild<QWidget*>() ) {
+            delete w;
+        }
+    }
+
+
+    if (mCurrCondName == "") {
+
         QLabel* lab = new QLabel("Nothing to edit", ui->value);
         lab->show();
+        return;
     }
-    ui->value->show();
-}
+    if (mVpm->getCondPlugin(mCurrCondName) != "") {
 
+        gvle2plugins plugs;
+        plugs.loadPlugins();
+        QString libName = plugs.getCondPluginPath(
+                mVpm->getCondPlugin(mCurrCondName));
+        QPluginLoader loader(libName);
 
-
-void
-FileVpzExpCond::onCellDoubleClicked(int row, int column)
-{
-    VleTextEdit* w;
-    if (column <= 1) {//edit cond name or port name
-        w = (qobject_cast<VleTextEdit*>(ui->table->cellWidget(row,column)));
-        w->setTextEdition(true);
-    } else {//edit a value
-        w = (qobject_cast<VleTextEdit*>(ui->table->cellWidget(row,0)));
-        QString cond = w->document()->toPlainText();
-        w = (qobject_cast<VleTextEdit*>(ui->table->cellWidget(row,1)));
-        QString port = w->document()->toPlainText();
-        QDomNode portNode = mVpz->portFromDoc(cond, port);
+        mPlugin = qobject_cast<PluginExpCond*>(loader.instance());
+        mPlugin->setExpCond(mVpm, mCurrCondName);
+        mPlugin->getWidget()->setParent(ui->value);
+        mPlugin->getWidget()->show();
+        return;
+    }
+    if (mCurrPortName == "") {
+        QLabel* lab = new QLabel("Nothing to edit", ui->value);
+        lab->show();
+        return;
+    }
+    if (mCurrValIndex < 0) {
+        QLabel* lab = new QLabel("Nothing to edit", ui->value);
+        lab->show();
+        return;
+    }
+    if (mCurrValIndex >= 0) {
+        QDomNode portNode = mVpm->portFromDoc(mCurrCondName, mCurrPortName);
         std::vector<vle::value::Value*> values;
-
-        mVpz->fillWithMultipleValue(portNode, values);
-        if (values.size() >= (unsigned int) (column -1)) {
-            vle::value::Value* val = values[column - 2];
-            w = (qobject_cast<VleTextEdit*>(ui->table->cellWidget(row,column)));
+        mVpm->fillWithMultipleValue(portNode, values);
+        if (values.size() > (unsigned int) mCurrValIndex) {
+            vle::value::Value* val = values[mCurrValIndex];
             switch (val->getType()) {
             case vle::value::Value::BOOLEAN:
             case vle::value::Value::INTEGER:
-            case vle::value::Value::DOUBLE: {
-                break;
-            }
-            case vle::value::Value::STRING: {
-                VleTextEdit* w = getTextEdit(row, column);
-                w->setTextEdition(true);
+            case vle::value::Value::DOUBLE:
+            case vle::value::Value::STRING:
+            case vle::value::Value::USER: {
+                QLabel* lab = new QLabel("Nothing to edit", ui->value);
+                lab->show();
                 break;
             } case vle::value::Value::SET:
             case vle::value::Value::MAP:
@@ -239,14 +268,27 @@ FileVpzExpCond::onCellDoubleClicked(int row, int column)
             case vle::value::Value::XMLTYPE:
             case vle::value::Value::NIL:
             case vle::value::Value::MATRIX: {
-                showValueEdit(val);
-                ui->table->scrollToItem(ui->table->item(row,column),
-                        QAbstractItemView::PositionAtCenter);
-                break;
-            } case vle::value::Value::USER: {
+                VleValueWidget* valWidget = new VleValueWidget(ui->value);
+                QObject::connect(valWidget,
+                        SIGNAL(valUpdated(const vle::value::Value&)),
+                        this, SLOT(onValUpdated(const vle::value::Value&)));
+                valWidget->setValue(val);
+                valWidget->show();
                 break;
             }}
         }
+    }
+}
+
+
+
+void
+FileVpzExpCond::onCellDoubleClicked(int row, int column)
+{
+    VleTextEdit* w = qobject_cast<VleTextEdit*>(
+            ui->table->cellWidget(row,column));
+    if (w) {
+        w->setTextEdition(true);
     }
 }
 
@@ -273,43 +315,54 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
         action->setData(plugList.at(i));
     }
 
+
+
+    QString condName = "";
+    if (index.row() > -1) {
+        condName = getTextEdit(index.row(), 0)->getCurrentText();
+    }
+
     action = menu.addAction("Remove condition");
     action->setData("EMenuCondRemove");
     action->setEnabled(index.column() == 0);
     menu.addSeparator();
     action = menu.addAction("Add port");
     action->setData("EMenuPortAdd");
-    action->setEnabled(index.column() == 1);
+    action->setEnabled((index.column() == 1) and
+            (mVpm->getCondPlugin(condName) == ""));
     action = menu.addAction("Remove port");
     action->setData("EMenuPortRemove");
-    action->setEnabled(index.column() == 1);
+    action->setEnabled((index.column() == 1) and
+            (mVpm->getCondPlugin(condName) == ""));
     menu.addSeparator();
     subMenu = buildAddValueMenu(menu, "Add");
     subMenu->setEnabled((index.column() == 1) and
             (getTextEdit(index.row(), index.column())->getCurrentText() !=
-                    "<Click here to add a port>"));
+                    "<Click here to add a port>") and
+            (mVpm->getCondPlugin(condName) == ""));
     subMenu = buildAddValueMenu(menu, "Set");
     subMenu->setEnabled(ui->table->item(index.row(), index.column()) and
-            (index.column() > 1));
+            (index.column() > 1) and
+            (ui->table->cellWidget(index.row(), index.column()) != 0));
 
     QAction* act = menu.exec(globalPos);
     if (act) {
         QString actCode = act->data().toString();
         if (actCode == "EMenuCondAdd") {
-            mVpz->addConditionToDoc(mVpz->newCondNameToDoc());
+            mVpm->addConditionToDoc(mVpm->newCondNameToDoc());
             reload(false);
         } else if (actCode == "EMenuCondRemove") {
             QString cond = getTextEdit(index.row(),0)->getCurrentText();
-            mVpz->rmConditionToDoc(cond);
+            mVpm->rmConditionToDoc(cond);
             reload(false);
         } else if (actCode == "EMenuPortAdd") {
             QString cond = getTextEdit(index.row(),0)->getCurrentText();
-            mVpz->addCondPortToDoc(cond, mVpz->newCondPortNameToDoc(cond));
+            mVpm->addCondPortToDoc(cond, mVpm->newCondPortNameToDoc(cond));
             reload(false);
         } else if (actCode == "EMenuPortRemove") {
             QString cond = getTextEdit(index.row(),0)->getCurrentText();
             QString port = getTextEdit(index.row(),1)->getCurrentText();
-            mVpz->rmCondPortToDoc(cond, port);
+            mVpm->rmCondPortToDoc(cond, port);
             reload(false);
         } else if ((actCode == "EMenuValueAddBoolean") or
                 (actCode == "EMenuValueAddInteger") or
@@ -324,35 +377,26 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             QString port = getTextEdit(index.row(),1)->getCurrentText();
             vle::value::Value* v = buildDefaultValue(actCode);
             if (index.column() == 1) {
-                mVpz->addValuePortCondToDoc(cond, port,*v);
+                mVpm->addValuePortCondToDoc(cond, port,*v);
             } else {
-                mVpz->fillWithValue(cond, port, index.column()-2, *v);
+                mVpm->fillWithValue(cond, port, index.column()-2, *v);
             }
             delete v;
             reload(false);
         } else {//add from plugin
-            QString newCond = mVpz->newCondNameToDoc();
-            mVpz->addConditionToDoc(newCond);
-            mVpz->mMetadata->setCondPlugin(newCond, actCode);
+            mCurrCondName = mVpm->newCondNameToDoc();
+            mVpm->addConditionFromPluginToDoc(mCurrCondName, actCode);
             reload(false);
-
-            QString libName = plugs.getCondPluginPath(actCode);
-            QPluginLoader loader(libName);
-            QObject* plugin = loader.instance();
-            delete mPlugin;
-            mPlugin = qobject_cast<PluginExpCond*>(plugin);
-            mPlugin->setVpz(mVpz);
-            mPlugin->setExpCond(newCond);
-            showValueEdit(0);
         }
     }
 }
 
 void
-FileVpzExpCond::onUndoRedoVpz(QDomNode /*oldVal*/, QDomNode /*newVal*/)
+FileVpzExpCond::onUndoRedoVpm(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
+        QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
 {
+    showEditPlace();
     reload(false);
-    showValueEdit(0);
 }
 
 void
@@ -364,18 +408,22 @@ FileVpzExpCond::onTextUpdated(const QString& id, const QString& oldVal,
     int col = split.at(1).toInt();
     QString cond = getTextEdit(row, 0)->getCurrentText();
     if (col == 0) {//edit cond name
-        mVpz->renameConditionToDoc(oldVal, newVal);
+        mVpm->renameConditionToDoc(oldVal, cond);
+        mCurrCondName = cond;
     } else if (col == 1) {//edit port name
+        mCurrCondName = cond;
         if (oldVal == "<Click here to add a port>"){
-            mVpz->addCondPortToDoc(cond, newVal);
+            mVpm->addCondPortToDoc(cond, newVal);
         } else {
-            mVpz->renameCondPortToDoc(cond, oldVal, newVal);
+            mVpm->renameCondPortToDoc(cond, oldVal, newVal);
+            mCurrPortName = newVal;
         }
+
     } else {//edit value String
         QString port = getTextEdit(row, 1)->getCurrentText();
-        vle::value::Value* curr = mVpz->buildValueFromDoc(cond, port, col-2);
+        vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toString().set(newVal.toStdString());
-        mVpz->fillWithValue(cond, port, col-2, *curr);
+        mVpm->fillWithValue(cond, port, col-2, *curr);
         delete curr;
     }
     reload(false);
@@ -390,9 +438,9 @@ FileVpzExpCond::onIntUpdated(const QString& id, int newVal)
     if (col >= 2) {//necesserlay a value
         QString cond = getTextEdit(row, 0)->getCurrentText();
         QString port = getTextEdit(row, 1)->getCurrentText();
-        vle::value::Value* curr = mVpz->buildValueFromDoc(cond, port, col-2);
+        vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toInteger().set(newVal);
-        mVpz->fillWithValue(cond, port, col-2, *curr);
+        mVpm->fillWithValue(cond, port, col-2, *curr);
         delete curr;
     }
 }
@@ -406,9 +454,9 @@ FileVpzExpCond::onDoubleUpdated(const QString& id, double newVal)
     if (col >= 2) {//necesserlay a value
         QString cond = getTextEdit(row, 0)->getCurrentText();
         QString port = getTextEdit(row, 1)->getCurrentText();
-        vle::value::Value* curr = mVpz->buildValueFromDoc(cond, port, col-2);
+        vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toDouble().set(newVal);
-        mVpz->fillWithValue(cond, port, col-2, *curr);
+        mVpm->fillWithValue(cond, port, col-2, *curr);
         delete curr;
     }
 }
@@ -421,9 +469,9 @@ FileVpzExpCond::onBoolUpdated(const QString& id, const QString& newVal)
     if (col >= 2) {//necesserlay a value
         QString cond = getTextEdit(row, 0)->getCurrentText();
         QString port = getTextEdit(row, 1)->getCurrentText();
-        vle::value::Value* curr = mVpz->buildValueFromDoc(cond, port, col-2);
+        vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toBoolean().set(QVariant(newVal).toBool());
-        mVpz->fillWithValue(cond, port, col-2, *curr);
+        mVpm->fillWithValue(cond, port, col-2, *curr);
         delete curr;
     }
 }
@@ -431,8 +479,7 @@ FileVpzExpCond::onBoolUpdated(const QString& id, const QString& newVal)
 void
 FileVpzExpCond::onValUpdated(const vle::value::Value& newVal)
 {
-    mVpz->fillWithValue(mCurrCondName, mCurrPortName, mCurrValIndex, newVal);
-    reload(false);
+    mVpm->fillWithValue(mCurrCondName, mCurrPortName, mCurrValIndex, newVal);
 }
 
 void
@@ -455,7 +502,7 @@ FileVpzExpCond::onSelected(const QString& id)
             }
         }
     }
-    showValueEdit(0);
+    showEditPlace();
 }
 
 
@@ -508,6 +555,15 @@ FileVpzExpCond::buildDefaultValue(QString type)
         return new vle::value::Matrix();
     }
     return 0;
+}
+
+void
+FileVpzExpCond::insertNullWidget(int row, int col)
+{
+    ui->table->setCellWidget(row, col, 0);
+    QTableWidgetItem* item = new QTableWidgetItem;
+    item->setFlags(item->flags() &  ~Qt::ItemIsEditable);
+    ui->table->setItem(row, col, item);//used to find it
 }
 
 void

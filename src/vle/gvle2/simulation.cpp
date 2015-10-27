@@ -41,7 +41,7 @@ simulationView::simulationView(QWidget *parent) :
     ui(new Ui::simulationView),
     uiTool(new Ui::simulationRTool)
 {
-    mVpz = 0;
+    mVpm = 0;
     mLogger = 0;
     mThread = 0;
     mSettings = 0;
@@ -74,23 +74,23 @@ simulationView::~simulationView()
     }
 }
 
-void simulationView::setVpz(vleVpz *vpz)
+void simulationView::setVpm(vleVpm* vpm)
 {
-    QString fileName = vpz->getFilename();
-    mVpz = new vle::vpz::Vpz(fileName.toStdString());
+    QString fileName = vpm->getFilename();
+    mVpm = new vle::vpz::Vpz(fileName.toStdString());
 
-    //mVpz = vpz;
+    //mVpm = vpz;
     vle::vpz::Observables curVpzObs;
     vle::vpz::Views       curVpzViews;
     vle::vpz::AtomicModelVector curVpzModels;
 
-    curVpzViews  = mVpz->project().experiment().views();
-    curVpzObs    = mVpz->project().experiment().views().observables();
-    mVpz->project().model().getAtomicModelList(curVpzModels);
+    curVpzViews  = mVpm->project().experiment().views();
+    curVpzObs    = mVpm->project().experiment().views().observables();
+    mVpm->project().model().getAtomicModelList(curVpzModels);
 
     // Update the title (Experiment Name and VPZ file name)
-    QString expName = mVpz->project().experiment().name().c_str();
-    QString simTitle = QString("%1 (%2)").arg(expName).arg(mVpz->filename().c_str());
+    QString expName = mVpm->project().experiment().name().c_str();
+    QString simTitle = QString("%1 (%2)").arg(expName).arg(mVpm->filename().c_str());
     ui->modelName->setText(simTitle);
 
     // Initiate the view/port tree by adding the View list
@@ -193,7 +193,7 @@ void simulationView::updateViews()
 
 void simulationView::simulationStart()
 {
-    mSimThread = new simulationThread(mVpz);
+    mSimThread = new simulationThread(mVpm);
 
     ui->progressBar->setTextVisible(true);
 
@@ -222,8 +222,8 @@ void simulationView::simulationStart()
 
     ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/control_pause_blue.png")));
 
-    QString expName = mVpz->project().experiment().name().c_str();
-    mDuration = mVpz->project().experiment().duration();
+    QString expName = mVpm->project().experiment().name().c_str();
+    mDuration = mVpm->project().experiment().duration();
     QString startMessage;
     startMessage  = tr("Simulation started. ");
     startMessage += tr("Experiment name: ") + expName + " ";
@@ -248,7 +248,7 @@ void simulationView::simulationGetStep()
 {
     // Update the progress bar
     double debugTime = mSimThread->getCurrentTime();
-    double debugElapsed = debugTime - mVpz->project().experiment().begin();
+    double debugElapsed = debugTime - mVpm->project().experiment().begin();
     double percent = (debugElapsed / mDuration) * 100.00;
     ui->progressBar->setValue(percent);
 
@@ -320,46 +320,46 @@ void simulationView::onTreeItemSelected()
 
 /* ------------------------- Simulation thread ------------------------- */
 
-simulationThread::simulationThread(vleVpz *vpz)
+simulationThread::simulationThread(vleVpm* vpm)
 {
     mOutputs = 0;
     mCurrentState = Wait;
-    if (vpz)
+    if (vpm)
     {
         // Instanciate an empty VPZ
-        mVpz = new vle::vpz::Vpz();
+        mVpm = new vle::vpz::Vpz();
 
         // Get the raw XML of vleVpz
-        QByteArray xml = vpz->xGetXml();
+        QByteArray xml = vpm->xGetXml();
 
         std::string buffer = (char *)xml.data();
-        mVpz->parseMemory(buffer);
+        mVpm->parseMemory(buffer);
 
         // Instanciate the root coordinator    ToDo : Plugins
         mRoot = new vle::devs::RootCoordinator(mLoadedPlugin);
     }
     else
     {
-        mVpz  = 0;
+        mVpm  = 0;
         mRoot = 0;
     }
 }
 
-simulationThread::simulationThread(vle::vpz::Vpz *vpz)
+simulationThread::simulationThread(vle::vpz::Vpz* vpz)
 {
     mOutputs = 0;
     mCurrentState = Wait;
     if (vpz)
     {
         // Make a copy of current VPZ before use it for sim
-        mVpz = new vle::vpz::Vpz(*vpz);
+        mVpm = new vle::vpz::Vpz(*vpz);
 
         // Instanciate the root coordinator    ToDo : Plugins
         mRoot = new vle::devs::RootCoordinator(mLoadedPlugin);
     }
     else
     {
-        mVpz  = 0;
+        mVpm  = 0;
         mRoot = 0;
     }
 }
@@ -373,8 +373,8 @@ simulationThread::~simulationThread()
     if (mRoot)
         delete mRoot;
 
-    if (mVpz)
-        delete mVpz;
+    if (mVpm)
+        delete mVpm;
 }
 
 /**
@@ -407,7 +407,7 @@ vle::value::Matrix *simulationThread::getMatrix(vle::value::Value *value)
  */
 double simulationThread::getStartTime()
 {
-    return mVpz->project().experiment().begin();
+    return mVpm->project().experiment().begin();
 }
 
 /**
@@ -417,7 +417,7 @@ double simulationThread::getStartTime()
  */
 double simulationThread::getDuration()
 {
-    return mVpz->project().experiment().duration();
+    return mVpm->project().experiment().duration();
 }
 
 /**
@@ -446,11 +446,11 @@ void simulationThread::setOutputPath(QString path)
 
     mOutputPath = path;
 
-    if (mVpz == 0)
+    if (mVpm == 0)
         return;
 
-    itb = mVpz->project().experiment().views().outputs().begin();
-    ite = mVpz->project().experiment().views().outputs().end();
+    itb = mVpm->project().experiment().views().outputs().begin();
+    ite = mVpm->project().experiment().views().outputs().end();
     for (; itb!=ite; itb++)
     {
         vle::vpz::Output& output = itb->second;
@@ -539,7 +539,7 @@ void simulationThread::restart()
  */
 void simulationThread::load()
 {
-    if ((mVpz == 0) || (mRoot == 0))
+    if ((mVpm == 0) || (mRoot == 0))
     {
         mErrorMessage = tr("Model or RootCoordinator missing");
         throw 10;
@@ -547,7 +547,7 @@ void simulationThread::load()
     }
 
     try {
-        mRoot->load(*mVpz);
+        mRoot->load(*mVpm);
     } catch (const std::exception &e) {
         mErrorMessage = QString(e.what());
         throw 1;

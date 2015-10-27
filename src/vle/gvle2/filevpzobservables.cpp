@@ -31,7 +31,7 @@ namespace gvle2 {
 
 
 FileVpzObservables::FileVpzObservables(QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzObservables), mVpz(0)
+    QWidget(parent), ui(new Ui::FileVpzObservables), mVpm(0)
 {
     ui->setupUi(this);
 
@@ -114,8 +114,8 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
         if (actCode == 1) {
-            QString name = mVpz->newObsNameToDoc();
-            mVpz->addObservableToDoc(name);
+            QString name = mVpm->newObsNameToDoc();
+            mVpm->addObservableToDoc(name);
             QTreeWidgetItem *newObsItem = newItem(FileVpzObservables::EObsObs, name);
             ui->obsTree->addTopLevelItem(newObsItem);
             ui->obsTree->editItem(newObsItem, 0);
@@ -124,7 +124,7 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
         } else if (actCode == 2) {
             foreach( QTreeWidgetItem *item, ui->obsTree->selectedItems() ) {
                 if (itemType(item) == FileVpzObservables::EObsObs) {
-                    mVpz->rmObservableFromDoc(item->text(0));
+                    mVpm->rmObservableFromDoc(item->text(0));
                     int index = ui->obsTree->indexOfTopLevelItem(item);
                     ui->obsTree->takeTopLevelItem(index);
                     delete item;
@@ -133,9 +133,9 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
         } else if (actCode == 3) {
             QTreeWidgetItem *item = ui->obsTree->currentItem();
             if (itemType(item) == FileVpzObservables::EObsObs) {
-                QString name = mVpz->newObsPortNameToDoc(itemName(item));
+                QString name = mVpm->newObsPortNameToDoc(itemName(item));
 
-                mVpz->addObsPortToDoc(itemName(item), name);
+                mVpm->addObsPortToDoc(itemName(item), name);
                 QTreeWidgetItem *newPortItem = newItem(FileVpzObservables::EObsPort,
                                                        name);
 
@@ -145,7 +145,7 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
             foreach(QTreeWidgetItem *item, ui->obsTree->selectedItems()) {
                 if (itemType(item) == FileVpzObservables::EObsPort) {
                     QTreeWidgetItem *obs = item->parent();
-                    mVpz->rmObsPortToDoc(itemName(item->parent()), item->text(0));
+                    mVpm->rmObsPortToDoc(itemName(item->parent()), item->text(0));
                     obs->removeChild(item);
                     delete item;
                 }
@@ -156,9 +156,9 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
                 foreach( QTreeWidgetItem *itemPort, ui->obsTree->selectedItems() ) {
                     if (itemType(itemPort) == FileVpzObservables::EObsPort) {
                         QTreeWidgetItem *obs = itemPort->parent();
-                        if (not mVpz->existViewFromObsPortDoc(itemName(obs),
+                        if (not mVpm->existViewFromObsPortDoc(itemName(obs),
                                                               itemName(itemPort), viewName)) {
-                            mVpz->attachViewToObsPortDoc(itemName(obs),
+                            mVpm->attachViewToObsPortDoc(itemName(obs),
                                                          itemName(itemPort), viewName);
                             QTreeWidgetItem *newValueItem = newItem(FileVpzObservables::EObsOut,
                                                                     viewName);
@@ -173,7 +173,7 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
                 if (itemType(item) == FileVpzObservables::EObsOut) {
                     QTreeWidgetItem *port = item->parent();
                     QTreeWidgetItem *obs = port->parent();
-                    mVpz->rmViewToObsPortDoc(itemName(obs),
+                    mVpm->rmViewToObsPortDoc(itemName(obs),
                                              itemName(port), itemName(item));
                     port->removeChild(item);
                     delete item;
@@ -195,7 +195,7 @@ FileVpzObservables::onObservableChanged(QTreeWidgetItem *item, int /*column*/)
     switch (curItemType) {
     case EObsObs:
         if (curItemValue != item->text(0)) {
-            mVpz->renameObservableToDoc(curItemValue, item->text(0));
+            mVpm->renameObservableToDoc(curItemValue, item->text(0));
             qVList[1] = item->text(0);
             QVariant data(qVList);
             item->setData(0, Qt::UserRole, data);
@@ -211,9 +211,9 @@ FileVpzObservables::~FileVpzObservables()
     delete ui;
 }
 
-void FileVpzObservables::setVpz(vleVpz *vpz)
+void FileVpzObservables::setVpm(vleVpm* vpm)
 {
-    mVpz = vpz;
+    mVpm = vpm;
     reload();
 }
 
@@ -225,12 +225,12 @@ void FileVpzObservables::reload()
 
 void FileVpzObservables::reloadViews()
 {
-    if (!mVpz) {
+    if (!mVpm) {
         throw vle::utils::InternalError(
             " gvle2: error in FileVpzExpView::reloadViews");
     }
     std::vector<std::string> outputNames;
-    mVpz->viewOutputNames(outputNames);
+    mVpm->viewOutputNames(outputNames);
     ui->viewsList->clear();
     std::vector<std::string>::iterator itb = outputNames.begin();
     std::vector<std::string>::iterator ite = outputNames.end();
@@ -241,7 +241,7 @@ void FileVpzObservables::reloadViews()
 
 void FileVpzObservables::reloadObservables()
 {
-    if (!mVpz) {
+    if (!mVpm) {
         throw vle::utils::InternalError(
             " gvle2: error in FileVpzExpView::reloadObservables");
     }
@@ -250,7 +250,7 @@ void FileVpzObservables::reloadObservables()
     ui->obsTree->setColumnCount(1);
 
     std::vector<std::string> observableNames;
-    mVpz->viewObservableNames(observableNames);
+    mVpm->viewObservableNames(observableNames);
     QList<QTreeWidgetItem *> obsItems;
     std::vector<std::string>::iterator itb = observableNames.begin();
     std::vector<std::string>::iterator ite = observableNames.end();
@@ -280,17 +280,19 @@ void FileVpzObservables::reloadPorts(const QString& obsName,
         delete child;
     }
 
-    QDomNodeList portList = mVpz->obsPortsListFromDoc(obsName);
+    QDomNodeList portList = mVpm->obsPortsListFromDoc(obsName);
     for (unsigned int j = 0; j < portList.length(); j++) {
         QDomNode port = portList.at(j);
-        QTreeWidgetItem *newPortItem = newItem(FileVpzObservables::EObsPort,
-                                               mVpz->attributeValue(port, "name"));
+        QTreeWidgetItem *newPortItem = newItem(
+                FileVpzObservables::EObsPort,
+                mVpm->vdo()->attributeValue(port, "name"));
         obsItem->addChild(newPortItem);
-        QList<QDomNode> OutList = mVpz->childNodesWithoutText(port,"attachedview");
+        QList<QDomNode> OutList = mVpm->childNodesWithoutText(port,"attachedview");
         for (int k = 0; k < OutList.size(); k++) {
             QDomNode& attachedView = OutList[k];
-            QTreeWidgetItem *newValueItem = newItem(FileVpzObservables::EObsOut,
-                                                    mVpz->attributeValue(attachedView, "name"));
+            QTreeWidgetItem *newValueItem = newItem(
+                    FileVpzObservables::EObsOut,
+                    mVpm->vdo()->attributeValue(attachedView, "name"));
 
             newPortItem->addChild(newValueItem);
         }

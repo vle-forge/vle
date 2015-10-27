@@ -25,7 +25,7 @@
 #ifndef GVLE2_FILEVPZDYNAMICS_H
 #define GVLE2_FILEVPZDYNAMICS_H
 
-#include "vlevpz.h"
+#include "vlevpm.h"
 
 namespace Ui {
 class FileVpzDynamics;
@@ -43,14 +43,15 @@ public:
 public:
     explicit FileVpzDynamics(QWidget *parent = 0);
     ~FileVpzDynamics();
-    void setVpz(vleVpz *vpz);
+    void setVpm(vleVpm* vpm);
     void reload();
 
 public slots:
     void onSelectPackage(const QString & id, const QString & text);
     void onSelectLibrary(const QString & id, const QString& text);
     void onDynamicsTableMenu(const QPoint&);
-    void onUndoRedoVpz(QDomNode, QDomNode);
+    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+            QDomNode oldValVpm, QDomNode newValVpm);
     void onTextUpdated(const QString& id, const QString&, const QString&);
 
 protected:
@@ -61,7 +62,7 @@ protected:
 
 private:
     Ui::FileVpzDynamics *ui;
-    vleVpz  *mVpz;
+    vleVpz  *mVpm;
 };
 
 }}//namespaces

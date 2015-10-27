@@ -51,8 +51,6 @@
 #include <vle/utils/Template.hpp>
 #endif
 
-#define QTVPZ 1
-
 namespace Ui {
 class GVLE2Win;
 }
@@ -116,7 +114,7 @@ private:
     QTimer*               mTimer;
     WidgetProjectTree*    mProjectTree;
     QSettings*            mSettings;
-    vle::vpz::Vpz*        mVpz;
+    vle::vpz::Vpz*        mVpm;
     bool                  mSimOpened;
     QActionGroup*         mMenuSimGroup;
     QMap<QString,QString> mSimulatorPlugins;

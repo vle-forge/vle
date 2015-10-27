@@ -37,9 +37,9 @@
 namespace vle {
 namespace gvle2 {
 
-VpzConnectionLineItem::VpzConnectionLineItem(QDomNode node, vleVpz* vpz, QLineF l,
-        QGraphicsItem* parent, VpzDiagScene* scene):
-        QGraphicsItem(parent,scene), mVpz(vpz), mnode(node)
+VpzConnectionLineItem::VpzConnectionLineItem(QDomNode node, vleVpm* vpm,
+        QLineF l, QGraphicsItem* parent, VpzDiagScene* scene):
+        QGraphicsItem(parent,scene), mVpm(vpm), mnode(node)
 {
     QGraphicsLineItem* it = new QGraphicsLineItem(l,this,this->scene());
     it->setPen(scene->getPenConnection());
@@ -74,9 +74,9 @@ VpzConnectionLineItem::type() const
 
 /*******************************************************************************/
 
-VpzPortItem::VpzPortItem(QDomNode node, vleVpz* vpz, bool input,
+VpzPortItem::VpzPortItem(QDomNode node, vleVpm* vpm, bool input,
         QGraphicsItem* parent, VpzDiagScene* scene):
-        QGraphicsObject(parent), mVpz(vpz),
+        QGraphicsObject(parent), mVpm(vpm),
         mnode(node), mInput(input)
 {
     this->setAcceptHoverEvents(true);
@@ -147,7 +147,7 @@ VpzPortItem::getConnectionPoint()
 QString
 VpzPortItem::getPortName()
 {
-    return mVpz->attributeValue(mnode, "name");
+    return mVpm->vdo()->attributeValue(mnode, "name");
 }
 
 QGraphicsTextItem*
@@ -192,7 +192,7 @@ VpzPortItem::setNameEdition(bool val)
         textItem->clearFocus();
 
         if (getPortName() != textItem->toPlainText()) {
-            mVpz->renameModelPort(mnode, getTextItem()->toPlainText());
+            mVpm->renameModelPort(mnode, getTextItem()->toPlainText());
             update();
         }
     }
@@ -218,8 +218,8 @@ VpzPortItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*evt*/)
 
 /*******************************************************************************/
 
-VpzModelItem::VpzModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
-        QGraphicsScene* scene): QGraphicsItem(parent,scene), mVpz(vpz),
+VpzModelItem::VpzModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* parent,
+        QGraphicsScene* scene): QGraphicsItem(parent,scene), mVpm(vpm),
                 mnode(node), margin(5), rectWidth(0), rectHeight(0)
 {
 
@@ -333,7 +333,7 @@ VpzModelItem::clearTitle()
 QString
 VpzModelItem::getModelName()
 {
-    return mVpz->attributeValue(mnode, "name");
+    return mVpm->vdo()->attributeValue(mnode, "name");
 }
 
 double
@@ -396,7 +396,7 @@ VpzModelItem::setNameEdition(bool val)
         textItem->setSelected(false);
         textItem->clearFocus();
         if (getModelName() != textItem->toPlainText()) {
-            mVpz->renameModel(mnode, textItem->toPlainText());
+            mVpm->renameModel(mnode, textItem->toPlainText());
             update();
         }
     }
@@ -405,8 +405,8 @@ VpzModelItem::setNameEdition(bool val)
 
 /*******************************************************************************/
 
-VpzSubModelItem::VpzSubModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
-        QGraphicsScene* scene): VpzModelItem(node, vpz, parent, scene)
+VpzSubModelItem::VpzSubModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* parent,
+        QGraphicsScene* scene): VpzModelItem(node, vpm, parent, scene)
 {
     this->setAcceptHoverEvents(true);
     initializeFromDom();
@@ -445,7 +445,7 @@ VpzSubModelItem::initializeFromDom()
     it->setFont(vpzscene->getFontModel());
 
     QGraphicsRectItem * rec = new QGraphicsRectItem(QRectF(), this, vpzscene);
-    if (mVpz->attributeValue(mnode, "type") == "atomic") {
+    if (mVpm->vdo()->attributeValue(mnode, "type") == "atomic") {
         rec->setBrush(vpzscene->getBrushAtomicModel());
     } else {
         rec->setBrush(vpzscene->getBrushCoupledModel());
@@ -462,7 +462,7 @@ VpzSubModelItem::initializeFromDom()
             unsigned int nbPortsIn = nChildIns.length();
             for (unsigned int k =0; k<nbPortsIn; k++) {
                 QDomNode nChildIn = nChildIns.at(k);
-                new VpzPortItem(nChildIn, mVpz, true, this, vpzscene);
+                new VpzPortItem(nChildIn, mVpm, true, this, vpzscene);
             }
         }
 
@@ -474,7 +474,7 @@ VpzSubModelItem::initializeFromDom()
             unsigned int nbPortsOut = nChildOuts.length();
             for (unsigned int k =0; k<nbPortsOut; k++) {
                 QDomNode nChildOut = nChildOuts.at(k);
-                new VpzPortItem(nChildOut, mVpz, false, this, vpzscene);
+                new VpzPortItem(nChildOut, mVpm, false, this, vpzscene);
             }
         }
     }
@@ -490,8 +490,8 @@ VpzSubModelItem::update(const QRectF & /*rect*/)
 
     VpzDiagScene* vpzscene = static_cast<VpzDiagScene*>(scene());
 
-    double w = mVpz->attributeValue(mnode, "width").toDouble();
-    double h = mVpz->attributeValue(mnode, "height").toDouble();
+    double w = mVpm->vdo()->attributeValue(mnode, "width").toDouble();
+    double h = mVpm->vdo()->attributeValue(mnode, "height").toDouble();
     rectWidth = std::max(getTitle()->boundingRect().width(),
                 std::max(2*margin + widthInputPorts() + widthOutputPorts(),
                         w));
@@ -591,7 +591,7 @@ VpzSubModelItem::getSelType(QPointF selPoint)
 QString
 VpzSubModelItem::getModelName()
 {
-    return mVpz->attributeValue(mnode, "name");
+    return mVpm->vdo()->attributeValue(mnode, "name");
 }
 
 int
@@ -615,8 +615,8 @@ VpzSubModelItem::removeNameEditionMode()
 }
 
 /****************************************************************************/
-VpzMainModelItem::VpzMainModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
-        QGraphicsScene* scene):  VpzModelItem(node, vpz, parent, scene)
+VpzMainModelItem::VpzMainModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* parent,
+        QGraphicsScene* scene):  VpzModelItem(node, vpm, parent, scene)
 {
     //this->set
     initializeFromDom();
@@ -645,7 +645,7 @@ VpzMainModelItem::initializeFromDom()
 
     QGraphicsRectItem * rec = new QGraphicsRectItem(QRectF(), this, this->scene());
     rec->setPen(vpzscene->getPenNotSelectedModel());
-    if (mVpz->attributeValue(mnode, "type") == "atomic") {
+    if (mVpm->vdo()->attributeValue(mnode, "type") == "atomic") {
         rec->setBrush(vpzscene->getBrushAtomicModel());
     } else {
         rec->setBrush(vpzscene->getBrushCoupledModel());
@@ -662,7 +662,7 @@ VpzMainModelItem::initializeFromDom()
             unsigned int nbPortsIn = nChildIns.length();
             for (unsigned int k =0; k<nbPortsIn; k++) {
                 QDomNode nChildIn = nChildIns.at(k);
-                new VpzPortItem(nChildIn, mVpz, true, this, vpzscene);
+                new VpzPortItem(nChildIn, mVpm, true, this, vpzscene);
             }
         }
     }
@@ -673,19 +673,19 @@ VpzMainModelItem::initializeFromDom()
             unsigned int nbPortsOut = nChildOuts.length();
             for (unsigned int k =0; k<nbPortsOut; k++) {
                 QDomNode nChildOut = nChildOuts.at(k);
-                new VpzPortItem(nChildOut, mVpz, false, this, vpzscene);
+                new VpzPortItem(nChildOut, mVpm, false, this, vpzscene);
             }
         }
     }
     //add submodels
     double wports = widthInputPorts();
-    QList<QDomNode> childList = mVpz->submodelsFromModel(mnode);
+    QList<QDomNode> childList = mVpm->submodelsFromModel(mnode);
     for (int i =0; i<childList.size(); i++) {
         QDomNode& n = childList[i];
         double x,y;
-        x = QVariant(mVpz->attributeValue(n, "x")).toDouble();
-        y = QVariant(mVpz->attributeValue(n, "y")).toDouble();
-        VpzSubModelItem* mod = new VpzSubModelItem(n, mVpz, this, vpzscene);
+        x = QVariant(mVpm->vdo()->attributeValue(n, "x")).toDouble();
+        y = QVariant(mVpm->vdo()->attributeValue(n, "y")).toDouble();
+        VpzSubModelItem* mod = new VpzSubModelItem(n, mVpm, this, vpzscene);
         mod->setPos(QPointF(std::max(wports+margin,x),
                 std::max(0.0,y)));
     }
@@ -723,8 +723,8 @@ void
 VpzMainModelItem::addConnLines()
 {
     //Add connections
-    QList<QDomNode> childList = mVpz->childNodesWithoutText(
-            mVpz->connectionsFromModel(mnode));
+    QList<QDomNode> childList = mVpm->childNodesWithoutText(
+            mVpm->connectionsFromModel(mnode));
 
     VpzDiagScene* vpzscene = static_cast<VpzDiagScene*>(this->scene());
 
@@ -738,57 +738,57 @@ VpzMainModelItem::addConnLines()
             QDomNode orig = conn.toElement().elementsByTagName("origin").at(0);
             QDomNode dest =
                     conn.toElement().elementsByTagName("destination").at(0);
-            if (mVpz->attributeValue(conn, "type") == "output") {
+            if (mVpm->vdo()->attributeValue(conn, "type") == "output") {
                 //            VpzSubModelItem* origMod = getSubModel(
-                //                    mVpz->attributeValue(orig, "model"));
-                ap = getSubModel(mVpz->attributeValue(orig, "model"))
-                            ->getOutPort(mVpz->attributeValue(orig, "port"));
-                bp = getOutPort(mVpz->attributeValue(dest, "port"));
-            } else if (mVpz->attributeValue(conn, "type") == "internal") {
-                ap = getSubModel(mVpz->attributeValue(orig, "model"))
-                            ->getOutPort(mVpz->attributeValue(orig, "port"));
-                bp = getSubModel(mVpz->attributeValue(dest, "model"))
-                            ->getInPort(mVpz->attributeValue(dest, "port"));
-            } else if (mVpz->attributeValue(conn, "type") == "input") {
-                ap = getInPort(mVpz->attributeValue(orig, "port"));
-                bp = getSubModel(mVpz->attributeValue(dest, "model"))
-                            ->getInPort(mVpz->attributeValue(dest, "port"));
+                //                    mVpm->attributeValue(orig, "model"));
+                ap = getSubModel(mVpm->vdo()->attributeValue(orig, "model"))
+                            ->getOutPort(mVpm->vdo()->attributeValue(orig, "port"));
+                bp = getOutPort(mVpm->vdo()->attributeValue(dest, "port"));
+            } else if (mVpm->vdo()->attributeValue(conn, "type") == "internal") {
+                ap = getSubModel(mVpm->vdo()->attributeValue(orig, "model"))
+                            ->getOutPort(mVpm->vdo()->attributeValue(orig, "port"));
+                bp = getSubModel(mVpm->vdo()->attributeValue(dest, "model"))
+                            ->getInPort(mVpm->vdo()->attributeValue(dest, "port"));
+            } else if (mVpm->vdo()->attributeValue(conn, "type") == "input") {
+                ap = getInPort(mVpm->vdo()->attributeValue(orig, "port"));
+                bp = getSubModel(mVpm->vdo()->attributeValue(dest, "model"))
+                            ->getInPort(mVpm->vdo()->attributeValue(dest, "port"));
             }
             if (ap and bp) {//paint connections
                 QPointF a = ap->getConnectionPoint();
                 QPointF b = bp->getConnectionPoint();
                 if (a.x() >= b.x()) {
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(a,
                                     QPointF(a.x()+2*margin,a.y())),
                                     this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(QPointF(a.x()+2*margin,a.y()),
                                     QPointF(a.x()+2*margin,(a.y()+b.y())/2.0)),
                                     this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(QPointF(a.x()+2*margin,(a.y()+b.y())/2.0),
                                     QPointF(b.x()-2*margin,(a.y()+b.y())/2.0)),
                                     this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(QPointF(b.x()-2*margin,(a.y()+b.y())/2.0),
                                     QPointF(b.x()-2*margin,b.y())),
                                     this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(QPointF(b.x()-2*margin,b.y()),
                                     b),
                                     this,vpzscene);
 
                 } else {
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(a,
                                     QPointF((a.x()+b.x())/2.0,a.y())),
                                     this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(QPointF((a.x()+b.x())/2.0,a.y()),
                                     QPointF((a.x()+b.x())/2.0,b.y())),
                                     this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpz,
+                    new VpzConnectionLineItem(conn, mVpm,
                             QLineF(QPointF((a.x()+b.x())/2.0,b.y()),
                                     b),
                                     this,vpzscene);
@@ -836,9 +836,9 @@ VpzMainModelItem::update(const QRectF & /*rect*/)
     QList<VpzSubModelItem *> sub = getSubModels();
     for (int i=0; i<sub.length(); i++) {
         sub[i]->setPos(QPointF(std::max(widthInputPorts()+margin,
-                mVpz->attributeValue(sub[i]->mnode, "x").toDouble()),
+                mVpm->vdo()->attributeValue(sub[i]->mnode, "x").toDouble()),
                 std::max(0.0,
-                        mVpz->attributeValue(sub[i]->mnode, "y").toDouble())));
+                        mVpm->vdo()->attributeValue(sub[i]->mnode, "y").toDouble())));
         sub[i]->update();
     }
 
@@ -1002,7 +1002,7 @@ VpzMainModelItem::removeNameEditionMode()
 bool
 VpzMainModelItem::isAtomic()
 {
-    return (mVpz->attributeValue(mnode,"type") == "atomic");
+    return (mVpm->vdo()->attributeValue(mnode,"type") == "atomic");
 }
 
 int
@@ -1015,7 +1015,7 @@ VpzMainModelItem::type() const
 /*********************************************************************************/
 
 VpzDiagScene::VpzDiagScene() :
-        QGraphicsScene(), mVpz(0), mCoupled(0), mPortSel1(0), mPortSel2(0),
+        QGraphicsScene(), mVpm(0), mCoupled(0), mPortSel1(0), mPortSel2(0),
         mConnection(0), mDragStartPoint(), mDragCurrPoint(),
         mModelSelType(MIDDLE), mIsEnteringCoupled(false)
 {
@@ -1025,15 +1025,17 @@ VpzDiagScene::VpzDiagScene() :
 
 
 void
-VpzDiagScene::init(vleVpz* vpz, const QString& className)
+VpzDiagScene::init(vleVpm* vpm, const QString& className)
 {
     clear();
-    mVpz = vpz;
-    QDomNode selModelNode = mVpz->classModelFromDoc(className);
+    mVpm = vpm;
+    QDomNode selModelNode = mVpm->classModelFromDoc(className);
 
     setFocus(selModelNode);
-    QObject::connect(mVpz->undoStack, SIGNAL(undoRedoVpz(QDomNode, QDomNode)),
-            this, SLOT(onUndoRedoVpz(QDomNode, QDomNode)));
+    QObject::connect(mVpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            this,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 
     emit initializationDone(this);
 
@@ -1045,7 +1047,7 @@ VpzDiagScene::setFocus(QDomNode selModelNode)
     if (mCoupled) {
         delete mCoupled;
     }
-    mCoupled = new VpzMainModelItem(selModelNode, mVpz, 0, this);
+    mCoupled = new VpzMainModelItem(selModelNode, mVpm, 0, this);
     mCoupled->setPos(QPointF(0,0));
     mCoupled->update();
     unselectAllSubModels();
@@ -1056,7 +1058,7 @@ VpzDiagScene::setFocus(QDomNode selModelNode)
 void
 VpzDiagScene::clear()
 {
-    mVpz = 0;
+    mVpm = 0;
     delete mCoupled;
     mCoupled = 0;
     mPortSel1 = 0;
@@ -1098,7 +1100,7 @@ VpzDiagScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent)
             VpzSubModelItem* subMod = static_cast<VpzSubModelItem*>(items[i]);
             SEL_TYPE seType = subMod->getSelType(mouseEvent->scenePos());
             if ((seType == MIDDLE) and
-                (mVpz->attributeValue(subMod->mnode, "type") == "coupled")) {
+                (mVpm->vdo()->attributeValue(subMod->mnode, "type") == "coupled")) {
                 setFocus(subMod->mnode);
                 mIsEnteringCoupled = true;
                 return;
@@ -1244,7 +1246,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             double oldwidth = mod->boundingRect().width();
             double ri =  p.x() - (oldx + oldwidth);
             double newwidth = oldwidth  + ri;
-            mVpz->setWidthToModel(mod->mnode, newwidth);
+            mVpm->setWidthToModel(mod->mnode, newwidth);
             mod->update();
             mCoupled->update();
             break;
@@ -1252,7 +1254,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             double oldheight = mod->boundingRect().height();
             double bi =  p.y() - (oldy + oldheight);
             double newheight = oldheight  + bi;
-            mVpz->setHeightToModel(mod->mnode, newheight);
+            mVpm->setHeightToModel(mod->mnode, newheight);
             mod->update();
             mCoupled->update();
             break;
@@ -1264,7 +1266,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             if ((mDragCurrPoint.x() != prevDragPoint.x()) or
                     (mDragCurrPoint.y() != prevDragPoint.y())) {
                 //avoid a modif on a doubleClicked
-                mVpz->setPositionToModel(mod->mnode, x, y);
+                mVpm->setPositionToModel(mod->mnode, x, y);
             }
             break;
         } default:
@@ -1293,13 +1295,12 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             modsToMove.append(mod->mnode);
             newXs.append(x);
             newYs.append(y);
-
-            mVpz->setAttributeValue(mod->mnode.toElement(), "x",
+            mVpm->setAttributeValue(mod->mnode.toElement(), "x",
                     QVariant(x).toString());
-            mVpz->setAttributeValue(mod->mnode.toElement(), "y",
+            mVpm->setAttributeValue(mod->mnode.toElement(), "y",
                     QVariant(y).toString());
         }
-        mVpz->setPositionToModel(modsToMove, newXs, newYs);
+        mVpm->setPositionToModel(modsToMove, newXs, newYs);
         mCoupled->update();
     }
 }
@@ -1317,7 +1318,7 @@ VpzDiagScene::dropEvent(QGraphicsSceneDragDropEvent * event)
                     and (VpzDiagScene::isVpzPort(items[i]))){
                 VpzPortItem* itemPort = static_cast<VpzPortItem*>(items[i]);
                 mPortSel2 = itemPort;
-                mVpz->addModelConnection(mPortSel1->mnode, mPortSel2->mnode);
+                mVpm->addModelConnection(mPortSel1->mnode, mPortSel2->mnode);
                 found = true;
             }
         }
@@ -1421,20 +1422,20 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
             } else if (actCode == VDMA_paste_models) {
 
                 if (mModelsCopies.size() > 0) {
-                    double x = mVpz->attributeValue(
+                    double x = mVpm->vdo()->attributeValue(
                             mModelsCopies[0], "x").toDouble();
-                    double y = mVpz->attributeValue(
+                    double y = mVpm->vdo()->attributeValue(
                             mModelsCopies[0], "y").toDouble();
                     for (int i =1; i<mModelsCopies.size(); i++) {
-                        x = std::min(x, mVpz->attributeValue(
+                        x = std::min(x, mVpm->vdo()->attributeValue(
                                 mModelsCopies[i], "x").toDouble());
-                        y = std::min(y, mVpz->attributeValue(
+                        y = std::min(y, mVpm->vdo()->attributeValue(
                                 mModelsCopies[i], "y").toDouble());
                     }
                     QPointF pcopies(x, y);
                     qreal xtranslation = event->scenePos().x() - pcopies.x();
                     qreal ytranslation = event->scenePos().y() - pcopies.y();
-                    mVpz->copyModelsToModel(mModelsCopies, mCoupled->mnode,
+                    mVpm->copyModelsToModel(mModelsCopies, mCoupled->mnode,
                             xtranslation, ytranslation);
                     mCoupled->initializeFromDom();
                 }
@@ -1452,7 +1453,7 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
             } else if (actCode == VDMA_Remove) {
                 if (isVpzPort(sel)) {
                     VpzPortItem* it = static_cast<VpzPortItem*>(sel);
-                    mVpz->rmModelPort(it->mnode);
+                    mVpm->rmModelPort(it->mnode);
                     removeItem(it);
                     it->setParentItem(NULL);
                     delete it;
@@ -1460,7 +1461,7 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                 } else if(isVpzConnectionLine(sel)){
                     VpzConnectionLineItem* it =
                             static_cast<VpzConnectionLineItem*>(sel);
-                    mVpz->rmModelConnection(it->mnode);
+                    mVpm->rmModelConnection(it->mnode);
                     mCoupled->update();
                 } else if(isVpzSubModel(sel)) {
                     VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
@@ -1468,13 +1469,13 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                         for (int i =0; i< selMods.size(); i++) {
                             it = selMods.at(i);
                             it->setSelected(false);
-                            mVpz->rmModel(it->mnode);
+                            mVpm->rmModel(it->mnode);
                             removeItem(it);
                             delete it;
                         }
                     } else {
                         it->setSelected(false);
-                        mVpz->rmModel(it->mnode);
+                        mVpm->rmModel(it->mnode);
                         removeItem(it);
                         delete it;
                     }
@@ -1483,13 +1484,13 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
             } else if (actCode == VDMA_Add_input_port) {
                 if (isVpzSubModel(sel)) {
                     VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
-                    mVpz->addModelInputPort(it->mnode);
+                    mVpm->addModelInputPort(it->mnode);
                     it->initializeFromDom();
                     it->update();
                     mCoupled->update();
                 } else if(isVpzMainModel(sel)) {
                     VpzMainModelItem* it = static_cast<VpzMainModelItem*>(sel);
-                    mVpz->addModelInputPort(it->mnode);
+                    mVpm->addModelInputPort(it->mnode);
                     it->initializeFromDom();
                     it->update();
                     mCoupled->update();
@@ -1497,26 +1498,26 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
             } else if(actCode == VDMA_Add_output_port) {
                 if (isVpzSubModel(sel)) {
                     VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
-                    mVpz->addModelOutputPort(it->mnode);
+                    mVpm->addModelOutputPort(it->mnode);
                     it->initializeFromDom();
                     it->update();
                     mCoupled->update();
                 } else if(isVpzMainModel(sel)){
 
                     VpzMainModelItem* it = static_cast<VpzMainModelItem*>(sel);
-                    mVpz->addModelOutputPort(it->mnode);
+                    mVpm->addModelOutputPort(it->mnode);
                     it->initializeFromDom();
                     it->update();
                     mCoupled->update();
                 }
             } else if(actCode == VDMA_Add_atomic_model) {
                 VpzMainModelItem* it = static_cast<VpzMainModelItem*>(sel);
-                mVpz->addModel(it->mnode, "atomic", event->scenePos());
+                mVpm->addModel(it->mnode, "atomic", event->scenePos());
                 it->initializeFromDom();
                 it->update();
             } else if(actCode == VDMA_Add_coupled_model) {
                 VpzMainModelItem* it = static_cast<VpzMainModelItem*>(sel);
-                mVpz->addModel(it->mnode, "coupled", event->scenePos());
+                mVpm->addModel(it->mnode, "coupled", event->scenePos());
                 it->initializeFromDom();
                 it->update();
             }
@@ -1591,7 +1592,7 @@ VpzDiagScene::getXQueryOfTheSelectedModel()
 {
     QList<VpzSubModelItem *> sels = mCoupled->getSelectedSubModels();
     if (sels.size() == 1) {
-        QString res =  mVpz->getXQuery(sels.at(0)->mnode);
+        QString res =  mVpm->vdo()->getXQuery(sels.at(0)->mnode);
         return (res);
     } else {
         return "";
@@ -1644,7 +1645,7 @@ VpzDiagScene::getSelectedModels()
     QStringList res;
     QList<VpzSubModelItem*> sels = mCoupled->getSelectedSubModels();
     for (int i=0; i<sels.size();i++) {
-        res.append(mVpz->getXQuery(sels.at(i)->mnode));
+        res.append(mVpm->vdo()->getXQuery(sels.at(i)->mnode));
     }
     return res;
 }
@@ -1706,30 +1707,32 @@ VpzDiagScene::onDragDestroyed(QObject */*obj*/)
 }
 
 void
-VpzDiagScene::onUndoRedoVpz(QDomNode oldVal,
-        QDomNode newVal)
+VpzDiagScene::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+        QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
 {
 
-    QString curr_query = mVpz->getXQuery(mCoupled->mnode);
+    QString curr_query = mVpm->vdo()->getXQuery(mCoupled->mnode);
     //try to reinitialize with current node
-    QDomNode cplNode = mVpz->getNodeFromXQuery(mVpz->getXQuery(mCoupled->mnode));
+    QDomNode cplNode = mVpm->vdo()->getNodeFromXQuery(
+            mVpm->vdo()->getXQuery(mCoupled->mnode));
     if (cplNode.isNull()) {
-        //try to reinitialize with merge newVal and current
-        QString new_query = mVpz->getXQuery(newVal);
-        QString merged_query = mVpz->mergeQueries(new_query, curr_query);
-        cplNode = mVpz->getNodeFromXQuery(merged_query);
+        //try to reinitialize with merge newValVpz and current
+        QString new_query = mVpm->vdo()->getXQuery(newValVpz);
+        QString merged_query = mVpm->mergeQueries(new_query, curr_query);
+        cplNode = mVpm->vdo()->getNodeFromXQuery(merged_query);
         if (cplNode.isNull()) {
-            //try to reinitialize with missing model in oldVal
-            QString old_query = mVpz->getXQuery(oldVal);
-            if (oldVal.nodeName() == "model") {
+            //try to reinitialize with missing model in oldValVpz
+            QString old_query = mVpm->vdo()->getXQuery(oldValVpz);
+            if (oldValVpz.nodeName() == "model") {
                 old_query = old_query +"/submodels";
             }
-            QDomNode root_oldVal = mVpz->getNodeFromXQuery(old_query, oldVal);
+            QDomNode root_oldValVpz = mVpm->vdo()->getNodeFromXQuery(old_query,
+                    oldValVpz);
             QList<QDomNode> oldMods =
-                    mVpz->childNodesWithoutText(root_oldVal, "model");
-            QString subQuery = mVpz->subQuery(merged_query, 0,-1);
-            QList<QDomNode> newMods = mVpz->childNodesWithoutText(
-                    mVpz->getNodeFromXQuery(subQuery), "model");
+                    mVpm->childNodesWithoutText(root_oldValVpz, "model");
+            QString subQuery = mVpm->subQuery(merged_query, 0,-1);
+            QList<QDomNode> newMods = mVpm->childNodesWithoutText(
+                    mVpm->vdo()->getNodeFromXQuery(subQuery), "model");
             for (int i =0; i< newMods.size(); i++) {
                 if (not oldMods.contains(newMods.at(i))) {
                     cplNode = newMods.at(i);
@@ -1739,11 +1742,11 @@ VpzDiagScene::onUndoRedoVpz(QDomNode oldVal,
                 //default got up to the first model
                 bool stop = false;
                 while (not stop) {
-                    merged_query = mVpz->subQuery(merged_query, 0, -1);
+                    merged_query = mVpm->subQuery(merged_query, 0, -1);
                     if (merged_query == "") {
                         stop = true;
                     } else {
-                        cplNode = mVpz->getNodeFromXQuery(merged_query);
+                        cplNode = mVpm->vdo()->getNodeFromXQuery(merged_query);
                         if (not cplNode.isNull()
                                 and (cplNode.nodeName() == "model")){
                             stop = true;

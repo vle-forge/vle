@@ -35,7 +35,7 @@
 #include <QUndoView>
 
 #include "ui_filevpzrtool.h"
-#include "vlevpz.h"
+#include "vlevpm.h"
 #include "widgetvpzproperty.h"
 #include "filevpzdynamics.h"
 #include "filevpzexpcond.h"
@@ -76,8 +76,8 @@ public:
      */
     explicit fileVpzView(QWidget *parent = 0);
     ~fileVpzView();
-    void setVpz(vleVpz *v);
-    vleVpz* vpz();
+    void setVpm(vleVpm *v);
+    vleVpm* vpm();
     bool isUsed(int *reason);
     void usedBySim(bool isUsed);
     void save();
@@ -108,7 +108,7 @@ private:
     FileVpzObservables  *mObservablesTab;
     FileVpzProject  *mProjectTab;
     FileVpzClasses  *mClassesTab;
-    vleVpz          *mVpz;
+    vleVpm          *mVpm;
     //QWidget         *mWidgetTool;
     QList<QTreeWidgetItem *> mViewsItems;
 //    vleVpzModel     *mCurrentModel;

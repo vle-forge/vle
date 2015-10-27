@@ -43,27 +43,84 @@
 #include <QDateTimeEdit>
 #include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
+#include "gvle2plugins.h"
+#include "vlevpz.h"
+#include "vleDomDiffStack.h"
 
 
 namespace vle {
 namespace gvle2 {
 
-class vpzVpm : public QObject
+
+/**
+ * @brief Class that implements vleDomObject especially for vleVpm
+ */
+class vleDomVpm : public vleDomObject
+{
+public:
+    vleDomVpm(QDomDocument* doc);
+    ~vleDomVpm();
+    QString  getXQuery(QDomNode node);
+    QDomNode getNodeFromXQuery(const QString& query, QDomNode d=QDomNode());
+};
+
+/**
+ * @brief class that handles a vleVpz using metadata xml file
+ * (Virtual Project Metadata - vpm)
+ * The two xml files have to be coherent
+ *
+ *                                             VleDomObject
+ *                                                ^
+ *                                      ----------|
+ *                                      |         |
+ *    VleVpz   <>-- VleDomDiffStack<VleDomVpz>    |
+ *       ^                              -----------
+ *       |                              |
+ *    VleVpz   <>-- VleDomDiffStack<VleDomVpz>
+ *
+ */
+class vleVpm : public vleVpz
 {
     Q_OBJECT
 public:
-    vpzVpm();
-    vpzVpm(const QString& filename);
+    vleVpm(const QString& vpzpath, const QString& vpmpath);
     QString toQString(const QDomNode& node) const;
     void xCreateDom();
     void xReadDom();
     void xSaveDom();
     void setCondPlugin(const QString& condName, const QString& name);
+    void addConditionFromPluginToDoc(const QString& condName,
+            const QString& pluginName);
+    void renameConditionToDoc(const QString& oldName, const QString& newName);
+    void rmConditionToDoc(const QString& condName);
     QString getCondPlugin(const QString& condName);
+    void setCurrentTab(QString tabName);
 
+    void undo();
+    void redo();
 
-    QDomDocument* mDoc;
-    QString       mFileName;
+public slots:
+    void onSnapshotVpz(QDomNode snapVpz, bool isMerged);
+    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz);
+    void onSnapshotVpm(QDomNode snapVpm, bool isMerged);
+    void onUndoRedoVpm(QDomNode oldValVpm, QDomNode newValVpm);
+
+signals:
+    void undoRedo(QDomNode oldValVpz, QDomNode newValVpz,
+            QDomNode oldValVpm, QDomNode newValVpm);
+
+private:
+    QDomDocument*    mDoc;
+    QString          mFileName;
+    vleDomVpm*       mVdo;
+    vleDomDiffStack* undoStack;
+    bool waitUndoRedoVpz;
+    bool waitUndoRedoVpm;
+    QDomNode oldValVpz;
+    QDomNode newValVpz;
+    QDomNode oldValVpm;
+    QDomNode newValVpm;
+    gvle2plugins plugins;
 };
 
 }}//namespaces

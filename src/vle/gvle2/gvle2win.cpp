@@ -38,7 +38,7 @@
 #include "aboutbox.h"
 #include "filevpzview.h"
 #include "simulation.h"
-#include "vlevpz.h"
+#include "vlevpm.h"
 #include <QtDebug>
 #include <QDebug>
 
@@ -52,7 +52,7 @@ GVLE2Win::GVLE2Win(QWidget *parent) :
     ui(new Ui::GVLE2Win)
 {
 
-    mVpz = 0;
+    mVpm = 0;
     mTimer = 0;
     mLogger = 0;
     mSimOpened = false;
@@ -124,8 +124,8 @@ GVLE2Win::~GVLE2Win()
     delete mSettings;
     if (mProjectTree)
         delete mProjectTree;
-    if (mVpz)
-        delete mVpz;
+    if (mVpm)
+        delete mVpm;
 
     ui->treeProject->clear();
 
@@ -674,7 +674,7 @@ void GVLE2Win::onLaunchSimulation()
             newTab->setProperty("vpz",    QVariant::fromValue((void*)vpzView));
             vpzView->usedBySim(true);
             try {
-                sim->setVpz(vpzView->vpz());
+                sim->setVpm(vpzView->vpm());
                 sim->setPackage(&mCurrPackage);
                 // Associate the pluggin widget with a new tab
                 int n = ui->tabWidget->addTab(newTab, "Simulation");
@@ -706,7 +706,7 @@ void GVLE2Win::onLaunchSimulation()
         newTab->setProperty("type", QString("simulation"));
         newTab->setProperty("vpz",  QVariant::fromValue((void*)vpzView));
         vpzView->usedBySim(true);
-        newTab->setVpz(vpzView->vpz());
+        newTab->setVpm(vpzView->vpm());
         newTab->setPackage(&mCurrPackage);
         newTab->setLogger(mLogger);
         newTab->setSettings(mSettings);
@@ -733,7 +733,7 @@ GVLE2Win::onUndo()
 {
     QWidget *w = ui->tabWidget->currentWidget();
     fileVpzView *tabVpz = (fileVpzView *)w;
-    tabVpz->vpz()->undoStack->undo();
+    tabVpz->vpm()->undo();
 
 }
 
@@ -742,7 +742,7 @@ GVLE2Win::onRedo()
 {
     QWidget *w = ui->tabWidget->currentWidget();
     fileVpzView *tabVpz = (fileVpzView *)w;
-    tabVpz->vpz()->undoStack->redo();
+    tabVpz->vpm()->redo();
 
 }
 
@@ -944,7 +944,7 @@ bool GVLE2Win::tabClose(int index)
             if (useReason == 2)
             {
                 msgBox.setText(tr("Modified file: ") +
-                               tabVpz->vpz()->getFilename() + "\n" +
+                               tabVpz->vpm()->getFilename() + "\n" +
                                tr("Save before close ?"));
                 msgBox.addButton(QMessageBox::Save);
                 msgBox.addButton(QMessageBox::Discard);
@@ -1153,16 +1153,24 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
     if (selectedFileInfo.suffix() != "vpz")
         return;
 
-#ifdef QTVPZ
-    vleVpz *selVpz;
-    selVpz = new vleVpz(fileName, true);
-    selVpz->setLogger(mLogger);
-    selVpz->setBasePath(mPackage->getName());
-    selVpz->setPackage(mPackage);
-#else
-    vle::vpz::Vpz *selectedVpz;
-    selectedVpz = new vle::vpz::Vpz(fileName.toStdString());
-#endif
+    //TODO should be better handled
+    QString relPath;
+    QStringList fileNameSplit = fileName.split("/");
+    for (int i=1;i<fileNameSplit.length();i++) {
+        if (i>1) {
+            relPath += "/";
+        }
+        relPath += fileNameSplit.at(i);
+    }
+    QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
+
+    vleVpm* selVpm = new vleVpm(basepath+"/"+relPath,
+            basepath+"/metadata/"+relPath);
+
+    selVpm->setLogger(mLogger);
+    selVpm->setBasePath(mPackage->getName());
+    selVpm->setPackage(mPackage);
+
 
     // Search if the selected VPZ has already been opened
     int alreadyOpened = 0;
@@ -1189,16 +1197,13 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
         // Create a new Tab to display VPZ model
         fileVpzView * newTab = new fileVpzView();
         newTab->setProperty("type", QString("vpz"));
-#ifdef QTVPZ
-        newTab->setVpz(selVpz);
-#else
-        newTab->setVpz(selectedVpz);
-#endif
+        newTab->setVpm(selVpm);
+
         int n = ui->tabWidget->addTab(newTab, fileName);
         ui->tabWidget->setCurrentIndex(n);
         newTab->show();
 
-        QObject::connect(selVpz, SIGNAL(sigChanged(QString)),
+        QObject::connect(selVpm, SIGNAL(sigChanged(QString)),
                          this,  SLOT  (setChangedVpz(QString)));
 
         // Create a new toolbox for the right column

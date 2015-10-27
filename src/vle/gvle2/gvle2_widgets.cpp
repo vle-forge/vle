@@ -246,10 +246,11 @@ VleTextEdit::setText(const QString& text)
 }
 
 void
-VleTextEdit::focusOutEvent(QFocusEvent *e)
+VleTextEdit::focusOutEvent(QFocusEvent* e)
 {
     setPalette(QApplication::palette());
     setTextEdition(false);
+    update();
     QPlainTextEdit::focusOutEvent(e);
 }
 

@@ -39,7 +39,7 @@ FileVpzProject::FileVpzProject(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FileVpzProject)
 {
-    mVpz = 0;
+    mVpm = 0;
 
     ui->setupUi(this);
 
@@ -94,18 +94,18 @@ void FileVpzProject::setUndo(QUndoStack *undo)
 
 void FileVpzProject::reload()
 {
-    mAuthor->setText(mVpz->getAuthor());
-    mDate->setDateTime(QDateTime::fromString(mVpz->getDate(), "dddd d MMMM yyyy hh:mm"));
-    mVersion->setText(mVpz->getVersion());
-    mName->setText(mVpz->getExpName());
-    mDuration->setText(mVpz->getExpDuration());
-    mBegin->setText(mVpz->getExpBegin());
+    mAuthor->setText(mVpm->getAuthor());
+    mDate->setDateTime(QDateTime::fromString(mVpm->getDate(), "dddd d MMMM yyyy hh:mm"));
+    mVersion->setText(mVpm->getVersion());
+    mName->setText(mVpm->getExpName());
+    mDuration->setText(mVpm->getExpDuration());
+    mBegin->setText(mVpm->getExpBegin());
 }
 
 void FileVpzProject::setAuthorToVpz()
 {
-    if (mAuthor->text() != mVpz->getAuthor()) {
-        QUndoCommand *changeAuthor = new Ui::ChangeAuthor(mAuthor->text(), mVpz,
+    if (mAuthor->text() != mVpm->getAuthor()) {
+        QUndoCommand *changeAuthor = new Ui::ChangeAuthor(mAuthor->text(), mVpm,
                                                           mAuthor, mTab, mId);
         mUndoStack->push(changeAuthor);
     }
@@ -113,17 +113,17 @@ void FileVpzProject::setAuthorToVpz()
 
 void FileVpzProject::setDateToVpz()
 {
-    if (mDate->text() != mVpz->getDate()) {
+    if (mDate->text() != mVpm->getDate()) {
         QUndoCommand *changeDate = new Ui::ChangeDate(
-            mDate->dateTime().toString("dddd d MMMM yyyy hh:mm"), mVpz,
+            mDate->dateTime().toString("dddd d MMMM yyyy hh:mm"), mVpm,
             mDate, mTab, mId);
         mUndoStack->push(changeDate);
     }
 }
 void FileVpzProject::setVersionToVpz()
 {
-    if (mVersion->text() != mVpz->getVersion()) {
-        QUndoCommand *changeVersion = new Ui::ChangeVersion(mVersion->text(), mVpz,
+    if (mVersion->text() != mVpm->getVersion()) {
+        QUndoCommand *changeVersion = new Ui::ChangeVersion(mVersion->text(), mVpm,
                                                             mVersion, mTab, mId);
         mUndoStack->push(changeVersion);
     }
@@ -131,8 +131,8 @@ void FileVpzProject::setVersionToVpz()
 
 void FileVpzProject::setExpNameToVpz()
 {
-    if (mName->text() != mVpz->getExpName()) {
-        QUndoCommand *changeName = new Ui::ChangeExpName(mName->text(), mVpz,
+    if (mName->text() != mVpm->getExpName()) {
+        QUndoCommand *changeName = new Ui::ChangeExpName(mName->text(), mVpm,
                                                          mName, mTab, mId);
         mUndoStack->push(changeName);
     }
@@ -140,8 +140,8 @@ void FileVpzProject::setExpNameToVpz()
 
 void FileVpzProject::setExpDurationToVpz()
 {
-    if (mDuration->text() != mVpz->getExpDuration()) {
-        QUndoCommand *changeDuration = new Ui::ChangeExpDuration(mDuration->text(), mVpz,
+    if (mDuration->text() != mVpm->getExpDuration()) {
+        QUndoCommand *changeDuration = new Ui::ChangeExpDuration(mDuration->text(), mVpm,
                                                                  mDuration, mTab, mId);
         mUndoStack->push(changeDuration);
     }
@@ -149,8 +149,8 @@ void FileVpzProject::setExpDurationToVpz()
 
 void FileVpzProject::setExpBeginToVpz()
 {
-    if (mBegin->text() != mVpz->getExpBegin()) {
-        QUndoCommand *changeBegin = new Ui::ChangeExpBegin(mBegin->text(), mVpz,
+    if (mBegin->text() != mVpm->getExpBegin()) {
+        QUndoCommand *changeBegin = new Ui::ChangeExpBegin(mBegin->text(), mVpm,
                                                            mBegin, mTab, mId);
         mUndoStack->push(changeBegin);
     }

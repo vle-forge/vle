@@ -30,10 +30,11 @@
 #include <QWidget>
 #include <QSettings>
 #include <vle/gvle2/logger.h>
-#include <vle/gvle2/vlevpz.h>
 
 namespace vle {
 namespace gvle2 {
+
+class vleVpm;
 
 class PluginExpCond: public QObject
 {
@@ -46,11 +47,7 @@ public:
     virtual void     delWidgetToolbar() = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  setExpCond(const QString& condName) = 0;
-    virtual void  setVpz(vleVpz* vpz) = 0;
-    virtual void *getVpz() = 0;
-//signals:
-//    virtual void  valueChanged() = 0;
+    virtual void  setExpCond(vleVpm* vpm, const QString& condName) = 0;
 };
 
 }} //namepsaces

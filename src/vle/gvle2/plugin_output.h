@@ -29,7 +29,7 @@
 #include <QString>
 #include <QWidget>
 #include "logger.h"
-#include "vlevpz.h"
+#include "vlevpm.h"
 
 namespace vle {
 namespace gvle2 {
@@ -42,7 +42,7 @@ public:
     virtual QWidget *getWidget() = 0;
     virtual void     delWidget() = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  init(vleVpz* vpz, const QString& viewName) = 0;
+    virtual void  init(vleVpm* vpz, const QString& viewName) = 0;
 };
 
 }}//namespaces

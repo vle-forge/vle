@@ -36,7 +36,7 @@
 #include <QUndoView>
 
 #include "ui_filevpzrtool.h"
-#include "vlevpz.h"
+#include "vlevpm.h"
 #include "vpzDiagScene.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
@@ -58,9 +58,9 @@ class FileVpzClasses : public QWidget
 public:
     explicit FileVpzClasses(QWidget *parent = 0);
     ~FileVpzClasses();
-    void setVpz(vleVpz *v);
+    void setVpm(vleVpm* vpm);
     void reload();
-//    vleVpz* vpz();
+//    vleVpm* vpz();
 //    bool isUsed(int *reason);
 //    void usedBySim(bool isUsed);
 //    void save();
@@ -95,7 +95,7 @@ public:
     VpzDiagScene        mScene;
 private:
     Ui::FileVpzClasses* ui;
-    vleVpz*             mVpz;
+    vleVpm*             mVpm;
     QString             mSelClass;
 
 //    bool             mUseSim;
@@ -104,7 +104,7 @@ private:
 //    FileVpzExpView  *mExpViewTab;
 //    FileVpzObservables  *mObservablesTab;
 //    FileVpzProject  *mProjectTab;
-//    vleVpz          *mVpz;
+//    vleVpz          *mVpm;
 //    QWidget         *mWidgetTool;
 //    QList<QTreeWidgetItem *> mViewsItems;
 //    vleVpzModel     *mCurrentModel;

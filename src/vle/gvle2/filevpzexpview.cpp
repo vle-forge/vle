@@ -80,7 +80,7 @@ namespace vle {
 namespace gvle2 {
 
 FileVpzExpView::FileVpzExpView(QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzExpView),mVpz(0), mPlugin(0),
+    QWidget(parent), ui(new Ui::FileVpzExpView),mVpm(0), mPlugin(0),
     currView(""), currOutput("")
 {
     ui->setupUi(this);
@@ -102,9 +102,9 @@ FileVpzExpView::~FileVpzExpView()
     delete ui;
 }
 
-void FileVpzExpView::setVpz(vleVpz *vpz)
+void FileVpzExpView::setVpm(vleVpm* vpm)
 {
-    mVpz = vpz;
+    mVpm = vpm;
     reload();
     QObject::connect(ui->vleViewList, SIGNAL(itemPressed (QListWidgetItem *)),
                      this, SLOT(onViewSelected(QListWidgetItem *)));
@@ -156,13 +156,13 @@ FileVpzExpView::reloadOov()
 
 void FileVpzExpView::reloadViews()
 {
-    if (!mVpz) {
+    if (!mVpm) {
         throw vle::utils::InternalError(
                 " gvle2: error in FileVpzExpView::reloadViews");
     }
     // Initiate the view/port tree by adding the View list
     std::vector<std::string> outputNames;
-    mVpz->viewOutputNames(outputNames);
+    mVpm->viewOutputNames(outputNames);
     ui->vleViewList->clear();
     std::vector<std::string>::iterator itb = outputNames.begin();
     std::vector<std::string>::iterator ite = outputNames.end();
@@ -207,17 +207,17 @@ void FileVpzExpView::updatePlugin(const QString& plug)
             pluginName = "gvle2.output/file";
         }
         if (pluginName != "") {
-            PluginOutput *plugin = mVpz->getPackage()->getOutputPlugin(pluginName);
+            PluginOutput *plugin = mVpm->getPackage()->getOutputPlugin(pluginName);
 
             if (plugin == 0)
             {
-                mVpz->logger()->log(QString("Output plugin cannot be loaded %1")
+                mVpm->logger()->log(QString("Output plugin cannot be loaded %1")
                         .arg(pluginName));
                 return;
             }
             mPlugin = plugin;
             QWidget *w = mPlugin->getWidget();
-            mPlugin->init(mVpz, getSelectedViewName());
+            mPlugin->init(mVpm, getSelectedViewName());
 
             //    // Stay informed of changes made by plugin
             //    QObject::connect(w,    SIGNAL(valueChanged(vpzExpCond *)),
@@ -258,14 +258,14 @@ void FileVpzExpView::onViewSelected(QListWidgetItem * item)
     ui->viewTypes->setEnabled(true);
     //ui->listVleOOV->setEditable(true);
     ui->listVleOOV->setEnabled(true);
-    QDomNode viewsNode = mVpz->viewsFromDoc();
-    QString plug = mVpz->getOutputPluginFromViews(viewsNode,
+    QDomNode viewsNode = mVpm->viewsFromDoc();
+    QString plug = mVpm->getOutputPluginFromViews(viewsNode,
             item->text());
-    QDomNode viewNode = mVpz->viewFromViews(viewsNode, item->text());
-    QString viewType = mVpz->viewTypeFromView(viewNode);
+    QDomNode viewNode = mVpm->viewFromViews(viewsNode, item->text());
+    QString viewType = mVpm->viewTypeFromView(viewNode);
     if (viewType == "timed") {
         ui->timeStep->setEnabled(true);
-        ui->timeStep->setValue(mVpz->timeStepFromView(viewNode));
+        ui->timeStep->setValue(mVpm->timeStepFromView(viewNode));
     } else {
         ui->timeStep->setEnabled(false);
     }
@@ -279,12 +279,12 @@ void
 FileVpzExpView::onOutputSelected(const QString& item)
 {
     if (item != "") {
-        if (mVpz and ui->vleViewList and ui->vleViewList->currentItem()) {
-            QDomNode viewsNode = mVpz->viewsFromDoc();
-            QDomNode outputsNode = mVpz->outputsFromViews(viewsNode);
-            QDomNode outputNode = mVpz->outputFromOutputs(outputsNode,
+        if (mVpm and ui->vleViewList and ui->vleViewList->currentItem()) {
+            QDomNode viewsNode = mVpm->viewsFromDoc();
+            QDomNode outputsNode = mVpm->outputsFromViews(viewsNode);
+            QDomNode outputNode = mVpm->outputFromOutputs(outputsNode,
                     ui->vleViewList->currentItem()->text());
-            mVpz->setOutputPlugin(outputNode, item);
+            mVpm->setOutputPlugin(outputNode, item);
             updatePlugin(item);
         }
     }
@@ -294,16 +294,16 @@ void
 FileVpzExpView::onViewTypeSelected(const QString& item)
 {
     if (item != "") {
-        if (mVpz and ui->vleViewList and ui->vleViewList->currentItem()
+        if (mVpm and ui->vleViewList and ui->vleViewList->currentItem()
                 and ui->viewTypes and ui->viewTypes->currentText() != "") {
-            QDomNode viewsNode = mVpz->viewsFromDoc();
-            QDomNode viewNode = mVpz->viewFromViews(viewsNode,
+            QDomNode viewsNode = mVpm->viewsFromDoc();
+            QDomNode viewNode = mVpm->viewFromViews(viewsNode,
                     ui->vleViewList->currentItem()->text());
-             mVpz->setViewTypeFromView(viewNode, item);
+             mVpm->setViewTypeFromView(viewNode, item);
 
              if (item == "timed") {
                  ui->timeStep->setEnabled(true);
-                 ui->timeStep->setValue(mVpz->timeStepFromView(viewNode));
+                 ui->timeStep->setValue(mVpm->timeStepFromView(viewNode));
              } else {
                  ui->timeStep->setEnabled(false);
              }
@@ -314,12 +314,12 @@ FileVpzExpView::onViewTypeSelected(const QString& item)
 void
 FileVpzExpView::onTimeStepChanged(double v)
 {
-    if ((v > 0)  and mVpz and ui->vleViewList and ui->vleViewList->currentItem()
+    if ((v > 0)  and mVpm and ui->vleViewList and ui->vleViewList->currentItem()
                 and ui->viewTypes and ui->viewTypes->currentText() == "timed") {
-        QDomNode viewsNode = mVpz->viewsFromDoc();
-        QDomNode viewNode = mVpz->viewFromViews(viewsNode,
+        QDomNode viewsNode = mVpm->viewsFromDoc();
+        QDomNode viewNode = mVpm->viewFromViews(viewsNode,
                 getSelectedViewName());
-        mVpz->setTimeStepFromView(viewNode, v);
+        mVpm->setTimeStepFromView(viewNode, v);
     }
 }
 
@@ -347,15 +347,15 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
         if (actCode == FVEVM_add_view) {
-            QString viewName =mVpz->newViewNameToDoc();
-            mVpz->addViewToDoc(viewName);
+            QString viewName =mVpm->newViewNameToDoc();
+            mVpm->addViewToDoc(viewName);
             QListWidgetItem* item = new QListWidgetItem(viewName);
             item->setFlags (item->flags () | Qt::ItemIsEditable);
             ui->vleViewList->addItem(item);
         }
         if (actCode == FVEVM_remove_view) {
             if (item) {
-                mVpz->rmViewToDoc(item->text());
+                mVpm->rmViewToDoc(item->text());
                 delete item;
             }
         }
@@ -374,12 +374,12 @@ FileVpzExpView::onItemChanged(QListWidgetItem * item)
 {
     if (not oldViewName.isEmpty())  {
         QString newName = item->text();
-        if (mVpz->existViewFromDoc(newName)) {
+        if (mVpm->existViewFromDoc(newName)) {
             bool save = ui->vleViewList->blockSignals(true);
             item->setText(oldViewName);
             ui->vleViewList->blockSignals(save);
         } else if (oldViewName != newName) {
-            mVpz->renameViewToDoc(oldViewName, newName);
+            mVpm->renameViewToDoc(oldViewName, newName);
         }
         oldViewName = "";
     }

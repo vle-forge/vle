@@ -29,7 +29,7 @@
 #include <QString>
 #include <QWidget>
 #include <vle/gvle2/logger.h>
-#include <vle/gvle2/vlevpz.h>
+#include <vle/gvle2/vlevpm.h>
 
 #ifndef Q_MOC_RUN
 #include <vle/utils/Package.hpp>
@@ -50,7 +50,7 @@ public:
     virtual void     delWidgetToolbar() = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  setVpz(vleVpz *vpz) = 0;
+    virtual void  setVpm(vleVpm *vpm) = 0;
     virtual void *getVpz() = 0;
     virtual void  setPackage(vle::utils::Package *pkg) = 0;
 };

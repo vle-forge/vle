@@ -29,7 +29,7 @@
 #include <QUndoStack>
 #include <QTabWidget>
 #include <QDateTime>
-#include "vlevpz.h"
+#include "vlevpm.h"
 #include "vpzActions.h"
 
 namespace Ui {
@@ -46,8 +46,8 @@ class FileVpzProject : public QWidget
 public:
     explicit FileVpzProject(QWidget *parent = 0);
     ~FileVpzProject();
-    void setVpz(vleVpz *vpz)
-    {mVpz = vpz;};
+    void setVpm(vleVpm* vpm)
+    {mVpm = vpm;};
     void setUndo(QUndoStack *undo);
     void setTabId(int i)
     {mId = i;};
@@ -81,7 +81,7 @@ private:
     QLineEdit *mDuration;
     QLineEdit *mBegin;
 
-    vleVpz  *mVpz;
+    vleVpm*    mVpm;
 };
 
 }} //namepsaces

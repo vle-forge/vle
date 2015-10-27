@@ -61,15 +61,16 @@ public:
     explicit FileVpzExpCond(QWidget *parent = 0);
 
     ~FileVpzExpCond();
-    void setVpz(vleVpz *vpz);
+    void setVpm(vleVpm* vpm);
     void resizeTable();
     void reload(bool resize=true);
-    void showValueEdit(vle::value::Value* val);
+    void showEditPlace();
 
 public slots:
     void onCellDoubleClicked(int row, int column);
     void onConditionMenu(const QPoint&);
-    void onUndoRedoVpz(QDomNode oldVal, QDomNode newVal);
+    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+            QDomNode oldValVpm, QDomNode newValVpm);
     void onTextUpdated(const QString& id, const QString& oldVal,
             const QString& newVal);
     void onIntUpdated(const QString& id, int newVal);
@@ -81,6 +82,7 @@ public slots:
 private:
     QMenu* buildAddValueMenu(QMenu& menu, const QString& setOrAdd);
     vle::value::Value* buildDefaultValue(QString type);
+    void insertNullWidget(int row, int col);
     void insertTextEdit(int row, int col, const QString& val);
     void insertSpinBox(int row, int col, int val);
     void insertDoubleSpinBox(int row, int col, double val);
@@ -89,7 +91,7 @@ private:
 
 private:
     Ui::FileVpzExpCond* ui;
-    vleVpz*             mVpz;
+    vleVpm*             mVpm;
     QString             mCurrCondName;
     QString             mCurrPortName;
     int                 mCurrValIndex;

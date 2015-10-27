@@ -28,7 +28,7 @@
 #include <QMenu>
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
-#include "vlevpz.h"
+#include "vlevpm.h"
 
 namespace Ui {
     class FileVpzObservables;
@@ -48,7 +48,7 @@ public:
 
     explicit FileVpzObservables(QWidget *parent = 0);
     ~FileVpzObservables();
-    void setVpz(vleVpz *vpz);
+    void setVpm(vleVpm* vpm);
     void reload();
 
 public slots:
@@ -67,7 +67,7 @@ private:
 		     QTreeWidgetItem *obsItem = 0);
 
     Ui::FileVpzObservables* ui;
-    vleVpz* mVpz;
+    vleVpm* mVpm;
 };
 
 }} //namespaces

@@ -47,7 +47,7 @@ fileVpzView::fileVpzView(QWidget *parent) :
     //undoView->show();
     undoView->setAttribute(Qt::WA_QuitOnClose, false);
 
-    mVpz = 0;
+    mVpm = 0;
     mUseSim = false;
     mDynamicsTab = 0;
     mExpCondTab = 0;
@@ -154,59 +154,59 @@ fileVpzView::~fileVpzView()
  *        Associate the tab with an allocated VPZ object
  *
  */
-void fileVpzView::setVpz(vleVpz *vpz)
+void fileVpzView::setVpm(vleVpm* vpm)
 {
-    mVpz = vpz;
+    mVpm = vpm;
 
-    QObject::connect(mVpz, SIGNAL(modelsUpdated()),
+    QObject::connect(mVpm, SIGNAL(modelsUpdated()),
                      mRtool, SLOT (onModelsUpdated()));
 
-    mVpz->undoStack->current_source = ui->tabWidget->tabText(
-            ui->tabWidget->currentIndex());
+    mVpm->setCurrentTab(ui->tabWidget->tabText(
+            ui->tabWidget->currentIndex()));
 
     if (mRtool) {
-        mRtool->setVpz(mVpz);
+        mRtool->setVpm(mVpm);
     }
 
     // ---- Dynamics Tab ----
     if (mDynamicsTab) {
-        mDynamicsTab->setVpz(mVpz);
+        mDynamicsTab->setVpm(mVpm);
         //mDynamicsTab->setUndo(mUndoStack);
         mDynamicsTab->reload();
     }
 
     // ---- Experimental Conditions Tab ----
     if (mExpCondTab) {
-        mExpCondTab->setVpz(mVpz);
+        mExpCondTab->setVpm(mVpm);
         mExpCondTab->reload();
     }
 
     // ---- Experimental Conditions Tab ----
     if (mObservablesTab) {
-        mObservablesTab->setVpz(mVpz);
+        mObservablesTab->setVpm(mVpm);
     }
 
     // ---- Experimental Conditions Tab ----
     if (mProjectTab) {
-        mProjectTab->setVpz(mVpz);
+        mProjectTab->setVpm(mVpm);
         mProjectTab->setUndo(mUndoStack);
         mProjectTab->reload();
     }
 
     // ---- View Tab ----
     if (mExpViewTab) {
-        mExpViewTab->setVpz(mVpz);
+        mExpViewTab->setVpm(mVpm);
         mExpViewTab->reload();
     }
 
     // ---- View Tab ----
     if (mClassesTab) {
-        mClassesTab->setVpz(mVpz);
+        mClassesTab->setVpm(mVpm);
        //mClassesTab->reload();
     }
 
     //Build Scene
-    mScene.init(mVpz, "");
+    mScene.init(mVpm, "");
     ui->graphicView->setSceneRect(QRect(0,0,0,0));
     ui->graphicView->setScene(&mScene);
     mScene.update();
@@ -216,10 +216,10 @@ void fileVpzView::setVpz(vleVpz *vpz)
 
 void fileVpzView::save()
 {
-    if ( ! mVpz)
+    if ( ! mVpm)
         return;
 
-    mVpz->save();
+    mVpm->save();
 }
 
 /**
@@ -227,12 +227,12 @@ void fileVpzView::save()
  *        Readback the VPZ currently used
  *
  */
-vleVpz* fileVpzView::vpz()
+vleVpm* fileVpzView::vpm()
 {
-    //QString fileName = mVpz->getFilename();
+    //QString fileName = mVpm->getFilename();
     //mVleLibVpz = new vle::vpz::Vpz(fileName.toStdString());
 
-    return mVpz;
+    return mVpm;
 }
 
 void fileVpzView::usedBySim(bool isUsed)
@@ -245,7 +245,7 @@ bool fileVpzView::isUsed(int *reason = 0)
     int flag = 0;
     if (mUseSim)
         flag = 1;
-    else if (mVpz)
+    else if (mVpm)
     {
         flag = 2;
     }
@@ -278,7 +278,7 @@ fileVpzView::onCurrentChanged(int index)
     } else if (tab == "Classes") {
         mRtool->onInitializationDone(&(mClassesTab->mScene));
     }
-    vpz()->undoStack->current_source = tab;
+    vpm()->setCurrentTab(tab);
 }
 
 }}//namespaces

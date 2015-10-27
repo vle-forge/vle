@@ -34,9 +34,9 @@ ChangeAuthor::ChangeAuthor(QString newAuthor, vleVpz  *vpz,
                            QUndoCommand *parent) :
     QUndoCommand(parent)
 {
-    mVpz = vpz;
+    mVpm = vpz;
     mAuthor = newAuthor;
-    mPreviousAuthor = mVpz->getAuthor();
+    mPreviousAuthor = mVpm->getAuthor();
     mLine = line;
     mTab = tab;
     mId = id;
@@ -48,14 +48,14 @@ ChangeAuthor::ChangeAuthor(QString newAuthor, vleVpz  *vpz,
 
 void ChangeAuthor::undo()
 {
-    mVpz->setAuthor(mPreviousAuthor);
+    mVpm->setAuthor(mPreviousAuthor);
     mTab->setCurrentIndex(mId);
     mLine->setText(mPreviousAuthor);
 }
 
 void ChangeAuthor::redo()
 {
-    mVpz->setAuthor(mAuthor);
+    mVpm->setAuthor(mAuthor);
     mTab->setCurrentIndex(mId);
     mLine->setText(mAuthor);
 }
@@ -65,9 +65,9 @@ ChangeDate::ChangeDate(QString newDate, vleVpz  *vpz,
                        QUndoCommand *parent) :
     QUndoCommand(parent)
 {
-    mVpz = vpz;
+    mVpm = vpz;
     mDate = newDate;
-    mPreviousDate = mVpz->getDate();
+    mPreviousDate = mVpm->getDate();
     mLine = line;
     mTab = tab;
     mId = id;
@@ -78,14 +78,14 @@ ChangeDate::ChangeDate(QString newDate, vleVpz  *vpz,
 
 void ChangeDate::undo()
 {
-    mVpz->setDate(mPreviousDate);
+    mVpm->setDate(mPreviousDate);
     mTab->setCurrentIndex(mId);
     mLine->setDateTime(QDateTime::fromString(mPreviousDate, "dddd d MMMM yyyy hh:mm"));
 }
 
 void ChangeDate::redo()
 {
-    mVpz->setDate(mDate);
+    mVpm->setDate(mDate);
     mTab->setCurrentIndex(mId);
     mLine->setDateTime(QDateTime::fromString(mDate, "dddd MMMM d yyyy hh:mm"));
 }
@@ -95,9 +95,9 @@ ChangeVersion::ChangeVersion(QString newVersion, vleVpz  *vpz,
                              QUndoCommand *parent) :
     QUndoCommand(parent)
 {
-    mVpz = vpz;
+    mVpm = vpz;
     mVersion = newVersion;
-    mPreviousVersion = mVpz->getVersion();
+    mPreviousVersion = mVpm->getVersion();
     mLine = line;
     mTab = tab;
     mId = id;
@@ -109,14 +109,14 @@ ChangeVersion::ChangeVersion(QString newVersion, vleVpz  *vpz,
 
 void ChangeVersion::undo()
 {
-    mVpz->setVersion(mPreviousVersion);
+    mVpm->setVersion(mPreviousVersion);
     mTab->setCurrentIndex(mId);
     mLine->setText(mPreviousVersion);
 }
 
 void ChangeVersion::redo()
 {
-    mVpz->setVersion(mVersion);
+    mVpm->setVersion(mVersion);
     mTab->setCurrentIndex(mId);
     mLine->setText(mVersion);
 }
@@ -126,9 +126,9 @@ ChangeExpName::ChangeExpName(QString newExpName, vleVpz  *vpz,
                              QUndoCommand *parent) :
     QUndoCommand(parent)
 {
-    mVpz = vpz;
+    mVpm = vpz;
     mName = newExpName;
-    mPreviousName = mVpz->getExpName();
+    mPreviousName = mVpm->getExpName();
     mLine = line;
     mTab = tab;
     mId = id;
@@ -140,14 +140,14 @@ ChangeExpName::ChangeExpName(QString newExpName, vleVpz  *vpz,
 
 void ChangeExpName::undo()
 {
-    mVpz->setExpName(mPreviousName);
+    mVpm->setExpName(mPreviousName);
     mTab->setCurrentIndex(mId);
     mLine->setText(mPreviousName);
 }
 
 void ChangeExpName::redo()
 {
-    mVpz->setExpName(mName);
+    mVpm->setExpName(mName);
     mTab->setCurrentIndex(mId);
     mLine->setText(mName);
 }
@@ -157,9 +157,9 @@ ChangeExpDuration::ChangeExpDuration(QString newExpDuration, vleVpz  *vpz,
                                      QUndoCommand *parent) :
     QUndoCommand(parent)
 {
-    mVpz = vpz;
+    mVpm = vpz;
     mDuration = newExpDuration;
-    mPreviousDuration = mVpz->getExpDuration();
+    mPreviousDuration = mVpm->getExpDuration();
     mLine = line;
     mTab = tab;
     mId = id;
@@ -171,14 +171,14 @@ ChangeExpDuration::ChangeExpDuration(QString newExpDuration, vleVpz  *vpz,
 
 void ChangeExpDuration::undo()
 {
-    mVpz->setExpDuration(mPreviousDuration);
+    mVpm->setExpDuration(mPreviousDuration);
     mTab->setCurrentIndex(mId);
     mLine->setText(mPreviousDuration);
 }
 
 void ChangeExpDuration::redo()
 {
-    mVpz->setExpDuration(mDuration);
+    mVpm->setExpDuration(mDuration);
     mTab->setCurrentIndex(mId);
     mLine->setText(mDuration);
 }
@@ -188,9 +188,9 @@ ChangeExpBegin::ChangeExpBegin(QString newExpBegin, vleVpz  *vpz,
                                QUndoCommand *parent) :
     QUndoCommand(parent)
 {
-    mVpz = vpz;
+    mVpm = vpz;
     mBegin = newExpBegin;
-    mPreviousBegin = mVpz->getExpBegin();
+    mPreviousBegin = mVpm->getExpBegin();
     mLine = line;
     mTab = tab;
     mId = id;
@@ -202,14 +202,14 @@ ChangeExpBegin::ChangeExpBegin(QString newExpBegin, vleVpz  *vpz,
 
 void ChangeExpBegin::undo()
 {
-    mVpz->setExpBegin(mPreviousBegin);
+    mVpm->setExpBegin(mPreviousBegin);
     mTab->setCurrentIndex(mId);
     mLine->setText(mPreviousBegin);
 }
 
 void ChangeExpBegin::redo()
 {
-    mVpz->setExpBegin(mBegin);
+    mVpm->setExpBegin(mBegin);
     mTab->setCurrentIndex(mId);
     mLine->setText(mBegin);
 }

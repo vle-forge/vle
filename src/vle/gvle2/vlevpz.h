@@ -43,7 +43,7 @@
 #include <QDateTimeEdit>
 #include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
-#include "vlevpm.h"
+#include "vleDomDiffStack.h"
 #include "logger.h"
 
 
@@ -53,13 +53,27 @@ namespace gvle2 {
 class vlePackage;
 class vleDomDiffStack;
 
+/**
+ * @brief Class that implements vleDomObject especially for vleVpz
+ */
+class vleDomVpz : public vleDomObject
+{
+public:
+    vleDomVpz(QDomDocument* doc);
+    ~vleDomVpz();
+    QString  getXQuery(QDomNode node);
+    QDomNode getNodeFromXQuery(const QString& query, QDomNode d=QDomNode());
+};
 
-class vleVpz : public QObject /*, public QXmlDefaultHandler */
+
+/**
+ * @brief Main class
+ */
+class vleVpz : public QObject
 {
     Q_OBJECT
 public:
-    vleVpz();
-    vleVpz(const QString& filename, bool withMetadata);
+    vleVpz(const QString& filename);
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
@@ -214,41 +228,26 @@ public:
     /*******************************************************
      * Utils Functions QDom
      ******************************************************/
+    vleDomVpz* vdo();
+
     QList<QDomNode> childNodesWithoutText(QDomNode node,
             const QString& nodeName = "") const;
 
-    QDomNode childWhithNameAttr(QDomNode node,
-            const QString& nodeName, const QString& nameValue) const;
     /**
      * @brief remove children that are QDomText to a node
      */
     void removeTextChilds(QDomNode node, bool recursively=true);
-    /**
-     * @brief get attribute value of a node which name is attrName
-     */
-    QString attributeValue(const QDomNode& node, const QString& attrName) const;
     /**
      * @brief set attribute value of a node which name is attrName
      * and value is val
      */
     void setAttributeValue(QDomElement node, const QString& attrName,
                const QString& val);
-    /**
-     * @brief get the first child corresponding to the name and add it
-     * if not present
-     */
-    QDomNode obtainChild(QDomNode node, const QString& nodeName,
-            bool addIfNot=true);
 
-    QString getXQuery(QDomNode node);
+
 
     QString mergeQueries(const QString& query1, const QString& query2);
     QString subQuery(const QString& query, int begin, int end);
-
-
-
-
-    QDomNode getNodeFromXQuery(const QString& query, QDomNode d=QDomNode());
 
     /*****************************************************
      * TODO A TRIER
@@ -583,7 +582,8 @@ public:
     /**
      * @brief set the 'name' attribute of tag <condition> to a new value
      */
-    void renameConditionToDoc(const QString& oldName, const QString& newName);
+    virtual void renameConditionToDoc(const QString& oldName,
+            const QString& newName);
     void renameDynamicToDoc(const QString& oldName, const QString& newName);
     /**
      * @brief set the 'name' attribute of tag <port> to a new value
@@ -661,7 +661,7 @@ public:
      * @brief remove a <condition> tag to a Vpz Doc
      * with attribute 'name'  condName
      */
-    void rmConditionToDoc(const QString& condName);
+    virtual void rmConditionToDoc(const QString& condName);
     /**
      * @brief remove <port> tag from a condition to a Vpz doc
      * which attribute 'name' is portName
@@ -956,10 +956,6 @@ public:
      */
     QString getOutputPluginFromViews(QDomNode node,
             const QString& outputName);
-    /**
-     * @brief get a QString representation of a QDomNode
-     */
-    QString toQString(const QDomNode& node) const;
 
     /**
      * @brief Fill a QList with names of the dynamics
@@ -1036,81 +1032,12 @@ private:
     QString      mPath;
     QFile        mFile;
     QDomDocument mDoc;
-    bool         mWithMetadata;
-public:
-    vpzVpm*      mMetadata;
 private:
     vlePackage*  mPackage;
     Logger*      mLogger;
-public:
+protected:
+    vleDomVpz*       mVdo;
     vleDomDiffStack* undoStack;
-};
-
-class vleDomDiffStack : public QObject
-{
-    Q_OBJECT
-public:
-    enum DomDiffType {DDF_setHeightToModel, DDF_setWidthToModel,
-        DDF_setPositionToModel, DDF_null};
-    struct DomDiff {
-        QDomNode node_before;
-        QDomNode node_after;
-        QString query;
-        DomDiffType merge_type;
-        vle::value::Map* merge_args;
-        QString source;
-
-        DomDiff():node_before(), node_after(), query(""),
-                merge_type(DDF_null), merge_args(0), source("")
-        {
-        }
-
-        ~DomDiff()
-        {
-            if (merge_args) {
-                delete merge_args;
-                merge_args = 0;
-            }
-        }
-        void reset()
-        {
-            node_before = QDomNode();
-            node_after = QDomNode();
-            query == "";
-            merge_type = DDF_null;
-            if (merge_args) {
-                delete merge_args;
-                merge_args = 0;
-            }
-            source = "";
-        }
-    };
-
-    std::vector<DomDiff> diffs;
-    unsigned int curr;
-    vleVpz* mVpz;
-    QString current_source;
-
-    vleDomDiffStack(vleVpz* vpz): diffs(), curr(0), mVpz(vpz),
-            current_source("")
-    {
-    }
-
-    void init (QDomNode node);
-
-    void snapshot (QDomNode node);
-
-    void snapshot (QDomNode node, DomDiffType mergeType,
-            vle::value::Map* mergeArgs);
-
-
-
-    void undo();
-    void redo();
-
-signals:
-    void undoRedoVpz(QDomNode oldVal, QDomNode newVal);
-
 };
 
 }}//namepsaces

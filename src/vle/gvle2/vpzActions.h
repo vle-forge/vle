@@ -42,7 +42,7 @@ public:
     void redo();
 
 private:
-    vle::gvle2::vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpm;
     QString mAuthor;
     QString mPreviousAuthor;
     QLineEdit *mLine;
@@ -61,7 +61,7 @@ public:
     void redo();
 
 private:
-    vle::gvle2::vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpm;
     QString mDate;
     QString mPreviousDate;
     QDateTimeEdit *mLine;
@@ -80,7 +80,7 @@ public:
     void redo();
 
 private:
-    vle::gvle2::vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpm;
     QString mVersion;
     QString mPreviousVersion;
     QLineEdit *mLine;
@@ -99,7 +99,7 @@ public:
     void redo();
 
 private:
-    vle::gvle2::vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpm;
     QString mName;
     QString mPreviousName;
     QLineEdit *mLine;
@@ -118,7 +118,7 @@ public:
     void redo();
 
 private:
-    vle::gvle2::vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpm;
     QString mDuration;
     QString mPreviousDuration;
     QLineEdit *mLine;
@@ -137,7 +137,7 @@ public:
     void redo();
 
 private:
-    vle::gvle2::vleVpz  *mVpz;
+    vle::gvle2::vleVpz  *mVpm;
     QString mBegin;
     QString mPreviousBegin;
     QLineEdit *mLine;
