@@ -65,37 +65,82 @@ GVLE2Win::GVLE2Win(QWidget *parent) :
 
     // GUI init
     ui->setupUi(this);
+
+    mProjectFileSytem = new QFileSystemModel(this);
+    QTreeView *tree = ui->treeProject;
+    tree->setModel(mProjectFileSytem);
+
     // Open the configuration file
     std::string configFile = vu::Path::path().getHomeFile("gvle2.conf");
     mSettings = new QSettings(QString(configFile.c_str()),QSettings::IniFormat);
     menuRecentProjectRefresh();
 
-    // Connect menubar handlers
-    QObject::connect(ui->actionNewProject,  SIGNAL(triggered()), this, SLOT(onNewProject()));
-    QObject::connect(ui->actionOpenProject,  SIGNAL(triggered()), this, SLOT(onOpenProject()));
-    QObject::connect(ui->actionRecent1,      SIGNAL(triggered()), this, SLOT(onProjectRecent1()));
-    QObject::connect(ui->actionRecent2,      SIGNAL(triggered()), this, SLOT(onProjectRecent2()));
-    QObject::connect(ui->actionRecent3,      SIGNAL(triggered()), this, SLOT(onProjectRecent3()));
-    QObject::connect(ui->actionRecent4,      SIGNAL(triggered()), this, SLOT(onProjectRecent4()));
-    QObject::connect(ui->actionRecent5,      SIGNAL(triggered()), this, SLOT(onProjectRecent5()));
-    QObject::connect(ui->actionCloseProject, SIGNAL(triggered()), this, SLOT(onCloseProject()));
-    QObject::connect(ui->actionQuit,         SIGNAL(triggered()), this, SLOT(onQuit()));
-    QObject::connect(ui->actionUndo,         SIGNAL(triggered()), this, SLOT(onUndo()));
-    QObject::connect(ui->actionRedo,         SIGNAL(triggered()), this, SLOT(onRedo()));
-    QObject::connect(ui->actionConfigureProject, SIGNAL(triggered()), this, SLOT(onProjectConfigure()));
-    QObject::connect(ui->actionBuildProject, SIGNAL(triggered()), this, SLOT(onProjectBuild()));
-    QObject::connect(ui->actionLaunchSimulation, SIGNAL(triggered()), this, SLOT(onLaunchSimulation()));
-    QObject::connect(ui->actionSimNone,      SIGNAL(toggled(bool)),   this, SLOT(onSelectSimulator(bool)));
-    QObject::connect(ui->actionHelp,         SIGNAL(triggered()), this, SLOT(onHelp()));
-    QObject::connect(ui->actionAbout,        SIGNAL(triggered()), this, SLOT(onAbout()));
-    // Handle -click- on project tree
-    QObject::connect(ui->treeProject, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), \
-                     this,              SLOT(onTreeDblClick(QTreeWidgetItem*, int)));
-    //
-    QObject::connect(ui->tabWidget,   SIGNAL(currentChanged(int)),    this, SLOT(onTabChange(int)));
-    QObject::connect(ui->tabWidget,   SIGNAL(tabCloseRequested(int)), this, SLOT(onTabClose(int)));
-    // Buttons and bar
-    QObject::connect(ui->statusTitleToggle,  SIGNAL(clicked()),   this, SLOT(onStatusToggle()));
+    QObject::connect(ui->actionNewProject,
+                     SIGNAL(triggered()), this,
+                     SLOT(onNewProject()));
+    QObject::connect(ui->actionOpenProject,
+                     SIGNAL(triggered()), this,
+                     SLOT(onOpenProject()));
+    QObject::connect(ui->actionRecent1,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectRecent1()));
+    QObject::connect(ui->actionRecent2,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectRecent2()));
+    QObject::connect(ui->actionRecent3,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectRecent3()));
+    QObject::connect(ui->actionRecent4,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectRecent4()));
+    QObject::connect(ui->actionRecent5,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectRecent5()));
+    QObject::connect(ui->actionCloseProject,
+                     SIGNAL(triggered()), this,
+                     SLOT(onCloseProject()));
+    QObject::connect(ui->actionQuit,
+                     SIGNAL(triggered()), this,
+                     SLOT(onQuit()));
+    QObject::connect(ui->actionUndo,
+                     SIGNAL(triggered()), this,
+                     SLOT(onUndo()));
+    QObject::connect(ui->actionRedo,
+                     SIGNAL(triggered()), this,
+                     SLOT(onRedo()));
+    QObject::connect(ui->actionConfigureProject,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectConfigure()));
+    QObject::connect(ui->actionBuildProject,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectBuild()));
+    QObject::connect(ui->actionLaunchSimulation,
+                     SIGNAL(triggered()), this,
+                     SLOT(onLaunchSimulation()));
+    QObject::connect(ui->actionSimNone,
+                     SIGNAL(toggled(bool)), this,
+                     SLOT(onSelectSimulator(bool)));
+    QObject::connect(ui->actionHelp,
+                     SIGNAL(triggered()), this,
+                     SLOT(onHelp()));
+    QObject::connect(ui->actionAbout,
+                     SIGNAL(triggered()), this,
+                     SLOT(onAbout()));
+
+    QObject::connect(ui->treeProject,
+                     SIGNAL(doubleClicked(QModelIndex)), this,
+                     SLOT(onTreeDblClick(QModelIndex)));
+
+    QObject::connect(ui->tabWidget,
+                     SIGNAL(currentChanged(int)), this,
+                     SLOT(onTabChange(int)));
+    QObject::connect(ui->tabWidget,
+                     SIGNAL(tabCloseRequested(int)), this,
+                     SLOT(onTabClose(int)));
+
+    QObject::connect(ui->statusTitleToggle,
+                     SIGNAL(clicked()), this, SLOT(onStatusToggle()));
+
     mProjectTree = new WidgetProjectTree();
     // Initiate an mutual exclusive selection on simulators menu
     mMenuSimGroup = new QActionGroup(this);
@@ -126,8 +171,6 @@ GVLE2Win::~GVLE2Win()
         delete mProjectTree;
     if (mVpm)
         delete mVpm;
-
-    ui->treeProject->clear();
 
     while(ui->tabWidget->count())
     {
@@ -454,9 +497,6 @@ bool GVLE2Win::closeProject()
         }
     }
 
-    // Clear the project tree
-    ui->treeProject->clear();
-    ui->treeProject->setColumnCount(0);
     // Update menus
     ui->actionCloseProject->setEnabled(false);
     ui->menuProject->setEnabled(false);
@@ -1056,98 +1096,22 @@ void GVLE2Win::statusWidgetClose()
 
 void GVLE2Win::treeProjectUpdate()
 {
-    QTreeWidget *tree = ui->treeProject;
-    QString      packageName( vu::Path::filename(mCurrPackage.name()).c_str() );
+    QTreeView* projectTreeView = ui->treeProject;
+    QString projectName(vu::Path::filename(mCurrPackage.name()).c_str());
 
-    // Clear the current tree
-    tree->clear();
-    tree->setColumnCount(1);
-    // Add package name at the top of the widget
-    QStringList HeaderLabels;
-    HeaderLabels << packageName;
-    tree->setHeaderLabels(HeaderLabels);
+    QModelIndex projectIndex = mProjectFileSytem->setRootPath(projectName);
 
-    // Read directory content
-    QDir dir(mCurrPackage.name().c_str());
-    dir.setFilter(QDir::Dirs | QDir::Files);
-    dir.setSorting(QDir::Name);
-    QFileInfoList list = dir.entryInfoList();
-    QListIterator<QFileInfo> files( list );
-    QList<QTreeWidgetItem *> fileItems;
-    QList<QTreeWidgetItem *> folderItems;
-    while( files.hasNext() )
-    {
-        QFileInfo fileInfo = files.next();
-        QString   fileName = fileInfo.fileName();
-        if (fileInfo.isFile())
-        {
-            QTreeWidgetItem *item = new QTreeWidgetItem();
-            item->setData(0, Qt::UserRole, QVariant(fileInfo.filePath()));
-            item->setText(0, fileName);
-            item->setIcon(0, *(new QIcon(":/icon/resources/page_white.png")));
-            fileItems.append(item);
-        }
-        if (fileInfo.isDir())
-        {
-            if ( (fileName == ".") || (fileName ==".."))
-                continue;
-            QTreeWidgetItem *item = new QTreeWidgetItem();
-            item->setText(0, fileName);
-            item->setIcon(0, *(new QIcon(":/icon/resources/folder.png")));
-            folderItems.append(item);
-            treeProjectUpdate(item, fileInfo.filePath());
-        }
-    }
-    tree->insertTopLevelItems(0, fileItems);
-    tree->insertTopLevelItems(0, folderItems);
-    tree->setStyleSheet(QStyleFactory::keys().at(1));
+    projectTreeView->setRootIndex(projectIndex);
 }
 
-void GVLE2Win::treeProjectUpdate(QTreeWidgetItem *base, QString folderName)
+void GVLE2Win::onTreeDblClick(QModelIndex index)
 {
-    QDir dir(folderName);
-    dir.setFilter(QDir::Dirs | QDir::Files);
-    dir.setSorting(QDir::Name);
+    if (not index.isValid()) return;
 
-    QFileInfoList list = dir.entryInfoList();
-    QListIterator<QFileInfo> files( list );
-    QList<QTreeWidgetItem *> fileItems;
+    QString fileName = mProjectFileSytem->filePath(index);
+    QString currentDir = QDir::currentPath() += "/";
 
-    while( files.hasNext() )
-    {
-        QFileInfo fileInfo = files.next();
-        QString   fileName = fileInfo.fileName();
-        if (fileInfo.isFile())
-        {
-            QTreeWidgetItem *item = new QTreeWidgetItem();
-            item->setData(0, Qt::UserRole, QVariant(fileInfo.filePath()));
-            item->setText(0, fileName);
-            if (fileInfo.suffix() == "vpz")
-                item->setIcon(0, *(new QIcon(":/icon/resources/map_color.png")));
-            else
-                item->setIcon(0, *(new QIcon(":/icon/resources/page_white.png")));
-            fileItems.append(item);
-        }
-        if (fileInfo.isDir())
-        {
-            if ( (fileName == ".") || (fileName ==".."))
-                continue;
-            QTreeWidgetItem *item = new QTreeWidgetItem();
-            item->setText(0, fileName);
-            item->setIcon(0, *(new QIcon(":/icon/resources/folder.png")));
-            base->addChild(item);
-            treeProjectUpdate(item, fileInfo.filePath());
-        }
-    }
-
-    QListIterator<QTreeWidgetItem*> items( fileItems );
-    while( items.hasNext() )
-        base->addChild(items.next());
-}
-
-void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
-{
-    QString fileName = item->data(column, Qt::UserRole).toString();
+    fileName.replace(currentDir, "");
 
     QFileInfo selectedFileInfo = QFileInfo(fileName);
     if (selectedFileInfo.suffix() != "vpz")
@@ -1162,6 +1126,7 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
         }
         relPath += fileNameSplit.at(i);
     }
+
     QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
 
     vleVpm* selVpm = new vleVpm(basepath+"/"+relPath,
@@ -1194,7 +1159,6 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
         ui->tabWidget->setCurrentIndex(alreadyOpened);
     else
     {
-        // Create a new Tab to display VPZ model
         fileVpzView * newTab = new fileVpzView();
         newTab->setProperty("type", QString("vpz"));
         newTab->setVpm(selVpm);
@@ -1275,51 +1239,43 @@ pluginModelerView *GVLE2Win::openModeler(QString filename)
 // Todo : this method must be move to a "package" class
 void GVLE2Win::loadModelerClasses(pluginModelerView *modeler)
 {
-    QTreeWidget     *tree = ui->treeProject;
-    QTreeWidgetItem *item;
-    for (int i = 0; i < tree->topLevelItemCount(); i++)
-    {
-        item = tree->topLevelItem(i);
-        if (item->text(0) == "src")
-            break;
-        item = 0;
-    }
-    if (item == 0)
-        return;
-
     QString pluginName = modeler->getName();
 
     QDir dir(mCurrPackage.name().c_str());
-    dir.cd("src");
+    if (dir.cd("src")) {
+        dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+        QStringList filters;
+        filters << "*.cpp";
+        dir.setNameFilters(filters);
+        QFileInfoList list = dir.entryInfoList();
+        for (int i = 0; i < list.size(); ++i) {
+            QFileInfo fileInfo = list.at(i);
+            QString fname = fileInfo.fileName();
 
-    QTreeWidgetItem *fileItem;
-    for (int i = 0; i < item->childCount(); i++)
-    {
-        fileItem = item->child(i);
-        QString fname = dir.absoluteFilePath(fileItem->text(0));
+            vu::Template tpl;
+            try {
+                std::string tplPlugin, packagename, conf;
 
-        vu::Template tpl;
-        try {
-            std::string tplPlugin, packagename, conf;
+                tpl.open(fname.toStdString());
+                tpl.tag(tplPlugin, packagename, conf);
 
-            tpl.open(fname.toStdString());
-            tpl.tag(tplPlugin, packagename, conf);
+                if (pluginName != QString(tplPlugin.c_str()))
+                    continue;
+                QString tplConf = QString( conf.c_str() );
+                QStringList confEntries = tplConf.split(";");
 
-            if (pluginName != QString(tplPlugin.c_str()))
+                // Get the class name from conf
+                QStringList classNameEntry = confEntries.filter("class:");
+                QString className = classNameEntry.at(0).split(":").at(1);
+
+                modeler->addClass(className, fname);
+            } catch(...) {
                 continue;
-            QString tplConf = QString( conf.c_str() );
-            QStringList confEntries = tplConf.split(";");
-
-            // Get the class name from conf
-            QStringList classNameEntry = confEntries.filter("class:");
-            QString className = classNameEntry.at(0).split(":").at(1);
-
-            modeler->addClass(className, fname);
-        } catch(...) {
-            continue;
+            }
         }
     }
 }
+
 
 /**
  * @brief GVLE2Win::onOpenModeler (slot)

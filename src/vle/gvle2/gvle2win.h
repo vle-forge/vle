@@ -34,6 +34,8 @@
 #include <QPluginLoader>
 #include <QSettings>
 #include <QTimer>
+#include <QtCore>
+#include <QtGui>
 
 #include "vlepackage.h"
 #include "pluginmodelerview.h"
@@ -99,7 +101,7 @@ private slots:
     void onTabChange(int index);
     void onTabClose(int index);
     void onStatusToggle();
-    void onTreeDblClick(QTreeWidgetItem *item, int column);
+    void onTreeDblClick(QModelIndex index);
     void projectConfigureTimer();
     void projectBuildTimer();
     void projectInstallTimer();
@@ -126,6 +128,8 @@ private:
     QMap<QString,QString> mExpPlugins;
     QMap<QString,QString> mOutputPlugins;
 
+    QFileSystemModel*     mProjectFileSytem;
+
 
 protected:
     void newProject(QString pathName);
@@ -137,7 +141,6 @@ private:
     void statusWidgetOpen();
     void statusWidgetClose();
     void treeProjectUpdate();
-    void treeProjectUpdate(QTreeWidgetItem *base, QString folderName);
     bool tabClose(int index);
     bool closeProject();
 private:
