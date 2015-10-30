@@ -81,7 +81,7 @@ namespace gvle2 {
 
 FileVpzExpView::FileVpzExpView(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzExpView),mVpm(0), mPlugin(0),
-    currView(""), currOutput("")
+    currView("")
 {
     ui->setupUi(this);
     ui->timeStep->setEnabled(false);
@@ -105,7 +105,7 @@ FileVpzExpView::~FileVpzExpView()
 void FileVpzExpView::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
-    reload();
+
     QObject::connect(ui->vleViewList, SIGNAL(itemPressed (QListWidgetItem *)),
                      this, SLOT(onViewSelected(QListWidgetItem *)));
     QObject::connect(ui->vleViewList, SIGNAL(itemChanged(QListWidgetItem *)),
@@ -116,28 +116,60 @@ void FileVpzExpView::setVpm(vleVpm* vpm)
                      this, SLOT(onViewTypeSelected(const QString&)));
     QObject::connect(ui->timeStep, SIGNAL(valueChanged (double)),
                          this, SLOT(onTimeStepChanged(double)));
+    QObject::connect(mVpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            this,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 
-
+    reload();
 }
 
 void
 FileVpzExpView::reload()
 {
-    reloadViews();
-    reloadOov();
-}
+    if (!mVpm) {
+        throw vle::utils::InternalError(
+                " gvle2: error in FileVpzExpView::reloadViews");
+    }
 
-void
-FileVpzExpView::reloadOov()
-{
+    if (currView != "") {
+        if (not mVpm->existViewFromDoc(currView)) {
+            currView = "";
+        }
+    }
+
+    //reload views
+    std::vector<std::string> outputNames;
+    mVpm->viewOutputNames(outputNames);
+    bool oldBlock = ui->vleViewList->blockSignals(true);
+    ui->vleViewList->clear();
+    QListWidgetItem* itemSelected = 0;
+    std::vector<std::string>::iterator itb = outputNames.begin();
+    std::vector<std::string>::iterator ite = outputNames.end();
+    for ( ; itb != ite; itb++) {
+        QListWidgetItem* item = new QListWidgetItem(QString(itb->c_str()));
+        item->setFlags (item->flags () | Qt::ItemIsEditable);
+        ui->vleViewList->addItem(item);
+        if (QString(itb->c_str()) == currView) {
+            itemSelected = item;
+        }
+
+    }
+    if (itemSelected) {
+        ui->vleViewList->setItemSelected(itemSelected, true);
+    }
+    ui->vleViewList->blockSignals(oldBlock);
+
+    //reload vle output plugins
+    oldBlock = ui->listVleOOV->blockSignals(true);
     bool isEditable = ui->listVleOOV->isEditable();
     ui->listVleOOV->setEditable(true);
     ui->listVleOOV->clear();
     std::string repName;
     std::vector<std::string> pkglist;
     vle::utils::Path::path().fillBinaryPackagesList(pkglist);
-    std::vector<std::string>::const_iterator itb = pkglist.begin();
-    std::vector<std::string>::const_iterator ite = pkglist.end();
+    itb = pkglist.begin();
+    ite = pkglist.end();
     for (; itb != ite; itb++) {
         vle::utils::Package pkg(*itb);
         vle::utils::PathList pathList = pkg.getPluginsOutput();
@@ -150,95 +182,69 @@ FileVpzExpView::reloadOov()
             ui->listVleOOV->addItem(QString(repName.c_str()));
         }
     }
+    if (currView != "") {
+        QString plug = mVpm->getOutputPluginFromDoc(currView);
+        ui->listVleOOV->setCurrentIndex(ui->listVleOOV->findText(plug));
+        ui->listVleOOV->setEnabled(true);
+    } else {
+        ui->listVleOOV->setEnabled(false);
+    }
     ui->listVleOOV->setEditable(isEditable);
-
-}
-
-void FileVpzExpView::reloadViews()
-{
-    if (!mVpm) {
-        throw vle::utils::InternalError(
-                " gvle2: error in FileVpzExpView::reloadViews");
+    ui->listVleOOV->blockSignals(oldBlock);
+    //reload view type
+    oldBlock = ui->viewTypes->blockSignals(true);
+    if (currView != "") {
+        ui->viewTypes->setCurrentIndex(
+                ui->viewTypes->findText(mVpm->viewTypeFromDoc(currView)));
+        ui->viewTypes->setEnabled(true);
+    } else {
+        ui->viewTypes->setEnabled(false);
     }
-    // Initiate the view/port tree by adding the View list
-    std::vector<std::string> outputNames;
-    mVpm->viewOutputNames(outputNames);
-    ui->vleViewList->clear();
-    std::vector<std::string>::iterator itb = outputNames.begin();
-    std::vector<std::string>::iterator ite = outputNames.end();
-    for ( ; itb != ite; itb++)
-    {
-        QListWidgetItem* item = new QListWidgetItem(QString(itb->c_str()));
-        item->setFlags (item->flags () | Qt::ItemIsEditable);
-        ui->vleViewList->addItem(item);
+    ui->viewTypes->blockSignals(oldBlock);
+    //reload time step
+    oldBlock = ui->timeStep->blockSignals(true);
+    if (currView != "") {
+        QString viewType = mVpm->viewTypeFromDoc(currView);
+        if (viewType == "timed") {
+            ui->timeStep->setEnabled(true);
+            ui->timeStep->setValue(mVpm->timeStepFromDoc(currView));
+        } else {
+            ui->timeStep->setEnabled(false);
+        }
+    } else {
+        ui->timeStep->setEnabled(false);
     }
-}
+    ui->timeStep->blockSignals(oldBlock);
+    //reload gvle2 plugin
+    updatePlugin();
 
-/**
- * @brief FileVpzExpView::condHidePlugin
- *        Hide the custom (plugin) widget, and restore default display
- */
-void FileVpzExpView::outputHidePlugin()
-{
-    QWidget *ow = mPlugin->getWidget();
-    int index = ui->pluginHere->indexOf(ow);
-    if (index >= 0)
-        ui->pluginHere->removeWidget(ow);
-    mPlugin->delWidget();
-    // Plugin aloc/desalloc is managed elseware, so we can just forget reference
-    mPlugin = 0;
 }
 
 
-void FileVpzExpView::updatePlugin(const QString& plug)
-{
-    if ((getSelectedViewName() != currView) or
-            (getSelectedOutputPlugin() != currOutput)) {
-        currView = getSelectedViewName();
-        currOutput = getSelectedOutputPlugin();
-        if (mPlugin)
-            outputHidePlugin();
-        //TODO
-        QString pluginName("");
-        if (plug == "vle.output/storage") {
-            pluginName = "gvle2.output/storage";
-        }
-        if (plug == "vle.output/file") {
-            pluginName = "gvle2.output/file";
-        }
-        if (pluginName != "") {
-            PluginOutput *plugin = mVpm->getPackage()->getOutputPlugin(pluginName);
 
-            if (plugin == 0)
-            {
-                mVpm->logger()->log(QString("Output plugin cannot be loaded %1")
-                        .arg(pluginName));
-                return;
-            }
-            mPlugin = plugin;
+void FileVpzExpView::updatePlugin()
+{
+    if (mPlugin) {
+        QWidget* ow = mPlugin->getWidget();
+        int index = ui->pluginHere->indexOf(ow);
+        if (index >= 0)
+            ui->pluginHere->removeWidget(ow);
+        mPlugin->delWidget();
+        // TODO is that true:
+        //Plugin aloc/desalloc is managed elseware, so we can just forget reference
+        //delete mPlugin;//should we delete ?
+        mPlugin = 0;
+    }
+    if (currView != "") {
+        mPlugin = mVpm->provideOutputGUIplugin(currView);
+        if (mPlugin) {
             QWidget *w = mPlugin->getWidget();
-            mPlugin->init(mVpm, getSelectedViewName());
-
-            //    // Stay informed of changes made by plugin
-            //    QObject::connect(w,    SIGNAL(valueChanged(vpzExpCond *)),
-            //                     this, SLOT(onPluginChanges(vpzExpCond *)));
-
             int index = ui->pluginHere->addWidget(w);
-
             ui->pluginHere->setCurrentIndex(index);
         }
     }
 }
 
-QString
-FileVpzExpView::getSelectedViewName()
-{
-    if (ui and ui->vleViewList and ui->vleViewList->currentItem()) {
-        return ui->vleViewList->currentItem()->text();
-    } else {
-        return "";
-    }
-}
 
 QString
 FileVpzExpView::getSelectedOutputPlugin()
@@ -252,41 +258,20 @@ FileVpzExpView::getSelectedOutputPlugin()
 
 //Slots
 
-void FileVpzExpView::onViewSelected(QListWidgetItem * item)
+void FileVpzExpView::onViewSelected(QListWidgetItem* item)
 {
-    //ui->viewTypes->setEditable(true);
-    ui->viewTypes->setEnabled(true);
-    //ui->listVleOOV->setEditable(true);
-    ui->listVleOOV->setEnabled(true);
-    QDomNode viewsNode = mVpm->viewsFromDoc();
-    QString plug = mVpm->getOutputPluginFromViews(viewsNode,
-            item->text());
-    QDomNode viewNode = mVpm->viewFromViews(viewsNode, item->text());
-    QString viewType = mVpm->viewTypeFromView(viewNode);
-    if (viewType == "timed") {
-        ui->timeStep->setEnabled(true);
-        ui->timeStep->setValue(mVpm->timeStepFromView(viewNode));
-    } else {
-        ui->timeStep->setEnabled(false);
+    if (item->text() != currView) {
+        currView = item->text();
+        reload();
     }
-    ui->viewTypes->setCurrentIndex(ui->viewTypes->findText(viewType));
-    ui->listVleOOV->setCurrentIndex(ui->listVleOOV->findText(plug));
-    updatePlugin(plug);
-
 }
 
 void
 FileVpzExpView::onOutputSelected(const QString& item)
 {
     if (item != "") {
-        if (mVpm and ui->vleViewList and ui->vleViewList->currentItem()) {
-            QDomNode viewsNode = mVpm->viewsFromDoc();
-            QDomNode outputsNode = mVpm->outputsFromViews(viewsNode);
-            QDomNode outputNode = mVpm->outputFromOutputs(outputsNode,
-                    ui->vleViewList->currentItem()->text());
-            mVpm->setOutputPlugin(outputNode, item);
-            updatePlugin(item);
-        }
+        mVpm->setOutputPluginToDoc(currView, item);
+        reload();
     }
 }
 
@@ -294,32 +279,16 @@ void
 FileVpzExpView::onViewTypeSelected(const QString& item)
 {
     if (item != "") {
-        if (mVpm and ui->vleViewList and ui->vleViewList->currentItem()
-                and ui->viewTypes and ui->viewTypes->currentText() != "") {
-            QDomNode viewsNode = mVpm->viewsFromDoc();
-            QDomNode viewNode = mVpm->viewFromViews(viewsNode,
-                    ui->vleViewList->currentItem()->text());
-             mVpm->setViewTypeFromView(viewNode, item);
-
-             if (item == "timed") {
-                 ui->timeStep->setEnabled(true);
-                 ui->timeStep->setValue(mVpm->timeStepFromView(viewNode));
-             } else {
-                 ui->timeStep->setEnabled(false);
-             }
-        }
+        mVpm->setViewTypeToDoc(currView, item);
+        reload();
     }
 }
 
 void
 FileVpzExpView::onTimeStepChanged(double v)
 {
-    if ((v > 0)  and mVpm and ui->vleViewList and ui->vleViewList->currentItem()
-                and ui->viewTypes and ui->viewTypes->currentText() == "timed") {
-        QDomNode viewsNode = mVpm->viewsFromDoc();
-        QDomNode viewNode = mVpm->viewFromViews(viewsNode,
-                getSelectedViewName());
-        mVpm->setTimeStepFromView(viewNode, v);
+    if (v > 0) {
+        mVpm->setTimeStepToDoc(currView, v);
     }
 }
 
@@ -347,16 +316,19 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
         if (actCode == FVEVM_add_view) {
-            QString viewName =mVpm->newViewNameToDoc();
+            QString viewName = mVpm->newViewNameToDoc();
             mVpm->addViewToDoc(viewName);
-            QListWidgetItem* item = new QListWidgetItem(viewName);
-            item->setFlags (item->flags () | Qt::ItemIsEditable);
-            ui->vleViewList->addItem(item);
+            currView = viewName;
+            reload();
+//            QListWidgetItem* item = new QListWidgetItem(viewName);
+//            item->setFlags (item->flags () | Qt::ItemIsEditable);
+//            ui->vleViewList->addItem(item);
         }
         if (actCode == FVEVM_remove_view) {
             if (item) {
                 mVpm->rmViewToDoc(item->text());
-                delete item;
+                currView = "";
+                reload();
             }
         }
         if (actCode == FVEVM_rename_view) {
@@ -382,8 +354,16 @@ FileVpzExpView::onItemChanged(QListWidgetItem * item)
             mVpm->renameViewToDoc(oldViewName, newName);
         }
         oldViewName = "";
+        reload();
     }
 
+}
+
+void
+FileVpzExpView::onUndoRedoVpm(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
+        QDomNode /*oldVpm*/, QDomNode /*newVpm*/)
+{
+    reload();
 }
 
 }}//namespaces

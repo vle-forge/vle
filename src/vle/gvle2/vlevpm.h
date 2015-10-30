@@ -51,6 +51,9 @@
 namespace vle {
 namespace gvle2 {
 
+class PluginOutput;
+class PluginExpCond;
+
 
 /**
  * @brief Class that implements vleDomObject especially for vleVpm
@@ -87,14 +90,32 @@ public:
     QString toQString(const QDomNode& node) const;
     void xCreateDom();
     void xReadDom();
-    void xSaveDom();
-    void setCondPlugin(const QString& condName, const QString& name);
+    void setCondGUIplugin(const QString& condName, const QString& name);
+    void setOutputGUIplugin(const QString& viewName, const QString& pluginName);
     void addConditionFromPluginToDoc(const QString& condName,
             const QString& pluginName);
     void renameConditionToDoc(const QString& oldName, const QString& newName);
+    bool setOutputPluginToDoc(const QString& viewName,
+            const QString& outputPlugin);
+    /**
+     * @brief Provides outputGUIplugin initialized with a view
+     * without snapshot
+     */
+    PluginOutput* provideOutputGUIplugin(const QString& viewName);
+    /**
+     * @brief Provides condPlugin initialized with a cond
+     * without snapshot
+     */
+    PluginExpCond* provideCondGUIplugin(const QString& condName);
+
+    void addViewToDoc(const QString& viewName);
+    void renameViewToDoc(const QString& oldName, const QString& newName);
     void rmConditionToDoc(const QString& condName);
-    QString getCondPlugin(const QString& condName);
+    QString getCondGUIplugin(const QString& condName);
+    QString getOutputGUIplugin(const QString& viewName);
     void setCurrentTab(QString tabName);
+
+    void   save();
 
     void undo();
     void redo();
@@ -110,17 +131,17 @@ signals:
             QDomNode oldValVpm, QDomNode newValVpm);
 
 private:
-    QDomDocument*    mDoc;
-    QString          mFileName;
-    vleDomVpm*       mVdo;
-    vleDomDiffStack* undoStack;
-    bool waitUndoRedoVpz;
-    bool waitUndoRedoVpm;
-    QDomNode oldValVpz;
-    QDomNode newValVpz;
-    QDomNode oldValVpm;
-    QDomNode newValVpm;
-    gvle2plugins plugins;
+    QDomDocument*    mDocVpm;
+    QString          mFileNameVpm;
+    vleDomVpm*       mVdoVpm;
+    vleDomDiffStack* undoStackVpm;
+    bool             waitUndoRedoVpz;
+    bool             waitUndoRedoVpm;
+    QDomNode         oldValVpz;
+    QDomNode         newValVpz;
+    QDomNode         oldValVpm;
+    QDomNode         newValVpm;
+    gvle2plugins     plugins;
 };
 
 }}//namespaces

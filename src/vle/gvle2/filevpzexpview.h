@@ -64,21 +64,18 @@ public slots:
     void onTimeStepChanged(double v);
     void onViewListMenu(const QPoint&);
     void onItemChanged(QListWidgetItem* );
+    void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
+            QDomNode oldVpm, QDomNode newVpm);
 
 private:
-    void reloadViews();
-    void reloadOov();
-    void outputHidePlugin();
-    QString getSelectedViewName();
     QString getSelectedOutputPlugin();
-    void updatePlugin(const QString& plug);
+    void updatePlugin();
 
 
     Ui::FileVpzExpView* ui;
     vleVpm*             mVpm;
     PluginOutput*       mPlugin;
     QString             currView;
-    QString             currOutput;
     QString             oldViewName;
 
 };

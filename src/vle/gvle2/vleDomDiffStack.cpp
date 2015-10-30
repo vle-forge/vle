@@ -168,7 +168,6 @@ vleDomDiffStack::snapshot (QDomNode node,
         QString mergeType,
         vle::value::Map* mergeArgs)
 {
-
     if (not snapshotEnabled) {
         return;
     }
@@ -235,8 +234,6 @@ vleDomDiffStack::snapshot (QDomNode node,
             diffs[curr].merge_args = mergeArgs;
             diffs[curr].source = current_source;
             diffs[curr].isDefined = true;
-
-
             //unvalidate all undo stack
             for (unsigned int i = curr+1; i<diffs.size(); i++) {
                 diffs[i].reset();
@@ -259,7 +256,6 @@ vleDomDiffStack::undo()
         } else {
             diffs[curr].node_after =
                     mVdo->getNodeFromXQuery(diffs[curr].query).cloneNode();
-
             QDomNode currN = mVdo->getNodeFromXQuery(diffs[curr].query);
             QDomNode parent = currN.parentNode();
             if (parent.isNull()) {
@@ -283,7 +279,6 @@ vleDomDiffStack::redo()
             QDomNode currN = mVdo->getNodeFromXQuery(diffs[curr].query);
             QDomNode parent = currN.parentNode();
             parent.replaceChild(diffs[curr].node_after, currN);
-
             emit undoRedoVdo(currN, diffs[curr].node_after);
         }
 

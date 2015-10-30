@@ -576,9 +576,12 @@ public:
     bool existPortFromDoc(const QString& condName,
             const QString& portName) const;
     /**
-     * @brief set the 'name' attribute of tag <view> to a new value
+     * @brief Renames a view and the output associated to it
+     * (attribute 'output' of <view> and attribute 'name' of <output>
+     * @brief oldName, the old name of the view (and output)
+     * @brief newName, the new name of the view (and output)
      */
-    void renameViewToDoc(const QString& oldName, const QString& newName);
+    virtual void renameViewToDoc(const QString& oldName, const QString& newName);
     /**
      * @brief set the 'name' attribute of tag <condition> to a new value
      */
@@ -609,15 +612,17 @@ public:
      */
     QString newCondPortNameToDoc(const QString& condName) const;
     /**
-     * @brief add a <view> tag to a Vpz Doc
-     * whith attribute 'name'  viewName
+     * @brief Add a view (and output with the same name) to a Vpz Doc
+     * (tag <view> with attr 'name' set to viewName and default config based
+     * on vle.output/file output plugin)
+     * @param viewName, name of the view (and output associated to it) to add
      */
-    QDomNode addViewToDoc(const QString& viewName);
+    virtual void addViewToDoc(const QString& viewName);
     /**
      * @brief rm a <view> tag to a Vpz Doc
      * whith attribute 'name'  viewName
      */
-    void rmViewToDoc(const QString& viewName);
+    virtual void rmViewToDoc(const QString& viewName);
     /**
      * @brief add a <condition> tag to a Vpz Doc
      * whith attribute 'name'  condName
@@ -792,6 +797,24 @@ public:
      * which name is outputName
      */
     QDomNode outputFromOutputs(QDomNode node, const QString& outputName);
+
+
+    /**
+     * @brief build a map from an output configuration
+     * (map under <output>)
+     * @param outputName, the name of the output (=viewName)
+     * @return the configuration map if present or 0
+     */
+    vle::value::Map* buildOutputConfigMap(const QString& outputName);
+    /**
+     * @brief fills the configuration of an output
+     * (map under <output>)
+     * @param outputName, the name of the output (=viewName)
+     * @param mapConfig, the map for configuration
+     */
+    void fillOutputConfigMap(const QString& outputName,
+            const vle::value::Map& mapConfig);
+
     /**
      * @brief get the list of attribute values of 'name' of different <output>
      * in <experiment>/<views>/<outputs>
@@ -816,27 +839,42 @@ public:
      */
     QDomNode viewFromViews(QDomNode node, const QString& viewName) const;
     /**
-     * @brief get attribute 'type' from a tag <view>
+     * @brief Get the node of a view
+     * @brief viewName, the name of the view to get
      */
-     QString viewTypeFromView(QDomNode node) const;
+    QDomNode viewFromDoc(const QString& viewName) const;
+    /**
+     * @brief get type (timed, finish or event) from a view
+     *  (attribute 'type' of tag <view>)
+     * @brief viewName, the name of the view
+     */
+     QString viewTypeFromDoc(const QString& viewName) const;
      /**
-      * @brief set attribute 'type' to a tag <view>
+      * @brief set view type (timed, event, finish) to a view
+      * (attribute 'type' to a tag <view>)
+      * @param viewName, the name of the view
+      * @param viewType, either timed, finish or event
       */
-     void setViewTypeFromView(QDomNode node, const QString& viewType);
+     void setViewTypeToDoc(const QString& viewName, const QString& viewType);
      /**
-      * @brief get attribute 'timestep' from a tag <view>
+      * @brief get time step of a view
+      *  (attribute 'timestep' of tag <view>)
+      * @brief viewName, the name of the view
       */
-     double timeStepFromView(QDomNode node) const;
+     double timeStepFromDoc(const QString& viewName) const;
      /**
-      * @brief set attribute 'timestep' to a tag <view>
+      * @brief set time step to a view
+      *  (attribute 'timestep' of tag <view>)
+      * @param viewName, the name of the view
+      * @param ts, the new timestep
       */
-     void setTimeStepFromView(QDomNode node, double ts);
+     void setTimeStepToDoc(const QString& viewName, double ts);
      /**
-      * @brief set output plugin to a tag <output>
-      * plugin name has to be of the form :
-      *   package/plugin
+      * @brief set output plugin to a view
+      * @param outputPlugin, has to be of the form : package/plugin
       */
-     bool setOutputPlugin(QDomNode node, const QString& outputPlugin);
+     virtual bool setOutputPluginToDoc(const QString& viewName,
+             const QString& outputPlugin);
      /**
      * @brief get output plugin from a tag <output>
      * plugin name has the form :
@@ -950,12 +988,11 @@ public:
     QDomNode getOutputFromViews(QDomNode node,
             const QString& outputName);
     /**
-     * @brief get output plugin from a tag <views>
-     * plugin name has the form :
-     *   package/plugin
+     * @brief Get vle output plugin attached to an output (=view)
+     * @param outputName (=viewName), the name of the output or view
+     * @return a vle output plugin of the form : package/plugin
      */
-    QString getOutputPluginFromViews(QDomNode node,
-            const QString& outputName);
+    QString getOutputPluginFromDoc(const QString& outputName);
 
     /**
      * @brief Fill a QList with names of the dynamics
@@ -997,7 +1034,7 @@ public:
     vlePackage*    getPackage();
     void           setPackage(vlePackage* package);
     bool           isAltered();
-    void           save();
+    virtual void   save();
     void           removeDynamic(const QString& dynamic);
 
 signals:
@@ -1032,7 +1069,6 @@ private:
     QString      mPath;
     QFile        mFile;
     QDomDocument mDoc;
-private:
     vlePackage*  mPackage;
     Logger*      mLogger;
 protected:

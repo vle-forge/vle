@@ -1163,9 +1163,10 @@ void GVLE2Win::onTreeDblClick(QTreeWidgetItem *item, int column)
         relPath += fileNameSplit.at(i);
     }
     QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
-
+    QString relPathVpm = relPath;
+    relPathVpm.replace(".vpz", ".vpm");
     vleVpm* selVpm = new vleVpm(basepath+"/"+relPath,
-            basepath+"/metadata/"+relPath);
+            basepath+"/metadata/"+relPathVpm);
 
     selVpm->setLogger(mLogger);
     selVpm->setBasePath(mPackage->getName());

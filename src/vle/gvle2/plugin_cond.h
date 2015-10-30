@@ -47,7 +47,7 @@ public:
     virtual void     delWidgetToolbar() = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  setExpCond(vleVpm* vpm, const QString& condName) = 0;
+    virtual void  init(vleVpm* vpm, const QString& condName) = 0;
 };
 
 }} //namepsaces

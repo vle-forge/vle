@@ -95,7 +95,7 @@ FileVpzExpCond::resizeTable()
     for (unsigned int i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
         QString name = mVpm->vdo()->attributeValue(cond, "name");
-        if (mVpm->getCondPlugin(name) != "") {
+        if (mVpm->getCondGUIplugin(name) != "") {
             nbRows++;
         } else {
             QDomNodeList portList = mVpm->portsListFromDoc(name);
@@ -127,10 +127,10 @@ FileVpzExpCond::reload(bool resize)
         QDomNode cond = condList.item(i);
         QString name = mVpm->vdo()->attributeValue(cond, "name");
         QDomNodeList portList = mVpm->portsListFromDoc(name);
-        if (mVpm->getCondPlugin(name) != ""){
+        if (mVpm->getCondGUIplugin(name) != ""){
             insertTextEdit(rows, 0, name);
             insertTextEdit(rows, 1, QString("[plugin:%1]").arg(
-                    mVpm->getCondPlugin(name)));
+                    mVpm->getCondGUIplugin(name)));
             for (int j=2; j < ui->table->columnCount(); j++) {
                 insertNullWidget(rows, j);
             }
@@ -207,7 +207,6 @@ FileVpzExpCond::showEditPlace()
     if (mPlugin) {
         mPlugin->delWidget();
         mPlugin->delWidgetToolbar();
-        delete mPlugin;
         mPlugin = 0;
     } else {
         while (QWidget* w = ui->value->findChild<QWidget*>() ) {
@@ -222,16 +221,8 @@ FileVpzExpCond::showEditPlace()
         lab->show();
         return;
     }
-    if (mVpm->getCondPlugin(mCurrCondName) != "") {
-
-        gvle2plugins plugs;
-        plugs.loadPlugins();
-        QString libName = plugs.getCondPluginPath(
-                mVpm->getCondPlugin(mCurrCondName));
-        QPluginLoader loader(libName);
-
-        mPlugin = qobject_cast<PluginExpCond*>(loader.instance());
-        mPlugin->setExpCond(mVpm, mCurrCondName);
+    if (mVpm->getCondGUIplugin(mCurrCondName) != "") {
+        mPlugin = mVpm->provideCondGUIplugin(mCurrCondName);
         mPlugin->getWidget()->setParent(ui->value);
         mPlugin->getWidget()->show();
         return;
@@ -329,17 +320,17 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
     action = menu.addAction("Add port");
     action->setData("EMenuPortAdd");
     action->setEnabled((index.column() == 1) and
-            (mVpm->getCondPlugin(condName) == ""));
+            (mVpm->getCondGUIplugin(condName) == ""));
     action = menu.addAction("Remove port");
     action->setData("EMenuPortRemove");
     action->setEnabled((index.column() == 1) and
-            (mVpm->getCondPlugin(condName) == ""));
+            (mVpm->getCondGUIplugin(condName) == ""));
     menu.addSeparator();
     subMenu = buildAddValueMenu(menu, "Add");
     subMenu->setEnabled((index.column() == 1) and
             (getTextEdit(index.row(), index.column())->getCurrentText() !=
                     "<Click here to add a port>") and
-            (mVpm->getCondPlugin(condName) == ""));
+            (mVpm->getCondGUIplugin(condName) == ""));
     subMenu = buildAddValueMenu(menu, "Set");
     subMenu->setEnabled(ui->table->item(index.row(), index.column()) and
             (index.column() > 1) and

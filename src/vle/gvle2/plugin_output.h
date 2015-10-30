@@ -42,7 +42,7 @@ public:
     virtual QWidget *getWidget() = 0;
     virtual void     delWidget() = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  init(vleVpm* vpz, const QString& viewName) = 0;
+    virtual void  init(vleVpm* vpm, const QString& viewName) = 0;
 };
 
 }}//namespaces

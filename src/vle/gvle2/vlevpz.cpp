@@ -65,7 +65,8 @@ vleDomVpz::getXQuery(QDomNode node)
         (name == "classes") or
         (name == "dynamics") or
         (name == "conditions") or
-        (name == "experiment")) {
+        (name == "experiment") or
+        (name == "views")) {
         return getXQuery(node.parentNode())+"/"+name;
     }
     //element identified wy attribute name
@@ -127,7 +128,8 @@ vleDomVpz::getNodeFromXQuery(const QString& query,
         (curr == "classes") or
         (curr == "dynamics") or
         (curr == "conditions") or
-        (curr == "experiment")){
+        (curr == "experiment") or
+        (curr == "views")){
         return getNodeFromXQuery(rest, obtainChild(d, curr, true));
     }
     //handle recursion with nodes identified by name
@@ -1041,6 +1043,7 @@ void
 vleVpz::renameViewToDoc(const QString& oldName, const QString& newName)
 {
     QDomNode views = viewsFromDoc();
+    undoStack->snapshot(views);
     QList<QDomNode> viewList = childNodesWithoutText(views, "view");
     for (int i =0; i< viewList.size(); i++) {
         QDomNode v = viewList[i];
@@ -1250,10 +1253,11 @@ vleVpz::addObservableToDoc(const QString& obsName)
     return newObs;
 }
 
-QDomNode
+void
 vleVpz::addViewToDoc(const QString& viewName)
 {
     QDomNode views = viewsFromDoc();
+    undoStack->snapshot(views);
     if (views.isNull()) {
         QDomNode exp = experimentFromDoc();
         QDomElement viewsTag = getDomDoc().createElement("views");
@@ -1261,13 +1265,13 @@ vleVpz::addViewToDoc(const QString& viewName)
     }
     QDomNode view = addView(viewsFromDoc(),viewName);
     emit viewsUpdated();
-    return view;
 }
 
 void
 vleVpz::rmViewToDoc(const QString& viewName)
 {
     QDomNode views = viewsFromDoc();
+    undoStack->snapshot(views);
     if (views.isNull()) {
         return;
     }
@@ -2778,6 +2782,35 @@ vleVpz::outputFromOutputs(QDomNode node, const QString& outputName)
     return QDomNode();
 }
 
+vle::value::Map*
+vleVpz::buildOutputConfigMap(const QString& outputName)
+{
+    QDomNode outputNode = outputFromOutputs(outputsFromViews(
+                    viewsFromDoc()), outputName);
+    QList<QDomNode> nodes = childNodesWithoutText(outputNode, "map");
+    if (nodes.size() == 1) {
+        vle::value::Value* val = buildValue(nodes.at(0), false);
+        if (val->isMap()) {
+            return dynamic_cast<vle::value::Map*>(val);
+        } else {
+            qDebug() << ("Internal error in buildOutputConfigMap (not a map)");
+            delete val;
+        }
+    }
+    return new vle::value::Map();
+}
+
+void
+vleVpz::fillOutputConfigMap(const QString& outputName,
+        const vle::value::Map& mapConfig)
+{
+    undoStack->snapshot(viewsFromDoc());
+    QDomNode outputNode = outputFromOutputs(outputsFromViews(
+                    viewsFromDoc()), outputName);
+    QDomNode nodeMap = mVdo->obtainChild(outputNode, "map", true);
+    fillWithValue(nodeMap, mapConfig);
+}
+
 void
 vleVpz::viewObservableNames(std::vector<std::string>& v) const
 {
@@ -2838,45 +2871,54 @@ vleVpz::viewFromViews(QDomNode node, const QString& viewName) const
 
 }
 
+ QDomNode
+ vleVpz::viewFromDoc(const QString& viewName) const
+ {
+     return viewFromViews(viewsFromDoc(), viewName);
+ }
+
 QString
-vleVpz::viewTypeFromView(QDomNode node) const
+vleVpz::viewTypeFromDoc(const QString& viewName) const
 {
+    QDomNode node = viewFromDoc(viewName);
     if (node.nodeName() != "view") {
-        qDebug() << ("Internal error in viewTypeFromView (wrong main tag)");
+        qDebug() << ("Internal error in viewTypeFromDoc (wrong main tag)");
         return QString();
     }
     return node.attributes().namedItem("type").nodeValue();
 }
 
 void
-vleVpz::setViewTypeFromView(QDomNode node, const QString& viewType)
+vleVpz::setViewTypeToDoc(const QString& viewName, const QString& viewType)
 {
-    if (node.nodeName() != "view") {
-        qDebug() << ("Internal error in setViewTypeFromView (wrong main tag)");
-        return;
-    }
-    node.attributes().namedItem("type").setNodeValue(viewType);
+    QDomNode viewsNode = viewsFromDoc();
+    undoStack->snapshot(viewsNode);
+    QDomNode viewNode = viewFromViews(viewsNode,viewName);
+    viewNode.attributes().namedItem("type").setNodeValue(viewType);
 }
 
 double
-vleVpz::timeStepFromView(QDomNode node) const
+vleVpz::timeStepFromDoc(const QString& viewName) const
 {
-    if (node.nodeName() != "view") {
-        qDebug() << ("Internal error in viewTypeFromView (wrong main tag)");
+    QDomNode viewNode = viewFromDoc(viewName);
+    if (viewNode.nodeName() != "view") {
+        qDebug() << ("Internal error in timeStepFromDoc (wrong main tag)");
         return -1.0;
     }
-    QVariant qv(node.attributes().namedItem("timestep").nodeValue());
+    QVariant qv(viewNode.attributes().namedItem("timestep").nodeValue());
     return qv.toDouble();
 }
 
 void
-vleVpz::setTimeStepFromView(QDomNode node, double ts)
+vleVpz::setTimeStepToDoc(const QString& viewName, double ts)
 {
+    QDomNode node = viewFromDoc(viewName);
+    undoStack->snapshot(viewsFromDoc());
     if (node.nodeName() != "view") {
         qDebug() << ("Internal error in setTimeStepFromView (wrong main tag)");
         return;
     }
-    if (viewTypeFromView(node) == "timed" and ts > 0.0) {
+    if (viewTypeFromDoc(viewName) == "timed" and ts > 0.0) {
         if (not node.attributes().contains("timestep")) {
             QDomAttr a = getDomDoc().createAttribute("timestep");
             node.appendChild(a);
@@ -2887,14 +2929,15 @@ vleVpz::setTimeStepFromView(QDomNode node, double ts)
 }
 
 bool
-vleVpz::setOutputPlugin(QDomNode node, const QString& outputPlugin)
+vleVpz::setOutputPluginToDoc(const QString& viewName,
+        const QString& outputPlugin)
 {
-    if (node.nodeName() != "output") {
-        qDebug() << ("Internal error in setOutputPlugin (wrong main tag)");
-        return false;
-    }
-    QDomNode pkg = node.attributes().namedItem("package");
-    QDomNode plugin = node.attributes().namedItem("plugin");
+    QDomNode viewsNode = viewsFromDoc();
+    undoStack->snapshot(viewsNode);
+    QDomNode outputsNode = outputsFromViews(viewsNode);
+    QDomNode outputNode = outputFromOutputs(outputsNode, viewName);
+    QDomNode pkg = outputNode.attributes().namedItem("package");
+    QDomNode plugin = outputNode.attributes().namedItem("plugin");
     QStringList ll = outputPlugin.split("/");
     pkg.setNodeValue(ll.at(0));
     plugin.setNodeValue(ll.at(1));
@@ -3471,10 +3514,9 @@ vleVpz::getOutputFromViews(QDomNode node,
 }
 
 QString
-vleVpz::getOutputPluginFromViews(QDomNode node,
-        const QString& outputName)
+vleVpz::getOutputPluginFromDoc(const QString& outputName)
 {
-    QDomNode output = getOutputFromViews(node, outputName);
+    QDomNode output = getOutputFromViews(viewsFromDoc(), outputName);
     return getOutputPlugin(output);
 }
 

@@ -24,12 +24,14 @@
 
 #include "vlevpm.h"
 #include "plugin_cond.h"
+#include "plugin_output.h"
 
 #include <QDebug>
+#include <QFileInfo>
+#include <QDir>
 
 namespace vle {
 namespace gvle2 {
-
 
 vleDomVpm::vleDomVpm(QDomDocument* doc): vleDomObject(doc)
 
@@ -45,11 +47,13 @@ vleDomVpm::getXQuery(QDomNode node)
 {
     QString name = node.nodeName();
     //element uniq in children
-    if ((name == "condPlugins")) {
+    if ((name == "condPlugins") or
+        (name == "outputGUIplugins")) {
         return getXQuery(node.parentNode())+"/"+name;
     }
-    //element identified wy attribute name
-    if ((name == "condPlugin")){
+    //element identified by attribute name
+    if ((name == "condPlugin") or
+        (name == "outputGUIplugin")){
         return getXQuery(node.parentNode())+"/"+name+"[@name=\""
                 +attributeValue(node,"name")+"\"]";
     }
@@ -95,12 +99,14 @@ vleDomVpm::getNodeFromXQuery(const QString& query,
     }
 
     //handle recursion with uniq node
-    if ((curr == "condPlugins")){
+    if ((curr == "condPlugins") or
+        (curr == "outputGUIplugins")){
         return getNodeFromXQuery(rest, obtainChild(d, curr, true));
     }
     //handle recursion with nodes identified by name
     std::vector<QString> nodeByNames;
     nodeByNames.push_back(QString("condPlugin"));
+    nodeByNames.push_back(QString("outputGUIplugin"));
     QString selNodeByName ="";
     for (unsigned int i=0; i< nodeByNames.size(); i++) {
         if (curr.startsWith(nodeByNames[i])) {
@@ -118,15 +124,24 @@ vleDomVpm::getNodeFromXQuery(const QString& query,
 /************************************************************************/
 
 vleVpm::vleVpm(const QString& vpzpath, const QString& vpmpath):
-        vleVpz(vpzpath), mDoc(0), mFileName(vpmpath), mVdo(0), undoStack(0),
-        waitUndoRedoVpz(false), waitUndoRedoVpm(false), oldValVpz(),
-        newValVpz(), oldValVpm(), newValVpm(), plugins()
+        vleVpz(vpzpath), mDocVpm(0), mFileNameVpm(vpmpath), mVdoVpm(0),
+        undoStackVpm(0), waitUndoRedoVpz(false), waitUndoRedoVpm(false),
+        oldValVpz(), newValVpz(), oldValVpm(), newValVpm(), plugins()
 {
-    xCreateDom();
+    QFile file(mFileNameVpm);
+    if (file.exists()) {
+        mDocVpm = new QDomDocument("vle_project_metadata");
+        QXmlInputSource source(&file);
+        QXmlSimpleReader reader;
+        mDocVpm->setContent(&source, &reader);
+    } else {
+        xCreateDom();
+    }
+
     plugins.loadPlugins();
-    mVdo = new vleDomVpm(mDoc);
-    undoStack = new vleDomDiffStack(mVdo);
-    undoStack->init(*mDoc);
+    mVdoVpm = new vleDomVpm(mDocVpm);
+    undoStackVpm = new vleDomDiffStack(mVdoVpm);
+    undoStackVpm->init(*mDocVpm);
 
 
     QObject::connect(vleVpz::undoStack,
@@ -135,10 +150,10 @@ vleVpm::vleVpm(const QString& vpzpath, const QString& vpmpath):
     QObject::connect(vleVpz::undoStack,
                 SIGNAL(snapshotVdo(QDomNode, bool)),
                 this, SLOT(onSnapshotVpz(QDomNode, bool)));
-    QObject::connect(undoStack,
+    QObject::connect(undoStackVpm,
                 SIGNAL(undoRedoVdo(QDomNode, QDomNode)),
                 this, SLOT(onUndoRedoVpm(QDomNode, QDomNode)));
-    QObject::connect(undoStack,
+    QObject::connect(undoStackVpm,
                 SIGNAL(snapshotVdo(QDomNode, bool)),
                 this, SLOT(onSnapshotVpm(QDomNode, bool)));
 
@@ -156,56 +171,45 @@ vleVpm::toQString(const QDomNode& node) const
 void
 vleVpm::xCreateDom()
 {
-    if (not mDoc) {
-        mDoc = new QDomDocument("vle_project_metadata");
+    if (not mDocVpm) {
+        mDocVpm = new QDomDocument("vle_project_metadata");
         QDomProcessingInstruction pi;
-        pi = mDoc->createProcessingInstruction("xml",
+        pi = mDocVpm->createProcessingInstruction("xml",
                 "version=\"1.0\" encoding=\"UTF-8\" ");
-        mDoc->appendChild(pi);
+        mDocVpm->appendChild(pi);
 
-        QDomElement vpmRoot = mDoc->createElement("vle_project_metadata");
+        QDomElement vpmRoot = mDocVpm->createElement("vle_project_metadata");
         // Save VPZ file revision
         vpmRoot.setAttribute("version", "1.x");
         // Save the author name (if known)
         vpmRoot.setAttribute("author", "me");
-        QDomElement xCondPlug = mDoc->createElement("condPlugins");
+        QDomElement xCondPlug = mDocVpm->createElement("condPlugins");
         vpmRoot.appendChild(xCondPlug);
-        mDoc->appendChild(vpmRoot);
+        QDomElement xOutPlug = mDocVpm->createElement("outputGUIplugins");
+        vpmRoot.appendChild(xOutPlug);
+        mDocVpm->appendChild(vpmRoot);
     }
 }
 
 void
 vleVpm::xReadDom()
 {
-    if (mDoc) {
-        QFile file(mFileName);
-        mDoc->setContent(&file);
+    if (mDocVpm) {
+        QFile file(mFileNameVpm);
+        mDocVpm->setContent(&file);
     }
 }
 
 void
-vleVpm::xSaveDom()
-{
-    if (mDoc) {
-        QFile file(mFileName);
-        file.open(QIODevice::Truncate | QIODevice::WriteOnly);
-        QByteArray xml = mDoc->toByteArray();
-        file.write(xml);
-        file.close();
-    }
-}
-
-
-void
-vleVpm::setCondPlugin(const QString& condName, const QString& name)
+vleVpm::setCondGUIplugin(const QString& condName, const QString& name)
 {
     xCreateDom();
 
-    QDomElement docElem = mDoc->documentElement();
+    QDomElement docElem = mDocVpm->documentElement();
 
     QDomNode condsPlugins =
-            mDoc->elementsByTagName("condPlugins").item(0);
-    undoStack->snapshot(condsPlugins);
+            mDocVpm->elementsByTagName("condPlugins").item(0);
+    undoStackVpm->snapshot(condsPlugins);
     QDomNodeList plugins =
             condsPlugins.toElement().elementsByTagName("condPlugin");
     for (unsigned int i =0; i< plugins.length(); i++) {
@@ -218,7 +222,7 @@ vleVpm::setCondPlugin(const QString& condName, const QString& name)
             }
         }
     }
-    QDomElement el = mDoc->createElement("condPlugin");
+    QDomElement el = mDocVpm->createElement("condPlugin");
     el.setAttribute("cond", condName);
     el.setAttribute("plugin", name);
     condsPlugins.appendChild(el);
@@ -227,88 +231,211 @@ vleVpm::setCondPlugin(const QString& condName, const QString& name)
 }
 
 void
+vleVpm::setOutputGUIplugin(const QString& viewName, const QString& pluginName)
+{
+    xCreateDom();
+
+    QDomElement docElem = mDocVpm->documentElement();
+    QDomNode outGUIplugs =
+            mDocVpm->elementsByTagName("outputGUIplugins").item(0);
+    if (outGUIplugs.isNull() ) {
+        QDomNode metaData = mDocVpm->elementsByTagName(
+                "vle_project_metadata").item(0);
+        undoStackVpm->snapshot(metaData);
+        metaData.appendChild(mDocVpm->createElement("outputGUIplugins"));
+        outGUIplugs =  mDocVpm->elementsByTagName("outputGUIplugins").item(0);
+    } else {
+        undoStackVpm->snapshot(outGUIplugs);
+    }
+    QDomNodeList plugins =
+            outGUIplugs.toElement().elementsByTagName("outputGUIplugin");
+    for (unsigned int i =0; i< plugins.length(); i++) {
+        QDomNode plug = plugins.at(i);
+        for (int j=0; j< plug.attributes().size(); j++) {
+            if ((plug.attributes().item(j).nodeName() == "view") and
+                    (plug.attributes().item(j).nodeValue() == viewName))  {
+                plug.toElement().setAttribute("GUIplugin", pluginName);
+                return;
+            }
+        }
+    }
+    QDomElement el = mDocVpm->createElement("outputGUIplugin");
+    el.setAttribute("view", viewName);
+    el.setAttribute("GUIplugin", pluginName);
+    outGUIplugs.appendChild(el);
+}
+
+void
 vleVpm::addConditionFromPluginToDoc(const QString& condName,
         const QString& pluginName)
 {
-    QString libName = plugins.getCondPluginPath(pluginName);
-    QPluginLoader loader(libName);
-    PluginExpCond* plugin = qobject_cast<PluginExpCond*>(loader.instance());
+    //update vpm with snapshot but without signal
+    bool oldBlock = undoStackVpm->blockSignals(true);
+    setCondGUIplugin(condName, pluginName);
+    undoStackVpm->blockSignals(oldBlock);
 
-    bool oldBlock;
-    bool enableSnapshot;
+    //update vpz with snapshot but without signal
     oldBlock = vleVpz::undoStack->blockSignals(true);
-    vleVpz::undoStack->snapshot(condsFromDoc());
+    vleVpz::addConditionToDoc(condName);
+    provideCondGUIplugin(condName);
     vleVpz::undoStack->blockSignals(oldBlock);
-
-    enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
-    addConditionToDoc(condName);
-    plugin->setExpCond(this, condName);
-    delete plugin;
-    vleVpz::undoStack->enableSnapshot(enableSnapshot);
-    oldBlock = undoStack->blockSignals(true);
-    setCondPlugin(condName, pluginName);
-    undoStack->blockSignals(oldBlock);
-
-
 }
 
 void
 vleVpm::renameConditionToDoc(const QString& oldName, const QString& newName)
 {
-
-    QString condPlugin = getCondPlugin(oldName);
+    QString condPlugin = getCondGUIplugin(oldName);
     if (condPlugin == "") {
         vleVpz::renameConditionToDoc(oldName, newName);
     } else {
-        //snapshtot vpz conditions (without signal)
-        bool oldBlock;
-        oldBlock = vleVpz::undoStack->blockSignals(true);
-        vleVpz::undoStack->snapshot(condsFromDoc());
-        vleVpz::undoStack->blockSignals(oldBlock);
-        //rename condition into vpz without snapshot
-        bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
+        //update vpz with snapshot bu without signal
+        bool oldBlock = vleVpz::undoStack->blockSignals(true);
         vleVpz::renameConditionToDoc(oldName, newName);
-        vleVpz::undoStack->enableSnapshot(enableSnapshot);
-        //change condition name into vpm (without signal but with snapshot)
-        oldBlock = undoStack->blockSignals(true);
-        setCondPlugin(oldName, "");
-        setCondPlugin(newName, condPlugin);
-        undoStack->blockSignals(oldBlock);
+        vleVpz::undoStack->blockSignals(oldBlock);
+        //update vpm with snapshot but without signal
+        oldBlock = undoStackVpm->blockSignals(true);
+        setCondGUIplugin(oldName, "");
+        setCondGUIplugin(newName, condPlugin);
+        undoStackVpm->blockSignals(oldBlock);
     }
+}
+
+bool
+vleVpm::setOutputPluginToDoc(const QString& viewName,
+        const QString& outputPlugin)
+{
+    //TODO, ne devrait pas etre en dur
+    QString guiPluginName("");
+    if (outputPlugin == "vle.output/storage") {
+        guiPluginName = "gvle2.output/storage";
+    }
+    if (outputPlugin == "vle.output/file") {
+        guiPluginName = "gvle2.output/file";
+    }
+    //update vpm with snapshot but without signal
+    bool oldBlock = undoStackVpm->blockSignals(true);
+    setOutputGUIplugin(viewName, guiPluginName);
+    undoStackVpm->blockSignals(oldBlock);
+
+    //update in vpz with snapshot but without signal
+    oldBlock = vleVpz::undoStack->blockSignals(true);
+    bool res = vleVpz::setOutputPluginToDoc(viewName, outputPlugin);
+    provideOutputGUIplugin(viewName);
+    vleVpz::undoStack->blockSignals(oldBlock);
+
+    return res;
+}
+
+PluginOutput*
+vleVpm::provideOutputGUIplugin(const QString& viewName)
+{
+    QString guiPluginName = getOutputGUIplugin(viewName);
+    if (guiPluginName == "") {
+        return 0;
+    } else {
+        QString libName = plugins.getOutputPluginPath(guiPluginName);
+        QPluginLoader loader(libName);
+        PluginOutput* plugin = qobject_cast<PluginOutput*>(loader.instance());
+        bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
+        bool oldBlock = undoStackVpm->blockSignals(true);
+        bool oldBlock2 = vleVpz::undoStack->blockSignals(true);
+        plugin->init(this, viewName);
+        vleVpz::undoStack->blockSignals(oldBlock2);
+        undoStackVpm->blockSignals(oldBlock);
+        vleVpz::undoStack->enableSnapshot(enableSnapshot);
+        return plugin;
+    }
+}
+
+PluginExpCond*
+vleVpm::provideCondGUIplugin(const QString& condName)
+{
+    QString guiPluginName = getCondGUIplugin(condName);
+    if (guiPluginName == "") {
+        return 0;
+    } else {
+        QString libName = plugins.getCondPluginPath(guiPluginName);
+        QPluginLoader loader(libName);
+        PluginExpCond* plugin = qobject_cast<PluginExpCond*>(loader.instance());
+        bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
+        bool oldBlock = undoStackVpm->blockSignals(true);
+        bool oldBlock2 = vleVpz::undoStack->blockSignals(true);
+        plugin->init(this, condName);
+        vleVpz::undoStack->blockSignals(oldBlock2);
+        undoStackVpm->blockSignals(oldBlock);
+        vleVpz::undoStack->enableSnapshot(enableSnapshot);
+        return plugin;
+    }
+}
+
+void
+vleVpm::addViewToDoc(const QString& viewName)
+{
+    //update vpz with snapshot but without signal
+    bool oldBlock = vleVpz::undoStack->blockSignals(true);
+    vleVpz::addViewToDoc(viewName);
+    vleVpz::undoStack->blockSignals(oldBlock);
+
+    //update vpm with snapshot but without signal
+    QString outputPlugin = vleVpz::getOutputPluginFromDoc(viewName);
+    QString guiPluginName("");
+    if (outputPlugin == "vle.output/storage") {
+        guiPluginName = "gvle2.output/storage";
+    }
+    if (outputPlugin == "vle.output/file") {
+        guiPluginName = "gvle2.output/file";
+    }
+    oldBlock = undoStackVpm->blockSignals(true);
+    setOutputGUIplugin(viewName, guiPluginName);
+    undoStackVpm->blockSignals(oldBlock);
+
+    //build plugin and initialize it with the view
+    provideOutputGUIplugin(viewName);
+}
+
+void
+vleVpm::renameViewToDoc(const QString& oldName, const QString& newName)
+{
+    //update in vpz with snapshot without signal
+    bool oldBlock = vleVpz::undoStack->blockSignals(true);
+    vleVpz::renameViewToDoc(oldName, newName);
+    vleVpz::undoStack->blockSignals(oldBlock);
+
+    //update vpm with snapshot but without signal
+    oldBlock = undoStackVpm->blockSignals(true);
+    QString outputGUIplugin = getOutputGUIplugin(oldName);
+    setOutputGUIplugin(oldName, "");
+    setOutputGUIplugin(newName, outputGUIplugin);
+    undoStackVpm->blockSignals(oldBlock);
 }
 
 void
 vleVpm::rmConditionToDoc(const QString& condName)
 {
-    QString condPlugin = getCondPlugin(condName);
+    QString condPlugin = getCondGUIplugin(condName);
     if (condPlugin == "") {
         vleVpz::rmConditionToDoc(condName);
     } else {
-        //snapshtot vpz conditions (without signal)
-        bool oldBlock;
-        oldBlock = vleVpz::undoStack->blockSignals(true);
-        vleVpz::undoStack->snapshot(condsFromDoc());
-        vleVpz::undoStack->blockSignals(oldBlock);
-        //remove condition into vpz without snapshot
-        bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
+        //update vpz with snapshot but without signal
+        bool oldBlock = vleVpz::undoStack->blockSignals(true);
         vleVpz::rmConditionToDoc(condName);
-        vleVpz::undoStack->enableSnapshot(enableSnapshot);
-        //change condition name into vpm (without signal but with snapshot)
-        oldBlock = undoStack->blockSignals(true);
-        setCondPlugin(condName, "");
-        undoStack->blockSignals(oldBlock);
+        vleVpz::undoStack->blockSignals(oldBlock);
+        //update vpm with snapshot but without signal
+        oldBlock = undoStackVpm->blockSignals(true);
+        setCondGUIplugin(condName, "");
+        undoStackVpm->blockSignals(oldBlock);
     }
 }
 
 QString
-vleVpm::getCondPlugin(const QString& condName)
+vleVpm::getCondGUIplugin(const QString& condName)
 {
 
     QStringList res;
-    if (mDoc) {
-        QDomElement docElem = mDoc->documentElement();
+    if (mDocVpm) {
+        QDomElement docElem = mDocVpm->documentElement();
         QDomNode condsPlugins =
-                mDoc->elementsByTagName("condPlugins").item(0);
+                mDocVpm->elementsByTagName("condPlugins").item(0);
         QDomNodeList plugins =
                 condsPlugins.toElement().elementsByTagName("condPlugin");
         for (unsigned int i =0; i< plugins.length(); i++) {
@@ -322,11 +449,60 @@ vleVpm::getCondPlugin(const QString& condName)
     return "";
 }
 
+QString
+vleVpm::getOutputGUIplugin(const QString& viewName)
+{
+
+    QStringList res;
+    if (mDocVpm) {
+        QDomElement docElem = mDocVpm->documentElement();
+        QDomNode condsPlugins =
+                mDocVpm->elementsByTagName("outputGUIplugins").item(0);
+        QDomNodeList plugins =
+                condsPlugins.toElement().elementsByTagName("outputGUIplugin");
+        for (unsigned int i =0; i< plugins.length(); i++) {
+            QDomNode plug = plugins.item(i);
+            if (plug.attributes().contains("view") and
+                (plug.attributes().namedItem("view").nodeValue() == viewName)) {
+                return plug.attributes().namedItem("GUIplugin").nodeValue();
+            }
+        }
+    }
+    return "";
+}
+
 void
 vleVpm::setCurrentTab(QString tabName)
 {
-    undoStack->current_source = tabName;
+    undoStackVpm->current_source = tabName;
     vleVpz::undoStack->current_source = tabName;
+}
+
+void
+vleVpm::save()
+{
+    //save vpz
+    vleVpz::save();
+    //save vpm
+    QFile file(mFileNameVpm);
+    QFileInfo fileInfo(file);
+    if (not fileInfo.dir().exists()) {
+        if (not QDir().mkpath(fileInfo.dir().path())) {
+            qDebug() << "Cannot create dir " << fileInfo.dir().path() ;
+            return;
+        }
+    }
+    if (not file.exists()) {
+        if (not file.open(QIODevice::WriteOnly)) {
+            qDebug() << "VPM File (" << mFileNameVpm << ")can't be opened for write !";
+            return;
+        }
+        file.close();
+    }
+    file.open(QIODevice::Truncate | QIODevice::WriteOnly);
+    QByteArray xml = mDocVpm->toByteArray();
+    file.write(xml);
+    file.close();
 }
 
 void
@@ -334,7 +510,7 @@ vleVpm::undo()
 {
     waitUndoRedoVpz = true;
     waitUndoRedoVpm = true;
-    undoStack->undo();
+    undoStackVpm->undo();
     vleVpz::undoStack->undo();
 
 }
@@ -343,7 +519,7 @@ vleVpm::redo()
 {
     waitUndoRedoVpz = true;
     waitUndoRedoVpm = true;
-    undoStack->redo();
+    undoStackVpm->redo();
     vleVpz::undoStack->redo();
 }
 
@@ -351,9 +527,9 @@ void
 vleVpm::onSnapshotVpz(QDomNode /*snapVpz*/, bool isMerged)
 {
     if (not isMerged) {
-        bool oldBlock = undoStack->blockSignals(true);
-        undoStack->snapshot(QDomNode());
-        undoStack->blockSignals(oldBlock);
+        bool oldBlock = undoStackVpm->blockSignals(true);
+        undoStackVpm->snapshot(QDomNode());
+        undoStackVpm->blockSignals(oldBlock);
     }
 
 }

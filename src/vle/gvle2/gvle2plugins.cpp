@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <vle/utils/Path.hpp>
 #include "plugin_cond.h"
+#include "plugin_output.h"
 #include "gvle2plugins.h"
 
 
@@ -81,12 +82,29 @@ gvle2plugins::loadPlugins()
                     qDebug() << " WARNING cannot load plugin " << libName;
                     continue;
                 }
-                PluginExpCond *expcond = qobject_cast<PluginExpCond *>(plugin);
+                PluginExpCond* expcond = qobject_cast<PluginExpCond*>(plugin);
                 if (expcond) {
                     mCondPlugins.insert(expcond->getname(),
                             gvle2plug(it.fileName(), libName));
                 }
-                loader.unload();
+
+            }
+        }
+        if (QDir(it.filePath() + "/" + pathgvleo).exists()) {
+            QDirIterator itbis(it.filePath() + "/" + pathgvleo, QDir::Files);
+            while (itbis.hasNext()) {
+                QString libName =  itbis.next();
+                QPluginLoader loader(libName);
+                QObject* plugin = loader.instance();
+                if ( ! loader.isLoaded()) {
+                    qDebug() << " WARNING cannot load plugin " << libName;
+                    continue;
+                }
+                PluginOutput* outputPlug = qobject_cast<PluginOutput*>(plugin);
+                if (outputPlug) {
+                    mOutputPlugins.insert(outputPlug->getname(),
+                            gvle2plug(it.fileName(), libName));
+                }
             }
         }
     }
@@ -98,6 +116,12 @@ gvle2plugins::getCondPluginsList()
     return mCondPlugins.keys();
 }
 
+QStringList
+gvle2plugins::getOutputPluginsList()
+{
+    return mOutputPlugins.keys();
+}
+
 QString
 gvle2plugins::getCondPluginPath(QString name)
 {
@@ -105,9 +129,21 @@ gvle2plugins::getCondPluginPath(QString name)
 }
 
 QString
+gvle2plugins::getOutputPluginPath(QString name)
+{
+    return mOutputPlugins.value(name).libPath;
+}
+
+QString
 gvle2plugins::getCondPluginPackage(QString name)
 {
     return mCondPlugins.value(name).package;
+}
+
+QString
+gvle2plugins::getOutputPluginPackage(QString name)
+{
+    return mOutputPlugins.value(name).package;
 }
 
 }} //namespaces

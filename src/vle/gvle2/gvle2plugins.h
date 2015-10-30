@@ -55,12 +55,15 @@ public:
     QStringList getCondPluginsList();
     QString getCondPluginPath(QString name);
     QString getCondPluginPackage(QString name);
+    QStringList getOutputPluginsList();
+    QString getOutputPluginPath(QString name);
+    QString getOutputPluginPackage(QString name);
 
 private:
     QList<QPluginLoader*> mModelerPlugins;
     QMap<QString,QString> mSimulatorPlugins;
     QMap<QString,gvle2plug>      mCondPlugins;
-    QMap<QString,QString> mOutputPlugins;
+    QMap<QString,gvle2plug>      mOutputPlugins;
 };
 
 }}//namespaces
