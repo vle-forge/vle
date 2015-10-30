@@ -102,6 +102,7 @@ private slots:
     void onTabClose(int index);
     void onStatusToggle();
     void onTreeDblClick(QModelIndex index);
+    void onCustomContextMenu(const QPoint & point);
     void projectConfigureTimer();
     void projectBuildTimer();
     void projectInstallTimer();
@@ -143,6 +144,9 @@ private:
     void treeProjectUpdate();
     bool tabClose(int index);
     bool closeProject();
+
+    void removeFile(QModelIndex index);
+
 private:
     vlePackage         *mPackage;
     vle::utils::Package mCurrPackage;
