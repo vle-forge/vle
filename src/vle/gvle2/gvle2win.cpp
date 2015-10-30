@@ -69,6 +69,7 @@ GVLE2Win::GVLE2Win(QWidget *parent) :
     mProjectFileSytem = new QFileSystemModel(this);
     QTreeView *tree = ui->treeProject;
     tree->setModel(mProjectFileSytem);
+    tree->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // Open the configuration file
     std::string configFile = vu::Path::path().getHomeFile("gvle2.conf");
@@ -130,6 +131,9 @@ GVLE2Win::GVLE2Win(QWidget *parent) :
     QObject::connect(ui->treeProject,
                      SIGNAL(doubleClicked(QModelIndex)), this,
                      SLOT(onTreeDblClick(QModelIndex)));
+    QObject::connect(ui->treeProject,
+                     SIGNAL(customContextMenuRequested(const QPoint &)), this,
+                     SLOT(onCustomContextMenu(const QPoint &)));
 
     QObject::connect(ui->tabWidget,
                      SIGNAL(currentChanged(int)), this,
@@ -1179,6 +1183,69 @@ void GVLE2Win::onTreeDblClick(QModelIndex index)
         //set undo redo enabled
         ui->actionUndo->setEnabled(true);
         ui->actionRedo->setEnabled(true);
+    }
+}
+
+void GVLE2Win::onCustomContextMenu(const QPoint &point)
+{
+    QTreeView* projectTreeView = ui->treeProject;
+
+    QPoint globalPos = projectTreeView->mapToGlobal(point);
+    QModelIndex index = projectTreeView->indexAt(point);
+    if (not index.isValid()) return;
+
+    QAction *lastAction;
+
+    QMenu ctxMenu;
+    lastAction = ctxMenu.addAction(tr("Remove File"));
+    lastAction->setData(1);
+
+    QAction* selectedItem = ctxMenu.exec(globalPos);
+    if (selectedItem) {
+        int actCode = selectedItem->data().toInt();
+        if (actCode == 1) {
+            removeFile(index);
+        }
+    }
+}
+
+void GVLE2Win::removeFile(QModelIndex index)
+{
+    QString fileName = mProjectFileSytem->filePath(index);
+    QString currentDir = QDir::currentPath() += "/";
+
+    fileName.replace(currentDir, "");
+
+    int i;
+    for (i = 0; i < ui->tabWidget->count(); i++)
+    {
+        if (ui->tabWidget->tabText(i) == fileName)
+            break;
+    }
+
+    if (i != ui->tabWidget->count()) {
+        QMessageBox::question(this, tr("Warning"),
+                              fileName +
+                              " is currently being edited,\n"           \
+                              "you don't want to remove it!");
+    } else {
+
+        QFileInfo selectedFileInfo = QFileInfo(fileName);
+
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Question"),
+                                      tr("Remove ") +
+                                              fileName + " ?",
+                                      QMessageBox::Yes|
+                                      QMessageBox::No);
+
+        if (reply == QMessageBox::Yes) {
+            if (selectedFileInfo.isDir()) {
+                mProjectFileSytem->rmdir(index);
+            } else {
+                mProjectFileSytem->remove(index);
+            }
+        }
     }
 }
 
