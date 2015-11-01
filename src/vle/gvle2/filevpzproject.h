@@ -30,7 +30,6 @@
 #include <QTabWidget>
 #include <QDateTime>
 #include "vlevpm.h"
-#include "vpzActions.h"
 
 namespace Ui {
 class FileVpzProject;
@@ -46,9 +45,7 @@ class FileVpzProject : public QWidget
 public:
     explicit FileVpzProject(QWidget *parent = 0);
     ~FileVpzProject();
-    void setVpm(vleVpm* vpm)
-    {mVpm = vpm;};
-    void setUndo(QUndoStack *undo);
+    void setVpm(vleVpm* vpm);
     void setTabId(int i)
     {mId = i;};
     void setTab(QTabWidget *tab)
@@ -62,6 +59,8 @@ public slots:
     void setExpNameToVpz();
     void setExpDurationToVpz();
     void setExpBeginToVpz();
+    void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
+            QDomNode oldVpm, QDomNode newVpm);
 
 protected:
 
@@ -70,7 +69,6 @@ private:
 private:
     Ui::FileVpzProject *ui;
 
-    QUndoStack *mUndoStack;
     QTabWidget *mTab;
     int mId;
 

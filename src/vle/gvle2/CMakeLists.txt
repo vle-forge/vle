@@ -26,7 +26,7 @@ SET(GVLE2_SOURCES_CPP gvle2_widgets.cpp gvle2win.cpp aboutbox.cpp help.cpp
   helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp  filevpzclasses.cpp
   filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
   filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
-  sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp vpzActions.cpp
+  sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp
   vleDomDiffStack.cpp
   vlevpz.cpp vlevpm.cpp vpzDiagScene.cpp widgetvpzproperty.cpp
   plugin_modeler.cpp pluginmodelerview.cpp pluginmodelersummary.cpp

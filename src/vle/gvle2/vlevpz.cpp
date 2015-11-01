@@ -792,6 +792,7 @@ QString vleVpz::getAuthor() const
 void vleVpz::setAuthor(const QString author)
 {
     QDomElement docElem = getDomDoc().documentElement();
+    undoStack->snapshot(docElem);
     docElem.setAttribute("author", author);
 }
 
@@ -812,6 +813,7 @@ QString vleVpz::getDate() const
 void vleVpz::setDate(const QString date)
 {
     QDomElement docElem = getDomDoc().documentElement();
+    undoStack->snapshot(docElem);
     docElem.setAttribute("date", date);
 }
 
@@ -832,6 +834,7 @@ QString vleVpz::getVersion() const
 void vleVpz::setVersion(const QString version)
 {
     QDomElement docElem = getDomDoc().documentElement();
+    undoStack->snapshot(docElem);
     docElem.setAttribute("version", version);
 }
 
@@ -853,6 +856,7 @@ void vleVpz::setExpName(const QString name)
 {
     QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
     QDomElement docElem = nodeList.item(0).toElement();
+    undoStack->snapshot(docElem);
     docElem.setAttribute("name", name);
 }
 
@@ -875,6 +879,7 @@ void vleVpz::setExpDuration(const QString duration)
 {
     QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
     QDomElement docElem = nodeList.item(0).toElement();
+    undoStack->snapshot(docElem);
     docElem.setAttribute("duration", duration);
 }
 
@@ -899,6 +904,7 @@ vleVpz::setExpBegin(const QString begin)
 {
     QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
     QDomElement docElem = nodeList.item(0).toElement();
+    undoStack->snapshot(docElem);
     docElem.setAttribute("begin", begin);
 }
 

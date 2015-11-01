@@ -114,8 +114,6 @@ private:
 //    vleVpzModel     *mCurrentModel;
 
 private:
-    QUndoStack      *mUndoStack;
-    QUndoView       *undoView;
 
     VpzDiagScene       mScene;
 };

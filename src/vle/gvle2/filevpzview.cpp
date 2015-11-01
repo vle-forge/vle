@@ -39,14 +39,6 @@ fileVpzView::fileVpzView(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    mUndoStack = new QUndoStack();
-
-    // createundoview
-    undoView = new QUndoView(mUndoStack);
-    undoView->setWindowTitle(tr("Command List"));
-    //undoView->show();
-    undoView->setAttribute(Qt::WA_QuitOnClose, false);
-
     mVpm = 0;
     mUseSim = false;
     mDynamicsTab = 0;
@@ -171,7 +163,6 @@ void fileVpzView::setVpm(vleVpm* vpm)
     // ---- Dynamics Tab ----
     if (mDynamicsTab) {
         mDynamicsTab->setVpm(mVpm);
-        //mDynamicsTab->setUndo(mUndoStack);
         mDynamicsTab->reload();
     }
 
@@ -189,8 +180,6 @@ void fileVpzView::setVpm(vleVpm* vpm)
     // ---- Experimental Conditions Tab ----
     if (mProjectTab) {
         mProjectTab->setVpm(mVpm);
-        mProjectTab->setUndo(mUndoStack);
-        mProjectTab->reload();
     }
 
     // ---- View Tab ----
@@ -202,7 +191,6 @@ void fileVpzView::setVpm(vleVpm* vpm)
     // ---- View Tab ----
     if (mClassesTab) {
         mClassesTab->setVpm(mVpm);
-       //mClassesTab->reload();
     }
 
     //Build Scene

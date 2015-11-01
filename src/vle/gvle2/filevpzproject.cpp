@@ -36,10 +36,9 @@ namespace vle {
 namespace gvle2 {
 
 FileVpzProject::FileVpzProject(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::FileVpzProject)
+    QWidget(parent), ui(new Ui::FileVpzProject), mTab(0), mId(0), mAuthor(0),
+    mDate(0), mVersion(0), mName(0), mDuration(0),  mBegin(0), mVpm(0)
 {
-    mVpm = 0;
 
     ui->setupUi(this);
 
@@ -79,17 +78,16 @@ FileVpzProject::~FileVpzProject()
     delete ui;
 }
 
-void FileVpzProject::setUndo(QUndoStack *undo)
+void
+FileVpzProject::setVpm(vleVpm* vpm)
 {
-    mUndoStack = undo;
-    QAction *undoAction = mUndoStack->createUndoAction(this, tr("&Undo"));
-    undoAction->setShortcuts(QKeySequence::Undo);
+    mVpm = vpm;
 
-    QAction *redoAction = mUndoStack->createRedoAction(this, tr("&Redo"));
-    redoAction->setShortcuts(QKeySequence::Redo);
-
-    addAction(undoAction);
-    addAction(redoAction);
+    QObject::connect(mVpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            this,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+    reload();
 }
 
 void FileVpzProject::reload()
@@ -105,55 +103,49 @@ void FileVpzProject::reload()
 void FileVpzProject::setAuthorToVpz()
 {
     if (mAuthor->text() != mVpm->getAuthor()) {
-        QUndoCommand *changeAuthor = new Ui::ChangeAuthor(mAuthor->text(), mVpm,
-                                                          mAuthor, mTab, mId);
-        mUndoStack->push(changeAuthor);
+        mVpm->setAuthor(mAuthor->text());
     }
 }
 
 void FileVpzProject::setDateToVpz()
 {
     if (mDate->text() != mVpm->getDate()) {
-        QUndoCommand *changeDate = new Ui::ChangeDate(
-            mDate->dateTime().toString("dddd d MMMM yyyy hh:mm"), mVpm,
-            mDate, mTab, mId);
-        mUndoStack->push(changeDate);
+        mVpm->setDate(mDate->text());
     }
 }
 void FileVpzProject::setVersionToVpz()
 {
     if (mVersion->text() != mVpm->getVersion()) {
-        QUndoCommand *changeVersion = new Ui::ChangeVersion(mVersion->text(), mVpm,
-                                                            mVersion, mTab, mId);
-        mUndoStack->push(changeVersion);
+        mVpm->setVersion(mVersion->text());
     }
 }
 
 void FileVpzProject::setExpNameToVpz()
 {
     if (mName->text() != mVpm->getExpName()) {
-        QUndoCommand *changeName = new Ui::ChangeExpName(mName->text(), mVpm,
-                                                         mName, mTab, mId);
-        mUndoStack->push(changeName);
+        mVpm->setExpName(mName->text());
     }
 }
 
 void FileVpzProject::setExpDurationToVpz()
 {
     if (mDuration->text() != mVpm->getExpDuration()) {
-        QUndoCommand *changeDuration = new Ui::ChangeExpDuration(mDuration->text(), mVpm,
-                                                                 mDuration, mTab, mId);
-        mUndoStack->push(changeDuration);
+        mVpm->setExpDuration(mDuration->text());
     }
 }
 
 void FileVpzProject::setExpBeginToVpz()
 {
     if (mBegin->text() != mVpm->getExpBegin()) {
-        QUndoCommand *changeBegin = new Ui::ChangeExpBegin(mBegin->text(), mVpm,
-                                                           mBegin, mTab, mId);
-        mUndoStack->push(changeBegin);
+        mVpm->setExpBegin(mBegin->text());
     }
+}
+
+void
+FileVpzProject::onUndoRedoVpm(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
+        QDomNode /*oldVpm*/, QDomNode /*newVpm*/)
+{
+    reload();
 }
 
 }} //namespaces
