@@ -284,17 +284,12 @@ public:
      * @brief tells if the port portName exists in observable obsName
      */
     bool existObsPortFromDoc(const QString& condName,
-			     const QString& portName) const;
-    /*
-     * @brief tells if a observable port already has a view
-     */
-    bool existViewFromObsPort(const QDomNode node, const QString& obsPort,
-			      const QString& viewName) const;
+            const QString& portName) const;
     /**
      * @brief tells if a observable port already has a view
      */
     bool existViewFromObsPortDoc(const QString& obsName, const QString& obsPort,
-				 const QString& viewName) const;
+            const QString& viewName) const;
     /**
      * @brief get <observables> tag from Vpz doc
      */
@@ -326,24 +321,27 @@ public:
      * which attribute 'name' is portName
      */
     QDomNode portFromObs(const QDomNode& node, const QString& portName) const;
-
-
     /**
      * @brief set the 'name' attribute of tag <Observable> to a new value
      * by the way also update models that do use this renamed obs.
      */
     void renameObservableToDoc(const QString& oldName, const QString& newName);
     /**
+     * @brief rename an observable port
+     * (set attribute 'name' of <port> child of an <observable> with
+     * attribute 'name' equals obsName)
+     * @param obsName, the observable name
+     * @param oldPortName, the old name of the port
+     * @param newPortName, the new name of the port
+     */
+    void renameObsPortToDoc(const QString& obsName,
+            const QString& oldPortName, const QString& newPortName);
+    /**
      * @brief set the 'name' attribute of tag <Observable> to a new value
      * for the models configuration that needs that
      */
     void renameObservableFromModel(QDomNode &node,
             const QString &oldName, const QString &newName);
-    /**
-     * @brief set the 'name' attribute of tag <Observable> to a new value
-     */
-    void renameObsFromObss(QDomNode node,
-            const QString& oldName, const QString& newName);
 
     /**
      * @brief rename a model xpath = //model
@@ -431,16 +429,12 @@ public:
     /**
      * @brief rm a view from a observable port
      */
-    void rmViewToObsPort(const QDomNode node, const QString& obsPort,
-			 const QString& viewName);
-    /**
-     * @brief rm a view from a observable port
-     */
     void rmViewToObsPortDoc(const QString& obsName, const QString& obsPort,
-			    const QString& viewName);
+            const QString& viewName);
+
     /**
      * @brief remove a <observable> tag from a Vpz Doc
-     * with attribute 'name'  condName
+     * with attribute 'name'  obsName
      */
     void rmObservableFromDoc(const QString& obsName);
     /**
@@ -456,20 +450,10 @@ public:
      */
     void rmObsPortToDoc(const QString& condName, const QString& portName);
     /**
-     * @brief remove <observable> tag from <observabless>
-     * which attribute 'name' is obsName
-     */
-    void rmObsFromObss(QDomNode node, const QString& obsName);
-    /**
      * @brief remove <port> tag from <observable>
      * which attribute 'name' is portName
      */
     void rmObsPortFromCond(QDomNode node, const QString& portName);
-    /**
-     * @brief remove <port> tag from <observable>
-     * which attribute 'name' is obsName
-     */
-    void rmPortFromObs(QDomNode node, const QString& obsName);
     /**
      * @brief unset a observable from a atomic model only if the model
      * is observed by
@@ -496,27 +480,18 @@ public:
      * @brief add a <observable> tag to a Vpz Doc
      * whith attribute 'name' obsName
      */
-    QDomNode addObservableToDoc(const QString& obsName);
+    void addObservableToDoc(const QString& obsName);
     /**
      * @brief add a <port> tag to a Vpz Doc
      * with attribute 'name'  portName for condition condName
      */
-    QDomNode addObsPortToDoc(const QString& obsName, const QString& portName);
+    void addObsPortToDoc(const QString& obsName, const QString& portName);
+
     /**
      * @brief add an <attachedview> to an observable port
      */
     void attachViewToObsPortDoc(const QString& obsName, const QString& portName,
-				const QString& viewName);
-    /**
-     * @brief add an <attachedview> to an observable port
-     */
-    void attachViewToObsPort(QDomNode node, const QString& portName,
-			     const QString& viewName);
-    /**
-     * @brief add a <observable> tag to <observabless>
-     * whith attribute 'name' obsName
-     */
-    QDomNode addObservable(QDomNode node, const QString& obsName);
+                                const QString& viewName);
 
     /**
      * @brief set width of a model
@@ -546,12 +521,6 @@ public:
      *
      */
     void setObsToAtomicModel(const QString& model_query, const QString& obsName);
-
-    /**
-     * @brief add a <port> tag to <Observable>
-     * whith attribute 'name'  portName
-     */
-    QDomNode addObsPort(QDomNode node, const QString& portName);
 
     /**
      * @brief build an empty node corresponding to the value type from Vpz doc

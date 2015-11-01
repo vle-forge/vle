@@ -53,18 +53,20 @@ public:
 
 public slots:
     void onViewTreeMenu(const QPoint pos);
-    void onObservableChanged(QTreeWidgetItem *item,
-			     int /*column*/);
+    void onItemChanged(QTreeWidgetItem *item,
+                             int /*column*/);
+    void onViewsUpdated();
+    void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
+            QDomNode oldVpm, QDomNode newVpm);
 
 private:
     int itemType(const QTreeWidgetItem * item) const;
     QString itemName(QTreeWidgetItem * item) const;
     QTreeWidgetItem* newItem(const ObsTreeType type, const QString name);
-
-    void reloadViews();
     void reloadObservables();
     void reloadPorts(const QString& obsName,
-		     QTreeWidgetItem *obsItem = 0);
+                    QTreeWidgetItem *obsItem = 0);
+    void reloadViews();
 
     Ui::FileVpzObservables* ui;
     vleVpm* mVpm;
