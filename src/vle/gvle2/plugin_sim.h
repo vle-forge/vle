@@ -50,8 +50,8 @@ public:
     virtual void     delWidgetToolbar() = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  setVpm(vleVpm *vpm) = 0;
-    virtual void *getVpz() = 0;
+    virtual void  init(vleVpm *vpm) = 0;
+    virtual void *getVpm() = 0;
     virtual void  setPackage(vle::utils::Package *pkg) = 0;
 };
 

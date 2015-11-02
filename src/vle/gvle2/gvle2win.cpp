@@ -718,7 +718,7 @@ void GVLE2Win::onLaunchSimulation()
             newTab->setProperty("vpz",    QVariant::fromValue((void*)vpzView));
             vpzView->usedBySim(true);
             try {
-                sim->setVpm(vpzView->vpm());
+                sim->init(vpzView->vpm());
                 sim->setPackage(&mCurrPackage);
                 // Associate the pluggin widget with a new tab
                 int n = ui->tabWidget->addTab(newTab, "Simulation");
