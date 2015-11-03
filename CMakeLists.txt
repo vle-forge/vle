@@ -2,6 +2,21 @@ cmake_minimum_required(VERSION 2.6)
 project(VLE CXX C)
 enable_testing()
 
+#
+# Options
+#
+
+option(WITH_CAIRO "use cairomm to build output plugin [default: on]" ON)
+option(WITH_GVLE "use qt to build gvle [default: on]" ON)
+option(WITH_TEST "use the libboost test unit library [default: on]" ON)
+option(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
+option(WITH_MVLE "build mvle [default: off]" OFF)
+option(WITH_CVLE "build cvle [default: off]" OFF)
+
+#
+# Usefull variables
+# 
+
 set(VLE_MAJOR 1)
 set(VLE_MINOR 3)
 set(VLE_PATCH 0)
@@ -80,32 +95,31 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
 endif (COMMAND CMAKE_POLICY)
 
-option(WITH_GTK "use gtkmm to build gvle [default: on]" ON)
-option(WITH_GTKSOURCEVIEW "use gtksourceview to build gvle [default: on]" ON)
 
-if (WITH_GTK AND WITH_GTKSOURCEVIEW)
-  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
-    gtkmm-3.0 gtksourceview-3.0)
-
-  if (NOT VLEDEPS_FOUND)
-    message(STATUS "Failed to find gtksourceview-3.0")
-    set (WITH_GTKSOURCEVIEW OFF)
+if (WITH_CAIRO)
+  pkg_check_modules(VLE_CAIROMM_DEP cairomm-1.0)
+  if (VLE_CAIROMM_DEP_FOUND) 
+    set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
+  else ()
+    set(VLE_HAVE_CAIRO 0 CACHE INTERNAL "" FORCE)
   endif ()
+endif()
+
+if (WITH_GVLE)
+  find_package(Qt4 REQUIRED)
+  if (NOT QT_FOUND)
+    message(FATAL_ERROR "Qt is required")
+  endif (NOT QT_FOUND)
+  set(VLE_HAVE_QT 1 CACHE INTERNAL "" FORCE)
+  set(VLE_HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
+  SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
 endif ()
 
-if (WITH_GTK AND NOT WITH_GTKSOURCEVIEW)
-  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
-    gtkmm-3.0)
+pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
 
-  if (NOT VLEDEPS_FOUND)
-    set (WITH_GTK OFF)
-  endif ()
-endif ()
 
-if (NOT WITH_GTK)
-  pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0)
 
-  if (NOT VLEDEPS_FOUND)
+if (NOT VLEDEPS_FOUND)
     message(FATAL_ERROR "Failed to find minimal dependencies: libarchive,"
       "glibmm-2.4, gthread-2.0 and libxml-2.0")
   endif ()
@@ -131,19 +145,11 @@ else ()
   set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
 endif ()
 
-if (WITH_GTK)
-  set(VLE_HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
-endif ()
-
-if (WITH_GTKSOURCEVIEW)
-  set(VLE_HAVE_GTKSOURCEVIEWMM 1 CACHE INTERNAL "" FORCE)
-endif ()
-
 #
 # Test the libboost header and libboost-text library.
 #
 
-option(WITH_TEST "use the libboost test unit library [default: on]" ON)
+
 
 if (WIN32)
   set(Boost_THREADAPI "win32")
@@ -208,8 +214,6 @@ endif (WITH_TEST)
 # Check for an MPI implementation. building mvle and/or cvle
 #
 
-option(WITH_MVLE "build mvle [default: on]" ON)
-option(WITH_CVLE "build cvle [default: on]" ON)
 
 if (WITH_MVLE OR WITH_CVLE)
   find_package(MPI REQUIRED)
@@ -315,7 +319,7 @@ endif (GETTEXT_FOUND)
 #
 # Generating documentation with doxygen
 #
-option(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
+
 if (WITH_DOXYGEN)
   find_package(Doxygen)
   if (DOXYGEN)
@@ -342,7 +346,6 @@ message(STATUS "Build with execinfo.h.........: ${VLE_HAVE_EXECINFO}")
 message(STATUS "Build unit test...............: ${VLE_HAVE_UNITTESTFRAMEWORK}")
 message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
 message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
-message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
 message(STATUS "Build with mvle...............: ${VLE_HAVE_MVLE}")
 message(STATUS "Build with cvle...............: ${VLE_HAVE_CVLE}")
 

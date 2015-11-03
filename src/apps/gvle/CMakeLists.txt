@@ -1,32 +1,64 @@
-include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+SET(CMAKE_AUTOMOC ON)
+
+SET(QT_USE_QTXML TRUE)
+
+FIND_PACKAGE(Qt4 REQUIRED)
+INCLUDE(${QT_USE_FILE})
+
+FIND_PACKAGE(PkgConfig REQUIRED)
+
+PKG_CHECK_MODULES(XMLDEPS libxml-2.0)
+INCLUDE_DIRECTORIES(${XMLDEPS_INCLUDE_DIRS})
+
+INCLUDE_DIRECTORIES(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
+  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS})
+SET(V_LIB vlelib)
+IF (WIN32)
+  LINK_DIRECTORIES(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+ENDIF (WIN32)
+
+#
+# Add Intl/Gettext lib
+#
+IF (WIN32)
+  SET(INTL_LIB "intl")
+ELSE (WIN32)
+  SET(INTL_LIB "")
+ENDIF (WIN32)
+
+INCLUDE_DIRECTORIES(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS})
 
-link_directories(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+LINK_DIRECTORIES(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 
-if (WIN32)
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gvle.o
+SET(GVLE2_SOURCE_DIR ${VLE_SOURCE_DIR}/src/vle/gvle)
+
+#QT4_ADD_RESOURCES(gvle_RES gvle.qrc)
+
+IF (WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gvle.o
     COMMAND ${CMAKE_RC_COMPILER}
     -I${CMAKE_BINARY_DIR}/share
     -i${CMAKE_BINARY_DIR}/share/gvle.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/gvle.o)
-  add_executable(gvle WIN32 main.cpp ${CMAKE_CURRENT_BINARY_DIR}/gvle.o)
+  ADD_EXECUTABLE(gvle WIN32 main.cpp ${gvle_RES}
+    ${CMAKE_CURRENT_BINARY_DIR}/gvle.o)
 
-  set_target_properties(gvle PROPERTIES
+  SET_TARGET_PROPERTIES(gvle PROPERTIES
     COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
-else (WIN32)
-  add_executable(gvle WIN32 main.cpp)
+ELSE (WIN32)
+  ADD_EXECUTABLE(gvle WIN32 main.cpp ${gvle_RES})
 
-  set_target_properties(gvle PROPERTIES
+  SET_TARGET_PROPERTIES(gvle PROPERTIES
     SOVERSION "${VLE_MAJOR}.${VLE_MINOR}"
     VERSION "${VLE_MAJOR}.${VLE_MINOR}"
     COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
-endif (WIN32)
+ENDIF (WIN32)
 
-target_link_libraries(gvle gvlelib vlelib ${VLEDEPS_LIBRARIES}
-     ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
+TARGET_LINK_LIBRARIES(gvle gvlelib vlelib ${VLEDEPS_LIBRARIES}
+  ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
-install(TARGETS gvle DESTINATION bin)
+INSTALL(TARGETS gvle DESTINATION bin)
 
-install(FILES gvle.1 DESTINATION ${VLE_MANPAGE_PATH}
-  RENAME "gvle-${VLE_VERSION_SHORT}.1")

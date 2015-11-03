@@ -18,6 +18,7 @@
   Var ADD_TO_PATH_ALL_USERS
   Var ADD_TO_PATH_CURRENT_USER
   Var INSTALL_DESKTOP
+  Var INSTDIR_TEMP
 
 ;--------------------------------
 ;Include Modern UI
@@ -219,6 +220,15 @@ Var AR_RegFlags
   Pop "${OUT}"
 !macroend
 !define StrReplace '!insertmacro "_strReplaceConstructor"'
+
+!macro _strReplaceBisConstructor OUT NEEDLE NEEDLE2 HAYSTACK
+  Push "${HAYSTACK}"
+  Push "${NEEDLE}"
+  Push "${NEEDLE2}"
+   Call deux.StrReplace
+  Pop "${OUT}"
+!macroend
+!define StrReplaceBis '!insertmacro "_strReplaceBisConstructor"'
 
 ; ---------------------------------- Macro Definitions end-------------------------------------
 
@@ -471,6 +481,8 @@ FunctionEnd
 !macroend   ; EnvVarUpdate UN
 !insertmacro EnvVarUpdate ""
 !insertmacro EnvVarUpdate "un."
+!insertmacro StrReplace "deux."
+
 ;----------------------------------- EnvVarUpdate end----------------------------------------
 
 
@@ -834,6 +846,22 @@ Section "-Core installation"
   SetOutPath "$INSTDIR"
   @CPACK_NSIS_FULL_INSTALL@
 
+  ;to manage the qt install
+  FileOpen $0 "$INSTDIR\bin\qt.conf" w
+
+  StrCpy $INSTDIR_TEMP "$INSTDIR"
+  ${StrReplaceBis} $INSTDIR_TEMP "\" "/" $INSTDIR_TEMP
+
+  ;write the string "hello world!" to the output file
+  FileWrite $0 "[Paths]"
+  FileWrite $0 "$\r$\n"
+
+  FileWrite $0 "prefix = \$""$INSTDIR_TEMP\$""
+  FileWrite $0 "$\r$\n"
+
+  ; close the file
+  FileClose $0
+
   ;Store installation folder
   WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "" $INSTDIR
 
@@ -1024,6 +1052,9 @@ Section "Uninstall"
   ReadRegStr $INSTALL_DESKTOP SHCTX \
     "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_DIRECTORY@" "InstallToDesktop"
   DetailPrint "Install to desktop: $INSTALL_DESKTOP "
+
+  ;Remove the Qt conf
+  Delete "$INSTDIR\bin\qt.conf"
 
 @CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS@
 

@@ -1,41 +1,69 @@
-set(GVLE_SOURCES_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp
-  CalendarBox.cpp CompleteViewDrawingArea.cpp ConditionsBox.cpp
-  ConnectionBox.cpp CoupledModelBox.cpp CutCopyPaste.cpp
-  DynamicBox.cpp DynamicsBox.cpp Editor.cpp ExperimentBox.cpp
-  FileTreeView.cpp GVLE.cpp GVLEMenuAndToolbar.cpp
-  ImportClassesBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp
-  LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp ModelClassBox.cpp
-  ModelDescriptionBox.cpp Modeling.cpp GlobalPlugin.cpp
-  ModelingPlugin.cpp ModelTreeBox.cpp NewDynamicsBox.cpp
-  NewModelClassBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp
-  OpenModelingPluginBox.cpp OpenPackageBox.cpp OutputPlugin.cpp
-  PluginFactory.cpp PortDialog.cpp PreferencesBox.cpp QuitBox.cpp
-  SaveVpzBox.cpp Settings.cpp SimpleTypeBox.cpp
-  SimpleViewDrawingArea.cpp TableBox.cpp TreeViewValue.cpp
-  TupleBox.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp
-  ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp SpawnPool.cpp)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
 
-set(GVLE_SOURCES_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp
-  CalendarBox.hpp ComboboxString.hpp CompleteViewDrawingArea.hpp
-  ConditionsBox.hpp ConnectionBox.hpp CoupledModelBox.hpp
-  CutCopyPaste.hpp DllDefines.hpp DynamicBox.hpp DynamicsBox.hpp
-  Editor.hpp ExperimentBox.hpp FileTreeView.hpp GVLE.hpp
-  GVLEMenuAndToolbar.hpp ImportClassesBox.hpp ImportModelBox.hpp
-  InteractiveTypeBox.hpp LaunchSimulationBox.hpp MatrixBox.hpp
-  Message.hpp ModelClassBox.hpp ModelDescriptionBox.hpp Modeling.hpp
-  GlobalPlugin.hpp ModelingPlugin.hpp ModelTreeBox.hpp
-  NewDynamicsBox.hpp NewModelClassBox.hpp NewTypeBox.hpp
-  ObsAndViewBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
-  OpenPackageBox.hpp OutputPlugin.hpp PluginFactory.hpp PortDialog.hpp
-  PreferencesBox.hpp QuitBox.hpp SaveVpzBox.hpp Settings.hpp
-  SimpleTypeBox.hpp SimpleViewDrawingArea.hpp TableBox.hpp
-  TreeViewValue.hpp TupleBox.hpp ValueBox.hpp ValuesTreeView.hpp
-  ViewDrawingArea.hpp View.hpp ViewOutputBox.hpp XmlTypeBox.hpp
-  SpawnPool.hpp)
+set(QT_USE_QTXML TRUE)
+set(QT_USE_QTHELP TRUE)
 
-install(FILES ${GVLE_SOURCES_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
+find_package(Qt4 REQUIRED)
+include(${QT_USE_FILE})
 
-install(FILES gvle.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(XMLDEPS libxml-2.0)
+include_directories(${XMLDEPS_INCLUDE_DIRS})
+
+if (WIN32)
+  set(INTL_LIB "intl")
+else (WIN32)
+  set(INTL_LIB "")
+endif (WIN32)
+
+include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
+  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${gvle_SOURCE_DIR}
+  ${VLE_SOURCE_DIR}/src/apps/gvle)
+
+SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
+  helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp  filevpzclasses.cpp
+  filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
+  filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
+  sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp
+  vleDomDiffStack.cpp
+  vlevpz.cpp vlevpm.cpp vpzDiagScene.cpp widgetvpzproperty.cpp
+  plugin_modeler.cpp pluginmodelerview.cpp pluginmodelersummary.cpp
+  filevpzrtool.cpp gvle_plugins.cpp)
+
+QT4_WRAP_UI(ui_gvle_win_h gvle_win.ui)
+QT4_WRAP_UI(aboutbox_h aboutbox.ui)
+QT4_WRAP_UI(help_h help.ui)
+QT4_WRAP_UI(filevpzview_h     filevpzview.ui)
+QT4_WRAP_UI(filevpzdynamics_h filevpzdynamics.ui)
+QT4_WRAP_UI(filevpzproject_h filevpzproject.ui)
+QT4_WRAP_UI(filevpzobservables_h filevpzobservables.ui)
+QT4_WRAP_UI(filevpzexpcond_h  filevpzexpcond.ui)
+QT4_WRAP_UI(filevpzexpview_h  filevpzexpview.ui)
+QT4_WRAP_UI(filevpzclasses_h  filevpzclasses.ui)
+QT4_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
+QT4_WRAP_UI(filevpzrtool_h   filevpzrtool.ui)
+QT4_WRAP_UI(simulationview_h simulationview.ui)
+QT4_WRAP_UI(simulationrtool_h simulationrtool.ui)
+QT4_WRAP_UI(widgetvpzpropertydynamics_h widgetvpzpropertydynamics.ui)
+QT4_WRAP_UI(widgetvpzpropertyexpcond_h  widgetvpzpropertyexpcond.ui)
+QT4_WRAP_UI(widgetvpzpropertyobservables_h  widgetvpzpropertyobservables.ui)
+QT4_WRAP_UI(pluginmodelerview_h pluginmodelerview.ui)
+QT4_WRAP_UI(pluginmodelersummary_h pluginmodelersummary.ui)
+
+SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h}
+  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
+  ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h} 
+  ${filevpzclasses_h} ${filevpztooltip_h} ${filevpzrtool_h} ${simulationview_h}
+  ${simulationrtool_h} gvle_widgets.h simulation.h logger.h sourcecpp.h
+  sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
+  ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
+  plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h 
+  vleDomDiffStack.h vlevpz.h vlevpm.h
+  widgetvpzproperty.h vpzDiagScene.h gvle_plugins.h
+  ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h}
+  ${widgetvpzpropertyobservables_h})
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
@@ -50,15 +78,14 @@ else (WIN32)
   set(OS_SPECIFIC_LIBRARIES dl)
 endif (WIN32)
 
-add_library(gvlelib SHARED
-    ${GVLE_SOURCES_HPP};${GVLE_SOURCES_CPP};${OS_SPECIFIC_PATH_IMPL})
+add_library(gvlelib SHARED ${gvle_SOURCES_CPP} ${gvle_SOURCES_HPP})
 
 set_target_properties(gvlelib PROPERTIES
   VERSION 0
   OUTPUT_NAME "gvle-${VLE_VERSION_SHORT}"
   DEFINE_SYMBOL "gvlelib_EXPORTS"
-  COMPILE_DEFINITIONS "GVLE_DLL"
-  COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
+  COMPILE_DEFINITIONS "gvle_DLL"
+#  COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
   CLEAN_DIRECT_OUTPUT 1)
 
 if (WIN32)
@@ -66,8 +93,10 @@ if (WIN32)
     LINK_FLAGS " -mwindows")
 endif ()
 
-target_link_libraries(gvlelib vlelib ${VLEDEPS_LIBRARIES}
-  ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
+target_link_libraries(gvlelib vlelib ${QT_LIBRARIES} ${INTL_LIB})
+
+install(FILES ${gvle_SOURCES_HPP}
+  DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
 
 install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)

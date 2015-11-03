@@ -223,6 +223,10 @@ public:
     PathList getPluginsGvleModeling() const;
     PathList getPluginsGvleOutput() const;
 
+    std::string getMetadataExpDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+
+    std::string getMetadataExpFile(const std::string& expName,
+            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
     /**
      * Return true if a file package/path/to/file exists in the
