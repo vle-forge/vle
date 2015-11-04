@@ -855,7 +855,7 @@ Section "-Core installation"
   FileWrite $0 "[Paths]"
   FileWrite $0 "$\r$\n"
 
-  FileWrite $0 "prefix = \$""$INSTDIR_TEMP\$""
+  FileWrite $0 'prefix = "$INSTDIR_TEMP"'
   FileWrite $0 "$\r$\n"
 
   ; close the file
