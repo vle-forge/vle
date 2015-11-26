@@ -229,8 +229,8 @@ namespace vle { namespace devs {
     private:
         std::map < Simulator*, EventBagModel >              _bags;
         std::map < Simulator*, EventBagModel >::iterator    _itbags;
-        std::list < std::map < Simulator*, EventBagModel >::value_type* > _exec;
-        std::list < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
+        std::vector < std::map < Simulator*, EventBagModel >::value_type* > _exec;
+        std::vector < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
 
         ViewEventList _states;
     };

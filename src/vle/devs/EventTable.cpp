@@ -92,7 +92,7 @@ std::map < Simulator*, EventBagModel >::value_type&
     }
 
     while (_itexec != _exec.end()) {
-        std::list < std::map < Simulator*, EventBagModel >::value_type*
+        std::vector < std::map < Simulator*, EventBagModel >::value_type*
             >::iterator r = _itexec;
         ++_itexec;
         return **r;
