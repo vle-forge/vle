@@ -28,6 +28,44 @@
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+
+namespace {
+
+/** Compute the depth of the hierarchy.
+ *
+ * @return @e depth returns 0 if executive is in the top model otherwise a
+ * internet less than 0.
+ */
+inline unsigned depth(const vle::devs::Dynamics *mdl) throw()
+{
+    unsigned ret = 0;
+
+    const vle::vpz::CoupledModel *parent = mdl->getModel().getParent();
+    while (parent != NULL) {
+        parent = parent->getParent();
+        --ret;
+    }
+
+    return ret;
+}
+
+/** A functor to sort executive internal events from the @e
+ * CompleteEventBagModel according to the depth of the executive in the model.
+ *
+ */
+struct ExecutiveSort {
+    typedef std::map<vle::devs::Simulator*,
+                     vle::devs::EventBagModel>::value_type param;
+
+    inline bool operator()(const param* lhs, const param *rhs) const throw()
+    {
+        return ::depth(lhs->first->dynamics()) <
+            ::depth(rhs->first->dynamics());
+    }
+};
+
+} // anonymous namespace
 
 namespace vle { namespace devs {
 
@@ -42,6 +80,13 @@ std::map < Simulator*, EventBagModel >::value_type&
         } else {
             std::map < Simulator*, EventBagModel >::iterator r = _itbags;
             ++_itbags;
+
+            // First time all the dynamics (not executive) are treated, we need
+            // to sort all executive events according to the DEVS hierarchy of
+            // the structure.
+            if (_itbags == _bags.end())
+                std::sort(_exec.begin(), _exec.end(), ::ExecutiveSort());
+
             return *r;
         }
     }
