@@ -77,12 +77,19 @@ std::map < Simulator*, EventBagModel >::value_type&
             _exec.push_back(&(*_itbags));
             _itexec = _exec.begin();
             _itbags++;
+
+            // If the latest element in the bag is an executive internal event,
+            // we sort all executive events according to the DEVS hierarchy of
+            // the structure.
+            if (_itbags == _bags.end())
+                _exec.sort(::ExecutiveSort());
+
         } else {
             std::map < Simulator*, EventBagModel >::iterator r = _itbags;
             ++_itbags;
 
-            // First time all the dynamics (not executive) are treated, we need
-            // to sort all executive events according to the DEVS hierarchy of
+            // If the latest element in the bag is an dynamics internal event,
+            // we sort all executive events according to the DEVS hierarchy of
             // the structure.
             if (_itbags == _bags.end())
                 _exec.sort(::ExecutiveSort());
