@@ -28,6 +28,44 @@
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+
+namespace {
+
+/** Compute the depth of the hierarchy.
+ *
+ * @return @e depth returns 0 if executive is in the top model otherwise a
+ * internet less than 0.
+ */
+inline unsigned depth(const vle::devs::Dynamics *mdl) throw()
+{
+    unsigned ret = 0;
+
+    const vle::vpz::CoupledModel *parent = mdl->getModel().getParent();
+    while (parent != NULL) {
+        parent = parent->getParent();
+        --ret;
+    }
+
+    return ret;
+}
+
+/** A functor to sort executive internal events from the @e
+ * CompleteEventBagModel according to the depth of the executive in the model.
+ *
+ */
+struct ExecutiveSort {
+    typedef std::map<vle::devs::Simulator*,
+                     vle::devs::EventBagModel>::value_type param;
+
+    inline bool operator()(const param* lhs, const param *rhs) const throw()
+    {
+        return ::depth(lhs->first->dynamics()) <
+            ::depth(rhs->first->dynamics());
+    }
+};
+
+} // anonymous namespace
 
 namespace vle { namespace devs {
 
@@ -42,6 +80,13 @@ std::map < Simulator*, EventBagModel >::value_type&
         } else {
             std::map < Simulator*, EventBagModel >::iterator r = _itbags;
             ++_itbags;
+
+            // First time all the dynamics (not executive) are treated, we need
+            // to sort all executive events according to the DEVS hierarchy of
+            // the structure.
+            if (_itbags == _bags.end())
+                _exec.sort(::ExecutiveSort());
+
             return *r;
         }
     }
@@ -181,12 +226,21 @@ bool EventTable::putInternalEvent(InternalEvent* event)
     std::push_heap(mInternalEventList.begin(), mInternalEventList.end(),
                    internalLessThan);
 
-    assert(event->getModel());
+    // Try to insert a new InternalEventModel into the InternalEventList
+    // (beginning of the simulation the EventTable is empty or after an infinity
+    // time advance).
+    std::pair <InternalEventModel::iterator, bool> r =
+        mInternalEventModel.insert(
+            std::pair <Simulator*, InternalEvent*>(event->getModel(), NULL));
 
-    if (mInternalEventModel[event->getModel()])
-      mInternalEventModel[event->getModel()]->invalidate();
+    // If a InternalEventModel exist, we invalidate the associated internal
+    // events.
+    if (r.first->second)
+        r.first->second->invalidate();
 
-    mInternalEventModel[event->getModel()] = event;
+    // We assign the newly InternalEvent.
+    r.first->second = event;
+
     return true;
 }
 
