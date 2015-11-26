@@ -696,11 +696,16 @@ void Editor::createBlankNewFile(const std::string& path,
     try {
         DocumentText* doc =
             new DocumentText(mGVLE,  path + "/" + fileName, true, true);
+
+        std::string filepath(path);
+        filepath += '/';
+        filepath += fileName;
+
         mDocuments.insert(
-            std::make_pair < std::string, DocumentText* >
-            (path + "/" + fileName, doc));
-        append_page(*doc, *(addLabel(fileName,
-                                     path + "/" + fileName)));
+            std::pair<std::string, DocumentText*>(
+                filepath, doc));
+
+        append_page(*doc, *(addLabel(fileName, filepath)));
     } catch (std::exception& e) {
         Error(e.what());
     }
@@ -724,10 +729,8 @@ void Editor::createBlankNewFile()
     name = nameTmp;
     try {
         DocumentText* doc = new DocumentText(mGVLE, nameTmp, true);
-        mDocuments.insert(
-            std::make_pair < std::string, DocumentText* >(nameTmp, doc));
-        append_page(*doc, *(addLabel(doc->filename(),
-                                     nameTmp)));
+        mDocuments.insert(std::pair<std::string, DocumentText*>(nameTmp, doc));
+        append_page(*doc, *(addLabel(doc->filename(), nameTmp)));
     } catch (std::exception& e) {
         Error(e.what());
     }

@@ -119,6 +119,11 @@ if (NOT WITH_CAIRO AND NOT WITH_GTK)
   endif ()
 endif()
 
+# Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
+# #seems to be a CMake'list. So we replace ';' with ' '.
+string(REPLACE ";" " " VLEDEPS_CFLAGS_OTHER_STRING "${VLEDEPS_CFLAGS_OTHER}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VLEDEPS_CFLAGS_OTHER_STRING}")
+
 if (WITH_QT)
   find_package(Qt4 REQUIRED)
   if (NOT QT_FOUND)
@@ -244,6 +249,8 @@ include_directories(${VLE_BINARY_DIR})
 # prefix=/target to detect the DIRNAME
 # cflag=-Iboost_1_34_1 for the directory
 #
+
+set(VLE_PKGCONFIG_CFLAGS_OTHER "${VLEDEPS_CFLAGS_OTHER_STRING}")
 if (UNIX)
   set(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
   set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "${Boost_INCLUDE_DIRS}")

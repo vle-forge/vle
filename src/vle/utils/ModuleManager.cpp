@@ -401,7 +401,7 @@ public:
 
             if (result) {
                 mLst.insert(
-                    std::make_pair < std::string, void* >(symbol, result));
+                    std::pair<std::string, void*>(symbol, result));
                 return result;
             } else {
                 throw utils::InternalError(fmt(
@@ -507,7 +507,7 @@ public:
                 return it->second;
             } else {
                 return mTableSimulator.insert(
-                    std::make_pair < std::string, pimpl::Module* >(
+                    std::pair<std::string, pimpl::Module*>(
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
@@ -518,7 +518,7 @@ public:
                 return it->second;
             } else {
                 return mTableOov.insert(
-                    std::make_pair < std::string, pimpl::Module* >(
+                    std::pair<std::string, pimpl::Module*>(
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
@@ -529,7 +529,7 @@ public:
                 return it->second;
             } else {
                 return mTableGvleGlobal.insert(
-                    std::make_pair < std::string, pimpl::Module* >(
+                    std::pair<std::string, pimpl::Module*>(
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
@@ -540,7 +540,7 @@ public:
                 return it->second;
             } else {
                 return mTableGvleModeling.insert(
-                    std::make_pair < std::string, pimpl::Module* >(
+                    std::pair<std::string, pimpl::Module*>(
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
@@ -551,7 +551,7 @@ public:
                 return it->second;
             } else {
                 return mTableGvleOutput.insert(
-                    std::make_pair < std::string, pimpl::Module* >(
+                    std::pair<std::string, pimpl::Module*>(
                         path, new pimpl::Module(path, package, library,
                                                 type))).first->second;
             }
