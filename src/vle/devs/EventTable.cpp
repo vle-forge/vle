@@ -181,12 +181,21 @@ bool EventTable::putInternalEvent(InternalEvent* event)
     std::push_heap(mInternalEventList.begin(), mInternalEventList.end(),
                    internalLessThan);
 
-    assert(event->getModel());
+    // Try to insert a new InternalEventModel into the InternalEventList
+    // (beginning of the simulation the EventTable is empty or after an infinity
+    // time advance).
+    std::pair <InternalEventModel::iterator, bool> r =
+        mInternalEventModel.insert(
+            std::pair <Simulator*, InternalEvent*>(event->getModel(), NULL));
 
-    if (mInternalEventModel[event->getModel()])
-      mInternalEventModel[event->getModel()]->invalidate();
+    // If a InternalEventModel exist, we invalidate the associated internal
+    // events.
+    if (r.first->second)
+        r.first->second->invalidate();
 
-    mInternalEventModel[event->getModel()] = event;
+    // We assign the newly InternalEvent.
+    r.first->second = event;
+
     return true;
 }
 
