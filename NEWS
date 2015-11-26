@@ -1,7 +1,8 @@
-= VLE 1.1 =
+VLE 1.1
+=======
 
 Release highlights
-==================
+------------------
 
 From VLE 1.1, the extension (FSA, Petri net, Difference Equation,
 etc.) are provided into packages. A package can provides simulators,
@@ -35,27 +36,90 @@ depends of an MPI library.
 Switch VLE to Github.
 
 Changes from vle-1.1.2
-======================
+----------------------
 
-Gauthier Quesnel (10):
+### Important features
 
-- github: add travis hooks config
-- utils: fix regular expression in unit test package
-- utils: fix deallocated memory in SpawnUnix
-- devs: fix a potential segfault in Coordinator
-- vpz: remove useless assignment in CoupledModel
-- mvle: assign a default value to the number of VPZ
-- utils: simplify source in SpawnUnix
-- cpack: fix installation of gtksourceview directory
-- NEWS: update
+- An experimental GVLE2 in QT appears. To enable it, install QT 4.8 and adjust
+  the `WITH_QT=YES` to CMake configure script.
+- Add a new cluster simulations tools that run big experimental frames from
+  input files. Try *cvle*!
 
-Ronan Trépos (2):
+### Important bug fixes
 
-- utils: fix messages in ModuleManager
-- utils: remove extra test of finished spawn
+- Fix an important bug with definition of `infinity` and `negativeInfinity`
+  predicates in the `vle::devs` namespace. These functions are mainly used into
+  the Decision extension.
+- Fix the simulation kernel scheduler when multiple executives internal events
+  are in the same bag but at different hierarchical level. Now, we prioritize
+  lower levels.
+- Fix source code to C++11.
+- Fix some GVLE bugs.
+- Fix memory allocation in the `vle::value::Matrix`.
+
+### log
+
+Gauthier Quesnel (15):
+
+-  vle: patch for compiling under Mac OS
+-  travis: add test and build type
+-  devs: fix time infinity and negativeInfinity predicates
+-  travis: fix script to correct test
+-  travis: fix script to correct test
+-  NEWS: update
+-  cvle: add a new cluster simulation tools
+-  utils: fix compilation error with c++11
+-  CMakeLists: propagates -std=C++11 CC option from pkg-config
+-  gvle: fix compilation error with gcc5 and c++11
+-  devs: fix executives internal events conflict in scheduler
+-  devs: increasing the speed of the putInternalEvent function
+-  devs: fix the executive internal events sort
+
+Patrick Chabrier (12):
+
+-  gvle: fix the tuple editor dialog
+-  gvle: enlarge the gvle API
+-  gvle2: add the new GUI
+-  gvle2: fix the opening of an empty vpz
+-  gvle2: add a Project editor
+-  gvle2: add Qt for windows
+-  gvle2: fix the experimental condition settings
+-  gvle: fix the modeling plugin
+-  gvle2: add the observable editor and selector
+-  gvle2: refactor the project treeview
+-  gvle2: add a remove file feature
+-  gvle2: update the installer builder
+
+Ronan Trépos (25):
+
+-  utils: improve reading the Preferences
+-  gvle2: add output configuration tab
+-  gvle2: refactoring widget vpz
+-  gvle2: remove vpzexpcond API and refactor cond GUI
+-  value: fix update of attributes on Matrix::resize
+-  gvle2: enhance XML api
+-  gvle2: fix the enumeration of views
+-  gvle2: remove vleVpzDynamic API
+-  gvle2: reduce vleVpzModel API
+-  gvle2: enhance vleVpz API
+-  gvle2: use QXmlSimpleReader to parse vpz
+-  gvle2: vpz classes
+-  gvle2: replace main view with VpzDiagScene
+-  gvle2: add a menu for the views
+-  gvle2: add undo/redo process for diagrams
+-  gvle2: simplify dynamics tab and add undo/redo
+-  value: add a news functions
+-  gvle2: simplify conditions and add undo/redo
+-  gvle2: first version of condition plugins
+-  gvle2: impromvements for conditions and plugins
+-  gvle2: simplify views and add undo/redo
+-  gvle2: simplify observables and add undo/redo
+-  gvle2: change selection of observables
+-  gvle2: add undo/redo for Project tab
+-  gvle2: update simulation plugin API with metadata
 
 Changes from vle-1.1.1
-======================
+----------------------
 
 Gauthier Quesnel (8):
 
@@ -74,7 +138,7 @@ Ronan Trépos (2):
 - utils: remove extra test of finished spawn
 
 Changes from vle-1.1.0
-======================
+----------------------
 
 - AUTHORS: update
 - Switch to 2014
@@ -83,7 +147,7 @@ Changes from vle-1.1.0
 - gvle: fix the matrix value editor
 
 Changes from vle-1.1.0-beta4
-============================
+----------------------------
 
 - README: adding Gtksourceview dependency
 - devs: add a runtime access to the simulation results
@@ -104,7 +168,7 @@ Changes from vle-1.1.0-beta4
 - win32: fix the default VLE_HOME
 
 Changes from vle-1.1.0-beta3
-============================
+----------------------------
 
 - devs: fix Dynamics::init() with negative Time
 - devs: improve the positive and negative infinity test
@@ -119,7 +183,7 @@ Changes from vle-1.1.0-beta3
 - vpz: fix an error message
 
 Changes from vle-1.1.0-beta2
-============================
+----------------------------
 
 - README: switch to rst
 - cli: add user messages in RemoteManager
@@ -161,7 +225,7 @@ Changes from vle-1.1.0-beta2
 - win32: fix cmake install command
 
 Changes from vle-1.1.0-beta1
-============================
+----------------------------
 
 - cli: fix uncaught exception
 - cmake: fix the error message in gvle
@@ -179,16 +243,14 @@ Changes from vle-1.1.0-beta1
 - win32: fix the test_package test
 
 Details
-=======
+-------
 
-VLE
----
+### VLE
 
 We replace the init and finalize functions in old libvleutils,
 libvlevalue, libvlemanager with a new classical object.
 
-Utils
------
+### Utils
 
 - Add a new RemoteMananger class to access remote repositories. The
   command line interface is inspirited from the apt-get debian's
@@ -213,8 +275,7 @@ Utils
   access to OOV and EOV. Thus, the utils::Socket and utils::Hosts are
   useless.
 
-Manager
--------
+### Manager
 
 Rewrite the Manager system:
 
@@ -229,19 +290,16 @@ Rewrite the Manager system:
   and, or, xor, equal and different between SimulationOptions and
   LogOptions to ensure correct type casting.
 
-Vpz
----
+### Vpz
 
 - Remove any reference to distant and local dynamics plugins.
 
 - Merge the libgraph.
 
-Extension
----------
+### Extension
 
 We move the extension into the repository `packages`.
 
-Geometry, Eov and Graph
------------------------
+### Geometry, Eov and Graph
 
 These three librarires are removed.
