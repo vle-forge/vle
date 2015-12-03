@@ -33,7 +33,7 @@
 #include <boost/lexical_cast.hpp>
 #include <iomanip>
 
-#ifdef G_OS_WIN32
+#ifdef _WIN32
 #include <io.h>
 #endif
 

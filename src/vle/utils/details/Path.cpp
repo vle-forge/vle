@@ -28,7 +28,7 @@
 #include <list>
 #include <stdlib.h>
 
-#ifdef G_OS_WIN32
+#ifdef _WIN32
 #include <io.h>
 #endif
 
@@ -40,6 +40,7 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/version.hpp>
 
@@ -236,9 +237,9 @@ PathList Path::getBinaryLibraries()
             if (fs::is_regular(jt->status())) {
                 fs::path::string_type ext = fs::extension(jt->path());
 #endif
-#ifdef G_OS_WINDOWS
+#ifdef _WIN32
                 if (ext == ".dll") {
-                    result.push_back(jt->path().file_string());
+                    result.push_back(jt->path().string());
                 }
 #elif G_OS_MACOS
                 if (ext == ".dylib") {
@@ -425,20 +426,25 @@ std::string Path::writeToTemp(const std::string& prefix,
                               const std::string& buffer)
 {
     std::string filename;
-    int fd;
+//    int fd;
 
     boost::filesystem::path temp = boost::filesystem::unique_path();
-    std::string tempstr    = temp.native();
+    boost::filesystem::ofstream of (temp);
+    of << buffer.c_str();
+/*#ifdef _WIN32
+    const std::wstring tempstr    = temp.native();
+#else
+    const std::string tempstr    = temp.native();
+#endif
 
     fd = ::fileno(std::fopen(tempstr.c_str(), "+wb"));
-
     if (fd == -1) {
         throw utils::InternalError(fmt(
                 _("Cannot open file %2% with prefix %1% in temporary "
                   "directory\n")) % prefix % filename);
     }
 
-#ifdef G_OS_WIN32
+#ifdef _WIN32
     ssize_t sz = ::_write(fd, buffer.c_str(), buffer.size());
 #else
     ssize_t sz = ::write(fd, buffer.c_str(), buffer.size());
@@ -450,12 +456,12 @@ std::string Path::writeToTemp(const std::string& prefix,
             filename);
     }
 
-#ifdef G_OS_WIN32
+#ifdef _WIN32
     ::_close(fd);
 #else
     ::close(fd);
 #endif
-
+*///TODO
     return filename;
 }
 

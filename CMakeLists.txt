@@ -84,11 +84,6 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQU
   endif ()
 endif ()
 
-#
-# Check libraries with pkgconfig
-#
-find_package(PkgConfig REQUIRED)
-
 # FIXME use old-style link directories for now
 if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
@@ -104,25 +99,27 @@ if (WITH_GVLE)
   SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
 endif ()
 
-pkg_check_modules(VLEDEPS libarchive libxml-2.0)
 
-
-if (NOT VLEDEPS_FOUND)
+if (WIN32)
+  SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/share/cmake ${CMAKE_MODULE_PATH})
+  set(VLEDEPS_DEBUG 1)
+  find_package(VLEDEPS REQUIRED)
+else ()
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(VLEDEPS libarchive libxml-2.0)
+  if (NOT VLEDEPS_FOUND)
     message(FATAL_ERROR "Failed to find minimal dependencies: libarchive "
       " and libxml-2.0")
+  endif ()
 endif ()
+
+
 
 # Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
 # #seems to be a CMake'list. So we replace ';' with ' '.
 string(REPLACE ";" " " VLEDEPS_CFLAGS_OTHER_STRING "${VLEDEPS_CFLAGS_OTHER}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VLEDEPS_CFLAGS_OTHER_STRING}")
 
-if (WITH_QT)
-  find_package(Qt4 REQUIRED)
-  if (NOT QT_FOUND)
-    message(FATAL_ERROR "Qt is required")
-  endif (NOT QT_FOUND)
-endif ()
 
 
 #
@@ -139,19 +136,21 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_DETAILED_FAILURE_MSG ON)
 set(Boost_DEBUG OFF)
 
+
+
 if (VLE_BOOST_INCLUDE_PATH AND VLE_BOOST_LIBRARIES_PATH)
  set (BOOST_LIBRARYDIR ${VLE_BOOST_LIBRARIES_PATH})
  set (BOOST_INCLUDEDIR ${VLE_BOOST_INCLUDE_PATH})
 endif ()
 
-find_package(Boost COMPONENTS unit_test_framework thread filesystem system
-  chrono date_time regex program_options serialization mpi)
-
-if (NOT Boost_FOUND)
-  message(STATUS "Boost is not founded. Try without chrono")
+set(Boost_DEBUG 0)
+if (WITH_MVLE OR WITH_CVLE)
   find_package(Boost COMPONENTS unit_test_framework thread filesystem system
-    date_time regex program_options)
-endif ()
+    chrono date_time regex program_options serialization mpi)
+else ()
+  find_package(Boost COMPONENTS unit_test_framework thread filesystem system
+    chrono date_time regex program_options)
+endif()
 
 if (NOT Boost_FILESYSTEM_FOUND)
   message(FATAL_ERROR "The boost filesystem library is required")
@@ -311,6 +310,7 @@ endif (WITH_DOXYGEN)
 # Browse the src subdirectory
 #
 ADD_SUBDIRECTORY(src)
+
 
 #
 # Status

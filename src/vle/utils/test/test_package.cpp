@@ -84,7 +84,7 @@ static std::string get_temporary_path()
 
 #ifdef _WIN32
     return "c:/tmp";
-#else
+#else	
     return "/tmp";
 #endif
 }

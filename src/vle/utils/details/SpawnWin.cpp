@@ -35,7 +35,7 @@
 #include <functional>
 #include <fstream>
 #include <windows.h>
-#include <glib.h>
+#include <iostream>
 
 
 namespace vle { namespace utils {
@@ -133,7 +133,7 @@ static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
 static Envp prepareEnvironmentVariable()
 {
     Envp envp;
-    gchar** allenv = g_listenv();
+    /*gchar** allenv = g_listenv();
     gchar** it = allenv;
 
     while (*it != NULL) {
@@ -152,8 +152,11 @@ static Envp prepareEnvironmentVariable()
         it++;
     }
 
-    g_strfreev(allenv);
+    g_strfreev(allenv);*///TODO
 
+	envp.push_back(replaceEnvironmentVariable(
+                       "SystemRoot",
+                       "C:\\Windows", false));
     envp.push_back(replaceEnvironmentVariable(
                        "PATH",
                        Path::buildFilename(
@@ -480,6 +483,8 @@ struct Spawn::Pimpl
                const std::string& workingdir,
                const std::vector < std::string > &args)
     {
+		
+		
         HANDLE hOutputReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hErrorReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hOutputWrite = INVALID_HANDLE_VALUE;
@@ -533,6 +538,7 @@ struct Spawn::Pimpl
         err__ << "Cmd: [" << cmdline << "]\n";
 
         ZeroMemory(&m_pi, sizeof(PROCESS_INFORMATION));
+
         if (!(CreateProcess(NULL, cmdline, NULL, NULL, TRUE,
                             CREATE_NO_WINDOW,
                             envp,

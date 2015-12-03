@@ -86,11 +86,11 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
 
 std::string Path::findProgram(const std::string& exe)
 {
-    std::string res("");
+    std::string res("");    
     if (exe == "cmake" or exe == "cmake.exe") {
         res =  Path::buildFilename(
                 UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
-                                   "CMake","bin", "cmake.exe");
+                                   "bin", "cmake.exe");
     } else if (exe == "vle" or exe == "vle.exe"){
         res =  Path::buildFilename(
                 UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),

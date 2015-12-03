@@ -120,17 +120,13 @@ if (${_find_vle_using_cmake})
 
   set(VLE_INCLUDE_DIRS
     ${_vle_base_include}/vle-${VLE_ABI_VERSION};
-    ${_vle_base_include}; ${_vle_base_include}/libxml2;
-    ${_vle_base_include}/glibmm-2.4;${_vle_base_lib}/glibmm-2.4/include;
-    ${_vle_base_include}/sigc++-2.0;${_vle_base_lib}/sigc++-2.0/include;
-    ${_vle_base_include}/glib-2.0;${_vle_base_lib}/glib-2.0/include)
+    ${_vle_base_include}; ${_vle_base_include}/libxml2)
 
   set(VLE_LIBRARY_DIRS
     ${_vle_base_bin};${_vle_base_lib})
 
   set (VLE_LIBRARIES
-    vle-${VLE_ABI_VERSION} xml2 glibmm-2.4 gobject-2.0 sigc-2.0 gthread-2.0
-    glib-2.0 intl)
+    vle-${VLE_ABI_VERSION} xml2 intl)
 
   set (VLE_SHARE_DIR "${_vle_base_include}/../share/vle-${VLE_ABI_VERSION}")
 
