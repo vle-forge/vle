@@ -428,7 +428,8 @@ bool SimpleViewDrawingArea::on_button_press_event(GdkEventButton* event)
     case GVLE::VLE_GVLE_ADDLINK:
         if (event->button == 1) {
             addLinkOnButtonPress(mMouse.get_x(), mMouse.get_y());
-            mPrecMouse = mMouse;
+            mPrecMouse.set_x(mMouse.get_x());
+            mPrecMouse.set_y(mMouse.get_y());
             queueRedraw();
         }
         break;
@@ -442,7 +443,8 @@ bool SimpleViewDrawingArea::on_button_press_event(GdkEventButton* event)
         break;
     case GVLE::VLE_GVLE_ZOOM:
         if (event->button == 1) {
-            mPrecMouse = mMouse;
+            mPrecMouse.set_x(mMouse.get_x());
+            mPrecMouse.set_y(mMouse.get_y());
             queueRedraw();
         }
         queueRedraw();

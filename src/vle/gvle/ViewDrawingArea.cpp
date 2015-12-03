@@ -558,14 +558,16 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
                     mPrecMouse.get_x() == -1 ? 0 : mPrecMouse.get_x(),
                     mPrecMouse.get_y() == -1 ? 0 : mPrecMouse.get_y(),
                     mMouse.get_x(), mMouse.get_y());
-                mPrecMouse = mMouse;
+                mPrecMouse.set_x(mMouse.get_x());
+                mPrecMouse.set_y(mMouse.get_y());
                 queueRedraw();
             } else {
                 queueRedraw();
             }
         } else {
             highlightLine((int)mMouse.get_x(), (int)mMouse.get_y());
-            mPrecMouse = mMouse;
+            mPrecMouse.set_x(mMouse.get_x());
+            mPrecMouse.set_y(mMouse.get_y());
         }
         break;
     case GVLE::VLE_GVLE_ZOOM:
@@ -578,11 +580,13 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
             addLinkOnMotion((int)mMouse.get_x(), (int)mMouse.get_y());
             queueRedraw();
         }
-        mPrecMouse = mMouse;
+        mPrecMouse.set_x(mMouse.get_x());
+        mPrecMouse.set_y(mMouse.get_y());
         break;
     case GVLE::VLE_GVLE_DELETE:
         highlightLine((int)event->x, (int)event->y);
-        mPrecMouse = mMouse;
+        mPrecMouse.set_x(mMouse.get_x());
+        mPrecMouse.set_y(mMouse.get_y());
         break;
     default:
         break;
@@ -645,7 +649,8 @@ void ViewDrawingArea::on_gvlepointer_button_1(vpz::BaseModel* mdl,
         }
         mGVLE->getMenu()->hideCopyCut();
         mView->clearSelectedModels();
-        mPrecMouse = mMouse;
+        mPrecMouse.set_x(mMouse.get_x());
+        mPrecMouse.set_y(mMouse.get_y());
         queueRedraw();
     }
     queueRedraw();
