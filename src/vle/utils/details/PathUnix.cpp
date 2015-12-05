@@ -67,7 +67,11 @@ void Path::initHomeDir()
      * If no VLE_HOME directory, we build $HOME/.vle directory.
      */
     if (m_home.empty()) {
-        std::string homepath(std::getenv("HOME"));
+        const char* path_str = std::getenv("HOME");
+        std::string homepath("");
+        if (path_str) {
+            homepath.assign(path_str);
+        }
         m_home = utils::Path::buildDirname(homepath, ".vle");
     }
 }

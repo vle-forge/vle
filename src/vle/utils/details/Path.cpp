@@ -346,7 +346,11 @@ void Path::addModelingDir(const std::string& dirname)
 
 bool Path::readEnv(const std::string& variable, PathList& out)
 {
-    std::string path(std::getenv(variable.c_str()));
+    const char* path_str = std::getenv(variable.c_str());
+    std::string path("");
+    if (path_str) {
+        path.assign(path_str);
+    }
     if (not path.empty()) {
         PathList result;
         boost::algorithm::split(result, path, boost::is_any_of(":"),
@@ -365,8 +369,11 @@ bool Path::readEnv(const std::string& variable, PathList& out)
 
 void Path::readHomeDir()
 {
-
-    std::string path(std::getenv("VLE_HOME"));
+    const char* path_str = std::getenv("VLE_HOME");
+    std::string path("");
+    if (path_str) {
+        path.assign(path_str);
+    }
     if (not path.empty()) {
         if (fs::is_directory(path)) {
             m_home = path;

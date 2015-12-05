@@ -109,8 +109,16 @@ void Path::initHomeDir()
      * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
      */
     if (m_home.empty()) {
-        std::string homedrive(std::getenv("HOMEDRIVE"));
-        std::string homepath(std::getenv("HOMEPATH"));
+        const char* homedrive_str = std::getenv("HOMEDRIVE");
+        std::string homedrive("");
+        if (homedrive_str) {
+            homedrive.assign(homedrive_str);
+        }
+        const char* homepath_str = std::getenv("HOMEPATH");
+        std::string homepath("");
+        if (homepath_str) {
+            homepath.assign(homepath_str);
+        }        
         m_home = utils::Path::buildDirname(homedrive, homepath, "vle");
     }
 }
