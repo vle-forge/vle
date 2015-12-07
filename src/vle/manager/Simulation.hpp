@@ -48,6 +48,8 @@ namespace vle { namespace manager {
 class VLE_API Simulation
 {
 public:
+    typedef value::Map result_type;
+
     Simulation(LogOptions         logoptions,
                SimulationOptions  simulationoptionts,
                std::ostream      *output);

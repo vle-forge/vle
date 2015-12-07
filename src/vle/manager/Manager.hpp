@@ -51,6 +51,8 @@ namespace vle { namespace manager {
 class VLE_API Manager
 {
 public:
+    typedef value::Matrix result_type;
+
     Manager(LogOptions            logoptions,
             SimulationOptions     simulationoptions,
             std::ostream         *output);
