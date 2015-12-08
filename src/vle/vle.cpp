@@ -46,8 +46,6 @@ Init::Init()
 {
     __vle_init();
 
-    setlocale(LC_ALL, "");
-
 #ifdef VLE_HAVE_NLS
     bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().c_str());
     textdomain(VLE_LOCALE_NAME);

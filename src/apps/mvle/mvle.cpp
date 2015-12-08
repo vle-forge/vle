@@ -233,7 +233,7 @@ int main(int argc, char **argv)
     bool show = false;
     bool result;
 
-    vle::Init app;
+    vle::Init app("");
 
     if ((result = mvle_mpi_init(&argc, &argv, &rank, &world))) {
         int vpz = 0;
