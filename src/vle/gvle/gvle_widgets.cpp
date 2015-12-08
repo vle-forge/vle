@@ -1112,6 +1112,7 @@ VleValueWidget::onTextUpdated(const QString& id, const QString& /*old*/,
             vle::value::Value* val = editVal->toMap().get(oldKey);
             editVal->toMap().value().erase(oldKey);
             editVal->toMap().set(newVal.toStdString(), val);
+            showCurrentValueDetail();
         } else {
             editVal->toMap().get(id.toStdString())->toString().set(
                     newVal.toStdString());
