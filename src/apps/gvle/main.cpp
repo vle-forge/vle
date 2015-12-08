@@ -40,9 +40,10 @@ typedef std::vector < std::string > CmdArgs;
 
 struct GVLE
 {
-    vle::Init app("");
+    vle::Init app;
 
     GVLE(int verbose)
+        : app("")
     {
         vle::utils::Trace::setLogFile(
                 vle::utils::Trace::getLogFilename("gvle.log"));
