@@ -52,7 +52,7 @@ typedef std::vector < std::string > CmdArgs;
 
 struct VLE
 {
-    vle::Init app;
+    vle::Init app("");
 
     VLE(int verbose, int trace)
     {

@@ -424,7 +424,7 @@ int run_as_master(const std::string &inputfile,
     int blockid = 0;
 
     try {
-        vle::Init app;
+        vle::Init app("");
         Root r(inputfile, outputfile, blocksize);
         boost::mpi::communicator comm;
         std::vector <bool> workers(comm.size(), false);
