@@ -335,6 +335,11 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
     subMenu->setEnabled(ui->table->item(index.row(), index.column()) and
             (index.column() > 1) and
             (ui->table->cellWidget(index.row(), index.column()) != 0));
+    action = menu.addAction("Remove value");
+    action->setData("EMenuValueRemove");
+    action->setEnabled(ui->table->item(index.row(), index.column()) and
+            (index.column() > 1) and
+            (ui->table->cellWidget(index.row(), index.column()) != 0));
 
     QAction* act = menu.exec(globalPos);
     if (act) {
@@ -373,6 +378,11 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
                 mVpm->fillWithValue(cond, port, index.column()-2, *v);
             }
             delete v;
+            reload(false);
+        } else if (actCode == "EMenuValueRemove") {
+            QString cond = getTextEdit(index.row(),0)->getCurrentText();
+            QString port = getTextEdit(index.row(),1)->getCurrentText();
+            mVpm->rmValuePortCondToDoc(cond, port, index.column()-2);
             reload(false);
         } else {//add from plugin
             mCurrCondName = mVpm->newCondNameToDoc();

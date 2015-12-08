@@ -1598,6 +1598,7 @@ vleVpz::rmValuePortCondToDoc(const QString& condName, const QString& portName,
 {
     if (index >= 0) {
         QDomNode port = portFromDoc(condName, portName);
+        undoStack->snapshot(port);
         if (port.childNodes().length() > (unsigned int) index ) {
             QDomNode n = port.childNodes().at(index);
             port.removeChild(n);
