@@ -37,9 +37,9 @@ namespace {
  * @return @e depth returns 0 if executive is in the top model otherwise a
  * internet less than 0.
  */
-inline unsigned depth(const vle::devs::Dynamics *mdl) throw()
+inline int depth(const vle::devs::Dynamics *mdl) throw()
 {
-    unsigned ret = 0;
+    int ret = 0;
 
     const vle::vpz::CoupledModel *parent = mdl->getModel().getParent();
     while (parent != NULL) {
@@ -81,9 +81,10 @@ std::map < Simulator*, EventBagModel >::value_type&
             // If the latest element in the bag is an executive internal event,
             // we sort all executive events according to the DEVS hierarchy of
             // the structure.
-            if (_itbags == _bags.end())
+            if (_itbags == _bags.end()) {
                 _exec.sort(::ExecutiveSort());
-
+                _itexec = _exec.begin();
+            }
         } else {
             std::map < Simulator*, EventBagModel >::iterator r = _itbags;
             ++_itbags;
@@ -91,8 +92,10 @@ std::map < Simulator*, EventBagModel >::value_type&
             // If the latest element in the bag is an dynamics internal event,
             // we sort all executive events according to the DEVS hierarchy of
             // the structure.
-            if (_itbags == _bags.end())
+            if (_itbags == _bags.end()) {
                 _exec.sort(::ExecutiveSort());
+                _itexec = _exec.begin();
+            }
 
             return *r;
         }
