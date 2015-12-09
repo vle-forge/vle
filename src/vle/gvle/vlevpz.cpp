@@ -2925,12 +2925,8 @@ vleVpz::setTimeStepToDoc(const QString& viewName, double ts)
         return;
     }
     if (viewTypeFromDoc(viewName) == "timed" and ts > 0.0) {
-        if (not node.attributes().contains("timestep")) {
-            QDomAttr a = getDomDoc().createAttribute("timestep");
-            node.appendChild(a);
-        }
-        node.attributes().namedItem("timestep").setNodeValue(
-                                QVariant(ts).toString());
+        setAttributeValue(node.toElement(), "timestep",
+                QVariant(ts).toString());
     }
 }
 
