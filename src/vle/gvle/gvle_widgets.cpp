@@ -951,7 +951,7 @@ VleValueWidget::onMenuSetView(const QPoint& pos)
                 break;
             } case vle::value::Value::MAP: {
                 editVal->toMap().value().erase(static_cast<VleTextEdit*>(
-                        table->cellWidget(0, index.column()))
+                        table->cellWidget(index.row(), 0))
                         ->getCurrentText().toStdString());
                 break;
             } default : {
@@ -1000,7 +1000,8 @@ VleValueWidget::onMenuSetView(const QPoint& pos)
                 break;
             } case vle::value::Value::MAP: {
                 editVal->toMap().set(static_cast<VleTextEdit*>(
-                        table->cellWidget(0, 1))->id.toStdString(), v);
+                        table->cellWidget(index.row(), 1))
+                        ->id.toStdString(), v);
                 break;
             } case vle::value::Value::MATRIX: {
                 editVal->toMatrix().set( index.column(), index.row(), v);
