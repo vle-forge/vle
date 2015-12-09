@@ -171,6 +171,17 @@ vleVpz::vleVpz(const QString& filename) :
     undoStack->init(getDomDoc());
 }
 
+vleVpz::vleVpz(QXmlInputSource& source):
+  mFilename(), mPath(), mFile(), mDoc("vle_project"),
+  mPackage(0), mLogger(0), undoStack(0)
+{
+    QXmlSimpleReader reader;
+    mDoc.setContent(&source, &reader);
+    mVdo = new vleDomVpz(&mDoc);
+    undoStack = new vleDomDiffStack(mVdo);
+    undoStack->init(getDomDoc());
+}
+
 const QDomDocument&
 vleVpz::getDomDoc() const
 {
@@ -3043,17 +3054,21 @@ vleVpz::buildValue(const QDomNode& node, bool buildText) const
 
     }
     if (node.nodeName() == "tuple") {
-        if (node.childNodes().length() != 1){
+        if (node.childNodes().length() > 1){
             qDebug() << "Internal error in buildValue (4)";
             return 0;
         }
-        QString qv = node.childNodes().item(0).toText().nodeValue();
-        QStringList vals = qv.split(" ");
-        vle::value::Tuple* res = new vle::value::Tuple(vals.length());
-        for (int i = 0; i<vals.size();i++) {
-            (*res)[i] = QVariant(vals.at(i)).toDouble();
+        if (node.childNodes().length() == 0) {
+            return new vle::value::Tuple(0, 0.0);
+        } else {
+            QString qv = node.childNodes().item(0).toText().nodeValue();
+            QStringList vals = qv.split(" ");
+            vle::value::Tuple* res = new vle::value::Tuple(vals.length());
+            for (int i = 0; i<vals.size();i++) {
+                (*res)[i] = QVariant(vals.at(i)).toDouble();
+            }
+            return res;
         }
-        return res;
     }
     if (node.nodeName() == "table") {
         if (node.childNodes().length() != 1){
@@ -3660,8 +3675,6 @@ void vleVpz::xReadDom()
     QXmlInputSource source(&mFile);
     QXmlSimpleReader reader;
     mDoc.setContent(&source, &reader);
-    QDomElement docElem = mDoc.documentElement();
-
 }
 
 void vleVpz::xSaveDom(QDomDocument *doc)

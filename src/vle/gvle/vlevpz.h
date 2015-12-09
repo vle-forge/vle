@@ -74,6 +74,7 @@ class vleVpz : public QObject
     Q_OBJECT
 public:
     vleVpz(const QString& filename);
+    vleVpz(QXmlInputSource& filename);
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
