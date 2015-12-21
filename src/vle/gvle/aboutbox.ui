@@ -42,7 +42,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="gvle.qrc">:/logo/resources/logo.png</pixmap>
+        <pixmap resource="gvle.qrc">:/logo/resources/logo/logo.png</pixmap>
        </property>
       </widget>
       <widget class="QLabel" name="label_2">

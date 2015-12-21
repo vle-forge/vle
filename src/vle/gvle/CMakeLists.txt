@@ -54,12 +54,12 @@ QT4_WRAP_UI(pluginmodelersummary_h pluginmodelersummary.ui)
 
 SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h}
   ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
-  ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h} 
+  ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h}
   ${filevpzclasses_h} ${filevpztooltip_h} ${filevpzrtool_h} ${simulationview_h}
   ${simulationrtool_h} gvle_widgets.h simulation.h logger.h sourcecpp.h
   sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
   ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
-  plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h 
+  plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h
   vleDomDiffStack.h vlevpz.h vlevpm.h
   widgetvpzproperty.h vpzDiagScene.h gvle_plugins.h
   ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h}
@@ -78,7 +78,9 @@ else (WIN32)
   set(OS_SPECIFIC_LIBRARIES dl)
 endif (WIN32)
 
-add_library(gvlelib SHARED ${gvle_SOURCES_CPP} ${gvle_SOURCES_HPP})
+QT4_ADD_RESOURCES(GVLE_QRC gvle.qrc)
+
+add_library(gvlelib SHARED ${gvle_SOURCES_CPP} ${gvle_SOURCES_HPP} ${GVLE_QRC})
 
 set_target_properties(gvlelib PROPERTIES
   VERSION 0

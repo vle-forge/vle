@@ -105,7 +105,8 @@
         </property>
         <property name="icon">
          <iconset resource="gvle.qrc">
-          <normaloff>:/icon/resources/control_play_blue.png</normaloff>:/icon/resources/control_play_blue.png</iconset>
+          <normaloff>:/icon/resources/icon/control_play_blue.png</normaloff>
+         </iconset>
         </property>
        </widget>
       </item>

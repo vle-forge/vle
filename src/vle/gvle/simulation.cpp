@@ -101,7 +101,7 @@ void simulationView::setVpm(vleVpm* vpm)
         vle::vpz::View& vv = itb->second;
         QTreeWidgetItem *item = new QTreeWidgetItem();
         item->setText(0, QString(vv.name().c_str()));
-        item->setIcon(0, *(new QIcon(":/icon/resources/magnifier.png")));
+        item->setIcon(0, *(new QIcon(":/icon/resources/icon/magnifier.png")));
         mViewsItems.append(item);
     }
 
@@ -170,7 +170,7 @@ void simulationView::insertViewPort(QString viewName, QString portName, QString 
             newItem->setData(0, Qt::UserRole+1, viewName);
             newItem->setData(0, Qt::UserRole+2, portName);
             newItem->setToolTip(0, portInfo);
-            newItem->setIcon(0, *(new QIcon(":/icon/resources/comment.png")));
+            newItem->setIcon(0, *(new QIcon(":/icon/resources/icon/comment.png")));
             item->addChild(newItem);
             break;
         }
@@ -220,7 +220,7 @@ void simulationView::simulationStart()
     for (i = mViewLastRow.begin(); i != mViewLastRow.end(); ++i)
         i.value() = 1;
 
-    ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/control_pause_blue.png")));
+    ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/icon/control_pause_blue.png")));
 
     QString expName = mVpm->project().experiment().name().c_str();
     mDuration = mVpm->project().experiment().duration();
@@ -273,7 +273,7 @@ void simulationView::simulationFinished()
         log(logMessage);
     }
     log(tr("Simulation finished"));
-    ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/control_play_blue.png")));
+    ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/icon/control_play_blue.png")));
     ui->progressBar->setFormat("%p%");
     uiTool->treeSimViews->setEnabled(true);
 }
@@ -294,13 +294,13 @@ void simulationView::onButtonGo()
                 mSimThread->setPause(false);
                 ui->progressBar->setFormat("%p%");
                 ui->progressBar->setStyleSheet("");
-                ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/control_pause_blue.png")));
+                ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/icon/control_pause_blue.png")));
             }
             else
             {
                 mSimThread->setPause(true);
                 ui->progressBar->setFormat(tr("%p% (Paused)"));
-                ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/control_play_blue.png")));
+                ui->buttonGo->setIcon(*(new QIcon(":/icon/resources/icon/control_play_blue.png")));
             }
         }
     }

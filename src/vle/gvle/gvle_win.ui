@@ -171,7 +171,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../apps/gvle/gvle.qrc">:/logo/resources/logo.png</pixmap>
+           <pixmap resource="gvle.qrc">:/logo/resources/logo/logo.png</pixmap>
           </property>
          </widget>
          <widget class="QTextBrowser" name="textBrowser_3">
@@ -865,6 +865,7 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="gvle.qrc"/>
   <include location="../../apps/gvle/gvle.qrc"/>
  </resources>
  <connections/>
