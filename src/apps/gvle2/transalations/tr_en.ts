@@ -20,7 +20,7 @@
     </message>
     <message utf8="true">
         <location filename="aboutbox.ui" line="79"/>
-        <source>Copyright © 2007-2013 INRA http://www.inra.fr</source>
+        <source>Copyright © 2007-2016 INRA http://www.inra.fr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -30,12 +30,12 @@
     </message>
     <message utf8="true">
         <location filename="aboutbox.ui" line="124"/>
-        <source>Copyright © 2003-2013 ULCO http://www.univ-littoral.fr</source>
+        <source>Copyright © 2003-2016 ULCO http://www.univ-littoral.fr</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
         <location filename="aboutbox.ui" line="145"/>
-        <source>Copyright © 2003-2013 Gauthier Quesnel quesnel@users.sourceforge.net</source>
+        <source>Copyright © 2003-2016 Gauthier Quesnel quesnel@users.sourceforge.net</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
