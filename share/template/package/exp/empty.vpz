@@ -2,6 +2,8 @@
 <!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.9.0.dtd">
 <vle_project version="1.0" date="" author="Gauthier Quesnel">
  <structures>
+   <model width="300" x="0" y="0" height="300" type="coupled" name="top">
+   </model>
  </structures>
  <dynamics>
  </dynamics>
