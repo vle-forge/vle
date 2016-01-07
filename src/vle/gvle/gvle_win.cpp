@@ -27,6 +27,7 @@
 #include <QActionGroup>
 #include <QMessageBox>
 #include <QDirIterator>
+#include <QDir>
 
 #include <iostream>
 
@@ -333,22 +334,29 @@ void gvle_win::loadOutputPlugins(PluginOutput *out, QString fileName)
     mOutputPlugins.insert(out->getname(), fileName);
 }
 
-/**
- * @brief gvle_win::onOpenProject
- *        Handler for menu function : File > New Project
- */
 void gvle_win::onNewProject()
 {
     QFileDialog FileChooserDialog(this);
 
     FileChooserDialog.setFileMode(QFileDialog::AnyFile);
     FileChooserDialog.setOptions(QFileDialog::ShowDirsOnly);
+    FileChooserDialog.setAcceptMode(QFileDialog::AcceptSave);
     FileChooserDialog.setLabelText(QFileDialog::LookIn,
-            "Choose a directory");
+                                   "Choose a directory");
     FileChooserDialog.setLabelText(QFileDialog::FileName,
-            "Name of the VLE project");
-    if (FileChooserDialog.exec())
-        newProject(FileChooserDialog.selectedFiles().first());
+                                   "Name of the VLE project");
+    if (FileChooserDialog.exec()) {
+        QString dirPkgName = FileChooserDialog.selectedFiles().first();
+        QFileInfo fInfo(dirPkgName);
+        if (fInfo.exists()) {
+            if (fInfo.isDir()) {
+                removeDir(dirPkgName);
+            } else {
+                QFile::remove(dirPkgName);
+            }
+        }
+        newProject(dirPkgName);
+    }
 }
 /**
  * @brief gvle_win::onOpenProject
@@ -1208,6 +1216,29 @@ void gvle_win::onCustomContextMenu(const QPoint &point)
             removeFile(index);
         }
     }
+}
+
+bool gvle_win::removeDir(const QString & dirName)
+{
+    bool result = true;
+    QDir dir(dirName);
+
+    if (dir.exists(dirName)) {
+        Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+            if (info.isDir()) {
+                result = removeDir(info.absoluteFilePath());
+            }
+            else {
+                result = QFile::remove(info.absoluteFilePath());
+            }
+
+            if (!result) {
+                return result;
+            }
+        }
+        result = dir.rmdir(dirName);
+    }
+    return result;
 }
 
 void gvle_win::removeFile(QModelIndex index)

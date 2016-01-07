@@ -145,7 +145,9 @@ private:
     bool tabClose(int index);
     bool closeProject();
 
+    bool removeDir(const QString& dirName);
     void removeFile(QModelIndex index);
+
 
 private:
     vlePackage         *mPackage;
