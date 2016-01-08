@@ -146,7 +146,6 @@ gvle_win::gvle_win(QWidget *parent) :
     QObject::connect(ui->statusTitleToggle,
                      SIGNAL(clicked()), this, SLOT(onStatusToggle()));
 
-    mProjectTree = new WidgetProjectTree();
     // Initiate an mutual exclusive selection on simulators menu
     mMenuSimGroup = new QActionGroup(this);
     ui->actionSimNone->setActionGroup(mMenuSimGroup);
@@ -172,8 +171,6 @@ gvle_win::~gvle_win()
 {
     mSettings->sync();
     delete mSettings;
-    if (mProjectTree)
-        delete mProjectTree;
     if (mVpm)
         delete mVpm;
 

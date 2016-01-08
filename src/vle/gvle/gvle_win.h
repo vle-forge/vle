@@ -26,7 +26,6 @@
 #define gvle_gvle_win_H
 
 #include "vle/gvle/logger.h"
-#include "widgetprojecttree.h"
 #include <QMainWindow>
 #include <QTranslator>
 #include <QTreeWidgetItem>
@@ -112,10 +111,9 @@ private slots:
     void setChangedVpz(QString filename);
 
 private:
-    Ui::gvleWin*         ui;
+    Ui::gvleWin*          ui;
     Logger*               mLogger;
     QTimer*               mTimer;
-    WidgetProjectTree*    mProjectTree;
     QSettings*            mSettings;
     vle::vpz::Vpz*        mVpm;
     bool                  mSimOpened;
@@ -136,6 +134,7 @@ protected:
     void newProject(QString pathName);
     void openProject(QString pathName);
 private:
+
     void menuRecentProjectRefresh();
     void menuRecentProjectSet(QString path, QAction *menu);
     void menuRecentProjectUpdate(QString path);

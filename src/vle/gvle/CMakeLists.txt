@@ -25,7 +25,7 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
 SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
   helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp  filevpzclasses.cpp
   filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
-  filevpzexpview.cpp simulation.cpp widgetprojecttree.cpp logger.cpp
+  filevpzexpview.cpp simulation.cpp logger.cpp
   sourcecpp.cpp sourcecpptemplate.cpp vlepackage.cpp
   vleDomDiffStack.cpp
   vlevpz.cpp vlevpm.cpp vpzDiagScene.cpp widgetvpzproperty.cpp
