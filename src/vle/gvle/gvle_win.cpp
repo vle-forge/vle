@@ -71,6 +71,7 @@ gvle_win::gvle_win(QWidget *parent) :
     QTreeView *tree = ui->treeProject;
     tree->setModel(mProjectFileSytem);
     tree->setContextMenuPolicy(Qt::CustomContextMenu);
+    tree->header()->setResizeMode(0, QHeaderView::ResizeToContents);
 
     // Open the configuration file
     std::string configFile = vu::Path::path().getHomeFile("gvle.conf");
@@ -398,13 +399,9 @@ void gvle_win::onProjectRecent5()
         openProject(path.toString());
 }
 
-/**
- * @brief gvle_win::newProject
- *        Handler for menu function : File > New Project
- */
 void gvle_win::newProject(QString pathName)
 {
-    QDir    dir(pathName);
+    QDir dir(pathName);
     std::string basename = dir.dirName().toStdString ();
 
     if (mPackage) {
@@ -1111,6 +1108,8 @@ void gvle_win::treeProjectUpdate()
     QModelIndex projectIndex = mProjectFileSytem->setRootPath(projectName);
 
     projectTreeView->setRootIndex(projectIndex);
+
+    projectTreeView->resizeColumnToContents(0);
 }
 
 void gvle_win::onTreeDblClick(QModelIndex index)
