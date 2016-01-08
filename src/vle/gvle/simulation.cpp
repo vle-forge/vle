@@ -239,21 +239,16 @@ void simulationView::simulationStart()
     mThread->start();
 }
 
-/**
- * @brief simulationView::simulationGetStep
- *        Called when thread emit a "step" signal (each run loop)
- *
- */
 void simulationView::simulationGetStep()
 {
-    // Update the progress bar
     double debugTime = mSimThread->getCurrentTime();
     double debugElapsed = debugTime - mVpm->project().experiment().begin();
-    double percent = (debugElapsed / mDuration) * 100.00;
+    double percent = qMax(100.0,(debugElapsed / mDuration) * 100.00);
     ui->progressBar->setValue(percent);
 
     mStepCount++;
 }
+
 void simulationView::simulationFinished()
 {
     try {
