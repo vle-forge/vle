@@ -3691,12 +3691,10 @@ void vleVpz::xSaveDom(QDomDocument *doc)
     vpzRoot.setAttribute("date", getDate());
     vpzRoot.setAttribute("version", getVersion());
 
-    vpzRoot.appendChild(structuresFromDoc());
-    vpzRoot.appendChild(dynamicsFromDoc());
-    vpzRoot.appendChild(classesFromDoc());
-    vpzRoot.appendChild(experimentFromDoc());
-    vpzRoot.appendChild(classesFromDoc());
-
+    vpzRoot.appendChild(structuresFromDoc().cloneNode());
+    vpzRoot.appendChild(dynamicsFromDoc().cloneNode());
+    vpzRoot.appendChild(experimentFromDoc().cloneNode());
+    vpzRoot.appendChild(classesFromDoc().cloneNode());
     doc->appendChild(vpzRoot);
 }
 

@@ -93,7 +93,7 @@ private:
     QString                     mErrorMessage;
     QString                     mOutputPath;
     QMutex                      mValueMutex;
-    vle::vpz::Vpz              *mVpm;
+    vle::vpz::Vpz              *mVpz;
     vle::devs::RootCoordinator *mRoot;
     vle::value::Map            *mOutputs;
     vle::utils::ModuleManager   mLoadedPlugin;
@@ -144,7 +144,8 @@ private:
     QWidget               *  mWidgetTool;
     simulationThread      *  mSimThread;
     QList<QTreeWidgetItem *> mViewsItems;
-    vle::vpz::Vpz         *  mVpm;
+    vleVpm                *  mVpm;
+    vle::vpz::Vpz         *  mVpz;
     vle::utils::Package   *  mCurrPackage;
     vle::utils::ModuleManager mLoadedPlugin;
     vle::value::Map       *  mOutputs;
