@@ -64,19 +64,19 @@ class gvle_win : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit gvle_win(QWidget *parent = 0);
+    explicit gvle_win(QWidget* parent = 0);
     ~gvle_win();
 
 protected:
     void loadPlugins();
-    void loadExpCondPlugins   (PluginExpCond   *plugin, QString fileName);
-    void loadModelerPlugins   (PluginModeler   *plugin, QString fileName);
-    void loadSimulationPlugins(PluginSimulator *plugin, QString fileName);
-    void loadOutputPlugins(PluginOutput *out, QString fileName);
-    void showEvent(QShowEvent *event);
-    void closeEvent(QCloseEvent *event);
+    void loadExpCondPlugins(PluginExpCond* plugin, QString fileName);
+    void loadModelerPlugins(PluginModeler* plugin, QString fileName);
+    void loadSimulationPlugins(PluginSimulator* plugin, QString fileName);
+    void loadOutputPlugins(PluginOutput* out, QString fileName);
+    void showEvent(QShowEvent* event);
+    void closeEvent(QCloseEvent* event);
     pluginModelerView *openModeler(QString filename);
-    void loadModelerClasses(pluginModelerView *modeler);
+    void loadModelerClasses(pluginModelerView* modeler);
 
 private slots:
     void onNewProject();
@@ -101,7 +101,12 @@ private slots:
     void onTabClose(int index);
     void onStatusToggle();
     void onTreeDblClick(QModelIndex index);
-    void onCustomContextMenu(const QPoint & point);
+    void onCustomContextMenu(const QPoint& point);
+    void onItemChanged(QTreeWidgetItem* item, int col);
+    void onDataChanged(QModelIndex indexTL, QModelIndex indexBR);
+    void onFileRenamed(const QString& path, const QString& oldName,
+		       const QString& newName);
+    void onCurrentChanged(const QModelIndex& index);
     void projectConfigureTimer();
     void projectBuildTimer();
     void projectInstallTimer();
@@ -145,6 +150,8 @@ private:
     bool closeProject();
 
     bool removeDir(const QString& dirName);
+    QString treeProjectRelativePath(const QModelIndex index) const;
+    void copyFile(QModelIndex index);
     void removeFile(QModelIndex index);
 
 
