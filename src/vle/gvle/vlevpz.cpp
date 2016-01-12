@@ -1092,6 +1092,9 @@ vleVpz::renameViewToDoc(const QString& oldName, const QString& newName)
         if (mVdo->attributeValue(v,"name") == oldName) {
             setAttributeValue(v.toElement(), "name", newName);
         }
+        if (mVdo->attributeValue(v,"output") == oldName) {
+            setAttributeValue(v.toElement(), "output", newName);
+        }
     }
     //rename output (view and output names are set to be equal)
     QDomNode outputs = mVdo->obtainChild(views, "outputs", true);
@@ -1356,6 +1359,25 @@ vleVpz::rmViewToDoc(const QString& viewName)
         QDomNode o = outList[i];
         if (mVdo->attributeValue(o,"name") == viewName) {
             outputs.removeChild(o);
+        }
+    }
+    QDomNode observables = mVdo->obtainChild(views, "observables", false);
+    if (observables.isNull()) {
+        return;
+    }
+    QList<QDomNode> obsList = childNodesWithoutText(observables, "observable");
+    for (int i=0; i<obsList.size(); i++) {
+        QDomNode o = obsList[i];
+        QList<QDomNode> portList = childNodesWithoutText(o, "port");
+        for (int j=0; j<portList.size(); j++) {
+            QDomNode p = portList[j];
+            QList<QDomNode> atList = childNodesWithoutText(p, "attachedview");
+            for (int k=0; k<atList.size(); k++) {
+                QDomNode a = atList[k];
+                if (mVdo->attributeValue(a,"name") == viewName) {
+                    p.removeChild(a);
+                }
+            }
         }
     }
     emit viewsUpdated();
