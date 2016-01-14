@@ -1014,6 +1014,7 @@ signals:
     void conditionsUpdated();
     void modelsUpdated();
     void dynamicsUpdated();
+    void experimentUpdated();
 
     protected:
     bool startElement(const QString &namespaceURI,

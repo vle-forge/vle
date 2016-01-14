@@ -80,9 +80,13 @@ FileVpzExpCond::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
     QObject::connect(mVpm,
-            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-            this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+                     SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+                     this,
+                     SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+    QObject::connect(mVpm,
+                     SIGNAL(experimentUpdated()),
+                     this,
+                     SLOT(onExpUpdated()));
 
 }
 
@@ -395,6 +399,13 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
 void
 FileVpzExpCond::onUndoRedoVpm(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
         QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
+{
+    showEditPlace();
+    reload(false);
+}
+
+void
+FileVpzExpCond::onExpUpdated()
 {
     showEditPlace();
     reload(false);

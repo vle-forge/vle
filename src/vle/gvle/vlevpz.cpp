@@ -871,19 +871,14 @@ void vleVpz::setExpName(const QString name)
     docElem.setAttribute("name", name);
 }
 
-
 QString vleVpz::getExpDuration() const
 {
-    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
-    QDomElement docElem = nodeList.item(0).toElement();
-    QDomNamedNodeMap attrMap = docElem.attributes();
-
-    if (attrMap.contains("duration"))
-    {
-        QDomNode xDuration = attrMap.namedItem("duration");
-        return xDuration.nodeValue();
-    }
-    return QString("");
+    QDomNode xDuration = portFromDoc("simulation_engine",
+                                     "duration");
+    std::vector<vle::value::Value*> valuesToFill;
+    fillWithMultipleValue(xDuration, valuesToFill);
+    vle::value::Value* durationValue = valuesToFill[0];
+    return QString::number(durationValue->toDouble().value());
 }
 
 void vleVpz::setExpDuration(const QString duration)
@@ -892,21 +887,27 @@ void vleVpz::setExpDuration(const QString duration)
     QDomElement docElem = nodeList.item(0).toElement();
     undoStack->snapshot(docElem);
     docElem.setAttribute("duration", duration);
+    bool ok;
+    double durationNum = duration.toDouble(&ok);
+    if (ok) {
+        vle::value::Value* durationValue =
+            new vle::value::Double(durationNum);
+        fillWithValue("simulation_engine", "duration", 0, *durationValue);
+        delete durationValue;
+
+        emit experimentUpdated();
+    }
 }
 
 QString
 vleVpz::getExpBegin() const
 {
-    QDomNodeList nodeList = getDomDoc().elementsByTagName("experiment");
-    QDomElement docElem = nodeList.item(0).toElement();
-    QDomNamedNodeMap attrMap = docElem.attributes();
-
-    if (attrMap.contains("begin"))
-    {
-        QDomNode xBegin = attrMap.namedItem("begin");
-        return xBegin.nodeValue();
-    }
-    return QString("");
+    QDomNode xBegin = portFromDoc("simulation_engine",
+                                     "begin");
+    std::vector<vle::value::Value*> valuesToFill;
+    fillWithMultipleValue(xBegin, valuesToFill);
+    vle::value::Value* beginValue = valuesToFill[0];
+    return QString::number(beginValue->toDouble().value());
 }
 
 
@@ -917,6 +918,16 @@ vleVpz::setExpBegin(const QString begin)
     QDomElement docElem = nodeList.item(0).toElement();
     undoStack->snapshot(docElem);
     docElem.setAttribute("begin", begin);
+    bool ok;
+    double beginNum = begin.toDouble(&ok);
+    if (ok) {
+        vle::value::Value* beginValue =
+            new vle::value::Double(beginNum);
+        fillWithValue("simulation_engine", "begin", 0, *beginValue);
+        delete beginValue;
+
+        emit experimentUpdated();
+    }
 }
 
 void
@@ -3291,6 +3302,7 @@ vleVpz::fillWithValue(const QString& condName, const QString& portName,
         valNode = chs[index];
     }
     fillWithValue(valNode, val);
+    emit conditionsUpdated();
     return true;
 }
 

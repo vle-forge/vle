@@ -50,7 +50,8 @@ public:
     {mId = i;};
     void setTab(QTabWidget *tab)
     {mTab = tab;};
-    void reload();
+    bool eventFilter(QObject *target, QEvent *event);
+
 
 public slots:
     void setAuthorToVpz();
@@ -61,6 +62,7 @@ public slots:
     void setExpBeginToVpz();
     void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
             QDomNode oldVpm, QDomNode newVpm);
+    void reload();
 
 protected:
 

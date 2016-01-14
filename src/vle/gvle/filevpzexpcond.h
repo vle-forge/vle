@@ -71,6 +71,7 @@ public slots:
     void onConditionMenu(const QPoint&);
     void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);
+    void onExpUpdated();
     void onTextUpdated(const QString& id, const QString& oldVal,
             const QString& newVal);
     void onIntUpdated(const QString& id, int newVal);

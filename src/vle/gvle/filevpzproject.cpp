@@ -39,7 +39,6 @@ FileVpzProject::FileVpzProject(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzProject), mTab(0), mId(0), mAuthor(0),
     mDate(0), mVersion(0), mName(0), mDuration(0),  mBegin(0), mVpm(0)
 {
-
     ui->setupUi(this);
 
     mAuthor = ui->authorLineEdit;
@@ -54,7 +53,7 @@ FileVpzProject::FileVpzProject(QWidget *parent) :
 
     mBegin = ui->beginEdit;
 
-    QDoubleValidator *beginValidator = new QDoubleValidator(DBL_MIN, DBL_MAX, 3, this);
+    QDoubleValidator *beginValidator = new QDoubleValidator(-DBL_MAX, DBL_MAX, 3, this);
     beginValidator->setNotation(QDoubleValidator::ScientificNotation);
     mBegin->setValidator(beginValidator);
 
@@ -69,8 +68,10 @@ FileVpzProject::FileVpzProject(QWidget *parent) :
     QObject::connect(mDuration, SIGNAL(editingFinished()),
                      this, SLOT(setExpDurationToVpz()) );
     QObject::connect(mBegin, SIGNAL(editingFinished()),
-                     this, SLOT(setExpBeginToVpz()) );
+                     this, SLOT(setExpBeginToVpz()));
 
+    mDuration->installEventFilter(this);
+    mBegin->installEventFilter(this);
 }
 
 FileVpzProject::~FileVpzProject()
@@ -84,9 +85,15 @@ FileVpzProject::setVpm(vleVpm* vpm)
     mVpm = vpm;
 
     QObject::connect(mVpm,
-            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-            this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+                     SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+                     this,
+                     SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+
+    QObject::connect(mVpm,
+                     SIGNAL(conditionsUpdated()),
+                     this,
+                     SLOT(reload()));
+
     reload();
 }
 
@@ -148,4 +155,31 @@ FileVpzProject::onUndoRedoVpm(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
     reload();
 }
 
+bool
+FileVpzProject::eventFilter(QObject *target, QEvent *event)
+{
+    if (target == mDuration) {
+        switch(event->type()) {
+        case QEvent::FocusOut:
+            if (mDuration->text().isEmpty()) {
+                mDuration->setText(mVpm->getExpDuration());
+            }
+            break;
+        default:
+            break;
+        }
+    } else if (target == mBegin) {
+        switch(event->type()) {
+        case QEvent::FocusOut:
+            if (mBegin->text().isEmpty()) {
+                mBegin->setText(mVpm->getExpBegin());
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return QWidget::eventFilter(target, event);
+}
 }} //namespaces
