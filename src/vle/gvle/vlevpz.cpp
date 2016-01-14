@@ -947,6 +947,8 @@ vleVpz::renameObsPortToDoc(const QString& obsName,
     QDomNode obs = obsFromObss(obss, obsName);
     QDomNode portToRename = mVdo->childWhithNameAttr(obs, "port", oldPortName);
     setAttributeValue(portToRename.toElement(),"name", newPortName);
+
+    emit observablesUpdated();
 }
 
 
@@ -1318,6 +1320,7 @@ vleVpz::addObservableToDoc(const QString& obsName)
     QDomElement elem = getDomDoc().createElement("observable");
     elem.setAttribute("name", obsName);
     observables.appendChild(elem);
+
     emit observablesUpdated();
 }
 
@@ -1470,6 +1473,8 @@ vleVpz::addObsPortToDoc(const QString& obsName, const QString& portName)
     QDomElement elem = getDomDoc().createElement("port");
     elem.setAttribute("name", portName);
     obs.appendChild(elem);
+
+    emit observablesUpdated();
 }
 
 QDomNode
@@ -1535,6 +1540,7 @@ vleVpz::rmViewToObsPortDoc(const QString& obsName, const QString& portName,
         }
     }
 
+    emit observablesUpdated();
 }
 
 void
@@ -1558,6 +1564,8 @@ vleVpz::attachViewToObsPortDoc(const QString& obsName, const QString& portName,
     QDomElement elem = getDomDoc().createElement("attachedview");
     elem.setAttribute("name", viewName);
     toBeAttachedTo.appendChild(elem);
+
+    emit observablesUpdated();
 }
 
 void
@@ -1568,6 +1576,8 @@ vleVpz::rmObsPortToDoc(const QString& obsName, const QString& portName)
     QDomNode obs = obsFromObss(obss, obsName);
     QDomNode toRm = portFromObs(obs, portName);
     obs.removeChild(toRm);
+
+    emit observablesUpdated();
 }
 
 void
@@ -1682,6 +1692,8 @@ vleVpz::rmObservableFromModel(QDomNode &node, const QString &obsName)
             unsetObsFromAtomicModel(currModel, obsName);
         }
     }
+
+    emit observablesUpdated();
 }
 
 void
@@ -1712,6 +1724,8 @@ vleVpz::renameObservableFromModel(QDomNode &node, const QString &oldName, const 
             }
         }
     }
+
+    emit observablesUpdated();
 }
 
 
@@ -2772,6 +2786,8 @@ void
 vleVpz::setObsToAtomicModel(QDomNode &node, const QString& obsName)
 {
      setAttributeValue(node.toElement(), "observables", obsName);
+
+     emit observablesUpdated();
 }
 
 void
@@ -2779,6 +2795,8 @@ vleVpz::setObsToAtomicModel(const QString& model_query, const QString& obsName)
 {
    QDomNode atom = mVdo->getNodeFromXQuery(model_query);
    setAttributeValue(atom.toElement(), "observables", obsName);
+
+   emit observablesUpdated();
 }
 
 void
@@ -2786,6 +2804,8 @@ vleVpz::unsetObsFromAtomicModel(const QString& model_query)
 {
     QDomNode atom = mVdo->getNodeFromXQuery(model_query);
     setAttributeValue(atom.toElement(), "observables","");
+
+    emit observablesUpdated();
 }
 
 void
@@ -2798,6 +2818,8 @@ vleVpz::unsetObsFromAtomicModel(QDomNode& node, const QString& obsName)
     if(mVdo->attributeValue(node, "observables") == obsName) {
         setAttributeValue(node.toElement(), "observables","");
     }
+
+    emit observablesUpdated();
 }
 
 QDomNode
