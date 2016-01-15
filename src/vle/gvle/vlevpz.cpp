@@ -161,8 +161,8 @@ vleDomVpz::getNodeFromXQuery(const QString& query,
 
 vleVpz::vleVpz(const QString& filename) :
     mFilename(filename), mPath(), mFile(mFilename), mDoc("vle_project"),
-    mPackage(0), mLogger(0), undoStack(0)
-
+    mPackage(0), mLogger(0),
+    maxPrecision(std::numeric_limits<double>::digits10), undoStack(0)
 {
     xReadDom();
 
@@ -878,7 +878,7 @@ QString vleVpz::getExpDuration() const
     std::vector<vle::value::Value*> valuesToFill;
     fillWithMultipleValue(xDuration, valuesToFill);
     vle::value::Value* durationValue = valuesToFill[0];
-    return QString::number(durationValue->toDouble().value());
+    return QString::number(durationValue->toDouble().value(), 'g', maxPrecision);
 }
 
 void vleVpz::setExpDuration(const QString duration)
@@ -907,7 +907,7 @@ vleVpz::getExpBegin() const
     std::vector<vle::value::Value*> valuesToFill;
     fillWithMultipleValue(xBegin, valuesToFill);
     vle::value::Value* beginValue = valuesToFill[0];
-    return QString::number(beginValue->toDouble().value());
+    return QString::number(beginValue->toDouble().value(), 'g', maxPrecision);
 }
 
 

@@ -1267,7 +1267,7 @@ void gvle_win::onCustomContextMenu(const QPoint &point)
     }
 }
 
-void  gvle_win::onCurrentChanged(const QModelIndex& index)
+void  gvle_win::onCurrentChanged(const QModelIndex& /*index*/)
 {
     mProjectFileSytem->setReadOnly(true);
 }
@@ -1300,14 +1300,13 @@ void  gvle_win::onFileRenamed(const QString & path,
     mProjectFileSytem->setReadOnly(true);
 }
 
-void gvle_win::onDataChanged(QModelIndex indexTL, QModelIndex indexBR)
+    void gvle_win::onDataChanged(QModelIndex /*indexTL*/, QModelIndex /*indexBR*/)
 {
     mProjectFileSytem->setReadOnly(true);
 }
 
-void gvle_win::onItemChanged(QTreeWidgetItem * item, int col)
+    void gvle_win::onItemChanged(QTreeWidgetItem* /*item*/, int /*col*/)
 {
-    qDebug() << "changed";
 }
 
 

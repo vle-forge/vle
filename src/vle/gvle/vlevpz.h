@@ -1042,6 +1042,8 @@ private:
     QDomDocument mDoc;
     vlePackage*  mPackage;
     Logger*      mLogger;
+
+    int          maxPrecision;
 protected:
     vleDomVpz*       mVdo;
     vleDomDiffStack* undoStack;

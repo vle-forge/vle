@@ -60,28 +60,33 @@ public slots:
     void setExpNameToVpz();
     void setExpDurationToVpz();
     void setExpBeginToVpz();
+    void setExpBeginDateTimeToVpz();
     void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
-            QDomNode oldVpm, QDomNode newVpm);
+		       QDomNode oldVpm, QDomNode newVpm);
     void reload();
 
 protected:
 
 private:
+    bool beginNumtoDate(const QString& num, QDateTime& date) const;
 
 private:
-    Ui::FileVpzProject *ui;
+    Ui::FileVpzProject* ui;
 
-    QTabWidget *mTab;
-    int mId;
+    QTabWidget*         mTab;
+    int                 mId;
 
-    QLineEdit *mAuthor;
-    QDateTimeEdit *mDate;
-    QLineEdit *mVersion;
-    QLineEdit *mName;
-    QLineEdit *mDuration;
-    QLineEdit *mBegin;
+    QLineEdit*          mAuthor;
+    QDateTimeEdit*      mDate;
+    QLineEdit*          mVersion;
+    QLineEdit*          mName;
+    QLineEdit*          mDuration;
+    QLineEdit*          mBegin;
+    QDateTimeEdit*      mBeginDateTime;
 
-    vleVpm*    mVpm;
+    vleVpm*             mVpm;
+
+    int                 maxPrecision;
 };
 
 }} //namepsaces

@@ -27,7 +27,10 @@
 #include <QUndoCommand>
 #include <QDoubleValidator>
 #include <QtGlobal>
+#include <vle/utils/DateTime.hpp>
 #include <float.h>
+#include <iostream>
+#include <limits>
 
 #include "filevpzproject.h"
 #include "ui_filevpzproject.h"
@@ -37,7 +40,8 @@ namespace gvle {
 
 FileVpzProject::FileVpzProject(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzProject), mTab(0), mId(0), mAuthor(0),
-    mDate(0), mVersion(0), mName(0), mDuration(0),  mBegin(0), mVpm(0)
+    mDate(0), mVersion(0), mName(0), mDuration(0),  mBegin(0), mVpm(0),
+    maxPrecision(std::numeric_limits<double>::digits10)
 {
     ui->setupUi(this);
 
@@ -47,13 +51,16 @@ FileVpzProject::FileVpzProject(QWidget *parent) :
     mName = ui->nameEdit;
     mDuration = ui->durationEdit;
 
-    QDoubleValidator *durationValidator = new QDoubleValidator(0., DBL_MAX, 3, this);
+    QDoubleValidator *durationValidator =
+        new QDoubleValidator(0., DBL_MAX, maxPrecision, this);
     durationValidator->setNotation(QDoubleValidator::ScientificNotation);
     mDuration->setValidator(durationValidator);
 
     mBegin = ui->beginEdit;
+    mBeginDateTime = ui->beginDateTimeEdit;
 
-    QDoubleValidator *beginValidator = new QDoubleValidator(-DBL_MAX, DBL_MAX, 3, this);
+    QDoubleValidator *beginValidator =
+        new QDoubleValidator(-DBL_MAX, DBL_MAX, maxPrecision, this);
     beginValidator->setNotation(QDoubleValidator::ScientificNotation);
     mBegin->setValidator(beginValidator);
 
@@ -69,6 +76,8 @@ FileVpzProject::FileVpzProject(QWidget *parent) :
                      this, SLOT(setExpDurationToVpz()) );
     QObject::connect(mBegin, SIGNAL(editingFinished()),
                      this, SLOT(setExpBeginToVpz()));
+    QObject::connect(mBeginDateTime, SIGNAL(editingFinished()),
+                     this, SLOT(setExpBeginDateTimeToVpz()));
 
     mDuration->installEventFilter(this);
     mBegin->installEventFilter(this);
@@ -85,9 +94,11 @@ FileVpzProject::setVpm(vleVpm* vpm)
     mVpm = vpm;
 
     QObject::connect(mVpm,
-                     SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+                     SIGNAL(undoRedo(QDomNode, QDomNode,
+                                     QDomNode, QDomNode)),
                      this,
-                     SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+                     SLOT(onUndoRedoVpm(QDomNode,
+                                        QDomNode, QDomNode, QDomNode)));
 
     QObject::connect(mVpm,
                      SIGNAL(conditionsUpdated()),
@@ -100,11 +111,17 @@ FileVpzProject::setVpm(vleVpm* vpm)
 void FileVpzProject::reload()
 {
     mAuthor->setText(mVpm->getAuthor());
-    mDate->setDateTime(QDateTime::fromString(mVpm->getDate(), "dddd d MMMM yyyy hh:mm"));
+    mDate->setDateTime(QDateTime::fromString(mVpm->getDate(),
+                                             "dddd d MMMM yyyy hh:mm"));
     mVersion->setText(mVpm->getVersion());
     mName->setText(mVpm->getExpName());
     mDuration->setText(mVpm->getExpDuration());
-    mBegin->setText(mVpm->getExpBegin());
+    QString beginNumString = mVpm->getExpBegin();
+    mBegin->setText(beginNumString);
+    QDateTime beginDateTime;
+    if (beginNumtoDate(beginNumString, beginDateTime)) {
+        mBeginDateTime->setDateTime(beginDateTime);
+    }
 }
 
 void FileVpzProject::setAuthorToVpz()
@@ -144,11 +161,29 @@ void FileVpzProject::setExpDurationToVpz()
 void FileVpzProject::setExpBeginToVpz()
 {
     if (mBegin->text() != mVpm->getExpBegin()) {
-        mVpm->setExpBegin(mBegin->text());
+        QString beginNumString = mBegin->text();
+        mVpm->setExpBegin(beginNumString);
+        QDateTime beginDateTime;
+        if (beginNumtoDate(beginNumString, beginDateTime)) {
+            mBeginDateTime->setDateTime(beginDateTime);
+        }
+    }
+}
+
+void FileVpzProject::setExpBeginDateTimeToVpz()
+{
+    std::string beginDateTimeString =
+        mBeginDateTime->text().toStdString();
+    try {
+        double beginNum = vle::utils::DateTime::toJulianDay(beginDateTimeString);
+        mVpm->setExpBegin(QString::number(beginNum, 'g', maxPrecision));
+        mBegin->setText(QString::number(beginNum, 'g', maxPrecision));
+    } catch (...) {
     }
 }
 
 void
+
 FileVpzProject::onUndoRedoVpm(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
         QDomNode /*oldVpm*/, QDomNode /*newVpm*/)
 {
@@ -182,4 +217,27 @@ FileVpzProject::eventFilter(QObject *target, QEvent *event)
 
     return QWidget::eventFilter(target, event);
 }
+
+bool
+FileVpzProject::beginNumtoDate(const QString& num, QDateTime& date) const
+{
+    bool ok;
+    double beginNum = num.toDouble(&ok);
+    if (ok) {
+        try {
+            QString beginNumQString = QString::fromStdString(
+                vle::utils::DateTime::toJulianDay(beginNum));
+            QString restoreLocale = QLocale::system().name();
+            QLocale::setDefault(QLocale::C);
+            date = QLocale().toDateTime(beginNumQString,
+                                        "yyyy-MMM-dd hh:mm:ss");
+            QLocale::setDefault(restoreLocale);
+        } catch (...) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 }} //namespaces
