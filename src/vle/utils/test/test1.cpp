@@ -326,6 +326,12 @@ BOOST_AUTO_TEST_CASE(julian_date)
 			vle::utils::DateTime::toJulianDayNumber("2001-10-9"));
 
     BOOST_TEST_MESSAGE("\nJulian day\n");
+
+    BOOST_REQUIRE_EQUAL("2007-01-14 01:18:59",
+                        vle::utils::DateTime::toJulianDay(2454115.05486));
+
+
+
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::toJulianDay(2454115.05486),
                         vle::utils::DateTime::toJulianDay(
 			    vle::utils::DateTime::toJulianDay(

@@ -242,7 +242,7 @@ public:
     /**
      * @brief Convert a julian date into a string.
      * @code
-     * vle::utils::DateTime::toJulianDay(2454115.05486)) = "2001-10-9:hh:mm:ss";
+     * vle::utils::DateTime::toJulianDay(2454115.05486)) = "2001-10-9 hh:mm:ss";
      * @endcode
      * @param date The date to convert.
      * @return A string representation of the julian day.
@@ -252,7 +252,7 @@ public:
     /**
      * @brief Convert a string into a julian day.
      * @code
-     * vle::utils::DateTime::toJulianDay("2001-10-9:hh:mm:ss") = 2454115.05486;
+     * vle::utils::DateTime::toJulianDay("2001-10-9 hh:mm:ss") = 2454115.05486;
      * @endcode
      * @param date The date to convert.
      * @return A string representation of the julian day.
