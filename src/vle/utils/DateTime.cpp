@@ -30,6 +30,7 @@
 #include <boost/date_time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <sstream>
 #include <cmath>
 
@@ -227,7 +228,14 @@ std::string DateTime::toJulianDay(double date)
 
     boost::posix_time::time_duration td(hours, minutes, seconds, f);
     boost::posix_time::ptime d(boost::gregorian::date(e), td);
-    return boost::posix_time::to_simple_string(d);
+
+    std::stringstream ss;
+    boost::posix_time::time_facet* facet = new boost::posix_time::time_facet();
+    facet->format("%Y-%m-%d %H:%M:%S");
+    ss.imbue(std::locale(std::locale::classic(), facet));
+    ss << d;
+    return ss.str();
+    //return boost::posix_time::to_simple_string(d);
 }
 
 double DateTime::toJulianDay(const std::string& date)
