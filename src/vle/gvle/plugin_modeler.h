@@ -63,6 +63,6 @@ protected:
 
 }}//namespaces
 
-Q_DECLARE_INTERFACE(vle::gvle::PluginModeler, "fr.inra.vle.gvle.PluginModeler/1.0")
+Q_DECLARE_INTERFACE(vle::gvle::PluginModeler, "fr.inra.vle.gvle.PluginModeler")
 
 #endif // PLUGIN_MODELER_H

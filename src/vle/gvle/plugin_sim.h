@@ -57,6 +57,6 @@ public:
 
 }} //namespaces
 
-Q_DECLARE_INTERFACE(vle::gvle::PluginSimulator, "fr.inra.vle.gvle.PluginSimulator/1.0")
+Q_DECLARE_INTERFACE(vle::gvle::PluginSimulator, "fr.inra.vle.gvle.PluginSimulator")
 
 #endif // PLUGIN_SIM_H

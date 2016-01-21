@@ -71,7 +71,7 @@ gvle_win::gvle_win(QWidget *parent) :
     QTreeView *tree = ui->treeProject;
     tree->setModel(mProjectFileSytem);
     tree->setContextMenuPolicy(Qt::CustomContextMenu);
-    tree->header()->setResizeMode(0, QHeaderView::ResizeToContents);
+    tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
     QItemSelectionModel *selmod = tree->selectionModel();
 

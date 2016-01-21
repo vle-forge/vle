@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtGui/QGraphicsRectItem>
+#include <QtGui>
 #include <QGraphicsSceneMouseEvent>
 #include <qpainterpath.h>
 
@@ -39,9 +39,9 @@ namespace gvle {
 
 VpzConnectionLineItem::VpzConnectionLineItem(QDomNode node, vleVpm* vpm,
         QLineF l, QGraphicsItem* parent, VpzDiagScene* scene):
-        QGraphicsItem(parent,scene), mVpm(vpm), mnode(node)
+        QGraphicsItem(parent), mVpm(vpm), mnode(node)
 {
-    QGraphicsLineItem* it = new QGraphicsLineItem(l,this,this->scene());
+    QGraphicsLineItem* it = new QGraphicsLineItem(l,this);
     it->setPen(scene->getPenConnection());
     update();
     it->update();
@@ -82,15 +82,14 @@ VpzPortItem::VpzPortItem(QDomNode node, vleVpm* vpm, bool input,
     this->setAcceptHoverEvents(true);
 
     QPixmap pix (":/icon/resources/vpz_inport.png");
-    QGraphicsTextItem* textItem = new QGraphicsTextItem(getPortName(), this,
-            scene);
+    QGraphicsTextItem* textItem = new QGraphicsTextItem(getPortName(), this);
     textItem->setFont(scene->getFontPort());
 //    textItem->setDefaultTextColor(Qt::black);
     //textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
     //textItem->setTextInteractionFlags(Qt::TextEditable);
     textItem->setTextInteractionFlags(Qt::NoTextInteraction);
 
-    new QGraphicsPixmapItem(pix, this, scene);
+    new QGraphicsPixmapItem(pix, this);
     update();
 }
 
@@ -153,7 +152,7 @@ VpzPortItem::getPortName()
 QGraphicsTextItem*
 VpzPortItem::getTextItem() const
 {
-    QList<QGraphicsItem*> chs = QGraphicsItem::children();
+    QList<QGraphicsItem*> chs = QGraphicsItem::childItems();
     for (int i =0; i<chs.length(); i++){
         if (chs.at(i)->type() == 8) {//8 is for QGraphicsTextItem
             return static_cast<QGraphicsTextItem*>(chs.at(i));
@@ -166,7 +165,7 @@ VpzPortItem::getTextItem() const
 QGraphicsPixmapItem*
 VpzPortItem::getPixItem() const
 {
-    QList<QGraphicsItem*> chs = QGraphicsItem::children();
+    QList<QGraphicsItem*> chs = QGraphicsItem::childItems();
     for (int i =0; i<chs.length(); i++){
         if (chs.at(i)->type() == 7) {//7 is for QGraphicsPixmapItem
             return static_cast<QGraphicsPixmapItem*>(chs.at(i));
@@ -219,7 +218,7 @@ VpzPortItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*evt*/)
 /*******************************************************************************/
 
 VpzModelItem::VpzModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* parent,
-        QGraphicsScene* scene): QGraphicsItem(parent,scene), mVpm(vpm),
+        QGraphicsScene* scene): QGraphicsItem(parent), mVpm(vpm),
                 mnode(node), margin(5), rectWidth(0), rectHeight(0)
 {
 
@@ -441,10 +440,10 @@ VpzSubModelItem::initializeFromDom()
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsMovable, false);
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsSelectable, true);
     QGraphicsTextItem* it = new QGraphicsTextItem(getModelName(),
-            this, vpzscene);
+            this);
     it->setFont(vpzscene->getFontModel());
 
-    QGraphicsRectItem * rec = new QGraphicsRectItem(QRectF(), this, vpzscene);
+    QGraphicsRectItem * rec = new QGraphicsRectItem(QRectF(), this);
     if (mVpm->vdo()->attributeValue(mnode, "type") == "atomic") {
         rec->setBrush(vpzscene->getBrushAtomicModel());
     } else {
@@ -643,7 +642,7 @@ VpzMainModelItem::initializeFromDom()
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsMovable, false);
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsSelectable, false);
 
-    QGraphicsRectItem * rec = new QGraphicsRectItem(QRectF(), this, this->scene());
+    QGraphicsRectItem * rec = new QGraphicsRectItem(QRectF(), this);
     rec->setPen(vpzscene->getPenNotSelectedModel());
     if (mVpm->vdo()->attributeValue(mnode, "type") == "atomic") {
         rec->setBrush(vpzscene->getBrushAtomicModel());
@@ -689,8 +688,7 @@ VpzMainModelItem::initializeFromDom()
         mod->setPos(QPointF(std::max(wports+margin,x),
                 std::max(0.0,y)));
     }
-    QGraphicsTextItem* it = new QGraphicsTextItem(getModelName(), this,
-                            this->scene());
+    QGraphicsTextItem* it = new QGraphicsTextItem(getModelName(), this);
     it->setFont(vpzscene->getFontModel());
     it->setDefaultTextColor(vpzscene->getColorModelNameNotSelected());
     update();
@@ -1048,6 +1046,7 @@ VpzDiagScene::setFocus(QDomNode selModelNode)
         delete mCoupled;
     }
     mCoupled = new VpzMainModelItem(selModelNode, mVpm, 0, this);
+    addItem(mCoupled);
     mCoupled->setPos(QPointF(0,0));
     mCoupled->update();
     unselectAllSubModels();
@@ -1229,7 +1228,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
         } else {
             mConnection = new QGraphicsLineItem(QLineF(
                     mPortSel1->getConnectionPoint(),
-                    event->scenePos()),0, this);
+                    event->scenePos()),0);
         }
         return;
     }

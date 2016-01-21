@@ -14,7 +14,7 @@ option(WITH_CVLE "build cvle [default: off]" OFF)
 
 #
 # Usefull variables
-# 
+#
 
 set(VLE_MAJOR 1)
 set(VLE_MINOR 3)
@@ -89,14 +89,31 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
 endif (COMMAND CMAKE_POLICY)
 
+set(QMAKE_QUERY_LIBPATH qmake -query QT_INSTALL_LIBS)
+
+execute_process(COMMAND ${QMAKE_QUERY_LIBPATH} OUTPUT_VARIABLE
+  CMAKE_PREFIX_PATH)
+
 if (WITH_GVLE)
-  find_package(Qt4 REQUIRED)
-  if (NOT QT_FOUND)
-    message(FATAL_ERROR "Qt is required")
-  endif (NOT QT_FOUND)
+  find_package(Qt5 COMPONENTS Widgets Xml Gui Help)
+  if (NOT Qt5_FOUND)
+    message(FATAL_ERROR "Qt5 is required")
+  endif (NOT Qt5_FOUND)
+  if (NOT Qt5Widgets_FOUND)
+    message(FATAL_ERROR "Qt5Widgets is required")
+  endif (NOT Qt5Widgets_FOUND)
+  if (NOT Qt5Xml_FOUND)
+    message(FATAL_ERROR "Qt5Xml is required")
+  endif (NOT Qt5Xml_FOUND)
+  if (NOT Qt5Gui_FOUND)
+    message(FATAL_ERROR "Qt5Gui is required")
+  endif (NOT Qt5Gui_FOUND)
+  if (NOT Qt5Help_FOUND)
+    message(FATAL_ERROR "Qt5Help is required")
+  endif (NOT Qt5Help_FOUND)
   set(VLE_HAVE_QT 1 CACHE INTERNAL "" FORCE)
   set(VLE_HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
-  SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
+  # SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
 endif ()
 
 
@@ -119,8 +136,6 @@ endif ()
 # #seems to be a CMake'list. So we replace ';' with ' '.
 string(REPLACE ";" " " VLEDEPS_CFLAGS_OTHER_STRING "${VLEDEPS_CFLAGS_OTHER}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VLEDEPS_CFLAGS_OTHER_STRING}")
-
-
 
 #
 # Test the libboost header and libboost-text library.
@@ -207,7 +222,7 @@ if (WITH_MVLE OR WITH_CVLE)
     if (Boost_SERIALIZATION_FOUND AND Boost_MPI_FOUND)
       set(VLE_HAVE_CVLE 1 CACHE INTERNAL "" FORCE)
     else ()
-      message(WARNING "boost mpi or boost serialization not found to build cvle") 
+      message(WARNING "boost mpi or boost serialization not found to build cvle")
       set(VLE_HAVE_CVLE 0 CACHE INTERNAL "" FORCE)
     endif ()
   else ()

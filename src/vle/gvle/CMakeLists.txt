@@ -1,16 +1,13 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-set(QT_USE_QTXML TRUE)
-set(QT_USE_QTHELP TRUE)
-
-find_package(Qt4 REQUIRED)
-include(${QT_USE_FILE})
-
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(XMLDEPS libxml-2.0)
 include_directories(${XMLDEPS_INCLUDE_DIRS})
+
+include_directories(${Qt5Widgets_INCLUDES} ${Qt5Xml_INCLUDES}
+  ${Qt5Gui_INCLUDES} ${Qt5Help_INCLUDES})
 
 if (WIN32)
   set(INTL_LIB "intl")
@@ -32,38 +29,37 @@ SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
   plugin_modeler.cpp pluginmodelerview.cpp pluginmodelersummary.cpp
   filevpzrtool.cpp gvle_plugins.cpp)
 
-QT4_WRAP_UI(ui_gvle_win_h gvle_win.ui)
-QT4_WRAP_UI(aboutbox_h aboutbox.ui)
-QT4_WRAP_UI(help_h help.ui)
-QT4_WRAP_UI(filevpzview_h     filevpzview.ui)
-QT4_WRAP_UI(filevpzdynamics_h filevpzdynamics.ui)
-QT4_WRAP_UI(filevpzproject_h filevpzproject.ui)
-QT4_WRAP_UI(filevpzobservables_h filevpzobservables.ui)
-QT4_WRAP_UI(filevpzexpcond_h  filevpzexpcond.ui)
-QT4_WRAP_UI(filevpzexpview_h  filevpzexpview.ui)
-QT4_WRAP_UI(filevpzclasses_h  filevpzclasses.ui)
-QT4_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
-QT4_WRAP_UI(filevpzrtool_h   filevpzrtool.ui)
-QT4_WRAP_UI(simulationview_h simulationview.ui)
-QT4_WRAP_UI(simulationrtool_h simulationrtool.ui)
-QT4_WRAP_UI(widgetvpzpropertydynamics_h widgetvpzpropertydynamics.ui)
-QT4_WRAP_UI(widgetvpzpropertyexpcond_h  widgetvpzpropertyexpcond.ui)
-QT4_WRAP_UI(widgetvpzpropertyobservables_h  widgetvpzpropertyobservables.ui)
-QT4_WRAP_UI(pluginmodelerview_h pluginmodelerview.ui)
-QT4_WRAP_UI(pluginmodelersummary_h pluginmodelersummary.ui)
+QT5_WRAP_UI(ui_gvle_win_h gvle_win.ui)
+QT5_WRAP_UI(aboutbox_h aboutbox.ui)
+QT5_WRAP_UI(help_h help.ui)
+QT5_WRAP_UI(filevpzview_h     filevpzview.ui)
+QT5_WRAP_UI(filevpzdynamics_h filevpzdynamics.ui)
+QT5_WRAP_UI(filevpzproject_h filevpzproject.ui)
+QT5_WRAP_UI(filevpzobservables_h filevpzobservables.ui)
+QT5_WRAP_UI(filevpzexpcond_h  filevpzexpcond.ui)
+QT5_WRAP_UI(filevpzexpview_h  filevpzexpview.ui)
+QT5_WRAP_UI(filevpzclasses_h  filevpzclasses.ui)
+QT5_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
+QT5_WRAP_UI(filevpzrtool_h   filevpzrtool.ui)
+QT5_WRAP_UI(simulationview_h simulationview.ui)
+QT5_WRAP_UI(simulationrtool_h simulationrtool.ui)
+QT5_WRAP_UI(widgetvpzpropertydynamics_h widgetvpzpropertydynamics.ui)
+QT5_WRAP_UI(widgetvpzpropertyexpcond_h  widgetvpzpropertyexpcond.ui)
+QT5_WRAP_UI(widgetvpzpropertyobservables_h  widgetvpzpropertyobservables.ui)
+QT5_WRAP_UI(pluginmodelerview_h pluginmodelerview.ui)
+QT5_WRAP_UI(pluginmodelersummary_h pluginmodelersummary.ui)
 
 SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h}
   ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
   ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h}
-  ${filevpzclasses_h} ${filevpztooltip_h} ${filevpzrtool_h} ${simulationview_h}
-  ${simulationrtool_h} gvle_widgets.h simulation.h logger.h sourcecpp.h
-  sourcecpptemplate.h ${pluginmodelerview_h} pluginmodelerview.h
-  ${pluginmodelersummary_h} pluginmodelersummary.h plugin_cond.h
-  plugin_modeler.h plugin_sim.h plugin_output.h vlepackage.h
-  vleDomDiffStack.h vlevpz.h vlevpm.h
-  widgetvpzproperty.h vpzDiagScene.h gvle_plugins.h
-  ${widgetvpzpropertydynamics_h} ${widgetvpzpropertyexpcond_h}
-  ${widgetvpzpropertyobservables_h})
+  ${filevpzclasses_h} ${filevpztooltip_h} ${filevpzrtool_h}
+  ${simulationview_h} ${simulationrtool_h} gvle_widgets.h simulation.h
+  logger.h sourcecpp.h sourcecpptemplate.h ${pluginmodelerview_h}
+  pluginmodelerview.h ${pluginmodelersummary_h} pluginmodelersummary.h
+  plugin_cond.h plugin_modeler.h plugin_sim.h plugin_output.h
+  vlepackage.h vleDomDiffStack.h vlevpz.h vlevpm.h widgetvpzproperty.h
+  vpzDiagScene.h gvle_plugins.h ${widgetvpzpropertydynamics_h}
+  ${widgetvpzpropertyexpcond_h} ${widgetvpzpropertyobservables_h})
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
@@ -78,9 +74,10 @@ else (WIN32)
   set(OS_SPECIFIC_LIBRARIES dl)
 endif (WIN32)
 
-QT4_ADD_RESOURCES(GVLE_QRC gvle.qrc)
+QT5_ADD_RESOURCES(GVLE_QRC gvle.qrc)
 
-add_library(gvlelib SHARED ${gvle_SOURCES_CPP} ${gvle_SOURCES_HPP} ${GVLE_QRC})
+add_library(gvlelib SHARED ${gvle_SOURCES_CPP} ${gvle_SOURCES_HPP}
+  ${GVLE_QRC})
 
 set_target_properties(gvlelib PROPERTIES
   VERSION 0
@@ -95,7 +92,12 @@ if (WIN32)
     LINK_FLAGS " -mwindows")
 endif ()
 
-target_link_libraries(gvlelib vlelib ${QT_LIBRARIES} ${INTL_LIB})
+add_definitions(${Qt5Widgets_DEFINITIONS} ${Qt5Xml_DEFINITIONS}
+  ${Qt5Gui_DEFINITIONS} ${Qt5Help_DEFINITIONS})
+
+target_link_libraries(gvlelib vlelib ${INTL_LIB}
+  ${Qt5Xml_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES}
+  ${Qt5Help_LIBRARIES})
 
 install(FILES ${gvle_SOURCES_HPP}
   DESTINATION ${VLE_INCLUDE_DIRS}/gvle)

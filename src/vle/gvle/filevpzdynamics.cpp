@@ -60,7 +60,7 @@ FileVpzDynamics::FileVpzDynamics(QWidget *parent) :
 
     QTableWidget* dynList = ui->tabDynamics;
 
-    dynList->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+    dynList->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     dynList->horizontalHeader()->setStretchLastSection(true);
 
     QObject::connect(ui->tabDynamics,

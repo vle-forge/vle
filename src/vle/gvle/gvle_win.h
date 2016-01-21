@@ -35,6 +35,7 @@
 #include <QTimer>
 #include <QtCore>
 #include <QtGui>
+#include <QFileSystemModel>
 
 #include "vlepackage.h"
 #include "pluginmodelerview.h"

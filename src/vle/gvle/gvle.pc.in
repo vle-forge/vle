@@ -5,8 +5,7 @@ includedir=${prefix}/include
 
 Name: gvle
 Description: gvle the other gui for VLE the multimodelling and Simulation tools
-Requires: QtCore QtXml vle-@VLE_VERSION_SHORT@
+Requires: Qt5Core Qt5Xml Qt5Help Qt5Gui Qt5Widgets vle-@VLE_VERSION_SHORT@
 Version: @VLE_VERSION@
 Libs:	-L${libdir} @VLE_GVLE_LIBRARY@ -lvle-@VLE_VERSION_SHORT@
 Cflags: -I${includedir}/vle-@VLE_VERSION_SHORT@ -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@ @VLE_PKGCONFIG_CFLAGS_OTHER@
-

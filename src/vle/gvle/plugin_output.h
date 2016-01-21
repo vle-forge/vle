@@ -47,6 +47,6 @@ public:
 
 }}//namespaces
 
-Q_DECLARE_INTERFACE(vle::gvle::PluginOutput, "fr.inra.vle.gvle.PluginOutput/1.0")
+Q_DECLARE_INTERFACE(vle::gvle::PluginOutput, "fr.inra.vle.gvle.PluginOutput")
 
 #endif
