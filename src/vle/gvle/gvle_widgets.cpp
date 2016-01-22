@@ -108,6 +108,7 @@ VleDoubleSpinBox::VleDoubleSpinBox(QWidget* parent, double val,
         const QString& idStr): QDoubleSpinBox(parent), id(idStr)
 {
     setMaximum(10000000);
+    setMinimum(-10000000);
     setFocusPolicy(Qt::StrongFocus);
     setContextMenuPolicy(Qt::NoContextMenu);
     setValue(val);
