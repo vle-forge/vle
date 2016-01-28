@@ -157,6 +157,10 @@ public:
         if (not m_finish) {
             wait();
         }
+        ::close(m_pipeout[1]);
+        ::close(m_pipeerr[1]);
+        ::close(m_pipeout[0]);
+        ::close(m_pipeerr[0]);
     }
 
     bool is_running()
