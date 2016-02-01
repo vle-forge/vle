@@ -62,7 +62,7 @@ struct F
     ~F() { }
 };
 
-BOOST_GLOBAL_FIXTURE(F)
+BOOST_GLOBAL_FIXTURE(F);
 
 struct is_odd
 {

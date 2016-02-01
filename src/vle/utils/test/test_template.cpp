@@ -57,7 +57,7 @@ struct F
     ~F() { }
 };
 
-BOOST_GLOBAL_FIXTURE(F)
+BOOST_GLOBAL_FIXTURE(F);
 
 const char* tpl1 = "@@tag test1@package.name-ext1_ext2 @@" \
                     "azertyuiop qsdfghjklm wxcvbn,;:!" \
