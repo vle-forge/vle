@@ -41,12 +41,13 @@
 #include <QDomNamedNodeMap>
 #include <QXmlDefaultHandler>
 #include <QDateTimeEdit>
+#ifndef Q_MOC_RUN 
 #include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
 #include "gvle2plugins.h"
 #include "vlevpz.h"
 #include "vleDomDiffStack.h"
-
+#endif
 
 namespace vle {
 namespace gvle2 {

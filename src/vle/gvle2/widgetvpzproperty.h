@@ -25,7 +25,9 @@
 #define GVLE2_WIDGETVPZPROPERTY_H
 
 #include <QWidget>
+#ifndef Q_MOC_RUN
 #include "vlevpz.h"
+#endif
 
 namespace Ui {
 class WidgetVpzPropertyDynamics;

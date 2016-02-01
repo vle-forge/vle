@@ -41,9 +41,11 @@
 #include <QDomNamedNodeMap>
 #include <QXmlDefaultHandler>
 #include <QDateTimeEdit>
+#ifndef Q_MOC_RUN 
 #include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
 #include "vleDomDiffStack.h"
+#endif
 #include "logger.h"
 
 
