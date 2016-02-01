@@ -15,7 +15,6 @@ Specification formalism (DEVS).
 
 For the VFL API:
 
-* glibmm (≥ 2.22)
 * libxml2 (≥ 2.8)
 * libarchive (≥ 2.0)
 * boost (≥ 1.41)
@@ -29,8 +28,8 @@ For the MPI command line:
 
 For the GUI:
 
-* gtkmm (≥ 3.0.0)
-* gtksourceview (≥ 2.0.0)
+* Qt4
+* Qwt
 
 ## Getting the code
 

@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: vle
 Description: VLE multimodelling and Simulation tools
-Requires: libxml-2.0 glibmm-2.4
+Requires: libxml-2.0
 Version: @VLE_VERSION@
 Libs:	-L${libdir} -lvle-@VLE_VERSION_SHORT@
 Cflags: -I${includedir}/vle-@VLE_VERSION_SHORT@ -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@ @VLE_PKGCONFIG_CFLAGS_OTHER@
