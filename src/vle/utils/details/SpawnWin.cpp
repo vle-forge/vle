@@ -133,31 +133,32 @@ static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
 static Envp prepareEnvironmentVariable()
 {
     Envp envp;
-    /*gchar** allenv = g_listenv();
-    gchar** it = allenv;
+    char* env_char = GetEnvironmentStrings();
+    unsigned int prev = 0;
+    std::string env_string;
+    for(unsigned int i = 0; ; i++) {
+        if (env_char[i] == '\0') {
+            env_string.assign(std::string(env_char + prev, env_char + i));
+            std::vector<std::string> splitvec;
+            boost::algorithm::split(splitvec, env_string, boost::is_any_of("="),
+                    boost::algorithm::token_compress_on);
+            if ((splitvec.size() == 2) and (not splitvec[0].empty())
+                    and (splitvec[0].size() > 1)) {
+                envp.push_back(replaceEnvironmentVariable(
+                        splitvec[0].substr(1),//don't know why we
+                                              //have to remove a blank
+                        splitvec[1], false));
+            }
 
-    while (*it != NULL) {
-        if (strcasecmp(*it, "PATH") and
-            strcasecmp(*it, "PKG_CONFIG_PATH") and
-            strcasecmp(*it, "BOOST_ROOT") and
-            strcasecmp(*it, "BOOST_INCLUDEDIR") and
-            strcasecmp(*it, "BOOST_LIBRARYDIR")) {
-
-            const gchar* res = g_getenv(*it);
-            if (res) {
-                envp.push_back(Envp::value_type(*it, res));
+            prev = i;
+            if (env_char[i + 1] == '\0') {
+                break;
             }
         }
-
-        it++;
     }
+    FreeEnvironmentStrings(env_char);
 
-    g_strfreev(allenv);*///TODO
-
-	envp.push_back(replaceEnvironmentVariable(
-                       "SystemRoot",
-                       "C:\\Windows", false));
-    envp.push_back(replaceEnvironmentVariable(
+   envp.push_back(replaceEnvironmentVariable(
                        "PATH",
                        Path::buildFilename(
                            UtilsWin::convertPathTo83Path(
