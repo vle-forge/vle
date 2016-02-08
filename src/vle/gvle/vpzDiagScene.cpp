@@ -617,7 +617,7 @@ VpzSubModelItem::removeNameEditionMode()
 VpzMainModelItem::VpzMainModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* parent,
         QGraphicsScene* scene):  VpzModelItem(node, vpm, parent, scene)
 {
-    //this->set
+    scene->addItem(this);
     initializeFromDom();
     update();
 }
