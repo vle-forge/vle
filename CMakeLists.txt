@@ -43,10 +43,6 @@ set(VLE_INCLUDE_DIR "include/vle-${VLE_VERSION_SHORT}")
 set(VLE_MANPAGE_PATH "share/man/man1")
 set(VLE_SHARE_DIRS "share/vle-${VLE_VERSION_SHORT}")
 
-#
-# CPack configuration
-#
-include(CMakeCPack.cmake)
 
 #
 # CMake modules
@@ -90,9 +86,11 @@ if (COMMAND CMAKE_POLICY)
 endif (COMMAND CMAKE_POLICY)
 
 set(QMAKE_QUERY_LIBPATH qmake -query QT_INSTALL_LIBS)
-
 execute_process(COMMAND ${QMAKE_QUERY_LIBPATH} OUTPUT_VARIABLE
   CMAKE_PREFIX_PATH)
+set(QMAKE_QUERY_HOSTPATH qmake -query QT_HOST_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${QMAKE_QUERY_HOSTPATH} OUTPUT_VARIABLE
+  QT_INSTALL_PATH)
 
 if (WITH_GVLE)
   find_package(Qt5 COMPONENTS Widgets Xml Gui Help)
@@ -113,7 +111,6 @@ if (WITH_GVLE)
   endif (NOT Qt5Help_FOUND)
   set(VLE_HAVE_QT 1 CACHE INTERNAL "" FORCE)
   set(VLE_HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
-  # SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
 endif ()
 
 
@@ -130,7 +127,10 @@ else ()
   endif ()
 endif ()
 
-
+#
+# CPack configuration
+#
+include(CMakeCPack.cmake)
 
 # Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
 # #seems to be a CMake'list. So we replace ';' with ' '.

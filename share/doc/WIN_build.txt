@@ -51,6 +51,7 @@ set VLE_BUILD_ENV=c:\natifvle
 set cmakepath=c:\CMake
 set PKG_CONFIG_PATH=c:\MinGW\lib\pkgconfig
 set boostversion=1_59
+set qmake_bin=c:\Qt\Qt5.5.1\5.5\mingw492_32\bin\
 
 set builddir="%VLE_BUILD_ENV%\build"
 set sourcedir="%VLE_BUILD_ENV%\vle"
@@ -65,6 +66,7 @@ set OLDPATH=%PATH%
 set PATH=c:\mingw\bin;%PATH%
 set PATH=%cmakepath%\bin;%PATH%
 set PATH=%vlepathtestbin%;%PATH%
+set PATH=%qmake_bin%;%PATH%
 
 mingw-get install base
 mingw-get install libarchive
@@ -84,11 +86,14 @@ bootstrap.bat gcc
 .\b2 --toolset=gcc --with-date_time --with-filesystem --with-program_options --with-random --with-regex --with-system --with-test --with-thread --with-timer variant=release threading=multi link=shared runtime-link=shared install --prefix=%boost_root%
 
 cd %builddir%\vle
-cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=OFF -DCMAKE_INSTALL_PREFIX=%installdir%\vle -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="c:\cmake" -DVLE_MINGW_PATH="c:\mingw" -DVLE_BOOST_INCLUDE_PATH=%boost_include_path% -DVLE_BOOST_LIBRARIES_PATH=%boost_library_path% %sourcedir%
+cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%installdir%\vle -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="c:\cmake" -DVLE_MINGW_PATH="c:\mingw" -DVLE_BOOST_INCLUDE_PATH=%boost_include_path% -DVLE_BOOST_LIBRARIES_PATH=%boost_library_path% %sourcedir%
 
 mingw32-make install
 mingw32-make test
 
+
+----- Qt Download
+qt.mirror.constant.com/official_releases/qt/5.5/5.5.1/qt-opensource-windows-x86-mingw492-5.5.1.exe 
 
 ---
 b2 toolset=gcc install --prefix=%boost_src%\b2
