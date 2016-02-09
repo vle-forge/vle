@@ -45,30 +45,118 @@
 #include <iostream>
 #include <iomanip>
 
+#include <cerrno>
+
 const int default_block_size_value = 5000;
 
-/**
- * @brief Convert a column name into couple condition, port.
- * @details Split the column name 'condition.name' into 'condition',
- *     'portname'.
- * @param str The column to split.
- * @return Two strings.
+typedef boost::shared_ptr <vle::vpz::Vpz> VpzPtr;
+
+/** @e Accessor stores an access to a VPZ or an undefined string.
+ * @code
+ * Accessor a("generic");
+ * Accessor b("cond.port");
+ * Accessor c("cond.port.1.value");
+ * @endcode
  */
-static
-std::pair <std::string, std::string> split_column_name(const std::string &str)
-{
-    std::string::size_type dot_position = str.find('.');
+struct Access {
 
-    if (dot_position == std::string::npos ||
-        dot_position == 0 ||
-        dot_position == str.size())
-        return std::pair <std::string, std::string>(
-                   str, std::string());
+    Access(const std::string& str)
+    {
+        namespace ba = boost::algorithm;
 
-    return std::pair <std::string, std::string>(
-               str.substr(0, dot_position),
-               str.substr(dot_position + 1, std::string::npos));
-}
+        std::vector <std::string> tokens;
+        ba::split(tokens, str, ba::is_any_of("."));
+
+        switch (tokens.size()) {
+        case 0:
+            condition = str;
+            return;
+        case 2:
+            port = tokens[1];
+        case 1:
+            condition = tokens[0];
+            break;
+        default:
+            condition = tokens[0];
+            port = tokens[1];
+            std::copy(tokens.begin() + 2, tokens.end(), std::back_inserter(params));
+            break;
+        }
+
+        assert(not condition.empty());
+        assert(not params.empty() and port.empty());
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Access& access)
+    {
+        os << access.condition;
+
+        if (not access.port.empty())
+            os << '.' << access.port;
+
+        for (std::size_t i = 0, e = access.params.size(); i != e; ++i)
+            os << '.' << access.params[i];
+
+        return os;
+    }
+
+    inline bool is_undefined_string() const
+    {
+        return port.empty();
+    }
+
+    /** @e value function try to convert the @e Access object into a
+     * @e vle::value::Value pointer by browsing the experimental condition
+     * of the @e vpz.
+     */
+    vle::value::Value* value(VpzPtr vpz) const
+    {
+        vle::vpz::Condition& cnd = vpz->project().experiment().conditions().get(condition);
+        vle::value::Set& set = cnd.getSetValues(port);
+
+        if (params.empty())
+            return set.get(0);
+
+        vle::value::Value *current = set.get(0);
+        for (std::size_t i = 0, e = params.size(); i != e; ++i) {
+            if (current->isSet()) {
+                errno = 0;
+                long int val = strtol(params[i].c_str(), NULL, 10);
+
+                if (errno == 0 or
+                    val >= boost::numeric_cast<long int>(current->toSet().size()))
+                    throw std::runtime_error(
+                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' as correct set index")
+                         % condition % port % i).str());
+
+                current = current->toSet().get(val);
+            } else if (current->isMap()) {
+                vle::value::Map::iterator it = current->toMap().find(params[i]);
+
+                if (it == current->toMap().end())
+                    throw std::runtime_error(
+                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' as correct map index")
+                         % condition % port % i).str());
+
+                current = it->second;
+            } else {
+                throw std::runtime_error(
+                    (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' must be Map or Set")
+                     % condition % port % i).str());
+            }
+
+            if (not current)
+                throw std::runtime_error(
+                    (vle::fmt("Fails to convert '%1%'") % *this).str());
+        }
+
+        return current;
+    }
+
+    std::string condition;
+    std::string port;
+    std::vector <std::string> params;
+};
 
 /**
  * @brief Remove quotes from a string.
@@ -175,6 +263,16 @@ struct Columns {
             assign_string_to_value(data[id].value, str);
     }
 
+    friend std::ostream&
+    operator<<(std::ostream &os, const Columns &columns)
+    {
+        for (std::size_t i = 0, e = columns.size(); i != e; ++i)
+            if (not columns.data[i].value)
+                os << columns.data[i].str << ',';
+
+        return os;
+    }
+
     container_type data;
 };
 
@@ -187,8 +285,8 @@ std::ostream &operator<<(std::ostream &os, const vle::value::Matrix *value)
         if (value->get(i, value->rows() - 1)) {
             switch (value->get(i, value->rows() - 1)->getType()) {
             case vle::value::Value::BOOLEAN:
-                os << (value->get(i,
-                                  value->rows() - 1)->toBoolean().value() == true ? "true" : "false");
+                os << (value->get(i, value->rows() - 1)->toBoolean().value() == true
+                       ? "true" : "false");
                 break;
 
             case vle::value::Value::INTEGER:
@@ -217,20 +315,10 @@ std::ostream &operator<<(std::ostream &os, const vle::value::Matrix *value)
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const Columns &columns)
-{
-    for (std::size_t i = 0, e = columns.size(); i != e; ++i)
-        if (columns.data[i].value == NULL)
-            os << columns.data[i].str << ',';
-
-    return os;
-}
-
 class Worker
 {
 private:
     typedef boost::scoped_ptr <vle::value::Map> MapPtr;
-    typedef boost::shared_ptr <vle::vpz::Vpz> VpzPtr;
 
     std::string m_packagename;
     std::string m_vpzfilename;
@@ -277,30 +365,18 @@ public:
 
     void init(const std::string &header)
     {
-        using namespace boost::algorithm;
+        namespace ba = boost::algorithm;
+
         std::vector <std::string> tokens;
-        boost::algorithm::split(tokens, header,
-                                boost::algorithm::is_any_of(","));
+        ba::split(tokens, header, ba::is_any_of(","));
 
         for (std::size_t i = 0, e = tokens.size(); i != e; ++i) {
-            std::string current = cleanup_token(tokens[i]);
-            std::pair <std::string, std::string> names =
-                split_column_name(current);
+            Access access(cleanup_token(tokens[i]));
 
-            if (names.second.empty()) {
-                m_columns.add(names.second);
+            if (access.is_undefined_string()) {
+                m_columns.add(access.condition);
             } else {
-                vle::vpz::Condition &cnd(
-                    m_vpz->project().experiment().conditions().get(names.first));
-                vle::value::Set &set(cnd.getSetValues(names.second));
-
-                if (set.size() != 1u or set.get(0) == NULL)
-                    throw std::runtime_error((vle::fmt("can not determine type"
-                                                       " of condition %1% port"
-                                                       " %2%")
-                                              % names.first % names.second).str());
-
-                m_columns.add(set.get(0));
+                m_columns.add(access.value(m_vpz));
             }
         }
     }
