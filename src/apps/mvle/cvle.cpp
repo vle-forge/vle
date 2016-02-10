@@ -464,16 +464,20 @@ public:
         int i = 0;
         block.clear();
 
+        if (m_is->fail())
+            return false;
+
         while (m_is->good() && i < m_blocksize) {
             std::string tmp;
             std::getline(*m_is.get(), tmp);
 
-            if (!m_is->good())
-                return false;
-
-            block += tmp;
-            block += '\n';
-            ++i;
+            if (not tmp.empty()) {
+                block += tmp;
+                block += '\n';
+                ++i;
+            } else {
+                return not block.empty();
+            }
         }
 
         return true;
@@ -562,7 +566,9 @@ int run_as_worker(const std::string &package, const std::string &vpzfile)
         boost::mpi::broadcast(comm, block, 0);
         w.init(block);
 
-        for (;;) {
+        bool end = false;
+
+        while (not end) {
             boost::mpi::status msg = comm.probe();
 
             switch (msg.tag()) {
@@ -574,6 +580,7 @@ int run_as_worker(const std::string &package, const std::string &vpzfile)
 
             case worker_end_tag:
                 comm.recv(0, worker_end_tag);
+                end = true;
                 break;
             }
         }
