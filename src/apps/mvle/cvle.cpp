@@ -126,10 +126,12 @@ struct Access {
                 errno = 0;
                 long int val = strtol(params[i].c_str(), NULL, 10);
 
-                if (errno == 0 or
-                    val >= boost::numeric_cast<long int>(current->toSet().size()))
+                if (errno or val < 0 or
+                    val >= boost::numeric_cast<long int>(
+                        current->toSet().size()))
                     throw std::runtime_error(
-                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' as correct set index")
+                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%'"
+                                  " as correct set index")
                          % condition % port % i).str());
 
                 current = current->toSet().get(val);
@@ -138,13 +140,15 @@ struct Access {
 
                 if (it == current->toMap().end())
                     throw std::runtime_error(
-                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' as correct map index")
+                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%'"
+                                  " as correct map index")
                          % condition % port % i).str());
 
                 current = it->second;
             } else {
                 throw std::runtime_error(
-                    (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' must be Map or Set")
+                    (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%'"
+                              " must be Map or Set")
                      % condition % port % i).str());
             }
 
