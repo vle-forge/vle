@@ -121,8 +121,7 @@ if (${_find_gvle_using_cmake})
     ${_gvle_base_include}/libxml2)
 
   set (GVLE_LIBRARY_DIRS
-    ${_gvle_base_bin}; ${_gvle_base_lib};
-    c:/devel/dist/win32/lipng-1.4.3-1/lib)
+    ${_gvle_base_bin}; ${_gvle_base_lib})
 
   set (GVLE_LIBRARIES
     gvle-${VLE_ABI_VERSION} intl)
