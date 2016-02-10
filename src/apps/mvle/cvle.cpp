@@ -79,12 +79,15 @@ struct Access {
         default:
             condition = tokens[0];
             port = tokens[1];
-            std::copy(tokens.begin() + 2, tokens.end(), std::back_inserter(params));
+            std::copy(tokens.begin() + 2, tokens.end(),
+                      std::back_inserter(params));
             break;
         }
 
         assert(not condition.empty());
-        assert(not params.empty() and port.empty());
+        assert((not params.empty() and not port.empty())
+               or (params.empty() and not port.empty())
+               or port.empty());
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Access& access)
