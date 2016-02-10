@@ -1,11 +1,6 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(PkgConfig REQUIRED)
-
-pkg_check_modules(XMLDEPS libxml-2.0)
-include_directories(${XMLDEPS_INCLUDE_DIRS})
-
 include_directories(${Qt5Widgets_INCLUDES} ${Qt5Xml_INCLUDES}
   ${Qt5Gui_INCLUDES} ${Qt5Help_INCLUDES})
 

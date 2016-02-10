@@ -83,6 +83,7 @@ endif ()
 # FIXME use old-style link directories for now
 if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
+  cmake_policy(SET CMP0020 NEW)#for qt link
 endif (COMMAND CMAKE_POLICY)
 
 set(QMAKE_QUERY_LIBPATH qmake -query QT_INSTALL_LIBS)

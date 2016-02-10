@@ -1,124 +1,56 @@
 
+
+
+Install MSYS2:   msys2-i686-20150916.exe
+Install NSIS:    2.50
+
+#####
+#
+# In c:\msys32\etc\pacman.conf
+# use curl for downloading uncomment line (if required):
+# 
+# XferCommand = /usr/bin/curl -C - -f %u > %o
+#
+###
+
+pacman -S mingw-w64-i686-cmake  ## 3.4.1-1
+pacman -S mingw-w64-i686-gcc    ## 5.3.0-2
+pacman -S mingw-w64-i686-make   ## 4.1.2351.a80a8b8-1
+pacman -S mingw-w64-i686-qt5    ## 5.5.1-4
+pacman -S mingw-w64-i686-boost  ## 1.60.0-2
+
 *******************************************
-** Build VLE natively on WIN32, using MinGW
+** Build VLE natively on WIN32, using Msys2
 *******************************************
 
-1) Declare a build environment (for the script, see section 3):
---------------------------------------------------------------
-
-set VLE_BUILD_ENV=c:\buildenv
-
-2) Downloads and pre install
-----------------------------
-
-Download Boost  into %VLE_BUILD_ENV%         **** boost_1_54_0
-git clone vle sources into %VLE_BUILD_ENV%   **** dev
-Install Mingw                                **** mingw-get-inst-20120426.exe
-Install gtkmm                                **** gtkmm-win32-devel-2.22 .0-1.exe
-Install cmake                                **** cmake-2.8.12-2
-
-**** Download and install mingw : mingw-get-inst-20120426 
-** You can find it here : 
-**   http://www.vle-project.org/pub/3rd-party
-** During install: 
-**   1) use pre-packaged repository catalogues; 
-**   2) select C, C++, Fortran compilers, Msys (Msys is for rvle build only)
-**   3) install into the default directory C:\MinGW
-**   4) Do NOT Add C:\MinGW\bin to the path
-
-**** Download and install CMake-2.8
-** You can find it here :  
-**   http://www.cmake.org/files/v2.8/cmake-2.8.11-win32-x86.exe
-**   or  http://www.vle-project.org/pub/3rd-party
-** During install: 
-**   1) choose install path c:\CMake
-**   2) Do NOT Add C:\CMake\bin to the path 
-
-
-**** Install gtkmm binaries
-**  You can fing it here
-**    http://ftp.gnome.org/pub/GNOME/binaries/win32/gtkmm/2.22/gtkmm-win32-devel-2.22.0-2.exe
-**  During install, install into the default directory C:\gtkmm
-
-**** Download boost_1_54_0.zip and unzip into %VLE_BUILD_ENV%\boost_1_54_0
-
-**** git clone vle into %VLE_BUILD_ENV%\vle
-
-3) Building script
-------------------
-
-set VLE_BUILD_ENV=c:\natifvle
-set cmakepath=c:\CMake
-set PKG_CONFIG_PATH=c:\MinGW\lib\pkgconfig
-set boostversion=1_59
-set qmake_bin=c:\Qt\Qt5.5.1\5.5\mingw492_32\bin\
-
-set builddir="%VLE_BUILD_ENV%\build"
-set sourcedir="%VLE_BUILD_ENV%\vle"
-set installdir=%VLE_BUILD_ENV%\install
-set boost_src="%VLE_BUILD_ENV%\boost_%boostversion%_0"
-set boost_root="%VLE_BUILD_ENV%\install\boost"
-set boost_include_path="%boost_root%\include"
-set boost_library_path="%boost_root%\lib"
-set vlepathtestbin=%installdir%\vle\bin
+set VLE_DIR=c:\natifvle\vle
+set MINGW_PATH=c:\msys32\mingw32
+set install_dir=c:\natifvle\install
 
 set OLDPATH=%PATH%
-set PATH=c:\mingw\bin;%PATH%
-set PATH=%cmakepath%\bin;%PATH%
-set PATH=%vlepathtestbin%;%PATH%
-set PATH=%qmake_bin%;%PATH%
+set PATH=%MINGW_PATH%\bin;%PATH%
 
-mingw-get install base
-mingw-get install libarchive
-mingw-get install gettext
-mingw-get install gcc
-mingw-get install gcc-g++
-mingw-get install gcc-fortran
-mingw-get install gdb
-mingw-get install autotools
+mkdir %VLE_DIR%\buildvle
+cd %VLE_DIR%\buildvle
 
-mkdir %builddir%\vle
-mkdir %installdir%\vle
-mkdir %vlepathtestbin%
+cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%install_dir%\vle -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="%MINGW_PATH%" -DVLE_MINGW_PATH="%MINGW_PATH%" -DVLE_BOOST_INCLUDE_PATH="%MINGW_PATH%\include" -DVLE_BOOST_LIBRARIES_PATH="%MINGW_PATH%\lib" ..
 
-cd %boost_src%
-bootstrap.bat gcc
-.\b2 --toolset=gcc --with-date_time --with-filesystem --with-program_options --with-random --with-regex --with-system --with-test --with-thread --with-timer variant=release threading=multi link=shared runtime-link=shared install --prefix=%boost_root%
-
-cd %builddir%\vle
-cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%installdir%\vle -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="c:\cmake" -DVLE_MINGW_PATH="c:\mingw" -DVLE_BOOST_INCLUDE_PATH=%boost_include_path% -DVLE_BOOST_LIBRARIES_PATH=%boost_library_path% %sourcedir%
 
 mingw32-make install
+
+set PATH=%install_dir%\vle\bin;%PATH%
 mingw32-make test
 
-
------ Qt Download
-qt.mirror.constant.com/official_releases/qt/5.5/5.5.1/qt-opensource-windows-x86-mingw492-5.5.1.exe 
-
----
-b2 toolset=gcc install --prefix=%boost_src%\b2
-cd %boost_src%
-mkdir %boost_root%
-mkdir %boost_include_path%
-mkdir %boost_include_path%\boost
-xcopy /E %boost_src%\boost %boost_include_path%\boost
-xcopy /E %boost_src%\stage\lib %boost_library_path%\
-
-
-cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=OFF -DCMAKE_INSTALL_PREFIX=%installdir%\vle -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="c:\cmake" -DVLE_MINGW_PATH="c:\mingw" -DVLE_BOOST_INCLUDE_PATH=%boost_include_path% -DVLE_BOOST_LIBRARIES_PATH=%boost_library_path% %sourcedir%
-mingw32-make install
-mingw32-make test
-
+set PATH=%MINGW_PATH%\bin;%OLDPATH%
 cpack.exe -G NSIS
-set PATH=%OLDPATH%
 
-mingw32-make
-copy /Y src\vle\libvle-1.3.a ..\..\install\vle\lib\
-copy /Y src\vle\libvle-1.3.dll.a ..\..\install\vle\lib\
-copy /Y src\vle\libvle-1.3.dll ..\..\install\vle\bin\
+
+#set QT_QPA_PLATFORM_PLUGIN_PATH=%install_dir%\vle\share\qt5\plugins\platforms\
+#set QT_PLUGIN_PATH=%install_dir%\vle\share\qt5\plugins\
+
 
 *******************************************
-** Build RVLE natively on WIN32, using MinGW
+** Build RVLE natively on WIN32, using Msys2
 *******************************************
 
 1) Downloads and pre install

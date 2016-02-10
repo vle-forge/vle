@@ -25,6 +25,7 @@
  */
 
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
@@ -50,73 +51,48 @@ typedef std::vector < std::pair < std::string, std::string > > Envp;
  * A specific \b Win32 function to build a new environment
  * variable.
  *
+ * @param[out] envp
  * @param variable
  * @param value
- * @param append
+ * @param append either with in places values or in env vars
  *
- * @return
  */
-static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
-                                                   const std::string& value,
-                                                   bool append)
+static void replaceEnvironmentVariable(Envp& envp,
+        const std::string& variable,
+        const std::string& value,
+        bool append)
 {
-    Envp::value_type result;
-
-    result.first = variable;
-    result.second = value;
-
-    if (append) {
-        char* env = std::getenv(variable.c_str());
-
-        if (env != NULL) {
-            std::string old(env, std::strlen(env));
-            result.second += ";";
-            result.second += old;
+    //check if in envp
+    Envp::iterator itb = envp.begin();
+    Envp::iterator ite = envp.end();
+    Envp::iterator itf = ite;
+    for (; (itb != ite) and (itf == ite); itb++) {
+        if (itb->first == variable) {
+            itf = itb;
         }
     }
 
-    return result;
-}
-
-/**
- * A specific \b Win32 function to build a new environment
- * variable. Three arguments are given to this function corresponding to
- * three paths to add
- *
- * @param variable
- * @param value1
- * @param value2
- * @param value3
- * @param append
- *
- * @return
- */
-static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
-                                                   const std::string& value1,
-                                                   const std::string& value2,
-                                                   const std::string& value3,
-                                                   bool append)
-{
-    Envp::value_type result;
-
-    result.first = variable;
-    result.second = value1;
-    result.second += ";";
-    result.second += value2;
-    result.second += ";";
-    result.second += value3;
-
-    if (append) {
-        char* env = std::getenv(variable.c_str());
-
-        if (env != NULL) {
-            std::string old(env, std::strlen(env));
-            result.second += ";";
-            result.second += old;
+    if (itf != ite) {//found in envp
+        Envp::value_type& result = *itf;
+        if (append) {
+            result.second = value + ";" +result.second;
+        } else {
+            result.second = value;
         }
+    } else {//not in envp
+        Envp::value_type result;
+        result.first = variable;
+        result.second = value;
+        if(append) {
+            char* env = std::getenv(variable.c_str());
+            if(env != NULL) {
+                std::string old(env, std::strlen(env));
+                result.second += ";";
+                result.second += old;
+            }
+        }
+        envp.push_back(result);
     }
-
-    return result;
 }
 
 /**
@@ -133,7 +109,11 @@ static Envp::value_type replaceEnvironmentVariable(const std::string& variable,
 static Envp prepareEnvironmentVariable()
 {
     Envp envp;
-    char* env_char = GetEnvironmentStrings();
+    char* env_char = ::GetEnvironmentStrings();
+    if (env_char == NULL) {
+        throw vle::utils::InternalError(
+                "[SpawnWin] error reading environmental variables");
+    }
     unsigned int prev = 0;
     std::string env_string;
     for(unsigned int i = 0; ; i++) {
@@ -144,59 +124,59 @@ static Envp prepareEnvironmentVariable()
                     boost::algorithm::token_compress_on);
             if ((splitvec.size() == 2) and (not splitvec[0].empty())
                     and (splitvec[0].size() > 1)) {
-                envp.push_back(replaceEnvironmentVariable(
+                replaceEnvironmentVariable(envp,
                         splitvec[0].substr(1),//don't know why we
-                                              //have to remove a blank
-                        splitvec[1], false));
+                        //have to remove a blank
+                        splitvec[1], false);
             }
-
             prev = i;
             if (env_char[i + 1] == '\0') {
                 break;
             }
         }
     }
-    FreeEnvironmentStrings(env_char);
+    ::FreeEnvironmentStrings(env_char);
 
-   envp.push_back(replaceEnvironmentVariable(
-                       "PATH",
-                       Path::buildFilename(
-                           UtilsWin::convertPathTo83Path(
-                                   Path::path().getPrefixDir()), "bin"),
-                       Path::buildFilename(
-                           UtilsWin::convertPathTo83Path(
-                                   Path::path().getPrefixDir()), "MinGW","bin"),
-                       Path::buildFilename(
-                           UtilsWin::convertPathTo83Path(
-                                   Path::path().getPrefixDir()), "CMake","bin"),
-                       true));
+    replaceEnvironmentVariable(envp,
+            "PATH",
+            Path::buildFilename(
+                    UtilsWin::convertPathTo83Path(
+                            Path::path().getPrefixDir()), "bin"),
+                            true);
 
-    envp.push_back(replaceEnvironmentVariable(
-                       "PKG_CONFIG_PATH",
-                       Path::buildFilename(
-                           UtilsWin::convertPathTo83Path(
-                                   Path::path().getPrefixDir()), "lib",
-                                   "pkgconfig"),
-                       false));
+    replaceEnvironmentVariable(envp,
+            "Path",
+            Path::buildFilename(
+                    UtilsWin::convertPathTo83Path(
+                            Path::path().getPrefixDir()), "bin"),
+                            true);
 
-    envp.push_back(replaceEnvironmentVariable(
-                       "BOOST_INCLUDEDIR",
-                       Path::buildFilename(
-                               UtilsWin::convertPathTo83Path(
-                                       Path::path().getPrefixDir()), "include"),
-                       false));
+    replaceEnvironmentVariable(envp,
+            "PKG_CONFIG_PATH",
+            Path::buildFilename(
+                    UtilsWin::convertPathTo83Path(
+                            Path::path().getPrefixDir()), "lib",
+                            "pkgconfig"),
+                            false);
 
-    envp.push_back(replaceEnvironmentVariable(
-                       "BOOST_LIBRARYDIR",
-                       Path::buildFilename(
-                               UtilsWin::convertPathTo83Path(
-                                       Path::path().getPrefixDir()), "lib"),
-                       false));
+    replaceEnvironmentVariable(envp,
+            "BOOST_INCLUDEDIR",
+            Path::buildFilename(
+                    UtilsWin::convertPathTo83Path(
+                            Path::path().getPrefixDir()), "include"),
+                            false);
 
-    envp.push_back(replaceEnvironmentVariable(
-                       "BOOST_ROOT",
-                       UtilsWin::convertPathTo83Path(
-                               Path::path().getPrefixDir()), false));
+    replaceEnvironmentVariable(envp,
+            "BOOST_LIBRARYDIR",
+            Path::buildFilename(
+                    UtilsWin::convertPathTo83Path(
+                            Path::path().getPrefixDir()), "lib"),
+                            false);
+
+    replaceEnvironmentVariable(envp,
+            "BOOST_ROOT",
+            UtilsWin::convertPathTo83Path(
+                    Path::path().getPrefixDir()), false);
     return envp;
 }
 
@@ -236,13 +216,13 @@ static std::string win32_quote(const std::string& arg)
 }
 
 struct win32_argv_quote
-    : public std::unary_function < std::string, void >
+        : public std::unary_function < std::string, void >
 {
     std::string *cmd;
     char separator;
 
     win32_argv_quote(std::string *cmd, char separator)
-        : cmd(cmd), separator(separator)
+    : cmd(cmd), separator(separator)
     {}
 
     ~win32_argv_quote()
@@ -256,12 +236,12 @@ struct win32_argv_quote
 };
 
 struct win32_envp_quote
-    : public std::unary_function < Envp::value_type, void >
+        : public std::unary_function < Envp::value_type, void >
 {
     std::string *cmd;
 
     win32_envp_quote(std::string *cmd)
-        : cmd(cmd)
+    : cmd(cmd)
     {}
 
     ~win32_envp_quote()
@@ -273,25 +253,23 @@ struct win32_envp_quote
             std::vector < std::string > tokens;
 
             boost::algorithm::split(tokens, arg.second,
-                                    boost::algorithm::is_any_of(";"),
-                                    boost::algorithm::token_compress_on);
+                    boost::algorithm::is_any_of(";"),
+                    boost::algorithm::token_compress_on);
 
             cmd->append(arg.first);
             cmd->push_back('=');
 
             std::for_each(tokens.begin(), tokens.end(),
-                          win32_argv_quote(cmd, ';'));
+                    win32_argv_quote(cmd, ';'));
 
-            cmd->operator[](cmd->size() - 1) = '\0'; /**< remove the
-                                                      * last `;' to
-                                                      * avoid bad
-                                                      * environment. */
+            cmd->operator[](cmd->size() - 1) = '\0'; /**< remove the last `;' to
+                                                      * avoid bad environment.*/
         }
     }
 };
 
 static char* build_command_line(const std::string& exe,
-                                const std::vector < std::string >&args)
+        const std::vector < std::string >&args)
 {
     std::string cmd;
     char *buf;
@@ -343,10 +321,10 @@ struct Spawn::Pimpl
 
 
     Pimpl(unsigned int waitchildtimeout)
-        : hOutputRead(INVALID_HANDLE_VALUE),
-          hErrorRead(INVALID_HANDLE_VALUE),
-          m_status(0), m_waitchildtimeout(waitchildtimeout),
-          m_finish(false), out__("c:/out.txt"), err__("c:/err.txt")
+    : hOutputRead(INVALID_HANDLE_VALUE),
+      hErrorRead(INVALID_HANDLE_VALUE),
+      m_status(0), m_waitchildtimeout(waitchildtimeout),
+      m_finish(false), out__("c:/out.txt"), err__("c:/err.txt")
     {
     }
 
@@ -387,7 +365,7 @@ struct Spawn::Pimpl
 
         {
             PeekNamedPipe(hOutputRead, &buffer[0], buffer.size() - 1,
-                          &bread, &avail, NULL);
+                    &bread, &avail, NULL);
 
             if (bread) {
                 out__ << "get PeekNamedPipe success " << bread << " " <<  avail << "\n";
@@ -395,18 +373,18 @@ struct Spawn::Pimpl
                 std::fill(buffer.begin(), buffer.end(), '\0');
                 if (avail > buffer.size() - 1) {
                     out__ << "get PeekNamedPipe " << avail << "\n"
-                           << buffer.size() - 1 << "\n";
+                            << buffer.size() - 1 << "\n";
                     while (bread >= buffer.size() - 1) {
                         ReadFile(hOutputRead, &buffer[0],
-                                 buffer.size() - 1, &bread, NULL);
+                                buffer.size() - 1, &bread, NULL);
 
-                    out__ << "get: " << bread << "\n";
+                        out__ << "get: " << bread << "\n";
 
                         if (bread > 0) {
                             unsigned long sz = std::min(
-                                bread,
-                                static_cast < unsigned long >(
-                                    buffer.size() - 1));
+                                    bread,
+                                    static_cast < unsigned long >(
+                                            buffer.size() - 1));
 
                             output->append(&buffer[0], sz);
                             out__.write(&buffer[0], sz);
@@ -415,18 +393,18 @@ struct Spawn::Pimpl
                         std::fill(buffer.begin(), buffer.end(), '\0');
                     }
                 } else {
-                out__ << "get PeekNamedPipe success (else) " << bread << " " <<  avail << "\n";
+                    out__ << "get PeekNamedPipe success (else) " << bread << " " <<  avail << "\n";
 
                     ReadFile(hOutputRead, &buffer[0],
-                             buffer.size() - 1, &bread, NULL);
+                            buffer.size() - 1, &bread, NULL);
 
                     out__ << "get: " << bread << "\n";
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                            bread,
-                            static_cast < unsigned long >(
-                                buffer.size() - 1));
+                                bread,
+                                static_cast < unsigned long >(
+                                        buffer.size() - 1));
 
                         output->append(&buffer[0], sz);
                         out__.write(&buffer[0], sz);
@@ -437,7 +415,7 @@ struct Spawn::Pimpl
 
         {
             PeekNamedPipe(hErrorRead, &buffer[0], buffer.size() - 1,
-                          &bread, &avail, NULL);
+                    &bread, &avail, NULL);
 
             if (bread) {
                 err__ << "[err] get PeekNamedPipe success " <<  avail << "\n";
@@ -446,13 +424,13 @@ struct Spawn::Pimpl
                 if (avail > buffer.size() - 1) {
                     while (bread >= buffer.size() - 1) {
                         ReadFile(hErrorRead, &buffer[0],
-                                 buffer.size() - 1, &bread, NULL);
+                                buffer.size() - 1, &bread, NULL);
 
                         if (bread > 0) {
                             unsigned long sz = std::min(
-                                bread,
-                                static_cast < unsigned long >(
-                                    buffer.size() - 1));
+                                    bread,
+                                    static_cast < unsigned long >(
+                                            buffer.size() - 1));
 
                             error->append(&buffer[0], sz);
                             err__.write(&buffer[0], sz);
@@ -462,13 +440,13 @@ struct Spawn::Pimpl
                     }
                 } else {
                     ReadFile(hErrorRead, &buffer[0],
-                             buffer.size() - 1, &bread, NULL);
+                            buffer.size() - 1, &bread, NULL);
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                            bread,
-                            static_cast < unsigned long >(
-                                buffer.size() - 1));
+                                bread,
+                                static_cast < unsigned long >(
+                                        buffer.size() - 1));
 
                         error->append(&buffer[0], sz);
                         err__.write(&buffer[0], sz);
@@ -481,11 +459,11 @@ struct Spawn::Pimpl
     }
 
     bool start(const std::string& exe,
-               const std::string& workingdir,
-               const std::vector < std::string > &args)
+            const std::string& workingdir,
+            const std::vector < std::string > &args)
     {
-		
-		
+
+
         HANDLE hOutputReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hErrorReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hOutputWrite = INVALID_HANDLE_VALUE;
@@ -497,7 +475,7 @@ struct Spawn::Pimpl
         LPVOID envp;
 
         InitializeSecurityDescriptor(&securitydescriptor,
-                                     SECURITY_DESCRIPTOR_REVISION);
+                SECURITY_DESCRIPTOR_REVISION);
 
         SetSecurityDescriptorDacl(&securitydescriptor, TRUE, NULL, FALSE);
         securityatt.lpSecurityDescriptor = &securitydescriptor;
@@ -505,15 +483,15 @@ struct Spawn::Pimpl
         securityatt.bInheritHandle = TRUE;
 
         if (!CreatePipe(&hOutputReadTmp, &hOutputWrite, &securityatt, 0) ||
-            !DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,
-                             GetCurrentProcess(), &hOutputRead, 0,
-                             FALSE, DUPLICATE_SAME_ACCESS))
+                !DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,
+                        GetCurrentProcess(), &hOutputRead, 0,
+                        FALSE, DUPLICATE_SAME_ACCESS))
             goto pipe_out_failure;
 
         if (!CreatePipe(&hErrorReadTmp, &hErrorWrite, &securityatt, 0) ||
-            !DuplicateHandle(GetCurrentProcess(), hErrorReadTmp,
-                             GetCurrentProcess(), &hErrorRead, 0,
-                             TRUE, DUPLICATE_SAME_ACCESS))
+                !DuplicateHandle(GetCurrentProcess(), hErrorReadTmp,
+                        GetCurrentProcess(), &hErrorRead, 0,
+                        TRUE, DUPLICATE_SAME_ACCESS))
             goto pipe_err_failure;
 
         CloseHandle(hOutputReadTmp);
@@ -541,9 +519,9 @@ struct Spawn::Pimpl
         ZeroMemory(&m_pi, sizeof(PROCESS_INFORMATION));
 
         if (!(CreateProcess(NULL, cmdline, NULL, NULL, TRUE,
-                            CREATE_NO_WINDOW,
-                            envp,
-                            workingdir.c_str(), &startupinfo, &m_pi)))
+                CREATE_NO_WINDOW,
+                envp,
+                workingdir.c_str(), &startupinfo, &m_pi)))
             goto create_process_failure;
 
         free(cmdline);
@@ -558,20 +536,20 @@ struct Spawn::Pimpl
 
         return true;
 
-    create_process_failure:
+        create_process_failure:
         free(cmdline);
 
-    malloc_failure:
+        malloc_failure:
         CloseHandle(hErrorReadTmp);
         CloseHandle(hErrorRead);
         CloseHandle(hErrorWrite);
 
-    pipe_err_failure:
+        pipe_err_failure:
         CloseHandle(hOutputReadTmp);
         CloseHandle(hOutputRead);
         CloseHandle(hOutputWrite);
 
-    pipe_out_failure:
+        pipe_out_failure:
         return false;
     }
 
@@ -612,7 +590,7 @@ struct Spawn::Pimpl
 };
 
 Spawn::Spawn()
-    : m_pimpl(0)
+: m_pimpl(0)
 {
 }
 
@@ -622,9 +600,9 @@ Spawn::~Spawn()
 }
 
 bool Spawn::start(const std::string& exe,
-                  const std::string& workingdir,
-                  const std::vector < std::string > &args,
-                  unsigned int waitchildtimeout)
+        const std::string& workingdir,
+        const std::vector < std::string > &args,
+        unsigned int waitchildtimeout)
 {
     if (m_pimpl) {
         delete m_pimpl;

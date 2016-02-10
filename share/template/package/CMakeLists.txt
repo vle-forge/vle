@@ -51,6 +51,14 @@ INCLUDE(CheckLibraryExists)
 INCLUDE(CMakeDetermineCCompiler)
 
 ##
+## cmake policy
+##
+if (COMMAND CMAKE_POLICY)
+  cmake_policy(SET CMP0020 NEW)#for qt link
+endif (COMMAND CMAKE_POLICY)
+
+
+##
 ## Check VLE and package dependencies
 ##
 
@@ -67,6 +75,7 @@ VleCheckDependencies()
 ##
 
 if (WITH_GVLE)
+  set(GVLE_DEBUG 0)
   find_package(GVLE)
   if (GVLE_FOUND)
     set (HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
@@ -88,7 +97,7 @@ find_package(Boost COMPONENTS unit_test_framework date_time thread
 ## Find Qt
 ##
 
-if (WITH_GVLE)
+if (HAVE_GVLE)
   set(QMAKE_QUERY_LIBPATH qmake -query QT_INSTALL_LIBS)
   execute_process(COMMAND ${QMAKE_QUERY_LIBPATH} OUTPUT_VARIABLE
     CMAKE_PREFIX_PATH)

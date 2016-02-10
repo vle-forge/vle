@@ -87,26 +87,30 @@ endif ()
 #
 
 if (${_find_vle_using_cmake})
-  find_path(_vle_base_include zlib.h PATHS
+
+  find_path(_vle_base_include vle-${VLE_ABI_VERSION}/vle/vle.hpp PATHS
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/include")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/include"
+	NO_DEFAULT_PATH)
 
-  find_path(_vle_base_bin zlib1.dll PATHS
+  find_path(_vle_base_bin vle.exe PATHS
     $ENV{VLE_BASEPATH}/bin
     ${VLE_BASEPATH_LOCAL}/bin
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/bin")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/bin"
+	NO_DEFAULT_PATH)
 
-  find_path(_vle_base_lib libz.dll.a PATHS
+  find_path(_vle_base_lib libvle-${VLE_ABI_VERSION}.a PATHS
     $ENV{VLE_BASEPATH}/lib
     ${VLE_BASEPATH_LOCAL}/lib
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/lib")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/lib"
+	NO_DEFAULT_PATH)
 
   if (${_vle_debug})
     message (" vle_debug _vle_base_include ${_vle_base_include}")
@@ -119,8 +123,8 @@ if (${_find_vle_using_cmake})
   endif ()
 
   set(VLE_INCLUDE_DIRS
-    ${_vle_base_include}/vle-${VLE_ABI_VERSION};
-    ${_vle_base_include}; ${_vle_base_include}/libxml2)
+    ${_vle_base_include}/vle-${VLE_ABI_VERSION}; ${_vle_base_include};
+    ${_vle_base_include}/libxml2)
 
   set(VLE_LIBRARY_DIRS
     ${_vle_base_bin};${_vle_base_lib})
@@ -147,6 +151,7 @@ if (${_vle_debug})
   message (" vle_debug VLE_INCLUDE_DIRS ${VLE_INCLUDE_DIRS}")
   message (" vle_debug VLE_LIBRARY_DIRS ${VLE_LIBRARY_DIRS}")
   message (" vle_debug VLE_LIBRARIES ${VLE_LIBRARIES}")
+  message (" vle_debug VLE_SHARE_DIR ${VLE_SHARE_DIR}")
 endif ()
 
 #mark_as_advanced(VLE_INCLUDE_DIRS VLE_LIBRARIES VLE_LIBRARY_DIRS)

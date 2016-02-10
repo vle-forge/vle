@@ -85,26 +85,30 @@ endif ()
 #
 
 if (${_find_gvle_using_cmake})
-  find_path(_gvle_base_include zlib.h PATHS
+
+  find_path(_gvle_base_include vle-${VLE_ABI_VERSION}/vle/gvle/gvle_widgets.h PATHS
     $ENV{VLE_BASEPATH}/include
     ${VLE_BASEPATH_LOCAL}/include
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/include")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/include"
+	NO_DEFAULT_PATH)
 
-  find_path(_gvle_base_bin zlib1.dll PATHS
+  find_path(_gvle_base_bin gvle.exe PATHS
     $ENV{VLE_BASEPATH}/bin
     ${VLE_BASEPATH_LOCAL}/bin
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/bin")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/bin"
+	NO_DEFAULT_PATH)
 
-  find_path(_gvle_base_lib libz.dll.a PATHS
+  find_path(_gvle_base_lib libgvle-${VLE_ABI_VERSION}.dll.a PATHS
     $ENV{VLE_BASEPATH}/lib
     ${VLE_BASEPATH_LOCAL}/lib
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/lib")
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/lib"
+	NO_DEFAULT_PATH)
 
   if (${_gvle_debug})
     message (" gvle_debug _gvle_base_include ${_gvle_base_include}")
@@ -112,16 +116,11 @@ if (${_find_gvle_using_cmake})
     message (" gvle_debug _gvle_base_lib ${_gvle_base_lib}")
   endif ()
 
-  if(NOT _gvle_base_include OR NOT _gvle_base_bin OR NOT _gvle_base_lib)
-     message (FATAL_ERROR "Missing gvle dependencies")
-  endif ()
-
   set(GVLE_INCLUDE_DIRS
-    ${_gvle_base_include}/vle-${VLE_ABI_VERSION}; ${_gvle_base_include};
-    ${_gvle_base_include}/libxml2)
+    ${_gvle_base_include})
 
   set (GVLE_LIBRARY_DIRS
-    ${_gvle_base_bin}; ${_gvle_base_lib})
+    ${_gvle_base_bin};${_gvle_base_lib})
 
   set (GVLE_LIBRARIES
     gvle-${VLE_ABI_VERSION} intl)

@@ -481,7 +481,7 @@ FunctionEnd
 !macroend   ; EnvVarUpdate UN
 !insertmacro EnvVarUpdate ""
 !insertmacro EnvVarUpdate "un."
-!insertmacro StrReplace "deux."
+
 
 ;----------------------------------- EnvVarUpdate end----------------------------------------
 
@@ -739,6 +739,7 @@ FunctionEnd
 !macroend   ; StrContains UN
 !insertmacro StrReplace ""
 !insertmacro StrReplace "un."
+!insertmacro StrReplace "deux."
 
 ;----------------------------------------- StrReplace end ---------------------------------------
 
@@ -856,7 +857,7 @@ Section "-Core installation"
   FileWrite $0 "[Paths]"
   FileWrite $0 "$\r$\n"
 
-  FileWrite $0 "prefix = \$""$INSTDIR_TEMP\$""
+  FileWrite $0 'Plugins = "$INSTDIR_TEMP/share/qt5/plugins"'
   FileWrite $0 "$\r$\n"
 
   ; close the file

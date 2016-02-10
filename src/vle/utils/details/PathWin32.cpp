@@ -43,13 +43,13 @@ static void ErrorMessage(LPCSTR description)
     LPVOID msg;
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                  FORMAT_MESSAGE_FROM_SYSTEM |
-                  FORMAT_MESSAGE_IGNORE_INSERTS,
-                  NULL,
-                  GetLastError(),
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                  (LPTSTR) &msg,
-                  0, NULL);
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            GetLastError(),
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR) &msg,
+            0, NULL);
 
     std::string finalmsg = (vle::fmt("%1%: %2%") % description % msg).str();
 
@@ -65,7 +65,7 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     std::vector < TCHAR > buf(MAX_PATH, '\0');
 
     if (RegQueryValueEx(hkey, (LPCTSTR)"", NULL, NULL,
-                        (LPBYTE)&buf[0], &sz) == ERROR_SUCCESS) {
+            (LPBYTE)&buf[0], &sz) == ERROR_SUCCESS) {
         buf[sz] = '\0';
         path->assign(&buf[0]);
 
@@ -73,7 +73,7 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     } else {
         sz = MAX_PATH;
         if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
-                            (LPBYTE)&buf[0], &sz) == ERROR_SUCCESS) {
+                (LPBYTE)&buf[0], &sz) == ERROR_SUCCESS) {
             buf[sz] = '\0';
             path->assign(&buf[0]);
 
@@ -90,11 +90,11 @@ std::string Path::findProgram(const std::string& exe)
     if (exe == "cmake" or exe == "cmake.exe") {
         res =  Path::buildFilename(
                 UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
-                                   "bin", "cmake.exe");
+                "bin", "cmake.exe");
     } else if (exe == "vle" or exe == "vle.exe"){
         res =  Path::buildFilename(
                 UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
-                                   "bin", "vle.exe");
+                "bin", "vle.exe");
     }
     return res;
 }
@@ -130,11 +130,11 @@ void Path::initPrefixDir()
     HKEY hkey;
     bool result;
     std::string key(boost::str(fmt("%1% %2%.%3%.0") %
-                               "SOFTWARE\\VLE Development Team\\VLE" %
-                               VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
+            "SOFTWARE\\VLE Development Team\\VLE" %
+            VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
 
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
-                     0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+            0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
         result = win32_RegQueryValue(hkey, &m_prefix);
         RegCloseKey(hkey);
 
@@ -144,7 +144,7 @@ void Path::initPrefixDir()
     }
 
     if (RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
-                     0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+            0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
         result = win32_RegQueryValue(hkey, &m_prefix);
         RegCloseKey(hkey);
 
@@ -174,7 +174,7 @@ void Path::initPrefixDir()
 }
 
 std::string Path::getTempFile(const std::string& prefix,
-                              std::ofstream* file)
+        std::ofstream* file)
 {
     if (file and not file->is_open()) {
         TCHAR filename[MAX_PATH];
@@ -184,14 +184,14 @@ std::string Path::getTempFile(const std::string& prefix,
         result = ::GetTempPath(MAX_PATH, tmp);
         if (result and result < MAX_PATH) {
             result = ::GetTempFileName(tmp,
-                                       prefix.c_str(),
-                                       0,
-                                       filename);
+                    prefix.c_str(),
+                    0,
+                    filename);
 
             if (result) {
                 file->open(static_cast < char* >(filename),
-                           std::ios_base::trunc | std::ios_base::out |
-                           std::ios_base::binary);
+                        std::ios_base::trunc | std::ios_base::out |
+                        std::ios_base::binary);
 
                 if (file->is_open()) {
                     return filename;
