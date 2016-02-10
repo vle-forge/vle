@@ -326,6 +326,7 @@ private:
     vle::utils::ModuleManager m_modules;
     VpzPtr m_vpz;
     Columns m_columns;
+    bool m_warnings;
 
     void simulate(std::ostream &os)
     {
@@ -334,13 +335,15 @@ private:
                                       m_modules, &error));
 
         if (error.code) {
-            std::cerr << vle::fmt("Simulation failed. %1% [code: %2%] in %3%")
-                      %
-                      error.message % error.code % m_columns << '\n';
+            if (m_warnings)
+                std::cerr <<
+                    vle::fmt("Simulation failed. %1% [code: %2%] in %3%")
+                    % error.message % error.code % m_columns << '\n';
         } else if (result == NULL) {
-            std::cerr << vle::fmt("Simulation without result (try storage as"
-                                  " output plug-in) in %1%") %
-                      m_columns << '\n';
+            if (m_warnings)
+                std::cerr <<
+                    vle::fmt("Simulation without result (try storage as"
+                             " output plug-in) in %1%") % m_columns << '\n';
         } else {
             for (vle::value::Map::const_iterator it = result->begin(),
                  et = result->end(); it != et; ++it) {
@@ -352,9 +355,10 @@ private:
     }
 
 public:
-    Worker(const std::string &package, const std::string &vpz)
+    Worker(const std::string &package, const std::string &vpz, bool warnings)
         : m_packagename(package)
         , m_simulator(vle::manager::LOG_NONE, vle::manager::SIMULATION_NONE, NULL)
+        , m_warnings(warnings)
     {
         vle::utils::Package pack;
         pack.select(m_packagename);
@@ -439,12 +443,14 @@ class Root
     boost::shared_ptr <std::ostream> m_os;
     std::ofstream m_ofs;
     int m_blocksize;
+    bool m_warnings;
 
 public:
-    Root(const std::string &input, const std::string &output, int blocksize)
+    Root(const std::string &input, const std::string &output, int blocksize, bool warnings)
         : m_is(&std::cin, no_deleter <std::istream>())
         , m_os(&std::cout, no_deleter <std::ostream>())
         , m_blocksize(blocksize)
+        , m_warnings(warnings)
     {
         if (!input.empty())
             m_is = open <std::ifstream>(input);
@@ -498,14 +504,15 @@ enum CommunicationTag {
 
 int run_as_master(const std::string &inputfile,
                   const std::string &outputfile,
-                  int blocksize)
+                  int blocksize,
+                  bool warnings)
 {
     int ret = EXIT_SUCCESS;
     int blockid = 0;
 
     try {
         vle::Init app("");
-        Root r(inputfile, outputfile, blocksize);
+        Root r(inputfile, outputfile, blocksize, warnings);
         boost::mpi::communicator comm;
         std::vector <bool> workers(comm.size(), false);
         std::string block, header;
@@ -514,7 +521,8 @@ int run_as_master(const std::string &inputfile,
 
         for (int child = 1; child < comm.size(); ++child) {
             if (r.read(block)) {
-                std::cout << vle::fmt("master sends block %1% to %2%\n") % blockid++ % child;
+                std::cout << vle::fmt("master sends block %1% to %2%\n")
+                    % blockid++ % child;
                 comm.send(child, worker_block_todo_tag, block);
                 workers[child] = true;
             } else
@@ -555,13 +563,13 @@ int run_as_master(const std::string &inputfile,
     return ret;
 }
 
-int run_as_worker(const std::string &package, const std::string &vpzfile)
+int run_as_worker(const std::string &package, const std::string &vpzfile, bool warnings)
 {
     int ret = EXIT_SUCCESS;
 
     try {
         boost::mpi::communicator comm;
-        Worker w(package, vpzfile);
+        Worker w(package, vpzfile, warnings);
         std::string block;
         boost::mpi::broadcast(comm, block, 0);
         w.init(block);
@@ -599,28 +607,33 @@ public:
                   std::string *package,
                   std::string *vpzfile,
                   std::string *inputfile,
-                  std::string *outputfile)
+                  std::string *outputfile,
+                  bool *warnings)
         : blocksize(blocksize), package(package), vpzfile(vpzfile),
-          inputfile(inputfile), outputfile(outputfile),
+          inputfile(inputfile), outputfile(outputfile), warnings(warnings),
           desc("Allowed options")
     {
         desc.add_options()("help", "produce help message")
-        ("package,P",
-         boost::program_options::value<std::string>(package),
-         "set package name")
-        ("vpz,V",
-         boost::program_options::value<std::string>(vpzfile),
-         "set vpz file")
-        ("input-file,i",
-         boost::program_options::value<std::string>(inputfile),
-         "csv input file")
-        ("output-file,o",
-         boost::program_options::value<std::string>(outputfile),
-         "csv output file")
-        ("blocksize,b",
-         boost::program_options::value<int>(blocksize)->default_value(
-             default_block_size_value),
-         "block size to treat");
+            ("package,P",
+             boost::program_options::value<std::string>(package),
+             "set package name")
+            ("vpz,V",
+             boost::program_options::value<std::string>(vpzfile),
+             "set vpz file")
+            ("input-file,i",
+             boost::program_options::value<std::string>(inputfile),
+             "csv input file")
+            ("output-file,o",
+             boost::program_options::value<std::string>(outputfile),
+             "csv output file")
+            ("warnings,w",
+             boost::program_options::value<bool>(warnings)->default_value(
+                 true),
+             "show warnings in standard error output")
+            ("blocksize,b",
+             boost::program_options::value<int>(blocksize)->default_value(
+                 default_block_size_value),
+             "block size to treat");
     }
 
     bool run(int argc, char *argv[])
@@ -645,6 +658,7 @@ private:
     std::string *vpzfile;
     std::string *inputfile;
     std::string *outputfile;
+    bool *warnings;
     boost::program_options::options_description desc;
 };
 
@@ -654,13 +668,15 @@ int main(int argc, char *argv[])
     boost::mpi::communicator comm;
     int blocksize = default_block_size_value;
     std::string package, vpzfile, inputfile, outputfile;
+    bool warnings = true;
 
     if (comm.size() == 1)  {
         std::cerr << "cvle needs two processors.\n";
         return EXIT_FAILURE;
     }
 
-    ProgramOption po(&blocksize, &package, &vpzfile, &inputfile, &outputfile);
+    ProgramOption po(&blocksize, &package, &vpzfile, &inputfile, &outputfile,
+                     &warnings);
 
     try {
         if (!po.run(argc, argv)) {
@@ -685,8 +701,8 @@ int main(int argc, char *argv[])
                   << "\noutput file: "
                   << (outputfile.empty() ? "stdout" : outputfile)
                   << '\n';
-        return run_as_master(inputfile, outputfile, blocksize);
+        return run_as_master(inputfile, outputfile, blocksize, warnings);
     } else {
-        return run_as_worker(package, vpzfile);
+        return run_as_worker(package, vpzfile, warnings);
     }
 }
