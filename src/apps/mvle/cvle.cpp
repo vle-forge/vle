@@ -58,8 +58,8 @@ typedef boost::shared_ptr <vle::vpz::Vpz> VpzPtr;
  * Accessor c("cond.port.1.value");
  * @endcode
  */
-struct Access {
-
+struct Access
+{
     Access(const std::string& str)
     {
         namespace ba = boost::algorithm;
@@ -79,15 +79,19 @@ struct Access {
         default:
             condition = tokens[0];
             port = tokens[1];
-            std::copy(tokens.begin() + 2, tokens.end(), std::back_inserter(params));
+            std::copy(tokens.begin() + 2, tokens.end(),
+                      std::back_inserter(params));
             break;
         }
 
         assert(not condition.empty());
-        assert(not params.empty() and port.empty());
+        assert((not params.empty() and not port.empty())
+               or (params.empty() and not port.empty())
+               or port.empty());
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Access& access)
+    friend
+    std::ostream& operator<<(std::ostream& os, const Access& access)
     {
         os << access.condition;
 
@@ -100,7 +104,8 @@ struct Access {
         return os;
     }
 
-    inline bool is_undefined_string() const
+    inline
+    bool is_undefined_string() const
     {
         return port.empty();
     }
@@ -111,7 +116,8 @@ struct Access {
      */
     vle::value::Value* value(VpzPtr vpz) const
     {
-        vle::vpz::Condition& cnd = vpz->project().experiment().conditions().get(condition);
+        vle::vpz::Condition& cnd = vpz->project().experiment().conditions().get(
+            condition);
         vle::value::Set& set = cnd.getSetValues(port);
 
         if (params.empty())
@@ -123,10 +129,12 @@ struct Access {
                 errno = 0;
                 long int val = strtol(params[i].c_str(), NULL, 10);
 
-                if (errno == 0 or
-                    val >= boost::numeric_cast<long int>(current->toSet().size()))
+                if (errno or val < 0 or
+                    val >= boost::numeric_cast<long int>(
+                        current->toSet().size()))
                     throw std::runtime_error(
-                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' as correct set index")
+                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%'"
+                                  " as correct set index")
                          % condition % port % i).str());
 
                 current = current->toSet().get(val);
@@ -135,13 +143,15 @@ struct Access {
 
                 if (it == current->toMap().end())
                     throw std::runtime_error(
-                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' as correct map index")
+                        (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%'"
+                                  " as correct map index")
                          % condition % port % i).str());
 
                 current = it->second;
             } else {
                 throw std::runtime_error(
-                    (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%' must be Map or Set")
+                    (vle::fmt("Fails to convert '%1%.%2%' parameter '%3%'"
+                              " must be Map or Set")
                      % condition % port % i).str());
             }
 
@@ -217,7 +227,8 @@ void assign_string_to_value(vle::value::Value *value, const std::string &str)
     }
 }
 
-struct ColumnDefinition {
+struct ColumnDefinition
+{
     ColumnDefinition(const std::string &str)
         : str(str)
         , value(NULL)
@@ -232,7 +243,8 @@ struct ColumnDefinition {
     vle::value::Value *value;
 };
 
-struct Columns {
+struct Columns
+{
     typedef std::vector <ColumnDefinition> container_type;
     typedef container_type::iterator iterator;
     typedef container_type::const_iterator const_iterator;
@@ -263,8 +275,8 @@ struct Columns {
             assign_string_to_value(data[id].value, str);
     }
 
-    friend std::ostream&
-    operator<<(std::ostream &os, const Columns &columns)
+    friend
+    std::ostream& operator<<(std::ostream &os, const Columns &columns)
     {
         for (std::size_t i = 0, e = columns.size(); i != e; ++i)
             if (not columns.data[i].value)
@@ -276,7 +288,7 @@ struct Columns {
     container_type data;
 };
 
-std::ostream &operator<<(std::ostream &os, const vle::value::Matrix *value)
+std::ostream& operator<<(std::ostream &os, const vle::value::Matrix *value)
 {
     if  (value->rows() <= 0 or value->columns() <= 0)
         return os;
@@ -285,8 +297,8 @@ std::ostream &operator<<(std::ostream &os, const vle::value::Matrix *value)
         if (value->get(i, value->rows() - 1)) {
             switch (value->get(i, value->rows() - 1)->getType()) {
             case vle::value::Value::BOOLEAN:
-                os << (value->get(i, value->rows() - 1)->toBoolean().value() == true
-                       ? "true" : "false");
+                os << (value->get(i, value->rows() - 1)->toBoolean().value()
+                       == true ? "true" : "false");
                 break;
 
             case vle::value::Value::INTEGER:
@@ -298,11 +310,12 @@ std::ostream &operator<<(std::ostream &os, const vle::value::Matrix *value)
                 break;
 
             case vle::value::Value::STRING:
-                os << '"' << value->get(i, value->rows() - 1)->toString() << '"';
+                os << '"' << value->get(i, value->rows() - 1)->toString()
+                   << '"';
                 break;
 
             default:
-                throw std::runtime_error("fail to output a value (only bool, "
+                throw std::runtime_error("fail to write a value (only bool, "
                                          "integer, double and string are "
                                          "available");
             }
@@ -357,7 +370,8 @@ private:
 public:
     Worker(const std::string &package, const std::string &vpz, bool warnings)
         : m_packagename(package)
-        , m_simulator(vle::manager::LOG_NONE, vle::manager::SIMULATION_NONE, NULL)
+        , m_simulator(vle::manager::LOG_NONE, vle::manager::SIMULATION_NONE,
+                      NULL)
         , m_warnings(warnings)
     {
         vle::utils::Package pack;
@@ -419,7 +433,8 @@ public:
 };
 
 template <typename T>
-struct no_deleter {
+struct no_deleter
+{
     void operator()(T *)
     {
     }
@@ -431,7 +446,8 @@ boost::shared_ptr <T> open(const std::string &file)
     boost::shared_ptr <T> fs(new T(file.c_str()));
 
     if (!fs->is_open()) {
-        throw std::invalid_argument((vle::fmt("fail to open file %1%") % file).str());
+        throw std::invalid_argument((vle::fmt("fail to open file %1%")
+                                     % file).str());
     }
 
     return fs;
@@ -446,7 +462,8 @@ class Root
     bool m_warnings;
 
 public:
-    Root(const std::string &input, const std::string &output, int blocksize, bool warnings)
+    Root(const std::string &input, const std::string &output, int blocksize,
+         bool warnings)
         : m_is(&std::cin, no_deleter <std::istream>())
         , m_os(&std::cout, no_deleter <std::ostream>())
         , m_blocksize(blocksize)
@@ -539,14 +556,15 @@ int run_as_master(const std::string &inputfile,
             end = !r.read(block);
 
             if (!block.empty()) {
-                std::cout << vle::fmt("master sends block %1% to %2%\n") % blockid++ %
-                          msg.source();
+                std::cout << vle::fmt("master sends block %1% to %2%\n")
+                    % blockid++ % msg.source();
                 comm.send(msg.source(), worker_block_todo_tag, block);
                 workers[msg.source()] = true;
             }
         }
 
-        while (std::find(workers.begin(), workers.end(), true) != workers.end()) {
+        while (std::find(workers.begin(), workers.end(), true)
+               != workers.end()) {
             boost::mpi::status msg = comm.probe();
             comm.recv(msg.source(), worker_block_end_tag, block);
             workers[msg.source()] = false;
@@ -563,7 +581,8 @@ int run_as_master(const std::string &inputfile,
     return ret;
 }
 
-int run_as_worker(const std::string &package, const std::string &vpzfile, bool warnings)
+int run_as_worker(const std::string &package, const std::string &vpzfile,
+                  bool warnings)
 {
     int ret = EXIT_SUCCESS;
 
@@ -613,35 +632,31 @@ public:
           inputfile(inputfile), outputfile(outputfile), warnings(warnings),
           desc("Allowed options")
     {
+        namespace bpo = boost::program_options;
+
         desc.add_options()("help", "produce help message")
-            ("package,P",
-             boost::program_options::value<std::string>(package),
-             "set package name")
-            ("vpz,V",
-             boost::program_options::value<std::string>(vpzfile),
-             "set vpz file")
-            ("input-file,i",
-             boost::program_options::value<std::string>(inputfile),
+            ("package,P", bpo::value<std::string>(package), "set package name")
+            ("vpz,V", bpo::value<std::string>(vpzfile), "set vpz file")
+            ("input-file,i", bpo::value<std::string>(inputfile),
              "csv input file")
-            ("output-file,o",
-             boost::program_options::value<std::string>(outputfile),
+            ("output-file,o", bpo::value<std::string>(outputfile),
              "csv output file")
-            ("warnings,w",
-             boost::program_options::value<bool>(warnings)->default_value(
-                 true),
+            ("warnings,w", bpo::value<bool>(warnings)->default_value(true),
              "show warnings in standard error output")
-            ("blocksize,b",
-             boost::program_options::value<int>(blocksize)->default_value(
-                 default_block_size_value),
+            ("blocksize,b", bpo::value<int>(blocksize)->default_value(
+                default_block_size_value),
              "block size to treat");
     }
 
     bool run(int argc, char *argv[])
     {
-        boost::program_options::variables_map vm;
-        boost::program_options::store(boost::program_options::command_line_parser(
-                                          argc, argv).options(desc).run(), vm);
-        boost::program_options::notify(vm);
+        namespace bpo = boost::program_options;
+
+        bpo::variables_map vm;
+        bpo::store(bpo::command_line_parser(
+                       argc, argv).options(desc).run(), vm);
+        bpo::notify(vm);
+
         return !package->empty() and !vpzfile->empty() and !vm.count("help");
     }
 
