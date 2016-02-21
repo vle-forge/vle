@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QDir>
+#include <QPluginLoader>
 
 namespace vle {
 namespace gvle {
@@ -123,10 +124,11 @@ vleDomVpm::getNodeFromXQuery(const QString& query,
 
 /************************************************************************/
 
-vleVpm::vleVpm(const QString& vpzpath, const QString& vpmpath):
+vleVpm::vleVpm(const QString& vpzpath, const QString& vpmpath,
+        gvle_plugins* plugs):
         vleVpz(vpzpath), mDocVpm(0), mFileNameVpm(vpmpath), mVdoVpm(0),
         undoStackVpm(0), waitUndoRedoVpz(false), waitUndoRedoVpm(false),
-        oldValVpz(), newValVpz(), oldValVpm(), newValVpm(), plugins()
+        oldValVpz(), newValVpz(), oldValVpm(), newValVpm(), mGvlePlugins(plugs)
 {
     QFile file(mFileNameVpm);
     if (file.exists()) {
@@ -138,7 +140,6 @@ vleVpm::vleVpm(const QString& vpzpath, const QString& vpmpath):
         xCreateDom();
     }
 
-    plugins.loadPlugins();
     mVdoVpm = new vleDomVpm(mDocVpm);
     undoStackVpm = new vleDomDiffStack(mVdoVpm);
     undoStackVpm->init(*mDocVpm);
@@ -156,6 +157,9 @@ vleVpm::vleVpm(const QString& vpzpath, const QString& vpmpath):
     QObject::connect(undoStackVpm,
                 SIGNAL(snapshotVdo(QDomNode, bool)),
                 this, SLOT(onSnapshotVpm(QDomNode, bool)));
+    QObject::connect(vleVpz::undoStack,
+                SIGNAL(undoAvailable(bool)),
+                this, SLOT(onUndoAvailable(bool)));
 
 }
 
@@ -168,28 +172,6 @@ vleVpm::toQString(const QDomNode& node) const
     return str;
 }
 
-void
-vleVpm::xCreateDom()
-{
-    if (not mDocVpm) {
-        mDocVpm = new QDomDocument("vle_project_metadata");
-        QDomProcessingInstruction pi;
-        pi = mDocVpm->createProcessingInstruction("xml",
-                "version=\"1.0\" encoding=\"UTF-8\" ");
-        mDocVpm->appendChild(pi);
-
-        QDomElement vpmRoot = mDocVpm->createElement("vle_project_metadata");
-        // Save VPZ file revision
-        vpmRoot.setAttribute("version", "1.x");
-        // Save the author name (if known)
-        vpmRoot.setAttribute("author", "me");
-        QDomElement xCondPlug = mDocVpm->createElement("condPlugins");
-        vpmRoot.appendChild(xCondPlug);
-        QDomElement xOutPlug = mDocVpm->createElement("outputGUIplugins");
-        vpmRoot.appendChild(xOutPlug);
-        mDocVpm->appendChild(vpmRoot);
-    }
-}
 
 void
 vleVpm::xReadDom()
@@ -201,74 +183,11 @@ vleVpm::xReadDom()
 }
 
 void
-vleVpm::setCondGUIplugin(const QString& condName, const QString& name)
-{
-    xCreateDom();
-
-    QDomElement docElem = mDocVpm->documentElement();
-
-    QDomNode condsPlugins =
-            mDocVpm->elementsByTagName("condPlugins").item(0);
-    undoStackVpm->snapshot(condsPlugins);
-    QDomNodeList plugins =
-            condsPlugins.toElement().elementsByTagName("condPlugin");
-    for (unsigned int i =0; i< plugins.length(); i++) {
-        QDomNode plug = plugins.at(i);
-        for (int j=0; j< plug.attributes().size(); j++) {
-            if ((plug.attributes().item(j).nodeName() == "cond") and
-                    (plug.attributes().item(j).nodeValue() == condName))  {
-                plug.toElement().setAttribute("plugin", name);
-                return;
-            }
-        }
-    }
-    QDomElement el = mDocVpm->createElement("condPlugin");
-    el.setAttribute("cond", condName);
-    el.setAttribute("plugin", name);
-    condsPlugins.appendChild(el);
-
-
-}
-
-void
-vleVpm::setOutputGUIplugin(const QString& viewName, const QString& pluginName)
-{
-    xCreateDom();
-
-    QDomElement docElem = mDocVpm->documentElement();
-    QDomNode outGUIplugs =
-            mDocVpm->elementsByTagName("outputGUIplugins").item(0);
-    if (outGUIplugs.isNull() ) {
-        QDomNode metaData = mDocVpm->elementsByTagName(
-                "vle_project_metadata").item(0);
-        undoStackVpm->snapshot(metaData);
-        metaData.appendChild(mDocVpm->createElement("outputGUIplugins"));
-        outGUIplugs =  mDocVpm->elementsByTagName("outputGUIplugins").item(0);
-    } else {
-        undoStackVpm->snapshot(outGUIplugs);
-    }
-    QDomNodeList plugins =
-            outGUIplugs.toElement().elementsByTagName("outputGUIplugin");
-    for (unsigned int i =0; i< plugins.length(); i++) {
-        QDomNode plug = plugins.at(i);
-        for (int j=0; j< plug.attributes().size(); j++) {
-            if ((plug.attributes().item(j).nodeName() == "view") and
-                    (plug.attributes().item(j).nodeValue() == viewName))  {
-                plug.toElement().setAttribute("GUIplugin", pluginName);
-                return;
-            }
-        }
-    }
-    QDomElement el = mDocVpm->createElement("outputGUIplugin");
-    el.setAttribute("view", viewName);
-    el.setAttribute("GUIplugin", pluginName);
-    outGUIplugs.appendChild(el);
-}
-
-void
 vleVpm::addConditionFromPluginToDoc(const QString& condName,
         const QString& pluginName)
 {
+    int prevCurr = vleVpz::undoStack->curr;
+
     //update vpm with snapshot but without signal
     bool oldBlock = undoStackVpm->blockSignals(true);
     setCondGUIplugin(condName, pluginName);
@@ -279,24 +198,34 @@ vleVpm::addConditionFromPluginToDoc(const QString& condName,
     vleVpz::addConditionToDoc(condName);
     provideCondGUIplugin(condName);
     vleVpz::undoStack->blockSignals(oldBlock);
+
+    int curr = vleVpz::undoStack->curr;
+    tryEmitUndoAvailability(prevCurr,curr);
 }
 
 void
 vleVpm::renameConditionToDoc(const QString& oldName, const QString& newName)
 {
+    if (oldName == "simulation_engine") {
+        return;
+    }
     QString condPlugin = getCondGUIplugin(oldName);
     if (condPlugin == "") {
         vleVpz::renameConditionToDoc(oldName, newName);
     } else {
+        int prevCurr = vleVpz::undoStack->curr;
+
         //update vpz with snapshot bu without signal
         bool oldBlock = vleVpz::undoStack->blockSignals(true);
         vleVpz::renameConditionToDoc(oldName, newName);
         vleVpz::undoStack->blockSignals(oldBlock);
         //update vpm with snapshot but without signal
         oldBlock = undoStackVpm->blockSignals(true);
-        setCondGUIplugin(oldName, "");
-        setCondGUIplugin(newName, condPlugin);
+        renameCondGUIplugin(oldName, newName);
         undoStackVpm->blockSignals(oldBlock);
+
+        int curr = vleVpz::undoStack->curr;
+        tryEmitUndoAvailability(prevCurr,curr);
     }
 }
 
@@ -304,6 +233,8 @@ bool
 vleVpm::setOutputPluginToDoc(const QString& viewName,
         const QString& outputPlugin)
 {
+    int prevCurr = vleVpz::undoStack->curr;
+
     //TODO, ne devrait pas etre en dur
     QString guiPluginName("");
     if (outputPlugin == "vle.output/storage") {
@@ -323,6 +254,9 @@ vleVpm::setOutputPluginToDoc(const QString& viewName,
     provideOutputGUIplugin(viewName);
     vleVpz::undoStack->blockSignals(oldBlock);
 
+    int curr = vleVpz::undoStack->curr;
+    tryEmitUndoAvailability(prevCurr,curr);
+
     return res;
 }
 
@@ -333,9 +267,7 @@ vleVpm::provideOutputGUIplugin(const QString& viewName)
     if (guiPluginName == "") {
         return 0;
     } else {
-        QString libName = plugins.getOutputPluginPath(guiPluginName);
-        QPluginLoader loader(libName);
-        PluginOutput* plugin = qobject_cast<PluginOutput*>(loader.instance());
+        PluginOutput* plugin = mGvlePlugins->provideOutputPlugin(guiPluginName);
         bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
         bool oldBlock = undoStackVpm->blockSignals(true);
         bool oldBlock2 = vleVpz::undoStack->blockSignals(true);
@@ -354,9 +286,7 @@ vleVpm::provideCondGUIplugin(const QString& condName)
     if (guiPluginName == "") {
         return 0;
     } else {
-        QString libName = plugins.getCondPluginPath(guiPluginName);
-        QPluginLoader loader(libName);
-        PluginExpCond* plugin = qobject_cast<PluginExpCond*>(loader.instance());
+        PluginExpCond* plugin =  mGvlePlugins->provideCondPlugin(guiPluginName);
         bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
         bool oldBlock = undoStackVpm->blockSignals(true);
         bool oldBlock2 = vleVpz::undoStack->blockSignals(true);
@@ -371,6 +301,8 @@ vleVpm::provideCondGUIplugin(const QString& condName)
 void
 vleVpm::addViewToDoc(const QString& viewName)
 {
+    int prevCurr = vleVpz::undoStack->curr;
+
     //update vpz with snapshot but without signal
     bool oldBlock = vleVpz::undoStack->blockSignals(true);
     vleVpz::addViewToDoc(viewName);
@@ -391,11 +323,16 @@ vleVpm::addViewToDoc(const QString& viewName)
 
     //build plugin and initialize it with the view
     provideOutputGUIplugin(viewName);
+
+    int curr = vleVpz::undoStack->curr;
+    tryEmitUndoAvailability(prevCurr,curr);
 }
 
 void
 vleVpm::renameViewToDoc(const QString& oldName, const QString& newName)
 {
+    int prevCurr = vleVpz::undoStack->curr;
+
     //update in vpz with snapshot without signal
     bool oldBlock = vleVpz::undoStack->blockSignals(true);
     vleVpz::renameViewToDoc(oldName, newName);
@@ -407,6 +344,9 @@ vleVpm::renameViewToDoc(const QString& oldName, const QString& newName)
     setOutputGUIplugin(oldName, "");
     setOutputGUIplugin(newName, outputGUIplugin);
     undoStackVpm->blockSignals(oldBlock);
+
+    int curr = vleVpz::undoStack->curr;
+    tryEmitUndoAvailability(prevCurr,curr);
 }
 
 void
@@ -416,6 +356,8 @@ vleVpm::rmConditionToDoc(const QString& condName)
     if (condPlugin == "") {
         vleVpz::rmConditionToDoc(condName);
     } else {
+        int prevCurr = vleVpz::undoStack->curr;
+
         //update vpz with snapshot but without signal
         bool oldBlock = vleVpz::undoStack->blockSignals(true);
         vleVpz::rmConditionToDoc(condName);
@@ -424,13 +366,15 @@ vleVpm::rmConditionToDoc(const QString& condName)
         oldBlock = undoStackVpm->blockSignals(true);
         setCondGUIplugin(condName, "");
         undoStackVpm->blockSignals(oldBlock);
+
+        int curr = vleVpz::undoStack->curr;
+        tryEmitUndoAvailability(prevCurr,curr);
     }
 }
 
 QString
-vleVpm::getCondGUIplugin(const QString& condName)
+vleVpm::getCondGUIplugin(const QString& condName) const
 {
-
     QStringList res;
     if (mDocVpm) {
         QDomElement docElem = mDocVpm->documentElement();
@@ -503,6 +447,8 @@ vleVpm::save()
     QByteArray xml = mDocVpm->toByteArray();
     file.write(xml);
     file.close();
+
+    undoStackVpm->clear();
 }
 
 void
@@ -512,7 +458,6 @@ vleVpm::undo()
     waitUndoRedoVpm = true;
     undoStackVpm->undo();
     vleVpz::undoStack->undo();
-
 }
 void
 vleVpm::redo()
@@ -537,13 +482,20 @@ vleVpm::onSnapshotVpz(QDomNode /*snapVpz*/, bool isMerged)
 void
 vleVpm::onSnapshotVpm(QDomNode /*snapVpm*/, bool isMerged)
 {
+
     if (not isMerged) {
         bool oldBlock = vleVpz::undoStack->blockSignals(true);
         vleVpz::undoStack->snapshot(QDomNode());
         vleVpz::undoStack->blockSignals(oldBlock);
     }
-
 }
+
+void
+vleVpm::onUndoAvailable(bool b)
+{
+    emit undoAvailable(b);
+}
+
 void
 vleVpm::onUndoRedoVpm(QDomNode oldVpm, QDomNode newVpm)
 {
@@ -564,6 +516,131 @@ vleVpm::onUndoRedoVpz(QDomNode oldVpz, QDomNode newVpz)
     waitUndoRedoVpz = false;
     if (not waitUndoRedoVpm ) {
         emit undoRedo(oldValVpz, newValVpz, oldValVpm, newValVpm);
+    }
+}
+
+/**********************************************************
+ *  Private functions
+ **********************************************************/
+
+void
+vleVpm::xCreateDom()
+{
+    if (not mDocVpm) {
+        mDocVpm = new QDomDocument("vle_project_metadata");
+        QDomProcessingInstruction pi;
+        pi = mDocVpm->createProcessingInstruction("xml",
+                "version=\"1.0\" encoding=\"UTF-8\" ");
+        mDocVpm->appendChild(pi);
+
+        QDomElement vpmRoot = mDocVpm->createElement("vle_project_metadata");
+        // Save VPZ file revision
+        vpmRoot.setAttribute("version", "1.x");
+        // Save the author name (if known)
+        vpmRoot.setAttribute("author", "me");
+        QDomElement xCondPlug = mDocVpm->createElement("condPlugins");
+        vpmRoot.appendChild(xCondPlug);
+        QDomElement xOutPlug = mDocVpm->createElement("outputGUIplugins");
+        vpmRoot.appendChild(xOutPlug);
+        mDocVpm->appendChild(vpmRoot);
+    }
+}
+
+void
+vleVpm::renameCondGUIplugin(const QString& oldCond, const QString& newCond)
+{
+    xCreateDom();
+
+    QDomElement docElem = mDocVpm->documentElement();
+
+    QDomNode condsPlugins =
+            mDocVpm->elementsByTagName("condPlugins").item(0);
+    undoStackVpm->snapshot(condsPlugins);
+    QDomNodeList plugins =
+            condsPlugins.toElement().elementsByTagName("condPlugin");
+    for (unsigned int i =0; i< plugins.length(); i++) {
+        QDomNode plug = plugins.at(i);
+        for (int j=0; j< plug.attributes().size(); j++) {
+            if ((plug.attributes().item(j).nodeName() == "cond") and
+                    (plug.attributes().item(j).nodeValue() == oldCond))  {
+                plug.toElement().setAttribute("cond", newCond);
+                return;
+            }
+        }
+    }
+}
+
+void
+vleVpm::setCondGUIplugin(const QString& condName, const QString& name)
+{
+    xCreateDom();
+
+    QDomElement docElem = mDocVpm->documentElement();
+
+    QDomNode condsPlugins =
+            mDocVpm->elementsByTagName("condPlugins").item(0);
+    undoStackVpm->snapshot(condsPlugins);
+    QDomNodeList plugins =
+            condsPlugins.toElement().elementsByTagName("condPlugin");
+    for (unsigned int i =0; i< plugins.length(); i++) {
+        QDomNode plug = plugins.at(i);
+        for (int j=0; j< plug.attributes().size(); j++) {
+            if ((plug.attributes().item(j).nodeName() == "cond") and
+                    (plug.attributes().item(j).nodeValue() == condName))  {
+                plug.toElement().setAttribute("plugin", name);
+                return;
+            }
+        }
+    }
+    QDomElement el = mDocVpm->createElement("condPlugin");
+    el.setAttribute("cond", condName);
+    el.setAttribute("plugin", name);
+    condsPlugins.appendChild(el);
+}
+
+void
+vleVpm::setOutputGUIplugin(const QString& viewName, const QString& pluginName)
+{
+    xCreateDom();
+
+    QDomElement docElem = mDocVpm->documentElement();
+    QDomNode outGUIplugs =
+            mDocVpm->elementsByTagName("outputGUIplugins").item(0);
+    if (outGUIplugs.isNull() ) {
+        QDomNode metaData = mDocVpm->elementsByTagName(
+                "vle_project_metadata").item(0);
+        undoStackVpm->snapshot(metaData);
+        metaData.appendChild(mDocVpm->createElement("outputGUIplugins"));
+        outGUIplugs =  mDocVpm->elementsByTagName("outputGUIplugins").item(0);
+    } else {
+        undoStackVpm->snapshot(outGUIplugs);
+    }
+    QDomNodeList plugins =
+            outGUIplugs.toElement().elementsByTagName("outputGUIplugin");
+    for (unsigned int i =0; i< plugins.length(); i++) {
+        QDomNode plug = plugins.at(i);
+        for (int j=0; j< plug.attributes().size(); j++) {
+            if ((plug.attributes().item(j).nodeName() == "view") and
+                    (plug.attributes().item(j).nodeValue() == viewName))  {
+                plug.toElement().setAttribute("GUIplugin", pluginName);
+                return;
+            }
+        }
+    }
+    QDomElement el = mDocVpm->createElement("outputGUIplugin");
+    el.setAttribute("view", viewName);
+    el.setAttribute("GUIplugin", pluginName);
+    outGUIplugs.appendChild(el);
+}
+
+void
+vleVpm::tryEmitUndoAvailability(int prevCurr, int curr)
+{
+    if ((prevCurr == 0) and (curr > 0)){
+        emit undoAvailable(true);
+    }
+    if ((curr == 0) and (prevCurr > 0)) {
+        emit undoAvailable(false);
     }
 }
 

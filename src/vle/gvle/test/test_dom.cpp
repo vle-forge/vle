@@ -129,7 +129,6 @@ BOOST_AUTO_TEST_CASE(test_build_value)
     source.setData(QString(vpz_content));
     vle::gvle::vleVpz vpz(source);
     vle::gvle::vleDomVpz vleDom(&vpz.getDomDoc());
-    //qDebug() << " dbg " << vleDom.toQString(vpz.getDomDoc());
 
     //test tuple
     vle::value::Value* t = vpz.buildValueFromDoc("cond", "myport", 0);
@@ -137,7 +136,6 @@ BOOST_AUTO_TEST_CASE(test_build_value)
     delete t;
     t = vpz.buildValueFromDoc("cond", "myport", 1);
     BOOST_REQUIRE_EQUAL(t->toTuple().size(), 3);
-    //std::cout << " dbg " << *t << "\n";
     BOOST_REQUIRE_CLOSE(t->toTuple().at(0), 1.5, 1e-5);
     BOOST_REQUIRE_CLOSE(t->toTuple().at(1), 2, 1e-5);
     BOOST_REQUIRE_CLOSE(t->toTuple().at(2), 4.6, 1e-5);

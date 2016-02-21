@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <QMessageBox>
 #include <QScrollArea>
 #include <QSpinBox>
@@ -30,26 +31,28 @@
 #include <QListWidgetItem>
 #include <QPushButton>
 #include <QTreeWidgetItem>
+#include <QDebug>
 #include <QTableWidgetItem>
+
 #include <vle/value/Set.hpp>
 #include <vle/value/Matrix.hpp>
 
-
-#include "vlepackage.h"
 #include "gvle_plugins.h"
+#include "gvle_widgets.h"
+#include "vlevpm.h"
 
 #include "filevpzexpcond.h"
-#include "ui_filevpzexpcond.h"
-#include "gvle_widgets.h"
 
-#include <QDebug>
+#include "ui_filevpzexpcond.h"
+
+
 
 namespace vle {
 namespace gvle {
 
-FileVpzExpCond::FileVpzExpCond(QWidget *parent) :
+FileVpzExpCond::FileVpzExpCond(gvle_plugins* plugs, QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzExpCond), mVpm(0), mCurrCondName(""),
-    mCurrPortName(""), mCurrValIndex(-1),  mPlugin(0)
+    mCurrPortName(""), mCurrValIndex(-1),  mPlugin(0), mGvlePlugins(plugs)
 {
     ui->setupUi(this);
 
@@ -301,9 +304,7 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
     action->setEnabled(true);
 
     //check plugins
-    gvle_plugins plugs;
-    plugs.loadPlugins();
-    QStringList plugList = plugs.getCondPluginsList();
+    QStringList plugList = mGvlePlugins->getCondPluginsList();
     for (int i =0; i<plugList.size(); i++) {
         action = subMenu->addAction(plugList.at(i)+" (plugin)");
         action->setEnabled(true);
@@ -389,6 +390,7 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             mVpm->rmValuePortCondToDoc(cond, port, index.column()-2);
             reload(false);
         } else {//add from plugin
+
             mCurrCondName = mVpm->newCondNameToDoc();
             mVpm->addConditionFromPluginToDoc(mCurrCondName, actCode);
             reload(false);

@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef gvle_FILE_VPZ_RTOOL_H
-#define gvle_FILE_VPZ_RTOOL_H
+#ifndef gvle_FILE_VPZ_SIM_H
+#define gvle_FILE_VPZ_SIM_H
 
 #include <QGraphicsScene>
 #include <QWidget>
@@ -38,16 +38,7 @@
 #include "vlevpz.h"
 #include "widgetvpzproperty.h"
 #include "vpzDiagScene.h"
-//#include "filevpzdynamics.h"
-//#include "filevpzexpcond.h"
-//#include "filevpzexpview.h"
-//#include "filevpzobservables.h"
-//#include "filevpzproject.h"
-//#include "filevpzclasses.h"
-
-//#ifndef Q_MOC_RUN
-//#include <vle/vpz/Vpz.hpp>
-//#endif
+#include "plugin_simpanel.h"
 
 #define ROW_NAME 0
 #define ROW_DYN  1
@@ -55,44 +46,37 @@
 #define ROW_OBS  3
 
 namespace Ui {
-class fileVpzRTool;
+class FileVpzSim;
 }
 
 namespace vle {
 namespace gvle {
 
-class FileVpzRtool : public QWidget
+class FileVpzSim : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit FileVpzRtool(QWidget *parent = 0);
-    ~FileVpzRtool();
+    explicit FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
+            QWidget *parent = 0);
+    ~FileVpzSim();
     void setVpm(vleVpm* v);
-    void clear();
-    void updateTree();
-    vleVpm* vpm();
-    QString getModelQuery(QTreeWidgetItem* base);
-    QTreeWidgetItem* getTreeWidgetItem(const QString& model_query);
-    void updateModelProperty(const QString& model_query);
-    QTreeWidgetItem* treeInsertModel(QDomNode mode, QTreeWidgetItem *base);
-//    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
-//    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
+    void setSimLeftWidget(QWidget* leftWidget);
+    QWidget* rightWidget();
 
+signals:
+    void rightWidgetChanged();
 public slots:
-    void onTreeModelSelected();
-    void onEnterCoupledModel(QDomNode node);
-    void onSelectionChanged();
-    void onInitializationDone(VpzDiagScene* scene);
-    void onModelsUpdated();
+    void onPluginChanged(const QString& text);
 
 
 public:
-    Ui::fileVpzRtool*  ui;
+    Ui::FileVpzSim*  ui;
 private:
     vleVpm*          mVpm;
-    VpzDiagScene*    mCurrScene;
-    bool             mExternalSelection;
+    gvle_plugins*    mGvlePlugins;
+    PluginSimPanel*  mPluginSimPanel;
+    vle::utils::Package*     mPackage;
 };
 
 }} //namespaces

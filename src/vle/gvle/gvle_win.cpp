@@ -22,26 +22,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <QFileDialog>
 #include <QStyleFactory>
 #include <QActionGroup>
 #include <QMessageBox>
 #include <QDirIterator>
+#include <QDomDocument>
 #include <QDir>
-
-#include <iostream>
+#include <QDebug>
 
 #include "gvle_win.h"
 #include "ui_gvle_win.h"
-#include "plugin_modeler.h"
-#include "plugin_sim.h"
+#include "plugin_mainpanel.h"
 #include "help.h"
 #include "aboutbox.h"
 #include "filevpzview.h"
-#include "simulation.h"
 #include "vlevpm.h"
-#include <QtDebug>
-#include <QDebug>
+#include "DefaultVpzPanel.h"
+#include "DefaultCppPanel.h"
+#include "plugin_cond.h"
+#include "plugin_output.h"
+
 
 namespace vu = vle::utils;
 
@@ -53,16 +56,11 @@ gvle_win::gvle_win(QWidget *parent) :
     ui(new Ui::gvleWin)
 {
 
-    mVpm = 0;
     mTimer = 0;
     mLogger = 0;
     mSimOpened = false;
-    mCurrentSimPlugin = 0;
-    mPackage = 0;
     // VLE init
     mCurrPackage.refreshPath();
-    //
-    mModelers.clear();
 
     // GUI init
     ui->setupUi(this);
@@ -104,6 +102,9 @@ gvle_win::gvle_win(QWidget *parent) :
     QObject::connect(ui->actionCloseProject,
                      SIGNAL(triggered()), this,
                      SLOT(onCloseProject()));
+    QObject::connect(ui->actionSaveFile,
+                     SIGNAL(triggered()), this,
+                     SLOT(onSaveFile()));
     QObject::connect(ui->actionQuit,
                      SIGNAL(triggered()), this,
                      SLOT(onQuit()));
@@ -119,9 +120,12 @@ gvle_win::gvle_win(QWidget *parent) :
     QObject::connect(ui->actionBuildProject,
                      SIGNAL(triggered()), this,
                      SLOT(onProjectBuild()));
-    QObject::connect(ui->actionLaunchSimulation,
+    QObject::connect(ui->actionCleanProject,
                      SIGNAL(triggered()), this,
-                     SLOT(onLaunchSimulation()));
+                     SLOT(onProjectClean()));
+    QObject::connect(ui->actionUninstall,
+                     SIGNAL(triggered()), this,
+                     SLOT(onProjectUninstall()));
     QObject::connect(ui->actionSimNone,
                      SIGNAL(toggled(bool)), this,
                      SLOT(onSelectSimulator(bool)));
@@ -183,8 +187,8 @@ gvle_win::gvle_win(QWidget *parent) :
     sizes.append(200);
     ui->splitter->setSizes(sizes);
 
-    loadPlugins();
-    ui->menuSelectSimulator->setEnabled(true);
+
+    mGvlePlugins.registerPlugins();
 
 }
 
@@ -192,8 +196,6 @@ gvle_win::~gvle_win()
 {
     mSettings->sync();
     delete mSettings;
-    if (mVpm)
-        delete mVpm;
 
     while(ui->tabWidget->count())
     {
@@ -205,7 +207,8 @@ gvle_win::~gvle_win()
     delete ui;
 }
 
-void gvle_win::closeEvent(QCloseEvent *event)
+void
+gvle_win::closeEvent(QCloseEvent *event)
 {
     if (closeProject()) {
         event->accept();
@@ -215,152 +218,24 @@ void gvle_win::closeEvent(QCloseEvent *event)
 }
 
 
-void gvle_win::showEvent(QShowEvent *event)
+void
+gvle_win::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
     statusWidgetClose();
 }
 
-void gvle_win::loadPlugins()
-{
-    QString pathgvlec = "plugins/gvle/condition";
-    QString pathgvles = "plugins/gvle/simulating";
-    QString pathgvlem = "plugins/gvle/modeling";
-    QString pathgvleo = "plugins/gvle/output";
 
-    QString packagesDir = vu::Path::path().getBinaryPackagesDir().c_str();
 
-    QDirIterator it(packagesDir, QDir::AllDirs);
-
-    while (it.hasNext()) {
-        it.next();
-        if (QDir(it.filePath() + "/" + pathgvlec).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvlec, QDir::Files);
-            while (itbis.hasNext()) {
-                QString libName =  itbis.next();
-                QPluginLoader loader(libName);
-                QObject *plugin = loader.instance();
-                if ( ! loader.isLoaded()) {
-                    continue;
-                }
-                PluginExpCond *expcond = qobject_cast<PluginExpCond *>(plugin);
-                if (expcond) {
-                    loadExpCondPlugins(expcond, libName);
-                }
-                loader.unload();
-            }
-        }
-
-        if (QDir(it.filePath() + "/" + pathgvlem).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvlem, QDir::Files);
-            while (itbis.hasNext()) {
-                QString libName =  itbis.next();
-                QPluginLoader loader(libName);
-                QObject *plugin = loader.instance();
-                if ( ! loader.isLoaded()) {
-                    continue;
-                }
-                PluginModeler *modeling = qobject_cast<PluginModeler *>(plugin);
-                if (modeling) {
-                    loadModelerPlugins(modeling, libName);
-                }
-                loader.unload();
-            }
-        }
-
-        if (QDir(it.filePath() + "/" + pathgvles).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvles, QDir::Files);
-            while (itbis.hasNext()) {
-                QString libName =  itbis.next();
-                QPluginLoader loader(libName);
-                QObject *plugin = loader.instance();
-                if ( ! loader.isLoaded()) {
-                    continue;
-                }
-                PluginSimulator *simulating = qobject_cast<PluginSimulator *>(plugin);
-                if (simulating) {
-                    loadSimulationPlugins(simulating, libName);
-                }
-                loader.unload();
-            }
-        }
-
-        if (QDir(it.filePath() + "/" + pathgvleo).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvleo, QDir::Files);
-
-            while (itbis.hasNext()) {
-                QString libName =  itbis.next();
-                QPluginLoader loader(libName);
-                QObject *plugin = loader.instance();
-                if ( ! loader.isLoaded()) {
-                    continue;
-                }
-                PluginOutput *simulating = qobject_cast<PluginOutput *>(plugin);
-                if (simulating) {
-                    loadOutputPlugins(simulating, libName);
-                }
-                loader.unload();
-            }
-        }
-    }
-}
-
-void gvle_win::loadExpCondPlugins(PluginExpCond *plugin, QString fileName)
-{
-    qDebug() << " - Found experimental condition plugin: " << plugin->getname();
-    mExpPlugins.insert(plugin->getname(), fileName);
-}
-
-void gvle_win::loadModelerPlugins(PluginModeler *plugin, QString fileName)
-{
-    qDebug() << " - Found modeling plugin: " << plugin->getname();
-    mModelers.append(fileName);
-
-    QMenu *newPluginMenu = ui->menuModeling->addMenu(plugin->getname());
-
-    QAction *newAct = newPluginMenu->addAction(tr("New class"));
-    newAct->setProperty("fileName", fileName);
-    QAction *updAct = newPluginMenu->addAction(tr("Update"));
-    updAct->setEnabled(false);
-    newPluginMenu->addSeparator();
-    QAction *openAct = newPluginMenu->addAction(tr("Open"));
-    openAct->setProperty("fileName", fileName);
-
-    QObject::connect(newAct,  SIGNAL(triggered()), this, SLOT(onNewModelerClass()));
-    QObject::connect(openAct, SIGNAL(triggered()), this, SLOT(onOpenModeler()));
-}
-
-void gvle_win::loadSimulationPlugins(PluginSimulator *sim, QString fileName)
-{
-    qDebug() << " - Found simulating plugin: " << sim->getname();
-    mLogger->log(QString("Load simulator pluggin : %1").arg(sim->getname()));
-
-    mSimulatorPlugins.insert(sim->getname(), fileName);
-
-    // Update Menu
-    QAction *newAct = ui->menuSelectSimulator->addAction(sim->getname());
-    newAct->setCheckable(true);
-    newAct->setActionGroup(mMenuSimGroup);
-    newAct->setObjectName(sim->getname());
-    newAct->setData(fileName);
-    QObject::connect(newAct, SIGNAL(toggled(bool)), this, SLOT(onSelectSimulator(bool)));
-}
-
-void gvle_win::loadOutputPlugins(PluginOutput *out, QString fileName)
-{
-    qDebug() << " - Found output plugin: " << out->getname();
-    mOutputPlugins.insert(out->getname(), fileName);
-}
-
-void gvle_win::onNewProject()
+void
+gvle_win::onNewProject()
 {
     QFileDialog FileChooserDialog(this);
 
+    FileChooserDialog.setWindowTitle("New Project");
     FileChooserDialog.setFileMode(QFileDialog::AnyFile);
     FileChooserDialog.setOptions(QFileDialog::ShowDirsOnly);
     FileChooserDialog.setAcceptMode(QFileDialog::AcceptSave);
-    FileChooserDialog.setLabelText(QFileDialog::LookIn,
-                                   "Choose a directory");
     FileChooserDialog.setLabelText(QFileDialog::FileName,
                                    "Name of the VLE project");
     if (FileChooserDialog.exec()) {
@@ -380,7 +255,8 @@ void gvle_win::onNewProject()
  * @brief gvle_win::onOpenProject
  *        Handler for menu function : File > Open Project
  */
-void gvle_win::onOpenProject()
+void
+gvle_win::onOpenProject()
 {
     QFileDialog FileChooserDialog(this);
 
@@ -388,58 +264,57 @@ void gvle_win::onOpenProject()
     if (FileChooserDialog.exec())
         openProject(FileChooserDialog.selectedFiles().first());
 }
-void gvle_win::onProjectRecent1()
+void
+gvle_win::onProjectRecent1()
 {
     QVariant path = mSettings->value("Projects/recent1");
     if (path.isValid())
         openProject(path.toString());
 }
-void gvle_win::onProjectRecent2()
+void
+gvle_win::onProjectRecent2()
 {
     QVariant path = mSettings->value("Projects/recent2");
     if (path.isValid())
         openProject(path.toString());
 }
-void gvle_win::onProjectRecent3()
+void
+gvle_win::onProjectRecent3()
 {
     QVariant path = mSettings->value("Projects/recent3");
     if (path.isValid())
         openProject(path.toString());
 }
-void gvle_win::onProjectRecent4()
+void
+gvle_win::onProjectRecent4()
 {
     QVariant path = mSettings->value("Projects/recent4");
     if (path.isValid())
         openProject(path.toString());
 }
-void gvle_win::onProjectRecent5()
+void
+gvle_win::onProjectRecent5()
 {
     QVariant path = mSettings->value("Projects/recent5");
     if (path.isValid())
         openProject(path.toString());
 }
 
-void gvle_win::newProject(QString pathName)
+void
+gvle_win::newProject(QString pathName)
 {
     QDir dir(pathName);
     std::string basename = dir.dirName().toStdString ();
+    dir.cdUp();
+    QDir::setCurrent( dir.path() );
 
-    if (mPackage) {
-        if ( not closeProject()) {
-            return;
-        }
-    }
-
-    mPackage = new vlePackage(pathName);
-    mPackage->setStdPackage( &mCurrPackage );
+    mCurrPackage.select(basename);
 
     mLogger->log(QString("New Project %1").arg(dir.dirName()));
 
     // Update window title
-    setWindowTitle("GVLE - " + dir.dirName());
+    setWindowTitle(QString("GVLE - ") + basename.c_str());
 
-    dir.cdUp();
-    QDir::setCurrent( dir.path() );
     mCurrPackage.select(basename);
     mCurrPackage.create();
     treeProjectUpdate();
@@ -450,45 +325,26 @@ void gvle_win::newProject(QString pathName)
 
     ui->actionCloseProject->setEnabled(true);
     ui->menuProject->setEnabled(true);
-    ui->menuModeling->setEnabled(true);
 }
 
 /**
  * @brief gvle_win::openProject
  *        Handler for menu function : File > Open Project
  */
-void gvle_win::openProject(QString pathName)
+void
+gvle_win::openProject(QString pathName)
 {
-    if (mPackage) {
-        if ( not closeProject()) {
-            return;
-        }
-    }
-    mPackage = new vlePackage(pathName);
-    mPackage->setStdPackage( &mCurrPackage );
-    // Register modelers
-    for (int i = 0; i < mModelers.count(); i++)
-        mPackage->addModeler(mModelers.at(i));
-    // Register Experimental Conditions plugins
-    QList <QString> expNames = mExpPlugins.keys();
-    for (int i = 0; i < mExpPlugins.count(); i++)
-    {
-        QString name = expNames.at(i);
-        mPackage->addExpPlugin(name, mExpPlugins.value(name));
-    }
+    QDir dir(pathName);
+    std::string basename = dir.dirName().toStdString ();
+    dir.cdUp();
+    QDir::setCurrent( dir.path() );
 
-    // Register Output plugins
-    QList <QString> outNames = mOutputPlugins.keys();
-    for (int i = 0; i < mOutputPlugins.count(); i++)
-    {
-        QString name = outNames.at(i);
-        mPackage->addOutputPlugin(name, mOutputPlugins.value(name));
-    }
+    mCurrPackage.select(basename);
 
-    mLogger->log(QString("Open Project %1").arg(mPackage->getName()));
+    mLogger->log(QString("Open Project %1").arg(mCurrPackage.name().c_str()));
 
     // Update window title
-    setWindowTitle("GVLE - " + mPackage->getName());
+    setWindowTitle(QString("GVLE - ") + mCurrPackage.name().c_str());
 
     treeProjectUpdate();
 
@@ -496,12 +352,11 @@ void gvle_win::openProject(QString pathName)
     menuRecentProjectUpdate(pathName);
     menuRecentProjectRefresh();
 
-    ui->actionCloseProject->setEnabled(true);
     ui->menuProject->setEnabled(true);
-    ui->menuModeling->setEnabled(true);
 }
 
-bool gvle_win::closeProject()
+bool
+gvle_win::closeProject()
 {
     for (int i = (ui->tabWidget->count() - 1); i >= 0; i--) {
 
@@ -517,29 +372,52 @@ bool gvle_win::closeProject()
         }
 
         if (rtool.isValid()) {
-            QWidget *wtool = ui->rightStack->widget( rtool.toInt() );
-            ui->rightStack->removeWidget(wtool);
-            delete wtool;
+            setRightWidget(0);
         }
     }
 
     // Update menus
-    ui->actionCloseProject->setEnabled(false);
     ui->menuProject->setEnabled(false);
     // Update window title
     setWindowTitle("GVLE");
 
     mLogger->log(QString("Project closed"));
 
-    delete mPackage;
-    mPackage = 0;
-
     return true;
+}
+
+PluginMainPanel*
+gvle_win::getMainPanelFromTabIndex(int index)
+{
+    QString relPath = getRelPathFromTabIndex(index);
+    if (mPanels.contains(relPath)) {
+        return mPanels[relPath];
+    }
+    return 0;
+}
+
+QString
+gvle_win::getRelPathFromTabIndex(int index)
+{
+    QString relPath = ui->tabWidget->tabText(index);
+    if (relPath.startsWith("* ")) {
+        relPath = relPath.remove("* ");
+    }
+    return relPath;
 }
 
 void gvle_win::onCloseProject()
 {
     closeProject();
+}
+
+
+
+void
+gvle_win::onSaveFile()
+{
+    QString relPath = getRelPathFromTabIndex(ui->tabWidget->currentIndex());
+    mPanels[relPath]->save();
 }
 
 /**
@@ -553,7 +431,8 @@ void gvle_win::onQuit()
     }
 }
 
-void gvle_win::onProjectConfigure()
+void
+gvle_win::onProjectConfigure()
 {
     mLogger->log(tr("Project configuration started"));
     statusWidgetOpen();
@@ -566,21 +445,22 @@ void gvle_win::onProjectConfigure()
         mLogger->log(tr("Project configuration failed"));
         return;
     }
-    ui->actionConfigureProject->setEnabled(false);
+    ui->menuProject->setEnabled(false);
 
     mTimer = new QTimer();
     QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectConfigureTimer()));
-    mTimer->start(50);
+    mTimer->start(2);
 }
 
-void gvle_win::projectConfigureTimer()
+void
+gvle_win::projectConfigureTimer()
 {
     if (mCurrPackage.isFinish())
     {
         mTimer->stop();
         delete mTimer;
         mLogger->log(tr("Project configuration complete"));
-        ui->actionConfigureProject->setEnabled(true);
+        ui->menuProject->setEnabled(true);
     }
     std::string oo;
     std::string oe;
@@ -594,7 +474,8 @@ void gvle_win::projectConfigureTimer()
     }
 }
 
-void gvle_win::onProjectBuild()
+void
+gvle_win::onProjectBuild()
 {
     mLogger->log(tr("Project compilation started"));
     statusWidgetOpen();
@@ -607,14 +488,58 @@ void gvle_win::onProjectBuild()
         mLogger->log(tr("Project compilation failed"));
         return;
     }
-    ui->actionBuildProject->setEnabled(false);
+    ui->menuProject->setEnabled(false);
 
     mTimer = new QTimer();
     QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectBuildTimer()));
-    mTimer->start(50);
+    mTimer->start(2);
 }
 
-void gvle_win::projectBuildTimer()
+void
+gvle_win::onProjectClean()
+{
+    mLogger->log(tr("Project clean started"));
+    statusWidgetOpen();
+
+    try {
+        mCurrPackage.clean();
+    } catch (const std::exception &e) {
+        QString logMessage = QString("%1").arg(e.what());
+        mLogger->logExt(logMessage, true);
+        mLogger->log(tr("Project clean failed"));
+        return;
+    }
+    ui->menuProject->setEnabled(false);
+
+    mTimer = new QTimer();
+    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectCleanTimer()));
+    mTimer->start(2);
+}
+
+void
+gvle_win::onProjectUninstall()
+{
+    mLogger->log(tr("Project uninstall started"));
+    statusWidgetOpen();
+
+    try {
+        mCurrPackage.rclean();
+    } catch (const std::exception &e) {
+        QString logMessage = QString("%1").arg(e.what());
+        mLogger->logExt(logMessage, true);
+        mLogger->log(tr("Project uninstall failed"));
+        return;
+    }
+    ui->menuProject->setEnabled(false);
+
+    mTimer = new QTimer();
+    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectUninstallTimer()));
+    mTimer->start(2);
+}
+
+
+void
+gvle_win::projectBuildTimer()
 {
     std::string oo, oe;
 
@@ -644,29 +569,12 @@ void gvle_win::projectBuildTimer()
         } else {
             mLogger->log(tr("Project compilation failed"));
         }
-        ui->actionBuildProject->setEnabled(true);
+        ui->menuProject->setEnabled(true);
     }
 }
 
-void gvle_win::projectInstall()
-{
-    mLogger->log(tr("Project installation started"));
-
-    try {
-        mCurrPackage.install();
-    } catch (const std::exception& e) {
-        QString logMessage = QString("%1").arg(e.what());
-        mLogger->logExt(logMessage, true);
-        mLogger->log(tr("Project installation failed"));
-        return;
-    }
-
-    mTimer = new QTimer();
-    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectInstallTimer()));
-    mTimer->start(50);
-}
-
-void gvle_win::projectInstallTimer()
+void
+gvle_win::projectInstallTimer()
 {
     std::string oo, oe;
 
@@ -687,143 +595,76 @@ void gvle_win::projectInstallTimer()
         } else {
             mLogger->log(tr("Project installation failed"));
         }
-        ui->actionBuildProject->setEnabled(true);
+        ui->menuProject->setEnabled(true);
     }
 }
 
-/**
- * @brief gvle_win::onLaunchSimulation
- *        Handler for menu function : Simulation > Launch Simulation
- */
-void gvle_win::onLaunchSimulation()
+void
+gvle_win::projectCleanTimer()
 {
-    QWidget *w = ui->tabWidget->currentWidget();
-
-    vle::gvle::fileVpzView *vpzView = qobject_cast<vle::gvle::fileVpzView *>(w);
-    if (vpzView == 0)
-        return;
-
-    if (mSimOpened)
-        return;
-
-    if ( ! ui->actionSimNone->isChecked())
+    if (mCurrPackage.isFinish())
     {
-        // If plugin not already loadloed (or unloaded)
-        if (mCurrentSimPlugin == 0)
-        {
-            // Instantiate a new loader - See QTBUG-24079
-            QString pluginFile = mSimulatorPlugins.value(mCurrentSimName);
-            mCurrentSimPlugin = new QPluginLoader(pluginFile);
-            // If loading failed, nothing more to do :(
-            if (mCurrentSimPlugin == 0)
-                return;
-        }
-        mCurrentSimPlugin->load();
-        QObject *plugin = mCurrentSimPlugin->instance();
-        if ( ! mCurrentSimPlugin->isLoaded())
-            return;
-        PluginSimulator *sim = qobject_cast<PluginSimulator *>(plugin);
-        if ( ! sim)
-            return;
-
-        mCurrentSim = sim;
-
-        sim->setSettings(mSettings);
-        //sim->setLogger(mLogger);
-
-        QWidget *newTab = sim->getWidget();
-        if (newTab)
-        {
-            // Configure Pluggin for the requested VPZ
-            newTab->setProperty("type",   QString("simulation"));
-            newTab->setProperty("plugin", QString("yes"));
-            newTab->setProperty("vpz",    QVariant::fromValue((void*)vpzView));
-            vpzView->usedBySim(true);
-            try {
-                sim->init(vpzView->vpm());
-                sim->setPackage(&mCurrPackage);
-                // Associate the pluggin widget with a new tab
-                int n = ui->tabWidget->addTab(newTab, "Simulation");
-                ui->tabWidget->setCurrentIndex(n);
-                newTab->show();
-            } catch(...) {
-                qDebug() << "Simulation pluggin configuration error";
-            }
-        }
-
-        // Search a toolbox widget from the plugin
-        QWidget *newTool = sim->getWidgetToolbar();
-        if (newTool)
-        {
-            try {
-                int nid;
-                nid = ui->rightStack->addWidget(newTool);
-                ui->rightStack->setCurrentWidget(newTool);
-                newTab->setProperty("wTool", nid);
-            } catch (...) {
-                qDebug() << "Simulation pluggin toolbar error";
-            }
-        }
+        mTimer->stop();
+        delete mTimer;
+        mLogger->log(tr("Project clean complete"));
+        ui->menuProject->setEnabled(true);
     }
-    else
+    std::string oo;
+    std::string oe;
+    bool ret = mCurrPackage.get(&oo, &oe);
+    if (ret)
     {
-        // Create a new tab
-        simulationView * newTab = new simulationView();
-        newTab->setProperty("type", QString("simulation"));
-        newTab->setProperty("vpz",  QVariant::fromValue((void*)vpzView));
-        vpzView->usedBySim(true);
-        newTab->setVpm(vpzView->vpm());
-        newTab->setPackage(&mCurrPackage);
-        newTab->setLogger(mLogger);
-        newTab->setSettings(mSettings);
-        int n = ui->tabWidget->addTab(newTab, "Simulation");
-        ui->tabWidget->setCurrentIndex(n);
-        newTab->show();
-
-        // Create a new toolbox for the right column
-        int nid;
-        QWidget *newRTool = newTab->getTool();
-        nid = ui->rightStack->addWidget(newRTool);
-        ui->rightStack->setCurrentWidget(newRTool);
-        newTab->setProperty("wTool", nid);
+        if(oe.length())
+            mLogger->logExt(oe.c_str(), true);
+        if (oo.length())
+            mLogger->logExt(oo.c_str());
     }
+}
 
-    // Disable some menu entries when a tab is opened
-    ui->actionLaunchSimulation->setEnabled(false);
-    ui->menuSelectSimulator->setEnabled(false);
-    mSimOpened = true;
+void
+gvle_win::projectUninstallTimer()
+{
+    if (mCurrPackage.isFinish())
+    {
+        mTimer->stop();
+        delete mTimer;
+        mLogger->log(tr("Project uninstall complete"));
+        ui->menuProject->setEnabled(true);
+    }
+    std::string oo;
+    std::string oe;
+    bool ret = mCurrPackage.get(&oo, &oe);
+    if (ret)
+    {
+        if(oe.length())
+            mLogger->logExt(oe.c_str(), true);
+        if (oo.length())
+            mLogger->logExt(oo.c_str());
+    }
 }
 
 void
 gvle_win::onUndo()
 {
-    QWidget *w = ui->tabWidget->currentWidget();
-    fileVpzView *tabVpz = (fileVpzView *)w;
-    tabVpz->vpm()->undo();
-
+    QString relPath = ui->tabWidget->currentWidget()->property("relPath").toString();
+    mPanels[relPath]->undo();
 }
 
 void
 gvle_win::onRedo()
 {
-    QWidget *w = ui->tabWidget->currentWidget();
-    fileVpzView *tabVpz = (fileVpzView *)w;
-    tabVpz->vpm()->redo();
+    QString relPath = ui->tabWidget->currentWidget()->property("relPath").toString();
+    mPanels[relPath]->redo();
 
 }
 
-void gvle_win::onSelectSimulator(bool isChecked)
+void
+gvle_win::onSelectSimulator(bool isChecked)
 {
     QAction *act = (QAction *)sender();
 
     if (isChecked)
     {
-        if (mCurrentSimPlugin)
-        {
-            mCurrentSimPlugin->unload();
-            delete mCurrentSimPlugin;
-            mCurrentSimPlugin = 0;
-        }
         if (act->objectName() != "actionSimNone")
             mCurrentSimName = act->objectName();
     }
@@ -833,7 +674,8 @@ void gvle_win::onSelectSimulator(bool isChecked)
  * @brief gvle_win::onHelp Handler of menu Help > Help
  *        Open a new tab and display embedded help page
  */
-void gvle_win::onHelp()
+void
+gvle_win::onHelp()
 {
     bool  helpOpened = false;
     help *tabHelp = 0;
@@ -870,7 +712,8 @@ void gvle_win::onHelp()
  * @brief gvle_win::onAbout Handler of menu Help > About
  *        Open the about box as dialog and show it
  */
-void gvle_win::onAbout()
+void
+gvle_win::onAbout()
 {
     AboutBox box;
 
@@ -881,7 +724,8 @@ void gvle_win::onAbout()
  * @brief gvle_win::menuRecentProjectRefresh
  *        Read the recent opened projects list and update menu
  */
-void gvle_win::menuRecentProjectRefresh()
+void
+gvle_win::menuRecentProjectRefresh()
 {
     QVariant v1 = mSettings->value("Projects/recent1");
     QVariant v2 = mSettings->value("Projects/recent2");
@@ -902,7 +746,9 @@ void gvle_win::menuRecentProjectRefresh()
     if (v5.isValid())
         menuRecentProjectSet(v5.toString(), ui->actionRecent5);
 }
-void gvle_win::menuRecentProjectSet(QString path, QAction *menu)
+
+void
+gvle_win::menuRecentProjectSet(QString path, QAction *menu)
 {
     QDir dir(path);
     menu->setText(dir.dirName());
@@ -910,7 +756,9 @@ void gvle_win::menuRecentProjectSet(QString path, QAction *menu)
     menu->setEnabled(true);
     menu->setVisible(true);
 }
-void gvle_win::menuRecentProjectUpdate(QString path)
+
+void
+gvle_win::menuRecentProjectUpdate(QString path)
 {
     QVariant v1 = mSettings->value("Projects/recent1");
     QVariant v2 = mSettings->value("Projects/recent2");
@@ -939,151 +787,84 @@ void gvle_win::menuRecentProjectUpdate(QString path)
 
 /* ---------- Manage the central tabs ---------- */
 
-void gvle_win::onTabChange(int index)
+void
+gvle_win::onTabChange(int index)
 {
+
     if (ui->tabWidget->count() == 0)
         return;
-
-    QWidget *w = ui->tabWidget->widget(index);
-    QVariant tabType = w->property("type");
-    bool isVpz = (tabType.toString().compare("vpz") == 0);
-    bool isSim = (tabType.toString().compare("simulation") == 0);
-
-    if (tabType.isValid())
-    {
-        // Update Right Column
-        if (isSim)
-        {
-            int toolId = w->property("wTool").toInt();
-            ui->rightStack->setCurrentIndex(toolId);
-        }
-        else if (isVpz)
-        {
-            int toolId = w->property("wTool").toInt();
-            ui->rightStack->setCurrentIndex(toolId);
-        }
-        else
-            ui->rightStack->setCurrentIndex(0);
-
-        // Update Simulation menu
-        if (isVpz || isSim)
-            ui->menuSimulation->setEnabled(true);
-        else
-            ui->menuSimulation->setEnabled(false);
-    }
-    else
-    {
-        ui->menuSimulation->setEnabled(false);
-        ui->rightStack->setCurrentIndex(0);
+    PluginMainPanel* w = getMainPanelFromTabIndex(index);
+    if (w) {
+        setRightWidget(w->rightWidget());
+    } else {
+        setRightWidget(0);
     }
 }
 
-bool gvle_win::tabClose(int index)
+bool
+gvle_win::tabClose(int index)
 {
-    bool isSim = false;
-    QWidget *wTool = 0;
-    QWidget *w = ui->tabWidget->widget(index);
-    if (w == 0) {
+    QString relPath = getRelPathFromTabIndex(index);
+    PluginMainPanel* w = getMainPanelFromTabIndex(index);
+    if (not w) {
+        removeTab(index);
+        return true;
+    }
+    QString canBeClosed =  w->canBeClosed();
+    if (canBeClosed != "") {
+        QMessageBox msgBox;
+        msgBox.setText(
+                QString("This file cannot be closed: %1").arg(canBeClosed));
+        msgBox.exec();
         return false;
     }
-
-    bool isPlugin = false;
-    QVariant vIsPlugin = w->property("plugin");
-    if (vIsPlugin.isValid())
-        isPlugin = (vIsPlugin.toString().compare("yes") == 0);
-
-    if (w->property("type").toString().compare("vpz") == 0)
-    {
-        fileVpzView *tabVpz = (fileVpzView *)w;
-
-        int useReason;
-        bool allowClose = false;
-        if (tabVpz->isUsed(&useReason))
-        {
-            QMessageBox msgBox;
-            if (useReason == 1)
-            {
-                msgBox.setText(tr("This tab can't be closed (used by a simulator)"));
-                msgBox.exec();
-                return false;
-            }
-            if (useReason == 2)
-            {
-                msgBox.setText(tr("Modified file: ") +
-                               tabVpz->vpm()->getFilename() + "\n" +
-                               tr("Save before close ?"));
-                msgBox.addButton(QMessageBox::Save);
-                msgBox.addButton(QMessageBox::Discard);
-                msgBox.addButton(QMessageBox::Cancel);
-                int ret = msgBox.exec();
-                switch (ret) {
-                  case QMessageBox::Save:
-                    tabVpz->save();
-                    allowClose = true;
-                    break;
-                  case QMessageBox::Discard:
-                    allowClose = true;
-                    break;
-                  case QMessageBox::Cancel:
-                    allowClose = false;
-                    break;
-                  default:
-                      // should never be reached
-                      break;
-                }
-                if (! allowClose)
-                    return false;
-            }
+    QString tabText = ui->tabWidget->tabText(index);
+    if (tabText.startsWith("* ")) {
+        QMessageBox msgBox;
+        msgBox.setText("Save file before closing it ?");
+        msgBox.addButton(QMessageBox::Save);
+        msgBox.addButton(QMessageBox::Discard);
+        msgBox.addButton(QMessageBox::Cancel);
+        int ret = msgBox.exec();
+        switch (ret) {
+        case QMessageBox::Save:
+            w->save();
+            mPanels.remove(relPath);
+            removeTab(index);
+            delete w;
+            break;
+        case QMessageBox::Discard:
+            mPanels.remove(relPath);
+            removeTab(index);
+            delete w;
+            break;
+        case QMessageBox::Cancel:
+            break;
+        default:
+            // should never be reached
+            break;
         }
-    }
-
-    ui->tabWidget->removeTab(index);
-
-    if (w->property("type").toString().compare("simulation") == 0)
-    {
-        isSim = true;
-
-        QVariant linkedVpz = w->property("vpz");
-        if (linkedVpz.isValid())
-        {
-            void *ptr = linkedVpz.value<void *>();
-            fileVpzView *currentVpz = (fileVpzView *)ptr;
-            currentVpz->usedBySim(false);
-        }
-
-        ui->actionLaunchSimulation->setEnabled(true);
-        ui->menuSelectSimulator->setEnabled(true);
-        mSimOpened = false;
-
-        int toolId = w->property("wTool").toInt();
-        wTool = ui->rightStack->widget(toolId);
-        ui->rightStack->removeWidget(wTool);
-        if (isPlugin)
-            mCurrentSim->delWidgetToolbar();
-        else
-            delete wTool;
-
-        if (isPlugin)
-        {
-            mCurrentSim->delWidget();
-            w = 0;
-        }
-    }
-    if (w)
+    } else {
+        mPanels.remove(relPath);
+        removeTab(index);
         delete w;
-
-    if (isSim && isPlugin)
-    {
-        mCurrentSimPlugin->unload();
-        delete mCurrentSimPlugin;
-        mCurrentSimPlugin = 0;
-        //delete mCurrentSim;
-        mCurrentSim = 0;
     }
     return true;
 }
 
-void gvle_win::onTabClose(int index)
+void
+gvle_win::removeTab(int index)
+{
+    QString tabText = ui->tabWidget->tabText(index);
+    ui->tabWidget->removeTab(index);
+    PluginMainPanel* w = getMainPanelFromTabIndex(ui->tabWidget->currentIndex());
+    if (w)  {
+        setRightWidget(w->rightWidget());
+    }
+}
+
+void
+gvle_win::onTabClose(int index)
 {
     tabClose(index);
 }
@@ -1094,7 +875,8 @@ void gvle_win::onTabClose(int index)
  * @brief gvle_win::onProjectConfigure
  *        Handler for menu function : Project > Configure Project
  */
-void gvle_win::onStatusToggle()
+void
+gvle_win::onStatusToggle()
 {
     if (ui->statusLog->isVisible())
         statusWidgetClose();
@@ -1102,7 +884,8 @@ void gvle_win::onStatusToggle()
         statusWidgetOpen();
 }
 
-void gvle_win::statusWidgetOpen()
+void
+gvle_win::statusWidgetOpen()
 {
     ui->statusLog->show();
     ui->statusWidget->setMinimumSize(0, 0);
@@ -1110,7 +893,8 @@ void gvle_win::statusWidgetOpen()
     ui->statusWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
 
-void gvle_win::statusWidgetClose()
+void
+gvle_win::statusWidgetClose()
 {
     ui->statusLog->hide();
     QSize titleSize = ui->statusTitleFrame->size();
@@ -1120,7 +904,8 @@ void gvle_win::statusWidgetClose()
 
 /* ---------- Manage the Project navigator ---------- */
 
-void gvle_win::treeProjectUpdate()
+void
+gvle_win::treeProjectUpdate()
 {
     QTreeView* projectTreeView = ui->treeProject;
     QString projectName(vu::Path::filename(mCurrPackage.name()).c_str());
@@ -1132,7 +917,8 @@ void gvle_win::treeProjectUpdate()
     projectTreeView->resizeColumnToContents(0);
 }
 
-QString gvle_win::treeProjectRelativePath(const QModelIndex index) const
+QString
+gvle_win::treeProjectRelativePath(const QModelIndex index) const
 {
     QString fileName = mProjectFileSytem->filePath(index);
     QString currentDir = QDir::currentPath() += "/";
@@ -1151,79 +937,65 @@ QString gvle_win::treeProjectRelativePath(const QModelIndex index) const
     return relPath;
 }
 
-void gvle_win::onTreeDblClick(QModelIndex index)
+void
+gvle_win::onTreeDblClick(QModelIndex index)
 {
     if (not index.isValid()) return;
 
     QString fileName = mProjectFileSytem->filePath(index);
     QString currentDir = QDir::currentPath() += "/";
-
     fileName.replace(currentDir, "");
-
     QFileInfo selectedFileInfo = QFileInfo(fileName);
-    if (selectedFileInfo.suffix() != "vpz")
-        return;
+    QString relPath = treeProjectRelativePath(index);
 
-    QString relPath;
-    relPath = treeProjectRelativePath(index);
-
-    QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
-    QString relPathVpm = relPath;
-    relPathVpm.replace(".vpz", ".vpm");
-    vleVpm* selVpm = new vleVpm(basepath+"/"+relPath,
-            basepath+"/metadata/"+relPathVpm);
-
-    selVpm->setLogger(mLogger);
-    selVpm->setBasePath(mPackage->getName());
-    selVpm->setPackage(mPackage);
-
-
-    // Search if the selected VPZ has already been opened
-    int alreadyOpened = 0;
-    int i;
-    for (i = 0; i < ui->tabWidget->count(); i++)
-    {
-        QWidget *w = ui->tabWidget->widget(i);
-        QVariant tabType = w->property("type");
-        if (tabType.toString() != "vpz")
-            continue;
-        // Compare the tab title with the requested vpz name
-        if (ui->tabWidget->tabText(i) == fileName)
-        {
-            alreadyOpened = i;
-            break;
-        }
+    int alreadyOpened = findTabIndex(relPath);
+    if (alreadyOpened != -1) {
+        ui->tabWidget->setCurrentIndex(alreadyOpened);
+        return ;
     }
 
-    if (alreadyOpened)
-        // If the VPZ is opened, select his tab
-        ui->tabWidget->setCurrentIndex(alreadyOpened);
-    else
-    {
-        fileVpzView * newTab = new fileVpzView();
-        newTab->setProperty("type", QString("vpz"));
-        newTab->setVpm(selVpm);
+    PluginMainPanel* newPanel = 0;
+    if (selectedFileInfo.suffix() == "vpz") {
+        //TODO check if a plugin
+        newPanel = new DefaultVpzPanel();
+        QObject::connect(newPanel, SIGNAL(rightWidgetChanged()),
+                         this, SLOT(onRightWidgetChanged()));
 
-        int n = ui->tabWidget->addTab(newTab, fileName);
+    } else if ((selectedFileInfo.suffix() == "cpp") or
+               (selectedFileInfo.suffix() == "hpp")){
+        QString plug = getCppPlugin(relPath);
+        if (plug == "") {
+            newPanel = new DefaultCppPanel();
+        } else {
+            newPanel = mGvlePlugins.newInstanceMainPanelPlugin(plug);
+        }
+
+
+    }
+    if (newPanel) {
+        QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
+                         this, SLOT(onUndoAvailable(bool)));
+
+        newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+
+        int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
+        bool oldBlock = ui->tabWidget->blockSignals(true);
         ui->tabWidget->setCurrentIndex(n);
-        newTab->show();
-
-        QObject::connect(selVpm, SIGNAL(sigChanged(QString)),
-                         this,  SLOT  (setChangedVpz(QString)));
+        ui->tabWidget->widget(n)->setProperty("relPath",relPath);
+        ui->tabWidget->blockSignals(oldBlock);
+        mPanels.insert(relPath,newPanel);
+        newPanel->leftWidget()->show();
 
         // Create a new toolbox for the right column
-        int nid;
-        QWidget *newRTool = newTab->getTool();
-        nid = ui->rightStack->addWidget(newRTool);
-        ui->rightStack->setCurrentWidget(newRTool);
-        newTab->setProperty("wTool", nid);
-        //set undo redo enabled
-        ui->actionUndo->setEnabled(true);
-        ui->actionRedo->setEnabled(true);
+        setRightWidget(newPanel->rightWidget());
     }
+    //set undo redo enabled
+    ui->actionUndo->setEnabled(true);
+    ui->actionRedo->setEnabled(true);
 }
 
-void gvle_win::onCustomContextMenu(const QPoint &point)
+void
+gvle_win::onCustomContextMenu(const QPoint &point)
 {
     QTreeView* projectTreeView = ui->treeProject;
 
@@ -1235,7 +1007,6 @@ void gvle_win::onCustomContextMenu(const QPoint &point)
     QString currentDir = QDir::currentPath() += "/";
     fileName.replace(currentDir, "");
     QFileInfo selectedFileInfo = QFileInfo(fileName);
-
 
     QAction *lastAction;
 
@@ -1252,6 +1023,16 @@ void gvle_win::onCustomContextMenu(const QPoint &point)
     if (selectedFileInfo.suffix() != "vpz") {
         lastAction->setDisabled(true);
     }
+    if (insideSrc(index)) {
+
+        QStringList plugList = mGvlePlugins.getMainPanelPluginsList();
+        for (int i =0; i<plugList.size(); i++) {
+            QString pluginName = plugList.at(i);
+            lastAction = ctxMenu.addAction(tr("New") + " " + pluginName);
+            lastAction->setProperty("srcPlugin",pluginName);
+        }
+    }
+
     QAction* selectedItem = ctxMenu.exec(globalPos);
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
@@ -1263,17 +1044,97 @@ void gvle_win::onCustomContextMenu(const QPoint &point)
         } else if (actCode == 3) {
             mProjectFileSytem->setReadOnly(false);
             copyFile(index);
+        } else {
+            QVariant plugName = selectedItem->property("srcPlugin");
+            if ( ! plugName.isValid()) {
+                return;
+            }
+
+            //TODO check if a plugin
+            PluginMainPanel* newPanel = mGvlePlugins.newInstanceMainPanelPlugin(
+                    plugName.toString());
+
+            QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
+                             this, SLOT(onUndoAvailable(bool)));
+
+            QString relPath = getNewCpp();
+
+            newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+
+            int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
+            bool oldBlock = ui->tabWidget->blockSignals(true);
+            ui->tabWidget->setCurrentIndex(n);
+            ui->tabWidget->widget(n)->setProperty("relPath",relPath);
+            ui->tabWidget->blockSignals(oldBlock);
+
+            mPanels.insert(relPath,newPanel);
+            newPanel->leftWidget()->show();
+
+            // Create a new toolbox for the right column
+            setRightWidget(newPanel->rightWidget());
+
         }
     }
 }
 
-void  gvle_win::onCurrentChanged(const QModelIndex& /*index*/)
+bool
+gvle_win::insideSrc(QModelIndex index)
+{
+    QString filePath = mProjectFileSytem->filePath(index);
+    QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    QFile srcFile(pkgPath + "/src");
+    return filePath.indexOf(srcFile.fileName()) == 0;
+}
+
+QString
+gvle_win::getNewCpp()
+{
+    QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    QString cppPrefix = "NewCpp";
+    QString relPath = QString("src/")+cppPrefix+".cpp";
+
+    if (not QFile(pkgPath + "/" + relPath).exists()) {
+        return relPath;
+    }
+    unsigned int i = 1 ;
+    bool found = false;
+    while (not found) {
+        relPath = QString("src/")+cppPrefix+"_"+QVariant(i).toString()+".cpp";
+        found = not QFile(pkgPath + "/" + relPath).exists();
+        i++;
+    }
+    return relPath;
+}
+
+QString
+gvle_win::getCppPlugin(QString relPath)
+{
+    QString metaPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    metaPath += "/metadata/"+relPath;
+    metaPath.replace(".cpp",".sm");
+    QFile file(metaPath);
+    if (not QFile(metaPath).exists()) {
+        return "";
+    }
+    QDomDocument dom("vle_project_metadata");
+    QXmlInputSource source(&file);
+    QXmlSimpleReader reader;
+    dom.setContent(&source, &reader);
+    QDomElement docElem = dom.documentElement();
+    QDomNode srcPluginNode = dom.elementsByTagName("srcPlugin").item(0);
+    return srcPluginNode.attributes().namedItem("name").nodeValue();
+
+}
+
+void
+gvle_win::onCurrentChanged(const QModelIndex& /*index*/)
 {
     mProjectFileSytem->setReadOnly(true);
 }
 
 
-void  gvle_win::onFileRenamed(const QString & path,
+void
+gvle_win::onFileRenamed(const QString & path,
                               const QString & oldName, const QString & newName)
 {
     QFileInfo oldFileInfo = QFileInfo(path + "/" + oldName);
@@ -1300,17 +1161,20 @@ void  gvle_win::onFileRenamed(const QString & path,
     mProjectFileSytem->setReadOnly(true);
 }
 
-    void gvle_win::onDataChanged(QModelIndex /*indexTL*/, QModelIndex /*indexBR*/)
+void
+gvle_win::onDataChanged(QModelIndex /*indexTL*/, QModelIndex /*indexBR*/)
 {
     mProjectFileSytem->setReadOnly(true);
 }
 
-    void gvle_win::onItemChanged(QTreeWidgetItem* /*item*/, int /*col*/)
+void
+gvle_win::onItemChanged(QTreeWidgetItem* /*item*/, int /*col*/)
 {
 }
 
 
-bool gvle_win::removeDir(const QString & dirName)
+bool
+gvle_win::removeDir(const QString & dirName)
 {
     bool result = true;
     QDir dir(dirName);
@@ -1429,145 +1293,88 @@ void gvle_win::onRefreshFiles()
     treeProjectUpdate();
 }
 
-void gvle_win::setChangedVpz(QString filename)
+void
+gvle_win::onRightWidgetChanged()
 {
-    for (int i = (ui->tabWidget->count() - 1); i >= 0; i--)
-    {
-        if (ui->tabWidget->tabText(i) == filename)
-        {
-            ui->tabWidget->setTabText(i, "* "+ filename);
-            break;
+    QString relPath = getRelPathFromTabIndex(ui->tabWidget->currentIndex());
+    PluginMainPanel* w = getMainPanelFromTabIndex(ui->tabWidget->currentIndex());
+    if (w) {
+        setRightWidget(mPanels[relPath]->rightWidget());
+    }
+
+    //ui->rightStack->removeWidget()(right);
+}
+
+void
+gvle_win::onUndoAvailable(bool b)
+{
+    int curr = ui->tabWidget->currentIndex();
+    QString relPath = ui->tabWidget->widget(curr)->property("relPath").toString();
+    QString tabName;
+    if (b) {
+        tabName = QString("* %1").arg(relPath);
+    } else {
+        tabName = relPath;
+    }
+    ui->tabWidget->setTabText(curr, tabName);
+}
+
+void gvle_win::projectInstall()
+{
+    mLogger->log(tr("Project installation started"));
+
+    try {
+        mCurrPackage.install();
+    } catch (const std::exception& e) {
+        QString logMessage = QString("%1").arg(e.what());
+        mLogger->logExt(logMessage, true);
+        mLogger->log(tr("Project installation failed"));
+        return;
+    }
+
+    mTimer = new QTimer();
+    QObject::connect(mTimer, SIGNAL(timeout()),
+                     this, SLOT(projectInstallTimer()));
+    mTimer->start(2);
+}
+
+void
+gvle_win::setRightWidget(QWidget* rightWidget)
+{
+    int stackSize = ui->rightStack->count();
+    if (stackSize < 1 or stackSize > 2) {
+        qDebug() << " Internal error gvle_win::setRightWidget ";
+        return ;
+    }
+
+    if (stackSize == 2){
+        ui->rightStack->removeWidget(ui->rightStack->widget(1));
+    }
+    if (rightWidget) {
+        ui->rightStack->addWidget(rightWidget);
+        ui->rightStack->setCurrentIndex(1);
+        rightWidget->show();
+    } else {
+        ui->rightStack->setCurrentIndex(0);
+    }
+}
+
+int
+gvle_win::findTabIndex(QString relPath)
+{
+    QString relPathModified = QString("* %1").arg(relPath);
+    QString currentPath;
+    for (int i = 0; i< ui->tabWidget->count(); i++) {
+        currentPath = ui->tabWidget->tabText(i);
+        if (currentPath == relPath) {
+            return i;
+        }
+        if (currentPath == relPathModified) {
+            return i;
         }
     }
+    return -1;
 }
 
-/**
- * @brief gvle_win::openModeler
- *        Open (or return existing) modeler view tab
- *
- */
-pluginModelerView *gvle_win::openModeler(QString filename)
-{
-    pluginModelerView *wview;
-
-    for (int i = (ui->tabWidget->count() - 1); i >= 0; i--)
-    {
-        QWidget *w = ui->tabWidget->widget(i);
-        wview = qobject_cast<pluginModelerView *>(w);
-        if (wview == 0)
-            continue;
-        if (wview->getFilename() == filename)
-            return wview;
-    }
-
-    wview = new pluginModelerView();
-    wview->setPlugin(filename);
-    wview->setPackage(mPackage);
-
-    QObject::connect(wview, SIGNAL(refreshFiles()),
-                     this,  SLOT  (onRefreshFiles()));
-
-    QString tabName = QString("Modeler: %1").arg( wview->getName() );
-    int n = ui->tabWidget->addTab(wview, tabName);
-    ui->tabWidget->setCurrentIndex(n);
-    wview->show();
-
-    loadModelerClasses(wview);
-
-    return wview;
-}
-
-// Todo : this method must be move to a "package" class
-void gvle_win::loadModelerClasses(pluginModelerView *modeler)
-{
-    QString pluginName = modeler->getName();
-
-    QDir dir(mCurrPackage.name().c_str());
-    if (dir.cd("src")) {
-        dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-        QStringList filters;
-        filters << "*.cpp";
-        dir.setNameFilters(filters);
-        QFileInfoList list = dir.entryInfoList();
-        for (int i = 0; i < list.size(); ++i) {
-            QFileInfo fileInfo = list.at(i);
-            QString fname = fileInfo.fileName();
-
-            vu::Template tpl;
-            try {
-                std::string tplPlugin, packagename, conf;
-
-                tpl.open(fname.toStdString());
-                tpl.tag(tplPlugin, packagename, conf);
-
-                if (pluginName != QString(tplPlugin.c_str()))
-                    continue;
-                QString tplConf = QString( conf.c_str() );
-                QStringList confEntries = tplConf.split(";");
-
-                // Get the class name from conf
-                QStringList classNameEntry = confEntries.filter("class:");
-                QString className = classNameEntry.at(0).split(":").at(1);
-
-                modeler->addClass(className, fname);
-            } catch(...) {
-                continue;
-            }
-        }
-    }
-}
-
-
-/**
- * @brief gvle_win::onOpenModeler (slot)
- *        Called on "Open" menu of a Modeler plugin
- *
- */
-void gvle_win::onOpenModeler()
-{
-    // Search the caller menu (which plugin)
-    QObject *senderObject = QObject::sender();
-    QAction *senderAction = qobject_cast<QAction *>(senderObject);
-    // This function -must- be called by a QAction signal
-    if (senderAction == 0)
-        return;
-
-    QVariant varFileName = senderAction->property("fileName");
-    if ( ! varFileName.isValid())
-        return;
-
-    QString fileName = varFileName.toString();
-
-    pluginModelerView *tab;
-    tab = openModeler(fileName);
-
-    tab->showSummary();
-}
-
-/**
- * @brief gvle_win::onNewModelerClass (slot)
- *        Called on "New class" menu of a Modeler plugin
- *
- */
-void gvle_win::onNewModelerClass()
-{
-    // Search the caller menu (which plugin)
-    QObject *senderObject = QObject::sender();
-    QAction *senderAction = qobject_cast<QAction *>(senderObject);
-    // This function -must- be called by a QAction signal
-    if (senderAction == 0)
-        return;
-
-    QVariant varFileName = senderAction->property("fileName");
-    if ( ! varFileName.isValid())
-        return;
-
-    QString fileName = varFileName.toString();
-
-    pluginModelerView *tab;
-    tab = openModeler(fileName);
-
-    tab->addNewTab();
-}
 
 }} //namespaces

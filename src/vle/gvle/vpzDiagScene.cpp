@@ -1023,14 +1023,14 @@ VpzDiagScene::VpzDiagScene() :
 
 
 void
-VpzDiagScene::init(vleVpm* vpm, const QString& className)
+VpzDiagScene::init(vleVpm* vpm, const QString& className, QObject* emitter)
 {
     clear();
     mVpm = vpm;
     QDomNode selModelNode = mVpm->classModelFromDoc(className);
 
     setFocus(selModelNode);
-    QObject::connect(mVpm,
+    QObject::connect(emitter,
             SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
             this,
             SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
@@ -1046,7 +1046,7 @@ VpzDiagScene::setFocus(QDomNode selModelNode)
         delete mCoupled;
     }
     mCoupled = new VpzMainModelItem(selModelNode, mVpm, 0, this);
-    addItem(mCoupled);
+    //addItem(mCoupled);
     mCoupled->setPos(QPointF(0,0));
     mCoupled->update();
     unselectAllSubModels();
@@ -1709,7 +1709,9 @@ void
 VpzDiagScene::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
         QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
 {
-
+    if (not mVpm) {
+        return;
+    }
     QString curr_query = mVpm->vdo()->getXQuery(mCoupled->mnode);
     //try to reinitialize with current node
     QDomNode cplNode = mVpm->vdo()->getNodeFromXQuery(

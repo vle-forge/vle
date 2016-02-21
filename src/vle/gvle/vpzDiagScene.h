@@ -206,7 +206,14 @@ class VpzDiagScene : public QGraphicsScene
     Q_OBJECT
 public:
     VpzDiagScene();
-    void init(vleVpm* vpz, const QString& className = "");
+    /**
+     * @brief initialize the scene with a vpm file
+     * @param vpm, the vpm file
+     * @param className, if empty then the main model is shown
+     * @param emitter, the object that send the signal:
+     *   undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)
+     */
+    void init(vleVpm* vpm, const QString& className, QObject* emitter);
     void setFocus(QDomNode selModelNode);
     void clear();
     void update(const QRectF & rect = QRectF());
@@ -252,7 +259,8 @@ signals:
 
 public slots:
     void onDragDestroyed(QObject *obj =0);
-    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz, QDomNode oldValVpm, QDomNode newValVpm);
+    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+            QDomNode oldValVpm, QDomNode newValVpm);
 
 public:
     vleVpm*                mVpm;

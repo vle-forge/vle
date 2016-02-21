@@ -31,16 +31,26 @@
 #include <QPluginLoader>
 
 
+
 namespace vle {
 namespace gvle {
+
+class PluginOutput;
+class PluginExpCond;
+class PluginSimPanel;
+class PluginMainPanel;
+
+
 
 struct gvleplug
 {
     gvleplug();
     gvleplug(QString pkg, QString libPath);
+    virtual ~gvleplug();
 
-    QString package;
-    QString libPath;
+    QString        package;
+    QString        libPath;
+    QPluginLoader* loader;
 };
 
 class gvle_plugins : public QObject
@@ -51,19 +61,35 @@ public:
     gvle_plugins();
     ~gvle_plugins();
 
-    void loadPlugins();
-    QStringList getCondPluginsList();
-    QString getCondPluginPath(QString name);
-    QString getCondPluginPackage(QString name);
-    QStringList getOutputPluginsList();
-    QString getOutputPluginPath(QString name);
-    QString getOutputPluginPackage(QString name);
+    void             registerPlugins();
+
+    QStringList      getOutputPluginsList();
+    QString          getOutputPluginPath(QString name);
+    QString          getOutputPluginPackage(QString name);
+    PluginOutput*    provideOutputPlugin(QString name);
+
+    QStringList      getCondPluginsList();
+    QString          getCondPluginPath(QString name);
+    QString          getCondPluginPackage(QString name);
+    PluginExpCond*   provideCondPlugin(QString name);
+
+    QStringList      getSimPanelPluginsList();
+    QString          getSimPanelPluginPath(QString name);
+    QString          getSimPanelPluginPackage(QString name);
+    PluginSimPanel*  newInstanceSimPanelPlugin(QString name);
+
+    QStringList      getMainPanelPluginsList();
+    QString          getMainPanelPluginPath(QString name);
+    QString          getMainPanelPluginPackage(QString name);
+    PluginMainPanel* newInstanceMainPanelPlugin(QString name);
+
+
 
 private:
-    QList<QPluginLoader*> mModelerPlugins;
-    QMap<QString,QString> mSimulatorPlugins;
-    QMap<QString,gvleplug>      mCondPlugins;
     QMap<QString,gvleplug>      mOutputPlugins;
+    QMap<QString,gvleplug>      mCondPlugins;
+    QMap<QString,gvleplug>      mSimPanelPlugins;
+    QMap<QString,gvleplug>      mMainPanelPlugins;
 };
 
 }}//namespaces

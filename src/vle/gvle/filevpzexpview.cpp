@@ -28,12 +28,12 @@
 #include <QtCore/qdebug.h>
 #include <QMessageBox>
 #include <QtXml>
+
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
-#include "vlepackage.h"
+
 #include "filevpzexpview.h"
 #include "ui_filevpzexpview.h"
-
 
 /**
  * @brief Get the plug-in name of the filename provided.

@@ -79,19 +79,19 @@ public:
  *    VleVpz   <>-- VleDomDiffStack<VleDomVpz>    |
  *       ^                              -----------
  *       |                              |
- *    VleVpz   <>-- VleDomDiffStack<VleDomVpz>
+ *    VleVpz   <>-- VleDomDiffStack<VleDomVpm>
  *
  */
 class vleVpm : public vleVpz
 {
     Q_OBJECT
 public:
-    vleVpm(const QString& vpzpath, const QString& vpmpath);
+    vleVpm(const QString& vpzpath, const QString& vpmpath,
+            gvle_plugins* plugs);
     QString toQString(const QDomNode& node) const;
-    void xCreateDom();
+
     void xReadDom();
-    void setCondGUIplugin(const QString& condName, const QString& name);
-    void setOutputGUIplugin(const QString& viewName, const QString& pluginName);
+
     void addConditionFromPluginToDoc(const QString& condName,
             const QString& pluginName);
     void renameConditionToDoc(const QString& oldName, const QString& newName);
@@ -111,7 +111,7 @@ public:
     void addViewToDoc(const QString& viewName);
     void renameViewToDoc(const QString& oldName, const QString& newName);
     void rmConditionToDoc(const QString& condName);
-    QString getCondGUIplugin(const QString& condName);
+    QString getCondGUIplugin(const QString& condName) const;
     QString getOutputGUIplugin(const QString& viewName);
     void setCurrentTab(QString tabName);
 
@@ -125,23 +125,32 @@ public slots:
     void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz);
     void onSnapshotVpm(QDomNode snapVpm, bool isMerged);
     void onUndoRedoVpm(QDomNode oldValVpm, QDomNode newValVpm);
+    void onUndoAvailable(bool);
 
 signals:
     void undoRedo(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);
-
+    void undoAvailable(bool);
 private:
-    QDomDocument*    mDocVpm;
-    QString          mFileNameVpm;
-    vleDomVpm*       mVdoVpm;
-    vleDomDiffStack* undoStackVpm;
-    bool             waitUndoRedoVpz;
-    bool             waitUndoRedoVpm;
-    QDomNode         oldValVpz;
-    QDomNode         newValVpz;
-    QDomNode         oldValVpm;
-    QDomNode         newValVpm;
-    gvle_plugins     plugins;
+    void xCreateDom();
+    void renameCondGUIplugin(const QString& oldCond, const QString& newCond);
+    void setCondGUIplugin(const QString& condName, const QString& name);
+    void setOutputGUIplugin(const QString& viewName, const QString& pluginName);
+
+    void tryEmitUndoAvailability(int prevCurr, int curr);
+
+
+    QDomDocument*     mDocVpm;
+    QString           mFileNameVpm;
+    vleDomVpm*        mVdoVpm;
+    vleDomDiffStack*  undoStackVpm;
+    bool              waitUndoRedoVpz;
+    bool              waitUndoRedoVpm;
+    QDomNode          oldValVpz;
+    QDomNode          newValVpz;
+    QDomNode          oldValVpm;
+    QDomNode          newValVpm;
+    gvle_plugins*     mGvlePlugins;
 };
 
 }}//namespaces

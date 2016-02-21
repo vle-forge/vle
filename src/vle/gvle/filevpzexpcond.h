@@ -58,7 +58,7 @@ public:
     enum eMapMenuActions { EMapBooleanAdd, EMapValueRename, EMapValueRemove};
 
 public:
-    explicit FileVpzExpCond(QWidget *parent = 0);
+    explicit FileVpzExpCond(gvle_plugins* plugs, QWidget *parent = 0);
 
     ~FileVpzExpCond();
     void setVpm(vleVpm* vpm);
@@ -97,6 +97,7 @@ private:
     QString             mCurrPortName;
     int                 mCurrValIndex;
     PluginExpCond*      mPlugin;
+    gvle_plugins*       mGvlePlugins;
 };
 
 }}//namespaces

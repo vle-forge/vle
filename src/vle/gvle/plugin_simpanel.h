@@ -21,49 +21,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef gvle_SOURCECPP_H
-#define gvle_SOURCECPP_H
 
-#include <QObject>
-#include <QString>
-#include "sourcecpptemplate.h"
-#include "vlepackage.h"
-#include "plugin_modeler.h"
+#ifndef GVLE_PLUGIN_SIMPANEL_H
+#define GVLE_PLUGIN_SIMPANEL_H
 
+#include <QWidget>
+#include "logger.h"
+#include <vle/utils/Package.hpp>
+#include <vle/gvle/vlevpm.h>
 
 namespace vle {
 namespace gvle {
 
-class PluginModeler;
-class vlePackage;
-
-
-
-class sourceCpp : public QObject
+class PluginSimPanel :public QObject
 {
     Q_OBJECT
 public:
-    sourceCpp();
-    ~sourceCpp();
-    sourceCpp(QString filename, vlePackage *package = 0);
-    void               load();
-    void               write(QString data);
-    sourceCppTemplate *getTemplate();
-    PluginModeler     *getModeler();
-    QString            getModelerName();
-    QString            getFilename();
-    bool               isNew();
-    void               setPackage(vlePackage *package);
+    PluginSimPanel(){};
+    virtual ~PluginSimPanel(){};
+    virtual void init(vleVpm* vpm, vle::utils::Package* pkg) = 0;
+    virtual QString  getname()                               = 0;
+    virtual QWidget* leftWidget()                            = 0;
+    virtual QWidget* rightWidget()                           = 0;
+    virtual void undo()                                      = 0;
+    virtual void redo()                                      = 0;
+    virtual PluginSimPanel* newInstance()                    = 0;
 
-private:
-    bool    mIsNew;
-    QString mFileName;
-    vlePackage        *mPackage;
-    sourceCppTemplate *mTemplate;
-    PluginModeler     *mModeler;
-    QString            mContent;
 };
 
-}}//namespaces
+}} //namespaces
 
-#endif // SOURCECPP_H
+Q_DECLARE_INTERFACE(vle::gvle::PluginSimPanel, "fr.inra.vle.gvle.PluginSimPanel")
+
+#endif

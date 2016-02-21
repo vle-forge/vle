@@ -22,41 +22,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef gvle_PLUGIN_SIM_H
-#define gvle_PLUGIN_SIM_H
+#ifndef GVLE_DEFAULT_CPP_PANEL_H
+#define GVLE_DEFAULT_CPP_PANEL_H
 
-#include <QObject>
-#include <QString>
 #include <QWidget>
-#include <vle/gvle/logger.h>
-#include <vle/gvle/vlevpm.h>
-
-#ifndef Q_MOC_RUN
-#include <vle/utils/Package.hpp>
-#include <vle/vpz/Vpz.hpp>
-#endif
+#include <QObject>
+#include <QDebug>
+#include "vlevpm.h"
+#include "filevpzview.h"
+#include "filevpzrtool.h"
 
 namespace vle {
 namespace gvle {
 
 
-class PluginSimulator
+class DefaultCppPanel : public PluginMainPanel
 {
+    Q_OBJECT
 public:
-    virtual QString  getname()   = 0;
-    virtual QWidget *getWidget() = 0;
-    virtual void     delWidget() = 0;
-    virtual QWidget *getWidgetToolbar() = 0;
-    virtual void     delWidgetToolbar() = 0;
-    virtual void  setSettings(QSettings *s) = 0;
-    virtual void  setLogger(Logger *logger) = 0;
-    virtual void  init(vleVpm *vpm) = 0;
-    virtual void *getVpm() = 0;
-    virtual void  setPackage(vle::utils::Package *pkg) = 0;
+    DefaultCppPanel();
+    virtual ~DefaultCppPanel();
+    QString  getname();
+    QWidget* leftWidget();
+    QWidget* rightWidget();
+    void undo();
+    void redo();
+    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs);
+    QString canBeClosed();
+    void save();
+    PluginMainPanel* newInstance(){return 0;}
+
+public slots:
+    void onUndoAvailable(bool);
+public:
+    QTextEdit*  m_edit;
+    QString m_file;
 };
 
 }} //namespaces
 
-Q_DECLARE_INTERFACE(vle::gvle::PluginSimulator, "fr.inra.vle.gvle.PluginSimulator")
 
-#endif // PLUGIN_SIM_H
+#endif

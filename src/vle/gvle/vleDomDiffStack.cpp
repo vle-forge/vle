@@ -132,8 +132,8 @@ vleDomDiffStack::DomDiff::reset()
     isDefined = false;
 }
 
-vleDomDiffStack::vleDomDiffStack(vleDomObject* vdo): diffs(), curr(0),
-        mVdo(vdo), current_source(""), snapshotEnabled(true)
+vleDomDiffStack::vleDomDiffStack(vleDomObject* vdo): diffs(), prevCurr(0),
+        curr(0), mVdo(vdo), current_source(""), snapshotEnabled(true)
 {
 }
 
@@ -168,6 +168,7 @@ vleDomDiffStack::snapshot (QDomNode node,
         QString mergeType,
         vle::value::Map* mergeArgs)
 {
+    prevCurr = curr;
     if (not snapshotEnabled) {
         return;
     }
@@ -241,12 +242,13 @@ vleDomDiffStack::snapshot (QDomNode node,
         }
     }
     emit snapshotVdo(node, isMerged);
+    tryEmitUndoAvailability();
 }
 
 void
 vleDomDiffStack::undo()
 {
-
+    prevCurr = curr;
     if (curr <= 0) {
         return;
     }
@@ -267,11 +269,13 @@ vleDomDiffStack::undo()
         }
         curr --;
     }
+    tryEmitUndoAvailability();
 }
 
 void
 vleDomDiffStack::redo()
 {
+    prevCurr = curr;
     if (diffs[curr+1].isDefined) {
         if ((diffs[curr+1].source == current_source) or
                 (diffs[curr+1].source.isEmpty())){
@@ -281,9 +285,43 @@ vleDomDiffStack::redo()
             parent.replaceChild(diffs[curr].node_after, currN);
             emit undoRedoVdo(currN, diffs[curr].node_after);
         }
-
     }
+    tryEmitUndoAvailability();
+}
 
+void
+vleDomDiffStack::clear()
+{
+    prevCurr = curr;
+    for (unsigned int i = 0; i<diffs.size(); i++) {
+        diffs[i].reset();
+    }
+    curr = 0;
+    tryEmitUndoAvailability();
+}
+
+int
+vleDomDiffStack::getUndoAvailability()
+{
+    if (curr == 1 and prevCurr == 0) {
+        return 1;
+    }
+    if (curr == 0 and prevCurr >= 1) {
+        return -1;
+    }
+    return 0;
+}
+
+void
+vleDomDiffStack::tryEmitUndoAvailability()
+{
+    int undoAvailability = getUndoAvailability();
+    if (undoAvailability == 1) {
+        emit undoAvailable(true);
+    }
+    if (undoAvailability == -1) {
+        emit undoAvailable(false);
+    }
 }
 
 }}//namespaces

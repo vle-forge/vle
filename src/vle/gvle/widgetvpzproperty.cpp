@@ -138,7 +138,7 @@ WidgetVpzPropertyExpCond::refresh()
 //    if (dyn != "") {
         //TODO only way to see if it is an atomic model ??
         QDomNodeList conds = mVpm->condsListFromConds(mVpm->condsFromDoc());
-        for (unsigned int i=0; i< conds.length(); i++) {
+        for (int i=0; i< conds.length(); i++) {
             QDomNode cond = conds.at(i);
             QString condName = mVpm->vdo()->attributeValue(cond, "name");
             QListWidgetItem *wi = new QListWidgetItem(ui->listCond);
@@ -169,13 +169,13 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
         return;
 
     // Search the vleExpCond associated with the checkbox
-    bool oldBlock = mVpm->blockSignals(true);
+    //bool oldBlock = mVpm->blockSignals(true);
     if (checked) {
         mVpm->attachCondToAtomicModel(mModQuery, cb->text());
     } else {
         mVpm->detachCondToAtomicModel(mModQuery, cb->text());
     }
-    mVpm->blockSignals(oldBlock);
+    //mVpm->blockSignals(oldBlock);
 
 }
 
@@ -200,7 +200,7 @@ WidgetVpzPropertyObservables::refresh()
     ui->listObs->clear();
     QString dyn = mVpm->modelDynFromDoc(mModQuery);
     QDomNodeList obss = mVpm->obssListFromObss(mVpm->obsFromDoc());
-    for (unsigned int i=0; i< obss.length(); i++) {
+    for (int i=0; i< obss.length(); i++) {
         QDomNode obs = obss.at(i);
         QString obsName = mVpm->vdo()->attributeValue(obs, "name");
         QListWidgetItem *wi = new QListWidgetItem(ui->listObs);
@@ -239,8 +239,6 @@ WidgetVpzPropertyObservables::onCheckboxClick(bool checked)
 
     if ( (mVpm == 0) || (cb == 0) )
         return;
-
-    bool oldBlock = mVpm->blockSignals(true);
     if (checked) {
         mVpm->setObsToAtomicModel(mModQuery, cb->text());
 
@@ -257,7 +255,6 @@ WidgetVpzPropertyObservables::onCheckboxClick(bool checked)
     } else {
         mVpm->unsetObsFromAtomicModel(mModQuery);
     }
-    mVpm->blockSignals(oldBlock);
 }
 
 }}//namepsaces

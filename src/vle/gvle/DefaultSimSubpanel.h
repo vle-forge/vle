@@ -22,42 +22,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLUGINMODELERSUMMARY_H
-#define PLUGINMODELERSUMMARY_H
+#ifndef GVLE_DEFAULT_SIM_SUB_PANEL_H
+#define GVLE_DEFAULT_SIM_SUB_PANEL_H
 
-#include <QListWidgetItem>
 #include <QWidget>
+#include <QObject>
+#include <QDebug>
+#include "qcustomplot/qcustomplot.h"
 
-namespace Ui {
-class pluginModelerSummary;
-}
+#include "plugin_simpanel.h"
+#include "vlevpm.h"
 
-class pluginModelerSummary : public QWidget
+namespace vle {
+namespace gvle {
+
+
+class DefaultSimSubpanel : public PluginSimPanel
 {
     Q_OBJECT
-
 public:
-    explicit pluginModelerSummary(QWidget *parent = 0);
-    ~pluginModelerSummary();
-    void addClassList(QString name, QString filename);
-    void startDuplicate();
-    void endDuplicate();
+    DefaultSimSubpanel();
+    virtual ~DefaultSimSubpanel();
+    void init(vleVpm* vpm, vle::utils::Package* pkg);
+    QString  getname();
+    QWidget* leftWidget();
+    QWidget* rightWidget();
+    void undo();
+    void redo();
+    PluginSimPanel* newInstance();
 
-signals:
-    void newClass();
-    void openClass(QString filename);
-    void duplicateReq(QString className);
-    void duplicateClass(QString src, QString dst);
 
-private slots:
-    void onSelectClass(QListWidgetItem *item);
-    void onDuplicate();
-    void onDuplicateCancel();
-    void onDuplicateSave();
-    void onNewClass();
-
-private:
-    Ui::pluginModelerSummary *ui;
+    QCustomPlot* customPlot;
 };
 
-#endif // PLUGINMODELERSUMMARY_H
+}} //namespaces
+
+
+#endif

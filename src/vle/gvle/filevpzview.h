@@ -36,6 +36,7 @@
 
 #include "ui_filevpzrtool.h"
 #include "vlevpm.h"
+#include "plugin_mainpanel.h"
 #include "widgetvpzproperty.h"
 #include "filevpzdynamics.h"
 #include "filevpzexpcond.h"
@@ -43,6 +44,7 @@
 #include "filevpzobservables.h"
 #include "filevpzproject.h"
 #include "filevpzclasses.h"
+#include "filevpzsim.h"
 #include "filevpzrtool.h"
 #include "vpzDiagScene.h"
 #ifndef Q_MOC_RUN
@@ -65,7 +67,6 @@ namespace gvle {
 class fileVpzView : public QWidget
 {
     Q_OBJECT
-
 public:
     enum ExpCondTreeType { ECondNone, ECondCondition, ECondParameter };
 
@@ -74,20 +75,27 @@ public:
      * @brief fileVpzView::fileVpzView
      *        Default constructor for VPZ tab
      */
-    explicit fileVpzView(QWidget *parent = 0);
+    explicit fileVpzView(vle::utils::Package* pkg,
+            gvle_plugins* plugs, QWidget *parent = 0);
     ~fileVpzView();
     void setVpm(vleVpm *v);
+    void setRtool(FileVpzRtool* tool);
     vleVpm* vpm();
     bool isUsed(int *reason);
     void usedBySim(bool isUsed);
     void save();
     QWidget *getTool();
+    QString  getname();
+    QWidget* leftPanel();
+    QWidget* rigthPanel();
+    QString getCurrentTab();
+    void undo();
+    void redo();
 //    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
 //    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
 
 public slots:
     void onTabClose(int index);
-    void onCurrentChanged(int index);
 //    void onViewTreeMenu(const QPoint pos);
 //    void onFocusChanged(vleVpzModel *model);
 //    void onModelDblClick(vleVpzModel *model);
@@ -98,22 +106,24 @@ public slots:
 //    void onAddModelerTab(vleVpzModel *model);
 //    void onExpCondChanged(const QString& condName);
 
-private:
+public:
     bool             mUseSim;
-    Ui::fileVpzView *ui;
-    FileVpzRtool*    mRtool;
+    Ui::fileVpzView*ui;
     FileVpzDynamics *mDynamicsTab;
     FileVpzExpCond  *mExpCondTab;
-    FileVpzExpView  *mExpViewTab;
-    FileVpzObservables  *mObservablesTab;
-    FileVpzProject  *mProjectTab;
-    FileVpzClasses  *mClassesTab;
-    vleVpm          *mVpm;
-    //QWidget         *mWidgetTool;
+    FileVpzExpView*mExpViewTab;
+    FileVpzObservables*      mObservablesTab;
+    FileVpzProject*          mProjectTab;
+    FileVpzClasses*          mClassesTab;
+    FileVpzSim*              mSimTab;
+    vleVpm*                  mVpm;
+    FileVpzRtool*            mRtool;
     QList<QTreeWidgetItem *> mViewsItems;
+    gvle_plugins*            mGvlePlugins;
+    vle::utils::Package*     mPackage;
 //    vleVpzModel     *mCurrentModel;
 
-private:
+public:
 
     VpzDiagScene       mScene;
 };

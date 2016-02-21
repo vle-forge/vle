@@ -98,6 +98,7 @@ public:
     };
 
     std::vector<DomDiff> diffs;
+    unsigned int prevCurr;
     unsigned int curr;
     vleDomObject* mVdo;
     QString current_source;
@@ -125,10 +126,24 @@ public:
 
     void undo();
     void redo();
+    /**
+     * @brief clear the stack, eg on a save acion
+     */
+    void clear();
 
+    /**
+     * @brief tells if the last action (snapshot, undo or redo)
+     * changed the state of undo availability
+     * @return -1, if the stack changed undo action from available to not.
+     *          0, if the stack did not changed undo availability
+     *          1, if the stack changed undo action from not available to avail.
+     */
+    int getUndoAvailability();
+    void tryEmitUndoAvailability();
 signals:
     void undoRedoVdo(QDomNode oldVal, QDomNode newVal);
     void snapshotVdo(QDomNode snapshot, bool isMerged);
+    void undoAvailable(bool);
 
 
 };

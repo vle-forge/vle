@@ -24,7 +24,6 @@
 
 #include <QtGui>
 #include <QGraphicsSceneMouseEvent>
-#include <qpainterpath.h>
 
 #include <QScrollBar>
 #include <QComboBox>
@@ -90,6 +89,10 @@ FileVpzClasses::setVpm(vleVpm* vpm)
 {
 
     mVpm = vpm;
+    QObject::connect(vpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            this,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
     reload();
 }
 
@@ -111,6 +114,18 @@ FileVpzClasses::reload()
     }
 }
 
+void
+FileVpzClasses::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+        QDomNode oldValVpm, QDomNode newValVpm)
+{
+    if (oldValVpz.nodeName() == "classes") {
+        //the action is the creation of a class, nothing to do do for the scene
+        //except clearing the scene
+        reload();
+    } else {
+        emit undoRedo(oldValVpz, newValVpz, oldValVpm, newValVpm);
+    }
+}
 
 void
 FileVpzClasses::onNewAtomicTriggered(bool /*checked*/)
@@ -132,7 +147,7 @@ void
 FileVpzClasses::onTextChanged(const QString& text)
 {
     if (mSelClass != text and mSelClass != "<None>" and text != "<None>"
-            and not mVpm->existClassFromDoc(text)) {
+            and not mVpm->existClassFromDoc(text) and text != "") {
         mVpm->renameClassToDoc(mSelClass, text);
         int it = ui->classesList->currentIndex();
         ui->classesList->setItemText(it, text);
@@ -160,12 +175,6 @@ FileVpzClasses::onPushDelete(bool /*checked*/)
     }
 }
 
-//void
-//FileVpzClasses::onPushNew(bool /*checked*/)
-//{
-//
-//}
-
 void
 FileVpzClasses::onCurrentIndexChanged(const QString & /*text*/)
 {
@@ -173,7 +182,7 @@ FileVpzClasses::onCurrentIndexChanged(const QString & /*text*/)
         mSelClass = ui->classesList->currentText();
         if (mSelClass != "<None>") {
             //vpz get first model of class
-            mScene.init(mVpm, mSelClass);
+            mScene.init(mVpm, mSelClass, this);
             ui->graphicsView->setSceneRect(QRect(0,0,0,0));
             ui->graphicsView->setScene(&mScene);
             mScene.update();

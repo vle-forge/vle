@@ -69,7 +69,10 @@ public:
 //    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
 //    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
 //
+signals:
+    void undoRedo(QDomNode, QDomNode, QDomNode, QDomNode);
 public slots:
+    void onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode);
     void onNewAtomicTriggered(bool checked);
     void onNewCoupledTriggered(bool checked);
     void onTextChanged(const QString & text);

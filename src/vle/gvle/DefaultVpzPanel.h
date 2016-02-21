@@ -21,44 +21,56 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef gvle_SOURCECPPTEMPLATE_H
-#define gvle_SOURCECPPTEMPLATE_H
 
-#include <QMap>
-#include <QString>
+#ifndef GVLE_DEFAULT_VPZ_PANEL_H
+#define GVLE_DEFAULT_VPZ_PANEL_H
+
+#include <QWidget>
+#include <QObject>
+#include <QDebug>
 
 #ifndef Q_MOC_RUN
-#include <vle/utils/Template.hpp>
+#include "vlevpm.h"
+#include "filevpzview.h"
+#include "ui_filevpzview.h"
+#include "filevpzrtool.h"
+#include "plugin_mainpanel.h"
+#include "plugin_simpanel.h"
 #endif
-
 
 namespace vle {
 namespace gvle {
 
-class sourceCpp;
 
-class sourceCppTemplate
+class DefaultVpzPanel : public PluginMainPanel
 {
+    Q_OBJECT
 public:
-    sourceCppTemplate(sourceCpp *parent = 0);
-    bool    isValid();
-    QString getPluginName();
-    bool    tagArrayLoad(QString name);
-    QString getTagValue(QString name);
-    int     getTagArrayCount();
-    QString getTagArrayName(int pos);
-    QString getTagArrayValue(int pos);
-private:
-    void tagLoad();
-private:
-    sourceCpp  *mSource;
-    bool        mTagLoaded;
-    QString     mTagPlugin;
-    QString     mTagPackage;
-    QMap<QString,QString> mTagConf;
-    QMap<QString,QString> mTagConfValue;
+    DefaultVpzPanel();
+    virtual ~DefaultVpzPanel();
+    QString  getname();
+    QWidget* leftWidget();
+    QWidget* rightWidget();
+    void undo();
+    void redo();
+    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs);
+    QString canBeClosed();
+    void save();
+    void setSimLeftWidget(QWidget*);
+    PluginMainPanel* newInstance(){return 0;}
+
+public slots:
+    void onCurrentChanged(int index);
+    void onUndoAvailable(bool);
+    void onRightSimWidgetChanged();
+
+public:
+    fileVpzView*  m_vpzview;
+    FileVpzRtool* m_rtool;
+    gvle_plugins*  mGvlePlugins;
 };
 
-}}//namepsaces
+}} //namespaces
 
-#endif // SOURCECPPTEMPLATE_H
+
+#endif

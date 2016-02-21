@@ -32,10 +32,10 @@
 namespace vle {
 namespace gvle {
 
-
-fileVpzView::fileVpzView(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::fileVpzView)
+fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
+        QWidget *parent) :
+    QWidget(parent), ui(new Ui::fileVpzView), mRtool(0), mGvlePlugins(plugs),
+    mPackage(pkg)
 {
     ui->setupUi(this);
 
@@ -51,11 +51,8 @@ fileVpzView::fileVpzView(QWidget *parent) :
 //    mWidgetTool = new QWidget();
 //    uiTool->setupUi(mWidgetTool);
 
-    //Setup vpzRtool
-    mRtool = new vle::gvle::FileVpzRtool();
-
     // Configure Experimental Conditions tab
-    mExpCondTab = new vle::gvle::FileVpzExpCond();
+    mExpCondTab = new vle::gvle::FileVpzExpCond(mGvlePlugins);
     int expTabId = ui->tabWidget->addTab(mExpCondTab, tr("Conditions"));
 
     // Configure Dynamics tab
@@ -64,8 +61,20 @@ fileVpzView::fileVpzView(QWidget *parent) :
 
     // Configure Observables tab
     mObservablesTab = new FileVpzObservables();
-    int observablesTabId = ui->tabWidget->addTab(mObservablesTab, tr("Observables"));
+    int observablesTabId = ui->tabWidget->addTab(mObservablesTab,
+            tr("Observables"));
 
+    // Configure View tab
+    mExpViewTab = new vle::gvle::FileVpzExpView();
+    int viewTabId = ui->tabWidget->addTab(mExpViewTab, tr("Views"));
+
+    // Configure Classes tab
+    mClassesTab = new vle::gvle::FileVpzClasses();
+    int classesTabId = ui->tabWidget->addTab(mClassesTab, tr("Classes"));
+
+    //Configure Sim Tab
+    mSimTab = new vle::gvle::FileVpzSim(mPackage, mGvlePlugins);
+    int simTabId = ui->tabWidget->addTab(mSimTab, tr("Simulation"));
 
     // Configure Project tab
     mProjectTab = new FileVpzProject();
@@ -73,13 +82,6 @@ fileVpzView::fileVpzView(QWidget *parent) :
     mProjectTab->setTabId(projectTabId);
     mProjectTab->setTab(ui->tabWidget);
 
-    // Configure View tab
-    mExpViewTab = new vle::gvle::FileVpzExpView();
-    int viewTabId = ui->tabWidget->addTab(mExpViewTab, tr("Views"));
-
-    // Configure View tab
-    mClassesTab = new vle::gvle::FileVpzClasses();
-    int classesTabId = ui->tabWidget->addTab(mClassesTab, tr("Classes"));
 
     ui->tabWidget->setTabsClosable(true);
     QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
@@ -93,34 +95,18 @@ fileVpzView::fileVpzView(QWidget *parent) :
     tabBar->setTabButton(expTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(viewTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(observablesTabId, QTabBar::RightSide, 0);
-    tabBar->setTabButton(projectTabId, QTabBar::RightSide, 0);
     tabBar->setTabButton(classesTabId, QTabBar::RightSide, 0);
+    tabBar->setTabButton(simTabId, QTabBar::RightSide, 0);
+    tabBar->setTabButton(projectTabId, QTabBar::RightSide, 0);
 
     //set signals/clots
     QObject::connect(ui->tabWidget,   SIGNAL(tabCloseRequested(int)),
                      this,            SLOT  (onTabClose(int)));
-    QObject::connect(ui->tabWidget,   SIGNAL(currentChanged(int)),
-                     this,            SLOT  (onCurrentChanged(int)));
-    QObject::connect(&mScene, SIGNAL(enterCoupledModel(QDomNode)),
-                     mRtool,    SLOT  (onEnterCoupledModel(QDomNode)));
-    QObject::connect(&(mClassesTab->mScene), SIGNAL(enterCoupledModel(QDomNode)),
-                     mRtool,    SLOT  (onEnterCoupledModel(QDomNode)));
-    QObject::connect(&mScene, SIGNAL(selectionChanged()),
-                     mRtool,    SLOT  (onSelectionChanged()));
-    QObject::connect(&(mClassesTab->mScene), SIGNAL(selectionChanged()),
-                     mRtool,    SLOT  (onSelectionChanged()));
-    QObject::connect(&mScene, SIGNAL(initializationDone(VpzDiagScene*)),
-                     mRtool, SLOT (onInitializationDone(VpzDiagScene*)));
-    QObject::connect(&(mClassesTab->mScene), SIGNAL(initializationDone(VpzDiagScene*)),
-                     mRtool, SLOT (onInitializationDone(VpzDiagScene*)));
+
 
 }
 
-/**
- * @brief fileVpzView::~fileVpzView
- *        Default destructor
- *
- */
+
 fileVpzView::~fileVpzView()
 {
     if (mDynamicsTab)
@@ -138,6 +124,9 @@ fileVpzView::~fileVpzView()
     if (mClassesTab)
         delete mClassesTab;
 
+    if (mSimTab)
+        delete mSimTab;
+
     delete ui;
 }
 
@@ -150,15 +139,8 @@ void fileVpzView::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
 
-    QObject::connect(mVpm, SIGNAL(modelsUpdated()),
-                     mRtool, SLOT (onModelsUpdated()));
-
     mVpm->setCurrentTab(ui->tabWidget->tabText(
             ui->tabWidget->currentIndex()));
-
-    if (mRtool) {
-        mRtool->setVpm(mVpm);
-    }
 
     // ---- Dynamics Tab ----
     if (mDynamicsTab) {
@@ -193,13 +175,23 @@ void fileVpzView::setVpm(vleVpm* vpm)
         mClassesTab->setVpm(mVpm);
     }
 
+    // ---- View Tab ----
+    if (mSimTab) {
+        mSimTab->setVpm(mVpm);
+    }
+
     //Build Scene
-    mScene.init(mVpm, "");
+    mScene.init(mVpm, "", mVpm);
     ui->graphicView->setSceneRect(QRect(0,0,0,0));
     ui->graphicView->setScene(&mScene);
     mScene.update();
 
 
+}
+
+void fileVpzView::setRtool(FileVpzRtool* tool)
+{
+    mRtool = tool;
 }
 
 void fileVpzView::save()
@@ -247,26 +239,35 @@ bool fileVpzView::isUsed(int *reason = 0)
 
 QWidget *fileVpzView::getTool()
 {
-    return mRtool->mWidgetTool;
+    return 0;
+//    return mRtool->mWidgetTool;
 }
 
+
+QString  fileVpzView::getname(){return "VpzMainpanel";}
+QWidget* fileVpzView::leftPanel() {return ui->tabWidget;}
+QWidget* fileVpzView::rigthPanel() {return 0;}
+
+QString
+fileVpzView::getCurrentTab()
+{
+    return ui->tabWidget->tabText(ui->tabWidget->currentIndex());
+}
+
+void fileVpzView::undo()
+{
+    vpm()->undo();
+}
+
+void fileVpzView::redo()
+{
+    vpm()->redo();
+}
 
 void fileVpzView::onTabClose(int index)
 {
     QWidget *w = ui->tabWidget->widget(index);
     delete w;
-}
-
-void
-fileVpzView::onCurrentChanged(int index)
-{
-    QString tab = ui->tabWidget->tabText(index);
-    if (tab == "Diagram") {
-        mRtool->onInitializationDone(&mScene);
-    } else if (tab == "Classes") {
-        mRtool->onInitializationDone(&(mClassesTab->mScene));
-    }
-    vpm()->setCurrentTab(tab);
 }
 
 }}//namespaces

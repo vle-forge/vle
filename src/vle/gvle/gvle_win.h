@@ -26,6 +26,7 @@
 #define gvle_gvle_win_H
 
 #include "vle/gvle/logger.h"
+#include "plugin_mainpanel.h"
 #include <QMainWindow>
 #include <QTranslator>
 #include <QTreeWidgetItem>
@@ -37,13 +38,8 @@
 #include <QtGui>
 #include <QFileSystemModel>
 
-#include "vlepackage.h"
-#include "pluginmodelerview.h"
 
-#include "plugin_cond.h"
-#include "plugin_modeler.h"
-#include "plugin_sim.h"
-#include "plugin_output.h"
+
 
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
@@ -69,15 +65,14 @@ public:
     ~gvle_win();
 
 protected:
-    void loadPlugins();
-    void loadExpCondPlugins(PluginExpCond* plugin, QString fileName);
-    void loadModelerPlugins(PluginModeler* plugin, QString fileName);
-    void loadSimulationPlugins(PluginSimulator* plugin, QString fileName);
-    void loadOutputPlugins(PluginOutput* out, QString fileName);
     void showEvent(QShowEvent* event);
     void closeEvent(QCloseEvent* event);
-    pluginModelerView *openModeler(QString filename);
-    void loadModelerClasses(pluginModelerView* modeler);
+    void setRightWidget(QWidget* rightWidget);
+    int findTabIndex(QString relPath);
+    bool insideSrc(QModelIndex index);
+    QString getNewCpp();
+    QString getCppPlugin(QString relpath);
+
 
 private slots:
     void onNewProject();
@@ -88,11 +83,12 @@ private slots:
     void onProjectRecent4();
     void onProjectRecent5();
     void onCloseProject();
+    void onSaveFile();
     void onQuit();
     void onProjectConfigure();
     void onProjectBuild();
-    void projectInstall();
-    void onLaunchSimulation();
+    void onProjectClean();
+    void onProjectUninstall();
     void onUndo();
     void onRedo();
     void onSelectSimulator(bool isChecked);
@@ -111,29 +107,27 @@ private slots:
     void projectConfigureTimer();
     void projectBuildTimer();
     void projectInstallTimer();
-    void onOpenModeler();
-    void onNewModelerClass();
+    void projectCleanTimer();
+    void projectUninstallTimer();
     void onRefreshFiles();
-    void setChangedVpz(QString filename);
+    void onRightWidgetChanged();
+    void onUndoAvailable(bool);
 
 private:
+    void projectInstall();
+
     Ui::gvleWin*          ui;
     Logger*               mLogger;
     QTimer*               mTimer;
     QSettings*            mSettings;
-    vle::vpz::Vpz*        mVpm;
     bool                  mSimOpened;
     QActionGroup*         mMenuSimGroup;
     QMap<QString,QString> mSimulatorPlugins;
     QString               mCurrentSimName;
-    PluginSimulator*      mCurrentSim;
-    QPluginLoader*        mCurrentSimPlugin;
-    QList <QString>       mModelers;
-    QList<QPluginLoader*> mModelerPlugins;
-    QMap<QString,QString> mExpPlugins;
-    QMap<QString,QString> mOutputPlugins;
-
+    QMap<QString, PluginMainPanel*>
+                          mPanels;
     QFileSystemModel*     mProjectFileSytem;
+    gvle_plugins          mGvlePlugins;
 
 
 protected:
@@ -148,7 +142,10 @@ private:
     void statusWidgetClose();
     void treeProjectUpdate();
     bool tabClose(int index);
+    void removeTab(int index);
     bool closeProject();
+    PluginMainPanel* getMainPanelFromTabIndex(int index);
+    QString getRelPathFromTabIndex(int index);
 
     bool removeDir(const QString& dirName);
     QString treeProjectRelativePath(const QModelIndex index) const;
@@ -157,7 +154,6 @@ private:
 
 
 private:
-    vlePackage         *mPackage;
     vle::utils::Package mCurrPackage;
 };
 

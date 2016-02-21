@@ -35,11 +35,10 @@ namespace gvle {
 
 FileVpzRtool::FileVpzRtool(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::fileVpzRtool), mWidgetTool(0), mVpm(0), mCurrScene(0),
+    ui(new Ui::fileVpzRtool), mVpm(0), mCurrScene(0),
     mExternalSelection(false)
 {
-    mWidgetTool = new QWidget();
-    ui->setupUi(mWidgetTool);
+    ui->setupUi(this);
 
     QObject::connect(ui->modelTree, SIGNAL(itemSelectionChanged()),
             this, SLOT (onTreeModelSelected()));
@@ -65,7 +64,6 @@ FileVpzRtool::clear()
     viewTree->clearSelection();
     viewTree->clear();
     viewTree->setColumnCount(1);
-
 }
 
 void
@@ -114,12 +112,6 @@ FileVpzRtool::treeInsertModel(QDomNode model, QTreeWidgetItem *base)
     }
     return newItem;
 }
-
-QWidget *FileVpzRtool::getTool()
-{
-    return mWidgetTool;
-}
-
 
 QString
 FileVpzRtool::getModelQuery(QTreeWidgetItem* base)
@@ -170,12 +162,15 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
     bool oldBlockModeProperty = ui->modelProperty->blockSignals(true);
     bool oldBlockStackProperty = ui->stackProperty->blockSignals(true);
     if (not mVpm) {
+        ui->stackProperty->setCurrentIndex(0);
         return ;
     }
     if (ui->modelTree->selectedItems().isEmpty()) {
+        ui->stackProperty->setCurrentIndex(0);
         return;
     }
     if (model_query.isEmpty()) {
+        ui->stackProperty->setCurrentIndex(0);
         return;
     }
 
@@ -212,7 +207,7 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
 //            ui->modelProperty->resizeColumnsToContents();
 
 //        ui->modelProperty->setVisible(false);
-//        ui->modelProperty->resizeRowsToContents();
+        ui->modelProperty->resizeRowsToContents();
 //        ui->modelProperty->resizeColumnsToContents();
 //        ui->modelProperty->setVisible(true);
 
@@ -290,9 +285,10 @@ FileVpzRtool::onInitializationDone(VpzDiagScene* scene)
 {
     bool oldBlock = ui->modelTree->blockSignals(true);
     mCurrScene = scene;
+    QString theSelected = "";
     if (mVpm and scene and scene->mCoupled) {
         updateTree();
-        QString theSelected = scene->getXQueryOfTheSelectedModel();
+        theSelected = scene->getXQueryOfTheSelectedModel();
         if (theSelected.isEmpty() and
                 not scene->mCoupled->mnode.parentNode().isNull()) { //TODO pas tres propre
             theSelected = mVpm->vdo()->getXQuery(scene->mCoupled->mnode);
@@ -302,10 +298,11 @@ FileVpzRtool::onInitializationDone(VpzDiagScene* scene)
         } else {
             ui->modelTree->setCurrentItem(getTreeWidgetItem(theSelected));
         }
-        updateModelProperty(theSelected);
+
     } else {
         clear();
     }
+    updateModelProperty(theSelected);
     ui->modelTree->blockSignals(oldBlock);
 }
 

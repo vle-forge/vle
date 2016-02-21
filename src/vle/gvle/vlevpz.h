@@ -50,7 +50,6 @@
 namespace vle {
 namespace gvle {
 
-class vlePackage;
 class vleDomDiffStack;
 
 /**
@@ -456,12 +455,6 @@ public:
      */
     void rmObsPortFromCond(QDomNode node, const QString& portName);
     /**
-     * @brief unset a observable from a atomic model only if the model
-     * is observed by
-     * @param atom, atomic model node
-     */
-    void unsetObsFromAtomicModel(QDomNode &node, const QString& obsName);
-    /**
      * @brief unset a observable from a atomic model
      * @param model_query, a Xquery that points to model
      * @param obsName, obs name
@@ -508,13 +501,6 @@ public:
     void setPositionToModel(QList<QDomNode>& nodes, QList<double> xs,
             QList<double> ys);
 
-    /**
-     * @brief set an observable to an anatomic model
-     * @param node, atomic model
-     * @param obsName, observable name
-     *
-     */
-    void setObsToAtomicModel(QDomNode &node, const QString& obsName);
     /**
      * @brief set an observable to an anatomic model
      * @param model_query, a Xquery that points to a model
@@ -1001,14 +987,11 @@ public:
     QString getDynamicLibrary(const QString& dyn) const;
 
     void           setBasePath(const QString path);
-    vlePackage*    getPackage();
-    void           setPackage(vlePackage* package);
     bool           isAltered();
     virtual void   save();
     void           removeDynamic(const QString& dynamic);
 
 signals:
-    void sigChanged(QString filename);
     void observablesUpdated();
     void viewsUpdated();
     void conditionsUpdated();
@@ -1040,7 +1023,6 @@ private:
     QString      mPath;
     QFile        mFile;
     QDomDocument mDoc;
-    vlePackage*  mPackage;
     Logger*      mLogger;
 
     int          maxPrecision;
