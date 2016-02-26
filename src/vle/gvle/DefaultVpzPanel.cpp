@@ -77,7 +77,6 @@ DefaultVpzPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
     vleVpm* vpm = new vleVpm(basepath+"/"+relPath,
             basepath+"/metadata/"+relPathVpm, mGvlePlugins);
 
-
     vpm->setLogger(log);
     vpm->setBasePath("coucouTODO");
 
@@ -159,7 +158,7 @@ DefaultVpzPanel::redo()
 }
 
 void
-DefaultVpzPanel::onCurrentChanged(int index)
+DefaultVpzPanel::onCurrentChanged(int /*index*/)
 {
     QString tab = m_vpzview->getCurrentTab();
     m_vpzview->vpm()->setCurrentTab(tab);

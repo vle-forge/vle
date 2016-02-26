@@ -46,7 +46,7 @@ DefaultCppPanel::~DefaultCppPanel()
 }
 
 void
-DefaultCppPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
+DefaultCppPanel::init(QString& relPath, utils::Package* pkg, Logger* /*log*/,
         gvle_plugins* /*plugs*/)
 {
     QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
@@ -79,6 +79,7 @@ DefaultCppPanel::save()
             file.close();
         }
     }
+    emit undoAvailable(false);
 }
 
 QString
@@ -112,7 +113,6 @@ DefaultCppPanel::redo()
 
 void
 DefaultCppPanel::onUndoAvailable(bool b)
-
 {
     emit undoAvailable(b);
 }

@@ -56,7 +56,7 @@ vleDomObject::childWhithNameAttr(QDomNode node,
 {
     QDomNodeList childs = node.childNodes();
     QList<QDomNode> childsWithoutText;
-    for (unsigned int i=0; i<childs.length();i++) {
+    for (int i=0; i<childs.length();i++) {
         QDomNode ch = childs.at(i);
         if (not ch.isText() and ch.nodeName() == nodeName and
                 attributeValue(ch, "name") == nameValue) {

@@ -218,7 +218,7 @@ VpzPortItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*evt*/)
 /*******************************************************************************/
 
 VpzModelItem::VpzModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* parent,
-        QGraphicsScene* scene): QGraphicsItem(parent), mVpm(vpm),
+        QGraphicsScene* /*scene*/): QGraphicsItem(parent), mVpm(vpm),
                 mnode(node), margin(5), rectWidth(0), rectHeight(0)
 {
 
@@ -454,7 +454,7 @@ VpzSubModelItem::initializeFromDom()
 
     QDomNodeList chList = mnode.childNodes();
     //build port items and get max widths of items
-    for (unsigned int j=0; j<chList.length(); j++) {
+    for (int j=0; j<chList.length(); j++) {
         QDomNode nChild = chList.at(j);
         if (nChild.nodeName() == "in") {
             QDomNodeList nChildIns = nChild.toElement().elementsByTagName("port");
@@ -466,7 +466,7 @@ VpzSubModelItem::initializeFromDom()
         }
 
     }
-    for (unsigned int j=0; j<chList.length(); j++) {
+    for (int j=0; j<chList.length(); j++) {
         QDomNode nChild = chList.at(j);
         if (nChild.nodeName() == "out") {
             QDomNodeList nChildOuts = nChild.toElement().elementsByTagName("port");
@@ -654,7 +654,7 @@ VpzMainModelItem::initializeFromDom()
 
     //add port items
     QDomNodeList chList = mnode.childNodes();
-    for (unsigned int j=0; j<chList.length(); j++) {
+    for (int j=0; j<chList.length(); j++) {
         QDomNode nChild = chList.at(j);
         if (nChild.nodeName() == "in") {
             QDomNodeList nChildIns = nChild.toElement().elementsByTagName("port");
@@ -665,7 +665,7 @@ VpzMainModelItem::initializeFromDom()
             }
         }
     }
-    for (unsigned int j=0; j<chList.length(); j++) {
+    for (int j=0; j<chList.length(); j++) {
         QDomNode nChild = chList.at(j);
         if (nChild.nodeName() == "out") {
             QDomNodeList nChildOuts = nChild.toElement().elementsByTagName("port");

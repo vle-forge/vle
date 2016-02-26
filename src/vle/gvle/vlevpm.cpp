@@ -382,7 +382,7 @@ vleVpm::getCondGUIplugin(const QString& condName) const
                 mDocVpm->elementsByTagName("condPlugins").item(0);
         QDomNodeList plugins =
                 condsPlugins.toElement().elementsByTagName("condPlugin");
-        for (unsigned int i =0; i< plugins.length(); i++) {
+        for (int i =0; i< plugins.length(); i++) {
             QDomNode plug = plugins.item(i);
             if (plug.attributes().contains("cond") and
                 (plug.attributes().namedItem("cond").nodeValue() == condName)) {
@@ -404,7 +404,7 @@ vleVpm::getOutputGUIplugin(const QString& viewName)
                 mDocVpm->elementsByTagName("outputGUIplugins").item(0);
         QDomNodeList plugins =
                 condsPlugins.toElement().elementsByTagName("outputGUIplugin");
-        for (unsigned int i =0; i< plugins.length(); i++) {
+        for (int i =0; i< plugins.length(); i++) {
             QDomNode plug = plugins.item(i);
             if (plug.attributes().contains("view") and
                 (plug.attributes().namedItem("view").nodeValue() == viewName)) {
@@ -558,7 +558,7 @@ vleVpm::renameCondGUIplugin(const QString& oldCond, const QString& newCond)
     undoStackVpm->snapshot(condsPlugins);
     QDomNodeList plugins =
             condsPlugins.toElement().elementsByTagName("condPlugin");
-    for (unsigned int i =0; i< plugins.length(); i++) {
+    for (int i =0; i< plugins.length(); i++) {
         QDomNode plug = plugins.at(i);
         for (int j=0; j< plug.attributes().size(); j++) {
             if ((plug.attributes().item(j).nodeName() == "cond") and
@@ -582,7 +582,7 @@ vleVpm::setCondGUIplugin(const QString& condName, const QString& name)
     undoStackVpm->snapshot(condsPlugins);
     QDomNodeList plugins =
             condsPlugins.toElement().elementsByTagName("condPlugin");
-    for (unsigned int i =0; i< plugins.length(); i++) {
+    for (int i =0; i< plugins.length(); i++) {
         QDomNode plug = plugins.at(i);
         for (int j=0; j< plug.attributes().size(); j++) {
             if ((plug.attributes().item(j).nodeName() == "cond") and
@@ -617,7 +617,7 @@ vleVpm::setOutputGUIplugin(const QString& viewName, const QString& pluginName)
     }
     QDomNodeList plugins =
             outGUIplugs.toElement().elementsByTagName("outputGUIplugin");
-    for (unsigned int i =0; i< plugins.length(); i++) {
+    for (int i =0; i< plugins.length(); i++) {
         QDomNode plug = plugins.at(i);
         for (int j=0; j< plug.attributes().size(); j++) {
             if ((plug.attributes().item(j).nodeName() == "view") and

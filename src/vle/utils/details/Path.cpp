@@ -422,49 +422,6 @@ std::string Path::buildTemp(const std::string& filename)
     return utils::Path::buildFilename(tmp_path.string(), filename);
 }
 
-std::string Path::writeToTemp(const std::string& prefix,
-                              const std::string& buffer)
-{
-    std::string filename;
-//    int fd;
-
-    boost::filesystem::path temp = boost::filesystem::unique_path();
-    boost::filesystem::ofstream of (temp);
-    of << buffer.c_str();
-/*#ifdef _WIN32
-    const std::wstring tempstr    = temp.native();
-#else
-    const std::string tempstr    = temp.native();
-#endif
-
-    fd = ::fileno(std::fopen(tempstr.c_str(), "+wb"));
-    if (fd == -1) {
-        throw utils::InternalError(fmt(
-                _("Cannot open file %2% with prefix %1% in temporary "
-                  "directory\n")) % prefix % filename);
-    }
-
-#ifdef _WIN32
-    ssize_t sz = ::_write(fd, buffer.c_str(), buffer.size());
-#else
-    ssize_t sz = ::write(fd, buffer.c_str(), buffer.size());
-#endif
-
-    if (sz == -1 or sz == 0) {
-        throw utils::InternalError(fmt(
-            _("Cannot write buffer in file %1% in tempory directory\n")) %
-            filename);
-    }
-
-#ifdef _WIN32
-    ::_close(fd);
-#else
-    ::close(fd);
-#endif
-*///TODO
-    return filename;
-}
-
 
 std::string Path::buildFilename(const std::string& dir,
                                 const std::string& file)

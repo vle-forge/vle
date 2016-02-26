@@ -29,6 +29,7 @@
 #include "plugin_mainpanel.h"
 #include <QMainWindow>
 #include <QTranslator>
+#include <QFileInfo>
 #include <QTreeWidgetItem>
 #include <QActionGroup>
 #include <QPluginLoader>
@@ -60,7 +61,43 @@ class gvle_win : public QMainWindow
 {
     Q_OBJECT
 
+
+
+
 public:
+    enum StatusFile {
+        NOT_OPENED, //no tab opened
+        OPENED, //tab opened but content not modified
+        OPENED_AND_MODIFIED //tab opened and modified
+    };
+
+    /***
+     * @brief the couple of a source file (either cpp or vpz) with the metadata
+     * file
+     */
+    struct gvle_file {
+        gvle_file():
+            source_file(""), metadata_file(""){}
+        gvle_file(const gvle_file& f):
+            source_file(f.source_file), metadata_file(f.metadata_file){}
+        QString source_file;
+        QString metadata_file;
+
+    };
+
+    /**
+     * @brief type of vle file names required by gvle Application
+     *
+     */
+    enum GvleFileRequirement {
+        COPY,          // from a file (cpp or vpz) get the gvle_file which
+                       // is a copy name that does not exist
+        METADATA_FILE, // from a file (cpp or vpz) get the gvle_file which is
+                       // associated to (ie. computes metada file)
+        NEW_VPZ,       // get a new vpz gvle_file
+        NEW_CPP        // get a new cpp gvle_file
+    };
+
     explicit gvle_win(QWidget* parent = 0);
     ~gvle_win();
 
@@ -70,7 +107,18 @@ protected:
     void setRightWidget(QWidget* rightWidget);
     int findTabIndex(QString relPath);
     bool insideSrc(QModelIndex index);
-    QString getNewCpp();
+    /**
+     * @brief get a gvle file name (source and metadata)
+     * @param relPath, eg: src/NewCpp.cpp
+     * @param req, type of file names path building
+     */
+    gvle_file getGvleFile(QString relPath, GvleFileRequirement req);
+    /**
+     * @brief get the plugin attached to a cpp by reading the metadata
+     * associated to the cpp file
+     * @param the relPath eg 'src/NewCpp.cpp' to the cpp file
+     * @return the cpp plugin eg gvle.discrete-time
+     */
     QString getCppPlugin(QString relpath);
 
 
@@ -144,11 +192,63 @@ private:
     bool tabClose(int index);
     void removeTab(int index);
     bool closeProject();
-    PluginMainPanel* getMainPanelFromTabIndex(int index);
-    QString getRelPathFromTabIndex(int index);
+    /**
+     * @brief get the relative path (eg. exp/empty.vpz) from a QFileInfo
+     * which text can be eg. '* exp/empty.vpz' or 'exp/empty.vpz'.
+     * The relative path (relPath) is the id of the main panel at index i
+     * of the tab widget
+     * @param i, tab widget index
+     * @return the relative path of the tab
+     */
+    QString getRelPathFromTabIndex(int i);
+    /**
+     * @brief get the relative path (eg. exp/empty.vpz) from an index of
+     * file info
+     * @param f, a file info
+     * @return the relative path
+     */
+    QString getRelPathFromFileInfo(QFileInfo& f);
+    /**
+     * @brief get the relative path (eg. exp/empty.vpz) from an index of the
+     * filesystem tree.
+     * @param index, filesystem index
+     * @return the relative path of the tab
+     */
+    QString getRelPathFromFSIndex(QModelIndex index);
+    /**
+     * @brief get the file system index from a relative path (eg exp/empty.vpz)
+     * @param relPath, the relative path
+     * @return the file system index
+     */
+    QModelIndex getFSIndexFromRelPath(QString relPath);
+    /**
+     * @brief get the main panel from a tab widget index
+     * @param i, tab widget index
+     * @return the main panel into the tab widget at index i
+     */
+    PluginMainPanel* getMainPanelFromTabIndex(int i);
+    /**
+     * @brief get the main panel from its id (relative path)
+     * @param relPath, id of the file
+     * @return the main panel associated to relPath or 0
+     */
+    PluginMainPanel* getMainPanelFromRelPath(QString relPath);
+
+    /**
+     * @brief get status ogf a file idetified by relative path
+     * (eg. src/Simple.cpp).
+     * @param relPath, id of the file
+     * @return the status of this file.
+     */
+    StatusFile getStatus(QString relPath);
+
 
     bool removeDir(const QString& dirName);
-    QString treeProjectRelativePath(const QModelIndex index) const;
+    /**
+     * @brief copy file from the index of files tree, get a new name for
+     * the copy and copy metadata for vpz and cpp files.
+     * @param the index from the files tree.
+     */
     void copyFile(QModelIndex index);
     void removeFile(QModelIndex index);
 

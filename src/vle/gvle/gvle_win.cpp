@@ -24,6 +24,8 @@
 
 #include <iostream>
 
+#include <boost/filesystem.hpp>
+
 #include <QFileDialog>
 #include <QStyleFactory>
 #include <QActionGroup>
@@ -52,26 +54,15 @@ namespace vle {
 namespace gvle {
 
 gvle_win::gvle_win(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::gvleWin)
+    QMainWindow(parent), ui(new Ui::gvleWin), mLogger(0), mTimer(0),
+    mSettings(0), mSimOpened(false), mMenuSimGroup(0), mSimulatorPlugins(),
+    mCurrentSimName(""), mPanels(), mProjectFileSytem(0), mGvlePlugins()
 {
-
-    mTimer = 0;
-    mLogger = 0;
-    mSimOpened = false;
     // VLE init
     mCurrPackage.refreshPath();
 
     // GUI init
     ui->setupUi(this);
-
-    mProjectFileSytem = new QFileSystemModel(this);
-    QTreeView *tree = ui->treeProject;
-    tree->setModel(mProjectFileSytem);
-    tree->setContextMenuPolicy(Qt::CustomContextMenu);
-    tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-
-    QItemSelectionModel *selmod = tree->selectionModel();
 
     // Open the configuration file
     std::string configFile = vu::Path::path().getHomeFile("gvle.conf");
@@ -142,24 +133,7 @@ gvle_win::gvle_win(QWidget *parent) :
     QObject::connect(ui->treeProject,
                      SIGNAL(customContextMenuRequested(const QPoint &)), this,
                      SLOT(onCustomContextMenu(const QPoint &)));
-    // QObject::connect(ui->treeProject,
-    //                  SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
-    //                  SLOT(onItemChanged(QTreeWidgetItem *, int)));
-    QObject::connect(mProjectFileSytem,
-                     SIGNAL(dataChanged(QModelIndex, QModelIndex)), this,
-                     SLOT(onDataChanged(QModelIndex, QModelIndex)));
-    QObject::connect(mProjectFileSytem,
-                     SIGNAL(fileRenamed(const QString &,
-                                        const QString &,
-                                        const QString &)),this,
-                     SLOT(onFileRenamed(const QString &,
-                                        const QString &,
-                                        const QString &)));
 
-    QObject::connect(selmod,
-                     SIGNAL(currentChanged(const QModelIndex &,
-                                           const QModelIndex &)), this,
-                     SLOT(onCurrentChanged(const QModelIndex &)));
 
     QObject::connect(ui->tabWidget,
                      SIGNAL(currentChanged(int)), this,
@@ -189,7 +163,7 @@ gvle_win::gvle_win(QWidget *parent) :
 
 
     mGvlePlugins.registerPlugins();
-
+    treeProjectUpdate();
 }
 
 gvle_win::~gvle_win()
@@ -230,6 +204,10 @@ gvle_win::showEvent(QShowEvent *event)
 void
 gvle_win::onNewProject()
 {
+    if (not closeProject()) {
+        return;
+    }
+
     QFileDialog FileChooserDialog(this);
 
     FileChooserDialog.setWindowTitle("New Project");
@@ -315,8 +293,16 @@ gvle_win::newProject(QString pathName)
     // Update window title
     setWindowTitle(QString("GVLE - ") + basename.c_str());
 
-    mCurrPackage.select(basename);
-    mCurrPackage.create();
+
+    try {
+        mCurrPackage.create();
+    } catch (boost::filesystem::filesystem_error&) {
+        QMessageBox::warning(this, "Warning", QString("Project '")
+                + basename.c_str() + "' cannot be created in directory '"
+                + QDir::currentPath() + "'", QMessageBox::Ok);
+        mCurrPackage.select("");
+        return ;
+    }
     treeProjectUpdate();
 
     // Update the recent projects
@@ -353,58 +339,107 @@ gvle_win::openProject(QString pathName)
     menuRecentProjectRefresh();
 
     ui->menuProject->setEnabled(true);
+    ui->actionCloseProject->setEnabled(true);
 }
 
 bool
 gvle_win::closeProject()
 {
+    QString relPath;
     for (int i = (ui->tabWidget->count() - 1); i >= 0; i--) {
-
-        QWidget *w = ui->tabWidget->widget(i);
-
-        QVariant tabType = w->property("type");
-        QVariant rtool = w->property("wTool");
-
-        if (tabType.isValid()) {
+        relPath = getRelPathFromTabIndex(i);
+        if (relPath != "Welcome") {
+            ui->tabWidget->setCurrentIndex(i);
             if (not tabClose(i)) {
                 return false;
             }
         }
-
-        if (rtool.isValid()) {
-            setRightWidget(0);
-        }
     }
 
     // Update menus
+    mCurrPackage.select("");
+    ui->treeProject->setModel(mProjectFileSytem);
     ui->menuProject->setEnabled(false);
+    ui->actionCloseProject->setEnabled(false);
     // Update window title
     setWindowTitle("GVLE");
 
     mLogger->log(QString("Project closed"));
 
+    treeProjectUpdate();
     return true;
 }
 
-PluginMainPanel*
-gvle_win::getMainPanelFromTabIndex(int index)
+QString
+gvle_win::getRelPathFromTabIndex(int i)
 {
-    QString relPath = getRelPathFromTabIndex(index);
+    QString relPath = ui->tabWidget->tabText(i);
+    if (relPath.startsWith("* ")) {
+        relPath = relPath.remove("* ");
+    }
+    return relPath;
+}
+
+QString
+gvle_win::getRelPathFromFileInfo(QFileInfo& f)
+{
+    QString relPath = f.filePath();
+    QString currentDir = QDir::currentPath()+ "/"
+            + mCurrPackage.name().c_str() + "/";
+
+    relPath.replace(currentDir, "");
+
+    return relPath;
+}
+
+QString
+gvle_win::getRelPathFromFSIndex(QModelIndex index)
+{
+    QFileInfo f = QFileInfo(mProjectFileSytem->filePath(index));
+    return getRelPathFromFileInfo(f);
+}
+
+QModelIndex
+gvle_win::getFSIndexFromRelPath(QString relPath)
+{
+    QModelIndex index = mProjectFileSytem->index(relPath);
+    return index;
+}
+
+PluginMainPanel*
+gvle_win::getMainPanelFromTabIndex(int i)
+{
+    QString relPath = getRelPathFromTabIndex(i);
     if (mPanels.contains(relPath)) {
         return mPanels[relPath];
     }
     return 0;
 }
 
-QString
-gvle_win::getRelPathFromTabIndex(int index)
+PluginMainPanel*
+gvle_win::getMainPanelFromRelPath(QString relPath)
 {
-    QString relPath = ui->tabWidget->tabText(index);
-    if (relPath.startsWith("* ")) {
-        relPath = relPath.remove("* ");
+    if (mPanels.contains(relPath)) {
+        return mPanels[relPath];
     }
-    return relPath;
+    return 0;
 }
+
+gvle_win::StatusFile
+gvle_win::getStatus(QString relPath)
+{
+    if (not mPanels.contains(relPath)) {
+        return NOT_OPENED;
+    }
+    int i = findTabIndex(relPath);
+    QString tabText = ui->tabWidget->tabText(i);
+    if (tabText.startsWith("* ")) {
+        return OPENED_AND_MODIFIED;
+    }
+    return OPENED;
+}
+
+
 
 void gvle_win::onCloseProject()
 {
@@ -448,7 +483,8 @@ gvle_win::onProjectConfigure()
     ui->menuProject->setEnabled(false);
 
     mTimer = new QTimer();
-    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectConfigureTimer()));
+    QObject::connect(mTimer, SIGNAL(timeout()),
+                     this, SLOT(projectConfigureTimer()));
     mTimer->start(2);
 }
 
@@ -820,13 +856,11 @@ gvle_win::tabClose(int index)
     }
     QString tabText = ui->tabWidget->tabText(index);
     if (tabText.startsWith("* ")) {
-        QMessageBox msgBox;
-        msgBox.setText("Save file before closing it ?");
-        msgBox.addButton(QMessageBox::Save);
-        msgBox.addButton(QMessageBox::Discard);
-        msgBox.addButton(QMessageBox::Cancel);
-        int ret = msgBox.exec();
-        switch (ret) {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Question"),
+                tr("Save file ") + relPath + " before closing it ?",
+                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        switch (reply) {
         case QMessageBox::Save:
             w->save();
             mPanels.remove(relPath);
@@ -839,6 +873,7 @@ gvle_win::tabClose(int index)
             delete w;
             break;
         case QMessageBox::Cancel:
+            return false;
             break;
         default:
             // should never be reached
@@ -907,34 +942,35 @@ gvle_win::statusWidgetClose()
 void
 gvle_win::treeProjectUpdate()
 {
+    delete mProjectFileSytem;
+    mProjectFileSytem = new QFileSystemModel(this);
+    QTreeView *tree = ui->treeProject;
+    tree->setModel(mProjectFileSytem);
+    tree->setContextMenuPolicy(Qt::CustomContextMenu);
+    tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    QItemSelectionModel *selmod = tree->selectionModel();
     QTreeView* projectTreeView = ui->treeProject;
     QString projectName(vu::Path::filename(mCurrPackage.name()).c_str());
-
-    QModelIndex projectIndex = mProjectFileSytem->setRootPath(projectName);
-
-    projectTreeView->setRootIndex(projectIndex);
-
-    projectTreeView->resizeColumnToContents(0);
-}
-
-QString
-gvle_win::treeProjectRelativePath(const QModelIndex index) const
-{
-    QString fileName = mProjectFileSytem->filePath(index);
-    QString currentDir = QDir::currentPath() += "/";
-
-    fileName.replace(currentDir, "");
-
-    QString relPath;
-    QStringList fileNameSplit = fileName.split("/");
-
-    for (int i=1;i<fileNameSplit.length();i++) {
-        if (i>1) {
-            relPath += "/";
-        }
-        relPath += fileNameSplit.at(i);
+    if (projectName != "") {
+        QModelIndex projectIndex = mProjectFileSytem->setRootPath(projectName);
+        projectTreeView->setRootIndex(projectIndex);
     }
-    return relPath;
+    projectTreeView->resizeColumnToContents(0);
+    QObject::connect(mProjectFileSytem,
+                     SIGNAL(dataChanged(QModelIndex, QModelIndex)), this,
+                     SLOT(onDataChanged(QModelIndex, QModelIndex)));
+    QObject::connect(mProjectFileSytem,
+                     SIGNAL(fileRenamed(const QString &,
+                                        const QString &,
+                                        const QString &)),this,
+                     SLOT(onFileRenamed(const QString &,
+                                        const QString &,
+                                        const QString &)));
+    QObject::connect(selmod,
+                     SIGNAL(currentChanged(const QModelIndex &,
+                                           const QModelIndex &)), this,
+                     SLOT(onCurrentChanged(const QModelIndex &)));
+
 }
 
 void
@@ -946,7 +982,7 @@ gvle_win::onTreeDblClick(QModelIndex index)
     QString currentDir = QDir::currentPath() += "/";
     fileName.replace(currentDir, "");
     QFileInfo selectedFileInfo = QFileInfo(fileName);
-    QString relPath = treeProjectRelativePath(index);
+    QString relPath = getRelPathFromFSIndex(index);
 
     int alreadyOpened = findTabIndex(relPath);
     if (alreadyOpened != -1) {
@@ -955,7 +991,9 @@ gvle_win::onTreeDblClick(QModelIndex index)
     }
 
     PluginMainPanel* newPanel = 0;
-    if (selectedFileInfo.suffix() == "vpz") {
+    if (relPath == "Description.txt") {
+        newPanel = new DefaultCppPanel();
+    }else if (selectedFileInfo.suffix() == "vpz") {
         //TODO check if a plugin
         newPanel = new DefaultVpzPanel();
         QObject::connect(newPanel, SIGNAL(rightWidgetChanged()),
@@ -975,6 +1013,7 @@ gvle_win::onTreeDblClick(QModelIndex index)
     if (newPanel) {
         QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
                          this, SLOT(onUndoAvailable(bool)));
+
 
         newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
 
@@ -1008,43 +1047,49 @@ gvle_win::onCustomContextMenu(const QPoint &point)
     fileName.replace(currentDir, "");
     QFileInfo selectedFileInfo = QFileInfo(fileName);
 
-    QAction *lastAction;
+    QString relPath = getRelPathFromFSIndex(index);
+    gvle_win::StatusFile status_file = getStatus(relPath);
+
+    QAction* action;
 
     QMenu ctxMenu;
-    lastAction = ctxMenu.addAction(tr("Remove File"));
-    lastAction->setData(1);
-    lastAction = ctxMenu.addAction(tr("Rename File"));
-    lastAction->setData(2);
-    if (selectedFileInfo.suffix() != "vpz") {
-        lastAction->setDisabled(true);
-    }
-    lastAction = ctxMenu.addAction(tr("Copy File"));
-    lastAction->setData(3);
-    if (selectedFileInfo.suffix() != "vpz") {
-        lastAction->setDisabled(true);
-    }
-    if (insideSrc(index)) {
+    action = ctxMenu.addAction(tr("Remove File"));
+    action->setData(1);
+    action->setDisabled(((selectedFileInfo.suffix() != "vpz") and
+                        (selectedFileInfo.suffix() != "cpp")) or
+                        (status_file == OPENED_AND_MODIFIED));
+    action = ctxMenu.addAction(tr("Rename File"));
+    action->setData(2);
+    action->setDisabled(((selectedFileInfo.suffix() != "vpz") and
+                        (selectedFileInfo.suffix() != "cpp")) or
+                        (status_file == OPENED_AND_MODIFIED));
+    action = ctxMenu.addAction(tr("Copy File"));
+    action->setData(3);
+    action->setDisabled((selectedFileInfo.suffix() != "vpz") and
+                        (selectedFileInfo.suffix() != "cpp"));
 
+    if (insideSrc(index)) {
+        ctxMenu.addSeparator();
         QStringList plugList = mGvlePlugins.getMainPanelPluginsList();
         for (int i =0; i<plugList.size(); i++) {
             QString pluginName = plugList.at(i);
-            lastAction = ctxMenu.addAction(tr("New") + " " + pluginName);
-            lastAction->setProperty("srcPlugin",pluginName);
+            action = ctxMenu.addAction(tr("New") + " " + pluginName);
+            action->setProperty("srcPlugin",pluginName);
         }
     }
 
     QAction* selectedItem = ctxMenu.exec(globalPos);
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
-        if (actCode == 1) {
+        if (actCode == 1) {//Remove File
             removeFile(index);
-        } else if (actCode == 2) {
+        } else if (actCode == 2) {//Rename File
             mProjectFileSytem->setReadOnly(false);
             projectTreeView->edit(index);
-        } else if (actCode == 3) {
+        } else if (actCode == 3) {//Copy File
             mProjectFileSytem->setReadOnly(false);
             copyFile(index);
-        } else {
+        } else {//Add a new Cpp based on a plugin
             QVariant plugName = selectedItem->property("srcPlugin");
             if ( ! plugName.isValid()) {
                 return;
@@ -1057,7 +1102,7 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
                              this, SLOT(onUndoAvailable(bool)));
 
-            QString relPath = getNewCpp();
+            relPath = getGvleFile("", NEW_CPP).source_file;
 
             newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
 
@@ -1086,32 +1131,81 @@ gvle_win::insideSrc(QModelIndex index)
     return filePath.indexOf(srcFile.fileName()) == 0;
 }
 
-QString
-gvle_win::getNewCpp()
+gvle_win::gvle_file
+gvle_win::getGvleFile(QString relPath, GvleFileRequirement req)
 {
-    QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
-    QString cppPrefix = "NewCpp";
-    QString relPath = QString("src/")+cppPrefix+".cpp";
+    gvle_file gf;
 
-    if (not QFile(pkgPath + "/" + relPath).exists()) {
-        return relPath;
+    QFileInfo fileInfo = QFileInfo(relPath);
+    QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+
+    QString suffix = ""; // vpz or cpp
+    QString baseName = ""; // eg NewCpp
+    QString dir = "";        //src or exp
+    QString pre_suffix = ""; //eg: _copy or ""
+    QString suffix_metadata = ""; // vpm or sm
+
+    //set suffix and basename
+    if(req == NEW_VPZ) {
+        suffix = "vpz";
+        baseName = "NewVpz";
+    } else if (req == NEW_CPP) {
+        suffix = "cpp";
+        baseName = "NewCpp";
+    } else {
+        suffix =  fileInfo.suffix();
+        baseName =  fileInfo.baseName();
     }
-    unsigned int i = 1 ;
-    bool found = false;
-    while (not found) {
-        relPath = QString("src/")+cppPrefix+"_"+QVariant(i).toString()+".cpp";
-        found = not QFile(pkgPath + "/" + relPath).exists();
-        i++;
+
+    //set dir and suffix_metadata
+    if (suffix == "vpz") {
+        dir = "exp";
+        suffix_metadata = "vpm";
+    } else if(suffix == "cpp") {
+        dir = "src";
+        suffix_metadata = "sm";
     }
-    return relPath;
+
+    //set pre_suffix
+    if (req == COPY) {
+        pre_suffix = "_copy";
+    } else {
+        pre_suffix = "";
+    }
+
+    //set gvle_file
+    if (req == METADATA_FILE) {
+        gf.source_file = relPath;
+        gf.metadata_file =  "metadata/"+ dir + "/"+ baseName + "."
+                + suffix_metadata;
+    } else {//we have to look for a new name
+        unsigned int i = 0 ;
+        bool found = false;
+        while (not found) {
+            gf.source_file = dir + "/" + baseName + pre_suffix;
+            gf.metadata_file = "metadata/" + dir + "/" + baseName + pre_suffix;
+            if (i > 0) {
+                gf.source_file += "_" + QVariant(i).toString();
+                gf.metadata_file += "_" + QVariant(i).toString();
+            }
+            gf.source_file  += "." + suffix;
+            gf.metadata_file += "." + suffix_metadata;
+
+            found = not QFile(pkgPath + "/" + gf.source_file).exists();
+            i++;
+        }
+    }
+
+    return gf;
+
 }
 
 QString
 gvle_win::getCppPlugin(QString relPath)
 {
     QString metaPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
-    metaPath += "/metadata/"+relPath;
-    metaPath.replace(".cpp",".sm");
+    gvle_file gf = getGvleFile(relPath, METADATA_FILE);
+    metaPath += "/" + gf.metadata_file;
     QFile file(metaPath);
     if (not QFile(metaPath).exists()) {
         return "";
@@ -1123,7 +1217,6 @@ gvle_win::getCppPlugin(QString relPath)
     QDomElement docElem = dom.documentElement();
     QDomNode srcPluginNode = dom.elementsByTagName("srcPlugin").item(0);
     return srcPluginNode.attributes().namedItem("name").nodeValue();
-
 }
 
 void
@@ -1135,29 +1228,22 @@ gvle_win::onCurrentChanged(const QModelIndex& /*index*/)
 
 void
 gvle_win::onFileRenamed(const QString & path,
-                              const QString & oldName, const QString & newName)
+                        const QString & oldName, const QString & newName)
 {
     QFileInfo oldFileInfo = QFileInfo(path + "/" + oldName);
     QFileInfo newFileInfo = QFileInfo(path + "/" + newName);
-
-    if (newFileInfo.suffix() != "vpz") {
-        QFile::rename(path + "/" + newName,
-                      path + "/" + oldName);
+    QString relPathOld = getRelPathFromFileInfo(oldFileInfo);
+    QString relPathNew = getRelPathFromFileInfo(newFileInfo);
+    if (newFileInfo.suffix() != oldFileInfo.suffix()) {
+        //reset old name: not handled by gvle
+        QFile::rename(path + "/" + newName, path + "/" + oldName);
     } else {
-        QString newVpm = newName;
-        newVpm.replace(".vpz", ".vpm");
-        QString oldVpm = oldName;
-        oldVpm.replace(".vpz", ".vpm");
-
-        QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
-
-        QString pathOldVpm = basepath + "/metadata/exp/" + oldVpm;
-        QString pathNewVpm = basepath + "/metadata/exp/" + newVpm;
-
-        QFile::rename(pathOldVpm,
-                      pathNewVpm);
+        gvle_file gfOld = getGvleFile(relPathOld, METADATA_FILE);
+        gvle_file gfNew = getGvleFile(relPathNew, METADATA_FILE);
+        QString pkgPath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
+        QFile::rename(pkgPath+"/"+gfOld.source_file, pkgPath+"/"+gfNew.source_file);
+        QFile::rename(pkgPath+"/"+gfOld.metadata_file, pkgPath+"/"+gfNew.metadata_file);
     }
-
     mProjectFileSytem->setReadOnly(true);
 }
 
@@ -1204,29 +1290,16 @@ gvle_win::removeDir(const QString & dirName)
 
 void gvle_win::copyFile(QModelIndex index)
 {
-    QString fileName = mProjectFileSytem->filePath(index);
-    QFileInfo fileInfo = QFileInfo(fileName);
-    QString suffix = fileInfo.suffix();
-    QString baseName = fileInfo.baseName();
-    QString dirPath = fileInfo.absoluteDir().absolutePath();
-
-    int counter = 1;
-    QString addCounter = "";
-    while (QFile(dirPath + "/" + baseName + "_copy" +
-                 addCounter+ "." + suffix).exists()){
-        counter++;
-        addCounter = QString::number(counter);
-    }
-
-    QFile::copy(fileName,
-                dirPath + "/" + baseName + "_copy" +
-                addCounter + "." + suffix);
-
+    QString relPath = getRelPathFromFSIndex(index);
+    gvle_file gf = getGvleFile(relPath, METADATA_FILE);
+    gvle_file gfcopy = getGvleFile(relPath, COPY);
     QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
-    QString pathOldVpm = basepath + "/metadata/exp/" + baseName + ".vpm";
-    QString pathNewVpm = basepath + "/metadata/exp/" + baseName + "_copy" +
-        addCounter + ".vpm";
-    QFile::copy(pathOldVpm, pathNewVpm);
+    QString pathOld= basepath + "/" + gf.source_file;
+    QString pathNew= basepath + "/" + gfcopy.source_file;
+    QFile::copy(pathOld, pathNew);
+    pathOld= basepath + "/" + gf.metadata_file;
+    pathNew= basepath + "/" + gfcopy.metadata_file;
+    QFile::copy(pathOld, pathNew);
 }
 
 void gvle_win::removeFile(QModelIndex index)
@@ -1236,60 +1309,36 @@ void gvle_win::removeFile(QModelIndex index)
 
     fileName.replace(currentDir, "");
 
-    int i;
-    for (i = 0; i < ui->tabWidget->count(); i++)
-    {
-        if (ui->tabWidget->tabText(i) == fileName)
-            break;
+    QString relPath = getRelPathFromFSIndex(index);
+    PluginMainPanel* panel = getMainPanelFromRelPath(relPath);
+    if (panel) {
+        QMessageBox::warning(this, "Warning", QString("The file ") + relPath +
+                " is opened. Please close it.", QMessageBox::Ok);
+        return ;
     }
+    QFileInfo selectedFileInfo = QFileInfo(fileName);
 
-    if (i != ui->tabWidget->count()) {
-        QMessageBox::question(this, tr("Warning"),
-                              fileName +
-                              " is currently being edited,\n"   \
-                              "you don't want to remove it!");
-    } else {
-
-        QFileInfo selectedFileInfo = QFileInfo(fileName);
-
+    if (not selectedFileInfo.isDir()) {
+        //cannot remove dir for the moment (strange behavior)
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, tr("Question"),
-                                      tr("Remove ") +
-                                      fileName + " ?",
-                                      QMessageBox::Yes|
-                                      QMessageBox::No);
+                tr("Remove ") + relPath + " ?",
+                QMessageBox::Yes| QMessageBox::No);
 
         if (reply == QMessageBox::Yes) {
-            if (selectedFileInfo.isDir()) {
-                mProjectFileSytem->rmdir(index);
-            } else {
-                mProjectFileSytem->remove(index);
-                if (selectedFileInfo.suffix() == "vpz") {
-                    QString relPath;
-                    relPath = treeProjectRelativePath(index);
-                    QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
-                    QString relPathVpm = relPath;
-                    relPathVpm.replace(".vpz", ".vpm");
-                    QString fullPathVpm = basepath + "/metadata/" + relPathVpm;
-                    QFile::remove(fullPathVpm);
-                }
-                if (selectedFileInfo.suffix() == "src") {
-                    QString relPath;
-                    relPath = treeProjectRelativePath(index);
-                    QString basepath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
-                    QString relPathVpm = relPath;
-                    relPathVpm.replace(".src", ".sm");
-                    QString fullPathVpm = basepath + "/metadata/" + relPathVpm;
-                    QFile::remove(fullPathVpm);
-                }
-            }
+            QString fileSuffix = selectedFileInfo.suffix();
+            mProjectFileSytem->remove(index);
+            QString relPath = getRelPathFromFSIndex(index);
+            gvle_file gf = getGvleFile(relPath, METADATA_FILE);
+            QString pkgPath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
+            QString fullPathMeta = pkgPath + "/" + gf.metadata_file;
+            QFile::remove(fullPathMeta);
         }
     }
 }
 
 void gvle_win::onRefreshFiles()
 {
-    qDebug() << "gvle_win::onRefreshFiles()";
     treeProjectUpdate();
 }
 

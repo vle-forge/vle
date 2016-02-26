@@ -370,16 +370,6 @@ public:
      */
     static std::string findProgram(const std::string& exe);
 
-    /**
-     * Write specified buffer to temporary file and return the
-     * filename. The file is created in the temporary directory.
-     * @param prefix if you want to prefix the temporary file.
-     * @param buffer buffer to write.
-     * @return filename of the new temporary file.
-     */
-    static std::string writeToTemp(const std::string& prefix,
-                                   const std::string& buffer);
-
     static std::string buildFilename(const std::string& dir,
                                      const std::string& file);
     static std::string buildFilename(const std::string& dir1,

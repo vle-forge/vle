@@ -59,7 +59,7 @@ DefaultSimSubpanel::~DefaultSimSubpanel()
 
 }
 void
-DefaultSimSubpanel::init(vleVpm* vpm, vle::utils::Package* pkg)
+DefaultSimSubpanel::init(vleVpm* /*vpm*/, vle::utils::Package* /*pkg*/)
 {
 
 }

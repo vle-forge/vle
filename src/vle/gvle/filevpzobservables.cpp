@@ -306,7 +306,7 @@ void FileVpzObservables::reloadPorts(const QString& obsName,
     }
 
     QDomNodeList portList = mVpm->obsPortsListFromDoc(obsName);
-    for (unsigned int j = 0; j < portList.length(); j++) {
+    for (int j = 0; j < portList.length(); j++) {
         QDomNode port = portList.at(j);
         QTreeWidgetItem *newPortItem = newItem(
                 FileVpzObservables::EObsPort,

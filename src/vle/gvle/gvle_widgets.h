@@ -75,7 +75,6 @@ public slots:
     void onValueChanged(int i);
     void onEditingFinished()
     {
-//        std::cout << " dbg onEditingFinished " <<"\n";
     }
 signals:
     void valUpdated(const QString& id, int i);
