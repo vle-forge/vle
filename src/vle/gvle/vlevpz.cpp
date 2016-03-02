@@ -2777,7 +2777,10 @@ vleVpz::attachCondToAtomicModel(const QString& model_query, const QString& condN
     QDomNode atom = mVdo->getNodeFromXQuery(model_query);
     undoStack->snapshot(atom);
     QString attachedConds = mVdo->attributeValue(atom, "conditions");
-    QStringList condSplit = attachedConds.split(",");
+    QStringList condSplit;
+    if (attachedConds != "") {
+        condSplit = attachedConds.split(",");
+    }
     if (not condSplit.contains(condName)) {
         condSplit.append(condName);
         QString res ="";
