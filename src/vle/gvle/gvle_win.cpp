@@ -840,6 +840,9 @@ gvle_win::onTabChange(int index)
 bool
 gvle_win::tabClose(int index)
 {
+    if (index < 0) {
+        return true;
+    }
     QString relPath = getRelPathFromTabIndex(index);
     PluginMainPanel* w = getMainPanelFromTabIndex(index);
     if (not w) {
@@ -1241,8 +1244,11 @@ gvle_win::onFileRenamed(const QString & path,
         gvle_file gfOld = getGvleFile(relPathOld, METADATA_FILE);
         gvle_file gfNew = getGvleFile(relPathNew, METADATA_FILE);
         QString pkgPath = mCurrPackage.getDir(vle::utils::PKG_SOURCE).c_str();
-        QFile::rename(pkgPath+"/"+gfOld.source_file, pkgPath+"/"+gfNew.source_file);
-        QFile::rename(pkgPath+"/"+gfOld.metadata_file, pkgPath+"/"+gfNew.metadata_file);
+        QFile::rename(pkgPath+"/"+gfOld.source_file,
+                pkgPath+"/"+gfNew.source_file);
+        QFile::rename(pkgPath+"/"+gfOld.metadata_file,
+                pkgPath+"/"+gfNew.metadata_file);
+        tabClose(findTabIndex(gfOld.source_file));
     }
     mProjectFileSytem->setReadOnly(true);
 }
