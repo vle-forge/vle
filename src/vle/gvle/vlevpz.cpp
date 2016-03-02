@@ -545,7 +545,6 @@ vleVpz::obsFromViews(QDomNode node) const
             return child;
         }
     }
-    qDebug() << ("Internal error in obsFromView (observables not found)");
     return QDomNode();
 }
 
@@ -1326,12 +1325,18 @@ vleVpz::addObservableToDoc(const QString& obsName)
     QDomElement elem;
     if (observables.isNull()) {
         undoStack->snapshot(expe);
+        QDomNode views;
         QDomNodeList nodeList = expe.toElement().elementsByTagName("views");
         if (nodeList.size() == 0) {
-            elem = getDomDoc().createElement("views");
-            expe.appendChild(elem);
+            views = getDomDoc().createElement("views");
+            expe.appendChild(views);
+        } else {
+            views = nodeList.at(0);
+        }
+        observables = obsFromDoc();
+        if (observables.isNull()) {
             observables = getDomDoc().createElement("observables");
-            elem.appendChild(observables);
+            views.appendChild(observables);
         }
     } else {
         undoStack->snapshot(observables);
@@ -1355,11 +1360,14 @@ void
 vleVpz::addViewToDoc(const QString& viewName)
 {
     QDomNode views = viewsFromDoc();
-    undoStack->snapshot(views);
+
     if (views.isNull()) {
         QDomNode exp = experimentFromDoc();
         QDomElement viewsTag = getDomDoc().createElement("views");
         exp.appendChild(viewsTag);
+        undoStack->snapshot(experimentFromDoc());
+    } else {
+        undoStack->snapshot(views);
     }
     QDomNode view = addView(viewsFromDoc(),viewName);
     emit viewsUpdated();
@@ -2756,7 +2764,6 @@ vleVpz::setDynToAtomicModel(const QString& model_query, const QString& dyn,
 void
 vleVpz::removeDyn(const QString& dyn)
 {
-    qDebug() << " vleVpz::removeDyn " << mVdo->getXQuery(getDomDoc()) << " " << dyn;
     undoStack->snapshot(vleProjectFromDoc());
     QDomNodeList nodeList = getDomDoc().elementsByTagName("dynamics");
     QDomElement dynamics = nodeList.item(0).toElement();

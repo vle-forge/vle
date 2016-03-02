@@ -70,7 +70,7 @@ public:
 /**
  * @brief class that handles a vleVpz using metadata xml file
  * (Virtual Project Metadata - vpm)
- * The two xml files have to be coherent
+ * The two xml files have to be coherent (same number of snapshots)
  *
  *                                             VleDomObject
  *                                                ^
@@ -79,7 +79,7 @@ public:
  *    VleVpz   <>-- VleDomDiffStack<VleDomVpz>    |
  *       ^                              -----------
  *       |                              |
- *    VleVpz   <>-- VleDomDiffStack<VleDomVpm>
+ *    VleVpm   <>-- VleDomDiffStack<VleDomVpm>
  *
  */
 class vleVpm : public vleVpz

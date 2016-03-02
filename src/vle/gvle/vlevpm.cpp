@@ -303,6 +303,7 @@ vleVpm::addViewToDoc(const QString& viewName)
 {
     int prevCurr = vleVpz::undoStack->curr;
 
+
     //update vpz with snapshot but without signal
     bool oldBlock = vleVpz::undoStack->blockSignals(true);
     vleVpz::addViewToDoc(viewName);
@@ -319,10 +320,8 @@ vleVpm::addViewToDoc(const QString& viewName)
     }
     oldBlock = undoStackVpm->blockSignals(true);
     setOutputGUIplugin(viewName, guiPluginName);
-    undoStackVpm->blockSignals(oldBlock);
-
-    //build plugin and initialize it with the view
     provideOutputGUIplugin(viewName);
+    undoStackVpm->blockSignals(oldBlock);
 
     int curr = vleVpz::undoStack->curr;
     tryEmitUndoAvailability(prevCurr,curr);

@@ -203,6 +203,9 @@ FileVpzObservables::onItemChanged(QTreeWidgetItem *item, int /*column*/)
         if (curItemValue != item->text(0)) {
             mVpm->renameObsPortToDoc(item->parent()->text(0),
                     curItemValue, item->text(0));
+            qVList[1] = item->text(0);
+            QVariant data(qVList);
+            item->setData(0, Qt::UserRole, data);
         }
         break;
     } default :
