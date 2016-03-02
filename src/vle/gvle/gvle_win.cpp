@@ -488,6 +488,73 @@ gvle_win::onProjectConfigure()
     mTimer->start(2);
 }
 
+
+void
+gvle_win::onProjectBuild()
+{
+    mLogger->log(tr("Project compilation started"));
+    statusWidgetOpen();
+
+    try {
+        mCurrPackage.build();
+    } catch (const std::exception &e) {
+        QString logMessage = QString("%1").arg(e.what());
+        mLogger->logExt(logMessage, true);
+        mLogger->log(tr("Project compilation failed"));
+        return;
+    }
+    ui->menuProject->setEnabled(false);
+
+    mTimer = new QTimer();
+    QObject::connect(mTimer, SIGNAL(timeout()),
+            this, SLOT(projectBuildTimer()));
+    mTimer->start(2);
+}
+
+void
+gvle_win::onProjectClean()
+{
+    mLogger->log(tr("Project clean started"));
+    statusWidgetOpen();
+    bool success = true;
+    try {
+        mCurrPackage.clean();
+    } catch (const std::exception &e) {
+        QString logMessage = QString("%1").arg(e.what());
+        mLogger->logExt(logMessage, true);
+
+        success = false;
+    }
+    if (success) {
+        mLogger->log(tr("Project clean complete"));
+    } else {
+        mLogger->log(tr("Project clean failed"));
+    }
+    ui->menuProject->setEnabled(true);
+}
+
+void
+gvle_win::onProjectUninstall()
+{
+    mLogger->log(tr("Project uninstall started"));
+    statusWidgetOpen();
+    bool success = true;
+    try {
+        mCurrPackage.rclean();
+    } catch (const std::exception &e) {
+        QString logMessage = QString("%1").arg(e.what());
+        mLogger->logExt(logMessage, true);
+
+        success = false;
+    }
+    if (success) {
+        mLogger->log(tr("Project uninstall complete"));
+    } else {
+        mLogger->log(tr("Project uninstall failed"));
+    }
+    ui->menuProject->setEnabled(true);
+}
+
 void
 gvle_win::projectConfigureTimer()
 {
@@ -509,70 +576,6 @@ gvle_win::projectConfigureTimer()
             mLogger->logExt(oo.c_str());
     }
 }
-
-void
-gvle_win::onProjectBuild()
-{
-    mLogger->log(tr("Project compilation started"));
-    statusWidgetOpen();
-
-    try {
-        mCurrPackage.build();
-    } catch (const std::exception &e) {
-        QString logMessage = QString("%1").arg(e.what());
-        mLogger->logExt(logMessage, true);
-        mLogger->log(tr("Project compilation failed"));
-        return;
-    }
-    ui->menuProject->setEnabled(false);
-
-    mTimer = new QTimer();
-    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectBuildTimer()));
-    mTimer->start(2);
-}
-
-void
-gvle_win::onProjectClean()
-{
-    mLogger->log(tr("Project clean started"));
-    statusWidgetOpen();
-
-    try {
-        mCurrPackage.clean();
-    } catch (const std::exception &e) {
-        QString logMessage = QString("%1").arg(e.what());
-        mLogger->logExt(logMessage, true);
-        mLogger->log(tr("Project clean failed"));
-        return;
-    }
-    ui->menuProject->setEnabled(false);
-
-    mTimer = new QTimer();
-    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectCleanTimer()));
-    mTimer->start(2);
-}
-
-void
-gvle_win::onProjectUninstall()
-{
-    mLogger->log(tr("Project uninstall started"));
-    statusWidgetOpen();
-
-    try {
-        mCurrPackage.rclean();
-    } catch (const std::exception &e) {
-        QString logMessage = QString("%1").arg(e.what());
-        mLogger->logExt(logMessage, true);
-        mLogger->log(tr("Project uninstall failed"));
-        return;
-    }
-    ui->menuProject->setEnabled(false);
-
-    mTimer = new QTimer();
-    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(projectUninstallTimer()));
-    mTimer->start(2);
-}
-
 
 void
 gvle_win::projectBuildTimer()
@@ -635,49 +638,6 @@ gvle_win::projectInstallTimer()
     }
 }
 
-void
-gvle_win::projectCleanTimer()
-{
-    if (mCurrPackage.isFinish())
-    {
-        mTimer->stop();
-        delete mTimer;
-        mLogger->log(tr("Project clean complete"));
-        ui->menuProject->setEnabled(true);
-    }
-    std::string oo;
-    std::string oe;
-    bool ret = mCurrPackage.get(&oo, &oe);
-    if (ret)
-    {
-        if(oe.length())
-            mLogger->logExt(oe.c_str(), true);
-        if (oo.length())
-            mLogger->logExt(oo.c_str());
-    }
-}
-
-void
-gvle_win::projectUninstallTimer()
-{
-    if (mCurrPackage.isFinish())
-    {
-        mTimer->stop();
-        delete mTimer;
-        mLogger->log(tr("Project uninstall complete"));
-        ui->menuProject->setEnabled(true);
-    }
-    std::string oo;
-    std::string oe;
-    bool ret = mCurrPackage.get(&oo, &oe);
-    if (ret)
-    {
-        if(oe.length())
-            mLogger->logExt(oe.c_str(), true);
-        if (oo.length())
-            mLogger->logExt(oo.c_str());
-    }
-}
 
 void
 gvle_win::onUndo()

@@ -155,8 +155,6 @@ private slots:
     void projectConfigureTimer();
     void projectBuildTimer();
     void projectInstallTimer();
-    void projectCleanTimer();
-    void projectUninstallTimer();
     void onRefreshFiles();
     void onRightWidgetChanged();
     void onUndoAvailable(bool);

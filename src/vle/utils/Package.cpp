@@ -457,7 +457,6 @@ bool Package::get(std::string *out, std::string *err)
     err->reserve(Spawn::default_buffer_size);
 
     m_pimpl->m_spawn.get(out, err);
-    TraceAlways(" Package::get spawn get ");
     return true;
 }
 
