@@ -44,6 +44,7 @@
 #include "vlevpm.h"
 #include "DefaultVpzPanel.h"
 #include "DefaultCppPanel.h"
+#include "DefaultOutPanel.h"
 #include "plugin_cond.h"
 #include "plugin_output.h"
 
@@ -1007,9 +1008,15 @@ gvle_win::onTreeDblClick(QModelIndex index)
         } else {
             newPanel = mGvlePlugins.newInstanceMainPanelPlugin(plug);
         }
-
-
+    } else if (selectedFileInfo.suffix() == "dat"){
+        QString plug = getOutPlugin(relPath);
+        if (plug == "") {
+            newPanel = new DefaultOutPanel();
+        } else {
+            newPanel = mGvlePlugins.newInstanceMainPanelOutPlugin(plug);
+        }
     }
+
     if (newPanel) {
 
         newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
@@ -1080,6 +1087,15 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             action->setProperty("srcPlugin",pluginName);
         }
     }
+    if (insideOut(index)) {
+        ctxMenu.addSeparator();
+        QStringList plugList = mGvlePlugins.getMainPanelOutPluginsList();
+        for (int i =0; i<plugList.size(); i++) {
+            QString pluginName = plugList.at(i);
+            action = ctxMenu.addAction(tr("Use") + " " + pluginName);
+            action->setProperty("outPlugin", pluginName);
+        }
+    }
 
     QAction* selectedItem = ctxMenu.exec(globalPos);
     if (selectedItem) {
@@ -1094,9 +1110,7 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             copyFile(index);
         } else {//Add a new Cpp based on a plugin
             QVariant plugName = selectedItem->property("srcPlugin");
-            if ( ! plugName.isValid()) {
-                return;
-            }
+            if (plugName.isValid()) {
 
             //TODO check if a plugin
             PluginMainPanel* newPanel = mGvlePlugins.newInstanceMainPanelPlugin(
@@ -1120,7 +1134,30 @@ gvle_win::onCustomContextMenu(const QPoint &point)
 
             // Create a new toolbox for the right column
             setRightWidget(newPanel->rightWidget());
+            } else {
+                plugName = selectedItem->property("outPlugin");
+                if (not plugName.isValid()) {
+                    return;
+                }
 
+                PluginMainPanel* newPanel = mGvlePlugins.newInstanceMainPanelOutPlugin(
+                    plugName.toString());
+
+                QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
+                                 this, SLOT(onUndoAvailable(bool)));
+
+                QString relPath = getRelPathFromFSIndex(index);
+
+                newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+
+                int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
+                bool oldBlock = ui->tabWidget->blockSignals(true);
+                ui->tabWidget->setCurrentIndex(n);
+                ui->tabWidget->widget(n)->setProperty("relPath",relPath);
+                ui->tabWidget->blockSignals(oldBlock);
+
+                mPanels.insert(relPath,newPanel);
+            }
         }
     }
 }
@@ -1131,6 +1168,15 @@ gvle_win::insideSrc(QModelIndex index)
     QString filePath = mProjectFileSytem->filePath(index);
     QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
     QFile srcFile(pkgPath + "/src");
+    return filePath.indexOf(srcFile.fileName()) == 0;
+}
+
+bool
+gvle_win::insideOut(QModelIndex index)
+{
+    QString filePath = mProjectFileSytem->filePath(index);
+    QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    QFile srcFile(pkgPath + "/out");
     return filePath.indexOf(srcFile.fileName()) == 0;
 }
 
@@ -1219,6 +1265,25 @@ gvle_win::getCppPlugin(QString relPath)
     dom.setContent(&source, &reader);
     QDomElement docElem = dom.documentElement();
     QDomNode srcPluginNode = dom.elementsByTagName("srcPlugin").item(0);
+    return srcPluginNode.attributes().namedItem("name").nodeValue();
+}
+
+QString
+gvle_win::getOutPlugin(QString relPath)
+{
+    QString metaPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    metaPath += "/metadata/"+relPath;
+    metaPath.replace(".dat",".om");
+    QFile file(metaPath);
+    if (not QFile(metaPath).exists()) {
+        return "";
+    }
+    QDomDocument dom("vle_project_metadata");
+    QXmlInputSource source(&file);
+    QXmlSimpleReader reader;
+    dom.setContent(&source, &reader);
+    QDomElement docElem = dom.documentElement();
+    QDomNode srcPluginNode = dom.elementsByTagName("outPlugin").item(0);
     return srcPluginNode.attributes().namedItem("name").nodeValue();
 }
 

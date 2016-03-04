@@ -75,6 +75,7 @@ gvle_plugins::registerPlugins()
     QString pathgvlec = "plugins/gvle/condition";
     QString pathgvleo = "plugins/gvle/output";
     QString pathgvlem = "plugins/gvle/modeling";
+    QString pathgvleu = "plugins/gvle/out";
     QString pathgvles = "plugins/gvle/simulating";
 
     QString packagesDir =
@@ -135,6 +136,25 @@ gvle_plugins::registerPlugins()
                         qobject_cast<PluginMainPanel *>(plugin);
                 if (modeling) {
                     mMainPanelPlugins.insert(modeling->getname(),
+                            gvleplug(it.fileName(), libName));
+                }
+            }
+        }
+
+        if (QDir(it.filePath() + "/" + pathgvleu).exists()) {
+            QDirIterator itbis(it.filePath() + "/" + pathgvleu, QDir::Files);
+            while (itbis.hasNext()) {
+                QString libName =  itbis.next();
+                QPluginLoader loader(libName);
+                QObject *plugin = loader.instance();
+                if ( ! loader.isLoaded()) {
+                    qDebug() << " WARNING cannot load plugin " << libName;
+                    continue;
+                }
+                PluginMainPanel* modeling =
+                        qobject_cast<PluginMainPanel *>(plugin);
+                if (modeling) {
+                    mMainPanelOutPlugins.insert(modeling->getname(),
                             gvleplug(it.fileName(), libName));
                 }
             }
@@ -320,4 +340,47 @@ gvle_plugins::newInstanceMainPanelPlugin(QString name)
 
 }
 
+QStringList
+gvle_plugins::getMainPanelOutPluginsList()
+{
+    return mMainPanelOutPlugins.keys();
+}
+
+QString
+gvle_plugins::getMainPanelOutPluginPath(QString name)
+{
+    if (mMainPanelOutPlugins.contains(name)) {
+        return mMainPanelOutPlugins.value(name).libPath;
+    } else {
+        return "";
+    }
+
+}
+
+QString
+gvle_plugins::getMainPanelOutPluginPackage(QString name)
+{
+    return mMainPanelOutPlugins.value(name).package;
+}
+
+PluginMainPanel*
+gvle_plugins::newInstanceMainPanelOutPlugin(QString name)
+{
+    if (not mMainPanelOutPlugins.contains(name)) {
+        qDebug() << " Error no MainPanelOutPlugin "<< name;
+        return 0;
+    }
+    gvleplug& plug = mMainPanelOutPlugins[name];
+    if (not plug.loader) {
+        plug.loader = new QPluginLoader(plug.libPath);
+        if (not plug.loader->isLoaded()) {
+            qDebug() << " Error cannot load MainPanelOutPlugin "<< name;
+            return 0;
+        }
+        return qobject_cast<PluginMainPanel*>(plug.loader->instance());
+    }
+    //Tricky : the plugin instance is already used build a clone
+    return qobject_cast<PluginMainPanel*>(plug.loader->instance())->newInstance();
+
+}
 }} //namespaces
