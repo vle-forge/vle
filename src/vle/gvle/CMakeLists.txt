@@ -19,7 +19,7 @@ SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
   filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
   filevpzexpview.cpp logger.cpp vleDomDiffStack.cpp vlevpz.cpp vlevpm.cpp
   vpzDiagScene.cpp widgetvpzproperty.cpp filevpzrtool.cpp gvle_plugins.cpp
-  DefaultVpzPanel.cpp DefaultCppPanel.cpp DefaultSimSubpanel.cpp filevpzsim.cpp
+  DefaultVpzPanel.cpp DefaultCppPanel.cpp DefaultOutPanel.cpp DefaultSimSubpanel.cpp filevpzsim.cpp
   qcustomplot/qcustomplot.cpp)
 
 
