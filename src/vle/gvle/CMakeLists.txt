@@ -14,13 +14,14 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${gvle_SOURCE_DIR}
   ${VLE_SOURCE_DIR}/src/apps/gvle)
 
-SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
-  helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp  filevpzclasses.cpp
-  filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
-  filevpzexpview.cpp logger.cpp vleDomDiffStack.cpp vlevpz.cpp vlevpm.cpp
-  vpzDiagScene.cpp widgetvpzproperty.cpp filevpzrtool.cpp gvle_plugins.cpp
-  DefaultVpzPanel.cpp DefaultCppPanel.cpp DefaultOutPanel.cpp DefaultSimSubpanel.cpp filevpzsim.cpp
-  qcustomplot/qcustomplot.cpp)
+SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp
+  help.cpp helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp
+  filevpzclasses.cpp filevpzobservables.cpp filevpzproject.cpp
+  filevpzexpcond.cpp filevpzexpview.cpp logger.cpp vleDomDiffStack.cpp
+  vlevpz.cpp vlevpm.cpp vpzDiagScene.cpp widgetvpzproperty.cpp
+  filevpzrtool.cpp gvle_plugins.cpp DefaultVpzPanel.cpp
+  DefaultCppPanel.cpp DefaultOutPanel.cpp DefaultDataPanel.cpp
+  DefaultSimSubpanel.cpp filevpzsim.cpp qcustomplot/qcustomplot.cpp)
 
 
 
