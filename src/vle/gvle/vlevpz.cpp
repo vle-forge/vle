@@ -877,7 +877,8 @@ QString vleVpz::getExpDuration() const
     std::vector<vle::value::Value*> valuesToFill;
     fillWithMultipleValue(xDuration, valuesToFill);
     vle::value::Value* durationValue = valuesToFill[0];
-    return QString::number(durationValue->toDouble().value(), 'g', maxPrecision);
+    return QLocale().toString(durationValue->toDouble().value(), 'g',
+                              maxPrecision);
 }
 
 void vleVpz::setExpDuration(const QString duration)
@@ -887,7 +888,7 @@ void vleVpz::setExpDuration(const QString duration)
     undoStack->snapshot(docElem);
     docElem.setAttribute("duration", duration);
     bool ok;
-    double durationNum = duration.toDouble(&ok);
+    double durationNum = QLocale().toDouble(duration, &ok);
     if (ok) {
         vle::value::Value* durationValue =
             new vle::value::Double(durationNum);
@@ -906,7 +907,8 @@ vleVpz::getExpBegin() const
     std::vector<vle::value::Value*> valuesToFill;
     fillWithMultipleValue(xBegin, valuesToFill);
     vle::value::Value* beginValue = valuesToFill[0];
-    return QString::number(beginValue->toDouble().value(), 'g', maxPrecision);
+    return QLocale().toString(beginValue->toDouble().value(), 'g',
+                              maxPrecision);
 }
 
 
@@ -918,7 +920,7 @@ vleVpz::setExpBegin(const QString begin)
     undoStack->snapshot(docElem);
     docElem.setAttribute("begin", begin);
     bool ok;
-    double beginNum = begin.toDouble(&ok);
+    double beginNum = QLocale().toDouble(begin, &ok);
     if (ok) {
         vle::value::Value* beginValue =
             new vle::value::Double(beginNum);
