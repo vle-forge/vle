@@ -33,9 +33,86 @@
 #include "plugin_simpanel.h"
 #include "vlevpm.h"
 
+namespace Ui {
+class simpanelleft;
+class simpanelright;
+}
+
 namespace vle {
 namespace gvle {
 
+
+class DefaultSimSubpanelThread : public QObject
+{
+    Q_OBJECT
+public:
+    vle::value::Map* output_map;
+    vleVpm* mvpm;
+    vle::utils::Package* mpkg;
+
+    DefaultSimSubpanelThread();
+    ~DefaultSimSubpanelThread();
+    void init(vleVpm* vpm, vle::utils::Package* /*pkg*/);
+public slots:
+   void onStarted();
+signals:
+   void simulationFinished();
+};
+
+/**
+ * @brief left  widget
+ */
+
+class DefaultSimSubpanelLeftWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    DefaultSimSubpanelLeftWidget();
+    ~DefaultSimSubpanelLeftWidget();
+    Ui::simpanelleft* ui;
+    QCustomPlot* customPlot;
+
+};
+
+/**
+ * @brief right widget
+ */
+
+class DefaultSimSubpanelRightWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    DefaultSimSubpanelRightWidget();
+    ~DefaultSimSubpanelRightWidget();
+    Ui::simpanelright* ui;
+
+};
+
+
+struct portToPlot
+{
+    portToPlot() : view(), port(), color()
+    {
+    }
+    portToPlot(QString viewN, QString portN): view(viewN), port(portN),
+            color(70,130,180)
+    {
+    }
+
+    portToPlot(const portToPlot& p) : view(p.view), port(p.port),
+            color(p.color)
+    {
+    }
+
+    QString view;
+    QString port;
+    QColor  color;
+
+};
+
+/**
+ * @brief Sim panel
+ */
 
 class DefaultSimSubpanel : public PluginSimPanel
 {
@@ -51,8 +128,28 @@ public:
     void redo();
     PluginSimPanel* newInstance();
 
+    void showCustomPlot(bool b);
+    void addPortToPlot(QString view, QString port);
+    void removePortToPlot(QString view, QString port);
+    portToPlot* getPortToPlot(QString view, QString port);
+    void updateCustomPlot();
+    double getDouble(const vle::value::Matrix& view, unsigned int col,
+            unsigned int row);
 
-    QCustomPlot* customPlot;
+    DefaultSimSubpanelLeftWidget* left;
+    DefaultSimSubpanelRightWidget* right;
+    DefaultSimSubpanelThread* sim_process;
+    QThread* thread;
+    vleVpm* mvpm;
+    vle::utils::Package* mpkg;
+    std::vector<portToPlot> portsToPlot;
+
+public slots:
+    void onSimulationFinished();
+    void onRunPressed();
+    void onTreeItemChanged(QTreeWidgetItem* item, int col);
+    void onTreeItemSelected();
+    void onToolColor();
 };
 
 }} //namespaces

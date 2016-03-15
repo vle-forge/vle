@@ -22,6 +22,8 @@ SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
   DefaultVpzPanel.cpp DefaultCppPanel.cpp DefaultSimSubpanel.cpp filevpzsim.cpp
   qcustomplot/qcustomplot.cpp)
 
+
+
 QT5_WRAP_UI(ui_gvle_win_h gvle_win.ui)
 QT5_WRAP_UI(aboutbox_h aboutbox.ui)
 QT5_WRAP_UI(help_h help.ui)
@@ -35,6 +37,8 @@ QT5_WRAP_UI(filevpzclasses_h  filevpzclasses.ui)
 QT5_WRAP_UI(filevpzsim_h  filevpzsim.ui)
 QT5_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
 QT5_WRAP_UI(filevpzrtool_h   filevpzrtool.ui)
+QT5_WRAP_UI(simpanelleft_h simpanelleft.ui)
+QT5_WRAP_UI(simpanelright_h simpanelright.ui)
 QT5_WRAP_UI(widgetvpzpropertydynamics_h widgetvpzpropertydynamics.ui)
 QT5_WRAP_UI(widgetvpzpropertyexpcond_h  widgetvpzpropertyexpcond.ui)
 QT5_WRAP_UI(widgetvpzpropertyobservables_h  widgetvpzpropertyobservables.ui)
@@ -43,10 +47,11 @@ SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h}
   ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
   ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h}
   ${filevpzclasses_h} ${filevpzsim_h} ${filevpztooltip_h} ${filevpzrtool_h}
+  ${simpanelleft_h} ${simpanelright_h} ${widgetvpzpropertydynamics_h}
+  ${widgetvpzpropertyexpcond_h} ${widgetvpzpropertyobservables_h}
   gvle_widgets.h logger.h plugin_cond.h plugin_mainpanel.h plugin_simpanel.h
   plugin_output.h vleDomDiffStack.h vlevpz.h vlevpm.h widgetvpzproperty.h
-  vpzDiagScene.h gvle_plugins.h ${widgetvpzpropertydynamics_h}
-  ${widgetvpzpropertyexpcond_h} ${widgetvpzpropertyobservables_h})
+  vpzDiagScene.h gvle_plugins.h)
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
