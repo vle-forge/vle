@@ -415,12 +415,18 @@ vleVpm::getOutputGUIplugin(const QString& viewName)
 }
 
 void
-vleVpm::setCurrentTab(QString tabName)
+vleVpm::setCurrentSource(QString source)
 {
-    undoStackVpm->current_source = tabName;
-    vleVpz::undoStack->current_source = tabName;
+    undoStackVpm->current_source = source;
+    vleVpz::undoStack->current_source = source;
 }
 
+
+QString
+vleVpm::getCurrentSource()
+{
+    return undoStackVpm->current_source;
+}
 void
 vleVpm::save()
 {

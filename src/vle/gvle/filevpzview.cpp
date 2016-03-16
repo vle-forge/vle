@@ -139,7 +139,7 @@ void fileVpzView::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
 
-    mVpm->setCurrentTab(ui->tabWidget->tabText(
+    mVpm->setCurrentSource(ui->tabWidget->tabText(
             ui->tabWidget->currentIndex()));
 
     // ---- Dynamics Tab ----

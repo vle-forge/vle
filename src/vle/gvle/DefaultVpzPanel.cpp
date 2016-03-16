@@ -162,19 +162,36 @@ DefaultVpzPanel::onCurrentChanged(int /*index*/)
 {
 
     QString tab = m_vpzview->getCurrentTab();
-    m_vpzview->vpm()->setCurrentTab(tab);
+    QString previousTab = m_vpzview->vpm()->getCurrentSource();
+    m_vpzview->vpm()->setCurrentSource(tab);
     //return  m_plugin_sim->leftWidget();
     if (tab == "Diagram") {
         m_rtool->onInitializationDone(&m_vpzview->mScene);
         emit rightWidgetChanged();
     } else if (tab == "Conditions") {
-        //keep last right widget
+        if (previousTab == "Simulation") {
+            m_rtool->onInitializationDone(&m_vpzview->mScene);
+            emit rightWidgetChanged();
+        }
+        //else keep last right widget
     } else if (tab == "Dynamics") {
-        //keep last right widget
+        if (previousTab == "Simulation") {
+            m_rtool->onInitializationDone(&m_vpzview->mScene);
+            emit rightWidgetChanged();
+        }
+        //else keep last right widget
     } else if (tab == "Observables") {
-        //keep last right widget
+        if (previousTab == "Simulation") {
+            m_rtool->onInitializationDone(&m_vpzview->mScene);
+            emit rightWidgetChanged();
+        }
+        //else keep last right widget
     } else if (tab == "Views") {
-        //keep last right widget
+        if (previousTab == "Simulation") {
+            m_rtool->onInitializationDone(&m_vpzview->mScene);
+            emit rightWidgetChanged();
+        }
+        //else keep last right widget
     } else if (tab == "Classes") {
         m_rtool->onInitializationDone(&(m_vpzview->mClassesTab->mScene));
         emit rightWidgetChanged();

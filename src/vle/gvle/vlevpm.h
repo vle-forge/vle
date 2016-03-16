@@ -113,7 +113,8 @@ public:
     void rmConditionToDoc(const QString& condName);
     QString getCondGUIplugin(const QString& condName) const;
     QString getOutputGUIplugin(const QString& viewName);
-    void setCurrentTab(QString tabName);
+    void setCurrentSource(QString source);
+    QString getCurrentSource();
 
     void   save();
 
