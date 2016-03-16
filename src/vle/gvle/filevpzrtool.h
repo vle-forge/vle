@@ -73,9 +73,11 @@ public:
     void clear();
     void updateTree();
     vleVpm* vpm();
-    QString getModelQuery(QTreeWidgetItem* base);
-    QTreeWidgetItem* getTreeWidgetItem(const QString& model_query);
+    QString getModelQuery(QTreeWidgetItem* item);
+    QTreeWidgetItem* getTreeWidgetItem(const QString& model_query,
+            QTreeWidgetItem* base = 0);
     void updateModelProperty(const QString& model_query);
+    void updateModelLabel();
     QTreeWidgetItem* treeInsertModel(QDomNode mode, QTreeWidgetItem *base);
 //    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
 //    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
@@ -93,7 +95,6 @@ public:
 private:
     vleVpm*          mVpm;
     VpzDiagScene*    mCurrScene;
-    bool             mExternalSelection;
 };
 
 }} //namespaces
