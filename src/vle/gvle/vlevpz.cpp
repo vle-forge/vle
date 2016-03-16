@@ -2063,7 +2063,7 @@ bool
 vleVpz::existSubModel(QDomNode node, const QString& modName)
 {
     if (node.nodeName() != "model") {
-        qDebug() << ("Internal error in addModel (wrong main tag)");
+        qDebug() << ("Internal error in existSubModel (wrong main tag)");
         return false;
     }
     QList<QDomNode> chs = childNodesWithoutText(node, "submodels");
@@ -2078,6 +2078,34 @@ vleVpz::existSubModel(QDomNode node, const QString& modName)
     }
     return false;
 }
+
+
+bool
+vleVpz::existSiblingModel(QDomNode node, const QString& modName)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in existSiblingModel (wrong main tag)");
+        return false;
+    }
+    if (node.parentNode().nodeName() == "structures") {//main model
+        return false;
+    }
+    if (node.parentNode().nodeName() == "class") {//class main model
+        return false;
+    }
+    if (node.parentNode().nodeName() != "submodels") {
+        qDebug() << ("Internal error in existSiblingModel (wrong main tag 2)");
+        return false;
+    }
+    QList<QDomNode> mods = childNodesWithoutText(node.parentNode(), "model");
+    for (int i=0; i<mods.size(); i++) {
+        if (mVdo->attributeValue(mods[i], "name") == modName) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void
 vleVpz::addModel(QDomNode node, const QString& type, QPointF pos)

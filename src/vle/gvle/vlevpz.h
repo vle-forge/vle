@@ -372,6 +372,13 @@ public:
     bool existSubModel(QDomNode node, const QString& modName);
 
     /**
+     * @brief return true if modName is a sibling of node
+     * @param node, which node name is <model>
+     * @param modName, the sibling name to check
+     */
+    bool existSiblingModel(QDomNode node, const QString& modName);
+
+    /**
      * @brief add a submodel to a model
      * @param node: QDomNode <model> with xpath = //model
      * @param type: "coupled" or "atomic"

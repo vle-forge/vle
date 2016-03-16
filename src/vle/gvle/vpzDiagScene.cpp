@@ -395,7 +395,13 @@ VpzModelItem::setNameEdition(bool val)
         textItem->setSelected(false);
         textItem->clearFocus();
         if (getModelName() != textItem->toPlainText()) {
-            mVpm->renameModel(mnode, textItem->toPlainText());
+            if (mVpm->existSiblingModel(mnode, textItem->toPlainText())) {
+                bool oldBlock = textItem->blockSignals(true);
+                textItem->setPlainText(getModelName());
+                textItem->blockSignals(oldBlock);
+            } else {
+                mVpm->renameModel(mnode, textItem->toPlainText());
+            }
             update();
         }
     }
@@ -798,7 +804,6 @@ VpzMainModelItem::addConnLines()
 void
 VpzMainModelItem::update(const QRectF & /*rect*/)
 {
-
     setSelected(false);
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsMovable, false);
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsSelectable, false);
@@ -877,15 +882,16 @@ VpzMainModelItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
     QGraphicsItem::mouseReleaseEvent(mouseEvent);
 }
 
-
 void
 VpzMainModelItem::dragEnterEvent(QGraphicsSceneDragDropEvent * /*event*/)
 {
 }
+
 void
 VpzMainModelItem::dragLeaveEvent(QGraphicsSceneDragDropEvent * /*event*/)
 {
 }
+
 void
 VpzMainModelItem::dragMoveEvent(QGraphicsSceneDragDropEvent * /*event*/)
 {
@@ -1157,6 +1163,7 @@ VpzDiagScene::mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent)
                     if (not mod->isSelected()) {
                         unselectAllSubModels();
                         mod->setSelected(true);
+                        mod->update();
                     }
 
                     //Start drag event
