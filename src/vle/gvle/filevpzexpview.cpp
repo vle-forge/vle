@@ -144,13 +144,16 @@ FileVpzExpView::reload()
     bool oldBlock = ui->vleViewList->blockSignals(true);
     ui->vleViewList->clear();
     QListWidgetItem* itemSelected = 0;
+    QString viewName;
     std::vector<std::string>::iterator itb = outputNames.begin();
     std::vector<std::string>::iterator ite = outputNames.end();
     for ( ; itb != ite; itb++) {
-        QListWidgetItem* item = new QListWidgetItem(QString(itb->c_str()));
+        viewName = itb->c_str();
+        QListWidgetItem* item = new QListWidgetItem(viewName);
         item->setFlags (item->flags () | Qt::ItemIsEditable);
+        item->setData(Qt::UserRole+0, viewName);
         ui->vleViewList->addItem(item);
-        if (QString(itb->c_str()) == currView) {
+        if (viewName == currView) {
             itemSelected = item;
         }
 
@@ -307,9 +310,6 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
     action = myMenu.addAction("Remove view");
     action->setData(FVEVM_remove_view);
     action->setEnabled(item);
-    action = myMenu.addAction("Rename view");
-    action->setData(FVEVM_rename_view);
-    action->setEnabled(item);
 
 
     QAction* selectedItem = myMenu.exec(globalPos);
@@ -323,40 +323,29 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
 //            QListWidgetItem* item = new QListWidgetItem(viewName);
 //            item->setFlags (item->flags () | Qt::ItemIsEditable);
 //            ui->vleViewList->addItem(item);
-        }
-        if (actCode == FVEVM_remove_view) {
+        } else if (actCode == FVEVM_remove_view) {
             if (item) {
                 mVpm->rmViewToDoc(item->text());
                 currView = "";
                 reload();
             }
         }
-        if (actCode == FVEVM_rename_view) {
-            if (item) {
-                oldViewName = item->text();
-                ui->vleViewList->editItem(item);
-            }
-        }
-
     }
 }
 
 void
 FileVpzExpView::onItemChanged(QListWidgetItem * item)
 {
-    if (not oldViewName.isEmpty())  {
-        QString newName = item->text();
-        if (mVpm->existViewFromDoc(newName)) {
-            bool save = ui->vleViewList->blockSignals(true);
-            item->setText(oldViewName);
-            ui->vleViewList->blockSignals(save);
-        } else if (oldViewName != newName) {
-            mVpm->renameViewToDoc(oldViewName, newName);
-        }
-        oldViewName = "";
-        reload();
+    QString oldViewName = item->data( Qt::UserRole+0).toString();
+    QString newName = item->text();
+    if (mVpm->existViewFromDoc(newName)) {
+        bool oldBlock = ui->vleViewList->blockSignals(true);
+        item->setText(oldViewName);
+        ui->vleViewList->blockSignals(oldBlock);
+    } else if (oldViewName != newName) {
+        mVpm->renameViewToDoc(oldViewName, newName);
     }
-
+    reload();
 }
 
 void

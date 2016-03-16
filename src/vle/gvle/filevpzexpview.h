@@ -76,7 +76,6 @@ private:
     vleVpm*             mVpm;
     PluginOutput*       mPlugin;
     QString             currView;
-    QString             oldViewName;
 
 };
 }}//namespaces
