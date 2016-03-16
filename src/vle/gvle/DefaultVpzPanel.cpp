@@ -165,6 +165,7 @@ DefaultVpzPanel::onCurrentChanged(int /*index*/)
     //return  m_plugin_sim->leftWidget();
     if (tab == "Diagram") {
         m_rtool->onInitializationDone(&m_vpzview->mScene);
+        emit rightWidgetChanged();
     } else if (tab == "Conditions") {
         //keep last right widget
     } else if (tab == "Dynamics") {
