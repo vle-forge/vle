@@ -40,8 +40,11 @@ FileVpzRtool::FileVpzRtool(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->modelProperty->setAutoScroll(false);
+
     QObject::connect(ui->modelTree, SIGNAL(itemSelectionChanged()),
             this, SLOT (onTreeModelSelected()));
+
 }
 
 FileVpzRtool::~FileVpzRtool()
@@ -159,6 +162,7 @@ FileVpzRtool::getTreeWidgetItem(const QString& model_query)
 void
 FileVpzRtool::updateModelProperty(const QString& model_query)
 {
+
     bool oldBlockModeProperty = ui->modelProperty->blockSignals(true);
     bool oldBlockStackProperty = ui->stackProperty->blockSignals(true);
     if (not mVpm) {
@@ -180,7 +184,7 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
         QTableWidgetItem *newItem = new QTableWidgetItem(
                 mVpm->vdo()->attributeValue(nodeSel, "name"));
         newItem->setData(Qt::UserRole, ROW_NAME);
-        //newItem->setData(Qt::UserRole+1, QVariant::fromValue((void*)model));
+        newItem->setFlags(newItem->flags() ^ Qt::ItemIsEditable);
         ui->modelProperty->setItem(ROW_NAME, 1, newItem);
         // This row Name is selected by default
         ui->modelProperty->setCurrentCell(ROW_NAME, 0);
@@ -188,43 +192,23 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
         WidgetVpzPropertyDynamics *wpd = new WidgetVpzPropertyDynamics();
         wpd->setModel(mVpm, model_query);
         ui->modelProperty->setCellWidget(ROW_DYN, 1, wpd);
-        ui->modelProperty->resizeRowToContents(ROW_DYN);
-
-        WidgetVpzPropertyExpCond *wpec = new WidgetVpzPropertyExpCond();
-        wpec->setModel(mVpm, model_query);
-        ui->modelProperty->setCellWidget(ROW_EXP, 1, wpec);
-        ui->modelProperty->resizeRowToContents(ROW_EXP);
 
         WidgetVpzPropertyObservables *wpo = new WidgetVpzPropertyObservables();
         wpo->setModel(mVpm, model_query);
         ui->modelProperty->setCellWidget(ROW_OBS, 1, wpo);
-        ui->modelProperty->resizeRowToContents(ROW_OBS);
-        ui->modelProperty->resizeColumnToContents(1);
-//        ui->modelProperty->resizeColumnToContents(0);
-//        ui->modelProperty->resizeColumnToContents(1);
-
-//            ui->modelProperty->resizeRowsToContents();
-//            ui->modelProperty->resizeColumnsToContents();
-
-//        ui->modelProperty->setVisible(false);
-        ui->modelProperty->resizeRowsToContents();
-//        ui->modelProperty->resizeColumnsToContents();
-//        ui->modelProperty->setVisible(true);
-
-            ui->stackProperty->setCurrentIndex(1);
 
 
-        //        ui->modelProperty->resizeRowsToContents();
-        //        ui->modelProperty->resizeColumnsToContents();
+        WidgetVpzPropertyExpCond *wpec = new WidgetVpzPropertyExpCond();
+        wpec->setModel(mVpm, model_query);
+        ui->modelProperty->setCellWidget(ROW_EXP, 1, wpec);
 
-
-
+        ui->modelProperty->resizeRowToContents(ROW_EXP);
+        ui->modelProperty->resizeColumnsToContents();
+        ui->stackProperty->setCurrentIndex(1);
     } else {
         ui->modelProperty->setCellWidget(ROW_DYN, 1, 0);
         ui->modelProperty->setCellWidget(ROW_EXP, 1, 0);
         ui->modelProperty->setCellWidget(ROW_OBS, 1, 0);
-//        ui->modelProperty->resizeRowsToContents();
-//        ui->modelProperty->resizeColumnsToContents();
         ui->stackProperty->setCurrentIndex(0);
     }
     ui->modelProperty->blockSignals(oldBlockModeProperty);

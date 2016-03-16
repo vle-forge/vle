@@ -320,9 +320,6 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
             mVpm->addViewToDoc(viewName);
             currView = viewName;
             reload();
-//            QListWidgetItem* item = new QListWidgetItem(viewName);
-//            item->setFlags (item->flags () | Qt::ItemIsEditable);
-//            ui->vleViewList->addItem(item);
         } else if (actCode == FVEVM_remove_view) {
             if (item) {
                 mVpm->rmViewToDoc(item->text());

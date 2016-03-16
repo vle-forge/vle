@@ -51,8 +51,9 @@
 
 #define ROW_NAME 0
 #define ROW_DYN  1
-#define ROW_EXP  2
-#define ROW_OBS  3
+#define ROW_OBS  2
+#define ROW_EXP  3
+
 
 namespace Ui {
 class fileVpzRTool;

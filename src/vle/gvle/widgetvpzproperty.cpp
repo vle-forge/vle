@@ -35,24 +35,18 @@ namespace gvle {
 
 
 WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget *parent) :
-    QWidget(parent), ui(new Ui::WidgetVpzPropertyDynamics),
-    mVpm(0), mModQuery("")
+    QComboBox(parent), mVpm(0), mModQuery("")
 {
-    ui->setupUi(this);
-    setFocusPolicy(Qt::ClickFocus);
 
-    ui->comboBox->setVisible(true);
-    ui->comboBox->setFocusPolicy(Qt::ClickFocus);
-//    ui->comboBox->setVisible(true);
+    QComboBox::setVisible(true);
+    QComboBox::setFocusPolicy(Qt::ClickFocus);
 
-    // Signal used in edit mode when combo-box value change
-    QObject::connect(ui->comboBox, SIGNAL(currentIndexChanged(int)),
+    QObject::connect(this, SIGNAL(currentIndexChanged(int)),
                      this,         SLOT  (onChange(int)));
 }
 
 WidgetVpzPropertyDynamics::~WidgetVpzPropertyDynamics()
 {
-    delete ui;
 }
 
 void
@@ -68,23 +62,23 @@ WidgetVpzPropertyDynamics::setModel(vleVpz* model, const QString& mod_query)
 
     // Get the Dynamic of the model
     QString dyn = mVpm->modelDynFromDoc(mModQuery);
-    bool oldBlockComboBox = ui->comboBox->blockSignals(true);
-    while(ui->comboBox->count()) {
-        ui->comboBox->removeItem(0);
+    bool oldBlockComboBox = QComboBox::blockSignals(true);
+    while(QComboBox::count()) {
+        QComboBox::removeItem(0);
     }
-    ui->comboBox->addItem( tr("<none>") );
+    QComboBox::addItem( tr("<none>") );
 
     QList<QString> dynList;
     mVpm->fillWithDynamicsList(dynList);
     for (int i=0; i< dynList.length(); i++) {
-        ui->comboBox->addItem(dynList.at(i));
+        QComboBox::addItem(dynList.at(i));
         if (dyn == dynList.at(i)) {
             index = count;
         }
         count ++;
     }
-    ui->comboBox->setCurrentIndex(index);
-    ui->comboBox->blockSignals(oldBlockComboBox);
+    QComboBox::setCurrentIndex(index);
+    QComboBox::blockSignals(oldBlockComboBox);
 
 }
 
@@ -92,7 +86,7 @@ void
 WidgetVpzPropertyDynamics::onChange(int index)
 {
     // Get the selected dynamic name from widget
-    QString selectedName = ui->comboBox->itemText(index);
+    QString selectedName = QComboBox::itemText(index);
 
     // If the selected Dynamic exists
     if (mVpm->existDynamicIntoDoc(selectedName)) {
@@ -106,16 +100,13 @@ WidgetVpzPropertyDynamics::onChange(int index)
 /****************************************************************************/
 
 WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget *parent) :
-        QWidget(parent), ui(new Ui::WidgetVpzPropertyExpCond),
-        mVpm(0), mModQuery("")
+        QListWidget(parent), mVpm(0), mModQuery("")
 {
-    ui->setupUi(this);
-    ui->listCond->setVisible(true);
+    QListWidget::setVisible(true);
 }
 
 WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
 {
-    delete ui;
 }
 
 void
@@ -133,28 +124,28 @@ void
 WidgetVpzPropertyExpCond::refresh()
 {
     // First, clear the current list content
-    ui->listCond->clear();
+    bool oldBlock = QListWidget::blockSignals(true);
+    QListWidget::clear();
     QString dyn = mVpm->modelDynFromDoc(mModQuery);
-//    if (dyn != "") {
-        //TODO only way to see if it is an atomic model ??
-        QDomNodeList conds = mVpm->condsListFromConds(mVpm->condsFromDoc());
-        for (int i=0; i< conds.length(); i++) {
-            QDomNode cond = conds.at(i);
-            QString condName = mVpm->vdo()->attributeValue(cond, "name");
-            QListWidgetItem *wi = new QListWidgetItem(ui->listCond);
-            ui->listCond->addItem(wi);
-            QCheckBox *cb = new QCheckBox(this);
-            cb->setText( condName);
-            if (mVpm->isAttachedCond(mModQuery, condName)) {
-                cb->setCheckState( Qt::Checked );
-            } else {
-                cb->setCheckState( Qt::Unchecked );
-            }
-            QObject::connect(cb,   SIGNAL(toggled(bool)),
-                    this, SLOT(onCheckboxToggle(bool)));
-            ui->listCond->setItemWidget(wi, cb);
+    //TODO only way to see if it is an atomic model ??
+    QDomNodeList conds = mVpm->condsListFromConds(mVpm->condsFromDoc());
+    for (int i=0; i< conds.length(); i++) {
+        QDomNode cond = conds.at(i);
+        QString condName = mVpm->vdo()->attributeValue(cond, "name");
+        QListWidgetItem *wi = new QListWidgetItem(this);
+        QListWidget::addItem(wi);
+        QCheckBox *cb = new QCheckBox(this);
+        cb->setText( condName);
+        if (mVpm->isAttachedCond(mModQuery, condName)) {
+            cb->setCheckState( Qt::Checked );
+        } else {
+            cb->setCheckState( Qt::Unchecked );
         }
-//    }
+        QObject::connect(cb,   SIGNAL(toggled(bool)),
+                this, SLOT(onCheckboxToggle(bool)));
+        QListWidget::setItemWidget(wi, cb);
+    }
+    QListWidget::blockSignals(oldBlock);
 }
 
 void
@@ -182,40 +173,39 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
 /****************************************************************************/
 
 WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget *parent) :
-        QWidget(parent), ui(new Ui::WidgetVpzPropertyObservables),
-        mVpm(0), mModQuery("")
+        QComboBox(parent), mVpm(0), mModQuery("")
 {
-    ui->setupUi(this);
-    ui->listObs->setVisible(true);
+    QComboBox::setVisible(true);
+    QComboBox::setFocusPolicy(Qt::ClickFocus);
+
+    QObject::connect(this, SIGNAL(currentIndexChanged(int)),
+                     this,         SLOT  (onChange(int)));
 }
 
 WidgetVpzPropertyObservables::~WidgetVpzPropertyObservables()
 {
-    delete ui;
 }
 
 void
 WidgetVpzPropertyObservables::refresh()
 {
-    ui->listObs->clear();
+
+    bool oldBlock = QComboBox::blockSignals(true);
+    QComboBox::clear();
     QString dyn = mVpm->modelDynFromDoc(mModQuery);
     QDomNodeList obss = mVpm->obssListFromObss(mVpm->obsFromDoc());
+    QComboBox::addItem("<none>");
+    int selectIndex = 0;
     for (int i=0; i< obss.length(); i++) {
         QDomNode obs = obss.at(i);
         QString obsName = mVpm->vdo()->attributeValue(obs, "name");
-        QListWidgetItem *wi = new QListWidgetItem(ui->listObs);
-        ui->listObs->addItem(wi);
-        QCheckBox *cb = new QCheckBox(this);
-        cb->setText(obsName);
+        QComboBox::addItem(obsName);
         if (mVpm->modelObsFromDoc(mModQuery) == obsName) {
-            cb->setCheckState( Qt::Checked );
-        } else {
-            cb->setCheckState( Qt::Unchecked );
+            selectIndex = i+1;
         }
-        QObject::connect(cb, SIGNAL(clicked(bool)),
-                this, SLOT(onCheckboxClick(bool)));
-        ui->listObs->setItemWidget(wi, cb);
     }
+    QComboBox::setCurrentIndex(selectIndex);
+    QComboBox::blockSignals(oldBlock);
 }
 
 void
@@ -232,27 +222,14 @@ WidgetVpzPropertyObservables::setModel(vleVpz *model,
 }
 
 void
-WidgetVpzPropertyObservables::onCheckboxClick(bool checked)
+WidgetVpzPropertyObservables::onChange(int index)
 {
-    QObject *sender = QObject::sender();
-    QCheckBox *cb = qobject_cast<QCheckBox *>(sender);
 
-    if ( (mVpm == 0) || (cb == 0) )
-        return;
-    if (checked) {
-        mVpm->setObsToAtomicModel(mModQuery, cb->text());
-
-        for(int row = 0; row <  ui->listObs->count(); row++)
-        {
-            QListWidgetItem *item = ui->listObs->item(row);
-            QCheckBox *cbi = qobject_cast<QCheckBox *>(ui->listObs->itemWidget(item));
-            if (cbi->text() != cb->text()) {
-                cbi->setCheckState(Qt::Unchecked );
-            } else {
-                cbi->setCheckState(Qt::Checked );
-            }
-        }
-    } else {
+    // Get the selected dynamic name from widget
+    QString selectedObs = QComboBox::itemText(index);
+    if (mVpm->existObsFromDoc(selectedObs)) {
+        mVpm->setObsToAtomicModel(mModQuery, selectedObs);
+    } else if (selectedObs == "<none>") {
         mVpm->unsetObsFromAtomicModel(mModQuery);
     }
 }

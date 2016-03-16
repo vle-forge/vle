@@ -25,11 +25,11 @@
 #define gvle_WIDGETVPZPROPERTY_H
 
 #include <QWidget>
+#include <QListWidget>
+#include <QComboBox>
 #include "vlevpz.h"
 
 namespace Ui {
-class WidgetVpzPropertyDynamics;
-class WidgetVpzPropertyExpCond;
 class WidgetVpzPropertyObservables;
 }
 
@@ -37,7 +37,7 @@ namespace vle {
 namespace gvle {
 
 
-class WidgetVpzPropertyDynamics : public QWidget
+class WidgetVpzPropertyDynamics : public QComboBox
 {
     Q_OBJECT
 
@@ -53,12 +53,11 @@ private slots:
     void onChange(int index);
 
 private:
-    Ui::WidgetVpzPropertyDynamics *ui;
     vleVpz *mVpm;
     QString mModQuery;
 };
 
-class WidgetVpzPropertyExpCond : public QWidget
+class WidgetVpzPropertyExpCond : public QListWidget
 {
     Q_OBJECT
 public:
@@ -74,12 +73,11 @@ private slots:
     void refresh();
 
 private:
-    Ui::WidgetVpzPropertyExpCond *ui;
     vleVpz *mVpm;
     QString mModQuery;
 };
 
-class WidgetVpzPropertyObservables : public QWidget
+class WidgetVpzPropertyObservables : public QComboBox
 {
     Q_OBJECT
 public:
@@ -91,10 +89,9 @@ public slots:
     void refresh();
 
 private slots:
-    void onCheckboxClick(bool checked);
+    void onChange(int index);
 
 private:
-    Ui::WidgetVpzPropertyObservables *ui;
     vleVpz *mVpm;
     QString mModQuery;
 };

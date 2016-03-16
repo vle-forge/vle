@@ -44,7 +44,7 @@
    <item>
     <widget class="QStackedWidget" name="stackProperty">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabBlank"/>
      <widget class="QWidget" name="tabModelProperty">
@@ -156,7 +156,7 @@
          </item>
          <item row="2" column="0">
           <property name="text">
-           <string>Conditions</string>
+           <string>Observable</string>
           </property>
           <property name="textAlignment">
            <set>AlignLeft|AlignTop</set>
@@ -166,19 +166,25 @@
           </property>
          </item>
          <item row="2" column="1">
+          <property name="text">
+           <string/>
+          </property>
           <property name="textAlignment">
            <set>AlignLeft|AlignTop</set>
           </property>
          </item>
          <item row="3" column="0">
           <property name="text">
-           <string>Observable</string>
+           <string>Conditions</string>
           </property>
           <property name="textAlignment">
            <set>AlignLeft|AlignTop</set>
           </property>
          </item>
          <item row="3" column="1">
+          <property name="text">
+           <string/>
+          </property>
           <property name="textAlignment">
            <set>AlignLeft|AlignTop</set>
           </property>
