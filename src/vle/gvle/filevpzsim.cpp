@@ -35,9 +35,9 @@ namespace gvle {
 
 
 FileVpzSim::FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
-        QWidget *parent) :
+        Logger* log, QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzSim), mVpm(0), mGvlePlugins(plugs),
-    mPluginSimPanel(0), mPackage(pkg)
+    mPluginSimPanel(0), mPackage(pkg), mLog(log)
 {
     ui->setupUi(this);
     QObject::connect(ui->pluginList, SIGNAL(currentIndexChanged(const QString&)),
@@ -69,7 +69,7 @@ FileVpzSim::setVpm(vleVpm* vpm)
 
     //TODO check if a plugin
     mPluginSimPanel = new DefaultSimSubpanel();
-    mPluginSimPanel->init(mVpm, mPackage);
+    mPluginSimPanel->init(mVpm, mPackage, mLog);
     setSimLeftWidget(mPluginSimPanel->leftWidget());
 
     emit rightWidgetChanged();
@@ -111,7 +111,7 @@ FileVpzSim::onPluginChanged(const QString& text)
     } else {
         mPluginSimPanel = mGvlePlugins->newInstanceSimPanelPlugin(text);
     }
-    mPluginSimPanel->init(mVpm, mPackage);
+    mPluginSimPanel->init(mVpm, mPackage, mLog);
     setSimLeftWidget(mPluginSimPanel->leftWidget());
 
     emit rightWidgetChanged();

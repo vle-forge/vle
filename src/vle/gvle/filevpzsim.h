@@ -58,7 +58,7 @@ class FileVpzSim : public QWidget
 
 public:
     explicit FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
-            QWidget *parent = 0);
+            Logger* log, QWidget *parent = 0);
     ~FileVpzSim();
     void setVpm(vleVpm* v);
     void setSimLeftWidget(QWidget* leftWidget);
@@ -71,12 +71,13 @@ public slots:
 
 
 public:
-    Ui::FileVpzSim*  ui;
+    Ui::FileVpzSim*          ui;
 private:
-    vleVpm*          mVpm;
-    gvle_plugins*    mGvlePlugins;
-    PluginSimPanel*  mPluginSimPanel;
+    vleVpm*                  mVpm;
+    gvle_plugins*            mGvlePlugins;
+    PluginSimPanel*          mPluginSimPanel;
     vle::utils::Package*     mPackage;
+    Logger*                  mLog;
 };
 
 }} //namespaces

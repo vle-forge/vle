@@ -26,9 +26,9 @@
 #define GVLE_PLUGIN_SIMPANEL_H
 
 #include <QWidget>
-#include "logger.h"
 #include <vle/utils/Package.hpp>
 #include <vle/gvle/vlevpm.h>
+#include "logger.h"
 
 namespace vle {
 namespace gvle {
@@ -39,13 +39,13 @@ class PluginSimPanel :public QObject
 public:
     PluginSimPanel(){};
     virtual ~PluginSimPanel(){};
-    virtual void init(vleVpm* vpm, vle::utils::Package* pkg) = 0;
-    virtual QString  getname()                               = 0;
-    virtual QWidget* leftWidget()                            = 0;
-    virtual QWidget* rightWidget()                           = 0;
-    virtual void undo()                                      = 0;
-    virtual void redo()                                      = 0;
-    virtual PluginSimPanel* newInstance()                    = 0;
+    virtual void init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log) = 0;
+    virtual QString  getname()                                            = 0;
+    virtual QWidget* leftWidget()                                         = 0;
+    virtual QWidget* rightWidget()                                        = 0;
+    virtual void undo()                                                   = 0;
+    virtual void redo()                                                   = 0;
+    virtual PluginSimPanel* newInstance()                                 = 0;
 
 };
 

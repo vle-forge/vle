@@ -54,7 +54,7 @@ DefaultVpzPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
 {
     mGvlePlugins = plugs;
 
-    m_vpzview = new fileVpzView(pkg, mGvlePlugins);
+    m_vpzview = new fileVpzView(pkg, mGvlePlugins, log);
     m_rtool = new FileVpzRtool();
 
     QObject::connect(&m_vpzview->mScene, SIGNAL(enterCoupledModel(QDomNode)),

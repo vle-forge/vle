@@ -76,7 +76,7 @@ public:
      *        Default constructor for VPZ tab
      */
     explicit fileVpzView(vle::utils::Package* pkg,
-            gvle_plugins* plugs, QWidget *parent = 0);
+            gvle_plugins* plugs, Logger* log, QWidget *parent = 0);
     ~fileVpzView();
     void setVpm(vleVpm *v);
     void setRtool(FileVpzRtool* tool);
@@ -121,6 +121,7 @@ public:
     QList<QTreeWidgetItem *> mViewsItems;
     gvle_plugins*            mGvlePlugins;
     vle::utils::Package*     mPackage;
+    Logger*                  mLog;
 //    vleVpzModel     *mCurrentModel;
 
 public:

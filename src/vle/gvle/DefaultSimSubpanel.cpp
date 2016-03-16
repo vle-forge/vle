@@ -38,7 +38,7 @@ namespace gvle {
 
 
 DefaultSimSubpanelThread::DefaultSimSubpanelThread():
-        output_map(0), mvpm(0), mpkg(0)
+        output_map(0), mvpm(0), mpkg(0), mlog(0)
 {
 }
 
@@ -47,10 +47,12 @@ DefaultSimSubpanelThread::~DefaultSimSubpanelThread()
     delete output_map;
 }
 void
-DefaultSimSubpanelThread::init(vleVpm* vpm, vle::utils::Package* pkg)
+DefaultSimSubpanelThread::init(vleVpm* vpm, vle::utils::Package* pkg,
+        Logger* log)
 {
     mvpm = vpm;
     mpkg = pkg;
+    mlog = log;
 }
 
 void
@@ -66,9 +68,10 @@ DefaultSimSubpanelThread::onStarted()
             new vle::vpz::Vpz(mvpm->getFilename().toStdString()),
             modules, &manerror);
     if (manerror.code != 0) {
-        throw vle::utils::InternalError(
-                vle::fmt("Error in MetaManager '%1%'")
-        % manerror.message);
+        mlog->logExt(QString("Error in MetaManager '%1'")
+                .arg(manerror.message.c_str()), true);
+        delete output_map;
+        output_map = 0;
     }
     emit simulationFinished();
 }
@@ -105,7 +108,7 @@ DefaultSimSubpanelRightWidget::~DefaultSimSubpanelRightWidget()
 DefaultSimSubpanel::DefaultSimSubpanel():
             PluginSimPanel(), left(new DefaultSimSubpanelLeftWidget),
             right(new DefaultSimSubpanelRightWidget), sim_process(0), thread(0),
-            mvpm(0), mpkg(0), portsToPlot()
+            mvpm(0), mpkg(0),mLog(0), portsToPlot()
 {
     QObject::connect(left->ui->runButton,  SIGNAL(pressed()),
                      this, SLOT(onRunPressed()));
@@ -133,10 +136,11 @@ DefaultSimSubpanel::~DefaultSimSubpanel()
     }
 }
 void
-DefaultSimSubpanel::init(vleVpm* vpm, vle::utils::Package* pkg)
+DefaultSimSubpanel::init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log)
 {
     mvpm = vpm;
     mpkg = pkg;
+    mLog = log;
     onTreeItemSelected();
 }
 
@@ -438,7 +442,7 @@ DefaultSimSubpanel::onRunPressed()
     //delte simulation thread
     delete sim_process;
     sim_process = new DefaultSimSubpanelThread();
-    sim_process->init(mvpm, mpkg);
+    sim_process->init(mvpm, mpkg, mLog);
 
     //delete set
     delete thread;

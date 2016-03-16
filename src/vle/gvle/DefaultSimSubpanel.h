@@ -46,13 +46,14 @@ class DefaultSimSubpanelThread : public QObject
 {
     Q_OBJECT
 public:
-    vle::value::Map* output_map;
-    vleVpm* mvpm;
+    vle::value::Map*     output_map;
+    vleVpm*              mvpm;
     vle::utils::Package* mpkg;
+    Logger*              mlog;
 
     DefaultSimSubpanelThread();
     ~DefaultSimSubpanelThread();
-    void init(vleVpm* vpm, vle::utils::Package* /*pkg*/);
+    void init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log);
 public slots:
    void onStarted();
 signals:
@@ -120,7 +121,7 @@ class DefaultSimSubpanel : public PluginSimPanel
 public:
     DefaultSimSubpanel();
     virtual ~DefaultSimSubpanel();
-    void init(vleVpm* vpm, vle::utils::Package* pkg);
+    void init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log);
     QString  getname();
     QWidget* leftWidget();
     QWidget* rightWidget();
@@ -142,6 +143,8 @@ public:
     QThread* thread;
     vleVpm* mvpm;
     vle::utils::Package* mpkg;
+    Logger* mLog;
+
     std::vector<portToPlot> portsToPlot;
 
 public slots:

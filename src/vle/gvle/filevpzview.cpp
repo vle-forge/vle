@@ -33,9 +33,9 @@ namespace vle {
 namespace gvle {
 
 fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
-        QWidget *parent) :
+        Logger* log, QWidget *parent) :
     QWidget(parent), ui(new Ui::fileVpzView), mRtool(0), mGvlePlugins(plugs),
-    mPackage(pkg)
+    mPackage(pkg), mLog(log)
 {
     ui->setupUi(this);
 
@@ -73,7 +73,7 @@ fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
     int classesTabId = ui->tabWidget->addTab(mClassesTab, tr("Classes"));
 
     //Configure Sim Tab
-    mSimTab = new vle::gvle::FileVpzSim(mPackage, mGvlePlugins);
+    mSimTab = new vle::gvle::FileVpzSim(mPackage, mGvlePlugins, log);
     int simTabId = ui->tabWidget->addTab(mSimTab, tr("Simulation"));
 
     // Configure Project tab
