@@ -1537,8 +1537,33 @@ vleVpz::addCondPortToDoc(const QString& condName, const QString& portName)
 void
 vleVpz::rmConditionToDoc(const QString& condName)
 {
+    if (not existCondFromDoc(condName)) {
+        return;
+    }
+    undoStack->snapshot(vleProjectFromDoc());
+    //detach the condition to all the models
+    QDomNode atom;
+    QDomNodeList modList = getDomDoc().elementsByTagName("model");
+    for (int i=0; i<modList.length(); i++) {
+        atom = modList.at(i);
+        if (mVdo->attributeValue(atom, "type") == "atomic") {
+            QString attachedConds = mVdo->attributeValue(atom, "conditions");
+            QStringList condSplit = attachedConds.split(",");
+            if (condSplit.contains(condName)) {
+                condSplit.removeOne(condName);
+                QString res ="";
+                for (int i = 0; i < condSplit.length(); i++) {
+                    if (i > 0){
+                        res += ",";
+                    }
+                    res += condSplit.at(i);
+                }
+                setAttributeValue(atom.toElement(), "conditions", res);
+            }
+        }
+    }
+    //remove cond from experiment
     QDomNode conds = condsFromDoc();
-    undoStack->snapshot(conds);
     rmCondFromConds(conds, condName);
 }
 
