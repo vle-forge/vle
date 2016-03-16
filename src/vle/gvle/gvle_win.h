@@ -214,6 +214,13 @@ private:
      */
     QString getRelPathFromFSIndex(QModelIndex index);
     /**
+     * @brief get the relative path (eg. exp/empty.vpz) from a pointer to
+     * a main panel
+     * @param p, the main panel
+     * @return the relative path corresponding to p
+     */
+    QString getRelPathFromMainPanel(PluginMainPanel* p);
+    /**
      * @brief get the file system index from a relative path (eg exp/empty.vpz)
      * @param relPath, the relative path
      * @return the file system index
@@ -231,6 +238,13 @@ private:
      * @return the main panel associated to relPath or 0
      */
     PluginMainPanel* getMainPanelFromRelPath(QString relPath);
+    /**
+     * @brief get the tab index form a relPath
+     * @param relPath, id of the file
+     * @return the tab index
+     */
+    int getTabIndexFromRelPath(QString relPath);
+
 
     /**
      * @brief get status ogf a file idetified by relative path

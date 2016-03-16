@@ -399,6 +399,18 @@ gvle_win::getRelPathFromFSIndex(QModelIndex index)
     return getRelPathFromFileInfo(f);
 }
 
+QString
+gvle_win::getRelPathFromMainPanel(PluginMainPanel* p)
+{
+    QMap<QString, PluginMainPanel*>::iterator i;
+    for (i = mPanels.begin(); i != mPanels.end(); ++i) {
+        if (i.value() == p) {
+            return i.key();
+        }
+    }
+    return "";
+}
+
 QModelIndex
 gvle_win::getFSIndexFromRelPath(QString relPath)
 {
@@ -423,6 +435,17 @@ gvle_win::getMainPanelFromRelPath(QString relPath)
         return mPanels[relPath];
     }
     return 0;
+}
+
+int
+gvle_win::getTabIndexFromRelPath(QString relPath)
+{
+    for (int i =0 ;i <ui->tabWidget->count(); i++) {
+        if (getRelPathFromTabIndex(i) == relPath) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 gvle_win::StatusFile
@@ -959,8 +982,7 @@ gvle_win::onTreeDblClick(QModelIndex index)
     }else if (selectedFileInfo.suffix() == "vpz") {
         //TODO check if a plugin
         newPanel = new DefaultVpzPanel();
-        QObject::connect(newPanel, SIGNAL(rightWidgetChanged()),
-                         this, SLOT(onRightWidgetChanged()));
+
 
     } else if ((selectedFileInfo.suffix() == "cpp") or
                (selectedFileInfo.suffix() == "hpp")){
@@ -974,12 +996,8 @@ gvle_win::onTreeDblClick(QModelIndex index)
 
     }
     if (newPanel) {
-        QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
-                         this, SLOT(onUndoAvailable(bool)));
-
 
         newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
-
         int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
         bool oldBlock = ui->tabWidget->blockSignals(true);
         ui->tabWidget->setCurrentIndex(n);
@@ -990,6 +1008,11 @@ gvle_win::onTreeDblClick(QModelIndex index)
 
         // Create a new toolbox for the right column
         setRightWidget(newPanel->rightWidget());
+
+        QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
+                         this, SLOT(onUndoAvailable(bool)));
+        QObject::connect(newPanel, SIGNAL(rightWidgetChanged()),
+                         this, SLOT(onRightWidgetChanged()));
     }
     //set undo redo enabled
     ui->actionUndo->setEnabled(true);
@@ -1323,15 +1346,16 @@ gvle_win::onRightWidgetChanged()
 void
 gvle_win::onUndoAvailable(bool b)
 {
-    int curr = ui->tabWidget->currentIndex();
-    QString relPath = ui->tabWidget->widget(curr)->property("relPath").toString();
+    QString relPath = getRelPathFromMainPanel(
+            (PluginMainPanel*) QObject::sender());
+    int i = getTabIndexFromRelPath(relPath);
     QString tabName;
     if (b) {
         tabName = QString("* %1").arg(relPath);
     } else {
         tabName = relPath;
     }
-    ui->tabWidget->setTabText(curr, tabName);
+    ui->tabWidget->setTabText(i, tabName);
 }
 
 void gvle_win::projectInstall()
