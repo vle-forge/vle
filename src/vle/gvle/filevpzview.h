@@ -86,20 +86,11 @@ public:
     QString getCurrentTab();
     void undo();
     void redo();
-//    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
-//    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
 
 public slots:
     void onTabClose(int index);
-//    void onViewTreeMenu(const QPoint pos);
-//    void onFocusChanged(vleVpzModel *model);
-//    void onModelDblClick(vleVpzModel *model);
-//    void onPropertyChanged(QTableWidgetItem *item);
-//    void onPropertySelected(int cr, int cc, int pr, int pc);
-//    void onPropertyMode(bool isSelected);
-
-//    void onAddModelerTab(vleVpzModel *model);
-//    void onExpCondChanged(const QString& condName);
+    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+            QDomNode oldValVpm, QDomNode newValVpm);
 
 public:
     bool             mUseSim;
@@ -117,7 +108,6 @@ public:
     gvle_plugins*            mGvlePlugins;
     vle::utils::Package*     mPackage;
     Logger*                  mLog;
-//    vleVpzModel     *mCurrentModel;
 
 public:
 

@@ -116,10 +116,6 @@ void FileVpzExpView::setVpm(vleVpm* vpm)
                      this, SLOT(onViewTypeSelected(const QString&)));
     QObject::connect(ui->timeStep, SIGNAL(valueChanged (double)),
                          this, SLOT(onTimeStepChanged(double)));
-    QObject::connect(mVpm,
-            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-            this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 
     reload();
 }

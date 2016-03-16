@@ -237,10 +237,6 @@ void FileVpzObservables::setVpm(vleVpm* vpm)
     reload();
     QObject::connect(mVpm,   SIGNAL(viewsUpdated()),
                      this, SLOT(onViewsUpdated()));
-    QObject::connect(mVpm,
-            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-            this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 }
 
 void FileVpzObservables::reload()

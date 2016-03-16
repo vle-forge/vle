@@ -83,10 +83,6 @@ FileVpzExpCond::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
     QObject::connect(mVpm,
-                     SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-                     this,
-                     SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
-    QObject::connect(mVpm,
                      SIGNAL(experimentUpdated()),
                      this,
                      SLOT(onExpUpdated()));

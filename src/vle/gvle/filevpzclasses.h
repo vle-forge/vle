@@ -60,17 +60,6 @@ public:
     ~FileVpzClasses();
     void setVpm(vleVpm* vpm);
     void reload();
-//    vleVpm* vpz();
-//    bool isUsed(int *reason);
-//    void usedBySim(bool isUsed);
-//    void save();
-//    QWidget *getTool();
-//    void treeInsertModel(vleVpzModel *model, QTreeWidgetItem *base);
-//    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
-//    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
-//
-signals:
-    void undoRedo(QDomNode, QDomNode, QDomNode, QDomNode);
 public slots:
     void onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode);
     void onNewAtomicTriggered(bool checked);
@@ -78,21 +67,11 @@ public slots:
     void onTextChanged(const QString & text);
     void onPushCopy(bool checked);
     void onPushDelete(bool checked);
-//    void onPushNew(bool checked);
     void onCurrentIndexChanged(const QString & text);
     void onChanged(const QList<QRectF> & region);
     void onSceneRectChanged(const QRectF& rect);
     void onSelectionChanged();
     void onMenu(const QPoint& pt);
-//    void onViewTreeMenu(const QPoint pos);
-//    void onFocusChanged(vleVpzModel *model);
-//    void onModelDblClick(vleVpzModel *model);
-//    void onPropertyChanged(QTableWidgetItem *item);
-//    void onPropertySelected(int cr, int cc, int pr, int pc);
-//    void onPropertyMode(bool isSelected);
-//    void onTabClose(int index);
-//    void onAddModelerTab(vleVpzModel *model);
-//    void onExpCondChanged(const QString& condName);
 
 public:
     VpzDiagScene        mScene;
@@ -101,22 +80,6 @@ private:
     vleVpm*             mVpm;
     QString             mSelClass;
 
-//    bool             mUseSim;
-//    FileVpzDynamics *mDynamicsTab;
-//    FileVpzExpCond  *mExpCondTab;
-//    FileVpzExpView  *mExpViewTab;
-//    FileVpzObservables  *mObservablesTab;
-//    FileVpzProject  *mProjectTab;
-//    vleVpz          *mVpm;
-//    QWidget         *mWidgetTool;
-//    QList<QTreeWidgetItem *> mViewsItems;
-//    vleVpzModel     *mCurrentModel;
-//
-//private:
-//    QUndoStack      *mUndoStack;
-//    QUndoView       *undoView;
-//
-//    QGraphicsScene   mScene;
 };
 
 }}

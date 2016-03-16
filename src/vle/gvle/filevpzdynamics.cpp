@@ -87,10 +87,6 @@ FileVpzDynamics::~FileVpzDynamics()
 void FileVpzDynamics::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
-    QObject::connect(mVpm,
-            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-            this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 }
 
 /**

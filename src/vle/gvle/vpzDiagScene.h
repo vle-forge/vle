@@ -213,7 +213,8 @@ public:
      * @param emitter, the object that send the signal:
      *   undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)
      */
-    void init(vleVpm* vpm, const QString& className, QObject* emitter);
+    void init(vleVpm* vpm, const QString& className);
+    QString getClass();
     void setFocus(QDomNode selModelNode);
     void clear();
     void update(const QRectF & rect = QRectF());
@@ -264,6 +265,7 @@ public slots:
 
 public:
     vleVpm*                mVpm;
+    QString                mClass;
     VpzMainModelItem*      mCoupled;
     VpzPortItem*           mPortSel1;
     VpzPortItem*           mPortSel2;

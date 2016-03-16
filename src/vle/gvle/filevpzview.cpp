@@ -53,32 +53,32 @@ fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
 
     // Configure Experimental Conditions tab
     mExpCondTab = new vle::gvle::FileVpzExpCond(mGvlePlugins);
-    int expTabId = ui->tabWidget->addTab(mExpCondTab, tr("Conditions"));
+    int expTabId = ui->tabWidget->addTab(mExpCondTab, "Conditions");
 
     // Configure Dynamics tab
     mDynamicsTab = new vle::gvle::FileVpzDynamics();
-    int dynTabId = ui->tabWidget->addTab(mDynamicsTab, tr("Dynamics"));
+    int dynTabId = ui->tabWidget->addTab(mDynamicsTab, "Dynamics");
 
     // Configure Observables tab
     mObservablesTab = new FileVpzObservables();
     int observablesTabId = ui->tabWidget->addTab(mObservablesTab,
-            tr("Observables"));
+            "Observables");
 
     // Configure View tab
     mExpViewTab = new vle::gvle::FileVpzExpView();
-    int viewTabId = ui->tabWidget->addTab(mExpViewTab, tr("Views"));
+    int viewTabId = ui->tabWidget->addTab(mExpViewTab, "Views");
 
     // Configure Classes tab
     mClassesTab = new vle::gvle::FileVpzClasses();
-    int classesTabId = ui->tabWidget->addTab(mClassesTab, tr("Classes"));
+    int classesTabId = ui->tabWidget->addTab(mClassesTab, "Classes");
 
     //Configure Sim Tab
     mSimTab = new vle::gvle::FileVpzSim(mPackage, mGvlePlugins, log);
-    int simTabId = ui->tabWidget->addTab(mSimTab, tr("Simulation"));
+    int simTabId = ui->tabWidget->addTab(mSimTab, "Simulation");
 
     // Configure Project tab
     mProjectTab = new FileVpzProject();
-    int projectTabId = ui->tabWidget->addTab(mProjectTab, tr("Project"));
+    int projectTabId = ui->tabWidget->addTab(mProjectTab, "Project");
     mProjectTab->setTabId(projectTabId);
     mProjectTab->setTab(ui->tabWidget);
 
@@ -181,10 +181,15 @@ void fileVpzView::setVpm(vleVpm* vpm)
     }
 
     //Build Scene
-    mScene.init(mVpm, "", mVpm);
+    mScene.init(mVpm, "");
     ui->graphicView->setSceneRect(QRect(0,0,0,0));
     ui->graphicView->setScene(&mScene);
     mScene.update();
+
+    QObject::connect(mVpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            this,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 
 
 }
@@ -264,10 +269,43 @@ void fileVpzView::redo()
     vpm()->redo();
 }
 
-void fileVpzView::onTabClose(int index)
+void
+fileVpzView::onTabClose(int index)
 {
     QWidget *w = ui->tabWidget->widget(index);
     delete w;
+}
+
+void
+fileVpzView::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+        QDomNode oldValVpm, QDomNode newValVpm)
+{
+    QString tab = getCurrentTab();
+    if (tab == "Diagram") {
+        mScene.onUndoRedoVpm(oldValVpz, newValVpz,
+                oldValVpm, newValVpm);
+    } else if (tab == "Conditions") {
+        mExpCondTab->onUndoRedoVpm(oldValVpz, newValVpz,
+                oldValVpm, newValVpm);
+    } else if (tab == "Dynamics") {
+        mDynamicsTab->onUndoRedoVpm(oldValVpz, newValVpz,
+                oldValVpm, newValVpm);
+    } else if (tab == "Observables") {
+        mObservablesTab->onUndoRedoVpm(oldValVpz, newValVpz,
+                oldValVpm, newValVpm);
+    } else if (tab == "Views") {
+        mExpViewTab->onUndoRedoVpm(oldValVpz, newValVpz,
+                oldValVpm, newValVpm);
+    } else if (tab == "Classes") {
+        mClassesTab->onUndoRedoVpm(oldValVpz, newValVpz,
+                oldValVpm, newValVpm);
+    } else if (tab == "Simulation") {
+//        mSimTab->onUndoRedoVpm(oldValVpz, newValVpz,
+//                oldValVpm, newValVpm);
+    } else if (tab == "Project") {
+        mProjectTab->onUndoRedoVpm(oldValVpz, newValVpz,
+                oldValVpm, newValVpm);
+    }
 }
 
 }}//namespaces

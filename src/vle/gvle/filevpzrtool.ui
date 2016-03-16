@@ -6,29 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>303</width>
+    <height>419</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>10</number>
-   </property>
+   <item>
+    <widget class="QLineEdit" name="labelModel">
+     <property name="text">
+      <string>Main model</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QTreeWidget" name="modelTree">
      <attribute name="headerVisible">
@@ -44,7 +42,7 @@
    <item>
     <widget class="QStackedWidget" name="stackProperty">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabBlank"/>
      <widget class="QWidget" name="tabModelProperty">

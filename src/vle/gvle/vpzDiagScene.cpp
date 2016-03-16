@@ -1019,8 +1019,8 @@ VpzMainModelItem::type() const
 /*********************************************************************************/
 
 VpzDiagScene::VpzDiagScene() :
-        QGraphicsScene(), mVpm(0), mCoupled(0), mPortSel1(0), mPortSel2(0),
-        mConnection(0), mDragStartPoint(), mDragCurrPoint(),
+        QGraphicsScene(), mVpm(0), mClass(""), mCoupled(0), mPortSel1(0),
+        mPortSel2(0), mConnection(0), mDragStartPoint(), mDragCurrPoint(),
         mModelSelType(MIDDLE), mIsEnteringCoupled(false)
 {
     setBackgroundBrush(getBrushBackground());
@@ -1029,20 +1029,23 @@ VpzDiagScene::VpzDiagScene() :
 
 
 void
-VpzDiagScene::init(vleVpm* vpm, const QString& className, QObject* emitter)
+VpzDiagScene::init(vleVpm* vpm, const QString& className)
 {
     clear();
     mVpm = vpm;
-    QDomNode selModelNode = mVpm->classModelFromDoc(className);
-
-    setFocus(selModelNode);
-    QObject::connect(emitter,
-            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-            this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+    mClass = className;
+    if (mClass == "" or mVpm->existClassFromDoc(className)) {
+        QDomNode selModelNode = mVpm->classModelFromDoc(className);
+        setFocus(selModelNode);
+    }
 
     emit initializationDone(this);
+}
 
+QString
+VpzDiagScene::getClass()
+{
+    return mClass;
 }
 
 void
@@ -1080,6 +1083,9 @@ VpzDiagScene::clear()
 void
 VpzDiagScene::update(const QRectF & /*rect*/)
 {
+    if (not mCoupled) {
+        return;
+    }
     if (views().size() > 0) {
         views()[0]->verticalScrollBar()->setValue(
                 views()[0]->verticalScrollBar()->minimum());

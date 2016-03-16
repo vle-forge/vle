@@ -165,6 +165,18 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
 
     bool oldBlockModeProperty = ui->modelProperty->blockSignals(true);
     bool oldBlockStackProperty = ui->stackProperty->blockSignals(true);
+
+    if (mCurrScene) {
+        if (mCurrScene->getClass() == "") {
+            ui->labelModel->setText("Main model");
+        } else {
+            ui->labelModel->setText(QString("Class model: %1")
+                    .arg(mCurrScene->getClass()));
+        }
+    } else {
+        ui->labelModel->setText("No model");
+    }
+
     if (not mVpm) {
         ui->stackProperty->setCurrentIndex(0);
         return ;
@@ -213,7 +225,6 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
     }
     ui->modelProperty->blockSignals(oldBlockModeProperty);
     ui->stackProperty->blockSignals(oldBlockStackProperty);
-
 
 }
 
@@ -288,6 +299,9 @@ FileVpzRtool::onInitializationDone(VpzDiagScene* scene)
     }
     updateModelProperty(theSelected);
     ui->modelTree->blockSignals(oldBlock);
+
+
+
 }
 
 void

@@ -160,6 +160,7 @@ DefaultVpzPanel::redo()
 void
 DefaultVpzPanel::onCurrentChanged(int /*index*/)
 {
+
     QString tab = m_vpzview->getCurrentTab();
     m_vpzview->vpm()->setCurrentTab(tab);
     //return  m_plugin_sim->leftWidget();
