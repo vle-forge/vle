@@ -135,7 +135,7 @@ public:
     portToPlot* getPortToPlot(QString view, QString port);
     void updateCustomPlot();
     double getDouble(const vle::value::Matrix& view, unsigned int col,
-            unsigned int row);
+            unsigned int row, bool error_message);
 
     DefaultSimSubpanelLeftWidget* left;
     DefaultSimSubpanelRightWidget* right;

@@ -275,7 +275,7 @@ DefaultSimSubpanel::updateCustomPlot()
         if (index != -1) {
             for (unsigned int i=1; i<view.rows(); ++i) {
                 double xi = view.getDouble(0,i);//time column
-                double yi = getDouble(view, index, i);
+                double yi = getDouble(view, index, i, i ==1);
                 if (yi < minyi) {
                     minyi = yi;
                 }
@@ -325,7 +325,7 @@ DefaultSimSubpanel::updateCustomPlot()
             QVector<double> x(view.rows()-1), y(view.rows()-1);
             for (unsigned int i=1; i<view.rows(); ++i) {
                 x[i-1] = view.getDouble(0,i); //time
-                y[i-1] = getDouble(view, index, i);
+                y[i-1] = getDouble(view, index, i, false);
             }
             // create graph and assign data to it:
             left->customPlot->addGraph();
@@ -348,14 +348,23 @@ DefaultSimSubpanel::updateCustomPlot()
 
 double
 DefaultSimSubpanel::getDouble(const vle::value::Matrix& view, unsigned int col,
-        unsigned int row)
+        unsigned int row, bool error_message)
 {
-    if (view.get(col,row)->isInteger()) {
+    if (not view.get(col,row)) {
+        if (error_message) {
+            mLog->logExt(QString("output '%1' is null")
+                    .arg(view.getString(col, 0).c_str()), true);
+        }
+        return 0;
+    } else if (view.get(col,row)->isInteger()) {
         return (double) view.getInt(col,row);
     } else if (view.get(col,row)->isDouble()){
         return (double) view.getDouble(col,row);
     } else {
-        qDebug() << "[ERROR] not double neighter int" ;
+        if (error_message) {
+            mLog->logExt(QString("output '%1' is neither an int nor a double")
+                    .arg(view.getString(col, 0).c_str()), true);
+        }
         return 0;
     }
 }
