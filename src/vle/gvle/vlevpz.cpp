@@ -2609,11 +2609,13 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
             and (node2type == "in")) {
         QDomNode cons = connectionsFromModel(coupled1);
         if (cons.isNull()) {
+            undoStack->snapshot(coupled1);
             QDomElement c = getDomDoc().createElement("connections");
             coupled1.appendChild(c);
+            cons = connectionsFromModel(coupled1);
+        } else {
+            undoStack->snapshot(cons);
         }
-        cons = connectionsFromModel(coupled1);
-        undoStack->snapshot(cons);
         QDomElement con = getDomDoc().createElement("connection");
         con.setAttribute("type", "internal");
         QDomElement orig = getDomDoc().createElement("origin");
@@ -2629,11 +2631,13 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
             and (node2type == "in")) {
         QDomNode cons = connectionsFromModel(coupled2);
         if (cons.isNull()) {
+            undoStack->snapshot(coupled2);
             QDomElement c = getDomDoc().createElement("connections");
             coupled2.appendChild(c);
+            cons = connectionsFromModel(coupled2);
+        } else {
+            undoStack->snapshot(cons);
         }
-        undoStack->snapshot(cons);
-        cons = connectionsFromModel(coupled2);
         QDomElement con = getDomDoc().createElement("connection");
         con.setAttribute("type", "input");
         QDomElement orig = getDomDoc().createElement("origin");
@@ -2649,11 +2653,13 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
             and (node2type == "out")) {
         QDomNode cons = connectionsFromModel(coupled1);
         if (cons.isNull()) {
+            undoStack->snapshot(coupled1);
             QDomElement c = getDomDoc().createElement("connections");
             coupled1.appendChild(c);
+            cons = connectionsFromModel(coupled1);
+        } else {
+            undoStack->snapshot(cons);
         }
-        cons = connectionsFromModel(coupled1);
-        undoStack->snapshot(cons);
         QDomElement con = getDomDoc().createElement("connection");
         con.setAttribute("type", "output");
         QDomElement orig = getDomDoc().createElement("origin");
