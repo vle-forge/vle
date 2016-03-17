@@ -84,8 +84,6 @@ public:
     QWidget* leftPanel();
     QWidget* rigthPanel();
     QString getCurrentTab();
-    void undo();
-    void redo();
 
 public slots:
     void onTabClose(int index);
@@ -94,10 +92,10 @@ public slots:
 
 public:
     bool             mUseSim;
-    Ui::fileVpzView*ui;
-    FileVpzDynamics *mDynamicsTab;
-    FileVpzExpCond  *mExpCondTab;
-    FileVpzExpView*mExpViewTab;
+    Ui::fileVpzView*         ui;
+    FileVpzDynamics*         mDynamicsTab;
+    FileVpzExpCond*          mExpCondTab;
+    FileVpzExpView*          mExpViewTab;
     FileVpzObservables*      mObservablesTab;
     FileVpzProject*          mProjectTab;
     FileVpzClasses*          mClassesTab;
@@ -108,9 +106,6 @@ public:
     gvle_plugins*            mGvlePlugins;
     vle::utils::Package*     mPackage;
     Logger*                  mLog;
-
-public:
-
     VpzDiagScene       mScene;
 };
 

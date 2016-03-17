@@ -72,6 +72,12 @@ public:
      * @brief get attribute value of a node which name is attrName
      */
     QString attributeValue(const QDomNode& node, const QString& attrName) const;
+
+    /**
+     * @brief set an attribute value to a node
+     */
+    void setAttributeValue(QDomNode& node, const QString& attrName,
+            const QString& val);
     /**
      * @brief get a QString representation of a QDomNode
      */

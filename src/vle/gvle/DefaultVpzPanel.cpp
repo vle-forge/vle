@@ -84,15 +84,16 @@ DefaultVpzPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
     m_vpzview->setVpm(vpm);
     m_vpzview->setRtool(m_rtool);
 
-
-    QObject::connect(vpm, SIGNAL(modelsUpdated()),
-                     m_rtool, SLOT (onModelsUpdated()));
     QObject::connect(vpm, SIGNAL(undoAvailable(bool)),
                      this, SLOT (onUndoAvailable(bool)));
     QObject::connect(m_vpzview->ui->tabWidget,   SIGNAL(currentChanged(int)),
-                     this,            SLOT  (onCurrentChanged(int)));
+                     this, SLOT  (onCurrentChanged(int)));
     QObject::connect(m_vpzview->mSimTab,   SIGNAL(rightWidgetChanged()),
-                     this,            SLOT  (onRightSimWidgetChanged()));
+                     this, SLOT  (onRightSimWidgetChanged()));
+    QObject::connect(vpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            m_vpzview,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
 }
 
 QString

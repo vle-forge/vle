@@ -87,9 +87,9 @@ public slots:
     void onEnterCoupledModel(QDomNode node);
     void onSelectionChanged();
     void onInitializationDone(VpzDiagScene* scene);
-    void onModelsUpdated();
-
-
+    void onDataUpdate();
+    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+            QDomNode oldValVpm, QDomNode newValVpm);
 public:
     Ui::fileVpzRtool*  ui;
 private:

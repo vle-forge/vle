@@ -1066,6 +1066,7 @@ VpzDiagScene::setFocus(QDomNode selModelNode)
 void
 VpzDiagScene::clear()
 {
+    bool oldBlock = this->blockSignals(true);
     mVpm = 0;
     delete mCoupled;
     mCoupled = 0;
@@ -1076,8 +1077,7 @@ VpzDiagScene::clear()
     mDragCurrPoint = QPointF();
     mModelSelType = MIDDLE;
     mIsEnteringCoupled = false;
-
-    emit initializationDone(this);
+    this->blockSignals(oldBlock);
 }
 
 void
@@ -1307,9 +1307,9 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             modsToMove.append(mod->mnode);
             newXs.append(x);
             newYs.append(y);
-            mVpm->setAttributeValue(mod->mnode.toElement(), "x",
+            mVpm->vdo()->setAttributeValue(mod->mnode, "x",
                     QVariant(x).toString());
-            mVpm->setAttributeValue(mod->mnode.toElement(), "y",
+            mVpm->vdo()->setAttributeValue(mod->mnode, "y",
                     QVariant(y).toString());
         }
         mVpm->setPositionToModel(modsToMove, newXs, newYs);

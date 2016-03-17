@@ -94,6 +94,17 @@ vleDomObject::attributeValue(const QDomNode& node,
     return "";
 }
 
+void
+vleDomObject::setAttributeValue(QDomNode& node, const QString& attrName,
+        const QString& val)
+{
+    if (node.attributes().contains(attrName)) {
+         node.attributes().namedItem(attrName).setNodeValue(val);
+    } else {
+        node.toElement().setAttribute(attrName, val);
+    }
+}
+
 QString
 vleDomObject::toQString(const QDomNode& node) const
 {

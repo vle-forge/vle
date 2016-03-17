@@ -47,6 +47,7 @@ public:
     void reload();
 
 public slots:
+
     void onSelectPackage(const QString & id, const QString & text);
     void onSelectLibrary(const QString & id, const QString& text);
     void onDynamicsTableMenu(const QPoint&);

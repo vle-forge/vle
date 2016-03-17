@@ -237,12 +237,7 @@ public:
      * @brief remove children that are QDomText to a node
      */
     void removeTextChilds(QDomNode node, bool recursively=true);
-    /**
-     * @brief set attribute value of a node which name is attrName
-     * and value is val
-     */
-    void setAttributeValue(QDomElement node, const QString& attrName,
-               const QString& val);
+
 
 
 

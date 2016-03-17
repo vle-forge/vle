@@ -206,7 +206,8 @@ vleVpm::addConditionFromPluginToDoc(const QString& condName,
 void
 vleVpm::renameConditionToDoc(const QString& oldName, const QString& newName)
 {
-    if (oldName == "simulation_engine") {
+    if (oldName == "simulation_engine" or existCondFromDoc(newName) or
+            not existCondFromDoc(oldName) or oldName == newName) {
         return;
     }
     QString condPlugin = getCondGUIplugin(oldName);

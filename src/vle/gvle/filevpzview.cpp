@@ -186,12 +186,6 @@ void fileVpzView::setVpm(vleVpm* vpm)
     ui->graphicView->setScene(&mScene);
     mScene.update();
 
-    QObject::connect(mVpm,
-            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
-            this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
-
-
 }
 
 void fileVpzView::setRtool(FileVpzRtool* tool)
@@ -259,16 +253,6 @@ fileVpzView::getCurrentTab()
     return ui->tabWidget->tabText(ui->tabWidget->currentIndex());
 }
 
-void fileVpzView::undo()
-{
-    vpm()->undo();
-}
-
-void fileVpzView::redo()
-{
-    vpm()->redo();
-}
-
 void
 fileVpzView::onTabClose(int index)
 {
@@ -280,6 +264,11 @@ void
 fileVpzView::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
         QDomNode oldValVpm, QDomNode newValVpm)
 {
+    if (newValVpz.nodeName() == "vle_project") {
+        setVpm(mVpm);
+        return;
+    }
+
     QString tab = getCurrentTab();
     if (tab == "Diagram") {
         mScene.onUndoRedoVpm(oldValVpz, newValVpz,

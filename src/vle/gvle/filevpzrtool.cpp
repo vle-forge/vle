@@ -56,6 +56,15 @@ FileVpzRtool::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
     mCurrScene = 0;
+    QObject::connect(vpm, SIGNAL(modelsUpdated()),
+                     this, SLOT (onDataUpdate()));
+    QObject::connect(vpm, SIGNAL(dynamicsUpdated()),
+                     this, SLOT (onDataUpdate()));
+    QObject::connect(vpm,
+            SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
+            this,
+            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+
 }
 
 void
@@ -290,7 +299,14 @@ FileVpzRtool::onInitializationDone(VpzDiagScene* scene)
 }
 
 void
-FileVpzRtool::onModelsUpdated()
+FileVpzRtool::onDataUpdate()
+{
+    onInitializationDone(mCurrScene);
+}
+
+void
+FileVpzRtool::onUndoRedoVpm(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
+        QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
 {
     onInitializationDone(mCurrScene);
 }
