@@ -49,11 +49,11 @@ public:
     vle::value::Map*     output_map;
     vleVpm*              mvpm;
     vle::utils::Package* mpkg;
-    Logger*              mlog;
+    QString              error_simu;
 
     DefaultSimSubpanelThread();
     ~DefaultSimSubpanelThread();
-    void init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log);
+    void init(vleVpm* vpm, vle::utils::Package* pkg);
 public slots:
    void onStarted();
 signals:

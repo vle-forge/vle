@@ -38,7 +38,7 @@ namespace gvle {
 
 
 DefaultSimSubpanelThread::DefaultSimSubpanelThread():
-        output_map(0), mvpm(0), mpkg(0), mlog(0)
+        output_map(0), mvpm(0), mpkg(0), error_simu("")
 {
 }
 
@@ -47,12 +47,10 @@ DefaultSimSubpanelThread::~DefaultSimSubpanelThread()
     delete output_map;
 }
 void
-DefaultSimSubpanelThread::init(vleVpm* vpm, vle::utils::Package* pkg,
-        Logger* log)
+DefaultSimSubpanelThread::init(vleVpm* vpm, vle::utils::Package* pkg)
 {
     mvpm = vpm;
     mpkg = pkg;
-    mlog = log;
 }
 
 void
@@ -68,8 +66,9 @@ DefaultSimSubpanelThread::onStarted()
             new vle::vpz::Vpz(mvpm->getFilename().toStdString()),
             modules, &manerror);
     if (manerror.code != 0) {
-        mlog->logExt(QString("Error in MetaManager '%1'")
-                .arg(manerror.message.c_str()), true);
+        error_simu = QString("Error during simulation '%1'")
+                        .arg(manerror.message.c_str());
+
         delete output_map;
         output_map = 0;
     }
@@ -366,9 +365,9 @@ DefaultSimSubpanel::onSimulationFinished()
 {
     bool oldBlockTree = right->ui->treeSimViews->blockSignals(true);
     right->ui->treeSimViews->clear();
-
-
-    if (sim_process and sim_process->output_map) {
+    if (sim_process and not sim_process->error_simu.isEmpty()) {
+        mLog->logExt(sim_process->error_simu, true);
+    } else if (sim_process and sim_process->output_map) {
         const vle::value::Map& simu = *sim_process->output_map;
         QList<QTreeWidgetItem*> views_items;
         vle::value::Map::const_iterator itb = simu.begin();
@@ -442,7 +441,7 @@ DefaultSimSubpanel::onRunPressed()
     //delte simulation thread
     delete sim_process;
     sim_process = new DefaultSimSubpanelThread();
-    sim_process->init(mvpm, mpkg, mLog);
+    sim_process->init(mvpm, mpkg);
 
     //delete set
     delete thread;
