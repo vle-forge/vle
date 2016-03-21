@@ -61,14 +61,18 @@ DefaultSimSubpanelThread::onStarted()
     vle::utils::ModuleManager modules;
     vle::manager::Error manerror;
     delete output_map;
-
-    output_map =  sim.run(
-            new vle::vpz::Vpz(mvpm->getFilename().toStdString()),
-            modules, &manerror);
+    vle::vpz::Vpz* vpz = 0;
+    try{
+         vpz = new vle::vpz::Vpz(mvpm->getFilename().toStdString());
+    } catch(const vle::utils::SaxParserError& e) {
+        error_simu = QString("Error before simulation '%1'").arg(e.what());
+    }
+    if (vpz) {
+        output_map =  sim.run(vpz, modules, &manerror);
+    }
     if (manerror.code != 0) {
         error_simu = QString("Error during simulation '%1'")
-                        .arg(manerror.message.c_str());
-
+                                            .arg(manerror.message.c_str());
         delete output_map;
         output_map = 0;
     }
