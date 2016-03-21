@@ -71,7 +71,9 @@ enum VPZ_DIAG_MENU_ACTION {
     VDMA_Add_input_port,
     VDMA_Add_output_port,
     VDMA_Add_atomic_model,
-    VDMA_Add_coupled_model
+    VDMA_Add_coupled_model,
+    VDMA_Zoom_In,
+    VDMA_Zoom_Out
 };
 
 class VpzConnectionLineItem : public QGraphicsItem
@@ -198,6 +200,7 @@ public:
     void removeNameEditionMode();
     bool isAtomic();
     int type() const;
+
 };
 
 
@@ -218,6 +221,7 @@ public:
     void setFocus(QDomNode selModelNode);
     void clear();
     void update(const QRectF & rect = QRectF());
+    void setScale (const qreal z);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
     void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
     void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);

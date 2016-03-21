@@ -46,6 +46,16 @@ VpzConnectionLineItem::VpzConnectionLineItem(QDomNode node, vleVpm* vpm,
     update();
     it->update();
     it->show();
+
+    //build tool tip
+    QDomNode origin = mnode.firstChildElement("origin");
+    QDomNode dest = mnode.firstChildElement("destination");
+    QString toolTipMessage =  QString("%1:%2 -> %3:%4")
+            .arg(mVpm->vdo()->attributeValue(origin,"model"))
+            .arg(mVpm->vdo()->attributeValue(origin,"port"))
+            .arg(mVpm->vdo()->attributeValue(dest,"model"))
+            .arg(mVpm->vdo()->attributeValue(dest,"port"));
+    setToolTip(toolTipMessage);
 }
 
 void
@@ -219,7 +229,7 @@ VpzPortItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*evt*/)
 
 VpzModelItem::VpzModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* parent,
         QGraphicsScene* /*scene*/): QGraphicsItem(parent), mVpm(vpm),
-                mnode(node), margin(5), rectWidth(0), rectHeight(0)
+                mnode(node), margin(0.0), rectWidth(0), rectHeight(0)
 {
 
 }
@@ -577,17 +587,18 @@ VpzSubModelItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 SEL_TYPE
 VpzSubModelItem::getSelType(QPointF selPoint)
 {
+    double m = 5;//margin for the selection of borders
     QPointF p = mapFromParent(selPoint);
-    if (p.x() < margin and p.y() < rectHeight + margin) {
+    if (p.x() < m and p.y() < rectHeight + m) {
         return LEFT;
     }
-    if (p.y() < margin) {
+    if (p.y() < m) {
         return TOP;
     }
-    if (p.x() > rectWidth - margin and p.y() < rectHeight + margin) {
+    if (p.x() > rectWidth - m and p.y() < rectHeight + m) {
         return RIGHT;
     }
-    if (p.y() > rectHeight - margin and p.y() < rectHeight + margin) {
+    if (p.y() > rectHeight - m and p.y() < rectHeight + m) {
         return BOTTOM;
     }
     return MIDDLE;
@@ -624,6 +635,8 @@ VpzMainModelItem::VpzMainModelItem(QDomNode node, vleVpm* vpm, QGraphicsItem* pa
         QGraphicsScene* scene):  VpzModelItem(node, vpm, parent, scene)
 {
     scene->addItem(this);
+
+
     initializeFromDom();
     update();
 }
@@ -723,6 +736,8 @@ VpzMainModelItem::clearSubModels()
     }
 }
 
+
+
 void
 VpzMainModelItem::addConnLines()
 {
@@ -732,70 +747,128 @@ VpzMainModelItem::addConnLines()
 
     VpzDiagScene* vpzscene = static_cast<VpzDiagScene*>(this->scene());
 
+    double SPACE = 5;
+    double width_input = widthInputPorts();
+    double x_output = boundingRect().x() + boundingRect().width()
+            - widthOutputPorts();
+    std::map<std::string, int> deltas_out;
+    std::map<std::string, int> deltas_in;
+
+    VpzPortItem* ap = 0;
+    VpzPortItem* bp = 0;
+
+    VpzSubModelItem* amod = 0;
+    VpzSubModelItem* bmod = 0;
+
+    QDomNode orig;
+    QDomNode dest;
+
+    QString model_a;
+    QString model_b;
+    QString mod_port_b; //mod:port for destination
+
+    QString port_a;
+    QString port_b;
+
+    int model_a_y_up= 0;
+    int model_a_y_down= 0;
+
+    QString conn_type;
+
     for (int i =0; i<childList.size(); i++) {
         QDomNode conn = childList[i];
         if (conn.nodeName() == "connection") {
-            VpzPortItem* ap = 0;
-            VpzPortItem* bp = 0;
+            ap = 0;
+            bp = 0;
+            amod = 0;
+            bmod = 0 ;
 
+            orig = conn.toElement().elementsByTagName("origin").at(0);
+            dest = conn.toElement().elementsByTagName("destination").at(0);
+            model_a = mVpm->vdo()->attributeValue(orig, "model");
+            model_b = mVpm->vdo()->attributeValue(dest, "model");
+            port_a = mVpm->vdo()->attributeValue(orig, "port");
+            port_b = mVpm->vdo()->attributeValue(dest, "port");
 
-            QDomNode orig = conn.toElement().elementsByTagName("origin").at(0);
-            QDomNode dest =
-                    conn.toElement().elementsByTagName("destination").at(0);
-            if (mVpm->vdo()->attributeValue(conn, "type") == "output") {
-                //            VpzSubModelItem* origMod = getSubModel(
-                //                    mVpm->attributeValue(orig, "model"));
-                ap = getSubModel(mVpm->vdo()->attributeValue(orig, "model"))
-                            ->getOutPort(mVpm->vdo()->attributeValue(orig, "port"));
-                bp = getOutPort(mVpm->vdo()->attributeValue(dest, "port"));
-            } else if (mVpm->vdo()->attributeValue(conn, "type") == "internal") {
-                ap = getSubModel(mVpm->vdo()->attributeValue(orig, "model"))
-                            ->getOutPort(mVpm->vdo()->attributeValue(orig, "port"));
-                bp = getSubModel(mVpm->vdo()->attributeValue(dest, "model"))
-                            ->getInPort(mVpm->vdo()->attributeValue(dest, "port"));
-            } else if (mVpm->vdo()->attributeValue(conn, "type") == "input") {
-                ap = getInPort(mVpm->vdo()->attributeValue(orig, "port"));
-                bp = getSubModel(mVpm->vdo()->attributeValue(dest, "model"))
-                            ->getInPort(mVpm->vdo()->attributeValue(dest, "port"));
+            conn_type = mVpm->vdo()->attributeValue(conn, "type");
+            if (conn_type == "output") {
+                amod = getSubModel(model_a);
+                ap = amod->getOutPort(port_a);
+                bp = getOutPort(port_b);
+                model_b = QString("_%1").arg(model_b);
+            } else if (conn_type == "internal") {
+                amod = getSubModel(model_a);
+                bmod = getSubModel(model_b);
+                model_a_y_up = amod->pos().y();
+                model_a_y_down = amod->pos().y() + amod->boundingRect().height();
+                ap = amod->getOutPort(port_a);
+                bp = bmod->getInPort(port_b);
+            } else if (conn_type == "input") {
+                bmod = getSubModel(model_b);
+                ap = getInPort(port_a);
+                bp = bmod->getInPort(port_b);
+                model_a = QString("_%1").arg(model_a);
             }
+            deltas_out[model_a.toStdString()] ++;
+            QString mod_port_b = QString("%1:%2").arg(model_b).arg(port_b);
+            deltas_in[mod_port_b.toStdString()] ++;
+
+            int ind_din = deltas_in[mod_port_b.toStdString()];
+            double dout = deltas_out[model_a.toStdString()] * SPACE;
+            double din = ind_din / (int) 2;
+            din = din * SPACE;
+            if (ind_din % 2 == 0) {
+                din = - din ;
+            }
+
             if (ap and bp) {//paint connections
                 QPointF a = ap->getConnectionPoint();
                 QPointF b = bp->getConnectionPoint();
-                if (a.x() >= b.x()) {
-                    new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(a,
-                                    QPointF(a.x()+2*margin,a.y())),
-                                    this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(QPointF(a.x()+2*margin,a.y()),
-                                    QPointF(a.x()+2*margin,(a.y()+b.y())/2.0)),
-                                    this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(QPointF(a.x()+2*margin,(a.y()+b.y())/2.0),
-                                    QPointF(b.x()-2*margin,(a.y()+b.y())/2.0)),
-                                    this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(QPointF(b.x()-2*margin,(a.y()+b.y())/2.0),
-                                    QPointF(b.x()-2*margin,b.y())),
-                                    this,vpzscene);
-                    new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(QPointF(b.x()-2*margin,b.y()),
-                                    b),
-                                    this,vpzscene);
+                if (a.x()+3*SPACE >= b.x()) {
+                    QPointF trans1(a.x() + dout,a.y());
+                    QPointF trans2(a.x() + dout, model_a_y_up - SPACE) ;
+                    QPointF trans3(b.x() - 3 * SPACE,model_a_y_up - SPACE);
+                    if (a.y() < b.y()) {
+                        trans2.setY(model_a_y_down + SPACE);
+                        trans3.setY(model_a_y_down + SPACE);
+                    }
+                    QPointF trans4(b.x() - 3*SPACE,b.y()+din);
+                    QPointF trans5(b.x() - 2*SPACE,b.y()+din);
 
+                    new VpzConnectionLineItem(conn, mVpm,
+                            QLineF(a,trans1), this,vpzscene);
+                    new VpzConnectionLineItem(conn, mVpm,
+                            QLineF(trans1, trans2), this,vpzscene);
+                    new VpzConnectionLineItem(conn, mVpm,
+                            QLineF(trans2, trans3), this,vpzscene);
+                    new VpzConnectionLineItem(conn, mVpm,
+                            QLineF(trans3, trans4), this,vpzscene);
+                    new VpzConnectionLineItem(conn, mVpm,
+                            QLineF(trans4, trans5), this,vpzscene);
+                    new VpzConnectionLineItem(conn, mVpm,
+                            QLineF(trans5, b), this,vpzscene);
                 } else {
+                    QPointF trans1(a.x() + dout,a.y());
+                    QPointF trans2(a.x() + dout,b.y()+din);
+                    QPointF trans3(b.x() - 2 * SPACE,b.y()+din);
+                    if (conn_type == "input") {
+                        trans1.setX(std::min(width_input + dout,
+                                             width_input + 10*SPACE));
+                        trans2.setX(std::min(width_input + dout,
+                                             width_input + 10*SPACE));
+                    } else if (conn_type == "output") {
+                        trans1.setX(std::min(a.x()+dout,x_output-SPACE));
+                        trans2.setX(std::min(a.x()+dout,x_output-SPACE));
+                    }
+
                     new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(a,
-                                    QPointF((a.x()+b.x())/2.0,a.y())),
-                                    this,vpzscene);
+                            QLineF(a, trans1), this,vpzscene);
                     new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(QPointF((a.x()+b.x())/2.0,a.y()),
-                                    QPointF((a.x()+b.x())/2.0,b.y())),
-                                    this,vpzscene);
+                            QLineF(trans1,trans2), this,vpzscene);
                     new VpzConnectionLineItem(conn, mVpm,
-                            QLineF(QPointF((a.x()+b.x())/2.0,b.y()),
-                                    b),
-                                    this,vpzscene);
+                            QLineF(trans2, trans3), this, vpzscene);
+                    new VpzConnectionLineItem(conn, mVpm,
+                            QLineF(trans3, b), this, vpzscene);
                 }
             }
         }
@@ -807,38 +880,38 @@ VpzMainModelItem::update(const QRectF & /*rect*/)
     setSelected(false);
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsMovable, false);
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsSelectable, false);
-
+    double SPACE = 5;
     //compute rect width and height
     //->initialize with minimal sizes constrained by ports and names
     QRectF subModsRect = subModelsBoundingRect(false);
     rectWidth = std::max(std::max(std::max(
             200.0,
             getTitle()->boundingRect().width()),
-            subModsRect.x()+subModsRect.width()+widthOutputPorts()+2*margin),
-            widthInputPorts()+widthOutputPorts()+2*margin);
+            subModsRect.x()+subModsRect.width()+widthOutputPorts()+10*SPACE),
+            widthInputPorts()+widthOutputPorts()+10*SPACE);
     double nbPortMax = std::max(getInPorts().size(),
                                 getOutPorts().size());
 
     rectHeight = std::max(std::max(
             200.0,
             (nbPortMax+1)*margin + nbPortMax*heightPort()),
-            subModsRect.y() + subModsRect.height()+2*margin);
+            subModsRect.y() + subModsRect.height()+2*SPACE);
 
     //set localization of ports
     for (int i=0; i<getInPorts().length(); i++) {
         getInPorts().at(i)->setPos(QPointF(0,
-                margin + ((double) i)*(margin + heightPort())));
+                SPACE + ((double) i)*(SPACE + heightPort())));
     }
     for (int i=0; i<getOutPorts().length(); i++) {
         getOutPorts().at(i)->setPos(QPointF(
                 rectWidth-getOutPorts()[i]->boundingRect().width(),
-                margin + ((double) i)*(margin + heightPort())));
+                SPACE + ((double) i)*(SPACE + heightPort())));
     }
 
     //move to x,y
     QList<VpzSubModelItem *> sub = getSubModels();
     for (int i=0; i<sub.length(); i++) {
-        sub[i]->setPos(QPointF(std::max(widthInputPorts()+margin,
+        sub[i]->setPos(QPointF(std::max(widthInputPorts()+SPACE,
                 mVpm->vdo()->attributeValue(sub[i]->mnode, "x").toDouble()),
                 std::max(0.0,
                         mVpm->vdo()->attributeValue(sub[i]->mnode, "y").toDouble())));
@@ -1096,6 +1169,16 @@ VpzDiagScene::update(const QRectF & /*rect*/)
 }
 
 void
+VpzDiagScene::setScale (const qreal z)
+{
+    foreach (QGraphicsView* view, views ()) {
+        view->setTransformationAnchor (QGraphicsView::AnchorUnderMouse);
+        view->scale (z, z);
+    }
+}
+
+
+void
 VpzDiagScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
     QList<QGraphicsItem*> items = this->items(mouseEvent->scenePos());
@@ -1230,6 +1313,7 @@ VpzDiagScene::dragLeaveEvent(QGraphicsSceneDragDropEvent * /*event*/)
 void
 VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
 {
+    double SPACE = 5;
     QPointF prevDragPoint = mDragCurrPoint;
     mDragCurrPoint = event->scenePos();
 
@@ -1271,7 +1355,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             mCoupled->update();
             break;
         } case MIDDLE: {
-            double x = std::max(mCoupled->widthInputPorts() + mCoupled->margin,
+            double x = std::max(mCoupled->widthInputPorts() + mCoupled->margin + 10* SPACE,
                     mod->pos().x()+mDragCurrPoint.x() - prevDragPoint.x());
             double y = std::max(mCoupled->margin,
                     mod->pos().y()+mDragCurrPoint.y() - prevDragPoint.y());
@@ -1421,6 +1505,13 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     action->setData(VDMA_Add_coupled_model);
     action->setEnabled(sel and isVpzMainModel(sel) and not
                        (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
+    menu.addSeparator();
+    action = menu.addAction("Zoom In");
+    action->setData(VDMA_Zoom_In);
+    action->setEnabled(true);
+    action = menu.addAction("Zoom Out");
+    action->setData(VDMA_Zoom_Out);
+    action->setEnabled(true);
 
     if (sel) {
         action = menu.exec(event->screenPos());
@@ -1532,6 +1623,12 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                 mVpm->addModel(it->mnode, "coupled", event->scenePos());
                 it->initializeFromDom();
                 it->update();
+            } else if(actCode == VDMA_Zoom_In) {
+                setScale(1.2);
+                update();
+            } else if(actCode == VDMA_Zoom_Out) {
+                setScale(0.8);
+                update();
             }
         }
     }
@@ -1568,6 +1665,7 @@ VpzDiagScene::getPenConnection()
 {
     return QPen(QColor(127,127,127), 3, Qt::SolidLine);
 }
+
 
 QBrush
 VpzDiagScene::getBrushBackground()
