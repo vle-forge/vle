@@ -2735,7 +2735,7 @@ vleVpz::rmPortFromCond(QDomNode node, const QString& portName)
 }
 
 void
-vleVpz::setWidthToModel(QDomNode node, double width)
+vleVpz::setWidthToModel(QDomNode node, int width)
 {
     if (node.nodeName() != "model") {
         qDebug() << ("wrong main tag in setWidthToModel");
@@ -2751,7 +2751,7 @@ vleVpz::setWidthToModel(QDomNode node, double width)
 }
 
 void
-vleVpz::setHeightToModel(QDomNode node, double height)
+vleVpz::setHeightToModel(QDomNode node, int height)
 {
     if (node.nodeName() != "model") {
         qDebug() << ("wrong main tag in setHeightToModel");
@@ -2767,7 +2767,7 @@ vleVpz::setHeightToModel(QDomNode node, double height)
 }
 
 void
-vleVpz::setPositionToModel(QDomNode node, double x, double y)
+vleVpz::setPositionToModel(QDomNode node, int x, int y)
 {
     if (node.nodeName() != "model") {
         qDebug() << ("wrong main tag in setPositionToModel");
@@ -2784,8 +2784,8 @@ vleVpz::setPositionToModel(QDomNode node, double x, double y)
     mVdo->setAttributeValue(node, "y", QVariant(y).toString());
 }
 void
-vleVpz::setPositionToModel(QList<QDomNode>& nodes, QList<double> xs,
-        QList<double> ys)
+vleVpz::setPositionToModel(QList<QDomNode>& nodes, QList<int> xs,
+        QList<int> ys)
 {
     int size = nodes.size();
     if (size > 0) {

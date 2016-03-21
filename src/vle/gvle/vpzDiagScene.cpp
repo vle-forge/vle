@@ -1362,7 +1362,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             if ((mDragCurrPoint.x() != prevDragPoint.x()) or
                     (mDragCurrPoint.y() != prevDragPoint.y())) {
                 //avoid a modif on a doubleClicked
-                mVpm->setPositionToModel(mod->mnode, x, y);
+                mVpm->setPositionToModel(mod->mnode, (int) x, (int) y);
             }
             break;
         } default:
@@ -1381,16 +1381,16 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
 
         //move VpzSubModel only
         QList<QDomNode> modsToMove;
-        QList<double> newXs;
-        QList<double> newYs;
+        QList<int> newXs;
+        QList<int> newYs;
 
         for (int i =0;i<sels.length();i++) {
             VpzSubModelItem* mod = sels.at(i);
             double x = mod->pos().x()+deltaX;
             double y = mod->pos().y()+deltaY;
             modsToMove.append(mod->mnode);
-            newXs.append(x);
-            newYs.append(y);
+            newXs.append((int) x);
+            newYs.append((int) y);
             mVpm->vdo()->setAttributeValue(mod->mnode, "x",
                     QVariant(x).toString());
             mVpm->vdo()->setAttributeValue(mod->mnode, "y",

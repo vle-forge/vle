@@ -510,14 +510,14 @@ public:
      * @param node, model node
      * @param width
      */
-    void setWidthToModel(QDomNode node, double width);
+    void setWidthToModel(QDomNode node, int width);
 
-    void setHeightToModel(QDomNode node, double height);
+    void setHeightToModel(QDomNode node, int height);
 
-    void setPositionToModel(QDomNode node, double x, double y);
+    void setPositionToModel(QDomNode node, int x, int y);
 
-    void setPositionToModel(QList<QDomNode>& nodes, QList<double> xs,
-            QList<double> ys);
+    void setPositionToModel(QList<QDomNode>& nodes, QList<int> xs,
+            QList<int> ys);
 
     /**
      * @brief set an observable to an anatomic model
