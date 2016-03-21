@@ -239,48 +239,60 @@ gvle_win::onOpenProject()
     QFileDialog FileChooserDialog(this);
 
     FileChooserDialog.setFileMode(QFileDialog::Directory);
-    if (FileChooserDialog.exec())
+    if (FileChooserDialog.exec()) {
         openProject(FileChooserDialog.selectedFiles().first());
+    }
+
 }
 void
 gvle_win::onProjectRecent1()
 {
     QVariant path = mSettings->value("Projects/recent1");
-    if (path.isValid())
+    if (path.isValid()) {
         openProject(path.toString());
+    }
+
 }
 void
 gvle_win::onProjectRecent2()
 {
     QVariant path = mSettings->value("Projects/recent2");
-    if (path.isValid())
+    if (path.isValid()) {
         openProject(path.toString());
+    }
+
 }
 void
 gvle_win::onProjectRecent3()
 {
     QVariant path = mSettings->value("Projects/recent3");
-    if (path.isValid())
+    if (path.isValid()) {
         openProject(path.toString());
+    }
 }
 void
 gvle_win::onProjectRecent4()
 {
     QVariant path = mSettings->value("Projects/recent4");
-    if (path.isValid())
+    if (path.isValid()) {
         openProject(path.toString());
+    }
 }
 void
 gvle_win::onProjectRecent5()
 {
     QVariant path = mSettings->value("Projects/recent5");
-    if (path.isValid())
+    if (path.isValid()) {
         openProject(path.toString());
+    }
 }
 
 void
 gvle_win::newProject(QString pathName)
 {
+    if (not closeProject()) {
+        return;
+    }
     QDir dir(pathName);
     std::string basename = dir.dirName().toStdString ();
     dir.cdUp();
@@ -320,6 +332,9 @@ gvle_win::newProject(QString pathName)
 void
 gvle_win::openProject(QString pathName)
 {
+    if (not closeProject()) {
+        return;
+    }
     QDir dir(pathName);
     std::string basename = dir.dirName().toStdString ();
     dir.cdUp();
@@ -1043,11 +1058,13 @@ gvle_win::onCustomContextMenu(const QPoint &point)
     action->setData(1);
     action->setDisabled(((selectedFileInfo.suffix() != "vpz") and
                         (selectedFileInfo.suffix() != "cpp")) or
+                        (status_file == OPENED) or
                         (status_file == OPENED_AND_MODIFIED));
     action = ctxMenu.addAction(tr("Rename File"));
     action->setData(2);
     action->setDisabled(((selectedFileInfo.suffix() != "vpz") and
                         (selectedFileInfo.suffix() != "cpp")) or
+                        (status_file == OPENED) or
                         (status_file == OPENED_AND_MODIFIED));
     action = ctxMenu.addAction(tr("Copy File"));
     action->setData(3);
