@@ -894,7 +894,7 @@ VpzMainModelItem::update(const QRectF & /*rect*/)
 
     rectHeight = std::max(std::max(
             200.0,
-            (nbPortMax+1)*margin + nbPortMax*heightPort()),
+            (nbPortMax+1)*SPACE + nbPortMax*heightPort()),
             subModsRect.y() + subModsRect.height()+2*SPACE);
 
     //set localization of ports
