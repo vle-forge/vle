@@ -352,12 +352,7 @@ public:
      * @note: update connections by getting ancestor node
      */
     void rmModel(QDomNode node);
-    /**
-     * @brief remove a model connection
-     * @param node: QDomNode <connection>
-     *     with xpath = //model/connections/connection
-     */
-    void rmModelConnection(QDomNode node, bool undo=true);
+
 
     /**
      * @brief return true if modName is a submodel of node
@@ -422,12 +417,33 @@ public:
      * @param node: QDomNode <model> with xpath = //model
      */
     void addModelOutputPort(QDomNode node);
+
+
+    /**
+     * @brief tells if a connection already exist
+     * @param connections: QDomNode <connections>
+     *   with xpath = //model/connections
+     * @param modelOrig: origin model
+     * @param portOrig: origin port from modelOrig
+     * @param modelDest: destination model
+     * @param portDest: destination port from modelDest
+     * @param connType: either internal, input or output
+     */
+    bool existConnection(QDomNode connections, QString modelOrig,
+            QString portOrig, QString modelDest, QString portDest,
+            QString connType);
     /**
      * @brief add a connection between two port
      * @param node1: QDomNode <port> with xpath = //model//port
      * @param node2: QDomNode <port> with xpath = //model//port
      */
     void addModelConnection(QDomNode node1, QDomNode node2);
+    /**
+     * @brief remove a model connection
+     * @param node: QDomNode <connection>
+     *     with xpath = //model/connections/connection
+     */
+    void rmModelConnection(QDomNode node, bool undo=true);
     /**
      * @brief rm a view from a observable port
      */

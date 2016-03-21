@@ -2133,20 +2133,6 @@ vleVpz::rmModel(QDomNode node)
     emit modelsUpdated();
 }
 
-void
-vleVpz::rmModelConnection(QDomNode node, bool undo)
-{
-    if (node.nodeName() != "connection") {
-        qDebug() << ("Internal error in rmModelConnection (wrong main tag)");
-        return;
-    }
-    QDomNode parent = node.parentNode();
-    if (undo) {
-        undoStack->snapshot(parent);
-    }
-    parent.removeChild(node);
-    removeTextChilds(parent);
-}
 
 bool
 vleVpz::existSubModel(QDomNode node, const QString& modName)
@@ -2580,6 +2566,35 @@ vleVpz::addModelOutputPort(QDomNode node)
     addModelPort(node, "out");
 }
 
+bool
+vleVpz::existConnection(QDomNode connections, QString modelOrig,
+        QString portOrig, QString modelDest, QString portDest,
+        QString connType)
+{
+    if (connections.nodeName() != "connections") {
+        qDebug() << ("Internal error in existConnection (wrong main tag)");
+        return false;
+    }
+    QDomNodeList currConns = connections.childNodes();
+    for (int i =0; i<currConns.length(); i++) {
+        QDomNode currCon = currConns.at(i);
+        if (currCon.nodeName() == "connection" and
+                vdo()->attributeValue(currCon, "type") == connType) {
+            QDomNode currOrig =
+                    currCon.toElement().elementsByTagName("origin").at(0);
+            QDomNode currDest =
+                    currCon.toElement().elementsByTagName("destination").at(0);
+            if ((vdo()->attributeValue(currOrig, "model") == modelOrig) and
+                    (vdo()->attributeValue(currDest, "model") == modelDest) and
+                    (vdo()->attributeValue(currOrig, "port") == portOrig) and
+                    (vdo()->attributeValue(currDest, "port") == portDest)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void
 vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
 {
@@ -2597,6 +2612,8 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
     QDomNode model2 = node2.parentNode().parentNode();
     QString model1name = mVdo->attributeValue(model1, "name");
     QString model2name = mVdo->attributeValue(model2, "name");
+    QString port1name = mVdo->attributeValue(node1,"name");
+    QString port2name = mVdo->attributeValue(node2,"name");
     QDomNode coupled1;
     QDomNode coupled2;
     if (model1.parentNode().nodeName() == "submodels") {
@@ -2614,17 +2631,21 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
             coupled1.appendChild(c);
             cons = connectionsFromModel(coupled1);
         } else {
+            if (existConnection(cons, model1name, port1name, model2name,
+                    port2name, "internal")) {
+                return;
+            }
             undoStack->snapshot(cons);
         }
         QDomElement con = getDomDoc().createElement("connection");
         con.setAttribute("type", "internal");
         QDomElement orig = getDomDoc().createElement("origin");
         orig.setAttribute("model",model1name);
-        orig.setAttribute("port",mVdo->attributeValue(node1,"name"));
+        orig.setAttribute("port",port1name);
         con.appendChild(orig);
         QDomElement dest = getDomDoc().createElement("destination");
         dest.setAttribute("model",model2name);
-        dest.setAttribute("port",mVdo->attributeValue(node2,"name"));
+        dest.setAttribute("port",port2name);
         con.appendChild(dest);
         cons.appendChild(con);
     } else if ((model1 == coupled2) and (node1type == "in")
@@ -2636,17 +2657,21 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
             coupled2.appendChild(c);
             cons = connectionsFromModel(coupled2);
         } else {
+            if (existConnection(cons, model1name, port1name, model2name,
+                    port2name, "input")) {
+                return;
+            }
             undoStack->snapshot(cons);
         }
         QDomElement con = getDomDoc().createElement("connection");
         con.setAttribute("type", "input");
         QDomElement orig = getDomDoc().createElement("origin");
         orig.setAttribute("model",model1name);
-        orig.setAttribute("port",mVdo->attributeValue(node1,"name"));
+        orig.setAttribute("port",port1name);
         con.appendChild(orig);
         QDomElement dest = getDomDoc().createElement("destination");
         dest.setAttribute("model",model2name);
-        dest.setAttribute("port",mVdo->attributeValue(node2,"name"));
+        dest.setAttribute("port",port2name);
         con.appendChild(dest);
         cons.appendChild(con);
     } else if ((coupled1 == model2)  and (node1type == "out")
@@ -2658,23 +2683,40 @@ vleVpz::addModelConnection(QDomNode node1, QDomNode node2)
             coupled1.appendChild(c);
             cons = connectionsFromModel(coupled1);
         } else {
+            if (existConnection(cons, model1name, port1name, model2name,
+                    port2name, "output")) {
+                return;
+            }
             undoStack->snapshot(cons);
         }
         QDomElement con = getDomDoc().createElement("connection");
         con.setAttribute("type", "output");
         QDomElement orig = getDomDoc().createElement("origin");
         orig.setAttribute("model",model1name);
-        orig.setAttribute("port",mVdo->attributeValue(node1,"name"));
+        orig.setAttribute("port",port1name);
         con.appendChild(orig);
         QDomElement dest = getDomDoc().createElement("destination");
         dest.setAttribute("model",model2name);
-        dest.setAttribute("port",mVdo->attributeValue(node2,"name"));
+        dest.setAttribute("port",port2name);
         con.appendChild(dest);
         cons.appendChild(con);
     }
     emit modelsUpdated();
+}
 
-
+void
+vleVpz::rmModelConnection(QDomNode node, bool undo)
+{
+    if (node.nodeName() != "connection") {
+        qDebug() << ("Internal error in rmModelConnection (wrong main tag)");
+        return;
+    }
+    QDomNode parent = node.parentNode();
+    if (undo) {
+        undoStack->snapshot(parent);
+    }
+    parent.removeChild(node);
+    removeTextChilds(parent);
 }
 
 void
