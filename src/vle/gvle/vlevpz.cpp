@@ -292,6 +292,7 @@ vleVpz::renameClassToDoc(const QString& oldClass, const QString& newClass)
         qDebug() << "Internal error in renameClassToDoc (class not found)";
         return;
     }
+    undoStack->snapshot(classesFromDoc());
     mVdo->setAttributeValue(cl,"name", newClass);
 }
 
