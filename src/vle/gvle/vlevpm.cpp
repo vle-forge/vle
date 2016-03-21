@@ -272,7 +272,9 @@ vleVpm::provideOutputGUIplugin(const QString& viewName)
         bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
         bool oldBlock = undoStackVpm->blockSignals(true);
         bool oldBlock2 = vleVpz::undoStack->blockSignals(true);
-        plugin->init(this, viewName);
+        if (plugin) {
+            plugin->init(this, viewName);
+        }
         vleVpz::undoStack->blockSignals(oldBlock2);
         undoStackVpm->blockSignals(oldBlock);
         vleVpz::undoStack->enableSnapshot(enableSnapshot);
@@ -291,7 +293,9 @@ vleVpm::provideCondGUIplugin(const QString& condName)
         bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
         bool oldBlock = undoStackVpm->blockSignals(true);
         bool oldBlock2 = vleVpz::undoStack->blockSignals(true);
-        plugin->init(this, condName);
+        if (plugin) {
+            plugin->init(this, condName);
+        }
         vleVpz::undoStack->blockSignals(oldBlock2);
         undoStackVpm->blockSignals(oldBlock);
         vleVpz::undoStack->enableSnapshot(enableSnapshot);

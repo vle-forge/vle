@@ -183,7 +183,6 @@ PluginOutput*
 gvle_plugins::provideOutputPlugin(QString name)
 {
     if (not mOutputPlugins.contains(name)) {
-        qDebug() << " Error no OutputPlugin "<< name;
         return 0;
     }
     gvleplug& plug = mOutputPlugins[name];
@@ -220,7 +219,6 @@ PluginExpCond*
 gvle_plugins::provideCondPlugin(QString name)
 {
     if (not mCondPlugins.contains(name)) {
-        qDebug() << " Error no CondPlugin "<< name;
         return 0;
     }
     gvleplug& plug = mCondPlugins[name];

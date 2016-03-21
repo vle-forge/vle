@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project_metadata>
+<vle_project_metadata version="1.x" author="me">
+ <condPlugins/>
+ <outputGUIplugins>
+  <outputGUIplugin GUIplugin="gvle.output/storage" view="view"/>
+ </outputGUIplugins>
+</vle_project_metadata>

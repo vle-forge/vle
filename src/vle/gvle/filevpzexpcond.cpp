@@ -226,8 +226,10 @@ FileVpzExpCond::showEditPlace()
     }
     if (mVpm->getCondGUIplugin(mCurrCondName) != "") {
         mPlugin = mVpm->provideCondGUIplugin(mCurrCondName);
-        mPlugin->getWidget()->setParent(ui->value);
-        mPlugin->getWidget()->show();
+        if (mPlugin) {
+            mPlugin->getWidget()->setParent(ui->value);
+            mPlugin->getWidget()->show();
+        }
         return;
     }
     if (mCurrPortName == "") {

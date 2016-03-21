@@ -1,22 +1,48 @@
-<?xml version="1.0"?>
-<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.9.0.dtd">
-<vle_project version="1.0" date="" author="Gauthier Quesnel">
+<?xml version="1.0" encoding="UTF-8" ?>
+<vle_project author="Gauthier Quesnel" version="1.0" date="">
  <structures>
-   <model width="300" x="0" y="0" height="300" type="coupled" name="top">
-   </model>
+   <model x="0" width="300" y="0" name="top" height="300" type="coupled">
+   <in/>
+   <out/>
+  </model>
  </structures>
  <dynamics>
  </dynamics>
-  <experiment name="test" seed="123456789">
+ <experiment name="test" seed="123456789">
    <conditions>
-    <condition name="simulation_engine" >
-     <port name="begin" >
+    <condition name="simulation_engine">
+     <port name="begin">
       <double>0.0</double>
      </port>
-     <port name="duration" >
+     <port name="duration">
       <double>1.0</double>
      </port>"
     </condition>
    </conditions>
-  </experiment>
+  <views>
+   <outputs>
+    <output location="" name="view" package="vle.output" format="local" plugin="storage">
+     <map>
+      <key name="columns">
+       <integer>15</integer>
+      </key>
+      <key name="header">
+       <string>top</string>
+      </key>
+      <key name="inc_columns">
+       <integer>10</integer>
+      </key>
+      <key name="inc_rows">
+       <integer>10</integer>
+      </key>
+      <key name="rows">
+       <integer>15</integer>
+      </key>
+     </map>
+    </output>
+   </outputs>
+   <view timestep="1" name="view" output="view" type="timed"/>
+   <observables/>
+  </views>
+ </experiment>
 </vle_project>
