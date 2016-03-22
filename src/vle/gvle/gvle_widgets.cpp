@@ -112,6 +112,7 @@ VleDoubleSpinBox::VleDoubleSpinBox(QWidget* parent, double val,
     setFocusPolicy(Qt::StrongFocus);
     setContextMenuPolicy(Qt::NoContextMenu);
     setValue(val);
+    setDecimals(6);
 
     QObject::connect(this,SIGNAL(valueChanged(double)),
             this,SLOT(onValueChanged(double)));
