@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "widgetvpzproperty.h"
-#include "ui_widgetvpzpropertydynamics.h"
-#include "ui_widgetvpzpropertyexpcond.h"
-#include "ui_widgetvpzpropertyobservables.h"
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QVBoxLayout>
