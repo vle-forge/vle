@@ -73,7 +73,8 @@ enum VPZ_DIAG_MENU_ACTION {
     VDMA_Add_atomic_model,
     VDMA_Add_coupled_model,
     VDMA_Zoom_In,
-    VDMA_Zoom_Out
+    VDMA_Zoom_Out,
+    VDMA_Configure_model
 };
 
 class VpzConnectionLineItem : public QGraphicsItem
@@ -231,8 +232,8 @@ public:
     void dragMoveEvent(QGraphicsSceneDragDropEvent * event);
     void dropEvent(QGraphicsSceneDragDropEvent * event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent);
-
-
+    void populateConfigureMenu(QMenu* menu);
+    void doConfigureMenu(QDomNode model, const QString& meta);
 
     QBrush getBrushAtomicModel();
     QBrush getBrushCoupledModel();
@@ -251,13 +252,17 @@ public:
     void unselectAllSubModels();
     void selectSubModel(const QString& nameSub);
 
-
     static bool isVpzPort(QGraphicsItem* item);
     static bool isVpzInputPort(QGraphicsItem* item);
     static bool isVpzOutputPort(QGraphicsItem* item);
     static bool isVpzSubModel(QGraphicsItem* item);
     static bool isVpzMainModel(QGraphicsItem* item);
     static bool isVpzConnectionLine(QGraphicsItem* item);
+
+    static void setActionType(QAction* action, VPZ_DIAG_MENU_ACTION type);
+    static VPZ_DIAG_MENU_ACTION getActionType(QAction* action);
+
+    bool isVpzSubModelConfigured(QGraphicsItem* item);
 signals:
     void enterCoupledModel(QDomNode node);
     void initializationDone(VpzDiagScene* scene);
