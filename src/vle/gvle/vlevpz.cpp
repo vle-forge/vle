@@ -1493,6 +1493,14 @@ vleVpz::addConditionToDoc(const QString& condName)
     return cond;
 }
 
+QDomElement
+vleVpz::createDynamic(const QString& dyn)
+{
+    QDomElement elem = getDomDoc().createElement("dynamic");
+    elem.setAttribute("name", dyn);
+    return elem;
+}
+
 
 QDomNode
 vleVpz::addDynamicToDoc(const QString& dyn)
@@ -1502,8 +1510,7 @@ vleVpz::addDynamicToDoc(const QString& dyn)
         qDebug() << ("Internal error in addDynamicToDoc (already here)");
         return QDomNode();
     }
-    QDomElement elem = getDomDoc().createElement("dynamic");
-    elem.setAttribute("name", dyn);
+    QDomElement elem = createDynamic(dyn);
     dynamicsFromDoc().appendChild(elem);
     return elem;
 }
@@ -2551,8 +2558,6 @@ vleVpz::addModelPort(QDomNode node, const QString& type)
     inPort.setAttribute("name", newPortName);
     portsType.appendChild(inPort);
     emit modelsUpdated();
-
-
 }
 
 void
@@ -2566,6 +2571,33 @@ vleVpz::addModelOutputPort(QDomNode node)
 {
     addModelPort(node, "out");
 }
+
+bool
+vleVpz::hasModelPort(QDomNode node, const QString& type)
+{
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in addModelPort (wrong main tag)");
+        return false;
+    }
+
+    QDomNode portsType = mVdo->obtainChild(node, type);
+
+    QDomNodeList ports = portsType.toElement().elementsByTagName("port");
+    return ports.length() != 0;
+}
+
+bool
+vleVpz::hasModelInputPort(QDomNode node)
+{
+    return hasModelPort(node, "in");
+}
+
+bool
+vleVpz::hasModelOutputPort(QDomNode node)
+{
+    return hasModelPort(node, "out");
+}
+
 
 bool
 vleVpz::existConnection(QDomNode connections, QString modelOrig,
@@ -2905,6 +2937,19 @@ vleVpz::isAttachedCond(const QString& model_query,
 }
 
 QString
+vleVpz::getAtomicModelConds(const QDomNode atom)
+{
+    return mVdo->attributeValue(atom, "conditions");
+}
+
+bool
+vleVpz::isAtomicModelCondsSet(const QDomNode atom)
+{
+    return mVdo->attributeValue(atom, "conditions") != "";
+}
+
+
+QString
 vleVpz::modelDynFromDoc(const QString& model_query)
 {
     QDomNode atom = mVdo->getNodeFromXQuery(model_query);
@@ -2918,6 +2963,18 @@ vleVpz::modelObsFromDoc(const QString& model_query)
     return mVdo->attributeValue(atom, "observables");
 }
 
+QString
+vleVpz::getAtomicModelObs(QDomNode atom)
+{
+    return mVdo->attributeValue(atom, "observables");
+}
+
+bool
+vleVpz::isAtomicModelObsSet(QDomNode atom)
+{
+    return getAtomicModelObs(atom) != "";
+}
+
 void
 vleVpz::setDynToAtomicModel(const QString& model_query, const QString& dyn,
         bool undo)
@@ -2927,6 +2984,18 @@ vleVpz::setDynToAtomicModel(const QString& model_query, const QString& dyn,
         undoStack->snapshot(atom);
     }
     mVdo->setAttributeValue(atom, "dynamics", dyn);
+}
+
+QString
+vleVpz::getAtomicModelDyn(QDomNode atom)
+{
+    return mVdo->attributeValue(atom, "dynamics");
+}
+
+bool
+vleVpz::isAtomicModelDynSet(QDomNode atom)
+{
+    return getAtomicModelDyn(atom) != "";
 }
 
 void
@@ -3938,6 +4007,41 @@ void vleVpz::xSaveDom(QDomDocument *doc)
     vpzRoot.appendChild(experimentFromDoc().cloneNode());
     vpzRoot.appendChild(classesFromDoc().cloneNode());
     doc->appendChild(vpzRoot);
+}
+
+void vleVpz::configureModel(QDomNode model, QDomNode dynamic,
+                            QDomNode observable, QDomNode condition,
+                            QDomNode in, QDomNode out)
+{
+    QDomElement docElem = getDomDoc().documentElement();
+    undoStack->snapshot(docElem);
+
+    QDomElement modele = model.toElement();
+
+    QString dyn = dynamic.attributes().namedItem("name").nodeValue();
+
+    QDomNodeList dynList = dynListFromDoc();
+    if (not existDynamicIntoDynList(dyn, dynList)) {
+        dynamicsFromDoc().appendChild(dynamic);
+    }
+    modele.setAttribute("dynamics", dyn);
+
+    QString obs = observable.attributes().namedItem("name").nodeValue();
+
+    if (not existObsFromDoc(obs)) {
+        obsFromDoc().appendChild(observable);
+    }
+    modele.setAttribute("observables", obs);
+
+    QString cond = condition.attributes().namedItem("name").nodeValue();
+
+    if (not existCondFromDoc(cond)) {
+        condsFromDoc().appendChild(condition);
+    }
+    modele.setAttribute("conditions", cond);
+
+    modele.replaceChild(in, mVdo->obtainChild(modele,"in"));
+    modele.replaceChild(out, mVdo->obtainChild(modele,"out"));
 }
 
 }}//namespaces

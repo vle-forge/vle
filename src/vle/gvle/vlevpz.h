@@ -417,7 +417,22 @@ public:
      * @param node: QDomNode <model> with xpath = //model
      */
     void addModelOutputPort(QDomNode node);
-
+    /**
+     * @brief checks if a model already has ports
+     * @param node: QDomNode <model>
+     * @param type: "in" or "out"
+     */
+    bool hasModelPort(QDomNode node, const QString& type);
+    /**
+     * @brief checks if a model already has input ports
+     * @param node: QDomNode <model>
+     */
+    bool hasModelInputPort(QDomNode node);
+    /**
+     * @brief checks if a model already has input ports
+     * @param node: QDomNode <model>
+     */
+    bool hasModelOutputPort(QDomNode node);
 
     /**
      * @brief tells if a connection already exist
@@ -604,6 +619,12 @@ public:
     QDomNode addConditionToDoc(const QString& condName);
 
     /**
+     * @brief create a <dynamic> tag
+     * whith dyn, attribute 'name'  set to dyn
+     */
+    QDomElement createDynamic(const QString& dyn);
+
+    /**
      * @brief add a <dynamic> tag to a Vpz Doc
      * whith dyn, attribute 'name'  set to dyn
      */
@@ -721,7 +742,23 @@ public:
      * @return true if condName is attached to model_query
      */
     bool isAttachedCond(const QString& model_query,
-            const QString& condName);
+			const QString& condName);
+
+
+    /**
+     * @brief returns a string containing the list of conditions
+     * attached to the model
+     * @param model node
+     * @return string containing the list
+     */
+    QString getAtomicModelConds(const QDomNode atom);
+
+     /**
+     * @brief to know if conditions are set to
+     * @param model node
+     * @return true if there is a condition attached
+     */
+    bool isAtomicModelCondsSet(const QDomNode atom);
 
     /**
      * @brief get the dynamics of an atomic model
@@ -737,12 +774,36 @@ public:
     QString modelObsFromDoc(const QString& model_query);
 
     /**
+     * @brief get the observable
+     * @param model node
+     */
+    QString getAtomicModelObs(QDomNode atom);
+
+    /**
+     * @brief check if the observable has already been set
+     * @param model node
+     */
+    bool isAtomicModelObsSet(QDomNode atom);
+
+    /**
      * @brief sets a dynamic to an an atomic model
      * @param model_query, a Xquery that points to a model
      *
      */
     void setDynToAtomicModel(const QString& model_query, const QString& dyn,
-            bool undo=true);
+			     bool undo=true);
+
+    /**
+     * @brief returns the dymaic name or an empty string
+     * @param a model atom
+     */
+    QString getAtomicModelDyn(QDomNode atom);
+
+    /**
+     * @brief check if the model already has a dynamic set
+     * @param a model atom
+     */
+    bool isAtomicModelDynSet(QDomNode atom);
 
     /**
      * @brief Removes a dynamic
@@ -1008,6 +1069,19 @@ public:
     bool           isAltered();
     virtual void   save();
     void           removeDynamic(const QString& dynamic);
+
+    /**
+     * @brief totally configures the model
+     * @param the model node to be configured
+     * @param the dynamic node
+     * @param the obsrvable node
+     * @param the condition node
+     * @param the in node
+     * @param the out node
+     */
+    void configureModel(QDomNode model, QDomNode dynamic,
+			QDomNode observable, QDomNode condition,
+			QDomNode in, QDomNode out);
 
 signals:
     void observablesUpdated();
