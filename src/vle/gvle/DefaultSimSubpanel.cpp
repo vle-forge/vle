@@ -403,7 +403,7 @@ DefaultSimSubpanel::onSimulationFinished()
                 vItem->setData(0, Qt::UserRole+1, viewName);
                 const vle::value::Matrix& res = itb->second->toMatrix();
                 for (unsigned int i=0; i<res.columns(); i++) {
-                    if (res.get(i,0)->isString()) {
+                    if (res.get(i,0) and res.get(i,0)->isString()) {
                         QString portName = res.getString(i,0).c_str();
                         if (portName != "time") {
                             QTreeWidgetItem* pItem = new QTreeWidgetItem();
