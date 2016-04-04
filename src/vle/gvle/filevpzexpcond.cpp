@@ -86,6 +86,10 @@ FileVpzExpCond::setVpm(vleVpm* vpm)
                      SIGNAL(experimentUpdated()),
                      this,
                      SLOT(onExpUpdated()));
+    QObject::connect(mVpm,
+                     SIGNAL(conditionsUpdated()),
+                     this,
+                     SLOT(onCondUpdated()));
 
 }
 
@@ -406,6 +410,13 @@ FileVpzExpCond::onUndoRedoVpm(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
 
 void
 FileVpzExpCond::onExpUpdated()
+{
+    showEditPlace();
+    reload(false);
+}
+
+void
+FileVpzExpCond::onCondUpdated()
 {
     showEditPlace();
     reload(false);
