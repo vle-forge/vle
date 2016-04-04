@@ -87,6 +87,8 @@ FileVpzDynamics::~FileVpzDynamics()
 void FileVpzDynamics::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
+    QObject::connect(vpm, SIGNAL(dynamicsUpdated()),
+                     this, SLOT (reload()));
 }
 
 /**

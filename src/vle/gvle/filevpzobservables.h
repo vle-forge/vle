@@ -56,6 +56,7 @@ public slots:
     void onItemChanged(QTreeWidgetItem *item,
                              int /*column*/);
     void onViewsUpdated();
+    void onObservablesUpdated();
     void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
             QDomNode oldVpm, QDomNode newVpm);
 
