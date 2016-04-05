@@ -997,10 +997,12 @@ gvle_win::onTreeDblClick(QModelIndex index)
     if (relPath == "Description.txt") {
         newPanel = new DefaultCppPanel();
     }else if (selectedFileInfo.suffix() == "vpz") {
-        //TODO check if a plugin
-        newPanel = new DefaultVpzPanel();
-
-
+        QString plug = getVpzPlugin(relPath);
+        if (plug == "") {
+            newPanel = new DefaultVpzPanel();
+        } else {
+            newPanel = mGvlePlugins.newInstanceMainPanelVpzPlugin(plug);
+        }
     } else if ((selectedFileInfo.suffix() == "cpp") or
                (selectedFileInfo.suffix() == "hpp")){
         QString plug = getCppPlugin(relPath);
@@ -1115,6 +1117,18 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             action->setProperty("dataPlugin", pluginName);
         }
     }
+    if (insideExp(index)) {
+        ctxMenu.addSeparator();
+        action = ctxMenu.addAction(tr("Use") + " " + "Default");
+        action->setProperty("vpzPlugin", "");
+        ctxMenu.addSeparator();
+        QStringList plugList = mGvlePlugins.getMainPanelVpzPluginsList();
+        for (int i =0; i<plugList.size(); i++) {
+            QString pluginName = plugList.at(i);
+            action = ctxMenu.addAction(tr("Use") + " " + pluginName);
+            action->setProperty("vpzPlugin", pluginName);
+        }
+    }
     QAction* selectedItem = ctxMenu.exec(globalPos);
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
@@ -1128,8 +1142,29 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             copyFile(index);
         } else {//Add a new Cpp based on a plugin
             QVariant plugName;
-            if ((plugName =
-                 selectedItem->property("srcPlugin")).isValid()) {
+            if (selectedItem->property("vpzPlugin") == "") {
+                PluginMainPanel* newPanel = new DefaultVpzPanel();
+
+                QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
+                                 this, SLOT(onUndoAvailable(bool)));
+
+                relPath = getRelPathFromFSIndex(index);
+
+                newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+
+                int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
+                bool oldBlock = ui->tabWidget->blockSignals(true);
+                ui->tabWidget->setCurrentIndex(n);
+                ui->tabWidget->widget(n)->setProperty("relPath",relPath);
+                ui->tabWidget->blockSignals(oldBlock);
+
+                mPanels.insert(relPath,newPanel);
+                newPanel->leftWidget()->show();
+
+                // Create a new toolbox for the right column
+                setRightWidget(newPanel->rightWidget());
+            } else if ((plugName =
+                        selectedItem->property("srcPlugin")).isValid()) {
 
                 //TODO check if a plugin
                 PluginMainPanel* newPanel =
@@ -1196,6 +1231,27 @@ gvle_win::onCustomContextMenu(const QPoint &point)
                 ui->tabWidget->blockSignals(oldBlock);
 
                 mPanels.insert(relPath,newPanel);
+            }  else if ((plugName =
+                         selectedItem->property("vpzPlugin")).isValid()) {
+
+                PluginMainPanel* newPanel =
+                    mGvlePlugins.newInstanceMainPanelVpzPlugin(
+                        plugName.toString());
+
+                QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
+                                 this, SLOT(onUndoAvailable(bool)));
+
+                QString relPath = getRelPathFromFSIndex(index);
+
+                newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+
+                int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
+                bool oldBlock = ui->tabWidget->blockSignals(true);
+                ui->tabWidget->setCurrentIndex(n);
+                ui->tabWidget->widget(n)->setProperty("relPath",relPath);
+                ui->tabWidget->blockSignals(oldBlock);
+
+                mPanels.insert(relPath,newPanel);
             } else {
                 return;
             }
@@ -1203,6 +1259,14 @@ gvle_win::onCustomContextMenu(const QPoint &point)
     }
 }
 
+bool
+gvle_win::insideExp(QModelIndex index)
+{
+    QString filePath = mProjectFileSytem->filePath(index);
+    QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    QFile srcFile(pkgPath + "/exp");
+    return filePath.indexOf(srcFile.fileName()) == 0;
+}
 
 bool
 gvle_win::insideSrc(QModelIndex index)
@@ -1298,6 +1362,25 @@ gvle_win::getGvleFile(QString relPath, GvleFileRequirement req)
 
     return gf;
 
+}
+
+QString
+gvle_win::getVpzPlugin(QString relPath)
+{
+    QString metaPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    gvle_file gf = getGvleFile(relPath, METADATA_FILE);
+    metaPath += "/" + gf.metadata_file;
+    QFile file(metaPath);
+    if (not QFile(metaPath).exists()) {
+        return "";
+    }
+    QDomDocument dom("vle_project_metadata");
+    QXmlInputSource source(&file);
+    QXmlSimpleReader reader;
+    dom.setContent(&source, &reader);
+    QDomElement docElem = dom.documentElement();
+    QDomNode srcPluginNode = dom.elementsByTagName("vpzPlugin").item(0);
+    return srcPluginNode.attributes().namedItem("name").nodeValue();
 }
 
 QString

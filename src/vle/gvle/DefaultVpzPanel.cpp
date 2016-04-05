@@ -44,7 +44,6 @@ DefaultVpzPanel::~DefaultVpzPanel()
 {
     delete m_vpzview;
     delete m_rtool;
-
 }
 
 
@@ -216,5 +215,3 @@ DefaultVpzPanel::onRightSimWidgetChanged()
 }
 
 }} //namespaces
-
-

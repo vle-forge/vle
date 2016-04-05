@@ -93,6 +93,11 @@ public:
     QString          getMainPanelDataPluginPackage(QString name);
     PluginMainPanel* newInstanceMainPanelDataPlugin(QString name);
 
+    QStringList      getMainPanelVpzPluginsList();
+    QString          getMainPanelVpzPluginPath(QString name);
+    QString          getMainPanelVpzPluginPackage(QString name);
+    PluginMainPanel* newInstanceMainPanelVpzPlugin(QString name);
+
 private:
     QMap<QString,gvleplug>      mOutputPlugins;
     QMap<QString,gvleplug>      mCondPlugins;
@@ -100,6 +105,7 @@ private:
     QMap<QString,gvleplug>      mMainPanelPlugins;
     QMap<QString,gvleplug>      mMainPanelOutPlugins;
     QMap<QString,gvleplug>      mMainPanelDataPlugins;
+    QMap<QString,gvleplug>      mMainPanelVpzPlugins;
 };
 
 }}//namespaces

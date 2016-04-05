@@ -106,6 +106,7 @@ protected:
     void closeEvent(QCloseEvent* event);
     void setRightWidget(QWidget* rightWidget);
     int findTabIndex(QString relPath);
+    bool insideExp(QModelIndex index);
     bool insideSrc(QModelIndex index);
     bool insideOut(QModelIndex index);
     bool insideData(QModelIndex index);
@@ -124,6 +125,7 @@ protected:
     QString getCppPlugin(QString relpath);
     QString getOutPlugin(QString relpath);
     QString getDataPlugin(QString relpath);
+    QString getVpzPlugin(QString relpath);
 
 
 private slots:
