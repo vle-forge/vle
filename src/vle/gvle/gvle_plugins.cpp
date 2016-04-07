@@ -75,7 +75,10 @@ gvle_plugins::registerPlugins()
     QString pathgvlec = "plugins/gvle/condition";
     QString pathgvleo = "plugins/gvle/output";
     QString pathgvlem = "plugins/gvle/modeling";
+    QString pathgvleu = "plugins/gvle/out";
+    QString pathgvled = "plugins/gvle/data";
     QString pathgvles = "plugins/gvle/simulating";
+    QString pathgvlev = "plugins/gvle/vpz";
 
     QString packagesDir =
             vle::utils::Path::path().getBinaryPackagesDir().c_str();
@@ -140,6 +143,44 @@ gvle_plugins::registerPlugins()
             }
         }
 
+        if (QDir(it.filePath() + "/" + pathgvleu).exists()) {
+            QDirIterator itbis(it.filePath() + "/" + pathgvleu, QDir::Files);
+            while (itbis.hasNext()) {
+                QString libName =  itbis.next();
+                QPluginLoader loader(libName);
+                QObject *plugin = loader.instance();
+                if ( ! loader.isLoaded()) {
+                    qDebug() << " WARNING cannot load plugin " << libName;
+                    continue;
+                }
+                PluginMainPanel* modeling =
+                        qobject_cast<PluginMainPanel *>(plugin);
+                if (modeling) {
+                    mMainPanelOutPlugins.insert(modeling->getname(),
+                            gvleplug(it.fileName(), libName));
+                }
+            }
+        }
+
+        if (QDir(it.filePath() + "/" + pathgvled).exists()) {
+            QDirIterator itbis(it.filePath() + "/" + pathgvled, QDir::Files);
+            while (itbis.hasNext()) {
+                QString libName =  itbis.next();
+                QPluginLoader loader(libName);
+                QObject *plugin = loader.instance();
+                if ( ! loader.isLoaded()) {
+                    qDebug() << " WARNING cannot load plugin " << libName;
+                    continue;
+                }
+                PluginMainPanel* modeling =
+                        qobject_cast<PluginMainPanel *>(plugin);
+                if (modeling) {
+                    mMainPanelDataPlugins.insert(modeling->getname(),
+                            gvleplug(it.fileName(), libName));
+                }
+            }
+        }
+
         if (QDir(it.filePath() + "/" + pathgvles).exists()) {
             QDirIterator itbis(it.filePath() + "/" + pathgvles, QDir::Files);
             while (itbis.hasNext()) {
@@ -155,6 +196,25 @@ gvle_plugins::registerPlugins()
                 if (simulating) {
                     mSimPanelPlugins.insert(simulating->getname(),
                             gvleplug(it.fileName(), libName));
+                }
+            }
+        }
+
+        if (QDir(it.filePath() + "/" + pathgvlev).exists()) {
+            QDirIterator itbis(it.filePath() + "/" + pathgvlev, QDir::Files);
+            while (itbis.hasNext()) {
+                QString libName =  itbis.next();
+                QPluginLoader loader(libName);
+                QObject *plugin = loader.instance();
+                if ( ! loader.isLoaded()) {
+                    qDebug() << " WARNING cannot load plugin " << libName;
+                    continue;
+                }
+                PluginMainPanel* vpz =
+                    qobject_cast<PluginMainPanel *>(plugin);
+                if (vpz) {
+                    mMainPanelVpzPlugins.insert(vpz->getname(),
+                                                gvleplug(it.fileName(), libName));
                 }
             }
         }
@@ -320,4 +380,135 @@ gvle_plugins::newInstanceMainPanelPlugin(QString name)
 
 }
 
+QStringList
+gvle_plugins::getMainPanelOutPluginsList()
+{
+    return mMainPanelOutPlugins.keys();
+}
+
+QString
+gvle_plugins::getMainPanelOutPluginPath(QString name)
+{
+    if (mMainPanelOutPlugins.contains(name)) {
+        return mMainPanelOutPlugins.value(name).libPath;
+    } else {
+        return "";
+    }
+
+}
+
+QString
+gvle_plugins::getMainPanelOutPluginPackage(QString name)
+{
+    return mMainPanelOutPlugins.value(name).package;
+}
+
+PluginMainPanel*
+gvle_plugins::newInstanceMainPanelOutPlugin(QString name)
+{
+    if (not mMainPanelOutPlugins.contains(name)) {
+        qDebug() << " Error no MainPanelOutPlugin "<< name;
+        return 0;
+    }
+    gvleplug& plug = mMainPanelOutPlugins[name];
+    if (not plug.loader) {
+        plug.loader = new QPluginLoader(plug.libPath);
+        if (not plug.loader->isLoaded()) {
+            qDebug() << " Error cannot load MainPanelOutPlugin "<< name;
+            return 0;
+        }
+        return qobject_cast<PluginMainPanel*>(plug.loader->instance());
+    }
+    //Tricky : the plugin instance is already used build a clone
+    return qobject_cast<PluginMainPanel*>(plug.loader->instance())->newInstance();
+
+}
+
+QStringList
+gvle_plugins::getMainPanelDataPluginsList()
+{
+    return mMainPanelDataPlugins.keys();
+}
+
+QString
+gvle_plugins::getMainPanelDataPluginPath(QString name)
+{
+    if (mMainPanelDataPlugins.contains(name)) {
+        return mMainPanelDataPlugins.value(name).libPath;
+    } else {
+        return "";
+    }
+
+}
+
+QString
+gvle_plugins::getMainPanelDataPluginPackage(QString name)
+{
+    return mMainPanelDataPlugins.value(name).package;
+}
+
+PluginMainPanel*
+gvle_plugins::newInstanceMainPanelDataPlugin(QString name)
+{
+    if (not mMainPanelDataPlugins.contains(name)) {
+        qDebug() << " Error no MainPanelDataPlugin "<< name;
+        return 0;
+    }
+    gvleplug& plug = mMainPanelDataPlugins[name];
+    if (not plug.loader) {
+        plug.loader = new QPluginLoader(plug.libPath);
+        if (not plug.loader->isLoaded()) {
+            qDebug() << " Error cannot load MainPanelDataPlugin "<< name;
+            return 0;
+        }
+        return qobject_cast<PluginMainPanel*>(plug.loader->instance());
+    }
+    //Tricky : the plugin instance is already used build a clone
+    return qobject_cast<PluginMainPanel*>(plug.loader->instance())->newInstance();
+
+}
+
+QStringList
+gvle_plugins::getMainPanelVpzPluginsList()
+{
+    return mMainPanelVpzPlugins.keys();
+}
+
+QString
+gvle_plugins::getMainPanelVpzPluginPath(QString name)
+{
+    if (mMainPanelVpzPlugins.contains(name)) {
+        return mMainPanelVpzPlugins.value(name).libPath;
+    } else {
+        return "";
+    }
+
+}
+
+QString
+gvle_plugins::getMainPanelVpzPluginPackage(QString name)
+{
+    return mMainPanelVpzPlugins.value(name).package;
+}
+
+PluginMainPanel*
+gvle_plugins::newInstanceMainPanelVpzPlugin(QString name)
+{
+    if (not mMainPanelVpzPlugins.contains(name)) {
+        qDebug() << " Error no MainPanelVpzPlugin "<< name;
+        return 0;
+    }
+    gvleplug& plug = mMainPanelVpzPlugins[name];
+    if (not plug.loader) {
+        plug.loader = new QPluginLoader(plug.libPath);
+        if (not plug.loader->isLoaded()) {
+            qDebug() << " Error cannot load MainPanelVpzPlugin "<< name;
+            return 0;
+        }
+        return qobject_cast<PluginMainPanel*>(plug.loader->instance());
+    }
+    //Tricky : the plugin instance is already used build a clone
+    return qobject_cast<PluginMainPanel*>(plug.loader->instance())->newInstance();
+
+}
 }} //namespaces

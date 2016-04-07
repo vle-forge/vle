@@ -214,6 +214,12 @@ FileVpzObservables::onItemChanged(QTreeWidgetItem *item, int /*column*/)
 }
 
 void
+FileVpzObservables::onObservablesUpdated()
+{
+    reload();
+}
+
+void
 FileVpzObservables::onViewsUpdated()
 {
     reload();
@@ -235,8 +241,10 @@ void FileVpzObservables::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
     reload();
-    QObject::connect(mVpm,   SIGNAL(viewsUpdated()),
+    QObject::connect(mVpm, SIGNAL(viewsUpdated()),
                      this, SLOT(onViewsUpdated()));
+    QObject::connect(mVpm, SIGNAL(observablesUpdated()),
+                     this, SLOT(onObservablesUpdated()));
 }
 
 void FileVpzObservables::reload()

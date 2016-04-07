@@ -22,50 +22,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef gvle_FILEVPZDYNAMICS_H
-#define gvle_FILEVPZDYNAMICS_H
+#ifndef GVLE_DEFAULT_OUT_PANEL_H
+#define GVLE_DEFAULT_OUT_PANEL_H
 
+#include <QWidget>
+#include <QObject>
+#include <QDebug>
 #include "vlevpm.h"
-
-namespace Ui {
-class FileVpzDynamics;
-}
+#include "filevpzview.h"
+#include "filevpzrtool.h"
 
 namespace vle {
 namespace gvle {
 
-class FileVpzDynamics : public QWidget
+
+class DefaultOutPanel : public PluginMainPanel
 {
     Q_OBJECT
-
 public:
-    enum FVD_MENU { FVD_add_dynamic, FVD_rename_dynamic, FVD_remove_dynamic };
-public:
-    explicit FileVpzDynamics(QWidget *parent = 0);
-    ~FileVpzDynamics();
-    void setVpm(vleVpm* vpm);
+    DefaultOutPanel();
+    virtual ~DefaultOutPanel();
+    QString  getname();
+    QWidget* leftWidget();
+    QWidget* rightWidget();
+    void undo();
+    void redo();
+    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs);
+    QString canBeClosed();
+    void save();
+    PluginMainPanel* newInstance(){return 0;}
 
 public slots:
-
-    void reload();
-    void onSelectPackage(const QString & id, const QString & text);
-    void onSelectLibrary(const QString & id, const QString& text);
-    void onDynamicsTableMenu(const QPoint&);
-    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
-            QDomNode oldValVpm, QDomNode newValVpm);
-    void onTextUpdated(const QString& id, const QString&, const QString&);
-
-protected:
-    void updatePackageList(QString name = "");
-    void updateLibraryList(QString package = "", QString name = "");
-    QString getSelected();
-
-
-private:
-    Ui::FileVpzDynamics *ui;
-    vleVpz  *mVpm;
+    void onUndoAvailable(bool);
+public:
+    QTextEdit*  m_edit;
+    QString m_file;
 };
 
-}}//namespaces
+}} //namespaces
+
 
 #endif
