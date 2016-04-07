@@ -153,7 +153,9 @@ public:
                            index) {
                     cpy->add(jt->second->get(index)->clone());
                 } else {
-                    throw utils::InternalError(fmt(
+                    delete cpy;
+                    throw utils::InternalError(
+                        fmt(
                             _("ExperimentGenerator can not access to the index"
                               " `%1%' of the condition `%2%' port `%3%' ")) %
                         index % it->first % jt->first);
