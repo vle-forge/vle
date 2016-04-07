@@ -404,7 +404,7 @@ public:
         std::ostringstream result;
         std::vector <std::string> output;
         std::string::size_type begin = 0u;
-        std::string::size_type end = block.find('\n');
+        std::string::size_type end;
         result.imbue(std::locale::classic());
         result << std::setprecision(
                    std::floor(
