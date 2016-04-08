@@ -82,13 +82,13 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 		_("_Add"),
 		sigc::mem_fun(
 		    *this,
-		    &ConditionsBox::ConditionsTreeView::on_add)));
+		    &ConditionsBox::ConditionsTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
-		    &ConditionsBox::ConditionsTreeView::on_remove)));
+		    &ConditionsBox::ConditionsTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		_("_Rename"),
@@ -174,7 +174,7 @@ void ConditionsBox::ConditionsTreeView::on_select()
     }
 }
 
-void ConditionsBox::ConditionsTreeView::on_add()
+void ConditionsBox::ConditionsTreeView::onAdd()
 {
     SimpleTypeBox box(_("Name of the condition ?"), "");
     vpz::ConditionList& list = mConditions->conditionlist();
@@ -186,7 +186,7 @@ void ConditionsBox::ConditionsTreeView::on_add()
     }
 }
 
-void ConditionsBox::ConditionsTreeView::on_remove()
+void ConditionsBox::ConditionsTreeView::onRemove()
 {
     Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
 
@@ -358,13 +358,13 @@ ConditionsBox::PortsTreeView::PortsTreeView(
 		_("_Add"),
 		sigc::mem_fun(
 		    *this,
-		    &ConditionsBox::PortsTreeView::on_add)));
+		    &ConditionsBox::PortsTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
-		    &ConditionsBox::PortsTreeView::on_remove)));
+		    &ConditionsBox::PortsTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		_("_Rename"),
@@ -455,7 +455,7 @@ void ConditionsBox::PortsTreeView::on_select()
     }
 }
 
-void ConditionsBox::PortsTreeView::on_add()
+void ConditionsBox::PortsTreeView::onAdd()
 {
     SimpleTypeBox box(_("Name of the parameter ?"), "");
     std::list < std::string > list;
@@ -472,7 +472,7 @@ void ConditionsBox::PortsTreeView::on_add()
     }
 }
 
-void ConditionsBox::PortsTreeView::on_remove()
+void ConditionsBox::PortsTreeView::onRemove()
 {
     Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
 

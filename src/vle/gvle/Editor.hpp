@@ -134,7 +134,6 @@ public:
 private:
     GtkWidget *mView;
 
-    bool           mModified;
     bool           mNew;
     bool           mHasFullName;
     std::string    mIdLang;

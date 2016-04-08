@@ -74,7 +74,6 @@ private:
 
     //Buttons
     Gtk::Button*                    mButtonSave;
-    Gtk::Button*                    mButtonCancel;
     Gtk::Button*                    mButtonClose;
 
     Gtk::Label*                     mMessage;

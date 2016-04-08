@@ -157,7 +157,6 @@ private:
     void on_cancel();
 
     Glib::RefPtr < Gtk::Builder >          mXml;
-    Modeling*                              mModeling;
     GVLE*                                  mGVLE;
     vpz::CoupledModel*                   mGraphModel;
     vpz::CoupledModel*                   mCurrentGraphModel;
@@ -171,7 +170,6 @@ private:
     OutputPortTreeView*                    mOutputPorts;
 
 
-    Gtk::TreeView*                         mTreeViewOutput;
     ModelColumns                           mColumnsOutput;
     Glib::RefPtr<Gtk::ListStore>           mRefListOutput;
 

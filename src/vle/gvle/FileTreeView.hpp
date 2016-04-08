@@ -163,7 +163,6 @@ private:
 
     //Cell
     int                              mColumnName;
-    bool                             mValidateRetry;
     Gtk::CellRendererText*           mCellrenderer;
     Glib::ustring                    mInvalidTextForRetry;
     guint32                          mDelayTime;

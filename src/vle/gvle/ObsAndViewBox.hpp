@@ -113,7 +113,6 @@ namespace vle { namespace gvle {
         Gtk::Button*                          mButtonApply;
         Gtk::Button*                          mButtonCancel;
 
-        bool                                  mSelected;
         bool                                  mValid;
 
         void on_apply();

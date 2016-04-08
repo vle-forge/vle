@@ -189,7 +189,6 @@ private:
     Gtk::Menu                            mMenuPopup;
 
     //Backup
-    vpz::ClassList*                      mClasses_backup;
     Glib::RefPtr<Gtk::TreeStore>         mRefTreeModel;
     std::string                          mSearch;
 

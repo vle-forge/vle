@@ -920,7 +920,6 @@ private:
     ImportClassesBox*               mImportClassesBox;
     ConditionsBox*                  mConditionsBox;
     PreferencesBox*                 mPreferencesBox;
-    PackageBrowserWindow*           mPackageBrowserWindow;
     SaveVpzBox*                     mSaveVpzBox;
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;

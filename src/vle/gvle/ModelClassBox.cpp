@@ -45,7 +45,6 @@ ModelClassBox::ModelClassBox(BaseObjectType* cobject,
                              const Glib::RefPtr < Gtk::Builder >& xml):
     Gtk::TreeView(cobject),
     mXml(xml),
-    mClasses_backup(0),
     mDelayTime(0)
 {
     mRefTreeModel = Gtk::TreeStore::create(mColumns);

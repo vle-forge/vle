@@ -80,8 +80,8 @@ class ConditionsBox
 
 	void on_select();
 	//Signal handler for popup menu items:
-	virtual void on_add();
-	virtual void on_remove();
+	virtual void onAdd();
+	virtual void onRemove();
 	virtual void onRename();
 	virtual void onCopy();
 	void onEdit(std::string pluginName);
@@ -150,8 +150,8 @@ class ConditionsBox
 	virtual bool on_button_press_event(GdkEventButton *ev);
 	void on_select();
 	//Signal handler for popup menu items:
-	virtual void on_add();
-	virtual void on_remove();
+	virtual void onAdd();
+	virtual void onRemove();
 	virtual void onRename();
 	virtual void onDuplicate();
 	void onEdit(std::string pluginName);
@@ -212,7 +212,6 @@ private:
 
     Gtk::Dialog*        mDialog;
     Gtk::Button*        mButtonCancel;
-    Gtk::Button*        mButtonApply;
 
     Glib::RefPtr < Gtk::Builder >  m_xml;
 

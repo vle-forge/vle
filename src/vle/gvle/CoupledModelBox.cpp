@@ -431,9 +431,8 @@ void CoupledModelBox::OutputPortTreeView::onEdition(
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 CoupledModelBox::CoupledModelBox(const Glib::RefPtr < Gtk::Builder >& xml,
-                                 Modeling* m, GVLE* gvle):
+                                 Modeling* /* m */, GVLE* gvle):
     mXml(xml),
-    mModeling(m),
     mGVLE(gvle),
     mGraphModel(0),
     mCurrentGraphModel(0)

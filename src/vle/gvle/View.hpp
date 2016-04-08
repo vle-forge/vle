@@ -326,7 +326,6 @@ private:
 
     vpz::ModelList            mSelectedModels;
     vpz::BaseModel*               mDestinationModel;
-    GVLE::ButtonType            mCurrentButton;
 };
 
 }} // namespace vle gvle

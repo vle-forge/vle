@@ -357,7 +357,6 @@ private:
 	int                      mColumnName;
 	int                      mColumnPackage;
 	int                      mColumnDyn;
-	int                      mColumnModel;
         int                      mColumnSel;
     };
 
@@ -426,7 +425,6 @@ private:
 	std::string              mOldName;
 	bool                     mValidateRetry;
 	Glib::ustring            mInvalidTextForRetry;
-	guint32                  mDelayTime;
     };
 
     Glib::RefPtr < Gtk::Builder >        mXml;
