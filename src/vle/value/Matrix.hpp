@@ -71,9 +71,6 @@ public:
     /// Define a Range of Matrix.
     typedef MatrixValue::index_range Range;
 
-    /// Define a Extents of Matrix.
-    typedef MatrixValue::extent_gen Extents;
-
     /// Define an index of Matrix.
     typedef MatrixValue::index index;
 
@@ -99,7 +96,7 @@ public:
      * @param resizeRows the number of rows to add when resize the matrix.
      */
     Matrix(index columns, index rows, index resizeColumns, index resizeRows)
-        : m_matrix(m_extents[columns][rows]), m_nbcol(columns), m_nbrow(rows),
+        : m_matrix(boost::extents[columns][rows]), m_nbcol(columns), m_nbrow(rows),
         m_stepcol(resizeColumns), m_steprow(resizeRows), m_lastX(0), m_lastY(0)
     {}
 
@@ -893,7 +890,6 @@ public:
 private:
     MatrixValue m_matrix; /// @brief to store the values.
     Indices m_indices;  /// @brief indices for the matrix.
-    Extents m_extents; /// @brief to extents matrix.
     size_type m_nbcol;  /// @brief to store the column number.
     size_type m_nbrow;  /// @brief to store the row number. Note: m_nbrow
     //represents the real number of rows, m_matrix.shape[1] is the number
