@@ -99,7 +99,7 @@ public:
      * @param resizeRows the number of rows to add when resize the matrix.
      */
     Matrix(index columns, index rows, index resizeColumns, index resizeRows)
-        : m_matrix(m_extents[columns][rows]), m_nbcol(columns), m_nbrow(rows),
+        : m_matrix(boost::extents[columns][rows]), m_nbcol(columns), m_nbrow(rows),
         m_stepcol(resizeColumns), m_steprow(resizeRows), m_lastX(0), m_lastY(0)
     {}
 

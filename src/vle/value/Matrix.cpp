@@ -33,7 +33,7 @@ namespace vle { namespace value {
 
 Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
                resizeColumns, index resizeRows)
-    : m_matrix(m_extents[columnmax][rowmax]), m_nbcol(columns), m_nbrow(rows),
+    : m_matrix(boost::extents[columnmax][rowmax]), m_nbcol(columns), m_nbrow(rows),
     m_stepcol(resizeColumns), m_steprow(resizeRows), m_lastX(0), m_lastY(0)
 {
     if (columns > columnmax) {
@@ -51,7 +51,7 @@ Matrix::Matrix(const Matrix& m)
     : Value(m), m_nbcol(m.m_nbcol), m_nbrow(m.m_nbrow), m_stepcol(m.m_stepcol),
     m_steprow(m.m_steprow), m_lastX(0), m_lastY(0)
 {
-    m_matrix.resize(m_extents[m_nbcol][m_nbrow]);
+    m_matrix.resize(boost::extents[m_nbcol][m_nbrow]);
 
     for (size_type i = 0; i < m_nbcol; ++i) {
         for (size_type j = 0; j < m_nbrow; ++j) {
@@ -193,7 +193,7 @@ void Matrix::resize(const size_type& columns, const size_type& rows)
             }
         }
     }
-    m_matrix.resize(m_extents[columns][rows]);
+    m_matrix.resize(boost::extents[columns][rows]);
     m_nbcol = columns;
     m_nbrow = rows;
 }
@@ -201,7 +201,7 @@ void Matrix::resize(const size_type& columns, const size_type& rows)
 void
 Matrix::increaseAllocation(const size_type& columns, const size_type& rows)
 {
-    m_matrix.resize(m_extents
+    m_matrix.resize(boost::extents
             [std::max(std::max(m_matrix.shape()[0],m_nbcol), columns)]
             [std::max(std::max(m_matrix.shape()[1],m_nbrow), rows)]);
 }
@@ -227,7 +227,7 @@ void Matrix::addColumn()
 {
     if (m_nbcol + 1 >= m_matrix.shape()[0]) {
         m_matrix.resize(
-            m_extents[m_matrix.shape()[0] + m_stepcol]
+            boost::extents[m_matrix.shape()[0] + m_stepcol]
             [m_matrix.shape()[1]]);
     }
     if (m_stepcol > 0) {
@@ -239,7 +239,7 @@ void Matrix::addRow()
 {
     if (m_nbrow + 1 >= m_matrix.shape()[1]) {
         m_matrix.resize(
-            m_extents[m_matrix.shape()[0]]
+            boost::extents[m_matrix.shape()[0]]
             [m_matrix.shape()[1] + m_steprow]);
     }
     if (m_steprow > 0) {
