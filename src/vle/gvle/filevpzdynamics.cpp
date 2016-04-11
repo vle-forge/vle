@@ -87,6 +87,8 @@ FileVpzDynamics::~FileVpzDynamics()
 void FileVpzDynamics::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
+    QObject::connect(vpm, SIGNAL(dynamicsUpdated()),
+                     this, SLOT (reload()));
 }
 
 /**
@@ -213,7 +215,6 @@ FileVpzDynamics::onDynamicsTableMenu(const QPoint& pos)
         case FVD_add_dynamic: {
             QString dynName = mVpm->newDynamicNameToDoc();
             mVpm->addDynamicToDoc(dynName, "<None>", "<None>");
-            reload();
             break;
         } case FVD_rename_dynamic: {
             VleTextEdit* itemText = qobject_cast<VleTextEdit*>(item);
@@ -221,7 +222,6 @@ FileVpzDynamics::onDynamicsTableMenu(const QPoint& pos)
             break;
         } case FVD_remove_dynamic: {
             mVpm->removeDyn((qobject_cast<VleTextEdit*>(item))->toPlainText());
-            reload();
             break;
         }}
     }

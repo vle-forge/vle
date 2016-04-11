@@ -116,18 +116,10 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
         if (actCode == 1) {
             QString name = mVpm->newObsNameToDoc();
             mVpm->addObservableToDoc(name);
-            QTreeWidgetItem *newObsItem = newItem(FileVpzObservables::EObsObs, name);
-            ui->obsTree->addTopLevelItem(newObsItem);
-            ui->obsTree->editItem(newObsItem, 0);
-            ui->obsTree->setCurrentItem(newObsItem);
-
         } else if (actCode == 2) {
             foreach( QTreeWidgetItem *item, ui->obsTree->selectedItems() ) {
                 if (itemType(item) == FileVpzObservables::EObsObs) {
                     mVpm->rmObservableFromDoc(item->text(0));
-                    int index = ui->obsTree->indexOfTopLevelItem(item);
-                    ui->obsTree->takeTopLevelItem(index);
-                    delete item;
                 }
             }
         } else if (actCode == 3) {
@@ -214,6 +206,12 @@ FileVpzObservables::onItemChanged(QTreeWidgetItem *item, int /*column*/)
 }
 
 void
+FileVpzObservables::onObservablesUpdated()
+{
+    reload();
+}
+
+void
 FileVpzObservables::onViewsUpdated()
 {
     reload();
@@ -235,8 +233,10 @@ void FileVpzObservables::setVpm(vleVpm* vpm)
 {
     mVpm = vpm;
     reload();
-    QObject::connect(mVpm,   SIGNAL(viewsUpdated()),
+    QObject::connect(mVpm, SIGNAL(viewsUpdated()),
                      this, SLOT(onViewsUpdated()));
+    QObject::connect(mVpm, SIGNAL(observablesUpdated()),
+                     this, SLOT(onObservablesUpdated()));
 }
 
 void FileVpzObservables::reload()

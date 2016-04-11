@@ -34,6 +34,8 @@
 #include <QtDebug>
 #include "vpzDiagScene.h"
 
+#include <vle/utils/Path.hpp>
+
 namespace vle {
 namespace gvle {
 
@@ -1457,25 +1459,25 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     QMenu menu;
     QAction* action;
     action = menu.addAction("Copy models");
-    action->setData(VDMA_copy_models);
+    setActionType(action, VDMA_copy_models);
     action->setEnabled(
             (sel and isVpzSubModel(sel) and (selMods.size() >= 1)
                  and (selMods.contains(static_cast<VpzSubModelItem*>(sel))))
          or (sel and isVpzSubModel(sel) and (selMods.size() == 0)));
     action = menu.addAction("Paste models");
-    action->setData(VDMA_paste_models);
+    setActionType(action, VDMA_paste_models);
     action->setEnabled(sel and isVpzMainModel(sel) and not
             (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
     menu.addSeparator();
     action = menu.addAction("Edit name");
-    action->setData(VDMA_Edit_name);
+    setActionType(action, VDMA_Edit_name);
     action->setEnabled((sel and isVpzPort(sel))
             or (sel and isVpzSubModel(sel) and (selMods.size() == 1)
                     and (selMods.contains(static_cast<VpzSubModelItem*>(sel))))
             or (sel and isVpzSubModel(sel) and (selMods.size() == 0))
             or (sel and isVpzMainModel(sel)));
     action = menu.addAction("Remove");
-    action->setData(VDMA_Remove);
+    setActionType(action, VDMA_Remove);
     action->setEnabled((sel and isVpzPort(sel))
             or (sel and isVpzSubModel(sel) and (selMods.size() >= 1)
                     and (selMods.contains(static_cast<VpzSubModelItem*>(sel))))
@@ -1483,7 +1485,7 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
             or (sel and isVpzConnectionLine(sel)));
     menu.addSeparator();
     action = menu.addAction("Add input port");
-    action->setData(VDMA_Add_input_port);
+    setActionType(action, VDMA_Add_input_port);
     action->setEnabled(
             (sel and isVpzSubModel(sel) and (selMods.size() == 1)
                  and (selMods.contains(static_cast<VpzSubModelItem*>(sel))))
@@ -1491,32 +1493,39 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
             or (sel and isVpzMainModel(sel)));
     action = menu.addAction("Add output port");
     menu.addSeparator();
-    action->setData(VDMA_Add_output_port);
+    setActionType(action, VDMA_Add_output_port);
     action->setEnabled(
                 (sel and isVpzSubModel(sel) and (selMods.size() == 1)
                      and (selMods.contains(static_cast<VpzSubModelItem*>(sel))))
                 or (sel and isVpzSubModel(sel) and (selMods.size() == 0))
                 or (sel and isVpzMainModel(sel)));
     action = menu.addAction("Add atomic model");
-    action->setData(VDMA_Add_atomic_model);
+    setActionType(action, VDMA_Add_atomic_model);
     action->setEnabled(sel and isVpzMainModel(sel) and not
                        (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
     action = menu.addAction("Add coupled port");
-    action->setData(VDMA_Add_coupled_model);
+    setActionType(action, VDMA_Add_coupled_model);
     action->setEnabled(sel and isVpzMainModel(sel) and not
                        (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
     menu.addSeparator();
     action = menu.addAction("Zoom In");
-    action->setData(VDMA_Zoom_In);
+    setActionType(action, VDMA_Zoom_In);
     action->setEnabled(true);
     action = menu.addAction("Zoom Out");
-    action->setData(VDMA_Zoom_Out);
+    setActionType(action, VDMA_Zoom_Out);
     action->setEnabled(true);
+    menu.addSeparator();
+    QMenu* submenuconfigure = menu.addMenu("Configure");
+    submenuconfigure->setEnabled(sel and not isVpzMainModel(sel) and
+                                 (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
+                                 not isVpzSubModelConfigured(sel));
+    populateConfigureMenu(submenuconfigure);
+
 
     if (sel) {
         action = menu.exec(event->screenPos());
         if (action) {
-            int actCode = action->data().toInt();
+            int actCode = getActionType(action);
             if (actCode == VDMA_copy_models) {
                 mModelsCopies.clear();
                 for (int i =0; i< selMods.size(); i++) {
@@ -1629,12 +1638,74 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
             } else if(actCode == VDMA_Zoom_Out) {
                 setScale(0.8);
                 update();
+            }  else if(actCode == VDMA_Configure_model) {
+                VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
+                QString metadata = action->data().toList()[1].toString();
+                doConfigureMenu(it->mnode, metadata);
+                it->initializeFromDom();
+                it->update();
             }
         }
     }
-
-
     //QGraphicsScene::contextMenuEvent(event);
+}
+
+void
+VpzDiagScene::populateConfigureMenu(QMenu* menu)
+{
+    QString pathgvlesm = "metadata/src";
+    QString packagesDir =
+        vle::utils::Path::path().getBinaryPackagesDir().c_str();
+
+    QDirIterator it(packagesDir, QDir::AllDirs);
+
+    QAction* action;
+
+    while (it.hasNext()) {
+        it.next();
+
+        if (QDir(it.filePath() + "/" + pathgvlesm).exists()) {
+            QDirIterator itbis(it.filePath() + "/" + pathgvlesm, QDir::Files);
+            while (itbis.hasNext()) {
+                QString metaDataFileName =  itbis.next();
+                if (QFile(metaDataFileName).exists()) {
+                    QFile file(metaDataFileName);
+                    QDomDocument dom("vle_project_metadata");
+                    QXmlInputSource source(&file);
+                    QXmlSimpleReader reader;
+                    dom.setContent(&source, &reader);
+                    QDomElement docElem = dom.documentElement();
+                    QDomNode srcPluginNode = dom.elementsByTagName("srcPlugin").item(0);
+                    QString className = srcPluginNode.attributes().namedItem("class").nodeValue();
+                    QString packName = srcPluginNode.attributes().namedItem("namespace").nodeValue();
+                    action = menu->addAction(packName + "::" + className);
+                    setActionType(action, VDMA_Configure_model);
+                    QVariantList dataList = action->data().toList();
+                    dataList << metaDataFileName;
+                    action->setData(dataList);
+                }
+            }
+        }
+    }
+}
+
+void
+VpzDiagScene::doConfigureMenu(QDomNode model, const QString& meta)
+{
+    QFile file(meta);
+    QDomDocument dom("vle_project_metadata");
+    QXmlInputSource source(&file);
+    QXmlSimpleReader reader;
+    dom.setContent(&source, &reader);
+    QDomElement docElem = dom.documentElement();
+
+    QDomNode dynamic = dom.elementsByTagName("dynamic").item(0);
+    QDomNode observable = dom.elementsByTagName("observable").item(0);
+    QDomNode condition = dom.elementsByTagName("condition").item(0);
+    QDomNode in = dom.elementsByTagName("in").item(0);
+    QDomNode out = dom.elementsByTagName("out").item(0);
+
+    mVpm->configureModel(model, dynamic, observable, condition, in, out);
 }
 
 QBrush
@@ -1665,7 +1736,6 @@ VpzDiagScene::getPenConnection()
 {
     return QPen(QColor(127,127,127), 3, Qt::SolidLine);
 }
-
 
 QBrush
 VpzDiagScene::getBrushBackground()
@@ -1808,6 +1878,32 @@ VpzDiagScene::isVpzConnectionLine(QGraphicsItem* item)
     return item and (item->type() == VpzConnectionLineType);
 }
 
+void
+VpzDiagScene::setActionType(QAction* action, VPZ_DIAG_MENU_ACTION type)
+{
+    QVariantList dataList;
+    dataList << type;
+    action->setData(dataList);
+}
+
+VPZ_DIAG_MENU_ACTION
+VpzDiagScene::getActionType(QAction* action)
+{
+    return static_cast<VPZ_DIAG_MENU_ACTION>(
+        action->data().toList()[0].toInt());
+}
+
+
+bool
+VpzDiagScene::isVpzSubModelConfigured(QGraphicsItem* item)
+{
+    VpzSubModelItem* it = static_cast<VpzSubModelItem*>(item);
+    return mVpm->isAtomicModelDynSet(it->mnode) ||
+        mVpm->isAtomicModelCondsSet(it->mnode) ||
+        mVpm->isAtomicModelObsSet(it->mnode) ||
+        mVpm->hasModelInputPort(it->mnode) ||
+        mVpm->hasModelOutputPort(it->mnode);
+}
 
 void
 VpzDiagScene::onDragDestroyed(QObject */*obj*/)

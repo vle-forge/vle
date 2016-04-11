@@ -44,10 +44,10 @@ public:
     explicit FileVpzDynamics(QWidget *parent = 0);
     ~FileVpzDynamics();
     void setVpm(vleVpm* vpm);
-    void reload();
 
 public slots:
 
+    void reload();
     void onSelectPackage(const QString & id, const QString & text);
     void onSelectLibrary(const QString & id, const QString& text);
     void onDynamicsTableMenu(const QPoint&);
