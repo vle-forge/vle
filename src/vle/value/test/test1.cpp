@@ -349,3 +349,36 @@ BOOST_AUTO_TEST_CASE(test_user_value)
 
     BOOST_REQUIRE(data.get() != cloned_data.get());
 }
+
+BOOST_AUTO_TEST_CASE(test_table)
+{
+    value::Table t(2, 3);
+
+    {
+        double value = 0;
+        for (auto & v : t.value())
+            v = value++;
+    }
+
+    BOOST_REQUIRE(t(0, 0) == 0.);
+    BOOST_REQUIRE(t(1, 0) == 1.);
+    BOOST_REQUIRE(t(0, 1) == 2.);
+    BOOST_REQUIRE(t(1, 1) == 3.);
+    BOOST_REQUIRE(t(0, 2) == 4.);
+    BOOST_REQUIRE(t(1, 2) == 5.);
+
+    t.resize(3, 4);
+
+    BOOST_REQUIRE(t(0, 0) == 0.);
+    BOOST_REQUIRE(t(1, 0) == 1.);
+    BOOST_REQUIRE(t(0, 1) == 2.);
+    BOOST_REQUIRE(t(1, 1) == 3.);
+    BOOST_REQUIRE(t(0, 2) == 4.);
+    BOOST_REQUIRE(t(1, 2) == 5.);
+
+    t.resize(1, 3);
+
+    BOOST_REQUIRE(t(0, 0) == 0.);
+    BOOST_REQUIRE(t(0, 1) == 2.);
+    BOOST_REQUIRE(t(0, 2) == 4.);
+}

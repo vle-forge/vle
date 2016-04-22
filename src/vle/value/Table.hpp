@@ -30,14 +30,14 @@
 
 #include <vle/value/Value.hpp>
 #include <vle/DllDefines.hpp>
-#include <boost/multi_array.hpp>
+#include <vector>
 
 namespace vle { namespace value {
 
 /**
  * @brief Define an array of two dimensions of real.
  */
-typedef boost::multi_array < double, 2 > TableValue;
+typedef std::vector <double> TableValue;
 
 /**
  * @brief A table is a container for double value into an
@@ -46,10 +46,10 @@ typedef boost::multi_array < double, 2 > TableValue;
 class VLE_API Table : public Value
 {
 public:
-    typedef TableValue::index index;
-    typedef TableValue::size_type size_type;
-    typedef TableValue::iterator iterator;
-    typedef TableValue::const_iterator const_iterator;
+    using index = TableValue::size_type;
+    using size_type = TableValue::size_type;
+    using iterator = TableValue::iterator;
+    using const_iterator = TableValue::const_iterator;
 
     /**
      * @brief Build a Table object with a default value to empty TableValue.
@@ -64,20 +64,14 @@ public:
      * @param width The number of columns.
      * @param height The number of rows.
      */
-    Table(index width, index height)
-        : m_value(boost::extents[width][height]), m_width(width),
-        m_height(height)
-    {}
+    Table(std::size_t width, std::size_t height);
 
     /**
      * @brief Copy constructor.
      *
      * @param value The value to copy.
      */
-    Table(const Table& value)
-        : Value(value), m_value(value.m_value), m_width(value.m_width),
-        m_height(value.m_height)
-    {}
+    Table(const Table& value) = default;
 
     /**
      * @brief Nothing to delete.
@@ -129,8 +123,7 @@ public:
      *
      * @return Value::TABLE.
      */
-    virtual Value::type getType() const override
-    { return Value::TABLE; }
+    virtual Value::type getType() const override;
 
     /**
      * @brief Push all real from the TableValue separated by space for columns
@@ -219,12 +212,7 @@ public:
      * @param width The width of the TableValue.
      * @param height The height of the TableValue.
      */
-    inline void resize(std::size_t width, std::size_t height)
-    {
-        m_value.resize((boost::extents[width][height]));
-        m_width = width;
-        m_height = height;
-    }
+    void resize(std::size_t width, std::size_t height);
 
     /**
      * @brief get a constant reference to the value at the specified index.
@@ -234,8 +222,7 @@ public:
      *
      * @return a constant reference to the real.
      */
-    inline const double& get(std::size_t x, std::size_t y) const
-    { return m_value[x][y]; }
+    double operator()(std::size_t x, std::size_t y) const;
 
     /**
      * @brief get a reference to the value at the specified index.
@@ -245,8 +232,27 @@ public:
      *
      * @return a reference to the real.
      */
-    inline double& get(std::size_t x, std::size_t y)
-    { return m_value[x][y]; }
+    double& operator()(std::size_t x, std::size_t y);
+
+    /**
+     * @brief get a constant reference to the value at the specified index.
+     *
+     * @param x the index of the column.
+     * @param y the index of the row.
+     *
+     * @return a constant reference to the real.
+     */
+    double get(std::size_t x, std::size_t y) const;
+
+    /**
+     * @brief get a reference to the value at the specified index.
+     *
+     * @param x the index of the column.
+     * @param y the index of the row.
+     *
+     * @return a reference to the real.
+     */
+    double& get(std::size_t x, std::size_t y);
 
     /**
      * @brief Fill the current table with multiple reals read from a string.

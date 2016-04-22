@@ -32,13 +32,59 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
 
+namespace {
+
+inline
+double& pp_get(vle::value::TableValue& t, std::size_t x, std::size_t y,
+               std::size_t width)
+{
+    auto i = y * width + x;
+
+    if (i > t.size())
+        throw vle::utils::ArgError(
+            vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y);
+
+    return t[i];
+}
+
+inline
+double pp_get(const vle::value::TableValue& t, std::size_t x, std::size_t y,
+              std::size_t width)
+{
+    auto i = y * width + x;
+
+    if (i > t.size())
+        throw vle::utils::ArgError(
+            vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y);
+
+    return t[i];
+}
+
+}
+
 namespace vle { namespace value {
+
+Table::Table(std::size_t width, std::size_t height)
+    : m_value(width * height)
+    , m_width(width)
+    , m_height(height)
+{
+    if (width * height <= 0)
+        throw utils::ArgError(
+            fmt(_("Table: bad constructor initialization %1%x%2%"))
+            % width % height);
+}
+
+Value::type Table::getType() const
+{
+    return Value::TABLE;
+}
 
 void Table::writeFile(std::ostream& out) const
 {
     for (index j = 0; j < m_height; ++j) {
         for (index i = 0; i < m_width; ++i) {
-            out << m_value[i][j] << " ";
+            out << get(i, j) << " ";
         }
         out << "\n";
     }
@@ -51,7 +97,7 @@ void Table::writeString(std::ostream& out) const
     for (index j = 0; j < m_height; ++j) {
         out << "(";
         for (index i = 0; i < m_width; ++i) {
-            out << m_value[i][j];
+            out << get(i, j);
             if (i + 1 < m_width) {
                 out << ",";
             }
@@ -70,10 +116,55 @@ void Table::writeXml(std::ostream& out) const
     out << "<table width=\"" << m_width << "\" height=\"" << m_height << "\" >";
     for (index j = 0; j < m_height; ++j) {
         for (index i = 0; i < m_width; ++i) {
-            out << m_value[i][j] << " ";
+            out << get(i, j) << " ";
         }
     }
     out << "</table>";
+}
+
+void Table::resize(std::size_t width, std::size_t height)
+{
+    if (width * height <= 0)
+        throw utils::ArgError(
+            fmt(_("Table: bad constructor initialization %1%x%2%"))
+            % width % height);
+
+    if (width == m_width and height == m_height)
+        return;
+
+    std::vector<double> tmp(width * height);
+
+    auto min_r = std::min(m_width, width);
+    auto min_c = std::min(m_height, height);
+
+    for (std::size_t r = 0; r < min_r; ++r)
+        for (std::size_t c = 0; c < min_c; ++c)
+            tmp[c * width + r] = m_value[c * m_width + r];
+
+    std::swap(tmp, m_value);
+
+    m_width = width;
+    m_height = height;
+}
+
+double Table::operator()(std::size_t x, std::size_t y) const
+{
+    return ::pp_get(m_value, x, y, m_width);
+}
+
+double& Table::operator()(std::size_t x, std::size_t y)
+{
+    return ::pp_get(m_value, x, y, m_width);
+}
+
+double Table::get(std::size_t x, std::size_t y) const
+{
+    return ::pp_get(m_value, x, y, m_width);
+}
+
+double& Table::get(std::size_t x, std::size_t y)
+{
+    return ::pp_get(m_value, x, y, m_width);
 }
 
 void Table::fill(const std::string& str)
@@ -103,7 +194,7 @@ void Table::fill(const std::string& str)
                 }
             }
 
-            m_value[i][j] = result;
+            get(i, j) = result;
             if (i + 1 >= m_width) {
                 i = 0;
                 if (j + 1 >= m_height) {
@@ -119,4 +210,3 @@ void Table::fill(const std::string& str)
 }
 
 }} // namespace vle value
-

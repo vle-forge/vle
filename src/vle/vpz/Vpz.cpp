@@ -31,6 +31,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <sstream>
 #include <vle/version.hpp>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
