@@ -88,6 +88,95 @@ public:
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
+     * Initialize the \e attributes with a Boolean.
+     *
+     * \param value default value.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Boolean& addBoolean(bool value = true);
+
+    /**
+     * Initialize the \e attributes with a Double.
+     *
+     * \param value default value.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Double& addDouble(double value = 0.0);
+
+    /**
+     * Initialize the \e attributes with a Integer.
+     *
+     * \param value default value.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Integer& addInteger(int32_t value = 0);
+
+    /**
+     * Initialize the \e attributes with a String.
+     *
+     * \param value default value.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::String& addString(const std::string& value = std::string());
+
+    /**
+     * Initialize the \e attributes with a Xml.
+     *
+     * \param value default value.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Xml& addXml(const std::string& value = std::string());
+
+    /**
+     * Initialize the \e attributes with a Tuple.
+     *
+     * \param size size of the tuple.
+     * \param value default value.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Tuple& addTuple(std::size_t size, double value);
+
+    /**
+     * Initialize the \e attributes with a Table.
+     *
+     * \param width Default width of the Table.
+     * \param height Default height of the Table.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Table& addTable(std::size_t width, std::size_t height);
+
+    /**
+     * Initialize the \e attributes with a Map.
+     *
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Map& addMap();
+
+    /**
+     * Initialize the \e attributes with a Set.
+     *
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Set& addSet();
+
+    /**
+     * Initialize the \e attributes with a Matrix.
+     *
+     * \param columns the initial number of columns.
+     * \param rows the initial number of rows.
+     * \param columnmax The max number of columns.
+     * \param rowmax The max number of rows.
+     * \param resizeColumns the number of columns to add when resize the
+     * matrix.
+     * \param resizeRow the number of rows to add when resize the matrix.
+     * \return a reference to the newly allocated \e attributes.
+     */
+    value::Matrix& addMatrix(std::size_t columns, std::size_t rows,
+                             std::size_t columnmax, std::size_t rowmax,
+                             std::size_t resizeColumns,
+                             std::size_t resizeRows);
+
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -107,7 +196,7 @@ public:
      */
     value::Boolean& getBoolean();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -127,7 +216,7 @@ public:
      */
     value::Double& getDouble();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -147,7 +236,7 @@ public:
      */
     value::Integer& getInteger();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -167,7 +256,7 @@ public:
      */
     value::String& getString();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -187,7 +276,7 @@ public:
      */
     value::Xml& getXml();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -207,7 +296,7 @@ public:
      */
     value::Tuple& getTuple();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -227,7 +316,7 @@ public:
      */
     value::Table& getTable();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -267,7 +356,7 @@ public:
      */
     value::Map& getMap();
 
-        /**
+    /**
      * Return the map attached to the event.
      *
      * \return a reference to the attached map.
@@ -401,6 +490,16 @@ private:
     Simulator                      *m_target;
     std::shared_ptr <value::Value>  m_attributes;
     std::string                     m_port;
+
+    template <typename T, typename... Args>
+        T& pp_add(Args&&... args)
+    {
+        auto value = std::make_shared<T>(std::forward<Args>(args)...);
+        auto ret = value.get();
+        m_attributes = value;
+        return *ret;
+    }
+
 };
 
 }} // namespace vle devs

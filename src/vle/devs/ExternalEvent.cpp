@@ -41,6 +41,60 @@
 
 namespace vle { namespace devs {
 
+value::Boolean& ExternalEvent::addBoolean(bool value)
+{
+    return pp_add<value::Boolean>(value);
+}
+
+value::Double& ExternalEvent::addDouble(double value)
+{
+    return pp_add<value::Double>(value);
+}
+
+value::Integer& ExternalEvent::addInteger(int32_t value)
+{
+    return pp_add<value::Integer>(value);
+}
+
+value::String& ExternalEvent::addString(const std::string& value)
+{
+    return pp_add<value::String>(value);
+}
+
+value::Xml& ExternalEvent::addXml(const std::string& value)
+{
+    return pp_add<value::Xml>(value);
+}
+
+value::Tuple& ExternalEvent::addTuple(std::size_t size, double value)
+{
+    return pp_add<value::Tuple>(size, value);
+}
+
+value::Table& ExternalEvent::addTable(std::size_t width, std::size_t height)
+{
+    return pp_add<value::Table>(width, height);
+}
+
+value::Map& ExternalEvent::addMap()
+{
+    return pp_add<value::Map>();
+}
+
+value::Set& ExternalEvent::addSet()
+{
+    return pp_add<value::Set>();
+}
+
+value::Matrix& ExternalEvent::addMatrix(
+    std::size_t columns, std::size_t rows,
+    std::size_t columnmax, std::size_t rowmax,
+    std::size_t resizeColumns, std::size_t resizeRows)
+{
+    return pp_add<value::Matrix>(columns, rows, columnmax, rowmax,
+                                 resizeColumns, resizeRows);
+}
+
 const value::Boolean& ExternalEvent::getBoolean() const
 {
     if (not m_attributes or not m_attributes->isBoolean())
