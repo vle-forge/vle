@@ -32,12 +32,10 @@ namespace vle { namespace devs {
 
 std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts)
 {
-    for (ExternalEventList::const_iterator it = evts.begin();
-         it != evts.end(); ++it) {
-        o << "port: '" << (*it)->getPortName() << "' value: '"
-          << ((*it)->haveAttributes() ?
-              (*it)->getAttributes().writeToString() : "") << "'";
-    }
+    for (const auto& elem : evts)
+        o << "port: '" << elem->getPortName() << "' value: '"
+          << (elem->haveAttributes() ?
+              elem->attributes().get()->writeToString() : "") << "'";
 
     return o;
 }

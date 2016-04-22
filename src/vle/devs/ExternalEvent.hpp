@@ -29,9 +29,10 @@
 #define VLE_DEVS_EXTERNALEVENT_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/devs/Attribute.hpp>
+#include <vle/value/Map.hpp>
 #include <vle/utils/Exception.hpp>
-#include <boost/shared_ptr.hpp>
+#include <vle/utils/Deprecated.hpp>
+#include <memory>
 #include <string>
 
 namespace vle { namespace devs {
@@ -39,16 +40,23 @@ namespace vle { namespace devs {
 class Simulator;
 
 /**
- * @brief External event based on the devs::Event class and are build by
- * graph::Model when output function are called.
+ * \e ExternalEvent are simple object to store {Simulator, Port, Value}
+ * for event build in \e vle::devs::Dynamics::output() function. The same
+ * object is use into the \e vle::devs::Dynamics::externalTransition()
+ * function.
  *
  */
 class VLE_API ExternalEvent
 {
 public:
-    ExternalEvent(const std::string& sourcePortName)
-        : m_target(0),
-        m_port(sourcePortName)
+    ExternalEvent() = delete;
+    ExternalEvent(const ExternalEvent& other) = delete;
+    ExternalEvent& operator=(const ExternalEvent& other) = delete;
+
+    ExternalEvent(const std::string& port)
+        : m_target(0)
+        , m_attributes(0)
+        , m_port(port)
     {
     }
 
@@ -61,182 +69,335 @@ public:
     {
     }
 
-    ~ExternalEvent()
-    {
-    }
+    ~ExternalEvent() = default;
 
     const std::string& getPortName() const
-    { return m_port; }
+    {
+        return m_port;
+    }
 
     Simulator* getTarget()
     { return m_target; }
 
-    bool onPort(const std::string& portName) const
-    { return m_port == portName; }
-
-    void putAttributes(const value::Map& map);
-
-    /**
-     * Put an attribute on this Event.
-     * @param name std::string name of Value to add.
-     * @param value Value to add, not clone.
-     */
-    void putAttribute(const std::string& name,
-                      std::unique_ptr<value::Value> value)
-    { attributes().add(name, std::move(value)); }
-
-    /**
-     * Put an attribute on an event. The goal is to simplify building event.
-     * @code
-     * ExternalEvent* evt = new ExternalEvent(
-     *                              "free?", currenttime, getModel();
-     * evt << attribute("x", 5) << attribute("y", 7.0)
-     *     << attribute("msg", "hello world");
-     * @endcode
-     * @param event the event to put the attribute.
-     * @param attr the attribute to put into event.
-     * @return the current event.
-     */
-    friend ExternalEvent* operator<<(ExternalEvent* event,
-                                     Attribute& attr)
-    {
-        event->putAttribute(attr.first, std::move(attr.second));
-        return event;
-    }
-
-    /**
-     * Put an attribute on an event. The goal is to simplify building event.
-     * @code
-     * ExternalEvent evt("free?", currenttime, getModel();
-     * evt << attribute("x", 5) << attribute("y", 7.0)
-     *     << attribute("msg", "hello world");
-     * @endcode
-     * @param event the event to put the attribute.
-     * @param attr the attribute to put into event.
-     * @return the current event.
-     */
-    friend ExternalEvent& operator<<(ExternalEvent& event,
-                                     Attribute& attr)
-    {
-        event.putAttribute(attr.first, std::move(attr.second));
-        return event;
-    }
+    bool onPort(const std::string& port) const
+    { return m_port == port; }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * @brief Test if the map have a Value with specified name.
-     * @param name the name of value to find.
-     * @return true if Value exist, false otherwise.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Boolean.
      */
-    bool existAttributeValue(const std::string& name) const
-    { return haveAttributes() ? attributes().exist(name) : false; }
+    const value::Boolean& getBoolean() const;
 
     /**
-     * Get an attribute from this Event.
-     * @param name std::string name of Value to get.
-     * @return a reference to Value.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Boolean.
      */
-    const value::Value& getAttributeValue(
-        const std::string& name) const
-    { return value::reference(attributes().get(name)); }
+    value::Boolean& getBoolean();
+
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Double.
+     */
+    const value::Double& getDouble() const;
 
     /**
-     * Get a double attribute from this Event.
-     * @param name std::string name of double to get.
-     * @return a double.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Double.
      */
-    double getDoubleAttributeValue(const std::string& name) const
-    { return attributes().getDouble(name); }
+    value::Double& getDouble();
+
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Integer.
+     */
+    const value::Integer& getInteger() const;
 
     /**
-     * Get an integer attribute from this Event.
-     * @param name std::string name of integer to get.
-     * @return an integer.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Integer.
      */
-    int32_t getIntegerAttributeValue(const std::string& name) const
-    { return attributes().getInt(name); }
+    value::Integer& getInteger();
+
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::String.
+     */
+    const value::String& getString() const;
 
     /**
-     * Get a boolean attribute from this Event.
-     * @param name std::string name of boolean to get.
-     * @return a boolean.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::String.
      */
-    bool getBooleanAttributeValue(const std::string& name) const
-    { return attributes().getBoolean(name); }
+    value::String& getString();
+
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Xml.
+     */
+    const value::Xml& getXml() const;
 
     /**
-     * Get a string attribute from this Event.
-     * @param name std::string name of string to get.
-     * @return a string.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Xml.
      */
-    const std::string& getStringAttributeValue(
-        const std::string& name) const
-    { return attributes().getString(name); }
+    value::Xml& getXml();
+
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Tuple.
+     */
+    const value::Tuple& getTuple() const;
 
     /**
-     * @brief Get a Set attribute from this event.
-     * @param name std::string name of Set to get.
-     * @return a Set
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Tuple.
      */
-    const value::Set& getSetAttributeValue(
-        const std::string& name) const
-    { return attributes().getSet(name); }
+    value::Tuple& getTuple();
+
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Table.
+     */
+    const value::Table& getTable() const;
 
     /**
-     * @brief Get a Map attribute from this event.
-     * @param name std::string name of Map to get.
-     * @return a Map.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Table.
      */
-    const value::Map& getMapAttributeValue(
-        const std::string& name) const
-    { return attributes().getMap(name); }
+    value::Table& getTable();
+
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Set.
+     */
+    const value::Set& getSet() const;
 
     /**
-     * @brief Return the map attached to the event.
-     * @return a reference to the attached map.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Set.
      */
-    const value::Map& getAttributes() const
-    { return attributes(); }
+    value::Set& getSet();
 
     /**
-     * @brief Return the map attached to the event.
-     * @return a reference to the attached map.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Map.
      */
-    value::Map& getAttributes()
-    { return attributes(); }
+    const value::Map& getMap() const;
 
     /**
-     * @brief Check if attributes is present in the attributes lists.
-     * @return True if the attributes lists exists, false otherwise.
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Map.
      */
-    bool haveAttributes() const
-    { return m_attributes.get(); }
+    value::Map& getMap();
 
-    value::Map& attributes()
+        /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Matrix.
+     */
+    const value::Matrix& getMatrix() const;
+
+    /**
+     * Return the map attached to the event.
+     *
+     * \return a reference to the attached map.
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Matrix.
+     */
+    value::Matrix& getMatrix();
+
+    //
+    // Deprecated part.
+    //
+
+    /**
+     * Return the map attached to the event or throw exception.
+     *
+     * \return a reference to the attached map.
+     *
+     * \deprecated
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is empty
+     * or if \e attributes() is not a \e value::Map.
+     */
+    const value::Map& getAttributes() const DEPRECATED
     {
-        if (m_attributes.get() == 0) {
-            m_attributes = boost::shared_ptr < value::Map >(new value::Map());
-        }
-        return *m_attributes;
+        if (m_attributes.get() == nullptr)
+            throw utils::ArgError(
+                _("ExternalEvent: getAttributes returns null pointer"));
+
+        if (m_attributes->isMap())
+            return m_attributes->toMap();
+
+        throw utils::ArgError(
+            _("ExternalEvent: getAttributes can not return another"
+              " type than value::Map"));
     }
 
-    const value::Map& attributes() const
+    /**
+     * Return the map attached to the event or, if \e attributes() is
+     * empty, returns a newly allocated value::Map.
+     *
+     * \return a reference to the attached map.
+     *
+     * \deprecated
+     *
+     * \exception can throw \e utils::ArgError if \e attributes() is not a
+     * \e value::Map.
+     */
+    value::Map& getAttributes() DEPRECATED
     {
-        if (m_attributes.get() == 0) {
-            throw utils::ArgError(_("No attribute in this event"));
+        if (m_attributes.get() == nullptr) {
+            auto ptr = std::make_shared<value::Map>();
+            m_attributes = ptr;
+            return *ptr;
         }
-        return *m_attributes;
+
+        if (m_attributes->isMap())
+            return m_attributes->toMap();
+
+        throw utils::ArgError(
+            _("ExternalEvent: getAttributes is filled with another "
+              "type than value::Map"));
+    }
+
+    /**
+     * Fill the \e m_attributes with a clone of the map.
+     *
+     * \deprecated
+     */
+    void putAttributes(const value::Map& map) DEPRECATED;
+
+    /**
+     * Put an attribute to the \e m_attributes if and only if the \e
+     * m_attributes is a value::Map or m_attributes equal nullptr.
+     *
+     * \deprecated
+     *
+     * \param name std::string name of value::Value to add (the key of the
+     * value::Map).
+     * \param value Value to add, not clone.
+     */
+    void putAttribute(const std::string& name,
+                      std::unique_ptr<value::Value> value);
+
+    //
+    // End of the deprecated part.
+    //
+
+    /**
+     * Test if the attributes is present and is a value::Map.
+     *
+     * \return true if m_attributes.get() != nullptr and if
+     * m_attribute.isMap() is true.
+     */
+    bool haveAttributes() const
+    {
+        return m_attributes.get() != nullptr;
+    }
+
+    /**
+     * Get direct access to the underlying attributes (value::Value).
+     *
+     * \return a std::shared_ptr<value::Value> without or without values.
+     */
+    std::shared_ptr<value::Value>& attributes()
+    {
+        return m_attributes;
+    }
+
+    /**
+     * Get direct access to the underlying attributes (value::Value).
+     *
+     * \return a std::shared_ptr<value::Value> without or without values.
+     */
+    const std::shared_ptr<value::Value>& attributes() const
+    {
+        return m_attributes;
     }
 
 private:
-    ExternalEvent();
-    ExternalEvent(const ExternalEvent& other);
-    ExternalEvent& operator=(const ExternalEvent& other);
-
-    Simulator                        *m_target;
-    boost::shared_ptr < value::Map >  m_attributes;
-    std::string                       m_port;
+    Simulator                      *m_target;
+    std::shared_ptr <value::Value>  m_attributes;
+    std::string                     m_port;
 };
 
 }} // namespace vle devs
