@@ -51,6 +51,18 @@ include(CheckIncludeFileCXX)
 include(CheckIncludeFile)
 include(CheckLibraryExists)
 include(CMakeDetermineCCompiler)
+include(CheckCXXCompilerFlag)
+
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
+CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
+
+if (COMPILER_SUPPORTS_CXX14)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+elseif(COMPILER_SUPPORTS_CXX1Y)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+else()
+  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14/1y support. Please use a different C++ compiler.")
+endif()
 
 #
 # append debug mode when compiler is GNU.
@@ -154,8 +166,6 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_DETAILED_FAILURE_MSG ON)
 set(Boost_DEBUG OFF)
-
-
 
 if (VLE_BOOST_INCLUDE_PATH AND VLE_BOOST_LIBRARIES_PATH)
  set (BOOST_LIBRARYDIR ${VLE_BOOST_LIBRARIES_PATH})
@@ -328,8 +338,7 @@ endif (WITH_DOXYGEN)
 #
 # Browse the src subdirectory
 #
-ADD_SUBDIRECTORY(src)
-
+add_subdirectory(src)
 
 #
 # Status
