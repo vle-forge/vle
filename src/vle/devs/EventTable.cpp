@@ -134,16 +134,6 @@ EventTable::~EventTable()
     std::for_each(mObservationEventList.begin(),
                   mObservationEventList.end(),
                   boost::checked_deleter < ViewEvent >());
-
-    {
-	for (ExternalEventModel::iterator it = mExternalEventModel.begin();
-	     it != mExternalEventModel.end(); ++it) {
-
-            std::for_each((*it).second.begin(),
-                          (*it).second.end(),
-                          boost::checked_deleter < ExternalEvent >());
-	}
-    }
 }
 
 size_t EventTable::getEventNumber() const
@@ -254,19 +244,19 @@ bool EventTable::putInternalEvent(InternalEvent* event)
     return true;
 }
 
-bool EventTable::putExternalEvent(ExternalEvent* event)
+void EventTable::putExternalEvent(Simulator *target,
+                                  const std::shared_ptr<value::Value>& atts,
+                                  const std::string& port)
 {
-    Simulator* mdl = event->getTarget();
-    assert(mdl);
+    mExternalEventModel[target].emplace_back(target, atts, port);
 
-    mExternalEventModel[mdl].push_back(event);
-    InternalEventModel::iterator it = mInternalEventModel.find(mdl);
+    // If an internal event is in the scheduller, we invalidate the event
+    // for this simulator.
+    auto it = mInternalEventModel.find(target);
     if (it != mInternalEventModel.end() and (*it).second and
-        (*it).second->getTime() > getCurrentTime()) {
+        (*it).second->getTime() > getCurrentTime())
 	(*it).second->invalidate();
 	(*it).second = 0;
-    }
-    return true;
 }
 
 bool EventTable::putObservationEvent(ViewEvent* event)
@@ -316,12 +306,8 @@ void EventTable::delModelEvents(Simulator* mdl)
     }
 
     {
-        ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
+        auto it = mExternalEventModel.find(mdl);
         if (it != mExternalEventModel.end()) {
-            std::for_each((*it).second.begin(),
-                          (*it).second.end(),
-                          boost::checked_deleter < ExternalEvent >());
-
             (*it).second.clear();
             mExternalEventModel.erase(it);
         }

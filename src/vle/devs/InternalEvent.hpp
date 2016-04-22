@@ -45,6 +45,9 @@ class Simulator;
 class VLE_API InternalEvent
 {
 public:
+    InternalEvent(const InternalEvent&) = delete;
+    InternalEvent& operator=(const InternalEvent&) = delete;
+
     /**
      * InternalEvent constructor.
      *
@@ -60,9 +63,7 @@ public:
      * InternalEvent descructor.
      *
      */
-    ~InternalEvent()
-    {
-    }
+    ~InternalEvent() = default;
 
     /**
      * Get a pointer to the simulator.
@@ -147,9 +148,6 @@ public:
     { return m_isvalid; }
 
 private:
-    InternalEvent(const InternalEvent&);
-    InternalEvent& operator=(const InternalEvent&);
-
     Simulator *m_simulator;     /**< A pointer to the simulator. */
     Time       m_time;          /**< The time to wake-up the simulator. */
     bool       m_isvalid;       /**< Is this InternalEvent valid? */

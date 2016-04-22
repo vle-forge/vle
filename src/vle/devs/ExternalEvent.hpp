@@ -49,23 +49,22 @@ class Simulator;
 class VLE_API ExternalEvent
 {
 public:
-    ExternalEvent() = delete;
-    ExternalEvent(const ExternalEvent& other) = delete;
-    ExternalEvent& operator=(const ExternalEvent& other) = delete;
+    ExternalEvent() = default;
+    ExternalEvent(const ExternalEvent& other) = default;
+    ExternalEvent& operator=(const ExternalEvent& other) = default;
 
     ExternalEvent(const std::string& port)
         : m_target(0)
-        , m_attributes(0)
         , m_port(port)
     {
     }
 
-    ExternalEvent(ExternalEvent& event,
-                  Simulator* target,
-                  const std::string& targetPortName)
-        : m_target(target),
-        m_attributes(event.m_attributes),
-        m_port(targetPortName)
+    ExternalEvent(Simulator* target,
+                  const std::shared_ptr<value::Value>& attributes,
+                  const std::string& port)
+        : m_target(target)
+        , m_attributes(attributes)
+        , m_port(port)
     {
     }
 
@@ -77,10 +76,14 @@ public:
     }
 
     Simulator* getTarget()
-    { return m_target; }
+    {
+        return m_target;
+    }
 
     bool onPort(const std::string& port) const
-    { return m_port == port; }
+    {
+        return m_port == port;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

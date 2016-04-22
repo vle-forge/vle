@@ -412,19 +412,17 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
          eventList.end(); ++it) {
 
         std::pair < Simulator::iterator, Simulator::iterator > x;
-        x = sim->targets((*it)->getPortName(), m_modelList);
+        x = sim->targets((*it).getPortName(), m_modelList);
 
         if (x.first != x.second and x.first->second.first) {
-            for (Simulator::iterator jt = x.first; jt != x.second; ++jt) {
-                m_eventTable.putExternalEvent(
-                    new ExternalEvent(*(*it),
-                                      jt->second.first,
-                                      jt->second.second));
-            }
-        }
 
-        delete (*it);
+            for (Simulator::iterator jt = x.first; jt != x.second; ++jt)
+                m_eventTable.putExternalEvent(jt->second.first,
+                                              it->attributes(),
+                                              jt->second.second);
+        }
     }
+
     eventList.clear();
 }
 

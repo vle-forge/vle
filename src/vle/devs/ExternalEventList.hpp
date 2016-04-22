@@ -36,9 +36,10 @@ namespace vle { namespace devs {
 
 class ExternalEvent;
 
-typedef std::vector < ExternalEvent* > ExternalEventList;
+typedef std::vector <ExternalEvent> ExternalEventList;
 
-VLE_API std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts);
+VLE_API std::ostream&
+operator<<(std::ostream& o, const ExternalEventList& evts);
 
 }} // namespace vle devs
 

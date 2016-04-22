@@ -33,9 +33,9 @@ namespace vle { namespace devs {
 std::ostream& operator<<(std::ostream& o, const ExternalEventList& evts)
 {
     for (const auto& elem : evts)
-        o << "port: '" << elem->getPortName() << "' value: '"
-          << (elem->haveAttributes() ?
-              elem->attributes().get()->writeToString() : "") << "'";
+        o << "port: '" << elem.getPortName() << "' value: '"
+          << (elem.haveAttributes() ?
+              elem.attributes().get()->writeToString() : "") << "'";
 
     return o;
 }

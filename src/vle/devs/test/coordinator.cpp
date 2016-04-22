@@ -46,6 +46,68 @@
 
 using namespace vle;
 
+class Model : public vle::devs::Dynamics
+{
+    int state;
+
+public:
+    Model(const vle::devs::DynamicsInit& init,
+          const vle::devs::InitEventList& events)
+        : vle::devs::Dynamics(init, events)
+    {}
+
+    virtual ~Model()
+    {}
+
+    virtual vle::devs::Time init(const vle::devs::Time& /* time */)
+    {
+        state = 0;
+        return vle::devs::infinity;
+    }
+
+    virtual void output(const vle::devs::Time& /* time */,
+                        vle::devs::ExternalEventList& output) const
+    {
+        output.emplace_back("out");
+
+        output.back().attributes() =
+            std::make_shared<value::String>("My message");
+    }
+
+    virtual vle::devs::Time timeAdvance() const
+    { return vle::devs::infinity; }
+
+    virtual void internalTransition(
+        const vle::devs::Time& /* time */)
+    { }
+
+    virtual void externalTransition(
+        const vle::devs::ExternalEventList& events,
+        const vle::devs::Time& /* time */)
+    {
+        for (const auto& elem : events)
+            if (elem.onPort("x"))
+                state = 1;
+    }
+
+    virtual void confluentTransitions(
+        const vle::devs::Time& time,
+        const vle::devs::ExternalEventList& extEventlist)
+    {
+        internalTransition(time);
+        externalTransition(extEventlist, time);
+    }
+
+    virtual std::unique_ptr<vle::value::Value>
+    observation(const vle::devs::ObservationEvent& /* event */) const
+    {
+        return std::unique_ptr<vle::value::Value>();
+    }
+
+    virtual void finish()
+    {}
+};
+
 BOOST_AUTO_TEST_CASE(test_del_coupled_model)
 {
     utils::ModuleManager modules;

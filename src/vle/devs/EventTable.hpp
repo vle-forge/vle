@@ -115,18 +115,8 @@ namespace vle { namespace devs {
             delete _intev;
             _intev = 0;
 
-            std::for_each(_extev.begin(), _extev.end(),
-                          boost::checked_deleter < ExternalEvent >());
             _extev.clear();
         }
-
-        friend std::ostream& operator<<(std::ostream& o, const EventBagModel& e)
-        {
-	    o << "[Internal: " << e._intev << "][Externals: ";
-	    for (size_t i = 0; i < e._extev.size(); ++i)
-		o << e._extev.at(i) << " ";
-	    return o;
-	}
 
     private:
 	InternalEvent*          _intev;
@@ -254,7 +244,7 @@ namespace vle { namespace devs {
 
         /**
          * Delete all existing events in vectors internal, external, state
-         * and init. Be carreful, don't delete Event that you have put.
+         * and init. Be carreful, don't delete Event that you have pute.
          */
         ~EventTable();
 
@@ -290,13 +280,16 @@ namespace vle { namespace devs {
         bool putInternalEvent(InternalEvent* event);
 
         /**
-         * Put an external event into vector heap. Delete Internal event from
-         * same model source if present in vector heap.
+         * Put an external event into scheduller. Delete the internal
+         * event from same model source if present in scheduller.
          *
-         * @param event ExternalEvent to put into vector heap.
-         * @return true.
+         * \param target The simulator that receives the external event.
+         * \param atts The attributes of the external event.
+         * \param port The destination port of the simulator.
          */
-        bool putExternalEvent(ExternalEvent* event);
+        void putExternalEvent(Simulator *target,
+                              const std::shared_ptr<value::Value>& atts,
+                              const std::string& port);
 
         /**
          * Put a state event into vector heap.
