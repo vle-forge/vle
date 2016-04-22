@@ -32,7 +32,47 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
 
+namespace {
+
+inline
+double
+pp_get(const vle::value::TupleValue& t, size_t i)
+{
+    if (i > t.size())
+        throw vle::utils::ArgError(
+            vle::fmt(_("Tuple: bad accessor %1%")) % i);
+
+    return t[i];
+}
+
+inline
+double&
+pp_get(vle::value::TupleValue& t, size_t i)
+{
+    if (i > t.size())
+        throw vle::utils::ArgError(
+            vle::fmt(_("Tuple: bad accessor %1%")) % i);
+
+    return t[i];
+}
+
+}
+
 namespace vle { namespace value {
+
+Tuple::Tuple(size_type n, double value)
+    : m_value(n, value)
+{
+    if (n <= 0)
+        throw utils::ArgError(
+            fmt(_("Tuple: bad constructor initialization %1%"))
+            % n);
+}
+
+Value::type Tuple::getType() const
+{
+    return Value::TUPLE;
+}
 
 void Tuple::writeFile(std::ostream& out) const
 {
@@ -66,6 +106,46 @@ void Tuple::writeXml(std::ostream& out) const
         out << *it;
     }
     out << "</tuple>";
+}
+
+double Tuple::operator[](size_type i) const
+{
+    return ::pp_get(m_value, i);
+}
+
+double& Tuple::operator[](size_type i)
+{
+    return ::pp_get(m_value, i);
+}    
+
+double Tuple::operator()(size_type i) const
+{
+    return ::pp_get(m_value, i);
+}
+
+double& Tuple::operator()(size_type i)
+{
+    return ::pp_get(m_value, i);
+}
+    
+double Tuple::get(size_type i) const
+{ 
+    return ::pp_get(m_value, i);
+}
+
+double& Tuple::get(size_type i)
+{ 
+    return ::pp_get(m_value, i);
+}
+  
+double Tuple::at(size_type i) const
+{ 
+    return ::pp_get(m_value, i);
+}
+
+double& Tuple::at(size_type i)
+{ 
+    return ::pp_get(m_value, i);
 }
 
 void Tuple::fill(const std::string& str)

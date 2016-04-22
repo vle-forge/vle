@@ -350,6 +350,17 @@ BOOST_AUTO_TEST_CASE(test_user_value)
     BOOST_REQUIRE(data.get() != cloned_data.get());
 }
 
+BOOST_AUTO_TEST_CASE(test_tuple)
+{
+    value::Tuple t(4, 1.);
+
+    for (auto & v : t.value())
+        BOOST_REQUIRE(v == 1.);
+
+    t(0) = 2;
+    BOOST_REQUIRE(t.at(0) == t(0));
+}
+
 BOOST_AUTO_TEST_CASE(test_table)
 {
     value::Table t(2, 3);

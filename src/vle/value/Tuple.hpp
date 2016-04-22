@@ -37,7 +37,7 @@ namespace vle { namespace value {
 /**
  * @brief Define a array of double.
  */
-typedef std::vector < double > TupleValue;
+typedef std::vector <double> TupleValue;
 
 /**
  * @brief A Tuple Value is a container to store a list of double value into
@@ -46,16 +46,14 @@ typedef std::vector < double > TupleValue;
 class VLE_API Tuple : public Value
 {
 public:
-    typedef TupleValue::size_type size_type;
-    typedef TupleValue::iterator iterator;
-    typedef TupleValue::const_iterator const_iterator;
+    using size_type = TupleValue::size_type;
+    using iterator = TupleValue::iterator;
+    using const_iterator = TupleValue::const_iterator;
 
     /**
      * @brief Build a Tuple object with a default value to empty TupleValue.
      */
-    Tuple()
-        : m_value()
-    {}
+    Tuple() = default;
 
     /**
      * @brief Build a Tuple object with a default size of `n' elements
@@ -63,23 +61,18 @@ public:
      * @param n The number of elements to initially create.
      * @param value The default value.
      */
-    Tuple(size_type n, double value = 0.0)
-        : m_value(n, value)
-    {}
+    Tuple(size_type n, double value = 0.0);
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Tuple(const Tuple& value)
-        : Value(value), m_value(value.m_value)
-    {}
+    Tuple(const Tuple& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Tuple()
-    {}
+    virtual ~Tuple() {}
 
     ///
     ////
@@ -121,8 +114,7 @@ public:
      * @brief Get the type of this class.
      * @return Value::TUPLE.
      */
-    virtual Value::type getType() const override
-    { return Value::TUPLE; }
+    virtual Value::type getType() const override;
 
     /**
      * @brief Push all real from the TupleValue separated by space.
@@ -192,8 +184,7 @@ public:
      * @param i The index of the value to get.
      * @return The real at the specified index.
      */
-    inline const double& operator[](size_type i) const
-    { return m_value[i]; }
+    double operator[](size_type i) const;
 
     /**
      * @brief Get a reference to the real at the specified index. Be
@@ -201,17 +192,31 @@ public:
      * @param i The index of the value to get.
      * @return The real at the specified index.
      */
-    inline double& operator[](size_type i)
-    { return m_value[i]; }
+    double& operator[](size_type i);
 
+    /**
+     * @brief Get a constant reference to the real at the specified index. Be
+     * careful, the index is not tested.
+     * @param i The index of the value to get.
+     * @return The real at the specified index.
+     */
+    double operator()(size_type i) const;
+
+    /**
+     * @brief Get a reference to the real at the specified index. Be
+     * careful, the index is not tested.
+     * @param i The index of the value to get.
+     * @return The real at the specified index.
+     */
+    double& operator()(size_type i);
+    
     /**
      * @brief Get a constant reference to the real at the specified index.
      * @param i The index of the value to get.
      * @return The real at the specified index.
      * @throw std::out_of_range if the index is too big.
      */
-    inline const double& at(size_type i) const
-    { return m_value.at(i); }
+    double get(size_type i) const;
 
     /**
      * @brief Get a reference to the real at the specified index.
@@ -219,8 +224,23 @@ public:
      * @return The real at the specified index.
      * @throw std::out_of_range if the index is too big.
      */
-    inline double& at(size_type i)
-    { return m_value.at(i); }
+    double& get(size_type i);
+    
+    /**
+     * @brief Get a constant reference to the real at the specified index.
+     * @param i The index of the value to get.
+     * @return The real at the specified index.
+     * @throw std::out_of_range if the index is too big.
+     */
+    double at(size_type i) const;
+
+    /**
+     * @brief Get a reference to the real at the specified index.
+     * @param i The index of the value to get.
+     * @return The real at the specified index.
+     * @throw std::out_of_range if the index is too big.
+     */
+    double& at(size_type i);
 
     /**
      * @brief Fill the current tuple with multiple reals read from a string.
