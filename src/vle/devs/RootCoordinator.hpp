@@ -107,12 +107,9 @@ namespace vle { namespace devs {
          * the simulation. This function can return NULL lists of view is empty
          * or no storage are used.
          *
-         * @attention You need to delete the value::Map and after the
-         * destruction of the RootCoordinator..
-         *
          * @return Return a pointer to the data of the list of plug-ins.
          */
-        value::Map * outputs();
+        std::unique_ptr<value::Map> outputs();
 
         /**
          * @brief Return a reference to the random generator.
@@ -136,7 +133,7 @@ namespace vle { namespace devs {
         devs::Time          m_end;
 
         /** @brief Stores the results of the simulation. */
-        value::Map          *m_result;
+        std::unique_ptr<value::Map> m_result;
 
         Coordinator*        m_coordinator;
         vpz::BaseModel*     m_root;

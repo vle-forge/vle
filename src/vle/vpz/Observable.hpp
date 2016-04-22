@@ -88,13 +88,13 @@ namespace vle { namespace vpz {
          * @endcode
          * @param out
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this class.
          * @return OBSERVABLEPORT.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_OBSERVABLEPORT; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -233,13 +233,13 @@ namespace vle { namespace vpz {
          * @endcode
          * @param out The output stream parameter.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this class.
          * @return OBSERVABLE.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_OBSERVABLE; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

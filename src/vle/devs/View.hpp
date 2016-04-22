@@ -132,7 +132,7 @@ public:
      * @attention You are in charge of freeing the value::Matrix after
      * the end of the simulation.
      */
-    value::Matrix * matrix() const;
+    std::unique_ptr<value::Matrix> matrix() const;
 
 protected:
     ObservableList      m_observableList;
@@ -156,10 +156,10 @@ public:
     virtual ~TimedView()
     {}
 
-    virtual bool isTimed() const
+    virtual bool isTimed() const override
     { return true; }
 
-    virtual Time getNextTime(const Time& current) const
+    virtual Time getNextTime(const Time& current) const override
     {
         return current + mTimestep;
     }
@@ -182,10 +182,10 @@ public:
     virtual ~EventView()
     {}
 
-    virtual bool isEvent() const
+    virtual bool isEvent() const override
     { return true; }
 
-    virtual Time getNextTime(const Time& /*current*/) const
+    virtual Time getNextTime(const Time& /*current*/) const override
     {
         return infinity;
     }
@@ -205,10 +205,10 @@ public:
     virtual ~FinishView()
     {}
 
-    virtual bool isFinish() const
+    virtual bool isFinish() const override
     { return true; }
 
-    virtual Time getNextTime(const Time& /*current*/) const
+    virtual Time getNextTime(const Time& /*current*/) const override
     {
         return infinity;
     }

@@ -70,11 +70,12 @@ public:
         }
     }
 
-    value::Map * runVerboseRun(vpz::Vpz                   *vpz,
-                               const utils::ModuleManager &modulemgr,
-                               Error                      *error)
+    std::unique_ptr<value::Map>
+    runVerboseRun(vpz::Vpz                   *vpz,
+                  const utils::ModuleManager &modulemgr,
+                  Error                      *error)
     {
-        value::Map   *result = 0;
+        std::unique_ptr<value::Map> result;
         boost::timer  timer;
 
         try {
@@ -134,11 +135,12 @@ public:
         return result;
     }
 
-    value::Map * runVerboseSummary(vpz::Vpz                   *vpz,
-                                   const utils::ModuleManager &modulemgr,
-                                   Error                      *error)
+    std::unique_ptr<value::Map>
+    runVerboseSummary(vpz::Vpz                   *vpz,
+                      const utils::ModuleManager &modulemgr,
+                      Error                      *error)
     {
-        value::Map   *result = 0;
+        std::unique_ptr<value::Map> result;
         boost::timer  timer;
 
         try {
@@ -185,11 +187,12 @@ public:
         return result;
     }
 
-    value::Map * runQuiet(vpz::Vpz                   *vpz,
-                          const utils::ModuleManager &modulemgr,
-                          Error                      *error)
+    std::unique_ptr<value::Map>
+    runQuiet(vpz::Vpz                   *vpz,
+             const utils::ModuleManager &modulemgr,
+             Error                      *error)
     {
-        value::Map *result = 0;
+        std::unique_ptr<value::Map> result;
 
         try {
             devs::RootCoordinator root(modulemgr);
@@ -227,12 +230,13 @@ Simulation::~Simulation()
     delete mPimpl;
 }
 
-value::Map * Simulation::run(vpz::Vpz                   *vpz,
-                             const utils::ModuleManager &modulemgr,
-                             Error                      *error)
+std::unique_ptr<value::Map>
+Simulation::run(vpz::Vpz                   *vpz,
+                const utils::ModuleManager &modulemgr,
+                Error                      *error)
 {
     error->code = 0;
-    value::Map *result = NULL;
+    std::unique_ptr<value::Map> result;
 
     if (mPimpl->m_logoptions != manager::LOG_NONE) {
         if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {
@@ -246,8 +250,7 @@ value::Map * Simulation::run(vpz::Vpz                   *vpz,
     }
 
     if (mPimpl->m_simulationoptions & manager::SIMULATION_NO_RETURN) {
-        delete result;
-        return NULL;
+        return {};
     } else {
         return result;
     }

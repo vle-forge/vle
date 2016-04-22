@@ -28,9 +28,10 @@
 #ifndef VLE_VPZ_OUTPUT_HPP
 #define VLE_VPZ_OUTPUT_HPP
 
-#include <string>
 #include <vle/vpz/Base.hpp>
 #include <vle/DllDefines.hpp>
+#include <string>
+#include <memory>
 
 namespace vle {
 
@@ -100,13 +101,13 @@ namespace vle {
          * @endcode
          * @param out The output stream.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this class.
          * @return OUTPUT.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_OUTPUT; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -177,7 +178,7 @@ namespace vle {
          * deleted. Be careful, the data parameter is not cloned.
          * @param value The new data to assign.
          */
-        void setData(value::Value* value);
+        void setData(std::unique_ptr<value::Value> value);
 
         /**
          * @brief Delete the m_data value and assign null.
@@ -229,7 +230,7 @@ namespace vle {
          * @brief Get a reference to the data. The data can be null.
          * @return a string representation of the data.
          */
-        const value::Value* data() const
+        const std::unique_ptr<value::Value>& data() const
         { return m_data; }
 
         /**
@@ -254,12 +255,12 @@ namespace vle {
 	bool operator==(const Output& output) const;
 
     private:
-        Format          m_format;
-        std::string     m_name;
-        std::string     m_plugin;
-        std::string     m_location;
-        std::string     m_package;
-        value::Value*   m_data;
+        Format                        m_format;
+        std::string                   m_name;
+        std::string                   m_plugin;
+        std::string                   m_location;
+        std::string                   m_package;
+        std::unique_ptr<value::Value> m_data;
     };
 
 }} // namespace vle vpz

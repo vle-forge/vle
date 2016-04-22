@@ -96,28 +96,28 @@ namespace vle { namespace devs {
          * @param time the time of the creation of this model.
          * @return duration of the initial state.
          */
-        virtual Time init(const Time& time);
+        virtual Time init(const Time& time) override;
 
         /**
          * @brief Process the output function: compute the output function.
          * @param time the time of the occurrence of output function.
          * @param output the list of external events (output parameter).
          */
-        virtual void output(const Time& time, ExternalEventList& output) const;
+        virtual void output(const Time& time, ExternalEventList& output) const override;
 
         /**
          * @brief Process the time advance function: compute the duration of the
          * current state.
          * @return duration of the current state.
          */
-        virtual Time timeAdvance() const;
+        virtual Time timeAdvance() const override;
 
         /**
          * @brief Process an internal transition: compute the new state of the
          * model with the internal transition function.
          * @param time the date of occurence of this event.
          */
-        virtual void internalTransition(const Time& time);
+        virtual void internalTransition(const Time& time) override;
 
         /**
          * @brief Process an external transition: compute the new state of the
@@ -127,7 +127,7 @@ namespace vle { namespace devs {
          */
         virtual void
             externalTransition(const ExternalEventList& event,
-                               const Time& time);
+                               const Time& time) override;
 
         /**
          * @brief Process the confluent transition: select the transition to
@@ -138,7 +138,7 @@ namespace vle { namespace devs {
          */
         virtual void
             confluentTransitions(const Time& time,
-                                 const ExternalEventList& extEventlist);
+                                 const ExternalEventList& extEventlist) override;
 
         /**
          * @brief Process an observation event: compute the current state of the
@@ -146,14 +146,14 @@ namespace vle { namespace devs {
          * @param event the state event with of the port
          * @return the value of state variable
          */
-        virtual vle::value::Value*
-            observation(const ObservationEvent& event) const;
+        virtual std::unique_ptr<vle::value::Value>
+            observation(const ObservationEvent& event) const override;
 
         /**
          * @brief When the simulation of the atomic model is finished, the
          * finish method is invoked.
          */
-        virtual void finish();
+        virtual void finish() override;
 
     private:
         Dynamics* mDynamics;

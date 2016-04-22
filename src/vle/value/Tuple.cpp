@@ -35,7 +35,7 @@ namespace vle { namespace value {
 
 void Tuple::writeFile(std::ostream& out) const
 {
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+    for (auto it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << " ";
         }
@@ -46,7 +46,7 @@ void Tuple::writeFile(std::ostream& out) const
 void Tuple::writeString(std::ostream& out) const
 {
     out << "(";
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+    for (auto it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << ",";
         }
@@ -58,7 +58,7 @@ void Tuple::writeString(std::ostream& out) const
 void Tuple::writeXml(std::ostream& out) const
 {
     out << "<tuple>";
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+    for (auto it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << " ";
         }
@@ -76,19 +76,18 @@ void Tuple::fill(const std::string& str)
     boost::algorithm::split(result, cpy,
                             boost::algorithm::is_any_of(" \n\t\r"));
 
-    for (std::vector < std::string >::iterator it = result.begin();
-         it != result.end(); ++it) {
-        boost::algorithm::trim(*it);
-        if (not (*it).empty()) {
+    for (auto & elem : result) {
+        boost::algorithm::trim(elem);
+        if (not (elem).empty()) {
             try {
-                m_value.push_back(boost::lexical_cast < double >(*it));
+                m_value.push_back(boost::lexical_cast < double >(elem));
             } catch(const boost::bad_lexical_cast& e) {
                 try {
-                    m_value.push_back(boost::lexical_cast < long >(*it));
+                    m_value.push_back(boost::lexical_cast < long >(elem));
                 } catch(const boost::bad_lexical_cast& e) {
                     throw utils::ArgError(fmt(
                                 "Can not convert string '%1%' into"
-                                " double or long") % (*it));
+                                " double or long") % (elem));
                 }
             }
         }

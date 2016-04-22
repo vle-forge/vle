@@ -64,7 +64,7 @@ public:
      * @param width The number of columns.
      * @param height The number of rows.
      */
-    Table(const index& width, const index& height)
+    Table(index width, index height)
         : m_value(boost::extents[width][height]), m_width(width),
         m_height(height)
     {}
@@ -94,8 +94,10 @@ public:
      *
      * @return A new empty Table.
      */
-    static Table* create()
-    { return new Table(); }
+    static std::unique_ptr<value::Value> create()
+    {
+        return std::unique_ptr<value::Value>(new Table());
+    }
 
     /**
      * @brief Build a Table with a specified size.
@@ -106,8 +108,10 @@ public:
      * @return A new Table with the specified size, all real are initialized
      * with 0.0.
      */
-    static Table* create(const index& width, const index& height)
-    { return new Table(width, height); }
+    static std::unique_ptr<value::Value> create(index width, index height)
+    {
+        return std::unique_ptr<value::Value>(new Table(width, height));
+    }
 
     ///
     ////
@@ -117,15 +121,15 @@ public:
      * @brief Clone the current Table with the same TableValue datas.
      * @return A new Table.
      */
-    virtual Value* clone() const
-    { return new Table(*this); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new Table(*this)); }
 
     /**
      * @brief Get the type of this class.
      *
      * @return Value::TABLE.
      */
-    virtual Value::type getType() const
+    virtual Value::type getType() const override
     { return Value::TABLE; }
 
     /**
@@ -138,7 +142,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TableValue separated by colon for
@@ -150,7 +154,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TableValue into an XML representation.
@@ -162,7 +166,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -261,29 +265,23 @@ private:
     index           m_height;
 };
 
+inline const Table& toTableValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toTable(); }
+
 inline const Table& toTableValue(const Value& value)
 { return value.toTable(); }
-
-inline const Table* toTableValue(const Value* value)
-{ return value ? &value->toTable() : 0; }
 
 inline Table& toTableValue(Value& value)
 { return value.toTable(); }
 
-inline Table* toTableValue(Value* value)
-{ return value ? &value->toTable() : 0; }
+inline const TableValue& toTable(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toTable().value(); }
 
 inline const TableValue& toTable(const Value& value)
 { return value.toTable().value(); }
 
 inline TableValue& toTable(Value& value)
 { return value.toTable().value(); }
-
-inline const TableValue& toTable(const Value* value)
-{ return value::reference(value).toTable().value(); }
-
-inline TableValue& toTable(Value* value)
-{ return value::reference(value).toTable().value(); }
 
 }} // namespace vle value
 

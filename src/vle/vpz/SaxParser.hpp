@@ -103,13 +103,13 @@ namespace vle { namespace vpz {
          * @brief Get the content of the SaxStackValue.
          * @return A constant reference to the vector of value::Value.
          */
-        const std::vector < value::Value* >& getValues() const;
+        const std::vector <std::unique_ptr<value::Value>>& getValues() const;
 
         /**
          * @brief Get the content of the SaxParserError.
          * @return A reference to the vector of value::Value.
          */
-        std::vector < value::Value* >& getValues();
+        std::vector <std::unique_ptr<value::Value>>& getValues();
 
         /**
          * @brief Get the content of a specific cells of the SaxStackValue.
@@ -117,7 +117,7 @@ namespace vle { namespace vpz {
          * @throw utils::SaxParserError if i is greater that size of the vector.
          * @return A constant reference to the value.
          */
-        value::Value* getValue(const size_t pos) const;
+        const std::unique_ptr<value::Value>& getValue(const size_t pos) const;
 
         /**
          * @brief Get a constant reference to the Vpz.

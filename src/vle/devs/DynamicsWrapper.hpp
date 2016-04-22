@@ -105,7 +105,7 @@ namespace vle { namespace devs {
          * call.
          * @return false if Dynamics is not a DynamicsWrapper.
          */
-        inline virtual bool isWrapper() const
+        inline virtual bool isWrapper() const override
         { return true; }
 
     protected:

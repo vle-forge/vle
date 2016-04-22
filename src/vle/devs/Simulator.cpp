@@ -218,7 +218,8 @@ InternalEvent* Simulator::externalTransition(
     return buildInternalEvent(time);
 }
 
-value::Value* Simulator::observation(const ObservationEvent& event) const
+std::unique_ptr<value::Value>
+Simulator::observation(const ObservationEvent& event) const
 {
     return m_dynamics->observation(event);
 }

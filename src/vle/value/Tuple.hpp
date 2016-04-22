@@ -63,7 +63,7 @@ public:
      * @param n The number of elements to initially create.
      * @param value The default value.
      */
-    Tuple(const size_type& n, const double& value = 0.0)
+    Tuple(size_type n, double value = 0.0)
         : m_value(n, value)
     {}
 
@@ -89,8 +89,10 @@ public:
      * @brief Build a Tuple.
      * @return A new Tuple.
      */
-    static Tuple* create()
-    { return new Tuple(); }
+    static std::unique_ptr<value::Value> create()
+    {
+        return std::unique_ptr<value::Value>(new Tuple());
+    }
 
     /**
      * @brief Build a Tuple object with a default size of `n' elements
@@ -99,8 +101,10 @@ public:
      * @param value The default value.
      * @return A new Tuple.
      */
-    static Tuple* create(const size_type& n, const double& value = 0.0)
-    { return new Tuple(n, value); }
+    static std::unique_ptr<value::Value> create(size_type n, double value = 0.0)
+    {
+        return std::unique_ptr<value::Value>(new Tuple(n, value));
+    }
 
     ///
     ////
@@ -110,27 +114,27 @@ public:
      * @brief Clone the current Tuple with the same TupleValue datas.
      * @return A new Tuple.
      */
-    virtual Value* clone() const
-    { return new Tuple(*this); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new Tuple(*this)); }
 
     /**
      * @brief Get the type of this class.
      * @return Value::TUPLE.
      */
-    virtual Value::type getType() const
+    virtual Value::type getType() const override
     { return Value::TUPLE; }
 
     /**
      * @brief Push all real from the TupleValue separated by space.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TupleValue separated by colon.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TupleValue. The XML representation of this
@@ -141,7 +145,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -235,29 +239,23 @@ private:
     TupleValue              m_value;
 };
 
+inline const Tuple& toTupleValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toTuple(); }
+
 inline const Tuple& toTupleValue(const Value& value)
 { return value.toTuple(); }
-
-inline const Tuple* toTupleValue(const Value* value)
-{ return value ? &value->toTuple() : 0; }
 
 inline Tuple& toTupleValue(Value& value)
 { return value.toTuple(); }
 
-inline Tuple* toTupleValue(Value* value)
-{ return value ? &value->toTuple() : 0; }
+inline const TupleValue& toTuple(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toTuple().value(); }
 
 inline const TupleValue& toTuple(const Value& value)
 { return value.toTuple().value(); }
 
 inline TupleValue& toTuple(Value& value)
 { return value.toTuple().value(); }
-
-inline const TupleValue& toTuple(const Value* value)
-{ return value::reference(value).toTuple().value(); }
-
-inline TupleValue& toTuple(Value* value)
-{ return value::reference(value).toTuple().value(); }
 
 }} // namespace vle value
 

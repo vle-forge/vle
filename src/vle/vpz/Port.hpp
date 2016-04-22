@@ -54,14 +54,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return IN.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_IN; }
     };
 
@@ -86,14 +86,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return OUT.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_OUT; }
     };
 
@@ -118,14 +118,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return INIT.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_INIT; }
     };
 
@@ -150,14 +150,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return STATE.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_STATE; }
     };
 
@@ -182,14 +182,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return PORT.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_PORT; }
     };
 

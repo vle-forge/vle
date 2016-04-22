@@ -73,13 +73,13 @@ namespace vle { namespace vpz {
          * @endcode
          * @param out an output stream.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this class.
          * @return MODEL.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_MODEL; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -201,14 +201,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return SUBMODELS.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_SUBMODELS; }
     };
 
@@ -233,14 +233,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return CONNECTIONS.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_CONNECTIONS; }
     };
 
@@ -265,14 +265,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return INTERNAL_CONNECTION.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_INTERNAL_CONNECTION; }
     };
 
@@ -297,14 +297,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return INPUT_CONNECTION.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_INPUT_CONNECTION; }
     };
 
@@ -329,14 +329,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return OUTPUT_CONNECTION.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_OUTPUT_CONNECTION; }
     };
 
@@ -366,14 +366,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return ORIGIN.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_ORIGIN; }
 
         std::string model; //!< the name of the model.
@@ -406,14 +406,14 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
          * @brief Get the type of this class.
          * @return DESTINATION.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_DESTINATION; }
 
         std::string model; //!< the name of the model.

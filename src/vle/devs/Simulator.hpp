@@ -171,8 +171,9 @@ namespace vle { namespace devs {
 
         InternalEvent* externalTransition(const ExternalEventList& event,
                                           const Time& time);
-
-        value::Value* observation(const ObservationEvent& event) const;
+        
+        std::unique_ptr<value::Value>
+            observation(const ObservationEvent& event) const;
 
     private:
         TargetSimulatorList mTargets;

@@ -86,20 +86,19 @@ void Table::fill(const std::string& str)
 
     index i = 0;
     index j = 0;
-    for (std::vector < std::string >::iterator it = result.begin();
-         it != result.end(); ++it) {
-        boost::algorithm::trim(*it);
-        if (not (*it).empty()) {
+    for (auto & elem : result) {
+        boost::algorithm::trim(elem);
+        if (not (elem).empty()) {
             double result;
             try {
-                result = boost::lexical_cast < double >(*it);
+                result = boost::lexical_cast < double >(elem);
             } catch(const boost::bad_lexical_cast& e) {
                 try {
-                    result = boost::lexical_cast < long >(*it);
+                    result = boost::lexical_cast < long >(elem);
                 } catch(const boost::bad_lexical_cast& e) {
                     throw utils::ArgError(fmt(_(
                             "Can not convert string \'%1%\' into"
-                            " double or long")) % (*it));
+                            " double or long")) % (elem));
                 }
             }
 

@@ -77,8 +77,10 @@ public:
      * @param value the value of the boolean.
      * @return A new Boolean.
      */
-    static Boolean* create(bool value = false)
-    { return new Boolean(value); }
+    static std::unique_ptr<value::Value> create(bool value = true)
+    {
+        return std::unique_ptr<value::Value>(new Boolean(value));
+    }
 
     ///
     ////
@@ -88,14 +90,14 @@ public:
      * @brief Clone the current Boolean with the same value.
      * @return A new Boolean.
      */
-    virtual Value* clone() const
-    { return new Boolean(m_value); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new Boolean(m_value)); }
 
     /**
      * @brief Get the type of this class.
      * @return Return Value::BOOLEAN.
      */
-    inline virtual Value::type getType() const
+    inline virtual Value::type getType() const override
     { return Value::BOOLEAN; }
 
     /**
@@ -103,14 +105,14 @@ public:
      * alphabool() to get true or false string instead of 0 an 1.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the bool in the stream. Use the ostream operator
      * alphabool() to get true or false string instead of 0 and 1.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the bool in the stream. The string pushed in the ostream:
@@ -120,7 +122,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -151,29 +153,23 @@ private:
     bool m_value;
 };
 
+inline const Boolean& toBooleanValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toBoolean(); }
+
 inline const Boolean& toBooleanValue(const Value& value)
 { return value.toBoolean(); }
-
-inline const Boolean* toBooleanValue(const Value* value)
-{ return value ? &value->toBoolean() : 0; }
 
 inline Boolean& toBooleanValue(Value& value)
 { return value.toBoolean(); }
 
-inline Boolean* toBooleanValue(Value* value)
-{ return value ? &value->toBoolean() : 0; }
+inline bool toBoolean(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toBoolean().value(); }
 
 inline bool toBoolean(const Value& value)
 { return value.toBoolean().value(); }
 
 inline bool& toBoolean(Value& value)
 { return value.toBoolean().value(); }
-
-inline bool toBoolean(const Value* value)
-{ return value::reference(value).toBoolean().value(); }
-
-inline bool& toBoolean(Value* value)
-{ return value::reference(value).toBoolean().value(); }
 
 }} // namespace vle value
 

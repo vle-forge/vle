@@ -77,13 +77,13 @@ namespace vle { namespace vpz {
          * @endcode
          * @param out an output stream.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Return the type of this class.
          * @return OUTPUTS.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_OUTPUTS; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

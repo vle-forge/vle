@@ -39,18 +39,23 @@
 
 namespace vle { namespace value {
 
+Set::Set(const size_type& size)
+    : m_value(size)
+{}
+
 Set::Set(const Set& setfactory)
     : Value(setfactory)
 {
-    m_value.resize(setfactory.size());
+    m_value.reserve(setfactory.size());
 
-    std::transform(setfactory.begin(), setfactory.end(),
-                   m_value.begin(), CloneValue());
+    for (const auto & elem : setfactory.m_value)
+        m_value.emplace_back(
+            std::unique_ptr<Value>(elem.get() ? elem->clone() : nullptr));
 }
 
 void Set::writeFile(std::ostream& out) const
 {
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+    for (auto it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << ",";
         }
@@ -66,7 +71,7 @@ void Set::writeString(std::ostream& out) const
 {
     out << "(";
 
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+    for (auto it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << ",";
         }
@@ -84,9 +89,9 @@ void Set::writeXml(std::ostream& out) const
 {
     out << "<set>";
 
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
-        if (*it) {
-            (*it)->writeXml(out);
+    for (const auto & elem : m_value) {
+        if (elem) {
+            (elem)->writeXml(out);
         } else {
             out << "<null />";
         }
@@ -95,127 +100,68 @@ void Set::writeXml(std::ostream& out) const
     out << "</set>";
 }
 
-Value* Set::give(const size_type& i)
-{
-    if (i >= size()) {
-        throw utils::ArgError(_("Set: too big index"));
-    }
-
-    Value* result = m_value[i];
-    m_value[i] = 0;
-    return result;
-}
-
-void Set::del(const size_type i)
-{
-    if (i >= size()) {
-        throw utils::ArgError(_("Set: too big index"));
-    }
-
-    delete m_value[i];
-    m_value[i] = 0;
-    m_value.erase(begin() + i);
-}
-
-void Set::clear()
-{
-    std::for_each(begin(), end(), boost::checked_deleter < Value >());
-
-    m_value.clear();
-}
-
 Set& Set::addSet()
 {
-    Set* value = new Set();
-
-    m_value.push_back(value);
-
-    return *value;
+    return pp_add<Set>();
 }
 
 Map& Set::addMap()
 {
-    Map* value = new Map();
-
-    m_value.push_back(value);
-
-    return *value;
+    return pp_add<Map>();
 }
 
 Matrix& Set::addMatrix()
 {
-    Matrix* value = new Matrix();
-
-    m_value.push_back(value);
-
-    return *value;
-}
-
-void
-Set::resize(int newSize, const Value& fill)
-{
-    if ((int) size() == newSize) {
-        return;
-    }
-    if ((int) size() > newSize) {
-        for (int i=(int) size()-1; i>newSize; i--) {
-            delete m_value[i];
-        }
-        m_value.resize(newSize);
-    } else {
-        int oldSize = (int) size();
-        m_value.resize(newSize);
-        for (int i=oldSize; i<(int) size(); i++) {
-            m_value[i] = fill.clone();
-        }
-    }
+    return pp_add<Matrix>();
 }
 
 Set& Set::getSet(const size_type& i)
 {
-    value::Value& value = value::reference(get(i));
-
-    return value::toSetValue(value);
+    return pp_get_value(i).toSet();
 }
 
 Map& Set::getMap(const size_type& i)
 {
-    value::Value& value = value::reference(get(i));
-
-    return value::toMapValue(value);
+    return pp_get_value(i).toMap(); 
 }
 
 Matrix& Set::getMatrix(const size_type& i)
 {
-    value::Value& value = value::reference(get(i));
-
-    return value::toMatrixValue(value);
+    return pp_get_value(i).toMatrix();
 }
 
 const Set& Set::getSet(const size_type& i) const
 {
-    const value::Value& value = value::reference(get(i));
-
-    return value::toSetValue(value);
+    return pp_get_value(i).toSet();
 }
 
 const Map& Set::getMap(const size_type& i) const
 {
-    const value::Value& value = value::reference(get(i));
-
-    return value::toMapValue(value);
+    return pp_get_value(i).toMap();
 }
 
 const Matrix& Set::getMatrix(const size_type& i) const
 {
-    const value::Value& value = value::reference(get(i));
-
-    return value::toMatrixValue(value);
+    return pp_get_value(i).toMatrix();
 }
 
-void Set::remove(const size_type& i)
+void Set::resize(size_type newSize, const Value& fill)
 {
-    del(i);
+    if (newSize == size())
+        return;
+
+    if (newSize > size()) {
+        auto old_size = size();
+        auto to_fill = newSize - size();
+        m_value.resize(newSize);
+
+        for (size_t i = 0; i != to_fill; ++i)
+            m_value[old_size + i] = fill.clone();
+        
+        return;
+    }
+    
+    m_value.resize(newSize);
 }
 
 }} // namespace vle value

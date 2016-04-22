@@ -27,6 +27,7 @@
 
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Coordinator.hpp>
+#include <cassert>
 
 namespace vle { namespace devs {
 
@@ -40,21 +41,50 @@ namespace vle { namespace devs {
  * @return NULL if the \c vle::devs::ViewList does not have storage
  * plug-ins.
  */
-static value::Map * getMatrixFromView(const ViewList &views)
+static std::unique_ptr<value::Map> getMatrixFromView(const ViewList &views)
 {
-    value::Map * result = 0;
+    std::unique_ptr<value::Map> result;
 
     ViewList::const_iterator it = views.begin();
     while (it != views.end()) {
-        value::Matrix *matrix = it->second->matrix();
+        auto matrix = it->second->matrix();
 
         if (matrix) {
-            if (not result) {
-                result = new value::Map();
-            }
-            result->add(it->first, matrix);
-        }
+            if (not result)
+                result = std::unique_ptr<value::Map>(new value::Map());
 
+            result->add(it->first, std::move(matrix));
+        }
+        ++it;
+    }
+
+    return result;
+}
+
+/**
+ * Retrieves for all Views the \c vle::value::Matrix result.
+ *
+ * The \c getMatrixFromView is a private implementation function.
+ *
+ * @param views The \c vle::devs::ViewList to browse.
+ *
+ * @return NULL if the \c vle::devs::ViewList does not have storage
+ * plug-ins.
+ */
+static std::unique_ptr<value::Map> getCloneMatrixFromView(const ViewList &views)
+{
+    std::unique_ptr<value::Map> result;
+
+    ViewList::const_iterator it = views.begin();
+    while (it != views.end()) {
+        auto matrix = it->second->matrix();
+
+        if (matrix) {
+            if (not result)
+                result = std::unique_ptr<value::Map>(new value::Map());
+
+            result->add(it->first, matrix->clone());
+        }
         ++it;
     }
 
@@ -64,7 +94,7 @@ static value::Map * getMatrixFromView(const ViewList &views)
                        /* - - - - - - - - - -*/
 
 RootCoordinator::RootCoordinator(const utils::ModuleManager& modulemgr)
-    : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0), m_result(0),
+    : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0),
       m_coordinator(0), m_root(0), m_modulemgr(modulemgr)
 {
 }
@@ -121,8 +151,9 @@ void RootCoordinator::finish()
     if (m_coordinator) {
         m_coordinator->finish();
 
-        if (!m_result)
-            m_result = getMatrixFromView(m_coordinator->getViews());
+        assert(m_result);
+        
+        m_result = getMatrixFromView(m_coordinator->getViews());
 
         delete m_coordinator;
         m_coordinator = 0;
@@ -134,12 +165,12 @@ void RootCoordinator::finish()
     }
 }
 
-value::Map * RootCoordinator::outputs()
+std::unique_ptr<value::Map> RootCoordinator::outputs()
 {
-    if (!m_result && m_coordinator)
-        m_result = getMatrixFromView(m_coordinator->getViews());
+    if (m_coordinator)
+        return getCloneMatrixFromView(m_coordinator->getViews());
 
-    return m_result;
+    return std::move(m_result);
 }
 
 }} // namespace vle devs

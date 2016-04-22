@@ -76,7 +76,7 @@ public:
               const std::string& package,
               const std::string& location,
               const std::string& file,
-              value::Value* parameters,
+              std::unique_ptr<value::Value> parameters,
               const devs::Time& time);
 
     void processNewObservable(Simulator* simulator,
@@ -97,7 +97,7 @@ public:
                  const std::string& portname,
                  const devs::Time& time,
                  const std::string& view,
-                 value::Value* value);
+                 std::unique_ptr<value::Value> value);
 
     /**
      * Close the output stream.
@@ -115,7 +115,7 @@ public:
      * @attention You are in charge of freeing the value::Matrix after
      * the end of the simulation.
      */
-    value::Matrix * matrix() const;
+    std::unique_ptr<value::Matrix> matrix() const;
 
     ///
     ////

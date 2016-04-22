@@ -50,8 +50,8 @@ public:
      * @brief Build an Xml object with a specified value.
      * @param value The value to copy.
      */
-    Xml(const std::string& value)
-        : m_value(value)
+    Xml(std::string  value)
+        : m_value(std::move(value))
     {}
 
     /**
@@ -77,8 +77,11 @@ public:
      * @param value the default value of the Xml.
      * @return A new allocated Xml.
      */
-    static Xml* create(const std::string& value = std::string())
-    { return new Xml(value); }
+    static std::unique_ptr<value::Value> create(
+        const std::string& value = std::string())
+    {
+        return std::unique_ptr<value::Value>(new Xml(value));
+    }
 
     ///
     ////
@@ -88,27 +91,27 @@ public:
      * @brief Clone the current Xml with the same value.
      * @return A new Xml.
      */
-    virtual Value* clone() const
-    { return new Xml(m_value); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new Xml(m_value)); }
 
     /**
      * @brief Get the type of this class.
      * @return Return Value::XMLTYPE.
      */
-    virtual Value::type getType() const
+    virtual Value::type getType() const override
     { return Value::XMLTYPE; }
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream. The string pushed in
@@ -122,7 +125,7 @@ public:
      * @endcode
      * @param out
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     /**
      * @brief Get a constant reference to the encapsulated std::string.
@@ -149,29 +152,23 @@ private:
     std::string     m_value;
 };
 
+inline const Xml& toXmlValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toXml(); }
+
 inline const Xml& toXmlValue(const Value& value)
 { return value.toXml(); }
-
-inline const Xml* toXmlValue(const Value* value)
-{ return value ? &value->toXml() : 0; }
 
 inline Xml& toXmlValue(Value& value)
 { return value.toXml(); }
 
-inline Xml* toXmlValue(Value* value)
-{ return value ? &value->toXml() : 0; }
+inline const std::string& toXml(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toXml().value(); }
 
 inline const std::string& toXml(const Value& value)
 { return value.toXml().value(); }
 
 inline std::string& toXml(Value& value)
 { return value.toXml().value(); }
-
-inline const std::string& toXml(const Value* value)
-{ return value::reference(value).toXml().value(); }
-
-inline std::string& toXml(Value* value)
-{ return value::reference(value).toXml().value(); }
 
 }} // namespace vle value
 

@@ -38,13 +38,12 @@ namespace gvle {
 
 
 DefaultSimSubpanelThread::DefaultSimSubpanelThread():
-        output_map(0), mvpm(0), mpkg(0), error_simu("")
+    mvpm(0), mpkg(0), error_simu("")
 {
 }
 
 DefaultSimSubpanelThread::~DefaultSimSubpanelThread()
 {
-    delete output_map;
 }
 void
 DefaultSimSubpanelThread::init(vleVpm* vpm, vle::utils::Package* pkg)
@@ -60,7 +59,7 @@ DefaultSimSubpanelThread::onStarted()
             vle::manager::SIMULATION_NONE, &std::cout);
     vle::utils::ModuleManager modules;
     vle::manager::Error manerror;
-    delete output_map;
+    output_map.reset(nullptr);
     vle::vpz::Vpz* vpz = 0;
     try{
          vpz = new vle::vpz::Vpz(mvpm->getFilename().toStdString());
@@ -73,8 +72,7 @@ DefaultSimSubpanelThread::onStarted()
     if (manerror.code != 0) {
         error_simu = QString("Error during simulation '%1'")
                                             .arg(manerror.message.c_str());
-        delete output_map;
-        output_map = 0;
+        output_map.reset();
     }
     emit simulationFinished();
 }

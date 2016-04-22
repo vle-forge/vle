@@ -77,8 +77,10 @@ public:
      * @param value the value of the Double.
      * @return A new Double.
      */
-    static Double* create(const double& value = 0.0)
-    { return new Double(value); }
+    static std::unique_ptr<value::Value> create(double value = 0.0)
+    {
+        return std::unique_ptr<value::Value>(new Double(value));
+    }
 
     ///
     ////
@@ -88,14 +90,14 @@ public:
      * @brief Clone the current Double with the same value.
      * @return A new Double.
      */
-    virtual Value* clone() const
-    { return new Double(m_value); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new Double(m_value)); }
 
     /**
      * @brief Get the type of this class.
      * @return Return Value::DOUBLE.
      */
-    inline virtual Value::type getType() const
+    inline virtual Value::type getType() const override
     { return Value::DOUBLE; }
 
     /**
@@ -103,14 +105,14 @@ public:
      * setprecision, fill etc. to manage the representation of this double.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the double in the stream. Use the stream operator
      * setprecision, fill etc. to manage the representation of this double.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the double in the stream. The string pushed in the stream:
@@ -120,7 +122,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -151,29 +153,23 @@ private:
     double m_value;
 };
 
+inline const Double& toDoubleValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toDouble(); }
+
 inline const Double& toDoubleValue(const Value& value)
 { return value.toDouble(); }
-
-inline const Double* toDoubleValue(const Value* value)
-{ return value ? &value->toDouble() : 0; }
 
 inline Double& toDoubleValue(Value& value)
 { return value.toDouble(); }
 
-inline Double* toDoubleValue(Value* value)
-{ return value ? &value->toDouble() : 0; }
+inline double toDouble(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toDouble().value(); }
 
-inline const double& toDouble(const Value& value)
+inline double toDouble(const Value& value)
 { return value.toDouble().value(); }
 
 inline double& toDouble(Value& value)
 { return value.toDouble().value(); }
-
-inline const double& toDouble(const Value* value)
-{ return value::reference(value).toDouble().value(); }
-
-inline double& toDouble(Value* value)
-{ return value::reference(value).toDouble().value(); }
 
 }} // namespace vle value
 

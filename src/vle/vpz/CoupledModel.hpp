@@ -58,7 +58,7 @@ namespace vle { namespace vpz {
 
         CoupledModel& operator=(const CoupledModel& mdl);
 
-        virtual BaseModel* clone() const
+        virtual BaseModel* clone() const override
         { return new CoupledModel(*this); }
 
         /**
@@ -70,13 +70,13 @@ namespace vle { namespace vpz {
          * @brief Return true, CoupledModel is a coupled model.
          * @return true.
          */
-        virtual bool isCoupled() const { return true; }
+        virtual bool isCoupled() const override { return true; }
 
         /**
          * @brief Write the coupled model in the output stream.
          * @param out output stream.
          */
-        void writeXML(std::ostream& out) const;
+        void writeXML(std::ostream& out) const override;
 
         ////
         //// Specific functions.
@@ -179,7 +179,7 @@ namespace vle { namespace vpz {
          * @return model founded, otherwise 0.
          * @deprecated
          */
-        BaseModel* findModel(const std::string& modelname) const;
+        BaseModel* findModel(const std::string& modelname) const override;
 
         /**
          * @brief Gets a model with the specified name
@@ -703,7 +703,7 @@ namespace vle { namespace vpz {
          * @brief Write the hierarchy of models into the output stream.
          * @param out The output stream.
          */
-        void write(std::ostream& out) const;
+        void write(std::ostream& out) const override;
 
         /**
 	 * @brief Update the dynamics of each AtomicModel
@@ -712,13 +712,13 @@ namespace vle { namespace vpz {
 	 * @param newname the new name of the dynamics.
 	 */
         virtual void updateDynamics(const std::string& oldname,
-                                    const std::string& newname);
+                                    const std::string& newname) override;
 
         /**
 	 * @brief purge the dymamics not present in the list
 	 * @param dynamicslist a list of dynamics name
 	 */
-	virtual void purgeDynamics(const std::set < std::string >& dynamicslist);
+	virtual void purgeDynamics(const std::set < std::string >& dynamicslist) override;
 
         /**
 	 * @brief Update the Observable of each AtomicModels where an
@@ -727,14 +727,14 @@ namespace vle { namespace vpz {
 	 * @param newname the new name of the observable.
 	 */
 	virtual void updateObservable(const std::string& oldname,
-                                      const std::string& newname);
+                                      const std::string& newname) override;
 
         /**
 	 * @brief purge the observables references of the AtomicModels
 	 * where the observable is not present in the list, for each model.
 	 * @param observablelist a list of observable name
 	 */
-	virtual void purgeObservable(const std::set < std::string >& observablelist);
+	virtual void purgeObservable(const std::set < std::string >& observablelist) override;
 
         /**
 	 * @brief Update the Conditions of the AtomicModel where an
@@ -743,14 +743,14 @@ namespace vle { namespace vpz {
 	 * @param newname the new name of the observable.
 	 */
 	virtual void updateConditions(const std::string& oldname,
-                                      const std::string& newname);
+                                      const std::string& newname) override;
 
         /**
 	 * @brief purge the Conditions references of the model where the
 	 * Condition is not present in the list, for each model.
 	 * @param conditionlist a list of condition name
 	 */
-	virtual void purgeConditions(const std::set < std::string >& conditionlist);
+	virtual void purgeConditions(const std::set < std::string >& conditionlist) override;
 
     private:
         void delConnection(BaseModel* src, const std::string& portSrc,

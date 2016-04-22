@@ -34,10 +34,10 @@ namespace vle { namespace vpz {
 
 Conditions::Conditions()
 {
-    Condition& def= add(Experiment::defaultSimulationEngineCondName());
+    Condition& def = add(Experiment::defaultSimulationEngineCondName());
 
-    def.addValueToPort("begin", new value::Double(0.0));
-    def.addValueToPort("duration", new value::Double(100.0));
+    def.addValueToPort("begin", value::Double::create(0.0));
+    def.addValueToPort("duration", value::Double::create(100.0));
 }
 
 std::set < std::string > Conditions::getKeys()
@@ -69,18 +69,27 @@ void Conditions::write(std::ostream& out) const
     }
 }
 
-void Conditions::conditionnames(std::list < std::string >& lst) const
+std::vector <std::string>
+Conditions::conditionnames() const
 {
-    lst.resize(m_list.size());
-    std::transform(m_list.begin(), m_list.end(), lst.begin(),
-                   utils::select1st < ConditionList::value_type >());
+    std::vector <std::string> lst(m_list.size());
+
+    std::transform(m_list.begin(), m_list.end(),
+                   lst.begin(),
+                   [](const value_type& value)
+                   {
+                       return value.first;
+                   });
+
+    return lst;
 }
 
-void Conditions::portnames(const std::string& condition,
-                           std::list < std::string >& lst) const
+std::vector <std::string>
+Conditions::portnames(const std::string& condition) const
 {
     const Condition& cnd(get(condition));
-    cnd.portnames(lst);
+
+    return cnd.portnames();
 }
 
 void Conditions::add(const Conditions& cdts)
@@ -129,8 +138,8 @@ void Conditions::clear()
 
     if (it == m_list.end()) {
         Condition& def= add(Experiment::defaultSimulationEngineCondName());
-        def.addValueToPort("begin", new value::Double(0.0));
-        def.addValueToPort("duration", new value::Double(100.0));
+        def.setValueToPort("begin", value::Double::create(0.0));
+        def.setValueToPort("duration", value::Double::create(100.0));
     } else {
         do {
             iterator tmp = it;

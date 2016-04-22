@@ -83,8 +83,8 @@ void Vpz::parseFile(const std::string& filename)
     Condition& cond_sim = project().experiment().conditions().get(
             Experiment::defaultSimulationEngineCondName());
     if (cond_sim.getSetValues("begin").empty()) {
-        cond_sim.getSetValues("begin").add(value::Double(0));
-        cond_sim.getSetValues("duration").add(value::Double(100));
+        cond_sim.getSetValues("begin").add(value::Double::create(0));
+        cond_sim.getSetValues("duration").add(value::Double::create(100));
     }
 }
 
@@ -108,12 +108,13 @@ void Vpz::parseMemory(const std::string& buffer)
     Condition& cond_sim = project().experiment().conditions().get(
                 Experiment::defaultSimulationEngineCondName());
     if (cond_sim.getSetValues("begin").empty()) {
-        cond_sim.getSetValues("begin").add(value::Double(0));
-        cond_sim.getSetValues("duration").add(value::Double(100));
+        cond_sim.getSetValues("begin").add(value::Double::create(0));
+        cond_sim.getSetValues("duration").add(value::Double::create(100));
     }
 }
 
-value::Value* Vpz::parseValue(const std::string& buffer)
+std::unique_ptr<value::Value>
+Vpz::parseValue(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -124,10 +125,11 @@ value::Value* Vpz::parseValue(const std::string& buffer)
                               buffer);
     }
 
-    return sax.getValue(0);
+    return std::move(sax.getValues()[0]);
 }
 
-std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
+std::vector <std::unique_ptr<value::Value>>
+Vpz::parseValues(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -138,7 +140,7 @@ std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
                               buffer);
     }
 
-    return sax.getValues();
+    return std::move(sax.getValues());
 }
 
 void Vpz::write()

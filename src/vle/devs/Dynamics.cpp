@@ -37,58 +37,6 @@
 
 namespace vle { namespace devs {
 
-ExternalEvent* Dynamics::buildEvent(const std::string& portName) const
-{
-  return new ExternalEvent(portName);
-}
-
-ExternalEvent* Dynamics::buildEventWithADouble(
-    const std::string & portName,
-    const std::string & attributeName,
-    double attributeValue) const
-{
-    ExternalEvent* event = new ExternalEvent(portName);
-    event->putAttribute(attributeName,
-                        value::Double::create(attributeValue));
-    return event;
-}
-
-ExternalEvent* Dynamics::buildEventWithAInteger(
-    const std::string & portName,
-    const std::string & attributeName,
-    long attributeValue) const
-{
-    ExternalEvent* event = new ExternalEvent(portName);
-
-    event->putAttribute(attributeName,
-                          value::Integer::create(attributeValue));
-    return event;
-}
-
-ExternalEvent* Dynamics::buildEventWithABoolean(
-    const std::string & portName,
-    const std::string & attributeName,
-    bool attributeValue) const
-{
-    ExternalEvent* event = new ExternalEvent(portName);
-
-    event->putAttribute(attributeName,
-                        value::Boolean::create(attributeValue));
-    return event;
-}
-
-ExternalEvent* Dynamics::buildEventWithAString(
-    const std::string & portName,
-    const std::string & attributeName,
-    const std::string & attributeValue) const
-{
-    ExternalEvent* event = new ExternalEvent(portName);
-
-    event->putAttribute(attributeName,
-                        value::String::create(attributeValue));
-    return event;
-}
-
 std::string Dynamics::getPackageDir() const
 {
     vle::utils::Package pkg(*m_packageid);

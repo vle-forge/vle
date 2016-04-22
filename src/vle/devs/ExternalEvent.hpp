@@ -80,8 +80,9 @@ public:
      * @param name std::string name of Value to add.
      * @param value Value to add, not clone.
      */
-    void putAttribute(const std::string& name, value::Value* value)
-    { attributes().add(name, value); }
+    void putAttribute(const std::string& name,
+                      std::unique_ptr<value::Value> value)
+    { attributes().add(name, std::move(value)); }
 
     /**
      * Put an attribute on an event. The goal is to simplify building event.
@@ -96,9 +97,9 @@ public:
      * @return the current event.
      */
     friend ExternalEvent* operator<<(ExternalEvent* event,
-            const Attribute& attr)
+                                     Attribute& attr)
     {
-        event->putAttribute(attr.first, attr.second);
+        event->putAttribute(attr.first, std::move(attr.second));
         return event;
     }
 
@@ -114,9 +115,9 @@ public:
      * @return the current event.
      */
     friend ExternalEvent& operator<<(ExternalEvent& event,
-            const Attribute& attr)
+                                     Attribute& attr)
     {
-        event.putAttribute(attr.first, attr.second);
+        event.putAttribute(attr.first, std::move(attr.second));
         return event;
     }
 

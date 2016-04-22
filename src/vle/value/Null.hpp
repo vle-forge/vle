@@ -68,8 +68,10 @@ public:
      * @brief Build a new Null value.
      * @return A new allocated Null.
      */
-    static Null* create()
-    { return new Null(); }
+    static std::unique_ptr<value::Value> create()
+    {
+        return std::unique_ptr<value::Value>(new Null());
+    }
 
     ///
     ////
@@ -79,27 +81,27 @@ public:
      * @brief Clone the current Null.
      * @return A new Null.
      */
-    virtual Value* clone() const
-    { return new Null(); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new Null()); }
 
     /**
      * @brief Get the type of this class.
      * @return Return Value::NIL.
      */
-    inline virtual Value::type getType() const
+    inline virtual Value::type getType() const override
     { return Value::NIL; }
 
     /**
      * @brief Push the string 'NA' into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the string 'NA' into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push a specific string into the stream. The XML representation of
@@ -109,7 +111,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 };
 
 /**
@@ -136,21 +138,18 @@ struct VLE_API IsNullValue
      * @param value The pointer to check.
      * @return True if the value is 0 or a Null value, false otherwise.
      */
-    bool operator()(const value::Value* value) const
+    bool operator()(const std::unique_ptr<value::Value>& value) const
     { return value and value->getType() == Value::NIL; }
 };
+
+inline const Null& toNullValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toNull(); }
 
 inline const Null& toNullValue(const Value& value)
 { return value.toNull(); }
 
-inline const Null* toNullValue(const Value* value)
-{ return value ? &value->toNull() : 0; }
-
 inline Null& toNullValue(Value& value)
 { return value.toNull(); }
-
-inline Null* toNullValue(Value* value)
-{ return value ? &value->toNull() : 0; }
 
 }} // namespace vle value
 

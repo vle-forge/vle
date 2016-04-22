@@ -145,7 +145,7 @@ public:
             for (vpz::ConditionValues::const_iterator jt = cnvsrc.begin();
                  jt != cnvsrc.end(); ++jt) {
 
-                value::Set *cpy = new value::Set();
+                auto cpy = std::unique_ptr<value::Set>(new value::Set());
 
                 if (jt->second->size() == 1) {
                     cpy->add(jt->second->get(0)->clone());
@@ -153,7 +153,6 @@ public:
                            index) {
                     cpy->add(jt->second->get(index)->clone());
                 } else {
-                    delete cpy;
                     throw utils::InternalError(
                         fmt(
                             _("ExperimentGenerator can not access to the index"
@@ -161,8 +160,7 @@ public:
                         index % it->first % jt->first);
                 }
 
-                delete cnvdst[jt->first];
-                cnvdst[jt->first] = cpy;
+                cnvdst[jt->first] = std::move(cpy);
             }
         }
     }

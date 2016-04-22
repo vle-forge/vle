@@ -95,21 +95,21 @@ void View::run(const Time& time)
         for (ObservableList::iterator it = m_observableList.begin();
              it != m_observableList.end(); ++it) {
             ObservationEvent event(time, it->first, getName(), it->second);
-            value::Value* val = it->first->observation(event);
-            m_stream->process(it->first, it->second, time, getName(), val);
+            std::unique_ptr<value::Value> val = it->first->observation(event);
+            m_stream->process(it->first, it->second, time, getName(),
+                              std::move(val));
         }
     } else {
         m_stream->process(0, std::string(), time, getName(), 0);
     }
 }
 
-value::Matrix * View::matrix() const
+std::unique_ptr<value::Matrix> View::matrix() const
 {
-    if (m_stream->plugin()) {
+    if (m_stream->plugin())
         return m_stream->plugin()->matrix();
-    }
 
-    return NULL;
+    return std::unique_ptr<value::Matrix>();
 }
 
 }} // namespace vle devs

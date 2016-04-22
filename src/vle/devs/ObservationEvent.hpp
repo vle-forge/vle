@@ -84,8 +84,9 @@ public:
      * @param name std::string name of Value to add.
      * @param value Value to add, not clone.
      */
-    void putAttribute(const std::string& name, value::Value* value)
-    { attributes().add(name, value); }
+    void putAttribute(const std::string& name,
+                      std::unique_ptr<value::Value> value)
+    { attributes().add(name, std::move(value)); }
 
     /**
      * Put an attribute on an event. The goal is to simplify building event.
@@ -99,8 +100,9 @@ public:
      * @param attr the attribute to put into event.
      * @return the current event.
      */
-    friend ObservationEvent* operator<<(ObservationEvent* event, const Attribute& attr)
-    { event->putAttribute(attr.first, attr.second); return event;}
+    friend ObservationEvent*
+        operator<<(ObservationEvent* event, Attribute& attr)
+    { event->putAttribute(attr.first, std::move(attr.second)); return event;}
 
     /**
      * Put an attribute on an event. The goal is to simplify building event.
@@ -113,8 +115,8 @@ public:
      * @param attr the attribute to put into event.
      * @return the current event.
      */
-    friend ObservationEvent& operator<<(ObservationEvent& event, const Attribute& attr)
-    { event.putAttribute(attr.first, attr.second); return event;}
+    friend ObservationEvent& operator<<(ObservationEvent& event, Attribute& attr)
+    { event.putAttribute(attr.first, std::move(attr.second)); return event;}
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

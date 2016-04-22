@@ -34,8 +34,8 @@ namespace vle { namespace vpz {
 Experiment::Experiment()
 {
     Condition cond(defaultSimulationEngineCondName());
-    cond.addValueToPort("begin", new vle::value::Double(0));
-    cond.addValueToPort("duration", new vle::value::Double(1));
+    cond.setValueToPort("begin", value::Double::create(0));
+    cond.setValueToPort("duration", value::Double::create(100));
     conditions().add(cond);
 }
 
@@ -86,15 +86,15 @@ void Experiment::setName(const std::string& name)
 
 void Experiment::setDuration(double duration)
 {
-    if (not conditions().exist(defaultSimulationEngineCondName())) {
+    if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
                 "does not exist"));
-    }
+
     vle::vpz::Condition& condSim = conditions().get(
             defaultSimulationEngineCondName());
     vle::value::Set& dur = condSim.getSetValues("duration");
     dur.clear();
-    dur.add(new vle::value::Double(duration));
+    dur.add(value::Double::create(duration));
 }
 
 double Experiment::duration() const
@@ -118,7 +118,7 @@ void Experiment::setBegin(double begin)
             defaultSimulationEngineCondName());
     vle::value::Set& dur = condSim.getSetValues("begin");
     dur.clear();
-    dur.add(new vle::value::Double(begin));
+    dur.add(value::Double::create(begin));
 }
 
 double Experiment::begin() const

@@ -136,7 +136,7 @@ namespace vle { namespace vpz {
          * value::Matrix, value::Tuple or value::Table), a new value.
          * @param val the value to add.
          */
-        void pushOnVectorValue(value::Value* val);
+        void pushOnVectorValue(std::unique_ptr<value::Value> val);
 
         /**
          * @brief Pop the current head. If stack is empty, do nothing.
@@ -167,8 +167,10 @@ namespace vle { namespace vpz {
          * @brief Add a value::Value to the values'vector.
          * @param val The value::Value to add.
          */
-        inline void pushResult(value::Value* val)
-        { m_result.push_back(val); }
+        inline void pushResult(std::unique_ptr<value::Value> val)
+        {
+            m_result.push_back(std::move(val));
+        }
 
         /**
          * @brief Get the value::Value from the values'vector at a specified
@@ -178,7 +180,7 @@ namespace vle { namespace vpz {
          * vector'size.
          * @return A constant reference to the value::Value.
          */
-        inline value::Value* getResult(size_t i) const
+        inline const std::unique_ptr<value::Value>& getResult(size_t i) const
         {
             if (m_result.size() < i) {
                 throw utils::SaxParserError(fmt(
@@ -193,7 +195,7 @@ namespace vle { namespace vpz {
          * @throw utils::SaxParserError if the vector of result is empty.
          * @return A constant reference to the latest pushed value::Value.
          */
-        inline value::Value* getLastResult() const
+        inline const std::unique_ptr<value::Value>& getLastResult() const
         {
             if (m_result.empty()) {
                 throw utils::SaxParserError(
@@ -207,14 +209,14 @@ namespace vle { namespace vpz {
          * @brief Get the vector of value::Value.
          * @return A constant reference to the vector of value::Value.
          */
-        const std::vector < value::Value* >& getResults() const
+        const std::vector <std::unique_ptr<value::Value>>& getResults() const
         { return m_result; }
 
         /**
          * @brief Get the vector of value::Value.
          * @return A reference to the vector of value::Value.
          */
-        std::vector < value::Value* >& getResults()
+        std::vector <std::unique_ptr<value::Value>>& getResults()
         { return m_result; }
 
     private:
@@ -227,15 +229,16 @@ namespace vle { namespace vpz {
 
         /**
          * @brief Store the value stack, usefull for composite value, Map, Set,
-         * Matrix.
+         * Matrix. m_valuestack does not take ownership of value. Just
+         * reference.
          */
-        std::stack < value::Value* >  m_valuestack;
+        std::stack <value::Value*> m_valuestack;
 
         /**
          * @brief Store result of Values parsing from trame, simple value,
          * factor.
          */
-        std::vector < value::Value* > m_result;
+        std::vector <std::unique_ptr<value::Value>> m_result;
 
         /**
          * @brief Last map key read.

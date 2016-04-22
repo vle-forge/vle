@@ -3347,7 +3347,9 @@ vleVpz::buildValue(const QDomNode& node, bool buildText) const
         vle::value::Set* res = new vle::value::Set();
         for (int i=0; i < chs.size(); i++) {
             QDomNode child = chs[i];
-            res->add(buildValue(child, buildText));
+            res->add(
+                std::unique_ptr<value::Value>(
+                    buildValue(child, buildText)));
         }
         return res;
     }
@@ -3368,8 +3370,9 @@ vleVpz::buildValue(const QDomNode& node, bool buildText) const
                 mapItemValue = mapItemValue.nextSibling();
             }
             res->add(
-                 child.attributes().namedItem("name").nodeValue().toStdString(),
-                 buildValue(mapItemValue, buildText));
+                child.attributes().namedItem("name").nodeValue().toStdString(),
+                std::unique_ptr<value::Value>(
+                    buildValue(mapItemValue, buildText)));
         }
         return res;
     }
@@ -3393,7 +3396,8 @@ vleVpz::buildValue(const QDomNode& node, bool buildText) const
         for (int i=0; i < rows; i++) {
             for (int j=0; j < columns; j++) {
                 QDomNode child = chs[(j + (i*columns))];
-                res->set(j,i, buildValue(child, buildText));
+                res->set(j,i, std::unique_ptr<value::Value>(
+                             buildValue(child, buildText)));
             }
         }
         return res;
@@ -3644,7 +3648,7 @@ vleVpz::fillWithValue(QDomNode node, const vle::value::Value& val)
         removeAllChilds(node);
         for (int i=0; i < rows; i++) {
             for (int j= 0; j < columns; j++) {
-                const vle::value::Value* val = mat.get(j, i);//WARNING inversed
+                const auto& val = mat.get(j, i);//WARNING inversed
                 QDomElement elemVal = buildEmptyValueFromDoc(val->getType());
                 fillWithValue(elemVal, *val);
                 node.appendChild(elemVal);

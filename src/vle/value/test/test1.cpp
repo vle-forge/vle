@@ -37,6 +37,7 @@
 #include <stdexcept>
 #include <limits>
 #include <fstream>
+#include <iostream>
 #include <functional>
 #include <vle/value/Value.hpp>
 #include <vle/value/Boolean.hpp>
@@ -69,49 +70,44 @@ using namespace vle;
 BOOST_AUTO_TEST_CASE(check_simple_value)
 {
     {
-        value::Boolean* b = new value::Boolean(true);
+        auto b = std::unique_ptr<value::Boolean>(new value::Boolean(true));
         BOOST_REQUIRE_EQUAL(b->value(), true);
         b->set(false);
         BOOST_REQUIRE_EQUAL(b->value(), false);
-        delete b;
     }
 
     {
-        value::Double* d = value::Double::create(12.34);
+        auto d = std::unique_ptr<value::Double>(new value::Double(12.34));
         BOOST_REQUIRE_CLOSE(d->value(), 12.34, 1e-10);
         d->set(43.21);
         BOOST_REQUIRE_CLOSE(d->value(), 43.21, 1e-10);
-        delete d;
     }
 
     {
-        value::Integer* i = value::Integer::create(1234);
+        auto i = std::unique_ptr<value::Integer>(new value::Integer(1234));
         BOOST_REQUIRE_EQUAL(i->value(), 1234);
         i->set(4321);
         BOOST_REQUIRE_EQUAL(i->value(), 4321);
-        delete i;
     }
 
     {
-        value::String* s = value::String::create("1234");
+        auto s = std::unique_ptr<value::String>(new value::String("1234"));
         BOOST_REQUIRE_EQUAL(s->value(), "1234");
         s->set("4321");
         BOOST_REQUIRE_EQUAL(s->value(), "4321");
-        delete s;
     }
 
     {
-        value::Xml* x = value::Xml::create("test");
+        auto x = std::unique_ptr<value::Xml>(new value::Xml("test"));
         BOOST_REQUIRE_EQUAL(x->value(), "test");
         x->set("tset");
         BOOST_REQUIRE_EQUAL(x->value(), "tset");
-        delete x;
     }
 }
 
 BOOST_AUTO_TEST_CASE(check_map_value)
 {
-    value::Map* mp = value::Map::create();
+    auto mp = std::unique_ptr<value::Map>(new value::Map());
 
     BOOST_REQUIRE_EQUAL(mp->empty(), true);
     mp->addBoolean("boolean", true);
@@ -132,13 +128,11 @@ BOOST_AUTO_TEST_CASE(check_map_value)
     BOOST_REQUIRE_THROW(mp->getInt("double"), utils::CastError);
     BOOST_REQUIRE_THROW(mp->getInt("string"), utils::CastError);
     BOOST_REQUIRE_THROW(mp->getInt("xml"), utils::CastError);
-
-    delete(mp);
 }
 
 BOOST_AUTO_TEST_CASE(check_set_value)
 {
-    value::Set* st = value::Set::create();
+    auto st = std::unique_ptr<value::Set>(new value::Set());
 
     BOOST_REQUIRE_EQUAL(st->empty(), true);
     st->addBoolean(true);
@@ -159,44 +153,45 @@ BOOST_AUTO_TEST_CASE(check_set_value)
     BOOST_REQUIRE_THROW(st->getInt(2), utils::CastError);
     BOOST_REQUIRE_THROW(st->getInt(3), utils::CastError);
     BOOST_REQUIRE_THROW(st->getInt(4), utils::CastError);
-
-    delete(st);
 }
 
 BOOST_AUTO_TEST_CASE(check_clone)
 {
-    value::Map* mp = value::Map::create();
-    mp->add("x1", value::String::create("toto"));
-    mp->add("x2", value::String::create("toto"));
-    mp->add("x3", value::String::create("toto"));
+    std::unique_ptr<value::Value> clone;
 
-    value::Map* mpclone = dynamic_cast < value::Map* >(mp->clone());
-    BOOST_REQUIRE(mp->get("x1") != mpclone->get("x1"));
-    BOOST_REQUIRE(mp->get("x2") != mpclone->get("x2"));
-    BOOST_REQUIRE(mp->get("x3") != mpclone->get("x3"));
+    {
+        auto mp = std::unique_ptr<value::Map>(new value::Map());
+        mp->add("x1", value::String::create("toto"));
+        mp->add("x2", value::String::create("toto"));
+        mp->add("x3", value::String::create("toto"));
 
-    value::Set* st = value::Set::create();
-    st->add(value::String::create("toto"));
-    st->add(value::String::create("toto"));
-    st->add(value::String::create("toto"));
+        clone = mp->clone();
+        auto mpclone = clone->toMap();
 
-    value::Set* stclone = dynamic_cast < value::Set* >(st->clone());
+        BOOST_REQUIRE(mp->get("x1") != mpclone.get("x1"));
+        BOOST_REQUIRE(mp->get("x2") != mpclone.get("x2"));
+        BOOST_REQUIRE(mp->get("x3") != mpclone.get("x3"));
+    }
 
-    BOOST_REQUIRE_EQUAL(st->size(), stclone->size());
+    {
+        auto st = std::unique_ptr<value::Set>(new value::Set());
+        st->add(value::String::create("toto"));
+        st->add(value::String::create("toto"));
+        st->add(value::String::create("toto"));
 
-    BOOST_REQUIRE(st->get(0) != stclone->get(0));
-    BOOST_REQUIRE(st->get(1) != stclone->get(1));
-    BOOST_REQUIRE(st->get(2) != stclone->get(2));
+        clone = st->clone();
+        auto stclone = clone->toSet();
 
-    delete(mp);
-    delete(mpclone);
-    delete(st);
-    delete(stclone);
+        BOOST_REQUIRE_EQUAL(st->size(), stclone.size());
+        BOOST_REQUIRE(st->get(0) != stclone.get(0));
+        BOOST_REQUIRE(st->get(1) != stclone.get(1));
+        BOOST_REQUIRE(st->get(2) != stclone.get(2));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(check_null)
 {
-    value::Set* st = value::Set::create();
+    auto st = std::unique_ptr<value::Set>(new value::Set());
     st->addString("toto1");
     st->addNull();
     st->addString("toto2");
@@ -210,25 +205,27 @@ BOOST_AUTO_TEST_CASE(check_null)
 
     BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 10);
 
-    value::VectorValue::iterator it = st->value().begin();
+    auto it = st->value().begin();
+
     while ((it = std::find_if(it, st->value().end(), value::IsNullValue()))
             != st->value().end()) {
-        delete(*it);
-        *it = 0;
+        *it = std::unique_ptr<value::Value>();
     }
+
     it = std::remove_if(st->value().begin(), st->value().end(),
-                        std::bind2nd(std::equal_to <value::Value*>(), NULL));
+                        [](const std::unique_ptr<value::Value>& value)
+                        {
+                            return not value.get();
+                        });
 
     st->value().erase(it, st->value().end());
 
     BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 5);
-
-    delete(st);
 }
 
 BOOST_AUTO_TEST_CASE(check_matrix)
 {
-    value::Matrix* mx = value::Matrix::create(100, 100, 10, 10);
+    auto mx = std::unique_ptr<value::Matrix>(new value::Matrix(100, 100, 10, 10));
     BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)100);
     BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)100);
 
@@ -241,31 +238,38 @@ BOOST_AUTO_TEST_CASE(check_matrix)
     BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)101);
 
     mx->add(0, 0, value::Integer::create(10));
-    BOOST_REQUIRE_EQUAL(mx->value()[0][0]->isInteger(), true);
-    BOOST_REQUIRE_EQUAL(value::toInteger(*mx->value()[0][0]), 10);
 
-    value::Matrix* cpy = dynamic_cast < value::Matrix* >(mx->clone());
-    BOOST_REQUIRE_EQUAL(cpy->value()[0][0]->isInteger(), true);
-    value::toIntegerValue(*cpy->value()[0][0]).set(20);
-    BOOST_REQUIRE_EQUAL(value::toInteger(*mx->value()[0][0]), 10);
-    BOOST_REQUIRE_EQUAL(value::toInteger(*cpy->value()[0][0]), 20);
+    BOOST_REQUIRE_EQUAL(mx->get(0, 0)->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mx->get(0, 0)->toInteger().value(), 10);
+
+    auto cpy = std::unique_ptr<value::Matrix>(new value::Matrix(*mx));
+
+    BOOST_REQUIRE_EQUAL(cpy->get(0,0)->isInteger(), true);
+
+    cpy->get(0, 0)->toInteger().set(20);
+    std::cout << cpy->writeToString() << '\n';
+
+    BOOST_REQUIRE_EQUAL(mx->get(0, 0)->toInteger().value(), 10);
+    BOOST_REQUIRE_EQUAL(cpy->get(0, 0)->toInteger().value(), 20);
 
     BOOST_REQUIRE_EQUAL(cpy->rows(), 101);
     BOOST_REQUIRE_EQUAL(cpy->columns(), 101);
 
     cpy->resize(3, 4);
+    std::cout << cpy->writeToString() << '\n';
 
     BOOST_REQUIRE_EQUAL(cpy->rows(), 4);
     BOOST_REQUIRE_EQUAL(cpy->columns(), 3);
 
-    cpy->resize(5, 3, vle::value::Boolean(true));
+    cpy->resize(5, 3, value::Boolean::create(true));
+    std::cout << cpy->writeToString() << '\n';
 
     BOOST_REQUIRE_EQUAL(cpy->rows(), 3);
     BOOST_REQUIRE_EQUAL(cpy->columns(), 5);
     BOOST_REQUIRE(cpy->getBoolean(4,2));
 
-    delete(mx);
-    delete(cpy);
+    cpy->resize(10, 10, value::Boolean::create(false));
+    std::cout << cpy->writeToString() << '\n';
 }
 
 namespace test {
@@ -280,8 +284,8 @@ namespace test {
             : vle::value::User(), x(0.0), y(0.0), z(0.0)
         {}
 
-        MyData(double x, double y, double z, const std::string &name)
-            : vle::value::User(), x(x), y(y), z(z), name(name)
+        MyData(double x, double y, double z, std::string name)
+            : vle::value::User(), x(x), y(y), z(z), name(std::move(name))
         {}
 
         MyData(const MyData &value)
@@ -291,21 +295,24 @@ namespace test {
 
         virtual ~MyData() {}
 
-        virtual size_t id() const { return 15978462u; }
+        virtual size_t id() const override { return 15978462u; }
 
-        virtual Value* clone() const { return new MyData(*this); }
+        virtual std::unique_ptr<Value> clone() const override
+        {
+            return std::unique_ptr<Value>(new MyData(*this));
+        }
 
-        virtual void writeFile(std::ostream& out) const
+        virtual void writeFile(std::ostream& out) const override
         {
             out << "(" << name << ": " << x << ", " << y <<  ", " << z << ")";
         }
 
-        virtual void writeString(std::ostream& out) const
+        virtual void writeString(std::ostream& out) const override
         {
             writeFile(out);
         }
 
-        virtual void writeXml(std::ostream& out) const
+        virtual void writeXml(std::ostream& out) const override
         {
             out << "<set><string>" << name << "</string><double>" << x <<
                 "</double><double>" << y << "</double> <double>" << z <<
@@ -314,17 +321,15 @@ namespace test {
     };
 }
 
-void check_user_value(vle::value::Value *to_check)
+void check_user_value(vle::value::Value& to_check)
 {
-    BOOST_REQUIRE(to_check);
-    BOOST_REQUIRE_EQUAL(to_check->getType(), vle::value::Value::USER);
+    BOOST_REQUIRE_EQUAL(to_check.getType(), vle::value::Value::USER);
 
-    vle::value::User *user = vle::value::toUserValue(to_check);
-    BOOST_REQUIRE(user);
-    BOOST_REQUIRE_EQUAL(user->getType(), vle::value::Value::USER);
-    BOOST_REQUIRE_EQUAL(user->id(), 15978462u);
+    auto& user = to_check.toUser();
+    BOOST_REQUIRE_EQUAL(user.getType(), vle::value::Value::USER);
+    BOOST_REQUIRE_EQUAL(user.id(), 15978462u);
 
-    test::MyData *mydata = dynamic_cast <test::MyData*>(user);
+    test::MyData *mydata = dynamic_cast <test::MyData*>(&user);
     BOOST_REQUIRE(mydata);
 
     BOOST_REQUIRE_EQUAL(mydata->x, 1.);
@@ -335,14 +340,11 @@ void check_user_value(vle::value::Value *to_check)
 
 BOOST_AUTO_TEST_CASE(test_user_value)
 {
-    vle::value::Value *data = new test::MyData(1., 2., 3., "test-vle");
-    check_user_value(data);
+    auto data = std::unique_ptr<value::Value>(new test::MyData(1., 2., 3., "test-vle"));
+    check_user_value(*data.get());
 
-    vle::value::Value *cloned_data = data->clone();
-    check_user_value(cloned_data);
+    std::unique_ptr<vle::value::Value> cloned_data = data->clone();
+    check_user_value(*cloned_data.get());
 
-    BOOST_REQUIRE(data != cloned_data);
-
-    delete data;
-    delete cloned_data;
+    BOOST_REQUIRE(data.get() != cloned_data.get());
 }

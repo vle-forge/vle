@@ -244,51 +244,65 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     BOOST_REQUIRE_EQUAL(experiment.name(), "test1");
     BOOST_REQUIRE_EQUAL(experiment.duration(), 0.33);
 
-    std::list < std::string > lst;
-    cnds.conditionnames(lst);
+    std::vector<std::string> lst = cnds.conditionnames();
     BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)3);
-    BOOST_REQUIRE_EQUAL(*lst.begin(), "cond1");
-    BOOST_REQUIRE_EQUAL(*lst.rbegin(), "simulation_engine");
-    lst.clear();
 
-    cnds.portnames("cond1", lst);
+    {
+        auto it = std::find(lst.begin(), lst.end(), "cond1");
+        BOOST_REQUIRE(it != lst.end());
+    }
+    {
+        auto it = std::find(lst.begin(), lst.end(), "simulation_engine");
+        BOOST_REQUIRE(it != lst.end());
+    }
+
+    lst.clear();
+    lst = cnds.portnames("cond1");
     BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)2);
-    BOOST_REQUIRE_EQUAL(*lst.begin(), "init1");
-    BOOST_REQUIRE_EQUAL(*lst.rbegin(), "init2");
+
+    {
+        auto it = std::find(lst.begin(), lst.end(), "init1");
+        BOOST_REQUIRE(it != lst.end());
+    }
+    
+    {
+        auto it = std::find(lst.begin(), lst.end(), "init2");
+        BOOST_REQUIRE(it != lst.end());
+    }
 
     const vpz::Condition& cnd1(cnds.get("cond1"));
     const vpz::Condition& cnd2(cnds.get("cond2"));
 
     {
         const value::Set& set(cnd1.getSetValues("init1"));
-        const value::Double* real(value::toDoubleValue(set.get(0)));
-        BOOST_REQUIRE_EQUAL(real->value(), 123.);
-        const value::Integer* integer(value::toIntegerValue(set.get(1)));
-        BOOST_REQUIRE_EQUAL(integer->value(), 1);
+        const value::Double& real(set.get(0)->toDouble());
+        BOOST_REQUIRE_EQUAL(real.value(), 123.);
+        const value::Integer& integer(set.get(1)->toInteger());
+        BOOST_REQUIRE_EQUAL(integer.value(), 1);
     }
 
     {
         const value::Set& set(cnd1.getSetValues("init2"));
-        const value::Double* real(value::toDoubleValue(set.get(0)));
-        BOOST_REQUIRE_EQUAL(real->value(), 456.);
-        const value::Integer* integer(value::toIntegerValue(set.get(1)));
-        BOOST_REQUIRE_EQUAL(integer->value(), 2);
+        const value::Double& real(set.get(0)->toDouble());
+        BOOST_REQUIRE_EQUAL(real.value(), 456.);
+        const value::Integer& integer(set.get(1)->toInteger());
+        BOOST_REQUIRE_EQUAL(integer.value(), 2);
     }
 
     {
         const value::Set& set = cnd2.getSetValues("init3");
-        const value::Double* real = value::toDoubleValue(set.get(0));
-        BOOST_REQUIRE_EQUAL(real->value(), .123);
-        const value::Integer* integer = value::toIntegerValue(set.get(1));
-        BOOST_REQUIRE_EQUAL(integer->value(), -1);
+        const value::Double& real(set.get(0)->toDouble());
+        BOOST_REQUIRE_EQUAL(real.value(), .123);
+        const value::Integer& integer(set.get(1)->toInteger());
+        BOOST_REQUIRE_EQUAL(integer.value(), -1);
     }
 
     {
         const value::Set& set = cnd2.getSetValues("init4");
-        const value::Double* real = value::toDoubleValue(set.get(0));
-        BOOST_REQUIRE_EQUAL(real->value(), .456);
-        const value::Integer* integer = value::toIntegerValue(set.get(1));
-        BOOST_REQUIRE_EQUAL(integer->value(), -2);
+        const value::Double& real(set.get(0)->toDouble());
+        BOOST_REQUIRE_EQUAL(real.value(), .456);
+        const value::Integer& integer(set.get(1)->toInteger());
+        BOOST_REQUIRE_EQUAL(integer.value(), -2);
     }
 
     {
@@ -303,10 +317,9 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
 	    BOOST_REQUIRE_NO_THROW(cnd1.rename(oldport, newport));
 	    {
 		const value::Set& set(cnd1.getSetValues(newport));
-		const value::Double& real(value::toDoubleValue(*set.get(0)));
+		const value::Double& real(set.get(0)->toDouble());
 		BOOST_REQUIRE_EQUAL(real.value(), 123.);
-                const value::Integer&
-                    integer(value::toIntegerValue(*set.get(1)));
+                const value::Integer& integer(set.get(1)->toInteger());
 		BOOST_REQUIRE_EQUAL(integer.value(), 1);
 	    }
 
@@ -366,7 +379,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         const vpz::Output& out(outputs.outputlist().find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
         BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::LOCAL);
-        BOOST_REQUIRE(out.data() != (value::Value*)0);
+        BOOST_REQUIRE(out.data());
         BOOST_REQUIRE_EQUAL(out.data()->isString(), true);
         BOOST_REQUIRE_EQUAL(value::toString(out.data()), "test");
     }

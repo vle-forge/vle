@@ -46,7 +46,7 @@ class DefaultSimSubpanelThread : public QObject
 {
     Q_OBJECT
 public:
-    vle::value::Map*     output_map;
+    std::unique_ptr<vle::value::Map>     output_map;
     vleVpm*              mvpm;
     vle::utils::Package* mpkg;
     QString              error_simu;

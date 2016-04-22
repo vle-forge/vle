@@ -49,4 +49,3 @@ void Boolean::writeXml(std::ostream& out) const
 }
 
 }} // namespace vle value
-

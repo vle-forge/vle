@@ -31,6 +31,7 @@
 #include <vle/vpz/Condition.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/DllDefines.hpp>
+#include <unordered_map>
 #include <string>
 #include <list>
 #include <set>
@@ -50,7 +51,7 @@ namespace vpz {
     /**
      * @brief Define a condition list like list of names, conditions.
      */
-    typedef std::map < std::string, Condition > ConditionList;
+    typedef std::unordered_map < std::string, Condition > ConditionList;
 
     /**
      * @brief This class describe a list of condition and allow loading and
@@ -95,13 +96,13 @@ namespace vpz {
          * @endcode
          * @param out a output stream where write the classes tags.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this class.
          * @return CONDITIONS.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_CONDITIONS; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -114,17 +115,17 @@ namespace vpz {
          * @brief Build a list of string that contains all condition names.
          * @param lst An output string list.
          */
-        void conditionnames(std::list < std::string >& lst) const;
+        std::vector <std::string> conditionnames() const;
 
         /**
          * @brief Build a list of string that contains all port names for the
          * specified condition.
          * @param condition The condition to get port name.
-         * @param lst An output string list.
+         * @return An output string list.
          * @throw utils::ArgError if condition not exist.
          */
-        void portnames(const std::string& condition,
-                       std::list < std::string >& lst) const;
+        std::vector <std::string>
+            portnames(const std::string& condition) const;
 
         /**
          * @brief Add a list of Conditions to the list.

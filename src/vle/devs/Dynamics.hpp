@@ -189,9 +189,11 @@ namespace vle { namespace devs {
 	 * @param event the state event with of the port
 	 * @return the value of state variable
 	 */
-        virtual vle::value::Value* observation(
-	    const vle::devs::ObservationEvent& /* event */) const
-        { return 0; }
+        virtual std::unique_ptr<vle::value::Value>
+            observation(const vle::devs::ObservationEvent& /* event */) const
+        {
+            return std::unique_ptr<vle::value::Value>();
+        }
 
         /**
          * @brief When the simulation of the atomic model is finished, the
@@ -243,54 +245,6 @@ namespace vle { namespace devs {
         { return m_model.getName(); }
 
 	/**
-	 * Build a Double object from a double value
-	 *
-	 * @param value the double value
-	 *
-	 * @return the Double object
-	 */
-        inline vle::value::Double* buildDouble(double value) const
-        { return value::Double::create(value); }
-
-	/**
-	 * Build a Integer object from a long value
-	 *
-	 * @param value the long value
-	 *
-	 * @return the Integer object
-	 */
-        inline vle::value::Integer* buildInteger(long value) const
-        { return value::Integer::create(value); }
-
-	/**
-	 * Build a Boolean object from a bool value
-	 *
-	 * @param value the bool value
-	 *
-	 * @return the Boolean object
-	 */
-        inline vle::value::Boolean* buildBoolean(bool value) const
-        { return value::Boolean::create(value); }
-
-	/**
-	 * Build a String object from a string value
-	 *
-	 * @param value the string value
-	 *
-	 * @return the String object
-	 */
-        inline vle::value::String* buildString(const std::string& value) const
-        { return value::String::create(value); }
-
-	/**
-	 * Build an empty event list
-	 *
-	 * @return the empty event list
-	 */
-        vle::devs::ExternalEventList* noEvent() const
-        { return new ExternalEventList(); }
-
-	/**
 	 * Build an event list with a single event on a specified port at
 	 * a specified time
 	 *
@@ -299,70 +253,6 @@ namespace vle { namespace devs {
 	 * @return the event list with the event
 	 */
         vle::devs::ExternalEvent* buildEvent(const std::string& portName) const;
-
-	/**
-	 * Build an event list with a single event which is attached a
-	 * double attribute
-	 *
-	 * @param portName the name of port where the event will post
-	 * @param attributeName the name of the attribute attached to
-	 * the event
-	 * @param attributeValue the double value given to the attribute
-	 *
-	 * @return the event list with the event
-	 */
-        vle::devs::ExternalEvent* buildEventWithADouble(
-                           const std::string& portName,
-                           const std::string& attributeName,
-                           double attributeValue) const;
-
-	/**
-	 * Build an event list with a single event which is attached a
-	 * long attribute
-	 *
-	 * @param portName the name of port where the event will post
-	 * @param attributeName the name of the attribute attached to
-	 * the event
-	 * @param attributeValue the long value given to the attribute
-	 *
-	 * @return the event list with the event
-	 */
-        vle::devs::ExternalEvent* buildEventWithAInteger(
-                            const std::string& portName,
-                            const std::string& attributeName,
-                            long attributeValue) const;
-
-	/**
-	 * Build an event list with a single event which is attached a
-	 * bool attribute
-	 *
-	 * @param portName the name of port where the event will post
-	 * @param attributeName the name of the attribute attached to
-	 * the event
-	 * @param attributeValue the bool value given to the attribute
-	 *
-	 * @return the event list with the event
-	 */
-        vle::devs::ExternalEvent* buildEventWithABoolean(
-                           const std::string& portName,
-                           const std::string& attributeName,
-                           bool attributeValue) const;
-
-	/**
-	 * Build an event list with a single event which is attached a
-	 * string attribute
-	 *
-	 * @param portName the name of port where the event will post
-	 * @param attributeName the name of the attribute attached to
-	 * the event
-	 * @param attributeValue the string value given to the attribute
-	 *
-	 * @return the event list with the event
-	 */
-        vle::devs::ExternalEvent* buildEventWithAString(
-                           const std::string& portName,
-                           const std::string& attributeName,
-                           const std::string& attributeValue) const;
 
        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 

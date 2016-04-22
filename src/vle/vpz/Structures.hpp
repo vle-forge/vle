@@ -48,7 +48,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to output.
          */
-        virtual void write(std::ostream& /* out */) const
+        virtual void write(std::ostream& /* out */) const override
         {}
 
         /**
@@ -61,7 +61,7 @@ namespace vle { namespace vpz {
          * @brief Get the type of this class.
          * @return STRUCTURES.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_STRUCTURES; }
     };
 

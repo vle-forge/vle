@@ -69,7 +69,7 @@ namespace vle { namespace oov {
                                  const std::string& package,
                                  const std::string& location,
                                  const std::string& file,
-                                 value::Value* parameters,
+                                 std::unique_ptr<value::Value> parameters,
                                  const double& time);
 
         /**
@@ -123,7 +123,7 @@ namespace vle { namespace oov {
                              const std::string& port,
                              const std::string& view,
                              const double& time,
-                             value::Value* value);
+                             std::unique_ptr<value::Value> value);
 
         /**
          * @brief Call when the simulation is finished.

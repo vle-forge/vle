@@ -679,10 +679,10 @@ void SaxParser::onEndPort()
 {
     if (m_vpzstack.top()->isCondition()) {
         value::Set& vals(m_vpzstack.popConditionPort());
-        std::vector < value::Value* >& lst(getValues());
-        for (std::vector < value::Value* >::iterator it =
+        std::vector <std::unique_ptr<value::Value>>& lst(getValues());
+        for (std::vector < std::unique_ptr<value::Value>>::iterator it =
              lst.begin(); it != lst.end(); ++it) {
-            vals.add(*it);
+            vals.add(std::move(*it));
         }
         m_valuestack.clear();
     } else if (m_vpzstack.top()->isObservablePort()) {
@@ -799,15 +799,15 @@ void SaxParser::onEndOutput()
     if (m_vpzstack.top()->isOutput()) {
         Output* out = dynamic_cast < Output* >(m_vpzstack.top());
 
-        std::vector < value::Value* >& lst(getValues());
+        std::vector < std::unique_ptr<value::Value>>& lst(getValues());
         if (not lst.empty()) {
             if (lst.size() > 1) {
                 throw utils::SaxParserError(
                     _("VPZ parser: multiples values for output"));
             }
-            value::Value* val = lst[0];
-            if (val) {
-                out->setData(val);
+
+            if (lst[0].get()) {
+                out->setData(std::move(lst[0]));
                 m_valuestack.clear();
             }
         }
@@ -825,17 +825,20 @@ void SaxParser::onEndClass()
     m_vpzstack.popClass();
 }
 
-const std::vector < value::Value* >& SaxParser::getValues() const
+const std::vector <std::unique_ptr <value::Value>>&
+SaxParser::getValues() const
 {
     return m_valuestack.getResults();
 }
 
-std::vector < value::Value* >& SaxParser::getValues()
+std::vector <std::unique_ptr<value::Value>>&
+SaxParser::getValues()
 {
     return m_valuestack.getResults();
 }
 
-value::Value* SaxParser::getValue(const size_t pos) const
+const std::unique_ptr<value::Value>&
+SaxParser::getValue(const size_t pos) const
 {
     return m_valuestack.getResult(pos);
 }

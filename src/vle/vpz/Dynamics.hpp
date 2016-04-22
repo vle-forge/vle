@@ -90,13 +90,13 @@ namespace vpz {
          * @endcode
          * @param out the output stream.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this class.
          * @return DYNAMICS.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_DYNAMICS; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

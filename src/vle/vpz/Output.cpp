@@ -31,20 +31,17 @@
 namespace vle { namespace vpz {
 
 Output::Output()
-    : m_format(LOCAL), m_data(0)
+    : m_format(LOCAL)
 {
 }
 
 Output::Output(const Output& output)
     : Base(output), m_format(output.m_format), m_name(output.m_name),
     m_plugin(output.m_plugin), m_location(output.m_location),
-    m_package(output.m_package)
+      m_package(output.m_package), m_data()
 {
-    if (output.m_data) {
+    if (output.m_data)
         m_data = output.m_data->clone();
-    } else {
-        m_data = 0;
-    }
 }
 
 Output& Output::operator=(const Output& output)
@@ -171,16 +168,14 @@ void Output::setDistantStream(const std::string& location,
     clearData();
 }
 
-void Output::setData(value::Value* value)
+void Output::setData(std::unique_ptr<value::Value> value)
 {
-    clearData();
-    m_data = value;
+    m_data = std::move(value);
 }
 
 void Output::clearData()
 {
-    delete m_data;
-    m_data = 0;
+    m_data.reset(nullptr);
 }
 
 bool Output::operator==(const Output& output) const

@@ -108,13 +108,13 @@ void DynamicsDbg::confluentTransitions(
     mDynamics->confluentTransitions(time, extEventlist);
 }
 
-vle::value::Value* DynamicsDbg::observation(
-    const ObservationEvent& event) const
+std::unique_ptr<vle::value::Value>
+DynamicsDbg::observation(const ObservationEvent& event) const
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
                     " port: '%4%']")) % event.getTime() % mName
               % event.getViewName() % event.getPortName());
-
+    
     return mDynamics->observation(event);
 }
 

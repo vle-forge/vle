@@ -50,8 +50,8 @@ public:
      * @brief Build a String object with a specified value.
      * @param value The value to copy.
      */
-    String(const std::string& value)
-        : m_value(value)
+    String(std::string  value)
+        : m_value(std::move(value))
     {}
 
     /**
@@ -77,8 +77,11 @@ public:
      * @param value the value of the string.
      * @return A new String.
      */
-    static String* create(const std::string& value = std::string())
-    { return new String(value); }
+    static std::unique_ptr<value::Value>
+        create(const std::string value = std::string())
+    {
+        return std::unique_ptr<value::Value>(new String(value));
+    }
 
     ///
     ////
@@ -88,27 +91,27 @@ public:
      * @brief Clone the current String with the same value.
      * @return A new String.
      */
-    virtual Value* clone() const
-    { return new String(m_value); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new String(m_value)); }
 
     /**
      * @brief Get the type of this class.
      * @return Return Value::STRING.
      */
-    virtual Value::type getType() const
+    virtual Value::type getType() const override
     { return Value::STRING; }
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream. Be careful, the
@@ -121,7 +124,7 @@ public:
      * @endcode
      * @param out
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     /**
      * @brief Get a constant reference to the encapsulated std::string.
@@ -148,29 +151,23 @@ private:
     std::string m_value;
 };
 
+inline const String& toStringValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toString(); }
+
 inline const String& toStringValue(const Value& value)
 { return value.toString(); }
-
-inline const String* toStringValue(const Value* value)
-{ return value ? &value->toString() : 0; }
 
 inline String& toStringValue(Value& value)
 { return value.toString(); }
 
-inline String* toStringValue(Value* value)
-{ return value ? &value->toString() : 0; }
+inline const std::string& toString(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toString().value(); }
 
 inline const std::string& toString(const Value& value)
 { return value.toString().value(); }
 
 inline std::string& toString(Value& value)
 { return value.toString().value(); }
-
-inline const std::string& toString(const Value* value)
-{ return value::reference(value).toString().value(); }
-
-inline std::string& toString(Value* value)
-{ return value::reference(value).toString().value(); }
 
 }} // namespace vle value
 

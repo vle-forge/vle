@@ -45,7 +45,7 @@ namespace vle { namespace value {
 /**
  * @brief Define a std::Vector of value.
  */
-typedef std::vector < Value* > VectorValue;
+typedef std::vector <std::unique_ptr<Value>> VectorValue;
 
 /**
  * @brief The Set Value is a vector of pointer of value.
@@ -68,9 +68,7 @@ public:
     /**
      * @brief Build a Set with size cells initialized with NULL pointer.
      */
-    Set(const size_type& size)
-        : m_value(size, 0)
-    {}
+    Set(const size_type& size);
 
     /**
      * @brief Copy constructor. All the Value are cloned.
@@ -81,32 +79,33 @@ public:
     /**
      * @brief Delete all Value in the set.
      */
-    virtual ~Set()
-    { clear(); }
+    virtual ~Set() {}
 
     /**
      * @brief Build a new Set.
      * @return A new Set.
      */
-    static Set* create(const size_type& size = 0)
-    { return new Set(size); }
+    static std::unique_ptr<Value> create(const size_type& size = 0)
+    {
+        return std::unique_ptr<Value>(new Set(size));
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * @brief Clone the Set and recursively cloned each cells.
      * @return A new allocated Set.
      */
-    virtual Value* clone() const
-    { return new Set(*this); }
+    virtual std::unique_ptr<Value> clone() const override
+    { return std::unique_ptr<Value>(new Set(*this)); }
 
     /**
      * @brief Get the type of this class.
      * @return Value::SET.
      */
-    virtual Value::type getType() const
+    virtual Value::type getType() const override
     { return Value::SET; }
 
     /**
@@ -116,7 +115,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the Set, recursively and colon separated with
@@ -126,7 +125,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the Set recursively in an XML representation:
@@ -142,10 +141,10 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -197,68 +196,10 @@ public:
      * @param i The index of the value.
      * @param val The value to add.
      */
-    void set(const size_type& i, Value* val)
+    void set(const size_type& i, std::unique_ptr<Value> val)
     {
-#ifndef NDEBUG
-        if (i >= size()) {
-            throw utils::ArgError(_("Set: too big index"));
-        }
-#endif
-        delete m_value[i];
-        m_value[i] = val;
-    }
-
-    /**
-     * @brief Assign a value to a cell of the Set.
-     * @param i The index of the value.
-     * @param val The value to add.
-     */
-    void set(const size_type& i, const Value* val)
-    {
-#ifndef NDEBUG
-        if (i >= size()) {
-            throw utils::ArgError(_("Set: too big index"));
-        }
-#endif
-        delete m_value[i];
-        if (val) {
-            m_value[i] = val->clone();
-        } else {
-            m_value[i] = 0;
-        }
-    }
-
-    /**
-     * @brief Assign a value to a cell of the Set.
-     * Don't delete buffer after.
-     * @param i The index of the value.
-     * @param val The value to add.
-     */
-    void set(const size_type& i, const Value& val)
-    {
-#ifndef NDEBUG
-        if (i >= size()) {
-            throw utils::ArgError(_("Set: too big index"));
-        }
-#endif
-        delete m_value[i];
-        m_value[i] = val.clone();
-    }
-
-    /**
-     * @brief Assign a value to a cell of the Set.
-     * @param i The index of the value.
-     * @param val The value to add.
-     */
-    void set(const size_type& i, Value& val)
-    {
-#ifndef NDEBUG
-        if (i >= size()) {
-            throw utils::ArgError(_("Set: too big index"));
-        }
-#endif
-        delete m_value[i];
-        m_value[i] = val.clone();
+        pp_check_index(i);
+        m_value[i] = std::move(val);
     }
 
     /**
@@ -267,29 +208,9 @@ public:
      * @return A constant reference.
      * @throw utils::ArgError if index 'i' is too big in debug mode.
      */
-    const Value* get(const size_type& i) const
+    const std::unique_ptr<Value>& get(const size_type& i) const
     {
-#ifndef NDEBUG
-        if (i >= size()) {
-            throw utils::ArgError(_("Set: too big index"));
-        }
-#endif
-        return m_value[i];
-    }
-
-    /**
-     * @brief Get a reference to the Value at specified index.
-     * @param i The index of the value.
-     * @return A reference.
-     * @throw utils::ArgError if index 'i' is too big in debug mode.
-     */
-    Value* get(const size_type& i)
-    {
-#ifndef NDEBUG
-        if (i >= size()) {
-            throw utils::ArgError(_("Set: too big index"));
-        }
-#endif
+        pp_check_index(i);
         return m_value[i];
     }
 
@@ -299,17 +220,11 @@ public:
      * @return A constant reference.
      * @throw utils::ArgError if index 'i' is too big.
      */
-    const Value* operator[](const size_type& i) const
-    { return get(i); }
-
-    /**
-     * @brief Get a reference to the Value at specified index.
-     * @param i The index of the value.
-     * @return A reference.
-     * @throw utils::ArgError if index 'i' is too big.
-     */
-    Value* operator[](const size_type i)
-    { return get(i); }
+    const std::unique_ptr<Value>& operator[](const size_type& i) const
+    {
+        pp_check_index(i);
+        return m_value[i];
+    }
 
     /**
      * @brief Get the pointer of the Value at specified index. The value at
@@ -318,7 +233,12 @@ public:
      * @return A reference.
      * @throw utils::ArgError if index 'i' is too big.
      */
-    Value* give(const size_type& i);
+    std::unique_ptr<Value> give(const size_type& i)
+    {
+        auto it = pp_get(i);
+
+        return std::move(*it);
+    }
 
     /**
      * @brief Get the size of the VectorValue.
@@ -338,10 +258,13 @@ public:
      * @brief Delete all value from the VectorValue and clean the
      * VectorValue.
      */
-    void clear();
+    void clear()
+    {
+        m_value.clear();
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -350,43 +273,27 @@ public:
      * @param value the Value to add.
      * @throw std::invalid_argument if value is null.
      */
-    void add(Value* value)
-    { m_value.push_back(value); }
-
-    /**
-     * @brief Add a value into the set. The data is cloned.
-     * @param value the Value to add.
-     * @throw std::invalid_argument if value is null.
-     */
-    void add(const Value* value)
-    { m_value.push_back(value->clone()); }
-
-    /**
-     * @brief Add a value into the set. The data is cloned.
-     * @param value the Value to add.
-     */
-    void add(Value& value)
-    { m_value.push_back(value.clone()); }
-
-    /**
-     * @brief Add a value into the set. The data is cloned.
-     * @param value the Value to add.
-     */
-    void add(const Value& value)
-    { m_value.push_back(value.clone()); }
+    void add(std::unique_ptr<Value> value)
+    {
+        m_value.push_back(std::move(value));
+    }
 
     /**
      * @brief Add a null value into the set.
      */
-    void addNull()
-    { m_value.push_back(new Null()); }
+    Null& addNull()
+    {
+        return pp_add<Null>();
+    }
 
     /**
      * @brief Add a BooleanValue into the set.
      * @param value
      */
-    void addBoolean(bool value)
-    { m_value.push_back(new Boolean(value)); }
+    Boolean& addBoolean(bool value)
+    {
+        return pp_add<Boolean>(value);
+    }
 
     /**
      * @brief Get a bool from the specified index.
@@ -396,7 +303,9 @@ public:
      * index 'i' is not a Boolean.
      */
     bool getBoolean(const size_type& i) const
-    { return value::toBoolean(get(i)); }
+    {
+        return pp_get_value(i).toBoolean().value();
+    }
 
     /**
      * @brief Get a bool from the specified index.
@@ -406,14 +315,18 @@ public:
      * index 'i' is not a Boolean.
      */
     bool& getBoolean(const size_type& i)
-    { return value::toBoolean(get(i)); }
+    {
+        return pp_get_value(i).toBoolean().value();
+    }
 
     /**
      * @brief Add a double into the set.
      * @param value
      */
-    void addDouble(const double& value)
-    { m_value.push_back(new Double(value)); }
+    Double& addDouble(const double& value)
+    {
+        return pp_add<Double>(value);
+    }
 
     /**
      * @brief Get a double from the specified index.
@@ -423,7 +336,9 @@ public:
      * index 'i' is not a Double.
      */
     double getDouble(const size_type& i) const
-    { return value::toDouble(get(i)); }
+    {
+        return pp_get_value(i).toDouble().value();
+    }
 
     /**
      * @brief Get a double from the specified index.
@@ -433,14 +348,18 @@ public:
      * index 'i' is not a Double.
      */
     double& getDouble(const size_type& i)
-    { return value::toDouble(get(i)); }
+    {
+        return pp_get_value(i).toDouble().value();
+    }
 
     /**
      * @brief Add an IntegerValue into the set.
      * @param value
      */
-    void addInt(const int& value)
-    { m_value.push_back(new Integer(value)); }
+    Integer& addInt(const int& value)
+    {
+        return pp_add<Integer>(value);
+    }
 
     /**
      * @brief Get a int from the specified index.
@@ -450,7 +369,9 @@ public:
      * index 'i' is not a Integer.
      */
     int32_t getInt(const size_type& i) const
-    { return value::toInteger(get(i)); }
+    {
+        return pp_get_value(i).toInteger().value();
+    }
 
     /**
      * @brief Get a int from the specified index.
@@ -460,14 +381,18 @@ public:
      * index 'i' is not a Integer.
      */
     int32_t& getInt(const size_type& i)
-    { return value::toInteger(get(i)); }
+    {
+        return pp_get_value(i).toInteger().value();
+    }
 
     /**
      * @brief Add a StringValue into the set.
      * @param value
      */
-    void addString(const std::string& value)
-    { m_value.push_back(new String(value)); }
+    String& addString(const std::string& value)
+    {
+        return pp_add<String>(value);
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -477,7 +402,9 @@ public:
      * index 'i' is not a String.
      */
     const std::string& getString(const size_type& i) const
-    { return value::toString(get(i)); }
+    {
+        return pp_get_value(i).toString().value();
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -487,14 +414,18 @@ public:
      * index 'i' is not a String.
      */
     std::string& getString(const size_type& i)
-    { return value::toString(get(i)); }
+    {
+        return pp_get_value(i).toString().value();
+    }
 
     /**
      * @brief Add an XMLValue into the set.
      * @param value
      */
-    void addXml(const std::string& value)
-    { m_value.push_back(new Xml(value)); }
+    Xml& addXml(const std::string& value)
+    {
+        return pp_add<Xml>(value);
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -504,7 +435,9 @@ public:
      * index 'i' is not an XML.
      */
     const std::string& getXml(const size_type& i) const
-    { return value::toXml(get(i)); }
+    {
+        return pp_get_value(i).toXml().value();
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -514,15 +447,19 @@ public:
      * index 'i' is not an XML.
      */
     std::string& getXml(const size_type& i)
-    { return value::toXml(get(i)); }
+    {
+        return pp_get_value(i).toXml().value();
+    }
 
     /**
      * @brief Add an Table into the set.
      * @param value
      */
-    void addTable(const Table::size_type& width = 0,
-                  const Table::size_type& height = 0)
-    { m_value.push_back(new Table(width, height)); }
+    Table& addTable(Table::size_type width = 0,
+                    Table::size_type height = 0)
+    {
+        return pp_add<Table>(width, height);
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -532,7 +469,9 @@ public:
      * index 'i' is not an XML.
      */
     const Table& getTable(const size_type& i) const
-    { return value::toTableValue(value::reference(get(i))); }
+    {
+        return pp_get_value(i).toTable();
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -542,14 +481,18 @@ public:
      * index 'i' is not an XML.
      */
     Table& getTable(const size_type& i)
-    { return value::toTableValue(value::reference(get(i))); }
+    {
+        return pp_get_value(i).toTable();
+    }
 
     /**
      * @brief Add an Tuple into the set.
      * @param value
      */
-    void addTuple(const Tuple::size_type& width = 0, const double& value = 0.0)
-    { m_value.push_back(new Tuple(width, value)); }
+    Tuple& addTuple(Tuple::size_type width = 0, double value = 0.0)
+    {
+        return pp_add<Tuple>(width, value);
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -559,7 +502,9 @@ public:
      * index 'i' is not an XML.
      */
     const Tuple& getTuple(const size_type& i) const
-    { return value::toTupleValue(value::reference(get(i))); }
+    {
+        return pp_get_value(i).toTuple();
+    }
 
     /**
      * @brief Get a string from the specified index.
@@ -569,7 +514,9 @@ public:
      * index 'i' is not an XML.
      */
     Tuple& getTuple(const size_type& i)
-    { return value::toTupleValue(value::reference(get(i))); }
+    {
+        return pp_get_value(i).toTuple();
+    }
 
     /**
      * @brief Add a Set at the end of the Set.
@@ -588,13 +535,6 @@ public:
      * @return A reference to the newly allocated Set.
      */
     Matrix& addMatrix();
-
-    /**
-     * @brief Resize the set
-     * @param newSize, the new size
-     * @param fill, the default value for filling new elements
-     */
-    void resize(int newSize, const Value& fill);
 
     /**
      * @brief Get a Set from the specified index.
@@ -651,46 +591,101 @@ public:
     const Matrix& getMatrix(const size_type& i) const;
 
     /**
+     * @brief Delete the Value at the specified index. Be careful, all
+     * reference and iterator are invalided after this call.
      * @brief Remove an elemet of the set
      * @param i index of value to remove
      */
-    void remove(const size_type& i);
+    void remove(const size_type& i)
+    {
+        pp_check_index(i);
+        m_value.erase(begin() + i);
+    }
+
+    /**
+     * @brief Resize the set
+     * @param newSize, the new size
+     * @param fill, the default value for filling new elements
+     */
+    void resize(size_type newSize, const Value& fill);
 
 private:
     VectorValue m_value;
 
-    /**
-     * @brief Delete the Value at the specified index. Be careful, all
-     * reference and iterator are invalided after this call.
-     * @param i The index of the value.
-     * @throw utils::ArgError if index 'i' is too big.
-     */
-    void del(const size_type i);
+    inline void pp_check_index(size_type i) const
+    {
+#ifndef NDEBUG
+        if (i >= size())
+            throw utils::ArgError(
+                fmt(_("Set: too big index '%1%'")) % i);
+#else
+        (void)i;
+#endif
+    }
+
+    inline iterator pp_get(size_type i)
+    {
+        pp_check_index(i);
+        return begin() + i;
+    }
+
+    inline const_iterator pp_get(size_type i) const
+    {
+        pp_check_index(i);
+        return begin() + i;
+    }
+
+    inline Value& pp_get_value(size_type i)
+    {
+        auto it = pp_get(i);
+
+        if (not it->get())
+            throw utils::ArgError(
+                fmt(_("Set: empty or null value at '%1%'")) % i);
+
+        return *it->get();
+    }
+
+    inline const Value& pp_get_value(size_type i) const
+    {
+        auto it = pp_get(i);
+
+        if (not it->get())
+            throw utils::ArgError(
+                fmt(_("Set: empty or null value at '%1%'")) % i);
+
+        return *it->get();
+    }
+
+    template <typename T, typename... Args>
+        T& pp_add(Args&&... args)
+    {
+        auto value = std::unique_ptr<Value>(new T(std::forward<Args>(args)...));
+        auto *ret = static_cast<T*>(value.get());
+
+        m_value.emplace_back(std::move(value));
+
+        return *ret;
+    }
 };
+
+inline const Set& toSetValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toSet(); }
 
 inline const Set& toSetValue(const Value& value)
 { return value.toSet(); }
 
-inline const Set* toSetValue(const Value* value)
-{ return value ? &value->toSet() : 0; }
-
 inline Set& toSetValue(Value& value)
 { return value.toSet(); }
 
-inline Set* toSetValue(Value* value)
-{ return value ? &value->toSet() : 0; }
+inline const VectorValue& toSet(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toSet().value(); }
 
 inline const VectorValue& toSet(const Value& value)
 { return value.toSet().value(); }
 
 inline VectorValue& toSet(Value& value)
 { return value.toSet().value(); }
-
-inline const VectorValue& toSet(const Value* value)
-{ return value::reference(value).toSet().value(); }
-
-inline VectorValue& toSet(Value* value)
-{ return value::reference(value).toSet().value(); }
 
 }} // namespace vle value
 

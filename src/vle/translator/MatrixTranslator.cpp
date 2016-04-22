@@ -170,12 +170,12 @@ void MatrixTranslator::parseXML(const value::Value& value)
             const value::Set& libraries = cells.getSet("libraries");
             for (value::Set::const_iterator it = libraries.begin();
                  it != libraries.end(); ++it, ++index) {
-                const value::Map* library = value::toMapValue(*it);
+                const value::Map& library = (*it)->toMap();
 
-                const std::string& lib = library->getString("library");
+                const std::string& lib = library.getString("library");
 
-                if (library->exist("model")) {
-                    const std::string& model = library->getString("model");
+                if (library.exist("model")) {
+                    const std::string& model = library.getString("model");
                     m_libraries[index] = std::make_pair(lib, model);
                 } else {
                     m_libraries[index] = std::make_pair(lib, "");
@@ -508,7 +508,7 @@ void MatrixTranslator::translateCondition1D(unsigned int i)
     std::string name = (fmt("cond_%1%_%2%")
                         % m_prefix % i).str();
     vpz::Condition condition(name);
-    value::Set* neighbourhood = value::Set::create();
+    auto neighbourhood = std::unique_ptr<value::Set>(new value::Set());
 
     if (i != 1)
         neighbourhood->add(value::String::create("L"));
@@ -516,7 +516,7 @@ void MatrixTranslator::translateCondition1D(unsigned int i)
     if (i != m_size[0])
         neighbourhood->add(value::String::create("R"));
 
-    condition.addValueToPort("Neighbourhood", neighbourhood);
+    condition.addValueToPort("Neighbourhood", std::move(neighbourhood));
 
     condition.addValueToPort("_x", value::Integer::create(i));
 
@@ -529,7 +529,7 @@ void MatrixTranslator::translateCondition2D(unsigned int i,
     std::string name = (fmt("cond_%1%_%2%_%3%")
                         % m_prefix % i % j).str();
     vpz::Condition condition(name);
-    value::Set* neighbourhood = value::Set::create();
+    auto neighbourhood = std::unique_ptr<value::Set>(new value::Set());
 
     if (i != 1)
         neighbourhood->add(value::String::create("N"));
@@ -557,7 +557,7 @@ void MatrixTranslator::translateCondition2D(unsigned int i,
             neighbourhood->add(value::String::create("SE"));
     }
 
-    condition.addValueToPort("Neighbourhood", neighbourhood);
+    condition.addValueToPort("Neighbourhood", std::move(neighbourhood));
 
     condition.addValueToPort("_x", value::Integer::create(i));
     condition.addValueToPort("_y", value::Integer::create(j));

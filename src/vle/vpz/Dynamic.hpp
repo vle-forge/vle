@@ -67,13 +67,13 @@ public:
      * stream.
      * @param out Output stream where flush this class.
      */
-    virtual void write(std::ostream& out) const;
+    virtual void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return Return DYNAMIC.
      */
-    virtual Base::type getType() const
+    virtual Base::type getType() const override
     { return VLE_VPZ_DYNAMIC; }
 
     /**

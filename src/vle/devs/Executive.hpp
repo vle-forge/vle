@@ -111,7 +111,7 @@ public:
      * simulation.
      * @return false if Dynamics is not an Executive.
      */
-    inline virtual bool isExecutive() const
+    inline virtual bool isExecutive() const override
     { return true; }
 
     // / / / /

@@ -117,19 +117,16 @@ void ModelFactory::createModel(Coordinator& coordinator,
 	    value::MapValue vl;
 	    cnd.fillWithFirstValues(vl);
 
-	    for (value::MapValue::const_iterator itv = vl.begin();
+	    for (value::MapValue::iterator itv = vl.begin();
 		 itv != vl.end(); ++itv) {
 
-                if (initValues.exist(itv->first)) {
-                    initValues.value().clear();
-                    throw utils::InternalError(fmt(_(
-                            "Multiples condition with the same init port " \
-                            "name '%1%'")) % itv->first);
-                }
-                initValues.add(itv->first, itv->second);
-            }
+                if (initValues.exist(itv->first))
+                    throw utils::InternalError(
+                        fmt(_("Multiples condition with the same init port " \
+                              "name '%1%'")) % itv->first);
 
-            vl.clear();
+                initValues.add(itv->first, std::move(itv->second));
+            }
 	}
     }
 

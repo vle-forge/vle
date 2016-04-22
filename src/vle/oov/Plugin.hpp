@@ -106,9 +106,9 @@ public:
      * @attention You are in charge of freeing the value::Matrix after
      * the end of the simulation.
      */
-    virtual value::Matrix * matrix() const
+    virtual std::unique_ptr<value::Matrix> matrix() const
     {
-        return 0;
+        return {};
     }
 
     /**
@@ -145,7 +145,7 @@ public:
     virtual void onParameter(const std::string& plugin,
                              const std::string& location,
                              const std::string& file,
-                             value::Value* parameters,
+                             std::unique_ptr<value::Value> parameters,
                              const double& time) = 0;
 
     /**
@@ -176,7 +176,7 @@ public:
                          const std::string& port,
                          const std::string& view,
                          const double& time,
-                         value::Value* value) = 0;
+                         std::unique_ptr<value::Value> value) = 0;
 
     /**
      * Call when the simulation is finished.

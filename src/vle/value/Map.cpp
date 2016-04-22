@@ -24,35 +24,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Matrix.hpp>
-#include <vle/utils/Algo.hpp>
-#include <boost/checked_delete.hpp>
-#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace value {
 
 Map::Map(const Map& orig)
     : Value(orig)
 {
-    for (const_iterator it = orig.begin(); it != orig.end(); ++it) {
-        if ((*it).second) {
-            m_value.insert(std::make_pair((*it).first,
-                                          ((*it).second)->clone()));
-        } else {
-            m_value.insert(std::make_pair((*it).first, (value::Value*)0));
-        }
-    }
+    for (const auto & elem : orig.m_value)
+        m_value[elem.first] =
+            std::unique_ptr<Value>(
+                elem.second ? elem.second->clone() : nullptr);
+}
+
+std::unique_ptr<Value> Map::clone() const
+{
+    return std::unique_ptr <Value>(new Map(*this));
+}
+
+Value::type Map::getType() const
+{
+    return Value::MAP;
 }
 
 void Map::writeFile(std::ostream& out) const
 {
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if (it != begin()) {
+    for (auto it = begin(); it != end(); ++it) {
+        if (it != begin())
             out << " ";
-        }
+
         out << "(" << (*it).first.c_str() << ", ";
         (*it).second->writeFile(out);
         out << ")";
@@ -61,10 +63,10 @@ void Map::writeFile(std::ostream& out) const
 
 void Map::writeString(std::ostream& out) const
 {
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if (it != begin()) {
+    for (auto it = begin(); it != end(); ++it) {
+        if (it != begin())
             out << " ";
-        }
+
         out << "(" << (*it).first.c_str() << ", ";
         (*it).second->writeString(out);
         out << ")";
@@ -75,155 +77,88 @@ void Map::writeXml(std::ostream& out) const
 {
     out << "<map>";
 
-    for (const_iterator it = begin(); it != end(); ++it) {
-        out << "<key name=\"" << (*it).first.c_str() << "\">";
-        (*it).second->writeXml(out);
+    for (const auto & elem : *this) {
+        out << "<key name=\"" << (elem).first.c_str() << "\">";
+        (elem).second->writeXml(out);
         out << "</key>";
     }
+
     out << "</map>";
+}
+
+Map& Map::addMap(const std::string& name)
+{
+    return pp_add<Map>(name);
+}
+    
+Set& Map::addSet(const std::string& name)
+{
+    return pp_add<Set>(name);
 }
 
 Matrix& Map::addMatrix(const std::string& name)
 {
-    value::Matrix* value = new Matrix();
-
-    add(name, value);
-
-    return *value;
+    return pp_add<Matrix>(name);
 }
+
+Map& Map::getMap(const std::string& name)
+{
+    return pp_get_value(name).toMap();
+}
+
+Set& Map::getSet(const std::string& name)
+{
+    return pp_get_value(name).toSet();
+}
+
+Matrix& Map::getMatrix(const std::string& name)
+{
+    return pp_get_value(name).toMatrix();
+}
+
+const Map& Map::getMap(const std::string& name) const
+{
+    return pp_get_value(name).toMap();
+}
+
+const Set& Map::getSet(const std::string& name) const
+{
+    return pp_get_value(name).toSet();
+}
+
+const Matrix& Map::getMatrix(const std::string& name) const
+{
+    return pp_get_value(name).toMatrix();
+}
+
 
 void
 Map::addMultilpleValues(int toadd, const vle::value::Value& fill)
 {
-    if (toadd <= 0) {
+    if (toadd <= 0)
         return;
-    }
+
     std::string key;
     bool found;
-    for (int i=0; i<toadd; i++) {
+    
+    for (auto i=0; i < toadd; ++i) {
         key.assign("NewKey");
         int current = 0;
         found = false;
+        
         while (not found) {
             found = not exist(key);
             if (not found) {
                 current ++;
                 key.assign("NewKey");
                 key += "_";
-                key += boost::lexical_cast<std::string>(current);
+                key += std::to_string(current);
             }
         }
-        add(key, fill.clone());
+        auto to_add = std::unique_ptr<Value>(fill.clone());
+        
+        std::swap(m_value[key], to_add);
     }
-}
-
-Set& Map::addSet(const std::string& name)
-{
-    value::Set* value = new Set();
-
-    add(name, value);
-
-    return *value;
-}
-
-Map& Map::addMap(const std::string& name)
-{
-    value::Map* value = new Map();
-
-    add(name, value);
-
-    return *value;
-}
-
-const Value* Map::operator[](const std::string& name) const
-{
-    const_iterator it = find(name);
-
-    if (it == end()) {
-        throw utils::ArgError(fmt(_(
-                "Map: the key '%1%' does not exist")) % name);
-    }
-
-    return it->second;
-}
-
-Value* Map::operator[](const std::string& name)
-{
-    iterator it = find(name);
-
-    if (it == end()) {
-        throw utils::ArgError(fmt(_(
-                "Map: the key '%1%' does not exist")) % name);
-    }
-
-    return it->second;
-}
-
-Value* Map::give(const std::string& name)
-{
-    iterator it = find(name);
-
-    if (it == end()) {
-        throw utils::ArgError(fmt(_(
-                "Map: the key '%1%' does not exist")) % name);
-    }
-
-    Value* result = it->second;
-    it->second = 0;
-    m_value.erase(it);
-
-    return result;
-}
-
-const Map& Map::getMap(const std::string& name) const
-{
-    return value::toMapValue(value::reference(get(name)));
-}
-
-const Set& Map::getSet(const std::string& name) const
-{
-    return value::toSetValue(value::reference(get(name)));
-}
-
-const Matrix& Map::getMatrix(const std::string& name) const
-{
-    return value::toMatrixValue(value::reference(get(name)));
-}
-
-Map& Map::getMap(const std::string& name)
-{
-    return value::toMapValue(value::reference(get(name)));
-}
-
-Set& Map::getSet(const std::string& name)
-{
-    return value::toSetValue(value::reference(get(name)));
-}
-
-Matrix& Map::getMatrix(const std::string& name)
-{
-    return value::toMatrixValue(value::reference(get(name)));
-}
-
-void Map::clear()
-{
-    vle::utils::forEach(begin(), end(), boost::checked_deleter < Value >());
-
-    m_value.clear();
-}
-
-Value* Map::getPointer(const std::string& name)
-{
-    iterator it = find(name);
-
-    return it == end() ? 0 : it->second;
-}
-
-const Value* Map::getPointer(const std::string& name) const
-{
-    const_iterator it = find(name);
-
-    return it == end() ? 0 : it->second;
 }
 
 }} // namespace vle value

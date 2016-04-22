@@ -49,7 +49,7 @@ void StreamWriter::open(const std::string& pluginname,
                         const std::string& package,
                         const std::string& location,
                         const std::string& file,
-                        value::Value* parameters,
+                        std::unique_ptr<value::Value> parameters,
                         const devs::Time& time)
 {
     void *symbol = 0;
@@ -65,7 +65,8 @@ void StreamWriter::open(const std::string& pluginname,
             e.what());
     }
 
-    plugin()->onParameter(pluginname, location, file, parameters, time);
+    plugin()->onParameter(pluginname, location, file,
+                          std::move(parameters), time);
 }
 
 void StreamWriter::processNewObservable(Simulator* simulator,
@@ -92,7 +93,7 @@ void StreamWriter::process(Simulator* simulator,
                            const std::string& portname,
                            const devs::Time& time,
                            const std::string& view,
-                           value::Value* val)
+                           std::unique_ptr<value::Value> val)
 {
     std::string name, parent;
 
@@ -101,7 +102,7 @@ void StreamWriter::process(Simulator* simulator,
         parent = simulator->getParent();
     }
 
-    plugin()->onValue(name, parent, portname, view, time, val);
+    plugin()->onValue(name, parent, portname, view, time, std::move(val));
 }
 
 void StreamWriter::close(const devs::Time& time)
@@ -109,13 +110,12 @@ void StreamWriter::close(const devs::Time& time)
     plugin()->close(time);
 }
 
-value::Matrix * StreamWriter::matrix() const
+std::unique_ptr<value::Matrix> StreamWriter::matrix() const
 {
-    if (m_plugin) {
+    if (m_plugin)
         return m_plugin->matrix();
-    }
 
-    return NULL;
+    return {};
 }
 
 }} // namespace vle devs

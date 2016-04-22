@@ -38,55 +38,29 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/DllDefines.hpp>
-#include <boost/multi_array.hpp>
 
 namespace vle { namespace value {
 
 /// @brief Define a Matrix of value::Value object.
-typedef boost::multi_array<value::Value*, 2 >  MatrixValue;
-
-/// @brief Define a Vector View  of the Matrix.
-typedef MatrixValue::array_view < 1 >::type VectorView;
-
-/// @brief Define a constant Vector View  of the Matrix.
-typedef MatrixValue::const_array_view < 1 >::type ConstVectorView;
-
-/// @brief Define a Matrix View of the Matrix.
-typedef MatrixValue::array_view < 2 >::type MatrixView;
-
-/// @brief Define a constant Matrix View of the Matrix.
-typedef MatrixValue::const_array_view < 2 >::type ConstMatrixView;
+typedef std::vector <std::unique_ptr<Value>> MatrixValue;
 
 /**
- * @brief A Matrix Value. This class wraps a boost::multi_array from the
- * Boost library (http://www.boost.org) class of two dimension of
- * value::Value.
+ * @brief A Matrix Value. This class wraps an std::vector class and manage
+ * size (rows() * columns()), allocated_size (rowmax * columnmax) to step
+ * up resize or add column/row dynamically.
  */
 class VLE_API Matrix : public Value
 {
 public:
-    /// Define indices of Matrix.
-    typedef MatrixValue::index_gen Indices;
-
-    /// Define a Range of Matrix.
-    typedef MatrixValue::index_range Range;
-
-    /// Define an index of Matrix.
-    typedef MatrixValue::index index;
-
-    /// Define a dimension size of Matrix.
+    typedef MatrixValue::size_type index;
     typedef MatrixValue::size_type size_type;
-
     typedef MatrixValue::iterator iterator;
     typedef MatrixValue::const_iterator const_iterator;
 
     /**
-     * @brief Build an empty Matrix.
+     * @brief Build an empty Matrix but an allocated size of 256*1024 cells.
      */
-    Matrix()
-        : m_matrix(), m_nbcol(0), m_nbrow(0), m_stepcol(1), m_steprow(1),
-        m_lastX(0), m_lastY(0)
-    {}
+    Matrix();
 
     /**
      * @brief Build an empty matrix of value of size [colums][row].
@@ -95,10 +69,7 @@ public:
      * @param resizeColumns the number of columns to add when resize the matrix.
      * @param resizeRows the number of rows to add when resize the matrix.
      */
-    Matrix(index columns, index rows, index resizeColumns, index resizeRows)
-        : m_matrix(boost::extents[columns][rows]), m_nbcol(columns), m_nbrow(rows),
-        m_stepcol(resizeColumns), m_steprow(resizeRows), m_lastX(0), m_lastY(0)
-    {}
+    Matrix(index columns, index rows, index resizeColumns, index resizeRows);
 
     /**
      * @brief Build an empty buffered matrix of value of size [colums][rows] in
@@ -124,8 +95,7 @@ public:
     /**
      * @brief Delete all data.
      */
-    virtual ~Matrix()
-    { clear(); }
+    virtual ~Matrix() {}
 
     /**
      * @brief Build a new Matrix.
@@ -135,11 +105,14 @@ public:
      * @param resizeRows Number of row when resize buffer.
      * @return A new allocated Matrix.
      */
-    static Matrix* create(index columns = 10,
-                          index rows = 10,
-                          index resizeColumns = 10,
-                          index resizeRows = 10)
-    { return new Matrix(columns, rows, resizeColumns, resizeRows); }
+    static std::unique_ptr<Value> create(index columns = 10,
+                                         index rows = 10,
+                                         index resizeColumns = 10,
+                                         index resizeRows = 10)
+    {
+        return std::unique_ptr<Value>(
+            new Matrix(columns, rows, resizeColumns, resizeRows));
+    }
 
     /**
      * @brief Build a new Matrix with a specified views.
@@ -151,14 +124,17 @@ public:
      * @param resizeRows Number of row when resize buffer.
      * @return A new allocated Matrix.
      */
-    static Matrix* create(index columns,
-                          index rows,
-                          index columnmax,
-                          index rowmax,
-                          index resizeColumns,
-                          index resizeRows)
-    { return new Matrix(columns, rows, columnmax, rowmax, resizeColumns,
-                        resizeRows); }
+    static std::unique_ptr<Value> create(index columns,
+                                         index rows,
+                                         index columnmax,
+                                         index rowmax,
+                                         index resizeColumns,
+                                         index resizeRows)
+    {
+        return std::unique_ptr<Value>(
+            new Matrix(columns, rows, columnmax, rowmax,
+                       resizeColumns, resizeRows));
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -168,14 +144,16 @@ public:
      * @brief Clone the Matrix and all value::Value.
      * @return A new Matrix.
      */
-    virtual Value* clone() const
-    { return new Matrix(*this); }
+    virtual std::unique_ptr<Value> clone() const override
+    {
+        return std::unique_ptr<Value>(new Matrix(*this));
+    }
 
     /**
      * @brief Get the type of this class.
      * @return Value::MATRIX.
      */
-    inline virtual Value::type getType() const
+    inline virtual Value::type getType() const override
     { return Value::MATRIX; }
 
     /**
@@ -187,7 +165,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the MatrixValue, recursively and space
@@ -198,7 +176,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the MatrixValue recursively in an XML
@@ -224,7 +202,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -251,11 +229,28 @@ public:
     void clear();
 
     /**
+     * Reserve memory for the matrix. If \e columnmax or \e rowmax are
+     * lower than columm and row do nothing.
+     * @param columnmax The number of columns of the matrix.
+     * @param rowmax The number of rows of the matrix.
+     */
+    void reserve(size_type columnmax, size_type rowmax);
+
+    /**
      * @brief Resize the current matrix.
      * @param columns The number of columns of the matrix.
      * @param rows The number of rows of the matrix.
      */
-    void resize(const size_type& columns, const size_type& rows);
+    void resize(size_type columns, size_type rows);
+
+    /**
+     * @brief Resize the current matrix.
+     * @param columns The number of columns of the matrix.
+     * @param rows The number of rows of the matrix.
+     * @parma value Default value to be assigned in each new cell.
+     */
+    void resize(size_type columns, size_type rows,
+                std::unique_ptr<Value> value);
 
     /**
      * @brief Resize only the size of allocated matrix . Content of the matrix
@@ -265,16 +260,7 @@ public:
      * @param rows The number of rows of the matrix. Has to be
      * greater the m_nbrow and m_matrix.shape[1], otherwise nothing happens.
      */
-    void increaseAllocation(const size_type& columns, const size_type& rows);
-
-    /**
-     * @brief Resize the current matrix.
-     * @param columns The number of columns of the matrix.
-     * @param rows The number of rows of the matrix.
-     * @param def The default Value used to fill new cells
-     */
-    void resize(const size_type& columns, const size_type& rows,
-            const vle::value::Value& def);
+    void increaseAllocation(size_type columns, size_type rows);
 
     /**
      * @brief Add a new column to the Matrix.
@@ -287,41 +273,21 @@ public:
     void addRow();
 
     /**
-     * @brief Set the cell at (column, row) to the specified value. Be careful,
-     * the value is managed by the Matrix.
-     * @param column index of the cell's column.
-     * @param row index of the cell's row.
-     * @param value the value to set.
+     * @brief Get am access to the underlying std::vector.
+     * @return a reference to the std::vector.
      */
-    void add(const size_type& column, const size_type& row,
-             value::Value* val)
+    inline MatrixValue& value()
     {
-        set(column, row, val);
+        return m_matrix;
     }
 
     /**
-     * @brief Set the cell at (column, row) to the specified value.
-     * @param column index of the cell's column.
-     * @param row index of the cell's row.
-     * @param value the value to set.
+     * @brief Get a constant access to the underlying std::vector.
+     * @return a reference to the std::vector.
      */
-    void add(const size_type& column, const size_type& row,
-             const value::Value* val)
+    inline const MatrixValue& value() const
     {
-        set(column, row, val);
-    }
-
-    /**
-     * @brief Set the cell at (column, row) to the specified value.
-     * The value is cloned.
-     * @param column index of the cell's column.
-     * @param row index of the cell's row.
-     * @param value the value to set.
-     */
-    void add(const size_type& column, const size_type& row,
-             const value::Value& val)
-    {
-        set(column, row, val);
+        return m_matrix;
     }
 
     /**
@@ -331,42 +297,25 @@ public:
      * @param row index of the cell's row.
      * @param value the value to set.
      */
-    void set(const size_type& column, const size_type& row,
-             value::Value* val)
+    void add(index column, index row, std::unique_ptr<Value> val)
     {
-        delete m_matrix[column][row];
-        m_matrix[column][row] = val;
+        pp_check_index(column, row);
+
+        m_matrix[row * m_nbcolmax + column] = std::move(val);
     }
 
     /**
-     * @brief Set the cell at (column, row) to the specified value.
+     * @brief Set the cell at (column, row) to the specified value. Be careful,
+     * the value is managed by the Matrix.
      * @param column index of the cell's column.
      * @param row index of the cell's row.
      * @param value the value to set.
      */
-    void set(const size_type& column, const size_type& row,
-             const value::Value* val)
+    void set(index column, index row, std::unique_ptr<Value> val)
     {
-        delete m_matrix[column][row];
-        if (val) {
-            m_matrix[column][row] = val->clone();
-        } else {
-            m_matrix[column][row] = 0;
-        }
-    }
+        pp_check_index(column, row);
 
-    /**
-     * @brief Set the cell at (column, row) to the specified value.
-     * The value is cloned.
-     * @param column index of the cell's column.
-     * @param row index of the cell's row.
-     * @param value the value to set.
-     */
-    void set(const size_type& column, const size_type& row,
-             const value::Value& val)
-    {
-        delete m_matrix[column][row];
-        m_matrix[column][row] = val.clone();
+        m_matrix[row * m_nbcolmax + column] = std::move(val);
     }
 
     /**
@@ -376,32 +325,36 @@ public:
      * @return A constant pointer to the Value.
      * @throw utils::ArgError if bad access to the matrix, in debug mode only.
      */
-    const Value* get(const size_type& column, const size_type& row) const
+    const std::unique_ptr<Value>& get(index column, index row) const
     {
-#ifndef NDEBUG
-        if (not (column < m_nbcol and row <= m_nbrow)) {
-            throw utils::ArgError(_("Matrix: bad access"));
-        }
-#endif
+        pp_check_index(column, row);
+        return m_matrix[row * m_nbcolmax + column];
+    }
 
-        return m_matrix[column][row];
+    /**
+     * Get an ownership pointer to the specified cell. The \e Value is
+     * removed from the Matrix.
+     * @param column The column.
+     * @param row The row.
+     * @return A ownership pointer to the Value.
+     */
+    std::unique_ptr<Value> give(index column, index row)
+    {
+        pp_check_index(column, row);
+        return std::move(m_matrix[row * m_nbcolmax + column]);
     }
 
     /**
      * @brief Get a pointer from a cell of the matrix.
      * @param column The column.
      * @param row The row.
-     * @return A pointer to the Value.
+     * @return A constant pointer to the Value.
      * @throw utils::ArgError if bad access to the matrix, in debug mode only.
      */
-    Value* get(const size_type& column, const size_type& row)
+    const std::unique_ptr<Value>& operator()(index column, index row) const
     {
-#ifndef NDEBUG
-        if (not (column < m_nbcol and row <= m_nbrow)) {
-            throw utils::ArgError(_("Matrix: bad access"));
-        }
-#endif
-        return m_matrix[column][row];
+        pp_check_index(column, row);
+        return m_matrix[row * m_nbcolmax + column];
     }
 
     /**
@@ -409,20 +362,9 @@ public:
      * cloned.
      * @param val the value to clone and assign.
      */
-    void addToLastCell(const value::Value& val)
+    void addToLastCell(std::unique_ptr<Value> val)
     {
-        add(m_lastX, m_lastY, val);
-    }
-
-    /**
-     * @brief Set the last cell to the specificed value.
-     * Be careful, the value is managed by the Matrix.
-     * @param val the value to assign. Be carefull, the value is managed by
-     * the Matrix class.
-     */
-    void addToLastCell(value::Value* val)
-    {
-        add(m_lastX, m_lastY, val);
+        m_matrix[m_lastY * m_nbcolmax + m_lastX] = std::move(val);
     }
 
     /**
@@ -431,33 +373,6 @@ public:
      * row + 1. If the row equal the number of row, row is set to 0.
      */
     void moveLastCell();
-
-    /**
-     * @brief Get the correct subset of the Matrix define in:
-     * [0, columns()][0, rows()]. Not the global Matrix:
-     * [0, matrix.shape()[0][0, matrix.shape()[1]];
-     * @return A view of the data.
-     */
-    inline MatrixView value()
-    { return m_matrix[m_indices [Range(0, m_nbcol)][Range(0, m_nbrow)]]; }
-
-    /**
-     * @brief Get the correct subset of the Matrix define in:
-     * [0, columns()][0, rows()]. Not the global Matrix:
-     * [0, matrix.shape()[0][0, matrix.shape()[1]];
-     * @return A view of the data.
-     */
-    inline ConstMatrixView value() const
-    { return m_matrix[m_indices [Range(0, m_nbcol)][Range(0, m_nbrow)]]; }
-
-    /**
-     * @brief Get the correct subset of the Matrx define in:
-     * [0, columns()][0, rows()]. Not the global Matrix:
-     * [0, matrix.shape()[0][0, matrix.shape()[1]];
-     * @return A constant view of the data.
-     */
-    inline ConstMatrixView getConstValue() const
-    { return m_matrix[m_indices [Range(0, m_nbcol)][Range(0, m_nbrow)]]; }
 
     /**
      * @brief Get a constant reference to the complete matrix.
@@ -474,20 +389,11 @@ public:
     { return m_nbcol; }
 
     /**
-     * @brief Return a vector from the Matrix.
-     * @param index the index of the vector.
-     * @return A view on the column of the Matrix.
+     * @brief Return the number of allocatede column data.
+     * @return the number of valid column.
      */
-    inline VectorView column(index index)
-    { return m_matrix[boost::indices[index][Range(0, m_nbrow)]]; }
-
-    /**
-     * @brief Return a vector from the Matrix.
-     * @param index the index of the vector.
-     * @return A view on the column of the Matrix.
-     */
-    inline ConstVectorView column(index index) const
-    { return m_matrix[boost::indices[index][Range(0, m_nbrow)]]; }
+    inline size_type columns_max() const
+    { return m_nbcolmax; }
 
     /**
      * @brief Return the number of valid row data.
@@ -497,20 +403,11 @@ public:
     { return m_nbrow; }
 
     /**
-     * @brief Return a vector from the Matrix.
-     * @param index the index of the vector.
-     * @return A view on the row of the Matrix.
+     * @brief Return the number allocated row data.
+     * @return the number of valid row.
      */
-    inline VectorView row(index index)
-    { return m_matrix[boost::indices[Range(0, m_nbcol)][index]]; }
-
-    /**
-     * @brief Return a constant vector from the Matrix.
-     * @param index the index of the vector.
-     * @return A constant view on the row of the Matrix.
-     */
-    inline ConstVectorView row(index index) const
-    { return m_matrix[boost::indices[Range(0, m_nbcol)][index]]; }
+    inline size_type rows_max() const
+    { return m_nbrowmax; }
 
     /**
      * @brief Return the number of column to add.
@@ -549,9 +446,9 @@ public:
      * @param column The column.
      * @param row The row.
      */
-    void addNull(const size_type& column, const size_type& row)
+    Null& addNull(index column, index row)
     {
-        add(column, row, new Null());
+        return pp_add<Null>(column, row);
     }
 
     /**
@@ -560,9 +457,9 @@ public:
      * @param row The row.
      * @param value The value of the boolean.
      */
-    void addBoolean(const size_type& column, const size_type& row, bool value)
+    Boolean& addBoolean(index column, index row, bool value)
     {
-        add(column, row, new Boolean(value));
+        return pp_add<Boolean>(column, row, value);
     }
 
     /**
@@ -571,9 +468,9 @@ public:
      * @param row The row.
      * @return The boolean readed from the matrix.
      */
-    bool getBoolean(const size_type& column, const size_type& row) const
+    bool getBoolean(index column, index row) const
     {
-        return value::toBoolean(get(column, row));
+        return pp_get_value(column, row).toBoolean().value();
     }
 
     /**
@@ -582,9 +479,9 @@ public:
      * @param row The row.
      * @return The boolean readed from the matrix.
      */
-    bool& getBoolean(const size_type& column, const size_type& row)
+    bool& getBoolean(index column, index row)
     {
-        return value::toBoolean(get(column, row));
+        return pp_get_value(column, row).toBoolean().value();
     }
 
     /**
@@ -593,10 +490,10 @@ public:
      * @param row The row.
      * @param value The value of the double.
      */
-    void addDouble(const size_type& column, const size_type& row,
+    Double& addDouble(index column, index row,
                    const double& value)
     {
-        add(column, row, new Double(value));
+        return pp_add<Double>(column, row, value);
     }
 
     /**
@@ -605,9 +502,9 @@ public:
      * @param row The row.
      * @return The double readed from the matrix.
      */
-    double getDouble(const size_type& column, const size_type& row) const
+    double getDouble(index column, index row) const
     {
-        return value::toDouble(get(column, row));
+        return pp_get_value(column, row).toDouble().value();
     }
 
     /**
@@ -616,9 +513,9 @@ public:
      * @param row The row.
      * @return The double readed from the matrix.
      */
-    double& getDouble(const size_type& column, const size_type& row)
+    double& getDouble(index column, index row)
     {
-        return value::toDouble(get(column, row));
+        return pp_get_value(column, row).toDouble().value();
     }
 
     /**
@@ -627,9 +524,9 @@ public:
      * @param row The row.
      * @param value The value of the int.
      */
-    void addInt(const size_type& column, const size_type& row, const int32_t& value)
+    Integer& addInt(index column, index row, const int32_t& value)
     {
-        add(column, row, new Integer(value));
+        return pp_add<Integer>(column, row, value);
     }
 
     /**
@@ -638,9 +535,9 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    int32_t getInt(const size_type& column, const size_type& row) const
+    int32_t getInt(index column, index row) const
     {
-        return value::toInteger(get(column, row));
+        return pp_get_value(column, row).toInteger().value();
     }
 
     /**
@@ -649,9 +546,9 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    int32_t& getInt(const size_type& column, const size_type& row)
+    int32_t& getInt(index column, index row)
     {
-        return value::toInteger(get(column, row));
+        return pp_get_value(column, row).toInteger().value();
     }
 
     /**
@@ -660,10 +557,9 @@ public:
      * @param row The row.
      * @param value The value of the string.
      */
-    void addString(const size_type& column, const size_type& row,
-                   const std::string& value)
+    String& addString(index column, index row, const std::string& value)
     {
-        add(column, row, new String(value));
+        return pp_add<String>(column, row, value);
     }
 
     /**
@@ -672,10 +568,9 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    const std::string& getString(const size_type& column,
-                                 const size_type& row) const
+    const std::string& getString(index column, index row) const
     {
-        return value::toString(get(column, row));
+        return pp_get_value(column, row).toString().value();
     }
 
     /**
@@ -684,9 +579,9 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    std::string& getString(const size_type& column, const size_type& row)
+    std::string& getString(index column, index row)
     {
-        return value::toString(get(column, row));
+        return pp_get_value(column, row).toString().value();
     }
 
     /**
@@ -695,10 +590,9 @@ public:
      * @param row The row.
      * @param value The value of the xml.
      */
-    void addXml(const size_type& column, const size_type& row,
-                const std::string& value)
+    Xml& addXml(index column, index row, const std::string& value)
     {
-        add(column, row, new Xml(value));
+        return pp_add<Xml>(column, row, value);
     }
 
     /**
@@ -707,10 +601,9 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    const std::string& getXml(const size_type& column,
-                              const size_type& row) const
+    const std::string& getXml(index column, index row) const
     {
-        return value::toXml(get(column, row));
+        return pp_get_value(column, row).toXml().value();
     }
 
     /**
@@ -719,9 +612,9 @@ public:
      * @param row The row.
      * @return The integer readed from the matrix.
      */
-    std::string& getXml(const size_type& column, const size_type& row)
+    std::string& getXml(index column, index row)
     {
-        return value::toXml(get(column, row));
+        return pp_get_value(column, row).toXml().value();
     }
 
     /**
@@ -732,13 +625,11 @@ public:
      * @param value The default value of cells in the Tuple.
      * @return A reference to the allocated Tuple.
      */
-    Tuple& addTuple(const size_type& column, const size_type& row,
-                    const Tuple::size_type& width = 0,
-                    const double& value = 0.0)
+    Tuple& addTuple(index column, index row,
+                    Tuple::size_type width = 0,
+                    double value = 0.0)
     {
-        value::Tuple* tuple = new Tuple(width, value);
-        add(column, row, tuple);
-        return *tuple;
+        return pp_add<Tuple>(column, row, width, value);
     }
 
     /**
@@ -747,9 +638,9 @@ public:
      * @param row The row.
      * @return The Tuple readed from the matrix.
      */
-    const Tuple& getTuple(const size_type& column, const size_type& row) const
+    const Tuple& getTuple(index column, index row) const
     {
-        return value::toTupleValue(value::reference(get(column, row)));
+        return pp_get_value(column, row).toTuple();
     }
 
     /**
@@ -758,9 +649,9 @@ public:
      * @param row The row.
      * @return The Tuple readed from the matrix.
      */
-    Tuple& getTuple(const size_type& column, const size_type& row)
+    Tuple& getTuple(index column, index row)
     {
-        return value::toTupleValue(value::reference(get(column, row)));
+        return pp_get_value(column, row).toTuple();
     }
 
     /**
@@ -771,13 +662,11 @@ public:
      * @param height The height of the newly allocated Table.
      * @return A reference to the allocated Table.
      */
-    Table& addTable(const size_type& column, const size_type& row,
-                    const Table::size_type& width = 0,
-                    const Table::size_type& height = 0)
+    Table& addTable(index column, index row,
+                    Table::size_type width = 0,
+                    Table::size_type height = 0)
     {
-        value::Table* table = new Table(width, height);
-        add(column, row, table);
-        return *table;
+        return pp_add<Table>(column, row, width, height);
     }
 
     /**
@@ -786,9 +675,9 @@ public:
      * @param row The row.
      * @return The Table readed from the matrix.
      */
-    const Table& getTable(const size_type& column, const size_type& row) const
+    const Table& getTable(index column, index row) const
     {
-        return value::toTableValue(value::reference(get(column, row)));
+        return pp_get_value(column, row).toTable();
     }
 
     /**
@@ -797,9 +686,9 @@ public:
      * @param row The row.
      * @return The Table readed from the matrix.
      */
-    Table& getTable(const size_type& column, const size_type& row)
+    Table& getTable(index column, index row)
     {
-        return value::toTableValue(value::reference(get(column, row)));
+        return pp_get_value(column, row).toTable();
     }
 
     /**
@@ -808,7 +697,7 @@ public:
      * @param row The row.
      * @return A reference to the newly allocated Set.
      */
-    Set& addSet(const size_type& column, const size_type& row);
+    Set& addSet(index column, index row);
 
     /**
      * @brief Add a Map at the end of the Set.
@@ -816,7 +705,7 @@ public:
      * @param row The row.
      * @return A reference to the newly allocated Map.
      */
-    Map& addMap(const size_type& column, const size_type& row);
+    Map& addMap(index column, index row);
 
     /**
      * @brief Add a Matrix at the end of the Set.
@@ -824,7 +713,7 @@ public:
      * @param row The row.
      * @return A reference to the newly allocated Set.
      */
-    Matrix& addMatrix(const size_type& column, const size_type& row);
+    Matrix& addMatrix(index column, index row);
 
     /**
      * @brief Get a Set from the specified index.
@@ -834,7 +723,7 @@ public:
      * @throw utils::ArgError if the index 'column' or 'row' are to big (in
      * debug mode) or if the value at (column, row) is null or is not a Set.
      */
-    Set& getSet(const size_type& column, const size_type& row);
+    Set& getSet(index column, index row);
 
     /**
      * @brief Get a Map from the specified index.
@@ -844,7 +733,7 @@ public:
      * @throw utils::ArgError if the index 'column' or 'row' are to big (in
      * debug mode) or if the value at (column, row) is null or is not a Set.
      */
-    Map& getMap(const size_type& column, const size_type& row);
+    Map& getMap(index column, index row);
 
     /**
      * @brief Get a Matrix from the specified index.
@@ -854,7 +743,7 @@ public:
      * @throw utils::ArgError if the index 'column' or 'row' are to big (in
      * debug mode) or if the value at (column, row) is null or is not a Map.
      */
-    Matrix& getMatrix(const size_type& column, const size_type& row);
+    Matrix& getMatrix(index column, index row);
 
     /**
      * @brief Get a constant Set from the specified index.
@@ -864,7 +753,7 @@ public:
      * @throw utils::ArgError if the index 'column' or 'row' are to big (in
      * debug mode) or if the value at (column, row) is null or is not a Map.
      */
-    const Set& getSet(const size_type& column, const size_type& row) const;
+    const Set& getSet(index column, index row) const;
 
     /**
      * @brief Get a constant Map from the specified index.
@@ -874,7 +763,7 @@ public:
      * @throw utils::ArgError if the index 'column' or 'row' are to big (in
      * debug mode) or if the value at (column, row) is null or is not an Matrix.
      */
-    const Map& getMap(const size_type& column, const size_type& row) const;
+    const Map& getMap(index column, index row) const;
 
     /**
      * @brief Get a constant Matrix from the specified index.
@@ -884,21 +773,70 @@ public:
      * @throw utils::ArgError if the index 'column' or 'row' are to big (in
      * debug mode) or if the value at (column, row) is null or is not an Matrix.
      */
-    const Matrix& getMatrix(const size_type& column,
-                            const size_type& row) const;
+    const Matrix& getMatrix(index column, index row) const;
 
 private:
     MatrixValue m_matrix; /// @brief to store the values.
-    Indices m_indices;  /// @brief indices for the matrix.
     size_type m_nbcol;  /// @brief to store the column number.
-    size_type m_nbrow;  /// @brief to store the row number. Note: m_nbrow
-    //represents the real number of rows, m_matrix.shape[1] is the number
-    //of rows allocated. It can be greater than m_nbrow,
-    //especially if m_steprow > 1
+    size_type m_nbrow;  /// @brief to store the row number.
+    size_type m_nbcolmax;  /// @brief to store the column number.
+    size_type m_nbrowmax;  /// @brief to store the row number.
     size_type m_stepcol; /// @brief the column when resize.
     size_type m_steprow; /// @brief the row when resize.
-    size_type m_lastX; /// @brief the last columns set.
-    size_type m_lastY; /// @brief the last row set.
+    index m_lastX; /// @brief the last columns set.
+    index m_lastY; /// @brief the last row set.
+
+    void pp_check_index(index column, index row) const
+    {
+#ifndef NDEBUG
+        if (not (column < m_nbcol and row <= m_nbrow)) {
+            throw utils::ArgError(
+                fmt(_("Matrix: bad access %1% %2% for %3%x%4% matrix"))
+                % column % row % m_nbcol % m_nbrow);
+        }
+#else
+        (void)column;
+        (void)row;
+#endif
+    }
+
+    inline Value& pp_get_value(index column, index row)
+    {
+        pp_check_index(column, row);
+
+        auto pointer = m_matrix[row * m_nbcolmax + column].get();
+        if (not pointer)
+            throw utils::ArgError(
+                fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
+                      "matrix")) % column % row % m_nbcol % m_nbrow);
+
+        return *pointer;
+    }
+
+    inline const Value& pp_get_value(index column, index row) const
+    {
+        pp_check_index(column, row);
+
+        auto pointer = m_matrix[row * m_nbcolmax + column].get();
+        if (not pointer)
+            throw utils::ArgError(
+                fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
+                      "matrix")) % column % row % m_nbcol % m_nbrow);
+
+        return *pointer;
+    }
+
+    template <typename T, typename... Args>
+        T& pp_add(index column, index row, Args&&... args)
+    {
+        auto value = std::unique_ptr<Value>(new T(std::forward<Args>(args)...));
+        auto *ret = static_cast<T*>(value.get());
+
+        pp_check_index(column, row);
+        m_matrix[row * m_nbcolmax + column] = std::move(value);
+
+        return *ret;
+    }
 };
 
 /**
@@ -914,29 +852,24 @@ struct VLE_API IsMatrixValue
     { return value and value->getType() == Value::MATRIX; }
 };
 
+inline const Matrix& toMatrixValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toMatrix(); }
+
 inline const Matrix& toMatrixValue(const Value& value)
 { return value.toMatrix(); }
-
-inline const Matrix* toMatrixValue(const Value* value)
-{ return value ? &value->toMatrix() : 0; }
 
 inline Matrix& toMatrixValue(Value& value)
 { return value.toMatrix(); }
 
-inline Matrix* toMatrixValue(Value* value)
-{ return value ? &value->toMatrix() : 0; }
-
-inline ConstMatrixView toMatrix(const Value& value)
-{ return value.toMatrix().value(); }
-
-inline MatrixView toMatrix(Value& value)
-{ return value.toMatrix().value(); }
-
-inline ConstMatrixView toMatrix(const Value* value)
+inline const MatrixValue& toMatrix(const std::unique_ptr<Value>& value)
 { return value::reference(value).toMatrix().value(); }
 
-inline MatrixView toMatrix(Value* value)
-{ return value::reference(value).toMatrix().value(); }
+inline const MatrixValue& toMatrix(const Value& value)
+{ return value.toMatrix().value(); }
+
+inline MatrixValue& toMatrix(Value& value)
+{ return value.toMatrix().value(); }
+
 
 }} // namespace vle value
 

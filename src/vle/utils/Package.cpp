@@ -34,7 +34,20 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
+
+// To avoid the C++11/14 link error: gcc-4.9 and boost-1.55
+// libvle-1.3.so.0: undefined reference «
+//    boost::filesystem::detail::copy_file(
+//    boost::filesystem::path const&,
+//    boost::filesystem::path const&,
+//    boost::filesystem::copy_option,
+//    boost::system::error_code*) »
+
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
+
 #include <boost/version.hpp>
 #include <boost/program_options.hpp>
 #include <boost/cast.hpp>

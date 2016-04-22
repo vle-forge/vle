@@ -77,12 +77,13 @@ public:
      *
      * @return A @c value::Matrix to freed.
      */
-    value::Matrix * run(vpz::Vpz             *exp,
-                        utils::ModuleManager &modulemgr,
-                        uint32_t              thread,
-                        uint32_t              rank,
-                        uint32_t              world,
-                        Error                *error);
+    std::unique_ptr<value::Matrix>
+        run(vpz::Vpz             *exp,
+            utils::ModuleManager &modulemgr,
+            uint32_t              thread,
+            uint32_t              rank,
+            uint32_t              world,
+            Error                *error);
 
 private:
     Manager(const Manager& other);

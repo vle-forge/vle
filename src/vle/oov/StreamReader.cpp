@@ -65,13 +65,14 @@ void StreamReader::onParameter(const std::string& pluginname,
                                const std::string& package,
                                const std::string& location,
                                const std::string& file,
-                               value::Value* parameters,
+                               std::unique_ptr<value::Value> parameters,
                                const double& time)
 {
     initPlugin(pluginname, package, location, m_modulemgr);
 
 
-    plugin()->onParameter(pluginname, location, file, parameters, time);
+    plugin()->onParameter(pluginname, location, file,
+                          std::move(parameters), time);
 }
 
 void StreamReader::onNewObservable(const std::string& simulator,
@@ -97,9 +98,9 @@ void StreamReader::onValue(const std::string& simulator,
                            const std::string& port,
                            const std::string& view,
                            const double& time,
-                           value::Value* value)
+                           std::unique_ptr<value::Value> value)
 {
-    plugin()->onValue(simulator, parent, port, view, time, value);
+    plugin()->onValue(simulator, parent, port, view, time, std::move(value));
 }
 
 void StreamReader::onClose(const double& time)

@@ -29,13 +29,12 @@
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 
-
 namespace vle { namespace vpz {
 
 bool ValueStackSax::isCompositeParent() const
 {
     if (not m_valuestack.empty()) {
-        const value::Value* val = m_valuestack.top();
+        const auto & val = m_valuestack.top();
 
         return val->isMap() or val->isSet() or val->isMatrix();
     }
@@ -175,7 +174,7 @@ void ValueStackSax::popValue()
     }
 }
 
-value::Value* ValueStackSax::topValue()
+value::Value*  ValueStackSax::topValue()
 {
     if (m_valuestack.empty()) {
         throw utils::SaxParserError(
@@ -185,32 +184,30 @@ value::Value* ValueStackSax::topValue()
     return m_valuestack.top();
 }
 
-void ValueStackSax::pushOnVectorValue(value::Value* val)
+void ValueStackSax::pushOnVectorValue(std::unique_ptr<value::Value> val)
 {
+    auto pointer = val.get();
+    
     if (not m_valuestack.empty()) {
         if (m_valuestack.top()->isSet()) {
-            m_valuestack.top()->toSet().add(val);
+            m_valuestack.top()->toSet().add(std::move(val));
         } else if (m_valuestack.top()->isMap()) {
-            m_valuestack.top()->toMap().add(m_lastkey, val);
+            m_valuestack.top()->toMap().add(m_lastkey, std::move(val));
         } else if (m_valuestack.top()->isMatrix()) {
             value::Matrix& mx(m_valuestack.top()->toMatrix());
-            if (not val->isNull()) {
-                mx.addToLastCell(val);
-            }
+            if (not val->isNull())
+                mx.addToLastCell(std::move(val));
+
             mx.moveLastCell();
         }
     } else {
-        m_result.push_back(val);
+        m_result.push_back(std::move(val));
     }
 
-    if (val->isSet() or val->isMap() or val->isTuple() or val->isTable() or
-        val->isMatrix()) {
-        m_valuestack.push(val);
-    }
-
-    if (val->isNull()) {
-        delete val;
-    }
+    if (pointer->isSet() or pointer->isMap() or
+        pointer->isTuple() or pointer->isTable() or
+        pointer->isMatrix())
+        m_valuestack.push(pointer);
 }
 
 void ValueStackSax::clear()

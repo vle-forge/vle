@@ -79,21 +79,18 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::User.
      */
-    virtual Value::type getType() const
+    virtual Value::type getType() const override
     { return Value::USER; }
 };
+
+inline const User& toUserValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toUser(); }
 
 inline const User& toUserValue(const Value& value)
 { return value.toUser(); }
 
-inline const User* toUserValue(const Value* value)
-{ return value ? &value->toUser() : 0; }
-
 inline User& toUserValue(Value& value)
 { return value.toUser(); }
-
-inline User* toUserValue(Value* value)
-{ return value ? &value->toUser() : 0; }
 
 }} // namespace vle value
 

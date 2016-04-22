@@ -38,14 +38,15 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/DllDefines.hpp>
-#include <map>
+#include <memory>
+#include <unordered_map>
 
 namespace vle { namespace value {
 
 /**
  * @brief Define a list of Value in a dictionnary.
  */
-typedef std::map < std::string, Value* > MapValue;
+typedef std::unordered_map <std::string, std::unique_ptr<Value>> MapValue;
 
 /**
  * @brief Map Value a container to a pair of std::string, Value pointer. The
@@ -62,9 +63,7 @@ public:
     /**
      * @brief Build a Map object with an empty MapValue.
      */
-    Map()
-        : m_value()
-    {}
+    Map() {}
 
     /**
      * @brief Copy constructor. All the Value are cloned.
@@ -75,15 +74,17 @@ public:
     /**
      * @brief Delete all Value in the Set.
      */
-    virtual ~Map()
-    { clear(); }
+    virtual ~Map() {}
 
     /**
-     * @brief Build a new Map.
-     * @return A new Map allocated.
+     * @brief Build a Xml.
+     * @param value the default value of the Xml.
+     * @return A new allocated Xml.
      */
-    static Map* create()
-    { return new Map(); }
+    static std::unique_ptr<value::Value> create()
+    {
+        return std::unique_ptr<value::Value>(new Map());
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -94,15 +95,13 @@ public:
      * MapValue.
      * @return A new Map.
      */
-    virtual Value* clone() const
-    { return new Map(*this); }
+    virtual std::unique_ptr<Value> clone() const override final;
 
     /**
      * @brief Get the type of this class.
      * @return Value::MAP.
      */
-    virtual Value::type getType() const
-    { return Value::MAP; }
+    virtual Value::type getType() const override final;
 
     /**
      * @brief Push all Value from the MapValue, recursively and colon
@@ -112,7 +111,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const;
+    virtual void writeFile(std::ostream& out) const override final;
 
     /**
      * @brief Push all VAlue from the MapValue, recursively and colon
@@ -121,7 +120,7 @@ public:
      * (key,value), key2,123) (key3, true)
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const;
+    virtual void writeString(std::ostream& out) const override final;
 
     /**
      * @brief Push all Value from the MapValue recursively in an XML
@@ -141,7 +140,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const;
+    virtual void writeXml(std::ostream& out) const override final;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -155,90 +154,22 @@ public:
      * @param value the Value to add.
      * @throw utils::ArgError if the value is null.
      */
-    void add(const std::string& name, Value* value)
+    void add(const std::string& name, std::unique_ptr<Value> value)
     {
-        set(name, value);
+        std::swap(m_value[name], value);
     }
 
     /**
-     * @brief Add a value into the map. The data is cloned. If a value already
-     * eixsts with the same name it will be replaced.
-     * @param name the name of Value to add.
-     * @param value the Value to add.
-     * @throw utils::ArgError if the value is null.
-     */
-    void add(const std::string& name, const Value* value)
-    {
-        set(name, value);
-    }
-
-    /**
-     * @brief Add a value into the map. The data is cloned. If a value already
-     * eixsts with the same name it will be replaced.
-     * @param name the name of Value to add.
-     * @param value the Value to add.
-     */
-    void add(const std::string& name, const Value& value)
-    {
-        set(name, value);
-    }
-
-    /**
-     * @brief Set a value into the map. Be carrefull, the data is not
+     * @brief Add a value into the map. Be carrefull, the data is not
      * cloned. Don't delete buffer after. If a value already exist with the
      * same key, it will be deleted and replaced.
-     * @param name the name of Value to Set.
-     * @param value the Value to Set.
+     * @param name the name of Value to add.
+     * @param value the Value to add.
      * @throw utils::ArgError if the value is null.
      */
-    void set(const std::string& name, Value* value)
+    void set(const std::string& name, std::unique_ptr<Value> value)
     {
-        iterator it = find(name);
-
-        if (it != end()) {
-            delete it->second;
-            it->second = value;
-        } else {
-            m_value.insert(std::make_pair(name, value));
-        }
-    }
-
-    /**
-     * @brief Set a value into the map. The data is cloned. If a value already
-     * eixsts with the same name it will be replaced.
-     * @param name the name of Value to Set.
-     * @param value the Value to Set.
-     * @throw utils::ArgError if the value is null.
-     */
-    void set(const std::string& name, const Value* value)
-    {
-        Value* clone = (value) ? value->clone() : (value::Value*)0;
-        iterator it = find(name);
-
-        if (it != end()) {
-            delete it->second;
-            it->second = clone;
-        } else {
-            m_value.insert(std::make_pair(name, clone));
-        }
-    }
-
-    /**
-     * @brief Set a value into the map. The data is cloned. If a value already
-     * eixsts with the same name it will be replaced.
-     * @param name the name of Value to Set.
-     * @param value the Value to Set.
-     */
-    void set(const std::string& name, const Value& value)
-    {
-        iterator it = find(name);
-
-        if (it != end()) {
-            delete it->second;
-            it->second = value.clone();
-        } else {
-            m_value.insert(std::make_pair(name, value.clone()));
-        }
+        std::swap(m_value[name], value);
     }
 
     /**
@@ -247,7 +178,9 @@ public:
      * @return true if Value exist, false otherwise.
      */
     inline bool exist(const std::string& name) const
-    { return find(name) != end(); }
+    {
+        return m_value.find(name) != m_value.end();
+    }
 
     /**
      * @brief Get a Value from the map specified by his name.
@@ -255,33 +188,9 @@ public:
      * @return A reference to the specified value or a newly builded.
      * @throw utils::ArgError if the key does not exist.
      */
-    Value* operator[](const std::string& name);
-
-    /**
-     * @brief Get a Value from the map specified by his name.
-     * @param name The name of the value.
-     * @return A constant reference to the specified value or a newly
-     * builded.
-     * @throw utils::ArgError if the key does not exist.
-     */
-    const Value* operator[](const std::string& name) const;
-
-    /**
-     * @brief Get the Value objet for specified name.
-     * @param name The name of the Value in the map.
-     * @return a reference to the Value.
-     * @throw utils::ArgError if value don't exist.
-     */
-    const Value* get(const std::string& name) const
+    const std::unique_ptr<Value>& operator[](const std::string& name) const
     {
-        const_iterator it = find(name);
-
-        if (it == end()) {
-            throw utils::ArgError(fmt(_(
-                        "Map: the key '%1%' does not exist")) % name);
-        }
-
-        return (*it).second;
+        return pp_get(name)->second;
     }
 
     /**
@@ -290,16 +199,9 @@ public:
      * @return a reference to the Value.
      * @throw utils::ArgError if value don't exist.
      */
-    Value* get(const std::string& name)
+    const std::unique_ptr<Value>& get(const std::string& name) const
     {
-        iterator it = find(name);
-
-        if (it == end()) {
-            throw utils::ArgError(fmt(_(
-                        "Map: the key '%1%' does not exist")) % name);
-        }
-
-        return (*it).second;
+        return pp_get(name)->second;
     }
 
     /**
@@ -309,7 +211,11 @@ public:
      * @return the pointer to the Value.
      * @throw utils::ArgError if value don't exist.
      */
-    Value* give(const std::string& name);
+    std::unique_ptr<Value> give(const std::string& name)
+    {
+        auto it = pp_get(name);
+        return std::move(it->second);
+    }
 
     /**
      * @brief Get an access to the std::map.
@@ -328,7 +234,8 @@ public:
     /**
      * @brief Delete all value from map.
      */
-    void clear();
+    void clear()
+    { m_value.clear(); }
 
     /**
      * @brief Return true if the value::Map does not contain any element.
@@ -399,9 +306,9 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    void addNull(const std::string& name)
+    Null& addNull(const std::string& name)
     {
-        add(name, new Null());
+        return pp_add<Null>(name);
     }
 
     /**
@@ -413,7 +320,7 @@ public:
      */
     const std::string& getString(const std::string& name) const
     {
-        return value::toString(get(name));
+        return pp_get_value(name).toString().value();
     }
 
     /**
@@ -425,7 +332,7 @@ public:
      */
     std::string& getString(const std::string& name)
     {
-        return value::toString(get(name));
+        return pp_get_value(name).toString().value();
     }
 
     /**
@@ -434,9 +341,9 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    void addString(const std::string& name, const std::string& value)
+    String& addString(const std::string& name, const std::string& value)
     {
-        add(name, new String(value));
+        return pp_add<String>(name, value);
     }
 
     /**
@@ -448,7 +355,7 @@ public:
      */
     bool getBoolean(const std::string& name) const
     {
-        return value::toBoolean(get(name));
+        return pp_get_value(name).toBoolean().value();
     }
 
     /**
@@ -460,7 +367,7 @@ public:
      */
     bool& getBoolean(const std::string& name)
     {
-        return value::toBoolean(get(name));
+        return pp_get_value(name).toBoolean().value();
     }
 
     /**
@@ -469,14 +376,21 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    void addBoolean(const std::string& name, bool value)
+    Boolean& addBoolean(const std::string& name, bool value)
     {
-        add(name, new Boolean(value));
+        return pp_add<Boolean>(name, value);
     }
 
+    /**
+     * @brief Get the Integer value objet from specified name.
+     * @param name The name of the Value in the map.
+     * @return a reference to the Value.
+     * @throw utils::ArgError if type is not Value::STRING or value do not
+     * exist.
+     */
     int32_t getInt(const std::string& name) const
     {
-        return value::toInteger(get(name));
+        return pp_get_value(name).toInteger().value();
     }
 
     /**
@@ -488,7 +402,7 @@ public:
      */
     int32_t& getInt(const std::string& name)
     {
-        return value::toInteger(get(name));
+        return pp_get_value(name).toInteger().value();
     }
 
     /**
@@ -499,7 +413,7 @@ public:
      */
     void addInt(const std::string& name, const int32_t& value)
     {
-        add(name, new Integer(value));
+        pp_add<Integer>(name, value);
     }
 
     /**
@@ -511,7 +425,7 @@ public:
      */
     double getDouble(const std::string& name) const
     {
-        return value::toDouble(get(name));
+        return pp_get_value(name).toDouble().value();
     }
 
     /**
@@ -523,7 +437,7 @@ public:
      */
     double& getDouble(const std::string& name)
     {
-        return value::toDouble(get(name));
+        return pp_get_value(name).toDouble().value();
     }
 
     /**
@@ -532,9 +446,9 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    void addDouble(const std::string& name, const double& value)
+    Double& addDouble(const std::string& name, const double& value)
     {
-        add(name, new Double(value));
+        return pp_add<Double>(name, value);
     }
 
     /**
@@ -546,7 +460,7 @@ public:
      */
     const std::string& getXml(const std::string& name) const
     {
-        return value::toXml(get(name));
+        return pp_get_value(name).toXml().value();
     }
 
     /**
@@ -558,7 +472,7 @@ public:
      */
     std::string& getXml(const std::string& name)
     {
-        return value::toXml(get(name));
+        return pp_get_value(name).toXml().value();
     }
 
     /**
@@ -567,9 +481,9 @@ public:
      * @param name The key of the Xml.
      * @param value The value of the key.
      */
-    void addXml(const std::string& name, const std::string& value)
+    Xml& addXml(const std::string& name, const std::string& value)
     {
-        add(name, new Xml(value));
+        return pp_add<Xml>(name, value);
     }
 
     /**
@@ -580,7 +494,7 @@ public:
      */
     const Table& getTable(const std::string& name) const
     {
-        return value::toTableValue(value::reference(get(name)));
+        return pp_get_value(name).toTable();
     }
 
     /**
@@ -591,7 +505,7 @@ public:
      */
     Table& getTable(const std::string& name)
     {
-        return value::toTableValue(value::reference(get(name)));
+        return pp_get_value(name).toTable();
     }
 
     /**
@@ -600,11 +514,11 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    void addTable(const std::string& name,
-                  const Table::size_type& width = 0,
-                  const Table::size_type& height = 0)
+    Table& addTable(const std::string& name,
+                    Table::size_type width = 0,
+                    Table::size_type height = 0)
     {
-        add(name, new Table(width, height));
+        return pp_add<Table>(name, width, height);
     }
 
     /**
@@ -615,7 +529,7 @@ public:
      */
     const Tuple& getTuple(const std::string& name) const
     {
-        return value::toTupleValue(value::reference(get(name)));
+        return pp_get_value(name).toTuple();
     }
 
     /**
@@ -626,7 +540,7 @@ public:
      */
     Tuple& getTuple(const std::string& name)
     {
-        return value::toTupleValue(value::reference(get(name)));
+        return pp_get_value(name).toTuple();
     }
 
     /**
@@ -635,11 +549,11 @@ public:
      * @param name The key of the Map.
      * @param value The value of the key.
      */
-    void addTuple(const std::string& name,
-                  const Tuple::size_type& width = 0,
-                  const double& value = 0.0)
+    Tuple& addTuple(const std::string& name,
+                    Tuple::size_type width = 0,
+                    double value = 0.0)
     {
-        add(name, new Tuple(width, value));
+        return pp_add<Tuple>(name, width, value);
     }
 
     /**
@@ -728,34 +642,79 @@ public:
 private:
     MapValue m_value;
 
-    Value* getPointer(const std::string& name);
+    inline iterator pp_get(const std::string& name)
+    {
+        auto it = find(name);
 
-    const Value* getPointer(const std::string& name) const;
+        if (it == end())
+            throw utils::ArgError(
+                fmt(_("Map: the key '%1%' does not exist")) % name);
+
+        return it;
+    }
+
+    inline const_iterator pp_get(const std::string& name) const
+    {
+        auto it = find(name);
+
+        if (it == end())
+            throw utils::ArgError(
+                fmt(_("Map: the key '%1%' does not exist")) % name);
+
+        return it;
+    }
+
+    inline Value& pp_get_value(const std::string& name)
+    {
+        auto it = pp_get(name);
+
+        if (not it->second)
+            throw utils::ArgError(
+                fmt(_("Map: the key '%1%' have empty (null) value")) % name);
+
+        return *it->second.get();
+    }
+
+    inline const Value& pp_get_value(const std::string& name) const
+    {
+        auto it = pp_get(name);
+
+        if (not it->second)
+            throw utils::ArgError(
+                fmt(_("Map: the key '%1%' have empty (null) value")) % name);
+
+        return *it->second.get();
+    }
+
+    template <typename T, typename... Args>
+        T& pp_add(const std::string& name, Args&&... args)
+    {
+        auto value = std::unique_ptr<Value>(new T(std::forward<Args>(args)...));
+        auto *ret = static_cast<T*>(value.get());
+
+        std::swap(m_value[name], value);
+
+        return *ret;
+    }
 };
+
+inline const Map& toMapValue(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toMap(); }
 
 inline const Map& toMapValue(const Value& value)
 { return value.toMap(); }
 
-inline const Map* toMapValue(const Value* value)
-{ return value ? &value->toMap() : 0; }
-
 inline Map& toMapValue(Value& value)
 { return value.toMap(); }
 
-inline Map* toMapValue(Value* value)
-{ return value ? &value->toMap() : 0; }
+inline const MapValue& toMap(const std::unique_ptr<Value>& value)
+{ return value::reference(value).toMap().value(); }
 
 inline const MapValue& toMap(const Value& value)
 { return value.toMap().value(); }
 
 inline MapValue& toMap(Value& value)
 { return value.toMap().value(); }
-
-inline const MapValue& toMap(const Value* value)
-{ return value::reference(value).toMap().value(); }
-
-inline MapValue& toMap(Value* value)
-{ return value::reference(value).toMap().value(); }
 
 }} // namespace vle value
 

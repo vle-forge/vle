@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_lower_than_exp)
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 10000; ++i) {
-            cnd1.addValueToPort("init1", new value::Double(i));
-            cnd1.addValueToPort("init2", new value::Double(i));
+            cnd1.addValueToPort("init1", value::Double::create(i));
+            cnd1.addValueToPort("init2", value::Double::create(i));
         }
     }
 
@@ -115,8 +115,8 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_lower_than_exp)
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 9999; i >= 0; --i) {
-            cnd2.addValueToPort("init3", new value::Double(i));
-            cnd2.addValueToPort("init4", new value::Double(i));
+            cnd2.addValueToPort("init3", value::Double::create(i));
+            cnd2.addValueToPort("init4", value::Double::create(i));
         }
     }
 
@@ -149,8 +149,8 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_greater_than_exp)
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 3; ++i) {
-            cnd1.addValueToPort("init1", new value::Double(i));
-            cnd1.addValueToPort("init2", new value::Double(i));
+            cnd1.addValueToPort("init1", value::Double::create(i));
+            cnd1.addValueToPort("init2", value::Double::create(i));
         }
     }
 
@@ -159,8 +159,8 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_greater_than_exp)
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 2; i >= 0; --i) {
-            cnd2.addValueToPort("init3", new value::Double(i));
-            cnd2.addValueToPort("init4", new value::Double(i));
+            cnd2.addValueToPort("init3", value::Double::create(i));
+            cnd2.addValueToPort("init4", value::Double::create(i));
         }
     }
 
@@ -204,9 +204,9 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_max_1_max_1)
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 7; ++i) {
-            cnd1.addValueToPort("init1", new value::Double(i));
+            cnd1.addValueToPort("init1", value::Double::create(i));
         }
-        cnd1.addValueToPort("init2", new value::Double(0));
+        cnd1.addValueToPort("init2", value::Double::create(0));
     }
 
     {
@@ -214,9 +214,9 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_max_1_max_1)
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 7; i > 0; --i) {
-            cnd2.addValueToPort("init3", new value::Double(i));
+            cnd2.addValueToPort("init3", value::Double::create(i));
         }
-        cnd2.addValueToPort("init4", new value::Double(7));
+        cnd2.addValueToPort("init4", value::Double::create(7));
     }
 
     manager::ExperimentGenerator expgen1(vpz, 0, 1);

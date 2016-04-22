@@ -75,13 +75,13 @@ namespace vle { namespace vpz {
          * vpz::Project object.
          * @param out The output parameter where send XML representation.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this object.
          * @return Return VPZ.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_VPZ; }
 
         /**
@@ -139,7 +139,8 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if buffer is not a value.
          * @return value read from buffer.
          */
-        static value::Value* parseValue(const std::string& buffer);
+        static std::unique_ptr<value::Value>
+            parseValue(const std::string& buffer);
 
         /**
          * @brief Parse the buffer to find a list of values.
@@ -147,8 +148,8 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if buffer is not a value.
          * @return a vector of values read from buffer.
          */
-        static std::vector < value::Value* > parseValues(
-            const std::string& buffer);
+        static std::vector <std::unique_ptr<value::Value>>
+            parseValues(const std::string& buffer);
 
         /**
          * @brief Add the vpz extension to filename if does not exist, If

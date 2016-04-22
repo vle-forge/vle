@@ -65,14 +65,14 @@ namespace vle { namespace vpz {
          *
          * @param out Write in XML into an std::ostream.
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Return the type of the project Vpz tag.
          *
          * @return The constant PROJECT.
          */
-        virtual Base::type getType() const
+        virtual Base::type getType() const override
         { return VLE_VPZ_PROJECT; }
 
         /**

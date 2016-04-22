@@ -33,15 +33,15 @@
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <string>
-#include <map>
-#include <list>
+#include <unordered_map>
 
 namespace vle { namespace vpz {
 
     /**
      * @brief Define the ConditionValues like a dictionnary, (portname, values).
      */
-    typedef std::map < std::string, value::Set* > ConditionValues;
+    using ConditionValues =
+        std::unordered_map <std::string, std::unique_ptr<value::Set>>;
 
     /**
      * @brief A condition define a couple model name, port name and a Value.
@@ -70,7 +70,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Delete all the values attached to this Conditon.
          */
-        virtual ~Condition();
+        virtual ~Condition() {}
 
         /**
          * @brief Add Condition informations to the stream.
@@ -84,13 +84,13 @@ namespace vle { namespace vpz {
          *
          * @param out
          */
-        virtual void write(std::ostream& out) const;
+        virtual void write(std::ostream& out) const override;
 
         /**
          * @brief Get the type of this class.
          * @return CONDITION.
          */
-        inline virtual Base::type getType() const
+        inline virtual Base::type getType() const override
         { return VLE_VPZ_CONDITION; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -103,7 +103,7 @@ namespace vle { namespace vpz {
          * @brief Build a list of string that contains all port names.
          * @param lst An output string list.
          */
-        void portnames(std::list < std::string >& lst) const;
+        std::vector <std::string> portnames() const;
 
         /**
          * @brief Add a port to the value list.
@@ -122,7 +122,8 @@ namespace vle { namespace vpz {
 	  * @param old_name name of the port to rename
 	  * @param new_name new name of the specified port
 	  */
-	void rename(const std::string& oldportname, const std::string& newportname);
+	void rename(const std::string& oldportname,
+                    const std::string& newportname);
 
         /**
          * @brief Add a value to a specified port. If port does not exist, it
@@ -131,16 +132,7 @@ namespace vle { namespace vpz {
          * @param value the value to push.
          */
         void addValueToPort(const std::string& portname,
-                            value::Value* value);
-
-        /**
-         * @brief Add a value to a specified port. If port does not exist, it
-         * will be create.
-         * @param portname name of the port to add value.
-         * @param value the value to push.
-         */
-        void addValueToPort(const std::string& portname,
-                            const value::Value& value);
+                            std::unique_ptr<value::Value> value);
 
         /**
          * @brief Set a value to a specified port. If port contains already
@@ -150,8 +142,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if portname does not exist.
          */
         void setValueToPort(const std::string& portname,
-                            const value::Value& value);
-
+                            std::unique_ptr<value::Value> value);
         /**
          * @brief Clear the specified port.
          * @param portname The name of the port to clear.
