@@ -28,6 +28,7 @@
 #include <vle/oov/StreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
 
 namespace vle { namespace oov {
@@ -35,7 +36,7 @@ namespace vle { namespace oov {
 PluginPtr StreamReader::plugin() const
 {
     if (not m_plugin.get()) {
-        throw utils::InternalError(
+        throw vle::utils::InternalError(
             _("Plugin are not loaded and cannot respond to the StreamReader"));
     }
 

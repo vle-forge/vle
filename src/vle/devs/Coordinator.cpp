@@ -33,6 +33,7 @@
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/StreamWriter.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>

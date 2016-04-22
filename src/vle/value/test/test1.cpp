@@ -53,6 +53,7 @@
 #include <vle/value/User.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/vle.hpp>
 
 struct F

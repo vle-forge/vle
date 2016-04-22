@@ -192,7 +192,7 @@ public:
      * @param i The index of the value to get.
      * @return The real at the specified index.
      */
-    inline const double& operator[](const size_type& i) const
+    inline const double& operator[](size_type i) const
     { return m_value[i]; }
 
     /**
@@ -201,7 +201,7 @@ public:
      * @param i The index of the value to get.
      * @return The real at the specified index.
      */
-    inline double& operator[](const size_type& i)
+    inline double& operator[](size_type i)
     { return m_value[i]; }
 
     /**
@@ -210,7 +210,7 @@ public:
      * @return The real at the specified index.
      * @throw std::out_of_range if the index is too big.
      */
-    inline const double& at(const size_type& i) const
+    inline const double& at(size_type i) const
     { return m_value.at(i); }
 
     /**
@@ -219,7 +219,7 @@ public:
      * @return The real at the specified index.
      * @throw std::out_of_range if the index is too big.
      */
-    inline double& at(const size_type& i)
+    inline double& at(size_type i)
     { return m_value.at(i); }
 
     /**
@@ -233,7 +233,7 @@ public:
      * @brief Remove an elemet of the tuple
      * @param i index of double to remove
      */
-    void remove(const size_type& i);
+    void remove(size_type i);
 
 private:
     TupleValue              m_value;

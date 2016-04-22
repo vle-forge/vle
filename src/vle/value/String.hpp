@@ -50,7 +50,7 @@ public:
      * @brief Build a String object with a specified value.
      * @param value The value to copy.
      */
-    String(std::string  value)
+    String(std::string value)
         : m_value(std::move(value))
     {}
 

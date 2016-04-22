@@ -27,6 +27,7 @@
 
 #include <vle/vpz/Output.hpp>
 #include <vle/value/Value.hpp>
+#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace vpz {
 

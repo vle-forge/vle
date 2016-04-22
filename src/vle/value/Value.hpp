@@ -28,10 +28,10 @@
 #ifndef VLE_VALUE_VALUE_HPP
 #define VLE_VALUE_VALUE_HPP 1
 
-#include <vle/version.hpp>
-#include <vle/utils/Types.hpp>
-#include <vle/utils/Exception.hpp>
 #include <vle/DllDefines.hpp>
+#include <memory>
+#include <ostream>
+#include <string>
 
 namespace vle { namespace value {
 
@@ -65,24 +65,18 @@ public:
      * Value* val2 = new value::Integer(13);
      * @endcode
      */
-    Value()
-    {
-    }
+    Value() = default;
 
     /**
      * @brief Copy constructor. In subclass, all datas are cloned.
      * @param value The value to clone;
      */
-    Value(const Value& /* value */)
-    {
-    }
+    Value(const Value& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Value()
-    {
-    }
+    virtual ~Value() {}
 
     ///
     //// Abstract functions
@@ -215,10 +209,10 @@ public:
      * @return the std::stream.
      */
     friend std::ostream& operator<<(std::ostream& out, const Value& obj)
-    { obj.writeString(out); return out; }
-
-private:
-    Value& operator=(const Value& /* value */) { return *this; }
+    {
+        obj.writeString(out);
+        return out;
+    }
 };
 
 /**
@@ -227,21 +221,7 @@ private:
  * @param val The Value to check.
  * @return True if the Value is a Map, a Set or a Matrix.
  */
-inline bool is_composite(const std::unique_ptr<Value>& val)
-{
-    if (not val)
-        return false;
-
-    switch (val->getType()) {
-    case Value::MAP:
-    case Value::SET:
-    case Value::MATRIX:
-        return true;
-
-    default:
-        return false;
-    }
-}
+VLE_API bool is_composite(const std::unique_ptr<Value>& val);
 
 /**
  * @brief Convert a constant value::Value pointer to a constant
@@ -250,13 +230,7 @@ inline bool is_composite(const std::unique_ptr<Value>& val)
  * @return A reference.
  * @throw utils::ArgError if value is NULL.
  */
-inline const Value& reference(const std::unique_ptr<Value>& value)
-{
-    if (not value)
-        throw utils::ArgError(_("Null value"));
-
-    return *value.get();
-}
+VLE_API const Value& reference(const std::unique_ptr<Value>& value);
 
 }} // namespace vle
 

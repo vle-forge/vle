@@ -28,6 +28,7 @@
 #include <vle/vpz/Views.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iterator>

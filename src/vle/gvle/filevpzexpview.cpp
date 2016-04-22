@@ -31,7 +31,7 @@
 
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
-
+#include <vle/utils/Exception.hpp>
 #include "filevpzexpview.h"
 #include "ui_filevpzexpview.h"
 

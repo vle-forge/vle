@@ -30,6 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Attribute.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/devs/Time.hpp>
 #include <vector>
 

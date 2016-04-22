@@ -33,7 +33,7 @@
 #include <vle/value/String.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
-
+#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace devs {
 

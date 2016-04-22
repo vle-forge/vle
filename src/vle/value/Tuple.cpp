@@ -26,6 +26,7 @@
 
 
 #include <vle/value/Tuple.hpp>
+#include <vle/utils/Exception.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -85,7 +86,7 @@ void Tuple::fill(const std::string& str)
                 try {
                     m_value.push_back(boost::lexical_cast < long >(elem));
                 } catch(const boost::bad_lexical_cast& e) {
-                    throw utils::ArgError(fmt(
+                    throw vle::utils::ArgError(fmt(
                                 "Can not convert string '%1%' into"
                                 " double or long") % (elem));
                 }
@@ -94,7 +95,7 @@ void Tuple::fill(const std::string& str)
     }
 }
 
-void Tuple::remove(const size_type& i)
+void Tuple::remove(size_type i)
 {
     m_value.erase(m_value.begin() + i);
 }

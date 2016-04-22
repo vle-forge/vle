@@ -50,7 +50,7 @@ public:
      * @brief Build an Xml object with a specified value.
      * @param value The value to copy.
      */
-    Xml(std::string  value)
+    Xml(std::string value)
         : m_value(std::move(value))
     {}
 

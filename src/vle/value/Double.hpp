@@ -50,7 +50,7 @@ public:
      * @brief Build a Double object with a specifiied value.
      * @param value The value to copy.
      */
-    Double(const double& value)
+    Double(double value)
         : m_value(value)
     {}
 
@@ -146,7 +146,7 @@ public:
      * @brief Assign a value to the encapsulated double.
      * @param value The value to set.
      */
-    inline void set(const double& value)
+    inline void set(double value)
     { m_value = value; }
 
 private:

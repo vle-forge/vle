@@ -39,6 +39,20 @@
 #include <fstream>
 #include <vle/devs/Simulator.hpp>
 #include <vle/gvle/vlevpz.h>
+#include <vle/value/Value.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
+#include <vle/value/Null.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/User.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/value/XML.hpp>
 #include <iostream>
 
 const char* vpz_content=

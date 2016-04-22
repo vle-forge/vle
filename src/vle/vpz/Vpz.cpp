@@ -26,6 +26,8 @@
 
 
 #include <vle/vpz/Vpz.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/utils/Exception.hpp>
 #include <fstream>
 #include <iomanip>
 #include <limits>

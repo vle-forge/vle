@@ -403,14 +403,6 @@ namespace vle {
         vpz::Class* getLastClass() const;
 
     private:
-        inline void checkEmptyStack() const
-        { if (not m_stack.empty()) throw utils::SaxParserError(
-                "Not empty vpz stack"); }
-
-        inline void checkNotEmptyStack() const
-        { if (m_stack.empty()) throw utils::SaxParserError(
-                "Empty vpz stack"); }
-
         void checkParentIsVpz() const;
         void checkParentIsClass() const;
         void checkParentIsSubmodels() const;

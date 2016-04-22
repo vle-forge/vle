@@ -31,6 +31,7 @@
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Tuple.hpp>

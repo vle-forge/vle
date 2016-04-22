@@ -28,6 +28,7 @@
 #include <QLibraryInfo>
 #include <QtDebug>
 #include <iostream>
+#include <vle/version.hpp>
 
 int main(int argc, char *argv[])
 {

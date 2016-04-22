@@ -167,10 +167,7 @@ namespace vle { namespace vpz {
          * @brief Add a value::Value to the values'vector.
          * @param val The value::Value to add.
          */
-        inline void pushResult(std::unique_ptr<value::Value> val)
-        {
-            m_result.push_back(std::move(val));
-        }
+        void pushResult(std::unique_ptr<value::Value> val);
 
         /**
          * @brief Get the value::Value from the values'vector at a specified
@@ -180,30 +177,14 @@ namespace vle { namespace vpz {
          * vector'size.
          * @return A constant reference to the value::Value.
          */
-        inline const std::unique_ptr<value::Value>& getResult(size_t i) const
-        {
-            if (m_result.size() < i) {
-                throw utils::SaxParserError(fmt(
-                        _("Get result value with to big index %1%.")) % i);
-            }
-
-            return m_result[i];
-        }
+        const std::unique_ptr<value::Value>& getResult(size_t i) const;
 
         /**
          * @brief Get latest value::Value pushed into the values'vector.
          * @throw utils::SaxParserError if the vector of result is empty.
          * @return A constant reference to the latest pushed value::Value.
          */
-        inline const std::unique_ptr<value::Value>& getLastResult() const
-        {
-            if (m_result.empty()) {
-                throw utils::SaxParserError(
-                    _("Get last result value with empty result vector"));
-            }
-
-            return m_result[m_result.size() - 1];
-        }
+        const std::unique_ptr<value::Value>& getLastResult() const;
 
         /**
          * @brief Get the vector of value::Value.

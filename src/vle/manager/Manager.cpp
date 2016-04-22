@@ -35,6 +35,8 @@
 #include <vle/manager/Simulation.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <boost/thread/thread.hpp>

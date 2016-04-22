@@ -30,6 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Attribute.hpp>
+#include <vle/utils/Exception.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
 

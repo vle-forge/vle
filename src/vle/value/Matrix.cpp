@@ -26,9 +26,91 @@
 
 
 #include <vle/value/Matrix.hpp>
-#include <vle/value/Set.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
+#include <vle/value/Null.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/XML.hpp>
+#include <vle/utils/Exception.hpp>
 #include <cassert>
+
+namespace {
+
+inline
+void
+pp_check_index(const vle::value::Matrix& m,
+               vle::value::Matrix::index column,
+               vle::value::Matrix::index row)
+{
+#ifndef NDEBUG
+    if (not (column < m.columns()  and row <= m.rows()))
+        throw vle::utils::ArgError(
+            vle::fmt(_("Matrix: bad access %1% %2% for %3%x%4% matrix"))
+            % column % row % m_nbcol % m_nbrow);
+#else
+    (void)m;
+    (void)column;
+    (void)row;
+#endif
+}
+
+inline
+vle::value::Value&
+pp_get_value(vle::value::Matrix& m,
+             vle::value::Matrix::index column,
+             vle::value::Matrix::index row)
+{
+    pp_check_index(m, column, row);
+
+    auto pointer = m.value()[row * m.columns_max() + column].get();
+    if (not pointer)
+        throw vle::utils::ArgError(
+            vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
+                       "matrix")) % column % row % m.columns() % m.rows());
+
+    return *pointer;
+}
+
+inline
+const vle::value::Value&
+pp_get_value(const vle::value::Matrix& m,
+             vle::value::Matrix::index column,
+             vle::value::Matrix::index row)
+{
+    pp_check_index(m, column, row);
+
+    auto pointer = m.value()[row * m.columns_max() + column].get();
+    if (not pointer)
+        throw vle::utils::ArgError(
+            vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
+                       "matrix")) % column % row % m.columns() % m.rows());
+
+    return *pointer;
+}
+
+template <typename T, typename... Args>
+T&
+pp_add(vle::value::Matrix& m,
+       vle::value::Matrix::index column,
+       vle::value::Matrix::index row,
+       Args&&... args)
+{
+    auto value = std::unique_ptr<vle::value::Value>(new T(std::forward<Args>(args)...));
+    auto *ret = static_cast<T*>(value.get());
+
+    pp_check_index(m, column, row);
+    m.value()[row * m.columns_max() + column] = std::move(value);
+
+    return *ret;
+}
+
+}
 
 namespace vle { namespace value {
 
@@ -70,6 +152,11 @@ Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
     if (rows > rowmax)
         throw utils::ArgError(
             fmt(_("Matrix: Number of row error: %1% on %2%")) % rows % rowmax);
+}
+
+Value::type Matrix::getType() const
+{
+    return Value::MATRIX;
 }
 
 Matrix::Matrix(const Matrix& m)
@@ -149,49 +236,163 @@ void Matrix::clear()
     m_lastY = 0;
 }
 
+Null& Matrix::addNull(index column, index row)
+{
+    return ::pp_add<Null>(*this, column, row);
+}
+
+Boolean& Matrix::addBoolean(index column, index row, bool value)
+{
+    return ::pp_add<Boolean>(*this, column, row, value);
+}
+
+bool Matrix::getBoolean(index column, index row) const
+{
+    return ::pp_get_value(*this, column, row).toBoolean().value();
+}
+
+bool& Matrix::getBoolean(index column, index row)
+{
+    return ::pp_get_value(*this, column, row).toBoolean().value();
+}
+
+Double& Matrix::addDouble(index column, index row, double value)
+{
+    return ::pp_add<Double>(*this, column, row, value);
+}
+
+double Matrix::getDouble(index column, index row) const
+{
+    return ::pp_get_value(*this, column, row).toDouble().value();
+}
+
+double& Matrix::getDouble(index column, index row)
+{
+    return ::pp_get_value(*this, column, row).toDouble().value();
+}
+
+Integer& Matrix::addInt(index column, index row, int32_t value)
+{
+    return ::pp_add<Integer>(*this, column, row, value);
+}
+
+int32_t Matrix::getInt(index column, index row) const
+{
+    return ::pp_get_value(*this, column, row).toInteger().value();
+}
+
+int32_t& Matrix::getInt(index column, index row)
+{
+    return ::pp_get_value(*this, column, row).toInteger().value();
+}
+
+String& Matrix::addString(index column, index row, const std::string& value)
+{
+    return ::pp_add<String>(*this, column, row, value);
+}
+
+const std::string& Matrix::getString(index column, index row) const
+{
+    return ::pp_get_value(*this, column, row).toString().value();
+}
+
+std::string& Matrix::getString(index column, index row)
+{
+    return ::pp_get_value(*this, column, row).toString().value();
+}
+
+Xml& Matrix::addXml(index column, index row, const std::string& value)
+{
+    return ::pp_add<Xml>(*this, column, row, value);
+}
+
+const std::string& Matrix::getXml(index column, index row) const
+{
+    return ::pp_get_value(*this, column, row).toXml().value();
+}
+
+std::string& Matrix::getXml(index column, index row)
+{
+    return ::pp_get_value(*this, column, row).toXml().value();
+}
+
+Tuple& Matrix::addTuple(index column, index row,
+                        std::size_t width,
+                        double value)
+{
+    return ::pp_add<Tuple>(*this, column, row, width, value);
+}
+
+const Tuple& Matrix::getTuple(index column, index row) const
+{
+    return ::pp_get_value(*this, column, row).toTuple();
+}
+
+Tuple& Matrix::getTuple(index column, index row)
+{
+    return ::pp_get_value(*this, column, row).toTuple();
+}
+
+Table& Matrix::addTable(index column, index row,
+                        std::size_t width,
+                        std::size_t height)
+{
+    return ::pp_add<Table>(*this, column, row, width, height);
+}
+
+const Table& Matrix::getTable(index column, index row) const
+{
+    return ::pp_get_value(*this, column, row).toTable();
+}
+
+Table& Matrix::getTable(index column, index row)
+{
+    return ::pp_get_value(*this, column, row).toTable();
+}
+
 Set& Matrix::addSet(index column, index row)
 {
-    return pp_add<Set>(column, row);
+    return ::pp_add<Set>(*this, column, row);
 }
 
 Map& Matrix::addMap(index column, index row)
 {
-    return pp_add<Map>(column, row);
+    return ::pp_add<Map>(*this, column, row);
 }
 
 Matrix& Matrix::addMatrix(index column, index row)
 {
-    return pp_add<Matrix>(column, row);
+    return ::pp_add<Matrix>(*this, column, row);
 }
 
 Set& Matrix::getSet(index column, index row)
 {
-    return pp_get_value(column, row).toSet();
+    return ::pp_get_value(*this, column, row).toSet();
 }
 
 Map& Matrix::getMap(index column, index row)
 {
-    return pp_get_value(column, row).toMap();
+    return ::pp_get_value(*this, column, row).toMap();
 }
 
 Matrix& Matrix::getMatrix(index column, index row)
 {
-    return pp_get_value(column, row).toMatrix();
+    return ::pp_get_value(*this, column, row).toMatrix();
 }
 
 const Set& Matrix::getSet(index column, index row) const
 {
-    return pp_get_value(column, row).toSet();
+    return ::pp_get_value(*this, column, row).toSet();
 }
 
 const Map& Matrix::getMap(index column, index row) const
 {
-    return pp_get_value(column, row).toMap();
+    return ::pp_get_value(*this, column, row).toMap();
 }
 
 const Matrix& Matrix::getMatrix(index column, index row) const
 {
-    return pp_get_value(column, row).toMatrix();
+    return ::pp_get_value(*this, column, row).toMatrix();
 }
 
 void Matrix::reserve(size_type columnmax, size_type rowmax)
@@ -298,6 +499,43 @@ void Matrix::moveLastCell()
             m_lastY = 0;
         }
     }
+}
+
+void Matrix::add(index column, index row, std::unique_ptr<Value> val)
+{
+    ::pp_check_index(*this, column, row);
+    
+    m_matrix[row * m_nbcolmax + column] = std::move(val);
+}
+
+void Matrix::set(index column, index row, std::unique_ptr<Value> val)
+{
+    ::pp_check_index(*this, column, row);
+    
+    m_matrix[row * m_nbcolmax + column] = std::move(val);
+}
+
+const std::unique_ptr<Value>& Matrix::get(index column, index row) const
+{
+    ::pp_check_index(*this, column, row);
+    return m_matrix[row * m_nbcolmax + column];
+}
+
+std::unique_ptr<Value> Matrix::give(index column, index row)
+{
+    ::pp_check_index(*this, column, row);
+    return std::move(m_matrix[row * m_nbcolmax + column]);
+}
+
+const std::unique_ptr<Value>& Matrix::operator()(index column, index row) const
+{
+    ::pp_check_index(*this, column, row);
+    return m_matrix[row * m_nbcolmax + column];
+}
+
+void Matrix::addToLastCell(std::unique_ptr<Value> val)
+{
+    m_matrix[m_lastY * m_nbcolmax + m_lastX] = std::move(val);
 }
 
 }} // namespace vle value

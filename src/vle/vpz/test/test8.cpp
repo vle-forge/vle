@@ -40,8 +40,8 @@
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vle.hpp>
 

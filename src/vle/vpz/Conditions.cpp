@@ -28,7 +28,10 @@
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/value/Double.hpp>
 #include <algorithm>
+#include <iterator>
 
 namespace vle { namespace vpz {
 

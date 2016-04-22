@@ -26,6 +26,7 @@
 #include <unistd.h>
 
 #include <vle/value/Matrix.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/manager/Simulation.hpp>
 #include "DefaultSimSubpanel.h"
 

@@ -26,6 +26,7 @@
 
 
 #include <vle/value/Table.hpp>
+#include <vle/utils/Exception.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -96,7 +97,7 @@ void Table::fill(const std::string& str)
                 try {
                     result = boost::lexical_cast < long >(elem);
                 } catch(const boost::bad_lexical_cast& e) {
-                    throw utils::ArgError(fmt(_(
+                    throw vle::utils::ArgError(fmt(_(
                             "Can not convert string \'%1%\' into"
                             " double or long")) % (elem));
                 }

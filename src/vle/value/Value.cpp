@@ -38,6 +38,7 @@
 #include <vle/value/Null.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/value/User.hpp>
+#include <vle/utils/Exception.hpp>
 #include <sstream>
 
 namespace vle { namespace value {
@@ -253,6 +254,30 @@ User& Value::toUser()
         throw utils::CastError(_("Value is not a user value"));
     }
     return static_cast < User& >(*this);
+}
+
+bool is_composite(const std::unique_ptr<Value>& val)
+{
+    if (not val)
+        return false;
+
+    switch (val->getType()) {
+    case Value::MAP:
+    case Value::SET:
+    case Value::MATRIX:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+const Value& reference(const std::unique_ptr<Value>& value)
+{
+    if (not value)
+        throw utils::ArgError(_("Null value"));
+
+    return *value.get();
 }
 
 }} // namespace vle value

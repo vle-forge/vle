@@ -29,6 +29,7 @@
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Simulation.hpp>
 #include <boost/timer.hpp>

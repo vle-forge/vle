@@ -31,9 +31,28 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
+#include <vle/utils/Exception.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
 #include <cstring>
+
+namespace {
+
+template <typename T>
+inline void checkEmptyStack(const T& t)
+{
+    if (not t.empty())
+        throw vle::utils::SaxParserError("Not empty vpz stack");
+}
+
+template <typename T>
+inline void checkNotEmptyStack(const T& t)
+{
+    if (t.empty())
+        throw vle::utils::SaxParserError("Empty vpz stack");
+}
+
+}
 
 namespace vle { namespace vpz {
 
@@ -75,7 +94,7 @@ void SaxStackVpz::clear()
 
 vpz::Vpz* SaxStackVpz::pushVpz(const xmlChar** att)
 {
-    checkEmptyStack();
+    ::checkEmptyStack(m_stack);
 
     for (int i = 0; att[i] != NULL; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"date") == 0) {
@@ -95,7 +114,7 @@ vpz::Vpz* SaxStackVpz::pushVpz(const xmlChar** att)
 
 void SaxStackVpz::pushStructure()
 {
-    checkNotEmptyStack();
+    ::checkNotEmptyStack(m_stack);
     checkParentIsVpz();
 
     push(new vpz::Structures());
@@ -103,7 +122,7 @@ void SaxStackVpz::pushStructure()
 
 void SaxStackVpz::pushModel(const xmlChar** att)
 {
-    checkNotEmptyStack();
+    ::checkNotEmptyStack(m_stack);
     checkParentOfModel();
 
     vpz::CoupledModel* cplparent = 0;

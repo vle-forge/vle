@@ -29,6 +29,7 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
+#include <vle/value/Tuple.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <boost/cast.hpp>
 

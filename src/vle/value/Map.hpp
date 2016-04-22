@@ -29,16 +29,7 @@
 #define VLE_VALUE_MAP_HPP 1
 
 #include <vle/value/Value.hpp>
-#include <vle/value/Boolean.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Null.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Table.hpp>
-#include <vle/value/Tuple.hpp>
-#include <vle/value/XML.hpp>
 #include <vle/DllDefines.hpp>
-#include <memory>
 #include <unordered_map>
 
 namespace vle { namespace value {
@@ -46,7 +37,7 @@ namespace vle { namespace value {
 /**
  * @brief Define a list of Value in a dictionnary.
  */
-typedef std::unordered_map <std::string, std::unique_ptr<Value>> MapValue;
+using MapValue = std::unordered_map <std::string, std::unique_ptr<Value>>;
 
 /**
  * @brief Map Value a container to a pair of std::string, Value pointer. The
@@ -55,10 +46,10 @@ typedef std::unordered_map <std::string, std::unique_ptr<Value>> MapValue;
 class VLE_API Map : public Value
 {
 public:
-    typedef MapValue::size_type size_type;
-    typedef MapValue::iterator iterator;
-    typedef MapValue::const_iterator const_iterator;
-    typedef MapValue::value_type value_type;
+    using size_type = MapValue::size_type;
+    using iterator = MapValue::iterator;
+    using const_iterator = MapValue::const_iterator;
+    using value_type = MapValue::value_type;
 
     /**
      * @brief Build a Map object with an empty MapValue.
@@ -87,7 +78,7 @@ public:
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -143,7 +134,7 @@ public:
     virtual void writeXml(std::ostream& out) const override final;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -154,10 +145,7 @@ public:
      * @param value the Value to add.
      * @throw utils::ArgError if the value is null.
      */
-    void add(const std::string& name, std::unique_ptr<Value> value)
-    {
-        std::swap(m_value[name], value);
-    }
+    void add(const std::string& name, std::unique_ptr<Value> value);
 
     /**
      * @brief Add a value into the map. Be carrefull, the data is not
@@ -167,20 +155,14 @@ public:
      * @param value the Value to add.
      * @throw utils::ArgError if the value is null.
      */
-    void set(const std::string& name, std::unique_ptr<Value> value)
-    {
-        std::swap(m_value[name], value);
-    }
+    void set(const std::string& name, std::unique_ptr<Value> value);
 
     /**
      * @brief Test if the map have already a Value with specified name.
      * @param name the name to find into value.
      * @return true if Value exist, false otherwise.
      */
-    inline bool exist(const std::string& name) const
-    {
-        return m_value.find(name) != m_value.end();
-    }
+    bool exist(const std::string& name) const;
 
     /**
      * @brief Get a Value from the map specified by his name.
@@ -188,10 +170,7 @@ public:
      * @return A reference to the specified value or a newly builded.
      * @throw utils::ArgError if the key does not exist.
      */
-    const std::unique_ptr<Value>& operator[](const std::string& name) const
-    {
-        return pp_get(name)->second;
-    }
+    const std::unique_ptr<Value>& operator[](const std::string& name) const;
 
     /**
      * @brief Get the Value objet for specified name.
@@ -199,10 +178,7 @@ public:
      * @return a reference to the Value.
      * @throw utils::ArgError if value don't exist.
      */
-    const std::unique_ptr<Value>& get(const std::string& name) const
-    {
-        return pp_get(name)->second;
-    }
+    const std::unique_ptr<Value>& get(const std::string& name) const;
 
     /**
      * @brief Get the Value object for the specified name. If the name
@@ -211,74 +187,61 @@ public:
      * @return the pointer to the Value.
      * @throw utils::ArgError if value don't exist.
      */
-    std::unique_ptr<Value> give(const std::string& name)
-    {
-        auto it = pp_get(name);
-        return std::move(it->second);
-    }
+    std::unique_ptr<Value> give(const std::string& name);
 
     /**
      * @brief Get an access to the std::map.
      * @return a reference to the set::map.
      */
-    inline MapValue& value()
-    { return m_value; }
+    inline MapValue& value() { return m_value; }
 
     /**
      * @brief Get a constant access to the std::map.
      * @return a reference to the const std::map.
      */
-    inline const MapValue& value() const
-    { return m_value; }
+    inline const MapValue& value() const { return m_value; }
 
     /**
      * @brief Delete all value from map.
      */
-    void clear()
-    { m_value.clear(); }
+    void clear() { m_value.clear(); }
 
     /**
      * @brief Return true if the value::Map does not contain any element.
      * @return True if empty, false otherwise.
      */
-    inline bool empty() const
-    { return m_value.empty(); }
+    inline bool empty() const { return m_value.empty(); }
 
     /**
      * Return the number of element in the @c std::map.
      *
      * @return An integer [0..MAX_SIZE_T];
      */
-    inline size_type size() const
-    { return m_value.size(); }
+    inline size_type size() const { return m_value.size(); }
 
     /**
      * @brief Get the first constant iterator from Map.
      * @return the first iterator.
      */
-    inline const_iterator begin() const
-    { return m_value.begin(); }
+    inline const_iterator begin() const { return m_value.begin(); }
 
     /**
      * @brief Get the last constant iterator from Map.
      * @return the last iterator.
      */
-    inline const_iterator end() const
-    { return m_value.end(); }
+    inline const_iterator end() const { return m_value.end(); }
 
     /**
      * @brief Get the first constant iterator from Map.
      * @return the first iterator.
      */
-    inline iterator begin()
-    { return m_value.begin(); }
+    inline iterator begin() { return m_value.begin(); }
 
     /**
      * @brief Get the last constant iterator from Map.
      * @return the last iterator.
      */
-    inline iterator end()
-    { return m_value.end(); }
+    inline iterator end() { return m_value.end(); }
 
     /**
      * @brief Find an constant iterator into the value::Map using a key.
@@ -297,7 +260,7 @@ public:
     { return m_value.find(key); }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -306,10 +269,7 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    Null& addNull(const std::string& name)
-    {
-        return pp_add<Null>(name);
-    }
+    Null& addNull(const std::string& name);
 
     /**
      * @brief Get the String value objet from specified name.
@@ -318,10 +278,7 @@ public:
      * @throw utils::ArgError if type is not Value::STRING or value do not
      * exist.
      */
-    const std::string& getString(const std::string& name) const
-    {
-        return pp_get_value(name).toString().value();
-    }
+    const std::string& getString(const std::string& name) const;
 
     /**
      * @brief Get the String value objet from specified name.
@@ -330,10 +287,7 @@ public:
      * @throw utils::ArgError if type is not Value::STRING or value do not
      * exist.
      */
-    std::string& getString(const std::string& name)
-    {
-        return pp_get_value(name).toString().value();
-    }
+    std::string& getString(const std::string& name);
 
     /**
      * @brief Set a string to the value of the specified key. If the key
@@ -341,10 +295,7 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    String& addString(const std::string& name, const std::string& value)
-    {
-        return pp_add<String>(name, value);
-    }
+    String& addString(const std::string& name, const std::string& value);
 
     /**
      * @brief Get the String value objet from specified name.
@@ -353,10 +304,7 @@ public:
      * @throw utils::ArgError if type is not Value::STRING or value do not
      * exist.
      */
-    bool getBoolean(const std::string& name) const
-    {
-        return pp_get_value(name).toBoolean().value();
-    }
+    bool getBoolean(const std::string& name) const;
 
     /**
      * @brief Get the String value objet from specified name.
@@ -365,10 +313,7 @@ public:
      * @throw utils::ArgError if type is not Value::STRING or value do not
      * exist.
      */
-    bool& getBoolean(const std::string& name)
-    {
-        return pp_get_value(name).toBoolean().value();
-    }
+    bool& getBoolean(const std::string& name);
 
     /**
      * @brief Set a boolean to the value of the specified key. If the key
@@ -376,10 +321,7 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    Boolean& addBoolean(const std::string& name, bool value)
-    {
-        return pp_add<Boolean>(name, value);
-    }
+    Boolean& addBoolean(const std::string& name, bool value);
 
     /**
      * @brief Get the Integer value objet from specified name.
@@ -388,10 +330,7 @@ public:
      * @throw utils::ArgError if type is not Value::STRING or value do not
      * exist.
      */
-    int32_t getInt(const std::string& name) const
-    {
-        return pp_get_value(name).toInteger().value();
-    }
+    int32_t getInt(const std::string& name) const;
 
     /**
      * @brief Get the integer value objet from specified name.
@@ -400,10 +339,7 @@ public:
      * @throw utils::ArgError if type is not Value::INTEGER or value do not
      * exist.
      */
-    int32_t& getInt(const std::string& name)
-    {
-        return pp_get_value(name).toInteger().value();
-    }
+    int32_t& getInt(const std::string& name);
 
     /**
      * @brief Set a integer to the value of the specified key. If the
@@ -411,10 +347,7 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    void addInt(const std::string& name, const int32_t& value)
-    {
-        pp_add<Integer>(name, value);
-    }
+    void addInt(const std::string& name, const int32_t& value);
 
     /**
      * @brief Get the Double value objet from specified name.
@@ -423,10 +356,7 @@ public:
      * @throw utils::ArgError if type is not Value::DOUBLE or value do not
      * exist.
      */
-    double getDouble(const std::string& name) const
-    {
-        return pp_get_value(name).toDouble().value();
-    }
+    double getDouble(const std::string& name) const;
 
     /**
      * @brief Get the Double value objet from specified name.
@@ -435,10 +365,7 @@ public:
      * @throw utils::ArgError if type is not Value::DOUBLE or value do not
      * exist.
      */
-    double& getDouble(const std::string& name)
-    {
-        return pp_get_value(name).toDouble().value();
-    }
+    double& getDouble(const std::string& name);
 
     /**
      * @brief Set a double to the value of the specified key. If the
@@ -446,10 +373,7 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    Double& addDouble(const std::string& name, const double& value)
-    {
-        return pp_add<Double>(name, value);
-    }
+    Double& addDouble(const std::string& name, const double& value);
 
     /**
      * @brief Get the Xml value objet from specified name.
@@ -458,10 +382,7 @@ public:
      * @throw utils::ArgError if type is not Value::STRING or value do not
      * exist.
      */
-    const std::string& getXml(const std::string& name) const
-    {
-        return pp_get_value(name).toXml().value();
-    }
+    const std::string& getXml(const std::string& name) const;
 
     /**
      * @brief Get the Xml value objet from specified name.
@@ -470,10 +391,7 @@ public:
      * @throw utils::ArgError if type is not Value::STRING or value do not
      * exist.
      */
-    std::string& getXml(const std::string& name)
-    {
-        return pp_get_value(name).toXml().value();
-    }
+    std::string& getXml(const std::string& name);
 
     /**
      * @brief Set an Xml to the value of the specified key. If the key does not
@@ -481,10 +399,7 @@ public:
      * @param name The key of the Xml.
      * @param value The value of the key.
      */
-    Xml& addXml(const std::string& name, const std::string& value)
-    {
-        return pp_add<Xml>(name, value);
-    }
+    Xml& addXml(const std::string& name, const std::string& value);
 
     /**
      * @brief Get the Table value objet from specified name.
@@ -492,10 +407,7 @@ public:
      * @return a reference to the Table.
      * @throw utils::ArgError if type is not a Table or value do not exist.
      */
-    const Table& getTable(const std::string& name) const
-    {
-        return pp_get_value(name).toTable();
-    }
+    const Table& getTable(const std::string& name) const;
 
     /**
      * @brief Get the Table value objet from specified name.
@@ -503,10 +415,7 @@ public:
      * @return a reference to the Table.
      * @throw utils::ArgError if type is not a Table or value do not exist.
      */
-    Table& getTable(const std::string& name)
-    {
-        return pp_get_value(name).toTable();
-    }
+    Table& getTable(const std::string& name);
 
     /**
      * @brief Add an XML to the value of the specified key. If the key does not
@@ -514,12 +423,8 @@ public:
      * @param name The key of the map.
      * @param value The value of the key.
      */
-    Table& addTable(const std::string& name,
-                    Table::size_type width = 0,
-                    Table::size_type height = 0)
-    {
-        return pp_add<Table>(name, width, height);
-    }
+    Table& addTable(const std::string& name, std::size_t width = 0,
+                    std::size_t height = 0);
 
     /**
      * @brief Get the Tuple value objet from specified name.
@@ -527,10 +432,7 @@ public:
      * @return a reference to the Tuple.
      * @throw utils::ArgError if type is not a Tuple or value do not exist.
      */
-    const Tuple& getTuple(const std::string& name) const
-    {
-        return pp_get_value(name).toTuple();
-    }
+    const Tuple& getTuple(const std::string& name) const;
 
     /**
      * @brief Get the Tuple value objet from specified name.
@@ -538,10 +440,7 @@ public:
      * @return a reference to the Tuple.
      * @throw utils::ArgError if type is not a Tuple or value do not exist.
      */
-    Tuple& getTuple(const std::string& name)
-    {
-        return pp_get_value(name).toTuple();
-    }
+    Tuple& getTuple(const std::string& name);
 
     /**
      * @brief Add an Tuple to the value of the specified key. If the key does
@@ -549,12 +448,8 @@ public:
      * @param name The key of the Map.
      * @param value The value of the key.
      */
-    Tuple& addTuple(const std::string& name,
-                    Tuple::size_type width = 0,
-                    double value = 0.0)
-    {
-        return pp_add<Tuple>(name, width, value);
-    }
+    Tuple& addTuple(const std::string& name, std::size_t width = 0,
+                    double value = 0.0);
 
     /**
      * @brief Add a Map into the Map.
@@ -641,61 +536,6 @@ public:
 
 private:
     MapValue m_value;
-
-    inline iterator pp_get(const std::string& name)
-    {
-        auto it = find(name);
-
-        if (it == end())
-            throw utils::ArgError(
-                fmt(_("Map: the key '%1%' does not exist")) % name);
-
-        return it;
-    }
-
-    inline const_iterator pp_get(const std::string& name) const
-    {
-        auto it = find(name);
-
-        if (it == end())
-            throw utils::ArgError(
-                fmt(_("Map: the key '%1%' does not exist")) % name);
-
-        return it;
-    }
-
-    inline Value& pp_get_value(const std::string& name)
-    {
-        auto it = pp_get(name);
-
-        if (not it->second)
-            throw utils::ArgError(
-                fmt(_("Map: the key '%1%' have empty (null) value")) % name);
-
-        return *it->second.get();
-    }
-
-    inline const Value& pp_get_value(const std::string& name) const
-    {
-        auto it = pp_get(name);
-
-        if (not it->second)
-            throw utils::ArgError(
-                fmt(_("Map: the key '%1%' have empty (null) value")) % name);
-
-        return *it->second.get();
-    }
-
-    template <typename T, typename... Args>
-        T& pp_add(const std::string& name, Args&&... args)
-    {
-        auto value = std::unique_ptr<Value>(new T(std::forward<Args>(args)...));
-        auto *ret = static_cast<T*>(value.get());
-
-        std::swap(m_value[name], value);
-
-        return *ret;
-    }
 };
 
 inline const Map& toMapValue(const std::unique_ptr<Value>& value)

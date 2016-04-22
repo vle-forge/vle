@@ -28,6 +28,7 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Set.hpp>
+#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace vpz {
 

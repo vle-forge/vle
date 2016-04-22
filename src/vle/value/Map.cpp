@@ -25,8 +25,86 @@
  */
 
 #include <vle/value/Map.hpp>
-#include <vle/value/Set.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
 #include <vle/value/Matrix.hpp>
+#include <vle/value/Null.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/XML.hpp>
+#include <vle/utils/Exception.hpp>
+
+namespace {
+
+inline
+vle::value::MapValue::iterator
+pp_get(vle::value::MapValue& m, const std::string& name)
+{
+    auto it = m.find(name);
+
+    if (it == m.end())
+        throw vle::utils::ArgError(
+            vle::fmt(_("Map: the key '%1%' does not exist")) % name);
+
+    return it;
+}
+
+inline
+vle::value::MapValue::const_iterator
+pp_get(const vle::value::MapValue& m, const std::string& name)
+{
+    auto it = m.find(name);
+
+    if (it == m.end())
+        throw vle::utils::ArgError(
+            vle::fmt(_("Map: the key '%1%' does not exist")) % name);
+
+    return it;
+}
+
+inline
+vle::value::Value&
+pp_get_value(vle::value::MapValue& m, const std::string& name)
+{
+    auto it = pp_get(m, name);
+
+    if (not it->second)
+    throw vle::utils::ArgError(
+                            vle::fmt(_("Map: the key '%1%' have empty (null) value"))
+                            % name);
+
+    return *it->second.get();
+}
+
+inline
+const vle::value::Value&
+pp_get_value(const vle::value::MapValue& m, const std::string& name)
+{
+    auto it = pp_get(m, name);
+
+    if (not it->second)
+        throw vle::utils::ArgError(
+            vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name);
+
+    return *it->second.get();
+}
+
+template <typename T, typename... Args>
+T&
+pp_add(vle::value::MapValue& m, const std::string& name, Args&&... args)
+{
+    auto value = std::unique_ptr<vle::value::Value>(new T(std::forward<Args>(args)...));
+    auto *ret = static_cast<T*>(value.get());
+
+    std::swap(m[name], value);
+
+    return *ret;
+}
+
+}
 
 namespace vle { namespace value {
 
@@ -86,66 +164,209 @@ void Map::writeXml(std::ostream& out) const
     out << "</map>";
 }
 
+void Map::add(const std::string& name, std::unique_ptr<Value> value)
+{
+    std::swap(m_value[name], value);
+}
+
+void Map::set(const std::string& name, std::unique_ptr<Value> value)
+{
+    std::swap(m_value[name], value);
+}
+
+bool Map::exist(const std::string& name) const
+{
+    return m_value.find(name) != m_value.end();
+}
+
+const std::unique_ptr<Value>& Map::operator[](const std::string& name) const
+{
+    return ::pp_get(m_value, name)->second;
+}
+
+const std::unique_ptr<Value>& Map::get(const std::string& name) const
+{
+    return ::pp_get(m_value, name)->second;
+}
+
+std::unique_ptr<Value> Map::give(const std::string& name)
+{
+    auto it = ::pp_get(m_value, name);
+    return std::move(it->second);
+}
+
 Map& Map::addMap(const std::string& name)
 {
-    return pp_add<Map>(name);
+    return ::pp_add<Map>(m_value, name);
 }
-    
+
 Set& Map::addSet(const std::string& name)
 {
-    return pp_add<Set>(name);
+    return ::pp_add<Set>(m_value, name);
 }
 
 Matrix& Map::addMatrix(const std::string& name)
 {
-    return pp_add<Matrix>(name);
+    return ::pp_add<Matrix>(m_value, name);
 }
 
 Map& Map::getMap(const std::string& name)
 {
-    return pp_get_value(name).toMap();
+    return ::pp_get_value(m_value, name).toMap();
 }
 
 Set& Map::getSet(const std::string& name)
 {
-    return pp_get_value(name).toSet();
+    return ::pp_get_value(m_value, name).toSet();
 }
 
 Matrix& Map::getMatrix(const std::string& name)
 {
-    return pp_get_value(name).toMatrix();
+    return ::pp_get_value(m_value, name).toMatrix();
 }
 
 const Map& Map::getMap(const std::string& name) const
 {
-    return pp_get_value(name).toMap();
+    return ::pp_get_value(m_value, name).toMap();
 }
 
 const Set& Map::getSet(const std::string& name) const
 {
-    return pp_get_value(name).toSet();
+    return ::pp_get_value(m_value, name).toSet();
 }
 
 const Matrix& Map::getMatrix(const std::string& name) const
 {
-    return pp_get_value(name).toMatrix();
+    return ::pp_get_value(m_value, name).toMatrix();
 }
 
+Null& Map::addNull(const std::string& name)
+{
+    return ::pp_add<Null>(m_value, name);
+}
 
-void
-Map::addMultilpleValues(int toadd, const vle::value::Value& fill)
+const std::string& Map::getString(const std::string& name) const
+{
+    return ::pp_get_value(m_value, name).toString().value();
+}
+
+std::string& Map::getString(const std::string& name)
+{
+    return ::pp_get_value(m_value, name).toString().value();
+}
+
+String& Map::addString(const std::string& name, const std::string& value)
+{
+    return ::pp_add<String>(m_value, name, value);
+}
+
+bool Map::getBoolean(const std::string& name) const
+{
+    return ::pp_get_value(m_value, name).toBoolean().value();
+}
+
+bool& Map::getBoolean(const std::string& name)
+{
+    return ::pp_get_value(m_value, name).toBoolean().value();
+}
+
+Boolean& Map::addBoolean(const std::string& name, bool value)
+{
+    return ::pp_add<Boolean>(m_value, name, value);
+}
+
+int32_t Map::getInt(const std::string& name) const
+{
+    return ::pp_get_value(m_value, name).toInteger().value();
+}
+
+int32_t& Map::getInt(const std::string& name)
+{
+    return ::pp_get_value(m_value, name).toInteger().value();
+}
+
+void Map::addInt(const std::string& name, const int32_t& value)
+{
+    ::pp_add<Integer>(m_value, name, value);
+}
+
+double Map::getDouble(const std::string& name) const
+{
+    return ::pp_get_value(m_value, name).toDouble().value();
+}
+
+double& Map::getDouble(const std::string& name)
+{
+    return ::pp_get_value(m_value, name).toDouble().value();
+}
+
+Double& Map::addDouble(const std::string& name, const double& value)
+{
+    return ::pp_add<Double>(m_value, name, value);
+}
+
+const std::string& Map::getXml(const std::string& name) const
+{
+    return ::pp_get_value(m_value, name).toXml().value();
+}
+
+std::string& Map::getXml(const std::string& name)
+{
+    return ::pp_get_value(m_value, name).toXml().value();
+}
+
+Xml& Map::addXml(const std::string& name, const std::string& value)
+{
+    return ::pp_add<Xml>(m_value, name, value);
+}
+
+const Table& Map::getTable(const std::string& name) const
+{
+    return ::pp_get_value(m_value, name).toTable();
+}
+
+Table& Map::getTable(const std::string& name)
+{
+    return ::pp_get_value(m_value, name).toTable();
+}
+
+Table& Map::addTable(const std::string& name,
+                Table::size_type width,
+                Table::size_type height)
+{
+    return ::pp_add<Table>(m_value, name, width, height);
+}
+
+const Tuple& Map::getTuple(const std::string& name) const
+{
+    return ::pp_get_value(m_value, name).toTuple();
+}
+
+Tuple& Map::getTuple(const std::string& name)
+{
+    return ::pp_get_value(m_value, name).toTuple();
+}
+
+Tuple& Map::addTuple(const std::string& name,
+                     std::size_t width,
+                     double value)
+{
+    return ::pp_add<Tuple>(m_value, name, width, value);
+}
+
+void Map::addMultilpleValues(int toadd, const vle::value::Value& fill)
 {
     if (toadd <= 0)
         return;
 
     std::string key;
     bool found;
-    
+
     for (auto i=0; i < toadd; ++i) {
         key.assign("NewKey");
         int current = 0;
         found = false;
-        
+
         while (not found) {
             found = not exist(key);
             if (not found) {
@@ -156,7 +377,7 @@ Map::addMultilpleValues(int toadd, const vle::value::Value& fill)
             }
         }
         auto to_add = std::unique_ptr<Value>(fill.clone());
-        
+
         std::swap(m_value[key], to_add);
     }
 }

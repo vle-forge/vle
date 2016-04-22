@@ -32,6 +32,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vle.hpp>

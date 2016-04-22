@@ -50,7 +50,7 @@ public:
      * @brief Build an Integer object with a specified value.
      * @param value The value to copy.
      */
-    Integer(const int32_t& value)
+    Integer(int32_t value)
         : m_value(value)
     {}
 
@@ -143,7 +143,7 @@ public:
      * @brief Assign a value to the encapsulated long.
      * @param value The value to set.
      */
-    inline void set(const int32_t& value)
+    inline void set(int32_t value)
     { m_value = value; }
 
 private:

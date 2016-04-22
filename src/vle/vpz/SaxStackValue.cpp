@@ -28,6 +28,9 @@
 #include <vle/vpz/SaxStackValue.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace vpz {
 
@@ -216,6 +219,29 @@ void ValueStackSax::clear()
         m_valuestack.pop();
 
     m_result.clear();
+}
+
+void ValueStackSax::pushResult(std::unique_ptr<value::Value> val)
+{
+    m_result.push_back(std::move(val));
+}
+
+const std::unique_ptr<value::Value>& ValueStackSax::getResult(size_t i) const
+{
+    if (m_result.size() < i)
+        throw utils::SaxParserError(
+            fmt(_("Get result value with to big index %1%.")) % i);
+
+    return m_result[i];
+}
+
+const std::unique_ptr<value::Value>& ValueStackSax::getLastResult() const
+{
+    if (m_result.empty())
+        throw utils::SaxParserError(
+            _("Get last result value with empty result vector"));
+
+    return m_result[m_result.size() - 1];
 }
 
 }} // namespace vle vpz

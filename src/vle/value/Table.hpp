@@ -201,7 +201,7 @@ public:
      *
      * @return The width.
      */
-    inline const index& width() const
+    inline std::size_t width() const
     { return m_width; }
 
     /**
@@ -209,7 +209,7 @@ public:
      *
      * @return The height.
      */
-    inline const index& height() const
+    inline std::size_t height() const
     { return m_height; }
 
     /**
@@ -219,7 +219,7 @@ public:
      * @param width The width of the TableValue.
      * @param height The height of the TableValue.
      */
-    inline void resize(const index& width, const index& height)
+    inline void resize(std::size_t width, std::size_t height)
     {
         m_value.resize((boost::extents[width][height]));
         m_width = width;
@@ -234,7 +234,7 @@ public:
      *
      * @return a constant reference to the real.
      */
-    inline const double& get(const index& x, const index& y) const
+    inline const double& get(std::size_t x, std::size_t y) const
     { return m_value[x][y]; }
 
     /**
@@ -245,7 +245,7 @@ public:
      *
      * @return a reference to the real.
      */
-    inline double& get(const index& x, const index& y)
+    inline double& get(std::size_t x, std::size_t y)
     { return m_value[x][y]; }
 
     /**
