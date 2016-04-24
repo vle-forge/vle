@@ -28,35 +28,35 @@
 #ifndef VLE_UTILS_TYPES_HPP
 #define VLE_UTILS_TYPES_HPP
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 /*
- * \c Types.hpp defines a list of integer types based on the C99 library wrapped
- * into boost/cstdint.hpp
+ * \c Types.hpp defines a list of integer types based on the C99 library
+ * wrapped into boost/cstdint.hpp
  */
 
 namespace vle {
 
-    using boost::int8_t;
-    using boost::int16_t;
-    using boost::int32_t;
-    using boost::uint8_t;
-    using boost::uint16_t;
-    using boost::uint32_t;
+using std::int8_t;
+using std::int16_t;
+using std::int32_t;
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
 
-    using boost::int_fast8_t;
-    using boost::int_fast16_t;
-    using boost::int_fast32_t;
-    using boost::uint_fast8_t;
-    using boost::uint_fast16_t;
-    using boost::uint_fast32_t;
+using std::int_fast8_t;
+using std::int_fast16_t;
+using std::int_fast32_t;
+using std::uint_fast8_t;
+using std::uint_fast16_t;
+using std::uint_fast32_t;
 
-    using boost::int_least8_t;
-    using boost::int_least16_t;
-    using boost::int_least32_t;
-    using boost::uint_least8_t;
-    using boost::uint_least16_t;
-    using boost::uint_least32_t;
+using std::int_least8_t;
+using std::int_least16_t;
+using std::int_least32_t;
+using std::uint_least8_t;
+using std::uint_least16_t;
+using std::uint_least32_t;
 
 } // namespace vle utils
 

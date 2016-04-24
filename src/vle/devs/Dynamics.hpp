@@ -41,6 +41,7 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/PackageTable.hpp>
+#include <vle/utils/Types.hpp>
 #include <vle/version.hpp>
 #include <string>
 

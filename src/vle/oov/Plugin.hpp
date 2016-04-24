@@ -30,6 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/value/Matrix.hpp>
+#include <vle/utils/Types.hpp>
 #include <vle/version.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
