@@ -57,10 +57,6 @@ public:
                     " implemented"));
     }
 
-    ~Pimpl()
-    {
-    }
-
     template <typename T>
     void write(const T& t)
     {
@@ -72,7 +68,7 @@ public:
     }
 
     std::unique_ptr<value::Map>
-    runVerboseRun(vpz::Vpz                   *vpz,
+    runVerboseRun(std::unique_ptr<vpz::Vpz>   vpz,
                   const utils::ModuleManager &modulemgr,
                   Error                      *error)
     {
@@ -94,7 +90,7 @@ public:
 
             write(_(" - Clean project file ...........: "));
             vpz->clear();
-            delete vpz;
+            vpz.reset(nullptr);
             write(_("ok\n"));
 
             write(_(" - Coordinator initializing .....: "));
@@ -137,7 +133,7 @@ public:
     }
 
     std::unique_ptr<value::Map>
-    runVerboseSummary(vpz::Vpz                   *vpz,
+    runVerboseSummary(std::unique_ptr<vpz::Vpz>   vpz,
                       const utils::ModuleManager &modulemgr,
                       Error                      *error)
     {
@@ -156,7 +152,7 @@ public:
 
             write(_(" - Clean project file ...........: "));
             vpz->clear();
-            delete vpz;
+            vpz.reset(nullptr);
             write(_("ok\n"));
 
             write(_(" - Coordinator initializing .....: "));
@@ -189,7 +185,7 @@ public:
     }
 
     std::unique_ptr<value::Map>
-    runQuiet(vpz::Vpz                   *vpz,
+    runQuiet(std::unique_ptr<vpz::Vpz>   vpz,
              const utils::ModuleManager &modulemgr,
              Error                      *error)
     {
@@ -199,7 +195,7 @@ public:
             devs::RootCoordinator root(modulemgr);
             root.load(*vpz);
             vpz->clear();
-            delete vpz;
+            vpz.reset(nullptr);
 
             root.init();
             while (root.run()) {}
@@ -216,23 +212,23 @@ public:
 
         return result;
     }
-
 };
 
 Simulation::Simulation(LogOptions         logoptions,
                        SimulationOptions  simulationoptionts,
                        std::ostream      *output)
-    : mPimpl(new Simulation::Pimpl(logoptions, simulationoptionts, output))
+    : mPimpl(
+        std::make_unique<Simulation::Pimpl>(
+            logoptions, simulationoptionts, output))
 {
 }
 
 Simulation::~Simulation()
 {
-    delete mPimpl;
 }
 
 std::unique_ptr<value::Map>
-Simulation::run(vpz::Vpz                   *vpz,
+Simulation::run(std::unique_ptr<vpz::Vpz>  vpz,
                 const utils::ModuleManager &modulemgr,
                 Error                      *error)
 {
@@ -241,13 +237,13 @@ Simulation::run(vpz::Vpz                   *vpz,
 
     if (mPimpl->m_logoptions != manager::LOG_NONE) {
         if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {
-            result = mPimpl->runVerboseRun(vpz, modulemgr, error);
+            result = mPimpl->runVerboseRun(std::move(vpz), modulemgr, error);
         } else {
-            result = mPimpl->runVerboseSummary(vpz, modulemgr, error);
+            result = mPimpl->runVerboseSummary(std::move(vpz), modulemgr, error);
         }
 
     } else {
-        result = mPimpl->runQuiet(vpz, modulemgr, error);
+        result = mPimpl->runQuiet(std::move(vpz), modulemgr, error);
     }
 
     if (mPimpl->m_simulationoptions & manager::SIMULATION_NO_RETURN) {

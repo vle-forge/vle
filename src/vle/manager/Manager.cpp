@@ -52,7 +52,7 @@ namespace vle { namespace manager {
  * @param name The base name of the experiment.
  * @param number The combination number.
  */
-static void setExperimentName(vpz::Vpz           *destination,
+static void setExperimentName(const std::unique_ptr<vpz::Vpz>& destination,
                               const std::string&  name,
                               uint32_t            number)
 {
@@ -61,7 +61,6 @@ static void setExperimentName(vpz::Vpz           *destination,
     result.replace(0, name.size(), name);
     result.replace(name.size() + 1, std::string::npos,
                    utils::to < uint32_t >(number));
-
 
     destination->project().setInstance(number);
     destination->project().experiment().setName(result);
@@ -76,10 +75,6 @@ public:
         : mLogOption(logoptions),
           mSimulationOption(simulationoptions),
           mOutputStream(output)
-    {
-    }
-
-    ~Pimpl()
     {
     }
 
@@ -114,7 +109,7 @@ public:
      */
     struct worker
     {
-        const vpz::Vpz       *vpz;
+        const std::unique_ptr<vpz::Vpz>& vpz;
         ExperimentGenerator  &expgen;
         utils::ModuleManager &modulemgr;
         LogOptions            mLogOption;
@@ -124,15 +119,15 @@ public:
         value::Matrix        *result;
         Error                *error;
 
-        worker(const vpz::Vpz        *vpz,
-               ExperimentGenerator&   expgen,
-               utils::ModuleManager&  modulemgr,
-               LogOptions             logoptions,
-               SimulationOptions      simulationoptions,
-               uint32_t               index,
-               uint32_t               threads,
-               value::Matrix         *result,
-               Error                 *error)
+        worker(const std::unique_ptr<vpz::Vpz>&  vpz,
+               ExperimentGenerator&              expgen,
+               utils::ModuleManager&             modulemgr,
+               LogOptions                        logoptions,
+               SimulationOptions                 simulationoptions,
+               uint32_t                          index,
+               uint32_t                          threads,
+               value::Matrix                    *result,
+               Error                            *error)
             : vpz(vpz), expgen(expgen), modulemgr(modulemgr),
               mLogOption(logoptions), mSimulationOption(simulationoptions),
               index(index), threads(threads), result(result), error(error)
@@ -151,11 +146,12 @@ public:
                  i += threads) {
                 Simulation sim(mLogOption, mSimulationOption, NULL);
                 Error err;
-                vpz::Vpz *file = new vpz::Vpz(*vpz);
+
+                auto file = std::make_unique<vpz::Vpz>(*vpz);
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                std::unique_ptr<value::Map> simresult = sim.run(file,
+                std::unique_ptr<value::Map> simresult = sim.run(std::move(file),
                                                                 modulemgr,
                                                                 &err);
 
@@ -174,7 +170,7 @@ public:
     };
 
     std::unique_ptr<value::Matrix>
-    runManagerThread(vpz::Vpz              *vpz,
+    runManagerThread(std::unique_ptr<vpz::Vpz> vpz,
                      utils::ModuleManager&  modulemgr,
                      uint32_t               threads,
                      uint32_t               rank,
@@ -188,21 +184,22 @@ public:
             new value::Matrix(expgen.size(), 1, expgen.size(), 1));
 
         for (uint32_t i = 0; i < threads; ++i) {
-            gp.create_thread(worker(vpz, expgen, modulemgr,
-                                    mLogOption, mSimulationOption,
-                                    i, threads, result.get(), error));
+            gp.create_thread(
+                worker(vpz, expgen, modulemgr,
+                       mLogOption, mSimulationOption,
+                       i, threads, result.get(), error));
         }
 
         gp.join_all();
 
-         delete vpz->project().model().model();
-         delete vpz;
+        // TOO BAD
+        delete vpz->project().model().model();
 
-         return result;
+        return result;
     }
 
     std::unique_ptr<value::Matrix>
-    runManagerMono(vpz::Vpz             *vpz,
+    runManagerMono(std::unique_ptr<vpz::Vpz> vpz,
                    utils::ModuleManager &modulemgr,
                    uint32_t              rank,
                    uint32_t              world,
@@ -219,11 +216,11 @@ public:
         if (mSimulationOption == manager::SIMULATION_NO_RETURN) {
             for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
-                vpz::Vpz *file = new vpz::Vpz(*vpz);
+                auto file = std::make_unique<vpz::Vpz>(*vpz);
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                sim.run(file, modulemgr, &err);
+                sim.run(std::move(file), modulemgr, &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -240,11 +237,11 @@ public:
 
             for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
-                vpz::Vpz *file = new vpz::Vpz(*vpz);
+                auto file = std::make_unique<vpz::Vpz>(*vpz);
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                std::unique_ptr<value::Map> simresult = sim.run(file,
+                std::unique_ptr<value::Map> simresult = sim.run(std::move(file),
                                                                 modulemgr,
                                                                 &err);
 
@@ -261,8 +258,8 @@ public:
             }
         }
 
+        // TOO BAD
         delete vpz->project().model().model();
-        delete vpz;
 
         return result;
     }
@@ -277,22 +274,22 @@ public:
 Manager::Manager(LogOptions            logoptions,
                  SimulationOptions     simulationoptions,
                  std::ostream         *output)
-    : mPimpl(new Manager::Pimpl(logoptions, simulationoptions, output))
+    : mPimpl(std::make_unique<Manager::Pimpl>(
+                 logoptions, simulationoptions, output))
 {
 }
 
 Manager::~Manager()
 {
-    delete mPimpl;
 }
 
 std::unique_ptr<value::Matrix>
-Manager::run(vpz::Vpz             *exp,
-             utils::ModuleManager &modulemgr,
-             uint32_t              thread,
-             uint32_t              rank,
-             uint32_t              world,
-             Error                *error)
+Manager::run(std::unique_ptr<vpz::Vpz>  exp,
+             utils::ModuleManager      &modulemgr,
+             uint32_t                   thread,
+             uint32_t                   rank,
+             uint32_t                   world,
+             Error                     *error)
 {
     std::unique_ptr<value::Matrix> result;
 
@@ -317,10 +314,10 @@ Manager::run(vpz::Vpz             *exp,
     mPimpl->writeSummaryLog(_("Manager started"));
 
     if (thread > 1) {
-        result = mPimpl->runManagerThread(exp, modulemgr, thread, rank,
+        result = mPimpl->runManagerThread(std::move(exp), modulemgr, thread, rank,
                                           world, error);
     } else {
-        result = mPimpl->runManagerMono(exp, modulemgr, rank, world, error);
+        result = mPimpl->runManagerMono(std::move(exp), modulemgr, rank, world, error);
     }
 
     mPimpl->writeSummaryLog(_("Manager ended"));

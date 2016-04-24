@@ -48,25 +48,26 @@ namespace vle { namespace manager {
 class VLE_API Simulation
 {
 public:
-    typedef std::unique_ptr<value::Map> result_type;
+    using result_type = std::unique_ptr<value::Map>;
 
     Simulation(LogOptions         logoptions,
                SimulationOptions  simulationoptionts,
                std::ostream      *output);
 
+    Simulation(const Simulation &other) = delete;
+    Simulation& operator=(const Simulation &other) = delete;
+
     ~Simulation();
 
     std::unique_ptr<value::Map>
-        run(vpz::Vpz                   *vpz,
+        run(std::unique_ptr<vpz::Vpz>   vpz,
             const utils::ModuleManager &modulemgr,
             Error                      *error);
 
 private:
-    Simulation(const Simulation &other);
-    Simulation& operator=(const Simulation &other);
-
     class Pimpl;
-    Pimpl *mPimpl;
+
+    std::unique_ptr<Pimpl> mPimpl;
 };
 
 }}

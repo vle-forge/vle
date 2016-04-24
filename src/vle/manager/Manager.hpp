@@ -51,11 +51,14 @@ namespace vle { namespace manager {
 class VLE_API Manager
 {
 public:
-    typedef value::Matrix result_type;
+    using result_type = std::unique_ptr<value::Matrix>;
 
     Manager(LogOptions            logoptions,
             SimulationOptions     simulationoptions,
             std::ostream         *output);
+
+    Manager(const Manager& other) = delete;
+    Manager& operator=(const Manager& other) = delete;;
 
     ~Manager();
 
@@ -78,19 +81,17 @@ public:
      * @return A @c value::Matrix to freed.
      */
     std::unique_ptr<value::Matrix>
-        run(vpz::Vpz             *exp,
-            utils::ModuleManager &modulemgr,
-            uint32_t              thread,
-            uint32_t              rank,
-            uint32_t              world,
-            Error                *error);
+        run(std::unique_ptr<vpz::Vpz>  exp,
+            utils::ModuleManager      &modulemgr,
+            uint32_t                   thread,
+            uint32_t                   rank,
+            uint32_t                   world,
+            Error                     *error);
 
 private:
-    Manager(const Manager& other);
-    Manager& operator=(const Manager& other);
-
     class Pimpl;
-    Pimpl *mPimpl;
+
+    std::unique_ptr<Pimpl> mPimpl;
 };
 
 }} // namespace vle manager

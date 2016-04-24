@@ -207,12 +207,13 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
     for (; it != end; ++it) {
         vle::manager::Error error;
         std::unique_ptr<vle::value::Matrix> res =
-            man.run(new vle::vpz::Vpz(search_vpz(*it, pkg)),
-                    modules,
-                    processor,
-                    0,
-                    1,
-                    &error);
+            man.run(
+                std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
+                modules,
+                processor,
+                0,
+                1,
+                &error);
 
         if (error.code) {
             std::cerr << vle::fmt(_("Experimental frames `%s' throws error %s"))
@@ -238,7 +239,7 @@ static int run_simulation(CmdArgs::const_iterator it,
     for (; it != end; ++it) {
         vle::manager::Error error;
         std::unique_ptr<vle::value::Map> res =
-            sim.run(new vle::vpz::Vpz(search_vpz(*it, pkg)),
+            sim.run(std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
                     modules,
                     &error);
 
