@@ -147,7 +147,9 @@ public:
                 Simulation sim(mLogOption, mSimulationOption, NULL);
                 Error err;
 
-                auto file = std::make_unique<vpz::Vpz>(*vpz);
+                auto file =
+                    std::unique_ptr<vpz::Vpz>(
+                        new vpz::Vpz(*vpz));
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
@@ -216,7 +218,7 @@ public:
         if (mSimulationOption == manager::SIMULATION_NO_RETURN) {
             for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
-                auto file = std::make_unique<vpz::Vpz>(*vpz);
+                auto file = std::unique_ptr<vpz::Vpz>(new vpz::Vpz(*vpz));
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
@@ -237,7 +239,7 @@ public:
 
             for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
-                auto file = std::make_unique<vpz::Vpz>(*vpz);
+                auto file = std::unique_ptr<vpz::Vpz>(new vpz::Vpz(*vpz));
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
@@ -274,8 +276,9 @@ public:
 Manager::Manager(LogOptions            logoptions,
                  SimulationOptions     simulationoptions,
                  std::ostream         *output)
-    : mPimpl(std::make_unique<Manager::Pimpl>(
-                 logoptions, simulationoptions, output))
+    : mPimpl(
+        std::unique_ptr<Manager::Pimpl>(
+            new Manager::Pimpl(logoptions, simulationoptions, output)))
 {
 }
 

@@ -208,7 +208,8 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
         vle::manager::Error error;
         std::unique_ptr<vle::value::Matrix> res =
             man.run(
-                std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
+                std::unique_ptr<vle::vpz::Vpz>(
+                    new vle::vpz::Vpz(search_vpz(*it, pkg))),
                 modules,
                 processor,
                 0,
@@ -239,7 +240,7 @@ static int run_simulation(CmdArgs::const_iterator it,
     for (; it != end; ++it) {
         vle::manager::Error error;
         std::unique_ptr<vle::value::Map> res =
-            sim.run(std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
+            sim.run(std::unique_ptr<vle::vpz::Vpz>(new vle::vpz::Vpz(search_vpz(*it, pkg))),
                     modules,
                     &error);
 

@@ -218,8 +218,8 @@ Simulation::Simulation(LogOptions         logoptions,
                        SimulationOptions  simulationoptionts,
                        std::ostream      *output)
     : mPimpl(
-        std::make_unique<Simulation::Pimpl>(
-            logoptions, simulationoptionts, output))
+        std::unique_ptr<Simulation::Pimpl>(
+            new Simulation::Pimpl(logoptions, simulationoptionts, output)))
 {
 }
 
