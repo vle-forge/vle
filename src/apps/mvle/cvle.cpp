@@ -31,8 +31,6 @@
 #include <vle/vle.hpp>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/program_options.hpp>
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/communicator.hpp>
@@ -49,7 +47,7 @@
 
 const int default_block_size_value = 5000;
 
-typedef boost::shared_ptr <vle::vpz::Vpz> VpzPtr;
+typedef std::shared_ptr <vle::vpz::Vpz> VpzPtr;
 
 /** @e Accessor stores an access to a VPZ or an undefined string.
  * @code
@@ -441,22 +439,21 @@ struct no_deleter
 };
 
 template <typename T>
-boost::shared_ptr <T> open(const std::string &file)
+std::shared_ptr <T> open(const std::string &file)
 {
-    boost::shared_ptr <T> fs(new T(file.c_str()));
+    auto fs = std::make_shared<T>(file.c_str());
 
-    if (!fs->is_open()) {
-        throw std::invalid_argument((vle::fmt("fail to open file %1%")
-                                     % file).str());
-    }
+    if (!fs->is_open())
+        throw std::invalid_argument(
+            (vle::fmt("fail to open file %1%") % file).str());
 
     return fs;
 }
 
 class Root
 {
-    boost::shared_ptr <std::istream> m_is;
-    boost::shared_ptr <std::ostream> m_os;
+    std::shared_ptr <std::istream> m_is;
+    std::shared_ptr <std::ostream> m_os;
     std::ofstream m_ofs;
     int m_blocksize;
     bool m_warnings;

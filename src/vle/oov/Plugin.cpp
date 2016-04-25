@@ -27,8 +27,6 @@
 
 #include <vle/oov/Plugin.hpp>
 
-
-
 namespace vle { namespace oov {
 
 

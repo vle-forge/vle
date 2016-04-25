@@ -32,7 +32,7 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/utils/Types.hpp>
 #include <vle/version.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <map>
 
 #define DECLARE_OOV_PLUGIN(x)                           \
@@ -206,14 +206,14 @@ private:
  * This typedef is used by the StreamReader build factory to
  * automatically destroy plugin at the end of the simulation.
  */
-typedef boost::shared_ptr < Plugin > PluginPtr;
+using PluginPtr = std::shared_ptr <Plugin>;
 
 /**
  * Define the pointer to function of the oov::Plugin plug-in.
  * @param The output location of the oov::Plugin.
  * @return A pointer to the oov::Plugin newly build.
  */
-typedef Plugin* (*OovPluginSlot)(const std::string&);
+using OovPluginSlot = Plugin*(*)(const std::string&);
 
 /**
  * This typedef is used to defined the dictionnary of key view name
