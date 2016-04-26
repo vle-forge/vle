@@ -163,10 +163,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
         }
     }
 
-    InternalEvent* evt = sim->init(coordinator.getCurrentTime());
-    if (evt) {
-        coordinator.eventtable().putInternalEvent(evt);
-    }
+    coordinator.processInit(sim);
 }
 
 void ModelFactory::createModels(Coordinator& coordinator,
@@ -216,11 +213,11 @@ vpz::BaseModel* ModelFactory::createModelFromClass(Coordinator& coordinator,
     return mdl;
 }
 
-static devs::Dynamics* buildNewDynamicsWrapper(
-    devs::Simulator* atom,
-    const vpz::Dynamic& dyn,
-    const InitEventList& events,
-    void* symbol)
+std::unique_ptr<Dynamics>
+buildNewDynamicsWrapper(devs::Simulator* atom,
+                        const vpz::Dynamic& dyn,
+                        const InitEventList& events,
+                        void* symbol)
 {
     typedef Dynamics*(*fctdw)(const DynamicsWrapperInit&, const InitEventList&);
 
@@ -228,10 +225,12 @@ static devs::Dynamics* buildNewDynamicsWrapper(
 
     try {
         utils::PackageTable pkg_table;
-        return fct(DynamicsWrapperInit(
-                *atom->getStructure(),
-                pkg_table.get(dyn.package()),
-                dyn.library()), events);
+        
+        return std::unique_ptr<Dynamics>(
+            fct(DynamicsWrapperInit(
+                    *atom->getStructure(),
+                    pkg_table.get(dyn.package()),
+                    dyn.library()), events));
     } catch(const std::exception& e) {
         throw utils::ModellingError(
             fmt(_("Atomic model wrapper `%1%:%2%' (from dynamics `%3%'"
@@ -243,22 +242,21 @@ static devs::Dynamics* buildNewDynamicsWrapper(
     }
 }
 
-static devs::Dynamics* buildNewDynamics(
-    devs::Simulator* atom,
-    const vpz::Dynamic& dyn,
-    const InitEventList& events,
-    void *symbol)
+std::unique_ptr<Dynamics> buildNewDynamics(devs::Simulator* atom,
+                                           const vpz::Dynamic& dyn,
+                                           const InitEventList& events,
+                                           void *symbol)
 {
     typedef Dynamics*(*fctdyn)(const DynamicsInit&, const InitEventList&);
-
+    
     fctdyn fct = utils::functionCast < fctdyn >(symbol);
 
     try {
         utils::PackageTable pkg_table;
-        return fct(DynamicsInit(
-                *atom->getStructure(),
-                pkg_table.get(dyn.package())),
-            events);
+        
+        return std::unique_ptr<Dynamics>(
+            fct(DynamicsInit(*atom->getStructure(),
+                             pkg_table.get(dyn.package())), events));
     } catch(const std::exception& e) {
         throw utils::ModellingError(
             fmt(_("Atomic model `%1%:%2%' (from dynamics `%3%' library"
@@ -269,12 +267,11 @@ static devs::Dynamics* buildNewDynamics(
     }
 }
 
-static devs::Dynamics* buildNewExecutive(
-    Coordinator& coordinator,
-    devs::Simulator* atom,
-    const vpz::Dynamic& dyn,
-    const InitEventList& events,
-    void *symbol)
+std::unique_ptr<Dynamics> buildNewExecutive(Coordinator& coordinator,
+                                            devs::Simulator* atom,
+                                            const vpz::Dynamic& dyn,
+                                            const InitEventList& events,
+                                            void *symbol)
 {
     typedef Dynamics*(*fctexe)(const ExecutiveInit&, const InitEventList&);
 
@@ -282,10 +279,12 @@ static devs::Dynamics* buildNewExecutive(
 
     try {
         utils::PackageTable pkg_table;
-        return fct(ExecutiveInit(
-                *atom->getStructure(),
-                pkg_table.get(dyn.package()),
-                coordinator), events);
+
+        return std::unique_ptr<Dynamics>(
+            fct(ExecutiveInit(
+                    *atom->getStructure(),
+                    pkg_table.get(dyn.package()),
+                    coordinator), events));
     } catch(const std::exception& e) {
         throw utils::ModellingError(
             fmt(_("Executive model `%1%:%2%' (from dynamics `%3%'"
@@ -297,12 +296,13 @@ static devs::Dynamics* buildNewExecutive(
     }
 }
 
-devs::Dynamics* ModelFactory::attachDynamics(Coordinator& coordinator,
-                                             devs::Simulator* atom,
-                                             const vpz::Dynamic& dyn,
-                                             const InitEventList& events)
+std::unique_ptr<Dynamics>
+ModelFactory::attachDynamics(Coordinator& coordinator,
+                             devs::Simulator* atom,
+                             const vpz::Dynamic& dyn,
+                             const InitEventList& events)
 {
-    void *symbol = NULL;
+    void *symbol = nullptr;
     utils::ModuleType type = utils::MODULE_DYNAMICS;
 
     try {

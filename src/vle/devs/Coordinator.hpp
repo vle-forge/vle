@@ -30,7 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/devs/EventTable.hpp>
+#include <vle/devs/Scheduler.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/ModelFactory.hpp>
@@ -48,7 +48,7 @@ typedef std::map < vpz::AtomicModel*, devs::Simulator* > SimulatorMap;
  * model.
  *
  */
-class VLE_API Coordinator
+class VLE_LOCAL Coordinator
 {
 public:
     Coordinator(const utils::ModuleManager& modulemgr,
@@ -68,14 +68,13 @@ public:
      * @throw Exception::Internal if a condition have no model port name
      * associed.
      */
-    void init(const vpz::Model& mdls, const Time& current,
-              const Time& duration);
+    void init(const vpz::Model& mdls, Time current, Time duration);
 
     /**
-     * @brief Return the top devs::Time of the devs::EventTable.
+     * \brief Returns the next time.
      * @return A devs::Time.
      */
-    const Time& getNextTime();
+    // Time getNextTime() noexcept { return m_eventTable.getNextTime(); }
 
     /**
      * @brief Pop the next devs::CompleteEventBagModel from the
@@ -89,33 +88,6 @@ public:
      * simulator.
      */
     void finish();
-
-    //
-    ///
-    //// Functions use by Executive models to manage DsDevs simulation.
-    ///
-    //
-
-    /**
-     * @brief Add a permanent vpz::Dynamic into cache.
-     * @param dynamics The new vpz::Dynamic to push into cache.
-     * @throw utils::InternalError if dynamics already exist.
-     */
-    void addPermanent(const vpz::Dynamic& dynamics);
-
-    /**
-     * @brief Add a permanent vpz::Condition into cache.
-     * @param condition The new vpz::Condition to push into cache.
-     * @throw utils::InternalError if condition already exist.
-     */
-    void addPermanent(const vpz::Condition& condition);
-
-    /**
-     * @brief Add a permanent vpz::Observable into cache.
-     * @param observable The new vpz::Observable to push into cache.
-     * @throw utils::InternalError if observable already exist.
-     */
-    void addPermanent(const vpz::Observable& observable);
 
     /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
@@ -229,12 +201,6 @@ public:
     inline Time getCurrentTime() const
     { return m_currentTime; }
 
-    inline const EventTable& eventtable() const
-    { return m_eventTable; }
-
-    inline EventTable& eventtable()
-    { return m_eventTable; }
-
     inline const SimulatorMap& modellist() const
     { return m_modelList; }
 
@@ -285,6 +251,12 @@ public:
 
     const ViewList& getViews() const { return m_viewList; }
 
+
+    void processInit(Simulator *simulator);
+    void processInternalEvent(Bag::value_type& modelbag);
+    void processExternalEvents(Bag::value_type& modelbag);
+    void processConflictEvents(Bag::value_type& modelbag);
+    
 private:
     Coordinator(const Coordinator& other);
     Coordinator& operator=(const Coordinator& other);
@@ -292,7 +264,7 @@ private:
     Time                        m_currentTime;
     Time                        m_durationTime;
     SimulatorMap                m_modelList;
-    EventTable                  m_eventTable;
+    Scheduler                   m_eventTable;
     ViewList                    m_viewList;
     EventViewList               m_eventViewList;
     TimedViewList               m_timedViewList;
@@ -319,15 +291,6 @@ private:
     StreamWriter* buildOutput(const vpz::View& view,
                               const vpz::Output& output);
 
-    void processInternalEvent(Simulator* sim,
-                              const EventBagModel& modelbag);
-
-    void processExternalEvents(Simulator* sim,
-                               const EventBagModel& modelbag);
-
-    void processConflictEvents(Simulator* sim,
-                               const EventBagModel& modelbag);
-
     /**
      * @brief Process for each ObservationEvent in the bag and observation
      * for the specified model. All ObservationEvent are destroyed by this
@@ -336,8 +299,8 @@ private:
      * @param bag The ObservationEventList to process and clear.
      * @param time The current time of the simulation.
      */
-    void processViewEvents(ViewEventList& bag);
-
+    void processViewEvents(std::vector<ViewEvent>& bag);
+    
     /**
      * @brief build the simulator from the vpz::BaseModel stock.
      * @param model

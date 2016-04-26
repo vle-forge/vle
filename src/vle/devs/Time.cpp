@@ -32,22 +32,25 @@
 
 namespace vle { namespace devs {
 
-std::string convertTimeToString(const Time& time)
+std::string convertTimeToString(Time time)
 {
-    if (isPositiveInfinity(time)) {
+    if (isPositiveInfinity(time))
         return std::string("+infinity");
-    } else if (isNegativeInfinity(time)) {
+    
+    if (isNegativeInfinity(time))
         return std::string("-infinity");
-    } else {
-        std::ostringstream out;
 
-        out << std::showpoint
-            << std::fixed
-            << std::setprecision(std::numeric_limits < double >::digits10)
-            << time;
+    if (isNan(time))
+        return std::string("NAN");
+    
+    std::ostringstream out;
 
-        return out.str();
-    }
+    out << std::showpoint
+        << std::fixed
+        << std::setprecision(std::numeric_limits < double >::digits10)
+        << time;
+
+    return out.str();
 }
 
 }} // namespace vle devs

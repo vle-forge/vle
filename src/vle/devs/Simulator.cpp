@@ -33,31 +33,22 @@
 namespace vle { namespace devs {
 
 Simulator::Simulator(vpz::AtomicModel* atomic) :
-    m_dynamics(0),
-    m_atomicModel(atomic)
+    m_atomicModel(atomic),
+    m_tn(negativeInfinity),
+    m_have_handle(false)
 {
-    if (not atomic) {
-        throw utils::InternalError(_(
-            "Simulator is not connected to an atomic model."));
-    }
-}
-
-Simulator::~Simulator()
-{
-    delete m_dynamics;
+    assert(atomic);
 }
 
 void Simulator::clear()
 {
-    delete m_dynamics;
-    m_dynamics = 0;
+    m_dynamics.reset(nullptr);
     m_atomicModel = 0;
 }
 
-void
-Simulator::updateSimulatorTargets(
-        const std::string& port,
-        std::map < vpz::AtomicModel*, devs::Simulator* >& simulators)
+void Simulator::updateSimulatorTargets(
+    const std::string& port,
+    std::map < vpz::AtomicModel*, devs::Simulator* >& simulators)
 {
     mTargets.erase(port);
 
@@ -121,43 +112,28 @@ void Simulator::addTargetPort(const std::string& port)
                                                std::string())));
 }
 
-void Simulator::addDynamics(Dynamics* dynamics)
+void Simulator::addDynamics(std::unique_ptr<Dynamics> dynamics)
 {
-    delete m_dynamics;
-    m_dynamics = dynamics;
+    m_dynamics = std::unique_ptr<Dynamics>(std::move(dynamics));
 }
 
 const std::string& Simulator::getName() const
 {
-    if (not m_atomicModel) {
+    if (not m_atomicModel)
         throw utils::InternalError(_("Simulator destroyed"));
-    }
 
     return m_atomicModel->getName();
 }
 
 const std::string& Simulator::getParent()
 {
-    if (not m_atomicModel) {
+    if (not m_atomicModel)
         throw utils::InternalError(_("Simulator destroyed"));
-    }
 
-    if (m_parents.empty()) {
+    if (m_parents.empty())
         m_parents.assign(m_atomicModel->getParentName());
-    }
 
     return m_parents;
-}
-
-InternalEvent * Simulator::buildInternalEvent(const Time& currentTime)
-{
-    Time time(timeAdvance());
-
-    if (not isInfinity(time)) {
-        return new InternalEvent(currentTime + time, this);
-    } else {
-        return 0;
-    }
 }
 
 void Simulator::finish()
@@ -165,57 +141,56 @@ void Simulator::finish()
     m_dynamics->finish();
 }
 
-void Simulator::output(const Time& currentTime, ExternalEventList& output)
+void Simulator::output(ExternalEventList& output, Time time)
 {
-    m_dynamics->output(currentTime, output);
+    m_dynamics->output(time, output);
 }
 
 Time Simulator::timeAdvance()
 {
-    Time result = m_dynamics->timeAdvance();
-    if (result < 0.0) {
-        throw utils::ModellingError(fmt(
-                _("Negative time advance in '%1%' (%2%)")) % getName() %
-            result);
-    }
-    return result;
-}
+    Time tn = m_dynamics->timeAdvance();
 
-InternalEvent* Simulator::init(const Time& currentTime)
-{
-    Time time = m_dynamics->init(currentTime);
-
-    if (time < 0.0)
+    if (tn < 0.0)
         throw utils::ModellingError(
-            fmt(_("Negative init function in '%1%' (%2%)")) % getName() %
-            time);
+            fmt(_("Negative time advance in '%1%' (%2%)")) % getName() % tn);
 
-    if (isInfinity(time))
-        return 0;
-
-    return new InternalEvent(currentTime + time, this);
+    return tn;
 }
 
-InternalEvent* Simulator::confluentTransitions(
-    const InternalEvent& internal,
-    const ExternalEventList& extEventlist)
+Time Simulator::init(Time time)
 {
-    m_dynamics->confluentTransitions(internal.getTime(), extEventlist);
-    return buildInternalEvent(internal.getTime());
+    Time tn = m_dynamics->init(time);
+
+    if (tn < 0.0)
+        throw utils::ModellingError(
+            fmt(_("Negative init function in '%1%' (%2%)")) % getName() % tn);
+
+    m_tn = tn + time;
+    return m_tn;
 }
 
-InternalEvent* Simulator::internalTransition(const InternalEvent& event)
+Time Simulator::confluentTransitions(const ExternalEventList& events, Time time)
 {
-    m_dynamics->internalTransition(event.getTime());
-    return buildInternalEvent(event.getTime());
+    m_dynamics->confluentTransitions(time, events);
+
+    m_tn = timeAdvance() + time;
+    return m_tn;
 }
 
-InternalEvent* Simulator::externalTransition(
-    const ExternalEventList& event,
-    const Time& time)
+Time Simulator::internalTransition(Time time)
 {
-    m_dynamics->externalTransition(event, time);
-    return buildInternalEvent(time);
+    m_dynamics->internalTransition(time);
+
+    m_tn = timeAdvance() + time;
+    return m_tn;
+}
+
+Time Simulator::externalTransition(const ExternalEventList& events, Time time)
+{
+    m_dynamics->externalTransition(events, time);
+
+    m_tn = timeAdvance() + time;
+    return m_tn;
 }
 
 std::unique_ptr<value::Value>

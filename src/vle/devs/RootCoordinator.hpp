@@ -60,7 +60,7 @@ namespace vle { namespace devs {
      * @endexample
      *
      */
-    class VLE_API RootCoordinator
+    class VLE_LOCAL RootCoordinator
     {
     public:
         RootCoordinator(const utils::ModuleManager& modulemgr);

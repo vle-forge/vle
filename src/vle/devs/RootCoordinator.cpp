@@ -134,7 +134,7 @@ void RootCoordinator::init()
 
 bool RootCoordinator::run()
 {
-    m_currentTime = m_coordinator->getNextTime();
+    m_currentTime = m_coordinator->getCurrentTime();
 
     if (isInfinity(m_currentTime)) {
         return false;

@@ -67,12 +67,12 @@ public:
      *
      * @return The next date of the futur
      */
-    void run(Time time) { mView->run(time); }
+    void run(Time time);
 
     /**
      * @brief Update the next wake-up time.
      */
-    void update(Time current) { mTime = mView->getNextTime(current); }
+    void update(Time current);
 
     //
     //

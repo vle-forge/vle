@@ -39,8 +39,9 @@
                               const vle::devs::InitEventList& events)   \
         {                                                               \
             vle::devs::DynamicsDbg* x__;                                \
-            x__ = new vle::devs::DynamicsDbg( init, events);            \
-            x__->set(new mdl(init, events));                            \
+            x__ = new vle::devs::DynamicsDbg(init, events);             \
+            x__->set(std::unique_ptr<vle::devs::Dynamics>(              \
+                         new mdl(init, events)));                       \
             return x__;                                                 \
         }                                                               \
                                                                         \
@@ -57,108 +58,111 @@
 
 namespace vle { namespace devs {
 
+/**
+ * @brief A Dynamics debug class which wrap an another Dynamics to show
+ * debug information. This class inherits the DEVS standard API.
+ */
+class VLE_API DynamicsDbg : public Dynamics
+{
+public:
     /**
-     * @brief A Dynamics debug class which wrap an another Dynamics to show
-     * debug information. This class inherits the DEVS standard API.
+     * @brief Constructor of Dynamics for an atomic model.
+     *
+     * @param init The initialiser of Dynamics.
+     * @param events The parameter from the experimental frame.
      */
-    class VLE_API DynamicsDbg : public Dynamics
+    DynamicsDbg(const DynamicsInit& init,
+                const InitEventList& events);
+
+    /**
+     * @brief Destructor.
+     */
+    virtual ~DynamicsDbg() = default;
+
+    /**
+     * @brief Assign a Dynamics to debug for this DynamicsDbg class.
+     *
+     * @param dyn The Dynamics to attach.
+     */
+    void set(std::unique_ptr<Dynamics> dyn)
     {
-    public:
-        /**
-         * @brief Constructor of Dynamics for an atomic model.
-         *
-         * @param init The initialiser of Dynamics.
-         * @param events The parameter from the experimental frame.
-         */
-        DynamicsDbg(const DynamicsInit& init,
-                    const InitEventList& events);
+        mDynamics = std::move(dyn);
+    }
 
-        /**
-         * @brief Destructor.
-         */
-        virtual ~DynamicsDbg() { delete mDynamics; }
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /**
-         * @brief Assign a Dynamics to debug for this DynamicsDbg class.
-         *
-         * @param dyn The Dynamics to attach.
-         */
-        void set(Dynamics* dyn) { mDynamics = dyn; }
+    /**
+     * @brief Process the initialization of the model by initializing the
+     * initial state and return the duration (or timeAdvance) of the initial
+     * state.
+     * @param time the time of the creation of this model.
+     * @return duration of the initial state.
+     */
+    virtual Time init(Time time) override;
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /**
+     * @brief Process the output function: compute the output function.
+     * @param time the time of the occurrence of output function.
+     * @param output the list of external events (output parameter).
+     */
+    virtual void output(Time time, ExternalEventList& output) const override;
 
-        /**
-         * @brief Process the initialization of the model by initializing the
-         * initial state and return the duration (or timeAdvance) of the initial
-         * state.
-         * @param time the time of the creation of this model.
-         * @return duration of the initial state.
-         */
-        virtual Time init(const Time& time) override;
+    /**
+     * @brief Process the time advance function: compute the duration of the
+     * current state.
+     * @return duration of the current state.
+     */
+    virtual Time timeAdvance() const override;
 
-        /**
-         * @brief Process the output function: compute the output function.
-         * @param time the time of the occurrence of output function.
-         * @param output the list of external events (output parameter).
-         */
-        virtual void output(const Time& time, ExternalEventList& output) const override;
+    /**
+     * @brief Process an internal transition: compute the new state of the
+     * model with the internal transition function.
+     * @param time the date of occurence of this event.
+     */
+    virtual void internalTransition(Time time) override;
 
-        /**
-         * @brief Process the time advance function: compute the duration of the
-         * current state.
-         * @return duration of the current state.
-         */
-        virtual Time timeAdvance() const override;
+    /**
+     * @brief Process an external transition: compute the new state of the
+     * model when an external event occurs.
+     * @param event the external event with of the port.
+     * @param time the date of occurrence of this event.
+     */
+    virtual void
+        externalTransition(const ExternalEventList& event,
+                           Time time) override;
 
-        /**
-         * @brief Process an internal transition: compute the new state of the
-         * model with the internal transition function.
-         * @param time the date of occurence of this event.
-         */
-        virtual void internalTransition(const Time& time) override;
+    /**
+     * @brief Process the confluent transition: select the transition to
+     * call when an internal and one or more external event appear in the
+     * same time.
+     * @param internal the internal event.
+     * @param extEventlist the external events list.
+     */
+    virtual void
+        confluentTransitions(Time time,
+                             const ExternalEventList& extEventlist) override;
 
-        /**
-         * @brief Process an external transition: compute the new state of the
-         * model when an external event occurs.
-         * @param event the external event with of the port.
-         * @param time the date of occurrence of this event.
-         */
-        virtual void
-            externalTransition(const ExternalEventList& event,
-                               const Time& time) override;
+    /**
+     * @brief Process an observation event: compute the current state of the
+     * model at a specified time and for a specified port.
+     * @param event the state event with of the port
+     * @return the value of state variable
+     */
+    virtual std::unique_ptr<vle::value::Value>
+        observation(const ObservationEvent& event) const override;
 
-        /**
-         * @brief Process the confluent transition: select the transition to
-         * call when an internal and one or more external event appear in the
-         * same time.
-         * @param internal the internal event.
-         * @param extEventlist the external events list.
-         */
-        virtual void
-            confluentTransitions(const Time& time,
-                                 const ExternalEventList& extEventlist) override;
+    /**
+     * @brief When the simulation of the atomic model is finished, the
+     * finish method is invoked.
+     */
+    virtual void finish() override;
 
-        /**
-         * @brief Process an observation event: compute the current state of the
-         * model at a specified time and for a specified port.
-         * @param event the state event with of the port
-         * @return the value of state variable
-         */
-        virtual std::unique_ptr<vle::value::Value>
-            observation(const ObservationEvent& event) const override;
-
-        /**
-         * @brief When the simulation of the atomic model is finished, the
-         * finish method is invoked.
-         */
-        virtual void finish() override;
-
-    private:
-        Dynamics* mDynamics;
-        std::string mName;
-    };
+private:
+    std::unique_ptr<Dynamics> mDynamics;
+    std::string mName;
+};
 
 }} // namespace vle devs
 

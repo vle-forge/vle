@@ -49,70 +49,74 @@ namespace vle { namespace devs {
  */
 typedef double Time;
 
+static_assert(std::numeric_limits<Time>::has_quiet_NaN == true,
+              "Use an iec559 standard OS/Compiler");
+
 static const Time infinity = std::numeric_limits <Time>::infinity();
 static const Time negativeInfinity = -1 * std::numeric_limits <Time>::infinity();
+static const Time nan = std::numeric_limits<double>::quiet_NaN();
 
 /**
- * Test if the @e value is Nan.
+ * Test if the @e time is Nan.
  *
- * @param value The double to check.
+ * @param time The double to check.
  *
- * @return true if @e value is NaN.
+ * @return true if @e time is NaN.
  */
-inline static bool isNan(const Time& value)
+inline static bool isNan(Time time)
 {
-    return std::isnan(value);
+    return std::isnan(time);
 }
 
 /**
  * Test if the @e Time is infinity or -infinity.
  *
- * @param value The double to check.
+ * @param time The double to check.
  *
- * @return true if @e value is infinity or -infinity.
+ * @return true if @e time is infinity or -infinity.
  */
-inline static bool isInfinity(const Time& value)
+inline static bool isInfinity(Time time)
 {
-    return value == infinity or value == negativeInfinity;
+    return time == infinity or time == negativeInfinity;
 }
 
 /**
  * Test if the @e Time is infinity.
  *
- * @param value The double to check.
+ * @param time The double to check.
  *
- * @return true if @e value is infinity.
+ * @return true if @e time is infinity.
  */
-inline static bool isPositiveInfinity(const Time& value)
+inline static bool isPositiveInfinity(Time time)
 {
-    return value == infinity;
+    return time == infinity;
 }
 
 /**
  * Test if the @e Time is -infinity.
  *
- * @param value The double to check.
+ * @param time The double to check.
  *
- * @return true if @e value is -infinity.
+ * @return true if @e time is -infinity.
  */
-inline static bool isNegativeInfinity(const Time& value)
+inline static bool isNegativeInfinity(Time time)
 {
-    return value == negativeInfinity;
+    return time == negativeInfinity;
 }
 
 /**
- * Transform the @e Time value into @e an std::string.
+ * Transform the @e Time time into @e an std::string.
  *
  * If @e Time equals infinity, the toString function returns "+infinity",
  * if @e time equals negative infinity, the toString fuction
  * return "-infinity" else the string representation of the double
- * value is returned using the C locale.
+ * time is returned using the C locale.
  *
  * @param time The @e time to convert.
  *
- * @return An @e std::string representation of the @e Time value.
+ * @return An @e std::string representation of the @e Time time.
  */
-VLE_API std::string convertTimeToString(const Time& time);
+VLE_API std::string convertTimeToString(Time time);
 
 }} // namespace vle devs
 

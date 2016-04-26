@@ -37,32 +37,32 @@ namespace vle { namespace devs {
 class Simulator;
 
 /**
- * The @e InternalEvent represents internal events in VLE.
- *
- * The @e InternalEvent is only used by the scheduler of VLE. To
- * speed-up the simulation an @e InternalEvent can be invalidate.
+ * The \e InternalEvent represents DEVS internal events and is stored in
+ * scheduller ie. \e EventTable. The \e InternalEvent is only used by the
+ * scheduler of VLE. To speed-up the simulation an \e InternalEvent can be
+ * invalidate.
  */
-class VLE_API InternalEvent
+class VLE_LOCAL InternalEvent
 {
 public:
-    InternalEvent(const InternalEvent&) = delete;
-    InternalEvent& operator=(const InternalEvent&) = delete;
-
     /**
      * InternalEvent constructor.
      *
      * @param time The @e time when wake up the model.
      * @param simualtor The @e simulator associated.
      */
-    InternalEvent(const Time& time, Simulator* simulator)
-        : m_simulator(simulator), m_time(time), m_isvalid(true)
+    InternalEvent(Time time, Simulator* simulator, std::int32_t id)
+        : m_simulator(simulator)
+        , m_time(time)
+        , m_id(id)
     {
     }
 
-    /**
-     * InternalEvent descructor.
-     *
-     */
+    InternalEvent() = default;
+    InternalEvent(const InternalEvent&) = default;
+    InternalEvent(InternalEvent&&) = default;
+    InternalEvent& operator=(const InternalEvent&) = default;
+    InternalEvent& operator=(InternalEvent&&) = default;
     ~InternalEvent() = default;
 
     /**
@@ -70,93 +70,102 @@ public:
      *
      * @return A pointer to the simulator.
      */
-    Simulator* getModel() const
-    { return m_simulator; }
+    Simulator* getModel() const noexcept { return m_simulator; }
 
     /**
      * Get the wake up time.
      *
      * @return A time.
      */
-    inline const Time& getTime() const
-    { return m_time; }
+    Time getTime() const noexcept { return m_time; }
 
     /**
-     * Inferior comparator.
-     *
-     * @param event Event to test, no test on validity.
-     *
-     * @return true if this Event is inferior to @e event.
+     * Get the identifier of the internal event.
+     * \return The identifier.
      */
-    inline bool operator<(const InternalEvent *event) const
-    { return m_time < event->m_time; }
+    std::int32_t getId() const noexcept { return m_id; }
 
     /**
-     * Superior comparator.
+     * Check if the \e id is equal to the underlying \id provided in
+     * constructor.
      *
-     * @param event Event to test, no test on validity.
-     *
-     * @return true if this Event is superior to @e event.
+     * \param id The identifier  to compare.
+     * \return true if \e id equals \e m_id.
      */
-    inline bool operator>(const InternalEvent *event) const
-    { return m_time > event->m_time; }
-
-    /**
-     * Inferior comparator.
-     *
-     * @param event Event to test, no test on validity.
-     *
-     * @return true if this Event is inferior to @e event.
-     */
-    inline bool operator<=(const InternalEvent *event) const
-    { return m_time <= event->m_time; }
-
-    /**
-     * Superior comparator.
-     *
-     * @param event Event to test, no test on validity.
-     *
-     * @return true if this Event is superior to @e event.
-     */
-    inline bool operator>=(const InternalEvent *event) const
-    { return m_time >= event->m_time; }
-
-    /**
-     * Equality comparator.
-     *
-     * @param event Event to test, no test on validity.
-     *
-     * @return true if this Event is equal to @e event.
-     */
-    inline bool operator==(const InternalEvent *event) const
-    { return m_time == event->m_time; }
-
-    /**
-     * Invalidate this @e InternalEvent.
-     *
-     */
-    inline void invalidate()
-    { m_isvalid = false; }
-
-    /**
-     * Check if this @e InternalEvent is valid or not.
-     *
-     *
-     * @return true if this InternalEvent is valid false otherwise.
-     */
-    inline bool isValid() const
-    { return m_isvalid; }
-
+    bool isCurrentId(std::int32_t id) const noexcept { return id == m_id; }
+    
 private:
     Simulator *m_simulator;     /**< A pointer to the simulator. */
     Time       m_time;          /**< The time to wake-up the simulator. */
-    bool       m_isvalid;       /**< Is this InternalEvent valid? */
+    int32_t    m_id;            /**< An identifier to the indicate elemet
+                                 * status. */
 };
+
+
+/**
+ * Inferior comparator.
+ *
+ * @param event Event to test, no test on validity.
+ * @return true if this Event is inferior to @e event.
+ */
+inline bool
+operator<(const InternalEvent &lhs, const InternalEvent &rhs) noexcept
+{
+    return lhs.getTime() < rhs.getTime();
+}
+
+/**
+ * Superior comparator.
+ *
+ * @param event Event to test, no test on validity.
+ * @return true if this Event is superior to @e event.
+ */
+inline bool
+operator>(const InternalEvent &lhs, const InternalEvent &rhs) noexcept
+{
+    return lhs.getTime() > rhs.getTime();
+}
+
+/**
+ * Inferior comparator.
+ *
+ * @param event Event to test, no test on validity.
+ * @return true if this Event is inferior to @e event.
+ */
+inline bool
+operator<=(const InternalEvent &lhs, const InternalEvent &rhs) noexcept
+{
+    return lhs.getTime() <= rhs.getTime();
+}
+
+/**
+ * Superior comparator.
+ *
+ * @param event Event to test, no test on validity.
+ * @return true if this Event is superior to @e event.
+ */
+inline bool
+operator>=(const InternalEvent &lhs, const InternalEvent &rhs) noexcept
+{
+    return lhs.getTime() >= rhs.getTime();
+}
+
+/**
+ * Equality comparator.
+ *
+ * @param event Event to test, no test on validity.
+ * @return true if this Event is equal to @e event.
+ */
+inline bool
+operator==(const InternalEvent &lhs, const InternalEvent &rhs) noexcept
+{
+    return lhs.getTime() == rhs.getTime();
+}
 
 /**
  * @brief Define a vector of pionter of InternalEvent.
  */
-typedef std::vector < InternalEvent* > InternalEventList;
+using InternalEventList = std::vector <InternalEvent>;
 
 }} // namespace vle devs
 

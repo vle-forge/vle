@@ -29,7 +29,6 @@
 #define VLE_DEVS_EXECUTIVE_HPP 1
 
 #include <vle/DllDefines.hpp>
-#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Dynamics.hpp>
@@ -60,6 +59,7 @@
 namespace vle { namespace devs {
 
 class Simulator;
+class Coordinator;
 
 class VLE_API ExecutiveInit : public DynamicsInit
 {
@@ -67,11 +67,11 @@ public:
     ExecutiveInit(const vpz::AtomicModel& model,
                   PackageId packageid,
                   Coordinator& coordinator)
-        : DynamicsInit(model, packageid), m_coordinator(coordinator)
+        : DynamicsInit(model, packageid)
+        , m_coordinator(coordinator)
     {}
 
-    virtual ~ExecutiveInit()
-    {}
+    virtual ~ExecutiveInit() = default;
 
     Coordinator& coordinator() const { return m_coordinator; }
 
@@ -124,45 +124,39 @@ public:
      * @brief Get a constant reference to the list of vpz::Dynamics objects.
      * @return A constant reference to the list of vpz::Dynamics objects.
      */
-    const vpz::Dynamics& dynamics() const
-    { return m_coordinator.dynamics(); }
+    const vpz::Dynamics& dynamics() const;
 
     /**
      * @brief Get a reference to the list of vpz::Dynamics objects.
      * @return A reference to the list of vpz::Dynamics objects.
      */
-    vpz::Dynamics& dynamics()
-    { return m_coordinator.dynamics(); }
+    vpz::Dynamics& dynamics();
 
     /**
      * @brief Get a constant reference to the list of vpz::Conditions
      * objects.
      * @return A constant reference to the list of vpz::Conditions objects.
      */
-    const vpz::Conditions& conditions() const
-    { return m_coordinator.conditions(); }
+    const vpz::Conditions& conditions() const;
 
     /**
      * @brief Get a reference to the list of vpz::Conditions objects.
      * @return A reference to the list of vpz::Conditions objects.
      */
-    vpz::Conditions& conditions()
-    { return m_coordinator.conditions(); }
+    vpz::Conditions& conditions();
 
     /**
      * @brief Get a constant reference to the list of vpz::Observables
      * objects.
      * @return A constant reference to the list of vpz::Observables objects.
      */
-    const vpz::Observables& observables() const
-    { return m_coordinator.observables(); }
+    const vpz::Observables& observables() const;
 
     /**
      * @brief Get a reference to the list of vpz::Conditions objects.
      * @return A reference to the list of vpz::Conditions objects.
      */
-    vpz::Observables& observables()
-    { return m_coordinator.observables(); }
+    vpz::Observables& observables();
 
     /**
      * @brief Add an observable, ie. a reference and a model to the

@@ -47,7 +47,7 @@ class Observable;
  * plugins.
  *
  */
-class VLE_API StreamWriter
+class VLE_LOCAL StreamWriter
 {
 public:
     StreamWriter(const utils::ModuleManager& modulemgr)

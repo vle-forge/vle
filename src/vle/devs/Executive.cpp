@@ -26,9 +26,41 @@
 
 
 #include <vle/devs/Executive.hpp>
+#include <vle/devs/Coordinator.hpp>
 #include <vle/vpz/Vpz.hpp>
 
 namespace vle { namespace devs {
+
+const vpz::Dynamics& Executive::dynamics() const
+{
+    return m_coordinator.dynamics();
+}
+
+vpz::Dynamics& Executive::dynamics()
+{
+    return m_coordinator.dynamics();
+}
+
+const vpz::Conditions& Executive::conditions() const
+{
+    return m_coordinator.conditions();
+}
+
+vpz::Conditions& Executive::conditions()
+{
+    return m_coordinator.conditions();
+}
+
+const vpz::Observables& Executive::observables() const
+{
+    return m_coordinator.observables();
+}
+
+vpz::Observables& Executive::observables()
+{
+    return m_coordinator.observables();
+}
+
 
 void Executive::addObservableToView(const std::string& model,
                                     const std::string& portname,

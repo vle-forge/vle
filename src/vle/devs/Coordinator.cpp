@@ -46,6 +46,30 @@ using std::map;
 using std::string;
 using std::pair;
 
+namespace {
+
+/** Compute the depth of the hierarchy.
+ *
+ * @return @e depth returns 0 if executive is in the top model otherwise a
+ * internet less than 0.
+ */
+inline
+int
+depth(const std::unique_ptr<vle::devs::Dynamics>& mdl) noexcept
+{
+    int ret = 0;
+
+    const vle::vpz::CoupledModel *parent = mdl->getModel().getParent();
+    while (parent != NULL) {
+        parent = parent->getParent();
+        --ret;
+    }
+
+    return ret;
+}
+
+}
+
 namespace vle { namespace devs {
 
 Coordinator::Coordinator(const utils::ModuleManager& modulemgr,
@@ -53,8 +77,10 @@ Coordinator::Coordinator(const utils::ModuleManager& modulemgr,
                          const vpz::Classes& cls,
                          const vpz::Experiment& experiment,
                          RootCoordinator& root)
-    : m_currentTime(0.0), m_modelFactory(modulemgr, dyn, cls, experiment, root),
-      m_modulemgr(modulemgr), m_isStarted(false)
+    : m_currentTime(0.0)
+    , m_modelFactory(modulemgr, dyn, cls, experiment, root)
+    , m_modulemgr(modulemgr)
+    , m_isStarted(false)
 {
 }
 
@@ -73,8 +99,7 @@ Coordinator::~Coordinator()
                       boost::bind(&ViewList::value_type::second, _1)));
 }
 
-void Coordinator::init(const vpz::Model& mdls, const Time& current,
-                       const Time& duration)
+void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
 {
     m_currentTime = current;
     m_durationTime = duration;
@@ -82,11 +107,8 @@ void Coordinator::init(const vpz::Model& mdls, const Time& current,
     addModels(mdls);
     m_toDelete = 0;
     m_isStarted = true;
-}
 
-const Time& Coordinator::getNextTime()
-{
-    return m_eventTable.topEvent();
+    m_eventTable.makeNextBag();
 }
 
 void Coordinator::run()
@@ -94,59 +116,77 @@ void Coordinator::run()
     DTraceDevs(_("-------- BAG --------"));
     SimulatorList::size_type oldToDelete(m_toDelete);
 
-    CompleteEventBagModel& bags = m_eventTable.popEvent();
-    if (not bags.empty()) {
-        updateCurrentTime(m_eventTable.getCurrentTime());
+    Bag& bags = m_eventTable.getCurrentBag();
+    if (not bags.empty())
+        m_currentTime = m_eventTable.getCurrentTime();
+
+    std::vector<Bag::value_type> executives;
+    for (auto & elem: bags) {
+        if (elem.first->dynamics()->isExecutive()) {
+            executives.push_back(std::move(elem));
+            continue;
+        }
+
+        if (elem.second.internal_event) {
+            if (elem.second.external_events.empty())
+                processInternalEvent(elem);
+            else
+                processConflictEvents(elem);
+        } else {
+            if (not elem.second.external_events.empty())
+                processExternalEvents(elem);
+        }
     }
 
-    while (not bags.emptyBag()) {
-        std::map < Simulator*, EventBagModel >::value_type& bag(bags.topBag());
-        if (not bag.second.emptyInternal()) {
-            if (not bag.second.emptyExternal()) {
-                processConflictEvents(bag.first, bag.second);
+    if (not executives.empty()) {
+        std::sort(executives.begin(), executives.end(),
+                  [](const Bag::value_type& lhs, const Bag::value_type& rhs)
+                  {
+                      return ::depth(lhs.first->dynamics()) <
+                      ::depth(rhs.first->dynamics());
+                  });
+
+        // TODO sort according to the highest in the graph model and loop
+        // process.
+        for (auto & elem: executives) {
+            if (elem.second.internal_event) {
+                if (elem.second.external_events.empty())
+                    processInternalEvent(elem);
+                else
+                    processConflictEvents(elem);
             } else {
-                processInternalEvent(bag.first, bag.second);
-            }
-        } else {
-            if (not bag.second.emptyExternal()) {
-                processExternalEvents(bag.first, bag.second);
+                if (not elem.second.external_events.empty())
+                    processExternalEvents(elem);
             }
         }
     }
 
+    // If there is model to delete, we remove models that are destroyed in
+    // previous \e run() call.
     if (oldToDelete > 0) {
-        for (SimulatorList::iterator it = m_deletedSimulator.begin();
-             it != m_deletedSimulator.begin() + oldToDelete; ++it) {
-            m_eventTable.delModelEvents(*it);
+        auto begin = m_deletedSimulator.begin();
+        auto end = m_deletedSimulator.begin() + oldToDelete;
+
+        for (auto it = begin; it != end; ++it) {
+            m_eventTable.delSimulator(*it);
             delete *it;
             *it = 0;
         }
 
-        m_deletedSimulator.erase(m_deletedSimulator.begin(),
-                                 m_deletedSimulator.begin() + oldToDelete);
-
+        m_deletedSimulator.erase(begin, end);
         m_toDelete = m_deletedSimulator.size();
     }
 
-    if (not bags.emptyStates()) {
-        if (getNextTime() == bags.topObservationEvent()->getTime()) {
-            m_obsEventBuffer.insert(bags.states().begin(),
-                                    bags.states().end());
-            bags.states().clear();
-        } else {
-            processViewEvents(bags.states());
-            processViewEvents(m_obsEventBuffer);
-            bags.states().erase();
-            m_obsEventBuffer.erase();
-        }
-    } else if (not m_obsEventBuffer.empty()) {
-        if (getNextTime() != m_obsEventBuffer.front()->getTime()) {
-            processViewEvents(m_obsEventBuffer);
-            m_obsEventBuffer.erase();
-        }
+    /* Process observation event if the next bag is scheduled for a
+     * different date than \e m_currentTime. */
+    if (not m_eventTable.haveNextBagAtTime()
+        and m_eventTable.haveObservationEventAtTime()) {
+        auto obs = m_eventTable.getCurrentObservationBag();
+        processViewEvents(obs);
     }
 
-    bags.clear();
+    m_eventTable.makeNextBag();
+    m_currentTime = m_eventTable.getCurrentTime();
 }
 
 void Coordinator::finish()
@@ -161,27 +201,6 @@ void Coordinator::finish()
                       &View::finish,
                       boost::bind(&ViewList::value_type::second, _1),
                       m_currentTime));
-}
-
-//
-///
-//// Functions use by Executive models to manage DsDevs simulation.
-///
-//
-
-void Coordinator::addPermanent(const vpz::Dynamic& dynamics)
-{
-    m_modelFactory.addPermanent(dynamics);
-}
-
-void Coordinator::addPermanent(const vpz::Condition& condition)
-{
-    m_modelFactory.addPermanent(condition);
-}
-
-void Coordinator::addPermanent(const vpz::Observable& observable)
-{
-    m_modelFactory.addPermanent(observable);
 }
 
 void Coordinator::createModel(vpz::AtomicModel* model,
@@ -374,7 +393,7 @@ void Coordinator::delAtomicModel(vpz::AtomicModel* atom)
         View* View = (*it2).second;
         View->removeObservable(satom);
     }
-    m_eventTable.delModelEvents(satom);
+    m_eventTable.delSimulator(satom);
     satom->clear();
     m_deletedSimulator.push_back(satom);
 
@@ -415,11 +434,10 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         x = sim->targets((*it).getPortName(), m_modelList);
 
         if (x.first != x.second and x.first->second.first) {
-
             for (Simulator::iterator jt = x.first; jt != x.second; ++jt)
-                m_eventTable.putExternalEvent(jt->second.first,
-                                              it->attributes(),
-                                              jt->second.second);
+                m_eventTable.addExternal(jt->second.first,
+                                         it->attributes(),
+                                         jt->second.second);
         }
     }
 
@@ -444,8 +462,7 @@ void Coordinator::buildViews()
                                          it->second.timestep());
             m_timedViewList[it->second.name()] = v;
             obs = v;
-            m_eventTable.putObservationEvent(
-                new ViewEvent(obs, m_currentTime));
+            m_eventTable.addObservation(obs, m_currentTime);
         } else if (it->second.type() == vpz::View::EVENT) {
             EventView* v = new EventView(it->second.name(), stream);
             m_eventViewList[it->second.name()] = v;
@@ -454,8 +471,7 @@ void Coordinator::buildViews()
             FinishView* v = new devs::FinishView(it->second.name(), stream);
             m_finishViewList[it->second.name()] = v;
             obs = v;
-            m_eventTable.putObservationEvent(
-                new ViewEvent(obs, m_durationTime));
+            m_eventTable.addObservation(obs, m_durationTime);
         }
         m_viewList[it->second.name()] = obs;
         stream->setView(obs);
@@ -477,62 +493,54 @@ StreamWriter* Coordinator::buildOutput(const vpz::View& view,
     return stream;
 }
 
-void Coordinator::processInternalEvent(
-    Simulator* sim,
-    const EventBagModel& modelbag)
+void Coordinator::processInit(Simulator *simulator)
 {
-    const InternalEvent* ev = modelbag.internal();
-
-    {
-        ExternalEventList result;
-        sim->output(m_currentTime, result);
-        dispatchExternalEvent(result, sim);
-    }
-
-    {
-        InternalEvent* internal(sim->internalTransition(*ev));
-        if (internal) {
-            m_eventTable.putInternalEvent(internal);
-        }
-    }
-
-    processEventView(sim);
+    Time tn = simulator->init(m_currentTime);
+    if (not isInfinity(tn))
+        m_eventTable.addInternal(simulator, tn);
 }
 
-void Coordinator::processExternalEvents(
-    Simulator* sim,
-    const EventBagModel& modelbag)
+void Coordinator::processInternalEvent(Bag::value_type& modelbag)
 {
-    const ExternalEventList& lst(modelbag.externals());
+    ExternalEventList result; // TODO perhaps use an attribute to cahce
+                              // the malloc, realloc, etc.
+    modelbag.first->output(result, m_currentTime);
+    dispatchExternalEvent(result, modelbag.first);
 
-    {
-        InternalEvent* internal(sim->externalTransition(lst, m_currentTime));
-        if (internal) {
-            m_eventTable.putInternalEvent(internal);
-        }
-    }
+    Time tn = modelbag.first->internalTransition(m_currentTime);
+    if (not isInfinity(tn))
+        m_eventTable.addInternal(modelbag.first, tn);
 
-    processEventView(sim);
+    processEventView(modelbag.first);
 }
 
-void Coordinator::processConflictEvents(
-    Simulator* sim,
-    const EventBagModel& modelbag)
+void Coordinator::processExternalEvents(Bag::value_type& modelbag)
 {
-    {
-        ExternalEventList result;
-        sim->output(m_currentTime, result);
-        dispatchExternalEvent(result, sim);
-    }
+    Time tn = modelbag.first->externalTransition(
+        modelbag.second.external_events,
+        m_currentTime);
 
-    InternalEvent* internal = sim->confluentTransitions(
-        *modelbag.internal(), modelbag.externals());
+    if (not isInfinity(tn))
+        m_eventTable.addInternal(modelbag.first, tn);
 
-    processEventView(sim);
+    processEventView(modelbag.first);
+}
 
-    if (internal) {
-        m_eventTable.putInternalEvent(internal);
-    }
+void Coordinator::processConflictEvents(Bag::value_type& modelbag)
+{
+    ExternalEventList result; // TODO perhaps use an attribute to cache
+                              // the malloc, realloc, etc.
+    modelbag.first->output(result, m_currentTime);
+    dispatchExternalEvent(result, modelbag.first);
+
+    Time tn = modelbag.first->confluentTransitions(
+        modelbag.second.external_events,
+        m_currentTime);
+
+    if (not isInfinity(tn))
+        m_eventTable.addInternal(modelbag.first, tn);
+
+    processEventView(modelbag.first);
 }
 
 void Coordinator::processEventView(Simulator* model)
@@ -546,14 +554,12 @@ void Coordinator::processEventView(Simulator* model)
     }
 }
 
-void Coordinator::processViewEvents(ViewEventList& bag)
+void Coordinator::processViewEvents(std::vector<ViewEvent>& bag)
 {
-    for (ViewEventList::iterator it = bag.begin(); it != bag.end(); ++it) {
-        (*it)->run(m_currentTime);
-        (*it)->update(m_currentTime);
-
-        m_eventTable.putObservationEvent(
-            new ViewEvent((*it)->getView(), (*it)->getTime()));
+    for (auto & elem : bag) {
+        elem.run(m_currentTime);
+        elem.update(m_currentTime);
+        m_eventTable.addObservation(elem.getView(), elem.getTime());
     }
 }
 

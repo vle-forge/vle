@@ -51,7 +51,7 @@ class Dynamics;
  * @brief Read simulations plugin from models directories and manage models
  * classes.
  */
-class VLE_API ModelFactory : boost::noncopyable
+class VLE_LOCAL ModelFactory : boost::noncopyable
 {
 public:
     /**
@@ -263,10 +263,11 @@ private:
      * @return A pointer to the allocated dynamics.
      * @throw Exception::Internal if XML cannot be parse.
      */
-    devs::Dynamics* attachDynamics(Coordinator& coordinator,
-                                   devs::Simulator* atom,
-                                   const vpz::Dynamic& dyn,
-                                   const InitEventList& events);
+    std::unique_ptr<Dynamics>
+        attachDynamics(Coordinator& coordinator,
+                       devs::Simulator* atom,
+                       const vpz::Dynamic& dyn,
+                       const InitEventList& events);
 };
 
 }} // namespace vle devs

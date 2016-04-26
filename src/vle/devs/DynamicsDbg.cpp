@@ -33,13 +33,13 @@ namespace vle { namespace devs {
 
 DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
                          const InitEventList& events)
-    : Dynamics(init, events), mDynamics(0),
-    mName(init.model().getCompleteName())
+    : Dynamics(init, events)
+    , mName(init.model().getCompleteName())
 {
     TraceDevs(fmt(_("                     %1% [DEVS] constructor")) % mName);
 }
 
-Time DynamicsDbg::init(const Time& time)
+Time DynamicsDbg::init(Time time)
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] init")) % time % mName);
 
@@ -51,7 +51,7 @@ Time DynamicsDbg::init(const Time& time)
     return duration;
 }
 
-void DynamicsDbg::output(const Time& time, ExternalEventList& output) const
+void DynamicsDbg::output(Time time, ExternalEventList& output) const
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] output")) % time % mName);
 
@@ -80,7 +80,7 @@ Time DynamicsDbg::timeAdvance() const
     return time;
 }
 
-void DynamicsDbg::internalTransition(const Time& time)
+void DynamicsDbg::internalTransition(Time time)
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
               mName);
@@ -89,7 +89,7 @@ void DynamicsDbg::internalTransition(const Time& time)
 }
 
 void DynamicsDbg::externalTransition(const ExternalEventList& event,
-                                     const Time& time)
+                                     Time time)
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) % time
               % mName % event);
@@ -98,7 +98,7 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
 }
 
 void DynamicsDbg::confluentTransitions(
-    const Time& time,
+    Time time,
     const ExternalEventList& extEventlist)
 {
     TraceDevs(fmt(

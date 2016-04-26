@@ -64,7 +64,7 @@ template < typename UserModel > class ExecutiveDbg : public UserModel
 public:
     ExecutiveDbg(const ExecutiveInit& init, const InitEventList& events)
         : UserModel(init, events), mCurrentTime(),
-        mName(init.model().getCompleteName())
+          mName(init.model().getCompleteName())
     {
         TraceExtension(fmt(_("                     %1% [DEVS] constructor"))
                        % mName);
@@ -73,7 +73,7 @@ public:
     virtual ~ExecutiveDbg()
     {}
 
-    virtual Time init(const Time& time)
+    virtual Time init(Time time)
     {
         mCurrentTime = time;
 
@@ -83,7 +83,7 @@ public:
         return UserModel::init(time);
     }
 
-    virtual void output(const Time& time, ExternalEventList& output) const
+    virtual void output(Time time, ExternalEventList& output) const
     {
         TraceDevs(fmt(_("%1$20.10g %2% [DEVS] output")) % time %
                   mName);
@@ -91,20 +91,20 @@ public:
         UserModel::output(time, output);
 
         if (output.empty()) {
-            TraceDevs(fmt(
-                    _("                .... %1% [DEVS] output returns empty "
+            TraceDevs(
+                fmt(_("                .... %1% [DEVS] output returns empty "
                       "output")) % mName);
         } else {
-            TraceDevs(fmt(
-                    _("                .... %1% [DEVS] output returns %2%")) %
+            TraceDevs(
+                fmt(_("                .... %1% [DEVS] output returns %2%")) %
                 mName % output);
         }
     }
 
     virtual Time timeAdvance() const
     {
-        TraceDevs(fmt(_("                     %1% [DEVS] ta")) %
-                  mName);
+        TraceDevs(
+            fmt(_("                     %1% [DEVS] ta")) % mName);
 
         Time time(UserModel::timeAdvance());
 
@@ -114,7 +114,7 @@ public:
         return time;
     }
 
-    virtual void internalTransition(const Time& time)
+    virtual void internalTransition(Time time)
     {
         mCurrentTime = time;
 
@@ -125,7 +125,7 @@ public:
     }
 
     virtual void externalTransition(const ExternalEventList& event,
-            const Time& time)
+                                    Time time)
     {
         mCurrentTime = time;
 
@@ -135,19 +135,19 @@ public:
         UserModel::externalTransition(event, time);
     }
 
-    virtual void confluentTransitions(
-        const Time& time,
-        const ExternalEventList& extEventlist)
+    virtual void
+    confluentTransitions(Time time,
+                         const ExternalEventList& extEventlist)
     {
-        TraceDevs(fmt(
-                _("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
+        TraceDevs(
+            fmt(_("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
             mName % extEventlist);
 
         UserModel::confluentTransitions(time, extEventlist);
     }
 
-    virtual vle::value::Value* observation(
-        const ObservationEvent& event) const
+    virtual std::unique_ptr<vle::value::Value>
+    observation(const ObservationEvent& event) const
     {
         TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
                         " port: '%4%']")) % event.getTime() % mName
@@ -214,8 +214,8 @@ public:
             }
         }
 
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] createModel "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] createModel "
                   "name: %3%, inputs: (%4%), output: (%5%), "
                   "dynamics %6%, conditions: (%7%), observable (%8%)")) %
             mCurrentTime % mName % name % inputsString %
@@ -236,8 +236,8 @@ public:
         const std::string& classname,
         const std::string& modelname)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] createModelFromClass "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] createModelFromClass "
                   "class: %3%, modelname: %4%")) % mCurrentTime %
             mName % classname % modelname);
 
@@ -252,8 +252,8 @@ public:
      */
     virtual void delModel(const std::string& modelname)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] delModel "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] delModel "
                   "model: %3%")) % mCurrentTime % mName %
             modelname);
 
@@ -265,8 +265,8 @@ public:
                                const std::string& modeldestination,
                                const std::string& inputport)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] addConnection "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] addConnection "
                   "from model: %3% port: %4% "
                   "to model %5% port: %6%")) % mCurrentTime %
             mName % modelsource % outputport %
@@ -281,8 +281,8 @@ public:
                                   const std::string& modeldestination,
                                   const std::string& inputport)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] removeConnection "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] removeConnection "
                   "from model: %3% port: %4% "
                   "to model %5% port: %6%")) % mCurrentTime %
             mName % modelsource % outputport %
@@ -295,30 +295,30 @@ public:
     virtual void addInputPort(const std::string& modelName,
                               const std::string& portName)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] addInputPort "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] addInputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
             mName % modelName % portName);
-
+        
         UserModel::addInputPort(modelName, portName);
     }
 
     virtual void addOutputPort(const std::string& modelName,
                                const std::string& portName)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] addOutputPort "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] addOutputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
             mName % modelName % portName);
-
+        
         UserModel::addOutputPort(modelName, portName);
     }
 
     virtual void removeInputPort(const std::string& modelName,
                                  const std::string& portName)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] removeInputPort "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] removeInputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
             mName % modelName % portName);
 
@@ -328,11 +328,11 @@ public:
     virtual void removeOutputPort(const std::string& modelName,
                                   const std::string& portName)
     {
-        TraceExtension(fmt(
-                _("%1$20.10g %2% [EXE] removeOutputPort "
+        TraceExtension(
+            fmt(_("%1$20.10g %2% [EXE] removeOutputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
             mName % modelName % portName);
-
+        
         UserModel::removeOutputPort(modelName, portName);
     }
 

@@ -36,6 +36,10 @@
 #include <stdexcept>
 #include <limits>
 #include <fstream>
+#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/DynamicsDbg.hpp>
+#include <vle/devs/Executive.hpp>
+#include <vle/devs/ExecutiveDbg.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -56,17 +60,16 @@ public:
         : vle::devs::Dynamics(init, events)
     {}
 
-    virtual ~Model()
-    {}
+    virtual ~Model() = default;
 
-    virtual vle::devs::Time init(const vle::devs::Time& /* time */)
+    virtual vle::devs::Time init(vle::devs::Time /* time */) override
     {
         state = 0;
         return vle::devs::infinity;
     }
 
-    virtual void output(const vle::devs::Time& /* time */,
-                        vle::devs::ExternalEventList& output) const
+    virtual void output(vle::devs::Time /* time */,
+                        vle::devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
 
@@ -74,16 +77,16 @@ public:
             std::make_shared<value::String>("My message");
     }
 
-    virtual vle::devs::Time timeAdvance() const
+    virtual vle::devs::Time timeAdvance() const override
     { return vle::devs::infinity; }
 
     virtual void internalTransition(
-        const vle::devs::Time& /* time */)
+        vle::devs::Time /* time */) override
     { }
 
     virtual void externalTransition(
         const vle::devs::ExternalEventList& events,
-        const vle::devs::Time& /* time */)
+        vle::devs::Time /* time */) override
     {
         for (const auto& elem : events)
             if (elem.onPort("x"))
@@ -91,22 +94,168 @@ public:
     }
 
     virtual void confluentTransitions(
-        const vle::devs::Time& time,
-        const vle::devs::ExternalEventList& extEventlist)
+        vle::devs::Time time,
+        const vle::devs::ExternalEventList& extEventlist) override
     {
         internalTransition(time);
         externalTransition(extEventlist, time);
     }
 
     virtual std::unique_ptr<vle::value::Value>
-    observation(const vle::devs::ObservationEvent& /* event */) const
+    observation(const vle::devs::ObservationEvent& /* event */) const override
     {
         return std::unique_ptr<vle::value::Value>();
     }
 
-    virtual void finish()
+    virtual void finish() override
     {}
 };
+
+class ModelDbg : public vle::devs::DynamicsDbg
+{
+    int state;
+
+public:
+    ModelDbg(const vle::devs::DynamicsInit& init,
+             const vle::devs::InitEventList& events)
+        : vle::devs::DynamicsDbg(init, events)
+    {}
+
+    virtual ~ModelDbg() = default;
+
+    virtual vle::devs::Time init(vle::devs::Time /* time */) override
+    {
+        state = 0;
+        return vle::devs::infinity;
+    }
+
+    virtual void output(vle::devs::Time /* time */,
+                        vle::devs::ExternalEventList& output) const override
+    {
+        output.emplace_back("out");
+
+        output.back().attributes() =
+            std::make_shared<value::String>("My message");
+    }
+
+    virtual vle::devs::Time timeAdvance() const override
+    { return vle::devs::infinity; }
+
+    virtual void internalTransition(
+        vle::devs::Time /* time */) override
+    { }
+
+    virtual void externalTransition(
+        const vle::devs::ExternalEventList& events,
+        vle::devs::Time /* time */) override
+    {
+        for (const auto& elem : events)
+            if (elem.onPort("x"))
+                state = 1;
+    }
+
+    virtual void confluentTransitions(
+        vle::devs::Time time,
+        const vle::devs::ExternalEventList& extEventlist) override
+    {
+        internalTransition(time);
+        externalTransition(extEventlist, time);
+    }
+
+    virtual std::unique_ptr<vle::value::Value>
+    observation(const vle::devs::ObservationEvent& /* event */) const override
+    {
+        return std::unique_ptr<vle::value::Value>();
+    }
+
+    virtual void finish() override
+    {}
+};
+
+class Exe : public vle::devs::Executive
+{
+    int state;
+
+public:
+    Exe(const vle::devs::ExecutiveInit& init,
+           const vle::devs::InitEventList& events)
+        : vle::devs::Executive(init, events)
+    {}
+
+    virtual ~Exe() = default;
+
+    virtual vle::devs::Time init(vle::devs::Time /* time */) override
+    {
+        state = 0;
+        return vle::devs::infinity;
+    }
+
+    virtual void output(vle::devs::Time /* time */,
+                        vle::devs::ExternalEventList& output) const override
+    {
+        output.emplace_back("out");
+
+        output.back().attributes() =
+            std::make_shared<value::String>("My message");
+    }
+
+    virtual vle::devs::Time timeAdvance() const override
+    { return vle::devs::infinity; }
+
+    virtual void internalTransition(
+        vle::devs::Time /* time */) override
+    { }
+
+    virtual void externalTransition(
+        const vle::devs::ExternalEventList& events,
+        vle::devs::Time /* time */) override
+    {
+        for (const auto& elem : events)
+            if (elem.onPort("x"))
+                state = 1;
+    }
+
+    virtual void confluentTransitions(
+        vle::devs::Time time,
+        const vle::devs::ExternalEventList& extEventlist) override
+    {
+        internalTransition(time);
+        externalTransition(extEventlist, time);
+    }
+
+    virtual std::unique_ptr<vle::value::Value>
+    observation(const vle::devs::ObservationEvent& /* event */) const override
+    {
+        return std::unique_ptr<vle::value::Value>();
+    }
+
+    virtual void finish() override
+    {}
+};
+
+BOOST_AUTO_TEST_CASE(instantiate_mode)
+{
+    BOOST_REQUIRE(std::is_polymorphic<Model>::value == true);
+    BOOST_REQUIRE(std::is_polymorphic<ModelDbg>::value == true);
+    BOOST_REQUIRE(std::is_polymorphic<Exe>::value == true);
+    BOOST_REQUIRE(std::is_polymorphic<
+                  vle::devs::ExecutiveDbg<Exe>>::value == true);
+
+    bool check;
+
+    check = std::is_base_of<vle::devs::Dynamics, Model>::value == true;
+    BOOST_REQUIRE(check);
+    
+    check = std::is_base_of<vle::devs::DynamicsDbg, ModelDbg>::value == true;
+    BOOST_REQUIRE(check);
+
+    check = std::is_base_of<vle::devs::Executive, Exe>::value == true;
+    BOOST_REQUIRE(check);
+
+    check = std::is_base_of<vle::devs::Executive,
+                            vle::devs::ExecutiveDbg<Exe>>::value == true;
+    BOOST_REQUIRE(check);
+}
 
 BOOST_AUTO_TEST_CASE(test_del_coupled_model)
 {
