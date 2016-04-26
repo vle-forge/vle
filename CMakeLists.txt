@@ -30,6 +30,11 @@ set(VLE_MANPAGE_PATH "share/man/man1")
 set(VLE_SHARE_DIRS "share/vle-${VLE_VERSION_SHORT}")
 
 #
+# CPack configuration
+#
+include(CMakeCPack.cmake)
+
+#
 # CMake modules
 #
 include(CheckIncludeFileCXX)
@@ -49,7 +54,17 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQU
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
-  if ("${CMAKE_BUILD_TYPE}" EQUAL "Debug" OR "${CMAKE_BUILD_TYPE}" EQUAL "RelWithDebInfo")
+  option(WITH_COVERAGE "use coverage build [default: off]" OFF)
+  if (WITH_COVERAGE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+  endif ()
+
+  if ("${CMAKE_BUILD_TYPE}" EQUAL "Debug" OR
+      "${CMAKE_BUILD_TYPE}" EQUAL "RelWithDebInfo")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ggdb3")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb3")
   endif ()
@@ -68,7 +83,6 @@ endif (COMMAND CMAKE_POLICY)
 option(WITH_CAIRO "use cairomm to build output plugin [default: on]" ON)
 option(WITH_GTK "use gtkmm to build gvle [default: on]" ON)
 option(WITH_GTKSOURCEVIEW "use gtksourceview to build gvle [default: on]" ON)
-option(WITH_QT "use qt to build gvle2 [default: on]" ON)
 
 if (WITH_CAIRO AND WITH_GTK AND WITH_GTKSOURCEVIEW)
   pkg_check_modules(VLEDEPS libarchive glibmm-2.4 gthread-2.0 libxml-2.0
@@ -109,18 +123,6 @@ if (NOT WITH_CAIRO AND NOT WITH_GTK)
   endif ()
 endif()
 
-# Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
-# #seems to be a CMake'list. So we replace ';' with ' '.
-string(REPLACE ";" " " VLEDEPS_CFLAGS_OTHER_STRING "${VLEDEPS_CFLAGS_OTHER}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VLEDEPS_CFLAGS_OTHER_STRING}")
-
-if (WITH_QT)
-  find_package(Qt4 REQUIRED)
-  if (NOT QT_FOUND)
-    message(FATAL_ERROR "Qt is required")
-  endif (NOT QT_FOUND)
-endif ()
-
 if (WITH_CAIRO)
     set(VLE_HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
 endif ()
@@ -133,16 +135,10 @@ if (WITH_GTKSOURCEVIEW)
   set(VLE_HAVE_GTKSOURCEVIEWMM 1 CACHE INTERNAL "" FORCE)
 endif ()
 
-if (WITH_QT)
-  set(VLE_HAVE_QT 1 CACHE INTERNAL "" FORCE)
-  set(VLE_HAVE_GVLE2 1 CACHE INTERNAL "" FORCE)
-  SET(VLE_QT_PATH ${QT_BINARY_DIR} CACHE PATH "Qt path" FORCE)
-endif ()
-
-#
-# CPack configuration
-#
-include(CMakeCPack.cmake)
+# Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
+# #seems to be a CMake'list. So we replace ';' with ' '.
+string(REPLACE ";" " " VLEDEPS_CFLAGS_OTHER_STRING "${VLEDEPS_CFLAGS_OTHER}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VLEDEPS_CFLAGS_OTHER_STRING}")
 
 #
 # Test the libboost header and libboost-text library.
@@ -169,9 +165,16 @@ find_package(Boost COMPONENTS unit_test_framework thread filesystem system
   chrono date_time regex program_options serialization mpi)
 
 if (NOT Boost_FOUND)
-  message(STATUS "Boost is not founded. Try without chrono")
+  message(STATUS "Boost is not founded. Try without serialization mpi")
+
   find_package(Boost COMPONENTS unit_test_framework thread filesystem system
-    date_time regex program_options)
+    chrono date_time regex program_options)
+
+  if (NOT Boost_FOUND)
+    message(STATUS "Boost is not founded. Try without serialization mpi chrono")
+    find_package(Boost COMPONENTS unit_test_framework thread filesystem system
+      date_time regex program_options)
+  endif ()
 endif ()
 
 if (NOT Boost_FILESYSTEM_FOUND)
@@ -190,13 +193,6 @@ if (NOT Boost_PROGRAM_OPTIONS_FOUND)
   message(FATAL_ERROR "The boost program options library is required")
 endif (NOT Boost_PROGRAM_OPTIONS_FOUND)
 
-if (NOT Boost_SERIALIZATION_FOUND)
-  message(STATUS "The boost serialization was not found, MPI disabled")
-endif ()
-if (NOT Boost_MPI_FOUND)
-  message(STATUS "The boost mpi was not found, MPI disabled")
-endif ()
-
 if (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
   set(VLE_HAVE_BOOST_SPIRIT2 0 CACHE INTERNAL "" FORCE)
 else (Boost_MINOR_VERSION AND ${Boost_MINOR_VERSION} LESS "41")
@@ -214,7 +210,7 @@ endif (WITH_TEST)
 #
 
 option(WITH_MPI "use an installed MPI library [default: on]" ON)
-if (WITH_MPI AND Boost_SERIALIZATION_FOUND AND Boost_MPI_FOUND)
+if (WITH_MPI)
   find_package(MPI REQUIRED)
   message(STATUS "mpi include ${MPI_INCLUDE_PATH}")
   message(STATUS "mpi lib ${MPI_LIBRARY}")
@@ -239,8 +235,6 @@ include_directories(${VLE_BINARY_DIR})
 # prefix=/target to detect the DIRNAME
 # cflag=-Iboost_1_34_1 for the directory
 #
-
-set(VLE_PKGCONFIG_CFLAGS_OTHER "${VLEDEPS_CFLAGS_OTHER_STRING}")
 if (UNIX)
   set(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
   set(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
@@ -332,7 +326,5 @@ message(STATUS "Build with cairo plugin.......: ${VLE_HAVE_CAIRO}")
 message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with gtksourceviewmm....: ${VLE_HAVE_GTKSOURCEVIEWMM}")
 message(STATUS "Build with MPI................: ${VLE_HAVE_MPI}")
-message(STATUS "Build with Qt.................: ${VLE_HAVE_QT}")
-message(STATUS "Build with gvle2..............: ${VLE_HAVE_GVLE2}")
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2

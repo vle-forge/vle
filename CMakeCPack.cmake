@@ -43,7 +43,7 @@ else ()
 endif ()
 
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${VLE_NAME_COMPLETE})
-set(CPACK_PACKAGE_EXECUTABLES "vle" "VLE" "gvle" "GVLE" "gvle2" "GVLE2")
+set(CPACK_PACKAGE_EXECUTABLES "vle" "VLE" "gvle" "GVLE")
 
 # CPack source configuration
 set(CPACK_SOURCE_PACKAGE_FILE_NAME ${VLE_NAME_COMPLETE})
@@ -72,8 +72,6 @@ set(CPACK_RPM_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simulati
 if (CPACK_GENERATOR MATCHES "NSIS")
 
   set(CMAKE_MODULE_PATH "share")
-  set(VLE_QT_PATH CACHE PATH "Qt path")
-  set(QT_INSTALL_PATH CACHE PATH "Qt install path")
   set(VLE_MINGW_PATH CACHE PATH "Mingw Boost directory")
   set(VLE_BOOST_INCLUDE_PATH CACHE PATH "Boost include path")
   set(VLE_BOOST_LIBRARIES_PATH CACHE PATH "Boost libraries path")
@@ -100,30 +98,6 @@ if (CPACK_GENERATOR MATCHES "NSIS")
   install(FILES "${VLE_MINGW_PATH}/bin/liblzma-1.dll" DESTINATION bin)
   install(FILES "${VLE_MINGW_PATH}/bin/libz-1.dll" DESTINATION bin)
 
-  install(FILES "${VLE_QT_PATH}\\\\QtCore4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtGui4.dll"   DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtXml4.dll"   DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtCored4.dll" DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtGuid4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtXmld4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtHelp4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtCLucene4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtSql4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtNetwork4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtOpenGL4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\QtSvg4.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\mingwm10.dll"  DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\qwt.dll"      DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\Qwtd.dll"     DESTINATION bin)
-  
-  install(FILES "${VLE_QT_PATH}\\\\qmake.exe"     DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\moc.exe"     DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\rcc.exe"     DESTINATION bin)
-  install(FILES "${VLE_QT_PATH}\\\\uic.exe"     DESTINATION bin)
-
-  install(DIRECTORY "${QT_INSTALL_PATH}/include/" DESTINATION include)
-  install(DIRECTORY "${QT_INSTALL_PATH}/src/" DESTINATION src)
-
   install(DIRECTORY "${VLE_BOOST_INCLUDE_PATH}/boost" DESTINATION include)
   install(DIRECTORY "${VLE_BOOST_LIBRARIES_PATH}/" DESTINATION bin
     FILES_MATCHING PATTERN "libboost*.dll")
@@ -144,13 +118,12 @@ if (CPACK_GENERATOR MATCHES "NSIS")
 
   install(DIRECTORY "${VLE_CMAKE_PATH}/bin" DESTINATION CMake)
   install(DIRECTORY "${VLE_CMAKE_PATH}/share" DESTINATION CMake)
-
+  
   set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
   set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
   set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\logo.bmp")
   set(CPACK_NSIS_MENU_LINKS "${VLE_SHARE_DIRS}/doc/vle.chm" "VLE API" "http://www.vle-project.org" "VLE Web Site")
   set(CPACK_CREATE_DESKTOP_LINKS gvle)
-  set(CPACK_CREATE_DESKTOP_LINKS gvle2)
   set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
   set(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboratory Environment")
   set(CPACK_NSIS_HELP_LINK "http://www.vle-project.org")
