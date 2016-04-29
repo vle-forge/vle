@@ -58,7 +58,7 @@ MatrixTranslator::getModel(const std::string& name) const
 
 unsigned int MatrixTranslator::getSize(unsigned int i) const
 {
-    std::map < unsigned int, unsigned int >::const_iterator it(
+    auto it(
         m_size.find(i));
 
     if (it == m_size.end()) {
@@ -138,7 +138,7 @@ void MatrixTranslator::parseXML(const value::Value& value)
         const value::Tuple& grid = root.getTuple("grid");
         m_dimension = grid.size() - 1;
         int dim = 0;
-        for (value::Tuple::const_iterator it = grid.value().begin(); it !=
+        for (auto it = grid.value().begin(); it !=
              grid.value().end(); ++it, ++dim) {
             m_size[dim] = boost::numeric_cast < int >(*it);
         }
@@ -169,7 +169,7 @@ void MatrixTranslator::parseXML(const value::Value& value)
         } else if (cells.exist("libraries")) {
             int index = 0;
             const value::Set& libraries = cells.getSet("libraries");
-            for (value::Set::const_iterator it = libraries.begin();
+            for (auto it = libraries.begin();
                  it != libraries.end(); ++it, ++index) {
                 const value::Map& library = (*it)->toMap();
 
@@ -190,9 +190,8 @@ void MatrixTranslator::parseXML(const value::Value& value)
             m_multiple = false;
         } else if (cells.exist("classes")) {
             const value::Set& classes = cells.getSet("classes");
-            for (value::Set::const_iterator it = classes.begin();
-                 it != classes.end(); ++it) {
-                m_classes.push_back(value::toString(*it));
+            for (const auto & classe : classes) {
+                m_classes.push_back(value::toString(classe));
             }
             m_multiple = true;
         }
@@ -207,9 +206,8 @@ void MatrixTranslator::parseXML(const value::Value& value)
             const value::Tuple& init = cells.getTuple("init");
             unsigned int i = 0;
 
-            for (value::Tuple::const_iterator it = init.value().begin(); it !=
-                 init.value().end(); ++it) {
-                m_init[i] = boost::numeric_cast < unsigned int >(*it);
+            for (const auto & elem : init.value()) {
+                m_init[i] = boost::numeric_cast < unsigned int >(elem);
                 ++i;
             }
         }
