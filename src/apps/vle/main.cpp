@@ -270,8 +270,8 @@ static bool init_package(vle::utils::Package& pkg, const CmdArgs &args)
 static int manage_package_mode(const std::string &packagename, bool manager,
                                int processor, const CmdArgs &args)
 {
-    CmdArgs::const_iterator it = args.begin();
-    CmdArgs::const_iterator end = args.end();
+    auto it = args.begin();
+    auto end = args.end();
     bool stop = false;
 
     vle::utils::Package pkg(packagename);
