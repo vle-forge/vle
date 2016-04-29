@@ -111,21 +111,18 @@ void ModelFactory::createModel(Coordinator& coordinator,
 
     value::Map initValues;
     if (not conditions.empty()) {
-        for (std::vector < std::string >::const_iterator it =
-             conditions.begin(); it != conditions.end(); ++it) {
-	    const vpz::Condition& cnd(mExperiment.conditions().get(*it));
+        for (const auto & elem : conditions) {
+	    const auto& cnd = mExperiment.conditions().get(elem);
 	    value::MapValue vl;
 	    cnd.fillWithFirstValues(vl);
 
-	    for (value::MapValue::iterator itv = vl.begin();
-		 itv != vl.end(); ++itv) {
-
-                if (initValues.exist(itv->first))
+	    for (auto & elem : vl) {
+                if (initValues.exist(elem.first))
                     throw utils::InternalError(
                         fmt(_("Multiples condition with the same init port " \
-                              "name '%1%'")) % itv->first);
+                              "name '%1%'")) % elem.first);
 
-                initValues.add(itv->first, std::move(itv->second));
+                initValues.add(elem.first, std::move(elem.second));
             }
 	}
     }
@@ -143,21 +140,19 @@ void ModelFactory::createModel(Coordinator& coordinator,
         vpz::Observable& ob(mExperiment.views().observables().get(observable));
         const vpz::ObservablePortList& lst(ob.observableportlist());
 
-        for (vpz::ObservablePortList::const_iterator it = lst.begin();
-             it != lst.end(); ++it) {
-            const vpz::ViewNameList& vnlst(it->second.viewnamelist());
-            for (vpz::ViewNameList::const_iterator jt = vnlst.begin();
-                 jt != vnlst.end(); ++jt) {
+        for (const auto & elem : lst) {
+            const vpz::ViewNameList& vnlst(elem.second.viewnamelist());
+            for (const auto & vnlst_jt : vnlst) {
 
-                View* view = coordinator.getView(*jt);
+                View* view = coordinator.getView(vnlst_jt);
 
                 if (not view) {
                     throw utils::InternalError(fmt(_(
                                 "The view '%1%' is unknow of coordinator "
-                                "view list")) % *jt);
+                                "view list")) % vnlst_jt);
                 }
 
-                view->addObservable(sim, it->first,
+                view->addObservable(sim, elem.first,
                                     coordinator.getCurrentTime());
             }
         }
@@ -179,13 +174,12 @@ void ModelFactory::createModels(Coordinator& coordinator,
             vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
         }
 
-        for (vpz::AtomicModelVector::iterator it = atomicmodellist.begin();
-             it != atomicmodellist.end(); ++it) {
+        for (auto & elem : atomicmodellist) {
             createModel(coordinator,
-                        *it,
-                        (*it)->dynamics(),
-                        (*it)->conditions(),
-                        (*it)->observables());
+                        elem,
+                        (elem)->dynamics(),
+                        (elem)->conditions(),
+                        (elem)->observables());
         }
     }
 }
@@ -201,13 +195,12 @@ vpz::BaseModel* ModelFactory::createModelFromClass(Coordinator& coordinator,
     vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
     parent->addModel(mdl, modelname);
 
-    for (vpz::AtomicModelVector::iterator it = atomicmodellist.begin();
-         it != atomicmodellist.end(); ++it) {
+    for (auto & elem : atomicmodellist) {
         createModel(coordinator,
-                    *it,
-                    (*it)->dynamics(),
-                    (*it)->conditions(),
-                    (*it)->observables());
+                    elem,
+                    (elem)->dynamics(),
+                    (elem)->conditions(),
+                    (elem)->observables());
     }
 
     return mdl;

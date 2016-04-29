@@ -52,7 +52,7 @@ void StreamWriter::open(const std::string& pluginname,
                         std::unique_ptr<value::Value> parameters,
                         const devs::Time& time)
 {
-    void *symbol = 0;
+    void *symbol = nullptr;
 
     try {
         symbol = m_modulemgr.get(package, pluginname, utils::MODULE_OOV);

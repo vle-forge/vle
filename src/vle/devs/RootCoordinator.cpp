@@ -45,7 +45,7 @@ static std::unique_ptr<value::Map> getMatrixFromView(const ViewList &views)
 {
     std::unique_ptr<value::Map> result;
 
-    ViewList::const_iterator it = views.begin();
+    auto it = views.begin();
     while (it != views.end()) {
         auto matrix = it->second->matrix();
 
@@ -75,7 +75,7 @@ static std::unique_ptr<value::Map> getCloneMatrixFromView(const ViewList &views)
 {
     std::unique_ptr<value::Map> result;
 
-    ViewList::const_iterator it = views.begin();
+    auto it = views.begin();
     while (it != views.end()) {
         auto matrix = it->second->matrix();
 
@@ -95,7 +95,7 @@ static std::unique_ptr<value::Map> getCloneMatrixFromView(const ViewList &views)
 
 RootCoordinator::RootCoordinator(const utils::ModuleManager& modulemgr)
     : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0),
-      m_coordinator(0), m_root(0), m_modulemgr(modulemgr)
+      m_coordinator(nullptr), m_root(nullptr), m_modulemgr(modulemgr)
 {
 }
 
@@ -156,12 +156,12 @@ void RootCoordinator::finish()
         m_result = getMatrixFromView(m_coordinator->getViews());
 
         delete m_coordinator;
-        m_coordinator = 0;
+        m_coordinator = nullptr;
     }
 
     if (m_root) {
         delete m_root;
-        m_root = 0;
+        m_root = nullptr;
     }
 }
 

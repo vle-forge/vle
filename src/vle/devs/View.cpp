@@ -93,15 +93,14 @@ bool View::exist(Simulator* simulator) const
 void View::run(const Time& time)
 {
     if (not m_observableList.empty()) {
-        for (ObservableList::iterator it = m_observableList.begin();
-             it != m_observableList.end(); ++it) {
-            ObservationEvent event(time, getName(), it->second);
-            std::unique_ptr<value::Value> val = it->first->observation(event);
-            m_stream->process(it->first, it->second, time, getName(),
+        for (auto & elem : m_observableList) {
+            ObservationEvent event(time, getName(), elem.second);
+            std::unique_ptr<value::Value> val = elem.first->observation(event);
+            m_stream->process(elem.first, elem.second, time, getName(),
                               std::move(val));
         }
     } else {
-        m_stream->process(0, std::string(), time, getName(), 0);
+        m_stream->process(nullptr, std::string(), time, getName(), nullptr);
     }
 }
 

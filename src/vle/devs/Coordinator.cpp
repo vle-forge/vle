@@ -60,7 +60,7 @@ depth(const std::unique_ptr<vle::devs::Dynamics>& mdl) noexcept
     int ret = 0;
 
     const vle::vpz::CoupledModel *parent = mdl->getModel().getParent();
-    while (parent != NULL) {
+    while (parent != nullptr) {
         parent = parent->getParent();
         --ret;
     }
@@ -170,7 +170,7 @@ void Coordinator::run()
         for (auto it = begin; it != end; ++it) {
             m_eventTable.delSimulator(*it);
             delete *it;
-            *it = 0;
+            *it = nullptr;
         }
 
         m_deletedSimulator.erase(begin, end);
@@ -224,7 +224,7 @@ void Coordinator::addObservableToView(vpz::AtomicModel* model,
                                       const std::string& portname,
                                       const std::string& view)
 {
-    ViewList::iterator it = m_viewList.find(view);
+    auto it = m_viewList.find(view);
 
     if (it == m_viewList.end()) {
         throw utils::InternalError(fmt(_(
@@ -270,10 +270,9 @@ void Coordinator::getSimulatorsSource(
 {
     if (m_isStarted) {
         vpz::ConnectionList& inputs(model->getInputPortList());
-        for (vpz::ConnectionList::iterator it = inputs.begin(); it !=
-             inputs.end(); ++it) {
+        for (auto & input : inputs) {
 
-            const std::string& port(it->first);
+            const std::string& port(input.first);
             getSimulatorsSource(model, port, lst);
         }
     }
@@ -288,13 +287,12 @@ void Coordinator::getSimulatorsSource(
         vpz::ModelPortList result;
         model->getAtomicModelsSource(port, result);
 
-        for (vpz::ModelPortList::iterator jt = result.begin();
-             jt != result.end(); ++jt) {
+        for (auto & elem : result) {
             lst.push_back(
                 std::make_pair(
                     getModel(
-                        reinterpret_cast < vpz::AtomicModel* >(jt->first)),
-                    jt->second));
+                        reinterpret_cast < vpz::AtomicModel* >(elem.first)),
+                    elem.second));
         }
     }
 }
@@ -303,10 +301,9 @@ void Coordinator::updateSimulatorsTarget(
     std::vector < std::pair < Simulator*, std::string > >& lst)
 {
     if (m_isStarted) {
-        for (std::vector < std::pair < Simulator*, std::string > >::iterator
-             it = lst.begin(); it != lst.end(); ++it) {
-            if (it->first != 0) {
-                it->first->updateSimulatorTargets(it->second, m_modelList);
+        for (auto & elem : lst) {
+            if (elem.first != nullptr) {
+                elem.first->updateSimulatorTargets(elem.second, m_modelList);
             }
         }
     }
@@ -344,27 +341,27 @@ void Coordinator::addModel(vpz::AtomicModel* model, Simulator* simulator)
 
 Simulator* Coordinator::getModel(const vpz::AtomicModel* model) const
 {
-    SimulatorMap::const_iterator it =
+    auto it =
         m_modelList.find( const_cast < vpz::AtomicModel* >(model));
-    return (it == m_modelList.end()) ? 0 : it->second;
+    return (it == m_modelList.end()) ? nullptr : it->second;
 }
 
 Simulator* Coordinator::getModel(const std::string& name) const
 {
-    SimulatorMap::const_iterator it = m_modelList.begin();
+    auto it = m_modelList.begin();
     while (it != m_modelList.end()) {
         if ((*it).first->getName() == name) {
             return (*it).second;
         }
         ++it;
     }
-    return 0;
+    return nullptr;
 }
 
 View* Coordinator::getView(const std::string& name) const
 {
-    ViewList::const_iterator it = m_viewList.find(name);
-    return (it == m_viewList.end()) ? 0 : it->second;
+    auto it = m_viewList.find(name);
+    return (it == m_viewList.end()) ? nullptr : it->second;
 }
 
 ///
@@ -378,7 +375,7 @@ void Coordinator::delAtomicModel(vpz::AtomicModel* atom)
             _("Cannot delete undefined atomic model"));
     }
 
-    SimulatorMap::iterator it = m_modelList.find(atom);
+    auto it = m_modelList.find(atom);
     if (it == m_modelList.end()) {
         throw utils::ModellingError(
             _("Cannot delete an unknown atomic model"));
@@ -427,16 +424,15 @@ void Coordinator::addModels(const vpz::Model& model)
 void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
                                         Simulator* sim)
 {
-    for (ExternalEventList::iterator it = eventList.begin(); it !=
-         eventList.end(); ++it) {
+    for (auto & elem : eventList) {
 
         std::pair < Simulator::iterator, Simulator::iterator > x;
-        x = sim->targets((*it).getPortName(), m_modelList);
+        x = sim->targets((elem).getPortName(), m_modelList);
 
         if (x.first != x.second and x.first->second.first) {
-            for (Simulator::iterator jt = x.first; jt != x.second; ++jt)
+            for (auto jt = x.first; jt != x.second; ++jt)
                 m_eventTable.addExternal(jt->second.first,
-                                         it->attributes(),
+                                         elem.attributes(),
                                          jt->second.second);
         }
     }
@@ -450,30 +446,29 @@ void Coordinator::buildViews()
     const vpz::Views& views(m_modelFactory.views());
     const vpz::ViewList& viewlist(views.viewlist());
 
-    for (vpz::ViewList::const_iterator it = viewlist.begin();
-         it != viewlist.end(); ++it) {
+    for (const auto & elem : viewlist) {
 
         StreamWriter* stream = buildOutput(
-            it->second, outs.get(it->second.output()));
+            elem.second, outs.get(elem.second.output()));
 
-        View* obs = 0;
-        if (it->second.type() == vpz::View::TIMED) {
-            TimedView* v = new TimedView(it->second.name(), stream,
-                                         it->second.timestep());
-            m_timedViewList[it->second.name()] = v;
+        View* obs = nullptr;
+        if (elem.second.type() == vpz::View::TIMED) {
+            auto  v = new TimedView(elem.second.name(), stream,
+                                         elem.second.timestep());
+            m_timedViewList[elem.second.name()] = v;
             obs = v;
             m_eventTable.addObservation(obs, m_currentTime);
-        } else if (it->second.type() == vpz::View::EVENT) {
-            EventView* v = new EventView(it->second.name(), stream);
-            m_eventViewList[it->second.name()] = v;
+        } else if (elem.second.type() == vpz::View::EVENT) {
+            auto  v = new EventView(elem.second.name(), stream);
+            m_eventViewList[elem.second.name()] = v;
             obs = v;
-        } else if (it->second.type() == vpz::View::FINISH) {
-            FinishView* v = new devs::FinishView(it->second.name(), stream);
-            m_finishViewList[it->second.name()] = v;
+        } else if (elem.second.type() == vpz::View::FINISH) {
+            auto  v = new devs::FinishView(elem.second.name(), stream);
+            m_finishViewList[elem.second.name()] = v;
             obs = v;
             m_eventTable.addObservation(obs, m_durationTime);
         }
-        m_viewList[it->second.name()] = obs;
+        m_viewList[elem.second.name()] = obs;
         stream->setView(obs);
     }
 }
@@ -481,14 +476,14 @@ void Coordinator::buildViews()
 StreamWriter* Coordinator::buildOutput(const vpz::View& view,
                                        const vpz::Output& output)
 {
-    StreamWriter* stream = new StreamWriter(m_modulemgr);
+    auto  stream = new StreamWriter(m_modulemgr);
 
     std::string file((fmt("%1%_%2%") %
                       m_modelFactory.experiment().name() %
                       view.name()).str());
 
     stream->open(output.plugin(), output.package(), output.location(), file,
-                 (output.data()) ? output.data()->clone() : 0, m_currentTime);
+                 (output.data()) ? output.data()->clone() : nullptr, m_currentTime);
 
     return stream;
 }
@@ -545,11 +540,10 @@ void Coordinator::processConflictEvents(Bag::value_type& modelbag)
 
 void Coordinator::processEventView(Simulator* model)
 {
-    for (EventViewList::iterator it = m_eventViewList.begin(); it !=
-         m_eventViewList.end(); ++it) {
+    for (auto & elem : m_eventViewList) {
 
-        if (it->second->exist(model)) {
-            it->second->run(m_currentTime);
+        if (elem.second->exist(model)) {
+            elem.second->run(m_currentTime);
         }
     }
 }

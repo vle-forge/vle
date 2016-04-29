@@ -68,7 +68,7 @@ void Executive::addObservableToView(const std::string& model,
 {
     vpz::BaseModel* mdl = cpled()->findModel(model);
 
-    if (mdl == 0) {
+    if (mdl == nullptr) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) % model);
     }
@@ -92,7 +92,7 @@ Executive::createModel(const std::string& name,
                            const std::vector < std::string >& conditions,
                            const std::string& observable)
 {
-    vpz::AtomicModel* model = new vpz::AtomicModel(name, cpled());
+    auto  model = new vpz::AtomicModel(name, cpled());
     std::vector < std::string >::const_iterator it;
 
     for (it = inputs.begin(); it != inputs.end(); ++it) {
@@ -136,7 +136,7 @@ void Executive::renameModel(const std::string& oldname,
                             const std::string& newname)
 {
     vpz::BaseModel* mdl = cpled()->findModel(oldname);
-    if (mdl == 0) {
+    if (mdl == nullptr) {
         throw utils::DevsGraphError(
             fmt(_("Executive error: rename `%1%' into `%2%' failed, `%1%' "
                   "does not exist")) % oldname % newname);
@@ -179,9 +179,8 @@ void Executive::addConnection(const std::string& srcModelName,
             vpz::ModelPortList lst;
             cpled()->getAtomicModelsTarget(dstPortName, lst);
 
-            for (vpz::ModelPortList::iterator it = lst.begin(); it !=
-                 lst.end(); ++it) {
-                m_coordinator.getSimulatorsSource(it->first, it->second,
+            for (auto & elem : lst) {
+                m_coordinator.getSimulatorsSource(elem.first, elem.second,
                                                   toupdate);
             }
         } else {
@@ -329,7 +328,7 @@ void Executive::dump(std::ostream& out, const std::string& name) const
     f.write(out);
 
     delete f.project().model().model();
-    f.project().model().setModel(0);
+    f.project().model().setModel(nullptr);
 }
 
 }} // namespace vle devs

@@ -43,7 +43,7 @@ Simulator::Simulator(vpz::AtomicModel* atomic) :
 void Simulator::clear()
 {
     m_dynamics.reset(nullptr);
-    m_atomicModel = 0;
+    m_atomicModel = nullptr;
 }
 
 void Simulator::updateSimulatorTargets(
@@ -57,21 +57,20 @@ void Simulator::updateSimulatorTargets(
 
     if (result.begin() == result.end()) {
         mTargets.insert(value_type(port, TargetSimulator(
-                   (Simulator*)0, std::string())));
+                   (Simulator*)nullptr, std::string())));
     } else {
-        for (vpz::ModelPortList::iterator it = result.begin(); it !=
-                result.end(); ++it) {
+        for (auto & elem : result) {
 
             std::map < vpz::AtomicModel*, devs::Simulator* >::iterator target;
             target = simulators.find(
-                    reinterpret_cast < vpz::AtomicModel*>(it->first));
+                    reinterpret_cast < vpz::AtomicModel*>(elem.first));
 
             if (target == simulators.end()) {
                 mTargets.erase(port);
                 break;
             } else {
                 mTargets.insert(std::make_pair(port, TargetSimulator(
-                            target->second, it->second)));
+                            target->second, elem.second)));
             }
         }
     }
@@ -87,7 +86,7 @@ Simulator::targets(
     if (x.first == x.second) {
         updateSimulatorTargets(port, simulators);
         x = mTargets.equal_range(port);
-    } else if (x.first->second.first == 0) {
+    } else if (x.first->second.first == nullptr) {
         x = make_pair(mTargets.end(), mTargets.end());
     }
 
@@ -96,7 +95,7 @@ Simulator::targets(
 
 void Simulator::removeTargetPort(const std::string& port)
 {
-    iterator it = mTargets.find(port);
+    auto it = mTargets.find(port);
 
     if (it != mTargets.end()) {
         mTargets.erase(it);
@@ -108,7 +107,7 @@ void Simulator::addTargetPort(const std::string& port)
     assert(mTargets.find(port) == mTargets.end());
 
     mTargets.insert(value_type(port,
-                               TargetSimulator((Simulator*)0,
+                               TargetSimulator((Simulator*)nullptr,
                                                std::string())));
 }
 
