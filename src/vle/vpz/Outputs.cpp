@@ -87,7 +87,7 @@ Output& Outputs::addDistantStream(const std::string& name,
 
 void Outputs::del(const std::string& name)
 {
-    iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it != end()) {
         m_list.erase(it);
@@ -115,7 +115,7 @@ Output& Outputs::add(const Output& o)
 
 Output& Outputs::get(const std::string& name)
 {
-    iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknow output '%1%'\n")) % name);
@@ -126,7 +126,7 @@ Output& Outputs::get(const std::string& name)
 
 const Output& Outputs::get(const std::string& name) const
 {
-    const_iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknow output '%1%'\n")) % name);
@@ -157,9 +157,9 @@ std::set < std::string > Outputs::depends() const
 {
     std::set < std::string > result;
 
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if (not it->second.package().empty()) {
-            result.insert(it->second.package());
+    for (const auto & elem : *this) {
+        if (not elem.second.package().empty()) {
+            result.insert(elem.second.package());
         }
     }
 

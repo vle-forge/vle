@@ -56,8 +56,8 @@ void ModelPortList::remove(BaseModel *model, const std::string& portname)
     }
 
     std::pair < iterator, iterator > its = m_lst.equal_range(model);
-    iterator it = its.first;
-    iterator previous = its.first;
+    auto it = its.first;
+    auto previous = its.first;
 
     while (it != its.second) {
 	if (it->second == portname) {
@@ -78,15 +78,15 @@ void ModelPortList::remove(BaseModel *model, const std::string& portname)
 
 void ModelPortList::merge(ModelPortList& lst)
 {
-    for (iterator it = lst.begin(); it != lst.end(); ++it) {
-        m_lst.insert(value_type(it->first, it->second));
+    for (auto & elem : lst) {
+        m_lst.insert(value_type(elem.first, elem.second));
     }
 }
 
 bool ModelPortList::exist(BaseModel *model, const std::string& portname) const
 {
     std::pair < const_iterator, const_iterator > its(m_lst.equal_range(model));
-    for (const_iterator it = its.first; it != its.second; ++it) {
+    for (auto it = its.first; it != its.second; ++it) {
         if (it->second == portname) {
             return true;
         }
@@ -98,7 +98,7 @@ bool ModelPortList::exist(const BaseModel *model, const std::string& portname) c
 {
     std::pair < const_iterator, const_iterator > its;
     its = m_lst.equal_range(const_cast < BaseModel *>(model));
-    for (const_iterator it = its.first; it != its.second; ++it) {
+    for (auto it = its.first; it != its.second; ++it) {
         if (it->second == portname) {
             return true;
         }

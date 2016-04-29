@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
     BOOST_REQUIRE_EQUAL(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
 
     const vpz::Model& mdl = vpz.project().model();
-    BOOST_REQUIRE(mdl.model() != 0);
+    BOOST_REQUIRE(mdl.model() != nullptr);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
     BOOST_REQUIRE_EQUAL(mdl.model()->getInputPortNumber(), 2);
     BOOST_REQUIRE_EQUAL(mdl.model()->getOutputPortNumber(), 2);
@@ -141,26 +141,26 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
-    BOOST_REQUIRE(mdl.model() != 0);
+    BOOST_REQUIRE(mdl.model() != nullptr);
     BOOST_REQUIRE_EQUAL(mdl.model()->isCoupled(), true);
 
     vpz::CoupledModel* cpl = dynamic_cast < vpz::CoupledModel*
         >(mdl.model());
-    BOOST_REQUIRE(cpl != 0);
+    BOOST_REQUIRE(cpl != nullptr);
     BOOST_REQUIRE(cpl->existOutputPort("o") != 0);
     BOOST_REQUIRE(cpl->existInputPort("i") != 0);
 
     vpz::BaseModel* mdl1 = cpl->findModel("atom1");
     vpz::BaseModel* mdl2 = cpl->findModel("atom2");
-    BOOST_REQUIRE(mdl1 != 0);
-    BOOST_REQUIRE(mdl2 != 0);
+    BOOST_REQUIRE(mdl1 != nullptr);
+    BOOST_REQUIRE(mdl2 != nullptr);
 
     vpz::AtomicModel* atom1 = dynamic_cast < vpz::AtomicModel* >(mdl1);
     vpz::AtomicModel* atom2 = dynamic_cast < vpz::AtomicModel* >(mdl2);
-    BOOST_REQUIRE(atom1 != 0);
+    BOOST_REQUIRE(atom1 != nullptr);
     BOOST_REQUIRE(atom1->existOutputPort("out"));
     BOOST_REQUIRE(atom1->existInputPort("in"));
-    BOOST_REQUIRE(atom2 != 0);
+    BOOST_REQUIRE(atom2 != nullptr);
     BOOST_REQUIRE(atom2->existInputPort("in"));
     BOOST_REQUIRE(atom2->existOutputPort("out"));
 
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
     vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
-    BOOST_REQUIRE(mdl.model() != 0);
+    BOOST_REQUIRE(mdl.model() != nullptr);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
 
     vpz::AtomicModel* atom(

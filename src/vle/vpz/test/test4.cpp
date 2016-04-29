@@ -423,8 +423,8 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
 
 void check_classes_unittest_vpz(vpz::Classes& cls)
 {
-    void* ptr1 = 0;
-    void* ptr2 = 0;
+    void* ptr1 = nullptr;
+    void* ptr2 = nullptr;
 
     BOOST_REQUIRE(cls.exist("beepbeep"));
     {

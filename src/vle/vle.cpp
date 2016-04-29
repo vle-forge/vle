@@ -56,7 +56,7 @@ Init::Init(const char *localname)
 {
     __vle_init();
 
-    if (!setlocale(LC_ALL, localname == NULL ? "" : localname))
+    if (!setlocale(LC_ALL, localname == nullptr ? "" : localname))
         setlocale(LC_ALL, "C");
 
 #ifdef VLE_HAVE_NLS

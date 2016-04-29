@@ -72,7 +72,7 @@ AtomicModel& AtomicModel::operator=(const AtomicModel& mdl)
 
 void AtomicModel::delCondition(const std::string& str)
 {
-    std::vector < std::string >::iterator itfind =
+    auto itfind =
 	std::find(m_conditions.begin(), m_conditions.end(), str);
 
     m_conditions.erase(itfind);
@@ -82,7 +82,7 @@ BaseModel* AtomicModel::findModel(const std::string& name) const
 {
     return (getName() == name) ?
         const_cast < BaseModel* >(
-            reinterpret_cast < const BaseModel* >(this)) : 0;
+            reinterpret_cast < const BaseModel* >(this)) : nullptr;
 }
 
 void AtomicModel::writeXML(std::ostream& out) const
@@ -101,7 +101,7 @@ void AtomicModel::write(std::ostream& out) const
     if (not conditions().empty()) {
 	out << "conditions=\"";
 
-        std::vector < std::string >::const_iterator it =
+        auto it =
             conditions().begin();
         while (it != conditions().end()) {
             out << it->c_str();
@@ -173,7 +173,7 @@ void AtomicModel::purgeConditions(const std::set < std::string >&
 {
     for (int i = m_conditions.size() - 1; i >= 0; --i) {
 
-        std::set < std::string >::iterator itfind =
+        auto itfind =
             conditionlist.find(m_conditions[i]);
 
         if (itfind == conditionlist.end()) {

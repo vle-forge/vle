@@ -211,11 +211,11 @@ void Vpz::validateFile(const std::string& filename)
     xmlDocPtr doc;
 
     ctxt = xmlNewParserCtxt();
-    if (ctxt == NULL) {
+    if (ctxt == nullptr) {
         throw utils::SaxParserError(_("Failed to allocate parser context\n"));
     }
 
-    doc = xmlCtxtReadFile(ctxt, filename.c_str(), NULL, XML_PARSE_DTDVALID);
+    doc = xmlCtxtReadFile(ctxt, filename.c_str(), nullptr, XML_PARSE_DTDVALID);
     if (not doc) {
         std::string msg((fmt(_("Failed to parse '%1%': %2%")) % filename %
                          (ctxt->lastError.message ? ctxt->lastError.message :
@@ -245,11 +245,11 @@ void Vpz::validateMemory(const std::string& buffer)
     xmlDocPtr doc;
 
     ctxt = xmlNewParserCtxt();
-    if (ctxt == NULL) {
+    if (ctxt == nullptr) {
         throw utils::SaxParserError(_("Failed to allocate parser context\n"));
     }
 
-    doc = xmlCtxtReadMemory(ctxt, buffer.c_str(), buffer.size(), NULL, NULL,
+    doc = xmlCtxtReadMemory(ctxt, buffer.c_str(), buffer.size(), nullptr, nullptr,
                             XML_PARSE_DTDVALID);
     if (not doc) {
         xmlFreeParserCtxt(ctxt);

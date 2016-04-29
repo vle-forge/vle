@@ -168,7 +168,7 @@ void SaxParser::onStartElement(void* ctx, const xmlChar* name,
 
     if (not sax->isStopped()) {
         sax->clearLastCharactersStored();
-        StartFuncList::iterator it = sax->m_starts.find(name);
+        auto it = sax->m_starts.find(name);
         if (it != sax->m_starts.end()) {
             try {
                 (sax->*(it->second))(atts);
@@ -187,7 +187,7 @@ void SaxParser::onEndElement(void* ctx, const xmlChar* name)
     SaxParser* sax = static_cast < SaxParser* >(ctx);
 
     if (not sax->isStopped()) {
-        EndFuncList::iterator it = sax->m_ends.find(name);
+        auto it = sax->m_ends.find(name);
         if (it != sax->m_ends.end()) {
             try {
                 (sax->*(it->second))();
@@ -226,7 +226,7 @@ void SaxParser::onCDataBlock(void* ctx, const xmlChar* value, int len)
 
 void SaxParser::onWarning(void* /* ctx */, const char *msg, ...)
 {
-    char* buffer = new char[1024];
+    auto  buffer = new char[1024];
     memset(buffer, 0, 1024);
 
     va_list args;
@@ -245,7 +245,7 @@ void SaxParser::onError(void* ctx, const char *msg, ...)
     setlocale(LC_ALL, "");
 
     SaxParser* sax = static_cast < SaxParser* >(ctx);
-    char* buffer = new char[1024];
+    auto  buffer = new char[1024];
     memset(buffer, 0, 1024);
 
     va_list args;
@@ -262,7 +262,7 @@ void SaxParser::onFatalError(void* ctx, const char *msg, ...)
     setlocale(LC_ALL, "");
 
     SaxParser* sax = static_cast < SaxParser* >(ctx);
-    char* buffer = new char[1024];
+    auto  buffer = new char[1024];
     memset(buffer, 0, 1024);
 
     va_list args;
@@ -306,14 +306,14 @@ void SaxParser::onSet(const xmlChar**)
 
 void SaxParser::onMatrix(const xmlChar** att)
 {
-    const xmlChar* rows = 0;
-    const xmlChar* columns = 0;
-    const xmlChar* rowmax = 0;
-    const xmlChar* columnmax = 0;
-    const xmlChar* columnstep = 0;
-    const xmlChar* rowstep = 0;
+    const xmlChar* rows = nullptr;
+    const xmlChar* columns = nullptr;
+    const xmlChar* rowmax = nullptr;
+    const xmlChar* columnmax = nullptr;
+    const xmlChar* columnstep = nullptr;
+    const xmlChar* rowstep = nullptr;
 
-    for (int i = 0; att[i] != 0; i += 2) {
+    for (int i = 0; att[i] != nullptr; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"rows") == 0) {
             rows = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"columns") == 0) {
@@ -358,9 +358,9 @@ void SaxParser::onMap(const xmlChar**)
 
 void SaxParser::onKey(const xmlChar** att)
 {
-    const xmlChar* name = 0;
+    const xmlChar* name = nullptr;
 
-    for (int i = 0; att[i] != 0; i += 2) {
+    for (int i = 0; att[i] != nullptr; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
             name = att[i + 1];
         }
@@ -381,10 +381,10 @@ void SaxParser::onTuple(const xmlChar**)
 
 void SaxParser::onTable(const xmlChar** att)
 {
-    const xmlChar* width = 0;
-    const xmlChar* height = 0;
+    const xmlChar* width = nullptr;
+    const xmlChar* height = nullptr;
 
-    for (int i = 0; att[i] != 0; i += 2) {
+    for (int i = 0; att[i] != nullptr; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"width") == 0) {
             width = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"height") == 0) {
@@ -606,11 +606,10 @@ void SaxParser::onEndTuple()
     boost::algorithm::split(result, cpy,
                             boost::algorithm::is_any_of(" \n\t\r"));
 
-    for (std::vector < std::string >::iterator it = result.begin();
-         it != result.end(); ++it) {
-        boost::algorithm::trim(*it);
-        if (not (*it).empty()) {
-            tuple.add(xmlCharToDouble((const xmlChar*)((*it).c_str())));
+    for (auto & elem : result) {
+        boost::algorithm::trim(elem);
+        if (not (elem).empty()) {
+            tuple.add(xmlCharToDouble((const xmlChar*)((elem).c_str())));
         }
     }
 
@@ -644,11 +643,10 @@ void SaxParser::onEndTable()
 
     value::Table::index i = 0;
     value::Table::index j = 0;
-    for (std::vector < std::string >::iterator it = result.begin(); it !=
-         result.end(); ++it) {
-        boost::algorithm::trim(*it);
-        if (not (*it).empty()) {
-            table.get(i, j) = xmlCharToDouble((const xmlChar*)((*it).c_str()));
+    for (auto & elem : result) {
+        boost::algorithm::trim(elem);
+        if (not (elem).empty()) {
+            table.get(i, j) = xmlCharToDouble((const xmlChar*)((elem).c_str()));
             if (i + 1 >= table.width()) {
                 i = 0;
                 if (j + 1 >= table.height()) {
@@ -681,9 +679,8 @@ void SaxParser::onEndPort()
     if (m_vpzstack.top()->isCondition()) {
         value::Set& vals(m_vpzstack.popConditionPort());
         std::vector <std::unique_ptr<value::Value>>& lst(getValues());
-        for (std::vector < std::unique_ptr<value::Value>>::iterator it =
-             lst.begin(); it != lst.end(); ++it) {
-            vals.add(std::move(*it));
+        for (auto & elem : lst) {
+            vals.add(std::move(elem));
         }
         m_valuestack.clear();
     } else if (m_vpzstack.top()->isObservablePort()) {
@@ -856,7 +853,7 @@ bool xmlCharToBoolean(const xmlChar* str)
 
 long int xmlCharToInt(const xmlChar* str)
 {
-    char* res = 0;
+    char* res = nullptr;
 
     errno = 0;
     long int r = strtol((const char*)str, &res, 10);
@@ -879,7 +876,7 @@ long int xmlCharToInt(const xmlChar* str)
 
 unsigned long int xmlCharToUnsignedInt(const xmlChar* str)
 {
-    char* res = 0;
+    char* res = nullptr;
 
     errno = 0;
     unsigned long int r = strtoul((const char*)str, &res, 10);
@@ -902,7 +899,7 @@ unsigned long int xmlCharToUnsignedInt(const xmlChar* str)
 
 double xmlCharToDouble(const xmlChar* str)
 {
-    char* res = 0;
+    char* res = nullptr;
 
     errno = 0;
     double r = strtod((const char*)str, &res);

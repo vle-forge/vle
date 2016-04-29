@@ -80,31 +80,31 @@ BOOST_AUTO_TEST_CASE(test_findModelFromPath)
 {
     vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz"));
     BaseModel* d = file.project().model().model()->findModelFromPath("d");
-    bool found = (d != 0);
+    bool found = (d != nullptr);
 
     BOOST_REQUIRE_EQUAL(found, true);
     BaseModel* top1 = file.project().model().model()->findModelFromPath("top1");
-    found = (top1 != 0);
+    found = (top1 != nullptr);
     BOOST_REQUIRE_EQUAL(found, true);
     BaseModel* top2_g = file.project().model().model()->findModelFromPath("top2,g");
-    found = (top2_g != 0);
+    found = (top2_g != nullptr);
     BOOST_REQUIRE_EQUAL(found, true);
     BaseModel* nomodel =
         file.project().model().model()->findModelFromPath("nomodel");
-    found = (nomodel != 0);
+    found = (nomodel != nullptr);
     BOOST_REQUIRE_EQUAL(found, false);
     BaseModel* empty = file.project().model().model()->findModelFromPath("");
-    found = (empty != 0);
+    found = (empty != nullptr);
     BOOST_REQUIRE_EQUAL(found, false);
     BaseModel* top1_a_nomodel =
         file.project().model().model()->findModelFromPath("top1,a,nomodel");
-    found = (top1_a_nomodel != 0);
+    found = (top1_a_nomodel != nullptr);
     BOOST_REQUIRE_EQUAL(found, false);
 }
 
 BOOST_AUTO_TEST_CASE(test_del_all_connection)
 {
-    CoupledModel* top = new CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
     AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(test_del_all_connection)
 
 BOOST_AUTO_TEST_CASE(test_have_connection)
 {
-    CoupledModel* top = new CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
     AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_have_connection)
 
 BOOST_AUTO_TEST_CASE(test_displace)
 {
-    CoupledModel* top = new CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
     AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(test_displace)
     top->addInternalConnection("a", "out", "b", "in");
     top->addInternalConnection("b", "out", "a", "in");
 
-    CoupledModel* newtop = new CoupledModel("newtop", 0);
+    CoupledModel* newtop = new CoupledModel("newtop", nullptr);
 
     ModelList lst;
     lst["a"] = a;
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(test_displace)
 
 BOOST_AUTO_TEST_CASE(test_complex_displace)
 {
-    CoupledModel* top = new CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
     AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(test_complex_displace)
 
 BOOST_AUTO_TEST_CASE(test_delinput_port)
 {
-    CoupledModel* top = new CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
     AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE(test_del_port)
 
 BOOST_AUTO_TEST_CASE(test_clone1)
 {
-    CoupledModel* top = new CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", nullptr);
     top->addInputPort("in");
     top->addOutputPort("out");
 
@@ -364,7 +364,7 @@ BOOST_AUTO_TEST_CASE(test_clone1)
     BOOST_REQUIRE(top->existInternalConnection("b", "out", "top", "in"));
 
     CoupledModel* newtop(dynamic_cast < CoupledModel* >(top->clone()));
-    BOOST_REQUIRE(newtop != 0);
+    BOOST_REQUIRE(newtop != nullptr);
     BOOST_REQUIRE(newtop->getModelList().size() == 2);
 
     AtomicModel* newa = dynamic_cast < AtomicModel* >(newtop->findModel("top"));

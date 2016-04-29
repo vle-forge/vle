@@ -56,18 +56,15 @@ void Condition::write(std::ostream& out) const
 {
     out << "<condition name=\"" << m_name.c_str() << "\" >\n";
 
-    for (ConditionValues::const_iterator it = m_list.begin(); it !=
-         m_list.end();
-         ++it) {
+    for (const auto & elem : m_list) {
         out << " <port "
-            << "name=\"" << it->first.c_str() << "\" "
+            << "name=\"" << elem.first.c_str() << "\" "
             << ">\n";
 
         assert(it->second);
-        const value::VectorValue& val(value::toSet(*it->second));
-        for (value::VectorValue::const_iterator jt = val.begin();
-             jt != val.end(); ++jt) {
-            (*jt)->writeXml(out);
+        const value::VectorValue& val(value::toSet(*elem.second));
+        for (const auto & val_jt : val) {
+            (val_jt)->writeXml(out);
             out << "\n";
         }
         out << "</port>\n";
@@ -177,7 +174,7 @@ void Condition::fillWithFirstValues(value::MapValue& mapToFill) const
 
 const value::Set& Condition::getSetValues(const std::string& portname) const
 {
-    ConditionValues::const_iterator it = m_list.find(portname);
+    auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
         throw utils::ArgError(fmt(_("Condition %1% have no port %2%")) % m_name
@@ -190,7 +187,7 @@ const value::Set& Condition::getSetValues(const std::string& portname) const
 
 value::Set& Condition::getSetValues(const std::string& portname)
 {
-    ConditionValues::iterator it = m_list.find(portname);
+    auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
         throw utils::ArgError(fmt(_("Condition %1% have no port %2%")) % m_name
@@ -214,7 +211,7 @@ const value::Value& Condition::nValue(const std::string& portname,
 
 value::Set& Condition::lastAddedPort()
 {
-    ConditionValues::iterator it = m_list.find(m_last_port);
+    auto it = m_list.find(m_last_port);
 
     if (it == m_list.end()) {
         throw utils::ArgError(fmt(_("Condition %1% have no port %2%")) % m_name
@@ -228,9 +225,8 @@ value::Set& Condition::lastAddedPort()
 
 void Condition::deleteValueSet()
 {
-    for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
-         ++it) {
-        it->second->clear();
+    for (auto & elem : m_list) {
+        elem.second->clear();
     }
 }
 

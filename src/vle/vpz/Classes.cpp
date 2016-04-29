@@ -63,7 +63,7 @@ void Classes::del(const std::string& name)
 
 const Class& Classes::get(const std::string& name) const
 {
-    const_iterator it = m_lst.find(name);
+    auto it = m_lst.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknow class '%1%'")) % name);
@@ -74,7 +74,7 @@ const Class& Classes::get(const std::string& name) const
 
 Class& Classes::get(const std::string& name)
 {
-    iterator it = m_lst.find(name);
+    auto it = m_lst.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknow class '%1%'")) % name);
@@ -89,7 +89,7 @@ void Classes::rename(const std::string& oldname, const std::string& newname)
         throw utils::ArgError(fmt(_("Class '%1%' already exists")) % newname);
     }
 
-    iterator it = m_lst.find(oldname);
+    auto it = m_lst.find(oldname);
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknow class '%1%'")) % oldname);
     }
@@ -104,7 +104,7 @@ void Classes::rename(const std::string& oldname, const std::string& newname)
 void Classes::updateDynamics(const std::string& oldname,
                              const std::string& newname)
 {
-    vpz::ClassList::iterator it = m_lst.begin();
+    auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.updateDynamics(oldname, newname);
         ++it;
@@ -113,7 +113,7 @@ void Classes::updateDynamics(const std::string& oldname,
 
 void Classes::purgeDynamics(const std::set < std::string >& dynamicslist)
 {
-    vpz::ClassList::iterator it = m_lst.begin();
+    auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.purgeDynamics(dynamicslist);
         ++it;
@@ -123,7 +123,7 @@ void Classes::purgeDynamics(const std::set < std::string >& dynamicslist)
 void Classes::updateObservable(const std::string& oldname,
                                const std::string& newname)
 {
-    vpz::ClassList::iterator it = m_lst.begin();
+    auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.updateObservable(oldname, newname);
          ++it;
@@ -132,7 +132,7 @@ void Classes::updateObservable(const std::string& oldname,
 
 void Classes::purgeObservable(const std::set < std::string >& observablelist)
 {
-    vpz::ClassList::iterator it = m_lst.begin();
+    auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.purgeObservable(observablelist);
          ++it;
@@ -142,7 +142,7 @@ void Classes::purgeObservable(const std::set < std::string >& observablelist)
 void Classes::updateConditions(const std::string& oldname,
                               const std::string& newname)
 {
-    vpz::ClassList::iterator it = m_lst.begin();
+    auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.updateConditions(oldname, newname);
          ++it;
@@ -151,7 +151,7 @@ void Classes::updateConditions(const std::string& oldname,
 
 void Classes::purgeConditions(const std::set < std::string >& conditionlist)
 {
-    vpz::ClassList::iterator it = m_lst.begin();
+    auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.purgeConditions(conditionlist);
         ++it;

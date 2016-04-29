@@ -71,14 +71,11 @@ void Dynamics::add(const Dynamics& dyns)
 
 Dynamic& Dynamics::add(const Dynamic& dynamic)
 {
-    std::pair < iterator, bool > r;
+    auto r = m_list.insert(std::make_pair(dynamic.name(), dynamic));
 
-    r = m_list.insert(value_type(dynamic.name(), dynamic));
-
-    if (not r.second) {
+    if (not r.second)
         throw utils::ArgError(fmt(
                 _("The dynamics '%1%' already exists")) % dynamic.name());
-    }
 
     return r.first->second;
 }
@@ -90,7 +87,7 @@ void Dynamics::del(const std::string& name)
 
 const Dynamic& Dynamics::get(const std::string& name) const
 {
-    const_iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(
@@ -102,7 +99,7 @@ const Dynamic& Dynamics::get(const std::string& name) const
 
 Dynamic& Dynamics::get(const std::string& name)
 {
-    iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(
@@ -114,10 +111,10 @@ Dynamic& Dynamics::get(const std::string& name)
 
 void Dynamics::cleanNoPermanent()
 {
-    iterator it = begin();
+    auto it = begin();
 
     while ((it = utils::findIf(it, end(), Dynamic::IsPermanent())) != end()) {
-        iterator del = it++;
+        auto del = it++;
         m_list.erase(del);
     }
 }
@@ -142,9 +139,9 @@ std::set < std::string > Dynamics::depends() const
 {
     std::set < std::string > result;
 
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if (not it->second.package().empty()) {
-            result.insert(it->second.package());
+    for (const auto & elem : *this) {
+        if (not elem.second.package().empty()) {
+            result.insert(elem.second.package());
         }
     }
 

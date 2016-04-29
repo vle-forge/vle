@@ -150,7 +150,7 @@ void Views::del(const std::string& name)
 
 const View& Views::get(const std::string& name) const
 {
-    ViewList::const_iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknow view '%1%'\n")) % name);
@@ -161,7 +161,7 @@ const View& Views::get(const std::string& name) const
 
 View& Views::get(const std::string& name)
 {
-    ViewList::iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknow view '%1%'\n")) % name);
@@ -174,7 +174,7 @@ void Views::renameOutput(const std::string& oldname,
                          const std::string& newname)
 {
     iterator prec;
-    for (iterator it = begin(); it != end(); ++it) {
+    for (auto it = begin(); it != end(); ++it) {
         prec = it;
         if (it->second.output() == oldname) {
             vpz::View copy(get(it->first));
@@ -268,7 +268,7 @@ void Views::copyView(const std::string& viewname,
 
 bool Views::isUsedOutput(const std::string& name) const
 {
-    ViewList::const_iterator it(std::find_if(begin(), end(), UseOutput(name)));
+    auto it(std::find_if(begin(), end(), UseOutput(name)));
     return it != end();
 }
 

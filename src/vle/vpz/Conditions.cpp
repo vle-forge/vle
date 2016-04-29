@@ -137,7 +137,7 @@ void Conditions::copy(const std::string& conditionname,
 
 void Conditions::clear()
 {
-    iterator it = m_list.begin();
+    auto it = m_list.begin();
 
     if (it == m_list.end()) {
         Condition& def= add(Experiment::defaultSimulationEngineCondName());
@@ -145,7 +145,7 @@ void Conditions::clear()
         def.setValueToPort("duration", value::Double::create(100.0));
     } else {
         do {
-            iterator tmp = it;
+            auto tmp = it;
             ++it;
 
             if (tmp->first != Experiment::defaultSimulationEngineCondName())
@@ -156,7 +156,7 @@ void Conditions::clear()
 
 const Condition& Conditions::get(const std::string& condition) const
 {
-    const_iterator it = m_list.find(condition);
+    auto it = m_list.find(condition);
 
     if (it == end()) {
         throw utils::ArgError(fmt(
@@ -168,7 +168,7 @@ const Condition& Conditions::get(const std::string& condition) const
 
 Condition& Conditions::get(const std::string& condition)
 {
-    iterator it = m_list.find(condition);
+    auto it = m_list.find(condition);
 
     if (it == end()) {
         throw utils::ArgError(fmt(
@@ -180,10 +180,10 @@ Condition& Conditions::get(const std::string& condition)
 
 void Conditions::cleanNoPermanent()
 {
-    iterator it = begin();
+    auto it = begin();
 
     while ((it = utils::findIf(it, end(), Condition::IsPermanent())) != end()) {
-        iterator del = it++;
+        auto del = it++;
         m_list.erase(del);
     }
 }

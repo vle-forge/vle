@@ -39,8 +39,8 @@ void ObservablePort::write(std::ostream& out) const
         out << "<port name=\"" << m_name.c_str() << "\" />\n";
     } else {
         out << "<port name=\"" << m_name.c_str() << "\" >\n";
-        for (const_iterator it = begin(); it != end(); ++it) {
-            out << " <attachedview name=\"" << it->c_str() << "\" />\n";
+        for (const auto & elem : *this) {
+            out << " <attachedview name=\"" << elem.c_str() << "\" />\n";
         }
         out << "</port>\n";
     }
@@ -116,7 +116,7 @@ ObservablePort& Observable::add(const ObservablePort& obs)
 
 ObservablePort& Observable::get(const std::string& portname)
 {
-    iterator it = m_list.find(portname);
+    auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
         throw utils::ArgError(fmt(
@@ -128,7 +128,7 @@ ObservablePort& Observable::get(const std::string& portname)
 
 const ObservablePort& Observable::get(const std::string& portname) const
 {
-    const_iterator it = m_list.find(portname);
+    auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
         throw utils::ArgError(fmt(
@@ -140,7 +140,7 @@ const ObservablePort& Observable::get(const std::string& portname) const
 
 void Observable::del(const std::string& portname)
 {
-    iterator it = m_list.find(portname);
+    auto it = m_list.find(portname);
     if (it != end()) {
         m_list.erase(it);
     }

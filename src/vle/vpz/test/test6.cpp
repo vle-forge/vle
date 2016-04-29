@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(single_class)
     BOOST_REQUIRE_EQUAL(classes.exist("xxx"), true);
 
     const vpz::Class& classe(classes.get("xxx"));
-    BOOST_REQUIRE(classe.model() != 0);
+    BOOST_REQUIRE(classe.model() != nullptr);
 
     const vpz::BaseModel* mdl = classe.model();
     BOOST_REQUIRE(mdl->isCoupled());
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_CASE(single_class_utf8)
     BOOST_REQUIRE_EQUAL(classes.exist("xx € ç x"), true);
 
     const vpz::Class& classe(classes.get("xx € ç x"));
-    BOOST_REQUIRE(classe.model() != 0);
+    BOOST_REQUIRE(classe.model() != nullptr);
 
     const vpz::BaseModel* mdl = classe.model();
     BOOST_REQUIRE(mdl->isCoupled());

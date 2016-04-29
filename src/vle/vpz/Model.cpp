@@ -34,8 +34,8 @@ namespace vle { namespace vpz {
 Model::Model(const Model& mdl) :
     Base(mdl)
 {
-    if (mdl.m_graph == 0) {
-        m_graph = 0;
+    if (mdl.m_graph == nullptr) {
+        m_graph = nullptr;
     } else {
         m_graph = mdl.m_graph->clone();
     }
@@ -51,7 +51,7 @@ void Model::write(std::ostream& out) const
 void Model::clear()
 {
     // m_atomicmodels.clear();
-    m_graph = 0;
+    m_graph = nullptr;
 }
 
 void Model::setModel(BaseModel* mdl)

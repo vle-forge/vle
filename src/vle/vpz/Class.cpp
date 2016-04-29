@@ -34,8 +34,8 @@ Class::Class(const Class& cls) :
     Base(cls),
     m_name(cls.m_name)
 {
-    if (cls.m_model == 0) {
-        m_model = 0;
+    if (cls.m_model == nullptr) {
+        m_model = nullptr;
     } else {
         m_model = cls.m_model->clone();
     }

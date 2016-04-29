@@ -82,7 +82,7 @@ Observable& Observables::add(const Observable& obs)
 
 Observable& Observables::get(const std::string& name)
 {
-    iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == m_list.end()) {
         throw utils::ArgError(fmt(_("Observable %1% does not exist")) % name);
@@ -93,7 +93,7 @@ Observable& Observables::get(const std::string& name)
 
 const Observable& Observables::get(const std::string& name) const
 {
-    const_iterator it = m_list.find(name);
+    auto it = m_list.find(name);
 
     if (it == m_list.end()) {
         throw utils::ArgError(fmt(
@@ -109,7 +109,7 @@ void Observables::rename(const std::string& old_name,
     Observable& obs = get(old_name);
     Observable new_obs(new_name);
     const ObservablePortList& port_list = obs.observableportlist();
-    ObservablePortList::const_iterator it_port = port_list.begin();
+    auto it_port = port_list.begin();
     while (it_port != port_list.end()) {
         new_obs.add(it_port->second);
         ++it_port;
@@ -120,11 +120,11 @@ void Observables::rename(const std::string& old_name,
 
 void Observables::cleanNoPermanent()
 {
-    iterator it = m_list.begin();
+    auto it = m_list.begin();
 
     while ((it = utils::findIf(it, end(), Observable::IsPermanent())) != end())
     {
-        iterator del = it++;
+        auto del = it++;
         m_list.erase(del);
     }
 }
@@ -132,9 +132,9 @@ void Observables::cleanNoPermanent()
 void Observables::updateView(const std::string& oldname,
                              const std::string& newname)
 {
-    for (iterator itobs = m_list.begin(); itobs != m_list.end(); ++itobs) {
-	if (itobs->second.hasView(oldname)) {
-	    vpz::Observable& obs = itobs->second;
+    for (auto & elem : m_list) {
+	if (elem.second.hasView(oldname)) {
+	    vpz::Observable& obs = elem.second;
 	    ObservablePortList::iterator itport;
 	    for (itport = obs.begin(); itport != obs.end(); ++itport) {
 		vpz::ObservablePort& obsport = itport->second;
