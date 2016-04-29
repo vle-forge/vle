@@ -37,16 +37,11 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/vle.hpp>
-#include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <numeric>
 #include <boost/program_options.hpp>
-
-#ifndef NDEBUG
-# include <vle/devs/ExternalEvent.hpp>
-# include <vle/devs/InternalEvent.hpp>
-# include <vle/value/Value.hpp>
-#endif
+#include <cstdlib>
 
 namespace po = boost::program_options;
 
