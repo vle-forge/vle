@@ -30,7 +30,6 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/Project.hpp>
-#include <vle/vpz/SaxParser.hpp>
 #include <set>
 #include <string>
 

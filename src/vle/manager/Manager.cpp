@@ -37,6 +37,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <boost/thread/thread.hpp>

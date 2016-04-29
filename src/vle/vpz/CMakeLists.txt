@@ -13,10 +13,9 @@ add_sources(vlelib Base.hpp Class.cpp Classes.cpp Classes.hpp
 install(FILES Base.hpp Classes.hpp Class.hpp Condition.hpp
   Conditions.hpp Dynamic.hpp Dynamics.hpp Experiment.hpp Model.hpp
   Observable.hpp Observables.hpp Output.hpp Outputs.hpp Port.hpp
-  Project.hpp SaxParser.hpp SaxStackValue.hpp SaxStackVpz.hpp
-  Structures.hpp View.hpp Views.hpp Vpz.hpp AtomicModel.hpp
-  CoupledModel.hpp BaseModel.hpp ModelPortList.hpp DESTINATION
-  ${VLE_INCLUDE_DIRS}/vpz)
+  Project.hpp Structures.hpp View.hpp Views.hpp Vpz.hpp
+  AtomicModel.hpp CoupledModel.hpp BaseModel.hpp ModelPortList.hpp
+  DESTINATION ${VLE_INCLUDE_DIRS}/vpz)
 
 if (VLE_HAVE_UNITTESTFRAMEWORK)
   add_subdirectory(test)

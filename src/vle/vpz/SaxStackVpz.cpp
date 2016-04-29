@@ -26,6 +26,7 @@
 
 
 #include <vle/vpz/SaxStackVpz.hpp>
+#include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Port.hpp>
 #include <vle/vpz/Vpz.hpp>

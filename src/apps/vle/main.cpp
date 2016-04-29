@@ -35,6 +35,7 @@
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/vle.hpp>
 #include <cstdlib>
 #include <iostream>
