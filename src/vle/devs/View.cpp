@@ -95,7 +95,7 @@ void View::run(const Time& time)
     if (not m_observableList.empty()) {
         for (ObservableList::iterator it = m_observableList.begin();
              it != m_observableList.end(); ++it) {
-            ObservationEvent event(time, it->first, getName(), it->second);
+            ObservationEvent event(time, getName(), it->second);
             std::unique_ptr<value::Value> val = it->first->observation(event);
             m_stream->process(it->first, it->second, time, getName(),
                               std::move(val));

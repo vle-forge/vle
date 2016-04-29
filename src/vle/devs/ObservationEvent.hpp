@@ -50,11 +50,9 @@ public:
     ObservationEvent& operator=(const ObservationEvent& other) = delete;
 
     ObservationEvent(const Time& time,
-                     Simulator* model,
                      const std::string& viewname,
                      const std::string& portName)
-        : m_model(model)
-        , m_time(time)
+        : m_time(time)
         , m_viewName(viewname)
         , m_portName(portName)
     {
@@ -78,7 +76,6 @@ public:
     { return m_time; }
 
 private:
-    Simulator  *m_model;
     Time        m_time;
     std::string m_viewName;
     std::string m_portName;
