@@ -48,7 +48,7 @@ void StreamReader::initPlugin(const std::string& plugin,
                               const std::string& location,
                               const utils::ModuleManager& modulemgr)
 {
-    void *symbol = 0;
+    void *symbol = nullptr;
 
     try {
         symbol = modulemgr.get(package, plugin, utils::MODULE_OOV);
