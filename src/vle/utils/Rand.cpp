@@ -24,11 +24,97 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <cmath>
 #include <vle/utils/Rand.hpp>
+#include <cmath>
 
 namespace vle { namespace utils {
+
+Rand::Rand(result_type seed)
+    : m_rand(seed)
+{
+}
+
+void Rand::seed(result_type seed)
+{
+    m_rand.seed(seed);
+}
+
+bool Rand::getBool()
+{
+    std::bernoulli_distribution distrib(0.5);
+    return distrib(m_rand);
+}
+
+Rand::result_type Rand::getInt()
+{
+    return m_rand();
+}
+
+int Rand::getInt(int begin, int end)
+{
+    std::uniform_int_distribution<int> distrib(begin, end);
+    return distrib(m_rand);
+}
+
+double Rand::getDouble()
+{
+    std::uniform_real_distribution<double> distrib(0.0, 1.0);
+    return distrib(m_rand);
+}
+
+double Rand::getDouble(double begin, double end)
+{
+    std::uniform_real_distribution<double> distrib(begin, end);
+    return distrib(m_rand);
+}
+
+double Rand::normal(double mean, double sigma)
+{
+    std::normal_distribution<double> distrib(mean, sigma);
+    return distrib(m_rand);
+}
+
+double Rand::logNormal(double mean, double sigma)
+{
+    std::lognormal_distribution<double> distrib(mean, sigma);
+    return distrib(m_rand);
+}
+
+double Rand::exponential(double rate)
+{
+    std::exponential_distribution <double> distrib(rate);
+    return distrib(m_rand);
+}
+
+double Rand::poisson(double mean)
+{
+    std::poisson_distribution <int> distrib(mean);
+    return distrib(m_rand);
+}
+
+double Rand::gamma(double alpha)
+{
+    std::gamma_distribution <double> distrib(alpha);
+    return distrib(m_rand);
+}
+
+double Rand::binomial(int t, double p)
+{
+    std::binomial_distribution <int> distrib(t, p);
+    return distrib(m_rand);
+}
+
+double Rand::geometric(double p)
+{
+    std::geometric_distribution <int> distrib(p);
+    return distrib(m_rand);
+}
+
+double Rand::cauchy(double median, double sigma)
+{
+    std::cauchy_distribution <double> distrib(median, sigma);
+    return distrib(m_rand);
+}
 
 double Rand::vonMises(const double kappa, const double mu)
 {
@@ -69,11 +155,21 @@ double Rand::getDoubleExcluded()
     return x ;
 }
 
+double Rand::triangle(double a, double b, double c)
+{
+    double u = getDouble();
+    double f = (c - a) / (b - a);
+
+    if (u <= f)
+        return a + std::sqrt(u * (b - a) * (c - a));
+
+    return b - std::sqrt((1 - u) * (b - a) * (b - c));
+}
+
 double Rand::weibull(const double a, const double b)
 {
-    double x = pow(-log(getDoubleExcluded()), 1.0 / a);
-
-    return b * x;
+    std::weibull_distribution<double> distrib(a, b);
+    return distrib(m_rand);
 }
 
 double Rand::weibull3(const double a, const double b, const double c)
