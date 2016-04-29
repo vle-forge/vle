@@ -48,7 +48,7 @@ class ExperimentGenerator::Pimpl
 
         const vpz::Conditions& cnds(mVpz.project().experiment().conditions());
 
-        vpz::ConditionList::const_iterator it = cnds.conditionlist().begin();
+        auto it = cnds.conditionlist().begin();
         while (it != cnds.conditionlist().end()) {
             const vpz::Condition& cnd(it->second);
             vpz::ConditionValues::const_iterator jt;
@@ -143,25 +143,24 @@ public:
             const vpz::ConditionValues& cnvsrc = it->second.conditionvalues();
             vpz::ConditionValues& cnvdst = r.first->second.conditionvalues();
 
-            for (vpz::ConditionValues::const_iterator jt = cnvsrc.begin();
-                 jt != cnvsrc.end(); ++jt) {
+            for (const auto & elem : cnvsrc) {
 
                 auto cpy = std::unique_ptr<value::Set>(new value::Set());
 
-                if (jt->second->size() == 1) {
-                    cpy->add(jt->second->get(0)->clone());
-                } else if (jt->second->size() > 1 and jt->second->size() >
+                if (elem.second->size() == 1) {
+                    cpy->add(elem.second->get(0)->clone());
+                } else if (elem.second->size() > 1 and elem.second->size() >
                            index) {
-                    cpy->add(jt->second->get(index)->clone());
+                    cpy->add(elem.second->get(index)->clone());
                 } else {
                     throw utils::InternalError(
                         fmt(
                             _("ExperimentGenerator can not access to the index"
                               " `%1%' of the condition `%2%' port `%3%' ")) %
-                        index % it->first % jt->first);
+                        index % it->first % elem.first);
                 }
 
-                cnvdst[jt->first] = std::move(cpy);
+                cnvdst[elem.first] = std::move(cpy);
             }
         }
     }

@@ -145,7 +145,7 @@ public:
 
             for (uint32_t i = expgen.min() + index; i < expgen.max();
                  i += threads) {
-                Simulation sim(mLogOption, mSimulationOption, NULL);
+                Simulation sim(mLogOption, mSimulationOption, nullptr);
                 Error err;
 
                 auto file =
@@ -208,7 +208,7 @@ public:
                    uint32_t              world,
                    Error                *error)
     {
-        Simulation sim(mLogOption, mSimulationOption, NULL);
+        Simulation sim(mLogOption, mSimulationOption, nullptr);
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
         std::unique_ptr<value::Matrix> result;
