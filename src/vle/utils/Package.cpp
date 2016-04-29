@@ -89,8 +89,8 @@ struct Package::Pimpl
     {
     }
 
-    Pimpl(const std::string& pkgname) :
-        m_pkgname(pkgname), m_pkgbinarypath(), m_pkgsourcepath()
+    Pimpl(std::string  pkgname) :
+        m_pkgname(std::move(pkgname)), m_pkgbinarypath(), m_pkgsourcepath()
     {
         refreshPath();
     }

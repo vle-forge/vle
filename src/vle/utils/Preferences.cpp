@@ -71,9 +71,9 @@ namespace vle { namespace utils {
 class Preferences::Pimpl
 {
 public:
-    Pimpl(bool readOnly, const std::string& filename)
+    Pimpl(bool readOnly, std::string  filename)
         : mreadOnly(readOnly),
-          mFilename(filename),
+          mFilename(std::move(filename)),
           mGvlePackagesOptions("gvle.packages"),
           mGvleEditorOptions("gvle.editor"),
           mGvleGraphicsOptions("gvle.graphics"),
@@ -82,94 +82,94 @@ public:
     {
          mGvleEditorOptions.add_options()
             ("gvle.packages.auto-build", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Auto build"));
 
         mGvleEditorOptions.add_options()
             ("gvle.editor.auto-indent", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Auto indent"))
             ("gvle.editor.font", po::value < std::string >
-             (NULL)->default_value("Monospace 10"),
+             (nullptr)->default_value("Monospace 10"),
              _("Font"))
             ("gvle.editor.highlight-line", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Highlight line"))
             ("gvle.editor.highlight-brackets", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Highlight line"))
             ("gvle.editor.highlight-syntax", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Highlight syntax"))
             ("gvle.editor.indent-on-tab", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              ("Indent on tabulation"))
             ("gvle.editor.indent-size", po::value < uint32_t >
-             (NULL)->default_value(4),
+             (nullptr)->default_value(4),
              _("Indentation size"))
             ("gvle.editor.show-line-numbers", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Show line numbers"))
             ("gvle.editor.show-right-margin", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Show right margin"))
             ("gvle.editor.smart-home-end", po::value < bool >
-             (NULL)->default_value(true),
+             (nullptr)->default_value(true),
              _("Smart Home end"));
 
         mGvleGraphicsOptions.add_options()
             ("gvle.graphics.background-color", po::value < std::string >
-             (NULL)->default_value("#ffffffffffff"))
+             (nullptr)->default_value("#ffffffffffff"))
             ("gvle.graphics.foreground-color", po::value < std::string >
-             (NULL)->default_value("#000000000000"))
+             (nullptr)->default_value("#000000000000"))
             ("gvle.graphics.atomic-color", po::value < std::string >
-             (NULL)->default_value("#0000ffff0000"))
+             (nullptr)->default_value("#0000ffff0000"))
             ("gvle.graphics.coupled-color", po::value < std::string >
-             (NULL)->default_value("#00000000ffff"))
+             (nullptr)->default_value("#00000000ffff"))
             ("gvle.graphics.selected-color", po::value < std::string >
-             (NULL)->default_value("#ffff00000000"))
+             (nullptr)->default_value("#ffff00000000"))
             ("gvle.graphics.connection-color", po::value < std::string >
-             (NULL)->default_value("#000000000000"))
+             (nullptr)->default_value("#000000000000"))
             ("gvle.graphics.font", po::value < std::string >
-             (NULL)->default_value("Monospace 10"))
+             (nullptr)->default_value("Monospace 10"))
             ("gvle.graphics.font-size", po::value < double >
-             (NULL)->default_value(10.0))
+             (nullptr)->default_value(10.0))
             ("gvle.graphics.line-width", po::value < double >
-             (NULL)->default_value(3.0));
+             (nullptr)->default_value(3.0));
 
         mVlePackageOptions.add_options()
             ("vle.packages.configure", po::value < std::string >
-             (NULL)->default_value(VLE_PACKAGE_COMMAND_CONFIGURE))
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_CONFIGURE))
             ("vle.packages.test", po::value < std::string >
-             (NULL)->default_value(VLE_PACKAGE_COMMAND_TEST))
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_TEST))
             ("vle.packages.build", po::value < std::string >
-             (NULL)->default_value(VLE_PACKAGE_COMMAND_BUILD))
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_BUILD))
             ("vle.packages.install", po::value < std::string >
-             (NULL)->default_value(VLE_PACKAGE_COMMAND_INSTALL))
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_INSTALL))
             ("vle.packages.clean", po::value < std::string >
-             (NULL)->default_value(VLE_PACKAGE_COMMAND_CLEAN))
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_CLEAN))
             ("vle.packages.package", po::value < std::string >
-             (NULL)->default_value(VLE_PACKAGE_COMMAND_PACKAGE))
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_PACKAGE))
             ("vle.packages.unzip", po::value < std::string >
-             (NULL)->default_value(VLE_PACKAGE_COMMAND_UNZIP));
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_UNZIP));
 
         mVleDaemonOptions.add_options()
             ("vle.daemon.hosts", po::value < std::string >
-             (NULL)->default_value("localhost"))
+             (nullptr)->default_value("localhost"))
             ("vle.daemon.ports", po::value < std::string >
-             (NULL)->default_value("8001"))
+             (nullptr)->default_value("8001"))
             ("vle.daemon.processes", po::value < std::string >
-             (NULL)->default_value("1"));
+             (nullptr)->default_value("1"));
 
         mVleRemoteOptions.add_options()
             ("vle.remote.url", po::value < std::string >
-             (NULL)->default_value((fmt(
+             (nullptr)->default_value((fmt(
                          "http://www.vle-project.org/pub/%1%.%2%") %
                      VLE_MAJOR_VERSION % VLE_MINOR_VERSION).str()))
             ("vle.remote.proxy_ip", po::value < std::string >
-             (NULL)->default_value(""))
+             (nullptr)->default_value(""))
             ("vle.remote.proxy_port", po::value < std::string >
-             (NULL)->default_value(""));
+             (nullptr)->default_value(""));
 
         mConfigFileOptions.add(mVlePackageOptions).
             add(mGvleEditorOptions).add(mGvleGraphicsOptions).
@@ -228,7 +228,7 @@ public:
 
     bool set(const std::string& key, const boost::any& value)
     {
-        po::variables_map::iterator it = mSettings.find(key);
+        auto it = mSettings.find(key);
 
         if (it != mSettings.end()) {
             it->second.value() = value;
@@ -240,7 +240,7 @@ public:
 
     boost::any get(const std::string& key)
     {
-        po::variables_map::iterator it = mSettings.find(key);
+        auto it = mSettings.find(key);
 
         if (it != mSettings.end()) {
             return it->second.value();

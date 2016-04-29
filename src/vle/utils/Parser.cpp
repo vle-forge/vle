@@ -52,7 +52,7 @@ void Block::addRelativeReal(const std::string& key, const double& val)
 
 Block& Block::addBlock(const std::string& name)
 {
-    std::multimap < std::string, Block >::iterator it =
+    auto it =
         blocks.insert(std::make_pair(name, Block(name)));
 
     return it->second;
@@ -60,7 +60,7 @@ Block& Block::addBlock(const std::string& name)
 
 const Block& Block::getBlock(const std::string& name) const
 {
-    std::multimap < std::string, Block >::const_iterator it = blocks.find(name);
+    auto it = blocks.find(name);
     if (it == blocks.end()) {
         throw utils::ParseError(fmt(
                 _("The block `%1%' does not exist")) % name);

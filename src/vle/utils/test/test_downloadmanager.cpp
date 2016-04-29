@@ -47,7 +47,7 @@ struct F
     vle::Init *a;
 
     F() throw()
-        : a(0)
+        : a(nullptr)
     {
         a = new vle::Init();
         vle::utils::Preferences prefs(false, "vle.conf");

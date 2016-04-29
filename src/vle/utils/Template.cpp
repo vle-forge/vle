@@ -35,7 +35,7 @@ namespace vle { namespace utils {
 
 void SymbolString::append(const std::string& key, const std::string& value)
 {
-    iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it != end()) {
         throw utils::ArgError(fmt(_("Symbol '%1%' already exist")) % key);
     }
@@ -44,7 +44,7 @@ void SymbolString::append(const std::string& key, const std::string& value)
 
 void SymbolString::remove(const std::string& key)
 {
-    iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it != end()) {
         lst_.erase(it);
     }
@@ -52,7 +52,7 @@ void SymbolString::remove(const std::string& key)
 
 const std::string& SymbolString::get(const std::string& key) const
 {
-    const_iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknown single symbol '%1%'")) % key);
     }
@@ -63,7 +63,7 @@ const std::string& SymbolString::get(const std::string& key) const
 
 void SymbolBool::append(const std::string& key, bool value)
 {
-    iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it != end()) {
         throw utils::ArgError(fmt(_("Symbol '%1%' already exist")) % key);
     }
@@ -72,7 +72,7 @@ void SymbolBool::append(const std::string& key, bool value)
 
 void SymbolBool::remove(const std::string& key)
 {
-    iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it != end()) {
         lst_.erase(it);
     }
@@ -80,7 +80,7 @@ void SymbolBool::remove(const std::string& key)
 
 bool SymbolBool::get(const std::string& key) const
 {
-    const_iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknown bool symbol '%1%'")) % key);
     }
@@ -91,7 +91,7 @@ bool SymbolBool::get(const std::string& key) const
 
 void SymbolList::append(const std::string& key)
 {
-    iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it == end()) {
         lst_.insert(std::make_pair(key, value_t()));
     }
@@ -99,7 +99,7 @@ void SymbolList::append(const std::string& key)
 
 void SymbolList::append(const std::string& key, const std::string& value)
 {
-    iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it != end()) {
         it->second.push_back(value);
     } else {
@@ -110,7 +110,7 @@ void SymbolList::append(const std::string& key, const std::string& value)
 
 void SymbolList::remove(const std::string& key)
 {
-    iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it != end()) {
         lst_.erase(it);
     }
@@ -119,7 +119,7 @@ void SymbolList::remove(const std::string& key)
 const std::string&
 SymbolList::get(const std::string& key, value_t::size_type i) const
 {
-    const_iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknown list symbol '%1%'")) % key);
     }
@@ -134,7 +134,7 @@ SymbolList::get(const std::string& key, value_t::size_type i) const
 SymbolList::value_t::size_type
 SymbolList::size(const std::string& key) const
 {
-    const_iterator it = lst_.find(key);
+    auto it = lst_.find(key);
     if (it == end()) {
         throw utils::ArgError(fmt(_("Unknown list symbol '%1%'")) % key);
     }

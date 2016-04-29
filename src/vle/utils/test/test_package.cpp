@@ -108,7 +108,7 @@ struct F
     fs::path current_path;
 
     F() throw()
-        : a(0)
+        : a(nullptr)
     {
         bs::error_code ec;
 
@@ -241,7 +241,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_check_package_tmp, F)
     utils::Packages results;
 
     {
-        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", NULL);
+        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
         BOOST_REQUIRE_EQUAL(results.empty(), true);
@@ -249,7 +249,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_check_package_tmp, F)
     }
 
     {
-        rmt.start(utils::REMOTE_MANAGER_LOCAL_SEARCH, ".*", NULL);
+        rmt.start(utils::REMOTE_MANAGER_LOCAL_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
 
@@ -312,7 +312,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
 
     {
         utils::Packages results;
-        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", NULL);
+        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
         BOOST_REQUIRE_EQUAL(results.empty(), false);
@@ -323,7 +323,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
 
     {
         utils::Packages results;
-        rmt.start(utils::REMOTE_MANAGER_LOCAL_SEARCH, ".*", NULL);
+        rmt.start(utils::REMOTE_MANAGER_LOCAL_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
         BOOST_REQUIRE_EQUAL(results.empty(), true);
@@ -384,7 +384,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
 
     {
         utils::RemoteManager rmt;
-        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", NULL);
+        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
 
         utils::Packages results;
@@ -396,7 +396,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
 
     {
         utils::RemoteManager rmt;
-        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", NULL);
+        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
 
         utils::Packages results;
@@ -408,7 +408,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
 
     {
         utils::RemoteManager rmt;
-        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", NULL);
+        rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
 
         utils::Packages results;

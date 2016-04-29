@@ -262,9 +262,9 @@ std::string demangle(const std::string& in)
 {
     std::string result;
 #ifdef VLE_HAVE_GCC_ABI_DEMANGLE
-    char* output = NULL;
+    char* output = nullptr;
     int status;
-    output = abi::__cxa_demangle(in.c_str(), NULL, NULL, &status);
+    output = abi::__cxa_demangle(in.c_str(), nullptr, nullptr, &status);
     if (status == 0 and output) {
         result.assign(output);
     }

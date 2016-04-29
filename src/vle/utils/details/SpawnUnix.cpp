@@ -67,7 +67,7 @@ void free_str_array(char **args)
 
 char ** convert_string_str_array(const std::vector < std::string >& args)
 {
-    char **result = 0;
+    char **result = nullptr;
 
     result = new char*[args.size() + 1];
 
@@ -76,7 +76,7 @@ char ** convert_string_str_array(const std::vector < std::string >& args)
                    result,
                    strdup_functor());
 
-    result[args.size()] = 0;
+    result[args.size()] = nullptr;
 
     return result;
 }
@@ -84,8 +84,8 @@ char ** convert_string_str_array(const std::vector < std::string >& args)
 static char ** prepare_environment_variable(void)
 {
     char **it = ::environ;
-    char **jt = NULL;
-    char **result = NULL;
+    char **jt = nullptr;
+    char **result = nullptr;
     int size = 0;
 
     while (*it++) {
@@ -100,7 +100,7 @@ static char ** prepare_environment_variable(void)
         *jt++ = strdup(*it++);
     }
 
-    result[size] = 0;
+    result[size] = nullptr;
 
     return result;
 }
@@ -128,7 +128,7 @@ static int input_timeout(int fd, unsigned int microseconds)
     timeout.tv_usec = microseconds;
 
     do {
-        result = select (FD_SETSIZE, &set, NULL, NULL, &timeout);
+        result = select (FD_SETSIZE, &set, nullptr, nullptr, &timeout);
     } while (result == -1L && errno == EINTR);
 
     return result;
@@ -354,7 +354,7 @@ public:
 };
 
 Spawn::Spawn()
-    : m_pimpl(0)
+    : m_pimpl(nullptr)
 {
 }
 

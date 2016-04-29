@@ -129,7 +129,7 @@ class RemoteManager::Pimpl
 {
 public:
     Pimpl()
-        : mStream(0), mIsStarted(false), mIsFinish(false), mStop(false),
+        : mStream(nullptr), mIsStarted(false), mIsFinish(false), mStop(false),
           mHasError(false)
     {
         {
@@ -399,7 +399,7 @@ public:
             }
         }
 
-        mStream = 0;
+        mStream = nullptr;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
@@ -520,7 +520,7 @@ public:
              mHasError = true;
          }
         mResults.push_back(pkgid);
-        mStream = 0;
+        mStream = nullptr;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
@@ -540,7 +540,7 @@ public:
                             std::back_inserter(mResults),
                             NotHaveExpression(expression));
 
-        mStream = 0;
+        mStream = nullptr;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
@@ -560,7 +560,7 @@ public:
                             std::back_inserter(mResults),
                             NotHaveExpression(expression));
 
-        mStream = 0;
+        mStream = nullptr;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
@@ -597,7 +597,7 @@ public:
                   found.second,
                   std::back_inserter(mResults));
 
-        mStream = 0;
+        mStream = nullptr;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;
@@ -632,7 +632,7 @@ public:
                   found.second,
                   std::back_inserter(mResults));
 
-        mStream = 0;
+        mStream = nullptr;
         mIsFinish = true;
         mIsStarted = false;
         mStop = false;

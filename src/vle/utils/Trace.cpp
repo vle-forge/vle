@@ -47,7 +47,7 @@ class Trace::Pimpl
     {
         if (mType == TRACE_STREAM_FILE) {
             delete mStream;
-            mStream = 0;
+            mStream = nullptr;
             mFilename.clear();
         }
     }
@@ -68,7 +68,7 @@ public:
 
     void setLogFile(const std::string& filename)
     {
-        std::ofstream* tmp = new std::ofstream(filename.c_str());
+        auto  tmp = new std::ofstream(filename.c_str());
 
         if (not tmp->is_open()) {
             delete tmp;
@@ -175,7 +175,7 @@ private:
                                   design pattern. */
 };
 
-Trace::Pimpl* Trace::Pimpl::mTrace = 0;
+Trace::Pimpl* Trace::Pimpl::mTrace = nullptr;
 
 /*
  * the utils::Trace source.
@@ -192,7 +192,7 @@ void Trace::kill()
 {
 	if (Trace::Pimpl::mTrace) {
 		delete Trace::Pimpl::mTrace;
-		Trace::Pimpl::mTrace = 0;
+		Trace::Pimpl::mTrace = nullptr;
     }
 }
 

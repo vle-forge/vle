@@ -230,7 +230,7 @@ std::string DateTime::toJulianDay(double date)
     boost::posix_time::ptime d(boost::gregorian::date(e), td);
 
     std::stringstream ss;
-    boost::posix_time::time_facet* facet = new boost::posix_time::time_facet();
+    auto  facet = new boost::posix_time::time_facet();
     facet->format("%Y-%m-%d %H:%M:%S");
     ss.imbue(std::locale(std::locale::classic(), facet));
     ss << d;

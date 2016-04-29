@@ -93,7 +93,7 @@ std::string Path::getTempFile(const std::string& prefix,
                 boost::filesystem::temp_directory_path(ec).string(),
                 result);
 
-        char *buffer = new char[result.size()];
+        auto buffer = new char[result.size()];
         std::strncpy(buffer, result.c_str(), result.size());
 
         int fd = ::mkstemp(buffer);

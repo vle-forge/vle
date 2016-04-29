@@ -114,10 +114,9 @@ public:
      * @param library
      * @param type
      */
-    Module(const std::string& path, const std::string& package, const
-           std::string& library, ModuleType type)
-        : mPath(path), mPackage(package), mLibrary(library), mHandle(0),
-        mFunction(0), mType(type)
+    Module(std::string  path, std::string  package, std::string  library, ModuleType type)
+        : mPath(std::move(path)), mPackage(std::move(package)), mLibrary(std::move(library)), mHandle(nullptr),
+        mFunction(nullptr), mType(type)
     {
     }
 
@@ -391,12 +390,12 @@ public:
         if (it != mLst.end()) {
             return it->second;
         } else {
-            void *result = 0;
+            void *result = nullptr;
 #ifdef BOOST_WINDOWS
             FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
             result = (void*)ptr;
 #else
-            result = ::dlsym(NULL, symbol.c_str());
+            result = ::dlsym(nullptr, symbol.c_str());
 #endif
 
             if (result) {
@@ -434,7 +433,7 @@ public:
         void operator()(value_type& x) const
         {
             delete x.second;
-            x.second = 0;
+            x.second = nullptr;
         }
     };
 

@@ -225,9 +225,9 @@ PathList Path::getBinaryLibraries()
     PathList result;
     const PathList& dirs = Path::path().getSimulatorDirs();
 
-    for (PathList::const_iterator it = dirs.begin(); it != dirs.end(); ++it) {
-        fs::path dir(*it);
-
+    for (auto elem : dirs) {
+        fs::path dir(elem);
+        
         if (not fs::exists(dir) or not fs::is_directory(dir)) {
             throw utils::InternalError(fmt(
                     _("Pkg list error: '%1%' is not a library directory")) %
