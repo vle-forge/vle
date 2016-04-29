@@ -2739,7 +2739,10 @@ void
 vleVpz::rmPortFromCond(QDomNode node, const QString& portName)
 {
     QDomNode toRm = portFromCond(node, portName);
-    node.removeChild(toRm);
+    if (! toRm.isNull()) {
+        undoStack->snapshot(node);
+        node.removeChild(toRm);
+    }
 }
 
 void
