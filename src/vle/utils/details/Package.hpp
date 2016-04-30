@@ -28,10 +28,10 @@
 #define VLE_UTILS_DETAILS_PACKAGE_HPP
 
 #include <vle/utils/RemoteManager.hpp>
-#include <boost/functional/hash.hpp>
-#include <boost/unordered_set.hpp>
+#include <unordered_set>
 #include <functional>
 #include <ostream>
+#include <iterator>
 #include <cstring>
 
 namespace vle { namespace utils {
@@ -40,12 +40,10 @@ namespace vle { namespace utils {
  * A functor to hash @c PackageId.
  *
  */
-struct PackageIdHash
-    : public std::unary_function < PackageId, std::size_t >
-{
-    std::size_t operator()(const PackageId& lhs) const
+struct PackageIdHash {
+    std::size_t operator()(const PackageId& lhs) const noexcept
     {
-        return boost::hash_value(lhs.name);
+        return std::hash<std::string>()(lhs.name);
     }
 };
 
@@ -55,9 +53,8 @@ struct PackageIdHash
  * A package is equal it tow @c PackageId have the same name.
  */
 struct PackageIdEqual
-    : public std::binary_function < PackageId, PackageId, bool >
 {
-    bool operator()(const PackageId& lhs, const PackageId& rhs) const
+    bool operator()(const PackageId& lhs, const PackageId& rhs) const noexcept
     {
         return lhs.name == rhs.name;
     }
@@ -70,9 +67,8 @@ struct PackageIdEqual
  * the second @c PackageId has a more recent version
  */
 struct PackageIdUpdate
-    : public std::binary_function < PackageId, PackageId, bool >
 {
-    bool operator()(const PackageId& lhs, const PackageId& rhs) const
+    bool operator()(const PackageId& lhs, const PackageId& rhs) const noexcept
     {
         if (lhs.name != rhs.name) {
             return false;
@@ -123,18 +119,16 @@ inline void cleanup(PackageLinkId& pkglinkid)
     pkglinkid.op = PACKAGE_OPERATOR_EQUAL;
 }
 
-struct PackageIdClear
-    : public std::unary_function < PackageId, void >
-{
-    void operator()(PackageId& lhs) const
+struct PackageIdClear {
+    void operator()(PackageId& lhs) const noexcept
     {
         cleanup(lhs);
     }
 };
 
-typedef boost::unordered_multiset < PackageId,
-                                    PackageIdHash,
-                                    PackageIdEqual > PackagesIdSet;
+typedef std::unordered_multiset <PackageId,
+                                 PackageIdHash,
+                                 PackageIdEqual > PackagesIdSet;
 
 inline std::ostream& operator<<(std::ostream& os, const PackagesIdSet& b)
 {
