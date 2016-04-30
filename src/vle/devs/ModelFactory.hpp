@@ -37,7 +37,6 @@
 #include <vle/devs/InitEventList.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/utils/ModuleManager.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace vle { namespace devs {
 
@@ -51,7 +50,7 @@ class Dynamics;
  * @brief Read simulations plugin from models directories and manage models
  * classes.
  */
-class VLE_LOCAL ModelFactory : boost::noncopyable
+class VLE_LOCAL ModelFactory
 {
 public:
     /**
@@ -66,6 +65,11 @@ public:
                  const vpz::Classes& cls,
                  const vpz::Experiment& experiment,
                  RootCoordinator& root);
+
+    ModelFactory(const ModelFactory& other) = delete;
+    ModelFactory& operator=(const ModelFactory& other) = delete;
+    ModelFactory(ModelFactory&& other) = delete;
+    ModelFactory& operator=(ModelFactory&& other) = delete;
 
     /**
      * @brief Return the reference to the list of initiale conditions for
@@ -226,9 +230,6 @@ public:
                                        const std::string& modelname);
 
 private:
-    ModelFactory(const ModelFactory& other);
-    ModelFactory& operator=(const ModelFactory& other);
-
     const utils::ModuleManager& mModuleMgr; /**< A reference to the
                                               utils::ModuleManager. */
 
