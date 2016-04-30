@@ -30,6 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -78,9 +79,7 @@ struct VLE_API Module
     {
     }
 
-    Module()
-    {
-    }
+    Module() = default;
 
     std::string package;
     std::string library;
@@ -125,6 +124,11 @@ public:
      * Delete all shared library load into the ModuleManager.
      */
     ~ModuleManager();
+
+    ModuleManager(const ModuleManager&) = delete;
+    ModuleManager& operator=(const ModuleManager&) = delete;
+    ModuleManager(ModuleManager&&) = delete;
+    ModuleManager& operator=(ModuleManager&&) = delete;
 
     /**
      * @brief Get a symbol from a shared library.
@@ -278,14 +282,10 @@ public:
                                            ModuleType type);
 
 private:
-    ModuleManager(const ModuleManager& other);
-    ModuleManager& operator=(const ModuleManager& other);
-
     class Pimpl; /**< We hide the implementation detail of this class. */
-    Pimpl *mPimpl;
+    std::unique_ptr<Pimpl> mPimpl;
 };
 
 }} // namespace vle utils
 
 #endif
-

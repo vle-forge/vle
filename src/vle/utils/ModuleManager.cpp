@@ -32,9 +32,8 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/version.hpp>
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 #include <boost/filesystem.hpp>
-#include <boost/thread.hpp>
 #include <boost/version.hpp>
 
 #ifdef BOOST_WINDOWS
@@ -114,9 +113,11 @@ public:
      * @param library
      * @param type
      */
-    Module(std::string  path, std::string  package, std::string  library, ModuleType type)
-        : mPath(std::move(path)), mPackage(std::move(package)), mLibrary(std::move(library)), mHandle(nullptr),
-        mFunction(nullptr), mType(type)
+    Module(std::string  path, std::string  package, std::string  library,
+           ModuleType type)
+        : mPath(std::move(path)), mPackage(std::move(package)),
+          mLibrary(std::move(library)), mHandle(nullptr),
+          mFunction(nullptr), mType(type)
     {
     }
 
@@ -370,10 +371,10 @@ public:
 class SymbolTable
 {
 public:
-    typedef std::map < std::string, void* > Container;
-    typedef std::map < std::string, void* >::const_iterator const_iterator;
-    typedef std::map < std::string, void* >::iterator iterator;
-    typedef std::map < std::string, void* >::size_type size_type;
+    typedef std::unordered_map < std::string, void* > Container;
+    typedef std::unordered_map < std::string, void* >::const_iterator const_iterator;
+    typedef std::unordered_map < std::string, void* >::iterator iterator;
+    typedef std::unordered_map < std::string, void* >::size_type size_type;
 
     SymbolTable()
     {
@@ -421,12 +422,12 @@ private:
 class ModuleManager::Pimpl
 {
 public:
-    typedef boost::unordered_map < std::string, pimpl::Module* > ModuleTable;
+    typedef std::unordered_map < std::string, pimpl::Module* > ModuleTable;
     typedef ModuleTable::value_type value_type;
     typedef ModuleTable::const_iterator const_iterator;
     typedef ModuleTable::iterator iterator;
 
-    typedef std::map < std::string, void* > MapSymbol;
+    typedef std::unordered_map < std::string, void* > MapSymbol;
 
     struct ModuleDeleter
     {
@@ -596,20 +597,18 @@ public:
     ModuleTable mTableGvleGlobal;
     ModuleTable mTableGvleModeling;
     ModuleTable mTableGvleOutput;
-
     pimpl::SymbolTable mTableSymbols;
-
-    boost::mutex mMutex;
 };
 
 ModuleManager::ModuleManager()
-    : mPimpl(new ModuleManager::Pimpl())
+    : mPimpl(
+        std::unique_ptr<ModuleManager::Pimpl>(
+            new ModuleManager::Pimpl()))
 {
 }
 
 ModuleManager::~ModuleManager()
 {
-    delete mPimpl;
 }
 
 void *ModuleManager::get(const std::string& package,
@@ -617,9 +616,6 @@ void *ModuleManager::get(const std::string& package,
                          ModuleType type,
                          ModuleType *newtype) const
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
-
     if (not newtype) {
         return mPimpl->getModule(package, library, type)->get();
     } else {
@@ -633,15 +629,11 @@ void *ModuleManager::get(const std::string& package,
 
 void *ModuleManager::get(const std::string& symbol)
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     return mPimpl->getSymbol(symbol);
 }
 
 void ModuleManager::browse()
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     fs::path packages = utils::Path::path().getBinaryPackagesDir();
 
     fs::path pathsim = "plugins/simulator";
@@ -717,8 +709,6 @@ void ModuleManager::browse()
 
 void ModuleManager::browse(ModuleType type)
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     fs::path packages = utils::Path::path().getBinaryPackagesDir();
 
     fs::path pathtype;
@@ -763,8 +753,6 @@ void ModuleManager::browse(ModuleType type)
 
 void ModuleManager::browse(const std::string& package)
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     fs::path pkg = utils::Path::path().getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
@@ -803,8 +791,6 @@ void ModuleManager::browse(const std::string& package)
 
 void ModuleManager::browse(const std::string& package, ModuleType type)
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     fs::path pkg = utils::Path::path().getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
@@ -834,8 +820,6 @@ void ModuleManager::browse(const std::string& package, ModuleType type)
 
 void ModuleManager::fill(ModuleList *lst) const
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     std::transform(mPimpl->mTableSimulator.begin(),
                    mPimpl->mTableSimulator.end(),
                    std::back_inserter(*lst),
@@ -864,8 +848,6 @@ void ModuleManager::fill(ModuleList *lst) const
 
 void ModuleManager::fill(ModuleType type, ModuleList *lst) const
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     switch (type) {
     case MODULE_DYNAMICS:
     case MODULE_DYNAMICS_EXECUTIVE:
@@ -904,8 +886,6 @@ void ModuleManager::fill(ModuleType type, ModuleList *lst) const
 
 void ModuleManager::fill(const std::string& package, ModuleList *lst) const
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     transformIf(mPimpl->mTableSimulator.begin(),
                 mPimpl->mTableSimulator.end(),
                 std::back_inserter(*lst),
@@ -940,8 +920,6 @@ void ModuleManager::fill(const std::string& package, ModuleList *lst) const
 void ModuleManager::fill(const std::string& package, ModuleType type,
                          ModuleList *lst) const
 {
-    boost::mutex::scoped_lock lock(mPimpl->mMutex);
-
     switch (type) {
     case MODULE_DYNAMICS:
     case MODULE_DYNAMICS_EXECUTIVE:
