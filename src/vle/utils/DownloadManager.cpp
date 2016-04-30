@@ -24,25 +24,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined _WIN32 || defined __CYGWIN__
-# define BOOST_THREAD_USE_LIB
-# define BOOST_THREAD_DONT_USE_CHRONO
-#endif
-
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/asio.hpp>
-#include <cstring>
+#include <thread>
+#include <mutex>
 #include <fstream>
 #include <sstream>
+#include <cstring>
 
 
 namespace bip = boost::asio::ip;
@@ -63,6 +59,11 @@ public:
     {
         join();
     }
+
+    Pimpl(const Pimpl&) = delete;
+    Pimpl& operator=(const Pimpl&) = delete;
+    Pimpl(Pimpl&&) = delete;
+    Pimpl& operator=(Pimpl&&) = delete;
 
     void start(const std::string& url, const std::string& serverfile)
     {
@@ -98,7 +99,7 @@ public:
         mCompletePath.append(mUrl);
         mCompletePath.append(mServerFile);
         mIsStarted = true;
-        mThread = boost::thread(&DownloadManager::Pimpl::run, this);
+        mThread = std::thread(&DownloadManager::Pimpl::run, this);
     }
 
     void join()
@@ -241,8 +242,8 @@ public:
             file.close();
     }
 
-    boost::mutex mMutex;
-    boost::thread mThread;
+    std::mutex mMutex;
+    std::thread mThread;
     std::string mUrl;
     std::string mServerFile;
     std::string mCompletePath;
@@ -252,24 +253,21 @@ public:
     bool mIsStarted;
     bool mIsFinish;
     bool mHasError;
-
-private:
-    Pimpl(const Pimpl&);
-    Pimpl& operator=(const Pimpl&);
 };
 
 DownloadManager::DownloadManager()
-    : mPimpl(new DownloadManager::Pimpl())
+    : mPimpl(
+        std::unique_ptr<DownloadManager::Pimpl>(
+            new DownloadManager::Pimpl()))
 {
 }
 
 DownloadManager::~DownloadManager()
 {
-    delete mPimpl;
 }
 
-void DownloadManager::start(const std::string& url, const std::string&
-        serverfile)
+void DownloadManager::start(const std::string& url,
+                            const std::string& serverfile)
 {
     mPimpl->start(url, serverfile);
 }
@@ -282,7 +280,7 @@ void DownloadManager::join()
 uint32_t DownloadManager::size() const
 {
     if (mPimpl->mIsStarted and not mPimpl->mIsFinish) {
-        boost::mutex::scoped_lock lock(mPimpl->mMutex);
+        std::lock_guard<std::mutex> lock(mPimpl->mMutex);
         return mPimpl->mDownloadManageredSize;
     }
     return mPimpl->mDownloadManageredSize;
@@ -291,7 +289,7 @@ uint32_t DownloadManager::size() const
 std::string DownloadManager::filename() const
 {
     if (mPimpl->mIsStarted and not mPimpl->mIsFinish) {
-        boost::mutex::scoped_lock lock(mPimpl->mMutex);
+        std::lock_guard<std::mutex> lock(mPimpl->mMutex);
         return mPimpl->mFilename;
     }
     return mPimpl->mFilename;
@@ -300,7 +298,7 @@ std::string DownloadManager::filename() const
 bool DownloadManager::isFinish() const
 {
     if (mPimpl->mIsStarted and not mPimpl->mIsFinish) {
-        boost::mutex::scoped_lock lock(mPimpl->mMutex);
+        std::lock_guard<std::mutex> lock(mPimpl->mMutex);
         return mPimpl->mIsFinish;
     }
     return mPimpl->mIsFinish;
@@ -309,7 +307,7 @@ bool DownloadManager::isFinish() const
 bool DownloadManager::hasError() const
 {
     if (mPimpl->mIsStarted and not mPimpl->mIsFinish) {
-        boost::mutex::scoped_lock lock(mPimpl->mMutex);
+        std::lock_guard<std::mutex> lock(mPimpl->mMutex);
         return mPimpl->mHasError;
     }
     return mPimpl->mHasError;
@@ -318,7 +316,7 @@ bool DownloadManager::hasError() const
 std::string DownloadManager::getErrorMessage() const
 {
     if (mPimpl->mIsStarted and not mPimpl->mIsFinish) {
-        boost::mutex::scoped_lock lock(mPimpl->mMutex);
+        std::lock_guard<std::mutex> lock(mPimpl->mMutex);
         return mPimpl->mErrorMessage;
     }
     return mPimpl->mErrorMessage;

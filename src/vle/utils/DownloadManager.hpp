@@ -29,6 +29,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
+#include <memory>
 #include <string>
 
 namespace vle { namespace utils {
@@ -70,6 +71,11 @@ public:
      */
     ~DownloadManager();
 
+    DownloadManager(const DownloadManager&) = delete;
+    DownloadManager& operator=(const DownloadManager&) = delete;
+    DownloadManager(DownloadManager&&) = delete;
+    DownloadManager& operator=(DownloadManager&&) = delete;
+
     /**
      * Start the download of the specified \c url in a thread. If a previous
      * thread is already alive, this function does nothing.
@@ -85,8 +91,7 @@ public:
      * @param url The url of the server (e.g. "www.vle-project.org").
      * @param serverfile The resource to download (e.g. "vle-1.0.0.dtd").
      */
-    void start(const std::string& url,
-            const std::string& serverfile);
+    void start(const std::string& url, const std::string& serverfile);
 
     /**
      * A blocking function while the download is not finish.
@@ -133,11 +138,8 @@ public:
     std::string getErrorMessage() const;
 
 private:
-    DownloadManager(const DownloadManager&);
-    DownloadManager& operator=(const DownloadManager&);
-
     class Pimpl;
-    Pimpl *mPimpl;
+    std::unique_ptr<Pimpl> mPimpl;
 };
 
 }} // namespace vle utils
