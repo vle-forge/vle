@@ -57,10 +57,12 @@ public:
             SimulationOptions     simulationoptions,
             std::ostream         *output);
 
+    ~Manager();
+
     Manager(const Manager& other) = delete;
     Manager& operator=(const Manager& other) = delete;;
-
-    ~Manager();
+    Manager(Manager&& other) = delete;
+    Manager& operator=(Manager&& other) = delete;;
 
     /**
      * Run an part or a complete experimental frames with mono thread
@@ -90,7 +92,6 @@ public:
 
 private:
     class Pimpl;
-
     std::unique_ptr<Pimpl> mPimpl;
 };
 

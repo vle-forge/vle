@@ -24,12 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#if defined _WIN32 || defined __CYGWIN__
-# define BOOST_THREAD_USE_LIB
-# define BOOST_THREAD_DONT_USE_CHRONO
-#endif
-
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/manager/Simulation.hpp>
@@ -40,7 +34,7 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/BaseModel.hpp>
-#include <boost/thread/thread.hpp>
+#include <thread>
 
 namespace vle { namespace manager {
 
@@ -182,18 +176,19 @@ public:
     {
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
-        boost::thread_group gp;
+
         auto result = std::unique_ptr<value::Matrix>(
             new value::Matrix(expgen.size(), 1, expgen.size(), 1));
 
-        for (uint32_t i = 0; i < threads; ++i) {
-            gp.create_thread(
+        std::vector<std::thread> gp;
+        for (uint32_t i = 0; i < threads; ++i)
+            gp.emplace_back(
                 worker(vpz, expgen, modulemgr,
                        mLogOption, mSimulationOption,
                        i, threads, result.get(), error));
-        }
 
-        gp.join_all();
+        for (uint32_t i = 0; i < threads; ++i)
+            gp[i].join();
 
         // TOO BAD
         delete vpz->project().model().model();
