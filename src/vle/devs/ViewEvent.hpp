@@ -156,8 +156,8 @@ public:
 
     void erase()
     {
-        std::for_each(mElems.begin(), mElems.end(),
-                      boost::checked_deleter < ViewEvent >());
+        for (auto elem : mElems)
+            delete elem;
 
         mElems.clear();
     }
