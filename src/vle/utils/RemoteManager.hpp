@@ -31,9 +31,9 @@
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <vector>
-
 
 namespace vle { namespace utils {
 
@@ -215,18 +215,8 @@ public:
     static std::string getRemotePackageFilename();
 
 private:
-    /**
-     * Uncopyable class.
-     */
-    RemoteManager(const RemoteManager& RemoteManager);
-
-    /**
-     * Uncopyable class.
-     */
-    RemoteManager& operator=(const RemoteManager& RemoteManager);
-
     class Pimpl;
-    Pimpl* mPimpl;
+    std::unique_ptr<Pimpl> mPimpl;
 };
 
 }} // namespace vle utils

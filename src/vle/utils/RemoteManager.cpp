@@ -25,11 +25,6 @@
  */
 
 
-#if defined _WIN32 || defined __CYGWIN__
-# define BOOST_THREAD_USE_LIB
-# define BOOST_THREAD_DONT_USE_CHRONO
-#endif
-
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DownloadManager.hpp>
@@ -44,17 +39,17 @@
 #include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/details/PackageManager.hpp>
 #include <vle/version.hpp>
+#include <thread>
+#include <fstream>
+#include <ostream>
+#include <iostream>
+#include <string>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/regex.hpp>
-#include <fstream>
-#include <ostream>
-#include <iostream>
-#include <string>
 
 #define PACKAGESID_VECTOR_RESERVED_SIZE 100u
 
@@ -168,31 +163,31 @@ public:
 
             switch (action) {
             case REMOTE_MANAGER_UPDATE:
-                mThread = boost::thread(
+                mThread = std::thread(
                     &RemoteManager::Pimpl::actionUpdate, this);
                 break;
             case REMOTE_MANAGER_SOURCE:
-                mThread = boost::thread(
+                mThread = std::thread(
                     &RemoteManager::Pimpl::actionSource, this);
                 break;
             case REMOTE_MANAGER_INSTALL:
-                mThread = boost::thread(
+                mThread = std::thread(
                     &RemoteManager::Pimpl::actionInstall, this);
                 break;
             case REMOTE_MANAGER_LOCAL_SEARCH:
-                mThread = boost::thread(
+                mThread = std::thread(
                     &RemoteManager::Pimpl::actionLocalSearch, this);
                 break;
             case REMOTE_MANAGER_SEARCH:
-                mThread = boost::thread(
+                mThread = std::thread(
                     &RemoteManager::Pimpl::actionSearch, this);
                 break;
             case REMOTE_MANAGER_SHOW:
-                mThread = boost::thread(
+                mThread = std::thread(
                     &RemoteManager::Pimpl::actionShow, this);
                 break;
             case REMOTE_MANAGER_LOCAL_SHOW:
-                mThread = boost::thread(
+                mThread = std::thread(
                     &RemoteManager::Pimpl::actionLocalShow, this);
                 break;
             default:
@@ -201,7 +196,7 @@ public:
         }
     }
 
-    void join()
+    void join() noexcept
     {
         if (mIsStarted) {
             if (not mIsFinish) {
@@ -267,7 +262,7 @@ public:
         }
     };
 
-    void save() const throw()
+    void save() const noexcept
     {
         try {
             std::ofstream file;
@@ -640,12 +635,12 @@ public:
 
     PackagesIdSet local;
     PackagesIdSet remote;
+
     /**
      * @brief The set of packages resulting form the last command
      */
     Packages mResults;
-    boost::mutex mMutex;
-    boost::thread mThread;
+    std::thread mThread;
     std::string mArgs;
     std::ostream* mStream;
     bool mIsStarted;
@@ -653,17 +648,17 @@ public:
     bool mStop;
     bool mHasError;
     std::string mErrorMessage;
-
 };
 
 RemoteManager::RemoteManager()
-    : mPimpl(new RemoteManager::Pimpl())
+    : mPimpl(
+        std::unique_ptr<RemoteManager::Pimpl>(
+            new RemoteManager::Pimpl()))
 {
 }
 
 RemoteManager::~RemoteManager()
 {
-    delete mPimpl;
 }
 
 void RemoteManager::start(RemoteManagerActions action,
