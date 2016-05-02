@@ -68,7 +68,8 @@ DefaultSimSubpanelThread::onStarted()
         error_simu = QString("Error before simulation '%1'").arg(e.what());
     }
     if (vpz) {
-        output_map =  sim.run(vpz, modules, &manerror);
+        output_map =  sim.run(std::unique_ptr<vle::vpz::Vpz>(vpz),
+                modules, &manerror);
     }
     if (manerror.code != 0) {
         error_simu = QString("Error during simulation '%1'")
