@@ -47,7 +47,7 @@ void
 pp_check_index(const vle::value::Set& s, std::size_t i)
 {
 #ifndef NDEBUG
-    if (i >= size())
+    if (i >= s.size())
         throw vle::utils::ArgError(
             vle::fmt(_("Set: too big index '%1%'")) % i);
 #else

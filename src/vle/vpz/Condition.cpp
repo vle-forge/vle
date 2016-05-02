@@ -61,7 +61,7 @@ void Condition::write(std::ostream& out) const
             << "name=\"" << elem.first.c_str() << "\" "
             << ">\n";
 
-        assert(it->second);
+        assert(elem.second);
         const value::VectorValue& val(value::toSet(*elem.second));
         for (const auto & val_jt : val) {
             (val_jt)->writeXml(out);

@@ -52,7 +52,7 @@ pp_check_index(const vle::value::Matrix& m,
     if (not (column < m.columns()  and row <= m.rows()))
         throw vle::utils::ArgError(
             vle::fmt(_("Matrix: bad access %1% %2% for %3%x%4% matrix"))
-            % column % row % m_nbcol % m_nbrow);
+            % column % row % m.columns() % m.rows());
 #else
     (void)m;
     (void)column;
@@ -165,7 +165,7 @@ Matrix::Matrix(const Matrix& m)
       m_stepcol(m.m_stepcol), m_steprow(m.m_steprow),
       m_lastX(0), m_lastY(0)
 {
-    assert(m.matrix.size() == m_nbcolmax * m_nbrowmax);
+    assert(m.m_matrix.size() == m_nbcolmax * m_nbrowmax);
 
     m_matrix.reserve(m.m_matrix.size());
 
