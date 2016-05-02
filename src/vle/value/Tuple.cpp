@@ -63,10 +63,6 @@ namespace vle { namespace value {
 Tuple::Tuple(size_type n, double value)
     : m_value(n, value)
 {
-    if (n <= 0)
-        throw utils::ArgError(
-            fmt(_("Tuple: bad constructor initialization %1%"))
-            % n);
 }
 
 Value::type Tuple::getType() const
