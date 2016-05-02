@@ -51,38 +51,41 @@ public:
     {
     }
 
-    virtual vd::Time init(const vd::Time& /*time*/)
+    virtual vd::Time init(vle::devs::Time /*time*/) override
     {
         return vd::infinity;
     }
 
-    virtual void output(const vd::Time& /*time*/,
-                        vd::ExternalEventList& /*output*/) const
+    virtual void output(vle::devs::Time /*time*/,
+                        vd::ExternalEventList& /*output*/) const override
     {
     }
 
-    virtual vd::Time timeAdvance() const
+    virtual vd::Time timeAdvance() const override
     {
         return vd::infinity;
     }
 
-    virtual void internalTransition(const vd::Time& /*time*/)
+    virtual void internalTransition(vle::devs::Time /*time*/) override
     {
     }
 
-    virtual void externalTransition(const vd::ExternalEventList& /*event*/,
-                                    const vd::Time& /*time*/)
+    virtual void externalTransition(
+            const vd::ExternalEventList& /*event*/,
+            vle::devs::Time /*time*/) override
     {
     }
 
-    virtual void confluentTransitions(const vd::Time& time,
-                                      const vd::ExternalEventList& events)
+    virtual void confluentTransitions(
+            vle::devs::Time time,
+            const vd::ExternalEventList& events) override
     {
         internalTransition(time);
         externalTransition(events, time);
     }
 
-    virtual vv::Value* observation(const vd::ObservationEvent& /*event*/) const
+    virtual std::unique_ptr<vle::value::Value> observation(
+            const vd::ObservationEvent& /*event*/) const override
     {
         return 0;
     }
