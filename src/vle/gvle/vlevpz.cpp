@@ -1297,6 +1297,25 @@ vleVpz::newViewNameToDoc() const
 }
 
 QString
+vleVpz::newCondNameToDoc(QString name) const
+{
+    QString condName = name;
+    unsigned int idCond = 0;
+    bool condNameFound = false;
+    while (not condNameFound) {
+        if (existCondFromDoc(condName)) {
+            idCond ++;
+            condName = name;
+            condName += "_";
+            condName += QVariant(idCond).toString();
+        } else {
+            condNameFound = true;
+        }
+    }
+    return condName;
+}
+
+QString
 vleVpz::newCondNameToDoc() const
 {
     QString condName = "NewCondition";

@@ -596,6 +596,11 @@ public:
      */
     QString newCondNameToDoc() const;
     /**
+     * @brief get a new condition name not already in tag <conditions>
+     * from the Vpz doc
+     */
+    QString newCondNameToDoc(QString name) const;
+    /**
      * @brief get a new port name for condition condName not already in tag
      * <condition> from the Vpz doc
      */

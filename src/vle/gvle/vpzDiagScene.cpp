@@ -1516,11 +1516,14 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     action->setEnabled(true);
     menu.addSeparator();
     QMenu* submenuconfigure = menu.addMenu("Configure");
-    submenuconfigure->setEnabled(sel and not isVpzMainModel(sel) and
-                                 (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
-                                 not isVpzSubModelConfigured(sel));
-    populateConfigureMenu(submenuconfigure);
+    bool enabled = (sel and not isVpzMainModel(sel) and
+                    (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
+                    not isVpzSubModelConfigured(sel));
 
+    submenuconfigure->setEnabled(enabled);
+    if (enabled) {
+        populateConfigureMenu(submenuconfigure);
+    }
 
     if (sel) {
         action = menu.exec(event->screenPos());
@@ -1702,6 +1705,12 @@ VpzDiagScene::doConfigureMenu(QDomNode model, const QString& meta)
     QDomNode dynamic = dom.elementsByTagName("dynamic").item(0);
     QDomNode observable = dom.elementsByTagName("observable").item(0);
     QDomNode condition = dom.elementsByTagName("condition").item(0);
+
+    QString genericConditionName =
+        condition.attributes().namedItem("name").nodeValue();
+    QString specificConditionName = mVpm->newCondNameToDoc(genericConditionName);
+    condition.attributes().namedItem("name").setNodeValue(specificConditionName);
+
     QDomNode in = dom.elementsByTagName("in").item(0);
     QDomNode out = dom.elementsByTagName("out").item(0);
 
