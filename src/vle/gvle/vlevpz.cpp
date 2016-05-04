@@ -4043,6 +4043,74 @@ void vleVpz::xSaveDom(QDomDocument *doc)
     doc->appendChild(vpzRoot);
 }
 
+void vleVpz::clearConfModel(QDomNode model)
+{
+    QDomElement docElem = getDomDoc().documentElement();
+    undoStack->snapshot(docElem);
+
+    QDomElement modele = model.toElement();
+
+    removeDyn(mVdo->attributeValue(modele, "dynamics"));
+    rmObservableFromDoc(mVdo->attributeValue(modele, "observables"));
+
+    QString attachedConds = mVdo->attributeValue(modele, "conditions");
+    QStringList condSplit = attachedConds.split(",");
+    for (int i = 0; i < condSplit.length(); i++) {
+        rmConditionToDoc(condSplit.at(i));
+    }
+
+    {
+        QDomNode in = mVdo->obtainChild(model,"in");
+        QDomNodeList ports = in.toElement().elementsByTagName("port");
+        while (ports.length() > 0) {
+            rmModelPort(ports.at(0));
+        }
+    }
+
+    {
+        QDomNode out = mVdo->obtainChild(model,"out");
+        QDomNodeList ports = out.toElement().elementsByTagName("port");
+        while (ports.length() > 0) {
+            rmModelPort(ports.at(0));
+        }
+    }
+
+    emit dynamicsUpdated();
+    emit observablesUpdated();
+    emit conditionsUpdated();
+    emit modelsUpdated();
+}
+
+void vleVpz::unConfigureModel(QDomNode model)
+{
+    QDomElement docElem = getDomDoc().documentElement();
+    undoStack->snapshot(docElem);
+
+    QDomElement modele = model.toElement();
+
+    modele.setAttribute("dynamics", "");
+    modele.setAttribute("observables", "");
+    modele.setAttribute("conditions", "");
+
+    {
+        QDomNode in = mVdo->obtainChild(model,"in");
+        QDomNodeList ports = in.toElement().elementsByTagName("port");
+        while (ports.length() > 0) {
+            rmModelPort(ports.at(0));
+        }
+    }
+
+    {
+        QDomNode out = mVdo->obtainChild(model,"out");
+        QDomNodeList ports = out.toElement().elementsByTagName("port");
+        while (ports.length() > 0) {
+            rmModelPort(ports.at(0));
+        }
+    }
+
+    emit modelsUpdated();
+}
+
 void vleVpz::configureModel(QDomNode model, QDomNode dynamic,
                             QDomNode observable, QDomNode condition,
                             QDomNode in, QDomNode out)
@@ -4082,5 +4150,4 @@ void vleVpz::configureModel(QDomNode model, QDomNode dynamic,
     emit conditionsUpdated();
     emit modelsUpdated();
 }
-
 }}//namespaces

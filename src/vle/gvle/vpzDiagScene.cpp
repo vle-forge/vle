@@ -1524,6 +1524,16 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     if (enabled) {
         populateConfigureMenu(submenuconfigure);
     }
+    action = menu.addAction("Unconfigure");
+    setActionType(action, VDMA_Unconfigure_model);
+    action->setEnabled(sel and not isVpzMainModel(sel) and
+                       (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
+                       isVpzSubModelConfigured(sel));
+    action = menu.addAction("Clear conf");
+    setActionType(action, VDMA_Clear_conf_model);
+    action->setEnabled(sel and not isVpzMainModel(sel) and
+                       (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
+                       isVpzSubModelConfigured(sel));
 
     if (sel) {
         action = menu.exec(event->screenPos());
@@ -1647,6 +1657,25 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                 doConfigureMenu(it->mnode, metadata);
                 it->initializeFromDom();
                 it->update();
+            } else if(actCode == VDMA_Unconfigure_model) {
+                VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
+                mVpm->unConfigureModel(it->mnode);
+                it->initializeFromDom();
+                it->update();
+            } else if(actCode == VDMA_Clear_conf_model) {
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(NULL, "Question",
+                   "Do you want to remove each item (dynamic, observable,"\
+                   " conditions) attached to this model, even if they can"\
+                   " be attached to another model?",
+                                              QMessageBox::Yes|QMessageBox::No);
+                if (reply == QMessageBox::Yes) {
+                    VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
+                    mVpm->clearConfModel(it->mnode);
+                    it->initializeFromDom();
+                    it->update();
+                }
+
             }
         }
     }

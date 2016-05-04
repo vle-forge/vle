@@ -74,7 +74,9 @@ enum VPZ_DIAG_MENU_ACTION {
     VDMA_Add_coupled_model,
     VDMA_Zoom_In,
     VDMA_Zoom_Out,
-    VDMA_Configure_model
+    VDMA_Configure_model,
+    VDMA_Unconfigure_model,
+    VDMA_Clear_conf_model
 };
 
 class VpzConnectionLineItem : public QGraphicsItem

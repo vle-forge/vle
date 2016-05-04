@@ -1076,6 +1076,19 @@ public:
     void           removeDynamic(const QString& dynamic);
 
     /**
+     * @brief totally unconfigure the model, and also remove
+     * the dynamic, the observable and each condition atached to
+     * @param the model node to be unconfigured
+     */
+    void clearConfModel(QDomNode model);
+
+    /**
+     * @brief totally unconfigure the model, without removing the conf
+     * @param the model node to be unconfigured
+     */
+    void unConfigureModel(QDomNode model);
+
+    /**
      * @brief totally configures the model
      * @param the model node to be configured
      * @param the dynamic node
