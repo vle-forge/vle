@@ -151,7 +151,7 @@ void RootCoordinator::finish()
     if (m_coordinator) {
         m_coordinator->finish();
 
-        assert(m_result);
+        m_result.reset(nullptr);
         
         m_result = getMatrixFromView(m_coordinator->getViews());
 
