@@ -4,7 +4,7 @@ enable_testing()
 
 set(VLE_MAJOR 1)
 set(VLE_MINOR 1)
-set(VLE_PATCH 2)
+set(VLE_PATCH 3)
 set(VLE_EXTRA "")
 set(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")
 set(VLE_VERSION_SHORT "${VLE_MAJOR}.${VLE_MINOR}")
