@@ -34,15 +34,20 @@
 namespace vle { namespace vpz {
 
 /**
- * @brief A Dynamic represents the DYNAMIC tag of XML project file. It
- * stores the name of the dynamics, the library and model used by vle, the
- * type local or distant and a string data attached to the dynamics
- * initialisation.
+ * @brief A Dynamic represents the DYNAMIC elemt in the XML project
+ * file. It stores the name of the dynamics, the package and the library
+ * and language used by vle. If the \e package() returns an empty
+ * string the VLE assumes that \e library() stores the name of the symbol
+ * to be load instead of the shared library. This feature is useful for
+ * unit test of VLE.
+ *
  * Example:
  * @code
  * <dynamic name="xxxx"     <!-- name of the dynamics -->
+ *          package="aaaa"  <!-- name of the package -->
  *          library="yyyy"  <!-- name of the library -->
- *
+ *          />
+ * <dynamic name="xxxx" library="make_my_new_model" />
  * @endcode
  */
 class VLE_API Dynamic : public Base
@@ -54,6 +59,16 @@ public:
      */
     Dynamic(const std::string& name) :
         m_name(name)
+    {}
+
+    Dynamic(const std::string& name,
+            const std::string& package,
+            const std::string& library,
+            const std::string& language = std::string())
+        : m_name(name)
+        , m_package(package)
+        , m_library(library)
+        , m_language(language)
     {}
 
     /**

@@ -55,8 +55,18 @@ void StreamWriter::open(const std::string& pluginname,
     void *symbol = nullptr;
 
     try {
-        symbol = m_modulemgr.get(package, pluginname, utils::MODULE_OOV);
-        oov::OovPluginSlot fct(utils::functionCast < oov::OovPluginSlot>(symbol));
+        /* If \e package is not empty we assume that library is the shared
+         * library. Otherwise, we load the global symbol stores in \e
+         * library/executable and we cast it into a \e
+         * vle::oov::OovPluginSlot... Only useful for unit test or to
+         * build executable with plugins.
+         */
+        if (not package.empty())
+            symbol = m_modulemgr.get(package, pluginname, utils::MODULE_OOV);
+        else
+            symbol = m_modulemgr.get(pluginname);
+
+        oov::OovPluginSlot fct(utils::functionCast<oov::OovPluginSlot>(symbol));
         oov::PluginPtr ptr(fct(location));
         m_plugin = ptr;
     } catch(const std::exception& e) {

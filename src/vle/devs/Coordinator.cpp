@@ -476,7 +476,7 @@ void Coordinator::buildViews()
 StreamWriter* Coordinator::buildOutput(const vpz::View& view,
                                        const vpz::Output& output)
 {
-    auto  stream = new StreamWriter(m_modulemgr);
+    auto stream = new StreamWriter(m_modulemgr);
 
     std::string file((fmt("%1%_%2%") %
                       m_modelFactory.experiment().name() %

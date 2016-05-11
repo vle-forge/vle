@@ -123,7 +123,7 @@ public:
     /**
      * Delete all shared library load into the ModuleManager.
      */
-    ~ModuleManager();
+    ~ModuleManager() noexcept;
 
     ModuleManager(const ModuleManager&) = delete;
     ModuleManager& operator=(const ModuleManager&) = delete;
@@ -198,7 +198,7 @@ public:
      *
      * @return A pointer to the founded symbol.
      */
-    void *get(const std::string& symbol);
+    void *get(const std::string& symbol) const;
 
     /*
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

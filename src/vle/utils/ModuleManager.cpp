@@ -124,10 +124,13 @@ public:
     /**
      * @brief Delete the instance of the shared library.
      */
-    ~Module()
+    ~Module() noexcept
     {
-        DTraceModel(vle::fmt("ModuleManager unload: %1%:%2%") % mHandle %
-                mPath);
+        try {
+            DTraceModel(vle::fmt("ModuleManager unload: %1%:%2%")
+                        % mHandle % mPath);
+        } catch (...) {
+        }
 
         if (mHandle) {
 #ifdef BOOST_WINDOWS
@@ -627,7 +630,7 @@ void *ModuleManager::get(const std::string& package,
     }
 }
 
-void *ModuleManager::get(const std::string& symbol)
+void *ModuleManager::get(const std::string& symbol) const
 {
     return mPimpl->getSymbol(symbol);
 }

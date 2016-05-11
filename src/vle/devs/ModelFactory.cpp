@@ -112,11 +112,11 @@ void ModelFactory::createModel(Coordinator& coordinator,
     value::Map initValues;
     if (not conditions.empty()) {
         for (const auto & elem : conditions) {
-	    const auto& cnd = mExperiment.conditions().get(elem);
-	    value::MapValue vl;
-	    cnd.fillWithFirstValues(vl);
+            const auto& cnd = mExperiment.conditions().get(elem);
+            value::MapValue vl;
+            cnd.fillWithFirstValues(vl);
 
-	    for (auto & elem : vl) {
+            for (auto & elem : vl) {
                 if (initValues.exist(elem.first))
                     throw utils::InternalError(
                         fmt(_("Multiples condition with the same init port " \
@@ -124,7 +124,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
 
                 initValues.add(elem.first, std::move(elem.second));
             }
-	}
+        }
     }
 
     try {
@@ -218,7 +218,7 @@ buildNewDynamicsWrapper(devs::Simulator* atom,
 
     try {
         utils::PackageTable pkg_table;
-        
+
         return std::unique_ptr<Dynamics>(
             fct(DynamicsWrapperInit(
                     *atom->getStructure(),
@@ -241,12 +241,12 @@ std::unique_ptr<Dynamics> buildNewDynamics(devs::Simulator* atom,
                                            void *symbol)
 {
     typedef Dynamics*(*fctdyn)(const DynamicsInit&, const InitEventList&);
-    
+
     fctdyn fct = utils::functionCast < fctdyn >(symbol);
 
     try {
         utils::PackageTable pkg_table;
-        
+
         return std::unique_ptr<Dynamics>(
             fct(DynamicsInit(*atom->getStructure(),
                              pkg_table.get(dyn.package())), events));
@@ -299,11 +299,28 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
     utils::ModuleType type = utils::MODULE_DYNAMICS;
 
     try {
-        symbol = mModuleMgr.get(dyn.package(), dyn.library(),
-                                utils::MODULE_DYNAMICS, &type);
+        /* If \e package is not empty we assume that library is the shared
+         * library. Otherwise, we load the global symbol stores in \e
+         * library/executable and we cast it into a \e
+         * vle::devs::Dynamics... Only useful for unit test or to build
+         * executable with dynamics.
+         */
+        if (not dyn.package().empty()) {
+            symbol = mModuleMgr.get(dyn.package(), dyn.library(),
+                                    utils::MODULE_DYNAMICS, &type);
+        } else {
+            symbol = mModuleMgr.get(dyn.library());
+
+            if (dyn.library().length() >= 4) {
+                if (dyn.library().compare(0, 4, "exe_") == 0)
+                    type = utils::MODULE_DYNAMICS_EXECUTIVE;
+                else if (dyn.library().compare(0, 4, "wra_") == 0)
+                    type = utils::MODULE_DYNAMICS_WRAPPER;
+            }
+        }
     } catch (const std::exception& e) {
-        throw utils::ModellingError(fmt(
-                _("Dynamic library loading problem: cannot get any"
+        throw utils::ModellingError(
+            fmt(_("Dynamic library loading problem: cannot get any"
                   " dynamics, executive or wrapper '%1%' in library"
                   " '%2%' package '%3%'\n:%4%")) % dyn.name() %
             dyn.library() % dyn.package() % e.what());
