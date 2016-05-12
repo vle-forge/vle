@@ -280,56 +280,40 @@ public:
         return false;
     }
 
-    virtual void onParameter(const std::string& plugin,
-                             const std::string& location,
-                             const std::string& file,
-                             std::unique_ptr<value::Value> parameters,
-                             const double& time) override
+    virtual void onParameter(const std::string& /* plugin */,
+                             const std::string& /* location */,
+                             const std::string& /* file */,
+                             std::unique_ptr<value::Value> /* parameters */,
+                             const double& /* time */) override
     {
-        (void)parameters;
-
-        std::printf("onParameter: %s/%s/%s/%f\n", plugin.c_str(),
-                    location.c_str(), file.c_str(), time);
     }
 
     virtual void onNewObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& port,
-                                 const std::string& view,
-                                 const double& time) override
+                                 const std::string& /* view */,
+                                 const double& /* time */) override
     {
-        std::printf("onNewObservable %s/%s/%s/%s/%f\n", simulator.c_str(),
-                    parent.c_str(), port.c_str(), view.c_str(), time);
-
         std::string key = parent + '.' + simulator + '.' + port;
 
         pp_D[key] = { std::unique_ptr<vle::value::Value>(), 0 };
     }
 
-    virtual void onDelObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& port,
-                                 const std::string& view,
-                                 const double& time) override
+    virtual void onDelObservable(const std::string& /* simulator */,
+                                 const std::string& /* parent */,
+                                 const std::string& /* port */,
+                                 const std::string& /* view */,
+                                 const double& /* time */) override
     {
-        std::printf("onDelObservable\n");
-        (void)simulator;
-        (void)parent;
-        (void)port;
-        (void)view;
-        (void)time;
     }
 
     virtual void onValue(const std::string& simulator,
                          const std::string& parent,
                          const std::string& port,
-                         const std::string& view,
-                         const double& time,
+                         const std::string& /* view */,
+                         const double& /* time */,
                          std::unique_ptr<value::Value> value) override
     {
-        std::printf("onValue %s/%s/%s/%s/%f\n", simulator.c_str(),
-                    parent.c_str(), port.c_str(), view.c_str(), time);
-
         std::string key = parent + '.' + simulator + '.' + port;
 
         auto& data = pp_D[key];
@@ -382,7 +366,7 @@ extern "C" {
         return new ::ModelDbg(init, events);
     }
 
-    VLE_MODULE vle::devs::Dynamics* make_new_exe(
+    VLE_MODULE vle::devs::Dynamics* exe_make_new_exe(
         const vle::devs::ExecutiveInit& init,
         const vle::devs::InitEventList& events)
     {
@@ -450,32 +434,36 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
     vpz.project().experiment().setDuration(100.0);
     vpz.project().experiment().setBegin(0.0);
 
-    vpz.project().experiment().views().addLocalStreamOutput("output", "toto",
-                                                            "make_oovplugin", "");
+    vpz.project().experiment().views().addLocalStreamOutput(
+        "output", "toto", "make_oovplugin", "");
 
     vpz.project().experiment().views().add(
         vpz::View("The_view", vle::vpz::View::Type::TIMED, "output", 1.0));
 
-    vpz::Observable& obs = vpz.project().experiment().views().addObservable(vpz::Observable("obs"));
+    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+        vpz::Observable("obs"));
     vpz::ObservablePort& port = obs.add("port");
     port.add("The_view");
 
     {
-        auto x = vpz.project().dynamics().dynamiclist().emplace("dyn_1", vpz::Dynamic("dyn_1"));
+        auto x = vpz.project().dynamics().dynamiclist().emplace(
+            "dyn_1", vpz::Dynamic("dyn_1"));
         BOOST_REQUIRE(x.second == true);
         x.first->second.setLibrary("make_new_model");
     }
 
     {
-        auto x = vpz.project().dynamics().dynamiclist().emplace("dyn_3", vpz::Dynamic("dyn_3"));
+        auto x = vpz.project().dynamics().dynamiclist().emplace(
+            "dyn_3", vpz::Dynamic("dyn_3"));
         BOOST_REQUIRE(x.second == true);
         x.first->second.setLibrary("make_new_model_dbg");
     }
 
     {
-        auto x = vpz.project().dynamics().dynamiclist().emplace("dyn_2", vpz::Dynamic("dyn_2"));
+        auto x = vpz.project().dynamics().dynamiclist().emplace(
+            "dyn_2", vpz::Dynamic("dyn_2"));
         BOOST_REQUIRE(x.second == true);
-        x.first->second.setLibrary("make_new_exe");
+        x.first->second.setLibrary("exe_make_new_exe");
     }
 
     vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
