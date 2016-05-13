@@ -112,6 +112,10 @@ void StreamWriter::process(Simulator* simulator,
         parent = simulator->getParent();
     }
 
+    /* This is a strange behaviour. If the simulator is destroyed, we call
+     * the onValue function with empty simulator and parent.
+     */
+
     plugin()->onValue(name, parent, portname, view, time, std::move(val));
 }
 
