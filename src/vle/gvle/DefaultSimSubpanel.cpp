@@ -65,6 +65,19 @@ DefaultSimSubpanelThread::onStarted()
     std::unique_ptr<vle::vpz::Vpz> vpz(nullptr);
     try{
          vpz.reset(new vle::vpz::Vpz(mvpm->getFilename().toStdString()));
+        //set default location of outputs
+        vle::vpz::Outputs::iterator itb =
+            vpz->project().experiment().views().outputs().begin();
+        vle::vpz::Outputs::iterator ite =
+            vpz->project().experiment().views().outputs().end();
+        for (; itb!=ite; itb++) {
+            vle::vpz::Output& output = itb->second;
+            if (output.location().empty()) {
+                mpkg->addDirectory("","output",vle::utils::PKG_SOURCE);
+                output.setLocalStreamLocation(mpkg->getOutputDir(
+                                                  vle::utils::PKG_SOURCE));
+            }
+        }
     } catch(const vle::utils::SaxParserError& e) {
         error_simu = QString("Error before simulation '%1'").arg(e.what());
     }
@@ -535,5 +548,3 @@ DefaultSimSubpanel::onToolColor()
 }
 
 }} //namespaces
-
-
