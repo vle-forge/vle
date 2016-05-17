@@ -93,7 +93,7 @@ VpzPortItem::VpzPortItem(QDomNode node, vleVpm* vpm, bool input,
 {
     this->setAcceptHoverEvents(true);
 
-    QPixmap pix (":/icon/resources/vpz_inport.png");
+    QPixmap pix (":/icon/resources/icon/vpz_inport.png");
     QGraphicsTextItem* textItem = new QGraphicsTextItem(getPortName(), this);
     textItem->setFont(scene->getFontPort());
 //    textItem->setDefaultTextColor(Qt::black);
