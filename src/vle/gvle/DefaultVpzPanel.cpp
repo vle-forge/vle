@@ -78,7 +78,6 @@ DefaultVpzPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
             basepath+"/metadata/"+relPathVpm, mGvlePlugins);
 
     vpm->setLogger(log);
-    vpm->setBasePath("coucouTODO");
 
     m_rtool->setVpm(vpm);
     m_vpzview->setVpm(vpm);
@@ -216,5 +215,3 @@ DefaultVpzPanel::onRightSimWidgetChanged()
 }
 
 }} //namespaces
-
-
