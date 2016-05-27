@@ -60,9 +60,9 @@ public:
     ~Manager();
 
     Manager(const Manager& other) = delete;
-    Manager& operator=(const Manager& other) = delete;;
+    Manager& operator=(const Manager& other) = delete;
     Manager(Manager&& other) = delete;
-    Manager& operator=(Manager&& other) = delete;;
+    Manager& operator=(Manager&& other) = delete;
 
     /**
      * Run an part or a complete experimental frames with mono thread
