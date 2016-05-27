@@ -42,11 +42,14 @@
 #include <fstream>
 #include <vector>
 #include <map>
+#include <thread>
+#include <chrono>
 #include <string>
 #include <iterator>
 #include <iostream>
 #include <sstream>
 #include <numeric>
+#include <memory>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DateTime.hpp>
@@ -68,111 +71,45 @@ using namespace vle;
 namespace bs = boost::system;
 namespace fs = boost::filesystem;
 
-#if BOOST_VERSION <= 104500
-/*
- * Build a temporary directory path name.
- */
-static std::string get_temporary_path()
-{
-    const char *names[] = { "TMPDIR", "TMP", "TEMP" };
-    const int names_size = sizeof(names) / sizeof(names[0]);
-
-    for (int i = 0; i != names_size; ++i)
-        if (::getenv(names[i]) && fs::exists(::getenv(names[i])) &&
-                     fs::is_directory(::getenv(names[i])))
-            return names[i];
-
-#ifdef _WIN32
-    return "c:/tmp";
-#else	
-    return "/tmp";
-#endif
-}
-#endif
-
-/*
- * We need to ensure each file really installed.
- */
-static void make_pause()
-{
-#ifdef _WIN32
-    ::Sleep(1000);
-#else
-    ::sleep(1);
-#endif
-}
-
 struct F
 {
-    vle::Init *a;
+    std::unique_ptr<vle::Init> a;
     fs::path current_path;
 
     F() throw()
-        : a(nullptr)
     {
         bs::error_code ec;
 
-#if BOOST_VERSION > 104500
         current_path = fs::temp_directory_path(ec);
         current_path /= fs::unique_path("vle-%%%%-%%%%-%%%%-%%%%");
-#else
-	current_path = get_temporary_path();
-	current_path /= "checkvle";
-#endif
 
-#if BOOST_VERSION > 104500
         fs::create_directory(current_path, ec);
-#else
-        fs::create_directory(current_path);
-#endif
 
-#if BOOST_VERSION > 104500
         if (fs::exists(current_path, ec) && fs::is_directory(current_path, ec)) {
-#else
-        if (fs::exists(current_path) && fs::is_directory(current_path)) {
-#endif
 
 #ifdef _WIN32
             ::_putenv((vle::fmt("VLE_HOME=%1%")
-                    % current_path.string()).str().c_str());
+                       % current_path.string()).str().c_str());
 #else
-#  if BOOST_VERSION > 104500
             ::setenv("VLE_HOME", current_path.c_str(), 1);
-#  else
-            ::setenv("VLE_HOME", current_path.file_string().c_str(), 1);
-#  endif
 #endif
         }
 
-#if BOOST_VERSION > 104500
         fs::current_path(current_path, ec);
-#else
-        fs::current_path(current_path);
-#endif
 
-        a = new vle::Init();
+        a = std::unique_ptr<vle::Init>(new vle::Init());
         vle::utils::Preferences prefs(false, "vle.conf");
     }
 
     ~F() throw()
     {
-#if BOOST_VERSION > 104500
         bs::error_code ec;
 
-        if (fs::exists(current_path, ec) && fs::is_directory(current_path, ec)) {
-            fs::remove_all(current_path, ec); /**< comment this line if you
-                                      * want to conserve the temporary VLE_HOME
-                                      * directory. */
-        }
-#else
-        if (fs::exists(current_path) && fs::is_directory(current_path)) {
-            fs::remove_all(current_path); /**< comment this line if you
-                                      * want to conserve the temporary VLE_HOME
-                                      * directory. */
-        }
-#endif
-
-        delete a;
+        // if (fs::exists(current_path, ec) && fs::is_directory(current_path, ec))
+        //     fs::remove_all(current_path, ec); /**< comment this line if
+        //                                        * you want to conserve the
+        //                                        * temporary VLE_HOME
+        //                                        * directory. */
     }
 
 private:
@@ -211,19 +148,20 @@ BOOST_FIXTURE_TEST_CASE(show_package, F)
     pkg.install();
 
     /* We need to ensure each file really installed. */
-    make_pause();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     std::cout << "Installed packages:\n";
     PathList lst = Path::path().getBinaryPackages();
     std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
                   std::cout, "\n"));
 
-    if (not fs::exists(pkg.getExpDir(vle::utils::PKG_BINARY))) {
-        std::cout << "Installed vpz  :\n";
-        PathList vpz = pkg.getExperiments();
-        std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
-                std::cout, "\n"));
-    }
+    if (not fs::exists(pkg.getExpDir(vle::utils::PKG_BINARY)))
+        return;
+    
+    std::cout << "Installed vpz  :\n";
+    PathList vpz = pkg.getExperiments();
+    std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
+                  std::cout, "\n"));
 }
 
 BOOST_FIXTURE_TEST_CASE(remote_package_check_package_tmp, F)
@@ -235,7 +173,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_check_package_tmp, F)
     pkg_tmp.install();
 
     /* We need to ensure each file really installed. */
-    make_pause();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     utils::RemoteManager rmt;
     utils::Packages results;
@@ -298,7 +236,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
     pkg.minor = 2;
     pkg.patch = 3;
 
-     fs::path path = utils::RemoteManager::getRemotePackageFilename();
+    fs::path path = utils::RemoteManager::getRemotePackageFilename();
 
     {
         std::ofstream ofs(path.string().c_str());
@@ -306,7 +244,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
     }
 
     /* We need to ensure each file really installed. */
-    make_pause();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     utils::RemoteManager rmt;
 
@@ -380,7 +318,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
     }
 
     /* We need to ensure each file really installed. */
-    make_pause();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     {
         utils::RemoteManager rmt;
@@ -486,36 +424,27 @@ BOOST_FIXTURE_TEST_CASE(test_compress_filepath, F)
 {
     std::string filepath;
     std::string uniquepath;
-    try {
-#if BOOST_VERSION > 104500
-        fs::path unique = fs::unique_path("%%%%-%%%%-%%%%-%%%%");
-#else
-        fs::path unique = "check";
-#endif
 
+    try {
+        fs::path unique = fs::unique_path("%%%%-%%%%-%%%%-%%%%");
         vle::utils::Package pkg(unique.string());
         pkg.create();
-
-        filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
-
         pkg.configure();
         pkg.build();
         pkg.install();
+
+        filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
         uniquepath = unique.string();
     } catch (...) {
         BOOST_REQUIRE(false);
     }
 
     /* We need to ensure each file really installed. */
-    make_pause();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     BOOST_REQUIRE(not filepath.empty());
 
-#if BOOST_VERSION > 104500
     fs::path tarfile(fs::temp_directory_path());
-#else
-    fs::path tarfile(get_temporary_path());
-#endif
     tarfile /= "check.tar.bz2";
 
     fs::current_path(vle::utils::Path::path().getBinaryPackagesDir());
@@ -524,11 +453,7 @@ BOOST_FIXTURE_TEST_CASE(test_compress_filepath, F)
                                                         tarfile.string()));
     BOOST_REQUIRE(fs::exists(fs::path(tarfile)));
 
-#if BOOST_VERSION > 104500
     fs::path tmpfile(fs::temp_directory_path());
-#else
-    fs::path tmpfile = get_temporary_path();
-#endif
     tmpfile /= "unique";
 
     fs::create_directory(tmpfile);

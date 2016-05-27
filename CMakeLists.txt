@@ -136,10 +136,9 @@ if (WIN32)
   find_package(VLEDEPS REQUIRED)
 else ()
   find_package(PkgConfig REQUIRED)
-  pkg_check_modules(VLEDEPS libarchive libxml-2.0)
+  pkg_check_modules(VLEDEPS libxml-2.0)
   if (NOT VLEDEPS_FOUND)
-    message(FATAL_ERROR "Failed to find minimal dependencies: libarchive "
-      " and libxml-2.0")
+    message(FATAL_ERROR "Failed to find minimal dependencies: libxml-2.0")
   endif ()
 endif ()
 

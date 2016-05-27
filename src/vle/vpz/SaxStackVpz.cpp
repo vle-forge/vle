@@ -33,8 +33,7 @@
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Exception.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/cast.hpp>
+#include <vle/utils/Tools.hpp>
 #include <cstring>
 
 namespace {

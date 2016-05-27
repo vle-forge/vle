@@ -46,7 +46,7 @@ struct F
     ~F() { }
 };
 
-BOOST_GLOBAL_FIXTURE(F);
+BOOST_GLOBAL_FIXTURE(F)
 
 const std::string& str(
     "# this file is a test\n"
