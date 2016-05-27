@@ -105,7 +105,7 @@ FileVpzExpCond::resizeTable()
     int nbRows = 0;
     int nbCols = 0;
     QDomNodeList condList = mVpm->condsListFromConds(mVpm->condsFromDoc());
-    for (unsigned int i = 0; i < condList.length(); i++) {
+    for (auto i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
         QString name = mVpm->vdo()->attributeValue(cond, "name");
         if (mVpm->getCondGUIplugin(name) != "") {
@@ -115,7 +115,7 @@ FileVpzExpCond::resizeTable()
             if (portList.length() == 0) {
                 nbRows++;
             }
-            for (unsigned int j = 0; j < portList.length(); j++) {
+            for (auto j = 0; j < portList.length(); j++) {
                 nbRows++;
                 QDomNode port = portList.at(j);
                 nbCols = std::max(nbCols,
@@ -136,7 +136,7 @@ FileVpzExpCond::reload(bool resize)
     QDomNodeList condList = mVpm->condsListFromConds(mVpm->condsFromDoc());
 
     int rows = 0;
-    for (unsigned int i = 0; i < condList.length(); i++) {
+    for (auto i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
         QString name = mVpm->vdo()->attributeValue(cond, "name");
         QDomNodeList portList = mVpm->portsListFromDoc(name);
@@ -157,7 +157,7 @@ FileVpzExpCond::reload(bool resize)
             rows++;
         } else  {
             // Then for each port, add an item into the tree
-            for (unsigned int j = 0; j < portList.length(); j++) {
+            for (auto j = 0; j < portList.length(); j++) {
                 QDomNode port = portList.at(j);
                 insertTextEdit(rows, 0, name);
                 insertTextEdit(rows, 1, mVpm->vdo()->attributeValue(port,

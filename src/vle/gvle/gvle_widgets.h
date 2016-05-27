@@ -150,7 +150,7 @@ public:
     void mouseDoubleClickEvent(QMouseEvent* e);
     QString saved_value;
     QString id;
-    bool edit_on_dble_click;;
+    bool edit_on_dble_click;
 
 signals:
     void textUpdated(const QString& id, const QString& old,
