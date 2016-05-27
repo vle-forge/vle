@@ -4,12 +4,48 @@ VLE 1.3.0
 Release highlights
 ------------------
 
-- GVLE is completely rewritten with QT 4.8. The old GVLE in Gtkmm
-  [2,3] is removed and all plug-ins are disabled or rewritten.
+### C++11/14
+
+All the source code and API move to the C++11/14. Compiler
+requirements are now gcc 4.8 or clang 3.5 available in Ubuntu LTS
+14.04 or Debian GNU/Linux Wheezy.
+
+Many boost functions or classes are replaced with standard functions
+and classes.
+
+### Remove dependencies:
+
+- The libarchive-dev is remove. We replace the libarchive dependency to
+  build/extract tarball with the cmake subprocess command (`cmake -E tar
+  [cxt][vf][zjJ] file.tar` command).
+
+- `boost::random`, `boost::thread` removed.
+
+### Model in executable:
+
+From now, ModelFactory and StreamWriter can load symbol into the main
+program instead of the shared libraries specified by the package
+information. To use this feature, the package must be empty in the
+vpz::Dynamics or vpz::Output object. Then the library is used to
+define the symbol to load. For example:
+
+- `vpz::Dynamics { Package = "toto", Libbrary = "titi" }` loads the
+  shared library `$VLE_HOME/pkgs-1.x/toto/lib/simulator/libtiti.so`
+  and try to found the `vle_make_dynamics` symbol.
+
+- `vpz::Dynamics { Package = "", library="make_titi" }` loads the
+  symbol `make_titi`.
+
+If the library name starts with `exe_` or `wra_` then symbols
+respectively define a `vle::devs::Executive` or a
+`vle::devs::DynamicsWrapper`.
+
+### GVLE
+
+- GVLE is completely rewritten with QT 5. The old GVLE in Gtkmm [2,3]
+  is removed and all plug-ins are disabled or rewritten.
+
+### CMake
+
 - The users CMake scripts are updated to simplify the development of
   packages.
-
-Changes from VLE-1.2
---------------------
-
-To be continued.
