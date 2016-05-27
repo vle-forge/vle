@@ -221,23 +221,23 @@ void SaxStackVpz::buildModelGraphics(vpz::BaseModel* mdl,
 {
     if (not x.empty() and not y.empty()) {
         try {
-            mdl->setX(boost::lexical_cast < int >(x));
-            mdl->setY(boost::lexical_cast < int >(y));
-        } catch (boost::bad_lexical_cast& e) {
-            throw(utils::SaxParserError(fmt(_(
-                    "Cannot convert x or y position for model %1%")) %
-                mdl->getName()));
+            mdl->setX(std::stoi(x));
+            mdl->setY(std::stoi(y));
+        } catch (const std::exception& /* e */) {
+            throw utils::SaxParserError(
+                fmt(_("Cannot convert x or y position for model %1%")) %
+                mdl->getName());
         }
     }
 
     if (not width.empty() and not height.empty()) {
         try {
-            mdl->setWidth(boost::lexical_cast < int >(width));
-            mdl->setHeight(boost::lexical_cast < int >(height));
-        } catch (boost::bad_lexical_cast& e) {
-            throw(utils::SaxParserError(fmt(_(
-                    "Cannot convert width or height for model %1%")) %
-                mdl->getName()));
+            mdl->setWidth(std::stoi(width));
+            mdl->setHeight(std::stoi(height));
+        } catch (const std::exception& /* e */) {
+            throw utils::SaxParserError(
+                fmt(_("Cannot convert width or height for model %1%")) %
+                mdl->getName());
         }
     }
 }

@@ -174,16 +174,9 @@ class DescriptionParser
         unget();
 
         try {
-            *value = boost::lexical_cast < int32_t >(str);
-
-            // std::cout << "read_integer " << *value << "\n";
-
+            *value = std::stoi(str);
             return true;
-        } catch (const std::exception &e) {
-            (void)e;
-
-            // std::cout << "read_integer bad cast\n";
-
+        } catch (const std::exception &/* e */) {
             return false;
         }
     }
@@ -406,12 +399,9 @@ class DescriptionParser
         } while (in);
 
         try {
-            *value = boost::lexical_cast < uint64_t >(str);
-
+            *value = std::stol(str);
             return true;
-        } catch (const std::exception &e) {
-            (void)e;
-
+        } catch (const std::exception &/* e */) {
             return false;
         }
     }

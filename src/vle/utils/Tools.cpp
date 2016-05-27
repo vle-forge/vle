@@ -30,8 +30,8 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Types.hpp>
 #include <vle/version.hpp>
-#include <boost/lexical_cast.hpp>
 #include <iomanip>
+#include <sstream>
 
 #ifdef _WIN32
 #include <io.h>
@@ -58,29 +58,23 @@ namespace vle { namespace utils {
 template < typename T >
     bool is(const std::string& str)
     {
-        try {
-            boost::lexical_cast < T >(str);
-            return true;
-        } catch (const boost::bad_lexical_cast& /*e*/) {
-            return false;
-        }
+        std::stringstream s(str);
+        T t;
+        return s >> t;
     }
 
 template <>
     bool is < bool >(const std::string& str)
     {
-        if (str == "true") {
+        if (str == "true")
             return true;
-        } else if (str == "false") {
+
+        if (str == "false")
             return false;
-        } else {
-            try {
-                boost::lexical_cast < bool >(str);
-                return true;
-            } catch (const boost::bad_lexical_cast& /*e*/) {
-                return false;
-            }
-        }
+        
+        std::stringstream s(str);
+        bool b;
+        return s >> b;
     }
 
 template VLE_API bool is < bool >(const std::string& str);
@@ -124,11 +118,12 @@ template VLE_API std::string to < float >(const float t);
 template < typename T >
     T to(const std::string& str)
     {
-        try {
-            return boost::lexical_cast < T >(str);
-        } catch (const boost::bad_lexical_cast& /*e*/) {
-            throw utils::ArgError(fmt(_("Can not convert `%1%'")) % str);
-        }
+        std::stringstream s(str);
+        T ret;
+        if (s >> ret)
+            return ret;
+
+        throw utils::ArgError(fmt(_("Can not convert `%1%'")) % str);
     }
 
 template VLE_API bool to < bool >(const std::string& str);
