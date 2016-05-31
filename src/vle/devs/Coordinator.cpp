@@ -89,15 +89,17 @@ Coordinator::~Coordinator()
 {
     std::for_each(m_modelList.begin(),
                   m_modelList.end(),
-                  boost::bind(
-                      boost::checked_deleter < Simulator >(),
-                      boost::bind(&SimulatorMap::value_type::second, _1)));
+                  [](const SimulatorMap::value_type& pair)
+                  {
+                      delete pair.second;
+                  });
 
     std::for_each(m_viewList.begin(),
                   m_viewList.end(),
-                  boost::bind(
-                      boost::checked_deleter < View >(),
-                      boost::bind(&ViewList::value_type::second, _1)));
+                  [](const ViewList::value_type& pair)
+                  {
+                      delete pair.second;
+                  });
 }
 
 void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
