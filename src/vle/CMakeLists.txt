@@ -3,8 +3,6 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
 
 link_directories(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 
-
-
 #
 # Explore subfolders to find source code, plug-ins etc.
 #

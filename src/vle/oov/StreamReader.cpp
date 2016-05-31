@@ -29,6 +29,7 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
 
 namespace vle { namespace oov {
@@ -56,9 +57,9 @@ void StreamReader::initPlugin(const std::string& plugin,
         PluginPtr ptr(fct(location));
         m_plugin = ptr;
     } catch(const std::exception& e) {
-        throw utils::InternalError(fmt(
-                _("Oov module: error when loading the module: %1%")) %
-            e.what());
+        throw utils::InternalError(
+            (fmt(_("Oov module: error when loading the module: %1%")) %
+             e.what()).str());
     }
 }
 

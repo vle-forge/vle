@@ -26,6 +26,7 @@
 
 
 #include <vle/translator/GraphTranslator.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/tokenizer.hpp>
 
 namespace vle { namespace translator {
@@ -97,7 +98,7 @@ void GraphTranslator::translate(const value::Map& buffer)
 void GraphTranslator::makeBigBang()
 {
     for (size_type i = 0; i < mNodeNumber; ++i){
-        std::string name = (boost::format("%1%-%2%") % mPrefix % i).str();
+        std::string name = (fmt("%1%-%2%") % mPrefix % i).str();
         createNewNode(name, mClass[i]);
     }
 

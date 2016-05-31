@@ -39,6 +39,7 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/value/User.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <sstream>
 
 namespace vle { namespace value {

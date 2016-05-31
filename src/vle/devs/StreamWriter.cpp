@@ -30,6 +30,7 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
 
 namespace vle { namespace devs {
@@ -71,8 +72,8 @@ void StreamWriter::open(const std::string& pluginname,
         m_plugin = ptr;
     } catch(const std::exception& e) {
         throw utils::InternalError(
-            fmt(_("Oov: Can not open the plug-in `%1%': %2%")) % pluginname %
-            e.what());
+            (fmt(_("Oov: Can not open the plug-in `%1%': %2%")) % pluginname %
+             e.what()).str());
     }
 
     plugin()->onParameter(pluginname, location, file,

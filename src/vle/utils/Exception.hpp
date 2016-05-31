@@ -25,162 +25,138 @@
  */
 
 
-#ifndef UTILS_EXCEPTION_HPP
-#define UTILS_EXCEPTION_HPP
+#ifndef VLE_UTILS_EXCEPTION_HPP
+#define VLE_UTILS_EXCEPTION_HPP
 
-#include <string>
 #include <exception>
 #include <stdexcept>
-#include <vle/utils/i18n.hpp>
+#include <string>
 #include <vle/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
-    /**
-     * @brief Base class to manage exception in VLE application.
-     *
-     */
-    class VLE_API BaseError : public std::runtime_error
-    {
-    public:
-        explicit BaseError(const std::string& argv = std::string())
-            : std::runtime_error(argv) {}
+/**
+ * @brief Base class to manage exception in VLE application.
+ *
+ */
+class VLE_API BaseError : public std::runtime_error
+{
+public:
+    explicit BaseError(const std::string& argv = std::string())
+        : std::runtime_error(argv)
+    {}
+};
 
-        explicit BaseError(const boost::format& argv)
-            : std::runtime_error(argv.str()) {}
-    };
+/**
+ * @brief Throw to report a bad file access (read, write, open).
+ *
+ */
+class VLE_API FileError : public BaseError
+{
+public:
+    explicit FileError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-    /**
-     * @brief Throw to report a bad file access (read, write, open).
-     *
-     */
-    class VLE_API FileError : public BaseError
-    {
-    public:
-        explicit FileError(const std::string& argv = std::string())
-            : BaseError(argv) {}
+/**
+ * @brief Throw to report a bad XML file parsing.
+ *
+ */
+class VLE_API ParseError : public BaseError
+{
+public:
+    explicit ParseError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-        explicit FileError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
+/**
+ * @brief Throw to report a bad parameter.
+ *
+ */
+class VLE_API ArgError : public BaseError
+{
+public:
+    explicit ArgError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-    /**
-     * @brief Throw to report a bad XML file parsing.
-     *
-     */
-    class VLE_API ParseError : public BaseError
-    {
-    public:
-        explicit ParseError(const std::string& argv = std::string())
-            : BaseError(argv) {}
+/**
+ * @brief Throw to report a bad parameter.
+ *
+ */
+class VLE_API CastError : public BaseError
+{
+public:
+    explicit CastError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-        explicit ParseError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
+/**
+ * @brief Throw to report an internal error.
+ *
+ */
+class VLE_API InternalError : public BaseError
+{
+public:
+    explicit InternalError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-    /**
-     * @brief Throw to report a bad parameter.
-     *
-     */
-    class VLE_API ArgError : public BaseError
-    {
-    public:
-        explicit ArgError(const std::string& argv = std::string())
-            : BaseError(argv) {}
+/**
+ * @brief Throw to report an modelling error.
+ */
+class VLE_API ModellingError : public BaseError
+{
+public:
+    explicit ModellingError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-        explicit ArgError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
+/**
+ * @brief Throw to report an unimplemted feature.
+ */
+class VLE_API NotYetImplemented : public BaseError
+{
+public:
+    explicit NotYetImplemented(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-    /**
-     * @brief Throw to report a bad parameter.
-     *
-     */
-    class VLE_API CastError : public BaseError
-    {
-    public:
-        explicit CastError(const std::string& argv = std::string())
-            : BaseError(argv) {}
+/**
+ * @brief Throw to report a DEVS graph library error.
+ */
+class VLE_API DevsGraphError : public BaseError
+{
+public:
+    explicit DevsGraphError(const std::string& argv = std::string())
+        : BaseError(argv) {}
+};
 
-        explicit CastError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
+class VLE_API VpzError : public BaseError
+{
+public:
+    explicit VpzError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
-    /**
-     * @brief Throw to report an internal error.
-     *
-     */
-    class VLE_API InternalError : public BaseError
-    {
-    public:
-        explicit InternalError(const std::string& argv = std::string())
-            : BaseError(argv) {}
-
-        explicit InternalError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
-
-    /**
-     * @brief Throw to report an modelling error.
-     */
-    class VLE_API ModellingError : public BaseError
-    {
-    public:
-        explicit ModellingError(const std::string& argv = std::string())
-            : BaseError(argv) {}
-
-        explicit ModellingError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
-
-    /**
-     * @brief Throw to report an unimplemted feature.
-     */
-    class VLE_API NotYetImplemented : public BaseError
-    {
-    public:
-        explicit NotYetImplemented(const std::string& argv = std::string())
-            : BaseError(argv) {}
-
-        explicit NotYetImplemented(const boost::format& argv)
-            : BaseError(argv) {}
-    };
-
-    /**
-     * @brief Throw to report a DEVS graph library error.
-     */
-    class VLE_API DevsGraphError : public BaseError
-    {
-    public:
-        explicit DevsGraphError(const std::string& argv = std::string())
-            : BaseError(argv) {}
-
-        explicit DevsGraphError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
-
-    class VLE_API VpzError : public BaseError
-    {
-    public:
-        explicit VpzError(const std::string& argv = std::string())
-            : BaseError(argv) {}
-
-        explicit VpzError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
-
-    /**
-     * @brief Throw to report an error in SaxParser.
-     */
-    class VLE_API SaxParserError : public BaseError
-    {
-    public:
-        explicit SaxParserError(const std::string& argv = std::string())
-            : BaseError(argv) {}
-
-        explicit SaxParserError(const boost::format& argv)
-            : BaseError(argv) {}
-    };
+/**
+ * @brief Throw to report an error in SaxParser.
+ */
+class VLE_API SaxParserError : public BaseError
+{
+public:
+    explicit SaxParserError(const std::string& argv = std::string())
+        : BaseError(argv)
+    {}
+};
 
 }} // namespace vle utils
 

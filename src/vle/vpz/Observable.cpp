@@ -49,8 +49,9 @@ void ObservablePort::write(std::ostream& out) const
 void ObservablePort::add(const std::string& portname)
 {
     if (exist(portname)) {
-        throw utils::ArgError(fmt(
-                _("The port %1% have already a view %2%")) % m_name % portname);
+        throw utils::ArgError(
+            (fmt(_("The port %1% have already a view %2%"))
+             % m_name % portname).str());
     }
 
     m_list.push_back(portname);
@@ -90,9 +91,9 @@ ObservablePort& Observable::add(const std::string& portname)
     x = m_list.insert(value_type(portname, ObservablePort(portname)));
 
     if (not x.second) {
-        throw utils::ArgError(fmt(
-                _("The observable %1% have already a port %2%")) %
-            m_name % portname);
+        throw utils::ArgError(
+            (fmt(_("The observable %1% have already a port %2%")) %
+             m_name % portname).str());
     }
 
     return x.first->second;
@@ -106,9 +107,9 @@ ObservablePort& Observable::add(const ObservablePort& obs)
                 obs.name(), obs));
 
     if (not x.second) {
-        throw utils::ArgError(fmt(
-                _("The observable %1% have already a port %2%")) %
-            m_name % obs.name());
+        throw utils::ArgError(
+            (fmt(_("The observable %1% have already a port %2%")) %
+             m_name % obs.name()).str());
     }
 
     return x.first->second;
@@ -119,8 +120,9 @@ ObservablePort& Observable::get(const std::string& portname)
     auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(fmt(
-                _("The observable %1% have not port %2%")) % m_name % portname);
+        throw utils::ArgError(
+            (fmt(_("The observable %1% have not port %2%"))
+             % m_name % portname).str());
     }
 
     return it->second;
@@ -131,8 +133,9 @@ const ObservablePort& Observable::get(const std::string& portname) const
     auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(fmt(
-                _("The observable %1% have not port %2%")) % m_name % portname);
+        throw utils::ArgError(
+            (fmt(_("The observable %1% have not port %2%"))
+             % m_name % portname).str());
     }
 
     return it->second;

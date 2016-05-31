@@ -76,8 +76,8 @@ static void buildCommandLine(const std::string& cmd,
     su.g_shell_parse_argv(cmd, argcp, argv);
 
     if (argv.empty()) {
-        throw utils::ArgError(fmt(_(
-                    "Package command line: error, empty command `%1%'")) % cmd);
+        throw utils::ArgError(
+            (fmt(_("Package command line: error, empty command `%1%'")) % cmd).str());
     }
     exe = Path::findProgram(argv.front());
     argv.erase(argv.begin());
@@ -121,7 +121,7 @@ struct Package::Pimpl
         if (not m_spawn.isfinish()) {
             if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
                 utils::Trace::send(
-                    fmt("-[%1%] Need to wait old process before") % exe);
+                    (fmt("-[%1%] Need to wait old process before") % exe).str());
             }
             m_spawn.wait();
             m_spawn.status(&m_message, &m_issuccess);
@@ -129,7 +129,7 @@ struct Package::Pimpl
         bool started = m_spawn.start(exe, workingDir, argv);
 
         if (not started) {
-            throw utils::ArgError(fmt(_("Failed to start `%1%'")) % exe);
+            throw utils::ArgError((fmt(_("Failed to start `%1%'")) % exe).str());
         }
     }
 
@@ -178,8 +178,9 @@ Package::~Package()
 void Package::create()
 {
     if (fs::exists(getDir(PKG_SOURCE))) {
-        throw utils::FileError( fmt(_("Pkg create error: "
-                "the directory %1% already exists")) % getDir(PKG_SOURCE));
+        throw utils::FileError(
+            (fmt(_("Pkg create error: "
+                   "the directory %1% already exists")) % getDir(PKG_SOURCE)).str());
     }
     refreshPath();
     fs::create_directory(getDir(PKG_SOURCE));
@@ -219,8 +220,8 @@ void Package::configure()
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch(const std::exception& e) {
         fs::current_path(old_dir);
-        throw utils::InternalError(fmt(
-                _("Pkg configure error: %1%")) % e.what());
+        throw utils::InternalError(
+            (fmt(_("Pkg configure error: %1%")) % e.what()).str());
     }
     fs::current_path(old_dir);
 }
@@ -245,8 +246,8 @@ void Package::test()
     }
     if (not fs::exists(pkg_buildir)) {
         throw utils::FileError(
-                fmt(_("Pkg test error: building directory '%1%' "
-                        "does not exist ")) % pkg_buildir.c_str());
+            (fmt(_("Pkg test error: building directory '%1%' "
+                   "does not exist ")) % pkg_buildir).str());
     }
     fs::path old_dir = fs::current_path();
     fs::current_path(pkg_buildir);
@@ -262,7 +263,7 @@ void Package::test()
     } catch (const std::exception& e) {
         fs::current_path(old_dir);
         throw utils::InternalError(
-            fmt(_("Pkg error: test launch failed %1%")) % e.what());
+            (fmt(_("Pkg error: test launch failed %1%")) % e.what()).str());
     }
     fs::current_path(old_dir);
 }
@@ -301,8 +302,8 @@ void Package::build()
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch(const std::exception& e) {
         fs::current_path(old_dir);
-        throw utils::InternalError(fmt(
-                _("Pkg build error: build failed %1%")) % e.what());
+        throw utils::InternalError(
+            (fmt(_("Pkg build error: build failed %1%")) % e.what()).str());
     }
     fs::current_path(old_dir);
 }
@@ -327,8 +328,8 @@ void Package::install()
     }
     if (not fs::exists(pkg_buildir)) {
         throw utils::FileError(
-                fmt(_("Pkg install error: building directory '%1%' "
-                        "does not exist ")) % pkg_buildir.c_str());
+            (fmt(_("Pkg install error: building directory '%1%' "
+                   "does not exist ")) % pkg_buildir.c_str()).str());
     }
     fs::path old_dir = fs::current_path();
     fs::current_path(pkg_buildir);
@@ -341,22 +342,14 @@ void Package::install()
 
     if (not fs::exists(builddir)) {
         throw utils::ArgError(
-            fmt(_("Pkg build error: directory '%1%' does not exist")) %
-#if BOOST_VERSION > 104500
-            builddir.string());
-#else
-            builddir.file_string());
-#endif
+            (fmt(_("Pkg build error: directory '%1%' does not exist")) %
+             builddir.string()).str());
     }
 
     if (not fs::is_directory(builddir)) {
-        throw utils::ArgError(fmt(
-                _("Pkg build error: '%1%' is not a directory")) %
-#if BOOST_VERSION > 104500
-            builddir.string());
-#else
-            builddir.file_string());
-#endif
+        throw utils::ArgError(
+            (fmt(_("Pkg build error: '%1%' is not a directory")) %
+             builddir.string()).str());
     }
 
     try {
@@ -364,7 +357,7 @@ void Package::install()
     } catch(const std::exception& e) {
         fs::current_path(old_dir);
         throw utils::InternalError(
-            fmt(_("Pkg build error: install lib failed %1%")) % e.what());
+            (fmt(_("Pkg build error: install lib failed %1%")) % e.what()).str());
     }
     fs::current_path(old_dir);
 }
@@ -416,8 +409,8 @@ void Package::pack()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch(const std::exception& e) {
-        throw utils::InternalError(fmt(
-                _("Pkg packaging error: package failed %1%")) % e.what());
+        throw utils::InternalError(
+            (fmt(_("Pkg packaging error: package failed %1%")) % e.what()).str());
     }
 }
 
@@ -696,13 +689,9 @@ PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
 {
     fs::path pkg(getExpDir(type));
     if (not fs::exists(pkg) or not fs::is_directory(pkg)) {
-        throw utils::InternalError(fmt(
-                _("Pkg list error: '%1%' is not an experiments directory")) %
-#if BOOST_VERSION > 104500
-            pkg.string());
-#else
-            pkg.file_string());
-#endif
+        throw utils::InternalError(
+            (fmt(_("Pkg list error: '%1%' is not an experiments directory")) %
+             pkg.string()).str());
     }
 
     PathList result;
@@ -847,13 +836,9 @@ std::string Package::rename(const std::string& oldname,
     newfilepath /= newname;
 
     if (not fs::exists(oldfilepath) or fs::exists(newfilepath)) {
-        throw utils::ArgError(fmt(
-                _("In Package `%1%', can not rename `%2%' in `%3%'")) %
-#if BOOST_VERSION > 104500
-            name() % oldfilepath.string() % newfilepath.string());
-#else
-            name() % oldfilepath.file_string() % newfilepath.file_string());
-#endif
+        throw utils::ArgError(
+            (fmt(_("In Package `%1%', can not rename `%2%' in `%3%'")) %
+             name() % oldfilepath.string() % newfilepath.string()).str());
     }
 
     fs::rename(oldfilepath, newfilepath);

@@ -29,6 +29,7 @@
 #include <vle/vpz/SaxParser.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <fstream>
 #include <iomanip>
 #include <limits>
@@ -79,8 +80,8 @@ void Vpz::parseFile(const std::string& filename)
             validateFile(filename);
         } catch(const std::exception& dom) {
             saxparser.clearParserState();
-            throw utils::SaxParserError(fmt(_("%2%\n\n%1%")) % dom.what() %
-                                        sax.what());
+            throw utils::SaxParserError(
+                (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
         }
         throw utils::SaxParserError(sax.what());
     }
@@ -104,8 +105,8 @@ void Vpz::parseMemory(const std::string& buffer)
         try {
             validateMemory(buffer);
         } catch(const std::exception& dom) {
-            throw utils::SaxParserError(fmt(_("%2%\n\n%1%")) % dom.what() %
-                                        sax.what());
+            throw utils::SaxParserError(
+                (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
         }
         throw utils::SaxParserError(sax.what());
     }
@@ -125,8 +126,8 @@ Vpz::parseValue(const std::string& buffer)
     sax.parseMemory(buffer);
 
     if (not sax.isValue()) {
-        throw utils::ArgError(fmt(_("The buffer [%1%] is not a value.")) %
-                              buffer);
+        throw utils::ArgError(
+            (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
     }
 
     return std::move(sax.getValues()[0]);
@@ -140,8 +141,8 @@ Vpz::parseValues(const std::string& buffer)
     sax.parseMemory(buffer);
 
     if (not sax.isValue()) {
-        throw utils::ArgError(fmt(_("The buffer [%1%] is not a value.")) %
-                              buffer);
+        throw utils::ArgError(
+            (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
     }
 
     return std::move(sax.getValues());
@@ -152,9 +153,9 @@ void Vpz::write()
     std::ofstream out(m_filename.c_str());
 
     if (out.fail() or out.bad()) {
-        throw utils::FileError(fmt(_(
-                "Vpz: cannot open file '%1%' for writing"))
-            % m_filename);
+        throw utils::FileError(
+            (fmt(_("Vpz: cannot open file '%1%' for writing"))
+             % m_filename).str());;
     }
 
     out << std::showpoint

@@ -74,8 +74,8 @@ Dynamic& Dynamics::add(const Dynamic& dynamic)
     auto r = m_list.insert(std::make_pair(dynamic.name(), dynamic));
 
     if (not r.second)
-        throw utils::ArgError(fmt(
-                _("The dynamics '%1%' already exists")) % dynamic.name());
+        throw utils::ArgError(
+            (fmt(_("The dynamics '%1%' already exists")) % dynamic.name()).str());
 
     return r.first->second;
 }
@@ -90,8 +90,8 @@ const Dynamic& Dynamics::get(const std::string& name) const
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(
-                _("The dynamics %1% does not exist")) % name);
+        throw utils::ArgError((fmt(_("The dynamics %1% does not exist"))
+                               % name).str());
     }
 
     return it->second;
@@ -102,8 +102,8 @@ Dynamic& Dynamics::get(const std::string& name)
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(
-                _( "The dynamics %1% does not exist")) % name);
+        throw utils::ArgError(
+            (fmt(_( "The dynamics %1% does not exist")) % name).str());
     }
 
     return it->second;

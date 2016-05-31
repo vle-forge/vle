@@ -33,6 +33,8 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+
+#include <stddef.h>
 #include <boost/asio.hpp>
 #include <thread>
 #include <mutex>

@@ -31,6 +31,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/RemoteManager.hpp>
@@ -41,6 +42,7 @@
 #include <fstream>
 #include <numeric>
 #include <boost/program_options.hpp>
+#include <boost/format.hpp>
 #include <cstdlib>
 
 namespace po = boost::program_options;
@@ -509,9 +511,10 @@ static int manage_config_mode(const std::string &configvar, const CmdArgs &args)
         std::string concat = std::accumulate(args.begin(), args.end(),
                 std::string(), Comma());
 
-        if (not prefs.set(configvar, concat))
-            throw vle::utils::ArgError(vle::fmt(_("Unknown variable `%1%'")) %
-                    configvar);
+	if (not prefs.set(configvar, concat))
+	    throw vle::utils::ArgError(
+		    (boost::format(_("Unknown variable `%1%'")) %
+		     configvar).str());
 
     } catch (const std::exception &e) {
         std::cerr << vle::fmt(_("Config error: %1%\n")) % e.what();

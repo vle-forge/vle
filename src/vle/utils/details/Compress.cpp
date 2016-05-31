@@ -44,8 +44,8 @@ void Path::compress(const std::string& filepath,
     boost::filesystem::path path(filepath);
     if (not boost::filesystem::exists(path))
         throw utils::InternalError(
-            fmt(_("fail to compress '%1%': file or directory does not exist"))
-            % filepath);
+            (fmt(_("fail to compress '%1%': file or directory does not exist"))
+             % filepath).str());
 
     vle::utils::Spawn spawn;
 
@@ -95,17 +95,17 @@ void Path::decompress(const std::string& compressedfilepath,
     if (not boost::filesystem::exists(path)
         or not boost::filesystem::is_directory(path))
         throw utils::InternalError(
-            fmt(_("fail to extract '%1%' in directory '%2%': "
-                  " directory does not exist"))
-            % compressedfilepath % directorypath);
+            (fmt(_("fail to extract '%1%' in directory '%2%': "
+                   " directory does not exist"))
+             % compressedfilepath % directorypath).str());
 
     boost::filesystem::path file(compressedfilepath);
     if (not boost::filesystem::exists(path)
         or not boost::filesystem::is_regular(file))
         throw utils::InternalError(
-            fmt(_("fail to extract '%1%' in directory '%2%': "
+            (fmt(_("fail to extract '%1%' in directory '%2%': "
                   "file does not exist"))
-            % compressedfilepath % directorypath);
+             % compressedfilepath % directorypath).str());
 
     vle::utils::Spawn spawn;
 

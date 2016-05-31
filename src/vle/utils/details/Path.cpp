@@ -120,8 +120,8 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
 
     if (not fs::exists(source)) {
         throw utils::InternalError(
-            fmt(_("Can not copy '%1%' into '%2%'. '%1%' does not exist in"
-                  "'%3%'")) % name % to % dirname);
+            (fmt(_("Can not copy '%1%' into '%2%'. '%1%' does not exist in"
+                   "'%3%'")) % name % to % dirname).str());
     }
 
     if (fs::is_directory(source)) {
@@ -167,9 +167,9 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
                 }
             }
         } catch (const std::exception& e) {
-            throw utils::InternalError(fmt(
-                    _("Error when copy template '%1%' into '%2%: %3%")) % name
-                % to % e.what());
+            throw utils::InternalError(
+                (fmt(_("Error when copy template '%1%' into '%2%: %3%")) % name
+                 % to % e.what()).str());
         }
     } else {
         try {
@@ -180,9 +180,9 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
                 fs::copy_file(src, dst);
             }
         } catch (const std::exception& e) {
-            throw utils::InternalError(fmt(
-                    _("Can not copy '%1%' into '%2%': %3%")) % name % to %
-                e.what());
+            throw utils::InternalError(
+                (fmt(_("Can not copy '%1%' into '%2%': %3%")) % name % to %
+                 e.what()).str());
         }
     }
 }
@@ -197,9 +197,9 @@ PathList Path::getBinaryPackages()
     fs::path pkgs(Path::path().getBinaryPackagesDir());
 
     if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
-        throw utils::InternalError(fmt(
-                _("Package error: '%1%' is not a directory")) %
-            Path::path().getBinaryPackagesDir());
+        throw utils::InternalError(
+            (fmt(_("Package error: '%1%' is not a directory")) %
+             Path::path().getBinaryPackagesDir()).str());
     }
 
     PathList result;
@@ -229,12 +229,12 @@ PathList Path::getBinaryLibraries()
         fs::path dir(elem);
         
         if (not fs::exists(dir) or not fs::is_directory(dir)) {
-            throw utils::InternalError(fmt(
-                    _("Pkg list error: '%1%' is not a library directory")) %
+            throw utils::InternalError(
+                (fmt(_("Pkg list error: '%1%' is not a library directory")) %
 #if BOOST_VERSION > 103600
-                dir.string());
+                 dir.string()).str());
 #else
-                dir.file_string());
+            dir.file_string()).str());
 #endif
         }
 
@@ -309,9 +309,9 @@ void Path::initVleHomeDirectory()
 #if BOOST_VERSION > 104500
     if (not fs::exists(pkgs, ec)) {
         if (not fs::create_directories(getBinaryPackagesDir(), ec)) {
-            throw FileError(fmt(
-                    _("Failed to build VLE_HOME directory (%1%):\n%2%")) %
-                pkgs.string() % ec.message());
+            throw FileError(
+                (fmt(_("Failed to build VLE_HOME directory (%1%):\n%2%")) %
+                 pkgs.string() % ec.message()).str());
         }
     }
 #else
@@ -391,8 +391,8 @@ void Path::readHomeDir()
         if (fs::is_directory(path)) {
             m_home = path;
         } else {
-            throw FileError(fmt(_(
-                    "Path: VLE_HOME '%1%' does not exist")) % path);
+            throw FileError(
+                (fmt(_("Path: VLE_HOME '%1%' does not exist")) % path).str());
         }
     } else {
         m_home.clear();

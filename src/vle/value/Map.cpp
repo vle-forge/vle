@@ -36,6 +36,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace {
 
@@ -47,7 +48,7 @@ pp_get(vle::value::MapValue& m, const std::string& name)
 
     if (it == m.end())
         throw vle::utils::ArgError(
-            vle::fmt(_("Map: the key '%1%' does not exist")) % name);
+            (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
 
     return it;
 }
@@ -60,7 +61,7 @@ pp_get(const vle::value::MapValue& m, const std::string& name)
 
     if (it == m.end())
         throw vle::utils::ArgError(
-            vle::fmt(_("Map: the key '%1%' does not exist")) % name);
+            (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
 
     return it;
 }
@@ -73,8 +74,8 @@ pp_get_value(vle::value::MapValue& m, const std::string& name)
 
     if (not it->second)
     throw vle::utils::ArgError(
-                            vle::fmt(_("Map: the key '%1%' have empty (null) value"))
-                            % name);
+        (vle::fmt(_("Map: the key '%1%' have empty (null) value"))
+         % name).str());
 
     return *it->second.get();
 }
@@ -87,7 +88,7 @@ pp_get_value(const vle::value::MapValue& m, const std::string& name)
 
     if (not it->second)
         throw vle::utils::ArgError(
-            vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name);
+            (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name).str());
 
     return *it->second.get();
 }

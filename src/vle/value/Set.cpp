@@ -37,6 +37,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <fstream>
 #include <sstream>
 
@@ -49,7 +50,7 @@ pp_check_index(const vle::value::Set& s, std::size_t i)
 #ifndef NDEBUG
     if (i >= s.size())
         throw vle::utils::ArgError(
-            vle::fmt(_("Set: too big index '%1%' (max %2%)")) % i % s.size());
+            (vle::fmt(_("Set: too big index '%1%' (max %2%)")) % i % s.size()).str());
 #else
     (void)s;
     (void)i;
@@ -80,7 +81,7 @@ pp_get_value(vle::value::Set& s, std::size_t i)
 
     if (not it->get())
         throw vle::utils::ArgError(
-            vle::fmt(_("Set: empty or null value at '%1%'")) % i);
+            (vle::fmt(_("Set: empty or null value at '%1%'")) % i).str());
 
     return *it->get();
 }
@@ -93,7 +94,7 @@ pp_get_value(const vle::value::Set& s, std::size_t i)
 
     if (not it->get())
         throw vle::utils::ArgError(
-            vle::fmt(_("Set: empty or null value at '%1%'")) % i);
+            (vle::fmt(_("Set: empty or null value at '%1%'")) % i).str());
 
     return *it->get();
 }

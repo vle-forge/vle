@@ -60,7 +60,9 @@ template < typename T >
     {
         std::stringstream s(str);
         T t;
-        return s >> t;
+        s >> t;
+
+        return not s.fail();
     }
 
 template <>
@@ -74,7 +76,9 @@ template <>
         
         std::stringstream s(str);
         bool b;
-        return s >> b;
+        s >> b;
+
+        return not s.fail();
     }
 
 template VLE_API bool is < bool >(const std::string& str);
@@ -123,7 +127,7 @@ template < typename T >
         if (s >> ret)
             return ret;
 
-        throw utils::ArgError(fmt(_("Can not convert `%1%'")) % str);
+        throw utils::ArgError((fmt(_("Can not convert `%1%'")) % str).str());
     }
 
 template VLE_API bool to < bool >(const std::string& str);

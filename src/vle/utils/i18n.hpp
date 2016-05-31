@@ -33,10 +33,9 @@
 
 namespace vle {
 
-    typedef boost::format fmt;
+using fmt = boost::format;
 
 }
-
 
 #ifdef VLE_HAVE_NLS
 # ifndef ENABLE_NLS

@@ -39,9 +39,9 @@ ModelPortList::~ModelPortList()
 void ModelPortList::add(BaseModel *model, const std::string& portname)
 {
     if (not model) {
-        throw utils::DevsGraphError(fmt(
-                _("Cannot add model port %1% in an empty model")) %
-            portname);
+        throw utils::DevsGraphError(
+            (fmt(_("Cannot add model port %1% in an empty model")) %
+             portname).str());
     }
 
     m_lst.insert(value_type(model, portname));
@@ -50,9 +50,9 @@ void ModelPortList::add(BaseModel *model, const std::string& portname)
 void ModelPortList::remove(BaseModel *model, const std::string& portname)
 {
     if (not model) {
-        throw utils::DevsGraphError(fmt(
-                _("Cannot remove model port %1% in an empty model")) %
-            portname);
+        throw utils::DevsGraphError(
+            (fmt(_("Cannot remove model port %1% in an empty model")) %
+             portname).str());
     }
 
     std::pair < iterator, iterator > its = m_lst.equal_range(model);

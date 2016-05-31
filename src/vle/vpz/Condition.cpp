@@ -28,8 +28,10 @@
 #include <vle/vpz/Condition.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
+#include <cassert>
 
 namespace vle { namespace vpz {
 
@@ -107,8 +109,8 @@ void Condition::rename(const std::string& oldportname,
 
     if (m_list.find(oldportname) == m_list.end())
         throw utils::ArgError(
-            fmt(_("Condition: can not rename inexistant port '%1%'"))
-            % oldportname);
+            (fmt(_("Condition: can not rename inexistant port '%1%'"))
+             % oldportname).str());
 
     std::swap(m_list[newportname], m_list[oldportname]);
     del(oldportname);
@@ -156,8 +158,8 @@ void Condition::clearValueOfPort(const std::string& portname)
     auto it = m_list.find(portname);
 
     if (it == m_list.end())
-        throw utils::ArgError(fmt(
-                _("Condition %1% have no port %2%")) % m_name % portname);
+        throw utils::ArgError(
+            (fmt(_("Condition %1% have no port %2%")) % m_name % portname).str());
 
     it->second->clear();
 }
@@ -177,8 +179,9 @@ const value::Set& Condition::getSetValues(const std::string& portname) const
     auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(fmt(_("Condition %1% have no port %2%")) % m_name
-                              % portname);
+        throw utils::ArgError(
+            (fmt(_("Condition %1% have no port %2%")) % m_name
+             % portname).str());
     }
 
     assert(it->second);
@@ -190,8 +193,8 @@ value::Set& Condition::getSetValues(const std::string& portname)
     auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(fmt(_("Condition %1% have no port %2%")) % m_name
-                              % portname);
+        throw utils::ArgError(
+            (fmt(_("Condition %1% have no port %2%")) % m_name % portname).str());
     }
 
     assert(it->second);
@@ -214,8 +217,8 @@ value::Set& Condition::lastAddedPort()
     auto it = m_list.find(m_last_port);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(fmt(_("Condition %1% have no port %2%")) % m_name
-                              % m_last_port);
+        throw utils::ArgError(
+            (fmt(_("Condition %1% have no port %2%")) % m_name % m_last_port).str());
     }
 
     assert(it->second);

@@ -127,8 +127,8 @@ public:
     ~Module() noexcept
     {
         try {
-            DTraceModel(vle::fmt("ModuleManager unload: %1%:%2%")
-                        % mHandle % mPath);
+            DTraceModel((vle::fmt("ModuleManager unload: %1%:%2%")
+                         % mHandle % mPath).str());
         } catch (...) {
         }
 
@@ -165,12 +165,12 @@ public:
                 if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
                     if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
                         if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
-                            throw utils::InternalError(fmt(
-                                    _("Module `%1%' is not a dynamic module"
-                                      " (symbol vle_make_new_dynamics,"
-                                      " vle_make_new_executive or"
-                                      " vle_make_new_dynamics_wrapper are not"
-                                      " found")) % mPath);
+                            throw utils::InternalError(
+                                (fmt(_("Module `%1%' is not a dynamic module"
+                                       " (symbol vle_make_new_dynamics,"
+                                       " vle_make_new_executive or"
+                                       " vle_make_new_dynamics_wrapper are not"
+                                       " found")) % mPath).str());
 
                         } else {
                             mType = MODULE_DYNAMICS_WRAPPER;
@@ -186,12 +186,12 @@ public:
                 if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
                     if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
                         if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
-                            throw utils::InternalError(fmt(
-                                    _("Module `%1%' is not a dynamic module"
-                                      " (symbol vle_make_new_dynamics,"
-                                      " vle_make_new_executive or"
-                                      " vle_make_new_dynamics_wrapper are not"
-                                      " found")) % mPath);
+                            throw utils::InternalError(
+                                (fmt(_("Module `%1%' is not a dynamic module"
+                                       " (symbol vle_make_new_dynamics,"
+                                       " vle_make_new_executive or"
+                                       " vle_make_new_dynamics_wrapper are not"
+                                       " found")) % mPath).str());
 
                         } else {
                             mType = MODULE_DYNAMICS_WRAPPER;
@@ -207,12 +207,12 @@ public:
                 if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
                     if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
                         if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
-                            throw utils::InternalError(fmt(
-                                    _("Module `%1%' is not a dynamic module"
-                                      " (symbol vle_make_new_dynamics,"
-                                      " vle_make_new_executive or"
-                                      " vle_make_new_dynamics_wrapper are not"
-                                      " found")) % mPath);
+                            throw utils::InternalError(
+                                (fmt(_("Module `%1%' is not a dynamic module"
+                                       " (symbol vle_make_new_dynamics,"
+                                       " vle_make_new_executive or"
+                                       " vle_make_new_dynamics_wrapper are not"
+                                       " found")) % mPath).str());
                         } else {
                             mType = MODULE_DYNAMICS_EXECUTIVE;
                         }
@@ -225,33 +225,33 @@ public:
                 break;
             case MODULE_OOV:
                 if (not (mFunction = (getSymbol("vle_make_new_oov")))) {
-                    throw utils::InternalError(fmt(
-                            _("Module `%1%' is not an oov module (symbol"
-                              " vle_make_new_oov not found)")) % mPath);
+                    throw utils::InternalError(
+                        (fmt(_("Module `%1%' is not an oov module (symbol"
+                               " vle_make_new_oov not found)")) % mPath).str());
                 }
                 break;
             case MODULE_GVLE_GLOBAL:
                 if (not (mFunction = (getSymbol("vle_make_new_gvle_global")))) {
-                    throw utils::InternalError(fmt(
-                            _("Module: `%1%' is not a GVLE global module"
-                              " (symbol vle_make_new_gvle_global not found)"))
-                        % mPath);
+                    throw utils::InternalError(
+                        (fmt(_("Module: `%1%' is not a GVLE global module"
+                               " (symbol vle_make_new_gvle_global not found)"))
+                         % mPath).str());
                 }
                 break;
             case MODULE_GVLE_MODELING:
                 if (not (mFunction = (getSymbol("vle_make_new_gvle_modeling")))) {
-                    throw utils::InternalError(fmt(
-                            _("Module: `%1%' is not a GVLE modeling module"
-                              " (symbol vle_make_new_gvle_modeling not found)"))
-                        % mPath);
+                    throw utils::InternalError(
+                        (fmt(_("Module: `%1%' is not a GVLE modeling module"
+                               " (symbol vle_make_new_gvle_modeling not found)"))
+                         % mPath).str());
                 }
                 break;
             case MODULE_GVLE_OUTPUT:
                 if (not (mFunction = (getSymbol("vle_make_new_gvle_output")))) {
-                    throw utils::InternalError(fmt(
-                            _("Module: `%1%' is not a GVLE output module"
-                              " (symbol vle_make_new_gvle_output not found)"))
-                        % mPath);
+                    throw utils::InternalError(
+                        (fmt(_("Module: `%1%' is not a GVLE output module"
+                               " (symbol vle_make_new_gvle_output not found)"))
+                         % mPath).str());
                 }
                 break;
             default:
@@ -282,7 +282,7 @@ public:
         void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
 
-        DTraceModel(vle::fmt("ModuleManager load: %1%:%2%") % handle % mPath);
+        DTraceModel((vle::fmt("ModuleManager load: %1%:%2%") % handle % mPath).str());
 
         if (not handle) {
             std::string extra;
@@ -307,9 +307,9 @@ public:
                 extra.assign(error);
             }
 #endif
-            throw utils::InternalError(fmt(
-                    _("Module can not open shared library `%1%': %2%")) % mPath
-                % extra);
+            throw utils::InternalError(
+                (fmt(_("Module can not open shared library `%1%': %2%")) % mPath
+                 % extra).str());
         } else {
             mHandle = handle;
         }
@@ -327,9 +327,9 @@ public:
         symbol = getSymbol("vle_api_level");
 
         if (not symbol) {
-            throw utils::InternalError(fmt(
-                    _("Module `%1%' does not have a vle_api_level symbol. "
-                      "This module seems to be too old.")) % mPath);
+            throw utils::InternalError(
+                (fmt(_("Module `%1%' does not have a vle_api_level symbol. "
+                      "This module seems to be too old.")) % mPath).str());
         }
 
 #ifdef BOOST_WINDOWS
@@ -340,17 +340,17 @@ public:
         fct(&major, &minor, &patch);
 
         if (major != VLE_MAJOR_VERSION or minor != VLE_MINOR_VERSION) {
-            throw utils::InternalError(fmt(
-                    _("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
-                      " not API/ABI compatible with the current VLE"
-                      " %5%.%6%.%7%")) % mPath % major % minor % patch %
-                VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION);
+            throw utils::InternalError(
+                (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
+                       " not API/ABI compatible with the current VLE"
+                       " %5%.%6%.%7%")) % mPath % major % minor % patch %
+                 VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION).str());
         } else if (patch != VLE_PATCH_VERSION) {
-            utils::Trace::send(fmt(
-                    _("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
-                      " not be API/ABI compatible with the current VLE"
-                      " %5%.%6%.%7%")) % mPath % major % minor % patch %
-                VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION);
+            utils::Trace::send(
+                (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
+                       " not be API/ABI compatible with the current VLE"
+                       " %5%.%6%.%7%")) % mPath % major % minor % patch %
+                 VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION).str());
         }
     }
 
@@ -407,8 +407,8 @@ public:
                     std::pair<std::string, void*>(symbol, result));
                 return result;
             } else {
-                throw utils::InternalError(fmt(
-                        _("Module: `%1%' not found in global space")) % symbol);
+                throw utils::InternalError(
+                    (fmt(_("Module: `%1%' not found in global space")) % symbol).str());
             }
         }
     }

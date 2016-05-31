@@ -37,6 +37,7 @@
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace devs {
 
@@ -61,9 +62,9 @@ void ModelFactory::addPermanent(const vpz::Dynamic& dynamics)
     try {
         mDynamics.add(dynamics);
     } catch(const std::exception& e) {
-        throw utils::InternalError(fmt(_(
-            "Model factory cannot add dynamics %1%: %2%")) % dynamics.name() %
-            e.what());
+        throw utils::InternalError(
+            (fmt(_("Model factory cannot add dynamics %1%: %2%"))
+             % dynamics.name() % e.what()).str());
     }
 }
 
@@ -73,9 +74,9 @@ void ModelFactory::addPermanent(const vpz::Condition& condition)
         vpz::Conditions& conds(mExperiment.conditions());
         conds.add(condition);
     } catch(const std::exception& e) {
-        throw utils::InternalError(fmt(_(
-                "Model factory cannot add condition %1%: %2%")) %
-            condition.name() % e.what());
+        throw utils::InternalError(
+            (fmt(_("Model factory cannot add condition %1%: %2%")) %
+             condition.name() % e.what()).str());
     }
 }
 
@@ -85,9 +86,9 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
         vpz::Views& views(mExperiment.views());
         views.addObservable(observable);
     } catch(const std::exception& e) {
-        throw utils::InternalError(fmt(_(
-                "Model factory cannot add observable %1%: %2%")) %
-            observable.name() % e.what());
+        throw utils::InternalError(
+            (fmt(_("Model factory cannot add observable %1%: %2%")) %
+             observable.name() % e.what()).str());
     }
 }
 
@@ -101,9 +102,9 @@ void ModelFactory::createModel(Coordinator& coordinator,
 
     const SimulatorMap& result(coordinator.modellist());
     if (result.find(model) != result.end()) {
-        throw utils::InternalError(fmt(_(
-                "The model '%1%' already exist in coordinator")) %
-            model->getName());
+        throw utils::InternalError(
+            (fmt(_("The model '%1%' already exist in coordinator")) %
+             model->getName()).str());
     }
 
     Simulator* sim = new Simulator(model);
@@ -119,8 +120,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
             for (auto & elem : vl) {
                 if (initValues.exist(elem.first))
                     throw utils::InternalError(
-                        fmt(_("Multiples condition with the same init port " \
-                              "name '%1%'")) % elem.first);
+                        (fmt(_("Multiples condition with the same init port " \
+                               "name '%1%'")) % elem.first).str());
 
                 initValues.add(elem.first, std::move(elem.second));
             }
@@ -147,9 +148,9 @@ void ModelFactory::createModel(Coordinator& coordinator,
                 View* view = coordinator.getView(vnlst_jt);
 
                 if (not view) {
-                    throw utils::InternalError(fmt(_(
-                                "The view '%1%' is unknow of coordinator "
-                                "view list")) % vnlst_jt);
+                    throw utils::InternalError(
+                        (fmt(_("The view '%1%' is unknow of coordinator "
+                               "view list")) % vnlst_jt).str());
                 }
 
                 view->addObservable(sim, elem.first,
@@ -226,12 +227,12 @@ buildNewDynamicsWrapper(devs::Simulator* atom,
                     dyn.library()), events));
     } catch(const std::exception& e) {
         throw utils::ModellingError(
-            fmt(_("Atomic model wrapper `%1%:%2%' (from dynamics `%3%'"
-                  " library `%4%' package `%5%') throws error in"
-                  " constructor: `%6%'")) %
-            atom->getStructure()->getParentName() %
-            atom->getStructure()->getName() %
-            dyn.name() % dyn.library() % dyn.package() % e.what());
+            (fmt(_("Atomic model wrapper `%1%:%2%' (from dynamics `%3%'"
+                   " library `%4%' package `%5%') throws error in"
+                   " constructor: `%6%'")) %
+             atom->getStructure()->getParentName() %
+             atom->getStructure()->getName() %
+             dyn.name() % dyn.library() % dyn.package() % e.what()).str());
     }
 }
 
@@ -252,11 +253,11 @@ std::unique_ptr<Dynamics> buildNewDynamics(devs::Simulator* atom,
                              pkg_table.get(dyn.package())), events));
     } catch(const std::exception& e) {
         throw utils::ModellingError(
-            fmt(_("Atomic model `%1%:%2%' (from dynamics `%3%' library"
-                  " `%4%' package `%5%') throws error in constructor:"
-                  " `%6%'")) % atom->getStructure()->getParentName() %
-            atom->getStructure()->getName() % dyn.name() % dyn.library() %
-            dyn.package() % e.what());
+            (fmt(_("Atomic model `%1%:%2%' (from dynamics `%3%' library"
+                   " `%4%' package `%5%') throws error in constructor:"
+                   " `%6%'")) % atom->getStructure()->getParentName() %
+             atom->getStructure()->getName() % dyn.name() % dyn.library() %
+             dyn.package() % e.what()).str());
     }
 }
 
@@ -280,12 +281,12 @@ std::unique_ptr<Dynamics> buildNewExecutive(Coordinator& coordinator,
                     coordinator), events));
     } catch(const std::exception& e) {
         throw utils::ModellingError(
-            fmt(_("Executive model `%1%:%2%' (from dynamics `%3%'"
-                  " library `%4%' package `%5%') throws error in"
-                  " constructor: `%6%'")) %
-            atom->getStructure()->getParentName() %
-            atom->getStructure()->getName() % dyn.name() % dyn.library() %
-            dyn.package() % e.what());
+            (fmt(_("Executive model `%1%:%2%' (from dynamics `%3%'"
+                   " library `%4%' package `%5%') throws error in"
+                   " constructor: `%6%'")) %
+             atom->getStructure()->getParentName() %
+             atom->getStructure()->getName() % dyn.name() % dyn.library() %
+             dyn.package() % e.what()).str());
     }
 }
 
@@ -320,10 +321,10 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
         }
     } catch (const std::exception& e) {
         throw utils::ModellingError(
-            fmt(_("Dynamic library loading problem: cannot get any"
-                  " dynamics, executive or wrapper '%1%' in library"
-                  " '%2%' package '%3%'\n:%4%")) % dyn.name() %
-            dyn.library() % dyn.package() % e.what());
+            (fmt(_("Dynamic library loading problem: cannot get any"
+                   " dynamics, executive or wrapper '%1%' in library"
+                   " '%2%' package '%3%'\n:%4%")) % dyn.name() %
+             dyn.library() % dyn.package() % e.what()).str());
     }
 
     switch (type) {

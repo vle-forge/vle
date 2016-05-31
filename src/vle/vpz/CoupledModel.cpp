@@ -28,6 +28,7 @@
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <cmath>
 #include <set>
 #include <cassert>
@@ -603,9 +604,9 @@ std::vector < std::string > CoupledModel::getBasicConnections(
          ++it) {
 
         if (it->second->getParent() != this) {
-            throw utils::DevsGraphError(fmt(
-                    _("The model %1% is not the child of %2%")) %
-                it->second->getName() % getName());
+            throw utils::DevsGraphError(
+                (fmt(_("The model %1% is not the child of %2%")) %
+                 it->second->getName() % getName()).str());
         }
 
         const ConnectionList& cnts((*it).second->getOutputPortList());
@@ -646,9 +647,9 @@ void CoupledModel::setBasicConnections(const std::vector < std::string >& lst)
                  jt != it; jt += 4) {
                 delInternalConnection(*jt, *(jt + 1), *(jt + 2), *(jt + 3));
             }
-            throw utils::DevsGraphError(fmt(
-                    _("Cannot displace the connection %1% %2% to %3% %4%")) %
-                source % portsource % destination % portdestination);
+            throw utils::DevsGraphError(
+                (fmt(_("Cannot displace the connection %1% %2% to %3% %4%"))
+                 % source % portsource % destination % portdestination).str());
         }
     }
 }
@@ -722,9 +723,9 @@ void CoupledModel::addModel(BaseModel* model)
 {
     if (exist(model->getName())) {
         throw utils::DevsGraphError(
-            vle::fmt(_("Cannot add the model '%1%' into the coupled model "
-                    "'%2%' (it already exists)"))
-                    % model->getName() % getName());
+            (fmt(_("Cannot add the model '%1%' into the coupled model "
+                   "'%2%' (it already exists)"))
+             % model->getName() % getName()).str());
     }
 
     model->setParent(this);
@@ -735,9 +736,8 @@ void CoupledModel::addModel(BaseModel* model, const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-                vle::fmt(_("Cannot add the model '%1%' into the coupled model "
-                        "'%2%' (it already exists)"))
-                        % name % getName());
+            (fmt(_("Cannot add the model '%1%' into the coupled model "
+                   "'%2%' (it already exists)")) % name % getName()).str());
     }
 
     BaseModel::rename(model, name);
@@ -749,9 +749,8 @@ AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-                vle::fmt(_("Cannot add the model '%1%' into the coupled model "
-                        "'%2%' (it already exists)"))
-                        % name % getName());
+            (fmt(_("Cannot add the model '%1%' into the coupled model "
+                   "'%2%' (it already exists)")) % name % getName()).str());
     }
 
     AtomicModel* x = new AtomicModel(name, this);
@@ -763,9 +762,8 @@ CoupledModel* CoupledModel::addCoupledModel(const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-                vle::fmt(_("Cannot add the model '%1%' into the coupled model "
-                        "'%2%' (it already exists)"))
-                        % name % getName());
+            (fmt(_("Cannot add the model '%1%' into the coupled model "
+                   "'%2%' (it already exists)")) % name % getName()).str());
     }
 
     CoupledModel* x = new CoupledModel(name, this);
@@ -816,9 +814,9 @@ void CoupledModel::detachModel(BaseModel* model)
         it->second->setParent(0);
         m_modelList.erase(it);
     } else {
-        throw utils::DevsGraphError(fmt(
-                _("Model %1% is not attached to the coupled model %2%")) %
-            model->getName() % getName());
+        throw utils::DevsGraphError(
+            (fmt(_("Model %1% is not attached to the coupled model %2%")) %
+             model->getName() % getName()).str());
     }
 }
 
@@ -1029,8 +1027,9 @@ ModelPortList& CoupledModel::getInternalInPort(const std::string& name)
 {
     ConnectionList::iterator it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
-        throw utils::DevsGraphError(fmt(
-                _("Coupled model %1% have no input port %2%")) % getName() % name);
+        throw utils::DevsGraphError(
+            (fmt(_("Coupled model %1% have no input port %2%"))
+             % getName() % name).str());
     }
 
     return it->second;
@@ -1041,8 +1040,9 @@ const ModelPortList& CoupledModel::getInternalInPort(
 {
     ConnectionList::const_iterator it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
-        throw utils::DevsGraphError(fmt(
-                _("Coupled model %1% have no input port %2%")) % getName() % name);
+        throw utils::DevsGraphError(
+            (fmt(_("Coupled model %1% have no input port %2%"))
+             % getName() % name).str());
     }
 
     return it->second;
@@ -1052,8 +1052,9 @@ ModelPortList& CoupledModel::getInternalOutPort(const std::string& name)
 {
     ConnectionList::iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
-        throw utils::DevsGraphError(fmt(
-                _("Coupled model %1% have no output port %2%")) % getName() % name);
+        throw utils::DevsGraphError(
+            (fmt(_("Coupled model %1% have no output port %2%"))
+             % getName() % name).str());
     }
 
     return it->second;
@@ -1064,9 +1065,9 @@ const ModelPortList& CoupledModel::getInternalOutPort(
 {
     ConnectionList::const_iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
-        throw utils::DevsGraphError(fmt(
-                _("Coupled model %1% have no output port %2%")) % getName() %
-            name);
+        throw utils::DevsGraphError(
+            (fmt(_("Coupled model %1% have no output port %2%")) % getName() %
+             name).str());
     }
 
     return it->second;

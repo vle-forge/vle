@@ -34,6 +34,7 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace devs {
 
@@ -43,8 +44,8 @@ std::string Dynamics::getPackageDir() const
     if (pkg.existsBinary()) {
         return pkg.getDir(vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not " "installed")) % *m_packageid).str());
     }
 }
 
@@ -54,8 +55,8 @@ std::string Dynamics::getPackageSimulatorDir() const
     if (pkg.existsBinary()) {
         return pkg.getPluginSimulatorDir(vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not " "installed")) % *m_packageid).str());
     }
 }
 
@@ -65,8 +66,8 @@ std::string Dynamics::getPackageSrcDir() const
     if (pkg.existsBinary()) {
         return pkg.getSrcDir(vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -76,8 +77,8 @@ std::string Dynamics::getPackageDataDir() const
     if (pkg.existsBinary()) {
         return pkg.getDataDir(vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -87,8 +88,8 @@ std::string Dynamics::getPackageDocDir() const
     if (pkg.existsBinary()) {
         return pkg.getDocDir(vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -98,8 +99,8 @@ std::string Dynamics::getPackageExpDir() const
     if (pkg.existsBinary()) {
         return pkg.getExpDir(vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not " "installed")) % *m_packageid).str());
     }
 }
 
@@ -109,8 +110,8 @@ std::string Dynamics::getPackageFile(const std::string& name) const
     if (pkg.existsBinary()) {
         return pkg.getFile(name, vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -120,8 +121,8 @@ std::string Dynamics::getPackageLibFile(const std::string& name) const
     if (pkg.existsBinary()) {
         return pkg.getLibFile(name, vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -131,8 +132,8 @@ std::string Dynamics::getPackageSrcFile(const std::string& name) const
     if (pkg.existsBinary()) {
         return pkg.getSrcFile(name, vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -142,8 +143,8 @@ std::string Dynamics::getPackageDataFile(const std::string& name) const
     if (pkg.existsBinary()) {
         return pkg.getDataFile(name, vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -153,8 +154,8 @@ std::string Dynamics::getPackageDocFile(const std::string& name) const
     if (pkg.existsBinary()) {
         return pkg.getDocFile(name, vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 
@@ -164,8 +165,8 @@ std::string Dynamics::getPackageExpFile(const std::string& name) const
     if (pkg.existsBinary()) {
         return pkg.getExpFile(name, vle::utils::PKG_BINARY);
     } else {
-        throw vle::utils::FileError(vle::fmt(_("Package '%1%' is not "
-                "installed")) % *m_packageid);
+        throw vle::utils::FileError(
+            (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
     }
 }
 

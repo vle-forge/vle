@@ -31,6 +31,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace vpz {
 
@@ -230,7 +231,7 @@ const std::unique_ptr<value::Value>& ValueStackSax::getResult(size_t i) const
 {
     if (m_result.size() < i)
         throw utils::SaxParserError(
-            fmt(_("Get result value with to big index %1%.")) % i);
+            (fmt(_("Get result value with to big index %1%.")) % i).str());
 
     return m_result[i];
 }

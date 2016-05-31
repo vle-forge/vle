@@ -42,9 +42,9 @@ View::View(const std::string& name,
 {
     if (m_type == View::TIMED) {
         if (m_timestep <= 0.0) {
-            throw utils::ArgError(fmt(
-                    _("Cannont define the View '%1%' with a timestep '%2%'")) %
-                m_name % m_timestep);
+            throw utils::ArgError(
+                (fmt(_("Cannont define the View '%1%' with a timestep '%2%'")) %
+                 m_name % m_timestep).str());
         }
     }
 }
@@ -82,8 +82,8 @@ void View::write(std::ostream& out) const
 void View::setTimestep(double time)
 {
     if ((m_type == View::TIMED) && (time <= 0.0)) {
-        throw utils::ArgError(fmt(
-                _("Bad time step %1% for view %2%")) % time % m_name);
+        throw utils::ArgError(
+            (fmt(_("Bad time step %1% for view %2%")) % time % m_name).str());
     }
 
     m_timestep = time;

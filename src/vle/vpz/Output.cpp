@@ -28,6 +28,7 @@
 #include <vle/vpz/Output.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace vpz {
 
@@ -102,8 +103,8 @@ void Output::setLocalStream(const std::string& location,
                             const std::string& package)
 {
     if (plugin.empty()) {
-        throw utils::ArgError(fmt(
-                _("Output '%1%' have not plugin defined")) % m_name);
+        throw utils::ArgError(
+            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
     }
 
     m_location.assign(location);
@@ -124,8 +125,8 @@ void Output::setLocalStream(const std::string& location,
                             const std::string& plugin)
 {
     if (plugin.empty()) {
-        throw utils::ArgError(fmt(
-                _("Output '%1%' have not plugin defined")) % m_name);
+        throw utils::ArgError(
+            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
     }
 
     m_location.assign(location);
@@ -141,8 +142,8 @@ void Output::setDistantStream(const std::string& location,
                               const std::string& package)
 {
     if (plugin.empty()) {
-        throw utils::ArgError(fmt(
-                _("Output '%1%' have not plugin defined")) % m_name);
+        throw utils::ArgError(
+            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
     }
 
     m_location.assign(location);
@@ -157,8 +158,8 @@ void Output::setDistantStream(const std::string& location,
                               const std::string& plugin)
 {
     if (plugin.empty()) {
-        throw utils::ArgError(fmt(
-                _("Output '%1%' have not plugin defined")) % m_name);
+        throw utils::ArgError(
+            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
     }
 
     m_location.assign(location);

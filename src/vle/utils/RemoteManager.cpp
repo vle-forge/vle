@@ -274,9 +274,9 @@ public:
             file << local << std::endl;
         } catch (const std::exception& e) {
             TraceAlways(
-                fmt(_("Remote manager: failed to write local package "
-                      "`%1%': %2%")) % RemoteManager::getLocalPackageFilename()
-                % e.what());
+                (fmt(_("Remote manager: failed to write local package "
+                       "`%1%': %2%")) % RemoteManager::getLocalPackageFilename()
+                 % e.what()).str())
         }
 
         try  {
@@ -289,9 +289,9 @@ public:
             file << remote << std::endl;
         } catch (const std::exception& e) {
             TraceAlways(
-                fmt(_("Remote manager: failed to write remote package "
-                      "`%1%': %2%")) % RemoteManager::getRemotePackageFilename()
-                % e.what());
+                (fmt(_("Remote manager: failed to write remote package "
+                       "`%1%': %2%")) % RemoteManager::getRemotePackageFilename()
+                 % e.what()).str());
         }
     }
 

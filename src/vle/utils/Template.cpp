@@ -27,6 +27,7 @@
 
 #include <vle/utils/Template.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/regex.hpp>
 #include <fstream>
 #include <sstream>
@@ -37,7 +38,7 @@ void SymbolString::append(const std::string& key, const std::string& value)
 {
     auto it = lst_.find(key);
     if (it != end()) {
-        throw utils::ArgError(fmt(_("Symbol '%1%' already exist")) % key);
+        throw utils::ArgError((fmt(_("Symbol '%1%' already exist")) % key).str());
     }
     lst_.insert(std::make_pair(key, value));
 }
@@ -54,7 +55,7 @@ const std::string& SymbolString::get(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknown single symbol '%1%'")) % key);
+        throw utils::ArgError((fmt(_("Unknown single symbol '%1%'")) % key).str());
     }
     return it->second;
 }
@@ -65,7 +66,7 @@ void SymbolBool::append(const std::string& key, bool value)
 {
     auto it = lst_.find(key);
     if (it != end()) {
-        throw utils::ArgError(fmt(_("Symbol '%1%' already exist")) % key);
+        throw utils::ArgError((fmt(_("Symbol '%1%' already exist")) % key).str());
     }
     lst_.insert(std::make_pair(key, value));
 }
@@ -82,7 +83,7 @@ bool SymbolBool::get(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknown bool symbol '%1%'")) % key);
+        throw utils::ArgError((fmt(_("Unknown bool symbol '%1%'")) % key).str());
     }
     return it->second;
 }
@@ -121,7 +122,7 @@ SymbolList::get(const std::string& key, value_t::size_type i) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknown list symbol '%1%'")) % key);
+        throw utils::ArgError((fmt(_("Unknown list symbol '%1%'")) % key).str());
     }
 
     if (it->second.size() < i) {
@@ -136,7 +137,7 @@ SymbolList::size(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknown list symbol '%1%'")) % key);
+        throw utils::ArgError((fmt(_("Unknown list symbol '%1%'")) % key).str());
     }
 
     return it->second.size();
@@ -157,8 +158,8 @@ void Template::open(const std::string& filename)
 
         buffer_ = output.str();
     } catch(const std::ios_base::failure& e) {
-        throw utils::ArgError(fmt(
-                _("Template error, can not open file '%1%'")) % filename);
+        throw utils::ArgError(
+            (fmt(_("Template error, can not open file '%1%'")) % filename).str());
     }
 }
 

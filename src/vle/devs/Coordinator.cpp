@@ -34,6 +34,7 @@
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -227,16 +228,17 @@ void Coordinator::addObservableToView(vpz::AtomicModel* model,
     auto it = m_viewList.find(view);
 
     if (it == m_viewList.end()) {
-        throw utils::InternalError(fmt(_(
-            "The view '%1%' is unknow of coordinator view list")) % view);
+        throw utils::InternalError(
+            (fmt(_("The view '%1%' is unknow of coordinator view list"))
+             % view).str());
     }
 
     Simulator* simulator = getModel(model);
 
     if (not simulator) {
-        throw utils::InternalError(fmt(_(
-                "The simulator of the model '%1%' does not exist")) %
-            model->getName());
+        throw utils::InternalError(
+            (fmt(_("The simulator of the model '%1%' does not exist")) %
+             model->getName()).str());
     }
 
     View* obs = it->second;
@@ -250,8 +252,8 @@ void Coordinator::delModel(vpz::CoupledModel* parent,
     vpz::BaseModel* mdl = parent->findModel(modelname);
 
     if (not mdl) {
-        throw utils::InternalError(fmt(_(
-                "Cannot delete an unknown model '%1%'")) % modelname);
+        throw utils::InternalError(
+            (fmt(_("Cannot delete an unknown model '%1%'")) % modelname).str());
     }
 
     if (mdl->isCoupled()) {
@@ -333,9 +335,9 @@ void Coordinator::addModel(vpz::AtomicModel* model, Simulator* simulator)
         m_modelList.insert(std::make_pair(model, simulator));
 
     if (not r.second) {
-        throw utils::InternalError(fmt(_(
-                    "The Atomic model node '%1% have already a simulator"))
-            % model->getName());
+        throw utils::InternalError(
+            (fmt(_("The Atomic model node '%1% have already a simulator"))
+             % model->getName()).str());
     }
 }
 

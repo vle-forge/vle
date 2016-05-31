@@ -36,54 +36,55 @@ DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
     : Dynamics(init, events)
     , mName(init.model().getCompleteName())
 {
-    TraceDevs(fmt(_("                     %1% [DEVS] constructor")) % mName);
+    TraceDevs((fmt(_("                     %1% [DEVS] constructor"))
+               % mName).str());
 }
 
 Time DynamicsDbg::init(Time time)
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] init")) % time % mName);
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] init")) % time % mName).str());
 
     Time duration(mDynamics->init(time));
 
-    TraceDevs(fmt(_("                .... %1% [DEVS] init returns %2%")) %
-              mName % duration);
+    TraceDevs((fmt(_("                .... %1% [DEVS] init returns %2%")) %
+               mName % duration).str());
 
     return duration;
 }
 
 void DynamicsDbg::output(Time time, ExternalEventList& output) const
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] output")) % time % mName);
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] output")) % time % mName).str());
 
     mDynamics->output(time, output);
 
     if (output.empty()) {
-        TraceDevs(fmt(
+        TraceDevs((fmt(
                 _("                .... %1% [DEVS] output returns "
-                  "empty output")) % mName);
+                  "empty output")) % mName).str());
     } else {
-        TraceDevs(fmt(
+        TraceDevs((fmt(
                 _("                .... %1% [DEVS] output returns "
-                  "%2%")) % mName % output);
+                  "%2%")) % mName % output).str());
     }
 }
 
 Time DynamicsDbg::timeAdvance() const
 {
-    TraceDevs(fmt(_("                     %1% [DEVS] ta")) % mName);
+    TraceDevs((fmt(_("                     %1% [DEVS] ta")) % mName).str());
 
     Time time(mDynamics->timeAdvance());
 
-    TraceDevs(fmt(_("                .... %1% [DEVS] ta returns %2%")) %
-              mName % time);
+    TraceDevs((fmt(_("                .... %1% [DEVS] ta returns %2%")) %
+               mName % time).str());
 
     return time;
 }
 
 void DynamicsDbg::internalTransition(Time time)
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
-              mName);
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
+               mName).str());
 
     mDynamics->internalTransition(time);
 }
@@ -91,8 +92,8 @@ void DynamicsDbg::internalTransition(Time time)
 void DynamicsDbg::externalTransition(const ExternalEventList& event,
                                      Time time)
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) % time
-              % mName % event);
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) % time
+               % mName % event).str());
 
     mDynamics->externalTransition(event, time);
 }
@@ -101,9 +102,9 @@ void DynamicsDbg::confluentTransitions(
     Time time,
     const ExternalEventList& extEventlist)
 {
-    TraceDevs(fmt(
-            _("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
-        mName % extEventlist);
+    TraceDevs(
+        (fmt(_("%1$20.10g %2% [DEVS] confluent transition: [%3%]"))
+         % time % mName % extEventlist).str());
 
     mDynamics->confluentTransitions(time, extEventlist);
 }
@@ -111,16 +112,16 @@ void DynamicsDbg::confluentTransitions(
 std::unique_ptr<vle::value::Value>
 DynamicsDbg::observation(const ObservationEvent& event) const
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
-                    " port: '%4%']")) % event.getTime() % mName
-              % event.getViewName() % event.getPortName());
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
+                     " port: '%4%']")) % event.getTime() % mName
+               % event.getViewName() % event.getPortName()).str());
     
     return mDynamics->observation(event);
 }
 
 void DynamicsDbg::finish()
 {
-    TraceDevs(fmt(_("                     %1% [DEVS] finish")) % mName);
+    TraceDevs((fmt(_("                     %1% [DEVS] finish")) % mName).str());
 
     mDynamics->finish();
 }

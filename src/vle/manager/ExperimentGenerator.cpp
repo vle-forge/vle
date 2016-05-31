@@ -27,6 +27,7 @@
 
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/vpz/Condition.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/BaseModel.hpp>
@@ -65,10 +66,10 @@ class ExperimentGenerator::Pimpl
                         if (conditionsize != 0 and conditionsize != 1
                             and result != conditionsize) {
                             throw utils::InternalError(
-                                fmt(_("ExperimentGenerator: bad combination "
-                                      "size for the condition `%1%' port "
-                                      "`%2%': %3%")) % it->first % jt->first %
-                                conditionsize);
+                                (fmt(_("ExperimentGenerator: bad combination "
+                                       "size for the condition `%1%' port "
+                                       "`%2%': %3%")) % it->first % jt->first %
+                                 conditionsize).str());
                         }
                     }
                 }
@@ -154,10 +155,9 @@ public:
                     cpy->add(elem.second->get(index)->clone());
                 } else {
                     throw utils::InternalError(
-                        fmt(
-                            _("ExperimentGenerator can not access to the index"
-                              " `%1%' of the condition `%2%' port `%3%' ")) %
-                        index % it->first % elem.first);
+                        (fmt(_("ExperimentGenerator can not access to the index"
+                               " `%1%' of the condition `%2%' port `%3%' ")) %
+                         index % it->first % elem.first).str());
                 }
 
                 cnvdst[elem.first] = std::move(cpy);

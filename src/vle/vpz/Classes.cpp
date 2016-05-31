@@ -50,7 +50,7 @@ Class& Classes::add(const std::string& name)
     x = m_lst.insert(value_type(name, Class(name)));
 
     if (not x.second) {
-        throw utils::ArgError(fmt(_("Class '%1%' already exists")) % name);
+        throw utils::ArgError((fmt(_("Class '%1%' already exists")) % name).str());
     }
 
     return x.first->second;
@@ -66,7 +66,7 @@ const Class& Classes::get(const std::string& name) const
     auto it = m_lst.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknow class '%1%'")) % name);
+        throw utils::ArgError((fmt(_("Unknow class '%1%'")) % name).str());
     }
 
     return it->second;
@@ -77,7 +77,7 @@ Class& Classes::get(const std::string& name)
     auto it = m_lst.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknow class '%1%'")) % name);
+        throw utils::ArgError((fmt(_("Unknow class '%1%'")) % name).str());
     }
 
     return it->second;
@@ -86,12 +86,12 @@ Class& Classes::get(const std::string& name)
 void Classes::rename(const std::string& oldname, const std::string& newname)
 {
     if (exist(newname)) {
-        throw utils::ArgError(fmt(_("Class '%1%' already exists")) % newname);
+        throw utils::ArgError((fmt(_("Class '%1%' already exists")) % newname).str());
     }
 
     auto it = m_lst.find(oldname);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknow class '%1%'")) % oldname);
+        throw utils::ArgError((fmt(_("Unknow class '%1%'")) % oldname).str());
     }
 
     std::pair < iterator, bool > x;

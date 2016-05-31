@@ -78,17 +78,19 @@ void SaxParser::parseFile(const std::string& filename)
 
     if (xmlSAXUserParseFile(&m_sax, this, filename.c_str())) {
         if (m_error.empty()) {
-            throw utils::SaxParserError(fmt(
-                    _("Error parsing file '%1%'")) % filename);
+            throw utils::SaxParserError(
+                (fmt(_("Error parsing file '%1%'")) % filename).str());
         } else {
-            throw utils::SaxParserError(fmt(
-                    _("Error parsing file '%1%': %2%")) % filename % m_error);
+            throw utils::SaxParserError(
+                (fmt(_("Error parsing file '%1%': %2%"))
+                 % filename % m_error).str());
         }
     }
 
     if (m_stop) {
-        throw utils::SaxParserError(fmt(
-                _("Error when parsing file '%1%': %2%")) % filename % m_error);
+        throw utils::SaxParserError(
+            (fmt(_("Error when parsing file '%1%': %2%"))
+             % filename % m_error).str());
     }
 
     xmlMemoryDump();
@@ -114,14 +116,14 @@ void SaxParser::parseMemory(const std::string& buffer)
         if (m_error.empty()) {
             throw utils::SaxParserError(_("Error parsing memory"));
         } else {
-            throw utils::SaxParserError(fmt(
-                    _("Error parsing memory: %1%")) % m_error);
+            throw utils::SaxParserError(
+                (fmt(_("Error parsing memory: %1%")) % m_error).str());
         }
     }
 
     if (m_stop) {
-        throw utils::SaxParserError(fmt(
-                _("Error when parsing memory: %1%")) % m_error);
+        throw utils::SaxParserError(
+            (fmt(_("Error when parsing memory: %1%")) % m_error).str());
     }
     xmlMemoryDump();
     setlocale(LC_ALL, "");
@@ -235,7 +237,7 @@ void SaxParser::onWarning(void* /* ctx */, const char *msg, ...)
     vsnprintf(buffer, 1023, msg, args);
     va_end(args);
 
-    TraceAlways(fmt(_("XML warning: %1%")) % buffer);
+    TraceAlways((fmt(_("XML warning: %1%")) % buffer).str());
 
     delete [] buffer;
 }
@@ -346,8 +348,9 @@ void SaxParser::onMatrix(const xmlChar** att)
             numeric_cast < m_t >(columnstep ? xmlCharToInt(columnstep) : 0),
             numeric_cast < m_t >(rowstep ? xmlCharToInt(rowstep) : 0));
     } catch(const std::exception& e) {
-        throw utils::SaxParserError(fmt(
-            _("Matrix tag does not convert a attribute '%1%'")) % e.what());
+        throw utils::SaxParserError(
+            (fmt(_("Matrix tag does not convert a attribute '%1%'"))
+             % e.what()).str());
     }
 }
 
@@ -400,9 +403,9 @@ void SaxParser::onTable(const xmlChar** att)
     try {
         m_valuestack.pushTable(xmlCharToInt(width), xmlCharToInt(height));
     } catch (const std::exception& e) {
-        throw utils::SaxParserError(fmt(
-            _("Table value tag can not convert attributes 'width' or "
-              "'height': %1%")) % e.what());
+        throw utils::SaxParserError(
+            (fmt(_("Table value tag can not convert attributes 'width' or "
+                   "'height': %1%")) % e.what()).str());
     }
 }
 
@@ -632,8 +635,8 @@ void SaxParser::onEndTable()
         size = boost::numeric_cast < size_t >(table.width() * table.height());
     } catch (const std::exception /*e*/) {
         throw utils::SaxParserError(
-            fmt(_("VPZ parser: bad height (%1%) or width (%2%) table ")) %
-            table.width() % table.height());
+            (fmt(_("VPZ parser: bad height (%1%) or width (%2%) table ")) %
+             table.width() % table.height()).str());
     }
 
     if (result.size() != size) {
@@ -861,14 +864,14 @@ long int xmlCharToInt(const xmlChar* str)
 
     if ((err == ERANGE and (r == LONG_MAX || r == LONG_MIN)) or
         (err != 0 and r == 0)) {
-        throw utils::SaxParserError(fmt(
-                _("error to convert '%1%' to integer: %2%")) % str %
-            strerror(err));
+        throw utils::SaxParserError(
+            (fmt(_("error to convert '%1%' to integer: %2%")) % str %
+             strerror(err)).str());
     }
 
     if (res == (const char*)str) {
-        throw utils::SaxParserError(fmt(
-                _("error to convert '%1%' to integer")) % str);
+        throw utils::SaxParserError(
+            (fmt(_("error to convert '%1%' to integer")) % str).str());
     }
 
     return r;
@@ -884,14 +887,14 @@ unsigned long int xmlCharToUnsignedInt(const xmlChar* str)
 
     if ((err == ERANGE and (r == ULONG_MAX)) or
         (err != 0 and r == 0)) {
-        throw utils::SaxParserError(fmt(
-                _("error to convert '%1%' to unsigned integer: %2%")) % str %
-            strerror(err));
+        throw utils::SaxParserError(
+            (fmt(_("error to convert '%1%' to unsigned integer: %2%"))
+             % str % strerror(err)).str());
     }
 
     if (res == (const char*)str) {
-        throw utils::SaxParserError(fmt(
-                _("error to convert '%1%' to unsigned integer")) % str);
+        throw utils::SaxParserError(
+            (fmt(_("error to convert '%1%' to unsigned integer")) % str).str());
     }
 
     return r;
@@ -906,14 +909,14 @@ double xmlCharToDouble(const xmlChar* str)
     int err = errno;
 
     if ((err == ERANGE and r == HUGE_VAL) or (err != 0 and r == 0)) {
-        throw utils::SaxParserError(fmt(
-                _("error to convert '%1%' to double: %2%")) % str %
-            strerror(err));
+        throw utils::SaxParserError(
+            (fmt(_("error to convert '%1%' to double: %2%")) % str %
+             strerror(err)).str());
     }
 
     if (res == (const char*)str) {
-        throw utils::SaxParserError(fmt(
-                _("error to convert '%1%' to double")) % str);
+        throw utils::SaxParserError(
+            (fmt(_("error to convert '%1%' to double")) % str).str());
     }
 
     return r;

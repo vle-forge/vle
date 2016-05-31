@@ -251,17 +251,6 @@ void Trace::send(const std::string& str, TraceLevelOptions level)
     Pimpl::mTrace->send(str, level);
 }
 
-void Trace::send(const boost::format& str, TraceLevelOptions level)
-{
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
-
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    Pimpl::mTrace->send(str.str(), level);
-}
-
 std::string Trace::getDefaultLogFilename()
 {
     return getLogFilename("vle.log");

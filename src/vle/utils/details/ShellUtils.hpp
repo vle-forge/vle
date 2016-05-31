@@ -23,6 +23,7 @@
 
 #include <string.h>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 /**
  * SECTION:shell
@@ -131,8 +132,10 @@ public:
             }
         }
       /* If we reach here this means the close quote was never encountered */
-      throw vle::utils::CastError(vle::fmt("Unmatched quotation mark in command line "
-              "or other shell-quoted text: %1%") % retval);
+      throw vle::utils::CastError(
+          (vle::fmt("Unmatched quotation mark in command line "
+                    "or other shell-quoted text: %1%") % retval).str());
+
       return  std::make_pair(retval, it);
     }
 
@@ -329,7 +332,8 @@ public:
               case '"':
                   current_token_exist = true;
                   current_token += *p;
-                  /* FALL THRU */
+                  current_quote = *p;
+		  break;
               case '\\':
                   current_quote = *p;
                   break;

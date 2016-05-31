@@ -27,6 +27,7 @@
 
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/date_time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -200,9 +201,9 @@ long DateTime::toJulianDayNumber(const std::string& date)
 	    d = boost::gregorian::from_undelimited_string(date);
 	    return d.julian_day();
 	} catch (...) {
-            throw utils::InternalError(fmt(
-                    _("Date time error: error to convert '%1%' into julian"
-                      " day number")) % date);
+            throw utils::InternalError(
+                (fmt(_("Date time error: error to convert '%1%' into julian"
+                       " day number")) % date).str());
 	}
     }
 
@@ -276,9 +277,9 @@ double DateTime::toJulianDay(const std::string& date)
 		    d.time_of_day().total_seconds() / 86400.0;
 	    }
 	} catch (...) {
-            throw utils::InternalError(fmt(
-                    _("Date time error: error to convert '%1%' into julian"
-                      " day")) % date);
+            throw utils::InternalError(
+                (fmt(_("Date time error: error to convert '%1%' into julian"
+                       " day")) % date).str());
 	}
     }
     return -1.0;
@@ -334,9 +335,9 @@ double DateTime::toTime(const double& date, long& year,
 
         return f;
     } else {
-        throw utils::ArgError(fmt(
-                _("Can not convert date '%1%' to gregorian calendar")) %
-            date);
+        throw utils::ArgError(
+            (fmt(_("Can not convert date '%1%' to gregorian calendar")) %
+             date).str());
     }
 
     return 0.0;

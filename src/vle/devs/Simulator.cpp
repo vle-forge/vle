@@ -29,6 +29,8 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/AtomicModel.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace devs {
 
@@ -151,7 +153,8 @@ Time Simulator::timeAdvance()
 
     if (tn < 0.0)
         throw utils::ModellingError(
-            fmt(_("Negative time advance in '%1%' (%2%)")) % getName() % tn);
+            (fmt(_("Negative time advance in '%1%' (%2%)"))
+             % getName() % tn).str());
 
     return tn;
 }
@@ -162,7 +165,8 @@ Time Simulator::init(Time time)
 
     if (tn < 0.0)
         throw utils::ModellingError(
-            fmt(_("Negative init function in '%1%' (%2%)")) % getName() % tn);
+            (fmt(_("Negative init function in '%1%' (%2%)"))
+             % getName() % tn).str());
 
     m_tn = tn + time;
     return m_tn;

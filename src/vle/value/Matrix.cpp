@@ -38,6 +38,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <cassert>
 
 namespace {
@@ -51,8 +52,8 @@ pp_check_index(const vle::value::Matrix& m,
 #ifndef NDEBUG
     if (not (column < m.columns()  and row <= m.rows()))
         throw vle::utils::ArgError(
-            vle::fmt(_("Matrix: bad access %1% %2% for %3%x%4% matrix"))
-            % column % row % m.columns() % m.rows());
+            (vle::fmt(_("Matrix: bad access %1% %2% for %3%x%4% matrix"))
+             % column % row % m.columns() % m.rows()).str());
 #else
     (void)m;
     (void)column;
@@ -71,8 +72,8 @@ pp_get_value(vle::value::Matrix& m,
     auto pointer = m.value()[row * m.columns_max() + column].get();
     if (not pointer)
         throw vle::utils::ArgError(
-            vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
-                       "matrix")) % column % row % m.columns() % m.rows());
+            (vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
+                        "matrix")) % column % row % m.columns() % m.rows()).str());
 
     return *pointer;
 }
@@ -88,8 +89,8 @@ pp_get_value(const vle::value::Matrix& m,
     auto pointer = m.value()[row * m.columns_max() + column].get();
     if (not pointer)
         throw vle::utils::ArgError(
-            vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
-                       "matrix")) % column % row % m.columns() % m.rows());
+            (vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
+                        "matrix")) % column % row % m.columns() % m.rows()).str());
 
     return *pointer;
 }
@@ -129,8 +130,8 @@ Matrix::Matrix(index columns, index rows, index resizeColumns, index resizeRows)
 {
     if (columns * rows <= 0)
         throw utils::ArgError(
-            fmt(_("Matrix: bad constructor initialization %1%x%2%"))
-            % columns % rows);
+            (fmt(_("Matrix: bad constructor initialization %1%x%2%"))
+             % columns % rows).str());
 }
 
 Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
@@ -141,17 +142,17 @@ Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
 {
     if (columnmax * rowmax <= 0)
         throw utils::ArgError(
-            fmt(_("Matrix: bad constructor initialization %1%x%2%"))
-            % columns % rows);
+            (fmt(_("Matrix: bad constructor initialization %1%x%2%"))
+             % columns % rows).str());
 
     if (columns > columnmax)
         throw utils::ArgError(
-            fmt(_("Matrix: Number of columns error: %1% on %2%"))
-            % columns % columnmax);
+            (fmt(_("Matrix: Number of columns error: %1% on %2%"))
+             % columns % columnmax).str());
 
     if (rows > rowmax)
         throw utils::ArgError(
-            fmt(_("Matrix: Number of row error: %1% on %2%")) % rows % rowmax);
+            (fmt(_("Matrix: Number of row error: %1% on %2%")) % rows % rowmax).str());
 }
 
 Value::type Matrix::getType() const
@@ -399,8 +400,8 @@ void Matrix::reserve(size_type columnmax, size_type rowmax)
 {
     if (columnmax * rowmax <= 0)
         throw utils::ArgError(
-            fmt(_("Matrix: bad reserve operation %1%x%2%"))
-            % columnmax % rowmax);
+            (fmt(_("Matrix: bad reserve operation %1%x%2%"))
+             % columnmax % rowmax).str());
 
     if (columnmax <= m_nbcolmax and rowmax <= m_nbrowmax)
         return;
@@ -421,8 +422,8 @@ void Matrix::resize(size_type columns, size_type rows)
 {
     if (columns * rows <= 0)
         throw utils::ArgError(
-            fmt(_("Matrix: bad resize operation %1%x%2%"))
-            % columns % rows);
+            (fmt(_("Matrix: bad resize operation %1%x%2%"))
+             % columns % rows).str());
 
     if (columns >= m_nbcolmax or rows >= m_nbrowmax)
         reserve(columns + m_stepcol, rows + m_steprow);
@@ -450,8 +451,8 @@ void Matrix::resize(size_type columns, size_type rows,
 {
     if (columns * rows <= 0)
         throw utils::ArgError(
-            fmt(_("Matrix: bad resize operation %1%x%2%"))
-            % columns % rows);
+            (fmt(_("Matrix: bad resize operation %1%x%2%"))
+             % columns % rows).str());
 
     if (columns >= m_nbcolmax or rows >= m_nbrowmax)
         reserve(columns + m_stepcol, rows + m_steprow);

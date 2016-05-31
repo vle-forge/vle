@@ -342,7 +342,7 @@ bool Preferences::get(const std::string& key, std::string* value) const
         (*value) = boost::any_cast < std::string >(result);
         return true;
     } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways((fmt(_("Preferences: %1% is not a string")) % key));
+        TraceAlways((fmt(_("Preferences: %1% is not a string")) % key).str());
         return false;
     }
 }
@@ -355,7 +355,7 @@ bool Preferences::get(const std::string& key, double* value) const
         (*value) = boost::any_cast < double >(result);
         return true;
     } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways((fmt(_("Preferences: %1% is not a real")) % key));
+        TraceAlways((fmt(_("Preferences: %1% is not a real")) % key).str());
         return false;
     }
 }
@@ -368,7 +368,7 @@ bool Preferences::get(const std::string& key, uint32_t* value) const
         (*value) = boost::any_cast < uint32_t >(result);
         return true;
     } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways((fmt(_("Preferences: %1% is not an integer")) % key));
+        TraceAlways((fmt(_("Preferences: %1% is not an integer")) % key).str());
         return false;
     }
 }
@@ -381,7 +381,7 @@ bool Preferences::get(const std::string& key, bool* value) const
         (*value) = boost::any_cast < bool >(result);
         return true;
     } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways((fmt(_("Preferences: %1% is not a bool")) % key));
+        TraceAlways((fmt(_("Preferences: %1% is not a bool")) % key).str());
         return false;
     }
 }

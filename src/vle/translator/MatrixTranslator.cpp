@@ -30,6 +30,7 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Tuple.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <boost/cast.hpp>
 
@@ -49,8 +50,8 @@ MatrixTranslator::getModel(const std::string& name) const
     it = m_models.find(name);
 
     if (it == m_models.end()) {
-        throw utils::InternalError(fmt(
-                _("MatrixTranslator: unknow model '%1%'")) % name);
+        throw utils::InternalError(
+            (fmt(_("MatrixTranslator: unknow model '%1%'")) % name).str());
     }
 
     return it->second;
@@ -62,8 +63,8 @@ unsigned int MatrixTranslator::getSize(unsigned int i) const
         m_size.find(i));
 
     if (it == m_size.end()) {
-        throw utils::InternalError(fmt(
-                _("MatrixTranslator: unknow size '%1%'")) % i);
+        throw utils::InternalError(
+            (fmt(_("MatrixTranslator: unknow size '%1%'")) % i).str());
     }
 
     return it->second;
@@ -223,8 +224,8 @@ void MatrixTranslator::translate(const value::Value& buffer)
         translateConditions();
         translateStructures();
     } catch (const std::exception& e) {
-        throw utils::InternalError(fmt(
-                _("Matrix translator error: %1%")) % e.what());
+        throw utils::InternalError(
+            (fmt(_("Matrix translator error: %1%")) % e.what()).str());
     }
 }
 

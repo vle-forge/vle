@@ -27,6 +27,7 @@
 
 #include <vle/value/Table.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -42,7 +43,7 @@ double& pp_get(vle::value::TableValue& t, std::size_t x, std::size_t y,
 
     if (i > t.size())
         throw vle::utils::ArgError(
-            vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y);
+            (vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y).str());
 
     return t[i];
 }
@@ -55,7 +56,7 @@ double pp_get(const vle::value::TableValue& t, std::size_t x, std::size_t y,
 
     if (i > t.size())
         throw vle::utils::ArgError(
-            vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y);
+            (vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y).str());
 
     return t[i];
 }
@@ -71,8 +72,8 @@ Table::Table(std::size_t width, std::size_t height)
 {
     if (width * height <= 0)
         throw utils::ArgError(
-            fmt(_("Table: bad constructor initialization %1%x%2%"))
-            % width % height);
+            (fmt(_("Table: bad constructor initialization %1%x%2%"))
+             % width % height).str());
 }
 
 Value::type Table::getType() const
@@ -126,8 +127,8 @@ void Table::resize(std::size_t width, std::size_t height)
 {
     if (width * height <= 0)
         throw utils::ArgError(
-            fmt(_("Table: bad constructor initialization %1%x%2%"))
-            % width % height);
+            (fmt(_("Table: bad constructor initialization %1%x%2%"))
+             % width % height).str());
 
     if (width == m_width and height == m_height)
         return;
@@ -188,9 +189,9 @@ void Table::fill(const std::string& str)
                 try {
                     result = boost::lexical_cast < long >(elem);
                 } catch(const boost::bad_lexical_cast& e) {
-                    throw vle::utils::ArgError(fmt(_(
-                            "Can not convert string \'%1%\' into"
-                            " double or long")) % (elem));
+                    throw vle::utils::ArgError(
+                        (fmt(_("Can not convert string \'%1%\' into"
+                               " double or long")) % (elem)).str());
                 }
             }
 

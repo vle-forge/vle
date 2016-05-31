@@ -27,6 +27,7 @@
 
 #include <vle/value/Tuple.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -40,7 +41,7 @@ pp_get(const vle::value::TupleValue& t, size_t i)
 {
     if (i > t.size())
         throw vle::utils::ArgError(
-            vle::fmt(_("Tuple: bad accessor %1%")) % i);
+            (vle::fmt(_("Tuple: bad accessor %1%")) % i).str());
 
     return t[i];
 }
@@ -51,7 +52,7 @@ pp_get(vle::value::TupleValue& t, size_t i)
 {
     if (i > t.size())
         throw vle::utils::ArgError(
-            vle::fmt(_("Tuple: bad accessor %1%")) % i);
+            (vle::fmt(_("Tuple: bad accessor %1%")) % i).str());
 
     return t[i];
 }
@@ -162,9 +163,9 @@ void Tuple::fill(const std::string& str)
                 try {
                     m_value.push_back(boost::lexical_cast < long >(elem));
                 } catch(const boost::bad_lexical_cast& e) {
-                    throw vle::utils::ArgError(fmt(
-                                "Can not convert string '%1%' into"
-                                " double or long") % (elem));
+                    throw vle::utils::ArgError(
+                        (fmt("Can not convert string '%1%' into"
+                             " double or long") % (elem)).str());
                 }
             }
         }

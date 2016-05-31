@@ -27,8 +27,10 @@
 #include <vle/vpz/Observables.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <iterator>
 #include <algorithm>
+#include <vector>
 
 namespace vle { namespace vpz {
 
@@ -73,8 +75,8 @@ Observable& Observables::add(const Observable& obs)
     x = m_list.insert(value_type(obs.name(), obs));
 
     if (not x.second) {
-        throw utils::ArgError(fmt(
-                _("Observable %1% already exist")) % obs.name());
+        throw utils::ArgError(
+            (fmt(_("Observable %1% already exist")) % obs.name()).str());
     }
 
     return x.first->second;
@@ -85,7 +87,8 @@ Observable& Observables::get(const std::string& name)
     auto it = m_list.find(name);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(fmt(_("Observable %1% does not exist")) % name);
+        throw utils::ArgError(
+            (fmt(_("Observable %1% does not exist")) % name).str());
     }
 
     return it->second;
@@ -96,8 +99,8 @@ const Observable& Observables::get(const std::string& name) const
     auto it = m_list.find(name);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(fmt(
-                _("Observable %1% doest not exist")) % name);
+        throw utils::ArgError(
+            (fmt(_("Observable %1% doest not exist")) % name).str());
     }
 
     return it->second;

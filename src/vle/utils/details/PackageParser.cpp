@@ -518,9 +518,9 @@ public:
                 return true;
             default:
                 TraceAlways(
-                    fmt(_("Remote Manager: Syntax error in file `%1%' "
+                    (fmt(_("Remote Manager: Syntax error in file `%1%' "
                           "l. %2% c. %3%: %4%")) % filepath % line %
-                    column % result);
+                     column % result).str());
                 return false;
             }
         } while (in);
@@ -538,8 +538,9 @@ bool PackageParser::extract(const std::string& filepath,
         DescriptionParser parser(ifs, filepath);
 
         if (not parser.read_packages(distribution, &m_packages)) {
-            TraceAlways(fmt(_("Remote Manager: Failed to parser %1%"))
-                        % filepath);
+            TraceAlways(
+                (fmt(_("Remote Manager: Failed to parser %1%"))
+                 % filepath).str());
             return false;
         }
     }

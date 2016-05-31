@@ -29,6 +29,7 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/value/Double.hpp>
 #include <algorithm>
 #include <iterator>
@@ -159,8 +160,8 @@ const Condition& Conditions::get(const std::string& condition) const
     auto it = m_list.find(condition);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(
-                _("The condition '%1%' does not exists")) % condition);
+        throw utils::ArgError(
+            (fmt(_("The condition '%1%' does not exists")) % condition).str());
     }
 
     return it->second;
@@ -171,8 +172,8 @@ Condition& Conditions::get(const std::string& condition)
     auto it = m_list.find(condition);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(
-                _("The condition '%1%' does not exists")) % condition);
+        throw utils::ArgError(
+            (fmt(_("The condition '%1%' does not exists")) % condition).str());
     }
 
     return it->second;

@@ -29,7 +29,6 @@
 #define VLE_UTILS_TRACE_HPP 1
 
 #include <vle/DllDefines.hpp>
-#include <boost/format/format_fwd.hpp>
 #include <string>
 
 namespace vle { namespace utils {
@@ -124,15 +123,6 @@ public:
      * @param level The Level of the message.
      */
     static void send(const std::string& str,
-                     TraceLevelOptions level = TRACE_LEVEL_ALWAYS);
-
-    /**
-     * Send a message to the log file using a boost::format object.
-     *
-     * @param str The boost::format message to send.
-     * @param level The Level of the message.
-     */
-    static void send(const boost::format& str,
                      TraceLevelOptions level = TRACE_LEVEL_ALWAYS);
 
     /**

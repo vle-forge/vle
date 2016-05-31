@@ -62,8 +62,8 @@ const Block& Block::getBlock(const std::string& name) const
 {
     auto it = blocks.find(name);
     if (it == blocks.end()) {
-        throw utils::ParseError(fmt(
-                _("The block `%1%' does not exist")) % name);
+        throw utils::ParseError(
+            (fmt(_("The block `%1%' does not exist")) % name).str());
     }
     return it->second;
 }
@@ -75,9 +75,9 @@ Parser::Parser(std::istream& stream) throw(utils::ParseError)
     try {
         readBlock(mRoot);
     } catch(const std::exception& e) {
-        throw utils::ParseError(fmt(
-                _("Parser error before line %1% column %2%:\t%3%")) % mLine %
-            mColumn % e.what());
+        throw utils::ParseError(
+            (fmt(_("Parser error before line %1% column %2%:\t%3%")) % mLine %
+             mColumn % e.what()).str());
     }
 }
 
@@ -190,8 +190,8 @@ double Parser::readReal()
                 result += c;
             } else if (c == '.') {
                 if (result.find(".") != std::string::npos){
-                    throw utils::ParseError(fmt(
-                       _("Multiple '.' while parsing real `%1%.' ")) % result);
+                    throw utils::ParseError(
+                        (fmt(_("Multiple '.' while parsing real `%1%.' ")) % result).str());
                 }
                 result += c;
             } else {

@@ -294,20 +294,20 @@ Manager::run(std::unique_ptr<vpz::Vpz>  exp,
 
     if (thread <= 0) {
         throw vle::utils::ArgError(
-            fmt(_("Manager error: thread must be superior to 0 (%1%)"))
-            % thread);
+            (fmt(_("Manager error: thread must be superior to 0 (%1%)"))
+             % thread).str());
     }
 
     if (world <= rank) {
         throw vle::utils::ArgError(
-            fmt(_("Manager error: rank (%1%) must be inferior"
-                  " to world (%2%)"))  % rank % world);
+            (fmt(_("Manager error: rank (%1%) must be inferior"
+                   " to world (%2%)"))  % rank % world).str());
     }
 
     if (world <= 0) {
         throw vle::utils::ArgError(
-            fmt(_("Manager error: world (%1%) must be superior to 0."))
-            % world);
+            (fmt(_("Manager error: world (%1%) must be superior to 0."))
+             % world).str());
     }
 
     mPimpl->writeSummaryLog(_("Manager started"));

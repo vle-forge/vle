@@ -29,6 +29,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/value/Value.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iterator>
@@ -99,8 +100,8 @@ View& Views::add(const View& view)
     x = m_list.insert(value_type(view.name(), view));
 
     if (not x.second) {
-        throw utils::ArgError(fmt(
-                _("View '%1%' already exist")) % view.name());
+        throw utils::ArgError(
+            (fmt(_("View '%1%' already exist")) % view.name()).str());
     }
 
     return x.first->second;
@@ -110,9 +111,9 @@ View& Views::addEventView(const std::string& name,
                           const std::string& output)
 {
     if (isUsedOutput(output)) {
-        throw utils::ArgError(fmt(
-                _("Output '%1%' of view '%2%' is already used")) % output %
-            name);
+        throw utils::ArgError(
+            (fmt(_("Output '%1%' of view '%2%' is already used")) % output %
+             name).str());
     }
 
     return add(View(name, View::EVENT, output));
@@ -123,9 +124,9 @@ View& Views::addTimedView(const std::string& name,
                           const std::string& output)
 {
     if (isUsedOutput(output)) {
-        throw utils::ArgError(fmt(
-                _("Output '%1%' of view '%2%' is already used")) % output %
-            name);
+        throw utils::ArgError(
+            (fmt(_("Output '%1%' of view '%2%' is already used")) % output %
+             name).str());
     }
 
     return add(View(name, View::TIMED, output, timestep));
@@ -135,9 +136,9 @@ View& Views::addFinishView(const std::string& name,
                            const std::string& output)
 {
     if (isUsedOutput(output)) {
-        throw utils::ArgError(fmt(
-                _("Output '%1%' of view '%2%' is already used")) % output %
-            name);
+        throw utils::ArgError(
+            (fmt(_("Output '%1%' of view '%2%' is already used")) % output %
+             name).str());
     }
 
     return add(View(name, View::FINISH, output));
@@ -153,7 +154,7 @@ const View& Views::get(const std::string& name) const
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknow view '%1%'\n")) % name);
+        throw utils::ArgError((fmt(_("Unknow view '%1%'\n")) % name).str());
     }
 
     return it->second;
@@ -164,7 +165,7 @@ View& Views::get(const std::string& name)
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unknow view '%1%'\n")) % name);
+        throw utils::ArgError((fmt(_("Unknow view '%1%'\n")) % name).str());
     }
 
     return it->second;
