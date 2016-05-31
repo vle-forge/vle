@@ -49,9 +49,7 @@ public:
      */
     ViewEvent(View* view, const Time& time)
         : mView(view), mTime(time)
-    {
-        assert(view);
-    }
+    {}
 
     ViewEvent(const ViewEvent&) = default;
     ViewEvent& operator=(const ViewEvent&) = default;
@@ -169,8 +167,8 @@ public:
 
     void remove(Simulator* sim)
     {
-        std::for_each(mElems.begin(), mElems.end(),
-                      ViewEventList::RemoveSimulator(sim));
+        for (auto& elem : mElems)
+            elem->getView()->removeObservable(sim);
     }
 
     iterator begin() { return mElems.begin(); }
@@ -179,18 +177,6 @@ public:
     const_iterator end() const { return mElems.end(); }
     bool empty() const { return mElems.empty(); }
     size_type size() const { return mElems.size(); }
-
-    struct RemoveSimulator
-    {
-        RemoveSimulator(Simulator* sim) : mSim(sim) {}
-
-        void operator()(ViewEvent* view)
-        {
-            view->getView()->removeObservable(mSim);
-        }
-
-        Simulator* mSim;
-    };
 
 private:
     value_type mElems;

@@ -31,7 +31,6 @@
 #include <vle/DllDefines.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Deprecated.hpp>
 #include <memory>
 #include <string>
 
@@ -375,81 +374,6 @@ public:
      * or if \e attributes() is not a \e value::Matrix.
      */
     value::Matrix& getMatrix();
-
-    //
-    // Deprecated part.
-    //
-
-    /**
-     * Return the map attached to the event or throw exception.
-     *
-     * \return a reference to the attached map.
-     *
-     * \deprecated
-     *
-     * \exception can throw \e utils::ArgError if \e attributes() is empty
-     * or if \e attributes() is not a \e value::Map.
-     */
-    const value::Map& getAttributes() const DEPRECATED
-    {
-        if (m_attributes.get() == nullptr)
-            throw utils::ArgError(
-                _("ExternalEvent: getAttributes returns null pointer"));
-
-        if (m_attributes->isMap())
-            return m_attributes->toMap();
-
-        throw utils::ArgError(
-            _("ExternalEvent: getAttributes can not return another"
-              " type than value::Map"));
-    }
-
-    /**
-     * Return the map attached to the event or, if \e attributes() is
-     * empty, returns a newly allocated value::Map.
-     *
-     * \return a reference to the attached map.
-     *
-     * \deprecated
-     *
-     * \exception can throw \e utils::ArgError if \e attributes() is not a
-     * \e value::Map.
-     */
-    value::Map& getAttributes() DEPRECATED
-    {
-        if (m_attributes.get() == nullptr) {
-            auto ptr = std::make_shared<value::Map>();
-            m_attributes = ptr;
-            return *ptr;
-        }
-
-        if (m_attributes->isMap())
-            return m_attributes->toMap();
-
-        throw utils::ArgError(
-            _("ExternalEvent: getAttributes is filled with another "
-              "type than value::Map"));
-    }
-
-    /**
-     * Fill the \e m_attributes with a clone of the map.
-     *
-     * \deprecated
-     */
-    void putAttributes(const value::Map& map) DEPRECATED;
-
-    /**
-     * Put an attribute to the \e m_attributes if and only if the \e
-     * m_attributes is a value::Map or m_attributes equal nullptr.
-     *
-     * \deprecated
-     *
-     * \param name std::string name of value::Value to add (the key of the
-     * value::Map).
-     * \param value Value to add, not clone.
-     */
-    void putAttribute(const std::string& name,
-                      std::unique_ptr<value::Value> value);
 
     //
     // End of the deprecated part.

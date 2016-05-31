@@ -610,9 +610,7 @@ ModuleManager::ModuleManager()
 {
 }
 
-ModuleManager::~ModuleManager()
-{
-}
+ModuleManager::~ModuleManager() noexcept = default;
 
 void *ModuleManager::get(const std::string& package,
                          const std::string& library,

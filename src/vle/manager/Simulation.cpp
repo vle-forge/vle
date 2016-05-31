@@ -34,6 +34,7 @@
 #include <vle/manager/Simulation.hpp>
 #include <boost/timer.hpp>
 #include <boost/progress.hpp>
+#include <sstream>
 
 namespace vle { namespace manager {
 
@@ -63,7 +64,9 @@ public:
         if (m_out) {
             (*m_out) << t;
         } else {
-            utils::Trace::send(t);
+            std::stringstream ss;
+            ss << t;
+            utils::Trace::send(ss.str());
         }
     }
 

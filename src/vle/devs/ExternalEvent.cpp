@@ -296,15 +296,4 @@ value::Matrix& ExternalEvent::getMatrix()
     return m_attributes->toMatrix();
 }
 
-void ExternalEvent::putAttributes(const value::Map& mp)
-{
-    m_attributes = std::shared_ptr<value::Map>(new value::Map(mp));
-}
-
-void ExternalEvent::putAttribute(const std::string& name,
-                                 std::unique_ptr<value::Value> value)
-{
-    getMap().add(name, std::move(value));
-}
-
 }} // namespace vle devs
