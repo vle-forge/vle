@@ -171,10 +171,10 @@ endif ()
 set(Boost_DEBUG 0)
 if (WITH_MVLE OR WITH_CVLE)
   find_package(Boost COMPONENTS unit_test_framework filesystem system
-    chrono date_time regex program_options serialization mpi)
+    date_time regex program_options serialization mpi)
 else ()
   find_package(Boost COMPONENTS unit_test_framework filesystem system
-    chrono date_time regex program_options)
+    date_time regex program_options)
 endif()
 
 if (NOT Boost_FILESYSTEM_FOUND)
