@@ -156,9 +156,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VLEDEPS_CFLAGS_OTHER_STRING}")
 # Test the libboost header and libboost-text library.
 #
 
-if (WIN32)
-  set(Boost_THREADAPI "win32")
-endif (WIN32)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
@@ -173,10 +170,10 @@ endif ()
 
 set(Boost_DEBUG 0)
 if (WITH_MVLE OR WITH_CVLE)
-  find_package(Boost COMPONENTS unit_test_framework thread filesystem system
+  find_package(Boost COMPONENTS unit_test_framework filesystem system
     chrono date_time regex program_options serialization mpi)
 else ()
-  find_package(Boost COMPONENTS unit_test_framework thread filesystem system
+  find_package(Boost COMPONENTS unit_test_framework filesystem system
     chrono date_time regex program_options)
 endif()
 
@@ -189,9 +186,6 @@ endif (NOT Boost_REGEX_FOUND)
 if (NOT Boost_DATE_TIME_FOUND)
   message(FATAL_ERROR "The boost date_time library is required")
 endif (NOT Boost_DATE_TIME_FOUND)
-if (NOT Boost_THREAD_FOUND)
-  message(FATAL_ERROR "The boost thread library is required")
-endif (NOT Boost_THREAD_FOUND)
 if (NOT Boost_PROGRAM_OPTIONS_FOUND)
   message(FATAL_ERROR "The boost program options library is required")
 endif (NOT Boost_PROGRAM_OPTIONS_FOUND)

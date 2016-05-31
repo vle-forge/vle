@@ -28,6 +28,7 @@
 #include <fstream>
 #include <ostream>
 #include <cstring>
+#include <thread>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
@@ -53,7 +54,6 @@
 #include <boost/cast.hpp>
 #include <boost/version.hpp>
 #include <boost/config.hpp>
-#include <boost/thread/thread.hpp>
 #include "details/ShellUtils.hpp"
 
 namespace fs = boost::filesystem;
@@ -446,7 +446,7 @@ bool Package::wait(std::ostream& out, std::ostream& err)
 
             output.clear();
             error.clear();
-            boost::this_thread::sleep(boost::posix_time::microseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         } else {
             break;
         }

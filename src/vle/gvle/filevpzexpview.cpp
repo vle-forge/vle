@@ -23,7 +23,6 @@
  */
 #include <boost/unordered_map.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/thread.hpp>
 #include <boost/version.hpp>
 #include <QtCore/qdebug.h>
 #include <QMessageBox>
