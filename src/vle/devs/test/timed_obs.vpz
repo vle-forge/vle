@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
+<vle_project version="0.5" date="Mon, 27 Dec 2010" author="Gauthier Quesnel">
+<structures>
+<model name="top" type="coupled" width="459"  >
+<submodels>
+<model name="A" type="atomic" dynamics="timed_obs" observables="obs1" x="140" y="25" width="100" height="45" >
+<in>
+</in>
+<out>
+</out>
+</model>
+</submodels>
+<connections>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="timed_obs" package="" library="dynamics_timed_obs"  />
+</dynamics>
+<experiment name="expe" duration="4" begin="0.000000000000000" >
+<views>
+<outputs>
+<output name="o" location="" format="local" package="" plugin="oov_plugin" />
+</outputs>
+<observables>
+<observable name="obs1" >
+<port name="obs" >
+ <attachedview name="view1" />
+</port>
+</observable>
+</observables>
+<view name="view1" output="o" type="timed" timestep="1.000000000000000" />
+</views>
+</experiment>
+</vle_project>

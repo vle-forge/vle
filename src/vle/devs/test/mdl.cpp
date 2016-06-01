@@ -336,6 +336,156 @@ private:
     int m_counter;
 };
 
+class Confluent_transitionA : public devs::Dynamics
+{
+public:
+    Confluent_transitionA(const devs::DynamicsInit& atom,
+              const devs::InitEventList& events) :
+        devs::Dynamics(atom, events)
+    {}
+
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 0.0;
+    }
+
+    virtual devs::Time timeAdvance() const override
+    {
+        return devs::infinity;
+    }
+
+    virtual void internalTransition(devs::Time /* time */) override
+    {
+    }
+
+    virtual void externalTransition(
+        const devs::ExternalEventList& /*events*/,
+        devs::Time /* time */) override
+    {
+    }
+
+    virtual void confluentTransitions(
+            devs::Time /*time*/,
+            const devs::ExternalEventList& /*extEventlist*/)
+    {
+    }
+
+    virtual void output(devs::Time /*time*/,
+                        devs::ExternalEventList& output) const override
+    {
+        output.emplace_back("out");
+    }
+
+    virtual std::unique_ptr<value::Value>
+    observation(const devs::ObservationEvent&) const override
+    {
+        return 0;
+    }
+};
+
+class Confluent_transitionB : public devs::Dynamics
+{
+public:
+    Confluent_transitionB(const devs::DynamicsInit& atom,
+              const devs::InitEventList& events) :
+        devs::Dynamics(atom, events), state(0)
+    {}
+
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 0.0;
+    }
+
+    virtual devs::Time timeAdvance() const override
+    {
+        if (state<2) {
+            return 0;
+        } else {
+            return devs::infinity;
+        }
+    }
+
+    virtual void internalTransition(devs::Time /* time */) override
+    {
+        state++;
+    }
+
+    virtual void externalTransition(
+        const devs::ExternalEventList& /*events*/,
+        devs::Time /* time */) override
+    {
+        //should not have an external transition, rather a confluent
+        throw "error confluent_transition::internalTransition";
+    }
+
+    virtual void confluentTransitions(
+            devs::Time /*time*/,
+            const devs::ExternalEventList& /*extEventlist*/)
+    {
+    }
+
+    virtual void output(devs::Time /* time */,
+                        devs::ExternalEventList& /*output*/) const override
+    {
+    }
+
+    virtual std::unique_ptr<value::Value>
+    observation(const devs::ObservationEvent&) const override
+    {
+        return 0;
+    }
+    int state;
+};
+
+
+class TimedObs : public devs::Dynamics
+{
+public:
+    TimedObs(const devs::DynamicsInit& atom,
+              const devs::InitEventList& events) :
+        devs::Dynamics(atom, events)
+    {}
+
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return devs::infinity;
+    }
+
+    virtual devs::Time timeAdvance() const override
+    {
+        return devs::infinity;
+    }
+
+    virtual void internalTransition(devs::Time /* time */) override
+    {
+    }
+
+    virtual void externalTransition(
+        const devs::ExternalEventList& /*events*/,
+        devs::Time /* time */) override
+    {
+    }
+
+    virtual void confluentTransitions(
+            devs::Time /*time*/,
+            const devs::ExternalEventList& /*extEventlist*/)
+    {
+    }
+
+    virtual void output(devs::Time /*time*/,
+                        devs::ExternalEventList& /*output*/) const override
+    {
+    }
+
+    virtual std::unique_ptr<value::Value>
+    observation(const devs::ObservationEvent&) const override
+    {
+        return 0;
+    }
+};
+
+
+
 class GenExecutive : public devs::Executive
 {
     enum state { INIT, IDLE, ADDMODEL, DELMODEL };
@@ -690,6 +840,9 @@ public:
 DECLARE_DYNAMICS_SYMBOL(dynamics_beep, ::Beep)
 DECLARE_DYNAMICS_SYMBOL(dynamics_counter, ::Counter)
 DECLARE_DYNAMICS_SYMBOL(dynamics_transform, ::Transform)
+DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionA, ::Confluent_transitionA)
+DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionB, ::Confluent_transitionB)
+DECLARE_DYNAMICS_SYMBOL(dynamics_timed_obs, ::TimedObs)
 DECLARE_EXECUTIVE_SYMBOL(exe_branch, ::Branch)
 DECLARE_EXECUTIVE_SYMBOL(exe_deleteconnection, ::DeleteConnection)
 DECLARE_EXECUTIVE_SYMBOL(exe_genexecutive, ::GenExecutive)
@@ -701,8 +854,8 @@ BOOST_AUTO_TEST_CASE(test_gensvpz)
 {
     int ret = ::chdir(DEVS_TEST_DIR);
     BOOST_REQUIRE(ret == 0);
-        
-    vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");    
+
+    vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
     utils::ModuleManager modules;
     devs::RootCoordinator root(modules);
 
@@ -750,7 +903,7 @@ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
     int ret = ::chdir(DEVS_TEST_DIR);
     BOOST_REQUIRE(ret == 0);
 
-    vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");    
+    vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
     utils::ModuleManager modules;
     devs::RootCoordinator root(modules);
 
@@ -773,8 +926,8 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
     int ret = ::chdir(DEVS_TEST_DIR);
     BOOST_REQUIRE(ret == 0);
 
-    for (int s = 0, es = 100; s != es; ++s) { 
-        vpz::Vpz file(DEVS_TEST_DIR "/ordereddeleter.vpz");    
+    for (int s = 0, es = 100; s != es; ++s) {
+        vpz::Vpz file(DEVS_TEST_DIR "/ordereddeleter.vpz");
         utils::ModuleManager modules;
         devs::RootCoordinator root(modules);
 
@@ -801,3 +954,52 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
         }
     }
 }
+
+
+BOOST_AUTO_TEST_CASE(test_confluent_transition)
+{
+    int ret = ::chdir(DEVS_TEST_DIR);
+    BOOST_REQUIRE(ret == 0);
+
+    vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
+    utils::ModuleManager modules;
+    devs::RootCoordinator root(modules);
+
+    try {
+        root.load(file);
+        file.clear();
+        root.init();
+
+        while (root.run());
+        std::unique_ptr<value::Map> out = root.outputs();
+        BOOST_REQUIRE(out);
+        root.finish();
+    } catch (const std::exception& e) {
+        BOOST_REQUIRE(false);
+    }
+}
+
+
+BOOST_AUTO_TEST_CASE(test_timed_obs)
+{
+    int ret = ::chdir(DEVS_TEST_DIR);
+    BOOST_REQUIRE(ret == 0);
+
+    vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
+    utils::ModuleManager modules;
+    devs::RootCoordinator root(modules);
+
+    try {
+        root.load(file);
+        file.clear();
+        root.init();
+
+        while (root.run());
+        std::unique_ptr<value::Map> out = root.outputs();
+        BOOST_REQUIRE(out);
+        root.finish();
+    } catch (const std::exception& e) {
+        BOOST_REQUIRE(false);
+    }
+}
+
