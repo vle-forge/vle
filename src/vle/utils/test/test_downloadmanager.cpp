@@ -34,6 +34,7 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Preferences.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/vle.hpp>
 
 #ifdef _WIN32
@@ -66,13 +67,13 @@ BOOST_FIXTURE_TEST_CASE(download_dtd, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("www.vle-project.org", "vle-1.0.0.dtd");
+    dm.start("www.vle-project.org/vle-1.0.0.dtd",
+             utils::Path::path().buildTemp("vle-1.1.0.dtd"));
     dm.join();
 
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
-
-    BOOST_CHECK_EQUAL(dm.size(), 3315u);
+    BOOST_CHECK(utils::Path::path().existFile(dm.filename()));
 }
 
 
@@ -80,28 +81,24 @@ BOOST_FIXTURE_TEST_CASE(download_package, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("www.vle-project.org", "pub/1.2/packages.pkg");
+    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg",
+             utils::Path::path().buildTemp("packages.pkg"));
     dm.join();
 
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
-
-    bool res = dm.size() > 0;
-
-    BOOST_CHECK(res);
+    BOOST_CHECK(utils::Path::path().existFile(dm.filename()));
 }
 
 BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("http://www.vle-project.org/pub/1.2", "packages.pkg");
+    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg",
+             utils::Path::path().buildTemp("packages.pkg"));
     dm.join();
 
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
-
-    bool res = dm.size() > 0;
-
-    BOOST_CHECK(res);
+    BOOST_CHECK(utils::Path::path().existFile(dm.filename()));
 }

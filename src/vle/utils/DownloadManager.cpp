@@ -29,32 +29,36 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Preferences.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-
-#include <stddef.h>
-#include <boost/asio.hpp>
+#include <boost/filesystem.hpp>
 #include <thread>
 #include <mutex>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-
-
-namespace bip = boost::asio::ip;
 
 namespace vle { namespace utils {
 
-class DownloadManager::Pimpl
+struct DownloadManager::Pimpl
 {
-public:
+    std::mutex mMutex;
+    std::thread mThread;
+    std::string mCommand;
+    std::string mUrl;
+    std::string mFilename;
+    std::string mErrorMessage;
+    bool mIsStarted;
+    bool mIsFinish;
+    bool mHasError;
+
     Pimpl()
-        : mMutex(), mThread(), mUrl(), mServerFile(), mCompletePath(),
-          mFilename(), mErrorMessage(), mDownloadManageredSize(0),
-          mIsStarted(false), mIsFinish(false), mHasError(false)
+        : mIsStarted(false)
+        , mIsFinish(false)
+        , mHasError(false)
     {
+        utils::Preferences prefs(true);
+        if (not prefs.get("vle.command.url.get", &mCommand))
+            throw InternalError(
+                _("Download: fail to get vle.command.url.get command "
+                  "from vle.conf"));
     }
 
     ~Pimpl()
@@ -62,199 +66,80 @@ public:
         join();
     }
 
-    Pimpl(const Pimpl&) = delete;
-    Pimpl& operator=(const Pimpl&) = delete;
-    Pimpl(Pimpl&&) = delete;
-    Pimpl& operator=(Pimpl&&) = delete;
-
-    void start(const std::string& url, const std::string& serverfile)
+    void start(const std::string& url, const std::string& filepath)
     {
         if (mIsStarted) {
             mHasError = true;
             mErrorMessage.assign("Download manager: already started");
             return;
         }
-        if ( url.substr(0,7) != "http://") {
-            mUrl.assign(url);
-            mServerFile.assign("/");
-            mServerFile.append(serverfile);
-        } else {
-            mUrl.assign(url.substr(7));
-            std::vector < std::string > subUrl;
-            boost::algorithm::split(subUrl, mUrl,
-                    boost::algorithm::is_any_of("/"),
-                    boost::algorithm::token_compress_on);
-            mUrl.assign(subUrl[0]);
-            mServerFile.assign("");
-            for (unsigned int i=1; i<subUrl.size(); i++) {
-                mServerFile.append("/");
-                mServerFile.append(subUrl[i]);
-            }
-            mServerFile.append("/");
-            mServerFile.append(serverfile);
 
-        }
-
-        mHasError = false;
-        mErrorMessage.assign("");
-        mCompletePath.assign("http://");
-        mCompletePath.append(mUrl);
-        mCompletePath.append(mServerFile);
+        mUrl = url;
+        mFilename = filepath;
+        mErrorMessage.clear();
         mIsStarted = true;
+        mIsFinish = false;
+        mHasError = false;
+
         mThread = std::thread(&DownloadManager::Pimpl::run, this);
     }
 
     void join()
     {
-        if (mIsStarted) {
-            if (not mIsFinish) {
-                mThread.join();
-                mIsFinish = true;
-            }
+        if (mIsStarted and not mIsFinish) {
+            mThread.join();
+            mIsFinish = true;
         }
     }
 
     void run()
     {
-        std::string proxyip;
-        std::string proxyport;
-        boost::asio::io_service io_service;
-        bip::tcp::resolver resolver(io_service);
-        bip::tcp::resolver::iterator endpoint_iterator;
-        bip::tcp::resolver::iterator end;
-        bip::tcp::socket socket(io_service);
-        boost::asio::streambuf request;
-        std::ostream request_stream(&request);
-        boost::asio::streambuf response;
-        std::istream response_stream(&response);
-        std::string http_version;
-        std::string header;
-        std::ofstream file;
-        boost::system::error_code error = boost::asio::error::host_not_found;
-        unsigned int status_code;
-        std::string status_message;
-        std::ostringstream errorStream;
+        std::string command;
+        try {
+            command = (vle::fmt(mCommand) % mUrl % mFilename).str();
 
-        if (not mIsStarted) {
+            std::vector<std::string> argv = Spawn::splitCommandLine(command);
+            std::string exe = std::move(argv.front());
+            argv.erase(argv.begin());
+
+            utils::Spawn spawn;
+            boost::filesystem::path pwd = boost::filesystem::current_path();
+            if (not spawn.start(exe, pwd.string(), argv, 50000u)) {
+                mErrorMessage = _("Download: fail to start download command");
+                TraceAlways(mErrorMessage.c_str());
+                mHasError = true;
+                return;
+            }
+
+            std::string output, error;
+            while (not spawn.isfinish()) {
+                if (spawn.get(&output, &error)) {
+                    TraceAlways(output.c_str());
+                    TraceAlways(output.c_str());
+                    output.clear();
+                    error.clear();
+
+                    std::this_thread::sleep_for(std::chrono::microseconds(200));
+                } else
+                    break;
+            }
+
+            spawn.wait();
+
+            std::string message;
+            bool success;
+            spawn.status(&message, &success);
+
+            if (not message.empty())
+                TraceAlways(message.c_str());
+        } catch (const std::exception& e) {
+            mErrorMessage = (fmt(_("Download: unable to download '%s' "
+                                   "in '%s' with the '%s' command"))
+                             % mUrl % mFilename % command).str();
+            TraceAlways(mErrorMessage.c_str());
             mHasError = true;
-            mErrorMessage.assign("[DownloadManager] Download manager is not"
-                    " initialized");
-            goto goto_flag_error;
         }
-
-        try {
-            utils::Preferences prefs(true);
-            prefs.get("vle.remote.proxy_ip", &proxyip);
-            prefs.get("vle.remote.proxy_port", &proxyport);
-            if (proxyip.empty()) {
-                proxyip.assign(mUrl);
-                proxyport.assign("http");
-            }
-        } catch (const std::exception& e) {
-            errorStream << "[DownloadManager] Error while reading the"
-                    " preferences file";
-            goto goto_flag_error;
-        }
-
-        try {
-
-            bip::tcp::resolver::query query(proxyip, proxyport);
-            endpoint_iterator = resolver.resolve(query);
-            while (error and endpoint_iterator != end) {
-                socket.close();
-                socket.connect(*endpoint_iterator++, error);
-            }
-        } catch (const std::exception& e) {
-            errorStream << vle::fmt("[DownloadManager]  Error while resolving"
-                    " the host %1%, %2% ") % proxyip % proxyport ;
-            goto goto_flag_error;
-        }
-
-        try {
-            request_stream << "GET " << mCompletePath << " HTTP/1.1\r\n";
-            request_stream << "Host: " << mUrl << "\r\n";
-            request_stream << "Accept: */*\r\n";
-            request_stream << "Connection: close\r\n\r\n";
-
-            boost::asio::write(socket, request);
-            boost::asio::read_until(socket, response, "\r\n");
-
-            response_stream >> http_version;
-            response_stream >> status_code;
-
-            std::getline(response_stream, status_message);
-        } catch (const std::exception& e) {
-            errorStream << vle::fmt("[DownloadManager] Error while getting"
-                            "the status_message");
-            goto goto_flag_error;
-        }
-
-        if (!response_stream || http_version.substr(0, 5) != "HTTP/") {
-            errorStream << vle::fmt("[DownloadManager] Invalid response while"
-                    " downloading '%1%' (status message = '%2%'")
-                    % mCompletePath % status_message;
-            goto goto_flag_error;
-        }
-        if (status_code != 200) {
-            errorStream << vle::fmt("[DownloadManager] Response returned with "
-                    " status code '%1%', (status message = '%2%') ")
-                     % status_code % status_message;
-            goto goto_flag_error;
-        }
-
-        try {
-            boost::asio::read_until(socket, response, "\r\n\r\n");
-            while (std::getline(response_stream, header) && header != "\r") {
-                std::string::size_type found = header.find("Content-Length: ");
-                if (found != std::string::npos ) {
-                    std::string sizeString = header.substr(16);
-                    std::istringstream sizeBuffer(sizeString);
-                    sizeBuffer >> mDownloadManageredSize;
-                }
-            }
-        } catch (const std::exception& e) {
-            errorStream << vle::fmt("[DownloadManager] Error while processing"
-                    " the response header (header = '%1%')") % header;
-            goto goto_flag_error;
-        }
-
-        try {
-            mFilename.assign(utils::Path::getTempFile("vle-dl-", &file));
-            if (response.size() > 0) {
-                file << &response ;
-            }
-            while (boost::asio::read(socket, response,
-                    boost::asio::transfer_at_least(1), error)) {
-                file << &response;
-            }
-            if (error != boost::asio::error::eof) {
-                errorStream << vle::fmt("[DownloadManager] Unexpected end of"
-                        " file while downloading '%1%'") % mCompletePath;
-                goto goto_flag_error;
-            }
-        } catch (const std::exception& e) {
-            errorStream << "[DownloadManager] Error while filling the file";
-            goto goto_flag_error;
-        }
-        return;
-
-        goto_flag_error:
-            mHasError = true;
-            mErrorMessage.assign(errorStream.str());
-            file.close();
     }
-
-    std::mutex mMutex;
-    std::thread mThread;
-    std::string mUrl;
-    std::string mServerFile;
-    std::string mCompletePath;
-    std::string mFilename;
-    std::string mErrorMessage;
-    size_t mDownloadManageredSize;
-    bool mIsStarted;
-    bool mIsFinish;
-    bool mHasError;
 };
 
 DownloadManager::DownloadManager()
@@ -264,28 +149,16 @@ DownloadManager::DownloadManager()
 {
 }
 
-DownloadManager::~DownloadManager()
-{
-}
+DownloadManager::~DownloadManager() noexcept = default;
 
-void DownloadManager::start(const std::string& url,
-                            const std::string& serverfile)
+void DownloadManager::start(const std::string& url, const std::string& filepath)
 {
-    mPimpl->start(url, serverfile);
+    mPimpl->start(url, filepath);
 }
 
 void DownloadManager::join()
 {
     mPimpl->join();
-}
-
-uint32_t DownloadManager::size() const
-{
-    if (mPimpl->mIsStarted and not mPimpl->mIsFinish) {
-        std::lock_guard<std::mutex> lock(mPimpl->mMutex);
-        return mPimpl->mDownloadManageredSize;
-    }
-    return mPimpl->mDownloadManageredSize;
 }
 
 std::string DownloadManager::filename() const

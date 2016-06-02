@@ -308,15 +308,17 @@ public:
             assert(parser);
         }
 
-        void operator()(const std::string& url) const
+        void operator()(std::string url) const
         {
             DownloadManager dl;
 
-            dl.start(url, "packages.pkg");
+            std::string filename = utils::Path::path().buildTemp("packages.pkg");
+
+            dl.start(url + "/packages.pkg", filename);
             dl.join();
 
             if (not dl.hasError()) {
-                parser->extract(dl.filename(), url);
+                parser->extract(filename, url);
             } else {
                 if (!(*remoteHasError)) {
                     *remoteHasError = true;
@@ -416,7 +418,6 @@ public:
             return;
         }
 
-
         PackagesIdSet::const_iterator it = pkgs_range.first;
         PackageIdUpdate pkgUpdateOp;
         while (pkgs_range.first != pkgs_range.second) {
@@ -432,16 +433,17 @@ public:
             return;
         }
 
-
         DownloadManager dl;
         std::string url = it->url;
         out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
-        dl.start(url, archname);
+
+        std::string archfile = vle::utils::Path::buildTemp(archname);
+        dl.start(url + archname, archfile);
         dl.join();
         if (not dl.hasError()) {
             out(fmt(_("ok\n")));
-            std::string archfile = vle::utils::Path::buildTemp(archname);
-            boost::filesystem::rename(dl.filename(), archfile);
+//            std::string archfile = vle::utils::Path::buildTemp(archname);
+            //          boost::filesystem::rename(dl.filename(), archfile);
             std::string tempDir = vle::utils::Path::path().getParentPath(
                     archfile);
             std::string oldDir = vle::utils::Path::path().getCurrentDir();

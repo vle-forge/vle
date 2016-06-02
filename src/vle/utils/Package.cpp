@@ -60,27 +60,22 @@ namespace fs = boost::filesystem;
 
 namespace vle { namespace utils {
 
-/**
- * Build a vector of string from a command line.
- *
- * @param cmd The command line to parse and extract arguments.
- * @param [out] exe The program name executable.
- * @param [out] argv The list of arguments.
- */
-static void buildCommandLine(const std::string& cmd,
-                             std::string& exe,
-                             std::vector < std::string >& argv)
+std::vector<std::string>
+Spawn::splitCommandLine(const std::string& command)
 {
+    std::vector<std::string> argv;
     details::ShellUtils su;
     int argcp;
-    su.g_shell_parse_argv(cmd, argcp, argv);
+    su.g_shell_parse_argv(command, argcp, argv);
 
-    if (argv.empty()) {
+    if (argv.empty())
         throw utils::ArgError(
-            (fmt(_("Package command line: error, empty command `%1%'")) % cmd).str());
-    }
-    exe = Path::findProgram(argv.front());
-    argv.erase(argv.begin());
+            (fmt(_("Package command line: error, empty command `%1%'"))
+             % command).str());
+
+    argv.front() = Path::findProgram(argv.front());
+
+    return argv;
 }
 
 struct Package::Pimpl
@@ -89,13 +84,15 @@ struct Package::Pimpl
     {
     }
 
-    Pimpl(std::string  pkgname) :
-        m_pkgname(std::move(pkgname)), m_pkgbinarypath(), m_pkgsourcepath()
+    Pimpl(std::string pkgname)
+        : m_pkgname(std::move(pkgname))
+        , m_pkgbinarypath()
+        , m_pkgsourcepath()
     {
         refreshPath();
     }
 
-    ~Pimpl() {}
+    ~Pimpl() = default;
 
     std::string  m_pkgname;
     std::string  m_pkgbinarypath;
@@ -211,11 +208,12 @@ void Package::configure()
     }
     fs::path old_dir = fs::current_path();
     fs::current_path(pkg_buildir);
-    std::vector < std::string > argv;
-    std::string exe, cmd;
+
     std::string pkg_binarydir = getDir(PKG_BINARY);
-    cmd = (vle::fmt(m_pimpl->mCommandConfigure) % pkg_binarydir).str();
-    buildCommandLine(cmd, exe, argv);
+    std::string cmd = (fmt(m_pimpl->mCommandConfigure) % pkg_binarydir).str();
+    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    std::string exe = std::move(argv.front());
+    argv.erase(argv.begin());
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch(const std::exception& e) {
@@ -252,11 +250,10 @@ void Package::test()
     fs::path old_dir = fs::current_path();
     fs::current_path(pkg_buildir);
 
-    std::vector < std::string > argv;
-    std::string exe, cmd;
-
-    cmd = (vle::fmt(m_pimpl->mCommandTest) % pkg_buildir).str();
-    buildCommandLine(cmd, exe, argv);
+    std::string cmd = (fmt(m_pimpl->mCommandTest) % pkg_buildir).str();
+    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    std::string exe = std::move(argv.front());
+    argv.erase(argv.begin());
 
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
@@ -292,11 +289,10 @@ void Package::build()
     fs::path old_dir = fs::current_path();
     fs::current_path(pkg_buildir);
 
-    std::vector < std::string > argv;
-    std::string exe, cmd;
-
-    cmd = (vle::fmt(m_pimpl->mCommandBuild) % pkg_buildir).str();
-    buildCommandLine(cmd, exe, argv);
+    std::string cmd = (vle::fmt(m_pimpl->mCommandBuild) % pkg_buildir).str();
+    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    std::string exe = std::move(argv.front());
+    argv.erase(argv.begin());
 
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
@@ -333,11 +329,11 @@ void Package::install()
     }
     fs::path old_dir = fs::current_path();
     fs::current_path(pkg_buildir);
-    std::vector < std::string > argv;
-    std::string exe, cmd;
+    std::string cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
+    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    std::string exe = std::move(argv.front());
+    argv.erase(argv.begin());
 
-    cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
-    buildCommandLine(cmd, exe, argv);
     fs::path builddir = pkg_buildir;
 
     if (not fs::exists(builddir)) {
@@ -400,11 +396,10 @@ void Package::pack()
 
     fs::create_directory(pkg_buildir);
 
-    std::vector < std::string > argv;
-    std::string exe, cmd;
-
-    cmd = (vle::fmt(m_pimpl->mCommandPack) % pkg_buildir).str();
-    buildCommandLine(cmd, exe, argv);
+    std::string cmd = (fmt(m_pimpl->mCommandPack) % pkg_buildir).str();
+    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    std::string exe = std::move(argv.front());
+    argv.erase(argv.begin());
 
     try {
         m_pimpl->process(exe, pkg_buildir, argv);

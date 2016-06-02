@@ -100,6 +100,16 @@ public:
                unsigned int waitchildtimeout = 50000u);
 
     /**
+     * Build a vector of string from a command line.
+     *
+     * @param command The command line to parse and extract arguments.
+     * @return a vector of arrgument. The first is the program name
+     * executable.
+     */
+    static std::vector<std::string>
+        splitCommandLine(const std::string& command);
+
+    /**
      * Wait the process.
      *
      *

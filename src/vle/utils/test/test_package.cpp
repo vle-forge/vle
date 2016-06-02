@@ -157,7 +157,7 @@ BOOST_FIXTURE_TEST_CASE(show_package, F)
 
     if (not fs::exists(pkg.getExpDir(vle::utils::PKG_BINARY)))
         return;
-    
+
     std::cout << "Installed vpz  :\n";
     PathList vpz = pkg.getExperiments();
     std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(

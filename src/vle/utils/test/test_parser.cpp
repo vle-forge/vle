@@ -46,14 +46,13 @@ struct F
     ~F() { }
 };
 
-BOOST_GLOBAL_FIXTURE(F)
+BOOST_GLOBAL_FIXTURE(F);
 
-const std::string& str(
-    "# this file is a test\n"
+const char *str = "# this file is a test\n"
     "test { # comment\n"
     "a = 1, 2, 3;"
     "b = \"1\", \"2\", \"3\";"
-    "}\n");
+    "}\n";
 
 BOOST_AUTO_TEST_CASE(ParserStr)
 {

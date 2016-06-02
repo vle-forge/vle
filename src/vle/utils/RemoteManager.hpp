@@ -195,12 +195,20 @@ public:
 
     void getResult(Packages *out);
 
+    /**
+     * Returns true if the download fail or any other step (copy file,
+     * write file etc.).
+     */
     bool hasError();
+
+    /**
+     * Returns a message that corresponds to the error returned by
+     * @hasError function.
+     */
     const std::string& messageError();
 
     /**
      * Return the path @e "$VLE_HOME/local.pkg".
-     *
      *
      * @return The path @e "$VLE_HOME/local.pkg."
      */
@@ -208,7 +216,6 @@ public:
 
     /**
      * Return the path @e "$VLE_HOME/remote.pkg".
-     *
      *
      * @return The path @e "$VLE_HOME/remote.pkg."
      */

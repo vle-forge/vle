@@ -228,7 +228,7 @@ void SaxParser::onCDataBlock(void* ctx, const xmlChar* value, int len)
 
 void SaxParser::onWarning(void* /* ctx */, const char *msg, ...)
 {
-    auto  buffer = new char[1024];
+    auto buffer = new char[1024];
     memset(buffer, 0, 1024);
 
     va_list args;

@@ -60,7 +60,6 @@ typedef std::vector < std::string > PathList;
 class VLE_API Path
 {
 public:
-
     /**
      * Return the prefix of the compilation on Unix or installation
      * directory taken from registry on Windows.

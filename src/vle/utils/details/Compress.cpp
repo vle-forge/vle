@@ -28,8 +28,10 @@
 #include <boost/version.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Trace.hpp>
 #include <ostream>
 #include <vector>
 #include <iostream>
@@ -47,45 +49,55 @@ void Path::compress(const std::string& filepath,
             (fmt(_("fail to compress '%1%': file or directory does not exist"))
              % filepath).str());
 
-    vle::utils::Spawn spawn;
-
-    std::vector<std::string> args {
-        "-E", "tar", "jcf", compressedfilepath, path.string() };
-
     boost::filesystem::path pwd = boost::filesystem::current_path();
+    std::string command;
 
-    std::string exe =
-#ifdef _WIN32
-        utils::Path::findProgram("cmake.exe");
-#else
-        utils::Path::findProgram("cmake");
-#endif
+    try {
+        {
+            utils::Preferences prefs(true);
+            prefs.get("vle.command.tar", &command);
+        }
 
-    if (not spawn.start(exe, pwd.string(), args, 50000u))
-        throw utils::InternalError(_("fail to start cmake command"));
+        command = (vle::fmt(command) % compressedfilepath
+                   % path.string()).str();
 
-    std::string output, error;
-    while (not spawn.isfinish()) {
-        if (spawn.get(&output, &error)) {
-            std::cout << output;
-            std::cerr << error;
+        std::vector<std::string> argv = Spawn::splitCommandLine(command);
+        std::string exe = std::move(argv.front());
+        argv.erase(argv.begin());
 
-            output.clear();
-            error.clear();
+        utils::Spawn spawn;
+        if (not spawn.start(exe, pwd.string(), argv, 50000u))
+            throw utils::InternalError(_("fail to start cmake command"));
 
-            std::this_thread::sleep_for(std::chrono::microseconds(200));
-        } else
-            break;
+        std::string output, error;
+        while (not spawn.isfinish()) {
+            if (spawn.get(&output, &error)) {
+                std::cout << output;
+                std::cerr << error;
+
+                output.clear();
+                error.clear();
+
+                std::this_thread::sleep_for(std::chrono::microseconds(200));
+            } else
+                break;
+        }
+
+        spawn.wait();
+
+        std::string message;
+        bool success;
+        spawn.status(&message, &success);
+
+        if (not message.empty())
+            std::cerr << message << '\n';
+    } catch (const std::exception& e) {
+        TraceAlways(_("Compress: unable to compress '%s' "
+                      "in '%s' with the '%s' command"),
+                    compressedfilepath.c_str(),
+                    pwd.string().c_str(),
+                    command.c_str());
     }
-
-    spawn.wait();
-
-    std::string message;
-    bool success;
-    spawn.status(&message, &success);
-
-    if (not message.empty())
-        std::cerr << message << '\n';
 }
 
 void Path::decompress(const std::string& compressedfilepath,
@@ -107,43 +119,54 @@ void Path::decompress(const std::string& compressedfilepath,
                   "file does not exist"))
              % compressedfilepath % directorypath).str());
 
-    vle::utils::Spawn spawn;
+    boost::filesystem::path pwd = boost::filesystem::current_path();
 
-    std::vector<std::string> args {
-        "-E", "tar", "jxf", file.string(), "." };
+    std::string command;
+    try {
+        {
+            utils::Preferences prefs(true);
+            prefs.get("vle.command.untar", &command);
+        }
 
-    std::string exe =
-#ifdef _WIN32
-        utils::Path::findProgram("cmake.exe");
-#else
-        utils::Path::findProgram("cmake");
-#endif
+        command = (vle::fmt(command) % file.string()).str();
 
-    if (not spawn.start(exe, path.string(), args, 50000u))
-        throw utils::InternalError(_("fail to start cmake command"));
+        std::vector<std::string> argv = Spawn::splitCommandLine(command);
+        std::string exe = std::move(argv.front());
+        argv.erase(argv.begin());
 
-    std::string output, error;
-    while (not spawn.isfinish()) {
-        if (spawn.get(&output, &error)) {
-            std::cout << output;
-            std::cerr << error;
+        utils::Spawn spawn;
+        if (not spawn.start(exe, path.string(), argv, 50000u))
+            throw utils::InternalError(_("fail to start cmake command"));
 
-            output.clear();
-            error.clear();
+        std::string output, error;
+        while (not spawn.isfinish()) {
+            if (spawn.get(&output, &error)) {
+                std::cout << output;
+                std::cerr << error;
 
-            std::this_thread::sleep_for(std::chrono::microseconds(200));
-        } else
-            break;
+                output.clear();
+                error.clear();
+
+                std::this_thread::sleep_for(std::chrono::microseconds(200));
+            } else
+                break;
+        }
+
+        spawn.wait();
+
+        std::string message;
+        bool success;
+        spawn.status(&message, &success);
+
+        if (not message.empty())
+            std::cerr << message << '\n';
+    } catch (const std::exception& e) {
+        TraceAlways(_("Decompress: unable to decompress '%s' "
+                      "in '%s' with the '%s' command"),
+                    compressedfilepath.c_str(),
+                    pwd.string().c_str(),
+                    command.c_str());
     }
-
-    spawn.wait();
-
-    std::string message;
-    bool success;
-    spawn.status(&message, &success);
-
-    if (not message.empty())
-        std::cerr << message << '\n';
 }
 
 }}

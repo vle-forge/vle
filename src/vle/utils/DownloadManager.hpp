@@ -69,7 +69,7 @@ public:
     /**
      * @brief Join the alive thread is if exists.
      */
-    ~DownloadManager();
+    ~DownloadManager() noexcept;
 
     DownloadManager(const DownloadManager&) = delete;
     DownloadManager& operator=(const DownloadManager&) = delete;
@@ -77,21 +77,13 @@ public:
     DownloadManager& operator=(DownloadManager&&) = delete;
 
     /**
-     * Start the download of the specified \c url in a thread. If a previous
-     * thread is already alive, this function does nothing.
+     * Start the download of the specified \c url in a thread. If a
+     * previous thread is already alive, this function does nothing.
      *
-     * Note: there are two possibilities for dwoloading a file :
-     * 1) set the protocol and the directory on server into the url and set
-     * the serverfile to file name
-     * eg: url="http://www.vle-project.org/pub/1.2" and serverfile="packages.pkg"
-     * 2) set only the url into the url and the directory/filename into server
-     * serverfile.
-     * eg: url="www.vle-project.org" and serverfile="pub/1.2/packages"
-     *
-     * @param url The url of the server (e.g. "www.vle-project.org").
-     * @param serverfile The resource to download (e.g. "vle-1.0.0.dtd").
+     * @param url The url that pointe to the object.
+     * @param filepath The file where the resources will be store.
      */
-    void start(const std::string& url, const std::string& serverfile);
+    void start(const std::string& url, const std::string& filepath);
 
     /**
      * A blocking function while the download is not finish.
@@ -101,13 +93,6 @@ public:
     //
     // Get/Set activities
     //
-
-    /**
-     * Return the downloaded size.
-     *
-     * @return A size.
-     */
-    uint32_t size() const;
 
     /**
      * Return the filename where downloaded file is stored.
@@ -138,7 +123,7 @@ public:
     std::string getErrorMessage() const;
 
 private:
-    class Pimpl;
+    struct Pimpl;
     std::unique_ptr<Pimpl> mPimpl;
 };
 
