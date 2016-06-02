@@ -32,6 +32,7 @@
 #include <vle/utils/Types.hpp>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace vle { namespace utils {
 
@@ -97,12 +98,17 @@ public:
      * or during the reading of the file.
      */
     Preferences(bool readOnly,
-            const std::string& filename = std::string("vle.conf"));
+                const std::string& filename = std::string("vle.conf"));
+
+    Preferences(Preferences&& rhs) = default;
+    Preferences& operator=(Preferences&& rhs) = default;
+    Preferences(const Preferences& other) = delete;
+    Preferences& operator=(const Preferences& other) = delete;
 
     /**
      * Write the resources files if an @c insert function is called.
      */
-    ~Preferences();
+    ~Preferences() noexcept;
 
     //
     // insert data for specified section.
@@ -192,9 +198,10 @@ public:
      * // section2.key3 = v4
      * @endcode
      *
-     * @param[out] sections Output parameter to store the name of the sections.
+     * @return sections Output parameter to store the name of the
+     * sections.
      */
-    void get(std::vector < std::string >* sections) const;
+    std::vector<std::string> get() const;
 
     /**
      * Get an @c std::string from specified key.
@@ -211,8 +218,8 @@ public:
      * @param[in] key The key.
      * @param[out] value The value to fill.
      *
-     * @throw utils::ArgError if section, key do not exist or if the value is
-     * not an @c std::string.
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not an @c std::string.
      */
     bool get(const std::string& key, std::string* value) const;
 
@@ -231,8 +238,8 @@ public:
      * @param[in] key The key.
      * @param[out] value The value to fill.
      *
-     * @throw utils::ArgError if section, key do not exist or if the value is
-     * not a @c real.
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not a @c real.
      */
     bool get(const std::string& key, double* value) const;
 
@@ -251,8 +258,8 @@ public:
      * @param[in] key The key.
      * @param[out] value The value to fill.
      *
-     * @throw utils::ArgError if section, key do not exist or if the value is
-     * not an @c integer.
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not an @c integer.
      */
     bool get(const std::string& key, uint32_t* value) const;
 
@@ -271,24 +278,14 @@ public:
      * @param[in] key The key.
      * @param[out] value The value to fill.
      *
-     * @throw utils::ArgError if section, key do not exist or if the value is
-     * not a @c boolean.
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not a @c boolean.
      */
     bool get(const std::string& key, bool* value) const;
 
 private:
-    /**
-     * Uncopyable class.
-     */
-    Preferences(const Preferences& other);
-
-    /**
-     * Unassignable class.
-     */
-    Preferences& operator=(const Preferences& other);
-
-    class Pimpl; // @Preferences use the Pimpl idiom. We hide the
-    Pimpl* mPimpl; // implementation detail.
+    struct Pimpl;
+    std::unique_ptr<Pimpl> mPimpl; // implementation detail.
 };
 
 }} //namespace vle utils

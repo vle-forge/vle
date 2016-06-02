@@ -35,33 +35,38 @@
 #include <boost/program_options/variables_map.hpp>
 #include <fstream>
 
-#ifdef BOOST_WINDOWS
-#define VLE_PACKAGE_COMMAND_CONFIGURE "cmake.exe -G 'MinGW Makefiles' " \
+#ifdef _WIN32
+#define VLE_PACKAGE_COMMAND_CONFIGURE                                   \
+    "cmake.exe -G 'MinGW Makefiles' "                                   \
     "-DWITH_DOC=OFF "                                                   \
     "-DWITH_TEST=ON "                                                   \
-    "-DWITH_WARNINGS=OFF "                                               \
+    "-DWITH_WARNINGS=OFF "                                              \
     "-DCMAKE_INSTALL_PREFIX='%1%' "                                     \
     "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
-
 #define VLE_PACKAGE_COMMAND_TEST "cmake.exe --build '%1%' --target test"
 #define VLE_PACKAGE_COMMAND_BUILD "cmake.exe --build '%1%' --target all"
 #define VLE_PACKAGE_COMMAND_INSTALL "cmake.exe --build '%1%' --target install"
 #define VLE_PACKAGE_COMMAND_CLEAN "cmake.exe --build '%1%' --target clean"
 #define VLE_PACKAGE_COMMAND_PACKAGE "cmake.exe --build '%1%' "  \
     "--target package_source"
-#define VLE_PACKAGE_COMMAND_UNZIP "unzip.exe"
+#define VLE_COMMAND_TAR "cmake.exe -E tar jcf '%1%' '%2%'"
+#define VLE_COMMAND_UNTAR "cmake.exe -E tar jxf '%1%' .'"
+#define VLE_COMMAND_URL_GET "curl.exe '%1%' -o '%2%'"
 #else
-#define VLE_PACKAGE_COMMAND_CONFIGURE "cmake -DCMAKE_INSTALL_PREFIX='%1%' " \
-    "-DWITH_DOC=OFF "                                                       \
-    "-DWITH_TEST=ON "                                                       \
-    "-DWITH_WARNINGS=ON "                                                   \
+#define VLE_PACKAGE_COMMAND_CONFIGURE                                   \
+    "cmake -DCMAKE_INSTALL_PREFIX='%1%' "                               \
+    "-DWITH_DOC=OFF "                                                   \
+    "-DWITH_TEST=ON "                                                   \
+    "-DWITH_WARNINGS=ON "                                               \
     "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 #define VLE_PACKAGE_COMMAND_TEST "cmake --build '%1%' --target test"
 #define VLE_PACKAGE_COMMAND_BUILD "cmake --build '%1%' --target all"
 #define VLE_PACKAGE_COMMAND_INSTALL "cmake --build '%1%' --target install"
 #define VLE_PACKAGE_COMMAND_CLEAN "cmake --build '%1%' --target clean"
 #define VLE_PACKAGE_COMMAND_PACKAGE "cmake --build '%1%' --target package_source"
-#define VLE_PACKAGE_COMMAND_UNZIP "unzip"
+#define VLE_COMMAND_TAR "cmake -E tar jcf '%1%' '%2%'"
+#define VLE_COMMAND_UNTAR "cmake -E tar jxf '%1%'"
+#define VLE_COMMAND_URL_GET "curl --progress-bar '%1%' -o '%2%'"
 #endif
 
 namespace po = boost::program_options;
@@ -71,17 +76,18 @@ namespace vle { namespace utils {
 class Preferences::Pimpl
 {
 public:
-    Pimpl(bool readOnly, std::string  filename)
-        : mreadOnly(readOnly),
-          mFilename(std::move(filename)),
-          mGvlePackagesOptions("gvle.packages"),
-          mGvleEditorOptions("gvle.editor"),
-          mGvleGraphicsOptions("gvle.graphics"),
-          mVlePackageOptions("vle.packages"),
-          mVleRemoteOptions("vle.remote")
+    Pimpl(bool readOnly, std::string filename)
+        : mGvlePackagesOptions("gvle.packages")
+        , mGvleEditorOptions("gvle.editor")
+        , mGvleGraphicsOptions("gvle.graphics")
+        , mVlePackageOptions("vle.packages")
+        , mVleRemoteOptions("vle.remote")
+        , mVleCommandOptions("vle.command")
+        , mFilename(std::move(filename))
+        , mreadOnly(readOnly)
     {
-         mGvleEditorOptions.add_options()
-            ("gvle.packages.auto-build", po::value < bool >
+        mGvleEditorOptions.add_options()
+            ("gvle.packages.auto-build", po::value <bool>
              (nullptr)->default_value(true),
              _("Auto build"));
 
@@ -149,9 +155,7 @@ public:
             ("vle.packages.clean", po::value < std::string >
              (nullptr)->default_value(VLE_PACKAGE_COMMAND_CLEAN))
             ("vle.packages.package", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_PACKAGE))
-            ("vle.packages.unzip", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_UNZIP));
+             (nullptr)->default_value(VLE_PACKAGE_COMMAND_PACKAGE));
 
         mVleDaemonOptions.add_options()
             ("vle.daemon.hosts", po::value < std::string >
@@ -163,25 +167,35 @@ public:
 
         mVleRemoteOptions.add_options()
             ("vle.remote.url", po::value < std::string >
-             (nullptr)->default_value((fmt(
-                         "http://www.vle-project.org/pub/%1%.%2%") %
-                     VLE_MAJOR_VERSION % VLE_MINOR_VERSION).str()))
+             (nullptr)->default_value(
+                 "http://www.vle-project.org/pub/" VLE_ABI_VERSION))
             ("vle.remote.proxy_ip", po::value < std::string >
              (nullptr)->default_value(""))
             ("vle.remote.proxy_port", po::value < std::string >
              (nullptr)->default_value(""));
 
+        mVleCommandOptions.add_options()
+            ("vle.command.tar", po::value<std::string>
+             (nullptr)->default_value(VLE_COMMAND_TAR))
+            ("vle.command.untar", po::value<std::string>
+             (nullptr)->default_value(VLE_COMMAND_UNTAR))
+            ("vle.command.url.get", po::value<std::string>
+             (nullptr)->default_value(VLE_COMMAND_URL_GET));
+
         mConfigFileOptions.add(mVlePackageOptions).
             add(mGvleEditorOptions).add(mGvleGraphicsOptions).
-            add(mVleDaemonOptions).add(mVleRemoteOptions);
+            add(mVleDaemonOptions).add(mVleRemoteOptions).
+            add(mVleCommandOptions);
 
         open();
     }
 
-    ~Pimpl()
+    ~Pimpl() noexcept
     {
-        if (! mreadOnly) {
-            save();
+        try {
+            if (not mreadOnly)
+                save();
+        } catch (...) {
         }
     }
 
@@ -189,40 +203,43 @@ public:
     {
         std::ifstream file(mFilename.c_str());
 
-        if (file.is_open()) {
-            po::store(po::parse_config_file(file, mConfigFileOptions, false),
-                      mSettings);
-            po::notify(mSettings);
+        if (not file.is_open()) {
+            TraceAlways(_("Preferences: fail to open '%s'"),
+                        mFilename.c_str());
+            return;
         }
+
+        po::store(po::parse_config_file(file, mConfigFileOptions, false),
+                  mSettings);
+        po::notify(mSettings);
     }
 
-    void save() throw()
+    void save()
     {
         std::ofstream file(mFilename.c_str());
 
-        if (file.is_open()) {
-            for (po::variables_map::const_iterator it = mSettings.begin();
-                 it != mSettings.end(); ++it) {
-                file << it->first << "=";
-                if (boost::any_cast < std::string >(&it->second.value())) {
-                    file << boost::any_cast
-                        < std::string >(it->second.value());
-                } else if (boost::any_cast < bool >(&it->second.value())) {
-                    file << boost::any_cast
-                        < bool >(it->second.value());
-                } else if (boost::any_cast < double >(&it->second.value())) {
-                    file << boost::any_cast
-                        < double >(it->second.value());
-                } else if (boost::any_cast < uint32_t
-                           >(&it->second.value())) {
-                    file << boost::any_cast
-                        < uint32_t>(it->second.value());
-                } else {
-                    TraceAlways(_("Preferences: unknown"));
-                    assert(false);
-                }
-                file << "\n";
-            }
+        if (not file.is_open()) {
+            TraceAlways(_("Preferences: fail to open '%s'"),
+                        mFilename.c_str());
+            return;
+        }
+
+        for (const auto& elem : mSettings) {
+            file << elem.first << "=";
+
+            if (boost::any_cast <std::string>(&elem.second.value()))
+                file << boost::any_cast<std::string>(elem.second.value());
+            else if (boost::any_cast<bool>(&elem.second.value()))
+                file << boost::any_cast<bool>(elem.second.value());
+            else if (boost::any_cast<double>(&elem.second.value()))
+                file << boost::any_cast<double>(elem.second.value());
+            else if (boost::any_cast<uint32_t>(&elem.second.value()))
+                file << boost::any_cast<uint32_t>(elem.second.value());
+            else
+                TraceAlways(_("Preferences: unknown type '%s'"),
+                            elem.first.c_str());
+
+            file << "\n";
         }
     }
 
@@ -242,33 +259,31 @@ public:
     {
         auto it = mSettings.find(key);
 
-        if (it != mSettings.end()) {
+        if (it != mSettings.end())
             return it->second.value();
-        } else {
-            return boost::any();
-        }
+
+        return boost::any();
     }
 
-    void get(std::vector < std::string >* sections) const
+    std::vector<std::string>
+    get() const
     {
-        sections->resize(mSettings.size());
+        std::vector<std::string> ret(mSettings.size());
 
-        std::transform(mSettings.begin(),
-                       mSettings.end(),
-                       sections->begin(),
-                       CopyVariableName());
+        std::transform(std::begin(mSettings), std::end(mSettings),
+                       std::begin(ret),
+                       [](const po::variables_map::value_type& pair)
+                       {
+                           return pair.first;
+                       });
+
+        return ret;
     }
 
 private:
-    bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
-
-    std::string mFilename; /**< The filename of the resources file in \c
-                             `VLE_HOME/vle.conf'. */
-
-    po::variables_map mSettings; /**< The variables_map which stores all the
-                                   parameters in a std::map < std::string,
-                                   po::variable_value >. */
-
+    po::variables_map mSettings; /**< The variables_map which stores all
+                                    the parameters in a std::map <
+                                    std::string, po::variable_value >. */
     po::options_description mGvlePackagesOptions;
     po::options_description mConfigFileOptions;
     po::options_description mGvleEditorOptions;
@@ -276,38 +291,31 @@ private:
     po::options_description mVlePackageOptions;
     po::options_description mVleDaemonOptions;
     po::options_description mVleRemoteOptions;
+    po::options_description mVleCommandOptions;
 
-    /**
-     * A functor to get the variable name in the @c
-     * boost::program_options::variables_map.
-     */
-    struct CopyVariableName
-    {
-        inline const std::string&
-            operator()(const po::variables_map::value_type& v) const
-            {
-                return v.first;
-            }
-    };
+    std::string mFilename; /**< The filename of the resources file in \c
+                              `VLE_HOME/vle.conf'. */
+
+    bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
 };
 
 Preferences::Preferences(const std::string& file)
-    : mPimpl(new Preferences::Pimpl(false,
-            utils::Path::path().getHomeFile(file)))
+    : mPimpl(
+        std::unique_ptr<Preferences::Pimpl>(
+            new Preferences::Pimpl(
+                false, utils::Path::path().getHomeFile(file))))
 {
 }
 
 Preferences::Preferences(bool readOnly, const std::string& file)
-    : mPimpl(new Preferences::Pimpl(readOnly,
-            utils::Path::path().getHomeFile(file)))
+    : mPimpl(
+        std::unique_ptr<Preferences::Pimpl>(
+            new Preferences::Pimpl(
+                readOnly, utils::Path::path().getHomeFile(file))))
 {
-
 }
 
-Preferences::~Preferences()
-{
-    delete mPimpl;
-}
+Preferences::~Preferences() noexcept = default;
 
 bool Preferences::set(const std::string& key, const std::string& value)
 {
@@ -329,9 +337,9 @@ bool Preferences::set(const std::string& key, bool value)
     return mPimpl->set(key, value);
 }
 
-void Preferences::get(std::vector < std::string >* sections) const
+std::vector<std::string> Preferences::get() const
 {
-    mPimpl->get(sections);
+    return mPimpl->get();
 }
 
 bool Preferences::get(const std::string& key, std::string* value) const
