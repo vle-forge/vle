@@ -152,7 +152,7 @@ public:
     /**
      * If an action is running, \c join it otherwise do nothing.
      */
-    ~RemoteManager();
+    ~RemoteManager() noexcept;
 
     /**
      * Start a process.

@@ -28,7 +28,7 @@
 #include <vle/utils/Template.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 #include <fstream>
 #include <sstream>
 
@@ -178,15 +178,14 @@ void Template::process(std::ostream& result) const
 void Template::tag(std::string& pluginname, std::string& packagename,
                    std::string& conf)
 {
-    boost::regex tagbegin("@@tag [[:alnum:]_]*@", boost::regex::grep);
-    boost::regex tagmiddle("@[[:word:]\\.\\-]* @@", boost::regex::grep);
-    boost::regex tagend("@@end tag@@", boost::regex::grep);
+    std::regex tagbegin("@@tag [[:alnum:]_]*@", std::regex::grep);
+    std::regex tagmiddle("@[[:alnum:]_\\.\\-]* @@", std::regex::grep);
+    std::regex tagend("@@end tag@@", std::regex::grep);
 
-    boost::sregex_iterator it(buffer_.begin(), buffer_.end(), tagbegin);
-    boost::sregex_iterator jt(buffer_.begin(), buffer_.end(), tagmiddle);
-    boost::sregex_iterator kt(buffer_.begin(), buffer_.end(), tagend);
-
-    boost::sregex_iterator end;
+    std::sregex_iterator it(buffer_.begin(), buffer_.end(), tagbegin);
+    std::sregex_iterator jt(buffer_.begin(), buffer_.end(), tagmiddle);
+    std::sregex_iterator kt(buffer_.begin(), buffer_.end(), tagend);
+    std::sregex_iterator end;
 
     if (it == end or jt == end or kt == end) {
         throw utils::ArgError(_("Template error, no begin or end tag"));
@@ -203,12 +202,12 @@ void Template::tag(std::string& pluginname, std::string& packagename,
 
 std::string Template::processIf(const std::string& buffer) const
 {
-    boost::regex expif("{{if [[:alnum:]_]*}}", boost::regex::grep);
-    boost::regex expendif("{{end if}}", boost::regex::grep);
+    std::regex expif("{{if [[:alnum:]_]*}}", std::regex::grep);
+    std::regex expendif("{{end if}}", std::regex::grep);
 
-    boost::sregex_iterator it(buffer.begin(), buffer.end(), expif);
-    boost::sregex_iterator jt(buffer.begin(), buffer.end(), expendif);
-    boost::sregex_iterator end, begin = it;
+    std::sregex_iterator it(buffer.begin(), buffer.end(), expif);
+    std::sregex_iterator jt(buffer.begin(), buffer.end(), expendif);
+    std::sregex_iterator end, begin = it;
     std::string temp;
 
     while (it != end) {
@@ -242,12 +241,12 @@ std::string Template::processIf(const std::string& buffer) const
 
 std::string Template::processIfnot(const std::string& buffer) const
 {
-    boost::regex expifnot("{{ifnot [[:alnum:]_]*}}", boost::regex::grep);
-    boost::regex expendifnot("{{end ifnot}}", boost::regex::grep);
+    std::regex expifnot("{{ifnot [[:alnum:]_]*}}", std::regex::grep);
+    std::regex expendifnot("{{end ifnot}}", std::regex::grep);
 
-    boost::sregex_iterator it(buffer.begin(), buffer.end(), expifnot);
-    boost::sregex_iterator jt(buffer.begin(), buffer.end(), expendifnot);
-    boost::sregex_iterator end, begin = it;
+    std::sregex_iterator it(buffer.begin(), buffer.end(), expifnot);
+    std::sregex_iterator jt(buffer.begin(), buffer.end(), expendifnot);
+    std::sregex_iterator end, begin = it;
     std::string temp;
 
     while (it != end) {
@@ -281,10 +280,10 @@ std::string Template::processIfnot(const std::string& buffer) const
 
 std::string Template::processFor(const std::string& buffer) const
 {
-    boost::regex expression("{{[[:alnum:]_]*}}", boost::regex::grep);
+    std::regex expression("{{[[:alnum:]_]*}}", std::regex::grep);
 
-    boost::sregex_iterator it(buffer.begin(), buffer.end(), expression);
-    boost::sregex_iterator end, current;
+    std::sregex_iterator it(buffer.begin(), buffer.end(), expression);
+    std::sregex_iterator end, current;
     std::string temp;
 
     while (it != end) {
@@ -308,14 +307,14 @@ std::string Template::processFor(const std::string& buffer) const
 
 std::string Template::processName(const std::string& buffer) const
 {
-    boost::regex expfor("{{for [[:alnum:]_] in [[:alnum:]_]*}}", boost::regex::grep);
-    boost::regex expendfor("{{end for}}", boost::regex::grep);
-    boost::regex var("{{[[:alnum:]_]*\\^[[:alnum:]_]}}", boost::regex::grep);
+    std::regex expfor("{{for [[:alnum:]_] in [[:alnum:]_]*}}", std::regex::grep);
+    std::regex expendfor("{{end for}}", std::regex::grep);
+    std::regex var("{{[[:alnum:]_]*\\^[[:alnum:]_]}}", std::regex::grep);
 
-    boost::sregex_iterator it(buffer.begin(), buffer.end(), expfor);
-    boost::sregex_iterator jt(buffer.begin(), buffer.end(), expendfor);
-    boost::sregex_iterator end, current;
-    boost::sregex_iterator begin = it;
+    std::sregex_iterator it(buffer.begin(), buffer.end(), expfor);
+    std::sregex_iterator jt(buffer.begin(), buffer.end(), expendfor);
+    std::sregex_iterator end, current;
+    std::sregex_iterator begin = it;
     std::string temp;
 
     while (it != end) {
@@ -330,7 +329,7 @@ std::string Template::processName(const std::string& buffer) const
 
         for (uint32_t i = 0; i < listSymbol().list().find(list)->second.size();
              ++i) {
-            boost::sregex_iterator vt(str.begin(), str.end(), var);
+            std::sregex_iterator vt(str.begin(), str.end(), var);
 
             while (vt != end) {
                 temp.append(vt->prefix());
@@ -348,8 +347,8 @@ std::string Template::processName(const std::string& buffer) const
             }
         }
 
-        boost::sregex_iterator nextJt = jt;
-        boost::sregex_iterator nextIt = it;
+        std::sregex_iterator nextJt = jt;
+        std::sregex_iterator nextIt = it;
         nextJt++;
         nextIt++;
 

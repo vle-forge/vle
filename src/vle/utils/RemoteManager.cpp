@@ -44,12 +44,12 @@
 #include <ostream>
 #include <iostream>
 #include <string>
+#include <regex>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cast.hpp>
-#include <boost/regex.hpp>
 
 #define PACKAGESID_VECTOR_RESERVED_SIZE 100u
 
@@ -118,8 +118,6 @@ std::ostream& operator<<(std::ostream& os, const PackageId& b)
               << "MD5sum: " << b.md5sum << "\n";
 }
 
-namespace fs = boost::filesystem;
-
 class RemoteManager::Pimpl
 {
 public:
@@ -144,9 +142,11 @@ public:
 
     ~Pimpl()
     {
-        join();
-
-        save();
+        try {
+            join();
+            save();
+        } catch (...) {
+        }
     }
 
     void start(RemoteManagerActions action, const std::string& arg,
@@ -198,18 +198,14 @@ public:
 
     void join() noexcept
     {
-        if (mIsStarted) {
-            if (not mIsFinish) {
-                mThread.join();
-            }
-        }
+        if (mIsStarted and not mIsFinish)
+            mThread.join();
     }
 
     void stop()
     {
-        if (mIsStarted and not mIsFinish) {
+        if (mIsStarted and not mIsFinish)
             mStop = true;
-        }
     }
 
     /**
@@ -219,9 +215,8 @@ public:
      */
     template < typename T > void out(const T& t)
     {
-        if (mStream) {
+        if (mStream)
             *mStream << t;
-        }
     }
 
     /**
@@ -231,30 +226,28 @@ public:
     struct NotHaveExpression
         : std::unary_function < PackageId, bool >
     {
-        const boost::regex& expression;
+        const std::regex& expression;
 
-        NotHaveExpression(const boost::regex& expression)
+        NotHaveExpression(const std::regex& expression)
             : expression(expression)
         {
         }
 
         bool operator()(const PackageId& pkg) const
         {
-            boost::match_results < std::string::const_iterator > what;
+            std::match_results < std::string::const_iterator > what;
 
-            if (boost::regex_search(pkg.name,
-                                    what,
-                                    expression,
-                                    boost::match_default |
-                                    boost::match_partial)) {
+            if (std::regex_search(pkg.name,
+                                  what,
+                                  expression,
+                                  std::regex_constants::match_default)) {
                 return false;
             }
 
-            if (boost::regex_search(pkg.description,
-                                    what,
-                                    expression,
-                                    boost::match_default |
-                                    boost::match_partial)) {
+            if (std::regex_search(pkg.description,
+                                  what,
+                                  expression,
+                                  std::regex_constants::match_default)) {
                 return false;
             }
 
@@ -528,7 +521,7 @@ public:
      */
     void actionLocalSearch() throw ()
     {
-        boost::regex expression(mArgs, boost::regex::grep);
+        std::regex expression(mArgs, std::regex::grep);
 
         std::remove_copy_if(local.begin(),
                             local.end(),
@@ -548,7 +541,7 @@ public:
      */
     void actionSearch() throw()
     {
-        boost::regex expression(mArgs, boost::regex::grep);
+        std::regex expression(mArgs, std::regex::grep);
 
         std::remove_copy_if(remote.begin(),
                             remote.end(),
