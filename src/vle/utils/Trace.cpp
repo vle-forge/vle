@@ -33,6 +33,8 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <mutex>
+#include <cstdio>
+#include <cstdarg>
 
 
 namespace vle { namespace utils {
@@ -111,6 +113,35 @@ public:
             if (level != utils::TRACE_LEVEL_ALWAYS) {
                 mWarnings++;
             }
+        }
+    }
+
+    void send(TraceLevelOptions level, const char *format, ...)
+    {
+        if (mStream) {
+            va_list ap;
+            int size = 0;
+
+            va_start(ap, format);
+            size = vsnprintf(nullptr, size, format, ap);
+            va_end(ap);
+
+            if (size < 0)
+                return;
+
+            size++;
+            std::string ret;
+            ret.reserve(size);
+
+            va_start(ap, format);
+            size = vsnprintf(&ret[0], size, format, ap);
+            if (size < 0)
+                return;
+            va_end(ap);
+
+            (*mStream) << "---" << ret << std::endl;
+            if (level != utils::TRACE_LEVEL_ALWAYS)
+                mWarnings++;
         }
     }
 
@@ -249,6 +280,36 @@ void Trace::send(const std::string& str, TraceLevelOptions level)
     std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
 
     Pimpl::mTrace->send(str, level);
+}
+
+void Trace::send(TraceLevelOptions level, const char *format, ...)
+{
+    if (not Trace::Pimpl::mTrace) {
+        Trace::init();
+    }
+
+    va_list ap;
+    int size = 0;
+
+    va_start(ap, format);
+    size = vsnprintf(nullptr, size, format, ap);
+    va_end(ap);
+
+    if (size < 0)
+        return;
+
+    size++;
+    std::string ret(size, '\0');
+
+    va_start(ap, format);
+    size = vsnprintf(&ret[0], size, format, ap);
+    if (size < 0)
+        return;
+    va_end(ap);
+
+    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
+
+    Pimpl::mTrace->send(ret, level);
 }
 
 std::string Trace::getDefaultLogFilename()

@@ -67,7 +67,7 @@ public:
           mName(init.model().getCompleteName())
     {
         TraceExtension((fmt(_("                     %1% [DEVS] constructor"))
-                        % mName).str());
+                        % mName).str().c_str());
     }
 
     virtual ~ExecutiveDbg()
@@ -78,7 +78,7 @@ public:
         mCurrentTime = time;
 
         TraceDevs((fmt(_("%1$20.10g %2% [DEVS] init")) % time %
-                   mName).str());
+                   mName).str().c_str());
 
         return UserModel::init(time);
     }
@@ -86,30 +86,30 @@ public:
     virtual void output(Time time, ExternalEventList& output) const
     {
         TraceDevs((fmt(_("%1$20.10g %2% [DEVS] output")) % time %
-                   mName).str());
+                   mName).str().c_str());
 
         UserModel::output(time, output);
 
         if (output.empty()) {
             TraceDevs(
                 (fmt(_("                .... %1% [DEVS] output returns empty "
-                       "output")) % mName).str());
+                       "output")) % mName).str().c_str());
         } else {
             TraceDevs(
                 (fmt(_("                .... %1% [DEVS] output returns %2%")) %
-                 mName % output).str());
+                 mName % output).str().c_str());
         }
     }
 
     virtual Time timeAdvance() const
     {
         TraceDevs(
-            (fmt(_("                     %1% [DEVS] ta")) % mName).str());
+            (fmt(_("                     %1% [DEVS] ta")) % mName).str().c_str());
 
         Time time(UserModel::timeAdvance());
 
         TraceDevs((fmt(_("                .... %1% [DEVS] ta returns %2%")) %
-                   mName % time).str());
+                   mName % time).str().c_str());
 
         return time;
     }
@@ -119,7 +119,7 @@ public:
         mCurrentTime = time;
 
         TraceDevs((fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
-                   mName).str());
+                   mName).str().c_str());
 
         UserModel::internalTransition(time);
     }
@@ -130,7 +130,7 @@ public:
         mCurrentTime = time;
 
         TraceDevs((fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) %
-                   time % mName % event).str());
+                   time % mName % event).str().c_str());
 
         UserModel::externalTransition(event, time);
     }
@@ -141,7 +141,7 @@ public:
     {
         TraceDevs(
             (fmt(_("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
-             mName % extEventlist).str());
+             mName % extEventlist).str().c_str());
 
         UserModel::confluentTransitions(time, extEventlist);
     }
@@ -151,7 +151,7 @@ public:
     {
         TraceDevs((fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
                          " port: '%4%']")) % event.getTime() % mName
-                   % event.getViewName() % event.getPortName()).str());
+                   % event.getViewName() % event.getPortName()).str().c_str());
 
         return UserModel::observation(event);
     }
@@ -159,7 +159,7 @@ public:
     virtual void finish()
     {
         TraceDevs((fmt(_("                     %1% [DEVS] finish")) %
-                   mName).str());
+                   mName).str().c_str());
 
         UserModel::finish();
     }
@@ -219,7 +219,7 @@ public:
                   "name: %3%, inputs: (%4%), output: (%5%), "
                   "dynamics %6%, conditions: (%7%), observable (%8%)")) %
             mCurrentTime % mName % name % inputsString %
-             outputsString % dynamics % conditionsString % observable).str());
+             outputsString % dynamics % conditionsString % observable).str().c_str());
 
         return UserModel::createModel(name, inputs, outputs, dynamics,
                                       conditions, observable);
@@ -239,7 +239,7 @@ public:
         TraceExtension(
             (fmt(_("%1$20.10g %2% [EXE] createModelFromClass "
                   "class: %3%, modelname: %4%")) % mCurrentTime %
-             mName % classname % modelname).str());
+             mName % classname % modelname).str().c_str());
 
         return UserModel::createModelFromClass(classname, modelname);
     }
@@ -255,7 +255,7 @@ public:
         TraceExtension(
             (fmt(_("%1$20.10g %2% [EXE] delModel "
                   "model: %3%")) % mCurrentTime % mName %
-             modelname).str());
+             modelname).str().c_str());
 
         UserModel::delModel(modelname);
     }
@@ -270,7 +270,7 @@ public:
                    "from model: %3% port: %4% "
                    "to model %5% port: %6%")) % mCurrentTime %
              mName % modelsource % outputport %
-             modeldestination % inputport).str());
+             modeldestination % inputport).str().c_str());
 
         UserModel::addConnection(modelsource, outputport, modeldestination,
                                  inputport);
@@ -286,7 +286,7 @@ public:
                   "from model: %3% port: %4% "
                   "to model %5% port: %6%")) % mCurrentTime %
             mName % modelsource % outputport %
-             modeldestination % inputport).str());
+             modeldestination % inputport).str().c_str());
 
         UserModel::removeConnection(modelsource, outputport, modeldestination,
                                     inputport);
@@ -298,8 +298,8 @@ public:
         TraceExtension(
             (fmt(_("%1$20.10g %2% [EXE] addInputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
-             mName % modelName % portName).str());
-        
+             mName % modelName % portName).str().c_str());
+
         UserModel::addInputPort(modelName, portName);
     }
 
@@ -309,8 +309,8 @@ public:
         TraceExtension(
             (fmt(_("%1$20.10g %2% [EXE] addOutputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
-             mName % modelName % portName).str());
-        
+             mName % modelName % portName).str().c_str());
+
         UserModel::addOutputPort(modelName, portName);
     }
 
@@ -320,7 +320,7 @@ public:
         TraceExtension(
             (fmt(_("%1$20.10g %2% [EXE] removeInputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
-             mName % modelName % portName).str());
+             mName % modelName % portName).str().c_str());
 
         UserModel::removeInputPort(modelName, portName);
     }
@@ -331,8 +331,8 @@ public:
         TraceExtension(
             (fmt(_("%1$20.10g %2% [EXE] removeOutputPort "
                   "model: %3%, port: %4%")) % mCurrentTime %
-             mName % modelName % portName).str());
-        
+             mName % modelName % portName).str().c_str());
+
         UserModel::removeOutputPort(modelName, portName);
     }
 

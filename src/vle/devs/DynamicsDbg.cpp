@@ -37,46 +37,46 @@ DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
     , mName(init.model().getCompleteName())
 {
     TraceDevs((fmt(_("                     %1% [DEVS] constructor"))
-               % mName).str());
+               % mName).str().c_str());
 }
 
 Time DynamicsDbg::init(Time time)
 {
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] init")) % time % mName).str());
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] init")) % time % mName).str().c_str());
 
     Time duration(mDynamics->init(time));
 
     TraceDevs((fmt(_("                .... %1% [DEVS] init returns %2%")) %
-               mName % duration).str());
+               mName % duration).str().c_str());
 
     return duration;
 }
 
 void DynamicsDbg::output(Time time, ExternalEventList& output) const
 {
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] output")) % time % mName).str());
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] output")) % time % mName).str().c_str());
 
     mDynamics->output(time, output);
 
     if (output.empty()) {
         TraceDevs((fmt(
                 _("                .... %1% [DEVS] output returns "
-                  "empty output")) % mName).str());
+                  "empty output")) % mName).str().c_str());
     } else {
         TraceDevs((fmt(
                 _("                .... %1% [DEVS] output returns "
-                  "%2%")) % mName % output).str());
+                  "%2%")) % mName % output).str().c_str());
     }
 }
 
 Time DynamicsDbg::timeAdvance() const
 {
-    TraceDevs((fmt(_("                     %1% [DEVS] ta")) % mName).str());
+    TraceDevs((fmt(_("                     %1% [DEVS] ta")) % mName).str().c_str());
 
     Time time(mDynamics->timeAdvance());
 
     TraceDevs((fmt(_("                .... %1% [DEVS] ta returns %2%")) %
-               mName % time).str());
+               mName % time).str().c_str());
 
     return time;
 }
@@ -84,7 +84,7 @@ Time DynamicsDbg::timeAdvance() const
 void DynamicsDbg::internalTransition(Time time)
 {
     TraceDevs((fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
-               mName).str());
+               mName).str().c_str());
 
     mDynamics->internalTransition(time);
 }
@@ -93,7 +93,7 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
                                      Time time)
 {
     TraceDevs((fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) % time
-               % mName % event).str());
+               % mName % event).str().c_str());
 
     mDynamics->externalTransition(event, time);
 }
@@ -104,7 +104,7 @@ void DynamicsDbg::confluentTransitions(
 {
     TraceDevs(
         (fmt(_("%1$20.10g %2% [DEVS] confluent transition: [%3%]"))
-         % time % mName % extEventlist).str());
+         % time % mName % extEventlist).str().c_str());
 
     mDynamics->confluentTransitions(time, extEventlist);
 }
@@ -114,14 +114,14 @@ DynamicsDbg::observation(const ObservationEvent& event) const
 {
     TraceDevs((fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
                      " port: '%4%']")) % event.getTime() % mName
-               % event.getViewName() % event.getPortName()).str());
-    
+               % event.getViewName() % event.getPortName()).str().c_str());
+
     return mDynamics->observation(event);
 }
 
 void DynamicsDbg::finish()
 {
-    TraceDevs((fmt(_("                     %1% [DEVS] finish")) % mName).str());
+    TraceDevs((fmt(_("                     %1% [DEVS] finish")) % mName).str().c_str());
 
     mDynamics->finish();
 }

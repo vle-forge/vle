@@ -45,11 +45,11 @@ static bool extract__(Packages *out, const std::string& filepath)
         parser.extract(pkg.string(), std::string());
         out->reserve(parser.size());
         out->insert(out->rbegin().base(), parser.begin(), parser.end());
-
         return true;
-    } else {
-        TraceAlways((fmt(_("can not open file `%1%'")) % pkg.string()).str());
     }
+
+    TraceAlways(_("Package: can not open file `%s'"),
+                pkg.string().c_str());
 
     return false;
 }
@@ -71,8 +71,8 @@ static bool rebuild__(Packages *out)
                     parser.extract(descfile.string(), std::string());
                 } else {
                     TraceAlways(
-                        (fmt(_("Remote manager: failed to open Description from"
-                               " `%1%'")) % descfile.string()).str());
+                        _("Remote: failed to open Description "
+                          "from `%s'"), descfile.string().c_str());
                 }
             }
         }
@@ -83,8 +83,8 @@ static bool rebuild__(Packages *out)
 
         return true;
     } else {
-        TraceAlways((fmt(_("failed to open directory `%1%'")) %
-                     pkgsdir.string()).str());
+        TraceAlways(_("Remote: failed to open directory `%s'"),
+                     pkgsdir.string().c_str());
 
         return false;
     }
@@ -95,9 +95,8 @@ bool LocalPackageManager::extract(Packages *out)
     try {
         return extract__(out, RemoteManager::getLocalPackageFilename());
     } catch (const std::exception& e) {
-        TraceAlways(
-            (fmt(_("Remote manager: internal error when reading local package:"
-                   " %1%")) % e.what()).str());
+        TraceAlways(_("Remote: internal error when reading local package:"
+                      " %s"), e.what());
 
         return false;
     }
@@ -108,9 +107,8 @@ bool LocalPackageManager::rebuild(Packages *out)
     try {
         return rebuild__(out);
     } catch (const std::exception& e) {
-        TraceAlways(
-            (fmt(_("Remote manager: failed to rebuild cache of installed"
-                   " package: %1%")) % e.what()).str());
+        TraceAlways(_("Remote: failed to rebuild cache of installed"
+                      " package: %s"), e.what());
 
         return false;
     }
@@ -121,9 +119,8 @@ bool RemotePackageManager::extract(Packages *out)
     try {
         return extract__(out, RemoteManager::getRemotePackageFilename());
     } catch (const std::exception& e) {
-        TraceAlways(
-            (fmt(_("Remote manager: internal error when reading remote"
-                   " package: %1%")) % e.what()).str());
+        TraceAlways(_("Remote: internal error when reading remote"
+                      " package: %s"), e.what());
 
         return false;
     }

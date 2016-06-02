@@ -48,7 +48,7 @@ enum TraceLevelOptions
 enum TraceStreamType
 {
     TRACE_STREAM_STANDARD_ERROR, /**< Uses the std::cerr to
-                                       * log. Default value */
+                                  * log. Default value */
     TRACE_STREAM_STANDARD_OUTPUT, /**< Uses the std::cout to log. */
     TRACE_STREAM_FILE      /**< Use a specific file to log */
 };
@@ -56,9 +56,9 @@ enum TraceStreamType
 /**
  * A logging class to send information into a file. We define two types of
  * macros to simplify the calls of this function. In NDEBUG mode (cflags
- * parameter), only TraceAlways, TraceModel, TraceExtension and TraceDevs work
- * otherwise. The macros DTraceAlways, DTraceModel, DTraceExtension and
- * DTraceDevs work only withtout NDEBUG.
+ * parameter), only TraceAlways, TraceModel, TraceExtension and TraceDevs
+ * work otherwise. The macros DTraceAlways, DTraceModel, DTraceExtension
+ * and DTraceDevs work only withtout NDEBUG.
  *
  * @code
  * #include <vle/utils/Trace.hpp>
@@ -80,6 +80,13 @@ enum TraceStreamType
 class VLE_API Trace
 {
 public:
+    Trace() = delete;
+    ~Trace() = delete;
+    Trace(const Trace& other) = delete;
+    Trace& operator=(const Trace& other) = delete;
+    Trace(Trace&& other) = delete;
+    Trace& operator=(Trace&& other) = delete;
+
     /**
      * Initialize the Trace singleton.
      */
@@ -124,6 +131,16 @@ public:
      */
     static void send(const std::string& str,
                      TraceLevelOptions level = TRACE_LEVEL_ALWAYS);
+
+    /**
+     * Send a printf like message to the log file.
+     *
+     * @param level The Level of the message.
+     * @param format The printf like format string.
+     * @param ... The printf like arguments.
+     */
+    static void send(TraceLevelOptions level,
+                     const char *format, ...);
 
     /**
      * Return the default log file position. $VLE_HOME/vle.log under Unix
@@ -193,12 +210,13 @@ public:
     /**
      * Cast the integer into a TraceLevelOptions option.
      *
-     * Try to cast the integer into a TraceLevelOptions. If integer is equal to
-     * 0, the function returns TRACE_LEVEL_ALWAYS, if integer is equal to 1,
-     * the function returns TRACE_LEVEL_MODEL, if the integer is equal to 2,
-     * the function return TRACE_LEVEL_EXTENSION, finally, if the integer is
-     * equal to 3, the function returns TRACE_LEVEL_DEVS. All other value, the
-     * function return TRACE_LEVEL_ALWAYS.
+     * Try to cast the integer into a TraceLevelOptions. If integer is
+     * equal to 0, the function returns TRACE_LEVEL_ALWAYS, if integer is
+     * equal to 1, the function returns TRACE_LEVEL_MODEL, if the integer
+     * is equal to 2, the function return TRACE_LEVEL_EXTENSION, finally,
+     * if the integer is equal to 3, the function returns
+     * TRACE_LEVEL_DEVS. All other value, the function return
+     * TRACE_LEVEL_ALWAYS.
      *
      * @code
      * utils::Trace::cast(0); // return TRACE_LEVEL_ALWAYS.
@@ -217,64 +235,82 @@ public:
     static TraceLevelOptions cast(int level) throw();
 
 private:
-    Trace();
-    ~Trace();
-    Trace(const Trace& other);
-    Trace& operator=(const Trace& other);
-
-    class Pimpl;
-    Pimpl* mImpl;
+    struct Pimpl;
+    Pimpl *mImpl;
 };
 
 }} // namespace vle utils
 
-#define TraceAlways(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_ALWAYS)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_ALWAYS); \
-    } \
-}
-#define TraceModel(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_MODEL)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_MODEL); \
-    } \
-}
-#define TraceExtension(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_EXTENSION)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_EXTENSION); \
-    } \
-}
-#define TraceDevs(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_DEVS)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_DEVS); \
-    } \
-}
+#define TraceAlways(format, ...) do {                                   \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_ALWAYS)) {                      \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_ALWAYS, format, ##__VA_ARGS__); \
+        }                                                               \
+    } while (0)
+
+#define TraceModel(format, ...) do {                                    \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_MODEL)) {                       \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_MODEL, format, ##__VA_ARGS__);  \
+        }                                                               \
+    } while (0)
+
+#define TraceExtension(format, ...) do {                                \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_EXTENSION)) {                   \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_EXTENSION, format, ##__VA_ARGS__); \
+        }                                                               \
+    } while (0)
+
+#define TraceDevs(format, ...) do {                                     \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_DEVS)) {                        \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_DEVS, format, ##__VA_ARGS__);   \
+        }                                                               \
+    } while (0)
 
 #ifndef NDEBUG
-#define DTraceAlways(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_ALWAYS)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_ALWAYS); \
-    } \
-}
-#define DTraceModel(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_MODEL)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_MODEL); \
-    } \
-}
-#define DTraceExtension(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_EXTENSION)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_EXTENSION); \
-    } \
-}
-#define DTraceDevs(x) { \
-    if (vle::utils::Trace::isInLevel(vle::utils::TRACE_LEVEL_DEVS)) { \
-        vle::utils::Trace::send(x, vle::utils::TRACE_LEVEL_DEVS); \
-    } \
-}
+#define DTraceAlways(format, ...) do {                                  \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_ALWAYS)) {                      \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_ALWAYS, format, ##__VA_ARGS__); \
+        }                                                               \
+    } while (0)
+
+#define DTraceModel(format, ...) do {                                   \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_MODEL)) {                       \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_MODEL, format, ##__VA_ARGS__);  \
+        }                                                               \
+    } while (0)
+
+#define DTraceExtension(format, ...) do {                               \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_EXTENSION)) {                   \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_EXTENSION, format, ##__VA_ARGS__); \
+        }                                                               \
+    } while (0)
+
+#define DTraceDevs(format, ...) do {                                    \
+        if (vle::utils::Trace::isInLevel(                               \
+                vle::utils::TRACE_LEVEL_DEVS)) {                        \
+            vle::utils::Trace::send(                                    \
+                vle::utils::TRACE_LEVEL_DEVS, format, ##__VA_ARGS__);   \
+        }                                                               \
+    } while (0)
+
 #else
-#define DTraceAlways(x) {}
-#define DTraceModel(x) {}
-#define DTraceExtension(x) {}
-#define DTraceDevs(x) {}
+#define DTraceAlways(format, ...)
+#define DTraceModel(format, ...)
+#define DTraceExtension(format, ...)
+#define DTraceDevs(format, ...)
 #endif
 
 #endif

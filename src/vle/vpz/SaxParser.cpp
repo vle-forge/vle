@@ -237,7 +237,7 @@ void SaxParser::onWarning(void* /* ctx */, const char *msg, ...)
     vsnprintf(buffer, 1023, msg, args);
     va_end(args);
 
-    TraceAlways((fmt(_("XML warning: %1%")) % buffer).str());
+    TraceAlways(_("Parser: warning: %s"), buffer);
 
     delete [] buffer;
 }

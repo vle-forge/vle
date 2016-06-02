@@ -127,8 +127,8 @@ public:
     ~Module() noexcept
     {
         try {
-            DTraceModel((vle::fmt("ModuleManager unload: %1%:%2%")
-                         % mHandle % mPath).str());
+            TraceModel(_("ModuleManager: unload %p:%s"),
+                       mHandle, mPath.c_str());
         } catch (...) {
         }
 
@@ -282,8 +282,7 @@ public:
         void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
 
-        DTraceModel((vle::fmt("ModuleManager load: %1%:%2%") % handle % mPath).str());
-
+        TraceModel(_("ModuleManager: load %p:%s"), handle, mPath.c_str());
         if (not handle) {
             std::string extra;
 #ifdef BOOST_WINDOWS
