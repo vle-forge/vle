@@ -60,7 +60,6 @@ VLE_API std::ostream& operator<<(std::ostream& out,
 class VLE_API Package
 {
 public:
-
     Package();
 
     Package(const std::string& pkgname);

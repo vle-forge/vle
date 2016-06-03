@@ -50,7 +50,6 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include <boost/version.hpp>
-#include <boost/program_options.hpp>
 #include <boost/cast.hpp>
 #include <boost/version.hpp>
 #include <boost/config.hpp>
