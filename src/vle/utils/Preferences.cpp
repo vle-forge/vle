@@ -31,17 +31,17 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
-#include <boost/program_options.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <boost/variant.hpp>
 #include <fstream>
+#include <map>
 
 #ifdef _WIN32
-#define VLE_PACKAGE_COMMAND_CONFIGURE                                   \
-    "cmake.exe -G 'MinGW Makefiles' "                                   \
-    "-DWITH_DOC=OFF "                                                   \
-    "-DWITH_TEST=ON "                                                   \
-    "-DWITH_WARNINGS=OFF "                                              \
-    "-DCMAKE_INSTALL_PREFIX='%1%' "                                     \
+#define VLE_PACKAGE_COMMAND_CONFIGURE           \
+    "cmake.exe -G 'MinGW Makefiles' "           \
+    "-DWITH_DOC=OFF "                           \
+    "-DWITH_TEST=ON "                           \
+    "-DWITH_WARNINGS=OFF "                      \
+    "-DCMAKE_INSTALL_PREFIX='%1%' "             \
     "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 #define VLE_PACKAGE_COMMAND_TEST "cmake.exe --build '%1%' --target test"
 #define VLE_PACKAGE_COMMAND_BUILD "cmake.exe --build '%1%' --target all"
@@ -53,11 +53,11 @@
 #define VLE_COMMAND_UNTAR "cmake.exe -E tar jxf '%1%' .'"
 #define VLE_COMMAND_URL_GET "curl.exe '%1%' -o '%2%'"
 #else
-#define VLE_PACKAGE_COMMAND_CONFIGURE                                   \
-    "cmake -DCMAKE_INSTALL_PREFIX='%1%' "                               \
-    "-DWITH_DOC=OFF "                                                   \
-    "-DWITH_TEST=ON "                                                   \
-    "-DWITH_WARNINGS=ON "                                               \
+#define VLE_PACKAGE_COMMAND_CONFIGURE           \
+    "cmake -DCMAKE_INSTALL_PREFIX='%1%' "       \
+    "-DWITH_DOC=OFF "                           \
+    "-DWITH_TEST=ON "                           \
+    "-DWITH_WARNINGS=ON "                       \
     "-DCMAKE_BUILD_TYPE=RelWithDebInfo .."
 #define VLE_PACKAGE_COMMAND_TEST "cmake --build '%1%' --target test"
 #define VLE_PACKAGE_COMMAND_BUILD "cmake --build '%1%' --target all"
@@ -69,248 +69,155 @@
 #define VLE_COMMAND_URL_GET "curl --progress-bar '%1%' -o '%2%'"
 #endif
 
-namespace po = boost::program_options;
-
 namespace vle { namespace utils {
+
+using PreferenceType = boost::variant<bool,
+                                      std::string,
+                                      long,
+                                      double>;
+
+using PreferenceMap = std::map<std::string, PreferenceType>;
 
 struct Preferences::Pimpl
 {
+    PreferenceMap ppMap;
+    std::string mFilename; /**< The filename of the resources file in \c
+                              `VLE_HOME/vle.conf'. */
+
+    bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
+
     Pimpl(bool readOnly, std::string filename)
-        : mGvlePackagesOptions("gvle.packages")
-        , mGvleEditorOptions("gvle.editor")
-        , mGvleGraphicsOptions("gvle.graphics")
-        , mVlePackageOptions("vle.packages")
-        , mVleRemoteOptions("vle.remote")
-        , mVleCommandOptions("vle.command")
+        : ppMap{
+        { "gvle.packages.auto-build", true },
+        { "gvle.editor.auto-indent", true },
+        { "gvle.editor.font", std::string("Monospace 10") },
+        { "gvle.editor.highlight-line", true },
+        { "gvle.editor.highlight-brackets", true },
+        { "gvle.editor.highlight-syntax", true },
+        { "gvle.editor.indent-on-tab", true },
+        { "gvle.editor.indent-size", 4l },
+        { "gvle.editor.show-line-numbers", true },
+        { "gvle.editor.show-right-margin", true },
+        { "gvle.editor.smart-home-end", true },
+        { "gvle.graphics.background-color", std::string("#ffffffffffff") },
+        { "gvle.graphics.foreground-color", std::string("#000000000000") },
+        { "gvle.graphics.atomic-color", std::string("#0000ffff0000") },
+        { "gvle.graphics.coupled-color", std::string("#00000000ffff") },
+        { "gvle.graphics.selected-color", std::string("#ffff00000000") },
+        { "gvle.graphics.connection-color", std::string("#000000000000") },
+        { "gvle.graphics.font", std::string("Monospace 10") },
+        { "gvle.graphics.font-size", 10.0 },
+        { "gvle.graphics.line-width", 3.0 },
+        { "vle.packages.configure", std::string(VLE_PACKAGE_COMMAND_CONFIGURE) },
+        { "vle.packages.test", std::string(VLE_PACKAGE_COMMAND_TEST) },
+        { "vle.packages.build", std::string(VLE_PACKAGE_COMMAND_BUILD) },
+        { "vle.packages.install", std::string(VLE_PACKAGE_COMMAND_INSTALL) },
+        { "vle.packages.clean", std::string(VLE_PACKAGE_COMMAND_CLEAN) },
+        { "vle.packages.package", std::string(VLE_PACKAGE_COMMAND_PACKAGE) },
+        { "vle.remote.url",
+                std::string("http://www.vle-project.org/pub/" VLE_ABI_VERSION) },
+        { "vle.command.tar", std::string(VLE_COMMAND_TAR) },
+        { "vle.command.untar", std::string(VLE_COMMAND_UNTAR) },
+        { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET) }}
         , mFilename(std::move(filename))
         , mreadOnly(readOnly)
     {
-        mGvleEditorOptions.add_options()
-            ("gvle.packages.auto-build", po::value <bool>
-             (nullptr)->default_value(true),
-             _("Auto build"));
+        std::ifstream ifs(mFilename);
+        if (not ifs.is_open()) {
+            TraceAlways(_("Preferences: fail open '%s'. Use default value."),
+                        mFilename.c_str());
+            return;
+        }
 
-        mGvleEditorOptions.add_options()
-            ("gvle.editor.auto-indent", po::value < bool >
-             (nullptr)->default_value(true),
-             _("Auto indent"))
-            ("gvle.editor.font", po::value < std::string >
-             (nullptr)->default_value("Monospace 10"),
-             _("Font"))
-            ("gvle.editor.highlight-line", po::value < bool >
-             (nullptr)->default_value(true),
-             _("Highlight line"))
-            ("gvle.editor.highlight-brackets", po::value < bool >
-             (nullptr)->default_value(true),
-             _("Highlight line"))
-            ("gvle.editor.highlight-syntax", po::value < bool >
-             (nullptr)->default_value(true),
-             _("Highlight syntax"))
-            ("gvle.editor.indent-on-tab", po::value < bool >
-             (nullptr)->default_value(true),
-             ("Indent on tabulation"))
-            ("gvle.editor.indent-size", po::value < uint32_t >
-             (nullptr)->default_value(4),
-             _("Indentation size"))
-            ("gvle.editor.show-line-numbers", po::value < bool >
-             (nullptr)->default_value(true),
-             _("Show line numbers"))
-            ("gvle.editor.show-right-margin", po::value < bool >
-             (nullptr)->default_value(true),
-             _("Show right margin"))
-            ("gvle.editor.smart-home-end", po::value < bool >
-             (nullptr)->default_value(true),
-             _("Smart Home end"));
+        int l = 0;
+        std::string line;
+        while (std::getline(ifs, line)) {
+            auto equalchar = line.find_first_of('=', 0);
+            if (equalchar == std::string::npos or
+                equalchar == 0 or
+                equalchar == line.size())
+                throw utils::InternalError(
+                    (fmt(_("Preferences: fail while reading '%s' line '%d'"))
+                     % mFilename % l).str());
 
-        mGvleGraphicsOptions.add_options()
-            ("gvle.graphics.background-color", po::value < std::string >
-             (nullptr)->default_value("#ffffffffffff"))
-            ("gvle.graphics.foreground-color", po::value < std::string >
-             (nullptr)->default_value("#000000000000"))
-            ("gvle.graphics.atomic-color", po::value < std::string >
-             (nullptr)->default_value("#0000ffff0000"))
-            ("gvle.graphics.coupled-color", po::value < std::string >
-             (nullptr)->default_value("#00000000ffff"))
-            ("gvle.graphics.selected-color", po::value < std::string >
-             (nullptr)->default_value("#ffff00000000"))
-            ("gvle.graphics.connection-color", po::value < std::string >
-             (nullptr)->default_value("#000000000000"))
-            ("gvle.graphics.font", po::value < std::string >
-             (nullptr)->default_value("Monospace 10"))
-            ("gvle.graphics.font-size", po::value < double >
-             (nullptr)->default_value(10.0))
-            ("gvle.graphics.line-width", po::value < double >
-             (nullptr)->default_value(3.0));
+            std::string key = line.substr(0, equalchar);
+            std::string value = line.substr(equalchar + 1, std::string::npos);
 
-        mVlePackageOptions.add_options()
-            ("vle.packages.configure", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_CONFIGURE))
-            ("vle.packages.test", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_TEST))
-            ("vle.packages.build", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_BUILD))
-            ("vle.packages.install", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_INSTALL))
-            ("vle.packages.clean", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_CLEAN))
-            ("vle.packages.package", po::value < std::string >
-             (nullptr)->default_value(VLE_PACKAGE_COMMAND_PACKAGE));
-
-        mVleDaemonOptions.add_options()
-            ("vle.daemon.hosts", po::value < std::string >
-             (nullptr)->default_value("localhost"))
-            ("vle.daemon.ports", po::value < std::string >
-             (nullptr)->default_value("8001"))
-            ("vle.daemon.processes", po::value < std::string >
-             (nullptr)->default_value("1"));
-
-        mVleRemoteOptions.add_options()
-            ("vle.remote.url", po::value < std::string >
-             (nullptr)->default_value(
-                 "http://www.vle-project.org/pub/" VLE_ABI_VERSION))
-            ("vle.remote.proxy_ip", po::value < std::string >
-             (nullptr)->default_value(""))
-            ("vle.remote.proxy_port", po::value < std::string >
-             (nullptr)->default_value(""));
-
-        mVleCommandOptions.add_options()
-            ("vle.command.tar", po::value<std::string>
-             (nullptr)->default_value(VLE_COMMAND_TAR))
-            ("vle.command.untar", po::value<std::string>
-             (nullptr)->default_value(VLE_COMMAND_UNTAR))
-            ("vle.command.url.get", po::value<std::string>
-             (nullptr)->default_value(VLE_COMMAND_URL_GET));
-
-        mConfigFileOptions.add(mVlePackageOptions).
-            add(mGvleEditorOptions).add(mGvleGraphicsOptions).
-            add(mVleDaemonOptions).add(mVleRemoteOptions).
-            add(mVleCommandOptions);
-
-        open();
+            auto it = ppMap.find(key);
+            if (it == ppMap.end()) {
+                TraceAlways(_("Preferences: unknown key '%s'"), key.c_str());
+            } else {
+                if (boost::get<bool>(&it->second)){
+                    if (value == "1" or value  == "true" or
+                        value == "1" or value == "TRUE" or value == "True")
+                        it->second = true;
+                    else if (value == "false" or value == "0"
+                             or value == "FALSE" or value == "False")
+                        it->second = false;
+                    else
+                        TraceAlways(_("Preferences: fail reading boolean value"
+                                      " at line %d in %s"), l, value.c_str());
+                } else if (boost::get<std::string>(&it->second)) {
+                    it->second = value;
+                } else if (boost::get<long>(&it->second)) {
+                    try {
+                        long r = std::stol(value);
+                        it->second = r;
+                    } catch (const std::exception& /* e */) {
+                        TraceAlways(_("Preferences: fail reading integer value"
+                                      " at line %d in %s"), l, value.c_str());
+                    }
+                } else if (boost::get<long>(&it->second)) {
+                    try {
+                        double r = std::stod(value);
+                        it->second = r;
+                    } catch (const std::exception& /* e */) {
+                        TraceAlways(_("Preferences: fail reading double value"
+                                      " at line %d in %s"), l, value.c_str());
+                    }
+                }
+            }
+            l++;
+        }
     }
 
     ~Pimpl() noexcept
     {
         try {
-            if (not mreadOnly)
-                save();
+            if (not mreadOnly) {
+                std::ofstream file(mFilename);
+
+                if (not file.is_open()) {
+                    TraceAlways(_("Preferences: fail write '%s'"),
+                                mFilename.c_str());
+                    return;
+                }
+
+                file << std::boolalpha;
+                for (const auto& elem : ppMap)
+                    file << elem.first
+                         << '=' << elem.second << '\n';
+
+                if (file.bad()) {
+                    TraceAlways(_("Preferences: fail while writing '%s'"),
+                                mFilename.c_str());
+                    return;
+                }
+            }
         } catch (...) {
         }
     }
-
-    void open()
-    {
-        std::ifstream file(mFilename.c_str());
-
-        if (not file.is_open()) {
-            TraceAlways(_("Preferences: fail to open '%s'"),
-                        mFilename.c_str());
-            return;
-        }
-
-        po::store(po::parse_config_file(file, mConfigFileOptions, false),
-                  mSettings);
-        po::notify(mSettings);
-    }
-
-    void save()
-    {
-        std::ofstream file(mFilename.c_str());
-
-        if (not file.is_open()) {
-            TraceAlways(_("Preferences: fail to open '%s'"),
-                        mFilename.c_str());
-            return;
-        }
-
-        for (const auto& elem : mSettings) {
-            file << elem.first << "=";
-
-            if (boost::any_cast <std::string>(&elem.second.value()))
-                file << boost::any_cast<std::string>(elem.second.value());
-            else if (boost::any_cast<bool>(&elem.second.value()))
-                file << boost::any_cast<bool>(elem.second.value());
-            else if (boost::any_cast<double>(&elem.second.value()))
-                file << boost::any_cast<double>(elem.second.value());
-            else if (boost::any_cast<uint32_t>(&elem.second.value()))
-                file << boost::any_cast<uint32_t>(elem.second.value());
-            else
-                TraceAlways(_("Preferences: unknown type '%s'"),
-                            elem.first.c_str());
-
-            file << "\n";
-        }
-    }
-
-    bool set(const std::string& key, const boost::any& value)
-    {
-        auto it = mSettings.find(key);
-
-        if (it != mSettings.end()) {
-            it->second.value() = value;
-            return true;
-        }
-
-        return false;
-    }
-
-    boost::any get(const std::string& key)
-    {
-        auto it = mSettings.find(key);
-
-        if (it != mSettings.end())
-            return it->second.value();
-
-        return boost::any();
-    }
-
-    std::vector<std::string>
-    get() const
-    {
-        std::vector<std::string> ret(mSettings.size());
-
-        std::transform(std::begin(mSettings), std::end(mSettings),
-                       std::begin(ret),
-                       [](const po::variables_map::value_type& pair)
-                       {
-                           return pair.first;
-                       });
-
-        return ret;
-    }
-
-private:
-    po::variables_map mSettings; /**< The variables_map which stores all
-                                    the parameters in a std::map <
-                                    std::string, po::variable_value >. */
-    po::options_description mGvlePackagesOptions;
-    po::options_description mConfigFileOptions;
-    po::options_description mGvleEditorOptions;
-    po::options_description mGvleGraphicsOptions;
-    po::options_description mVlePackageOptions;
-    po::options_description mVleDaemonOptions;
-    po::options_description mVleRemoteOptions;
-    po::options_description mVleCommandOptions;
-
-    std::string mFilename; /**< The filename of the resources file in \c
-                              `VLE_HOME/vle.conf'. */
-
-    bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
 };
 
 Preferences::Preferences(const std::string& file)
-    : mPimpl(
-        std::unique_ptr<Preferences::Pimpl>(
-            new Preferences::Pimpl(
-                false, utils::Path::path().getHomeFile(file))))
+    : mPimpl(new Preferences::Pimpl(
+                 false, utils::Path::path().getHomeFile(file)))
 {
 }
 
 Preferences::Preferences(bool readOnly, const std::string& file)
-    : mPimpl(
-        std::unique_ptr<Preferences::Pimpl>(
-            new Preferences::Pimpl(
-                readOnly, utils::Path::path().getHomeFile(file))))
+    : mPimpl(new Preferences::Pimpl(readOnly,
+                                    utils::Path::path().getHomeFile(file)))
 {
 }
 
@@ -318,79 +225,132 @@ Preferences::~Preferences() noexcept = default;
 
 bool Preferences::set(const std::string& key, const std::string& value)
 {
-    return mPimpl->set(key, value);
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
+        return false;
+
+    if (not boost::get<std::string>(&it->second))
+        return false;
+
+    it->second = value;
+
+    return true;
 }
 
 bool Preferences::set(const std::string& key, double value)
 {
-    return mPimpl->set(key, value);
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
+        return false;
+
+    if (not boost::get<double>(&it->second))
+        return false;
+
+    it->second = value;
+
+    return true;
 }
 
-bool Preferences::set(const std::string& key, uint32_t value)
+bool Preferences::set(const std::string& key, long value)
 {
-    return mPimpl->set(key, value);
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
+        return false;
+
+    if (not boost::get<long>(&it->second))
+        return false;
+
+    it->second = value;
+
+    return true;
 }
 
 bool Preferences::set(const std::string& key, bool value)
 {
-    return mPimpl->set(key, value);
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
+        return false;
+
+    if (not boost::get<bool>(&it->second))
+        return false;
+
+    it->second = value;
+
+    return true;
 }
 
 std::vector<std::string> Preferences::get() const
 {
-    return mPimpl->get();
+    std::vector<std::string> ret(mPimpl->ppMap.size());
+
+    std::transform(std::begin(mPimpl->ppMap), std::end(mPimpl->ppMap),
+                   std::begin(ret),
+                   [](const PreferenceMap::value_type& pair)
+                   {
+                       return pair.first;
+                   });
+
+    return ret;
 }
 
 bool Preferences::get(const std::string& key, std::string* value) const
 {
-    boost::any result = mPimpl->get(key);
-
-    try {
-        (*value) = boost::any_cast < std::string >(result);
-        return true;
-    } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways(_("Preferences: %s is not a string"), key.c_str());
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
         return false;
-    }
+
+    auto ptr = boost::get<std::string>(&it->second);
+    if (not ptr)
+        return false;
+
+    *value = *ptr;
+
+    return true;
 }
 
 bool Preferences::get(const std::string& key, double* value) const
 {
-    boost::any result = mPimpl->get(key);
-
-    try {
-        (*value) = boost::any_cast < double >(result);
-        return true;
-    } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways(_("Preferences: %s is not a real"), key.c_str());
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
         return false;
-    }
+
+    auto ptr = boost::get<double>(&it->second);
+    if (not ptr)
+        return false;
+
+    *value = *ptr;
+
+    return true;
 }
 
-bool Preferences::get(const std::string& key, uint32_t* value) const
+bool Preferences::get(const std::string& key, long* value) const
 {
-    boost::any result = mPimpl->get(key);
-
-    try {
-        (*value) = boost::any_cast < uint32_t >(result);
-        return true;
-    } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways(_("Preferences: %s is not a integer"), key.c_str());
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
         return false;
-    }
+
+    auto ptr = boost::get<long>(&it->second);
+    if (not ptr)
+        return false;
+
+    *value = *ptr;
+
+    return true;
 }
 
 bool Preferences::get(const std::string& key, bool* value) const
 {
-    boost::any result = mPimpl->get(key);
-
-    try {
-        (*value) = boost::any_cast < bool >(result);
-        return true;
-    } catch (const boost::bad_any_cast& /*e*/) {
-        TraceAlways(_("Preferences: %s is not a boolean"), key.c_str());
+    auto it = mPimpl->ppMap.find(key);
+    if (it == mPimpl->ppMap.end())
         return false;
-    }
+
+    auto ptr = boost::get<bool>(&it->second);
+    if (not ptr)
+        return false;
+
+    *value = *ptr;
+
+    return true;
 }
 
 }} //namespace vle utils

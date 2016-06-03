@@ -29,7 +29,6 @@
 #define VLE_UTILS_PREFERENCES_HPP 1
 
 #include <vle/DllDefines.hpp>
-#include <vle/utils/Types.hpp>
 #include <string>
 #include <vector>
 #include <memory>
@@ -37,8 +36,8 @@
 namespace vle { namespace utils {
 
 /**
- * This class permits to read and write the resources files `$VLE_HOME/vle.conf'
- * and stores them into internal structures.
+ * This class permits to read and write the resources files
+ * `$VLE_HOME/vle.conf' and stores them into internal structures.
  *
  * The resources file have a classical ini syntax:
  *
@@ -147,7 +146,7 @@ public:
     bool set(const std::string& key, double value);
 
     /**
-     * Insert an @c uint32_t into the specified key.
+     * Insert an @c long into the specified key.
      *
      * @code
      * Preferences f;
@@ -160,7 +159,7 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set(const std::string& key, uint32_t value);
+    bool set(const std::string& key, long value);
 
     /**
      * Insert an @c bool into the specified key.
@@ -244,11 +243,11 @@ public:
     bool get(const std::string& key, double* value) const;
 
     /**
-     * Get a @c uint32_t from specified key.
+     * Get a @c long from specified key.
      *
      * @code
      * Preferences f;
-     * uint32_t value;
+     * long value;
      * f.get("section.key", &value);
      * assert(value == 12345);
      *
@@ -261,7 +260,7 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not an @c integer.
      */
-    bool get(const std::string& key, uint32_t* value) const;
+    bool get(const std::string& key, long* value) const;
 
     /**
      * Get a @c bool from specified key.
