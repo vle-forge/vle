@@ -73,9 +73,8 @@ namespace po = boost::program_options;
 
 namespace vle { namespace utils {
 
-class Preferences::Pimpl
+struct Preferences::Pimpl
 {
-public:
     Pimpl(bool readOnly, std::string filename)
         : mGvlePackagesOptions("gvle.packages")
         , mGvleEditorOptions("gvle.editor")

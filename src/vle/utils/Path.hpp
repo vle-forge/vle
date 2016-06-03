@@ -38,7 +38,7 @@ namespace vle { namespace utils {
 /**
  * Define a list of directories.
  */
-typedef std::vector < std::string > PathList;
+using PathList = std::vector<std::string>;
 
 /**
  * Portable way to get and manage VLE's paths.
@@ -59,7 +59,28 @@ typedef std::vector < std::string > PathList;
  */
 class VLE_API Path
 {
+private:
+    Path();
+    ~Path() noexcept;
+
 public:
+    Path(const Path& other) = delete;
+    Path& operator=(const Path& other) = delete;
+    Path(Path&& other) = delete;
+    Path& operator=(Path&& other) = delete;
+
+    /**
+     * A singleton function that guaranteed to be destroyed. Instantiated
+     * on first use.
+     *
+     * @return Return the only one refernce to the Path object.
+     */
+    static Path& path()
+    {
+        static Path p;
+        return p;
+    }
+
     /**
      * Return the prefix of the compilation on Unix or installation
      * directory taken from registry on Windows.
@@ -200,31 +221,6 @@ public:
      */
     const PathList& getModelingDirs() const
     { return m_modeling; }
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *
-     * Manage singleton
-     *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /**
-     * Return a Path object instantiate in singleton method.
-     * @return A reference to the singleton object.
-     */
-    inline static Path& path()
-    { if (mPath == 0) mPath = new Path; return *mPath; }
-
-    /**
-     * Initialize the Path singleton.
-     */
-    inline static void init()
-    { path(); }
-
-    /**
-     * Delete Path object instantiate from function path().
-     */
-    inline static void kill()
-    { delete mPath; mPath = 0; }
 
     /**
      * Build the VLE_HOME directories:
@@ -452,10 +448,10 @@ private:
         }
     };
 
-    PathList    m_simulator;
-    PathList    m_stream;
-    PathList    m_output;
-    PathList    m_modeling;
+    PathList m_simulator;
+    PathList m_stream;
+    PathList m_output;
+    PathList m_modeling;
 
     std::string m_prefix; /*!< the $prefix of installation */
     std::string m_home; /*!< the $VLE_HOME */
@@ -473,15 +469,6 @@ private:
      * variable if it exist.
      */
     void readHomeDir();
-
-    /**
-     * A default constructor. This function clear the default
-     * directories, initialize the home, prefix, plug-ins and package
-     * directories.
-     *
-     * @throw utils::InternalError if Initialisation of the class failed.
-     */
-    Path();
 
     /**
      * Assign to the m_home attribut the content of the VLE_HOME
@@ -502,9 +489,6 @@ private:
      * Clear all plug-ins lists.
      */
     void clearPluginDirs();
-
-    static Path* mPath; /**< The static variable Path for singleton
-                           design pattern. */
 };
 
 /**

@@ -37,9 +37,6 @@ namespace vle {
 static void __vle_init()
 {
     xmlInitParser(); /**< Initialize the libxml2 library. */
-
-    utils::Path::init();
-    utils::Trace::init();
 }
 
 Init::Init()
@@ -67,9 +64,6 @@ Init::Init(const char *localname)
 
 Init::~Init()
 {
-    utils::Path::kill();
-    utils::Trace::kill();
-
     xmlCleanupParser();
 }
 

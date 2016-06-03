@@ -43,7 +43,7 @@ namespace vle { namespace utils {
  * The utils::Trace::Pimpl source.
  */
 
-class Trace::Pimpl
+struct Trace::Pimpl
 {
     void cleanup__()
     {
@@ -182,12 +182,6 @@ public:
         return mMutex;
     }
 
-    static Pimpl* mTrace;       /**< The singleton static variable, to
-                                   be sure to avoid all multithread
-                                   problem, call the Trace::init()
-                                   function before using macro or
-                                   utils::Trace API. */
-
 private:
     std::string mFilename;      /**< The current filename of the singleton. */
 
@@ -206,88 +200,50 @@ private:
                                  design pattern. */
 };
 
-Trace::Pimpl* Trace::Pimpl::mTrace = nullptr;
-
-/*
- * the utils::Trace source.
- */
-
-void Trace::init()
+Trace::Trace()
+    : ppImpl(new Trace::Pimpl())
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::Pimpl::mTrace = new Trace::Pimpl();
-    }
 }
 
-void Trace::kill()
-{
-	if (Trace::Pimpl::mTrace) {
-		delete Trace::Pimpl::mTrace;
-		Trace::Pimpl::mTrace = nullptr;
-    }
-}
+Trace::~Trace() noexcept = default;
 
 std::string Trace::getLogFile()
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    return Pimpl::mTrace->getLogFile();
+    return instance().ppImpl->getLogFile();
 }
 
 void Trace::setLogFile(const std::string& filename)
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    Pimpl::mTrace->setLogFile(filename);
+    instance().ppImpl->setLogFile(filename);
 }
 
 void Trace::setStandardOutput()
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    Pimpl::mTrace->setStandardOutput();
+    instance().ppImpl->setStandardOutput();
 }
 
 void Trace::setStandardError()
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    Pimpl::mTrace->setStandardError();
+    instance().ppImpl->setStandardError();
 }
 
 void Trace::send(const std::string& str, TraceLevelOptions level)
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    Pimpl::mTrace->send(str, level);
+    instance().ppImpl->send(str, level);
 }
 
 void Trace::send(TraceLevelOptions level, const char *format, ...)
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
-
     va_list ap;
     int size = 0;
 
@@ -307,9 +263,9 @@ void Trace::send(TraceLevelOptions level, const char *format, ...)
         return;
     va_end(ap);
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    Pimpl::mTrace->send(ret, level);
+    instance().ppImpl->send(ret, level);
 }
 
 std::string Trace::getDefaultLogFilename()
@@ -324,68 +280,44 @@ std::string Trace::getLogFilename(const std::string& filename)
 
 TraceStreamType Trace::getType()
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    return Pimpl::mTrace->getType();
+    return instance().ppImpl->getType();
 }
 
 TraceLevelOptions Trace::getLevel()
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    return Pimpl::mTrace->getLevel();
+    return instance().ppImpl->getLevel();
 }
 
 void Trace::setLevel(TraceLevelOptions level)
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    Pimpl::mTrace->setLevel(level);
+    instance().ppImpl->setLevel(level);
 }
 
 bool Trace::isInLevel(TraceLevelOptions level)
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    return Pimpl::mTrace->isInLevel(level);
+    return instance().ppImpl->isInLevel(level);
 }
 
 bool Trace::haveWarning()
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    return Pimpl::mTrace->haveWarning();
+    return instance().ppImpl->haveWarning();
 }
 
 size_t Trace::warnings()
 {
-    if (not Trace::Pimpl::mTrace) {
-        Trace::init();
-    }
+    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
-    std::lock_guard<std::mutex> lock(Trace::Pimpl::mTrace->getMutex());
-
-    return Pimpl::mTrace->warnings();
+    return instance().ppImpl->warnings();
 }
 
 TraceLevelOptions Trace::cast(int level) throw()

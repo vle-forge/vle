@@ -448,8 +448,6 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
 
     delete file1.project().model().model();
     delete file2.project().model().model();
-    utils::Trace::kill();
-    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_get_port_index)
@@ -478,8 +476,6 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
                         (ConnectionList::size_type)1);
 
     delete file.project().model().model();
-    utils::Trace::kill();
-    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_port)

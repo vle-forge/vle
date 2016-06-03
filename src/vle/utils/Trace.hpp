@@ -79,23 +79,30 @@ enum TraceStreamType
  */
 class VLE_API Trace
 {
+private:
+    Trace();
+    ~Trace() noexcept;
+
+    struct Pimpl;
+    std::unique_ptr<Pimpl> ppImpl;
+
 public:
-    Trace() = delete;
-    ~Trace() = delete;
     Trace(const Trace& other) = delete;
     Trace& operator=(const Trace& other) = delete;
     Trace(Trace&& other) = delete;
     Trace& operator=(Trace&& other) = delete;
 
     /**
-     * Initialize the Trace singleton.
+     * A singleton function that guaranteed to be destroyed. Instantiated
+     * on first use.
+     *
+     * @return Return the only one reference to the Trace object.
      */
-    static void init();
-
-    /**
-     * Delete Trace object instantiate from function Trace::init().
-     */
-    static void kill();
+    static Trace& instance()
+    {
+        static Trace t;
+        return t;
+    }
 
     /**
      * Get the current log filename.
@@ -233,10 +240,6 @@ public:
      * @return A TraceLevelOptions.
      */
     static TraceLevelOptions cast(int level) throw();
-
-private:
-    struct Pimpl;
-    Pimpl *mImpl;
 };
 
 }} // namespace vle utils

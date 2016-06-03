@@ -62,8 +62,6 @@ static const char *pkgdirname = "pkgs-" VLE_ABI_VERSION;
 
 namespace fs = boost::filesystem;
 
-Path* Path::mPath = 0;
-
 std::string Path::getLocaleDir() const
 {
     return buildDirname(m_prefix, "share", "locale");
@@ -227,7 +225,7 @@ PathList Path::getBinaryLibraries()
 
     for (auto elem : dirs) {
         fs::path dir(elem);
-        
+
         if (not fs::exists(dir) or not fs::is_directory(dir)) {
             throw utils::InternalError(
                 (fmt(_("Pkg list error: '%1%' is not a library directory")) %
@@ -369,8 +367,12 @@ bool Path::readEnv(const std::string& variable, PathList& out)
         boost::algorithm::split(result, path, boost::is_any_of(":"),
                                 boost::algorithm::token_compress_on);
 
-        PathList::iterator it(std::remove_if(result.begin(), result.end(),
-                                             std::not1(IsDirectory())));
+        PathList::iterator it(
+            std::remove_if(result.begin(), result.end(),
+                           [](const std::string& dirname)
+                           {
+                               return utils::Path::existDirectory(dirname);
+                           }));
 
         result.erase(it, result.end());
 
@@ -405,6 +407,8 @@ Path::Path()
     initPrefixDir();
     initVleHomeDirectory();
 }
+
+Path::~Path() noexcept = default;
 
 void Path::clearPluginDirs()
 {

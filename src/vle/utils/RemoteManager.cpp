@@ -652,7 +652,7 @@ RemoteManager::RemoteManager()
 {
 }
 
-RemoteManager::~RemoteManager()
+RemoteManager::~RemoteManager() noexcept
 {
 }
 
