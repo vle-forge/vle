@@ -31,94 +31,156 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/RemoteManager.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/vle.hpp>
+#include <vle/version.hpp>
+#include <boost/format.hpp>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
-#include <numeric>
-#include <boost/program_options.hpp>
-#include <boost/format.hpp>
+#include <iterator>
+#include <cstdio>
 #include <cstdlib>
+#include <cassert>
+#include <getopt.h>
 
-namespace po = boost::program_options;
+#ifdef VLE_HAVE_NLS
+# ifndef ENABLE_NLS
+#  define ENABLE_NLS
+# endif
+#  include <libintl.h>
+#  include <locale.h>
+#  define _(x) gettext(x)
+#  define gettext_noop(x) x
+#  define N_(x) gettext_noop(x)
+#else
+#  define _(x) x
+#  define N_(x) x
+#endif
 
-typedef std::vector < std::string > CmdArgs;
 
-struct VLE
-{
-    vle::Init app;
-
-    VLE(int verbose, int trace)
-        : app("")
-    {
-        vle::utils::Trace::setLevel(vle::utils::Trace::cast(verbose));
-
-        if (trace < 0)
-            vle::utils::Trace::setStandardError();
-        else if (trace > 0)
-            vle::utils::Trace::setStandardOutput();
-        else
-            vle::utils::Trace::setLogFile(
-                    vle::utils::Trace::getDefaultLogFilename());
-    }
-
-    ~VLE()
-    {
-        if (vle::utils::Trace::haveWarning() &&
-                vle::utils::Trace::getType() == vle::utils::TRACE_STREAM_FILE)
-            std::cerr << vle::fmt(
-                    "\n/!\\ Some warnings during run: See file %1%\n") %
-                vle::utils::Trace::getLogFile() << std::endl;
-    }
-};
-
-static int show_infos()
-{
-    std::cout << vle::fmt(
-        _("Virtual Laboratory Environment - %1%\n"
-          "Copyright (C) 2003 - 2014 The VLE Development Team.\n"
-          "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-          "You may redistribute copies of VLE\n"
-          "under the terms of the GNU General Public License.\n"
-          "For more information about these matters, see the file named "
-          "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
-
-    return EXIT_SUCCESS;
-}
-
-static int show_help(const po::options_description &desc)
-{
-    std::cout << desc << std::endl;
-
-    return EXIT_SUCCESS;
-}
-
-static int show_version()
-{
-    std::cout << vle::fmt(_("%1%\n")) % VLE_NAME_COMPLETE << std::endl;
-
-    return EXIT_SUCCESS;
-}
-
-static int show_package_list()
+static void show_infos() noexcept
 {
     std::vector<std::string> pkglist;
     vle::utils::Path::path().fillBinaryPackagesList(pkglist);
-    std::copy(pkglist.begin(), pkglist.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
 
-    return EXIT_SUCCESS;
+    puts(VLE_NAME_COMPLETE);
+    printf(_("%zu package(s) available %s:\n"),
+           pkglist.size() - 1, pkglist[0].c_str());
+
+    for (auto i = 1UL, e = pkglist.size(); i != e; ++i)
+        printf("%zu. %s\n", i - 1, pkglist[i].c_str());
 }
 
-static int remove_configuration_file()
+static void show_version() noexcept
 {
-    std::cout << vle::fmt(_("Remove configuration files\n"));
-    int ret = EXIT_SUCCESS;
+    printf(_("Virtual Laboratory Environment - %s\n"
+             "Copyright (C) 2003 - 2016 The VLE Development Team.\n"
+             "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+             "You may redistribute copies of VLE\n"
+             "under the terms of the GNU General Public License.\n"
+             "For more information about these matters, see the file"
+             " named COPYING.\n"), VLE_NAME_COMPLETE);
+}
+
+static void show_help() noexcept
+{
+    printf(
+        _("%s\nvle-%s [options...]\n\n"
+          "help,h      Produce help message\n"
+          "version,v   Print version string\n"
+          "infos       Informations of VLE\n"
+          "restart     Remove configuration file of VLE\n"
+          "list        Show the list of installed package\n"
+          "log-file    Trace of simulation are reported to the standard file\n"
+          "            ($VLE_HOME/vle.log"
+          "log-stdout  Trace of the simulation(s) are reported to the "
+          "standard output\n"
+          "\n"
+          "processor,o Select number of processor in manager mode [>= 1]\n"
+          "verbose,V   Verbose mode 0 - 3. [default 0]\n"
+          "                0 no trace and no long exception\n"
+          "                1 small simulation trace and long exception\n"
+          "                2 long simulation trace\n"
+          "                3 all simulation trace\n"
+          "manager,M  Use the manager mode to run experimental frames\n"
+          "package,P  Select package mode,\n  package name [options]...\n"
+          "                vle -P foo create: build new foo package\n"
+          "                vle -P foo configure: configure the foo package\n"
+          "                vle -P foo build: build the foo package\n"
+          "                vle -P foo test: start a unit test campaign\n"
+          "                vle -P foo install: install libs\n"
+          "                vle -P foo clean: clean up the build directory\n"
+          "                vle -P foo rclean: delete binary directories\n"
+          "                vle -P foo package: build packages\n"
+          "                vle -P foo all: build all depends of foo package\n"
+          "                vle -P foo depends: list depends of foo package\n"
+          "                vle -P foo list: list vpz and library package\n"
+          "remote,R   Select remote mode,\n  remote [command] [packages]...\n"
+          "                vle -R update: update the database\n"
+          "                vle -R search expression: search in database \n"
+          "                vle -R local_search expression: search in local\n"
+          "                vle -R install package: install package\n"
+          "                vle -R source package: download source package\n"
+          "                vle -R show package: show package in database\n"
+          "                vle -R localshow package: show package in local\n"
+          "config,C   Select configuration mode,\n  config variable value\n"
+          "                Update the vle.conf configuration file. Assign\n"
+          "                `value' to the `variable'\n"
+          "                vle -C vle.author me\n"
+          "                vle -C gvle.editor.font Monospace 10\n"),
+        VLE_NAME_COMPLETE, VLE_ABI_VERSION);
+}
+
+struct vle_initializer {
+    vle::Init app;
+
+    vle_initializer(int verbose, int trace)
+        : app("")
+    {
+        namespace vu = vle::utils;
+
+        vu::Trace::setLevel(vu::Trace::cast(verbose));
+        if (trace == 0)
+            vu::Trace::setStandardError();
+        else if (trace == 1)
+            vu::Trace::setStandardOutput();
+        else
+            vu::Trace::setLogFile(vu::Trace::getDefaultLogFilename());
+    }
+
+    ~vle_initializer() noexcept
+    {
+        namespace vu = vle::utils;
+
+        try {
+            if (vu::Trace::haveWarning() and
+                vu::Trace::getType() == vu::TRACE_STREAM_FILE)
+                fprintf(stderr, _("\n\t/!\\ Some warnings occurend: See "
+                                  "%s file"),
+                        vu::Trace::getLogFile().c_str());
+        } catch (...) {
+        }
+    }
+};
+
+enum cli_mode {
+    CLI_MODE_NOTHING = 0,
+    CLI_MODE_END = 1 << 1,
+    CLI_MODE_CONFIG = 1 << 2,
+    CLI_MODE_REMOTE = 1 << 3,
+    CLI_MODE_MANAGER = 1 << 4,
+    CLI_MODE_PACKAGE = 1 << 5
+};
+
+typedef std::vector<std::string> CmdArgs;
+
+static void remove_configuration_file()
+{
+    printf(_("Remove configuration files\n"));
 
     try {
         std::string filepath;
@@ -137,13 +199,9 @@ static int remove_configuration_file()
 
         vle::utils::Preferences prefs(false, "vle.conf");
     } catch (const std::exception &e) {
-        std::cerr << vle::fmt(_("Failed to remove configuration file: %1%\n"))
-            % e.what();
-
-        ret = EXIT_FAILURE;
+        fprintf(stderr, _("Failed to remove configuration file: %s\n"),
+                e.what());
     }
-
-    return ret;
 }
 
 static void show_package_content(vle::utils::Package& pkg)
@@ -152,17 +210,17 @@ static void show_package_content(vle::utils::Package& pkg)
     try {
         pkg.fillBinaryContent(pkgcontent);
     } catch (const std::exception &e) {
-        std::cerr << vle::fmt(_("Show package content error: %1% \n"))
-                              % e.what();
+        fprintf(stderr, _("Show package content error: %s\n"),
+                e.what());
         return;
     }
 
-    std::copy(pkgcontent.begin(), pkgcontent.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
+    for (const auto& elem : pkgcontent)
+        puts(elem.c_str());
 }
 
 static std::string search_vpz(const std::string &param,
-        vle::utils::Package& pkg)
+                              vle::utils::Package& pkg)
 {
     assert(not pkg.name().empty());
     if (vle::utils::Path::existFile(param))
@@ -173,7 +231,7 @@ static std::string search_vpz(const std::string &param,
     if (vle::utils::Path::existFile(np))
         return np;
 
-    std::cerr << vle::fmt(_("Filename '%1%' does not exist")) % param;
+    fprintf(stderr, _("Filename '%s' does not exist"), param.c_str());
 
     return std::string();
 }
@@ -193,7 +251,7 @@ static vle::manager::LogOptions convert_log_mode()
 }
 
 static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
-        int processor, vle::utils::Package& pkg)
+                       int processor, vle::utils::Package& pkg)
 {
     vle::manager::Manager man(convert_log_mode(),
                               vle::manager::SIMULATION_NONE |
@@ -215,9 +273,8 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
                 &error);
 
         if (error.code) {
-            std::cerr << vle::fmt(_("Experimental frames `%s' throws error %s"))
-                % (*it) % error.message.c_str();
-
+            fprintf(stderr, _("Experimental frames `%s' throws error %s"),
+                    it->c_str(), error.message.c_str());
             success = EXIT_FAILURE;
         }
     }
@@ -226,7 +283,7 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
 }
 
 static int run_simulation(CmdArgs::const_iterator it,
-        CmdArgs::const_iterator end, vle::utils::Package& pkg)
+                          CmdArgs::const_iterator end, vle::utils::Package& pkg)
 {
     vle::manager::Simulation sim(convert_log_mode(),
                                  vle::manager::SIMULATION_NONE |
@@ -243,9 +300,8 @@ static int run_simulation(CmdArgs::const_iterator it,
                     &error);
 
         if (error.code) {
-            std::cerr << vle::fmt(_("Simulator `%s' throws error %s \n")) %
-                (*it) % error.message.c_str();
-
+            fprintf(stderr, _("Simulator `%s' throws error %s\n"),
+                    it->c_str(), error.message.c_str());
             success = EXIT_FAILURE;
         }
     }
@@ -255,23 +311,29 @@ static int run_simulation(CmdArgs::const_iterator it,
 
 static bool init_package(vle::utils::Package& pkg, const CmdArgs &args)
 {
-    if (not pkg.existsBinary()) {
-        if (not pkg.existsSource()) {
-            if (std::find(args.begin(), args.end(), "create") == args.end()) {
-                std::cerr << vle::fmt(
-                    _("Package `%1%' does not exist. Use the create command"
-                      " before other command.\n")) % pkg.name();
+    if (not pkg.existsBinary() and not pkg.existsSource()) {
+        if (std::find(std::begin(args), std::end(args), "create")
+            == std::end(args)) {
+            fprintf(stderr, _("Package `%s' does not exist. Use the "
+                              "create command before other command.\n"),
+                    pkg.name().c_str());
 
-                return false;
-            }
+            return false;
         }
     }
+
     return true;
 }
 
-static int manage_package_mode(const std::string &packagename, bool manager,
-                               int processor, const CmdArgs &args)
+static int manage_package_mode(bool manager_mode, int processor, CmdArgs args)
 {
+    if (args.empty()) {
+        fprintf(stderr, _("missing package\n"));
+        return EXIT_FAILURE;
+    }
+
+    std::string packagename = std::move(args.front());
+    args.erase(args.begin());
     auto it = args.begin();
     auto end = args.end();
     bool stop = false;
@@ -286,12 +348,9 @@ static int manage_package_mode(const std::string &packagename, bool manager,
             try {
                 pkg.create();
             } catch (const std::exception &e) {
-                std::cerr << vle::fmt("Cannot create package: %1%")
-                                  % e.what()
-                          << std::endl;
+                fprintf(stderr, _("Cannot create package: %s\n"), e.what());
                 stop = true;
             }
-
         } else if (*it == "configure") {
             pkg.configure();
             pkg.wait(std::cerr, std::cerr);
@@ -321,10 +380,10 @@ static int manage_package_mode(const std::string &packagename, bool manager,
             pkg.wait(std::cerr, std::cerr);
             stop = not pkg.isSuccess();
         } else if (*it == "all") {
-            std::cerr << "all is not yet implemented\n";
+            fprintf(stderr, _("all is not yet implemented\n"));
             stop = true;
         } else if (*it == "depends") {
-            std::cerr << "Depends is not yet implemented\n";
+            fprintf(stderr, _("Depends is not yet implemented\n"));
             stop = true;
         } else if (*it == "list") {
             show_package_content(pkg);
@@ -338,7 +397,7 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     if (stop)
         ret = EXIT_FAILURE;
     else if (it != end) {
-        if (manager)
+        if (manager_mode)
             ret = run_manager(it, end, processor, pkg);
         else
             ret = run_simulation(it, end, pkg);
@@ -347,8 +406,16 @@ static int manage_package_mode(const std::string &packagename, bool manager,
     return ret;
 }
 
-static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
+static int manage_remote_mode(CmdArgs args)
 {
+    if (args.empty()) {
+        fprintf(stderr, _("missing argument\n"));
+        return EXIT_FAILURE;
+    }
+
+    std::string remotecmd = args.front();
+    args.erase(args.begin());
+
     vle::utils::RemoteManagerActions act = vle::utils::REMOTE_MANAGER_UPDATE;
     int ret = EXIT_SUCCESS;
 
@@ -367,8 +434,8 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
     else if (remotecmd == "localshow")
         act = vle::utils::REMOTE_MANAGER_LOCAL_SHOW;
     else {
-        std::cerr << vle::fmt(_("Remote error: remote command "
-                "'%1%' unrecognised \n")) % remotecmd;
+        fprintf(stderr, _("Remote error: remote command `%s' unrecognised\n"),
+                remotecmd.c_str());
         ret = EXIT_FAILURE;
         return ret;
     }
@@ -381,9 +448,9 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
             break;
         default:
             if (args.size() != 1) {
-                std::cerr << vle::fmt(_("Remote error: command '%1%' expects "
-                        "1 argument (got %2%)\n")) %
-                        remotecmd % args.size();
+                fprintf(stderr, _("Remote error: command '%s' expects "
+                                  "1 argument (got %zu\n"),
+                        remotecmd.c_str(), args.size());
                 ret = EXIT_FAILURE;
                 return ret;
             }
@@ -394,7 +461,7 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
         rm.join();
 
         if (rm.hasError()) {
-            std::cerr << vle::fmt(_("Remote error: %1%\n")) % rm.messageError();
+            fprintf(stderr, _("Remote error: %s\n"), rm.messageError().c_str());
             ret = EXIT_FAILURE;
             return ret;
         }
@@ -406,92 +473,87 @@ static int manage_remote_mode(const std::string &remotecmd, const CmdArgs &args)
         switch (act) {
         case vle::utils::REMOTE_MANAGER_UPDATE:
             if (itb == ite) {
-                std::cout << "No package has to be updated"
-                        << std::endl;
+                printf(_("No package has to be updated\n"));
             } else {
-                std::cout << "Packages to update (re-install them):"
-                        << std::endl;
-                for (; itb != ite; itb++) {
-                    std::cout << itb->name << "\t from " << itb->url
-                            << "\t (new version:  " << itb->major << "."
-                            << itb->minor << "." << itb->patch << ")"
-                            << std::endl;
-                }
+                printf(_("Packages to update (re-install them):"));
+                for (; itb != ite; itb++)
+                    printf(_("%s\tfrom %s\t (new version: %d.%d.%d)\n"),
+                           itb->name.c_str(), itb->url.c_str(),
+                           itb->major, itb->minor, itb->patch);
             }
             break;
         case vle::utils::REMOTE_MANAGER_SOURCE:
             if (itb == ite) {
-                std::cout << "No package has been downloaded" << std::endl;
+                printf(_("No package has been downloaded\n"));
             } else {
-                std::cout << "Package downloaded:" << std::endl;
+                printf(_("Package downloaded:"));
                 for (; itb != ite; itb++) {
-                    std::cout << itb->name << "\t from " << itb->url
-                            << std::endl;
+                    printf(_("%s\t from %s\n"), itb->name.c_str(),
+                           itb->url.c_str());
                 }
             }
             break;
         case vle::utils::REMOTE_MANAGER_INSTALL:
             if (itb == ite) {
-                std::cout << "No package has been installed" << std::endl;
+                printf(_("No package has been installed"));
             } else {
-                std::cout << "Package installed:" << std::endl;
+                printf(_("Package installed: "));
                 for (; itb != ite; itb++) {
-                    std::cout << itb->name << "\t from " << itb->url
-                        << std::endl;
+                    printf(_("%s\tfrom %s "), itb->name.c_str(),
+                           itb->url.c_str());
                 }
             }
             break;
         case vle::utils::REMOTE_MANAGER_LOCAL_SEARCH:
             if (itb == ite) {
-                std::cout << "No local package has been found" << std::endl;
+                printf(_("No local package has been found"));
             } else {
-                std::cout << "Found local packages:" << std::endl;
-                for (; itb != ite; itb++) {
-                    std::cout << itb->name << std::endl;
-                }
+                printf(_("Found local packages:"));
+                for (; itb != ite; itb++)
+                    puts(itb->name.c_str());
             }
             break;
         case vle::utils::REMOTE_MANAGER_SEARCH:
             if (itb == ite) {
-                std::cout << "No remote package has been found" << std::endl;
+                printf(_("No remote package has been found"));
             } else {
-                std::cout << "Found remote packages:" << std::endl;
+                printf(_("Found remote packages:"));
                 for (; itb != ite; itb++) {
-                    std::cout << itb->name << "\t from " << itb->url
-                        << std::endl;
+                    printf(_("%s\nfrom %s"), itb->name.c_str(),
+                           itb->url.c_str());
                 }
             }
             break;
         case vle::utils::REMOTE_MANAGER_SHOW:
             if (itb == ite) {
-                std::cout << "No remote package has been found" << std::endl;
+                printf(_("No remote package has been found"));
             } else {
                 for (; itb != ite; itb++) {
-                    std::cout << *itb << std::endl;
+                    printf(_("%s: %s\n"), itb->name.c_str(),
+                           itb->description.c_str());
                 }
             }
             break;
         case vle::utils::REMOTE_MANAGER_LOCAL_SHOW:
             if (itb == ite) {
-                std::cout << "No local package has been found" << std::endl;
+                printf(_("No local package has been found"));
             } else {
                 for (; itb != ite; itb++) {
-                    std::cout << *itb << std::endl;
+                    printf(_("%s: %s\n"), itb->name.c_str(),
+                           itb->description.c_str());
                 }
             }
             break;
         }
     } catch (const std::exception &e) {
-        std::cerr << vle::fmt(_("Remote error: %1%\n")) % e.what();
+        fprintf(stderr, _("Remote error: %s\n"), e.what());
         ret = EXIT_FAILURE;
     }
 
     return ret;
 }
 
-struct Comma:
-    public std::binary_function < std::string, std::string, std::string >
-{
+struct Comma {
     std::string operator()(const std::string &a, const std::string &b) const
     {
         if (a.empty())
@@ -501,210 +563,170 @@ struct Comma:
     }
 };
 
-static int manage_config_mode(const std::string &configvar, const CmdArgs &args)
+static int manage_config_mode(CmdArgs args)
 {
+    if (args.empty()) {
+        fprintf(stderr, _("missing variable name\n"));
+        return EXIT_FAILURE;
+    }
+
+    std::string configvar = args.front();
+    args.erase(args.begin());
+
     int ret = EXIT_SUCCESS;
 
     try {
         vle::utils::Preferences prefs(false, "vle.conf");
 
         std::string concat = std::accumulate(args.begin(), args.end(),
-                std::string(), Comma());
+                                             std::string(), Comma());
 
-	if (not prefs.set(configvar, concat))
-	    throw vle::utils::ArgError(
-		    (boost::format(_("Unknown variable `%1%'")) %
-		     configvar).str());
+        if (not prefs.set(configvar, concat))
+            throw vle::utils::ArgError(
+                (boost::format(_("Unknown variable `%1%'")) %
+                 configvar).str());
 
     } catch (const std::exception &e) {
-        std::cerr << vle::fmt(_("Config error: %1%\n")) % e.what();
+        fprintf(stderr, _("Config error: %s\n"), e.what());
         ret = EXIT_FAILURE;
     }
 
     return ret;
 }
 
-enum ProgramOptionsCode
+int main(int argc, char **argv)
 {
-    PROGRAM_OPTIONS_FAILURE = -1,
-    PROGRAM_OPTIONS_END = 0,
-    PROGRAM_OPTIONS_PACKAGE = 1,
-    PROGRAM_OPTIONS_REMOTE = 2,
-    PROGRAM_OPTIONS_CONFIG = 3,
-};
+    unsigned int mode = CLI_MODE_NOTHING;
+    int verbose_level = 0;
+    int processor_number = 1;
+    int log_stdout = 1;
+    int restart_conf = 0;
+    int opt_index;
+    int ret = EXIT_SUCCESS;
 
-struct ProgramOptions
-{
-    ProgramOptions(int *verbose, int *trace, int *processor,
-            bool *manager_mode, std::string *packagename,
-            std::string *remotecmd, std::string *configvar, CmdArgs *args)
-        : generic(_("Allowed options")), hidden(_("Hidden options")),
-        verbose(verbose), trace(trace), processor(processor),
-        manager_mode(manager_mode), packagename(packagename),
-        remotecmd(remotecmd), configvar(configvar), args(args)
-    {
-        generic.add_options()
-            ("help,h", _("Produce help message"))
-            ("version,v", _("Print version string"))
-            ("infos", _("Informations of VLE"))
-            ("restart", _("Remove configuration file of VLE"))
-            ("list", _("Show the list of installed package"))
-            ("log-file", _("Trace of simulation(s) are reported to the standard"
-                         " file ($VLE_HOME/vle.log"))
-            ("log-stdout", _("Trace of the simulation(s) are reported to the"
-                         " standard output"))
-            ("manager,m", _("Use the manager mode to run experimental frames"))
-            ("processor,o", po::value < int >(processor)->default_value(1),
-             _("Select number of processor in manager mode [>= 0]"))
-            ("verbose,V", po::value < int >(verbose)->default_value(0),
-             ("Verbose mode 0 - 3. [default 0]\n"
-              "0 no trace and no long exception\n"
-              "1 small simulation trace and long exception\n"
-              "2 long simulation trace\n"
-              "3 all simulation trace"))
-            ("package,P", po::value < std::string >(packagename),
-             _("Select package mode,\n  package name [options]...\n"
-                 "vle -P foo create: build new foo package\n"
-                 "vle -P foo configure: configure the foo package\n"
-                 "vle -P foo build: build the foo package\n"
-                 "vle -P foo test: start a unit test campaign\n"
-                 "vle -P foo install: install libs\n"
-                 "vle -P foo clean: clean up the build directory\n"
-                 "vle -P foo rclean: delete binary directories\n"
-                 "vle -P foo package: build packages\n"
-                 "vle -P foo all: build all depends of foo package\n"
-                 "vle -P foo depends: list depends of foo package\n"
-                 "vle -P foo list: list vpz and library package"))
-            ("remote,R", po::value < std::string >(remotecmd),
-             _("Select remote mode,\n  remote [command] [packages]...\n"
-                "\tvle -R update: update the database\n"
-                "\tvle -R search expression: search in database \n"
-                "\tvle -R local_search expression: search in local\n"
-                "\tvle -R install package: install package\n"
-                "\tvle -R source package: download source package\n"
-                "\tvle -R show package: show package in database\n"
-                "\tvle -R localshow package: show package in local"))
-            ("config,C", po::value < std::string >(configvar),
-             _("Select configuration mode,\n  config variable value\n"
-                "Update the vle.conf configuration file. Assign `value' to the"
-                " `variable'\n"
-                "vle -C vle.author me\n"
-                "vle -C gvle.editor.font Monospace 10"))
-            ;
+    const char* const short_opts = "hvV::p:MPRC";
+    const struct option long_opts[] = {
+        {"help", 0, nullptr, 'h'},
+        {"version", 0, nullptr, 'v'},
+        {"infos", 0, nullptr, 'i'},
+        {"restart", 0, &restart_conf, 1},
+        {"list", 0, nullptr, 'l'},
+        {"log-file", 0, &log_stdout, 0},
+        {"log-stdout", 0, &log_stdout, 1},
+        {"log-stderr", 0, &log_stdout, 2},
+        {"verbose", 2, nullptr, 'V'},
+        {"processor", 1, nullptr, 'p'},
+        {"manager", 0, nullptr, 'M'},
+        {"package", 0, nullptr, 'P'},
+        {"manager", 0, nullptr, 'R'},
+        {"config", 0, nullptr, 'C'},
+    };
 
-        hidden.add_options()
-            ("input", po::value < CmdArgs >(), _("input"))
-            ;
+    for (;;) {
+        const auto opt = getopt_long(argc, argv, short_opts,
+                                     long_opts, &opt_index);
+        if (opt == -1)
+            break;
 
-        desc.add(generic).add(hidden);
-    }
+        switch (opt) {
+        case 'C':
+            mode |= CLI_MODE_CONFIG;
+            break;
+        case 'R':
+            mode |= CLI_MODE_REMOTE;
+            break;
+        case 'P':
+            mode |= CLI_MODE_PACKAGE;
+            break;
+        case 'M':
+            mode |= CLI_MODE_MANAGER;
+            break;
+        case 'p':
+            try {
+                processor_number = std::stoi(::optarg);
+                if (processor_number <= 0)
+                    throw std::exception();
+            } catch (const std::exception& /* e */) {
+                fprintf(stderr, _("Bad processor_number: %s. "
+                                  "Assume processor_number=1\n"), ::optarg);
+                processor_number = 1;
+            }
+            break;
+        case 'V':
+            try {
+                verbose_level = std::stoi(::optarg);
+                if (verbose_level < 0)
+                    throw std::exception();
+            } catch (const std::exception& /* e */) {
+                fprintf(stderr, _("Bad verbose_level: %s. "
+                                  "Assume verbose_level=0\n"), ::optarg);
+                verbose_level = 0;
+            }
+            break;
+        case 'v':
+            mode |= CLI_MODE_END;
+            show_version();
+            break;
 
-    ~ProgramOptions()
-    {
-    }
+        case 'i':
+            mode |= CLI_MODE_END;
+            show_infos();
+            break;
 
-    int run(int argc, char *argv[])
-    {
-        po::positional_options_description p;
-        p.add("input", -1);
+        case 'h':
+            mode |= CLI_MODE_END;
+            show_help();
+            break;
 
-        try {
-            po::store(po::command_line_parser(argc,
-                        argv).options(desc).positional(p).run(), vm);
-            po::notify(vm);
-
-            if (vm.count("manager"))
-                *manager_mode = true;
-
-            if (vm.count("input"))
-                *args = vm["input"].as < CmdArgs >();
-
-            if (vm.count("log-file"))
-                *trace = 0;
-
-            if (vm.count("log-stdout"))
-                *trace = 1;
-
-            if (vm.count("help"))
-                return show_help(generic);
-
-            if (vm.count("version"))
-                return show_version();
-
-            if (vm.count("infos"))
-                return show_infos();
-
-            if (vm.count("list"))
-                return show_package_list();
-
-            if (vm.count("restart"))
-                return remove_configuration_file();
-
-            if (vm.count("package"))
-                return PROGRAM_OPTIONS_PACKAGE;
-
-            if (vm.count("remote"))
-                return PROGRAM_OPTIONS_REMOTE;
-
-            if (vm.count("config"))
-                return PROGRAM_OPTIONS_CONFIG;
-        } catch (const std::exception &e) {
-            std::cerr << e.what() << std::endl;
-
-            return PROGRAM_OPTIONS_FAILURE;
+        case '?':
+        default:
+            mode |= CLI_MODE_END;
+            ret = EXIT_FAILURE;
+            fprintf(stderr, _("Unknown command line option\n"));
+            break;
         }
-
-        std::cerr << _("Nothing to do. Use package, remote or config mode."
-                " See the help.\n");
-
-        return PROGRAM_OPTIONS_END;
     }
 
-    po::options_description desc, generic, hidden;
-    po::variables_map vm;
-    int *verbose, *trace, *processor;
-    bool *manager_mode;
-    std::string *packagename, *remotecmd, *configvar;
-    CmdArgs *args;
-};
+    //
+    // If --restart we remove configuration files but we continue the
+    // prcess.
+    //
+    if (restart_conf)
+        remove_configuration_file();
 
-int main(int argc, char *argv[])
-{
-    int ret;
-    int verbose = 0;
-    int processor = 1;
-    int trace = -1; /* < 0 = stderr, 0 = file and > 0 = stdout */
-    bool manager_mode = false;
-    std::string packagename, remotecmd, configvar;
-    CmdArgs args;
+    //
+    // If help(), infos(), versions() or and error in command line
+    // expression, we close application.
+    //
+    if (mode & CLI_MODE_END or mode & CLI_MODE_NOTHING)
+        return ret;
 
-    {
-        ProgramOptions prgs(&verbose, &trace, &processor, &manager_mode,
-                &packagename, &remotecmd, &configvar, &args);
+    //
+    // Otherwise, starts the simulation engines
+    //
+    vle_initializer v(verbose_level, log_stdout);
 
-        ret = prgs.run(argc, argv);
+    // if (::optind < argc)
+    CmdArgs commands(argv + ::optind, argv + argc);
 
-        if (ret == PROGRAM_OPTIONS_FAILURE)
-            return EXIT_FAILURE;
-        else if (ret == PROGRAM_OPTIONS_END
-                or (ret != PROGRAM_OPTIONS_REMOTE and args.empty()))
-            return EXIT_SUCCESS;
-    }
-
-    VLE app(verbose, trace); /* We are in package, remote or configuration
-                                mode, we need to initialize VLE's API. */
-
-    switch (ret) {
-    case PROGRAM_OPTIONS_PACKAGE:
-        return manage_package_mode(packagename, manager_mode, processor,
-                args);
-    case PROGRAM_OPTIONS_REMOTE:
-        return manage_remote_mode(remotecmd, args);
-    case PROGRAM_OPTIONS_CONFIG:
-        return manage_config_mode(configvar, args);
+    switch (mode) {
+    case CLI_MODE_PACKAGE:
+        ret = manage_package_mode(true, processor_number, std::move(commands));
+        break;
+    case CLI_MODE_MANAGER:
+        ret = manage_package_mode(false, processor_number, std::move(commands));
+        break;
+    case CLI_MODE_REMOTE:
+        ret = manage_remote_mode(std::move(commands));
+        break;
+    case CLI_MODE_CONFIG:
+        ret = manage_config_mode(std::move(commands));
+        break;
     default:
+        fprintf(stderr, _("Select only one mode in manager, "
+                          "remote or config\n"));
         break;
     };
 
-    return EXIT_SUCCESS;
+    return ret;
 }
