@@ -29,6 +29,7 @@
 #define VLE_UTILS_TRACE_HPP 1
 
 #include <vle/DllDefines.hpp>
+#include <memory>
 #include <string>
 
 namespace vle { namespace utils {
