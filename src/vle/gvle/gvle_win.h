@@ -106,6 +106,7 @@ protected:
     int findTabIndex(QString relPath);
     bool insideSrc(QModelIndex index);
     bool insideOut(QModelIndex index);
+    bool insideVpz(QModelIndex index);
     /**
      * @brief get a gvle file name (source and metadata)
      * @param relPath, eg: src/NewCpp.cpp
@@ -120,6 +121,7 @@ protected:
      */
     QString getCppPlugin(QString relpath);
     QString getOutPlugin(QString relpath);
+    QString getVpzPlugin(QString relpath);
 
 
 private slots:

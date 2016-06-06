@@ -92,12 +92,18 @@ public:
     QString          getMainPanelOutPluginPackage(QString name);
     PluginMainPanel* newInstanceMainPanelOutPlugin(QString name);
 
+    QStringList      getMainPanelVpzPluginsList();
+    QString          getMainPanelVpzPluginPath(QString name);
+    QString          getMainPanelVpzPluginPackage(QString name);
+    PluginMainPanel* newInstanceMainPanelVpzPlugin(QString name);
+
 private:
     QMap<QString,gvleplug>      mOutputPlugins;
     QMap<QString,gvleplug>      mCondPlugins;
     QMap<QString,gvleplug>      mSimPanelPlugins;
     QMap<QString,gvleplug>      mMainPanelPlugins;
     QMap<QString,gvleplug>      mMainPanelOutPlugins;
+    QMap<QString,gvleplug>      mMainPanelVpzPlugins;
     utils::ContextPtr           mCtx;
 };
 
