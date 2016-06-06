@@ -76,7 +76,7 @@ struct F
     std::unique_ptr<vle::Init> a;
     fs::path current_path;
 
-    F() throw()
+    F()
     {
         bs::error_code ec;
 
@@ -85,7 +85,11 @@ struct F
 
         fs::create_directory(current_path, ec);
 
-        if (fs::exists(current_path, ec) && fs::is_directory(current_path, ec)) {
+        /* We need to ensure each file really installed. */
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        if (fs::exists(current_path, ec) and
+            fs::is_directory(current_path, ec)) {
 
 #ifdef _WIN32
             ::_putenv((vle::fmt("VLE_HOME=%1%")
@@ -97,63 +101,48 @@ struct F
 
         fs::current_path(current_path, ec);
 
+        std::cout << "test start in " << current_path.string() << '\n';
+
         a = std::unique_ptr<vle::Init>(new vle::Init());
         vle::utils::Preferences prefs(false, "vle.conf");
     }
 
-    ~F() throw()
+    ~F()
     {
-        bs::error_code ec;
-
-        // if (fs::exists(current_path, ec) && fs::is_directory(current_path, ec))
-        //     fs::remove_all(current_path, ec); /**< comment this line if
-        //                                        * you want to conserve the
-        //                                        * temporary VLE_HOME
-        //                                        * directory. */
+        std::cout << "test finish in " << current_path.string() << '\n';
     }
-
-private:
-    F(const F&);
-    F& operator=(const F&);
 };
 
-BOOST_FIXTURE_TEST_CASE(show_path, F)
-{
-    using vle::utils::Package;
-    using vle::utils::Path;
-    using vle::utils::PathList;
+BOOST_GLOBAL_FIXTURE(F);
 
-    Package pkg("show_path");
-    pkg.create();
-    pkg.configure();
-    pkg.build();
-    pkg.install();
-
-    BOOST_REQUIRE_EQUAL((PathList::size_type)0,
-                        Path::path().getSimulatorDirs().size());
-}
-
-BOOST_FIXTURE_TEST_CASE(show_package, F)
+BOOST_AUTO_TEST_CASE(show_package)
 {
     using vle::utils::Path;
     using vle::utils::PathList;
     using vle::utils::Package;
-
-    std::ostringstream out, err;
 
     Package pkg("show_package");
     pkg.create();
+    pkg.wait(std::cerr, std::cerr);
     pkg.configure();
+    pkg.wait(std::cerr, std::cerr);
     pkg.build();
+    pkg.wait(std::cerr, std::cerr);
     pkg.install();
+    pkg.wait(std::cerr, std::cerr);
 
     /* We need to ensure each file really installed. */
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    BOOST_REQUIRE_EQUAL(static_cast<PathList::size_type>(0),
+                        Path::path().getSimulatorDirs().size());
 
     std::cout << "Installed packages:\n";
     PathList lst = Path::path().getBinaryPackages();
     std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
                   std::cout, "\n"));
+
+    BOOST_REQUIRE(Path::path().getBinaryPackages().size() == 1);
 
     if (not fs::exists(pkg.getExpDir(vle::utils::PKG_BINARY)))
         return;
@@ -162,15 +151,21 @@ BOOST_FIXTURE_TEST_CASE(show_package, F)
     PathList vpz = pkg.getExperiments();
     std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
                   std::cout, "\n"));
+
+    BOOST_REQUIRE(vpz.size() == 1);
 }
 
-BOOST_FIXTURE_TEST_CASE(remote_package_check_package_tmp, F)
+BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
 {
     utils::Package pkg_tmp("remote_package_check_package_tmp");
     pkg_tmp.create();
+    pkg_tmp.wait(std::cerr, std::cerr);
     pkg_tmp.configure();
+    pkg_tmp.wait(std::cerr, std::cerr);
     pkg_tmp.build();
+    pkg_tmp.wait(std::cerr, std::cerr);
     pkg_tmp.install();
+    pkg_tmp.wait(std::cerr, std::cerr);
 
     /* We need to ensure each file really installed. */
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -191,18 +186,20 @@ BOOST_FIXTURE_TEST_CASE(remote_package_check_package_tmp, F)
         rmt.join();
         rmt.getResult(&results);
 
-        BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 1u); /* We only build the tmp
-                                                    package, not x. */
+        //
+        // results.size() == 2, remote_manager_local_search and
+        // show_package (description.txt are the same, name is MyProject.
+        //
 
-        BOOST_REQUIRE(results[0].name == "MyProject");
+        BOOST_REQUIRE(results.empty() == false);
+        BOOST_REQUIRE(results.size() == 2);
+        BOOST_REQUIRE(results[0].name == "MyProject" and
+                      results[1].name == "MyProject");
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
+BOOST_AUTO_TEST_CASE(remote_package_local_remote)
 {
-    using namespace boost::assign;
-
     utils::PackageId pkg;
 
     pkg.size = 0;
@@ -212,7 +209,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
     pkg.description = "too good";
     pkg.url = "http://www.vle-project.org";
     pkg.md5sum = "1234567890987654321";
-    pkg.tags += "a", "b", "c";
+    pkg.tags = { "a", "b", "c" };
 
     {
         utils::PackageLinkId dep = { "a", 1, 1, 1,
@@ -239,8 +236,10 @@ BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
     fs::path path = utils::RemoteManager::getRemotePackageFilename();
 
     {
-        std::ofstream ofs(path.string().c_str());
+        std::ofstream ofs(path.string());
+        BOOST_REQUIRE(ofs.is_open());
         ofs << pkg << "\n";
+        BOOST_REQUIRE(ofs.good());
     }
 
     /* We need to ensure each file really installed. */
@@ -264,12 +263,12 @@ BOOST_FIXTURE_TEST_CASE(remote_package_local_remote, F)
         rmt.start(utils::REMOTE_MANAGER_LOCAL_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
-        BOOST_REQUIRE_EQUAL(results.empty(), true);
-        BOOST_REQUIRE_EQUAL(results.size(), 0u);
+        BOOST_REQUIRE_EQUAL(results.empty(), false);
+        BOOST_REQUIRE_EQUAL(results.size(), 2u);
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
+BOOST_AUTO_TEST_CASE(remote_package_read_write)
 {
     using namespace boost::assign;
 
@@ -420,7 +419,7 @@ BOOST_FIXTURE_TEST_CASE(remote_package_read_write, F)
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(test_compress_filepath, F)
+BOOST_AUTO_TEST_CASE(test_compress_filepath)
 {
     std::string filepath;
     std::string uniquepath;
@@ -429,10 +428,12 @@ BOOST_FIXTURE_TEST_CASE(test_compress_filepath, F)
         fs::path unique = fs::unique_path("%%%%-%%%%-%%%%-%%%%");
         vle::utils::Package pkg(unique.string());
         pkg.create();
+        pkg.wait(std::cerr, std::cerr);
         pkg.configure();
+        pkg.wait(std::cerr, std::cerr);
         pkg.build();
+        pkg.wait(std::cerr, std::cerr);
         pkg.install();
-
         filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
         uniquepath = unique.string();
     } catch (...) {
