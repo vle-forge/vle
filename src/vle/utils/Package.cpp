@@ -440,7 +440,7 @@ bool Package::wait(std::ostream& out, std::ostream& err)
 
             output.clear();
             error.clear();
-            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } else {
             break;
         }
