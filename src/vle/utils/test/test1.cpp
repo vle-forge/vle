@@ -178,6 +178,9 @@ BOOST_AUTO_TEST_CASE(test_generator)
 
 BOOST_AUTO_TEST_CASE(date_time)
 {
+    std::cout << "Test date_time " << vle::utils::DateTime::currentDate()
+              << "\n";
+
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::year((2451545)),
 			2000u);
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::month((2451545)),
@@ -249,6 +252,7 @@ BOOST_AUTO_TEST_CASE(date_time)
 
 BOOST_AUTO_TEST_CASE(julian_date)
 {
+
     BOOST_TEST_MESSAGE("\nJulian day number\n");
     BOOST_REQUIRE_EQUAL(2452192,
 			vle::utils::DateTime::toJulianDayNumber("2001-10-9"));
@@ -258,6 +262,13 @@ BOOST_AUTO_TEST_CASE(julian_date)
     BOOST_REQUIRE_EQUAL("2007-01-14 01:18:59",
                         vle::utils::DateTime::toJulianDay(2454115.05486));
 
+    //
+    // note: the value below is not the value above because
+    // julianDay(2454115.05486) involves not null milliseconds, etc..
+    // and toJulianDay only gives second precision
+    //
+    BOOST_REQUIRE_EQUAL(2454115.0548495371,
+                 vle::utils::DateTime::toJulianDay("2007-01-14 01:18:59"));
 
 
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::toJulianDay(2454115.05486),

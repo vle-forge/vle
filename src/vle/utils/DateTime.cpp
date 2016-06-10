@@ -28,85 +28,481 @@
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/date_time.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <sstream>
 #include <cmath>
+#include <iomanip>
+#include <regex>
+#include <ctime>
 
 namespace vle { namespace utils {
 
+//private
+
+//tells if it is a leap year
+bool intern_isLeapYear(long year)
+{
+    if (year % 4 != 0) return false;
+    if (year % 100 != 0) return true;
+    if (year % 400 != 0) return false;
+    return true;
+}
+
+//nb days into a year
+long intern_aYear(long year)
+{
+    if (intern_isLeapYear(year)) return 366;
+    return 365;
+}
+
+//nb days into a month
+long intern_aMonth(long year, long month)
+{
+    if (month == 1) return 31;
+    if (month == 2){
+        if (intern_isLeapYear(year)) return 29;
+        return 28;
+    }
+    if (month == 3) return 31;
+    if (month == 4) return 30;
+    if (month == 5) return 31;
+    if (month == 6) return 30;
+    if (month == 7) return 31;
+    if (month == 8) return 31;
+    if (month == 9) return 30;
+    if (month == 10) return 31;
+    if (month == 11) return 30;
+    if (month == 12) return 31;
+    return std::numeric_limits<long>::min();
+}
+
+
+
+
+struct intern_date
+{
+
+    long myear;
+    long mmonth;
+    long mday;
+    long mhours;
+    long mminutes;
+    long mseconds;
+
+    enum STR_FORMAT
+    {
+        extended, //"%Y-%m-%d %H:%M:%S"
+        ymd,      //"%Y-%m-%d"
+        hms       //"%H:%M:%S"
+    };
+
+    intern_date() :
+            myear(1400), mmonth(1), mday(1),mhours(0), mminutes(0), mseconds(0)
+    {
+    }
+
+    void initPartOfDay(double partofday)//between 0 and 1
+    {
+        double f = partofday * 24.0;
+        mhours = std::floor(f);
+        f -= mhours;
+
+        f *= 60.0;
+        mminutes = std::floor(f);
+        f -= mminutes;
+
+        f *= 60.0;
+        mseconds = std::floor(f);
+    }
+
+    intern_date(long year, long month, long day, double partofday)  :
+            myear(year), mmonth(month), mday(day), mhours(0), mminutes(0),
+            mseconds(0)
+    {
+        initPartOfDay(partofday);
+    }
+
+
+    intern_date(const intern_date& d) :
+        myear(d.myear), mmonth(d.mmonth), mday(d.mday), mhours(d.mhours),
+        mminutes(d.mminutes), mseconds(d.mseconds)
+    {
+    }
+
+    //convert to string
+    std::string toString(STR_FORMAT fmt)
+    {
+        std::stringstream ss;
+
+        if (fmt != hms) {
+            ss << myear << "-";
+            if (mmonth < 10) {
+                ss << "0";
+            }
+            ss << mmonth << "-";
+            if (mday < 10) {
+                ss << "0";
+            }
+            ss << mday ;
+        }
+        if (fmt == extended) {
+            ss << " ";
+        }
+        if (fmt != ymd) {
+            if (mhours < 10) {
+                ss << "0";
+            }
+            ss << mhours << ":";
+            if (mminutes < 10) {
+                ss << "0";
+            }
+            ss << mminutes << ":";
+            if (mseconds < 10) {
+                ss << "0";
+            }
+            ss << mseconds;
+
+        }
+
+        return ss.str();
+    }
+
+    //format : not extended = "%Y-%m-%d"
+    //         extended     = "%Y-%m-%d %H:%M:%S"
+    //return true if no error
+    bool fromString(const std::string& date, STR_FORMAT toparse)
+    {
+
+        bool error = false;
+
+        if (toparse == extended) {
+            //parse "%Y-%m-%d %H:%M:%S"
+            try {
+                std::regex regex("([^\\s]+)\\s([^\\s]+)");
+                std::sregex_iterator next(date.begin(), date.end(), regex);
+                std::sregex_iterator end;
+
+                if (next != end) {
+
+                    std::smatch match = *next;
+
+                    if (match.size() == 3) {
+                        fromString(match[1].str(), ymd);
+                        fromString(match[2].str(), hms);
+                    } else {
+                        error = true;
+                    }
+
+                } else {
+                    error =true;
+                }
+            } catch (const std::exception& e ){
+                error = true;
+            }
+        } else {
+            //parse "%Y-%m-%d" or "%H:%M:%S"
+            unsigned int nbmatches = 0;
+            try {
+                std::regex regex("[0-9]+|[^0-9]");
+                std::sregex_iterator next(date.begin(), date.end(), regex);
+                std::sregex_iterator end;
+                while (next != end) {
+                    std::smatch match = *next;
+                    nbmatches++;
+                    if (nbmatches == 1) {
+                        if (toparse == ymd) {
+                            myear = std::stol(match.str());
+                        } else {
+                            mhours = std::stol(match.str());
+                        }
+                    } else if (nbmatches == 3) {
+                        if (toparse == ymd) {
+                            mmonth = std::stol(match.str());
+                        } else {
+                            mminutes = std::stol(match.str());
+                        }
+                    } else if (nbmatches == 5) {
+                        if (toparse == ymd) {
+                            mday = std::stol(match.str());
+                        } else {
+                            mseconds = std::stol(match.str());
+                        }
+                    }
+                    next++;
+                }
+            } catch (const std::exception& e ){
+                error = true;
+            }
+            error = error or (nbmatches != 5);
+        }
+        return error;
+    }
+
+    //init from julian day eg: 2454115.05486
+    void fromJulianDay(double julianDay)
+    {
+
+        double partofday, J;
+        partofday = std::modf(julianDay, &J);
+
+        initPartOfDay(partofday);
+
+        //parameters for gregorian calendar (cf wikipedia)
+        int y=4716;
+        int j=1401;
+        int m=2;
+        int n=12;
+        int r=4;
+        int p=1461;
+        int v=3;
+        int u=5;
+        int s=153;
+        int w=2;
+        int B=274277;
+        int C=-38;
+
+        long f = J + j + (((4 * J + B) / 146097) * 3) / 4 + C;
+        long e = r * f + v;
+        long g = (e % p) / r;
+        long h = u * g + w;
+        mday = (h % s) / u + 1;
+        mmonth = ((h / s + m) % n) + 1;
+        myear = (e / p) - y + (n + m - mmonth) / n;
+    }
+
+    bool equals(const intern_date& d) const
+    {
+        return (myear == d.myear and mmonth == d.mmonth and mday == d.mday);
+    }
+
+    bool inf(const intern_date& d) const
+    {
+        if (myear < d.myear) return true;
+        if (myear > d.myear) return false;
+        if (mmonth < d.mmonth) return true;
+        if (mmonth > d.mmonth) return false;
+        return mday < d.mday;
+    }
+
+    bool sup(const intern_date& d) const
+    {
+        if (myear < d.myear) return false;
+        if (myear > d.myear) return true;
+        if (mmonth < d.mmonth) return false;
+        if (mmonth > d.mmonth) return true;
+        return mday > d.mday;
+    }
+
+    //tells if a date is valid
+    bool isValid() const
+    {
+        if (1 > mmonth or mmonth > 12) {
+            return false;
+        }
+        if (1 > mday or mday > intern_aMonth(myear, mmonth)) {
+            return false;
+        }
+        if (0 > mhours or mhours > 23) {
+            return false;
+        }
+        if (0 > mminutes or mminutes > 60) {
+            return false;
+        }
+        if (0 > mseconds or mseconds > 60) {
+            return false;
+        }
+        return true;
+    }
+
+    //add months to the current date
+    void addMonths(unsigned int months)
+    {
+        mmonth += months;
+        while (mmonth > 12) {
+            myear ++;
+            mmonth -= 12;
+            long nbDaysInMonth = intern_aMonth(mmonth, myear);
+            if (mday > nbDaysInMonth) {
+                mmonth ++;
+                mday -= nbDaysInMonth;
+            }
+        }
+    }
+
+    //daynNumber as computed in boost gregorian calendar.. (in wikipedia)
+    //12h Jan 1, 4713 BC (-4713-01-BC)
+    long julianDayNumber() const
+    {
+        unsigned short a = static_cast<unsigned short>((14-mmonth)/12);
+        unsigned short y = static_cast<unsigned short>(myear + 4800 - a);
+        unsigned short m = static_cast<unsigned short>(mmonth + 12*a - 3);
+        return mday+((153*m+2)/5)+365*y+(y/4)-(y/100)+(y/400)-32045;
+    }
+
+    double julianDay() const
+    {
+        double res = static_cast<double>(julianDayNumber());
+        res += mhours/24.0;
+        res += mminutes/1440.0;
+        res += mseconds/86400.0;
+        return res;
+    }
+
+
+    //day of the year (1<>366)
+    long dayOfyear() const
+    {
+        long ret = 0;
+        for (unsigned int m=1; m<mmonth-1; m++) {
+            ret += intern_aMonth(myear, m);
+        }
+        ret += mday;
+        return ret;
+    }
+
+    //days between a date and end of year (1<>366)
+    long daysUntilEndOfyear() const
+    {
+        return intern_aYear(myear) - dayOfyear();
+    }
+
+    //from boost date-time library
+    unsigned short dayOfWeek()
+    {
+        unsigned short a = static_cast<unsigned short>((14-mmonth)/12);
+        unsigned short y = static_cast<unsigned short>(myear - a);
+        unsigned short m = static_cast<unsigned short>(mmonth + 12*a - 2);
+        unsigned short d = static_cast<unsigned short>(
+                (mday + y + (y/4) - (y/100) + (y/400) + (31*m)/12) % 7);
+        return d;
+    }
+
+    //from boost date-time library
+    unsigned short weekOfYear()
+    {
+        unsigned long julianbegin = intern_date(myear, 1, 1, 0).julianDay();
+        unsigned long juliantoday = julianDay();
+        unsigned long day = (julianbegin + 3) % 7;
+        unsigned long week = (juliantoday + day - julianbegin + 4)/7;
+
+        if ((week >= 1) && (week <= 52)) {
+            return week;
+        }
+
+        if (week == 53) {
+            if((day==6) ||(day == 5 && intern_isLeapYear(myear))) {
+                return week; //under these circumstances week == 53.
+            } else {
+                return 1; //monday - wednesday is in week 1 of next year
+            }
+        }
+        //if the week is not in current year recalculate using the previous
+        //year as the beginning year
+        else if (week == 0) {
+            julianbegin = intern_date(myear-1, 1, 1, 0).julianDay();
+            day = (julianbegin + 3) % 7;
+            week = (juliantoday + day - julianbegin + 4)/7;
+            return week;
+        }
+        return week;  //not reachable -- well except
+                      // if day == 5 and is_leap_year != true
+    }
+
+    //days between a date and end of month (0<>31)
+    long idaysUntilEndOfMonth() const
+    {
+        return intern_aMonth(myear, mmonth)-mday;
+    }
+
+    //nb days between two dates (negative if this is before)
+    long daysUntil(const intern_date& d) const
+    {
+        if (equals(d)) return 0;
+        if (sup(d)) return -d.daysUntil(*this);
+        return d.julianDay() - julianDay();
+    }
+};
+
+
+
+/********************** public API *************************/
+//output format `2011-Jun-09 12:13:21'
 std::string DateTime::currentDate()
 {
-    boost::posix_time::ptime current(
-        boost::posix_time::second_clock::local_time());
 
-    std::ostringstream out;
-    out << current;
+    time_t rawtime;
+    struct tm * timeinfo;
 
-    return out.str();
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+
+//    const char wday_name[][4] = {
+//      "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+//    };
+    const char mon_name[][4] = {
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+    char result[26];
+    sprintf(result, "%d-%.3s-%d %.2d:%.2d:%.2d \n",
+            1900 + timeinfo->tm_year,
+            mon_name[timeinfo->tm_mon],
+            timeinfo->tm_mday,
+            timeinfo->tm_hour,
+            timeinfo->tm_min, timeinfo->tm_sec
+    );
+    return result;
+
 }
 
 unsigned int DateTime::year(const double& time)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-
-    return d.year();
+    intern_date d;
+    d.fromJulianDay(time);
+    return d.myear;
 }
 
 unsigned int DateTime::month(const double& time)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-
-    return d.month();
+    intern_date d;
+    d.fromJulianDay(time);
+    return d.mmonth;
 }
 
 unsigned int DateTime::dayOfMonth(const double& time)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-
-    return d.day();
+    intern_date d;
+    d.fromJulianDay(time);
+    return d.mday;
 }
 
 unsigned int DateTime::dayOfWeek(const double& time)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-
-    return d.day_of_week();
+    intern_date d;
+    d.fromJulianDay(time);
+    return d.dayOfWeek();
 }
 
 unsigned int DateTime::dayOfYear(const double& time)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-
-    return d.day_of_year();
+    intern_date d;
+    d.fromJulianDay(time);
+    return d.dayOfyear();
 }
 
 unsigned int DateTime::weekOfYear(const double& time)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-
-    return d.week_number();
+    intern_date d;
+    d.fromJulianDay(time);
+    return d.weekOfYear();
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 bool DateTime::isLeapYear(const double& time)
 {
-    return boost::gregorian::gregorian_calendar::is_leap_year(year(time));
+    intern_date d;
+    d.fromJulianDay(time);
+    return intern_isLeapYear(d.myear);;
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -118,32 +514,30 @@ double DateTime::aYear(const double& time)
 
 double DateTime::aMonth(const double& time)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-    boost::gregorian::months duration(1);
+    intern_date d;
+    d.fromJulianDay(time);
+    return(intern_aMonth(d.myear, d.mmonth));
 
-    return (int)((d + duration).julian_day() - d.julian_day());
 }
 
 double DateTime::years(const double& time, unsigned int n)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-    boost::gregorian::years duration(n);
 
-    return (int)((d + duration).julian_day() - d.julian_day());
+    intern_date d1;
+    d1.fromJulianDay(time);
+    intern_date d2(d1);
+    d2.myear += n;
+    return d2.julianDay() - d1.julianDay();
 }
 
 double DateTime::months(const double& time, unsigned int n)
 {
-    boost::gregorian::date d(
-	boost::numeric_cast <
-	boost::gregorian::date::date_int_type >(time));
-    boost::gregorian::months duration(n);
 
-    return (int)((d + duration).julian_day() - d.julian_day());
+    intern_date d1;
+    d1.fromJulianDay(time);
+    intern_date d2(d1);
+    d2.addMonths(n);
+    return d2.julianDay() - d1.julianDay();
 }
 
 DateTimeUnitOptions DateTime::convertUnit(const std::string& unit)
@@ -180,128 +574,46 @@ double DateTime::duration(const double& time, double duration,
 
 std::string DateTime::toJulianDayNumber(unsigned long date)
 {
-    boost::gregorian::date dmin(boost::gregorian::min_date_time);
-    boost::gregorian::days d(date - dmin.julian_day());
-
-    boost::gregorian::date result(dmin);
-    result = result + d;
-
-    return boost::gregorian::to_iso_extended_string(result);
+    intern_date d;
+    d.fromJulianDay(static_cast<double>(date));
+    return d.toString(intern_date::ymd);
 }
 
+
+//parsing "2001-10-9"
 long DateTime::toJulianDayNumber(const std::string& date)
 {
-    boost::gregorian::date d;
-
-    try {
-	d = boost::gregorian::from_simple_string(date);
-	return d.julian_day();
-    } catch (...) {
-	try {
-	    d = boost::gregorian::from_undelimited_string(date);
-	    return d.julian_day();
-	} catch (...) {
-            throw utils::InternalError(
-                (fmt(_("Date time error: error to convert '%1%' into julian"
-                       " day number")) % date).str());
-	}
-    }
-
-    return -1.0;
+    intern_date d;
+    d.fromString(date, intern_date::ymd);
+    return d.julianDayNumber();
 }
+
 
 std::string DateTime::toJulianDay(double date)
 {
-    double f, e;
-    f = std::modf(date, &e);
-
-    f *= 24.0;
-    long hours = std::floor(f);
-    f -= hours;
-
-    f *= 60.0;
-    long minutes = std::floor(f);
-    f -= minutes;
-
-    f *= 60.0;
-    long seconds = std::floor(f);
-    f -= seconds;
-
-    boost::posix_time::time_duration td(hours, minutes, seconds, f);
-    boost::posix_time::ptime d(boost::gregorian::date(e), td);
-
-    std::stringstream ss;
-    auto  facet = new boost::posix_time::time_facet();
-    facet->format("%Y-%m-%d %H:%M:%S");
-    ss.imbue(std::locale(std::locale::classic(), facet));
-    ss << d;
-    return ss.str();
-    //return boost::posix_time::to_simple_string(d);
+    intern_date d;
+    d.fromJulianDay(date);
+    return d.toString(intern_date::extended);
 }
 
+
+// parsing "2001-10-9 hh:mm:ss"
 double DateTime::toJulianDay(const std::string& date)
 {
-    boost::posix_time::ptime d;
 
-    try {
-	d = boost::posix_time::time_from_string(date);
-	switch (d.time_of_day().resolution()) {
-	case boost::date_time::milli:
-	    return d.date().julian_day() +
-		d.time_of_day().total_milliseconds() / 86400000.0;
-	case boost::date_time::micro:
-	    return d.date().julian_day() +
-		d.time_of_day().total_microseconds() / 86400000000.0;
-	case boost::date_time::nano:
-	    return d.date().julian_day() +
-		d.time_of_day().total_nanoseconds() / 86400000000000.0;
-	default:
-	    return d.date().julian_day() +
-		d.time_of_day().total_seconds() / 86400.0;
-	}
-    } catch (...) {
-	try {
-	    d = boost::posix_time::from_iso_string(date);
-	    switch (d.time_of_day().resolution()) {
-	    case boost::date_time::milli:
-		return d.date().julian_day() +
-		    d.time_of_day().total_milliseconds() / 86400000.0;
-	    case boost::date_time::micro:
-		return d.date().julian_day() +
-		    d.time_of_day().total_microseconds() / 86400000000.0;
-	    case boost::date_time::nano:
-		return d.date().julian_day() +
-		    d.time_of_day().total_nanoseconds() / 86400000000000.0;
-	    default:
-		return d.date().julian_day() +
-		    d.time_of_day().total_seconds() / 86400.0;
-	    }
-	} catch (...) {
-            throw utils::InternalError(
-                (fmt(_("Date time error: error to convert '%1%' into julian"
-                       " day")) % date).str());
-	}
-    }
-    return -1.0;
+    intern_date d;
+    d.fromString(date, intern_date::extended);
+    return d.julianDay();
 }
+
+
 
 bool DateTime::isValidYear(const double& date)
 {
-    namespace bg = boost::gregorian;
-
-    try {
-        bg::date mindate(bg::min_date_time);
-        bg::date maxdate(bg::max_date_time);
-        bg::date current(boost::numeric_cast < bg::date::date_int_type >(date));
-
-        if (not current.is_special()) {
-            return mindate < current and current < maxdate;
-        } else {
-            return false;
-        }
-    } catch(...) {
-        return false;
-    }
+    intern_date d;
+    d.fromJulianDay(date);
+    bool valid = (1399 < d.myear and d.myear < 10000);//boost rule ?
+    return valid;
 }
 
 double DateTime::toTime(const double& date, long& year,
@@ -309,36 +621,15 @@ double DateTime::toTime(const double& date, long& year,
                         long& hours, long& minutes,
                         long& seconds)
 {
-    namespace bg = boost::gregorian;
+    intern_date d;
+    d.fromJulianDay(date);
+    year = d.myear;
+    month = d.mmonth;
+    day = d.mday;
 
-    bg::date d(boost::numeric_cast < bg::date::date_int_type >(date));
-
-    if (not d.is_special()) {
-        year = d.year();
-        month = d.month();
-        day = d.day();
-
-        double f, e;
-        f = std::modf(date, &e);
-
-        f *= 24.0;
-        hours = std::floor(f);
-        f -= hours;
-
-        f *= 60.0;
-        minutes = std::floor(f);
-        f -= minutes;
-
-        f *= 60.0;
-        seconds = std::floor(f);
-        f -= seconds;
-
-        return f;
-    } else {
-        throw utils::ArgError(
-            (fmt(_("Can not convert date '%1%' to gregorian calendar")) %
-             date).str());
-    }
+    hours = d.mhours;
+    minutes = d.mminutes;
+    seconds = d.mseconds;
 
     return 0.0;
 }
@@ -347,12 +638,14 @@ void DateTime::currentDate(long& year,
                            long& month,
                            long& day)
 {
-    namespace bg = boost::gregorian;
 
-    bg::date d(bg::day_clock::local_day());
+    time_t rawtime;
+    struct tm * timeinfo;
 
-    year = d.year();
-    month = d.month();
-    day = d.day();
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+    year = timeinfo->tm_year;
+    month = timeinfo->tm_mon;
+    day = timeinfo->tm_mday;
 }
 }} // namespace vle utils
