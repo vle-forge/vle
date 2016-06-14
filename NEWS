@@ -21,6 +21,35 @@ and classes.
 
 - `boost::random`, `boost::thread` removed.
 
+### Debug
+
+The Debug mode is now dynamical. In the VPZ, we can provides a
+`debug="yes"` attribute to the `model` element to debug the atomic
+model. Before, we have to use the `DynamicsDbg.hpp` and replace the
+inheritance from `vle::devs::Dynamics` to `vle::devs:DynamicsDbg`.
+
+The `DynamicsDbg.hpp` header is removed from public API.
+
+In private implementation, the debug mode use the
+`vle::devs::DynamicsDbg` class placed between the
+`vle::devs::Simulator` and user's dynamics model.
+
+### Observation
+
+The Observation mechanism use the same behaviour than debug mode. A class between
+`vle::devs::Simulator` and the users'r dynamics or debug model (of course).
+
+We adjust the VPZ to provide observation for output, internal,
+external, confluent and finish functions by updating the `type`
+attribute in the `View` element of the VPZ. Type can be:
+
+- `event`: View::INTERNAL | View::EXTERNAL | View::CONFLUENT
+- `output`: View::OUTPUT
+- `internal`: View::INTERNAL;
+- `external`: View::EXTERNAL;
+- `confluent`: View::CONFLUENT;
+- `finish`: View::FINISH;
+
 ### Model in executable:
 
 From now, ModelFactory and StreamWriter can load symbol into the main
