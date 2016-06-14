@@ -171,21 +171,14 @@ endif ()
 set(Boost_DEBUG 0)
 if (WITH_MVLE OR WITH_CVLE)
   find_package(Boost COMPONENTS unit_test_framework filesystem system
-    date_time program_options serialization mpi)
+    serialization mpi)
 else ()
-  find_package(Boost COMPONENTS unit_test_framework filesystem system
-    date_time program_options)
+  find_package(Boost COMPONENTS unit_test_framework filesystem system)
 endif()
 
 if (NOT Boost_FILESYSTEM_FOUND)
   message(FATAL_ERROR "The boost filesystem library is required")
 endif (NOT Boost_FILESYSTEM_FOUND)
-if (NOT Boost_DATE_TIME_FOUND)
-  message(FATAL_ERROR "The boost date_time library is required")
-endif (NOT Boost_DATE_TIME_FOUND)
-if (NOT Boost_PROGRAM_OPTIONS_FOUND)
-  message(FATAL_ERROR "The boost program options library is required")
-endif (NOT Boost_PROGRAM_OPTIONS_FOUND)
 
 if (NOT Boost_SERIALIZATION_FOUND)
   message(STATUS "The boost serialization was not found, MPI disabled")
