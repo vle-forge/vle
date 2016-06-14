@@ -40,6 +40,7 @@
 #include <boost/format.hpp>
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <fstream>
 #include <iterator>
 #include <cstdio>
