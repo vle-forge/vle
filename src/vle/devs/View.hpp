@@ -31,95 +31,65 @@
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/value/Matrix.hpp>
+#include <vle/devs/StreamWriter.hpp>
 #include <string>
 #include <map>
 
 namespace vle { namespace devs {
 
-class Simulator;
-class StreamWriter;
+class Dynamics;
 class View;
 
-typedef std::multimap < Simulator*, std::string > ObservableList;
-typedef std::map < std::string, View* > ViewList;
-
 /**
- * @brief Represent a View on a devs::Simulator and a port name.
+ * @brief Represent a View on a devs::Dynamics and a port name.
  *
  */
 class VLE_LOCAL View
 {
 public:
-    typedef ObservableList::iterator iterator;
-    typedef ObservableList::const_iterator const_iterator;
-    typedef ObservableList::size_type size_type;
-    typedef ObservableList::value_type value_type;
+    View() = default;
+    ~View() = default;
 
-    View(const std::string& name, StreamWriter* stream)
-        : m_name(name), m_stream(stream), m_size(0)
-    {}
+    /**
+     * Initialize the View: a name and a stream writer.
+     *
+     */
+    void open(const std::string& name, std::unique_ptr<StreamWriter> stream);
 
-    virtual ~View();
-
-    void addObservable(Simulator* model,
+    void addObservable(Dynamics* model,
                        const std::string& portName,
                        const Time& currenttime);
 
     void finish(const Time& time);
 
-    virtual bool isEvent() const
-    { return false; }
-
-    virtual bool isTimed() const
-    { return false; }
-
-    virtual bool isFinish() const
-    { return false; }
-
     void run(const Time& current);
 
-    virtual Time getNextTime(const Time& current) const = 0;
+    void run(const Dynamics *dynamics, Time current, const std::string& port);
 
     /**
-     * Delete an observable for a specified Simulator. If model does not
+     * Delete an observable for a specified Dynamics. If model does not
      * exist, nothing is produce otherwise, the stream receives a message
      * that a observable is dead.
      * @param model delete observable attached to the specified
-     * Simulator.
+     * Dynamics.
      */
-    void removeObservable(Simulator* model);
+    void removeObservable(Dynamics* model);
 
     /**
-     * @brief Test if a simulator is already connected with the same port
+     * @brief Test if a dynamics is already connected with the same port
      * to the View.
-     * @param simulator the simulator to observe.
-     * @param portname the port of the simulator to observe.
-     * @return true if simulator is already connected with the same port.
+     * @param dynamics the dynamics to observe.
+     * @param portname the port of the dynamics to observe.
+     * @return true if dynamics is already connected with the same port.
      */
-    bool exist(Simulator* simulator, const std::string& portname) const;
+    bool exist(Dynamics* dynamics, const std::string& portname) const;
 
     /**
-     * @brief Test if a simulator is already connected to the View.
-     * @param simulator the simulator to search.
-     * @return true if simulator is already connected.
+     * @brief Test if a dynamics is already connected to the View.
+     * @param dynamics the dynamics to search.
+     * @return true if dynamics is already connected.
      */
-    bool exist(Simulator* simulator) const;
-
-    //
-    // Get/Set functions
-    //
-
-    inline const std::string& getName() const
-    { return m_name; }
-
-    inline const ObservableList& getObservableList() const
-    { return m_observableList; }
-
-    inline unsigned int getSize() const
-    { return m_size; }
-
-    inline StreamWriter * getStream() const
-    { return m_stream; }
+    bool exist(Dynamics* dynamics) const;
 
     /**
      * Return a pointer to the \c value::Matrix.
@@ -134,88 +104,12 @@ public:
     std::unique_ptr<value::Matrix> matrix() const;
 
 protected:
-    ObservableList      m_observableList;
-    std::string         m_name;
-    StreamWriter*       m_stream;
-    size_t              m_size;
+    using ObservableList = std::multimap<Dynamics*, std::string>;
+
+    ObservableList                m_observableList;
+    std::string                   m_name;
+    std::unique_ptr<StreamWriter> m_stream;
 };
-
-/**
- * @brief Define a Timed View base on devs::View class. This class
- * build state event with timed clock.
- */
-class VLE_LOCAL TimedView : public View
-{
-public:
-    TimedView(const std::string& name, StreamWriter* stream,
-              const Time& timestep)
-        : View(name, stream), mTimestep(timestep)
-    {}
-
-    virtual ~TimedView()
-    {}
-
-    virtual bool isTimed() const override
-    { return true; }
-
-    virtual Time getNextTime(const Time& current) const override
-    {
-        return current + mTimestep;
-    }
-
-private:
-    Time mTimestep;
-};
-
-/**
- * @brief Define a Event View base on devs::View class. This class
- * build state event when event are push.
- */
-class VLE_LOCAL EventView : public View
-{
-public:
-    EventView(const std::string& name, StreamWriter* stream)
-        : View(name, stream)
-    {}
-
-    virtual ~EventView()
-    {}
-
-    virtual bool isEvent() const override
-    { return true; }
-
-    virtual Time getNextTime(const Time& /*current*/) const override
-    {
-        return infinity;
-    }
-};
-
-/**
- * @brief Define a Finish view based on devs::View class. This class build
- * state event only at the end of the simulation.
- */
-class VLE_LOCAL FinishView : public View
-{
-public:
-    FinishView(const std::string& name, StreamWriter* stream)
-        : View(name, stream)
-    {}
-
-    virtual ~FinishView()
-    {}
-
-    virtual bool isFinish() const override
-    { return true; }
-
-    virtual Time getNextTime(const Time& /*current*/) const override
-    {
-        return infinity;
-    }
-};
-
-typedef std::map < std::string, FinishView* > FinishViewList;
-typedef std::map < std::string, EventView* > EventViewList;
-typedef std::map < std::string, TimedView* > TimedViewList;
 
 }} // namespace vle devs
 

@@ -156,8 +156,8 @@ public:
     void finish();
     void output(ExternalEventList& output, Time time);
     Time internalTransition(Time time);
-    Time externalTransition(const ExternalEventList& events, Time time);
-    Time confluentTransitions(const ExternalEventList& events, Time time);
+    Time externalTransition(Time time);
+    Time confluentTransitions(Time time);
     std::unique_ptr<value::Value> observation(const ObservationEvent& event) const;
 
 
@@ -188,14 +188,50 @@ public:
         m_have_handle = false;
     }
 
+    bool haveExternalEvents() const noexcept
+    {
+        return not m_external_events.empty();
+    }
+
+    void addExternalEvents(Simulator *simulator,
+                           std::shared_ptr<value::Value> values,
+                           const std::string& portname)
+    {
+        m_external_events_nextbag.emplace_back(simulator, values, portname);
+    }
+
+    void clearExternalEvents()
+    {
+        m_external_events.clear();
+    }
+
+    void swapExternalEvents()
+    {
+        m_external_events.clear();
+        m_external_events.swap(m_external_events_nextbag);
+    }
+
+    void setInternalEvent() noexcept
+    {
+        m_have_internal = true;
+    }
+
+    bool haveInternalEvent() const noexcept
+    {
+        return m_have_internal;
+    }
+
 private:
     std::unique_ptr<Dynamics> m_dynamics;
     vpz::AtomicModel*   m_atomicModel;
     TargetSimulatorList mTargets;
+    ExternalEventList   m_external_events;
+    ExternalEventList   m_external_events_nextbag;
     std::string         m_parents;
     Time                m_tn;
     HandleT             m_handle;
     bool                m_have_handle;
+    bool                m_have_internal;
 };
 
 }} // namespace vle devs

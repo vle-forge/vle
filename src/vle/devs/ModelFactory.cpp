@@ -30,6 +30,8 @@
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/devs/DynamicsDbg.hpp>
+#include <vle/devs/DynamicsObserver.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
 #include <vle/devs/Executive.hpp>
 #include <vle/vpz/BaseModel.hpp>
@@ -42,12 +44,17 @@
 namespace vle { namespace devs {
 
 ModelFactory::ModelFactory(const utils::ModuleManager& modulemgr,
+                           std::map<std::string, View>& eventviews,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
                            RootCoordinator& root)
-    : mModuleMgr(modulemgr), mDynamics(dyn), mClasses(cls), mExperiment(exp),
-      mRoot(root)
+    : mModuleMgr(modulemgr)
+    , mEventViews(eventviews)
+    , mDynamics(dyn)
+    , mClasses(cls)
+    , mExperiment(exp)
+    , mRoot(root)
 {
 }
 
@@ -129,7 +136,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
     }
 
     try {
-        sim->addDynamics(attachDynamics(coordinator, sim, dyn, initValues));
+        sim->addDynamics(attachDynamics(coordinator, sim, dyn,
+                                        initValues, observable));
     } catch(const std::exception& /*e*/) {
         initValues.value().clear();
         throw;
@@ -143,19 +151,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
 
         for (const auto & elem : lst) {
             const vpz::ViewNameList& vnlst(elem.second.viewnamelist());
-            for (const auto & vnlst_jt : vnlst) {
-
-                View* view = coordinator.getView(vnlst_jt);
-
-                if (not view) {
-                    throw utils::InternalError(
-                        (fmt(_("The view '%1%' is unknow of coordinator "
-                               "view list")) % vnlst_jt).str());
-                }
-
-                view->addObservable(sim, elem.first,
-                                    coordinator.getCurrentTime());
-            }
+            for (const auto & viewname : vnlst)
+                coordinator.addObservableToView(model, elem.first, viewname);
         }
     }
 
@@ -236,21 +233,114 @@ buildNewDynamicsWrapper(devs::Simulator* atom,
     }
 }
 
-std::unique_ptr<Dynamics> buildNewDynamics(devs::Simulator* atom,
-                                           const vpz::Dynamic& dyn,
-                                           const InitEventList& events,
-                                           void *symbol)
+//
+// Compute the dynamics observer options from the observable. If observable is
+// empty or equal to Tined, the model can be observed with a TimedView
+// otherwise, we compute which functions to observe.
+//
+bool haveEventView(const vpz::Views& views,
+                   const std::string& observable)
+{
+    if (observable.empty())
+        return false;
+
+    const auto& obs(views.observables().get(observable));
+    const auto& lst(obs.observableportlist());
+
+    for (const auto& elem: lst) {
+        const auto& viewnamelist(elem.second.viewnamelist());
+        for (const auto& viewname: viewnamelist) {
+            const auto& view = views.get(viewname);
+            if (not (view.type() & vpz::View::TIMED))
+                return true;
+        }
+    }
+
+    return false;
+}
+
+void assignEventView(
+    std::map<std::string, View>& views,
+    const vpz::Views& vpzviews,
+    const std::string& observable,
+    const std::unique_ptr<DynamicsObserver>& dynamics)
+{
+    const auto& obs(vpzviews.observables().get(observable));
+    const auto& lst(obs.observableportlist());
+
+    for (const auto& elem: lst) {
+        const auto& viewnamelist(elem.second.viewnamelist());
+        for (const auto& viewname: viewnamelist) {
+            const auto& v = vpzviews.get(viewname);
+
+            if (v.type() == vpz::View::TIMED)
+                continue;
+
+            auto& vv = views.at(viewname);
+    // for (auto& viewpair : views) {
+    //     if (not viewpair.second.exist(dynamics.get(), observable)) {
+            
+            // const auto &v = vpzviews.get(viewpair.first);
+            if (v.type() & vpz::View::OUTPUT)
+                dynamics->ppOutput.emplace_back(&vv, elem.first);
+
+            if (v.type() & vpz::View::INTERNAL)
+                dynamics->ppInternal.emplace_back(&vv, elem.first);
+
+            if (v.type() & vpz::View::EXTERNAL)
+                dynamics->ppExternal.emplace_back(&vv, elem.first);
+
+            if (v.type() & vpz::View::CONFLUENT)
+                dynamics->ppConfluent.emplace_back(&vv, elem.first);
+
+            if (v.type() & vpz::View::FINISH)
+                dynamics->ppFinish.emplace_back(&vv, elem.first);
+        }
+    }
+}
+
+std::unique_ptr<Dynamics> buildNewDynamics(
+    std::map<std::string, View>& views,
+    const vpz::Views& vpzviews,
+    const std::string& observable,
+    devs::Simulator* atom,
+    const vpz::Dynamic& dyn,
+    const InitEventList& events,
+    void *symbol)
 {
     typedef Dynamics*(*fctdyn)(const DynamicsInit&, const InitEventList&);
 
-    fctdyn fct = utils::functionCast < fctdyn >(symbol);
+    fctdyn fct = utils::functionCast<fctdyn>(symbol);
 
     try {
         utils::PackageTable pkg_table;
 
-        return std::unique_ptr<Dynamics>(
-            fct(DynamicsInit(*atom->getStructure(),
-                             pkg_table.get(dyn.package())), events));
+        DynamicsInit init(*atom->getStructure(), pkg_table.get(dyn.package()));
+        auto dynamics = std::unique_ptr<Dynamics>(fct(init, events));
+
+        if (haveEventView(vpzviews, observable)) {
+            auto observation = std::make_unique<DynamicsObserver>(init, events);
+
+            if (atom->getStructure()->needDebug()) {
+                auto debug = std::make_unique<DynamicsDbg>(init, events);
+                debug->set(std::move(dynamics));
+                observation->set(std::move(debug));
+            } else {
+                observation->set(std::move(dynamics));
+            }
+
+            assignEventView(views, vpzviews, observable, observation);
+
+            return std::move(observation);
+        }
+
+        if (atom->getStructure()->needDebug()) {
+            auto debug = std::make_unique<DynamicsDbg>(init, events);
+            debug->set(std::move(dynamics));
+            return std::move(debug);
+        } else {
+            return std::move(dynamics);
+        }
     } catch(const std::exception& e) {
         throw utils::ModellingError(
             (fmt(_("Atomic model `%1%:%2%' (from dynamics `%3%' library"
@@ -261,24 +351,52 @@ std::unique_ptr<Dynamics> buildNewDynamics(devs::Simulator* atom,
     }
 }
 
-std::unique_ptr<Dynamics> buildNewExecutive(Coordinator& coordinator,
-                                            devs::Simulator* atom,
-                                            const vpz::Dynamic& dyn,
-                                            const InitEventList& events,
-                                            void *symbol)
+std::unique_ptr<Dynamics> buildNewExecutive(
+    std::map<std::string, View>& views,
+    const vpz::Views& vpzviews,
+    const std::string& observable,
+    Coordinator& coordinator,
+    devs::Simulator* atom,
+    const vpz::Dynamic& dyn,
+    const InitEventList& events,
+    void *symbol)
 {
     typedef Dynamics*(*fctexe)(const ExecutiveInit&, const InitEventList&);
 
-    fctexe fct = utils::functionCast < fctexe >(symbol);
+    fctexe fct = utils::functionCast<fctexe>(symbol);
 
     try {
         utils::PackageTable pkg_table;
 
-        return std::unique_ptr<Dynamics>(
-            fct(ExecutiveInit(
-                    *atom->getStructure(),
-                    pkg_table.get(dyn.package()),
-                    coordinator), events));
+        ExecutiveInit executiveinit(*atom->getStructure(),
+                                    pkg_table.get(dyn.package()),
+                                    coordinator);
+        DynamicsInit init(*atom->getStructure(), pkg_table.get(dyn.package()));
+        auto executive = std::unique_ptr<Dynamics>(fct(executiveinit, events));
+
+        if (haveEventView(vpzviews, observable)) {
+            auto observation = std::make_unique<DynamicsObserver>(init, events);
+
+            if (atom->getStructure()->needDebug()) {
+                auto debug = std::make_unique<DynamicsDbg>(init, events);
+                debug->set(std::move(executive));
+                observation->set(std::move(debug));
+            } else {
+                observation->set(std::move(executive));
+            }
+
+            assignEventView(views, vpzviews, observable, observation);
+
+            return std::move(observation);
+        }
+
+        if (atom->getStructure()->needDebug()) {
+            auto debug = std::make_unique<DynamicsDbg>(init, events);
+            debug->set(std::move(executive));
+            return std::move(debug);
+        } else {
+            return std::move(executive);
+        }
     } catch(const std::exception& e) {
         throw utils::ModellingError(
             (fmt(_("Executive model `%1%:%2%' (from dynamics `%3%'"
@@ -294,7 +412,8 @@ std::unique_ptr<Dynamics>
 ModelFactory::attachDynamics(Coordinator& coordinator,
                              devs::Simulator* atom,
                              const vpz::Dynamic& dyn,
-                             const InitEventList& events)
+                             const InitEventList& events,
+                             const std::string& observable)
 {
     void *symbol = nullptr;
     utils::ModuleType type = utils::MODULE_DYNAMICS;
@@ -329,9 +448,12 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
 
     switch (type) {
     case utils::MODULE_DYNAMICS:
-        return buildNewDynamics(atom, dyn, events, symbol);
+        return buildNewDynamics(mEventViews, mExperiment.views(),
+                                observable, atom, dyn, events, symbol);
     case utils::MODULE_DYNAMICS_EXECUTIVE:
-        return buildNewExecutive(coordinator, atom, dyn, events, symbol);
+        return buildNewExecutive(mEventViews, mExperiment.views(),
+                                 observable, coordinator, atom,
+                                 dyn, events, symbol);
     case utils::MODULE_DYNAMICS_WRAPPER:
         return buildNewDynamicsWrapper(atom, dyn, events, symbol);
     default:

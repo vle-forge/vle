@@ -81,11 +81,6 @@ private:
     std::string m_portName;
 };
 
-/**
- * @brief Define a vector pointer of ObservationEvent.
- */
-typedef std::vector < ObservationEvent* > ObservationEventList;
-
 }} // namespace vle devs
 
 #endif

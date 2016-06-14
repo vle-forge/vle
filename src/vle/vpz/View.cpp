@@ -31,14 +31,12 @@
 
 namespace vle { namespace vpz {
 
-View::View(const std::string& name,
-           View::Type type,
-           const std::string& output,
-           double timestep) :
-    m_name(name),
-    m_type(type),
-    m_output(output),
-    m_timestep(timestep)
+View::View(const std::string& name, View::Type type,
+           const std::string& output, double timestep)
+    : m_timestep(timestep)
+    , m_name(name)
+    , m_output(output)
+    , m_type(type)
 {
     if (m_type == View::TIMED) {
         if (m_timestep <= 0.0) {
@@ -49,27 +47,26 @@ View::View(const std::string& name,
     }
 }
 
+View::View(const std::string& name)
+    : m_timestep(0.0)
+    , m_name(name)
+    , m_type(static_cast<Type>(View::INTERNAL | View::EXTERNAL |
+                               View::CONFLUENT))
+{
+}
+
 void View::write(std::ostream& out) const
 {
     out << "<view "
         << "name=\"" << m_name.c_str() << "\" "
-        << "output=\"" << m_output.c_str() << "\" ";
+        << "output=\"" << m_output.c_str() << "\" "
+        << "type=\"" << streamtype() << "\" ";
 
-    switch (m_type) {
-    case View::EVENT:
-        out << "type=\"event\"";
-        break;
-    case View::TIMED:
-        out << "type=\"timed\" "
-            << "timestep=\"" << m_timestep << "\"";
-        break;
-    case View::FINISH:
-        out << "type=\"finish\"";
-        break;
-    }
-
+    if (m_type == TIMED)
+        out << "timestep=\"" << m_timestep << "\" ";
+    
     if (m_data.empty()) {
-        out << " />\n";
+        out << "/>\n";
     } else {
         out << ">\n"
             << "<![CDATA[\n"
@@ -77,6 +74,42 @@ void View::write(std::ostream& out) const
             << "]]>\n"
             << "</view>\n";
     }
+}
+
+std::string View::streamtype() const
+{
+    if (m_type == TIMED)
+        return "timed";
+
+    std::string ret;
+    if (m_type & View::OUTPUT)
+        ret = "OUTPUT";
+
+    if (m_type & View::INTERNAL) {
+        if (not ret.empty())
+            ret += ',';
+        ret += "INTERNAL";
+    }
+    
+    if (m_type & View::EXTERNAL) {
+        if (not ret.empty())
+            ret += ',';
+        ret += "EXTERNAL";
+    }
+    
+    if (m_type & View::CONFLUENT) {
+        if (not ret.empty())
+            ret += ',';
+        ret += "CONFLUENT";
+    }
+    
+    if (m_type & View::FINISH) {
+        if (not ret.empty())
+            ret += ',';
+        ret += "FINISH";
+    }
+
+    return ret;
 }
 
 void View::setTimestep(double time)

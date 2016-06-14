@@ -63,10 +63,10 @@ namespace vle { namespace vpz {
          * @param observable The observable to attach.
          */
         AtomicModel(const std::string& name,
-                        CoupledModel* parent,
-                        const std::string& condition,
-                        const std::string& dynamic,
-                        const std::string& observable);
+                    CoupledModel* parent,
+                    const std::string& condition,
+                    const std::string& dynamic,
+                    const std::string& observable);
 
         AtomicModel(const AtomicModel& mdl);
 
@@ -78,7 +78,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to delete.
          */
-	virtual ~AtomicModel() { }
+        virtual ~AtomicModel() { }
 
         /**
          * @brief Return true, AtomicModel is an atomic model.
@@ -121,11 +121,11 @@ namespace vle { namespace vpz {
         inline void addCondition(const std::string& str)
         { m_conditions.push_back(str); }
 
-	/**
-	 * @brief Del a condition.
-	 * @param str The condition to delete.
-	 */
-	void delCondition(const std::string& str);
+        /**
+         * @brief Del a condition.
+         * @param str The condition to delete.
+         */
+        void delCondition(const std::string& str);
 
         /**
          * @brief Assign the dynamic.
@@ -153,7 +153,7 @@ namespace vle { namespace vpz {
          * @brief Write the atomic model in the output stream.
          * @param out output stream.
          */
-	virtual void writeXML(std::ostream& out) const override;
+        virtual void writeXML(std::ostream& out) const override;
 
         /**
          * @brief Output the AtomicModel informations into a std::ostream.
@@ -177,58 +177,75 @@ namespace vle { namespace vpz {
         void write(std::ostream& out) const override;
 
         /**
-	 * @brief Update the dynamics the AtomicModel
-	 * where an oldname became newname.
-	 * @param oldname the old name of the dynamics.
-	 * @param newname the new name of the dynamics.
-	 */
+         * @brief Update the dynamics the AtomicModel
+         * where an oldname became newname.
+         * @param oldname the old name of the dynamics.
+         * @param newname the new name of the dynamics.
+         */
         virtual void updateDynamics(const std::string& oldname,
                             const std::string& newname) override;
 
         /**
-	 * @brief purge the dymamics not present in the list.
-	 * @param dynamicslist a list of dynamics name
-	 */
-	virtual void purgeDynamics(const std::set < std::string >& dynamicslist) override;
+         * @brief purge the dymamics not present in the list.
+         * @param dynamicslist a list of dynamics name
+         */
+        virtual void purgeDynamics(const std::set < std::string >& dynamicslist) override;
 
         /**
-	 * @brief Update the Observable of the AtomicModel where an
-	 * oldname became newname, for each model.
-	 * @param oldname the old name of the observable.
-	 * @param newname the new name of the observable.
-	 */
-	virtual void updateObservable(const std::string& oldname,
+         * @brief Update the Observable of the AtomicModel where an
+         * oldname became newname, for each model.
+         * @param oldname the old name of the observable.
+         * @param newname the new name of the observable.
+         */
+        virtual void updateObservable(const std::string& oldname,
                                       const std::string& newname) override;
 
         /**
-	 * @brief purge the observable reference of the AtomicModel
-	 * where the observable is not present in the list.
-	 * @param observablelist a list of observable name
-	 */
-	virtual void purgeObservable(const std::set < std::string >& observablelist) override;
+         * @brief purge the observable reference of the AtomicModel
+         * where the observable is not present in the list.
+         * @param observablelist a list of observable name
+         */
+        virtual void purgeObservable(const std::set < std::string >& observablelist) override;
 
         /**
-	 * @brief Update the Conditions of the AtomicModel where an
-	 * oldname became newname, for the model.
-	 * @param oldname the old name of the observable.
-	 * @param newname the new name of the observable.
-	 */
-	virtual void updateConditions(const std::string& oldname,
+         * @brief Update the Conditions of the AtomicModel where an
+         * oldname became newname, for the model.
+         * @param oldname the old name of the observable.
+         * @param newname the new name of the observable.
+         */
+        virtual void updateConditions(const std::string& oldname,
                                       const std::string& newname) override;
 
         /**
-	 * @brief purge the Conditions references of the model where the
-	 * Condition is not present in the list
-	 * @param conditionlist a list of condition name
-	 */
-	virtual void purgeConditions(const std::set < std::string >& conditionlist) override;
+         * @brief purge the Conditions references of the model where the
+         * Condition is not present in the list
+         * @param conditionlist a list of condition name
+         */
+        virtual void purgeConditions(const std::set < std::string >& conditionlist) override;
 
+
+        bool needDebug() const noexcept
+        {
+            return m_debug;
+        }
+
+        void setDebug() noexcept
+        {
+            m_debug = true;
+        }
+
+        void resetDebug() noexcept
+        {
+            m_debug = false;
+        }
+        
     private:
         //AtomicModel() {}
 
-	std::vector < std::string > m_conditions;
+        std::vector < std::string > m_conditions;
         std::string m_dynamics;
         std::string m_observables;
+        bool m_debug;
     };
 
 }} // namespace vle vpz

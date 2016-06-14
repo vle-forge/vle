@@ -28,42 +28,19 @@
 #ifndef VLE_DEVS_DYNAMICSDBG_HPP
 #define VLE_DEVS_DYNAMICSDBG_HPP
 
-#include <vle/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/version.hpp>
-
-#define DECLARE_DYNAMICS_DBG(mdl)                                       \
-    extern "C" {                                                        \
-        VLE_MODULE vle::devs::Dynamics*                                 \
-        vle_make_new_dynamics(const vle::devs::DynamicsInit& init,      \
-                              const vle::devs::InitEventList& events)   \
-        {                                                               \
-            vle::devs::DynamicsDbg* x__;                                \
-            x__ = new vle::devs::DynamicsDbg(init, events);             \
-            x__->set(std::unique_ptr<vle::devs::Dynamics>(              \
-                         new mdl(init, events)));                       \
-            return x__;                                                 \
-        }                                                               \
-                                                                        \
-        VLE_MODULE void                                                 \
-        vle_api_level(vle::uint32_t* major,                             \
-                      vle::uint32_t* minor,                             \
-                      vle::uint32_t* patch)                             \
-        {                                                               \
-            *major = VLE_MAJOR_VERSION;                                 \
-            *minor = VLE_MINOR_VERSION;                                 \
-            *patch = VLE_PATCH_VERSION;                                 \
-        }                                                               \
-    }
 
 namespace vle { namespace devs {
 
 /**
- * @brief A Dynamics debug class which wrap an another Dynamics to show
- * debug information. This class inherits the DEVS standard API.
+ * A Dynamics proxy class that wraps an another Dynamics to show
+ * debug information. This class inherits \e Dynamics class.
  */
-class VLE_API DynamicsDbg : public Dynamics
+class DynamicsDbg : public Dynamics
 {
+    std::unique_ptr<Dynamics> mDynamics;
+    std::string mName;
+
 public:
     /**
      * @brief Constructor of Dynamics for an atomic model.
@@ -78,6 +55,28 @@ public:
      * @brief Destructor.
      */
     virtual ~DynamicsDbg() = default;
+
+    /**
+     * @brief If this function return true, then a cast to an Executive
+     * object is produce and the set_coordinator function is call. Executive
+     * permit to manipulate vpz::CoupledModel and devs::Coordinator at
+     * runtime of the simulation.
+     * @return false if Dynamics is not an Executive.
+     */
+    virtual bool isExecutive() const override
+    {
+        return mDynamics->isExecutive();
+    }
+
+    /**
+     * @brief If this function return true, then a cast to a DynamicsWrapper
+     * object is produce and the set_model and set_library function are call.
+     * @return false if Dynamics is not a DynamicsWrapper.
+     */
+    virtual bool isWrapper() const override
+    {
+        return mDynamics->isWrapper();
+    }
 
     /**
      * @brief Assign a Dynamics to debug for this DynamicsDbg class.
@@ -158,10 +157,6 @@ public:
      * finish method is invoked.
      */
     virtual void finish() override;
-
-private:
-    std::unique_ptr<Dynamics> mDynamics;
-    std::string mName;
 };
 
 }} // namespace vle devs

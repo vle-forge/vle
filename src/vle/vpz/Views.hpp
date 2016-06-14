@@ -226,6 +226,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if name already exist.
          */
         View& addEventView(const std::string& name,
+                           View::Type type,
                            const std::string& output);
 
         /**
@@ -239,16 +240,6 @@ namespace vle { namespace vpz {
         View& addTimedView(const std::string& name,
                            double timestep,
                            const std::string& output);
-
-        /**
-         * @brief Add a new finish View.
-         * @param name The name of the View.
-         * @param output The output of the View.
-         * @return A reference to the newly View.
-         * @throw utils::ArgError if name already exist.
-         */
-        View& addFinishView(const std::string& name,
-                            const std::string& output);
 
         /**
          * @brief Delete the specified View.

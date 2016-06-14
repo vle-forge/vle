@@ -184,13 +184,6 @@ public:
      */
     Simulator* getModel(const std::string& model) const;
 
-    /**
-     * @brief Return the devs::View from a specified View name.
-     * Complexity: log O(log(n)).
-     * @param name the name of the View to search.
-     * @return A reference to the devs::View or 0 if not found.
-     */
-    devs::View* getView(const std::string& name) const;
 
     //
     ///
@@ -249,14 +242,42 @@ public:
 
     bool isStarted() const { return m_isStarted; }
 
-    const ViewList& getViews() const { return m_viewList; }
-
-
     void processInit(Simulator *simulator);
     void processInternalEvent(Bag::value_type& modelbag);
     void processExternalEvents(Bag::value_type& modelbag);
     void processConflictEvents(Bag::value_type& modelbag);
-    
+
+    /**
+     * Retrieves for all Views the \c vle::value::Matrix result.
+     * The \c getMatrixFromView is a private implementation function.
+     *
+     * @param views The \c vle::devs::ViewList to browse.
+     *
+     * @return NULL if the \c vle::devs::ViewList does not have storage
+     * plug-ins.
+     */
+    std::unique_ptr<value::Map> getMatrix() const;
+
+    /**
+     * Retrieves for all Views the \c vle::value::Matrix result.
+     * The \c getMatrixFromView is a private implementation function.
+     *
+     * @param views The \c vle::devs::ViewList to browse.
+     *
+     * @return NULL if the \c vle::devs::ViewList does not have storage
+     * plug-ins.
+     */
+    std::unique_ptr<value::Map> getCloneMatrix() const;
+
+
+    /**
+     * Retrives access to all event (output, internal, external, ...) \e
+     * Views.
+     *
+     * @return A constatn 
+     */
+    const std::map<std::string, View>& getEventViewList() const;
+
 private:
     Coordinator(const Coordinator& other);
     Coordinator& operator=(const Coordinator& other);
@@ -265,15 +286,13 @@ private:
     Time                        m_durationTime;
     SimulatorMap                m_modelList;
     Scheduler                   m_eventTable;
-    ViewList                    m_viewList;
-    EventViewList               m_eventViewList;
-    TimedViewList               m_timedViewList;
-    FinishViewList              m_finishViewList;
+    TimedObservationScheduler   m_timed_observation_scheduler;
+    std::map<std::string, View> m_eventViewList;
+    std::map<std::string, View> m_timedViewList;
     ModelFactory                m_modelFactory;
     SimulatorList               m_deletedSimulator;
     SimulatorList::size_type    m_toDelete;
     const utils::ModuleManager& m_modulemgr;
-    ViewEventList               m_obsEventBuffer;
     bool                        m_isStarted;
 
     /**
@@ -288,19 +307,9 @@ private:
      * @param output the vpz::Output to get datas.
      * @return Buiild a new StreamWriter.
      */
-    StreamWriter* buildOutput(const vpz::View& view,
-                              const vpz::Output& output);
+    std::unique_ptr<StreamWriter> buildOutput(const vpz::View& view,
+                                              const vpz::Output& output);
 
-    /**
-     * @brief Process for each ObservationEvent in the bag and observation
-     * for the specified model. All ObservationEvent are destroyed by this
-     * function and the bag is cleared.
-     *
-     * @param bag The ObservationEventList to process and clear.
-     * @param time The current time of the simulation.
-     */
-    void processViewEvents(std::vector<ViewEvent>& bag);
-    
     /**
      * @brief build the simulator from the vpz::BaseModel stock.
      * @param model
@@ -339,10 +348,6 @@ private:
      * @param mdl the model to delete.
      */
     void delCoupledModel(vpz::CoupledModel* mdl);
-
-
-
-    void processEventView(Simulator* model);
 
     /**
      * Set a new date to the Coordinator.

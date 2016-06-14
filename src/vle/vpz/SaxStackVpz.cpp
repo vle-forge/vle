@@ -136,9 +136,11 @@ void SaxStackVpz::pushModel(const xmlChar** att)
     }
 
     vpz::BaseModel* gmdl = nullptr;
-    const xmlChar* conditions = nullptr, *dynamics = nullptr, *observables = nullptr;
-    const xmlChar* x = nullptr, *y = nullptr, *width = nullptr, *height = nullptr;
-    const xmlChar* type = nullptr, *name = nullptr;
+    const xmlChar *conditions = nullptr, *dynamics = nullptr;
+    const xmlChar *observables = nullptr, *width = nullptr, *height = nullptr;
+    const xmlChar *x = nullptr, *y = nullptr;
+    const xmlChar *type = nullptr, *name = nullptr;
+    const xmlChar *debug = nullptr;
 
     for (int i = 0; att[i] != nullptr; i+=2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"type") == 0) {
@@ -159,6 +161,8 @@ void SaxStackVpz::pushModel(const xmlChar** att)
             width = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"height") == 0) {
             height = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"debug") == 0) {
+            debug = att[i + 1];
         }
     }
 
@@ -173,12 +177,17 @@ void SaxStackVpz::pushModel(const xmlChar** att)
 
     if (xmlStrcmp(type, (const xmlChar*)"atomic") == 0) {
         try {
-            gmdl = new vpz::AtomicModel(
+            auto ptr = new vpz::AtomicModel(
                 (const char*)name,
                 cplparent,
                 conditions ? xmlCharToString(conditions) : "",
                 dynamics ? xmlCharToString(dynamics) : "",
                 observables ? xmlCharToString(observables) : "");
+
+            if (debug and (xmlStrcmp(type, (const xmlChar*)"true") == 0))
+                ptr->setDebug();
+
+            gmdl = ptr;
         } catch(const utils::DevsGraphError& e) {
             throw utils::SaxParserError(
                       (fmt(_("Error build atomic model '%1%' with error: %2%"))
@@ -734,14 +743,36 @@ void SaxStackVpz::pushView(const xmlChar** att)
         views.addTimedView(xmlCharToString(name),
                            xmlCharToDouble(timestep),
                            xmlCharToString(output));
-    } else if (xmlStrcmp(type, (const xmlChar*)"event") == 0) {
-        views.addEventView(xmlCharToString(name), xmlCharToString(output));
-    } else if (xmlStrcmp(type, (const xmlChar*)"finish") == 0) {
-        views.addFinishView(xmlCharToString(name), xmlCharToString(output));
     } else {
-        throw utils::SaxParserError(
-            (fmt(_("View tag does not accept type '%1%'")) % type).str());
-    }
+        using ustring = std::basic_string<unsigned char>;
+
+        ustring typestr(type);
+        ustring::size_type begin { 0 };
+        ustring::size_type it = typestr.find(',');
+        unsigned viewtype { 0 };
+
+        auto tmp = typestr.substr(begin, it);
+        if (tmp == (const xmlChar*)"event")
+            viewtype = static_cast<View::Type>(View::OUTPUT | View::INTERNAL |
+                                           View::EXTERNAL | View::FINISH);
+        else if (tmp == (const xmlChar*)"output")
+            viewtype |= View::OUTPUT;
+        else if (tmp == (const xmlChar*)"internal")
+            viewtype |= View::INTERNAL;
+        else if (tmp == (const xmlChar*)"external")
+            viewtype |= View::EXTERNAL;
+        else if (tmp == (const xmlChar*)"confluent")
+            viewtype |= View::CONFLUENT;
+        else if (tmp == (const xmlChar*)"finish")
+            viewtype |= View::FINISH;
+        else 
+            throw utils::SaxParserError(
+                (fmt(_("View tag does not accept type '%1%'")) % type).str());
+ 
+        views.addEventView(xmlCharToString(name),
+                           static_cast<View::Type>(viewtype),
+                           xmlCharToString(output));
+   }
 }
 
 void SaxStackVpz::pushAttachedView(const xmlChar** att)

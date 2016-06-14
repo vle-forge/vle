@@ -26,82 +26,106 @@
 
 
 #include <vle/devs/View.hpp>
-#include <vle/devs/Simulator.hpp>
+#include <vle/devs/Dynamics.hpp>
 #include <vle/devs/StreamWriter.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <cassert>
 
 namespace vle { namespace devs {
 
-View::~View()
+void View::open(const std::string& name, std::unique_ptr<StreamWriter> stream)
 {
-    delete m_stream;
+    m_name = name;
+
+    if (m_stream)
+        m_stream->close(devs::infinity);
+
+    m_stream = std::move(stream);
 }
 
-void View::addObservable(Simulator* model,
+void View::addObservable(Dynamics* dynamics,
                          const std::string& portname,
                          const Time& currenttime)
 {
-    assert(model);
+    assert(dynamics);
+    assert(not exist(dynamics, portname));
 
-    if (not exist(model, portname)) {
-        m_observableList.insert(value_type(model, portname));
-        m_stream->processNewObservable(model, portname, currenttime,
-                                       getName());
-    }
+    m_observableList.emplace(dynamics, portname);
+
+    if (m_stream)
+        m_stream->processNewObservable(
+            dynamics->getModel().getName(),
+            dynamics->getModel().getParentName(),
+            portname, currenttime,
+            m_name);
 }
 
 void View::finish(const Time& time)
 {
-    m_stream->close(time);
+    if (m_stream)
+        m_stream->close(time);
 }
 
-void View::removeObservable(Simulator* sim)
+void View::removeObservable(Dynamics* dynamics)
 {
-    assert(sim);
+    assert(dynamics);
 
-    std::pair < ObservableList::iterator, ObservableList::iterator > result;
-    ObservableList::iterator it;
+    auto result = m_observableList.equal_range(dynamics);
 
-    result = m_observableList.equal_range(sim);
-    for (it = result.first; it != result.second; ++it) {
-        m_stream->processRemoveObservable(it->first, it->second, 0.0,
-                                          getName());
-    }
+    for (auto it = result.first; it != result.second; ++it)
+        m_stream->processRemoveObservable(it->first->getModel().getName(),
+                                          it->first->getModel().getParentName(),
+                                          it->second, 0.0,
+                                          m_name);
 
     m_observableList.erase(result.first, result.second);
 }
 
-bool View::exist(Simulator* simulator, const std::string& portname) const
+bool View::exist(Dynamics* dynamics, const std::string& portname) const
 {
-    std::pair < ObservableList::const_iterator,
-                ObservableList::const_iterator > result;
-    ObservableList::const_iterator it;
-
-    result = m_observableList.equal_range(simulator);
-    for (it = result.first; it != result.second; ++it) {
-        if (it->second == portname) {
+    auto result = m_observableList.equal_range(dynamics);
+    
+    for (auto it = result.first; it != result.second; ++it)
+        if (it->second == portname)
             return true;
-        }
-    }
+
     return false;
 }
 
-bool View::exist(Simulator* simulator) const
+bool View::exist(Dynamics* dynamics) const
 {
-    return m_observableList.count(simulator) > 0;
+    return m_observableList.find(dynamics) != m_observableList.end();
 }
 
 void View::run(const Time& time)
 {
     if (not m_observableList.empty()) {
         for (auto & elem : m_observableList) {
-            ObservationEvent event(time, getName(), elem.second);
-            std::unique_ptr<value::Value> val = elem.first->observation(event);
-            m_stream->process(elem.first, elem.second, time, getName(),
+            ObservationEvent event(time, m_name, elem.second);
+            auto val = elem.first->observation(event);
+            m_stream->process(elem.first->getModel().getName(),
+                              elem.first->getModel().getParentName(),
+                              elem.second, time, m_name,
                               std::move(val));
         }
     } else {
-        m_stream->process(nullptr, std::string(), time, getName(), nullptr);
+        //
+        // Strange behavior.
+        //
+        m_stream->process(std::string(), std::string(),
+                          std::string(), time, m_name, nullptr);
     }
+}
+
+void View::run(const Dynamics *dynamics, Time current, const std::string& port)
+{
+    ObservationEvent event(current, m_name, port);
+    auto val = dynamics->observation(event);
+
+    m_stream->process(dynamics->getModel().getName(),
+                      dynamics->getModel().getParentName(),
+                      port, current, m_name,
+                      std::move(val));
 }
 
 std::unique_ptr<value::Matrix> View::matrix() const

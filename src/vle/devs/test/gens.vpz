@@ -1,58 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.3.0.dtd">
 <vle_project version="0.5" date="Mon, 27 Dec 2010" author="Gauthier Quesnel">
-<structures>
-<model name="top" type="coupled" width="459"  >
-<submodels>
-<model name="counter" type="atomic" dynamics="counter" observables="obs1" x="140" y="25" width="100" height="45" >
-<in>
- <port name="in" />
-</in>
-<out>
- <port name="out" />
-</out>
-</model>
-<model name="executive" type="atomic" dynamics="executive" observables="obs2" x="140" y="85" width="100" height="30" >
-</model>
-</submodels>
-<connections>
-</connections>
-</model>
-</structures>
-<dynamics>
-<dynamic name="counter" package="" library="dynamics_counter"  />
-<dynamic name="executive" package="" library="exe_genexecutive"  />
-</dynamics>
-<experiment name="generatorexecutive" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
-<views>
-<outputs>
-<output name="o" location="" format="local" package="" plugin="oov_plugin" />
-<output name="o2" location="" format="local" package="" plugin="oov_plugin" />
-</outputs>
-<observables>
-<observable name="obs1" >
-<port name="c" >
- <attachedview name="view1" />
-</port>
-
-</observable>
-
-<observable name="obs2" >
-<port name="nbmodel" >
- <attachedview name="view1" />
-</port>
-
-<port name="structure" >
- <attachedview name="view2" />
-</port>
-
-</observable>
-
-</observables>
-<view name="view1" output="o" type="timed" timestep="1.000000000000000" />
-
-<view name="view2" output="o2" type="timed" timestep="1.000000000000000" />
-
-</views>
-</experiment>
+  <structures>
+    <model name="top" type="coupled" width="459"  >
+      <submodels>
+        <model name="counter" type="atomic" dynamics="counter" observables="obs1" x="140" y="25" width="100" height="45" >
+          <in>
+            <port name="in" />
+          </in>
+          <out>
+            <port name="out" />
+          </out>
+        </model>
+        <model name="executive" type="atomic" dynamics="executive" observables="obs2" x="140" y="85" width="100" height="30" >
+        </model>
+      </submodels>
+      <connections>
+      </connections>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="counter" package="" library="dynamics_counter"  />
+    <dynamic name="executive" package="" library="exe_genexecutive"  />
+  </dynamics>
+  <experiment name="generatorexecutive" seed="123" >
+    <conditions>
+      <condition name="simulation_engine" >
+        <port name="begin" >
+          <double>0</double>
+        </port>
+        <port name="duration" >
+          <double>100</double>
+        </port>
+      </condition>
+    </conditions>
+    <views>
+      <outputs>
+        <output name="o" location="" format="local" package="" plugin="oov_plugin" />
+        <output name="o2" location="" format="local" package="" plugin="oov_plugin" />
+      </outputs>
+      <observables>
+        <observable name="obs1" >
+          <port name="c" >
+            <attachedview name="view1" />
+          </port>
+        </observable>
+        <observable name="obs2" >
+          <port name="nbmodel" >
+            <attachedview name="view1" />
+          </port>
+          <port name="structure" >
+            <attachedview name="view2" />
+          </port>
+        </observable>
+      </observables>
+      <view name="view1" output="o" type="timed" timestep="1.000000000000000" />
+      <view name="view2" output="o2" type="timed" timestep="1.000000000000000" />
+    </views>
+  </experiment>
 </vle_project>

@@ -50,7 +50,7 @@ template <typename EventT>
 bool
 EventCompare(const EventT& e1, const EventT& e2) noexcept
 {
-    return e1.getTime() > e2.getTime();
+    return e1.mTime > e2.mTime;
 }
 
 /**
@@ -91,7 +91,6 @@ void push(SchedulerT &scheduler, Args&&... args)
 }
 
 struct HeapElementCompare {
-
     template <typename HeapElementT>
     bool
     operator()(const HeapElementT& lhs, const HeapElementT& rhs) const noexcept
@@ -101,7 +100,6 @@ struct HeapElementCompare {
 };
 
 struct HeapElement {
-
     HeapElement(Time time, Simulator *Simulator)
         : m_time(time)
         , m_simulator(Simulator)
@@ -117,22 +115,15 @@ using Heap = boost::heap::fibonacci_heap<
 
 using HandleT = Heap::handle_type;
 
-struct BagModel
-{
-    BagModel()
-        : internal_event(false)
-    {}
-
-    ExternalEventList external_events;
-    bool internal_event;
-};
-
-using Bag = std::vector<std::pair<Simulator*, BagModel>>;
+using Bag = std::vector<Simulator*>;
 
 class VLE_LOCAL Scheduler
 {
 public:
-    Scheduler() = default;
+    Scheduler()
+        : m_current_time(negativeInfinity)
+    {}
+    
     ~Scheduler() = default;
 
     Scheduler(const Scheduler&) = delete;
@@ -140,9 +131,9 @@ public:
     Scheduler(Scheduler&&) = delete;
     Scheduler& operator=(Scheduler&&) = delete;
 
+    void init(Time time);
 
     void addInternal(Simulator *simulator, Time time);
-    void addObservation(View *ptr, Time time);
     void addExternal(Simulator *simulator,
                      std::shared_ptr<value::Value> values,
                      const std::string& portname);
@@ -150,28 +141,12 @@ public:
 
     Bag& getCurrentBag() noexcept;
 
-    /**
-     * Check if the next bag will be at the current date or at an
-     * another. This function is useful to check observation.
-     *
-     * \return true if the next scheduler date is the same date as the
-     * current date.
-     */
-    bool haveNextBagAtTime() noexcept;
-
     Time getCurrentTime() const noexcept
     {
         return m_current_time;
     }
 
-    bool haveObservationEventAtTime() noexcept;
-
-    /**
-     * Builds a list of \e ViewEvent for scheduler observation events.
-     *
-     * \return List of ViewEvent.
-     */
-    std::vector<ViewEvent> getCurrentObservationBag() noexcept;
+    Time getNextTime() const noexcept;
 
     /**
      * Builds the next bag: at the same time with external event or/and
@@ -184,11 +159,44 @@ private:
     Bag m_current_bag;
     Bag m_next_bag;
     Heap m_scheduler;
-    std::vector<ViewEvent> m_observation;
     Time m_current_time;
-
-    Time getNextTime() noexcept;
 };
+
+class VLE_LOCAL TimedObservationScheduler
+{
+    std::vector<ViewEvent> m_observation;
+
+public:
+    void add(View *ptr, Time time, Time timestep)
+    {
+        assert(not isInfinity(time) && "addObservation: infinity time");
+        assert(not isNegativeInfinity(time)
+               && "addObservation: negative infinity time");
+
+        push(m_observation, ptr, time, timestep);
+    }
+
+    bool haveObservationAtTime(Time time) noexcept
+    {
+        if (m_observation.empty())
+            return false;
+
+        return m_observation[0].mTime < time;
+    }
+
+    std::vector<ViewEvent> getObservationAtTime(Time time)
+    {
+        std::vector<ViewEvent> ret;
+
+        while (not m_observation.empty() and m_observation[0].mTime < time) {
+            ret.push_back(std::move(m_observation[0]));
+            pop(m_observation);
+        }
+
+        return ret;
+    }
+};
+
 
 }} // namespace vle devs
 

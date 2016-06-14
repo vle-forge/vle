@@ -37,11 +37,11 @@ namespace vle { namespace devs {
 
 oov::PluginPtr StreamWriter::plugin()
 {
-    if (not m_plugin) {
+    if (not m_plugin)
         throw utils::InternalError(
             _("Oov: The output plug-in is not initialized, "
-              "may be the StreamWriter::open() function was nether called."));
-    }
+              "may be the StreamWriter::open() function was nether "
+              "called."));
 
     return m_plugin;
 }
@@ -80,42 +80,35 @@ void StreamWriter::open(const std::string& pluginname,
                           std::move(parameters), time);
 }
 
-void StreamWriter::processNewObservable(Simulator* simulator,
+void StreamWriter::processNewObservable(const std::string& name,
+                                        const std::string& parent,
                                         const std::string& portname,
                                         const devs::Time& time,
                                         const std::string& view)
 {
-    plugin()->onNewObservable(simulator->getName(),
-                              simulator->getParent(),
-                              portname, view, time);
+    plugin()->onNewObservable(name, parent, portname, view, time);
 }
 
-void StreamWriter::processRemoveObservable(Simulator* simulator,
+void StreamWriter::processRemoveObservable(const std::string& name,
+                                           const std::string& parent,
                                            const std::string& portname,
                                            const devs::Time& time,
                                            const std::string& view)
 {
-    plugin()->onDelObservable(simulator->getName(),
-                              simulator->getParent(),
-                              portname, view, time);
+    plugin()->onDelObservable(name, parent, portname, view, time);
 }
 
-void StreamWriter::process(Simulator* simulator,
+void StreamWriter::process(const std::string& name,
+                           const std::string& parent,
                            const std::string& portname,
                            const devs::Time& time,
                            const std::string& view,
                            std::unique_ptr<value::Value> val)
 {
-    std::string name, parent;
-
-    if (simulator) {
-        name = simulator->getName();
-        parent = simulator->getParent();
-    }
-
-    /* This is a strange behaviour. If the simulator is destroyed, we call
-     * the onValue function with empty simulator and parent.
-     */
+    //
+    // This is a strange behaviour. If the simulator is destroyed, we call
+    // the onValue function with empty simulator and parent.
+    //
 
     plugin()->onValue(name, parent, portname, view, time, std::move(val));
 }

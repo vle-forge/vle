@@ -28,6 +28,7 @@
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
+#include <cassert>
 
 namespace vle { namespace devs {
 
@@ -42,7 +43,10 @@ DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
 
 Time DynamicsDbg::init(Time time)
 {
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] init")) % time % mName).str().c_str());
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] init"))
+               % time % mName).str().c_str());
 
     Time duration(mDynamics->init(time));
 
@@ -54,7 +58,10 @@ Time DynamicsDbg::init(Time time)
 
 void DynamicsDbg::output(Time time, ExternalEventList& output) const
 {
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] output")) % time % mName).str().c_str());
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] output"))
+               % time % mName).str().c_str());
 
     mDynamics->output(time, output);
 
@@ -71,7 +78,10 @@ void DynamicsDbg::output(Time time, ExternalEventList& output) const
 
 Time DynamicsDbg::timeAdvance() const
 {
-    TraceDevs((fmt(_("                     %1% [DEVS] ta")) % mName).str().c_str());
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
+    TraceDevs((fmt(_("                     %1% [DEVS] ta"))
+               % mName).str().c_str());
 
     Time time(mDynamics->timeAdvance());
 
@@ -83,6 +93,8 @@ Time DynamicsDbg::timeAdvance() const
 
 void DynamicsDbg::internalTransition(Time time)
 {
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
     TraceDevs((fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
                mName).str().c_str());
 
@@ -92,8 +104,10 @@ void DynamicsDbg::internalTransition(Time time)
 void DynamicsDbg::externalTransition(const ExternalEventList& event,
                                      Time time)
 {
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) % time
-               % mName % event).str().c_str());
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
+    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]"))
+               % time % mName % event).str().c_str());
 
     mDynamics->externalTransition(event, time);
 }
@@ -102,6 +116,8 @@ void DynamicsDbg::confluentTransitions(
     Time time,
     const ExternalEventList& extEventlist)
 {
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
     TraceDevs(
         (fmt(_("%1$20.10g %2% [DEVS] confluent transition: [%3%]"))
          % time % mName % extEventlist).str().c_str());
@@ -112,6 +128,8 @@ void DynamicsDbg::confluentTransitions(
 std::unique_ptr<vle::value::Value>
 DynamicsDbg::observation(const ObservationEvent& event) const
 {
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
     TraceDevs((fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
                      " port: '%4%']")) % event.getTime() % mName
                % event.getViewName() % event.getPortName()).str().c_str());
@@ -121,10 +139,12 @@ DynamicsDbg::observation(const ObservationEvent& event) const
 
 void DynamicsDbg::finish()
 {
-    TraceDevs((fmt(_("                     %1% [DEVS] finish")) % mName).str().c_str());
+    assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
+
+    TraceDevs((fmt(_("                     %1% [DEVS] finish"))
+               % mName).str().c_str());
 
     mDynamics->finish();
 }
 
 }} // namespace vle devs
-

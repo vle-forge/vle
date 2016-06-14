@@ -29,7 +29,6 @@
 #define VLE_UTILS_TEMPLATE_HPP
 
 #include <vle/DllDefines.hpp>
-#include <iostream>
 #include <string>
 #include <map>
 #include <vector>

@@ -37,7 +37,6 @@
 #include <limits>
 #include <fstream>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/Executive.hpp>
 #include <vle/devs/ExecutiveDbg.hpp>
 #include <vle/devs/Coordinator.hpp>
@@ -49,6 +48,7 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <cstdio>
+#include "oov.hpp"
 
 using namespace vle;
 
@@ -117,14 +117,14 @@ public:
     }
 };
 
-class ModelDbg : public vle::devs::DynamicsDbg
+class ModelDbg : public vle::devs::Dynamics
 {
     int state;
 
 public:
     ModelDbg(const vle::devs::DynamicsInit& init,
              const vle::devs::InitEventList& events)
-        : vle::devs::DynamicsDbg(init, events)
+        : vle::devs::Dynamics(init, events)
     {}
 
     virtual ~ModelDbg() = default;
@@ -247,7 +247,69 @@ public:
     }
 };
 
-class OutputPlugin : public vle::oov::Plugin
+class ObservationModel : public vle::devs::Dynamics
+{
+    mutable int state;
+
+public:
+    ObservationModel(const vle::devs::DynamicsInit& init,
+          const vle::devs::InitEventList& events)
+        : vle::devs::Dynamics(init, events)
+    {}
+
+    virtual ~ObservationModel() = default;
+
+    virtual vle::devs::Time init(vle::devs::Time /* time */) override
+    {
+        state = 0;
+        return 1;
+    }
+
+    virtual void output(vle::devs::Time /* time */,
+                        vle::devs::ExternalEventList& /* output */)
+        const override
+    {
+        state++;
+    }
+
+    virtual vle::devs::Time timeAdvance() const override
+    {
+        return 1.;
+    }
+
+    virtual void internalTransition(
+        vle::devs::Time /* time */) override
+    {
+        state++;
+    }
+
+    virtual void externalTransition(
+        const vle::devs::ExternalEventList& /* events */,
+        vle::devs::Time /* time */) override
+    {
+        state += 1000;
+    }
+
+    virtual void confluentTransitions(
+        vle::devs::Time /* time */,
+        const vle::devs::ExternalEventList& /* extEventlist */) override
+    {
+        state += 1000000;
+    }
+
+    virtual std::unique_ptr<vle::value::Value>
+    observation(const vle::devs::ObservationEvent& /* event */) const override
+    {
+        return vle::value::Integer::create(state);
+    }
+
+    virtual void finish() override
+    {
+        state++;
+    }
+};
+
+class OutputPluginSimple : public vle::oov::Plugin
 {
     struct data {
         std::unique_ptr<vle::value::Value> value;
@@ -257,13 +319,13 @@ class OutputPlugin : public vle::oov::Plugin
     std::map <std::string, data> pp_D;
 
 public:
-    OutputPlugin(const std::string& location)
+    OutputPluginSimple(const std::string& location)
         : vle::oov::Plugin(location)
     {
         assert(location == "toto");
     }
 
-    virtual ~OutputPlugin() = default;
+    virtual ~OutputPluginSimple() = default;
 
     virtual std::unique_ptr<value::Matrix> matrix() const override
     {
@@ -373,10 +435,23 @@ extern "C" {
         return new ::Exe(init, events);
     }
 
+    VLE_MODULE vle::devs::Dynamics* make_new_observation_model(
+        const vle::devs::DynamicsInit& init,
+        const vle::devs::InitEventList& events)
+    {
+        return new ::ObservationModel(init, events);
+    }       
+
     VLE_MODULE vle::oov::Plugin* make_oovplugin(
         const std::string& location)
     {
-        return new ::OutputPlugin(location);
+        return new ::OutputPluginSimple(location);
+    }
+
+    VLE_MODULE vle::oov::Plugin* make_oovplugin_default(
+        const std::string& location)
+    {
+        return new ::vletest::OutputPlugin(location);
     }
 }
 
@@ -394,7 +469,7 @@ BOOST_AUTO_TEST_CASE(instantiate_mode)
     check = std::is_base_of<vle::devs::Dynamics, Model>::value == true;
     BOOST_REQUIRE(check);
 
-    check = std::is_base_of<vle::devs::DynamicsDbg, ModelDbg>::value == true;
+    check = std::is_base_of<vle::devs::Dynamics, ModelDbg>::value == true;
     BOOST_REQUIRE(check);
 
     check = std::is_base_of<vle::devs::Executive, Exe>::value == true;
@@ -476,6 +551,7 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
     atomdbg->setDynamics("dyn_3");
     atomdbg->addOutputPort("out");
     atomdbg->setObservables("obs");
+    atomdbg->setDebug();
 
     auto *exe = depth0->addAtomicModel("exe");
     exe->setDynamics("dyn_2");
@@ -492,6 +568,69 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
     root.init();
 
     while (root.run());
+
+    root.finish();
+}
+
+BOOST_AUTO_TEST_CASE(test_observation_event)
+{
+    vpz::Vpz vpz;
+
+    vpz.project().experiment().setDuration(100.0);
+    vpz.project().experiment().setBegin(0.0);
+
+    vpz.project().experiment().views().addLocalStreamOutput(
+        "output", "toto", "make_oovplugin_default", "");
+
+    vpz.project().experiment().views().add(
+        vpz::View("The_view",
+                  vle::vpz::View::Type::FINISH |
+                  vle::vpz::View::Type::INTERNAL |
+                  vle::vpz::View::Type::EXTERNAL |
+                  vle::vpz::View::Type::CONFLUENT |
+                  vle::vpz::View::Type::OUTPUT,
+                  "output"));
+
+    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+        vpz::Observable("obs"));
+    vpz::ObservablePort& port = obs.add("port");
+    port.add("The_view");
+
+    {
+        auto x = vpz.project().dynamics().dynamiclist().emplace(
+            "dyn_1", vpz::Dynamic("dyn_1"));
+        BOOST_REQUIRE(x.second == true);
+        x.first->second.setLibrary("make_new_observation_model");
+    }
+
+    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
+    auto *atom = depth0->addAtomicModel("ObservationModel");
+    atom->setDynamics("dyn_1");
+    atom->addOutputPort("out");
+    atom->setObservables("obs");
+
+    vpz.project().model().setModel(depth0);
+
+    utils::ModuleManager modules;
+    devs::RootCoordinator root(modules);
+    root.load(vpz);
+    vpz.clear();
+
+    root.init();
+
+    while (root.run());
+    std::unique_ptr<value::Map> out = root.outputs(); 
+
+    BOOST_REQUIRE(out);
+
+    value::Matrix &matrix = out->getMatrix("The_view");
+    BOOST_REQUIRE_EQUAL(matrix.columns(), (std::size_t)2);
+    BOOST_REQUIRE_EQUAL(matrix.rows(), (std::size_t)101);
+
+    for (std::size_t i = 1, ei = 10; i != ei; ++i) {
+        BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, i)), i);
+        BOOST_REQUIRE_EQUAL(value::toInteger(matrix(1, i)), i * 2);
+    }
 
     root.finish();
 }

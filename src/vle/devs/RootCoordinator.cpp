@@ -31,68 +31,6 @@
 
 namespace vle { namespace devs {
 
-/**
- * Retrieves for all Views the \c vle::value::Matrix result.
- *
- * The \c getMatrixFromView is a private implementation function.
- *
- * @param views The \c vle::devs::ViewList to browse.
- *
- * @return NULL if the \c vle::devs::ViewList does not have storage
- * plug-ins.
- */
-static std::unique_ptr<value::Map> getMatrixFromView(const ViewList &views)
-{
-    std::unique_ptr<value::Map> result;
-
-    auto it = views.begin();
-    while (it != views.end()) {
-        auto matrix = it->second->matrix();
-
-        if (matrix) {
-            if (not result)
-                result = std::unique_ptr<value::Map>(new value::Map());
-
-            result->add(it->first, std::move(matrix));
-        }
-        ++it;
-    }
-
-    return result;
-}
-
-/**
- * Retrieves for all Views the \c vle::value::Matrix result.
- *
- * The \c getMatrixFromView is a private implementation function.
- *
- * @param views The \c vle::devs::ViewList to browse.
- *
- * @return NULL if the \c vle::devs::ViewList does not have storage
- * plug-ins.
- */
-static std::unique_ptr<value::Map> getCloneMatrixFromView(const ViewList &views)
-{
-    std::unique_ptr<value::Map> result;
-
-    auto it = views.begin();
-    while (it != views.end()) {
-        auto matrix = it->second->matrix();
-
-        if (matrix) {
-            if (not result)
-                result = std::unique_ptr<value::Map>(new value::Map());
-
-            result->add(it->first, matrix->clone());
-        }
-        ++it;
-    }
-
-    return result;
-}
-
-                       /* - - - - - - - - - -*/
-
 RootCoordinator::RootCoordinator(const utils::ModuleManager& modulemgr)
     : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0),
       m_coordinator(nullptr), m_root(nullptr), m_modulemgr(modulemgr)
@@ -151,9 +89,8 @@ void RootCoordinator::finish()
     if (m_coordinator) {
         m_coordinator->finish();
 
-        m_result.reset(nullptr);
-        
-        m_result = getMatrixFromView(m_coordinator->getViews());
+        m_result.reset(nullptr);       
+        m_result = m_coordinator->getMatrix();
 
         delete m_coordinator;
         m_coordinator = nullptr;
@@ -168,7 +105,7 @@ void RootCoordinator::finish()
 std::unique_ptr<value::Map> RootCoordinator::outputs()
 {
     if (m_coordinator)
-        return getCloneMatrixFromView(m_coordinator->getViews());
+        return m_coordinator->getCloneMatrix();
 
     return std::move(m_result);
 }

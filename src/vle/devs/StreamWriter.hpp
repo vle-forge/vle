@@ -25,12 +25,10 @@
  */
 
 
-#ifndef DEVS_STREAM_HPP
-#define DEVS_STREAM_HPP
+#ifndef VLE_DEVS_STREAM_HPP
+#define VLE_DEVS_STREAM_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/devs/View.hpp>
-#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/oov/Plugin.hpp>
@@ -38,26 +36,18 @@
 
 namespace vle { namespace devs {
 
-class View;
 class Observable;
 
-/**
- * Base class of the Stream Writer of the VLE DEVS simulator. This class is
- * the base of the MemoryStreamWriter and NetStreamWriter deployed as
- * plugins.
- *
- */
 class VLE_LOCAL StreamWriter
 {
 public:
     StreamWriter(const utils::ModuleManager& modulemgr)
-        : m_view(0), m_modulemgr(modulemgr)
-    {
-    }
+        : m_modulemgr(modulemgr)
+    {}
 
-    ~StreamWriter()
-    {
-    }
+    ~StreamWriter() = default;
+    StreamWriter(const StreamWriter& rhs) = delete;
+    StreamWriter& operator=(const StreamWriter& rhs) = delete;
 
     ///
     ////
@@ -79,21 +69,25 @@ public:
               std::unique_ptr<value::Value> parameters,
               const devs::Time& time);
 
-    void processNewObservable(Simulator* simulator,
+    void processNewObservable(const std::string& name,
+                              const std::string& parent,
                               const std::string& portname,
                               const devs::Time& time,
                               const std::string& view);
 
-    void processRemoveObservable(Simulator* simulator,
+    void processRemoveObservable(const std::string& name,
+                                 const std::string& parent,
                                  const std::string& portname,
                                  const devs::Time& time,
                                  const std::string& view);
 
     /**
-     * @brief Process the devs::ObservationEvent and write it to the Stream.
+     * @brief Process the devs::ObservationEvent and write it to the
+     * Stream.
      * @param event the devs::ObservationEvent to write.
      */
-    void process(Simulator* simulator,
+    void process(const std::string& name,
+                 const std::string& parent,
                  const std::string& portname,
                  const devs::Time& time,
                  const std::string& view,
@@ -101,7 +95,9 @@ public:
 
     /**
      * Close the output stream.
-     * @return A reference to the oov::Plugin if the plugin is serializable.
+     *
+     * @return A reference to the oov::Plugin if the plugin is
+     * serializable.
      */
     void close(const devs::Time& time);
 
@@ -121,30 +117,14 @@ public:
     ////
     ///
 
-    /**
-     * @brief Get the current View.
-     * @return View attached or NULL if no attanchement.
-     */
-    inline devs::View* getView() const
-    { return m_view; }
-
-    /**
-     * @brief Set the current View.
-     * @param View the new View to attach.
-     */
-    inline void setView(devs::View* View)
-    { m_view = View; }
-
     const utils::ModuleManager& getModuleManager() const
-    { return m_modulemgr; }
+    {
+        return m_modulemgr;
+    }
 
     oov::PluginPtr plugin();
 
 private:
-    StreamWriter(const StreamWriter& other);
-    StreamWriter& operator=(const StreamWriter& other);
-
-    devs::View*                 m_view;
     const utils::ModuleManager& m_modulemgr;
     oov::PluginPtr              m_plugin;
 };

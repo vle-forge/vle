@@ -34,12 +34,13 @@
 
 namespace vle { namespace devs {
 
-Simulator::Simulator(vpz::AtomicModel* atomic) :
-    m_atomicModel(atomic),
-    m_tn(negativeInfinity),
-    m_have_handle(false)
+Simulator::Simulator(vpz::AtomicModel* atomic)
+    : m_atomicModel(atomic)
+    , m_tn(negativeInfinity)
+    , m_have_handle(false)
+    , m_have_internal(false)
 {
-    assert(atomic);
+    assert(atomic && "Simulator: missing vpz::AtomicMOdel");
 }
 
 void Simulator::clear()
@@ -172,9 +173,12 @@ Time Simulator::init(Time time)
     return m_tn;
 }
 
-Time Simulator::confluentTransitions(const ExternalEventList& events, Time time)
+Time Simulator::confluentTransitions(Time time)
 {
-    m_dynamics->confluentTransitions(time, events);
+    assert(not m_external_events.empty() and "Simulator d-conf error");
+    assert(m_have_internal == true and "Simulator d-conf error");
+    m_dynamics->confluentTransitions(time, m_external_events);
+    m_external_events.clear();
 
     m_tn = timeAdvance() + time;
     return m_tn;
@@ -182,15 +186,19 @@ Time Simulator::confluentTransitions(const ExternalEventList& events, Time time)
 
 Time Simulator::internalTransition(Time time)
 {
+    assert(m_have_internal == true and "Simulator d-int error");
     m_dynamics->internalTransition(time);
+    m_have_internal = false;
 
     m_tn = timeAdvance() + time;
     return m_tn;
 }
 
-Time Simulator::externalTransition(const ExternalEventList& events, Time time)
+Time Simulator::externalTransition(Time time)
 {
-    m_dynamics->externalTransition(events, time);
+    assert(not m_external_events.empty() and "Simulator d-ext error");
+    m_dynamics->externalTransition(m_external_events, time);
+    m_external_events.clear();
 
     m_tn = timeAdvance() + time;
     return m_tn;

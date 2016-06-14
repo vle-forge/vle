@@ -36,6 +36,7 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/devs/InitEventList.hpp>
 #include <vle/devs/ExternalEventList.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/utils/ModuleManager.hpp>
 
 namespace vle { namespace devs {
@@ -61,6 +62,7 @@ public:
      * @param cls the vpz::classes to parse vpz::Dynamics to load.
      */
     ModelFactory(const utils::ModuleManager& modulemgr,
+                 std::map<std::string, View>& eventviews,
                  const vpz::Dynamics& dyn,
                  const vpz::Classes& cls,
                  const vpz::Experiment& experiment,
@@ -230,9 +232,9 @@ public:
                                        const std::string& modelname);
 
 private:
-    const utils::ModuleManager& mModuleMgr; /**< A reference to the
-                                              utils::ModuleManager. */
-
+    const utils::ModuleManager& mModuleMgr;
+    std::map<std::string, View>& mEventViews;
+    
     vpz::Dynamics           mDynamics; /**< List of available vpz::Dynamics. */
     vpz::Classes            mClasses; /**< List of available vpz::Classes. */
     vpz::Experiment         mExperiment; /**< A reference to the
@@ -268,7 +270,8 @@ private:
         attachDynamics(Coordinator& coordinator,
                        devs::Simulator* atom,
                        const vpz::Dynamic& dyn,
-                       const InitEventList& events);
+                       const InitEventList& events,
+                       const std::string& observable);
 };
 
 }} // namespace vle devs

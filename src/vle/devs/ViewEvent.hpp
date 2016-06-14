@@ -30,7 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/devs/View.hpp>
-#include <vector>
+#include <cassert>
 
 namespace vle { namespace devs {
 
@@ -38,157 +38,33 @@ namespace vle { namespace devs {
  * ViewEvent is used in scheduller to store the date to launch observation of
  * atomic models.
  */
-class VLE_LOCAL ViewEvent
+struct VLE_LOCAL ViewEvent
 {
-public:
-    /**
-     * @brief Build a new ViewEvent to be store into the scheduller.
-     *
-     * @param view The View to store.
-     * @param time When wake up the View.
-     */
-    ViewEvent(View* view, const Time& time)
-        : mView(view), mTime(time)
-    {}
-
-    ViewEvent(const ViewEvent&) = default;
-    ViewEvent& operator=(const ViewEvent&) = default;
-    ViewEvent(ViewEvent&&) = default;
-    ViewEvent& operator=(ViewEvent&&) = default;
+    ViewEvent(View* view, Time currenttime, Time timestep)
+        : mView(view)
+        , mTime(currenttime)
+        , mTimestep(timestep)
+    {
+        assert(view && "ViewEvent: view is null");
+        assert(not isInfinity(currenttime) && "ViewEvent: bad current time");
+        assert(not isInfinity(timestep) && "ViewEvent: bad timestep");
+    }
     
-    //
-    //
+    /**
+     * Call for each \e devs::Dynamics attached to this view, the
+     * observation function.
+     */
+    void run() { mView->run(mTime); }
 
     /**
-     * @brief Call for each atomic models (devs::Dynamics) attached to this
-     * view, the observation function.
-     *
-     * @return The next date of the futur
+     * Update the next wake-up time.
      */
-    void run(Time time) { mView->run(time); }
+    void update() { mTime = mTime + mTimestep; }
 
-    /**
-     * @brief Update the next wake-up time.
-     */
-    void update(Time current) { mTime = mView->getNextTime(current); }
-
-    //
-    //
-
-    /**
-     * @brief Get a reference to the View.
-     *
-     * @return A valid View.
-     */
-    View* getView() const { return mView; }
-
-    /**
-     * @brief Get the next time to wake up the View.
-     *
-     * @return An absolute date.
-     */
-    Time getTime() const { return mTime; }
-
-    /**
-     * Inferior comparator use Time as key.
-     * @param event Event to test, no test on validity.
-     * @return true if this Event is inferior to event.
-     */
-    inline bool operator<(const ViewEvent* event) const
-    { return mTime < event->mTime; }
-
-    /**
-     * Superior comparator use Time as key.
-     * @param event Event to test, no test on validity.
-     * @return true if this Event is superior to event.
-     */
-    inline bool operator>(const ViewEvent* event) const
-    { return mTime > event->mTime; }
-
-    /**
-     * Equality comparator use Time as key.
-     * @param event Event to test, no test on validity.
-     * @return true if this Event is equal to  event.
-     */
-    inline bool operator==(const ViewEvent * event) const
-    { return mTime == event->mTime; }
-
-private:
     View* mView;
     Time  mTime;
+    Time  mTimestep;
 };
-
-class ViewEventList
-{
-public:
-    typedef std::vector < ViewEvent* > value_type;
-    typedef value_type::iterator iterator;
-    typedef value_type::const_iterator const_iterator;
-    typedef value_type::size_type size_type;
-
-    void add(ViewEvent* event)
-    {
-        mElems.push_back(event);
-    }
-
-    void pop()
-    {
-        mElems.pop_back();
-    }
-
-    ViewEvent* front()
-    {
-        checkRange(0);
-        return mElems[0];
-    }
-
-    devs::Time time()
-    {
-        return front()->getTime();
-    }
-
-    void clear()
-    {
-        mElems.clear();
-    }
-
-    void erase()
-    {
-        for (auto elem : mElems)
-            delete elem;
-
-        mElems.clear();
-    }
-
-    void insert(iterator first, iterator last)
-    {
-        mElems.insert(begin(), first, last);
-    }
-
-    void remove(Simulator* sim)
-    {
-        for (auto& elem : mElems)
-            elem->getView()->removeObservable(sim);
-    }
-
-    iterator begin() { return mElems.begin(); }
-    const_iterator begin() const { return mElems.begin(); }
-    iterator end() { return mElems.end(); }
-    const_iterator end() const { return mElems.end(); }
-    bool empty() const { return mElems.empty(); }
-    size_type size() const { return mElems.size(); }
-
-private:
-    value_type mElems;
-
-    void checkRange(size_type i)
-    {
-        if (i >= size()) {
-            throw utils::InternalError("ViewEvent: index out of range");
-        }
-    }
-};
-
 
 }} // namespace vle devs
 

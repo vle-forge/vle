@@ -45,17 +45,20 @@ namespace vle { namespace vpz {
         /**
          * @brief Define the type of View.
          */
-        enum Type { TIMED, EVENT, FINISH };
+        enum Type {
+            TIMED     = 1 << 1,
+            OUTPUT    = 1 << 2,
+            INTERNAL  = 1 << 3,
+            EXTERNAL  = 1 << 4,
+            CONFLUENT = 1 << 5,
+            FINISH    = 1 << 6
+        };
 
         /**
          * @brief Build a new event view with a specific name.
          * @param name The name of the View.
          */
-        View(const std::string& name) :
-            m_name(name),
-            m_type(EVENT),
-            m_timestep(0.0)
-        {}
+        View(const std::string& name);
 
         /**
          * @brief Build a new View with a specific name, type and reference.
@@ -72,8 +75,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to delete.
          */
-        virtual ~View()
-        {}
+        virtual ~View() = default;
 
         /**
          * @brief Write the XML representation of this class.
@@ -130,11 +132,7 @@ namespace vle { namespace vpz {
          * @brief Get a string representation of the current type.
          * @return "timed", "event" or "finish".
          */
-        inline std::string streamtype() const
-        {
-            return m_type == TIMED ? "timed" : m_type == EVENT ? "event" :
-                "finish";
-        }
+        std::string streamtype() const;
 
         /**
          * @brief Assign a new time step to the timed view.
@@ -179,12 +177,67 @@ namespace vle { namespace vpz {
 	bool operator==(const View& view) const;
 
     private:
-        std::string     m_name;
-        Type            m_type;
-        std::string     m_output;
         double          m_timestep;
+        std::string     m_name;
+        std::string     m_output;
         std::string     m_data;
+        Type            m_type;
     };
+
+inline
+View::Type operator|(View::Type lhs, View::Type rhs) noexcept
+{
+    return static_cast<View::Type>(
+        static_cast<unsigned>(lhs) |
+        static_cast<unsigned>(rhs));
+}
+
+inline
+View::Type operator&(View::Type lhs, View::Type rhs) noexcept
+{
+    return static_cast<View::Type>(
+        static_cast<unsigned>(lhs) &
+        static_cast<unsigned>(rhs));
+}
+
+inline
+View::Type operator^(View::Type lhs, View::Type rhs) noexcept
+{
+    return static_cast<View::Type>(
+        static_cast<unsigned>(lhs) ^
+        static_cast<unsigned>(rhs));
+}
+
+inline
+View::Type operator~(View::Type flags) noexcept
+{
+    return static_cast<View::Type>(
+        ~static_cast<unsigned>(flags));
+}
+
+inline
+View::Type& operator|=(View::Type& lhs, View::Type rhs) noexcept
+{
+    return (lhs = static_cast<View::Type>(
+                static_cast<unsigned>(lhs) |
+                static_cast<unsigned>(rhs)));
+}
+
+inline
+View::Type& operator&=(View::Type& lhs, View::Type rhs) noexcept
+{
+    return (lhs = static_cast<View::Type>(
+                static_cast<unsigned>(lhs) &
+                static_cast<unsigned>(rhs)));
+}
+
+inline
+View::Type& operator^=(View::Type& lhs, View::Type rhs) noexcept
+{
+    return (lhs = static_cast<View::Type>(
+                static_cast<unsigned>(lhs) ^
+                static_cast<unsigned>(rhs)));
+}
 
 }} // namespace vle vpz
 

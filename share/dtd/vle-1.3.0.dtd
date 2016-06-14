@@ -100,7 +100,7 @@
 
 <!ATTLIST view
   name CDATA #REQUIRED
-  type (timed|event|finish) #REQUIRED
+  type (timed|event|internal|external|confluent|output|finish) #REQUIRED
   output CDATA #REQUIRED
   timestep CDATA #IMPLIED >
 

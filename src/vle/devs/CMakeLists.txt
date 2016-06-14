@@ -1,21 +1,9 @@
-add_sources(vlelib Coordinator.cpp Coordinator.hpp Dynamics.cpp
-  DynamicsDbg.cpp DynamicsDbg.hpp Dynamics.hpp DynamicsWrapper.hpp
-  Executive.cpp ExecutiveDbg.hpp Executive.hpp ExternalEvent.cpp
-  ExternalEvent.hpp ExternalEventList.cpp ExternalEventList.hpp
-  InitEventList.hpp InternalEvent.cpp InternalEvent.hpp
-  ModelFactory.cpp ModelFactory.hpp ObservationEvent.hpp
-  RootCoordinator.cpp RootCoordinator.hpp Scheduler.cpp Scheduler.hpp
-  Simulator.cpp Simulator.hpp StreamWriter.cpp StreamWriter.hpp
-  Time.cpp Time.hpp View.cpp ViewEvent.hpp View.hpp)
+add_sources(vlelib Coordinator.cpp Dynamics.cpp DynamicsDbg.cpp
+  Executive.cpp ExternalEvent.cpp ExternalEventList.cpp
+  InternalEvent.cpp ModelFactory.cpp RootCoordinator.cpp Scheduler.cpp
+  Simulator.cpp StreamWriter.cpp Time.cpp View.cpp ViewEvent.cpp)
 
-# install(FILES Coordinator.hpp DynamicsDbg.hpp Dynamics.hpp
-#   DynamicsWrapper.hpp ExecutiveDbg.hpp Executive.hpp ExternalEvent.hpp
-#   ExternalEventList.hpp InitEventList.hpp InternalEvent.hpp
-#   ModelFactory.hpp ObservationEvent.hpp RootCoordinator.hpp
-#   Scheduler.hpp Simulator.hpp StreamWriter.hpp Time.hpp ViewEvent.hpp
-#   View.hpp DESTINATION ${VLE_INCLUDE_DIRS}/devs)
-
-install(FILES DynamicsDbg.hpp Dynamics.hpp DynamicsWrapper.hpp
+install(FILES Dynamics.hpp DynamicsWrapper.hpp
   ExecutiveDbg.hpp Executive.hpp ExternalEvent.hpp
   ExternalEventList.hpp InitEventList.hpp ObservationEvent.hpp
   Time.hpp DESTINATION ${VLE_INCLUDE_DIRS}/devs)

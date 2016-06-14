@@ -48,6 +48,7 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <iostream>
+#include "oov.hpp"
 
 #if defined(__unix__)
 #include <unistd.h>
@@ -191,12 +192,10 @@ public:
 
     virtual devs::Time timeAdvance() const override
     {
-        if (m_active) {
+        if (m_active)
             return devs::Time(0.0);
-        }
-        else {
-            return devs::infinity;
-        }
+
+        return devs::infinity;
     }
 
     virtual void internalTransition(devs::Time /* event */) override
@@ -690,153 +689,6 @@ public:
     }
 };
 
-
-std::string make_id(const std::string& view,
-                    const std::string& simulator,
-                    const std::string& parent,
-                    const std::string& port)
-{
-    std::string ret;
-    ret.reserve(view.size() + simulator.size() +
-                parent.size() + port.size() + 4);
-
-    ret += view;
-    ret += '.';
-    ret += parent;
-    ret += '.';
-    ret += simulator;
-    ret += '.';
-    ret += port;
-
-    return ret;
-}
-
-
-class OutputPlugin : public vle::oov::Plugin
-{
-    using data_type = std::map<
-        std::string,
-        std::vector<
-            std::pair<
-                double, std::unique_ptr<vle::value::Value>>>>;
-    
-    data_type ppD;
-
-public:
-    OutputPlugin(const std::string& location)
-        : vle::oov::Plugin(location)
-    {   
-    }
-
-    virtual ~OutputPlugin() = default;
-
-    virtual std::unique_ptr<value::Matrix> matrix() const override
-    {
-        BOOST_REQUIRE(not ppD.empty());
-        const size_t columns = ppD.size() + 1; // colums = number of
-                                               // observation + a time column.
-        size_t rows = 0;
-
-        for (auto& elem : ppD)
-            for (std::size_t i = 0, e = elem.second.size(); i != e; ++i)
-                rows = std::max(rows,
-                                static_cast<std::size_t>(
-                                    std::floor(elem.second[i].first)));
-
-        auto matrix = std::unique_ptr<value::Matrix>(
-            new value::Matrix{columns, rows + 1, 100, 100});
-
-        size_t col = 1;
-        for (auto& elem : ppD) {
-            for (std::size_t i = 0, e = elem.second.size(); i != e; ++i) {
-                std::size_t row = static_cast<std::size_t>(
-                    std::floor(elem.second[i].first));
-
-                if (elem.second[i].second)
-                    matrix->set(col, row, elem.second[i].second->clone());
-
-                matrix->set(0, row, value::Double::create(elem.second[i].first));
-            }
-            col++;
-        }
-    
-        return matrix;
-    }
-
-    virtual std::string name() const override
-    {
-        return "OutputPlugin";
-    }
-
-    virtual bool isCairo() const override
-    {
-        return false;
-    }
-
-    virtual void onParameter(const std::string& plugin,
-                             const std::string& location,
-                             const std::string& file,
-                             std::unique_ptr<value::Value> parameters,
-                             const double& time) override
-    {
-        (void)plugin;
-        (void)location;
-        (void)file;
-        (void)parameters;
-        (void)time;            
-    }
-
-    virtual void onNewObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& port,
-                                 const std::string& view,
-                                 const double& time) override
-    {
-        (void)time;
-
-        std::string id = make_id(view, parent, simulator, port);
-        BOOST_REQUIRE(ppD.find(id) == ppD.cend());
-
-        ppD[id].reserve(100);
-    }
-
-    virtual void onDelObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& port,
-                                 const std::string& view,
-                                 const double& time) override
-    {
-        (void)time;
-
-        std::string id = make_id(view, parent, simulator, port);
-
-        BOOST_REQUIRE(ppD.find(id) != ppD.cend());
-    }
-
-    virtual void onValue(const std::string& simulator,
-                         const std::string& parent,
-                         const std::string& port,
-                         const std::string& view,
-                         const double& time,
-                         std::unique_ptr<value::Value> value) override
-    {
-        if (simulator.empty()) /** TODO this is a strange
-                                   behaviour. Sending value withtout
-                                   simulator ?!?. */
-            return;
-        
-        std::string id = make_id(view, parent, simulator, port);
-
-        BOOST_REQUIRE(ppD.find(id) != ppD.cend());
-
-        ppD[id].emplace_back(time, std::move(value));
-    }
-
-    virtual void close(const double& /* time */) override
-    {
-    }
-};
-
 DECLARE_DYNAMICS_SYMBOL(dynamics_beep, ::Beep)
 DECLARE_DYNAMICS_SYMBOL(dynamics_counter, ::Counter)
 DECLARE_DYNAMICS_SYMBOL(dynamics_transform, ::Transform)
@@ -848,7 +700,7 @@ DECLARE_EXECUTIVE_SYMBOL(exe_deleteconnection, ::DeleteConnection)
 DECLARE_EXECUTIVE_SYMBOL(exe_genexecutive, ::GenExecutive)
 DECLARE_EXECUTIVE_SYMBOL(exe_leaf, ::Leaf)
 DECLARE_EXECUTIVE_SYMBOL(exe_root, ::Root)
-DECLARE_OOV_SYMBOL(oov_plugin, ::OutputPlugin)
+DECLARE_OOV_SYMBOL(oov_plugin, ::vletest::OutputPlugin)
 
 BOOST_AUTO_TEST_CASE(test_gensvpz)
 {
@@ -873,6 +725,7 @@ BOOST_AUTO_TEST_CASE(test_gensvpz)
 
     /* get result of simulation */
     value::Matrix &matrix = out->getMatrix("view1");
+    std::cout << matrix << '\n';
 
     BOOST_REQUIRE_EQUAL(matrix.rows(), (std::size_t)101);
     BOOST_REQUIRE_EQUAL(matrix.columns(), (std::size_t)3);
@@ -955,7 +808,6 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(test_confluent_transition)
 {
     int ret = ::chdir(DEVS_TEST_DIR);
@@ -972,13 +824,14 @@ BOOST_AUTO_TEST_CASE(test_confluent_transition)
 
         while (root.run());
         std::unique_ptr<value::Map> out = root.outputs();
-        BOOST_REQUIRE(out);
+        BOOST_REQUIRE(not out);
         root.finish();
     } catch (const std::exception& e) {
         BOOST_REQUIRE(false);
+    } catch (...) { 
+        BOOST_REQUIRE(false);
     }
 }
-
 
 BOOST_AUTO_TEST_CASE(test_timed_obs)
 {
@@ -1002,4 +855,3 @@ BOOST_AUTO_TEST_CASE(test_timed_obs)
         BOOST_REQUIRE(false);
     }
 }
-

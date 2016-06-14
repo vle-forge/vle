@@ -108,6 +108,7 @@ View& Views::add(const View& view)
 }
 
 View& Views::addEventView(const std::string& name,
+                          View::Type type,
                           const std::string& output)
 {
     if (isUsedOutput(output)) {
@@ -116,7 +117,7 @@ View& Views::addEventView(const std::string& name,
              name).str());
     }
 
-    return add(View(name, View::EVENT, output));
+    return add(View(name, type, output));
 }
 
 View& Views::addTimedView(const std::string& name,
@@ -130,18 +131,6 @@ View& Views::addTimedView(const std::string& name,
     }
 
     return add(View(name, View::TIMED, output, timestep));
-}
-
-View& Views::addFinishView(const std::string& name,
-                           const std::string& output)
-{
-    if (isUsedOutput(output)) {
-        throw utils::ArgError(
-            (fmt(_("Output '%1%' of view '%2%' is already used")) % output %
-             name).str());
-    }
-
-    return add(View(name, View::FINISH, output));
 }
 
 void Views::del(const std::string& name)
@@ -185,11 +174,8 @@ void Views::renameOutput(const std::string& oldname,
             case vpz::View::TIMED:
                 addTimedView(copy.name(), copy.timestep(), newname);
                 break;
-            case vpz::View::EVENT:
-                addEventView(copy.name(), newname);
-                break;
-            case vpz::View::FINISH:
-                addFinishView(copy.name(), newname);
+            default:
+                addEventView(copy.name(), copy.type(), newname);
                 break;
             }
         }
@@ -207,11 +193,8 @@ void Views::renameView(const std::string& oldname,
     case vpz::View::TIMED:
 	addTimedView(newname, copy.timestep(), newname);
 	break;
-    case vpz::View::EVENT:
-	addEventView(newname, newname);
-	break;
-    case vpz::View::FINISH:
-	addFinishView(newname, newname);
+    default:
+	addEventView(newname, copy.type(), newname);
 	break;
     }
 }
@@ -256,11 +239,8 @@ void Views::copyView(const std::string& viewname,
     case vpz::View::TIMED:
 	addTimedView(copy.name(), copy.timestep(), copyoutputname);
 	break;
-    case vpz::View::EVENT:
-	addEventView(copy.name(), copyoutputname);
-	break;
-    case vpz::View::FINISH:
-	addFinishView(copy.name(), copyoutputname);
+    default:
+	addEventView(copy.name(), copy.type(), copyoutputname);
 	break;
     }
 }
