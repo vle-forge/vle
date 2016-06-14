@@ -46,6 +46,7 @@ namespace vle { namespace vpz {
          * @brief Define the type of View.
          */
         enum Type {
+            NOTHING   = 0,
             TIMED     = 1 << 1,
             OUTPUT    = 1 << 2,
             INTERNAL  = 1 << 3,

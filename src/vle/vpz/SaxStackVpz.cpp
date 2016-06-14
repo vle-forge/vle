@@ -749,12 +749,11 @@ void SaxStackVpz::pushView(const xmlChar** att)
         ustring typestr(type);
         ustring::size_type begin { 0 };
         ustring::size_type it = typestr.find(',');
-        unsigned viewtype { 0 };
+        View::Type viewtype = View::NOTHING;
 
         auto tmp = typestr.substr(begin, it);
         if (tmp == (const xmlChar*)"event")
-            viewtype = static_cast<View::Type>(View::OUTPUT | View::INTERNAL |
-                                           View::EXTERNAL | View::FINISH);
+            viewtype = View::INTERNAL | View::CONFLUENT | View::EXTERNAL;
         else if (tmp == (const xmlChar*)"output")
             viewtype |= View::OUTPUT;
         else if (tmp == (const xmlChar*)"internal")
