@@ -1095,18 +1095,18 @@ gvle_win::onCustomContextMenu(const QPoint &point)
         QStringList plugList = mGvlePlugins.getMainPanelOutPluginsList();
         for (int i =0; i<plugList.size(); i++) {
             QString pluginName = plugList.at(i);
-            action = ctxMenu.addAction(tr("Use") + " " + pluginName);
+            action = ctxMenu.addAction(tr("Open with") + " " + pluginName);
             action->setProperty("outPlugin", pluginName);
         }
     }
     if (insideVpz(index)) {
         ctxMenu.addSeparator();
-        action = ctxMenu.addAction(tr("Use") + " " + "Default");
+        action = ctxMenu.addAction(tr("Open with") + " " + "Default");
         action->setProperty("vpzPlugin", "Default");
         QStringList plugList = mGvlePlugins.getMainPanelVpzPluginsList();
         for (int i =0; i<plugList.size(); i++) {
             QString pluginName = plugList.at(i);
-            action = ctxMenu.addAction(tr("Use") + " " + pluginName);
+            action = ctxMenu.addAction(tr("Open with") + " " + pluginName);
             action->setProperty("vpzPlugin", pluginName);
         }
     }
@@ -1151,6 +1151,11 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             } else {
                 plugName = selectedItem->property("outPlugin");
                 if (plugName.isValid()) {
+                    int alreadyOpened = findTabIndex(relPath);
+                    if (alreadyOpened != -1) {
+                        ui->tabWidget->setCurrentIndex(alreadyOpened);
+                        return ;
+                    }
 
                     PluginMainPanel* newPanel = mGvlePlugins.newInstanceMainPanelOutPlugin(
                         plugName.toString());
@@ -1175,24 +1180,34 @@ gvle_win::onCustomContextMenu(const QPoint &point)
                     if (not plugName.isValid()) {
                         return;
                     } else if (plugName.toString() == "Default") {
+                        int alreadyOpened = findTabIndex(relPath);
+                        if (alreadyOpened != -1) {
+                            ui->tabWidget->setCurrentIndex(alreadyOpened);
+                            return ;
+                        }
                         newPanel = new DefaultVpzPanel();
                     } else {
+                        int alreadyOpened = findTabIndex(relPath);
+                        if (alreadyOpened != -1) {
+                            ui->tabWidget->setCurrentIndex(alreadyOpened);
+                            return ;
+                        }
                         newPanel = mGvlePlugins.newInstanceMainPanelVpzPlugin(
                             plugName.toString());
                     }
 
-                        QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
-                                         this, SLOT(onUndoAvailable(bool)));
+                    QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
+                                     this, SLOT(onUndoAvailable(bool)));
 
-                        QString relPath = getRelPathFromFSIndex(index);
+                    QString relPath = getRelPathFromFSIndex(index);
 
-                        newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+                    newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
 
-                        int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
-                        bool oldBlock = ui->tabWidget->blockSignals(true);
-                        ui->tabWidget->setCurrentIndex(n);
-                        ui->tabWidget->widget(n)->setProperty("relPath",relPath);
-                        ui->tabWidget->blockSignals(oldBlock);
+                    int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
+                    bool oldBlock = ui->tabWidget->blockSignals(true);
+                    ui->tabWidget->setCurrentIndex(n);
+                    ui->tabWidget->widget(n)->setProperty("relPath",relPath);
+                    ui->tabWidget->blockSignals(oldBlock);
 
                     mPanels.insert(relPath,newPanel);
                 }
