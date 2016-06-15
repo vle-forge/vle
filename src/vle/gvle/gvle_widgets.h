@@ -34,12 +34,33 @@
 #include <QHBoxLayout>
 #include <QTableWidget>
 #include <QLabel>
+#include <QLineEdit>
 #include <vle/value/Value.hpp>
 
 #include <iostream>
 
 namespace vle {
 namespace gvle {
+
+/**
+ * A double Editor
+ */
+class VleDoubleEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+    VleDoubleEdit(QWidget* parent, double val, const QString& idStr="");
+    ~VleDoubleEdit();
+    void focusInEvent(QFocusEvent* e);
+    bool eventFilter(QObject *target, QEvent *event);
+
+    QString id;
+public slots:
+    void onValueChanged();
+signals:
+    void valUpdated(const QString& id, double v);
+    void selected(const QString& id);
+};
 
 /**
  * A push button with an id

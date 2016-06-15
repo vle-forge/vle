@@ -87,7 +87,7 @@ private:
     void insertNullWidget(int row, int col);
     void insertTextEdit(int row, int col, const QString& val);
     void insertSpinBox(int row, int col, int val);
-    void insertDoubleSpinBox(int row, int col, double val);
+    void insertDoubleEdit(int row, int col, double val);
     void insertBooleanCombo(int row, int col, bool val);
     VleTextEdit* getTextEdit(int row, int col);
 

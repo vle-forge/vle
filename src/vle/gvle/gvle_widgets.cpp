@@ -44,12 +44,71 @@
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
 #include "gvle_widgets.h"
+#include <float.h>
 #include <iostream>
 #include <QDebug>
 
 
 namespace vle {
 namespace gvle {
+
+VleDoubleEdit::VleDoubleEdit(QWidget* parent, double val,
+                             const QString& idStr): QLineEdit(parent), id(idStr)
+{
+
+    QDoubleValidator *validator =
+        new QDoubleValidator(-DBL_MAX, DBL_MAX,
+                             std::numeric_limits<double>::digits10, this);
+    validator->setNotation(QDoubleValidator::ScientificNotation);
+    setValidator(validator);
+
+    setText(QLocale().toString(val, 'g',
+                               std::numeric_limits<double>::digits10));
+
+    QObject::connect(this, SIGNAL(editingFinished()),
+            this, SLOT(onValueChanged()));
+
+    installEventFilter(this);
+}
+
+VleDoubleEdit::~VleDoubleEdit()
+{
+}
+
+bool
+VleDoubleEdit::eventFilter(QObject *target, QEvent *event)
+{
+    if (target == this) {
+        switch(event->type()) {
+        case QEvent::FocusOut:
+            if (text().isEmpty()) {
+                setText("0");
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return QWidget::eventFilter(target, event);
+}
+
+void
+VleDoubleEdit::focusInEvent(QFocusEvent* e)
+{
+    QLineEdit::focusInEvent(e);
+    emit selected(id);
+}
+
+void
+VleDoubleEdit::onValueChanged()
+{
+    bool ok;
+    double v = QLocale().toDouble(text(), &ok);
+    if (ok) {
+        emit valUpdated(id, v);
+    }
+}
 
 VlePushButton::VlePushButton(QWidget *parent, const QString& text,
         const QString& idStr): QPushButton(text, parent), id(idStr)
