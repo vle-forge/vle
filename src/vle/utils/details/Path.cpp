@@ -36,31 +36,16 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
+#include <vle/utils/Filesystem.hpp>
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-
-// To avoid the C++11/14 link error: gcc-4.9 and boost-1.55
-// libvle-1.3.so.0: undefined reference «
-//    boost::filesystem::detail::copy_file(
-//    boost::filesystem::path const&,
-//    boost::filesystem::path const&,
-//    boost::filesystem::copy_option,
-//    boost::system::error_code*) »
-
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
-
 #include <boost/lexical_cast.hpp>
 #include <boost/version.hpp>
 
 namespace vle { namespace utils {
 
 static const char *pkgdirname = "pkgs-" VLE_ABI_VERSION;
-
-namespace fs = boost::filesystem;
 
 std::string Path::getLocaleDir() const
 {
@@ -111,112 +96,27 @@ std::string Path::getTemplate(const std::string& name) const
     return buildFilename(m_prefix, VLE_SHARE_DIRS, "template", name);
 }
 
-void Path::copyTemplate(const std::string& name, const std::string& to) const
-{
-    const std::string& dirname(getTemplate("package"));
-    fs::path source(dirname);
-
-    if (not fs::exists(source)) {
-        throw utils::InternalError(
-            (fmt(_("Can not copy '%1%' into '%2%'. '%1%' does not exist in"
-                   "'%3%'")) % name % to % dirname).str());
-    }
-
-    if (fs::is_directory(source)) {
-        try {
-            std::list < std::string > buildeddir;
-            for (fs::recursive_directory_iterator it(source), end; it != end;
-                 ++it) {
-                std::list < std::string > store;
-                {
-                    fs::path tmp(it->path());
-                    for (int i = it.level(); i >= 0; --i) {
-#if BOOST_VERSION > 104500
-                        store.push_back(tmp.filename().string());
-#else
-                        store.push_back(tmp.leaf());
-#endif
-                        tmp = tmp.branch_path();
-                    }
-                }
-
-                fs::path dst(to);
-                {
-                    for (std::list < std::string >::const_reverse_iterator jt =
-                         store.rbegin(); jt != store.rend(); ++jt) {
-                        dst /= *jt;
-                    }
-                }
-
-                fs::path dir(dst.branch_path());
-
-                if (std::find(buildeddir.rbegin(), buildeddir.rend(),
-                              dir.string()) == buildeddir.rend()) {
-                    if (not fs::exists(dir)) {
-                        fs::create_directories(dir);
-                        buildeddir.push_back(dir.string());
-                    }
-                }
-                fs::path src(it->path());
-                dir /= src.leaf();
-
-                if (not fs::is_directory(src) and not fs::exists(dir)) {
-                    fs::copy_file(src, dir);
-                }
-            }
-        } catch (const std::exception& e) {
-            throw utils::InternalError(
-                (fmt(_("Error when copy template '%1%' into '%2%: %3%")) % name
-                 % to % e.what()).str());
-        }
-    } else {
-        try {
-            fs::path src(source);
-            fs::path dst(to);
-            dst /= src.leaf();
-            if (fs::exists(src) and not fs::exists(dst)) {
-                fs::copy_file(src, dst);
-            }
-        } catch (const std::exception& e) {
-            throw utils::InternalError(
-                (fmt(_("Can not copy '%1%' into '%2%': %3%")) % name % to %
-                 e.what()).str());
-        }
-    }
-}
-
 std::string Path::getCurrentDir() const
 {
-    return fs::current_path().string();
+    return FSpath::current_path().string();
 }
 
 PathList Path::getBinaryPackages()
 {
-    fs::path pkgs(Path::path().getBinaryPackagesDir());
+    FSpath pkgs(Path::path().getBinaryPackagesDir());
 
-    if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
+    if (not pkgs.is_directory())
         throw utils::InternalError(
             (fmt(_("Package error: '%1%' is not a directory")) %
              Path::path().getBinaryPackagesDir()).str());
-    }
 
     PathList result;
-    for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
-        if (fs::is_directory(it->status())) {
-#if BOOST_VERSION > 104500
-            result.push_back(it->path().filename().string());
-#elif BOOST_VERSION > 103600
+    for (FSdirectory_iterator it(pkgs), end; it != end; ++it)
+        if (it->is_directory())
             result.push_back(it->path().filename());
-#else
-            result.push_back(it->path().leaf());
-#endif
-        }
-    }
 
     return result;
 }
-
-
 
 PathList Path::getBinaryLibraries()
 {
@@ -224,103 +124,66 @@ PathList Path::getBinaryLibraries()
     const PathList& dirs = Path::path().getSimulatorDirs();
 
     for (auto elem : dirs) {
-        fs::path dir(elem);
+        FSpath dir(elem);
 
-        if (not fs::exists(dir) or not fs::is_directory(dir)) {
+        if (not dir.is_directory())
             throw utils::InternalError(
                 (fmt(_("Pkg list error: '%1%' is not a library directory")) %
-#if BOOST_VERSION > 103600
                  dir.string()).str());
-#else
-            dir.file_string()).str());
-#endif
-        }
 
-        for (fs::directory_iterator jt(dir), end; jt != end; ++jt) {
-#if BOOST_VERSION > 104500
-            if (fs::is_regular_file(jt->status())) {
-                std::string ext = jt->path().extension().string();
-#elif BOOST_VERSION > 103600
-            if (fs::is_regular_file(jt->status())) {
-                fs::path::string_type ext = jt->path().extension();
-#else
-            if (fs::is_regular(jt->status())) {
-                fs::path::string_type ext = fs::extension(jt->path());
-#endif
+        for (FSdirectory_iterator jt(dir), end; jt != end; ++jt) {
+            if (jt->is_file()) {
+                std::string ext = jt->path().extension();
+
 #ifdef _WIN32
-                if (ext == ".dll") {
+                if (ext == ".dll")
                     result.push_back(jt->path().string());
-                }
-#elif G_OS_MACOS
-                if (ext == ".dylib") {
-                    result.push_back(jt->path().file_string());
-                }
-#else
-                if (ext == ".so") {
-#if BOOST_VERSION > 104500
+#elif __APPLE__
+                if (ext == ".dylib")
                     result.push_back(jt->path().string());
 #else
-                    result.push_back(jt->path().file_string());
-#endif
-                }
-#endif
+                if (ext == ".so")
+                    result.push_back(jt->path().string());
+#endif              
             }
         }
     }
     return result;
 }
 
-std::string Path::getPackageFromPath(const std::string& path)
-{
-    fs::path source(path);
-    fs::path package(vle::utils::Path::path().getBinaryPackagesDir());
+// std::string Path::getPackageFromPath(const std::string& path)
+// {
+//     FSpath source(path);
+//     FSpath package(vle::utils::Path::path().getBinaryPackagesDir());
 
-    fs::path::iterator it = source.begin();
-    fs::path::iterator jt = package.begin();
+//     fs::path::iterator it = source.begin();
+//     fs::path::iterator jt = package.begin();
 
-    while (it != source.end() and jt != package.end()) {
-        if ((*it) == (*jt)) {
-            ++it;
-            ++jt;
-        } else {
-            break;
-        }
-    }
+//     while (it != source.end() and jt != package.end()) {
+//         if ((*it) == (*jt)) {
+//             ++it;
+//             ++jt;
+//         } else {
+//             break;
+//         }
+//     }
 
-    if (jt == package.end() and it != source.end()) {
-#if BOOST_VERSION > 104500
-        return it->string();
-#else
-        return *it;
-#endif
-    } else {
-        return std::string();
-    }
-}
+//     if (jt == package.end() and it != source.end()) {
+//         return it->string();
+//     } else {
+//         return std::string();
+//     }
+// }
 
 void Path::initVleHomeDirectory()
 {
-    boost::system::error_code ec;
+    FSpath pkgs = getBinaryPackagesDir();
 
-    fs::path pkgs = getBinaryPackagesDir();
-
-#if BOOST_VERSION > 104500
-    if (not fs::exists(pkgs, ec)) {
-        if (not fs::create_directories(getBinaryPackagesDir(), ec)) {
+    if (not pkgs.exists())
+        if (not FSpath::create_directories(getBinaryPackagesDir()))
             throw FileError(
-                (fmt(_("Failed to build VLE_HOME directory (%1%):\n%2%")) %
-                 pkgs.string() % ec.message()).str());
-        }
-    }
-#else
-    if (not fs::exists(pkgs)) {
-        if (not fs::create_directories(getBinaryPackagesDir())) {
-            throw FileError(fmt(
-                    _("Failed to build VLE_HOME directory (%1%):\n%2%")) %
-                pkgs.string() % ec.message());
-        }
-    }
-#endif
+                (fmt(_("Failed to build VLE_HOME directory (%1%)")) %
+                 pkgs.string()).str());
 }
 
 /*
@@ -329,30 +192,26 @@ void Path::initVleHomeDirectory()
 
 void Path::addSimulatorDir(const std::string& dirname)
 {
-    if (fs::is_directory(dirname)) {
+    if (FSpath::is_directory(dirname))
         m_simulator.push_back(dirname);
-    }
 }
 
 void Path::addStreamDir(const std::string& dirname)
 {
-    if (fs::is_directory(dirname)) {
+    if (FSpath::is_directory(dirname))
         m_stream.push_back(dirname);
-    }
 }
 
 void Path::addOutputDir(const std::string& dirname)
 {
-    if (fs::is_directory(dirname)) {
+    if (FSpath::is_directory(dirname))
         m_output.push_back(dirname);
-    }
 }
 
 void Path::addModelingDir(const std::string& dirname)
 {
-    if (fs::is_directory(dirname)) {
+    if (FSpath::is_directory(dirname))
         m_modeling.push_back(dirname);
-    }
 }
 
 bool Path::readEnv(const std::string& variable, PathList& out)
@@ -390,7 +249,7 @@ void Path::readHomeDir()
         path.assign(path_str);
     }
     if (not path.empty()) {
-        if (fs::is_directory(path)) {
+        if (FSpath::is_directory(path)) {
             m_home = path;
         } else {
             throw FileError(
@@ -430,19 +289,15 @@ std::ostream& operator<<(std::ostream& out, const PathList& paths)
 
 std::string Path::buildTemp(const std::string& filename)
 {
+    FSpath tmp_path = FSpath::temp_directory_path() / filename;
 
-    boost::filesystem::path tmp_path;
-    boost::system::error_code ec;
-    tmp_path = fs::temp_directory_path(ec);
-
-    return utils::Path::buildFilename(tmp_path.string(), filename);
+    return tmp_path.string();
 }
-
 
 std::string Path::buildFilename(const std::string& dir,
                                 const std::string& file)
 {
-    fs::path f = dir;
+    FSpath f = dir;
     f /= file;
 
     return f.string();
@@ -452,7 +307,7 @@ std::string Path::buildFilename(const std::string& dir1,
                                 const std::string& dir2,
                                 const std::string& file)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
     f /= file;
 
@@ -464,7 +319,7 @@ std::string Path::buildFilename(const std::string& dir1,
                                 const std::string& dir3,
                                 const std::string& file)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
     f /= dir3;
     f /= file;
@@ -478,7 +333,7 @@ std::string Path::buildFilename(const std::string& dir1,
                                 const std::string& dir4,
                                 const std::string& file)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
     f /= dir3;
     f /= dir4;
@@ -494,7 +349,7 @@ std::string Path::buildFilename(const std::string& dir1,
                                 const std::string& dir5,
                                 const std::string& file)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
     f /= dir3;
     f /= dir4;
@@ -507,7 +362,7 @@ std::string Path::buildFilename(const std::string& dir1,
 std::string Path::buildDirname(const std::string& dir1,
                                const std::string& dir2)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
 
     return f.string();
@@ -517,7 +372,7 @@ std::string Path::buildDirname(const std::string& dir1,
                                const std::string& dir2,
                                const std::string& dir3)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
     f /= dir3;
 
@@ -529,7 +384,7 @@ std::string Path::buildDirname(const std::string& dir1,
                                const std::string& dir3,
                                const std::string& dir4)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
     f /= dir3;
     f /= dir4;
@@ -543,7 +398,7 @@ std::string Path::buildDirname(const std::string& dir1,
                                const std::string& dir4,
                                const std::string& dir5)
 {
-    fs::path f = dir1;
+    FSpath f = dir1;
     f /= dir2;
     f /= dir3;
     f /= dir4;
@@ -570,67 +425,58 @@ void Path::fillBinaryPackagesList(std::vector<std::string>& pkglist)
 
 std::string Path::getCurrentPath()
 {
-    fs::path current = fs::current_path();
+    FSpath current = FSpath::current_path();
 
-#if BOOST_VERSION > 104500
     return current.string();
-#else
-    return current.file_string();
-#endif
 }
 
 bool Path::exist(const std::string& filename)
 {
-    fs::path p(filename);
-    return fs::exists(p);
+    FSpath p(filename);
+
+    return p.exists();
 }
 
 bool Path::existDirectory(const std::string& filename)
 {
-    fs::path p(filename);
-    return fs::exists(p) and fs::is_directory(p);
+    FSpath p(filename);
+
+    return p.is_directory();
 }
 
 bool Path::existFile(const std::string& filename)
 {
-    fs::path p(filename);
-#if BOOST_VERSION > 103600
-    return fs::exists(p) and fs::is_regular_file(p);
-#else
-    return fs::exists(p) and fs::is_regular(p);
-#endif
+    FSpath p(filename);
+
+    return p.is_file();
 }
 
 std::string Path::filename(const std::string& filename)
 {
-    fs::path path(filename);
-#if BOOST_VERSION > 104500
-    return path.filename().string();
-#elif BOOST_VERSION > 103600
+    FSpath path(filename);
+
     return path.filename();
-#else
-    return path.leaf();
-#endif
 }
 
 std::string Path::basename(const std::string& filename)
 {
-    return fs::basename(filename);
+    FSpath path(filename);
+
+    return path.basename();
 }
 
 std::string Path::dirname(const std::string& filename)
 {
-    fs::path path(filename);
-#if BOOST_VERSION > 103600
+    FSpath path(filename);
+
     return path.parent_path().string();
-#else
-    return path.branch_path().string();
-#endif
 }
 
 std::string Path::extension(const std::string& filename)
 {
-    return fs::extension(filename);
+    FSpath path(filename);
+
+    return path.extension();
 }
 
 std::ostream& operator<<(std::ostream& out, const Path& p)
@@ -654,13 +500,9 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
 
 std::string Path::getParentPath(const std::string& pathfile)
 {
-    fs::path path(pathfile);
+    FSpath path(pathfile);
 
-#if BOOST_VERSION > 103600
     return path.parent_path().string();
-#else
-    return path.branch_path().string();
-#endif
 }
 
 }} // namespace vle utils

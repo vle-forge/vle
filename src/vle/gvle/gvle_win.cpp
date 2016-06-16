@@ -23,9 +23,6 @@
  */
 
 #include <iostream>
-
-#include <boost/filesystem.hpp>
-
 #include <QFileDialog>
 #include <QStyleFactory>
 #include <QActionGroup>
@@ -308,7 +305,7 @@ gvle_win::newProject(QString pathName)
 
     try {
         mCurrPackage.create();
-    } catch (boost::filesystem::filesystem_error&) {
+    } catch (...) {
         QMessageBox::warning(this, "Warning", QString("Project '")
                 + basename.c_str() + "' cannot be created in directory '"
                 + QDir::currentPath() + "'", QMessageBox::Ok);

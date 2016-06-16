@@ -29,33 +29,64 @@
 #include <ostream>
 #include <cstring>
 #include <thread>
+#include <stack>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
-
-// To avoid the C++11/14 link error: gcc-4.9 and boost-1.55
-// libvle-1.3.so.0: undefined reference «
-//    boost::filesystem::detail::copy_file(
-//    boost::filesystem::path const&,
-//    boost::filesystem::path const&,
-//    boost::filesystem::copy_option,
-//    boost::system::error_code*) »
-
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
-
+#include <vle/utils/Filesystem.hpp>
 #include <boost/version.hpp>
 #include <boost/cast.hpp>
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 #include "details/ShellUtils.hpp"
 
-namespace fs = boost::filesystem;
+namespace {
+
+void remove_all(const vle::utils::FSpath& path)
+{
+    if (not path.exists())
+        return;
+
+    if (path.is_file())
+        path.remove();
+
+    std::string command;
+    try {
+        vle::utils::Preferences prefs(true);
+        prefs.get("vle.command.dir.remove", &command);
+
+        command = (vle::fmt(command) % path.string()).str();
+
+        auto argv = vle::utils::Spawn::splitCommandLine(command);
+        auto exe = std::move(argv.front());
+        argv.erase(argv.begin());
+
+        vle::utils::Spawn spawn;
+        if (not spawn.start(exe, vle::utils::FSpath::current_path().string(),
+                            argv, 50000u))
+            throw vle::utils::InternalError(_("fail to start cmake command"));
+
+        spawn.wait();
+
+        std::string message;
+        bool success;
+
+        spawn.status(&message, &success);
+
+        if (not message.empty())
+            std::cerr << message << '\n';
+    } catch (const std::exception& e) {
+        TraceAlways(_("Package remove all: unable to remove `%s' with"
+                      " the `%s' command"),
+                    path.string().c_str(),
+                    command.c_str());
+    }
+}
+
+} // namespace anonymous
 
 namespace vle { namespace utils {
 
@@ -125,7 +156,8 @@ struct Package::Pimpl
         bool started = m_spawn.start(exe, workingDir, argv);
 
         if (not started) {
-            throw utils::ArgError((fmt(_("Failed to start `%1%'")) % exe).str());
+            throw utils::ArgError(
+                (fmt(_("Failed to start `%1%'")) % exe).str());
         }
     }
 
@@ -135,14 +167,13 @@ struct Package::Pimpl
         m_pkgsourcepath.clear();
 
         if (not m_pkgname.empty()) {
-            fs::path  path_binary = Path::path().getBinaryPackagesDir();
+            FSpath path_binary = Path::path().getBinaryPackagesDir();
             path_binary /= m_pkgname;
             m_pkgbinarypath = path_binary.string();
-            fs::path path_source_dir = Path::path().getCurrentDir();
-            fs::path path_source_pkg = path_source_dir;
+            FSpath path_source_dir = Path::path().getCurrentDir();
+            FSpath path_source_pkg = path_source_dir;
             path_source_pkg /= m_pkgname;
-            if (fs::exists(path_source_pkg) ||
-                fs::exists(path_source_dir)) {
+            if (path_source_pkg.exists() or path_source_dir.exists()) {
                 m_pkgsourcepath = path_source_pkg.string();
             }
         }
@@ -173,14 +204,69 @@ Package::~Package()
 
 void Package::create()
 {
-    if (fs::exists(getDir(PKG_SOURCE))) {
+    const std::string& dirname(utils::Path::path().getTemplate("package"));
+    FSpath source(dirname);
+
+    FSpath destination(getDir(PKG_SOURCE));
+
+    if (destination.exists())
         throw utils::FileError(
             (fmt(_("Pkg create error: "
-                   "the directory %1% already exists")) % getDir(PKG_SOURCE)).str());
-    }
+                   "the directory %1% already exists")) %
+             destination.string()).str());
+
     refreshPath();
-    fs::create_directory(getDir(PKG_SOURCE));
-    Path::path().copyTemplate("package",getDir(PKG_SOURCE));
+
+    FSpath::create_directory(destination);
+    std::string command;
+
+    try {
+        {
+            utils::Preferences prefs(true);
+            prefs.get("vle.command.dir.copy", &command);
+        }
+
+        command = (vle::fmt(command) % source.string() %
+                   destination.string()).str();
+
+        std::vector<std::string> argv = Spawn::splitCommandLine(command);
+        std::string exe = std::move(argv.front());
+        argv.erase(argv.begin());
+
+        utils::Spawn spawn;
+        if (not spawn.start(exe, FSpath::current_path().string(), argv, 50000u))
+            throw utils::InternalError(_("fail to start cmake command"));
+
+        std::string output, error;
+        while (not spawn.isfinish()) {
+            if (spawn.get(&output, &error)) {
+                std::cout << output;
+                std::cerr << error;
+
+                output.clear();
+                error.clear();
+
+                std::this_thread::sleep_for(std::chrono::microseconds(200));
+            } else
+                break;
+        }
+
+        spawn.wait();
+
+        std::string message;
+        bool success;
+        spawn.status(&message, &success);
+
+        if (not message.empty())
+            std::cerr << message << '\n';
+    } catch (const std::exception& e) {
+        TraceAlways(_("Package creatinig: unable to copy `%s' in `%s' with"
+                      "the `%s' command"),
+                      source.string().c_str(),
+                      destination.string().c_str(),
+                      command.c_str());
+    }
+
     m_pimpl->m_strout.append(_("Package creating - done\n"));
 }
 
@@ -202,11 +288,15 @@ void Package::configure()
         throw utils::FileError(
                 _("Pkg configure error: building directory path is empty"));
     }
-    if (not fs::exists(pkg_buildir)) {
-        fs::create_directories(pkg_buildir);
+
+    FSpath path { pkg_buildir };
+    if (not path.exists()) {
+        if (not FSpath::create_directories(path))
+            throw utils::FileError(
+                _("Pkg configure error: fails to build directories"));
     }
-    fs::path old_dir = fs::current_path();
-    fs::current_path(pkg_buildir);
+
+    FScurrent_path_restore restore(path);
 
     std::string pkg_binarydir = getDir(PKG_BINARY);
     std::string cmd = (fmt(m_pimpl->mCommandConfigure) % pkg_binarydir).str();
@@ -216,16 +306,13 @@ void Package::configure()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch(const std::exception& e) {
-        fs::current_path(old_dir);
         throw utils::InternalError(
             (fmt(_("Pkg configure error: %1%")) % e.what()).str());
     }
-    fs::current_path(old_dir);
 }
 
 void Package::test()
 {
-
     std::string pkg_buildir = getBuildDir(PKG_SOURCE);
     if (m_pimpl->mCommandBuild.empty()) {
         refreshCommands();
@@ -241,13 +328,14 @@ void Package::test()
         throw utils::FileError(
                 _("Pkg test error: building directory path is empty"));
     }
-    if (not fs::exists(pkg_buildir)) {
+
+    FSpath path { pkg_buildir };
+    if (not path.exists())
         throw utils::FileError(
             (fmt(_("Pkg test error: building directory '%1%' "
                    "does not exist ")) % pkg_buildir).str());
-    }
-    fs::path old_dir = fs::current_path();
-    fs::current_path(pkg_buildir);
+
+    FScurrent_path_restore restore(path);
 
     std::string cmd = (fmt(m_pimpl->mCommandTest) % pkg_buildir).str();
     std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
@@ -257,11 +345,9 @@ void Package::test()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
-        fs::current_path(old_dir);
         throw utils::InternalError(
             (fmt(_("Pkg error: test launch failed %1%")) % e.what()).str());
     }
-    fs::current_path(old_dir);
 }
 
 void Package::build()
@@ -282,11 +368,12 @@ void Package::build()
         throw utils::FileError(
                 _("Pkg build error: building directory path is empty"));
     }
-    if (not fs::exists(pkg_buildir)) {
+
+    FSpath path { pkg_buildir };
+    if (not path.exists())
         configure();
-    }
-    fs::path old_dir = fs::current_path();
-    fs::current_path(pkg_buildir);
+
+    FScurrent_path_restore restore(path);
 
     std::string cmd = (vle::fmt(m_pimpl->mCommandBuild) % pkg_buildir).str();
     std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
@@ -296,11 +383,9 @@ void Package::build()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch(const std::exception& e) {
-        fs::current_path(old_dir);
         throw utils::InternalError(
             (fmt(_("Pkg build error: build failed %1%")) % e.what()).str());
     }
-    fs::current_path(old_dir);
 }
 
 void Package::install()
@@ -321,27 +406,29 @@ void Package::install()
         throw utils::FileError(
                 _("Pkg install error: building directory path is empty"));
     }
-    if (not fs::exists(pkg_buildir)) {
+
+    FSpath path { pkg_buildir };
+    if (not path.exists())
         throw utils::FileError(
             (fmt(_("Pkg install error: building directory '%1%' "
                    "does not exist ")) % pkg_buildir.c_str()).str());
-    }
-    fs::path old_dir = fs::current_path();
-    fs::current_path(pkg_buildir);
+
+    FScurrent_path_restore restore(path);
+
     std::string cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
     std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
     argv.erase(argv.begin());
 
-    fs::path builddir = pkg_buildir;
+    FSpath builddir = pkg_buildir;
 
-    if (not fs::exists(builddir)) {
+    if (not builddir.exists()) {
         throw utils::ArgError(
             (fmt(_("Pkg build error: directory '%1%' does not exist")) %
              builddir.string()).str());
     }
 
-    if (not fs::is_directory(builddir)) {
+    if (not builddir.is_directory()) {
         throw utils::ArgError(
             (fmt(_("Pkg build error: '%1%' is not a directory")) %
              builddir.string()).str());
@@ -350,29 +437,26 @@ void Package::install()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch(const std::exception& e) {
-        fs::current_path(old_dir);
         throw utils::InternalError(
-            (fmt(_("Pkg build error: install lib failed %1%")) % e.what()).str());
+            (fmt(_("Pkg build error: install lib failed %1%"))
+             % e.what()).str());
     }
-    fs::current_path(old_dir);
 }
 
 void Package::clean()
 {
-    fs::path pkg_buildir = getBuildDir(PKG_SOURCE);
-    if (fs::exists(pkg_buildir)) {
-        fs::remove_all(pkg_buildir);
-        fs::remove(pkg_buildir);
-    }
+    FSpath pkg_buildir = getBuildDir(PKG_SOURCE);
+
+    if (pkg_buildir.exists())
+        ::remove_all(pkg_buildir);
 }
 
 void Package::rclean()
 {
-    fs::path pkg_buildir = getDir(PKG_BINARY);
-    if (fs::exists(pkg_buildir)) {
-        fs::remove_all(pkg_buildir);
-        fs::remove(pkg_buildir);
-    }
+    FSpath pkg_buildir = getDir(PKG_BINARY);
+
+    if (pkg_buildir.exists())
+        ::remove_all(pkg_buildir);
 }
 
 void Package::pack()
@@ -393,7 +477,7 @@ void Package::pack()
                 "no building directory found"));
     }
 
-    fs::create_directory(pkg_buildir);
+    FSpath::create_directory(pkg_buildir);
 
     std::string cmd = (fmt(m_pimpl->mCommandPack) % pkg_buildir).str();
     std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
@@ -468,14 +552,11 @@ void Package::select(const std::string& name)
 void Package::remove(const std::string& toremove, VLE_PACKAGE_TYPE type)
 {
     std::string pkg_dir = getDir(type);
-    fs::path torm(pkg_dir);
+    FSpath torm(pkg_dir);
     torm /= toremove;
 
-    if (fs::exists(torm)) {
-        fs::remove_all(torm);
-        fs::remove(torm);
-    }
-
+    if (torm.exists())
+        ::remove_all(torm);
 }
 
 std::string Package::getParentDir(VLE_PACKAGE_TYPE type) const
@@ -484,8 +565,8 @@ std::string Package::getParentDir(VLE_PACKAGE_TYPE type) const
     if (base_dir.empty()){
         return "";
     } else {
-        fs::path base_path = fs::path(base_dir);
-        return base_path.branch_path().string();
+        FSpath base_path = FSpath(base_dir);
+        return base_path.parent_path().string();
     }
 }
 
@@ -645,8 +726,9 @@ std::string Package::getPluginGvleOutputFile(const std::string& file,
 
 bool Package::existsBinary() const
 {
-    fs::path binary_dir = m_pimpl->m_pkgbinarypath;
-    return (fs::exists(binary_dir) && fs::is_directory(binary_dir));
+    FSpath binary_dir = m_pimpl->m_pkgbinarypath;
+
+    return binary_dir.is_directory();
 }
 
 bool Package::existsSource() const
@@ -658,9 +740,10 @@ bool Package::existsFile(const std::string& path, VLE_PACKAGE_TYPE type)
 {
     std::string base_dir = getDir(type);
     if (not base_dir.empty()) {
-        fs::path tmp(base_dir);
+        FSpath tmp(base_dir);
         tmp /= path;
-        return fs::exists(tmp) && fs::is_regular_file(tmp);
+
+        return tmp.is_file();
     }
     return false;
 }
@@ -670,51 +753,39 @@ void Package::addDirectory(const std::string& path, const std::string& name,
 {
     std::string base_dir = getDir(type);
     if (not base_dir.empty()) {
-        fs::path tmp(base_dir);
+        FSpath tmp(base_dir);
         tmp /= path;
         tmp /= name;
-        if (not fs::exists(tmp)) {
-            fs::create_directory(tmp);
+        if (not tmp.exists()) {
+            tmp.create_directory();
         }
     }
 }
 
 PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
 {
-    fs::path pkg(getExpDir(type));
-    if (not fs::exists(pkg) or not fs::is_directory(pkg)) {
+    FSpath pkg(getExpDir(type));
+
+    if (not pkg.is_directory())
         throw utils::InternalError(
             (fmt(_("Pkg list error: '%1%' is not an experiments directory")) %
              pkg.string()).str());
-    }
 
     PathList result;
-    std::stack < fs::path > stack;
+    std::stack < FSpath > stack;
     stack.push(pkg);
 
     while (not stack.empty()) {
-        fs::path dir = stack.top();
+        FSpath dir = stack.top();
         stack.pop();
 
-        for (fs::directory_iterator it(dir), end; it != end; ++it) {
-#if BOOST_VERSION > 104500
-            if (fs::is_regular_file(it->status())) {
-                std::string ext = it->path().extension().string();
-#elif BOOST_VERSION > 103600
-            if (fs::is_regular_file(it->status())) {
-                fs::path::string_type ext = it->path().extension();
-#else
-            if (fs::is_regular(it->status())) {
-                fs::path::string_type ext = fs::extension(it->path());
-#endif
+        for (FSdirectory_iterator it(dir), end; it != end; ++it) {
+            if (it->is_file()) {
+                std::string ext = it->path().extension();
                 if (ext == ".vpz") {
-#if BOOST_VERSION > 104500
                     result.push_back(it->path().string());
-#else
-                    result.push_back(it->path().file_string());
-#endif
                 }
-            } else if (fs::is_directory(it->status())) {
+            } else if (it->is_directory()) {
                 stack.push(it->path());
             }
         }
@@ -725,24 +796,17 @@ PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
 PathList Package::listLibraries(const std::string& path) const
 {
     PathList result;
-    fs::path simdir(path);
-    if (fs::exists(simdir) and fs::is_directory(simdir)) {
-        std::stack < fs::path > stack;
+    FSpath simdir(path);
+
+    if (simdir.is_directory()) {
+        std::stack < FSpath > stack;
         stack.push(simdir);
         while (not stack.empty()) {
-            fs::path dir = stack.top();
+            FSpath dir = stack.top();
             stack.pop();
-            for (fs::directory_iterator it(dir), end; it != end; ++it) {
-#if BOOST_VERSION > 104500
-                if (fs::is_regular_file(it->status())) {
-                    std::string ext = it->path().extension().string();
-#elif BOOST_VERSION > 103600
-                if (fs::is_regular_file(it->status())) {
-                    fs::path::string_type ext = it->path().extension();
-#else
-                if (fs::is_regular(it->status())) {
-                    fs::path::string_type ext = fs::extension(it->path());
-#endif
+            for (FSdirectory_iterator it(dir), end; it != end; ++it) {
+                if (it->is_file()) {
+                    std::string ext = it->path().extension();
 
 #if defined _WIN32
                     if (ext == ".dll") {
@@ -752,12 +816,8 @@ PathList Package::listLibraries(const std::string& path) const
                     if (ext == ".so") {
 #endif
 
-#if BOOST_VERSION > 104500
                         result.push_back(it->path().string());
-#else
-                        result.push_back(it->path().file_string());
-#endif
-                    } else if (fs::is_directory(it->status())) {
+                    } else if (it->is_directory()) {
                         stack.push(it->path());
                     }
                 }
@@ -793,60 +853,49 @@ PathList Package::getPluginsGvleOutput() const
 }
 
 std::string
-Package::getMetadataExpDir(
-        VLE_PACKAGE_TYPE type) const
+Package::getMetadataExpDir(VLE_PACKAGE_TYPE type) const
 {
-    boost::filesystem::path f = getDir(type);
+    FSpath f = getDir(type);
     f /= "metadata";
     f /= "exp";
     return f.string();
-
 }
 
 std::string
 Package::getMetadataExpFile(const std::string& expName,
         VLE_PACKAGE_TYPE type) const
 {
-    boost::filesystem::path f = getDir(type);
+    FSpath f = getDir(type);
     f /= "metadata";
     f /= "exp";
     f /= (expName+".vpm");
     return f.string();
 }
 
-
 std::string Package::rename(const std::string& oldname,
         const std::string& newname,
         VLE_PACKAGE_TYPE type)
 {
-    fs::path oldfilepath = getDir(type);
+    FSpath oldfilepath = getDir(type);
     oldfilepath /= oldname;
 
-#if BOOST_VERSION > 103600
-    fs::path newfilepath = oldfilepath.parent_path();
-#else
-    fs::path newfilepath = oldfilepath.branch_path();
-#endif
+    FSpath newfilepath = oldfilepath.parent_path();
     newfilepath /= newname;
 
-    if (not fs::exists(oldfilepath) or fs::exists(newfilepath)) {
+    if (not oldfilepath.exists() or newfilepath.exists()) {
         throw utils::ArgError(
             (fmt(_("In Package `%1%', can not rename `%2%' in `%3%'")) %
              name() % oldfilepath.string() % newfilepath.string()).str());
     }
 
-    fs::rename(oldfilepath, newfilepath);
+    FSpath::rename(oldfilepath, newfilepath);
 
-#if BOOST_VERSION > 104500
     return newfilepath.string();
-#else
-    return newfilepath.file_string();
-#endif
 }
 
 void Package::copy(const std::string& source, std::string& target)
 {
-    fs::copy_file(source, target);
+    FSpath::copy_file(source, target);
 }
 
 const std::string& Package::name() const

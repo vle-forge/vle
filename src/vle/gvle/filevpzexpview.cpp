@@ -21,8 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <boost/unordered_map.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 #include <QtCore/qdebug.h>
 #include <QMessageBox>
@@ -31,6 +31,7 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include "filevpzexpview.h"
 #include "ui_filevpzexpview.h"
 
@@ -47,32 +48,25 @@
  *
  * TODO function from ModuleManager
  */
-static std::string TMPgetLibraryName(const boost::filesystem::path& file)
+static std::string TMPgetLibraryName(const vle::utils::FSpath& file)
 {
-    namespace fs = boost::filesystem;
     std::string library;
 
-#if BOOST_VERSION > 104500
-    if (file.filename().string().compare(0, 3, "lib") == 0) {
-        library.append(file.filename().string(), 3, std::string::npos);
-    }
-#else
     if (file.filename().compare(0, 3, "lib") == 0) {
         library.append(file.filename(), 3, std::string::npos);
-    }
-#endif
 
-#ifdef BOOST_WINDOWS
-    if (fs::extension(file) == ".dll") {
-        library.assign(library, 0, library.size() - 4);
-    }
+#if defined(_WIN32)
+        if (file.extension() == ".dll")
+            library.assign(library, 0, library.size() - 4);
+#elif defined(__MACOS__)
+        if (file.extension() == ".dylib")
+            library.assign(library, 0, library.size() - 6);
 #else
-    if (fs::extension(file) == ".so") {
-        library.assign(library, 0, library.size() - 3);
-    }
+        if (file.extension() == ".so")
+            library.assign(library, 0, library.size() - 3);
 #endif
-
-    return library;
+    }
+return library;
 }
 
 namespace vle {

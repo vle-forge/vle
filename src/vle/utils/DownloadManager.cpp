@@ -31,7 +31,7 @@
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/filesystem.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <thread>
 #include <mutex>
 
@@ -103,7 +103,7 @@ struct DownloadManager::Pimpl
             argv.erase(argv.begin());
 
             utils::Spawn spawn;
-            boost::filesystem::path pwd = boost::filesystem::current_path();
+            FSpath pwd = FSpath::current_path();
             if (not spawn.start(exe, pwd.string(), argv, 50000u)) {
                 mErrorMessage = _("Download: fail to start download command");
                 TraceAlways(mErrorMessage.c_str());

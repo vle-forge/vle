@@ -23,8 +23,8 @@ else (WIN32)
      COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 endif (WIN32)
 
-target_link_libraries(vle vlelib ${VLEDEPS_LIBRARIES}
-  ${Boost_LIBRARIES}  ${OS_SPECIFIC_LIBRARIES})
+target_link_libraries(vle vlelib ${CMAKE_THREAD_LIBS_INIT}
+  ${VLEDEPS_LIBRARIES} ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vle DESTINATION bin)
 

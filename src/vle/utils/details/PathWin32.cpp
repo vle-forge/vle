@@ -30,7 +30,6 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <windows.h>
 #include <winreg.h>

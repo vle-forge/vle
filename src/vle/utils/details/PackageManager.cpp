@@ -26,22 +26,20 @@
 
 #include <vle/utils/details/PackageManager.hpp>
 #include <vle/utils/details/PackageParser.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/filesystem.hpp>
 
 namespace vle { namespace utils {
 
 static bool extract__(Packages *out, const std::string& filepath)
 {
-    namespace fs = boost::filesystem;
-
-    fs::path pkg(filepath);
+    FSpath pkg(filepath);
     PackageParser parser;
 
-    if (fs::exists(pkg) and fs::is_regular_file(pkg)) {
+    if (pkg.is_file()) {
         parser.extract(pkg.string(), std::string());
         out->reserve(parser.size());
         out->insert(out->rbegin().base(), parser.begin(), parser.end());
@@ -56,19 +54,18 @@ static bool extract__(Packages *out, const std::string& filepath)
 
 static bool rebuild__(Packages *out)
 {
-    namespace fs = boost::filesystem;
-
-    fs::path pkgsdir(utils::Path::path().getBinaryPackagesDir());
+    FSpath pkgsdir(utils::Path::path().getBinaryPackagesDir());
     PackageParser parser;
 
-    if (fs::exists(pkgsdir) and fs::is_directory(pkgsdir)) {
-        for (fs::directory_iterator it(pkgsdir), end; it != end; ++it) {
-            if (fs::is_directory(it->status())) {
-                fs::path descfile = *it;
+    if (pkgsdir.is_directory()) {
+        for (FSdirectory_iterator it(pkgsdir), end; it != end; ++it) {
+            if (it->is_directory()) {
+                FSpath descfile = *it;
                 descfile /= "Description.txt";
 
-                if (fs::exists(descfile)) {
+                if (descfile.is_file()) {
                     parser.extract(descfile.string(), std::string());
+
                 } else {
                     TraceAlways(
                         _("Remote: failed to open Description "

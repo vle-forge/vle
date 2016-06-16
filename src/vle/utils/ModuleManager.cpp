@@ -31,18 +31,16 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/version.hpp>
 #include <unordered_map>
-#include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
-
-namespace fs = boost::filesystem;
 
 namespace vle { namespace utils { namespace pimpl {
 
@@ -57,29 +55,22 @@ namespace vle { namespace utils { namespace pimpl {
  * @param path The path of the file to convert;
  * @return The plug-in name;
  */
-static std::string getLibraryName(const boost::filesystem::path& file)
+static std::string getLibraryName(const FSpath& file)
 {
-    namespace fs = boost::filesystem;
     std::string library;
 
-#if BOOST_VERSION > 104500
-    if (file.filename().string().compare(0, 3, "lib") == 0) {
-        library.append(file.filename().string(), 3, std::string::npos);
-    }
-#else
-    if (file.filename().compare(0, 3, "lib") == 0) {
+    if (file.filename().compare(0, 3, "lib") == 0)
         library.append(file.filename(), 3, std::string::npos);
-    }
-#endif
 
-#ifdef BOOST_WINDOWS
-    if (fs::extension(file) == ".dll") {
+#if defined(_WIN32)
+    if (file.extension() == ".dll")
         library.assign(library, 0, library.size() - 4);
-    }
+#elif __APPLE__
+    if (file.extension() == ".dylib")
+        library.assign(library, 0, library.size() - 6);
 #else
-    if (fs::extension(file) == ".so") {
+    if (file.extension() == ".so")
         library.assign(library, 0, library.size() - 3);
-    }
 #endif
 
     return library;
@@ -576,19 +567,20 @@ public:
      * @param package
      * @param type
      */
-    void browse(const boost::filesystem::path& path,
+    void browse(const FSpath& path,
                 const std::string& package,
                 ModuleType type)
     {
-        if (fs::is_directory(path)) {
-            fs::directory_iterator it(path), end;
-            for (; it != end; ++it) {
-                if (fs::is_regular(it->status())) {
-                    std::string library = pimpl::getLibraryName(*it);
+        if (not path.is_directory())
+            return;
+        
+        FSdirectory_iterator it(path), end;
+        for (; it != end; ++it) {
+            if (it->is_file()) {
+                std::string library = pimpl::getLibraryName(*it);
 
-                    if (not library.empty()) {
-                        getModule(package, library, type);
-                    }
+                if (not library.empty()) {
+                    getModule(package, library, type);
                 }
             }
         }
@@ -634,72 +626,43 @@ void *ModuleManager::get(const std::string& symbol) const
 
 void ModuleManager::browse()
 {
-    fs::path packages = utils::Path::path().getBinaryPackagesDir();
+    FSpath packages = utils::Path::path().getBinaryPackagesDir();
 
-    fs::path pathsim = "plugins/simulator";
-    fs::path pathoov = "plugins/output";
-    fs::path pathgvleg = "plugins/gvle/global";
-    fs::path pathgvlem = "plugins/gvle/modeling";
-    fs::path pathgvleo = "plugins/gvle/output";
+    FSpath pathsim = "plugins/simulator";
+    FSpath pathoov = "plugins/output";
+    FSpath pathgvleg = "plugins/gvle/global";
+    FSpath pathgvlem = "plugins/gvle/modeling";
+    FSpath pathgvleo = "plugins/gvle/output";
 
-    if (fs::is_directory(packages)) {
-        fs::directory_iterator it(packages), end;
+    if (packages.is_directory()) {
+        FSdirectory_iterator it(packages), end;
 
         for (; it != end; ++it) { /* for each package */
-            if (fs::is_directory(it->status())) {
-#if BOOST_VERSION > 104500
-                std::string package = it->path().filename().string();
-#else
-                std::string package = it->path().file_string();
-#endif
+            if (it->is_directory()) {
+                std::string package = it->path().filename();
 
                 {
-#if BOOST_VERSION > 104500
-                    fs::path tmp = (*it) / pathsim;
-#else
-                    fs::path tmp = (*it);
-                    tmp /= pathsim;
-#endif
+                    FSpath tmp = (*it) / pathsim;
                     mPimpl->browse(tmp, package, MODULE_DYNAMICS);
                 }
 
                 {
-#if BOOST_VERSION > 104500
-                    fs::path tmp = (*it) / pathoov;
-#else
-                    fs::path tmp = (*it);
-                    tmp /= pathoov;
-#endif
+                    FSpath tmp = (*it) / pathoov;
                     mPimpl->browse(tmp, package, MODULE_OOV);
                 }
 
                 {
-#if BOOST_VERSION > 104500
-                    fs::path tmp = (*it) / pathgvleg;
-#else
-                    fs::path tmp = (*it);
-                    tmp /= pathgvleg;
-#endif
+                    FSpath tmp = (*it) / pathgvleg;
                     mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
                 }
 
                 {
-#if BOOST_VERSION > 104500
-                    fs::path tmp = (*it) / pathgvlem;
-#else
-                    fs::path tmp = (*it);
-                    tmp /= pathgvlem;
-#endif
+                    FSpath tmp = (*it) / pathgvlem;
                     mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
                 }
 
                 {
-#if BOOST_VERSION > 104500
-                    fs::path tmp = (*it) / pathgvleo;
-#else
-                    fs::path tmp = (*it);
-                    tmp /= pathgvleo;
-#endif
+                    FSpath tmp = (*it) / pathgvleo;
                     mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
                 }
             }
@@ -709,9 +672,9 @@ void ModuleManager::browse()
 
 void ModuleManager::browse(ModuleType type)
 {
-    fs::path packages = utils::Path::path().getBinaryPackagesDir();
+    FSpath packages = utils::Path::path().getBinaryPackagesDir();
 
-    fs::path pathtype;
+    FSpath pathtype;
 
     switch (type) {
     case MODULE_DYNAMICS:
@@ -733,19 +696,15 @@ void ModuleManager::browse(ModuleType type)
         break;
     }
 
-    if (fs::is_directory(packages)) {
-        fs::directory_iterator it(packages), end;
+    if (packages.is_directory()) {
+        FSdirectory_iterator it(packages), end;
 
         for (; it != end; ++it) { /* for each package */
-            if (fs::is_directory(it->status())) {
-                fs::path pkg = (*it);
+            if (it->is_directory()) {
+                FSpath pkg = (*it);
                 pkg /= pathtype;
 
-#if BOOST_VERSION > 104500
-                mPimpl->browse(pkg, it->path().filename().string(), type);
-#else
-                mPimpl->browse(pkg, it->path().file_string(), type);
-#endif
+                mPimpl->browse(pkg, it->path().filename(), type);
             }
         }
     }
@@ -753,36 +712,36 @@ void ModuleManager::browse(ModuleType type)
 
 void ModuleManager::browse(const std::string& package)
 {
-    fs::path pkg = utils::Path::path().getBinaryPackagesDir();
+    FSpath pkg = utils::Path::path().getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 
     {
-        fs::path tmp = pkg;
+        FSpath tmp = pkg;
         tmp /= "simulator";
         mPimpl->browse(tmp, package, MODULE_DYNAMICS);
     }
 
     {
-        fs::path tmp = pkg;
+        FSpath tmp = pkg;
         tmp /= "output";
         mPimpl->browse(tmp, package, MODULE_OOV);
     }
 
     {
-        fs::path tmp = pkg;
+        FSpath tmp = pkg;
         tmp /= "gvle/global";
         mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
     }
 
     {
-        fs::path tmp = pkg;
+        FSpath tmp = pkg;
         tmp /= "gvle/modeling";
         mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
     }
 
     {
-        fs::path tmp = pkg;
+        FSpath tmp = pkg;
         tmp /= "gvle/output";
         mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
     }
@@ -791,7 +750,7 @@ void ModuleManager::browse(const std::string& package)
 
 void ModuleManager::browse(const std::string& package, ModuleType type)
 {
-    fs::path pkg = utils::Path::path().getBinaryPackagesDir();
+    FSpath pkg = utils::Path::path().getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 
@@ -965,7 +924,7 @@ std::string ModuleManager::buildModuleFilename(const std::string& package,
                                                const std::string& library,
                                                ModuleType type)
 {
-    fs::path current;
+    FSpath current;
     vle::utils::Package pkg(package);
 
     switch (type) {

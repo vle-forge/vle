@@ -57,7 +57,6 @@ set_target_properties(vlelib PROPERTIES
 target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
     ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
-
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
 

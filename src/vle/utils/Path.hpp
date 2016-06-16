@@ -157,7 +157,7 @@ public:
      * @return The package founded into the string `path' or an empty
      * string if not found.
      */
-    static std::string getPackageFromPath(const std::string& path);
+    // static std::string getPackageFromPath(const std::string& path);
 
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -179,14 +179,6 @@ public:
      * @return A string.
      */
     std::string getTemplate(const std::string& name) const;
-
-    /**
-     * Copy the file or directory name from the
-     * $PREFIX/share/vle-x.y.z/template/name into the output directory.
-     * @param name The name of the template to copy.
-     * @param to The destination of the template.
-     */
-    void copyTemplate(const std::string& name, const std::string& to) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -354,8 +346,8 @@ public:
      *
      * @return The path name of the file.
      */
-    static std::string getTempFile(const std::string& prefix,
-                                   std::ofstream* file);
+    // static std::string getTempFile(const std::string& prefix,
+    //                                std::ofstream* file);
 
 
     /**

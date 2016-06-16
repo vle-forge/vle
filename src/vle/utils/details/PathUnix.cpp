@@ -27,15 +27,13 @@
 
 #include <list>
 #include <fstream>
-
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/version.hpp>
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 namespace vle { namespace utils {
-
 
 std::string Path::findProgram(const std::string& exe)
 {
@@ -48,10 +46,10 @@ std::string Path::findProgram(const std::string& exe)
     std::vector<std::string>::const_iterator itb = splitVec.begin();
     std::vector<std::string>::const_iterator ite = splitVec.end();
     for (; itb != ite; itb++) {
-        boost::filesystem::path p(*itb);
+        FSpath p(*itb);
         p /= exe;
-        if (boost::filesystem::exists(p)) {
-            return p.native();
+        if (p.exists()) {
+            return p.string();
         }
     }
     return "";
@@ -81,38 +79,38 @@ void Path::initPrefixDir()
     m_prefix.assign(VLE_PREFIX_DIR);
 }
 
-std::string Path::getTempFile(const std::string& prefix,
-                              std::ofstream* file)
-{
-    std::string result;
+// std::string Path::getTempFile(const std::string& prefix,
+//                               std::ofstream* file)
+// {
+//     std::string result;
 
-    if (file and not file->is_open()) {
-        result = prefix + "XXXXXX";
-        boost::system::error_code ec;
-        result =  utils::Path::buildFilename(
-                boost::filesystem::temp_directory_path(ec).string(),
-                result);
+//     if (file and not file->is_open()) {
+//         result = prefix + "XXXXXX";
 
-        auto buffer = new char[result.size()];
-        std::strncpy(buffer, result.c_str(), result.size());
+//         result =  utils::Path::buildFilename(
+//                 boost::filesystem::temp_directory_path(ec).string(),
+//                 result);
 
-        int fd = ::mkstemp(buffer);
-        if (fd != -1) {
-            file->open(buffer, std::ios_base::trunc | std::ios_base::out |
-                       std::ios_base::binary);
-            close(fd);
+//         auto buffer = new char[result.size()];
+//         std::strncpy(buffer, result.c_str(), result.size());
 
-            if (file->is_open()) {
-                result.assign(buffer, result.size());
-            } else {
-                result.clear();
-            }
-        }
+//         int fd = ::mkstemp(buffer);
+//         if (fd != -1) {
+//             file->open(buffer, std::ios_base::trunc | std::ios_base::out |
+//                        std::ios_base::binary);
+//             close(fd);
 
-        delete[] buffer;
-    }
+//             if (file->is_open()) {
+//                 result.assign(buffer, result.size());
+//             } else {
+//                 result.clear();
+//             }
+//         }
 
-    return result;
-}
+//         delete[] buffer;
+//     }
+
+//     return result;
+// }
 
 }} // namespace vle utils

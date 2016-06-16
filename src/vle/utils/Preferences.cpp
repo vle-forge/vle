@@ -52,6 +52,8 @@
 #define VLE_COMMAND_TAR "cmake.exe -E tar jcf '%1%' '%2%'"
 #define VLE_COMMAND_UNTAR "cmake.exe -E tar jxf '%1%' .'"
 #define VLE_COMMAND_URL_GET "curl.exe '%1%' -o '%2%'"
+#define VLE_COMMAND_DIR_COPY "cmake.exe -E copy_directory '%1%' '%2%'"
+#define VLE_COMMAND_DIR_REMOVE "cmake.exe -E remove_directory '%1%'"
 #else
 #define VLE_PACKAGE_COMMAND_CONFIGURE           \
     "cmake -DCMAKE_INSTALL_PREFIX='%1%' "       \
@@ -67,6 +69,8 @@
 #define VLE_COMMAND_TAR "cmake -E tar jcf '%1%' '%2%'"
 #define VLE_COMMAND_UNTAR "cmake -E tar jxf '%1%'"
 #define VLE_COMMAND_URL_GET "curl --progress-bar '%1%' -o '%2%'"
+#define VLE_COMMAND_DIR_COPY "cmake -E copy_directory '%1%' '%2%'"
+#define VLE_COMMAND_DIR_REMOVE "cmake -E remove_directory '%1%'"
 #endif
 
 namespace vle { namespace utils {
@@ -118,7 +122,9 @@ struct Preferences::Pimpl
                 std::string("http://www.vle-project.org/pub/" VLE_ABI_VERSION) },
         { "vle.command.tar", std::string(VLE_COMMAND_TAR) },
         { "vle.command.untar", std::string(VLE_COMMAND_UNTAR) },
-        { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET) }}
+        { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET) },
+        { "vle.command.dir.copy", std::string(VLE_COMMAND_DIR_COPY) },
+        { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE) }}
         , mFilename(std::move(filename))
         , mreadOnly(readOnly)
     {

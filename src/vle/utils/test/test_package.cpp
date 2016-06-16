@@ -35,7 +35,6 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/config.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/assign.hpp>
 #include <stdexcept>
 #include <limits>
@@ -60,6 +59,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Preferences.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/vle.hpp>
 
 #ifdef _WIN32
@@ -68,38 +68,30 @@
 
 using namespace vle;
 
-namespace bs = boost::system;
-namespace fs = boost::filesystem;
-
 struct F
 {
     std::unique_ptr<vle::Init> a;
-    fs::path current_path;
+    vle::utils::FSpath current_path;
 
     F()
     {
-        bs::error_code ec;
-
-        current_path = fs::temp_directory_path(ec);
-        current_path /= fs::unique_path("vle-%%%%-%%%%-%%%%-%%%%");
-
-        fs::create_directory(current_path, ec);
+        current_path = vle::utils::FSpath::temp_directory_path();
+        current_path /= vle::utils::FSpath::unique_path("vle-%%%%-%%%%-%%%%");
+        current_path.create_directory();
 
         /* We need to ensure each file really installed. */
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-        if (fs::exists(current_path, ec) and
-            fs::is_directory(current_path, ec)) {
-
+        if (current_path.is_directory()) {
 #ifdef _WIN32
             ::_putenv((vle::fmt("VLE_HOME=%1%")
                        % current_path.string()).str().c_str());
 #else
-            ::setenv("VLE_HOME", current_path.c_str(), 1);
+            ::setenv("VLE_HOME", current_path.string().c_str(), 1);
 #endif
         }
 
-        fs::current_path(current_path, ec);
+        vle::utils::FSpath::current_path(current_path);
 
         std::cout << "test start in " << current_path.string() << '\n';
 
@@ -137,21 +129,23 @@ BOOST_AUTO_TEST_CASE(show_package)
     BOOST_REQUIRE_EQUAL(static_cast<PathList::size_type>(0),
                         Path::path().getSimulatorDirs().size());
 
-    std::cout << "Installed packages:\n";
-    PathList lst = Path::path().getBinaryPackages();
-    std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
-                  std::cout, "\n"));
+    std::cout << "getBinaryPackagesDir: " << Path::path().getBinaryPackagesDir()
+              << "\ngetBinaryPackages   : ";
+
+    auto lst = Path::path().getBinaryPackages();
+    for (const auto& elem : lst)
+        std::cout << elem << ' ';
 
     BOOST_REQUIRE(Path::path().getBinaryPackages().size() == 1);
+    vle::utils::FSpath p = pkg.getExpDir(vle::utils::PKG_BINARY);
 
-    if (not fs::exists(pkg.getExpDir(vle::utils::PKG_BINARY)))
-        return;
+    std::cout << "\ngetExpDir           : " << p.string()
+              << "\ngetExperiments      :";
+    auto vpz = pkg.getExperiments();
 
-    std::cout << "Installed vpz  :\n";
-    PathList vpz = pkg.getExperiments();
-    std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
-                  std::cout, "\n"));
-
+    for (const auto& elem : vpz)
+        std::cout << elem << ' ';
+    
     BOOST_REQUIRE(vpz.size() == 1);
 }
 
@@ -233,7 +227,7 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
     pkg.minor = 2;
     pkg.patch = 3;
 
-    fs::path path = utils::RemoteManager::getRemotePackageFilename();
+    vle::utils::FSpath path = utils::RemoteManager::getRemotePackageFilename();
 
     {
         std::ofstream ofs(path.string());
@@ -425,7 +419,7 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
     std::string uniquepath;
 
     try {
-        fs::path unique = fs::unique_path("%%%%-%%%%-%%%%-%%%%");
+        utils::FSpath unique = utils::FSpath::unique_path("%%%%-%%%%-%%%%-%%%%");
         vle::utils::Package pkg(unique.string());
         pkg.create();
         pkg.wait(std::cerr, std::cerr);
@@ -445,26 +439,30 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
 
     BOOST_REQUIRE(not filepath.empty());
 
-    fs::path tarfile(fs::temp_directory_path());
+    utils::FSpath tarfile(utils::FSpath::temp_directory_path());
     tarfile /= "check.tar.bz2";
 
-    fs::current_path(vle::utils::Path::path().getBinaryPackagesDir());
+    utils::FSpath::current_path(vle::utils::Path::path().getBinaryPackagesDir());
 
     BOOST_REQUIRE_NO_THROW(utils::Path::path().compress(uniquepath,
                                                         tarfile.string()));
-    BOOST_REQUIRE(fs::exists(fs::path(tarfile)));
 
-    fs::path tmpfile(fs::temp_directory_path());
+    utils::FSpath t { tarfile };
+    BOOST_REQUIRE(t.exists());
+
+    utils::FSpath tmpfile(utils::FSpath::temp_directory_path());
     tmpfile /= "unique";
 
-    fs::create_directory(tmpfile);
-    fs::current_path(tmpfile);
+    tmpfile.create_directory();
+    
+    utils::FSpath::current_path(tmpfile);
 
     BOOST_REQUIRE_NO_THROW(utils::Path::path().decompress(tarfile.string(),
                                                           tmpfile.string()));
-    BOOST_REQUIRE(fs::exists(fs::path(tmpfile)));
+    utils::FSpath t2 { tmpfile };
+    BOOST_REQUIRE(t2.exists());
 
-    tmpfile /= uniquepath;
+    t2 /= uniquepath;
 
-    BOOST_REQUIRE(fs::exists(fs::path(tmpfile)));
+    BOOST_REQUIRE(t2.exists());
 }

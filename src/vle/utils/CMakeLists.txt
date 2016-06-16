@@ -1,12 +1,9 @@
 add_subdirectory(details)
 
-add_sources(vlelib Algo.hpp DateTime.cpp DateTime.hpp Deprecated.hpp
-  DownloadManager.cpp DownloadManager.hpp Exception.hpp
-  ModuleManager.cpp ModuleManager.hpp Package.cpp Package.hpp
-  PackageTable.cpp PackageTable.hpp Parser.cpp Parser.hpp Path.hpp
-  Preferences.cpp Preferences.hpp Rand.cpp Rand.hpp RemoteManager.cpp
-  RemoteManager.hpp Spawn.hpp Template.cpp Template.hpp Tools.cpp
-  Tools.hpp Trace.cpp Trace.hpp Types.hpp)
+add_sources(vlelib DateTime.cpp DownloadManager.cpp Filesystem.cpp
+  ModuleManager.cpp Package.cpp PackageTable.cpp Parser.cpp
+  Preferences.cpp Rand.cpp RemoteManager.cpp Template.cpp Tools.cpp
+  Trace.cpp)
 
 install(FILES Algo.hpp DateTime.hpp Deprecated.hpp DownloadManager.hpp
   Exception.hpp ModuleManager.hpp Package.hpp PackageTable.hpp

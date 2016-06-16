@@ -38,6 +38,7 @@
 #include <vle/utils/details/Package.hpp>
 #include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/details/PackageManager.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/version.hpp>
 #include <thread>
 #include <fstream>
@@ -45,7 +46,6 @@
 #include <iostream>
 #include <string>
 #include <regex>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
@@ -446,23 +446,24 @@ public:
             //          boost::filesystem::rename(dl.filename(), archfile);
             std::string tempDir = vle::utils::Path::path().getParentPath(
                     archfile);
-            std::string oldDir = vle::utils::Path::path().getCurrentDir();
-            boost::filesystem::path archpath(archfile);
-            boost::filesystem::path dearchpath(tempDir);
-            boost::filesystem::current_path(boost::filesystem::path(tempDir));
-            vle::utils::Path::path().decompress(archpath.string(),
+            FSpath archpath(archfile);
+            FSpath dearchpath(tempDir);
+
+            {
+                FScurrent_path_restore restore(FSpath(tempdir));
+                vle::utils::Path::path().decompress(archpath.string(),
+                                                    dearchpath.string());
+                vle::utils::Package pkg(pkgid.name);
+                out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %
                     dearchpath.string());
-            vle::utils::Package pkg(pkgid.name);
-            out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %
-                    dearchpath.string());
-            pkg.configure();
-            pkg.wait(std::cerr, std::cerr);
-            pkg.build();
-            pkg.wait(std::cerr, std::cerr);
-            pkg.install();
-            pkg.wait(std::cerr, std::cerr);
-            out(fmt(_("ok\n")));
-            boost::filesystem::current_path(boost::filesystem::path(oldDir));
+                pkg.configure();
+                pkg.wait(std::cerr, std::cerr);
+                pkg.build();
+                pkg.wait(std::cerr, std::cerr);
+                pkg.install();
+                pkg.wait(std::cerr, std::cerr);
+                out(fmt(_("ok\n")));
+            }
             mResults.push_back(*it);
         } else {
             out(fmt(_("failed\n")));
@@ -495,7 +496,7 @@ public:
             dl.join();
             if (not dl.hasError()) {
                 std::string filename = dl.filename();
-                boost::filesystem::rename(filename, archname);
+                FSpath::rename(filename, archname);
             } else {
                 std::ostringstream errorStream;
                 errorStream << fmt(_("Error while downloading "

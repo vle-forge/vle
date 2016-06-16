@@ -61,7 +61,8 @@ if (COMPILER_SUPPORTS_CXX14)
 elseif(COMPILER_SUPPORTS_CXX1Y)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 else()
-  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14/1y support. Please use a different C++ compiler.")
+  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14/1y support."
+    "Please use a different C++ compiler.")
 endif()
 
 #
@@ -97,6 +98,11 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 OLD)
   cmake_policy(SET CMP0020 NEW)#for qt link
 endif (COMMAND CMAKE_POLICY)
+
+#
+# Detect thread library to use
+#
+find_package(Threads REQUIRED)
 
 set(QMAKE_QUERY_LIBPATH qmake -query QT_INSTALL_LIBS)
 execute_process(COMMAND ${QMAKE_QUERY_LIBPATH} OUTPUT_VARIABLE
@@ -170,15 +176,10 @@ endif ()
 
 set(Boost_DEBUG 0)
 if (WITH_MVLE OR WITH_CVLE)
-  find_package(Boost COMPONENTS unit_test_framework filesystem system
-    serialization mpi)
+  find_package(Boost COMPONENTS unit_test_framework serialization mpi)
 else ()
-  find_package(Boost COMPONENTS unit_test_framework filesystem system)
+  find_package(Boost COMPONENTS unit_test_framework)
 endif()
-
-if (NOT Boost_FILESYSTEM_FOUND)
-  message(FATAL_ERROR "The boost filesystem library is required")
-endif (NOT Boost_FILESYSTEM_FOUND)
 
 if (NOT Boost_SERIALIZATION_FOUND)
   message(STATUS "The boost serialization was not found, MPI disabled")

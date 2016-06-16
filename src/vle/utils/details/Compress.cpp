@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
@@ -32,6 +31,7 @@
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <ostream>
 #include <vector>
 #include <iostream>
@@ -43,13 +43,13 @@ namespace vle { namespace utils {
 void Path::compress(const std::string& filepath,
                     const std::string& compressedfilepath)
 {
-    boost::filesystem::path path(filepath);
-    if (not boost::filesystem::exists(path))
+    FSpath path(filepath);
+    if (not path.exists())
         throw utils::InternalError(
             (fmt(_("fail to compress '%1%': file or directory does not exist"))
              % filepath).str());
 
-    boost::filesystem::path pwd = boost::filesystem::current_path();
+    FSpath pwd = FSpath::current_path();
     std::string command;
 
     try {
@@ -103,23 +103,21 @@ void Path::compress(const std::string& filepath,
 void Path::decompress(const std::string& compressedfilepath,
                       const std::string& directorypath)
 {
-    boost::filesystem::path path(directorypath);
-    if (not boost::filesystem::exists(path)
-        or not boost::filesystem::is_directory(path))
+    FSpath path(directorypath);
+    if (not path.is_directory())
         throw utils::InternalError(
             (fmt(_("fail to extract '%1%' in directory '%2%': "
                    " directory does not exist"))
              % compressedfilepath % directorypath).str());
 
-    boost::filesystem::path file(compressedfilepath);
-    if (not boost::filesystem::exists(path)
-        or not boost::filesystem::is_regular(file))
+    FSpath file(compressedfilepath);
+    if (not file.is_file())
         throw utils::InternalError(
             (fmt(_("fail to extract '%1%' in directory '%2%': "
-                  "file does not exist"))
+                   "file does not exist"))
              % compressedfilepath % directorypath).str());
 
-    boost::filesystem::path pwd = boost::filesystem::current_path();
+    FSpath pwd = FSpath::current_path();
 
     std::string command;
     try {
