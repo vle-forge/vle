@@ -77,7 +77,8 @@ void remove_all(const vle::utils::FSpath& path)
         spawn.status(&message, &success);
 
         if (not message.empty())
-            std::cerr << message << '\n';
+            TraceAlways(_("Error during remove directory operation: %s."),
+                        message.c_str());
     } catch (const std::exception& e) {
         TraceAlways(_("Package remove all: unable to remove `%s' with"
                       " the `%s' command"),
@@ -240,11 +241,15 @@ void Package::create()
         std::string output, error;
         while (not spawn.isfinish()) {
             if (spawn.get(&output, &error)) {
-                std::cout << output;
-                std::cerr << error;
+                if (not output.empty()) {
+                    DTraceAlways(output.c_str());
+                    output.clear();
+                }
 
-                output.clear();
-                error.clear();
+                if (not error.empty()) {
+                    DTraceAlways(error.c_str());
+                    error.clear();
+                }
 
                 std::this_thread::sleep_for(std::chrono::microseconds(200));
             } else
@@ -258,7 +263,8 @@ void Package::create()
         spawn.status(&message, &success);
 
         if (not message.empty())
-            std::cerr << message << '\n';
+            TraceAlways(_("Error during copy directory operation: %s."),
+                        message.c_str());
     } catch (const std::exception& e) {
         TraceAlways(_("Package creatinig: unable to copy `%s' in `%s' with"
                       "the `%s' command"),
