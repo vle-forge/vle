@@ -188,30 +188,6 @@ PathList Path::getBinaryLibraries()
     return result;
 }
 
-// std::string Path::getPackageFromPath(const std::string& path)
-// {
-//     FSpath source(path);
-//     FSpath package(vle::utils::Path::path().getBinaryPackagesDir());
-
-//     fs::path::iterator it = source.begin();
-//     fs::path::iterator jt = package.begin();
-
-//     while (it != source.end() and jt != package.end()) {
-//         if ((*it) == (*jt)) {
-//             ++it;
-//             ++jt;
-//         } else {
-//             break;
-//         }
-//     }
-
-//     if (jt == package.end() and it != source.end()) {
-//         return it->string();
-//     } else {
-//         return std::string();
-//     }
-// }
-
 void Path::initVleHomeDirectory()
 {
     FSpath pkgs = getBinaryPackagesDir();
@@ -267,7 +243,8 @@ bool Path::readEnv(const std::string& variable, PathList& out)
             std::remove_if(result.begin(), result.end(),
                            [](const std::string& dirname)
                            {
-                               return utils::Path::existDirectory(dirname);
+                               FSpath p(dirname);
+                               return p.is_directory();
                            }));
 
         result.erase(it, result.end());
@@ -324,13 +301,6 @@ std::ostream& operator<<(std::ostream& out, const PathList& paths)
     return out;
 }
 
-std::string Path::buildTemp(const std::string& filename)
-{
-    FSpath tmp_path = FSpath::temp_directory_path() / filename;
-
-    return tmp_path.string();
-}
-
 void Path::fillBinaryPackagesList(std::vector<std::string>& pkglist)
 {
     std::string header = "Packages from: ";
@@ -345,62 +315,6 @@ void Path::fillBinaryPackagesList(std::vector<std::string>& pkglist)
         pkglist.push_back(*itb);
     }
     return;
-}
-
-std::string Path::getCurrentPath()
-{
-    FSpath current = FSpath::current_path();
-
-    return current.string();
-}
-
-bool Path::exist(const std::string& filename)
-{
-    FSpath p(filename);
-
-    return p.exists();
-}
-
-bool Path::existDirectory(const std::string& filename)
-{
-    FSpath p(filename);
-
-    return p.is_directory();
-}
-
-bool Path::existFile(const std::string& filename)
-{
-    FSpath p(filename);
-
-    return p.is_file();
-}
-
-std::string Path::filename(const std::string& filename)
-{
-    FSpath path(filename);
-
-    return path.filename();
-}
-
-std::string Path::basename(const std::string& filename)
-{
-    FSpath path(filename);
-
-    return path.basename();
-}
-
-std::string Path::dirname(const std::string& filename)
-{
-    FSpath path(filename);
-
-    return path.parent_path().string();
-}
-
-std::string Path::extension(const std::string& filename)
-{
-    FSpath path(filename);
-
-    return path.extension();
 }
 
 std::ostream& operator<<(std::ostream& out, const Path& p)
@@ -420,13 +334,6 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << std::endl;
 
     return out;
-}
-
-std::string Path::getParentPath(const std::string& pathfile)
-{
-    FSpath path(pathfile);
-
-    return path.parent_path().string();
 }
 
 }} // namespace vle utils

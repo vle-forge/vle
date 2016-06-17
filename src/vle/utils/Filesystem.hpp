@@ -98,8 +98,31 @@ public:
 
     std::string extension() const;
 
+    /**
+     * Return the basename of the current path.
+     * @code
+     * std::string s = "/tmp/test";
+     * std::string file = basename(s); // dir == test
+     *
+     * std::string x = "/tmp/test.toto";
+     * std::string file = basename(s); // dir == test
+     * @endcode
+     * @return The basename.
+     */
     std::string basename() const;
 
+    /**
+     * Return the filename of the current path.
+     * @code
+     * std::string s = "/tmp/test";
+     * std::string file = filename(s); // dir == test
+     *
+     * std::string x = "/tmp/test.toto";
+     * std::string file = filename(s); // dir == test.toto
+     * @endcode
+     *
+     * @return The filename in the path.
+     */
     std::string filename() const;
 
     FSpath parent_path() const;

@@ -35,6 +35,7 @@
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/vle.hpp>
 
 #ifdef _WIN32
@@ -67,13 +68,17 @@ BOOST_FIXTURE_TEST_CASE(download_dtd, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("www.vle-project.org/vle-1.0.0.dtd",
-             utils::Path::path().buildTemp("vle-1.1.0.dtd"));
+    vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
+    p /= "vle-1.1.0.dtd";
+
+    dm.start("www.vle-project.org/vle-1.0.0.dtd", p.string());
     dm.join();
 
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
-    BOOST_CHECK(utils::Path::path().existFile(dm.filename()));
+
+    vle::utils::FSpath dowloaded(dm.filename());
+    BOOST_CHECK(dowloaded.is_file());
 }
 
 
@@ -81,24 +86,32 @@ BOOST_FIXTURE_TEST_CASE(download_package, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg",
-             utils::Path::path().buildTemp("packages.pkg"));
+    vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
+    p /= "packages.pkg";
+
+    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
     dm.join();
 
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
-    BOOST_CHECK(utils::Path::path().existFile(dm.filename()));
+
+    vle::utils::FSpath d(dm.filename());
+    BOOST_CHECK(d.is_file());
 }
 
 BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
 {
     vle::utils::DownloadManager dm;
 
-    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg",
-             utils::Path::path().buildTemp("packages.pkg"));
+    vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
+    p /= "packages.pkg";
+
+    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
     dm.join();
 
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
-    BOOST_CHECK(utils::Path::path().existFile(dm.filename()));
+
+    vle::utils::FSpath d(dm.filename());
+    BOOST_CHECK(d.is_file());
 }

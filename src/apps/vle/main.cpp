@@ -34,6 +34,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/vle.hpp>
 #include <vle/version.hpp>
@@ -184,26 +185,29 @@ static void remove_configuration_file()
     printf(_("Remove configuration files\n"));
 
     try {
-        std::string filepath;
+        using vle::utils::FSpath;
 
-        filepath = vle::utils::Path::path().getHomeFile("vle.conf");
-        if (vle::utils::Path::existFile(filepath))
-            std::ofstream ofs(filepath.c_str());
+        {
+            FSpath filepath(vle::utils::Path::path().getHomeFile("vle.conf"));
+            filepath.remove();
+        }
 
-        filepath = vle::utils::Path::path().getHomeFile("vle.log");
-        if (vle::utils::Path::existFile(filepath))
-            std::ofstream ofs(filepath.c_str());
+        {
+            FSpath filepath(vle::utils::Path::path().getHomeFile("vle.log"));
+            filepath.remove();
+        }
 
-        filepath = vle::utils::Path::path().getHomeFile("gvle.log");
-        if (vle::utils::Path::existFile(filepath))
-            std::ofstream ofs(filepath.c_str());
+        {
+        FSpath filepath(vle::utils::Path::path().getHomeFile("gvle.log"));
+        filepath.remove();
+    }
 
         vle::utils::Preferences prefs(false, "vle.conf");
     } catch (const std::exception &e) {
         fprintf(stderr, _("Failed to remove configuration file: %s\n"),
-                e.what());
+            e.what());
     }
-}
+    }
 
 static void show_package_content(vle::utils::Package& pkg)
 {
@@ -224,12 +228,17 @@ static std::string search_vpz(const std::string &param,
                               vle::utils::Package& pkg)
 {
     assert(not pkg.name().empty());
-    if (vle::utils::Path::existFile(param))
-        return param;
+
+    {
+        vle::utils::FSpath p(param);
+        if (p.is_file())
+            return param;
+    }
 
     std::string np = pkg.getExpFile(param, vle::utils::PKG_BINARY);
 
-    if (vle::utils::Path::existFile(np))
+    vle::utils::FSpath p(np);
+    if (p.is_file(np))
         return np;
 
     fprintf(stderr, _("Filename '%s' does not exist"), param.c_str());

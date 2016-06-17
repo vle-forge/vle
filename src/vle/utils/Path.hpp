@@ -141,25 +141,6 @@ public:
     PathList getBinaryPackages();
     PathList getBinaryLibraries();
 
-
-    /**
-     * Browser the parameter path and retreive the package if
-     * it exists.
-     * @code
-     * // return toto if /home/foo/bar/ corresponds to VLE_HOME.
-     * getPackageFromPath("/home/foo/bar/pkgs-x.y/toto/lib/tutu.so");
-     * // return empty string.
-     * getPackageFromPath("/home/foo/tutu.so");
-     * // return foo if /home/bar/ corresponds to VLE_HOME.
-     * getPackageFromPath("/home/bar/pkgs-x.y/tutu.so");
-     * @endcode
-     * @param path The path to get the package.
-     * @return The package founded into the string `path' or an empty
-     * string if not found.
-     */
-    // static std::string getPackageFromPath(const std::string& path);
-
-
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
      * Manage template
@@ -233,124 +214,6 @@ public:
                            const std::string& directorypath);
 
     /**
-     * Get the current path of the process.
-     *
-     * @return The current path of the process.
-     */
-    static std::string getCurrentPath();
-
-    /**
-     * Check if the current path exist (file or directory).
-     * @param filename The name of the file to check.
-     * @return True if the file is a regular file.
-     */
-    static bool exist(const std::string& filename);
-
-    /**
-     * Check if the current filename corresponds to a regular file.
-     * @param filename The name of the file to check.
-     * @return True if the file is a regular file.
-     */
-    static bool existFile(const std::string& filename);
-
-    /**
-     * Check if the current filename corresponds to a directory.
-     * @param filename The name of the directory to check.
-     * @return True if the file is a directory.
-     */
-    static bool existDirectory(const std::string& filename);
-
-    /**
-     * Return the filename of the current path.
-     * @code
-     * std::string s = "/tmp/test";
-     * std::string file = filename(s); // dir == test
-     *
-     * std::string x = "/tmp/test.toto";
-     * std::string file = filename(s); // dir == test.toto
-     * @endcode
-     *
-     * @param filename The path.
-     *
-     * @return The filename in the path.
-     */
-    static std::string filename(const std::string& filename);
-
-    /**
-     * Return the basename of the current path.
-     * @code
-     * std::string s = "/tmp/test";
-     * std::string file = basename(s); // dir == test
-     *
-     * std::string x = "/tmp/test.toto";
-     * std::string file = basename(s); // dir == test
-     * @endcode
-     * @param filename The path.
-     * @return The basename.
-     */
-    static std::string basename(const std::string& filename);
-
-    /**
-     * Return the dirname of the current path.
-     * @code
-     * std::string s = "/tmp/test";
-     * std::string dir = dirname(s); // dir == /tmp
-     * @endcode
-     * @param filename The path.
-     * @return The dirname.
-     */
-    static std::string dirname(const std::string& filename);
-
-    /**
-     * Return the extension of the current path.
-     * @param filename The path.
-     * @return The extension.
-     */
-    static std::string extension(const std::string& filename);
-
-    /**
-     * return the parent directory of a file or directory
-     * @param path the absolute filepath
-     * @return a string with the new path
-     */
-    std::string getParentPath(const std::string& path);
-
-    /**
-     * build a portable temporary filename like:
-     * @code
-     * $TMP/<filename> on Unix/Linux
-     * $ c:\windows\tmp\<filename> on Windows
-     * @endcode
-     * @param filename string to add on temporary directory
-     * @return a portable temporary filename
-     */
-    static std::string buildTemp( const std::string& filename);
-
-    /**
-     * Get and open a temporary file.
-     *
-     * Get from the operating system a temporary directory, for example on
-     * Unix @c /tmp or @c c:\\windows\\temp on Win32 and build a file name
-     * from the template @c template.
-     *
-     * @code
-     * std::ofstream file;
-     * std::string result = utils::getTempFile("test-vle", &file);
-     * file << "Hello\n";
-     *
-     * std::cout << result; // For example, on Unix: /tmp/test-vle123251
-     * @endcode
-     *
-     * @param[in] prefix The prefix of the filename you want.
-     * @param[out] file A pointer to an existing std::ofstream not opened.
-     *
-     * @return The path name of the file.
-     */
-    // static std::string getTempFile(const std::string& prefix,
-    //                                std::ofstream* file);
-
-
-    /**
      * Find the absolute path to a program
      * @param the program name
      * @param the absolute path to a program
@@ -361,7 +224,8 @@ public:
      * @brief fill a vector of string with the list of binary packages
      * @param pkglist, the vector to fill
      */
-    static void fillBinaryPackagesList(std::vector<std::string>& pkglist);
+    static void fillBinaryPackagesList(
+        std::vector<std::string>& pkglist);
 
 private:
     void addSimulatorDir(const std::string& dirname);
@@ -379,29 +243,6 @@ private:
     std::string buildPackageFile(const std::string& dir1,
                                  const std::string& dir2,
                                  const std::string& name) const;
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *
-     * Functor
-     *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /**
-     * Predicate functor to test the existence of a directory.
-     */
-    struct IsDirectory
-        : public std::unary_function < std::string, bool >
-    {
-        /**
-         * Check if the directory exits.
-         * @param the string to check.
-         * @return true if the directory exists, false otherwise.
-         */
-        bool operator()(const std::string& dirname) const
-        {
-            return utils::Path::existDirectory(dirname);
-        }
-    };
 
     PathList m_simulator;
     PathList m_stream;

@@ -23,6 +23,7 @@
  */
 
 #include <iostream>
+#include <vle/utils/Filesystem.hpp>
 #include <QFileDialog>
 #include <QStyleFactory>
 #include <QActionGroup>
@@ -948,7 +949,9 @@ gvle_win::treeProjectUpdate()
     tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     QItemSelectionModel *selmod = tree->selectionModel();
     QTreeView* projectTreeView = ui->treeProject;
-    QString projectName(vu::Path::filename(mCurrPackage.name()).c_str());
+
+    vle::utils::FSpath p(mCurrPackage.name());
+    QString projectName(p.filename().c_str());
     if (projectName != "") {
         QModelIndex projectIndex = mProjectFileSytem->setRootPath(projectName);
         projectTreeView->setRootIndex(projectIndex);

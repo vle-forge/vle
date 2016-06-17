@@ -311,14 +311,14 @@ public:
         void operator()(std::string url) const
         {
             DownloadManager dl;
+            FSpath filename(FSpath::temp_directory_path());
+            filename /= "packages.pkg";
 
-            std::string filename = utils::Path::path().buildTemp("packages.pkg");
-
-            dl.start(url + "/packages.pkg", filename);
+            dl.start(url + "/packages.pkg", filename.string());
             dl.join();
 
             if (not dl.hasError()) {
-                parser->extract(filename, url);
+                parser->extract(filename.string(), url);
             } else {
                 if (!(*remoteHasError)) {
                     *remoteHasError = true;
@@ -437,15 +437,14 @@ public:
         std::string url = it->url;
         out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
 
-        std::string archfile = vle::utils::Path::buildTemp(archname);
-        dl.start(url + archname, archfile);
+        FSpath archfile(FSpath::temp_directory_path());
+        archfile /= archname;
+        dl.start(url + archname, archfile.string());
         dl.join();
         if (not dl.hasError()) {
             out(fmt(_("ok\n")));
-//            std::string archfile = vle::utils::Path::buildTemp(archname);
-            //          boost::filesystem::rename(dl.filename(), archfile);
-            std::string tempDir = vle::utils::Path::path().getParentPath(
-                    archfile);
+
+            FSpath tempDir(FSpath::temp_directory_path());
             FSpath archpath(archfile);
             FSpath dearchpath(tempDir);
 
