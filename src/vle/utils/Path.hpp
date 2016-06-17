@@ -357,43 +357,6 @@ public:
      */
     static std::string findProgram(const std::string& exe);
 
-    static std::string buildFilename(const std::string& dir,
-                                     const std::string& file);
-    static std::string buildFilename(const std::string& dir1,
-                                     const std::string& dir2,
-                                     const std::string& file);
-    static std::string buildFilename(const std::string& dir1,
-                                     const std::string& dir2,
-                                     const std::string& dir3,
-                                     const std::string& file);
-    static std::string buildFilename(const std::string& dir1,
-                                     const std::string& dir2,
-                                     const std::string& dir3,
-                                     const std::string& dir4,
-                                     const std::string& file);
-    static std::string buildFilename(const std::string& dir1,
-                                     const std::string& dir2,
-                                     const std::string& dir3,
-                                     const std::string& dir4,
-                                     const std::string& dir5,
-                                     const std::string& file);
-
-    static std::string buildDirname(const std::string& dir1,
-                                    const std::string& dir2);
-
-    static std::string buildDirname(const std::string& dir1,
-                                    const std::string& dir2,
-                                    const std::string& dir3);
-    static std::string buildDirname(const std::string& dir1,
-                                    const std::string& dir2,
-                                    const std::string& dir3,
-                                    const std::string& dir4);
-    static std::string buildDirname(const std::string& dir1,
-                                    const std::string& dir2,
-                                    const std::string& dir3,
-                                    const std::string& dir4,
-                                    const std::string& dir5);
-
     /**
      * @brief fill a vector of string with the list of binary packages
      * @param pkglist, the vector to fill

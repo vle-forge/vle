@@ -585,143 +585,239 @@ std::string Package::getDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getLibDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "lib");
+    FSpath p(getDir(type));
+    p /= "lib";
+
+    return p.string();
 }
 
 std::string Package::getSrcDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "src");
+    FSpath p(getDir(type));
+    p /= "src";
+
+    return p.string();
 }
 
 std::string Package::getDataDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "data");
+    FSpath p(getDir(type));
+    p /= "data";
+
+    return p.string();
 }
 
 std::string Package::getDocDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "doc");
+    FSpath p(getDir(type));
+    p /= "doc";
+
+    return p.string();
 }
 
 std::string Package::getExpDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "exp");
+    FSpath p(getDir(type));
+    p /= "exp";
+
+    return p.string();
 }
 
 std::string Package::getBuildDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "buildvle");
+    FSpath p(getDir(type));
+    p /= "buildvle";
+
+    return p.string();
 }
 
 std::string Package::getOutputDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "output");
+    FSpath p(getDir(type));
+    p /= "output";
+
+    return p.string();
 }
 
 std::string Package::getPluginDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins");
+    FSpath p(getDir(type));
+    p /= "plugins";
+
+    return p.string();
 }
 
 std::string Package::getPluginSimulatorDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", "simulator");
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "simulator";
+
+    return p.string();
 }
 
 std::string Package::getPluginOutputDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", "output");
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "output";
+
+    return p.string();
 }
 
 std::string Package::getPluginGvleGlobalDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", "gvle", "global");
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "gvle";
+    p /= "global";
+
+    return p.string();
 }
 
 std::string Package::getPluginGvleModelingDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", "gvle",
-            "modeling");
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "gvle";
+    p /= "modeling";
+
+    return p.string();
 }
 
 std::string Package::getPluginGvleOutputDir(VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", "gvle", "output");
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "gvle";
+    p /= "output";
+
+    return p.string();
 }
 
 std::string Package::getFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), file);
+    FSpath p(getDir(type));
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getLibFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "lib", file);
+    FSpath p(getDir(type));
+    p /= "lib";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getSrcFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "src", file);
+    FSpath p(getDir(type));
+    p /= "src";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getDataFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "data", file);
+    FSpath p(getDir(type));
+    p /= "data";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getDocFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "doc", file);
+    FSpath p(getDir(type));
+    p /= "doc";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getExpFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "exp", file);
+    FSpath p(getDir(type));
+    p /= "exp";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getOutputFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "output", file);
+    FSpath p(getDir(type));
+    p /= "output";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getPluginFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", file);
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getPluginSimulatorFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", "simulator",
-            file);
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "simulator";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getPluginOutputFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(getDir(type), "plugins", "output", file);
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "output";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getPluginGvleModelingFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(
-        getDir(type), "plugins", "gvle", "modeling", file);
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "gvle";
+    p /= "modeling";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Package::getPluginGvleOutputFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    return utils::Path::buildDirname(
-        getDir(type), "plugins", "gvle", "output", file);
+    FSpath p(getDir(type));
+    p /= "plugins";
+    p /= "gvle";
+    p /= "output";
+    p /= file;
+
+    return p.string();
 }
 
 bool Package::existsBinary() const

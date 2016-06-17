@@ -32,6 +32,7 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/DateTime.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <mutex>
 #include <cstdio>
 #include <cstdarg>
@@ -275,7 +276,10 @@ std::string Trace::getDefaultLogFilename()
 
 std::string Trace::getLogFilename(const std::string& filename)
 {
-    return Path::buildFilename(utils::Path::path().getHomeDir(), filename);
+    FSpath p(utils::Path::path().getHomeDir());
+    p /= filename;
+
+    return p.string();
 }
 
 TraceStreamType Trace::getType()

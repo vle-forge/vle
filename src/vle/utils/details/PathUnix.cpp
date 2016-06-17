@@ -70,7 +70,11 @@ void Path::initHomeDir()
         if (path_str) {
             homepath.assign(path_str);
         }
-        m_home = utils::Path::buildDirname(homepath, ".vle");
+
+        FSpath p(homepath);
+        p /= ".vle";
+
+        m_home = p.string();
     }
 }
 

@@ -698,16 +698,18 @@ const std::string& RemoteManager::messageError()
 
 std::string RemoteManager::getLocalPackageFilename()
 {
-    return utils::Path::path().buildFilename(
-            utils::Path::path().getBinaryPackagesDir(),
-            "local.pkg");
+    FSpath p(utils::Path::path().getBinaryPackagesDir());
+    p /= "local.pkg";
+
+    return p.string();
 }
 
 std::string RemoteManager::getRemotePackageFilename()
 {
-    return utils::Path::path().buildFilename(
-            utils::Path::path().getBinaryPackagesDir(),
-            "remote.pkg");
+    FSpath p(utils::Path::path().getBinaryPackagesDir());
+    p /= "remote.pkg";
+
+    return p.string();
 }
 
 }} // namespace vle utils

@@ -49,32 +49,57 @@ static const char *pkgdirname = "pkgs-" VLE_ABI_VERSION;
 
 std::string Path::getLocaleDir() const
 {
-    return buildDirname(m_prefix, "share", "locale");
+    FSpath p(m_prefix);
+    p /= "share";
+    p /= "locale";
+
+    return p.string();
 }
 
 std::string Path::getHomeFile(const std::string& name) const
 {
-    return buildFilename(m_home, name);
+    FSpath p(m_home);
+    p /= name;
+
+    return p.string();
 }
 
 std::string Path::getPixmapDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "pixmaps");
+    FSpath p(m_prefix);
+    p /= VLE_SHARE_DIRS;
+    p /= "pixmaps";
+
+    return p.string();
 }
 
 std::string Path::getPixmapFile(const std::string& file) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "pixmaps", file);
+    FSpath p(m_prefix);
+    p /= VLE_SHARE_DIRS;
+    p /= "pixmaps";
+    p /= file;
+
+    return p.string();
 }
 
 std::string Path::getGladeDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "glade");
+    FSpath p(m_prefix);
+    p /= VLE_SHARE_DIRS;
+    p /= "glade";
+
+    return p.string();
 }
 
 std::string Path::getGladeFile(const std::string& file) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "glade", file);
+    FSpath p(m_prefix);
+    p /= VLE_SHARE_DIRS;
+    p /= "glade";
+    p /= file;
+
+    return p.string();
 }
 
 /*
@@ -83,17 +108,29 @@ std::string Path::getGladeFile(const std::string& file) const
 
 std::string Path::getBinaryPackagesDir() const
 {
-    return buildDirname(m_home, pkgdirname);
+    FSpath p(m_home);
+    p /= pkgdirname;
+
+    return p.string();
 }
 
 std::string Path::getTemplateDir() const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "template");
+    FSpath p(m_prefix);
+    p /= VLE_SHARE_DIRS;
+    p /= "template";
+
+    return p.string();
 }
 
 std::string Path::getTemplate(const std::string& name) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "template", name);
+    FSpath p(m_prefix);
+    p /= VLE_SHARE_DIRS;
+    p /= "template";
+    p /= name;
+
+    return p.string();
 }
 
 std::string Path::getCurrentDir() const
@@ -144,7 +181,7 @@ PathList Path::getBinaryLibraries()
 #else
                 if (ext == ".so")
                     result.push_back(jt->path().string());
-#endif              
+#endif
             }
         }
     }
@@ -292,119 +329,6 @@ std::string Path::buildTemp(const std::string& filename)
     FSpath tmp_path = FSpath::temp_directory_path() / filename;
 
     return tmp_path.string();
-}
-
-std::string Path::buildFilename(const std::string& dir,
-                                const std::string& file)
-{
-    FSpath f = dir;
-    f /= file;
-
-    return f.string();
-}
-
-std::string Path::buildFilename(const std::string& dir1,
-                                const std::string& dir2,
-                                const std::string& file)
-{
-    FSpath f = dir1;
-    f /= dir2;
-    f /= file;
-
-    return f.string();
-}
-
-std::string Path::buildFilename(const std::string& dir1,
-                                const std::string& dir2,
-                                const std::string& dir3,
-                                const std::string& file)
-{
-    FSpath f = dir1;
-    f /= dir2;
-    f /= dir3;
-    f /= file;
-
-    return f.string();
-}
-
-std::string Path::buildFilename(const std::string& dir1,
-                                const std::string& dir2,
-                                const std::string& dir3,
-                                const std::string& dir4,
-                                const std::string& file)
-{
-    FSpath f = dir1;
-    f /= dir2;
-    f /= dir3;
-    f /= dir4;
-    f /= file;
-
-    return f.string();
-}
-
-std::string Path::buildFilename(const std::string& dir1,
-                                const std::string& dir2,
-                                const std::string& dir3,
-                                const std::string& dir4,
-                                const std::string& dir5,
-                                const std::string& file)
-{
-    FSpath f = dir1;
-    f /= dir2;
-    f /= dir3;
-    f /= dir4;
-    f /= dir5;
-    f /= file;
-
-    return f.string();
-}
-
-std::string Path::buildDirname(const std::string& dir1,
-                               const std::string& dir2)
-{
-    FSpath f = dir1;
-    f /= dir2;
-
-    return f.string();
-}
-
-std::string Path::buildDirname(const std::string& dir1,
-                               const std::string& dir2,
-                               const std::string& dir3)
-{
-    FSpath f = dir1;
-    f /= dir2;
-    f /= dir3;
-
-    return f.string();
-}
-
-std::string Path::buildDirname(const std::string& dir1,
-                               const std::string& dir2,
-                               const std::string& dir3,
-                               const std::string& dir4)
-{
-    FSpath f = dir1;
-    f /= dir2;
-    f /= dir3;
-    f /= dir4;
-
-    return f.string();
-}
-
-std::string Path::buildDirname(const std::string& dir1,
-                               const std::string& dir2,
-                               const std::string& dir3,
-                               const std::string& dir4,
-                               const std::string& dir5)
-{
-    FSpath f = dir1;
-    f /= dir2;
-    f /= dir3;
-    f /= dir4;
-    f /= dir5;
-
-    return f.string();
 }
 
 void Path::fillBinaryPackagesList(std::vector<std::string>& pkglist)
