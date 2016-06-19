@@ -35,7 +35,7 @@
 
 namespace vle { namespace utils {
 
-std::string Path::findProgram(const std::string& exe)
+FSpath Path::findProgram(const std::string& exe)
 {
     char* env_p = std::getenv("PATH");
 
@@ -48,11 +48,11 @@ std::string Path::findProgram(const std::string& exe)
     for (; itb != ite; itb++) {
         FSpath p(*itb);
         p /= exe;
-        if (p.exists()) {
+        if (p.exists())
             return p.string();
-        }
     }
-    return "";
+
+    return {};
 }
 
 void Path::initHomeDir()
@@ -79,8 +79,8 @@ void Path::initHomeDir()
 }
 
 void Path::initPrefixDir()
-{
-    m_prefix.assign(VLE_PREFIX_DIR);
+{   
+    m_prefix = VLE_PREFIX_DIR;
 }
 
 // std::string Path::getTempFile(const std::string& prefix,

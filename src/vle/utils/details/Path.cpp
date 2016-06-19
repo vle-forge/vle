@@ -47,107 +47,107 @@ namespace vle { namespace utils {
 
 static const char *pkgdirname = "pkgs-" VLE_ABI_VERSION;
 
-std::string Path::getLocaleDir() const
+FSpath Path::getLocaleDir() const
 {
     FSpath p(m_prefix);
     p /= "share";
     p /= "locale";
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getHomeFile(const std::string& name) const
+FSpath Path::getHomeFile(const std::string& name) const
 {
     FSpath p(m_home);
     p /= name;
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getPixmapDir() const
+FSpath Path::getPixmapDir() const
 {
     FSpath p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "pixmaps";
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getPixmapFile(const std::string& file) const
+FSpath Path::getPixmapFile(const std::string& file) const
 {
     FSpath p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "pixmaps";
     p /= file;
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getGladeDir() const
+FSpath Path::getGladeDir() const
 {
     FSpath p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "glade";
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getGladeFile(const std::string& file) const
+FSpath Path::getGladeFile(const std::string& file) const
 {
     FSpath p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "glade";
     p /= file;
 
-    return p.string();
+    return p;
 }
 
 /*
  * packages path
  */
 
-std::string Path::getBinaryPackagesDir() const
+FSpath Path::getBinaryPackagesDir() const
 {
     FSpath p(m_home);
     p /= pkgdirname;
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getTemplateDir() const
+FSpath Path::getTemplateDir() const
 {
     FSpath p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "template";
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getTemplate(const std::string& name) const
+FSpath Path::getTemplate(const std::string& name) const
 {
     FSpath p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "template";
     p /= name;
 
-    return p.string();
+    return p;
 }
 
-std::string Path::getCurrentDir() const
+FSpath Path::getCurrentDir() const
 {
-    return FSpath::current_path().string();
+    return FSpath::current_path();
 }
 
-PathList Path::getBinaryPackages()
+std::vector<std::string> Path::getBinaryPackages()
 {
     FSpath pkgs(Path::path().getBinaryPackagesDir());
 
     if (not pkgs.is_directory())
         throw utils::InternalError(
             (fmt(_("Package error: '%1%' is not a directory")) %
-             Path::path().getBinaryPackagesDir()).str());
+             Path::path().getBinaryPackagesDir().string()).str());
 
-    PathList result;
+    std::vector <std::string> result;
     for (FSdirectory_iterator it(pkgs), end; it != end; ++it)
         if (it->is_directory())
             result.push_back(it->path().filename());
@@ -155,38 +155,39 @@ PathList Path::getBinaryPackages()
     return result;
 }
 
-PathList Path::getBinaryLibraries()
-{
-    PathList result;
-    const PathList& dirs = Path::path().getSimulatorDirs();
-
-    for (auto elem : dirs) {
-        FSpath dir(elem);
-
-        if (not dir.is_directory())
-            throw utils::InternalError(
-                (fmt(_("Pkg list error: '%1%' is not a library directory")) %
-                 dir.string()).str());
-
-        for (FSdirectory_iterator jt(dir), end; jt != end; ++jt) {
-            if (jt->is_file()) {
-                std::string ext = jt->path().extension();
-
-#ifdef _WIN32
-                if (ext == ".dll")
-                    result.push_back(jt->path().string());
-#elif __APPLE__
-                if (ext == ".dylib")
-                    result.push_back(jt->path().string());
-#else
-                if (ext == ".so")
-                    result.push_back(jt->path().string());
-#endif
-            }
-        }
-    }
-    return result;
-}
+//PathList Path::getBinaryLibraries()
+//{
+//    PathList result;
+//    const PathList& dirs = Path::path().getSimulatorDirs();
+//
+//    for (auto elem : dirs) {
+//        FSpath dir(elem);
+//
+//        if (not dir.is_directory())
+//            throw utils::InternalError(
+//                (fmt(_("Pkg list error: '%1%' is not a library directory")) %
+//                 dir.string()).str());
+//
+//        for (FSdirectory_iterator jt(dir), end; jt != end; ++jt) {
+//            if (jt->is_file()) {
+//                std::string ext = jt->path().extension();
+//
+//#ifdef _WIN32
+//                if (ext == ".dll")
+//                    result.push_back(jt->path());
+//#elif __APPLE__
+//                if (ext == ".dylib")
+//                    result.push_back(jt->path());
+//#else
+//                if (ext == ".so")
+//                    result.push_back(jt->path());
+//#endif
+//            }
+//        }
+//    }
+//
+//    return result;
+//}
 
 void Path::initVleHomeDirectory()
 {
@@ -199,34 +200,6 @@ void Path::initVleHomeDirectory()
                  pkgs.string()).str());
 }
 
-/*
- * adding
- */
-
-void Path::addSimulatorDir(const std::string& dirname)
-{
-    if (FSpath::is_directory(dirname))
-        m_simulator.push_back(dirname);
-}
-
-void Path::addStreamDir(const std::string& dirname)
-{
-    if (FSpath::is_directory(dirname))
-        m_stream.push_back(dirname);
-}
-
-void Path::addOutputDir(const std::string& dirname)
-{
-    if (FSpath::is_directory(dirname))
-        m_output.push_back(dirname);
-}
-
-void Path::addModelingDir(const std::string& dirname)
-{
-    if (FSpath::is_directory(dirname))
-        m_modeling.push_back(dirname);
-}
-
 bool Path::readEnv(const std::string& variable, PathList& out)
 {
     const char* path_str = std::getenv(variable.c_str());
@@ -235,17 +208,16 @@ bool Path::readEnv(const std::string& variable, PathList& out)
         path.assign(path_str);
     }
     if (not path.empty()) {
-        PathList result;
+        std::vector<std::string> result;
         boost::algorithm::split(result, path, boost::is_any_of(":"),
                                 boost::algorithm::token_compress_on);
 
-        PathList::iterator it(
-            std::remove_if(result.begin(), result.end(),
-                           [](const std::string& dirname)
-                           {
-                               FSpath p(dirname);
-                               return p.is_directory();
-                           }));
+        auto it = std::remove_if(result.begin(), result.end(),
+                                 [](const std::string& dirname)
+                                 {
+                                     FSpath p(dirname);
+                                     return p.is_directory();
+                                 });
 
         result.erase(it, result.end());
 
@@ -293,25 +265,22 @@ void Path::clearPluginDirs()
 
 std::ostream& operator<<(std::ostream& out, const PathList& paths)
 {
-    PathList::const_iterator it = paths.begin();
-    while (it != paths.end()) {
-        out << "\t" << *it << "\n";
-        ++it;
-    }
+    for (const auto& elem : paths)
+        out << '\t' << elem.string() << '\n';
+
     return out;
 }
 
 void Path::fillBinaryPackagesList(std::vector<std::string>& pkglist)
 {
     std::string header = "Packages from: ";
-    header += path().getBinaryPackagesDir();
+    header += path().getBinaryPackagesDir().string();
     pkglist.clear();
     pkglist.push_back(header);
-    PathList pkgs = path().getBinaryPackages();
+    std::vector<std::string> pkgs = path().getBinaryPackages();
     std::sort(pkgs.begin(), pkgs.end());
-    PathList::const_iterator itb = pkgs.begin();
-    PathList::const_iterator ite = pkgs.end();
-    for (; itb!=ite; itb++){
+    auto itb = pkgs.cbegin(), ite = pkgs.cend();
+    for (; itb!=ite; itb++) {
         pkglist.push_back(*itb);
     }
     return;
@@ -319,14 +288,14 @@ void Path::fillBinaryPackagesList(std::vector<std::string>& pkglist)
 
 std::ostream& operator<<(std::ostream& out, const Path& p)
 {
-    out << "prefix................: " << p.getPrefixDir() << "\n"
+    out << "prefix................: " << p.getPrefixDir().string() << "\n"
         << "\n"
-        << "pixmap................: " << p.getPixmapDir() << "\n"
-        << "glade.................: " << p.getGladeDir() << "\n"
+        << "pixmap................: " << p.getPixmapDir().string() << "\n"
+        << "glade.................: " << p.getGladeDir().string() << "\n"
         << "\n"
-        << "vle home..............: " << p.getHomeDir() << "\n"
-        << "packages..............: " << p.getBinaryPackagesDir() << "\n"
-        << "\n";
+        << "vle home..............: " << p.getHomeDir().string() << "\n"
+        << "packages..............: " << p.getBinaryPackagesDir().string()
+        << "\n\n";
     out << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
         << "Real output list......:\n" << p.getOutputDirs() << "\n"
         << "Real modeling list....:\n" << p.getModelingDirs() << "\n"

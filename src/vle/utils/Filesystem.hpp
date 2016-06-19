@@ -193,8 +193,9 @@ public:
 
     static bool create_directories(const FSpath& p);
 
-    bool operator==(const FSpath &p) const;
-    bool operator!=(const FSpath &p) const;
+    friend bool operator==(const FSpath &p, const FSpath &q);
+    friend bool operator!=(const FSpath &p, const FSpath &q);
+    friend bool operator<(const FSpath &p, const FSpath &q);
 
 private:
     std::vector<std::string> m_path;

@@ -78,7 +78,7 @@ gvle_plugins::registerPlugins()
     QString pathgvles = "plugins/gvle/simulating";
 
     QString packagesDir =
-            vle::utils::Path::path().getBinaryPackagesDir().c_str();
+        vle::utils::Path::path().getBinaryPackagesDir().string().c_str();
 
     QDirIterator it(packagesDir, QDir::AllDirs);
 

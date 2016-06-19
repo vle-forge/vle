@@ -63,7 +63,7 @@ gvle_win::gvle_win(QWidget *parent) :
     ui->setupUi(this);
 
     // Open the configuration file
-    std::string configFile = vu::Path::path().getHomeFile("gvle.conf");
+    std::string configFile = vu::Path::path().getHomeFile("gvle.conf").string();
     mSettings = new QSettings(QString(configFile.c_str()),QSettings::IniFormat);
     menuRecentProjectRefresh();
 

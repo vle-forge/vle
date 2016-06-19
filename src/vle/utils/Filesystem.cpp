@@ -511,14 +511,25 @@ FSpath &FSpath::operator=(const std::wstring &str)
 }
 #endif
 
-bool FSpath::operator==(const FSpath &p) const
+bool operator==(const FSpath &p, const FSpath &q)
 {
-    return p.m_path == m_path;
+    return p.m_path == q.m_path;
 }
 
-bool FSpath::operator!=(const FSpath &p) const
+bool operator!=(const FSpath &p, const FSpath &q)
 {
-    return p.m_path != m_path;
+    return p.m_path != q.m_path;
+}
+
+bool operator<(const FSpath &p, const FSpath &q)
+{
+    const auto max = std::min(p.m_path.size(), q.m_path.size());
+
+    for (auto i = decltype(max) {0}; i != max; ++i)
+        if (p.m_path[i] != q.m_path[i])
+            return p.m_path[i] < q.m_path[i];
+
+    return p.m_path.size() < q.m_path.size();
 }
 
 bool FSpath::is_directory(const FSpath& p)

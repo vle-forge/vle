@@ -103,10 +103,8 @@ void FileVpzDynamics::reload()
     // get list of known/installed packages
     QList <QString> pkgList;
     {
-        vle::utils::PathList pathList;
-        pathList = vle::utils::Path::path().getBinaryPackages();
-        for (vle::utils::PathList::const_iterator i = pathList.begin(),
-                e = pathList.end(); i != e; ++i) {
+        auto pathList = vle::utils::Path::path().getBinaryPackages();
+        for (auto i = pathList.cbegin(), e = pathList.cend(); i != e; ++i) {
             std::string name = *i;
             QString pkgName = QString( name.c_str() );
             pkgList.append(pkgName);

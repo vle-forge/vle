@@ -28,17 +28,18 @@
 #ifndef VLE_UTILS_PATH_HPP
 #define VLE_UTILS_PATH_HPP
 
+#include <vle/utils/Filesystem.hpp>
+#include <vle/DllDefines.hpp>
 #include <string>
 #include <vector>
 #include <iosfwd>
-#include <vle/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
 /**
  * Define a list of directories.
  */
-using PathList = std::vector<std::string>;
+using PathList = std::vector<vle::utils::FSpath>;
 
 /**
  * Portable way to get and manage VLE's paths.
@@ -50,7 +51,7 @@ using PathList = std::vector<std::string>;
  *
  * This class is a singleton. To use it:
  * @code
- * std::string file(utils::Path::path().getHomeDir("toto");
+ * FSpath file(utils::Path::path().getHomeDir("toto");
  * // Return:
  * //  - $HOME/.vle/toto if VLE_HOME is not defined.
  * //  - %HOMEDRIVE%%HOMEPATH%\vle on Windows if VLE_HOME is not defined.
@@ -86,7 +87,7 @@ public:
      * directory taken from registry on Windows.
      * @return A string path.
      */
-    const std::string& getPrefixDir() const
+    const FSpath& getPrefixDir() const
     { return m_prefix; }
 
     /**
@@ -96,33 +97,33 @@ public:
      * this variable.
      * @return A string path.
      */
-    const std::string& getHomeDir() const
+    const FSpath& getHomeDir() const
     { return m_home; }
 
     /**
      * Get a file from the getHomeDir() directory.
      * @param name The filename to concat.
      */
-    std::string getHomeFile(const std::string& name) const;
+    FSpath getHomeFile(const std::string& name) const;
 
     /**
      * Get the locale directory (/usr/share/locale).
      */
-    std::string getLocaleDir() const;
+    FSpath getLocaleDir() const;
 
     /*
      * pixmap path
      */
 
-    std::string getPixmapDir() const;
-    std::string getPixmapFile(const std::string& file) const;
+    FSpath getPixmapDir() const;
+    FSpath getPixmapFile(const std::string& file) const;
 
     /*
      * glade path
      */
 
-    std::string getGladeDir() const;
-    std::string getGladeFile(const std::string& file) const;
+    FSpath getGladeDir() const;
+    FSpath getGladeFile(const std::string& file) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -135,11 +136,17 @@ public:
      * @return A string.
      */
 
-    std::string getBinaryPackagesDir() const;
-    std::string getCurrentDir() const;
+    FSpath getBinaryPackagesDir() const;
+    FSpath getCurrentDir() const;
 
-    PathList getBinaryPackages();
-    PathList getBinaryLibraries();
+
+    /** Returns the list of dirname available in the binary package directory.
+     */
+    std::vector<std::string> getBinaryPackages();
+
+    /** Returns the list of filepath available in all binary package directory.
+     */
+    // PathList getBinaryLibraries();
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -151,7 +158,7 @@ public:
      * Get the $PREFIX/share/vle-x.y.z/template directory name.
      * @return A string.
      */
-    std::string getTemplateDir() const;
+    FSpath getTemplateDir() const;
 
     /**
      * Return the $PREFIX/share/vle-x.y.z/template/name directory
@@ -159,7 +166,7 @@ public:
      * @path The name of the template.
      * @return A string.
      */
-    std::string getTemplate(const std::string& name) const;
+    FSpath getTemplate(const std::string& name) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -207,50 +214,41 @@ public:
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    static void compress(const std::string& filepath,
-                         const std::string& compressedfilepath);
+    static void compress(const FSpath& filepath,
+                         const FSpath& compressedfilepath);
 
-    static void decompress(const std::string& compressedfilepath,
-                           const std::string& directorypath);
+    static void decompress(const FSpath& compressedfilepath,
+                           const FSpath& directorypath);
 
     /**
      * Find the absolute path to a program
      * @param the program name
      * @param the absolute path to a program
      */
-    static std::string findProgram(const std::string& exe);
+    static FSpath findProgram(const std::string& exe);
 
     /**
      * @brief fill a vector of string with the list of binary packages
      * @param pkglist, the vector to fill
      */
-    static void fillBinaryPackagesList(
-        std::vector<std::string>& pkglist);
+    static void fillBinaryPackagesList(std::vector<std::string>& pkglist);
 
 private:
-    void addSimulatorDir(const std::string& dirname);
-
-    void addStreamDir(const std::string& dirname);
-
-    void addOutputDir(const std::string& dirname);
-
-    void addModelingDir(const std::string& dirname);
-
-    std::string buildPackageDir(const std::string& name) const;
-    std::string buildPackageFile(const std::string& name) const;
-    std::string buildPackageFile(const std::string& dir,
-                                 const std::string& name) const;
-    std::string buildPackageFile(const std::string& dir1,
-                                 const std::string& dir2,
-                                 const std::string& name) const;
+    FSpath buildPackageDir(const std::string& name) const;
+    FSpath buildPackageFile(const std::string& name) const;
+    FSpath buildPackageFile(const std::string& dir,
+                                 const FSpath& name) const;
+    FSpath buildPackageFile(const std::string& dir1,
+                                 const FSpath& dir2,
+                                 const FSpath& name) const;
 
     PathList m_simulator;
     PathList m_stream;
     PathList m_output;
     PathList m_modeling;
 
-    std::string m_prefix; /*!< the $prefix of installation */
-    std::string m_home; /*!< the $VLE_HOME */
+    FSpath m_prefix; /*!< the $prefix of installation */
+    FSpath m_home; /*!< the $VLE_HOME */
 
     /**
      * Build the paths from environment variables.

@@ -129,7 +129,8 @@ BOOST_AUTO_TEST_CASE(show_package)
     BOOST_REQUIRE_EQUAL(static_cast<PathList::size_type>(0),
                         Path::path().getSimulatorDirs().size());
 
-    std::cout << "getBinaryPackagesDir: " << Path::path().getBinaryPackagesDir()
+    std::cout << "getBinaryPackagesDir: "
+              << Path::path().getBinaryPackagesDir().string()
               << "\ngetBinaryPackages   : ";
 
     auto lst = Path::path().getBinaryPackages();
@@ -144,7 +145,7 @@ BOOST_AUTO_TEST_CASE(show_package)
     auto vpz = pkg.getExperiments();
 
     for (const auto& elem : vpz)
-        std::cout << elem << ' ';
+        std::cout << elem.string() << ' ';
     
     BOOST_REQUIRE(vpz.size() == 1);
 }

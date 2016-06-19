@@ -40,14 +40,13 @@
 
 namespace vle { namespace utils {
 
-void Path::compress(const std::string& filepath,
-                    const std::string& compressedfilepath)
+void Path::compress(const FSpath& filepath,
+                    const FSpath& compressedfilepath)
 {
-    FSpath path(filepath);
-    if (not path.exists())
+    if (not filepath.exists())
         throw utils::InternalError(
             (fmt(_("fail to compress '%1%': file or directory does not exist"))
-             % filepath).str());
+             % filepath.string()).str());
 
     FSpath pwd = FSpath::current_path();
     std::string command;
@@ -58,8 +57,8 @@ void Path::compress(const std::string& filepath,
             prefs.get("vle.command.tar", &command);
         }
 
-        command = (vle::fmt(command) % compressedfilepath
-                   % path.string()).str();
+        command = (vle::fmt(command) % compressedfilepath.string()
+                   % filepath.string()).str();
 
         std::vector<std::string> argv = Spawn::splitCommandLine(command);
         std::string exe = std::move(argv.front());
@@ -94,28 +93,26 @@ void Path::compress(const std::string& filepath,
     } catch (const std::exception& e) {
         TraceAlways(_("Compress: unable to compress '%s' "
                       "in '%s' with the '%s' command"),
-                    compressedfilepath.c_str(),
+                    compressedfilepath.string().c_str(),
                     pwd.string().c_str(),
                     command.c_str());
     }
 }
 
-void Path::decompress(const std::string& compressedfilepath,
-                      const std::string& directorypath)
+void Path::decompress(const FSpath& compressedfilepath,
+                      const FSpath& directorypath)
 {
-    FSpath path(directorypath);
-    if (not path.is_directory())
+    if (not directorypath.is_directory())
         throw utils::InternalError(
             (fmt(_("fail to extract '%1%' in directory '%2%': "
                    " directory does not exist"))
-             % compressedfilepath % directorypath).str());
+             % compressedfilepath.string() % directorypath.string()).str());
 
-    FSpath file(compressedfilepath);
-    if (not file.is_file())
+    if (not compressedfilepath.is_file())
         throw utils::InternalError(
             (fmt(_("fail to extract '%1%' in directory '%2%': "
                    "file does not exist"))
-             % compressedfilepath % directorypath).str());
+             % compressedfilepath.string() % directorypath.string()).str());
 
     FSpath pwd = FSpath::current_path();
 
@@ -126,14 +123,14 @@ void Path::decompress(const std::string& compressedfilepath,
             prefs.get("vle.command.untar", &command);
         }
 
-        command = (vle::fmt(command) % file.string()).str();
+        command = (vle::fmt(command) % compressedfilepath.string()).str();
 
         std::vector<std::string> argv = Spawn::splitCommandLine(command);
         std::string exe = std::move(argv.front());
         argv.erase(argv.begin());
 
         utils::Spawn spawn;
-        if (not spawn.start(exe, path.string(), argv, 50000u))
+        if (not spawn.start(exe, directorypath.string(), argv, 50000u))
             throw utils::InternalError(_("fail to start cmake command"));
 
         std::string output, error;
@@ -161,7 +158,7 @@ void Path::decompress(const std::string& compressedfilepath,
     } catch (const std::exception& e) {
         TraceAlways(_("Decompress: unable to decompress '%s' "
                       "in '%s' with the '%s' command"),
-                    compressedfilepath.c_str(),
+                    compressedfilepath.string().c_str(),
                     pwd.string().c_str(),
                     command.c_str());
     }

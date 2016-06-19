@@ -44,7 +44,7 @@ Init::Init()
     __vle_init();
 
 #ifdef VLE_HAVE_NLS
-    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().c_str());
+    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().string().c_str());
     textdomain(VLE_LOCALE_NAME);
 #endif
 }
@@ -57,7 +57,7 @@ Init::Init(const char *localname)
         setlocale(LC_ALL, "C");
 
 #ifdef VLE_HAVE_NLS
-    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().c_str());
+    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().string().c_str());
     textdomain(VLE_LOCALE_NAME);
 #endif
 }

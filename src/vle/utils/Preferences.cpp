@@ -217,13 +217,15 @@ struct Preferences::Pimpl
 
 Preferences::Preferences(const std::string& file)
     : mPimpl(new Preferences::Pimpl(
-                 false, utils::Path::path().getHomeFile(file)))
+                 false,
+                 utils::Path::path().getHomeFile(file).string()))
 {
 }
 
 Preferences::Preferences(bool readOnly, const std::string& file)
-    : mPimpl(new Preferences::Pimpl(readOnly,
-                                    utils::Path::path().getHomeFile(file)))
+    : mPimpl(new Preferences::Pimpl(
+                 readOnly,
+                 utils::Path::path().getHomeFile(file).string()))
 {
 }
 

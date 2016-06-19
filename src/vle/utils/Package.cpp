@@ -76,7 +76,7 @@ void remove_all(const vle::utils::FSpath& path)
 
         spawn.status(&message, &success);
 
-        if (not message.empty())
+        if (not success && not message.empty())
             TraceAlways(_("Error during remove directory operation: %s."),
                         message.c_str());
     } catch (const std::exception& e) {
@@ -104,7 +104,7 @@ Spawn::splitCommandLine(const std::string& command)
             (fmt(_("Package command line: error, empty command `%1%'"))
              % command).str());
 
-    argv.front() = Path::findProgram(argv.front());
+    argv.front() = Path::findProgram(argv.front()).string();
 
     return argv;
 }
@@ -205,8 +205,7 @@ Package::~Package()
 
 void Package::create()
 {
-    const std::string& dirname(utils::Path::path().getTemplate("package"));
-    FSpath source(dirname);
+    FSpath source(utils::Path::path().getTemplate("package"));
 
     FSpath destination(getDir(PKG_SOURCE));
 
@@ -238,6 +237,12 @@ void Package::create()
         if (not spawn.start(exe, FSpath::current_path().string(), argv, 50000u))
             throw utils::InternalError(_("fail to start cmake command"));
 
+        printf("`%s' `%s'\n", exe.c_str(),
+               FSpath::current_path().string().c_str());
+
+        for (const auto& elem : argv)
+            printf("- `%s'\n", elem.c_str());
+        
         std::string output, error;
         while (not spawn.isfinish()) {
             if (spawn.get(&output, &error)) {
@@ -262,7 +267,7 @@ void Package::create()
         bool success;
         spawn.status(&message, &success);
 
-        if (not message.empty())
+        if (not success && not message.empty())
             TraceAlways(_("Error during copy directory operation: %s."),
                         message.c_str());
     } catch (const std::exception& e) {
@@ -1036,10 +1041,10 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     tmp = getExperiments();
     pkgcontent.push_back("-- experiments : ");
     std::sort(tmp.begin(), tmp.end());
-    std::vector<std::string>::const_iterator itb = tmp.begin();
-    std::vector<std::string>::const_iterator ite = tmp.end();
-    for (; itb!=ite; itb++){
-        pkgcontent.push_back(*itb);
+
+    auto itb = tmp.cbegin(), ite = tmp.cend();
+    for (; itb != ite; itb++){
+        pkgcontent.push_back(itb->string());
     }
 
     tmp = getPluginsSimulator();
@@ -1048,7 +1053,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     itb = tmp.begin();
     ite = tmp.end();
     for (; itb!=ite; itb++){
-        pkgcontent.push_back(*itb);
+        pkgcontent.push_back(itb->string());
     }
 
     tmp = getPluginsOutput();
@@ -1057,7 +1062,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     itb = tmp.begin();
     ite = tmp.end();
     for (; itb!=ite; itb++){
-        pkgcontent.push_back(*itb);
+        pkgcontent.push_back(itb->string());
     }
 
     tmp = getPluginsGvleGlobal();
@@ -1066,7 +1071,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     itb = tmp.begin();
     ite = tmp.end();
     for (; itb!=ite; itb++){
-        pkgcontent.push_back(*itb);
+        pkgcontent.push_back(itb->string());
     }
 
     tmp = getPluginsGvleModeling();
@@ -1075,7 +1080,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     itb = tmp.begin();
     ite = tmp.end();
     for (; itb!=ite; itb++){
-        pkgcontent.push_back(*itb);
+        pkgcontent.push_back(itb->string());
     }
 
     tmp = getPluginsGvleOutput();
@@ -1084,7 +1089,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     itb = tmp.begin();
     ite = tmp.end();
     for (; itb!=ite; itb++){
-        pkgcontent.push_back(*itb);
+        pkgcontent.push_back(itb->string());
     }
     return;
 }
