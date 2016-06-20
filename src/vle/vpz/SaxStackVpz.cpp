@@ -751,23 +751,31 @@ void SaxStackVpz::pushView(const xmlChar** att)
         ustring::size_type it = typestr.find(',');
         View::Type viewtype = View::NOTHING;
 
-        auto tmp = typestr.substr(begin, it);
-        if (tmp == (const xmlChar*)"event")
-            viewtype = View::INTERNAL | View::CONFLUENT | View::EXTERNAL;
-        else if (tmp == (const xmlChar*)"output")
-            viewtype |= View::OUTPUT;
-        else if (tmp == (const xmlChar*)"internal")
-            viewtype |= View::INTERNAL;
-        else if (tmp == (const xmlChar*)"external")
-            viewtype |= View::EXTERNAL;
-        else if (tmp == (const xmlChar*)"confluent")
-            viewtype |= View::CONFLUENT;
-        else if (tmp == (const xmlChar*)"finish")
-            viewtype |= View::FINISH;
-        else 
-            throw utils::SaxParserError(
-                (fmt(_("View tag does not accept type '%1%'")) % type).str());
- 
+        while (begin != std::string::npos) {
+            auto tmp = typestr.substr(begin, it - 1);
+            if (tmp == (const xmlChar*)"event")
+                viewtype = View::INTERNAL | View::CONFLUENT | View::EXTERNAL;
+            else if (tmp == (const xmlChar*)"output")
+                viewtype |= View::OUTPUT;
+            else if (tmp == (const xmlChar*)"internal")
+                viewtype |= View::INTERNAL;
+            else if (tmp == (const xmlChar*)"external")
+                viewtype |= View::EXTERNAL;
+            else if (tmp == (const xmlChar*)"confluent")
+                viewtype |= View::CONFLUENT;
+            else if (tmp == (const xmlChar*)"finish")
+                viewtype |= View::FINISH;
+            else
+                throw utils::SaxParserError(
+                    (fmt(_("View tag does not accept type '%1%'"))
+                     % type).str());
+
+            if (it != std::string::npos)
+                begin = std::min(it + 1, typestr.size());
+            else
+                begin = std::string::npos;
+        }
+
         views.addEventView(xmlCharToString(name),
                            static_cast<View::Type>(viewtype),
                            xmlCharToString(output));
