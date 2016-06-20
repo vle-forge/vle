@@ -66,6 +66,7 @@ public:
     };
 
     FSpath();
+    ~FSpath() = default;
 
     FSpath(const char *string);
     FSpath(const std::string &string);

@@ -60,8 +60,6 @@ public:
                        const std::string& portName,
                        const Time& currenttime);
 
-    void finish(const Time& time);
-
     void run(const Time& current);
 
     void run(const Dynamics *dynamics, Time current, const std::string& port);

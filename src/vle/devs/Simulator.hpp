@@ -85,15 +85,6 @@ public:
     const std::string& getName() const;
 
     /**
-     * @brief Get a std::string which concatenate the names of the hierarchy
-     * of vpz::CoupledModel parent. Use the function
-     * vpz::Model::getParentName().
-     * @return The concatenated names of the parents or "Deleted model" if
-     * the model is destroy before observed.
-     */
-    const std::string& getParent();
-
-    /**
      * @brief Get the atomic model attached to the Simulator.
      * @return A reference.
      */

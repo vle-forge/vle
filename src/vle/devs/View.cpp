@@ -60,12 +60,6 @@ void View::addObservable(Dynamics* dynamics,
             m_name);
 }
 
-void View::finish(const Time& time)
-{
-    if (m_stream)
-        m_stream->close(time);
-}
-
 void View::removeObservable(Dynamics* dynamics)
 {
     assert(dynamics);

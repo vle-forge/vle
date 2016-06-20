@@ -315,12 +315,6 @@ void Coordinator::updateSimulatorsTarget(
     }
 }
 
-void Coordinator::addSimulatorTargetPort(vpz::AtomicModel* model,
-                                         const std::string& port)
-{
-    getModel(model)->addTargetPort(port);
-}
-
 void Coordinator::removeSimulatorTargetPort(vpz::AtomicModel* model,
                                             const std::string& port)
 {

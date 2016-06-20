@@ -127,17 +127,6 @@ const std::string& Simulator::getName() const
     return m_atomicModel->getName();
 }
 
-const std::string& Simulator::getParent()
-{
-    if (not m_atomicModel)
-        throw utils::InternalError(_("Simulator destroyed"));
-
-    if (m_parents.empty())
-        m_parents.assign(m_atomicModel->getParentName());
-
-    return m_parents;
-}
-
 void Simulator::finish()
 {
     m_dynamics->finish();

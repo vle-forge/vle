@@ -167,33 +167,6 @@ public:
     //
 
     /**
-     * @brief Remove all atomic model information that have no the tag
-     * permantent in the VPZ format.
-     */
-    void cleanCache();
-
-    /**
-     * @brief Add a permanent vpz::Dynamic into cache.
-     * @param dynamics The new vpz::Dynamic to push into cache.
-     * @throw utils::InternalError if dynamics already exist.
-     */
-    void addPermanent(const vpz::Dynamic& dynamics);
-
-    /**
-     * @brief Add a permanent vpz::Condition into cache.
-     * @param condition The new vpz::Condition to push into cache.
-     * @throw utils::InternalError if condition already exist.
-     */
-    void addPermanent(const vpz::Condition& condition);
-
-    /**
-     * @brief Add a permanent vpz::Observable into cache.
-     * @param observable The new vpz::Observable to push into cache.
-     * @throw utils::InternalError if observable already exist.
-     */
-    void addPermanent(const vpz::Observable& observable);
-
-    /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
      * to this model information of dynamics, condition and observable.
      * @param model the vpz::AtomicGraphModel reference source of

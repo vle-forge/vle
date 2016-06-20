@@ -51,6 +51,7 @@ public:
     ExternalEvent() = default;
     ExternalEvent(const ExternalEvent& other) = default;
     ExternalEvent& operator=(const ExternalEvent& other) = default;
+    ~ExternalEvent() = default;
 
     ExternalEvent(const std::string& port)
         : m_target(0)
@@ -66,8 +67,6 @@ public:
         , m_port(port)
     {
     }
-
-    ~ExternalEvent() = default;
 
     const std::string& getPortName() const
     {

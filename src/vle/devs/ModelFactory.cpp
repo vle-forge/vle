@@ -58,47 +58,6 @@ ModelFactory::ModelFactory(const utils::ModuleManager& modulemgr,
 {
 }
 
-void ModelFactory::cleanCache()
-{
-    mDynamics.cleanNoPermanent();
-    mExperiment.cleanNoPermanent();
-}
-
-void ModelFactory::addPermanent(const vpz::Dynamic& dynamics)
-{
-    try {
-        mDynamics.add(dynamics);
-    } catch(const std::exception& e) {
-        throw utils::InternalError(
-            (fmt(_("Model factory cannot add dynamics %1%: %2%"))
-             % dynamics.name() % e.what()).str());
-    }
-}
-
-void ModelFactory::addPermanent(const vpz::Condition& condition)
-{
-    try {
-        vpz::Conditions& conds(mExperiment.conditions());
-        conds.add(condition);
-    } catch(const std::exception& e) {
-        throw utils::InternalError(
-            (fmt(_("Model factory cannot add condition %1%: %2%")) %
-             condition.name() % e.what()).str());
-    }
-}
-
-void ModelFactory::addPermanent(const vpz::Observable& observable)
-{
-    try {
-        vpz::Views& views(mExperiment.views());
-        views.addObservable(observable);
-    } catch(const std::exception& e) {
-        throw utils::InternalError(
-            (fmt(_("Model factory cannot add observable %1%: %2%")) %
-             observable.name() % e.what()).str());
-    }
-}
-
 void ModelFactory::createModel(Coordinator& coordinator,
                                vpz::AtomicModel* model,
                                const std::string& dynamics,

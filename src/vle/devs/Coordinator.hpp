@@ -148,9 +148,6 @@ public:
     void updateSimulatorsTarget(
         std::vector < std::pair < Simulator*, std::string > >& lst);
 
-    void addSimulatorTargetPort(vpz::AtomicModel* model,
-                                const std::string& port);
-
     void removeSimulatorTargetPort(vpz::AtomicModel* model,
                                    const std::string& port);
 
