@@ -184,6 +184,14 @@ public:
         return m_observation[0].mTime < time;
     }
 
+    void finalize(Time time)
+    {
+        for (auto& elem : m_observation)
+            elem.run(time);
+
+        m_observation.clear();
+    }
+    
     std::vector<ViewEvent> getObservationAtTime(Time time)
     {
         std::vector<ViewEvent> ret;

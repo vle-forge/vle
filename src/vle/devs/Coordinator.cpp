@@ -172,27 +172,40 @@ void Coordinator::run()
     }
 
     /* Process observation event if the next bag is scheduled for a
-     * different date than \e m_currentTime. */
-    {
-        auto next = m_eventTable.getNextTime();
-        if (isInfinity(next))
-            next = m_durationTime + 0.01;
+     * different date than \e m_currentTime.
+     */
+    auto next = m_eventTable.getNextTime();
+    if (next > m_currentTime) {
+        /* Scheduler is empty. We 'eat' all timed view until the
+         * duration time.
+         */
+        auto eatuntil = isInfinity(next) ? m_durationTime : next;
 
-        while (m_timed_observation_scheduler.haveObservationAtTime(next)) {
-            auto obs = m_timed_observation_scheduler.getObservationAtTime(next);
+        while (m_timed_observation_scheduler.haveObservationAtTime(eatuntil)) {
+            auto obs = m_timed_observation_scheduler.getObservationAtTime(
+                eatuntil);
 
-            if (not obs.empty()) {
-                m_currentTime = obs.back().mTime;
+                if (not obs.empty()) {
+                    m_currentTime = obs.back().mTime;
 
-                for (auto & elem : obs) {
-                    elem.run();
-                    elem.update();
+                    for (auto & elem : obs) {
+                        elem.run();
+                        elem.update();
 
-                    if (not isInfinity(elem.mTime))
-                        m_timed_observation_scheduler.add(elem.mView, elem.mTime,
-                                                          elem.mTimestep);
+                        if (not isInfinity(elem.mTime))
+                            m_timed_observation_scheduler.add(elem.mView,
+                                                              elem.mTime,
+                                                              elem.mTimestep);
                 }
             }
+        }
+
+        if (isInfinity(next)) {
+            /* For all Timed view, process a final observation and clear
+             * the scheduller.
+             */
+            m_currentTime = m_durationTime;
+            m_timed_observation_scheduler.finalize(m_currentTime);
         }
     }
 

@@ -49,17 +49,41 @@ struct VLE_LOCAL ViewEvent
         assert(not isInfinity(currenttime) && "ViewEvent: bad current time");
         assert(not isInfinity(timestep) && "ViewEvent: bad timestep");
     }
-    
+
     /**
      * Call for each \e devs::Dynamics attached to this view, the
      * observation function.
      */
-    void run() { mView->run(mTime); }
+    void run()
+    {
+        assert(mView && "ViewEvent::run(Time) was called previously. Mistake.");
+        
+        mView->run(mTime);
+    }
+
+    /**
+     * Call for each \e devs::Dynanics attached to this view, the
+     * observation function for a specified time.
+     *
+     * \note To be use in final simulation loop.
+     *
+     * \e time The current date to observe.
+     */
+    void run(Time time)
+    {
+        assert(mView && "ViewEvent::run(Time) was called previously. Mistake.");
+
+        mView->run(time);
+        mView = nullptr;
+    }
 
     /**
      * Update the next wake-up time.
      */
-    void update() { mTime = mTime + mTimestep; }
+    void update()
+    {
+        mTime += mTimestep;
+    }
 
     View* mView;
     Time  mTime;
@@ -69,4 +93,3 @@ struct VLE_LOCAL ViewEvent
 }} // namespace vle devs
 
 #endif
-
