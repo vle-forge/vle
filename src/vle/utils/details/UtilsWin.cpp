@@ -24,27 +24,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <windows.h>
 #include <vle/utils/details/UtilsWin.hpp>
+#include <memory>
+#include <windows.h>
 
 namespace vle { namespace utils {
 
-std::string UtilsWin::convertPathTo83Path(const std::string& path)
+FSpath UtilsWin::convertPathTo83Path(const FSpath& path)
 {
-    std::string newvalue(path);
+    FSpath ret = path;
+    std::string strpath(path.string());
     DWORD lenght;
 
-    lenght = GetShortPathName(path.c_str(), NULL, 0);
+    lenght = GetShortPathName(strpath.c_str(), NULL, 0);
     if (lenght > 0) {
-        TCHAR* buffer = new TCHAR[lenght];
-        lenght = GetShortPathName(path.c_str(), buffer, lenght);
-        if (lenght > 0) {
-            newvalue.assign(static_cast < char* >(buffer));
-        }
-        delete [] buffer;
+        auto p = std::make_unique<TCHAR[]>(lenght);
+        lenght = GetShortPathName(strpath.c_str(), p.get(), lenght);
+        if (lenght > 0)
+            ret = p.get();
     }
 
-    return newvalue;
+    return ret;
 }
 
 }} // namespace vle utils

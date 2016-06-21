@@ -28,7 +28,7 @@
 #ifndef VLE_UTILS_DETAILS_UTILS_WIN_HPP
 #define VLE_UTILS_DETAILS_UTILS_WIN_HPP
 
-#include <string>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/DllDefines.hpp>
 
 namespace vle { namespace utils {
@@ -44,7 +44,7 @@ public:
      * @param path, the path to convert
      * @return the path converted into 8.3 path on windows
      */
-    static std::string convertPathTo83Path(const std::string& path);
+    static FSpath convertPathTo83Path(const FSpath& path);
 };
 
 }} // namespace vle utils

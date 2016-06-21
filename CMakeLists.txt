@@ -151,7 +151,7 @@ endif ()
 #
 # CPack configuration
 #
-include(CMakeCPack.cmake)
+# include(CMakeCPack.cmake)
 
 # Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
 # #seems to be a CMake'list. So we replace ';' with ' '.
@@ -162,8 +162,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VLEDEPS_CFLAGS_OTHER_STRING}")
 # Test the libboost header and libboost-text library.
 #
 
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_STATIC_RUNTIME OFF)
+# set(Boost_USE_STATIC_LIBS OFF)
+# set(Boost_USE_STATIC_RUNTIME OFF)
 
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_DETAILED_FAILURE_MSG ON)

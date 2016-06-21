@@ -73,6 +73,7 @@ public:
 #if defined(_WIN32)
     FSpath(const std::wstring &wstring);
     FSpath(const wchar_t *wstring);
+    FSpath &operator=(const std::wstring& str);
 #endif
     FSpath(const FSpath &path);
     FSpath(FSpath &&path);

@@ -33,7 +33,7 @@ if (WIN32)
     -i${CMAKE_BINARY_DIR}/share/vfl.rc
     -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
   set(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
-  set(OS_SPECIFIC_LIBRARIES ws2_32 intl)
+  # set(OS_SPECIFIC_LIBRARIES ws2_32)
 else (WIN32)
   set(OS_SPECIFIC_PATH_IMPL)
   set(OS_SPECIFIC_LIBRARIES dl)
@@ -54,8 +54,9 @@ set_target_properties(vlelib PROPERTIES
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
   CLEAN_DIRECT_OUTPUT 1)
 
-target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
-    ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
+target_include_directories(vlelib PUBLIC ${VLEDEPS_INCLUDE_DIRS})
+
+target_link_libraries(vlelib ${VLEDEPS_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)

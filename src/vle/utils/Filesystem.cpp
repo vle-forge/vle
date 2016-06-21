@@ -46,6 +46,7 @@
 
 #if defined(_WIN32)
 #include <windows.h>
+#include <direct.h>
 #else
 #include <unistd.h>
 #endif
@@ -53,10 +54,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+
+#if defined(__unix__)
 #include <fts.h>
+#endif
 
 #if defined(__linux)
-# include <linux/limits.h>
+#include <linux/limits.h>
 #endif
 
 namespace {
@@ -64,7 +68,8 @@ namespace {
 std::vector<std::string>
 tokenize(const std::string &string, const std::string &delim)
 {
-    std::string::size_type lastPos = 0, pos = string.find_first_of(delim, lastPos);
+    std::string::size_type lastPos = 0, pos = string.find_first_of(delim,
+                                                                   lastPos);
     std::vector<std::string> tokens;
 
     while (lastPos != std::string::npos) {
@@ -146,7 +151,7 @@ bool FSpath::is_absolute() const
 bool FSpath::exists() const
 {
 #if defined(_WIN32)
-    return GetFileAttributesW(wstr().c_str()) != INVALID_FILE_ATTRIBUTES;
+    return GetFileAttributesW(wstring().c_str()) != INVALID_FILE_ATTRIBUTES;
 #else
     struct stat sb;
     return stat(string().c_str(), &sb) == 0;
@@ -157,7 +162,7 @@ size_t FSpath::file_size() const
 {
 #if defined(_WIN32)
     struct _stati64 sb;
-    if (_wstati64(wstr().c_str(), &sb) != 0)
+    if (_wstati64(wstring().c_str(), &sb) != 0)
         throw std::runtime_error("FSpath::file_size(): cannot stat file \"" + string() + "\"!");
 #else
     struct stat sb;
@@ -170,7 +175,7 @@ size_t FSpath::file_size() const
 bool FSpath::is_directory() const
 {
 #if defined(_WIN32)
-    DWORD result = GetFileAttributesW(wstr().c_str());
+    DWORD result = GetFileAttributesW(wstring().c_str());
     if (result == INVALID_FILE_ATTRIBUTES)
         return false;
     return (result & FILE_ATTRIBUTE_DIRECTORY) != 0;
@@ -185,7 +190,7 @@ bool FSpath::is_directory() const
 bool FSpath::is_file() const
 {
 #if defined(_WIN32)
-    DWORD attr = GetFileAttributesW(wstr().c_str());
+    DWORD attr = GetFileAttributesW(wstring().c_str());
     return (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0);
 #else
     struct stat sb;
@@ -428,7 +433,7 @@ FSpath FSpath::temp_directory_path()
     const DWORD nBufferLength = MAX_PATH + 1;
     char buffer[nBufferLength];
 
-    auto result = GetTempPath(nBufferLength, &buffer);
+    auto result = GetTempPath(nBufferLength, static_cast<LPSTR>(&buffer[0]));
     if (result > 0) {
         buffer[result] = '\0';
         path = buffer;
@@ -481,21 +486,23 @@ void FSpath::copy_file(const FSpath& from, const FSpath& to)
 }
 
 #if defined(_WIN32)
-std::wstring FSpath::wstring(path_type type = native_path) const
+std::wstring FSpath::wstring(path_type type) const
 {
-    std::string temp = str(type);
-    int size = MultiByteToWideChar(CP_UTF8, 0, &temp[0], (int)temp.size(), NULL, 0);
+    std::string temp = string(type);
+    int size = MultiByteToWideChar(CP_UTF8, 0, &temp[0],
+                                   (int)temp.size(), NULL, 0);
     std::wstring result(size, 0);
     MultiByteToWideChar(CP_UTF8, 0, &temp[0], (int)temp.size(), &result[0],
                         size);
     return result;
 }
 
-void FSpath::set(const std::wstring &wstring, path_type type = native_path)
+void FSpath::set(const std::wstring &wstring, path_type type)
 {
     std::string string;
     if (!wstring.empty()) {
-        int size = WideCharToMultiByte(CP_UTF8, 0, &wstring[0], (int)wstring.size(),
+        int size = WideCharToMultiByte(CP_UTF8, 0, &wstring[0],
+                                       (int)wstring.size(),
                                        NULL, 0, NULL, NULL);
         string.resize(size, 0);
         WideCharToMultiByte(CP_UTF8, 0, &wstring[0], (int)wstring.size(),
@@ -606,7 +613,7 @@ public:
     Pimpl(const FSpath& path)
 #if defined(_WIN32)
         : hFind(INVALID_HANDLE_VALUE)
-        , n_path(path)
+        , m_path(path)
         , m_finish(false)
     {
         FSpath spec = m_path / "*.*";
@@ -617,8 +624,8 @@ public:
                 "FindFirstFile: Path does not exist or could not be read.");
 
         do {
-            if (wcscmp(ffd.cFileName, L".") != 0 or
-                wcscmp(ffd.cFileName, L"..") != 0) {
+            if (strcmp(ffd.cFileName, ".") != 0 or
+                strcmp(ffd.cFileName, "..") != 0) {
                 continue;
             } else {
                 m_entry.m_path = m_path / ffd.cFileName;
@@ -649,8 +656,8 @@ public:
         assert(not m_finish);
 #if defined(_WIN32)
         while (FindNextFile(hFind, &ffd) != 0) {
-            if (wcscmp(ffd.cFileName, L".") != 0 or
-                wcscmp(ffd.cFileName, L"..") != 0) {
+            if (strcmp(ffd.cFileName, ".") != 0 or
+                strcmp(ffd.cFileName, "..") != 0) {
                 continue;
             } else {
                 m_entry.m_path = m_path / ffd.cFileName;
@@ -677,8 +684,8 @@ public:
             m_entry.m_is_directory = entry->d_type == DT_DIR;
             return;
         }
-    }
 #endif
+    }
 
     ~Pimpl() noexcept
     {

@@ -27,7 +27,6 @@
 
 #define BOOST_TEST_MAIN
 #define BOOST_AUTO_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE manager_complete_test
 
 #include <boost/test/unit_test.hpp>

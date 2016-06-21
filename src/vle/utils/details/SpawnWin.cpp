@@ -137,46 +137,43 @@ static Envp prepareEnvironmentVariable()
     }
     ::FreeEnvironmentStrings(env_char);
 
-    replaceEnvironmentVariable(envp,
-            "PATH",
-            Path::buildFilename(
-                    UtilsWin::convertPathTo83Path(
-                            Path::path().getPrefixDir()), "bin"),
-                            true);
+    FSpath prefix = UtilsWin::convertPathTo83Path(Path::path().getPrefixDir());
 
-    replaceEnvironmentVariable(envp,
-            "Path",
-            Path::buildFilename(
-                    UtilsWin::convertPathTo83Path(
-                            Path::path().getPrefixDir()), "bin"),
-                            true);
+    {
+        FSpath bin = prefix;
+        bin /= "bin";
 
-    replaceEnvironmentVariable(envp,
-            "PKG_CONFIG_PATH",
-            Path::buildFilename(
-                    UtilsWin::convertPathTo83Path(
-                            Path::path().getPrefixDir()), "lib",
-                            "pkgconfig"),
-                            false);
+        replaceEnvironmentVariable(envp, "PATH", bin.string(), true);
+        replaceEnvironmentVariable(envp, "Path", bin.string(), true);
+    }
 
-    replaceEnvironmentVariable(envp,
-            "BOOST_INCLUDEDIR",
-            Path::buildFilename(
-                    UtilsWin::convertPathTo83Path(
-                            Path::path().getPrefixDir()), "include"),
-                            false);
+    {
+        FSpath lib = prefix;
+        lib /= "lib";
+        lib /= "pkgconfig";
 
-    replaceEnvironmentVariable(envp,
-            "BOOST_LIBRARYDIR",
-            Path::buildFilename(
-                    UtilsWin::convertPathTo83Path(
-                            Path::path().getPrefixDir()), "lib"),
-                            false);
+        replaceEnvironmentVariable(envp, "PKG_CONFIG_PATH",
+                                   lib.string(), false);
+    }
 
-    replaceEnvironmentVariable(envp,
-            "BOOST_ROOT",
-            UtilsWin::convertPathTo83Path(
-                    Path::path().getPrefixDir()), false);
+    {
+        FSpath inc = prefix;
+        inc /= "include";
+
+        replaceEnvironmentVariable(envp, "BOOST_INCLUDEDIR",
+                                   inc.string(), false);
+    }
+
+    {
+        FSpath lib = prefix;
+        lib /= "lib";
+
+        replaceEnvironmentVariable(envp, "BOOST_LIBRARYDIR",
+                                   lib.string(), false);
+    }
+
+    replaceEnvironmentVariable(envp, "BOOST_ROOT", prefix.string(), false);
+
     return envp;
 }
 

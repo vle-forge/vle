@@ -27,8 +27,7 @@
 
 #define BOOST_TEST_MAIN
 #define BOOST_AUTO_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE values_simple_test
+#define BOOST_TEST_MODULE vle_value_simple_test
 #include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -60,8 +59,7 @@ struct F
 {
     vle::Init a;
 
-    F() : a() { }
-    ~F() { }
+    F() : a() {}
 };
 
 BOOST_GLOBAL_FIXTURE(F);

@@ -27,7 +27,6 @@
 
 #define BOOST_TEST_MAIN
 #define BOOST_AUTO_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE utils_library_test
 #include <boost/version.hpp>
 #include <boost/test/unit_test.hpp>
@@ -37,31 +36,19 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/vle.hpp>
-
-#ifdef _WIN32
-#  include <Windows.h>
-#endif
+#include <memory>
 
 using namespace vle;
 
 struct F
 {
-    vle::Init *a;
+    vle::Init a;
 
-    F() throw()
-        : a(nullptr)
-    {
-        a = new vle::Init();
-        vle::utils::Preferences prefs(false, "vle.conf");
-    }
+    F()
+        : a()
+    {}
 
-    ~F() throw()
-    {
-        delete a;
-    }
-private:
-    F(const F&);
-    F& operator=(const F&);
+    ~F() noexcept = default;
 };
 
 BOOST_FIXTURE_TEST_CASE(download_dtd, F)

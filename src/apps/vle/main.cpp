@@ -73,7 +73,7 @@ static void show_infos() noexcept
     printf(_("%zu package(s) available %s:\n"),
            pkglist.size() - 1, pkglist[0].c_str());
 
-    for (auto i = 1UL, e = pkglist.size(); i != e; ++i)
+    for (auto i = decltype(pkglist.size()) {1}, e = pkglist.size(); i != e; ++i)
         printf("%zu. %s\n", i - 1, pkglist[i].c_str());
 }
 

@@ -50,7 +50,7 @@ static void ErrorMessage(LPCSTR description)
             (LPTSTR) &msg,
             0, NULL);
 
-    std::string finalmsg = (vle::fmt("%1%: %2%") % description % msg).str();
+    std::string finalmsg = (boost::format("%1%: %2%") % description % msg).str();
 
     MessageBox(NULL, (LPCTSTR)finalmsg.c_str(), TEXT("Error"), MB_ICONERROR);
 
@@ -83,18 +83,22 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     return false;
 }
 
-std::string Path::findProgram(const std::string& exe)
+FSpath Path::findProgram(const std::string& exe)
 {
-    std::string res("");    
-    if (exe == "cmake" or exe == "cmake.exe") {
-        res =  Path::buildFilename(
-                UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
-                "bin", "cmake.exe");
-    } else if (exe == "vle" or exe == "vle.exe"){
-        res =  Path::buildFilename(
-                UtilsWin::convertPathTo83Path(Path::path().getPrefixDir()),
-                "bin", "vle.exe");
-    }
+    FSpath res = UtilsWin::convertPathTo83Path(Path::path().getPrefixDir());
+    res /= "bin";
+
+    if (exe == "cmake" or exe == "cmake.exe")
+        res /= "cmake.exe";
+    else if (exe == "vle" or exe == "vle.exe")
+        res /= "vle.exe";
+    else if (exe == "curl" or exe == "curl.exe")
+        res /= "curl.exe";
+    else if (exe == "wget" or exe == "wget.exe")
+        res /= "wget.exe";
+    else
+        res /= "willfail";
+
     return res;
 }
 
@@ -117,89 +121,69 @@ void Path::initHomeDir()
         std::string homepath("");
         if (homepath_str) {
             homepath.assign(homepath_str);
-        }        
-        m_home = utils::Path::buildDirname(homedrive, homepath, "vle");
+        }
+
+        m_home = homedrive;
+        m_home /= homepath;
+        m_home /= "vle";
     }
 }
 
 void Path::initPrefixDir()
 {
-    m_prefix.clear();
+    {
+        // Try to read prefix from win32 registry (first in
+        // HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER otherwise.
+        HKEY hkey;
+        bool result;
+        std::string key = (boost::format("%1% %2%.%3%.0") %
+                           "SOFTWARE\\VLE Development Team\\VLE" %
+                           VLE_MAJOR_VERSION % VLE_MINOR_VERSION).str();
 
-    HKEY hkey;
-    bool result;
-    std::string key(boost::str(fmt("%1% %2%.%3%.0") %
-            "SOFTWARE\\VLE Development Team\\VLE" %
-            VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
+        std::string prefix;
 
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
-            0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
-        result = win32_RegQueryValue(hkey, &m_prefix);
-        RegCloseKey(hkey);
+        if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
+                         0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+            result = win32_RegQueryValue(hkey, &prefix);
+            RegCloseKey(hkey);
 
-        if (result) {
-            return;
+            if (result) {
+                m_prefix = prefix;
+                return;
+            }
+        }
+
+        if (RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
+                         0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+            result = win32_RegQueryValue(hkey, &prefix);
+            RegCloseKey(hkey);
+
+            if (result) {
+                m_prefix = prefix;
+                return;
+            }
         }
     }
 
-    if (RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
-            0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
-        result = win32_RegQueryValue(hkey, &m_prefix);
-        RegCloseKey(hkey);
+    {
+        // Try to read prefix from the Path of vle.exe
 
-        if (result) {
-            return;
-        }
-    }
+        DWORD size;
+        std::vector < TCHAR > filepath(MAX_PATH, '\0');
 
-    DWORD size;
-    std::vector < TCHAR > filepath(MAX_PATH, '\0');
+        if ((size = GetModuleFileName(NULL, &filepath[0], MAX_PATH))) {
+            std::vector < TCHAR > buf(MAX_PATH, '\0');
 
-    if ((size = GetModuleFileName(NULL, &filepath[0], MAX_PATH))) {
-        std::vector < TCHAR > buf(MAX_PATH, '\0');
+            FSpath path = &filepath[0];
+            FSpath result = path.parent_path().parent_path();
 
-        boost::filesystem::path path(&filepath[0]);
-        boost::filesystem::path result(path.parent_path().parent_path());
-
-        boost::system::error_code ec;
-        if (boost::filesystem::exists(result, ec)) {
-            m_prefix.assign(result.string());
-            return;
+            if (result.exists())
+                m_prefix = result;
         }
     }
 
     ErrorMessage("Failed to initialized prefix. Please, re-install VLE or "
             "define a variable into the the register editor");
-}
-
-std::string Path::getTempFile(const std::string& prefix,
-        std::ofstream* file)
-{
-    if (file and not file->is_open()) {
-        TCHAR filename[MAX_PATH];
-        TCHAR tmp[MAX_PATH];
-        DWORD result;
-
-        result = ::GetTempPath(MAX_PATH, tmp);
-        if (result and result < MAX_PATH) {
-            result = ::GetTempFileName(tmp,
-                    prefix.c_str(),
-                    0,
-                    filename);
-
-            if (result) {
-                file->open(static_cast < char* >(filename),
-                        std::ios_base::trunc | std::ios_base::out |
-                        std::ios_base::binary);
-
-                if (file->is_open()) {
-                    return filename;
-                }
-            }
-        }
-    }
-
-    return std::string();
 }
 
 }} // namespace vle utils

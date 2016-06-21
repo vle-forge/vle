@@ -1,10 +1,10 @@
 # FindVLEDEPS.cmake
-# =============
+# =================
 #
-# Try to find VLE dependencies libarchive and libXml2 without pkg-config
-# (for windows install only)
+# Try to find VLE dependencies (libXml2, zlib, iconv, intl without)
+# pkg-config (for windows install only)
 #
-# Copyright 2015-2015 INRA
+# Copyright 2015-2016 INRA
 # Gauthier Quesnel <quesnel@users.sourceforge.net>
 # Ronan Trépos <ronan.trepos@toulouse.inra.fr>
 #
@@ -61,51 +61,127 @@ if (NOT WIN32)
   message(FATAL_ERROR "FindVLEDEPS should be used only on win32")
 endif ()
 
+include(FindPackageHandleStandardArgs)
+
 #
-# Find LibArchive (home made to specify the path where it is located)
+# Try to found libxml2
 #
-find_path(LibArchive_INCLUDE_DIR NAMES archive.h
-   HINTS 
-     $ENV{VLEDEPS_BASEPATH}/include
-     ${VLEDEPS_PATH}/include
-)
-find_library(LibArchive_LIBRARIES NAMES archive libarchive
-   HINTS 
-     $ENV{VLEDEPS_BASEPATH}/lib
-     ${VLEDEPS_PATH}/lib
-)
+find_path(LIBXML2_INCLUDE_DIR
+  NAMES libxml/SAX2.h
+  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include
+  PATH_SUFFIXES libxml2)
+
+find_library(LIBXML2_LIBRARY
+  NAMES xml2 libxml2
+  HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+
+find_package_handle_standard_args(LibXml2
+  DEFAULT_MSG
+  LIBXML2_LIBRARY
+  LIBXML2_INCLUDE_DIR)
+
+mark_as_advanced(LIBXML2_INCLUDE_DIR LIBXML2_LIBRARY)
+
+#
+# Try to found zlib
+#
+find_path(ZLIB_INCLUDE_DIR
+  NAMES zlib.h
+  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
+
+find_library(ZLIB_LIBRARY
+  NAMES z libz zlib
+  HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+
+find_package_handle_standard_args(zlib
+  DEFAULT_MSG
+  ZLIB_LIBRARY
+  ZLIB_INCLUDE_DIR)
+
+mark_as_advanced(ZLIB_INCLUDE_DIR ZLIB_LIBRARY)
+
+#
+# Try to found iconv
+#
+find_path(ICONV_INCLUDE_DIR
+  NAMES iconv.h
+  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
+
+find_library(ICONV_LIBRARY
+  NAMES iconv libiconv
+  HINTS  $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+
+find_package_handle_standard_args(iconv
+  DEFAULT_MSG
+  ICONV_LIBRARY
+  ICONV_INCLUDE_DIR)
+
+mark_as_advanced(ICONV_INCLUDE_DIR ICONV_LIBRARY)
+
+#
+# Try to found libintl
+#
+
+find_path(INTL_INCLUDE_DIR
+  NAMES libintl.h
+  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
+
+find_library(INTL_LIBRARY
+  NAMES intl libintl
+  HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+
+find_package_handle_standard_args(intl
+  DEFAULT_MSG
+  INTL_LIBRARY
+  INTL_INCLUDE_DIR)
+
+mark_as_advanced(ICONV_INCLUDE_DIR ICONV_LIBRARY)
+
+#
+# Try to found libws2_32
+#
+
+find_path(WINSOCK2_INCLUDE_DIR
+  NAMES winsock2.h
+  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
+
+find_library(WINSOCK2_LIBRARY
+  NAMES ws2_32 libws2_32
+  HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+
+find_package_handle_standard_args(Winsock2
+  DEFAULT_MSG
+  WINSOCK2_LIBRARY
+  WINSOCK2_INCLUDE_DIR)
+
+mark_as_advanced(WINSOCK2_INCLUDE_DIR WINSOCK2_LIBRARY)
 
 
 #
-# Find LibXml2 (home made since the distributed script uses pkg-config)
+# Build variable
 #
-find_path(LibXml2_INCLUDE_DIR NAMES libxml/xpath.h
-   HINTS 
-     $ENV{VLEDEPS_BASEPATH}/include
-     ${VLEDEPS_PATH}/include
-   PATH_SUFFIXES libxml2
-)
-find_library(LibXml2_LIBRARIES NAMES xml2 libxml2
-   HINTS 
-     $ENV{VLEDEPS_BASEPATH}/lib
-     ${VLEDEPS_PATH}/lib
-)
+
+list(APPEND VLEDEPS_INCLUDE_DIRS ${LIBXML2_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR}
+  ${ICONV_INCLUDE_DIR} ${INTL_INCLUDE_DIR} ${WINSOCK2_INCLUDE_DIR})
+
+list(APPEND VLEDEPS_LIBRARIES ${LIBXML2_LIBRARY} ${ICONV_LIBRARY}
+  ${INTL_LIBRARY} ${ICONV_LIBRARY} ${ZLIB_LIBRARY} ${WINSOCK2_LIBRARY})
 
 if (_vledeps_debug)
-  message ("[FindVLEDEPS] libarchive include path : ${LibArchive_INCLUDE_DIR}")
-  message ("[FindVLEDEPS] libarchive libs : ${LibArchive_LIBRARIES}")
-  message ("[FindVLEDEPS] libxml2 include path : ${LibXml2_INCLUDE_DIR}")
-  message ("[FindVLEDEPS] libxml2 libs : ${LibXml2_LIBRARIES}")
+  message ("[FindVLEDEPS] libxml2 include path : ${LIBXML2_INCLUDE_DIR}")
+  message ("              libxml2 libs : ${LIBXML2_LIBRARY}")
+  message ("              zlib include path : ${ZLIB_INCLUDE_DIR}")
+  message ("              zlib libs : ${ZLIB_LIBRARY}")
+  message ("              iconv include path : ${ICONV_INCLUDE_DIR}")
+  message ("              iconv libs : ${ICONV_LIBRARY}")
+  message ("              intl include path : ${INTL_INCLUDE_DIR}")
+  message ("              intl libs : ${INTL_LIBRARY}")
+  message ("              winsock2 include path : ${WINSOCK2_INCLUDE_DIR}")
+  message ("              winsock2 include path : ${WINSOCK2_LIBRARY}")
 endif()
 
-set(VLEDEPS_INCLUDE_DIRS "${LibArchive_INCLUDE_DIR};${LibXml2_INCLUDE_DIR}")
-set(VLEDEPS_LIBRARIES "${LibArchive_LIBRARIES};${LibXml2_LIBRARIES}")
+message ("VLEDEPS_LIBRARIES:" ${VLEDEPS_LIBRARIES})
+message ("VLEDEPS_INCLUDE_DIRS:" ${VLEDEPS_INCLUDE_DIRS})
 
-
-
-# handle the QUIETLY and REQUIRED arguments and set VLE_FOUND to TRUE if all
-# listed variables are TRUE
-include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(VLEDEPS REQUIRED_VARS VLEDEPS_INCLUDE_DIRS
-                        VLEDEPS_LIBRARIES)
-
+find_package_handle_standard_args(vledeps
+  REQUIRED_VARS VLEDEPS_INCLUDE_DIRS VLEDEPS_LIBRARIES)
