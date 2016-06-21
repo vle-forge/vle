@@ -25,11 +25,8 @@
  */
 
 #define BOOST_TEST_MAIN
-#define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_MODULE devstime_mdl
-#include <boost/test/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <stack>
 #include <stdexcept>
 #include <limits>
@@ -46,15 +43,9 @@
 #include <vle/vpz/Classes.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <iostream>
 #include "oov.hpp"
-
-#if defined(__unix__)
-#include <unistd.h>
-#elif defined(__WIN32__)
-#include <io.h>
-#include <stdio.h>
-#endif
 
 using namespace vle;
 
@@ -95,10 +86,10 @@ using namespace vle;
 
 
 
-class Beep : public devs::Dynamics
+class MyBeep : public devs::Dynamics
 {
 public:
-    Beep(const devs::DynamicsInit& model,
+    MyBeep(const devs::DynamicsInit& model,
          const devs::InitEventList& events) :
         devs::Dynamics(model, events)
     {
@@ -217,7 +208,7 @@ public:
                 return {};
             return value::Double::create(m_counter);
         }
-        
+
         if (ev.onPort("value"))
             return value::Integer::create(0);
 
@@ -500,9 +491,9 @@ public:
 
     virtual devs::Time init(devs::Time /* time */) override
     {
-        vpz::Dynamic dyn("gensbeep");
+        vpz::Dynamic dyn("gensMyBeep");
         dyn.setPackage("");
-        dyn.setLibrary("dynamics_beep");
+        dyn.setLibrary("dynamics_MyBeep");
         dynamics().add(dyn);
 
         m_state = INIT;
@@ -555,19 +546,19 @@ public:
     {
         if (ev.onPort("nbmodel"))
             return value::Integer::create(get_nb_model());
-        
+
         if (ev.onPort("structure")) {
             std::ostringstream out;
             coupledmodel().writeXML(out);
             return value::String::create(out.str());
         }
-        
+
         if (ev.onPort("adjacency_matrix")) {
             auto set = value::Set::create();
             set->toSet().add(value::Integer::create(1));
             if(get_nb_model() > 0 and ev.getTime() < 50.0){
                 set->toSet().add(value::String::create("add"));
-                std::string name = (fmt("beep_%1%") % m_stacknames.size()).str();
+                std::string name = (fmt("MyBeep_%1%") % m_stacknames.size()).str();
                 set->toSet().add(value::String::create(name));
                 set->toSet().add(value::String::create("2"));
                 std::string edge =  name + std::string(" counter ");
@@ -575,7 +566,7 @@ public:
             } else if(get_nb_model() > 0){
                 set->toSet().add(value::String::create("delete"));
                 std::string name = (fmt(
-                        "beep_%1%") % (get_nb_model())).str();
+                        "MyBeep_%1%") % (get_nb_model())).str();
                 set->toSet().add(value::String::create(name));
             }
 
@@ -590,12 +581,12 @@ public:
 
     void add_new_model()
     {
-        std::string name((fmt("beep_%1%") % m_stacknames.size()).str());
+        std::string name((fmt("MyBeep_%1%") % m_stacknames.size()).str());
 
         std::vector < std::string > outputs;
         outputs.push_back("out");
 
-        createModel(name, std::vector < std::string >(), outputs, "gensbeep");
+        createModel(name, std::vector < std::string >(), outputs, "gensMyBeep");
         addConnection(name, "out", "counter", "in");
 
         m_stacknames.push(name);
@@ -618,7 +609,7 @@ public:
         auto size = coupledmodel().getModelList().size();
         BOOST_REQUIRE(size > 0);
         BOOST_REQUIRE(size <= std::numeric_limits<int>::max());
-        
+
         return static_cast<int>(size - 1);
     }
 };
@@ -688,23 +679,23 @@ public:
     }
 };
 
-DECLARE_DYNAMICS_SYMBOL(dynamics_beep, ::Beep)
-DECLARE_DYNAMICS_SYMBOL(dynamics_counter, ::Counter)
-DECLARE_DYNAMICS_SYMBOL(dynamics_transform, ::Transform)
-DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionA, ::Confluent_transitionA)
-DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionB, ::Confluent_transitionB)
-DECLARE_DYNAMICS_SYMBOL(dynamics_timed_obs, ::TimedObs)
-DECLARE_EXECUTIVE_SYMBOL(exe_branch, ::Branch)
-DECLARE_EXECUTIVE_SYMBOL(exe_deleteconnection, ::DeleteConnection)
-DECLARE_EXECUTIVE_SYMBOL(exe_genexecutive, ::GenExecutive)
-DECLARE_EXECUTIVE_SYMBOL(exe_leaf, ::Leaf)
-DECLARE_EXECUTIVE_SYMBOL(exe_root, ::Root)
-DECLARE_OOV_SYMBOL(oov_plugin, ::vletest::OutputPlugin)
+DECLARE_DYNAMICS_SYMBOL(dynamics_MyBeep, MyBeep)
+DECLARE_DYNAMICS_SYMBOL(dynamics_counter, Counter)
+DECLARE_DYNAMICS_SYMBOL(dynamics_transform, Transform)
+DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionA, Confluent_transitionA)
+DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionB, Confluent_transitionB)
+DECLARE_DYNAMICS_SYMBOL(dynamics_timed_obs, TimedObs)
+DECLARE_EXECUTIVE_SYMBOL(exe_branch, Branch)
+DECLARE_EXECUTIVE_SYMBOL(exe_deleteconnection, DeleteConnection)
+DECLARE_EXECUTIVE_SYMBOL(exe_genexecutive, GenExecutive)
+DECLARE_EXECUTIVE_SYMBOL(exe_leaf, Leaf)
+DECLARE_EXECUTIVE_SYMBOL(exe_root, Root)
+DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 
 BOOST_AUTO_TEST_CASE(test_gensvpz)
 {
-    int ret = ::chdir(DEVS_TEST_DIR);
-    BOOST_REQUIRE(ret == 0);
+    vle::utils::FSpath p(DEVS_TEST_DIR);
+    vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
     utils::ModuleManager modules;
@@ -752,8 +743,8 @@ BOOST_AUTO_TEST_CASE(test_gensvpz)
 
 BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
 {
-    int ret = ::chdir(DEVS_TEST_DIR);
-    BOOST_REQUIRE(ret == 0);
+    vle::utils::FSpath p(DEVS_TEST_DIR);
+    vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
     utils::ModuleManager modules;
@@ -775,8 +766,8 @@ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
 
 BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 {
-    int ret = ::chdir(DEVS_TEST_DIR);
-    BOOST_REQUIRE(ret == 0);
+    vle::utils::FSpath p(DEVS_TEST_DIR);
+    vle::utils::FSpath::current_path(p);
 
     for (int s = 0, es = 100; s != es; ++s) {
         vpz::Vpz file(DEVS_TEST_DIR "/ordereddeleter.vpz");
@@ -809,8 +800,8 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 
 BOOST_AUTO_TEST_CASE(test_confluent_transition)
 {
-    int ret = ::chdir(DEVS_TEST_DIR);
-    BOOST_REQUIRE(ret == 0);
+    vle::utils::FSpath p(DEVS_TEST_DIR);
+    vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
     utils::ModuleManager modules;
@@ -827,15 +818,15 @@ BOOST_AUTO_TEST_CASE(test_confluent_transition)
         root.finish();
     } catch (const std::exception& e) {
         BOOST_REQUIRE(false);
-    } catch (...) { 
+    } catch (...) {
         BOOST_REQUIRE(false);
     }
 }
 
 BOOST_AUTO_TEST_CASE(test_timed_obs)
 {
-    int ret = ::chdir(DEVS_TEST_DIR);
-    BOOST_REQUIRE(ret == 0);
+    vle::utils::FSpath p(DEVS_TEST_DIR);
+    vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
     utils::ModuleManager modules;

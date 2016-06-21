@@ -26,10 +26,9 @@
 
 
 #define BOOST_TEST_MAIN
-#define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_MODULE utils_library_test
+#include <boost/test/included/unit_test.hpp>
 #include <boost/version.hpp>
-#include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>

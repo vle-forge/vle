@@ -1,28 +1,20 @@
-message("Boost: ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}")
-
 add_executable(test_algo test1.cpp)
-target_link_libraries(test_algo vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_algo vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(test_template test_template.cpp)
-target_link_libraries(test_template vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_template vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(test_parser test_parser.cpp)
-target_link_libraries(test_parser vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_parser vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(test_package test_package.cpp)
-target_link_libraries(test_package vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_package vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(test_downloadmanager test_downloadmanager.cpp)
-target_link_libraries(test_downloadmanager vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_downloadmanager vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(test_shell test_shell.cpp)
-target_link_libraries(test_shell vlelib
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(test_shell vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 add_test(utilstest_algo test_algo)
 add_test(utilstest_template test_template)

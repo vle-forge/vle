@@ -26,9 +26,8 @@
 
 
 #define BOOST_TEST_MAIN
-#define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_MODULE atomicdynamics_test
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
@@ -429,21 +428,21 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
     BOOST_REQUIRE(top1 and top2);
     BOOST_REQUIRE(top1 != top2);
 
-    AtomicModelVector lst1, lst2;
+    AtomicModelVector list1, list2;
 
-    BaseModel::getAtomicModelList(top1, lst1);
-    BaseModel::getAtomicModelList(top2, lst2);
+    BaseModel::getAtomicModelList(top1, list1);
+    BaseModel::getAtomicModelList(top2, list2);
 
     AtomicModelVector intersection;
 
-    std::sort(lst1.begin(), lst1.end());
-    std::sort(lst2.begin(), lst2.end());
+    std::sort(list1.begin(), list1.end());
+    std::sort(list2.begin(), list2.end());
 
     AtomicModelVector::iterator it;
 
-    it = std::search(lst1.begin(), lst1.end(), lst2.begin(), lst2.end());
+    it = std::search(list1.begin(), list1.end(), list2.begin(), list2.end());
 
-    BOOST_REQUIRE(it == lst1.end());
+    BOOST_REQUIRE(it == list1.end());
 
     delete file1.project().model().model();
     delete file2.project().model().model();

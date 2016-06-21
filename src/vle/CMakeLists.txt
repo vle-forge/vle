@@ -56,7 +56,8 @@ set_target_properties(vlelib PROPERTIES
 
 target_include_directories(vlelib PUBLIC ${VLEDEPS_INCLUDE_DIRS})
 
-target_link_libraries(vlelib ${VLEDEPS_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
+target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)

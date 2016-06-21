@@ -64,7 +64,7 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="beep" package="" library="dynamics_beep" type="local"  />
+<dynamic name="beep" package="" library="dynamics_MyBeep" type="local"  />
 <dynamic name="counter" package="" library="dynamics_counter" type="local"  />
 <dynamic name="executive" package="" library="exe_deleteconnection" type="local"  />
 </dynamics>

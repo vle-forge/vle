@@ -60,13 +60,13 @@ class OutputPlugin : public vle::oov::Plugin
         std::vector<
             std::pair<
                 double, std::unique_ptr<vle::value::Value>>>>;
-    
+
     data_type ppD;
 
 public:
     OutputPlugin(const std::string& location)
         : vle::oov::Plugin(location)
-    {   
+    {
     }
 
     virtual ~OutputPlugin() = default;
@@ -101,7 +101,7 @@ public:
             }
             col++;
         }
-    
+
         return matrix;
     }
 
@@ -125,7 +125,7 @@ public:
         (void)location;
         (void)file;
         (void)parameters;
-        (void)time;            
+        (void)time;
     }
 
     virtual void onNewObservable(const std::string& simulator,
@@ -137,7 +137,7 @@ public:
         (void)time;
 
         std::string id = make_id(view, parent, simulator, port);
-        
+
         assert(ppD.find(id) == ppD.cend());
 
         ppD[id].reserve(100);
@@ -152,7 +152,7 @@ public:
         (void)time;
 
         std::string id = make_id(view, parent, simulator, port);
-        
+
         assert(ppD.find(id) != ppD.cend());
     }
 
@@ -167,9 +167,9 @@ public:
                                    behaviour. Sending value withtout
                                    simulator ?!?. */
             return;
-        
+
         std::string id = make_id(view, parent, simulator, port);
-        
+
         assert(ppD.find(id) != ppD.cend());
 
         ppD[id].emplace_back(time, std::move(value));

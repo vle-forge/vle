@@ -24,7 +24,7 @@ else (WIN32)
 endif (WIN32)
 
 target_link_libraries(vle vlelib ${CMAKE_THREAD_LIBS_INIT}
-  ${VLEDEPS_LIBRARIES} ${Boost_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
+  ${VLEDEPS_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vle DESTINATION bin)
 

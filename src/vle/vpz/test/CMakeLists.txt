@@ -1,26 +1,26 @@
 ADD_EXECUTABLE(test_vpz_values test1.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_values vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_values vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_project test2.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_project vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_project vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_translator test3.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_translator vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_translator vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_io test4.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_io vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_io vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_oov test5.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_oov vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_oov vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_classes test6.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_classes vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_classes vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_structures test7.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_structures vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_structures vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_graph test8.cpp)
-TARGET_LINK_LIBRARIES(test_vpz_graph vlelib ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_vpz_graph vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_TEST(vpztest_values test_vpz_values)
 ADD_TEST(vpztest_project test_vpz_project)

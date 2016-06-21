@@ -26,10 +26,8 @@
 
 
 #define BOOST_TEST_MAIN
-#define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_MODULE vpz_structures
-
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
