@@ -39,7 +39,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/vle.hpp>
 
 struct F
@@ -626,8 +626,9 @@ void check_equal_outputs_unittest_vpz(vpz::Outputs outputs)
 
 BOOST_AUTO_TEST_CASE(test_remove_dyns)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -645,8 +646,9 @@ BOOST_AUTO_TEST_CASE(test_remove_dyns)
 
 BOOST_AUTO_TEST_CASE(test_rename_dyns)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -663,8 +665,9 @@ BOOST_AUTO_TEST_CASE(test_rename_dyns)
 
 BOOST_AUTO_TEST_CASE(test_remove_conds)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -681,8 +684,9 @@ BOOST_AUTO_TEST_CASE(test_remove_conds)
 
 BOOST_AUTO_TEST_CASE(test_rename_conds)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -698,9 +702,10 @@ BOOST_AUTO_TEST_CASE(test_rename_conds)
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_views)
-{
+{ 
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -713,8 +718,9 @@ BOOST_AUTO_TEST_CASE(test_rename_views)
 
 BOOST_AUTO_TEST_CASE(test_remove_observables)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -730,9 +736,10 @@ BOOST_AUTO_TEST_CASE(test_remove_observables)
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_observables)
-{
+{ 
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -750,8 +757,9 @@ BOOST_AUTO_TEST_CASE(test_rename_observables)
 
 BOOST_AUTO_TEST_CASE(test_connection)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     const vpz::Model& model(vpz.project().model());
     BOOST_REQUIRE(model.model());
@@ -777,21 +785,22 @@ BOOST_AUTO_TEST_CASE(test_connection)
 
 BOOST_AUTO_TEST_CASE(test_read_write_read)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
     delete vpz.project().model().model();
     vpz.clear();
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
     delete vpz.project().model().model();
     vpz.clear();
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
     delete vpz.project().model().model();
     vpz.clear();
 
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
 
     std::string str(vpz.writeToString());
@@ -804,8 +813,9 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
 
 BOOST_AUTO_TEST_CASE(test_read_write_read2)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     vpz::Vpz vpz2(vpz);
 
     check_unittest_vpz(vpz);
@@ -817,8 +827,9 @@ BOOST_AUTO_TEST_CASE(test_read_write_read2)
 
 BOOST_AUTO_TEST_CASE(test_copy_del_views)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -831,8 +842,9 @@ BOOST_AUTO_TEST_CASE(test_copy_del_views)
 
 BOOST_AUTO_TEST_CASE(test_equal_dynamics)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -844,8 +856,9 @@ BOOST_AUTO_TEST_CASE(test_equal_dynamics)
 
 BOOST_AUTO_TEST_CASE(test_equal_outputs)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -857,8 +870,9 @@ BOOST_AUTO_TEST_CASE(test_equal_outputs)
 
 BOOST_AUTO_TEST_CASE(test_equal_views)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().getTemplate("unittest.vpz").string());
+    vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -867,4 +881,3 @@ BOOST_AUTO_TEST_CASE(test_equal_views)
     check_equal_views_unittest_vpz(views);
     delete vpz.project().model().model();
 }
-

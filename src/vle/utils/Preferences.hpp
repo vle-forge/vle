@@ -29,6 +29,7 @@
 #define VLE_UTILS_PREFERENCES_HPP 1
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <string>
 #include <vector>
 #include <memory>
@@ -79,25 +80,24 @@ public:
      * Build a new Preferences object with a specified filename, read the
      * content of the resources file and fill internal structures.
      *
-     * @param file The filename to open.
+     * @param filepath The filename to open.
      *
      * @throw utils::ArgError if the opening of the resources file failed
      * or during the reading of the file.
      */
-    Preferences(const std::string& filename = std::string("vle.conf"));
+    Preferences(const FSpath& filepath);
 
     /**
      * Build a new Preferences object with a specified filename, read the
      * content of the resources file and fill internal structures.
      *
      * @param readOnly If TRUE, the file is not saved at destruction
-     * @param file The filename to open.
+     * @param filepath The filename to open.
      *
      * @throw utils::ArgError if the opening of the resources file failed
      * or during the reading of the file.
      */
-    Preferences(bool readOnly,
-                const std::string& filename = std::string("vle.conf"));
+    Preferences(bool readOnly, const FSpath& filepath);
 
     Preferences(Preferences&& rhs) = default;
     Preferences& operator=(Preferences&& rhs) = default;

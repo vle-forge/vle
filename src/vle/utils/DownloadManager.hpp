@@ -28,6 +28,7 @@
 #define VLE_UTILS_DOWNLOAD_MANAGER_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Types.hpp>
 #include <memory>
 #include <string>
@@ -64,7 +65,7 @@ public:
     /**
      * @brief Build a DownloadManager.
      */
-    DownloadManager();
+    DownloadManager(ContextPtr ctx);
 
     /**
      * @brief Join the alive thread is if exists.

@@ -99,18 +99,7 @@ public:
      *
      * @return Return the only one reference to the Trace object.
      */
-    static Trace& instance()
-    {
-        static Trace t;
-        return t;
-    }
-
-    /**
-     * Get the current log filename.
-     *
-     * @return current log filename or empty if not open.
-     */
-    static std::string getLogFile();
+    static Trace& instance();
 
     /**
      * Set a new filename to the current log file.
@@ -149,24 +138,6 @@ public:
      */
     static void send(TraceLevelOptions level,
                      const char *format, ...);
-
-    /**
-     * Return the default log file position. $VLE_HOME/vle.log under Unix
-     * system, %VLE_HOME%/vle.log under Win32.
-     *
-     * @return the default log filename.
-     */
-    static std::string getDefaultLogFilename();
-
-    /**
-     * Return a specific log file position. $VLE_HOME/.vle/[filename].log
-     * under Unix system, $VLE_HOME/[filename].log under windows.
-     *
-     * @param filename the filename without extension.
-     *
-     * @return the default log filename.
-     */
-    static std::string getLogFilename(const std::string& filename);
 
     /**
      * Return the current level.

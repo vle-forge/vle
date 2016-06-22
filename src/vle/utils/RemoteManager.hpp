@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -29,6 +29,7 @@
 #define VLE_UTILS_REMOTEMANAGER_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Types.hpp>
 #include <iosfwd>
 #include <memory>
@@ -147,7 +148,7 @@ public:
      * - Read the \c VLE_HOME/vle.conf file to get the list of remote host.
      * - Read the \c VLE_HOME/package file to get the list of available package.
      */
-    RemoteManager();
+    RemoteManager(ContextPtr ctx);
 
     /**
      * If an action is running, \c join it otherwise do nothing.
@@ -207,19 +208,11 @@ public:
      */
     const std::string& messageError();
 
-    /**
-     * Return the path @e "$VLE_HOME/local.pkg".
-     *
-     * @return The path @e "$VLE_HOME/local.pkg."
-     */
-    static std::string getLocalPackageFilename();
+    void compress(const FSpath& filepath,
+                  const FSpath& compressedfilepath);
 
-    /**
-     * Return the path @e "$VLE_HOME/remote.pkg".
-     *
-     * @return The path @e "$VLE_HOME/remote.pkg."
-     */
-    static std::string getRemotePackageFilename();
+    void decompress(const FSpath& compressedfilepath,
+                    const FSpath& directorypath);
 
 private:
     class Pimpl;

@@ -27,14 +27,9 @@
 #define BOOST_TEST_MAIN
 #define BOOST_TEST_MODULE devstime_mdl
 #include <boost/test/included/unit_test.hpp>
-#include <stack>
-#include <stdexcept>
-#include <limits>
-#include <fstream>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/devs/ExecutiveDbg.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -44,7 +39,12 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Filesystem.hpp>
+#include <boost/format.hpp>
 #include <iostream>
+#include <stack>
+#include <stdexcept>
+#include <limits>
+#include <fstream>
 #include "oov.hpp"
 
 using namespace vle;
@@ -558,15 +558,16 @@ public:
             set->toSet().add(value::Integer::create(1));
             if(get_nb_model() > 0 and ev.getTime() < 50.0){
                 set->toSet().add(value::String::create("add"));
-                std::string name = (fmt("MyBeep_%1%") % m_stacknames.size()).str();
+                std::string name = (boost::format("MyBeep_%1%") %
+                                    m_stacknames.size()).str();
                 set->toSet().add(value::String::create(name));
                 set->toSet().add(value::String::create("2"));
                 std::string edge =  name + std::string(" counter ");
                 set->toSet().add(value::String::create(edge));
             } else if(get_nb_model() > 0){
                 set->toSet().add(value::String::create("delete"));
-                std::string name = (fmt(
-                        "MyBeep_%1%") % (get_nb_model())).str();
+                std::string name = (boost::format("MyBeep_%1%")
+                                    % (get_nb_model())).str();
                 set->toSet().add(value::String::create(name));
             }
 
@@ -581,7 +582,8 @@ public:
 
     void add_new_model()
     {
-        std::string name((fmt("MyBeep_%1%") % m_stacknames.size()).str());
+        std::string name((boost::format("MyBeep_%1%")
+                          % m_stacknames.size()).str());
 
         std::vector < std::string > outputs;
         outputs.push_back("out");
@@ -595,7 +597,7 @@ public:
     void del_first_model()
     {
         if (m_stacknames.empty()) {
-            throw utils::InternalError(fmt(
+            throw utils::InternalError(boost::format(
                     "Cannot delete any model, the executive have no "
                     "element.").str());
         }
@@ -694,12 +696,13 @@ DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 
 BOOST_AUTO_TEST_CASE(test_gensvpz)
 {
+    auto ctx = vle::utils::make_context();
     vle::utils::FSpath p(DEVS_TEST_DIR);
     vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
-    utils::ModuleManager modules;
-    devs::RootCoordinator root(modules);
+    utils::ModuleManager modules(ctx);
+    devs::RootCoordinator root(ctx, modules);
 
     root.load(file);
     file.clear();
@@ -743,12 +746,13 @@ BOOST_AUTO_TEST_CASE(test_gensvpz)
 
 BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
 {
+    auto ctx = vle::utils::make_context();
     vle::utils::FSpath p(DEVS_TEST_DIR);
     vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
-    utils::ModuleManager modules;
-    devs::RootCoordinator root(modules);
+    utils::ModuleManager modules(ctx);
+    devs::RootCoordinator root(ctx, modules);
 
     try {
         root.load(file);
@@ -766,13 +770,14 @@ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
 
 BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 {
+    auto ctx = vle::utils::make_context();
     vle::utils::FSpath p(DEVS_TEST_DIR);
     vle::utils::FSpath::current_path(p);
 
     for (int s = 0, es = 100; s != es; ++s) {
         vpz::Vpz file(DEVS_TEST_DIR "/ordereddeleter.vpz");
-        utils::ModuleManager modules;
-        devs::RootCoordinator root(modules);
+        utils::ModuleManager modules(ctx);
+        devs::RootCoordinator root(ctx, modules);
 
         root.load(file);
         file.clear();
@@ -800,12 +805,13 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 
 BOOST_AUTO_TEST_CASE(test_confluent_transition)
 {
+    auto ctx = vle::utils::make_context();
     vle::utils::FSpath p(DEVS_TEST_DIR);
     vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
-    utils::ModuleManager modules;
-    devs::RootCoordinator root(modules);
+    utils::ModuleManager modules(ctx);
+    devs::RootCoordinator root(ctx, modules);
 
     try {
         root.load(file);
@@ -825,12 +831,13 @@ BOOST_AUTO_TEST_CASE(test_confluent_transition)
 
 BOOST_AUTO_TEST_CASE(test_timed_obs)
 {
+    auto ctx = vle::utils::make_context();
     vle::utils::FSpath p(DEVS_TEST_DIR);
     vle::utils::FSpath::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
-    utils::ModuleManager modules;
-    devs::RootCoordinator root(modules);
+    utils::ModuleManager modules(ctx);
+    devs::RootCoordinator root(ctx, modules);
 
     try {
         root.load(file);

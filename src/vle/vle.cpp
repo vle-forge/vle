@@ -26,40 +26,24 @@
 
 
 #include <vle/vle.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/utils/Trace.hpp>
 #include <libxml/parser.h>
 
 namespace vle {
 
-static void __vle_init()
-{
-    xmlInitParser(); /**< Initialize the libxml2 library. */
-}
+/* From libxml2 website: http://xmlsoft.org/threads.html
+ * 
+ * Starting with 2.4.7, libxml2 makes provisions to ensure that concurrent
+ * threads can safely work in parallel parsing different documents. There
+ * is however a couple of things to do to ensure it:
+ *
+ * - configure the library accordingly using the --with-threads options
+ * - call xmlInitParser() in the "main" thread before using any of the
+ *   libxml2 API (except possibly selecting a different memory allocator)
+ */
 
 Init::Init()
 {
-    __vle_init();
-
-#ifdef VLE_HAVE_NLS
-    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().string().c_str());
-    textdomain(VLE_LOCALE_NAME);
-#endif
-}
-
-Init::Init(const char *localname)
-{
-    __vle_init();
-
-    if (!setlocale(LC_ALL, localname == nullptr ? "" : localname))
-        setlocale(LC_ALL, "C");
-
-#ifdef VLE_HAVE_NLS
-    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().string().c_str());
-    textdomain(VLE_LOCALE_NAME);
-#endif
+    xmlInitParser();
 }
 
 Init::~Init()

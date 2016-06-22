@@ -34,42 +34,42 @@
 
 namespace vle { namespace utils {
 
-    class VLE_API PackageTable
-    {
-    public:
-        typedef std::set < std::string > table_t;
-        typedef table_t::const_iterator index;
-        typedef table_t::const_iterator const_iterator;
-        typedef table_t::iterator iterator;
-        typedef table_t::size_type size_type;
+class VLE_API PackageTable
+{
+public:
+    typedef std::set < std::string > table_t;
+    typedef table_t::const_iterator index;
+    typedef table_t::const_iterator const_iterator;
+    typedef table_t::iterator iterator;
+    typedef table_t::size_type size_type;
 
-        PackageTable();
+    PackageTable();
 
-        /**
-         * @brief Get an index to the specified package, if package does not
-         * exist it is added.
-         * @param package The package to get or add.
-         * @return An index to the existing or newly package.
-         * @throw utils::ArgError if package is empty.
-         */
-        index get(const std::string& package);
+    /**
+     * @brief Get an index to the specified package, if package does not
+     * exist it is added.
+     * @param package The package to get or add.
+     * @return An index to the existing or newly package.
+     * @throw utils::ArgError if package is empty.
+     */
+    index get(const std::string& package);
 
-        /**
-         * @brief Erase the specificied package from the list.
-         * @param id The identifiant of the package to delete.
-         * @throw utils::ArgError if package is the current package.
-         */
-        void remove(index id);
+    /**
+     * @brief Erase the specificied package from the list.
+     * @param id The identifiant of the package to delete.
+     * @throw utils::ArgError if package is the current package.
+     */
+    void remove(index id);
 
-        const_iterator begin() const { return m_table.begin(); }
-        const_iterator end() const { return m_table.end(); }
-        size_type size() const { return m_table.size(); }
-        bool empty() const { return m_table.empty(); }
+    const_iterator begin() const { return m_table.begin(); }
+    const_iterator end() const { return m_table.end(); }
+    size_type size() const { return m_table.size(); }
+    bool empty() const { return m_table.empty(); }
 
-    private:
-        table_t m_table;
-        const_iterator m_current;
-    };
+private:
+    table_t m_table;
+    const_iterator m_current;
+};
 
 }} // namespace vle utils
 

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -30,7 +30,6 @@
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
-#include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
@@ -121,21 +120,25 @@ std::ostream& operator<<(std::ostream& os, const PackageId& b)
 class RemoteManager::Pimpl
 {
 public:
-    Pimpl()
-        : mStream(nullptr), mIsStarted(false), mIsFinish(false), mStop(false),
-          mHasError(false)
+    Pimpl(ContextPtr ctx)
+        : mContext(ctx)
+        , mStream(nullptr)
+        , mIsStarted(false)
+        , mIsFinish(false)
+        , mStop(false)
+        , mHasError(false)
     {
         {
             Packages tmp;
 
-            LocalPackageManager::rebuild(&tmp);
+            LocalPackageManager::rebuild(mContext, &tmp);
             local.insert(tmp.begin(), tmp.end());
         }
 
         {
             Packages tmp;
 
-            RemotePackageManager::extract(&tmp);
+            RemotePackageManager::extract(mContext, &tmp);
             remote.insert(tmp.begin(), tmp.end());
         }
     }
@@ -263,12 +266,12 @@ public:
                             std::ios_base::failbit |
                             std::ios_base::badbit);
 
-            file.open(RemoteManager::getLocalPackageFilename().c_str());
+            file.open(mContext->getLocalPackageFilename().string());
             file << local << std::endl;
         } catch (const std::exception& e) {
             TraceAlways(_("Remote: failed to write local package "
                           "`%s': %s"),
-                        RemoteManager::getLocalPackageFilename().c_str(),
+                        mContext->getLocalPackageFilename().string().c_str(),
                         e.what());
         }
 
@@ -278,12 +281,12 @@ public:
                             std::ios_base::failbit |
                             std::ios_base::badbit);
 
-            file.open(RemoteManager::getRemotePackageFilename().c_str());
+            file.open(mContext->getRemotePackageFilename().string());
             file << remote << std::endl;
         } catch (const std::exception& e) {
             TraceAlways(_("Remote: failed to write remote package "
                           "`%s': %s"),
-                        RemoteManager::getRemotePackageFilename().c_str(),
+                        mContext->getRemotePackageFilename().string().c_str(),
                         e.what());
         }
     }
@@ -295,14 +298,15 @@ public:
     struct Download
         : public std::unary_function < std::string, void >
     {
+        ContextPtr context;
         PackageParser* parser;
         bool* remoteHasError;
         std::string* remoteMessageError;
 
 
-        Download(PackageParser *parser, bool *remoteHasError,
+        Download(ContextPtr ctx, PackageParser *parser, bool *remoteHasError,
                 std::string* remoteMessageError)
-            : parser(parser), remoteHasError(remoteHasError),
+            : context(ctx), parser(parser), remoteHasError(remoteHasError),
               remoteMessageError(remoteMessageError)
         {
             assert(parser);
@@ -310,7 +314,7 @@ public:
 
         void operator()(std::string url) const
         {
-            DownloadManager dl;
+            DownloadManager dl(context);
             FSpath filename(FSpath::temp_directory_path());
             filename /= "packages.pkg";
 
@@ -340,7 +344,7 @@ public:
 
         std::vector < std::string > urls;
         try {
-            utils::Preferences prefs(true);
+            utils::Preferences prefs(true, mContext->getConfigurationFile());
             std::string tmp;
             prefs.get("vle.remote.url", &tmp);
 
@@ -357,7 +361,7 @@ public:
 
         PackageParser parser;
         std::for_each(urls.begin(), urls.end(),
-                      Download(&parser, &mHasError, &mErrorMessage));
+                      Download(mContext, &parser, &mHasError, &mErrorMessage));
         remote.clear();
         {
             PackageParser::const_iterator itb = parser.begin();
@@ -433,7 +437,7 @@ public:
             return;
         }
 
-        DownloadManager dl;
+        DownloadManager dl(mContext);
         std::string url = it->url;
         out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
 
@@ -450,9 +454,8 @@ public:
 
             {
                 FScurrent_path_restore restore(FSpath(tempdir));
-                vle::utils::Path::path().decompress(archpath.string(),
-                                                    dearchpath.string());
-                vle::utils::Package pkg(pkgid.name);
+                decompress(archpath.string(), dearchpath.string());
+                vle::utils::Package pkg(mContext, pkgid.name);
                 out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %
                     dearchpath.string());
                 pkg.configure();
@@ -487,7 +490,7 @@ public:
         pkgid.name = mArgs;
         PackagesIdSet::const_iterator it = remote.find(pkgid);
         if (it != remote.end()) {
-            DownloadManager dl;
+            DownloadManager dl(mContext);
             std::string url = it->url;
             std::string archname = mArgs;
             archname.append(".tar.bz2");
@@ -628,12 +631,132 @@ public:
         mStop = false;
     }
 
+    void compress(const FSpath& filepath, const FSpath& compressedfilepath)
+    {
+        if (not filepath.exists())
+            throw utils::InternalError(
+                (fmt(_("fail to compress '%1%': file or directory does not exist"))
+                 % filepath.string()).str());
+
+        FSpath pwd = FSpath::current_path();
+        std::string command;
+
+        try {
+            {
+                utils::Preferences prefs(true, mContext->getConfigurationFile());
+                prefs.get("vle.command.tar", &command);
+            }
+
+            command = (vle::fmt(command) % compressedfilepath.string()
+                       % filepath.string()).str();
+
+            utils::Spawn spawn(mContext);
+            std::vector<std::string> argv = spawn.splitCommandLine(command);
+            std::string exe = std::move(argv.front());
+            argv.erase(argv.begin());
+
+            if (not spawn.start(exe, pwd.string(), argv, 50000u))
+                throw utils::InternalError(_("fail to start cmake command"));
+
+            std::string output, error;
+            while (not spawn.isfinish()) {
+                if (spawn.get(&output, &error)) {
+                    std::cout << output;
+                    std::cerr << error;
+
+                    output.clear();
+                    error.clear();
+
+                    std::this_thread::sleep_for(std::chrono::microseconds(200));
+                } else
+                    break;
+            }
+
+            spawn.wait();
+
+            std::string message;
+            bool success;
+            spawn.status(&message, &success);
+
+            if (not message.empty())
+                std::cerr << message << '\n';
+        } catch (const std::exception& e) {
+            TraceAlways(_("Compress: unable to compress '%s' "
+                          "in '%s' with the '%s' command"),
+                        compressedfilepath.string().c_str(),
+                        pwd.string().c_str(),
+                        command.c_str());
+        }
+    }
+    void decompress(const FSpath& compressedfilepath,
+                    const FSpath& directorypath)
+    {
+        if (not directorypath.is_directory())
+            throw utils::InternalError(
+                (fmt(_("fail to extract '%1%' in directory '%2%': "
+                       " directory does not exist"))
+                 % compressedfilepath.string() % directorypath.string()).str());
+
+        if (not compressedfilepath.is_file())
+            throw utils::InternalError(
+                (fmt(_("fail to extract '%1%' in directory '%2%': "
+                       "file does not exist"))
+                 % compressedfilepath.string() % directorypath.string()).str());
+
+        FSpath pwd = FSpath::current_path();
+
+        std::string command;
+        try {
+            {
+                utils::Preferences prefs(true, mContext->getConfigurationFile());
+                prefs.get("vle.command.untar", &command);
+            }
+
+            command = (vle::fmt(command) % compressedfilepath.string()).str();
+
+            utils::Spawn spawn(mContext);
+            std::vector<std::string> argv = spawn.splitCommandLine(command);
+            std::string exe = std::move(argv.front());
+            argv.erase(argv.begin());
+
+            if (not spawn.start(exe, directorypath.string(), argv, 50000u))
+                throw utils::InternalError(_("fail to start cmake command"));
+
+            std::string output, error;
+            while (not spawn.isfinish()) {
+                if (spawn.get(&output, &error)) {
+                    std::cout << output;
+                    std::cerr << error;
+
+                    output.clear();
+                    error.clear();
+
+                    std::this_thread::sleep_for(std::chrono::microseconds(200));
+                } else
+                    break;
+            }
+
+            spawn.wait();
+
+            std::string message;
+            bool success;
+            spawn.status(&message, &success);
+
+            if (not message.empty())
+                std::cerr << message << '\n';
+        } catch (const std::exception& e) {
+            TraceAlways(_("Decompress: unable to decompress '%s' "
+                          "in '%s' with the '%s' command"),
+                        compressedfilepath.string().c_str(),
+                        pwd.string().c_str(),
+                        command.c_str());
+        }
+    }
+
     PackagesIdSet local;
     PackagesIdSet remote;
 
-    /**
-     * @brief The set of packages resulting form the last command
-     */
+    ContextPtr mContext;
     Packages mResults;
     std::thread mThread;
     std::string mArgs;
@@ -645,10 +768,8 @@ public:
     std::string mErrorMessage;
 };
 
-RemoteManager::RemoteManager()
-    : mPimpl(
-        std::unique_ptr<RemoteManager::Pimpl>(
-            new RemoteManager::Pimpl()))
+RemoteManager::RemoteManager(ContextPtr context)
+    : mPimpl(std::make_unique<RemoteManager::Pimpl>(context))
 {
 }
 
@@ -695,20 +816,15 @@ const std::string& RemoteManager::messageError()
     return mPimpl->mErrorMessage;
 }
 
-std::string RemoteManager::getLocalPackageFilename()
+void RemoteManager::compress(const FSpath& filepath, const FSpath& compressedfilepath)
 {
-    FSpath p(utils::Path::path().getBinaryPackagesDir());
-    p /= "local.pkg";
-
-    return p.string();
+    mPimpl->compress(filepath, compressedfilepath);
 }
 
-std::string RemoteManager::getRemotePackageFilename()
+void RemoteManager::decompress(const FSpath& compressedfilepath,
+                               const FSpath& directorypath)
 {
-    FSpath p(utils::Path::path().getBinaryPackagesDir());
-    p /= "remote.pkg";
-
-    return p.string();
+    mPimpl->decompress(compressedfilepath, directorypath);
 }
 
 }} // namespace vle utils

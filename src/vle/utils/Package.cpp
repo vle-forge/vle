@@ -25,27 +25,25 @@
  */
 
 
-#include <fstream>
-#include <ostream>
-#include <cstring>
-#include <thread>
-#include <stack>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/i18n.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Filesystem.hpp>
-#include <boost/version.hpp>
 #include <boost/cast.hpp>
-#include <boost/version.hpp>
-#include <boost/config.hpp>
-#include "details/ShellUtils.hpp"
+#include <boost/format.hpp>
+#include <fstream>
+#include <ostream>
+#include <cstring>
+#include <thread>
+#include <stack>
 
 namespace {
 
-void remove_all(const vle::utils::FSpath& path)
+void remove_all(vle::utils::ContextPtr ctx, const vle::utils::FSpath& path)
 {
     if (not path.exists())
         return;
@@ -55,16 +53,16 @@ void remove_all(const vle::utils::FSpath& path)
 
     std::string command;
     try {
-        vle::utils::Preferences prefs(true);
+        vle::utils::Preferences prefs(true, ctx->getConfigurationFile());
         prefs.get("vle.command.dir.remove", &command);
 
-        command = (vle::fmt(command) % path.string()).str();
+        command = (boost::format(command) % path.string()).str();
 
-        auto argv = vle::utils::Spawn::splitCommandLine(command);
+        vle::utils::Spawn spawn(ctx);
+        auto argv = spawn.splitCommandLine(command);
         auto exe = std::move(argv.front());
         argv.erase(argv.begin());
 
-        vle::utils::Spawn spawn;
         if (not spawn.start(exe, vle::utils::FSpath::current_path().string(),
                             argv, 50000u))
             throw vle::utils::InternalError(_("fail to start cmake command"));
@@ -91,39 +89,25 @@ void remove_all(const vle::utils::FSpath& path)
 
 namespace vle { namespace utils {
 
-std::vector<std::string>
-Spawn::splitCommandLine(const std::string& command)
-{
-    std::vector<std::string> argv;
-    details::ShellUtils su;
-    int argcp;
-    su.g_shell_parse_argv(command, argcp, argv);
-
-    if (argv.empty())
-        throw utils::ArgError(
-            (fmt(_("Package command line: error, empty command `%1%'"))
-             % command).str());
-
-    argv.front() = Path::findProgram(argv.front()).string();
-
-    return argv;
-}
-
 struct Package::Pimpl
 {
-    Pimpl()
+    Pimpl(ContextPtr context)
+        : m_context(context)
+        , m_spawn(context)
     {
     }
 
-    Pimpl(std::string pkgname)
-        : m_pkgname(std::move(pkgname))
-        , m_pkgbinarypath()
-        , m_pkgsourcepath()
+    Pimpl(ContextPtr context, std::string pkgname)
+        : m_context(context)
+        , m_pkgname(std::move(pkgname))
+        , m_spawn(context)
     {
         refreshPath();
     }
 
     ~Pimpl() = default;
+
+    ContextPtr m_context;
 
     std::string  m_pkgname;
     std::string  m_pkgbinarypath;
@@ -168,10 +152,10 @@ struct Package::Pimpl
         m_pkgsourcepath.clear();
 
         if (not m_pkgname.empty()) {
-            FSpath path_binary = Path::path().getBinaryPackagesDir();
+            FSpath path_binary = m_context->getBinaryPackagesDir();
             path_binary /= m_pkgname;
             m_pkgbinarypath = path_binary.string();
-            FSpath path_source_dir = Path::path().getCurrentDir();
+            FSpath path_source_dir = FSpath::current_path();
             FSpath path_source_pkg = path_source_dir;
             path_source_pkg /= m_pkgname;
             if (path_source_pkg.exists() or path_source_dir.exists()) {
@@ -187,25 +171,21 @@ struct Package::Pimpl
     }
 };
 
-
-Package::Package(const std::string& pkgname)
-    : m_pimpl(new Package::Pimpl(pkgname))
+Package::Package(ContextPtr context)
+    : m_pimpl(std::make_unique<Package::Pimpl>(context))
 {
 }
 
-Package::Package()
-    : m_pimpl(new Package::Pimpl())
+Package::Package(ContextPtr context, const std::string& pkgname)
+    : m_pimpl(std::make_unique<Package::Pimpl>(context, pkgname))
 {
 }
 
-Package::~Package()
-{
-    delete m_pimpl;
-}
+Package::~Package() = default;
 
 void Package::create()
 {
-    FSpath source(utils::Path::path().getTemplate("package"));
+    FSpath source(m_pimpl->m_context->getTemplate("package"));
 
     FSpath destination(getDir(PKG_SOURCE));
 
@@ -222,18 +202,19 @@ void Package::create()
 
     try {
         {
-            utils::Preferences prefs(true);
+            utils::Preferences prefs(true,
+                                     m_pimpl->m_context->getConfigurationFile());
             prefs.get("vle.command.dir.copy", &command);
         }
 
         command = (vle::fmt(command) % source.string() %
                    destination.string()).str();
 
-        std::vector<std::string> argv = Spawn::splitCommandLine(command);
+        utils::Spawn spawn(m_pimpl->m_context);
+        std::vector<std::string> argv = spawn.splitCommandLine(command);
         std::string exe = std::move(argv.front());
         argv.erase(argv.begin());
 
-        utils::Spawn spawn;
         if (not spawn.start(exe, FSpath::current_path().string(), argv, 50000u))
             throw utils::InternalError(_("fail to start cmake command"));
 
@@ -242,7 +223,7 @@ void Package::create()
 
         for (const auto& elem : argv)
             printf("- `%s'\n", elem.c_str());
-        
+
         std::string output, error;
         while (not spawn.isfinish()) {
             if (spawn.get(&output, &error)) {
@@ -311,7 +292,8 @@ void Package::configure()
 
     std::string pkg_binarydir = getDir(PKG_BINARY);
     std::string cmd = (fmt(m_pimpl->mCommandConfigure) % pkg_binarydir).str();
-    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    Spawn spawn(m_pimpl->m_context);
+    std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
     argv.erase(argv.begin());
     try {
@@ -349,7 +331,8 @@ void Package::test()
     FScurrent_path_restore restore(path);
 
     std::string cmd = (fmt(m_pimpl->mCommandTest) % pkg_buildir).str();
-    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    Spawn spawn(m_pimpl->m_context);
+    std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
     argv.erase(argv.begin());
 
@@ -387,7 +370,8 @@ void Package::build()
     FScurrent_path_restore restore(path);
 
     std::string cmd = (vle::fmt(m_pimpl->mCommandBuild) % pkg_buildir).str();
-    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    Spawn spawn(m_pimpl->m_context);
+    std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
     argv.erase(argv.begin());
 
@@ -427,7 +411,8 @@ void Package::install()
     FScurrent_path_restore restore(path);
 
     std::string cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
-    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    Spawn spawn(m_pimpl->m_context);
+    std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
     argv.erase(argv.begin());
 
@@ -459,7 +444,7 @@ void Package::clean()
     FSpath pkg_buildir = getBuildDir(PKG_SOURCE);
 
     if (pkg_buildir.exists())
-        ::remove_all(pkg_buildir);
+        ::remove_all(m_pimpl->m_context, pkg_buildir);
 }
 
 void Package::rclean()
@@ -467,7 +452,7 @@ void Package::rclean()
     FSpath pkg_buildir = getDir(PKG_BINARY);
 
     if (pkg_buildir.exists())
-        ::remove_all(pkg_buildir);
+        ::remove_all(m_pimpl->m_context, pkg_buildir);
 }
 
 void Package::pack()
@@ -491,7 +476,8 @@ void Package::pack()
     FSpath::create_directory(pkg_buildir);
 
     std::string cmd = (fmt(m_pimpl->mCommandPack) % pkg_buildir).str();
-    std::vector<std::string> argv = Spawn::splitCommandLine(cmd);
+    Spawn spawn(m_pimpl->m_context);
+    std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
     argv.erase(argv.begin());
 
@@ -567,7 +553,7 @@ void Package::remove(const std::string& toremove, VLE_PACKAGE_TYPE type)
     torm /= toremove;
 
     if (torm.exists())
-        ::remove_all(torm);
+        ::remove_all(m_pimpl->m_context, torm);
 }
 
 std::string Package::getParentDir(VLE_PACKAGE_TYPE type) const
@@ -1012,7 +998,7 @@ const std::string& Package::name() const
 
 void Package::refreshCommands()
 {
-    utils::Preferences prefs(true);
+    utils::Preferences prefs(true, m_pimpl->m_context->getConfigurationFile());
 
     prefs.get("vle.packages.configure", &m_pimpl->mCommandConfigure);
     prefs.get("vle.packages.test", &m_pimpl->mCommandTest);

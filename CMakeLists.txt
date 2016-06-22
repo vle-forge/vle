@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project(VLE CXX C)
 enable_testing()
 
@@ -6,8 +6,8 @@ enable_testing()
 # Options
 #
 
-option(WITH_GVLE "use qt to build gvle [default: on]" ON)
-option(WITH_TEST "use the libboost test unit library [default: on]" ON)
+option(WITH_GVLE "use QT to build gvle [default: on]" ON)
+option(WITH_TEST "build unit test [default: on]" ON)
 option(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
 option(WITH_MVLE "build mvle [default: off]" OFF)
 option(WITH_CVLE "build cvle [default: off]" OFF)
@@ -184,6 +184,8 @@ if (WITH_MVLE OR WITH_CVLE)
   if (NOT Boost_MPI_FOUND)
     message(STATUS "The boost mpi was not found, MPI disabled")
   endif ()
+else ()
+  find_package(Boost REQUIRED)
 endif ()
 
 if (WITH_TEST)
@@ -193,7 +195,6 @@ endif (WITH_TEST)
 #
 # Check for an MPI implementation. building mvle and/or cvle
 #
-
 
 if (WITH_MVLE OR WITH_CVLE)
   find_package(MPI REQUIRED)
@@ -221,12 +222,7 @@ else ()
   set(VLE_HAVE_CVLE 0 CACHE INTERNAL "" FORCE)
 endif ()
 
-#
-# Generate the config.h
-#
-check_include_file_cxx(cxxabi.h VLE_HAVE_GCC_ABI_DEMANGLE)
-check_include_file_cxx(execinfo.h VLE_HAVE_EXECINFO)
-check_include_file_cxx(signal.h VLE_HAVE_SIGNAL)
+
 include_directories(${VLE_BINARY_DIR})
 
 #

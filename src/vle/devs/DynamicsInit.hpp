@@ -25,41 +25,36 @@
  */
 
 
-#ifndef VLE_MAIN_INIT_HPP
-#define VLE_MAIN_INIT_HPP
+#ifndef VLE_DEVS_DYNAMICS_INIT_HPP
+#define VLE_DEVS_DYNAMICS_INIT_HPP
 
-#include <vle/DllDefines.hpp>
+namespace vle { namespace devs {
 
-namespace vle {
+class Coordinator;
 
-/**
- * The \e vle::Init class is used to initialize the subsystem of VLE when
- * parsing several XML in multiple threads.
- *
- * \example
- * #include <vle/Vle.hpp>
- * #include <vle/utils/Context.hpp>
- *
- * int main(int argc, char **argv)
- * {
- *     vle::Init app;
- *     auto ptr = vle::utils::make_context("C");
- *     [...]
- * }
- * \endexample
- */
-struct VLE_API Init {
-    /**
-     * Initialize C subsystem.
-     */
-    Init();
-
-    /**
-     * Cleanup C subsystem.
-     */
-    ~Init();
+struct DynamicsInit
+{
+    utils::ContextPtr       context;
+    const vpz::AtomicModel& model;
+    PackageId               packageid;
 };
 
-}
+struct ExecutiveInit
+{
+    Coordinator&            coordinator;
+    utils::ContextPtr       context;
+    const vpz::AtomicModel& model;
+    PackageId               packageid;
+};
+
+struct DynamicsWrapperInit
+{
+    const std::string&      library;
+    utils::ContextPtr       context;
+    const vpz::AtomicModel& model;
+    PackageId               packageid;
+};
+
+}} // namespace vle devs
 
 #endif

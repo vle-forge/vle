@@ -29,6 +29,7 @@
 #define VLE_UTILS_MODULEMANAGER_HPP 1
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Types.hpp>
 #include <memory>
 #include <string>
@@ -118,7 +119,7 @@ typedef std::vector < Module > ModuleList;
 class VLE_API ModuleManager
 {
 public:
-    ModuleManager();
+    ModuleManager(ContextPtr ctx);
 
     /**
      * Delete all shared library load into the ModuleManager.
@@ -252,34 +253,6 @@ public:
      */
     void fill(const std::string& package, ModuleType type,
               ModuleList *lst) const;
-
-    /*
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     */
-
-    /**
-     * @brief Build a path for a module.
-     *
-     * Build a path from the combination of @c package, @c library and @c type
-     * parameters.
-     *
-     * @code
-     * std::string path = buildModuleFilename("foo", "bar", MODULE_DYNAMICS);
-     *
-     * assert(path == "/home/user/.vle/pkgs/foo/modules/simulators/libbar.so");
-     * @endcode
-     *
-     * @param package
-     * @param library
-     * @param type
-     *
-     * @return
-     */
-    static std::string buildModuleFilename(const std::string& package,
-                                           const std::string& library,
-                                           ModuleType type);
 
 private:
     class Pimpl; /**< We hide the implementation detail of this class. */

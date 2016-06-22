@@ -28,6 +28,7 @@
 #define VLE_UTILS_DETAILS_SPAWN_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <string>
 #include <vector>
 
@@ -74,13 +75,18 @@ public:
      * Default constructor.
      *
      */
-    Spawn();
+    Spawn(ContextPtr context);
 
     /**
      * Wait the process if it was running and release ressources
      *
      */
     ~Spawn();
+
+    Spawn(const Spawn&) = delete;
+    Spawn& operator=(const Spawn&) = delete;
+    Spawn(const Spawn&&) = delete;
+    Spawn& operator=(const Spawn&&) = delete;
 
     /**
      * Try to execute the command.
@@ -106,7 +112,7 @@ public:
      * @return a vector of arrgument. The first is the program name
      * executable.
      */
-    static std::vector<std::string>
+    std::vector<std::string>
         splitCommandLine(const std::string& command);
 
     /**
@@ -158,11 +164,8 @@ public:
     bool status(std::string *msg, bool *success);
 
 private:
-    Spawn(const Spawn&);
-    Spawn& operator=(const Spawn&);
-
     class Pimpl;
-    Pimpl *m_pimpl;
+    std::unique_ptr<Pimpl> m_pimpl;
 };
 
 }}

@@ -25,41 +25,15 @@
  */
 
 
-#ifndef VLE_MAIN_INIT_HPP
-#define VLE_MAIN_INIT_HPP
+#include <vle/devs/DynamicsWrapper.hpp>
+#include <vle/devs/DynamicsInit.hpp>
 
-#include <vle/DllDefines.hpp>
+namespace vle { namespace devs {
 
-namespace vle {
+DynamicsWrapper::DynamicsWrapper(const DynamicsWrapperInit& init,
+                                 const devs::InitEventList& events)
+    : Dynamics(DynamicsInit{init.context, init.model, init.packageid}, events)
+    , m_library(init.library)
+{}
 
-/**
- * The \e vle::Init class is used to initialize the subsystem of VLE when
- * parsing several XML in multiple threads.
- *
- * \example
- * #include <vle/Vle.hpp>
- * #include <vle/utils/Context.hpp>
- *
- * int main(int argc, char **argv)
- * {
- *     vle::Init app;
- *     auto ptr = vle::utils::make_context("C");
- *     [...]
- * }
- * \endexample
- */
-struct VLE_API Init {
-    /**
-     * Initialize C subsystem.
-     */
-    Init();
-
-    /**
-     * Cleanup C subsystem.
-     */
-    ~Init();
-};
-
-}
-
-#endif
+}} // namespace vle devs

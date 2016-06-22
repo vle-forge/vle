@@ -42,7 +42,7 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -41,7 +41,7 @@ struct LocalPackageManager
      *
      * @return true if success, false otherwise.
      */
-    static bool extract(Packages *out);
+    static bool extract(ContextPtr ctx, Packages *out);
 
     /**
      * Try to rebuild the @e PackageId from the package directory. This
@@ -51,7 +51,7 @@ struct LocalPackageManager
      *
      * @return true if success, false otherwise.
      */
-    static bool rebuild(Packages *out);
+    static bool rebuild(ContextPtr ctx, Packages *out);
 };
 
 struct RemotePackageManager
@@ -63,7 +63,7 @@ struct RemotePackageManager
      *
      * @return true is success, faled otherwise.
      */
-    static bool extract(Packages *out);
+    static bool extract(ContextPtr ctx, Packages *out);
 };
 
 }}

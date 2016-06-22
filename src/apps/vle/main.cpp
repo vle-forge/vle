@@ -29,7 +29,7 @@
 #include <vle/manager/Simulation.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
@@ -63,18 +63,24 @@
 #  define N_(x) x
 #endif
 
-
 static void show_infos() noexcept
 {
-    std::vector<std::string> pkglist;
-    vle::utils::Path::path().fillBinaryPackagesList(pkglist);
+    try {
+        auto ctx = vle::utils::make_context();
 
-    puts(VLE_NAME_COMPLETE);
-    printf(_("%zu package(s) available %s:\n"),
-           pkglist.size() - 1, pkglist[0].c_str());
+        std::vector<std::string> pkglist;
+        ctx->fillBinaryPackagesList(pkglist);
 
-    for (auto i = decltype(pkglist.size()) {1}, e = pkglist.size(); i != e; ++i)
-        printf("%zu. %s\n", i - 1, pkglist[i].c_str());
+        puts(VLE_NAME_COMPLETE);
+        printf(_("%zu package(s) available %s:\n"),
+               pkglist.size() - 1, pkglist[0].c_str());
+
+        for (auto i = decltype(pkglist.size()) {1}, e = pkglist.size();
+             i != e; ++i)
+            printf("%zu. %s\n", i - 1, pkglist[i].c_str());
+    } catch(const std::exception& e) {
+        fprintf(stderr, "show_information failure: %s\n", e.what());
+    }
 }
 
 static void show_version() noexcept
@@ -138,10 +144,11 @@ static void show_help() noexcept
 }
 
 struct vle_initializer {
-    vle::Init app;
+    vle::utils::ContextPtr m_context;
+    vle::Init m_app;
 
-    vle_initializer(int verbose, int trace)
-        : app("")
+    vle_initializer(vle::utils::ContextPtr ctx, int verbose, int trace)
+        : m_context(ctx)
     {
         namespace vu = vle::utils;
 
@@ -151,7 +158,7 @@ struct vle_initializer {
         else if (trace == 1)
             vu::Trace::setStandardOutput();
         else
-            vu::Trace::setLogFile(vu::Trace::getDefaultLogFilename());
+            vu::Trace::setLogFile(m_context->getLogFile().string());
     }
 
     ~vle_initializer() noexcept
@@ -163,7 +170,7 @@ struct vle_initializer {
                 vu::Trace::getType() == vu::TRACE_STREAM_FILE)
                 fprintf(stderr, _("\n\t/!\\ Some warnings occurend: See "
                                   "%s file"),
-                        vu::Trace::getLogFile().c_str());
+                        m_context->getLogFile().string().c_str());
         } catch (...) {
         }
     }
@@ -182,27 +189,23 @@ typedef std::vector<std::string> CmdArgs;
 
 static void remove_configuration_file()
 {
+    auto ctx = vle::utils::make_context();
     printf(_("Remove configuration files\n"));
 
     try {
         using vle::utils::FSpath;
 
         {
-            FSpath filepath(vle::utils::Path::path().getHomeFile("vle.conf"));
+            FSpath filepath(ctx->getConfigurationFile());
             filepath.remove();
         }
 
         {
-            FSpath filepath(vle::utils::Path::path().getHomeFile("vle.log"));
+            FSpath filepath(ctx->getLogFile());
             filepath.remove();
         }
 
-        {
-        FSpath filepath(vle::utils::Path::path().getHomeFile("gvle.log"));
-        filepath.remove();
-    }
-
-        vle::utils::Preferences prefs(false, "vle.conf");
+        vle::utils::Preferences prefs(false, ctx->getConfigurationFile());
     } catch (const std::exception &e) {
         fprintf(stderr, _("Failed to remove configuration file: %s\n"),
             e.what());
@@ -263,11 +266,12 @@ static vle::manager::LogOptions convert_log_mode()
 static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
                        int processor, vle::utils::Package& pkg)
 {
-    vle::manager::Manager man(convert_log_mode(),
+    auto ctx = vle::utils::make_context();
+    vle::manager::Manager man(ctx, convert_log_mode(),
                               vle::manager::SIMULATION_NONE |
                               vle::manager::SIMULATION_NO_RETURN,
                               &std::cout);
-    vle::utils::ModuleManager modules;
+    vle::utils::ModuleManager modules(ctx);
     int success = EXIT_SUCCESS;
 
     for (; it != end; ++it) {
@@ -295,17 +299,18 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
 static int run_simulation(CmdArgs::const_iterator it,
                           CmdArgs::const_iterator end, vle::utils::Package& pkg)
 {
-    vle::manager::Simulation sim(convert_log_mode(),
+    auto ctx = vle::utils::make_context();
+    vle::manager::Simulation sim(ctx, convert_log_mode(),
                                  vle::manager::SIMULATION_NONE |
                                  vle::manager::SIMULATION_NO_RETURN,
                                  &std::cout);
-    vle::utils::ModuleManager modules;
+    vle::utils::ModuleManager modules(ctx);
     int success = EXIT_SUCCESS;
 
     for (; it != end; ++it) {
         vle::manager::Error error;
         std::unique_ptr<vle::value::Map> res =
-            sim.run(std::unique_ptr<vle::vpz::Vpz>(new vle::vpz::Vpz(search_vpz(*it, pkg))),
+            sim.run(std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
                     modules,
                     &error);
 
@@ -335,7 +340,8 @@ static bool init_package(vle::utils::Package& pkg, const CmdArgs &args)
     return true;
 }
 
-static int manage_package_mode(bool manager_mode, int processor, CmdArgs args)
+static int manage_package_mode(vle::utils::ContextPtr ctx,
+                               bool manager_mode, int processor, CmdArgs args)
 {
     if (args.empty()) {
         fprintf(stderr, _("missing package\n"));
@@ -348,7 +354,7 @@ static int manage_package_mode(bool manager_mode, int processor, CmdArgs args)
     auto end = args.end();
     bool stop = false;
 
-    vle::utils::Package pkg(packagename);
+    vle::utils::Package pkg(ctx, packagename);
 
     if (not init_package(pkg, args))
         return EXIT_FAILURE;
@@ -416,7 +422,7 @@ static int manage_package_mode(bool manager_mode, int processor, CmdArgs args)
     return ret;
 }
 
-static int manage_remote_mode(CmdArgs args)
+static int manage_remote_mode(vle::utils::ContextPtr ctx, CmdArgs args)
 {
     if (args.empty()) {
         fprintf(stderr, _("missing argument\n"));
@@ -450,8 +456,8 @@ static int manage_remote_mode(CmdArgs args)
         return ret;
     }
 
-    try {
-        vle::utils::RemoteManager rm;
+    try { 
+        vle::utils::RemoteManager rm(ctx);
         switch (act) {
         case vle::utils::REMOTE_MANAGER_UPDATE:
             rm.start(act, "", &std::cout);
@@ -573,7 +579,7 @@ struct Comma {
     }
 };
 
-static int manage_config_mode(CmdArgs args)
+static int manage_config_mode(vle::utils::ContextPtr ctx, CmdArgs args)
 {
     if (args.empty()) {
         fprintf(stderr, _("missing variable name\n"));
@@ -586,7 +592,7 @@ static int manage_config_mode(CmdArgs args)
     int ret = EXIT_SUCCESS;
 
     try {
-        vle::utils::Preferences prefs(false, "vle.conf");
+        vle::utils::Preferences prefs(false, ctx->getConfigurationFile());
 
         std::string concat = std::accumulate(args.begin(), args.end(),
                                              std::string(), Comma());
@@ -714,23 +720,26 @@ int main(int argc, char **argv)
     //
     // Otherwise, starts the simulation engines
     //
-    vle_initializer v(verbose_level, log_stdout);
+    auto ctx = vle::utils::make_context();
+    vle_initializer v(ctx, verbose_level, log_stdout);
 
     // if (::optind < argc)
     CmdArgs commands(argv + ::optind, argv + argc);
 
     switch (mode) {
     case CLI_MODE_PACKAGE:
-        ret = manage_package_mode(true, processor_number, std::move(commands));
+        ret = manage_package_mode(ctx, true, processor_number,
+                                  std::move(commands));
         break;
     case CLI_MODE_MANAGER:
-        ret = manage_package_mode(false, processor_number, std::move(commands));
+        ret = manage_package_mode(ctx, false, processor_number,
+                                  std::move(commands));
         break;
     case CLI_MODE_REMOTE:
-        ret = manage_remote_mode(std::move(commands));
+        ret = manage_remote_mode(ctx, std::move(commands));
         break;
     case CLI_MODE_CONFIG:
-        ret = manage_config_mode(std::move(commands));
+        ret = manage_config_mode(ctx, std::move(commands));
         break;
     default:
         fprintf(stderr, _("Select only one mode in manager, "

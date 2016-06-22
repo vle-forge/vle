@@ -60,24 +60,7 @@ namespace vle { namespace devs {
 
 class Simulator;
 class Coordinator;
-
-class VLE_API ExecutiveInit : public DynamicsInit
-{
-public:
-    ExecutiveInit(const vpz::AtomicModel& model,
-                  PackageId packageid,
-                  Coordinator& coordinator)
-        : DynamicsInit(model, packageid)
-        , m_coordinator(coordinator)
-    {}
-
-    virtual ~ExecutiveInit() = default;
-
-    Coordinator& coordinator() const { return m_coordinator; }
-
-private:
-    Coordinator& m_coordinator;
-};
+struct ExecutiveInit;
 
 /**
  * @brief Dynamics class for the Barros DEVS extension. Provide graph
@@ -93,10 +76,7 @@ public:
      * @param init The structure to initialise the Executive.
      * @param events Experimentales conditions.
      */
-    Executive(const ExecutiveInit& init,
-              const InitEventList& events)
-        : Dynamics(init, events), m_coordinator(init.coordinator())
-    {}
+    Executive(const ExecutiveInit& init, const InitEventList& events);
 
     /**
      * @brief Destructor (nothing to do).

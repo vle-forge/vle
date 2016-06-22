@@ -26,7 +26,7 @@
 
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Spawn.hpp>
@@ -39,6 +39,7 @@ namespace vle { namespace utils {
 
 struct DownloadManager::Pimpl
 {
+    ContextPtr mContext;
     std::mutex mMutex;
     std::thread mThread;
     std::string mCommand;
@@ -49,12 +50,13 @@ struct DownloadManager::Pimpl
     bool mIsFinish;
     bool mHasError;
 
-    Pimpl()
-        : mIsStarted(false)
+    Pimpl(ContextPtr context)
+        : mContext(context)
+        , mIsStarted(false)
         , mIsFinish(false)
         , mHasError(false)
     {
-        utils::Preferences prefs(true);
+        utils::Preferences prefs(true, mContext->getConfigurationFile());
         if (not prefs.get("vle.command.url.get", &mCommand))
             throw InternalError(
                 _("Download: fail to get vle.command.url.get command "
@@ -98,11 +100,11 @@ struct DownloadManager::Pimpl
         try {
             command = (vle::fmt(mCommand) % mUrl % mFilename).str();
 
-            std::vector<std::string> argv = Spawn::splitCommandLine(command);
+            utils::Spawn spawn(mContext);
+            std::vector<std::string> argv = spawn.splitCommandLine(command);
             std::string exe = std::move(argv.front());
             argv.erase(argv.begin());
 
-            utils::Spawn spawn;
             FSpath pwd = FSpath::current_path();
             if (not spawn.start(exe, pwd.string(), argv, 50000u)) {
                 mErrorMessage = _("Download: fail to start download command");
@@ -142,10 +144,8 @@ struct DownloadManager::Pimpl
     }
 };
 
-DownloadManager::DownloadManager()
-    : mPimpl(
-        std::unique_ptr<DownloadManager::Pimpl>(
-            new DownloadManager::Pimpl()))
+DownloadManager::DownloadManager(ContextPtr context)
+    : mPimpl(std::make_unique<DownloadManager::Pimpl>(context))
 {
 }
 

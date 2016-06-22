@@ -36,7 +36,6 @@
 #include <fstream>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/devs/ExecutiveDbg.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -183,7 +182,7 @@ class Exe : public vle::devs::Executive
 
 public:
     Exe(const vle::devs::ExecutiveInit& init,
-           const vle::devs::InitEventList& events)
+        const vle::devs::InitEventList& events)
         : vle::devs::Executive(init, events)
     {
     }
@@ -453,14 +452,11 @@ extern "C" {
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(instantiate_mode)
 {
     BOOST_REQUIRE(std::is_polymorphic<Model>::value == true);
     BOOST_REQUIRE(std::is_polymorphic<ModelDbg>::value == true);
     BOOST_REQUIRE(std::is_polymorphic<Exe>::value == true);
-    BOOST_REQUIRE(std::is_polymorphic<
-                  vle::devs::ExecutiveDbg<Exe>>::value == true);
 
     bool check;
 
@@ -472,20 +468,17 @@ BOOST_AUTO_TEST_CASE(instantiate_mode)
 
     check = std::is_base_of<vle::devs::Executive, Exe>::value == true;
     BOOST_REQUIRE(check);
-
-    check = std::is_base_of<vle::devs::Executive,
-                            vle::devs::ExecutiveDbg<Exe>>::value == true;
-    BOOST_REQUIRE(check);
 }
 
 BOOST_AUTO_TEST_CASE(test_del_coupled_model)
 {
-    utils::ModuleManager modules;
+    auto ctx = vle::utils::make_context();
+    utils::ModuleManager modules(ctx);
     vpz::Dynamics dyns;
     vpz::Classes classes;
     vpz::Experiment expe;
-    devs::RootCoordinator root(modules);
-    devs::Coordinator coord(modules,dyns,classes,expe,root);
+    devs::RootCoordinator root(ctx, modules);
+    devs::Coordinator coord(ctx, modules,dyns,classes,expe,root);
     vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
     vpz::CoupledModel* depth1(depth0->addCoupledModel("depth1"));
     vpz::AtomicModel* depth2 = depth1->addAtomicModel("depth2");
@@ -500,6 +493,7 @@ BOOST_AUTO_TEST_CASE(test_del_coupled_model)
 
 BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
 {
+    auto ctx = vle::utils::make_context();
     // Build a simple Vpz object with an atomic model in a coupled model
     // with the previously defined devs::Dynamics.
     vpz::Vpz vpz;
@@ -558,8 +552,8 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
 
     vpz.project().model().setModel(depth0);
 
-    utils::ModuleManager modules;
-    devs::RootCoordinator root(modules);
+    utils::ModuleManager modules(ctx);
+    devs::RootCoordinator root(ctx, modules);
     root.load(vpz);
     vpz.clear();
 
@@ -572,6 +566,7 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
 
 BOOST_AUTO_TEST_CASE(test_observation_event)
 {
+    auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
 
     vpz.project().experiment().setDuration(100.0);
@@ -609,8 +604,8 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
 
     vpz.project().model().setModel(depth0);
 
-    utils::ModuleManager modules;
-    devs::RootCoordinator root(modules);
+    utils::ModuleManager modules(ctx);
+    devs::RootCoordinator root(ctx, modules);
     root.load(vpz);
     vpz.clear();
 

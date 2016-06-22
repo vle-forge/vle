@@ -29,118 +29,121 @@
 #define DEVS_ROOTCOORDINATOR_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/ModuleManager.hpp>
+#include <memory>
 
 namespace vle { namespace vpz {
 
-    class BaseModel;
+class BaseModel;
 
 }} // namespace vle graph
 
 namespace vle { namespace devs {
 
-    class Coordinator;
-    class Dynamics;
+class Coordinator;
+class Dynamics;
+
+/**
+ * @brief Define the DEVS root coordinator. Manage a lot of DEVS
+ * Coordinators.
+ *
+ * @example
+ * utils::ModuleManager mm;
+ * vle::RootCoordinator rc(mm);
+ *
+ * m.load(...);
+ * ...
+ * value::Map *res = rc.outputs();
+ * delete res;
+ * @endexample
+ *
+ */
+class VLE_LOCAL RootCoordinator
+{
+public:
+    RootCoordinator(utils::ContextPtr context,
+                    const utils::ModuleManager& modulemgr);
+
+    ~RootCoordinator();
 
     /**
-     * @brief Define the DEVS root coordinator. Manage a lot of DEVS
-     * Coordinators.
-     *
-     * @example
-     * utils::ModuleManager mm;
-     * vle::RootCoordinator rc(mm);
-     *
-     * m.load(...);
-     * ...
-     * value::Map *res = rc.outputs();
-     * delete res;
-     * @endexample
-     *
+     * @brief initialiase a new Coordinator with the specified vpz::Vpz
+     * reference and intitialise the simulation time.
+     * @param vp a reference to a structure.
      */
-    class VLE_LOCAL RootCoordinator
-    {
-    public:
-        RootCoordinator(const utils::ModuleManager& modulemgr);
+    void load(const vpz::Vpz& vp);
 
-        ~RootCoordinator();
+    /**
+     * @brief Initialise RootCoordinator and his Coordinator: initiale time
+     * is define, coordinator init function is call.
+     */
+    void init();
 
-        /**
-         * @brief initialiase a new Coordinator with the specified vpz::Vpz
-         * reference and intitialise the simulation time.
-         * @param vp a reference to a structure.
-         */
-        void load(const vpz::Vpz& vp);
+    /**
+     * @brief Call the coordinator run function and test if current time is
+     * the end of the simulation.
+     * @return false when simulation is finished, true otherwise.
+     */
+    bool run();
 
-        /**
-         * @brief Initialise RootCoordinator and his Coordinator: initiale time
-         * is define, coordinator init function is call.
-         */
-        void init();
+    /**
+     * @brief Call the coordinator finish function and delete the
+     * coordinator and all attached data.
+     */
+    void finish();
 
-        /**
-         * @brief Call the coordinator run function and test if current time is
-         * the end of the simulation.
-         * @return false when simulation is finished, true otherwise.
-         */
-        bool run();
+    /**
+     * @brief Return the current time of the simulation.
+     * @return A constant reference to the current time.
+     */
+    inline const Time& getCurrentTime()
+    { return m_currentTime; }
 
-        /**
-         * @brief Call the coordinator finish function and delete the
-         * coordinator and all attached data.
-         */
-        void finish();
+    /**
+     * Return the simulation results.
+     *
+     * This function build a new \c value::Map based on the observation of
+     * the simulation. This function can return NULL lists of view is empty
+     * or no storage are used.
+     *
+     * @return Return a pointer to the data of the list of plug-ins.
+     */
+    std::unique_ptr<value::Map> outputs();
 
-        /**
-         * @brief Return the current time of the simulation.
-         * @return A constant reference to the current time.
-         */
-        inline const Time& getCurrentTime()
-        { return m_currentTime; }
+    /**
+     * @brief Return a reference to the random generator.
+     * @return Return a reference to the random generator.
+     */
+    utils::Rand& rand() { return m_rand; }
 
-        /**
-         * Return the simulation results.
-         *
-         * This function build a new \c value::Map based on the observation of
-         * the simulation. This function can return NULL lists of view is empty
-         * or no storage are used.
-         *
-         * @return Return a pointer to the data of the list of plug-ins.
-         */
-        std::unique_ptr<value::Map> outputs();
+private:
+    RootCoordinator(const RootCoordinator& other);
+    RootCoordinator& operator=(const RootCoordinator& other);
 
-        /**
-         * @brief Return a reference to the random generator.
-         * @return Return a reference to the random generator.
-         */
-        utils::Rand& rand() { return m_rand; }
+    utils::ContextPtr   m_context;
+    utils::Rand         m_rand;
 
-    private:
-        RootCoordinator(const RootCoordinator& other);
-        RootCoordinator& operator=(const RootCoordinator& other);
+    /** @brief Store the beginning of the simulation. */
+    devs::Time          m_begin;
 
-        utils::Rand         m_rand;
+    /** @brief Store the current date of the simulator. */
+    devs::Time          m_currentTime;
 
-        /** @brief Store the beginning of the simulation. */
-        devs::Time          m_begin;
+    /** @brief Store the end date of the simulation. */
+    devs::Time          m_end;
 
-        /** @brief Store the current date of the simulator. */
-        devs::Time          m_currentTime;
+    /** @brief Stores the results of the simulation. */
+    std::unique_ptr<value::Map> m_result;
 
-        /** @brief Store the end date of the simulation. */
-        devs::Time          m_end;
+    std::unique_ptr<Coordinator> m_coordinator;
+    std::unique_ptr<vpz::BaseModel> m_root;
 
-        /** @brief Stores the results of the simulation. */
-        std::unique_ptr<value::Map> m_result;
-
-        Coordinator*        m_coordinator;
-        vpz::BaseModel*     m_root;
-
-
-        const utils::ModuleManager& m_modulemgr;
-    };
+    const utils::ModuleManager& m_modulemgr;
+};
 
 }} // namespace vle devs
 

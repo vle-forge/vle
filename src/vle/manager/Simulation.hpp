@@ -29,6 +29,7 @@
 #define VLE_MANGER_SIMULATION_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -50,7 +51,8 @@ class VLE_API Simulation
 public:
     using result_type = std::unique_ptr<value::Map>;
 
-    Simulation(LogOptions         logoptions,
+    Simulation(utils::ContextPtr  context,
+               LogOptions         logoptions,
                SimulationOptions  simulationoptionts,
                std::ostream      *output);
 
@@ -66,7 +68,6 @@ public:
 
 private:
     class Pimpl;
-
     std::unique_ptr<Pimpl> mPimpl;
 };
 

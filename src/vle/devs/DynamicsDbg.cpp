@@ -26,6 +26,7 @@
 
 
 #include <vle/devs/DynamicsDbg.hpp>
+#include <vle/devs/DynamicsInit.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
 #include <cassert>
@@ -35,7 +36,7 @@ namespace vle { namespace devs {
 DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
                          const InitEventList& events)
     : Dynamics(init, events)
-    , mName(init.model().getCompleteName())
+    , mName(init.model.getCompleteName())
 {
     TraceDevs((fmt(_("                     %1% [DEVS] constructor"))
                % mName).str().c_str());

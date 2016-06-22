@@ -28,7 +28,6 @@
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>

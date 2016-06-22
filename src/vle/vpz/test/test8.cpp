@@ -36,7 +36,7 @@
 #include <fstream>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
@@ -58,7 +58,8 @@ using namespace vpz;
 
 BOOST_AUTO_TEST_CASE(test_rename_model)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
         dynamic_cast<CoupledModel*>(file.project().model().model());
@@ -76,7 +77,8 @@ BOOST_AUTO_TEST_CASE(test_rename_model)
 
 BOOST_AUTO_TEST_CASE(test_findModelFromPath)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
     BaseModel* d = file.project().model().model()->findModelFromPath("d");
     bool found = (d != nullptr);
 
@@ -277,7 +279,8 @@ BOOST_AUTO_TEST_CASE(test_delinput_port)
 
 BOOST_AUTO_TEST_CASE(test_del_port)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
         dynamic_cast<CoupledModel*>(file.project().model().model());
@@ -390,7 +393,8 @@ BOOST_AUTO_TEST_CASE(test_clone1)
 
 BOOST_AUTO_TEST_CASE(test_clone2)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* oldtop = dynamic_cast < CoupledModel* >(
         file.project().model().model());
@@ -416,7 +420,8 @@ BOOST_AUTO_TEST_CASE(test_clone2)
 
 BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
 {
-    vpz::Vpz file1(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file1(ctx->getTemplate("unittest.vpz").string());
 
     vpz::Vpz file2(file1);
 
@@ -450,7 +455,8 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
 
 BOOST_AUTO_TEST_CASE(test_get_port_index)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top = dynamic_cast < CoupledModel* >(
         file.project().model().model());
@@ -478,7 +484,8 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
 
 BOOST_AUTO_TEST_CASE(test_rename_port)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
         dynamic_cast<CoupledModel*>(file.project().model().model());
@@ -559,7 +566,8 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
 
 BOOST_AUTO_TEST_CASE(test_bug_rename_port)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
         dynamic_cast<CoupledModel*>(file.project().model().model());
@@ -594,7 +602,8 @@ BOOST_AUTO_TEST_CASE(test_bug_rename_port)
 
 BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
         dynamic_cast<CoupledModel*>(file.project().model().model());
@@ -629,7 +638,8 @@ BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top((file.project().model().model())->toCoupled());
     BOOST_REQUIRE(top);
@@ -695,7 +705,8 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top((file.project().model().model())->toCoupled());
     CoupledModel* top1(top->findModel("top1")->toCoupled());
@@ -753,7 +764,8 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top((file.project().model().model())->toCoupled());
     CoupledModel* top2(top->findModel("top2")->toCoupled());
@@ -765,7 +777,8 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
 
 BOOST_AUTO_TEST_CASE(test_name)
 {
-    vpz::Vpz file(utils::Path::path().getTemplate("unittest.vpz").string());
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
     BaseModel *a, *b;
 
     a = file.project().model().model()->findModelFromPath("top2,g");

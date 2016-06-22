@@ -26,6 +26,9 @@
 
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/details/ShellUtils.hpp>
+#include <algorithm>
+#include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <cerrno>
@@ -33,8 +36,6 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <algorithm>
-#include <iostream>
 
 #ifdef __APPLE__
  #include <crt_externs.h>
@@ -137,6 +138,7 @@ static int input_timeout(int fd, unsigned int microseconds)
 class Spawn::Pimpl
 {
 public:
+    ContextPtr m_context;
     pid_t m_pid;
     unsigned int m_waitchildtimeout;
     int m_pipeout[2];
@@ -146,10 +148,21 @@ public:
     std::string m_msg;
     std::string m_command;
 
-    Pimpl(unsigned int waitchildtimeout)
-        : m_pid(-1), m_waitchildtimeout(waitchildtimeout / 1000.0),
-          m_status(0), m_finish(false)
+    Pimpl(ContextPtr ctx, unsigned int waitchildtimeout)
+        : m_context(ctx)
+        , m_pid(-1)
+        , m_waitchildtimeout(waitchildtimeout / 1000.0)
+        , m_status(0)
+        , m_finish(false)
     {
+    }
+
+    void init(unsigned int waitchildtimeout)
+    {
+        m_pid = -1;
+        m_waitchildtimeout = waitchildtimeout / 1000.0;
+        m_status = 0;
+        m_finish = false;
     }
 
     ~Pimpl()
@@ -353,26 +366,27 @@ public:
     }
 };
 
-Spawn::Spawn()
-    : m_pimpl(nullptr)
+Spawn::Spawn(ContextPtr ctx)
+    : m_pimpl(std::make_unique<Spawn::Pimpl>(ctx, 50000u))
 {
 }
 
-Spawn::~Spawn()
-{
-    delete m_pimpl;
-}
+Spawn::~Spawn() = default;
 
 bool Spawn::start(const std::string& exe,
                   const std::string& workingdir,
                   const std::vector < std::string > &args,
                   unsigned int waitchildtimeout)
 {
-    if (m_pimpl) {
-        delete m_pimpl;
+    if (not m_pimpl->m_finish) {
+        m_pimpl->wait();
+        ::close(m_pimpl->m_pipeout[1]);
+        ::close(m_pimpl->m_pipeerr[1]);
+        ::close(m_pimpl->m_pipeout[0]);
+        ::close(m_pimpl->m_pipeerr[0]);
     }
 
-    m_pimpl = new Spawn::Pimpl(waitchildtimeout);
+    m_pimpl->init(waitchildtimeout);
 
     return m_pimpl->start(exe, workingdir, args);
 }
@@ -421,6 +435,24 @@ bool Spawn::status(std::string *msg, bool *success)
         return false;
 
     return m_pimpl->status(msg, success);
+}
+
+std::vector<std::string>
+Spawn::splitCommandLine(const std::string& command)
+{
+    std::vector<std::string> argv;
+    details::ShellUtils su;
+    int argcp;
+    su.g_shell_parse_argv(command, argcp, argv);
+
+    if (argv.empty())
+        throw utils::ArgError(
+            (fmt(_("Package command line: error, empty command `%1%'"))
+             % command).str());
+
+    argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
+
+    return argv;
 }
 
 }}

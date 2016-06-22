@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
@@ -83,7 +82,7 @@ public:
     std::string mPackage;
     std::string mLibrary;
 
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
     HMODULE mHandle;
 #else
     void *mHandle;
@@ -124,7 +123,7 @@ public:
         }
 
         if (mHandle) {
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
             FreeLibrary(mHandle);
 #else
             dlclose(mHandle);
@@ -267,7 +266,7 @@ public:
     {
         assert(not mHandle);
 
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
         HMODULE handle = ::LoadLibrary(mPath.c_str());
 #else
         void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
@@ -276,7 +275,7 @@ public:
         TraceModel(_("ModuleManager: load %p:%s"), handle, mPath.c_str());
         if (not handle) {
             std::string extra;
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
             DWORD errorcode = ::GetLastError();
             LPVOID msg;
 
@@ -322,7 +321,7 @@ public:
                       "This module seems to be too old.")) % mPath).str());
         }
 
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
         fct = (versionFunction)symbol;
 #else
         fct = utils::functionCast < versionFunction >(symbol);
@@ -353,7 +352,7 @@ public:
      */
     void *getSymbol(const char *symbol)
     {
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
         return (void*)::GetProcAddress(mHandle, symbol);
 #else
         return ::dlsym(mHandle, symbol);
@@ -385,7 +384,7 @@ public:
             return it->second;
         } else {
             void *result = nullptr;
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
             FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
             result = (void*)ptr;
 #else
@@ -461,7 +460,8 @@ public:
         }
     };
 
-    Pimpl()
+    Pimpl(ContextPtr ctx)
+        : mContext(ctx)
     {
     }
 
@@ -573,7 +573,7 @@ public:
     {
         if (not path.is_directory())
             return;
-        
+
         FSdirectory_iterator it(path), end;
         for (; it != end; ++it) {
             if (it->is_file()) {
@@ -586,6 +586,47 @@ public:
         }
     }
 
+    std::string buildModuleFilename(const std::string& package,
+                                    const std::string& library,
+                                    ModuleType type)
+    {
+        FSpath current;
+        vle::utils::Package pkg(mContext, package);
+
+        switch (type) {
+        case MODULE_DYNAMICS:
+        case MODULE_DYNAMICS_EXECUTIVE:
+        case MODULE_DYNAMICS_WRAPPER:
+            current = pkg.getPluginSimulatorDir(PKG_BINARY);
+            break;
+        case MODULE_OOV:
+            current = pkg.getPluginOutputDir(PKG_BINARY);
+            break;
+        case MODULE_GVLE_GLOBAL:
+            current = pkg.getPluginGvleGlobalDir(PKG_BINARY);
+            break;
+        case MODULE_GVLE_MODELING:
+            current = pkg.getPluginGvleModelingDir(PKG_BINARY);
+            break;
+        case MODULE_GVLE_OUTPUT:
+            current = pkg.getPluginGvleOutputDir(PKG_BINARY);
+            break;
+        default:
+            throw utils::InternalError();
+        }
+
+#ifdef _WIN32
+        std::string filename = "lib" + library + ".dll";
+#else
+        std::string filename = "lib" + library + ".so";
+#endif
+
+        current /= filename;
+
+        return current.string();
+    }
+
+    ContextPtr mContext;
     ModuleTable mTableSimulator;
     ModuleTable mTableOov;
     ModuleTable mTableGvleGlobal;
@@ -594,10 +635,8 @@ public:
     pimpl::SymbolTable mTableSymbols;
 };
 
-ModuleManager::ModuleManager()
-    : mPimpl(
-        std::unique_ptr<ModuleManager::Pimpl>(
-            new ModuleManager::Pimpl()))
+ModuleManager::ModuleManager(ContextPtr ctx)
+    : mPimpl(std::make_unique<ModuleManager::Pimpl>(ctx))
 {
 }
 
@@ -626,7 +665,7 @@ void *ModuleManager::get(const std::string& symbol) const
 
 void ModuleManager::browse()
 {
-    FSpath packages = utils::Path::path().getBinaryPackagesDir();
+    FSpath packages = mPimpl->mContext->getBinaryPackagesDir();
 
     FSpath pathsim = "plugins/simulator";
     FSpath pathoov = "plugins/output";
@@ -672,7 +711,7 @@ void ModuleManager::browse()
 
 void ModuleManager::browse(ModuleType type)
 {
-    FSpath packages = utils::Path::path().getBinaryPackagesDir();
+    FSpath packages = mPimpl->mContext->getBinaryPackagesDir();
 
     FSpath pathtype;
 
@@ -712,7 +751,7 @@ void ModuleManager::browse(ModuleType type)
 
 void ModuleManager::browse(const std::string& package)
 {
-    FSpath pkg = utils::Path::path().getBinaryPackagesDir();
+    FSpath pkg = mPimpl->mContext->getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 
@@ -750,7 +789,7 @@ void ModuleManager::browse(const std::string& package)
 
 void ModuleManager::browse(const std::string& package, ModuleType type)
 {
-    FSpath pkg = utils::Path::path().getBinaryPackagesDir();
+    FSpath pkg = mPimpl->mContext->getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 
@@ -918,46 +957,6 @@ void ModuleManager::fill(const std::string& package, ModuleType type,
                     ModuleManager::Pimpl::ModuleConvert());
         break;
     }
-}
-
-std::string ModuleManager::buildModuleFilename(const std::string& package,
-                                               const std::string& library,
-                                               ModuleType type)
-{
-    FSpath current;
-    vle::utils::Package pkg(package);
-
-    switch (type) {
-        case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_EXECUTIVE:
-        case MODULE_DYNAMICS_WRAPPER:
-            current = pkg.getPluginSimulatorDir(PKG_BINARY);
-            break;
-        case MODULE_OOV:
-            current = pkg.getPluginOutputDir(PKG_BINARY);
-            break;
-        case MODULE_GVLE_GLOBAL:
-            current = pkg.getPluginGvleGlobalDir(PKG_BINARY);
-            break;
-        case MODULE_GVLE_MODELING:
-            current = pkg.getPluginGvleModelingDir(PKG_BINARY);
-            break;
-        case MODULE_GVLE_OUTPUT:
-            current = pkg.getPluginGvleOutputDir(PKG_BINARY);
-            break;
-        default:
-            throw utils::InternalError();
-    }
-
-#ifdef BOOST_WINDOWS
-    std::string filename = "lib" + library + ".dll";
-#else
-    std::string filename = "lib" + library + ".so";
-#endif
-
-    current /= filename;
-
-    return current.string();
 }
 
 }} // namespace vle utils

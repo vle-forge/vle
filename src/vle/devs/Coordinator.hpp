@@ -29,6 +29,7 @@
 #define VLE_DEVS_COORDINATOR_HPP 1
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Scheduler.hpp>
 #include <vle/devs/View.hpp>
@@ -51,7 +52,8 @@ typedef std::map < vpz::AtomicModel*, devs::Simulator* > SimulatorMap;
 class VLE_LOCAL Coordinator
 {
 public:
-    Coordinator(const utils::ModuleManager& modulemgr,
+    Coordinator(utils::ContextPtr context,
+                const utils::ModuleManager& modulemgr,
                 const vpz::Dynamics& dyn,
                 const vpz::Classes& cls,
                 const vpz::Experiment& experiment,
@@ -271,7 +273,7 @@ public:
      * Retrives access to all event (output, internal, external, ...) \e
      * Views.
      *
-     * @return A constatn 
+     * @return A constatn
      */
     const std::map<std::string, View>& getEventViewList() const;
 
@@ -279,6 +281,7 @@ private:
     Coordinator(const Coordinator& other);
     Coordinator& operator=(const Coordinator& other);
 
+    utils::ContextPtr           m_context;
     Time                        m_currentTime;
     Time                        m_durationTime;
     SimulatorMap                m_modelList;

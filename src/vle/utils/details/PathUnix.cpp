@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -27,7 +27,7 @@
 
 #include <list>
 #include <fstream>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/version.hpp>
 #include <boost/format.hpp>
@@ -35,7 +35,7 @@
 
 namespace vle { namespace utils {
 
-FSpath Path::findProgram(const std::string& exe)
+FSpath Context::findProgram(const std::string& exe)
 {
     char* env_p = std::getenv("PATH");
 
@@ -55,7 +55,7 @@ FSpath Path::findProgram(const std::string& exe)
     return {};
 }
 
-void Path::initHomeDir()
+void Context::initHomeDir()
 {
     m_home.clear();
 
@@ -78,43 +78,9 @@ void Path::initHomeDir()
     }
 }
 
-void Path::initPrefixDir()
-{   
+void Context::initPrefixDir()
+{
     m_prefix = VLE_PREFIX_DIR;
 }
-
-// std::string Path::getTempFile(const std::string& prefix,
-//                               std::ofstream* file)
-// {
-//     std::string result;
-
-//     if (file and not file->is_open()) {
-//         result = prefix + "XXXXXX";
-
-//         result =  utils::Path::buildFilename(
-//                 boost::filesystem::temp_directory_path(ec).string(),
-//                 result);
-
-//         auto buffer = new char[result.size()];
-//         std::strncpy(buffer, result.c_str(), result.size());
-
-//         int fd = ::mkstemp(buffer);
-//         if (fd != -1) {
-//             file->open(buffer, std::ios_base::trunc | std::ios_base::out |
-//                        std::ios_base::binary);
-//             close(fd);
-
-//             if (file->is_open()) {
-//                 result.assign(buffer, result.size());
-//             } else {
-//                 result.clear();
-//             }
-//         }
-
-//         delete[] buffer;
-//     }
-
-//     return result;
-// }
 
 }} // namespace vle utils

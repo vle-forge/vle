@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -51,7 +51,7 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Tools.hpp>
@@ -64,7 +64,7 @@ using namespace vle;
 
 struct F
 {
-    std::unique_ptr<vle::Init> a;
+    vle::Init a;
     vle::utils::FSpath current_path;
 
     F()
@@ -89,8 +89,8 @@ struct F
 
         std::cout << "test start in " << current_path.string() << '\n';
 
-        a = std::unique_ptr<vle::Init>(new vle::Init());
-        vle::utils::Preferences prefs(false, "vle.conf");
+        auto ctx = vle::utils::make_context();
+        vle::utils::Preferences prefs(false, ctx->getConfigurationFile());
     }
 
     ~F()
@@ -103,11 +103,11 @@ BOOST_GLOBAL_FIXTURE(F);
 
 BOOST_AUTO_TEST_CASE(show_package)
 {
-    using vle::utils::Path;
+    auto ctx = vle::utils::make_context();
     using vle::utils::PathList;
     using vle::utils::Package;
 
-    Package pkg("show_package");
+    Package pkg(ctx, "show_package");
     pkg.create();
     pkg.wait(std::cerr, std::cerr);
     pkg.configure();
@@ -120,18 +120,15 @@ BOOST_AUTO_TEST_CASE(show_package)
     /* We need to ensure each file really installed. */
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    BOOST_REQUIRE_EQUAL(static_cast<PathList::size_type>(0),
-                        Path::path().getSimulatorDirs().size());
-
     std::cout << "getBinaryPackagesDir: "
-              << Path::path().getBinaryPackagesDir().string()
+              << ctx->getBinaryPackagesDir().string()
               << "\ngetBinaryPackages   : ";
 
-    auto lst = Path::path().getBinaryPackages();
+    auto lst = ctx->getBinaryPackages();
     for (const auto& elem : lst)
         std::cout << elem << ' ';
 
-    BOOST_REQUIRE(Path::path().getBinaryPackages().size() == 1);
+    BOOST_REQUIRE(ctx->getBinaryPackages().size() == 1);
     vle::utils::FSpath p = pkg.getExpDir(vle::utils::PKG_BINARY);
 
     std::cout << "\ngetExpDir           : " << p.string()
@@ -140,13 +137,14 @@ BOOST_AUTO_TEST_CASE(show_package)
 
     for (const auto& elem : vpz)
         std::cout << elem.string() << ' ';
-    
+
     BOOST_REQUIRE(vpz.size() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
 {
-    utils::Package pkg_tmp("remote_package_check_package_tmp");
+    auto ctx = vle::utils::make_context();
+    utils::Package pkg_tmp(ctx, "remote_package_check_package_tmp");
     pkg_tmp.create();
     pkg_tmp.wait(std::cerr, std::cerr);
     pkg_tmp.configure();
@@ -159,7 +157,7 @@ BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
     /* We need to ensure each file really installed. */
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    utils::RemoteManager rmt;
+    utils::RemoteManager rmt(ctx);
     utils::Packages results;
 
     {
@@ -189,6 +187,7 @@ BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
 
 BOOST_AUTO_TEST_CASE(remote_package_local_remote)
 {
+    auto ctx = vle::utils::make_context();
     utils::PackageId pkg;
 
     pkg.size = 0;
@@ -222,7 +221,7 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
     pkg.minor = 2;
     pkg.patch = 3;
 
-    vle::utils::FSpath path = utils::RemoteManager::getRemotePackageFilename();
+    vle::utils::FSpath path = ctx->getRemotePackageFilename();
 
     {
         std::ofstream ofs(path.string());
@@ -234,7 +233,7 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
     /* We need to ensure each file really installed. */
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    utils::RemoteManager rmt;
+    utils::RemoteManager rmt(ctx);
 
     {
         utils::Packages results;
@@ -259,12 +258,11 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
 
 BOOST_AUTO_TEST_CASE(remote_package_read_write)
 {
-    using namespace boost::assign;
+    auto ctx = vle::utils::make_context();
 
     {
         std::ofstream OX("/tmp/X.dat");
-        std::ofstream ofs(
-            utils::RemoteManager::getRemotePackageFilename().c_str());
+        std::ofstream ofs(ctx->getRemotePackageFilename().string());
 
         for (int i = 0; i < 10; ++i) {
             utils::PackageId pkg;
@@ -276,7 +274,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
             pkg.description = "too good";
             pkg.url = "http://www.vle-project.org";
             pkg.md5sum = "1234567890987654321";
-            pkg.tags += "a", "b", "c";
+            pkg.tags = { "a", "b", "c" };
 
             {
                 utils::PackageLinkId dep = { "a", 1, 1, 1,
@@ -309,7 +307,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     {
-        utils::RemoteManager rmt;
+        utils::RemoteManager rmt(ctx);
         rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
 
@@ -321,7 +319,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
     }
 
     {
-        utils::RemoteManager rmt;
+        utils::RemoteManager rmt(ctx);
         rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
 
@@ -333,7 +331,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
     }
 
     {
-        utils::RemoteManager rmt;
+        utils::RemoteManager rmt(ctx);
         rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
 
@@ -344,7 +342,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         BOOST_REQUIRE_EQUAL(results.size(), 10u);
     }
 
-    vle::utils::RemoteManager rmt;
+    vle::utils::RemoteManager rmt(ctx);
 
     std::ostringstream output;
     rmt.start(vle::utils::REMOTE_MANAGER_SHOW, "name-8", &output);
@@ -410,12 +408,13 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
 
 BOOST_AUTO_TEST_CASE(test_compress_filepath)
 {
+    auto ctx = vle::utils::make_context();
     std::string filepath;
     std::string uniquepath;
 
     try {
-        utils::FSpath unique = utils::FSpath::unique_path("%%%%-%%%%-%%%%-%%%%");
-        vle::utils::Package pkg(unique.string());
+        utils::FSpath unique = utils::FSpath::unique_path("copy-template");
+        vle::utils::Package pkg(ctx, unique.string());
         pkg.create();
         pkg.wait(std::cerr, std::cerr);
         pkg.configure();
@@ -434,13 +433,13 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
 
     BOOST_REQUIRE(not filepath.empty());
 
+    utils::RemoteManager rmt(ctx);
     utils::FSpath tarfile(utils::FSpath::temp_directory_path());
     tarfile /= "check.tar.bz2";
 
-    utils::FSpath::current_path(vle::utils::Path::path().getBinaryPackagesDir());
+    // utils::FSpath::current_path(ctx->getBinaryPackagesDir());
 
-    BOOST_REQUIRE_NO_THROW(utils::Path::path().compress(uniquepath,
-                                                        tarfile.string()));
+    BOOST_REQUIRE_NO_THROW(rmt.compress(uniquepath, tarfile.string()));
 
     utils::FSpath t { tarfile };
     BOOST_REQUIRE(t.exists());
@@ -449,11 +448,10 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
     tmpfile /= "unique";
 
     tmpfile.create_directory();
-    
+
     utils::FSpath::current_path(tmpfile);
 
-    BOOST_REQUIRE_NO_THROW(utils::Path::path().decompress(tarfile.string(),
-                                                          tmpfile.string()));
+    BOOST_REQUIRE_NO_THROW(rmt.decompress(tarfile.string(), tmpfile.string()));
     utils::FSpath t2 { tmpfile };
     BOOST_REQUIRE(t2.exists());
 

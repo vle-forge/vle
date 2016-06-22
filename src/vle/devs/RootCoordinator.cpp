@@ -31,38 +31,37 @@
 
 namespace vle { namespace devs {
 
-RootCoordinator::RootCoordinator(const utils::ModuleManager& modulemgr)
-    : m_rand(0), m_begin(0), m_currentTime(0), m_end(1.0),
-      m_coordinator(nullptr), m_root(nullptr), m_modulemgr(modulemgr)
+RootCoordinator::RootCoordinator(utils::ContextPtr context,
+                                 const utils::ModuleManager& modulemgr)
+    : m_context(context)
+    , m_rand(0)
+    , m_begin(0)
+    , m_currentTime(0)
+    , m_end(1.0)
+    , m_coordinator(nullptr)
+    , m_root(nullptr)
+    , m_modulemgr(modulemgr)
 {
 }
 
-RootCoordinator::~RootCoordinator()
-{
-    delete m_coordinator;
-    delete m_root;
-}
+RootCoordinator::~RootCoordinator() = default;
 
 void RootCoordinator::load(const vpz::Vpz& io)
 {
-    if (m_coordinator) {
-        delete m_coordinator;
-        delete m_root;
-    }
-
     m_begin = io.project().experiment().begin();
     m_end = m_begin + io.project().experiment().duration();
     m_currentTime = m_begin;
 
-    m_coordinator = new Coordinator(m_modulemgr,
-                                    io.project().dynamics(),
-                                    io.project().classes(),
-                                    io.project().experiment(),
-                                    *this);
+    m_coordinator = std::make_unique<Coordinator>(m_context,
+                                                  m_modulemgr,
+                                                  io.project().dynamics(),
+                                                  io.project().classes(),
+                                                  io.project().experiment(),
+                                                  *this);
 
     m_coordinator->init(io.project().model(), m_currentTime, m_end);
 
-    m_root = io.project().model().model();
+    m_root.reset(io.project().model().model());
 }
 
 void RootCoordinator::init()
@@ -74,13 +73,14 @@ bool RootCoordinator::run()
 {
     m_currentTime = m_coordinator->getCurrentTime();
 
-    if (isInfinity(m_currentTime)) {
+    if (isInfinity(m_currentTime))
         return false;
-    } else if ((m_end - m_currentTime) < 0) {
+
+    if ((m_end - m_currentTime) < 0)
         return false;
-    }
 
     m_coordinator->run();
+
     return true;
 }
 
@@ -89,17 +89,17 @@ void RootCoordinator::finish()
     if (m_coordinator) {
         m_coordinator->finish();
 
-        m_result.reset(nullptr);       
+        m_result.reset(nullptr);
         m_result = m_coordinator->getMatrix();
 
-        delete m_coordinator;
-        m_coordinator = nullptr;
+        // delete m_coordinator;
+        // m_coordinator = nullptr;
     }
 
-    if (m_root) {
-        delete m_root;
-        m_root = nullptr;
-    }
+    // if (m_root) {
+    //     delete m_root;
+    //     m_root = nullptr;
+    // }
 }
 
 std::unique_ptr<value::Map> RootCoordinator::outputs()

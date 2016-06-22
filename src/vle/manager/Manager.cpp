@@ -64,12 +64,14 @@ static void setExperimentName(const std::unique_ptr<vpz::Vpz>& destination,
 class Manager::Pimpl
 {
 public:
-    Pimpl(LogOptions            logoptions,
+    Pimpl(utils::ContextPtr     context,
+          LogOptions            logoptions,
           SimulationOptions     simulationoptions,
           std::ostream         *output)
-        : mLogOption(logoptions),
-          mSimulationOption(simulationoptions),
-          mOutputStream(output)
+        : mContext(context)
+        , mLogOption(logoptions)
+        , mSimulationOption(simulationoptions)
+        , mOutputStream(output)
     {
     }
 
@@ -104,6 +106,7 @@ public:
      */
     struct worker
     {
+        utils::ContextPtr     context;
         const std::unique_ptr<vpz::Vpz>& vpz;
         ExperimentGenerator  &expgen;
         utils::ModuleManager &modulemgr;
@@ -114,7 +117,8 @@ public:
         value::Matrix        *result;
         Error                *error;
 
-        worker(const std::unique_ptr<vpz::Vpz>&  vpz,
+        worker(utils::ContextPtr                 context,
+               const std::unique_ptr<vpz::Vpz>&  vpz,
                ExperimentGenerator&              expgen,
                utils::ModuleManager&             modulemgr,
                LogOptions                        logoptions,
@@ -123,7 +127,7 @@ public:
                uint32_t                          threads,
                value::Matrix                    *result,
                Error                            *error)
-            : vpz(vpz), expgen(expgen), modulemgr(modulemgr),
+        : context(context), vpz(vpz), expgen(expgen), modulemgr(modulemgr),
               mLogOption(logoptions), mSimulationOption(simulationoptions),
               index(index), threads(threads), result(result), error(error)
         {
@@ -139,7 +143,7 @@ public:
 
             for (uint32_t i = expgen.min() + index; i < expgen.max();
                  i += threads) {
-                Simulation sim(mLogOption, mSimulationOption, nullptr);
+                Simulation sim(context, mLogOption, mSimulationOption, nullptr);
                 Error err;
 
                 auto file =
@@ -183,7 +187,7 @@ public:
         std::vector<std::thread> gp;
         for (uint32_t i = 0; i < threads; ++i)
             gp.emplace_back(
-                worker(vpz, expgen, modulemgr,
+                worker(mContext, vpz, expgen, modulemgr,
                        mLogOption, mSimulationOption,
                        i, threads, result.get(), error));
 
@@ -203,7 +207,7 @@ public:
                    uint32_t              world,
                    Error                *error)
     {
-        Simulation sim(mLogOption, mSimulationOption, nullptr);
+        Simulation sim(mContext, mLogOption, mSimulationOption, nullptr);
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
         std::unique_ptr<value::Matrix> result;
@@ -262,6 +266,7 @@ public:
         return result;
     }
 
+    utils::ContextPtr     mContext;
     LogOptions            mLogOption;
     SimulationOptions     mSimulationOption;
     std::ostream         *mOutputStream;
@@ -269,18 +274,16 @@ public:
     uint32_t              mduration;
 };
 
-Manager::Manager(LogOptions            logoptions,
+Manager::Manager(utils::ContextPtr     context,
+                 LogOptions            logoptions,
                  SimulationOptions     simulationoptions,
                  std::ostream         *output)
-    : mPimpl(
-        std::unique_ptr<Manager::Pimpl>(
-            new Manager::Pimpl(logoptions, simulationoptions, output)))
+    : mPimpl(std::make_unique<Manager::Pimpl>(context, logoptions,
+                                              simulationoptions, output))
 {
 }
 
-Manager::~Manager()
-{
-}
+Manager::~Manager() = default;
 
 std::unique_ptr<value::Matrix>
 Manager::run(std::unique_ptr<vpz::Vpz>  exp,

@@ -26,7 +26,7 @@
 
 
 #include <vle/utils/Preferences.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
@@ -90,7 +90,7 @@ struct Preferences::Pimpl
 
     bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
 
-    Pimpl(bool readOnly, std::string filename)
+    Pimpl(bool readOnly, const FSpath& filepath)
         : ppMap{
         { "gvle.packages.auto-build", true },
         { "gvle.editor.auto-indent", true },
@@ -125,7 +125,7 @@ struct Preferences::Pimpl
         { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET) },
         { "vle.command.dir.copy", std::string(VLE_COMMAND_DIR_COPY) },
         { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE) }}
-        , mFilename(std::move(filename))
+        , mFilename(filepath.string())
         , mreadOnly(readOnly)
     {
         std::ifstream ifs(mFilename);
@@ -215,17 +215,13 @@ struct Preferences::Pimpl
     }
 };
 
-Preferences::Preferences(const std::string& file)
-    : mPimpl(new Preferences::Pimpl(
-                 false,
-                 utils::Path::path().getHomeFile(file).string()))
+Preferences::Preferences(const FSpath& filepath)
+    : mPimpl(std::make_unique<Preferences::Pimpl>(false, filepath))
 {
 }
 
-Preferences::Preferences(bool readOnly, const std::string& file)
-    : mPimpl(new Preferences::Pimpl(
-                 readOnly,
-                 utils::Path::path().getHomeFile(file).string()))
+Preferences::Preferences(bool readOnly, const FSpath& filepath)
+    : mPimpl(std::make_unique<Preferences::Pimpl>(readOnly, filepath))
 {
 }
 

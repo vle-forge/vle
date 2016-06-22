@@ -33,6 +33,7 @@
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/DynamicsObserver.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
+#include <vle/devs/DynamicsInit.hpp>
 #include <vle/devs/Executive.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
@@ -43,13 +44,15 @@
 
 namespace vle { namespace devs {
 
-ModelFactory::ModelFactory(const utils::ModuleManager& modulemgr,
+ModelFactory::ModelFactory(utils::ContextPtr context,
+                           const utils::ModuleManager& modulemgr,
                            std::map<std::string, View>& eventviews,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
                            RootCoordinator& root)
-    : mModuleMgr(modulemgr)
+    : mContext(context)
+    , mModuleMgr(modulemgr)
     , mEventViews(eventviews)
     , mDynamics(dyn)
     , mClasses(cls)
@@ -164,7 +167,8 @@ vpz::BaseModel* ModelFactory::createModelFromClass(Coordinator& coordinator,
 }
 
 std::unique_ptr<Dynamics>
-buildNewDynamicsWrapper(devs::Simulator* atom,
+buildNewDynamicsWrapper(utils::ContextPtr context,
+                        devs::Simulator* atom,
                         const vpz::Dynamic& dyn,
                         const InitEventList& events,
                         void* symbol)
@@ -177,10 +181,10 @@ buildNewDynamicsWrapper(devs::Simulator* atom,
         utils::PackageTable pkg_table;
 
         return std::unique_ptr<Dynamics>(
-            fct(DynamicsWrapperInit(
-                    *atom->getStructure(),
-                    pkg_table.get(dyn.package()),
-                    dyn.library()), events));
+            fct(
+                DynamicsWrapperInit{
+                    dyn.library(), context, *atom->getStructure(),
+                        pkg_table.get(dyn.package())}, events));
     } catch(const std::exception& e) {
         throw utils::ModellingError(
             (fmt(_("Atomic model wrapper `%1%:%2%' (from dynamics `%3%'"
@@ -238,7 +242,7 @@ void assignEventView(
             auto& vv = views.at(viewname);
     // for (auto& viewpair : views) {
     //     if (not viewpair.second.exist(dynamics.get(), observable)) {
-            
+
             // const auto &v = vpzviews.get(viewpair.first);
             if (v.type() & vpz::View::OUTPUT)
                 dynamics->ppOutput.emplace_back(&vv, elem.first);
@@ -259,6 +263,7 @@ void assignEventView(
 }
 
 std::unique_ptr<Dynamics> buildNewDynamics(
+    utils::ContextPtr context,
     std::map<std::string, View>& views,
     const vpz::Views& vpzviews,
     const std::string& observable,
@@ -274,7 +279,7 @@ std::unique_ptr<Dynamics> buildNewDynamics(
     try {
         utils::PackageTable pkg_table;
 
-        DynamicsInit init(*atom->getStructure(), pkg_table.get(dyn.package()));
+        DynamicsInit init{context, *atom->getStructure(), pkg_table.get(dyn.package())};
         auto dynamics = std::unique_ptr<Dynamics>(fct(init, events));
 
         if (haveEventView(vpzviews, observable)) {
@@ -311,6 +316,7 @@ std::unique_ptr<Dynamics> buildNewDynamics(
 }
 
 std::unique_ptr<Dynamics> buildNewExecutive(
+    utils::ContextPtr context,
     std::map<std::string, View>& views,
     const vpz::Views& vpzviews,
     const std::string& observable,
@@ -327,10 +333,14 @@ std::unique_ptr<Dynamics> buildNewExecutive(
     try {
         utils::PackageTable pkg_table;
 
-        ExecutiveInit executiveinit(*atom->getStructure(),
-                                    pkg_table.get(dyn.package()),
-                                    coordinator);
-        DynamicsInit init(*atom->getStructure(), pkg_table.get(dyn.package()));
+        ExecutiveInit executiveinit {
+            coordinator, context, *atom->getStructure(), pkg_table.get(dyn.package())
+                };
+
+        DynamicsInit init {
+            context, *atom->getStructure(), pkg_table.get(dyn.package())
+                };
+
         auto executive = std::unique_ptr<Dynamics>(fct(executiveinit, events));
 
         if (haveEventView(vpzviews, observable)) {
@@ -407,14 +417,14 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
 
     switch (type) {
     case utils::MODULE_DYNAMICS:
-        return buildNewDynamics(mEventViews, mExperiment.views(),
+        return buildNewDynamics(mContext, mEventViews, mExperiment.views(),
                                 observable, atom, dyn, events, symbol);
     case utils::MODULE_DYNAMICS_EXECUTIVE:
-        return buildNewExecutive(mEventViews, mExperiment.views(),
+        return buildNewExecutive(mContext, mEventViews, mExperiment.views(),
                                  observable, coordinator, atom,
                                  dyn, events, symbol);
     case utils::MODULE_DYNAMICS_WRAPPER:
-        return buildNewDynamicsWrapper(atom, dyn, events, symbol);
+        return buildNewDynamicsWrapper(mContext, atom, dyn, events, symbol);
     default:
         throw utils::ModellingError();
     }

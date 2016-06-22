@@ -25,18 +25,15 @@
  */
 
 
+#include <vle/utils/Trace.hpp>
+#include <vle/utils/i18n.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <locale>
-#include <vle/utils/Trace.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/utils/DateTime.hpp>
-#include <vle/utils/Filesystem.hpp>
 #include <mutex>
 #include <cstdio>
 #include <cstdarg>
-
 
 namespace vle { namespace utils {
 
@@ -78,10 +75,13 @@ public:
         } else {
             cleanup__();
 
+            auto end = std::chrono::system_clock::now();
+            auto end_time = std::chrono::system_clock::to_time_t(end);
+
             mFilename.assign(filename);
             mStream = tmp;
-            (*mStream) << _("Start log at ") <<
-                utils::DateTime::currentDate() << "\n\n" << std::flush;
+            (*mStream) << _("Start log at ") << std::ctime(&end_time)
+                << std::flush;
             mType = TRACE_STREAM_FILE;
         }
     }
@@ -202,17 +202,16 @@ private:
 };
 
 Trace::Trace()
-    : ppImpl(new Trace::Pimpl())
+    : ppImpl(std::make_unique<Trace::Pimpl>())
 {
 }
 
 Trace::~Trace() noexcept = default;
 
-std::string Trace::getLogFile()
+Trace& Trace::instance()
 {
-    std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
-
-    return instance().ppImpl->getLogFile();
+    static Trace t;
+    return t;
 }
 
 void Trace::setLogFile(const std::string& filename)
@@ -267,19 +266,6 @@ void Trace::send(TraceLevelOptions level, const char *format, ...)
     std::lock_guard<std::mutex> lock(instance().ppImpl->getMutex());
 
     instance().ppImpl->send(ret, level);
-}
-
-std::string Trace::getDefaultLogFilename()
-{
-    return getLogFilename("vle.log");
-}
-
-std::string Trace::getLogFilename(const std::string& filename)
-{
-    FSpath p(utils::Path::path().getHomeDir());
-    p /= filename;
-
-    return p.string();
 }
 
 TraceStreamType Trace::getType()

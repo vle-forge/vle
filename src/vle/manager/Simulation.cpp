@@ -41,21 +41,24 @@ namespace vle { namespace manager {
 class Simulation::Pimpl
 {
 public:
+    utils::ContextPtr  m_context;
     std::ostream      *m_out;
     LogOptions         m_logoptions;
     SimulationOptions  m_simulationoptions;
 
-    Pimpl(LogOptions         logoptions,
+    Pimpl(utils::ContextPtr  context,
+          LogOptions         logoptions,
           SimulationOptions  simulationoptionts,
           std::ostream      *output)
-        : m_out(output),
-          m_logoptions(logoptions),
-          m_simulationoptions(simulationoptionts)
+        : m_context(context)
+        , m_out(output)
+        , m_logoptions(logoptions)
+        , m_simulationoptions(simulationoptionts)
     {
         if (m_simulationoptions & manager::SIMULATION_SPAWN_PROCESS)
             TraceAlways(
                 _("Simulation: SIMULATION_SPAWN_PROCESS is not yet"
-                    " implemented"));
+                  " implemented"));
     }
 
     template <typename T>
@@ -79,7 +82,7 @@ public:
         boost::timer  timer;
 
         try {
-            devs::RootCoordinator root(modulemgr);
+            devs::RootCoordinator root(m_context, modulemgr);
 
             const double duration = vpz->project().experiment().duration();
             const double begin    = vpz->project().experiment().begin();
@@ -144,7 +147,7 @@ public:
         boost::timer  timer;
 
         try {
-            devs::RootCoordinator root(modulemgr);
+            devs::RootCoordinator root(m_context, modulemgr);
 
             write(fmt(_("[%1%]\n")) % vpz->filename());
             write(_(" - Coordinator load models ......: "));
@@ -195,7 +198,7 @@ public:
         std::unique_ptr<value::Map> result;
 
         try {
-            devs::RootCoordinator root(modulemgr);
+            devs::RootCoordinator root(m_context, modulemgr);
             root.load(*vpz);
             vpz->clear();
             vpz.reset(nullptr);
@@ -217,18 +220,16 @@ public:
     }
 };
 
-Simulation::Simulation(LogOptions         logoptions,
+Simulation::Simulation(utils::ContextPtr  context,
+                       LogOptions         logoptions,
                        SimulationOptions  simulationoptionts,
                        std::ostream      *output)
-    : mPimpl(
-        std::unique_ptr<Simulation::Pimpl>(
-            new Simulation::Pimpl(logoptions, simulationoptionts, output)))
+    : mPimpl(std::make_unique<Simulation::Pimpl>(context, logoptions,
+                                                 simulationoptionts, output))
 {
 }
 
-Simulation::~Simulation()
-{
-}
+Simulation::~Simulation() = default;
 
 std::unique_ptr<value::Map>
 Simulation::run(std::unique_ptr<vpz::Vpz>  vpz,

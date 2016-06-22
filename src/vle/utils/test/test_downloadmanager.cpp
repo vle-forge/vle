@@ -32,7 +32,7 @@
 #include <boost/version.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Preferences.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/vle.hpp>
 #include <memory>
@@ -52,7 +52,8 @@ struct F
 
 BOOST_FIXTURE_TEST_CASE(download_dtd, F)
 {
-    vle::utils::DownloadManager dm;
+    auto ctx = vle::utils::make_context();
+    vle::utils::DownloadManager dm(ctx);
 
     vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
     p /= "vle-1.1.0.dtd";
@@ -70,7 +71,8 @@ BOOST_FIXTURE_TEST_CASE(download_dtd, F)
 
 BOOST_FIXTURE_TEST_CASE(download_package, F)
 {
-    vle::utils::DownloadManager dm;
+    auto ctx = vle::utils::make_context();
+    vle::utils::DownloadManager dm(ctx);
 
     vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
     p /= "packages.pkg";
@@ -87,7 +89,8 @@ BOOST_FIXTURE_TEST_CASE(download_package, F)
 
 BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
 {
-    vle::utils::DownloadManager dm;
+    auto ctx = vle::utils::make_context();
+    vle::utils::DownloadManager dm(ctx);
 
     vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
     p /= "packages.pkg";

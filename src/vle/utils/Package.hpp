@@ -30,7 +30,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/PackageTable.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <string>
 
 namespace vle { namespace utils {
@@ -60,9 +60,13 @@ VLE_API std::ostream& operator<<(std::ostream& out,
 class VLE_API Package
 {
 public:
-    Package();
+    Package(ContextPtr context);
+    Package(ContextPtr context, const std::string& pkgname);
 
-    Package(const std::string& pkgname);
+    Package(const Package&) = delete;
+    Package& operator=(const Package&) = delete;
+    Package(const Package&&) = delete;
+    Package& operator=(const Package&&) = delete;
 
     ~Package();
 
@@ -150,7 +154,6 @@ public:
      * @return true if get is a success, false otherwise.
      */
     bool get(std::string *out, std::string *err);
-
 
     /**
      * Test if the specified package exists in the user directory.
@@ -322,15 +325,10 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const Package& pkg);
 
 private:
-    Package(const Package&);
-    Package& operator=(const Package&);
-
-
     PathList listLibraries(const std::string& path) const;
 
     struct Pimpl;
-    Pimpl *m_pimpl;
-
+    std::unique_ptr<Pimpl> m_pimpl;
 };
 
 VLE_API std::ostream& operator<<(std::ostream& out, const Package& pkg);

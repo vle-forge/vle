@@ -25,7 +25,7 @@
  */
 
 
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
@@ -83,9 +83,9 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     return false;
 }
 
-FSpath Path::findProgram(const std::string& exe)
+FSpath Context::findProgram(const std::string& exe)
 {
-    FSpath res = UtilsWin::convertPathTo83Path(Path::path().getPrefixDir());
+    FSpath res = UtilsWin::convertPathTo83Path(getPrefixDir());
     res /= "bin";
 
     if (exe == "cmake" or exe == "cmake.exe")
@@ -102,7 +102,7 @@ FSpath Path::findProgram(const std::string& exe)
     return res;
 }
 
-void Path::initHomeDir()
+void Context::initHomeDir()
 {
     m_home.clear();
 
@@ -129,7 +129,7 @@ void Path::initHomeDir()
     }
 }
 
-void Path::initPrefixDir()
+void Context::initPrefixDir()
 {
     {
         // Try to read prefix from win32 registry (first in

@@ -26,11 +26,19 @@
 
 
 #include <vle/devs/Executive.hpp>
+#include <vle/devs/DynamicsInit.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/Vpz.hpp>
 
 namespace vle { namespace devs {
+
+Executive::Executive(const ExecutiveInit& init,
+                     const InitEventList& events)
+    : Dynamics(DynamicsInit{init.context, init.model, init.packageid}, events)
+    , m_coordinator(init.coordinator)
+{
+}
 
 const vpz::Dynamics& Executive::dynamics() const
 {

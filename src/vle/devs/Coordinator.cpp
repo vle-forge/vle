@@ -73,13 +73,15 @@ depth(const std::unique_ptr<vle::devs::Dynamics>& mdl) noexcept
 
 namespace vle { namespace devs {
 
-Coordinator::Coordinator(const utils::ModuleManager& modulemgr,
+Coordinator::Coordinator(utils::ContextPtr context,
+                         const utils::ModuleManager& modulemgr,
                          const vpz::Dynamics& dyn,
                          const vpz::Classes& cls,
                          const vpz::Experiment& experiment,
                          RootCoordinator& root)
-    : m_currentTime(0.0)
-    , m_modelFactory(modulemgr, m_eventViewList, dyn, cls, experiment, root)
+    : m_context(context)
+    , m_currentTime(0.0)
+    , m_modelFactory(context, modulemgr, m_eventViewList, dyn, cls, experiment, root)
     , m_modulemgr(modulemgr)
     , m_isStarted(false)
 {
@@ -104,7 +106,7 @@ void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
     m_toDelete = 0;
     m_isStarted = true;
 
-    m_eventTable.init(current);   
+    m_eventTable.init(current);
 }
 
 void Coordinator::run()

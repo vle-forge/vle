@@ -27,8 +27,8 @@
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/details/UtilsWin.hpp>
+#include <vle/utils/details/ShellUtils.hpp>
 #include <vle/utils/i18n.hpp>
-#include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <string>
@@ -106,7 +106,7 @@ static void replaceEnvironmentVariable(Envp& envp,
  *
  * @return A list of string.
  */
-static Envp prepareEnvironmentVariable()
+static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
 {
     Envp envp;
     char* env_char = ::GetEnvironmentStrings();
@@ -137,7 +137,7 @@ static Envp prepareEnvironmentVariable()
     }
     ::FreeEnvironmentStrings(env_char);
 
-    FSpath prefix = UtilsWin::convertPathTo83Path(Path::path().getPrefixDir());
+    FSpath prefix = UtilsWin::convertPathTo83Path(ctx->getPrefixDir());
 
     {
         FSpath bin = prefix;
@@ -286,9 +286,9 @@ static char* build_command_line(const std::string& exe,
     return buf;
 }
 
-static char * prepare_environment_variable(void)
+static char * prepare_environment_variable(vle::utils::ContextPtr ctx)
 {
-    Envp envp = prepareEnvironmentVariable();
+    Envp envp = prepareEnvironmentVariable(ctx);
 
     std::string cmd;
     cmd.reserve(Spawn::default_buffer_size);
@@ -305,8 +305,9 @@ static char * prepare_environment_variable(void)
 
 struct Spawn::Pimpl
 {
-    HANDLE hOutputRead;
-    HANDLE hErrorRead;
+    ContextPtr m_context;
+    HANDLE     hOutputRead;
+    HANDLE     hErrorRead;
 
     PROCESS_INFORMATION m_pi;
     DWORD               m_status;
@@ -317,19 +318,37 @@ struct Spawn::Pimpl
     std::ofstream out__, err__;
 
 
-    Pimpl(unsigned int waitchildtimeout)
-    : hOutputRead(INVALID_HANDLE_VALUE),
-      hErrorRead(INVALID_HANDLE_VALUE),
-      m_status(0), m_waitchildtimeout(waitchildtimeout),
-      m_finish(false), out__("c:/out.txt"), err__("c:/err.txt")
+    Pimpl(ContextPtr ctx, unsigned int waitchildtimeout)
+        : m_context(ctx)
+        , hOutputRead(INVALID_HANDLE_VALUE)
+        , hErrorRead(INVALID_HANDLE_VALUE)
+        , m_status(0), m_waitchildtimeout(waitchildtimeout)
+        , m_finish(false)
     {
+        utils::FSpath tmp(utils::FSpath::temp_directory_path());
+
+        utils::FSpath file_out(tmp);
+        file_out /= "vlespawn-out.txt";
+        out__.open(file_out.string());
+
+        utils::FSpath file_err(tmp);
+        file_err /= "vlespawn-error.txt";
+        err__.open(file_err.string());
+    }
+
+    void init(unsigned int waitchildtimeout)
+    {
+        hOutputRead = INVALID_HANDLE_VALUE;
+        hErrorRead = INVALID_HANDLE_VALUE;
+        m_status = 0;
+        m_waitchildtimeout = waitchildtimeout;
+        m_finish = false;
     }
 
     ~Pimpl()
     {
-        if (not m_finish) {
+        if (not m_finish)
             wait();
-        }
     }
 
     bool is_running()
@@ -459,8 +478,6 @@ struct Spawn::Pimpl
             const std::string& workingdir,
             const std::vector < std::string > &args)
     {
-
-
         HANDLE hOutputReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hErrorReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hOutputWrite = INVALID_HANDLE_VALUE;
@@ -506,7 +523,7 @@ struct Spawn::Pimpl
         if (!cmdline)
             goto malloc_failure;
 
-        envp = prepare_environment_variable();
+        envp = prepare_environment_variable(m_context);
         if (!envp)
             goto malloc_failure;
 
@@ -586,26 +603,23 @@ struct Spawn::Pimpl
     }
 };
 
-Spawn::Spawn()
-: m_pimpl(0)
+Spawn::Spawn(ContextPtr ctx)
+    : m_pimpl(std::make_unique<Spawn::Pimpl>(ctx, 50000u))
 {
 }
 
-Spawn::~Spawn()
-{
-    delete m_pimpl;
-}
+Spawn::~Spawn() = default;
 
 bool Spawn::start(const std::string& exe,
         const std::string& workingdir,
         const std::vector < std::string > &args,
         unsigned int waitchildtimeout)
 {
-    if (m_pimpl) {
-        delete m_pimpl;
+    if (not m_pimpl->m_finish) {
+        m_pimpl->wait();
     }
 
-    m_pimpl = new Spawn::Pimpl(waitchildtimeout);
+    m_pimpl->init(waitchildtimeout);
 
     return m_pimpl->start(exe, workingdir, args);
 }
@@ -648,6 +662,24 @@ bool Spawn::status(std::string *msg, bool *success)
         return false;
 
     return m_pimpl->status(msg, success);
+}
+
+std::vector<std::string>
+Spawn::splitCommandLine(const std::string& command)
+{
+    std::vector<std::string> argv;
+    details::ShellUtils su;
+    int argcp;
+    su.g_shell_parse_argv(command, argcp, argv);
+
+    if (argv.empty())
+        throw utils::ArgError(
+            (fmt(_("Package command line: error, empty command `%1%'"))
+             % command).str());
+
+    argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
+
+    return argv;
 }
 
 }}

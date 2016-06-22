@@ -61,7 +61,8 @@ public:
      * @param dyn the root dynamics of vpz::Dynamics to load.
      * @param cls the vpz::classes to parse vpz::Dynamics to load.
      */
-    ModelFactory(const utils::ModuleManager& modulemgr,
+    ModelFactory(utils::ContextPtr context,
+                 const utils::ModuleManager& modulemgr,
                  std::map<std::string, View>& eventviews,
                  const vpz::Dynamics& dyn,
                  const vpz::Classes& cls,
@@ -205,9 +206,10 @@ public:
                                        const std::string& modelname);
 
 private:
+    utils::ContextPtr mContext;
     const utils::ModuleManager& mModuleMgr;
     std::map<std::string, View>& mEventViews;
-    
+
     vpz::Dynamics           mDynamics; /**< List of available vpz::Dynamics. */
     vpz::Classes            mClasses; /**< List of available vpz::Classes. */
     vpz::Experiment         mExperiment; /**< A reference to the

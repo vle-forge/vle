@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -29,7 +29,7 @@
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/i18n.hpp>
 
 namespace vle { namespace utils {
@@ -52,9 +52,9 @@ static bool extract__(Packages *out, const std::string& filepath)
     return false;
 }
 
-static bool rebuild__(Packages *out)
+static bool rebuild__(ContextPtr ctx, Packages *out)
 {
-    FSpath pkgsdir(utils::Path::path().getBinaryPackagesDir());
+    FSpath pkgsdir(ctx->getBinaryPackagesDir());
     PackageParser parser;
 
     if (pkgsdir.is_directory()) {
@@ -87,10 +87,10 @@ static bool rebuild__(Packages *out)
     }
 }
 
-bool LocalPackageManager::extract(Packages *out)
+bool LocalPackageManager::extract(ContextPtr ctx, Packages *out)
 {
     try {
-        return extract__(out, RemoteManager::getLocalPackageFilename());
+        return extract__(out, ctx->getLocalPackageFilename().string());
     } catch (const std::exception& e) {
         TraceAlways(_("Remote: internal error when reading local package:"
                       " %s"), e.what());
@@ -99,10 +99,10 @@ bool LocalPackageManager::extract(Packages *out)
     }
 }
 
-bool LocalPackageManager::rebuild(Packages *out)
+bool LocalPackageManager::rebuild(ContextPtr ctx, Packages *out)
 {
     try {
-        return rebuild__(out);
+        return rebuild__(ctx, out);
     } catch (const std::exception& e) {
         TraceAlways(_("Remote: failed to rebuild cache of installed"
                       " package: %s"), e.what());
@@ -111,10 +111,10 @@ bool LocalPackageManager::rebuild(Packages *out)
     }
 }
 
-bool RemotePackageManager::extract(Packages *out)
+bool RemotePackageManager::extract(ContextPtr ctx, Packages *out)
 {
     try {
-        return extract__(out, RemoteManager::getRemotePackageFilename());
+        return extract__(out, ctx->getRemotePackageFilename().string());
     } catch (const std::exception& e) {
         TraceAlways(_("Remote: internal error when reading remote"
                       " package: %s"), e.what());

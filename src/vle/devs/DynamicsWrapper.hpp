@@ -56,62 +56,43 @@
 
 namespace vle { namespace devs {
 
-    class VLE_API DynamicsWrapperInit : public DynamicsInit
-    {
-    public:
-        DynamicsWrapperInit(const vpz::AtomicModel& atom,
-                            PackageId packageid,
-                            const std::string& library)
-            : DynamicsInit(atom, packageid), m_library(library)
-        {}
+struct DynamicsWrapperInit;
 
-        virtual ~DynamicsWrapperInit()
-        {}
-
-        const std::string& library() const { return m_library; }
-
-    private:
-        const std::string& m_library;
-    };
+/**
+ * @brief DynamicsWrapper class represent a part of the DEVS simulator. This
+ * class must be inherits to build simulation components into another
+ * programming language.
+ *
+ */
+class VLE_API DynamicsWrapper : public Dynamics
+{
+public:
+    /**
+     * @brief Constructor of the dynamics wrapper of an atomic model
+     * @param model the atomic model to which belongs the dynamics
+     */
+    DynamicsWrapper(const DynamicsWrapperInit& init,
+                    const devs::InitEventList& events);
 
     /**
-     * @brief DynamicsWrapper class represent a part of the DEVS simulator. This
-     * class must be inherits to build simulation components into another
-     * programming language.
-     *
+     * @brief Destructor (nothing to do).
+     * @return none
      */
-    class VLE_API DynamicsWrapper : public Dynamics
-    {
-    public:
-	/**
-	 * @brief Constructor of the dynamics wrapper of an atomic model
-	 * @param model the atomic model to which belongs the dynamics
-	 */
-        DynamicsWrapper(const DynamicsWrapperInit& init,
-                        const devs::InitEventList& events) :
-            Dynamics(init, events)
-        {}
+    virtual ~DynamicsWrapper()
+    {}
 
-	/**
-	 * @brief Destructor (nothing to do).
-	 * @return none
-	 */
-        virtual ~DynamicsWrapper()
-        {}
+    /**
+     * @brief If this function return true, then a cast to a DynamicsWrapper
+     * object is produce and the set_model and set_library function are
+     * call.
+     * @return false if Dynamics is not a DynamicsWrapper.
+     */
+    inline virtual bool isWrapper() const override
+    { return true; }
 
-        /**
-         * @brief If this function return true, then a cast to a DynamicsWrapper
-         * object is produce and the set_model and set_library function are
-         * call.
-         * @return false if Dynamics is not a DynamicsWrapper.
-         */
-        inline virtual bool isWrapper() const override
-        { return true; }
-
-    protected:
-      std::string m_model;
-      std::string m_library;
-    };
+protected:
+    std::string m_library;
+};
 
 }} // namespace vle devs
 

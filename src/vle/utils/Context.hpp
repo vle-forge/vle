@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,11 +25,12 @@
  */
 
 
-#ifndef VLE_UTILS_PATH_HPP
-#define VLE_UTILS_PATH_HPP
+#ifndef VLE_UTILS_CONTEXT_HPP
+#define VLE_UTILS_CONTEXT_HPP
 
 #include <vle/utils/Filesystem.hpp>
 #include <vle/DllDefines.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 #include <iosfwd>
@@ -41,8 +42,25 @@ namespace vle { namespace utils {
  */
 using PathList = std::vector<vle::utils::FSpath>;
 
+class Context;
+using ContextPtr = std::shared_ptr<Context>;
+
 /**
- * Portable way to get and manage VLE's paths.
+ * Build a std::shared_ptr<Context> using "C" as default locale.
+ *
+ * \e param prefix Default (\e prefix.empty() or \e
+ * !prefix.is_directory()), it reads the \e VLE_HOME environment variable
+ * and if it fails, try to build prefix from the \e HOME user.
+ *
+ * \e param locale Default "C" for ASCII, empty for current locale
+ * otherwise, you can specify what you want.  \e return An initialized
+ * std::shared_ptr<Context>.
+ */
+VLE_API ContextPtr make_context(const FSpath& prefix = {},
+                                std::string locale = {"C"});
+
+/**
+ * \e Context manage all users and installation paths of VLE.
  *
  * Linux and Unix versions use compiled paths, Windows version uses
  * registry to store path. And environment variable VLE_HOME is used to
@@ -51,36 +69,24 @@ using PathList = std::vector<vle::utils::FSpath>;
  *
  * This class is a singleton. To use it:
  * @code
- * FSpath file(utils::Path::path().getHomeDir("toto");
+ * auto ctx { vle::utils::make_context();
+ * std::cout << ctx->getHomeDir();
  * // Return:
- * //  - $HOME/.vle/toto if VLE_HOME is not defined.
+ * //  - $HOME/.vle if VLE_HOME is not defined.
  * //  - %HOMEDRIVE%%HOMEPATH%\vle on Windows if VLE_HOME is not defined.
  * //  - $VLE_HOME/toto if VLE_HOME is defined.
  * @endcode
  */
-class VLE_API Path
+class VLE_API Context
 {
-private:
-    Path();
-    ~Path() noexcept;
-
 public:
-    Path(const Path& other) = delete;
-    Path& operator=(const Path& other) = delete;
-    Path(Path&& other) = delete;
-    Path& operator=(Path&& other) = delete;
+    Context(const FSpath& prefix = {}, std::string locale = {"C"});
+    ~Context() = default;
 
-    /**
-     * A singleton function that guaranteed to be destroyed. Instantiated
-     * on first use.
-     *
-     * @return Return the only one refernce to the Path object.
-     */
-    static Path& path()
-    {
-        static Path p;
-        return p;
-    }
+    Context(const Context& other) = delete;
+    Context& operator=(const Context& other) = delete;
+    Context(Context&& other) = delete;
+    Context& operator=(Context&& other) = delete;
 
     /**
      * Return the prefix of the compilation on Unix or installation
@@ -101,6 +107,20 @@ public:
     { return m_home; }
 
     /**
+     * Returns the \e $VLE_HOME/vle-x.y.conf file path.
+     *
+     * \return A complete path to access the vle configuration file.
+     */
+    FSpath getConfigurationFile() const;
+
+    /**
+     * Return the \e $HOMEVLE/vle-x.y.log file path.
+     *
+     * \return A complete path to access the vle log file.
+     */
+    FSpath getLogFile() const;
+
+    /**
      * Get a file from the getHomeDir() directory.
      * @param name The filename to concat.
      */
@@ -110,20 +130,6 @@ public:
      * Get the locale directory (/usr/share/locale).
      */
     FSpath getLocaleDir() const;
-
-    /*
-     * pixmap path
-     */
-
-    FSpath getPixmapDir() const;
-    FSpath getPixmapFile(const std::string& file) const;
-
-    /*
-     * glade path
-     */
-
-    FSpath getGladeDir() const;
-    FSpath getGladeFile(const std::string& file) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -137,16 +143,24 @@ public:
      */
 
     FSpath getBinaryPackagesDir() const;
-    FSpath getCurrentDir() const;
-
 
     /** Returns the list of dirname available in the binary package directory.
      */
-    std::vector<std::string> getBinaryPackages();
+    std::vector<std::string> getBinaryPackages() const;
 
-    /** Returns the list of filepath available in all binary package directory.
+    /**
+     * Return the path @e "$VLE_HOME/local.pkg".
+     *
+     * @return The path @e "$VLE_HOME/local.pkg."
      */
-    // PathList getBinaryLibraries();
+    FSpath getLocalPackageFilename() const;
+
+    /**
+     * Return the path @e "$VLE_HOME/remote.pkg".
+     *
+     * @return The path @e "$VLE_HOME/remote.pkg."
+     */
+    FSpath getRemotePackageFilename() const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -175,34 +189,6 @@ public:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * Get the list of simulator's directories.
-     * @return A list of directory name.
-     */
-    const PathList& getSimulatorDirs() const
-    { return m_simulator; }
-
-    /**
-     * Get the list of stream's directories.
-     * @return A list of directory name.
-     */
-    const PathList& getStreamDirs() const
-    { return m_stream; }
-
-    /**
-     * Get the list of output directories.
-     * @return A list of directory name.
-     */
-    const PathList& getOutputDirs() const
-    { return m_output; }
-
-    /**
-     * Get the list of modeling directories.
-     * @return A list of directory name.
-     */
-    const PathList& getModelingDirs() const
-    { return m_modeling; }
-
-    /**
      * Build the VLE_HOME directories:
      * VLE_HOME/lib, doc, src, build, exp.
      */
@@ -214,24 +200,18 @@ public:
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    static void compress(const FSpath& filepath,
-                         const FSpath& compressedfilepath);
-
-    static void decompress(const FSpath& compressedfilepath,
-                           const FSpath& directorypath);
-
     /**
      * Find the absolute path to a program
      * @param the program name
      * @param the absolute path to a program
      */
-    static FSpath findProgram(const std::string& exe);
+    FSpath findProgram(const std::string& exe);
 
     /**
      * @brief fill a vector of string with the list of binary packages
      * @param pkglist, the vector to fill
      */
-    static void fillBinaryPackagesList(std::vector<std::string>& pkglist);
+    void fillBinaryPackagesList(std::vector<std::string>& pkglist) const;
 
 private:
     FSpath buildPackageDir(const std::string& name) const;
@@ -292,14 +272,6 @@ private:
  * @return The output stream.
  */
 VLE_API std::ostream& operator<<(std::ostream& out, const PathList& paths);
-
-/**
- * Stream operator to show the content of the Path class.
- * @param out The output stream.
- * @param p The Path to show.
- * @return The output stream.
- */
-VLE_API std::ostream& operator<<(std::ostream& out, const Path& p);
 
 }} // namespace vle utils
 

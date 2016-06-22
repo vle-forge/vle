@@ -29,6 +29,9 @@
 #define DEVS_DYNAMICS_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
+#include <vle/utils/PackageTable.hpp>
+#include <vle/utils/Types.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/InitEventList.hpp>
 #include <vle/devs/ExternalEvent.hpp>
@@ -40,8 +43,6 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
-#include <vle/utils/PackageTable.hpp>
-#include <vle/utils/Types.hpp>
 #include <vle/version.hpp>
 #include <string>
 
@@ -68,31 +69,9 @@
 namespace vle { namespace devs {
 
 class RootCoordinator;
+struct DynamicsInit;
 
-/**
- * @brief A PackageId defines a reference to an element of the
- * vle::utils::PackageTable.
- */
-typedef utils::PackageTable::index PackageId;
-
-class VLE_API DynamicsInit
-{
-public:
-    DynamicsInit(const vpz::AtomicModel& model,
-                 PackageId packageid)
-        : m_model(model)
-        , m_packageid(packageid)
-    {}
-
-    virtual ~DynamicsInit() = default;
-
-    const vpz::AtomicModel& model() const { return m_model; }
-    PackageId packageid() const { return m_packageid; }
-
-private:
-    const vpz::AtomicModel& m_model;
-    PackageId               m_packageid;
-};
+using PackageId = utils::PackageTable::index;
 
 /**
  * @brief Dynamics class represent a part of the DEVS simulator. This class
@@ -107,11 +86,7 @@ public:
      * @param init The initialiser of Dynamics.
      * @param events The parameter from the experimental frame.
      */
-    Dynamics(const DynamicsInit& init,
-             const InitEventList&  /* events */)
-        : m_model(init.model())
-        , m_packageid(init.packageid())
-    {}
+    Dynamics(const DynamicsInit& init, const InitEventList& events);
 
     /**
      * @brief Destructor (nothing to do)
@@ -338,20 +313,15 @@ public:
 
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-    /**
-     * @brief Get a constant reference to the element of the
-     * vle::utils::PackageTable string table.
-     * @return A consttant reference.
-     */
-    inline PackageId packageid() const { return m_packageid; }
-
 private:
-    const vpz::AtomicModel& m_model; /**< A constant reference to the
-                                        atomic model node of the graph.
-                                     */
+    ///< A reference to the context.
+    utils::ContextPtr m_context;
 
-    PackageId m_packageid; /**< An iterator to std::set of the
-                              vle::utils::PackageTable. */
+    ///< A constant reference to the atomic model node of the graph.
+    const vpz::AtomicModel& m_model;
+
+    ///< An iterator to std::set of the vle::utils::PackageTable.
+    PackageId m_packageid;
 };
 
 }} // namespace vle devs

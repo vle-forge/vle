@@ -29,6 +29,7 @@
 #define VLE_MANAGER_MANAGER_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -53,7 +54,8 @@ class VLE_API Manager
 public:
     using result_type = std::unique_ptr<value::Matrix>;
 
-    Manager(LogOptions            logoptions,
+    Manager(utils::ContextPtr     context,
+            LogOptions            logoptions,
             SimulationOptions     simulationoptions,
             std::ostream         *output);
 
