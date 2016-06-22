@@ -181,7 +181,7 @@ void Coordinator::run()
         /* Scheduler is empty. We 'eat' all timed view until the
          * duration time.
          */
-        auto eatuntil = isInfinity(next) ? m_durationTime : next;
+        auto eatuntil = std::min(next, m_durationTime);
 
         while (m_timed_observation_scheduler.haveObservationAtTime(eatuntil)) {
             auto obs = m_timed_observation_scheduler.getObservationAtTime(
@@ -202,7 +202,7 @@ void Coordinator::run()
             }
         }
 
-        if (isInfinity(next)) {
+        if (isInfinity(next) or next > m_durationTime) {
             /* For all Timed view, process a final observation and clear
              * the scheduller.
              */
