@@ -48,6 +48,7 @@ class DefaultVpzPanel : public PluginMainPanel
 public:
     DefaultVpzPanel();
     virtual ~DefaultVpzPanel();
+
     QString  getname() override;
     QWidget* leftWidget() override;
     QWidget* rightWidget() override;
@@ -56,6 +57,7 @@ public:
     void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs,
               const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
+    void discard(){};
     void save() override;
     void setSimLeftWidget(QWidget*);
     PluginMainPanel* newInstance() override {return 0;}

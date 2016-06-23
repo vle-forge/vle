@@ -869,6 +869,7 @@ gvle_win::tabClose(int index)
             delete w;
             break;
         case QMessageBox::Discard:
+            w->discard();
             mPanels.remove(relPath);
             removeTab(index);
             delete w;

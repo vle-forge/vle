@@ -75,6 +75,13 @@ VleDoubleEdit::~VleDoubleEdit()
 {
 }
 
+void
+VleDoubleEdit::setValue(double val)
+{
+     setText(QLocale().toString(val, 'g',
+                                std::numeric_limits<double>::digits10));
+}
+
 bool
 VleDoubleEdit::eventFilter(QObject *target, QEvent *event)
 {
@@ -82,7 +89,8 @@ VleDoubleEdit::eventFilter(QObject *target, QEvent *event)
         switch(event->type()) {
         case QEvent::FocusOut:
             if (text().isEmpty()) {
-                setText("0");
+                setText(QLocale().toString(0., 'g',
+                                std::numeric_limits<double>::digits10));
             }
             break;
         default:

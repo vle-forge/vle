@@ -118,5 +118,3 @@ DefaultCppPanel::onUndoAvailable(bool b)
 }
 
 }} //namespaces
-
-

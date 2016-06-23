@@ -53,6 +53,7 @@ public:
     ~VleDoubleEdit();
     void focusInEvent(QFocusEvent* e);
     bool eventFilter(QObject *target, QEvent *event);
+    void setValue(double val);
 
     QString id;
 public slots:

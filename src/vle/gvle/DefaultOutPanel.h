@@ -50,6 +50,7 @@ public:
     void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs);
     QString canBeClosed();
     void save();
+    void discard(){};
     PluginMainPanel* newInstance(){return 0;}
 
 public slots:

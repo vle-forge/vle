@@ -42,6 +42,7 @@ class DefaultCppPanel : public PluginMainPanel
 public:
     DefaultCppPanel();
     virtual ~DefaultCppPanel();
+
     QString  getname() override;
     QWidget* leftWidget() override;
     QWidget* rightWidget() override;
@@ -51,8 +52,8 @@ public:
               const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
     void save() override;
+    void discard(){};
     PluginMainPanel* newInstance() override {return 0;}
-
 public slots:
     void onUndoAvailable(bool);
 public:
