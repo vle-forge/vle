@@ -128,10 +128,6 @@ Matrix::Matrix(index columns, index rows, index resizeColumns, index resizeRows)
       m_nbcolmax(columns), m_nbrowmax(rows),
       m_stepcol(resizeColumns), m_steprow(resizeRows), m_lastX(0), m_lastY(0)
 {
-    if (columns * rows <= 0)
-        throw utils::ArgError(
-            (fmt(_("Matrix: bad constructor initialization %1%x%2%"))
-             % columns % rows).str());
 }
 
 Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
@@ -420,10 +416,11 @@ void Matrix::reserve(size_type columnmax, size_type rowmax)
 
 void Matrix::resize(size_type columns, size_type rows)
 {
-    if (columns * rows <= 0)
-        throw utils::ArgError(
-            (fmt(_("Matrix: bad resize operation %1%x%2%"))
-             % columns % rows).str());
+    if (columns * rows <= 0) {
+        m_nbcol = columns;
+        m_nbrow = rows;
+        return;
+    }
 
     if (columns >= m_nbcolmax or rows >= m_nbrowmax)
         reserve(columns + m_stepcol, rows + m_steprow);
@@ -449,10 +446,11 @@ void Matrix::resize(size_type columns, size_type rows)
 void Matrix::resize(size_type columns, size_type rows,
                     std::unique_ptr<Value> value)
 {
-    if (columns * rows <= 0)
-        throw utils::ArgError(
-            (fmt(_("Matrix: bad resize operation %1%x%2%"))
-             % columns % rows).str());
+    if (columns * rows <= 0) {
+        m_nbcol = columns;
+        m_nbrow = rows;
+        return;
+    }
 
     if (columns >= m_nbcolmax or rows >= m_nbrowmax)
         reserve(columns + m_stepcol, rows + m_steprow);
