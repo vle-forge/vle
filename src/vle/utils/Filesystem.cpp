@@ -32,6 +32,7 @@
 */
 
 #include <vle/utils/Filesystem.hpp>
+#include <vle/utils/Trace.hpp>
 #include <fstream>
 #include <string>
 #include <random>
@@ -348,10 +349,15 @@ bool FSpath::remove() const
 bool FSpath::create_directory() const
 {
 #if defined(_WIN32)
-    return ::CreateDirectoryW(wstring().c_str(), nullptr) != 0;
+    if (::CreateDirectoryW(wstring().c_str(), nullptr) == 0) {
 #else
-    return ::mkdir(string().c_str(), S_IRUSR | S_IWUSR | S_IXUSR) == 0;
+    if (::mkdir(string().c_str(), S_IRUSR | S_IWUSR | S_IXUSR)) {
 #endif
+        TraceAlways("FSpath::create_directory: %s fails", string().c_str());
+        return false;
+    }
+
+    return true;
 }
 
 bool FSpath::create_directories() const
