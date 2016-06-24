@@ -88,8 +88,6 @@ public:
 
     bool is_absolute() const;
 
-    FSpath make_absolute() const;
-
     bool exists() const;
 
     size_t file_size() const;
