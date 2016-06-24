@@ -168,16 +168,13 @@ public:
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    virtual const vpz::AtomicModel*
-        createModel(const std::string& name,
-                    const std::vector < std::string >& inputs =
-                        std::vector < std::string >(),
-                    const std::vector < std::string >& outputs =
-                        std::vector < std::string >(),
-                    const std::string& dynamics = std::string(),
-                    const std::vector < std::string >& conditions =
-                        std::vector < std::string >(),
-                    const std::string& observable = std::string());
+    const vpz::AtomicModel* createModel(
+        const std::string& name,
+        const std::vector <std::string>& inputs = {},
+        const std::vector <std::string>& outputs = {},
+        const std::string& dynamics = {},
+        const std::vector <std::string>& conditions = {},
+        const std::string& observable = {});
 
     /**
      * @brief Build a new devs::Simulator from the vpz::Classes information.
@@ -186,9 +183,8 @@ public:
      * @param modelname the new name of the model.
      * @throw utils::badArg if modelname already exist.
      */
-    virtual const vpz::BaseModel*
-        createModelFromClass(const std::string& classname,
-                             const std::string& modelname);
+    const vpz::BaseModel* createModelFromClass(const std::string& classname,
+                                               const std::string& modelname);
 
     /**
      * @brief Delete the specified model from coupled model. All
@@ -198,7 +194,7 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    virtual void delModel(const std::string& modelname);
+    void delModel(const std::string& modelname);
 
     /**
      * @brief Rename the specified model.
@@ -207,8 +203,8 @@ public:
      * @throw utils::ModelingError if model `oldname' does not exist or if a
      * model `newname' already exists.
      */
-    virtual void renameModel(const std::string& oldname,
-                             const std::string& newname);
+    void renameModel(const std::string& oldname,
+                     const std::string& newname);
 
     /**
      * @brief Add an internal, input or output connection in coupled model.
@@ -222,10 +218,10 @@ public:
      *
      * @throw utils::DevsGraphError if models or ports do not exist.
      */
-    virtual void addConnection(const std::string& modelsource,
-                               const std::string& outputport,
-                               const std::string& modeldestination,
-                               const std::string& inputport);
+    void addConnection(const std::string& modelsource,
+                       const std::string& outputport,
+                       const std::string& modeldestination,
+                       const std::string& inputport);
 
     /**
      * @brief Remove an internal, input or output connection in coupled model.
@@ -239,10 +235,10 @@ public:
      *
      * @throw utils::DevsGraphError if models or ports do not exist.
      */
-    virtual void removeConnection(const std::string& modelsource,
-                                  const std::string& outputport,
-                                  const std::string& modeldestination,
-                                  const std::string& inputport);
+    void removeConnection(const std::string& modelsource,
+                          const std::string& outputport,
+                          const std::string& modeldestination,
+                          const std::string& inputport);
 
     /**
      * @brief Add an input port for an internal model.
@@ -252,8 +248,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    virtual void addInputPort(const std::string& modelName,
-                              const std::string& portName);
+    void addInputPort(const std::string& modelName,
+                      const std::string& portName);
 
     /**
      * @brief Add an output port for an internal model.
@@ -263,8 +259,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    virtual void addOutputPort(const std::string& modelName,
-                               const std::string& portName);
+    void addOutputPort(const std::string& modelName,
+                       const std::string& portName);
 
     /**
      * @brief Remove an input port for an internal model.
@@ -274,8 +270,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    virtual void removeInputPort(const std::string& modelName,
-                                 const std::string& portName);
+    void removeInputPort(const std::string& modelName,
+                         const std::string& portName);
 
     /**
      * @brief Remove an output port for an internal model.
@@ -285,8 +281,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    virtual void removeOutputPort(const std::string& modelName,
-                                  const std::string& portName);
+    void removeOutputPort(const std::string& modelName,
+                          const std::string& portName);
 
 
     // / / / /
@@ -324,9 +320,9 @@ public:
     { return coupledmodel().getName(); }
 
 private:
-    Coordinator& m_coordinator; /**< A reference to the coordinator of this
-                                  executive to allow modification of coupled
-                                  model. */
+    /**< A reference to the coordinator of this executive to allow
+       modification of coupled model. */
+    Coordinator& m_coordinator;
 
     /**
      * @brief Get a reference to the current coupled model.
