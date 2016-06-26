@@ -74,19 +74,19 @@ struct F
         current_path.create_directory();
 
         /* We need to ensure each file really installed. */
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-        if (current_path.is_directory()) {
+        if (not current_path.is_directory())
+            throw std::runtime_error("Fails to found temporary directory");
+
 #ifdef _WIN32
-            ::_putenv((vle::fmt("VLE_HOME=%1%")
-                       % current_path.string()).str().c_str());
+        ::_putenv((vle::fmt("VLE_HOME=%1%")
+                   % current_path.string()).str().c_str());
 #else
-            ::setenv("VLE_HOME", current_path.string().c_str(), 1);
+        ::setenv("VLE_HOME", current_path.string().c_str(), 1);
 #endif
-        }
 
         vle::utils::FSpath::current_path(current_path);
-
         std::cout << "test start in " << current_path.string() << '\n';
 
         auto ctx = vle::utils::make_context();
@@ -110,6 +110,10 @@ BOOST_AUTO_TEST_CASE(show_package)
     Package pkg(ctx, "show_package");
     pkg.create();
     pkg.wait(std::cerr, std::cerr);
+
+    /* We need to ensure each file really installed. */
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
     pkg.configure();
     pkg.wait(std::cerr, std::cerr);
     pkg.build();
@@ -117,8 +121,6 @@ BOOST_AUTO_TEST_CASE(show_package)
     pkg.install();
     pkg.wait(std::cerr, std::cerr);
 
-    /* We need to ensure each file really installed. */
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     std::cout << "getBinaryPackagesDir: "
               << ctx->getBinaryPackagesDir().string()
@@ -144,6 +146,7 @@ BOOST_AUTO_TEST_CASE(show_package)
 BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
 {
     auto ctx = vle::utils::make_context();
+
     utils::Package pkg_tmp(ctx, "remote_package_check_package_tmp");
     pkg_tmp.create();
     pkg_tmp.wait(std::cerr, std::cerr);
@@ -437,8 +440,6 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
     utils::FSpath tarfile(utils::FSpath::temp_directory_path());
     tarfile /= "check.tar.bz2";
 
-    // utils::FSpath::current_path(ctx->getBinaryPackagesDir());
-
     BOOST_REQUIRE_NO_THROW(rmt.compress(uniquepath, tarfile.string()));
 
     utils::FSpath t { tarfile };
@@ -448,8 +449,6 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
     tmpfile /= "unique";
 
     tmpfile.create_directory();
-
-    utils::FSpath::current_path(tmpfile);
 
     BOOST_REQUIRE_NO_THROW(rmt.decompress(tarfile.string(), tmpfile.string()));
     utils::FSpath t2 { tmpfile };
