@@ -64,7 +64,7 @@ void remove_all(vle::utils::ContextPtr ctx, const vle::utils::FSpath& path)
         argv.erase(argv.begin());
 
         if (not spawn.start(exe, vle::utils::FSpath::current_path().string(),
-                            argv, 50000u))
+                            argv))
             throw vle::utils::InternalError(_("fail to start cmake command"));
 
         spawn.wait();
@@ -124,26 +124,22 @@ struct Package::Pimpl
     std::string  mCommandClean;
     std::string  mCommandPack;
     std::string  mCommandUnzip;
+    std::string  mCommandDirCopy;
     bool         m_issuccess;
 
     void process(const std::string& exe,
                  const std::string& workingDir,
                  const std::vector < std::string >& argv)
     {
-        if (not m_spawn.isfinish()) {
-            if (utils::Trace::isInLevel(utils::TRACE_LEVEL_DEVS)) {
-                utils::Trace::send(
-                    (fmt("-[%1%] Need to wait old process before") % exe).str());
-            }
+        if (m_spawn.isstart() and not m_spawn.isfinish()) {
+            DTraceAlways("-[%1%] Need to wait old process before", exe.c_str());
             m_spawn.wait();
             m_spawn.status(&m_message, &m_issuccess);
         }
-        bool started = m_spawn.start(exe, workingDir, argv);
 
-        if (not started) {
+        if (not m_spawn.start(exe, workingDir, argv))
             throw utils::ArgError(
                 (fmt(_("Failed to start `%1%'")) % exe).str());
-        }
     }
 
     void refreshPath()
@@ -185,8 +181,14 @@ Package::~Package() = default;
 
 void Package::create()
 {
-    FSpath source(m_pimpl->m_context->getTemplate("package"));
+    if (m_pimpl->mCommandDirCopy.empty())
+        refreshCommands();
 
+    if (m_pimpl->mCommandDirCopy.empty())
+        throw utils::FileError(
+            _("Pkg configure error: empty command"));
+
+    FSpath source(m_pimpl->m_context->getTemplate("package"));
     FSpath destination(getDir(PKG_SOURCE));
 
     if (destination.exists())
@@ -195,91 +197,41 @@ void Package::create()
                    "the directory %1% already exists")) %
              destination.string()).str());
 
-    refreshPath();
-
     FSpath::create_directory(destination);
-    std::string command;
+    std::string command = (vle::fmt(m_pimpl->mCommandDirCopy) %
+                           source.string() % destination.string()).str();
+
+    utils::Spawn spawn(m_pimpl->m_context);
+    std::vector<std::string> argv = spawn.splitCommandLine(command);
+    std::string exe = std::move(argv.front());
+    argv.erase(argv.begin());
 
     try {
-        {
-            utils::Preferences prefs(true,
-                                     m_pimpl->m_context->getConfigurationFile());
-            prefs.get("vle.command.dir.copy", &command);
-        }
-
-        command = (vle::fmt(command) % source.string() %
-                   destination.string()).str();
-
-        utils::Spawn spawn(m_pimpl->m_context);
-        std::vector<std::string> argv = spawn.splitCommandLine(command);
-        std::string exe = std::move(argv.front());
-        argv.erase(argv.begin());
-
-        if (not spawn.start(exe, FSpath::current_path().string(), argv, 50000u))
-            throw utils::InternalError(_("fail to start cmake command"));
-
-        printf("`%s' `%s'\n", exe.c_str(),
-               FSpath::current_path().string().c_str());
-
-        for (const auto& elem : argv)
-            printf("- `%s'\n", elem.c_str());
-
-        std::string output, error;
-        while (not spawn.isfinish()) {
-            if (spawn.get(&output, &error)) {
-                if (not output.empty()) {
-                    DTraceAlways(output.c_str());
-                    output.clear();
-                }
-
-                if (not error.empty()) {
-                    DTraceAlways(error.c_str());
-                    error.clear();
-                }
-
-                std::this_thread::sleep_for(std::chrono::microseconds(200));
-            } else
-                break;
-        }
-
-        spawn.wait();
-
-        std::string message;
-        bool success;
-        spawn.status(&message, &success);
-
-        if (not success && not message.empty())
-            TraceAlways(_("Error during copy directory operation: %s."),
-                        message.c_str());
+        m_pimpl->process(exe, source.string(), argv);
     } catch (const std::exception& e) {
-        TraceAlways(_("Package creatinig: unable to copy `%s' in `%s' with"
-                      "the `%s' command"),
-                      source.string().c_str(),
-                      destination.string().c_str(),
-                      command.c_str());
+        throw utils::InternalError(
+            (fmt(_("Pkg create error: %1%")) % e.what()).str());
     }
-
-    m_pimpl->m_strout.append(_("Package creating - done\n"));
 }
 
 void Package::configure()
 {
     std::string pkg_buildir = getBuildDir(PKG_SOURCE);
 
-    if (m_pimpl->mCommandConfigure.empty()) {
+    if (m_pimpl->mCommandConfigure.empty())
         refreshCommands();
-    }
-    if (pkg_buildir.empty()) {
+
+    if (pkg_buildir.empty())
         refreshPath();
-    }
-    if (m_pimpl->mCommandConfigure.empty() ||
-            pkg_buildir.empty()) {
-        throw utils::FileError(_("Pkg configure error: empty command"));
-    }
-    if (pkg_buildir.empty()) {
+
+    if (m_pimpl->mCommandConfigure.empty() || pkg_buildir.empty())
         throw utils::FileError(
-                _("Pkg configure error: building directory path is empty"));
-    }
+            _("Pkg configure error: empty command"));
+
+    if (pkg_buildir.empty())
+        throw utils::FileError(
+            _("Pkg configure error: building directory path is empty"));
+
 
     FSpath path { pkg_buildir };
     if (not path.exists()) {
@@ -287,8 +239,6 @@ void Package::configure()
             throw utils::FileError(
                 _("Pkg configure error: fails to build directories"));
     }
-
-    FScurrent_path_restore restore(path);
 
     std::string pkg_binarydir = getDir(PKG_BINARY);
     std::string cmd = (fmt(m_pimpl->mCommandConfigure) % pkg_binarydir).str();
@@ -328,8 +278,6 @@ void Package::test()
             (fmt(_("Pkg test error: building directory '%1%' "
                    "does not exist ")) % pkg_buildir).str());
 
-    FScurrent_path_restore restore(path);
-
     std::string cmd = (fmt(m_pimpl->mCommandTest) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
     std::vector<std::string> argv = spawn.splitCommandLine(cmd);
@@ -366,8 +314,6 @@ void Package::build()
     FSpath path { pkg_buildir };
     if (not path.exists())
         configure();
-
-    FScurrent_path_restore restore(path);
 
     std::string cmd = (vle::fmt(m_pimpl->mCommandBuild) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
@@ -407,8 +353,6 @@ void Package::install()
         throw utils::FileError(
             (fmt(_("Pkg install error: building directory '%1%' "
                    "does not exist ")) % pkg_buildir.c_str()).str());
-
-    FScurrent_path_restore restore(path);
 
     std::string cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
@@ -1007,6 +951,7 @@ void Package::refreshCommands()
     prefs.get("vle.packages.clean", &m_pimpl->mCommandClean);
     prefs.get("vle.packages.package", &m_pimpl->mCommandPack);
     prefs.get("vle.packages.unzip", &m_pimpl->mCommandUnzip);
+    prefs.get("vle.command.dir.copy", &m_pimpl->mCommandDirCopy);
 }
 
 void Package::refreshPath()

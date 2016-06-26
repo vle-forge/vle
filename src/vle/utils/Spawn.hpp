@@ -29,6 +29,7 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Context.hpp>
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -95,15 +96,15 @@ public:
      * @param workingdir The directory where the command need to be
      * executed.
      * @param args The arguments of the command.
-     * @param waitchildtimeout The timeout while VLE wait for
-     * subprocess [0,1000000] .
+     * @param waitchildtimeout The timeout while VLE wait for subprocess.
      *
      * @return
      */
     bool start(const std::string& exe,
                const std::string& workingdir,
                const std::vector < std::string > &args,
-               unsigned int waitchildtimeout = 50000u);
+               std::chrono::milliseconds waitchildtimeout =
+               std::chrono::milliseconds {5});
 
     /**
      * Build a vector of string from a command line.
@@ -124,10 +125,10 @@ public:
     bool wait();
 
     /**
-     * Return true if the process is running.
+     * Return true if the process is finished.
      *
-     * @return @e true if the process is running, false if it not
-     * started or not running.
+     * @return @e true if the process is start, false if it not
+     * started or running.
      */
     bool isstart();
 

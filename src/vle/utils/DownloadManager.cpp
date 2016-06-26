@@ -106,7 +106,7 @@ struct DownloadManager::Pimpl
             argv.erase(argv.begin());
 
             FSpath pwd = FSpath::current_path();
-            if (not spawn.start(exe, pwd.string(), argv, 50000u)) {
+            if (not spawn.start(exe, pwd.string(), argv)) {
                 mErrorMessage = _("Download: fail to start download command");
                 TraceAlways(mErrorMessage.c_str());
                 mHasError = true;

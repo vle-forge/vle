@@ -309,56 +309,63 @@ struct Spawn::Pimpl
     HANDLE     hOutputRead;
     HANDLE     hErrorRead;
 
-    PROCESS_INFORMATION m_pi;
-    DWORD               m_status;
-    std::string         m_msg;
-    unsigned int        m_waitchildtimeout;
-    bool                m_finish;
+    PROCESS_INFORMATION       m_pi;
+    DWORD                     m_status;
+    std::string               m_msg;
+    std::chrono::milliseconds m_waitchildtimeout;
+    bool                      m_start;
+    bool                      m_finish;
 
-    std::ofstream out__, err__;
+    std::ofstream ouputfs, errorfs;
 
-
-    Pimpl(ContextPtr ctx, unsigned int waitchildtimeout)
+    Pimpl(ContextPtr ctx, std::chrono::milliseconds waitchildtimeout)
         : m_context(ctx)
         , hOutputRead(INVALID_HANDLE_VALUE)
         , hErrorRead(INVALID_HANDLE_VALUE)
-        , m_status(0), m_waitchildtimeout(waitchildtimeout)
-        , m_finish(false)
+        , m_status(0)
+        , m_waitchildtimeout(waitchildtimeout)
+        , m_start(false)
+        , m_finish(true)
     {
         utils::FSpath tmp(utils::FSpath::temp_directory_path());
 
         utils::FSpath file_out(tmp);
         file_out /= "vlespawn-out.txt";
-        out__.open(file_out.string());
+        ouputfs.open(file_out.string());
 
         utils::FSpath file_err(tmp);
         file_err /= "vlespawn-error.txt";
-        err__.open(file_err.string());
+        errorfs.open(file_err.string());
     }
 
-    void init(unsigned int waitchildtimeout)
+    void init(std::chrono::milliseconds waitchildtimeout)
     {
+        if (m_start and not m_finish)
+            wait();
+
         hOutputRead = INVALID_HANDLE_VALUE;
         hErrorRead = INVALID_HANDLE_VALUE;
         m_status = 0;
         m_waitchildtimeout = waitchildtimeout;
-        m_finish = false;
+
+        m_finish = true;
+        m_start = false;
     }
 
     ~Pimpl()
     {
-        if (not m_finish)
+        if (m_start and not m_finish)
             wait();
     }
 
     bool is_running()
     {
-        assert(not m_finish);
+        if (m_start == false or m_finish == true)
+            return false;
 
         if (GetExitCodeProcess(m_pi.hProcess, &m_status)) {
             if (m_status == STILL_ACTIVE) {
                 m_finish = false;
-
                 return true;
             }
         }
@@ -369,9 +376,7 @@ struct Spawn::Pimpl
 
     bool get(std::string *output, std::string *error)
     {
-        if (m_finish) {
-            return false;
-        }
+        assert(m_start);
 
         is_running();
 
@@ -384,17 +389,18 @@ struct Spawn::Pimpl
                     &bread, &avail, NULL);
 
             if (bread) {
-                out__ << "get PeekNamedPipe success " << bread << " " <<  avail << "\n";
+                ouputfs << "get PeekNamedPipe success " << bread
+                        << " " <<  avail << "\n";
 
                 std::fill(buffer.begin(), buffer.end(), '\0');
                 if (avail > buffer.size() - 1) {
-                    out__ << "get PeekNamedPipe " << avail << "\n"
+                    ouputfs << "get PeekNamedPipe " << avail << "\n"
                             << buffer.size() - 1 << "\n";
                     while (bread >= buffer.size() - 1) {
                         ReadFile(hOutputRead, &buffer[0],
                                 buffer.size() - 1, &bread, NULL);
 
-                        out__ << "get: " << bread << "\n";
+                        ouputfs << "get: " << bread << "\n";
 
                         if (bread > 0) {
                             unsigned long sz = std::min(
@@ -403,18 +409,19 @@ struct Spawn::Pimpl
                                             buffer.size() - 1));
 
                             output->append(&buffer[0], sz);
-                            out__.write(&buffer[0], sz);
+                            ouputfs.write(&buffer[0], sz);
                         }
 
                         std::fill(buffer.begin(), buffer.end(), '\0');
                     }
                 } else {
-                    out__ << "get PeekNamedPipe success (else) " << bread << " " <<  avail << "\n";
+                    ouputfs << "get PeekNamedPipe success (else) "
+                            << bread << " " <<  avail << "\n";
 
                     ReadFile(hOutputRead, &buffer[0],
                             buffer.size() - 1, &bread, NULL);
 
-                    out__ << "get: " << bread << "\n";
+                    ouputfs << "get: " << bread << "\n";
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
@@ -423,7 +430,7 @@ struct Spawn::Pimpl
                                         buffer.size() - 1));
 
                         output->append(&buffer[0], sz);
-                        out__.write(&buffer[0], sz);
+                        ouputfs.write(&buffer[0], sz);
                     }
                 }
             }
@@ -434,7 +441,7 @@ struct Spawn::Pimpl
                     &bread, &avail, NULL);
 
             if (bread) {
-                err__ << "[err] get PeekNamedPipe success " <<  avail << "\n";
+                errorfs << "[err] get PeekNamedPipe success " <<  avail << "\n";
 
                 std::fill(buffer.begin(), buffer.end(), '\0');
                 if (avail > buffer.size() - 1) {
@@ -449,7 +456,7 @@ struct Spawn::Pimpl
                                             buffer.size() - 1));
 
                             error->append(&buffer[0], sz);
-                            err__.write(&buffer[0], sz);
+                            errorfs.write(&buffer[0], sz);
                         }
 
                         std::fill(buffer.begin(), buffer.end(), '\0');
@@ -465,7 +472,7 @@ struct Spawn::Pimpl
                                         buffer.size() - 1));
 
                         error->append(&buffer[0], sz);
-                        err__.write(&buffer[0], sz);
+                        errorfs.write(&buffer[0], sz);
                     }
                 }
             }
@@ -478,6 +485,9 @@ struct Spawn::Pimpl
             const std::string& workingdir,
             const std::vector < std::string > &args)
     {
+        m_start = true;
+        m_finish = false;
+
         HANDLE hOutputReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hErrorReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hOutputWrite = INVALID_HANDLE_VALUE;
@@ -527,8 +537,8 @@ struct Spawn::Pimpl
         if (!envp)
             goto malloc_failure;
 
-        out__ << "Cmd: [" << cmdline << "]\n";
-        err__ << "Cmd: [" << cmdline << "]\n";
+        ouputfs << "Cmd: [" << cmdline << "]\n";
+        errorfs << "Cmd: [" << cmdline << "]\n";
 
         ZeroMemory(&m_pi, sizeof(PROCESS_INFORMATION));
 
@@ -545,8 +555,8 @@ struct Spawn::Pimpl
 
         Sleep(25);
 
-        out__ << "CreateProcess success\n";
-        err__ << "CreateProcess success\n";
+        ouputfs << "CreateProcess success\n";
+        errorfs << "CreateProcess success\n";
 
         return true;
 
@@ -569,16 +579,15 @@ struct Spawn::Pimpl
 
     bool wait()
     {
-        if (m_finish)
-            return true;
+        assert(m_start);
 
-        if (WaitForSingleObject(m_pi.hProcess, 50000)) {
+        if (WaitForSingleObject(m_pi.hProcess, m_waitchildtimeout.count())) {
             if (GetExitCodeProcess(m_pi.hProcess, &m_status)) {
+                m_start = false;
                 m_finish = true;
 
                 CloseHandle(hErrorRead);
                 CloseHandle(hOutputRead);
-
                 CloseHandle(m_pi.hThread);
                 CloseHandle(m_pi.hProcess);
             }
@@ -587,8 +596,21 @@ struct Spawn::Pimpl
         return true;
     }
 
+    bool isfinish()
+    {
+        assert(m_start);
+
+        return m_finish;
+    }
+
+    bool isstart()
+    {
+        return m_start;
+    }
+
     bool status(std::string *msg, bool *success)
     {
+        assert(m_start);
         assert(m_finish);
 
         *msg = m_msg;
@@ -604,63 +626,53 @@ struct Spawn::Pimpl
 };
 
 Spawn::Spawn(ContextPtr ctx)
-    : m_pimpl(std::make_unique<Spawn::Pimpl>(ctx, 50000u))
+    : m_pimpl(std::make_unique<Spawn::Pimpl>(
+                  ctx,
+                  std::chrono::milliseconds {5}))
 {
 }
 
 Spawn::~Spawn() = default;
 
 bool Spawn::start(const std::string& exe,
-        const std::string& workingdir,
-        const std::vector < std::string > &args,
-        unsigned int waitchildtimeout)
+                  const std::string& workingdir,
+                  const std::vector < std::string > &args,
+                  std::chrono::milliseconds waitchildtimeout)
 {
-    if (not m_pimpl->m_finish) {
-        m_pimpl->wait();
-    }
-
     m_pimpl->init(waitchildtimeout);
+
+#ifndef NDEBUG
+    DTraceAlways("Command:`%s' chdir: `%s'", exe.c_str(), workingdir.c_str());
+
+    for (const auto& elem : args)
+        DTraceAlways("[%s]", elem.c_str());
+#endif
 
     return m_pimpl->start(exe, workingdir, args);
 }
 
 bool Spawn::wait()
 {
-    if (not m_pimpl)
-        return false;
-
     return m_pimpl->wait();
 }
 
 bool Spawn::isstart()
 {
-    if (not m_pimpl)
-        return false;
-
-    return not m_pimpl->m_finish;
+    return m_pimpl->isstart();
 }
 
 bool Spawn::isfinish()
 {
-    if (not m_pimpl)
-        return false;
-
-    return m_pimpl->m_finish;
+    return m_pimpl->isfinish();
 }
 
 bool Spawn::get(std::string *output, std::string *error)
 {
-    if (not m_pimpl and not isfinish())
-        return false;
-
     return m_pimpl->get(output, error);
 }
 
 bool Spawn::status(std::string *msg, bool *success)
 {
-    if (not m_pimpl or not m_pimpl->m_finish)
-        return false;
-
     return m_pimpl->status(msg, success);
 }
 

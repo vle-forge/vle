@@ -655,7 +655,7 @@ public:
             std::string exe = std::move(argv.front());
             argv.erase(argv.begin());
 
-            if (not spawn.start(exe, pwd.string(), argv, 50000u))
+            if (not spawn.start(exe, pwd.string(), argv))
                 throw utils::InternalError(_("fail to start cmake command"));
 
             std::string output, error;
@@ -719,7 +719,7 @@ public:
             std::string exe = std::move(argv.front());
             argv.erase(argv.begin());
 
-            if (not spawn.start(exe, directorypath.string(), argv, 50000u))
+            if (not spawn.start(exe, directorypath.string(), argv))
                 throw utils::InternalError(_("fail to start cmake command"));
 
             std::string output, error;

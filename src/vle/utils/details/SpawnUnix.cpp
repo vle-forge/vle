@@ -25,17 +25,20 @@
  */
 
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/details/ShellUtils.hpp>
 #include <algorithm>
 #include <iostream>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <thread>
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+
+#include <sys/wait.h>
+#include <unistd.h>
 
 #ifdef __APPLE__
  #include <crt_externs.h>
@@ -116,7 +119,7 @@ static char ** prepare_environment_variable(void)
  *
  * @return returns 0 if timeout, 1 if input available, -1 if error.
  */
-static int input_timeout(int fd, unsigned int microseconds)
+static int input_timeout(int fd, std::chrono::milliseconds wait)
 {
     fd_set set;
     struct timeval timeout;
@@ -125,8 +128,10 @@ static int input_timeout(int fd, unsigned int microseconds)
     FD_ZERO (&set);
     FD_SET (fd, &set);
 
+    wait *= 1000;
+
     timeout.tv_sec = 0;
-    timeout.tv_usec = microseconds;
+    timeout.tv_usec = wait.count();
 
     do {
         result = select (FD_SETSIZE, &set, nullptr, nullptr, &timeout);
@@ -139,46 +144,58 @@ class Spawn::Pimpl
 {
 public:
     ContextPtr m_context;
+    std::chrono::milliseconds m_waitchildtimeout;
     pid_t m_pid;
-    unsigned int m_waitchildtimeout;
     int m_pipeout[2];
     int m_pipeerr[2];
     int m_status;
+    bool m_start;
     bool m_finish;
     std::string m_msg;
     std::string m_command;
 
-    Pimpl(ContextPtr ctx, unsigned int waitchildtimeout)
+    Pimpl(ContextPtr ctx, std::chrono::milliseconds waitchildtimeout)
         : m_context(ctx)
+        , m_waitchildtimeout(waitchildtimeout)
         , m_pid(-1)
-        , m_waitchildtimeout(waitchildtimeout / 1000.0)
         , m_status(0)
-        , m_finish(false)
+        , m_start(false)
+        , m_finish(true)
     {
     }
 
-    void init(unsigned int waitchildtimeout)
+    void init(std::chrono::milliseconds waitchildtimeout)
     {
+        if (m_start and not m_finish) {
+            wait();
+            ::close(m_pipeout[1]);
+            ::close(m_pipeerr[1]);
+            ::close(m_pipeout[0]);
+            ::close(m_pipeerr[0]);
+        }
+
         m_pid = -1;
-        m_waitchildtimeout = waitchildtimeout / 1000.0;
+        m_waitchildtimeout = waitchildtimeout;
         m_status = 0;
-        m_finish = false;
+        m_finish = true;
+        m_start = false;
     }
 
     ~Pimpl()
     {
-        if (not m_finish) {
+        if (m_start and not m_finish) {
             wait();
+            ::close(m_pipeout[1]);
+            ::close(m_pipeerr[1]);
+            ::close(m_pipeout[0]);
+            ::close(m_pipeerr[0]);
         }
-        ::close(m_pipeout[1]);
-        ::close(m_pipeerr[1]);
-        ::close(m_pipeout[0]);
-        ::close(m_pipeerr[0]);
     }
 
     bool is_running()
     {
-        assert(not m_finish);
+        if (m_start == false or m_finish == true)
+            return false;
 
         /* waitpid(): on success, returns the process ID of the child
            whose state has changed; if WNOHANG was specified and one
@@ -200,15 +217,12 @@ public:
 
     bool get(std::string *output, std::string *error)
     {
-        if (m_finish) {
-            return false;
-        }
+        assert(m_start);
 
         is_running();
 
-        std::vector < char > buffer;
+        std::vector <char> buffer;
         buffer.reserve(BUFSIZ);
-
         int result;
 
         if ((result = input_timeout(m_pipeout[0], m_waitchildtimeout)) == -1)
@@ -234,9 +248,14 @@ public:
         return true;
     }
 
-    bool initchild(const std::string& exe,
-                   std::vector < std::string > args)
+    bool initchild(const std::string& exe, const std::string& workingdir,
+                   std::vector <std::string> args)
     {
+        if (::chdir(workingdir.c_str())) {
+            TraceAlways("Spawn: child fails to change current directory: %s",
+                        workingdir.c_str());
+            std::abort();
+        }
 
         ::dup2(m_pipeout[1], STDOUT_FILENO);
         ::dup2(m_pipeerr[1], STDERR_FILENO);
@@ -266,20 +285,20 @@ public:
         ::close(m_pipeerr[1]);
         m_pid = localpid;
 
-        usleep(m_waitchildtimeout);
+        std::this_thread::sleep_for(m_waitchildtimeout);
 
         return is_running();
     }
 
     bool start(const std::string& exe,
                const std::string& workingdir,
-               const std::vector < std::string > &args)
+               const std::vector <std::string> &args)
     {
-        if (m_pid != -1)
-            return false;
+        assert(m_finish);
+        m_start = true;
+        m_finish = false;
 
         m_command = exe;
-
         pid_t localpid;
         int err;
 
@@ -298,34 +317,30 @@ public:
             goto fork_failed;
         }
 
-        if (::chdir(workingdir.c_str())) {
-            err = errno;
-            goto chdir_failed;
-        }
+        if (localpid == 0)
+           return initchild(exe, workingdir, args);
 
-        if (localpid == 0) {
-            return initchild(exe, args);
-        } else {
-            return initparent(localpid);
-        }
+        return initparent(localpid);
 
     fork_failed:
-    chdir_failed:
         ::close(m_pipeerr[0]);
         ::close(m_pipeerr[1]);
     m_pipeerr_failed:
         ::close(m_pipeout[0]);
         ::close(m_pipeout[1]);
     m_pipeout_failed:
+        TraceAlways("Spawn failure: %s", strerror(err));
         m_msg.assign(strerror(err));
         return false;
     }
 
     bool wait()
     {
-        if (m_finish) {
+        assert(m_start);
+
+        if (m_finish)
             return true;
-        }
+
         switch (waitpid(m_pid, &m_status, 0)) {
         case -1:
             std::cout.flush();
@@ -340,8 +355,21 @@ public:
         }
     }
 
+    bool isfinish()
+    {
+        assert(m_start);
+
+        return m_finish;
+    }
+
+    bool isstart()
+    {
+        return m_start;
+    }
+
     bool status(std::string *msg, bool *success)
     {
+        assert(m_start);
         assert(m_finish);
 
         if (WIFEXITED(m_status)) {
@@ -369,7 +397,10 @@ public:
 };
 
 Spawn::Spawn(ContextPtr ctx)
-    : m_pimpl(std::make_unique<Spawn::Pimpl>(ctx, 50000u))
+    : m_pimpl(
+        std::make_unique<Spawn::Pimpl>(
+            ctx,
+            std::chrono::milliseconds {5}))
 {
 }
 
@@ -378,64 +409,42 @@ Spawn::~Spawn() = default;
 bool Spawn::start(const std::string& exe,
                   const std::string& workingdir,
                   const std::vector < std::string > &args,
-                  unsigned int waitchildtimeout)
+                  std::chrono::milliseconds waitchildtimeout)
 {
-    if (not m_pimpl->m_finish) {
-        m_pimpl->wait();
-        ::close(m_pimpl->m_pipeout[1]);
-        ::close(m_pimpl->m_pipeerr[1]);
-        ::close(m_pimpl->m_pipeout[0]);
-        ::close(m_pimpl->m_pipeerr[0]);
-    }
-
     m_pimpl->init(waitchildtimeout);
+
+#ifndef NDEBUG
+    DTraceAlways("Command:`%s' chdir: `%s'", exe.c_str(), workingdir.c_str());
+
+    for (const auto& elem : args)
+        DTraceAlways("[%s]", elem.c_str());
+#endif
 
     return m_pimpl->start(exe, workingdir, args);
 }
 
 bool Spawn::wait()
 {
-    if (not m_pimpl)
-        return false;
-
     return m_pimpl->wait();
 }
 
 bool Spawn::isstart()
 {
-    if (not m_pimpl)
-        return false;
-
-    return m_pimpl->m_pid != -1 and not m_pimpl->m_finish;
+    return m_pimpl->isstart();
 }
 
 bool Spawn::isfinish()
 {
-    if (not m_pimpl) {
-        return false;
-    }
-
-    if (m_pimpl->m_finish) {
-        return true;
-    } else {
-        m_pimpl->is_running();
-    }
-    return m_pimpl->m_finish;
+    return m_pimpl->isfinish();
 }
 
 bool Spawn::get(std::string *output, std::string *error)
 {
-    if (not m_pimpl or m_pimpl->m_finish)
-        return false;
-
     return m_pimpl->get(output, error);
 }
 
 bool Spawn::status(std::string *msg, bool *success)
 {
-    if (not m_pimpl or not m_pimpl->m_finish)
-        return false;
-
     return m_pimpl->status(msg, success);
 }
 
