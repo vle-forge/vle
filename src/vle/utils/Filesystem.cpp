@@ -420,33 +420,34 @@ bool FSpath::current_path(const FSpath& p)
 
 FSpath FSpath::temp_directory_path()
 {
-    FSpath path;
-
 #if !defined(_WIN32)
     static std::array<const char *, 4> ISO9945_path = { "TMPDIR", "TMP", "TEMP",
                                                         "TEMPDIR" };
 
     for (auto var : ISO9945_path) {
         const char *result = std::getenv(var);
-        path = result;
+        if (not result)
+            continue;
 
+        FSpath path = result;
         if (path.is_directory())
             return path;
     }
 
-    path = "/tmp";
+    return { "/tmp" };
 #else
     const DWORD nBufferLength = MAX_PATH + 1;
     char buffer[nBufferLength];
+    FSpath path;
 
     auto result = GetTempPath(nBufferLength, static_cast<LPSTR>(&buffer[0]));
     if (result > 0) {
         buffer[result] = '\0';
         path = buffer;
     }
-#endif
 
     return path;
+#endif
 }
 
 FSpath FSpath::unique_path(const std::string& model)
