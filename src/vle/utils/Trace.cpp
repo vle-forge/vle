@@ -110,7 +110,7 @@ public:
     void send(const std::string& str, TraceLevelOptions level)
     {
         if (mStream) {
-            (*mStream) << "---" << str << std::endl;
+            (*mStream) << "---" << str << '\n';
             if (level != utils::TRACE_LEVEL_ALWAYS) {
                 mWarnings++;
             }
@@ -140,7 +140,7 @@ public:
                 return;
             va_end(ap);
 
-            (*mStream) << "---" << ret << std::endl;
+            (*mStream) << "---" << ret << '\n';
             if (level != utils::TRACE_LEVEL_ALWAYS)
                 mWarnings++;
         }
