@@ -190,9 +190,11 @@ public:
             m_finish = false;
             return true;
         case -1:
+            TraceAlways("Check running child fail: %s", strerror(errno));
+            return false;
         default:
             m_finish = true;
-            return false;
+            return true;
         }
     }
 
