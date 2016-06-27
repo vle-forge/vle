@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include <iosfwd>
+#include <cstdarg>
 
 namespace vle { namespace utils {
 
@@ -42,9 +43,9 @@ namespace vle { namespace utils {
  */
 using PathList = std::vector<vle::utils::Path>;
 
+struct PrivateContextIimpl;
 class Context;
 using ContextPtr = std::shared_ptr<Context>;
-
 /**
  * Build a std::shared_ptr<Context> using "C" as default locale.
  *
@@ -88,13 +89,49 @@ public:
     Context(Context&& other) = delete;
     Context& operator=(Context&& other) = delete;
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * Manage log
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    using LogFn = std::function<void(const Context& ctx,
+                                     int priority,
+                                     const char *file,
+                                     int line,
+                                     const char *fn,
+                                     const char *format,
+                                     va_list args)>;
+
+    void set_log_function(LogFn fn) noexcept;
+
+    void set_log_priority(int priority) noexcept;
+
+    int get_log_priority() const noexcept;
+
+    void log(int priority,
+             const char *file,
+             int line,
+             const char *fn,
+             const char *format, ...)
+#if defined(__GNUC__)
+        noexcept __attribute__((format(printf, 6, 7)));
+#else
+        noexcept;
+#endif
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * Manage path
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     /**
      * Return the prefix of the compilation on Unix or installation
      * directory taken from registry on Windows.
      * @return A string path.
      */
-    const Path& getPrefixDir() const
-    { return m_prefix; }
+    const Path& getPrefixDir() const;
 
     /**
      * Return the VLE home directory. Default, returns $HOME/.vle on
@@ -103,8 +140,7 @@ public:
      * this variable.
      * @return A string path.
      */
-    const Path& getHomeDir() const
-    { return m_home; }
+    const Path& getHomeDir() const;
 
     /**
      * Returns the \e $VLE_HOME/vle-x.y.conf file path.
@@ -214,29 +250,7 @@ public:
     void fillBinaryPackagesList(std::vector<std::string>& pkglist) const;
 
 private:
-    Path buildPackageDir(const std::string& name) const;
-    Path buildPackageFile(const std::string& name) const;
-    Path buildPackageFile(const std::string& dir,
-                                 const Path& name) const;
-    Path buildPackageFile(const std::string& dir1,
-                                 const Path& dir2,
-                                 const Path& name) const;
-
-    PathList m_simulator;
-    PathList m_stream;
-    PathList m_output;
-    PathList m_modeling;
-
-    Path m_prefix; /*!< the $prefix of installation */
-    Path m_home; /*!< the $VLE_HOME */
-
-    /**
-     * Build the paths from environment variables.
-     * @param variable The name of the variable to read.
-     * @param out The output parameter to store valid path.
-     * @return true if success, false if variable does not exist.
-     */
-    bool readEnv(const std::string& variable, PathList& out);
+    std::unique_ptr<PrivateContextIimpl> m_pimpl;
 
     /**
      * Assign to the m_home attribute the content of the VLE_HOME
@@ -258,20 +272,7 @@ private:
      * from the registry.
      */
     void initPrefixDir();
-
-    /**
-     * Clear all plug-ins lists.
-     */
-    void clearPluginDirs();
 };
-
-/**
- * Stream operator to show the content of the Path::PathList.
- * @param out The output stream.
- * @param paths The list of path.
- * @return The output stream.
- */
-VLE_API std::ostream& operator<<(std::ostream& out, const PathList& paths);
 
 }} // namespace vle utils
 

@@ -26,14 +26,15 @@
 
 
 #include <vle/utils/Context.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include <fstream>
 #include <windows.h>
 #include <winreg.h>
-#include <fstream>
 
 namespace vle { namespace utils {
 
@@ -104,14 +105,14 @@ Path Context::findProgram(const std::string& exe)
 
 void Context::initHomeDir()
 {
-    m_home.clear();
+    m_pimpl->m_home.clear();
 
     readHomeDir();
 
     /*
      * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
      */
-    if (m_home.empty()) {
+    if (m_pimpl->m_home.empty()) {
         const char* homedrive_str = std::getenv("HOMEDRIVE");
         std::string homedrive("");
         if (homedrive_str) {
@@ -123,9 +124,9 @@ void Context::initHomeDir()
             homepath.assign(homepath_str);
         }
 
-        m_home = homedrive;
-        m_home /= homepath;
-        m_home /= "vle";
+        m_pimpl->m_home = homedrive;
+        m_pimpl->m_home /= homepath;
+        m_pimpl->m_home /= "vle";
     }
 }
 
@@ -148,7 +149,7 @@ void Context::initPrefixDir()
             RegCloseKey(hkey);
 
             if (result) {
-                m_prefix = prefix;
+                m_pimpl->m_prefix = prefix;
                 return;
             }
         }
@@ -159,7 +160,7 @@ void Context::initPrefixDir()
             RegCloseKey(hkey);
 
             if (result) {
-                m_prefix = prefix;
+                m_pimpl->m_prefix = prefix;
                 return;
             }
         }
@@ -178,7 +179,7 @@ void Context::initPrefixDir()
             Path result = path.parent_path().parent_path();
 
             if (result.exists())
-                m_prefix = result;
+                m_pimpl->m_prefix = result;
         }
     }
 

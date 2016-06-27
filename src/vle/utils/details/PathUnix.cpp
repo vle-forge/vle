@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <list>
-#include <fstream>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/version.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include <fstream>
+#include <list>
 
 namespace vle { namespace utils {
 
@@ -57,14 +57,14 @@ Path Context::findProgram(const std::string& exe)
 
 void Context::initHomeDir()
 {
-    m_home.clear();
+    m_pimpl->m_home.clear();
 
     readHomeDir();
 
     /*
      * If no VLE_HOME directory, we build $HOME/.vle directory.
      */
-    if (m_home.empty()) {
+    if (m_pimpl->m_home.empty()) {
         const char* path_str = std::getenv("HOME");
         std::string homepath("");
         if (path_str) {
@@ -74,13 +74,13 @@ void Context::initHomeDir()
         Path p(homepath);
         p /= ".vle";
 
-        m_home = p.string();
+        m_pimpl->m_home = p.string();
     }
 }
 
 void Context::initPrefixDir()
 {
-    m_prefix = VLE_PREFIX_DIR;
+    m_pimpl->m_prefix = VLE_PREFIX_DIR;
 }
 
 }} // namespace vle utils

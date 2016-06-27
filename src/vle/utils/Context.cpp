@@ -26,6 +26,7 @@
 
 
 #include <vle/utils/Context.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Filesystem.hpp>
@@ -35,13 +36,35 @@
 
 namespace vle { namespace utils {
 
+static void
+vle_log_stderr(const Context& ctx, int priority, const char *file,
+               int line, const char *fn, const char *format,
+               va_list args) noexcept
+{
+    (void)ctx;
+    (void)priority;
+    (void)file;
+    (void)line;
+
+    fprintf(stderr, "-: %s: ", fn);
+    vfprintf(stderr, format, args);
+}
+
 ContextPtr make_context(const Path& /* prefix */, std::string locale)
 {
     return std::make_shared<Context>(locale);
 }
 
 Context::Context(const Path& /* prefix */, std::string locale)
+    : m_pimpl(std::make_unique<PrivateContextIimpl>())
 {
+    m_pimpl->log_fn = vle_log_stderr;
+#ifndef NDEBUG
+    m_pimpl->log_priority = VLE_LOG_DEBUG;
+#else
+    m_pimpl->log_priority = VLE_LOG_ERR;
+#endif
+
     initHomeDir();
     initPrefixDir();
     initVleHomeDirectory();
@@ -52,15 +75,30 @@ Context::Context(const Path& /* prefix */, std::string locale)
         if (not setlocale(LC_ALL, locale.c_str()))
             setlocale(LC_ALL, "C");
 
+    vInfo(this, "Context initialized\n- Prefixdir=%s\n- Homedir=%s\n"
+          "- Locale=%s\n", m_pimpl->m_prefix.string().c_str(),
+          m_pimpl->m_home.string().c_str(),
+          locale.c_str());
+
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
     textdomain(VLE_LOCALE_NAME);
-#endif  
+#endif
+}
+
+const Path& Context::getPrefixDir() const
+{
+    return m_pimpl->m_prefix;
+}
+
+const Path& Context::getHomeDir() const
+{
+    return m_pimpl->m_home;
 }
 
 Path Context::getLocaleDir() const
 {
-    Path p(m_prefix);
+    Path p(m_pimpl->m_prefix);
     p /= "share";
     p /= "locale";
 
@@ -69,7 +107,7 @@ Path Context::getLocaleDir() const
 
 Path Context::getHomeFile(const std::string& name) const
 {
-    Path p(m_home);
+    Path p(m_pimpl->m_home);
     p /= name;
 
     return p;
@@ -87,7 +125,7 @@ Path Context::getLogFile() const
 
 Path Context::getBinaryPackagesDir() const
 {
-    Path p(m_home);
+    Path p(m_pimpl->m_home);
     p /= "pkgs-" VLE_ABI_VERSION;
 
     return p;
@@ -110,7 +148,6 @@ std::vector<std::string> Context::getBinaryPackages() const
     return result;
 }
 
-
 Path Context::getLocalPackageFilename() const
 {
     Path p(getBinaryPackagesDir());
@@ -129,7 +166,7 @@ Path Context::getRemotePackageFilename() const
 
 Path Context::getTemplateDir() const
 {
-    Path p(m_prefix);
+    Path p(m_pimpl->m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "template";
 
@@ -138,7 +175,7 @@ Path Context::getTemplateDir() const
 
 Path Context::getTemplate(const std::string& name) const
 {
-    Path p(m_prefix);
+    Path p(m_pimpl->m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "template";
     p /= name;
@@ -157,33 +194,6 @@ void Context::initVleHomeDirectory()
                  pkgs.string()).str());
 }
 
-bool Context::readEnv(const std::string& variable, PathList& out)
-{
-    const char* path_str = std::getenv(variable.c_str());
-    std::string path("");
-    if (path_str) {
-        path.assign(path_str);
-    }
-    if (not path.empty()) {
-        std::vector<std::string> result;
-        boost::algorithm::split(result, path, boost::is_any_of(":"),
-                                boost::algorithm::token_compress_on);
-
-        auto it = std::remove_if(result.begin(), result.end(),
-                                 [](const std::string& dirname)
-                                 {
-                                     Path p(dirname);
-                                     return p.is_directory();
-                                 });
-
-        result.erase(it, result.end());
-
-        std::copy(result.begin(), result.end(), std::back_inserter(out));
-        return true;
-    }
-    return false;
-}
-
 void Context::readHomeDir()
 {
     const char* path_str = std::getenv("VLE_HOME");
@@ -193,30 +203,14 @@ void Context::readHomeDir()
     }
     if (not path.empty()) {
         if (Path::is_directory(path)) {
-            m_home = path;
+            m_pimpl->m_home = path;
         } else {
             throw FileError(
                 (fmt(_("Path: VLE_HOME '%1%' does not exist")) % path).str());
         }
     } else {
-        m_home.clear();
+        m_pimpl->m_home.clear();
     }
-}
-
-void Context::clearPluginDirs()
-{
-    m_simulator.clear();
-    m_stream.clear();
-    m_output.clear();
-    m_modeling.clear();
-}
-
-std::ostream& operator<<(std::ostream& out, const PathList& paths)
-{
-    for (const auto& elem : paths)
-        out << '\t' << elem.string() << '\n';
-
-    return out;
 }
 
 void Context::fillBinaryPackagesList(std::vector<std::string>& pkglist) const
@@ -234,5 +228,39 @@ void Context::fillBinaryPackagesList(std::vector<std::string>& pkglist) const
     }
     return;
 }
+
+void Context::set_log_function(LogFn fn) noexcept
+{
+    m_pimpl->log_fn = fn;
+
+    vInfo(this, "custom logging function registered\n");
+}
+
+void Context::set_log_priority(int priority) noexcept
+{
+    m_pimpl->log_priority = priority % 8;
+}
+
+int Context::get_log_priority() const noexcept
+{
+    return m_pimpl->log_priority;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * ContextPrivate.hpp source code to use the pimpl pointer.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+void Context::log(int priority, const char *file, int line,
+                  const char *fn, const char *format, ...) noexcept
+{
+    va_list args;
+
+    va_start(args, format);
+    m_pimpl->log_fn(*this, priority, file, line, fn, format, args);
+    va_end(args);
+}
+
 
 }} // namespace vle utils
