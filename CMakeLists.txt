@@ -148,11 +148,6 @@ else ()
   endif ()
 endif ()
 
-#
-# CPack configuration
-#
-# include(CMakeCPack.cmake)
-
 # Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
 # #seems to be a CMake'list. So we replace ';' with ' '.
 string(REPLACE ";" " " VLEDEPS_CFLAGS_OTHER_STRING "${VLEDEPS_CFLAGS_OTHER}")
@@ -323,5 +318,11 @@ message(STATUS "Build unit test...............: ${VLE_HAVE_UNITTESTFRAMEWORK}")
 message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with mvle...............: ${VLE_HAVE_MVLE}")
 message(STATUS "Build with cvle...............: ${VLE_HAVE_CVLE}")
+
+#
+# CPack configuration
+#
+# include(CPack)
+include(CMakeCPack.cmake)
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2
