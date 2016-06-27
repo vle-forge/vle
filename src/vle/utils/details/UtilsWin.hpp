@@ -44,7 +44,7 @@ public:
      * @param path, the path to convert
      * @return the path converted into 8.3 path on windows
      */
-    static FSpath convertPathTo83Path(const FSpath& path);
+    static Path convertPathTo83Path(const Path& path);
 };
 
 }} // namespace vle utils

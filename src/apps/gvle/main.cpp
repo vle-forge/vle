@@ -36,12 +36,12 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     bool result;
 
-    vle::utils::FSpath prefix(vle::utils::Path::path().getPrefixDir());
-    vle::utils::FSpath localesPath(prefix);
+    vle::utils::Path prefix(vle::utils::Path::path().getPrefixDir());
+    vle::utils::Path localesPath(prefix);
     localesPath /= VLE_SHARE_DIRS;
     localesPath /= "translations";
 
-    vle::utils::FSpath manPath(prefix);
+    vle::utils::Path manPath(prefix);
     manPath /= VLE_SHARE_DIRS;
     manPath /= "man";
 

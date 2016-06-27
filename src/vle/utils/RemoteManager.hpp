@@ -208,11 +208,11 @@ public:
      */
     const std::string& messageError();
 
-    void compress(const FSpath& filepath,
-                  const FSpath& compressedfilepath);
+    void compress(const Path& filepath,
+                  const Path& compressedfilepath);
 
-    void decompress(const FSpath& compressedfilepath,
-                    const FSpath& directorypath);
+    void decompress(const Path& compressedfilepath,
+                    const Path& directorypath);
 
 private:
     class Pimpl;

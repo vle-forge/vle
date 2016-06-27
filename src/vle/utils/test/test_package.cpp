@@ -65,12 +65,12 @@ using namespace vle;
 struct F
 {
     vle::Init a;
-    vle::utils::FSpath current_path;
+    vle::utils::Path current_path;
 
     F()
     {
-        current_path = vle::utils::FSpath::temp_directory_path();
-        current_path /= vle::utils::FSpath::unique_path("vle-%%%%-%%%%-%%%%");
+        current_path = vle::utils::Path::temp_directory_path();
+        current_path /= vle::utils::Path::unique_path("vle-%%%%-%%%%-%%%%");
         current_path.create_directory();
 
         /* We need to ensure each file really installed. */
@@ -86,7 +86,7 @@ struct F
         ::setenv("VLE_HOME", current_path.string().c_str(), 1);
 #endif
 
-        vle::utils::FSpath::current_path(current_path);
+        vle::utils::Path::current_path(current_path);
         std::cout << "test start in " << current_path.string() << '\n';
 
         auto ctx = vle::utils::make_context();
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(show_package)
         std::cout << elem << ' ';
 
     BOOST_REQUIRE(ctx->getBinaryPackages().size() == 1);
-    vle::utils::FSpath p = pkg.getExpDir(vle::utils::PKG_BINARY);
+    vle::utils::Path p = pkg.getExpDir(vle::utils::PKG_BINARY);
 
     std::cout << "\ngetExpDir           : " << p.string()
               << "\ngetExperiments      :";
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
     pkg.minor = 2;
     pkg.patch = 3;
 
-    vle::utils::FSpath path = ctx->getRemotePackageFilename();
+    vle::utils::Path path = ctx->getRemotePackageFilename();
 
     {
         std::ofstream ofs(path.string());
@@ -416,7 +416,7 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
     std::string uniquepath;
 
     try {
-        utils::FSpath unique = utils::FSpath::unique_path("copy-template");
+        utils::Path unique = utils::Path::unique_path("copy-template");
         vle::utils::Package pkg(ctx, unique.string());
         pkg.create();
         pkg.wait(std::cerr, std::cerr);
@@ -437,21 +437,21 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
     BOOST_REQUIRE(not filepath.empty());
 
     utils::RemoteManager rmt(ctx);
-    utils::FSpath tarfile(utils::FSpath::temp_directory_path());
+    utils::Path tarfile(utils::Path::temp_directory_path());
     tarfile /= "check.tar.bz2";
 
     BOOST_REQUIRE_NO_THROW(rmt.compress(uniquepath, tarfile.string()));
 
-    utils::FSpath t { tarfile };
+    utils::Path t { tarfile };
     BOOST_REQUIRE(t.exists());
 
-    utils::FSpath tmpfile(utils::FSpath::temp_directory_path());
+    utils::Path tmpfile(utils::Path::temp_directory_path());
     tmpfile /= "unique";
 
     tmpfile.create_directory();
 
     BOOST_REQUIRE_NO_THROW(rmt.decompress(tarfile.string(), tmpfile.string()));
-    utils::FSpath t2 { tmpfile };
+    utils::Path t2 { tmpfile };
     BOOST_REQUIRE(t2.exists());
 
     t2 /= uniquepath;

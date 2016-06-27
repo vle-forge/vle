@@ -105,7 +105,7 @@ struct DownloadManager::Pimpl
             std::string exe = std::move(argv.front());
             argv.erase(argv.begin());
 
-            FSpath pwd = FSpath::current_path();
+            Path pwd = Path::current_path();
             if (not spawn.start(exe, pwd.string(), argv)) {
                 mErrorMessage = _("Download: fail to start download command");
                 TraceAlways(mErrorMessage.c_str());

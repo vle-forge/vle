@@ -697,8 +697,8 @@ DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 BOOST_AUTO_TEST_CASE(test_gensvpz)
 {
     auto ctx = vle::utils::make_context();
-    vle::utils::FSpath p(DEVS_TEST_DIR);
-    vle::utils::FSpath::current_path(p);
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
     utils::ModuleManager modules(ctx);
@@ -747,8 +747,8 @@ BOOST_AUTO_TEST_CASE(test_gensvpz)
 BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
 {
     auto ctx = vle::utils::make_context();
-    vle::utils::FSpath p(DEVS_TEST_DIR);
-    vle::utils::FSpath::current_path(p);
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
     utils::ModuleManager modules(ctx);
@@ -771,8 +771,8 @@ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
 BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 {
     auto ctx = vle::utils::make_context();
-    vle::utils::FSpath p(DEVS_TEST_DIR);
-    vle::utils::FSpath::current_path(p);
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
     for (int s = 0, es = 100; s != es; ++s) {
         vpz::Vpz file(DEVS_TEST_DIR "/ordereddeleter.vpz");
@@ -806,8 +806,8 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 BOOST_AUTO_TEST_CASE(test_confluent_transition)
 {
     auto ctx = vle::utils::make_context();
-    vle::utils::FSpath p(DEVS_TEST_DIR);
-    vle::utils::FSpath::current_path(p);
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
     utils::ModuleManager modules(ctx);
@@ -832,8 +832,8 @@ BOOST_AUTO_TEST_CASE(test_confluent_transition)
 BOOST_AUTO_TEST_CASE(test_timed_obs)
 {
     auto ctx = vle::utils::make_context();
-    vle::utils::FSpath p(DEVS_TEST_DIR);
-    vle::utils::FSpath::current_path(p);
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
     utils::ModuleManager modules(ctx);

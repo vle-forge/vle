@@ -48,7 +48,7 @@
  *
  * TODO function from ModuleManager
  */
-static std::string TMPgetLibraryName(const vle::utils::FSpath& file)
+static std::string TMPgetLibraryName(const vle::utils::Path& file)
 {
     std::string library;
 

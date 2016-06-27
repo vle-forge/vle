@@ -55,7 +55,7 @@ BOOST_FIXTURE_TEST_CASE(download_dtd, F)
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
 
-    vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
+    vle::utils::Path p(vle::utils::Path::temp_directory_path());
     p /= "vle-1.1.0.dtd";
 
     dm.start("www.vle-project.org/vle-1.0.0.dtd", p.string());
@@ -64,7 +64,7 @@ BOOST_FIXTURE_TEST_CASE(download_dtd, F)
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
 
-    vle::utils::FSpath dowloaded(dm.filename());
+    vle::utils::Path dowloaded(dm.filename());
     BOOST_CHECK(dowloaded.is_file());
 }
 
@@ -74,7 +74,7 @@ BOOST_FIXTURE_TEST_CASE(download_package, F)
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
 
-    vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
+    vle::utils::Path p(vle::utils::Path::temp_directory_path());
     p /= "packages.pkg";
 
     dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
@@ -83,7 +83,7 @@ BOOST_FIXTURE_TEST_CASE(download_package, F)
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
 
-    vle::utils::FSpath d(dm.filename());
+    vle::utils::Path d(dm.filename());
     BOOST_CHECK(d.is_file());
 }
 
@@ -92,7 +92,7 @@ BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
 
-    vle::utils::FSpath p(vle::utils::FSpath::temp_directory_path());
+    vle::utils::Path p(vle::utils::Path::temp_directory_path());
     p /= "packages.pkg";
 
     dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
@@ -101,6 +101,6 @@ BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
     BOOST_CHECK(dm.isFinish());
     BOOST_CHECK(not dm.hasError());
 
-    vle::utils::FSpath d(dm.filename());
+    vle::utils::Path d(dm.filename());
     BOOST_CHECK(d.is_file());
 }

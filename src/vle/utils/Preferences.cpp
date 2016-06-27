@@ -90,7 +90,7 @@ struct Preferences::Pimpl
 
     bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
 
-    Pimpl(bool readOnly, const FSpath& filepath)
+    Pimpl(bool readOnly, const Path& filepath)
         : ppMap{
         { "gvle.packages.auto-build", true },
         { "gvle.editor.auto-indent", true },
@@ -215,12 +215,12 @@ struct Preferences::Pimpl
     }
 };
 
-Preferences::Preferences(const FSpath& filepath)
+Preferences::Preferences(const Path& filepath)
     : mPimpl(std::make_unique<Preferences::Pimpl>(false, filepath))
 {
 }
 
-Preferences::Preferences(bool readOnly, const FSpath& filepath)
+Preferences::Preferences(bool readOnly, const Path& filepath)
     : mPimpl(std::make_unique<Preferences::Pimpl>(readOnly, filepath))
 {
 }

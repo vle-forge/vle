@@ -83,9 +83,9 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     return false;
 }
 
-FSpath Context::findProgram(const std::string& exe)
+Path Context::findProgram(const std::string& exe)
 {
-    FSpath res = UtilsWin::convertPathTo83Path(getPrefixDir());
+    Path res = UtilsWin::convertPathTo83Path(getPrefixDir());
     res /= "bin";
 
     if (exe == "cmake" or exe == "cmake.exe")
@@ -174,8 +174,8 @@ void Context::initPrefixDir()
         if ((size = GetModuleFileName(NULL, &filepath[0], MAX_PATH))) {
             std::vector < TCHAR > buf(MAX_PATH, '\0');
 
-            FSpath path = &filepath[0];
-            FSpath result = path.parent_path().parent_path();
+            Path path = &filepath[0];
+            Path result = path.parent_path().parent_path();
 
             if (result.exists())
                 m_prefix = result;

@@ -315,7 +315,7 @@ public:
         void operator()(std::string url) const
         {
             DownloadManager dl(context);
-            FSpath filename(FSpath::temp_directory_path());
+            Path filename(Path::temp_directory_path());
             filename /= "packages.pkg";
 
             dl.start(url + "/packages.pkg", filename.string());
@@ -441,19 +441,19 @@ public:
         std::string url = it->url;
         out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
 
-        FSpath archfile(FSpath::temp_directory_path());
+        Path archfile(Path::temp_directory_path());
         archfile /= archname;
         dl.start(url + archname, archfile.string());
         dl.join();
         if (not dl.hasError()) {
             out(fmt(_("ok\n")));
 
-            FSpath tempDir(FSpath::temp_directory_path());
-            FSpath archpath(archfile);
-            FSpath dearchpath(tempDir);
+            Path tempDir(Path::temp_directory_path());
+            Path archpath(archfile);
+            Path dearchpath(tempDir);
 
             {
-                FScurrent_path_restore restore(FSpath(tempdir));
+                FScurrent_path_restore restore(Path(tempdir));
                 decompress(archpath.string(), dearchpath.string());
                 vle::utils::Package pkg(mContext, pkgid.name);
                 out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %
@@ -498,7 +498,7 @@ public:
             dl.join();
             if (not dl.hasError()) {
                 std::string filename = dl.filename();
-                FSpath::rename(filename, archname);
+                Path::rename(filename, archname);
             } else {
                 std::ostringstream errorStream;
                 errorStream << fmt(_("Error while downloading "
@@ -631,14 +631,14 @@ public:
         mStop = false;
     }
 
-    void compress(const FSpath& filepath, const FSpath& compressedfilepath)
+    void compress(const Path& filepath, const Path& compressedfilepath)
     {
         if (not filepath.exists())
             throw utils::InternalError(
                 (fmt(_("fail to compress '%1%': file or directory does not exist"))
                  % filepath.string()).str());
 
-        FSpath pwd = FSpath::current_path();
+        Path pwd = Path::current_path();
         std::string command;
 
         try {
@@ -688,8 +688,8 @@ public:
                         command.c_str());
         }
     }
-    void decompress(const FSpath& compressedfilepath,
-                    const FSpath& directorypath)
+    void decompress(const Path& compressedfilepath,
+                    const Path& directorypath)
     {
         if (not directorypath.is_directory())
             throw utils::InternalError(
@@ -703,7 +703,7 @@ public:
                        "file does not exist"))
                  % compressedfilepath.string() % directorypath.string()).str());
 
-        FSpath pwd = FSpath::current_path();
+        Path pwd = Path::current_path();
 
         std::string command;
         try {
@@ -816,13 +816,13 @@ const std::string& RemoteManager::messageError()
     return mPimpl->mErrorMessage;
 }
 
-void RemoteManager::compress(const FSpath& filepath, const FSpath& compressedfilepath)
+void RemoteManager::compress(const Path& filepath, const Path& compressedfilepath)
 {
     mPimpl->compress(filepath, compressedfilepath);
 }
 
-void RemoteManager::decompress(const FSpath& compressedfilepath,
-                               const FSpath& directorypath)
+void RemoteManager::decompress(const Path& compressedfilepath,
+                               const Path& directorypath)
 {
     mPimpl->decompress(compressedfilepath, directorypath);
 }

@@ -40,7 +40,7 @@ namespace vle { namespace utils {
 /**
  * Define a list of directories.
  */
-using PathList = std::vector<vle::utils::FSpath>;
+using PathList = std::vector<vle::utils::Path>;
 
 class Context;
 using ContextPtr = std::shared_ptr<Context>;
@@ -56,7 +56,7 @@ using ContextPtr = std::shared_ptr<Context>;
  * otherwise, you can specify what you want.  \e return An initialized
  * std::shared_ptr<Context>.
  */
-VLE_API ContextPtr make_context(const FSpath& prefix = {},
+VLE_API ContextPtr make_context(const Path& prefix = {},
                                 std::string locale = {"C"});
 
 /**
@@ -80,7 +80,7 @@ VLE_API ContextPtr make_context(const FSpath& prefix = {},
 class VLE_API Context
 {
 public:
-    Context(const FSpath& prefix = {}, std::string locale = {"C"});
+    Context(const Path& prefix = {}, std::string locale = {"C"});
     ~Context() = default;
 
     Context(const Context& other) = delete;
@@ -93,7 +93,7 @@ public:
      * directory taken from registry on Windows.
      * @return A string path.
      */
-    const FSpath& getPrefixDir() const
+    const Path& getPrefixDir() const
     { return m_prefix; }
 
     /**
@@ -103,7 +103,7 @@ public:
      * this variable.
      * @return A string path.
      */
-    const FSpath& getHomeDir() const
+    const Path& getHomeDir() const
     { return m_home; }
 
     /**
@@ -111,25 +111,25 @@ public:
      *
      * \return A complete path to access the vle configuration file.
      */
-    FSpath getConfigurationFile() const;
+    Path getConfigurationFile() const;
 
     /**
      * Return the \e $HOMEVLE/vle-x.y.log file path.
      *
      * \return A complete path to access the vle log file.
      */
-    FSpath getLogFile() const;
+    Path getLogFile() const;
 
     /**
      * Get a file from the getHomeDir() directory.
      * @param name The filename to concat.
      */
-    FSpath getHomeFile(const std::string& name) const;
+    Path getHomeFile(const std::string& name) const;
 
     /**
      * Get the locale directory (/usr/share/locale).
      */
-    FSpath getLocaleDir() const;
+    Path getLocaleDir() const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -142,7 +142,7 @@ public:
      * @return A string.
      */
 
-    FSpath getBinaryPackagesDir() const;
+    Path getBinaryPackagesDir() const;
 
     /** Returns the list of dirname available in the binary package directory.
      */
@@ -153,14 +153,14 @@ public:
      *
      * @return The path @e "$VLE_HOME/local.pkg."
      */
-    FSpath getLocalPackageFilename() const;
+    Path getLocalPackageFilename() const;
 
     /**
      * Return the path @e "$VLE_HOME/remote.pkg".
      *
      * @return The path @e "$VLE_HOME/remote.pkg."
      */
-    FSpath getRemotePackageFilename() const;
+    Path getRemotePackageFilename() const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -172,7 +172,7 @@ public:
      * Get the $PREFIX/share/vle-x.y.z/template directory name.
      * @return A string.
      */
-    FSpath getTemplateDir() const;
+    Path getTemplateDir() const;
 
     /**
      * Return the $PREFIX/share/vle-x.y.z/template/name directory
@@ -180,7 +180,7 @@ public:
      * @path The name of the template.
      * @return A string.
      */
-    FSpath getTemplate(const std::string& name) const;
+    Path getTemplate(const std::string& name) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -205,7 +205,7 @@ public:
      * @param the program name
      * @param the absolute path to a program
      */
-    FSpath findProgram(const std::string& exe);
+    Path findProgram(const std::string& exe);
 
     /**
      * @brief fill a vector of string with the list of binary packages
@@ -214,21 +214,21 @@ public:
     void fillBinaryPackagesList(std::vector<std::string>& pkglist) const;
 
 private:
-    FSpath buildPackageDir(const std::string& name) const;
-    FSpath buildPackageFile(const std::string& name) const;
-    FSpath buildPackageFile(const std::string& dir,
-                                 const FSpath& name) const;
-    FSpath buildPackageFile(const std::string& dir1,
-                                 const FSpath& dir2,
-                                 const FSpath& name) const;
+    Path buildPackageDir(const std::string& name) const;
+    Path buildPackageFile(const std::string& name) const;
+    Path buildPackageFile(const std::string& dir,
+                                 const Path& name) const;
+    Path buildPackageFile(const std::string& dir1,
+                                 const Path& dir2,
+                                 const Path& name) const;
 
     PathList m_simulator;
     PathList m_stream;
     PathList m_output;
     PathList m_modeling;
 
-    FSpath m_prefix; /*!< the $prefix of installation */
-    FSpath m_home; /*!< the $VLE_HOME */
+    Path m_prefix; /*!< the $prefix of installation */
+    Path m_home; /*!< the $VLE_HOME */
 
     /**
      * Build the paths from environment variables.

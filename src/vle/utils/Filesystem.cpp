@@ -89,67 +89,67 @@ tokenize(const std::string &string, const std::string &delim)
 
 namespace vle { namespace utils {
 
-FSpath::FSpath()
+Path::Path()
     : m_type(native_path)
     , m_absolute(false)
 {}
 
-FSpath::FSpath(const FSpath &path)
+Path::Path(const Path &path)
     : m_path(path.m_path)
     , m_type(path.m_type)
     , m_absolute(path.m_absolute)
 {}
 
-FSpath::FSpath(FSpath &&path)
+Path::Path(Path &&path)
     : m_path(std::move(path.m_path))
     , m_type(path.m_type)
     , m_absolute(path.m_absolute)
 {}
 
-FSpath::FSpath(const char *string)
+Path::Path(const char *string)
 {
     if (string)
         set(string);
 }
 
-FSpath::FSpath(const std::string &string)
+Path::Path(const std::string &string)
 {
     set(string);
 }
 
 #if defined(_WIN32)
-FSpath::FSpath(const std::wstring &wstring)
+Path::Path(const std::wstring &wstring)
 {
     set(wstring);
 }
 
-FSpath::FSpath(const wchar_t *wstring)
+Path::Path(const wchar_t *wstring)
 {
     set(wstring);
 }
 #endif
 
-size_t FSpath::length() const
+size_t Path::length() const
 {
     return m_path.size();
 }
 
-bool FSpath::empty() const
+bool Path::empty() const
 {
     return m_path.empty();
 }
 
-void FSpath::clear() noexcept
+void Path::clear() noexcept
 {
     m_path.clear();
 }
 
-bool FSpath::is_absolute() const
+bool Path::is_absolute() const
 {
     return m_absolute;
 }
 
-bool FSpath::exists() const
+bool Path::exists() const
 {
 #if defined(_WIN32)
     return GetFileAttributesW(wstring().c_str()) != INVALID_FILE_ATTRIBUTES;
@@ -159,21 +159,21 @@ bool FSpath::exists() const
 #endif
 }
 
-size_t FSpath::file_size() const
+size_t Path::file_size() const
 {
 #if defined(_WIN32)
     struct _stati64 sb;
     if (_wstati64(wstring().c_str(), &sb) != 0)
-        throw std::runtime_error("FSpath::file_size(): cannot stat file \"" + string() + "\"!");
+        throw std::runtime_error("Path::file_size(): cannot stat file \"" + string() + "\"!");
 #else
     struct stat sb;
     if (stat(string().c_str(), &sb) != 0)
-        throw std::runtime_error("FSpath::file_size(): cannot stat file \"" + string() + "\"!");
+        throw std::runtime_error("Path::file_size(): cannot stat file \"" + string() + "\"!");
 #endif
     return (size_t) sb.st_size;
 }
 
-bool FSpath::is_directory() const
+bool Path::is_directory() const
 {
 #if defined(_WIN32)
     DWORD result = GetFileAttributesW(wstring().c_str());
@@ -188,7 +188,7 @@ bool FSpath::is_directory() const
 #endif
 }
 
-bool FSpath::is_file() const
+bool Path::is_file() const
 {
 #if defined(_WIN32)
     DWORD attr = GetFileAttributesW(wstring().c_str());
@@ -201,7 +201,7 @@ bool FSpath::is_file() const
 #endif
 }
 
-std::string FSpath::extension() const
+std::string Path::extension() const
 {
     const std::string &name = filename();
     size_t pos = name.find_last_of(".");
@@ -210,7 +210,7 @@ std::string FSpath::extension() const
     return name.substr(pos);
 }
 
-std::string FSpath::basename() const
+std::string Path::basename() const
 {
     if (empty())
         return {};
@@ -224,7 +224,7 @@ std::string FSpath::basename() const
     return str.substr(0, dot);
 }
 
-std::string FSpath::filename() const
+std::string Path::filename() const
 {
     if (empty())
         return {};
@@ -234,9 +234,9 @@ std::string FSpath::filename() const
     return last;
 }
 
-FSpath FSpath::parent_path() const
+Path Path::parent_path() const
 {
-    FSpath result;
+    Path result;
     result.m_absolute = m_absolute;
 
     if (m_path.empty()) {
@@ -250,16 +250,16 @@ FSpath FSpath::parent_path() const
     return result;
 }
 
-FSpath FSpath::operator/(const FSpath &other) const
+Path Path::operator/(const Path &other) const
 {
     if (other.m_absolute)
         throw std::runtime_error(
-            "FSpath::operator/(): expected a relative path!");
+            "Path::operator/(): expected a relative path!");
     if (m_type != other.m_type)
         throw std::runtime_error(
-            "FSpath::operator/(): expected a path of the same type!");
+            "Path::operator/(): expected a path of the same type!");
 
-    FSpath result(*this);
+    Path result(*this);
 
     for (size_t i=0; i<other.m_path.size(); ++i)
         result.m_path.push_back(other.m_path[i]);
@@ -267,11 +267,11 @@ FSpath FSpath::operator/(const FSpath &other) const
     return result;
 }
 
-FSpath& FSpath::operator/=(const FSpath &other)
+Path& Path::operator/=(const Path &other)
 {
     if (other.m_absolute)
         throw std::runtime_error(
-            "FSpath::operator/(): expected a relative path!");
+            "Path::operator/(): expected a relative path!");
 
     std::copy(other.m_path.begin(), other.m_path.end(),
               std::back_inserter(m_path));
@@ -279,7 +279,7 @@ FSpath& FSpath::operator/=(const FSpath &other)
     return *this;
 }
 
-std::string FSpath::string(path_type type) const
+std::string Path::string(path_type type) const
 {
     std::ostringstream oss;
 
@@ -299,7 +299,7 @@ std::string FSpath::string(path_type type) const
     return oss.str();
 }
 
-void FSpath::set(const std::string &str, path_type type)
+void Path::set(const std::string &str, path_type type)
 {
     m_type = type;
     if (type == windows_path) {
@@ -311,7 +311,7 @@ void FSpath::set(const std::string &str, path_type type)
     }
 }
 
-FSpath &FSpath::operator=(const FSpath &path)
+Path &Path::operator=(const Path &path)
 {
     m_type = path.m_type;
     m_path = path.m_path;
@@ -319,7 +319,7 @@ FSpath &FSpath::operator=(const FSpath &path)
     return *this;
 }
 
-FSpath &FSpath::operator=(FSpath &&path)
+Path &Path::operator=(Path &&path)
 {
     if (this != &path) {
         m_type = path.m_type;
@@ -329,7 +329,7 @@ FSpath &FSpath::operator=(FSpath &&path)
     return *this;
 }
 
-bool FSpath::remove() const
+bool Path::remove() const
 {
     if (is_file()) {
 #if !defined(_WIN32)
@@ -346,24 +346,24 @@ bool FSpath::remove() const
     }
 }
 
-bool FSpath::create_directory() const
+bool Path::create_directory() const
 {
 #if defined(_WIN32)
     if (::CreateDirectoryW(wstring().c_str(), nullptr) == 0) {
 #else
     if (::mkdir(string().c_str(), S_IRUSR | S_IWUSR | S_IXUSR)) {
 #endif
-        TraceAlways("FSpath::create_directory: %s fails", string().c_str());
+        TraceAlways("Path::create_directory: %s fails", string().c_str());
         return false;
     }
 
     return true;
 }
 
-bool FSpath::create_directories() const
+bool Path::create_directories() const
 {
     if (is_absolute()) {
-        FSpath tmp(*this);
+        Path tmp(*this);
 
         while (not tmp.empty()) {
             tmp.m_path.pop_back();
@@ -381,7 +381,7 @@ bool FSpath::create_directories() const
             }
         }
     } else {
-        FSpath tmp;
+        Path tmp;
 
         for (auto it = cbegin(), end = cend(); it != end; ++it) {
             tmp /= *it;
@@ -394,22 +394,22 @@ bool FSpath::create_directories() const
     return true;
 }
 
-FSpath FSpath::current_path()
+Path Path::current_path()
 {
 #if !defined(_WIN32)
     char temp[PATH_MAX];
     if (::getcwd(temp, PATH_MAX) == NULL)
         throw std::runtime_error("Internal error in getcwd(): " + std::string(strerror(errno)));
-    return FSpath(temp);
+    return Path(temp);
 #else
     std::wstring temp(MAX_PATH, '\0');
     if (!_wgetcwd(&temp[0], MAX_PATH))
         throw std::runtime_error("Internal error in getcwd(): " + std::to_string(GetLastError()));
-    return FSpath(temp.c_str());
+    return Path(temp.c_str());
 #endif
 }
 
-bool FSpath::current_path(const FSpath& p)
+bool Path::current_path(const Path& p)
 {
 #if !defined(_WIN32)
     return ::chdir(p.string().c_str()) == 0;
@@ -418,7 +418,7 @@ bool FSpath::current_path(const FSpath& p)
 #endif
 }
 
-FSpath FSpath::temp_directory_path()
+Path Path::temp_directory_path()
 {
 #if !defined(_WIN32)
     static std::array<const char *, 4> ISO9945_path = { "TMPDIR", "TMP", "TEMP",
@@ -429,7 +429,7 @@ FSpath FSpath::temp_directory_path()
         if (not result)
             continue;
 
-        FSpath path = result;
+        Path path = result;
         if (path.is_directory())
             return path;
     }
@@ -438,7 +438,7 @@ FSpath FSpath::temp_directory_path()
 #else
     const DWORD nBufferLength = MAX_PATH + 1;
     char buffer[nBufferLength];
-    FSpath path;
+    Path path;
 
     auto result = GetTempPath(nBufferLength, static_cast<LPSTR>(&buffer[0]));
     if (result > 0) {
@@ -450,7 +450,7 @@ FSpath FSpath::temp_directory_path()
 #endif
 }
 
-FSpath FSpath::unique_path(const std::string& model)
+Path Path::unique_path(const std::string& model)
 {
     std::mt19937 rng;
 
@@ -470,13 +470,13 @@ FSpath FSpath::unique_path(const std::string& model)
             }
         }
 
-        FSpath path(format);
+        Path path(format);
         if (not path.exists())
-            return FSpath(format);
+            return Path(format);
     }
 }
 
-void FSpath::copy_file(const FSpath& from, const FSpath& to)
+void Path::copy_file(const Path& from, const Path& to)
 {
     std::ifstream src(from.string(), std::ios::binary);
     if (not src)
@@ -493,7 +493,7 @@ void FSpath::copy_file(const FSpath& from, const FSpath& to)
 }
 
 #if defined(_WIN32)
-std::wstring FSpath::wstring(path_type type) const
+std::wstring Path::wstring(path_type type) const
 {
     std::string temp = string(type);
     int size = MultiByteToWideChar(CP_UTF8, 0, &temp[0],
@@ -504,7 +504,7 @@ std::wstring FSpath::wstring(path_type type) const
     return result;
 }
 
-void FSpath::set(const std::wstring &wstring, path_type type)
+void Path::set(const std::wstring &wstring, path_type type)
 {
     std::string string;
     if (!wstring.empty()) {
@@ -518,24 +518,24 @@ void FSpath::set(const std::wstring &wstring, path_type type)
     set(string, type);
 }
 
-FSpath &FSpath::operator=(const std::wstring &str)
+Path &Path::operator=(const std::wstring &str)
 {
     set(str);
     return *this;
 }
 #endif
 
-bool operator==(const FSpath &p, const FSpath &q)
+bool operator==(const Path &p, const Path &q)
 {
     return p.m_path == q.m_path;
 }
 
-bool operator!=(const FSpath &p, const FSpath &q)
+bool operator!=(const Path &p, const Path &q)
 {
     return p.m_path != q.m_path;
 }
 
-bool operator<(const FSpath &p, const FSpath &q)
+bool operator<(const Path &p, const Path &q)
 {
     const auto max = std::min(p.m_path.size(), q.m_path.size());
 
@@ -546,17 +546,17 @@ bool operator<(const FSpath &p, const FSpath &q)
     return p.m_path.size() < q.m_path.size();
 }
 
-bool FSpath::is_directory(const FSpath& p)
+bool Path::is_directory(const Path& p)
 {
     return p.is_directory();
 }
 
-bool FSpath::is_file(const FSpath& p)
+bool Path::is_file(const Path& p)
 {
     return p.is_file();
 }
 
-bool FSpath::rename(const FSpath& from, const FSpath& to)
+bool Path::rename(const Path& from, const Path& to)
 {
     if (not from.exists())
         return false;
@@ -567,42 +567,42 @@ bool FSpath::rename(const FSpath& from, const FSpath& to)
     return std::rename(from.string().c_str(), to.string().c_str()) == 0;
 }
 
-bool FSpath::create_directory(const FSpath& p)
+bool Path::create_directory(const Path& p)
 {
     return p.create_directory();
 }
 
-bool FSpath::create_directories(const FSpath& p)
+bool Path::create_directories(const Path& p)
 {
     return p.create_directories();
 }
 
 //
-// FSdirectory_entry, FSdirectory_iterator implementation
+// DirectoryEntry, DirectoryIterator implementation
 //
 
-FSdirectory_entry::FSdirectory_entry()
+DirectoryEntry::DirectoryEntry()
     : m_path()
     , m_is_file(false)
     , m_is_directory(false)
 {}
 
-const FSpath& FSdirectory_entry::path() const
+const Path& DirectoryEntry::path() const
 {
     return m_path;
 }
 
-bool FSdirectory_entry::is_file() const
+bool DirectoryEntry::is_file() const
 {
     return m_is_file;
 }
 
-bool FSdirectory_entry::is_directory() const
+bool DirectoryEntry::is_directory() const
 {
     return m_is_directory;
 }
 
-struct FSdirectory_iterator::Pimpl
+struct DirectoryIterator::Pimpl
 {
     enum Type { REGULAR, DIRECTORY, UNKNOWN };
 
@@ -612,18 +612,18 @@ struct FSdirectory_iterator::Pimpl
 #else
     DIR *m_directory;
 #endif
-    FSpath m_path;
-    FSdirectory_entry m_entry;
+    Path m_path;
+    DirectoryEntry m_entry;
     bool m_finish;
 
 public:
-    Pimpl(const FSpath& path)
+    Pimpl(const Path& path)
 #if defined(_WIN32)
         : hFind(INVALID_HANDLE_VALUE)
         , m_path(path)
         , m_finish(false)
     {
-        FSpath spec = m_path / "*.*";
+        Path spec = m_path / "*.*";
 
         hFind = FindFirstFile(spec.string().c_str(), &ffd);
         if (hFind == INVALID_HANDLE_VALUE)
@@ -706,17 +706,17 @@ public:
     }
 };;
 
-FSdirectory_iterator::FSdirectory_iterator()
+DirectoryIterator::DirectoryIterator()
     : m_pimpl()
 {}
 
-FSdirectory_iterator::FSdirectory_iterator(const FSpath& p)
-    : m_pimpl(std::make_shared<FSdirectory_iterator::Pimpl>(p))
+DirectoryIterator::DirectoryIterator(const Path& p)
+    : m_pimpl(std::make_shared<DirectoryIterator::Pimpl>(p))
 {}
 
-FSdirectory_iterator::~FSdirectory_iterator() = default;
+DirectoryIterator::~DirectoryIterator() = default;
 
-FSdirectory_iterator& FSdirectory_iterator::operator++()
+DirectoryIterator& DirectoryIterator::operator++()
 {
     if (not m_pimpl)
         return *this;
@@ -729,7 +729,7 @@ FSdirectory_iterator& FSdirectory_iterator::operator++()
     return *this;
 }
 
-FSpath FSdirectory_iterator::operator*() const
+Path DirectoryIterator::operator*() const
 {
     if (not m_pimpl)
         throw std::runtime_error("null pointer dereference");
@@ -737,7 +737,7 @@ FSpath FSdirectory_iterator::operator*() const
     return m_pimpl->m_entry.m_path;
 }
 
-FSdirectory_entry* FSdirectory_iterator::operator->() const
+DirectoryEntry* DirectoryIterator::operator->() const
 {
     if (not m_pimpl)
         throw std::runtime_error("null pointer dereference");
@@ -745,20 +745,20 @@ FSdirectory_entry* FSdirectory_iterator::operator->() const
     return &m_pimpl->m_entry;
 }
 
-void swap(FSdirectory_iterator& lhs,
-        FSdirectory_iterator& rhs)
+void swap(DirectoryIterator& lhs,
+        DirectoryIterator& rhs)
 {
     std::swap(lhs.m_pimpl, rhs.m_pimpl);
 }
 
-bool operator==(const FSdirectory_iterator& lhs,
-        const FSdirectory_iterator& rhs)
+bool operator==(const DirectoryIterator& lhs,
+        const DirectoryIterator& rhs)
 {
     return lhs.m_pimpl == rhs.m_pimpl;
 }
 
-bool operator!=(const FSdirectory_iterator& lhs,
-        const FSdirectory_iterator& rhs)
+bool operator!=(const DirectoryIterator& lhs,
+        const DirectoryIterator& rhs)
 {
     return lhs.m_pimpl != rhs.m_pimpl;
 }

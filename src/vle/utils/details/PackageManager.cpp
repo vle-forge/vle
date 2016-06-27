@@ -36,7 +36,7 @@ namespace vle { namespace utils {
 
 static bool extract__(Packages *out, const std::string& filepath)
 {
-    FSpath pkg(filepath);
+    Path pkg(filepath);
     PackageParser parser;
 
     if (pkg.is_file()) {
@@ -54,13 +54,13 @@ static bool extract__(Packages *out, const std::string& filepath)
 
 static bool rebuild__(ContextPtr ctx, Packages *out)
 {
-    FSpath pkgsdir(ctx->getBinaryPackagesDir());
+    Path pkgsdir(ctx->getBinaryPackagesDir());
     PackageParser parser;
 
     if (pkgsdir.is_directory()) {
-        for (FSdirectory_iterator it(pkgsdir), end; it != end; ++it) {
+        for (DirectoryIterator it(pkgsdir), end; it != end; ++it) {
             if (it->is_directory()) {
-                FSpath descfile = *it;
+                Path descfile = *it;
                 descfile /= "Description.txt";
 
                 if (descfile.is_file()) {

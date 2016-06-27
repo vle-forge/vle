@@ -30,9 +30,9 @@
 
 namespace vle { namespace utils {
 
-FSpath UtilsWin::convertPathTo83Path(const FSpath& path)
+Path UtilsWin::convertPathTo83Path(const Path& path)
 {
-    FSpath ret = path;
+    Path ret = path;
     std::string strpath(path.string());
     DWORD lenght;
 

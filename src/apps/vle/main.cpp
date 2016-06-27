@@ -193,15 +193,15 @@ static void remove_configuration_file()
     printf(_("Remove configuration files\n"));
 
     try {
-        using vle::utils::FSpath;
+        using vle::utils::Path;
 
         {
-            FSpath filepath(ctx->getConfigurationFile());
+            Path filepath(ctx->getConfigurationFile());
             filepath.remove();
         }
 
         {
-            FSpath filepath(ctx->getLogFile());
+            Path filepath(ctx->getLogFile());
             filepath.remove();
         }
 
@@ -233,14 +233,14 @@ static std::string search_vpz(const std::string &param,
     assert(not pkg.name().empty());
 
     {
-        vle::utils::FSpath p(param);
+        vle::utils::Path p(param);
         if (p.is_file())
             return param;
     }
 
     std::string np = pkg.getExpFile(param, vle::utils::PKG_BINARY);
 
-    vle::utils::FSpath p(np);
+    vle::utils::Path p(np);
     if (p.is_file(np))
         return np;
 

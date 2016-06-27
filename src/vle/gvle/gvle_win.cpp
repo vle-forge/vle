@@ -950,7 +950,7 @@ gvle_win::treeProjectUpdate()
     QItemSelectionModel *selmod = tree->selectionModel();
     QTreeView* projectTreeView = ui->treeProject;
 
-    vle::utils::FSpath p(mCurrPackage.name());
+    vle::utils::Path p(mCurrPackage.name());
     QString projectName(p.filename().c_str());
     if (projectName != "") {
         QModelIndex projectIndex = mProjectFileSytem->setRootPath(projectName);

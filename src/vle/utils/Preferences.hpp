@@ -85,7 +85,7 @@ public:
      * @throw utils::ArgError if the opening of the resources file failed
      * or during the reading of the file.
      */
-    Preferences(const FSpath& filepath);
+    Preferences(const Path& filepath);
 
     /**
      * Build a new Preferences object with a specified filename, read the
@@ -97,7 +97,7 @@ public:
      * @throw utils::ArgError if the opening of the resources file failed
      * or during the reading of the file.
      */
-    Preferences(bool readOnly, const FSpath& filepath);
+    Preferences(bool readOnly, const Path& filepath);
 
     Preferences(Preferences&& rhs) = default;
     Preferences& operator=(Preferences&& rhs) = default;

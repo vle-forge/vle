@@ -35,12 +35,12 @@
 
 namespace vle { namespace utils {
 
-ContextPtr make_context(const FSpath& /* prefix */, std::string locale)
+ContextPtr make_context(const Path& /* prefix */, std::string locale)
 {
     return std::make_shared<Context>(locale);
 }
 
-Context::Context(const FSpath& /* prefix */, std::string locale)
+Context::Context(const Path& /* prefix */, std::string locale)
 {
     initHomeDir();
     initPrefixDir();
@@ -58,36 +58,36 @@ Context::Context(const FSpath& /* prefix */, std::string locale)
 #endif  
 }
 
-FSpath Context::getLocaleDir() const
+Path Context::getLocaleDir() const
 {
-    FSpath p(m_prefix);
+    Path p(m_prefix);
     p /= "share";
     p /= "locale";
 
     return p;
 }
 
-FSpath Context::getHomeFile(const std::string& name) const
+Path Context::getHomeFile(const std::string& name) const
 {
-    FSpath p(m_home);
+    Path p(m_home);
     p /= name;
 
     return p;
 }
 
-FSpath Context::getConfigurationFile() const
+Path Context::getConfigurationFile() const
 {
     return getHomeFile("vle-" VLE_ABI_VERSION ".conf");
 }
 
-FSpath Context::getLogFile() const
+Path Context::getLogFile() const
 {
     return getHomeFile("vle-" VLE_ABI_VERSION ".log");
 }
 
-FSpath Context::getBinaryPackagesDir() const
+Path Context::getBinaryPackagesDir() const
 {
-    FSpath p(m_home);
+    Path p(m_home);
     p /= "pkgs-" VLE_ABI_VERSION;
 
     return p;
@@ -95,7 +95,7 @@ FSpath Context::getBinaryPackagesDir() const
 
 std::vector<std::string> Context::getBinaryPackages() const
 {
-    FSpath pkgs(getBinaryPackagesDir());
+    Path pkgs(getBinaryPackagesDir());
 
     if (not pkgs.is_directory())
         throw utils::InternalError(
@@ -103,7 +103,7 @@ std::vector<std::string> Context::getBinaryPackages() const
              getBinaryPackagesDir().string()).str());
 
     std::vector <std::string> result;
-    for (FSdirectory_iterator it(pkgs), end; it != end; ++it)
+    for (DirectoryIterator it(pkgs), end; it != end; ++it)
         if (it->is_directory())
             result.push_back(it->path().filename());
 
@@ -111,34 +111,34 @@ std::vector<std::string> Context::getBinaryPackages() const
 }
 
 
-FSpath Context::getLocalPackageFilename() const
+Path Context::getLocalPackageFilename() const
 {
-    FSpath p(getBinaryPackagesDir());
+    Path p(getBinaryPackagesDir());
     p /= "local.pkg";
 
     return p;
 }
 
-FSpath Context::getRemotePackageFilename() const
+Path Context::getRemotePackageFilename() const
 {
-    FSpath p(getBinaryPackagesDir());
+    Path p(getBinaryPackagesDir());
     p /= "remote.pkg";
 
     return p;
 }
 
-FSpath Context::getTemplateDir() const
+Path Context::getTemplateDir() const
 {
-    FSpath p(m_prefix);
+    Path p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "template";
 
     return p;
 }
 
-FSpath Context::getTemplate(const std::string& name) const
+Path Context::getTemplate(const std::string& name) const
 {
-    FSpath p(m_prefix);
+    Path p(m_prefix);
     p /= VLE_SHARE_DIRS;
     p /= "template";
     p /= name;
@@ -148,10 +148,10 @@ FSpath Context::getTemplate(const std::string& name) const
 
 void Context::initVleHomeDirectory()
 {
-    FSpath pkgs = getBinaryPackagesDir();
+    Path pkgs = getBinaryPackagesDir();
 
     if (not pkgs.exists())
-        if (not FSpath::create_directories(getBinaryPackagesDir()))
+        if (not Path::create_directories(getBinaryPackagesDir()))
             throw FileError(
                 (fmt(_("Failed to build VLE_HOME directory (%1%)")) %
                  pkgs.string()).str());
@@ -172,7 +172,7 @@ bool Context::readEnv(const std::string& variable, PathList& out)
         auto it = std::remove_if(result.begin(), result.end(),
                                  [](const std::string& dirname)
                                  {
-                                     FSpath p(dirname);
+                                     Path p(dirname);
                                      return p.is_directory();
                                  });
 
@@ -192,7 +192,7 @@ void Context::readHomeDir()
         path.assign(path_str);
     }
     if (not path.empty()) {
-        if (FSpath::is_directory(path)) {
+        if (Path::is_directory(path)) {
             m_home = path;
         } else {
             throw FileError(

@@ -137,10 +137,10 @@ static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
     }
     ::FreeEnvironmentStrings(env_char);
 
-    FSpath prefix = UtilsWin::convertPathTo83Path(ctx->getPrefixDir());
+    Path prefix = UtilsWin::convertPathTo83Path(ctx->getPrefixDir());
 
     {
-        FSpath bin = prefix;
+        Path bin = prefix;
         bin /= "bin";
 
         replaceEnvironmentVariable(envp, "PATH", bin.string(), true);
@@ -148,7 +148,7 @@ static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
     }
 
     {
-        FSpath lib = prefix;
+        Path lib = prefix;
         lib /= "lib";
         lib /= "pkgconfig";
 
@@ -157,7 +157,7 @@ static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
     }
 
     {
-        FSpath inc = prefix;
+        Path inc = prefix;
         inc /= "include";
 
         replaceEnvironmentVariable(envp, "BOOST_INCLUDEDIR",
@@ -165,7 +165,7 @@ static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
     }
 
     {
-        FSpath lib = prefix;
+        Path lib = prefix;
         lib /= "lib";
 
         replaceEnvironmentVariable(envp, "BOOST_LIBRARYDIR",
@@ -327,13 +327,13 @@ struct Spawn::Pimpl
         , m_start(false)
         , m_finish(true)
     {
-        utils::FSpath tmp(utils::FSpath::temp_directory_path());
+        utils::Path tmp(utils::Path::temp_directory_path());
 
-        utils::FSpath file_out(tmp);
+        utils::Path file_out(tmp);
         file_out /= "vlespawn-out.txt";
         ouputfs.open(file_out.string());
 
-        utils::FSpath file_err(tmp);
+        utils::Path file_err(tmp);
         file_err /= "vlespawn-error.txt";
         errorfs.open(file_err.string());
     }

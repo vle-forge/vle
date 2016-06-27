@@ -34,7 +34,7 @@
 
 namespace vle { namespace utils {
 
-class VLE_API FSpath
+class VLE_API Path
 {
 public:
     using container_type = std::vector<std::string>;
@@ -65,20 +65,20 @@ public:
 #endif
     };
 
-    FSpath();
-    ~FSpath() = default;
+    Path();
+    ~Path() = default;
 
-    FSpath(const char *string);
-    FSpath(const std::string &string);
+    Path(const char *string);
+    Path(const std::string &string);
 #if defined(_WIN32)
-    FSpath(const std::wstring &wstring);
-    FSpath(const wchar_t *wstring);
-    FSpath &operator=(const std::wstring& str);
+    Path(const std::wstring &wstring);
+    Path(const wchar_t *wstring);
+    Path &operator=(const std::wstring& str);
 #endif
-    FSpath(const FSpath &path);
-    FSpath(FSpath &&path);
-    FSpath &operator=(const FSpath &path);
-    FSpath &operator=(FSpath &&path);
+    Path(const Path &path);
+    Path(Path &&path);
+    Path &operator=(const Path &path);
+    Path &operator=(Path &&path);
 
     size_t length() const;
 
@@ -125,11 +125,11 @@ public:
      */
     std::string filename() const;
 
-    FSpath parent_path() const;
+    Path parent_path() const;
 
-    FSpath operator/(const FSpath &other) const;
+    Path operator/(const Path &other) const;
 
-    FSpath& operator/=(const FSpath &other);
+    Path& operator/=(const Path &other);
 
     std::string string(path_type type = native_path) const;
 
@@ -147,13 +147,13 @@ public:
 
     bool create_directories() const;
 
-    static bool is_directory(const FSpath& p);
+    static bool is_directory(const Path& p);
 
-    static bool is_file(const FSpath& p);
+    static bool is_file(const Path& p);
 
-    static FSpath current_path();
+    static Path current_path();
 
-    static bool current_path(const FSpath& p);
+    static bool current_path(const Path& p);
 
     /**
      * temp_directory_path get a directory path.
@@ -167,7 +167,7 @@ public:
      * TEMPDIR. If none of these are found, "/tmp".
      * Windows: The path reported by the Windows GetTempPath API function.
      */
-    static FSpath temp_directory_path();
+    static Path temp_directory_path();
 
     /**
      * The unique_path function generates a path name suitable for
@@ -176,26 +176,26 @@ public:
      * replacement by a random hexadecimal digit.
      *
      * \example
-     * FSpath p = FSpath::unique_path("vle-%%%%-%%%%-%%%%-%%%%.data");
+     * Path p = Path::unique_path("vle-%%%%-%%%%-%%%%-%%%%.data");
      * \endexample
      *
      * \return A path identical to model, except that each occurrence of
      * a percent sign character is replaced by a random hexadecimal digit
      * character in the range 0-9, a-f.
      */
-    static FSpath unique_path(const std::string& model);
+    static Path unique_path(const std::string& model);
 
-    static void copy_file(const FSpath& from, const FSpath& to);
+    static void copy_file(const Path& from, const Path& to);
 
-    static bool rename(const FSpath& from, const FSpath& to);
+    static bool rename(const Path& from, const Path& to);
 
-    static bool create_directory(const FSpath& p);
+    static bool create_directory(const Path& p);
 
-    static bool create_directories(const FSpath& p);
+    static bool create_directories(const Path& p);
 
-    friend bool operator==(const FSpath &p, const FSpath &q);
-    friend bool operator!=(const FSpath &p, const FSpath &q);
-    friend bool operator<(const FSpath &p, const FSpath &q);
+    friend bool operator==(const Path &p, const Path &q);
+    friend bool operator!=(const Path &p, const Path &q);
+    friend bool operator<(const Path &p, const Path &q);
 
 private:
     std::vector<std::string> m_path;
@@ -209,62 +209,62 @@ private:
  */
 class FScurrent_path_restore
 {
-    FSpath old;
+    Path old;
 
 public:
-    FScurrent_path_restore(const FSpath& p)
-        : old(FSpath::current_path())
+    FScurrent_path_restore(const Path& p)
+        : old(Path::current_path())
     {
-        if (not FSpath::current_path(p))
+        if (not Path::current_path(p))
             old.clear();
     }
 
     ~FScurrent_path_restore() noexcept
     {
         if (not old.empty())
-            FSpath::current_path(old);
+            Path::current_path(old);
     }
 };
 
-class FSdirectory_iterator;
-class VLE_API FSdirectory_entry
+class DirectoryIterator;
+class VLE_API DirectoryEntry
 {
-    FSpath m_path;
+    Path m_path;
     bool m_is_file;
     bool m_is_directory;
 
 public:
-    FSdirectory_entry();
-    ~FSdirectory_entry() = default;
-    FSdirectory_entry(const FSdirectory_entry& rhs) = default;
+    DirectoryEntry();
+    ~DirectoryEntry() = default;
+    DirectoryEntry(const DirectoryEntry& rhs) = default;
 
-    const FSpath& path() const;
+    const Path& path() const;
     bool is_file() const;
     bool is_directory() const;
 
-    friend FSdirectory_iterator;
+    friend DirectoryIterator;
 };
 
-class VLE_API FSdirectory_iterator
+class VLE_API DirectoryIterator
 {
     struct Pimpl;
     std::shared_ptr<Pimpl> m_pimpl;
 
 public:
-    FSdirectory_iterator();
-    FSdirectory_iterator(const FSpath& p);
-    ~FSdirectory_iterator();
+    DirectoryIterator();
+    DirectoryIterator(const Path& p);
+    ~DirectoryIterator();
 
-    FSdirectory_iterator& operator++();
-    FSpath operator*() const;
-    FSdirectory_entry* operator->() const;
+    DirectoryIterator& operator++();
+    Path operator*() const;
+    DirectoryEntry* operator->() const;
 
-    friend void swap(FSdirectory_iterator& lhs,
-                     FSdirectory_iterator& rhs);
-    friend bool operator==(const FSdirectory_iterator& lhs,
-                           const FSdirectory_iterator& rhs);
-    friend bool operator!=(const FSdirectory_iterator& lhs,
-                           const FSdirectory_iterator& rhs);
+    friend void swap(DirectoryIterator& lhs,
+                     DirectoryIterator& rhs);
+    friend bool operator==(const DirectoryIterator& lhs,
+                           const DirectoryIterator& rhs);
+    friend bool operator!=(const DirectoryIterator& lhs,
+                           const DirectoryIterator& rhs);
 };
 
 }} // namespace vle utils

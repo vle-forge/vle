@@ -43,7 +43,7 @@
 
 namespace {
 
-void remove_all(vle::utils::ContextPtr ctx, const vle::utils::FSpath& path)
+void remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
 {
     if (not path.exists())
         return;
@@ -63,7 +63,7 @@ void remove_all(vle::utils::ContextPtr ctx, const vle::utils::FSpath& path)
         auto exe = std::move(argv.front());
         argv.erase(argv.begin());
 
-        if (not spawn.start(exe, vle::utils::FSpath::current_path().string(),
+        if (not spawn.start(exe, vle::utils::Path::current_path().string(),
                             argv))
             throw vle::utils::InternalError(_("fail to start cmake command"));
 
@@ -148,11 +148,11 @@ struct Package::Pimpl
         m_pkgsourcepath.clear();
 
         if (not m_pkgname.empty()) {
-            FSpath path_binary = m_context->getBinaryPackagesDir();
+            Path path_binary = m_context->getBinaryPackagesDir();
             path_binary /= m_pkgname;
             m_pkgbinarypath = path_binary.string();
-            FSpath path_source_dir = FSpath::current_path();
-            FSpath path_source_pkg = path_source_dir;
+            Path path_source_dir = Path::current_path();
+            Path path_source_pkg = path_source_dir;
             path_source_pkg /= m_pkgname;
             if (path_source_pkg.exists() or path_source_dir.exists()) {
                 m_pkgsourcepath = path_source_pkg.string();
@@ -188,8 +188,8 @@ void Package::create()
         throw utils::FileError(
             _("Pkg configure error: empty command"));
 
-    FSpath source(m_pimpl->m_context->getTemplate("package"));
-    FSpath destination(getDir(PKG_SOURCE));
+    Path source(m_pimpl->m_context->getTemplate("package"));
+    Path destination(getDir(PKG_SOURCE));
 
     if (destination.exists())
         throw utils::FileError(
@@ -197,7 +197,7 @@ void Package::create()
                    "the directory %1% already exists")) %
              destination.string()).str());
 
-    FSpath::create_directory(destination);
+    Path::create_directory(destination);
     std::string command = (vle::fmt(m_pimpl->mCommandDirCopy) %
                            source.string() % destination.string()).str();
 
@@ -233,9 +233,9 @@ void Package::configure()
             _("Pkg configure error: building directory path is empty"));
 
 
-    FSpath path { pkg_buildir };
+    Path path { pkg_buildir };
     if (not path.exists()) {
-        if (not FSpath::create_directories(path))
+        if (not Path::create_directories(path))
             throw utils::FileError(
                 _("Pkg configure error: fails to build directories"));
     }
@@ -272,7 +272,7 @@ void Package::test()
                 _("Pkg test error: building directory path is empty"));
     }
 
-    FSpath path { pkg_buildir };
+    Path path { pkg_buildir };
     if (not path.exists())
         throw utils::FileError(
             (fmt(_("Pkg test error: building directory '%1%' "
@@ -311,7 +311,7 @@ void Package::build()
                 _("Pkg build error: building directory path is empty"));
     }
 
-    FSpath path { pkg_buildir };
+    Path path { pkg_buildir };
     if (not path.exists())
         configure();
 
@@ -348,7 +348,7 @@ void Package::install()
                 _("Pkg install error: building directory path is empty"));
     }
 
-    FSpath path { pkg_buildir };
+    Path path { pkg_buildir };
     if (not path.exists())
         throw utils::FileError(
             (fmt(_("Pkg install error: building directory '%1%' "
@@ -360,7 +360,7 @@ void Package::install()
     std::string exe = std::move(argv.front());
     argv.erase(argv.begin());
 
-    FSpath builddir = pkg_buildir;
+    Path builddir = pkg_buildir;
 
     if (not builddir.exists()) {
         throw utils::ArgError(
@@ -385,7 +385,7 @@ void Package::install()
 
 void Package::clean()
 {
-    FSpath pkg_buildir = getBuildDir(PKG_SOURCE);
+    Path pkg_buildir = getBuildDir(PKG_SOURCE);
 
     if (pkg_buildir.exists())
         ::remove_all(m_pimpl->m_context, pkg_buildir);
@@ -393,7 +393,7 @@ void Package::clean()
 
 void Package::rclean()
 {
-    FSpath pkg_buildir = getDir(PKG_BINARY);
+    Path pkg_buildir = getDir(PKG_BINARY);
 
     if (pkg_buildir.exists())
         ::remove_all(m_pimpl->m_context, pkg_buildir);
@@ -417,7 +417,7 @@ void Package::pack()
                 "no building directory found"));
     }
 
-    FSpath::create_directory(pkg_buildir);
+    Path::create_directory(pkg_buildir);
 
     std::string cmd = (fmt(m_pimpl->mCommandPack) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
@@ -493,7 +493,7 @@ void Package::select(const std::string& name)
 void Package::remove(const std::string& toremove, VLE_PACKAGE_TYPE type)
 {
     std::string pkg_dir = getDir(type);
-    FSpath torm(pkg_dir);
+    Path torm(pkg_dir);
     torm /= toremove;
 
     if (torm.exists())
@@ -506,7 +506,7 @@ std::string Package::getParentDir(VLE_PACKAGE_TYPE type) const
     if (base_dir.empty()){
         return "";
     } else {
-        FSpath base_path = FSpath(base_dir);
+        Path base_path = Path(base_dir);
         return base_path.parent_path().string();
     }
 }
@@ -526,7 +526,7 @@ std::string Package::getDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getLibDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "lib";
 
     return p.string();
@@ -534,7 +534,7 @@ std::string Package::getLibDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getSrcDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "src";
 
     return p.string();
@@ -542,7 +542,7 @@ std::string Package::getSrcDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getDataDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "data";
 
     return p.string();
@@ -550,7 +550,7 @@ std::string Package::getDataDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getDocDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "doc";
 
     return p.string();
@@ -558,7 +558,7 @@ std::string Package::getDocDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getExpDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "exp";
 
     return p.string();
@@ -566,7 +566,7 @@ std::string Package::getExpDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getBuildDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "buildvle";
 
     return p.string();
@@ -574,7 +574,7 @@ std::string Package::getBuildDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getOutputDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "output";
 
     return p.string();
@@ -582,7 +582,7 @@ std::string Package::getOutputDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getPluginDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
 
     return p.string();
@@ -590,7 +590,7 @@ std::string Package::getPluginDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getPluginSimulatorDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "simulator";
 
@@ -599,7 +599,7 @@ std::string Package::getPluginSimulatorDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getPluginOutputDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "output";
 
@@ -608,7 +608,7 @@ std::string Package::getPluginOutputDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getPluginGvleGlobalDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "gvle";
     p /= "global";
@@ -618,7 +618,7 @@ std::string Package::getPluginGvleGlobalDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getPluginGvleModelingDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "gvle";
     p /= "modeling";
@@ -628,7 +628,7 @@ std::string Package::getPluginGvleModelingDir(VLE_PACKAGE_TYPE type) const
 
 std::string Package::getPluginGvleOutputDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "gvle";
     p /= "output";
@@ -639,7 +639,7 @@ std::string Package::getPluginGvleOutputDir(VLE_PACKAGE_TYPE type) const
 std::string Package::getFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= file;
 
     return p.string();
@@ -648,7 +648,7 @@ std::string Package::getFile(const std::string& file,
 std::string Package::getLibFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "lib";
     p /= file;
 
@@ -658,7 +658,7 @@ std::string Package::getLibFile(const std::string& file,
 std::string Package::getSrcFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "src";
     p /= file;
 
@@ -668,7 +668,7 @@ std::string Package::getSrcFile(const std::string& file,
 std::string Package::getDataFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "data";
     p /= file;
 
@@ -678,7 +678,7 @@ std::string Package::getDataFile(const std::string& file,
 std::string Package::getDocFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "doc";
     p /= file;
 
@@ -688,7 +688,7 @@ std::string Package::getDocFile(const std::string& file,
 std::string Package::getExpFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "exp";
     p /= file;
 
@@ -698,7 +698,7 @@ std::string Package::getExpFile(const std::string& file,
 std::string Package::getOutputFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "output";
     p /= file;
 
@@ -708,7 +708,7 @@ std::string Package::getOutputFile(const std::string& file,
 std::string Package::getPluginFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= file;
 
@@ -718,7 +718,7 @@ std::string Package::getPluginFile(const std::string& file,
 std::string Package::getPluginSimulatorFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "simulator";
     p /= file;
@@ -729,7 +729,7 @@ std::string Package::getPluginSimulatorFile(const std::string& file,
 std::string Package::getPluginOutputFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "output";
     p /= file;
@@ -740,7 +740,7 @@ std::string Package::getPluginOutputFile(const std::string& file,
 std::string Package::getPluginGvleModelingFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "gvle";
     p /= "modeling";
@@ -752,7 +752,7 @@ std::string Package::getPluginGvleModelingFile(const std::string& file,
 std::string Package::getPluginGvleOutputFile(const std::string& file,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath p(getDir(type));
+    Path p(getDir(type));
     p /= "plugins";
     p /= "gvle";
     p /= "output";
@@ -763,7 +763,7 @@ std::string Package::getPluginGvleOutputFile(const std::string& file,
 
 bool Package::existsBinary() const
 {
-    FSpath binary_dir = m_pimpl->m_pkgbinarypath;
+    Path binary_dir = m_pimpl->m_pkgbinarypath;
 
     return binary_dir.is_directory();
 }
@@ -777,7 +777,7 @@ bool Package::existsFile(const std::string& path, VLE_PACKAGE_TYPE type)
 {
     std::string base_dir = getDir(type);
     if (not base_dir.empty()) {
-        FSpath tmp(base_dir);
+        Path tmp(base_dir);
         tmp /= path;
 
         return tmp.is_file();
@@ -790,7 +790,7 @@ void Package::addDirectory(const std::string& path, const std::string& name,
 {
     std::string base_dir = getDir(type);
     if (not base_dir.empty()) {
-        FSpath tmp(base_dir);
+        Path tmp(base_dir);
         tmp /= path;
         tmp /= name;
         if (not tmp.exists()) {
@@ -801,7 +801,7 @@ void Package::addDirectory(const std::string& path, const std::string& name,
 
 PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
 {
-    FSpath pkg(getExpDir(type));
+    Path pkg(getExpDir(type));
 
     if (not pkg.is_directory())
         throw utils::InternalError(
@@ -809,14 +809,14 @@ PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
              pkg.string()).str());
 
     PathList result;
-    std::stack < FSpath > stack;
+    std::stack < Path > stack;
     stack.push(pkg);
 
     while (not stack.empty()) {
-        FSpath dir = stack.top();
+        Path dir = stack.top();
         stack.pop();
 
-        for (FSdirectory_iterator it(dir), end; it != end; ++it) {
+        for (DirectoryIterator it(dir), end; it != end; ++it) {
             if (it->is_file()) {
                 std::string ext = it->path().extension();
                 if (ext == ".vpz") {
@@ -833,15 +833,15 @@ PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
 PathList Package::listLibraries(const std::string& path) const
 {
     PathList result;
-    FSpath simdir(path);
+    Path simdir(path);
 
     if (simdir.is_directory()) {
-        std::stack < FSpath > stack;
+        std::stack < Path > stack;
         stack.push(simdir);
         while (not stack.empty()) {
-            FSpath dir = stack.top();
+            Path dir = stack.top();
             stack.pop();
-            for (FSdirectory_iterator it(dir), end; it != end; ++it) {
+            for (DirectoryIterator it(dir), end; it != end; ++it) {
                 if (it->is_file()) {
                     std::string ext = it->path().extension();
 
@@ -892,7 +892,7 @@ PathList Package::getPluginsGvleOutput() const
 std::string
 Package::getMetadataExpDir(VLE_PACKAGE_TYPE type) const
 {
-    FSpath f = getDir(type);
+    Path f = getDir(type);
     f /= "metadata";
     f /= "exp";
     return f.string();
@@ -902,7 +902,7 @@ std::string
 Package::getMetadataExpFile(const std::string& expName,
         VLE_PACKAGE_TYPE type) const
 {
-    FSpath f = getDir(type);
+    Path f = getDir(type);
     f /= "metadata";
     f /= "exp";
     f /= (expName+".vpm");
@@ -913,10 +913,10 @@ std::string Package::rename(const std::string& oldname,
         const std::string& newname,
         VLE_PACKAGE_TYPE type)
 {
-    FSpath oldfilepath = getDir(type);
+    Path oldfilepath = getDir(type);
     oldfilepath /= oldname;
 
-    FSpath newfilepath = oldfilepath.parent_path();
+    Path newfilepath = oldfilepath.parent_path();
     newfilepath /= newname;
 
     if (not oldfilepath.exists() or newfilepath.exists()) {
@@ -925,14 +925,14 @@ std::string Package::rename(const std::string& oldname,
              name() % oldfilepath.string() % newfilepath.string()).str());
     }
 
-    FSpath::rename(oldfilepath, newfilepath);
+    Path::rename(oldfilepath, newfilepath);
 
     return newfilepath.string();
 }
 
 void Package::copy(const std::string& source, std::string& target)
 {
-    FSpath::copy_file(source, target);
+    Path::copy_file(source, target);
 }
 
 const std::string& Package::name() const

@@ -54,7 +54,7 @@ namespace vle { namespace utils { namespace pimpl {
  * @param path The path of the file to convert;
  * @return The plug-in name;
  */
-static std::string getLibraryName(const FSpath& file)
+static std::string getLibraryName(const Path& file)
 {
     std::string library;
 
@@ -567,14 +567,14 @@ public:
      * @param package
      * @param type
      */
-    void browse(const FSpath& path,
+    void browse(const Path& path,
                 const std::string& package,
                 ModuleType type)
     {
         if (not path.is_directory())
             return;
 
-        FSdirectory_iterator it(path), end;
+        DirectoryIterator it(path), end;
         for (; it != end; ++it) {
             if (it->is_file()) {
                 std::string library = pimpl::getLibraryName(*it);
@@ -590,7 +590,7 @@ public:
                                     const std::string& library,
                                     ModuleType type)
     {
-        FSpath current;
+        Path current;
         vle::utils::Package pkg(mContext, package);
 
         switch (type) {
@@ -665,43 +665,43 @@ void *ModuleManager::get(const std::string& symbol) const
 
 void ModuleManager::browse()
 {
-    FSpath packages = mPimpl->mContext->getBinaryPackagesDir();
+    Path packages = mPimpl->mContext->getBinaryPackagesDir();
 
-    FSpath pathsim = "plugins/simulator";
-    FSpath pathoov = "plugins/output";
-    FSpath pathgvleg = "plugins/gvle/global";
-    FSpath pathgvlem = "plugins/gvle/modeling";
-    FSpath pathgvleo = "plugins/gvle/output";
+    Path pathsim = "plugins/simulator";
+    Path pathoov = "plugins/output";
+    Path pathgvleg = "plugins/gvle/global";
+    Path pathgvlem = "plugins/gvle/modeling";
+    Path pathgvleo = "plugins/gvle/output";
 
     if (packages.is_directory()) {
-        FSdirectory_iterator it(packages), end;
+        DirectoryIterator it(packages), end;
 
         for (; it != end; ++it) { /* for each package */
             if (it->is_directory()) {
                 std::string package = it->path().filename();
 
                 {
-                    FSpath tmp = (*it) / pathsim;
+                    Path tmp = (*it) / pathsim;
                     mPimpl->browse(tmp, package, MODULE_DYNAMICS);
                 }
 
                 {
-                    FSpath tmp = (*it) / pathoov;
+                    Path tmp = (*it) / pathoov;
                     mPimpl->browse(tmp, package, MODULE_OOV);
                 }
 
                 {
-                    FSpath tmp = (*it) / pathgvleg;
+                    Path tmp = (*it) / pathgvleg;
                     mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
                 }
 
                 {
-                    FSpath tmp = (*it) / pathgvlem;
+                    Path tmp = (*it) / pathgvlem;
                     mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
                 }
 
                 {
-                    FSpath tmp = (*it) / pathgvleo;
+                    Path tmp = (*it) / pathgvleo;
                     mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
                 }
             }
@@ -711,9 +711,9 @@ void ModuleManager::browse()
 
 void ModuleManager::browse(ModuleType type)
 {
-    FSpath packages = mPimpl->mContext->getBinaryPackagesDir();
+    Path packages = mPimpl->mContext->getBinaryPackagesDir();
 
-    FSpath pathtype;
+    Path pathtype;
 
     switch (type) {
     case MODULE_DYNAMICS:
@@ -736,11 +736,11 @@ void ModuleManager::browse(ModuleType type)
     }
 
     if (packages.is_directory()) {
-        FSdirectory_iterator it(packages), end;
+        DirectoryIterator it(packages), end;
 
         for (; it != end; ++it) { /* for each package */
             if (it->is_directory()) {
-                FSpath pkg = (*it);
+                Path pkg = (*it);
                 pkg /= pathtype;
 
                 mPimpl->browse(pkg, it->path().filename(), type);
@@ -751,36 +751,36 @@ void ModuleManager::browse(ModuleType type)
 
 void ModuleManager::browse(const std::string& package)
 {
-    FSpath pkg = mPimpl->mContext->getBinaryPackagesDir();
+    Path pkg = mPimpl->mContext->getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 
     {
-        FSpath tmp = pkg;
+        Path tmp = pkg;
         tmp /= "simulator";
         mPimpl->browse(tmp, package, MODULE_DYNAMICS);
     }
 
     {
-        FSpath tmp = pkg;
+        Path tmp = pkg;
         tmp /= "output";
         mPimpl->browse(tmp, package, MODULE_OOV);
     }
 
     {
-        FSpath tmp = pkg;
+        Path tmp = pkg;
         tmp /= "gvle/global";
         mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
     }
 
     {
-        FSpath tmp = pkg;
+        Path tmp = pkg;
         tmp /= "gvle/modeling";
         mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
     }
 
     {
-        FSpath tmp = pkg;
+        Path tmp = pkg;
         tmp /= "gvle/output";
         mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
     }
@@ -789,7 +789,7 @@ void ModuleManager::browse(const std::string& package)
 
 void ModuleManager::browse(const std::string& package, ModuleType type)
 {
-    FSpath pkg = mPimpl->mContext->getBinaryPackagesDir();
+    Path pkg = mPimpl->mContext->getBinaryPackagesDir();
     pkg /= package;
     pkg /= "plugins";
 

@@ -35,7 +35,7 @@
 
 namespace vle { namespace utils {
 
-FSpath Context::findProgram(const std::string& exe)
+Path Context::findProgram(const std::string& exe)
 {
     char* env_p = std::getenv("PATH");
 
@@ -46,7 +46,7 @@ FSpath Context::findProgram(const std::string& exe)
     std::vector<std::string>::const_iterator itb = splitVec.begin();
     std::vector<std::string>::const_iterator ite = splitVec.end();
     for (; itb != ite; itb++) {
-        FSpath p(*itb);
+        Path p(*itb);
         p /= exe;
         if (p.exists())
             return p.string();
@@ -71,7 +71,7 @@ void Context::initHomeDir()
             homepath.assign(path_str);
         }
 
-        FSpath p(homepath);
+        Path p(homepath);
         p /= ".vle";
 
         m_home = p.string();
