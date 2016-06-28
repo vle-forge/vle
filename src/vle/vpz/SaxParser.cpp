@@ -30,7 +30,6 @@
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
@@ -236,8 +235,6 @@ void SaxParser::onWarning(void* /* ctx */, const char *msg, ...)
     va_start(args, msg);
     vsnprintf(buffer, 1023, msg, args);
     va_end(args);
-
-    TraceAlways(_("Parser: warning: %s"), buffer);
 
     delete [] buffer;
 }

@@ -27,7 +27,7 @@
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/Trace.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
@@ -108,7 +108,7 @@ struct DownloadManager::Pimpl
             Path pwd = Path::current_path();
             if (not spawn.start(exe, pwd.string(), argv)) {
                 mErrorMessage = _("Download: fail to start download command");
-                TraceAlways(mErrorMessage.c_str());
+                vErr(mContext, "%s\n", mErrorMessage.c_str());
                 mHasError = true;
                 return;
             }
@@ -116,8 +116,8 @@ struct DownloadManager::Pimpl
             std::string output, error;
             while (not spawn.isfinish()) {
                 if (spawn.get(&output, &error)) {
-                    TraceAlways(output.c_str());
-                    TraceAlways(output.c_str());
+                    vDbg(mContext, "%s", output.c_str());
+                    vDbg(mContext, "%s", error.c_str());
                     output.clear();
                     error.clear();
 
@@ -132,13 +132,14 @@ struct DownloadManager::Pimpl
             bool success;
             spawn.status(&message, &success);
 
-            if (not message.empty())
-                TraceAlways(message.c_str());
+            if (not success and not message.empty())
+                vErr(mContext, _("Download: fail to download resources: %s\n"),
+                     message.c_str());
         } catch (const std::exception& e) {
             mErrorMessage = (fmt(_("Download: unable to download '%s' "
                                    "in '%s' with the '%s' command"))
                              % mUrl % mFilename % command).str();
-            TraceAlways(mErrorMessage.c_str());
+            vErr(mContext, "%s\n", mErrorMessage.c_str());
             mHasError = true;
         }
     }

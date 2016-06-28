@@ -26,13 +26,13 @@
 
 
 #include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Preferences.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/details/Package.hpp>
 #include <vle/utils/details/PackageParser.hpp>
@@ -269,10 +269,9 @@ public:
             file.open(mContext->getLocalPackageFilename().string());
             file << local << std::endl;
         } catch (const std::exception& e) {
-            TraceAlways(_("Remote: failed to write local package "
-                          "`%s': %s"),
-                        mContext->getLocalPackageFilename().string().c_str(),
-                        e.what());
+            vErr(mContext, _("Remote: failed to write local package `%s': %s"),
+                 mContext->getLocalPackageFilename().string().c_str(),
+                 e.what());
         }
 
         try  {
@@ -284,10 +283,9 @@ public:
             file.open(mContext->getRemotePackageFilename().string());
             file << remote << std::endl;
         } catch (const std::exception& e) {
-            TraceAlways(_("Remote: failed to write remote package "
-                          "`%s': %s"),
-                        mContext->getRemotePackageFilename().string().c_str(),
-                        e.what());
+            vErr(mContext, _("Remote: failed to write remote package `%s': %s"),
+                 mContext->getRemotePackageFilename().string().c_str(),
+                 e.what());
         }
     }
 
@@ -635,8 +633,8 @@ public:
     {
         if (not filepath.exists())
             throw utils::InternalError(
-                (fmt(_("fail to compress '%1%': file or directory does not exist"))
-                 % filepath.string()).str());
+                (fmt(_("fail to compress '%1%': file or directory does not "
+                       "exist")) % filepath.string()).str());
 
         Path pwd = Path::current_path();
         std::string command;
@@ -679,15 +677,16 @@ public:
             spawn.status(&message, &success);
 
             if (not message.empty())
-                std::cerr << message << '\n';
+                vErr(mContext, "Compress: %s\n", message.c_str());
         } catch (const std::exception& e) {
-            TraceAlways(_("Compress: unable to compress '%s' "
-                          "in '%s' with the '%s' command"),
-                        compressedfilepath.string().c_str(),
-                        pwd.string().c_str(),
-                        command.c_str());
+            vErr(mContext, _("Compress: unable to compress '%s' in '%s' with "
+                             "the '%s' command"),
+                 compressedfilepath.string().c_str(),
+                 pwd.string().c_str(),
+                 command.c_str());
         }
     }
+
     void decompress(const Path& compressedfilepath,
                     const Path& directorypath)
     {
@@ -743,13 +742,13 @@ public:
             spawn.status(&message, &success);
 
             if (not message.empty())
-                std::cerr << message << '\n';
+                vErr(mContext, "Decompress: %s\n", message.c_str());
         } catch (const std::exception& e) {
-            TraceAlways(_("Decompress: unable to decompress '%s' "
-                          "in '%s' with the '%s' command"),
-                        compressedfilepath.string().c_str(),
-                        pwd.string().c_str(),
-                        command.c_str());
+            vErr(mContext, _("Decompress: unable to decompress '%s' "
+                             "in '%s' with the '%s' command"),
+                 compressedfilepath.string().c_str(),
+                 pwd.string().c_str(),
+                 command.c_str());
         }
     }
 

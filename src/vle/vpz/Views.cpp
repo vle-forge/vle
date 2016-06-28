@@ -26,7 +26,6 @@
 
 
 #include <vle/vpz/Views.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>

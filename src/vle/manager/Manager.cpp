@@ -28,7 +28,6 @@
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/manager/Simulation.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/value/Matrix.hpp>
@@ -78,25 +77,15 @@ public:
     template <typename T >
     void writeSummaryLog(const T& fmt)
     {
-        if (mLogOption & manager::LOG_SUMMARY) {
-            if (mOutputStream) {
-                *mOutputStream << fmt;
-            } else {
-                utils::Trace::send(fmt);
-            }
-        }
+        if (mLogOption & manager::LOG_SUMMARY and mOutputStream)
+            *mOutputStream << fmt;
     }
 
     template <typename T >
     void writeRunLog(const T& fmt)
     {
-        if (mLogOption & manager::LOG_RUN) {
-            if (mOutputStream) {
-                *mOutputStream << fmt;
-            } else {
-                utils::Trace::send(fmt);
-            }
-        }
+        if (mLogOption & manager::LOG_RUN and mOutputStream)
+            *mOutputStream << fmt;
     }
 
     /**

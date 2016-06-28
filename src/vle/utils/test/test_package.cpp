@@ -53,7 +53,6 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Rand.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Preferences.hpp>

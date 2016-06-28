@@ -26,9 +26,9 @@
 
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Simulation.hpp>
@@ -56,21 +56,15 @@ public:
         , m_simulationoptions(simulationoptionts)
     {
         if (m_simulationoptions & manager::SIMULATION_SPAWN_PROCESS)
-            TraceAlways(
-                _("Simulation: SIMULATION_SPAWN_PROCESS is not yet"
-                  " implemented"));
+            vInfo(m_context, _("Simulation: SIMULATION_SPAWN_PROCESS is not "
+                               " yet implemented\n"));
     }
 
     template <typename T>
     void write(const T& t)
     {
-        if (m_out) {
+        if (m_out)
             (*m_out) << t;
-        } else {
-            std::stringstream ss;
-            ss << t;
-            utils::Trace::send(ss.str());
-        }
     }
 
     std::unique_ptr<value::Map>

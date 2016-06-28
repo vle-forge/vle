@@ -28,8 +28,8 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Context.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Preferences.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Filesystem.hpp>
@@ -75,13 +75,12 @@ void remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
         spawn.status(&message, &success);
 
         if (not success && not message.empty())
-            TraceAlways(_("Error during remove directory operation: %s."),
-                        message.c_str());
+            vErr(ctx, _("Error during remove directory operation: %s\n"),
+                 message.c_str());
     } catch (const std::exception& e) {
-        TraceAlways(_("Package remove all: unable to remove `%s' with"
-                      " the `%s' command"),
-                    path.string().c_str(),
-                    command.c_str());
+        vErr(ctx, _("Package remove all: unable to remove `%s' with"
+                    " the `%s' command\n"), path.string().c_str(),
+             command.c_str());
     }
 }
 
@@ -132,7 +131,9 @@ struct Package::Pimpl
                  const std::vector < std::string >& argv)
     {
         if (m_spawn.isstart() and not m_spawn.isfinish()) {
-            DTraceAlways("-[%1%] Need to wait old process before", exe.c_str());
+            vDbg(m_context, _("-[%s] Need to wait old process before\n"),
+                 exe.c_str());
+
             m_spawn.wait();
             m_spawn.status(&m_message, &m_issuccess);
         }

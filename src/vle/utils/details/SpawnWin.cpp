@@ -25,6 +25,7 @@
  */
 
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/details/ShellUtils.hpp>
@@ -641,12 +642,12 @@ bool Spawn::start(const std::string& exe,
 {
     m_pimpl->init(waitchildtimeout);
 
-#ifndef NDEBUG
-    DTraceAlways("Command:`%s' chdir: `%s'", exe.c_str(), workingdir.c_str());
+    vDbg(m_pimpl->m_context, _("Spawn: command: `%s' chdir: `%s'\n"),
+         exe.c_str(), workingdir.c_str());
 
-    for (const auto& elem : args)
-        DTraceAlways("[%s]", elem.c_str());
-#endif
+    for (const auto& elem : args) {
+        vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());
+    }
 
     return m_pimpl->start(exe, workingdir, args);
 }

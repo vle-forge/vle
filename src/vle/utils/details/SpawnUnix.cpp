@@ -25,7 +25,7 @@
  */
 
 #include <vle/utils/Spawn.hpp>
-#include <vle/utils/Trace.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/details/ShellUtils.hpp>
 #include <algorithm>
@@ -41,8 +41,8 @@
 #include <unistd.h>
 
 #ifdef __APPLE__
- #include <crt_externs.h>
- extern "C" char ** environ = *_NSGetEnviron();
+#include <crt_externs.h>
+extern "C" char ** environ = *_NSGetEnviron();
 #endif
 
 namespace vle { namespace utils {
@@ -207,7 +207,8 @@ public:
             m_finish = false;
             return true;
         case -1:
-            TraceAlways("Check running child fail: %s", strerror(errno));
+            vErr(m_context, _("Spawn: check running child fail: %s\n"),
+                 strerror(errno));
             return false;
         default:
             m_finish = true;
@@ -252,8 +253,8 @@ public:
                    std::vector <std::string> args)
     {
         if (::chdir(workingdir.c_str())) {
-            TraceAlways("Spawn: child fails to change current directory: %s",
-                        workingdir.c_str());
+            vErr(m_context, _("Spawn: child fails to change current directory:"
+                              " to `%s'\n"), workingdir.c_str());
             std::abort();
         }
 
@@ -329,7 +330,7 @@ public:
         ::close(m_pipeout[0]);
         ::close(m_pipeout[1]);
     m_pipeout_failed:
-        TraceAlways("Spawn failure: %s", strerror(err));
+        vErr(m_context, _("Spawn: failure `%s'\n"), strerror(err));
         m_msg.assign(strerror(err));
         return false;
     }
@@ -413,12 +414,12 @@ bool Spawn::start(const std::string& exe,
 {
     m_pimpl->init(waitchildtimeout);
 
-#ifndef NDEBUG
-    DTraceAlways("Command:`%s' chdir: `%s'", exe.c_str(), workingdir.c_str());
+    vDbg(m_pimpl->m_context, _("Spawn: command: `%s' chdir: `%s'\n"),
+         exe.c_str(), workingdir.c_str());
 
-    for (const auto& elem : args)
-        DTraceAlways("[%s]", elem.c_str());
-#endif
+    for (const auto& elem : args) {
+        vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());
+    }
 
     return m_pimpl->start(exe, workingdir, args);
 }

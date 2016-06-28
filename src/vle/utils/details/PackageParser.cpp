@@ -26,10 +26,9 @@
 
 #include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/details/Package.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Exception.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <cassert>
 
@@ -57,8 +56,6 @@ class DescriptionParser
             oldcolumn = column++;
         }
 
-        // std::cout << "+[" << last << "]";
-
         return last;
     }
 
@@ -70,8 +67,6 @@ class DescriptionParser
         } else {
             column = oldcolumn;
         }
-
-        // std::cout << "-[" << last << "]";
 
         in.unget();
     }
@@ -222,8 +217,6 @@ class DescriptionParser
             (str == ">") ? PACKAGE_OPERATOR_GREATER :
             (str == ">=") ? PACKAGE_OPERATOR_GREATER_OR_EQUAL :
             PACKAGE_OPERATOR_EQUAL;
-
-        // std::cout << vle::fmt("Readed operator: %1% %2%\n") % *type % str;
 
         return true;
     }
@@ -414,17 +407,6 @@ class DescriptionParser
             }
         }
 
-        // if (in.eof())
-        //     return 1;
-
-        // if (in) {
-        //     if (not read_newline()) {
-        //         unget();
-        //     } else {
-        //         read_blank();
-        //     }
-        // }
-
         if (not (read_word("Package:") and
                  read_identifier(&pkg->name) and
                  read_newline()))
@@ -438,56 +420,37 @@ class DescriptionParser
                  read_linkid(&pkg->depends)))
             return -3;
 
-        // std::cout << vle::fmt("********** ok depends\n");
-        // std::cerr << *pkg << "\n";
-
         if (not (read_word("Build-Depends:") and
                  read_linkid(&pkg->builddepends)))
             return -4;
-
-        // std::cout << vle::fmt("********** ok build-depends\n");
 
         if (not (read_word("Conflicts:") and
                  read_linkid(&pkg->conflicts)))
             return -5;
 
-        // std::cout << vle::fmt("********** ok conflicts\n");
-
         if (not (read_word("Maintainer:") and
                  read_maintainer(&pkg->maintainer)))
             return -6;
-
-        // std::cout << vle::fmt("********** ok maintainer\n");
 
         if (not (read_word("Description:") and
                  read_description(&pkg->description)))
             return -7;
 
-        // std::cout << vle::fmt("********** ok description\n");
-
         if (not (read_word("Tags:") and
                  read_tags(&pkg->tags)))
             return -8;
-
-        // std::cout << vle::fmt("********** ok tags\n");
 
         if (not (read_word("Url:") and
                  read_maintainer(&pkg->url)))
             return -9;
 
-        // std::cout << vle::fmt("********** ok url\n");
-
         if (not (read_word("Size:") and
                  read_size(&pkg->size)))
             return -10;
 
-        // std::cout << vle::fmt("********** ok size\n");
-
         if (not (read_word("MD5sum:") and
                  read_maintainer(&pkg->md5sum)))
             return -11;
-
-        // std::cout << vle::fmt("********** ok Md5sum\n");
 
         return 0;
     }
@@ -501,7 +464,7 @@ public:
     ~DescriptionParser()
     {}
 
-    bool read_packages(const std::string& distribution, Packages *pkgs)
+    void read_packages(const std::string& distribution, Packages *pkgs)
     {
         do {
             PackageId p;
@@ -515,35 +478,29 @@ public:
                 pkgs->push_back(p);
                 break;
             case 1:
-                return true;
+                return;
             default:
-                TraceAlways(
-                    _("Remote Manager: Syntax error in file `%s' "
-                      "l. %d c. %d: %d"), filepath.c_str(), line,
-                    column, result);
-                return false;
+                throw FileError(
+                    (boost::format(_("Remote: syntax error in file `%1%'"
+                                     " l. %2% c. %3%: %4%"))
+                     % filepath % line % column % result).str());
             }
         } while (in);
-
-        return false;
     }
 };
 
-bool PackageParser::extract(const std::string& filepath,
+void PackageParser::extract(const std::string& filepath,
                             const std::string& distribution)
 {
     std::ifstream ifs(filepath.c_str());
 
-    if (ifs) {
-        DescriptionParser parser(ifs, filepath);
+    if (not ifs)
+        throw FileError(
+            (boost::format(_("Remote: fail to parse package file '%1'"))
+             % filepath).str());
 
-        if (not parser.read_packages(distribution, &m_packages)) {
-            TraceAlways(_("Remote: failed to parser %s"),
-                        filepath.c_str());
-            return false;
-        }
-    }
-    return true;
+    DescriptionParser parser(ifs, filepath);
+    parser.read_packages(distribution, &m_packages);
 }
 
 }} // namespace vle utils

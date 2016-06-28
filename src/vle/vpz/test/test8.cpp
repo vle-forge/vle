@@ -37,7 +37,6 @@
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>

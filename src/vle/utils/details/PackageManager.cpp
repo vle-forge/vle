@@ -28,16 +28,18 @@
 #include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Context.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/i18n.hpp>
 
-namespace vle { namespace utils {
+namespace {
 
-static bool extract__(Packages *out, const std::string& filepath)
+bool extract(vle::utils::ContextPtr ctx,
+             vle::utils::Packages *out,
+             const std::string& filepath) noexcept
 {
-    Path pkg(filepath);
-    PackageParser parser;
+    vle::utils::Path pkg(filepath);
+    vle::utils::PackageParser parser;
 
     if (pkg.is_file()) {
         parser.extract(pkg.string(), std::string());
@@ -46,30 +48,28 @@ static bool extract__(Packages *out, const std::string& filepath)
         return true;
     }
 
-    TraceAlways(_("Package: can not open file `%s'"),
-                pkg.string().c_str());
+    vErr(ctx, _("Package: can not open file `%s'"), pkg.string().c_str());
 
     return false;
 }
 
-static bool rebuild__(ContextPtr ctx, Packages *out)
+bool rebuild(vle::utils::ContextPtr ctx,
+             vle::utils::Packages *out) noexcept
 {
-    Path pkgsdir(ctx->getBinaryPackagesDir());
-    PackageParser parser;
+    vle::utils::Path pkgsdir(ctx->getBinaryPackagesDir());
+    vle::utils::PackageParser parser;
 
     if (pkgsdir.is_directory()) {
-        for (DirectoryIterator it(pkgsdir), end; it != end; ++it) {
+        for (vle::utils::DirectoryIterator it(pkgsdir), end; it != end; ++it) {
             if (it->is_directory()) {
-                Path descfile = *it;
+                vle::utils::Path descfile = *it;
                 descfile /= "Description.txt";
 
                 if (descfile.is_file()) {
                     parser.extract(descfile.string(), std::string());
-
                 } else {
-                    TraceAlways(
-                        _("Remote: failed to open Description "
-                          "from `%s'"), descfile.string().c_str());
+                    vErr(ctx, _("Remote: failed to open Description "
+                                "from `%s'"), descfile.string().c_str());
                 }
             }
         }
@@ -79,21 +79,25 @@ static bool rebuild__(ContextPtr ctx, Packages *out)
                     parser.end());
 
         return true;
-    } else {
-        TraceAlways(_("Remote: failed to open directory `%s'"),
-                     pkgsdir.string().c_str());
-
-        return false;
     }
+
+    vErr(ctx, _("Remote: failed to open directory `%s'"),
+         pkgsdir.string().c_str());
+
+    return false;
 }
+
+} // anonymous namespace
+
+namespace vle { namespace utils {
 
 bool LocalPackageManager::extract(ContextPtr ctx, Packages *out)
 {
     try {
-        return extract__(out, ctx->getLocalPackageFilename().string());
+        return ::extract(ctx, out, ctx->getLocalPackageFilename().string());
     } catch (const std::exception& e) {
-        TraceAlways(_("Remote: internal error when reading local package:"
-                      " %s"), e.what());
+        vErr(ctx, _("Remote: internal error when reading local package:"
+                    " %s\n"), e.what());
 
         return false;
     }
@@ -102,10 +106,10 @@ bool LocalPackageManager::extract(ContextPtr ctx, Packages *out)
 bool LocalPackageManager::rebuild(ContextPtr ctx, Packages *out)
 {
     try {
-        return rebuild__(ctx, out);
+        return ::rebuild(ctx, out);
     } catch (const std::exception& e) {
-        TraceAlways(_("Remote: failed to rebuild cache of installed"
-                      " package: %s"), e.what());
+        vErr(ctx, _("Remote: failed to rebuild cache of installed"
+                    " package: %s\n"), e.what());
 
         return false;
     }
@@ -114,13 +118,13 @@ bool LocalPackageManager::rebuild(ContextPtr ctx, Packages *out)
 bool RemotePackageManager::extract(ContextPtr ctx, Packages *out)
 {
     try {
-        return extract__(out, ctx->getRemotePackageFilename().string());
+        return ::extract(ctx, out, ctx->getRemotePackageFilename().string());
     } catch (const std::exception& e) {
-        TraceAlways(_("Remote: internal error when reading remote"
-                      " package: %s"), e.what());
+        vErr(ctx, _("Remote: internal error when reading remote"
+                    " package: %s\n"), e.what());
 
         return false;
     }
 }
 
-}}
+}} // namespace vle utils

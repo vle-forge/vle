@@ -32,7 +32,6 @@
 */
 
 #include <vle/utils/Filesystem.hpp>
-#include <vle/utils/Trace.hpp>
 #include <fstream>
 #include <string>
 #include <random>
@@ -353,7 +352,6 @@ bool Path::create_directory() const
 #else
     if (::mkdir(string().c_str(), S_IRUSR | S_IWUSR | S_IXUSR)) {
 #endif
-        TraceAlways("Path::create_directory: %s fails", string().c_str());
         return false;
     }
 

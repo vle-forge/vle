@@ -27,9 +27,32 @@
 
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/DynamicsInit.hpp>
-#include <vle/utils/Trace.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/i18n.hpp>
+#include <sstream>
+#include <limits>
 #include <cassert>
+
+namespace {
+
+void print_external_event(const vle::devs::ExternalEventList& events,
+                          vle::utils::ContextPtr ctx) noexcept
+{
+    for (const auto& event : events) {
+        if (event.attributes().get()) {
+            std::ostringstream oss;
+            event.attributes()->writeString(oss);
+            vDbg(ctx, _("[%s: %s]"), event.getPortName().c_str(),
+                 oss.str().c_str());
+        } else {
+            vDbg(ctx, _("[%s: null]"), event.getPortName().c_str());
+        }
+    }
+
+    vDbg(ctx, "\n");
+}
+
+} // anonymous namespace
 
 namespace vle { namespace devs {
 
@@ -38,21 +61,22 @@ DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
     : Dynamics(init, events)
     , mName(init.model.getCompleteName())
 {
-    TraceDevs((fmt(_("                     %1% [DEVS] constructor"))
-               % mName).str().c_str());
+    vDbg(context(), _("                     %s [DEVS] constructor\n"),
+         mName.c_str());
 }
 
 Time DynamicsDbg::init(Time time)
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] init"))
-               % time % mName).str().c_str());
+    vDbg(context(), _("%.*g %s [DEVS] init\n"),
+         std::numeric_limits<double>::max_digits10, time, mName.c_str());
 
     Time duration(mDynamics->init(time));
 
-    TraceDevs((fmt(_("                .... %1% [DEVS] init returns %2%")) %
-               mName % duration).str().c_str());
+    vDbg(context(), _("                .... %s [DEVS] init returns %.*g\n"),
+         mName.c_str(), std::numeric_limits<double>::max_digits10,
+         duration);
 
     return duration;
 }
@@ -61,19 +85,18 @@ void DynamicsDbg::output(Time time, ExternalEventList& output) const
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] output"))
-               % time % mName).str().c_str());
+    vDbg(context(), _("%.*g %s [DEVS] output\n"),
+         std::numeric_limits<double>::max_digits10, time,
+         mName.c_str());
 
     mDynamics->output(time, output);
+    vDbg(context(), _("                .... %s [DEVS] output returns "),
+         mName.c_str());
 
     if (output.empty()) {
-        TraceDevs((fmt(
-                _("                .... %1% [DEVS] output returns "
-                  "empty output")) % mName).str().c_str());
+        vDbg(context(), _("no event\n"));
     } else {
-        TraceDevs((fmt(
-                _("                .... %1% [DEVS] output returns "
-                  "%2%")) % mName % output).str().c_str());
+        ::print_external_event(output, context());
     }
 }
 
@@ -81,13 +104,13 @@ Time DynamicsDbg::timeAdvance() const
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs((fmt(_("                     %1% [DEVS] ta"))
-               % mName).str().c_str());
+    vDbg(context(), _("                     %s [DEVS] ta\n"),
+         mName.c_str());
 
     Time time(mDynamics->timeAdvance());
 
-    TraceDevs((fmt(_("                .... %1% [DEVS] ta returns %2%")) %
-               mName % time).str().c_str());
+    vDbg(context(), _("                .... %s [DEVS] ta returns %.*g\n"),
+         mName.c_str(), std::numeric_limits<double>::max_digits10, time);
 
     return time;
 }
@@ -96,8 +119,9 @@ void DynamicsDbg::internalTransition(Time time)
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
-               mName).str().c_str());
+    vDbg(context(), _("%.*g %s [DEVS] internal transition\n"),
+         std::numeric_limits<double>::max_digits10,
+         time, mName.c_str());
 
     mDynamics->internalTransition(time);
 }
@@ -107,8 +131,11 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]"))
-               % time % mName % event).str().c_str());
+    vDbg(context(), _("%.*g %s [DEVS] external transition: "),
+         std::numeric_limits<double>::max_digits10, time,
+         mName.c_str());
+
+    ::print_external_event(event, context());
 
     mDynamics->externalTransition(event, time);
 }
@@ -119,9 +146,10 @@ void DynamicsDbg::confluentTransitions(
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs(
-        (fmt(_("%1$20.10g %2% [DEVS] confluent transition: [%3%]"))
-         % time % mName % extEventlist).str().c_str());
+    vDbg(context(), _("%.*g %s [DEVS] confluent transition: "),
+         std::numeric_limits<double>::max_digits10, time, mName.c_str());
+
+    ::print_external_event(extEventlist, context());
 
     mDynamics->confluentTransitions(time, extEventlist);
 }
@@ -131,9 +159,11 @@ DynamicsDbg::observation(const ObservationEvent& event) const
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs((fmt(_("%1$20.10g %2% [DEVS] observation: [from: '%3%'"
-                     " port: '%4%']")) % event.getTime() % mName
-               % event.getViewName() % event.getPortName()).str().c_str());
+    vDbg(context(), _("%.*g %s [DEVS] observation: [from: '%s' port:"
+                      " '%s']\n"),
+         std::numeric_limits<double>::max_digits10, event.getTime(),
+         mName.c_str(), event.getViewName().c_str(),
+         event.getPortName().c_str());
 
     return mDynamics->observation(event);
 }
@@ -142,8 +172,8 @@ void DynamicsDbg::finish()
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    TraceDevs((fmt(_("                     %1% [DEVS] finish"))
-               % mName).str().c_str());
+    vDbg(context(), _("                     %s [DEVS] finish\n"),
+         mName.c_str());
 
     mDynamics->finish();
 }

@@ -29,8 +29,8 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Filesystem.hpp>
+#include <vle/utils/Trace.hpp>
 #include <vle/version.hpp>
 #include <unordered_map>
 #include <boost/version.hpp>

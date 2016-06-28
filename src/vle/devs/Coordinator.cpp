@@ -26,6 +26,7 @@
 
 
 #include <vle/devs/Coordinator.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/Simulator.hpp>
@@ -38,7 +39,6 @@
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/utils/Trace.hpp>
 #include <functional>
 #include <boost/bind.hpp>
 
@@ -111,7 +111,7 @@ void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
 
 void Coordinator::run()
 {
-    DTraceDevs(_("-------- BAG --------"));
+    vDbg(m_context, _("-------- BAG --------"));
     SimulatorList::size_type oldToDelete(m_toDelete);
 
     Bag& bags = m_eventTable.getCurrentBag();

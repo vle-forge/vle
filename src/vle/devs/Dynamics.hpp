@@ -313,6 +313,11 @@ public:
 
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
+    /**
+     * Get a Context shared pointer.
+     */
+    utils::ContextPtr context() const noexcept { return m_context; }
+
 private:
     ///< A reference to the context.
     utils::ContextPtr m_context;

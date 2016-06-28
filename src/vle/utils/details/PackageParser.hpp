@@ -77,11 +77,8 @@ public:
      * @param distribution The distribution to assign for package.
      *
      * @throw std::exception if failure.
-     *
-     * @return True if success, false otherwise (and log with @c
-     * utils::Trace subsytem).
      */
-    bool extract(const std::string& filepath, const std::string& distribution);
+    void extract(const std::string& filepath, const std::string& distribution);
 
     iterator begin();
 
