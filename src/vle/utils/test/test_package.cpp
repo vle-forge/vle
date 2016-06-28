@@ -55,7 +55,6 @@
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/RemoteManager.hpp>
-#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/vle.hpp>
 
@@ -89,7 +88,7 @@ struct F
         std::cout << "test start in " << current_path.string() << '\n';
 
         auto ctx = vle::utils::make_context();
-        vle::utils::Preferences prefs(false, ctx->getConfigurationFile());
+        ctx->writeSettings();
     }
 
     ~F()

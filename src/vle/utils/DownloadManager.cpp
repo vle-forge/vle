@@ -28,7 +28,6 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Filesystem.hpp>
@@ -56,8 +55,7 @@ struct DownloadManager::Pimpl
         , mIsFinish(false)
         , mHasError(false)
     {
-        utils::Preferences prefs(true, mContext->getConfigurationFile());
-        if (not prefs.get("vle.command.url.get", &mCommand))
+        if (not context->get("vle.command.url.get", &mCommand))
             throw InternalError(
                 _("Download: fail to get vle.command.url.get command "
                   "from vle.conf"));

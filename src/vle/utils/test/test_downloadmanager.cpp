@@ -31,7 +31,6 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/version.hpp>
 #include <vle/utils/DownloadManager.hpp>
-#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/vle.hpp>

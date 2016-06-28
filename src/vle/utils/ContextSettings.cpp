@@ -25,15 +25,12 @@
  */
 
 
-#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Context.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
-#include <boost/variant.hpp>
 #include <fstream>
-#include <map>
 
 #ifdef _WIN32
 #define VLE_PACKAGE_COMMAND_CONFIGURE           \
@@ -75,23 +72,9 @@
 
 namespace vle { namespace utils {
 
-using PreferenceType = boost::variant<bool,
-                                      std::string,
-                                      long,
-                                      double>;
-
-using PreferenceMap = std::map<std::string, PreferenceType>;
-
-struct Preferences::Pimpl
+void Context::resetSettings() noexcept
 {
-    PreferenceMap ppMap;
-    std::string mFilename; /**< The filename of the resources file in \c
-                              `VLE_HOME/vle.conf'. */
-
-    bool mreadOnly; /**< if TRUE, the file is not saved at exit. */
-
-    Pimpl(bool readOnly, const Path& filepath)
-        : ppMap{
+    m_pimpl->settings = {
         { "gvle.packages.auto-build", true },
         { "gvle.editor.auto-indent", true },
         { "gvle.editor.font", std::string("Monospace 10") },
@@ -124,113 +107,101 @@ struct Preferences::Pimpl
         { "vle.command.untar", std::string(VLE_COMMAND_UNTAR) },
         { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET) },
         { "vle.command.dir.copy", std::string(VLE_COMMAND_DIR_COPY) },
-        { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE) }}
-        , mFilename(filepath.string())
-        , mreadOnly(readOnly)
-    {
-        std::ifstream ifs(mFilename);
-        if (not ifs.is_open()) {
-            TraceAlways(_("Preferences: fail open '%s'. Use default value."),
-                        mFilename.c_str());
-            return;
-        }
-
-        int l = 0;
-        std::string line;
-        while (std::getline(ifs, line)) {
-            auto equalchar = line.find_first_of('=', 0);
-            if (equalchar == std::string::npos or
-                equalchar == 0 or
-                equalchar == line.size())
-                throw utils::InternalError(
-                    (fmt(_("Preferences: fail while reading '%s' line '%d'"))
-                     % mFilename % l).str());
-
-            std::string key = line.substr(0, equalchar);
-            std::string value = line.substr(equalchar + 1, std::string::npos);
-
-            auto it = ppMap.find(key);
-            if (it == ppMap.end()) {
-                TraceAlways(_("Preferences: unknown key '%s'"), key.c_str());
-            } else {
-                if (boost::get<bool>(&it->second)){
-                    if (value == "1" or value  == "true" or
-                        value == "1" or value == "TRUE" or value == "True")
-                        it->second = true;
-                    else if (value == "false" or value == "0"
-                             or value == "FALSE" or value == "False")
-                        it->second = false;
-                    else
-                        TraceAlways(_("Preferences: fail reading boolean value"
-                                      " at line %d in %s"), l, value.c_str());
-                } else if (boost::get<std::string>(&it->second)) {
-                    it->second = value;
-                } else if (boost::get<long>(&it->second)) {
-                    try {
-                        long r = std::stol(value);
-                        it->second = r;
-                    } catch (const std::exception& /* e */) {
-                        TraceAlways(_("Preferences: fail reading integer value"
-                                      " at line %d in %s"), l, value.c_str());
-                    }
-                } else if (boost::get<long>(&it->second)) {
-                    try {
-                        double r = std::stod(value);
-                        it->second = r;
-                    } catch (const std::exception& /* e */) {
-                        TraceAlways(_("Preferences: fail reading double value"
-                                      " at line %d in %s"), l, value.c_str());
-                    }
-                }
-            }
-            l++;
-        }
-    }
-
-    ~Pimpl() noexcept
-    {
-        try {
-            if (not mreadOnly) {
-                std::ofstream file(mFilename);
-
-                if (not file.is_open()) {
-                    TraceAlways(_("Preferences: fail write '%s'"),
-                                mFilename.c_str());
-                    return;
-                }
-
-                file << std::boolalpha;
-                for (const auto& elem : ppMap)
-                    file << elem.first
-                         << '=' << elem.second << '\n';
-
-                if (file.bad()) {
-                    TraceAlways(_("Preferences: fail while writing '%s'"),
-                                mFilename.c_str());
-                    return;
-                }
-            }
-        } catch (...) {
-        }
-    }
-};
-
-Preferences::Preferences(const Path& filepath)
-    : mPimpl(std::make_unique<Preferences::Pimpl>(false, filepath))
-{
+        { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE) }};
 }
 
-Preferences::Preferences(bool readOnly, const Path& filepath)
-    : mPimpl(std::make_unique<Preferences::Pimpl>(readOnly, filepath))
+bool Context::loadSettings() noexcept
 {
+    std::ifstream ifs(getConfigurationFile().string());
+    if (not ifs.is_open()) {
+        vErr(this, _("Settings: fail to read configuration file `%s'."
+                    " Use default settings instead.\n"),
+             getConfigurationFile().string().c_str());
+        return false;
+    }
+
+    int l = 0;
+    std::string line;
+    while (std::getline(ifs, line)) {
+        auto equalchar = line.find_first_of('=', 0);
+        if (equalchar == std::string::npos or
+            equalchar == 0 or
+            equalchar == line.size()) {
+            vErr(this, _("Settings: fail while reading '%s' line '%d'\n"),
+                 getConfigurationFile().string().c_str(), l);
+            return false;
+        }
+
+        std::string key = line.substr(0, equalchar);
+        std::string value = line.substr(equalchar + 1, std::string::npos);
+
+        auto it = m_pimpl->settings.find(key);
+        if (it == m_pimpl->settings.end()) {
+            vInfo(this, _("Settings: unknown key `%s'\n"), key.c_str());
+            continue;
+        }
+
+        if (boost::get<bool>(&it->second)){
+            if (value == "1" or value  == "true" or
+                value == "1" or value == "TRUE" or value == "True")
+                it->second = true;
+            else if (value == "false" or value == "0"
+                     or value == "FALSE" or value == "False")
+                it->second = false;
+            else
+                vErr(this, _("Settings: fail reading boolean value"
+                            " at line %d in %s\n"), l, value.c_str());
+        } else if (boost::get<std::string>(&it->second)) {
+            it->second = value;
+        } else if (boost::get<long>(&it->second)) {
+            try {
+                long r = std::stol(value);
+                it->second = r;
+            } catch (const std::exception& /* e */) {
+                vErr(this, _("Settings: fail reading integer value"
+                            " at line %d in %s\n"), l, value.c_str());
+            }
+        } else if (boost::get<long>(&it->second)) {
+            try {
+                double r = std::stod(value);
+                it->second = r;
+            } catch (const std::exception& /* e */) {
+                vErr(this, _("Settings: fail reading double value"
+                            " at line %d in %s"), l, value.c_str());
+            }
+        }
+        l++;
+    }
+
+    return true;
 }
 
-Preferences::~Preferences() noexcept = default;
-
-bool Preferences::set(const std::string& key, const std::string& value)
+bool Context::writeSettings() const noexcept
 {
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    std::ofstream ofs(getConfigurationFile().string());
+    if (not ofs.is_open()) {
+        vErr(this, _("Settings: fail to write configuration file `%s'\n"),
+             getConfigurationFile().string().c_str());
+        return false;
+    }
+
+    ofs << std::boolalpha;
+    for (const auto& elem : m_pimpl->settings)
+        ofs << elem.first  << '=' << elem.second << '\n';
+
+    if (ofs.bad()) {
+        vErr(this, _("Settings: fail while writing configuration file `%s'\n"),
+             getConfigurationFile().string().c_str());
+        return false;
+    }
+
+    return true;
+}
+
+bool Context::set(const std::string& key, const std::string& value) noexcept
+{
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     if (not boost::get<std::string>(&it->second))
@@ -241,10 +212,10 @@ bool Preferences::set(const std::string& key, const std::string& value)
     return true;
 }
 
-bool Preferences::set(const std::string& key, double value)
+bool Context::set(const std::string& key, double value) noexcept
 {
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     if (not boost::get<double>(&it->second))
@@ -255,10 +226,10 @@ bool Preferences::set(const std::string& key, double value)
     return true;
 }
 
-bool Preferences::set(const std::string& key, long value)
+bool Context::set(const std::string& key, long value) noexcept
 {
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     if (not boost::get<long>(&it->second))
@@ -269,10 +240,10 @@ bool Preferences::set(const std::string& key, long value)
     return true;
 }
 
-bool Preferences::set(const std::string& key, bool value)
+bool Context::set(const std::string& key, bool value) noexcept
 {
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     if (not boost::get<bool>(&it->second))
@@ -283,24 +254,10 @@ bool Preferences::set(const std::string& key, bool value)
     return true;
 }
 
-std::vector<std::string> Preferences::get() const
+bool Context::get(const std::string& key, std::string* value) const noexcept
 {
-    std::vector<std::string> ret(mPimpl->ppMap.size());
-
-    std::transform(std::begin(mPimpl->ppMap), std::end(mPimpl->ppMap),
-                   std::begin(ret),
-                   [](const PreferenceMap::value_type& pair)
-                   {
-                       return pair.first;
-                   });
-
-    return ret;
-}
-
-bool Preferences::get(const std::string& key, std::string* value) const
-{
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     auto ptr = boost::get<std::string>(&it->second);
@@ -312,10 +269,10 @@ bool Preferences::get(const std::string& key, std::string* value) const
     return true;
 }
 
-bool Preferences::get(const std::string& key, double* value) const
+bool Context::get(const std::string& key, double* value) const noexcept
 {
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     auto ptr = boost::get<double>(&it->second);
@@ -327,10 +284,10 @@ bool Preferences::get(const std::string& key, double* value) const
     return true;
 }
 
-bool Preferences::get(const std::string& key, long* value) const
+bool Context::get(const std::string& key, long* value) const noexcept
 {
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     auto ptr = boost::get<long>(&it->second);
@@ -342,10 +299,10 @@ bool Preferences::get(const std::string& key, long* value) const
     return true;
 }
 
-bool Preferences::get(const std::string& key, bool* value) const
+bool Context::get(const std::string& key, bool* value) const noexcept
 {
-    auto it = mPimpl->ppMap.find(key);
-    if (it == mPimpl->ppMap.end())
+    auto it = m_pimpl->settings.find(key);
+    if (it == m_pimpl->settings.end())
         return false;
 
     auto ptr = boost::get<bool>(&it->second);

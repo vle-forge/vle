@@ -29,7 +29,6 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Filesystem.hpp>
@@ -52,10 +51,9 @@ void remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
         path.remove();
 
     std::string command;
-    try {
-        vle::utils::Preferences prefs(true, ctx->getConfigurationFile());
-        prefs.get("vle.command.dir.remove", &command);
+    ctx->get("vle.command.dir.remove", &command);
 
+    try {
         command = (boost::format(command) % path.string()).str();
 
         vle::utils::Spawn spawn(ctx);
@@ -943,16 +941,14 @@ const std::string& Package::name() const
 
 void Package::refreshCommands()
 {
-    utils::Preferences prefs(true, m_pimpl->m_context->getConfigurationFile());
-
-    prefs.get("vle.packages.configure", &m_pimpl->mCommandConfigure);
-    prefs.get("vle.packages.test", &m_pimpl->mCommandTest);
-    prefs.get("vle.packages.build", &m_pimpl->mCommandBuild);
-    prefs.get("vle.packages.install", &m_pimpl->mCommandInstall);
-    prefs.get("vle.packages.clean", &m_pimpl->mCommandClean);
-    prefs.get("vle.packages.package", &m_pimpl->mCommandPack);
-    prefs.get("vle.packages.unzip", &m_pimpl->mCommandUnzip);
-    prefs.get("vle.command.dir.copy", &m_pimpl->mCommandDirCopy);
+    m_pimpl->m_context->get("vle.packages.configure", &m_pimpl->mCommandConfigure);
+    m_pimpl->m_context->get("vle.packages.test", &m_pimpl->mCommandTest);
+    m_pimpl->m_context->get("vle.packages.build", &m_pimpl->mCommandBuild);
+    m_pimpl->m_context->get("vle.packages.install", &m_pimpl->mCommandInstall);
+    m_pimpl->m_context->get("vle.packages.clean", &m_pimpl->mCommandClean);
+    m_pimpl->m_context->get("vle.packages.package", &m_pimpl->mCommandPack);
+    m_pimpl->m_context->get("vle.packages.unzip", &m_pimpl->mCommandUnzip);
+    m_pimpl->m_context->get("vle.command.dir.copy", &m_pimpl->mCommandDirCopy);
 }
 
 void Package::refreshPath()

@@ -30,6 +30,8 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Context.hpp>
+#include <boost/variant.hpp>
+#include <map>
 
 #define VLE_LOG_EMERG   0               // system is unusable
 #define VLE_LOG_ALERT   1               // action must be taken immediately
@@ -78,15 +80,19 @@ vle_log_null(const vle::utils::ContextPtr&, const char *, ...)
 
 namespace vle { namespace utils {
 
+//
+// API for settings
+//
+
+using PreferenceType = boost::variant<bool, std::string, long, double>;
+using PreferenceMap = std::map<std::string, PreferenceType>;
+
 struct PrivateContextIimpl
 {
-    Path m_prefix; /*!< the $prefix of installation */
-    Path m_home; /*!< the $VLE_HOME */
+    Path m_prefix;                      ///< dirname of $PREFIX of installation
+    Path m_home;                        ///< dirname of $VLEHOME directory
 
-    PathList m_simulator;
-    PathList m_stream;
-    PathList m_output;
-    PathList m_modeling;
+    PreferenceMap settings;             ///< global settings
 
     Context::LogFn log_fn;
     int log_priority;

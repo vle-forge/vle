@@ -91,6 +91,165 @@ public:
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
+     * Manage settings
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * Assign default values to the settings database.
+     * settings database.
+     */
+    void resetSettings() noexcept;
+
+    /**
+     * Read the configuration file (\e %VLEHOME/vle.conf) and fill the
+     * settings database.
+     */
+    bool loadSettings() noexcept;
+
+    /**
+     * Read the configuration file (\e %VLEHOME/vle.conf).
+     */
+    bool writeSettings() const noexcept;
+
+    /**
+     * Insert an @c std::string into the specified key.
+     *
+     * @code
+     * f.set("section.key", "vle is wonderful");
+     * // section.key = "vle is wonderful"
+     * @endcode
+     *
+     * @param key The key.
+     * @param value The value.
+     *
+     * @return true if insertion is successful.
+     */
+    bool set(const std::string& key, const std::string& value) noexcept;
+
+    /**
+     * Insert an @c double into the specified key.
+     *
+     * @code
+     * f.set("section.key", 1.123456789);
+     * // section.key = 1.123456789
+     * @endcode
+     *
+     * @param key The key.
+     * @param value The value.
+     *
+     * @return true if insertion is successful.
+     */
+    bool set(const std::string& key, double value) noexcept;
+
+    /**
+     * Insert an @c long into the specified key.
+     *
+     * @code
+     * f.set("section.key", 23485);
+     * // section.key = 23485
+     * @endcode
+     *
+     * @param key The key.
+     * @param value The value.
+     *
+     * @return true if insertion is successful.
+     */
+    bool set(const std::string& key, long value) noexcept;
+
+    /**
+     * Insert an @c bool into the specified key.
+     *
+     * @code
+     * f.set("section.key", true);
+     * // section.key = true
+     * @endcode
+     *
+     * @param key The key.
+     * @param value The value.
+     *
+     * @return true if insertion is successful.
+     */
+    bool set(const std::string& section, bool value) noexcept;
+
+    /**
+     * Get an @c std::string from specified key.
+     *
+     * @code
+     * std::string value;
+     * f.get("section.key", &value);
+     * assert(value == "azertyuiop";
+     *
+     * // section.key = "azertyuiop"
+     * @endcode
+     *
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
+     *
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not an @c std::string.
+     */
+    bool get(const std::string& key, std::string* value) const noexcept;
+
+    /**
+     * Get a @c double from specified key.
+     *
+     * @code
+     * double value;
+     * f.get("section.key", &value);
+     * assert(value == 1.0);
+     *
+     * // section1.key = 1.0
+     * @endcode
+     *
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
+     *
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not a @c real.
+     */
+    bool get(const std::string& key, double* value) const noexcept;
+
+    /**
+     * Get a @c long from specified key.
+     *
+     * @code
+     * long value;
+     * f.get("section.key", &value);
+     * assert(value == 12345);
+     *
+     * // section.key = 12345
+     * @endcode
+     *
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
+     *
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not an @c integer.
+     */
+    bool get(const std::string& key, long* value) const noexcept;
+
+    /**
+     * Get a @c bool from specified key.
+     *
+     * @code
+     * bool value;
+     * f.get("section.key", &value);
+     * assert(value);
+     *
+     * // section.key = true
+     * @endcode
+     *
+     * @param[in] key The key.
+     * @param[out] value The value to fill.
+     *
+     * @throw utils::ArgError if section, key do not exist or if the value
+     * is not a @c boolean.
+     */
+    bool get(const std::string& key, bool* value) const noexcept;
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
      * Manage log
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -115,9 +274,9 @@ public:
              const char *fn,
              const char *format, ...)
 #if defined(__GNUC__)
-        noexcept __attribute__((format(printf, 6, 7)));
+        const noexcept __attribute__((format(printf, 6, 7)));
 #else
-        noexcept;
+        const noexcept;
 #endif
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

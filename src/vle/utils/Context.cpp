@@ -46,7 +46,7 @@ vle_log_stderr(const Context& ctx, int priority, const char *file,
     (void)file;
     (void)line;
 
-    fprintf(stderr, "-: %s: ", fn);
+    fprintf(stderr, "%s: ", fn);
     vfprintf(stderr, format, args);
 }
 
@@ -69,14 +69,22 @@ Context::Context(const Path& /* prefix */, std::string locale)
     initPrefixDir();
     initVleHomeDirectory();
 
+    resetSettings();
+
+    Path conf = getConfigurationFile();
+    if (not conf.is_file())
+        writeSettings();
+    else
+        loadSettings();
+
     if (locale == "C")
         setlocale(LC_ALL, "C");
     else
         if (not setlocale(LC_ALL, locale.c_str()))
             setlocale(LC_ALL, "C");
 
-    vInfo(this, "Context initialized\n- Prefixdir=%s\n- Homedir=%s\n"
-          "- Locale=%s\n", m_pimpl->m_prefix.string().c_str(),
+    vInfo(this, "Context initialized [prefix=%s] [home=%s] [locale=%s]\n",
+          m_pimpl->m_prefix.string().c_str(),
           m_pimpl->m_home.string().c_str(),
           locale.c_str());
 
@@ -85,6 +93,12 @@ Context::Context(const Path& /* prefix */, std::string locale)
     textdomain(VLE_LOCALE_NAME);
 #endif
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Path
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const Path& Context::getPrefixDir() const
 {
@@ -229,6 +243,12 @@ void Context::fillBinaryPackagesList(std::vector<std::string>& pkglist) const
     return;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Log
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 void Context::set_log_function(LogFn fn) noexcept
 {
     m_pimpl->log_fn = fn;
@@ -253,7 +273,7 @@ int Context::get_log_priority() const noexcept
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void Context::log(int priority, const char *file, int line,
-                  const char *fn, const char *format, ...) noexcept
+                  const char *fn, const char *format, ...) const noexcept
 {
     va_list args;
 

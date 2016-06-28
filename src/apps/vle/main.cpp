@@ -32,7 +32,6 @@
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Preferences.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/value/Matrix.hpp>
@@ -205,7 +204,8 @@ static void remove_configuration_file()
             filepath.remove();
         }
 
-        vle::utils::Preferences prefs(false, ctx->getConfigurationFile());
+        ctx->resetSettings();
+        ctx->writeSettings();
     } catch (const std::exception &e) {
         fprintf(stderr, _("Failed to remove configuration file: %s\n"),
             e.what());
@@ -592,12 +592,10 @@ static int manage_config_mode(vle::utils::ContextPtr ctx, CmdArgs args)
     int ret = EXIT_SUCCESS;
 
     try {
-        vle::utils::Preferences prefs(false, ctx->getConfigurationFile());
-
         std::string concat = std::accumulate(args.begin(), args.end(),
                                              std::string(), Comma());
 
-        if (not prefs.set(configvar, concat))
+        if (not ctx->set(configvar, concat))
             throw vle::utils::ArgError(
                 (boost::format(_("Unknown variable `%1%'")) %
                  configvar).str());

@@ -32,7 +32,6 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/details/Package.hpp>
 #include <vle/utils/details/PackageParser.hpp>
@@ -342,9 +341,8 @@ public:
 
         std::vector < std::string > urls;
         try {
-            utils::Preferences prefs(true, mContext->getConfigurationFile());
             std::string tmp;
-            prefs.get("vle.remote.url", &tmp);
+            mContext->get("vle.remote.url", &tmp);
 
             boost::algorithm::split(urls, tmp,
                                     boost::algorithm::is_any_of(","),
@@ -640,11 +638,7 @@ public:
         std::string command;
 
         try {
-            {
-                utils::Preferences prefs(true, mContext->getConfigurationFile());
-                prefs.get("vle.command.tar", &command);
-            }
-
+            mContext->get("vle.command.tar", &command);
             command = (vle::fmt(command) % compressedfilepath.string()
                        % filepath.string()).str();
 
@@ -706,11 +700,7 @@ public:
 
         std::string command;
         try {
-            {
-                utils::Preferences prefs(true, mContext->getConfigurationFile());
-                prefs.get("vle.command.untar", &command);
-            }
-
+            mContext->get("vle.command.untar", &command);
             command = (vle::fmt(command) % compressedfilepath.string()).str();
 
             utils::Spawn spawn(mContext);
