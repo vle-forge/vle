@@ -46,6 +46,7 @@ using PathList = std::vector<vle::utils::Path>;
 struct PrivateContextIimpl;
 class Context;
 using ContextPtr = std::shared_ptr<Context>;
+
 /**
  * Build a std::shared_ptr<Context> using "C" as default locale.
  *
@@ -116,7 +117,7 @@ public:
      * Insert an @c std::string into the specified key.
      *
      * @code
-     * f.set("section.key", "vle is wonderful");
+     * context->set("section.key", "vle is wonderful");
      * // section.key = "vle is wonderful"
      * @endcode
      *
@@ -131,7 +132,7 @@ public:
      * Insert an @c double into the specified key.
      *
      * @code
-     * f.set("section.key", 1.123456789);
+     * context->set("section.key", 1.123456789);
      * // section.key = 1.123456789
      * @endcode
      *
@@ -146,7 +147,7 @@ public:
      * Insert an @c long into the specified key.
      *
      * @code
-     * f.set("section.key", 23485);
+     * context->set("section.key", 23485);
      * // section.key = 23485
      * @endcode
      *
@@ -161,7 +162,7 @@ public:
      * Insert an @c bool into the specified key.
      *
      * @code
-     * f.set("section.key", true);
+     * context->set("section.key", true);
      * // section.key = true
      * @endcode
      *
@@ -177,7 +178,7 @@ public:
      *
      * @code
      * std::string value;
-     * f.get("section.key", &value);
+     * context->get("section.key", &value);
      * assert(value == "azertyuiop";
      *
      * // section.key = "azertyuiop"
@@ -196,7 +197,7 @@ public:
      *
      * @code
      * double value;
-     * f.get("section.key", &value);
+     * context->get("section.key", &value);
      * assert(value == 1.0);
      *
      * // section1.key = 1.0
@@ -215,7 +216,7 @@ public:
      *
      * @code
      * long value;
-     * f.get("section.key", &value);
+     * context->get("section.key", &value);
      * assert(value == 12345);
      *
      * // section.key = 12345
@@ -234,7 +235,7 @@ public:
      *
      * @code
      * bool value;
-     * f.get("section.key", &value);
+     * context->get("section.key", &value);
      * assert(value);
      *
      * // section.key = true
@@ -254,15 +255,18 @@ public:
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    using LogFn = std::function<void(const Context& ctx,
-                                     int priority,
-                                     const char *file,
-                                     int line,
-                                     const char *fn,
-                                     const char *format,
-                                     va_list args)>;
+    struct LogFunctor
+    {
+        virtual void write(const Context& ctx,
+                           int priority,
+                           const char *file,
+                           int line,
+                           const char *fn,
+                           const char *format,
+                           va_list args) noexcept = 0;
+    };
 
-    void set_log_function(LogFn fn) noexcept;
+    void set_log_function(std::unique_ptr<LogFunctor> fn) noexcept;
 
     void set_log_priority(int priority) noexcept;
 

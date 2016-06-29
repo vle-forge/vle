@@ -36,19 +36,21 @@
 
 namespace vle { namespace utils {
 
-static void
-vle_log_stderr(const Context& ctx, int priority, const char *file,
-               int line, const char *fn, const char *format,
-               va_list args) noexcept
+struct vle_log_stderr : Context::LogFunctor
 {
-    (void)ctx;
-    (void)priority;
-    (void)file;
-    (void)line;
+    virtual void write(const Context& ctx, int priority, const char *file,
+                       int line, const char *fn, const char *format,
+                       va_list args) noexcept override
+    {
+        (void)ctx;
+        (void)priority;
+        (void)file;
+        (void)line;
 
-    fprintf(stderr, "%s: ", fn);
-    vfprintf(stderr, format, args);
-}
+        fprintf(stderr, "%s: ", fn);
+        vfprintf(stderr, format, args);
+    }
+};
 
 ContextPtr make_context(const Path& /* prefix */, std::string locale)
 {
@@ -58,7 +60,7 @@ ContextPtr make_context(const Path& /* prefix */, std::string locale)
 Context::Context(const Path& /* prefix */, std::string locale)
     : m_pimpl(std::make_unique<PrivateContextIimpl>())
 {
-    m_pimpl->log_fn = vle_log_stderr;
+    m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
 #ifndef NDEBUG
     m_pimpl->log_priority = VLE_LOG_DEBUG;
 #else
@@ -249,9 +251,9 @@ void Context::fillBinaryPackagesList(std::vector<std::string>& pkglist) const
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void Context::set_log_function(LogFn fn) noexcept
+void Context::set_log_function(std::unique_ptr<LogFunctor> fn) noexcept
 {
-    m_pimpl->log_fn = fn;
+    m_pimpl->log_fn = std::move(fn);
 
     vInfo(this, "custom logging function registered\n");
 }
@@ -278,7 +280,7 @@ void Context::log(int priority, const char *file, int line,
     va_list args;
 
     va_start(args, format);
-    m_pimpl->log_fn(*this, priority, file, line, fn, format, args);
+    m_pimpl->log_fn->write(*this, priority, file, line, fn, format, args);
     va_end(args);
 }
 

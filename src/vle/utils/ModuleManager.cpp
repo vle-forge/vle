@@ -30,7 +30,6 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Filesystem.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/version.hpp>
 #include <unordered_map>
 #include <boost/version.hpp>
@@ -117,8 +116,8 @@ public:
     ~Module() noexcept
     {
         try {
-            TraceModel(_("ModuleManager: unload %p:%s"),
-                       mHandle, mPath.c_str());
+            //TraceModel(_("ModuleManager: unload %p:%s"),
+            //         mHandle, mPath.c_str());
         } catch (...) {
         }
 
@@ -272,7 +271,7 @@ public:
         void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
 
-        TraceModel(_("ModuleManager: load %p:%s"), handle, mPath.c_str());
+        //TraceModel(_("ModuleManager: load %p:%s"), handle, mPath.c_str());
         if (not handle) {
             std::string extra;
 #ifdef _WIN32
@@ -335,11 +334,11 @@ public:
                        " %5%.%6%.%7%")) % mPath % major % minor % patch %
                  VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION).str());
         } else if (patch != VLE_PATCH_VERSION) {
-            utils::Trace::send(
-                (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
-                       " not be API/ABI compatible with the current VLE"
-                       " %5%.%6%.%7%")) % mPath % major % minor % patch %
-                 VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION).str());
+            // utils::Trace::send(
+            //     (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
+            //            " not be API/ABI compatible with the current VLE"
+            //            " %5%.%6%.%7%")) % mPath % major % minor % patch %
+            //      VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION).str());
         }
     }
 

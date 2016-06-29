@@ -94,7 +94,7 @@ struct PrivateContextIimpl
 
     PreferenceMap settings;             ///< global settings
 
-    Context::LogFn log_fn;
+    std::unique_ptr <Context::LogFunctor> log_fn;
     int log_priority;
 };
 

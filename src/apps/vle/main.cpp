@@ -28,7 +28,6 @@
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/Simulation.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
@@ -61,6 +60,81 @@
 #  define _(x) x
 #  define N_(x) x
 #endif
+
+struct vle_log_stdout : vle::utils::Context::LogFunctor
+{
+    bool color;
+
+    vle_log_stdout()
+#if defined(__unix__)
+        : color(isatty(STDOUT_FILENO) == 1)
+#endif
+    {
+    }
+
+    virtual void write(const vle::utils::Context& ctx,
+                       int priority, const char *file,
+                       int line, const char *fn,
+                       const char *format,
+                       va_list args) noexcept override
+    {
+        (void)ctx;
+
+        if (color) {
+            if (priority == 7)
+                printf("\e[90m[dbg] %s:%d %s: \e[39m", file, line, fn);
+            else if (priority == 6)
+                printf("%s: \e[39m", fn);
+            else
+                printf("\e[91m[Error]\e[31m %s:\e[39m ", fn);
+            vprintf(format, args);
+        } else {
+            if (priority == 7)
+                printf("[dbg] %s:%d %s: ", file, line, fn);
+            else if (priority == 6)
+                printf("%s: ", fn);
+            else
+                printf("[Error] %s: ", fn);
+            vprintf(format, args);
+        }
+    }
+};
+
+struct vle_log_file : vle::utils::Context::LogFunctor
+{
+    FILE *fp;
+
+    vle_log_file()
+        : fp(nullptr)
+    {}
+
+    ~vle_log_file()
+    {
+        if (fp)
+            fclose(fp);
+    }
+
+    virtual void write(const vle::utils::Context& ctx,
+                       int priority, const char *file,
+                       int line, const char *fn,
+                       const char *format,
+                       va_list args) noexcept override
+    {
+        if (not fp)
+            fp = fopen(ctx.getLogFile().string().c_str(), "w");
+
+        if (fp) {
+            if (priority == 7)
+                fprintf(fp, "[dbg] %s:%d %s: ", file, line, fn);
+            else if (priority == 6)
+                fprintf(fp, "%s: ", fn);
+            else
+                fprintf(fp, "[Error] %s: ", fn);
+
+            vfprintf(fp, format, args);
+        }
+    }
+};
 
 static void show_infos() noexcept
 {
@@ -102,17 +176,21 @@ static void show_help() noexcept
           "infos       Informations of VLE\n"
           "restart     Remove configuration file of VLE\n"
           "list        Show the list of installed package\n"
-          "log-file    Trace of simulation are reported to the standard file\n"
-          "            ($VLE_HOME/vle.log"
-          "log-stdout  Trace of the simulation(s) are reported to the "
+          "log-file    log of simulation are reported to the standard file\n"
+          "            ($VLE_HOME/vle-x.y.log"
+          "log-stdout  log of the simulation(s) are reported to the "
           "standard output\n"
           "\n"
           "processor,o Select number of processor in manager mode [>= 1]\n"
-          "verbose,V   Verbose mode 0 - 3. [default 0]\n"
-          "                0 no trace and no long exception\n"
-          "                1 small simulation trace and long exception\n"
-          "                2 long simulation trace\n"
-          "                3 all simulation trace\n"
+          "verbose,V   Verbose mode 0 - 7. [default 3]\n"
+          "                0 system is unusable\n"
+          "                1 action must be taken immediately\n"
+          "                2 action must be taken immediately\n"
+          "                3 error conditions\n"
+          "                4 warning conditions\n"
+          "                5 normal, but significant, condition\n"
+          "                6 informational message\n"
+          "                7 debug-level message\n"
           "manager,M  Use the manager mode to run experimental frames\n"
           "package,P  Select package mode,\n  package name [options]...\n"
           "                vle -P foo create: build new foo package\n"
@@ -141,39 +219,6 @@ static void show_help() noexcept
           "                vle -C gvle.editor.font Monospace 10\n"),
         VLE_NAME_COMPLETE, VLE_ABI_VERSION);
 }
-
-struct vle_initializer {
-    vle::utils::ContextPtr m_context;
-    vle::Init m_app;
-
-    vle_initializer(vle::utils::ContextPtr ctx, int verbose, int trace)
-        : m_context(ctx)
-    {
-        namespace vu = vle::utils;
-
-        vu::Trace::setLevel(vu::Trace::cast(verbose));
-        if (trace == 0)
-            vu::Trace::setStandardError();
-        else if (trace == 1)
-            vu::Trace::setStandardOutput();
-        else
-            vu::Trace::setLogFile(m_context->getLogFile().string());
-    }
-
-    ~vle_initializer() noexcept
-    {
-        namespace vu = vle::utils;
-
-        try {
-            if (vu::Trace::haveWarning() and
-                vu::Trace::getType() == vu::TRACE_STREAM_FILE)
-                fprintf(stderr, _("\n\t/!\\ Some warnings occurend: See "
-                                  "%s file"),
-                        m_context->getLogFile().string().c_str());
-        } catch (...) {
-        }
-    }
-};
 
 enum cli_mode {
     CLI_MODE_NOTHING = 0,
@@ -249,15 +294,13 @@ static std::string search_vpz(const std::string &param,
     return std::string();
 }
 
-static vle::manager::LogOptions convert_log_mode()
+static vle::manager::LogOptions convert_log_mode(vle::utils::ContextPtr ctx)
 {
-    switch (vle::utils::Trace::getLevel()) {
-    case vle::utils::TRACE_LEVEL_DEVS:
+    switch (ctx->get_log_priority()) {
+    case 7:
         return vle::manager::LOG_SUMMARY & vle::manager::LOG_RUN;
-    case vle::utils::TRACE_LEVEL_EXTENSION:
-    case vle::utils::TRACE_LEVEL_MODEL:
+    case 6:
         return vle::manager::LOG_SUMMARY;
-    case vle::utils::TRACE_LEVEL_ALWAYS:
     default:
         return vle::manager::LOG_NONE;
     }
@@ -267,7 +310,7 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
                        int processor, vle::utils::Package& pkg)
 {
     auto ctx = vle::utils::make_context();
-    vle::manager::Manager man(ctx, convert_log_mode(),
+    vle::manager::Manager man(ctx, convert_log_mode(ctx),
                               vle::manager::SIMULATION_NONE |
                               vle::manager::SIMULATION_NO_RETURN,
                               &std::cout);
@@ -300,7 +343,7 @@ static int run_simulation(CmdArgs::const_iterator it,
                           CmdArgs::const_iterator end, vle::utils::Package& pkg)
 {
     auto ctx = vle::utils::make_context();
-    vle::manager::Simulation sim(ctx, convert_log_mode(),
+    vle::manager::Simulation sim(ctx, convert_log_mode(ctx),
                                  vle::manager::SIMULATION_NONE |
                                  vle::manager::SIMULATION_NO_RETURN,
                                  &std::cout);
@@ -456,7 +499,7 @@ static int manage_remote_mode(vle::utils::ContextPtr ctx, CmdArgs args)
         return ret;
     }
 
-    try { 
+    try {
         vle::utils::RemoteManager rm(ctx);
         switch (act) {
         case vle::utils::REMOTE_MANAGER_UPDATE:
@@ -673,8 +716,8 @@ int main(int argc, char **argv)
                     throw std::exception();
             } catch (const std::exception& /* e */) {
                 fprintf(stderr, _("Bad verbose_level: %s. "
-                                  "Assume verbose_level=0\n"), ::optarg);
-                verbose_level = 0;
+                                  "Assume verbose_level=3\n"), ::optarg);
+                verbose_level = 3;
             }
             break;
         case 'v':
@@ -719,9 +762,15 @@ int main(int argc, char **argv)
     // Otherwise, starts the simulation engines
     //
     auto ctx = vle::utils::make_context();
-    vle_initializer v(ctx, verbose_level, log_stdout);
+    vle::Init m_app;
+    verbose_level = verbose_level < 7 ? std::max(verbose_level, 0) :
+        std::min(verbose_level, 7);
 
-    // if (::optind < argc)
+    if (log_stdout == 0)
+        ctx->set_log_function(std::make_unique<vle_log_stdout>());
+    else if (log_stdout != 1)
+        ctx->set_log_function(std::make_unique<vle_log_file>());
+
     CmdArgs commands(argv + ::optind, argv + argc);
 
     switch (mode) {

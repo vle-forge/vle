@@ -329,6 +329,14 @@ private:
     PackageId m_packageid;
 };
 
+#define Trace(ctx, priority, arg...)                    \
+    do {                                                \
+        if (ctx->get_log_priority() >= priority) {      \
+            ctx->log(priority, __FILE__, __LINE__,      \
+                     __FUNCTION__, ##arg);              \
+        }                                               \
+    } while (0)
+
 }} // namespace vle devs
 
 #endif
