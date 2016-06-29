@@ -147,7 +147,7 @@ struct Package::Pimpl
         m_pkgsourcepath.clear();
 
         if (not m_pkgname.empty()) {
-            Path path_binary = m_context->getBinaryPackagesDir();
+            Path path_binary = m_context->getBinaryPackagesDir()[0];
             path_binary /= m_pkgname;
             m_pkgbinarypath = path_binary.string();
             Path path_source_dir = Path::current_path();

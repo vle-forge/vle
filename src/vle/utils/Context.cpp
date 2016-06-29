@@ -139,34 +139,44 @@ Path Context::getLogFile() const
     return getHomeFile("vle-" VLE_ABI_VERSION ".log");
 }
 
-Path Context::getBinaryPackagesDir() const
+std::vector<Path> Context::getBinaryPackagesDir() const
 {
-    Path p(m_pimpl->m_home);
-    p /= "pkgs-" VLE_ABI_VERSION;
+    std::vector<Path> ret(2);
 
-    return p;
+    ret[0] = m_pimpl->m_home;
+    ret[0] /= "pkgs-" VLE_ABI_VERSION;
+
+    ret[1] = m_pimpl->m_prefix;
+    ret[1] /= "lib";
+    ret[1] /= "vle-" VLE_ABI_VERSION;
+    ret[1] /= "pkgs";
+
+    return ret;
 }
 
-std::vector<std::string> Context::getBinaryPackages() const
+std::vector<Path> Context::getBinaryPackages() const
 {
-    Path pkgs(getBinaryPackagesDir());
+    std::vector <Path> result;
+    const auto& paths = getBinaryPackagesDir();
 
-    if (not pkgs.is_directory())
-        throw utils::InternalError(
-            (fmt(_("Package error: '%1%' is not a directory")) %
-             getBinaryPackagesDir().string()).str());
+    for (const auto& elem : paths) {
+        if (not elem.is_directory()) {
+            vErr(this, _("Package error: '%s' is not a directory"),
+                 elem.string().c_str());
+            continue;
+        }
 
-    std::vector <std::string> result;
-    for (DirectoryIterator it(pkgs), end; it != end; ++it)
-        if (it->is_directory())
-            result.push_back(it->path().filename());
+        for (DirectoryIterator it(elem), end; it != end; ++it)
+            if (it->is_directory())
+                result.emplace_back(it->path());
+    }
 
     return result;
 }
-
+\
 Path Context::getLocalPackageFilename() const
 {
-    Path p(getBinaryPackagesDir());
+    Path p = getHomeDir();
     p /= "local.pkg";
 
     return p;
@@ -174,7 +184,7 @@ Path Context::getLocalPackageFilename() const
 
 Path Context::getRemotePackageFilename() const
 {
-    Path p(getBinaryPackagesDir());
+    Path p = getHomeDir();
     p /= "remote.pkg";
 
     return p;
@@ -201,13 +211,20 @@ Path Context::getTemplate(const std::string& name) const
 
 void Context::initVleHomeDirectory()
 {
-    Path pkgs = getBinaryPackagesDir();
+    Path homedir = getHomeDir();
+    homedir /= "pkgs-" VLE_ABI_VERSION;
 
-    if (not pkgs.exists())
-        if (not Path::create_directories(getBinaryPackagesDir()))
+    if (not homedir.is_directory()) {
+        if (homedir.is_file())
             throw FileError(
-                (fmt(_("Failed to build VLE_HOME directory (%1%)")) %
-                 pkgs.string()).str());
+                (fmt(_("VLE_HOME must be a directory (%1%)"))
+                 % homedir.string()).str());
+
+        if (not Path::create_directories(homedir))
+            throw FileError(
+                (fmt(_("Failed to build VLE_HOME directory (%1%)"))
+                 % homedir.string()).str());
+    }
 }
 
 void Context::readHomeDir()
@@ -227,22 +244,6 @@ void Context::readHomeDir()
     } else {
         m_pimpl->m_home.clear();
     }
-}
-
-void Context::fillBinaryPackagesList(std::vector<std::string>& pkglist) const
-{
-    std::string header = "Packages from: ";
-    header += getBinaryPackagesDir().string();
-    pkglist.clear();
-    pkglist.push_back(header);
-
-    std::vector<std::string> pkgs = getBinaryPackages();
-    std::sort(pkgs.begin(), pkgs.end());
-    auto itb = pkgs.cbegin(), ite = pkgs.cend();
-    for (; itb!=ite; itb++) {
-        pkglist.push_back(*itb);
-    }
-    return;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

@@ -119,14 +119,19 @@ BOOST_AUTO_TEST_CASE(show_package)
     pkg.install();
     pkg.wait(std::cerr, std::cerr);
 
+    std::cout << "getBinaryPackagesDir:\n";
+    {
+        auto paths = ctx->getBinaryPackagesDir();
+        for (std::size_t i = 0, e = paths.size(); i != e; ++i)
+            std::cout << i << ": " << paths[i].string() << '\n';
+    }
 
-    std::cout << "getBinaryPackagesDir: "
-              << ctx->getBinaryPackagesDir().string()
-              << "\ngetBinaryPackages   : ";
-
-    auto lst = ctx->getBinaryPackages();
-    for (const auto& elem : lst)
-        std::cout << elem << ' ';
+    std::cout << "getBinaryPackages:\n";
+    {
+        auto paths = ctx->getBinaryPackages();
+        for (std::size_t i = 0, e = paths.size(); i != e; ++i)
+            std::cout << i << ": " << paths[i].string() << '\n';
+    }
 
     BOOST_REQUIRE(ctx->getBinaryPackages().size() == 1);
     vle::utils::Path p = pkg.getExpDir(vle::utils::PKG_BINARY);

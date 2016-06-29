@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,10 +25,10 @@
  */
 
 #include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/Package.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/version.hpp>
 #include <unordered_map>
@@ -74,10 +74,9 @@ static std::string getLibraryName(const Path& file)
     return library;
 }
 
-class Module
+struct Module
 {
-public:
-    std::string mPath;
+    Path mPath;
     std::string mPackage;
     std::string mLibrary;
 
@@ -102,7 +101,7 @@ public:
      * @param library
      * @param type
      */
-    Module(std::string  path, std::string  package, std::string  library,
+    Module(Path path, std::string package, std::string library,
            ModuleType type)
         : mPath(std::move(path)), mPackage(std::move(package)),
           mLibrary(std::move(library)), mHandle(nullptr),
@@ -115,12 +114,6 @@ public:
      */
     ~Module() noexcept
     {
-        try {
-            //TraceModel(_("ModuleManager: unload %p:%s"),
-            //         mHandle, mPath.c_str());
-        } catch (...) {
-        }
-
         if (mHandle) {
 #ifdef _WIN32
             FreeLibrary(mHandle);
@@ -151,97 +144,30 @@ public:
         if (not mFunction) {
             switch (mType) {
             case MODULE_DYNAMICS:
-                if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
-                    if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
-                        if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
-                            throw utils::InternalError(
-                                (fmt(_("Module `%1%' is not a dynamic module"
-                                       " (symbol vle_make_new_dynamics,"
-                                       " vle_make_new_executive or"
-                                       " vle_make_new_dynamics_wrapper are not"
-                                       " found")) % mPath).str());
-
-                        } else {
-                            mType = MODULE_DYNAMICS_WRAPPER;
-                        }
-                    } else {
-                        mType = MODULE_DYNAMICS_EXECUTIVE;
-                    }
-                } else {
-                    mType = MODULE_DYNAMICS;
-                }
-                break;
             case MODULE_DYNAMICS_EXECUTIVE:
-                if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
-                    if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
-                        if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
-                            throw utils::InternalError(
-                                (fmt(_("Module `%1%' is not a dynamic module"
-                                       " (symbol vle_make_new_dynamics,"
-                                       " vle_make_new_executive or"
-                                       " vle_make_new_dynamics_wrapper are not"
-                                       " found")) % mPath).str());
-
-                        } else {
-                            mType = MODULE_DYNAMICS_WRAPPER;
-                        }
-                    } else {
-                        mType = MODULE_DYNAMICS;
-                    }
-                } else {
-                    mType = MODULE_DYNAMICS_EXECUTIVE;
-                }
-                break;
             case MODULE_DYNAMICS_WRAPPER:
-                if (not (mFunction = (getSymbol("vle_make_new_dynamics_wrapper")))) {
-                    if (not (mFunction = (getSymbol("vle_make_new_dynamics")))) {
-                        if (not (mFunction = (getSymbol("vle_make_new_executive")))) {
+                if (! (mFunction = (getSymbol("vle_make_new_dynamics"))))
+                    if (! (mFunction = (getSymbol("vle_make_new_executive"))))
+                        if (! (mFunction = (getSymbol("vle_make_new_dynamics_wrapper"))))
                             throw utils::InternalError(
                                 (fmt(_("Module `%1%' is not a dynamic module"
                                        " (symbol vle_make_new_dynamics,"
                                        " vle_make_new_executive or"
                                        " vle_make_new_dynamics_wrapper are not"
-                                       " found")) % mPath).str());
-                        } else {
-                            mType = MODULE_DYNAMICS_EXECUTIVE;
-                        }
-                    } else {
-                        mType = MODULE_DYNAMICS;
-                    }
-                } else {
-                    mType = MODULE_DYNAMICS_WRAPPER;
-                }
+                                       " found")) % mPath.string()).str());
+
+                        else
+                            mType = MODULE_DYNAMICS_WRAPPER;
+                    else
+                        mType = MODULE_DYNAMICS_EXECUTIVE;
+                else
+                    mType = MODULE_DYNAMICS;
                 break;
             case MODULE_OOV:
-                if (not (mFunction = (getSymbol("vle_make_new_oov")))) {
+                if (not (mFunction = (getSymbol("vle_make_new_oov"))))
                     throw utils::InternalError(
                         (fmt(_("Module `%1%' is not an oov module (symbol"
-                               " vle_make_new_oov not found)")) % mPath).str());
-                }
-                break;
-            case MODULE_GVLE_GLOBAL:
-                if (not (mFunction = (getSymbol("vle_make_new_gvle_global")))) {
-                    throw utils::InternalError(
-                        (fmt(_("Module: `%1%' is not a GVLE global module"
-                               " (symbol vle_make_new_gvle_global not found)"))
-                         % mPath).str());
-                }
-                break;
-            case MODULE_GVLE_MODELING:
-                if (not (mFunction = (getSymbol("vle_make_new_gvle_modeling")))) {
-                    throw utils::InternalError(
-                        (fmt(_("Module: `%1%' is not a GVLE modeling module"
-                               " (symbol vle_make_new_gvle_modeling not found)"))
-                         % mPath).str());
-                }
-                break;
-            case MODULE_GVLE_OUTPUT:
-                if (not (mFunction = (getSymbol("vle_make_new_gvle_output")))) {
-                    throw utils::InternalError(
-                        (fmt(_("Module: `%1%' is not a GVLE output module"
-                               " (symbol vle_make_new_gvle_output not found)"))
-                         % mPath).str());
-                }
+                               " vle_make_new_oov not found)")) % mPath.string()).str());
                 break;
             default:
                 throw utils::InternalError();
@@ -266,12 +192,12 @@ public:
         assert(not mHandle);
 
 #ifdef _WIN32
-        HMODULE handle = ::LoadLibrary(mPath.c_str());
+        HMODULE handle = ::LoadLibrary(mPath.string().c_str());
 #else
-        void *handle = ::dlopen(mPath.c_str(), RTLD_LAZY | RTLD_LOCAL);
+        void *handle = ::dlopen(mPath.string().c_str(),
+                                RTLD_LAZY | RTLD_LOCAL);
 #endif
 
-        //TraceModel(_("ModuleManager: load %p:%s"), handle, mPath.c_str());
         if (not handle) {
             std::string extra;
 #ifdef _WIN32
@@ -296,8 +222,8 @@ public:
             }
 #endif
             throw utils::InternalError(
-                (fmt(_("Module can not open shared library `%1%': %2%")) % mPath
-                 % extra).str());
+                (fmt(_("Module can not open shared library `%1%': %2%"))
+                 % mPath.string() % extra).str());
         } else {
             mHandle = handle;
         }
@@ -317,7 +243,8 @@ public:
         if (not symbol) {
             throw utils::InternalError(
                 (fmt(_("Module `%1%' does not have a vle_api_level symbol. "
-                      "This module seems to be too old.")) % mPath).str());
+                       "This module seems to be too old."))
+                 % mPath.string()).str());
         }
 
 #ifdef _WIN32
@@ -331,8 +258,9 @@ public:
             throw utils::InternalError(
                 (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
                        " not API/ABI compatible with the current VLE"
-                       " %5%.%6%.%7%")) % mPath % major % minor % patch %
-                 VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION).str());
+                       " %5%.%6%.%7%")) % mPath.string() % major % minor
+                 % patch % VLE_MAJOR_VERSION % VLE_MINOR_VERSION
+                 % VLE_PATCH_VERSION).str());
         } else if (patch != VLE_PATCH_VERSION) {
             // utils::Trace::send(
             //     (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
@@ -359,53 +287,52 @@ public:
     }
 };
 
-class SymbolTable
+struct SymbolTable
 {
 public:
-    typedef std::unordered_map < std::string, void* > Container;
-    typedef std::unordered_map < std::string, void* >::const_iterator const_iterator;
-    typedef std::unordered_map < std::string, void* >::iterator iterator;
-    typedef std::unordered_map < std::string, void* >::size_type size_type;
+    using container = std::unordered_map<std::string, void*>;
+    using const_iterator = container::const_iterator;
+    using iterator = container::iterator;
+    using size_type = container::size_type;
 
-    SymbolTable()
-    {
-    }
+    container mLst;
 
-    ~SymbolTable()
-    {
-    }
+    SymbolTable() = default;
+    ~SymbolTable() = default;
+
+    SymbolTable(const SymbolTable&) = delete;
+    SymbolTable& operator=(const SymbolTable&) = delete;
 
     void *get(const std::string& symbol)
     {
         const_iterator it = mLst.find(symbol);
 
-        if (it != mLst.end()) {
+        // Already in cache, returns the symbol.
+        if (it != mLst.end())
             return it->second;
-        } else {
-            void *result = nullptr;
+
+        // Otherwise, try to found symbol into the current process symbol
+        // table.
+
+        void *result = nullptr;
+
 #ifdef _WIN32
-            FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
-            result = (void*)ptr;
+        FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
+        result = (void*)ptr;
 #else
-            result = ::dlsym(nullptr, symbol.c_str());
+        result = ::dlsym(nullptr, symbol.c_str());
 #endif
 
-            if (result) {
-                mLst.insert(
-                    std::pair<std::string, void*>(symbol, result));
-                return result;
-            } else {
-                throw utils::InternalError(
-                    (fmt(_("Module: `%1%' not found in global space")) % symbol).str());
-            }
-        }
+        if (not result)
+            throw utils::InternalError(
+                (fmt(_("Module: `%1%' not found in global space")) % symbol).str());
+
+        auto ret = mLst.emplace(symbol, result);
+
+        assert(ret.second && "emplace failure but find returns true");
+
+        return result;
     }
-
-    Container mLst;
-
-private:
-    SymbolTable(const SymbolTable&);
-    SymbolTable& operator=(const SymbolTable&);
 };
 
 } // namespace pimpl
@@ -413,39 +340,27 @@ private:
 class ModuleManager::Pimpl
 {
 public:
-    typedef std::unordered_map < std::string, pimpl::Module* > ModuleTable;
-    typedef ModuleTable::value_type value_type;
-    typedef ModuleTable::const_iterator const_iterator;
-    typedef ModuleTable::iterator iterator;
-
-    typedef std::unordered_map < std::string, void* > MapSymbol;
-
-    struct ModuleDeleter
-    {
-        void operator()(value_type& x) const
-        {
-            delete x.second;
-            x.second = nullptr;
-        }
-    };
+    using ModuleTable = std::unordered_map<std::string,
+                                           std::unique_ptr<pimpl::Module>>;
+    using value_type = ModuleTable::value_type;
+    using const_iterator = ModuleTable::const_iterator;
+    using iterator = ModuleTable::iterator;
 
     /**
      * @brief An unary operator to convert pimpl::Module into Module.
      */
-    struct ModuleConvert
-    {
+    struct ModuleConvert {
         Module operator()(const ModuleTable::value_type& module) const
         {
-            return Module(module.second->mPackage, module.second->mLibrary,
-                          module.second->mPath, module.second->mType);
+            return { module.second->mPackage, module.second->mLibrary,
+                    module.second->mPath, module.second->mType };
         }
     };
 
     /**
      * @brief A predicate to check if a pimpl::Module is in specified package.
      */
-    struct ModuleIsInPackage
-    {
+    struct ModuleIsInPackage {
         const std::string& mPackage;
 
         ModuleIsInPackage(const std::string& package)
@@ -466,91 +381,56 @@ public:
 
     ~Pimpl()
     {
-        std::for_each(mTableSimulator.begin(),
-                      mTableSimulator.end(),
-                      ModuleDeleter());
-        std::for_each(mTableOov.begin(),
-                      mTableOov.end(),
-                      ModuleDeleter());
-        std::for_each(mTableGvleGlobal.begin(),
-                      mTableGvleGlobal.end(),
-                      ModuleDeleter());
-        std::for_each(mTableGvleModeling.begin(),
-                      mTableGvleModeling.end(),
-                      ModuleDeleter());
-        std::for_each(mTableGvleOutput.begin(),
-                      mTableGvleOutput.end(),
-                      ModuleDeleter());
     }
 
-    pimpl::Module *getModule(const std::string& package,
-                             const std::string& library,
-                             ModuleType type)
+    bool exists(const std::string& filepath) const
     {
-        std::string path = buildModuleFilename(package, library, type);
+        auto it = mTableSimulator.find(filepath);
+        if (it != mTableSimulator.cend())
+            return true;
+
+        return mTableOov.find(filepath) != mTableOov.cend();
+    }
+
+    const std::unique_ptr<pimpl::Module>&
+    getModule(const std::string& package,
+              const std::string& library,
+              ModuleType type)
+    {
+        Path path = buildModuleFilename(package, library, type);
+        std::string strpath = path.string();
+
         iterator it;
 
         switch (type) {
         case MODULE_DYNAMICS:
         case MODULE_DYNAMICS_WRAPPER:
         case MODULE_DYNAMICS_EXECUTIVE:
-            it = mTableSimulator.find(path);
-            if (it != mTableSimulator.end()) {
+            it = mTableSimulator.find(strpath);
+            if (it != mTableSimulator.end())
                 return it->second;
-            } else {
-                return mTableSimulator.insert(
-                    std::pair<std::string, pimpl::Module*>(
-                        path, new pimpl::Module(path, package, library,
-                                                type))).first->second;
-            }
+
+            return mTableSimulator.emplace(
+                strpath,
+                std::make_unique<pimpl::Module>(
+                    path, package, library,
+                    type)).first->second;
             break;
         case MODULE_OOV:
-            it = mTableOov.find(path);
-            if (it != mTableOov.end()) {
+            it = mTableOov.find(strpath);
+            if (it != mTableOov.end())
                 return it->second;
-            } else {
-                return mTableOov.insert(
-                    std::pair<std::string, pimpl::Module*>(
-                        path, new pimpl::Module(path, package, library,
-                                                type))).first->second;
-            }
-            break;
-        case MODULE_GVLE_GLOBAL:
-            it = mTableGvleGlobal.find(path);
-            if (it != mTableGvleGlobal.end()) {
-                return it->second;
-            } else {
-                return mTableGvleGlobal.insert(
-                    std::pair<std::string, pimpl::Module*>(
-                        path, new pimpl::Module(path, package, library,
-                                                type))).first->second;
-            }
-            break;
-        case MODULE_GVLE_MODELING:
-            it = mTableGvleModeling.find(path);
-            if (it != mTableGvleModeling.end()) {
-                return it->second;
-            } else {
-                return mTableGvleModeling.insert(
-                    std::pair<std::string, pimpl::Module*>(
-                        path, new pimpl::Module(path, package, library,
-                                                type))).first->second;
-            }
-            break;
-        case MODULE_GVLE_OUTPUT:
-            it = mTableGvleOutput.find(path);
-            if (it != mTableGvleOutput.end()) {
-                return it->second;
-            } else {
-                return mTableGvleOutput.insert(
-                    std::pair<std::string, pimpl::Module*>(
-                        path, new pimpl::Module(path, package, library,
-                                                type))).first->second;
-            }
+
+            return mTableOov.emplace(
+                strpath,
+                std::make_unique<pimpl::Module>(
+                    path, package, library,
+                    type)).first->second;
             break;
         default:
-            throw utils::InternalError();
+            break;
         }
+
         throw utils::InternalError();
     }
 
@@ -585,52 +465,62 @@ public:
         }
     }
 
-    std::string buildModuleFilename(const std::string& package,
-                                    const std::string& library,
-                                    ModuleType type)
+
+    Path buildModuleFilename(const std::string& package,
+                             const std::string& library,
+                             ModuleType type)
     {
-        Path current;
-        vle::utils::Package pkg(mContext, package);
+        const auto& paths = mContext->getBinaryPackagesDir();
+        for (const auto& elem : paths) {
+            Path current = elem / package;
 
-        switch (type) {
-        case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_EXECUTIVE:
-        case MODULE_DYNAMICS_WRAPPER:
-            current = pkg.getPluginSimulatorDir(PKG_BINARY);
-            break;
-        case MODULE_OOV:
-            current = pkg.getPluginOutputDir(PKG_BINARY);
-            break;
-        case MODULE_GVLE_GLOBAL:
-            current = pkg.getPluginGvleGlobalDir(PKG_BINARY);
-            break;
-        case MODULE_GVLE_MODELING:
-            current = pkg.getPluginGvleModelingDir(PKG_BINARY);
-            break;
-        case MODULE_GVLE_OUTPUT:
-            current = pkg.getPluginGvleOutputDir(PKG_BINARY);
-            break;
-        default:
-            throw utils::InternalError();
-        }
+            if (not current.is_directory()) // if package does not exists
+                continue;                   // in repository test the next.
 
-#ifdef _WIN32
-        std::string filename = "lib" + library + ".dll";
+            switch (type) {
+            case MODULE_DYNAMICS:
+            case MODULE_DYNAMICS_EXECUTIVE:
+            case MODULE_DYNAMICS_WRAPPER:
+                current /= "plugins";
+                current /= "simulator";
+                break;
+            case MODULE_OOV:
+                current /= "plugins";
+                current /= "output";
+                break;
+            default:
+                throw utils::InternalError();
+            }
+
+#if defined(_WIN32)
+            std::string filename = "lib" + library + ".dll";
+#elif defined(__APPLE__)
+            std::string filename = "lib" + library + ".dylib";
 #else
-        std::string filename = "lib" + library + ".so";
+            std::string filename = "lib" + library + ".so";
 #endif
 
-        current /= filename;
+            current /= filename;
 
-        return current.string();
+            if (not current.is_file()) {
+                vDbg(mContext, _("ModuleManager: library %s is missing"
+                                 " in binary package %s in %s\n"),
+                     library.c_str(), package.c_str(),
+                     current.string().c_str());
+                continue;
+            }
+
+            return current;
+        }
+
+        throw utils::FileError(
+            (fmt(_("ModuleManager: library %1% package %2% not found"
+                   "in binary repositories")) % library % package).str());
     }
 
     ContextPtr mContext;
     ModuleTable mTableSimulator;
     ModuleTable mTableOov;
-    ModuleTable mTableGvleGlobal;
-    ModuleTable mTableGvleModeling;
-    ModuleTable mTableGvleOutput;
     pimpl::SymbolTable mTableSymbols;
 };
 
@@ -646,15 +536,14 @@ void *ModuleManager::get(const std::string& package,
                          ModuleType type,
                          ModuleType *newtype) const
 {
-    if (not newtype) {
+    if (not newtype)
         return mPimpl->getModule(package, library, type)->get();
-    } else {
-        pimpl::Module *module = mPimpl->getModule(package, library, type);
-        void *result = module->get();
-        *newtype = module->mType;
 
-        return result;
-    }
+    const auto& module = mPimpl->getModule(package, library, type);
+    void *result = module->get();
+    *newtype = module->mType;
+
+    return result;
 }
 
 void *ModuleManager::get(const std::string& symbol) const
@@ -664,155 +553,43 @@ void *ModuleManager::get(const std::string& symbol) const
 
 void ModuleManager::browse()
 {
-    Path packages = mPimpl->mContext->getBinaryPackagesDir();
+    const auto& paths = mPimpl->mContext->getBinaryPackagesDir();
 
-    Path pathsim = "plugins/simulator";
-    Path pathoov = "plugins/output";
-    Path pathgvleg = "plugins/gvle/global";
-    Path pathgvlem = "plugins/gvle/modeling";
-    Path pathgvleo = "plugins/gvle/output";
+    for (const auto& elem : paths) {
+        Path packages = elem;
+        Path pathsim = "plugins/simulator";
+        Path pathoov = "plugins/output";
 
-    if (packages.is_directory()) {
-        DirectoryIterator it(packages), end;
+        if (not packages.is_directory()) {
+            vErr(mPimpl->mContext, _("ModuleManager: %s is not a packages "
+                                     "directory\n"), elem.string().c_str());
+            continue;
+        }
 
-        for (; it != end; ++it) { /* for each package */
-            if (it->is_directory()) {
-                std::string package = it->path().filename();
+        DirectoryIterator it(elem), end;
+        for (; it != end; ++it) {
+            if (not it->is_directory())
+                continue;
 
-                {
-                    Path tmp = (*it) / pathsim;
-                    mPimpl->browse(tmp, package, MODULE_DYNAMICS);
-                }
+            std::string package = it->path().filename();
+            if (mPimpl->exists(it->path().string())) {
+                vInfo(mPimpl->mContext, _("ModuleManager: package `%s' already"
+                                          " exists. Forget this path: `%s'\n"),
+                      package.c_str(), it->path().string().c_str());
+                continue;
+            }
 
-                {
-                    Path tmp = (*it) / pathoov;
-                    mPimpl->browse(tmp, package, MODULE_OOV);
-                }
+            {
+                Path tmp = (*it) / "plugins" / "simulator";
+                mPimpl->browse(tmp, package, MODULE_DYNAMICS);
+            }
 
-                {
-                    Path tmp = (*it) / pathgvleg;
-                    mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
-                }
-
-                {
-                    Path tmp = (*it) / pathgvlem;
-                    mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
-                }
-
-                {
-                    Path tmp = (*it) / pathgvleo;
-                    mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
-                }
+            {
+                Path tmp = (*it) / "plugins" / "output";
+                mPimpl->browse(tmp, package, MODULE_OOV);
             }
         }
     }
-}
-
-void ModuleManager::browse(ModuleType type)
-{
-    Path packages = mPimpl->mContext->getBinaryPackagesDir();
-
-    Path pathtype;
-
-    switch (type) {
-    case MODULE_DYNAMICS:
-    case MODULE_DYNAMICS_EXECUTIVE:
-    case MODULE_DYNAMICS_WRAPPER:
-        pathtype = "plugins/simulator";
-        break;
-    case MODULE_OOV:
-        pathtype = "plugins/output";
-        break;
-    case MODULE_GVLE_GLOBAL:
-        pathtype = "plugins/gvle/global";
-        break;
-    case MODULE_GVLE_MODELING:
-        pathtype = "plugins/gvle/modeling";
-        break;
-    case MODULE_GVLE_OUTPUT:
-        pathtype = "plugins/gvle/output";
-        break;
-    }
-
-    if (packages.is_directory()) {
-        DirectoryIterator it(packages), end;
-
-        for (; it != end; ++it) { /* for each package */
-            if (it->is_directory()) {
-                Path pkg = (*it);
-                pkg /= pathtype;
-
-                mPimpl->browse(pkg, it->path().filename(), type);
-            }
-        }
-    }
-}
-
-void ModuleManager::browse(const std::string& package)
-{
-    Path pkg = mPimpl->mContext->getBinaryPackagesDir();
-    pkg /= package;
-    pkg /= "plugins";
-
-    {
-        Path tmp = pkg;
-        tmp /= "simulator";
-        mPimpl->browse(tmp, package, MODULE_DYNAMICS);
-    }
-
-    {
-        Path tmp = pkg;
-        tmp /= "output";
-        mPimpl->browse(tmp, package, MODULE_OOV);
-    }
-
-    {
-        Path tmp = pkg;
-        tmp /= "gvle/global";
-        mPimpl->browse(tmp, package, MODULE_GVLE_GLOBAL);
-    }
-
-    {
-        Path tmp = pkg;
-        tmp /= "gvle/modeling";
-        mPimpl->browse(tmp, package, MODULE_GVLE_MODELING);
-    }
-
-    {
-        Path tmp = pkg;
-        tmp /= "gvle/output";
-        mPimpl->browse(tmp, package, MODULE_GVLE_OUTPUT);
-    }
-
-}
-
-void ModuleManager::browse(const std::string& package, ModuleType type)
-{
-    Path pkg = mPimpl->mContext->getBinaryPackagesDir();
-    pkg /= package;
-    pkg /= "plugins";
-
-    switch (type) {
-    case MODULE_DYNAMICS:
-    case MODULE_DYNAMICS_EXECUTIVE:
-    case MODULE_DYNAMICS_WRAPPER:
-        pkg /= "simulator";
-        break;
-    case MODULE_OOV:
-        pkg /= "output";
-        break;
-    case MODULE_GVLE_GLOBAL:
-        pkg /= "gvle/global";
-        break;
-    case MODULE_GVLE_MODELING:
-        pkg /= "gvle/modeling";
-        break;
-    case MODULE_GVLE_OUTPUT:
-        pkg /= "gvle/output";
-        break;
-    }
-
-    mPimpl->browse(pkg, package, type);
 }
 
 void ModuleManager::fill(ModuleList *lst) const
@@ -824,21 +601,6 @@ void ModuleManager::fill(ModuleList *lst) const
 
     std::transform(mPimpl->mTableOov.begin(),
                    mPimpl->mTableOov.end(),
-                   std::back_inserter(*lst),
-                   ModuleManager::Pimpl::ModuleConvert());
-
-    std::transform(mPimpl->mTableGvleGlobal.begin(),
-                   mPimpl->mTableGvleGlobal.end(),
-                   std::back_inserter(*lst),
-                   ModuleManager::Pimpl::ModuleConvert());
-
-    std::transform(mPimpl->mTableGvleModeling.begin(),
-                   mPimpl->mTableGvleModeling.end(),
-                   std::back_inserter(*lst),
-                   ModuleManager::Pimpl::ModuleConvert());
-
-    std::transform(mPimpl->mTableGvleOutput.begin(),
-                   mPimpl->mTableGvleOutput.end(),
                    std::back_inserter(*lst),
                    ModuleManager::Pimpl::ModuleConvert());
 }
@@ -860,25 +622,9 @@ void ModuleManager::fill(ModuleType type, ModuleList *lst) const
                        std::back_inserter(*lst),
                        ModuleManager::Pimpl::ModuleConvert());
         break;
-    case MODULE_GVLE_GLOBAL:
-        std::transform(mPimpl->mTableGvleGlobal.begin(),
-                       mPimpl->mTableGvleGlobal.end(),
-                       std::back_inserter(*lst),
-                       ModuleManager::Pimpl::ModuleConvert());
+    default:
         break;
-    case MODULE_GVLE_MODELING:
-        std::transform(mPimpl->mTableGvleModeling.begin(),
-                       mPimpl->mTableGvleModeling.end(),
-                       std::back_inserter(*lst),
-                       ModuleManager::Pimpl::ModuleConvert());
-        break;
-    case MODULE_GVLE_OUTPUT:
-        std::transform(mPimpl->mTableGvleOutput.begin(),
-                       mPimpl->mTableGvleOutput.end(),
-                       std::back_inserter(*lst),
-                       ModuleManager::Pimpl::ModuleConvert());
-        break;
-    }
+    };
 }
 
 void ModuleManager::fill(const std::string& package, ModuleList *lst) const
@@ -891,24 +637,6 @@ void ModuleManager::fill(const std::string& package, ModuleList *lst) const
 
     transformIf(mPimpl->mTableOov.begin(),
                 mPimpl->mTableOov.end(),
-                std::back_inserter(*lst),
-                ModuleManager::Pimpl::ModuleIsInPackage(package),
-                ModuleManager::Pimpl::ModuleConvert());
-
-    transformIf(mPimpl->mTableGvleGlobal.begin(),
-                mPimpl->mTableGvleGlobal.end(),
-                std::back_inserter(*lst),
-                ModuleManager::Pimpl::ModuleIsInPackage(package),
-                ModuleManager::Pimpl::ModuleConvert());
-
-    transformIf(mPimpl->mTableGvleModeling.begin(),
-                mPimpl->mTableGvleModeling.end(),
-                std::back_inserter(*lst),
-                ModuleManager::Pimpl::ModuleIsInPackage(package),
-                ModuleManager::Pimpl::ModuleConvert());
-
-    transformIf(mPimpl->mTableGvleOutput.begin(),
-                mPimpl->mTableGvleOutput.end(),
                 std::back_inserter(*lst),
                 ModuleManager::Pimpl::ModuleIsInPackage(package),
                 ModuleManager::Pimpl::ModuleConvert());
@@ -934,26 +662,7 @@ void ModuleManager::fill(const std::string& package, ModuleType type,
                     ModuleManager::Pimpl::ModuleIsInPackage(package),
                     ModuleManager::Pimpl::ModuleConvert());
         break;
-    case MODULE_GVLE_GLOBAL:
-        transformIf(mPimpl->mTableGvleGlobal.begin(),
-                    mPimpl->mTableGvleGlobal.end(),
-                    std::back_inserter(*lst),
-                    ModuleManager::Pimpl::ModuleIsInPackage(package),
-                    ModuleManager::Pimpl::ModuleConvert());
-        break;
-    case MODULE_GVLE_MODELING:
-        transformIf(mPimpl->mTableGvleModeling.begin(),
-                    mPimpl->mTableGvleModeling.end(),
-                    std::back_inserter(*lst),
-                    ModuleManager::Pimpl::ModuleIsInPackage(package),
-                    ModuleManager::Pimpl::ModuleConvert());
-        break;
-    case MODULE_GVLE_OUTPUT:
-        transformIf(mPimpl->mTableGvleOutput.begin(),
-                    mPimpl->mTableGvleOutput.end(),
-                    std::back_inserter(*lst),
-                    ModuleManager::Pimpl::ModuleIsInPackage(package),
-                    ModuleManager::Pimpl::ModuleConvert());
+    default:
         break;
     }
 }

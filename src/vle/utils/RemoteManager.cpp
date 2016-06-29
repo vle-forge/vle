@@ -563,7 +563,6 @@ public:
      */
     void actionShow() throw()
     {
-
         mHasError = false;
 
         PackageId pkgid;

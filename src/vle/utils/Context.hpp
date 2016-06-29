@@ -337,15 +337,20 @@ public:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * Return the $VLE_HOME/packages dirname.
-     * @return A string.
+     * Default returns the $HOMEVLE/.vle/pkgs $prefix/usr/lib/vle-x.y/pkgs
+     * dirnames.
+     *
+     * @return A list of path.
      */
+    std::vector<Path> getBinaryPackagesDir() const;
 
-    Path getBinaryPackagesDir() const;
-
-    /** Returns the list of dirname available in the binary package directory.
+    /**
+     * Returns the list of \e Path available into all \e
+     * getBinaryPackagesDir() paths..
+     *
+     * @return A lisf of path.
      */
-    std::vector<std::string> getBinaryPackages() const;
+    std::vector<Path> getBinaryPackages() const;
 
     /**
      * Return the path @e "$VLE_HOME/local.pkg".
@@ -405,12 +410,6 @@ public:
      * @param the absolute path to a program
      */
     Path findProgram(const std::string& exe);
-
-    /**
-     * @brief fill a vector of string with the list of binary packages
-     * @param pkglist, the vector to fill
-     */
-    void fillBinaryPackagesList(std::vector<std::string>& pkglist) const;
 
 private:
     std::unique_ptr<PrivateContextIimpl> m_pimpl;

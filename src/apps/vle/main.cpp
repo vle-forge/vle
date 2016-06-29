@@ -141,16 +141,19 @@ static void show_infos() noexcept
     try {
         auto ctx = vle::utils::make_context();
 
-        std::vector<std::string> pkglist;
-        ctx->fillBinaryPackagesList(pkglist);
+        {
+            auto paths = ctx->getBinaryPackagesDir();
+            printf(_("Binary package repositories: %zu\n"), paths.size());
+            for (std::size_t i = 0, e = paths.size(); i != e; ++i)
+                printf(_("* %zu: %s\n"), i, paths[i].string().c_str());
+        }
 
-        puts(VLE_NAME_COMPLETE);
-        printf(_("%zu package(s) available %s:\n"),
-               pkglist.size() - 1, pkglist[0].c_str());
-
-        for (auto i = decltype(pkglist.size()) {1}, e = pkglist.size();
-             i != e; ++i)
-            printf("%zu. %s\n", i - 1, pkglist[i].c_str());
+        {
+            auto paths = ctx->getBinaryPackages();
+            printf(_("Binary package: %zu\n"), paths.size());
+            for (std::size_t i = 0, e = paths.size(); i != e; ++i)
+                printf(_("* %zu: %s\n"), i, paths[i].string().c_str());
+        }
     } catch(const std::exception& e) {
         fprintf(stderr, "show_information failure: %s\n", e.what());
     }

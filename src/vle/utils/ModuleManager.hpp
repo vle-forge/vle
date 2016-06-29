@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2014, 2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
  * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2014 INRA http://www.inra.fr
  *
@@ -52,15 +52,6 @@ enum ModuleType
                                  vle_make_new_executive. */
     MODULE_OOV, /**< The @e Module is an output (from oov library) and it needs
                   to have the following symbol: @c vle_make_new_oov. */
-    MODULE_GVLE_GLOBAL, /**< The @e Module is a global module (from the vle
-                            library) and it needs to have the following symbol:
-                            @c vle_make_new_gvle_global. */
-    MODULE_GVLE_MODELING, /**< The @e Module is a modeling module (from the vle
-                            library) and it needs to have the following symbol:
-                            @c vle_make_new_gvle_modeling. */
-    MODULE_GVLE_OUTPUT /**< The @e Module is a modeling output module (from the
-                         gvle library) and it needs to have the following
-                         symbol: @c vle_make_new_gvle_output. */
 };
 
 /**
@@ -72,33 +63,24 @@ enum ModuleType
  */
 struct VLE_API Module
 {
-    Module(const std::string& package,
-           const std::string& library,
-           const std::string& path,
-           ModuleType type)
-        : package(package), library(library), path(path), type(type)
-    {
-    }
-
-    Module() = default;
-
     std::string package;
     std::string library;
-    std::string path;
+    Path path;
     ModuleType type;
 };
 
 /**
  * @brief A @e ModuleList stored list of @e Module in public API.
  */
-typedef std::vector < Module > ModuleList;
+using ModuleList = std::vector<Module> ;
 
 /**
- * @brief ModuleManager permit to store a list of shared libraries or modules.
+ * @brief ModuleManager permit to store a list of shared libraries or
+ * modules.
  *
- * ModuleManager stores shared libraries of VLE (simulators, output, gvle's
- * output and gvle's modeling modules). For each module, an handle is stored,
- * a pointer to the associated function, a type and a version.
+ * ModuleManager stores shared libraries of VLE (simulators and
+ * output). For each module, an handle is stored, a pointer to the
+ * associated function, a type and a version.
  *
  * ModuleManager checks the symbols:
  * - "vle_api_level": A function which returns three @c uint32_t. This
@@ -106,11 +88,7 @@ typedef std::vector < Module > ModuleList;
  * - "vle_make_new_dynamics" (MODULE_DYNAMICS).
  * - "vle_make_new_dynamics_wrapper" (MODULE_DYNAMICS).
  * - "vle_make_new_executive" (MODULE_DYNAMICS).
- * - "vle_make_new_oov" (MODULE_OOV).
- * - "vle_make_new_gvle_global" (MODULE_GVLE_GLOBAL).
- * - "vle_make_new_gvle_modeling" (MODULE_GVLE_MODELING).
- * - "vle_make_new_gvle_output" (MODULE_GVLE_OUTPUT).
- *
+ * - "vle_make_new_oov" (MODULE_OOV). *
  * @code
  * vle::utils::ModuleManager mng;
  * void* mng.get("foo", "sim", vle::utils::MODULE_DYNAMICS);
@@ -165,7 +143,11 @@ public:
      * assert(type == MODULE_OOV);
      * @endcode
      *
-     * @param package
+     * @param package The name of the package. If several packages with
+     * the same name appear in paths provided by \c
+     * Context::getBinaryPackagesDir() then the first found is returned
+     * (priority to the begin).
+     *
      * @param library
      * @param type
      * @param[out] newtype If @e newtype is null, newtype will not be affected.
@@ -184,7 +166,7 @@ public:
      *
      * Try to get a symbol from the executable if it was never loaded. This
      * function allows to build executable where we can store simulators,
-     * oov's modules, gvle's modules for instance in unit test.
+     * oov's modules for instance in unit test.
      *
      * @code
      * // try to get the symbol:
@@ -208,12 +190,6 @@ public:
      */
 
     void browse();
-
-    void browse(ModuleType type);
-
-    void browse(const std::string& package);
-
-    void browse(const std::string& package, ModuleType type);
 
     /*
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

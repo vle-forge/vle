@@ -56,35 +56,34 @@ bool extract(vle::utils::ContextPtr ctx,
 bool rebuild(vle::utils::ContextPtr ctx,
              vle::utils::Packages *out) noexcept
 {
-    vle::utils::Path pkgsdir(ctx->getBinaryPackagesDir());
+    // We only use the user's binary package repository.
+    auto pkgsdir = ctx->getBinaryPackagesDir()[0];
     vle::utils::PackageParser parser;
 
-    if (pkgsdir.is_directory()) {
-        for (vle::utils::DirectoryIterator it(pkgsdir), end; it != end; ++it) {
-            if (it->is_directory()) {
-                vle::utils::Path descfile = *it;
-                descfile /= "Description.txt";
-
-                if (descfile.is_file()) {
-                    parser.extract(descfile.string(), std::string());
-                } else {
-                    vErr(ctx, _("Remote: failed to open Description "
-                                "from `%s'"), descfile.string().c_str());
-                }
-            }
-        }
-
-        out->reserve(parser.size());
-        out->insert(out->rbegin().base(), parser.begin(),
-                    parser.end());
-
-        return true;
+    if (not pkgsdir.is_directory()) {
+        vErr(ctx, _("Remote: failed to open directory `%s'"),
+             pkgsdir.string().c_str());
+        return false;
     }
 
-    vErr(ctx, _("Remote: failed to open directory `%s'"),
-         pkgsdir.string().c_str());
+    for (vle::utils::DirectoryIterator it(pkgsdir), end; it != end; ++it) {
+        if (it->is_directory()) {
+            vle::utils::Path descfile = *it;
+            descfile /= "Description.txt";
 
-    return false;
+            if (descfile.is_file()) {
+                parser.extract(descfile.string(), std::string());
+            } else {
+                vErr(ctx, _("Remote: failed to open Description "
+                            "from `%s'"), descfile.string().c_str());
+            }
+        }
+    }
+
+    out->reserve(parser.size());
+    out->insert(out->rbegin().base(), parser.begin(), parser.end());
+
+    return true;
 }
 
 } // anonymous namespace
