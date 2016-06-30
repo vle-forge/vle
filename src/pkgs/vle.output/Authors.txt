@@ -1,0 +1,70 @@
+			      VLE development team
+			      ====================
+
+
+Copyright
+=========
+
+- Gauthier Quesnel
+  - Copyright © 2003-2007
+  - quesnel@users.sourceforge.net
+
+- ULCO
+  - Copyright © 2003-2011
+  - Université du Littoral Côte d'Opale
+  - http://www.univ-littoral.fr
+
+- INRA
+  - Copyright © 2007-2011
+  - French National Institute for Agricultural Research
+  - Institut National de la Recherche Agronomique
+  - http://www.inra.fr
+
+
+
+Authors
+=======
+
+Integrator / Release manager
+----------------------------
+
+- Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+
+Main programmer and founder
+---------------------------
+
+- Gauthier Quesnel <quesnel@users.sourceforge.net>
+- Eric Ramat <eramat@users.sourceforge.net>
+
+
+Contributors
+------------
+
+- Mahuna Akplogan <makploga@users.sourceforge.net>
+- Guillaume Ansel <anselg@users.sourceforge.net>
+- Jennifer Baudet <jennifer.baudet@toulouse.inra.fr>
+- Bruno Bonté <bruno.bonte@cirad.fr>
+- Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+- Rémy Desrivières <remy.desrivieres@gmail.com>
+- Raphael Duboz <duboz@users.sourceforge.net>
+- David Duvivier <duvivier@lil.univ-littoral.fr>
+- Cyril Marcq <cmarcq@users.sourceforge.net>
+- Tatiana Pruvost <tatiana.pruvost@gmail.com>
+- Guillaume Radenne <guillaume.radenne@gmail.com>
+- Daniel Salomé <dansal62@users.sourceforge.net>
+- Jérome Thiard <jerome.thiard@toulouse.inra.fr>
+- Ronan Trépos <rtrepos@toulouse.inra.fr>
+- Gaëtan Vergeot <gaetan.vergeot@toulouse.inra.fr>
+
+
+
+Retired Contributors
+--------------------
+
+- Aurélien Ansel <camumus@gmail.com>
+- Philippe Blangi <blangi@users.sourceforge.net>
+- Aurélie Blot <ablot@users.sourceforge.net>
+- Romain Hennuyer <romain.hennuyer@gmail.com>
+- David Versmisse <versmisse@users.sourceforge.net>
+- Geoffroy Weisenhorn <geoffroy.weisenhorn@gmail.com>

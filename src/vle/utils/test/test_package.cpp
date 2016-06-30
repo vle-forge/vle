@@ -133,7 +133,9 @@ BOOST_AUTO_TEST_CASE(show_package)
             std::cout << i << ": " << paths[i].string() << '\n';
     }
 
-    BOOST_REQUIRE(ctx->getBinaryPackages().size() == 1);
+    // 2 binary packages: the show_package build previously and the
+    // vle.output package provided with VLE.
+    BOOST_REQUIRE(ctx->getBinaryPackages().size() == 2);
     vle::utils::Path p = pkg.getExpDir(vle::utils::PKG_BINARY);
 
     std::cout << "\ngetExpDir           : " << p.string()
@@ -257,6 +259,10 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
         rmt.start(utils::REMOTE_MANAGER_LOCAL_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
+
+        for (const auto& elem : results)
+            std::cout << elem;
+
         BOOST_REQUIRE_EQUAL(results.empty(), false);
         BOOST_REQUIRE_EQUAL(results.size(), 2u);
     }

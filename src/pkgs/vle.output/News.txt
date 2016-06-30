@@ -1,0 +1,7 @@
+Changes from previous versions of vle.extension.difference-equation
+===================================================================
+
+Initial version 0.1.0
+---------------------
+
+- initial packaging.
