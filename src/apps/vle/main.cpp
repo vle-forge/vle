@@ -61,13 +61,15 @@
 #  define N_(x) x
 #endif
 
-struct vle_log_stdout : vle::utils::Context::LogFunctor
+struct vle_log_standard : vle::utils::Context::LogFunctor
 {
+    FILE *stream;
     bool color;
 
-    vle_log_stdout()
+    vle_log_standard(FILE *f)
 #if defined(__unix__)
-        : color(isatty(STDOUT_FILENO) == 1)
+        : stream(f)
+        , color(isatty(fileno(f)) == 1)
 #endif
     {
     }
@@ -82,20 +84,20 @@ struct vle_log_stdout : vle::utils::Context::LogFunctor
 
         if (color) {
             if (priority == 7)
-                printf("\e[90m[dbg] %s:%d %s: \e[39m", file, line, fn);
+                fprintf(stream, "\e[90m[dbg] %s:%d %s: \e[39m", file, line, fn);
             else if (priority == 6)
-                printf("%s: \e[39m", fn);
+                fprintf(stream, "%s: \e[39m", fn);
             else
-                printf("\e[91m[Error]\e[31m %s:\e[39m ", fn);
-            vprintf(format, args);
+                fprintf(stream, "\e[91m[Error]\e[31m %s:\e[39m ", fn);
+            vfprintf(stream, format, args);
         } else {
             if (priority == 7)
-                printf("[dbg] %s:%d %s: ", file, line, fn);
+                fprintf(stream, "[dbg] %s:%d %s: ", file, line, fn);
             else if (priority == 6)
-                printf("%s: ", fn);
+                fprintf(stream, "%s: ", fn);
             else
-                printf("[Error] %s: ", fn);
-            vprintf(format, args);
+                fprintf(stream, "[Error] %s: ", fn);
+            vfprintf(stream, format, args);
         }
     }
 };
@@ -770,8 +772,10 @@ int main(int argc, char **argv)
         std::min(verbose_level, 7);
 
     if (log_stdout == 0)
-        ctx->set_log_function(std::make_unique<vle_log_stdout>());
-    else if (log_stdout != 1)
+        ctx->set_log_function(std::make_unique<vle_log_standard>(stdout));
+    else if (log_stdout == 1)
+        ctx->set_log_function(std::make_unique<vle_log_standard>(stderr));
+    else
         ctx->set_log_function(std::make_unique<vle_log_file>());
 
     CmdArgs commands(argv + ::optind, argv + argc);
