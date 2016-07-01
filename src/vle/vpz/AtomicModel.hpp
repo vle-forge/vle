@@ -240,8 +240,6 @@ namespace vle { namespace vpz {
         }
         
     private:
-        //AtomicModel() {}
-
         std::vector < std::string > m_conditions;
         std::string m_dynamics;
         std::string m_observables;

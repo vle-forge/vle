@@ -32,18 +32,21 @@
 namespace vle { namespace vpz {
 
 AtomicModel::AtomicModel(const std::string& name,
-                                   CoupledModel* parent) :
-    BaseModel(name, parent)
+                         CoupledModel* parent)
+    : BaseModel(name, parent)
+    , m_debug(false)
 {
 }
 
 AtomicModel::AtomicModel(const std::string& name,
-                                   CoupledModel* parent,
-                                   const std::string& condition,
-                                   const std::string& dynamic,
-                                   const std::string& observable) :
-    BaseModel(name, parent),
-    m_dynamics(dynamic), m_observables(observable)
+                         CoupledModel* parent,
+                         const std::string& condition,
+                         const std::string& dynamic,
+                         const std::string& observable)
+    : BaseModel(name, parent)
+    , m_dynamics(dynamic)
+    , m_observables(observable)
+    , m_debug(false)
 {
     std::string conditionList(condition);
     boost::trim(conditionList);
@@ -57,8 +60,11 @@ AtomicModel::AtomicModel(const std::string& name,
     }
 }
 
-AtomicModel::AtomicModel(const AtomicModel& mdl) :
-    BaseModel(mdl), m_dynamics(mdl.dynamics()), m_observables(mdl.observables())
+AtomicModel::AtomicModel(const AtomicModel& mdl)
+    : BaseModel(mdl)
+    , m_dynamics(mdl.dynamics())
+    , m_observables(mdl.observables())
+    , m_debug(mdl.m_debug)
 {
     m_conditions = mdl.m_conditions;
 }
