@@ -280,21 +280,24 @@ public:
     /**
      * @brief A @e Module must have a type which determine the symbol to load.
      */
-    enum class ModuleType {
-        MODULE_DYNAMICS, /**< The @e Module is a simulator and it needs to
-                            have the following symbol: @c
-                            vle_make_new_dynamics. */
-            MODULE_DYNAMICS_WRAPPER, /**< The @e Module is a simulator and it
-                                        needs to have the following symbols:
-                                        @c vle_make_new_dynamics_wrapper. */
-            MODULE_DYNAMICS_EXECUTIVE, /**< The @e Module is a simulator and
-                                          it needs to have the following
-                                          symbols: @c
-                                          vle_make_new_executive. */
-            MODULE_OOV, /**< The @e Module is an output (from oov library) and
-                           it needs to have the following symbol: @c
-                           vle_make_new_oov. */
-            };
+    enum class ModuleType
+    {
+        MODULE_DYNAMICS, /*|< The @e Module is a simulator and it needs to
+                          * have the following symbol: @c
+                          * vle_make_new_dynamics. */
+
+        MODULE_DYNAMICS_WRAPPER, /*!< The @e Module is a simulator and it
+                                   needs to have the following symbols: @c
+                                   vle_make_new_dynamics_wrapper. */
+
+        MODULE_DYNAMICS_EXECUTIVE, /*!< The @e Module is a simulator and
+                                    it needs to have the following
+                                    symbols: @c vle_make_new_executive. */
+
+        MODULE_OOV, /*|< The @e Module is an output (from oov library) and
+                      it needs to have the following symbol: @c
+                      vle_make_new_oov. */
+    };
 
     /**
      * @brief A @e Module describes a dynamic loaded shared library.
@@ -392,6 +395,23 @@ public:
      * shared libraries.
      */
     void unload_dynamic_libraries() noexcept;
+
+    /**
+     * \brief Retrieves the list of dynamic libraries of the specified
+     * package and type (simulator, output).
+     *
+     * \note If the same package is available in multiple binary package
+     * repositories, the \c std::vector is filled with the first package
+     * found according to the \c getBinaryPackagesDir priority.
+     *
+     * \param package The name of the package to by retrieve.
+     * \param type The type of module to by retrieve.
+     *
+     * \return All modules availables.
+     */
+    std::vector<Module>
+        get_dynamic_libraries(const std::string& package,
+                              ModuleType type) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *

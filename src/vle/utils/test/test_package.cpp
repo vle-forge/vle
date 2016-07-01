@@ -146,6 +146,13 @@ BOOST_AUTO_TEST_CASE(show_package)
         std::cout << elem.string() << ' ';
 
     BOOST_REQUIRE(vpz.size() == 1);
+
+
+    auto modules = ctx->get_dynamic_libraries(
+        "show_package",
+        vle::utils::Context::ModuleType::MODULE_DYNAMICS);
+
+    BOOST_REQUIRE(modules.size() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)

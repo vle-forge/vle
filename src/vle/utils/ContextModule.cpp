@@ -329,7 +329,8 @@ public:
 
         auto ret = mLst.emplace(symbol, result);
 
-        assert(ret.second && "emplace failure but find returns true");
+        if (not ret.second)
+            assert("emplace failure but find returns true");
 
         return result;
     }
@@ -368,7 +369,7 @@ struct ModuleManager
                  elem.second->mPackage.c_str(),
                  elem.second->mLibrary.c_str());
     }
-    
+
     /**
      * @brief An unary operator to convert pimpl::Module into Module.
      */
@@ -716,6 +717,57 @@ void* Context::get_symbol(const std::string& pluginname)
 void Context::unload_dynamic_libraries() noexcept
 {
     m_pimpl.reset(nullptr);
+}
+
+std::vector<Context::Module>
+Context::get_dynamic_libraries(const std::string& package,
+                               ModuleType type) const
+{
+    std::vector<Context::Module> ret;
+    const auto& paths = getBinaryPackagesDir();
+    for (auto elem : paths) {
+        if (not elem.is_directory())
+            continue;
+
+        elem /= package;
+        if (not elem.is_directory())
+            continue;
+
+        if (type == ModuleType::MODULE_DYNAMICS or
+            type == ModuleType::MODULE_DYNAMICS_WRAPPER or
+            type == ModuleType::MODULE_DYNAMICS_EXECUTIVE) {
+            Path modules = elem;
+            modules /= "plugins";
+            modules /= "simulator";
+
+            for (DirectoryIterator it(modules), end; it != end; ++it) {
+                if (not it->is_file())
+                    continue;
+
+                ret.push_back({package, getLibraryName(it->path()),
+                            it->path(), ModuleType::MODULE_DYNAMICS});
+            }
+        }
+
+        if (type == Context::ModuleType::MODULE_OOV) {
+            Path modules = elem;
+            modules /= "plugins";
+            modules /= "output";
+
+            for (DirectoryIterator it(modules), end; it != end; ++it) {
+                if (not it->is_file())
+                    continue;
+
+                ret.push_back({package, getLibraryName(it->path()),
+                            it->path(), ModuleType::MODULE_OOV});
+            }
+        }
+
+        break; // We stop when we have found the first package in the
+               // first binary package repositories.
+    }
+
+    return ret;
 }
 
 }} // namespace vle utils
