@@ -50,6 +50,14 @@ vle_log_null(const vle::utils::ContextPtr&, const char *, ...)
 {
 }
 
+static inline void
+#if defined(__GNUC__)
+ __attribute__((always_inline, format(printf, 2, 3)))
+#endif
+vle_log_null(const vle::utils::Context*, const char *, ...)
+{
+}
+
 #define vle_log_cond(ctx, prio, arg...)                                \
     do {                                                               \
         if (ctx->get_log_priority() >= prio) {                         \
