@@ -74,15 +74,13 @@ depth(const std::unique_ptr<vle::devs::Dynamics>& mdl) noexcept
 namespace vle { namespace devs {
 
 Coordinator::Coordinator(utils::ContextPtr context,
-                         const utils::ModuleManager& modulemgr,
                          const vpz::Dynamics& dyn,
                          const vpz::Classes& cls,
                          const vpz::Experiment& experiment,
                          RootCoordinator& root)
     : m_context(context)
     , m_currentTime(0.0)
-    , m_modelFactory(context, modulemgr, m_eventViewList, dyn, cls, experiment, root)
-    , m_modulemgr(modulemgr)
+    , m_modelFactory(context, m_eventViewList, dyn, cls, experiment, root)
     , m_isStarted(false)
 {
 }
@@ -468,7 +466,7 @@ std::unique_ptr<StreamWriter>
 Coordinator::buildOutput(const vpz::View& view,
                          const vpz::Output& output)
 {
-    auto stream = std::make_unique<StreamWriter>(m_modulemgr);
+    auto stream = std::make_unique<StreamWriter>(m_context);
 
     std::string file((fmt("%1%_%2%") %
                       m_modelFactory.experiment().name() %

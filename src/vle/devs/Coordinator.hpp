@@ -53,7 +53,6 @@ class VLE_LOCAL Coordinator
 {
 public:
     Coordinator(utils::ContextPtr context,
-                const utils::ModuleManager& modulemgr,
                 const vpz::Dynamics& dyn,
                 const vpz::Classes& cls,
                 const vpz::Experiment& experiment,
@@ -292,7 +291,6 @@ private:
     ModelFactory                m_modelFactory;
     SimulatorList               m_deletedSimulator;
     SimulatorList::size_type    m_toDelete;
-    const utils::ModuleManager& m_modulemgr;
     bool                        m_isStarted;
 
     /**

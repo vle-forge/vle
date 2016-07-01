@@ -44,9 +44,9 @@
         }                                               \
                                                         \
         VLE_MODULE void                                 \
-        vle_api_level(vle::uint32_t* major,             \
-                      vle::uint32_t* minor,             \
-                      vle::uint32_t* patch)             \
+        vle_api_level(std::uint32_t* major,             \
+                      std::uint32_t* minor,             \
+                      std::uint32_t* patch)             \
         {                                               \
             *major = VLE_MAJOR_VERSION;                 \
             *minor = VLE_MINOR_VERSION;                 \
@@ -206,7 +206,7 @@ private:
  * This typedef is used by the StreamReader build factory to
  * automatically destroy plugin at the end of the simulation.
  */
-using PluginPtr = std::shared_ptr <Plugin>;
+using PluginPtr = std::unique_ptr<Plugin>;
 
 /**
  * Define the pointer to function of the oov::Plugin plug-in.

@@ -47,6 +47,7 @@ struct PrivateContextIimpl;
 class Context;
 using ContextPtr = std::shared_ptr<Context>;
 
+
 /**
  * Build a std::shared_ptr<Context> using "C" as default locale.
  *
@@ -248,6 +249,149 @@ public:
      * is not a @c boolean.
      */
     bool get(const std::string& key, bool* value) const noexcept;
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * Manage modules
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /*
+     * @brief ModuleManager permit to store a list of shared libraries or
+     * modules.
+     *
+     * ModuleManager stores shared libraries of VLE (simulators and
+     * output). For each module, an handle is stored, a pointer to the
+     * associated function, a type and a version.
+     *
+     * ModuleManager checks the symbols:
+     * - "vle_api_level": A function which returns three @c uint32_t. This
+     *   integers represent the version of VLE which build the module.
+     * - "vle_make_new_dynamics" (MODULE_DYNAMICS).
+     * - "vle_make_new_dynamics_wrapper" (MODULE_DYNAMICS).
+     * - "vle_make_new_executive" (MODULE_DYNAMICS).
+     * - "vle_make_new_oov" (MODULE_OOV). *
+     * @code
+     * vle::utils::ModuleManager mng;
+     * void* mng.get("foo", "sim", vle::utils::MODULE_DYNAMICS);
+     * @endcode
+     */
+
+    /**
+     * @brief A @e Module must have a type which determine the symbol to load.
+     */
+    enum class ModuleType {
+        MODULE_DYNAMICS, /**< The @e Module is a simulator and it needs to
+                            have the following symbol: @c
+                            vle_make_new_dynamics. */
+            MODULE_DYNAMICS_WRAPPER, /**< The @e Module is a simulator and it
+                                        needs to have the following symbols:
+                                        @c vle_make_new_dynamics_wrapper. */
+            MODULE_DYNAMICS_EXECUTIVE, /**< The @e Module is a simulator and
+                                          it needs to have the following
+                                          symbols: @c
+                                          vle_make_new_executive. */
+            MODULE_OOV, /**< The @e Module is an output (from oov library) and
+                           it needs to have the following symbol: @c
+                           vle_make_new_oov. */
+            };
+
+    /**
+     * @brief A @e Module describes a dynamic loaded shared library.
+     *
+     * @e Module is a public representation of @e ModuleManager's internal Module
+     * which store an handle to the shared library and a pointer to the symbol
+     * referenced by the @e ModuleType.
+     */
+    struct Module {
+        std::string package;
+        std::string library;
+        Path path;
+        Context::ModuleType type;
+    };
+
+    /**
+     * @brief Get a symbol from a shared library.
+     *
+     * Check the list of shared libraries already loaded. If the shared
+     * library exists, the symbol @c type is researched into the
+     * library. Otherwise, the ModuleManager try to load the shared
+     * library named from the combination of @c package, @c library and @e
+     * type.
+     *
+     * This function return is @e newtype parameter the type of the module
+     * read. The @e type is MODULE_DYNAMICS, MODULE_DYNAMICS_EXECUTIVE or
+     * MODULE_DYNAMICS_WRAPPER the @e newtype check the type and if it
+     * does not corresponds it check the two other simulators (MODULE_DYNAMICS,
+     * MODULE_DYNAMICS_EXECUTIVE or MODULE_DYNAMICS_EXECUTIVE). If @e type is
+     * not MODULE_DYNAMICS, MODULE_DYNAMICS_WRAPPER,
+     * MODULE_DYNAMICS_EXECUTIVE , the @e newtype will be affected by the
+     * founded type.
+     *
+     * @code
+     * // try to load the shared library
+     * // $VLE_HOME/.vle/pkgs/glue/lib/libcounter.so
+     * auto ctx = utils::make_context();
+     * ModuleType type;
+     * ctx->get_symbol("glue", "counter", MODULE_DYNAMICS, &type);
+     * assert(type == MODULE_DYNAMICS || type == MODULE_DYNAMICS_WRAPPER ||
+     *        type == MODULE_DYNAMICS_WRAPPER);
+     *
+     * ctx->get_symbol("glue", "counter", MODULE_DYNAMICS_WRAPPER, &type);
+     * assert(type == MODULE_DYNAMICS || type == MODULE_DYNAMICS_WRAPPER ||
+     *        type == MODULE_DYNAMICS_WRAPPER);
+     *
+     * ctx->get_symbol("glue", "counter", MODULE_OOV, &type);
+     * assert(type == MODULE_OOV);
+     * @endcode
+     *
+     * @param package The name of the package. If several packages with
+     * the same name appear in paths provided by \c
+     * Context::getBinaryPackagesDir() then the first found is returned
+     * (priority to the begin).
+     *
+     * @param library
+     * @param type
+     * @param[out] newtype If @e newtype is null, newtype will not be affected.
+     *
+     * @throw utils::InternalError if shared library does not exists or if the
+     * symbols wanted does not exist.
+     *
+     * @return A pointer to the founded symbol.
+     */
+    void* get_symbol(const std::string& package,
+                     const std::string& pluginname,
+                     ModuleType type,
+                     ModuleType *newtype = nullptr);
+
+    /**
+     * @brief Get a symbol directly in the executable.
+     *
+     * Try to get a symbol from the executable if it was never
+     * loaded. This function allows to build executable where we can store
+     * simulators, oov's modules for instance in unit test.
+     *
+     * @code
+     * auto ctx = vle::utils::make_context();
+     * ctx->get_symbol("main");
+     * @endcode
+     *
+     * @param symbol The name of the symbol.
+     *
+     * @throw utils::InternalError if the executable does not have a symbol of
+     * this name.
+     *
+     * @return A pointer to the founded symbol.
+     */
+    void* get_symbol(const std::string& pluginname);
+
+    /**
+     * \e Brief Unload of loaded shared libraries.
+     *
+     * Unload (via \c ::dlclose or \c ::FreeLibrary) all previously loaded
+     * shared libraries.
+     */
+    void unload_dynamic_libraries() noexcept;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *

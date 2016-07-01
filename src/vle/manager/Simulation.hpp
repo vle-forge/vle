@@ -30,7 +30,6 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ModuleManager.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
 
@@ -63,7 +62,6 @@ public:
 
     std::unique_ptr<value::Map>
         run(std::unique_ptr<vpz::Vpz>   vpz,
-            const utils::ModuleManager &modulemgr,
             Error                      *error);
 
 private:

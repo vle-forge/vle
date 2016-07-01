@@ -33,7 +33,6 @@
 #include <vle/utils/Rand.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/utils/ModuleManager.hpp>
 #include <memory>
 
 namespace vle { namespace vpz {
@@ -65,8 +64,7 @@ class Dynamics;
 class VLE_LOCAL RootCoordinator
 {
 public:
-    RootCoordinator(utils::ContextPtr context,
-                    const utils::ModuleManager& modulemgr);
+    RootCoordinator(utils::ContextPtr context);
 
     ~RootCoordinator();
 
@@ -141,8 +139,6 @@ private:
 
     std::unique_ptr<Coordinator> m_coordinator;
     std::unique_ptr<vpz::BaseModel> m_root;
-
-    const utils::ModuleManager& m_modulemgr;
 };
 
 }} // namespace vle devs

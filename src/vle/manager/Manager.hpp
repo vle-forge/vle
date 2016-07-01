@@ -30,7 +30,6 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ModuleManager.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
 
@@ -86,7 +85,6 @@ public:
      */
     std::unique_ptr<value::Matrix>
         run(std::unique_ptr<vpz::Vpz>  exp,
-            utils::ModuleManager      &modulemgr,
             uint32_t                   thread,
             uint32_t                   rank,
             uint32_t                   world,

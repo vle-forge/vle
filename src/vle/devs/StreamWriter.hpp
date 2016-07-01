@@ -32,7 +32,7 @@
 #include <vle/devs/Time.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/Context.hpp>
 
 namespace vle { namespace devs {
 
@@ -41,8 +41,8 @@ class Observable;
 class VLE_LOCAL StreamWriter
 {
 public:
-    StreamWriter(const utils::ModuleManager& modulemgr)
-        : m_modulemgr(modulemgr)
+    StreamWriter(utils::ContextPtr ctx)
+        : m_context(ctx)
     {}
 
     ~StreamWriter() = default;
@@ -117,18 +117,13 @@ public:
     ////
     ///
 
-    const utils::ModuleManager& getModuleManager() const
-    {
-        return m_modulemgr;
-    }
-
-    oov::PluginPtr plugin();
+    const oov::PluginPtr& plugin() const;
 
 private:
-    const utils::ModuleManager& m_modulemgr;
-    oov::PluginPtr              m_plugin;
+    utils::ContextPtr m_context;
+    oov::PluginPtr    m_plugin;
 };
 
-}} // namespace vle devs
+}} // Namespace vle devs
 
 #endif

@@ -31,8 +31,7 @@
 
 namespace vle { namespace devs {
 
-RootCoordinator::RootCoordinator(utils::ContextPtr context,
-                                 const utils::ModuleManager& modulemgr)
+RootCoordinator::RootCoordinator(utils::ContextPtr context)
     : m_context(context)
     , m_rand(0)
     , m_begin(0)
@@ -40,7 +39,6 @@ RootCoordinator::RootCoordinator(utils::ContextPtr context,
     , m_end(1.0)
     , m_coordinator(nullptr)
     , m_root(nullptr)
-    , m_modulemgr(modulemgr)
 {
 }
 
@@ -53,7 +51,6 @@ void RootCoordinator::load(const vpz::Vpz& io)
     m_currentTime = m_begin;
 
     m_coordinator = std::make_unique<Coordinator>(m_context,
-                                                  m_modulemgr,
                                                   io.project().dynamics(),
                                                   io.project().classes(),
                                                   io.project().experiment(),

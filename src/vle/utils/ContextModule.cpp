@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
@@ -40,7 +39,7 @@
 #include <dlfcn.h>
 #endif
 
-namespace vle { namespace utils { namespace pimpl {
+namespace vle { namespace utils {
 
 /**
  * @brief Get the plug-in name of the filename provided.
@@ -87,7 +86,7 @@ struct Module
 #endif
 
     void *mFunction;
-    ModuleType mType;
+    Context::ModuleType mType;
 
     /**
      * @brief A Module store shared library and symbol.
@@ -102,7 +101,7 @@ struct Module
      * @param type
      */
     Module(Path path, std::string package, std::string library,
-           ModuleType type)
+           Context::ModuleType type)
         : mPath(std::move(path)), mPackage(std::move(package)),
           mLibrary(std::move(library)), mHandle(nullptr),
           mFunction(nullptr), mType(type)
@@ -143,9 +142,9 @@ struct Module
 
         if (not mFunction) {
             switch (mType) {
-            case MODULE_DYNAMICS:
-            case MODULE_DYNAMICS_EXECUTIVE:
-            case MODULE_DYNAMICS_WRAPPER:
+            case Context::ModuleType::MODULE_DYNAMICS:
+            case Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
+            case Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
                 if (! (mFunction = (getSymbol("vle_make_new_dynamics"))))
                     if (! (mFunction = (getSymbol("vle_make_new_executive"))))
                         if (! (mFunction = (getSymbol("vle_make_new_dynamics_wrapper"))))
@@ -157,13 +156,13 @@ struct Module
                                        " found")) % mPath.string()).str());
 
                         else
-                            mType = MODULE_DYNAMICS_WRAPPER;
+                            mType = Context::ModuleType::MODULE_DYNAMICS_WRAPPER;
                     else
-                        mType = MODULE_DYNAMICS_EXECUTIVE;
+                        mType = Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE;
                 else
-                    mType = MODULE_DYNAMICS;
+                    mType = Context::ModuleType::MODULE_DYNAMICS;
                 break;
-            case MODULE_OOV:
+            case Context::ModuleType::MODULE_OOV:
                 if (not (mFunction = (getSymbol("vle_make_new_oov"))))
                     throw utils::InternalError(
                         (fmt(_("Module `%1%' is not an oov module (symbol"
@@ -231,8 +230,8 @@ struct Module
 
     void checkVersion()
     {
-        typedef void(*versionFunction)(vle::uint32_t*, vle::uint32_t*,
-                                       vle::uint32_t*);
+        typedef void(*versionFunction)(std::uint32_t*, std::uint32_t*,
+                                       std::uint32_t*);
         void *symbol;
 
         uint32_t major, minor, patch;
@@ -325,7 +324,8 @@ public:
 
         if (not result)
             throw utils::InternalError(
-                (fmt(_("Module: `%1%' not found in global space")) % symbol).str());
+                (fmt(_("Module: `%1%' not found in global space"))
+                 % symbol).str());
 
         auto ret = mLst.emplace(symbol, result);
 
@@ -335,22 +335,45 @@ public:
     }
 };
 
-} // namespace pimpl
-
-class ModuleManager::Pimpl
+struct ModuleManager
 {
-public:
     using ModuleTable = std::unordered_map<std::string,
-                                           std::unique_ptr<pimpl::Module>>;
+                                           std::unique_ptr<Module>>;
     using value_type = ModuleTable::value_type;
     using const_iterator = ModuleTable::const_iterator;
     using iterator = ModuleTable::iterator;
 
+    Context* mContext;
+    ModuleTable mTableSimulator;
+    ModuleTable mTableOov;
+    SymbolTable mTableSymbols;
+
+    ModuleManager(Context* ctx)
+        : mContext(ctx)
+    {}
+
+    ~ModuleManager() noexcept
+    {
+        for (const auto& elem : mTableSimulator)
+            vDbg(mContext, _("ModuleManager: simulator unload %s (%s %s %s)\n"),
+                 elem.first.c_str(),
+                 elem.second->mPath.string().c_str(),
+                 elem.second->mPackage.c_str(),
+                 elem.second->mLibrary.c_str());
+
+        for (const auto& elem : mTableSimulator)
+            vDbg(mContext, _("ModuleManager: output unload %s (%s %s %s)\n"),
+                 elem.first.c_str(),
+                 elem.second->mPath.string().c_str(),
+                 elem.second->mPackage.c_str(),
+                 elem.second->mLibrary.c_str());
+    }
+    
     /**
      * @brief An unary operator to convert pimpl::Module into Module.
      */
     struct ModuleConvert {
-        Module operator()(const ModuleTable::value_type& module) const
+        Context::Module operator()(const ModuleTable::value_type& module) const
         {
             return { module.second->mPackage, module.second->mLibrary,
                     module.second->mPath, module.second->mType };
@@ -374,15 +397,6 @@ public:
         }
     };
 
-    Pimpl(ContextPtr ctx)
-        : mContext(ctx)
-    {
-    }
-
-    ~Pimpl()
-    {
-    }
-
     bool exists(const std::string& filepath) const
     {
         auto it = mTableSimulator.find(filepath);
@@ -392,10 +406,10 @@ public:
         return mTableOov.find(filepath) != mTableOov.cend();
     }
 
-    const std::unique_ptr<pimpl::Module>&
+    const std::unique_ptr<Module>&
     getModule(const std::string& package,
               const std::string& library,
-              ModuleType type)
+              Context::ModuleType type)
     {
         Path path = buildModuleFilename(package, library, type);
         std::string strpath = path.string();
@@ -403,29 +417,27 @@ public:
         iterator it;
 
         switch (type) {
-        case MODULE_DYNAMICS:
-        case MODULE_DYNAMICS_WRAPPER:
-        case MODULE_DYNAMICS_EXECUTIVE:
+        case Context::ModuleType::MODULE_DYNAMICS:
+        case Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
+        case Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
             it = mTableSimulator.find(strpath);
             if (it != mTableSimulator.end())
                 return it->second;
 
             return mTableSimulator.emplace(
                 strpath,
-                std::make_unique<pimpl::Module>(
-                    path, package, library,
-                    type)).first->second;
+                std::make_unique<Module>(path, package, library,
+                                         type)).first->second;
             break;
-        case MODULE_OOV:
+        case Context::ModuleType::MODULE_OOV:
             it = mTableOov.find(strpath);
             if (it != mTableOov.end())
                 return it->second;
 
             return mTableOov.emplace(
                 strpath,
-                std::make_unique<pimpl::Module>(
-                    path, package, library,
-                    type)).first->second;
+                std::make_unique<Module>(path, package, library,
+                                         type)).first->second;
             break;
         default:
             break;
@@ -448,7 +460,7 @@ public:
      */
     void browse(const Path& path,
                 const std::string& package,
-                ModuleType type)
+                Context::ModuleType type)
     {
         if (not path.is_directory())
             return;
@@ -456,7 +468,7 @@ public:
         DirectoryIterator it(path), end;
         for (; it != end; ++it) {
             if (it->is_file()) {
-                std::string library = pimpl::getLibraryName(*it);
+                std::string library = getLibraryName(*it);
 
                 if (not library.empty()) {
                     getModule(package, library, type);
@@ -468,7 +480,7 @@ public:
 
     Path buildModuleFilename(const std::string& package,
                              const std::string& library,
-                             ModuleType type)
+                             Context::ModuleType type)
     {
         const auto& paths = mContext->getBinaryPackagesDir();
         for (const auto& elem : paths) {
@@ -478,13 +490,13 @@ public:
                 continue;                   // in repository test the next.
 
             switch (type) {
-            case MODULE_DYNAMICS:
-            case MODULE_DYNAMICS_EXECUTIVE:
-            case MODULE_DYNAMICS_WRAPPER:
+            case Context::ModuleType::MODULE_DYNAMICS:
+            case Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
+            case Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
                 current /= "plugins";
                 current /= "simulator";
                 break;
-            case MODULE_OOV:
+            case Context::ModuleType::MODULE_OOV:
                 current /= "plugins";
                 current /= "output";
                 break;
@@ -518,153 +530,192 @@ public:
                    "in binary repositories")) % library % package).str());
     }
 
-    ContextPtr mContext;
-    ModuleTable mTableSimulator;
-    ModuleTable mTableOov;
-    pimpl::SymbolTable mTableSymbols;
+    /*
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+
+    void browse()
+    {
+        const auto& paths = mContext->getBinaryPackagesDir();
+
+        for (const auto& elem : paths) {
+            Path packages = elem;
+            Path pathsim = "plugins/simulator";
+            Path pathoov = "plugins/output";
+
+            if (not packages.is_directory()) {
+                vErr(mContext, _("ModuleManager: %s is not a packages "
+                                 "directory\n"), elem.string().c_str());
+                continue;
+            }
+
+            DirectoryIterator it(elem), end;
+            for (; it != end; ++it) {
+                if (not it->is_directory())
+                    continue;
+
+                std::string package = it->path().filename();
+                if (exists(it->path().string())) {
+                    vInfo(mContext,
+                          _("ModuleManager: package `%s' already"
+                            " exists. Forget this path: `%s'\n"),
+                          package.c_str(), it->path().string().c_str());
+                    continue;
+                }
+
+                {
+                    Path tmp = (*it) / "plugins" / "simulator";
+                    browse(tmp, package,
+                                   Context::ModuleType::MODULE_DYNAMICS);
+                }
+
+                {
+                    Path tmp = (*it) / "plugins" / "output";
+                    browse(tmp, package,
+                                   Context::ModuleType::MODULE_OOV);
+                }
+            }
+        }
+    }
+
+    /*
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+
+    /**
+     * @brief Retrieve the list of all modules.
+     *
+     * @param[out] lst An output parameter, all modules are pushed backward.
+     */
+    void fill(std::vector<Context::Module> *lst) const
+    {
+        std::transform(mTableSimulator.begin(),
+                       mTableSimulator.end(),
+                       std::back_inserter(*lst),
+                       ModuleManager::ModuleConvert());
+
+        std::transform(mTableOov.begin(),
+                       mTableOov.end(),
+                       std::back_inserter(*lst),
+                       ModuleManager::ModuleConvert());
+    }
+
+    /**
+     * @brief Retrieve the list of modules of the specified type.
+     *
+     * @param type The type of module to by retrieve.
+     * @param[out] lst An output parameter, all modules are pushed backward.
+     */
+    void fill(Context::ModuleType type, std::vector<Context::Module> *lst) const
+    {
+        switch (type) {
+        case Context::ModuleType::MODULE_DYNAMICS:
+        case Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
+        case Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
+            std::transform(mTableSimulator.begin(),
+                           mTableSimulator.end(),
+                           std::back_inserter(*lst),
+                           ModuleManager::ModuleConvert());
+            break;
+        case Context::ModuleType::MODULE_OOV:
+            std::transform(mTableOov.begin(),
+                           mTableOov.end(),
+                           std::back_inserter(*lst),
+                           ModuleManager::ModuleConvert());
+            break;
+        default:
+            break;
+        };
+    }
+
+    /**
+     * @brief Retrieve the list of modules of the specified package.
+     *
+     * @param package The name of the package to by retrieve.
+     * @param[out] lst An output parameter, all modules are pushed backward.
+     */
+    void fill(const std::string& package,
+              std::vector<Context::Module> *lst) const
+    {
+        transformIf(mTableSimulator.begin(),
+                    mTableSimulator.end(),
+                    std::back_inserter(*lst),
+                    ModuleManager::ModuleIsInPackage(package),
+                    ModuleManager::ModuleConvert());
+
+        transformIf(mTableOov.begin(),
+                    mTableOov.end(),
+                    std::back_inserter(*lst),
+                    ModuleManager::ModuleIsInPackage(package),
+                    ModuleManager::ModuleConvert());
+    }
+
+    /**
+     * @brief Retrieve the list of modules of the specified package and type.
+     *
+     * @param package The name of the package to by retrieve.
+     * @param type The type of module to by retrieve.
+     * @param[out] lst An output parameter, all modules are pushed backward.
+     */
+    void fill(const std::string& package, Context::ModuleType type,
+              std::vector<Context::Module> *lst) const
+    {
+        switch (type) {
+        case Context::ModuleType::MODULE_DYNAMICS:
+        case Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
+        case Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
+            transformIf(mTableSimulator.begin(),
+                        mTableSimulator.end(),
+                        std::back_inserter(*lst),
+                        ModuleManager::ModuleIsInPackage(package),
+                        ModuleManager::ModuleConvert());
+            break;
+        case Context::ModuleType::MODULE_OOV:
+            transformIf(mTableOov.begin(),
+                        mTableOov.end(),
+                        std::back_inserter(*lst),
+                        ModuleManager::ModuleIsInPackage(package),
+                        ModuleManager::ModuleConvert());
+            break;
+        default:
+            break;
+        }
+    }
 };
 
-ModuleManager::ModuleManager(ContextPtr ctx)
-    : mPimpl(std::make_unique<ModuleManager::Pimpl>(ctx))
+void* Context::get_symbol(const std::string& package,
+                          const std::string& library,
+                          Context::ModuleType type,
+                          Context::ModuleType *newtype)
 {
-}
+    if (not m_pimpl->modules)
+        m_pimpl->modules = std::make_shared<ModuleManager>(this);
 
-ModuleManager::~ModuleManager() noexcept = default;
-
-void *ModuleManager::get(const std::string& package,
-                         const std::string& library,
-                         ModuleType type,
-                         ModuleType *newtype) const
-{
     if (not newtype)
-        return mPimpl->getModule(package, library, type)->get();
+        return m_pimpl->modules->getModule(package, library, type)->get();
 
-    const auto& module = mPimpl->getModule(package, library, type);
-    void *result = module->get();
+    const auto& module = m_pimpl->modules->getModule(package, library, type);
+    auto *result = module->get();
     *newtype = module->mType;
 
     return result;
 }
 
-void *ModuleManager::get(const std::string& symbol) const
+void* Context::get_symbol(const std::string& pluginname)
 {
-    return mPimpl->getSymbol(symbol);
+    if (not m_pimpl->modules)
+        m_pimpl->modules = std::make_shared<ModuleManager>(this);
+
+    return m_pimpl->modules->getSymbol(pluginname);
 }
 
-void ModuleManager::browse()
+void Context::unload_dynamic_libraries() noexcept
 {
-    const auto& paths = mPimpl->mContext->getBinaryPackagesDir();
-
-    for (const auto& elem : paths) {
-        Path packages = elem;
-        Path pathsim = "plugins/simulator";
-        Path pathoov = "plugins/output";
-
-        if (not packages.is_directory()) {
-            vErr(mPimpl->mContext, _("ModuleManager: %s is not a packages "
-                                     "directory\n"), elem.string().c_str());
-            continue;
-        }
-
-        DirectoryIterator it(elem), end;
-        for (; it != end; ++it) {
-            if (not it->is_directory())
-                continue;
-
-            std::string package = it->path().filename();
-            if (mPimpl->exists(it->path().string())) {
-                vInfo(mPimpl->mContext, _("ModuleManager: package `%s' already"
-                                          " exists. Forget this path: `%s'\n"),
-                      package.c_str(), it->path().string().c_str());
-                continue;
-            }
-
-            {
-                Path tmp = (*it) / "plugins" / "simulator";
-                mPimpl->browse(tmp, package, MODULE_DYNAMICS);
-            }
-
-            {
-                Path tmp = (*it) / "plugins" / "output";
-                mPimpl->browse(tmp, package, MODULE_OOV);
-            }
-        }
-    }
-}
-
-void ModuleManager::fill(ModuleList *lst) const
-{
-    std::transform(mPimpl->mTableSimulator.begin(),
-                   mPimpl->mTableSimulator.end(),
-                   std::back_inserter(*lst),
-                   ModuleManager::Pimpl::ModuleConvert());
-
-    std::transform(mPimpl->mTableOov.begin(),
-                   mPimpl->mTableOov.end(),
-                   std::back_inserter(*lst),
-                   ModuleManager::Pimpl::ModuleConvert());
-}
-
-void ModuleManager::fill(ModuleType type, ModuleList *lst) const
-{
-    switch (type) {
-    case MODULE_DYNAMICS:
-    case MODULE_DYNAMICS_EXECUTIVE:
-    case MODULE_DYNAMICS_WRAPPER:
-        std::transform(mPimpl->mTableSimulator.begin(),
-                       mPimpl->mTableSimulator.end(),
-                       std::back_inserter(*lst),
-                       ModuleManager::Pimpl::ModuleConvert());
-        break;
-    case MODULE_OOV:
-        std::transform(mPimpl->mTableOov.begin(),
-                       mPimpl->mTableOov.end(),
-                       std::back_inserter(*lst),
-                       ModuleManager::Pimpl::ModuleConvert());
-        break;
-    default:
-        break;
-    };
-}
-
-void ModuleManager::fill(const std::string& package, ModuleList *lst) const
-{
-    transformIf(mPimpl->mTableSimulator.begin(),
-                mPimpl->mTableSimulator.end(),
-                std::back_inserter(*lst),
-                ModuleManager::Pimpl::ModuleIsInPackage(package),
-                ModuleManager::Pimpl::ModuleConvert());
-
-    transformIf(mPimpl->mTableOov.begin(),
-                mPimpl->mTableOov.end(),
-                std::back_inserter(*lst),
-                ModuleManager::Pimpl::ModuleIsInPackage(package),
-                ModuleManager::Pimpl::ModuleConvert());
-}
-
-void ModuleManager::fill(const std::string& package, ModuleType type,
-                         ModuleList *lst) const
-{
-    switch (type) {
-    case MODULE_DYNAMICS:
-    case MODULE_DYNAMICS_EXECUTIVE:
-    case MODULE_DYNAMICS_WRAPPER:
-        transformIf(mPimpl->mTableSimulator.begin(),
-                    mPimpl->mTableSimulator.end(),
-                    std::back_inserter(*lst),
-                    ModuleManager::Pimpl::ModuleIsInPackage(package),
-                    ModuleManager::Pimpl::ModuleConvert());
-        break;
-    case MODULE_OOV:
-        transformIf(mPimpl->mTableOov.begin(),
-                    mPimpl->mTableOov.end(),
-                    std::back_inserter(*lst),
-                    ModuleManager::Pimpl::ModuleIsInPackage(package),
-                    ModuleManager::Pimpl::ModuleConvert());
-        break;
-    default:
-        break;
-    }
+    m_pimpl.reset(nullptr);
 }
 
 }} // namespace vle utils

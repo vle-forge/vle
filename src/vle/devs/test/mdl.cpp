@@ -37,7 +37,6 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <boost/format.hpp>
 #include <iostream>
@@ -701,8 +700,7 @@ BOOST_AUTO_TEST_CASE(test_gensvpz)
     vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
-    utils::ModuleManager modules(ctx);
-    devs::RootCoordinator root(ctx, modules);
+    devs::RootCoordinator root(ctx);
 
     root.load(file);
     file.clear();
@@ -751,8 +749,7 @@ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
     vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
-    utils::ModuleManager modules(ctx);
-    devs::RootCoordinator root(ctx, modules);
+    devs::RootCoordinator root(ctx);
 
     try {
         root.load(file);
@@ -776,8 +773,7 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 
     for (int s = 0, es = 100; s != es; ++s) {
         vpz::Vpz file(DEVS_TEST_DIR "/ordereddeleter.vpz");
-        utils::ModuleManager modules(ctx);
-        devs::RootCoordinator root(ctx, modules);
+        devs::RootCoordinator root(ctx);
 
         root.load(file);
         file.clear();
@@ -810,8 +806,7 @@ BOOST_AUTO_TEST_CASE(test_confluent_transition)
     vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
-    utils::ModuleManager modules(ctx);
-    devs::RootCoordinator root(ctx, modules);
+    devs::RootCoordinator root(ctx);
 
     try {
         root.load(file);
@@ -836,8 +831,7 @@ BOOST_AUTO_TEST_CASE(test_timed_obs)
     vle::utils::Path::current_path(p);
 
     vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
-    utils::ModuleManager modules(ctx);
-    devs::RootCoordinator root(ctx, modules);
+    devs::RootCoordinator root(ctx);
 
     try {
         root.load(file);

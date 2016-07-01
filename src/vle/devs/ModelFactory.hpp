@@ -37,7 +37,7 @@
 #include <vle/devs/InitEventList.hpp>
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/View.hpp>
-#include <vle/utils/ModuleManager.hpp>
+#include <vle/utils/Context.hpp>
 
 namespace vle { namespace devs {
 
@@ -62,7 +62,6 @@ public:
      * @param cls the vpz::classes to parse vpz::Dynamics to load.
      */
     ModelFactory(utils::ContextPtr context,
-                 const utils::ModuleManager& modulemgr,
                  std::map<std::string, View>& eventviews,
                  const vpz::Dynamics& dyn,
                  const vpz::Classes& cls,
@@ -207,7 +206,6 @@ public:
 
 private:
     utils::ContextPtr mContext;
-    const utils::ModuleManager& mModuleMgr;
     std::map<std::string, View>& mEventViews;
 
     vpz::Dynamics           mDynamics; /**< List of available vpz::Dynamics. */
@@ -228,8 +226,8 @@ private:
      *
      * @return Return a constant.
      */
-    utils::ModuleType open(const vpz::Dynamic& dyn,
-                           std::string* path);
+    utils::Context::ModuleType open(const vpz::Dynamic& dyn,
+                                    std::string* path);
 
     /**
      * @brief Attach to the specified devs::Simulator reference a

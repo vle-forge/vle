@@ -34,7 +34,7 @@
 
 namespace vle { namespace devs {
 
-oov::PluginPtr StreamWriter::plugin()
+const oov::PluginPtr& StreamWriter::plugin() const
 {
     if (not m_plugin)
         throw utils::InternalError(
@@ -52,9 +52,9 @@ void StreamWriter::open(const std::string& pluginname,
                         std::unique_ptr<value::Value> parameters,
                         const devs::Time& time)
 {
-    void *symbol = nullptr;
-
     try {
+        void *symbol = nullptr;
+
         /* If \e package is not empty we assume that library is the shared
          * library. Otherwise, we load the global symbol stores in \e
          * library/executable and we cast it into a \e
@@ -62,13 +62,14 @@ void StreamWriter::open(const std::string& pluginname,
          * build executable with plugins.
          */
         if (not package.empty())
-            symbol = m_modulemgr.get(package, pluginname, utils::MODULE_OOV);
+            symbol = m_context->get_symbol(package, pluginname,
+                                          utils::Context::ModuleType::MODULE_OOV,
+                                          nullptr);
         else
-            symbol = m_modulemgr.get(pluginname);
+            symbol = m_context->get_symbol(pluginname);
 
         oov::OovPluginSlot fct(utils::functionCast<oov::OovPluginSlot>(symbol));
-        oov::PluginPtr ptr(fct(location));
-        m_plugin = ptr;
+        m_plugin = std::unique_ptr<oov::Plugin>(fct(location));
     } catch(const std::exception& e) {
         throw utils::InternalError(
             (fmt(_("Oov: Can not open the plug-in `%1%': %2%")) % pluginname %

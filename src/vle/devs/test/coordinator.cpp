@@ -43,7 +43,6 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/utils/ModuleManager.hpp>
 #include <cstdio>
 #include "oov.hpp"
 
@@ -473,12 +472,11 @@ BOOST_AUTO_TEST_CASE(instantiate_mode)
 BOOST_AUTO_TEST_CASE(test_del_coupled_model)
 {
     auto ctx = vle::utils::make_context();
-    utils::ModuleManager modules(ctx);
     vpz::Dynamics dyns;
     vpz::Classes classes;
     vpz::Experiment expe;
-    devs::RootCoordinator root(ctx, modules);
-    devs::Coordinator coord(ctx, modules,dyns,classes,expe,root);
+    devs::RootCoordinator root(ctx);
+    devs::Coordinator coord(ctx, dyns, classes, expe, root);
     vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
     vpz::CoupledModel* depth1(depth0->addCoupledModel("depth1"));
     vpz::AtomicModel* depth2 = depth1->addAtomicModel("depth2");
@@ -552,8 +550,7 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
 
     vpz.project().model().setModel(depth0);
 
-    utils::ModuleManager modules(ctx);
-    devs::RootCoordinator root(ctx, modules);
+    devs::RootCoordinator root(ctx);
     root.load(vpz);
     vpz.clear();
 
@@ -604,8 +601,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
 
     vpz.project().model().setModel(depth0);
 
-    utils::ModuleManager modules(ctx);
-    devs::RootCoordinator root(ctx, modules);
+    devs::RootCoordinator root(ctx);
     root.load(vpz);
     vpz.clear();
 

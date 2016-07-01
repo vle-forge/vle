@@ -98,7 +98,6 @@ public:
         utils::ContextPtr     context;
         const std::unique_ptr<vpz::Vpz>& vpz;
         ExperimentGenerator  &expgen;
-        utils::ModuleManager &modulemgr;
         LogOptions            mLogOption;
         SimulationOptions     mSimulationOption;
         uint32_t              index;
@@ -109,16 +108,21 @@ public:
         worker(utils::ContextPtr                 context,
                const std::unique_ptr<vpz::Vpz>&  vpz,
                ExperimentGenerator&              expgen,
-               utils::ModuleManager&             modulemgr,
                LogOptions                        logoptions,
                SimulationOptions                 simulationoptions,
                uint32_t                          index,
                uint32_t                          threads,
                value::Matrix                    *result,
                Error                            *error)
-        : context(context), vpz(vpz), expgen(expgen), modulemgr(modulemgr),
-              mLogOption(logoptions), mSimulationOption(simulationoptions),
-              index(index), threads(threads), result(result), error(error)
+          : context(context)
+          , vpz(vpz)
+          , expgen(expgen)
+          , mLogOption(logoptions)
+          , mSimulationOption(simulationoptions)
+          , index(index)
+          , threads(threads)
+          , result(result)
+          , error(error)
         {
         }
 
@@ -141,13 +145,9 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                std::unique_ptr<value::Map> simresult = sim.run(std::move(file),
-                                                                modulemgr,
-                                                                &err);
+                auto simresult = sim.run(std::move(file), &err);
 
                 if (err.code) {
-                    // writeRunLog(err.message);
-
                     if (not error->code) {
                         error->code = -1;
                         error->message = _("Manager failure.");
@@ -161,7 +161,6 @@ public:
 
     std::unique_ptr<value::Matrix>
     runManagerThread(std::unique_ptr<vpz::Vpz> vpz,
-                     utils::ModuleManager&  modulemgr,
                      uint32_t               threads,
                      uint32_t               rank,
                      uint32_t               world,
@@ -176,7 +175,7 @@ public:
         std::vector<std::thread> gp;
         for (uint32_t i = 0; i < threads; ++i)
             gp.emplace_back(
-                worker(mContext, vpz, expgen, modulemgr,
+                worker(mContext, vpz, expgen,
                        mLogOption, mSimulationOption,
                        i, threads, result.get(), error));
 
@@ -191,7 +190,6 @@ public:
 
     std::unique_ptr<value::Matrix>
     runManagerMono(std::unique_ptr<vpz::Vpz> vpz,
-                   utils::ModuleManager &modulemgr,
                    uint32_t              rank,
                    uint32_t              world,
                    Error                *error)
@@ -211,7 +209,7 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                sim.run(std::move(file), modulemgr, &err);
+                sim.run(std::move(file), &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -231,10 +229,8 @@ public:
                 auto file = std::unique_ptr<vpz::Vpz>(new vpz::Vpz(*vpz));
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
-
-                std::unique_ptr<value::Map> simresult = sim.run(std::move(file),
-                                                                modulemgr,
-                                                                &err);
+                
+                auto simresult = sim.run(std::move(file), &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -276,7 +272,6 @@ Manager::~Manager() = default;
 
 std::unique_ptr<value::Matrix>
 Manager::run(std::unique_ptr<vpz::Vpz>  exp,
-             utils::ModuleManager      &modulemgr,
              uint32_t                   thread,
              uint32_t                   rank,
              uint32_t                   world,
@@ -305,10 +300,11 @@ Manager::run(std::unique_ptr<vpz::Vpz>  exp,
     mPimpl->writeSummaryLog(_("Manager started"));
 
     if (thread > 1) {
-        result = mPimpl->runManagerThread(std::move(exp), modulemgr, thread, rank,
+        result = mPimpl->runManagerThread(std::move(exp), thread, rank,
                                           world, error);
     } else {
-        result = mPimpl->runManagerMono(std::move(exp), modulemgr, rank, world, error);
+        result = mPimpl->runManagerMono(std::move(exp), rank,
+                                        world, error);
     }
 
     mPimpl->writeSummaryLog(_("Manager ended"));

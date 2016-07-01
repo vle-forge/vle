@@ -27,7 +27,6 @@
 
 #include <vle/DllDefines.hpp>
 #include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/ModuleManager.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/devs/RootCoordinator.hpp>
@@ -69,14 +68,13 @@ public:
 
     std::unique_ptr<value::Map>
     runVerboseRun(std::unique_ptr<vpz::Vpz>   vpz,
-                  const utils::ModuleManager &modulemgr,
                   Error                      *error)
     {
         std::unique_ptr<value::Map> result;
         boost::timer  timer;
 
         try {
-            devs::RootCoordinator root(m_context, modulemgr);
+            devs::RootCoordinator root(m_context);
 
             const double duration = vpz->project().experiment().duration();
             const double begin    = vpz->project().experiment().begin();
@@ -134,14 +132,13 @@ public:
 
     std::unique_ptr<value::Map>
     runVerboseSummary(std::unique_ptr<vpz::Vpz>   vpz,
-                      const utils::ModuleManager &modulemgr,
                       Error                      *error)
     {
         std::unique_ptr<value::Map> result;
         boost::timer  timer;
 
         try {
-            devs::RootCoordinator root(m_context, modulemgr);
+            devs::RootCoordinator root(m_context);
 
             write(fmt(_("[%1%]\n")) % vpz->filename());
             write(_(" - Coordinator load models ......: "));
@@ -186,13 +183,12 @@ public:
 
     std::unique_ptr<value::Map>
     runQuiet(std::unique_ptr<vpz::Vpz>   vpz,
-             const utils::ModuleManager &modulemgr,
              Error                      *error)
     {
         std::unique_ptr<value::Map> result;
 
         try {
-            devs::RootCoordinator root(m_context, modulemgr);
+            devs::RootCoordinator root(m_context);
             root.load(*vpz);
             vpz->clear();
             vpz.reset(nullptr);
@@ -227,7 +223,6 @@ Simulation::~Simulation() = default;
 
 std::unique_ptr<value::Map>
 Simulation::run(std::unique_ptr<vpz::Vpz>  vpz,
-                const utils::ModuleManager &modulemgr,
                 Error                      *error)
 {
     error->code = 0;
@@ -235,13 +230,13 @@ Simulation::run(std::unique_ptr<vpz::Vpz>  vpz,
 
     if (mPimpl->m_logoptions != manager::LOG_NONE) {
         if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {
-            result = mPimpl->runVerboseRun(std::move(vpz), modulemgr, error);
+            result = mPimpl->runVerboseRun(std::move(vpz), error);
         } else {
-            result = mPimpl->runVerboseSummary(std::move(vpz), modulemgr, error);
+            result = mPimpl->runVerboseSummary(std::move(vpz), error);
         }
 
     } else {
-        result = mPimpl->runQuiet(std::move(vpz), modulemgr, error);
+        result = mPimpl->runQuiet(std::move(vpz), error);
     }
 
     if (mPimpl->m_simulationoptions & manager::SIMULATION_NO_RETURN) {

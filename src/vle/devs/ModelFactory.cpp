@@ -45,14 +45,12 @@
 namespace vle { namespace devs {
 
 ModelFactory::ModelFactory(utils::ContextPtr context,
-                           const utils::ModuleManager& modulemgr,
                            std::map<std::string, View>& eventviews,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
                            RootCoordinator& root)
     : mContext(context)
-    , mModuleMgr(modulemgr)
     , mEventViews(eventviews)
     , mDynamics(dyn)
     , mClasses(cls)
@@ -385,7 +383,7 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
                              const std::string& observable)
 {
     void *symbol = nullptr;
-    utils::ModuleType type = utils::MODULE_DYNAMICS;
+    auto type = utils::Context::ModuleType::MODULE_DYNAMICS;
 
     try {
         /* If \e package is not empty we assume that library is the shared
@@ -395,16 +393,18 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
          * executable with dynamics.
          */
         if (not dyn.package().empty()) {
-            symbol = mModuleMgr.get(dyn.package(), dyn.library(),
-                                    utils::MODULE_DYNAMICS, &type);
+            symbol = mContext->get_symbol(
+                dyn.package(), dyn.library(),
+                utils::Context::ModuleType::MODULE_DYNAMICS,
+                &type);
         } else {
-            symbol = mModuleMgr.get(dyn.library());
+            symbol = mContext->get_symbol(dyn.library());
 
             if (dyn.library().length() >= 4) {
                 if (dyn.library().compare(0, 4, "exe_") == 0)
-                    type = utils::MODULE_DYNAMICS_EXECUTIVE;
+                    type = utils::Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE;
                 else if (dyn.library().compare(0, 4, "wra_") == 0)
-                    type = utils::MODULE_DYNAMICS_WRAPPER;
+                    type = utils::Context::ModuleType::MODULE_DYNAMICS_WRAPPER;
             }
         }
     } catch (const std::exception& e) {
@@ -416,14 +416,14 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
     }
 
     switch (type) {
-    case utils::MODULE_DYNAMICS:
+    case utils::Context::ModuleType::MODULE_DYNAMICS:
         return buildNewDynamics(mContext, mEventViews, mExperiment.views(),
                                 observable, atom, dyn, events, symbol);
-    case utils::MODULE_DYNAMICS_EXECUTIVE:
+    case utils::Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
         return buildNewExecutive(mContext, mEventViews, mExperiment.views(),
                                  observable, coordinator, atom,
                                  dyn, events, symbol);
-    case utils::MODULE_DYNAMICS_WRAPPER:
+    case utils::Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
         return buildNewDynamicsWrapper(mContext, atom, dyn, events, symbol);
     default:
         throw utils::ModellingError();

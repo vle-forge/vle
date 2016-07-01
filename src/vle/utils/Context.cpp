@@ -285,5 +285,4 @@ void Context::log(int priority, const char *file, int line,
     va_end(args);
 }
 
-
 }} // namespace vle utils

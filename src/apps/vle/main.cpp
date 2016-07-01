@@ -319,7 +319,6 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
                               vle::manager::SIMULATION_NONE |
                               vle::manager::SIMULATION_NO_RETURN,
                               &std::cout);
-    vle::utils::ModuleManager modules(ctx);
     int success = EXIT_SUCCESS;
 
     for (; it != end; ++it) {
@@ -328,7 +327,6 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
             man.run(
                 std::unique_ptr<vle::vpz::Vpz>(
                     new vle::vpz::Vpz(search_vpz(*it, pkg))),
-                modules,
                 processor,
                 0,
                 1,
@@ -352,14 +350,12 @@ static int run_simulation(CmdArgs::const_iterator it,
                                  vle::manager::SIMULATION_NONE |
                                  vle::manager::SIMULATION_NO_RETURN,
                                  &std::cout);
-    vle::utils::ModuleManager modules(ctx);
     int success = EXIT_SUCCESS;
 
     for (; it != end; ++it) {
         vle::manager::Error error;
         std::unique_ptr<vle::value::Map> res =
             sim.run(std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
-                    modules,
                     &error);
 
         if (error.code) {

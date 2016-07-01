@@ -87,6 +87,8 @@ namespace vle { namespace utils {
 using PreferenceType = boost::variant<bool, std::string, long, double>;
 using PreferenceMap = std::map<std::string, PreferenceType>;
 
+struct ModuleManager;
+
 struct PrivateContextIimpl
 {
     Path m_prefix;                      ///< dirname of $PREFIX of installation
@@ -94,6 +96,8 @@ struct PrivateContextIimpl
 
     PreferenceMap settings;             ///< global settings
 
+    std::shared_ptr <ModuleManager> modules;
+    
     std::unique_ptr <Context::LogFunctor> log_fn;
     int log_priority;
 };
