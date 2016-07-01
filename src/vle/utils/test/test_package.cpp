@@ -88,7 +88,7 @@ struct F
         std::cout << "test start in " << current_path.string() << '\n';
 
         auto ctx = vle::utils::make_context();
-        ctx->writeSettings();
+        ctx->write_settings();
     }
 
     ~F()

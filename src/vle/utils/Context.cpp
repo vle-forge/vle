@@ -71,13 +71,13 @@ Context::Context(const Path& /* prefix */, std::string locale)
     initPrefixDir();
     initVleHomeDirectory();
 
-    resetSettings();
+    reset_settings();
 
     Path conf = getConfigurationFile();
     if (not conf.is_file())
-        writeSettings();
+        write_settings();
     else
-        loadSettings();
+        load_settings();
 
     if (locale == "C")
         setlocale(LC_ALL, "C");
@@ -161,7 +161,7 @@ std::vector<Path> Context::getBinaryPackages() const
 
     for (const auto& elem : paths) {
         if (not elem.is_directory()) {
-            vErr(this, _("Package error: '%s' is not a directory"),
+            vErr(this, _("Package error: '%s' is not a directory\n"),
                  elem.string().c_str());
             continue;
         }

@@ -55,7 +55,7 @@ struct DownloadManager::Pimpl
         , mIsFinish(false)
         , mHasError(false)
     {
-        if (not context->get("vle.command.url.get", &mCommand))
+        if (not context->get_setting("vle.command.url.get", &mCommand))
             throw InternalError(
                 _("Download: fail to get vle.command.url.get command "
                   "from vle.conf"));

@@ -101,18 +101,18 @@ public:
      * Assign default values to the settings database.
      * settings database.
      */
-    void resetSettings() noexcept;
+    void reset_settings() noexcept;
 
     /**
      * Read the configuration file (\e %VLEHOME/vle.conf) and fill the
      * settings database.
      */
-    bool loadSettings() noexcept;
+    bool load_settings() noexcept;
 
     /**
      * Read the configuration file (\e %VLEHOME/vle.conf).
      */
-    bool writeSettings() const noexcept;
+    bool write_settings() const noexcept;
 
     /**
      * Insert an @c std::string into the specified key.
@@ -127,7 +127,7 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set(const std::string& key, const std::string& value) noexcept;
+    bool set_setting(const std::string& key, const std::string& value) noexcept;
 
     /**
      * Insert an @c double into the specified key.
@@ -142,7 +142,7 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set(const std::string& key, double value) noexcept;
+    bool set_setting(const std::string& key, double value) noexcept;
 
     /**
      * Insert an @c long into the specified key.
@@ -157,7 +157,7 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set(const std::string& key, long value) noexcept;
+    bool set_setting(const std::string& key, long value) noexcept;
 
     /**
      * Insert an @c bool into the specified key.
@@ -172,7 +172,7 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set(const std::string& section, bool value) noexcept;
+    bool set_setting(const std::string& section, bool value) noexcept;
 
     /**
      * Get an @c std::string from specified key.
@@ -191,7 +191,7 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not an @c std::string.
      */
-    bool get(const std::string& key, std::string* value) const noexcept;
+    bool get_setting(const std::string& key, std::string* value) const noexcept;
 
     /**
      * Get a @c double from specified key.
@@ -210,7 +210,7 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not a @c real.
      */
-    bool get(const std::string& key, double* value) const noexcept;
+    bool get_setting(const std::string& key, double* value) const noexcept;
 
     /**
      * Get a @c long from specified key.
@@ -229,7 +229,7 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not an @c integer.
      */
-    bool get(const std::string& key, long* value) const noexcept;
+    bool get_setting(const std::string& key, long* value) const noexcept;
 
     /**
      * Get a @c bool from specified key.
@@ -248,7 +248,7 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not a @c boolean.
      */
-    bool get(const std::string& key, bool* value) const noexcept;
+    bool get_setting(const std::string& key, bool* value) const noexcept;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *

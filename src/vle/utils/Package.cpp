@@ -51,7 +51,7 @@ void remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
         path.remove();
 
     std::string command;
-    ctx->get("vle.command.dir.remove", &command);
+    ctx->get_setting("vle.command.dir.remove", &command);
 
     try {
         command = (boost::format(command) % path.string()).str();
@@ -941,14 +941,22 @@ const std::string& Package::name() const
 
 void Package::refreshCommands()
 {
-    m_pimpl->m_context->get("vle.packages.configure", &m_pimpl->mCommandConfigure);
-    m_pimpl->m_context->get("vle.packages.test", &m_pimpl->mCommandTest);
-    m_pimpl->m_context->get("vle.packages.build", &m_pimpl->mCommandBuild);
-    m_pimpl->m_context->get("vle.packages.install", &m_pimpl->mCommandInstall);
-    m_pimpl->m_context->get("vle.packages.clean", &m_pimpl->mCommandClean);
-    m_pimpl->m_context->get("vle.packages.package", &m_pimpl->mCommandPack);
-    m_pimpl->m_context->get("vle.packages.unzip", &m_pimpl->mCommandUnzip);
-    m_pimpl->m_context->get("vle.command.dir.copy", &m_pimpl->mCommandDirCopy);
+    m_pimpl->m_context->get_setting("vle.packages.configure",
+                                    &m_pimpl->mCommandConfigure);
+    m_pimpl->m_context->get_setting("vle.packages.test",
+                                    &m_pimpl->mCommandTest);
+    m_pimpl->m_context->get_setting("vle.packages.build",
+                                    &m_pimpl->mCommandBuild);
+    m_pimpl->m_context->get_setting("vle.packages.install",
+                                    &m_pimpl->mCommandInstall);
+    m_pimpl->m_context->get_setting("vle.packages.clean",
+                                    &m_pimpl->mCommandClean);
+    m_pimpl->m_context->get_setting("vle.packages.package",
+                                    &m_pimpl->mCommandPack);
+    m_pimpl->m_context->get_setting("vle.packages.unzip",
+                                    &m_pimpl->mCommandUnzip);
+    m_pimpl->m_context->get_setting("vle.command.dir.copy",
+                                    &m_pimpl->mCommandDirCopy);
 }
 
 void Package::refreshPath()

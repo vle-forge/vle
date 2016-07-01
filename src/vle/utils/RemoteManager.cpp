@@ -268,7 +268,7 @@ public:
             file.open(mContext->getLocalPackageFilename().string());
             file << local << std::endl;
         } catch (const std::exception& e) {
-            vErr(mContext, _("Remote: failed to write local package `%s': %s"),
+            vErr(mContext, _("Remote: failed to write local package `%s': %s\n"),
                  mContext->getLocalPackageFilename().string().c_str(),
                  e.what());
         }
@@ -282,7 +282,8 @@ public:
             file.open(mContext->getRemotePackageFilename().string());
             file << remote << std::endl;
         } catch (const std::exception& e) {
-            vErr(mContext, _("Remote: failed to write remote package `%s': %s"),
+            vErr(mContext, _("Remote: failed to write remote package `%s': "
+                             "%s\n"),
                  mContext->getRemotePackageFilename().string().c_str(),
                  e.what());
         }
@@ -342,7 +343,7 @@ public:
         std::vector < std::string > urls;
         try {
             std::string tmp;
-            mContext->get("vle.remote.url", &tmp);
+            mContext->get_setting("vle.remote.url", &tmp);
 
             boost::algorithm::split(urls, tmp,
                                     boost::algorithm::is_any_of(","),
@@ -637,7 +638,7 @@ public:
         std::string command;
 
         try {
-            mContext->get("vle.command.tar", &command);
+            mContext->get_setting("vle.command.tar", &command);
             command = (vle::fmt(command) % compressedfilepath.string()
                        % filepath.string()).str();
 
@@ -673,7 +674,7 @@ public:
                 vErr(mContext, "Compress: %s\n", message.c_str());
         } catch (const std::exception& e) {
             vErr(mContext, _("Compress: unable to compress '%s' in '%s' with "
-                             "the '%s' command"),
+                             "the '%s' command\n"),
                  compressedfilepath.string().c_str(),
                  pwd.string().c_str(),
                  command.c_str());
@@ -699,7 +700,7 @@ public:
 
         std::string command;
         try {
-            mContext->get("vle.command.untar", &command);
+            mContext->get_setting("vle.command.untar", &command);
             command = (vle::fmt(command) % compressedfilepath.string()).str();
 
             utils::Spawn spawn(mContext);
@@ -734,7 +735,7 @@ public:
                 vErr(mContext, "Decompress: %s\n", message.c_str());
         } catch (const std::exception& e) {
             vErr(mContext, _("Decompress: unable to decompress '%s' "
-                             "in '%s' with the '%s' command"),
+                             "in '%s' with the '%s' command\n"),
                  compressedfilepath.string().c_str(),
                  pwd.string().c_str(),
                  command.c_str());

@@ -48,7 +48,7 @@ bool extract(vle::utils::ContextPtr ctx,
         return true;
     }
 
-    vErr(ctx, _("Package: can not open file `%s'"), pkg.string().c_str());
+    vErr(ctx, _("Package: can not open file `%s'\n"), pkg.string().c_str());
 
     return false;
 }
@@ -61,7 +61,7 @@ bool rebuild(vle::utils::ContextPtr ctx,
     vle::utils::PackageParser parser;
 
     if (not pkgsdir.is_directory()) {
-        vErr(ctx, _("Remote: failed to open directory `%s'"),
+        vErr(ctx, _("Remote: failed to open directory `%s'\n"),
              pkgsdir.string().c_str());
         return false;
     }
@@ -75,7 +75,7 @@ bool rebuild(vle::utils::ContextPtr ctx,
                 parser.extract(descfile.string(), std::string());
             } else {
                 vErr(ctx, _("Remote: failed to open Description "
-                            "from `%s'"), descfile.string().c_str());
+                            "from `%s'\n"), descfile.string().c_str());
             }
         }
     }

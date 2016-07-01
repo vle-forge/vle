@@ -72,7 +72,7 @@
 
 namespace vle { namespace utils {
 
-void Context::resetSettings() noexcept
+void Context::reset_settings() noexcept
 {
     m_pimpl->settings = {
         { "gvle.packages.auto-build", true },
@@ -110,7 +110,7 @@ void Context::resetSettings() noexcept
         { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE) }};
 }
 
-bool Context::loadSettings() noexcept
+bool Context::load_settings() noexcept
 {
     std::ifstream ifs(getConfigurationFile().string());
     if (not ifs.is_open()) {
@@ -167,7 +167,7 @@ bool Context::loadSettings() noexcept
                 it->second = r;
             } catch (const std::exception& /* e */) {
                 vErr(this, _("Settings: fail reading double value"
-                            " at line %d in %s"), l, value.c_str());
+                            " at line %d in %s\n"), l, value.c_str());
             }
         }
         l++;
@@ -176,7 +176,7 @@ bool Context::loadSettings() noexcept
     return true;
 }
 
-bool Context::writeSettings() const noexcept
+bool Context::write_settings() const noexcept
 {
     std::ofstream ofs(getConfigurationFile().string());
     if (not ofs.is_open()) {
@@ -198,7 +198,8 @@ bool Context::writeSettings() const noexcept
     return true;
 }
 
-bool Context::set(const std::string& key, const std::string& value) noexcept
+bool Context::set_setting(const std::string& key,
+                          const std::string& value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -212,7 +213,7 @@ bool Context::set(const std::string& key, const std::string& value) noexcept
     return true;
 }
 
-bool Context::set(const std::string& key, double value) noexcept
+bool Context::set_setting(const std::string& key, double value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -226,7 +227,7 @@ bool Context::set(const std::string& key, double value) noexcept
     return true;
 }
 
-bool Context::set(const std::string& key, long value) noexcept
+bool Context::set_setting(const std::string& key, long value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -240,7 +241,7 @@ bool Context::set(const std::string& key, long value) noexcept
     return true;
 }
 
-bool Context::set(const std::string& key, bool value) noexcept
+bool Context::set_setting(const std::string& key, bool value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -254,7 +255,8 @@ bool Context::set(const std::string& key, bool value) noexcept
     return true;
 }
 
-bool Context::get(const std::string& key, std::string* value) const noexcept
+bool Context::get_setting(const std::string& key,
+                          std::string* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -269,7 +271,7 @@ bool Context::get(const std::string& key, std::string* value) const noexcept
     return true;
 }
 
-bool Context::get(const std::string& key, double* value) const noexcept
+bool Context::get_setting(const std::string& key, double* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -284,7 +286,7 @@ bool Context::get(const std::string& key, double* value) const noexcept
     return true;
 }
 
-bool Context::get(const std::string& key, long* value) const noexcept
+bool Context::get_setting(const std::string& key, long* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -299,7 +301,7 @@ bool Context::get(const std::string& key, long* value) const noexcept
     return true;
 }
 
-bool Context::get(const std::string& key, bool* value) const noexcept
+bool Context::get_setting(const std::string& key, bool* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())

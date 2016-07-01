@@ -109,12 +109,12 @@ void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
 
 void Coordinator::run()
 {
-    vDbg(m_context, _("-------- BAG --------"));
-    SimulatorList::size_type oldToDelete(m_toDelete);
-
     Bag& bags = m_eventTable.getCurrentBag();
     if (not bags.empty())
         m_currentTime = m_eventTable.getCurrentTime();
+
+    vDbg(m_context, _("-------- BAG [%f] --------\n"), m_currentTime);
+    SimulatorList::size_type oldToDelete(m_toDelete);
 
     std::vector<Bag::value_type> executives;
     for (auto & elem: bags) {

@@ -38,18 +38,21 @@ namespace {
 void print_external_event(const vle::devs::ExternalEventList& events,
                           vle::utils::ContextPtr ctx) noexcept
 {
+    std::ostringstream oss;
+
     for (const auto& event : events) {
+        oss << '[' << event.getPortName();
+
         if (event.attributes().get()) {
-            std::ostringstream oss;
+            oss << ": ";
             event.attributes()->writeString(oss);
-            vDbg(ctx, _("[%s: %s]"), event.getPortName().c_str(),
-                 oss.str().c_str());
+            oss << ']';
         } else {
-            vDbg(ctx, _("[%s: null]"), event.getPortName().c_str());
+            oss << ": null]";
         }
     }
 
-    vDbg(ctx, "\n");
+    vDbg(ctx, "%s\n", oss.str().c_str());
 }
 
 } // anonymous namespace

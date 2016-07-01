@@ -254,8 +254,8 @@ static void remove_configuration_file()
             filepath.remove();
         }
 
-        ctx->resetSettings();
-        ctx->writeSettings();
+        ctx->reset_settings();
+        ctx->write_settings();
     } catch (const std::exception &e) {
         fprintf(stderr, _("Failed to remove configuration file: %s\n"),
             e.what());
@@ -639,7 +639,7 @@ static int manage_config_mode(vle::utils::ContextPtr ctx, CmdArgs args)
         std::string concat = std::accumulate(args.begin(), args.end(),
                                              std::string(), Comma());
 
-        if (not ctx->set(configvar, concat))
+        if (not ctx->set_setting(configvar, concat))
             throw vle::utils::ArgError(
                 (boost::format(_("Unknown variable `%1%'")) %
                  configvar).str());
