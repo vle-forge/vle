@@ -16,11 +16,10 @@ Specification formalism (DEVS).
 For the VFL API:
 
 * libxml2 (≥ 2.8)
-* libarchive (≥ 2.0)
-* boost (≥ 1.41)
+* boost (≥ 1.47)
 * cmake (≥ 2.8.0)
 * make (≥ 1.8)
-* c++ compiler (gcc ≥ 4.4, clang ≥ 3.1, intel icc (≥ 11.0)
+* c++ compiler (gcc ≥ 4.9, clang ≥ 3.3, intel icc (≥ 11.0)
 
 For the MPI command line:
 
@@ -28,7 +27,7 @@ For the MPI command line:
 
 For the GUI:
 
-* Qt4
+* Qt5
 * Qwt
 
 ## Getting the code
