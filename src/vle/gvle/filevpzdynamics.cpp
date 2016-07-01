@@ -22,20 +22,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef Q_MOC_RUN
-#include <vle/utils/ModuleManager.hpp>
-#include <vle/utils/Path.hpp>
-#endif
 
 #include <QMessageBox>
 #include <QComboBox>
 #include <QMenu>
 #include <QUndoCommand>
+#include <QDebug>
+#include <vle/utils/Context.hpp>
+
 #include "gvle_widgets.h"
 #include "filevpzdynamics.h"
 #include "ui_filevpzdynamics.h"
 
-#include <QDebug>
 
 namespace vle {
 namespace gvle {
@@ -45,12 +43,12 @@ namespace gvle {
  *        Default constructor for Dynamics tab of VPZ view
  *
  */
-FileVpzDynamics::FileVpzDynamics(QWidget *parent) :
+FileVpzDynamics::FileVpzDynamics(const utils::ContextPtr& ctx, QWidget* parent):
     QWidget(parent),
-    ui(new Ui::FileVpzDynamics)
-{
-    mVpm = 0;
+    ui(new Ui::FileVpzDynamics),
+    mVpm(0), mCtx(ctx)
 
+{
     ui->setupUi(this);
     QStringList headers;
     headers.append("Dynamic name");
@@ -103,9 +101,9 @@ void FileVpzDynamics::reload()
     // get list of known/installed packages
     QList <QString> pkgList;
     {
-        auto pathList = vle::utils::Path::path().getBinaryPackages();
+        auto pathList = mCtx->getBinaryPackages();
         for (auto i = pathList.cbegin(), e = pathList.cend(); i != e; ++i) {
-            std::string name = *i;
+            std::string name = i->filename();
             QString pkgName = QString( name.c_str() );
             pkgList.append(pkgName);
         }
@@ -123,14 +121,10 @@ void FileVpzDynamics::reload()
         //get list of libs for the dynPkg package
         QList <QString> libList;
         {
-            vle::utils::ModuleList lst;
-            vle::utils::ModuleManager manager;
-            std::string stdPackage = dynPkg.toLocal8Bit().constData();
-            manager.browse();
-            manager.fill(stdPackage, vle::utils::MODULE_DYNAMICS, &lst);
-            vle::utils::ModuleList::iterator it;
-            for (it = lst.begin(); it != lst.end(); ++it) {
-                std::string name = it->library;
+            auto modules = mCtx->get_dynamic_libraries(dynPkg.toStdString(),
+                    utils::Context::ModuleType::MODULE_DYNAMICS);
+            for (auto mod : modules) {
+                std::string name = mod.library;
                 QString libName = QString( name.c_str() );
                 libList.append(libName);
             }

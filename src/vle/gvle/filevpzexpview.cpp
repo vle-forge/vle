@@ -22,13 +22,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <boost/unordered_map.hpp>
 #include <boost/version.hpp>
 #include <QtCore/qdebug.h>
 #include <QMessageBox>
 #include <QtXml>
 
-#include <vle/utils/Path.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
@@ -48,33 +50,33 @@
  *
  * TODO function from ModuleManager
  */
-static std::string TMPgetLibraryName(const vle::utils::Path& file)
-{
-    std::string library;
-
-    if (file.filename().compare(0, 3, "lib") == 0) {
-        library.append(file.filename(), 3, std::string::npos);
-
-#if defined(_WIN32)
-        if (file.extension() == ".dll")
-            library.assign(library, 0, library.size() - 4);
-#elif defined(__MACOS__)
-        if (file.extension() == ".dylib")
-            library.assign(library, 0, library.size() - 6);
-#else
-        if (file.extension() == ".so")
-            library.assign(library, 0, library.size() - 3);
-#endif
-    }
-return library;
-}
+//static std::string TMPgetLibraryName(const vle::utils::Path& file)
+//{
+//    std::string library;
+//
+//    if (file.filename().compare(0, 3, "lib") == 0) {
+//        library.append(file.filename(), 3, std::string::npos);
+//
+//#if defined(_WIN32)
+//        if (file.extension() == ".dll")
+//            library.assign(library, 0, library.size() - 4);
+//#elif defined(__MACOS__)
+//        if (file.extension() == ".dylib")
+//            library.assign(library, 0, library.size() - 6);
+//#else
+//        if (file.extension() == ".so")
+//            library.assign(library, 0, library.size() - 3);
+//#endif
+//    }
+//return library;
+//}
 
 namespace vle {
 namespace gvle {
 
-FileVpzExpView::FileVpzExpView(QWidget *parent) :
+FileVpzExpView::FileVpzExpView(const utils::ContextPtr& ctx, QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzExpView),mVpm(0), mPlugin(0),
-    currView("")
+    currView(""), mCtx(ctx)
 {
     ui->setupUi(this);
     ui->timeStep->setEnabled(false);
@@ -159,21 +161,19 @@ FileVpzExpView::reload()
     ui->listVleOOV->clear();
     std::string repName;
     std::vector<std::string> pkglist;
-    vle::utils::Path::path().fillBinaryPackagesList(pkglist);
-    itb = pkglist.begin();
-    ite = pkglist.end();
-    for (; itb != ite; itb++) {
-        vle::utils::Package pkg(*itb);
-        vle::utils::PathList pathList = pkg.getPluginsOutput();
-        vle::utils::PathList::const_iterator ipb = pathList.begin();
-        vle::utils::PathList::const_iterator ipe = pathList.end();
-        for (; ipb != ipe; ipb++) {
-            repName.assign(*itb);
+    auto pkgs = mCtx->getBinaryPackages();
+    for (auto pkg : pkgs) {
+        auto modules = mCtx->get_dynamic_libraries(pkg.filename(),
+                utils::Context::ModuleType::MODULE_OOV);
+        for (auto mod : modules) {
+            repName.assign(pkg.filename());
             repName += "/";
-            repName += TMPgetLibraryName(*ipb);
+            repName += mod.library;
             ui->listVleOOV->addItem(QString(repName.c_str()));
+
         }
     }
+
     if (currView != "") {
         QString plug = mVpm->getOutputPluginFromDoc(currView);
         ui->listVleOOV->setCurrentIndex(ui->listVleOOV->findText(plug));

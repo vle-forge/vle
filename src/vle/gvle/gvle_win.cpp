@@ -51,10 +51,11 @@ namespace vu = vle::utils;
 namespace vle {
 namespace gvle {
 
-gvle_win::gvle_win(QWidget *parent) :
+gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
     QMainWindow(parent), ui(new Ui::gvleWin), mLogger(0), mTimer(0),
     mSettings(0), mSimOpened(false), mMenuSimGroup(0), mSimulatorPlugins(),
-    mCurrentSimName(""), mPanels(), mProjectFileSytem(0), mGvlePlugins()
+    mCurrentSimName(""), mPanels(), mProjectFileSytem(0), mGvlePlugins(ctx),
+    mCtx(ctx), mCurrPackage(ctx)
 {
     // VLE init
     mCurrPackage.refreshPath();
@@ -63,7 +64,7 @@ gvle_win::gvle_win(QWidget *parent) :
     ui->setupUi(this);
 
     // Open the configuration file
-    std::string configFile = vu::Path::path().getHomeFile("gvle.conf").string();
+    std::string configFile = mCtx->getHomeFile("gvle.conf").string();
     mSettings = new QSettings(QString(configFile.c_str()),QSettings::IniFormat);
     menuRecentProjectRefresh();
 
@@ -1012,7 +1013,7 @@ gvle_win::onTreeDblClick(QModelIndex index)
     }
     if (newPanel) {
 
-        newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+        newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins, mCtx);
         int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
         bool oldBlock = ui->tabWidget->blockSignals(true);
         ui->tabWidget->setCurrentIndex(n);
@@ -1107,7 +1108,7 @@ gvle_win::onCustomContextMenu(const QPoint &point)
 
             relPath = getGvleFile("", NEW_CPP).source_file;
 
-            newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+            newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins, mCtx);
 
             int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
             bool oldBlock = ui->tabWidget->blockSignals(true);

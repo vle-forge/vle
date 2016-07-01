@@ -41,16 +41,16 @@ class PluginMainPanel : public QObject
 public:
     PluginMainPanel(){};
     virtual ~PluginMainPanel(){};
-    virtual QString  getname()                              = 0;
-    virtual QWidget* leftWidget()                           = 0;
-    virtual QWidget* rightWidget()                          = 0;
-    virtual void undo()                                     = 0;
-    virtual void redo()                                     = 0;
-    virtual void init(QString& file, utils::Package* pkg,
-            Logger* log, gvle_plugins* plugs)               = 0;
-    virtual QString canBeClosed()                           = 0;
-    virtual void save()                                     = 0;
-    virtual PluginMainPanel* newInstance()                  = 0;
+    virtual QString  getname()                                           = 0;
+    virtual QWidget* leftWidget()                                        = 0;
+    virtual QWidget* rightWidget()                                       = 0;
+    virtual void undo()                                                  = 0;
+    virtual void redo()                                                  = 0;
+    virtual void init(QString& file, utils::Package* pkg, Logger* log,
+                      gvle_plugins* plugs, const utils::ContextPtr& ctx) =0;
+    virtual QString canBeClosed()                                        = 0;
+    virtual void save()                                                  = 0;
+    virtual PluginMainPanel* newInstance()                               = 0;
 signals:
     void rightWidgetChanged();
     void undoAvailable(bool);

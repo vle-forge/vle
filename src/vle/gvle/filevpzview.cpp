@@ -33,7 +33,7 @@ namespace vle {
 namespace gvle {
 
 fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
-        Logger* log, QWidget *parent) :
+        Logger* log,  const utils::ContextPtr& ctx, QWidget *parent) :
     QWidget(parent), ui(new Ui::fileVpzView), mRtool(0), mGvlePlugins(plugs),
     mPackage(pkg), mLog(log)
 {
@@ -56,7 +56,7 @@ fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
     int expTabId = ui->tabWidget->addTab(mExpCondTab, "Conditions");
 
     // Configure Dynamics tab
-    mDynamicsTab = new vle::gvle::FileVpzDynamics();
+    mDynamicsTab = new vle::gvle::FileVpzDynamics(ctx);
     int dynTabId = ui->tabWidget->addTab(mDynamicsTab, "Dynamics");
 
     // Configure Observables tab
@@ -65,7 +65,7 @@ fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
             "Observables");
 
     // Configure View tab
-    mExpViewTab = new vle::gvle::FileVpzExpView();
+    mExpViewTab = new vle::gvle::FileVpzExpView(ctx);
     int viewTabId = ui->tabWidget->addTab(mExpViewTab, "Views");
 
     // Configure Classes tab

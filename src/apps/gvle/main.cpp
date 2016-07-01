@@ -36,7 +36,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     bool result;
 
-    vle::utils::Path prefix(vle::utils::Path::path().getPrefixDir());
+    auto ctx = vle::utils::make_context();
+
+    vle::utils::Path prefix(ctx->getPrefixDir());
     vle::utils::Path localesPath(prefix);
     localesPath /= VLE_SHARE_DIRS;
     localesPath /= "translations";
@@ -58,7 +60,9 @@ int main(int argc, char *argv[])
     }
     a.installTranslator(&qtTranslator);
 
-    vle::gvle::gvle_win w;
+
+
+    vle::gvle::gvle_win w(ctx);
 
     w.show();
 

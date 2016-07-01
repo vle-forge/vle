@@ -27,6 +27,7 @@
 
 #include <vle/value/Matrix.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/manager/Simulation.hpp>
 #include "DefaultSimSubpanel.h"
 
@@ -56,20 +57,19 @@ DefaultSimSubpanelThread::init(vleVpm* vpm, vle::utils::Package* pkg)
 void
 DefaultSimSubpanelThread::onStarted()
 {
-    vle::manager::Simulation sim(vle::manager::LOG_NONE,
+    auto ctx = utils::make_context();
+    vle::manager::Simulation sim(ctx, vle::manager::LOG_NONE,
             vle::manager::SIMULATION_NONE, &std::cout);
-    vle::utils::ModuleManager modules;
     vle::manager::Error manerror;
     output_map.reset(nullptr);
-    vle::vpz::Vpz* vpz = 0;
+    std::unique_ptr<vle::vpz::Vpz> vpz(nullptr);
     try{
-         vpz = new vle::vpz::Vpz(mvpm->getFilename().toStdString());
+         vpz.reset(new vle::vpz::Vpz(mvpm->getFilename().toStdString()));
     } catch(const vle::utils::SaxParserError& e) {
         error_simu = QString("Error before simulation '%1'").arg(e.what());
     }
     if (vpz) {
-        output_map =  sim.run(std::unique_ptr<vle::vpz::Vpz>(vpz),
-                modules, &manerror);
+        output_map =  sim.run(std::move(vpz), &manerror);
     }
     if (manerror.code != 0) {
         error_simu = QString("Error during simulation '%1'")

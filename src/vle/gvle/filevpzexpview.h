@@ -28,8 +28,12 @@
 #include <QMenu>
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
+
+#ifndef Q_MOC_RUN
+#include <vle/utils/Context.hpp>
 #include <vle/gvle/vlevpz.h>
 #include <vle/gvle/plugin_output.h>
+#endif
 
 namespace Ui {
 class FileVpzExpView;
@@ -49,7 +53,7 @@ class FileVpzExpView : public QWidget
     Q_OBJECT
 
 public:
-    explicit FileVpzExpView(QWidget *parent = 0);
+    explicit FileVpzExpView(const utils::ContextPtr& ctx, QWidget *parent = 0);
     ~FileVpzExpView();
     void setVpm(vleVpm* vpm);
     void reload();
@@ -76,6 +80,7 @@ private:
     vleVpm*             mVpm;
     PluginOutput*       mPlugin;
     QString             currView;
+    utils::ContextPtr   mCtx;
 
 };
 }}//namespaces

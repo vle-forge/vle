@@ -47,7 +47,7 @@ DefaultCppPanel::~DefaultCppPanel()
 
 void
 DefaultCppPanel::init(QString& relPath, utils::Package* pkg, Logger* /*log*/,
-        gvle_plugins* /*plugs*/)
+        gvle_plugins* /*plugs*/, const utils::ContextPtr& /*ctx*/)
 {
     QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
 

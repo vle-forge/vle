@@ -30,6 +30,10 @@
 #include <QStringList>
 #include <QPluginLoader>
 
+#ifndef Q_MOC_RUN
+#include <vle/utils/Context.hpp>
+#endif
+
 
 
 namespace vle {
@@ -58,7 +62,7 @@ class gvle_plugins : public QObject
     Q_OBJECT
 
 public:
-    gvle_plugins();
+    gvle_plugins(const utils::ContextPtr& ctx);
     ~gvle_plugins();
 
     void             registerPlugins();
@@ -90,6 +94,7 @@ private:
     QMap<QString,gvleplug>      mCondPlugins;
     QMap<QString,gvleplug>      mSimPanelPlugins;
     QMap<QString,gvleplug>      mMainPanelPlugins;
+    utils::ContextPtr           mCtx;
 };
 
 }}//namespaces

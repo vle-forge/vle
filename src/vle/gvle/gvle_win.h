@@ -44,9 +44,7 @@
 
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/utils/Package.hpp>
-#include <vle/utils/Preferences.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/utils/Template.hpp>
 #endif
 
@@ -98,7 +96,7 @@ public:
         NEW_CPP        // get a new cpp gvle_file
     };
 
-    explicit gvle_win(QWidget* parent = 0);
+    explicit gvle_win( const vle::utils::ContextPtr& ctx, QWidget* parent =0);
     ~gvle_win();
 
 protected:
@@ -174,6 +172,8 @@ private:
                           mPanels;
     QFileSystemModel*     mProjectFileSytem;
     gvle_plugins          mGvlePlugins;
+    utils::ContextPtr     mCtx;
+    utils::Package               mCurrPackage;
 
 
 protected:
@@ -264,9 +264,6 @@ private:
     void copyFile(QModelIndex index);
     void removeFile(QModelIndex index);
 
-
-private:
-    vle::utils::Package mCurrPackage;
 };
 
 }}//namespaces

@@ -27,6 +27,10 @@
 
 #include "vlevpm.h"
 
+#ifndef Q_MOC_RUN
+#include <vle/utils/Context.hpp>
+#endif
+
 namespace Ui {
 class FileVpzDynamics;
 }
@@ -41,7 +45,7 @@ class FileVpzDynamics : public QWidget
 public:
     enum FVD_MENU { FVD_add_dynamic, FVD_rename_dynamic, FVD_remove_dynamic };
 public:
-    explicit FileVpzDynamics(QWidget *parent = 0);
+    explicit FileVpzDynamics(const utils::ContextPtr& ctx, QWidget* parent=0);
     ~FileVpzDynamics();
     void setVpm(vleVpm* vpm);
     void reload();
@@ -62,8 +66,10 @@ protected:
 
 
 private:
-    Ui::FileVpzDynamics *ui;
-    vleVpz  *mVpm;
+    Ui::FileVpzDynamics* ui;
+    vleVpz*              mVpm;
+    utils::ContextPtr    mCtx;
+
 };
 
 }}//namespaces
