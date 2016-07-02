@@ -7,7 +7,7 @@ Release highlights
 ### C++11/14
 
 All the source code and API move to the C++11/14. Compiler
-requirements are now gcc 4.8 or clang 3.5 available in Ubuntu LTS
+requirements are now gcc 4.9 or clang 3.5 available in Ubuntu LTS
 14.04 or Debian GNU/Linux Wheezy.
 
 Many boost functions or classes are replaced with standard functions
@@ -15,15 +15,39 @@ and classes.
 
 ### Remove dependencies:
 
-- The libarchive-dev is remove. We replace the libarchive dependency to
-  build/extract tarball with the cmake subprocess command (`cmake -E tar
-  [cxt][vf][zjJ] file.tar` command).
+- The libarchive-dev is remove. We replace the libarchive dependency
+  to build/extract tarball with the cmake sub-process command (`cmake
+  -E tar [cxt][vf][zjJ] file.tar` command).
 
-- `boost::random`, `boost::thread` removed.
+- All boost binary libraries are removed. `boost::random`,
+  `boost::thread`, `boost::filesystem`, `boost::system`,
+  `boost::date_time`, `boost::unittest_framework`.
+
+### Changes in public API
+
+- Less less and less.
+
+- No singleton nor static variables.
+
+- Only dependency with the standard C++ library.
+
+### 'System' binary packages
+
+The Git repository of VLE provides some very useful packages for VLE
+and GVLE (`vle.output`, `vle.aqss`, `gvle.simulation` etc.). These
+packages installed in the `$prefix/lib/vle-1.3/pkgs` (`$prefix` is the
+installation prefix of VLE. A read-only directory) simplify
+installation of VLE: VLE can be use without using the Github packages
+repository.
+
+Default, priority goes to `$VLEHOME/pkgs-1.3` instead of system
+packages `$prefix/lib/vle-1.3/pkgs`. So, if you want to develop
+another `vle.output` package, nothing change.
 
 ### Debug
 
-The Debug mode is now dynamical. In the VPZ, we can provides a
+The Debug mode is available at run-time (without the use of
+DECLARE\_DYNAMICS\_DBG macro). In the VPZ, we can provides a
 `debug="yes"` attribute to the `model` element to debug the atomic
 model. Before, we have to use the `DynamicsDbg.hpp` and replace the
 inheritance from `vle::devs::Dynamics` to `vle::devs:DynamicsDbg`.
@@ -36,8 +60,9 @@ In private implementation, the debug mode use the
 
 ### Observation
 
-The Observation mechanism use the same behaviour than debug mode. A class between
-`vle::devs::Simulator` and the users'r dynamics or debug model (of course).
+The Observation mechanism use the same behaviors than debug mode. A
+class between `vle::devs::Simulator` and the user's dynamics or debug
+model (of course).
 
 We adjust the VPZ to provide observation for output, internal,
 external, confluent and finish functions by updating the `type`
@@ -50,7 +75,7 @@ attribute in the `View` element of the VPZ. Type can be:
 - `confluent`: View::CONFLUENT;
 - `finish`: View::FINISH;
 
-### Model in executable:
+### Model in executable
 
 From now, ModelFactory and StreamWriter can load symbol into the main
 program instead of the shared libraries specified by the package
@@ -58,7 +83,7 @@ information. To use this feature, the package must be empty in the
 vpz::Dynamics or vpz::Output object. Then the library is used to
 define the symbol to load. For example:
 
-- `vpz::Dynamics { Package = "toto", Libbrary = "titi" }` loads the
+- `vpz::Dynamics { Package = "toto", Library = "titi" }` loads the
   shared library `$VLE_HOME/pkgs-1.x/toto/lib/simulator/libtiti.so`
   and try to found the `vle_make_dynamics` symbol.
 
