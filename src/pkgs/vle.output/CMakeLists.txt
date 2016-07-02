@@ -9,9 +9,9 @@ add_library(pkg_storage MODULE Storage.cpp)
 add_library(pkg_console MODULE Console)
 
 install(TARGETS pkg_dummy pkg_file pkg_storage pkg_console
-  RUNTIME DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output
-  LIBRARY DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output
-  ARCHIVE DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output)
+  RUNTIME DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output/plugins/output
+  LIBRARY DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output/plugins/output
+  ARCHIVE DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output/plugins/output)
 
 set_target_properties(pkg_dummy PROPERTIES
   OUTPUT_NAME dummy

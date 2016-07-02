@@ -1,7 +1,7 @@
-Changes from previous versions of vle.extension.difference-equation
-===================================================================
+# v1.3.0
 
-Initial version 0.1.0
----------------------
+- vle.output package is merged in VLE as system package.
+
+# v0.1.0
 
 - initial packaging.
