@@ -484,6 +484,13 @@ public:
     Path getLogFile() const;
 
     /**
+     * Return the \e $HOMEVLE/prefix-x.y.log file path.
+     *
+     * \return A complete path to access a specific log file.
+     */
+    Path getLogFile(const std::string& prefix) const;
+
+    /**
      * Get a file from the getHomeDir() directory.
      * @param name The filename to concat.
      */

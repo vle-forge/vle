@@ -139,6 +139,13 @@ Path Context::getLogFile() const
     return getHomeFile("vle-" VLE_ABI_VERSION ".log");
 }
 
+Path Context::getLogFile(const std::string& prefix) const
+{
+    std::string lf = prefix;
+    lf += "-" VLE_ABI_VERSION ".log";
+    return getHomeFile(lf);
+}
+
 std::vector<Path> Context::getBinaryPackagesDir() const
 {
     std::vector<Path> ret(2);
