@@ -213,14 +213,6 @@ void Coordinator::run()
     m_currentTime = m_eventTable.getCurrentTime();
 }
 
-void Coordinator::finish()
-{
-    std::for_each(m_modelList.begin(), m_modelList.end(),
-                  boost::bind(
-                      &Simulator::finish,
-                      boost::bind(&SimulatorMap::value_type::second, _1)));
-}
-
 void Coordinator::createModel(vpz::AtomicModel* model,
                               const std::string& dynamics,
                               const std::vector < std::string >& conditions,
@@ -521,13 +513,19 @@ void Coordinator::processConflictEvents(Bag::value_type& modelbag)
         m_eventTable.addInternal(modelbag, tn);
 }
 
-std::unique_ptr<value::Map> Coordinator::getMatrix() const
+std::unique_ptr<value::Map> Coordinator::finish()
 {
+    //delete models
+    std::for_each(m_modelList.begin(), m_modelList.end(),
+                  boost::bind(
+                      &Simulator::finish,
+                      boost::bind(&SimulatorMap::value_type::second, _1)));
+
+    //build result views
     std::unique_ptr<value::Map> result;
 
     for (const auto& elem : m_timedViewList) {
         auto matrix = elem.second.matrix();
-
         if (matrix) {
             if (not result)
                 result = std::unique_ptr<value::Map>(new value::Map());
@@ -538,11 +536,9 @@ std::unique_ptr<value::Map> Coordinator::getMatrix() const
 
     for (const auto& elem : m_eventViewList) {
         auto matrix = elem.second.matrix();
-
         if (matrix) {
             if (not result)
                 result = std::unique_ptr<value::Map>(new value::Map());
-
             result->add(elem.first, std::move(matrix));
         }
     }
@@ -550,7 +546,7 @@ std::unique_ptr<value::Map> Coordinator::getMatrix() const
     return result;
 }
 
-std::unique_ptr<value::Map> Coordinator::getCloneMatrix() const
+std::unique_ptr<value::Map> Coordinator::getMap() const
 {
     std::unique_ptr<value::Map> result;
 
@@ -561,7 +557,7 @@ std::unique_ptr<value::Map> Coordinator::getCloneMatrix() const
             if (not result)
                 result = std::unique_ptr<value::Map>(new value::Map());
 
-            result->add(elem.first, matrix->clone());
+            result->add(elem.first, std::move(matrix));
         }
     }
 
@@ -572,7 +568,7 @@ std::unique_ptr<value::Map> Coordinator::getCloneMatrix() const
             if (not result)
                 result = std::unique_ptr<value::Map>(new value::Map());
 
-            result->add(elem.first, matrix->clone());
+            result->add(elem.first, std::move(matrix));
         }
     }
 

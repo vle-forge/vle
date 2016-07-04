@@ -78,33 +78,25 @@ bool RootCoordinator::run()
 
     m_coordinator->run();
 
+
     return true;
 }
 
-void RootCoordinator::finish()
+std::unique_ptr<value::Map> RootCoordinator::finish()
 {
     if (m_coordinator) {
-        m_coordinator->finish();
+        return std::move(m_coordinator->finish());
 
-        m_result.reset(nullptr);
-        m_result = m_coordinator->getMatrix();
-
-        // delete m_coordinator;
-        // m_coordinator = nullptr;
     }
-
-    // if (m_root) {
-    //     delete m_root;
-    //     m_root = nullptr;
-    // }
+    return {};
 }
 
-std::unique_ptr<value::Map> RootCoordinator::outputs()
+std::unique_ptr<value::Map> RootCoordinator::outputs() const
 {
-    if (m_coordinator)
-        return m_coordinator->getCloneMatrix();
-
-    return std::move(m_result);
+    if (m_coordinator) {
+        return m_coordinator->getMap();
+    }
+    return {};
 }
 
 }} // namespace vle devs

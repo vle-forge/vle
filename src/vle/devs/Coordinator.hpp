@@ -85,12 +85,6 @@ public:
     void run();
 
     /**
-     * @brief Delete all devs::Simulator and all devs::View of this
-     * simulator.
-     */
-    void finish();
-
-    /**
      * @brief Build a new devs::Simulator from the dynamics library. Attach
      * to this model information of dynamics, condition and observable.
      * @param model the vpz::AtomicModel reference source of
@@ -247,26 +241,18 @@ public:
 
     /**
      * Retrieves for all Views the \c vle::value::Matrix result.
-     * The \c getMatrixFromView is a private implementation function.
      *
-     * @param views The \c vle::devs::ViewList to browse.
-     *
-     * @return NULL if the \c vle::devs::ViewList does not have storage
-     * plug-ins.
+     * @return NULL if the views do not have storage
+     * plug-ins. Or the map of matrices cloned into oov plugins
      */
-    std::unique_ptr<value::Map> getMatrix() const;
+    std::unique_ptr<value::Map> getMap() const;
 
     /**
-     * Retrieves for all Views the \c vle::value::Matrix result.
-     * The \c getMatrixFromView is a private implementation function.
+     * Called when the simulation finishes
      *
-     * @param views The \c vle::devs::ViewList to browse.
-     *
-     * @return NULL if the \c vle::devs::ViewList does not have storage
-     * plug-ins.
+     * @return the map of matrices built in oov storage
      */
-    std::unique_ptr<value::Map> getCloneMatrix() const;
-
+    std::unique_ptr<value::Map> finish();
 
     /**
      * Retrives access to all event (output, internal, external, ...) \e

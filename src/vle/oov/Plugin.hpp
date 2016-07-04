@@ -59,7 +59,7 @@ namespace vle { namespace oov {
 /**
  * \c vle::oov::Plugin permit to build output plug-ins.
  *
- * The vle::oov::Plugin is a class to develop output steam plugins.
+ * The vle::oov::Plugin is a class to develop output plugins.
  * For instance, an output stream text (for gnuplot or R) and cairo (for
  * building vectorial image or bitmap). This class define a plugin.
  * @code
@@ -82,8 +82,7 @@ public:
      * Default constructor of the Plugin.
      *
      * @param location this string represents the name of the default
-     * directory for a \c devs::LocalStreamWriter or a
-     * host:port:directory for a \c devs::DistantStreamWriter.
+     * directory
      */
     Plugin(const std::string& location)
         : m_location(location)
@@ -98,14 +97,12 @@ public:
     }
 
     /**
-     * Return a pointer to the \c value::Matrix.
+     * Return a clone of the \c value::Matrix.
      *
      * If the plug-in does not manage \c value::Matrix, this function
-     * returns NULL otherwise, this function return the \c
+     * returns NULL otherwise, this function return a clone of the \c
      * value::Matrix manager by the plug-in.
      *
-     * @attention You are in charge of freeing the value::Matrix after
-     * the end of the simulation.
      */
     virtual std::unique_ptr<value::Matrix> matrix() const
     {
@@ -181,8 +178,12 @@ public:
 
     /**
      * Call when the simulation is finished.
+     * Return a pointer to the Matrix built during simulation, or NULL.
      */
-    virtual void close(const double& time) = 0;
+    virtual std::unique_ptr<value::Matrix> finish(const double& /*time*/)
+    {
+        return {};
+    }
 
     ///
     ////

@@ -91,14 +91,15 @@ public:
     }
 
     /**
-     * @attention We do not remove the m_matrix attribute. The @c
-     * manager::Simulation can retrieve it from the @c
-     * devs::RootCoordinator. Users have in charge to freed the
-     * m_matrix.
+     * Return a clone of the current matrix
+     * The pointer is given in the finish function
      */
     virtual std::unique_ptr<value::Matrix> matrix() const override
     {
-        return std::unique_ptr<value::Matrix>(m_matrix);
+        if (m_matrix) {
+            return std::unique_ptr<value::Matrix>(new value::Matrix(*m_matrix));
+        }
+        return {};
     }
 
     virtual std::string name() const
@@ -140,13 +141,13 @@ public:
             parameters.reset();
         }
         if (m_headertype == STORAGE_HEADER_TOP) {
-            m_matrix = new value::Matrix(1, 1, rzcolumns, rzrows,
-                 rzcolumns, rzrows);
+            m_matrix.reset(new value::Matrix(1, 1, rzcolumns, rzrows,
+                 rzcolumns, rzrows));
             m_matrix->add(0, 0, std::unique_ptr<value::Value>(
                     new vle::value::String("time")));
         } else {
-            m_matrix = new value::Matrix(1, 0, rzcolumns, rzrows,
-                    rzcolumns, rzrows);
+            m_matrix.reset(new value::Matrix(1, 0, rzcolumns, rzrows,
+                    rzcolumns, rzrows));
 
         }
     }
@@ -196,17 +197,18 @@ public:
         }
     }
 
-    virtual void close(const double& /*time*/) override
+    virtual std::unique_ptr<value::Matrix>
+    finish(const double& /*time*/) override
     {
+        return std::move(m_matrix);
     }
 
 private:
-    value::Matrix*     m_matrix;//TODO the interface Plugin::matrix is const
-                                //should it be non const to use unique_ptr ?
-    MapPairIndex       m_colAccess;
-    double             m_time;
-    bool               m_isstart;
-    StorageHeaderType  m_headertype;
+    std::unique_ptr<value::Matrix>  m_matrix;
+    MapPairIndex                    m_colAccess;
+    double                          m_time;
+    bool                            m_isstart;
+    StorageHeaderType               m_headertype;
 
     inline void nextTime(double trame_time)
     {

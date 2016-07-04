@@ -113,11 +113,6 @@ void StreamWriter::process(const std::string& name,
     plugin()->onValue(name, parent, portname, view, time, std::move(val));
 }
 
-void StreamWriter::close(const devs::Time& time)
-{
-    plugin()->close(time);
-}
-
 std::unique_ptr<value::Matrix> StreamWriter::matrix() const
 {
     if (m_plugin)

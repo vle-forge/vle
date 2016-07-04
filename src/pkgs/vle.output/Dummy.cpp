@@ -74,8 +74,5 @@ void Dummy::onValue(const std::string& /*simulator*/,
     value.reset(nullptr);
 }
 
-void Dummy::close(const double& /*time*/)
-{
-}
 
 }}} // namespace vle oov plugin

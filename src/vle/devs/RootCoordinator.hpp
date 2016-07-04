@@ -92,7 +92,7 @@ public:
      * @brief Call the coordinator finish function and delete the
      * coordinator and all attached data.
      */
-    void finish();
+    std::unique_ptr<value::Map>  finish();
 
     /**
      * @brief Return the current time of the simulation.
@@ -110,7 +110,7 @@ public:
      *
      * @return Return a pointer to the data of the list of plug-ins.
      */
-    std::unique_ptr<value::Map> outputs();
+    std::unique_ptr<value::Map> outputs() const;
 
     /**
      * @brief Return a reference to the random generator.
@@ -133,9 +133,6 @@ private:
 
     /** @brief Store the end date of the simulation. */
     devs::Time          m_end;
-
-    /** @brief Stores the results of the simulation. */
-    std::unique_ptr<value::Map> m_result;
 
     std::unique_ptr<Coordinator> m_coordinator;
     std::unique_ptr<vpz::BaseModel> m_root;

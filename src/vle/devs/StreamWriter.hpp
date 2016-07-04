@@ -94,14 +94,6 @@ public:
                  std::unique_ptr<value::Value> value);
 
     /**
-     * Close the output stream.
-     *
-     * @return A reference to the oov::Plugin if the plugin is
-     * serializable.
-     */
-    void close(const devs::Time& time);
-
-    /**
      * Return a pointer to the \c value::Matrix.
      *
      * If the plug-in does not manage \c value::Matrix, this function

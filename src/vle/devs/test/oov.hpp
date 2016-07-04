@@ -174,10 +174,6 @@ public:
 
         ppD[id].emplace_back(time, std::move(value));
     }
-
-    virtual void close(const double& /* time */) override
-    {
-    }
 };
 
 } // namespace vletest

@@ -323,11 +323,6 @@ public:
 
     virtual ~OutputPluginSimple() = default;
 
-    virtual std::unique_ptr<value::Matrix> matrix() const override
-    {
-        return {};
-    }
-
     virtual std::string name() const override
     {
         return "OutputPlugin";
@@ -379,7 +374,8 @@ public:
         data.number++;
     }
 
-    virtual void close(const double& /* time */) override
+    virtual std::unique_ptr<value::Matrix> finish(
+            const double& /* time */) override
     {
         auto it = pp_D.find("depth0.atom.port");
         BOOST_REQUIRE(it != pp_D.cend());
@@ -401,6 +397,7 @@ public:
         BOOST_REQUIRE(it->second.value);
         BOOST_REQUIRE(it->second.value->isInteger());
         BOOST_REQUIRE(it->second.value->toInteger().value() == 3);
+        return {};
     }
 };
 

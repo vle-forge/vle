@@ -111,10 +111,8 @@ public:
             display += 100 - previous;
 
             write(_(" - Coordinator cleaning .........: "));
-            root.finish();
+            result = root.finish();
             write(_("ok\n"));
-
-            result = root.outputs();
 
             write(fmt(_(" - Time spent in kernel .........: %1% s"))
                   % timer.elapsed());
@@ -162,10 +160,8 @@ public:
             write(_("ok\n"));
 
             write(_(" - Coordinator cleaning .........: "));
-            root.finish();
+            result = root.finish();
             write(_("ok\n"));
-
-            result = root.outputs();
 
             write(fmt(_(" - Time spent in kernel .........: %1% s"))
                   % timer.elapsed());
@@ -189,16 +185,16 @@ public:
 
         try {
             devs::RootCoordinator root(m_context);
+
             root.load(*vpz);
             vpz->clear();
             vpz.reset(nullptr);
 
             root.init();
             while (root.run()) {}
-            root.finish();
+            result = root.finish();
 
             error->code    = 0;
-            result         = root.outputs();
         } catch(const std::exception& e) {
             error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%"))
                               % utils::demangle(typeid(e))

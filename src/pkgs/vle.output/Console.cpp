@@ -202,7 +202,7 @@ public:
         mTime = time;
     }
 
-    void close(const double& time) override
+    std::unique_ptr<value::Matrix> finish(const double& time) override
     {
         finalFlush(time);
 
@@ -232,6 +232,7 @@ public:
 
             std::cout << "\n";
         }
+        return {};
     }
 
     void flush()

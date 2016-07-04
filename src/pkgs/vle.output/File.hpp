@@ -106,7 +106,7 @@ public:
                          const double& time,
                          std::unique_ptr<value::Value> value) override;
 
-    virtual void close(const double& time) override;
+    virtual std::unique_ptr<value::Matrix> finish(const double& time) override;
 
     class FileType
     {

@@ -37,9 +37,6 @@ void View::open(const std::string& name, std::unique_ptr<StreamWriter> stream)
 {
     m_name = name;
 
-    if (m_stream)
-        m_stream->close(devs::infinity);
-
     m_stream = std::move(stream);
 }
 

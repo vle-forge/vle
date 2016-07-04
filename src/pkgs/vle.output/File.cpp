@@ -232,8 +232,9 @@ void File::onValue(const std::string& simulator,
     m_time = time;
 }
 
-void File::close(const double& time)
+std::unique_ptr<value::Matrix> File::finish(const double& time)
 {
+    //build the final file
     finalFlush(time);
     std::vector < std::string > array(m_columns.size());
 
@@ -251,6 +252,8 @@ void File::close(const double& time)
                 std::cerr, array);
     }
     std::remove(m_filenametmp.c_str());
+
+    return {};
 }
 
 void File::flush()

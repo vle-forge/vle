@@ -65,8 +65,6 @@ public:
                          const double& time,
                          std::unique_ptr<value::Value> value) override;
 
-    virtual void close(const double& time) override;
-
 };
 
 }}} // namespace vle oov plugin
