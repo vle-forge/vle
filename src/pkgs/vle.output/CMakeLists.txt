@@ -31,3 +31,7 @@ set_target_properties(pkg_console PROPERTIES
 
 install(FILES Authors.txt Description.txt License.txt News.txt Readme.txt
   DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output)
+
+if (${VLE_HAVE_GVLE})
+  add_subdirectory(gvle)
+endif()
