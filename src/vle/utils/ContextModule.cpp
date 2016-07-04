@@ -739,13 +739,14 @@ Context::get_dynamic_libraries(const std::string& package,
             Path modules = elem;
             modules /= "plugins";
             modules /= "simulator";
+            if (modules.is_directory()) {
+                for (DirectoryIterator it(modules), end; it != end; ++it) {
+                    if (not it->is_file())
+                        continue;
 
-            for (DirectoryIterator it(modules), end; it != end; ++it) {
-                if (not it->is_file())
-                    continue;
-
-                ret.push_back({package, getLibraryName(it->path()),
-                            it->path(), ModuleType::MODULE_DYNAMICS});
+                    ret.push_back({package, getLibraryName(it->path()),
+                        it->path(), ModuleType::MODULE_DYNAMICS});
+                }
             }
         }
 
@@ -753,13 +754,14 @@ Context::get_dynamic_libraries(const std::string& package,
             Path modules = elem;
             modules /= "plugins";
             modules /= "output";
+            if (modules.is_directory()) {
+                for (DirectoryIterator it(modules), end; it != end; ++it) {
+                    if (not it->is_file())
+                        continue;
 
-            for (DirectoryIterator it(modules), end; it != end; ++it) {
-                if (not it->is_file())
-                    continue;
-
-                ret.push_back({package, getLibraryName(it->path()),
-                            it->path(), ModuleType::MODULE_OOV});
+                    ret.push_back({package, getLibraryName(it->path()),
+                        it->path(), ModuleType::MODULE_OOV});
+                }
             }
         }
 
