@@ -227,7 +227,7 @@ public:
     };
 
 
-    value_stack         mValueStack;
+    value_stack mValueStack;
     QWidget* stack_buttons;
     QTableWidget* table;
     QWidget* resize_place;
@@ -235,8 +235,12 @@ public:
     VleSpinBox* resize_col;
     VlePushButton* resize;
     QString mId;
+    bool mLimited;
 
-    explicit VleValueWidget( QWidget *parent = 0);
+    /*
+     * @brief limited provide a limited mode
+     */
+    explicit VleValueWidget(QWidget *parent = 0, bool limited = false);
     ~VleValueWidget();
     void showCurrentValueDetail();
     void setId(const QString& id);

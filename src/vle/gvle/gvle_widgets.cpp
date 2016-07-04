@@ -544,10 +544,10 @@ VleValueWidget::value_stack::toString()
     return res;
 }
 
-
-VleValueWidget::VleValueWidget(QWidget *parent):
+VleValueWidget::VleValueWidget(QWidget *parent, bool limited):
     QWidget(parent),  mValueStack(), stack_buttons(0), table(0),
-    resize_place(0), resize_row(0), resize_col(0), resize(0), mId("")
+    resize_place(0), resize_row(0), resize_col(0), resize(0), mId(""),
+    mLimited(limited)
 {
     setObjectName("VleValueWidget");
     setLayout(new QVBoxLayout());
@@ -560,9 +560,13 @@ VleValueWidget::VleValueWidget(QWidget *parent):
     stack_buttons->layout()->addWidget(root);
     stack_buttons->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     layout()->addWidget(stack_buttons);
+
     //views
     table = new QTableWidget();
-    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    if (not mLimited) {
+        table->setContextMenuPolicy(Qt::CustomContextMenu);
+    }
+
     table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout()->addWidget(table);
     //resize place
@@ -582,16 +586,21 @@ VleValueWidget::VleValueWidget(QWidget *parent):
     QObject::connect(table,
                     SIGNAL(cellDoubleClicked(int, int)),
                     this, SLOT(setDoubleClicked(int, int)));
+
     QObject::connect(table,
-            SIGNAL(customContextMenuRequested(const QPoint&)),
-            this, SLOT(onMenuSetView(const QPoint&)));
+                     SIGNAL(customContextMenuRequested(const QPoint&)),
+                     this, SLOT(onMenuSetView(const QPoint&)));
     QObject::connect(resize,
-                    SIGNAL(clicked(bool)),
-                    this, SLOT(onResize(bool)));
+                     SIGNAL(clicked(bool)),
+                     this, SLOT(onResize(bool)));
 
+    if (mLimited) {
+        stack_buttons->setEnabled(false);
 
-
-
+        resize_row->setEnabled(false);
+        resize_col->setEnabled(false);
+        resize->setEnabled(false);
+    }
 }
 
 VleValueWidget::~VleValueWidget()
@@ -801,6 +810,14 @@ VleValueWidget::showCurrentValueDetail()
     resize_col->setEnabled((editType == vle::value::Value::TABLE) or
             (editType == vle::value::Value::MATRIX));
     resize->setEnabled(resize_row->isEnabled());
+    if (mLimited) {
+        stack_buttons->setEnabled(false);
+
+        resize_row->setEnabled(false);
+        resize_col->setEnabled(false);
+        resize->setEnabled(false);
+    }
+
 }
 
 
