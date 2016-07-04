@@ -1,9 +1,9 @@
 add_subdirectory(details)
 
 add_sources(vlelib Context.cpp ContextModule.cpp ContextSettings.cpp
-  DateTime.cpp DownloadManager.cpp Filesystem.cpp Package.cpp
-  PackageTable.cpp Parser.cpp Rand.cpp RemoteManager.cpp Template.cpp
-  Tools.cpp)
+  DateTime.cpp DownloadManager.cpp Exception.cpp Filesystem.cpp
+  Package.cpp PackageTable.cpp Parser.cpp Rand.cpp RemoteManager.cpp
+  Template.cpp Tools.cpp)
 
 install(FILES Algo.hpp Context.hpp DateTime.hpp Deprecated.hpp
   DownloadManager.hpp Exception.hpp Filesystem.hpp Package.hpp

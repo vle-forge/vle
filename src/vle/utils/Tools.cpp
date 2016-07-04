@@ -32,6 +32,7 @@
 #include <vle/version.hpp>
 #include <iomanip>
 #include <sstream>
+#include <cstdarg>
 
 #ifdef _WIN32
 #include <io.h>
@@ -55,6 +56,35 @@
 
 namespace vle { namespace utils {
 
+std::string format(const char *fmt, ...) noexcept
+{
+    try {
+        int n;
+        int size = 256;
+        std::string ret(size, '\0');
+
+        for (;;) {
+            va_list ap;
+            va_start(ap, fmt);
+            n = vsnprintf(&ret[0], size, fmt, ap);
+            va_end(ap);
+
+            if (n < 0)
+                return {};
+
+            if (n < size) {
+                ret.erase(n, std::string::npos);
+                return ret;
+            }
+
+            size = n + 1;
+            ret.resize(size);
+        }
+    } catch (const std::bad_alloc& e) {
+        return {};
+    }
+}
+
 template < typename T >
     bool is(const std::string& str)
     {
@@ -73,7 +103,7 @@ template <>
 
         if (str == "false")
             return false;
-        
+
         std::stringstream s(str);
         bool b;
         s >> b;
