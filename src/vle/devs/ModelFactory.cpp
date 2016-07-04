@@ -426,7 +426,7 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
     case utils::Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
         return buildNewDynamicsWrapper(mContext, atom, dyn, events, symbol);
     default:
-        throw utils::ModellingError();
+        throw utils::InternalError("Missing type");
     }
 }
 

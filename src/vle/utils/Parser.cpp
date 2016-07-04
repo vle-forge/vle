@@ -97,27 +97,26 @@ std::string Parser::readKeyword()
         }
     } while (mStream);
 
-    if (not mStream) {
-        throw utils::InternalError();
-    } else {
-        std::string result;
+    if (not mStream)
+        throw utils::ParseError(_("End of file"));
 
-        do {
-            char c = get();
+    std::string result;
 
-            if (isspace(c)) {
-                unget();
-                break;
-            } else if (c == '#') {
-                forgetLine();
-                break;
-            } else {
-                result += c;
-            }
-        } while (mStream);
+    do {
+        char c = get();
 
-        return result;
-    }
+        if (isspace(c)) {
+            unget();
+            break;
+        } else if (c == '#') {
+            forgetLine();
+            break;
+        } else {
+            result += c;
+        }
+    } while (mStream);
+
+    return result;
 }
 
 std::string Parser::readString()
@@ -136,24 +135,23 @@ std::string Parser::readString()
         }
     } while (mStream);
 
-    if (not mStream) {
-        throw utils::InternalError();
-    } else {
-        std::string result;
+    if (not mStream)
+        throw utils::ParseError(_("End of file"));
 
-        do {
-            char c = get();
+    std::string result;
 
-            if (isalnum(c)) {
-                result += c;
-            } else {
-                unget();
-                return result;
-            }
-        } while (mStream);
+    do {
+        char c = get();
 
-        return result;
-    }
+        if (isalnum(c)) {
+            result += c;
+        } else {
+            unget();
+            return result;
+        }
+    } while (mStream);
+
+    return result;
 }
 
 double Parser::readReal()
@@ -172,36 +170,36 @@ double Parser::readReal()
         }
     } while (mStream);
 
-    if (not mStream) {
-        throw utils::InternalError();
-    } else {
-        std::string result;
+    if (not mStream)
+        throw utils::ParseError(_("End of file"));
 
-        do {
-            char c = get();
+    std::string result;
 
-            if (isspace(c)) {
-                unget();
-                break;
-            } else if (c == '#') {
-                forgetLine();
-                break;
-            } else if (isdigit(c)) {
-                result += c;
-            } else if (c == '.') {
-                if (result.find(".") != std::string::npos){
-                    throw utils::ParseError(
-                        (fmt(_("Multiple '.' while parsing real `%1%.' ")) % result).str());
-                }
-                result += c;
-            } else {
-                unget();
-                break;
-            }
-        } while (mStream);
+    do {
+        char c = get();
 
-        return boost::lexical_cast < double >(result);
-    }
+        if (isspace(c)) {
+            unget();
+            break;
+        } else if (c == '#') {
+            forgetLine();
+            break;
+        } else if (isdigit(c)) {
+            result += c;
+        } else if (c == '.') {
+            if (result.find(".") != std::string::npos)
+                throw utils::ParseError(
+                    _("Multiple '.' while parsing real `%s'"),
+                    result.c_str());
+
+            result += c;
+        } else {
+            unget();
+            break;
+        }
+    } while (mStream);
+
+    return boost::lexical_cast<double>(result);
 }
 
 double Parser::readRelativeReal()
@@ -226,7 +224,7 @@ std::string Parser::readQuotedString()
         }
     } while (mStream);
 
-    throw utils::InternalError();
+    throw utils::ParseError(_("End of file"));
 }
 
 void Parser::readChar(char r)
@@ -242,11 +240,11 @@ void Parser::readChar(char r)
         } else if (c == r) {
             return;
         } else {
-            throw utils::InternalError();
+            throw utils::ParseError(_("End of file"));
         }
     } while (mStream);
 
-    throw utils::InternalError();
+    throw utils::ParseError(_("End of file"));
 }
 
 Parser::Token Parser::nextToken()
@@ -334,12 +332,12 @@ void Parser::readBlock(Block& block)
                     block.addString(str, readString());
                 }
             } else {
-                throw utils::InternalError();
+                throw utils::ParseError(_("End of file"));
             }
             readSemicolon();
             break;
         default:
-            throw utils::InternalError("bad file");
+            throw utils::ParseError(_("End of file"));
         };
     } while (nextToken() != Parser::End and mStream);
 }

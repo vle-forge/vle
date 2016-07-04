@@ -28,134 +28,158 @@
 #ifndef VLE_UTILS_EXCEPTION_HPP
 #define VLE_UTILS_EXCEPTION_HPP
 
-#include <exception>
+#include <vle/DllDefines.hpp>
 #include <stdexcept>
 #include <string>
-#include <vle/DllDefines.hpp>
+
+#if defined(__GNUC__)
+#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                   \
+    __attribute__((format(printf, (idformat), (idarg))))
+#else
+#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)
+#endif
 
 namespace vle { namespace utils {
-
-/**
- * @brief Base class to manage exception in VLE application.
- *
- */
-class VLE_API BaseError : public std::runtime_error
-{
-public:
-    explicit BaseError(const std::string& argv = std::string())
-        : std::runtime_error(argv)
-    {}
-};
 
 /**
  * @brief Throw to report a bad file access (read, write, open).
  *
  */
-class VLE_API FileError : public BaseError
+class VLE_API FileError : public std::runtime_error
 {
+    std::string m_message;
+
 public:
-    explicit FileError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    FileError(std::string message);
+
+    FileError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 /**
  * @brief Throw to report a bad XML file parsing.
  *
  */
-class VLE_API ParseError : public BaseError
+class VLE_API ParseError : public std::runtime_error
 {
+    std::string m_message;
+
 public:
-    explicit ParseError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    ParseError(std::string message);
+
+    ParseError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 /**
  * @brief Throw to report a bad parameter.
  *
  */
-class VLE_API ArgError : public BaseError
+class VLE_API ArgError : public std::logic_error
 {
+    std::string m_message;
+
 public:
-    explicit ArgError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    ArgError(std::string message);
+
+    ArgError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 /**
  * @brief Throw to report a bad parameter.
  *
  */
-class VLE_API CastError : public BaseError
+class VLE_API CastError : public std::runtime_error
 {
+    std::string m_message;
+
 public:
-    explicit CastError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    CastError(std::string message);
+
+    CastError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 /**
  * @brief Throw to report an internal error.
  *
  */
-class VLE_API InternalError : public BaseError
+class VLE_API InternalError : public std::logic_error
 {
+    std::string m_message;
+
 public:
-    explicit InternalError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    InternalError(std::string message);
+
+    InternalError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 /**
  * @brief Throw to report an modelling error.
  */
-class VLE_API ModellingError : public BaseError
+class VLE_API ModellingError : public std::runtime_error
 {
+    std::string m_message;
+
 public:
-    explicit ModellingError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    ModellingError(std::string message);
+
+    ModellingError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
+
 
 /**
  * @brief Throw to report an unimplemted feature.
  */
-class VLE_API NotYetImplemented : public BaseError
+class VLE_API NotYetImplemented : public std::logic_error
 {
+    std::string m_message;
+
 public:
-    explicit NotYetImplemented(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    NotYetImplemented(std::string message);
+
+    NotYetImplemented(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 /**
  * @brief Throw to report a DEVS graph library error.
  */
-class VLE_API DevsGraphError : public BaseError
+class VLE_API DevsGraphError : public std::runtime_error
 {
-public:
-    explicit DevsGraphError(const std::string& argv = std::string())
-        : BaseError(argv) {}
-};
+    std::string m_message;
 
-class VLE_API VpzError : public BaseError
-{
 public:
-    explicit VpzError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    DevsGraphError(std::string message);
+
+    DevsGraphError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 /**
  * @brief Throw to report an error in SaxParser.
  */
-class VLE_API SaxParserError : public BaseError
+class VLE_API SaxParserError : public std::runtime_error
 {
+    std::string m_message;
+
 public:
-    explicit SaxParserError(const std::string& argv = std::string())
-        : BaseError(argv)
-    {}
+    SaxParserError(std::string message);
+
+    SaxParserError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+
+    virtual const char* what() const noexcept;
 };
 
 }} // namespace vle utils

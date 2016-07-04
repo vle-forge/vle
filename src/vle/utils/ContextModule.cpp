@@ -169,7 +169,7 @@ struct Module
                                " vle_make_new_oov not found)")) % mPath.string()).str());
                 break;
             default:
-                throw utils::InternalError();
+                throw utils::InternalError(_("Missing type"));
             }
         }
 
@@ -444,7 +444,7 @@ struct ModuleManager
             break;
         }
 
-        throw utils::InternalError();
+        throw utils::InternalError(_("Missing type"));
     }
 
     void *getSymbol(const std::string& symbol)
@@ -502,7 +502,7 @@ struct ModuleManager
                 current /= "output";
                 break;
             default:
-                throw utils::InternalError();
+                throw utils::InternalError(_("Missing type"));
             }
 
 #if defined(_WIN32)

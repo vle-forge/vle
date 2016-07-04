@@ -418,10 +418,8 @@ void SaxParser::onNull(const xmlChar**)
 
 void SaxParser::onVLEProject(const xmlChar** att)
 {
-    if (m_isValue) {
-        throw utils::SaxParserError();
-    }
-
+    assert(not m_isValue);
+    
     m_isVPZ = true;
     m_vpzstack.pushVpz(att);
 }

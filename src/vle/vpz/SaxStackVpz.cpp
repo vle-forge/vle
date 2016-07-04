@@ -255,7 +255,7 @@ void SaxStackVpz::buildModelGraphics(vpz::BaseModel* mdl,
 void SaxStackVpz::pushPort(const xmlChar** att)
 {
     if (m_stack.empty()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     if (parent()->isCondition()) {
@@ -264,13 +264,13 @@ void SaxStackVpz::pushPort(const xmlChar** att)
         pushObservablePort(att);
     } else {
         if (not (parent()->isIn() or parent()->isOut())) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
 
         vpz::Base* type = pop();
 
         if (not parent()->isModel()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
 
         vpz::Model* mdl = static_cast < vpz::Model* >(parent());
@@ -299,7 +299,7 @@ void SaxStackVpz::pushPort(const xmlChar** att)
 void SaxStackVpz::pushPortType(const char* att)
 {
     if (m_stack.empty() or not parent()->isModel()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     vpz::Base* prt = nullptr;
@@ -322,7 +322,7 @@ void SaxStackVpz::pushPortType(const char* att)
 void SaxStackVpz::pushSubModels()
 {
     if (m_stack.empty() or not parent()->isModel()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     auto  sub = new vpz::Submodels();
@@ -332,7 +332,7 @@ void SaxStackVpz::pushSubModels()
 void SaxStackVpz::pushConnections()
 {
     if (m_stack.empty() or not parent()->isModel()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     auto  cnts = new vpz::Connections();
@@ -342,7 +342,7 @@ void SaxStackVpz::pushConnections()
 void SaxStackVpz::pushConnection(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isConnections()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* type = nullptr;
@@ -377,7 +377,7 @@ void SaxStackVpz::pushOrigin(const xmlChar** att)
     if (m_stack.empty() or (not parent()->isInternalConnection()
         and not parent()->isInputConnection()
         and not parent()->isOutputConnection())) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* model = nullptr;
@@ -403,7 +403,7 @@ void SaxStackVpz::pushOrigin(const xmlChar** att)
 void SaxStackVpz::pushDestination(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isOrigin()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* model = nullptr;
@@ -429,17 +429,17 @@ void SaxStackVpz::pushDestination(const xmlChar** att)
 void SaxStackVpz::buildConnection()
 {
     if (m_stack.empty()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     if (not parent()->isDestination()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     vpz::Destination* dest = static_cast < vpz::Destination* >(pop());
 
     if (not parent()->isOrigin()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     vpz::Origin* orig = static_cast < vpz::Origin* >(pop());
@@ -447,18 +447,18 @@ void SaxStackVpz::buildConnection()
     if (not (parent()->isInternalConnection() or
              parent()->isInputConnection() or
              parent()->isOutputConnection())) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     vpz::Base* cnt = pop();
 
     if (not parent()->isConnections()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
     vpz::Base* cntx = pop();
 
     if (not parent()->isModel()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
     vpz::Model* model = static_cast < vpz::Model* >(parent());
 
@@ -483,7 +483,7 @@ void SaxStackVpz::buildConnection()
 void SaxStackVpz::pushDynamics()
 {
     if (m_stack.empty() or not parent()->isVpz()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     push(&m_vpz.project().dynamics());
@@ -492,7 +492,7 @@ void SaxStackVpz::pushDynamics()
 void SaxStackVpz::pushDynamic(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isDynamics()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -539,7 +539,7 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
 void SaxStackVpz::pushExperiment(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isVpz()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
 
@@ -568,7 +568,7 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
 void SaxStackVpz::pushConditions()
 {
     if (m_stack.empty() or not parent()->isExperiment()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     push(&m_vpz.project().experiment().conditions());
@@ -577,7 +577,7 @@ void SaxStackVpz::pushConditions()
 void SaxStackVpz::pushCondition(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isConditions()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     vpz::Conditions& cnds(m_vpz.project().experiment().conditions());
@@ -603,7 +603,7 @@ void SaxStackVpz::pushCondition(const xmlChar** att)
 void SaxStackVpz::pushConditionPort(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isCondition()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -626,7 +626,7 @@ void SaxStackVpz::pushConditionPort(const xmlChar** att)
 value::Set& SaxStackVpz::popConditionPort()
 {
     if (m_stack.empty() or not parent()->isCondition()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     vpz::Condition* cnd(static_cast < vpz::Condition* >(parent()));
@@ -638,7 +638,7 @@ value::Set& SaxStackVpz::popConditionPort()
 void SaxStackVpz::pushViews()
 {
     if (m_stack.empty() or not parent()->isExperiment()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     push(&m_vpz.project().experiment().views());
@@ -647,7 +647,7 @@ void SaxStackVpz::pushViews()
 void SaxStackVpz::pushOutputs()
 {
     if (m_stack.empty() or not parent()->isViews()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     push(&m_vpz.project().experiment().views().outputs());
@@ -656,7 +656,7 @@ void SaxStackVpz::pushOutputs()
 void SaxStackVpz::popOutput()
 {
     if (m_stack.empty() or not parent()->isOutput()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     pop();
@@ -665,7 +665,7 @@ void SaxStackVpz::popOutput()
 void SaxStackVpz::pushOutput(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isOutputs()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -713,7 +713,7 @@ void SaxStackVpz::pushOutput(const xmlChar** att)
 void SaxStackVpz::pushView(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isViews()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -785,7 +785,7 @@ void SaxStackVpz::pushView(const xmlChar** att)
 void SaxStackVpz::pushAttachedView(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isObservablePort()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     pushObservablePortOnView(att);
@@ -794,7 +794,7 @@ void SaxStackVpz::pushAttachedView(const xmlChar** att)
 void SaxStackVpz::pushObservables()
 {
     if (m_stack.empty() or not parent()->isViews()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     Observables& obs(m_vpz.project().experiment().views().observables());
@@ -804,7 +804,7 @@ void SaxStackVpz::pushObservables()
 void SaxStackVpz::pushObservable(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isObservables()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -828,7 +828,7 @@ void SaxStackVpz::pushObservable(const xmlChar** att)
 void SaxStackVpz::pushObservablePort(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isObservable()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -852,7 +852,7 @@ void SaxStackVpz::pushObservablePort(const xmlChar** att)
 void SaxStackVpz::pushObservablePortOnView(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isObservablePort()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -875,7 +875,7 @@ void SaxStackVpz::pushObservablePortOnView(const xmlChar** att)
 void SaxStackVpz::pushClasses()
 {
     if (m_stack.empty() or not parent()->isVpz()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     push(&m_vpz.project().classes());
@@ -884,7 +884,7 @@ void SaxStackVpz::pushClasses()
 void SaxStackVpz::pushClass(const xmlChar** att)
 {
     if (m_stack.empty() or not parent()->isClasses()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     const xmlChar* name = nullptr;
@@ -907,7 +907,7 @@ void SaxStackVpz::pushClass(const xmlChar** att)
 void SaxStackVpz::popClasses()
 {
     if (m_stack.empty() or not parent()->isClasses()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     pop();
@@ -916,7 +916,7 @@ void SaxStackVpz::popClasses()
 void SaxStackVpz::popClass()
 {
     if (m_stack.empty() or not parent()->isClass()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     pop();
@@ -932,7 +932,7 @@ vpz::Base* SaxStackVpz::pop()
 const vpz::Base* SaxStackVpz::top() const
 {
     if (m_stack.empty()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     return parent();
@@ -941,7 +941,7 @@ const vpz::Base* SaxStackVpz::top() const
 vpz::Base* SaxStackVpz::top()
 {
     if (m_stack.empty()) {
-        throw utils::SaxParserError();
+        throw utils::SaxParserError(_("Bad file format"));
     }
 
     return parent();

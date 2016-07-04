@@ -83,7 +83,7 @@ void Vpz::parseFile(const std::string& filename)
             throw utils::SaxParserError(
                 (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
         }
-        throw utils::SaxParserError(sax.what());
+        throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
     }
     Condition& cond_sim = project().experiment().conditions().get(
             Experiment::defaultSimulationEngineCondName());
@@ -108,7 +108,7 @@ void Vpz::parseMemory(const std::string& buffer)
             throw utils::SaxParserError(
                 (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
         }
-        throw utils::SaxParserError(sax.what());
+        throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
     }
     Condition& cond_sim = project().experiment().conditions().get(
                 Experiment::defaultSimulationEngineCondName());
@@ -250,11 +250,12 @@ void Vpz::validateMemory(const std::string& buffer)
         throw utils::SaxParserError(_("Failed to allocate parser context\n"));
     }
 
-    doc = xmlCtxtReadMemory(ctxt, buffer.c_str(), buffer.size(), nullptr, nullptr,
+    doc = xmlCtxtReadMemory(ctxt, buffer.c_str(), buffer.size(),
+                            nullptr, nullptr,
                             XML_PARSE_DTDVALID);
     if (not doc) {
         xmlFreeParserCtxt(ctxt);
-        throw utils::SaxParserError(_("Failed to parse memory '%1%'"));
+        throw utils::SaxParserError(_("Failed to parse memory"));
     }
 
     if (ctxt->valid == 0) {

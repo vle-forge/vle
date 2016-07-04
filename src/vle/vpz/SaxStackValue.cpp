@@ -49,7 +49,7 @@ void ValueStackSax::pushInteger()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 }
@@ -58,7 +58,7 @@ void ValueStackSax::pushBoolean()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 }
@@ -67,7 +67,7 @@ void ValueStackSax::pushString()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 }
@@ -76,7 +76,7 @@ void ValueStackSax::pushDouble()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 }
@@ -85,7 +85,7 @@ void ValueStackSax::pushMap()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 
@@ -96,7 +96,7 @@ void ValueStackSax::pushMapKey(const std::string& key)
 {
     if (not m_valuestack.empty()) {
         if (not m_valuestack.top()->isMap()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 
@@ -107,7 +107,7 @@ void ValueStackSax::pushSet()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 
@@ -123,7 +123,7 @@ void ValueStackSax::pushMatrix(value::Matrix::index col,
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 
@@ -135,7 +135,7 @@ void ValueStackSax::pushTuple()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 
@@ -146,7 +146,7 @@ void ValueStackSax::pushTable(const size_t width, const size_t height)
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 
@@ -157,7 +157,7 @@ void ValueStackSax::pushXml()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 }
@@ -166,7 +166,7 @@ void ValueStackSax::pushNull()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
-            throw utils::SaxParserError();
+            throw utils::SaxParserError(_("Bad file format"));
         }
     }
 }

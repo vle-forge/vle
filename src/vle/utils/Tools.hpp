@@ -32,7 +32,31 @@
 #include <typeinfo>
 #include <string>
 
+#if defined(__GNUC__)
+#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                   \
+    __attribute__((format(printf, (idformat), (idarg))))
+#else
+#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)
+#endif
+
 namespace vle { namespace utils {
+
+/**
+ * The function \c format() produce a \c std::string according to a C
+ * printf format as described in standard \c printf() function.
+ *
+ * \code
+ * std::string A = vle::utils::format("%d is good!", 1);
+ * std::string B = vle::utils::format("%s %s!", "hello", "world");
+ * \endcode
+ *
+ * \param format The format to convert.
+ *
+ * \return a empty string if an error occured otherwise the \e printf()
+ * formatted string.
+ */
+std::string VLE_API
+format(const char *format, ...) noexcept GCC_ATTRIBUTE_FORMAT(1, 2);
 
     /**
      * Return true if the string \c str can be translated the template type \c T.

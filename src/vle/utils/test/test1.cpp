@@ -85,6 +85,35 @@ struct append_string
     { str.append(x); }
 };
 
+BOOST_AUTO_TEST_CASE(test_format)
+{
+    std::string A = vle::utils::format("%d is good!", 1);
+    std::string B = vle::utils::format("%d is good!", 1);
+
+    BOOST_REQUIRE_EQUAL(A, B);
+
+    std::string C { "1 is good!" };
+    BOOST_REQUIRE_EQUAL(A, C);
+
+    A[0] = 2;
+
+    BOOST_REQUIRE(A != B);
+
+    std::string Big = vle::utils::format("%s %s %s %s %s %s %s %s %s %s\n",
+                                         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                         "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                                         "cccccccccccccccccccccccccccccc",
+                                         "dddddddddddddddddddddddddddddd",
+                                         "eeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                                         "ffffffffffffffffffffffffffffff",
+                                         "gggggggggggggggggggggggggggggg",
+                                         "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+                                         "iiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
+                                         "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
+
+    BOOST_REQUIRE(Big.size() > 256);
+}
+
 BOOST_AUTO_TEST_CASE(test_algo)
 {
     std::vector < int > b(5);
