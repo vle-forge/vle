@@ -22,8 +22,9 @@ ADD_LIBRARY(gvleOutputFile SHARED
   ${FilePluginGvle_h} )
 
 TARGET_LINK_LIBRARIES(gvleOutputFile
-  ${INTL_LIB} ${GVLE_LIBRARIES} ${VLE_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Xml_LIBRARIES})
+  gvlelib ${Qt5Xml_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES}
+  ${Qt5Help_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} vlelib ${VLEDEPS_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 INSTALL(TARGETS gvleOutputFile 
   RUNTIME DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output/plugins/gvle/output

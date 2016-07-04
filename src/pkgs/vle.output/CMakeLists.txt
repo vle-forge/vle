@@ -17,17 +17,30 @@ set_target_properties(pkg_dummy PROPERTIES
   OUTPUT_NAME dummy
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
+target_link_libraries(pkg_dummy vlelib ${VLEDEPS_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
+
 set_target_properties(pkg_file PROPERTIES
   OUTPUT_NAME file
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
+
+target_link_libraries(pkg_file vlelib ${VLEDEPS_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 set_target_properties(pkg_storage PROPERTIES
   OUTPUT_NAME storage
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
+target_link_libraries(pkg_storage vlelib ${VLEDEPS_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
+
 set_target_properties(pkg_console PROPERTIES
   OUTPUT_NAME console
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
+
+
+target_link_libraries(pkg_console vlelib ${VLEDEPS_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 install(FILES Authors.txt Description.txt License.txt News.txt Readme.txt
   DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output)
