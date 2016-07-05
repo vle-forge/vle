@@ -3410,7 +3410,7 @@ vleVpz::buildValue(const QDomNode& node, bool buildText) const
         return res;
     }
     qDebug() << "Internal error in buildValue (3): " << node.nodeName() << "\n" << mVdo->toQString(node);
-    throw vle::utils::ArgError("");
+    throw vle::utils::InternalError("Unknown value: %s", node.nodeName().toStdString().c_str());
     return 0;
 }
 
