@@ -319,10 +319,4 @@ message(STATUS "Build with gvle...............: ${VLE_HAVE_GVLE}")
 message(STATUS "Build with mvle...............: ${VLE_HAVE_MVLE}")
 message(STATUS "Build with cvle...............: ${VLE_HAVE_CVLE}")
 
-#
-# CPack configuration
-#
-# include(CPack)
-include(CMakeCPack.cmake)
-
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2
