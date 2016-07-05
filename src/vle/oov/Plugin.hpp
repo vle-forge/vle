@@ -101,7 +101,7 @@ public:
      *
      * If the plug-in does not manage \c value::Matrix, this function
      * returns NULL otherwise, this function return a clone of the \c
-     * value::Matrix manager by the plug-in.
+     * value::Matrix managed by the plug-in.
      *
      */
     virtual std::unique_ptr<value::Matrix> matrix() const

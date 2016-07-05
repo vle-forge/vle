@@ -127,4 +127,11 @@ std::unique_ptr<value::Matrix> View::matrix() const
     return std::unique_ptr<value::Matrix>();
 }
 
+std::unique_ptr<value::Matrix> View::finish(Time current)
+{
+    if (m_stream->plugin())
+        return m_stream->plugin()->finish(current);
+    return std::unique_ptr<value::Matrix>();
+}
+
 }} // namespace vle devs

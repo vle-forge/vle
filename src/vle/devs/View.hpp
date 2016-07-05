@@ -94,12 +94,18 @@ public:
      *
      * If the plug-in does not manage \c value::Matrix, this function
      * returns NULL otherwise, this function return the \c
-     * value::Matrix manager by the plug-in.
+     * value::Matrix provided as a clone by the plugin.
      *
-     * @attention You are in charge of freeing the value::Matrix after
-     * the end of the simulation.
      */
     std::unique_ptr<value::Matrix> matrix() const;
+
+
+    /**
+     * Return a pointer to the \c value::Matrix managed by te plugin.
+     *
+     * @param current, the current time (finish time)
+     */
+    std::unique_ptr<value::Matrix> finish(Time current) ;
 
 protected:
     using ObservableList = std::multimap<Dynamics*, std::string>;

@@ -524,8 +524,8 @@ std::unique_ptr<value::Map> Coordinator::finish()
     //build result views
     std::unique_ptr<value::Map> result;
 
-    for (const auto& elem : m_timedViewList) {
-        auto matrix = elem.second.matrix();
+    for (auto& elem : m_timedViewList) {
+        auto matrix = elem.second.finish(m_currentTime);
         if (matrix) {
             if (not result)
                 result = std::unique_ptr<value::Map>(new value::Map());
@@ -534,8 +534,8 @@ std::unique_ptr<value::Map> Coordinator::finish()
         }
     }
 
-    for (const auto& elem : m_eventViewList) {
-        auto matrix = elem.second.matrix();
+    for (auto& elem : m_eventViewList) {
+        auto matrix = elem.second.finish(m_currentTime);
         if (matrix) {
             if (not result)
                 result = std::unique_ptr<value::Map>(new value::Map());
