@@ -778,11 +778,11 @@ int main(int argc, char **argv)
 
     switch (mode) {
     case CLI_MODE_PACKAGE:
-        ret = manage_package_mode(ctx, true, processor_number,
+        ret = manage_package_mode(ctx, false, 0,
                                   std::move(commands));
         break;
     case CLI_MODE_MANAGER:
-        ret = manage_package_mode(ctx, false, processor_number,
+        ret = manage_package_mode(ctx, true, processor_number,
                                   std::move(commands));
         break;
     case CLI_MODE_REMOTE:
