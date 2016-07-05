@@ -1,2 +1,2 @@
 add_subdirectory(vle.output)
-# add_subdirectory(vle.adaptative-qss)
+add_subdirectory(vle.adaptative-qss)

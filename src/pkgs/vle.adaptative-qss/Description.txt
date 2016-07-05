@@ -1,0 +1,12 @@
+Package: vle.adaptative-aqss
+Version: 2.0.0
+Depends: vle.output
+Build-Depends:
+Conflicts:
+Maintainer: Gauthier Quesnel <gauthier.quesnel@toulouse.inra.fr>
+Description: A set of simulators to build ordinary differential equation systems using the quantized state systems (QSS) methods for numerical integration solvers.
+ .
+Tags: qss
+Url: http://www.vle-project.org/pub/2.0
+Size: 0
+MD5sum: xxxx
