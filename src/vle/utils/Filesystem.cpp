@@ -1,37 +1,20 @@
 /*
- * This file is part of VLE, a framework for multi-modeling, simulation
- * and analysis of complex dynamical systems.
- * http://www.vle-project.org
- *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
- *
- * See the AUTHORS or Authors.txt file for copyright owners and
- * contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at
- * your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
     path.h -- A simple class for manipulating paths on Linux/Windows/Mac OS
     Copyright (c) 2015 Wenzel Jakob <wenzel@inf.ethz.ch>
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE file.
+
+    Filesystem.hpp -- A modified path.h with little changes
+    Copyright (c) 2016 INRA
+    gauthier.quesnel@toulouse.inra.fr
+    - Remove make_absolute() functionality useless for VLE.
+    - Add temp_directory_path() and unique_path() for tempory path.
+    - Add DirectoryEntry and DirectoryIterator to pass trough repertory.
 */
 
 #include <vle/utils/Filesystem.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <fstream>
 #include <string>
 #include <random>
@@ -163,11 +146,13 @@ size_t Path::file_size() const
 #if defined(_WIN32)
     struct _stati64 sb;
     if (_wstati64(wstring().c_str(), &sb) != 0)
-        throw std::runtime_error("Path::file_size(): cannot stat file \"" + string() + "\"!");
+        throw FileError(_("Path::file_size(): cannot stat file %s"),
+                        string().c_str());
 #else
     struct stat sb;
     if (stat(string().c_str(), &sb) != 0)
-        throw std::runtime_error("Path::file_size(): cannot stat file \"" + string() + "\"!");
+        throw FileError(_("Path::file_size(): cannot stat file %s"),
+                        string().c_str());
 #endif
     return (size_t) sb.st_size;
 }
@@ -252,11 +237,11 @@ Path Path::parent_path() const
 Path Path::operator/(const Path &other) const
 {
     if (other.m_absolute)
-        throw std::runtime_error(
-            "Path::operator/(): expected a relative path!");
+        throw FileError(
+            _("Path::operator/(): expected a relative path"));
     if (m_type != other.m_type)
-        throw std::runtime_error(
-            "Path::operator/(): expected a path of the same type!");
+        throw FileError(
+            _("Path::operator/(): expected a path of the same type"));
 
     Path result(*this);
 
@@ -269,8 +254,8 @@ Path Path::operator/(const Path &other) const
 Path& Path::operator/=(const Path &other)
 {
     if (other.m_absolute)
-        throw std::runtime_error(
-            "Path::operator/(): expected a relative path!");
+        throw FileError(
+            _("Path::operator/(): expected a relative path"));
 
     std::copy(other.m_path.begin(), other.m_path.end(),
               std::back_inserter(m_path));
@@ -397,12 +382,14 @@ Path Path::current_path()
 #if !defined(_WIN32)
     char temp[PATH_MAX];
     if (::getcwd(temp, PATH_MAX) == NULL)
-        throw std::runtime_error("Internal error in getcwd(): " + std::string(strerror(errno)));
+        throw FileError(_("Internal error in getcwd(): %s"),
+                        strerror(errno));
     return Path(temp);
 #else
     std::wstring temp(MAX_PATH, '\0');
     if (!_wgetcwd(&temp[0], MAX_PATH))
-        throw std::runtime_error("Internal error in getcwd(): " + std::to_string(GetLastError()));
+        throw FileError(_("Internal error in getcwd(): %s"),
+              std::to_string(GetLastError().c_str()));
     return Path(temp.c_str());
 #endif
 }
@@ -478,16 +465,16 @@ void Path::copy_file(const Path& from, const Path& to)
 {
     std::ifstream src(from.string(), std::ios::binary);
     if (not src)
-        throw std::runtime_error("Copy file: fail to open source file");
+        throw FileError(_("Copy file: fail to open source file"));
 
     std::ofstream  dst(to.string(),   std::ios::binary);
     if (not dst)
-        throw std::runtime_error("Copy file: fail to open destination file");
+        throw FileError(_("Copy file: fail to open destination file"));
 
     dst << src.rdbuf();
 
     if (not src.good() or not dst.good())
-        throw std::runtime_error("Copy file: error during copy");
+        throw FileError(_("Copy file: error during copy"));
 }
 
 #if defined(_WIN32)
@@ -625,8 +612,8 @@ public:
 
         hFind = FindFirstFile(spec.string().c_str(), &ffd);
         if (hFind == INVALID_HANDLE_VALUE)
-            throw std::runtime_error(
-                "FindFirstFile: Path does not exist or could not be read.");
+            throw FileError(
+                _("DirectoryEntry: Path does not exist or could not be read."));
 
         do {
             if (strcmp(ffd.cFileName, ".") != 0 or
@@ -649,8 +636,8 @@ public:
     {
         m_directory = opendir(m_path.string().c_str());
         if (m_directory == nullptr)
-            throw std::runtime_error(
-                "opendir: Path does not exist or could not be read.");
+            throw FileError(
+                _("DirectoryEntry: Path does not exist or could not be read."));
 
         next();
     }
@@ -730,7 +717,7 @@ DirectoryIterator& DirectoryIterator::operator++()
 Path DirectoryIterator::operator*() const
 {
     if (not m_pimpl)
-        throw std::runtime_error("null pointer dereference");
+        throw FileError(_("DirectoryIterator: null pointer dereference"));
 
     return m_pimpl->m_entry.m_path;
 }
@@ -738,7 +725,7 @@ Path DirectoryIterator::operator*() const
 DirectoryEntry* DirectoryIterator::operator->() const
 {
     if (not m_pimpl)
-        throw std::runtime_error("null pointer dereference");
+        throw FileError(_("DirectoryIterator: null pointer dereference"));
 
     return &m_pimpl->m_entry;
 }

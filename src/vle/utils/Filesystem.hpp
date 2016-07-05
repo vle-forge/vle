@@ -1,28 +1,16 @@
 /*
- * This file is part of VLE, a framework for multi-modeling, simulation
- * and analysis of complex dynamical systems.
- * http://www.vle-project.org
- *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
- *
- * See the AUTHORS or Authors.txt file for copyright owners and
- * contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at
- * your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+    path.h -- A simple class for manipulating paths on Linux/Windows/Mac OS
+    Copyright (c) 2015 Wenzel Jakob <wenzel@inf.ethz.ch>
+    All rights reserved. Use of this source code is governed by a
+    BSD-style license that can be found in the LICENSE file.
+
+    Filesystem.hpp -- A modified path.h with little changes
+    Copyright (c) 2016 INRA
+    gauthier.quesnel@toulouse.inra.fr
+    - Remove make_absolute() functionality useless for VLE.
+    - Add temp_directory_path() and unique_path() for tempory path.
+    - Add DirectoryEntry and DirectoryIterator to pass trough repertory.
+*/
 
 #ifndef VLE_UTILS_FILESYSTEM_HPP
 #define VLE_UTILS_FILESYSTEM_HPP
