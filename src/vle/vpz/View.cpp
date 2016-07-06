@@ -83,30 +83,30 @@ std::string View::streamtype() const
 
     std::string ret;
     if (m_type & View::OUTPUT)
-        ret = "OUTPUT";
+        ret = "output";
 
     if (m_type & View::INTERNAL) {
         if (not ret.empty())
             ret += ',';
-        ret += "INTERNAL";
+        ret += "internal";
     }
 
     if (m_type & View::EXTERNAL) {
         if (not ret.empty())
             ret += ',';
-        ret += "EXTERNAL";
+        ret += "external";
     }
 
     if (m_type & View::CONFLUENT) {
         if (not ret.empty())
             ret += ',';
-        ret += "CONFLUENT";
+        ret += "confluent";
     }
 
     if (m_type & View::FINISH) {
         if (not ret.empty())
             ret += ',';
-        ret += "FINISH";
+        ret += "finish";
     }
 
     return ret;
