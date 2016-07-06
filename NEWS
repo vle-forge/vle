@@ -1,5 +1,5 @@
-VLE 1.3.0
-=========
+VLE 2.0
+=======
 
 Release highlights
 ------------------
@@ -35,13 +35,13 @@ and classes.
 
 The Git repository of VLE provides some very useful packages for VLE
 and GVLE (`vle.output`, `vle.aqss`, `gvle.simulation` etc.). These
-packages installed in the `$prefix/lib/vle-1.3/pkgs` (`$prefix` is the
+packages installed in the `$prefix/lib/vle-2.0/pkgs` (`$prefix` is the
 installation prefix of VLE. A read-only directory) simplify
 installation of VLE: VLE can be use without using the Github packages
 repository.
 
-Default, priority goes to `$VLEHOME/pkgs-1.3` instead of system
-packages `$prefix/lib/vle-1.3/pkgs`. So, if you want to develop
+Default, priority goes to `$VLEHOME/pkgs-2.0` instead of system
+packages `$prefix/lib/vle-2.0/pkgs`. So, if you want to develop
 another `vle.output` package, nothing change.
 
 ### Debug

@@ -1,4 +1,4 @@
-# v1.3.0
+# v2.0.0
 
 - vle.output package is merged in VLE as system package.
 

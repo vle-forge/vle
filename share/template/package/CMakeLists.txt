@@ -76,7 +76,7 @@ endif (COMMAND CMAKE_POLICY)
 ##
 
 set(VLE_DEBUG 0)
-set(VLE_ABI_VERSION 1.3)
+set(VLE_ABI_VERSION 2.0)
 find_package(VLE REQUIRED)
 set (VleUtils_DIR "${VLE_SHARE_DIR}/cmake")
 set (CMAKE_MODULE_PATH ${VLE_SHARE_DIR}/cmake ${CMAKE_MODULE_PATH})

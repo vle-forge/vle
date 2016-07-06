@@ -7,7 +7,6 @@ Maintainer: Gauthier Quesnel <quesnel@users.sourceforge.net>
 Description: Still in progress
  .
 Tags: examples
-Url: http://www.vle-project.org/1.3
+Url: http://www.vle-project.org/2.0
 Size: 0
 MD5sum: xxxx
-

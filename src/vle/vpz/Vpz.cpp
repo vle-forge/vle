@@ -62,7 +62,7 @@ void Vpz::write(std::ostream& out) const
         << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
         << "<!DOCTYPE vle_project PUBLIC \"-//VLE TEAM//DTD Strict//EN\" "
         << "\"http://www.vle-project.org/vle-"
-        << VLE_MAJOR_VERSION << "." << VLE_MINOR_VERSION << ".0.dtd\">\n";
+        << VLE_MAJOR_VERSION << "." << VLE_MINOR_VERSION << ".dtd\">\n";
 
     m_project.write(out);
 }
@@ -193,11 +193,11 @@ void Vpz::fixExtension(std::string& filename)
 {
     const std::string::size_type dot = filename.find_last_of('.');
     if (dot == std::string::npos) {
-	filename += ".vpz";
+        filename += ".vpz";
     } else {
         if (filename.size() >= 4) {
             const std::string extension(filename, dot, 4);
-	    if (extension != ".vpz") {
+            if (extension != ".vpz") {
                 filename += ".vpz";
             }
         } else {

@@ -16,8 +16,8 @@ option(WITH_CVLE "build cvle [default: off]" OFF)
 # Usefull variables
 #
 
-set(VLE_MAJOR 1)
-set(VLE_MINOR 3)
+set(VLE_MAJOR 2)
+set(VLE_MINOR 0)
 set(VLE_PATCH 0)
 set(VLE_EXTRA "dev")
 set(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")

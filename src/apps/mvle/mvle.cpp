@@ -45,7 +45,7 @@ void mvle_show_help()
 {
     std::fprintf(stderr, _(
             "Use:\n"
-            "  mvle [-h,--help] [-v,--version] [-s|--show] [-P,--package"
+            "  mvle [-h,--help] [-v,--version] [-s|--show] [-P,--package"
             " package_name] vpz_files...\n"
             "\n"
             "Help options:\n"

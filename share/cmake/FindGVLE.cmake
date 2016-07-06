@@ -21,7 +21,7 @@
 #
 # CMake variables used by this module:
 #
-#  VLE_ABI_VERSION       - gives the VLE version to search for (e.g 1.3)
+#  VLE_ABI_VERSION       - gives the VLE version to search for (e.g 1.3 2.0)
 #                          (REQUIRED)
 #  GVLE_DEBUG            - If true, prints debug traces
 #                          (default OFF)
@@ -47,7 +47,7 @@
 # Usage
 # -----
 #
-# set(VLE_ABI_VERSION 1.3)
+# set(VLE_ABI_VERSION 2.0)
 # find_package(GVLE REQUIRED)
 #
 #=============================================================================
@@ -92,7 +92,7 @@ if (${_find_gvle_using_cmake})
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/include"
-	NO_DEFAULT_PATH)
+        NO_DEFAULT_PATH)
 
   find_path(_gvle_base_bin gvle.exe PATHS
     $ENV{VLE_BASEPATH}/bin
@@ -100,7 +100,7 @@ if (${_find_gvle_using_cmake})
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/bin"
-	NO_DEFAULT_PATH)
+        NO_DEFAULT_PATH)
 
   find_path(_gvle_base_lib libgvle-${VLE_ABI_VERSION}.dll.a PATHS
     $ENV{VLE_BASEPATH}/lib
@@ -108,7 +108,7 @@ if (${_find_gvle_using_cmake})
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/lib"
-	NO_DEFAULT_PATH)
+        NO_DEFAULT_PATH)
 
   if (${_gvle_debug})
     message (" gvle_debug _gvle_base_include ${_gvle_base_include}")

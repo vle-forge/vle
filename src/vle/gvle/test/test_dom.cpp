@@ -54,7 +54,7 @@
 
 const char* vpz_content=
         "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-        "<vle_project version=\"1.3.0\" author=\"Ronan Trépos\" date=\"2015-Jun-15 16:13:07\">\n"
+        "<vle_project version=\"2.0\" author=\"Ronan Trépos\" date=\"2015-Jun-15 16:13:07\">\n"
         " <structures>\n"
         "<model width=\"482\" x=\"0\" y=\"0\" height=\"376\" type=\"coupled\" name=\"LogExMM\">\n"
         "<submodels>\n"

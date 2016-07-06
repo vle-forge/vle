@@ -1,4 +1,4 @@
-Virtual Laboratory Environment 1.3
+Virtual Laboratory Environment 2.0
 ==================================
 
 [![Build Status](https://travis-ci.org/vle-forge/vle.png?branch=master)](https://travis-ci.org/vle-forge/vle)
