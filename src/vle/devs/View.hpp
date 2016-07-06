@@ -29,9 +29,10 @@
 #define VLE_DEVS_VIEW_HPP 1
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/value/Matrix.hpp>
-#include <vle/devs/StreamWriter.hpp>
+#include <vle/oov/Plugin.hpp>
 #include <string>
 #include <map>
 
@@ -51,16 +52,33 @@ public:
     ~View() = default;
 
     /**
-     * Initialize the View: a name and a stream writer.
+     * Initialize plugin with specified information.
+     *
+     * @param plugin the plugin's name.
+     * @param package the plugin's package.
+     * @param location where the plugin write data.
+     * @param file name of the file.
+     * @param parameters the value attached to the plug-in.
+     * @param time the date when the plug-in was opened.
+     */
+    void open(utils::ContextPtr ctx,
+              const std::string& name,
+              const std::string& pluginname,
+              const std::string& package,
+              const std::string& location,
+              const std::string& file,
+              Time time,
+              std::unique_ptr<value::Value> parameters);
+
+    /**
+     * Add new observable (\e Dynamics*, \e portname) into the View.
      *
      */
-    void open(const std::string& name, std::unique_ptr<StreamWriter> stream);
-
     void addObservable(Dynamics* model,
                        const std::string& portName,
-                       const Time& currenttime);
+                       Time currenttime);
 
-    void run(const Time& current);
+    void run(Time current);
 
     void run(const Dynamics *dynamics, Time current, const std::string& port);
 
@@ -99,7 +117,6 @@ public:
      */
     std::unique_ptr<value::Matrix> matrix() const;
 
-
     /**
      * Return a pointer to the \c value::Matrix managed by te plugin.
      *
@@ -110,9 +127,9 @@ public:
 protected:
     using ObservableList = std::multimap<Dynamics*, std::string>;
 
-    ObservableList                m_observableList;
-    std::string                   m_name;
-    std::unique_ptr<StreamWriter> m_stream;
+    ObservableList m_observableList;
+    std::string    m_name;
+    oov::PluginPtr m_plugin;
 };
 
 }} // namespace vle devs

@@ -286,15 +286,6 @@ private:
     void buildViews();
 
     /**
-     * @brief Build a StreamWriter for a specific View and Output.
-     * @param view the vpz::View to get data..
-     * @param output the vpz::Output to get datas.
-     * @return Buiild a new StreamWriter.
-     */
-    std::unique_ptr<StreamWriter> buildOutput(const vpz::View& view,
-                                              const vpz::Output& output);
-
-    /**
      * @brief build the simulator from the vpz::BaseModel stock.
      * @param model
      */

@@ -33,8 +33,8 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/StreamWriter.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
@@ -438,37 +438,32 @@ void Coordinator::buildViews()
     const vpz::ViewList& viewlist(views.viewlist());
 
     for (const auto & elem : viewlist) {
-        auto stream = buildOutput(elem.second, outs.get(elem.second.output()));
+
+        std::string file = utils::format("%s_%s",
+                                         m_modelFactory.experiment().name().c_str(),
+                                         elem.first.c_str());
+
+        const auto& output = outs.get(elem.second.output());
 
         if (elem.second.type() == vpz::View::TIMED) {
             View& v = m_timedViewList[elem.second.name()];
 
-            v.open(elem.second.name(), std::move(stream));
+            v.open(m_context, elem.second.name(), output.plugin(),
+                   output.package(), output.location(), file,
+                   m_currentTime,
+                   (output.data()) ? output.data()->clone() : nullptr);
+
             m_timed_observation_scheduler.add(&v, m_currentTime,
                                               elem.second.timestep());
         } else {
             auto& v = m_eventViewList[elem.second.name()];
 
-            v.open(elem.second.name(), std::move(stream));
+            v.open(m_context, elem.second.name(), output.plugin(),
+                   output.package(), output.location(), file,
+                   m_currentTime,
+                   (output.data()) ? output.data()->clone() : nullptr);
         }
     }
-}
-
-std::unique_ptr<StreamWriter>
-Coordinator::buildOutput(const vpz::View& view,
-                         const vpz::Output& output)
-{
-    auto stream = std::make_unique<StreamWriter>(m_context);
-
-    std::string file((fmt("%1%_%2%") %
-                      m_modelFactory.experiment().name() %
-                      view.name()).str());
-
-    stream->open(output.plugin(), output.package(), output.location(), file,
-                 (output.data()) ? output.data()->clone() : nullptr,
-                 m_currentTime);
-
-    return stream;
 }
 
 void Coordinator::processInit(Simulator *simulator)
