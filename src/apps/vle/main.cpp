@@ -67,9 +67,11 @@ struct vle_log_standard : vle::utils::Context::LogFunctor
     bool color;
 
     vle_log_standard(FILE *f)
-#if defined(__unix__)
         : stream(f)
+#if defined(__unix__)
         , color(isatty(fileno(f)) == 1)
+#else
+        , color(false)
 #endif
     {
     }
