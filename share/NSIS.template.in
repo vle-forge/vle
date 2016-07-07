@@ -6,6 +6,8 @@
   !define VERSION "@CPACK_PACKAGE_VERSION@"
   !define PATCH  "@CPACK_PACKAGE_VERSION_PATCH@"
   !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
+  !define VLE_MINGW_PATH "@VLE_MINGW_PATH@"
+
 
 ;--------------------------------
 ;Variables
@@ -846,6 +848,16 @@ Section "-Core installation"
   ;list of directories here in sync with the RMDir commands below.
   SetOutPath "$INSTDIR"
   @CPACK_NSIS_FULL_INSTALL@
+
+  File /r "${VLE_MINGW_PATH}\bin\*.*"
+  File /r "${VLE_MINGW_PATH}\include\*.*"
+  File /r "${VLE_MINGW_PATH}\lib\*.*"
+  File /r "${VLE_MINGW_PATH}\i686-w64-mingw32\*.*"
+  File /r "${VLE_MINGW_PATH}\share\cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" "share\"
+  File /r "${VLE_MINGW_PATH}\share\qt5\mkspecs" "share\qt5\"
+  File /r "${VLE_MINGW_PATH}\share\qt5\plugins\platforms" "share\qt5\plugins\"
+  File /r "${VLE_MINGW_PATH}\share\qt5\plugins\imageformats" "share\qt5\plugins\"
+  File /r "${VLE_MINGW_PATH}\share\qt5\plugins\generic" "share\qt5\plugins\"
 
   ;to manage the qt install
   FileOpen $0 "$INSTDIR\bin\qt.conf" w
