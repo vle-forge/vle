@@ -178,25 +178,27 @@ static void show_help() noexcept
         _("%s\nvle-%s [options...]\n\n"
           "help,h      Produce help message\n"
           "version,v   Print version string\n"
-          "infos       Informations of VLE\n"
+          "infos,i     Informations of VLE\n"
           "restart     Remove configuration file of VLE\n"
-          "list        Show the list of installed package\n"
           "log-file    log of simulation are reported to the standard file\n"
           "            ($VLE_HOME/vle-x.y.log"
           "log-stdout  log of the simulation(s) are reported to the "
-          "standard output\n"
+          "standard output (default)\n"
+          "log-stderr  log of the sinulation(s) are reported to the "
+          "standard error output\n"
           "\n"
-          "processor,o Select number of processor in manager mode [>= 1]\n"
+          "processor,j Select number of processor in manager mode [>= 1]\n"
+          "manager,m  Use the manager mode to run experimental frames\n"
           "verbose,V   Verbose mode 0 - 7. [default 3]\n"
           "                0 system is unusable\n"
           "                1 action must be taken immediately\n"
-          "                2 action must be taken immediately\n"
+          "                2 critial conditions\n"
           "                3 error conditions\n"
           "                4 warning conditions\n"
           "                5 normal, but significant, condition\n"
           "                6 informational message\n"
           "                7 debug-level message\n"
-          "manager,M  Use the manager mode to run experimental frames\n"
+          "\n"
           "package,P  Select package mode,\n  package name [options]...\n"
           "                vle -P foo create: build new foo package\n"
           "                vle -P foo configure: configure the foo package\n"
@@ -230,8 +232,7 @@ enum cli_mode {
     CLI_MODE_END = 1 << 1,
     CLI_MODE_CONFIG = 1 << 2,
     CLI_MODE_REMOTE = 1 << 3,
-    CLI_MODE_MANAGER = 1 << 4,
-    CLI_MODE_PACKAGE = 1 << 5
+    CLI_MODE_PACKAGE = 1 << 4
 };
 
 typedef std::vector<std::string> CmdArgs;
@@ -311,10 +312,10 @@ static vle::manager::LogOptions convert_log_mode(vle::utils::ContextPtr ctx)
     }
 }
 
-static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
+static int run_manager(vle::utils::ContextPtr ctx,
+                       CmdArgs::const_iterator it, CmdArgs::const_iterator end,
                        int processor, vle::utils::Package& pkg)
 {
-    auto ctx = vle::utils::make_context();
     vle::manager::Manager man(ctx, convert_log_mode(ctx),
                               vle::manager::SIMULATION_NONE |
                               vle::manager::SIMULATION_NO_RETURN,
@@ -342,10 +343,10 @@ static int run_manager(CmdArgs::const_iterator it, CmdArgs::const_iterator end,
     return success;
 }
 
-static int run_simulation(CmdArgs::const_iterator it,
+static int run_simulation(vle::utils::ContextPtr ctx,
+                          CmdArgs::const_iterator it,
                           CmdArgs::const_iterator end, vle::utils::Package& pkg)
 {
-    auto ctx = vle::utils::make_context();
     vle::manager::Simulation sim(ctx, convert_log_mode(ctx),
                                  vle::manager::SIMULATION_NONE |
                                  vle::manager::SIMULATION_NO_RETURN,
@@ -458,9 +459,9 @@ static int manage_package_mode(vle::utils::ContextPtr ctx,
         ret = EXIT_FAILURE;
     else if (it != end) {
         if (manager_mode)
-            ret = run_manager(it, end, processor, pkg);
+            ret = run_manager(ctx, it, end, processor, pkg);
         else
-            ret = run_simulation(it, end, pkg);
+            ret = run_simulation(ctx, it, end, pkg);
     }
 
     return ret;
@@ -659,25 +660,26 @@ int main(int argc, char **argv)
     int processor_number = 1;
     int log_stdout = 1;
     int restart_conf = 0;
+    int manager = 0;
     int opt_index;
     int ret = EXIT_SUCCESS;
 
-    const char* const short_opts = "hvV::p:MPRC";
+    const char* const short_opts = "hviV:j:mPRC";
     const struct option long_opts[] = {
         {"help", 0, nullptr, 'h'},
         {"version", 0, nullptr, 'v'},
         {"infos", 0, nullptr, 'i'},
         {"restart", 0, &restart_conf, 1},
-        {"list", 0, nullptr, 'l'},
         {"log-file", 0, &log_stdout, 0},
         {"log-stdout", 0, &log_stdout, 1},
         {"log-stderr", 0, &log_stdout, 2},
-        {"verbose", 2, nullptr, 'V'},
-        {"processor", 1, nullptr, 'p'},
-        {"manager", 0, nullptr, 'M'},
+        {"verbose", 1, nullptr, 'V'},
+        {"processor", 1, nullptr, 'j'},
+        {"manager", 0, nullptr, 'm'},
         {"package", 0, nullptr, 'P'},
         {"manager", 0, nullptr, 'R'},
         {"config", 0, nullptr, 'C'},
+        {0, 0, nullptr, 0}
     };
 
     for (;;) {
@@ -687,19 +689,33 @@ int main(int argc, char **argv)
             break;
 
         switch (opt) {
-        case 'C':
-            mode |= CLI_MODE_CONFIG;
+        case 0:
+            printf("options %s\n", long_opts[opt_index].name);
             break;
-        case 'R':
-            mode |= CLI_MODE_REMOTE;
+        case 'h':
+            mode |= CLI_MODE_END;
+            show_help();
             break;
-        case 'P':
-            mode |= CLI_MODE_PACKAGE;
+        case 'v':
+            mode |= CLI_MODE_END;
+            show_version();
             break;
-        case 'M':
-            mode |= CLI_MODE_MANAGER;
+        case 'i':
+            mode |= CLI_MODE_END;
+            show_infos();
             break;
-        case 'p':
+        case 'V':
+            try {
+                verbose_level = std::stoi(::optarg);
+                if (verbose_level < 0 or 7 < verbose_level)
+                    throw std::exception();
+            } catch (const std::exception& /* e */) {
+                fprintf(stderr, _("Bad verbose_level: %s. "
+                                  "Assume verbose_level=3\n"), ::optarg);
+                verbose_level = 3;
+            }
+            break;
+        case 'j':
             try {
                 processor_number = std::stoi(::optarg);
                 if (processor_number <= 0)
@@ -710,32 +726,19 @@ int main(int argc, char **argv)
                 processor_number = 1;
             }
             break;
-        case 'V':
-            try {
-                verbose_level = std::stoi(::optarg);
-                if (verbose_level < 0)
-                    throw std::exception();
-            } catch (const std::exception& /* e */) {
-                fprintf(stderr, _("Bad verbose_level: %s. "
-                                  "Assume verbose_level=3\n"), ::optarg);
-                verbose_level = 3;
-            }
-            break;
-        case 'v':
-            mode |= CLI_MODE_END;
-            show_version();
-            break;
 
-        case 'i':
-            mode |= CLI_MODE_END;
-            show_infos();
+        case 'm':
+            manager = 1;
             break;
-
-        case 'h':
-            mode |= CLI_MODE_END;
-            show_help();
+        case 'P':
+            mode |= CLI_MODE_PACKAGE;
             break;
-
+        case 'R':
+            mode |= CLI_MODE_REMOTE;
+            break;
+        case 'C':
+            mode |= CLI_MODE_CONFIG;
+            break;
         case '?':
         default:
             mode |= CLI_MODE_END;
@@ -778,11 +781,7 @@ int main(int argc, char **argv)
 
     switch (mode) {
     case CLI_MODE_PACKAGE:
-        ret = manage_package_mode(ctx, false, 0,
-                                  std::move(commands));
-        break;
-    case CLI_MODE_MANAGER:
-        ret = manage_package_mode(ctx, true, processor_number,
+        ret = manage_package_mode(ctx, manager, processor_number,
                                   std::move(commands));
         break;
     case CLI_MODE_REMOTE:
