@@ -31,7 +31,6 @@
 
 namespace {
 
-constexpr
 int default_buffer_size(std::size_t size) noexcept
 {
     return static_cast<int>(
