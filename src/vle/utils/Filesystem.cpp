@@ -700,7 +700,10 @@ DirectoryIterator::DirectoryIterator()
 
 DirectoryIterator::DirectoryIterator(const Path& p)
     : m_pimpl(std::make_shared<DirectoryIterator::Pimpl>(p))
-{}
+{
+    if (m_pimpl->m_finish)
+        m_pimpl.reset();
+}
 
 DirectoryIterator::~DirectoryIterator() = default;
 
