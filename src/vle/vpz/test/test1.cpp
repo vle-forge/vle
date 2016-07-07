@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(value_set)
         auto ptr = vpz::Vpz::parseValue(t2);
 
         std::cout << ptr->writeToXml() << '\n';
-        
+
         const auto& v = ptr->toSet();
         BOOST_CHECK(value::toInteger(v.get(0)) == 1);
 
@@ -448,7 +448,7 @@ BOOST_AUTO_TEST_CASE(value_matrix)
     BOOST_REQUIRE_EQUAL(m.columns_max(), (value::Matrix::size_type)15);
     BOOST_REQUIRE_EQUAL(m.resizeRow(), (value::Matrix::size_type)200);
     BOOST_REQUIRE_EQUAL(m.resizeColumn(), (value::Matrix::size_type)100);
-    
+
     std::cout << "value_matrix:\n" << m.writeToString() << '\n';
 
     BOOST_REQUIRE_EQUAL(m(0,0)->isInteger(), true);

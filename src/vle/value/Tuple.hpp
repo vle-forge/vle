@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -209,7 +209,7 @@ public:
      * @return The real at the specified index.
      */
     double& operator()(size_type i);
-    
+
     /**
      * @brief Get a constant reference to the real at the specified index.
      * @param i The index of the value to get.
@@ -225,7 +225,7 @@ public:
      * @throw std::out_of_range if the index is too big.
      */
     double& get(size_type i);
-    
+
     /**
      * @brief Get a constant reference to the real at the specified index.
      * @param i The index of the value to get.

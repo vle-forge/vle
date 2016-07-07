@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -290,7 +290,7 @@ public:
      * @param value the value to set.
      */
     void add(index column, index row, std::unique_ptr<Value> val);
-    
+
     /**
      * @brief Set the cell at (column, row) to the specified value. Be careful,
      * the value is managed by the Matrix.
@@ -299,7 +299,7 @@ public:
      * @param value the value to set.
      */
     void set(index column, index row, std::unique_ptr<Value> val);
-    
+
     /**
      * @brief Get a pointer from a cell of the matrix.
      * @param column The column.
@@ -308,7 +308,7 @@ public:
      * @throw utils::ArgError if bad access to the matrix, in debug mode only.
      */
     const std::unique_ptr<Value>& get(index column, index row) const;
-    
+
     /**
      * Get an ownership pointer to the specified cell. The \e Value is
      * removed from the Matrix.
@@ -414,7 +414,7 @@ public:
      * @param row The row.
      */
     Null& addNull(index column, index row);
-   
+
     /**
      * @brief Add a boolean into the matrix.
      * @param column The column.
@@ -554,7 +554,7 @@ public:
      * @return The Tuple readed from the matrix.
      */
     const Tuple& getTuple(index column, index row) const;
-    
+
     /**
      * @brief Get a Tuple from the matrix.
      * @param column The column.
@@ -562,7 +562,7 @@ public:
      * @return The Tuple readed from the matrix.
      */
     Tuple& getTuple(index column, index row);
-    
+
     /**
      * @brief Add a Table into the Matrix.
      * @param column The column.
@@ -574,7 +574,7 @@ public:
     Table& addTable(index column, index row,
                     std::size_t width = 0,
                     std::size_t height = 0);
-    
+
     /**
      * @brief Get a Table from the matrix.
      * @param column The column.
@@ -590,7 +590,7 @@ public:
      * @return The Table readed from the matrix.
      */
     Table& getTable(index column, index row);
-    
+
     /**
      * @brief Add a Set at the end of the Set.
      * @param column The column.

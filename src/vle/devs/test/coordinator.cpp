@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -433,7 +433,7 @@ extern "C" {
         const vle::devs::InitEventList& events)
     {
         return new ::ObservationModel(init, events);
-    }       
+    }
 
     VLE_MODULE vle::oov::Plugin* make_oovplugin(
         const std::string& location)
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
     root.init();
 
     while (root.run());
-    std::unique_ptr<value::Map> out = root.outputs(); 
+    std::unique_ptr<value::Map> out = root.outputs();
 
     BOOST_REQUIRE(out);
 

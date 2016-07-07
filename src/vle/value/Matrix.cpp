@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -503,14 +503,14 @@ void Matrix::moveLastCell()
 void Matrix::add(index column, index row, std::unique_ptr<Value> val)
 {
     ::pp_check_index(*this, column, row);
-    
+
     m_matrix[row * m_nbcolmax + column] = std::move(val);
 }
 
 void Matrix::set(index column, index row, std::unique_ptr<Value> val)
 {
     ::pp_check_index(*this, column, row);
-    
+
     m_matrix[row * m_nbcolmax + column] = std::move(val);
 }
 

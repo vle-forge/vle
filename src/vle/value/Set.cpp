@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -107,7 +107,7 @@ pp_add(vle::value::Set& s, Args&&... args)
     auto *ret = static_cast<T*>(value.get());
 
     s.value().emplace_back(std::move(value));
-    
+
     return *ret;
 }
 
@@ -227,7 +227,7 @@ Set& Set::getSet(size_type i)
 
 Map& Set::getMap(size_type i)
 {
-    return pp_get_value(*this, i).toMap(); 
+    return pp_get_value(*this, i).toMap();
 }
 
 Matrix& Set::getMatrix(size_type i)
@@ -383,10 +383,10 @@ void Set::resize(size_type newSize, const Value& fill)
 
         for (size_t i = 0; i != to_fill; ++i)
             m_value[old_size + i] = fill.clone();
-        
+
         return;
     }
-    
+
     m_value.resize(newSize);
 }
 

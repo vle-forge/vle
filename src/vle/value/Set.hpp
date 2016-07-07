@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -251,13 +251,13 @@ public:
      * @brief Add a null value into the set.
      */
     Null& addNull();
-    
+
     /**
      * @brief Add a BooleanValue into the set.
      * @param value
      */
     Boolean& addBoolean(bool value);
-    
+
     /**
      * @brief Get a bool from the specified index.
      * @param i The index to get value.
@@ -323,7 +323,7 @@ public:
      * index 'i' is not a Integer.
      */
     int32_t& getInt(size_type i);
-    
+
     /**
      * @brief Add a StringValue into the set.
      * @param value

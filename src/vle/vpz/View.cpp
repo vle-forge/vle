@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2014 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2014 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2014 INRA http://www.inra.fr
+ * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2016 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -64,7 +64,7 @@ void View::write(std::ostream& out) const
 
     if (m_type == TIMED)
         out << "timestep=\"" << m_timestep << "\" ";
-    
+
     if (m_data.empty()) {
         out << "/>\n";
     } else {
@@ -90,19 +90,19 @@ std::string View::streamtype() const
             ret += ',';
         ret += "INTERNAL";
     }
-    
+
     if (m_type & View::EXTERNAL) {
         if (not ret.empty())
             ret += ',';
         ret += "EXTERNAL";
     }
-    
+
     if (m_type & View::CONFLUENT) {
         if (not ret.empty())
             ret += ',';
         ret += "CONFLUENT";
     }
-    
+
     if (m_type & View::FINISH) {
         if (not ret.empty())
             ret += ',';

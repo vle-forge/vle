@@ -3,7 +3,7 @@
 #
 # Check the dependencies of the current package
 #
-# Copyright (c) 2014-2014 INRA
+# Copyright (c) 2014-2016 INRA
 # Ronan Trépos <rtrepos@toulouse.inra.fr>
 #
 # Distributed under the OS-approved BSD License (the "License");
@@ -24,7 +24,7 @@
 # -----------
 #
 # Following CMake variables have to be defined :
-#  
+#
 #  VLE_DEBUG       - if true, prints debug traces (default OFF)
 #  VLE_ABI_VERSION - it gives the ABI version of installed vle. For example,
 #                    if VLE_ABI_VERSION = "1.2", then packages are expected to
@@ -34,7 +34,7 @@
 #
 #####
 #
-# VleCheckPackage: it checks if a package is installed into the binary 
+# VleCheckPackage: it checks if a package is installed into the binary
 #     packages. And sets the variables used to link to the designated package.
 #
 #> set(VLE_ABI_VERSION 1.2)
@@ -69,7 +69,7 @@
 #> find_package(VleUtils REQUIRED)
 #> VleBuildDynamic(Simple "Simple.cpp;otherSouce.cpp")
 #
-# The Simple.cpp can contain the 'tagdepends', of the form  
+# The Simple.cpp can contain the 'tagdepends', of the form
 #
 #// @@tagdepends: pkg1,pkg2 @@endtagdepends
 #
@@ -81,7 +81,7 @@
 #> find_package(VleUtils REQUIRED)
 #> VleBuildTest(test_pkg "test.cpp")
 #
-# The test.cpp can contain the 'tagdepends', of the form  
+# The test.cpp can contain the 'tagdepends', of the form
 #
 #// @@tagdepends: pkg1,pkg2 @@endtagdepends
 #
@@ -147,7 +147,7 @@ function(_vle_str_remove_blanks inStr outStr)
 endfunction(_vle_str_remove_blanks)
 
 ###
-# Split module requirement : 
+# Split module requirement :
 #   in: ext.muparser(>=1.0)
 #   out1: ext.muparser
 #   out2: >=1.0
@@ -156,35 +156,35 @@ endfunction(_vle_str_remove_blanks)
 function(IntVleSplitModRequirement in out1 out2)
   if (VLE_DEBUG)
     message(STATUS "Enter IntVleSplitModRequirement : '${in}' ")
-  endif () 
+  endif ()
   string(REPLACE "(" ";" _module_as_list ${in})
   list(LENGTH _module_as_list _module_as_list_length)
   if (2 EQUAL _module_as_list_length)
     if (VLE_DEBUG)
-      message(STATUS "Module '${in}' has a version requirement") 
+      message(STATUS "Module '${in}' has a version requirement")
     endif ()
     list(GET _module_as_list 0 _out1tmp)
     list(GET _module_as_list 1 _out2tmp)
     string(REPLACE ")" "" _out2tmp2 ${_out2tmp})
     set (${out1} ${_out1tmp} PARENT_SCOPE)
-    set (${out2} ${_out2tmp2} PARENT_SCOPE) 
+    set (${out2} ${_out2tmp2} PARENT_SCOPE)
   else ()
     if (1 EQUAL _module_as_list_length)
       if (VLE_DEBUG)
-        message(STATUS "Module '${in}' does not have a version requirement") 
+        message(STATUS "Module '${in}' does not have a version requirement")
       endif ()
       list(GET _module_as_list 0 _out1tmp)
       set (${out1} ${_out1tmp} PARENT_SCOPE)
-      set (${out2} "" PARENT_SCOPE) 
+      set (${out2} "" PARENT_SCOPE)
     else ()
-      message(FATAL_ERROR 
+      message(FATAL_ERROR
        "Module name format unrecognised : '${in}'")
    endif ()
   endif()
 endfunction()
 
 ###
-# Requirement check : 
+# Requirement check :
 #   in1: >=1.0
 #   in2: 1.0.2
 #   out: TRUE
@@ -194,15 +194,15 @@ function(IntVleRequirementCheck in1 in2 out)
    string(LENGTH ${in1} _in1length)
    string(SUBSTRING ${in1} 0 2 _in1twoChar)
    if (VLE_DEBUG)
-        message(STATUS "IntVleRequirementCheck two-char comp. ${_in1twoChar}") 
-        message(STATUS "IntVleRequirementCheck in1 ${in1}") 
+        message(STATUS "IntVleRequirementCheck two-char comp. ${_in1twoChar}")
+        message(STATUS "IntVleRequirementCheck in1 ${in1}")
    endif ()
    string (COMPARE EQUAL ${_in1twoChar} ">=" _greater_eq)
    if (${_greater_eq})
      math(EXPR _in1ver_length "${_in1length}-2")
      string(SUBSTRING ${in1} 2  ${_in1ver_length} _in1ver)
      if (VLE_DEBUG)
-        message(STATUS "IntVleRequirementCheck vers. ${_in1ver}") 
+        message(STATUS "IntVleRequirementCheck vers. ${_in1ver}")
      endif ()
      string(COMPARE EQUAL ${in2} ${_in1ver} _outtmp1)
      string(COMPARE GREATER ${in2} ${_in1ver} _outtmp2)
@@ -230,14 +230,14 @@ function(IntVleRequirementCheck in1 in2 out)
 endfunction()
 
 ###
-# Get the list of build depends of the current package : 
+# Get the list of build depends of the current package :
 #   out: mypkg1,mypkg2(>=1.0)
 ###
 
 function(IntVleBuildDepends out)
   if (NOT EXISTS "${CMAKE_SOURCE_DIR}/Description.txt")
     message(FATAL_ERROR "Missing Description.txt file: "
-                        "${CMAKE_SOURCE_DIR}/Description.txt ")  
+                        "${CMAKE_SOURCE_DIR}/Description.txt ")
   endif ()
   file(STRINGS "${CMAKE_SOURCE_DIR}/Description.txt" _description_text)
   foreach(_line_descr_text IN LISTS _description_text)
@@ -249,11 +249,11 @@ function(IntVleBuildDepends out)
       return ()
     endif ()
    endif ()
-  endforeach () 
+  endforeach ()
 endfunction()
 
 ###
-# Get the VLE_HOME package directory: 
+# Get the VLE_HOME package directory:
 #   out: /home/user/.vle/pkgs-1.2
 ###
 
@@ -265,7 +265,7 @@ function(IntVleHomePkgs out)
     else ()
       file(TO_CMAKE_PATH "$ENV{HOME}/.vle" _vle_home)
     endif ()
-    if (_vle_debug) 
+    if (_vle_debug)
       message(STATUS "The VLE_HOME undefined, try default ${_vle_home}")
     endif()
   else ()
@@ -294,7 +294,7 @@ endfunction()
 
 ###
 # Get the the version of a installed package from the Description file:
-#   in: mypkg 
+#   in: mypkg
 #   out: 1.0.2
 ###
 
@@ -318,7 +318,7 @@ function(IntVleInstalledPkgVersion in out)
     endif ()
     return ()
    endif ()
-  endforeach () 
+  endforeach ()
 endfunction()
 
 ###
@@ -418,7 +418,7 @@ macro(VleCheckPackage _prefix _module_with_version)
   endif ()
 endmacro(VleCheckPackage)
 
-## 
+##
 
 macro(VleCheckDependencies)
   IntVleBuildDepends(_vle_pkgs_deps)
@@ -554,7 +554,7 @@ macro (VleBuildAllTest)
   endif ()
   file(GLOB __cpp_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
   if (_vle_debug)
-    message(STATUS "[VleBuildAllTest] search cpp files into: 
+    message(STATUS "[VleBuildAllTest] search cpp files into:
                     ${CMAKE_CURRENT_SOURCE_DIR}")
   endif ()
   foreach(__cppfile ${__cpp_files})
