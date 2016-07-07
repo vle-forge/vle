@@ -1,0 +1,1799 @@
+# French localization
+# Copyright (C) 2016 INRA
+# This file is distributed under the same license as the PACKAGE package.
+# Gauthier Quesnel <gauthier.quesnel@toulouse.inra.fr> 2016
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-06 16:27+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/vle/manager/Simulation.cpp:122 src/vle/manager/Simulation.cpp:171
+#: src/vle/manager/Simulation.cpp:199
+msgid ""
+"\n"
+"/!\\ vle error reported: %1%\n"
+"%2%"
+msgstr ""
+"\n"
+"/!\\ Erreur reportées par VLE : %1%\n"
+"%2%"
+
+#: src/vle/devs/DynamicsDbg.cpp:67
+#, c-format
+msgid "                     %s [DEVS] constructor\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:178
+#, c-format
+msgid "                     %s [DEVS] finish\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:110
+#, c-format
+msgid "                     %s [DEVS] ta\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:80
+#, c-format
+msgid "                .... %s [DEVS] init returns %.*g\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:96
+#, c-format
+msgid "                .... %s [DEVS] output returns "
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:115
+#, c-format
+msgid "                .... %s [DEVS] ta returns %.*g\n"
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:89 src/vle/manager/Simulation.cpp:148
+msgid " - Clean project file ...........: "
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:113 src/vle/manager/Simulation.cpp:162
+msgid " - Coordinator cleaning .........: "
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:94 src/vle/manager/Simulation.cpp:153
+msgid " - Coordinator initializing .....: "
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:83 src/vle/manager/Simulation.cpp:142
+msgid " - Coordinator load models ......: "
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:98 src/vle/manager/Simulation.cpp:157
+msgid " - Simulation run................: "
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:117 src/vle/manager/Simulation.cpp:166
+msgid " - Time spent in kernel .........: %1% s"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:152
+#, c-format
+msgid "%.*g %s [DEVS] confluent transition: "
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:137
+#, c-format
+msgid "%.*g %s [DEVS] external transition: "
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:75
+#, c-format
+msgid "%.*g %s [DEVS] init\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:125
+#, c-format
+msgid "%.*g %s [DEVS] internal transition\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:165
+#, c-format
+msgid "%.*g %s [DEVS] observation: [from: '%s' port: '%s']\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:91
+#, c-format
+msgid "%.*g %s [DEVS] output\n"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:84 src/vle/vpz/Vpz.cpp:109
+msgid ""
+"%2%\n"
+"\n"
+"%1%"
+msgstr ""
+
+#: src/apps/vle/main.cpp:551
+#, c-format
+msgid "%s\t from %s\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:540
+#, c-format
+msgid "%s\tfrom %s\t (new version: %d.%d.%d)\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:562
+#, c-format
+msgid "%s\tfrom %s "
+msgstr ""
+
+#: src/apps/vle/main.cpp:582
+#, c-format
+msgid ""
+"%s\n"
+"from %s"
+msgstr ""
+
+#: src/apps/vle/main.cpp:178
+#, c-format
+msgid ""
+"%s\n"
+"vle-%s [options...]\n"
+"\n"
+"help,h      Produce help message\n"
+"version,v   Print version string\n"
+"infos       Informations of VLE\n"
+"restart     Remove configuration file of VLE\n"
+"list        Show the list of installed package\n"
+"log-file    log of simulation are reported to the standard file\n"
+"            ($VLE_HOME/vle-x.y.loglog-stdout  log of the simulation(s) are "
+"reported to the standard output\n"
+"\n"
+"processor,o Select number of processor in manager mode [>= 1]\n"
+"verbose,V   Verbose mode 0 - 7. [default 3]\n"
+"                0 system is unusable\n"
+"                1 action must be taken immediately\n"
+"                2 action must be taken immediately\n"
+"                3 error conditions\n"
+"                4 warning conditions\n"
+"                5 normal, but significant, condition\n"
+"                6 informational message\n"
+"                7 debug-level message\n"
+"manager,M  Use the manager mode to run experimental frames\n"
+"package,P  Select package mode,\n"
+"  package name [options]...\n"
+"                vle -P foo create: build new foo package\n"
+"                vle -P foo configure: configure the foo package\n"
+"                vle -P foo build: build the foo package\n"
+"                vle -P foo test: start a unit test campaign\n"
+"                vle -P foo install: install libs\n"
+"                vle -P foo clean: clean up the build directory\n"
+"                vle -P foo rclean: delete binary directories\n"
+"                vle -P foo package: build packages\n"
+"                vle -P foo all: build all depends of foo package\n"
+"                vle -P foo depends: list depends of foo package\n"
+"                vle -P foo list: list vpz and library package\n"
+"remote,R   Select remote mode,\n"
+"  remote [command] [packages]...\n"
+"                vle -R update: update the database\n"
+"                vle -R search expression: search in database \n"
+"                vle -R local_search expression: search in local\n"
+"                vle -R install package: install package\n"
+"                vle -R source package: download source package\n"
+"                vle -R show package: show package in database\n"
+"                vle -R localshow package: show package in local\n"
+"config,C   Select configuration mode,\n"
+"  config variable value\n"
+"                Update the vle.conf configuration file. Assign\n"
+"                `value' to the `variable'\n"
+"                vle -C vle.author me\n"
+"                vle -C gvle.editor.font Monospace 10\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:592 src/apps/vle/main.cpp:602
+#, c-format
+msgid "%s: %s\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:150 src/apps/vle/main.cpp:157
+#, c-format
+msgid "* %zu: %s\n"
+msgstr ""
+
+#: src/vle/devs/Coordinator.cpp:116
+#, c-format
+msgid "-------- BAG [%f] --------\n"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:132
+#, c-format
+msgid "-[%s] Need to wait old process before\n"
+msgstr ""
+
+#: src/vle/vpz/Outputs.cpp:111
+msgid "An output have already this name '%1%'\n"
+msgstr ""
+
+#: src/vle/devs/ModelFactory.cpp:308
+msgid ""
+"Atomic model `%1%:%2%' (from dynamics `%3%' library `%4%' package `%5%') "
+"throws error in constructor: `%6%'"
+msgstr ""
+
+#: src/vle/devs/ModelFactory.cpp:188
+msgid ""
+"Atomic model wrapper `%1%:%2%' (from dynamics `%3%' library `%4%' package `"
+"%5%') throws error in constructor: `%6%'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:170
+msgid "Attribute name not defined"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:175
+msgid "Attribute type not defined for model '%1%'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:258 src/vle/vpz/SaxStackVpz.cpp:267
+#: src/vle/vpz/SaxStackVpz.cpp:273 src/vle/vpz/SaxStackVpz.cpp:302
+#: src/vle/vpz/SaxStackVpz.cpp:325 src/vle/vpz/SaxStackVpz.cpp:335
+#: src/vle/vpz/SaxStackVpz.cpp:345 src/vle/vpz/SaxStackVpz.cpp:380
+#: src/vle/vpz/SaxStackVpz.cpp:406 src/vle/vpz/SaxStackVpz.cpp:432
+#: src/vle/vpz/SaxStackVpz.cpp:436 src/vle/vpz/SaxStackVpz.cpp:442
+#: src/vle/vpz/SaxStackVpz.cpp:450 src/vle/vpz/SaxStackVpz.cpp:456
+#: src/vle/vpz/SaxStackVpz.cpp:461 src/vle/vpz/SaxStackVpz.cpp:486
+#: src/vle/vpz/SaxStackVpz.cpp:495 src/vle/vpz/SaxStackVpz.cpp:542
+#: src/vle/vpz/SaxStackVpz.cpp:571 src/vle/vpz/SaxStackVpz.cpp:580
+#: src/vle/vpz/SaxStackVpz.cpp:606 src/vle/vpz/SaxStackVpz.cpp:629
+#: src/vle/vpz/SaxStackVpz.cpp:641 src/vle/vpz/SaxStackVpz.cpp:650
+#: src/vle/vpz/SaxStackVpz.cpp:659 src/vle/vpz/SaxStackVpz.cpp:668
+#: src/vle/vpz/SaxStackVpz.cpp:716 src/vle/vpz/SaxStackVpz.cpp:788
+#: src/vle/vpz/SaxStackVpz.cpp:797 src/vle/vpz/SaxStackVpz.cpp:807
+#: src/vle/vpz/SaxStackVpz.cpp:831 src/vle/vpz/SaxStackVpz.cpp:855
+#: src/vle/vpz/SaxStackVpz.cpp:878 src/vle/vpz/SaxStackVpz.cpp:887
+#: src/vle/vpz/SaxStackVpz.cpp:910 src/vle/vpz/SaxStackVpz.cpp:919
+#: src/vle/vpz/SaxStackVpz.cpp:935 src/vle/vpz/SaxStackVpz.cpp:944
+#: src/vle/vpz/SaxStackValue.cpp:52 src/vle/vpz/SaxStackValue.cpp:61
+#: src/vle/vpz/SaxStackValue.cpp:70 src/vle/vpz/SaxStackValue.cpp:79
+#: src/vle/vpz/SaxStackValue.cpp:88 src/vle/vpz/SaxStackValue.cpp:99
+#: src/vle/vpz/SaxStackValue.cpp:110 src/vle/vpz/SaxStackValue.cpp:126
+#: src/vle/vpz/SaxStackValue.cpp:138 src/vle/vpz/SaxStackValue.cpp:149
+#: src/vle/vpz/SaxStackValue.cpp:160 src/vle/vpz/SaxStackValue.cpp:169
+msgid "Bad file format"
+msgstr ""
+
+#: src/apps/vle/main.cpp:708
+#, c-format
+msgid "Bad processor_number: %s. Assume processor_number=1\n"
+msgstr ""
+
+#: src/vle/manager/ExperimentGenerator.cpp:109
+#: src/vle/manager/ExperimentGenerator.cpp:120
+msgid "Bad rank"
+msgstr ""
+
+#: src/vle/vpz/View.cpp:119
+msgid "Bad time step %1% for view %2%"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:240
+msgid "Bad use of getModel from a list"
+msgstr ""
+
+#: src/apps/vle/main.cpp:719
+#, c-format
+msgid "Bad verbose_level: %s. Assume verbose_level=3\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:148
+#, c-format
+msgid "Binary package repositories: %zu\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:155
+#, c-format
+msgid "Binary package: %zu\n"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:456
+msgid "Building package '%1%' into '%2%': "
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:112
+msgid "Can not add input connection if destination is this coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:107
+msgid "Can not add input connection with unknown destination"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:134
+msgid "Can not add output connection if source is this coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:129
+msgid "Can not add output connection with unknown origin"
+msgstr ""
+
+#: src/vle/utils/Tools.cpp:160
+msgid "Can not convert `%1%'"
+msgstr ""
+
+#: src/vle/value/Table.cpp:193
+msgid "Can not convert string '%1%' into double or long"
+msgstr ""
+
+#: src/vle/vpz/View.cpp:44
+msgid "Cannont define the View '%1%' with a timestep '%2%'"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:168
+msgid "Cannot add internal connection if destination is this coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:162
+msgid "Cannot add internal connection if source is this coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:157
+msgid "Cannot add internal connection with unknown destination"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:152
+msgid "Cannot add internal connection with unknown origin"
+msgstr ""
+
+#: src/vle/vpz/ModelPortList.cpp:43
+msgid "Cannot add model port %1% in an empty model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:726 src/vle/vpz/CoupledModel.cpp:739
+#: src/vle/vpz/CoupledModel.cpp:752 src/vle/vpz/CoupledModel.cpp:765
+msgid ""
+"Cannot add the model '%1%' into the coupled model '%2%' (it already exists)"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:794
+msgid "Cannot attach an already attached model"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:249
+msgid "Cannot convert width or height for model %1%"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:238
+msgid "Cannot convert x or y position for model %1%"
+msgstr ""
+
+#: src/apps/vle/main.cpp:411
+#, c-format
+msgid "Cannot create package: %s\n"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:528
+msgid "Cannot delete all connection with an unknown model source"
+msgstr ""
+
+#: src/vle/devs/Coordinator.cpp:265
+msgid "Cannot delete an unknown model '%1%'"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:420
+msgid "Cannot delete connection with unknown destination"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:440
+msgid "Cannot delete input connection if destination is coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:435
+msgid "Cannot delete input connection with unknown destination"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:491
+msgid "Cannot delete internal connection if destination is coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:481
+msgid "Cannot delete internal connection if source is coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:486
+msgid "Cannot delete internal connection with unknown destination"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:476
+msgid "Cannot delete internal connection with unknown source"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:461
+msgid "Cannot delete output connection if source is coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:456
+msgid "Cannot delete output connection with unknown source"
+msgstr ""
+
+#: src/vle/devs/Coordinator.cpp:397
+msgid "Cannot delete undefined coupled model"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:651
+msgid "Cannot displace the connection %1% %2% to %3% %4%"
+msgstr ""
+
+#: src/vle/vpz/ModelPortList.cpp:54
+msgid "Cannot remove model port %1% in an empty model"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:160
+msgid "Cannot rename a model without parent"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:151
+msgid "Cannot rename empty model with '%1%'"
+msgstr ""
+
+#: src/vle/vpz/Classes.cpp:53 src/vle/vpz/Classes.cpp:89
+msgid "Class '%1%' already exists"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:900
+msgid "Class tag does not have attribute 'name'"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:676
+#, c-format
+msgid "Compress: unable to compress '%s' in '%s' with the '%s' command\n"
+msgstr ""
+
+#: src/vle/vpz/Condition.cpp:162 src/vle/vpz/Condition.cpp:183
+#: src/vle/vpz/Condition.cpp:197 src/vle/vpz/Condition.cpp:221
+msgid "Condition %1% have no port %2%"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:619
+msgid "Condition port tag does not have attribute 'name'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:595
+msgid "Condition tag does not have attribute 'name'"
+msgstr ""
+
+#: src/vle/vpz/Condition.cpp:112
+msgid "Condition: can not rename inexistant port '%1%'"
+msgstr ""
+
+#: src/apps/vle/main.cpp:648
+#, c-format
+msgid "Config error: %s\n"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:358
+msgid "Connection tag does not have an attribue 'type'"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:477
+msgid "Copy file: error during copy"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:472
+msgid "Copy file: fail to open destination file"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:468
+msgid "Copy file: fail to open source file"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:166
+msgid "Coupled model %1% already has submodel %2%"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:512 src/vle/vpz/CoupledModel.cpp:1031
+#: src/vle/vpz/CoupledModel.cpp:1044
+msgid "Coupled model %1% have no input port %2%"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:524 src/vle/vpz/CoupledModel.cpp:1056
+#: src/vle/vpz/CoupledModel.cpp:1069
+msgid "Coupled model %1% have no output port %2%"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:737
+#, c-format
+msgid "Decompress: unable to decompress '%s' in '%s' with the '%s' command\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:446
+#, c-format
+msgid "Depends is not yet implemented\n"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:422
+msgid "Destination tag does not have attributes 'model' or 'port'"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:616 src/vle/utils/Filesystem.cpp:640
+msgid "DirectoryEntry: Path does not exist or could not be read."
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:720 src/vle/utils/Filesystem.cpp:728
+msgid "DirectoryIterator: null pointer dereference"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:439
+msgid "Download archive  '%1%' from '%2%': "
+msgstr ""
+
+#: src/vle/utils/DownloadManager.cpp:134
+#, c-format
+msgid "Download: fail to download resources: %s\n"
+msgstr ""
+
+#: src/vle/utils/DownloadManager.cpp:60
+msgid "Download: fail to get vle.command.url.get command from vle.conf"
+msgstr ""
+
+#: src/vle/utils/DownloadManager.cpp:108
+msgid "Download: fail to start download command"
+msgstr ""
+
+#: src/vle/utils/DownloadManager.cpp:137
+#, c-format
+msgid "Download: unable to download '%s' in '%s' with the '%s' command"
+msgstr ""
+
+#: src/vle/devs/ModelFactory.cpp:412
+msgid ""
+"Dynamic library loading problem: cannot get any dynamics, executive or "
+"wrapper '%1%' in library '%2%' package '%3%'\n"
+":%4%"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:517
+msgid "Dynamic tag does not have 'name' or 'library' attribute"
+msgstr ""
+
+#: src/vle/vpz/Experiment.cpp:83
+msgid "Empty experiment name"
+msgstr ""
+
+#: src/vle/vpz/SaxStackValue.cpp:185
+msgid "Empty sax parser value stack for the top operation"
+msgstr ""
+
+#: src/vle/utils/Parser.cpp:101 src/vle/utils/Parser.cpp:139
+#: src/vle/utils/Parser.cpp:174 src/vle/utils/Parser.cpp:227
+#: src/vle/utils/Parser.cpp:243 src/vle/utils/Parser.cpp:247
+#: src/vle/utils/Parser.cpp:335 src/vle/utils/Parser.cpp:340
+msgid "End of file"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:193
+msgid "Error build atomic model '%1%' with error: %2%"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:201
+msgid "Error build coupled model '%1%' with error: %2%"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:76
+#, c-format
+msgid "Error during remove directory operation: %s\n"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:81
+msgid "Error parsing file '%1%'"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:84
+msgid "Error parsing file '%1%': %2%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:116
+msgid "Error parsing memory"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:119
+msgid "Error parsing memory: %1%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:91
+msgid "Error when parsing file '%1%': %2%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:125
+msgid "Error when parsing memory: %1%"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:470
+msgid "Error while downloading package `%1%'\n"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:501
+msgid "Error while downloading source package `%1%'\n"
+msgstr ""
+
+#: src/vle/devs/Executive.cpp:87
+msgid "Executive error: can not add observable to coupled model %1%"
+msgstr ""
+
+#: src/vle/devs/Executive.cpp:204
+msgid "Executive error: cannot add connection (`%1%', `%2%') to (`%3%', `%4%'"
+msgstr ""
+
+#: src/vle/devs/Executive.cpp:243
+msgid "Executive error: cannot remove connection (%1%, %2%) to (`%3%', `%4%')"
+msgstr ""
+
+#: src/vle/devs/Executive.cpp:150
+msgid "Executive error: rename `%1%' into `%2%' failed, `%1%' does not exist"
+msgstr ""
+
+#: src/vle/devs/Executive.cpp:156
+msgid "Executive error: rename `%1%' into `%2%' failed, `%2%' already exists"
+msgstr ""
+
+#: src/vle/devs/Executive.cpp:164
+msgid "Executive error: rename `%1%' into `%2%' failed: `%3%' "
+msgstr ""
+
+#: src/vle/devs/Executive.cpp:82 src/vle/devs/Executive.cpp:133
+#: src/vle/devs/Executive.cpp:255 src/vle/devs/Executive.cpp:267
+#: src/vle/devs/Executive.cpp:279 src/vle/devs/Executive.cpp:294
+msgid "Executive error: unknown model `%1%'"
+msgstr ""
+
+#: src/vle/devs/ModelFactory.cpp:369
+msgid ""
+"Executive model `%1%:%2%' (from dynamics `%3%' library `%4%' package `%5%') "
+"throws error in constructor: `%6%'"
+msgstr ""
+
+#: src/vle/manager/ExperimentGenerator.cpp:158
+msgid ""
+"ExperimentGenerator can not access to the index `%1%' of the condition `%2%' "
+"port `%3%' "
+msgstr ""
+
+#: src/vle/manager/ExperimentGenerator.cpp:69
+msgid ""
+"ExperimentGenerator: bad combination size for the condition `%1%' port `"
+"%2%': %3%"
+msgstr ""
+
+#: src/apps/vle/main.cpp:336
+#, c-format
+msgid "Experimental frames `%s' throws error %s"
+msgstr ""
+
+#: src/vle/devs/ExternalEvent.cpp:103 src/vle/devs/ExternalEvent.cpp:113
+#: src/vle/devs/ExternalEvent.cpp:123 src/vle/devs/ExternalEvent.cpp:133
+#: src/vle/devs/ExternalEvent.cpp:143 src/vle/devs/ExternalEvent.cpp:153
+#: src/vle/devs/ExternalEvent.cpp:163 src/vle/devs/ExternalEvent.cpp:173
+#: src/vle/devs/ExternalEvent.cpp:183 src/vle/devs/ExternalEvent.cpp:193
+#: src/vle/devs/ExternalEvent.cpp:203 src/vle/devs/ExternalEvent.cpp:213
+#: src/vle/devs/ExternalEvent.cpp:223 src/vle/devs/ExternalEvent.cpp:233
+#: src/vle/devs/ExternalEvent.cpp:243 src/vle/devs/ExternalEvent.cpp:253
+#: src/vle/devs/ExternalEvent.cpp:263 src/vle/devs/ExternalEvent.cpp:273
+#: src/vle/devs/ExternalEvent.cpp:283 src/vle/devs/ExternalEvent.cpp:293
+msgid "ExternalEvent: getAttributes is empty or is not a map."
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:216 src/vle/vpz/Vpz.cpp:250
+msgid "Failed to allocate parser context\n"
+msgstr ""
+
+#: src/vle/utils/Context.cpp:232
+msgid "Failed to build VLE_HOME directory (%1%)"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:221
+msgid "Failed to parse '%1%': %2%"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:258
+msgid "Failed to parse memory"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:353
+msgid "Failed to read preferences file"
+msgstr ""
+
+#: src/apps/vle/main.cpp:260
+#, c-format
+msgid "Failed to remove configuration file: %s\n"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:141
+msgid "Failed to start `%1%'"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:231
+msgid "Failed to validate '%1%': %2%"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:264
+msgid "Failed to validate memory"
+msgstr ""
+
+#: src/apps/vle/main.cpp:297
+#, c-format
+msgid "Filename '%s' does not exist"
+msgstr ""
+
+#: src/apps/vle/main.cpp:571
+#, c-format
+msgid "Found local packages:"
+msgstr ""
+
+#: src/apps/vle/main.cpp:580
+#, c-format
+msgid "Found remote packages:"
+msgstr ""
+
+#: src/vle/vpz/SaxStackValue.cpp:243
+msgid "Get last result value with empty result vector"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:248
+msgid "Get model have not the same name '%1%' and '%2%'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackValue.cpp:234
+msgid "Get result value with to big index %1%."
+msgstr ""
+
+#: src/vle/utils/Package.cpp:923
+msgid "In Package `%1%', can not rename `%2%' in `%3%'"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:571
+msgid "Input port %1% not exist in model %2%"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:385 src/vle/utils/Filesystem.cpp:391
+#, c-format
+msgid "Internal error in getcwd(): %s"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:371
+msgid "Key value tag does not have attribute 'name'"
+msgstr ""
+
+#: src/vle/manager/Manager.cpp:310
+msgid "Manager ended"
+msgstr ""
+
+#: src/vle/manager/Manager.cpp:290
+msgid "Manager error: rank (%1%) must be inferior to world (%2%)"
+msgstr ""
+
+#: src/vle/manager/Manager.cpp:284
+msgid "Manager error: thread must be superior to 0 (%1%)"
+msgstr ""
+
+#: src/vle/manager/Manager.cpp:296
+msgid "Manager error: world (%1%) must be superior to 0."
+msgstr ""
+
+#: src/vle/manager/Manager.cpp:153
+msgid "Manager failure."
+msgstr ""
+
+#: src/vle/manager/Manager.cpp:300
+msgid "Manager started"
+msgstr ""
+
+#: src/vle/value/Map.cpp:51 src/vle/value/Map.cpp:64
+msgid "Map: the key '%1%' does not exist"
+msgstr ""
+
+#: src/vle/value/Map.cpp:77 src/vle/value/Map.cpp:91
+msgid "Map: the key '%1%' have empty (null) value"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:349
+msgid "Matrix tag does not convert a attribute '%1%'"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:333
+msgid "Matrix tag does not have 'row' or 'column' attribute"
+msgstr ""
+
+#: src/vle/translator/MatrixTranslator.cpp:228
+msgid "Matrix translator error: %1%"
+msgstr ""
+
+#: src/vle/value/Matrix.cpp:146
+msgid "Matrix: Number of columns error: %1% on %2%"
+msgstr ""
+
+#: src/vle/value/Matrix.cpp:151
+msgid "Matrix: Number of row error: %1% on %2%"
+msgstr ""
+
+#: src/vle/value/Matrix.cpp:55
+msgid "Matrix: bad access %1% %2% for %3%x%4% matrix"
+msgstr ""
+
+#: src/vle/value/Matrix.cpp:141
+msgid "Matrix: bad constructor initialization %1%x%2%"
+msgstr ""
+
+#: src/vle/value/Matrix.cpp:399
+msgid "Matrix: bad reserve operation %1%x%2%"
+msgstr ""
+
+#: src/vle/value/Matrix.cpp:75 src/vle/value/Matrix.cpp:92
+msgid "Matrix: empty or null value at %1% %2% for %3%x%4% matrix"
+msgstr ""
+
+#: src/vle/translator/MatrixTranslator.cpp:54
+msgid "MatrixTranslator: unknow model '%1%'"
+msgstr ""
+
+#: src/vle/translator/MatrixTranslator.cpp:67
+msgid "MatrixTranslator: unknow size '%1%'"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:172 src/vle/utils/ContextModule.cpp:447
+#: src/vle/utils/ContextModule.cpp:505
+msgid "Missing type"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:536
+msgid "Model %1% have no input port %2%"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:548
+msgid "Model %1% have no output port %2%"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:818
+msgid "Model %1% is not attached to the coupled model %2%"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:271
+msgid "Model '%1%' have not the same parent"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:265
+msgid "Model '%1%' is not a coupled model"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:260
+msgid "Model '%1%' not found"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:244
+msgid ""
+"Module `%1%' does not have a vle_api_level symbol. This module seems to be "
+"too old."
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:152
+msgid ""
+"Module `%1%' is not a dynamic module (symbol vle_make_new_dynamics, "
+"vle_make_new_executive or vle_make_new_dynamics_wrapper are not found"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:168
+msgid "Module `%1%' is not an oov module (symbol vle_make_new_oov not found)"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:224
+msgid "Module can not open shared library `%1%': %2%"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:327
+msgid "Module: `%1%' not found in global space"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:258
+msgid ""
+"Module: `%1%' was produced with VLE %2%.%3%.%4% and is not API/ABI "
+"compatible with the current VLE %5%.%6%.%7%"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:550
+#, c-format
+msgid "ModuleManager: %s is not a packages directory\n"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:530
+msgid "ModuleManager: library %1% package %2% not foundin binary repositories"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:519
+#, c-format
+msgid "ModuleManager: library %s is missing in binary package %s in %s\n"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:366
+#, c-format
+msgid "ModuleManager: output unload %s (%s %s %s)\n"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:563
+#, c-format
+msgid "ModuleManager: package `%s' already exists. Forget this path: `%s'\n"
+msgstr ""
+
+#: src/vle/utils/ContextModule.cpp:359
+#, c-format
+msgid "ModuleManager: simulator unload %s (%s %s %s)\n"
+msgstr ""
+
+#: src/vle/utils/Parser.cpp:192
+#, c-format
+msgid "Multiple '.' while parsing real `%s'"
+msgstr ""
+
+#: src/vle/devs/ModelFactory.cpp:90
+msgid "Multiples condition with the same init port name '%1%'"
+msgstr ""
+
+#: src/vle/devs/Simulator.cpp:158
+msgid "Negative init function in '%1%' (%2%)"
+msgstr ""
+
+#: src/vle/devs/Simulator.cpp:146
+msgid "Negative time advance in '%1%' (%2%)"
+msgstr ""
+
+#: src/apps/vle/main.cpp:569 src/apps/vle/main.cpp:599
+#, c-format
+msgid "No local package has been found"
+msgstr ""
+
+#: src/apps/vle/main.cpp:547
+#, c-format
+msgid "No package has been downloaded\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:558
+#, c-format
+msgid "No package has been installed"
+msgstr ""
+
+#: src/apps/vle/main.cpp:536
+#, c-format
+msgid "No package has to be updated\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:578 src/apps/vle/main.cpp:589
+#, c-format
+msgid "No remote package has been found"
+msgstr ""
+
+#: src/vle/value/Value.cpp:279
+msgid "Null value"
+msgstr ""
+
+#: src/vle/vpz/Observables.cpp:79
+msgid "Observable %1% already exist"
+msgstr ""
+
+#: src/vle/vpz/Observables.cpp:91
+msgid "Observable %1% does not exist"
+msgstr ""
+
+#: src/vle/vpz/Observables.cpp:103
+msgid "Observable %1% doest not exist"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:844
+msgid "Observable port tag does not have attribute 'name'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:868
+msgid "Observable port view tag does not have attribute 'name'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:820
+msgid "Observable tag does not have attribute 'name'"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:669
+msgid "One or more models are connected to another model"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:396
+msgid "Origin tag does not have attributes 'model' or 'port'"
+msgstr ""
+
+#: src/vle/vpz/Output.cpp:107 src/vle/vpz/Output.cpp:129
+#: src/vle/vpz/Output.cpp:146 src/vle/vpz/Output.cpp:162
+msgid "Output '%1%' have not plugin defined"
+msgstr ""
+
+#: src/vle/vpz/Views.cpp:115 src/vle/vpz/Views.cpp:128
+msgid "Output '%1%' of view '%2%' is already used"
+msgstr ""
+
+#: src/vle/vpz/BaseModel.cpp:584
+msgid "Output port %1% not exist in model %2%"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:709
+msgid "Output tag does not define a '%1%' format"
+msgstr ""
+
+#: src/vle/devs/Dynamics.cpp:56 src/vle/devs/Dynamics.cpp:67
+#: src/vle/devs/Dynamics.cpp:78 src/vle/devs/Dynamics.cpp:89
+#: src/vle/devs/Dynamics.cpp:100 src/vle/devs/Dynamics.cpp:111
+#: src/vle/devs/Dynamics.cpp:122 src/vle/devs/Dynamics.cpp:133
+#: src/vle/devs/Dynamics.cpp:144 src/vle/devs/Dynamics.cpp:155
+#: src/vle/devs/Dynamics.cpp:166 src/vle/devs/Dynamics.cpp:177
+msgid "Package '%1%' is not installed"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:433
+msgid "Package `%1%` is already uptodate\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:376
+#, c-format
+msgid ""
+"Package `%s' does not exist. Use the create command before other command.\n"
+msgstr ""
+
+#: src/vle/utils/details/SpawnWin.cpp:690
+#: src/vle/utils/details/SpawnUnix.cpp:462
+msgid "Package command line: error, empty command `%1%'"
+msgstr ""
+
+#: src/apps/vle/main.cpp:549
+#, c-format
+msgid "Package downloaded:"
+msgstr ""
+
+#: src/vle/utils/Context.cpp:171
+#, c-format
+msgid "Package error: '%s' is not a directory\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:560
+#, c-format
+msgid "Package installed: "
+msgstr ""
+
+#: src/vle/utils/Package.cpp:79
+#, c-format
+msgid "Package remove all: unable to remove `%s' with the `%s' command\n"
+msgstr ""
+
+#: src/vle/utils/details/PackageManager.cpp:51
+#, c-format
+msgid "Package: can not open file `%s'\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:538
+#, c-format
+msgid "Packages to update (re-install them):"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:970
+msgid "Parent is not Class element"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:986
+msgid "Parent is not Structures element"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:978
+msgid "Parent is not Submodels element"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:962
+msgid "Parent is not Vpz element"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:995
+msgid "Parent of model is not class, submodel or structure"
+msgstr ""
+
+#: src/vle/utils/Parser.cpp:79
+msgid "Parser error before line %1% column %2%:\t%3%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser2.cpp:99
+#, c-format
+msgid "Parser: fail to read VPZ. Error at %d:%d\n"
+msgstr ""
+
+#: src/vle/utils/Context.cpp:249
+msgid "Path: VLE_HOME '%1%' does not exist"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:149 src/vle/utils/Filesystem.cpp:154
+#, c-format
+msgid "Path::file_size(): cannot stat file %s"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:244
+msgid "Path::operator/(): expected a path of the same type"
+msgstr ""
+
+#: src/vle/utils/Filesystem.cpp:241 src/vle/utils/Filesystem.cpp:258
+msgid "Path::operator/(): expected a relative path"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:372
+msgid "Pkg build error: '%1%' is not a directory"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:327
+msgid "Pkg build error: build failed %1%"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:310
+msgid "Pkg build error: building directory path is empty"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:366
+msgid "Pkg build error: directory '%1%' does not exist"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:306
+msgid "Pkg build error: empty command"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:380
+msgid "Pkg build error: install lib failed %1%"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:252
+msgid "Pkg configure error: %1%"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:232
+msgid "Pkg configure error: building directory path is empty"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:188 src/vle/utils/Package.cpp:228
+msgid "Pkg configure error: empty command"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:239
+msgid "Pkg configure error: fails to build directories"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:212
+msgid "Pkg create error: %1%"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:195
+msgid "Pkg create error: the directory %1% already exists"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:290
+msgid "Pkg error: test launch failed %1%"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:353
+msgid "Pkg install error: building directory '%1%' does not exist "
+msgstr ""
+
+#: src/vle/utils/Package.cpp:347
+msgid "Pkg install error: building directory path is empty"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:343
+msgid "Pkg install error: empty command"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:807
+msgid "Pkg list error: '%1%' is not an experiments directory"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:412
+msgid "Pkg packaging error: empty command"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:415
+msgid "Pkg packaging error: no building directory found"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:431
+msgid "Pkg packaging error: package failed %1%"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:277
+msgid "Pkg test error: building directory '%1%' does not exist "
+msgstr ""
+
+#: src/vle/utils/Package.cpp:271
+msgid "Pkg test error: building directory path is empty"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:267
+msgid "Pkg test error: empty command"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:287
+msgid "Port without name"
+msgstr ""
+
+#: src/vle/vpz/Project.cpp:73
+msgid "Project author unknow"
+msgstr ""
+
+#: src/apps/vle/main.cpp:524 src/apps/vle/main.cpp:609
+#, c-format
+msgid "Remote error: %s\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:511
+#, c-format
+msgid "Remote error: command '%s' expects 1 argument (got %zu\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:497
+#, c-format
+msgid "Remote error: remote command `%s' unrecognised\n"
+msgstr ""
+
+#: src/vle/utils/details/PackageParser.cpp:499
+msgid "Remote: fail to parse package file '%1'"
+msgstr ""
+
+#: src/vle/utils/details/PackageManager.cpp:77
+#, c-format
+msgid "Remote: failed to open Description from `%s'\n"
+msgstr ""
+
+#: src/vle/utils/details/PackageManager.cpp:64
+#, c-format
+msgid "Remote: failed to open directory `%s'\n"
+msgstr ""
+
+#: src/vle/utils/details/PackageManager.cpp:110
+#, c-format
+msgid "Remote: failed to rebuild cache of installed package: %s\n"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:271
+#, c-format
+msgid "Remote: failed to write local package `%s': %s\n"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:285
+#, c-format
+msgid "Remote: failed to write remote package `%s': %s\n"
+msgstr ""
+
+#: src/vle/utils/details/PackageManager.cpp:98
+#, c-format
+msgid "Remote: internal error when reading local package: %s\n"
+msgstr ""
+
+#: src/vle/utils/details/PackageManager.cpp:122
+#, c-format
+msgid "Remote: internal error when reading remote package: %s\n"
+msgstr ""
+
+#: src/vle/utils/details/PackageParser.cpp:484
+msgid "Remote: syntax error in file `%1%' l. %2% c. %3%: %4%"
+msgstr ""
+
+#: src/apps/vle/main.cpp:242
+#, c-format
+msgid "Remove configuration files\n"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:573
+msgid "Replace a model by null ?"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:569
+msgid "Replace a null model ?"
+msgstr ""
+
+#: src/apps/vle/main.cpp:795
+#, c-format
+msgid "Select only one mode in manager, remote or config\n"
+msgstr ""
+
+#: src/vle/value/Set.cpp:84 src/vle/value/Set.cpp:97
+msgid "Set: empty or null value at '%1%'"
+msgstr ""
+
+#: src/vle/value/Set.cpp:53
+msgid "Set: too big index '%1%' (max %2%)"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:152
+#, c-format
+msgid "Settings: fail reading boolean value at line %d in %s\n"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:169
+#, c-format
+msgid "Settings: fail reading double value at line %d in %s\n"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:161
+#, c-format
+msgid "Settings: fail reading integer value at line %d in %s\n"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:117
+#, c-format
+msgid ""
+"Settings: fail to read configuration file `%s'. Use default settings "
+"instead.\n"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:183
+#, c-format
+msgid "Settings: fail to write configuration file `%s'\n"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:130
+#, c-format
+msgid "Settings: fail while reading '%s' line '%d'\n"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:193
+#, c-format
+msgid "Settings: fail while writing configuration file `%s'\n"
+msgstr ""
+
+#: src/vle/utils/ContextSettings.cpp:140
+#, c-format
+msgid "Settings: unknown key `%s'\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:271
+#, c-format
+msgid "Show package content error: %s\n"
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:58
+msgid "Simulation: SIMULATION_SPAWN_PROCESS is not  yet implemented\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:362
+#, c-format
+msgid "Simulator `%s' throws error %s\n"
+msgstr ""
+
+#: src/vle/devs/Simulator.cpp:125
+msgid "Simulator destroyed"
+msgstr ""
+
+#: src/vle/utils/details/SpawnUnix.cpp:210
+#, c-format
+msgid "Spawn: check running child fail: %s\n"
+msgstr ""
+
+#: src/vle/utils/details/SpawnUnix.cpp:256
+#, c-format
+msgid "Spawn: child fails to change current directory: to `%s'\n"
+msgstr ""
+
+#: src/vle/utils/details/SpawnWin.cpp:645
+#: src/vle/utils/details/SpawnUnix.cpp:417
+#, c-format
+msgid "Spawn: command: `%s' chdir: `%s'\n"
+msgstr ""
+
+#: src/vle/utils/details/SpawnUnix.cpp:333
+#, c-format
+msgid "Spawn: failure `%s'\n"
+msgstr ""
+
+#: src/vle/utils/Template.cpp:41 src/vle/utils/Template.cpp:69
+msgid "Symbol '%1%' already exist"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:404
+msgid "Table value tag can not convert attributes 'width' or 'height': %1%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:397
+msgid "Table value tag does not have attributes 'width' or 'height'"
+msgstr ""
+
+#: src/vle/value/Table.cpp:46 src/vle/value/Table.cpp:59
+msgid "Table: bad accessor %1%x%2%"
+msgstr ""
+
+#: src/vle/value/Table.cpp:75 src/vle/value/Table.cpp:130
+msgid "Table: bad constructor initialization %1%x%2%"
+msgstr ""
+
+#: src/vle/utils/Template.cpp:195
+msgid "Template error, bad tag"
+msgstr ""
+
+#: src/vle/utils/Template.cpp:162
+msgid "Template error, can not open file '%1%'"
+msgstr ""
+
+#: src/vle/utils/Template.cpp:191
+msgid "Template error, no begin or end tag"
+msgstr ""
+
+#: src/vle/utils/details/ShellUtils.hpp:392
+msgid "Text ended before matching quote was found"
+msgstr ""
+
+#: src/vle/utils/details/ShellUtils.hpp:389
+msgid "Text ended just after a '\\' character."
+msgstr ""
+
+#: src/vle/utils/details/ShellUtils.hpp:399
+msgid "Text was empty (or contained only whitespace)"
+msgstr ""
+
+#: src/vle/devs/Coordinator.cpp:342
+msgid "The Atomic model node '%1% have already a simulator"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:632
+msgid "The basic connections list is malformed."
+msgstr ""
+
+#: src/vle/utils/Parser.cpp:66
+msgid "The block `%1%' does not exist"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:130 src/vle/vpz/Vpz.cpp:145
+msgid "The buffer [%1%] is not a value."
+msgstr ""
+
+#: src/vle/vpz/Conditions.cpp:164 src/vle/vpz/Conditions.cpp:176
+msgid "The condition '%1%' does not exists"
+msgstr ""
+
+#: src/vle/vpz/Dynamics.cpp:93 src/vle/vpz/Dynamics.cpp:106
+msgid "The dynamics %1% does not exist"
+msgstr ""
+
+#: src/vle/vpz/Dynamics.cpp:78
+msgid "The dynamics '%1%' already exists"
+msgstr ""
+
+#: src/vle/vpz/CoupledModel.cpp:608
+msgid "The model %1% is not the child of %2%"
+msgstr ""
+
+#: src/vle/devs/ModelFactory.cpp:73
+msgid "The model '%1%' already exist in coordinator"
+msgstr ""
+
+#: src/vle/vpz/Observable.cpp:95 src/vle/vpz/Observable.cpp:111
+msgid "The observable %1% have already a port %2%"
+msgstr ""
+
+#: src/vle/vpz/Observable.cpp:124 src/vle/vpz/Observable.cpp:137
+msgid "The observable %1% have not port %2%"
+msgstr ""
+
+#: src/vle/vpz/Observable.cpp:53
+msgid "The port %1% have already a view %2%"
+msgstr ""
+
+#: src/vle/vpz/Experiment.cpp:92 src/vle/vpz/Experiment.cpp:105
+#: src/vle/vpz/Experiment.cpp:116 src/vle/vpz/Experiment.cpp:129
+msgid "The simulation engine conditiondoes not exist"
+msgstr ""
+
+#: src/vle/devs/Coordinator.cpp:247
+msgid "The view '%1%' is unknown"
+msgstr ""
+
+#: src/vle/value/Tuple.cpp:44 src/vle/value/Tuple.cpp:55
+msgid "Tuple: bad accessor %1%"
+msgstr ""
+
+#: src/vle/vpz/Classes.cpp:69 src/vle/vpz/Classes.cpp:80
+#: src/vle/vpz/Classes.cpp:94
+msgid "Unknow class '%1%'"
+msgstr ""
+
+#: src/vle/vpz/Experiment.cpp:146
+msgid "Unknow combination '%1%'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:370
+msgid "Unknow connection type %1%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:199
+msgid "Unknow end tag '%1%'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:206
+msgid "Unknow model type %1%"
+msgstr ""
+
+#: src/vle/vpz/Outputs.cpp:123 src/vle/vpz/Outputs.cpp:134
+msgid "Unknow output '%1%'\n"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:317
+msgid "Unknow port type %1%."
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:180
+msgid "Unknow tag '%1%'"
+msgstr ""
+
+#: src/vle/vpz/Views.cpp:145 src/vle/vpz/Views.cpp:156
+msgid "Unknow view '%1%'\n"
+msgstr ""
+
+#: src/vle/utils/Template.cpp:86
+msgid "Unknown bool symbol '%1%'"
+msgstr ""
+
+#: src/apps/vle/main.cpp:743
+#, c-format
+msgid "Unknown command line option\n"
+msgstr ""
+
+#: src/vle/utils/Template.cpp:125 src/vle/utils/Template.cpp:140
+msgid "Unknown list symbol '%1%'"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:614
+msgid "Unknown local package `%1%'\n"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:416 src/vle/utils/RemoteManager.cpp:508
+msgid "Unknown package `%1%'\n"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:579
+msgid "Unknown remote package `%1%'\n"
+msgstr ""
+
+#: src/vle/utils/Template.cpp:58
+msgid "Unknown single symbol '%1%'"
+msgstr ""
+
+#: src/apps/vle/main.cpp:644
+msgid "Unknown variable `%1%'"
+msgstr ""
+
+#: src/apps/mvle/mvle.cpp:47
+#, c-format
+msgid ""
+"Use:\n"
+"  mvle [-h,--help] [-v,--version] [-s|--show] [-P,--package package_name] "
+"vpz_files...\n"
+"\n"
+"Help options:\n"
+"  -h, --help        Show help option\n"
+"\n"
+"Application options:\n"
+"  -s --show         Show the plan\n"
+"  -P --package      Start VLE in package mode\n"
+"  -v --version      Show the version\n"
+msgstr ""
+
+#: src/vle/utils/Context.cpp:227
+msgid "VLE_HOME must be a directory (%1%)"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:633
+msgid "VPZ parser: bad height (%1%) or width (%2%) table "
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:639
+msgid "VPZ parser: bad height or width for number of real in table"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:802
+msgid "VPZ parser: multiples values for output"
+msgstr ""
+
+#: src/vle/value/Value.cpp:175
+msgid "Value is is not an integer"
+msgstr ""
+
+#: src/vle/value/Value.cpp:71 src/vle/value/Value.cpp:167
+msgid "Value is not a boolean"
+msgstr ""
+
+#: src/vle/value/Value.cpp:87 src/vle/value/Value.cpp:183
+msgid "Value is not a double"
+msgstr ""
+
+#: src/vle/value/Value.cpp:111 src/vle/value/Value.cpp:207
+msgid "Value is not a map"
+msgstr ""
+
+#: src/vle/value/Value.cpp:151 src/vle/value/Value.cpp:247
+msgid "Value is not a matrix"
+msgstr ""
+
+#: src/vle/value/Value.cpp:143 src/vle/value/Value.cpp:239
+msgid "Value is not a null"
+msgstr ""
+
+#: src/vle/value/Value.cpp:103 src/vle/value/Value.cpp:199
+msgid "Value is not a set"
+msgstr ""
+
+#: src/vle/value/Value.cpp:95 src/vle/value/Value.cpp:191
+msgid "Value is not a string"
+msgstr ""
+
+#: src/vle/value/Value.cpp:127 src/vle/value/Value.cpp:223
+msgid "Value is not a table"
+msgstr ""
+
+#: src/vle/value/Value.cpp:119 src/vle/value/Value.cpp:215
+msgid "Value is not a tuple"
+msgstr ""
+
+#: src/vle/value/Value.cpp:159 src/vle/value/Value.cpp:255
+msgid "Value is not a user value"
+msgstr ""
+
+#: src/vle/value/Value.cpp:79
+msgid "Value is not an integer"
+msgstr ""
+
+#: src/vle/value/Value.cpp:135 src/vle/value/Value.cpp:231
+msgid "Value is not an xml"
+msgstr ""
+
+#: src/vle/vpz/Views.cpp:103
+msgid "View '%1%' already exist"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:770
+msgid "View tag does not accept type '%1%'"
+msgstr ""
+
+#: src/vle/vpz/SaxStackVpz.cpp:741
+msgid "View tag does not have a timestep attribute"
+msgstr ""
+
+#: src/vle/devs/View.cpp:67
+#, c-format
+msgid "View: Can not open the plug-in `%s' in package `%s': %s"
+msgstr ""
+
+#: src/apps/vle/main.cpp:166
+#, c-format
+msgid ""
+"Virtual Laboratory Environment - %s\n"
+"Copyright (C) 2003 - 2016 The VLE Development Team.\n"
+"VLE comes with ABSOLUTELY NO WARRANTY.\n"
+"You may redistribute copies of VLE\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING.\n"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:86 src/vle/vpz/Vpz.cpp:111
+#, c-format
+msgid "Vpz error: %s"
+msgstr ""
+
+#: src/vle/vpz/Vpz.cpp:157
+msgid "Vpz: cannot open file '%1%' for writing"
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:82 src/vle/manager/Simulation.cpp:141
+msgid "[%1%]\n"
+msgstr ""
+
+#: src/vle/utils/details/SpawnWin.cpp:649
+#: src/vle/utils/details/SpawnUnix.cpp:421
+#, c-format
+msgid "[%s]\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:443
+#, c-format
+msgid "all is not yet implemented\n"
+msgstr ""
+
+#: src/apps/mvle/mvle.cpp:134
+#, c-format
+msgid "bad mpi rank id: %d"
+msgstr ""
+
+#: src/apps/mvle/mvle.cpp:142
+#, c-format
+msgid "bad mpi world size: %d"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:914
+msgid "error to convert '%1%' to double"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:908
+msgid "error to convert '%1%' to double: %2%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:869
+msgid "error to convert '%1%' to integer"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:863
+msgid "error to convert '%1%' to integer: %2%"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:892
+msgid "error to convert '%1%' to unsigned integer"
+msgstr ""
+
+#: src/vle/vpz/SaxParser.cpp:886
+msgid "error to convert '%1%' to unsigned integer: %2%"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:634
+msgid "fail to compress '%1%': file or directory does not exist"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:689
+msgid "fail to extract '%1%' in directory '%2%':  directory does not exist"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:695
+msgid "fail to extract '%1%' in directory '%2%': file does not exist"
+msgstr ""
+
+#: src/vle/utils/Package.cpp:66 src/vle/utils/RemoteManager.cpp:651
+#: src/vle/utils/RemoteManager.cpp:712
+msgid "fail to start cmake command"
+msgstr ""
+
+#: src/vle/utils/RemoteManager.cpp:468
+msgid "failed\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:472
+#, c-format
+msgid "missing argument\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:391
+#, c-format
+msgid "missing package\n"
+msgstr ""
+
+#: src/apps/vle/main.cpp:629
+#, c-format
+msgid "missing variable name\n"
+msgstr ""
+
+#: src/apps/mvle/mvle.cpp:63
+#, c-format
+msgid ""
+"mvle - MPI manager for VLE\n"
+"Virtual Laboratory Environment - %s\n"
+"Copyright (C) 2003 - 2014 The VLE Development Team.\n"
+"VLE is a multi-modeling environment to build,\n"
+"simulate and analyse models of dynamic complex systems.\n"
+"For more information, see manuals with 'man mvle' or\n"
+"the VLE website http://sourceforge.net/projects/vle/\n"
+msgstr ""
+
+#: src/vle/devs/DynamicsDbg.cpp:100
+msgid "no event\n"
+msgstr ""
+
+#: src/vle/manager/Simulation.cpp:87 src/vle/manager/Simulation.cpp:92
+#: src/vle/manager/Simulation.cpp:96 src/vle/manager/Simulation.cpp:115
+#: src/vle/manager/Simulation.cpp:146 src/vle/manager/Simulation.cpp:151
+#: src/vle/manager/Simulation.cpp:155 src/vle/manager/Simulation.cpp:160
+#: src/vle/manager/Simulation.cpp:164 src/vle/utils/RemoteManager.cpp:446
+#: src/vle/utils/RemoteManager.cpp:464
+msgid "ok\n"
+msgstr ""
