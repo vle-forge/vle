@@ -320,3 +320,5 @@ message(STATUS "Build with mvle...............: ${VLE_HAVE_MVLE}")
 message(STATUS "Build with cvle...............: ${VLE_HAVE_CVLE}")
 
 # vim:tw=0:ts=8:tw=0:sw=2:sts=2
+
+include(CMakeCPack.cmake)

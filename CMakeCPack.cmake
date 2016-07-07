@@ -1,18 +1,8 @@
 include(InstallRequiredSystemLibraries)
 
-if (WIN32)
-  set(CPACK_GENERATOR "ZIP;NSIS")
-  set(CPACK_SOURCE_GENERATOR "ZIP")
-endif (WIN32)
-
-if (UNIX)
-  set(CPACK_GENERATOR "TGZ;DEB;RPM")
-  set(CPACK_SOURCE_GENERATOR "ZIP;TGZ;TBZ2")
-endif (UNIX)
-
-if (APPLE)
-  set(CPACK_GENERATOR "OSXX11")
-endif (APPLE)
+#
+# Common configuration
+#
 
 set(CPACK_STRIP_FILES "1")
 set(CPACK_PACKAGE_NAME "VLE")
@@ -45,11 +35,16 @@ endif ()
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${VLE_NAME_COMPLETE})
 set(CPACK_PACKAGE_EXECUTABLES "vle" "VLE" "gvle" "GVLE")
 
+#
 # CPack source configuration
+#
 set(CPACK_SOURCE_PACKAGE_FILE_NAME ${VLE_NAME_COMPLETE})
 set(CPACK_SOURCE_IGNORE_FILES "\\\\.swp$;/\\\\.gitignore;/build/;/\\\\.git/")
 
+#
 # CPack DEB configuration
+#
+
 set(CPACK_DEBIAN_PACKAGE_NAME ${VLE_NAME}-${VLE_MAJOR}.${VLE_MINOR})
 set(CPACK_DEBIAN_PACKAGE_VERSION ${VLE_COMPLETE})
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
@@ -59,7 +54,10 @@ set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simul
 set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
 
+#
 # CPack RPM configuration
+#
+
 set(CPACK_RPM_PACKAGE_SUMMARY "VLE, a framework for multi-modeling, simulation and analysis of complex dynamical systems.")
 set(CPACK_RPM_PACKAGE_NAME ${VLE_NAME}-${VLE_MAJOR}.${VLE_MINOR})
 set(CPACK_RPM_PACKAGE_VERSION ${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH})
@@ -68,33 +66,30 @@ set(CPACK_RPM_PACKAGE_VENDOR "Gauthier Quesnel <quesnel@users.sourceforge.net>")
 set(CPACK_RPM_PACKAGE_LICENSE "GNU General Public License (GPL)")
 set(CPACK_RPM_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simulation and analysis of complex dynamical systems.")
 
+#
 # CPack NSIS configuration
-if (CPACK_GENERATOR MATCHES "NSIS")
+#
+set(CMAKE_MODULE_PATH "share")
+set(QT_INSTALL_PATH CACHE PATH "Qt install path")
+set(VLE_MINGW_PATH CACHE PATH "Mingw Boost directory")
+set(VLEDEPS_PATH CACHE PATH "vle deps directory")
+set(VLE_BOOST_INCLUDE_PATH CACHE PATH "Boost include path")
+set(VLE_BOOST_LIBRARIES_PATH CACHE PATH "Boost libraries path")
+set(VLE_CMAKE_PATH CACHE PATH "CMake directory")
+set(Boost_INCLUDE_DIRS CACHE PATH "Boost include dirs")
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/share)
 
-  set(CMAKE_MODULE_PATH "share")
-  set(QT_INSTALL_PATH CACHE PATH "Qt install path")
-  set(VLE_MINGW_PATH CACHE PATH "Mingw Boost directory")
-  set(VLEDEPS_PATH CACHE PATH "vle deps directory")
-  set(VLE_BOOST_INCLUDE_PATH CACHE PATH "Boost include path")
-  set(VLE_BOOST_LIBRARIES_PATH CACHE PATH "Boost libraries path")
-  set(VLE_CMAKE_PATH CACHE PATH "CMake directory")
-  set(Boost_INCLUDE_DIRS CACHE PATH "Boost include dirs")
-  set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/share)
-
-  set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
-  set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
-  set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\logo.bmp")
-  set(CPACK_NSIS_MENU_LINKS "${VLE_SHARE_DIRS}/doc/vle.chm" "VLE API" "http://www.vle-project.org" "VLE Web Site")
-  set(CPACK_CREATE_DESKTOP_LINKS gvle)
-  set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
-  set(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboratory Environment")
-  set(CPACK_NSIS_HELP_LINK "http://www.vle-project.org")
-  set(CPACK_NSIS_URL_INFO_ABOUT "http://www.vle-project.org")
-  set(CPACK_NSIS_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
-  set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${VLE_VERSION_SHORT}.0")
-  set(CPACK_NSIS_MODIFY_PATH ON)
-endif ()
+set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
+set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
+set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\logo.bmp")
+set(CPACK_NSIS_MENU_LINKS "${VLE_SHARE_DIRS}/doc/vle.chm" "VLE API" "http://www.vle-project.org" "VLE Web Site")
+set(CPACK_CREATE_DESKTOP_LINKS gvle)
+set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
+set(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboratory Environment")
+set(CPACK_NSIS_HELP_LINK "http://www.vle-project.org")
+set(CPACK_NSIS_URL_INFO_ABOUT "http://www.vle-project.org")
+set(CPACK_NSIS_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
+set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${VLE_VERSION_SHORT}.0")
+set(CPACK_NSIS_MODIFY_PATH ON)
 
 include(CPack)
-
-# vim:tw=0:ts=8:tw=0:sw=2:sts=2
