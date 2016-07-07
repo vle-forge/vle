@@ -180,7 +180,7 @@ std::vector<Path> Context::getBinaryPackages() const
 
     return result;
 }
-\
+
 Path Context::getLocalPackageFilename() const
 {
     Path p = getHomeDir();
