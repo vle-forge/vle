@@ -662,18 +662,21 @@ public:
         m_finish = true;
 #else
         for (;;) {
-            struct dirent *entry = readdir(m_directory);
-            if (entry == nullptr) {
+            struct dirent entry;
+            struct dirent *result;
+            int ret = readdir_r(m_directory, &entry, &result);
+
+            if (ret or result == nullptr) {
                 m_finish = true;
                 return;
             }
 
-            if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+            if (!strcmp(entry.d_name, ".") || !strcmp(entry.d_name, ".."))
                 continue;
 
-            m_entry.m_path = m_path / entry->d_name;
-            m_entry.m_is_file = entry->d_type == DT_REG;
-            m_entry.m_is_directory = entry->d_type == DT_DIR;
+            m_entry.m_path = m_path / entry.d_name;
+            m_entry.m_is_file = entry.d_type == DT_REG;
+            m_entry.m_is_directory = entry.d_type == DT_DIR;
             return;
         }
 #endif
