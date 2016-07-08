@@ -27,82 +27,63 @@
 
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
-#include <vle/vle.hpp>
 #include <iostream>
-#include <cstdio>
-#include <cstdarg>
-#include <cstring>
 
-#define OMPI_SKIP_MPICXX
-#include <mpi.h>
+#include <boost/algorithm/string.hpp>
+#include <boost/program_options.hpp>
+#include <boost/mpi/environment.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives.hpp>
+
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cassert>
+#include <getopt.h>
+
+#ifdef VLE_HAVE_NLS
+# ifndef ENABLE_NLS
+#  define ENABLE_NLS
+# endif
+#  include <libintl.h>
+#  include <locale.h>
+#  define _(x) gettext(x)
+#  define gettext_noop(x) x
+#  define N_(x) gettext_noop(x)
+#else
+#  define _(x) x
+#  define N_(x) x
+#endif
 
 void mvle_show_help()
 {
-    std::fprintf(stderr, _(
-            "Use:\n"
-            "  mvle [-h,--help] [-v,--version] [-s|--show] [-P,--package"
-            " package_name] vpz_files...\n"
-            "\n"
-            "Help options:\n"
-            "  -h, --help        Show help option\n"
-            "\n"
-            "Application options:\n"
-            "  -s --show         Show the plan\n"
-            "  -P --package      Start VLE in package mode\n"
-            "  -v --version      Show the version\n"));
+    printf(_("Use:\n"
+             "  mvle [-h,--help] [-v,--version] [-s|--show] [-P,--package"
+             " package_name] vpz_files...\n"
+             "\n"
+             "Help options:\n"
+             "  -h, --help        Show help option\n"
+             "\n"
+             "Application options:\n"
+             "  -s --show         Show the plan\n"
+             "  -P --package      Start VLE in package mode\n"
+             "  -v --version      Show the version\n"));
 }
 
 void mvle_show_version()
 {
-    std::fprintf(stderr, _(
-            "mvle - MPI manager for VLE\n"
-            "Virtual Laboratory Environment - %s\n"
-            "Copyright (C) 2003 - 2014 The VLE Development Team.\n"
-            "VLE is a multi-modeling environment to build,\nsimulate "
-            "and analyse models of dynamic complex systems.\n"
-            "For more information, see manuals with 'man mvle' or\n"
-            "the VLE website http://sourceforge.net/projects/vle/\n"),
-        VLE_NAME_COMPLETE);
-}
-
-void mvle_print(const char *fmt, ...)
-{
-    va_list argptr;
-
-    va_start(argptr, fmt);
-    std::vfprintf(stdout, fmt, argptr);
-    va_end(argptr);
-}
-
-void mvle_print_debug(const char *fmt, ...)
-{
-    std::fprintf(stderr, "mvle_debug: ");
-
-    va_list argptr;
-
-    va_start(argptr, fmt);
-    std::vfprintf(stderr, fmt, argptr);
-    va_end(argptr);
-
-    std::fprintf(stderr, "\n");
-}
-
-void mvle_print_error(const char *fmt, ...)
-{
-    std::fprintf(stderr, "mvle_error: ");
-
-    va_list argptr;
-
-    va_start(argptr, fmt);
-    std::vfprintf(stderr, fmt, argptr);
-    va_end(argptr);
-
-    std::fprintf(stderr, "\n");
+    printf(_("mvle - MPI manager for VLE\n"
+             "Virtual Laboratory Environment - %s\n"
+             "Copyright (C) 2003 - 2014 The VLE Development Team.\n"
+             "VLE is a multi-modeling environment to build,\nsimulate "
+             "and analyse models of dynamic complex systems.\n"
+             "For more information, see manuals with 'man mvle' or\n"
+             "the VLE website http://sourceforge.net/projects/vle/\n"),
+           VLE_NAME_COMPLETE);
 }
 
 void mvle_mpi_error(int error)
@@ -116,7 +97,7 @@ void mvle_mpi_error(int error)
     MPI_Error_string(errorclass,  buffer, &len);
     buffer[len] = '\0';
 
-    mvle_print_error("%s", buffer);
+    fprintf(stderr, "%s", buffer);
 }
 
 bool mvle_mpi_init(int *argc, char ***argv, uint32_t *rank, uint32_t *world)
@@ -131,7 +112,7 @@ bool mvle_mpi_init(int *argc, char ***argv, uint32_t *rank, uint32_t *world)
             /* check the cast of the MPI's rank */
             if (t_rank < 0 or static_cast < unsigned int >(t_rank) >
                 std::numeric_limits < uint32_t >::max()) {
-                mvle_print_error(_("bad mpi rank id: %d"), t_rank);
+                fprintf(stderr, _("bad mpi rank id: %d"), t_rank);
             } else {
                 *rank = static_cast < uint32_t >(t_rank);
                 if ((r = MPI_Comm_size(MPI_COMM_WORLD, &t_world)) ==
@@ -139,7 +120,7 @@ bool mvle_mpi_init(int *argc, char ***argv, uint32_t *rank, uint32_t *world)
                     /* check the cast of the MPI's world size */
                     if (t_world < 0 and static_cast < unsigned int >(t_world) >
                         std::numeric_limits < uint32_t >::max()) {
-                        mvle_print_error(_("bad mpi world size: %d"), t_world);
+                        fprintf(stderr, _("bad mpi world size: %d"), t_world);
                     } else {
                         *world = static_cast < uint32_t >(t_world);
                         result = true;
@@ -158,7 +139,7 @@ bool mvle_mpi_init(int *argc, char ***argv, uint32_t *rank, uint32_t *world)
 }
 
 bool mvle_parse_arg(int argc, char **argv, int *vpz, bool *show,
-        vle::utils::Package& pack)
+                    vle::utils::Package& pack)
 {
     int i = 1;
 
@@ -196,32 +177,32 @@ void mvle_show(const std::string& vpz)
 
         expgen.get(expgen.min(), &conds);
 
-        mvle_print(";");
+        printf(";");
         for (it = conds.begin(); it != conds.end(); ++it) {
             const vle::vpz::Condition& cond = it->second;
             vle::vpz::Condition::const_iterator jt;
 
             for (jt = cond.begin(); jt != cond.end(); ++jt) {
-                mvle_print("%s.%s;", it->first.c_str(), jt->first.c_str());
+                printf("%s.%s;", it->first.c_str(), jt->first.c_str());
             }
         }
 
-        mvle_print("\n");
+        printf("\n");
 
         for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
             expgen.get(i, &conds);
 
-            mvle_print("%d;", i);
+            printf("%d;", i);
             for (it = conds.begin(); it != conds.end(); ++it) {
                 const vle::vpz::Condition& cond = it->second;
                 vle::vpz::Condition::const_iterator jt;
 
                 for (jt = cond.begin(); jt != cond.end(); ++jt) {
-                    mvle_print("%s;",
-                               jt->second->get(0)->writeToFile().c_str());
+                    printf("%s;",
+                           jt->second->get(0)->writeToFile().c_str());
                 }
             }
-            mvle_print("\n");
+            printf("\n");
         }
     }
 }
@@ -233,11 +214,10 @@ int main(int argc, char **argv)
     bool show = false;
     bool result;
 
-    vle::Init app("");
-
+    auto ctx = vle::utils::make_context();
     if ((result = mvle_mpi_init(&argc, &argv, &rank, &world))) {
         int vpz = 0;
-        vle::utils::Package pack;
+        vle::utils::Package pack(ctx);
         if ((result = mvle_parse_arg(argc, argv, &vpz, &show, pack))) {
             if (show) {
                 while (vpz < argc) {
@@ -247,39 +227,39 @@ int main(int argc, char **argv)
                 }
             } else {
                 try {
-                    vle::manager::Manager man(vle::manager::LOG_NONE,
+                    vle::manager::Manager man(ctx,
+                                              vle::manager::LOG_NONE,
                                               vle::manager::SIMULATION_NONE |
                                               vle::manager::SIMULATION_NO_RETURN,
                                               &std::cout);
-                    vle::utils::ModuleManager modules;
 
-                    mvle_print("MPI node %d/%d start\n", rank, world);
+                    printf("MPI node %d/%d start\n", rank, world);
 
                     while (vpz < argc) {
+                        auto v = std::make_unique<vle::vpz::Vpz>(
+                            pack.getExpFile(argv[vpz],
+                                            vle::utils::PKG_BINARY));
+
                         vle::manager::Error error;
-                        vle::value::Matrix *res = man.run(
-                            new vle::vpz::Vpz(pack.getExpFile(argv[vpz],
-                                    vle::utils::PKG_BINARY)),
-                            modules,
-                            1,
-                            rank,
-                            world,
-                            &error);
+                        auto res = man.run(std::move(v),
+                                           1,
+                                           rank,
+                                           world,
+                                           &error);
 
                         if (error.code) {
-                            mvle_print_error("Experimental frames `%s' throws error %s",
-                                             argv[vpz], error.message.c_str());
+                            fprintf(stderr, "Experimental frames `%s' "
+                                    "throws error %s",
+                                    argv[vpz], error.message.c_str());
                         }
-
-                        delete res;
 
                         vpz++;
                     }
 
-                    mvle_print("MPI node %d/%d end\n", rank, world);
+                    printf("MPI node %d/%d end\n", rank, world);
 
                 } catch (const std::exception& e) {
-                    mvle_print_error("manager problem: %s", e.what());
+                    fprintf(stderr, "manager problem: %s", e.what());
                 }
             }
         }
