@@ -52,6 +52,53 @@
 namespace vle {
 namespace gvle {
 
+VleBooleanEdit::VleBooleanEdit(QWidget* parent, bool val,
+                               const QString& idStr): QCheckBox(parent), id(idStr)
+{
+
+    if (val) {
+        setCheckState(Qt::Checked);
+    } else{
+        setCheckState(Qt::Unchecked);
+    }
+
+    QObject::connect(this, SIGNAL(clicked(bool)),
+            this, SLOT(onValueChanged(bool)));
+
+    installEventFilter(this);
+}
+
+VleBooleanEdit::~VleBooleanEdit()
+{
+}
+
+void
+VleBooleanEdit::setValue(bool val)
+{
+    if (val) {
+        setCheckState(Qt::Checked);
+    } else{
+        setCheckState(Qt::Unchecked);
+    }
+}
+
+void
+VleBooleanEdit::focusInEvent(QFocusEvent* e)
+{
+    QCheckBox::focusInEvent(e);
+    emit selected(id);
+}
+
+void
+VleBooleanEdit::onValueChanged(bool checked)
+{
+    if (checkState() == Qt::Checked) {
+        emit valUpdated(id, true);
+    } else {
+        emit valUpdated(id, false);
+    }
+}
+
 VleDoubleEdit::VleDoubleEdit(QWidget* parent, double val,
                              const QString& idStr): QLineEdit(parent), id(idStr)
 {

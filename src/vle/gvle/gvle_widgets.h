@@ -30,6 +30,7 @@
 #include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QPlainTextEdit>
 #include <QHBoxLayout>
 #include <QTableWidget>
@@ -41,6 +42,27 @@
 
 namespace vle {
 namespace gvle {
+
+
+/**
+ * A Bool Editor
+ */
+class VleBooleanEdit : public QCheckBox
+{
+    Q_OBJECT
+public:
+    VleBooleanEdit(QWidget* parent, bool val, const QString& idStr="");
+    ~VleBooleanEdit();
+    void focusInEvent(QFocusEvent* e);
+    void setValue(bool val);
+
+    QString id;
+public slots:
+    void onValueChanged(bool checked);
+signals:
+    void valUpdated(const QString& id, bool v);
+    void selected(const QString& id);
+};
 
 /**
  * A double Editor
