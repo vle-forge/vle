@@ -480,10 +480,9 @@ BOOST_AUTO_TEST_CASE(test_del_coupled_model)
     auto  simdepth2 = new devs::Simulator(depth2);
     coord.addModel(depth2,simdepth2);
 
-    BOOST_CHECK_NO_THROW(coord.delModel(depth0,"depth1"));
+    // BOOST_CHECK_NO_THROW(coord.prepare_dynamic_deletion(depth0));
 
     delete depth0;
-    delete simdepth2;
 }
 
 BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)

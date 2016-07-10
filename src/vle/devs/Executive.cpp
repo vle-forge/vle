@@ -125,20 +125,12 @@ Executive::createModelFromClass(const std::string& classname,
 
 void Executive::delModel(const std::string& modelname)
 {
-    std::vector < std::pair < Simulator*, std::string > > toupdate;
+    auto* mdl = cpled()->findModel(modelname);
+    if (not mdl)
+        throw utils::DevsGraphError(_("Executive error: unknown model `%s'"),
+                                    modelname.c_str());
 
-    vpz::BaseModel* mdl = cpled()->findModel(modelname);
-    if (not mdl) {
-        throw utils::DevsGraphError(
-            (fmt(_("Executive error: unknown model `%1%'")) %
-             modelname).str());
-    }
-
-    m_coordinator.getSimulatorsSource(mdl, toupdate);
-
-    m_coordinator.delModel(cpled(), modelname);
-
-    m_coordinator.updateSimulatorsTarget(toupdate);
+    m_coordinator.prepare_dynamic_deletion(mdl);
 }
 
 void Executive::renameModel(const std::string& oldname,

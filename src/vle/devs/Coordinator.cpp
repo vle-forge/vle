@@ -101,7 +101,6 @@ void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
     m_durationTime = duration;
     buildViews();
     addModels(mdls);
-    m_toDelete = 0;
     m_isStarted = true;
 
     m_eventTable.init(current);
@@ -114,25 +113,47 @@ void Coordinator::run()
         m_currentTime = m_eventTable.getCurrentTime();
 
     vDbg(m_context, _("-------- BAG [%f] --------\n"), m_currentTime);
-    SimulatorList::size_type oldToDelete(m_toDelete);
 
+    std::vector<Bag::value_type> simulators;
+    simulators.reserve(bags.size());
     std::vector<Bag::value_type> executives;
-    for (auto & elem: bags) {
-        if (elem->dynamics()->isExecutive()) {
-            executives.emplace_back(elem);
-            continue;
-        }
 
+    for (auto& elem : bags) {
+        if (elem->dynamics()->isExecutive())
+            executives.emplace_back(elem);
+        else
+            simulators.emplace_back(elem);
+    }
+
+    /* TODO this part can be threaded. */
+
+    for (auto & elem : simulators) {
         if (elem->haveInternalEvent()) {
+            elem->output(m_currentTime);
+
             if (not elem->haveExternalEvents())
-                processInternalEvent(elem);
+                elem->internalTransition(m_currentTime);
             else
-                processConflictEvents(elem);
+                elem->confluentTransitions(m_currentTime);
         } else {
-            assert(elem->haveExternalEvents() && "unknown simulator state");
-            processExternalEvents(elem);
+            elem->externalTransition(m_currentTime);
         }
     }
+
+    /* End thread loop for simulators. The update of the Scheduler must be
+       in mono thread to avoid mutex. */
+
+    for (auto& elem : simulators) {
+        auto tn = elem->getTn();
+        if (not isInfinity(tn))
+            m_eventTable.addInternal(elem, tn);
+    }
+
+    /* For all simulators, dispatch external events. */
+    dispatchExternalEvent(simulators);
+
+    /* Executives must be run in mono thread according to the depth in the
+       structure of the model. */
 
     if (not executives.empty()) {
         std::sort(executives.begin(), executives.end(),
@@ -144,41 +165,33 @@ void Coordinator::run()
 
         for (auto & elem: executives) {
             if (elem->haveInternalEvent()) {
+                elem->output(m_currentTime);
+
                 if (not elem->haveExternalEvents())
-                    processInternalEvent(elem);
+                    elem->internalTransition(m_currentTime);
                 else
-                    processConflictEvents(elem);
+                    elem->confluentTransitions(m_currentTime);
             } else {
-                assert(elem->haveExternalEvents() && "unknow simulator state");
-                processExternalEvents(elem);
+                elem->externalTransition(m_currentTime);
             }
         }
-    }
 
-    // If there is model to delete, we remove models that are destroyed in
-    // previous \e run() call.
-    if (oldToDelete > 0) {
-        auto begin = m_deletedSimulator.begin();
-        auto end = m_deletedSimulator.begin() + oldToDelete;
-
-        for (auto it = begin; it != end; ++it) {
-            m_eventTable.delSimulator(*it);
-            delete *it;
-            *it = nullptr;
+        for (auto& elem : executives) {
+            auto tn = elem->getTn();
+            if (not isInfinity(tn))
+                m_eventTable.addInternal(elem, tn);
         }
 
-        m_deletedSimulator.erase(begin, end);
-        m_toDelete = m_deletedSimulator.size();
+        dispatchExternalEvent(executives);
     }
 
-    /* Process observation event if the next bag is scheduled for a
-     * different date than \e m_currentTime.
-     */
+    /* Process observation event if the next bag is scheduled for a different
+       date than \e m_currentTime. */
     auto next = m_eventTable.getNextTime();
     if (next > m_currentTime) {
-        /* Scheduler is empty. We 'eat' all timed view until the
-         * duration time.
-         */
+
+        /* Scheduler is empty. We eat all timed view until the duration
+           time. */
         auto eatuntil = std::min(next, m_durationTime);
 
         while (m_timed_observation_scheduler.haveObservationAtTime(eatuntil)) {
@@ -201,13 +214,17 @@ void Coordinator::run()
         }
 
         if (isInfinity(next) or next > m_durationTime) {
-            /* For all Timed view, process a final observation and clear
-             * the scheduller.
-             */
+            /* For all Timed view, process a final observation and clear the
+               scheduler. */
             m_currentTime = m_durationTime;
             m_timed_observation_scheduler.finalize(m_currentTime);
         }
     }
+
+    /* Finally, we destroy model and simulator if one executive delete a
+       model. */
+    if (not m_delete_model.empty())
+        dynamic_deletion();
 
     m_eventTable.makeNextBag();
     m_currentTime = m_eventTable.getCurrentTime();
@@ -255,24 +272,42 @@ void Coordinator::addObservableToView(vpz::AtomicModel* model,
                                        portname, m_currentTime);
 }
 
-void Coordinator::delModel(vpz::CoupledModel* parent,
-                           const std::string& modelname)
+void Coordinator::prepare_dynamic_deletion(vpz::BaseModel* model)
 {
-    vpz::BaseModel* mdl = parent->findModel(modelname);
+    assert(model);
 
-    if (not mdl) {
-        throw utils::InternalError(
-            (fmt(_("Cannot delete an unknown model '%1%'")) % modelname).str());
+    m_delete_model.emplace_back(model);
+}
+
+void Coordinator::dynamic_deletion()
+{
+    std::vector<std::pair<Simulator*, std::string>> toupdate;
+    std::vector<Simulator*> lst;
+
+    for (auto& elem : m_delete_model) {
+        getSimulatorsSource(elem, toupdate);
+
+        auto* parent = elem->getParent();
+
+        if (elem->isCoupled())
+            delCoupledModel(static_cast<vpz::CoupledModel*>(elem), lst);
+        else
+            delAtomicModel(static_cast<vpz::AtomicModel*>(elem), lst);
+
+        if (parent)
+            parent->delModel(elem);
+
+        updateSimulatorsTarget(toupdate);
+        toupdate.clear();
     }
 
-    if (mdl->isCoupled()) {
-        delCoupledModel(static_cast < vpz::CoupledModel* >(mdl));
-    } else {
-        delAtomicModel(static_cast < vpz::AtomicModel* >(mdl));
-    }
+    m_delete_model.clear();
 
-    parent->delModel(mdl); // finally, we remove the model from the
-                           // vpz::CoupledModel object.
+    for (auto& elem : lst) {
+        m_eventTable.delSimulator(elem);
+        m_modelList.erase(elem->getStructure());
+        delete elem;
+    }
 }
 
 void Coordinator::getSimulatorsSource(
@@ -367,7 +402,8 @@ Simulator* Coordinator::getModel(const std::string& name) const
 /// Private functions.
 ///
 
-void Coordinator::delAtomicModel(vpz::AtomicModel* atom)
+void Coordinator::delAtomicModel(vpz::AtomicModel* atom,
+                                 std::vector<Simulator*>& to_delete)
 {
     assert(atom && "Cannot delete undefined atomic model");
 
@@ -383,28 +419,19 @@ void Coordinator::delAtomicModel(vpz::AtomicModel* atom)
     for (auto& elem : m_timedViewList)
         elem.second.removeObservable(satom->dynamics().get());
 
-    m_eventTable.delSimulator(satom);
-    satom->clear();
-    m_deletedSimulator.push_back(satom);
-
-    ++m_toDelete;
+    to_delete.emplace_back(satom);
 }
 
-void Coordinator::delCoupledModel(vpz::CoupledModel* mdl)
+void Coordinator::delCoupledModel(vpz::CoupledModel* mdl,
+                                  std::vector<Simulator*>& to_delete)
 {
-    if (not mdl) {
-        throw utils::DevsGraphError(
-            _("Cannot delete undefined coupled model"));
-    }
+    assert(mdl && "Cannot delete undefined coupled model");
 
-    std::vector < vpz::AtomicModel* > lst;
-    lst.reserve(16);
-
+    std::vector <vpz::AtomicModel*> lst;
     vpz::BaseModel::getAtomicModelList(mdl, lst);
 
-    std::for_each(lst.begin(), lst.end(),
-                  std::bind1st(
-                      std::mem_fun(&Coordinator::delAtomicModel), this));
+    for (auto& elem : lst)
+        delAtomicModel(elem, to_delete);
 }
 
 void Coordinator::addModels(const vpz::Model& model)
@@ -412,23 +439,26 @@ void Coordinator::addModels(const vpz::Model& model)
     m_modelFactory.createModels(*this, model);
 }
 
-void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
-                                        Simulator* sim)
+void Coordinator::dispatchExternalEvent(std::vector<Simulator*>& simulators)
 {
-    for (auto & elem : eventList) {
+    for (auto sim : simulators) {
+        if (sim->result().empty())
+            continue;
 
-        std::pair < Simulator::iterator, Simulator::iterator > x;
-        x = sim->targets((elem).getPortName(), m_modelList);
+        auto& eventList = sim->result();
+        for (auto & elem : eventList) {
+            auto x = sim->targets(elem.getPortName(), m_modelList);
 
-        if (x.first != x.second and x.first->second.first) {
-            for (auto jt = x.first; jt != x.second; ++jt)
-                m_eventTable.addExternal(jt->second.first,
-                                         elem.attributes(),
-                                         jt->second.second);
+            if (x.first != x.second and x.first->second.first) {
+                for (auto jt = x.first; jt != x.second; ++jt)
+                    m_eventTable.addExternal(jt->second.first,
+                                             elem.attributes(),
+                                             jt->second.second);
+            }
         }
-    }
 
-    eventList.clear();
+        sim->clear_result();
+    }
 }
 
 void Coordinator::buildViews()
@@ -438,10 +468,9 @@ void Coordinator::buildViews()
     const vpz::ViewList& viewlist(views.viewlist());
 
     for (const auto & elem : viewlist) {
-
-        std::string file = utils::format("%s_%s",
-                                         m_modelFactory.experiment().name().c_str(),
-                                         elem.first.c_str());
+        auto file = utils::format("%s_%s",
+                                  m_modelFactory.experiment().name().c_str(),
+                                  elem.first.c_str());
 
         const auto& output = outs.get(elem.second.output());
 
@@ -475,38 +504,38 @@ void Coordinator::processInit(Simulator *simulator)
     }
 }
 
-void Coordinator::processInternalEvent(Bag::value_type& modelbag)
-{
-    ExternalEventList result; // TODO perhaps use an attribute to cahce
-                              // the malloc, realloc, etc.
-    modelbag->output(result, m_currentTime);
-    dispatchExternalEvent(result, modelbag);
-
-    Time tn = modelbag->internalTransition(m_currentTime);
-    if (not isInfinity(tn))
-        m_eventTable.addInternal(modelbag, tn);
-}
-
-void Coordinator::processExternalEvents(Bag::value_type& modelbag)
-{
-    Time tn = modelbag->externalTransition(m_currentTime);
-
-    if (not isInfinity(tn))
-        m_eventTable.addInternal(modelbag, tn);
-}
-
-void Coordinator::processConflictEvents(Bag::value_type& modelbag)
-{
-    ExternalEventList result; // TODO perhaps use an attribute to cache
-                              // the malloc, realloc, etc.
-    modelbag->output(result, m_currentTime);
-    dispatchExternalEvent(result, modelbag);
-
-    Time tn = modelbag->confluentTransitions(m_currentTime);
-
-    if (not isInfinity(tn))
-        m_eventTable.addInternal(modelbag, tn);
-}
+// void Coordinator::processInternalEvent(Bag::value_type& modelbag)
+// {
+//     ExternalEventList result; // TODO perhaps use an attribute to cahce
+//                               // the malloc, realloc, etc.
+//     modelbag->output(result, m_currentTime);
+//     dispatchExternalEvent(result, modelbag);
+//
+//     Time tn = modelbag->internalTransition(m_currentTime);
+//     if (not isInfinity(tn))
+//         m_eventTable.addInternal(modelbag, tn);
+// }
+//
+// void Coordinator::processExternalEvents(Bag::value_type& modelbag)
+// {
+//     Time tn = modelbag->externalTransition(m_currentTime);
+//
+//     if (not isInfinity(tn))
+//         m_eventTable.addInternal(modelbag, tn);
+// }
+//
+// void Coordinator::processConflictEvents(Bag::value_type& modelbag)
+// {
+//     ExternalEventList result; // TODO perhaps use an attribute to cache
+//                               // the malloc, realloc, etc.
+//     modelbag->output(result, m_currentTime);
+//     dispatchExternalEvent(result, modelbag);
+//
+//     Time tn = modelbag->confluentTransitions(m_currentTime);
+//
+//     if (not isInfinity(tn))
+//         m_eventTable.addInternal(modelbag, tn);
+// }
 
 std::unique_ptr<value::Map> Coordinator::finish()
 {

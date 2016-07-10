@@ -92,11 +92,6 @@ public:
     { return m_atomicModel; }
 
     /**
-     * @brief Delete the dynamics and erase reference to the AtomicModel.
-     */
-    void clear();
-
-    /**
      * @brief Return a constant reference to the devs::Dynamics.
      * @return
      */
@@ -145,69 +140,78 @@ public:
     Time init(Time time);
     Time timeAdvance();
     void finish();
-    void output(ExternalEventList& output, Time time);
+    void output(Time time);
     Time internalTransition(Time time);
     Time externalTransition(Time time);
     Time confluentTransitions(Time time);
     std::unique_ptr<value::Value> observation(const ObservationEvent& event) const;
 
+    inline const ExternalEventList& result() const noexcept
+    {
+        return m_result;
+    }
 
-    Time getTn() const noexcept
+    inline void clear_result() noexcept
+    {
+        m_result.clear();
+    }
+
+    inline Time getTn() const noexcept
     {
         return m_tn;
     }
 
-    HandleT handle() const noexcept
+    inline HandleT handle() const noexcept
     {
         assert(m_have_handle && "Simulator: handle is not defined");
         return m_handle;
     }
 
-    bool haveHandle() const noexcept
+    inline bool haveHandle() const noexcept
     {
         return m_have_handle;
     }
 
-    void setHandle(HandleT handle) noexcept
+    inline void setHandle(HandleT handle) noexcept
     {
         m_have_handle = true;
         m_handle = handle;
     }
 
-    void resetHandle() noexcept
+    inline void resetHandle() noexcept
     {
         m_have_handle = false;
     }
 
-    bool haveExternalEvents() const noexcept
+    inline bool haveExternalEvents() const noexcept
     {
         return not m_external_events.empty();
     }
 
-    void addExternalEvents(Simulator *simulator,
-                           std::shared_ptr<value::Value> values,
-                           const std::string& portname)
+    inline void addExternalEvents(Simulator *simulator,
+                                  std::shared_ptr<value::Value> values,
+                                  const std::string& portname)
     {
         m_external_events_nextbag.emplace_back(simulator, values, portname);
     }
 
-    void clearExternalEvents()
+    inline void clearExternalEvents()
     {
         m_external_events.clear();
     }
 
-    void swapExternalEvents()
+    inline void swapExternalEvents()
     {
         m_external_events.clear();
         m_external_events.swap(m_external_events_nextbag);
     }
 
-    void setInternalEvent() noexcept
+    inline void setInternalEvent() noexcept
     {
         m_have_internal = true;
     }
 
-    bool haveInternalEvent() const noexcept
+    inline bool haveInternalEvent() const noexcept
     {
         return m_have_internal;
     }
@@ -218,6 +222,7 @@ private:
     TargetSimulatorList mTargets;
     ExternalEventList   m_external_events;
     ExternalEventList   m_external_events_nextbag;
+    ExternalEventList   m_result;
     std::string         m_parents;
     Time                m_tn;
     HandleT             m_handle;

@@ -128,8 +128,8 @@ public:
      * @param parent the coupled model parent of model to delete.
      * @param modelname the name of model to delete.
      */
-    void delModel(vpz::CoupledModel* parent,
-                  const std::string& modelname);
+    // void delModel(vpz::CoupledModel* parent,
+    //               const std::string& modelname);
 
     void getSimulatorsSource(
         vpz::BaseModel* model,
@@ -235,9 +235,6 @@ public:
     bool isStarted() const { return m_isStarted; }
 
     void processInit(Simulator *simulator);
-    void processInternalEvent(Bag::value_type& modelbag);
-    void processExternalEvents(Bag::value_type& modelbag);
-    void processConflictEvents(Bag::value_type& modelbag);
 
     /**
      * Retrieves for all Views the \c vle::value::Matrix result.
@@ -262,6 +259,20 @@ public:
      */
     const std::map<std::string, View>& getEventViewList() const;
 
+
+    /** An executive adds a model (atomic or coupled) to be delete at the
+     * end of the \e Coordinator::run() function.
+     *
+     * \param model The model (Atomic or Coupled) to delete.
+     */
+    void prepare_dynamic_deletion(vpz::BaseModel*);
+
+    /** For each element of the \e m_delete_model list, delete the \c
+     * vpz::BaseModel information from the structure of the model. Delete
+     * the \c Simulator from scheduller and the Simulator himself.
+     */
+    void dynamic_deletion();
+
 private:
     Coordinator(const Coordinator& other);
     Coordinator& operator=(const Coordinator& other);
@@ -275,8 +286,9 @@ private:
     std::map<std::string, View> m_eventViewList;
     std::map<std::string, View> m_timedViewList;
     ModelFactory                m_modelFactory;
-    SimulatorList               m_deletedSimulator;
-    SimulatorList::size_type    m_toDelete;
+
+    std::vector<vpz::BaseModel*> m_delete_model;
+
     bool                        m_isStarted;
 
     /**
@@ -298,11 +310,9 @@ private:
      * CompleteEventBagModel otherwise, if event is an External then is
      * push int the Schuduller.
      *
-     * @param eventList the external event list to treat.
      * @param sim the simulator that dispatch external events.
      */
-    void dispatchExternalEvent(ExternalEventList& eventList,
-                               Simulator* sim);
+    void dispatchExternalEvent(std::vector<Simulator*>& sim);
 
     /**
      * @brief Delete the atomic model from Graph, the Simulator from
@@ -311,7 +321,8 @@ private:
      *
      * @param atom the model to delete.
      */
-    void delAtomicModel(vpz::AtomicModel* atom);
+    void delAtomicModel(vpz::AtomicModel* atom,
+                        std::vector<Simulator*>& to_delete);
 
     /**
      * @brief Delete the coupled model from Devs::Graph. All the
@@ -322,7 +333,8 @@ private:
      *
      * @param mdl the model to delete.
      */
-    void delCoupledModel(vpz::CoupledModel* mdl);
+    void delCoupledModel(vpz::CoupledModel* mdl,
+                        std::vector<Simulator*>& to_delete);
 
     /**
      * Set a new date to the Coordinator.

@@ -43,16 +43,12 @@ Simulator::Simulator(vpz::AtomicModel* atomic)
     assert(atomic && "Simulator: missing vpz::AtomicMOdel");
 }
 
-void Simulator::clear()
-{
-    m_dynamics.reset(nullptr);
-    m_atomicModel = nullptr;
-}
-
 void Simulator::updateSimulatorTargets(
     const std::string& port,
     std::map < vpz::AtomicModel*, devs::Simulator* >& simulators)
 {
+    assert(m_atomicModel);
+
     mTargets.erase(port);
 
     vpz::ModelPortList result;
@@ -79,12 +75,12 @@ void Simulator::updateSimulatorTargets(
     }
 }
 
-std::pair < Simulator::iterator, Simulator::iterator >
+std::pair <Simulator::iterator, Simulator::iterator>
 Simulator::targets(
     const std::string& port,
-    std::map < vpz::AtomicModel*, devs::Simulator* >& simulators)
+    std::map <vpz::AtomicModel*, devs::Simulator*>& simulators)
 {
-    std::pair < iterator, iterator > x = mTargets.equal_range(port);
+    auto x = mTargets.equal_range(port);
 
     if (x.first == x.second) {
         updateSimulatorTargets(port, simulators);
@@ -132,9 +128,11 @@ void Simulator::finish()
     m_dynamics->finish();
 }
 
-void Simulator::output(ExternalEventList& output, Time time)
+void Simulator::output(Time time)
 {
-    m_dynamics->output(time, output);
+    assert(m_result.empty());
+
+    m_dynamics->output(time, m_result);
 }
 
 Time Simulator::timeAdvance()
