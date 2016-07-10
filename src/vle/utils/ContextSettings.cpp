@@ -95,6 +95,7 @@ void Context::reset_settings() noexcept
         { "gvle.graphics.font", std::string("Monospace 10") },
         { "gvle.graphics.font-size", 10.0 },
         { "gvle.graphics.line-width", 3.0 },
+        { "vle.simulation.thread", 1l },
         { "vle.packages.configure", std::string(VLE_PACKAGE_COMMAND_CONFIGURE) },
         { "vle.packages.test", std::string(VLE_PACKAGE_COMMAND_TEST) },
         { "vle.packages.build", std::string(VLE_PACKAGE_COMMAND_BUILD) },
