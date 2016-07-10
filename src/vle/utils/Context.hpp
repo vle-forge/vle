@@ -45,22 +45,6 @@ using PathList = std::vector<vle::utils::Path>;
 
 struct PrivateContextIimpl;
 class Context;
-using ContextPtr = std::shared_ptr<Context>;
-
-
-/**
- * Build a std::shared_ptr<Context> using "C" as default locale.
- *
- * \e param prefix Default (\e prefix.empty() or \e
- * !prefix.is_directory()), it reads the \e VLE_HOME environment variable
- * and if it fails, try to build prefix from the \e HOME user.
- *
- * \e param locale Default "C" for ASCII, empty for current locale
- * otherwise, you can specify what you want.  \e return An initialized
- * std::shared_ptr<Context>.
- */
-VLE_API ContextPtr make_context(const Path& prefix = {},
-                                std::string locale = {"C"});
 
 /**
  * \e Context manage all users and installation paths of VLE.
@@ -606,6 +590,27 @@ private:
      */
     void initPrefixDir();
 };
+
+/**
+ * \c ContextPtr is a shared pointer. \c ContextPtr is use in many piece of
+ * code of VLE. Try to use one \c Context per thread to avoid the use of global
+ * mutex.
+ */
+using ContextPtr = std::shared_ptr<Context>;
+
+/**
+ * Build a std::shared_ptr<Context> using "C" as default locale.
+ *
+ * \e param prefix Default (\e prefix.empty() or \e
+ * !prefix.is_directory()), it reads the \e VLE_HOME environment variable
+ * and if it fails, try to build prefix from the \e HOME user.
+ *
+ * \e param locale Default "C" for ASCII, empty for current locale
+ * otherwise, you can specify what you want.  \e return An initialized
+ * std::shared_ptr<Context>.
+ */
+VLE_API ContextPtr make_context(const Path& prefix = {},
+                                std::string locale = {"C"});
 
 }} // namespace vle utils
 
