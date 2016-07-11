@@ -226,8 +226,10 @@ FileVpzExpCond::showEditPlace()
         mPlugin->delWidgetToolbar();
         mPlugin = 0;
     } else {
-        while (QWidget* w = ui->value->findChild<QWidget*>() ) {
-            delete w;
+        QList<QWidget *> list =  ui->value->findChildren<QWidget *>();
+        QListIterator<QWidget *> i(list);
+        while (i.hasNext()) {
+            i.next()->deleteLater();
         }
     }
 
