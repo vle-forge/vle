@@ -226,35 +226,39 @@ FileVpzExpCond::showEditPlace()
         mPlugin->delWidgetToolbar();
         mPlugin = 0;
     } else {
-        QList<QWidget *> list =  ui->value->findChildren<QWidget *>();
-        QListIterator<QWidget *> i(list);
-        while (i.hasNext()) {
-            i.next()->deleteLater();
+        for (int i = 0; i < ui->vlValue->count(); i++) {
+            QWidget* currwid = ui->vlValue->itemAt(i)->widget();
+            ui->vlValue->removeWidget(currwid);
+            currwid->deleteLater();
         }
     }
 
 
     if (mCurrCondName == "") {
 
-        QLabel* lab = new QLabel("Nothing to edit", ui->value);
+        QLabel* lab = new QLabel("Nothing to edit");
+        ui->vlValue->addWidget(lab);
         lab->show();
         return;
     }
     if (mVpm->getCondGUIplugin(mCurrCondName) != "") {
         mPlugin = mVpm->provideCondGUIplugin(mCurrCondName);
         if (mPlugin) {
-            mPlugin->getWidget()->setParent(ui->value);
+            mPlugin->getWidget()->setParent(this);
+            ui->vlValue->addWidget(mPlugin->getWidget());
             mPlugin->getWidget()->show();
         }
         return;
     }
     if (mCurrPortName == "") {
-        QLabel* lab = new QLabel("Nothing to edit", ui->value);
+        QLabel* lab = new QLabel("Nothing to edit");
+        ui->vlValue->addWidget(lab);
         lab->show();
         return;
     }
     if (mCurrValIndex < 0) {
-        QLabel* lab = new QLabel("Nothing to edit", ui->value);
+        QLabel* lab = new QLabel("Nothing to edit");
+        ui->vlValue->addWidget(lab);
         lab->show();
         return;
     }
@@ -270,7 +274,8 @@ FileVpzExpCond::showEditPlace()
             case vle::value::Value::DOUBLE:
             case vle::value::Value::STRING:
             case vle::value::Value::USER: {
-                QLabel* lab = new QLabel("Nothing to edit", ui->value);
+                QLabel* lab = new QLabel("Nothing to edit");
+                ui->vlValue->addWidget(lab);
                 lab->show();
                 break;
             } case vle::value::Value::SET:
@@ -280,10 +285,11 @@ FileVpzExpCond::showEditPlace()
             case vle::value::Value::XMLTYPE:
             case vle::value::Value::NIL:
             case vle::value::Value::MATRIX: {
-                VleValueWidget* valWidget = new VleValueWidget(ui->value);
+                VleValueWidget* valWidget = new VleValueWidget(this);
                 QObject::connect(valWidget,
                         SIGNAL(valUpdated(const vle::value::Value&)),
                         this, SLOT(onValUpdated(const vle::value::Value&)));
+                ui->vlValue->addWidget(valWidget);
                 valWidget->setValue(val);
                 valWidget->show();
                 break;
