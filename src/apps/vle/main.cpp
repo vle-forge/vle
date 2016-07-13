@@ -772,6 +772,7 @@ int main(int argc, char **argv)
     verbose_level = verbose_level < 7 ? std::max(verbose_level, 0) :
         std::min(verbose_level, 7);
 
+    ctx->set_log_priority(verbose_level);
     if (log_stdout == 0)
         ctx->set_log_function(std::make_unique<vle_log_standard>(stdout));
     else if (log_stdout == 1)
