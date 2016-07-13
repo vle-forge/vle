@@ -338,8 +338,7 @@ public:
 
 struct ModuleManager
 {
-    using ModuleTable = std::unordered_map<std::string,
-                                           std::unique_ptr<Module>>;
+    using ModuleTable = std::unordered_map<std::string,std::unique_ptr<Module>>;
     using value_type = ModuleTable::value_type;
     using const_iterator = ModuleTable::const_iterator;
     using iterator = ModuleTable::iterator;
@@ -351,23 +350,42 @@ struct ModuleManager
 
     ModuleManager(Context* ctx)
         : mContext(ctx)
-    {}
+    {
+        assert(ctx);
+    }
 
     ~ModuleManager() noexcept
     {
-        for (const auto& elem : mTableSimulator)
-            vDbg(mContext, _("ModuleManager: simulator unload %s (%s %s %s)\n"),
-                 elem.first.c_str(),
-                 elem.second->mPath.string().c_str(),
-                 elem.second->mPackage.c_str(),
-                 elem.second->mLibrary.c_str());
+        if (mContext)
+            return;
 
         for (const auto& elem : mTableSimulator)
-            vDbg(mContext, _("ModuleManager: output unload %s (%s %s %s)\n"),
-                 elem.first.c_str(),
-                 elem.second->mPath.string().c_str(),
-                 elem.second->mPackage.c_str(),
-                 elem.second->mLibrary.c_str());
+            if (elem.second) {
+                vDbg(mContext,
+                     _("ModuleManager: simulator unload %s (%s %s %s)\n"),
+                     elem.first.c_str(),
+                     elem.second->mPath.string().c_str(),
+                     elem.second->mPackage.c_str(),
+                     elem.second->mLibrary.c_str());
+            } else {
+                vDbg(mContext,
+                     _("ModuleManager: simulator unload %s (not loaded)\n"),
+                     elem.first.c_str());
+            }
+
+        for (const auto& elem : mTableOov)
+            if (elem.second) {
+                vDbg(mContext,
+                     _("ModuleManager: output unload %s (%s %s %s)\n"),
+                     elem.first.c_str(),
+                     elem.second->mPath.string().c_str(),
+                     elem.second->mPackage.c_str(),
+                     elem.second->mLibrary.c_str());
+            } else {
+                vDbg(mContext,
+                     _("ModuleManager: output unload %s (not loaded)\n"),
+                     elem.first.c_str());
+            }
     }
 
     /**
