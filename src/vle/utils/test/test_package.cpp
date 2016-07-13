@@ -133,8 +133,8 @@ BOOST_AUTO_TEST_CASE(show_package)
             std::cout << i << ": " << paths[i].string() << '\n';
     }
 
-    // 2 binary packages: the show_package build previously and the
-    // vle.output package provided with VLE.
+    // 2 binary packages: the show_package build previously and the vle.output,
+    // vle.adaptative-qss packages provided with VLE.
     BOOST_REQUIRE(ctx->getBinaryPackages().size() == 2);
     vle::utils::Path p = pkg.getExpDir(vle::utils::PKG_BINARY);
 
