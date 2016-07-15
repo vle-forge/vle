@@ -48,14 +48,12 @@ ModelFactory::ModelFactory(utils::ContextPtr context,
                            std::map<std::string, View>& eventviews,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
-                           const vpz::Experiment& exp,
-                           RootCoordinator& root)
+                           const vpz::Experiment& exp)
     : mContext(context)
     , mEventViews(eventviews)
     , mDynamics(dyn)
     , mClasses(cls)
     , mExperiment(exp)
-    , mRoot(root)
 {
 }
 

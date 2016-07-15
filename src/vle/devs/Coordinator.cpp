@@ -27,7 +27,6 @@
 
 #include <vle/devs/Coordinator.hpp>
 #include <vle/utils/ContextPrivate.hpp>
-#include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/ExternalEvent.hpp>
@@ -76,11 +75,10 @@ namespace vle { namespace devs {
 Coordinator::Coordinator(utils::ContextPtr context,
                          const vpz::Dynamics& dyn,
                          const vpz::Classes& cls,
-                         const vpz::Experiment& experiment,
-                         RootCoordinator& root)
+                         const vpz::Experiment& experiment)
     : m_context(context)
     , m_currentTime(0.0)
-    , m_modelFactory(context, m_eventViewList, dyn, cls, experiment, root)
+    , m_modelFactory(context, m_eventViewList, dyn, cls, experiment)
     , m_isStarted(false)
 {
 }

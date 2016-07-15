@@ -41,11 +41,9 @@
 
 namespace vle { namespace devs {
 
-class RootCoordinator;
 class Coordinator;
 class Simulator;
 class Dynamics;
-
 
 /**
  * @brief Read simulations plugin from models directories and manage models
@@ -65,8 +63,7 @@ public:
                  std::map<std::string, View>& eventviews,
                  const vpz::Dynamics& dyn,
                  const vpz::Classes& cls,
-                 const vpz::Experiment& experiment,
-                 RootCoordinator& root);
+                 const vpz::Experiment& experiment);
 
     ModelFactory(const ModelFactory& other) = delete;
     ModelFactory& operator=(const ModelFactory& other) = delete;
@@ -212,7 +209,6 @@ private:
     vpz::Classes            mClasses; /**< List of available vpz::Classes. */
     vpz::Experiment         mExperiment; /**< A reference to the
                                            vpz::Experiment. */
-    RootCoordinator&        mRoot;
 
     /**
      * Try to open the plug-in and return the type of opened plugin

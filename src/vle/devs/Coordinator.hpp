@@ -52,8 +52,7 @@ public:
     Coordinator(utils::ContextPtr context,
                 const vpz::Dynamics& dyn,
                 const vpz::Classes& cls,
-                const vpz::Experiment& experiment,
-                RootCoordinator& root);
+                const vpz::Experiment& experiment);
 
     ~Coordinator() = default;
 

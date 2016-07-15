@@ -29,6 +29,7 @@
 #define DEVS_ROOTCOORDINATOR_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/devs/Coordinator.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/devs/Time.hpp>

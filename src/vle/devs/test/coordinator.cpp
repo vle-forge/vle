@@ -473,7 +473,7 @@ BOOST_AUTO_TEST_CASE(test_del_coupled_model)
     vpz::Classes classes;
     vpz::Experiment expe;
     devs::RootCoordinator root(ctx);
-    devs::Coordinator coord(ctx, dyns, classes, expe, root);
+    devs::Coordinator coord(ctx, dyns, classes, expe);
     vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
     vpz::CoupledModel* depth1(depth0->addCoupledModel("depth1"));
     vpz::AtomicModel* depth2 = depth1->addAtomicModel("depth2");

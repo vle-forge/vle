@@ -26,7 +26,6 @@
 
 
 #include <vle/devs/RootCoordinator.hpp>
-#include <vle/devs/Coordinator.hpp>
 #include <cassert>
 
 namespace vle { namespace devs {
@@ -53,8 +52,7 @@ void RootCoordinator::load(const vpz::Vpz& io)
     m_coordinator = std::make_unique<Coordinator>(m_context,
                                                   io.project().dynamics(),
                                                   io.project().classes(),
-                                                  io.project().experiment(),
-                                                  *this);
+                                                  io.project().experiment());
 
     m_coordinator->init(io.project().model(), m_currentTime, m_end);
 
