@@ -1,37 +1,64 @@
+sudo: required
+dist: trusty
 language: cpp
 
-compiler:
-  - gcc
-  - clang
-
-env:
-  - BUILD_TYPE=Debug
-  - BUILD_TYPE=RelWithDebInfo
-  - BUILD_TYPE=Release
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+        - COMPILER=g++-4.9
+        - QT_SELECT=qt5
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - COMPILER=g++-5
+        - QT_SELECT=qt5
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+      env:
+        - COMPILER=clang++-3.6
+        - QT_SELECT=qt5
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+      env:
+        - COMPILER=clang++-3.7
+        - QT_SELECT=qt5
 
 before_install:
-  - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ precise main universe"
   - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake g++ libgtkmm-3.0-dev libgtksourceview2.0-dev libboost1.48-dev libboost1.48-all-dev libopenmpi-dev libarchive-dev
-
-before_script:
+  - sudo apt-get install -y cmake libboost-dev libopenmpi-dev libxml2-dev
+script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_GVLE=OFF ..
   - make
   - sudo make install
-  - cd ..
-
-script:
-  - cd build
   - ctest -V
 
 notifications:
-  recipients:
-    - vle-devel@lists.sourceforge.net
-  email:
-    on_success: change
-    on_failure: always
   irc:
     channels:
       - "chat.freenode.net#vle"
