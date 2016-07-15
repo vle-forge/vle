@@ -40,9 +40,6 @@ namespace vle { namespace devs {
 
 class Executive;
 
-typedef std::vector < Simulator* > SimulatorList;
-typedef std::map < vpz::AtomicModel*, devs::Simulator* > SimulatorMap;
-
 /**
  * @brief Represent the DEVS Coordinator class. This class provide a non
  * hierarchical DEVS Coordinator ie. all models are in the same coupled
@@ -58,7 +55,7 @@ public:
                 const vpz::Experiment& experiment,
                 RootCoordinator& root);
 
-    ~Coordinator();
+    ~Coordinator() = default;
 
     /**
      * @brief Initialise Coordinator before running simulation. Rand is
@@ -153,29 +150,15 @@ public:
     //
 
     /**
-     * @brief Attach the specified simulator to the vpz::AtomicModel and
-     * install it on bus.
-     * @param model
-     * @param simulator
+     * Add a newly \c Simulator into the list of simulators and retrieves
+     * a pointer to the underlying simulator.
+     *
+     * \param model A pointer to the \e vpz::AtomicModel attached to this
+     * newly allocated Simulator.
+     *
+     * \return A pointer the the newly allocated Simulator.
      */
-    void addModel(vpz::AtomicModel* model, Simulator* simulator);
-
-    /**
-     * Return the devs::Simulator with a specified vpz::AtomicModel.
-     * Complexity: log O(log(n)).
-     * @param model the atomicmodel reference to search.
-     * @return A reference to the devs::Simulator or 0 if not found.
-     */
-    Simulator* getModel(const vpz::AtomicModel* model) const;
-
-    /**
-     * Return the devs::Simulator with a specified atomic model name.
-     * Complexity: linear O(n).
-     * @param model the name of atomic model to search.
-     * @return a reference to the devs::Simulator or 0 if not found.
-     */
-    Simulator* getModel(const std::string& model) const;
-
+    Simulator* addModel(vpz::AtomicModel* model);
 
     //
     ///
@@ -185,9 +168,6 @@ public:
 
     inline Time getCurrentTime() const
     { return m_currentTime; }
-
-    inline const SimulatorMap& modellist() const
-    { return m_modelList; }
 
     /**
      * @brief Get a constant reference to the list of vpz::Dynamics objects.
@@ -280,7 +260,7 @@ private:
     utils::ContextPtr           m_context;
     Time                        m_currentTime;
     Time                        m_durationTime;
-    SimulatorMap                m_modelList;
+    std::vector<std::unique_ptr<Simulator>> m_simulators;
     Scheduler                   m_eventTable;
     TimedObservationScheduler   m_timed_observation_scheduler;
     std::map<std::string, View> m_eventViewList;

@@ -33,6 +33,12 @@
 #include <string>
 #include <set>
 
+namespace vle { namespace devs {
+
+class Simulator;
+
+}} // namespace vle devs
+
 namespace vle { namespace vpz {
 
     /**
@@ -239,7 +245,20 @@ namespace vle { namespace vpz {
             m_debug = false;
         }
 
+        inline
+        devs::Simulator* get_simulator() const noexcept
+        {
+            return m_simulator;
+        }
+
+        /* \c AtomicModel is friend with the \c devs::Simulator to enable
+         * \c devs::Simulator class to assign the m_simulator pointer
+         * without providing a specific API for this.
+         */
+        friend devs::Simulator;
+
     private:
+        devs::Simulator* m_simulator;
         std::vector < std::string > m_conditions;
         std::string m_dynamics;
         std::string m_observables;

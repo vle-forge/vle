@@ -477,10 +477,10 @@ BOOST_AUTO_TEST_CASE(test_del_coupled_model)
     vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
     vpz::CoupledModel* depth1(depth0->addCoupledModel("depth1"));
     vpz::AtomicModel* depth2 = depth1->addAtomicModel("depth2");
-    auto  simdepth2 = new devs::Simulator(depth2);
-    coord.addModel(depth2,simdepth2);
 
-    // BOOST_CHECK_NO_THROW(coord.prepare_dynamic_deletion(depth0));
+    auto sim = coord.addModel(depth2);
+
+    BOOST_REQUIRE(sim != nullptr);
 
     delete depth0;
 }

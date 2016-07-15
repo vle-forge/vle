@@ -34,6 +34,7 @@ namespace vle { namespace vpz {
 AtomicModel::AtomicModel(const std::string& name,
                          CoupledModel* parent)
     : BaseModel(name, parent)
+    , m_simulator(nullptr)
     , m_debug(false)
 {
 }
@@ -44,6 +45,7 @@ AtomicModel::AtomicModel(const std::string& name,
                          const std::string& dynamic,
                          const std::string& observable)
     : BaseModel(name, parent)
+    , m_simulator(nullptr)
     , m_dynamics(dynamic)
     , m_observables(observable)
     , m_debug(false)
@@ -62,6 +64,7 @@ AtomicModel::AtomicModel(const std::string& name,
 
 AtomicModel::AtomicModel(const AtomicModel& mdl)
     : BaseModel(mdl)
+    , m_simulator(nullptr)
     , m_dynamics(mdl.dynamics())
     , m_observables(mdl.observables())
     , m_debug(mdl.m_debug)

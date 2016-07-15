@@ -67,15 +67,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
 {
     const vpz::Dynamic& dyn = mDynamics.get(dynamics);
 
-    const SimulatorMap& result(coordinator.modellist());
-    if (result.find(model) != result.end()) {
-        throw utils::InternalError(
-            (fmt(_("The model '%1%' already exist in coordinator")) %
-             model->getName()).str());
-    }
-
-    Simulator* sim = new Simulator(model);
-    coordinator.addModel(model, sim);
+    auto sim = coordinator.addModel(model);
 
     value::Map initValues;
     if (not conditions.empty()) {

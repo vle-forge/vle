@@ -85,16 +85,6 @@ Coordinator::Coordinator(utils::ContextPtr context,
 {
 }
 
-Coordinator::~Coordinator()
-{
-    std::for_each(m_modelList.begin(),
-                  m_modelList.end(),
-                  [](const SimulatorMap::value_type& pair)
-                  {
-                      delete pair.second;
-                  });
-}
-
 void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
 {
     m_currentTime = current;
@@ -251,9 +241,10 @@ void Coordinator::addObservableToView(vpz::AtomicModel* model,
                                       const std::string& portname,
                                       const std::string& view)
 {
-    Simulator* simulator = getModel(model);
+    assert(model);
+    assert(model->get_simulator());
 
-    assert(simulator && "Coordinator: simulator must exist");
+    Simulator* simulator = model->get_simulator();
 
     auto event_it = m_eventViewList.find(view);
     auto timed_it = m_timedViewList.find(view);
@@ -305,8 +296,14 @@ void Coordinator::dynamic_deletion()
 
     for (auto& elem : lst) {
         m_eventTable.delSimulator(elem);
-        m_modelList.erase(elem->getStructure());
-        delete elem;
+
+        for (auto it = m_simulators.begin(), et = m_simulators.end();
+             it != et; ++it) {
+            if (it->get() == elem) {
+                m_simulators.erase(it);
+                break;
+            }
+        }
     }
 }
 
@@ -317,7 +314,6 @@ void Coordinator::getSimulatorsSource(
     if (m_isStarted) {
         vpz::ConnectionList& inputs(model->getInputPortList());
         for (auto & input : inputs) {
-
             const std::string& port(input.first);
             getSimulatorsSource(model, port, lst);
         }
@@ -333,13 +329,10 @@ void Coordinator::getSimulatorsSource(
         vpz::ModelPortList result;
         model->getAtomicModelsSource(port, result);
 
-        for (auto & elem : result) {
-            lst.push_back(
-                std::make_pair(
-                    getModel(
-                        reinterpret_cast < vpz::AtomicModel* >(elem.first)),
-                    elem.second));
-        }
+        for (auto & elem : result)
+            lst.emplace_back(
+                static_cast<vpz::AtomicModel*>(elem.first)->get_simulator(),
+                elem.second);
     }
 }
 
@@ -347,9 +340,9 @@ void Coordinator::updateSimulatorsTarget(
     std::vector < std::pair < Simulator*, std::string > >& lst)
 {
     if (m_isStarted) {
-        for (auto & elem : lst) {
+        for (auto& elem : lst) {
             if (elem.first != nullptr) {
-                elem.first->updateSimulatorTargets(elem.second, m_modelList);
+                elem.first->updateSimulatorTargets(elem.second);
             }
         }
     }
@@ -358,44 +351,16 @@ void Coordinator::updateSimulatorsTarget(
 void Coordinator::removeSimulatorTargetPort(vpz::AtomicModel* model,
                                             const std::string& port)
 {
-    getModel(model)->removeTargetPort(port);
+    model->get_simulator()->removeTargetPort(port);
 }
 
-// / / / /
-//
-// Some usefull functions.
-//
-// / / / /
-
-void Coordinator::addModel(vpz::AtomicModel* model, Simulator* simulator)
+Simulator* Coordinator::addModel(vpz::AtomicModel* model)
 {
-    std::pair < SimulatorMap::iterator, bool > r =
-        m_modelList.insert(std::make_pair(model, simulator));
+    assert(model && "Coordinator: nullptr model to add?");
 
-    if (not r.second) {
-        throw utils::InternalError(
-            (fmt(_("The Atomic model node '%1% have already a simulator"))
-             % model->getName()).str());
-    }
-}
+    m_simulators.emplace_back(std::make_unique<Simulator>(model));
 
-Simulator* Coordinator::getModel(const vpz::AtomicModel* model) const
-{
-    auto it =
-        m_modelList.find( const_cast < vpz::AtomicModel* >(model));
-    return (it == m_modelList.end()) ? nullptr : it->second;
-}
-
-Simulator* Coordinator::getModel(const std::string& name) const
-{
-    auto it = m_modelList.begin();
-    while (it != m_modelList.end()) {
-        if ((*it).first->getName() == name) {
-            return (*it).second;
-        }
-        ++it;
-    }
-    return nullptr;
+    return m_simulators.back().get();
 }
 
 ///
@@ -407,11 +372,7 @@ void Coordinator::delAtomicModel(vpz::AtomicModel* atom,
 {
     assert(atom && "Cannot delete undefined atomic model");
 
-    auto it = m_modelList.find(atom);
-    assert(it != m_modelList.end() && "Cannot delete an unknown atomic model");
-
-    Simulator* satom = (*it).second;
-    m_modelList.erase(it);
+    Simulator* satom = atom->get_simulator();
 
     for (auto& elem : m_eventViewList)
         elem.second.removeObservable(satom->dynamics().get());
@@ -447,7 +408,7 @@ void Coordinator::dispatchExternalEvent(std::vector<Simulator*>& simulators)
 
         auto& eventList = sim->result();
         for (auto & elem : eventList) {
-            auto x = sim->targets(elem.getPortName(), m_modelList);
+            auto x = sim->targets(elem.getPortName());
 
             if (x.first != x.second and x.first->second.first) {
                 for (auto jt = x.first; jt != x.second; ++jt)
@@ -539,15 +500,12 @@ void Coordinator::processInit(Simulator *simulator)
 
 std::unique_ptr<value::Map> Coordinator::finish()
 {
-    //delete models
-    std::for_each(m_modelList.begin(), m_modelList.end(),
-                  boost::bind(
-                      &Simulator::finish,
-                      boost::bind(&SimulatorMap::value_type::second, _1)));
+    for (auto& elem : m_simulators) {
+        assert(elem.get());
+        elem->finish();
+    }
 
-    //build result views
     std::unique_ptr<value::Map> result;
-
     for (auto& elem : m_timedViewList) {
         auto matrix = elem.second.finish(m_currentTime);
         if (matrix) {

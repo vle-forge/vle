@@ -103,25 +103,22 @@ public:
     /*-*-*-*-*-*-*-*-*-*/
 
     /**
-     * @brief Call this function to browse the model's structure (atomic
-     * and coupled models) to find all devs::Simulator connected to the
+     * Browse model's structure to find Simulator connected to the
      * specified output port.
-     * @param port The output port used to build simulators' target list.
-     * @param simulators list of available simulators.
+     *
+     * \param port The output port used to build simulators' target list.
      */
-    void updateSimulatorTargets(
-        const std::string& port,
-        std::map < vpz::AtomicModel*, devs::Simulator* >& simulators);
+    void updateSimulatorTargets(const std::string& port);
 
     /**
-     * @brief Get two iterators (begin, end) on TargetSimulator.
-     * @param port The output port to get the simulators' target list.
-     * @param simulators list of available simulators.
-     * @return Two iterators.
+     * Get begin and end iterators to find Simulator connected to the
+     * specified output port.
+     *
+     * \param port The output port to get the simulators' target list.
+     *
+     * \return Two iterators.
      */
-    std::pair < iterator, iterator > targets(
-        const std::string& port,
-        std::map < vpz::AtomicModel*, devs::Simulator* >& simulators);
+    std::pair <iterator, iterator> targets(const std::string& port);
 
     /**
      * @brief Add an empty target port.

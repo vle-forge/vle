@@ -41,11 +41,11 @@ Simulator::Simulator(vpz::AtomicModel* atomic)
     , m_have_internal(false)
 {
     assert(atomic && "Simulator: missing vpz::AtomicMOdel");
+
+    m_atomicModel->m_simulator = this;
 }
 
-void Simulator::updateSimulatorTargets(
-    const std::string& port,
-    std::map < vpz::AtomicModel*, devs::Simulator* >& simulators)
+void Simulator::updateSimulatorTargets(const std::string& port)
 {
     assert(m_atomicModel);
 
@@ -55,39 +55,33 @@ void Simulator::updateSimulatorTargets(
     m_atomicModel->getAtomicModelsTarget(port, result);
 
     if (result.begin() == result.end()) {
-        mTargets.insert(value_type(port, TargetSimulator(
-                   (Simulator*)nullptr, std::string())));
-    } else {
-        for (auto & elem : result) {
-
-            std::map < vpz::AtomicModel*, devs::Simulator* >::iterator target;
-            target = simulators.find(
-                    reinterpret_cast < vpz::AtomicModel*>(elem.first));
-
-            if (target == simulators.end()) {
-                mTargets.erase(port);
-                break;
-            } else {
-                mTargets.insert(std::make_pair(port, TargetSimulator(
-                            target->second, elem.second)));
-            }
-        }
+        mTargets.emplace(port, TargetSimulator(nullptr, std::string()));
+        return;
     }
+
+    for (auto& elem : result)
+        mTargets.emplace(port,
+                         TargetSimulator(
+                             static_cast<vpz::AtomicModel*>(
+                                 elem.first)->get_simulator(),
+                             elem.second));
 }
 
 std::pair <Simulator::iterator, Simulator::iterator>
-Simulator::targets(
-    const std::string& port,
-    std::map <vpz::AtomicModel*, devs::Simulator*>& simulators)
+Simulator::targets(const std::string& port)
 {
     auto x = mTargets.equal_range(port);
 
+    // If the updateSimulatorTargets function was never call, we update
+    // the simulator targets and try to retrieve the newest simulator
+    // targets.
     if (x.first == x.second) {
-        updateSimulatorTargets(port, simulators);
+        updateSimulatorTargets(port);
         x = mTargets.equal_range(port);
-    } else if (x.first->second.first == nullptr) {
-        x = make_pair(mTargets.end(), mTargets.end());
     }
+
+    if (x.first->second.first == nullptr)
+        return { mTargets.end(), mTargets.end() };
 
     return x;
 }
