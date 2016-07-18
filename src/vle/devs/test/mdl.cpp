@@ -354,7 +354,7 @@ public:
 
     virtual void confluentTransitions(
             devs::Time /*time*/,
-            const devs::ExternalEventList& /*extEventlist*/)
+            const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 
@@ -408,7 +408,7 @@ public:
 
     virtual void confluentTransitions(
             devs::Time /*time*/,
-            const devs::ExternalEventList& /*extEventlist*/)
+            const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 
@@ -456,7 +456,7 @@ public:
 
     virtual void confluentTransitions(
             devs::Time /*time*/,
-            const devs::ExternalEventList& /*extEventlist*/)
+            const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 

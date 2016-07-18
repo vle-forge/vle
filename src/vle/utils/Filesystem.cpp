@@ -15,6 +15,7 @@
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <array>
 #include <fstream>
 #include <string>
 #include <random>
@@ -406,8 +407,8 @@ bool Path::current_path(const Path& p)
 Path Path::temp_directory_path()
 {
 #if !defined(_WIN32)
-    static std::array<const char *, 4> ISO9945_path = { "TMPDIR", "TMP", "TEMP",
-                                                        "TEMPDIR" };
+    static std::array<const char *, 4> ISO9945_path{{ "TMPDIR", "TMP", "TEMP",
+                "TEMPDIR" }};
 
     for (auto var : ISO9945_path) {
         const char *result = std::getenv(var);

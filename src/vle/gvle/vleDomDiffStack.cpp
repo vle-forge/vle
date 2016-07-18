@@ -133,7 +133,7 @@ vleDomDiffStack::DomDiff::reset()
 {
     node_before = QDomNode();
     node_after = QDomNode();
-    query == "";
+    query = "";
     merge_type = "null";
     if (merge_args) {
         delete merge_args;

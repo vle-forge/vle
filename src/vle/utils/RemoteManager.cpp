@@ -450,7 +450,7 @@ public:
             Path dearchpath(tempDir);
 
             {
-                FScurrent_path_restore restore(Path(tempdir));
+                FScurrent_path_restore restore(tempDir);
                 decompress(archpath.string(), dearchpath.string());
                 vle::utils::Package pkg(mContext, pkgid.name);
                 out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %

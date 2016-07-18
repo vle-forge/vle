@@ -66,8 +66,6 @@
 #  define N_(x) x
 #endif
 
-const int default_block_size_value = 5000;
-
 typedef std::shared_ptr <vle::vpz::Vpz> VpzPtr;
 
 /** @e Accessor stores an access to a VPZ or an undefined string.
@@ -92,6 +90,8 @@ struct Access
             return;
         case 2:
             port = tokens[1];
+            condition = tokens[0];
+            break;
         case 1:
             condition = tokens[0];
             break;
@@ -490,15 +490,12 @@ class Root
     std::shared_ptr <std::ostream> m_os;
     std::ofstream m_ofs;
     int m_blocksize;
-    bool m_warnings;
 
 public:
-    Root(const std::string &input, const std::string &output, int blocksize,
-         bool warnings)
+    Root(const std::string &input, const std::string &output, int blocksize)
         : m_is(&std::cin, no_deleter <std::istream>())
         , m_os(&std::cout, no_deleter <std::ostream>())
         , m_blocksize(blocksize)
-        , m_warnings(warnings)
     {
         if (!input.empty())
             m_is = open <std::ifstream>(input);
@@ -552,14 +549,13 @@ enum CommunicationTag {
 
 int run_as_master(const std::string &inputfile,
                   const std::string &outputfile,
-                  int blocksize,
-                  bool warnings)
+                  int blocksize)
 {
     int ret = EXIT_SUCCESS;
     int blockid = 0;
 
     try {
-        Root r(inputfile, outputfile, blocksize, warnings);
+        Root r(inputfile, outputfile, blocksize);
         boost::mpi::communicator comm;
         std::vector <bool> workers(comm.size(), false);
         std::string block, header;
@@ -708,6 +704,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, _("Bad block size: %s. Assume block size=%d"),
                         ::optarg, block_size);
             }
+            break;
         case '?':
         default:
             ret = EXIT_FAILURE;
@@ -745,7 +742,7 @@ int main(int argc, char *argv[])
             printf("%s ", elem.c_str());
         printf("\n");
 
-        return run_as_master(input_file, output_file, block_size, warnings);
+        return run_as_master(input_file, output_file, block_size);
     }
 
     return run_as_worker(package_name, vpz.front(), warnings);

@@ -330,7 +330,7 @@ public:
         auto ret = mLst.emplace(symbol, result);
 
         if (not ret.second)
-            assert("emplace failure but find returns true");
+            assert(false && "emplace failure but find returns true");
 
         return result;
     }

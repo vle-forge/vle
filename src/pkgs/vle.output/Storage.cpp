@@ -75,7 +75,6 @@ public:
         : Plugin(location),
           m_matrix(nullptr),
           m_time(devs::negativeInfinity),
-          m_isstart(false),
           m_headertype(STORAGE_HEADER_NONE)
     {
     }
@@ -102,7 +101,7 @@ public:
         return {};
     }
 
-    virtual std::string name() const
+    virtual std::string name() const override
     {
         return std::string("storage");
     }
@@ -207,7 +206,6 @@ private:
     std::unique_ptr<value::Matrix>  m_matrix;
     MapPairIndex                    m_colAccess;
     double                          m_time;
-    bool                            m_isstart;
     StorageHeaderType               m_headertype;
 
     inline void nextTime(double trame_time)
