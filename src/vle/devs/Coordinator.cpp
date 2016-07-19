@@ -38,6 +38,7 @@
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
+#include "Thread.hpp"
 #include <functional>
 #include <boost/bind.hpp>
 
@@ -78,6 +79,7 @@ Coordinator::Coordinator(utils::ContextPtr context,
                          const vpz::Experiment& experiment)
     : m_context(context)
     , m_currentTime(0.0)
+    , m_simulators_thread_pool(m_context)
     , m_modelFactory(context, m_eventViewList, dyn, cls, experiment)
     , m_isStarted(false)
 {
@@ -113,23 +115,22 @@ void Coordinator::run()
             simulators.emplace_back(elem);
     }
 
-    /* TODO this part can be threaded. */
+    if (m_simulators_thread_pool.parallelize()) {
+        m_simulators_thread_pool.for_each(simulators, m_currentTime);
+    } else {
+        for (auto& elem : simulators) {
+            if (elem->haveInternalEvent()) {
+                elem->output(m_currentTime);
 
-    for (auto & elem : simulators) {
-        if (elem->haveInternalEvent()) {
-            elem->output(m_currentTime);
-
-            if (not elem->haveExternalEvents())
-                elem->internalTransition(m_currentTime);
-            else
-                elem->confluentTransitions(m_currentTime);
-        } else {
-            elem->externalTransition(m_currentTime);
+                if (not elem->haveExternalEvents())
+                    elem->internalTransition(m_currentTime);
+                else
+                    elem->confluentTransitions(m_currentTime);
+            } else {
+                elem->externalTransition(m_currentTime);
+            }
         }
     }
-
-    /* End thread loop for simulators. The update of the Scheduler must be
-       in mono thread to avoid mutex. */
 
     for (auto& elem : simulators) {
         auto tn = elem->getTn();
@@ -171,6 +172,18 @@ void Coordinator::run()
         }
 
         dispatchExternalEvent(executives);
+    }
+
+    /* Finally, we go through simulators to get all observation. */
+    for (auto& elem : bags) {
+        auto& observations = elem->getObservations();
+        for (auto& obs : observations)
+            std::get<0>(obs)->run(elem->dynamics().get(),
+                                  m_currentTime,
+                                  std::get<1>(obs),
+                                  std::move(std::get<2>(obs)));
+
+        observations.clear();
     }
 
     /* Process observation event if the next bag is scheduled for a different

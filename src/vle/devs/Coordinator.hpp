@@ -35,6 +35,7 @@
 #include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/ModelFactory.hpp>
+#include "Thread.hpp"
 
 namespace vle { namespace devs {
 
@@ -259,6 +260,7 @@ private:
     utils::ContextPtr           m_context;
     Time                        m_currentTime;
     Time                        m_durationTime;
+    SimulatorProcessParallel    m_simulators_thread_pool;
     std::vector<std::unique_ptr<Simulator>> m_simulators;
     Scheduler                   m_eventTable;
     TimedObservationScheduler   m_timed_observation_scheduler;
