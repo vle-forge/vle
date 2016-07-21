@@ -35,6 +35,7 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
+#include <libxml/xpath.h>
 #include <cstring>
 
 namespace {
@@ -741,7 +742,7 @@ void SaxStackVpz::pushView(const xmlChar** att)
                 _("View tag does not have a timestep attribute"));
         }
         views.addTimedView(xmlCharToString(name),
-                           xmlCharToDouble(timestep),
+                           xmlXPathCastStringToNumber(timestep),
                            xmlCharToString(output));
     } else {
         using ustring = std::basic_string<unsigned char>;

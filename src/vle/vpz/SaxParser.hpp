@@ -376,15 +376,6 @@ namespace vle { namespace vpz {
      */
     VLE_LOCAL unsigned long int xmlCharToUnsignedInt(const xmlChar* str);
 
-    /**
-     * @brief Convert the xmlChar pointer to a double.
-     * @param str The constant xmlChar pointer to translate.
-     * @throw utils::SaxParserError if the xmlChar can not be translated into a
-     * double
-     * @return The double.
-     */
-    VLE_LOCAL double xmlCharToDouble(const xmlChar* str);
-
 }} // namespace vle vpz
 
 #endif

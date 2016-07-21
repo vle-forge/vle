@@ -48,6 +48,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <libxml/SAX2.h>
 #include <libxml/parser.h>
+#include <libxml/xpath.h>
 #include <cerrno>
 #include <cstring>
 
@@ -62,7 +63,6 @@ SaxParser::SaxParser(Vpz& vpz)
 
 void SaxParser::parseFile(const std::string& filename)
 {
-    setlocale(LC_ALL, "C");
     memset(&m_sax, 0, sizeof(xmlSAXHandler));
     m_sax.initialized = XML_SAX2_MAGIC;
     m_sax.startDocument = &SaxParser::onStartDocument;
@@ -93,12 +93,10 @@ void SaxParser::parseFile(const std::string& filename)
     }
 
     xmlMemoryDump();
-    setlocale(LC_ALL, "");
 }
 
 void SaxParser::parseMemory(const std::string& buffer)
 {
-    setlocale(LC_ALL, "C");
     memset(&m_sax, 0, sizeof(xmlSAXHandler));
     m_sax.initialized = XML_SAX2_MAGIC;
     m_sax.startDocument = &SaxParser::onStartDocument;
@@ -125,7 +123,6 @@ void SaxParser::parseMemory(const std::string& buffer)
             (fmt(_("Error when parsing memory: %1%")) % m_error).str());
     }
     xmlMemoryDump();
-    setlocale(LC_ALL, "");
 }
 
 void SaxParser::stopParser(const std::string& error)
@@ -241,8 +238,6 @@ void SaxParser::onWarning(void* /* ctx */, const char *msg, ...)
 
 void SaxParser::onError(void* ctx, const char *msg, ...)
 {
-    setlocale(LC_ALL, "");
-
     SaxParser* sax = static_cast < SaxParser* >(ctx);
     auto  buffer = new char[1024];
     memset(buffer, 0, 1024);
@@ -258,8 +253,6 @@ void SaxParser::onError(void* ctx, const char *msg, ...)
 
 void SaxParser::onFatalError(void* ctx, const char *msg, ...)
 {
-    setlocale(LC_ALL, "");
-
     SaxParser* sax = static_cast < SaxParser* >(ctx);
     auto  buffer = new char[1024];
     memset(buffer, 0, 1024);
@@ -563,8 +556,7 @@ void SaxParser::onEndInteger()
 void SaxParser::onEndDouble()
 {
     m_valuestack.pushOnVectorValue(
-        value::Double::create(
-            xmlCharToDouble(
+        value::Double::create(xmlXPathCastStringToNumber(
                 ((xmlChar*)lastCharactersStored().c_str()))));
 }
 
@@ -607,7 +599,8 @@ void SaxParser::onEndTuple()
     for (auto & elem : result) {
         boost::algorithm::trim(elem);
         if (not (elem).empty()) {
-            tuple.add(xmlCharToDouble((const xmlChar*)((elem).c_str())));
+            tuple.add(xmlXPathCastStringToNumber(
+                    (const xmlChar*)((elem).c_str())));
         }
     }
 
@@ -644,7 +637,8 @@ void SaxParser::onEndTable()
     for (auto & elem : result) {
         boost::algorithm::trim(elem);
         if (not (elem).empty()) {
-            table.get(i, j) = xmlCharToDouble((const xmlChar*)((elem).c_str()));
+            table.get(i, j) = xmlXPathCastStringToNumber(
+                    (const xmlChar*)((elem).c_str()));
             if (i + 1 >= table.width()) {
                 i = 0;
                 if (j + 1 >= table.height()) {
@@ -851,70 +845,12 @@ bool xmlCharToBoolean(const xmlChar* str)
 
 long int xmlCharToInt(const xmlChar* str)
 {
-    char* res = nullptr;
-
-    errno = 0;
-    long int r = strtol((const char*)str, &res, 10);
-    int err = errno;
-
-    if ((err == ERANGE and (r == LONG_MAX || r == LONG_MIN)) or
-        (err != 0 and r == 0)) {
-        throw utils::SaxParserError(
-            (fmt(_("error to convert '%1%' to integer: %2%")) % str %
-             strerror(err)).str());
-    }
-
-    if (res == (const char*)str) {
-        throw utils::SaxParserError(
-            (fmt(_("error to convert '%1%' to integer")) % str).str());
-    }
-
-    return r;
+    return (long int) xmlXPathCastStringToNumber(str);
 }
 
 unsigned long int xmlCharToUnsignedInt(const xmlChar* str)
 {
-    char* res = nullptr;
-
-    errno = 0;
-    unsigned long int r = strtoul((const char*)str, &res, 10);
-    int err = errno;
-
-    if ((err == ERANGE and (r == ULONG_MAX)) or
-        (err != 0 and r == 0)) {
-        throw utils::SaxParserError(
-            (fmt(_("error to convert '%1%' to unsigned integer: %2%"))
-             % str % strerror(err)).str());
-    }
-
-    if (res == (const char*)str) {
-        throw utils::SaxParserError(
-            (fmt(_("error to convert '%1%' to unsigned integer")) % str).str());
-    }
-
-    return r;
-}
-
-double xmlCharToDouble(const xmlChar* str)
-{
-    char* res = nullptr;
-
-    errno = 0;
-    double r = strtod((const char*)str, &res);
-    int err = errno;
-
-    if ((err == ERANGE and r == HUGE_VAL) or (err != 0 and r == 0)) {
-        throw utils::SaxParserError(
-            (fmt(_("error to convert '%1%' to double: %2%")) % str %
-             strerror(err)).str());
-    }
-
-    if (res == (const char*)str) {
-        throw utils::SaxParserError(
-            (fmt(_("error to convert '%1%' to double")) % str).str());
-    }
-
-    return r;
+    return (unsigned long int) xmlXPathCastStringToNumber(str);
 }
 
 }} // namespace vle vpz
