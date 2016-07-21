@@ -52,12 +52,51 @@ struct vle_log_stderr : Context::LogFunctor
     }
 };
 
-ContextPtr make_context(const Path& /* prefix */, std::string locale)
+
+ContextPtr make_context(const Path& prefix)
 {
-    return std::make_shared<Context>(locale);
+    return std::make_shared<Context>(prefix);
 }
 
-Context::Context(const Path& /* prefix */, std::string locale)
+ContextPtr make_context(std::string locale, const Path& prefix)
+{
+    return std::make_shared<Context>(locale, prefix);
+}
+
+
+Context::Context(const Path& /* prefix */)
+    : m_pimpl(std::make_unique<PrivateContextIimpl>())
+{
+    m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
+#ifndef NDEBUG
+    m_pimpl->log_priority = VLE_LOG_DEBUG;
+#else
+    m_pimpl->log_priority = VLE_LOG_ERR;
+#endif
+
+    initHomeDir();
+    initPrefixDir();
+    initVleHomeDirectory();
+
+    reset_settings();
+
+    Path conf = getConfigurationFile();
+    if (not conf.is_file())
+        write_settings();
+    else
+        load_settings();
+
+    vInfo(this, "Context initialized [prefix=%s] [home=%s]\n",
+          m_pimpl->m_prefix.string().c_str(),
+          m_pimpl->m_home.string().c_str());
+
+#if defined(VLE_HAVE_NLS)
+    bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
+    textdomain(VLE_LOCALE_NAME);
+#endif
+}
+
+Context::Context(std::string locale, const Path& /* prefix */)
     : m_pimpl(std::make_unique<PrivateContextIimpl>())
 {
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
@@ -95,6 +134,8 @@ Context::Context(const Path& /* prefix */, std::string locale)
     textdomain(VLE_LOCALE_NAME);
 #endif
 }
+
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

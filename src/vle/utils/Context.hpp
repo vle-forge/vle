@@ -67,7 +67,8 @@ class Context;
 class VLE_API Context
 {
 public:
-    Context(const Path& prefix = {}, std::string locale = {"C"});
+    Context(const Path& prefix = {});
+    Context(std::string locale, const Path& prefix = {});
     ~Context() = default;
 
     Context(const Context& other) = delete;
@@ -599,18 +600,32 @@ private:
 using ContextPtr = std::shared_ptr<Context>;
 
 /**
- * Build a std::shared_ptr<Context> using "C" as default locale.
+ * Build a std::shared_ptr<Context> without modifying the locale.
  *
  * \e param prefix Default (\e prefix.empty() or \e
  * !prefix.is_directory()), it reads the \e VLE_HOME environment variable
  * and if it fails, try to build prefix from the \e HOME user.
  *
- * \e param locale Default "C" for ASCII, empty for current locale
- * otherwise, you can specify what you want.  \e return An initialized
- * std::shared_ptr<Context>.
+ * \e return An initialized std::shared_ptr<Context>.
+ *
  */
-VLE_API ContextPtr make_context(const Path& prefix = {},
-                                std::string locale = {"C"});
+VLE_API ContextPtr make_context(const Path& prefix = {});
+
+
+/**
+ * Build a std::shared_ptr<Context> with locale.
+ *
+ * \e param locale Default "C" for ASCII, empty for current locale
+ * otherwise, you can specify what you want.
+ *
+ * \e param prefix Default (\e prefix.empty() or \e
+ * !prefix.is_directory()), it reads the \e VLE_HOME environment variable
+ * and if it fails, try to build prefix from the \e HOME user.
+ *
+ * \e return An initialized std::shared_ptr<Context>.
+ */
+VLE_API ContextPtr make_context(std::string locale, const Path& prefix = {});
+
 
 }} // namespace vle utils
 
