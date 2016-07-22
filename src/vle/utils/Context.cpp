@@ -63,10 +63,10 @@ ContextPtr make_context(std::string locale, const Path& prefix)
     return std::make_shared<Context>(locale, prefix);
 }
 
-
 Context::Context(const Path& /* prefix */)
-    : m_pimpl(std::make_unique<PrivateContextIimpl>())
+    : m_pimpl(std::make_unique<PrivateContextImpl>())
 {
+
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
 #ifndef NDEBUG
     m_pimpl->log_priority = VLE_LOG_DEBUG;
@@ -96,8 +96,9 @@ Context::Context(const Path& /* prefix */)
 #endif
 }
 
+
 Context::Context(std::string locale, const Path& /* prefix */)
-    : m_pimpl(std::make_unique<PrivateContextIimpl>())
+    : m_pimpl(std::make_unique<PrivateContextImpl>())
 {
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
 #ifndef NDEBUG
@@ -136,6 +137,19 @@ Context::Context(std::string locale, const Path& /* prefix */)
 }
 
 
+
+ContextPtr Context::clone()
+{
+    ContextPtr nctx = std::make_shared<Context>();
+    nctx->m_pimpl->m_prefix = m_pimpl->m_prefix;
+    nctx->m_pimpl->m_home = m_pimpl->m_home;
+    for (auto s : nctx->m_pimpl->settings) {
+        nctx->m_pimpl->settings.insert(s);
+    }
+    nctx->m_pimpl->modules = m_pimpl->modules;
+    nctx->m_pimpl->log_priority = m_pimpl->log_priority;
+    return nctx;
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

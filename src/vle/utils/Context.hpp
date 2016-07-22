@@ -43,8 +43,15 @@ namespace vle { namespace utils {
  */
 using PathList = std::vector<vle::utils::Path>;
 
-struct PrivateContextIimpl;
+struct PrivateContextImpl;
 class Context;
+/**
+ * \c ContextPtr is a shared pointer. \c ContextPtr is use in many piece of
+ * code of VLE. Try to use one \c Context per thread to avoid the use of global
+ * mutex.
+ */
+using ContextPtr = std::shared_ptr<Context>;
+
 
 /**
  * \e Context manage all users and installation paths of VLE.
@@ -75,6 +82,17 @@ public:
     Context& operator=(const Context& other) = delete;
     Context(Context&& other) = delete;
     Context& operator=(Context&& other) = delete;
+
+    /**
+     * @brief Build a (partial) copy of the context:
+     *  - the VLE_HOME, prefix and settings are copied
+     *  - the module manager is shared with current context
+     *  - the log functor is the default one (vle_log_stderr)
+     *  - the locale is not modified
+     *
+     * @return a (partial) copy of the current context
+     */
+    ContextPtr clone();
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -568,7 +586,7 @@ public:
     Path findProgram(const std::string& exe);
 
 private:
-    std::unique_ptr<PrivateContextIimpl> m_pimpl;
+    std::unique_ptr<PrivateContextImpl> m_pimpl;
 
     /**
      * Assign to the m_home attribute the content of the VLE_HOME
@@ -592,12 +610,7 @@ private:
     void initPrefixDir();
 };
 
-/**
- * \c ContextPtr is a shared pointer. \c ContextPtr is use in many piece of
- * code of VLE. Try to use one \c Context per thread to avoid the use of global
- * mutex.
- */
-using ContextPtr = std::shared_ptr<Context>;
+
 
 /**
  * Build a std::shared_ptr<Context> without modifying the locale.
@@ -625,7 +638,6 @@ VLE_API ContextPtr make_context(const Path& prefix = {});
  * \e return An initialized std::shared_ptr<Context>.
  */
 VLE_API ContextPtr make_context(std::string locale, const Path& prefix = {});
-
 
 }} // namespace vle utils
 

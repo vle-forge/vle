@@ -97,7 +97,7 @@ using PreferenceMap = std::map<std::string, PreferenceType>;
 
 struct ModuleManager;
 
-struct PrivateContextIimpl
+struct PrivateContextImpl
 {
     Path m_prefix;                      ///< dirname of $PREFIX of installation
     Path m_home;                        ///< dirname of $VLEHOME directory
