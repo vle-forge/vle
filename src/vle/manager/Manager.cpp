@@ -33,9 +33,52 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/BaseModel.hpp>
+#include <sstream>
 #include <thread>
 
 namespace vle { namespace manager {
+
+struct vle_log_manager_thread : vle::utils::Context::LogFunctor
+{
+    FILE *fp;
+    unsigned int th;
+
+    vle_log_manager_thread(unsigned int _th)
+        : fp(nullptr), th(_th)
+    {
+    }
+
+    ~vle_log_manager_thread()
+    {
+        if (fp)
+            fclose(fp);
+    }
+
+    virtual void write(const vle::utils::Context& /*ctx*/,
+                       int priority, const char *file,
+                       int line, const char *fn,
+                       const char *format,
+                       va_list args) noexcept override
+    {
+        if (not fp) {
+            std::stringstream s;
+            s.imbue(std::locale::classic());
+            s << "vle_manager_thread_" << th << ".log";
+            fp = fopen(s.str().c_str(), "w");
+        }
+
+        if (fp) {
+            if (priority == 7)
+                fprintf(fp, "[dbg] %s:%d %s: ", file, line, fn);
+            else if (priority == 6)
+                fprintf(fp, "%s: ", fn);
+            else
+                fprintf(fp, "[Error] %s: ", fn);
+
+            vfprintf(fp, format, args);
+        }
+    }
+};
 
 /**
  * Assign an new name to the experiment.
@@ -173,11 +216,15 @@ public:
             new value::Matrix(expgen.size(), 1, expgen.size(), 1));
 
         std::vector<std::thread> gp;
-        for (uint32_t i = 0; i < threads; ++i)
-            gp.emplace_back(
-                worker(mContext, vpz, expgen,
+        for (uint32_t i = 0; i < threads; ++i) {
+            utils::ContextPtr ctx = mContext->clone();
+            ctx->set_log_function(
+                    std::unique_ptr<utils::Context::LogFunctor>(
+                            new vle_log_manager_thread(i)));
+            gp.emplace_back(worker(ctx, vpz, expgen,
                        mLogOption, mSimulationOption,
                        i, threads, result.get(), error));
+        }
 
         for (uint32_t i = 0; i < threads; ++i)
             gp[i].join();
