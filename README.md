@@ -17,8 +17,7 @@ For the VFL API:
 
 * libxml2 (≥ 2.8)
 * boost (≥ 1.47)
-* cmake (≥ 2.8.0)
-* make (≥ 1.8)
+* cmake (≥ 3.0)
 * c++ compiler (gcc ≥ 4.9, clang ≥ 3.3, intel icc (≥ 11.0)
 
 For the MPI command line:
@@ -28,7 +27,6 @@ For the MPI command line:
 For the GUI:
 
 * Qt5
-* Qwt
 
 ## Getting the code
 
@@ -38,11 +36,18 @@ clone it:
 
     git clone git://github.com/vle-forge/vle.git
 
+Install dependencies (recent ubuntu/debian):
+
+    apt-get install libxml2-dev libboost-dev cmake g++ \
+            qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools \
+            qtchooser qt5-default
+
 Once you have met requirements, compiling and installing is simple:
 
     cd vle
     mkdir build
     cd build
+    export QT_SELECT=qt5
     cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     make
     make install
