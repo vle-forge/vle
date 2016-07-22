@@ -178,10 +178,10 @@ void Coordinator::run()
     for (auto& elem : bags) {
         auto& observations = elem->getObservations();
         for (auto& obs : observations)
-            std::get<0>(obs)->run(elem->dynamics().get(),
-                                  m_currentTime,
-                                  std::get<1>(obs),
-                                  std::move(std::get<2>(obs)));
+            obs.view->run(elem->dynamics().get(),
+                           m_currentTime,
+                           obs.portname,
+                           std::move(obs.value));
 
         observations.clear();
     }

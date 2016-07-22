@@ -267,11 +267,14 @@ std::unique_ptr<Dynamics> buildNewDynamics(
     try {
         utils::PackageTable pkg_table;
 
-        DynamicsInit init{context, *atom->getStructure(), pkg_table.get(dyn.package())};
+        DynamicsInit init{context, *atom->getStructure(),
+                pkg_table.get(dyn.package())};
         auto dynamics = std::unique_ptr<Dynamics>(fct(init, events));
 
         if (haveEventView(vpzviews, observable)) {
-            auto observation = std::make_unique<DynamicsObserver>(init, events);
+            auto observation = std::make_unique<DynamicsObserver>(
+                init, events,
+                atom->getObservations());
 
             if (atom->getStructure()->needDebug()) {
                 auto debug = std::make_unique<DynamicsDbg>(init, events);
@@ -332,7 +335,9 @@ std::unique_ptr<Dynamics> buildNewExecutive(
         auto executive = std::unique_ptr<Dynamics>(fct(executiveinit, events));
 
         if (haveEventView(vpzviews, observable)) {
-            auto observation = std::make_unique<DynamicsObserver>(init, events);
+            auto observation = std::make_unique<DynamicsObserver>(
+                init, events,
+                atom->getObservations());
 
             if (atom->getStructure()->needDebug()) {
                 auto debug = std::make_unique<DynamicsDbg>(init, events);

@@ -35,6 +35,7 @@
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/Scheduler.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 
 namespace vle { namespace devs {
@@ -213,6 +214,11 @@ public:
         return m_have_internal;
     }
 
+    inline std::vector<Observation>& getObservations() noexcept
+    {
+        return m_observations;
+    }
+
 private:
     std::unique_ptr<Dynamics> m_dynamics;
     vpz::AtomicModel*   m_atomicModel;
@@ -220,6 +226,7 @@ private:
     ExternalEventList   m_external_events;
     ExternalEventList   m_external_events_nextbag;
     ExternalEventList   m_result;
+    std::vector<Observation> m_observations;
     std::string         m_parents;
     Time                m_tn;
     HandleT             m_handle;

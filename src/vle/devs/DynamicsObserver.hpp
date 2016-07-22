@@ -44,6 +44,10 @@ class DynamicsObserver : public Dynamics
     /// devs::DynamicsDbg).
     std::unique_ptr<Dynamics> mDynamics;
 
+    /// A pointer to the \e Simulator observation's vector that wraps the \e
+    /// devs::Dynamics model.
+    std::vector<Observation>& mObservations;
+
 public:
     // These vectors stores View and observation's port for earch function to
     // observer.
@@ -60,7 +64,8 @@ public:
      * @param events The parameter from the experimental frame.
      */
     DynamicsObserver(const DynamicsInit& init,
-                     const InitEventList& events);
+                     const InitEventList& events,
+                     std::vector<Observation>& observations);
 
     /**
      * Destructor.
@@ -172,8 +177,10 @@ public:
 
 inline
 DynamicsObserver::DynamicsObserver(const DynamicsInit& init,
-                                   const InitEventList& events)
+                                   const InitEventList& events,
+                                   std::vector<Observation>& observations)
     : Dynamics(init, events)
+    , mObservations(observations)
 {
 }
 
@@ -214,8 +221,16 @@ void DynamicsObserver::output(Time time, ExternalEventList& output) const
 
     mDynamics->output(time, output);
 
-    for (const auto& elem : ppOutput)
-        std::get<0>(elem)->run(this, time, std::get<1>(elem));
+    for (const auto& elem : ppOutput) {
+        ObservationEvent event(time,
+                               std::get<0>(elem)->name(),
+                               std::get<1>(elem));
+
+        mObservations.emplace_back();
+        mObservations.back().view = std::get<0>(elem);
+        mObservations.back().portname = std::get<1>(elem);
+        mObservations.back().value = std::move(mDynamics->observation(event));
+    }
 }
 
 inline
@@ -233,8 +248,16 @@ void DynamicsObserver::internalTransition(Time time)
 
     mDynamics->internalTransition(time);
 
-    for (const auto& elem : ppInternal)
-        std::get<0>(elem)->run(this, time, std::get<1>(elem));
+    for (const auto& elem : ppInternal) {
+        ObservationEvent event(time,
+                               std::get<0>(elem)->name(),
+                               std::get<1>(elem));
+
+        mObservations.emplace_back();
+        mObservations.back().view = std::get<0>(elem);
+        mObservations.back().portname = std::get<1>(elem);
+        mObservations.back().value = std::move(mDynamics->observation(event));
+    }
 }
 
 inline
@@ -245,8 +268,16 @@ void DynamicsObserver::externalTransition(const ExternalEventList& event,
 
     mDynamics->externalTransition(event, time);
 
-    for (const auto& elem : ppExternal)
-        std::get<0>(elem)->run(this, time, std::get<1>(elem));
+    for (const auto& elem : ppExternal) {
+        ObservationEvent event(time,
+                               std::get<0>(elem)->name(),
+                               std::get<1>(elem));
+
+        mObservations.emplace_back();
+        mObservations.back().view = std::get<0>(elem);
+        mObservations.back().portname = std::get<1>(elem);
+        mObservations.back().value = std::move(mDynamics->observation(event));
+    }
 }
 
 inline
@@ -256,8 +287,16 @@ void DynamicsObserver::confluentTransitions(
 {
     mDynamics->confluentTransitions(time, extEventlist);
 
-    for (const auto& elem : ppConfluent)
-        std::get<0>(elem)->run(this, time, std::get<1>(elem));
+    for (const auto& elem : ppConfluent) {
+        ObservationEvent event(time,
+                               std::get<0>(elem)->name(),
+                               std::get<1>(elem));
+
+        mObservations.emplace_back();
+        mObservations.back().view = std::get<0>(elem);
+        mObservations.back().portname = std::get<1>(elem);
+        mObservations.back().value = std::move(mDynamics->observation(event));
+    }
 }
 
 inline
@@ -276,8 +315,16 @@ void DynamicsObserver::finish()
 
     mDynamics->finish();
 
-    for (const auto& elem : ppFinish)
-        std::get<0>(elem)->run(this, devs::infinity, std::get<1>(elem));
+    for (const auto& elem : ppFinish) {
+        ObservationEvent event(devs::infinity,
+                               std::get<0>(elem)->name(),
+                               std::get<1>(elem));
+
+        mObservations.emplace_back();
+        mObservations.back().view = std::get<0>(elem);
+        mObservations.back().portname = std::get<1>(elem);
+        mObservations.back().value = std::move(mDynamics->observation(event));
+    }
 }
 
 }} // namespace vle devs

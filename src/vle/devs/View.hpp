@@ -42,6 +42,16 @@ class Dynamics;
 class View;
 
 /**
+ * A simple structure that stores observation values for a specific view
+ * and portname tuple.
+ */
+struct Observation {
+    View *view = nullptr;
+    std::string portname;
+    std::unique_ptr<value::Value> value;
+};
+
+/**
  * @brief Represent a View on a devs::Dynamics and a port name.
  *
  */
@@ -82,6 +92,9 @@ public:
 
     void run(const Dynamics *dynamics, Time current, const std::string& port);
 
+    void run(const Dynamics *dynamics, Time current, const std::string& port,
+             std::unique_ptr<value::Value> value);
+
     /**
      * Delete an observable for a specified Dynamics. If model does not
      * exist, nothing is produce otherwise, the stream receives a message
@@ -116,6 +129,13 @@ public:
      *
      */
     std::unique_ptr<value::Matrix> matrix() const;
+
+    /**
+     * Retrieves the name of this \e View.
+     *
+     * @return A name
+     */
+    std::string name() const { return m_name; }
 
     /**
      * Return a pointer to the \c value::Matrix managed by te plugin.

@@ -149,6 +149,15 @@ void View::run(const Dynamics *dynamics, Time current, const std::string& port)
                       std::move(val));
 }
 
+void View::run(const Dynamics *dynamics, Time current, const std::string& port,
+               std::unique_ptr<value::Value> value)
+{
+    m_plugin->onValue(dynamics->getModel().getName(),
+                      dynamics->getModel().getParentName(),
+                      port, m_name, current,
+                      std::move(value));
+}
+
 std::unique_ptr<value::Matrix> View::matrix() const
 {
     return m_plugin->matrix();
