@@ -31,8 +31,6 @@
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/i18n.hpp>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
 #include <chrono>
 
@@ -61,8 +59,6 @@ bool simulator_process(SimulatorT *simulator, Time time) noexcept
 
 class SimulatorProcessParallel
 {
-    static constexpr std::chrono::nanoseconds thread_sleeping_duration { 1 };
-
     std::vector<std::thread> m_workers;
     std::atomic<long int> m_block_id;
     std::atomic<long int> m_block_count;
@@ -90,7 +86,7 @@ class SimulatorProcessParallel
                 // sleep_for function to reduce the overhead of the
                 // current thread.
                 //
-                std::this_thread::sleep_for(thread_sleeping_duration);
+                std::this_thread::sleep_for(std::chrono::nanoseconds(1));
             }
         }
     }
@@ -175,7 +171,7 @@ public:
         }
 
         while (m_block_count.load(std::memory_order_relaxed) >= 0)
-            std::this_thread::sleep_for(thread_sleeping_duration);
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 
         m_jobs = nullptr;
 
