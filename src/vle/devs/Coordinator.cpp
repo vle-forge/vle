@@ -98,27 +98,16 @@ void Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
 
 void Coordinator::run()
 {
-    Bag& bags = m_eventTable.getCurrentBag();
-    if (not bags.empty())
+    Bag& bag = m_eventTable.getCurrentBag();
+    if (not bag.empty())
         m_currentTime = m_eventTable.getCurrentTime();
 
     vDbg(m_context, _("-------- BAG [%f] --------\n"), m_currentTime);
 
-    std::vector<Bag::value_type> simulators;
-    simulators.reserve(bags.size());
-    std::vector<Bag::value_type> executives;
-
-    for (auto& elem : bags) {
-        if (elem->dynamics()->isExecutive())
-            executives.emplace_back(elem);
-        else
-            simulators.emplace_back(elem);
-    }
-
     if (m_simulators_thread_pool.parallelize()) {
-        m_simulators_thread_pool.for_each(simulators, m_currentTime);
+        m_simulators_thread_pool.for_each(bag.dynamics, m_currentTime);
     } else {
-        for (auto& elem : simulators) {
+        for (auto& elem : bag.dynamics) {
             if (elem->haveInternalEvent()) {
                 elem->output(m_currentTime);
 
@@ -132,27 +121,26 @@ void Coordinator::run()
         }
     }
 
-    for (auto& elem : simulators) {
+    for (auto& elem : bag.dynamics) {
         auto tn = elem->getTn();
         if (not isInfinity(tn))
             m_eventTable.addInternal(elem, tn);
     }
 
     /* For all simulators, dispatch external events. */
-    dispatchExternalEvent(simulators);
+    dispatchExternalEvent(bag.dynamics);
 
     /* Executives must be run in mono thread according to the depth in the
        structure of the model. */
 
-    if (not executives.empty()) {
-        std::sort(executives.begin(), executives.end(),
-                  [](const Bag::value_type& lhs,
-                     const Bag::value_type& rhs)
+    if (not bag.executives.empty()) {
+        std::sort(bag.executives.begin(), bag.executives.end(),
+                  [](const Simulator* lhs, const Simulator* rhs)
                   {
                       return ::depth(lhs->dynamics()) < ::depth(rhs->dynamics());
                   });
 
-        for (auto & elem: executives) {
+        for (auto & elem: bag.executives) {
             if (elem->haveInternalEvent()) {
                 elem->output(m_currentTime);
 
@@ -165,17 +153,28 @@ void Coordinator::run()
             }
         }
 
-        for (auto& elem : executives) {
+        for (auto& elem : bag.executives) {
             auto tn = elem->getTn();
             if (not isInfinity(tn))
                 m_eventTable.addInternal(elem, tn);
         }
 
-        dispatchExternalEvent(executives);
+        dispatchExternalEvent(bag.executives);
     }
 
     /* Finally, we go through simulators to get all observation. */
-    for (auto& elem : bags) {
+    for (auto& elem : bag.dynamics) {
+        auto& observations = elem->getObservations();
+        for (auto& obs : observations)
+            obs.view->run(elem->dynamics().get(),
+                           m_currentTime,
+                           obs.portname,
+                           std::move(obs.value));
+
+        observations.clear();
+    }
+
+    for (auto& elem : bag.executives) {
         auto& observations = elem->getObservations();
         for (auto& obs : observations)
             obs.view->run(elem->dynamics().get(),

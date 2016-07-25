@@ -115,7 +115,21 @@ using Heap = boost::heap::fibonacci_heap<
 
 using HandleT = Heap::handle_type;
 
-using Bag = std::vector<Simulator*>;
+struct Bag {
+    std::vector<Simulator*> dynamics;
+    std::vector<Simulator*> executives;
+
+    void clear() noexcept
+    {
+        dynamics.clear();
+        executives.clear();
+    }
+
+    bool empty() const noexcept
+    {
+        return dynamics.empty() and executives.empty();
+    }
+};
 
 class VLE_LOCAL Scheduler
 {
