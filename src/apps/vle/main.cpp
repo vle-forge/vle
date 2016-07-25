@@ -636,23 +636,51 @@ static int manage_config_mode(vle::utils::ContextPtr ctx, CmdArgs args)
     std::string configvar = args.front();
     args.erase(args.begin());
 
-    int ret = EXIT_SUCCESS;
+    std::string concat = std::accumulate(args.begin(), args.end(),
+                                         std::string(), Comma());
 
-    try {
-        std::string concat = std::accumulate(args.begin(), args.end(),
-                                             std::string(), Comma());
-
-        if (not ctx->set_setting(configvar, concat))
-            throw vle::utils::ArgError(
-                (boost::format(_("Unknown variable `%1%'")) %
-                 configvar).str());
-
-    } catch (const std::exception &e) {
-        fprintf(stderr, _("Config error: %s\n"), e.what());
-        ret = EXIT_FAILURE;
+    {
+        std::string value;
+        if (ctx->get_setting(configvar, &value)) {
+            ctx->set_setting(configvar, concat);
+            return ctx->write_settings() ? EXIT_SUCCESS : EXIT_FAILURE;
+        }
     }
 
-    return ret;
+    {
+        double value;
+        if (ctx->get_setting(configvar, &value)) {
+            try {
+                ctx->set_setting(configvar, std::stod(concat));
+                return ctx->write_settings() ? EXIT_SUCCESS : EXIT_FAILURE;
+            } catch(...) {
+            }
+        }
+    }
+
+    {
+        long value;
+        if (ctx->get_setting(configvar, &value)) {
+            try {
+                ctx->set_setting(configvar, std::stol(concat));
+                return ctx->write_settings() ? EXIT_SUCCESS : EXIT_FAILURE;
+            } catch(...) {
+            }
+        }
+    }
+
+    {
+        bool value;
+        if (ctx->get_setting(configvar, &value)) {
+            value = (concat == "true" or concat == "1");
+            ctx->set_setting(configvar, value);
+            return ctx->write_settings() ? EXIT_SUCCESS : EXIT_FAILURE;
+        }
+    }
+
+    fprintf(stderr, _("Config error: fail to assign `%s' to `%s' key\n"),
+            concat.c_str(), configvar.c_str());
+    return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv)
