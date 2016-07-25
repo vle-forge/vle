@@ -31,6 +31,27 @@ and classes.
 
 - Only dependency with the standard C++ library.
 
+### Kernel Parallelization
+
+We add a thread pool into the kernel `src/vle/devs/Thread.hpp` to parallelize
+with threads the PDEVS/DSDE immediate bag. It is the more pessimist
+parallelization approach and gains are obtained with big models, big transitions
+sources codes and big bags.
+
+To active the parallelization in VLE, use the following command:
+
+    vle -C vle.simulation.thread 8
+    vle -C vle.simulation.block-size 128
+
+These settings will use 8 threads (for an eight cores processor for example) and
+the PDEVS/DSDE immediate bag will be treat in blocks of 128 simulators.
+
+To disable the use of the parallelization mechanism, uses the following
+commands:
+
+    vle -C vle.simulation.thread 0
+    vle -C vle.simulation.block-size 0
+
 ### 'System' binary packages
 
 The Git repository of VLE provides some very useful packages for VLE
