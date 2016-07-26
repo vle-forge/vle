@@ -68,7 +68,7 @@ include(FindPackageHandleStandardArgs)
 #
 find_path(LIBXML2_INCLUDE_DIR
   NAMES libxml/SAX2.h
-  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include
+  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include ${VLEDEPS_PATH}/include/libxml2
   PATH_SUFFIXES libxml2)
 
 find_library(LIBXML2_LIBRARY
@@ -118,44 +118,48 @@ find_package_handle_standard_args(iconv
 
 mark_as_advanced(ICONV_INCLUDE_DIR ICONV_LIBRARY)
 
-#
-# Try to found libintl
-#
 
-find_path(INTL_INCLUDE_DIR
-  NAMES libintl.h
-  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  #
+  # Try to found libintl
+  #
+  find_path(INTL_INCLUDE_DIR
+    NAMES libintl.h
+    HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
 
-find_library(INTL_LIBRARY
-  NAMES intl libintl
-  HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+  find_library(INTL_LIBRARY
+    NAMES intl libintl
+    HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
 
-find_package_handle_standard_args(intl
-  DEFAULT_MSG
-  INTL_LIBRARY
-  INTL_INCLUDE_DIR)
+  find_package_handle_standard_args(intl
+    DEFAULT_MSG
+    INTL_LIBRARY
+    INTL_INCLUDE_DIR)
+
+  #
+  # Try to found libws2_32
+  #
+  find_path(WINSOCK2_INCLUDE_DIR
+    NAMES winsock2.h
+    HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
+
+  find_library(WINSOCK2_LIBRARY
+    NAMES ws2_32 libws2_32
+    HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+
+  find_package_handle_standard_args(Winsock2
+    DEFAULT_MSG
+    WINSOCK2_LIBRARY
+    WINSOCK2_INCLUDE_DIR)
+else ()
+  set(WINSOCK2_INCLUDE_DIR)
+  set(WINSOCK2_LIBRARY)
+  set(ICONV_INCLUDE_DIR)
+  set(ICONV_LIBRARY)
+endif()
 
 mark_as_advanced(ICONV_INCLUDE_DIR ICONV_LIBRARY)
-
-#
-# Try to found libws2_32
-#
-
-find_path(WINSOCK2_INCLUDE_DIR
-  NAMES winsock2.h
-  HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
-
-find_library(WINSOCK2_LIBRARY
-  NAMES ws2_32 libws2_32
-  HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
-
-find_package_handle_standard_args(Winsock2
-  DEFAULT_MSG
-  WINSOCK2_LIBRARY
-  WINSOCK2_INCLUDE_DIR)
-
 mark_as_advanced(WINSOCK2_INCLUDE_DIR WINSOCK2_LIBRARY)
-
 
 #
 # Build variable
