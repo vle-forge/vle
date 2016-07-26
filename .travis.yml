@@ -1,6 +1,11 @@
 sudo: required
 dist: trusty
 language: cpp
+branches:
+  only:
+    - master
+    - master1.1
+    - test
 
 addons:
   apt:
