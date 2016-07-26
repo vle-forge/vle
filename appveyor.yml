@@ -1,0 +1,43 @@
+version: '2.0.{build}'
+clone_depth: 5
+image: Visual Studio 2015
+skip_tags: true
+clone_folder: C:\projects\vle
+
+branches:
+  only:
+    - master
+    - test
+    - test_appveyor
+
+install:
+  - ps: Start-FileDownload 'ftp://ftp.zlatkovic.com/libxml/iconv-1.9.2.win32.zip' -Timeout 1200000
+  - ps: Start-FileDownload 'ftp://ftp.zlatkovic.com/libxml/libxml2-2.7.8.win32.zip' -Timeout 1200000
+  - ps: Start-FileDownload 'ftp://ftp.zlatkovic.com/libxml/zlib-1.2.5.win32.zip' -Timeout 1200000
+  - cmd: 7z x "iconv-1.9.2.win32.zip" -o"C:\projects\deps\"
+  - cmd: xcopy "C:\projects\deps\iconv-1.9.2.win32\*" "C:\projects\deps\*" /s /e /i /Y
+  - cmd: 7z x "libxml2-2.7.8.win32.zip" -o"C:\projects\deps\"
+  - cmd: xcopy "C:\projects\deps\libxml2-2.7.8.win32\*" "C:\projects\deps\*" /s /e /i /Y
+  - cmd: 7z x "zlib-1.2.5.win32.zip" -o"C:\projects\deps\"
+  - cmd: xcopy "C:\projects\deps\zlib-1.2.5\*" "C:\projects\deps\*" /s /e /i /Y
+
+environment:
+  CMAKE_GENERATOR: "Visual Studio 14 2015"
+  QT5: C:\Qt\5.7\msvc2015
+  MSBUILD_FLAGS: /verbosity:minimal /maxcpucount
+  BOOST_ROOT: C:\Libraries\boost_1_60_0
+  BOOST_INCLUDEDIR: C:\Libraries\boost_1_60_0
+  BOOST_LIBRARYDIR: C:\Libraries\boost_1_60_0\lib32-msvc-14.0
+  VLEDEPS_BASEPATH: C:\projects\deps
+
+before_build:
+  - set Path=%QT5%\bin;%Path%
+  - cmd: cd C:\projects\vle
+  - cmd: mkdir build 
+  - cmd: cd build 
+  - cmd: cmake -G "%CMAKE_GENERATOR%" -DCMAKE_SYSTEM_VERSION=10.0 "-DCMAKE_PREFIX_PATH=%QT5%" -DWITH_GVLE=ON -DWITH_DOC=OFF ..
+
+configuration: Release
+  
+build:
+  project: C:\projects\vle\build\vle.sln
