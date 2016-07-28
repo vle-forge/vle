@@ -145,59 +145,60 @@ gvle_plugins::registerPlugins()
                     }
                 }
             }
-        if (QDir(it.filePath() + "/" + pathgvleu).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvleu, QDir::Files);
-            while (itbis.hasNext()) {
-                QString libName =  itbis.next();
-                QPluginLoader loader(libName);
-                QObject *plugin = loader.instance();
-                if ( ! loader.isLoaded()) {
-                    qDebug() << " WARNING cannot load plugin " << libName;
-                    continue;
-                }
-                PluginMainPanel* modeling =
-                        qobject_cast<PluginMainPanel *>(plugin);
-                if (modeling) {
-                    mMainPanelOutPlugins.insert(modeling->getname(),
-                            gvleplug(it.fileName(), libName));
-                }
-            }
-        }
-
-        if (QDir(it.filePath() + "/" + pathgvles).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvles, QDir::Files);
-            while (itbis.hasNext()) {
-                QString libName =  itbis.next();
-                QPluginLoader loader(libName);
-                QObject *plugin = loader.instance();
-                if ( ! loader.isLoaded()) {
-                    qDebug() << " WARNING cannot load plugin " << libName;
-                    continue;
-                }
-                PluginSimPanel* simulating =
-                        qobject_cast<PluginSimPanel *>(plugin);
-                if (simulating) {
-                    mSimPanelPlugins.insert(simulating->getname(),
-                            gvleplug(it.fileName(), libName));
+            if (QDir(it.filePath() + "/" + pathgvleu).exists()) {
+                QDirIterator itbis(it.filePath() + "/" + pathgvleu, QDir::Files);
+                while (itbis.hasNext()) {
+                    QString libName =  itbis.next();
+                    QPluginLoader loader(libName);
+                    QObject *plugin = loader.instance();
+                    if ( ! loader.isLoaded()) {
+                        qDebug() << " WARNING cannot load plugin " << libName;
+                        continue;
+                    }
+                    PluginMainPanel* modeling =
+                            qobject_cast<PluginMainPanel *>(plugin);
+                    if (modeling) {
+                        mMainPanelOutPlugins.insert(modeling->getname(),
+                                gvleplug(it.fileName(), libName));
+                    }
                 }
             }
-        }
 
-        if (QDir(it.filePath() + "/" + pathgvlev).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvlev, QDir::Files);
-            while (itbis.hasNext()) {
-                QString libName =  itbis.next();
-                QPluginLoader loader(libName);
-                QObject *plugin = loader.instance();
-                if ( ! loader.isLoaded()) {
-                    qDebug() << " WARNING cannot load plugin " << libName;
-                    continue;
+            if (QDir(it.filePath() + "/" + pathgvles).exists()) {
+                QDirIterator itbis(it.filePath() + "/" + pathgvles, QDir::Files);
+                while (itbis.hasNext()) {
+                    QString libName =  itbis.next();
+                    QPluginLoader loader(libName);
+                    QObject *plugin = loader.instance();
+                    if ( ! loader.isLoaded()) {
+                        qDebug() << " WARNING cannot load plugin " << libName;
+                        continue;
+                    }
+                    PluginSimPanel* simulating =
+                            qobject_cast<PluginSimPanel *>(plugin);
+                    if (simulating) {
+                        mSimPanelPlugins.insert(simulating->getname(),
+                                gvleplug(it.fileName(), libName));
+                    }
                 }
-                PluginMainPanel* vpz =
-                        qobject_cast<PluginMainPanel *>(plugin);
-                if (vpz) {
-                    mMainPanelVpzPlugins.insert(vpz->getname(),
-                            gvleplug(it.fileName(), libName));
+            }
+
+            if (QDir(it.filePath() + "/" + pathgvlev).exists()) {
+                QDirIterator itbis(it.filePath() + "/" + pathgvlev, QDir::Files);
+                while (itbis.hasNext()) {
+                    QString libName =  itbis.next();
+                    QPluginLoader loader(libName);
+                    QObject *plugin = loader.instance();
+                    if ( ! loader.isLoaded()) {
+                        qDebug() << " WARNING cannot load plugin " << libName;
+                        continue;
+                    }
+                    PluginMainPanel* vpz =
+                            qobject_cast<PluginMainPanel *>(plugin);
+                    if (vpz) {
+                        mMainPanelVpzPlugins.insert(vpz->getname(),
+                                gvleplug(it.fileName(), libName));
+                    }
                 }
             }
         }

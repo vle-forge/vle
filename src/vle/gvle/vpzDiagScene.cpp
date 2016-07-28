@@ -34,7 +34,6 @@
 #include <QtDebug>
 #include "vpzDiagScene.h"
 
-#include <vle/utils/Path.hpp>
 
 namespace vle {
 namespace gvle {
@@ -1093,10 +1092,10 @@ VpzMainModelItem::type() const
 
 /*********************************************************************************/
 
-VpzDiagScene::VpzDiagScene() :
+VpzDiagScene::VpzDiagScene(const utils::ContextPtr& ctx) :
         QGraphicsScene(), mVpm(0), mClass(""), mCoupled(0), mPortSel1(0),
         mPortSel2(0), mConnection(0), mDragStartPoint(), mDragCurrPoint(),
-        mModelSelType(MIDDLE), mIsEnteringCoupled(false)
+        mModelSelType(MIDDLE), mIsEnteringCoupled(false), mCtx(ctx)
 {
     setBackgroundBrush(getBrushBackground());
 }
@@ -1686,35 +1685,36 @@ void
 VpzDiagScene::populateConfigureMenu(QMenu* menu)
 {
     QString pathgvlesm = "metadata/src";
-    QString packagesDir =
-        vle::utils::Path::path().getBinaryPackagesDir().c_str();
 
-    QDirIterator it(packagesDir, QDir::AllDirs);
+    for (auto binPkgDir : mCtx->getBinaryPackagesDir()) {
 
-    QAction* action;
+        QString packagesDir = binPkgDir.string().c_str();
+        QDirIterator it(packagesDir, QDir::AllDirs);
+        QAction* action;
 
-    while (it.hasNext()) {
-        it.next();
+        while (it.hasNext()) {
+            it.next();
 
-        if (QDir(it.filePath() + "/" + pathgvlesm).exists()) {
-            QDirIterator itbis(it.filePath() + "/" + pathgvlesm, QDir::Files);
-            while (itbis.hasNext()) {
-                QString metaDataFileName =  itbis.next();
-                if (QFile(metaDataFileName).exists()) {
-                    QFile file(metaDataFileName);
-                    QDomDocument dom("vle_project_metadata");
-                    QXmlInputSource source(&file);
-                    QXmlSimpleReader reader;
-                    dom.setContent(&source, &reader);
-                    QDomElement docElem = dom.documentElement();
-                    QDomNode srcPluginNode = dom.elementsByTagName("srcPlugin").item(0);
-                    QString className = srcPluginNode.attributes().namedItem("class").nodeValue();
-                    QString packName = srcPluginNode.attributes().namedItem("namespace").nodeValue();
-                    action = menu->addAction(packName + "::" + className);
-                    setActionType(action, VDMA_Configure_model);
-                    QVariantList dataList = action->data().toList();
-                    dataList << metaDataFileName;
-                    action->setData(dataList);
+            if (QDir(it.filePath() + "/" + pathgvlesm).exists()) {
+                QDirIterator itbis(it.filePath() + "/" + pathgvlesm, QDir::Files);
+                while (itbis.hasNext()) {
+                    QString metaDataFileName =  itbis.next();
+                    if (QFile(metaDataFileName).exists()) {
+                        QFile file(metaDataFileName);
+                        QDomDocument dom("vle_project_metadata");
+                        QXmlInputSource source(&file);
+                        QXmlSimpleReader reader;
+                        dom.setContent(&source, &reader);
+                        QDomElement docElem = dom.documentElement();
+                        QDomNode srcPluginNode = dom.elementsByTagName("srcPlugin").item(0);
+                        QString className = srcPluginNode.attributes().namedItem("class").nodeValue();
+                        QString packName = srcPluginNode.attributes().namedItem("namespace").nodeValue();
+                        action = menu->addAction(packName + "::" + className);
+                        setActionType(action, VDMA_Configure_model);
+                        QVariantList dataList = action->data().toList();
+                        dataList << metaDataFileName;
+                        action->setData(dataList);
+                    }
                 }
             }
         }

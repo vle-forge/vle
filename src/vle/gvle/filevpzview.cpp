@@ -35,7 +35,7 @@ namespace gvle {
 fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
         Logger* log,  const utils::ContextPtr& ctx, QWidget *parent) :
     QWidget(parent), ui(new Ui::fileVpzView), mRtool(0), mGvlePlugins(plugs),
-    mPackage(pkg), mLog(log)
+    mPackage(pkg), mLog(log), mScene(ctx)
 {
     ui->setupUi(this);
 
@@ -69,7 +69,7 @@ fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
     int viewTabId = ui->tabWidget->addTab(mExpViewTab, "Views");
 
     // Configure Classes tab
-    mClassesTab = new vle::gvle::FileVpzClasses();
+    mClassesTab = new vle::gvle::FileVpzClasses(ctx);
     int classesTabId = ui->tabWidget->addTab(mClassesTab, "Classes");
 
     //Configure Sim Tab

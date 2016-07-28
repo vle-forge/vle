@@ -1165,8 +1165,8 @@ gvle_win::onCustomContextMenu(const QPoint &point)
                                      this, SLOT(onUndoAvailable(bool)));
 
                     QString relPath = getRelPathFromFSIndex(index);
-
-                    newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+                    newPanel->init(relPath, &mCurrPackage, mLogger,
+                                   &mGvlePlugins, mCtx);
 
                     int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
                     bool oldBlock = ui->tabWidget->blockSignals(true);
@@ -1201,8 +1201,8 @@ gvle_win::onCustomContextMenu(const QPoint &point)
                                      this, SLOT(onUndoAvailable(bool)));
 
                     QString relPath = getRelPathFromFSIndex(index);
-
-                    newPanel->init(relPath, &mCurrPackage, mLogger, &mGvlePlugins);
+                    newPanel->init(relPath, &mCurrPackage, mLogger,
+                                   &mGvlePlugins, mCtx);
 
                     int n = ui->tabWidget->addTab(newPanel->leftWidget(), relPath);
                     bool oldBlock = ui->tabWidget->blockSignals(true);

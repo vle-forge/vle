@@ -3458,7 +3458,7 @@ vleVpz::buildValue(const vleDomObject* vdo, const QDomNode& node, bool buildText
             QDomNode child = chs[i];
             res->add(
                 std::unique_ptr<value::Value>(
-                    buildValue(child, buildText)));
+                    buildValue(vdo, child, buildText)));
         }
         return res;
     }
@@ -3481,7 +3481,7 @@ vleVpz::buildValue(const vleDomObject* vdo, const QDomNode& node, bool buildText
             res->add(
                 child.attributes().namedItem("name").nodeValue().toStdString(),
                 std::unique_ptr<value::Value>(
-                    buildValue(mapItemValue, buildText)));
+                    buildValue(vdo, mapItemValue, buildText)));
         }
         return res;
     }
@@ -3506,12 +3506,12 @@ vleVpz::buildValue(const vleDomObject* vdo, const QDomNode& node, bool buildText
             for (int j=0; j < columns; j++) {
                 QDomNode child = chs[(j + (i*columns))];
                 res->set(j,i, std::unique_ptr<value::Value>(
-                             buildValue(child, buildText)));
+                             buildValue(vdo, child, buildText)));
             }
         }
         return res;
     }
-    qDebug() << "Internal error in buildValue (3): " << node.nodeName() << "\n" << mVdo->toQString(node);
+    qDebug() << "Internal error in buildValue (3): " << node.nodeName() << "\n" << vdo->toQString(node);
     throw vle::utils::InternalError("Unknown value: %s", node.nodeName().toStdString().c_str());
     return 0;
 }

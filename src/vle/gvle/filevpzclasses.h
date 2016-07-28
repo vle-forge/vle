@@ -56,7 +56,9 @@ class FileVpzClasses : public QWidget
 {
     Q_OBJECT
 public:
-    explicit FileVpzClasses(QWidget *parent = 0);
+    explicit FileVpzClasses(
+            const vle::utils::ContextPtr& ctx,
+            QWidget *parent = 0);
     ~FileVpzClasses();
     void setVpm(vleVpm* vpm);
     void reload();

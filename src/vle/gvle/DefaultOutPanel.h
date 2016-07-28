@@ -42,16 +42,18 @@ class DefaultOutPanel : public PluginMainPanel
 public:
     DefaultOutPanel();
     virtual ~DefaultOutPanel();
-    QString  getname();
-    QWidget* leftWidget();
-    QWidget* rightWidget();
-    void undo();
-    void redo();
-    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs);
-    QString canBeClosed();
-    void save();
-    void discard(){};
-    PluginMainPanel* newInstance(){return 0;}
+
+    QString  getname() override;
+    QWidget* leftWidget() override;
+    QWidget* rightWidget() override;
+    void undo() override;
+    void redo() override;
+    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs,
+            const utils::ContextPtr& ctx) override;
+    QString canBeClosed() override;
+    void save() override;
+    void discard() override {}
+    PluginMainPanel* newInstance() override {return 0;}
 
 public slots:
     void onUndoAvailable(bool);

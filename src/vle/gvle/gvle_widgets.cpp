@@ -90,7 +90,7 @@ VleBooleanEdit::focusInEvent(QFocusEvent* e)
 }
 
 void
-VleBooleanEdit::onValueChanged(bool checked)
+VleBooleanEdit::onValueChanged(bool /*checked*/)
 {
     if (checkState() == Qt::Checked) {
         emit valUpdated(id, true);

@@ -46,8 +46,8 @@ DefaultOutPanel::~DefaultOutPanel()
 }
 
 void
-DefaultOutPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
-        gvle_plugins* /*plugs*/)
+DefaultOutPanel::init(QString& relPath, utils::Package* pkg, Logger* /*log*/,
+        gvle_plugins* /*plugs*/, const utils::ContextPtr& /*ctx*/)
 {
     QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
 

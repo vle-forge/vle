@@ -39,8 +39,9 @@ namespace gvle {
 
 
 
-FileVpzClasses::FileVpzClasses(QWidget *parent) :
-    QWidget(parent), mScene(), ui(new Ui::FileVpzClasses), mVpm(0),
+FileVpzClasses::FileVpzClasses(const vle::utils::ContextPtr& ctx,
+        QWidget *parent) :
+    QWidget(parent), mScene(ctx), ui(new Ui::FileVpzClasses), mVpm(0),
     mSelClass("<None>")
 {
 
