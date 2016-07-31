@@ -45,6 +45,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <stack>
 
 #include <cerrno>
 #include <cstdio>
@@ -67,6 +68,116 @@
 #endif
 
 typedef std::shared_ptr <vle::vpz::Vpz> VpzPtr;
+
+void generate_template_line(std::ostream& header, std::ostream& firstline,
+                            std::string name,
+                            const std::unique_ptr<vle::value::Value>& value)
+{
+    std::stack <std::tuple<std::string, const vle::value::Value*>> stack;
+
+    stack.push(std::make_tuple(name, value.get()));
+
+    while (not stack.empty()) {
+        std::string name;
+        const vle::value::Value* value;
+
+        std::tie(name, value) = stack.top();
+        stack.pop();
+
+        switch (value->getType()) {
+        case vle::value::Value::SET:
+            {
+                auto& set = value->toSet();
+                for (std::size_t i = 0, e = set.size(); i != e; ++i) {
+                    std::string newname = name + '.' + std::to_string(i);
+                    const vle::value::Value* newvalue = set.get(i).get();
+                    stack.emplace(newname, newvalue);
+                }
+            }
+        case vle::value::Value::MAP:
+            for (auto& value_map: value->toMap()) {
+                std::string newname = name + '.' + value_map.first;
+                const vle::value::Value* newvalue = value_map.second.get();
+
+                stack.emplace(newname, newvalue);
+            }
+            break;
+        case vle::value::Value::BOOLEAN:
+        case vle::value::Value::INTEGER:
+        case vle::value::Value::DOUBLE:
+        case vle::value::Value::STRING:
+            header << name;
+            firstline << value->writeToString();
+            if (not stack.empty()) {
+                header << ',';
+                firstline << ',';
+            }
+            break;
+        default:
+            fprintf(stderr, _("fail to read a value (only bool, integer, double"
+                " and string are available"));
+            break;
+        }
+    }
+}
+
+void generate_template(std::string file, std::string package, std::string exp) noexcept
+{
+    std::ofstream ofs(file);
+    if (not ofs.is_open()) {
+        fprintf(stderr, "Failed to open `%s' to generate template", file.c_str());
+        return;
+    }
+
+    std::ostringstream oss;
+
+    try {
+        auto ctx = vle::utils::make_context();
+        vle::utils::Package pack(ctx);
+        pack.select(package);
+        vle::vpz::Vpz vpz(pack.getExpFile(exp, vle::utils::PKG_BINARY));
+
+        auto it = vpz.project().experiment().conditions().begin();
+        auto end = vpz.project().experiment().conditions().end();
+
+        while (it != end) {
+            auto jt = it->second.begin();
+            auto endj = it->second.end();
+
+            while (jt != endj) {
+                if (not jt->second
+                    or not jt->second->isSet()
+                    or not jt->second->get(0))
+                    continue;
+
+                std::string name = it->first;
+                name += '.';
+                name += jt->first;
+
+                generate_template_line(ofs, oss, name, jt->second->get(0));
+
+                ++jt;
+
+                if (jt != endj) {
+                    ofs << ',';
+                    oss << ',';
+                }
+            }
+
+            ++it;
+
+            if (it != end) {
+                ofs << ',';
+                oss << ',';
+            }
+        }
+
+        ofs << '\n';
+        ofs << oss.str() << '\n';
+    } catch(const std::exception& e) {
+        fprintf(stderr, "Failed to generate template file: %s\n", e.what());
+    }
+}
 
 /** @e Accessor stores an access to a VPZ or an undefined string.
  * @code
@@ -653,24 +764,26 @@ void show_help()
              "  input-file,i file               csv input file\n"
              "  output-file,o file              csv output file\n"
              "  warnings                        Show warnings in output\n"
-             "  blocksize,b size                Set number of lines to be sent"
+             "  template,t file                 Generate a template csv input file\n"
+             "  block-size,b size               Set number of lines to be sent"
              " [default 5000]\n"));
 }
 
 int main(int argc, char *argv[])
 {
     std::string package_name;
-    std::string input_file, output_file;
+    std::string input_file, output_file, template_file;
     int warnings = 0;
     int block_size = 5000;
     int ret = EXIT_SUCCESS;
 
-    const char* const short_opts = "hP:i:o:b:";
+    const char* const short_opts = "hP:i:o:t:b:";
     const struct option long_opts[] = {
         {"help", 0, nullptr, 'h'},
         {"package", 1, nullptr, 'P'},
         {"input-file", 1, nullptr, 'i'},
         {"output-file", 1, nullptr, 'o'},
+        {"template", 1, nullptr, 't'},
         {"warnings", 0, &warnings, 1},
         {"block-size", 1, nullptr, 'b'},
         {0, 0, nullptr, 0}};
@@ -697,6 +810,9 @@ int main(int argc, char *argv[])
         case 'o':
             output_file = ::optarg;
             break;
+        case 't':
+            template_file = ::optarg;
+            break;
         case 'b':
             try {
                 block_size = std::stoi(::optarg);
@@ -721,14 +837,17 @@ int main(int argc, char *argv[])
     boost::mpi::environment env(argc, argv);
     boost::mpi::communicator comm;
 
+    std::vector<std::string> vpz(argv + ::optind, argv + argc);
+    if (vpz.size() > 1)
+        fprintf(stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
+
+    if (comm.rank() == 0 and not template_file.empty())
+        generate_template(template_file, package_name, vpz.front());
+
     if (comm.size() == 1)  {
         fprintf(stderr, _("cvle needs two processors.\n"));
         return EXIT_FAILURE;
     }
-
-    std::vector<std::string> vpz(argv + ::optind, argv + argc);
-    if (vpz.size() > 1)
-        fprintf(stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
 
     if (comm.rank() == 0) {
         printf(_("block size: %d\n"
