@@ -87,12 +87,12 @@ class DynamicObs : public devs::Dynamics
 public:
     DynamicObs(const devs::DynamicsInit& atom,
               const devs::InitEventList& events) :
-        devs::Dynamics(atom, events)
+        devs::Dynamics(atom, events), d(0.0)
     {}
 
     virtual devs::Time init(devs::Time /* time */) override
     {
-        return devs::infinity;
+        return 0;
     }
 
     virtual devs::Time timeAdvance() const override
@@ -102,6 +102,7 @@ public:
 
     virtual void internalTransition(devs::Time /* time */) override
     {
+        d = 3.9;
     }
 
     virtual void externalTransition(
@@ -124,8 +125,9 @@ public:
     virtual std::unique_ptr<value::Value>
     observation(const devs::ObservationEvent&) const override
     {
-        return 0;
+        return vle::value::Double::create(d);
     }
+    double d;
 };
 
 DECLARE_DYNAMICS_SYMBOL(dynamics_obs, DynamicObs)
@@ -145,10 +147,31 @@ BOOST_AUTO_TEST_CASE(test_dynamic_obs)
         root.init();
 
         while (root.run());
-        std::unique_ptr<value::Map> out = root.outputs();
+        std::unique_ptr<value::Map> out = root.finish();
         BOOST_REQUIRE(out);
-        BOOST_REQUIRE_EQUAL(out->size(),2);
-        root.finish();
+        BOOST_REQUIRE_EQUAL(out->size(),4);
+
+        //6 lines: header + 5 timed obs (timestep = 1, duration = 4)
+        BOOST_REQUIRE_EQUAL(out->getMatrix("viewTimed").rows(),6);
+        //std::cout << "dbg viewTimed\n" << out->getMatrix("viewTimed") << "\n";
+
+        //2 lines: header + only one input
+        BOOST_REQUIRE_EQUAL(out->getMatrix("viewOutput").rows(),2);
+        BOOST_REQUIRE_CLOSE(out->getMatrix("viewOutput").getDouble(1,1),
+                            0.0,10e-4);
+        //std::cout << "dbg viewOutput\n" << out->getMatrix("viewOutput") << "\n";
+
+
+        //2 lines: header + only one intenral transition
+        BOOST_REQUIRE_EQUAL(out->getMatrix("viewInternal").rows(),2);
+        BOOST_REQUIRE_CLOSE(out->getMatrix("viewInternal").getDouble(1,1),
+                                    3.9,10e-4);
+        //std::cout << "dbg viewInternal\n" << out->getMatrix("viewInternal") << "\n";
+
+        //2 lines: header +finish
+        BOOST_REQUIRE_EQUAL(out->getMatrix("viewFinish").rows(),2);
+        //std::cout << "dbg viewFinish\n" << out->getMatrix("viewFinish") << "\n";
+
     } catch (const std::exception& e) {
         BOOST_REQUIRE(false);
     }

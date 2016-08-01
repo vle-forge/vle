@@ -18,22 +18,110 @@
 <dynamics>
 <dynamic name="dynamic_obs" package="" library="dynamics_obs"  />
 </dynamics>
-<experiment name="expe" duration="4" begin="0.000000000000000" >
+<experiment name="expe" >
+<conditions>
+ <condition name="simulation_engine" >
+  <port name="begin" >
+   <double>0.000000000000000</double>
+  </port>
+  <port name="duration" >
+   <double>4.000000000000000</double>
+  </port>
+ </condition>
+</conditions>
 <views>
 <outputs>
-<output name="o" location="" format="local" package="vle.output" plugin="storage" />
-<output name="o1" location="" format="local" package="vle.output" plugin="storage" />
+<output name="o" location="" format="local" package="vle.output" plugin="storage" >
+     <map>
+      <key name="rows">
+       <integer>15</integer>
+      </key>
+      <key name="header">
+       <string>top</string>
+      </key>
+      <key name="inc_columns">
+       <integer>10</integer>
+      </key>
+      <key name="inc_rows">
+       <integer>10</integer>
+      </key>
+      <key name="columns">
+       <integer>15</integer>
+      </key>
+     </map>
+</output>
+<output name="o1" location="" format="local" package="vle.output" plugin="storage" >
+     <map>
+      <key name="rows">
+       <integer>15</integer>
+      </key>
+      <key name="header">
+       <string>top</string>
+      </key>
+      <key name="inc_columns">
+       <integer>10</integer>
+      </key>
+      <key name="inc_rows">
+       <integer>10</integer>
+      </key>
+      <key name="columns">
+       <integer>15</integer>
+      </key>
+     </map>
+</output>
+<output name="o2" location="" format="local" package="vle.output" plugin="storage" >
+     <map>
+      <key name="rows">
+       <integer>15</integer>
+      </key>
+      <key name="header">
+       <string>top</string>
+      </key>
+      <key name="inc_columns">
+       <integer>10</integer>
+      </key>
+      <key name="inc_rows">
+       <integer>10</integer>
+      </key>
+      <key name="columns">
+       <integer>15</integer>
+      </key>
+     </map>
+</output>
+<output name="o3" location="" format="local" package="vle.output" plugin="storage" >
+     <map>
+      <key name="rows">
+       <integer>15</integer>
+      </key>
+      <key name="header">
+       <string>top</string>
+      </key>
+      <key name="inc_columns">
+       <integer>10</integer>
+      </key>
+      <key name="inc_rows">
+       <integer>10</integer>
+      </key>
+      <key name="columns">
+       <integer>15</integer>
+      </key>
+     </map>
+</output>
 </outputs>
 <observables>
 <observable name="obs1" >
 <port name="obs" >
- <attachedview name="viewTimed" />
- <attachedview name="viewFinish" />
+  <attachedview name="viewTimed" /> 
+  <attachedview name="viewFinish" />
+  <attachedview name="viewOutput" />
+  <attachedview name="viewInternal" />
 </port>
 </observable>
 </observables>
-<view name="viewTimed" output="o" type="timed" timestep="1.000000000000000" />
+<view name="viewTimed" output="o" type="timed" timestep="1" /> 
 <view name="viewFinish" output="o1" type="finish" />
+<view name="viewOutput" output="o2" type="output" />
+<view name="viewInternal" output="o3" type="internal" />
 </views>
 </experiment>
 </vle_project>

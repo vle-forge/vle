@@ -310,6 +310,15 @@ void Coordinator::dynamic_deletion()
         for (auto it = m_simulators.begin(), et = m_simulators.end();
              it != et; ++it) {
             if (it->get() == elem) {
+                elem->finish();
+                auto& observations = elem->getObservations();
+                for (auto& obs : observations)
+                    obs.view->run(elem->dynamics().get(),
+                            m_currentTime,
+                            obs.portname,
+                            std::move(obs.value));
+
+                observations.clear();
                 m_simulators.erase(it);
                 break;
             }
@@ -513,6 +522,14 @@ std::unique_ptr<value::Map> Coordinator::finish()
     for (auto& elem : m_simulators) {
         assert(elem.get());
         elem->finish();
+        auto& observations = elem->getObservations();
+        for (auto& obs : observations)
+            obs.view->run(elem->dynamics().get(),
+                    m_currentTime,
+                    obs.portname,
+                    std::move(obs.value));
+
+        observations.clear();
     }
 
     std::unique_ptr<value::Map> result;
