@@ -4,7 +4,7 @@
 <structures>
 <model name="top" type="coupled" width="459"  >
 <submodels>
-<model name="A" type="atomic" dynamics="timed_obs" observables="obs1" x="140" y="25" width="100" height="45" >
+<model name="A" type="atomic" dynamics="dynamic_obs" observables="obs1" x="140" y="25" width="100" height="45" >
 <in>
 </in>
 <out>
@@ -16,21 +16,24 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="timed_obs" package="" library="dynamics_timed_obs"  />
+<dynamic name="dynamic_obs" package="" library="dynamics_obs"  />
 </dynamics>
 <experiment name="expe" duration="4" begin="0.000000000000000" >
 <views>
 <outputs>
-<output name="o" location="" format="local" package="" plugin="oov_plugin" />
+<output name="o" location="" format="local" package="vle.output" plugin="storage" />
+<output name="o1" location="" format="local" package="vle.output" plugin="storage" />
 </outputs>
 <observables>
 <observable name="obs1" >
 <port name="obs" >
- <attachedview name="view1" />
+ <attachedview name="viewTimed" />
+ <attachedview name="viewFinish" />
 </port>
 </observable>
 </observables>
-<view name="view1" output="o" type="timed" timestep="1.000000000000000" />
+<view name="viewTimed" output="o" type="timed" timestep="1.000000000000000" />
+<view name="viewFinish" output="o1" type="finish" />
 </views>
 </experiment>
 </vle_project>

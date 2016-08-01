@@ -425,55 +425,6 @@ public:
     int state;
 };
 
-
-class TimedObs : public devs::Dynamics
-{
-public:
-    TimedObs(const devs::DynamicsInit& atom,
-              const devs::InitEventList& events) :
-        devs::Dynamics(atom, events)
-    {}
-
-    virtual devs::Time init(devs::Time /* time */) override
-    {
-        return devs::infinity;
-    }
-
-    virtual devs::Time timeAdvance() const override
-    {
-        return devs::infinity;
-    }
-
-    virtual void internalTransition(devs::Time /* time */) override
-    {
-    }
-
-    virtual void externalTransition(
-        const devs::ExternalEventList& /*events*/,
-        devs::Time /* time */) override
-    {
-    }
-
-    virtual void confluentTransitions(
-            devs::Time /*time*/,
-            const devs::ExternalEventList& /*extEventlist*/) override
-    {
-    }
-
-    virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList& /*output*/) const override
-    {
-    }
-
-    virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent&) const override
-    {
-        return 0;
-    }
-};
-
-
-
 class GenExecutive : public devs::Executive
 {
     enum state { INIT, IDLE, ADDMODEL, DELMODEL };
@@ -685,7 +636,6 @@ DECLARE_DYNAMICS_SYMBOL(dynamics_counter, Counter)
 DECLARE_DYNAMICS_SYMBOL(dynamics_transform, Transform)
 DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionA, Confluent_transitionA)
 DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionB, Confluent_transitionB)
-DECLARE_DYNAMICS_SYMBOL(dynamics_timed_obs, TimedObs)
 DECLARE_EXECUTIVE_SYMBOL(exe_branch, Branch)
 DECLARE_EXECUTIVE_SYMBOL(exe_deleteconnection, DeleteConnection)
 DECLARE_EXECUTIVE_SYMBOL(exe_genexecutive, GenExecutive)
@@ -824,25 +774,3 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
      }
  }
 
- BOOST_AUTO_TEST_CASE(test_timed_obs)
- {
-     auto ctx = vle::utils::make_context();
-     vle::utils::Path p(DEVS_TEST_DIR);
-     vle::utils::Path::current_path(p);
-
-     vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
-     devs::RootCoordinator root(ctx);
-
-     try {
-         root.load(file);
-         file.clear();
-         root.init();
-
-         while (root.run());
-         std::unique_ptr<value::Map> out = root.outputs();
-         BOOST_REQUIRE(out);
-         root.finish();
-     } catch (const std::exception& e) {
-         BOOST_REQUIRE(false);
-     }
- }
