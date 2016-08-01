@@ -693,77 +693,77 @@ DECLARE_EXECUTIVE_SYMBOL(exe_leaf, Leaf)
 DECLARE_EXECUTIVE_SYMBOL(exe_root, Root)
 DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 
-// BOOST_AUTO_TEST_CASE(test_gensvpz)
-// {
-//     auto ctx = vle::utils::make_context();
-//     vle::utils::Path p(DEVS_TEST_DIR);
-//     vle::utils::Path::current_path(p);
+ BOOST_AUTO_TEST_CASE(test_gensvpz)
+ {
+     auto ctx = vle::utils::make_context();
+     vle::utils::Path p(DEVS_TEST_DIR);
+     vle::utils::Path::current_path(p);
 
-//     vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
-//     devs::RootCoordinator root(ctx);
+     vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
+     devs::RootCoordinator root(ctx);
 
-//     root.load(file);
-//     file.clear();
-//     root.init();
+     root.load(file);
+     file.clear();
+     root.init();
 
-//     while (root.run());
-//     std::unique_ptr<value::Map> out = root.outputs();
-//     root.finish();
+     while (root.run());
+     std::unique_ptr<value::Map> out = root.outputs();
+     root.finish();
 
 
-//     BOOST_REQUIRE(out);
-//     BOOST_REQUIRE_EQUAL(out->size(), 2);
+     BOOST_REQUIRE(out);
+     BOOST_REQUIRE_EQUAL(out->size(), 2);
 
-//     /* get result of simulation */
-//     value::Matrix &matrix = out->getMatrix("view1");
-//     std::cout << matrix << '\n';
+     /* get result of simulation */
+     value::Matrix &matrix = out->getMatrix("view1");
+     std::cout << matrix << '\n';
 
-//     BOOST_REQUIRE_EQUAL(matrix.rows(), (std::size_t)101);
-//     BOOST_REQUIRE_EQUAL(matrix.columns(), (std::size_t)3);
+     BOOST_REQUIRE_EQUAL(matrix.rows(), (std::size_t)101);
+     BOOST_REQUIRE_EQUAL(matrix.columns(), (std::size_t)3);
 
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 0)), 0);
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 0)), 0);
-//     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 0)), 1);
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 0)), 0);
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 0)), 0);
+     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 0)), 1);
 
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 10)), 10);
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 10)), 55);
-//     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 10)), 11);
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 10)), 10);
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 10)), 55);
+     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 10)), 11);
 
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 14)), 14);
-//     BOOST_REQUIRE(not matrix(1, 14));
-//     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 14)), 15);
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 14)), 14);
+     BOOST_REQUIRE(not matrix(1, 14));
+     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 14)), 15);
 
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 31)), 31);
-//     BOOST_REQUIRE(not matrix(1, 31));
-//     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 31)), 32);
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 31)), 31);
+     BOOST_REQUIRE(not matrix(1, 31));
+     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 31)), 32);
 
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 100)), 100);
-//     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 100)), 2550);
-//     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 100)), 1);
-// }
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 100)), 100);
+     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 100)), 2550);
+     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 100)), 1);
+ }
 
-// BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
-// {
-//     auto ctx = vle::utils::make_context();
-//     vle::utils::Path p(DEVS_TEST_DIR);
-//     vle::utils::Path::current_path(p);
+ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
+ {
+     auto ctx = vle::utils::make_context();
+     vle::utils::Path p(DEVS_TEST_DIR);
+     vle::utils::Path::current_path(p);
 
-//     vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
-//     devs::RootCoordinator root(ctx);
+     vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
+     devs::RootCoordinator root(ctx);
 
-//     try {
-//         root.load(file);
-//         file.clear();
-//         root.init();
+     try {
+         root.load(file);
+         file.clear();
+         root.init();
 
-//         while (root.run());
-//         std::unique_ptr<value::Map> out = root.outputs();
-//         BOOST_REQUIRE(not out);
-//         root.finish();
-//     } catch (const std::exception& e) {
-//         BOOST_REQUIRE(false);
-//     }
-// }
+         while (root.run());
+         std::unique_ptr<value::Map> out = root.outputs();
+         BOOST_REQUIRE(not out);
+         root.finish();
+     } catch (const std::exception& e) {
+         BOOST_REQUIRE(false);
+     }
+ }
 
 BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 {
@@ -799,50 +799,50 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
     }
 }
 
-// BOOST_AUTO_TEST_CASE(test_confluent_transition)
-// {
-//     auto ctx = vle::utils::make_context();
-//     vle::utils::Path p(DEVS_TEST_DIR);
-//     vle::utils::Path::current_path(p);
+ BOOST_AUTO_TEST_CASE(test_confluent_transition)
+ {
+     auto ctx = vle::utils::make_context();
+     vle::utils::Path p(DEVS_TEST_DIR);
+     vle::utils::Path::current_path(p);
 
-//     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
-//     devs::RootCoordinator root(ctx);
+     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
+     devs::RootCoordinator root(ctx);
 
-//     try {
-//         root.load(file);
-//         file.clear();
-//         root.init();
+     try {
+         root.load(file);
+         file.clear();
+         root.init();
 
-//         while (root.run());
-//         std::unique_ptr<value::Map> out = root.outputs();
-//         BOOST_REQUIRE(not out);
-//         root.finish();
-//     } catch (const std::exception& e) {
-//         BOOST_REQUIRE(false);
-//     } catch (...) {
-//         BOOST_REQUIRE(false);
-//     }
-// }
+         while (root.run());
+         std::unique_ptr<value::Map> out = root.outputs();
+         BOOST_REQUIRE(not out);
+         root.finish();
+     } catch (const std::exception& e) {
+         BOOST_REQUIRE(false);
+     } catch (...) {
+         BOOST_REQUIRE(false);
+     }
+ }
 
-// BOOST_AUTO_TEST_CASE(test_timed_obs)
-// {
-//     auto ctx = vle::utils::make_context();
-//     vle::utils::Path p(DEVS_TEST_DIR);
-//     vle::utils::Path::current_path(p);
+ BOOST_AUTO_TEST_CASE(test_timed_obs)
+ {
+     auto ctx = vle::utils::make_context();
+     vle::utils::Path p(DEVS_TEST_DIR);
+     vle::utils::Path::current_path(p);
 
-//     vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
-//     devs::RootCoordinator root(ctx);
+     vpz::Vpz file(DEVS_TEST_DIR "/timed_obs.vpz");
+     devs::RootCoordinator root(ctx);
 
-//     try {
-//         root.load(file);
-//         file.clear();
-//         root.init();
+     try {
+         root.load(file);
+         file.clear();
+         root.init();
 
-//         while (root.run());
-//         std::unique_ptr<value::Map> out = root.outputs();
-//         BOOST_REQUIRE(out);
-//         root.finish();
-//     } catch (const std::exception& e) {
-//         BOOST_REQUIRE(false);
-//     }
-// }
+         while (root.run());
+         std::unique_ptr<value::Map> out = root.outputs();
+         BOOST_REQUIRE(out);
+         root.finish();
+     } catch (const std::exception& e) {
+         BOOST_REQUIRE(false);
+     }
+ }
