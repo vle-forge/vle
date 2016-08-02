@@ -93,7 +93,7 @@ void DynamicsDbg::output(Time time, ExternalEventList& output) const
          mName.c_str());
 
     mDynamics->output(time, output);
-    vDbg(context(), _("                .... %s [DEVS] output returns "),
+    vDbg(context(), _("                .... %s [DEVS] output returns \n"),
          mName.c_str());
 
     if (output.empty()) {
@@ -134,7 +134,7 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] external transition: "),
+    vDbg(context(), _("%.*g %s [DEVS] external transition:\n"),
          std::numeric_limits<double>::max_digits10, time,
          mName.c_str());
 
@@ -149,7 +149,7 @@ void DynamicsDbg::confluentTransitions(
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] confluent transition: "),
+    vDbg(context(), _("%.*g %s [DEVS] confluent transition:\n"),
          std::numeric_limits<double>::max_digits10, time, mName.c_str());
 
     ::print_external_event(extEventlist, context());

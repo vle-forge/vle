@@ -185,7 +185,7 @@ void SaxStackVpz::pushModel(const xmlChar** att)
                 dynamics ? xmlCharToString(dynamics) : "",
                 observables ? xmlCharToString(observables) : "");
 
-            if (debug and (xmlStrcmp(type, (const xmlChar*)"true") == 0))
+            if (debug and (xmlStrcmp(debug, (const xmlChar*)"true") == 0))
                 ptr->setDebug();
 
             gmdl = ptr;
