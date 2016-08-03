@@ -11,6 +11,7 @@ add_executable(test_vle_output test_vle_output.cpp
 
 target_include_directories(test_vle_output PUBLIC
   ${CMAKE_SOURCE_DIR}/src ${VLE_BINARY_DIR}/src/
+  ${Boost_INCLUDE_DIRS}
 )
 
 set_target_properties(test_vle_output PROPERTIES
