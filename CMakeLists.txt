@@ -169,7 +169,6 @@ if (VLE_BOOST_INCLUDE_PATH AND VLE_BOOST_LIBRARIES_PATH)
  set (BOOST_INCLUDEDIR ${VLE_BOOST_INCLUDE_PATH})
 endif ()
 
-set(Boost_DEBUG 0)
 if (WITH_MVLE OR WITH_CVLE)
   find_package(Boost COMPONENTS unit_test_framework serialization mpi)
 
