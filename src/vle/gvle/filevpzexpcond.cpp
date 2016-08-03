@@ -641,7 +641,7 @@ FileVpzExpCond::insertDoubleEdit(int row, int col, double val)
 {
 
     QString id = QString("%1,%2").arg(row).arg(col);
-    VleDoubleEdit* w = new VleDoubleEdit(ui->table, val, id);
+    VleDoubleEdit* w = new VleDoubleEdit(ui->table, val, id, false);
     ui->table->setCellWidget(row, col, w);
     ui->table->setItem(row, col, new QTableWidgetItem);//used to find it
     QObject::connect(w, SIGNAL(valUpdated(const QString&, double)),

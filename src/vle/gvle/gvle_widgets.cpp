@@ -100,8 +100,12 @@ VleBooleanEdit::onValueChanged(bool /*checked*/)
 }
 
 VleDoubleEdit::VleDoubleEdit(QWidget* parent, double val,
-                             const QString& idStr): QLineEdit(parent), id(idStr)
+                             const QString& idStr, bool withDefaultMenu):
+                                     QLineEdit(parent), id(idStr)
 {
+    if (not withDefaultMenu) {
+        setContextMenuPolicy(Qt::NoContextMenu);
+    }
 
     QDoubleValidator *validator =
         new QDoubleValidator(-DBL_MAX, DBL_MAX,

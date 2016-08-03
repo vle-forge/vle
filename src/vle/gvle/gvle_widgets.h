@@ -71,7 +71,9 @@ class VleDoubleEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    VleDoubleEdit(QWidget* parent, double val, const QString& idStr="");
+
+    VleDoubleEdit(QWidget* parent, double val, const QString& idStr="",
+            bool withDefaultMenu = true);
     ~VleDoubleEdit();
     void focusInEvent(QFocusEvent* e);
     bool eventFilter(QObject *target, QEvent *event);
