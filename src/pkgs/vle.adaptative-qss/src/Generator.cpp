@@ -16,6 +16,7 @@
 
 #include <vle/devs/Dynamics.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/utils/Tools.hpp>
 
 namespace vd = vle::devs;
 namespace vv = vle::value;

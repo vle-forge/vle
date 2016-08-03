@@ -2,7 +2,6 @@ function(DeclareSimulator targetname package name sources)
   include_directories(
     ${VLE_BINARY_DIR}/src
     ${VLE_SOURCE_DIR}/src
-    ${Boost_INCLUDE_DIRS}
     ${VLEDEPS_INCLUDE_DIRS})
 
   link_directories(
@@ -11,8 +10,7 @@ function(DeclareSimulator targetname package name sources)
   add_library(${targetname} MODULE ${sources})
 
   target_link_libraries(${targetname}
-    ${VLE_LIBRARIES}
-    ${Boost_LIBRARIES})
+    ${VLE_LIBRARIES})
 
   set_target_properties(${targetname} PROPERTIES
     OUTPUT_NAME ${name}
