@@ -312,6 +312,69 @@ VleCombo::onValueChanged(const QString& v)
     emit valUpdated(id, v);
 }
 
+/************************** VleLineEdit ******************************/
+
+VleLineEdit::VleLineEdit(QWidget* parent, const QString& val,
+                         const QString& idStr, bool withDefaultMenu):
+             QLineEdit(parent), id(idStr), backup(val)
+{
+    if (not withDefaultMenu) {
+        setContextMenuPolicy(Qt::NoContextMenu);
+    }
+
+    setValue(val);
+
+    QObject::connect(this, SIGNAL(editingFinished()),
+            this, SLOT(onValueChanged()));
+
+    installEventFilter(this);
+}
+
+VleLineEdit::~VleLineEdit()
+{
+}
+
+void
+VleLineEdit::setValue(const QString& val)
+{
+     setText(val);
+}
+
+bool
+VleLineEdit::eventFilter(QObject *target, QEvent *event)
+{
+    if (target == this) {
+        switch(event->type()) {
+        case QEvent::FocusOut:
+            if (text().isEmpty()) {
+                setValue(backup);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return QWidget::eventFilter(target, event);
+}
+
+void
+VleLineEdit::focusInEvent(QFocusEvent* e)
+{
+    QLineEdit::focusInEvent(e);
+    emit selected(id);
+}
+
+void
+VleLineEdit::onValueChanged()
+{
+    if (text() != backup) {
+        emit textUpdated(id, backup, text());
+        backup = text();
+    }
+}
+
+/************************** VleTextEdit ******************************/
 VleTextEdit::VleTextEdit(QWidget *parent, const QString& text,
         const QString& idstr, bool editOnDbleClick): QPlainTextEdit(parent),
                 saved_value(""), id(idstr), edit_on_dble_click(editOnDbleClick)
@@ -403,7 +466,7 @@ VleTextEdit::mouseDoubleClickEvent(QMouseEvent* e)
     }
 }
 
-
+/************************** VleValueWIdget ******************************/
 
 QString
 VleValueWidget::getValueDisplay(const vle::value::Value& v,
@@ -547,7 +610,8 @@ VleValueWidget::value_stack::editingValue()
     for (; itb != ite; itb++) {
         switch ((*itb)->getType()) {
         case vle::value::Value::INTEGER: { //for id a Set elem
-            res = res->toSet().value().at((*itb)->toInteger().value()).get();            break;
+            res = res->toSet().value().at((*itb)->toInteger().value()).get();
+            break;
         } case vle::value::Value::STRING: {//for id a Map elem
             res = res->toMap().value().at((*itb)->toString().value()).get();
             break;

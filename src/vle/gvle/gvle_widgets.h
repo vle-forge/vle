@@ -174,6 +174,30 @@ signals:
 
 
 /**
+ * A line Editor (TODO validator for c++ names)
+ */
+class VleLineEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+
+    VleLineEdit(QWidget* parent, const QString& val, const QString& idStr="",
+            bool withDefaultMenu = true);
+    ~VleLineEdit();
+    void focusInEvent(QFocusEvent* e);
+    bool eventFilter(QObject *target, QEvent *event);
+    void setValue(const QString& val);
+
+    QString id;
+    QString backup;
+public slots:
+    void onValueChanged();
+signals:
+    void textUpdated(const QString& id, const QString& old, const QString& neW);
+    void selected(const QString& id);
+};
+
+/**
  * Required for setting a new value only on lost focus (not on all changes)
  * reimplement focusOutEvent
  * TODO should contain text rules no comma, no '<', etc..
