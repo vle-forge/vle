@@ -1248,6 +1248,10 @@ void
 vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
         const QString& newName)
 {
+    if (condName == "simulation_engine" and
+            (oldName == "begin" or  oldName == "duration")) {
+        return ;
+    }
     QDomNode cond = condFromConds(condsFromDoc(), condName);
     undoStack->snapshot(cond);
     QDomNodeList portList = portsListFromCond(cond);
