@@ -89,7 +89,7 @@ private:
     void insertSpinBox(int row, int col, int val);
     void insertDoubleEdit(int row, int col, double val);
     void insertBooleanCombo(int row, int col, bool val);
-    VleTextEdit* getTextEdit(int row, int col);
+    VleLineEdit* getLineEdit(int row, int col);
 
 private:
     Ui::FileVpzExpCond* ui;

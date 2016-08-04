@@ -303,10 +303,10 @@ FileVpzExpCond::showEditPlace()
 void
 FileVpzExpCond::onCellDoubleClicked(int row, int column)
 {
-    VleTextEdit* w = qobject_cast<VleTextEdit*>(
-            ui->table->cellWidget(row,column));
+    VleLineEdit* w = getLineEdit(row,column);
     if (w) {
-        w->setTextEdition(true);
+        //TODO
+        //w->setTextEdition(true);
     }
 }
 
@@ -335,7 +335,7 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
 
     QString condName = "";
     if (index.row() > -1) {
-        condName = getTextEdit(index.row(), 0)->getCurrentText();
+        condName = getLineEdit(index.row(), 0)->text();
     }
 
     action = menu.addAction("Remove condition");
@@ -353,7 +353,7 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
     menu.addSeparator();
     subMenu = buildAddValueMenu(menu, "Add");
     subMenu->setEnabled((index.column() == 1) and
-            (getTextEdit(index.row(), index.column())->getCurrentText() !=
+            (getLineEdit(index.row(), index.column())->text() !=
                     "<Click here to add a port>") and
             (mVpm->getCondGUIplugin(condName) == ""));
     subMenu = buildAddValueMenu(menu, "Set");
@@ -373,16 +373,16 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             mVpm->addConditionToDoc(mVpm->newCondNameToDoc());
             reload(false);
         } else if (actCode == "EMenuCondRemove") {
-            QString cond = getTextEdit(index.row(),0)->getCurrentText();
+            QString cond = getLineEdit(index.row(),0)->text();
             mVpm->rmConditionToDoc(cond);
             reload(false);
         } else if (actCode == "EMenuPortAdd") {
-            QString cond = getTextEdit(index.row(),0)->getCurrentText();
+            QString cond = getLineEdit(index.row(),0)->text();
             mVpm->addCondPortToDoc(cond, mVpm->newCondPortNameToDoc(cond));
             reload(false);
         } else if (actCode == "EMenuPortRemove") {
-            QString cond = getTextEdit(index.row(),0)->getCurrentText();
-            QString port = getTextEdit(index.row(),1)->getCurrentText();
+            QString cond = getLineEdit(index.row(),0)->text();
+            QString port = getLineEdit(index.row(),1)->text();
             mVpm->rmCondPortToDoc(cond, port);
             reload(false);
         } else if ((actCode == "EMenuValueAddBoolean") or
@@ -394,8 +394,8 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
                 (actCode == "EMenuValueAddTuple") or
                 (actCode == "EMenuValueAddTable") or
                 (actCode == "EMenuValueAddMatrix")) {
-            QString cond = getTextEdit(index.row(),0)->getCurrentText();
-            QString port = getTextEdit(index.row(),1)->getCurrentText();
+            QString cond = getLineEdit(index.row(),0)->text();
+            QString port = getLineEdit(index.row(),1)->text();
             vle::value::Value* v = buildDefaultValue(actCode);
             if (index.column() == 1) {
                 mVpm->addValuePortCondToDoc(cond, port,*v);
@@ -405,8 +405,8 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             delete v;
             reload(false);
         } else if (actCode == "EMenuValueRemove") {
-            QString cond = getTextEdit(index.row(),0)->getCurrentText();
-            QString port = getTextEdit(index.row(),1)->getCurrentText();
+            QString cond = getLineEdit(index.row(),0)->text();
+            QString port = getLineEdit(index.row(),1)->text();
             mVpm->rmValuePortCondToDoc(cond, port, index.column()-2);
             reload(false);
         } else {//add from plugin
@@ -444,10 +444,14 @@ void
 FileVpzExpCond::onTextUpdated(const QString& id, const QString& oldVal,
         const QString& newVal)
 {
+
+//    std::cout << " dbg " << __FUNCTION__ << " id=" << id.toStdString()
+//            << " oldVal=" << oldVal.toStdString() << " newVal="
+//            << " newVal=" << newVal.toStdString() << "\n";
     QStringList split = id.split(",");
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
-    QString cond = getTextEdit(row, 0)->getCurrentText();
+    QString cond = getLineEdit(row, 0)->text();
     if (col == 0) {//edit cond name
         mVpm->renameConditionToDoc(oldVal, cond);
         mCurrCondName = cond;
@@ -461,7 +465,7 @@ FileVpzExpCond::onTextUpdated(const QString& id, const QString& oldVal,
         }
 
     } else {//edit value String
-        QString port = getTextEdit(row, 1)->getCurrentText();
+        QString port = getLineEdit(row, 1)->text();
         vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toString().set(newVal.toStdString());
         mVpm->fillWithValue(cond, port, col-2, *curr);
@@ -477,8 +481,8 @@ FileVpzExpCond::onIntUpdated(const QString& id, int newVal)
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
     if (col >= 2) {//necesserlay a value
-        QString cond = getTextEdit(row, 0)->getCurrentText();
-        QString port = getTextEdit(row, 1)->getCurrentText();
+        QString cond = getLineEdit(row, 0)->text();
+        QString port = getLineEdit(row, 1)->text();
         vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toInteger().set(newVal);
         mVpm->fillWithValue(cond, port, col-2, *curr);
@@ -493,8 +497,8 @@ FileVpzExpCond::onDoubleUpdated(const QString& id, double newVal)
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
     if (col >= 2) {//necesserlay a value
-        QString cond = getTextEdit(row, 0)->getCurrentText();
-        QString port = getTextEdit(row, 1)->getCurrentText();
+        QString cond = getLineEdit(row, 0)->text();
+        QString port = getLineEdit(row, 1)->text();
         vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toDouble().set(newVal);
         mVpm->fillWithValue(cond, port, col-2, *curr);
@@ -508,8 +512,8 @@ FileVpzExpCond::onBoolUpdated(const QString& id, const QString& newVal)
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
     if (col >= 2) {//necesserlay a value
-        QString cond = getTextEdit(row, 0)->getCurrentText();
-        QString port = getTextEdit(row, 1)->getCurrentText();
+        QString cond = getLineEdit(row, 0)->text();
+        QString port = getLineEdit(row, 1)->text();
         vle::value::Value* curr = mVpm->buildValueFromDoc(cond, port, col-2);
         curr->toBoolean().set(QVariant(newVal).toBool());
         mVpm->fillWithValue(cond, port, col-2, *curr);
@@ -543,9 +547,9 @@ FileVpzExpCond::onSelected(const QString& id)
     mCurrValIndex = -1;
 
     if (col >= 0 ) {
-        mCurrCondName =  getTextEdit(row, 0)->getCurrentText();
+        mCurrCondName =  getLineEdit(row, 0)->text();
         if (col >= 1) {
-            mCurrPortName =  getTextEdit(row, 1)->getCurrentText();
+            mCurrPortName =  getLineEdit(row, 1)->text();
             if (col >= 2) {
                 mCurrValIndex = col - 2;
             }
@@ -619,7 +623,7 @@ void
 FileVpzExpCond::insertTextEdit(int row, int col, const QString& val)
 {
     QString id = QString("%1,%2").arg(row).arg(col);
-    VleTextEdit* w = new VleTextEdit(ui->table, val, id, false);
+    VleLineEdit* w = new VleLineEdit(ui->table, val, id, false);
     ui->table->setCellWidget(row, col, w);
     ui->table->setItem(row, col, new QTableWidgetItem);//used to find it
     QObject::connect(w, SIGNAL(
@@ -680,10 +684,10 @@ FileVpzExpCond::insertBooleanCombo(int row, int col, bool val)
             this, SLOT(onSelected(const QString&)));
 }
 
-VleTextEdit*
-FileVpzExpCond::getTextEdit(int row, int col)
+VleLineEdit*
+FileVpzExpCond::getLineEdit(int row, int col)
 {
-    return qobject_cast<VleTextEdit*>(ui->table->cellWidget(row,col));
+    return qobject_cast<VleLineEdit*>(ui->table->cellWidget(row,col));
 }
 
 }}
