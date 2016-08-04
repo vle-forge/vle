@@ -153,6 +153,7 @@ vleDomDiffStack::init(QDomNode node)
 {
     diffs.resize(300);
     diffs[0].node_before = node.cloneNode();
+    prevCurr = 0;
     curr = 0;
     saved = 0;
 }
@@ -180,16 +181,16 @@ vleDomDiffStack::snapshot (QDomNode node,
         QString mergeType,
         vle::value::Map* mergeArgs)
 {
-    prevCurr = curr;
+
     if (not snapshotEnabled) {
         return;
     }
     bool isMerged = false;
     if (node.isNull()) {
         //false snaphot
+        prevCurr = curr;
         curr ++;//TODO manage size
         if (curr >= diffs.size()) {
-
             qDebug() << " Internal error vleDomDiffStack::snapshot (size to big) ";
             return;
         }
@@ -236,6 +237,7 @@ vleDomDiffStack::snapshot (QDomNode node,
         }
 
         if (not isMerged) {
+            prevCurr = curr;
             curr ++;//TODO manage size
             if (curr >= diffs.size()) {
                 qDebug() << " Internal error vleDomDiffStack::snapshot (size to big) ";
@@ -251,8 +253,6 @@ vleDomDiffStack::snapshot (QDomNode node,
             for (unsigned int i = curr+1; i<diffs.size(); i++) {
                 diffs[i].reset();
             }
-        } else {
-            prevCurr--;
         }
     }
     emit snapshotVdo(node, isMerged);
@@ -262,10 +262,10 @@ vleDomDiffStack::snapshot (QDomNode node,
 void
 vleDomDiffStack::undo()
 {
-    prevCurr = curr;
     if (curr <= 0) {
         return;
     }
+
     if ((diffs[curr].source == current_source) and (diffs[curr].isDefined)) {
         if (diffs[curr].query == ""){
             emit undoRedoVdo(QDomNode(), QDomNode());
@@ -281,6 +281,7 @@ vleDomDiffStack::undo()
             parent.replaceChild(diffs[curr].node_before, currN);
             emit undoRedoVdo(currN, diffs[curr].node_before);
         }
+        prevCurr = curr;
         curr --;
     }
     tryEmitUndoAvailability();
@@ -289,10 +290,11 @@ vleDomDiffStack::undo()
 void
 vleDomDiffStack::redo()
 {
-    prevCurr = curr;
+
     if (diffs[curr+1].isDefined) {
         if ((diffs[curr+1].source == current_source) or
                 (diffs[curr+1].source.isEmpty())){
+            prevCurr = curr;
             curr++;
             QDomNode currN = mVdo->getNodeFromXQuery(diffs[curr].query);
             QDomNode parent = currN.parentNode();
@@ -313,10 +315,10 @@ vleDomDiffStack::registerSaveState()
 void
 vleDomDiffStack::clear()
 {
-    prevCurr = curr;
     for (unsigned int i = 0; i<diffs.size(); i++) {
         diffs[i].reset();
     }
+    prevCurr = curr;
     curr = 0;
     tryEmitUndoAvailability();
 }
