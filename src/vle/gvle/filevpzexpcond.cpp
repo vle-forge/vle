@@ -520,7 +520,15 @@ FileVpzExpCond::onBoolUpdated(const QString& id, const QString& newVal)
 void
 FileVpzExpCond::onValUpdated(const vle::value::Value& newVal)
 {
+    QObject::disconnect(mVpm,
+                     SIGNAL(conditionsUpdated()),
+                     this,
+                     SLOT(onCondUpdated()));
     mVpm->fillWithValue(mCurrCondName, mCurrPortName, mCurrValIndex, newVal);
+    QObject::connect(mVpm,
+                     SIGNAL(conditionsUpdated()),
+                     this,
+                     SLOT(onCondUpdated()));
 }
 
 void
