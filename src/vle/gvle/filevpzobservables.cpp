@@ -97,30 +97,55 @@ QTreeWidgetItem* FileVpzObservables::newItem(const ObsTreeType type, const QStri
 void FileVpzObservables::onViewTreeMenu(const QPoint pos)
 {
     QPoint globalPos = ui->obsTree->mapToGlobal(pos);
+    QModelIndex index = ui->obsTree->indexAt(pos);
+
+
+    int obsSelected = 0;
+    int portsSelected = 0;
+    int viewsSelected = 0;
+
+    foreach( QTreeWidgetItem *item, ui->obsTree->selectedItems() ) {
+        int t = itemType(item);
+        if (t == FileVpzObservables::EObsObs) obsSelected++;
+        if (t == FileVpzObservables::EObsPort) portsSelected++;
+        if (t == FileVpzObservables::EObsOut) viewsSelected++;
+    }
+
+    QList<QString> viewlist;
+    foreach(QListWidgetItem *itemView, ui->viewsList->selectedItems()) {
+        viewlist.append(itemView->text());
+    }
 
     QAction *lastAction;
 
     QMenu ctxMenu;
     lastAction = ctxMenu.addAction(tr("Add observable"));
     lastAction->setData(1);
+    lastAction->setEnabled(index.row() == -1);
     lastAction = ctxMenu.addAction(tr("Remove observable"));
     lastAction->setData(2);
+    lastAction->setEnabled(obsSelected > 0 and index.row() != -1);
     lastAction = ctxMenu.addAction(tr("Add port"));
     lastAction->setData(3);
+    lastAction->setEnabled(obsSelected == 1 and index.row() != -1);
     lastAction = ctxMenu.addAction(tr("Remove port"));
     lastAction->setData(4);
+    lastAction->setEnabled(portsSelected > 0 and index.row() != -1);
     lastAction = ctxMenu.addAction(tr("Attach views"));
     lastAction->setData(5);
+    lastAction->setEnabled(portsSelected > 0 and index.row() != -1 and
+            viewlist.size() > 0);
     lastAction = ctxMenu.addAction(tr("Detach views"));
     lastAction->setData(6);
+    lastAction->setEnabled(viewsSelected > 0 and index.row() != -1);
 
     QAction* selectedItem = ctxMenu.exec(globalPos);
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
-        if (actCode == 1) {
+        if (actCode == 1) {//add observable
             QString name = mVpm->newObsNameToDoc();
             mVpm->addObservableToDoc(name);
-        } else if (actCode == 2) {
+        } else if (actCode == 2) {//remove observable
             QList<QString> obslist;
             foreach( QTreeWidgetItem *item, ui->obsTree->selectedItems() ) {
                 if (itemType(item) == FileVpzObservables::EObsObs) {
@@ -159,10 +184,7 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
                     portlist.append(qMakePair(itemName(obs), itemName(itemPort)));
                 }
             }
-            QList<QString> viewlist;
-            foreach(QListWidgetItem *itemView, ui->viewsList->selectedItems()) {
-                viewlist.append(itemView->text());
-            }
+
             QString v;
             foreach(v, viewlist) {
                 QPair<QString, QString> p;
