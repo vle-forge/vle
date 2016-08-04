@@ -43,7 +43,7 @@ class FileVpzDynamics : public QWidget
     Q_OBJECT
 
 public:
-    enum FVD_MENU { FVD_add_dynamic, FVD_rename_dynamic, FVD_remove_dynamic };
+    enum FVD_MENU { FVD_add_dynamic,  FVD_remove_dynamic };
 public:
     explicit FileVpzDynamics(const utils::ContextPtr& ctx, QWidget* parent=0);
     ~FileVpzDynamics();

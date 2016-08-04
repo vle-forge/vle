@@ -137,7 +137,7 @@ void FileVpzDynamics::reload()
 
         QString dynLib = mVpm->getDynamicLibrary(dyn);
         ui->tabDynamics->insertRow(i);
-        VleTextEdit* dlabName = new VleTextEdit(ui->tabDynamics, dyn, "", true);
+        VleLineEdit* dlabName = new VleLineEdit(ui->tabDynamics, dyn, "", false);
         QObject::connect(dlabName,SIGNAL(
           textUpdated(const QString&, const QString&, const QString&)),
           this, SLOT(
@@ -192,12 +192,9 @@ FileVpzDynamics::onDynamicsTableMenu(const QPoint& pos)
     QMenu menu;
     action = menu.addAction("Add dynamic");
     action->setData(FVD_add_dynamic);
-    action = menu.addAction("Edit name");
-    action->setData(FVD_rename_dynamic);
-    action->setEnabled(item != 0);
-    action = menu.addAction("Remove");
+    action = menu.addAction("Remove dynamic");
     action->setData(FVD_remove_dynamic);
-    action->setEnabled(item != 0);
+    action->setEnabled(item != 0 and index.column() == 0);
 
 
     QAction* selAction = menu.exec(globalPos);
@@ -208,12 +205,8 @@ FileVpzDynamics::onDynamicsTableMenu(const QPoint& pos)
             QString dynName = mVpm->newDynamicNameToDoc();
             mVpm->addDynamicToDoc(dynName, "<None>", "<None>");
             break;
-        } case FVD_rename_dynamic: {
-            VleTextEdit* itemText = qobject_cast<VleTextEdit*>(item);
-            itemText->setTextEdition(true);
-            break;
         } case FVD_remove_dynamic: {
-            mVpm->removeDyn((qobject_cast<VleTextEdit*>(item))->toPlainText());
+            mVpm->removeDyn((qobject_cast<VleLineEdit*>(item))->text());
             break;
         }}
     }
@@ -243,10 +236,10 @@ QString FileVpzDynamics::getSelected()
 {
     int cr = ui->tabDynamics->currentRow();
     QWidget *widgetName  = ui->tabDynamics->cellWidget(cr, 0);
-    VleTextEdit  *labelName   = qobject_cast<VleTextEdit *>(widgetName);
+    VleLineEdit  *labelName   = qobject_cast<VleLineEdit *>(widgetName);
     if (labelName == 0)
         return 0;
-    return (labelName->toPlainText());
+    return (labelName->text());
 }
 
 /**

@@ -321,7 +321,7 @@ VleLineEdit::VleLineEdit(QWidget* parent, const QString& val,
     if (not withDefaultMenu) {
         setContextMenuPolicy(Qt::NoContextMenu);
     }
-
+    setAlignment(Qt::AlignLeft);
     setValue(val);
 
     QObject::connect(this, SIGNAL(editingFinished()),
@@ -338,6 +338,7 @@ void
 VleLineEdit::setValue(const QString& val)
 {
      setText(val);
+     home(false);
 }
 
 bool
