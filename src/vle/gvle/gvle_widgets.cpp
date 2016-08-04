@@ -22,6 +22,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <float.h>
+#include <iostream>
+#include <algorithm>
+
 #include <QScrollBar>
 #include <QMenu>
 #include <QMessageBox>
@@ -29,6 +33,8 @@
 #include <QApplication>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QDebug>
+
 #include <vle/value/Value.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
@@ -44,9 +50,6 @@
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
 #include "gvle_widgets.h"
-#include <float.h>
-#include <iostream>
-#include <QDebug>
 
 
 namespace vle {
@@ -748,34 +751,38 @@ VleValueWidget::showCurrentValueDetail()
         }
         break;
     } case vle::value::Value::MAP: {
+        const vle::value::Map&  map = editingValue->toMap();
         table->clear();
-        table->setRowCount(editingValue->toMap().size());
+        table->setRowCount(map.size());
         table->setColumnCount(2);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("map keys"));
         table->setHorizontalHeaderItem(1, new QTableWidgetItem("map values"));
-        vle::value::Map::const_iterator itb = editingValue->toMap().begin();
-        vle::value::Map::const_iterator ite = editingValue->toMap().end();
-        int nbEl = 0;
 
-        for (; itb !=ite; itb++) {
-            QString keyValue = itb->first.c_str();
+        std::vector<std::string> keys;
+        for (auto& i : map){
+            keys.push_back(i.first);
+        }
+        std::sort(keys.begin(), keys.end());
+        int nbEl = 0;
+        for (auto& k : keys) {
+            QString keyValue = k.c_str();
             QString id = QString("key:%1").arg(keyValue);
             setStringWidget(id, keyValue, nbEl, 0);
-            switch (itb->second->getType()) {
+            switch (map[k]->getType()) {
             case vle::value::Value::BOOLEAN: {
-                setBoolWidget(keyValue, itb->second.get(), nbEl, 1);
+                setBoolWidget(keyValue, map[k].get(), nbEl, 1);
                 break;
             } case vle::value::Value::INTEGER: {
-                setIntWidget(keyValue, itb->second.get(), nbEl, 1);
+                setIntWidget(keyValue, map[k].get(), nbEl, 1);
                 break;
             } case vle::value::Value::DOUBLE: {
-                setDoubleWidget(keyValue, itb->second.get(), nbEl, 1);
+                setDoubleWidget(keyValue, map[k].get(), nbEl, 1);
                 break;
             } case vle::value::Value::STRING: {
-                setStringWidget(keyValue, itb->second.get(), nbEl, 1);
+                setStringWidget(keyValue, map[k].get(), nbEl, 1);
                 break;
             } default: {
-                setComplexWidget(keyValue, itb->second.get(), nbEl, 1);
+                setComplexWidget(keyValue, map[k].get(), nbEl, 1);
                 break;
             }}
             nbEl++;
