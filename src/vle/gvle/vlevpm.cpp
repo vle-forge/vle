@@ -186,7 +186,8 @@ void
 vleVpm::addConditionFromPluginToDoc(const QString& condName,
         const QString& pluginName)
 {
-    int prevCurr = vleVpz::undoStack->curr;
+    unsigned int prevCurr = vleVpz::undoStack->curr;
+    unsigned int saved = vleVpz::undoStack->saved;
 
     //update vpm with snapshot but without signal
     bool oldBlock = undoStackVpm->blockSignals(true);
@@ -200,7 +201,7 @@ vleVpm::addConditionFromPluginToDoc(const QString& condName,
     vleVpz::undoStack->blockSignals(oldBlock);
 
     int curr = vleVpz::undoStack->curr;
-    tryEmitUndoAvailability(prevCurr,curr);
+    tryEmitUndoAvailability(prevCurr,curr,saved);
 }
 
 void
@@ -214,7 +215,9 @@ vleVpm::renameConditionToDoc(const QString& oldName, const QString& newName)
     if (condPlugin == "") {
         vleVpz::renameConditionToDoc(oldName, newName);
     } else {
-        int prevCurr = vleVpz::undoStack->curr;
+        unsigned int prevCurr = vleVpz::undoStack->curr;
+        unsigned int saved = vleVpz::undoStack->saved;
+
 
         //update vpz with snapshot bu without signal
         bool oldBlock = vleVpz::undoStack->blockSignals(true);
@@ -226,7 +229,7 @@ vleVpm::renameConditionToDoc(const QString& oldName, const QString& newName)
         undoStackVpm->blockSignals(oldBlock);
 
         int curr = vleVpz::undoStack->curr;
-        tryEmitUndoAvailability(prevCurr,curr);
+        tryEmitUndoAvailability(prevCurr,curr,saved);
     }
 }
 
@@ -234,7 +237,9 @@ bool
 vleVpm::setOutputPluginToDoc(const QString& viewName,
         const QString& outputPlugin)
 {
-    int prevCurr = vleVpz::undoStack->curr;
+    unsigned int prevCurr = vleVpz::undoStack->curr;
+    unsigned int saved = vleVpz::undoStack->saved;
+
 
     //TODO, ne devrait pas etre en dur
     QString guiPluginName("");
@@ -256,7 +261,7 @@ vleVpm::setOutputPluginToDoc(const QString& viewName,
     vleVpz::undoStack->blockSignals(oldBlock);
 
     int curr = vleVpz::undoStack->curr;
-    tryEmitUndoAvailability(prevCurr,curr);
+    tryEmitUndoAvailability(prevCurr,curr,saved);
 
     return res;
 }
@@ -306,8 +311,8 @@ vleVpm::provideCondGUIplugin(const QString& condName)
 void
 vleVpm::addViewToDoc(const QString& viewName)
 {
-    int prevCurr = vleVpz::undoStack->curr;
-
+    unsigned int prevCurr = vleVpz::undoStack->curr;
+    unsigned int saved = vleVpz::undoStack->saved;
 
     //update vpz with snapshot but without signal
     bool oldBlock = vleVpz::undoStack->blockSignals(true);
@@ -329,13 +334,14 @@ vleVpm::addViewToDoc(const QString& viewName)
     undoStackVpm->blockSignals(oldBlock);
 
     int curr = vleVpz::undoStack->curr;
-    tryEmitUndoAvailability(prevCurr,curr);
+    tryEmitUndoAvailability(prevCurr,curr,saved);
 }
 
 void
 vleVpm::renameViewToDoc(const QString& oldName, const QString& newName)
 {
-    int prevCurr = vleVpz::undoStack->curr;
+    unsigned int prevCurr = vleVpz::undoStack->curr;
+    unsigned int saved = vleVpz::undoStack->saved;
 
     //update in vpz with snapshot without signal
     bool oldBlock = vleVpz::undoStack->blockSignals(true);
@@ -350,7 +356,7 @@ vleVpm::renameViewToDoc(const QString& oldName, const QString& newName)
     undoStackVpm->blockSignals(oldBlock);
 
     int curr = vleVpz::undoStack->curr;
-    tryEmitUndoAvailability(prevCurr,curr);
+    tryEmitUndoAvailability(prevCurr,curr,saved);
 }
 
 void
@@ -360,7 +366,8 @@ vleVpm::rmConditionToDoc(const QString& condName)
     if (condPlugin == "") {
         vleVpz::rmConditionToDoc(condName);
     } else {
-        int prevCurr = vleVpz::undoStack->curr;
+        unsigned int prevCurr = vleVpz::undoStack->curr;
+        unsigned int saved = vleVpz::undoStack->saved;
 
         //update vpz with snapshot but without signal
         bool oldBlock = vleVpz::undoStack->blockSignals(true);
@@ -372,7 +379,7 @@ vleVpm::rmConditionToDoc(const QString& condName)
         undoStackVpm->blockSignals(oldBlock);
 
         int curr = vleVpz::undoStack->curr;
-        tryEmitUndoAvailability(prevCurr,curr);
+        tryEmitUndoAvailability(prevCurr,curr,saved);
     }
 }
 
@@ -458,7 +465,7 @@ vleVpm::save()
     file.write(xml);
     file.close();
 
-    undoStackVpm->clear();
+    undoStackVpm->registerSaveState();
 }
 
 void
@@ -644,12 +651,15 @@ vleVpm::setOutputGUIplugin(const QString& viewName, const QString& pluginName)
 }
 
 void
-vleVpm::tryEmitUndoAvailability(int prevCurr, int curr)
+vleVpm::tryEmitUndoAvailability(unsigned int prevCurr,
+        unsigned int curr, unsigned int saved)
 {
-    if ((prevCurr == 0) and (curr > 0)){
+    int undoAvailability = vleDomDiffStack::computeUndoAvailability(
+            prevCurr, curr, saved);
+    if (undoAvailability == 1) {
         emit undoAvailable(true);
     }
-    if ((curr == 0) and (prevCurr > 0)) {
+    if (undoAvailability == -1) {
         emit undoAvailable(false);
     }
 }

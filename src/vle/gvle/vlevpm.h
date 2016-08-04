@@ -138,7 +138,8 @@ private:
     void setCondGUIplugin(const QString& condName, const QString& name);
     void setOutputGUIplugin(const QString& viewName, const QString& pluginName);
 
-    void tryEmitUndoAvailability(int prevCurr, int curr);
+    void tryEmitUndoAvailability(unsigned int prevCurr,
+            unsigned int curr, unsigned int saved);
 
 
     QDomDocument*     mDocVpm;

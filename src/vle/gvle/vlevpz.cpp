@@ -4027,7 +4027,7 @@ void vleVpz::save()
     file.write(xml);
     file.close();
 
-    undoStack->clear();
+    undoStack->registerSaveState();
 
 }
 

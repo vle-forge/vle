@@ -144,7 +144,7 @@ vleDomDiffStack::DomDiff::reset()
 }
 
 vleDomDiffStack::vleDomDiffStack(vleDomObject* vdo): diffs(), prevCurr(0),
-        curr(0), mVdo(vdo), current_source(""), snapshotEnabled(true)
+        curr(0), saved(0), mVdo(vdo), current_source(""), snapshotEnabled(true)
 {
 }
 
@@ -154,6 +154,7 @@ vleDomDiffStack::init(QDomNode node)
     diffs.resize(300);
     diffs[0].node_before = node.cloneNode();
     curr = 0;
+    saved = 0;
 }
 
 bool
@@ -205,7 +206,7 @@ vleDomDiffStack::snapshot (QDomNode node,
         }
     } else {
         //check if it is possibly mergeable to top undo command
-        if ((curr > 0) and (mergeType != "null")
+        if ((curr > 0) and (mergeType != "null") and curr != saved
                 and (diffs[curr].merge_type == mergeType) and
                 (diffs[curr].query == mVdo->getXQuery(node))){
             if (mergeArgs->exist("query")) {
@@ -250,6 +251,8 @@ vleDomDiffStack::snapshot (QDomNode node,
             for (unsigned int i = curr+1; i<diffs.size(); i++) {
                 diffs[i].reset();
             }
+        } else {
+            prevCurr--;
         }
     }
     emit snapshotVdo(node, isMerged);
@@ -301,6 +304,13 @@ vleDomDiffStack::redo()
 }
 
 void
+vleDomDiffStack::registerSaveState()
+{
+    saved = curr;
+    tryEmitUndoAvailability();
+}
+
+void
 vleDomDiffStack::clear()
 {
     prevCurr = curr;
@@ -311,16 +321,38 @@ vleDomDiffStack::clear()
     tryEmitUndoAvailability();
 }
 
-int
-vleDomDiffStack::getUndoAvailability()
+void
+vleDomDiffStack::print(std::ostream& out) const
 {
-    if (curr == 1 and prevCurr == 0) {
-        return 1;
+    unsigned int diffSize = 1;
+    while (diffs[diffSize].isDefined){
+        diffSize++;
     }
-    if (curr == 0 and prevCurr >= 1) {
+    out << " [vleDomDiffStack] nb stack size=" << diffSize
+            << ", saved=" << saved << ", curr=" << curr
+            << ", prevCurr=" << prevCurr
+            << ", undoAvail=" << getUndoAvailability()<< "\n";
+}
+
+int
+vleDomDiffStack::computeUndoAvailability(
+        unsigned int prevCurr,
+        unsigned int curr,
+        unsigned int saved)
+{
+    if (prevCurr != saved and curr == saved ) {
         return -1;
     }
+    if (prevCurr == saved and curr != saved ) {
+        return 1;
+    }
     return 0;
+}
+
+int
+vleDomDiffStack::getUndoAvailability() const
+{
+    return computeUndoAvailability(prevCurr, curr, saved);
 }
 
 void
