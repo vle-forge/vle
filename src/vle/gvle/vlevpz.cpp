@@ -1253,17 +1253,26 @@ vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
         return ;
     }
     QDomNode cond = condFromConds(condsFromDoc(), condName);
-    undoStack->snapshot(cond);
     QDomNodeList portList = portsListFromCond(cond);
+    int oldNameIndex = -1;
     for (int i=0; i < portList.length(); i++) {
         QDomNode port = portList.at(i);
-        if (mVdo->attributeValue(port, "name") == oldName) {
-            mVdo->setAttributeValue(port, "name", newName);
-            emit conditionsUpdated();
+        if (mVdo->attributeValue(port, "name") == newName) {
+            //already exists do nothing.
             return;
         }
+        if (mVdo->attributeValue(port, "name") == oldName) {
+            oldNameIndex = i;
+        }
     }
-    qDebug() << "Internal error in renameCondPortToDoc (not found)";
+    if (oldNameIndex != -1){
+        undoStack->snapshot(cond);
+        QDomNode port = portList.at(oldNameIndex);
+        mVdo->setAttributeValue(port, "name", newName);
+        emit conditionsUpdated();
+    } else {
+        qDebug() << "Internal error in renameCondPortToDoc (not found)";
+    }
 }
 
 QString
