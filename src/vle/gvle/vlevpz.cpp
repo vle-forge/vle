@@ -1748,6 +1748,11 @@ vleVpz::rmObsPortToDoc(const QString& obsName, const QString& portName)
 void
 vleVpz::rmCondPortToDoc(const QString& condName, const QString& portName)
 {
+    if (condName == "simulation_engine") {
+        if (portName == "begin" or portName == "duration") {
+            return;
+        }
+    }
     rmPortFromCond(condFromConds(condsFromDoc(), condName), portName);
 }
 
