@@ -80,6 +80,7 @@ public:
     void setValue(double val);
 
     QString id;
+    double backup;
 public slots:
     void onValueChanged();
 signals:

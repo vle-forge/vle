@@ -104,7 +104,7 @@ VleBooleanEdit::onValueChanged(bool /*checked*/)
 
 VleDoubleEdit::VleDoubleEdit(QWidget* parent, double val,
                              const QString& idStr, bool withDefaultMenu):
-                                     QLineEdit(parent), id(idStr)
+                                     QLineEdit(parent), id(idStr), backup(val)
 {
     if (not withDefaultMenu) {
         setContextMenuPolicy(Qt::NoContextMenu);
@@ -116,8 +116,7 @@ VleDoubleEdit::VleDoubleEdit(QWidget* parent, double val,
     validator->setNotation(QDoubleValidator::ScientificNotation);
     setValidator(validator);
 
-    setText(QLocale().toString(val, 'g',
-                               std::numeric_limits<double>::digits10));
+    setValue(val);
 
     QObject::connect(this, SIGNAL(editingFinished()),
             this, SLOT(onValueChanged()));
@@ -143,8 +142,7 @@ VleDoubleEdit::eventFilter(QObject *target, QEvent *event)
         switch(event->type()) {
         case QEvent::FocusOut:
             if (text().isEmpty()) {
-                setText(QLocale().toString(0., 'g',
-                                std::numeric_limits<double>::digits10));
+                setValue(backup);
             }
             break;
         default:
@@ -167,7 +165,8 @@ VleDoubleEdit::onValueChanged()
 {
     bool ok;
     double v = QLocale().toDouble(text(), &ok);
-    if (ok) {
+    if (ok and v != backup) {
+        backup = v;
         emit valUpdated(id, v);
     }
 }
