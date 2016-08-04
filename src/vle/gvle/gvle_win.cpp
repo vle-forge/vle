@@ -680,16 +680,28 @@ gvle_win::projectInstallTimer()
 void
 gvle_win::onUndo()
 {
-    QString relPath = ui->tabWidget->currentWidget()->property("relPath").toString();
-    mPanels[relPath]->undo();
+    if (not ui->tabWidget->currentWidget()) {
+        return;
+    }
+    QString relPath =
+            ui->tabWidget->currentWidget()->property("relPath").toString();
+    if (relPath != "Welcome" and mPanels.find(relPath) != mPanels.end()){
+        mPanels[relPath]->undo();
+    }
+
 }
 
 void
 gvle_win::onRedo()
 {
-    QString relPath = ui->tabWidget->currentWidget()->property("relPath").toString();
-    mPanels[relPath]->redo();
-
+    if (not ui->tabWidget->currentWidget()) {
+        return;
+    }
+    QString relPath =
+            ui->tabWidget->currentWidget()->property("relPath").toString();
+    if (relPath != "Welcome" and mPanels.find(relPath) != mPanels.end()){
+        mPanels[relPath]->redo();
+    }
 }
 
 void
