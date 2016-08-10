@@ -188,11 +188,12 @@ VlePushButton::onClicked(bool b)
     emit clicked(id, b);
 }
 
-VleSpinBox::VleSpinBox(QWidget *parent, int val, const QString& idStr):
+VleSpinBox::VleSpinBox(QWidget *parent, int val, const QString& idStr,
+                       int min, int max):
         QSpinBox(parent), id(idStr)
 {
-    setMaximum(10000000);
-    setMinimum(-10000000);
+    setMaximum(max);
+    setMinimum(min);
     setFocusPolicy(Qt::StrongFocus);
     setContextMenuPolicy(Qt::NoContextMenu);
     setValue(val);
@@ -228,12 +229,12 @@ VleSpinBox::onValueChanged(int i)
     emit valUpdated(id, i);
 }
 
-
 VleDoubleSpinBox::VleDoubleSpinBox(QWidget* parent, double val,
-        const QString& idStr): QDoubleSpinBox(parent), id(idStr)
+                                   const QString& idStr, int min,
+                                   int max): QDoubleSpinBox(parent), id(idStr)
 {
-    setMaximum(10000000);
-    setMinimum(-10000000);
+    setMaximum(max);
+    setMinimum(min);
     setFocusPolicy(Qt::StrongFocus);
     setContextMenuPolicy(Qt::NoContextMenu);
     setDecimals(6);

@@ -27,7 +27,6 @@
 
 #include <QSpinBox>
 #include <QDoubleSpinBox>
-#include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QComboBox>
 #include <QCheckBox>
@@ -113,7 +112,8 @@ class VleSpinBox : public QSpinBox
 {
     Q_OBJECT
 public:
-    VleSpinBox(QWidget *parent, int val, const QString& idStr="");
+    VleSpinBox(QWidget *parent, int val, const QString& idStr = "",
+	       int min = -10000000, int max = 10000000);
     ~VleSpinBox();
     void wheelEvent(QWheelEvent *event);
     void focusInEvent(QFocusEvent* e);
@@ -136,7 +136,8 @@ class VleDoubleSpinBox : public QDoubleSpinBox
 {
     Q_OBJECT
 public:
-    VleDoubleSpinBox(QWidget* parent, double val, const QString& idStr="");
+    VleDoubleSpinBox(QWidget* parent, double val, const QString& idStr = "",
+	 int min = -10000000, int max = 10000000);
     ~VleDoubleSpinBox();
     void wheelEvent(QWheelEvent *event);
     void focusInEvent(QFocusEvent* e);
