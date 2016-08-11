@@ -136,6 +136,8 @@ if (WITH_GVLE)
 endif ()
 
 
+message (" dbg Root ${Qt5Widgets_INCLUDES} ${Qt5Widgets_INCLUDE_DIRS}")
+
 if (WIN32)
   SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/share/cmake ${CMAKE_MODULE_PATH})
   set(VLEDEPS_DEBUG 1)

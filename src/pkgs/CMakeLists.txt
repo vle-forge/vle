@@ -1,5 +1,8 @@
 add_subdirectory(vle.output)
 add_subdirectory(vle.adaptative-qss)
+if (VLE_HAVE_GVLE)
+  add_subdirectory(gvle.default)
+endif ()
 if (VLE_HAVE_UNITTESTFRAMEWORK)
   add_subdirectory(test)
 endif ()

@@ -28,7 +28,6 @@
 #include <QtDebug>
 #include "filevpzsim.h"
 #include "ui_filevpzsim.h"
-#include "DefaultSimSubpanel.h"
 
 namespace vle {
 namespace gvle {
@@ -68,7 +67,8 @@ FileVpzSim::setVpm(vleVpm* vpm)
     ui->pluginList->blockSignals(oldBlock);
 
     //TODO check if a plugin
-    mPluginSimPanel = new DefaultSimSubpanel();
+    QString plug = "Default";
+    mPluginSimPanel =  mGvlePlugins->newInstanceSimPanelPlugin(plug);
     mPluginSimPanel->init(mVpm, mPackage, mLog);
     setSimLeftWidget(mPluginSimPanel->leftWidget());
 
@@ -106,11 +106,7 @@ void
 FileVpzSim::onPluginChanged(const QString& text)
 {
     delete mPluginSimPanel;
-    if (text == "Default") {
-        mPluginSimPanel = new DefaultSimSubpanel();
-    } else {
-        mPluginSimPanel = mGvlePlugins->newInstanceSimPanelPlugin(text);
-    }
+    mPluginSimPanel = mGvlePlugins->newInstanceSimPanelPlugin("Default");
     mPluginSimPanel->init(mVpm, mPackage, mLog);
     setSimLeftWidget(mPluginSimPanel->leftWidget());
 

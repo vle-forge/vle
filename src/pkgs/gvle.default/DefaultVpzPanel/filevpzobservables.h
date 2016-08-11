@@ -28,7 +28,7 @@
 #include <QMenu>
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
-#include "vlevpm.h"
+#include <vle/gvle/vlevpm.h>
 
 namespace Ui {
     class FileVpzObservables;

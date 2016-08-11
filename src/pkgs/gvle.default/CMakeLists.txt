@@ -1,0 +1,4 @@
+add_subdirectory(DefaultCppPanel)
+add_subdirectory(DefaultOutPanel)
+add_subdirectory(DefaultSimSubpanel)
+add_subdirectory(DefaultVpzPanel)

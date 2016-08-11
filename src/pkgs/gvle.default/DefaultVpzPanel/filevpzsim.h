@@ -22,46 +22,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GVLE_DEFAULT_CPP_PANEL_H
-#define GVLE_DEFAULT_CPP_PANEL_H
+#ifndef gvle_FILE_VPZ_SIM_H
+#define gvle_FILE_VPZ_SIM_H
 
+#include <QGraphicsScene>
 #include <QWidget>
-#include <QObject>
-#include <QDebug>
-#include "vlevpm.h"
-#include "filevpzview.h"
-#include "filevpzrtool.h"
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QListWidgetItem>
+#include <QTableWidgetItem>
+#include <QUndoStack>
+#include <QUndoView>
+#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/plugin_simpanel.h>
+#include "ui_filevpzrtool.h"
+
+
+namespace Ui {
+class FileVpzSim;
+}
 
 namespace vle {
 namespace gvle {
 
-
-class DefaultCppPanel : public PluginMainPanel
+class FileVpzSim : public QWidget
 {
     Q_OBJECT
-public:
-    DefaultCppPanel();
-    virtual ~DefaultCppPanel();
 
-    QString  getname() override;
-    QWidget* leftWidget() override;
-    QWidget* rightWidget() override;
-    void undo() override;
-    void redo() override;
-    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs,
-              const utils::ContextPtr& ctx) override;
-    QString canBeClosed() override;
-    void save() override;
-    void discard(){};
-    PluginMainPanel* newInstance() override {return 0;}
-public slots:
-    void onUndoAvailable(bool);
 public:
-    QTextEdit*  m_edit;
-    QString m_file;
+    explicit FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
+            Logger* log, QWidget *parent = 0);
+    ~FileVpzSim();
+    void setVpm(vleVpm* v);
+    void setSimLeftWidget(QWidget* leftWidget);
+    QWidget* rightWidget();
+
+signals:
+    void rightWidgetChanged();
+public slots:
+    void onPluginChanged(const QString& text);
+
+
+public:
+    Ui::FileVpzSim*          ui;
+private:
+    vleVpm*                  mVpm;
+    gvle_plugins*            mGvlePlugins;
+    PluginSimPanel*          mPluginSimPanel;
+    vle::utils::Package*     mPackage;
+    Logger*                  mLog;
 };
 
 }} //namespaces
-
 
 #endif

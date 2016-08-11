@@ -97,7 +97,9 @@ gvle_plugins::registerPlugins()
                     QPluginLoader loader(libName);
                     QObject *plugin = loader.instance();
                     if ( ! loader.isLoaded()) {
-                        qDebug() << " WARNING cannot load plugin " << libName;
+                        qDebug() << " WARNING cannot load condition plugin: "
+                                 << loader.errorString();
+
                         continue;
                     }
                     PluginExpCond* expcond=qobject_cast<PluginExpCond*>(plugin);
@@ -115,7 +117,8 @@ gvle_plugins::registerPlugins()
                     QPluginLoader loader(libName);
                     QObject* plugin = loader.instance();
                     if ( ! loader.isLoaded()) {
-                        qDebug() << " WARNING cannot load plugin " << libName;
+                        qDebug() << " WARNING cannot load output plugin: "
+                                 << loader.errorString();
                         continue;
                     }
                     PluginOutput* outputPlug =
@@ -134,7 +137,8 @@ gvle_plugins::registerPlugins()
                     QPluginLoader loader(libName);
                     QObject *plugin = loader.instance();
                     if ( ! loader.isLoaded()) {
-                        qDebug() << " WARNING cannot load plugin " << libName;
+                        qDebug() << " WARNING cannot load modeling plugin: "
+                                 << loader.errorString() ;
                         continue;
                     }
                     PluginMainPanel* modeling =
@@ -152,7 +156,8 @@ gvle_plugins::registerPlugins()
                     QPluginLoader loader(libName);
                     QObject *plugin = loader.instance();
                     if ( ! loader.isLoaded()) {
-                        qDebug() << " WARNING cannot load plugin " << libName;
+                        qDebug() << " WARNING cannot load out plugin "
+                                 << loader.errorString() ;
                         continue;
                     }
                     PluginMainPanel* modeling =
@@ -171,7 +176,8 @@ gvle_plugins::registerPlugins()
                     QPluginLoader loader(libName);
                     QObject *plugin = loader.instance();
                     if ( ! loader.isLoaded()) {
-                        qDebug() << " WARNING cannot load plugin " << libName;
+                        qDebug() << " WARNING cannot load simulating plugin "
+                                 << loader.errorString() ;
                         continue;
                     }
                     PluginSimPanel* simulating =
@@ -190,9 +196,11 @@ gvle_plugins::registerPlugins()
                     QPluginLoader loader(libName);
                     QObject *plugin = loader.instance();
                     if ( ! loader.isLoaded()) {
-                        qDebug() << " WARNING cannot load plugin " << libName;
+                        qDebug() << " WARNING cannot load vpz plugin "
+                                 << loader.errorString() ;
                         continue;
                     }
+
                     PluginMainPanel* vpz =
                             qobject_cast<PluginMainPanel *>(plugin);
                     if (vpz) {

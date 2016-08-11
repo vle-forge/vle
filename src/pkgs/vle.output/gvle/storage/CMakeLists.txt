@@ -1,7 +1,7 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-include_directories(${Qt5Widgets_INCLUDES} ${Qt5Xml_INCLUDES}
+include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Xml_INCLUDES}
   ${Qt5Gui_INCLUDES} ${Qt5Help_INCLUDES} ${Qt5PrintSupport_INCLUDES})
 
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src

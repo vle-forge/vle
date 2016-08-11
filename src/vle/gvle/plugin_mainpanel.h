@@ -27,13 +27,13 @@
 
 #include <QWidget>
 #include <QDebug>
-#include <vle/utils/Package.hpp>
 #include "gvle_plugins.h"
 #include "logger.h"
 
+#include <vle/utils/Package.hpp>
+
 namespace vle {
 namespace gvle {
-
 
 class PluginMainPanel : public QObject
 {

@@ -47,9 +47,9 @@
 #include <vle/value/User.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
-#include "gvle_plugins.h"
-#include "gvle_widgets.h"
-#include "vlevpm.h"
+#include <vle/gvle/gvle_plugins.h>
+#include <vle/gvle/gvle_widgets.h>
+#include <vle/gvle/vlevpm.h>
 
 #include "filevpzexpcond.h"
 
@@ -444,10 +444,6 @@ void
 FileVpzExpCond::onTextUpdated(const QString& id, const QString& oldVal,
         const QString& newVal)
 {
-
-//    std::cout << " dbg " << __FUNCTION__ << " id=" << id.toStdString()
-//            << " oldVal=" << oldVal.toStdString() << " newVal="
-//            << " newVal=" << newVal.toStdString() << "\n";
     QStringList split = id.split(",");
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();

@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef gvle_FILE_VPZ_SIM_H
-#define gvle_FILE_VPZ_SIM_H
+#ifndef gvle_FILE_VPZ_RTOOL_H
+#define gvle_FILE_VPZ_RTOOL_H
 
 #include <QGraphicsScene>
 #include <QWidget>
@@ -33,47 +33,61 @@
 #include <QTableWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
-//
+#include <vle/gvle/vlevpm.h>
 #include "ui_filevpzrtool.h"
-#include "vlevpz.h"
 #include "widgetvpzproperty.h"
 #include "vpzDiagScene.h"
-#include "plugin_simpanel.h"
+
+//#ifndef Q_MOC_RUN
+//#include <vle/vpz/Vpz.hpp>
+//#endif
+
+#define ROW_NAME 0
+#define ROW_DYN  1
+#define ROW_OBS  2
+#define ROW_EXP  3
 
 
 namespace Ui {
-class FileVpzSim;
+class fileVpzRTool;
 }
 
 namespace vle {
 namespace gvle {
 
-class FileVpzSim : public QWidget
+class FileVpzRtool : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
-            Logger* log, QWidget *parent = 0);
-    ~FileVpzSim();
+    explicit FileVpzRtool(QWidget *parent = 0);
+    ~FileVpzRtool();
     void setVpm(vleVpm* v);
-    void setSimLeftWidget(QWidget* leftWidget);
-    QWidget* rightWidget();
+    void clear();
+    void updateTree();
+    vleVpm* vpm();
+    QString getModelQuery(QTreeWidgetItem* item);
+    QTreeWidgetItem* getTreeWidgetItem(const QString& model_query,
+            QTreeWidgetItem* base = 0);
+    void updateModelProperty(const QString& model_query);
+    void updateModelLabel();
+    QTreeWidgetItem* treeInsertModel(QDomNode mode, QTreeWidgetItem *base);
+//    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
+//    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
 
-signals:
-    void rightWidgetChanged();
 public slots:
-    void onPluginChanged(const QString& text);
-
-
+    void onTreeModelSelected();
+    void onEnterCoupledModel(QDomNode node);
+    void onSelectionChanged();
+    void onInitializationDone(VpzDiagScene* scene);
+    void onDataUpdate();
+    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+            QDomNode oldValVpm, QDomNode newValVpm);
 public:
-    Ui::FileVpzSim*          ui;
+    Ui::fileVpzRtool*  ui;
 private:
-    vleVpm*                  mVpm;
-    gvle_plugins*            mGvlePlugins;
-    PluginSimPanel*          mPluginSimPanel;
-    vle::utils::Package*     mPackage;
-    Logger*                  mLog;
+    vleVpm*          mVpm;
+    VpzDiagScene*    mCurrScene;
 };
 
 }} //namespaces

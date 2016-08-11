@@ -27,7 +27,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QComboBox>
-#include "vlevpz.h"
+#include <vle/gvle/vlevpm.h>
 
 namespace Ui {
 class WidgetVpzPropertyObservables;

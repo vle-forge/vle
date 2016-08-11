@@ -1,7 +1,7 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-include_directories(${Qt5Widgets_INCLUDES} ${Qt5Xml_INCLUDES}
+include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Xml_INCLUDES}
   ${Qt5Gui_INCLUDES} ${Qt5Help_INCLUDES} ${Qt5PrintSupport_INCLUDES})
 
 if (WIN32)
@@ -14,40 +14,18 @@ include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${gvle_SOURCE_DIR}
   ${VLE_SOURCE_DIR}/src/apps/gvle)
 
-SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
-  helpbrowser.cpp filevpzview.cpp filevpzdynamics.cpp  filevpzclasses.cpp
-  filevpzobservables.cpp filevpzproject.cpp filevpzexpcond.cpp
-  filevpzexpview.cpp logger.cpp vleDomDiffStack.cpp vlevpz.cpp vlevpm.cpp
-  vpzDiagScene.cpp widgetvpzproperty.cpp filevpzrtool.cpp gvle_plugins.cpp
-  DefaultVpzPanel.cpp DefaultCppPanel.cpp DefaultOutPanel.cpp DefaultSimSubpanel.cpp filevpzsim.cpp
-  qcustomplot/qcustomplot.cpp)
-
-
 
 QT5_WRAP_UI(ui_gvle_win_h gvle_win.ui)
 QT5_WRAP_UI(aboutbox_h aboutbox.ui)
 QT5_WRAP_UI(help_h help.ui)
-QT5_WRAP_UI(filevpzview_h     filevpzview.ui)
-QT5_WRAP_UI(filevpzdynamics_h filevpzdynamics.ui)
-QT5_WRAP_UI(filevpzproject_h filevpzproject.ui)
-QT5_WRAP_UI(filevpzobservables_h filevpzobservables.ui)
-QT5_WRAP_UI(filevpzexpcond_h  filevpzexpcond.ui)
-QT5_WRAP_UI(filevpzexpview_h  filevpzexpview.ui)
-QT5_WRAP_UI(filevpzclasses_h  filevpzclasses.ui)
-QT5_WRAP_UI(filevpzsim_h  filevpzsim.ui)
-QT5_WRAP_UI(filevpztooltip_h filevpztooltip.ui)
-QT5_WRAP_UI(filevpzrtool_h   filevpzrtool.ui)
-QT5_WRAP_UI(simpanelleft_h simpanelleft.ui)
-QT5_WRAP_UI(simpanelright_h simpanelright.ui)
 
-SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h}
-  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzobservables_h}
-  ${filevpzproject_h} ${filevpzexpcond_h} ${filevpzexpview_h}
-  ${filevpzclasses_h} ${filevpzsim_h} ${filevpztooltip_h} ${filevpzrtool_h}
-  ${simpanelleft_h} ${simpanelright_h}
-  gvle_widgets.h logger.h plugin_cond.h plugin_mainpanel.h plugin_simpanel.h
-  plugin_output.h vleDomDiffStack.h vlevpz.h vlevpm.h widgetvpzproperty.h
-  vpzDiagScene.h gvle_plugins.h)
+SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h} gvle_widgets.h
+   logger.h plugin_cond.h plugin_mainpanel.h plugin_simpanel.h plugin_output.h
+   vleDomDiffStack.h vlevpz.h vlevpm.h gvle_plugins.h)
+
+SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
+  helpbrowser.cpp logger.cpp vleDomDiffStack.cpp vlevpz.cpp vlevpm.cpp
+  gvle_plugins.cpp)
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o

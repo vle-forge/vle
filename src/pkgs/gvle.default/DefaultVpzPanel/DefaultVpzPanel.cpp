@@ -24,7 +24,6 @@
 
 
 #include "DefaultVpzPanel.h"
-#include "DefaultSimSubpanel.h"
 #include <QStackedWidget>
 #include "ui_filevpzsim.h"
 

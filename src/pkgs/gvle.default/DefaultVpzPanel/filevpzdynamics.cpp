@@ -28,9 +28,9 @@
 #include <QMenu>
 #include <QUndoCommand>
 #include <QDebug>
-#include <vle/utils/Context.hpp>
 
-#include "gvle_widgets.h"
+#include <vle/utils/Context.hpp>
+#include <vle/gvle/gvle_widgets.h>
 #include "filevpzdynamics.h"
 #include "ui_filevpzdynamics.h"
 

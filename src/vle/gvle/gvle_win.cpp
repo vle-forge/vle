@@ -38,11 +38,7 @@
 #include "plugin_mainpanel.h"
 #include "help.h"
 #include "aboutbox.h"
-#include "filevpzview.h"
 #include "vlevpm.h"
-#include "DefaultVpzPanel.h"
-#include "DefaultCppPanel.h"
-#include "DefaultOutPanel.h"
 #include "plugin_cond.h"
 #include "plugin_output.h"
 
@@ -1006,31 +1002,31 @@ gvle_win::onTreeDblClick(QModelIndex index)
         return ;
     }
 
+    QString plug;
     PluginMainPanel* newPanel = 0;
     if (relPath == "Description.txt") {
-        newPanel = new DefaultCppPanel();
+        plug = "Default";
+        newPanel = mGvlePlugins.newInstanceMainPanelPlugin(plug);
     }else if (selectedFileInfo.suffix() == "vpz") {
-        QString plug = getVpzPlugin(relPath);
+        plug = getVpzPlugin(relPath);
         if (plug == "") {
-            newPanel = new DefaultVpzPanel();
-        } else {
-            newPanel = mGvlePlugins.newInstanceMainPanelVpzPlugin(plug);
+            plug = "Default";
         }
+        newPanel = mGvlePlugins.newInstanceMainPanelVpzPlugin(plug);
     } else if ((selectedFileInfo.suffix() == "cpp") or
                (selectedFileInfo.suffix() == "hpp")){
         QString plug = getCppPlugin(relPath);
         if (plug == "") {
-            newPanel = new DefaultCppPanel();
-        } else {
-            newPanel = mGvlePlugins.newInstanceMainPanelPlugin(plug);
+            plug = "Default";
         }
+        newPanel = mGvlePlugins.newInstanceMainPanelPlugin(plug);
+
     } else if (selectedFileInfo.suffix() == "dat"){
         QString plug = getOutPlugin(relPath);
         if (plug == "") {
-            newPanel = new DefaultOutPanel();
-        } else {
-            newPanel = mGvlePlugins.newInstanceMainPanelOutPlugin(plug);
+            plug = "Default";
         }
+        newPanel = mGvlePlugins.newInstanceMainPanelOutPlugin(plug);
     }
 
     if (newPanel) {
@@ -1198,7 +1194,8 @@ gvle_win::onCustomContextMenu(const QPoint &point)
                             ui->tabWidget->setCurrentIndex(alreadyOpened);
                             return ;
                         }
-                        newPanel = new DefaultVpzPanel();
+                        newPanel = mGvlePlugins.newInstanceMainPanelVpzPlugin(
+                                "Default");
                     } else {
                         int alreadyOpened = findTabIndex(relPath);
                         if (alreadyOpened != -1) {

@@ -29,7 +29,7 @@
 #include <QUndoStack>
 #include <QTabWidget>
 #include <QDateTime>
-#include "vlevpm.h"
+#include <vle/gvle/vlevpm.h>
 
 namespace Ui {
 class FileVpzProject;

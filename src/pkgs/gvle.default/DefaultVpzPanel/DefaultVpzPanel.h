@@ -29,14 +29,13 @@
 #include <QObject>
 #include <QDebug>
 
-#ifndef Q_MOC_RUN
-#include "vlevpm.h"
+#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/plugin_mainpanel.h>
+#include <vle/gvle/plugin_simpanel.h>
 #include "filevpzview.h"
-#include "ui_filevpzview.h"
 #include "filevpzrtool.h"
-#include "plugin_mainpanel.h"
-#include "plugin_simpanel.h"
-#endif
+#include "ui_filevpzview.h"
+
 
 namespace vle {
 namespace gvle {
@@ -45,6 +44,8 @@ namespace gvle {
 class DefaultVpzPanel : public PluginMainPanel
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "fr.inra.vle.gvle.PluginMainPanel")
+    Q_INTERFACES(vle::gvle::PluginMainPanel)
 public:
     DefaultVpzPanel();
     virtual ~DefaultVpzPanel();
@@ -60,7 +61,7 @@ public:
     void discard(){};
     void save() override;
     void setSimLeftWidget(QWidget*);
-    PluginMainPanel* newInstance() override {return 0;}
+    PluginMainPanel* newInstance() override {return new DefaultVpzPanel();}
 
 public slots:
     void onCurrentChanged(int index);

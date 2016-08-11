@@ -24,9 +24,8 @@
 #ifndef gvle_FILEVPZEXPCOND_H
 #define gvle_FILEVPZEXPCOND_H
 
-#include "vlevpz.h"
-#include "plugin_cond.h"
-#include "gvle_widgets.h"
+#include <vle/gvle/plugin_cond.h>
+#include <vle/gvle/gvle_widgets.h>
 
 #include <iostream>
 

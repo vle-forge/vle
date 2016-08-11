@@ -25,7 +25,7 @@
 #ifndef gvle_FILEVPZDYNAMICS_H
 #define gvle_FILEVPZDYNAMICS_H
 
-#include "vlevpm.h"
+#include <vle/gvle/vlevpm.h>
 
 #ifndef Q_MOC_RUN
 #include <vle/utils/Context.hpp>

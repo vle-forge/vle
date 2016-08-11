@@ -30,8 +30,8 @@
 #include <QDebug>
 #include "qcustomplot/qcustomplot.h"
 
-#include "plugin_simpanel.h"
-#include "vlevpm.h"
+#include <vle/gvle/plugin_simpanel.h>
+#include <vle/gvle/vlevpm.h>
 
 namespace Ui {
 class simpanelleft;
@@ -118,6 +118,8 @@ struct portToPlot
 class DefaultSimSubpanel : public PluginSimPanel
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "fr.inra.vle.gvle.PluginSimPanel")
+    Q_INTERFACES(vle::gvle::PluginSimPanel)
 public:
     DefaultSimSubpanel();
     virtual ~DefaultSimSubpanel();

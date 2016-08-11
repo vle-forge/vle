@@ -36,7 +36,7 @@
 #include <QUndoView>
 
 #include "ui_filevpzrtool.h"
-#include "vlevpm.h"
+#include <vle/gvle/vlevpm.h>
 #include "vpzDiagScene.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>

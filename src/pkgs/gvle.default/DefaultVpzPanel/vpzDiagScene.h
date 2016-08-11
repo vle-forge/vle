@@ -35,7 +35,7 @@
 #include <QUndoStack>
 #include <QUndoView>
 
-#include "vlevpm.h"
+#include <vle/gvle/vlevpm.h>
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif

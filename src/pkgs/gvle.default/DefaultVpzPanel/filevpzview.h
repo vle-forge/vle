@@ -33,10 +33,8 @@
 #include <QTableWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
-
-#include "ui_filevpzrtool.h"
-#include "vlevpm.h"
-#include "plugin_mainpanel.h"
+#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/plugin_mainpanel.h>
 #include "widgetvpzproperty.h"
 #include "filevpzdynamics.h"
 #include "filevpzexpcond.h"
@@ -47,9 +45,7 @@
 #include "filevpzsim.h"
 #include "filevpzrtool.h"
 #include "vpzDiagScene.h"
-#ifndef Q_MOC_RUN
-#include <vle/vpz/Vpz.hpp>
-#endif
+#include "ui_filevpzrtool.h"
 
 namespace Ui {
 class fileVpzView;

@@ -28,9 +28,7 @@
 #include <QWidget>
 #include <QObject>
 #include <QDebug>
-#include "vlevpm.h"
-#include "filevpzview.h"
-#include "filevpzrtool.h"
+#include <vle/gvle/plugin_mainpanel.h>
 
 namespace vle {
 namespace gvle {
@@ -39,6 +37,9 @@ namespace gvle {
 class DefaultOutPanel : public PluginMainPanel
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "fr.inra.vle.gvle.PluginMainPanel")
+    Q_INTERFACES(vle::gvle::PluginMainPanel)
+
 public:
     DefaultOutPanel();
     virtual ~DefaultOutPanel();
@@ -53,7 +54,7 @@ public:
     QString canBeClosed() override;
     void save() override;
     void discard() override {}
-    PluginMainPanel* newInstance() override {return 0;}
+    PluginMainPanel* newInstance() override {return new DefaultOutPanel();}
 
 public slots:
     void onUndoAvailable(bool);
