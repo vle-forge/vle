@@ -1001,27 +1001,9 @@ gvle_win::onTreeDblClick(QModelIndex index)
         ui->tabWidget->setCurrentIndex(alreadyOpened);
         return ;
     }
-
     PluginMainPanel* newPanel = gf.newInstanceMainPanel(mGvlePlugins);
-
     if (newPanel) {
-
-        newPanel->init(gf, &mCurrPackage, mLogger, &mGvlePlugins, mCtx);
-        int n = ui->tabWidget->addTab(newPanel->leftWidget(), gf.relPath);
-        bool oldBlock = ui->tabWidget->blockSignals(true);
-        ui->tabWidget->setCurrentIndex(n);
-        ui->tabWidget->widget(n)->setProperty("relPath",gf.relPath);
-        ui->tabWidget->blockSignals(oldBlock);
-        mPanels.insert(gf.relPath,newPanel);
-        newPanel->leftWidget()->show();
-
-        // Create a new toolbox for the right column
-        setRightWidget(newPanel->rightWidget());
-
-        QObject::connect(newPanel, SIGNAL(undoAvailable(bool)),
-                         this, SLOT(onUndoAvailable(bool)));
-        QObject::connect(newPanel, SIGNAL(rightWidgetChanged()),
-                         this, SLOT(onRightWidgetChanged()));
+        openMainPanel(gf, newPanel);
     }
     //set undo redo enabled
     ui->actionUndo->setEnabled(true);
@@ -1037,33 +1019,33 @@ gvle_win::onCustomContextMenu(const QPoint &point)
     QModelIndex index = projectTreeView->indexAt(point);
     if (not index.isValid()) return;
 
-    QString fileName = mProjectFileSytem->filePath(index);
-    QString currentDir = QDir::currentPath() += "/";
-    fileName.replace(currentDir, "");
-    QFileInfo selectedFileInfo = QFileInfo(fileName);
-
+    bool inExp = insideExp(index);
+    bool inSrc = insideSrc(index);
+    bool inOut = insideOut(index);
     gvle_file gf = getGvleFileFromFSIndex(index);
+    QString suffix = gf.suffix();
     gvle_win::StatusFile status_file = getStatus(gf);
+
 
     QAction* action;
 
     QMenu ctxMenu;
     action = ctxMenu.addAction(tr("Remove File"));
     action->setData(1);
-    action->setDisabled(((selectedFileInfo.suffix() != "vpz") and
-                        (selectedFileInfo.suffix() != "cpp")) or
+    action->setDisabled(((suffix != "vpz") and (suffix != "cpp")) or
+                        (not (inExp or inSrc)) or
                         (status_file == OPENED) or
-                        (status_file == OPENED_AND_MODIFIED));
+                        (status_file == OPENED_AND_MODIFIED) );
     action = ctxMenu.addAction(tr("Rename File"));
     action->setData(2);
-    action->setDisabled(((selectedFileInfo.suffix() != "vpz") and
-                        (selectedFileInfo.suffix() != "cpp")) or
+    action->setDisabled(((suffix != "vpz") and (suffix != "cpp")) or
+                        (not (inExp or inSrc)) or
                         (status_file == OPENED) or
                         (status_file == OPENED_AND_MODIFIED));
     action = ctxMenu.addAction(tr("Copy File"));
     action->setData(3);
-    action->setDisabled((selectedFileInfo.suffix() != "vpz") and
-                        (selectedFileInfo.suffix() != "cpp"));
+    action->setDisabled((suffix != "vpz" and suffix != "cpp") or
+                        (not (inExp or inSrc)));
     ctxMenu.addSeparator();
     QMenu* subMenu = ctxMenu.addMenu("Add model");
     subMenu->setDisabled(gf.relPath != "exp");
@@ -1086,8 +1068,7 @@ gvle_win::onCustomContextMenu(const QPoint &point)
         }
     }
     subMenu = ctxMenu.addMenu("Open output with");
-    bool disable = not insideOut(index) or
-                   (selectedFileInfo.suffix() != "dat");
+    bool disable = not inOut or (suffix != "dat");
     subMenu->setDisabled(disable);
     if (not disable) {
         QStringList plugList = mGvlePlugins.getMainPanelOutPluginsList();
@@ -1130,15 +1111,7 @@ gvle_win::onCustomContextMenu(const QPoint &point)
                                                     outPlugin.toString());
             }
             if (newPanel) {
-                newPanel->init(gfnew, &mCurrPackage, mLogger, &mGvlePlugins, mCtx);
-                int n = ui->tabWidget->addTab(newPanel->leftWidget(), gfnew.relPath);
-                bool oldBlock = ui->tabWidget->blockSignals(true);
-                ui->tabWidget->setCurrentIndex(n);
-                ui->tabWidget->widget(n)->setProperty("relPath",gfnew.relPath);
-                ui->tabWidget->blockSignals(oldBlock);
-
-                mPanels.insert(gfnew.relPath,newPanel);
-                newPanel->leftWidget()->show();
+                openMainPanel(gfnew, newPanel);
             }
         }
     }
@@ -1163,7 +1136,7 @@ gvle_win::insideOut(QModelIndex index)
 }
 
 bool
-gvle_win::insideVpz(QModelIndex index)
+gvle_win::insideExp(QModelIndex index)
 {
     QString filePath = mProjectFileSytem->filePath(index);
     QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
@@ -1344,6 +1317,29 @@ void gvle_win::projectInstall()
     QObject::connect(mTimer, SIGNAL(timeout()),
                      this, SLOT(projectInstallTimer()));
     mTimer->start(2);
+}
+
+void
+gvle_win::openMainPanel(gvle_file gf, PluginMainPanel* panel)
+{
+
+    panel->init(gf, &mCurrPackage, mLogger, &mGvlePlugins, mCtx);
+    int n = ui->tabWidget->addTab(panel->leftWidget(), gf.relPath);
+    bool oldBlock = ui->tabWidget->blockSignals(true);
+    ui->tabWidget->setCurrentIndex(n);
+    ui->tabWidget->widget(n)->setProperty("relPath",gf.relPath);
+    ui->tabWidget->blockSignals(oldBlock);
+    mPanels.insert(gf.relPath,panel);
+    panel->leftWidget()->show();
+
+    // Create a new toolbox for the right column
+    setRightWidget(panel->rightWidget());
+
+    QObject::connect(panel, SIGNAL(undoAvailable(bool)),
+            this, SLOT(onUndoAvailable(bool)));
+    QObject::connect(panel, SIGNAL(rightWidgetChanged()),
+            this, SLOT(onRightWidgetChanged()));
+
 }
 
 void

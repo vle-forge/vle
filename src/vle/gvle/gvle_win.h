@@ -71,11 +71,12 @@ public:
 protected:
     void showEvent(QShowEvent* event);
     void closeEvent(QCloseEvent* event);
+    void openMainPanel(gvle_file gf, PluginMainPanel* p);
     void setRightWidget(QWidget* rightWidget);
     int findTabIndex(gvle_file gf);
     bool insideSrc(QModelIndex index);
     bool insideOut(QModelIndex index);
-    bool insideVpz(QModelIndex index);
+    bool insideExp(QModelIndex index);
 
 private slots:
     void onNewProject();

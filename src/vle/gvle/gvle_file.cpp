@@ -134,6 +134,13 @@ gvle_file::newInstanceMainPanel(gvle_plugins& plugins)
     return 0;
 }
 
+QString
+gvle_file::suffix()
+{
+    QFileInfo fileInfo = QFileInfo(source_file);
+    return fileInfo.suffix();
+}
+
 /*************** Static functions ***************/
 
 gvle_file
@@ -141,18 +148,19 @@ gvle_file::getNewCpp(const utils::Package& pkg)
 {
     QString pkgPath = QString(pkg.getDir(utils::PKG_SOURCE).c_str());
     QString baseName = "NewCpp";
+    QString currName;
     bool found = false;
     int i = 0;
     while (not found) {
+        currName = baseName;
         if (i > 0) {
-            baseName += "_" + QVariant(i).toString();
-            baseName += "_" + QVariant(i).toString();
+            currName += "_" + QVariant(i).toString();
         }
-        found= not QFile(pkgPath + "/src/" + baseName+ ".cpp").exists() and
-               not QFile(pkgPath + "/metadata/src/" + baseName+ ".sm").exists();
+        found= not QFile(pkgPath + "/src/" + currName+ ".cpp").exists() and
+               not QFile(pkgPath + "/metadata/src/" + currName+ ".sm").exists();
         i++;
     }
-    QString relPath = "src/"+baseName+".cpp";
+    QString relPath = "src/"+currName+".cpp";
     return gvle_file(pkg, relPath);
 }
 
@@ -163,16 +171,17 @@ gvle_file::getNewVpz(const utils::Package& pkg)
     QString baseName = "NewVpz";
     bool found = false;
     int i = 0;
+    QString currName;
     while (not found) {
+        currName = baseName;
         if (i > 0) {
-            baseName += "_" + QVariant(i).toString();
-            baseName += "_" + QVariant(i).toString();
+            currName += "_" + QVariant(i).toString();
         }
-        found= not QFile(pkgPath + "/exp/" + baseName+ ".vpz").exists() and
-               not QFile(pkgPath + "/metadata/exp/" + baseName+ ".vpm").exists();
+        found= not QFile(pkgPath + "/exp/" + currName+ ".vpz").exists() and
+               not QFile(pkgPath + "/metadata/exp/" + currName+ ".vpm").exists();
         i++;
     }
-    QString relPath = "exp/"+baseName+".vpz";
+    QString relPath = "exp/"+currName+".vpz";
     return gvle_file(pkg, relPath);
 }
 

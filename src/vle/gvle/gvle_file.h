@@ -47,6 +47,7 @@ struct gvle_file {
 
     QString baseName() const; //eg NewCpp
     PluginMainPanel* newInstanceMainPanel(gvle_plugins& plugins);
+    QString suffix(); //eg cpp or vpz or dat
 
     static gvle_file getNewCpp(const utils::Package& pkg);
     static gvle_file getNewVpz(const utils::Package& pkg);
