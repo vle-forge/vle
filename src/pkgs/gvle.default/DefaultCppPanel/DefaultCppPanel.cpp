@@ -22,11 +22,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <sstream>
+#include <QFileInfo>
+#include <vle/utils/Template.hpp>
 #include "DefaultCppPanel.h"
 
 namespace vle {
 namespace gvle {
+
+
 
 
 
@@ -45,13 +49,102 @@ DefaultCppPanel::~DefaultCppPanel()
 
 }
 
+
 void
-DefaultCppPanel::init(QString& relPath, utils::Package* pkg, Logger* /*log*/,
-        gvle_plugins* /*plugs*/, const utils::ContextPtr& /*ctx*/)
+DefaultCppPanel::initCpp(QString pkg, QString classname, QString filePath)
+{
+    std::string tpl =
+    "/*\n"                                                                     \
+    "* @@tagdynamic@@\n"                                                       \
+    "* @@tagdepends:@@endtagdepends\n"                                         \
+    "*/\n"                                                                     \
+    "#include <vle/value/Value.hpp>\n"                                         \
+    "#include <vle/devs/Dynamics.hpp>\n"                                       \
+    "namespace vd = vle::devs;\n"                                              \
+    "namespace vv = vle::value;\n"                                             \
+    "namespace {{pkg}} {\n"                                                    \
+    "class {{classname}} : public vd::Dynamics\n"                              \
+    "{\n"                                                                      \
+    " public:\n"                                                               \
+    "  {{classname}}(const vd::DynamicsInit& init,\n"                          \
+    "                const vd::InitEventList& events)\n"                       \
+    "        : vd::Dynamics(init, events)\n"                                   \
+    "  {\n"                                                                    \
+    "  }\n"                                                                    \
+    "  virtual ~{{classname}}()\n"                                             \
+    "  {\n"                                                                    \
+    "  }\n"                                                                    \
+    "  virtual vd::Time init(vle::devs::Time /*time*/) override\n"             \
+    "  {\n"                                                                    \
+    "    return vd::infinity;\n"                                               \
+    "  }\n"                                                                    \
+    "  virtual void output(vle::devs::Time /*time*/,\n"                        \
+    "                      vd::ExternalEventList& /*output*/) const override\n"\
+    "  {\n"                                                                    \
+    "  }\n"                                                                    \
+    "  virtual vd::Time timeAdvance() const override\n"                        \
+    "  {\n"                                                                    \
+    "    return vd::infinity;\n"                                               \
+    "  }\n"                                                                    \
+    "  virtual void internalTransition(vle::devs::Time /*time*/) override\n"   \
+    "  {\n"                                                                    \
+    "  }\n"                                                                    \
+    "  virtual void externalTransition(\n"                                     \
+    "            const vd::ExternalEventList& /*event*/,\n"                    \
+    "            vle::devs::Time /*time*/) override\n"                         \
+    "  {\n"                                                                    \
+    "  }\n"                                                                    \
+    "  virtual void confluentTransitions(\n"                                   \
+    "            vle::devs::Time time,\n"                                      \
+    "            const vd::ExternalEventList& events) override\n"              \
+    "  {\n"                                                                    \
+    "    internalTransition(time);\n"                                          \
+    "    externalTransition(events, time);\n"                                  \
+    "  }\n"                                                                    \
+    "  virtual std::unique_ptr<vle::value::Value> observation(\n"              \
+    "            const vd::ObservationEvent& /*event*/) const override\n"      \
+    "  {\n"                                                                    \
+    "    return 0;\n"                                                          \
+    "  }\n"                                                                    \
+    "  virtual void finish()\n"                                                \
+    "  {\n"                                                                    \
+    "  }\n"                                                                    \
+    " };\n"                                                                    \
+    "} // namespace\n"                                                         \
+    "DECLARE_DYNAMICS({{pkg}}::{{classname}})\n";
+
+    vle::utils::Template vleTpl(tpl);
+    vleTpl.stringSymbol().append("classname", classname.toStdString());
+    vleTpl.stringSymbol().append("pkg", pkg.toStdString());
+
+    std::ostringstream out;
+    vleTpl.process(out);
+
+    QFile cppfile(filePath);
+    cppfile.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    if(!cppfile.isOpen()){
+        qDebug() << "- Error, unable to open" << "outputFilename" << "for output";
+    }
+    QTextStream outStream(&cppfile);
+    outStream << out.str().c_str();
+    cppfile.close();
+}
+
+
+void
+DefaultCppPanel::init(const gvle_file& gf, utils::Package* pkg,
+        Logger* /*log*/, gvle_plugins* /*plugs*/,
+        const utils::ContextPtr& /*ctx*/)
 {
     QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
+    m_file = gf.source_file;
 
-    m_file = basepath+"/"+relPath;
+    if (not QFile(m_file).exists()){
+        initCpp(QString(pkg->name().c_str()),QFileInfo(m_file).baseName(),
+                m_file);
+    }
+
     QFile cppFile (m_file);
 
     if (!cppFile.open(QFile::ReadOnly | QFile::Text)) {

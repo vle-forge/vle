@@ -26,7 +26,6 @@
 #define gvle_gvle_win_H
 
 #include "vle/gvle/logger.h"
-#include "plugin_mainpanel.h"
 #include <QMainWindow>
 #include <QTranslator>
 #include <QFileInfo>
@@ -39,14 +38,14 @@
 #include <QtGui>
 #include <QFileSystemModel>
 
-
-
-
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Template.hpp>
 #endif
+
+#include "plugin_mainpanel.h"
+#include "gvle_file.h"
 
 namespace Ui {
 class gvleWin;
@@ -59,9 +58,6 @@ class gvle_win : public QMainWindow
 {
     Q_OBJECT
 
-
-
-
 public:
     enum StatusFile {
         NOT_OPENED, //no tab opened
@@ -69,60 +65,17 @@ public:
         OPENED_AND_MODIFIED //tab opened and modified
     };
 
-    /***
-     * @brief the couple of a source file (either cpp or vpz) with the metadata
-     * file
-     */
-    struct gvle_file {
-        gvle_file():
-            source_file(""), metadata_file(""){}
-        gvle_file(const gvle_file& f):
-            source_file(f.source_file), metadata_file(f.metadata_file){}
-        QString source_file;
-        QString metadata_file;
-
-    };
-
-    /**
-     * @brief type of vle file names required by gvle Application
-     *
-     */
-    enum GvleFileRequirement {
-        COPY,          // from a file (cpp or vpz) get the gvle_file which
-                       // is a copy name that does not exist
-        METADATA_FILE, // from a file (cpp or vpz) get the gvle_file which is
-                       // associated to (ie. computes metada file)
-        NEW_VPZ,       // get a new vpz gvle_file
-        NEW_CPP        // get a new cpp gvle_file
-    };
-
     explicit gvle_win( const vle::utils::ContextPtr& ctx, QWidget* parent =0);
-    ~gvle_win();
+    virtual ~gvle_win();
 
 protected:
     void showEvent(QShowEvent* event);
     void closeEvent(QCloseEvent* event);
     void setRightWidget(QWidget* rightWidget);
-    int findTabIndex(QString relPath);
+    int findTabIndex(gvle_file gf);
     bool insideSrc(QModelIndex index);
     bool insideOut(QModelIndex index);
     bool insideVpz(QModelIndex index);
-    /**
-     * @brief get a gvle file name (source and metadata)
-     * @param relPath, eg: src/NewCpp.cpp
-     * @param req, type of file names path building
-     */
-    gvle_file getGvleFile(QString relPath, GvleFileRequirement req);
-    /**
-     * @brief get the plugin attached to a cpp by reading the metadata
-     * associated to the cpp file
-     * @param the relPath eg 'src/NewCpp.cpp' to the cpp file
-     * @return the cpp plugin eg gvle.discrete-time
-     */
-    QString getCppPlugin(QString relpath);
-    QString getOutPlugin(QString relpath);
-    QString getVpzPlugin(QString relpath);
-
 
 private slots:
     void onNewProject();
@@ -202,34 +155,34 @@ private:
      * @param i, tab widget index
      * @return the relative path of the tab
      */
-    QString getRelPathFromTabIndex(int i);
+    gvle_file getGvleFileFromTabIndex(int i);
     /**
      * @brief get the relative path (eg. exp/empty.vpz) from an index of
      * file info
      * @param f, a file info
      * @return the relative path
      */
-    QString getRelPathFromFileInfo(QFileInfo& f);
+    gvle_file getGvleFileFromFileInfo(QFileInfo& f);
     /**
      * @brief get the relative path (eg. exp/empty.vpz) from an index of the
      * filesystem tree.
      * @param index, filesystem index
      * @return the relative path of the tab
      */
-    QString getRelPathFromFSIndex(QModelIndex index);
+    gvle_file getGvleFileFromFSIndex(QModelIndex index);
     /**
      * @brief get the relative path (eg. exp/empty.vpz) from a pointer to
      * a main panel
      * @param p, the main panel
      * @return the relative path corresponding to p
      */
-    QString getRelPathFromMainPanel(PluginMainPanel* p);
+    gvle_file getGvleFileFromMainPanel(PluginMainPanel* p);
     /**
      * @brief get the file system index from a relative path (eg exp/empty.vpz)
-     * @param relPath, the relative path
+     * @param gf, the gvle_file
      * @return the file system index
      */
-    QModelIndex getFSIndexFromRelPath(QString relPath);
+    QModelIndex getFSIndex(gvle_file gf);
     /**
      * @brief get the main panel from a tab widget index
      * @param i, tab widget index
@@ -238,25 +191,25 @@ private:
     PluginMainPanel* getMainPanelFromTabIndex(int i);
     /**
      * @brief get the main panel from its id (relative path)
-     * @param relPath, id of the file
+     * @param gf, the gvle_file
      * @return the main panel associated to relPath or 0
      */
-    PluginMainPanel* getMainPanelFromRelPath(QString relPath);
+    PluginMainPanel* getMainPanel(gvle_file gf);
     /**
      * @brief get the tab index form a relPath
-     * @param relPath, id of the file
+     * @param gf, the gvle_file
      * @return the tab index
      */
-    int getTabIndexFromRelPath(QString relPath);
+    int getTabIndex(gvle_file gf);
 
 
     /**
      * @brief get status ogf a file idetified by relative path
      * (eg. src/Simple.cpp).
-     * @param relPath, id of the file
+     * @param gf, the gvle_file
      * @return the status of this file.
      */
-    StatusFile getStatus(QString relPath);
+    StatusFile getStatus(gvle_file gf);
 
 
     bool removeDir(const QString& dirName);

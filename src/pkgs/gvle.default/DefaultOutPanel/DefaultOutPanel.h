@@ -29,10 +29,10 @@
 #include <QObject>
 #include <QDebug>
 #include <vle/gvle/plugin_mainpanel.h>
+#include <vle/gvle/gvle_file.h>
 
 namespace vle {
 namespace gvle {
-
 
 class DefaultOutPanel : public PluginMainPanel
 {
@@ -49,8 +49,8 @@ public:
     QWidget* rightWidget() override;
     void undo() override;
     void redo() override;
-    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs,
-            const utils::ContextPtr& ctx) override;
+    void init(const gvle_file& file, utils::Package* pkg, Logger*,
+            gvle_plugins* plugs, const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
     void save() override;
     void discard() override {}

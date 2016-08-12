@@ -48,9 +48,19 @@ DefaultVpzPanel::~DefaultVpzPanel()
 
 
 void
-DefaultVpzPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
+DefaultVpzPanel::init(const gvle_file& gf, utils::Package* pkg, Logger* log,
         gvle_plugins* plugs, const utils::ContextPtr& ctx)
 {
+    //Initialize if the vpe does not exist does not exist
+    QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
+    if (not QFile(gf.source_file).exists()) {
+        QString emptyVpzPath = ctx->getTemplate("package").string(
+                vle::utils::Path::native_path).c_str();
+        emptyVpzPath += "/exp/empty.vpz";
+        QFile::copy(emptyVpzPath, gf.source_file);
+    }
+
+
     mGvlePlugins = plugs;
 
     m_vpzview = new fileVpzView(pkg, mGvlePlugins, log, ctx);
@@ -69,12 +79,7 @@ DefaultVpzPanel::init(QString& relPath, utils::Package* pkg, Logger* log,
     QObject::connect(&(m_vpzview->mClassesTab->mScene), SIGNAL(initializationDone(VpzDiagScene*)),
             m_rtool, SLOT (onInitializationDone(VpzDiagScene*)));
 
-    QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
-    QString relPathVpm = relPath;
-
-    relPathVpm.replace(".vpz", ".vpm");
-    vleVpm* vpm = new vleVpm(basepath+"/"+relPath,
-            basepath+"/metadata/"+relPathVpm, mGvlePlugins);
+    vleVpm* vpm = new vleVpm(gf.source_file, gf.metadata_file, mGvlePlugins);
 
     vpm->setLogger(log);
 

@@ -45,9 +45,17 @@ class PluginSimPanel;
 class PluginMainPanel;
 
 
-
 struct gvleplug
 {
+    enum GVLE_PLUGIN_TYPE {
+        GVLE_PLUG_OUTPUT,     //a PluginOutput
+        GVLE_PLUG_COND,       //a PluginExpCond
+        GVLE_PLUG_SIM,        //a PluginSimPanel
+        GVLE_PLUG_MAIN,       //a PluginMainPanel
+        GVLE_PLUG_MAIN_OUT,   //a PluginMainPanel
+        GVLE_PLUG_MAIN_VPZ,   //a PluginMainPanel
+        GVLE_PLUG_NONE        //nullptr
+    };
     gvleplug();
     gvleplug(QString pkg, QString libPath);
     virtual ~gvleplug();

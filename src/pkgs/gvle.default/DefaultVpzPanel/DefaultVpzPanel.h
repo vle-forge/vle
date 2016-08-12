@@ -32,6 +32,8 @@
 #include <vle/gvle/vlevpm.h>
 #include <vle/gvle/plugin_mainpanel.h>
 #include <vle/gvle/plugin_simpanel.h>
+#include <vle/gvle/gvle_file.h>
+
 #include "filevpzview.h"
 #include "filevpzrtool.h"
 #include "ui_filevpzview.h"
@@ -55,8 +57,8 @@ public:
     QWidget* rightWidget() override;
     void undo() override;
     void redo() override;
-    void init(QString& file, utils::Package* pkg, Logger*, gvle_plugins* plugs,
-              const utils::ContextPtr& ctx) override;
+    void init(const gvle_file& file, utils::Package* pkg, Logger*,
+            gvle_plugins* plugs, const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
     void discard(){};
     void save() override;

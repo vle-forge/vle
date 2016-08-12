@@ -46,12 +46,13 @@ DefaultOutPanel::~DefaultOutPanel()
 }
 
 void
-DefaultOutPanel::init(QString& relPath, utils::Package* pkg, Logger* /*log*/,
-        gvle_plugins* /*plugs*/, const utils::ContextPtr& /*ctx*/)
+DefaultOutPanel::init(const gvle_file& gf, utils::Package* pkg,
+        Logger* /*log*/, gvle_plugins* /*plugs*/,
+        const utils::ContextPtr& /*ctx*/)
 {
     QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
 
-    m_file = basepath+"/"+relPath;
+    m_file = gf.source_file;
     QFile outFile (m_file);
 
     if (!outFile.open(QFile::ReadOnly | QFile::Text)) {
