@@ -189,6 +189,389 @@ vleVpz::vleVpz(QXmlInputSource& source):
     undoStack->init(getDomDoc());
 }
 
+vleVpz::~vleVpz()
+{
+}
+
+/******************************************************
+ * Static functions
+ ******************************************************/
+
+QList<QDomNode>
+vleVpz::childNodesWithoutText(QDomNode node, const QString& nodeName)
+{
+    QDomNodeList childs = node.childNodes();
+    QList<QDomNode> childsWithoutText;
+    for (int i=0; i<childs.length();i++) {
+        QDomNode ch = childs.at(i);
+        if (not ch.isText()) {
+            if (nodeName == "") {
+                childsWithoutText.push_back(ch);
+            } else if (ch.nodeName() == nodeName) {
+                childsWithoutText.push_back(ch);
+            }
+        }
+    }
+    return childsWithoutText;
+}
+
+QDomElement
+vleVpz::buildEmptyValueFromDoc(QDomDocument& domDoc,
+                               vle::value::Value::type vleType)
+{
+    QDomElement elem;
+    switch (vleType) {
+    case vle::value::Value::BOOLEAN: {
+        elem = domDoc.createElement("boolean");
+        break;
+    } case vle::value::Value::INTEGER: {
+        elem = domDoc.createElement("integer");
+        break;
+    } case vle::value::Value::DOUBLE: {
+        elem = domDoc.createElement("double");
+        break;
+    } case vle::value::Value::STRING: {
+        elem = domDoc.createElement("string");
+        break;
+    } case vle::value::Value::SET: {
+        elem = domDoc.createElement("set");
+        break;
+    } case vle::value::Value::MAP: {
+        elem = domDoc.createElement("map");
+        break;
+    } case vle::value::Value::TUPLE: {
+        elem = domDoc.createElement("tuple");
+        break;
+    } case vle::value::Value::TABLE: {
+        elem = domDoc.createElement("table");
+        break;
+    } case vle::value::Value::MATRIX: {
+        elem = domDoc.createElement("matrix");
+        break;
+    } default: {
+        qDebug() << "Internal error in buildEmptyValueFromDoc ";
+        break;
+    }}
+    return elem;
+}
+
+vle::value::Value*
+vleVpz::buildValue(const vleDomObject* vdo, const QDomNode& node, bool buildText)
+{
+
+    if (node.nodeName() == "boolean") {
+        if (node.childNodes().length() != 1){
+            qDebug() << "Internal error in buildValue (6)";
+            return 0;
+        }
+        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
+        return new vle::value::Boolean(qv.toBool());
+    }
+    if (node.nodeName() == "integer") {
+        if (node.childNodes().length() != 1){
+            qDebug() << "Internal error in buildValue (5) "<< node.childNodes().length() <<" " <<vdo->toQString(node);
+            qDebug() << "Internal error in buildValue son0 "<< vdo->toQString(node.childNodes().at(0));
+            qDebug() << "Internal error in buildValue son1 "<< vdo->toQString(node.childNodes().at(1));
+            return 0;
+        }
+        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
+        return new vle::value::Integer(qv.toInt());
+    }
+    if (node.nodeName() == "double") {
+        if (node.childNodes().length() != 1){
+            qDebug() << "Internal error in buildValue (10)" << vdo->toQString(node);
+            return 0;
+        }
+        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
+        return new vle::value::Double(qv.toDouble());
+    }
+    if (node.nodeName() == "string") {
+        if (node.childNodes().length() == 0){
+            return new vle::value::String("");
+        }
+        if (node.childNodes().length() == 1){
+            QString qv = node.childNodes().item(0).toText().nodeValue();
+            return new vle::value::String(qv.toStdString());
+        }
+        qDebug() << "Internal error in buildValue (4.3) "<<node.childNodes().length();
+        return 0;
+
+    }
+    if (node.nodeName() == "tuple") {
+        if (node.childNodes().length() > 1){
+            qDebug() << "Internal error in buildValue (4)";
+            return 0;
+        }
+        if (node.childNodes().length() == 0) {
+            return new vle::value::Tuple(0, 0.0);
+        } else {
+            QString qv = node.childNodes().item(0).toText().nodeValue();
+            QStringList vals = qv.split(" ");
+            vle::value::Tuple* res = new vle::value::Tuple(vals.length());
+            for (int i = 0; i<vals.size();i++) {
+                (*res)[i] = QVariant(vals.at(i)).toDouble();
+            }
+            return res;
+        }
+    }
+    if (node.nodeName() == "table") {
+        if (node.childNodes().length() != 1){
+            qDebug() << "Internal error in buildValue (14)" << vdo->toQString(node);
+            qDebug() << "Internal error in buildValue (14) length" << node.childNodes().length();
+            return 0;
+        }
+        int width = QVariant(vdo->attributeValue(node, "width")).toInt();
+        int height = QVariant(vdo->attributeValue(node, "height")).toInt();
+        QString qv = node.childNodes().item(0).toText().nodeValue();
+        vle::value::Table* res = new vle::value::Table(width, height);
+        res->fill(qv.toStdString());
+        return res;
+    }
+    if (node.nodeName() == "#text") {
+        if (buildText) {
+            return new vle::value::String(node.nodeValue().toStdString());
+        } else {
+            return 0;
+        }
+    }
+
+    QList<QDomNode> chs = childNodesWithoutText(node);
+    if (node.nodeName() == "set") {
+        vle::value::Set* res = new vle::value::Set();
+        for (int i=0; i < chs.size(); i++) {
+            QDomNode child = chs[i];
+            res->add(
+                std::unique_ptr<value::Value>(
+                    buildValue(vdo, child, buildText)));
+        }
+        return res;
+    }
+    if (node.nodeName() == "map") {
+        vle::value::Map* res = new vle::value::Map();
+        for (int i=0; i < chs.size(); i++) {
+            QDomNode child = chs[i];
+            if (child.nodeName() != "key") {
+                qDebug() << "Internal error in buildValue (1)";
+                return res;
+            }
+            if (not child.attributes().contains("name")) {
+                qDebug() << "Internal error in buildValue (2)";
+                return res;
+            }
+            QDomNode mapItemValue = child.childNodes().item(0);
+            while (mapItemValue.isText()) {
+                mapItemValue = mapItemValue.nextSibling();
+            }
+            res->add(
+                child.attributes().namedItem("name").nodeValue().toStdString(),
+                std::unique_ptr<value::Value>(
+                    buildValue(vdo, mapItemValue, buildText)));
+        }
+        return res;
+    }
+    if (node.nodeName() == "matrix") {
+        int columns = QVariant(vdo->attributeValue(node, "columns")).toInt();
+        int rows = QVariant(vdo->attributeValue(node, "rows")).toInt();
+        int columnmax = QVariant(vdo->attributeValue(node, "columnmax")).toInt();
+        int rowmax = QVariant(vdo->attributeValue(node, "rowmax")).toInt();
+        int columnstep = QVariant(vdo->attributeValue(node, "columnstep")).toInt();
+        int rowstep = QVariant(vdo->attributeValue(node, "rowstep")).toInt();
+
+        vle::value::Matrix* res = new vle::value::Matrix(columns,
+                rows, columnmax, rowmax, columnstep, rowstep);
+        if (chs.size() != (int) columns*rows) {
+            qDebug() << "Internal error in buildValue (matrix)" << vdo->toQString(node) ;
+            qDebug() << "Internal error in buildValue (matrix) childLength=" << chs.size() ;
+            qDebug() << "Internal error in buildValue (matrix) columns*row=" << (unsigned int) columns*rows ;
+
+            return 0;
+        }
+        for (int i=0; i < rows; i++) {
+            for (int j=0; j < columns; j++) {
+                QDomNode child = chs[(j + (i*columns))];
+                res->set(j,i, std::unique_ptr<value::Value>(
+                             buildValue(vdo, child, buildText)));
+            }
+        }
+        return res;
+    }
+    qDebug() << "Internal error in buildValue (3): " << node.nodeName() << "\n" << vdo->toQString(node);
+    throw vle::utils::InternalError("Unknown value: %s", node.nodeName().toStdString().c_str());
+    return 0;
+}
+
+
+bool
+vleVpz::fillWithValue(QDomDocument& domDoc, vleDomObject* vdo,
+                      QDomNode node, const vle::value::Value& val)
+{
+    switch (val.getType()) {
+    case vle::value::Value::BOOLEAN:
+    case vle::value::Value::INTEGER:
+    case vle::value::Value::DOUBLE:
+    case vle::value::Value::STRING:
+
+    {
+        if ( (val.isBoolean() and (node.nodeName() != "boolean")) or
+                (val.isInteger() and (node.nodeName() != "integer")) or
+                (val.isDouble() and (node.nodeName() != "double")) or
+                (val.isString() and (node.nodeName() != "string"))) {
+            return false;
+        }
+        QDomNodeList childs = node.childNodes();
+        if (childs.length() == 0) {
+            QDomText elemVal = domDoc.createTextNode(
+                    val.writeToString().c_str());
+            node.appendChild(elemVal);
+            return true;
+        }
+        if ((childs.length() == 1) and (childs.at(0).isText())){
+            QDomText elemVal = childs.at(0).toText();
+            elemVal.setData(val.writeToString().c_str());
+            return true;
+        } else {
+            qDebug() << "Internal error in fillWithValue (bool, string, integer)";
+            return false;
+        }
+        break;
+    } case vle::value::Value::SET: {
+        if (node.nodeName() != "set") {
+            return false;
+        }
+        removeAllChilds(node);
+        vle::value::Set::const_iterator itb = val.toSet().begin();
+        vle::value::Set::const_iterator ite = val.toSet().end();
+        for (; itb != ite; itb++) {
+            QDomElement elemVal = buildEmptyValueFromDoc(domDoc,
+                                                         (*itb)->getType());
+            fillWithValue(domDoc, vdo, elemVal, (**itb));
+            node.appendChild(elemVal);
+        }
+        break;
+    } case vle::value::Value::MAP: {
+        if (node.nodeName() != "map") {
+            return false;
+        }
+        removeAllChilds(node);
+        vle::value::Map::const_iterator itb = val.toMap().begin();
+        vle::value::Map::const_iterator ite = val.toMap().end();
+        for (; itb != ite; itb++) {
+            QDomElement elem = domDoc.createElement("key");
+            elem.setAttribute("name", QString(itb->first.c_str()));
+            QDomElement elemVal = buildEmptyValueFromDoc(domDoc,
+                                                         itb->second->getType());
+            fillWithValue(domDoc, vdo, elemVal, *(itb->second));
+            elem.appendChild(elemVal);
+            node.appendChild(elem);
+        }
+        break;
+    }case vle::value::Value::TUPLE: {
+        if (node.nodeName() != "tuple") {
+            return false;
+        }
+        QString valTxt ="";
+        const vle::value::Tuple& tuple = val.toTuple();
+        for (unsigned int i=0; i < tuple.size(); i++) {
+            if (i > 0){
+                valTxt += " ";
+            }
+            valTxt += QVariant(tuple.at(i)).toString();
+        }
+        QDomNodeList childs = node.childNodes();
+        if (childs.length() == 0) {
+            QDomText elemVal = domDoc.createTextNode(valTxt);
+            node.appendChild(elemVal);
+            return true;
+        }
+        if ((childs.length() == 1) and (childs.at(0).isText())){
+            QDomText elemVal = childs.at(0).toText();
+            elemVal.setData(valTxt);
+            return true;
+        } else {
+            qDebug() << "Internal error in fillWithValue (tuple)";
+            return false;
+        }
+        break;
+    } case vle::value::Value::TABLE: {
+        if (node.nodeName() != "table") {
+            return false;
+        }
+        QString strRepr = val.toTable().writeToString().c_str();
+        strRepr.remove("(");
+        strRepr.remove(")");
+        strRepr.replace(",", " ");
+
+        QDomNodeList childs = node.childNodes();
+        if (childs.length() == 0) {
+            QDomText elemVal = domDoc.createTextNode(strRepr);
+            node.appendChild(elemVal);
+            return true;
+        }
+        if ((childs.length() == 1) and (childs.at(0).isText())){
+            QDomText elemVal = childs.at(0).toText();
+            elemVal.setData(strRepr);
+            return true;
+        } else {
+
+            qDebug() << "Internal error in fillWithValue (table)" << vdo->toQString(childs.at(0));
+            qDebug() << "Internal error in fillWithValue (table)" << childs.length();
+            return false;
+        }
+        vdo->setAttributeValue(node, "width",
+                QVariant((int) val.toTable().width()).toString());
+        vdo->setAttributeValue(node, "height",
+                QVariant((int) val.toTable().height()).toString());
+        break;
+    }  case vle::value::Value::MATRIX: {
+        if (node.nodeName() != "matrix") {
+            return false;
+        }
+        const vle::value::Matrix& mat = val.toMatrix();
+        int rows = mat.rows();
+        int columns = mat.columns();
+
+        vdo->setAttributeValue(node, "columns",
+                QVariant(columns).toString());
+        vdo->setAttributeValue(node, "rows", QVariant(rows).toString());
+        vdo->setAttributeValue(node, "columnmax",
+                QVariant(columns).toString());
+        vdo->setAttributeValue(node, "rowmax",
+                QVariant(rows).toString());
+        vdo->setAttributeValue(node, "columnstep",
+                QVariant((int) mat.resizeColumn()).toString());
+        vdo->setAttributeValue(node, "rowsstep",
+                QVariant((int) mat.resizeColumn()).toString());
+        removeAllChilds(node);
+        for (int i=0; i < rows; i++) {
+            for (int j= 0; j < columns; j++) {
+
+                const auto& val = mat.get(j, i);//WARNING inversed
+                QDomElement elemVal = buildEmptyValueFromDoc(domDoc,
+                                                             val->getType());
+                fillWithValue(domDoc, vdo, elemVal, *val);
+                node.appendChild(elemVal);
+            }
+        }
+        break;
+    } default: {
+        qDebug() << "Internal error in fillWithValue (nnn)";
+        return false;
+    }}
+    return true;
+}
+
+void
+vleVpz::removeAllChilds(QDomNode node)
+{
+    QDomNodeList childs = node.childNodes();
+    while(node.hasChildNodes()) {
+        node.removeChild(childs.item(0));
+    }
+}
+
+/******************************************************
+ * Access to specific nodes in the vpz from Doc
+ ******************************************************/
 const QDomDocument&
 vleVpz::getDomDoc() const
 {
@@ -670,24 +1053,6 @@ vleVpz::vdo()
     return mVdo;
 }
 
-QList<QDomNode>
-vleVpz::childNodesWithoutText(QDomNode node, const QString& nodeName)
-{
-    QDomNodeList childs = node.childNodes();
-    QList<QDomNode> childsWithoutText;
-    for (int i=0; i<childs.length();i++) {
-        QDomNode ch = childs.at(i);
-        if (not ch.isText()) {
-            if (nodeName == "") {
-                childsWithoutText.push_back(ch);
-            } else if (ch.nodeName() == nodeName) {
-                childsWithoutText.push_back(ch);
-            }
-        }
-    }
-    return childsWithoutText;
-}
-
 void
 vleVpz::removeTextChilds(QDomNode node, bool recursively)
 {
@@ -982,46 +1347,6 @@ QDomElement
 vleVpz::buildEmptyValueFromDoc(vle::value::Value::type vleType)
 {
     return buildEmptyValueFromDoc(getDomDoc(),  vleType);
-}
-
-QDomElement
-vleVpz::buildEmptyValueFromDoc(QDomDocument& domDoc,
-                               vle::value::Value::type vleType)
-{
-    QDomElement elem;
-    switch (vleType) {
-    case vle::value::Value::BOOLEAN: {
-        elem = domDoc.createElement("boolean");
-        break;
-    } case vle::value::Value::INTEGER: {
-        elem = domDoc.createElement("integer");
-        break;
-    } case vle::value::Value::DOUBLE: {
-        elem = domDoc.createElement("double");
-        break;
-    } case vle::value::Value::STRING: {
-        elem = domDoc.createElement("string");
-        break;
-    } case vle::value::Value::SET: {
-        elem = domDoc.createElement("set");
-        break;
-    } case vle::value::Value::MAP: {
-        elem = domDoc.createElement("map");
-        break;
-    } case vle::value::Value::TUPLE: {
-        elem = domDoc.createElement("tuple");
-        break;
-    } case vle::value::Value::TABLE: {
-        elem = domDoc.createElement("table");
-        break;
-    } case vle::value::Value::MATRIX: {
-        elem = domDoc.createElement("matrix");
-        break;
-    } default: {
-        qDebug() << "Internal error in buildEmptyValueFromDoc ";
-        break;
-    }}
-    return elem;
 }
 
 bool
@@ -3389,151 +3714,6 @@ vleVpz::buildValue(const QDomNode& node, bool buildText) const
     return buildValue(mVdo, node, buildText);
 }
 
-vle::value::Value*
-vleVpz::buildValue(const vleDomObject* vdo, const QDomNode& node, bool buildText)
-{
-
-    if (node.nodeName() == "boolean") {
-        if (node.childNodes().length() != 1){
-            qDebug() << "Internal error in buildValue (6)";
-            return 0;
-        }
-        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
-        return new vle::value::Boolean(qv.toBool());
-    }
-    if (node.nodeName() == "integer") {
-        if (node.childNodes().length() != 1){
-            qDebug() << "Internal error in buildValue (5) "<< node.childNodes().length() <<" " <<vdo->toQString(node);
-            qDebug() << "Internal error in buildValue son0 "<< vdo->toQString(node.childNodes().at(0));
-            qDebug() << "Internal error in buildValue son1 "<< vdo->toQString(node.childNodes().at(1));
-            return 0;
-        }
-        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
-        return new vle::value::Integer(qv.toInt());
-    }
-    if (node.nodeName() == "double") {
-        if (node.childNodes().length() != 1){
-            qDebug() << "Internal error in buildValue (10)" << vdo->toQString(node);
-            return 0;
-        }
-        QVariant qv = node.childNodes().item(0).toText().nodeValue();;
-        return new vle::value::Double(qv.toDouble());
-    }
-    if (node.nodeName() == "string") {
-        if (node.childNodes().length() == 0){
-            return new vle::value::String("");
-        }
-        if (node.childNodes().length() == 1){
-            QString qv = node.childNodes().item(0).toText().nodeValue();
-            return new vle::value::String(qv.toStdString());
-        }
-        qDebug() << "Internal error in buildValue (4.3) "<<node.childNodes().length();
-        return 0;
-
-    }
-    if (node.nodeName() == "tuple") {
-        if (node.childNodes().length() > 1){
-            qDebug() << "Internal error in buildValue (4)";
-            return 0;
-        }
-        if (node.childNodes().length() == 0) {
-            return new vle::value::Tuple(0, 0.0);
-        } else {
-            QString qv = node.childNodes().item(0).toText().nodeValue();
-            QStringList vals = qv.split(" ");
-            vle::value::Tuple* res = new vle::value::Tuple(vals.length());
-            for (int i = 0; i<vals.size();i++) {
-                (*res)[i] = QVariant(vals.at(i)).toDouble();
-            }
-            return res;
-        }
-    }
-    if (node.nodeName() == "table") {
-        if (node.childNodes().length() != 1){
-            qDebug() << "Internal error in buildValue (14)" << vdo->toQString(node);
-            qDebug() << "Internal error in buildValue (14) length" << node.childNodes().length();
-            return 0;
-        }
-        int width = QVariant(vdo->attributeValue(node, "width")).toInt();
-        int height = QVariant(vdo->attributeValue(node, "height")).toInt();
-        QString qv = node.childNodes().item(0).toText().nodeValue();
-        vle::value::Table* res = new vle::value::Table(width, height);
-        res->fill(qv.toStdString());
-        return res;
-    }
-    if (node.nodeName() == "#text") {
-        if (buildText) {
-            return new vle::value::String(node.nodeValue().toStdString());
-        } else {
-            return 0;
-        }
-    }
-
-    QList<QDomNode> chs = childNodesWithoutText(node);
-    if (node.nodeName() == "set") {
-        vle::value::Set* res = new vle::value::Set();
-        for (int i=0; i < chs.size(); i++) {
-            QDomNode child = chs[i];
-            res->add(
-                std::unique_ptr<value::Value>(
-                    buildValue(vdo, child, buildText)));
-        }
-        return res;
-    }
-    if (node.nodeName() == "map") {
-        vle::value::Map* res = new vle::value::Map();
-        for (int i=0; i < chs.size(); i++) {
-            QDomNode child = chs[i];
-            if (child.nodeName() != "key") {
-                qDebug() << "Internal error in buildValue (1)";
-                return res;
-            }
-            if (not child.attributes().contains("name")) {
-                qDebug() << "Internal error in buildValue (2)";
-                return res;
-            }
-            QDomNode mapItemValue = child.childNodes().item(0);
-            while (mapItemValue.isText()) {
-                mapItemValue = mapItemValue.nextSibling();
-            }
-            res->add(
-                child.attributes().namedItem("name").nodeValue().toStdString(),
-                std::unique_ptr<value::Value>(
-                    buildValue(vdo, mapItemValue, buildText)));
-        }
-        return res;
-    }
-    if (node.nodeName() == "matrix") {
-        int columns = QVariant(vdo->attributeValue(node, "columns")).toInt();
-        int rows = QVariant(vdo->attributeValue(node, "rows")).toInt();
-        int columnmax = QVariant(vdo->attributeValue(node, "columnmax")).toInt();
-        int rowmax = QVariant(vdo->attributeValue(node, "rowmax")).toInt();
-        int columnstep = QVariant(vdo->attributeValue(node, "columnstep")).toInt();
-        int rowstep = QVariant(vdo->attributeValue(node, "rowstep")).toInt();
-
-        vle::value::Matrix* res = new vle::value::Matrix(columns,
-                rows, columnmax, rowmax, columnstep, rowstep);
-        if (chs.size() != (int) columns*rows) {
-            qDebug() << "Internal error in buildValue (matrix)" << vdo->toQString(node) ;
-            qDebug() << "Internal error in buildValue (matrix) childLength=" << chs.size() ;
-            qDebug() << "Internal error in buildValue (matrix) columns*row=" << (unsigned int) columns*rows ;
-
-            return 0;
-        }
-        for (int i=0; i < rows; i++) {
-            for (int j=0; j < columns; j++) {
-                QDomNode child = chs[(j + (i*columns))];
-                res->set(j,i, std::unique_ptr<value::Value>(
-                             buildValue(vdo, child, buildText)));
-            }
-        }
-        return res;
-    }
-    qDebug() << "Internal error in buildValue (3): " << node.nodeName() << "\n" << vdo->toQString(node);
-    throw vle::utils::InternalError("Unknown value: %s", node.nodeName().toStdString().c_str());
-    return 0;
-}
-
 
 vle::value::Value*
 vleVpz::buildValueFromDoc(const QString& condName, const QString& portName,
@@ -3640,165 +3820,6 @@ vleVpz::fillWithValue(QDomNode node, const vle::value::Value& val)
 }
 
 bool
-vleVpz::fillWithValue(QDomDocument& domDoc, vleDomObject* vdo,
-                      QDomNode node, const vle::value::Value& val)
-{
-    switch (val.getType()) {
-    case vle::value::Value::BOOLEAN:
-    case vle::value::Value::INTEGER:
-    case vle::value::Value::DOUBLE:
-    case vle::value::Value::STRING:
-
-    {
-        if ( (val.isBoolean() and (node.nodeName() != "boolean")) or
-                (val.isInteger() and (node.nodeName() != "integer")) or
-                (val.isDouble() and (node.nodeName() != "double")) or
-                (val.isString() and (node.nodeName() != "string"))) {
-            return false;
-        }
-        QDomNodeList childs = node.childNodes();
-        if (childs.length() == 0) {
-            QDomText elemVal = domDoc.createTextNode(
-                    val.writeToString().c_str());
-            node.appendChild(elemVal);
-            return true;
-        }
-        if ((childs.length() == 1) and (childs.at(0).isText())){
-            QDomText elemVal = childs.at(0).toText();
-            elemVal.setData(val.writeToString().c_str());
-            return true;
-        } else {
-            qDebug() << "Internal error in fillWithValue (bool, string, integer)";
-            return false;
-        }
-        break;
-    } case vle::value::Value::SET: {
-        if (node.nodeName() != "set") {
-            return false;
-        }
-        removeAllChilds(node);
-        vle::value::Set::const_iterator itb = val.toSet().begin();
-        vle::value::Set::const_iterator ite = val.toSet().end();
-        for (; itb != ite; itb++) {
-            QDomElement elemVal = buildEmptyValueFromDoc(domDoc,
-                                                         (*itb)->getType());
-            fillWithValue(domDoc, vdo, elemVal, (**itb));
-            node.appendChild(elemVal);
-        }
-        break;
-    } case vle::value::Value::MAP: {
-        if (node.nodeName() != "map") {
-            return false;
-        }
-        removeAllChilds(node);
-        vle::value::Map::const_iterator itb = val.toMap().begin();
-        vle::value::Map::const_iterator ite = val.toMap().end();
-        for (; itb != ite; itb++) {
-            QDomElement elem = domDoc.createElement("key");
-            elem.setAttribute("name", QString(itb->first.c_str()));
-            QDomElement elemVal = buildEmptyValueFromDoc(domDoc,
-                                                         itb->second->getType());
-            fillWithValue(domDoc, vdo, elemVal, *(itb->second));
-            elem.appendChild(elemVal);
-            node.appendChild(elem);
-        }
-        break;
-    }case vle::value::Value::TUPLE: {
-        if (node.nodeName() != "tuple") {
-            return false;
-        }
-        QString valTxt ="";
-        const vle::value::Tuple& tuple = val.toTuple();
-        for (unsigned int i=0; i < tuple.size(); i++) {
-            if (i > 0){
-                valTxt += " ";
-            }
-            valTxt += QVariant(tuple.at(i)).toString();
-        }
-        QDomNodeList childs = node.childNodes();
-        if (childs.length() == 0) {
-            QDomText elemVal = domDoc.createTextNode(valTxt);
-            node.appendChild(elemVal);
-            return true;
-        }
-        if ((childs.length() == 1) and (childs.at(0).isText())){
-            QDomText elemVal = childs.at(0).toText();
-            elemVal.setData(valTxt);
-            return true;
-        } else {
-            qDebug() << "Internal error in fillWithValue (tuple)";
-            return false;
-        }
-        break;
-    } case vle::value::Value::TABLE: {
-        if (node.nodeName() != "table") {
-            return false;
-        }
-        QString strRepr = val.toTable().writeToString().c_str();
-        strRepr.remove("(");
-        strRepr.remove(")");
-        strRepr.replace(",", " ");
-
-        QDomNodeList childs = node.childNodes();
-        if (childs.length() == 0) {
-            QDomText elemVal = domDoc.createTextNode(strRepr);
-            node.appendChild(elemVal);
-            return true;
-        }
-        if ((childs.length() == 1) and (childs.at(0).isText())){
-            QDomText elemVal = childs.at(0).toText();
-            elemVal.setData(strRepr);
-            return true;
-        } else {
-
-            qDebug() << "Internal error in fillWithValue (table)" << vdo->toQString(childs.at(0));
-            qDebug() << "Internal error in fillWithValue (table)" << childs.length();
-            return false;
-        }
-        vdo->setAttributeValue(node, "width",
-                QVariant((int) val.toTable().width()).toString());
-        vdo->setAttributeValue(node, "height",
-                QVariant((int) val.toTable().height()).toString());
-        break;
-    }  case vle::value::Value::MATRIX: {
-        if (node.nodeName() != "matrix") {
-            return false;
-        }
-        const vle::value::Matrix& mat = val.toMatrix();
-        int rows = mat.rows();
-        int columns = mat.columns();
-
-        vdo->setAttributeValue(node, "columns",
-                QVariant(columns).toString());
-        vdo->setAttributeValue(node, "rows", QVariant(rows).toString());
-        vdo->setAttributeValue(node, "columnmax",
-                QVariant(columns).toString());
-        vdo->setAttributeValue(node, "rowmax",
-                QVariant(rows).toString());
-        vdo->setAttributeValue(node, "columnstep",
-                QVariant((int) mat.resizeColumn()).toString());
-        vdo->setAttributeValue(node, "rowsstep",
-                QVariant((int) mat.resizeColumn()).toString());
-        removeAllChilds(node);
-        for (int i=0; i < rows; i++) {
-            for (int j= 0; j < columns; j++) {
-
-                const auto& val = mat.get(j, i);//WARNING inversed
-                QDomElement elemVal = buildEmptyValueFromDoc(domDoc,
-                                                             val->getType());
-                fillWithValue(domDoc, vdo, elemVal, *val);
-                node.appendChild(elemVal);
-            }
-        }
-        break;
-    } default: {
-        qDebug() << "Internal error in fillWithValue (nnn)";
-        return false;
-    }}
-    return true;
-}
-
-bool
 vleVpz::isInteger(QDomNode node)
 {
     return node.nodeName() == "integer";
@@ -3902,15 +3923,6 @@ vleVpz::addIntegerKeyInMap(QDomNode* node, const QString& key, int val)
     newInt.appendChild(newIntVal);
     newKey.appendChild(newInt);
     node->appendChild(newKey);
-}
-
-void
-vleVpz::removeAllChilds(QDomNode node)
-{
-    QDomNodeList childs = node.childNodes();
-    while(node.hasChildNodes()) {
-        node.removeChild(childs.item(0));
-    }
 }
 
 QDomNode

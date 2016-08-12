@@ -74,6 +74,46 @@ class vleVpz : public QObject
 public:
     vleVpz(const QString& filename);
     vleVpz(QXmlInputSource& filename);
+    virtual ~vleVpz();
+
+    /******************************************************
+     * Static functions
+     ******************************************************/
+
+    static QList<QDomNode> childNodesWithoutText(QDomNode node,
+                         const QString& nodeName = "");
+
+    /**
+     * @brief build an empty node corresponding to the value type from Vpz doc
+     */
+    static QDomElement buildEmptyValueFromDoc(QDomDocument& domDoc,
+                         vle::value::Value::type vleType);
+
+    /**
+     * @brief build a vle value from either tag
+     * <integer>, <string>, <map> etc..
+     * @param vdo corresponding to the vleDomObject
+     * @param node correponding to a vle value
+     * @param buildText, build vle::value::String for QDomText
+     * @note: result is a new allocated vle value.
+     */
+    static vle::value::Value* buildValue(const vleDomObject* vdo,
+                     const QDomNode& valNode,
+                     bool buildText);
+
+    /**
+     * @brief Fill a Node from a value
+     * @note: the main tag should corresponds to the value type ie:
+     * <integer>, <string>, <map> etc..
+     * @note: the map is first cleared
+     */
+    static bool fillWithValue(QDomDocument& domDoc, vleDomObject* vdo,
+                  QDomNode node, const vle::value::Value& val);
+
+    /**
+     * @brief Remove all childs from a QDomNode (keep attributes)
+     */
+    static void removeAllChilds(QDomNode node);
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
@@ -229,9 +269,6 @@ public:
      * Utils Functions QDom
      ******************************************************/
     vleDomVpz* vdo();
-
-    static QList<QDomNode> childNodesWithoutText(QDomNode node,
-						 const QString& nodeName = "");
 
     /**
      * @brief remove children that are QDomText to a node
@@ -541,12 +578,6 @@ public:
      *
      */
     void setObsToAtomicModel(const QString& model_query, const QString& obsName);
-
-    /**
-     * @brief build an empty node corresponding to the value type from Vpz doc
-     */
-    static QDomElement buildEmptyValueFromDoc(QDomDocument& domDoc,
-					     vle::value::Value::type vleType);
 
     /**
      * @brief build an empty node corresponding to the value type from Vpz doc
@@ -932,17 +963,7 @@ public:
      */
     vle::value::Value::type valueType(const QString& condName,
             const QString& portName, int index) const;
-    /**
-     * @brief build a vle value from either tag
-     * <integer>, <string>, <map> etc..
-     * @param vdo corresponding to the vleDomObject
-     * @param node correponding to a vle value
-     * @param buildText, build vle::value::String for QDomText
-     * @note: result is a new allocated vle value.
-     */
-    static vle::value::Value* buildValue(const vleDomObject* vdo,
-					 const QDomNode& valNode,
-					 bool buildText);
+
     /**
      * @brief build a vle value from either tag
      * <integer>, <string>, <map> etc..
@@ -1005,14 +1026,6 @@ public:
      */
     void fillWithClassesFromDoc(std::vector<std::string>& toFill);
 
-    /**
-     * @brief Fill a Node from a value
-     * @note: the main tag should corresponds to the value type ie:
-     * <integer>, <string>, <map> etc..
-     * @note: the map is first cleared
-     */
-    static bool fillWithValue(QDomDocument& domDoc, vleDomObject* vdo,
-			      QDomNode node, const vle::value::Value& val);
 
     /**
      * @brief Fill a Node from a value
@@ -1043,10 +1056,7 @@ public:
      */
     void addIntegerKeyInMap(QDomNode* node, const QString& key,
             int val);
-    /**
-     * @brief Remove all childs from a QDomNode (keep attributes)
-     */
-    static void removeAllChilds(QDomNode node);
+
     /**
      * @brief get <output>  from a tag <views>
      * @note : combine outputsFromViews, outputFromOutput
@@ -1124,8 +1134,8 @@ public:
      * @param the out node
      */
     void configureModel(QDomNode model, QDomNode dynamic,
-			QDomNode observable, QDomNode condition,
-			QDomNode in, QDomNode out);
+            QDomNode observable, QDomNode condition,
+            QDomNode in, QDomNode out);
 
 signals:
     void observablesUpdated();
