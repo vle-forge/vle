@@ -50,6 +50,36 @@ vleDomObject::~vleDomObject()
 {
 }
 
+/**************************************************
+ * Static functions
+ **************************************************/
+
+QString
+vleDomObject::attributeValue(const QDomNode& node,
+        const QString& attrName)
+{
+    if (node.attributes().contains(attrName)) {
+        return node.attributes().namedItem(attrName).nodeValue();
+    }
+    return "";
+}
+
+void
+vleDomObject::setAttributeValue(QDomNode& node, const QString& attrName,
+        const QString& val)
+{
+    if (node.attributes().contains(attrName)) {
+         node.attributes().namedItem(attrName).setNodeValue(val);
+    } else {
+        node.toElement().setAttribute(attrName, val);
+    }
+}
+
+/**************************************************
+ * Member functions
+ **************************************************/
+
+
 QDomNode
 vleDomObject::childWhithNameAttr(QDomNode node,
         const QString& nodeName, const QString& nameValue) const
@@ -59,7 +89,7 @@ vleDomObject::childWhithNameAttr(QDomNode node,
     for (int i=0; i<childs.length();i++) {
         QDomNode ch = childs.at(i);
         if (not ch.isText() and ch.nodeName() == nodeName and
-                attributeValue(ch, "name") == nameValue) {
+                vleDomObject::attributeValue(ch, "name") == nameValue) {
             return ch;
         }
     }
@@ -84,26 +114,7 @@ vleDomObject::obtainChild(QDomNode node, const QString& nodeName, bool addIfNot)
     return res;
 }
 
-QString
-vleDomObject::attributeValue(const QDomNode& node,
-        const QString& attrName) const
-{
-    if (node.attributes().contains(attrName)) {
-        return node.attributes().namedItem(attrName).nodeValue();
-    }
-    return "";
-}
 
-void
-vleDomObject::setAttributeValue(QDomNode& node, const QString& attrName,
-        const QString& val)
-{
-    if (node.attributes().contains(attrName)) {
-         node.attributes().namedItem(attrName).setNodeValue(val);
-    } else {
-        node.toElement().setAttribute(attrName, val);
-    }
-}
 
 QString
 vleDomObject::toQString(const QDomNode& node) const

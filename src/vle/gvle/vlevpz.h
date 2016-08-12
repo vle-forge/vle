@@ -115,6 +115,26 @@ public:
      */
     static void removeAllChilds(QDomNode node);
 
+    /**
+     * @brief get the list of attached cond
+     * @param atom, is expexted to be of the form
+     *    <model name="myname" type="atomic" ...>
+     *    ...
+     *    </model>
+     * @return the list of conditions attached to the atomic model
+     */
+    static QSet<QString> attachedCondsToAtomic(const QDomNode& atom);
+
+    /**
+     * @brief Attach a list of conditions to an atomic model
+     * @param atom, is expexted to be of the form
+     *    <model name="myname" type="atomic" ...>
+     *    ...
+     *    </model>
+     * @param the list of conditions to attach to the atomic model
+     */
+    static void attachCondsToAtomic(QDomNode& atom, const QSet<QString>& conds);
+
     /******************************************************
      * Access to specific nodes in the vpz from Doc
      ******************************************************/
@@ -228,10 +248,16 @@ public:
     QDomNode modelConnectionFromDoc(const QString& model_query,
             const QString& destinationFullPath, const QString& sourcePort,
             const QString& destinationPort);
-
+    /**
+     * @brief get the list of atomic model nodes into the current vpz.
+     * Atomic model are of the form
+     *   <model name="mymod" type="atomic" ...>
+     *   </model>
+     * @return the list of atomic models into the vpz
+     */
+    QList<QDomNode> listOfAtomicFromDoc() const;
 
     QDomNode baseModelFromModelQuery(const QString& model_query);
-
 
     /******************************************************
      * Access to specific nodes in the vpz from internal nodes
@@ -274,9 +300,6 @@ public:
      * @brief remove children that are QDomText to a node
      */
     void removeTextChilds(QDomNode node, bool recursively=true);
-
-
-
 
     QString mergeQueries(const QString& query1, const QString& query2);
     QString subQuery(const QString& query, int begin, int end);
@@ -784,7 +807,55 @@ public:
      * @return true if condName is attached to model_query
      */
     bool isAttachedCond(const QString& model_query,
-			const QString& condName);
+            const QString& condName);
+
+
+
+
+    /**
+     * @brief return the list of conditions that are attached to
+     * a specified atomic model and to at least another atomic model
+     *
+     * @param atom_query or atom, identifies atomic model of the form
+     *   <model name="mymod" type="atomic" ...>
+     *   ...
+     *   </model>
+     *
+     *  @return the list of conditions attached to the selected atomic model
+     *   and to at least one other atomic model
+     */
+    QSet<QString> sharedAttachedConds(const QString& atom_query) const;
+    QSet<QString> sharedAttachedConds(const QDomNode& atom) const;
+
+    /**
+     * @brief return the name of the dynamic of an atomic model
+     * if it is shared with an other atomic model
+     *
+     * @param atom_query or atom, identifies atomic model of the form
+     *   <model name="mymod" type="atomic" ...>
+     *   ...
+     *   </model>
+     *
+     *  @return the string "" if the dynamic of atom if not shared with any other
+     *  atomic dynamic, otherwise the name odf the dynamic
+     */
+    QString sharedDynamic(const QString& atom_query) const;
+    QString sharedDynamic(const QDomNode& atom) const;
+
+    /**
+     * @brief return the name of the observable of an atomic model
+     * if it is shared with an other atomic model
+     *
+     * @param atom_query or atom, identifies atomic model of the form
+     *   <model name="mymod" type="atomic" ...>
+     *   ...
+     *   </model>
+     *
+     *  @return the string "" if the observable of atom if not shared with any
+     *  other atomic model, otherwise the name odf the dynamic
+     */
+    QString sharedObservable(const QString& atom_query) const;
+    QString sharedObservable(const QDomNode& atom) const;
 
 
     /**

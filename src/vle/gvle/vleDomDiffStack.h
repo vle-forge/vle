@@ -60,6 +60,28 @@ public:
     virtual QString getXQuery(QDomNode node) = 0;
     virtual QDomNode getNodeFromXQuery(const QString& query,
             QDomNode d=QDomNode()) = 0;
+
+    /**************************************************
+     * Static functions
+     **************************************************/
+
+    /**
+     * @brief get attribute value of a node which name is attrName
+     */
+    static QString attributeValue(const QDomNode& node,
+            const QString& attrName);
+
+
+    /**
+     * @brief set an attribute value to a node
+     */
+    static void setAttributeValue(QDomNode& node, const QString& attrName,
+            const QString& val);
+
+    /***************************************************
+     * Menber functions :
+     * TODO some functions can be set to static
+     ***************************************************/
     QDomNode childWhithNameAttr(QDomNode node,
             const QString& nodeName, const QString& nameValue) const;
     /**
@@ -68,16 +90,7 @@ public:
      */
     QDomNode obtainChild(QDomNode node, const QString& nodeName,
             bool addIfNot=true);
-    /**
-     * @brief get attribute value of a node which name is attrName
-     */
-    QString attributeValue(const QDomNode& node, const QString& attrName) const;
 
-    /**
-     * @brief set an attribute value to a node
-     */
-    void setAttributeValue(QDomNode& node, const QString& attrName,
-            const QString& val);
     /**
      * @brief get a QString representation of a QDomNode
      */
