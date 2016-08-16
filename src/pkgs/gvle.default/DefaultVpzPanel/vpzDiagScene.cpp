@@ -1047,6 +1047,20 @@ VpzMainModelItem::getSelectedSubModels()
     return res;
 }
 
+QList<QDomNode>
+VpzMainModelItem::getSelectedSubModelsNode()
+{
+    QList<QDomNode> res;
+    QList<QGraphicsItem*>  children = childItems();
+    for (int i =0; i<children.length(); i++) {
+        QGraphicsItem* ch = children.at(i);
+        if (VpzDiagScene::isVpzSubModel(ch) and ch->isSelected()) {
+            res.append(static_cast<VpzSubModelItem*>(ch)->mnode);
+        }
+    }
+    return res;
+}
+
 QList<VpzConnectionLineItem *>
 VpzMainModelItem::getConnLines()
 {
@@ -1589,21 +1603,18 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                     mCoupled->update();
                 } else if(isVpzSubModel(sel)) {
                     VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
-                    if (selMods.contains(it)) {
+                    QList<QDomNode> torm = mCoupled->getSelectedSubModelsNode();
+                    if (torm.count() > 0){
+                        mVpm->rmModelsFromCoupled(torm);
+                        bool oldBlock = this->blockSignals(true);
                         for (int i =0; i< selMods.size(); i++) {
                             it = selMods.at(i);
-                            it->setSelected(false);
-                            mVpm->rmModel(it->mnode);
                             removeItem(it);
                             delete it;
                         }
-                    } else {
-                        it->setSelected(false);
-                        mVpm->rmModel(it->mnode);
-                        removeItem(it);
-                        delete it;
+                        this->blockSignals(oldBlock);
+                        mCoupled->update();
                     }
-                    mCoupled->update();
                 }
             } else if (actCode == VDMA_Add_input_port) {
                 if (isVpzSubModel(sel)) {

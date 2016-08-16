@@ -2496,7 +2496,7 @@ vleVpz::renameModel(QDomNode node, const QString& newName)
 }
 
 void
-vleVpz::rmModel(QDomNode node)
+vleVpz::rmModel(QDomNode node, bool withEmit)
 {
     if (node.nodeName() != "model") {
         qDebug() << ("Internal error in rmModel (wrong main tag)");
@@ -2540,9 +2540,44 @@ vleVpz::rmModel(QDomNode node)
     node.parentNode().removeChild(node);
     removeTextChilds(parent);
     removeTextChilds(parent.parentNode());
-    emit modelsUpdated();
+    if (withEmit) {
+        emit modelsUpdated();
+    }
 }
 
+
+void
+vleVpz::rmModelsFromCoupled(QList<QDomNode> nodes)
+{
+    if (nodes.empty()) {
+        return;
+    }
+    QString query = "";
+    QString queryi = "";
+    bool oldSnapshotAvailibility = true;
+    for (int i =0; i<nodes.size(); i++){
+        QDomNode modi = nodes.at(i);
+        QDomNode parent = modi.parentNode();//either structures, class or
+                                            //submodels
+        queryi = mVdo->getXQuery(parent);
+        if (i == 0) {
+            query = queryi;
+            if (parent.nodeName() == "submodels") {
+                undoStack->snapshot(parent.parentNode());
+            } else {
+                undoStack->snapshot(parent);
+            }
+            oldSnapshotAvailibility = undoStack->enableSnapshot(false);
+        } else {
+            if (query != queryi) {
+                qDebug() << ("Internal error in rmModelsFromCoupled ");
+            }
+        }
+        rmModel(modi);
+    }
+    undoStack->enableSnapshot(oldSnapshotAvailibility);
+    emit modelsUpdated();
+}
 
 bool
 vleVpz::existSubModel(QDomNode node, const QString& modName)

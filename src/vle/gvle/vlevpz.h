@@ -409,11 +409,17 @@ public:
     /**
      * @brief remove a model
      * @param node: QDomNode <model> with xpath = //model
+     * @param withEmit, emit a signal modelsUpdated or not
      * @note: update connections by getting ancestor node
      */
-    void rmModel(QDomNode node);
-
-
+    void rmModel(QDomNode node, bool withEmit=true);
+    /**
+     * @brief remove many models from the same coupled model
+     *   in one snapshot
+     * @param list of nodes: QDomNode <model> with xpath = //model
+     * @note: update connections by getting ancestor nodes
+     */
+    void rmModelsFromCoupled(QList<QDomNode> node);
     /**
      * @brief return true if modName is a submodel of node
      * @param node, which node name is <model>

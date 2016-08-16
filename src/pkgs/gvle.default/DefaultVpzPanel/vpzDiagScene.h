@@ -199,6 +199,7 @@ public:
     VpzSubModelItem* getSubModel(const QString& subMod);
     QList<VpzSubModelItem*> getSubModels();
     QList<VpzSubModelItem*> getSelectedSubModels();
+    QList<QDomNode> getSelectedSubModelsNode();
     QList<VpzConnectionLineItem *> getConnLines();
     void removeNameEditionMode();
     bool isAtomic();
