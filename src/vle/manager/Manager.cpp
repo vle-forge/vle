@@ -48,7 +48,7 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
     {
     }
 
-    ~vle_log_manager_thread()
+    virtual ~vle_log_manager_thread()
     {
         if (fp)
             fclose(fp);

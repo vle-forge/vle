@@ -431,6 +431,7 @@ public:
                            const char *fn,
                            const char *format,
                            va_list args) noexcept = 0;
+        virtual ~LogFunctor(){};
     };
 
     void set_log_function(std::unique_ptr<LogFunctor> fn) noexcept;
