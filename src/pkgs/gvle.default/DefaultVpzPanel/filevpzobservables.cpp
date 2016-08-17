@@ -224,6 +224,9 @@ void FileVpzObservables::onViewTreeMenu(const QPoint pos)
 void
 FileVpzObservables::onItemChanged(QTreeWidgetItem *item, int /*column*/)
 {
+    QObject::disconnect(mVpm, SIGNAL(observablesUpdated()),
+                     this, SLOT(onObservablesUpdated()));
+
     QList<QVariant> qVList = item->data(0, Qt::UserRole).toList();
     QVariant vItemType = qVList.at(0);
     ObsTreeType curItemType = (ObsTreeType)vItemType.toInt();
@@ -250,6 +253,9 @@ FileVpzObservables::onItemChanged(QTreeWidgetItem *item, int /*column*/)
     } default :
         break;
     }
+
+    QObject::connect(mVpm, SIGNAL(observablesUpdated()),
+                     this, SLOT(onObservablesUpdated()));
 }
 
 void
