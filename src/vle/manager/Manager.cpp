@@ -193,7 +193,7 @@ public:
                 if (err.code) {
                     if (not error->code) {
                         error->code = -1;
-                        error->message = _("Manager failure.");
+                        error->message = err.message;
                     }
                 } else {
                     result->add(i, 0, std::move(simresult));
