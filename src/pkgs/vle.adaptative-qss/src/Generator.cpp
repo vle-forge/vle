@@ -16,8 +16,6 @@
 
 #include <vle/devs/Dynamics.hpp>
 #include <vle/value/Map.hpp>
-#include <boost/format.hpp>
-#include <iostream>
 
 namespace vd = vle::devs;
 namespace vv = vle::value;
@@ -38,10 +36,9 @@ public:
             m_val = vv::toDouble(events.get("source_init_level"));
         } else {
             m_val = 1;
-            std::cout
-                << "Warning : Model " << getModelName()
-                << " got no init output level (source_init_level) : assuming 1"
-                << std::endl;
+            Trace(context(), 6, "Warning : Model %s got no init"
+                  " output level (source_init_level) : assuming 1\n",
+                  getModelName().c_str());
         }
 
         if (events.end() != events.find("source_trend")) {
@@ -50,24 +47,23 @@ public:
                 m_quantum = vv::toDouble(events.get("source_quantum"));
             } else {
                 m_quantum = 0.01;
-                std::cout
-                    << "Warning : Model " << getModelName()
-                    << " got no output quantum (source_quantum) : assuming 0.01"
-                    << std::endl;
+                Trace(context(), 6, "Warning : Model %s got no output"
+                      " quantum (source_quantum) : assuming 0.01\n",
+                      getModelName().c_str());
             }
         } else {
             m_trend = 0;
-            std::cout << "Warning : Model " << getModelName()
-                      << " got no output trend (source_trend) : assuming 0"
-                      << std::endl;
+
+            Trace(context(), 6, "%s got no output trend (source_trend)"
+                  " : assuming 0\n", getModelName().c_str());
+
             // no trend => quantum is useless but..
             m_quantum = 0.01;
         }
 
         if (0 == m_quantum) {
-            throw vu::ModellingError(
-                (boost::format("Model %1% has null output quantum. ") %
-                 getModelName()).str());
+            throw vu::ModellingError("Model %s has null output quantum.",
+                                     getModelName().c_str());
         }
 
         m_has_output_port = false;
@@ -77,10 +73,10 @@ public:
             m_output_port_label = (my_list.begin())->first;
             m_has_output_port = true;
         }
+
         if (my_list.size() > 1) {
-            std::cout << "Warning: multiple output ports" << std::endl;
-            std::cout << "Will use only port " << m_output_port_label
-                      << std::endl;
+            Trace(context(), 6, "Warning: multiple output ports."
+                  " Will use only port %s\n", m_output_port_label.c_str());
         }
     }
 

@@ -18,7 +18,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <deque>
-#include <iostream>
+
 namespace vd = vle::devs;
 namespace vv = vle::value;
 namespace vg = vle::vpz;
@@ -34,8 +34,9 @@ public:
         if (events.exist("X_0")) {
             x_0_val = vv::toDouble(events.get("X_0"));
         } else {
-            std::cout << "Warning : Model " << getModelName()
-                      << " got no initial value : assuming 0" << std::endl;
+            Trace(context(), 6, "%s: got no initial value : assuming 0.\n",
+                  getModelName().c_str());
+
             x_0_val = 0;
         }
 
@@ -63,14 +64,14 @@ public:
             m_output_port_label = (my_list.begin())->first;
             m_has_output_port = true;
         }
+
         if (my_list.size() > 1) {
-            std::cout << "Warning: multiple output ports" << std::endl;
-            std::cout << "Will use only port " << m_output_port_label
-                      << std::endl;
+            Trace(context(), 6, "Warning: multiple output ports."
+                  " Will use only port %s.\n", m_output_port_label.c_str());
         }
     }
 
-    virtual ~Integrator() // This is mandatory
+    virtual ~Integrator()
     {
     }
 

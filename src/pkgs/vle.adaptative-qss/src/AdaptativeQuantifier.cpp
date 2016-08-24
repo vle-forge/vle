@@ -18,9 +18,6 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/utils/Exception.hpp>
-
-#include <boost/format.hpp>
-#include <iostream>
 #include <vector>
 #include <deque>
 #include <cmath>
@@ -37,18 +34,16 @@ public:
                          const vd::InitEventList &events)
         : vd::Dynamics(init, events)
     {
-        vg::ConnectionList my_list;
-        my_list = getModel().getOutputPortList();
+        const auto& my_list = getModel().getOutputPortList();
 
-        if (my_list.size() > 0) {
+        if (not my_list.empty()) {
             m_output_port_label = (my_list.begin())->first;
             m_has_output_port = true;
         }
-        if (my_list.size() > 1) {
-            std::cout << "Warning: multiple output ports" << std::endl;
-            std::cout << "Will use only port " << m_output_port_label
-                      << std::endl;
-        }
+
+        if (my_list.size() > 1)
+            Trace(context(), 6, "Warning: multiple output ports."
+                  " Will use only port %s\n", m_output_port_label.c_str());
 
         m_adaptative = true;
 
@@ -70,17 +65,17 @@ public:
         if (events.end() != events.find("quantum")) {
             m_step_size = vv::toDouble(events.get("quantum"));
         } else {
-            std::cout << "Warning : no quantum value provided for Quantifier "
-                      << getModelName() << std::endl;
-            std::cout << "Using default value (0.1) " << std::endl;
+            Trace(context(), 6, "Warning : no quantum value provided for"
+                  " Quantifier %s. Using default value (0.1)\n",
+                  getModelName().c_str());
+
             m_step_size = 0.1;
         }
-        if (0 >= m_step_size) {
-            throw vu::ModellingError(
-                (boost::format("Bad quantum value ( provided value : %1%, "
-                               "should be strictly positive ) ") %
-                 m_step_size).str());
-        }
+
+        if (0 >= m_step_size)
+            throw vu::ModellingError("Bad quantum value (provided value : %f, "
+                                     "should be strictly positive)",
+                                     m_step_size);
 
         if (events.end() != events.find("archive_length")) {
             m_past_length = vv::toInteger(events.get("archive_length"));
@@ -89,10 +84,8 @@ public:
         }
 
         if (2 >= m_past_length) {
-            throw vu::ModellingError(
-                (boost::format("Bad archive length value ( provided value : "
-                               "%1%, should at least 3 ) ") %
-                 m_past_length).str());
+            throw vu::ModellingError("Bad archive length value ( provided value"
+                ": %u, should at least 3)", m_past_length);
         }
     }
 
@@ -113,10 +106,9 @@ public:
         double val, shifting_factor;
         int cnt;
 
-        if (events.size() > 1) {
-            std::cout << "Warning : " << getModelName()
-                      << " got multiple events at date : " << time << std::endl;
-        }
+        if (events.size() > 1)
+            Trace(context(), 6, "Warning: %s got multiple events at date: %f\n",
+                  getModelName().c_str(), time);
 
         auto it = events.begin();
         while (it != events.end()) {
@@ -127,13 +119,12 @@ public:
                 m_state = RESPONSE;
             } else {
                 cnt = 0;
-                if ((val > m_upthreshold) || (val < m_downthreshold)) {
-                    std::cout << getModelName()
-                              << " : treating out of bonds val : " << val
-                              << " (quantizer interval : [ " << m_downthreshold
-                              << " , " << m_upthreshold << " ])"
-                              << " at date : " << time << std::endl;
-                }
+                if ((val > m_upthreshold) || (val < m_downthreshold))
+                    Trace(context(), 6, "%s: treating out of bonds val: %f "
+                          "(quantizer interval : [%f,%f] at date: %f",
+                          getModelName().c_str(), val, m_downthreshold,
+                          m_upthreshold, time);
+
                 while ((val >= m_upthreshold) || (val <= m_downthreshold)) {
                     cnt++;
                     if (val >= m_upthreshold) {
@@ -154,33 +145,31 @@ public:
                         shifting_factor = shift_quanta();
                         if (0 > shifting_factor)
                             throw vu::ModellingError(
-                                (boost::format("Bad shifting value ( value : %1%, "
-                                               "should be strictly positive ) ") %
-                                 shifting_factor).str());
+                                "Bad shifting value (value : %f, "
+                                "should be strictly positive)\n",
+                                 shifting_factor);
                         if (1 < shifting_factor)
                             throw vu::ModellingError(
-                                (boost::format(
-                                    "Bad shifting value ( value : %1%, "
-                                    "should be less than 1 ) ") %
-                                 shifting_factor).str());
+                                "Bad shifting value ( value : %f, "
+                                "should be less than 1)\n",
+                                shifting_factor);;
                         if ((0 != shifting_factor) && (1 != shifting_factor)) {
-                            // update_thresholds(shifting_factor);
                             if (val >= m_upthreshold) {
                                 update_thresholds(shifting_factor, DOWN);
                             } else {
                                 update_thresholds(shifting_factor, UP);
                             }
-                            Trace(context(), 7,
+                            Trace(context(), 6,
                                   "Quantifier %s new quantas while treating new val %f at date %f",
                                   getModelName().c_str(), val, time);
 
-                            Trace(context(), 7,
+                            Trace(context(), 6,
                                   "Quantizer interval:  [%f, %f], amplitude: %f "
                                   "(default amplitude: %f)", m_downthreshold,
                                   m_upthreshold, (m_upthreshold - m_downthreshold),
                                   (2 * m_step_size));
 
-                            Trace(context(), 7,
+                            Trace(context(), 6,
                                   "Quantifier %s shifting : %f",
                                   getModelName().c_str(), shifting_factor);
 
@@ -198,22 +187,15 @@ public:
                     }
                 }
 
-                if (cnt > 1) {
-                    std::cout << "Warning : in " << getModelName()
-                              << " multiple quanta change ! " << std::endl;
-                    std::cout << "at date : " << time << " #" << cnt
-                              << std::endl;
-                }
-                if (0 == cnt) {
-                    std::cout
-                        << "Warning : in " << getModelName()
-                        << " useless ext transition call :  no quanta change ! "
-                        << std::endl;
-                    std::cout << getModelName() << " : input val : " << val
-                              << " (quantizer interval : [ " << m_downthreshold
-                              << " , " << m_upthreshold << " ])"
-                              << " at date : " << time << std::endl;
-                }
+                if (cnt > 1)
+                    Trace(context(), 6, "Warning : in %s multiple quanta change"
+                          " at date : %f %d\n", getModelName().c_str(), time, cnt);
+
+                if (0 == cnt)
+                    Trace(context(), 6, "Warning : in %s useless ext transition"
+                          "call: no quanta change! input val %f (quantizer "
+                          "interval : [%f,%f] at date %f\n", getModelName().c_str(),
+                          val, m_downthreshold, m_upthreshold, time);
             }
             ++it;
         }

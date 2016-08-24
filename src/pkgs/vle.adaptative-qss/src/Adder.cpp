@@ -17,7 +17,6 @@
 #include <vle/value/Map.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <iostream>
 
 namespace vd = vle::devs;
 namespace vv = vle::value;
@@ -39,19 +38,17 @@ public:
             m_output_port_label = (my_list.begin())->first;
             m_has_output_port = true;
         }
-        if (my_list.size() > 1) {
-            std::cout << "Warning: multiple output ports" << std::endl;
-            std::cout << "Will use only port " << m_output_port_label
-                      << std::endl;
-        }
+
+        if (my_list.size() > 1)
+            Trace(context(), 6, "Warning: %s multiple output ports. Will use"
+                  " only port %s\n", getModelName().c_str(),
+                  m_output_port_label.c_str());
 
         connected_input_port_list.resize(0);
 
         my_list = getModel().getInputPortList();
         for (auto &elem : my_list) {
-            if (0 == (elem).second.size()) {
-                // std::cout << (*it).first <<" with no connexion"<<std::endl;
-            } else {
+            if ((elem).second.size()) {
                 connected_input_port_list.push_back((elem).first);
             }
         }
@@ -68,21 +65,20 @@ public:
 
             for (auto &elem : connected_input_port_list) {
                 if (0 == input_coeffs.count(elem)) {
-                    std::cout << "Warning: no weight found for input port "
-                              << elem << " of model " << getModelName()
-                              << std::endl;
-                    std::cout << "Assuming 0 value ! " << std::endl;
+                    Trace(context(), 6, "Warning: no weight found for input"
+                          " port %s of model %s. Assuming 0 value !\n",
+                          elem.c_str(), getModelName().c_str());
+
                     input_coeffs[elem] = 0;
                 }
             }
         } else {
-            std::cout << "Warning : no weights values provided for adder "
-                      << getModelName() << std::endl;
-            std::cout << "Using default value (output is the mean of connected "
-                         "inputs) " << std::endl;
-            for (auto &elem : connected_input_port_list) {
+            Trace(context(), 6, "Warning : no weights values provided for adder %s"
+                  "Using default value (output is the mean of connected inputs)\n",
+                  getModelName().c_str());
+
+            for (auto &elem : connected_input_port_list)
                 input_coeffs[elem] = 1 / connected_input_port_list.size();
-            }
         }
     }
 
@@ -136,14 +132,13 @@ public:
     {
         vd::ExternalEventList::const_iterator it;
         for (it = lst.begin(); it != lst.end(); ++it) {
-            if (1 < (*it).getMap().value().size()) {
-                std::cout << "Warning : getting multiple attibutes on port "
-                          << (*it).getPortName() << std::endl;
-                std::cout << "They are : " << (*it).getMap()
-                          << std::endl;
-                std::cout << "Using only one" << std::endl;
-            }
-            input_values[(*it).getPortName()] = (*it).getMap().getDouble((*it).getMap().begin()->first);
+            if (1 < (*it).getMap().value().size())
+                Trace(context(), 6, "Warning : getting multiple attributes on"
+                      " port %s. Using only one\n",
+                      (*it).getPortName().c_str());
+
+            input_values[(*it).getPortName()] =
+                (*it).getMap().getDouble((*it).getMap().begin()->first);
 
             switch (m_state) {
             case INIT:
@@ -200,10 +195,10 @@ private:
 
     void dump_input_values()
     {
-        std::cout << "Input values :" << std::endl;
-        std::map<std::string, double>::iterator it;
-        for (it = input_values.begin(); it != input_values.end(); it++)
-            std::cout << (*it).first << " => " << (*it).second << std::endl;
+        Trace(context(), 6, "Input values :");
+
+        for (auto elem : input_values)
+            Trace(context(), 6, "%s => %f\n", elem.first.c_str(), elem.second);
     }
 
     double compute_output_val()

@@ -17,7 +17,7 @@
 #include <vle/value/Map.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/vpz/BaseModel.hpp>
-#include <iostream>
+
 namespace vd = vle::devs;
 namespace vv = vle::value;
 namespace vg = vle::vpz;
@@ -27,8 +27,8 @@ class Mult : public vd::Dynamics
 public:
     Mult(const vd::DynamicsInit &init, const vd::InitEventList &events)
         : vd::Dynamics(init, events)
+        , m_weights_label("powers")
     {
-        m_weights_label = "powers";
         vg::ConnectionList my_list;
 
         m_has_output_port = false;
@@ -38,18 +38,17 @@ public:
             m_output_port_label = (my_list.begin())->first;
             m_has_output_port = true;
         }
-        if (my_list.size() > 1) {
-            std::cout << "Warning: multiple output ports" << std::endl;
-            std::cout << "Will use only port " << m_output_port_label
-                      << std::endl;
-        }
+
+        if (my_list.size() > 1)
+            Trace(context(), 3, "Warning: multiple output ports. Will use "
+                  "only port: %s\n", m_output_port_label.c_str());
 
         connected_input_port_list.resize(0);
 
         my_list = getModel().getInputPortList();
         for (auto &elem : my_list) {
-            if (0 == (elem).second.size()) {
-                // std::cout << (*it).first <<" with no connexion"<<std::endl;
+            if (0 == elem.second.size()) {
+                Trace(context(), 3, "%s without connection\n", elem.first.c_str());
             } else {
                 connected_input_port_list.push_back((elem).first);
             }
@@ -67,19 +66,18 @@ public:
 
             for (auto &elem : connected_input_port_list) {
                 if (0 == input_coeffs.count(elem)) {
-                    std::cout << "Warning: no power found for input port "
-                              << elem << " of model " << getModelName()
-                              << std::endl;
-                    std::cout << "Assuming 1 value ! " << std::endl;
+                    Trace(context(), 6, "Warning: no power found for input port %s"
+                          " of model %s\nAssuming 1 value!", elem.c_str(),
+                          getModelName().c_str());
                     input_coeffs[elem] = 1;
                 }
             }
 
         } else {
-            std::cout << "Warning : no powers values provided for multiplier "
-                      << getModelName() << std::endl;
-            std::cout << "Using default value (output is the product of "
-                         "connected inputs) " << std::endl;
+            Trace(context(), 6, "Warning : no powers values provided for multiplier %s.\n"
+                  "Using default value (output is the product of connected inputs)\n",
+                  getModelName().c_str());
+
             for (auto &elem : connected_input_port_list) {
                 input_coeffs[elem] = 1;
             }
@@ -114,7 +112,6 @@ public:
     {
         switch (m_state) {
         case INIT:
-            return vd::infinity;
         case WAIT:
             return vd::infinity;
         case RESPONSE:
@@ -137,11 +134,8 @@ public:
         vd::ExternalEventList::const_iterator it;
         for (it = lst.begin(); it != lst.end(); ++it) {
             if (1 < (*it).getMap().value().size()) {
-                std::cout << "Warning : getting multiple attributes on port "
-                          << (*it).getPortName() << std::endl;
-                std::cout << "They are : " << (*it).getMap()
-                          << std::endl;
-                std::cout << "Using only one" << std::endl;
+                Trace(context(), 3, "Warning : getting multiple attributes on port %s\n",
+                      it->getPortName().c_str());
             }
 
 
@@ -160,10 +154,6 @@ public:
             case RESPONSE:
                 if (compute_output_val() != m_last_output) {
                     m_output_value = compute_output_val();
-                    // std::cout<<"Last outputed val : "<<m_last_output<<" next
-                    // output val : "<< compute_output_val()<<std::endl;
-                    // std::cout<<"delta = "<<m_last_output-
-                    // compute_output_val()<<std::endl;
                     m_state = RESPONSE;
                 } else
                     m_state = WAIT;
@@ -206,19 +196,19 @@ private:
 
     void dump_input_values()
     {
-        std::cout << "Input values :" << std::endl;
-        std::map<std::string, double>::iterator it;
-        for (it = input_values.begin(); it != input_values.end(); it++)
-            std::cout << (*it).first << " => " << (*it).second << std::endl;
+        Trace(context(), 6, "Input values :");
+
+        for (auto& elem : input_values)
+            Trace(context(), 6, "%s => %f\n", elem.first.c_str(), elem.second);
     }
 
     double compute_output_val()
     {
-        double acc;
-        acc = 1;
-        for (auto &elem : connected_input_port_list) {
-            acc *= pow(input_values[elem], input_coeffs[elem]);
-        }
+        double acc = 1;
+
+        for (auto &elem : connected_input_port_list)
+            acc *= std::pow(input_values[elem], input_coeffs[elem]);
+
         return acc;
     }
 };
