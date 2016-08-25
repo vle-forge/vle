@@ -72,6 +72,9 @@ BOOST_AUTO_TEST_CASE(test_rename_model)
     CoupledModel * top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     BOOST_REQUIRE_THROW(vpz::BaseModel::rename(top1, "top2"), utils::DevsGraphError);
     BOOST_REQUIRE_NO_THROW(vpz::BaseModel::rename(top1, "new_top1"));
+
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_findModelFromPath)
@@ -99,6 +102,9 @@ BOOST_AUTO_TEST_CASE(test_findModelFromPath)
         file.project().model().model()->findModelFromPath("top1,a,nomodel");
     found = (top1_a_nomodel != nullptr);
     BOOST_REQUIRE_EQUAL(found, false);
+
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_del_all_connection)
@@ -339,6 +345,9 @@ BOOST_AUTO_TEST_CASE(test_del_port)
                                                      "in2"), false);
     BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "out"),
                         false);
+
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_clone1)
@@ -561,6 +570,9 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
     BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "new_out"),
                         true);
     BOOST_REQUIRE_EQUAL(top1->nbOutputConnection("x", "out", "new_out"), 1);
+
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_bug_rename_port)
@@ -597,6 +609,8 @@ BOOST_AUTO_TEST_CASE(test_bug_rename_port)
 
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
                                                      "in"), false);
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
@@ -633,6 +647,8 @@ BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
 
     top->displace(mSelectedModels, coupled);
     BOOST_REQUIRE_EQUAL(coupled->nbInternalConnection("atom1", "out", "atom2", "in"), 1);
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source)
@@ -700,6 +716,8 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
     g->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
@@ -759,6 +777,9 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
     g->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
+
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
@@ -772,6 +793,9 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
 
     top2->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+
+    delete file.project().model().model();
+    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_name)
@@ -788,4 +812,7 @@ BOOST_AUTO_TEST_CASE(test_name)
 
     BOOST_REQUIRE_EQUAL(a->getCompleteName(), "top,top2,g");
     BOOST_REQUIRE_EQUAL(b->getCompleteName(), "top,top1,x");
+
+    delete file.project().model().model();
+    file.project().model().clear();
 }

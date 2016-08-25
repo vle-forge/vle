@@ -34,6 +34,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/vle.hpp>
@@ -145,6 +146,8 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_lower_than_exp)
     BOOST_CHECK_EQUAL(expgen3.min(), 5000);
     BOOST_CHECK_EQUAL(expgen3.max(), 5100);
     BOOST_CHECK_EQUAL(expgen3.size(), 10000);
+
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(experimentgenerator_greater_than_exp)
@@ -200,6 +203,8 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_greater_than_exp)
     manager::ExperimentGenerator expgen5(vpz, 4, 5);
     BOOST_CHECK_EQUAL(expgen5.min(), expgen5.max());
     BOOST_CHECK_EQUAL(expgen5.size(), 3);
+
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(experimentgenerator_max_1_max_1)
@@ -234,4 +239,6 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_max_1_max_1)
     BOOST_CHECK_EQUAL(expgen1.min(), 0);
     BOOST_CHECK_EQUAL(expgen1.max(), 7);
     BOOST_CHECK_EQUAL(expgen1.size(), 7);
+
+    delete vpz.project().model().model();
 }

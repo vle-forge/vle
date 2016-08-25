@@ -93,6 +93,9 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
     BOOST_REQUIRE(mdl.model()->existInputPort("in2") != 0);
     BOOST_REQUIRE(mdl.model()->existOutputPort("out1") != 0);
     BOOST_REQUIRE(mdl.model()->existOutputPort("out2") != 0);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
@@ -165,6 +168,9 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     BOOST_REQUIRE(cpl->existInputConnection("i", "atom1", "in"));
     BOOST_REQUIRE(cpl->existOutputConnection("atom2", "out", "o"));
     BOOST_REQUIRE(cpl->existInternalConnection("atom1", "out", "atom2", "in"));
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(dynamic_vpz)
@@ -194,6 +200,9 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
         reinterpret_cast < vpz::AtomicModel* >(mdl.model()));
 
     BOOST_REQUIRE(atom);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(experiment_vpz)
@@ -304,26 +313,29 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     }
 
     {
-	const std::string oldcond("cond1");
-	const std::string newcond("new_cond1");
-	vpz::Conditions cnds = (project.experiment().conditions());
+        const std::string oldcond("cond1");
+        const std::string newcond("new_cond1");
+        vpz::Conditions cnds = (project.experiment().conditions());
         BOOST_REQUIRE_NO_THROW(cnds.rename(oldcond, newcond));
-	{
-	    vpz::Condition cnd1(cnds.get(newcond));
-	    const std::string oldport("init1");
-	    const std::string newport("new_init1");
-	    BOOST_REQUIRE_NO_THROW(cnd1.rename(oldport, newport));
-	    {
-		const value::Set& set(cnd1.getSetValues(newport));
-		const value::Double& real(set.get(0)->toDouble());
-		BOOST_REQUIRE_EQUAL(real.value(), 123.);
+        {
+            vpz::Condition cnd1(cnds.get(newcond));
+            const std::string oldport("init1");
+            const std::string newport("new_init1");
+            BOOST_REQUIRE_NO_THROW(cnd1.rename(oldport, newport));
+            {
+                const value::Set& set(cnd1.getSetValues(newport));
+                const value::Double& real(set.get(0)->toDouble());
+                BOOST_REQUIRE_EQUAL(real.value(), 123.);
                 const value::Integer& integer(set.get(1)->toInteger());
-		BOOST_REQUIRE_EQUAL(integer.value(), 1);
-	    }
+                BOOST_REQUIRE_EQUAL(integer.value(), 1);
+            }
 
-	}
+        }
 
     }
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
@@ -434,16 +446,15 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     }
 
     {
-	vpz::Views views(experiment.views());
-	BOOST_REQUIRE_NO_THROW(views.renameView(std::string("x"), std::string("y")));
-	const vpz::View& view(views.viewlist().begin()->second);
-	BOOST_REQUIRE_EQUAL(view.name(), "y");
-	BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
-	BOOST_REQUIRE_EQUAL(view.timestep(), .05);
-	BOOST_REQUIRE_EQUAL(view.output(), "y");
+        vpz::Views views(experiment.views());
+        BOOST_REQUIRE_NO_THROW(views.renameView(std::string("x"), std::string("y")));
+        const vpz::View& view(views.viewlist().begin()->second);
+        BOOST_REQUIRE_EQUAL(view.name(), "y");
+        BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
+        BOOST_REQUIRE_EQUAL(view.timestep(), .05);
+        BOOST_REQUIRE_EQUAL(view.output(), "y");
     }
-}
 
-BOOST_AUTO_TEST_CASE(translator_vpz)
-{
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
 }

@@ -50,7 +50,6 @@ void Model::write(std::ostream& out) const
 
 void Model::clear()
 {
-    // m_atomicmodels.clear();
     m_graph = nullptr;
 }
 

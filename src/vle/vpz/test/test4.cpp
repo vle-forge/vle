@@ -633,7 +633,7 @@ BOOST_AUTO_TEST_CASE(test_remove_dyns)
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 
-    vpz::Project proj(vpz.project());
+    vpz::Project& proj(vpz.project());
     check_remove_dyns_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
@@ -642,6 +642,7 @@ BOOST_AUTO_TEST_CASE(test_remove_dyns)
     vpz.clear();
 
     vpz.parseMemory(str);
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_dyns)
@@ -653,7 +654,7 @@ BOOST_AUTO_TEST_CASE(test_rename_dyns)
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 
-    vpz::Project proj(vpz.project());
+    vpz::Project& proj(vpz.project());
     check_rename_dyns_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
@@ -661,6 +662,7 @@ BOOST_AUTO_TEST_CASE(test_rename_dyns)
     vpz.clear();
 
     vpz.parseMemory(str);
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_remove_conds)
@@ -672,7 +674,7 @@ BOOST_AUTO_TEST_CASE(test_remove_conds)
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 
-    vpz::Project proj(vpz.project());
+    vpz::Project& proj(vpz.project());
     check_remove_conds_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
@@ -680,6 +682,7 @@ BOOST_AUTO_TEST_CASE(test_remove_conds)
     vpz.clear();
 
     vpz.parseMemory(str);
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_conds)
@@ -691,7 +694,7 @@ BOOST_AUTO_TEST_CASE(test_rename_conds)
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 
-    vpz::Project proj(vpz.project());
+    vpz::Project& proj(vpz.project());
     check_rename_conds_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
@@ -699,6 +702,7 @@ BOOST_AUTO_TEST_CASE(test_rename_conds)
     vpz.clear();
 
     vpz.parseMemory(str);
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_views)
@@ -725,7 +729,7 @@ BOOST_AUTO_TEST_CASE(test_remove_observables)
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 
-    vpz::Project proj(vpz.project());
+    vpz::Project& proj(vpz.project());
     check_remove_obs_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
@@ -733,6 +737,7 @@ BOOST_AUTO_TEST_CASE(test_remove_observables)
     vpz.clear();
 
     vpz.parseMemory(str);
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_observables)
@@ -744,7 +749,7 @@ BOOST_AUTO_TEST_CASE(test_rename_observables)
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 
-    vpz::Project proj(vpz.project());
+    vpz::Project& proj(vpz.project());
     check_rename_observables_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
@@ -752,6 +757,7 @@ BOOST_AUTO_TEST_CASE(test_rename_observables)
     vpz.clear();
 
     vpz.parseMemory(str);
+    delete vpz.project().model().model();
 }
 
 
@@ -809,6 +815,7 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
 
     vpz.parseMemory(str);
     check_unittest_vpz(vpz);
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_read_write_read2)
