@@ -103,7 +103,7 @@ FileVpzSim::rightWidget()
 }
 
 void
-FileVpzSim::onPluginChanged(const QString& text)
+FileVpzSim::onPluginChanged(const QString& /*text*/)
 {
     delete mPluginSimPanel;
     mPluginSimPanel = mGvlePlugins->newInstanceSimPanelPlugin("Default");

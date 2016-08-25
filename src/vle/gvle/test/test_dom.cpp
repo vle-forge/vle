@@ -150,4 +150,5 @@ BOOST_AUTO_TEST_CASE(test_build_value)
     BOOST_REQUIRE_CLOSE(t->toTuple().at(0), 1.5, 1e-5);
     BOOST_REQUIRE_CLOSE(t->toTuple().at(1), 2, 1e-5);
     BOOST_REQUIRE_CLOSE(t->toTuple().at(2), 4.6, 1e-5);
+    delete t;
 }
