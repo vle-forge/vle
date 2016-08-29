@@ -1731,10 +1731,13 @@ VpzDiagScene::populateConfigureMenu(QMenu* menu)
                         QXmlSimpleReader reader;
                         dom.setContent(&source, &reader);
                         QDomElement docElem = dom.documentElement();
-                        QDomNode srcPluginNode = dom.elementsByTagName("srcPlugin").item(0);
-                        QString className = srcPluginNode.attributes().namedItem("class").nodeValue();
-                        QString packName = srcPluginNode.attributes().namedItem("namespace").nodeValue();
-                        action = menu->addAction(packName + "::" + className);
+                        QDomNode srcPluginNode =
+                                dom.elementsByTagName("srcPlugin").item(0);
+                        QString className = srcPluginNode.attributes().
+                                namedItem("class").nodeValue();
+                        QString packName = srcPluginNode.attributes().
+                                namedItem("package").nodeValue();
+                        action = menu->addAction(packName + "/" + className);
                         setActionType(action, VDMA_Configure_model);
                         QVariantList dataList = action->data().toList();
                         dataList << metaDataFileName;
