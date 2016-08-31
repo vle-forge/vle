@@ -505,7 +505,8 @@ private:
         } else {
             for (auto it = result->begin(), et = result->end(); it != et; ++it) {
                 if (it->second && it->second->isMatrix()) {
-                    os << vle::value::toMatrixValue(it->second);
+                    os << "view:" << it->first << "\n" <<
+                            vle::value::toMatrixValue(it->second);
                 }
             }
         }
@@ -567,7 +568,7 @@ public:
                 m_columns.update(i, current);
             }
 
-            result << m_columns;
+            result << m_columns << "\n";
             simulate(result);
             result << '\n';
         }
