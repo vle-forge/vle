@@ -254,11 +254,10 @@ public:
     struct value_stack {
         value_stack();
         ~value_stack();
-        vle::value::Value* startValue;
-        typedef  std::vector<vle::value::Value*> cont;
+        std::unique_ptr<value::Value> startValue;
+        typedef  std::vector<std::unique_ptr<value::Value>> cont;
         cont stack;
-        void delStartValue();
-        void setStartValue(vle::value::Value* val);
+        void setStartValue(std::unique_ptr<vle::value::Value> val);
         /*
          * @brief push a vle::value::Map key
          */
@@ -272,7 +271,7 @@ public:
          */
         void push(int row, int col);
 
-        vle::value::Value* editingValue();
+        value::Value& editingValue();
         std::vector<std::string> toString();
     };
 
@@ -294,8 +293,8 @@ public:
     ~VleValueWidget();
     void showCurrentValueDetail();
     void setId(const QString& id);
-    void setValue(vle::value::Value* val);
-    vle::value::Value* buildDefaultValue(eValueWidgetMenu type);
+    void setValue(std::unique_ptr<vle::value::Value> val);
+    std::unique_ptr<value::Value> buildDefaultValue(eValueWidgetMenu type);
 
 signals:
     void valUpdated(const vle::value::Value& newVal);
@@ -311,18 +310,18 @@ public slots:
     void onStackButtonClicked(const QString& id, bool b);
 
 private:
-    void setBoolWidget(const QString& id, const vle::value::Value* val,
+    void setBoolWidget(const QString& id, const vle::value::Value& val,
             int r, int c);
-    void setIntWidget(const QString& id, const vle::value::Value* val,
+    void setIntWidget(const QString& id, const vle::value::Value& val,
             int r, int c);
-    void setDoubleWidget(const QString& id, const vle::value::Value* val,
+    void setDoubleWidget(const QString& id, const vle::value::Value& val,
             int r, int c);
     void setDoubleWidget(const QString& id, double val, int r, int c);
-    void setStringWidget(const QString& id, const vle::value::Value* val,
+    void setStringWidget(const QString& id, const vle::value::Value& val,
             int r, int c);
     void setStringWidget(const QString& id, const QString&  val,
             int r, int c);
-    void setComplexWidget(const QString& id, const vle::value::Value* val,
+    void setComplexWidget(const QString& id, const vle::value::Value& val,
             int r, int c);
 
 };

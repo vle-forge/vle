@@ -58,7 +58,7 @@ private:
     Ui::StoragePluginGvle* ui;
     vle::gvle::vleVpm*    mvleVpm;
     QString                mViewName;
-    vle::value::Map*       outputNodeConfig;
+    std::unique_ptr<vle::value::Map>       outputNodeConfig;
 };
 
 #endif

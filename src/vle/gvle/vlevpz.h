@@ -60,8 +60,9 @@ class vleDomVpz : public vleDomObject
 public:
     vleDomVpz(QDomDocument* doc);
     ~vleDomVpz();
-    QString  getXQuery(QDomNode node);
-    QDomNode getNodeFromXQuery(const QString& query, QDomNode d=QDomNode());
+    QString  getXQuery(QDomNode node) override;
+    QDomNode getNodeFromXQuery(const QString& query,
+            QDomNode d=QDomNode()) override;
 };
 
 
@@ -78,10 +79,8 @@ public:
 
     /******************************************************
      * Static functions
+     * NOTE: snapshot is not performed
      ******************************************************/
-
-    static QList<QDomNode> childNodesWithoutText(QDomNode node,
-                         const QString& nodeName = "");
 
     /**
      * @brief build an empty node corresponding to the value type from Vpz doc
@@ -96,9 +95,9 @@ public:
      * @param node correponding to a vle value
      * @param buildText, build vle::value::String for QDomText
      * @note: result is a new allocated vle value.
+     *
      */
-    static vle::value::Value* buildValue(const vleDomObject* vdo,
-                     const QDomNode& valNode,
+    static std::unique_ptr<value::Value> buildValue(const QDomNode& valNode,
                      bool buildText);
 
     /**
@@ -106,14 +105,10 @@ public:
      * @note: the main tag should corresponds to the value type ie:
      * <integer>, <string>, <map> etc..
      * @note: the map is first cleared
+     *
      */
-    static bool fillWithValue(QDomDocument& domDoc, vleDomObject* vdo,
-                  QDomNode node, const vle::value::Value& val);
-
-    /**
-     * @brief Remove all childs from a QDomNode (keep attributes)
-     */
-    static void removeAllChilds(QDomNode node);
+    static bool fillWithValue(QDomDocument& domDoc, QDomNode node,
+            const vle::value::Value& val);
 
     /**
      * @brief get the list of attached cond
@@ -134,6 +129,24 @@ public:
      * @param the list of conditions to attach to the atomic model
      */
     static void attachCondsToAtomic(QDomNode& atom, const QSet<QString>& conds);
+
+    /**
+     * @brief Set the port values to a cond, without removing others
+     * @param domDoc, a Dom document to create new QDomNode
+     * @param atom, is expected to be of the form
+     *    <condition name="somecond">
+     *      <port name="someport">
+     *        ...
+     *      </port>
+     *      ...
+     *    </condition>
+     * @param val, a map where keys are port names
+     * @note the ports are cleared (unless it is not into the map)
+     * if present and only the first value can be filled handled
+     */
+
+    static bool fillConditionWithMap(QDomDocument& domDoc,
+                  QDomNode atom, const vle::value::Map& val);
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
@@ -744,6 +757,17 @@ public:
     void addValuePortCondToDoc(const QString& condName, const QString& portName,
             const vle::value::Value& val);
     /**
+     * @brief Set the port values to a cond, without removing others
+     * @param condName, name of the condition
+     * @param val, a map where keys are port names
+     *
+     * @note the ports are cleared (unless it is not into the map)
+     * if present and only the first value can be filled handled
+     */
+
+    bool fillConditionWithMapToDoc(const QString& condName,
+            const vle::value::Map& val);
+    /**
      * @brief rm a value from a tag <port> tag from a condition into a Vpz doc
      * 'index' is the index of value in port
      */
@@ -910,7 +934,7 @@ public:
      *
      */
     void setDynToAtomicModel(const QString& model_query, const QString& dyn,
-			     bool undo=true);
+            bool undo=true);
 
     /**
      * @brief returns the dymaic name or an empty string
@@ -959,7 +983,8 @@ public:
      * @param outputName, the name of the output (=viewName)
      * @return the configuration map if present or 0
      */
-    vle::value::Map* buildOutputConfigMap(const QString& outputName);
+    std::unique_ptr<value::Map> buildOutputConfigMap(const QString& outputName);
+
     /**
      * @brief fills the configuration of an output
      * (map under <output>)
@@ -1042,30 +1067,14 @@ public:
             const QString& portName, int index) const;
 
     /**
-     * @brief build a vle value from either tag
-     * <integer>, <string>, <map> etc..
-     * @param node correponding to a vle value
-     * @param buildText, build vle::value::String for QDomText
-     * @note: result is a new allocated vle value.
-     */
-    vle::value::Value* buildValue(const QDomNode& valNode,
-            bool buildText) const;
-    /**
      * @brief build a vle value at a given index from a port
      * @param condName, the condition name: tag <condition>
      * @param portName, the port name: tag <port>
      * @param valIndex, index of the value to build from
      * the set of values attached to the port
      */
-    vle::value::Value* buildValueFromDoc(const QString& condName,
-            const QString& portName, int valIndex) const;
-    /**
-     * @brief build a vle value at a given index from a port
-     * @param portNode, the node containing the port values: tag <port>
-     * @param valIndex, index of the value to build from
-     * the set of values attached to the port
-     */
-    vle::value::Value* buildValue(const QDomNode& portNode, int valIndex) const;
+    std::unique_ptr<vle::value::Value> buildValueFromDoc(
+            const QString& condName, const QString& portName, int valIndex) const;
 
     unsigned int nbValuesInPortFromDoc(const QString& condName,
             const QString& portName);
@@ -1080,7 +1089,9 @@ public:
      * @note: values is first cleared
      */
     bool fillWithMultipleValueFromDoc(const QString& condName,
-         const QString& portName, std::vector<vle::value::Value*>& values) const;
+         const QString& portName,
+         std::vector<std::unique_ptr<value::Value>>& values) const;
+
     /**
      * @brief Fill a vector of vle values with the multipl values contained by
      * a condition port
@@ -1088,8 +1099,9 @@ public:
      * @param values, the vector of values to fill
      * @note: values is first cleared
      */
-    bool fillWithMultipleValue(QDomNode port,
-            std::vector<vle::value::Value*>& values) const;
+    bool fillWithMultipleValue(QDomNode portNode,
+            std::vector<std::unique_ptr<value::Value>>& values) const;
+
     /**
      * @brief Fill a value at index of <port> portName of <condtion> condName
      * @note: the map is first cleared
@@ -1109,6 +1121,8 @@ public:
      * @note: the main tag should corresponds to the value type ie:
      * <integer>, <string>, <map> etc..
      * @note: the map is first cleared
+     *
+     * TODO no snapshot is performed
      */
     bool fillWithValue(QDomNode node, const vle::value::Value& val);
 

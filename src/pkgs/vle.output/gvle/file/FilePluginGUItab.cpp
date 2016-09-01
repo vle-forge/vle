@@ -36,7 +36,7 @@
  */
 FilePluginGUItab::FilePluginGUItab(QWidget *parent) :
     QWidget(parent), ui(new Ui::FilePluginGvle), mvleVpm(0), mViewName(""),
-    outputNodeConfig(0)
+    outputNodeConfig(nullptr)
 {
     ui->setupUi(this);
 
@@ -54,7 +54,6 @@ FilePluginGUItab::FilePluginGUItab(QWidget *parent) :
 
 FilePluginGUItab::~FilePluginGUItab()
 {
-    delete outputNodeConfig;
     delete ui;
 }
 
@@ -65,7 +64,7 @@ FilePluginGUItab::init(vle::gvle::vleVpm* vpm, const QString& viewName)
     mvleVpm = vpm;
     mViewName = viewName;
 
-    outputNodeConfig = mvleVpm->buildOutputConfigMap(mViewName);
+    outputNodeConfig = std::move(mvleVpm->buildOutputConfigMap(mViewName));
     if (not wellFormed()) {
         buildDefaultConfig();
         mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
@@ -211,7 +210,7 @@ FilePluginGUItab::buildDefaultConfig()
         qDebug() << " Internal Error FilePluginGUItab::buildDefaultConfig() ";
         return ;
     }
-    outputNodeConfig->clear();
+    outputNodeConfig.reset(new vle::value::Map());
     outputNodeConfig->addBoolean("flush-by-bag",false);
     outputNodeConfig->addBoolean("julian-day",false);
     outputNodeConfig->addString("locale","C");

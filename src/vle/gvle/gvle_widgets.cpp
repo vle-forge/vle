@@ -553,60 +553,46 @@ VleValueWidget::getValueDisplay(const vle::value::Value& v,
 
 
 VleValueWidget::value_stack::value_stack() :
-        startValue(0), stack()
+        startValue(nullptr), stack()
 {
 
 }
 VleValueWidget::value_stack::~value_stack()
 {
-    delete startValue;
-    cont::iterator itb = stack.begin();
-    cont::iterator ite = stack.end();
-    for (; itb != ite; itb++) {
-        delete (*itb);
-    }
+    setStartValue(std::unique_ptr<value::Value>(nullptr));
 }
 
 void
-VleValueWidget::value_stack::delStartValue()
+VleValueWidget::value_stack::setStartValue(std::unique_ptr<value::Value> val)
 {
-    delete startValue;
-    startValue = 0;
+    startValue = std::move(val);
     stack.clear();
-}
-
-void
-VleValueWidget::value_stack::setStartValue(vle::value::Value* val)
-{
-    delStartValue();
-    startValue = val;
-
 }
 
 void
 VleValueWidget::value_stack::push(const std::string& key)
 {
-    stack.push_back(new vle::value::String(key));
+    stack.push_back(value::String::create(key));
 }
 void
 VleValueWidget::value_stack::push(int index)
 {
-    stack.push_back(new vle::value::Integer(index));
+    stack.push_back(value::Integer::create(index));
 }
 
 void
 VleValueWidget::value_stack::push(int row, int col)
 {
-    vle::value::Tuple* val = new vle::value::Tuple(0);
+    std::unique_ptr<vle::value::Tuple> val(new vle::value::Tuple(0));
     val->add((double) row);
     val->add((double) col);
-    stack.push_back(val);
+    stack.push_back(std::move(val));
 }
 
-vle::value::Value*
+value::Value&
 VleValueWidget::value_stack::editingValue()
 {
-    vle::value::Value* res = startValue;
+    value::Value* res = startValue.get();
     cont::const_iterator itb = stack.begin();
     cont::const_iterator ite = stack.end();
     for (; itb != ite; itb++) {
@@ -619,7 +605,8 @@ VleValueWidget::value_stack::editingValue()
             break;
         } case vle::value::Value::TUPLE: {//for id a Matrix elem
             const vle::value::Tuple& tuple = (*itb)->toTuple();
-            res = res->toMatrix().get((int) tuple.at(1), (int) tuple.at(0)).get();
+            res = res->toMatrix().get((int) tuple.at(1),
+                    (int) tuple.at(0)).get();
             //WARNING inversed above
             break;
         } default: {
@@ -627,7 +614,7 @@ VleValueWidget::value_stack::editingValue()
             break;
         }}
     }
-    return res;
+    return *res;
 }
 
 std::vector<std::string>
@@ -758,8 +745,8 @@ VleValueWidget::showCurrentValueDetail()
         }
     }
 
-    const vle::value::Value* editingValue = mValueStack.editingValue();
-    vle::value::Value::type editType = editingValue->getType();
+    const value::Value& editingValue = mValueStack.editingValue();
+    value::Value::type editType = editingValue.getType();
     switch(editType) {
     case vle::value::Value::BOOLEAN: {
         table->clear();
@@ -787,36 +774,36 @@ VleValueWidget::showCurrentValueDetail()
         break;
     } case vle::value::Value::SET: {
         table->clear();
-        table->setRowCount(editingValue->toSet().size());
+        table->setRowCount(editingValue.toSet().size());
         table->setColumnCount(1);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("set values"));
-        vle::value::Set::const_iterator itb = editingValue->toSet().begin();
-        vle::value::Set::const_iterator ite = editingValue->toSet().end();
+        vle::value::Set::const_iterator itb = editingValue.toSet().begin();
+        vle::value::Set::const_iterator ite = editingValue.toSet().end();
         int nbEl = 0;
         for (; itb !=ite; itb++) {
             QString id = QString("%1").arg(nbEl);
             switch ((*itb)->getType()) {
             case vle::value::Value::BOOLEAN: {
-                setBoolWidget(id, (*itb).get(), nbEl, 0);
+                setBoolWidget(id, *(*itb), nbEl, 0);
                 break;
             } case vle::value::Value::INTEGER: {
-                setIntWidget(id, (*itb).get(), nbEl, 0);
+                setIntWidget(id, *(*itb), nbEl, 0);
                 break;
             } case vle::value::Value::DOUBLE: {
-                setDoubleWidget(id, (*itb).get(), nbEl, 0);
+                setDoubleWidget(id, *(*itb), nbEl, 0);
                 break;
             } case vle::value::Value::STRING: {
-                setStringWidget(id, (*itb).get(), nbEl, 0);
+                setStringWidget(id, *(*itb), nbEl, 0);
                 break;
             } default: {
-                setComplexWidget(id, (*itb).get(), nbEl, 0);
+                setComplexWidget(id, *(*itb), nbEl, 0);
                 break;
             }}
             nbEl++;
         }
         break;
     } case vle::value::Value::MAP: {
-        const vle::value::Map&  map = editingValue->toMap();
+        const vle::value::Map&  map = editingValue.toMap();
         table->clear();
         table->setRowCount(map.size());
         table->setColumnCount(2);
@@ -835,19 +822,19 @@ VleValueWidget::showCurrentValueDetail()
             setStringWidget(id, keyValue, nbEl, 0);
             switch (map[k]->getType()) {
             case vle::value::Value::BOOLEAN: {
-                setBoolWidget(keyValue, map[k].get(), nbEl, 1);
+                setBoolWidget(keyValue, *map[k], nbEl, 1);
                 break;
             } case vle::value::Value::INTEGER: {
-                setIntWidget(keyValue, map[k].get(), nbEl, 1);
+                setIntWidget(keyValue, *map[k], nbEl, 1);
                 break;
             } case vle::value::Value::DOUBLE: {
-                setDoubleWidget(keyValue, map[k].get(), nbEl, 1);
+                setDoubleWidget(keyValue, *map[k], nbEl, 1);
                 break;
             } case vle::value::Value::STRING: {
-                setStringWidget(keyValue, map[k].get(), nbEl, 1);
+                setStringWidget(keyValue, *map[k], nbEl, 1);
                 break;
             } default: {
-                setComplexWidget(keyValue, map[k].get(), nbEl, 1);
+                setComplexWidget(keyValue, *map[k], nbEl, 1);
                 break;
             }}
             nbEl++;
@@ -855,16 +842,16 @@ VleValueWidget::showCurrentValueDetail()
         break;
     } case vle::value::Value::TUPLE: {
         table->clear();
-        table->setRowCount(editingValue->toTuple().size());
+        table->setRowCount(editingValue.toTuple().size());
         table->setColumnCount(1);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("tuple values"));
-        const vle::value::Tuple& tuple = editingValue->toTuple();
+        const vle::value::Tuple& tuple = editingValue.toTuple();
         for (unsigned int nbEl=0; nbEl < tuple.size(); nbEl++) {
             setDoubleWidget(QString("%2").arg(nbEl), tuple.at(nbEl), nbEl, 0);
         }
         break;
     } case vle::value::Value::TABLE: {
-        const vle::value::Table& tableVal = editingValue->toTable();
+        const vle::value::Table& tableVal = editingValue.toTable();
         table->clear();
         table->setRowCount(tableVal.height());
         table->setColumnCount(tableVal.width());
@@ -876,7 +863,7 @@ VleValueWidget::showCurrentValueDetail()
         }
         break;
     } case vle::value::Value::MATRIX: {
-        const vle::value::Matrix& matrixVal = editingValue->toMatrix();
+        const vle::value::Matrix& matrixVal = editingValue.toMatrix();
         table->clear();
         table->setRowCount(matrixVal.rows());
         table->setColumnCount(matrixVal.columns());
@@ -886,19 +873,19 @@ VleValueWidget::showCurrentValueDetail()
                 const auto& valij = matrixVal.get(j,i);
                 switch(valij->getType()) {
                 case vle::value::Value::BOOLEAN: {
-                    setBoolWidget(id, valij.get(), i, j);
+                    setBoolWidget(id, *valij, i, j);
                     break;
                 } case vle::value::Value::INTEGER: {
-                    setIntWidget(id, valij.get(), i, j);
+                    setIntWidget(id, *valij, i, j);
                     break;
                 } case vle::value::Value::DOUBLE: {
-                    setDoubleWidget(id, valij.get(), i, j);
+                    setDoubleWidget(id, *valij, i, j);
                     break;
                 } case vle::value::Value::STRING: {
-                    setStringWidget(id, valij.get(), i, j);
+                    setStringWidget(id, *valij, i, j);
                     break;
                 } default : {
-                    setComplexWidget(id, valij.get(), i, j);
+                    setComplexWidget(id, *valij, i, j);
                     break;
                 }}
             }
@@ -909,20 +896,20 @@ VleValueWidget::showCurrentValueDetail()
     }}
 
     int nbRows = (editType ==  vle::value::Value::TABLE) ?
-                        editingValue->toTable().width() :
+                        editingValue.toTable().width() :
                  (editType ==  vle::value::Value::MATRIX) ?
-                        editingValue->toMatrix().rows() :
+                        editingValue.toMatrix().rows() :
                  (editType ==  vle::value::Value::SET) ?
-                        editingValue->toSet().size() :
+                        editingValue.toSet().size() :
                  (editType ==  vle::value::Value::MAP) ?
-                        editingValue->toMap().size() :
+                        editingValue.toMap().size() :
                  (editType ==  vle::value::Value::TUPLE) ?
-                        editingValue->toTuple().size() :
+                        editingValue.toTuple().size() :
                  0;
     int nbCols = (editType ==  vle::value::Value::TABLE) ?
-                        editingValue->toTable().height() :
+                        editingValue.toTable().height() :
                  (editType ==  vle::value::Value::MATRIX) ?
-                        editingValue->toMatrix().columns() :
+                        editingValue.toMatrix().columns() :
                  0;
     resize_row->setValue(nbRows);
     resize_col->setValue(nbCols);
@@ -951,56 +938,56 @@ VleValueWidget::setId(const QString& id)
 }
 
 void
-VleValueWidget::setValue(vle::value::Value* val)
+VleValueWidget::setValue(std::unique_ptr<vle::value::Value> val)
 {
-    mValueStack.setStartValue(val);
+    mValueStack.setStartValue(std::move(val));
     showCurrentValueDetail();
 }
 
 
 
-vle::value::Value*
+std::unique_ptr<value::Value>
 VleValueWidget::buildDefaultValue(eValueWidgetMenu type)
 {
     switch(type) {
     case EMenuValueAddBoolean:
     case EMenuValueSetBoolean:{
-        return new vle::value::Boolean();
+        return value::Boolean::create();
         break;
     } case EMenuValueAddInteger:
     case EMenuValueSetInteger:{
-        return new vle::value::Integer();
+        return value::Integer::create();
         break;
     } case EMenuValueAddDouble:
     case EMenuValueSetDouble:{
-        return new vle::value::Double();
+        return value::Double::create();
         break;
     } case EMenuValueAddString:
     case EMenuValueSetString:{
-        return new vle::value::String();
+        return value::String::create();
         break;
     } case EMenuValueAddSet:
     case EMenuValueSetSet:{
-        return new vle::value::Set();
+        return value::Set::create();
         break;
     } case EMenuValueAddMap:
     case EMenuValueSetMap:{
-        return new vle::value::Map();
+        return value::Map::create();
         break;
     } case EMenuValueAddTuple:
     case EMenuValueSetTuple:{
-        return new vle::value::Tuple();
+        return value::Tuple::create();
         break;
     } case EMenuValueAddTable:
     case EMenuValueSetTable:{
-        return new vle::value::Table();
+        return value::Table::create();
         break;
     } case EMenuValueAddMatrix:
     case EMenuValueSetMatrix:{
-        return new vle::value::Matrix();
+        return value::Matrix::create();
         break;
     } default: {
-        return 0;
+        return std::unique_ptr<value::Value>();
     }}
 }
 
@@ -1009,8 +996,8 @@ VleValueWidget::buildDefaultValue(eValueWidgetMenu type)
 void
 VleValueWidget::setDoubleClicked(int row, int col)
 {
-    vle::value::Value* edit = mValueStack.editingValue();
-    switch(edit->getType()) {
+    value::Value& edit = mValueStack.editingValue();
+    switch(edit.getType()) {
     case vle::value::Value::BOOLEAN:
     case vle::value::Value::INTEGER:
     case vle::value::Value::DOUBLE:
@@ -1019,7 +1006,7 @@ VleValueWidget::setDoubleClicked(int row, int col)
     case vle::value::Value::TABLE: {
         break ;
     } case vle::value::Value::SET: {
-        const auto& nextEdit = edit->toSet().get(row);
+        const auto& nextEdit = edit.toSet().get(row);
         switch(nextEdit->getType()) {
         case vle::value::Value::BOOLEAN:
         case vle::value::Value::INTEGER:
@@ -1042,7 +1029,7 @@ VleValueWidget::setDoubleClicked(int row, int col)
         if (col == 1) {
             std::string key = static_cast<VleTextEdit*>(
                     table->cellWidget(row, 0))->getCurrentText().toStdString();
-            const auto& nextEdit = edit->toMap().get(key);
+            const auto& nextEdit = edit.toMap().get(key);
             switch (nextEdit->getType()) {
             case vle::value::Value::BOOLEAN:
             case vle::value::Value::INTEGER:
@@ -1064,7 +1051,7 @@ VleValueWidget::setDoubleClicked(int row, int col)
         break;
     } case vle::value::Value::MATRIX: {
         if ((row >=0 and col >=0)) {
-            const auto& nextEdit = edit->toMatrix().get(col, row);
+            const auto& nextEdit = edit.toMatrix().get(col, row);
             switch (nextEdit->getType()) {
             case vle::value::Value::BOOLEAN:
             case vle::value::Value::INTEGER:
@@ -1094,8 +1081,8 @@ VleValueWidget::onMenuSetView(const QPoint& pos)
 {
     QPoint globalPos = table->mapToGlobal(pos);
     QModelIndex index = table->indexAt(pos);
-    vle::value::Value* editVal = mValueStack.editingValue();
-    vle::value::Value::type editType = editVal->getType();
+    vle::value::Value& editVal = mValueStack.editingValue();
+    vle::value::Value::type editType = editVal.getType();
 
     QAction* action;
     QMenu menu;
@@ -1155,15 +1142,15 @@ VleValueWidget::onMenuSetView(const QPoint& pos)
         eValueWidgetMenu actCode = (eValueWidgetMenu) act->data().toInt();
         switch(actCode) {
         case EMenuValueRemove: {
-            switch (mValueStack.editingValue()->getType()){
+            switch (editType){
             case vle::value::Value::SET: {
-                editVal->toSet().remove(index.row());
+                editVal.toSet().remove(index.row());
                 break;
             } case vle::value::Value::TUPLE: {
-                editVal->toTuple().remove(index.row());
+                editVal.toTuple().remove(index.row());
                 break;
             } case vle::value::Value::MAP: {
-                editVal->toMap().value().erase(static_cast<VleTextEdit*>(
+                editVal.toMap().value().erase(static_cast<VleTextEdit*>(
                         table->cellWidget(index.row(), 0))
                         ->getCurrentText().toStdString());
                 break;
@@ -1184,12 +1171,12 @@ VleValueWidget::onMenuSetView(const QPoint& pos)
         case EMenuValueAddMatrix: {
             auto v = std::unique_ptr<vle::value::Value>(
                 buildDefaultValue(actCode));
-            switch (mValueStack.editingValue()->getType()){
+            switch (editType){
             case vle::value::Value::SET: {
-                editVal->toSet().add(std::move(v));
+                editVal.toSet().add(std::move(v));
                 break;
             } case vle::value::Value::MAP: {
-                editVal->toMap().addMultilpleValues(1, *v);
+                editVal.toMap().addMultilpleValues(1, *v);
                 break;
             } default : {
                 break;
@@ -1208,18 +1195,18 @@ VleValueWidget::onMenuSetView(const QPoint& pos)
         case EMenuValueSetMatrix: {
             auto v = std::unique_ptr<vle::value::Value>(
                 buildDefaultValue(actCode));
-            switch (mValueStack.editingValue()->getType()){
+            switch (editType){
             case vle::value::Value::SET: {
-                editVal->toSet().set(index.row(), std::move(v));
+                editVal.toSet().set(index.row(), std::move(v));
                 break;
             } case vle::value::Value::MAP: {
                 QString key = static_cast<VleTextEdit*>(
                         table->cellWidget(index.row(), 0))->id;
                 key.replace("key:","");
-                editVal->toMap().set(key.toStdString(), std::move(v));
+                editVal.toMap().set(key.toStdString(), std::move(v));
                 break;
             } case vle::value::Value::MATRIX: {
-                editVal->toMatrix().set( index.column(), index.row(),
+                editVal.toMatrix().set( index.column(), index.row(),
                                          std::move(v));
                 break;
             } default : {
@@ -1237,19 +1224,19 @@ VleValueWidget::onMenuSetView(const QPoint& pos)
 void
 VleValueWidget::onValUpdated(const QString& id, int newVal)
 {
-    vle::value::Value* editVal = mValueStack.editingValue();
-    switch(editVal->getType()) {
+    value::Value& editVal = mValueStack.editingValue();
+    switch(editVal.getType()) {
     case vle::value::Value::SET: {
         int ix = id.toInt();
-        editVal->toSet().get(ix)->toInteger().set(newVal);
+        editVal.toSet().get(ix)->toInteger().set(newVal);
         break;
     } case vle::value::Value::MAP: {
-        editVal->toMap().get(id.toStdString())->toInteger().set(newVal);
+        editVal.toMap().get(id.toStdString())->toInteger().set(newVal);
         break;
     } case vle::value::Value::MATRIX: {
         int rx = id.split(",").at(0).split("(").at(1).toInt();
         int cx = id.split(",").at(1).split(")").at(0).toInt();
-        editVal->toMatrix().get(cx, rx)->toInteger().set(newVal);
+        editVal.toMatrix().get(cx, rx)->toInteger().set(newVal);
         break;
     } default : {
         break;
@@ -1260,28 +1247,28 @@ VleValueWidget::onValUpdated(const QString& id, int newVal)
 void
 VleValueWidget::onValUpdated(const QString& id, double newVal)
 {
-    vle::value::Value* editVal = mValueStack.editingValue();
-    switch(editVal->getType()) {
+    value::Value& editVal = mValueStack.editingValue();
+    switch(editVal.getType()) {
     case vle::value::Value::SET: {
         int ix = id.toInt();
-        editVal->toSet().get(ix)->toDouble().set(newVal);
+        editVal.toSet().get(ix)->toDouble().set(newVal);
         break;
     } case vle::value::Value::MAP: {
-        editVal->toMap().get(id.toStdString())->toDouble().set(newVal);
+        editVal.toMap().get(id.toStdString())->toDouble().set(newVal);
         break;
     } case vle::value::Value::TUPLE: {
         int ix = id.toInt();
-        editVal->toTuple()[ix] = newVal;
+        editVal.toTuple()[ix] = newVal;
         break;
     } case vle::value::Value::TABLE: {
         int rx = id.split(",").at(0).split("(").at(1).toInt();
         int cx = id.split(",").at(1).split(")").at(0).toInt();
-        editVal->toTable().get(cx, rx) = newVal;
+        editVal.toTable().get(cx, rx) = newVal;
         break;
     } case vle::value::Value::MATRIX: {
         int rx = id.split(",").at(0).split("(").at(1).toInt();
         int cx = id.split(",").at(1).split(")").at(0).toInt();
-        editVal->toMatrix().get(cx, rx)->toDouble().set(newVal);
+        editVal.toMatrix().get(cx, rx)->toDouble().set(newVal);
         break;
     } default : {
         break;
@@ -1293,19 +1280,19 @@ void
 VleValueWidget::onValUpdated(const QString& id, const QString& boolVal)
 {
     bool val = (boolVal == "true");
-    vle::value::Value* editVal = mValueStack.editingValue();
-    switch(editVal->getType()) {
+    value::Value& editVal = mValueStack.editingValue();
+    switch(editVal.getType()) {
     case vle::value::Value::SET: {
         int ix = id.toInt();
-        editVal->toSet().get(ix)->toBoolean().set(val);
+        editVal.toSet().get(ix)->toBoolean().set(val);
         break;
     } case vle::value::Value::MAP: {
-        editVal->toMap().get(id.toStdString())->toBoolean().set(val);
+        editVal.toMap().get(id.toStdString())->toBoolean().set(val);
         break;
     } case vle::value::Value::MATRIX: {
         int rx = id.split(",").at(0).split("(").at(1).toInt();
         int cx = id.split(",").at(1).split(")").at(0).toInt();
-        editVal->toMatrix().get(cx, rx)->toBoolean().set(val);
+        editVal.toMatrix().get(cx, rx)->toBoolean().set(val);
         break;
     } default : {
         break;
@@ -1317,28 +1304,28 @@ void
 VleValueWidget::onTextUpdated(const QString& id, const QString& /*old*/,
         const QString& newVal)
 {
-    vle::value::Value* editVal = mValueStack.editingValue();
-    switch(editVal->getType()) {
+    value::Value& editVal = mValueStack.editingValue();
+    switch(editVal.getType()) {
     case vle::value::Value::SET: {
         int ix = id.toInt();
-        editVal->toSet().get(ix)->toString().set(newVal.toStdString());
+        editVal.toSet().get(ix)->toString().set(newVal.toStdString());
         break;
     } case vle::value::Value::MAP: {
         if (id.startsWith("key:")) {
             std::string oldKey = id.split("key:").at(1).toStdString();
-            auto val = editVal->toMap().give(oldKey);
-            editVal->toMap().value().erase(oldKey);
-            editVal->toMap().set(newVal.toStdString(), std::move(val));
+            auto val = editVal.toMap().give(oldKey);
+            editVal.toMap().value().erase(oldKey);
+            editVal.toMap().set(newVal.toStdString(), std::move(val));
             showCurrentValueDetail();
         } else {
-            editVal->toMap().get(id.toStdString())->toString().set(
+            editVal.toMap().get(id.toStdString())->toString().set(
                     newVal.toStdString());
         }
         break;
     } case vle::value::Value::MATRIX: {
         int rx = id.split(",").at(0).split("(").at(1).toInt();
         int cx = id.split(",").at(1).split(")").at(0).toInt();
-        editVal->toMatrix().get(cx, rx)->toString().set(newVal.toStdString());
+        editVal.toMatrix().get(cx, rx)->toString().set(newVal.toStdString());
         break;
     } default : {
         break;
@@ -1349,28 +1336,28 @@ VleValueWidget::onTextUpdated(const QString& id, const QString& /*old*/,
 void
 VleValueWidget::onResize(bool /*b*/)
 {
-    vle::value::Value* edit = mValueStack.editingValue();
-    switch(edit->getType()) {
+    value::Value& edit = mValueStack.editingValue();
+    switch(edit.getType()) {
     case vle::value::Value::BOOLEAN:
     case vle::value::Value::INTEGER:
     case vle::value::Value::DOUBLE:
     case vle::value::Value::STRING: {
         break;
     } case vle::value::Value::SET: {
-        mValueStack.editingValue()->toSet().resize(
+        edit.toSet().resize(
                 resize_row->value(), vle::value::Boolean(true));
         break;
     } case vle::value::Value::TUPLE: {
-        mValueStack.editingValue()->toTuple().value().resize(
+        edit.toTuple().value().resize(
                 resize_row->value());
         break;
     } case vle::value::Value::TABLE: {
-        mValueStack.editingValue()->toTable().resize(
+        edit.toTable().resize(
                 resize_col->value(),
                 resize_row->value());//inverse col, row
                 break ;
     } case vle::value::Value::MATRIX: {
-        mValueStack.editingValue()->toMatrix().resize(
+        edit.toMatrix().resize(
                 resize_col->value(),
                 resize_row->value(), vle::value::Boolean::create(true));
         break ;
@@ -1393,11 +1380,11 @@ VleValueWidget::onStackButtonClicked(const QString& id, bool /*b*/)
 
 
 void
-VleValueWidget::setBoolWidget(const QString& id, const vle::value::Value* val,
+VleValueWidget::setBoolWidget(const QString& id, const vle::value::Value& val,
         int r, int c)
 {
     VleCombo* w = VleCombo::buildVleBoolCombo(table, id,
-            val->toBoolean().value());
+            val.toBoolean().value());
     table->setCellWidget(r, c, w);
     table->setItem(r, c, new QTableWidgetItem);
     QObject::connect(w,
@@ -1407,10 +1394,10 @@ VleValueWidget::setBoolWidget(const QString& id, const vle::value::Value* val,
 }
 
 void
-VleValueWidget::setIntWidget(const QString& id, const vle::value::Value* val,
+VleValueWidget::setIntWidget(const QString& id, const vle::value::Value& val,
         int r, int c)
 {
-    VleSpinBox* w = new VleSpinBox(table, val->toInteger().value(), id);
+    VleSpinBox* w = new VleSpinBox(table, val.toInteger().value(), id);
     table->setCellWidget(r, c, w);
     table->setItem(r, c, new QTableWidgetItem);//used to find it
     QObject::connect(w,
@@ -1420,10 +1407,10 @@ VleValueWidget::setIntWidget(const QString& id, const vle::value::Value* val,
 }
 
 void
-VleValueWidget::setDoubleWidget(const QString& id, const vle::value::Value* val,
+VleValueWidget::setDoubleWidget(const QString& id, const vle::value::Value& val,
         int r, int c)
 {
-    setDoubleWidget(id, val->toDouble().value(), r,  c);
+    setDoubleWidget(id, val.toDouble().value(), r,  c);
 }
 
 void
@@ -1440,10 +1427,10 @@ VleValueWidget::setDoubleWidget(const QString& id, double val,
 }
 
 void
-VleValueWidget::setStringWidget(const QString& id, const vle::value::Value* val,
+VleValueWidget::setStringWidget(const QString& id, const vle::value::Value& val,
         int r, int c)
 {
-    setStringWidget(id, QString(val->toString().value().c_str()),r, c);
+    setStringWidget(id, QString(val.toString().value().c_str()),r, c);
 }
 
 void
@@ -1463,11 +1450,11 @@ VleValueWidget::setStringWidget(const QString& id, const QString& val,
 
 void
 VleValueWidget::setComplexWidget(const QString& id,
-        const vle::value::Value* val, int r, int c)
+        const vle::value::Value& val, int r, int c)
 {
 
     VleTextEdit* w = new VleTextEdit(table,
-            getValueDisplay(*val, Insight), id, false);
+            getValueDisplay(val, Insight), id, false);
     table->setCellWidget(r, c, w);
     table->setItem(r, c, new QTableWidgetItem);
 }

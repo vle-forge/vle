@@ -31,7 +31,7 @@
  */
 StoragePluginGUItab::StoragePluginGUItab(QWidget *parent) :
     QWidget(parent), ui(new Ui::StoragePluginGvle), mvleVpm(0), mViewName(""),
-    outputNodeConfig(0)
+    outputNodeConfig(nullptr)
 {
 //
     ui->setupUi(this);
@@ -50,7 +50,6 @@ StoragePluginGUItab::StoragePluginGUItab(QWidget *parent) :
 StoragePluginGUItab::~StoragePluginGUItab()
 {
     delete ui;
-    delete outputNodeConfig;
 }
 
 
@@ -59,7 +58,7 @@ StoragePluginGUItab::init(vle::gvle::vleVpm* vpm, const QString& viewName)
 {
     mvleVpm = vpm;
     mViewName = viewName;
-    outputNodeConfig = mvleVpm->buildOutputConfigMap(mViewName);
+    outputNodeConfig = std::move(mvleVpm->buildOutputConfigMap(mViewName));
     if (not wellFormed()) {
         buildDefaultConfig();
         mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
@@ -181,7 +180,7 @@ bool StoragePluginGUItab::wellFormed()
 
 void StoragePluginGUItab::buildDefaultConfig()
 {
-    outputNodeConfig->clear();
+    outputNodeConfig.reset(new vle::value::Map());
     outputNodeConfig->addInt("rows", 15);
     outputNodeConfig->addInt("columns", 15);
     outputNodeConfig->addInt("inc_rows", 10);

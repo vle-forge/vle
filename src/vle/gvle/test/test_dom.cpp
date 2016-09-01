@@ -142,13 +142,12 @@ BOOST_AUTO_TEST_CASE(test_build_value)
     vle::gvle::vleDomVpz vleDom(&vpz.getDomDoc());
 
     //test tuple
-    vle::value::Value* t = vpz.buildValueFromDoc("cond", "myport", 0);
+    std::unique_ptr<vle::value::Value> t =
+            vpz.buildValueFromDoc("cond", "myport", 0);
     BOOST_REQUIRE_EQUAL(t->toTuple().size(), 0);
-    delete t;
     t = vpz.buildValueFromDoc("cond", "myport", 1);
     BOOST_REQUIRE_EQUAL(t->toTuple().size(), 3);
     BOOST_REQUIRE_CLOSE(t->toTuple().at(0), 1.5, 1e-5);
     BOOST_REQUIRE_CLOSE(t->toTuple().at(1), 2, 1e-5);
     BOOST_REQUIRE_CLOSE(t->toTuple().at(2), 4.6, 1e-5);
-    delete t;
 }

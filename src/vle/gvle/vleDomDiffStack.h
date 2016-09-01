@@ -62,7 +62,8 @@ public:
             QDomNode d=QDomNode()) = 0;
 
     /**************************************************
-     * Static functions
+     * Static functions, generic XML DOM
+     * NOTE: no snapshot
      **************************************************/
 
     /**
@@ -70,31 +71,33 @@ public:
      */
     static QString attributeValue(const QDomNode& node,
             const QString& attrName);
-
-
     /**
      * @brief set an attribute value to a node
      */
     static void setAttributeValue(QDomNode& node, const QString& attrName,
             const QString& val);
-
-    /***************************************************
-     * Menber functions :
-     * TODO some functions can be set to static
-     ***************************************************/
-    QDomNode childWhithNameAttr(QDomNode node,
-            const QString& nodeName, const QString& nameValue) const;
     /**
      * @brief get the first child corresponding to the name and add it
      * if not present
+     * @param domDoc, used to create the QDomNode
+     * @param node, the node to which one appends a child
+     * @param
      */
-    QDomNode obtainChild(QDomNode node, const QString& nodeName,
-            bool addIfNot=true);
+    static QDomNode obtainChild(QDomDocument& domDoc, QDomNode node,
+            const QString& nodeName, bool addIfNot=true);
 
+    static QDomNode childWhithNameAttr(const QDomNode& node,
+                const QString& nodeName, const QString& nameValue);
+
+    static QString toQString(const QDomNode& node);
     /**
-     * @brief get a QString representation of a QDomNode
+     * @brief Remove all childs from a QDomNode (keep attributes)
      */
-    virtual QString toQString(const QDomNode& node) const;
+    static void removeAllChilds(QDomNode node);
+
+    static QList<QDomNode> childNodesWithoutText(QDomNode node,
+                         const QString& nodeName = "");
+
     QDomDocument* mDoc;
 };
 

@@ -102,7 +102,7 @@ vleDomVpm::getNodeFromXQuery(const QString& query,
     //handle recursion with uniq node
     if ((curr == "condPlugins") or
         (curr == "outputGUIplugins")){
-        return getNodeFromXQuery(rest, obtainChild(d, curr, true));
+        return getNodeFromXQuery(rest, obtainChild(*mDoc, d, curr, true));
     }
     //handle recursion with nodes identified by name
     std::vector<QString> nodeByNames;
@@ -294,7 +294,8 @@ vleVpm::provideCondGUIplugin(const QString& condName)
     if (guiPluginName == "") {
         return 0;
     } else {
-        PluginExpCond* plugin =  mGvlePlugins->provideCondPlugin(guiPluginName);
+        PluginExpCond* plugin =  mGvlePlugins->newInstanceCondPlugin(
+                guiPluginName);
         bool enableSnapshot = vleVpz::undoStack->enableSnapshot(false);
         bool oldBlock = undoStackVpm->blockSignals(true);
         bool oldBlock2 = vleVpz::undoStack->blockSignals(true);

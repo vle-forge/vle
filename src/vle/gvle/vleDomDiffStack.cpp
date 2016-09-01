@@ -75,14 +75,28 @@ vleDomObject::setAttributeValue(QDomNode& node, const QString& attrName,
     }
 }
 
-/**************************************************
- * Member functions
- **************************************************/
-
+QDomNode
+vleDomObject::obtainChild(QDomDocument& domDoc,
+        QDomNode node, const QString& nodeName, bool addIfNot)
+{
+    QDomNodeList chs = node.childNodes();
+    for(int i = 0; i<chs.size(); i++) {
+        QDomNode ch = chs.at(i);
+        if (ch.nodeName() == nodeName) {
+            return ch;
+        }
+    }
+    if (not addIfNot) {
+        return QDomNode();
+    }
+    QDomNode res = domDoc.createElement(nodeName);
+    node.appendChild(res);
+    return res;
+}
 
 QDomNode
-vleDomObject::childWhithNameAttr(QDomNode node,
-        const QString& nodeName, const QString& nameValue) const
+vleDomObject::childWhithNameAttr(const QDomNode& node,
+        const QString& nodeName, const QString& nameValue)
 {
     QDomNodeList childs = node.childNodes();
     QList<QDomNode> childsWithoutText;
@@ -96,34 +110,45 @@ vleDomObject::childWhithNameAttr(QDomNode node,
     return QDomNode();
 }
 
-QDomNode
-vleDomObject::obtainChild(QDomNode node, const QString& nodeName, bool addIfNot)
-{
-    QDomNodeList chs = node.childNodes();
-    for(int i = 0; i<chs.size(); i++) {
-        QDomNode ch = chs.at(i);
-        if (ch.nodeName() == nodeName) {
-            return ch;
-        }
-    }
-    if (not addIfNot) {
-        return QDomNode();
-    }
-    QDomNode res = mDoc->createElement(nodeName);
-    node.appendChild(res);
-    return res;
-}
-
-
-
 QString
-vleDomObject::toQString(const QDomNode& node) const
+vleDomObject::toQString(const QDomNode& node)
 {
     QString str;
     QTextStream stream(&str);
     node.save(stream, node.nodeType());
     return str;
 }
+
+
+
+void
+vleDomObject::removeAllChilds(QDomNode node)
+{
+    QDomNodeList childs = node.childNodes();
+    while(node.hasChildNodes()) {
+        node.removeChild(childs.item(0));
+    }
+}
+
+QList<QDomNode>
+vleDomObject::childNodesWithoutText(QDomNode node, const QString& nodeName)
+{
+    QDomNodeList childs = node.childNodes();
+    QList<QDomNode> childsWithoutText;
+    for (int i=0; i<childs.length();i++) {
+        QDomNode ch = childs.at(i);
+        if (not ch.isText()) {
+            if (nodeName == "") {
+                childsWithoutText.push_back(ch);
+            } else if (ch.nodeName() == nodeName) {
+                childsWithoutText.push_back(ch);
+            }
+        }
+    }
+    return childsWithoutText;
+}
+
+
 
 /********************************************************************/
 

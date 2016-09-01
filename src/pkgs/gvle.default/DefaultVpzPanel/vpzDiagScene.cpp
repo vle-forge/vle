@@ -743,7 +743,7 @@ void
 VpzMainModelItem::addConnLines()
 {
     //Add connections
-    QList<QDomNode> childList = mVpm->childNodesWithoutText(
+    QList<QDomNode> childList = vleDomObject::childNodesWithoutText(
             mVpm->connectionsFromModel(mnode));
 
     VpzDiagScene* vpzscene = static_cast<VpzDiagScene*>(this->scene());
@@ -2003,9 +2003,9 @@ VpzDiagScene::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode root_oldValVpz = mVpm->vdo()->getNodeFromXQuery(old_query,
                     oldValVpz);
             QList<QDomNode> oldMods =
-                    mVpm->childNodesWithoutText(root_oldValVpz, "model");
+                    vleDomObject::childNodesWithoutText(root_oldValVpz, "model");
             QString subQuery = mVpm->subQuery(merged_query, 0,-1);
-            QList<QDomNode> newMods = mVpm->childNodesWithoutText(
+            QList<QDomNode> newMods = vleDomObject::childNodesWithoutText(
                     mVpm->vdo()->getNodeFromXQuery(subQuery), "model");
             for (int i =0; i< newMods.size(); i++) {
                 if (not oldMods.contains(newMods.at(i))) {
