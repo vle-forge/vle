@@ -488,11 +488,14 @@ vleVpz::fillWithValue(QDomDocument& domDoc, QDomNode node,
         if (node.nodeName() != "table") {
             return false;
         }
+        vleDomObject::setAttributeValue(node, "width",
+                QVariant((int) val.toTable().width()).toString());
+        vleDomObject::setAttributeValue(node, "height",
+                QVariant((int) val.toTable().height()).toString());
         QString strRepr = val.toTable().writeToString().c_str();
         strRepr.remove("(");
         strRepr.remove(")");
         strRepr.replace(",", " ");
-
         QDomNodeList childs = node.childNodes();
         if (childs.length() == 0) {
             QDomText elemVal = domDoc.createTextNode(strRepr);
@@ -510,30 +513,31 @@ vleVpz::fillWithValue(QDomDocument& domDoc, QDomNode node,
             qDebug() << "Internal error in fillWithValue (table)" << childs.length();
             return false;
         }
-        vleDomObject::setAttributeValue(node, "width",
-                QVariant((int) val.toTable().width()).toString());
-        vleDomObject::setAttributeValue(node, "height",
-                QVariant((int) val.toTable().height()).toString());
         break;
     }  case vle::value::Value::MATRIX: {
         if (node.nodeName() != "matrix") {
             return false;
         }
         const vle::value::Matrix& mat = val.toMatrix();
-        int rows = mat.rows();
         int columns = mat.columns();
+        int rows = mat.rows();
+        int columns_max = mat.columns_max();
+        int rows_max = mat.rows_max();
+        int columnstep = mat.resizeColumn();
+        int rowstep = mat.resizeRow();
 
         vleDomObject::setAttributeValue(node, "columns",
                 QVariant(columns).toString());
-        vleDomObject::setAttributeValue(node, "rows", QVariant(rows).toString());
-        vleDomObject::setAttributeValue(node, "columnmax",
-                QVariant(columns).toString());
-        vleDomObject::setAttributeValue(node, "rowmax",
+        vleDomObject::setAttributeValue(node, "rows",
                 QVariant(rows).toString());
+        vleDomObject::setAttributeValue(node, "columnmax",
+                QVariant(columns_max).toString());
+        vleDomObject::setAttributeValue(node, "rowmax",
+                QVariant(rows_max).toString());
         vleDomObject::setAttributeValue(node, "columnstep",
-                QVariant((int) mat.resizeColumn()).toString());
+                QVariant(columnstep).toString());
         vleDomObject::setAttributeValue(node, "rowsstep",
-                QVariant((int) mat.resizeColumn()).toString());
+                QVariant(rowstep).toString());
         vleDomObject::removeAllChilds(node);
         for (int i=0; i < rows; i++) {
             for (int j= 0; j < columns; j++) {

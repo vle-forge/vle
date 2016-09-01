@@ -115,6 +115,7 @@ public:
     VleSpinBox(QWidget *parent, int val, const QString& idStr = "",
 	       int min = -10000000, int max = 10000000);
     ~VleSpinBox();
+    void setMin(int min);
     void wheelEvent(QWheelEvent *event);
     void focusInEvent(QFocusEvent* e);
     QString id;

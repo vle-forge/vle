@@ -210,6 +210,12 @@ VleSpinBox::~VleSpinBox()
 }
 
 void
+VleSpinBox::setMin(int min)
+{
+    setMinimum(min);
+}
+
+void
 VleSpinBox::wheelEvent(QWheelEvent *event)
 {
     event->ignore();
@@ -858,7 +864,7 @@ VleValueWidget::showCurrentValueDetail()
         for (unsigned int i=0; i<tableVal.height(); i++) {
             for (unsigned int j=0; j<tableVal.width(); j++) {
                 setDoubleWidget(QString("(%1,%2)").arg(i).arg(j),
-                        tableVal.get(i,j), i, j);
+                        tableVal.get(j,i), i, j);//inverted
             }
         }
         break;
@@ -896,7 +902,7 @@ VleValueWidget::showCurrentValueDetail()
     }}
 
     int nbRows = (editType ==  vle::value::Value::TABLE) ?
-                        editingValue.toTable().width() :
+                        editingValue.toTable().height() :
                  (editType ==  vle::value::Value::MATRIX) ?
                         editingValue.toMatrix().rows() :
                  (editType ==  vle::value::Value::SET) ?
@@ -907,7 +913,7 @@ VleValueWidget::showCurrentValueDetail()
                         editingValue.toTuple().size() :
                  0;
     int nbCols = (editType ==  vle::value::Value::TABLE) ?
-                        editingValue.toTable().height() :
+                        editingValue.toTable().width() :
                  (editType ==  vle::value::Value::MATRIX) ?
                         editingValue.toMatrix().columns() :
                  0;
@@ -920,6 +926,13 @@ VleValueWidget::showCurrentValueDetail()
     resize_col->setEnabled((editType == vle::value::Value::TABLE) or
             (editType == vle::value::Value::MATRIX));
     resize->setEnabled(resize_row->isEnabled());
+    if (editType == value::Value::TABLE) {
+        resize_col->setMin(1);
+        resize_row->setMin(1);
+    } else {
+        resize_col->setMin(0);
+        resize_row->setMin(0);
+    }
     if (mLimited) {
         stack_buttons->setEnabled(false);
 
@@ -1354,7 +1367,7 @@ VleValueWidget::onResize(bool /*b*/)
     } case vle::value::Value::TABLE: {
         edit.toTable().resize(
                 resize_col->value(),
-                resize_row->value());//inverse col, row
+                resize_row->value());
                 break ;
     } case vle::value::Value::MATRIX: {
         edit.toMatrix().resize(
