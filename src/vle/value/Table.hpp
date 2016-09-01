@@ -54,9 +54,7 @@ public:
     /**
      * @brief Build a Table object with a default value to empty TableValue.
      */
-    Table()
-        : m_width(0), m_height(0)
-    {}
+    Table();
 
     /**
      * @brief Build a Table object wi a specified size.

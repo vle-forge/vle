@@ -65,6 +65,11 @@ double pp_get(const vle::value::TableValue& t, std::size_t x, std::size_t y,
 
 namespace vle { namespace value {
 
+Table::Table()
+    : m_value(1,0.0), m_width(1), m_height(1)
+{
+}
+
 Table::Table(std::size_t width, std::size_t height)
     : m_value(width * height)
     , m_width(width)
