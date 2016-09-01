@@ -486,7 +486,10 @@ void
 gvle_win::onSaveFile()
 {
     gvle_file gf = getGvleFileFromTabIndex(ui->tabWidget->currentIndex());
-    mPanels[gf.relPath]->save();
+    if (mPanels.contains(gf.relPath) and mProjectFileSytem
+            and mProjectFileSytem->isReadOnly())  {
+        mPanels[gf.relPath]->save();
+    }
 }
 
 /**
@@ -1181,6 +1184,7 @@ gvle_win::onFileRenamed(const QString & path,
 void
 gvle_win::onDataChanged(QModelIndex /*indexTL*/, QModelIndex /*indexBR*/)
 {
+
     mProjectFileSytem->setReadOnly(true);
 }
 
