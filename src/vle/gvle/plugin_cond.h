@@ -41,13 +41,11 @@ class PluginExpCond: public QObject
     Q_OBJECT
 public:
     virtual QString  getname()   = 0;
-    virtual QWidget *getWidget() = 0;
-    virtual void     delWidget() = 0;
-    virtual QWidget *getWidgetToolbar() = 0;
-    virtual void     delWidgetToolbar() = 0;
+    virtual QWidget* getWidget() = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
     virtual void  init(vleVpm* vpm, const QString& condName) = 0;
+    virtual PluginExpCond* newInstance() = 0;
 };
 
 }} //namepsaces

@@ -268,20 +268,22 @@ gvle_plugins::getCondPluginPackage(QString name)
 }
 
 PluginExpCond*
-gvle_plugins::provideCondPlugin(QString name)
+gvle_plugins::newInstanceCondPlugin(QString name)
 {
     if (not mCondPlugins.contains(name)) {
+        qDebug() << " Error no CondPlugins "<< name;
         return 0;
     }
     gvleplug& plug = mCondPlugins[name];
     if (not plug.loader) {
         plug.loader = new QPluginLoader(plug.libPath);
         if (not plug.loader->isLoaded()) {
-            qDebug() << " Error cannot load CondPlugin "<< name;
+            qDebug() << " Error cannot load CondPlugins "<< name;
             return 0;
         }
+        return qobject_cast<PluginExpCond*>(plug.loader->instance());
     }
-    return qobject_cast<PluginExpCond*>(plug.loader->instance());
+    return qobject_cast<PluginExpCond*>(plug.loader->instance())->newInstance();
 }
 
 QStringList

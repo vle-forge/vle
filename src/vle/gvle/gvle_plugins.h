@@ -83,7 +83,7 @@ public:
     QStringList      getCondPluginsList();
     QString          getCondPluginPath(QString name);
     QString          getCondPluginPackage(QString name);
-    PluginExpCond*   provideCondPlugin(QString name);
+    PluginExpCond*   newInstanceCondPlugin(QString name);
 
     QStringList      getSimPanelPluginsList();
     QString          getSimPanelPluginPath(QString name);
