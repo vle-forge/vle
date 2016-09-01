@@ -91,6 +91,9 @@ private:
     VleLineEdit* getLineEdit(int row, int col);
 
 private:
+    void disconnectConds();
+    void connectConds();
+
     Ui::FileVpzExpCond* ui;
     vleVpm*             mVpm;
     QString             mCurrCondName;

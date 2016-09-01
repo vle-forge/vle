@@ -96,6 +96,7 @@ FileVpzExpCond::setVpm(vleVpm* vpm)
                      SIGNAL(experimentUpdated()),
                      this,
                      SLOT(onExpUpdated()));
+    connectConds();
 
 }
 
@@ -365,6 +366,7 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
 
     QAction* act = menu.exec(globalPos);
     if (act) {
+        disconnectConds();
         QString actCode = act->data().toString();
         if (actCode == "EMenuCondAdd") {
             mVpm->addConditionToDoc(mVpm->newCondNameToDoc());
@@ -412,6 +414,7 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             mVpm->addConditionFromPluginToDoc(mCurrCondName, actCode);
             reload(false);
         }
+        connectConds();
     }
 }
 
@@ -441,6 +444,7 @@ void
 FileVpzExpCond::onTextUpdated(const QString& id, const QString& oldVal,
         const QString& newVal)
 {
+    disconnectConds();
     QStringList split = id.split(",");
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
@@ -464,11 +468,13 @@ FileVpzExpCond::onTextUpdated(const QString& id, const QString& oldVal,
         mVpm->fillWithValue(cond, port, col-2, *curr);
     }
     reload(false);
+    connectConds();
 }
 
 void
 FileVpzExpCond::onIntUpdated(const QString& id, int newVal)
 {
+    disconnectConds();
     QStringList split = id.split(",");
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
@@ -480,11 +486,13 @@ FileVpzExpCond::onIntUpdated(const QString& id, int newVal)
         curr->toInteger().set(newVal);
         mVpm->fillWithValue(cond, port, col-2, *curr);
     }
+    connectConds();
 }
 
 void
 FileVpzExpCond::onDoubleUpdated(const QString& id, double newVal)
 {
+    disconnectConds();
     QStringList split = id.split(",");
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
@@ -496,10 +504,12 @@ FileVpzExpCond::onDoubleUpdated(const QString& id, double newVal)
         curr->toDouble().set(newVal);
         mVpm->fillWithValue(cond, port, col-2, *curr);
     }
+    connectConds();
 }
 void
 FileVpzExpCond::onBoolUpdated(const QString& id, const QString& newVal)
 {
+    disconnectConds();
     QStringList split = id.split(",");
     int row = split.at(0).toInt();
     int col = split.at(1).toInt();
@@ -511,12 +521,15 @@ FileVpzExpCond::onBoolUpdated(const QString& id, const QString& newVal)
         curr->toBoolean().set(QVariant(newVal).toBool());
         mVpm->fillWithValue(cond, port, col-2, *curr);
     }
+    connectConds();
 }
 
 void
 FileVpzExpCond::onValUpdated(const vle::value::Value& newVal)
 {
+    disconnectConds();
     mVpm->fillWithValue(mCurrCondName, mCurrPortName, mCurrValIndex, newVal);
+    connectConds();
 }
 
 void
@@ -672,6 +685,27 @@ VleLineEdit*
 FileVpzExpCond::getLineEdit(int row, int col)
 {
     return qobject_cast<VleLineEdit*>(ui->table->cellWidget(row,col));
+}
+
+void
+FileVpzExpCond::disconnectConds()
+{
+    if (mVpm) {
+        QObject::disconnect(mVpm,
+                SIGNAL(conditionsUpdated()),
+                this,
+                SLOT(onCondUpdated()));
+    }
+}
+void
+FileVpzExpCond::connectConds()
+{
+    if (mVpm) {
+        QObject::connect(mVpm,
+                SIGNAL(conditionsUpdated()),
+                this,
+                SLOT(onCondUpdated()));
+    }
 }
 
 }}
