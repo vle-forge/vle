@@ -66,7 +66,6 @@ public:
     void showEditPlace();
 
 public slots:
-    void onCellDoubleClicked(int row, int column);
     void onConditionMenu(const QPoint&);
     void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);

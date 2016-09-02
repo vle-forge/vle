@@ -43,6 +43,24 @@ namespace vle {
 namespace gvle {
 
 
+
+/**
+ * A Null widget allows to get the selected signal
+ */
+class VleNullWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    VleNullWidget(QWidget* parent, const QString& idStr="");
+    ~VleNullWidget();
+    void focusInEvent(QFocusEvent* e);
+
+    QString id;
+signals:
+    void selected(const QString& id);
+};
+
+
 /**
  * A Bool Editor
  */

@@ -74,9 +74,6 @@ FileVpzExpCond::FileVpzExpCond(gvle_plugins* plugs, QWidget *parent) :
     ui->table->setContextMenuPolicy(Qt::CustomContextMenu);
 
     QObject::connect(ui->table,
-            SIGNAL(cellDoubleClicked(int, int)),
-            this, SLOT(onCellDoubleClicked(int, int)));
-    QObject::connect(ui->table,
                 SIGNAL(customContextMenuRequested(const QPoint&)),
                 this, SLOT(onConditionMenu(const QPoint&)));
 
@@ -222,22 +219,13 @@ FileVpzExpCond::showEditPlace()
     if (mPlugin) {
         delete mPlugin;
         mPlugin = 0;
-    } else {
-        for (int i = 0; i < ui->vlValue->count(); i++) {
-            QWidget* currwid = ui->vlValue->itemAt(i)->widget();
-            ui->vlValue->removeWidget(currwid);
-            currwid->deleteLater();
-        }
+    }
+    for (int i = 0; i < ui->vlValue->count(); i++) {
+        QWidget* currwid = ui->vlValue->itemAt(i)->widget();
+        ui->vlValue->removeWidget(currwid);
+        currwid->deleteLater();
     }
 
-
-    if (mCurrCondName == "") {
-
-        QLabel* lab = new QLabel("Nothing to edit");
-        ui->vlValue->addWidget(lab);
-        lab->show();
-        return;
-    }
     if (mVpm->getCondGUIplugin(mCurrCondName) != "") {
         mPlugin = mVpm->provideCondGUIplugin(mCurrCondName);
         if (mPlugin) {
@@ -247,66 +235,47 @@ FileVpzExpCond::showEditPlace()
         }
         return;
     }
-    if (mCurrPortName == "") {
-        QLabel* lab = new QLabel("Nothing to edit");
-        ui->vlValue->addWidget(lab);
-        lab->show();
+    if (mCurrCondName == "" or mCurrPortName == "" or mCurrValIndex < 0) {
         return;
     }
-    if (mCurrValIndex < 0) {
-        QLabel* lab = new QLabel("Nothing to edit");
-        ui->vlValue->addWidget(lab);
-        lab->show();
-        return;
-    }
-    if (mCurrValIndex >= 0) {
-        QDomNode portNode = mVpm->portFromDoc(mCurrCondName, mCurrPortName);
-        std::vector<std::unique_ptr<value::Value>> values;
-        mVpm->fillWithMultipleValue(portNode, values);
-        if (values.size() > (unsigned int) mCurrValIndex) {
-            std::unique_ptr<vle::value::Value> val =
-                    std::move(values[mCurrValIndex]);
-            switch (val->getType()) {
-            case vle::value::Value::BOOLEAN:
-            case vle::value::Value::INTEGER:
-            case vle::value::Value::DOUBLE:
-            case vle::value::Value::STRING:
-            case vle::value::Value::USER: {
-                QLabel* lab = new QLabel("Nothing to edit");
-                ui->vlValue->addWidget(lab);
-                lab->show();
-                break;
-            } case vle::value::Value::SET:
-            case vle::value::Value::MAP:
-            case vle::value::Value::TUPLE:
-            case vle::value::Value::TABLE:
-            case vle::value::Value::XMLTYPE:
-            case vle::value::Value::NIL:
-            case vle::value::Value::MATRIX: {
-                VleValueWidget* valWidget = new VleValueWidget(this);
-                QObject::connect(valWidget,
-                        SIGNAL(valUpdated(const vle::value::Value&)),
-                        this, SLOT(onValUpdated(const vle::value::Value&)));
-                ui->vlValue->addWidget(valWidget);
-                valWidget->setValue(std::move(val));
-                valWidget->show();
-                break;
-            }}
-        }
+
+    QDomNode portNode = mVpm->portFromDoc(mCurrCondName, mCurrPortName);
+    std::vector<std::unique_ptr<value::Value>> values;
+    mVpm->fillWithMultipleValue(portNode, values);
+    if (values.size() > (unsigned int) mCurrValIndex) {
+        std::unique_ptr<vle::value::Value> val =
+                std::move(values[mCurrValIndex]);
+        switch (val->getType()) {
+        case vle::value::Value::BOOLEAN:
+        case vle::value::Value::INTEGER:
+        case vle::value::Value::DOUBLE:
+        case vle::value::Value::STRING:
+        case vle::value::Value::USER: {
+            QLabel* lab = new QLabel("Nothing to edit");
+            ui->vlValue->addWidget(lab);
+            lab->show();
+            break;
+        } case vle::value::Value::SET:
+        case vle::value::Value::MAP:
+        case vle::value::Value::TUPLE:
+        case vle::value::Value::TABLE:
+        case vle::value::Value::XMLTYPE:
+        case vle::value::Value::NIL:
+        case vle::value::Value::MATRIX: {
+            VleValueWidget* valWidget = new VleValueWidget(this);
+            QObject::connect(valWidget,
+                    SIGNAL(valUpdated(const vle::value::Value&)),
+                    this, SLOT(onValUpdated(const vle::value::Value&)));
+            ui->vlValue->addWidget(valWidget);
+            valWidget->setValue(std::move(val));
+            valWidget->show();
+            break;
+        }}
     }
 }
 
 
 
-void
-FileVpzExpCond::onCellDoubleClicked(int row, int column)
-{
-    VleLineEdit* w = getLineEdit(row,column);
-    if (w) {
-        //TODO
-        //w->setTextEdition(true);
-    }
-}
 
 void
 FileVpzExpCond::onConditionMenu(const QPoint& pos)
@@ -610,10 +579,12 @@ FileVpzExpCond::buildDefaultValue(QString type)
 void
 FileVpzExpCond::insertNullWidget(int row, int col)
 {
-    ui->table->setCellWidget(row, col, 0);
-    QTableWidgetItem* item = new QTableWidgetItem;
-    item->setFlags(item->flags() &  ~Qt::ItemIsEditable);
-    ui->table->setItem(row, col, item);//used to find it
+    QString id = QString("%1,%2").arg(row).arg(col);
+    VleNullWidget* w = new VleNullWidget(ui->table, id);
+    ui->table->setCellWidget(row, col, w);
+    ui->table->setItem(row, col, new QTableWidgetItem);//used to find it
+    QObject::connect(w, SIGNAL(selected(const QString&)),
+            this, SLOT(onSelected(const QString&)));
 }
 
 void

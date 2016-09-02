@@ -55,6 +55,27 @@
 namespace vle {
 namespace gvle {
 
+
+VleNullWidget::VleNullWidget(QWidget* parent, const QString& idStr):
+                    QWidget(parent), id(idStr)
+{
+    setFocusPolicy(Qt::StrongFocus);
+}
+
+VleNullWidget::~VleNullWidget()
+{
+
+}
+
+void
+VleNullWidget::focusInEvent(QFocusEvent* /*e*/)
+{
+    emit selected(id);
+}
+
+
+/******************* Bool ********************************/
+
 VleBooleanEdit::VleBooleanEdit(QWidget* parent, bool val,
                                const QString& idStr): QCheckBox(parent), id(idStr)
 {
@@ -1430,8 +1451,8 @@ void
 VleValueWidget::setDoubleWidget(const QString& id, double val,
         int r, int c)
 {
-    VleDoubleSpinBox* w = new VleDoubleSpinBox(table,
-            val, id);
+    VleDoubleEdit* w = new VleDoubleEdit(table,
+            val, id, false);
     table->setCellWidget(r, c, w);
     table->setItem(r, c, new QTableWidgetItem);
     QObject::connect(w,
