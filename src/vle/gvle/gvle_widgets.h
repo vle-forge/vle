@@ -36,6 +36,8 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <vle/value/Value.hpp>
+//#include <QtWidgets/QStackedWidget>
+#include <QStackedWidget>
 
 #include <iostream>
 
@@ -250,6 +252,17 @@ signals:
 
 };
 
+
+/**
+ * @brief A resizeable QStackedWidget, size is adapted from the current widget
+ * see: http://stackoverflow.com/questions/23511430/qt-qstackedwidget-resizing-issue
+ */
+class VleStackedWidget : public QStackedWidget
+{
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
+};
+
 /**
  * Wigdet to edit a vle::value recursively (no UI required)
  * Could be used for plugins ?
@@ -296,6 +309,15 @@ public:
 
 
     value_stack mValueStack;
+
+    VleStackedWidget* stack;
+    VleCombo*       value_bool;
+    VleSpinBox*     value_int;
+    VleDoubleEdit*  value_double;
+    VleTextEdit*    value_string;
+    QWidget*        value_complex;
+
+
     QWidget* stack_buttons;
     QTableWidget* table;
     QWidget* resize_place;
@@ -308,7 +330,8 @@ public:
     /*
      * @brief limited provide a limited mode
      */
-    explicit VleValueWidget(QWidget *parent = 0, bool limited = false);
+    explicit VleValueWidget(QWidget *parent = 0, bool limited = false,
+            const QString& header ="");
     ~VleValueWidget();
     void showCurrentValueDetail();
     void setId(const QString& id);
@@ -344,7 +367,6 @@ private:
             int r, int c);
 
 };
-
 
 }}//namespaces
 
