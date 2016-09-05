@@ -76,8 +76,8 @@ vleDomObject::setAttributeValue(QDomNode& node, const QString& attrName,
 }
 
 QDomNode
-vleDomObject::obtainChild(QDomDocument& domDoc,
-        QDomNode node, const QString& nodeName, bool addIfNot)
+vleDomObject::obtainChild(QDomNode node, const QString& nodeName,
+        QDomDocument* domDoc)
 {
     QDomNodeList chs = node.childNodes();
     for(int i = 0; i<chs.size(); i++) {
@@ -86,17 +86,18 @@ vleDomObject::obtainChild(QDomDocument& domDoc,
             return ch;
         }
     }
-    if (not addIfNot) {
+    if (not domDoc) {
         return QDomNode();
     }
-    QDomNode res = domDoc.createElement(nodeName);
+    QDomNode res = domDoc->createElement(nodeName);
     node.appendChild(res);
     return res;
 }
 
 QDomNode
-vleDomObject::childWhithNameAttr(const QDomNode& node,
-        const QString& nodeName, const QString& nameValue)
+vleDomObject::childWhithNameAttr(QDomNode& node,
+        const QString& nodeName, const QString& nameValue,
+        QDomDocument* domDoc)
 {
     QDomNodeList childs = node.childNodes();
     QList<QDomNode> childsWithoutText;
@@ -107,7 +108,13 @@ vleDomObject::childWhithNameAttr(const QDomNode& node,
             return ch;
         }
     }
-    return QDomNode();
+    if (not domDoc) {
+        return QDomNode();
+    }
+    QDomNode res = domDoc->createElement(nodeName);
+    vleDomObject::setAttributeValue(res, "name", nameValue);
+    node.appendChild(res);
+    return res;
 }
 
 QString

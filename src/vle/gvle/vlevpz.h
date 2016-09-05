@@ -129,6 +129,51 @@ public:
      * @param the list of conditions to attach to the atomic model
      */
     static void attachCondsToAtomic(QDomNode& atom, const QSet<QString>& conds);
+    /**
+     * @brief Tells if a condition port exists
+     * @param atom, is expected to be of the form
+     *    <condition name="somecond">
+     *      <port name="someport">
+     *        ...
+     *      </port>
+     *      ...
+     *    </condition>
+     * @param portName, the name of the port to search for
+     * @return true if the condition port exists
+     */
+    static bool existPortFromCond(QDomNode atom, const QString& portName);
+
+    /**
+     * @brief Build a value from a condition port
+     * @param atom, is expected to be of the form
+     *    <condition name="somecond">
+     *      <port name="someport">
+     *        ...
+     *      </port>
+     *      ...
+     *    </condition>
+     * @param portName, the name of the port to search for
+     * @return true if the condition port exists
+     */
+    static std::unique_ptr<value::Value> getValueFromPortCond(QDomNode atom,
+            const QString& portName, int index);
+    /**
+     * @brief Remove the port form a condition
+     * @param atom, is expected to be of the form
+     *    <condition name="somecond">
+     *      <port name="someport">
+     *        ...
+     *      </port>
+     *      ...
+     *    </condition>
+     * @param portName, the name of the port to remove
+     * @param snapObj, snapshot is performed on snapObj if not null
+     * @return true if the port has existed
+     */
+    static bool rmPortFromCond(QDomNode atom, const QString& portName,
+            vleDomDiffStack* snapObj=0);
+    static bool renamePortFromCond(QDomNode atom, const QString& oldName,
+            const QString& newName, vleDomDiffStack* snapObj=0);
 
     /**
      * @brief Set the port values to a cond, without removing others
@@ -141,12 +186,66 @@ public:
      *      ...
      *    </condition>
      * @param val, a map where keys are port names
-     * @note the ports are cleared (unless it is not into the map)
-     * if present and only the first value can be filled handled
+     * @param snapObj, snapshot is performed on snapObj if not null
+     * @return true if modifications have been performed
+     *
+     * @note the ports into the map are first cleared, the others
+     * remain the same. Only the first value can be filled
      */
-
     static bool fillConditionWithMap(QDomDocument& domDoc,
-                  QDomNode atom, const vle::value::Map& val);
+                  QDomNode atom, const vle::value::Map& val,
+                  vleDomDiffStack* snapObj=0);
+    /**
+     * @brief Add a port to an observable
+     * @param domDoc, a Dom document to create new QDomNode
+     * @param atom, is expected to be of the form
+     *    <observable name="someobs">
+     *      <port name="someport"/>
+     *      ...
+     *    </observable>
+     * @param portName, the name of the port
+     * @param snapObj, snapshot is performed on snapObj if not null
+     * @return false if already present or error has occured
+     */
+    static bool addObservablePort(QDomDocument& domDoc, QDomNode atom,
+            const QString& portName, vleDomDiffStack* snapObj=0);
+    static bool rmObservablePort(QDomNode atom,
+            const QString& portName, vleDomDiffStack* snapObj=0);
+
+    /**
+     * @brief Add/remove a port to input list of a model
+     * @param domDoc, a Dom document to create new QDomNode
+     * @param atom, is expected to be of the form
+     *    <in>
+     *      <port name="someInputPort"/>
+     *      ...
+     *    </in>
+     * @param portName, the name of the port to add/remove
+     * @param snapObj, snapshot is performed on snapObj if not null
+     * @return false if an error occurred or nothing is done
+     */
+    static bool addPortToInNode(QDomDocument& domDoc, QDomNode atom,
+            const QString& portName, vleDomDiffStack* snapObj=0);
+    static bool rmPortToInNode(QDomNode atom,
+            const QString& portName, vleDomDiffStack* snapObj=0);
+
+
+    /**
+     * @brief Add a port to output list of a model
+     * @param domDoc, a Dom document to create new QDomNode
+     * @param atom, is expected to be of the form
+     *    <out>
+     *      <port name="someInputPort"/>
+     *      ...
+     *    </out>
+     * @param portName, the name of the port
+     * @param snapObj, snapshot is performed on snapObj if not null
+     * @return false if already present or error has occured
+     */
+    static bool addPortToOutNode(QDomDocument& domDoc, QDomNode atom,
+            const QString& portName, vleDomDiffStack* snapObj=0);
+    static bool rmPortToOutNode(QDomNode atom,
+            const QString& portName, vleDomDiffStack* snapObj=0);
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
@@ -639,11 +738,6 @@ public:
     bool existCondFromDoc(const QString& condName) const;
 
     /**
-     * @brief tells if the port portName exists in condition condName
-     */
-    bool existPortFromDoc(const QString& condName,
-            const QString& portName) const;
-    /**
      * @brief Renames a view and the output associated to it
      * (attribute 'output' of <view> and attribute 'name' of <output>
      * @brief oldName, the old name of the view (and output)
@@ -796,22 +890,12 @@ public:
     QDomNode portFromCond(const QDomNode& node, const QString& portName) const;
 
     /**
-     * @brief tells if there is a <port> wich attribute 'name' equals
-     * portName in a <condition> node
-     */
-    bool existPortFromCond(const QDomNode& node, const QString& portName) const;
-
-    /**
      * @brief remove <condition> tag from <conditions>
      * which attribute 'name' is condName
      */
     void rmCondFromConds(QDomNode node, const QString& condName);
 
-    /**
-     * @brief remove <port> tag from <condition>
-     * which attribute 'name' is portName
-     */
-    void rmPortFromCond(QDomNode node, const QString& portName);
+
     /**
      * @brief add a <view> tag to <views>
      * whith attribute 'name'  viewName

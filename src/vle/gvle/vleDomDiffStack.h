@@ -79,15 +79,28 @@ public:
     /**
      * @brief get the first child corresponding to the name and add it
      * if not present
-     * @param domDoc, used to create the QDomNode
      * @param node, the node to which one appends a child
-     * @param
+     * @param nodeName, the nodeName of the child name
+     * @param domDoc, if not null and node is not found then the node
+     * is created
+     * @param the (created or found) resulting node
      */
-    static QDomNode obtainChild(QDomDocument& domDoc, QDomNode node,
-            const QString& nodeName, bool addIfNot=true);
+    static QDomNode obtainChild(QDomNode node,
+            const QString& nodeName, QDomDocument* domDoc=0);
 
-    static QDomNode childWhithNameAttr(const QDomNode& node,
-                const QString& nodeName, const QString& nameValue);
+    /**
+     * @brief get a child with a specific nodename and a specific value
+     * for attribute "name".
+     * @param node, the node to which one appends a child
+     * @param nodeName, the name of the node to search
+     * @param nameValue, used to create the QDomNode
+     * @param domDoc, if not null and node is not found then the node
+     * is created
+     * @param the (created or found) resulting node
+     */
+    static QDomNode childWhithNameAttr(QDomNode& node,
+            const QString& nodeName, const QString& nameValue,
+            QDomDocument* domDoc=0);
 
     static QString toQString(const QDomNode& node);
     /**

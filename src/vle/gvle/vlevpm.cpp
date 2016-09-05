@@ -102,7 +102,7 @@ vleDomVpm::getNodeFromXQuery(const QString& query,
     //handle recursion with uniq node
     if ((curr == "condPlugins") or
         (curr == "outputGUIplugins")){
-        return getNodeFromXQuery(rest, obtainChild(*mDoc, d, curr, true));
+        return getNodeFromXQuery(rest, obtainChild(d, curr, mDoc));
     }
     //handle recursion with nodes identified by name
     std::vector<QString> nodeByNames;
