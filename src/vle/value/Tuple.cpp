@@ -177,5 +177,10 @@ void Tuple::remove(size_type i)
     m_value.erase(m_value.begin() + i);
 }
 
+void Tuple::resize(size_type n, double value)
+{
+    m_value.resize(n, value);
+}
+
 }} // namespace vle value
 

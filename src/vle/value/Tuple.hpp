@@ -255,6 +255,12 @@ public:
      */
     void remove(size_type i);
 
+    /**
+     * @brief Resizes the tuple
+     * @param n, the new size
+     */
+    void resize(size_type n, double value = 0.0);
+
 private:
     TupleValue              m_value;
 };
