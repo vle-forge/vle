@@ -1343,6 +1343,9 @@ gvle_win::openMainPanel(gvle_file gf, PluginMainPanel* panel)
             this, SLOT(onUndoAvailable(bool)));
     QObject::connect(panel, SIGNAL(rightWidgetChanged()),
             this, SLOT(onRightWidgetChanged()));
+    //set undo redo enabled
+    ui->actionUndo->setEnabled(true);
+    ui->actionRedo->setEnabled(true);
 
 }
 
