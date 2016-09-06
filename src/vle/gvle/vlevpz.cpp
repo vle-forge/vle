@@ -750,6 +750,26 @@ vleVpz::rmObservablePort(QDomNode atom, const QString& portName,
 }
 
 bool
+vleVpz::renameObservablePort(QDomNode atom,
+            const QString& oldName, const QString& newName,
+            vleDomDiffStack* snapObj)
+{
+    if (atom.nodeName() != "observable") {
+        qDebug() << "Internal error in renameObservablePort "<< atom.nodeName();
+        return false;
+    }
+    QDomNode toRename = vleDomObject::childWhithNameAttr(atom,"port", oldName);
+    if (toRename.isNull()) {
+        return false;
+    }
+    if (snapObj) {
+        snapObj->snapshot(atom);
+    }
+    vleDomObject::setAttributeValue(toRename, "name", newName);
+    return true;
+}
+
+bool
 vleVpz::addPortToInNode(QDomDocument& domDoc, QDomNode atom,
         const QString& portName, vleDomDiffStack* snapObj)
 {
@@ -763,7 +783,8 @@ vleVpz::addPortToInNode(QDomDocument& domDoc, QDomNode atom,
     if (snapObj) {
         snapObj->snapshot(atom);
     }
-    QDomNode portNode = vleDomObject::obtainChild(atom, "port", &domDoc);
+    QDomNode portNode = vleDomObject::childWhithNameAttr(
+            atom,"port", portName, &domDoc);
     vleDomObject::setAttributeValue(portNode, "name", portName);
     return true;
 }
@@ -788,6 +809,26 @@ vleVpz::rmPortToInNode(QDomNode atom,
 }
 
 bool
+vleVpz::renamePortToInNode(QDomNode atom,
+            const QString& oldName, const QString& newName,
+            vleDomDiffStack* snapObj)
+{
+    if (atom.nodeName() != "in") {
+        qDebug() << "Internal error in renamePortToInNode "<< atom.nodeName();
+        return false;
+    }
+    QDomNode toRename = vleDomObject::childWhithNameAttr(atom,"port", oldName);
+    if (toRename.isNull()) {
+        return false;
+    }
+    if (snapObj) {
+        snapObj->snapshot(atom);
+    }
+    vleDomObject::setAttributeValue(toRename, "name", newName);
+    return true;
+}
+
+bool
 vleVpz::addPortToOutNode(QDomDocument& domDoc, QDomNode atom,
         const QString& portName, vleDomDiffStack* snapObj)
 {
@@ -801,7 +842,9 @@ vleVpz::addPortToOutNode(QDomDocument& domDoc, QDomNode atom,
     if (snapObj) {
         snapObj->snapshot(atom);
     }
-    QDomNode portNode = vleDomObject::obtainChild(atom, "port", &domDoc);
+
+    QDomNode portNode = vleDomObject::childWhithNameAttr(
+            atom,"port", portName, &domDoc);
     vleDomObject::setAttributeValue(portNode, "name", portName);
     return true;
 }
@@ -823,6 +866,26 @@ vleVpz::rmPortToOutNode(QDomNode atom,
         return true;
     }
     return false;
+}
+
+bool
+vleVpz::renamePortToOutNode(QDomNode atom,
+            const QString& oldName, const QString& newName,
+            vleDomDiffStack* snapObj)
+{
+    if (atom.nodeName() != "out") {
+        qDebug() << "Internal error in renamePortToOutNode "<< atom.nodeName();
+        return false;
+    }
+    QDomNode toRename = vleDomObject::childWhithNameAttr(atom,"port", oldName);
+    if (toRename.isNull()) {
+        return false;
+    }
+    if (snapObj) {
+        snapObj->snapshot(atom);
+    }
+    vleDomObject::setAttributeValue(toRename, "name", newName);
+    return true;
 }
 
 

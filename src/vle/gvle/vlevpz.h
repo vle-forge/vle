@@ -211,6 +211,9 @@ public:
             const QString& portName, vleDomDiffStack* snapObj=0);
     static bool rmObservablePort(QDomNode atom,
             const QString& portName, vleDomDiffStack* snapObj=0);
+    static bool renameObservablePort(QDomNode atom,
+                const QString& oldName, const QString& newName,
+                vleDomDiffStack* snapObj=0);
 
     /**
      * @brief Add/remove a port to input list of a model
@@ -228,6 +231,9 @@ public:
             const QString& portName, vleDomDiffStack* snapObj=0);
     static bool rmPortToInNode(QDomNode atom,
             const QString& portName, vleDomDiffStack* snapObj=0);
+    static bool renamePortToInNode(QDomNode atom,
+                const QString& oldName, const QString& newName,
+                vleDomDiffStack* snapObj=0);
 
 
     /**
@@ -246,6 +252,10 @@ public:
             const QString& portName, vleDomDiffStack* snapObj=0);
     static bool rmPortToOutNode(QDomNode atom,
             const QString& portName, vleDomDiffStack* snapObj=0);
+    static bool renamePortToOutNode(QDomNode atom,
+                const QString& oldName, const QString& newName,
+                vleDomDiffStack* snapObj=0);
+
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
