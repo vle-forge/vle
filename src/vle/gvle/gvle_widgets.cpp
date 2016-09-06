@@ -1089,7 +1089,7 @@ VleValueWidget::buildDefaultValue(eValueWidgetMenu type)
         break;
     } case EMenuValueAddMatrix:
     case EMenuValueSetMatrix:{
-        return value::Matrix::create();
+        return std::unique_ptr<value::Value>(new value::Matrix());
         break;
     } default: {
         return std::unique_ptr<value::Value>();
