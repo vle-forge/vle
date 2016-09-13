@@ -355,8 +355,10 @@ struct Spawn::Pimpl
 
     ~Pimpl()
     {
-        if (m_start and not m_finish)
-            wait();
+        if (m_start) {
+            if (not m_finish)
+                wait();
+        }
     }
 
     bool is_running()
@@ -578,6 +580,37 @@ struct Spawn::Pimpl
         return false;
     }
 
+    void format(LPTSTR function, DWORD error)
+    {
+        LPVOID buffer;
+        LPVOID displaybuffer;
+
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                      FORMAT_MESSAGE_FROM_SYSTEM |
+                      FORMAT_MESSAGE_IGNORE_INSERTS,
+                      NULL,
+                      error,
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      (LPTSTR) &buffer,
+                      0, NULL );
+
+        displaybuffer = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+            (lstrlen((LPCTSTR)buffer) + lstrlen((LPCTSTR)function) + 40) *
+             sizeof(TCHAR));
+
+        StringCchPrintf((LPTSTR)displaybuffer,
+            LocalSize(displaybuffer) / sizeof(TCHAR),
+            TEXT("%s failed with error %d: %s"),
+            function, error, buffer);
+
+        // MessageBox(NULL, (LPCTSTR)displaybuffer, TEXT("Error"), MB_OK);
+
+        vDbg(m_pimpl->m_context, "%s\n", (char*)displaybuffer);
+
+        LocalFree(buffer);
+        LocalFree(displaybuffer);
+    }
+
     bool wait()
     {
         assert(m_start);
@@ -595,6 +628,17 @@ struct Spawn::Pimpl
         }
 
         return true;
+    }
+
+    void kill()
+    {
+        assert(m_start);
+
+        if (m_finish)
+            return;
+
+        if (TerminateProcess(m_pi, 0) == 0)
+            format("TerminateProcess", GetLastError());
     }
 
     bool isfinish()
@@ -655,6 +699,11 @@ bool Spawn::start(const std::string& exe,
 bool Spawn::wait()
 {
     return m_pimpl->wait();
+}
+
+void Spawn::kill()
+{
+    m_pimpl->kill();
 }
 
 bool Spawn::isstart()

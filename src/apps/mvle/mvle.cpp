@@ -227,11 +227,13 @@ int main(int argc, char **argv)
                 }
             } else {
                 try {
-                    vle::manager::Manager man(ctx,
-                                              vle::manager::LOG_NONE,
-                                              vle::manager::SIMULATION_NONE |
-                                              vle::manager::SIMULATION_NO_RETURN,
-                                              &std::cout);
+                    vle::manager::Manager man(
+                        ctx,
+                        vle::manager::LOG_NONE,
+                        vle::manager::SIMULATION_NONE |
+                        vle::manager::SIMULATION_SPAWN_PROCESS |
+                        vle::manager::SIMULATION_NO_RETURN,
+                        &std::cout);
 
                     printf("MPI node %d/%d start\n", rank, world);
 
@@ -242,6 +244,7 @@ int main(int argc, char **argv)
 
                         vle::manager::Error error;
                         auto res = man.run(std::move(v),
+                                           pack.name(),
                                            1,
                                            rank,
                                            world,

@@ -68,6 +68,7 @@
 #define VLE_COMMAND_URL_GET "curl --progress-bar '%1%' -o '%2%'"
 #define VLE_COMMAND_DIR_COPY "cmake -E copy_directory '%1%' '%2%'"
 #define VLE_COMMAND_DIR_REMOVE "cmake -E remove_directory '%1%'"
+#define VLE_COMMAND_VLE_SIMULATION "vle-" VLE_ABI_VERSION " --write-output '%1%' -P '%2%' '%3%'"
 #endif
 
 namespace vle { namespace utils {
@@ -77,7 +78,7 @@ void Context::reset_settings() noexcept
     m_pimpl->settings = {
         { "gvle.packages.auto-build", true },
         { "gvle.editor.auto-indent", true },
-        { "gvle.editor.font", std::string("Monospace 10") },
+        { "gvle.editor.font", std::string("Monospace 10")},
         { "gvle.editor.highlight-line", true },
         { "gvle.editor.highlight-brackets", true },
         { "gvle.editor.highlight-syntax", true },
@@ -86,30 +87,32 @@ void Context::reset_settings() noexcept
         { "gvle.editor.show-line-numbers", true },
         { "gvle.editor.show-right-margin", true },
         { "gvle.editor.smart-home-end", true },
-        { "gvle.graphics.background-color", std::string("#ffffffffffff") },
-        { "gvle.graphics.foreground-color", std::string("#000000000000") },
-        { "gvle.graphics.atomic-color", std::string("#0000ffff0000") },
-        { "gvle.graphics.coupled-color", std::string("#00000000ffff") },
-        { "gvle.graphics.selected-color", std::string("#ffff00000000") },
-        { "gvle.graphics.connection-color", std::string("#000000000000") },
-        { "gvle.graphics.font", std::string("Monospace 10") },
+        { "gvle.graphics.background-color", std::string("#ffffffffffff")},
+        { "gvle.graphics.foreground-color", std::string("#000000000000")},
+        { "gvle.graphics.atomic-color", std::string("#0000ffff0000")},
+        { "gvle.graphics.coupled-color", std::string("#00000000ffff")},
+        { "gvle.graphics.selected-color", std::string("#ffff00000000")},
+        { "gvle.graphics.connection-color", std::string("#000000000000")},
+        { "gvle.graphics.font", std::string("Monospace 10")},
         { "gvle.graphics.font-size", 10.0 },
         { "gvle.graphics.line-width", 3.0 },
         { "vle.simulation.thread", 0l },
         { "vle.simulation.block-size", 8l },
-        { "vle.packages.configure", std::string(VLE_PACKAGE_COMMAND_CONFIGURE) },
-        { "vle.packages.test", std::string(VLE_PACKAGE_COMMAND_TEST) },
-        { "vle.packages.build", std::string(VLE_PACKAGE_COMMAND_BUILD) },
-        { "vle.packages.install", std::string(VLE_PACKAGE_COMMAND_INSTALL) },
-        { "vle.packages.clean", std::string(VLE_PACKAGE_COMMAND_CLEAN) },
-        { "vle.packages.package", std::string(VLE_PACKAGE_COMMAND_PACKAGE) },
+        { "vle.packages.configure", std::string(VLE_PACKAGE_COMMAND_CONFIGURE)},
+        { "vle.packages.test", std::string(VLE_PACKAGE_COMMAND_TEST)},
+        { "vle.packages.build", std::string(VLE_PACKAGE_COMMAND_BUILD)},
+        { "vle.packages.install", std::string(VLE_PACKAGE_COMMAND_INSTALL)},
+        { "vle.packages.clean", std::string(VLE_PACKAGE_COMMAND_CLEAN)},
+        { "vle.packages.package", std::string(VLE_PACKAGE_COMMAND_PACKAGE)},
         { "vle.remote.url",
-                std::string("http://www.vle-project.org/pub/" VLE_ABI_VERSION) },
-        { "vle.command.tar", std::string(VLE_COMMAND_TAR) },
-        { "vle.command.untar", std::string(VLE_COMMAND_UNTAR) },
-        { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET) },
-        { "vle.command.dir.copy", std::string(VLE_COMMAND_DIR_COPY) },
-        { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE) }};
+                std::string("http://www.vle-project.org/pub/" VLE_ABI_VERSION)},
+        { "vle.command.tar", std::string(VLE_COMMAND_TAR)},
+        { "vle.command.untar", std::string(VLE_COMMAND_UNTAR)},
+        { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET)},
+        { "vle.command.dir.copy", std::string(VLE_COMMAND_DIR_COPY)},
+        { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE)},
+        { "vle.command.vle.simulation",
+          std::string(VLE_COMMAND_VLE_SIMULATION)}};
 }
 
 bool Context::load_settings() noexcept

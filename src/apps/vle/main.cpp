@@ -178,16 +178,18 @@ static void show_help() noexcept
 {
     printf(
         _("%s\nvle-%s [options...]\n\n"
-          "help,h      Produce help message\n"
-          "version,v   Print version string\n"
-          "infos,i     Informations of VLE\n"
-          "restart     Remove configuration file of VLE\n"
-          "log-file    log of simulation are reported to the standard file\n"
-          "            ($VLE_HOME/vle-x.y.log"
-          "log-stdout  log of the simulation(s) are reported to the "
+          "help,h        Produce help message\n"
+          "version,v     Print version string\n"
+          "infos,i       Informations of VLE\n"
+          "restart       Remove configuration file of VLE\n"
+          "log-file      log of simulation are reported to the standard file\n"
+          "              ($VLE_HOME/vle-x.y.log"
+          "log-stdout    log of the simulation(s) are reported to the "
           "standard output (default)\n"
-          "log-stderr  log of the sinulation(s) are reported to the "
+          "log-stderr    log of the sinulation(s) are reported to the "
           "standard error output\n"
+          "writeoutput,w output simulation results into XML output file. "
+          "Need a file name parameter.\n"
           "\n"
           "processor,j Select number of processor in manager mode [>= 1]\n"
           "manager,m  Use the manager mode to run experimental frames\n"
@@ -315,6 +317,7 @@ static vle::manager::LogOptions convert_log_mode(vle::utils::ContextPtr ctx)
 }
 
 static int run_manager(vle::utils::ContextPtr ctx,
+                       const std::string& package,
                        CmdArgs::const_iterator it, CmdArgs::const_iterator end,
                        int processor, vle::utils::Package& pkg)
 {
@@ -328,8 +331,8 @@ static int run_manager(vle::utils::ContextPtr ctx,
         vle::manager::Error error;
         std::unique_ptr<vle::value::Matrix> res =
             man.run(
-                std::unique_ptr<vle::vpz::Vpz>(
-                    new vle::vpz::Vpz(search_vpz(*it, pkg))),
+                std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
+                package,
                 processor,
                 0,
                 1,
@@ -346,25 +349,42 @@ static int run_manager(vle::utils::ContextPtr ctx,
 }
 
 static int run_simulation(vle::utils::ContextPtr ctx,
+                          const std::string& package,
+                          const std::string& output_file,
                           CmdArgs::const_iterator it,
-                          CmdArgs::const_iterator end, vle::utils::Package& pkg)
+                          CmdArgs::const_iterator end,
+                          vle::utils::Package& pkg)
 {
     vle::manager::Simulation sim(ctx, convert_log_mode(ctx),
-                                 vle::manager::SIMULATION_NONE |
-                                 vle::manager::SIMULATION_NO_RETURN,
+                                 vle::manager::SIMULATION_NONE,
                                  &std::cout);
     int success = EXIT_SUCCESS;
 
     for (; it != end; ++it) {
         vle::manager::Error error;
-        std::unique_ptr<vle::value::Map> res =
-            sim.run(std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
-                    &error);
+
+        auto res = sim.run(
+            std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
+            package,
+            &error);
 
         if (error.code) {
             fprintf(stderr, _("Simulator `%s' throws error %s\n"),
                     it->c_str(), error.message.c_str());
             success = EXIT_FAILURE;
+        } else {
+            if (res and not output_file.empty()) {
+                std::ofstream ofs(output_file);
+
+                if (not ofs) {
+                    fprintf(stderr, _("Simulation`%s' file to write output"
+                                      " file %s\n"),
+                            it->c_str(),
+                            output_file.c_str());
+                } else {
+                    res->writeXml(ofs);
+                }
+            }
         }
     }
 
@@ -388,7 +408,9 @@ static bool init_package(vle::utils::Package& pkg, const CmdArgs &args)
 }
 
 static int manage_package_mode(vle::utils::ContextPtr ctx,
-                               bool manager_mode, int processor, CmdArgs args)
+                               const std::string& output_file,
+                               bool manager_mode, int processor,
+                               CmdArgs args)
 {
     if (args.empty()) {
         fprintf(stderr, _("missing package\n"));
@@ -461,9 +483,9 @@ static int manage_package_mode(vle::utils::ContextPtr ctx,
         ret = EXIT_FAILURE;
     else if (it != end) {
         if (manager_mode)
-            ret = run_manager(ctx, it, end, processor, pkg);
+            ret = run_manager(ctx, packagename, it, end, processor, pkg);
         else
-            ret = run_simulation(ctx, it, end, pkg);
+            ret = run_simulation(ctx, packagename, output_file, it, end, pkg);
     }
 
     return ret;
@@ -685,6 +707,7 @@ static int manage_config_mode(vle::utils::ContextPtr ctx, CmdArgs args)
 
 int main(int argc, char **argv)
 {
+    std::string output_file;
     unsigned int mode = CLI_MODE_NOTHING;
     int verbose_level = 0;
     int processor_number = 1;
@@ -703,6 +726,7 @@ int main(int argc, char **argv)
         {"log-file", 0, &log_stdout, 0},
         {"log-stdout", 0, &log_stdout, 1},
         {"log-stderr", 0, &log_stdout, 2},
+        {"write-output", 1, nullptr, 0},
         {"verbose", 1, nullptr, 'V'},
         {"processor", 1, nullptr, 'j'},
         {"manager", 0, nullptr, 'm'},
@@ -720,7 +744,8 @@ int main(int argc, char **argv)
 
         switch (opt) {
         case 0:
-            printf("options %s\n", long_opts[opt_index].name);
+            if (not strcmp(long_opts[opt_index].name, "write-output"))
+                output_file = ::optarg;
             break;
         case 'h':
             mode |= CLI_MODE_END;
@@ -812,7 +837,7 @@ int main(int argc, char **argv)
 
     switch (mode) {
     case CLI_MODE_PACKAGE:
-        ret = manage_package_mode(ctx, manager, processor_number,
+        ret = manage_package_mode(ctx, output_file, manager, processor_number,
                                   std::move(commands));
         break;
     case CLI_MODE_REMOTE:

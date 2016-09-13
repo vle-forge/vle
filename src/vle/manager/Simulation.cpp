@@ -29,13 +29,46 @@
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Simulation.hpp>
 #include <boost/timer.hpp>
 #include <boost/progress.hpp>
+#include <fstream>
 #include <sstream>
 
 namespace vle { namespace manager {
+
+utils::Path make_temp(const char* format)
+{
+    assert(format);
+
+    utils::Path tmp = utils::Path::temp_directory_path();
+    tmp /= utils::Path::unique_path(format);
+
+    return tmp;
+}
+
+std::unique_ptr<value::Map> read_value(const utils::Path& p)
+{
+    std::ifstream ifs(p.string());
+    if (ifs.is_open()) {
+        std::stringstream ss;
+        ss << ifs.rdbuf();
+        std::string buffer(ss.str());
+
+        auto v = vpz::Vpz::parseValue(buffer);
+        if (v and v->isMap()) {
+            value::Map *ptr = static_cast<value::Map*>(v.get());
+            if (ptr) {
+                v.release();
+                return std::unique_ptr<value::Map>(ptr);
+            }
+        }
+    }
+
+    return std::unique_ptr<value::Map>{};
+}
 
 class Simulation::Pimpl
 {
@@ -44,6 +77,8 @@ public:
     std::ostream      *m_out;
     LogOptions         m_logoptions;
     SimulationOptions  m_simulationoptions;
+    utils::Path        m_vpz_file;
+    utils::Path        m_output_file;
 
     Pimpl(utils::ContextPtr  context,
           LogOptions         logoptions,
@@ -53,10 +88,9 @@ public:
         , m_out(output)
         , m_logoptions(logoptions)
         , m_simulationoptions(simulationoptionts)
+        , m_vpz_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.vpz"))
+        , m_output_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.value"))
     {
-        if (m_simulationoptions & manager::SIMULATION_SPAWN_PROCESS)
-            vInfo(m_context, _("Simulation: SIMULATION_SPAWN_PROCESS is not "
-                               " yet implemented\n"));
     }
 
     template <typename T>
@@ -204,35 +238,138 @@ public:
 
         return result;
     }
+
+    std::unique_ptr<value::Map>
+    runSubProcess(std::unique_ptr<vpz::Vpz> vpz,
+                  const std::string& package,
+                  Error *error)
+    {
+        auto pwd = utils::Path::current_path();
+        std::string command;
+
+        vpz->write(m_vpz_file.string());
+
+        try {
+            m_context->get_setting("vle.command.vle.simulation", &command);
+            command = (vle::fmt(command) % m_output_file.string() %
+                       package % m_vpz_file.string()).str();
+
+            vle::utils::Spawn spawn(m_context);
+            auto argv = spawn.splitCommandLine(command);
+            auto exe = std::move(argv.front());
+            argv.erase(argv.begin());
+
+            if (not spawn.start(exe, pwd.string(), argv)) {
+                error->code = -1;
+                error->message = "fail to spawn";
+                return {};
+            }
+
+            std::string output, err;
+            std::string message;
+            bool success;
+
+            if (m_timeout != std::chrono::milliseconds::zero()) {
+                auto duration = m_timeout;
+                auto starttime = std::chrono::system_clock::now();
+
+                while (not spawn.isfinish()) {
+                    if (spawn.get(&output, &err)) {
+                        vInfo(m_context, "%s", output.c_str());
+                        vErr(m_context, "%s", err.c_str());
+                        output.clear();
+                        err.clear();
+
+                        std::this_thread::sleep_for(
+                            std::chrono::microseconds(200));
+
+                        auto endtime = std::chrono::system_clock::now();
+                        auto elapsed = endtime - starttime;
+                        if (elapsed > duration) {
+                            printf("kill process. Too long\n");
+                            spawn.kill();
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                while (not spawn.isfinish()) {
+                    if (spawn.get(&output, &err)) {
+                        vInfo(m_context, "%s", output.c_str());
+                        vErr(m_context, "%s", err.c_str());
+                        output.clear();
+                        err.clear();
+
+                        std::this_thread::sleep_for(
+                            std::chrono::microseconds(200));
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            spawn.wait();
+            spawn.status(&message, &success);
+
+            if (not success and not message.empty()) {
+                vErr(m_context, "VLE failure: %s\n", message.c_str());
+                error->code = -1;
+                error->message = message;
+
+                return {};
+            }
+
+            return read_value(m_output_file);
+        } catch (const std::exception& e) {
+            vErr(m_context, _("VLE sub process: unable to start "
+                             "'%s' in '%s' with "
+                             "the '%s' command\n"),
+                 package.c_str(),
+                 pwd.string().c_str(),
+                 command.c_str());
+
+            error->code = -1;
+            error->message = "fail to run";
+        }
+
+        return {};
+    }
 };
 
 Simulation::Simulation(utils::ContextPtr  context,
                        LogOptions         logoptions,
                        SimulationOptions  simulationoptionts,
                        std::ostream      *output)
-    : mPimpl(std::make_unique<Simulation::Pimpl>(context, logoptions,
-                                                 simulationoptionts, output))
+    : mPimpl(std::make_unique<Simulation::Pimpl>(
+                 context, logoptions,
+                 simulationoptionts, output))
 {
 }
 
 Simulation::~Simulation() = default;
 
 std::unique_ptr<value::Map>
-Simulation::run(std::unique_ptr<vpz::Vpz>  vpz,
-                Error                      *error)
+Simulation::run(std::unique_ptr<vpz::Vpz> vpz,
+                const std::string& package,
+                Error *error)
 {
     error->code = 0;
     std::unique_ptr<value::Map> result;
 
-    if (mPimpl->m_logoptions != manager::LOG_NONE) {
-        if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {
-            result = mPimpl->runVerboseRun(std::move(vpz), error);
-        } else {
-            result = mPimpl->runVerboseSummary(std::move(vpz), error);
-        }
-
+    if (mPimpl->m_simulationoptions & SIMULATION_SPAWN_PROCESS) {
+        result = mPimpl->runSubProcess(std::move(vpz), package, error);
     } else {
-        result = mPimpl->runQuiet(std::move(vpz), error);
+        if (mPimpl->m_logoptions != manager::LOG_NONE) {
+            if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {
+                result = mPimpl->runVerboseRun(std::move(vpz), error);
+            } else {
+                result = mPimpl->runVerboseSummary(std::move(vpz), error);
+            }
+        } else {
+            result = mPimpl->runQuiet(std::move(vpz), error);
+        }
     }
 
     if (mPimpl->m_simulationoptions & manager::SIMULATION_NO_RETURN) {

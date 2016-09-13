@@ -139,6 +139,7 @@ public:
     struct worker
     {
         utils::ContextPtr     context;
+        const std::string& package;
         const std::unique_ptr<vpz::Vpz>& vpz;
         ExperimentGenerator  &expgen;
         LogOptions            mLogOption;
@@ -149,6 +150,7 @@ public:
         Error                *error;
 
         worker(utils::ContextPtr                 context,
+               const std::string& package,
                const std::unique_ptr<vpz::Vpz>&  vpz,
                ExperimentGenerator&              expgen,
                LogOptions                        logoptions,
@@ -158,6 +160,7 @@ public:
                value::Matrix                    *result,
                Error                            *error)
           : context(context)
+          , package(package)
           , vpz(vpz)
           , expgen(expgen)
           , mLogOption(logoptions)
@@ -188,7 +191,7 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                auto simresult = sim.run(std::move(file), &err);
+                auto simresult = sim.run(std::move(file), package, &err);
 
                 if (err.code) {
                     if (not error->code) {
@@ -204,6 +207,7 @@ public:
 
     std::unique_ptr<value::Matrix>
     runManagerThread(std::unique_ptr<vpz::Vpz> vpz,
+                     const std::string& package,
                      uint32_t               threads,
                      uint32_t               rank,
                      uint32_t               world,
@@ -221,7 +225,7 @@ public:
             ctx->set_log_function(
                     std::unique_ptr<utils::Context::LogFunctor>(
                             new vle_log_manager_thread(i)));
-            gp.emplace_back(worker(ctx, vpz, expgen,
+            gp.emplace_back(worker(ctx, package, vpz, expgen,
                        mLogOption, mSimulationOption,
                        i, threads, result.get(), error));
         }
@@ -237,9 +241,10 @@ public:
 
     std::unique_ptr<value::Matrix>
     runManagerMono(std::unique_ptr<vpz::Vpz> vpz,
-                   uint32_t              rank,
-                   uint32_t              world,
-                   Error                *error)
+                   const std::string& package,
+                   uint32_t rank,
+                   uint32_t world,
+                   Error *error)
     {
         Simulation sim(mContext, mLogOption, mSimulationOption, nullptr);
         ExperimentGenerator expgen(*vpz, rank, world);
@@ -256,7 +261,7 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                sim.run(std::move(file), &err);
+                sim.run(std::move(file), package, &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -277,7 +282,7 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                auto simresult = sim.run(std::move(file), &err);
+                auto simresult = sim.run(std::move(file), package, &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -310,8 +315,9 @@ Manager::Manager(utils::ContextPtr     context,
                  LogOptions            logoptions,
                  SimulationOptions     simulationoptions,
                  std::ostream         *output)
-    : mPimpl(std::make_unique<Manager::Pimpl>(context, logoptions,
-                                              simulationoptions, output))
+    : mPimpl(std::make_unique<Manager::Pimpl>(
+                 context, logoptions,
+                 simulationoptions, output))
 {
 }
 
@@ -319,6 +325,7 @@ Manager::~Manager() = default;
 
 std::unique_ptr<value::Matrix>
 Manager::run(std::unique_ptr<vpz::Vpz>  exp,
+             const std::string& package,
              uint32_t                   thread,
              uint32_t                   rank,
              uint32_t                   world,
@@ -347,10 +354,10 @@ Manager::run(std::unique_ptr<vpz::Vpz>  exp,
     mPimpl->writeSummaryLog(_("Manager started"));
 
     if (thread > 1) {
-        result = mPimpl->runManagerThread(std::move(exp), thread, rank,
+        result = mPimpl->runManagerThread(std::move(exp), package, thread, rank,
                                           world, error);
     } else {
-        result = mPimpl->runManagerMono(std::move(exp), rank,
+        result = mPimpl->runManagerMono(std::move(exp), package, rank,
                                         world, error);
     }
 

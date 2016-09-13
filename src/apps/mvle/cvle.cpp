@@ -489,7 +489,7 @@ private:
 
         auto vpz = std::make_unique<vle::vpz::Vpz>(*m_vpz.get());
 
-        auto result = m_simulator.run(std::move(vpz),  &error);
+        auto result = m_simulator.run(std::move(vpz), m_packagename, &error);
 
         if (error.code) {
             if (m_warnings) {
@@ -518,9 +518,11 @@ public:
         : m_context(vle::utils::make_context())
         , m_packagename(package)
         , m_simulator(m_context, vle::manager::LOG_NONE,
-                      vle::manager::SIMULATION_NONE, nullptr)
+                      vle::manager::SIMULATION_NONE |
+                      vle::manager::SIMULATION_SPAWN_PROCESS, nullptr)
         , m_warnings(warnings)
     {
+        m_context->set_log_priority(3);
         vle::utils::Package pack(m_context);
         pack.select(m_packagename);
         m_vpz = std::make_unique<vle::vpz::Vpz>(

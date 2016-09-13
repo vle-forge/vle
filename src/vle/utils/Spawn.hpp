@@ -125,6 +125,23 @@ public:
     bool wait();
 
     /**
+     * Try to kill the sub-process. If the process is not running, do
+     * nothing. Do not forget to use the \c wait() function to get the
+     * statutes of the sub-process.
+     *
+     * \code
+     * vle::utils::Spawn sp(context);
+     * [...]
+     * sp.kill();
+     *
+     * std::string msg;
+     * bool success;
+     * sp.status(&msg, &success);
+     * \encode
+     */
+    void kill();
+
+    /**
      * Return true if the process is finished.
      *
      * @return @e true if the process is start, false if it not
