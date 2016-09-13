@@ -47,11 +47,12 @@ class DefaultSimSubpanelThread : public QObject
     Q_OBJECT
 public:
     std::unique_ptr<vle::value::Map>     output_map;
-    vleVpm*              mvpm;
-    vle::utils::Package* mpkg;
-    QString              error_simu;
+    vleVpm*                   mvpm;
+    vle::utils::Package*      mpkg;
+    QString                   error_simu;
+    std::vector<std::string>& log_messages;
 
-    DefaultSimSubpanelThread();
+    DefaultSimSubpanelThread(std::vector<std::string>& logMessages);
     ~DefaultSimSubpanelThread();
     void init(vleVpm* vpm, vle::utils::Package* pkg);
 public slots:
@@ -72,6 +73,7 @@ public:
     ~DefaultSimSubpanelLeftWidget();
     Ui::simpanelleft* ui;
     QCustomPlot* customPlot;
+
 
 };
 
@@ -146,14 +148,18 @@ public:
     vleVpm* mvpm;
     vle::utils::Package* mpkg;
     Logger* mLog;
+    QTimer timer;
 
     std::vector<portToPlot> portsToPlot;
+    std::vector<std::string> log_messages;
+    unsigned int index_message;
 
 public slots:
     void onSimulationFinished();
     void onRunPressed();
     void onTreeItemChanged(QTreeWidgetItem* item, int col);
     void onTreeItemSelected();
+    void onTimeout();
     void onToolColor();
 };
 

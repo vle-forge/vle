@@ -113,12 +113,23 @@ public:
     /**
      * @brief get the list of attached cond
      * @param atom, is expexted to be of the form
-     *    <model name="myname" type="atomic" ...>
+     *    <model name="somemodel" type="atomic" ...>
      *    ...
      *    </model>
      * @return the list of conditions attached to the atomic model
      */
     static QSet<QString> attachedCondsToAtomic(const QDomNode& atom);
+    /**
+     * @brief tells if an atomic model is in debuging mode
+     * @param atom, is expexted to be of the form
+     *    <model name="somemodel" type="atomic" ...>
+     *    ...
+     *    </model>
+     * @return true if the atomic model is in debugging mode
+     */
+    static bool debuggingAtomic(const QDomNode& atom);
+    static bool setDebuggingToAtomic(QDomNode atom, bool val,
+            vleDomDiffStack* snapObj=0);
 
     /**
      * @brief Attach a list of conditions to an atomic model
@@ -1321,6 +1332,11 @@ public:
     void configureModel(QDomNode model, QDomNode dynamic,
             QDomNode observable, QDomNode condition,
             QDomNode in, QDomNode out);
+
+    inline vleDomDiffStack* getUndoStack()
+    {
+        return undoStack;
+    }
 
 signals:
     void observablesUpdated();

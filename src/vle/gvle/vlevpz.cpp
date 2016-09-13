@@ -567,6 +567,44 @@ vleVpz::attachedCondsToAtomic(const QDomNode& atom)
     return attachedConds.split(",").toSet();
 }
 
+bool
+vleVpz::debuggingAtomic(const QDomNode& atom)
+{
+    if (atom.nodeName() != "model" and
+            vleDomObject::attributeValue(atom, "type") != "atomic") {
+        qDebug() << "Internal error in debuggingAtomic "<< atom.nodeName();
+        return false;
+    }
+    if (vleDomObject::attributeValue(atom, "debug") == "true") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool
+vleVpz::setDebuggingToAtomic(QDomNode atom, bool val, vleDomDiffStack* snapObj)
+{
+    if (atom.nodeName() != "model" and
+            vleDomObject::attributeValue(atom, "type") != "atomic") {
+        qDebug() << "Internal error in setDebuggingToAtomic "<< atom.nodeName();
+        return false;
+    }
+    if (val == debuggingAtomic(atom)) {
+        return false;
+    }
+    if (snapObj) {
+        snapObj->snapshot(atom);
+    }
+
+    QString valStr = "false";
+    if (val) {
+        valStr = "true";
+    }
+    vleDomObject::setAttributeValue(atom, "debug", valStr);
+    return true;
+}
+
 void
 vleVpz::attachCondsToAtomic(QDomNode& atom, const QSet<QString>& conds)
 {

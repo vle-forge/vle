@@ -28,6 +28,7 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Context.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/manager/Simulation.hpp>
 #include "DefaultSimSubpanel.h"
 
@@ -37,10 +38,35 @@
 namespace vle {
 namespace gvle {
 
+struct sim_log : utils::Context::LogFunctor
+{
+    std::vector<std::string>& log_messages;
+    sim_log(std::vector<std::string>& logMessages):log_messages(logMessages)
+    {
+
+    }
+
+    virtual void write(const utils::Context& ctx, int priority,
+            const char *file, int line, const char *fn, const char *format,
+                       va_list args) noexcept override
+    {
+        (void)ctx;
+        (void)priority;
+        (void)file;
+        (void)line;
+        (void)fn;
+        log_messages.emplace_back(vle::utils::vformat(format, args));
+    }
+    virtual ~sim_log()
+    {
+    };
+};
 
 
-DefaultSimSubpanelThread::DefaultSimSubpanelThread():
-    mvpm(0), mpkg(0), error_simu("")
+
+DefaultSimSubpanelThread::DefaultSimSubpanelThread(
+        std::vector<std::string>& logMessages): output_map(nullptr),
+    mvpm(0), mpkg(0), error_simu(""), log_messages(logMessages)
 {
 }
 
@@ -58,6 +84,8 @@ void
 DefaultSimSubpanelThread::onStarted()
 {
     auto ctx = utils::make_context();
+    ctx->set_log_priority(7);
+    ctx->set_log_function(std::make_unique<sim_log>(log_messages));
     vle::manager::Simulation sim(ctx, vle::manager::LOG_NONE,
             vle::manager::SIMULATION_NONE, &std::cout);
     vle::manager::Error manerror;
@@ -89,6 +117,7 @@ DefaultSimSubpanelThread::onStarted()
                                             .arg(manerror.message.c_str());
         output_map.reset();
     }
+
     emit simulationFinished();
 }
 
@@ -124,7 +153,8 @@ DefaultSimSubpanelRightWidget::~DefaultSimSubpanelRightWidget()
 DefaultSimSubpanel::DefaultSimSubpanel():
             PluginSimPanel(), left(new DefaultSimSubpanelLeftWidget),
             right(new DefaultSimSubpanelRightWidget), sim_process(0), thread(0),
-            mvpm(0), mpkg(0),mLog(0), portsToPlot()
+            mvpm(0), mpkg(0),mLog(0), timer(this), portsToPlot(),
+            log_messages(), index_message(0)
 {
     QObject::connect(left->ui->runButton,  SIGNAL(pressed()),
                      this, SLOT(onRunPressed()));
@@ -138,6 +168,10 @@ DefaultSimSubpanel::DefaultSimSubpanel():
                      SIGNAL(itemSelectionChanged()),
                      this,
                      SLOT(onTreeItemSelected()));
+    QObject::connect(&timer,
+                     SIGNAL(timeout()),
+                     this,
+                     SLOT(onTimeout()));
 }
 
 DefaultSimSubpanel::~DefaultSimSubpanel()
@@ -391,6 +425,8 @@ DefaultSimSubpanel::onSimulationFinished()
 {
     bool oldBlockTree = right->ui->treeSimViews->blockSignals(true);
     right->ui->treeSimViews->clear();
+    onTimeout();
+    timer.stop();
     if (sim_process and not sim_process->error_simu.isEmpty()) {
         mLog->logExt(sim_process->error_simu, true);
     } else if (sim_process and sim_process->output_map) {
@@ -464,9 +500,11 @@ DefaultSimSubpanel::onRunPressed()
     showCustomPlot(false);
     portsToPlot.erase(portsToPlot.begin(), portsToPlot.end());
 
-    //delte simulation thread
+    //prepare new thread for simulation
+    log_messages.clear();
+    index_message = 0;
     delete sim_process;
-    sim_process = new DefaultSimSubpanelThread();
+    sim_process = new DefaultSimSubpanelThread(log_messages);
     sim_process->init(mvpm, mpkg);
 
     //delete set
@@ -474,6 +512,7 @@ DefaultSimSubpanel::onRunPressed()
     thread = new QThread();
 
     //move to thread
+    timer.start(1000);
     sim_process->moveToThread(thread);
     connect(thread,  SIGNAL(started()),
             sim_process, SLOT(onStarted()));
@@ -524,6 +563,15 @@ DefaultSimSubpanel::onTreeItemSelected()
         }
     }
     right->ui->widSimStyle->setVisible(itemVisility);
+}
+
+void
+DefaultSimSubpanel::onTimeout()
+{
+    for (unsigned int i=index_message; i<log_messages.size();i++) {
+        mLog->logExt(QString(log_messages[i].c_str()), false);
+    }
+    index_message = log_messages.size();
 }
 
 void

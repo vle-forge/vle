@@ -1468,6 +1468,14 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
         }
     }
 
+    bool debug_checked = false;
+    if (sel and not isVpzMainModel(sel) and
+        (static_cast<VpzMainModelItem*>(sel)->isAtomic())) {
+        VpzSubModelItem* item_atomic = static_cast<VpzSubModelItem*>(sel);
+        debug_checked = vleVpz::debuggingAtomic(item_atomic->mnode);
+    }
+
+
     QList<VpzSubModelItem*> selMods = mCoupled->getSelectedSubModels();
     QMenu menu;
     QAction* action;
@@ -1547,6 +1555,13 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     action->setEnabled(sel and not isVpzMainModel(sel) and
                        (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
                        isVpzSubModelConfigured(sel));
+    menu.addSeparator();
+    action = menu.addAction("Debug model");
+    action->setCheckable(true);
+    action->setChecked(debug_checked);
+    setActionType(action, VDMA_Debug_atomic);
+    action->setEnabled(sel and not isVpzMainModel(sel) and
+                       (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
 
     if (sel) {
         action = menu.exec(event->screenPos());
@@ -1700,6 +1715,10 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                     it->initializeFromDom();
                     it->update();
                 }
+            } else if(actCode == VDMA_Debug_atomic) {
+                VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
+                vleVpz::setDebuggingToAtomic(it->mnode, not debug_checked,
+                        mVpm->getUndoStack());
             }
         }
     }
