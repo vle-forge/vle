@@ -43,7 +43,6 @@ struct sim_log : utils::Context::LogFunctor
     std::vector<std::string>& log_messages;
     sim_log(std::vector<std::string>& logMessages):log_messages(logMessages)
     {
-
     }
 
     virtual void write(const utils::Context& ctx, int priority,
@@ -65,8 +64,10 @@ struct sim_log : utils::Context::LogFunctor
 
 
 DefaultSimSubpanelThread::DefaultSimSubpanelThread(
-        std::vector<std::string>& logMessages): output_map(nullptr),
-    mvpm(0), mpkg(0), error_simu(""), log_messages(logMessages)
+        std::vector<std::string>& logMessages, bool debug,
+        int nbthreads, int blockSize): output_map(nullptr),
+    mvpm(0), mpkg(0), error_simu(""), log_messages(logMessages), mdebug(debug),
+    mnbthreads(nbthreads), mblockSize(blockSize)
 {
 }
 
@@ -84,8 +85,19 @@ void
 DefaultSimSubpanelThread::onStarted()
 {
     auto ctx = utils::make_context();
-    ctx->set_log_priority(7);
-    ctx->set_log_function(std::make_unique<sim_log>(log_messages));
+    if (mdebug) {
+        ctx->set_log_priority(7);//VLE_LOG_DEBUG
+        ctx->set_log_function(std::make_unique<sim_log>(log_messages));
+    } else {
+        ctx->set_log_priority(3);//VLE_LOG_ERROR
+    }
+    if (mnbthreads>0) {
+        ctx->set_setting("vle.simulation.thread", (long)mnbthreads);
+    }
+    if (mblockSize!=8) {
+        ctx->set_setting("vle.simulation.block-size", (long)mblockSize);
+    }
+
     vle::manager::Simulation sim(ctx, vle::manager::LOG_NONE,
             vle::manager::SIMULATION_NONE, &std::cout);
     vle::manager::Error manerror;
@@ -151,13 +163,23 @@ DefaultSimSubpanelRightWidget::~DefaultSimSubpanelRightWidget()
 /*************** Default Sim panel ***************************/
 
 DefaultSimSubpanel::DefaultSimSubpanel():
-            PluginSimPanel(), left(new DefaultSimSubpanelLeftWidget),
-            right(new DefaultSimSubpanelRightWidget), sim_process(0), thread(0),
-            mvpm(0), mpkg(0),mLog(0), timer(this), portsToPlot(),
+            PluginSimPanel(), debug(false), nbthreads(0), blockSize(8),
+            left(new DefaultSimSubpanelLeftWidget),
+            right(new DefaultSimSubpanelRightWidget), sim_process(0),
+            thread(0), mvpm(0), mpkg(0),mLog(0), timer(this), portsToPlot(),
             log_messages(), index_message(0)
 {
     QObject::connect(left->ui->runButton,  SIGNAL(pressed()),
                      this, SLOT(onRunPressed()));
+    QObject::connect(left->ui->debugCombo,
+                      SIGNAL(currentTextChanged(QString)),
+                     this, SLOT(onDebugChanged(QString)));
+    QObject::connect(left->ui->threadsSpinBox,
+                     SIGNAL(valueChanged(int)),
+                     this, SLOT(onThreadsChanged(int)));
+    QObject::connect(left->ui->blockSizeSpinBox,
+            SIGNAL(valueChanged(int)),
+            this, SLOT(onBlockSizeChanged(int)));
     QObject::connect(right->ui->butSimColor, SIGNAL(clicked()),
                      this, SLOT(onToolColor()));
     QObject::connect(right->ui->treeSimViews,
@@ -504,7 +526,8 @@ DefaultSimSubpanel::onRunPressed()
     log_messages.clear();
     index_message = 0;
     delete sim_process;
-    sim_process = new DefaultSimSubpanelThread(log_messages);
+    sim_process = new DefaultSimSubpanelThread(log_messages, debug, nbthreads,
+            blockSize);
     sim_process->init(mvpm, mpkg);
 
     //delete set
@@ -519,6 +542,45 @@ DefaultSimSubpanel::onRunPressed()
     connect(sim_process, SIGNAL(simulationFinished()),
             this, SLOT(onSimulationFinished()));
     thread->start();
+}
+
+void
+DefaultSimSubpanel::onDebugChanged(QString val)
+{
+    if (val == "true") {
+        debug = true;
+    } else {
+        debug = false;
+    }
+}
+
+void
+DefaultSimSubpanel::onThreadsChanged(int val)
+{
+    if (val > 0) {
+        //set default debug value and disble it
+        int index = left->ui->debugCombo->findText("false");
+        if ( index != -1 ) {
+            left->ui->debugCombo->setCurrentIndex(index);
+        }
+        left->ui->debugCombo->setEnabled(false);
+        //enable block-size
+        left->ui->blockSizeSpinBox->setEnabled(true);
+
+    } else {
+        //enable debug
+        left->ui->debugCombo->setEnabled(true);
+        //set default block-size value and disable it
+        left->ui->blockSizeSpinBox->setValue(8);
+        left->ui->blockSizeSpinBox->setEnabled(false);
+    }
+    nbthreads = val;
+}
+
+void
+DefaultSimSubpanel::onBlockSizeChanged(int val)
+{
+    blockSize = val;
 }
 
 void

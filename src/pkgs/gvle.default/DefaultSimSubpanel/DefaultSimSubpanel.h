@@ -51,8 +51,13 @@ public:
     vle::utils::Package*      mpkg;
     QString                   error_simu;
     std::vector<std::string>& log_messages;
+    //parameters
+    bool mdebug;
+    int mnbthreads;
+    int mblockSize;
 
-    DefaultSimSubpanelThread(std::vector<std::string>& logMessages);
+    DefaultSimSubpanelThread(std::vector<std::string>& logMessages,
+            bool debug, int nbthreads, int blockSize);
     ~DefaultSimSubpanelThread();
     void init(vleVpm* vpm, vle::utils::Package* pkg);
 public slots:
@@ -141,6 +146,11 @@ public:
     double getDouble(const vle::value::Matrix& view, unsigned int col,
             unsigned int row, bool error_message);
 
+    //parameters
+    bool debug;
+    int nbthreads;
+    int blockSize;
+
     DefaultSimSubpanelLeftWidget* left;
     DefaultSimSubpanelRightWidget* right;
     DefaultSimSubpanelThread* sim_process;
@@ -150,13 +160,18 @@ public:
     Logger* mLog;
     QTimer timer;
 
+
     std::vector<portToPlot> portsToPlot;
     std::vector<std::string> log_messages;
     unsigned int index_message;
 
+
 public slots:
     void onSimulationFinished();
     void onRunPressed();
+    void onDebugChanged(QString);
+    void onThreadsChanged(int);
+    void onBlockSizeChanged(int);
     void onTreeItemChanged(QTreeWidgetItem* item, int col);
     void onTreeItemSelected();
     void onTimeout();
