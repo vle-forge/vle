@@ -85,6 +85,32 @@ std::string format(const char *fmt, ...) noexcept
     }
 }
 
+std::string vformat(const char *fmt, va_list ap) noexcept
+{
+    try {
+        int n;
+        int size = 256;
+        std::string ret(size, '\0');
+
+        for (;;) {
+            n = vsnprintf(&ret[0], size, fmt, ap);
+
+            if (n < 0)
+                return {};
+
+            if (n < size) {
+                ret.erase(n, std::string::npos);
+                return ret;
+            }
+
+            size = n + 1;
+            ret.resize(size);
+        }
+    } catch (const std::bad_alloc& e) {
+        return {};
+    }
+}
+
 template < typename T >
     bool is(const std::string& str)
     {

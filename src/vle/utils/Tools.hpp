@@ -58,6 +58,19 @@ namespace vle { namespace utils {
 std::string VLE_API
 format(const char *format, ...) noexcept GCC_ATTRIBUTE_FORMAT(1, 2);
 
+/**
+ * The function \c vformat() produces a \c std::string according to a C
+ * printf format as described in standard \c vprintf() function.
+ *
+ * \param format The format to convert.
+ * \param ap Arguments.
+ *
+ * \return a empty string if an error occured otherwise the \e printf()
+ * formatted string.
+ */
+std::string VLE_API
+vformat(const char *format, va_list ap) noexcept;
+
     /**
      * Return true if the string \c str can be translated the template type \c T.
      * The template type \c T can be one of the following type: bool, float,
