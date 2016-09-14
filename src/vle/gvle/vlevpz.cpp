@@ -931,6 +931,16 @@ vleVpz::renamePortToOutNode(QDomNode atom,
     return true;
 }
 
+QStringList
+vleVpz::getViewTypeToView(const QDomNode& atom)
+{
+    if (atom.nodeName() != "view") {
+        qDebug() << "Internal error in getViewTypeToView "<< atom.nodeName();
+        return QStringList();
+    }
+    return vleDomObject::attributeValue(atom, "type").split(",");
+}
+
 
 /******************************************************
  * Access to specific nodes in the vpz from Doc
@@ -4001,30 +4011,63 @@ vleVpz::viewFromViews(QDomNode node, const QString& viewName) const
 
 }
 
- QDomNode
- vleVpz::viewFromDoc(const QString& viewName) const
- {
-     return viewFromViews(viewsFromDoc(), viewName);
- }
-
-QString
-vleVpz::viewTypeFromDoc(const QString& viewName) const
+QDomNode
+vleVpz::viewFromDoc(const QString& viewName) const
 {
-    QDomNode node = viewFromDoc(viewName);
-    if (node.nodeName() != "view") {
-        qDebug() << ("Internal error in viewTypeFromDoc (wrong main tag)");
-        return QString();
-    }
-    return node.attributes().namedItem("type").nodeValue();
+    return viewFromViews(viewsFromDoc(), viewName);
 }
 
-void
-vleVpz::setViewTypeToDoc(const QString& viewName, const QString& viewType)
+QStringList
+vleVpz::getViewTypeFromDoc(const QString& viewName) const
 {
-    QDomNode viewsNode = viewsFromDoc();
-    undoStack->snapshot(viewsNode);
-    QDomNode viewNode = viewFromViews(viewsNode,viewName);
-    viewNode.attributes().namedItem("type").setNodeValue(viewType);
+    QDomNode node = viewFromDoc(viewName);
+    return vleVpz::getViewTypeToView(node);
+}
+
+bool
+vleVpz::addViewTypeToDoc(const QString& viewName, const QString& viewType)
+{
+    QDomNode node = viewFromDoc(viewName);
+    QStringList viewTypes = vleVpz::getViewTypeToView(node);
+    if (viewType == "timed") {
+        if (viewTypes.contains("timed") and viewTypes.length() ==1) {
+            return false;
+        } else {
+            undoStack->snapshot(node);
+            vleDomObject::setAttributeValue(node, "type", "timed");
+            vleDomObject::setAttributeValue(node, "timestep", "1.0");
+            return true;
+        }
+    } else {
+        if (not viewTypes.contains("timed") and viewTypes.contains(viewType)) {
+            return false;
+        } else {
+            viewTypes.append(viewType);
+            viewTypes.removeAll("timed");
+            undoStack->snapshot(viewsFromDoc());
+            node.toElement().removeAttribute("timestep");
+            vleDomObject::setAttributeValue(node, "type", viewTypes.join(","));
+            return true;
+        }
+    }
+}
+
+bool
+vleVpz::rmViewTypeToDoc(const QString& viewName, const QString& viewType)
+{
+    QDomNode node = viewFromDoc(viewName);
+    QStringList viewTypes = vleVpz::getViewTypeToView(node);
+    if (viewTypes.size() < 2) {
+        //cannot remove the only viewType
+        return false;
+    }
+    if (not viewTypes.contains(viewType)) {
+        return false;
+    }
+    viewTypes.removeAll(viewType);
+    undoStack->snapshot(viewsFromDoc());
+    vleDomObject::setAttributeValue(node, "type", viewTypes.join(","));
+    return true;
 }
 
 double
@@ -4039,19 +4082,22 @@ vleVpz::timeStepFromDoc(const QString& viewName) const
     return qv.toDouble();
 }
 
-void
+bool
 vleVpz::setTimeStepToDoc(const QString& viewName, double ts)
 {
     QDomNode node = viewFromDoc(viewName);
-    undoStack->snapshot(viewsFromDoc());
+
     if (node.nodeName() != "view") {
         qDebug() << ("Internal error in setTimeStepFromView (wrong main tag)");
-        return;
+        return false;
     }
-    if (viewTypeFromDoc(viewName) == "timed" and ts > 0.0) {
+    if (getViewTypeFromDoc(viewName).contains("timed") and ts > 0.0) {
+        undoStack->snapshot(viewsFromDoc());
         vleDomObject::setAttributeValue(node, "timestep",
                 QVariant(ts).toString());
+        return true;
     }
+    return false;
 }
 
 bool

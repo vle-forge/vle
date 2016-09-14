@@ -98,36 +98,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="viewTypes">
-             <item>
-              <property name="text">
-               <string>timed</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>finish</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>event</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
-              <widget class="QLabel" name="labelTimeStep">
-               <property name="font">
-                <font>
-                 <weight>50</weight>
-                 <bold>false</bold>
-                </font>
-               </property>
+              <widget class="QCheckBox" name="timedCheck">
                <property name="text">
-                <string>Time step</string>
+                <string>timed</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -142,30 +120,45 @@
                <property name="suffix">
                 <string/>
                </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
               </widget>
              </item>
             </layout>
            </item>
            <item>
-            <widget class="QLabel" name="labelLocation">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
+            <widget class="QCheckBox" name="finishCheck">
              <property name="text">
-              <string>Location</string>
+              <string>finish</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="location">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>30</height>
-              </size>
+            <widget class="QCheckBox" name="outputCheck">
+             <property name="text">
+              <string>output</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="internalCheck">
+             <property name="text">
+              <string>internal transition</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="externalCheck">
+             <property name="text">
+              <string>external transition</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="confluentCheck">
+             <property name="text">
+              <string>confluent transition</string>
              </property>
             </widget>
            </item>

@@ -458,17 +458,17 @@ DefaultSimSubpanel::onSimulationFinished()
         vle::value::Map::const_iterator ite = simu.end();
         for (; itb != ite; itb ++) {
             QString viewName(itb->first.c_str());
-            QString viewType = mvpm->viewTypeFromDoc(viewName);
-            if (viewType == "timed" or viewType == "finish") {
+            QStringList viewType = mvpm->getViewTypeFromDoc(viewName);
+            if (viewType.contains("timed") or viewType.contains("finish")) {
 
                 QTreeWidgetItem* vItem = new QTreeWidgetItem();
-                if (viewType == "timed") {
+                if (viewType.contains("timed")) {
                     double ts = mvpm->timeStepFromDoc(viewName);
                     vItem->setText(0, QString("%1 (%2:%3)").arg(viewName)
-                            .arg(viewType).arg(QVariant(ts).toString()));
+                            .arg("timed").arg(QVariant(ts).toString()));
                 } else {
                     vItem->setText(0, QString("%1 (%2)").arg(viewName)
-                            .arg(viewType));
+                            .arg("finish"));
                 }
                 vItem->setData(0, Qt::UserRole+0, "view");
                 vItem->setData(0, Qt::UserRole+1, viewName);

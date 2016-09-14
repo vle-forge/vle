@@ -64,8 +64,13 @@ signals:
 public slots:
     void onViewSelected(QListWidgetItem * item);
     void onOutputSelected(const QString& item);
-    void onViewTypeSelected(const QString& item);
     void onTimeStepChanged(double v);
+    void onTimedCheck(int);
+    void onOutputCheck(int);
+    void onInternalCheck(int);
+    void onExternalCheck(int);
+    void onConfluentCheck(int);
+    void onFinishCheck(int);
     void onViewListMenu(const QPoint&);
     void onItemChanged(QListWidgetItem* );
     void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
@@ -73,6 +78,7 @@ public slots:
 
 private:
     QString getSelectedOutputPlugin();
+    void updateViewType();
     void updatePlugin();
 
 

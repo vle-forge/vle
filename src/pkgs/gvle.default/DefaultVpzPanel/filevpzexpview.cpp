@@ -37,40 +37,6 @@
 #include "filevpzexpview.h"
 #include "ui_filevpzexpview.h"
 
-/**
- * @brief Get the plug-in name of the filename provided.
- *
- * @code
- * // return "toto".
- * utils::Module::getPluginName("/home/foo/bar/libtoto.so");
- * @endcode
- *
- * @param path The path of the file to convert;
- * @return The plug-in name;
- *
- * TODO function from ModuleManager
- */
-//static std::string TMPgetLibraryName(const vle::utils::Path& file)
-//{
-//    std::string library;
-//
-//    if (file.filename().compare(0, 3, "lib") == 0) {
-//        library.append(file.filename(), 3, std::string::npos);
-//
-//#if defined(_WIN32)
-//        if (file.extension() == ".dll")
-//            library.assign(library, 0, library.size() - 4);
-//#elif defined(__MACOS__)
-//        if (file.extension() == ".dylib")
-//            library.assign(library, 0, library.size() - 6);
-//#else
-//        if (file.extension() == ".so")
-//            library.assign(library, 0, library.size() - 3);
-//#endif
-//    }
-//return library;
-//}
-
 namespace vle {
 namespace gvle {
 
@@ -80,9 +46,6 @@ FileVpzExpView::FileVpzExpView(const utils::ContextPtr& ctx, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->timeStep->setEnabled(false);
-    ui->location->setEnabled(false);
-    ui->viewTypes->setEditable(false);
-    ui->viewTypes->setEnabled(false);
     ui->listVleOOV->setEditable(false);
     ui->listVleOOV->setEnabled(false);
 
@@ -102,15 +65,25 @@ void FileVpzExpView::setVpm(vleVpm* vpm)
     mVpm = vpm;
 
     QObject::connect(ui->vleViewList, SIGNAL(itemPressed (QListWidgetItem *)),
-                     this, SLOT(onViewSelected(QListWidgetItem *)));
+            this, SLOT(onViewSelected(QListWidgetItem *)));
     QObject::connect(ui->vleViewList, SIGNAL(itemChanged(QListWidgetItem *)),
-                         this, SLOT(onItemChanged(QListWidgetItem *)));
+            this, SLOT(onItemChanged(QListWidgetItem *)));
     QObject::connect(ui->listVleOOV, SIGNAL(currentIndexChanged(const QString&)),
-                     this, SLOT(onOutputSelected(const QString&)));
-    QObject::connect(ui->viewTypes, SIGNAL(currentIndexChanged(const QString&)),
-                     this, SLOT(onViewTypeSelected(const QString&)));
+            this, SLOT(onOutputSelected(const QString&)));
     QObject::connect(ui->timeStep, SIGNAL(valueChanged (double)),
-                         this, SLOT(onTimeStepChanged(double)));
+            this, SLOT(onTimeStepChanged(double)));
+    QObject::connect(ui->timedCheck, SIGNAL(stateChanged (int)),
+            this, SLOT(onTimedCheck(int)));
+    QObject::connect(ui->outputCheck, SIGNAL(stateChanged (int)),
+            this, SLOT(onOutputCheck(int)));
+    QObject::connect(ui->internalCheck, SIGNAL(stateChanged (int)),
+            this, SLOT(onInternalCheck(int)));
+    QObject::connect(ui->externalCheck, SIGNAL(stateChanged (int)),
+            this, SLOT(onExternalCheck(int)));
+    QObject::connect(ui->confluentCheck, SIGNAL(stateChanged (int)),
+            this, SLOT(onConfluentCheck(int)));
+    QObject::connect(ui->finishCheck, SIGNAL(stateChanged (int)),
+            this, SLOT(onFinishCheck(int)));
 
     reload();
 }
@@ -184,37 +157,83 @@ FileVpzExpView::reload()
     ui->listVleOOV->setEditable(isEditable);
     ui->listVleOOV->blockSignals(oldBlock);
     //reload view type
-    oldBlock = ui->viewTypes->blockSignals(true);
-    if (currView != "") {
-        ui->viewTypes->setCurrentIndex(
-                ui->viewTypes->findText(mVpm->viewTypeFromDoc(currView)));
-        ui->viewTypes->setEnabled(true);
-    } else {
-        ui->viewTypes->setEnabled(false);
-    }
-    ui->viewTypes->blockSignals(oldBlock);
-    //reload time step
-    oldBlock = ui->timeStep->blockSignals(true);
-    if (currView != "") {
-        QString viewType = mVpm->viewTypeFromDoc(currView);
-        if (viewType == "timed") {
-            ui->timeStep->setEnabled(true);
-            ui->timeStep->setValue(mVpm->timeStepFromDoc(currView));
-        } else {
-            ui->timeStep->setEnabled(false);
-        }
-    } else {
-        ui->timeStep->setEnabled(false);
-    }
-    ui->timeStep->blockSignals(oldBlock);
+    updateViewType();
     //reload gvle plugin
     updatePlugin();
 
 }
 
+void
+FileVpzExpView::updateViewType()
+{
+    if (currView == "") {
+        ui->timeStep->setEnabled(false);
+        ui->timedCheck->setEnabled(false);
+        ui->finishCheck->setEnabled(false);
+        ui->outputCheck->setEnabled(false);
+        ui->internalCheck->setEnabled(false);
+        ui->externalCheck->setEnabled(false);
+        ui->confluentCheck->setEnabled(false);
+    } else {
+        ui->timeStep->blockSignals(true);
+        ui->timedCheck->blockSignals(true);
+        ui->finishCheck->blockSignals(true);
+        ui->outputCheck->blockSignals(true);
+        ui->internalCheck->blockSignals(true);
+        ui->externalCheck->blockSignals(true);
+        ui->confluentCheck->blockSignals(true);
+
+        ui->timeStep->setValue(1.0);
+        ui->timedCheck->setCheckState(Qt::Unchecked);
+        ui->finishCheck->setCheckState(Qt::Unchecked);
+        ui->outputCheck->setCheckState(Qt::Unchecked);
+        ui->internalCheck->setCheckState(Qt::Unchecked);
+        ui->externalCheck->setCheckState(Qt::Unchecked);
+        ui->confluentCheck->setCheckState(Qt::Unchecked);
+        QStringList types = mVpm->getViewTypeFromDoc(currView);
+        for (int i =0; i<types.length();  i++) {
+            QString type = types[i];
+            if (type == "timed") {
+                ui->timedCheck->setCheckState(Qt::Checked);
+            } else if (type == "finish") {
+                ui->finishCheck->setCheckState(Qt::Checked);
+            } else if (type == "output") {
+                ui->outputCheck->setCheckState(Qt::Checked);
+            } else if (type == "internal") {
+                ui->internalCheck->setCheckState(Qt::Checked);
+            } else if (type == "external") {
+                ui->externalCheck->setCheckState(Qt::Checked);
+            } else if (type == "confluent") {
+                ui->confluentCheck->setCheckState(Qt::Checked);
+            }
+        }
+        if (ui->timedCheck->checkState() == Qt::Checked) {
+            ui->timeStep->setValue(mVpm->timeStepFromDoc(currView));
+            ui->timeStep->setEnabled(true);
+            ui->timeStep->blockSignals(false);
+        } else {
+            ui->timeStep->setEnabled(false);
+        }
+        ui->timedCheck->setEnabled(true);
+        ui->finishCheck->setEnabled(true);
+        ui->outputCheck->setEnabled(true);
+        ui->internalCheck->setEnabled(true);
+        ui->externalCheck->setEnabled(true);
+        ui->confluentCheck->setEnabled(true);
+
+        ui->timedCheck->blockSignals(false);
+        ui->finishCheck->blockSignals(false);
+        ui->outputCheck->blockSignals(false);
+        ui->internalCheck->blockSignals(false);
+        ui->externalCheck->blockSignals(false);
+        ui->confluentCheck->blockSignals(false);
+
+    }
+}
 
 
-void FileVpzExpView::updatePlugin()
+void
+FileVpzExpView::updatePlugin()
 {
     if (mPlugin) {
         QWidget* ow = mPlugin->getWidget();
@@ -268,20 +287,86 @@ FileVpzExpView::onOutputSelected(const QString& item)
 }
 
 void
-FileVpzExpView::onViewTypeSelected(const QString& item)
-{
-    if (item != "") {
-        mVpm->setViewTypeToDoc(currView, item);
-        reload();
-    }
-}
-
-void
 FileVpzExpView::onTimeStepChanged(double v)
 {
     if (v > 0) {
         mVpm->setTimeStepToDoc(currView, v);
     }
+
+}
+
+void
+FileVpzExpView::onTimedCheck(int v)
+{
+    if (currView != "") {
+        if (v) {
+            mVpm->addViewTypeToDoc(currView, "timed");
+        } else {
+            mVpm->rmViewTypeToDoc(currView, "timed");
+        }
+    }
+    updateViewType();
+}
+
+void
+FileVpzExpView::onOutputCheck(int v)
+{
+    if (currView != "") {
+        if (v) {
+            mVpm->addViewTypeToDoc(currView, "output");
+        } else {
+            mVpm->rmViewTypeToDoc(currView, "output");
+        }
+    }
+    updateViewType();
+}
+void
+FileVpzExpView::onInternalCheck(int v)
+{
+    if (currView != "") {
+        if (v) {
+            mVpm->addViewTypeToDoc(currView, "internal");
+        } else {
+            mVpm->rmViewTypeToDoc(currView, "internal");
+        }
+    }
+    updateViewType();
+}
+void
+FileVpzExpView::onExternalCheck(int v)
+{
+    if (currView != "") {
+        if (v) {
+            mVpm->addViewTypeToDoc(currView, "external");
+        } else {
+            mVpm->rmViewTypeToDoc(currView, "external");
+        }
+    }
+    updateViewType();
+}
+void
+FileVpzExpView::onConfluentCheck(int v)
+{
+    if (currView != "") {
+        if (v) {
+            mVpm->addViewTypeToDoc(currView, "confluent");
+        } else {
+            mVpm->rmViewTypeToDoc(currView, "confluent");
+        }
+    }
+    updateViewType();
+}
+void
+FileVpzExpView::onFinishCheck(int v)
+{
+    if (currView != "") {
+        if (v) {
+            mVpm->addViewTypeToDoc(currView, "finish");
+        } else {
+            mVpm->rmViewTypeToDoc(currView, "finish");
+        }
+    }
+    updateViewType();
 }
 
 void

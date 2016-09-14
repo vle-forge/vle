@@ -267,6 +267,17 @@ public:
                 const QString& oldName, const QString& newName,
                 vleDomDiffStack* snapObj=0);
 
+    /**
+     * @brief Get the types of an output
+     * @param atom, is expected to be of the form
+     *    <view type ="sometype" />
+     * @return the list of types :
+     * - timed or
+     * - a combination of finish, output, external, internal, confluent
+     *
+     */
+    static QStringList getViewTypeToView(const QDomNode& atom);
+
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
@@ -1132,14 +1143,21 @@ public:
      *  (attribute 'type' of tag <view>)
      * @brief viewName, the name of the view
      */
-     QString viewTypeFromDoc(const QString& viewName) const;
+     QStringList getViewTypeFromDoc(const QString& viewName) const;
      /**
-      * @brief set view type (timed, event, finish) to a view
-      * (attribute 'type' to a tag <view>)
-      * @param viewName, the name of the view
-      * @param viewType, either timed, finish or event
+      * @brief add view type to a view:
+      * @param viewName, name of the view
+      * @param viewType: either :
+      * timed, output, internal, external, confluent or finish
+      * @param return true if a modification ha been performed
+      * @return true if modifications have been performed
+      *
+      * @note if viewType is "timed", other current viewTypes are removed,
+      * otherwise the viewType "timed" is removed (since "timed" cannot be
+      * associated to others)
       */
-     void setViewTypeToDoc(const QString& viewName, const QString& viewType);
+     bool addViewTypeToDoc(const QString& viewName, const QString& viewType);
+     bool rmViewTypeToDoc(const QString& viewName, const QString& viewType);
      /**
       * @brief get time step of a view
       *  (attribute 'timestep' of tag <view>)
@@ -1151,8 +1169,9 @@ public:
       *  (attribute 'timestep' of tag <view>)
       * @param viewName, the name of the view
       * @param ts, the new timestep
+      * @return true if modifications have been performed
       */
-     void setTimeStepToDoc(const QString& viewName, double ts);
+     bool setTimeStepToDoc(const QString& viewName, double ts);
      /**
       * @brief set output plugin to a view
       * @param outputPlugin, has to be of the form : package/plugin
