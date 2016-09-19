@@ -114,6 +114,30 @@ public:
      * @brief Process the output function: compute the output function.
      * @param time the time of the occurrence of output function.
      * @param output the list of external events (output parameter).
+     *
+     *
+     * @code
+     *
+     * //
+     * // output method's body examples
+     * // filling events
+     * //
+     * ...
+     * // send an empty event to the "output" port
+     * output.emplace_back("output");
+     * // send a string event to the "outputString" port
+     * output.emplace_back("outputString");
+     * output.back().addString("a String");
+     * // send a double event
+     * output.emplace_back("outputDouble");
+     * output.back().addDouble(.0);
+     * // send a map event
+     * output.emplace_back("outputMap");
+     * value::Map& m = output.back().addMap();
+     * m.addString("name",it->first);
+     * m.addDouble("value", it->second);
+     * ...
+     * @endcode
      */
     virtual void output(Time /* time */,  ExternalEventList& /* output */) const
     {}
@@ -141,6 +165,38 @@ public:
      * model when an external event occurs.
      * @param event the external event with of the port.
      * @param time the date of occurrence of this event.
+     *
+     *
+     * @code
+     * //
+     * // externalTransition method's body examples
+     * // to get the content of an event
+     * //
+     * ...
+     * vle::devs::ExternalEventList::const_iterator
+     * it = events.begin();
+     * while (it != events.end()) {
+     *    // to get a double
+     *    if (it->attributes()->isDouble()) {
+     *        Double aDouble = it->getDouble().value();
+     *    // to get a integer
+     *    } else if (it->attributes()->isInteger()) {
+     *        Int aInteger = it->getInteger().value();
+     *    // to get a string
+     *    } else if (it->attributes()->isString()) {
+     *       std::string aString = it->getString().value();
+     *    // to get a map and inside values
+     *    } else if (it->attributes()->isMap()) {
+     *       const value::Map& attrs = it->getMap();
+     *       std::string aString = attrs.getString("name").value();
+     *       double aDouble = attrs.getDouble("value").value();
+     *       ...
+     *    } else {
+     *    ...
+     *    }
+     * }
+     * ...
+     * @endcode
      */
     virtual void externalTransition(const ExternalEventList& /* event */,
                                     Time /* time */)
@@ -165,6 +221,30 @@ public:
      * model at a specified time and for a specified port.
      * @param event the state event with of the port
      * @return the value of state variable
+     *
+     *
+     * @code
+     * //
+     * // observation method's body example
+     * // to observe different Types of values
+     * //
+     * ...
+     * const std::string& port = event.getPortName();
+     * if (port == "doubleObservablePort") {
+     *    return value::Double::create(.0);
+     * } else if (port == "integerObservablePort") {
+     *    return value::Integer::create(1);
+     * } else if (port == "stringObservablePort") {
+     *    return  value::String::create("a string");
+     * } else if (port == "setObservablePort") {
+     *    std::unique_ptr<value::Set> set(new vle::value::Set());
+     *    set->add(value::Integer::create(1));
+     *    set->add(value::String::create("a string"));
+     *    ...
+     *    return set;
+     * }
+     * ...
+     * @endcode
      */
     virtual std::unique_ptr<vle::value::Value>
         observation(const ObservationEvent& /* event */) const
