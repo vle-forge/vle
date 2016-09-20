@@ -54,7 +54,7 @@ public:
             gvle_plugins* plugs, const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
     void save() override;
-    void discard(){};
+    void discard() override {}
     PluginMainPanel* newInstance() override {return new DefaultCppPanel();}
 public slots:
     void onUndoAvailable(bool);
