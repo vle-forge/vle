@@ -50,6 +50,278 @@ BOOST_GLOBAL_FIXTURE(F);
 
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(test_translator)
+BOOST_AUTO_TEST_CASE(atomicmodel_timed_vpz)
 {
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <experiment name=\"graphtester\" seed=\"123\" >\n"
+        "  <views>\n"
+        "   <outputs>\n"
+        "    <output name=\"view\" format=\"local\" package=\"vle.output\" plugin=\"storage\" />\n"
+        "   </outputs>\n"
+        "   <observables>\n"
+        "    <observable name=\"obs\" >\n"
+        "     <port name=\"c\" >\n"
+        "      <attachedview name=\"view\" />\n"
+        "     </port>\n"
+        "    </observable>\n"
+        "   </observables>\n"
+        "   <view name=\"view\" output=\"view\" type=\"timed\" timestep=\"1.000000000000000\" />\n"
+        "  </views>\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+
+    vpz::Vpz vpz;
+    vpz.parseMemory(xml);
+
+    const auto& v = vpz.project().experiment().views().get("view");
+
+    BOOST_REQUIRE(v.type() == vle::vpz::View::TIMED);
+    BOOST_REQUIRE(v.timestep() == 1.0);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
+}
+
+BOOST_AUTO_TEST_CASE(atomicmodel_vpz_event_output)
+{
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <experiment name=\"graphtester\" seed=\"123\" >\n"
+        "  <views>\n"
+        "   <outputs>\n"
+        "    <output name=\"view\" format=\"local\" package=\"vle.output\" plugin=\"storage\" />\n"
+        "   </outputs>\n"
+        "   <observables>\n"
+        "    <observable name=\"obs\" >\n"
+        "     <port name=\"c\" >\n"
+        "      <attachedview name=\"view\" />\n"
+        "     </port>\n"
+        "    </observable>\n"
+        "   </observables>\n"
+        "   <view name=\"view\" output=\"view\" type=\"event,output\"  />\n"
+        "  </views>\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+
+    vpz::Vpz vpz;
+    vpz.parseMemory(xml);
+    
+    const auto& v = vpz.project().experiment().views().get("view");
+
+    auto c = vle::vpz::View::INTERNAL | vle::vpz::View::CONFLUENT
+        | vle::vpz::View::EXTERNAL | vle::vpz::View::OUTPUT;
+    
+    BOOST_REQUIRE(v.type() == c);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
+}
+
+BOOST_AUTO_TEST_CASE(atomicmodel_vpz_internal_output)
+{
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <experiment name=\"graphtester\" seed=\"123\" >\n"
+        "  <views>\n"
+        "   <outputs>\n"
+        "    <output name=\"view\" format=\"local\" package=\"vle.output\" plugin=\"storage\" />\n"
+        "   </outputs>\n"
+        "   <observables>\n"
+        "    <observable name=\"obs\" >\n"
+        "     <port name=\"c\" >\n"
+        "      <attachedview name=\"view\" />\n"
+        "     </port>\n"
+        "    </observable>\n"
+        "   </observables>\n"
+        "   <view name=\"view\" output=\"view\" type=\"internal,output\"  />\n"
+        "  </views>\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+
+    vpz::Vpz vpz;
+    vpz.parseMemory(xml);
+    
+    const auto& v = vpz.project().experiment().views().get("view");
+
+    auto c = vle::vpz::View::INTERNAL |  vle::vpz::View::OUTPUT;
+    
+    BOOST_REQUIRE(v.type() == c);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
+}
+
+BOOST_AUTO_TEST_CASE(atomicmodel_vpz_confluent)
+{
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <experiment name=\"graphtester\" seed=\"123\" >\n"
+        "  <views>\n"
+        "   <outputs>\n"
+        "    <output name=\"view\" format=\"local\" package=\"vle.output\" plugin=\"storage\" />\n"
+        "   </outputs>\n"
+        "   <observables>\n"
+        "    <observable name=\"obs\" >\n"
+        "     <port name=\"c\" >\n"
+        "      <attachedview name=\"view\" />\n"
+        "     </port>\n"
+        "    </observable>\n"
+        "   </observables>\n"
+        "   <view name=\"view\" output=\"view\" type=\"confluent\"  />\n"
+        "  </views>\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+
+    vpz::Vpz vpz;
+    vpz.parseMemory(xml);
+
+    const auto& v = vpz.project().experiment().views().get("view");
+
+    auto c = vle::vpz::View::CONFLUENT;
+    
+    BOOST_REQUIRE(v.type() == c);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
+}
+
+BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw1)
+{
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <experiment name=\"graphtester\" seed=\"123\" >\n"
+        "  <views>\n"
+        "   <outputs>\n"
+        "    <output name=\"view\" format=\"local\" package=\"vle.output\" plugin=\"storage\" />\n"
+        "   </outputs>\n"
+        "   <observables>\n"
+        "    <observable name=\"obs\" >\n"
+        "     <port name=\"c\" >\n"
+        "      <attachedview name=\"view\" />\n"
+        "     </port>\n"
+        "    </observable>\n"
+        "   </observables>\n"
+        "   <view name=\"view\" output=\"view\" type=\"confluent,\"  />\n"
+        "  </views>\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+
+    vpz::Vpz vpz;
+    BOOST_REQUIRE_THROW(vpz.parseMemory(xml), std::exception);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
+}
+
+BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw2)
+{
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <experiment name=\"graphtester\" seed=\"123\" >\n"
+        "  <views>\n"
+        "   <outputs>\n"
+        "    <output name=\"view\" format=\"local\" package=\"vle.output\" plugin=\"storage\" />\n"
+        "   </outputs>\n"
+        "   <observables>\n"
+        "    <observable name=\"obs\" >\n"
+        "     <port name=\"c\" >\n"
+        "      <attachedview name=\"view\" />\n"
+        "     </port>\n"
+        "    </observable>\n"
+        "   </observables>\n"
+        "   <view name=\"view\" output=\"view\" type=\"timed\"  />\n"
+        "  </views>\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+
+    vpz::Vpz vpz;
+    BOOST_REQUIRE_THROW(vpz.parseMemory(xml), std::exception);
+
+    delete vpz.project().model().model();
+    vpz.project().model().clear();
 }
