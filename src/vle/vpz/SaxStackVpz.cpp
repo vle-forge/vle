@@ -670,7 +670,6 @@ void SaxStackVpz::pushOutput(const xmlChar** att)
     }
 
     const xmlChar* name = nullptr;
-    const xmlChar* format = nullptr;
     const xmlChar* plugin = nullptr;
     const xmlChar* location = nullptr;
     const xmlChar* package = nullptr;
@@ -678,8 +677,6 @@ void SaxStackVpz::pushOutput(const xmlChar** att)
     for (int i = 0; att[i] != nullptr; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
             name = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"format") == 0) {
-            format = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"plugin") == 0) {
             plugin = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"location") == 0) {
@@ -691,24 +688,13 @@ void SaxStackVpz::pushOutput(const xmlChar** att)
 
     Outputs& outs(m_vpz.project().experiment().views().outputs());
 
-    if (xmlStrcmp(format, (const xmlChar*)"local") == 0) {
-        Output& result = outs.addLocalStream(
-            xmlCharToString(name),
-            location ? xmlCharToString(location) : std::string(),
-            xmlCharToString(plugin),
-            package ? xmlCharToString(package) : std::string());
-        push(&result);
-    } else if (xmlStrcmp(format, (const xmlChar*)"distant") == 0) {
-        Output& result = outs.addDistantStream(
-            xmlCharToString(name),
-            location ? xmlCharToString(location) : std::string(),
-            xmlCharToString(plugin),
-            package ? xmlCharToString(package) : std::string());
-        push(&result);
-    } else {
-        throw utils::SaxParserError(
-            (fmt(_("Output tag does not define a '%1%' format")) % name).str());
-    }
+    Output& result = outs.addStream(
+        xmlCharToString(name),
+        location ? xmlCharToString(location) : std::string(),
+        xmlCharToString(plugin),
+        package ? xmlCharToString(package) : std::string());
+
+    push(&result);
 }
 
 void SaxStackVpz::pushView(const xmlChar** att)

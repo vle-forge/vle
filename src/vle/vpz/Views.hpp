@@ -101,12 +101,12 @@ namespace vle { namespace vpz {
          * @return A reference to the newly output.
          * @throw utils::ArgError if name already exists.
          */
-        Output& addLocalStreamOutput(const std::string& name,
-                                     const std::string& location,
-                                     const std::string& plugin,
-                                     const std::string& package)
+        Output& addStreamOutput(const std::string& name,
+                                const std::string& location,
+                                const std::string& plugin,
+                                const std::string& package)
         {
-            return m_outputs.addLocalStream(name, location, plugin, package);
+            return m_outputs.addStream(name, location, plugin, package);
         }
 
         /**
@@ -117,43 +117,11 @@ namespace vle { namespace vpz {
          * @return A reference to the newly output.
          * @throw utils::ArgError if name already exists.
          */
-        Output& addLocalStreamOutput(const std::string& name,
-                                     const std::string& location,
-                                     const std::string& plugin)
+        Output& addStreamOutput(const std::string& name,
+                                const std::string& location,
+                                const std::string& plugin)
         {
-            return m_outputs.addLocalStream(name, location, plugin);
-        }
-
-        /**
-         * @brief Add a distant Output stream.
-         * @param name The name of this output.
-         * @param location The location of this output (on distant host).
-         * @param plugin The name of the plugin.
-         * @param package The package of the plugin.
-         * @return A reference to the newly output.
-         * @throw utils::ArgError if name already exists.
-         */
-        Output& addDistantStreamOutput(const std::string& name,
-                                       const std::string& location,
-                                       const std::string& plugin,
-                                       const std::string& package)
-        {
-            return m_outputs.addDistantStream(name, location, plugin, package);
-        }
-
-        /**
-         * @brief Add a distant Output stream.
-         * @param name The name of this output.
-         * @param location The location of this output (on distant host).
-         * @param plugin The name of the plugin.
-         * @return A reference to the newly output.
-         * @throw utils::ArgError if name already exists.
-         */
-        Output& addDistantStreamOutput(const std::string& name,
-                                       const std::string& location,
-                                       const std::string& plugin)
-        {
-            return m_outputs.addDistantStream(name, location, plugin);
+            return m_outputs.addStream(name, location, plugin);
         }
 
         /**

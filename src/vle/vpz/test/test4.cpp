@@ -350,7 +350,6 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
         {
             const vpz::Output& o(exp.views().outputs().get("view1"));
             BOOST_REQUIRE_EQUAL(o.name(), "view1");
-            BOOST_REQUIRE_EQUAL(o.format(), vpz::Output::LOCAL);
             BOOST_REQUIRE_EQUAL(o.plugin(), "storage");
 
             BOOST_REQUIRE(o.data().get());
@@ -383,7 +382,6 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
         {
             const vpz::Output& o(exp.views().outputs().get("view2"));
             BOOST_REQUIRE_EQUAL(o.name(), "view2");
-            BOOST_REQUIRE_EQUAL(o.format(), vpz::Output::LOCAL);
             BOOST_REQUIRE_EQUAL(o.plugin(), "storage");
             BOOST_REQUIRE(not o.data().get());
         }

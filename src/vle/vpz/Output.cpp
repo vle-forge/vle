@@ -32,15 +32,15 @@
 
 namespace vle { namespace vpz {
 
-Output::Output()
-    : m_format(LOCAL)
-{
-}
+Output::Output() = default;
 
 Output::Output(const Output& output)
-    : Base(output), m_format(output.m_format), m_name(output.m_name),
-    m_plugin(output.m_plugin), m_location(output.m_location),
-      m_package(output.m_package), m_data()
+    : Base(output)
+    , m_name(output.m_name)
+    , m_plugin(output.m_plugin)
+    , m_location(output.m_location)
+    , m_package(output.m_package)
+    , m_data()
 {
     if (output.m_data)
         m_data = output.m_data->clone();
@@ -60,7 +60,6 @@ Output::~Output()
 
 void Output::swap(Output& output)
 {
-    std::swap(m_format, output.m_format);
     std::swap(m_name, output.m_name);
     std::swap(m_plugin, output.m_plugin);
     std::swap(m_location, output.m_location);
@@ -71,23 +70,12 @@ void Output::swap(Output& output)
 void Output::write(std::ostream& out) const
 {
     out << "<output name=\"" << m_name.c_str() << "\" "
-        << "location=\"" << m_location.c_str()
-        << "\" ";
+        << "location=\"" << m_location.c_str() << "\" ";
 
-    switch (m_format) {
-    case Output::LOCAL:
-        out << "format=\"local\"";
-        break;
-    case Output::DISTANT:
-        out << "format=\"distant\"";
-        break;
-    }
+    if (not m_package.empty())
+        out << "package=\"" << m_package.c_str() << "\" ";
 
-    if (not m_package.empty()) {
-        out << " package=\"" << m_package.c_str() << "\" ";
-    }
-
-    out << " plugin=\"" << m_plugin.c_str() << "\" ";
+    out << "plugin=\"" << m_plugin.c_str() << "\" ";
 
     if (m_data) {
         out << ">\n";
@@ -98,9 +86,9 @@ void Output::write(std::ostream& out) const
     }
 }
 
-void Output::setLocalStream(const std::string& location,
-                            const std::string& plugin,
-                            const std::string& package)
+void Output::setStream(const std::string& location,
+                       const std::string& plugin,
+                       const std::string& package)
 {
     if (plugin.empty()) {
         throw utils::ArgError(
@@ -110,19 +98,17 @@ void Output::setLocalStream(const std::string& location,
     m_location.assign(location);
     m_plugin.assign(plugin);
     m_package.assign(package);
-    m_format = Output::LOCAL;
 
     clearData();
 }
 
-void Output::setLocalStreamLocation(const std::string& location)
+void Output::setStreamLocation(const std::string& location)
 {
     m_location.assign(location);
-    m_format = Output::LOCAL;
 }
 
-void Output::setLocalStream(const std::string& location,
-                            const std::string& plugin)
+void Output::setStream(const std::string& location,
+                       const std::string& plugin)
 {
     if (plugin.empty()) {
         throw utils::ArgError(
@@ -132,40 +118,6 @@ void Output::setLocalStream(const std::string& location,
     m_location.assign(location);
     m_plugin.assign(plugin);
     m_package.clear();
-    m_format = Output::LOCAL;
-
-    clearData();
-}
-
-void Output::setDistantStream(const std::string& location,
-                              const std::string& plugin,
-                              const std::string& package)
-{
-    if (plugin.empty()) {
-        throw utils::ArgError(
-            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
-    }
-
-    m_location.assign(location);
-    m_plugin.assign(plugin);
-    m_package.assign(package);
-    m_format = Output::DISTANT;
-
-    clearData();
-}
-
-void Output::setDistantStream(const std::string& location,
-                              const std::string& plugin)
-{
-    if (plugin.empty()) {
-        throw utils::ArgError(
-            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
-    }
-
-    m_location.assign(location);
-    m_plugin.assign(plugin);
-    m_package.clear();
-    m_format = Output::DISTANT;
 
     clearData();
 }
@@ -182,9 +134,9 @@ void Output::clearData()
 
 bool Output::operator==(const Output& output) const
 {
-    return m_format == output.format() and m_name == output.name()
-        and m_plugin == output.plugin() and m_location == output.location()
-        and m_package == output.package() and m_data == output.data();
+    return m_name == output.name() and m_plugin == output.plugin()
+        and m_location == output.location() and m_package == output.package()
+        and m_data == output.data();
 
 }
 

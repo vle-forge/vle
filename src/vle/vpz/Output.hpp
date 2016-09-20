@@ -44,21 +44,13 @@ namespace vle {
     namespace vpz {
 
     /**
-     * @brief This class defines an output information and stores the type of
-     * output: local or distant, the name of the oov::Plugin, its location
-     * (local file system or internet address and the parametrization of the
-     * plug-in).
+     * This class defines an output information and stores the type of
+     * output, the name of the oov::Plugin, its location and the
+     * parametrization of the plug-in).
      */
     class VLE_API Output : public Base
     {
     public:
-        /**
-         * @brief Define the output format of the plugin.
-         * - LOCAL: use a local communication for observations.
-         * - DISTANT: use a distant communication for observations using trame.
-         */
-        enum Format { LOCAL, DISTANT };
-
         /**
          * @brief Build a empty local output.
          */
@@ -131,9 +123,9 @@ namespace vle {
          * @param package the package of the plugin.
          * @throw utils::ArgError if name is empty.
          */
-        void setLocalStream(const std::string& location,
-                            const std::string& plugin,
-                            const std::string& package);
+        void setStream(const std::string& location,
+                       const std::string& plugin,
+                       const std::string& package);
 
         /**
          * @brief Set the output with text stream information. The name is
@@ -142,36 +134,14 @@ namespace vle {
          * @param plugin to use in output stream.
          * @throw utils::ArgError if name is empty.
          */
-        void setLocalStream(const std::string& location,
-                            const std::string& plugin);
+        void setStream(const std::string& location,
+                       const std::string& plugin);
 
         /**
          * @brief Set the location of the output plugin.
          * @param location the file name.
          */
-        void setLocalStreamLocation(const std::string& location);
-
-        /**
-         * @brief Set the output with the sdml stream information. The name is
-         * obligatory, the location defines a filename.
-         * @param location the file name.
-         * @param plugin to use in output stream.
-         * @param package the package of the plugin
-         * @throw utils::ArgError if name is empty.
-         */
-        void setDistantStream(const std::string& location,
-                              const std::string& plugin,
-                              const std::string& package);
-
-        /**
-         * @brief Set the output with the sdml stream information. The name is
-         * obligatory, the location defines a filename.
-         * @param location the file name.
-         * @param plugin to use in output stream.
-         * @throw utils::ArgError if name is empty.
-         */
-        void setDistantStream(const std::string& location,
-                              const std::string& plugin);
+        void setStreamLocation(const std::string& location);
 
         /**
          * @brief Assign data to the Output. If previous data exists, it will be
@@ -190,20 +160,6 @@ namespace vle {
          * Get/Set functions.
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        /**
-         * @brief Get the format of this Output.
-         * @return the Format of the plugin.
-         */
-        Format format() const
-        { return m_format; }
-
-        /**
-         * @brief Get the string representation of the format.
-         * @return "local" or "distant".
-         */
-        std::string streamformat() const
-        { return (m_format == LOCAL ? "local" : "distant"); }
 
         /**
          * @brief Get the plugin of this Output.
@@ -255,7 +211,6 @@ namespace vle {
 	bool operator==(const Output& output) const;
 
     private:
-        Format                        m_format;
         std::string                   m_name;
         std::string                   m_plugin;
         std::string                   m_location;

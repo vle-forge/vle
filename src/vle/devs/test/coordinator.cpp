@@ -495,7 +495,7 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
     vpz.project().experiment().setDuration(100.0);
     vpz.project().experiment().setBegin(0.0);
 
-    vpz.project().experiment().views().addLocalStreamOutput(
+    vpz.project().experiment().views().addStreamOutput(
         "output", "toto", "make_oovplugin", "");
 
     vpz.project().experiment().views().add(
@@ -565,7 +565,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
     vpz.project().experiment().setDuration(100.0);
     vpz.project().experiment().setBegin(0.0);
 
-    vpz.project().experiment().views().addLocalStreamOutput(
+    vpz.project().experiment().views().addStreamOutput(
         "output", "toto", "make_oovplugin_default", "");
 
     vpz.project().experiment().views().add(

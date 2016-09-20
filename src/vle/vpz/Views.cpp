@@ -202,19 +202,10 @@ void Views::copyOutput(const std::string& outputname,
 		       const std::string& copyname)
 {
     const Output& o = m_outputs.get(outputname);
-    if (o.format() == Output::LOCAL) {
-        Output& no = addLocalStreamOutput(copyname, o.location(), o.plugin(),
-                                          o.package());
-        if (o.data()) {
-            no.setData(o.data()->clone());
-        }
-    } else {
-        Output& no = addDistantStreamOutput(copyname, o.location(), o.plugin(),
-                                            o.package());
-        if (o.data()) {
-            no.setData(o.data()->clone());
-        }
-    }
+    Output& no = addStreamOutput(copyname, o.location(), o.plugin(), o.package());
+
+    if (o.data())
+        no.setData(o.data()->clone());
 }
 
 void Views::copyView(const std::string& viewname,

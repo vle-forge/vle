@@ -71,7 +71,7 @@ namespace vle { namespace vpz {
          * @brief Write the XML representation of this class.
          * @code
          * <outputs>
-         *  <output name="output1" format="local|distant" location="" />
+         *  <output name="output1" location="" />
          *  ...
          * </outputs>
          * @endcode
@@ -101,10 +101,10 @@ namespace vle { namespace vpz {
          * @param package the package of the plugin.
          * @throw utils::ArgError if name is empty.
          */
-        Output& addLocalStream(const std::string& name,
-                               const std::string& location,
-                               const std::string& plugin,
-                               const std::string& package);
+        Output& addStream(const std::string& name,
+                          const std::string& location,
+                          const std::string& plugin,
+                          const std::string& package);
 
         /**
          * @brief Add an output with text stream information. The name is
@@ -114,36 +114,10 @@ namespace vle { namespace vpz {
          * @param plugin to use in steam.
          * @throw utils::ArgError if name is empty.
          */
-        Output& addLocalStream(const std::string& name,
-                               const std::string& location,
-                               const std::string& plugin);
+        Output& addStream(const std::string& name,
+                          const std::string& location,
+                          const std::string& plugin);
 
-        /**
-         * @brief Add an output with the sdml stream information. The name is
-         * obligatory, the location defines a filename.
-         * @param name the output name.
-         * @param location the file name.
-         * @param plugin to use in steam.
-         * @param package the package of the plugin.
-         * @throw utils::ArgError if name is empty.
-         */
-        Output& addDistantStream(const std::string& name,
-                                 const std::string& location,
-                                 const std::string& plugin,
-                                 const std::string& package);
-
-        /**
-         * @brief Add an output with the sdml stream information. The name is
-         * obligatory, the location defines a filename.
-         * @param name the output name.
-         * @param location the file name.
-         * @param plugin to use in steam.
-         * @param package the package of the plugin.
-         * @throw utils::ArgError if name is empty.
-         */
-        Output& addDistantStream(const std::string& name,
-                                 const std::string& location,
-                                 const std::string& plugin);
 
         /**
          * @brief Add a list of outputs into the current list.

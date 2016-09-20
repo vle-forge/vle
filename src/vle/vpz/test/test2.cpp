@@ -347,12 +347,10 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         " <experiment name=\"test1\">\n"
         "  <views>\n"
         "   <outputs>\n"
-        "    <output name=\"x\" format=\"local\" "
-        "            plugin=\"yyy\" location=\"TEMP\">\n"
+        "    <output name=\"x\" plugin=\"yyy\" location=\"TEMP\">\n"
         "     <string>test</string>"
         "    </output>\n"
-        "    <output name=\"z\" format=\"distant\" "
-        "            plugin=\"xxx\" location=\"127.0.0.1:8888\" />\n"
+        "    <output name=\"z\" plugin=\"xxx\" location=\"127.0.0.1:8888\" />\n"
         "   </outputs>\n"
         "   <observables>\n"
         "    <observable name=\"oo\" >\n"
@@ -388,7 +386,6 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     {
         const vpz::Output& out(outputs.outputlist().find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
-        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::LOCAL);
         BOOST_REQUIRE(out.data());
         BOOST_REQUIRE_EQUAL(out.data()->isString(), true);
         BOOST_REQUIRE_EQUAL(value::toString(out.data()), "test");
@@ -397,7 +394,6 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     {
         const vpz::Output& out(outputs.outputlist().find("z")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "z");
-        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::DISTANT);
         BOOST_REQUIRE_EQUAL(out.plugin(), "xxx");
         BOOST_REQUIRE_EQUAL(out.location(), "127.0.0.1:8888");
     }

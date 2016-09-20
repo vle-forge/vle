@@ -114,8 +114,8 @@ DefaultSimSubpanelThread::onStarted()
             vle::vpz::Output& output = itb->second;
             if (output.location().empty()) {
                 mpkg->addDirectory("","output",vle::utils::PKG_SOURCE);
-                output.setLocalStreamLocation(mpkg->getOutputDir(
-                                                  vle::utils::PKG_SOURCE));
+                output.setStreamLocation(mpkg->getOutputDir(
+                                             vle::utils::PKG_SOURCE));
             }
         }
     } catch(const vle::utils::SaxParserError& e) {
