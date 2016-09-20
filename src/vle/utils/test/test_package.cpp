@@ -136,9 +136,10 @@ BOOST_AUTO_TEST_CASE(show_package)
     // Default, 2 binary package directories are available.
     BOOST_REQUIRE(ctx->getBinaryPackagesDir().size() == 2);
 
-    // 3 binary packages: the show_package build previously and the
-    // vle.output, vle.adaptative-qss packages provided with VLE.
-    BOOST_REQUIRE(ctx->getBinaryPackages().size() == 3);
+    // 4 binary packages: the show_package build previously and the
+    // vle.output, gvle.default, vle.adaptative-qss packages provided with
+    // VLE (perhaps 3 if gvle is not build).
+    BOOST_REQUIRE(ctx->getBinaryPackages().size() >= 3);
     vle::utils::Path p = pkg.getExpDir(vle::utils::PKG_BINARY);
 
     std::cout << "\ngetExpDir           : " << p.string()
