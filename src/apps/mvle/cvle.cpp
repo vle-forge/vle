@@ -94,6 +94,7 @@ void generate_template_line(std::ostream& header, std::ostream& firstline,
                     stack.emplace(newname, newvalue);
                 }
             }
+            break;
         case vle::value::Value::MAP:
             for (auto& value_map: value->toMap()) {
                 std::string newname = name + '.' + value_map.first;
