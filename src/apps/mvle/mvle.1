@@ -7,6 +7,7 @@ mvle \(em The MPI experimental frames executor for VLE framework
 .PP
 \fBmvle\fR
 [\fB-h\fP, \fB\-\-help\fP]
+[\fB\-\-timeout \fIduration\fP\fR]
 [\fB\-P\fP, \fB\-\-package \fIpackage_name\fP\fR]
 [\fB\-v\fP]
 [\fB\-\-version\fP]
@@ -35,6 +36,9 @@ Show summary of options.
 
 .IP "\fB-v\fp, \fB\-\-version\fP" 10
 Show version of program.
+
+.IP "\fB-P\fP, \fB\-\-timeout\fI duration\fR\fP"
+Limit the simulation duration with a timeout in miliseconds (integer).
 
 .IP "\fB-P\fP, \fB\-\-package\fI packagename\fR\fP"
 Selects the VLE package where search experimental frame from the $VLE_HOME

@@ -32,6 +32,7 @@
 #include <vle/utils/Context.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <chrono>
 
 namespace vle { namespace manager {
 
@@ -57,6 +58,12 @@ public:
             LogOptions            logoptions,
             SimulationOptions     simulationoptions,
             std::ostream         *output);
+
+    Manager(utils::ContextPtr          context,
+            LogOptions                 logoptions,
+            SimulationOptions          simulationoptions,
+            std::chrono::milliseconds  timeout,
+            std::ostream              *output);
 
     ~Manager();
 

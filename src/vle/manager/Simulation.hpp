@@ -32,6 +32,7 @@
 #include <vle/utils/Context.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <chrono>
 
 namespace vle { namespace manager {
 
@@ -50,10 +51,11 @@ class VLE_API Simulation
 public:
     using result_type = std::unique_ptr<value::Map>;
 
-    Simulation(utils::ContextPtr  context,
-               LogOptions         logoptions,
-               SimulationOptions  simulationoptionts,
-               std::ostream      *output);
+    Simulation(utils::ContextPtr          context,
+               LogOptions                 logoptions,
+               SimulationOptions          simulationoptionts,
+               std::chrono::milliseconds  timeout,
+               std::ostream              *output);
 
     Simulation(const Simulation &other) = delete;
     Simulation& operator=(const Simulation &other) = delete;

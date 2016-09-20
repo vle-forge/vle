@@ -106,15 +106,19 @@ static void setExperimentName(const std::unique_ptr<vpz::Vpz>& destination,
 class Manager::Pimpl
 {
 public:
-    Pimpl(utils::ContextPtr     context,
-          LogOptions            logoptions,
-          SimulationOptions     simulationoptions,
-          std::ostream         *output)
+    Pimpl(utils::ContextPtr          context,
+          LogOptions                 logoptions,
+          SimulationOptions          simulationoptions,
+          std::chrono::milliseconds  timeout,
+          std::ostream              *output)
         : mContext(context)
+        , mTimeout(timeout)
+        , mOutputStream(output)
         , mLogOption(logoptions)
         , mSimulationOption(simulationoptions)
-        , mOutputStream(output)
     {
+        if (timeout != std::chrono::milliseconds::zero())
+            mSimulationOption |= vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
     template <typename T >
@@ -138,20 +142,22 @@ public:
      */
     struct worker
     {
-        utils::ContextPtr     context;
-        const std::string& package;
-        const std::unique_ptr<vpz::Vpz>& vpz;
-        ExperimentGenerator  &expgen;
-        LogOptions            mLogOption;
-        SimulationOptions     mSimulationOption;
-        uint32_t              index;
-        uint32_t              threads;
-        value::Matrix        *result;
-        Error                *error;
+        utils::ContextPtr                 context;
+        const std::string&                package;
+        const std::unique_ptr<vpz::Vpz>&  vpz;
+        std::chrono::milliseconds         mTimeout;
+        ExperimentGenerator              &expgen;
+        LogOptions                        mLogOption;
+        SimulationOptions                 mSimulationOption;
+        uint32_t                          index;
+        uint32_t                          threads;
+        value::Matrix                    *result;
+        Error                            *error;
 
         worker(utils::ContextPtr                 context,
-               const std::string& package,
+               const std::string&                package,
                const std::unique_ptr<vpz::Vpz>&  vpz,
+               std::chrono::milliseconds         timeout,
                ExperimentGenerator&              expgen,
                LogOptions                        logoptions,
                SimulationOptions                 simulationoptions,
@@ -162,6 +168,7 @@ public:
           : context(context)
           , package(package)
           , vpz(vpz)
+          , mTimeout(timeout)
           , expgen(expgen)
           , mLogOption(logoptions)
           , mSimulationOption(simulationoptions)
@@ -182,7 +189,8 @@ public:
 
             for (uint32_t i = expgen.min() + index; i < expgen.max();
                  i += threads) {
-                Simulation sim(context, mLogOption, mSimulationOption, nullptr);
+                Simulation sim(context, mLogOption, mSimulationOption, mTimeout,
+                               nullptr);
                 Error err;
 
                 auto file =
@@ -225,7 +233,7 @@ public:
             ctx->set_log_function(
                     std::unique_ptr<utils::Context::LogFunctor>(
                             new vle_log_manager_thread(i)));
-            gp.emplace_back(worker(ctx, package, vpz, expgen,
+            gp.emplace_back(worker(ctx, package, vpz, mTimeout, expgen,
                        mLogOption, mSimulationOption,
                        i, threads, result.get(), error));
         }
@@ -246,7 +254,8 @@ public:
                    uint32_t world,
                    Error *error)
     {
-        Simulation sim(mContext, mLogOption, mSimulationOption, nullptr);
+        Simulation sim(mContext, mLogOption, mSimulationOption, mTimeout,
+                       nullptr);
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
         std::unique_ptr<value::Matrix> result;
@@ -303,12 +312,11 @@ public:
         return result;
     }
 
-    utils::ContextPtr     mContext;
-    LogOptions            mLogOption;
-    SimulationOptions     mSimulationOption;
-    std::ostream         *mOutputStream;
-    uint32_t              mCurrentTime;
-    uint32_t              mduration;
+    utils::ContextPtr          mContext;
+    std::chrono::milliseconds  mTimeout;
+    std::ostream              *mOutputStream;
+    LogOptions                 mLogOption;
+    SimulationOptions          mSimulationOption;
 };
 
 Manager::Manager(utils::ContextPtr     context,
@@ -317,7 +325,19 @@ Manager::Manager(utils::ContextPtr     context,
                  std::ostream         *output)
     : mPimpl(std::make_unique<Manager::Pimpl>(
                  context, logoptions,
-                 simulationoptions, output))
+                 simulationoptions,
+                 std::chrono::milliseconds(0), output))
+{
+}
+
+Manager::Manager(utils::ContextPtr     context,
+                 LogOptions            logoptions,
+                 SimulationOptions     simulationoptions,
+                 std::chrono::milliseconds  timeout,
+                 std::ostream         *output)
+    : mPimpl(std::make_unique<Manager::Pimpl>(
+                 context, logoptions,
+                 simulationoptions, timeout, output))
 {
 }
 

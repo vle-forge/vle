@@ -133,6 +133,7 @@ public:
      * vle::utils::Spawn sp(context);
      * [...]
      * sp.kill();
+     * sp.wait();
      *
      * std::string msg;
      * bool success;

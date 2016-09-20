@@ -99,7 +99,9 @@ DefaultSimSubpanelThread::onStarted()
     }
 
     vle::manager::Simulation sim(ctx, vle::manager::LOG_NONE,
-            vle::manager::SIMULATION_NONE, &std::cout);
+                                 vle::manager::SIMULATION_NONE,
+                                 std::chrono::milliseconds::zero(),
+                                 &std::cout);
     vle::manager::Error manerror;
     output_map.reset(nullptr);
     std::unique_ptr<vle::vpz::Vpz> vpz(nullptr);

@@ -73,24 +73,29 @@ std::unique_ptr<value::Map> read_value(const utils::Path& p)
 class Simulation::Pimpl
 {
 public:
-    utils::ContextPtr  m_context;
-    std::ostream      *m_out;
-    LogOptions         m_logoptions;
-    SimulationOptions  m_simulationoptions;
-    utils::Path        m_vpz_file;
-    utils::Path        m_output_file;
+    utils::ContextPtr          m_context;
+    std::chrono::milliseconds  m_timeout;
+    std::ostream              *m_out;
+    utils::Path                m_vpz_file;
+    utils::Path                m_output_file;
+    LogOptions                 m_logoptions;
+    SimulationOptions          m_simulationoptions;
 
-    Pimpl(utils::ContextPtr  context,
-          LogOptions         logoptions,
-          SimulationOptions  simulationoptionts,
-          std::ostream      *output)
+    Pimpl(utils::ContextPtr          context,
+          LogOptions                 logoptions,
+          SimulationOptions          simulationoptionts,
+          std::chrono::milliseconds  timeout,
+          std::ostream              *output)
         : m_context(context)
+        , m_timeout(timeout)
         , m_out(output)
-        , m_logoptions(logoptions)
-        , m_simulationoptions(simulationoptionts)
         , m_vpz_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.vpz"))
         , m_output_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.value"))
+        , m_logoptions(logoptions)
+        , m_simulationoptions(simulationoptionts)
     {
+        if (timeout != std::chrono::milliseconds::zero())
+            m_simulationoptions |= vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
     template <typename T>
@@ -259,7 +264,7 @@ public:
             auto exe = std::move(argv.front());
             argv.erase(argv.begin());
 
-            if (not spawn.start(exe, pwd.string(), argv)) {
+            if (not spawn.start(exe, pwd.string(), argv, m_timeout)) {
                 error->code = -1;
                 error->message = "fail to spawn";
                 return {};
@@ -338,13 +343,14 @@ public:
     }
 };
 
-Simulation::Simulation(utils::ContextPtr  context,
-                       LogOptions         logoptions,
-                       SimulationOptions  simulationoptionts,
-                       std::ostream      *output)
+Simulation::Simulation(utils::ContextPtr          context,
+                       LogOptions                 logoptions,
+                       SimulationOptions          simulationoptionts,
+                       std::chrono::milliseconds  timeout,
+                       std::ostream              *output)
     : mPimpl(std::make_unique<Simulation::Pimpl>(
                  context, logoptions,
-                 simulationoptionts, output))
+                 simulationoptionts, timeout, output))
 {
 }
 

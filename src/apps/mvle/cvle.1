@@ -7,6 +7,7 @@ cvle \(em The MPI experimental frames executor for VLE framework
 .PP
 \fBcvle\fR
 [\fB-h\fP, \fB\-\-help\fP]
+[\fB\-\-timeout \fIduration\fP\fR]
 [\fB\-P\fP, \fB\-\-package \fIpackage_name\fP\fR]
 [\fB\-i\fP, \fB\-\-input-file \fIinput_file.csv\fP\fR]
 [\fB\-o\fP, \fB\-\-output-file \fIoutput_file.csv\fP\fR]
@@ -59,6 +60,11 @@ included below.
 
 .IP "\fB-h\fP, \fB\-\-help\fP" 10
 Show summary of options.
+
+.IP "\fB-P\fP, \fB\-\-timeout\fI duration\fR\fP"
+Limit the simulation duration with a timeout in miliseconds (integer).
+          
+$VLE_HOME directory.
 
 .IP "\fB-P\fP, \fB\-\-package\fI packagename\fR\fP"
 Selects the VLE package where search experimental frame from the

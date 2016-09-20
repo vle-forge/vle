@@ -476,6 +476,7 @@ private:
     using MapPtr = std::unique_ptr<vle::value::Map>;
 
     vle::utils::ContextPtr m_context;
+    std::chrono::milliseconds m_timeout;
     std::string m_packagename;
     std::string m_vpzfilename;
     vle::manager::Simulation m_simulator;
@@ -514,12 +515,17 @@ private:
     }
 
 public:
-    Worker(const std::string &package, const std::string &vpz, bool warnings)
+    Worker(const std::string &package,
+           std::chrono::milliseconds timeout,
+           const std::string &vpz,
+           bool warnings)
         : m_context(vle::utils::make_context())
+        , m_timeout(timeout)
         , m_packagename(package)
         , m_simulator(m_context, vle::manager::LOG_NONE,
                       vle::manager::SIMULATION_NONE |
-                      vle::manager::SIMULATION_SPAWN_PROCESS, nullptr)
+                      vle::manager::SIMULATION_SPAWN_PROCESS,
+                      timeout, nullptr)
         , m_warnings(warnings)
     {
         m_context->set_log_priority(3);
@@ -723,13 +729,14 @@ int run_as_master(const std::string &inputfile,
 
 int run_as_worker(const std::string& package,
                   const std::string& vpz,
+                  std::chrono::milliseconds timeout,
                   bool warnings)
 {
     int ret = EXIT_SUCCESS;
 
     try {
         boost::mpi::communicator comm;
-        Worker w(package, vpz, warnings);
+        Worker w(package, timeout, vpz, warnings);
         std::string block;
         boost::mpi::broadcast(comm, block, 0);
         w.init(block);
@@ -764,11 +771,14 @@ void show_help()
 {
     printf(_("cvle [options...]\n\n"
              "  help,h                          Produce help message\n"
+             "  timeout [int]                   Limit the simulation duration "
+             "with a timeout in miliseconds.\n"
              "  package,P package file [file..] Set package name and files\n"
              "  input-file,i file               csv input file\n"
              "  output-file,o file              csv output file\n"
              "  warnings                        Show warnings in output\n"
-             "  template,t file                 Generate a template csv input file\n"
+             "  template,t file                 Generate a template csv input "
+             "file\n"
              "  block-size,b size               Set number of lines to be sent"
              " [default 5000]\n"));
 }
@@ -777,6 +787,7 @@ int main(int argc, char *argv[])
 {
     std::string package_name;
     std::string input_file, output_file, template_file;
+    std::chrono::milliseconds timeout{std::chrono::milliseconds::zero()};
     int warnings = 0;
     int block_size = 5000;
     int ret = EXIT_SUCCESS;
@@ -784,6 +795,7 @@ int main(int argc, char *argv[])
     const char* const short_opts = "hP:i:o:t:b:";
     const struct option long_opts[] = {
         {"help", 0, nullptr, 'h'},
+        {"timeout", 1, nullptr, 0},
         {"package", 1, nullptr, 'P'},
         {"input-file", 1, nullptr, 'i'},
         {"output-file", 1, nullptr, 'o'},
@@ -801,6 +813,17 @@ int main(int argc, char *argv[])
 
         switch (opt) {
         case 0:
+            if (not strcmp(long_opts[opt_index].name, "timeout")) {
+                try {
+                    long int t = std::stol(::optarg);
+                    if (t <= 0)
+                        throw std::exception();
+                    timeout = std::chrono::milliseconds(t);
+                } catch (const std::exception& /*e*/) {
+                    fprintf(stderr, _("Bad timeout: %s Assume no timeout\n"),
+                            ::optarg);
+                }
+            }
             break;
         case 'h':
             show_help();
@@ -856,11 +879,15 @@ int main(int argc, char *argv[])
     if (comm.rank() == 0) {
         printf(_("block size: %d\n"
                  "package   : %s\n"
+                 "timeout   : %ld\n"
                  "input csv : %s\n"
                  "output csv: %s\n"
-                 "vpz       :"), block_size, package_name.c_str(),
+                 "vpz       :"),
+               block_size, package_name.c_str(),
+               timeout.count(),
                (input_file.empty()) ? "stdin" : input_file.c_str(),
                (output_file.empty()) ? "stdin" : output_file.c_str());
+
         for (const auto& elem : vpz)
             printf("%s ", elem.c_str());
         printf("\n");
@@ -868,5 +895,5 @@ int main(int argc, char *argv[])
         return run_as_master(input_file, output_file, block_size);
     }
 
-    return run_as_worker(package_name, vpz.front(), warnings);
+    return run_as_worker(package_name, vpz.front(), timeout, warnings);
 }

@@ -38,12 +38,14 @@
 #include <vle/version.hpp>
 #include <boost/format.hpp>
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <numeric>
 #include <fstream>
 #include <iterator>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <cassert>
 #include <getopt.h>
 
@@ -188,8 +190,10 @@ static void show_help() noexcept
           "standard output (default)\n"
           "log-stderr    log of the sinulation(s) are reported to the "
           "standard error output\n"
-          "writeoutput,w output simulation results into XML output file. "
+          "write-output  output simulation results into XML output file. "
           "Need a file name parameter.\n"
+          "timeout       limit the simulation duration with a timeout in "
+          "miliseconds.\n"
           "\n"
           "processor,j Select number of processor in manager mode [>= 1]\n"
           "manager,m  Use the manager mode to run experimental frames\n"
@@ -318,13 +322,14 @@ static vle::manager::LogOptions convert_log_mode(vle::utils::ContextPtr ctx)
 
 static int run_manager(vle::utils::ContextPtr ctx,
                        const std::string& package,
+                       std::chrono::milliseconds timeout,
                        CmdArgs::const_iterator it, CmdArgs::const_iterator end,
                        int processor, vle::utils::Package& pkg)
 {
     vle::manager::Manager man(ctx, convert_log_mode(ctx),
                               vle::manager::SIMULATION_NONE |
                               vle::manager::SIMULATION_NO_RETURN,
-                              &std::cout);
+                              timeout, &std::cout);
     int success = EXIT_SUCCESS;
 
     for (; it != end; ++it) {
@@ -350,6 +355,7 @@ static int run_manager(vle::utils::ContextPtr ctx,
 
 static int run_simulation(vle::utils::ContextPtr ctx,
                           const std::string& package,
+                          std::chrono::milliseconds timeout,
                           const std::string& output_file,
                           CmdArgs::const_iterator it,
                           CmdArgs::const_iterator end,
@@ -357,7 +363,7 @@ static int run_simulation(vle::utils::ContextPtr ctx,
 {
     vle::manager::Simulation sim(ctx, convert_log_mode(ctx),
                                  vle::manager::SIMULATION_NONE,
-                                 &std::cout);
+                                 timeout, &std::cout);
     int success = EXIT_SUCCESS;
 
     for (; it != end; ++it) {
@@ -409,8 +415,9 @@ static bool init_package(vle::utils::Package& pkg, const CmdArgs &args)
 
 static int manage_package_mode(vle::utils::ContextPtr ctx,
                                const std::string& output_file,
-                               bool manager_mode, int processor,
-                               CmdArgs args)
+                               std::chrono::milliseconds timeout,
+                               bool manager_mode,
+                               int processor, CmdArgs args)
 {
     if (args.empty()) {
         fprintf(stderr, _("missing package\n"));
@@ -483,9 +490,11 @@ static int manage_package_mode(vle::utils::ContextPtr ctx,
         ret = EXIT_FAILURE;
     else if (it != end) {
         if (manager_mode)
-            ret = run_manager(ctx, packagename, it, end, processor, pkg);
+            ret = run_manager(ctx, packagename, timeout, it, end,
+                    processor, pkg);
         else
-            ret = run_simulation(ctx, packagename, output_file, it, end, pkg);
+            ret = run_simulation(ctx, packagename, timeout,
+                    output_file, it, end, pkg);
     }
 
     return ret;
@@ -708,6 +717,7 @@ static int manage_config_mode(vle::utils::ContextPtr ctx, CmdArgs args)
 int main(int argc, char **argv)
 {
     std::string output_file;
+    std::chrono::milliseconds timeout {std::chrono::milliseconds::zero()};
     unsigned int mode = CLI_MODE_NOTHING;
     int verbose_level = 0;
     int processor_number = 1;
@@ -727,6 +737,7 @@ int main(int argc, char **argv)
         {"log-stdout", 0, &log_stdout, 1},
         {"log-stderr", 0, &log_stdout, 2},
         {"write-output", 1, nullptr, 0},
+        {"timeout", 1, nullptr, 0},
         {"verbose", 1, nullptr, 'V'},
         {"processor", 1, nullptr, 'j'},
         {"manager", 0, nullptr, 'm'},
@@ -744,8 +755,19 @@ int main(int argc, char **argv)
 
         switch (opt) {
         case 0:
-            if (not strcmp(long_opts[opt_index].name, "write-output"))
+            if (not strcmp(long_opts[opt_index].name, "write-output")) {
                 output_file = ::optarg;
+            } else if (not strcmp(long_opts[opt_index].name, "timeout")) {
+                try {
+                    long int t = std::stol(::optarg);
+                    if (t <= 0)
+                        throw std::exception();
+                    timeout = std::chrono::milliseconds(t);
+                } catch (const std::exception /* e */) {
+                    fprintf(stderr, _("Bad timeout: %s. Assume no timeout\n"),
+                            ::optarg);
+                }
+            }
             break;
         case 'h':
             mode |= CLI_MODE_END;
@@ -837,8 +859,9 @@ int main(int argc, char **argv)
 
     switch (mode) {
     case CLI_MODE_PACKAGE:
-        ret = manage_package_mode(ctx, output_file, manager, processor_number,
-                                  std::move(commands));
+        ret = manage_package_mode(ctx, output_file, timeout, manager,
+                processor_number,
+                std::move(commands));
         break;
     case CLI_MODE_REMOTE:
         ret = manage_remote_mode(ctx, std::move(commands));

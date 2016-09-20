@@ -356,6 +356,16 @@ public:
         }
     }
 
+    void kill()
+    {
+        assert(m_start);
+
+        if (m_finish)
+            return;
+
+        ::kill(m_pid, SIGTERM);
+    }
+
     bool isfinish()
     {
         assert(m_start);
@@ -427,6 +437,11 @@ bool Spawn::start(const std::string& exe,
 bool Spawn::wait()
 {
     return m_pimpl->wait();
+}
+
+void Spawn::kill()
+{
+    m_pimpl->kill();
 }
 
 bool Spawn::isstart()
