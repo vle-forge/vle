@@ -248,7 +248,7 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
             return std::unique_ptr<value::Value>();
         }
         QVariant qv = node.childNodes().item(0).toText().nodeValue();
-        return std::move(value::Boolean::create(qv.toBool()));
+        return value::Boolean::create(qv.toBool());
     }
     if (node.nodeName() == "integer") {
         if (node.childNodes().length() != 1){
@@ -271,15 +271,15 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
             return std::unique_ptr<value::Value>();
         }
         QVariant qv = node.childNodes().item(0).toText().nodeValue();;
-        return std::move(value::Double::create(qv.toDouble()));
+        return value::Double::create(qv.toDouble());
     }
     if (node.nodeName() == "string") {
         if (node.childNodes().length() == 0){
-            return std::move(value::String::create(""));
+            return value::String::create(std::string());
         }
         if (node.childNodes().length() == 1){
             QString qv = node.childNodes().item(0).toText().nodeValue();
-            return std::move(value::String::create(qv.toStdString()));
+            return value::String::create(qv.toStdString());
         }
         qDebug() << "Internal error in buildValue (4.3) "<<node.childNodes().length();
         return std::unique_ptr<value::Value>();
@@ -291,14 +291,14 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
             return std::unique_ptr<value::Value>();
         }
         if (node.childNodes().length() == 0) {
-            return std::move(value::Tuple::create(0, 0.0));
+            return value::Tuple::create(0, 0.0);
         } else {
             QString qv = node.childNodes().item(0).toText().nodeValue();
             QStringList vals = qv.split(" ");
-            std::unique_ptr<value::Tuple> res(
-                    new vle::value::Tuple(vals.length()));
+            auto res = vle::value::Tuple::create(vals.length());
+            auto& tpl = res->toTuple();
             for (int i = 0; i<vals.size();i++) {
-                (*res)[i] = QVariant(vals.at(i)).toDouble();
+                tpl[i] = QVariant(vals.at(i)).toDouble();
             }
             return res;
         }
@@ -315,8 +315,9 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
         int height = QVariant(
                 vleDomObject::attributeValue(node, "height")).toInt();
         QString qv = node.childNodes().item(0).toText().nodeValue();
-        std::unique_ptr<value::Table> res(new vle::value::Table(width, height));
-        res->fill(qv.toStdString());
+
+        auto res = vle::value::Table::create(width, height);
+        res->toTable().fill(qv.toStdString());
         return res;
     }
     if (node.nodeName() == "#text") {
@@ -329,15 +330,16 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
 
     QList<QDomNode> chs = vleDomObject::childNodesWithoutText(node);
     if (node.nodeName() == "set") {
-        std::unique_ptr<value::Set> res(new value::Set());
+        auto res = vle::value::Set::create();
+        auto& st = res->toSet();
         for (int i=0; i < chs.size(); i++) {
             QDomNode child = chs[i];
-            res->add(vleVpz::buildValue(child, buildText));
+            st.add(vleVpz::buildValue(child, buildText));
         }
         return res;
     }
     if (node.nodeName() == "map") {
-        std::unique_ptr<value::Map> res(new value::Map());
+        auto res = vle::value::Map::create();
         for (int i=0; i < chs.size(); i++) {
             QDomNode child = chs[i];
             if (child.nodeName() != "key") {
@@ -352,9 +354,9 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
             while (mapItemValue.isText()) {
                 mapItemValue = mapItemValue.nextSibling();
             }
-            res->add(
-                child.attributes().namedItem("name").nodeValue().toStdString(),
-                vleVpz::buildValue(mapItemValue, buildText));
+            res->toMap().add(
+                    child.attributes().namedItem("name").nodeValue().toStdString(),
+                    vleVpz::buildValue(mapItemValue, buildText));
         }
         return res;
     }
@@ -368,8 +370,8 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
         int columnstep = QVariant(vleDomObject::attributeValue(node, "columnstep")).toInt();
         int rowstep = QVariant(vleDomObject::attributeValue(node, "rowstep")).toInt();
 
-        std::unique_ptr<value::Matrix> res(new vle::value::Matrix(columns,
-                rows, columnmax, rowmax, columnstep, rowstep));
+        auto res = vle::value::Matrix::create(columns,
+                rows, columnmax, rowmax, columnstep, rowstep);
         if (chs.size() != (int) columns*rows) {
             qDebug() << "Internal error in buildValue (matrix)"
                     << vleDomObject::toQString(node) ;
@@ -378,12 +380,15 @@ vleVpz::buildValue(const QDomNode& node, bool buildText)
 
             return std::unique_ptr<value::Value>();
         }
+
+        auto& mat = res->toMatrix();
         for (int i=0; i < rows; i++) {
             for (int j=0; j < columns; j++) {
                 QDomNode child = chs[(j + (i*columns))];
-                res->set(j,i, vleVpz::buildValue(child, buildText));
+                mat.set(j,i, vleVpz::buildValue(child, buildText));
             }
         }
+
         return res;
     }
     qDebug() << "Internal error in buildValue (3): " << node.nodeName() << "\n"
