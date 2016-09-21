@@ -312,6 +312,9 @@ public:
 
         void operator()(std::string url) const
         {
+            if (url.empty()) {
+                return;
+            }
             DownloadManager dl(context);
             Path filename(Path::temp_directory_path());
             filename /= "packages.pkg";
@@ -320,7 +323,15 @@ public:
             dl.join();
 
             if (not dl.hasError()) {
-                parser->extract(filename.string(), url);
+                try {
+                    parser->extract(filename.string(), url);
+                } catch (const utils::FileError& err) {
+                    *remoteHasError = true;
+                    remoteMessageError->assign((vle::fmt(
+                            "failed while parsing packages.pkg file: %1%\n")
+                                % err.what()).str());
+
+                }
             } else {
                 if (!(*remoteHasError)) {
                     *remoteHasError = true;
