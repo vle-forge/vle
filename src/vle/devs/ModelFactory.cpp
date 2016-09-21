@@ -294,7 +294,7 @@ std::unique_ptr<Dynamics> buildNewDynamics(
             debug->set(std::move(dynamics));
             return std::move(debug);
         } else {
-            return std::move(dynamics);
+            return dynamics;
         }
     } catch(const std::exception& e) {
         throw utils::ModellingError(
@@ -357,7 +357,7 @@ std::unique_ptr<Dynamics> buildNewExecutive(
             debug->set(std::move(executive));
             return std::move(debug);
         } else {
-            return std::move(executive);
+            return executive;
         }
     } catch(const std::exception& e) {
         throw utils::ModellingError(

@@ -83,7 +83,7 @@ bool RootCoordinator::run()
 std::unique_ptr<value::Map> RootCoordinator::finish()
 {
     if (m_coordinator) {
-        return std::move(m_coordinator->finish());
+        return m_coordinator->finish();
 
     }
     return {};

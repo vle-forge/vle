@@ -229,7 +229,7 @@ void DynamicsObserver::output(Time time, ExternalEventList& output) const
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
         mObservations.back().portname = std::get<1>(elem);
-        mObservations.back().value = std::move(mDynamics->observation(event));
+        mObservations.back().value = mDynamics->observation(event);
     }
 }
 
@@ -256,7 +256,7 @@ void DynamicsObserver::internalTransition(Time time)
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
         mObservations.back().portname = std::get<1>(elem);
-        mObservations.back().value = std::move(mDynamics->observation(event));
+        mObservations.back().value = mDynamics->observation(event);
     }
 }
 
@@ -276,7 +276,7 @@ void DynamicsObserver::externalTransition(const ExternalEventList& event,
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
         mObservations.back().portname = std::get<1>(elem);
-        mObservations.back().value = std::move(mDynamics->observation(event));
+        mObservations.back().value = mDynamics->observation(event);
     }
 }
 
@@ -295,7 +295,7 @@ void DynamicsObserver::confluentTransitions(
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
         mObservations.back().portname = std::get<1>(elem);
-        mObservations.back().value = std::move(mDynamics->observation(event));
+        mObservations.back().value = mDynamics->observation(event);
     }
 }
 
@@ -323,7 +323,7 @@ void DynamicsObserver::finish()
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
         mObservations.back().portname = std::get<1>(elem);
-        mObservations.back().value = std::move(mDynamics->observation(event));
+        mObservations.back().value = mDynamics->observation(event);
     }
 }
 
