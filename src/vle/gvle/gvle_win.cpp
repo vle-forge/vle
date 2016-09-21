@@ -23,7 +23,10 @@
  */
 
 #include <iostream>
+#include <algorithm>
 #include <vle/utils/Filesystem.hpp>
+#include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/Tools.hpp>
 #include <QFileDialog>
 #include <QStyleFactory>
 #include <QActionGroup>
@@ -48,22 +51,34 @@ namespace vu = vle::utils;
 namespace vle {
 namespace gvle {
 
+std::map<std::string, std::string>
+gvle_win::defaultDistrib()
+{
+    std::map<std::string, std::string> ret;
+    ret["http://www.vle-project.org/pub/2.0"] = "vle";
+    ret["http://recordb.toulouse.inra.fr/distributions/2.0"] = "record";
+    return ret;
+}
+
 gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
     QMainWindow(parent), ui(new Ui::gvleWin), mLogger(0), mTimer(0),
     mSettings(0), mSimOpened(false), mMenuSimGroup(0), mSimulatorPlugins(),
     mCurrentSimName(""), mPanels(), mProjectFileSytem(0), mGvlePlugins(ctx),
-    mCtx(ctx), mCurrPackage(ctx)
+    mCtx(ctx), mCurrPackage(ctx), mDistributions()
 {
-    // VLE init
-    mCurrPackage.refreshPath();
-
     // GUI init
     ui->setupUi(this);
+    mLogger = new Logger();
+    mLogger->setWidget(ui->statusLog);
+    // VLE init
+    mCurrPackage.refreshPath();
 
     // Open the configuration file
     std::string configFile = mCtx->getHomeFile("gvle.conf").string();
     mSettings = new QSettings(QString(configFile.c_str()),QSettings::IniFormat);
     menuRecentProjectRefresh();
+    menuDistributionsRefresh();
+    menuLocalPackagesRefresh();
 
     QObject::connect(ui->actionNewProject,
                      SIGNAL(triggered()), this,
@@ -145,8 +160,7 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
     mMenuSimGroup = new QActionGroup(this);
     ui->actionSimNone->setActionGroup(mMenuSimGroup);
 
-    mLogger = new Logger();
-    mLogger->setWidget(ui->statusLog);
+
 
     // Update window title
     setWindowTitle("GVLE");
@@ -237,6 +251,7 @@ gvle_win::onOpenProject()
     FileChooserDialog.setFileMode(QFileDialog::Directory);
     if (FileChooserDialog.exec()) {
         openProject(FileChooserDialog.selectedFiles().first());
+
     }
 
 }
@@ -351,6 +366,7 @@ gvle_win::openProject(QString pathName)
 
     ui->menuProject->setEnabled(true);
     ui->actionCloseProject->setEnabled(true);
+    menuLocalPackagesRefresh();
 }
 
 bool
@@ -830,6 +846,136 @@ gvle_win::menuRecentProjectUpdate(QString path)
     mSettings->sync();
 }
 
+void
+gvle_win::menuDistributionsRefresh()
+{
+    std::map<std::string, std::string> def = defaultDistrib();
+
+    mDistributions.clear();
+
+    std::string remotes = "";
+    mCtx->get_setting("vle.remote.url", &remotes);
+    QStringList remotesQStr = QString(remotes.c_str()).split(",");
+    remotesQStr.removeAll("");
+    int unknown = 0;
+    for (int r=0;r<remotesQStr.size() ; r++) {
+        QString rem = remotesQStr[r];
+        std::map<std::string, std::string>::iterator itf =
+                def.find(rem.toStdString());
+        if (itf != def.end()) {
+            mDistributions[itf->second] = std::make_pair (itf->first, true);
+        } else {
+            std::string key;
+            if (unknown > 0) {
+                key = utils::format("unknown_%d", unknown);
+            } else {
+                key = "unknown";
+            }
+            mDistributions[key] = std::make_pair(remotesQStr[r].toStdString(),
+                    true);
+            unknown++;
+        }
+    }
+
+    for (std::map<std::string, std::string>::iterator itb = def.begin();
+            itb != def.end(); itb++) {
+        mDistributions[itb->second] = std::make_pair (itb->first, false);
+    }
+
+    ui->menuDistributions->clear();
+    Distributions::iterator ite = mDistributions.end();
+    for (auto& d : mDistributions) {
+        QString el = d.first.c_str();
+        el += " (";
+        el += d.second.first.c_str();
+        el += ")";
+        QAction* action = ui->menuDistributions->addAction(el);
+        action->setCheckable(true);
+        action->setData(QString(d.first.c_str()));
+        d.second.second = remotesQStr.contains(QString(d.second.first.c_str()));
+        action->setChecked(d.second.second);
+        QObject::connect(action, SIGNAL(changed()),
+                this, SLOT(onCheckDistrib()));
+    }
+
+
+    menuPackagesInstallRefresh();
+
+}
+
+void
+gvle_win::menuPackagesInstallRefresh()
+{
+    //update packages to install
+    utils::RemoteManager rm(mCtx);
+    rm.start(utils::REMOTE_MANAGER_UPDATE, "", &std::cout);
+    rm.join();
+    if (rm.hasError()) {
+        mLogger->logExt(QString(rm.messageError().c_str()), true);
+        return;
+    }
+    rm.start(utils::REMOTE_MANAGER_SEARCH, ".*", &std::cout);
+    rm.join();
+    if (rm.hasError()) {
+        mLogger->logExt(QString(rm.messageError().c_str()), true);
+        return;
+    }
+
+    vle::utils::Packages res;
+    rm.getResult(&res);
+    vle::utils::Packages::const_iterator itb = res.begin();
+    vle::utils::Packages::const_iterator ite = res.end();
+    ui->menuInstall->clear();
+    for (; itb != ite; itb++) {
+        QString distrib = "";
+        for (auto& d : mDistributions) {
+            if (d.second.first == itb->url) {
+                distrib = QString(d.first.c_str());
+            }
+        }
+        QString el = itb->name.c_str();
+        el += " from ";
+        el += distrib;
+        QAction* action = ui->menuInstall->addAction(el);
+        action->setData(QString(itb->name.c_str()));
+        QObject::connect(action,
+                         SIGNAL(triggered()), this,
+                         SLOT(onPackageInstall()));
+    }
+}
+
+void
+gvle_win::menuLocalPackagesRefresh()
+{
+    //
+    std::vector<utils::Path> pkgs = mCtx->getBinaryPackages();
+    std::vector<std::string> pkgsName;
+    for (auto& p : pkgs) {
+        pkgsName.push_back(p.filename());
+    }
+    std::sort(pkgsName.begin(), pkgsName.end());
+
+    QStringList dep = getPackageToBuildDepends();
+
+    ui->menuUninstall->clear();
+    ui->menuDependencies->clear();
+    for (auto& p : pkgsName) {
+        QString el = p.c_str();
+        QAction* action = ui->menuUninstall->addAction(el);
+        action->setData(el);
+        QObject::connect(action,
+                         SIGNAL(triggered()), this,
+                         SLOT(onPackageUninstall()));
+
+        action = ui->menuDependencies->addAction(el);
+        action->setData(el);
+        action->setCheckable(true);
+        action->setChecked(dep.contains(el));
+        QObject::connect(action, SIGNAL(changed()),
+                this, SLOT(onCheckDependency()));
+    }
+}
+
 /* ---------- Manage the central tabs ---------- */
 
 void
@@ -1270,6 +1416,98 @@ void gvle_win::removeFile(QModelIndex index)
     }
 }
 
+QStringList
+gvle_win::getDescriptionFileContent()
+{
+    QStringList fileContent;
+    std::string descrPath = mCurrPackage.getDir(vle::utils::PKG_SOURCE);
+    if (descrPath == "") {
+        return fileContent;
+    }
+    descrPath += "/Description.txt";
+    // Read file
+    QFile file(QString(descrPath.c_str()));
+    if (!file.open(QFile::ReadOnly)) {
+        mLogger->logExt(QString("Error opening for read: %1").arg(
+                file.errorString()), true);
+        return fileContent;
+    }
+    QTextStream stream(&file);
+    QString line;
+
+    while (not stream.atEnd()) {
+        line = stream.readLine();
+        fileContent.append(line);
+    }
+    file.close();
+    return fileContent;
+}
+
+int
+gvle_win::setDescriptionFileContent(const QStringList& content)
+{
+    std::string descrPath = mCurrPackage.getDir(vle::utils::PKG_SOURCE);
+    descrPath += "/Description.txt";
+
+    // Write file
+    QFile file(QString(descrPath.c_str()));
+    if (!file.open(QFile::WriteOnly)) {
+        mLogger->logExt(QString("Error opening for write: %1").arg(
+                file.errorString()), true);
+        return -1;
+    }
+    QTextStream stream(&file);
+    for (QStringList::ConstIterator it = content.begin();
+            it != content.end(); ++it ) {
+        stream << *it ;
+        endl(stream);
+    }
+    return 0;
+}
+
+
+int
+gvle_win::setPackageToBuildDepends(const QString& pkg, bool add)
+{
+    QStringList content = getDescriptionFileContent();
+    for (QStringList::Iterator it = content.begin();
+            it != content.end(); ++it ) {
+        QString& line = *it;
+        if (line.startsWith("Build-Depends:")) {
+            line = line.remove("Build-Depends:").remove(" ");
+
+            QStringList dep = line.split(",");
+            if (add) {
+                if (not dep.contains(pkg)) {
+                    dep.append(pkg);
+                }
+            } else {
+                dep.removeAll(pkg);
+            }
+            dep.removeAll("");
+            line = "Build-Depends: ";
+            line += dep.join(",");
+        }
+    }
+    return setDescriptionFileContent(content);
+}
+
+QStringList
+gvle_win::getPackageToBuildDepends()
+{
+    QStringList content = getDescriptionFileContent();
+    for (QStringList::Iterator it = content.begin();
+            it != content.end(); ++it ) {
+        QString& line = *it;
+        if (line.startsWith("Build-Depends:")) {
+            QStringList dep = line.split(",");
+            dep.removeAll("");
+            return dep;
+        }
+    }
+    return QStringList();
+}
+
 void gvle_win::onRefreshFiles()
 {
     treeProjectUpdate();
@@ -1302,6 +1540,78 @@ gvle_win::onUndoAvailable(bool b)
         tabName = gf.relPath;
     }
     ui->tabWidget->setTabText(i, tabName);
+}
+
+void
+gvle_win::onCheckDistrib()
+{
+    QAction* senderAct = qobject_cast<QAction*>(QObject::sender());
+    QString distrib = senderAct->data().toString() ;
+
+    QStringList distribToVleConf;
+    for (auto& d : mDistributions){
+        if (d.first == distrib.toStdString()) {
+            d.second.second = senderAct->isChecked();
+        }
+        if (d.second.second) {
+            distribToVleConf.append(QString(d.second.first.c_str()));
+        }
+    }
+    std::string remoteLine = distribToVleConf.join(",").toStdString();
+    mCtx->set_setting("vle.remote.url", remoteLine);
+    mCtx->write_settings();
+    menuDistributionsRefresh();
+}
+
+void
+gvle_win::onCheckDependency()
+{
+    QAction* senderAct = qobject_cast<QAction*>(QObject::sender());
+    QString pkg = senderAct->data().toString() ;
+    setPackageToBuildDepends(pkg, senderAct->isChecked());
+}
+
+void
+gvle_win::onPackageInstall()
+{
+    QAction* senderAct = qobject_cast<QAction*>(QObject::sender());
+    QString pkg = senderAct->data().toString() ;
+
+    utils::RemoteManager rm(mCtx);
+    rm.start(utils::REMOTE_MANAGER_INSTALL, pkg.toStdString(), &std::cout);
+    rm.join();
+    if (rm.hasError()) {
+        std::cout<< "Remote error: " <<  rm.messageError() << "\n";
+        return;
+    }
+}
+
+void
+gvle_win::onPackageUninstall()
+{
+    QAction* senderAct = qobject_cast<QAction*>(QObject::sender());
+    QString pkg = senderAct->data().toString() ;
+
+    mLogger->log(QString(utils::format("Uninstall package '%s' ",
+            pkg.toStdString().c_str()).c_str()));
+    statusWidgetOpen();
+    utils::Package pack(mCtx, pkg.toStdString());
+    bool success = true;
+
+    try {
+        pack.rclean();
+    } catch (const std::exception &e) {
+        QString logMessage = QString("%1").arg(e.what());
+        mLogger->logExt(logMessage, true);
+        success = false;
+    }
+    if (success) {
+        mLogger->log(tr("Uninstall complete"));
+    } else {
+        mLogger->log(tr("Uninstall failed"));
+    }
+
+    menuLocalPackagesRefresh();
 }
 
 void gvle_win::projectInstall()

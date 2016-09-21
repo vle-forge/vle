@@ -462,9 +462,44 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
    </widget>
+   <widget class="QMenu" name="menuPackages">
+    <property name="title">
+     <string>Packages</string>
+    </property>
+    <widget class="QMenu" name="menuDistributions">
+     <property name="title">
+      <string>Distributions</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuInstall">
+     <property name="title">
+      <string>Install</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuDependencies">
+     <property name="title">
+      <string>Current package dependencies</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuUninstall">
+     <property name="title">
+      <string>Uninstall</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
+    <addaction name="menuDistributions"/>
+    <addaction name="menuInstall"/>
+    <addaction name="menuUninstall"/>
+    <addaction name="separator"/>
+    <addaction name="menuDependencies"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuProject"/>
+   <addaction name="menuPackages"/>
    <addaction name="menu_Help"/>
   </widget>
   <action name="actionNew_Project">
@@ -849,6 +884,11 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
    </property>
   </action>
   <action name="actionUninstall">
+   <property name="text">
+    <string>Uninstall</string>
+   </property>
+  </action>
+  <action name="actionPkgsUninstall">
    <property name="text">
     <string>Uninstall</string>
    </property>

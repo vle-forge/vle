@@ -59,6 +59,10 @@ class gvle_win : public QMainWindow
     Q_OBJECT
 
 public:
+    typedef std::map<std::string,std::pair<std::string, bool>> Distributions;
+
+    static std::map<std::string, std::string> defaultDistrib();
+
     enum StatusFile {
         NOT_OPENED, //no tab opened
         OPENED, //tab opened but content not modified
@@ -114,24 +118,30 @@ private slots:
     void onRefreshFiles();
     void onRightWidgetChanged();
     void onUndoAvailable(bool);
+    void onCheckDistrib();
+    void onCheckDependency();
+    void onPackageInstall();
+    void onPackageUninstall();
 
 private:
     void projectInstall();
 
-    Ui::gvleWin*          ui;
-    Logger*               mLogger;
-    QTimer*               mTimer;
-    QSettings*            mSettings;
-    bool                  mSimOpened;
-    QActionGroup*         mMenuSimGroup;
-    QMap<QString,QString> mSimulatorPlugins;
-    QString               mCurrentSimName;
-    QMap<QString, PluginMainPanel*>
-                          mPanels;
-    QFileSystemModel*     mProjectFileSytem;
-    gvle_plugins          mGvlePlugins;
-    utils::ContextPtr     mCtx;
-    utils::Package               mCurrPackage;
+
+
+    Ui::gvleWin*                    ui;
+    Logger*                         mLogger;
+    QTimer*                         mTimer;
+    QSettings*                      mSettings;
+    bool                            mSimOpened;
+    QActionGroup*                   mMenuSimGroup;
+    QMap<QString,QString>           mSimulatorPlugins;
+    QString                         mCurrentSimName;
+    QMap<QString, PluginMainPanel*> mPanels;
+    QFileSystemModel*               mProjectFileSytem;
+    gvle_plugins                    mGvlePlugins;
+    utils::ContextPtr               mCtx;
+    utils::Package                  mCurrPackage;
+    Distributions                   mDistributions;
 
 
 protected:
@@ -142,6 +152,9 @@ private:
     void menuRecentProjectRefresh();
     void menuRecentProjectSet(QString path, QAction *menu);
     void menuRecentProjectUpdate(QString path);
+    void menuDistributionsRefresh();
+    void menuPackagesInstallRefresh();
+    void menuLocalPackagesRefresh();
     void statusWidgetOpen();
     void statusWidgetClose();
     void treeProjectUpdate();
@@ -221,6 +234,21 @@ private:
      */
     void copyFile(QModelIndex index);
     void removeFile(QModelIndex index);
+
+
+    QStringList getDescriptionFileContent();
+    int setDescriptionFileContent(const QStringList& content);
+
+
+    /**
+     * @brief Open the Description.txt file and add or rm a package as a build
+     * dependency and write the file.
+     * @param pkg, name of the package
+     * @param add, if true pkg is added otherwise it is removed
+     * @return error code
+     */
+    int setPackageToBuildDepends(const QString& pkg, bool add);
+    QStringList getPackageToBuildDepends();
 
 };
 
