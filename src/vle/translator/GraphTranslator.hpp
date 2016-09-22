@@ -29,17 +29,35 @@
 #define VLE_TRANSLATOR_GRAPHTRANSLATOR_HPP
 
 #include <vle/DllDefines.hpp>
+#include <vle/utils/Array.hpp>
 #include <vle/devs/Executive.hpp>
-#include <boost/multi_array.hpp>
-#include <string>
-#include <vector>
+#include <vle/value/Map.hpp>
 
 namespace vle { namespace translator {
 
 /**
- * @brief A translator to build a DEVS graph where nodes are vpz::Class. The
+ * A struct that represents the result of the \c make_graph function. It
+ * provides the adjacency graph, the list of node names, the list of
+ * classes names and the number of nodes.
+ */
+struct graph_result {
+    vle::utils::Array<bool> graph;
+    std::vector<std::string> nodes;
+    std::vector<std::string> classes;
+    long int node_number;
+};
+
+/**
+ * A translator to build a DEVS graph where nodes are vpz::Class. The
  * graph uses an adjacency matrix to build connections between nodes.
- * @code
+ *
+ * \param executive The \c vle::devs::Executive model used to build
+ * structure of model.
+ *
+ * \param map The parameters of the translator formatted using a \c
+ * vle::value::Map.
+ *
+ * \code
  * <map>
  *  <key name="prefix">
  *   <string>node</string> <!-- build node-0, node-1 etc. Default is vertex -->
@@ -85,65 +103,12 @@ namespace vle { namespace translator {
  *   </string>
  *  </key>
  * </map>
- * @endcode
+ * \endcode
+ *
+ * \exception \c vle::utils::ArgError
  */
-class VLE_API GraphTranslator
-{
-public:
-    typedef boost::multi_array < bool, 2 > BoolArray;
-    typedef BoolArray::iterator iterator;
-    typedef BoolArray::const_iterator const_iterator;
-    typedef BoolArray::size_type size_type;
-
-    typedef std::vector < std::string > Strings;
-    typedef Strings::size_type index;
-
-
-    /**
-     * @brief Build an empty GraphTranslator, zero node and the prefix of node
-     * is `vertex'.
-     * @param exe The executive to manipulate coupled model
-     * (graph::CoupledModel) and coordinator (devs::Coordinator)..
-     */
-    GraphTranslator(devs::Executive& exe)
-        : mExecutive(exe), mNodeNumber(0), mPrefix("vertex")
-    {}
-
-    virtual ~GraphTranslator()
-    {}
-
-    /**
-     * @brief Build the graph translator.
-     * @param buffer A value::Map which contains the adjacency matrix, classes
-     * etc.
-     * @throw utils::ArgError if the value::Map contains bad parameters,
-     * utils::Exception if error in value.
-     */
-    void translate(const value::Map& buffer);
-
-    inline int getNodeNumber() const { return mNodeNumber; }
-    inline const std::string& getNode(index i) const { return mNode[i]; }
-    inline const std::string& getClass(index i) const { return mClass[i]; }
-
-    inline iterator begin() { return mGraph.begin(); }
-    inline iterator end() { return mGraph.end(); }
-    inline const_iterator begin() const { return mGraph.begin(); }
-    inline const_iterator end() const { return mGraph.end(); }
-    inline size_type size() const { return mGraph.size(); }
-
-private:
-    devs::Executive& mExecutive;
-    unsigned int mNodeNumber;
-    BoolArray mGraph;
-    std::vector < std::string > mNode;
-    std::vector < std::string > mClass;
-    std::string mPrefix;
-    std::string mPort;
-
-    void makeBigBang();
-    void createNewNode(const std::string& name, std::string& classname);
-    void connectNodes(unsigned int from, unsigned int to);
-};
+graph_result VLE_API make_graph(vle::devs::Executive& executive,
+                                const vle::value::Map& map);
 
 }} // namesapce vle translator
 

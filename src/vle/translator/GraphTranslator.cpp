@@ -26,10 +26,67 @@
 
 
 #include <vle/translator/GraphTranslator.hpp>
+#include <vle/utils/Array.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/tokenizer.hpp>
+#include <string>
+#include <vector>
 
 namespace vle { namespace translator {
+
+class VLE_API GraphTranslator
+{
+public:
+    typedef vle::utils::Array<bool> BoolArray;
+    typedef BoolArray::iterator iterator;
+    typedef BoolArray::const_iterator const_iterator;
+    typedef BoolArray::size_type size_type;
+    typedef std::vector < std::string > Strings;
+    typedef Strings::size_type index;
+
+    /**
+     * @brief Build an empty GraphTranslator, zero node and the prefix of node
+     * is `vertex'.
+     * @param exe The executive to manipulate coupled model
+     * (graph::CoupledModel) and coordinator (devs::Coordinator)..
+     */
+    GraphTranslator(devs::Executive& exe)
+        : mExecutive(exe)
+        , mNodeNumber(0)
+        , mPrefix("vertex")
+    {}
+
+    /**
+     * @brief Build the graph translator.
+     * @param buffer A value::Map which contains the adjacency matrix, classes
+     * etc.
+     * @throw utils::ArgError if the value::Map contains bad parameters,
+     * utils::Exception if error in value.
+     */
+    void translate(const value::Map& buffer);
+
+    inline int getNodeNumber() const { return mNodeNumber; }
+    inline const std::string& getNode(index i) const { return mNode[i]; }
+    inline const std::string& getClass(index i) const { return mClass[i]; }
+
+    inline iterator begin() { return mGraph.begin(); }
+    inline iterator end() { return mGraph.end(); }
+    inline const_iterator begin() const { return mGraph.begin(); }
+    inline const_iterator end() const { return mGraph.end(); }
+    inline size_type size() const { return mGraph.size(); }
+
+    devs::Executive& mExecutive;
+    unsigned int mNodeNumber;
+    BoolArray mGraph;
+    std::vector < std::string > mNode;
+    std::vector < std::string > mClass;
+    std::string mPrefix;
+    std::string mPort;
+
+    void makeBigBang();
+    void createNewNode(const std::string& name, std::string& classname);
+    void connectNodes(unsigned int from, unsigned int to);
+};
 
 void GraphTranslator::translate(const value::Map& buffer)
 {
@@ -39,9 +96,7 @@ void GraphTranslator::translate(const value::Map& buffer)
     if (mNodeNumber <= 0) {
         throw utils::ArgError("GraphTranslator: bad node number");
     } else {
-        BoolArray::extent_gen extents;
-
-        mGraph.resize(extents[mNodeNumber][mNodeNumber]);
+        mGraph.resize(mNodeNumber, mNodeNumber, false);
     }
 
     if (init.exist("prefix")) {
@@ -66,7 +121,7 @@ void GraphTranslator::translate(const value::Map& buffer)
 
         size_type i = 0, j = 0;
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it) {
-            mGraph[j][i] = ((*it) == "1");
+            mGraph.set(j, i, (*it) == "1");
 
             ++i;
             if (i == mNodeNumber) {
@@ -104,7 +159,7 @@ void GraphTranslator::makeBigBang()
 
     for (size_type i = 0; i < mNodeNumber; ++i) {
         for (size_type j = 0; j < mNodeNumber; ++j) {
-            if (mGraph[j][i]) {
+            if (mGraph(j, i)) {
                 connectNodes(j, i);
             }
         }
@@ -138,6 +193,21 @@ void GraphTranslator::connectNodes(unsigned int from, unsigned int to)
         mExecutive.addConnection(mNode[from], mNode[to], mNode[to],
                                  mNode[from]);
     }
+}
+
+graph_result VLE_API make_graph(vle::devs::Executive& executive,
+                                const vle::value::Map& map)
+{
+    GraphTranslator translator(executive);
+    translator.translate(map);
+
+    graph_result ret;
+    ret.graph = translator.mGraph;
+    ret.nodes = translator.mNode;
+    ret.classes = translator.mClass;
+    ret.node_number = translator.mNodeNumber;
+
+    return ret;
 }
 
 }} //namespace vle translator
