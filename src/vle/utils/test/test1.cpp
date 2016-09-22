@@ -40,6 +40,7 @@
 #include <sstream>
 #include <numeric>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Array.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Context.hpp>
@@ -206,53 +207,53 @@ BOOST_AUTO_TEST_CASE(date_time)
               << "\n";
 
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::year((2451545)),
-			2000u);
+                        2000u);
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::month((2451545)),
-			1u);
+                        1u);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::dayOfMonth((2451545)), 1);
+        vle::utils::DateTime::dayOfMonth((2451545)), 1);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::dayOfYear((2451545)), 1);
+        vle::utils::DateTime::dayOfYear((2451545)), 1);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::dayOfWeek((2451545)), 6);
+        vle::utils::DateTime::dayOfWeek((2451545)), 6);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::weekOfYear((2451547)), 1);
+        vle::utils::DateTime::weekOfYear((2451547)), 1);
 
     BOOST_REQUIRE(vle::utils::DateTime::isLeapYear((2451545)));
     BOOST_REQUIRE(not vle::utils::DateTime::isLeapYear(
-		      (2451911)));
+                      (2451911)));
 
     BOOST_REQUIRE(not vle::utils::DateTime::isValidYear(
-		      (-1)));
+                      (-1)));
 
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::aYear((2451545)), 366);
+        vle::utils::DateTime::aYear((2451545)), 366);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::aMonth((2451545)), 31);
+        vle::utils::DateTime::aMonth((2451545)), 31);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::aMonth((2451576)), 29);
+        vle::utils::DateTime::aMonth((2451576)), 29);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::aMonth((2451942)), 28);
+        vle::utils::DateTime::aMonth((2451942)), 28);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::aWeek(), 7);
+        vle::utils::DateTime::aWeek(), 7);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::aDay(), 1);
+        vle::utils::DateTime::aDay(), 1);
 
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::years((2451545), 1), 366);
+        vle::utils::DateTime::years((2451545), 1), 366);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::months((2451545), 2), 60);
+        vle::utils::DateTime::months((2451545), 2), 60);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::weeks(2), 14);
+        vle::utils::DateTime::weeks(2), 14);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::days(2), 2);
+        vle::utils::DateTime::days(2), 2);
 
     BOOST_REQUIRE_EQUAL(
         vle::utils::DateTime::convertUnit("year"),
         vle::utils::DATE_TIME_UNIT_YEAR);
     BOOST_REQUIRE_EQUAL(
-	vle::utils::DateTime::convertUnit("month"),
-	vle::utils::DATE_TIME_UNIT_MONTH);
+        vle::utils::DateTime::convertUnit("month"),
+        vle::utils::DATE_TIME_UNIT_MONTH);
     BOOST_REQUIRE_EQUAL(
         vle::utils::DateTime::convertUnit("week"),
         vle::utils::DATE_TIME_UNIT_WEEK);
@@ -279,7 +280,7 @@ BOOST_AUTO_TEST_CASE(julian_date)
 
     BOOST_TEST_MESSAGE("\nJulian day number\n");
     BOOST_REQUIRE_EQUAL(2452192,
-			vle::utils::DateTime::toJulianDayNumber("2001-10-9"));
+                        vle::utils::DateTime::toJulianDayNumber("2001-10-9"));
 
     BOOST_TEST_MESSAGE("\nJulian day\n");
 
@@ -297,17 +298,17 @@ BOOST_AUTO_TEST_CASE(julian_date)
 
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::toJulianDay(2454115.05486),
                         vle::utils::DateTime::toJulianDay(
-			    vle::utils::DateTime::toJulianDay(
+                            vle::utils::DateTime::toJulianDay(
                                 vle::utils::DateTime::toJulianDay(
-				    2454115.05486))));
+                                    2454115.05486))));
 
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::toJulianDay(
-			    vle::utils::DateTime::toJulianDay(2454115.05486)),
+                            vle::utils::DateTime::toJulianDay(2454115.05486)),
                         vle::utils::DateTime::toJulianDay(
-			    vle::utils::DateTime::toJulianDay(
+                            vle::utils::DateTime::toJulianDay(
                                 vle::utils::DateTime::toJulianDay(
-				    vle::utils::DateTime::toJulianDay(
-					2454115.05486)))));
+                                    vle::utils::DateTime::toJulianDay(
+                                        2454115.05486)))));
 }
 
 BOOST_AUTO_TEST_CASE(to_time_function)
@@ -394,4 +395,102 @@ BOOST_AUTO_TEST_CASE(test_format_copy)
     BOOST_REQUIRE_EQUAL(out.str(),
                         "\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", "
                         "\"8\", \"9\";");
+}
+
+BOOST_AUTO_TEST_CASE(test_array)
+{
+    {
+        vle::utils::Array<bool> a(2, 5);
+
+        BOOST_REQUIRE(a.size() == 2 * 5);
+        BOOST_REQUIRE(a.columns() == 2);
+        BOOST_REQUIRE(a.rows() == 5);
+
+        bool affect = true;
+        for (size_t c = 0, end_c = a.columns(); c != end_c; ++c) {
+            for (size_t r = 0, end_r = a.rows(); r != end_r; ++r) {
+                a(c, r) = affect;
+                affect = !affect;
+            }
+        }
+
+        BOOST_REQUIRE(a(0, 0) == true);
+        BOOST_REQUIRE(a(0, 1) == false);
+        BOOST_REQUIRE(a(0, 2) == true);
+        BOOST_REQUIRE(a(0, 3) == false);
+        BOOST_REQUIRE(a(0, 4) == true);
+        BOOST_REQUIRE(a(1, 0) == false);
+        BOOST_REQUIRE(a(1, 1) == true);
+        BOOST_REQUIRE(a(1, 2) == false);
+        BOOST_REQUIRE(a(1, 3) == true);
+        BOOST_REQUIRE(a(1, 4) == false);
+    }
+
+    {
+        vle::utils::Array<int> a(5, 2, -1);
+
+        BOOST_REQUIRE(a.size() == 5 * 2);
+        BOOST_REQUIRE(a.columns() == 5);
+        BOOST_REQUIRE(a.rows() == 2);
+
+        std::iota(std::begin(a), std::end(a), 0);
+
+        BOOST_REQUIRE(a(0, 0) == 0);
+        BOOST_REQUIRE(a(1, 0) == 1);
+        BOOST_REQUIRE(a(2, 0) == 2);
+        BOOST_REQUIRE(a(3, 0) == 3);
+        BOOST_REQUIRE(a(4, 0) == 4);
+        BOOST_REQUIRE(a(0, 1) == 5);
+        BOOST_REQUIRE(a(1, 1) == 6);
+        BOOST_REQUIRE(a(2, 1) == 7);
+        BOOST_REQUIRE(a(3, 1) == 8);
+        BOOST_REQUIRE(a(4, 1) == 9);
+
+        a.resize(2, 2);
+
+        BOOST_REQUIRE_EQUAL(a.size(), 2 * 2);
+        BOOST_REQUIRE(a.columns() == 2);
+        BOOST_REQUIRE(a.rows() == 2);
+
+        BOOST_REQUIRE(a(0, 0) == 0);
+        BOOST_REQUIRE(a(1, 0) == 1);
+        BOOST_REQUIRE(a(0, 1) == 5);
+        BOOST_REQUIRE(a(1, 1) == 6);
+
+        a.resize(3, 3);
+
+        BOOST_REQUIRE_EQUAL(a.size(), 3 * 3);
+        BOOST_REQUIRE(a.columns() == 3);
+        BOOST_REQUIRE(a.rows() == 3);
+
+        BOOST_REQUIRE(a(0, 0) == 0);
+        BOOST_REQUIRE(a(1, 0) == 1);
+        BOOST_REQUIRE(a(2, 0) == 0);
+        BOOST_REQUIRE(a(0, 1) == 5);
+        BOOST_REQUIRE(a(1, 1) == 6);
+        BOOST_REQUIRE(a(2, 1) == 0);
+        BOOST_REQUIRE(a(0, 2) == 0);
+        BOOST_REQUIRE(a(1, 2) == 0);
+        BOOST_REQUIRE(a(2, 2) == 0);
+
+        a.resize(4, 4, -1);
+
+        BOOST_REQUIRE_EQUAL(a.size(), 4 * 4);
+        BOOST_REQUIRE(a.columns() == 4);
+        BOOST_REQUIRE(a.rows() == 4);
+
+        std::find_if_not(std::cbegin(a), std::cend(a),
+                         [](int i)
+                         {
+                             return i == -1;
+                         });
+    }
+
+    {
+        vle::utils::Array<double> c(10, 10);
+
+        BOOST_REQUIRE_THROW(c(10, 10), std::exception);
+        BOOST_REQUIRE_THROW(c(10, 9), std::exception);
+        BOOST_REQUIRE_THROW(c(9, 10), std::exception);
+    }
 }
