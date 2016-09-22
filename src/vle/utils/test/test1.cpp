@@ -479,7 +479,7 @@ BOOST_AUTO_TEST_CASE(test_array)
         BOOST_REQUIRE(a.columns() == 4);
         BOOST_REQUIRE(a.rows() == 4);
 
-        std::find_if_not(std::cbegin(a), std::cend(a),
+        std::find_if_not(std::begin(a), std::end(a),
                          [](int i)
                          {
                              return i == -1;
