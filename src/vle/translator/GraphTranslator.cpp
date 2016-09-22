@@ -121,7 +121,7 @@ void GraphTranslator::translate(const value::Map& buffer)
 
         size_type i = 0, j = 0;
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it) {
-            mGraph.set(j, i, (*it) == "1");
+            mGraph.set(i, j, (*it) == "1");
 
             ++i;
             if (i == mNodeNumber) {
@@ -130,9 +130,8 @@ void GraphTranslator::translate(const value::Map& buffer)
             }
         }
 
-        if (j * mNodeNumber + i != mNodeNumber * mNodeNumber) {
+        if (j * mNodeNumber + i != mNodeNumber * mNodeNumber)
             throw utils::ArgError("GraphTranslator: bad node number in matrix");
-        }
     }
 
     {
@@ -157,13 +156,10 @@ void GraphTranslator::makeBigBang()
         createNewNode(name, mClass[i]);
     }
 
-    for (size_type i = 0; i < mNodeNumber; ++i) {
-        for (size_type j = 0; j < mNodeNumber; ++j) {
-            if (mGraph(j, i)) {
-                connectNodes(j, i);
-            }
-        }
-    }
+    for (size_type row = 0; row < mNodeNumber; ++row)
+        for (size_type col = 0; col < mNodeNumber; ++col)
+            if (mGraph(col, row))
+                connectNodes(row, col);
 }
 
 void GraphTranslator::createNewNode(const std::string& name,
