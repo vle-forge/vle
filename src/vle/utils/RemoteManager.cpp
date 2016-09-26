@@ -200,8 +200,14 @@ public:
 
     void join() noexcept
     {
-        if (mIsStarted and not mIsFinish)
-            mThread.join();
+        try {
+            if (mIsStarted and not mIsFinish and mThread.joinable()) {
+                mThread.join();
+            }
+        } catch (const std::exception& e) {
+            vErr(mContext, _("Remote: internal error joining thread:`%s'\n"),
+                    e.what());
+        }
     }
 
     void stop()
@@ -446,7 +452,7 @@ public:
         }
 
         DownloadManager dl(mContext);
-        std::string url = it->url;
+        std::string url = it->url +"/";
         out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
 
         Path archfile(Path::temp_directory_path());
@@ -502,6 +508,8 @@ public:
             std::string url = it->url;
             std::string archname = mArgs;
             archname.append(".tar.bz2");
+            url.append("/");
+            url.append(archname);
             dl.start(url, archname);
             dl.join();
             if (not dl.hasError()) {
