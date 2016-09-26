@@ -31,7 +31,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/gvle/plugin_cond.h>
 #include <vle/gvle/logger.h>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.h>
 
 //#include "tab.h"
 //#include "toolbar.h"
@@ -54,7 +54,7 @@ public:
     QWidget* getWidget() override;
     void setSettings(QSettings *s) override;
     void setLogger(Logger *logger) override;
-    void init(vleVpm*vpm, const QString& cond) override;
+    void init(vleVpz* vpz, const QString& cond) override;
     PluginExpCond* newInstance() {return new DateCondition();}
 
 public slots:
@@ -68,7 +68,7 @@ private:
     //widToolbar* mWidgetToolbar;
 
     QString     mExpCond;
-    vleVpm*     mVpm;
+    vleVpz*     mVpz;
     QCalendarWidget* mcalendar;
 };
 

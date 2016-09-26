@@ -46,7 +46,7 @@ public:
     QWidget *getWidget();
     void     delWidget();
     void setLogger(Logger *logger);
-    void init(vleVpm* vpm, const QString& viewName);
+    void init(vleVpz* vpz, const QString& viewName);
 
 public slots:
     void onTabDeleted(QObject *obj);

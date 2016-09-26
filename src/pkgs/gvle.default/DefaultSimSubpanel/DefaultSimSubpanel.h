@@ -31,7 +31,7 @@
 #include "qcustomplot/qcustomplot.h"
 
 #include <vle/gvle/plugin_simpanel.h>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.h>
 
 namespace Ui {
 class simpanelleft;
@@ -47,7 +47,7 @@ class DefaultSimSubpanelThread : public QObject
     Q_OBJECT
 public:
     std::unique_ptr<vle::value::Map>     output_map;
-    vleVpm*                   mvpm;
+    vleVpz*                   mvpz;
     vle::utils::Package*      mpkg;
     QString                   error_simu;
     std::vector<std::string>& log_messages;
@@ -59,7 +59,7 @@ public:
     DefaultSimSubpanelThread(std::vector<std::string>& logMessages,
             bool debug, int nbthreads, int blockSize);
     ~DefaultSimSubpanelThread();
-    void init(vleVpm* vpm, vle::utils::Package* pkg);
+    void init(vleVpz* vpz, vle::utils::Package* pkg);
 public slots:
    void onStarted();
 signals:
@@ -130,7 +130,7 @@ class DefaultSimSubpanel : public PluginSimPanel
 public:
     DefaultSimSubpanel();
     virtual ~DefaultSimSubpanel();
-    void init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log);
+    void init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log);
     QString  getname();
     QWidget* leftWidget();
     QWidget* rightWidget();
@@ -155,7 +155,7 @@ public:
     DefaultSimSubpanelRightWidget* right;
     DefaultSimSubpanelThread* sim_process;
     QThread* thread;
-    vleVpm* mvpm;
+    vleVpz* mvpz;
     vle::utils::Package* mpkg;
     Logger* mLog;
     QTimer timer;

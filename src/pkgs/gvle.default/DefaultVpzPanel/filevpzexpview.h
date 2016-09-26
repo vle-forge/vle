@@ -32,6 +32,7 @@
 #ifndef Q_MOC_RUN
 #include <vle/utils/Context.hpp>
 #include <vle/gvle/vlevpz.h>
+#include <vle/gvle/vlevpm.h>
 #include <vle/gvle/plugin_output.h>
 #endif
 

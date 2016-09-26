@@ -35,7 +35,7 @@
  *        Default constructor
  */
 FilePluginGUItab::FilePluginGUItab(QWidget *parent) :
-    QWidget(parent), ui(new Ui::FilePluginGvle), mvleVpm(0), mViewName(""),
+    QWidget(parent), ui(new Ui::FilePluginGvle), mvleVpz(0), mViewName(""),
     outputNodeConfig(nullptr)
 {
     ui->setupUi(this);
@@ -59,15 +59,15 @@ FilePluginGUItab::~FilePluginGUItab()
 
 
 void
-FilePluginGUItab::init(vle::gvle::vleVpm* vpm, const QString& viewName)
+FilePluginGUItab::init(vle::gvle::vleVpz* vpz, const QString& viewName)
 {
-    mvleVpm = vpm;
+    mvleVpz = vpz;
     mViewName = viewName;
 
-    outputNodeConfig = std::move(mvleVpm->buildOutputConfigMap(mViewName));
+    outputNodeConfig = std::move(mvleVpz->buildOutputConfigMap(mViewName));
     if (not wellFormed()) {
         buildDefaultConfig();
-        mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+        mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 
     bool oldBlock = ui->flushByBag->blockSignals(true);
@@ -98,7 +98,7 @@ FilePluginGUItab::flushByBagChanged(int val)
     bool& b = outputNodeConfig->getBoolean("flush-by-bag");
     if (b != (bool) val) {
         b = (bool) val;
-        mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+        mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 }
 
@@ -108,7 +108,7 @@ FilePluginGUItab::julianDayChanged(int val)
     bool& b = outputNodeConfig->getBoolean("julian-day");
     if (b != (bool) val) {
         b = (bool) val;
-        mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+        mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 }
 
@@ -118,7 +118,7 @@ FilePluginGUItab::localeChanged(const QString& val)
     std::string& type = outputNodeConfig->getString("locale");
     if (type != val.toStdString()) {
         type.assign(val.toStdString());
-        mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+        mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 }
 
@@ -128,7 +128,7 @@ FilePluginGUItab::destinationChanged(const QString& val)
     std::string& type = outputNodeConfig->getString("output");
     if (type != val.toStdString()) {
         type.assign(val.toStdString());
-        mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+        mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 }
 
@@ -138,7 +138,7 @@ FilePluginGUItab::fileTypeChanged(const QString& val)
     std::string& type = outputNodeConfig->getString("type");
     if (type != val.toStdString()) {
         type.assign(val.toStdString());
-        mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+        mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 }
 

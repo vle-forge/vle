@@ -66,7 +66,7 @@ struct sim_log : utils::Context::LogFunctor
 DefaultSimSubpanelThread::DefaultSimSubpanelThread(
         std::vector<std::string>& logMessages, bool debug,
         int nbthreads, int blockSize): output_map(nullptr),
-    mvpm(0), mpkg(0), error_simu(""), log_messages(logMessages), mdebug(debug),
+    mvpz(0), mpkg(0), error_simu(""), log_messages(logMessages), mdebug(debug),
     mnbthreads(nbthreads), mblockSize(blockSize)
 {
 }
@@ -75,9 +75,9 @@ DefaultSimSubpanelThread::~DefaultSimSubpanelThread()
 {
 }
 void
-DefaultSimSubpanelThread::init(vleVpm* vpm, vle::utils::Package* pkg)
+DefaultSimSubpanelThread::init(vleVpz* vpz, vle::utils::Package* pkg)
 {
-    mvpm = vpm;
+    mvpz = vpz;
     mpkg = pkg;
 }
 
@@ -106,7 +106,7 @@ DefaultSimSubpanelThread::onStarted()
     output_map.reset(nullptr);
     std::unique_ptr<vle::vpz::Vpz> vpz(nullptr);
     try{
-         vpz.reset(new vle::vpz::Vpz(mvpm->getFilename().toStdString()));
+         vpz.reset(new vle::vpz::Vpz(mvpz->getFilename().toStdString()));
         //set default location of outputs
         vle::vpz::Outputs::iterator itb =
             vpz->project().experiment().views().outputs().begin();
@@ -168,7 +168,7 @@ DefaultSimSubpanel::DefaultSimSubpanel():
             PluginSimPanel(), debug(false), nbthreads(0), blockSize(8),
             left(new DefaultSimSubpanelLeftWidget),
             right(new DefaultSimSubpanelRightWidget), sim_process(0),
-            thread(0), mvpm(0), mpkg(0),mLog(0), timer(this), portsToPlot(),
+            thread(0), mvpz(0), mpkg(0),mLog(0), timer(this), portsToPlot(),
             log_messages(), index_message(0)
 {
     QObject::connect(left->ui->runButton,  SIGNAL(pressed()),
@@ -210,9 +210,9 @@ DefaultSimSubpanel::~DefaultSimSubpanel()
     }
 }
 void
-DefaultSimSubpanel::init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log)
+DefaultSimSubpanel::init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log)
 {
-    mvpm = vpm;
+    mvpz = vpz;
     mpkg = pkg;
     mLog = log;
     onTreeItemSelected();
@@ -460,12 +460,12 @@ DefaultSimSubpanel::onSimulationFinished()
         vle::value::Map::const_iterator ite = simu.end();
         for (; itb != ite; itb ++) {
             QString viewName(itb->first.c_str());
-            QStringList viewType = mvpm->getViewTypeFromDoc(viewName);
+            QStringList viewType = mvpz->getViewTypeFromDoc(viewName);
             if (viewType.contains("timed") or viewType.contains("finish")) {
 
                 QTreeWidgetItem* vItem = new QTreeWidgetItem();
                 if (viewType.contains("timed")) {
-                    double ts = mvpm->timeStepFromDoc(viewName);
+                    double ts = mvpz->timeStepFromDoc(viewName);
                     vItem->setText(0, QString("%1 (%2:%3)").arg(viewName)
                             .arg("timed").arg(QVariant(ts).toString()));
                 } else {
@@ -530,7 +530,7 @@ DefaultSimSubpanel::onRunPressed()
     delete sim_process;
     sim_process = new DefaultSimSubpanelThread(log_messages, debug, nbthreads,
             blockSize);
-    sim_process->init(mvpm, mpkg);
+    sim_process->init(mvpz, mpkg);
 
     //delete set
     delete thread;

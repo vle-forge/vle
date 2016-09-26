@@ -27,7 +27,7 @@
 
 #include <QWidget>
 #include <vle/utils/Package.hpp>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.h>
 #include "logger.h"
 
 namespace vle {
@@ -39,7 +39,7 @@ class PluginSimPanel :public QObject
 public:
     PluginSimPanel(){};
     virtual ~PluginSimPanel(){};
-    virtual void init(vleVpm* vpm, vle::utils::Package* pkg, Logger* log) = 0;
+    virtual void init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log) = 0;
     virtual QString  getname()                                            = 0;
     virtual QWidget* leftWidget()                                         = 0;
     virtual QWidget* rightWidget()                                        = 0;

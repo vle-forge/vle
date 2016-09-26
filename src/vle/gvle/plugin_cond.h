@@ -30,6 +30,7 @@
 #include <QWidget>
 #include <QSettings>
 #include <vle/gvle/logger.h>
+#include <vle/gvle/vlevpz.h>
 
 namespace vle {
 namespace gvle {
@@ -44,7 +45,7 @@ public:
     virtual QWidget* getWidget() = 0;
     virtual void  setSettings(QSettings *s) = 0;
     virtual void  setLogger(Logger *logger) = 0;
-    virtual void  init(vleVpm* vpm, const QString& condName) = 0;
+    virtual void  init(vleVpz* vpz, const QString& condName) = 0;
     virtual PluginExpCond* newInstance() = 0;
 };
 

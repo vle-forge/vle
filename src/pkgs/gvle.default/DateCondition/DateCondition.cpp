@@ -39,7 +39,7 @@ namespace gvle{
  */
 DateCondition::DateCondition() :
   mSettings(0), mLogger(0),
-  mExpCond(), mVpm(0), mcalendar(0)
+  mExpCond(), mVpz(0), mcalendar(0)
 
 {
     mcalendar = new QCalendarWidget();
@@ -80,27 +80,27 @@ DateCondition::getWidget()
 }
 
 void
-DateCondition::init(vleVpm* vpm, const QString& cond)
+DateCondition::init(vleVpz* vpz, const QString& cond)
 {
     // Save it
-    mVpm = vpm;
+    mVpz = vpz;
     mExpCond = cond;
 
     QDomNode datePort;
 
     // Search the "date" port of the experimental condition
 
-    QDomNode condXml = mVpm->condFromConds(mVpm->condsFromDoc(), cond);
+    QDomNode condXml = mVpz->condFromConds(mVpz->condsFromDoc(), cond);
 
-    if (not mVpm->existPortFromCond(condXml, "date")) {
+    if (not mVpz->existPortFromCond(condXml, "date")) {
         value::Map portValues;
         portValues.addInt("date",utils::DateTime::toJulianDayNumber(
                 "2016-09-01"));
-        vleVpz::fillConditionWithMap(mVpm->getDomDoc(),condXml,portValues);
+        vleVpz::fillConditionWithMap(mVpz->getDomDoc(),condXml,portValues);
     }
 
     std::unique_ptr<value::Value> dateV = std::move(
-            mVpm->buildValueFromDoc(cond, "date",0));
+            mVpz->buildValueFromDoc(cond, "date",0));
     double dateI = dateV->toInteger().value();
     int dayI = utils::DateTime::dayOfMonth(dateI);
     int monthI = utils::DateTime::month(dateI);
@@ -130,9 +130,8 @@ DateCondition::dateSelected(QDate date)
     value::Map portValues;
     portValues.addInt("date",utils::DateTime::toJulianDayNumber(
             date.toString("yyyy-MM-dd").toStdString()));
-    mVpm->fillConditionWithMapToDoc(mExpCond,portValues);
+    mVpz->fillConditionWithMapToDoc(mExpCond,portValues);
     mcalendar->setCurrentPage(date.month(), date.year());
     mcalendar->showSelectedDate();
 }
 }}//namespaces
-

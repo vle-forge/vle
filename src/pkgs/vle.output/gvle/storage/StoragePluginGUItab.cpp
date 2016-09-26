@@ -30,7 +30,7 @@
  *        Default constructor
  */
 StoragePluginGUItab::StoragePluginGUItab(QWidget *parent) :
-    QWidget(parent), ui(new Ui::StoragePluginGvle), mvleVpm(0), mViewName(""),
+    QWidget(parent), ui(new Ui::StoragePluginGvle), mvleVpz(0), mViewName(""),
     outputNodeConfig(nullptr)
 {
 //
@@ -54,14 +54,14 @@ StoragePluginGUItab::~StoragePluginGUItab()
 
 
 void
-StoragePluginGUItab::init(vle::gvle::vleVpm* vpm, const QString& viewName)
+StoragePluginGUItab::init(vle::gvle::vleVpz* vpz, const QString& viewName)
 {
-    mvleVpm = vpm;
+    mvleVpz = vpz;
     mViewName = viewName;
-    outputNodeConfig = std::move(mvleVpm->buildOutputConfigMap(mViewName));
+    outputNodeConfig = std::move(mvleVpz->buildOutputConfigMap(mViewName));
     if (not wellFormed()) {
         buildDefaultConfig();
-        mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+        mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 
     bool oldBlock = ui->spinBoxRows->blockSignals(true);
@@ -96,7 +96,7 @@ StoragePluginGUItab::rowsChanged(int v)
 {
     int& toUp = outputNodeConfig->getInt("rows");
     toUp = v;
-    mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+    mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
 }
 
 void
@@ -104,7 +104,7 @@ StoragePluginGUItab::columnsChanged(int v)
 {
     int& toUp = outputNodeConfig->getInt("columns");
     toUp = v;
-    mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+    mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
 }
 
 void
@@ -112,7 +112,7 @@ StoragePluginGUItab::incRowsChanged(int v)
 {
     int& toUp = outputNodeConfig->getInt("inc_rows");
     toUp = v;
-    mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+    mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
 }
 
 void
@@ -120,7 +120,7 @@ StoragePluginGUItab::incColumnsChanged(int v)
 {
     int& toUp = outputNodeConfig->getInt("inc_columns");
     toUp = v;
-    mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+    mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
 }
 
 void
@@ -132,7 +132,7 @@ StoragePluginGUItab::headerOnTopChanged(bool v)
     } else {
         toUp = "none";
     }
-    mvleVpm->fillOutputConfigMap(mViewName, *outputNodeConfig);
+    mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
 }
 
 bool StoragePluginGUItab::wellFormed()

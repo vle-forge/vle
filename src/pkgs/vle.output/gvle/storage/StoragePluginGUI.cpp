@@ -54,10 +54,10 @@ StoragePluginGUI::setLogger(Logger *logger)
 }
 
 void
-StoragePluginGUI::init(vleVpm* vpm, const QString& viewName)
+StoragePluginGUI::init(vleVpz* vpz, const QString& viewName)
 {
     getWidget();
-    mWidgetTab->init(vpm, viewName);
+    mWidgetTab->init(vpz, viewName);
 }
 
 QWidget*

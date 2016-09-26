@@ -54,10 +54,10 @@ FilePluginGUI::setLogger(Logger *logger)
 }
 
 void
-FilePluginGUI::init(vleVpm* vpm, const QString& viewName)
+FilePluginGUI::init(vleVpz* vpz, const QString& viewName)
 {
     getWidget();
-    mWidgetTab->init(vpm, viewName);
+    mWidgetTab->init(vpz, viewName);
 }
 
 QWidget *

@@ -41,7 +41,6 @@
 #include "plugin_mainpanel.h"
 #include "help.h"
 #include "aboutbox.h"
-#include "vlevpm.h"
 #include "plugin_cond.h"
 #include "plugin_output.h"
 #include "ui_gvle_win.h"
