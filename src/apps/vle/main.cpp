@@ -589,38 +589,38 @@ static int manage_remote_mode(vle::utils::ContextPtr ctx, CmdArgs args)
             break;
         case vle::utils::REMOTE_MANAGER_INSTALL:
             if (itb == ite) {
-                printf(_("No package has been installed"));
+                printf(_("No package has been installed\n"));
             } else {
                 printf(_("Package installed: "));
                 for (; itb != ite; itb++) {
-                    printf(_("%s\tfrom %s "), itb->name.c_str(),
+                    printf(_("%s\tfrom %s\n"), itb->name.c_str(),
                            itb->url.c_str());
                 }
             }
             break;
         case vle::utils::REMOTE_MANAGER_LOCAL_SEARCH:
             if (itb == ite) {
-                printf(_("No local package has been found"));
+                printf(_("No local package has been found\n"));
             } else {
-                printf(_("Found local packages:"));
+                printf(_("Found local packages:\n"));
                 for (; itb != ite; itb++)
                     puts(itb->name.c_str());
             }
             break;
         case vle::utils::REMOTE_MANAGER_SEARCH:
             if (itb == ite) {
-                printf(_("No remote package has been found"));
+                printf(_("No remote package has been found\n"));
             } else {
-                printf(_("Found remote packages:"));
+                printf(_("Found remote packages:\n"));
                 for (; itb != ite; itb++) {
-                    printf(_("%s\nfrom %s"), itb->name.c_str(),
+                    printf(_("%s\tfrom %s\n"), itb->name.c_str(),
                            itb->url.c_str());
                 }
             }
             break;
         case vle::utils::REMOTE_MANAGER_SHOW:
             if (itb == ite) {
-                printf(_("No remote package has been found"));
+                printf(_("No remote package has been found\n"));
             } else {
                 for (; itb != ite; itb++) {
                     printf(_("%s: %s\n"), itb->name.c_str(),
@@ -630,7 +630,7 @@ static int manage_remote_mode(vle::utils::ContextPtr ctx, CmdArgs args)
             break;
         case vle::utils::REMOTE_MANAGER_LOCAL_SHOW:
             if (itb == ite) {
-                printf(_("No local package has been found"));
+                printf(_("No local package has been found\n"));
             } else {
                 for (; itb != ite; itb++) {
                     printf(_("%s: %s\n"), itb->name.c_str(),
