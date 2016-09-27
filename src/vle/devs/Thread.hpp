@@ -75,7 +75,8 @@ class SimulatorProcessParallel
 
             if (block >= 0) {
                 std::size_t begin = block * m_block_size;
-                std::size_t end = std::min(m_jobs->size(), begin + m_block_size);
+                std::size_t begin_plus_b = begin + m_block_size;
+                std::size_t end = std::min(m_jobs->size(), begin_plus_b);
 
                 for (; begin < end; ++begin)
                     simulator_process((*m_jobs)[begin], m_time);
@@ -162,7 +163,8 @@ public:
                 break;
 
             std::size_t begin = block * m_block_size;
-            std::size_t end = std::min(m_jobs->size(), begin + m_block_size);
+            std::size_t begin_plus_b = begin + m_block_size;
+            std::size_t end = std::min(m_jobs->size(), begin_plus_b);
 
             for (; begin < end; ++begin)
                 simulator_process((*m_jobs)[begin], m_time);
