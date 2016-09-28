@@ -31,7 +31,7 @@
 #include <ctime>
 #include <cmath>
 
-namespace {
+namespace vle { namespace utils {
 
 bool intern_isLeapYear(long year) noexcept
 {
@@ -449,9 +449,6 @@ struct intern_date
     }
 };
 
-} // anonymous namespace
-
-namespace vle { namespace utils {
 
 //output format `2011-Jun-09 12:13:21'
 std::string DateTime::currentDate()
@@ -478,88 +475,88 @@ std::string DateTime::currentDate()
     return result;
 }
 
-unsigned int DateTime::year(const double& time)
+unsigned int DateTime::year(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return d.myear;
 }
 
-unsigned int DateTime::month(const double& time)
+unsigned int DateTime::month(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return d.mmonth;
 }
 
-unsigned int DateTime::dayOfMonth(const double& time)
+unsigned int DateTime::dayOfMonth(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return d.mday;
 }
 
-unsigned int DateTime::dayOfWeek(const double& time)
+unsigned int DateTime::dayOfWeek(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return d.dayOfWeek();
 }
 
-unsigned int DateTime::dayOfYear(const double& time)
+unsigned int DateTime::dayOfYear(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return d.dayOfyear();
 }
 
-unsigned int DateTime::weekOfYear(const double& time)
+unsigned int DateTime::weekOfYear(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return d.weekOfYear();
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-bool DateTime::isLeapYear(const double& time)
+bool DateTime::isLeapYear(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return intern_isLeapYear(d.myear);;
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-double DateTime::aYear(const double& time)
+double DateTime::aYear(double time)
 {
     return isLeapYear(time) ? 366 : 365;
 }
 
-double DateTime::aMonth(const double& time)
+double DateTime::aMonth(double time)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(time);
     return(intern_aMonth(d.myear, d.mmonth));
 
 }
 
-double DateTime::years(const double& time, unsigned int n)
+double DateTime::years(double time, unsigned int n)
 {
 
-    ::intern_date d1;
+    intern_date d1;
     d1.fromJulianDay(time);
-    ::intern_date d2(d1);
+    intern_date d2(d1);
     d2.myear += n;
     return d2.julianDay() - d1.julianDay();
 }
 
-double DateTime::months(const double& time, unsigned int n)
+double DateTime::months(double time, unsigned int n)
 {
 
-    ::intern_date d1;
+    intern_date d1;
     d1.fromJulianDay(time);
-    ::intern_date d2(d1);
+    intern_date d2(d1);
     d2.addMonths(n);
     return d2.julianDay() - d1.julianDay();
 }
@@ -579,7 +576,7 @@ DateTimeUnitOptions DateTime::convertUnit(const std::string& unit)
     }
 }
 
-double DateTime::duration(const double& time, double duration,
+double DateTime::duration(double time, double duration,
 	DateTimeUnitOptions unit)
 {
     switch (unit) {
@@ -598,26 +595,26 @@ double DateTime::duration(const double& time, double duration,
 
 std::string DateTime::toJulianDayNumber(unsigned long date)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(static_cast<double>(date));
-    return d.toString(::intern_date::ymd);
+    return d.toString(intern_date::ymd);
 }
 
 
 //parsing "2001-10-9"
 long DateTime::toJulianDayNumber(const std::string& date)
 {
-    ::intern_date d;
-    d.fromString(date, ::intern_date::ymd);
+    intern_date d;
+    d.fromString(date, intern_date::ymd);
     return d.julianDayNumber();
 }
 
 
 std::string DateTime::toJulianDay(double date)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(date);
-    return d.toString(::intern_date::extended);
+    return d.toString(intern_date::extended);
 }
 
 
@@ -625,27 +622,27 @@ std::string DateTime::toJulianDay(double date)
 double DateTime::toJulianDay(const std::string& date)
 {
 
-    ::intern_date d;
-    d.fromString(date, ::intern_date::extended);
+    intern_date d;
+    d.fromString(date, intern_date::extended);
     return d.julianDay();
 }
 
 
 
-bool DateTime::isValidYear(const double& date)
+bool DateTime::isValidYear(double date)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(date);
     bool valid = (1399 < d.myear and d.myear < 10000);//boost rule ?
     return valid;
 }
 
-double DateTime::toTime(const double& date, long& year,
+double DateTime::toTime(double date, long& year,
 	long& month, long& day,
 	long& hours, long& minutes,
 	long& seconds)
 {
-    ::intern_date d;
+    intern_date d;
     d.fromJulianDay(date);
     year = d.myear;
     month = d.mmonth;

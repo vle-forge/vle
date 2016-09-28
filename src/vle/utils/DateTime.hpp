@@ -68,7 +68,7 @@ public:
      * @param time The simulation time.
      * @return An unsigned int.
      */
-    static unsigned int year(const double& time);
+    static unsigned int year(double time);
 
     /**
      * @brief Get the month in the simulation time.
@@ -78,7 +78,7 @@ public:
      * @param time The simulation time.
      * @return An unsigned int.
      */
-    static unsigned int month(const double& time);
+    static unsigned int month(double time);
 
     /**
      * @brief Get the day of the month in the simulation time.
@@ -88,7 +88,7 @@ public:
      * @param time The simulation time.
      * @return An unsigned int.
      */
-    static unsigned int dayOfMonth(const double& time);
+    static unsigned int dayOfMonth(double time);
 
     /**
      * @brief Get the day in the week of the simulation time.
@@ -98,7 +98,7 @@ public:
      * @param time The simulation time.
      * @return An unsigned int.
      */
-    static unsigned int dayOfWeek(const double& time);
+    static unsigned int dayOfWeek(double time);
 
     /**
      * @brief Get the day in the year of the simulation time.
@@ -108,7 +108,7 @@ public:
      * @param time The simulation time.
      * @return An unsigned int.
      */
-    static unsigned int dayOfYear(const double& time);
+    static unsigned int dayOfYear(double time);
 
     /**
      * @brief Get the week in the year of the simulation time.
@@ -118,14 +118,14 @@ public:
      * @param time The simulation time.
      * @return An unsigned int.
      */
-    static unsigned int weekOfYear(const double& time);
+    static unsigned int weekOfYear(double time);
 
     /**
      * @brief Check if the simulation time is a leap year.
      * @param time The simulation time.
      * @return true if time is a leap year, false otherwise.
      */
-    static bool isLeapYear(const double& time);
+    static bool isLeapYear(double time);
 
     /**
      * @brief Get the number of day in the year for the simulaton time.
@@ -135,7 +135,7 @@ public:
      * @param time The simulation time.
      * @return number of day.
      */
-    static double aYear(const double& time);
+    static double aYear(double time);
 
     /**
      * @brief Get the number of day in the month for the simulation time.
@@ -146,7 +146,7 @@ public:
      * @param time The simulation time.
      * @return number of day.
      */
-    static double aMonth(const double& time);
+    static double aMonth(double time);
 
     /**
      * @brief Get the number of day in a week.
@@ -170,7 +170,7 @@ public:
      * @param n The number of years.
      * @return The number of days in n-years.
      */
-    static double years(const double& time, unsigned int n);
+    static double years(double time, unsigned int n);
 
     /**
      * @brief Get number of days in n-months from the simulation time.
@@ -181,7 +181,7 @@ public:
      * @param n The number of weeks.
      * @return The number of days in n-months.
      */
-    static double months(const double& time, unsigned int n);
+    static double months(double time, unsigned int n);
 
     /**
      * @brief Get number of days in n-weeks.
@@ -213,7 +213,7 @@ public:
      * @param unit The unit.
      * @return A number of day.
      */
-    static double duration(const double& time,
+    static double duration(double time,
                            double duration,
                            DateTimeUnitOptions unit);
 
@@ -268,7 +268,7 @@ public:
      *
      * @return True if date is a valid year, false otherwise.
      */
-    static bool isValidYear(const double& date);
+    static bool isValidYear(double date);
 
     /**
      * @brief Explode the specified date attribute to year, month, day in the
@@ -286,7 +286,7 @@ public:
      *
      * @return The remainder of the conversion.
      */
-    static double toTime(const double& date,
+    static double toTime(double date,
                          long& year,
                          long& month,
                          long& day,
