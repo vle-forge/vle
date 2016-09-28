@@ -4,14 +4,17 @@ include(InstallRequiredSystemLibraries)
 # Common configuration
 #
 
-set(CPACK_STRIP_FILES "1")
 set(CPACK_PACKAGE_NAME "VLE")
 set(CPACK_PACKAGE_VENDOR "VLE Development Team")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "VLE - Virtual Laboratory Environment")
-set(CPACK_PACKAGE_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
+set(CPACK_PACKAGE_VERSION_MAJOR "${VLE_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${VLE_MINOR}")
+if ("${VLE_EXTRA}" STREQUAL "")
+  set(CPACK_PACKAGE_VERSION_PATCH "${VLE_PATCH}")
+else ()
+  set(CPACK_PACKAGE_VERSION_PATCH "${VLE_PATCH}-${VLE_EXTRA}")
+endif ()
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
-
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "VLE - Virtual Laboratory Environment")
 if (NOT CMAKE_SYSTEM_PROCESSOR)
   if (NOT CMAKE_HOST_SYSTEM_PROCESSOR)
     set(CPACK_PACKAGE_FILE_NAME "${VLE_NAME_COMPLETE}-${CMAKE_SYSTEM_NAME}")
@@ -21,19 +24,11 @@ if (NOT CMAKE_SYSTEM_PROCESSOR)
 else ()
   set(CPACK_PACKAGE_FILE_NAME "${VLE_NAME_COMPLETE}-${CMAKE_SYSTEM_PROCESSOR}")
 endif ()
-
-set(CPACK_PACKAGE_FILE_NAME "${VLE_NAME_COMPLETE}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-set(CPACK_PACKAGE_VERSION_MAJOR "${VLE_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${VLE_MINOR}")
-
-if ("${VLE_EXTRA}" STREQUAL "")
-  set(CPACK_PACKAGE_VERSION_PATCH "${VLE_PATCH}")
-else ()
-  set(CPACK_PACKAGE_VERSION_PATCH "${VLE_PATCH}-${VLE_EXTRA}")
-endif ()
-
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${VLE_NAME_COMPLETE})
+set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\logo.bmp")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_EXECUTABLES "vle" "VLE" "gvle" "GVLE")
+set(CPACK_STRIP_FILES "1")
 
 #
 # CPack source configuration
@@ -69,27 +64,36 @@ set(CPACK_RPM_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simulati
 #
 # CPack NSIS configuration
 #
-set(CMAKE_MODULE_PATH "share")
-set(QT_INSTALL_PATH CACHE PATH "Qt install path")
-set(VLE_MINGW_PATH CACHE PATH "Mingw Boost directory")
-set(VLEDEPS_PATH CACHE PATH "vle deps directory")
-set(VLE_BOOST_INCLUDE_PATH CACHE PATH "Boost include path")
-set(VLE_BOOST_LIBRARIES_PATH CACHE PATH "Boost libraries path")
-set(VLE_CMAKE_PATH CACHE PATH "CMake directory")
-set(Boost_INCLUDE_DIRS CACHE PATH "Boost include dirs")
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/share)
+
+set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${VLE_VERSION_SHORT}.0")
+set(CPACK_CREATE_DESKTOP_LINKS gvle)
+
+#set(CMAKE_MODULE_PATH "share")
+#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/share)
+
+#set(QT_INSTALL_PATH CACHE PATH "Qt install path")
+#set(VLE_MINGW_PATH CACHE PATH "Mingw Boost directory")
+#set(VLEDEPS_PATH CACHE PATH "vle deps directory")
+#set(VLE_BOOST_INCLUDE_PATH CACHE PATH "Boost include path")
+#set(VLE_BOOST_LIBRARIES_PATH CACHE PATH "Boost libraries path")
+#set(VLE_CMAKE_PATH CACHE PATH "CMake directory")
+#set(Boost_INCLUDE_DIRS CACHE PATH "Boost include dirs")
 
 set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
 set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
-set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\logo.bmp")
 set(CPACK_NSIS_MENU_LINKS "${VLE_SHARE_DIRS}/doc/vle.chm" "VLE API" "http://www.vle-project.org" "VLE Web Site")
-set(CPACK_CREATE_DESKTOP_LINKS gvle)
 set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
 set(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboratory Environment")
 set(CPACK_NSIS_HELP_LINK "http://www.vle-project.org")
 set(CPACK_NSIS_URL_INFO_ABOUT "http://www.vle-project.org")
 set(CPACK_NSIS_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
-set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${VLE_VERSION_SHORT}.0")
 set(CPACK_NSIS_MODIFY_PATH ON)
+
+#TODO commands for improving NSIS script
+#STRING(REPLACE "\\" "\\\\" VLE_MINGW_PATH_WIN ${VLE_MINGW_PATH}) 
+#set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "CopyFiles '${VLE_MINGW_PATH_WIN}\\\\bin\\\\libwinpthread-1.dll' $INSTDIR\\\\bin")
+
+message(" dbg ${VLE_MINGW_PATH}")
+message(" dbg ${VLE_MINGW_PATH_WIN}")
 
 include(CPack)
