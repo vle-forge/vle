@@ -25,6 +25,10 @@ set(DefaultSimSubpanel_SOURCES_CPP DefaultSimSubpanel.cpp
 add_library(DefaultSimSubpanel SHARED ${DefaultSimSubpanel_SOURCES_CPP}
             ${simpanelleft_h} ${simpanelright_h} qcustomplot/qcustomplot.cpp)
 
+target_link_libraries(DefaultSimSubpanel vlelib gvlelib
+  ${Qt5Xml_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES}
+  ${Qt5Help_LIBRARIES} ${Qt5PrintSupport_LIBRARIES})
+
 set(DefaultSimSubpanel_INST
   lib/vle-${VLE_VERSION_SHORT}/pkgs/gvle.default/plugins/gvle/simulating)
 install(TARGETS DefaultSimSubpanel 
