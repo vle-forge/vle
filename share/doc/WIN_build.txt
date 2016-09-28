@@ -1,8 +1,8 @@
 
 
 
-Install MSYS2:   msys2-i686-20150916.exe
-Install NSIS:    2.50
+Install MSYS2:   msys2-i686-20160921.exe
+Install NSIS:    3.0
 
 #####
 #
@@ -13,11 +13,12 @@ Install NSIS:    2.50
 #
 ###
 
-pacman -S mingw-w64-i686-cmake  ## 3.4.1-1
-pacman -S mingw-w64-i686-gcc    ## 5.3.0-2
-pacman -S mingw-w64-i686-make   ## 4.1.2351.a80a8b8-1
-pacman -S mingw-w64-i686-qt5    ## 5.5.1-4
-pacman -S mingw-w64-i686-boost  ## 1.60.0-2
+pacman -S --force mingw-w64-i686-cmake  ## 3.6.2-1
+pacman -S --force mingw-w64-i686-gcc    ## 6.2.0-2
+pacman -S --force mingw-w64-i686-make   ## 4.1.2351.a80a8b8-1
+pacman -S --force mingw-w64-i686-qt5    ## 5.6.1-3
+pacman -S --force mingw-w64-i686-boost  ## 1.60.0-4
+pacman -S --force mingw-w64-i686-gdb    ## 7.11.1-4
 
 *******************************************
 ** Build VLE natively on WIN32, using Msys2
@@ -25,7 +26,7 @@ pacman -S mingw-w64-i686-boost  ## 1.60.0-2
 
 set VLE_DIR=c:\natifvle\vle
 set MINGW_PATH=c:\msys32\mingw32
-set install_dir=c:\natifvle\install
+set install_dir=%MINGW_PATH%
 
 set OLDPATH=%PATH%
 set PATH=%MINGW_PATH%\bin;%PATH%
@@ -33,15 +34,11 @@ set PATH=%MINGW_PATH%\bin;%PATH%
 mkdir %VLE_DIR%\buildvle
 cd %VLE_DIR%\buildvle
 
-cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%install_dir%\vle -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="%MINGW_PATH%" -DVLE_MINGW_PATH="%MINGW_PATH%" -DVLE_BOOST_INCLUDE_PATH="%MINGW_PATH%\include" -DVLE_BOOST_LIBRARIES_PATH="%MINGW_PATH%\lib" ..
-
+cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%install_dir% -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVLE_CMAKE_PATH="%MINGW_PATH%" -DVLE_MINGW_PATH="%MINGW_PATH%" -DVLE_BOOST_INCLUDE_PATH="%MINGW_PATH%\include" -DVLE_BOOST_LIBRARIES_PATH="%MINGW_PATH%\lib" ..
 
 mingw32-make install
 
-set PATH=%install_dir%\vle\bin;%PATH%
 mingw32-make test
-
-set PATH=%MINGW_PATH%\bin;%OLDPATH%
 cpack.exe -G NSIS
 
 
