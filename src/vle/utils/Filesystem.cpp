@@ -617,8 +617,8 @@ public:
                 _("DirectoryEntry: Path does not exist or could not be read."));
 
         do {
-            if (strcmp(ffd.cFileName, ".") != 0 or
-                strcmp(ffd.cFileName, "..") != 0) {
+            if (strcmp(ffd.cFileName, ".") == 0 or
+                strcmp(ffd.cFileName, "..") == 0) {
                 continue;
             } else {
                 m_entry.m_path = m_path / ffd.cFileName;
@@ -649,8 +649,8 @@ public:
         assert(not m_finish);
 #if defined(_WIN32)
         while (FindNextFile(hFind, &ffd) != 0) {
-            if (strcmp(ffd.cFileName, ".") != 0 or
-                strcmp(ffd.cFileName, "..") != 0) {
+            if (strcmp(ffd.cFileName, ".") == 0 or
+                strcmp(ffd.cFileName, "..") == 0) {
                 continue;
             } else {
                 m_entry.m_path = m_path / ffd.cFileName;
