@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
+
 #include <vle/utils/Tools.hpp>
 #include <QFileDialog>
 #include <QStyleFactory>
@@ -63,7 +64,7 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
     QMainWindow(parent), ui(new Ui::gvleWin), mLogger(0), mTimer(0),
     mSettings(0), mSimOpened(false), mMenuSimGroup(0), mSimulatorPlugins(),
     mCurrentSimName(""), mPanels(), mProjectFileSytem(0), mGvlePlugins(ctx),
-    mCtx(ctx), mCurrPackage(ctx), mDistributions()
+    mCtx(ctx), mCurrPackage(ctx), mSpawn(ctx), mDistributions()
 {
     // GUI init
     ui->setupUi(this);
@@ -692,6 +693,36 @@ gvle_win::projectInstallTimer()
     }
 }
 
+void
+gvle_win::remoteInstallTimer()
+{
+    std::string oo, oe;
+    bool status;
+
+
+    if (mSpawn.get(&oo, &oe)) {
+        if(oe.length()) {
+            mLogger->logExt(oe.c_str());
+        }
+        if (oo.length()) {
+            mLogger->logExt(oo.c_str());
+        }
+    }
+
+    if (mSpawn.isfinish()) {
+        mTimer->stop();
+        delete mTimer;
+        mSpawn.status(&oe, &status);
+        if (status) {
+            mLogger->log("Remote package installation complete");
+        } else {
+            mLogger->logExt("Remote package installation failed", true);
+        }
+        menuLocalPackagesRefresh();
+        ui->menuDistributions->setEnabled(true);
+    }
+}
+
 
 void
 gvle_win::onUndo()
@@ -924,6 +955,11 @@ gvle_win::menuPackagesInstallRefresh()
 
     vle::utils::Packages res;
     rm.getResult(&res);
+    std::sort(res.begin(), res.end(), [](const utils::PackageId& a,
+                                         const utils::PackageId& b) {
+        return a.name < b.name;
+    });
+
     vle::utils::Packages::const_iterator itb = res.begin();
     vle::utils::Packages::const_iterator ite = res.end();
     ui->menuInstall->clear();
@@ -1578,13 +1614,28 @@ gvle_win::onPackageInstall()
     QAction* senderAct = qobject_cast<QAction*>(QObject::sender());
     QString pkg = senderAct->data().toString() ;
 
-    utils::RemoteManager rm(mCtx);
-    rm.start(utils::REMOTE_MANAGER_INSTALL, pkg.toStdString(), &std::cout);
-    rm.join();
-    if (rm.hasError()) {
-        std::cout<< "Remote error: " <<  rm.messageError() << "\n";
-        return;
+    std::string cmd = "vle -R install ";
+    cmd += pkg.toStdString();
+
+    std::vector<std::string> argv = mSpawn.splitCommandLine(cmd);
+    std::string exe = std::move(argv.front());
+    argv.erase(argv.begin());
+
+    try {
+        mSpawn.start(exe, vle::utils::Path::temp_directory_path().string(),
+                argv);
+    } catch (const std::exception& e) {
+
+        mLogger->logExt("Remote install error ", true);
+
     }
+
+
+    ui->menuDistributions->setEnabled(false);
+    mTimer = new QTimer();
+    QObject::connect(mTimer, SIGNAL(timeout()),
+                     this, SLOT(remoteInstallTimer()));
+    mTimer->start(2);
 }
 
 void

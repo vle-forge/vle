@@ -42,6 +42,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Template.hpp>
+#include <vle/utils/Spawn.hpp>
 #endif
 
 #include "plugin_mainpanel.h"
@@ -115,6 +116,7 @@ private slots:
     void projectConfigureTimer();
     void projectBuildTimer();
     void projectInstallTimer();
+    void remoteInstallTimer();
     void onRefreshFiles();
     void onRightWidgetChanged();
     void onUndoAvailable(bool);
@@ -141,6 +143,7 @@ private:
     gvle_plugins                    mGvlePlugins;
     utils::ContextPtr               mCtx;
     utils::Package                  mCurrPackage;
+    utils::Spawn                    mSpawn;
     Distributions                   mDistributions;
 
 
