@@ -40,9 +40,10 @@
 namespace vle {
 namespace gvle {
 
-FileVpzExpView::FileVpzExpView(const utils::ContextPtr& ctx, QWidget *parent) :
+FileVpzExpView::FileVpzExpView(const utils::ContextPtr& ctx,  Logger* log, 
+    QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzExpView),mVpm(0), mPlugin(0),
-    currView(""), mCtx(ctx)
+    currView(""), mCtx(ctx), mLog(log)
 {
     ui->setupUi(this);
     ui->timeStep->setEnabled(false);
@@ -91,6 +92,7 @@ void FileVpzExpView::setVpm(vleVpm* vpm)
 void
 FileVpzExpView::reload()
 {
+     mLog->log(" dbg FileVpzExpView::reload() ");
     if (!mVpm) {
         throw vle::utils::InternalError(
                 " gvle: error in FileVpzExpView::reloadViews");
@@ -136,9 +138,11 @@ FileVpzExpView::reload()
     std::vector<std::string> pkglist;
     auto pkgs = mCtx->getBinaryPackages();
     for (auto pkg : pkgs) {
+		mLog->log(" dbg FileVpzExpView::reload() pkg "+QString(pkg.string().c_str()));
         auto modules = mCtx->get_dynamic_libraries(pkg.filename(),
                 utils::Context::ModuleType::MODULE_OOV);
         for (auto mod : modules) {
+			mLog->log(" dbg FileVpzExpView::reload() mod "+QString(mod.library.c_str()));
             repName.assign(pkg.filename());
             repName += "/";
             repName += mod.library;
@@ -271,6 +275,7 @@ FileVpzExpView::getSelectedOutputPlugin()
 
 void FileVpzExpView::onViewSelected(QListWidgetItem* item)
 {
+	mLog->log(" dbg onViewSelected "+item->text());
     if (item->text() != currView) {
         currView = item->text();
         reload();

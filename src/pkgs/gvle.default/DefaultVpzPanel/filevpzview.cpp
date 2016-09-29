@@ -65,7 +65,7 @@ fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
             "Observables");
 
     // Configure View tab
-    mExpViewTab = new vle::gvle::FileVpzExpView(ctx);
+    mExpViewTab = new vle::gvle::FileVpzExpView(ctx, log);
     int viewTabId = ui->tabWidget->addTab(mExpViewTab, "Views");
 
     // Configure Classes tab

@@ -54,7 +54,8 @@ class FileVpzExpView : public QWidget
     Q_OBJECT
 
 public:
-    explicit FileVpzExpView(const utils::ContextPtr& ctx, QWidget *parent = 0);
+    explicit FileVpzExpView(const utils::ContextPtr& ctx,  Logger* log, 
+	                        QWidget *parent = 0);
     ~FileVpzExpView();
     void setVpm(vleVpm* vpm);
     void reload();
@@ -88,6 +89,7 @@ private:
     PluginOutput*       mPlugin;
     QString             currView;
     utils::ContextPtr   mCtx;
+	Logger*             mLog;
 
 };
 }}//namespaces
