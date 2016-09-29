@@ -321,14 +321,12 @@ VpzModelItem::clearPorts()
     QList<VpzPortItem*> inPorts = getInPorts();
      for (int i = 0; i<inPorts.length(); i++){
         scene()->removeItem(inPorts[i]);
-        inPorts[i]->setParentItem(NULL);
         delete inPorts[i];
 
     }
     QList<VpzPortItem*> outPorts = getOutPorts();
      for (int i = 0; i<outPorts.length(); i++){
         scene()->removeItem(outPorts[i]);
-        outPorts[i]->setParentItem(NULL);
         delete outPorts[i];
     }
 
@@ -721,7 +719,6 @@ VpzMainModelItem::clearLines()
     QList<VpzConnectionLineItem *> lines = getConnLines();
     for (int i =0; i<lines.length() ; i++) {
         scene()->removeItem(lines[i]);
-        lines[i]->setParentItem(NULL);
         delete lines[i];
     }
 }
@@ -732,7 +729,6 @@ VpzMainModelItem::clearSubModels()
     QList<VpzSubModelItem *> subs = getSubModels();
     for (int i =0; i<subs.length() ; i++) {
         scene()->removeItem(subs[i]);
-        subs[i]->setParentItem(NULL);
         delete subs[i];
     }
 }
@@ -1608,7 +1604,6 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                     VpzPortItem* it = static_cast<VpzPortItem*>(sel);
                     mVpm->rmModelPort(it->mnode);
                     removeItem(it);
-                    it->setParentItem(NULL);
                     delete it;
                     mCoupled->update();
                 } else if(isVpzConnectionLine(sel)){
