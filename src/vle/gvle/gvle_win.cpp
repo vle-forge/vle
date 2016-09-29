@@ -51,6 +51,45 @@ namespace vu = vle::utils;
 namespace vle {
 namespace gvle {
 
+struct gvle_ctx_log : vle::utils::Context::LogFunctor
+{
+    FILE *fp;
+
+    gvle_ctx_log()
+        : fp(nullptr)
+    {
+    }
+
+    virtual ~gvle_ctx_log()
+    {
+        if (fp)
+            fclose(fp);
+    }
+
+    virtual void write(const vle::utils::Context& ctx,
+                       int priority, const char *file,
+                       int line, const char *fn,
+                       const char *format,
+                       va_list args) noexcept override
+    {
+        if (not fp) {
+            fp = fopen(ctx.getLogFile("gvle").string().c_str(), "w");
+        }
+
+        if (fp) {
+            if (priority == 7)
+                fprintf(fp, "[dbg] %s:%d %s: ", file, line, fn);
+            else if (priority == 6)
+                fprintf(fp, "%s: ", fn);
+            else
+                fprintf(fp, "[Error] %s: ", fn);
+
+            vfprintf(fp, format, args);
+        }
+    }
+};
+
+
 std::map<std::string, std::string>
 gvle_win::defaultDistrib()
 {
@@ -68,8 +107,11 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
 {
     // GUI init
     ui->setupUi(this);
+    //log init (gvle::Logger and Ctx logger)
     mLogger = new Logger();
     mLogger->setWidget(ui->statusLog);
+    mCtx->set_log_function(
+            std::unique_ptr<utils::Context::LogFunctor>(new gvle_ctx_log()));
     // VLE init
     mCurrPackage.refreshPath();
 
