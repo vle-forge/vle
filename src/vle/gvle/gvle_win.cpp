@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
@@ -173,6 +173,8 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
 
     mGvlePlugins.registerPlugins();
     treeProjectUpdate();
+	mLogger->log(QString("Using VLE_HOME: %1").arg(
+					QString(mCtx->getHomeDir().string().c_str())));
 }
 
 gvle_win::~gvle_win()
