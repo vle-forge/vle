@@ -107,6 +107,7 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
 {
     // GUI init
     ui->setupUi(this);
+
     //log init (gvle::Logger and Ctx logger)
     mLogger = new Logger();
     mLogger->setWidget(ui->statusLog);
@@ -216,8 +217,10 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
 
     mGvlePlugins.registerPlugins();
     treeProjectUpdate();
-	mLogger->log(QString("Using VLE_HOME: %1").arg(
-					QString(mCtx->getHomeDir().string().c_str())));
+    mLogger->log(QString("Using VLE_HOME: %1").arg(
+            QString(mCtx->getHomeDir().string().c_str())));
+    ui->menuProject->setEnabled(false);
+    ui->menuDependencies->setEnabled(false);
 }
 
 gvle_win::~gvle_win()
@@ -378,6 +381,7 @@ gvle_win::newProject(QString pathName)
 
     ui->actionCloseProject->setEnabled(true);
     ui->menuProject->setEnabled(true);
+    ui->menuDependencies->setEnabled(true);
 }
 
 /**
@@ -409,6 +413,7 @@ gvle_win::openProject(QString pathName)
     menuRecentProjectRefresh();
 
     ui->menuProject->setEnabled(true);
+    ui->menuDependencies->setEnabled(true);
     ui->actionCloseProject->setEnabled(true);
     menuLocalPackagesRefresh();
 }
@@ -431,6 +436,7 @@ gvle_win::closeProject()
     mCurrPackage.select("");
     ui->treeProject->setModel(mProjectFileSytem);
     ui->menuProject->setEnabled(false);
+    ui->menuDependencies->setEnabled(false);
     ui->actionCloseProject->setEnabled(false);
     // Update window title
     setWindowTitle("GVLE");
@@ -578,6 +584,7 @@ gvle_win::onProjectConfigure()
         return;
     }
     ui->menuProject->setEnabled(false);
+    ui->menuDependencies->setEnabled(false);
 
     mTimer = new QTimer();
     QObject::connect(mTimer, SIGNAL(timeout()),
@@ -601,6 +608,7 @@ gvle_win::onProjectBuild()
         return;
     }
     ui->menuProject->setEnabled(false);
+    ui->menuDependencies->setEnabled(false);
 
     mTimer = new QTimer();
     QObject::connect(mTimer, SIGNAL(timeout()),
@@ -628,6 +636,7 @@ gvle_win::onProjectClean()
         mLogger->log(tr("Project clean failed"));
     }
     ui->menuProject->setEnabled(true);
+    ui->menuDependencies->setEnabled(true);
 }
 
 void
@@ -650,6 +659,7 @@ gvle_win::onProjectUninstall()
         mLogger->log(tr("Project uninstall failed"));
     }
     ui->menuProject->setEnabled(true);
+    ui->menuDependencies->setEnabled(true);
 }
 
 void
@@ -661,6 +671,7 @@ gvle_win::projectConfigureTimer()
         delete mTimer;
         mLogger->log(tr("Project configuration complete"));
         ui->menuProject->setEnabled(true);
+        ui->menuDependencies->setEnabled(true);
     }
     std::string oo;
     std::string oe;
@@ -706,6 +717,7 @@ gvle_win::projectBuildTimer()
             mLogger->log(tr("Project compilation failed"));
         }
         ui->menuProject->setEnabled(true);
+        ui->menuDependencies->setEnabled(true);
     }
 }
 
@@ -732,6 +744,7 @@ gvle_win::projectInstallTimer()
             mLogger->log(tr("Project installation failed"));
         }
         ui->menuProject->setEnabled(true);
+        ui->menuDependencies->setEnabled(true);
     }
 }
 
@@ -761,7 +774,7 @@ gvle_win::remoteInstallTimer()
             mLogger->logExt("Remote package installation failed", true);
         }
         menuLocalPackagesRefresh();
-        ui->menuDistributions->setEnabled(true);
+        ui->menuPackages->setEnabled(true);
     }
 }
 
@@ -1672,8 +1685,7 @@ gvle_win::onPackageInstall()
 
     }
 
-
-    ui->menuDistributions->setEnabled(false);
+    ui->menuPackages->setEnabled(false);
     mTimer = new QTimer();
     QObject::connect(mTimer, SIGNAL(timeout()),
                      this, SLOT(remoteInstallTimer()));
