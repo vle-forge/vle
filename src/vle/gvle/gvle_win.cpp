@@ -53,17 +53,13 @@ namespace gvle {
 
 struct gvle_ctx_log : vle::utils::Context::LogFunctor
 {
-    FILE *fp;
-
-    gvle_ctx_log()
-        : fp(nullptr)
+    bool first;
+    gvle_ctx_log(): first(true)
     {
     }
 
     virtual ~gvle_ctx_log()
     {
-        if (fp)
-            fclose(fp);
     }
 
     virtual void write(const vle::utils::Context& ctx,
@@ -72,10 +68,13 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
                        const char *format,
                        va_list args) noexcept override
     {
-        if (not fp) {
+        FILE* fp;
+        if (first) {
+            first = false;
             fp = fopen(ctx.getLogFile("gvle").string().c_str(), "w");
+        } else {
+            fp = fopen(ctx.getLogFile("gvle").string().c_str(), "a");
         }
-
         if (fp) {
             if (priority == 7)
                 fprintf(fp, "[dbg] %s:%d %s: ", file, line, fn);
@@ -85,6 +84,7 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
                 fprintf(fp, "[Error] %s: ", fn);
 
             vfprintf(fp, format, args);
+            fclose(fp);
         }
     }
 };
