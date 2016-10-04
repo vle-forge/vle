@@ -622,8 +622,8 @@ public:
                 continue;
             } else {
                 m_entry.m_path = m_path / ffd.cFileName;
-                m_entry.m_is_file = ffd.dwFileAttributes & FILE_ATTRIBUTE_NORMAL;
                 m_entry.m_is_directory = ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+                m_entry.m_is_file = not m_entry.m_is_directory;
                 return;
             }
         } while (FindNextFile(hFind, &ffd) != 0);
@@ -654,8 +654,8 @@ public:
                 continue;
             } else {
                 m_entry.m_path = m_path / ffd.cFileName;
-                m_entry.m_is_file = ffd.dwFileAttributes & FILE_ATTRIBUTE_NORMAL;
                 m_entry.m_is_directory = ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+                m_entry.m_is_file = not m_entry.m_is_directory;
                 return;
             }
         }
