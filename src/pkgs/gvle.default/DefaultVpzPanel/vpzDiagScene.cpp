@@ -1102,10 +1102,10 @@ VpzMainModelItem::type() const
 
 /*********************************************************************************/
 
-VpzDiagScene::VpzDiagScene(const utils::ContextPtr& ctx) :
+VpzDiagScene::VpzDiagScene(Logger* log, const utils::ContextPtr& ctx) :
         QGraphicsScene(), mVpm(0), mClass(""), mCoupled(0), mPortSel1(0),
         mPortSel2(0), mConnection(0), mDragStartPoint(), mDragCurrPoint(),
-        mModelSelType(MIDDLE), mIsEnteringCoupled(false), mCtx(ctx)
+        mModelSelType(MIDDLE), mIsEnteringCoupled(false), mLog(log), mCtx(ctx)
 {
     setBackgroundBrush(getBrushBackground());
 }

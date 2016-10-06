@@ -213,7 +213,7 @@ class VpzDiagScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    VpzDiagScene(const vle::utils::ContextPtr& ctx);
+    VpzDiagScene(Logger* log, const vle::utils::ContextPtr& ctx);
     /**
      * @brief initialize the scene with a vpm file
      * @param vpm, the vpm file
@@ -288,6 +288,7 @@ public:
     SEL_TYPE               mModelSelType;
     bool                   mIsEnteringCoupled;
     QList<QDomNode>        mModelsCopies;
+    Logger*                mLog;
     vle::utils::ContextPtr mCtx;
 };
 

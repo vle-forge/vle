@@ -56,7 +56,7 @@ class FileVpzClasses : public QWidget
 {
     Q_OBJECT
 public:
-    explicit FileVpzClasses(
+    explicit FileVpzClasses(Logger* log,
             const vle::utils::ContextPtr& ctx,
             QWidget *parent = 0);
     ~FileVpzClasses();
