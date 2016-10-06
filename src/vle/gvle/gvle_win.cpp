@@ -1590,8 +1590,9 @@ gvle_win::getPackageToBuildDepends()
     QStringList content = getDescriptionFileContent();
     for (QStringList::Iterator it = content.begin();
             it != content.end(); ++it ) {
-        QString& line = *it;
-        if (line.startsWith("Build-Depends:")) {
+        QString line = *it;
+        if (line.startsWith("Build-Depends: ")) {
+            line.replace("Build-Depends: ","");
             QStringList dep = line.split(",");
             dep.removeAll("");
             return dep;
