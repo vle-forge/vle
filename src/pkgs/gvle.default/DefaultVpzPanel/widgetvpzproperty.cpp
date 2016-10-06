@@ -34,8 +34,6 @@ namespace gvle {
 WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget *parent) :
     QComboBox(parent), mVpm(0), mModQuery("")
 {
-
-    QComboBox::setVisible(true);
     QComboBox::setFocusPolicy(Qt::ClickFocus);
 
     QObject::connect(this, SIGNAL(currentIndexChanged(int)),
@@ -99,7 +97,6 @@ WidgetVpzPropertyDynamics::onChange(int index)
 WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget *parent) :
         QListWidget(parent), mVpm(0), mModQuery("")
 {
-    QListWidget::setVisible(true);
 }
 
 WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
@@ -172,7 +169,6 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
 WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget *parent) :
         QComboBox(parent), mVpm(0), mModQuery("")
 {
-    QComboBox::setVisible(true);
     QComboBox::setFocusPolicy(Qt::ClickFocus);
 
     QObject::connect(this, SIGNAL(currentIndexChanged(int)),
