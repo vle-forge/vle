@@ -183,8 +183,10 @@ public:
 
     ~Pimpl()
     {
-        if (m_start and not m_finish) {
-            wait();
+        if (m_start) {
+            if (not m_finish)
+                wait();
+
             ::close(m_pipeout[1]);
             ::close(m_pipeerr[1]);
             ::close(m_pipeout[0]);
