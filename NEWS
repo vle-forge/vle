@@ -115,6 +115,17 @@ If the library name starts with `exe_` or `wra_` then symbols
 respectively define a `vle::devs::Executive` or a
 `vle::devs::DynamicsWrapper`.
 
+### Experimental frames
+
+Two new features:
+
+- Simulations can be start in subprocess so, if a simulation segfault, the
+  master process do not close.
+
+- The `cvle`, `vle` and `mvle` accept an `--timeout [ms]` parameter to limit
+  the duration of the simulation subprocess to avoid too long simulation
+  process.
+
 ### GVLE
 
 - GVLE is completely rewritten with QT 5. The old GVLE in Gtkmm [2,3]
