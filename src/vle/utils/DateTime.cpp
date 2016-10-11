@@ -373,7 +373,7 @@ struct intern_date
     {
 	long ret = 0;
 
-	for (long m = 1; m < mmonth - 1; m++)
+	for (long m = 1; m < mmonth; m++)
 	    ret += intern_aMonth(myear, m);
 
 	ret += mday;

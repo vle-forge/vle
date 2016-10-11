@@ -215,6 +215,16 @@ BOOST_AUTO_TEST_CASE(date_time)
     BOOST_REQUIRE_EQUAL(
         vle::utils::DateTime::dayOfYear((2451545)), 1);
     BOOST_REQUIRE_EQUAL(
+        vle::utils::DateTime::dayOfYear((2451545+31)), 32);
+    BOOST_REQUIRE_EQUAL(
+        vle::utils::DateTime::dayOfYear((2451545+31+31)), 63);
+    BOOST_REQUIRE_EQUAL(
+        vle::utils::DateTime::dayOfYear((2451911)), 1);
+    BOOST_REQUIRE_EQUAL(
+        vle::utils::DateTime::dayOfYear((2451911+31+31)), 63);
+    BOOST_REQUIRE_EQUAL(
+        vle::utils::DateTime::dayOfYear((2451607)), 63);
+    BOOST_REQUIRE_EQUAL(
         vle::utils::DateTime::dayOfWeek((2451545)), 6);
     BOOST_REQUIRE_EQUAL(
         vle::utils::DateTime::weekOfYear((2451547)), 1);
