@@ -109,10 +109,10 @@ namespace vle { namespace vpz {
         { return m_name; }
 
         /**
-          * @brief Set a new name for this View.
-	  * @param name The new name for this View.
-	  */
-	inline void setName(std::string name)
+         * @brief Set a new name for this View.
+         * @param name The new name for this View.
+         q*/
+        inline void setName(std::string name)
         { m_name = name; }
 
         /**
@@ -150,6 +150,35 @@ namespace vle { namespace vpz {
         { return m_timestep; }
 
         /**
+         * @brief Check if the view is enable.
+         * @details Return true if the view is enabled. Default (in
+         * constructor) views are enabled. Use the \c disable member function
+         * to disable the view.
+         *
+         * @return true if the View is enable, false otherwise.
+         */
+        inline bool is_enable() const
+        { return m_enabled; }
+
+        /**
+         * @brief Disable the View.
+         * @details Disable the View. Use this function in modelling or
+         * experimental frames tools. Simulation kernel only use the \c
+         * is_enable function at simulation startup.
+         */
+        inline void disable()
+        { m_enabled = false; }
+
+        /**
+         * @brief Enable the View.
+         * @details Disable the View. Use this function in modelling or
+         * experimental frames tools. Simulation kernel only use the \c
+         * is_enable function at simulation startup.
+         */
+        inline void enable()
+        { m_enabled = true; }
+
+        /**
          * @brief The string representation of the Output.
          * @return The Output.
          */
@@ -182,6 +211,7 @@ namespace vle { namespace vpz {
         std::string     m_name;
         std::string     m_output;
         std::string     m_data;
+        bool            m_enabled;
         Type            m_type;
     };
 

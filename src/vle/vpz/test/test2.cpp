@@ -375,16 +375,16 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const vpz::Project& project(vpz.project());
-    const vpz::Experiment& experiment(project.experiment());
-    const vpz::Views& views(experiment.views());
+    vpz::Project& project(vpz.project());
+    vpz::Experiment& experiment(project.experiment());
+    vpz::Views& views(experiment.views());
 
-    const vpz::Outputs& outputs(views.outputs());
+    vpz::Outputs& outputs(views.outputs());
     BOOST_REQUIRE(outputs.outputlist().size() == 2);
 
     BOOST_REQUIRE(outputs.outputlist().find("x") != outputs.outputlist().end());
     {
-        const vpz::Output& out(outputs.outputlist().find("x")->second);
+        vpz::Output& out(outputs.outputlist().find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
         BOOST_REQUIRE(out.data());
         BOOST_REQUIRE_EQUAL(out.data()->isString(), true);
@@ -392,7 +392,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     }
     BOOST_REQUIRE(outputs.outputlist().find("z") != outputs.outputlist().end());
     {
-        const vpz::Output& out(outputs.outputlist().find("z")->second);
+        vpz::Output& out(outputs.outputlist().find("z")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "z");
         BOOST_REQUIRE_EQUAL(out.plugin(), "xxx");
         BOOST_REQUIRE_EQUAL(out.location(), "127.0.0.1:8888");
@@ -403,8 +403,13 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     BOOST_REQUIRE((*views.viewlist().begin()).first
                   == (*views.viewlist().begin()).second.name());
 
-    const vpz::View& view(views.viewlist().begin()->second);
+    vpz::View& view(views.viewlist().begin()->second);
     BOOST_REQUIRE_EQUAL(view.name(), "x");
+    BOOST_REQUIRE_EQUAL(view.is_enable(), true);
+    view.disable();
+    BOOST_REQUIRE_EQUAL(view.is_enable(), false);
+    view.enable();
+    BOOST_REQUIRE_EQUAL(view.is_enable(), true);
     BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
     BOOST_REQUIRE_EQUAL(view.timestep(), .05);
     BOOST_REQUIRE_EQUAL(view.output(), "x");

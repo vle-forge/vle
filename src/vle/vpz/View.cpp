@@ -36,6 +36,7 @@ View::View(const std::string& name, View::Type type,
     : m_timestep(timestep)
     , m_name(name)
     , m_output(output)
+    , m_enabled(true)
     , m_type(type)
 {
     if (m_type == View::TIMED) {
@@ -50,6 +51,7 @@ View::View(const std::string& name, View::Type type,
 View::View(const std::string& name)
     : m_timestep(0.0)
     , m_name(name)
+    , m_enabled(true)
     , m_type(static_cast<Type>(View::INTERNAL | View::EXTERNAL |
                                View::CONFLUENT))
 {
