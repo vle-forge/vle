@@ -259,16 +259,10 @@ void Coordinator::addObservableToView(vpz::AtomicModel* model,
     auto event_it = m_eventViewList.find(view);
     auto timed_it = m_timedViewList.find(view);
 
-    if (event_it == m_eventViewList.end() and
-        timed_it == m_timedViewList.end())
-        throw utils::InternalError(
-            (fmt(_("The view '%1%' is unknown")) % view).str());
-
-
     if (event_it != m_eventViewList.end())
         event_it->second.addObservable(simulator->dynamics().get(),
                                        portname, m_currentTime);
-    else
+    else if (timed_it != m_timedViewList.end())
         timed_it->second.addObservable(simulator->dynamics().get(),
                                        portname, m_currentTime);
 }
@@ -448,29 +442,32 @@ void Coordinator::buildViews()
     const vpz::ViewList& viewlist(views.viewlist());
 
     for (const auto & elem : viewlist) {
-        auto file = utils::format("%s_%s",
-                                  m_modelFactory.experiment().name().c_str(),
-                                  elem.first.c_str());
+        if (elem.second.is_enable()) {
+            auto file = utils::format(
+                "%s_%s",
+                m_modelFactory.experiment().name().c_str(),
+                elem.first.c_str());
 
-        const auto& output = outs.get(elem.second.output());
+            const auto& output = outs.get(elem.second.output());
 
-        if (elem.second.type() == vpz::View::TIMED) {
-            View& v = m_timedViewList[elem.second.name()];
+            if (elem.second.type() == vpz::View::TIMED) {
+                View& v = m_timedViewList[elem.second.name()];
 
-            v.open(m_context, elem.second.name(), output.plugin(),
-                   output.package(), output.location(), file,
-                   m_currentTime,
-                   (output.data()) ? output.data()->clone() : nullptr);
+                v.open(m_context, elem.second.name(), output.plugin(),
+                       output.package(), output.location(), file,
+                       m_currentTime,
+                       (output.data()) ? output.data()->clone() : nullptr);
 
-            m_timed_observation_scheduler.add(&v, m_currentTime,
-                                              elem.second.timestep());
-        } else {
-            auto& v = m_eventViewList[elem.second.name()];
+                m_timed_observation_scheduler.add(&v, m_currentTime,
+                                                  elem.second.timestep());
+            } else {
+                auto& v = m_eventViewList[elem.second.name()];
 
-            v.open(m_context, elem.second.name(), output.plugin(),
-                   output.package(), output.location(), file,
-                   m_currentTime,
-                   (output.data()) ? output.data()->clone() : nullptr);
+                v.open(m_context, elem.second.name(), output.plugin(),
+                       output.package(), output.location(), file,
+                       m_currentTime,
+                       (output.data()) ? output.data()->clone() : nullptr);
+            }
         }
     }
 }

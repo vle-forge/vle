@@ -619,3 +619,181 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
 
     root.finish();
 }
+
+BOOST_AUTO_TEST_CASE(test_observation_event_disabled)
+{
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz vpz;
+
+    vpz.project().experiment().setDuration(100.0);
+    vpz.project().experiment().setBegin(0.0);
+
+    vpz.project().experiment().views().addStreamOutput(
+        "output", "toto", "make_oovplugin_default", "");
+
+    auto& v = vpz.project().experiment().views().add(
+        vpz::View("The_view",
+                  vle::vpz::View::Type::FINISH |
+                  vle::vpz::View::Type::INTERNAL |
+                  vle::vpz::View::Type::EXTERNAL |
+                  vle::vpz::View::Type::CONFLUENT |
+                  vle::vpz::View::Type::OUTPUT,
+                  "output"));
+
+    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+        vpz::Observable("obs"));
+    vpz::ObservablePort& port = obs.add("port");
+    port.add("The_view");
+
+    {
+        auto x = vpz.project().dynamics().dynamiclist().emplace(
+            "dyn_1", vpz::Dynamic("dyn_1"));
+        BOOST_REQUIRE(x.second == true);
+        x.first->second.setLibrary("make_new_observation_model");
+    }
+
+    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
+    auto *atom = depth0->addAtomicModel("ObservationModel");
+    atom->setDynamics("dyn_1");
+    atom->addOutputPort("out");
+    atom->setObservables("obs");
+
+    vpz.project().model().setModel(depth0);
+
+    {
+        vpz::Vpz copy(vpz);
+        devs::RootCoordinator root(ctx);
+        root.load(copy);
+        copy.clear();
+        root.init();
+
+        while (root.run());
+
+        std::unique_ptr<value::Map> out = root.outputs();
+
+        BOOST_REQUIRE(out);
+
+        root.finish();
+    }
+
+    v.disable();
+
+    {
+        vpz::Vpz copy(vpz);
+        devs::RootCoordinator root(ctx);
+        root.load(copy);
+        copy.clear();
+        root.init();
+
+        while (root.run());
+
+        std::unique_ptr<value::Map> out = root.outputs();
+        BOOST_REQUIRE(out == nullptr);
+
+        root.finish();
+    }
+
+    v.enable();
+
+    {
+        vpz::Vpz copy(vpz);
+        devs::RootCoordinator root(ctx);
+        root.load(copy);
+        copy.clear();
+        root.init();
+
+        while (root.run());
+
+        std::unique_ptr<value::Map> out = root.outputs();
+        BOOST_REQUIRE(out);
+
+        root.finish();
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_observation_timed_disabled)
+{
+    auto ctx = vle::utils::make_context();
+    vpz::Vpz vpz;
+
+    vpz.project().experiment().setDuration(100.0);
+    vpz.project().experiment().setBegin(0.0);
+
+    vpz.project().experiment().views().addStreamOutput(
+        "output", "toto", "make_oovplugin_default", "");
+
+    auto& v = vpz.project().experiment().views().add(
+        vpz::View("The_view",
+                  vle::vpz::View::Type::TIMED,
+                  "output", 1.0));
+
+    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+        vpz::Observable("obs"));
+    vpz::ObservablePort& port = obs.add("port");
+    port.add("The_view");
+
+    {
+        auto x = vpz.project().dynamics().dynamiclist().emplace(
+            "dyn_1", vpz::Dynamic("dyn_1"));
+        BOOST_REQUIRE(x.second == true);
+        x.first->second.setLibrary("make_new_observation_model");
+    }
+
+    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
+    auto *atom = depth0->addAtomicModel("ObservationModel");
+    atom->setDynamics("dyn_1");
+    atom->addOutputPort("out");
+    atom->setObservables("obs");
+
+    vpz.project().model().setModel(depth0);
+
+    {
+        vpz::Vpz copy(vpz);
+        devs::RootCoordinator root(ctx);
+        root.load(copy);
+        copy.clear();
+        root.init();
+
+        while (root.run());
+
+        std::unique_ptr<value::Map> out = root.outputs();
+
+        BOOST_REQUIRE(out);
+
+        root.finish();
+    }
+
+    v.disable();
+
+    {
+        vpz::Vpz copy(vpz);
+        devs::RootCoordinator root(ctx);
+        root.load(copy);
+        copy.clear();
+        root.init();
+
+        while (root.run());
+
+        std::unique_ptr<value::Map> out = root.outputs();
+        BOOST_REQUIRE(out == nullptr);
+
+        root.finish();
+    }
+
+    v.enable();
+
+    {
+        vpz::Vpz copy(vpz);
+        devs::RootCoordinator root(ctx);
+        root.load(copy);
+        copy.clear();
+        root.init();
+
+        while (root.run());
+
+        std::unique_ptr<value::Map> out = root.outputs();
+        BOOST_REQUIRE(out);
+
+        root.finish();
+    }
+}

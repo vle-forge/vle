@@ -202,7 +202,7 @@ bool haveEventView(const vpz::Views& views,
         const auto& viewnamelist(elem.second.viewnamelist());
         for (const auto& viewname: viewnamelist) {
             const auto& view = views.get(viewname);
-            if (not (view.type() & vpz::View::TIMED))
+            if (view.is_enable() and not (view.type() & vpz::View::TIMED))
                 return true;
         }
     }
@@ -227,11 +227,11 @@ void assignEventView(
             if (v.type() == vpz::View::TIMED)
                 continue;
 
-            auto& vv = views.at(viewname);
-    // for (auto& viewpair : views) {
-    //     if (not viewpair.second.exist(dynamics.get(), observable)) {
+            auto it = views.find(viewname);
+            if (it == views.end())
+                continue;
 
-            // const auto &v = vpzviews.get(viewpair.first);
+            auto& vv = it->second;
             if (v.type() & vpz::View::OUTPUT)
                 dynamics->ppOutput.emplace_back(&vv, elem.first);
 

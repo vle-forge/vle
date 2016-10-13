@@ -96,6 +96,11 @@ attribute in the `View` element of the VPZ. Type can be:
 - `confluent`: View::CONFLUENT;
 - `finish`: View::FINISH;
 
+Finally, an observation View can be enable or disable in GVLE and in R, python
+package. This feature can be useful to add debug observation mode without cost
+to simulation kernel. In previous VLE version, the output plug-in Dummy was
+used.
+
 ### Model in executable
 
 From now, ModelFactory and StreamWriter can load symbol into the main
