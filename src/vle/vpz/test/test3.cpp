@@ -92,9 +92,6 @@ BOOST_AUTO_TEST_CASE(atomicmodel_timed_vpz)
 
     BOOST_REQUIRE(v.type() == vle::vpz::View::TIMED);
     BOOST_REQUIRE(v.timestep() == 1.0);
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(atomicmodel_vpz_event_output)
@@ -134,16 +131,13 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_event_output)
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
-    
+
     const auto& v = vpz.project().experiment().views().get("view");
 
     auto c = vle::vpz::View::INTERNAL | vle::vpz::View::CONFLUENT
         | vle::vpz::View::EXTERNAL | vle::vpz::View::OUTPUT;
-    
-    BOOST_REQUIRE(v.type() == c);
 
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
+    BOOST_REQUIRE(v.type() == c);
 }
 
 BOOST_AUTO_TEST_CASE(atomicmodel_vpz_internal_output)
@@ -183,15 +177,12 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_internal_output)
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
-    
+
     const auto& v = vpz.project().experiment().views().get("view");
 
     auto c = vle::vpz::View::INTERNAL |  vle::vpz::View::OUTPUT;
-    
-    BOOST_REQUIRE(v.type() == c);
 
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
+    BOOST_REQUIRE(v.type() == c);
 }
 
 BOOST_AUTO_TEST_CASE(atomicmodel_vpz_confluent)
@@ -235,11 +226,8 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_confluent)
     const auto& v = vpz.project().experiment().views().get("view");
 
     auto c = vle::vpz::View::CONFLUENT;
-    
-    BOOST_REQUIRE(v.type() == c);
 
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
+    BOOST_REQUIRE(v.type() == c);
 }
 
 BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw1)
@@ -279,9 +267,6 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw1)
 
     vpz::Vpz vpz;
     BOOST_REQUIRE_THROW(vpz.parseMemory(xml), std::exception);
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw2)
@@ -321,7 +306,4 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw2)
 
     vpz::Vpz vpz;
     BOOST_REQUIRE_THROW(vpz.parseMemory(xml), std::exception);
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
 }

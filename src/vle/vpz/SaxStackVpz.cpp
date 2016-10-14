@@ -132,7 +132,8 @@ void SaxStackVpz::pushModel(const xmlChar** att)
     if (parent()->isSubmodels()) {
         vpz::Base* sub = pop();
         vpz::Model* tmp = static_cast < vpz::Model* >(parent());
-        cplparent = static_cast < vpz::CoupledModel* >(tmp->model());
+        assert(tmp->node());
+        cplparent = tmp->node()->toCoupled();
         push(sub);
     }
 
@@ -207,8 +208,6 @@ void SaxStackVpz::pushModel(const xmlChar** att)
             (fmt(_("Unknow model type %1%")) % (const char*)type).str());
     }
 
-    auto  mdl = new vpz::Model();
-    mdl->setModel(gmdl);
     buildModelGraphics(gmdl,
                        x ? xmlCharToString(x) : "",
                        y ? xmlCharToString(y) : "",
@@ -216,10 +215,15 @@ void SaxStackVpz::pushModel(const xmlChar** att)
                        height ? xmlCharToString(height) : "");
 
     if (parent()->isStructures()) {
-        vpz().project().model().setModel(gmdl);
+        vpz().project().model().setGraph(
+            std::unique_ptr<BaseModel>(gmdl));
     } else if (parent()->isClass()) {
-        reinterpret_cast < Class* >(parent())->setModel(gmdl);
+        reinterpret_cast < Class* >(parent())->setGraph(
+            std::unique_ptr<BaseModel>(gmdl));
     }
+
+    auto  mdl = new vpz::Model();
+    mdl->setNode(gmdl);
 
     push(mdl);
 }
@@ -275,7 +279,11 @@ void SaxStackVpz::pushPort(const xmlChar** att)
         }
 
         vpz::Model* mdl = static_cast < vpz::Model* >(parent());
-        vpz::BaseModel* gmdl = mdl->model();
+        vpz::BaseModel* gmdl = nullptr;
+
+        if (mdl->node())
+            gmdl = mdl->node();
+
         std::string name;
 
         for (int i = 0; att[i] != nullptr; i += 2) {
@@ -461,10 +469,9 @@ void SaxStackVpz::buildConnection()
     if (not parent()->isModel()) {
         throw utils::SaxParserError(_("Bad file format"));
     }
-    vpz::Model* model = static_cast < vpz::Model* >(parent());
 
-    vpz::CoupledModel* cpl = static_cast < vpz::CoupledModel*
-        >(model->model());
+    vpz::Model* model = static_cast < vpz::Model* >(parent());
+    vpz::CoupledModel* cpl = model->node()->toCoupled();
 
     if (cnt->isInternalConnection()) {
         cpl->addInternalConnection(orig->model, orig->port, dest->model,

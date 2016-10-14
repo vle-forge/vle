@@ -27,70 +27,121 @@
 
 #include <vle/vpz/Class.hpp>
 #include <vle/vpz/AtomicModel.hpp>
+#include <cassert>
 
 namespace vle { namespace vpz {
 
-Class::Class(const Class& cls) :
-    Base(cls),
-    m_name(cls.m_name)
+Class::Class(const std::string& name)
+    : Base()
+    , m_name(name)
+    , m_node(nullptr)
+{}
+
+Class::Class(const Class& cls)
+    : Base(cls)
+    , m_name(cls.m_name)
+    , m_node(nullptr)
 {
-    if (cls.m_model == nullptr) {
-        m_model = nullptr;
-    } else {
-        m_model = cls.m_model->clone();
-    }
+    if (cls.m_graph) {
+        m_graph = std::unique_ptr<BaseModel>(cls.m_graph->clone());
+        m_node = m_graph.get();
+    } else if (cls.m_node)
+        m_node = m_node->clone();
 }
 
-Class::~Class()
-{
-    delete m_model;
-}
+Class::~Class() = default;
 
 void Class::write(std::ostream& out) const
 {
-    out << "<class name=\"" << m_name.c_str() << "\" >\n";
-    m_model->write(out);
-    out << "</class>\n";
+    if (m_graph) {
+        out << "<class name=\"" << m_name.c_str() << "\" >\n";
+        m_graph->write(out);
+        out << "</class>\n";
+    }
+}
+
+void Class::setGraph(std::unique_ptr<BaseModel> graph)
+{
+    assert(m_graph.get() == m_node and
+            "Can not assign vpz.project.model with a node");
+
+    m_graph = std::move(graph);
+    m_node = m_graph.get();
+}
+
+std::unique_ptr<BaseModel> Class::graph()
+{
+    assert(m_graph.get() == m_node and
+            "Can not assign vpz.project.model with a node");
+
+    m_node = nullptr;
+    return std::move(m_graph);
+}
+
+void Class::setNode(BaseModel* mdl)
+{
+    assert(not m_graph && "Can not use setNode with vpz.project.model");
+
+    m_node = mdl;
+}
+
+BaseModel* Class::node()
+{
+    return m_node;
+}
+
+BaseModel* Class::node() const
+{
+    return m_node;
 }
 
 void Class::updateDynamics(const std::string& oldname,
                            const std::string& newname)
 {
-    m_model->updateDynamics(oldname,newname);
+    assert(not m_node && "Can not get node with a vpz.project.class");
+
+    m_graph->updateDynamics(oldname,newname);
 }
 
 void Class::purgeDynamics(const std::set < std::string >& dynamicslist)
 {
-    m_model->purgeDynamics(dynamicslist);
+    assert(not m_node && "Can not get node with a vpz.project.class");
+
+    m_graph->purgeDynamics(dynamicslist);
 }
 
 void Class::updateObservable(const std::string& oldname,
                              const std::string& newname)
 {
-    m_model->updateObservable(oldname, newname);
+    assert(not m_node && "Can not get node with a vpz.project.class");
+    m_graph->updateObservable(oldname, newname);
 }
 
 void Class::purgeObservable(const std::set < std::string >& observablelist)
 {
-    m_model->purgeObservable(observablelist);
+    assert(not m_node && "Can not get node with a vpz.project.class");
+    m_graph->purgeObservable(observablelist);
 }
 
 void Class::updateConditions(const std::string& oldname,
                              const std::string& newname)
 {
-    m_model->updateConditions(oldname, newname);
+    assert(not m_node && "Can not get node with a vpz.project.class");
+    m_graph->updateConditions(oldname, newname);
 }
 
 void Class::purgeConditions(const std::set < std::string >& conditionlist)
 {
-    m_model->purgeConditions(conditionlist);
+    assert(not m_node && "Can not get node with a vpz.project.class");
+    m_graph->purgeConditions(conditionlist);
 }
 
 void Class::getAtomicModelList(std::vector < AtomicModel* >& list) const
 {
-    list.clear();
+    assert(not m_node && "Can not get node with a vpz.project.class");
 
-    m_model->getAtomicModelList(m_model, list);
+    list.clear();
+    m_graph->getAtomicModelList(m_graph.get(), list);
 }
 
 }} // namespace vle vpz

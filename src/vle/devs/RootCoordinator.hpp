@@ -74,7 +74,7 @@ public:
      * reference and intitialise the simulation time.
      * @param vp a reference to a structure.
      */
-    void load(const vpz::Vpz& vp);
+    void load(vpz::Vpz& vp);
 
     /**
      * @brief Initialise RootCoordinator and his Coordinator: initiale time

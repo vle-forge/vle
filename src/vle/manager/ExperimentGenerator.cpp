@@ -123,11 +123,6 @@ public:
         computeRange();
     }
 
-    ~Pimpl()
-    {
-        delete mVpz.project().model().model();
-    }
-
     void get(uint32_t index, vpz::Conditions *conditions)
     {
         const vpz::Conditions& cnds(mVpz.project().experiment().conditions());

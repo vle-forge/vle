@@ -43,7 +43,7 @@ RootCoordinator::RootCoordinator(utils::ContextPtr context)
 
 RootCoordinator::~RootCoordinator() = default;
 
-void RootCoordinator::load(const vpz::Vpz& io)
+void RootCoordinator::load(vpz::Vpz& io)
 {
     m_begin = io.project().experiment().begin();
     m_end = m_begin + io.project().experiment().duration();
@@ -56,7 +56,7 @@ void RootCoordinator::load(const vpz::Vpz& io)
 
     m_coordinator->init(io.project().model(), m_currentTime, m_end);
 
-    m_root.reset(io.project().model().model());
+    m_root = std::move(io.project().model().graph());
 }
 
 void RootCoordinator::init()

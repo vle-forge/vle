@@ -69,6 +69,7 @@ void Vpz::write(std::ostream& out) const
 
 void Vpz::parseFile(const std::string& filename)
 {
+    clear();
     project().experiment().conditions().deleteValueSet();
     m_filename.assign(filename);
     vpz::SaxParser saxparser(*this);
@@ -95,6 +96,7 @@ void Vpz::parseFile(const std::string& filename)
 
 void Vpz::parseMemory(const std::string& buffer)
 {
+    clear();
     project().experiment().conditions().deleteValueSet();
     m_filename.clear();
 

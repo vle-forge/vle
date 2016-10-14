@@ -544,16 +544,13 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
     exe->addOutputPort("out");
     exe->setObservables("obs");
 
-    vpz.project().model().setModel(depth0);
+    vpz.project().model().setGraph(std::unique_ptr<vpz::BaseModel>(depth0));
 
     devs::RootCoordinator root(ctx);
     root.load(vpz);
     vpz.clear();
-
     root.init();
-
     while (root.run());
-
     root.finish();
 }
 
@@ -595,14 +592,12 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
     atom->addOutputPort("out");
     atom->setObservables("obs");
 
-    vpz.project().model().setModel(depth0);
+    vpz.project().model().setGraph(std::unique_ptr<vpz::BaseModel>(depth0));
 
     devs::RootCoordinator root(ctx);
     root.load(vpz);
     vpz.clear();
-
     root.init();
-
     while (root.run());
     std::unique_ptr<value::Map> out = root.outputs();
 
@@ -658,7 +653,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event_disabled)
     atom->addOutputPort("out");
     atom->setObservables("obs");
 
-    vpz.project().model().setModel(depth0);
+    vpz.project().model().setGraph(std::unique_ptr<vpz::BaseModel>(depth0));
 
     {
         vpz::Vpz copy(vpz);
@@ -745,7 +740,7 @@ BOOST_AUTO_TEST_CASE(test_observation_timed_disabled)
     atom->addOutputPort("out");
     atom->setObservables("obs");
 
-    vpz.project().model().setModel(depth0);
+    vpz.project().model().setGraph(std::unique_ptr<vpz::BaseModel>(depth0));
 
     {
         vpz::Vpz copy(vpz);

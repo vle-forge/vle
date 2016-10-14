@@ -62,7 +62,7 @@ void check_remove_dyns_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(not project.dynamics().exist("new_unittest"));
 
-    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
     vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set < std::string > dynamics = dyns.getKeys();
@@ -87,7 +87,7 @@ void check_rename_dyns_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(project.dynamics().exist("new_unittest"));
 
-    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
 
     BOOST_REQUIRE_NO_THROW(top->updateDynamics("unittest", "new_unittest"));
 
@@ -104,7 +104,7 @@ void check_remove_conds_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(not cnds.exist("cd"));
 
-    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
 
     std::set < std::string > conditions = cnds.getKeys();
 
@@ -143,7 +143,7 @@ void check_rename_conds_unittest_vpz(vpz::Project& project)
     BOOST_CHECK(not project.experiment().conditions().exist("cc"));
     BOOST_CHECK(not project.experiment().conditions().exist("cd"));
 
-    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
 
     BOOST_REQUIRE_NO_THROW(top->updateConditions("cd", "new_cd"));
 
@@ -189,7 +189,7 @@ void check_remove_obs_unittest_vpz(vpz::Project& project)
 
     BOOST_REQUIRE(not obs_list.exist("obs1"));
 
-    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
     vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set < std::string > obs = obs_list.getKeys();
@@ -219,7 +219,7 @@ void check_rename_observables_unittest_vpz(vpz::Project& project)
     BOOST_REQUIRE(not obs_list.exist("obs1"));
     BOOST_REQUIRE(not obs_list.exist("obs2"));
 
-    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().model());
+    vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
     vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     BOOST_REQUIRE_NO_THROW(top->updateObservable("obs2", "new_obs2"));
@@ -235,10 +235,10 @@ void check_rename_observables_unittest_vpz(vpz::Project& project)
 
 void check_model_unittest_vpz(const vpz::Model& model)
 {
-    BOOST_REQUIRE(model.model());
-    BOOST_REQUIRE(model.model()->isCoupled());
+    BOOST_REQUIRE(model.node());
+    BOOST_REQUIRE(model.node()->isCoupled());
 
-    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.model());
+    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.node());
     BOOST_REQUIRE_EQUAL(cpled->getName(), "top");
     BOOST_REQUIRE(cpled->exist("top1"));
     BOOST_REQUIRE(cpled->findModel("top1")->isCoupled());
@@ -425,10 +425,10 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
     BOOST_REQUIRE(cls.exist("beepbeep"));
     {
         const vpz::Class& c(cls.get("beepbeep"));
-        BOOST_REQUIRE(c.model());
-        BOOST_REQUIRE(c.model()->isCoupled());
-        BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
+        BOOST_REQUIRE(c.node());
+        BOOST_REQUIRE(c.node()->isCoupled());
+        BOOST_REQUIRE_EQUAL(c.node()->getName(), "top");
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
 
         ptr1 = cpled;
 
@@ -446,10 +446,10 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
     BOOST_REQUIRE(cls.exist("beepbeepbeep"));
     {
         const vpz::Class& c(cls.get("beepbeepbeep"));
-        BOOST_REQUIRE(c.model());
-        BOOST_REQUIRE(c.model()->isCoupled());
-        BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
+        BOOST_REQUIRE(c.node());
+        BOOST_REQUIRE(c.node()->isCoupled());
+        BOOST_REQUIRE_EQUAL(c.node()->getName(), "top");
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
 
         ptr2 = cpled;
 
@@ -487,10 +487,10 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
     BOOST_REQUIRE(cls.exist("newbeepbeep"));
     {
         const vpz::Class& c(cls.get("newbeepbeep"));
-        BOOST_REQUIRE(c.model());
-        BOOST_REQUIRE(c.model()->isCoupled());
-        BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
+        BOOST_REQUIRE(c.node());
+        BOOST_REQUIRE(c.node()->isCoupled());
+        BOOST_REQUIRE_EQUAL(c.node()->getName(), "top");
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
 
         BOOST_REQUIRE(ptr1 != cpled);
 
@@ -508,10 +508,10 @@ void check_classes_unittest_vpz(vpz::Classes& cls)
     BOOST_REQUIRE(cls.exist("newbeepbeepbeep"));
     {
         const vpz::Class& c(cls.get("newbeepbeepbeep"));
-        BOOST_REQUIRE(c.model());
-        BOOST_REQUIRE(c.model()->isCoupled());
-        BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.model());
+        BOOST_REQUIRE(c.node());
+        BOOST_REQUIRE(c.node()->isCoupled());
+        BOOST_REQUIRE_EQUAL(c.node()->getName(), "top");
+        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
 
         BOOST_REQUIRE(ptr2 != cpled);
 
@@ -636,11 +636,10 @@ BOOST_AUTO_TEST_CASE(test_remove_dyns)
 
     std::string str(vpz.writeToString());
 
-    delete vpz.project().model().model();
-    vpz.clear();
-
     vpz.parseMemory(str);
-    delete vpz.project().model().model();
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_dyns)
@@ -656,11 +655,9 @@ BOOST_AUTO_TEST_CASE(test_rename_dyns)
     check_rename_dyns_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
-    delete vpz.project().model().model();
-    vpz.clear();
-
     vpz.parseMemory(str);
-    delete vpz.project().model().model();
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 }
 
 BOOST_AUTO_TEST_CASE(test_remove_conds)
@@ -676,11 +673,9 @@ BOOST_AUTO_TEST_CASE(test_remove_conds)
     check_remove_conds_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
-    delete vpz.project().model().model();
-    vpz.clear();
-
     vpz.parseMemory(str);
-    delete vpz.project().model().model();
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_conds)
@@ -696,11 +691,9 @@ BOOST_AUTO_TEST_CASE(test_rename_conds)
     check_rename_conds_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
-    delete vpz.project().model().model();
-    vpz.clear();
-
     vpz.parseMemory(str);
-    delete vpz.project().model().model();
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_views)
@@ -714,8 +707,6 @@ BOOST_AUTO_TEST_CASE(test_rename_views)
 
     vpz::Views& views(vpz.project().experiment().views());
     check_rename_views_unittest_vpz(views);
-
-    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_remove_observables)
@@ -731,11 +722,9 @@ BOOST_AUTO_TEST_CASE(test_remove_observables)
     check_remove_obs_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
-    delete vpz.project().model().model();
-    vpz.clear();
-
     vpz.parseMemory(str);
-    delete vpz.project().model().model();
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_observables)
@@ -751,11 +740,9 @@ BOOST_AUTO_TEST_CASE(test_rename_observables)
     check_rename_observables_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
-    delete vpz.project().model().model();
-    vpz.clear();
-
     vpz.parseMemory(str);
-    delete vpz.project().model().model();
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 }
 
 
@@ -766,10 +753,10 @@ BOOST_AUTO_TEST_CASE(test_connection)
     vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
 
     const vpz::Model& model(vpz.project().model());
-    BOOST_REQUIRE(model.model());
-    BOOST_REQUIRE(model.model()->isCoupled());
+    BOOST_REQUIRE(model.node());
+    BOOST_REQUIRE(model.node()->isCoupled());
 
-    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.model());
+    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.node());
     BOOST_REQUIRE_EQUAL(cpled->getName(), "top");
     BOOST_REQUIRE(cpled->exist("top1"));
     BOOST_REQUIRE(cpled->exist("top2"));
@@ -783,8 +770,6 @@ BOOST_AUTO_TEST_CASE(test_connection)
     x->getAtomicModelsTarget("out", out);
 
     BOOST_REQUIRE_EQUAL(out.size(), (vpz::ModelPortList::size_type)10);
-
-    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_read_write_read)
@@ -793,27 +778,22 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
     vpz::Vpz vpz;
     vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
-    delete vpz.project().model().model();
+
     vpz.clear();
     vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
-    delete vpz.project().model().model();
     vpz.clear();
     vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
-    delete vpz.project().model().model();
     vpz.clear();
 
     vpz.parseFile(ctx->getTemplate("unittest.vpz").string());
     check_unittest_vpz(vpz);
 
     std::string str(vpz.writeToString());
-    delete vpz.project().model().model();
-    vpz.clear();
 
     vpz.parseMemory(str);
     check_unittest_vpz(vpz);
-    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_read_write_read2)
@@ -825,9 +805,6 @@ BOOST_AUTO_TEST_CASE(test_read_write_read2)
 
     check_unittest_vpz(vpz);
     check_unittest_vpz(vpz2);
-
-    delete vpz.project().model().model();
-    delete vpz2.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_copy_del_views)
@@ -841,8 +818,6 @@ BOOST_AUTO_TEST_CASE(test_copy_del_views)
 
     vpz::Views& views(vpz.project().experiment().views());
     check_copy_views_unittest_vpz(views);
-
-    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_equal_dynamics)
@@ -856,7 +831,6 @@ BOOST_AUTO_TEST_CASE(test_equal_dynamics)
 
     vpz::Dynamics& dynamics(vpz.project().dynamics());
     check_equal_dynamics_unittest_vpz(dynamics);
-    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_equal_outputs)
@@ -870,7 +844,6 @@ BOOST_AUTO_TEST_CASE(test_equal_outputs)
 
     vpz::Outputs& outputs(vpz.project().experiment().views().outputs());
     check_equal_outputs_unittest_vpz(outputs);
-    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_equal_views)
@@ -884,5 +857,4 @@ BOOST_AUTO_TEST_CASE(test_equal_views)
 
     vpz::Views& views(vpz.project().experiment().views());
     check_equal_views_unittest_vpz(views);
-    delete vpz.project().model().model();
 }

@@ -85,17 +85,14 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
     BOOST_REQUIRE_EQUAL(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
 
     const vpz::Model& mdl = vpz.project().model();
-    BOOST_REQUIRE(mdl.model() != nullptr);
-    BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
-    BOOST_REQUIRE_EQUAL(mdl.model()->getInputPortNumber(), 2);
-    BOOST_REQUIRE_EQUAL(mdl.model()->getOutputPortNumber(), 2);
-    BOOST_REQUIRE(mdl.model()->existInputPort("in1") != 0);
-    BOOST_REQUIRE(mdl.model()->existInputPort("in2") != 0);
-    BOOST_REQUIRE(mdl.model()->existOutputPort("out1") != 0);
-    BOOST_REQUIRE(mdl.model()->existOutputPort("out2") != 0);
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
+    BOOST_REQUIRE(mdl.node() != nullptr);
+    BOOST_REQUIRE_EQUAL(mdl.node()->isAtomic(), true);
+    BOOST_REQUIRE_EQUAL(mdl.node()->getInputPortNumber(), 2);
+    BOOST_REQUIRE_EQUAL(mdl.node()->getOutputPortNumber(), 2);
+    BOOST_REQUIRE(mdl.node()->existInputPort("in1") != 0);
+    BOOST_REQUIRE(mdl.node()->existInputPort("in2") != 0);
+    BOOST_REQUIRE(mdl.node()->existOutputPort("out1") != 0);
+    BOOST_REQUIRE(mdl.node()->existOutputPort("out2") != 0);
 }
 
 BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
@@ -142,11 +139,10 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
-    BOOST_REQUIRE(mdl.model() != nullptr);
-    BOOST_REQUIRE_EQUAL(mdl.model()->isCoupled(), true);
+    BOOST_REQUIRE(mdl.node() != nullptr);
+    BOOST_REQUIRE_EQUAL(mdl.node()->isCoupled(), true);
 
-    vpz::CoupledModel* cpl = dynamic_cast < vpz::CoupledModel*
-        >(mdl.model());
+    vpz::CoupledModel* cpl = mdl.node()->toCoupled();
     BOOST_REQUIRE(cpl != nullptr);
     BOOST_REQUIRE(cpl->existOutputPort("o") != 0);
     BOOST_REQUIRE(cpl->existInputPort("i") != 0);
@@ -168,9 +164,6 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     BOOST_REQUIRE(cpl->existInputConnection("i", "atom1", "in"));
     BOOST_REQUIRE(cpl->existOutputConnection("atom2", "out", "o"));
     BOOST_REQUIRE(cpl->existInternalConnection("atom1", "out", "atom2", "in"));
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(dynamic_vpz)
@@ -193,16 +186,11 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
     vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
-    BOOST_REQUIRE(mdl.model() != nullptr);
-    BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
-
-    vpz::AtomicModel* atom(
-        reinterpret_cast < vpz::AtomicModel* >(mdl.model()));
+    BOOST_REQUIRE(mdl.node() != nullptr);
+    BOOST_REQUIRE_EQUAL(mdl.node()->isAtomic(), true);
+    vpz::AtomicModel* atom = mdl.node()->toAtomic();
 
     BOOST_REQUIRE(atom);
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(experiment_vpz)
@@ -333,9 +321,6 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         }
 
     }
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
@@ -455,7 +440,4 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         BOOST_REQUIRE_EQUAL(view.timestep(), .05);
         BOOST_REQUIRE_EQUAL(view.output(), "y");
     }
-
-    delete vpz.project().model().model();
-    vpz.project().model().clear();
 }

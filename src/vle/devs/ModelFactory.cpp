@@ -113,7 +113,7 @@ void ModelFactory::createModels(Coordinator& coordinator,
                                 const vpz::Model& model)
 {
     vpz::AtomicModelVector atomicmodellist;
-    vpz::BaseModel* mdl = model.model();
+    vpz::BaseModel* mdl = model.node();
 
     if (mdl) {
         if (mdl->isAtomic()) {
@@ -138,7 +138,7 @@ vpz::BaseModel* ModelFactory::createModelFromClass(Coordinator& coordinator,
                                                  const std::string& modelname)
 {
     vpz::Class& classe(mClasses.get(classname));
-    vpz::BaseModel* mdl(classe.model()->clone());
+    vpz::BaseModel* mdl(classe.node()->clone());
     vpz::AtomicModelVector atomicmodellist;
     vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
     parent->addModel(mdl, modelname);

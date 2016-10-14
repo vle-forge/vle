@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(test_rename_model)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
-        dynamic_cast<CoupledModel*>(file.project().model().model());
+        dynamic_cast<CoupledModel*>(file.project().model().node());
     BOOST_REQUIRE(top);
     BOOST_REQUIRE_NO_THROW(vpz::BaseModel::rename(top, "new_top"));
 
@@ -72,39 +72,33 @@ BOOST_AUTO_TEST_CASE(test_rename_model)
     CoupledModel * top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     BOOST_REQUIRE_THROW(vpz::BaseModel::rename(top1, "top2"), utils::DevsGraphError);
     BOOST_REQUIRE_NO_THROW(vpz::BaseModel::rename(top1, "new_top1"));
-
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_findModelFromPath)
 {
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
-    BaseModel* d = file.project().model().model()->findModelFromPath("d");
+    BaseModel* d = file.project().model().node()->findModelFromPath("d");
     bool found = (d != nullptr);
 
     BOOST_REQUIRE_EQUAL(found, true);
-    BaseModel* top1 = file.project().model().model()->findModelFromPath("top1");
+    BaseModel* top1 = file.project().model().node()->findModelFromPath("top1");
     found = (top1 != nullptr);
     BOOST_REQUIRE_EQUAL(found, true);
-    BaseModel* top2_g = file.project().model().model()->findModelFromPath("top2,g");
+    BaseModel* top2_g = file.project().model().node()->findModelFromPath("top2,g");
     found = (top2_g != nullptr);
     BOOST_REQUIRE_EQUAL(found, true);
     BaseModel* nomodel =
-        file.project().model().model()->findModelFromPath("nomodel");
+        file.project().model().node()->findModelFromPath("nomodel");
     found = (nomodel != nullptr);
     BOOST_REQUIRE_EQUAL(found, false);
-    BaseModel* empty = file.project().model().model()->findModelFromPath("");
+    BaseModel* empty = file.project().model().node()->findModelFromPath("");
     found = (empty != nullptr);
     BOOST_REQUIRE_EQUAL(found, false);
     BaseModel* top1_a_nomodel =
-        file.project().model().model()->findModelFromPath("top1,a,nomodel");
+        file.project().model().node()->findModelFromPath("top1,a,nomodel");
     found = (top1_a_nomodel != nullptr);
     BOOST_REQUIRE_EQUAL(found, false);
-
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_del_all_connection)
@@ -288,7 +282,7 @@ BOOST_AUTO_TEST_CASE(test_del_port)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
-        dynamic_cast<CoupledModel*>(file.project().model().model());
+        dynamic_cast<CoupledModel*>(file.project().model().node());
     BOOST_REQUIRE(top);
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "top2",
                                                      "in"), true);
@@ -345,9 +339,6 @@ BOOST_AUTO_TEST_CASE(test_del_port)
                                                      "in2"), false);
     BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "out"),
                         false);
-
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_clone1)
@@ -405,7 +396,7 @@ BOOST_AUTO_TEST_CASE(test_clone2)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* oldtop = dynamic_cast < CoupledModel* >(
-        file.project().model().model());
+        file.project().model().node());
     BOOST_REQUIRE(oldtop);
 
     CoupledModel* top = dynamic_cast < CoupledModel* >(oldtop->clone());
@@ -423,7 +414,6 @@ BOOST_AUTO_TEST_CASE(test_clone2)
     BOOST_REQUIRE(g);
 
     delete top;
-    delete file.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
@@ -434,9 +424,9 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
     vpz::Vpz file2(file1);
 
     CoupledModel* top1 = dynamic_cast < CoupledModel*
-        >(file1.project().model().model());
+        >(file1.project().model().node());
     CoupledModel* top2 = dynamic_cast < CoupledModel*
-        >(file2.project().model().model());
+        >(file2.project().model().node());
 
     BOOST_REQUIRE(top1 and top2);
     BOOST_REQUIRE(top1 != top2);
@@ -456,9 +446,6 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
     it = std::search(list1.begin(), list1.end(), list2.begin(), list2.end());
 
     BOOST_REQUIRE(it == list1.end());
-
-    delete file1.project().model().model();
-    delete file2.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_get_port_index)
@@ -467,7 +454,7 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top = dynamic_cast < CoupledModel* >(
-        file.project().model().model());
+        file.project().model().node());
 
     BOOST_REQUIRE(top);
 
@@ -486,8 +473,6 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
     BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in2"), 1);
     BOOST_REQUIRE_EQUAL(e->getOutputPortList().size(),
                         (ConnectionList::size_type)1);
-
-    delete file.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_port)
@@ -496,7 +481,7 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
-        dynamic_cast<CoupledModel*>(file.project().model().model());
+        dynamic_cast<CoupledModel*>(file.project().model().node());
     BOOST_REQUIRE(top);
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "top2",
                                                      "in"), true);
@@ -570,9 +555,6 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
     BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "new_out"),
                         true);
     BOOST_REQUIRE_EQUAL(top1->nbOutputConnection("x", "out", "new_out"), 1);
-
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_bug_rename_port)
@@ -581,7 +563,7 @@ BOOST_AUTO_TEST_CASE(test_bug_rename_port)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
-        dynamic_cast<CoupledModel*>(file.project().model().model());
+        dynamic_cast<CoupledModel*>(file.project().model().node());
     BOOST_REQUIRE(top);
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "top2",
                                                      "in"), true);
@@ -609,8 +591,6 @@ BOOST_AUTO_TEST_CASE(test_bug_rename_port)
 
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
                                                      "in"), false);
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
@@ -619,7 +599,7 @@ BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
     CoupledModel* top =
-        dynamic_cast<CoupledModel*>(file.project().model().model());
+        dynamic_cast<CoupledModel*>(file.project().model().node());
     BOOST_REQUIRE(top);
 
     AtomicModel* atom1(top->addAtomicModel("atom1"));
@@ -647,8 +627,6 @@ BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
 
     top->displace(mSelectedModels, coupled);
     BOOST_REQUIRE_EQUAL(coupled->nbInternalConnection("atom1", "out", "atom2", "in"), 1);
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source)
@@ -656,7 +634,7 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
-    CoupledModel* top((file.project().model().model())->toCoupled());
+    CoupledModel* top((file.project().model().node())->toCoupled());
     BOOST_REQUIRE(top);
     AtomicModel* e(top->findModel("e")->toAtomic());
     BOOST_REQUIRE(e);
@@ -716,8 +694,6 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source)
     g->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
@@ -725,7 +701,7 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
-    CoupledModel* top((file.project().model().model())->toCoupled());
+    CoupledModel* top((file.project().model().node())->toCoupled());
     CoupledModel* top1(top->findModel("top1")->toCoupled());
     CoupledModel* top2(top->findModel("top2")->toCoupled());
 
@@ -777,9 +753,6 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
     g->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
-
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
@@ -787,15 +760,12 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
-    CoupledModel* top((file.project().model().model())->toCoupled());
+    CoupledModel* top((file.project().model().node())->toCoupled());
     CoupledModel* top2(top->findModel("top2")->toCoupled());
     vpz::ModelPortList result;
 
     top2->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
-
-    delete file.project().model().model();
-    file.project().model().clear();
 }
 
 BOOST_AUTO_TEST_CASE(test_name)
@@ -804,15 +774,12 @@ BOOST_AUTO_TEST_CASE(test_name)
     vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
     BaseModel *a, *b;
 
-    a = file.project().model().model()->findModelFromPath("top2,g");
-    b = file.project().model().model()->findModelFromPath("top1,x");
+    a = file.project().model().node()->findModelFromPath("top2,g");
+    b = file.project().model().node()->findModelFromPath("top1,x");
 
     BOOST_REQUIRE(a);
     BOOST_REQUIRE(b);
 
     BOOST_REQUIRE_EQUAL(a->getCompleteName(), "top,top2,g");
     BOOST_REQUIRE_EQUAL(b->getCompleteName(), "top,top1,x");
-
-    delete file.project().model().model();
-    file.project().model().clear();
 }

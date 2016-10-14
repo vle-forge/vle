@@ -241,9 +241,6 @@ public:
         for (uint32_t i = 0; i < threads; ++i)
             gp[i].join();
 
-        // TOO BAD
-        delete vpz->project().model().model();
-
         return result;
     }
 
@@ -305,9 +302,6 @@ public:
                 }
             }
         }
-
-        // TOO BAD
-        delete vpz->project().model().model();
 
         return result;
     }
