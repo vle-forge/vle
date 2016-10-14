@@ -115,18 +115,21 @@ void generate_template_line(std::ostream& header, std::ostream& firstline,
             }
             break;
         default:
-            fprintf(stderr, _("fail to read a value (only bool, integer, double"
-                " and string are available"));
+            fprintf(stderr, _("fail to read a value (only bool, integer,"
+                " double and string are available.\n"));
             break;
         }
     }
 }
 
-void generate_template(std::string file, std::string package, std::string exp) noexcept
+void
+generate_template(std::string file, std::string package,
+                  std::string exp) noexcept
 {
     std::ofstream ofs(file);
     if (not ofs.is_open()) {
-        fprintf(stderr, "Failed to open `%s' to generate template", file.c_str());
+        fprintf(stderr, "Failed to open `%s' to generate template\n",
+                file.c_str());
         return;
     }
 
@@ -720,7 +723,7 @@ int run_as_master(const std::string &inputfile,
         for (int child = 1; child < comm.size(); ++child)
             comm.send(child, worker_end_tag);
     } catch (const std::exception &e) {
-        std::cerr << "master fails: " << e.what() << std::endl;
+        std::fprintf(stderr, "master fails: %s\n", e.what());
         ret = EXIT_SUCCESS;
     }
 
@@ -760,7 +763,7 @@ int run_as_worker(const std::string& package,
             }
         }
     } catch (const std::exception &e) {
-        std::cerr << "worker fails: " << e.what() << std::endl;
+        std::fprintf(stderr, "worker fails: %s\n", e.what());
         ret = EXIT_FAILURE;
     }
 
@@ -844,8 +847,8 @@ int main(int argc, char *argv[])
             try {
                 block_size = std::stoi(::optarg);
             } catch(const std::exception& /* e */) {
-                fprintf(stderr, _("Bad block size: %s. Assume block size=%d"),
-                        ::optarg, block_size);
+                fprintf(stderr, _("Bad block size: %s. "
+                    "Assume block size=%d\n"), ::optarg, block_size);
             }
             break;
         case '?':
@@ -866,7 +869,8 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> vpz(argv + ::optind, argv + argc);
     if (vpz.size() > 1)
-        fprintf(stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
+        fprintf(stderr, _("Use only the first vpz: %s\n"),
+            vpz.front().c_str());
 
     if (comm.rank() == 0 and not template_file.empty())
         generate_template(template_file, package_name, vpz.front());
@@ -886,7 +890,7 @@ int main(int argc, char *argv[])
                block_size, package_name.c_str(),
                timeout.count(),
                (input_file.empty()) ? "stdin" : input_file.c_str(),
-               (output_file.empty()) ? "stdin" : output_file.c_str());
+               (output_file.empty()) ? "stdout" : output_file.c_str());
 
         for (const auto& elem : vpz)
             printf("%s ", elem.c_str());
