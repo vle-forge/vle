@@ -38,7 +38,7 @@ clone it:
 
 Install dependencies (recent ubuntu/debian):
 
-    apt-get install libxml2-dev libboost-dev cmake g++ \
+    apt-get install libxml2-dev libboost-dev cmake pkg-config g++ \
             qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools \
             qtchooser qt5-default
 
