@@ -242,7 +242,7 @@ public:
      * @parma value Default value to be assigned in each new cell.
      */
     void resize(size_type columns, size_type rows,
-                std::unique_ptr<Value> value);
+                const std::unique_ptr<Value>& value);
 
     /**
      * @brief Resize only the size of allocated matrix . Content of the matrix

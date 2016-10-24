@@ -444,7 +444,7 @@ void Matrix::resize(size_type columns, size_type rows)
 }
 
 void Matrix::resize(size_type columns, size_type rows,
-                    std::unique_ptr<Value> value)
+                    const std::unique_ptr<Value>& value)
 {
     if (columns * rows <= 0) {
         m_nbcol = columns;
