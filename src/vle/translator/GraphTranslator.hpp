@@ -24,92 +24,110 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_TRANSLATOR_GRAPHTRANSLATOR_HPP
 #define VLE_TRANSLATOR_GRAPHTRANSLATOR_HPP
 
+#include <array>
+#include <random>
 #include <vle/DllDefines.hpp>
-#include <vle/utils/Array.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/value/Map.hpp>
+#include <vle/utils/Array.hpp>
+#include <vle/vpz/Condition.hpp>
 
-namespace vle { namespace translator {
+namespace vle
+{
+namespace translator
+{
 
-/**
- * A struct that represents the result of the \c make_graph function. It
- * provides the adjacency graph, the list of node names, the list of
- * classes names and the number of nodes.
- */
-struct graph_result {
-    vle::utils::Array<bool> graph;
-    std::vector<std::string> nodes;
-    std::vector<std::string> classes;
-    long int node_number;
+class VLE_API graph_generator
+{
+public:
+    enum class connectivity {
+        IN_OUT, /*!< @c in-out: add an output port @c out for source model and
+                 an input port @c in for destination model. */
+        IN,     /*!< @c in: add an output port with same name as the
+                 destination model, and an input port @c in. */
+        OUT,    /*!< @c out: add an output port @c out for source model and an
+                 input port with the same name as the source model.*/
+        OTHER   /*!< @c other: add an output port with same name as the
+                 destination model and an input port with the same name as the
+                 source model. */
+    };
+
+    struct graph_metrics {
+        int vertices;  /*!< Number of vertices. */
+        int edges;     /*!< Number of edges. */
+        int bandwidth; /*!< The maximum distance between two adjacent
+                            vertices,  with distance measured on a line upon
+                            which the vertices have been placed at unit
+                            intervals.*/
+    };
+
+    struct node_metrics {
+        int id;         /*!< Unique identifier for node. */
+        int in_degree;  /*!< Number of edges entering vertex. */
+        int out_degree; /*|< Number of edges leaving vertex. */
+    };
+
+    struct parameter {
+        /*!< Function to build the @c name, @c classname and @c condition for
+         * the model defined by the @c metrics. */
+        std::function<void(const node_metrics &metrics,
+                           std::string &name,
+                           std::string &classname)> make_model;
+
+        /*!< The connectivity between each DEVS model.*/
+        connectivity type;
+
+        /*!< True is the connection should be directed or undirected. */
+        bool directed;
+    };
+
+    graph_generator(const parameter &params);
+
+    graph_metrics metrics() const;
+
+    void make_graph(vle::devs::Executive &executive,
+                    int number,
+                    const vle::utils::Array<bool> &graph);
+
+    void make_smallworld(vle::devs::Executive &executive,
+                         std::mt19937 &gen,
+                         int number,
+                         int k,
+                         double probability,
+                         bool allow_self_loops);
+
+    void make_scalefree(vle::devs::Executive &executive,
+                        std::mt19937 &gen,
+                        int number,
+                        double alpha,
+                        double beta,
+                        bool allow_self_loops);
+
+    void make_sorted_erdos_renyi(vle::devs::Executive &executive,
+                                 std::mt19937 &gen,
+                                 int number,
+                                 double probability,
+                                 bool allow_self_loops);
+
+    void make_erdos_renyi(vle::devs::Executive &executive,
+                          std::mt19937 &gen,
+                          int number,
+                          double fraction,
+                          bool allow_self_loops);
+
+    void make_erdos_renyi(vle::devs::Executive &executive,
+                          std::mt19937 &gen,
+                          int number,
+                          int edges_number,
+                          bool allow_self_loops);
+
+private:
+    parameter m_params;
+    graph_metrics m_metrics;
 };
-
-/**
- * A translator to build a DEVS graph where nodes are vpz::Class. The
- * graph uses an adjacency matrix to build connections between nodes.
- *
- * \param executive The \c vle::devs::Executive model used to build
- * structure of model.
- *
- * \param map The parameters of the translator formatted using a \c
- * vle::value::Map.
- *
- * \code
- * <map>
- *  <key name="prefix">
- *   <string>node</string> <!-- build node-0, node-1 etc. Default is vertex -->
- *  </key>
- *  <key name="number">
- *   <integer>10</integer> <!-- number of node in the graph. -->
- *  </key>
- *  <key name="adjacency matrix">
- *   <string>
- *    <!-- build a input, output ports and a connection. For example, the first
- *    operation is:
- *      * node-0 add an output port node-1.
- *      * node-1 add an input port node-0.
- *      * add connection (node-0, node-1) to (node-1 port node-0).
- *      -->
- *    0 1 0 1 1 1 1
- *    0 0 0 0 1 1 1
- *    0 0 0 0 0 1 1
- *    0 0 0 0 0 0 1
- *    0 0 0 0 0 0 0
- *    0 0 1 0 1 0 0
- *    0 0 0 1 0 0 0
- *   </string>
- *  </key>
- *  <key name="classes">
- *   <string>
- *   <!-- one class per node -->
- *   class1 class2 class3 class4 class5
- *   class6 class7
- *   </string>
- *  </key>
- *  <key name="port">
- *   <string>
- *   <!-- Type of connection:
- *     * in-out: add an output port `out' for source model and an input port
- *     `in' for destination model.
- *     * in: add an output port with same name as the destination model, and an
- *     input port `in'.
- *     * out: add an output port `out' for source model and an input port with
- *     the same name as the source model.
- *     * other: add an output port with same name as the destination model and
- *     an input port with the same name as the source model.
- *   </string>
- *  </key>
- * </map>
- * \endcode
- *
- * \exception \c vle::utils::ArgError
- */
-graph_result VLE_API make_graph(vle::devs::Executive& executive,
-                                const vle::value::Map& map);
-
-}} // namesapce vle translator
+}
+} // namespace vle translator
 
 #endif
