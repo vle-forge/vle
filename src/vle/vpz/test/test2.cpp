@@ -24,12 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE vpz_complete_test
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <vle/vpz/Vpz.hpp>
@@ -44,20 +39,9 @@
 #include <fstream>
 #include <iostream>
 
-
-struct F
-{
-    vle::Init a;
-
-    F() : a() { }
-    ~F() { }
-};
-
-BOOST_GLOBAL_FIXTURE(F);
-
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
+void atomicmodel_vpz()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -80,22 +64,22 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
-    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.5");
-    BOOST_REQUIRE_EQUAL(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
+    EnsuresEqual(vpz.project().author(), "Gauthier Quesnel");
+    EnsuresEqual(vpz.project().version(), "0.5");
+    EnsuresEqual(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
 
     const vpz::Model& mdl = vpz.project().model();
-    BOOST_REQUIRE(mdl.node() != nullptr);
-    BOOST_REQUIRE_EQUAL(mdl.node()->isAtomic(), true);
-    BOOST_REQUIRE_EQUAL(mdl.node()->getInputPortNumber(), 2);
-    BOOST_REQUIRE_EQUAL(mdl.node()->getOutputPortNumber(), 2);
-    BOOST_REQUIRE(mdl.node()->existInputPort("in1") != 0);
-    BOOST_REQUIRE(mdl.node()->existInputPort("in2") != 0);
-    BOOST_REQUIRE(mdl.node()->existOutputPort("out1") != 0);
-    BOOST_REQUIRE(mdl.node()->existOutputPort("out2") != 0);
+    Ensures(mdl.node() != nullptr);
+    EnsuresEqual(mdl.node()->isAtomic(), true);
+    EnsuresEqual(mdl.node()->getInputPortNumber(), 2);
+    EnsuresEqual(mdl.node()->getOutputPortNumber(), 2);
+    Ensures(mdl.node()->existInputPort("in1") != 0);
+    Ensures(mdl.node()->existInputPort("in2") != 0);
+    Ensures(mdl.node()->existOutputPort("out1") != 0);
+    Ensures(mdl.node()->existOutputPort("out2") != 0);
 }
 
-BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
+void coupledmodel_vpz()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -139,34 +123,34 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
-    BOOST_REQUIRE(mdl.node() != nullptr);
-    BOOST_REQUIRE_EQUAL(mdl.node()->isCoupled(), true);
+    Ensures(mdl.node() != nullptr);
+    EnsuresEqual(mdl.node()->isCoupled(), true);
 
     vpz::CoupledModel* cpl = mdl.node()->toCoupled();
-    BOOST_REQUIRE(cpl != nullptr);
-    BOOST_REQUIRE(cpl->existOutputPort("o") != 0);
-    BOOST_REQUIRE(cpl->existInputPort("i") != 0);
+    Ensures(cpl != nullptr);
+    Ensures(cpl->existOutputPort("o") != 0);
+    Ensures(cpl->existInputPort("i") != 0);
 
     vpz::BaseModel* mdl1 = cpl->findModel("atom1");
     vpz::BaseModel* mdl2 = cpl->findModel("atom2");
-    BOOST_REQUIRE(mdl1 != nullptr);
-    BOOST_REQUIRE(mdl2 != nullptr);
+    Ensures(mdl1 != nullptr);
+    Ensures(mdl2 != nullptr);
 
     vpz::AtomicModel* atom1 = dynamic_cast < vpz::AtomicModel* >(mdl1);
     vpz::AtomicModel* atom2 = dynamic_cast < vpz::AtomicModel* >(mdl2);
-    BOOST_REQUIRE(atom1 != nullptr);
-    BOOST_REQUIRE(atom1->existOutputPort("out"));
-    BOOST_REQUIRE(atom1->existInputPort("in"));
-    BOOST_REQUIRE(atom2 != nullptr);
-    BOOST_REQUIRE(atom2->existInputPort("in"));
-    BOOST_REQUIRE(atom2->existOutputPort("out"));
+    Ensures(atom1 != nullptr);
+    Ensures(atom1->existOutputPort("out"));
+    Ensures(atom1->existInputPort("in"));
+    Ensures(atom2 != nullptr);
+    Ensures(atom2->existInputPort("in"));
+    Ensures(atom2->existOutputPort("out"));
 
-    BOOST_REQUIRE(cpl->existInputConnection("i", "atom1", "in"));
-    BOOST_REQUIRE(cpl->existOutputConnection("atom2", "out", "o"));
-    BOOST_REQUIRE(cpl->existInternalConnection("atom1", "out", "atom2", "in"));
+    Ensures(cpl->existInputConnection("i", "atom1", "in"));
+    Ensures(cpl->existOutputConnection("atom2", "out", "o"));
+    Ensures(cpl->existInternalConnection("atom1", "out", "atom2", "in"));
 }
 
-BOOST_AUTO_TEST_CASE(dynamic_vpz)
+void dynamic_vpz()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -186,14 +170,14 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
     vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
-    BOOST_REQUIRE(mdl.node() != nullptr);
-    BOOST_REQUIRE_EQUAL(mdl.node()->isAtomic(), true);
+    Ensures(mdl.node() != nullptr);
+    EnsuresEqual(mdl.node()->isAtomic(), true);
     vpz::AtomicModel* atom = mdl.node()->toAtomic();
 
-    BOOST_REQUIRE(atom);
+    Ensures(atom);
 }
 
-BOOST_AUTO_TEST_CASE(experiment_vpz)
+void experiment_vpz()
 {
     const char* xml=
         "<?xml version=\"1.0\"?>\n"
@@ -236,33 +220,33 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     const vpz::Experiment& experiment(project.experiment());
     const vpz::Conditions& cnds(project.experiment().conditions());
 
-    BOOST_REQUIRE_EQUAL(experiment.name(), "test1");
-    BOOST_REQUIRE_EQUAL(experiment.duration(), 0.33);
+    EnsuresEqual(experiment.name(), "test1");
+    EnsuresEqual(experiment.duration(), 0.33);
 
     std::vector<std::string> lst = cnds.conditionnames();
-    BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)3);
+    EnsuresEqual(lst.size(), (std::list < std::string >::size_type)3);
 
     {
         auto it = std::find(lst.begin(), lst.end(), "cond1");
-        BOOST_REQUIRE(it != lst.end());
+        Ensures(it != lst.end());
     }
     {
         auto it = std::find(lst.begin(), lst.end(), "simulation_engine");
-        BOOST_REQUIRE(it != lst.end());
+        Ensures(it != lst.end());
     }
 
     lst.clear();
     lst = cnds.portnames("cond1");
-    BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)2);
+    EnsuresEqual(lst.size(), (std::list < std::string >::size_type)2);
 
     {
         auto it = std::find(lst.begin(), lst.end(), "init1");
-        BOOST_REQUIRE(it != lst.end());
+        Ensures(it != lst.end());
     }
 
     {
         auto it = std::find(lst.begin(), lst.end(), "init2");
-        BOOST_REQUIRE(it != lst.end());
+        Ensures(it != lst.end());
     }
 
     const vpz::Condition& cnd1(cnds.get("cond1"));
@@ -271,51 +255,51 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     {
         const value::Set& set(cnd1.getSetValues("init1"));
         const value::Double& real(set.get(0)->toDouble());
-        BOOST_REQUIRE_EQUAL(real.value(), 123.);
+        EnsuresEqual(real.value(), 123.);
         const value::Integer& integer(set.get(1)->toInteger());
-        BOOST_REQUIRE_EQUAL(integer.value(), 1);
+        EnsuresEqual(integer.value(), 1);
     }
 
     {
         const value::Set& set(cnd1.getSetValues("init2"));
         const value::Double& real(set.get(0)->toDouble());
-        BOOST_REQUIRE_EQUAL(real.value(), 456.);
+        EnsuresEqual(real.value(), 456.);
         const value::Integer& integer(set.get(1)->toInteger());
-        BOOST_REQUIRE_EQUAL(integer.value(), 2);
+        EnsuresEqual(integer.value(), 2);
     }
 
     {
         const value::Set& set = cnd2.getSetValues("init3");
         const value::Double& real(set.get(0)->toDouble());
-        BOOST_REQUIRE_EQUAL(real.value(), .123);
+        EnsuresEqual(real.value(), .123);
         const value::Integer& integer(set.get(1)->toInteger());
-        BOOST_REQUIRE_EQUAL(integer.value(), -1);
+        EnsuresEqual(integer.value(), -1);
     }
 
     {
         const value::Set& set = cnd2.getSetValues("init4");
         const value::Double& real(set.get(0)->toDouble());
-        BOOST_REQUIRE_EQUAL(real.value(), .456);
+        EnsuresEqual(real.value(), .456);
         const value::Integer& integer(set.get(1)->toInteger());
-        BOOST_REQUIRE_EQUAL(integer.value(), -2);
+        EnsuresEqual(integer.value(), -2);
     }
 
     {
         const std::string oldcond("cond1");
         const std::string newcond("new_cond1");
         vpz::Conditions cnds = (project.experiment().conditions());
-        BOOST_REQUIRE_NO_THROW(cnds.rename(oldcond, newcond));
+        EnsuresNotThrow(cnds.rename(oldcond, newcond), std::exception);
         {
             vpz::Condition cnd1(cnds.get(newcond));
             const std::string oldport("init1");
             const std::string newport("new_init1");
-            BOOST_REQUIRE_NO_THROW(cnd1.rename(oldport, newport));
+            EnsuresNotThrow(cnd1.rename(oldport, newport), std::exception);
             {
                 const value::Set& set(cnd1.getSetValues(newport));
                 const value::Double& real(set.get(0)->toDouble());
-                BOOST_REQUIRE_EQUAL(real.value(), 123.);
+                EnsuresEqual(real.value(), 123.);
                 const value::Integer& integer(set.get(1)->toInteger());
-                BOOST_REQUIRE_EQUAL(integer.value(), 1);
+                EnsuresEqual(integer.value(), 1);
             }
 
         }
@@ -323,7 +307,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     }
 }
 
-BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
+void experiment_measures_vpz()
 {
     const char* xml=
         "<?xml version=\"1.0\"?>\n"
@@ -365,79 +349,91 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     vpz::Views& views(experiment.views());
 
     vpz::Outputs& outputs(views.outputs());
-    BOOST_REQUIRE(outputs.outputlist().size() == 2);
+    Ensures(outputs.outputlist().size() == 2);
 
-    BOOST_REQUIRE(outputs.outputlist().find("x") != outputs.outputlist().end());
+    Ensures(outputs.outputlist().find("x") != outputs.outputlist().end());
     {
         vpz::Output& out(outputs.outputlist().find("x")->second);
-        BOOST_REQUIRE_EQUAL(out.name(), "x");
-        BOOST_REQUIRE(out.data());
-        BOOST_REQUIRE_EQUAL(out.data()->isString(), true);
-        BOOST_REQUIRE_EQUAL(value::toString(out.data()), "test");
+        EnsuresEqual(out.name(), "x");
+        Ensures(out.data());
+        EnsuresEqual(out.data()->isString(), true);
+        EnsuresEqual(value::toString(out.data()), "test");
     }
-    BOOST_REQUIRE(outputs.outputlist().find("z") != outputs.outputlist().end());
+    Ensures(outputs.outputlist().find("z") != outputs.outputlist().end());
     {
         vpz::Output& out(outputs.outputlist().find("z")->second);
-        BOOST_REQUIRE_EQUAL(out.name(), "z");
-        BOOST_REQUIRE_EQUAL(out.plugin(), "xxx");
-        BOOST_REQUIRE_EQUAL(out.location(), "127.0.0.1:8888");
+        EnsuresEqual(out.name(), "z");
+        EnsuresEqual(out.plugin(), "xxx");
+        EnsuresEqual(out.location(), "127.0.0.1:8888");
     }
 
 
-    BOOST_REQUIRE(not views.viewlist().empty());
-    BOOST_REQUIRE((*views.viewlist().begin()).first
+    Ensures(not views.viewlist().empty());
+    Ensures((*views.viewlist().begin()).first
                   == (*views.viewlist().begin()).second.name());
 
     vpz::View& view(views.viewlist().begin()->second);
-    BOOST_REQUIRE_EQUAL(view.name(), "x");
-    BOOST_REQUIRE_EQUAL(view.is_enable(), true);
+    EnsuresEqual(view.name(), "x");
+    EnsuresEqual(view.is_enable(), true);
     view.disable();
-    BOOST_REQUIRE_EQUAL(view.is_enable(), false);
+    EnsuresEqual(view.is_enable(), false);
     view.enable();
-    BOOST_REQUIRE_EQUAL(view.is_enable(), true);
-    BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
-    BOOST_REQUIRE_EQUAL(view.timestep(), .05);
-    BOOST_REQUIRE_EQUAL(view.output(), "x");
+    EnsuresEqual(view.is_enable(), true);
+    EnsuresEqual(view.streamtype(), "timed");
+    EnsuresEqual(view.timestep(), .05);
+    EnsuresEqual(view.output(), "x");
 
     const vpz::Observables& obs(views.observables());
-    BOOST_REQUIRE(obs.observablelist().size() == 2);
+    Ensures(obs.observablelist().size() == 2);
 
-    BOOST_REQUIRE(obs.observablelist().find("oo") !=
+    Ensures(obs.observablelist().find("oo") !=
                   obs.observablelist().end());
     {
         const vpz::Observable& ob = obs.observablelist().find("oo")->second;
-        BOOST_REQUIRE_EQUAL(ob.name(), "oo");
-        BOOST_REQUIRE_EQUAL(ob.observableportlist().size(),
+        EnsuresEqual(ob.name(), "oo");
+        EnsuresEqual(ob.observableportlist().size(),
                             (vpz::ObservablePortList::size_type)3);
 
-        BOOST_REQUIRE(ob.exist("x1"));
-        BOOST_REQUIRE(ob.exist("x2"));
-        BOOST_REQUIRE(ob.exist("x3"));
+        Ensures(ob.exist("x1"));
+        Ensures(ob.exist("x2"));
+        Ensures(ob.exist("x3"));
 
         const vpz::ObservablePort& port(ob.get("x1"));
-        BOOST_REQUIRE(port.exist("x"));
+        Ensures(port.exist("x"));
     }
 
-    BOOST_REQUIRE(obs.observablelist().find("xx") !=
+    Ensures(obs.observablelist().find("xx") !=
                   obs.observablelist().end());
     {
         const vpz::Observable& ob = obs.observablelist().find("xx")->second;
-        BOOST_REQUIRE_EQUAL(ob.name(), "xx");
-        BOOST_REQUIRE_EQUAL(ob.observableportlist().size(),
+        EnsuresEqual(ob.name(), "xx");
+        EnsuresEqual(ob.observableportlist().size(),
                             (vpz::ObservablePortList::size_type)3);
 
-        BOOST_REQUIRE(ob.exist("x4"));
-        BOOST_REQUIRE(ob.exist("x5"));
-        BOOST_REQUIRE(ob.exist("x6"));
+        Ensures(ob.exist("x4"));
+        Ensures(ob.exist("x5"));
+        Ensures(ob.exist("x6"));
     }
 
     {
         vpz::Views views(experiment.views());
-        BOOST_REQUIRE_NO_THROW(views.renameView(std::string("x"), std::string("y")));
+        EnsuresNotThrow(views.renameView(std::string("x"), std::string("y")),
+            std::exception);
         const vpz::View& view(views.viewlist().begin()->second);
-        BOOST_REQUIRE_EQUAL(view.name(), "y");
-        BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
-        BOOST_REQUIRE_EQUAL(view.timestep(), .05);
-        BOOST_REQUIRE_EQUAL(view.output(), "y");
+        EnsuresEqual(view.name(), "y");
+        EnsuresEqual(view.streamtype(), "timed");
+        EnsuresEqual(view.timestep(), .05);
+        EnsuresEqual(view.output(), "y");
     }
+}
+
+int main()
+{
+    atomicmodel_vpz();
+    coupledmodel_vpz();
+    dynamic_vpz();
+    experiment_vpz();
+    experiment_measures_vpz();
+
+    return unit_test::report_errors();
 }

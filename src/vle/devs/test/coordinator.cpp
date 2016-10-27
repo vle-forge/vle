@@ -24,13 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE devstime_test
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
-#include <boost/lexical_cast.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <stdexcept>
 #include <limits>
 #include <fstream>
@@ -378,25 +372,25 @@ public:
             const double& /* time */) override
     {
         auto it = pp_D.find("depth0.atom.port");
-        BOOST_REQUIRE(it != pp_D.cend());
-        BOOST_REQUIRE_EQUAL(it->second.number, 101);
-        BOOST_REQUIRE(it->second.value);
-        BOOST_REQUIRE(it->second.value->isInteger());
-        BOOST_REQUIRE(it->second.value->toInteger().value() == 1);
+        Ensures(it != pp_D.cend());
+        EnsuresEqual(it->second.number, 101);
+        Ensures(it->second.value);
+        Ensures(it->second.value->isInteger());
+        Ensures(it->second.value->toInteger().value() == 1);
 
          it = pp_D.find("depth0.atom2.port");
-        BOOST_REQUIRE(it != pp_D.cend());
-        BOOST_REQUIRE_EQUAL(it->second.number, 101);
-        BOOST_REQUIRE(it->second.value);
-        BOOST_REQUIRE(it->second.value->isInteger());
-        BOOST_REQUIRE(it->second.value->toInteger().value() == 2);
+        Ensures(it != pp_D.cend());
+        EnsuresEqual(it->second.number, 101);
+        Ensures(it->second.value);
+        Ensures(it->second.value->isInteger());
+        Ensures(it->second.value->toInteger().value() == 2);
 
          it = pp_D.find("depth0.exe.port");
-        BOOST_REQUIRE(it != pp_D.cend());
-        BOOST_REQUIRE_EQUAL(it->second.number, 101);
-        BOOST_REQUIRE(it->second.value);
-        BOOST_REQUIRE(it->second.value->isInteger());
-        BOOST_REQUIRE(it->second.value->toInteger().value() == 3);
+        Ensures(it != pp_D.cend());
+        EnsuresEqual(it->second.number, 101);
+        Ensures(it->second.value);
+        Ensures(it->second.value->isInteger());
+        Ensures(it->second.value->toInteger().value() == 3);
         return {};
     }
 };
@@ -448,25 +442,25 @@ extern "C" {
     }
 }
 
-BOOST_AUTO_TEST_CASE(instantiate_mode)
+void instantiate_mode()
 {
-    BOOST_REQUIRE(std::is_polymorphic<Model>::value == true);
-    BOOST_REQUIRE(std::is_polymorphic<ModelDbg>::value == true);
-    BOOST_REQUIRE(std::is_polymorphic<Exe>::value == true);
+    Ensures(std::is_polymorphic<Model>::value == true);
+    Ensures(std::is_polymorphic<ModelDbg>::value == true);
+    Ensures(std::is_polymorphic<Exe>::value == true);
 
     bool check;
 
     check = std::is_base_of<vle::devs::Dynamics, Model>::value == true;
-    BOOST_REQUIRE(check);
+    Ensures(check);
 
     check = std::is_base_of<vle::devs::Dynamics, ModelDbg>::value == true;
-    BOOST_REQUIRE(check);
+    Ensures(check);
 
     check = std::is_base_of<vle::devs::Executive, Exe>::value == true;
-    BOOST_REQUIRE(check);
+    Ensures(check);
 }
 
-BOOST_AUTO_TEST_CASE(test_del_coupled_model)
+void test_del_coupled_model()
 {
     auto ctx = vle::utils::make_context();
     vpz::Dynamics dyns;
@@ -480,12 +474,12 @@ BOOST_AUTO_TEST_CASE(test_del_coupled_model)
 
     auto sim = coord.addModel(depth2);
 
-    BOOST_REQUIRE(sim != nullptr);
+    Ensures(sim != nullptr);
 
     delete depth0;
 }
 
-BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
+void test_loading_dynamics_from_executable()
 {
     auto ctx = vle::utils::make_context();
     // Build a simple Vpz object with an atomic model in a coupled model
@@ -509,21 +503,21 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
     {
         auto x = vpz.project().dynamics().dynamiclist().emplace(
             "dyn_1", vpz::Dynamic("dyn_1"));
-        BOOST_REQUIRE(x.second == true);
+        Ensures(x.second == true);
         x.first->second.setLibrary("make_new_model");
     }
 
     {
         auto x = vpz.project().dynamics().dynamiclist().emplace(
             "dyn_3", vpz::Dynamic("dyn_3"));
-        BOOST_REQUIRE(x.second == true);
+        Ensures(x.second == true);
         x.first->second.setLibrary("make_new_model_dbg");
     }
 
     {
         auto x = vpz.project().dynamics().dynamiclist().emplace(
             "dyn_2", vpz::Dynamic("dyn_2"));
-        BOOST_REQUIRE(x.second == true);
+        Ensures(x.second == true);
         x.first->second.setLibrary("exe_make_new_exe");
     }
 
@@ -554,7 +548,7 @@ BOOST_AUTO_TEST_CASE(test_loading_dynamics_from_executable)
     root.finish();
 }
 
-BOOST_AUTO_TEST_CASE(test_observation_event)
+void test_observation_event()
 {
     auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
@@ -582,7 +576,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
     {
         auto x = vpz.project().dynamics().dynamiclist().emplace(
             "dyn_1", vpz::Dynamic("dyn_1"));
-        BOOST_REQUIRE(x.second == true);
+        Ensures(x.second == true);
         x.first->second.setLibrary("make_new_observation_model");
     }
 
@@ -601,21 +595,21 @@ BOOST_AUTO_TEST_CASE(test_observation_event)
     while (root.run());
     std::unique_ptr<value::Map> out = root.outputs();
 
-    BOOST_REQUIRE(out);
+    Ensures(out);
 
     value::Matrix &matrix = out->getMatrix("The_view");
-    BOOST_REQUIRE_EQUAL(matrix.columns(), (std::size_t)2);
-    BOOST_REQUIRE_EQUAL(matrix.rows(), (std::size_t)101);
+    EnsuresEqual(matrix.columns(), (std::size_t)2);
+    EnsuresEqual(matrix.rows(), (std::size_t)101);
 
     for (std::size_t i = 1, ei = 10; i != ei; ++i) {
-        BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, i)), i);
-        BOOST_REQUIRE_EQUAL(value::toInteger(matrix(1, i)), i * 2);
+        EnsuresEqual(value::toDouble(matrix(0, i)), i);
+        EnsuresEqual(value::toInteger(matrix(1, i)), static_cast<int>(i * 2));
     }
 
     root.finish();
 }
 
-BOOST_AUTO_TEST_CASE(test_observation_event_disabled)
+void test_observation_event_disabled()
 {
     auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
@@ -643,7 +637,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event_disabled)
     {
         auto x = vpz.project().dynamics().dynamiclist().emplace(
             "dyn_1", vpz::Dynamic("dyn_1"));
-        BOOST_REQUIRE(x.second == true);
+        Ensures(x.second == true);
         x.first->second.setLibrary("make_new_observation_model");
     }
 
@@ -666,7 +660,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event_disabled)
 
         std::unique_ptr<value::Map> out = root.outputs();
 
-        BOOST_REQUIRE(out);
+        Ensures(out);
 
         root.finish();
     }
@@ -683,7 +677,7 @@ BOOST_AUTO_TEST_CASE(test_observation_event_disabled)
         while (root.run());
 
         std::unique_ptr<value::Map> out = root.outputs();
-        BOOST_REQUIRE(out == nullptr);
+        Ensures(out == nullptr);
 
         root.finish();
     }
@@ -700,13 +694,13 @@ BOOST_AUTO_TEST_CASE(test_observation_event_disabled)
         while (root.run());
 
         std::unique_ptr<value::Map> out = root.outputs();
-        BOOST_REQUIRE(out);
+        Ensures(out);
 
         root.finish();
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_observation_timed_disabled)
+void test_observation_timed_disabled()
 {
     auto ctx = vle::utils::make_context();
     vpz::Vpz vpz;
@@ -730,7 +724,7 @@ BOOST_AUTO_TEST_CASE(test_observation_timed_disabled)
     {
         auto x = vpz.project().dynamics().dynamiclist().emplace(
             "dyn_1", vpz::Dynamic("dyn_1"));
-        BOOST_REQUIRE(x.second == true);
+        Ensures(x.second == true);
         x.first->second.setLibrary("make_new_observation_model");
     }
 
@@ -753,7 +747,7 @@ BOOST_AUTO_TEST_CASE(test_observation_timed_disabled)
 
         std::unique_ptr<value::Map> out = root.outputs();
 
-        BOOST_REQUIRE(out);
+        Ensures(out);
 
         root.finish();
     }
@@ -770,7 +764,7 @@ BOOST_AUTO_TEST_CASE(test_observation_timed_disabled)
         while (root.run());
 
         std::unique_ptr<value::Map> out = root.outputs();
-        BOOST_REQUIRE(out == nullptr);
+        Ensures(out == nullptr);
 
         root.finish();
     }
@@ -787,8 +781,20 @@ BOOST_AUTO_TEST_CASE(test_observation_timed_disabled)
         while (root.run());
 
         std::unique_ptr<value::Map> out = root.outputs();
-        BOOST_REQUIRE(out);
+        Ensures(out);
 
         root.finish();
     }
+}
+
+int main()
+{
+    instantiate_mode();
+    test_del_coupled_model();
+    test_loading_dynamics_from_executable();
+    test_observation_event();
+    test_observation_event_disabled();
+    test_observation_timed_disabled();
+
+    return unit_test::report_errors();
 }

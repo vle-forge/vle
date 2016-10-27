@@ -25,10 +25,7 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE utils_library_test
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/version.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Context.hpp>
@@ -38,18 +35,7 @@
 
 using namespace vle;
 
-struct F
-{
-    vle::Init a;
-
-    F()
-        : a()
-    {}
-
-    ~F() noexcept = default;
-};
-
-BOOST_FIXTURE_TEST_CASE(download_dtd, F)
+void download_dtd()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
@@ -60,15 +46,15 @@ BOOST_FIXTURE_TEST_CASE(download_dtd, F)
     dm.start("www.vle-project.org/vle-1.0.0.dtd", p.string());
     dm.join();
 
-    BOOST_CHECK(dm.isFinish());
-    BOOST_CHECK(not dm.hasError());
+    Ensures(dm.isFinish());
+    Ensures(not dm.hasError());
 
     vle::utils::Path dowloaded(dm.filename());
-    BOOST_CHECK(dowloaded.is_file());
+    Ensures(dowloaded.is_file());
 }
 
 
-BOOST_FIXTURE_TEST_CASE(download_package, F)
+void download_package()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
@@ -79,14 +65,14 @@ BOOST_FIXTURE_TEST_CASE(download_package, F)
     dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
     dm.join();
 
-    BOOST_CHECK(dm.isFinish());
-    BOOST_CHECK(not dm.hasError());
+    Ensures(dm.isFinish());
+    Ensures(not dm.hasError());
 
     vle::utils::Path d(dm.filename());
-    BOOST_CHECK(d.is_file());
+    Ensures(d.is_file());
 }
 
-BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
+void download_package_bis()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
@@ -97,9 +83,18 @@ BOOST_FIXTURE_TEST_CASE(download_package_bis, F)
     dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
     dm.join();
 
-    BOOST_CHECK(dm.isFinish());
-    BOOST_CHECK(not dm.hasError());
+    Ensures(dm.isFinish());
+    Ensures(not dm.hasError());
 
     vle::utils::Path d(dm.filename());
-    BOOST_CHECK(d.is_file());
+    Ensures(d.is_file());
+}
+
+int main()
+{
+    download_dtd();
+    download_package();
+    download_package_bis();
+
+    return unit_test::report_errors();
 }

@@ -25,11 +25,7 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE test_dom
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <limits>
@@ -134,7 +130,7 @@ const char* vpz_content=
         "</vle_project>";
 
 
-BOOST_AUTO_TEST_CASE(test_build_value)
+void test_build_value()
 {
     QXmlInputSource source;
     source.setData(QString(vpz_content));
@@ -144,10 +140,17 @@ BOOST_AUTO_TEST_CASE(test_build_value)
     //test tuple
     std::unique_ptr<vle::value::Value> t =
             vpz.buildValueFromDoc("cond", "myport", 0);
-    BOOST_REQUIRE_EQUAL(t->toTuple().size(), 0);
+    EnsuresEqual(t->toTuple().size(), 0);
     t = vpz.buildValueFromDoc("cond", "myport", 1);
-    BOOST_REQUIRE_EQUAL(t->toTuple().size(), 3);
-    BOOST_REQUIRE_CLOSE(t->toTuple().at(0), 1.5, 1e-5);
-    BOOST_REQUIRE_CLOSE(t->toTuple().at(1), 2, 1e-5);
-    BOOST_REQUIRE_CLOSE(t->toTuple().at(2), 4.6, 1e-5);
+    EnsuresEqual(t->toTuple().size(), 3);
+    EnsuresApproximatelyEqual(t->toTuple().at(0), 1.5, 1e-5);
+    EnsuresApproximatelyEqual(t->toTuple().at(1), 2, 1e-5);
+    EnsuresApproximatelyEqual(t->toTuple().at(2), 4.6, 1e-5);
+}
+
+int main()
+{
+    test_build_value();
+
+    return unit_test::report_errors();
 }

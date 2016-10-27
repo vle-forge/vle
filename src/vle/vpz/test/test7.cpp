@@ -24,46 +24,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE vpz_structures
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vle.hpp>
 #include <stdexcept>
 
-
-struct F
-{
-    vle::Init a;
-
-    F() : a() { }
-    ~F() { }
-};
-
-BOOST_GLOBAL_FIXTURE(F);
-
 using namespace vle;
 using namespace vpz;
 
-BOOST_AUTO_TEST_CASE(vpz_obs_port)
+void vpz_obs_port()
 {
     Observable obs("Obs");
-    BOOST_REQUIRE_EQUAL(obs.exist("port"), false);
-    BOOST_REQUIRE_THROW(obs.get("port"), utils::ArgError);
-    BOOST_REQUIRE_NO_THROW(obs.del("port"));
-    BOOST_REQUIRE_NO_THROW(obs.add("port"));
-    BOOST_REQUIRE_THROW(obs.add("port"), utils::ArgError);
-    BOOST_REQUIRE_EQUAL(obs.exist("port"), true);
-    BOOST_REQUIRE_NO_THROW(obs.get("port"));
-    BOOST_REQUIRE_NO_THROW(obs.del("port"));
-    BOOST_REQUIRE_EQUAL(obs.exist("port"), false);
+    EnsuresEqual(obs.exist("port"), false);
+    EnsuresThrow(obs.get("port"), utils::ArgError);
+    EnsuresNotThrow(obs.del("port"), std::exception);
+    EnsuresNotThrow(obs.add("port"), std::exception);
+    EnsuresThrow(obs.add("port"), utils::ArgError);
+    EnsuresEqual(obs.exist("port"), true);
+    EnsuresNotThrow(obs.get("port"), std::exception);
+    EnsuresNotThrow(obs.del("port"), std::exception);
+    EnsuresEqual(obs.exist("port"), false);
 }
 
-BOOST_AUTO_TEST_CASE(vpz_add_output)
+void vpz_add_output()
 {
     Views views;
 
@@ -71,14 +56,24 @@ BOOST_AUTO_TEST_CASE(vpz_add_output)
     views.addStreamOutput("out2", "", "storage", "");
     views.addStreamOutput("out3", "", "storage", "");
 
-    BOOST_REQUIRE_NO_THROW(views.addEventView("view1", View::FINISH, "out1"));
-    BOOST_REQUIRE_NO_THROW(views.addEventView("view2", View::OUTPUT, "out4"));
+    EnsuresNotThrow(views.addEventView("view1", View::FINISH, "out1"),
+        std::exception);
+    EnsuresNotThrow(views.addEventView("view2", View::OUTPUT, "out4"),
+        std::exception);
 
-    BOOST_REQUIRE_NO_THROW(views.addTimedView("view3", 1.0, "out3"));
-    BOOST_REQUIRE_THROW(views.addTimedView("view3", 1.0, "out1"),
+    EnsuresNotThrow(views.addTimedView("view3", 1.0, "out3"), std::exception);
+    EnsuresThrow(views.addTimedView("view3", 1.0, "out1"),
                         utils::ArgError);
-    BOOST_REQUIRE_THROW(views.addTimedView("view4", 0.5, "out4"),
+    EnsuresThrow(views.addTimedView("view4", 0.5, "out4"),
                         utils::ArgError);
-    BOOST_REQUIRE_THROW(views.addTimedView("view4", 0.0, "out2"),
+    EnsuresThrow(views.addTimedView("view4", 0.0, "out2"),
                         utils::ArgError);
+}
+
+int main()
+{
+    vpz_obs_port();
+    vpz_add_output();
+
+    return unit_test::report_errors();
 }

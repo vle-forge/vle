@@ -25,11 +25,7 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE manager_complete_test
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <iostream>
@@ -52,17 +48,6 @@
 #include <vle/value/User.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
-
-struct F
-{
-    vle::Init a;
-
-    F() : a() { }
-    ~F() { }
-};
-
-
-BOOST_GLOBAL_FIXTURE(F);
 
 using namespace vle;
 
@@ -104,7 +89,7 @@ const char *xml =
         " </experiment>\n"
         "</vle_project>\n";
 
-BOOST_AUTO_TEST_CASE(experimentgenerator_lower_than_exp)
+void experimentgenerator_lower_than_exp()
 {
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
@@ -133,22 +118,22 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_lower_than_exp)
     }
 
     manager::ExperimentGenerator expgen1(vpz, 0, 100);
-    BOOST_CHECK_EQUAL(expgen1.min(), 0);
-    BOOST_CHECK_EQUAL(expgen1.max(), 100);
-    BOOST_CHECK_EQUAL(expgen1.size(), 10000);
+    EnsuresEqual(expgen1.min(), 0);
+    EnsuresEqual(expgen1.max(), 100);
+    EnsuresEqual(expgen1.size(), 10000);
 
     manager::ExperimentGenerator expgen2(vpz, 99, 100);
-    BOOST_CHECK_EQUAL(expgen2.min(), 9900);
-    BOOST_CHECK_EQUAL(expgen2.max(), 10000);
-    BOOST_CHECK_EQUAL(expgen2.size(), 10000);
+    EnsuresEqual(expgen2.min(), 9900);
+    EnsuresEqual(expgen2.max(), 10000);
+    EnsuresEqual(expgen2.size(), 10000);
 
     manager::ExperimentGenerator expgen3(vpz, 50, 100);
-    BOOST_CHECK_EQUAL(expgen3.min(), 5000);
-    BOOST_CHECK_EQUAL(expgen3.max(), 5100);
-    BOOST_CHECK_EQUAL(expgen3.size(), 10000);
+    EnsuresEqual(expgen3.min(), 5000);
+    EnsuresEqual(expgen3.max(), 5100);
+    EnsuresEqual(expgen3.size(), 10000);
 }
 
-BOOST_AUTO_TEST_CASE(experimentgenerator_greater_than_exp)
+void experimentgenerator_greater_than_exp()
 {
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
@@ -177,33 +162,33 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_greater_than_exp)
     }
 
     manager::ExperimentGenerator expgen1(vpz, 0, 5);
-    BOOST_CHECK_EQUAL(expgen1.min(), 0);
-    BOOST_CHECK_EQUAL(expgen1.max(), 1);
-    BOOST_CHECK_EQUAL(expgen1.size(), 3);
+    EnsuresEqual(expgen1.min(), 0);
+    EnsuresEqual(expgen1.max(), 1);
+    EnsuresEqual(expgen1.size(), 3);
 
     manager::ExperimentGenerator expgen2(vpz, 1, 5);
-    BOOST_CHECK_EQUAL(expgen2.min(), 1);
-    BOOST_CHECK_EQUAL(expgen2.max(), 2);
-    BOOST_CHECK_EQUAL(expgen2.size(), 3);
+    EnsuresEqual(expgen2.min(), 1);
+    EnsuresEqual(expgen2.max(), 2);
+    EnsuresEqual(expgen2.size(), 3);
 
     manager::ExperimentGenerator expgen3(vpz, 2, 5);
-    BOOST_CHECK_EQUAL(expgen3.min(), 2);
-    BOOST_CHECK_EQUAL(expgen3.max(), 3);
-    BOOST_CHECK_EQUAL(expgen3.size(), 3);
+    EnsuresEqual(expgen3.min(), 2);
+    EnsuresEqual(expgen3.max(), 3);
+    EnsuresEqual(expgen3.size(), 3);
 
     manager::ExperimentGenerator expgen4(vpz, 3, 5);
-    BOOST_CHECK_EQUAL(expgen4.min(), expgen4.max()); /* no job for experiment
+    EnsuresEqual(expgen4.min(), expgen4.max()); /* no job for experiment
                                                         generator 4 and 5.
                                                         max() - min() returns
                                                         null. */
-    BOOST_CHECK_EQUAL(expgen4.size(), 3);
+    EnsuresEqual(expgen4.size(), 3);
 
     manager::ExperimentGenerator expgen5(vpz, 4, 5);
-    BOOST_CHECK_EQUAL(expgen5.min(), expgen5.max());
-    BOOST_CHECK_EQUAL(expgen5.size(), 3);
+    EnsuresEqual(expgen5.min(), expgen5.max());
+    EnsuresEqual(expgen5.size(), 3);
 }
 
-BOOST_AUTO_TEST_CASE(experimentgenerator_max_1_max_1)
+void experimentgenerator_max_1_max_1()
 {
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
@@ -232,7 +217,16 @@ BOOST_AUTO_TEST_CASE(experimentgenerator_max_1_max_1)
     }
 
     manager::ExperimentGenerator expgen1(vpz, 0, 1);
-    BOOST_CHECK_EQUAL(expgen1.min(), 0);
-    BOOST_CHECK_EQUAL(expgen1.max(), 7);
-    BOOST_CHECK_EQUAL(expgen1.size(), 7);
+    EnsuresEqual(expgen1.min(), 0);
+    EnsuresEqual(expgen1.max(), 7);
+    EnsuresEqual(expgen1.size(), 7);
+}
+
+int main()
+{
+    experimentgenerator_lower_than_exp();
+    experimentgenerator_greater_than_exp();
+    experimentgenerator_max_1_max_1();
+
+    return unit_test::report_errors();
 }

@@ -25,16 +25,12 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE utils_library_test_template
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <vle/utils/details/ShellUtils.hpp>
 #include <iostream>
 
-BOOST_AUTO_TEST_CASE(g_shell)
+void g_shell()
 {
     //tests taken from glib-2.47.3 (shell.c)
 
@@ -51,25 +47,25 @@ BOOST_AUTO_TEST_CASE(g_shell)
 
 
     input = ""; res = su.g_shell_quote(input);
-    BOOST_REQUIRE(( res== "''"));
+    Ensures(( res== "''"));
 
     input = "a"; res = su.g_shell_quote(input);
-    BOOST_REQUIRE(( res== "'a'"));
+    Ensures(( res== "'a'"));
 
     input = "("; res = su.g_shell_quote(input);
-    BOOST_REQUIRE(( res== "'('"));
+    Ensures(( res== "'('"));
 
     input = "'"; res = su.g_shell_quote(input);
-    BOOST_REQUIRE(( res== "''\\'''"));
+    Ensures(( res== "''\\'''"));
 
     input = "'a"; res = su.g_shell_quote(input);
-    BOOST_REQUIRE(( res== "''\\''a'"));
+    Ensures(( res== "''\\''a'"));
 
     input = "a'"; res = su.g_shell_quote(input);
-    BOOST_REQUIRE(( res== "'a'\\'''"));
+    Ensures(( res== "'a'\\'''"));
 
     input = "a'a"; res = su.g_shell_quote(input);
-    BOOST_REQUIRE(( res== "'a'\\''a'"));
+    Ensures(( res== "'a'\\''a'"));
 
 
 //    { "", "", -1 },
@@ -95,67 +91,67 @@ BOOST_AUTO_TEST_CASE(g_shell)
 //    { "\x22\\n\"", "\\n", -1 }
 
     input = ""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== ""));
+    Ensures(( res== ""));
 
     input = "a"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "a"));
+    Ensures(( res== "a"));
 
     input = "'a'"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "a"));
+    Ensures(( res== "a"));
 
     input = "'('"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "("));
+    Ensures(( res== "("));
 
     input = "''\\'''"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "'"));
+    Ensures(( res== "'"));
 
     input = "''\\''a'"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "'a"));
+    Ensures(( res== "'a"));
 
     input = "'a'\\'''"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "a'"));
+    Ensures(( res== "a'"));
 
     input = "'a'\\''a'"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "a'a"));
+    Ensures(( res== "a'a"));
 
     input = "\\\\"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "\\"));
+    Ensures(( res== "\\"));
 
     input = "\\\n"; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== ""));
+    Ensures(( res== ""));
 
     input = "'\\''";
-    BOOST_REQUIRE_THROW(su.g_shell_unquote(input), vle::utils::CastError);
+    EnsuresThrow(su.g_shell_unquote(input), vle::utils::CastError);
 
     input = "\"\\\"\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "\""));
+    Ensures(( res== "\""));
 
     input = "\"";
-    BOOST_REQUIRE_THROW(su.g_shell_unquote(input), vle::utils::CastError);
+    EnsuresThrow(su.g_shell_unquote(input), vle::utils::CastError);
 
     input = "'";
-    BOOST_REQUIRE_THROW(su.g_shell_unquote(input), vle::utils::CastError);
+    EnsuresThrow(su.g_shell_unquote(input), vle::utils::CastError);
 
     input = "\x22\\\\\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "\\"));
+    Ensures(( res== "\\"));
 
     input = "\x22\\`\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "`"));
+    Ensures(( res== "`"));
 
     input = "\x22\\$\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "$"));
+    Ensures(( res== "$"));
 
     input = "\x22\\\n\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "\n"));
+    Ensures(( res== "\n"));
 
     input = "\"\\'\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "\\'"));
+    Ensures(( res== "\\'"));
 
     input = "\x22\\\r\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "\\\r"));
+    Ensures(( res== "\\\r"));
 
     input = "\x22\\n\""; res = su.g_shell_unquote(input);
-    BOOST_REQUIRE(( res== "\\n"));
+    Ensures(( res== "\\n"));
 
 
 //    { "foo bar", 2, { "foo", "bar", NULL }, -1 },
@@ -186,182 +182,184 @@ BOOST_AUTO_TEST_CASE(g_shell)
     std::vector<std::string> argvp;
 
     input = "foo bar"; su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "bar"));
+    Ensures(( res== "bar"));
 
     input = "foo 'bar'"; su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "bar"));
+    Ensures(( res== "bar"));
 
     input = "foo \"bar\""; su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "bar"));
+    Ensures(( res== "bar"));
 
     input = "foo '' 'bar'";
     su.g_shell_parse_argv(input, argc, argvp);//dbg
-    BOOST_REQUIRE_EQUAL(argc, 3);
+    EnsuresEqual(argc, 3);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== ""));
+    Ensures(( res== ""));
     res = argvp[2];
-    BOOST_REQUIRE(( res== "bar"));
+    Ensures(( res== "bar"));
 
     input = "foo \"bar\"'baz'blah'foo'\\''blah'\"boo\"";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "barbazblahfoo'blahboo"));
+    Ensures(( res== "barbazblahfoo'blahboo"));
 
     input = "foo \t \tblah\tfoo\t\tbar  baz";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 5);
+    EnsuresEqual(argc, 5);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "blah"));
+    Ensures(( res== "blah"));
     res = argvp[2];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[3];
-    BOOST_REQUIRE(( res== "bar"));
+    Ensures(( res== "bar"));
     res = argvp[4];
-    BOOST_REQUIRE(( res== "baz"));
+    Ensures(( res== "baz"));
 
     input = "foo '    spaces more spaces lots of     spaces in this   '  \t";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "    spaces more spaces lots of     spaces in this   "));
+    Ensures(( res== "    spaces more spaces lots of     spaces in this   "));
 
     input = "foo \\\nbar";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "bar"));
+    Ensures(( res== "bar"));
 
 
     input = "foo '' ''";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 3);
+    EnsuresEqual(argc, 3);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== ""));
+    Ensures(( res== ""));
     res = argvp[2];
-    BOOST_REQUIRE(( res== ""));
+    Ensures(( res== ""));
 
     input = "foo \\\" la la la";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 5);
+    EnsuresEqual(argc, 5);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "\""));
+    Ensures(( res== "\""));
     res = argvp[2];
-    BOOST_REQUIRE(( res== "la"));
+    Ensures(( res== "la"));
     res = argvp[3];
-    BOOST_REQUIRE(( res== "la"));
+    Ensures(( res== "la"));
     res = argvp[4];
-    BOOST_REQUIRE(( res== "la"));
+    Ensures(( res== "la"));
 
 
     input = "foo \\ foo woo woo\\ ";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 4);
+    EnsuresEqual(argc, 4);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== " foo"));
+    Ensures(( res== " foo"));
     res = argvp[2];
-    BOOST_REQUIRE(( res== "woo"));
+    Ensures(( res== "woo"));
     res = argvp[3];
-    BOOST_REQUIRE(( res== "woo "));
+    Ensures(( res== "woo "));
 
     input = "foo \"yada yada \\$\\\"\"";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "yada yada $\""));
+    Ensures(( res== "yada yada $\""));
 
     input = "foo \"c:\\\\\"";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "c:\\"));
+    Ensures(( res== "c:\\"));
 
     input = "foo # bla bla bla\n bar";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "bar"));
+    Ensures(( res== "bar"));
 
     input = "foo a#b";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "a#b"));
+    Ensures(( res== "a#b"));
 
     input = "#foo";
-    BOOST_REQUIRE_THROW(su.g_shell_parse_argv(input, argc, argvp),
+    EnsuresThrow(su.g_shell_parse_argv(input, argc, argvp),
             vle::utils::CastError);
 
     input =  "foo bar \\";
-    BOOST_REQUIRE_THROW(su.g_shell_parse_argv(input, argc, argvp),
+    EnsuresThrow(su.g_shell_parse_argv(input, argc, argvp),
             vle::utils::CastError);
 
     input = "foo 'bar baz";
-    BOOST_REQUIRE_THROW(su.g_shell_parse_argv(input, argc, argvp),
+    EnsuresThrow(su.g_shell_parse_argv(input, argc, argvp),
             vle::utils::CastError);
 
     input = "foo '\"bar\" baz";
-    BOOST_REQUIRE_THROW(su.g_shell_parse_argv(input, argc, argvp),
+    EnsuresThrow(su.g_shell_parse_argv(input, argc, argvp),
             vle::utils::CastError);
 
     input = "";
-    BOOST_REQUIRE_THROW(su.g_shell_parse_argv(input, argc, argvp),
+    EnsuresThrow(su.g_shell_parse_argv(input, argc, argvp),
             vle::utils::CastError);
 
     input = "  ";
-    BOOST_REQUIRE_THROW(su.g_shell_parse_argv(input, argc, argvp),
+    EnsuresThrow(su.g_shell_parse_argv(input, argc, argvp),
             vle::utils::CastError);
 
     input = "# foo bar";
-    BOOST_REQUIRE_THROW(su.g_shell_parse_argv(input, argc, argvp),
+    EnsuresThrow(su.g_shell_parse_argv(input, argc, argvp),
             vle::utils::CastError);
 
     input = "foo '/bar/summer'\\''09 tours.pdf'";
     su.g_shell_parse_argv(input, argc, argvp);
-    BOOST_REQUIRE_EQUAL(argc, 2);
+    EnsuresEqual(argc, 2);
     res = argvp[0];
-    BOOST_REQUIRE(( res== "foo"));
+    Ensures(( res== "foo"));
     res = argvp[1];
-    BOOST_REQUIRE(( res== "/bar/summer'09 tours.pdf"));
-
-
+    Ensures(( res== "/bar/summer'09 tours.pdf"));
 }
 
+int main()
+{
+    g_shell();
 
-
+    return unit_test::report_errors();
+}

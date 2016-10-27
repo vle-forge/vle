@@ -25,11 +25,7 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE utils_library_test_template
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <limits>
@@ -46,16 +42,6 @@
 #include <vle/vle.hpp>
 
 using namespace vle;
-
-struct F
-{
-    vle::Init a;
-
-    F() : a() { }
-    ~F() { }
-};
-
-BOOST_GLOBAL_FIXTURE(F);
 
 const char* tpl1 = "@@tag test1@package.name-ext1_ext2 @@" \
                     "azertyuiop qsdfghjklm wxcvbn,;:!" \
@@ -142,7 +128,7 @@ const char* tpl5 = "@@end tag@@" \
                     "c) My name is {{name}} and I am {{year}} olds\n";
 
 
-BOOST_AUTO_TEST_CASE(test_template_simple)
+void test_template_simple()
 {
     vle::utils::Template tpl(tpl1);
     tpl.stringSymbol().append("name", "toto");
@@ -153,7 +139,7 @@ BOOST_AUTO_TEST_CASE(test_template_simple)
 
     std::string str = out.str();
 
-    BOOST_REQUIRE_EQUAL(str,
+    EnsuresEqual(str,
                         "@@tag test1@package.name-ext1_ext2 @@" \
                         "azertyuiop qsdfghjklm wxcvbn,;:!" \
                         "@@end tag@@" \
@@ -162,7 +148,7 @@ BOOST_AUTO_TEST_CASE(test_template_simple)
                         "c) My name is toto and I am 74 olds\n");
 }
 
-BOOST_AUTO_TEST_CASE(test_template_for)
+void test_template_for()
 {
     vle::utils::Template tpl(tpl2);
 
@@ -179,7 +165,7 @@ BOOST_AUTO_TEST_CASE(test_template_for)
     std::stringstream out;
     tpl.process(out);
 
-    BOOST_REQUIRE_EQUAL(out.str(),
+    EnsuresEqual(out.str(),
                         "class meteo : public DifferenceEquation::Multiple\n"
                         "{\n"
                         "public:\n"
@@ -219,7 +205,7 @@ BOOST_AUTO_TEST_CASE(test_template_for)
                         "};\n");
 }
 
-BOOST_AUTO_TEST_CASE(test_template_for_if)
+void test_template_for_if()
 {
     vle::utils::Template tpl(tpl3);
 
@@ -238,7 +224,7 @@ BOOST_AUTO_TEST_CASE(test_template_for_if)
     std::stringstream out;
     tpl.process(out);
 
-    BOOST_REQUIRE_EQUAL(out.str(),
+    EnsuresEqual(out.str(),
                         "class meteo : public DifferenceEquation::Multiple\n"
                         "{\n"
                         "public:\n"
@@ -266,7 +252,7 @@ BOOST_AUTO_TEST_CASE(test_template_for_if)
                         "};\n");
 }
 
-BOOST_AUTO_TEST_CASE(test_template_for_ifnot)
+void test_template_for_ifnot()
 {
     vle::utils::Template tpl(tpl3);
 
@@ -285,7 +271,7 @@ BOOST_AUTO_TEST_CASE(test_template_for_ifnot)
     std::stringstream out;
     tpl.process(out);
 
-    BOOST_REQUIRE_EQUAL(out.str(),
+    EnsuresEqual(out.str(),
                         "class meteo : public DifferenceEquation::Multiple\n"
                         "{\n"
                         "public:\n"
@@ -316,26 +302,36 @@ BOOST_AUTO_TEST_CASE(test_template_for_ifnot)
                         "};\n");
 }
 
-BOOST_AUTO_TEST_CASE(test_template_tag)
+void test_template_tag()
 {
     std::string plugin, package, conf;
 
     {
         vle::utils::Template tpl(tpl1);
         tpl.tag(plugin, package, conf);
-        BOOST_REQUIRE_EQUAL(plugin, "test1");
-        BOOST_REQUIRE_EQUAL(package, "package.name-ext1_ext2");
-        BOOST_REQUIRE_EQUAL(conf, "azertyuiop qsdfghjklm wxcvbn,;:!");
+        EnsuresEqual(plugin, "test1");
+        EnsuresEqual(package, "package.name-ext1_ext2");
+        EnsuresEqual(conf, "azertyuiop qsdfghjklm wxcvbn,;:!");
     }
 
     {
         vle::utils::Template tpl(tpl5);
-        BOOST_REQUIRE_THROW(tpl.tag(plugin, package, conf), utils::ArgError);
+        EnsuresThrow(tpl.tag(plugin, package, conf), utils::ArgError);
     }
 
     {
         vle::utils::Template tpl(tpl4);
-        BOOST_REQUIRE_THROW(tpl.tag(plugin, package, conf), utils::ArgError);
+        EnsuresThrow(tpl.tag(plugin, package, conf), utils::ArgError);
     }
 }
 
+int main()
+{
+    test_template_simple();
+    test_template_for();
+    test_template_for_if();
+    test_template_for_ifnot();
+    test_template_tag();
+
+    return unit_test::report_errors();
+}

@@ -24,12 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE translator_complete_test
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/output_test_stream.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -38,19 +33,9 @@
 #include <vle/value/Double.hpp>
 #include <vle/vle.hpp>
 
-struct F
-{
-    vle::Init a;
-
-    F() : a() { }
-    ~F() { }
-};
-
-BOOST_GLOBAL_FIXTURE(F);
-
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(atomicmodel_timed_vpz)
+void atomicmodel_timed_vpz()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -90,11 +75,11 @@ BOOST_AUTO_TEST_CASE(atomicmodel_timed_vpz)
 
     const auto& v = vpz.project().experiment().views().get("view");
 
-    BOOST_REQUIRE(v.type() == vle::vpz::View::TIMED);
-    BOOST_REQUIRE(v.timestep() == 1.0);
+    Ensures(v.type() == vle::vpz::View::TIMED);
+    Ensures(v.timestep() == 1.0);
 }
 
-BOOST_AUTO_TEST_CASE(atomicmodel_vpz_event_output)
+void atomicmodel_vpz_event_output()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -137,10 +122,10 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_event_output)
     auto c = vle::vpz::View::INTERNAL | vle::vpz::View::CONFLUENT
         | vle::vpz::View::EXTERNAL | vle::vpz::View::OUTPUT;
 
-    BOOST_REQUIRE(v.type() == c);
+    Ensures(v.type() == c);
 }
 
-BOOST_AUTO_TEST_CASE(atomicmodel_vpz_internal_output)
+void atomicmodel_vpz_internal_output()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -182,10 +167,10 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_internal_output)
 
     auto c = vle::vpz::View::INTERNAL |  vle::vpz::View::OUTPUT;
 
-    BOOST_REQUIRE(v.type() == c);
+    Ensures(v.type() == c);
 }
 
-BOOST_AUTO_TEST_CASE(atomicmodel_vpz_confluent)
+void atomicmodel_vpz_confluent()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -227,10 +212,10 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_confluent)
 
     auto c = vle::vpz::View::CONFLUENT;
 
-    BOOST_REQUIRE(v.type() == c);
+    Ensures(v.type() == c);
 }
 
-BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw1)
+void atomicmodel_vpz_throw1()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -266,10 +251,10 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw1)
         "</vle_project>\n";
 
     vpz::Vpz vpz;
-    BOOST_REQUIRE_THROW(vpz.parseMemory(xml), std::exception);
+    EnsuresThrow(vpz.parseMemory(xml), std::exception);
 }
 
-BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw2)
+void atomicmodel_vpz_throw2()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -305,5 +290,17 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz_throw2)
         "</vle_project>\n";
 
     vpz::Vpz vpz;
-    BOOST_REQUIRE_THROW(vpz.parseMemory(xml), std::exception);
+    EnsuresThrow(vpz.parseMemory(xml), std::exception);
+}
+
+int main()
+{
+    atomicmodel_timed_vpz();
+    atomicmodel_vpz_event_output();
+    atomicmodel_vpz_internal_output();
+    atomicmodel_vpz_confluent();
+    atomicmodel_vpz_throw1();
+    atomicmodel_vpz_throw2();
+
+    return unit_test::report_errors();
 }
