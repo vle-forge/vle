@@ -8,7 +8,7 @@ add_sources(vlelib Context.cpp ContextModule.cpp ContextSettings.cpp
 install(FILES Algo.hpp Array.hpp Context.hpp DateTime.hpp
   Deprecated.hpp DownloadManager.hpp Exception.hpp Filesystem.hpp
   Package.hpp PackageTable.hpp Parser.hpp Rand.hpp RemoteManager.hpp
-  Spawn.hpp Template.hpp Tools.hpp Types.hpp DESTINATION
+  Spawn.hpp Template.hpp Tools.hpp Types.hpp unit-test.hpp DESTINATION
   ${VLE_INCLUDE_DIRS}/utils)
 
 if (VLE_HAVE_UNITTESTFRAMEWORK)
