@@ -25,26 +25,13 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE utils_library_test_parser
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Parser.hpp>
 #include <vle/vle.hpp>
+#include <sstream>
 
 using namespace vle;
-
-struct F
-{
-    vle::Init a;
-
-    F() : a() { }
-    ~F() { }
-};
-
-BOOST_GLOBAL_FIXTURE(F);
 
 const char *str = "# this file is a test\n"
     "test { # comment\n"
@@ -52,32 +39,39 @@ const char *str = "# this file is a test\n"
     "b = \"1\", \"2\", \"3\";"
     "}\n";
 
-BOOST_AUTO_TEST_CASE(ParserStr)
+void ParserStr()
 {
     std::istringstream in(str);
     vle::utils::Parser parser(in);
 
-    BOOST_REQUIRE_EQUAL(parser.root().blocks.size(), 1);
+    EnsuresEqual(parser.root().blocks.size(), 1);
 
     const vle::utils::Block& block = parser.root().getBlock("test");
-    BOOST_REQUIRE_EQUAL(block.name, "test");
-    BOOST_REQUIRE_EQUAL(block.strings.size(), 3);
-    BOOST_REQUIRE_EQUAL(block.reals.size(), 3);
+    EnsuresEqual(block.name, "test");
+    EnsuresEqual(block.strings.size(), 3);
+    EnsuresEqual(block.reals.size(), 3);
 
     {
         typedef vle::utils::Block::Reals::const_iterator Iterator;
         std::pair < Iterator, Iterator > r = block.reals.equal_range("a");
-        BOOST_REQUIRE_EQUAL(block.reals.count("a"), 3);
-        BOOST_REQUIRE_EQUAL(r.first++->second, 1);
-        BOOST_REQUIRE_EQUAL(r.first++->second, 2);
-        BOOST_REQUIRE_EQUAL(r.first++->second, 3);
+        EnsuresEqual(block.reals.count("a"), 3);
+        EnsuresEqual(r.first++->second, 1);
+        EnsuresEqual(r.first++->second, 2);
+        EnsuresEqual(r.first++->second, 3);
     }
     {
         typedef vle::utils::Block::Strings::const_iterator Iterator;
         std::pair < Iterator, Iterator > r = block.strings.equal_range("b");
-        BOOST_REQUIRE_EQUAL(block.strings.count("b"), 3);
-        BOOST_REQUIRE_EQUAL(r.first++->second, "1");
-        BOOST_REQUIRE_EQUAL(r.first++->second, "2");
-        BOOST_REQUIRE_EQUAL(r.first++->second, "3");
+        EnsuresEqual(block.strings.count("b"), 3);
+        EnsuresEqual(r.first++->second, "1");
+        EnsuresEqual(r.first++->second, "2");
+        EnsuresEqual(r.first++->second, "3");
     }
+}
+
+int main()
+{
+    ParserStr();
+
+    return unit_test::report_errors();
 }

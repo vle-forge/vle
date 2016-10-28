@@ -24,12 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE vpz_classes_extensions
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <vle/value/Value.hpp>
@@ -37,19 +32,9 @@
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vle.hpp>
 
-struct F
-{
-    vle::Init a;
-
-    F() : a() { }
-    ~F() { }
-};
-
-BOOST_GLOBAL_FIXTURE(F);
-
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(single_class)
+void single_class()
 {
     const char* xml=
         "<?xml version=\"1.0\"?>\n"
@@ -208,20 +193,20 @@ BOOST_AUTO_TEST_CASE(single_class)
     vpz.parseMemory(xml);
 
     const vpz::Classes& classes(vpz.project().classes());
-    BOOST_REQUIRE_EQUAL(classes.exist("xxx"), true);
+    EnsuresEqual(classes.exist("xxx"), true);
 
     const vpz::Class& classe(classes.get("xxx"));
-    BOOST_REQUIRE(classe.node() != nullptr);
+    Ensures(classe.node() != nullptr);
 
     const vpz::BaseModel* mdl = classe.node();
-    BOOST_REQUIRE(mdl->isCoupled());
+    Ensures(mdl->isCoupled());
 
     const vpz::CoupledModel* cpl(dynamic_cast < const
                                    vpz::CoupledModel*>(mdl));
-    BOOST_REQUIRE(cpl);
+    Ensures(cpl);
 }
 
-BOOST_AUTO_TEST_CASE(single_class_utf8)
+void single_class_utf8()
 {
     const char* xml=
         "<?xml version=\"1.0\"?>\n"
@@ -380,15 +365,23 @@ BOOST_AUTO_TEST_CASE(single_class_utf8)
     vpz.parseMemory(xml);
 
     const vpz::Classes& classes(vpz.project().classes());
-    BOOST_REQUIRE_EQUAL(classes.exist("xx € ç x"), true);
+    EnsuresEqual(classes.exist("xx € ç x"), true);
 
     const vpz::Class& classe(classes.get("xx € ç x"));
-    BOOST_REQUIRE(classe.node() != nullptr);
+    Ensures(classe.node() != nullptr);
 
     const vpz::BaseModel* mdl = classe.node();
-    BOOST_REQUIRE(mdl->isCoupled());
+    Ensures(mdl->isCoupled());
 
     const vpz::CoupledModel* cpl(dynamic_cast < const
                                    vpz::CoupledModel*>(mdl));
-    BOOST_REQUIRE(cpl);
+    Ensures(cpl);
+}
+
+int main()
+{
+    single_class();
+    single_class_utf8();
+
+    return unit_test::report_errors();
 }

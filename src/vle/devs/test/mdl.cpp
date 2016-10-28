@@ -24,9 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE devstime_mdl
-#include <boost/test/included/unit_test.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/Executive.hpp>
@@ -44,6 +42,7 @@
 #include <stdexcept>
 #include <limits>
 #include <fstream>
+#include <sstream>
 #include "oov.hpp"
 
 using namespace vle;
@@ -68,8 +67,8 @@ using namespace vle;
                 const vle::devs::InitEventList& events)                 \
         {                                                               \
             std::string symbol_test(xstringify(symbol_));               \
-            BOOST_REQUIRE(symbol_test.length() > 4);                    \
-            BOOST_REQUIRE(symbol_test.compare(0, 4, "exe_") == 0);      \
+            Ensures(symbol_test.length() > 4);                    \
+            Ensures(symbol_test.compare(0, 4, "exe_") == 0);      \
             return new model_(init, events);                            \
         }                                                               \
     }
@@ -559,8 +558,8 @@ public:
     int get_nb_model() const
     {
         auto size = coupledmodel().getModelList().size();
-        BOOST_REQUIRE(size > 0);
-        BOOST_REQUIRE(size <= std::numeric_limits<int>::max());
+        Ensures(size > 0);
+        Ensures(size <= std::numeric_limits<int>::max());
 
         return static_cast<int>(size - 1);
     }
@@ -643,7 +642,7 @@ DECLARE_EXECUTIVE_SYMBOL(exe_leaf, Leaf)
 DECLARE_EXECUTIVE_SYMBOL(exe_root, Root)
 DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 
- BOOST_AUTO_TEST_CASE(test_gensvpz)
+ void test_gensvpz()
  {
      auto ctx = vle::utils::make_context();
      vle::utils::Path p(DEVS_TEST_DIR);
@@ -661,38 +660,38 @@ DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
      root.finish();
 
 
-     BOOST_REQUIRE(out);
-     BOOST_REQUIRE_EQUAL(out->size(), 2);
+     Ensures(out);
+     EnsuresEqual(out->size(), 2);
 
      /* get result of simulation */
      value::Matrix &matrix = out->getMatrix("view1");
      std::cout << matrix << '\n';
 
-     BOOST_REQUIRE_EQUAL(matrix.rows(), (std::size_t)101);
-     BOOST_REQUIRE_EQUAL(matrix.columns(), (std::size_t)3);
+     EnsuresEqual(matrix.rows(), (std::size_t)101);
+     EnsuresEqual(matrix.columns(), (std::size_t)3);
 
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 0)), 0);
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 0)), 0);
-     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 0)), 1);
+     EnsuresEqual(value::toDouble(matrix(0, 0)), 0);
+     EnsuresEqual(value::toDouble(matrix(1, 0)), 0);
+     EnsuresEqual(value::toInteger(matrix(2, 0)), 1);
 
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 10)), 10);
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 10)), 55);
-     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 10)), 11);
+     EnsuresEqual(value::toDouble(matrix(0, 10)), 10);
+     EnsuresEqual(value::toDouble(matrix(1, 10)), 55);
+     EnsuresEqual(value::toInteger(matrix(2, 10)), 11);
 
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 14)), 14);
-     BOOST_REQUIRE(not matrix(1, 14));
-     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 14)), 15);
+     EnsuresEqual(value::toDouble(matrix(0, 14)), 14);
+     Ensures(not matrix(1, 14));
+     EnsuresEqual(value::toInteger(matrix(2, 14)), 15);
 
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 31)), 31);
-     BOOST_REQUIRE(not matrix(1, 31));
-     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 31)), 32);
+     EnsuresEqual(value::toDouble(matrix(0, 31)), 31);
+     Ensures(not matrix(1, 31));
+     EnsuresEqual(value::toInteger(matrix(2, 31)), 32);
 
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, 100)), 100);
-     BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, 100)), 2550);
-     BOOST_REQUIRE_EQUAL(value::toInteger(matrix(2, 100)), 1);
+     EnsuresEqual(value::toDouble(matrix(0, 100)), 100);
+     EnsuresEqual(value::toDouble(matrix(1, 100)), 2550);
+     EnsuresEqual(value::toInteger(matrix(2, 100)), 1);
  }
 
- BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
+ void test_gens_delete_connection()
  {
      auto ctx = vle::utils::make_context();
      vle::utils::Path p(DEVS_TEST_DIR);
@@ -708,14 +707,14 @@ DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 
          while (root.run());
          std::unique_ptr<value::Map> out = root.outputs();
-         BOOST_REQUIRE(not out);
+         Ensures(not out);
          root.finish();
      } catch (const std::exception& e) {
-         BOOST_REQUIRE(false);
+         Ensures(false);
      }
  }
 
-BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
+void test_gens_ordereddeleter()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(DEVS_TEST_DIR);
@@ -734,22 +733,22 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
         root.finish();
 
         /* begin check */
-        BOOST_REQUIRE(out);
-        BOOST_REQUIRE_EQUAL(out->size(), 1);
+        Ensures(out);
+        EnsuresEqual(out->size(), 1);
 
         /* get result of simulation */
         value::Matrix &matrix = out->getMatrix("view1");
 
-        BOOST_REQUIRE_EQUAL(matrix.columns(), (std::size_t)2);
+        EnsuresEqual(matrix.columns(), (std::size_t)2);
 
         for (std::size_t i = 0, ei = 10; i != ei; ++i) {
-            BOOST_REQUIRE_EQUAL(value::toDouble(matrix(0, i)), i);
-            BOOST_REQUIRE_EQUAL(value::toDouble(matrix(1, i)), 0);
+            EnsuresEqual(value::toDouble(matrix(0, i)), i);
+            EnsuresEqual(value::toDouble(matrix(1, i)), 0);
         }
     }
 }
 
- BOOST_AUTO_TEST_CASE(test_confluent_transition)
+ void test_confluent_transition()
  {
      auto ctx = vle::utils::make_context();
      vle::utils::Path p(DEVS_TEST_DIR);
@@ -765,12 +764,21 @@ BOOST_AUTO_TEST_CASE(test_gens_ordereddeleter)
 
          while (root.run());
          std::unique_ptr<value::Map> out = root.outputs();
-         BOOST_REQUIRE(not out);
+         Ensures(not out);
          root.finish();
      } catch (const std::exception& e) {
-         BOOST_REQUIRE(false);
+         Ensures(false);
      } catch (...) {
-         BOOST_REQUIRE(false);
+         Ensures(false);
      }
  }
 
+int main()
+{
+    test_gensvpz();
+    test_gens_delete_connection();
+    test_gens_ordereddeleter();
+    test_confluent_transition();
+
+    return unit_test::report_errors();
+}

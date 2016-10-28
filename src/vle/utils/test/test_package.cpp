@@ -25,12 +25,8 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE utils_library_test
-#include <boost/test/included/unit_test.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/version.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/config.hpp>
 #include <boost/assign.hpp>
@@ -97,9 +93,7 @@ struct F
     }
 };
 
-BOOST_GLOBAL_FIXTURE(F);
-
-BOOST_AUTO_TEST_CASE(show_package)
+void show_package()
 {
     auto ctx = vle::utils::make_context();
     using vle::utils::PathList;
@@ -134,12 +128,12 @@ BOOST_AUTO_TEST_CASE(show_package)
     }
 
     // Default, 2 binary package directories are available.
-    BOOST_REQUIRE(ctx->getBinaryPackagesDir().size() == 2);
+    Ensures(ctx->getBinaryPackagesDir().size() == 2);
 
     // 4 binary packages: the show_package build previously and the
     // vle.output, gvle.default, vle.adaptative-qss packages provided with
     // VLE (perhaps 3 if gvle is not build).
-    BOOST_REQUIRE(ctx->getBinaryPackages().size() >= 3);
+    Ensures(ctx->getBinaryPackages().size() >= 3);
     vle::utils::Path p = pkg.getExpDir(vle::utils::PKG_BINARY);
 
     std::cout << "\ngetExpDir           : " << p.string()
@@ -149,17 +143,17 @@ BOOST_AUTO_TEST_CASE(show_package)
     for (const auto& elem : vpz)
         std::cout << elem.string() << ' ';
 
-    BOOST_REQUIRE(vpz.size() == 1);
+    Ensures(vpz.size() == 1);
 
 
     auto modules = ctx->get_dynamic_libraries(
         "show_package",
         vle::utils::Context::ModuleType::MODULE_DYNAMICS);
 
-    BOOST_REQUIRE(modules.size() == 1);
+    Ensures(modules.size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
+void remote_package_check_package_tmp()
 {
     auto ctx = vle::utils::make_context();
 
@@ -183,8 +177,8 @@ BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
         rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
-        BOOST_REQUIRE_EQUAL(results.empty(), true);
-        BOOST_REQUIRE_EQUAL(results.size(), 0u);
+        EnsuresEqual(results.empty(), true);
+        EnsuresEqual(results.size(), 0u);
     }
 
     {
@@ -197,14 +191,14 @@ BOOST_AUTO_TEST_CASE(remote_package_check_package_tmp)
         // show_package (description.txt are the same, name is MyProject.
         //
 
-        BOOST_REQUIRE(results.empty() == false);
-        BOOST_REQUIRE(results.size() == 2);
-        BOOST_REQUIRE(results[0].name == "MyProject" and
+        Ensures(results.empty() == false);
+        Ensures(results.size() == 2);
+        Ensures(results[0].name == "MyProject" and
                       results[1].name == "MyProject");
     }
 }
 
-BOOST_AUTO_TEST_CASE(remote_package_local_remote)
+void remote_package_local_remote()
 {
     auto ctx = vle::utils::make_context();
     utils::PackageId pkg;
@@ -244,9 +238,9 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
 
     {
         std::ofstream ofs(path.string());
-        BOOST_REQUIRE(ofs.is_open());
+        Ensures(ofs.is_open());
         ofs << pkg << "\n";
-        BOOST_REQUIRE(ofs.good());
+        Ensures(ofs.good());
     }
 
     /* We need to ensure each file really installed. */
@@ -259,10 +253,10 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
         rmt.start(utils::REMOTE_MANAGER_SEARCH, ".*", nullptr);
         rmt.join();
         rmt.getResult(&results);
-        BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 1u);
+        EnsuresEqual(results.empty(), false);
+        EnsuresEqual(results.size(), 1u);
 
-        BOOST_REQUIRE(results[0].name == "name");
+        Ensures(results[0].name == "name");
     }
 
     {
@@ -274,12 +268,12 @@ BOOST_AUTO_TEST_CASE(remote_package_local_remote)
         for (const auto& elem : results)
             std::cout << elem;
 
-        BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 2u);
+        EnsuresEqual(results.empty(), false);
+        EnsuresEqual(results.size(), 2u);
     }
 }
 
-BOOST_AUTO_TEST_CASE(remote_package_read_write)
+void remote_package_read_write()
 {
     auto ctx = vle::utils::make_context();
 
@@ -337,8 +331,8 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         utils::Packages results;
         rmt.getResult(&results);
 
-        BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 10u);
+        EnsuresEqual(results.empty(), false);
+        EnsuresEqual(results.size(), 10u);
     }
 
     {
@@ -349,8 +343,8 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         utils::Packages results;
         rmt.getResult(&results);
 
-        BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 10u);
+        EnsuresEqual(results.empty(), false);
+        EnsuresEqual(results.size(), 10u);
     }
 
     {
@@ -361,8 +355,8 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         utils::Packages results;
         rmt.getResult(&results);
 
-        BOOST_REQUIRE_EQUAL(results.empty(), false);
-        BOOST_REQUIRE_EQUAL(results.size(), 10u);
+        EnsuresEqual(results.empty(), false);
+        EnsuresEqual(results.size(), 10u);
     }
 
     vle::utils::RemoteManager rmt(ctx);
@@ -375,17 +369,17 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         vle::utils::Packages pkgs;
         rmt.getResult(&pkgs);
 
-        BOOST_REQUIRE_EQUAL(pkgs.size(), 1u);
+        EnsuresEqual(pkgs.size(), 1u);
 
-        BOOST_REQUIRE_EQUAL(pkgs[0].name, "name-8");
-        BOOST_REQUIRE_EQUAL(pkgs[0].size, 8u);
-        BOOST_REQUIRE_EQUAL(pkgs[0].md5sum, "1234567890987654321");
-        BOOST_REQUIRE_EQUAL(pkgs[0].url, "http://www.vle-project.org");
-        BOOST_REQUIRE_EQUAL(pkgs[0].maintainer, "me");
-        BOOST_REQUIRE_EQUAL(pkgs[0].major, 1);
-        BOOST_REQUIRE_EQUAL(pkgs[0].minor, 2);
-        BOOST_REQUIRE_EQUAL(pkgs[0].patch, 3);
-        BOOST_REQUIRE_EQUAL(pkgs[0].description, "too good");
+        EnsuresEqual(pkgs[0].name, "name-8");
+        EnsuresEqual(pkgs[0].size, 8u);
+        EnsuresEqual(pkgs[0].md5sum, "1234567890987654321");
+        EnsuresEqual(pkgs[0].url, "http://www.vle-project.org");
+        EnsuresEqual(pkgs[0].maintainer, "me");
+        EnsuresEqual(pkgs[0].major, 1);
+        EnsuresEqual(pkgs[0].minor, 2);
+        EnsuresEqual(pkgs[0].patch, 3);
+        EnsuresEqual(pkgs[0].description, "too good");
     }
 
     {
@@ -393,7 +387,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, ".*", &output);
         rmt.join();
         rmt.getResult(&pkgs);
-        BOOST_REQUIRE_EQUAL(pkgs.size(), 10u);
+        EnsuresEqual(pkgs.size(), 10u);
     }
 
     {
@@ -401,7 +395,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "name.*", &output);
         rmt.join();
         rmt.getResult(&pkgs);
-        BOOST_REQUIRE_EQUAL(pkgs.size(), 10u);
+        EnsuresEqual(pkgs.size(), 10u);
     }
 
     {
@@ -409,7 +403,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "0$", &output);
         rmt.join();
         rmt.getResult(&pkgs);
-        BOOST_REQUIRE_EQUAL(pkgs.size(), 1u);
+        EnsuresEqual(pkgs.size(), 1u);
     }
 
     {
@@ -417,7 +411,7 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, ".*", &output);
         rmt.join();
         rmt.getResult(&pkgs);
-        BOOST_REQUIRE_EQUAL(pkgs.size(), 10u);
+        EnsuresEqual(pkgs.size(), 10u);
     }
 
     {
@@ -425,11 +419,11 @@ BOOST_AUTO_TEST_CASE(remote_package_read_write)
         rmt.start(vle::utils::REMOTE_MANAGER_SEARCH, "[1|2]$", &output);
         rmt.join();
         rmt.getResult(&pkgs);
-        BOOST_REQUIRE_EQUAL(pkgs.size(), 2u);
+        EnsuresEqual(pkgs.size(), 2u);
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_compress_filepath)
+void test_compress_filepath()
 {
     auto ctx = vle::utils::make_context();
     std::string filepath;
@@ -448,33 +442,48 @@ BOOST_AUTO_TEST_CASE(test_compress_filepath)
         filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
         uniquepath = unique.string();
     } catch (...) {
-        BOOST_REQUIRE(false);
+        Ensures(false);
     }
 
     /* We need to ensure each file really installed. */
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    BOOST_REQUIRE(not filepath.empty());
+    Ensures(not filepath.empty());
 
     utils::RemoteManager rmt(ctx);
     utils::Path tarfile(utils::Path::temp_directory_path());
     tarfile /= "check.tar.bz2";
 
-    BOOST_REQUIRE_NO_THROW(rmt.compress(uniquepath, tarfile.string()));
+    EnsuresNotThrow(rmt.compress(uniquepath, tarfile.string()),
+        std::exception);
 
     utils::Path t { tarfile };
-    BOOST_REQUIRE(t.exists());
+    Ensures(t.exists());
 
     utils::Path tmpfile(utils::Path::temp_directory_path());
     tmpfile /= "unique";
 
     tmpfile.create_directory();
 
-    BOOST_REQUIRE_NO_THROW(rmt.decompress(tarfile.string(), tmpfile.string()));
+    EnsuresNotThrow(rmt.decompress(tarfile.string(), tmpfile.string()),
+        std::exception);
     utils::Path t2 { tmpfile };
-    BOOST_REQUIRE(t2.exists());
+    Ensures(t2.exists());
 
     t2 /= uniquepath;
 
-    BOOST_REQUIRE(t2.exists());
+    Ensures(t2.exists());
+}
+
+int main()
+{
+    F fixture;
+
+    show_package();
+    remote_package_check_package_tmp();
+    remote_package_local_remote();
+    remote_package_read_write();
+    test_compress_filepath();
+
+    return unit_test::report_errors();
 }

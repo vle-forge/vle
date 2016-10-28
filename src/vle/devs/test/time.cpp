@@ -24,12 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE devstime_test
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <limits>
@@ -38,52 +33,51 @@
 
 using namespace vle;
 
-
-BOOST_AUTO_TEST_CASE(compare)
+void compare()
 {
     devs::Time a(1.0);
     devs::Time b(2.0);
 
-    BOOST_REQUIRE(b > a);
-    BOOST_REQUIRE(b > 1.0);
-    BOOST_REQUIRE(2.0 > a);
-    BOOST_REQUIRE(b > 1);
-    BOOST_REQUIRE(2 > a);
+    Ensures(b > a);
+    Ensures(b > 1.0);
+    Ensures(2.0 > a);
+    Ensures(b > 1);
+    Ensures(2 > a);
 
     devs::Time c = devs::infinity;
 
-    BOOST_REQUIRE((a >= 2.0) == false);
+    Ensures((a >= 2.0) == false);
 
-    BOOST_REQUIRE(c > a);
-    BOOST_REQUIRE(c > b);
-    BOOST_REQUIRE(c > 2.0);
-    BOOST_REQUIRE(c > 0.0);
+    Ensures(c > a);
+    Ensures(c > b);
+    Ensures(c > 2.0);
+    Ensures(c > 0.0);
 
-    BOOST_REQUIRE_EQUAL(a, devs::Time(1.0));
-    BOOST_REQUIRE_EQUAL(a, 1.0);
-    BOOST_REQUIRE_EQUAL(a, 1);
+    EnsuresEqual(a, devs::Time(1.0));
+    EnsuresEqual(a, 1.0);
+    EnsuresEqual(a, 1);
 
-    BOOST_REQUIRE_EQUAL(b, devs::Time(2.0));
-    BOOST_REQUIRE_EQUAL(b, 2.0);
-    BOOST_REQUIRE_EQUAL(b, 2);
+    EnsuresEqual(b, devs::Time(2.0));
+    EnsuresEqual(b, 2.0);
+    EnsuresEqual(b, 2);
 
-    BOOST_REQUIRE(a == devs::Time(1.0));
-    BOOST_REQUIRE(a == 1.0);
-    BOOST_REQUIRE(a == 1);
+    Ensures(a == devs::Time(1.0));
+    Ensures(a == 1.0);
+    Ensures(a == 1);
 
-    BOOST_REQUIRE(a < b);
-    BOOST_REQUIRE(a < 2.0);
-    BOOST_REQUIRE(a < 2);
+    Ensures(a < b);
+    Ensures(a < 2.0);
+    Ensures(a < 2);
 
-    BOOST_REQUIRE(a <= devs::Time(1.0));
-    BOOST_REQUIRE(a <= 1.0);
-    BOOST_REQUIRE(a <= 1);
+    Ensures(a <= devs::Time(1.0));
+    Ensures(a <= 1.0);
+    Ensures(a <= 1);
 
-    BOOST_REQUIRE(a <= devs::Time(devs::infinity));
-    BOOST_REQUIRE(a >= -1.0);
+    Ensures(a <= devs::Time(devs::infinity));
+    Ensures(a >= -1.0);
 }
 
-BOOST_AUTO_TEST_CASE(modify)
+void modify()
 {
     devs::Time a(1.0);
     devs::Time b(2.0);
@@ -92,98 +86,107 @@ BOOST_AUTO_TEST_CASE(modify)
     double x;
 
     x = c - b - a;
-    BOOST_REQUIRE_EQUAL(x, 0.0);
-    BOOST_REQUIRE_EQUAL(a + b, c);
-    BOOST_REQUIRE(c >= a + b);
-    BOOST_REQUIRE_EQUAL(1.0 + b, c);
-    BOOST_REQUIRE(c >= a + 2.0);
+    EnsuresEqual(x, 0.0);
+    EnsuresEqual(a + b, c);
+    Ensures(c >= a + b);
+    EnsuresEqual(1.0 + b, c);
+    Ensures(c >= a + 2.0);
 
     a += b;
-    BOOST_REQUIRE_EQUAL(a, c);
+    EnsuresEqual(a, c);
 
     a -= b;
-    BOOST_REQUIRE_EQUAL(a + b, c);
+    EnsuresEqual(a + b, c);
 
     devs::Time z = a;
     ++z;
-    BOOST_REQUIRE_EQUAL(z, a + 1);
+    EnsuresEqual(z, a + 1);
     --z;
-    BOOST_REQUIRE_EQUAL(z, a);
+    EnsuresEqual(z, a);
 }
 
-BOOST_AUTO_TEST_CASE(modify_and_infinity)
+void modify_and_infinity()
 {
     devs::Time a(1.0);
 
-    BOOST_REQUIRE_EQUAL(a + devs::infinity, devs::infinity);
-    BOOST_REQUIRE_EQUAL(devs::infinity + a, devs::infinity);
-    BOOST_REQUIRE_EQUAL(devs::infinity - a, devs::infinity);
+    EnsuresEqual(a + devs::infinity, devs::infinity);
+    EnsuresEqual(devs::infinity + a, devs::infinity);
+    EnsuresEqual(devs::infinity - a, devs::infinity);
 
     {
         devs::Time a(1.0);
         devs::Time b(devs::infinity);
         a += b;
-        BOOST_REQUIRE_EQUAL(a, devs::infinity);
+        EnsuresEqual(a, devs::infinity);
     }
 
     {
         devs::Time a(devs::infinity);
         devs::Time b(1.0);
         a += b;
-        BOOST_REQUIRE_EQUAL(a, devs::infinity);
-        BOOST_REQUIRE_EQUAL(b, 1.0);
+        EnsuresEqual(a, devs::infinity);
+        EnsuresEqual(b, 1.0);
     }
 
     {
         devs::Time b(devs::infinity);
-        BOOST_REQUIRE(devs::isInfinity(b));
+        Ensures(devs::isInfinity(b));
     }
 
     {
         devs::Time a(devs::infinity);
         devs::Time b(1.0);
         a -= b;
-        BOOST_REQUIRE_EQUAL(a, devs::infinity);
-        BOOST_REQUIRE_EQUAL(b, 1.0);
+        EnsuresEqual(a, devs::infinity);
+        EnsuresEqual(b, 1.0);
     }
 
     {
         devs::Time a(devs::infinity);
         devs::Time b(1.0);
         a += b;
-        BOOST_REQUIRE_EQUAL(a, devs::infinity);
-        BOOST_REQUIRE_EQUAL(b, 1.0);
+        EnsuresEqual(a, devs::infinity);
+        EnsuresEqual(b, 1.0);
     }
 }
 
-BOOST_AUTO_TEST_CASE(prefix_and_postfix_operator)
+void prefix_and_postfix_operator()
 {
     devs::Time a(1.0);
 
     devs::Time b = a++;
-    BOOST_REQUIRE_EQUAL(a, 2.0);
-    BOOST_REQUIRE_EQUAL(b, 1.0);
+    EnsuresEqual(a, 2.0);
+    EnsuresEqual(b, 1.0);
 
     ++a;
-    BOOST_REQUIRE_EQUAL(a, 3.0);
+    EnsuresEqual(a, 3.0);
 
     ++(++a);
-    BOOST_REQUIRE_EQUAL(a, 5.0);
+    EnsuresEqual(a, 5.0);
 
     (++a) = 7;
-    BOOST_REQUIRE_EQUAL(a, 7.0);
+    EnsuresEqual(a, 7.0);
 
     devs::Time c = a--;
-    BOOST_REQUIRE_EQUAL(a, 6.0);
-    BOOST_REQUIRE_EQUAL(c, 7.0);
+    EnsuresEqual(a, 6.0);
+    EnsuresEqual(c, 7.0);
 
     --a;
-    BOOST_REQUIRE_EQUAL(a, 5.0);
+    EnsuresEqual(a, 5.0);
 
     --(--a);
-    BOOST_REQUIRE_EQUAL(a, 3.0);
+    EnsuresEqual(a, 3.0);
 
     (--a) = 0;
-    BOOST_REQUIRE_EQUAL(a, 0.0);
+    EnsuresEqual(a, 0.0);
 }
 
+int main()
+{
+    compare();
+    modify();
+    modify_and_infinity();
+    prefix_and_postfix_operator();
+
+    return unit_test::report_errors();
+}

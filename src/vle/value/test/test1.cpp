@@ -25,11 +25,7 @@
  */
 
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE vle_value_simple_test
-#include <boost/test/included/unit_test.hpp>
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
 #include <stdexcept>
@@ -54,106 +50,97 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/vle.hpp>
 
-struct F
-{
-    vle::Init a;
-
-    F() : a() {}
-};
-
-BOOST_GLOBAL_FIXTURE(F);
-
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(check_simple_value)
+void check_simple_value()
 {
     {
         auto b = std::unique_ptr<value::Boolean>(new value::Boolean(true));
-        BOOST_REQUIRE_EQUAL(b->value(), true);
+        EnsuresEqual(b->value(), true);
         b->set(false);
-        BOOST_REQUIRE_EQUAL(b->value(), false);
+        EnsuresEqual(b->value(), false);
     }
 
     {
         auto d = std::unique_ptr<value::Double>(new value::Double(12.34));
-        BOOST_REQUIRE_CLOSE(d->value(), 12.34, 1e-10);
+        EnsuresApproximatelyEqual(d->value(), 12.34, 1e-10);
         d->set(43.21);
-        BOOST_REQUIRE_CLOSE(d->value(), 43.21, 1e-10);
+        EnsuresApproximatelyEqual(d->value(), 43.21, 1e-10);
     }
 
     {
         auto i = std::unique_ptr<value::Integer>(new value::Integer(1234));
-        BOOST_REQUIRE_EQUAL(i->value(), 1234);
+        EnsuresEqual(i->value(), 1234);
         i->set(4321);
-        BOOST_REQUIRE_EQUAL(i->value(), 4321);
+        EnsuresEqual(i->value(), 4321);
     }
 
     {
         auto s = std::unique_ptr<value::String>(new value::String("1234"));
-        BOOST_REQUIRE_EQUAL(s->value(), "1234");
+        EnsuresEqual(s->value(), "1234");
         s->set("4321");
-        BOOST_REQUIRE_EQUAL(s->value(), "4321");
+        EnsuresEqual(s->value(), "4321");
     }
 
     {
         auto x = std::unique_ptr<value::Xml>(new value::Xml("test"));
-        BOOST_REQUIRE_EQUAL(x->value(), "test");
+        EnsuresEqual(x->value(), "test");
         x->set("tset");
-        BOOST_REQUIRE_EQUAL(x->value(), "tset");
+        EnsuresEqual(x->value(), "tset");
     }
 }
 
-BOOST_AUTO_TEST_CASE(check_map_value)
+void check_map_value()
 {
     auto mp = std::unique_ptr<value::Map>(new value::Map());
 
-    BOOST_REQUIRE_EQUAL(mp->empty(), true);
+    EnsuresEqual(mp->empty(), true);
     mp->addBoolean("boolean", true);
     mp->addInt("integer", 1234);
     mp->addDouble("double", 12.34);
     mp->addString("string", "test");
     mp->addXml("xml", "xml test");
-    BOOST_REQUIRE_EQUAL(mp->empty(), false);
+    EnsuresEqual(mp->empty(), false);
 
-    BOOST_REQUIRE_EQUAL(mp->getBoolean("boolean"), true);
-    BOOST_REQUIRE_EQUAL(mp->getInt("integer"), 1234);
-    BOOST_REQUIRE_CLOSE(mp->getDouble("double"), 12.34, 1e-10);
-    BOOST_REQUIRE_EQUAL(mp->getString("string"), "test");
-    BOOST_REQUIRE_EQUAL(mp->getXml("xml"), "xml test");
+    EnsuresEqual(mp->getBoolean("boolean"), true);
+    EnsuresEqual(mp->getInt("integer"), 1234);
+    EnsuresApproximatelyEqual(mp->getDouble("double"), 12.34, 1e-10);
+    EnsuresEqual(mp->getString("string"), "test");
+    EnsuresEqual(mp->getXml("xml"), "xml test");
 
-    BOOST_REQUIRE_THROW(mp->getInt("boolean"), utils::CastError);
-    BOOST_REQUIRE_NO_THROW(mp->getInt("integer"));
-    BOOST_REQUIRE_THROW(mp->getInt("double"), utils::CastError);
-    BOOST_REQUIRE_THROW(mp->getInt("string"), utils::CastError);
-    BOOST_REQUIRE_THROW(mp->getInt("xml"), utils::CastError);
+    EnsuresThrow(mp->getInt("boolean"), utils::CastError);
+    EnsuresNotThrow(mp->getInt("integer"), std::exception);
+    EnsuresThrow(mp->getInt("double"), utils::CastError);
+    EnsuresThrow(mp->getInt("string"), utils::CastError);
+    EnsuresThrow(mp->getInt("xml"), utils::CastError);
 }
 
-BOOST_AUTO_TEST_CASE(check_set_value)
+void check_set_value()
 {
     auto st = std::unique_ptr<value::Set>(new value::Set());
 
-    BOOST_REQUIRE_EQUAL(st->empty(), true);
+    EnsuresEqual(st->empty(), true);
     st->addBoolean(true);
     st->addInt(1234);
     st->addDouble(12.34);
     st->addString("test");
     st->addXml("xml test");
-    BOOST_REQUIRE_EQUAL(st->empty(), false);
+    EnsuresEqual(st->empty(), false);
 
-    BOOST_REQUIRE_EQUAL(st->getBoolean(0), true);
-    BOOST_REQUIRE_EQUAL(st->getInt(1), 1234);
-    BOOST_REQUIRE_CLOSE(st->getDouble(2), 12.34, 1e-10);
-    BOOST_REQUIRE_EQUAL(st->getString(3), "test");
-    BOOST_REQUIRE_EQUAL(st->getXml(4), "xml test");
+    EnsuresEqual(st->getBoolean(0), true);
+    EnsuresEqual(st->getInt(1), 1234);
+    EnsuresApproximatelyEqual(st->getDouble(2), 12.34, 1e-10);
+    EnsuresEqual(st->getString(3), "test");
+    EnsuresEqual(st->getXml(4), "xml test");
 
-    BOOST_REQUIRE_THROW(st->getInt(0), utils::CastError);
-    BOOST_REQUIRE_NO_THROW(st->getInt(1));
-    BOOST_REQUIRE_THROW(st->getInt(2), utils::CastError);
-    BOOST_REQUIRE_THROW(st->getInt(3), utils::CastError);
-    BOOST_REQUIRE_THROW(st->getInt(4), utils::CastError);
+    EnsuresThrow(st->getInt(0), utils::CastError);
+    EnsuresNotThrow(st->getInt(1), std::exception);
+    EnsuresThrow(st->getInt(2), utils::CastError);
+    EnsuresThrow(st->getInt(3), utils::CastError);
+    EnsuresThrow(st->getInt(4), utils::CastError);
 }
 
-BOOST_AUTO_TEST_CASE(check_clone)
+void check_clone()
 {
     std::unique_ptr<value::Value> clone;
 
@@ -166,9 +153,9 @@ BOOST_AUTO_TEST_CASE(check_clone)
         clone = mp->clone();
         auto mpclone = clone->toMap();
 
-        BOOST_REQUIRE(mp->get("x1") != mpclone.get("x1"));
-        BOOST_REQUIRE(mp->get("x2") != mpclone.get("x2"));
-        BOOST_REQUIRE(mp->get("x3") != mpclone.get("x3"));
+        Ensures(mp->get("x1") != mpclone.get("x1"));
+        Ensures(mp->get("x2") != mpclone.get("x2"));
+        Ensures(mp->get("x3") != mpclone.get("x3"));
     }
 
     {
@@ -180,14 +167,14 @@ BOOST_AUTO_TEST_CASE(check_clone)
         clone = st->clone();
         auto stclone = clone->toSet();
 
-        BOOST_REQUIRE_EQUAL(st->size(), stclone.size());
-        BOOST_REQUIRE(st->get(0) != stclone.get(0));
-        BOOST_REQUIRE(st->get(1) != stclone.get(1));
-        BOOST_REQUIRE(st->get(2) != stclone.get(2));
+        EnsuresEqual(st->size(), stclone.size());
+        Ensures(st->get(0) != stclone.get(0));
+        Ensures(st->get(1) != stclone.get(1));
+        Ensures(st->get(2) != stclone.get(2));
     }
 }
 
-BOOST_AUTO_TEST_CASE(check_null)
+void check_null()
 {
     auto st = std::unique_ptr<value::Set>(new value::Set());
     st->addString("toto1");
@@ -201,7 +188,7 @@ BOOST_AUTO_TEST_CASE(check_null)
     st->addString("toto5");
     st->addNull();
 
-    BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 10);
+    EnsuresEqual(st->size(), (value::VectorValue::size_type) 10);
 
     auto it = st->value().begin();
 
@@ -218,53 +205,53 @@ BOOST_AUTO_TEST_CASE(check_null)
 
     st->value().erase(it, st->value().end());
 
-    BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 5);
+    EnsuresEqual(st->size(), (value::VectorValue::size_type) 5);
 }
 
-BOOST_AUTO_TEST_CASE(check_matrix)
+void check_matrix()
 {
     auto mx = std::unique_ptr<value::Matrix>(new value::Matrix(100, 100, 10, 10));
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)100);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)100);
+    EnsuresEqual(mx->rows(), (value::Matrix::size_type)100);
+    EnsuresEqual(mx->columns(), (value::Matrix::size_type)100);
 
     mx->addColumn();
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)100);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)101);
+    EnsuresEqual(mx->rows(), (value::Matrix::size_type)100);
+    EnsuresEqual(mx->columns(), (value::Matrix::size_type)101);
 
     mx->addRow();
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)101);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)101);
+    EnsuresEqual(mx->rows(), (value::Matrix::size_type)101);
+    EnsuresEqual(mx->columns(), (value::Matrix::size_type)101);
 
     mx->add(0, 0, value::Integer::create(10));
 
-    BOOST_REQUIRE_EQUAL(mx->get(0, 0)->isInteger(), true);
-    BOOST_REQUIRE_EQUAL(mx->get(0, 0)->toInteger().value(), 10);
+    EnsuresEqual(mx->get(0, 0)->isInteger(), true);
+    EnsuresEqual(mx->get(0, 0)->toInteger().value(), 10);
 
     auto cpy = std::unique_ptr<value::Matrix>(new value::Matrix(*mx));
 
-    BOOST_REQUIRE_EQUAL(cpy->get(0,0)->isInteger(), true);
+    EnsuresEqual(cpy->get(0,0)->isInteger(), true);
 
     cpy->get(0, 0)->toInteger().set(20);
     std::cout << cpy->writeToString() << '\n';
 
-    BOOST_REQUIRE_EQUAL(mx->get(0, 0)->toInteger().value(), 10);
-    BOOST_REQUIRE_EQUAL(cpy->get(0, 0)->toInteger().value(), 20);
+    EnsuresEqual(mx->get(0, 0)->toInteger().value(), 10);
+    EnsuresEqual(cpy->get(0, 0)->toInteger().value(), 20);
 
-    BOOST_REQUIRE_EQUAL(cpy->rows(), 101);
-    BOOST_REQUIRE_EQUAL(cpy->columns(), 101);
+    EnsuresEqual(cpy->rows(), 101);
+    EnsuresEqual(cpy->columns(), 101);
 
     cpy->resize(3, 4);
     std::cout << cpy->writeToString() << '\n';
 
-    BOOST_REQUIRE_EQUAL(cpy->rows(), 4);
-    BOOST_REQUIRE_EQUAL(cpy->columns(), 3);
+    EnsuresEqual(cpy->rows(), 4);
+    EnsuresEqual(cpy->columns(), 3);
 
     cpy->resize(5, 3, value::Boolean::create(true));
     std::cout << cpy->writeToString() << '\n';
 
-    BOOST_REQUIRE_EQUAL(cpy->rows(), 3);
-    BOOST_REQUIRE_EQUAL(cpy->columns(), 5);
-    BOOST_REQUIRE(cpy->getBoolean(4,2));
+    EnsuresEqual(cpy->rows(), 3);
+    EnsuresEqual(cpy->columns(), 5);
+    Ensures(cpy->getBoolean(4,2));
 
     cpy->resize(10, 10, value::Boolean::create(false));
     std::cout << cpy->writeToString() << '\n';
@@ -321,22 +308,22 @@ namespace test {
 
 void check_user_value(vle::value::Value& to_check)
 {
-    BOOST_REQUIRE_EQUAL(to_check.getType(), vle::value::Value::USER);
+    EnsuresEqual(to_check.getType(), vle::value::Value::USER);
 
     auto& user = to_check.toUser();
-    BOOST_REQUIRE_EQUAL(user.getType(), vle::value::Value::USER);
-    BOOST_REQUIRE_EQUAL(user.id(), 15978462u);
+    EnsuresEqual(user.getType(), vle::value::Value::USER);
+    EnsuresEqual(user.id(), 15978462u);
 
     test::MyData *mydata = dynamic_cast <test::MyData*>(&user);
-    BOOST_REQUIRE(mydata);
+    Ensures(mydata);
 
-    BOOST_REQUIRE_EQUAL(mydata->x, 1.);
-    BOOST_REQUIRE_EQUAL(mydata->y, 2.);
-    BOOST_REQUIRE_EQUAL(mydata->z, 3.);
-    BOOST_REQUIRE_EQUAL(mydata->name, "test-vle");
+    EnsuresEqual(mydata->x, 1.);
+    EnsuresEqual(mydata->y, 2.);
+    EnsuresEqual(mydata->z, 3.);
+    EnsuresEqual(mydata->name, "test-vle");
 }
 
-BOOST_AUTO_TEST_CASE(test_user_value)
+void test_user_value()
 {
     auto data = std::unique_ptr<value::Value>(new test::MyData(1., 2., 3., "test-vle"));
     check_user_value(*data.get());
@@ -344,21 +331,21 @@ BOOST_AUTO_TEST_CASE(test_user_value)
     std::unique_ptr<vle::value::Value> cloned_data = data->clone();
     check_user_value(*cloned_data.get());
 
-    BOOST_REQUIRE(data.get() != cloned_data.get());
+    Ensures(data.get() != cloned_data.get());
 }
 
-BOOST_AUTO_TEST_CASE(test_tuple)
+void test_tuple()
 {
     value::Tuple t(4, 1.);
 
     for (auto & v : t.value())
-        BOOST_REQUIRE(v == 1.);
+        Ensures(v == 1.);
 
     t(0) = 2;
-    BOOST_REQUIRE(t.at(0) == t(0));
+    Ensures(t.at(0) == t(0));
 }
 
-BOOST_AUTO_TEST_CASE(test_table)
+void test_table()
 {
     value::Table t(2, 3);
 
@@ -368,25 +355,41 @@ BOOST_AUTO_TEST_CASE(test_table)
             v = value++;
     }
 
-    BOOST_REQUIRE(t(0, 0) == 0.);
-    BOOST_REQUIRE(t(1, 0) == 1.);
-    BOOST_REQUIRE(t(0, 1) == 2.);
-    BOOST_REQUIRE(t(1, 1) == 3.);
-    BOOST_REQUIRE(t(0, 2) == 4.);
-    BOOST_REQUIRE(t(1, 2) == 5.);
+    Ensures(t(0, 0) == 0.);
+    Ensures(t(1, 0) == 1.);
+    Ensures(t(0, 1) == 2.);
+    Ensures(t(1, 1) == 3.);
+    Ensures(t(0, 2) == 4.);
+    Ensures(t(1, 2) == 5.);
 
     t.resize(3, 4);
 
-    BOOST_REQUIRE(t(0, 0) == 0.);
-    BOOST_REQUIRE(t(1, 0) == 1.);
-    BOOST_REQUIRE(t(0, 1) == 2.);
-    BOOST_REQUIRE(t(1, 1) == 3.);
-    BOOST_REQUIRE(t(0, 2) == 4.);
-    BOOST_REQUIRE(t(1, 2) == 5.);
+    Ensures(t(0, 0) == 0.);
+    Ensures(t(1, 0) == 1.);
+    Ensures(t(0, 1) == 2.);
+    Ensures(t(1, 1) == 3.);
+    Ensures(t(0, 2) == 4.);
+    Ensures(t(1, 2) == 5.);
 
     t.resize(1, 3);
 
-    BOOST_REQUIRE(t(0, 0) == 0.);
-    BOOST_REQUIRE(t(0, 1) == 2.);
-    BOOST_REQUIRE(t(0, 2) == 4.);
+    Ensures(t(0, 0) == 0.);
+    Ensures(t(0, 1) == 2.);
+    Ensures(t(0, 2) == 4.);
+}
+
+
+int main()
+{
+    check_simple_value();
+    check_map_value();
+    check_set_value();
+    check_clone();
+    check_null();
+    check_matrix();
+    test_user_value();
+    test_tuple();
+    test_table();
+
+    return unit_test::report_errors();
 }

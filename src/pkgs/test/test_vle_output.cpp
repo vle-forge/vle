@@ -24,9 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE devstime_mdl
-#include <boost/test/included/unit_test.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/Executive.hpp>
 #include <vle/devs/Coordinator.hpp>
@@ -66,8 +64,8 @@ using namespace vle;
                 const vle::devs::InitEventList& events)                 \
         {                                                               \
             std::string symbol_test(xstringify(symbol_));               \
-            BOOST_REQUIRE(symbol_test.length() > 4);                    \
-            BOOST_REQUIRE(symbol_test.compare(0, 4, "exe_") == 0);      \
+            Ensures(symbol_test.length() > 4);                    \
+            Ensures(symbol_test.compare(0, 4, "exe_") == 0);      \
             return new model_(init, events);                            \
         }                                                               \
     }
@@ -132,7 +130,7 @@ public:
 
 DECLARE_DYNAMICS_SYMBOL(dynamics_obs, DynamicObs)
 
-BOOST_AUTO_TEST_CASE(test_dynamic_obs)
+void test_dynamic_obs()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(PKGS_TEST_DIR);
@@ -148,31 +146,38 @@ BOOST_AUTO_TEST_CASE(test_dynamic_obs)
 
         while (root.run());
         std::unique_ptr<value::Map> out = root.finish();
-        BOOST_REQUIRE(out);
-        BOOST_REQUIRE_EQUAL(out->size(),4);
+        Ensures(out);
+        EnsuresEqual(out->size(),4);
 
         //6 lines: header + 5 timed obs (timestep = 1, duration = 4)
-        BOOST_REQUIRE_EQUAL(out->getMatrix("viewTimed").rows(),6);
+        EnsuresEqual(out->getMatrix("viewTimed").rows(),6);
         //std::cout << "dbg viewTimed\n" << out->getMatrix("viewTimed") << "\n";
 
         //2 lines: header + only one input
-        BOOST_REQUIRE_EQUAL(out->getMatrix("viewOutput").rows(),2);
-        BOOST_REQUIRE_CLOSE(out->getMatrix("viewOutput").getDouble(1,1),
+        EnsuresEqual(out->getMatrix("viewOutput").rows(),2);
+        EnsuresApproximatelyEqual(out->getMatrix("viewOutput").getDouble(1,1),
                             0.0,10e-4);
         //std::cout << "dbg viewOutput\n" << out->getMatrix("viewOutput") << "\n";
 
 
         //2 lines: header + only one intenral transition
-        BOOST_REQUIRE_EQUAL(out->getMatrix("viewInternal").rows(),2);
-        BOOST_REQUIRE_CLOSE(out->getMatrix("viewInternal").getDouble(1,1),
+        EnsuresEqual(out->getMatrix("viewInternal").rows(),2);
+        EnsuresApproximatelyEqual(out->getMatrix("viewInternal").getDouble(1,1),
                                     3.9,10e-4);
         //std::cout << "dbg viewInternal\n" << out->getMatrix("viewInternal") << "\n";
 
         //2 lines: header +finish
-        BOOST_REQUIRE_EQUAL(out->getMatrix("viewFinish").rows(),2);
+        EnsuresEqual(out->getMatrix("viewFinish").rows(),2);
         //std::cout << "dbg viewFinish\n" << out->getMatrix("viewFinish") << "\n";
 
     } catch (const std::exception& e) {
-        BOOST_REQUIRE(false);
+        Ensures(false);
     }
+}
+
+int main()
+{
+    test_dynamic_obs();
+
+    return unit_test::report_errors();
 }
