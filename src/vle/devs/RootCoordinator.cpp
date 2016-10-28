@@ -56,7 +56,7 @@ void RootCoordinator::load(vpz::Vpz& io)
 
     m_coordinator->init(io.project().model(), m_currentTime, m_end);
 
-    m_root = std::move(io.project().model().graph());
+    m_root = io.project().model().graph();
 }
 
 void RootCoordinator::init()
