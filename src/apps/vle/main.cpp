@@ -185,7 +185,7 @@ static void show_help() noexcept
           "infos,i       Informations of VLE\n"
           "restart       Remove configuration file of VLE\n"
           "log-file      log of simulation are reported to the standard file\n"
-          "              ($VLE_HOME/vle-x.y.log"
+          "              ($VLE_HOME/vle-x.y.log)\n"
           "log-stdout    log of the simulation(s) are reported to the "
           "standard output (default)\n"
           "log-stderr    log of the sinulation(s) are reported to the "
@@ -742,7 +742,7 @@ int main(int argc, char **argv)
         {"processor", 1, nullptr, 'j'},
         {"manager", 0, nullptr, 'm'},
         {"package", 0, nullptr, 'P'},
-        {"manager", 0, nullptr, 'R'},
+        {"remote", 0, nullptr, 'R'},
         {"config", 0, nullptr, 'C'},
         {0, 0, nullptr, 0}
     };
@@ -870,7 +870,7 @@ int main(int argc, char **argv)
         ret = manage_config_mode(ctx, std::move(commands));
         break;
     default:
-        fprintf(stderr, _("Select only one mode in manager, "
+        fprintf(stderr, _("Select only one mode in package, "
                           "remote or config\n"));
         break;
     };
