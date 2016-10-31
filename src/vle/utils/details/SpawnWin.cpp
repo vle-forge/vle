@@ -37,6 +37,7 @@
 #include <functional>
 #include <fstream>
 #include <windows.h>
+#include <strsafe.h>
 #include <iostream>
 
 
@@ -605,7 +606,7 @@ struct Spawn::Pimpl
 
         // MessageBox(NULL, (LPCTSTR)displaybuffer, TEXT("Error"), MB_OK);
 
-        vDbg(m_pimpl->m_context, "%s\n", (char*)displaybuffer);
+        vDbg(m_context, "%s\n", (char*)displaybuffer);
 
         LocalFree(buffer);
         LocalFree(displaybuffer);
@@ -637,8 +638,9 @@ struct Spawn::Pimpl
         if (m_finish)
             return;
 
-        if (TerminateProcess(m_pi, 0) == 0)
+        if (TerminateProcess(m_pi.hProcess, 0) == 0)
             format("TerminateProcess", GetLastError());
+            
     }
 
     bool isfinish()

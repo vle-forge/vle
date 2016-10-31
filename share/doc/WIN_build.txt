@@ -39,7 +39,7 @@ cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OF
 mingw32-make install
 
 mingw32-make test
-cpack.exe -G NSIS
+cpack.exe --debug -G NSIS
 
 
 #set QT_QPA_PLATFORM_PLUGIN_PATH=%install_dir%\vle\share\qt5\plugins\platforms\

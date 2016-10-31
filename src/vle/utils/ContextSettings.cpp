@@ -51,6 +51,7 @@
 #define VLE_COMMAND_URL_GET "curl.exe '%1%' -o '%2%'"
 #define VLE_COMMAND_DIR_COPY "cmake.exe -E copy_directory '%1%' '%2%'"
 #define VLE_COMMAND_DIR_REMOVE "cmake.exe -E remove_directory '%1%'"
+#define VLE_COMMAND_VLE_SIMULATION "vle.exe --write-output '%1%' '%2%'"
 #else
 #define VLE_PACKAGE_COMMAND_CONFIGURE           \
     "cmake -DCMAKE_INSTALL_PREFIX='%1%' "       \
