@@ -244,7 +244,6 @@ int main(int argc, char **argv)
 
                         vle::manager::Error error;
                         auto res = man.run(std::move(v),
-                                           pack.name(),
                                            1,
                                            rank,
                                            world,

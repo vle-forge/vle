@@ -287,23 +287,32 @@ static void show_package_content(vle::utils::Package& pkg)
 }
 
 static std::string search_vpz(const std::string &param,
-                              vle::utils::Package& pkg)
+                              std::shared_ptr<vle::utils::Package> pkg)
 {
-    assert(not pkg.name().empty());
+    if (pkg == nullptr) {
+        vle::utils::Path p(param);
+        if (p.is_file()) {
+            return param;
+        } else {
+            fprintf(stderr, _("Filename '%s' does not exist\n"), param.c_str());
+            return std::string();
+        }
+    }
 
+    assert(not pkg->name().empty());
     {
         vle::utils::Path p(param);
         if (p.is_file())
             return param;
     }
 
-    std::string np = pkg.getExpFile(param, vle::utils::PKG_BINARY);
+    std::string np = pkg->getExpFile(param, vle::utils::PKG_BINARY);
 
     vle::utils::Path p(np);
     if (p.is_file(np))
         return np;
 
-    fprintf(stderr, _("Filename '%s' does not exist"), param.c_str());
+    fprintf(stderr, _("Filename '%s' does not exist\n"), param.c_str());
 
     return std::string();
 }
@@ -321,10 +330,9 @@ static vle::manager::LogOptions convert_log_mode(vle::utils::ContextPtr ctx)
 }
 
 static int run_manager(vle::utils::ContextPtr ctx,
-                       const std::string& package,
                        std::chrono::milliseconds timeout,
                        CmdArgs::const_iterator it, CmdArgs::const_iterator end,
-                       int processor, vle::utils::Package& pkg)
+                       int processor, std::shared_ptr<vle::utils::Package> pkg)
 {
     vle::manager::Manager man(ctx, convert_log_mode(ctx),
                               vle::manager::SIMULATION_NONE |
@@ -332,21 +340,25 @@ static int run_manager(vle::utils::ContextPtr ctx,
                               timeout, &std::cout);
     int success = EXIT_SUCCESS;
 
-    for (; it != end; ++it) {
-        vle::manager::Error error;
-        std::unique_ptr<vle::value::Matrix> res =
-            man.run(
-                std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
-                package,
-                processor,
-                0,
-                1,
-                &error);
-
-        if (error.code) {
-            fprintf(stderr, _("Experimental frames `%s' throws error %s"),
-                    it->c_str(), error.message.c_str());
+    for (; (it != end) and (success == EXIT_SUCCESS); ++it) {
+        std::string vpzAbsolutePath = search_vpz(*it, pkg);
+        if (vpzAbsolutePath.empty()) {
             success = EXIT_FAILURE;
+        } else {
+            vle::manager::Error error;
+            std::unique_ptr<vle::value::Matrix> res =
+                    man.run(
+                            std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath),
+                            processor,
+                            0,
+                            1,
+                            &error);
+
+            if (error.code) {
+                fprintf(stderr, _("Experimental frames `%s' throws error %s"),
+                        it->c_str(), error.message.c_str());
+                success = EXIT_FAILURE;
+            }
         }
     }
 
@@ -354,41 +366,43 @@ static int run_manager(vle::utils::ContextPtr ctx,
 }
 
 static int run_simulation(vle::utils::ContextPtr ctx,
-                          const std::string& package,
                           std::chrono::milliseconds timeout,
                           const std::string& output_file,
                           CmdArgs::const_iterator it,
                           CmdArgs::const_iterator end,
-                          vle::utils::Package& pkg)
+                          std::shared_ptr<vle::utils::Package> pkg)
 {
     vle::manager::Simulation sim(ctx, convert_log_mode(ctx),
                                  vle::manager::SIMULATION_NONE,
                                  timeout, &std::cout);
     int success = EXIT_SUCCESS;
 
-    for (; it != end; ++it) {
-        vle::manager::Error error;
-
-        auto res = sim.run(
-            std::make_unique<vle::vpz::Vpz>(search_vpz(*it, pkg)),
-            package,
-            &error);
-
-        if (error.code) {
-            fprintf(stderr, _("Simulator `%s' throws error %s\n"),
-                    it->c_str(), error.message.c_str());
+    for (; (it != end) and (success == EXIT_SUCCESS); ++it) {
+        std::string vpzAbsolutePath = search_vpz(*it, pkg);
+        if (vpzAbsolutePath.empty()) {
             success = EXIT_FAILURE;
         } else {
-            if (res and not output_file.empty()) {
-                std::ofstream ofs(output_file);
+            vle::manager::Error error;
+            auto res = sim.run(
+                    std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath),
+                    &error);
 
-                if (not ofs) {
-                    fprintf(stderr, _("Simulation`%s' file to write output"
-                                      " file %s\n"),
-                            it->c_str(),
-                            output_file.c_str());
-                } else {
-                    res->writeXml(ofs);
+            if (error.code) {
+                fprintf(stderr, _("Simulator `%s' throws error %s\n"),
+                        it->c_str(), error.message.c_str());
+                success = EXIT_FAILURE;
+            } else {
+                if (res and not output_file.empty()) {
+                    std::ofstream ofs(output_file);
+
+                    if (not ofs) {
+                        fprintf(stderr, _("Simulation`%s' file to write output"
+                                " file %s\n"),
+                                it->c_str(),
+                                output_file.c_str());
+                    } else {
+                        res->writeXml(ofs);
+                    }
                 }
             }
         }
@@ -430,47 +444,48 @@ static int manage_package_mode(vle::utils::ContextPtr ctx,
     auto end = args.end();
     bool stop = false;
 
-    vle::utils::Package pkg(ctx, packagename);
+    std::shared_ptr<vle::utils::Package> pkg =
+            std::make_shared<vle::utils::Package>(ctx, packagename);
 
-    if (not init_package(pkg, args))
+    if (not init_package(*pkg, args))
         return EXIT_FAILURE;
 
     for (; not stop and it != end; ++it) {
         if (*it == "create") {
             try {
-                pkg.create();
+                pkg->create();
             } catch (const std::exception &e) {
                 fprintf(stderr, _("Cannot create package: %s\n"), e.what());
                 stop = true;
             }
         } else if (*it == "configure") {
-            pkg.configure();
-            pkg.wait(std::cerr, std::cerr);
-            stop = not pkg.isSuccess();
+            pkg->configure();
+            pkg->wait(std::cerr, std::cerr);
+            stop = not pkg->isSuccess();
         } else if (*it == "build") {
-            pkg.build();
-            pkg.wait(std::cerr, std::cerr);
-            if (pkg.isSuccess()) {
-                pkg.install();
-                pkg.wait(std::cerr, std::cerr);
+            pkg->build();
+            pkg->wait(std::cerr, std::cerr);
+            if (pkg->isSuccess()) {
+                pkg->install();
+                pkg->wait(std::cerr, std::cerr);
             }
-            stop = not pkg.isSuccess();
+            stop = not pkg->isSuccess();
         } else if (*it == "test") {
-            pkg.test();
-            pkg.wait(std::cerr, std::cerr);
-            stop = not pkg.isSuccess();
+            pkg->test();
+            pkg->wait(std::cerr, std::cerr);
+            stop = not pkg->isSuccess();
         } else if (*it == "install") {
-            pkg.install();
-            pkg.wait(std::cerr, std::cerr);
-            stop = not pkg.isSuccess();
+            pkg->install();
+            pkg->wait(std::cerr, std::cerr);
+            stop = not pkg->isSuccess();
         } else if (*it == "clean") {
-            pkg.clean();
+            pkg->clean();
         } else if (*it == "rclean") {
-            pkg.rclean();
+            pkg->rclean();
         } else if (*it == "package") {
-            pkg.pack();
-            pkg.wait(std::cerr, std::cerr);
-            stop = not pkg.isSuccess();
+            pkg->pack();
+            pkg->wait(std::cerr, std::cerr);
+            stop = not pkg->isSuccess();
         } else if (*it == "all") {
             fprintf(stderr, _("all is not yet implemented\n"));
             stop = true;
@@ -478,7 +493,7 @@ static int manage_package_mode(vle::utils::ContextPtr ctx,
             fprintf(stderr, _("Depends is not yet implemented\n"));
             stop = true;
         } else if (*it == "list") {
-            show_package_content(pkg);
+            show_package_content(*pkg);
         } else {
             break;
         }
@@ -490,10 +505,10 @@ static int manage_package_mode(vle::utils::ContextPtr ctx,
         ret = EXIT_FAILURE;
     else if (it != end) {
         if (manager_mode)
-            ret = run_manager(ctx, packagename, timeout, it, end,
+            ret = run_manager(ctx, timeout, it, end,
                     processor, pkg);
         else
-            ret = run_simulation(ctx, packagename, timeout,
+            ret = run_simulation(ctx, timeout,
                     output_file, it, end, pkg);
     }
 
@@ -647,6 +662,37 @@ static int manage_remote_mode(vle::utils::ContextPtr ctx, CmdArgs args)
     return ret;
 }
 
+
+
+static int manage_nothing_mode(vle::utils::ContextPtr ctx,
+        const std::string& output_file,
+        std::chrono::milliseconds timeout,
+        bool manager_mode,
+        int processor, CmdArgs args)
+{
+    if (args.empty()) {
+        fprintf(stderr, _("missing vpz file to simulate\n"));
+        return EXIT_FAILURE;
+    }
+
+    std::shared_ptr<vle::utils::Package> pkg = nullptr;
+
+    auto it = args.begin();
+    auto end = args.end();
+    int ret = EXIT_SUCCESS;
+
+    if (manager_mode)
+        ret = run_manager(ctx, timeout, it, end,
+                processor, pkg);
+    else
+        ret = run_simulation(ctx, timeout,
+                output_file, it, end, pkg);
+
+    return ret;
+}
+
+
+
 struct Comma {
     std::string operator()(const std::string &a, const std::string &b) const
     {
@@ -763,7 +809,7 @@ int main(int argc, char **argv)
                     if (t <= 0)
                         throw std::exception();
                     timeout = std::chrono::milliseconds(t);
-                } catch (const std::exception /* e */) {
+                } catch (const std::exception& /* e */) {
                     fprintf(stderr, _("Bad timeout: %s. Assume no timeout\n"),
                             ::optarg);
                 }
@@ -826,17 +872,18 @@ int main(int argc, char **argv)
     }
 
     //
-    // If --restart we remove configuration files but we continue the
-    // prcess.
+    // If --restart we remove configuration files and we stop the process
     //
-    if (restart_conf)
+    if (restart_conf) {
         remove_configuration_file();
+        return ret;
+    }
 
     //
     // If help(), infos(), versions() or and error in command line
     // expression, we close application.
     //
-    if (mode & CLI_MODE_END or mode & CLI_MODE_NOTHING)
+    if (mode & CLI_MODE_END)
         return ret;
 
     //
@@ -869,9 +916,14 @@ int main(int argc, char **argv)
     case CLI_MODE_CONFIG:
         ret = manage_config_mode(ctx, std::move(commands));
         break;
+    case CLI_MODE_NOTHING:
+        ret = manage_nothing_mode(ctx, output_file, timeout, manager,
+                processor_number,
+                std::move(commands));
+        break;
     default:
-        fprintf(stderr, _("Select only one mode in package, "
-                          "remote or config\n"));
+        fprintf(stderr, _("Provide vpz to simulate or select only one mode in "
+                "package, remote or config\n"));
         break;
     };
 

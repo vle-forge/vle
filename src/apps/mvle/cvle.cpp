@@ -493,7 +493,7 @@ private:
 
         auto vpz = std::make_unique<vle::vpz::Vpz>(*m_vpz.get());
 
-        auto result = m_simulator.run(std::move(vpz), m_packagename, &error);
+        auto result = m_simulator.run(std::move(vpz), &error);
 
         if (error.code) {
             if (m_warnings) {

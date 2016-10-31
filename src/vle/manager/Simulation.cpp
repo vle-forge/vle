@@ -246,7 +246,6 @@ public:
 
     std::unique_ptr<value::Map>
     runSubProcess(std::unique_ptr<vpz::Vpz> vpz,
-                  const std::string& package,
                   Error *error)
     {
         auto pwd = utils::Path::current_path();
@@ -257,7 +256,7 @@ public:
         try {
             m_context->get_setting("vle.command.vle.simulation", &command);
             command = (vle::fmt(command) % m_output_file.string() %
-                       package % m_vpz_file.string()).str();
+                       m_vpz_file.string()).str();
 
             vle::utils::Spawn spawn(m_context);
             auto argv = spawn.splitCommandLine(command);
@@ -331,7 +330,7 @@ public:
             vErr(m_context, _("VLE sub process: unable to start "
                              "'%s' in '%s' with "
                              "the '%s' command\n"),
-                 package.c_str(),
+                 m_vpz_file.string().c_str(),
                  pwd.string().c_str(),
                  command.c_str());
 
@@ -358,14 +357,13 @@ Simulation::~Simulation() = default;
 
 std::unique_ptr<value::Map>
 Simulation::run(std::unique_ptr<vpz::Vpz> vpz,
-                const std::string& package,
                 Error *error)
 {
     error->code = 0;
     std::unique_ptr<value::Map> result;
 
     if (mPimpl->m_simulationoptions & SIMULATION_SPAWN_PROCESS) {
-        result = mPimpl->runSubProcess(std::move(vpz), package, error);
+        result = mPimpl->runSubProcess(std::move(vpz), error);
     } else {
         if (mPimpl->m_logoptions != manager::LOG_NONE) {
             if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {

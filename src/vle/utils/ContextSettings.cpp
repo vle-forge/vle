@@ -68,7 +68,7 @@
 #define VLE_COMMAND_URL_GET "curl --progress-bar '%1%' -o '%2%'"
 #define VLE_COMMAND_DIR_COPY "cmake -E copy_directory '%1%' '%2%'"
 #define VLE_COMMAND_DIR_REMOVE "cmake -E remove_directory '%1%'"
-#define VLE_COMMAND_VLE_SIMULATION "vle-" VLE_ABI_VERSION " --write-output '%1%' -P '%2%' '%3%'"
+#define VLE_COMMAND_VLE_SIMULATION "vle-" VLE_ABI_VERSION " --write-output '%1%' '%2%'"
 #endif
 
 namespace vle { namespace utils {

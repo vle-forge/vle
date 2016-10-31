@@ -64,7 +64,6 @@ public:
 
     std::unique_ptr<value::Map>
         run(std::unique_ptr<vpz::Vpz> vpz,
-            const std::string& package,
             Error *error);
 
 private:

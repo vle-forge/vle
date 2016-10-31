@@ -77,7 +77,6 @@ public:
      * or multi-thread.
      *
      * @param exp
-     * @param modulemgr
      * @param thread
      * @param rank
      * @param world
@@ -92,7 +91,6 @@ public:
      */
     std::unique_ptr<value::Matrix>
         run(std::unique_ptr<vpz::Vpz> exp,
-            const std::string& package,
             uint32_t thread,
             uint32_t rank,
             uint32_t world,

@@ -143,7 +143,6 @@ public:
     struct worker
     {
         utils::ContextPtr                 context;
-        const std::string&                package;
         const std::unique_ptr<vpz::Vpz>&  vpz;
         std::chrono::milliseconds         mTimeout;
         ExperimentGenerator              &expgen;
@@ -155,7 +154,6 @@ public:
         Error                            *error;
 
         worker(utils::ContextPtr                 context,
-               const std::string&                package,
                const std::unique_ptr<vpz::Vpz>&  vpz,
                std::chrono::milliseconds         timeout,
                ExperimentGenerator&              expgen,
@@ -166,7 +164,6 @@ public:
                value::Matrix                    *result,
                Error                            *error)
           : context(context)
-          , package(package)
           , vpz(vpz)
           , mTimeout(timeout)
           , expgen(expgen)
@@ -199,7 +196,7 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                auto simresult = sim.run(std::move(file), package, &err);
+                auto simresult = sim.run(std::move(file), &err);
 
                 if (err.code) {
                     if (not error->code) {
@@ -215,7 +212,6 @@ public:
 
     std::unique_ptr<value::Matrix>
     runManagerThread(std::unique_ptr<vpz::Vpz> vpz,
-                     const std::string& package,
                      uint32_t               threads,
                      uint32_t               rank,
                      uint32_t               world,
@@ -233,7 +229,7 @@ public:
             ctx->set_log_function(
                     std::unique_ptr<utils::Context::LogFunctor>(
                             new vle_log_manager_thread(i)));
-            gp.emplace_back(worker(ctx, package, vpz, mTimeout, expgen,
+            gp.emplace_back(worker(ctx, vpz, mTimeout, expgen,
                        mLogOption, mSimulationOption,
                        i, threads, result.get(), error));
         }
@@ -246,7 +242,6 @@ public:
 
     std::unique_ptr<value::Matrix>
     runManagerMono(std::unique_ptr<vpz::Vpz> vpz,
-                   const std::string& package,
                    uint32_t rank,
                    uint32_t world,
                    Error *error)
@@ -267,7 +262,7 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                sim.run(std::move(file), package, &err);
+                sim.run(std::move(file), &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -288,7 +283,7 @@ public:
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
-                auto simresult = sim.run(std::move(file), package, &err);
+                auto simresult = sim.run(std::move(file), &err);
 
                 if (err.code) {
                     writeRunLog(err.message);
@@ -339,7 +334,6 @@ Manager::~Manager() = default;
 
 std::unique_ptr<value::Matrix>
 Manager::run(std::unique_ptr<vpz::Vpz>  exp,
-             const std::string& package,
              uint32_t                   thread,
              uint32_t                   rank,
              uint32_t                   world,
@@ -368,10 +362,10 @@ Manager::run(std::unique_ptr<vpz::Vpz>  exp,
     mPimpl->writeSummaryLog(_("Manager started"));
 
     if (thread > 1) {
-        result = mPimpl->runManagerThread(std::move(exp), package, thread, rank,
+        result = mPimpl->runManagerThread(std::move(exp), thread, rank,
                                           world, error);
     } else {
-        result = mPimpl->runManagerMono(std::move(exp), package, rank,
+        result = mPimpl->runManagerMono(std::move(exp), rank,
                                         world, error);
     }
 
