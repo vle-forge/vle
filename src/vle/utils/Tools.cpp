@@ -331,4 +331,22 @@ std::string demangle(const std::string& in)
     return result;
 }
 
+void tokenize(const std::string& str, std::vector<std::string>& tokens,
+              const std::string& delim, bool trimEmpty)
+{
+   std::string::size_type pos, lastPos = 0, length = str.length();
+   using value_type = typename std::vector<std::string>::value_type;
+   using size_type  = typename std::vector<std::string>::size_type;
+   while(lastPos < length + 1) {
+      pos = str.find_first_of(delim, lastPos);
+      if(pos == std::string::npos) {
+         pos = length;
+      }
+      if(pos != lastPos || !trimEmpty)
+         tokens.push_back(value_type(str.data()+lastPos,
+                 (size_type)pos-lastPos ));
+      lastPos = pos + 1;
+   }
+}
+
 }} // namespace vle utils

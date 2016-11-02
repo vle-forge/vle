@@ -492,7 +492,7 @@ macro (VleBuildTest _testname _cppfiles)
   set (__cppfilesarg "${_cppfiles}")
   list(GET __cppfilesarg 0 __cppfile1)
   IntVleComputeDependencies("${__cppfile1}"  __include_dirs __libraries)
-  link_directories(${VLE_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+  link_directories(${VLE_LIBRARY_DIRS})
   if (_vle_debug)
     message(STATUS "[VleBuildTest] : add executable `${_testname}'")
   endif ()
@@ -500,18 +500,15 @@ macro (VleBuildTest _testname _cppfiles)
   if (CMAKE_VERSION VERSION_LESS 2.8.12)
     include_directories(
       "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};"
-      "${Boost_INCLUDE_DIRS};${__include_dirs}")
+      "${__include_dirs}")
   else ()
     target_include_directories(${_testname} PUBLIC
      "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};"
-     "${Boost_INCLUDE_DIRS};${__include_dirs}")
+     "${__include_dirs}")
   endif ()
   target_link_libraries(${_testname}
       ${__libraries}
-      ${VLE_LIBRARIES}
-      ${Boost_LIBRARIES}
-      ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-      ${Boost_DATE_TIME_LIBRARY})
+      ${VLE_LIBRARIES})
   if (_vle_debug)
     message(STATUS "[VleBuildTest] : add test `${_testname}'")
   endif ()

@@ -31,6 +31,7 @@
 #include <vle/DllDefines.hpp>
 #include <typeinfo>
 #include <string>
+#include <vector>
 
 #if defined(__GNUC__)
 #define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                   \
@@ -168,6 +169,19 @@ namespace vle { namespace utils {
      * @return the demangled string or the same if libcwd is not linked.
      */
     VLE_API std::string demangle(const std::string& in);
+
+    /**
+     * Tokenize a string with a delimiter
+     * @param[in]  str, the string to tokenize
+     * @param[out] toks, vector filled with tokens
+     * @param[in]  delim, the delimiter for tokenizing
+     * @param[in]  trimEmpty, if true remove empty tokens
+     * @return the tokens
+     */
+    VLE_API  void tokenize(const std::string& str,
+            std::vector<std::string>& toks, const std::string& delim,
+            bool trimEmpty);
+
 
 }} // namespace vle utils
 

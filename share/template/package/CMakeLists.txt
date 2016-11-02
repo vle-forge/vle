@@ -70,7 +70,6 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0020 NEW)#for qt link
 endif (COMMAND CMAKE_POLICY)
 
-
 ##
 ## Check VLE and package dependencies
 ##
@@ -96,15 +95,6 @@ if (WITH_GVLE)
     message (WARNING "GVLE not found!")
   endif ()
 endif ()
-
-##
-## Find boost
-##
-
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREAD ON)
-find_package(Boost COMPONENTS unit_test_framework date_time thread
-  system filesystem)
 
 ##
 ## Find Qt
@@ -194,12 +184,11 @@ endif ()
 if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src")
   add_subdirectory(src)
 endif ()
-
-if (Boost_UNIT_TEST_FRAMEWORK_FOUND AND WITH_TEST)
+if (WITH_TEST)
   if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test")
     add_subdirectory(test)
   endif ()
-endif (Boost_UNIT_TEST_FRAMEWORK_FOUND AND WITH_TEST)
+endif ()
 
 ##
 ## CPack configuration

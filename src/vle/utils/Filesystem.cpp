@@ -15,6 +15,7 @@
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Tools.hpp>
 #include <array>
 #include <fstream>
 #include <string>
@@ -47,28 +48,6 @@
 #include <linux/limits.h>
 #endif
 
-namespace {
-
-std::vector<std::string>
-tokenize(const std::string &string, const std::string &delim)
-{
-    std::string::size_type lastPos = 0, pos = string.find_first_of(delim,
-                                                                   lastPos);
-    std::vector<std::string> tokens;
-
-    while (lastPos != std::string::npos) {
-        if (pos != lastPos)
-            tokens.push_back(string.substr(lastPos, pos - lastPos));
-        lastPos = pos;
-        if (lastPos == std::string::npos || lastPos + 1 == string.length())
-            break;
-        pos = string.find_first_of(delim, ++lastPos);
-    }
-
-    return tokens;
-}
-
-} // anonymous namespace
 
 namespace vle { namespace utils {
 
@@ -288,10 +267,12 @@ void Path::set(const std::string &str, path_type type)
 {
     m_type = type;
     if (type == windows_path) {
-        m_path = tokenize(str, "/\\");
+        m_path.clear();
+        tokenize(str, m_path, "/\\", true);
         m_absolute = str.size() >= 2 && std::isalpha(str[0]) && str[1] == ':';
     } else {
-        m_path = tokenize(str, "/");
+        m_path.clear();
+        tokenize(str, m_path, "/", true);
         m_absolute = !str.empty() && str[0] == '/';
     }
 }

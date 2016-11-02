@@ -496,6 +496,30 @@ void test_array()
     }
 }
 
+void test_tokenize()
+{
+    {
+        std::vector<std::string> tok;
+        vle::utils::tokenize("c:iiu::e",tok, ":",true);
+        Ensures(tok.size() == 3);
+        Ensures(tok[0] == "c");
+        Ensures(tok[1] == "iiu");
+        Ensures(tok[2] == "e");
+    }
+    {
+        std::vector<std::string> tok;
+        vle::utils::tokenize(" c iiu  e ",tok, " ",false);
+        Ensures(tok.size() == 6);
+        Ensures(tok[0] == "");
+        Ensures(tok[1] == "c");
+        Ensures(tok[2] == "iiu");
+        Ensures(tok[3] == "");
+        Ensures(tok[4] == "e");
+        Ensures(tok[5] == "");
+    }
+
+}
+
 int main()
 {
     Ensures(true == true);
@@ -512,6 +536,7 @@ int main()
     to_scientific_string_function();
     test_format_copy();
     test_array();
+    test_tokenize();
 
     return unit_test::report_errors();
 }

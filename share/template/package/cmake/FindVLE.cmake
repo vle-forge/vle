@@ -37,17 +37,10 @@
 #
 #=============================================================================
 #
-# Notes :
-# ---------
-#   FindVLE will try to find VLE and the gtkmm dependencies,
-#   only some boost libraries are not included into the libraries given
-#
-#=============================================================================
-#
 # Usage
 # -----
 #
-# set(VLE_ABI_VERSION 1.2)
+# set(VLE_ABI_VERSION 2.0)
 # find_package(VLE REQUIRED)
 #
 #=============================================================================
