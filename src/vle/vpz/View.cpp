@@ -32,11 +32,11 @@
 namespace vle { namespace vpz {
 
 View::View(const std::string& name, View::Type type,
-           const std::string& output, double timestep)
+           const std::string& output, double timestep, bool enable)
     : m_timestep(timestep)
     , m_name(name)
     , m_output(output)
-    , m_enabled(true)
+    , m_enabled(enable)
     , m_type(type)
 {
     if (m_type == View::TIMED) {

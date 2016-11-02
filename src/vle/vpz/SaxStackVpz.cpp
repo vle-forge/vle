@@ -714,6 +714,7 @@ void SaxStackVpz::pushView(const xmlChar** att)
     const xmlChar* type = nullptr;
     const xmlChar* output = nullptr;
     const xmlChar* timestep = nullptr;
+    const xmlChar* enable = nullptr;
 
     for (int i = 0; att[i] != nullptr; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
@@ -724,9 +725,15 @@ void SaxStackVpz::pushView(const xmlChar** att)
             output = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"timestep") == 0) {
             timestep = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"enable") == 0) {
+            enable = att[i + 1];
         }
     }
 
+    bool enable_b = true;
+    if (enable and xmlStrcmp(enable, (const xmlChar*)"false") == 0) {
+        enable_b = false;
+    }
     Views& views(m_vpz.project().experiment().views());
 
     if (xmlStrcmp(type, (const xmlChar*)"timed") == 0) {
@@ -736,7 +743,8 @@ void SaxStackVpz::pushView(const xmlChar** att)
         }
         views.addTimedView(xmlCharToString(name),
                            xmlXPathCastStringToNumber(timestep),
-                           xmlCharToString(output));
+                           xmlCharToString(output), enable_b);
+
     } else {
         using ustring = std::basic_string<unsigned char>;
 
@@ -773,7 +781,7 @@ void SaxStackVpz::pushView(const xmlChar** att)
 
         views.addEventView(xmlCharToString(name),
                            static_cast<View::Type>(viewtype),
-                           xmlCharToString(output));
+                           xmlCharToString(output), enable_b);
    }
 }
 

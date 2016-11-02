@@ -71,7 +71,8 @@ namespace vle { namespace vpz {
          * Type is TIMED.
          */
         View(const std::string& name, View::Type type,
-             const std::string& output, double timestep = 0.0);
+             const std::string& output, double timestep = 0.0,
+             bool enable =true);
 
         /**
          * @brief Nothing to delete.

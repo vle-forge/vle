@@ -189,25 +189,30 @@ namespace vle { namespace vpz {
         /**
          * @brief Add a new event View.
          * @param name The name of the View.
+         * @param type Type of the view.
          * @param output The output of the View.
+         * @param enable If false, the view is disabled at simulation
          * @return A reference to the newly View.
          * @throw utils::ArgError if name already exist.
          */
         View& addEventView(const std::string& name,
                            View::Type type,
-                           const std::string& output);
+                           const std::string& output,
+                           bool enable = true);
 
         /**
          * @brief Add a new timed View.
          * @param name The name of the View.
          * @param timestep The timestep of observation.
          * @param output The output of the View.
+         * @param enable If false, the view is disabled at simulation
          * @return A reference to the newly View.
          * @throw utils::ArgError if name already exist.
          */
         View& addTimedView(const std::string& name,
                            double timestep,
-                           const std::string& output);
+                           const std::string& output,
+                           bool enable = true);
 
         /**
          * @brief Delete the specified View.

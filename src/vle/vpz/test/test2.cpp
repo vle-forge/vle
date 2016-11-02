@@ -336,7 +336,7 @@ void experiment_measures_vpz()
         "    </observable>\n"
         "   </observables>\n"
         "   <view name=\"x\" type=\"timed\" timestep=\".05\""
-        "            output=\"x\" library=\"lib\" />\n"
+        "            output=\"x\" library=\"lib\" enable=\"false\" />\n"
         "  </views>\n"
         " </experiment>\n"
         "</vle_project>\n";
@@ -374,6 +374,8 @@ void experiment_measures_vpz()
 
     vpz::View& view(views.viewlist().begin()->second);
     EnsuresEqual(view.name(), "x");
+    EnsuresEqual(view.is_enable(), false);
+    view.enable();
     EnsuresEqual(view.is_enable(), true);
     view.disable();
     EnsuresEqual(view.is_enable(), false);

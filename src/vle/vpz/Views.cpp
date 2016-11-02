@@ -108,7 +108,8 @@ View& Views::add(const View& view)
 
 View& Views::addEventView(const std::string& name,
                           View::Type type,
-                          const std::string& output)
+                          const std::string& output,
+                          bool enable)
 {
     if (isUsedOutput(output)) {
         throw utils::ArgError(
@@ -116,12 +117,13 @@ View& Views::addEventView(const std::string& name,
              name).str());
     }
 
-    return add(View(name, type, output));
+    return add(View(name, type, output, 0.0, enable));
 }
 
 View& Views::addTimedView(const std::string& name,
                           double timestep,
-                          const std::string& output)
+                          const std::string& output,
+                          bool enable)
 {
     if (isUsedOutput(output)) {
         throw utils::ArgError(
@@ -129,7 +131,7 @@ View& Views::addTimedView(const std::string& name,
              name).str());
     }
 
-    return add(View(name, View::TIMED, output, timestep));
+    return add(View(name, View::TIMED, output, timestep, enable));
 }
 
 void Views::del(const std::string& name)
