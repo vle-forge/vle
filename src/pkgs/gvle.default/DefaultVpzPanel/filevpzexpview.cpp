@@ -92,7 +92,6 @@ void FileVpzExpView::setVpm(vleVpm* vpm)
 void
 FileVpzExpView::reload()
 {
-     mLog->log(" dbg FileVpzExpView::reload() ");
     if (!mVpm) {
         throw vle::utils::InternalError(
                 " gvle: error in FileVpzExpView::reloadViews");
@@ -138,11 +137,9 @@ FileVpzExpView::reload()
     std::vector<std::string> pkglist;
     auto pkgs = mCtx->getBinaryPackages();
     for (auto pkg : pkgs) {
-		mLog->log(" dbg FileVpzExpView::reload() pkg "+QString(pkg.string().c_str()));
         auto modules = mCtx->get_dynamic_libraries(pkg.filename(),
                 utils::Context::ModuleType::MODULE_OOV);
         for (auto mod : modules) {
-			mLog->log(" dbg FileVpzExpView::reload() mod "+QString(mod.library.c_str()));
             repName.assign(pkg.filename());
             repName += "/";
             repName += mod.library;
@@ -381,17 +378,27 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
     //QModelIndex index = ui->vleViewList->indexAt(pos);
     QListWidgetItem* item = ui->vleViewList->itemAt(pos);
 
+    bool enable_view = true;
+    if (item and not mVpm->enabledViewFromDoc(item->text())) {
+        enable_view = false;
+    }
     QAction* action;
-    QMenu myMenu;
-    action = myMenu.addAction("Add view");
+    QMenu menu;
+    action = menu.addAction("Add view");
     action->setData(FVEVM_add_view);
     action->setEnabled(true);
-    action = myMenu.addAction("Remove view");
+    action = menu.addAction("Remove view");
     action->setData(FVEVM_remove_view);
     action->setEnabled(item);
+    menu.addSeparator();
+    action = menu.addAction("Disable view");
+    action->setData(FVEVM_disable_view);
+    action->setEnabled(item);
+    action->setCheckable(true);
+    action->setChecked(not enable_view);//TODO if disabled
 
 
-    QAction* selectedItem = myMenu.exec(globalPos);
+    QAction* selectedItem = menu.exec(globalPos);
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
         if (actCode == FVEVM_add_view) {
@@ -404,6 +411,10 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
                 mVpm->rmViewToDoc(item->text());
                 currView = "";
                 reload();
+            }
+        } else if (actCode == FVEVM_disable_view) {
+            if (item) {
+                mVpm->enableViewToDoc(item->text(), not enable_view);
             }
         }
     }

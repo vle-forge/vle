@@ -2212,7 +2212,39 @@ vleVpz::rmViewToDoc(const QString& viewName)
     emit viewsUpdated();
 }
 
+bool
+vleVpz::enableViewToDoc(const QString& viewName, bool enable)
+{
+    QDomNode views = viewsFromDoc();
+    QDomNode atom = viewFromDoc(viewName);
+    if (atom.isNull()) {
+        qDebug() << "Internal error in enableViewToDoc "<< viewName;
+        return false;
+    }
+    bool disable_in_place =
+            (vleDomObject::attributeValue(atom, "enable") == "false");
+    if (disable_in_place and enable) {
+        undoStack->snapshot(views);
+        vleDomObject::setAttributeValue(atom, "enable", "true");
+        return true;
+    }
+    if (not disable_in_place and not enable) {
+        undoStack->snapshot(views);
+        vleDomObject::setAttributeValue(atom, "enable", "false");
+        return true;
+    }
+    return false;
+}
 
+bool
+vleVpz::enabledViewFromDoc(const QString& viewName)
+{
+    QDomNode atom = viewFromDoc(viewName);
+    if (atom.isNull()) {
+        return false;
+    }
+    return (not (vleDomObject::attributeValue(atom, "enable") == "false"));
+}
 
 QDomNode
 vleVpz::addConditionToDoc(const QString& condName)

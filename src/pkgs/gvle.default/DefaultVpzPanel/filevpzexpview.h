@@ -46,7 +46,8 @@ namespace gvle {
 enum FILE_VPZ_EXP_VIEW_MENU {
     FVEVM_add_view,
     FVEVM_remove_view,
-    FVEVM_rename_view
+    FVEVM_rename_view,
+    FVEVM_disable_view
 };
 
 class FileVpzExpView : public QWidget

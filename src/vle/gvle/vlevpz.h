@@ -823,6 +823,20 @@ public:
      */
     virtual void rmViewToDoc(const QString& viewName);
     /**
+     * @brief enable/disable a <view> tag to a Vpz Doc
+     * whith attribute 'name'  viewName
+     * @param viewName, the name of the view
+     * @param enable, if true, enable the view else disable the view
+     * @return true if a change has been performed
+     */
+    bool enableViewToDoc(const QString& viewName, bool enable);
+    /**
+     * @brief tells if a <view> tag from a Vpz Doc is enabled
+     * @param viewName, the name of the view
+     * @return true if the view is enabled, false otherwise
+     */
+    bool enabledViewFromDoc(const QString& viewName);
+    /**
      * @brief add a <condition> tag to a Vpz Doc
      * whith attribute 'name'  condName
      */
