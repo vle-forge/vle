@@ -203,8 +203,6 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
     mMenuSimGroup = new QActionGroup(this);
     ui->actionSimNone->setActionGroup(mMenuSimGroup);
 
-
-
     // Update window title
     setWindowTitle("GVLE");
     //

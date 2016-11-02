@@ -11,6 +11,7 @@ option(WITH_TEST "build unit test [default: on]" ON)
 option(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
 option(WITH_MVLE "build mvle [default: off]" OFF)
 option(WITH_CVLE "build cvle [default: off]" OFF)
+option(WITH_WIN32_INSTALLER "prepare win32 installer [default: off]" OFF)
 
 #
 # Usefull variables
