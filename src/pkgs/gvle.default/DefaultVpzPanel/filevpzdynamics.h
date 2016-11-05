@@ -25,7 +25,7 @@
 #ifndef gvle_FILEVPZDYNAMICS_H
 #define gvle_FILEVPZDYNAMICS_H
 
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 
 #ifndef Q_MOC_RUN
 #include <vle/utils/Context.hpp>
@@ -47,7 +47,7 @@ public:
 public:
     explicit FileVpzDynamics(const utils::ContextPtr& ctx, QWidget* parent=0);
     ~FileVpzDynamics();
-    void setVpm(vleVpm* vpm);
+    void setVpz(vleVpz* vpz);
 
 public slots:
 
@@ -55,7 +55,7 @@ public slots:
     void onSelectPackage(const QString & id, const QString & text);
     void onSelectLibrary(const QString & id, const QString& text);
     void onDynamicsTableMenu(const QPoint&);
-    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);
     void onTextUpdated(const QString& id, const QString&, const QString&);
 
@@ -67,7 +67,7 @@ protected:
 
 private:
     Ui::FileVpzDynamics* ui;
-    vleVpz*              mVpm;
+    vleVpz*              mVpz;
     utils::ContextPtr    mCtx;
 
 };

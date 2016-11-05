@@ -46,7 +46,7 @@ namespace gvle {
 FileVpzDynamics::FileVpzDynamics(const utils::ContextPtr& ctx, QWidget* parent):
     QWidget(parent),
     ui(new Ui::FileVpzDynamics),
-    mVpm(0), mCtx(ctx)
+    mVpz(0), mCtx(ctx)
 
 {
     ui->setupUi(this);
@@ -82,10 +82,10 @@ FileVpzDynamics::~FileVpzDynamics()
  *        Set the VPZ object to use
  *
  */
-void FileVpzDynamics::setVpm(vleVpm* vpm)
+void FileVpzDynamics::setVpz(vleVpz* vpz)
 {
-    mVpm = vpm;
-    QObject::connect(vpm, SIGNAL(dynamicsUpdated()),
+    mVpz = vpz;
+    QObject::connect(vpz, SIGNAL(dynamicsUpdated()),
                      this, SLOT (reload()));
 }
 
@@ -115,10 +115,10 @@ void FileVpzDynamics::reload()
 
     // Get the dynamics list from VPZ
     QList<QString> ddynList;
-    mVpm->fillWithDynamicsList(ddynList);
+    mVpz->fillWithDynamicsList(ddynList);
     for (int i = 0; i < ddynList.length(); i++) {
         const QString& dyn = ddynList.at(i);
-        QString dynPkg = mVpm->getDynamicPackage(dyn);
+        QString dynPkg = mVpz->getDynamicPackage(dyn);
 
         //get list of libs for the dynPkg package
         QList <QString> libList;
@@ -135,7 +135,7 @@ void FileVpzDynamics::reload()
         }
 
 
-        QString dynLib = mVpm->getDynamicLibrary(dyn);
+        QString dynLib = mVpz->getDynamicLibrary(dyn);
         ui->tabDynamics->insertRow(i);
         VleLineEdit* dlabName = new VleLineEdit(ui->tabDynamics, dyn, "", false);
         QObject::connect(dlabName,SIGNAL(
@@ -170,14 +170,14 @@ void FileVpzDynamics::reload()
 void
 FileVpzDynamics::onSelectPackage(const QString& id, const QString& text)
 {
-    mVpm->configDynamicToDoc(id.split(",").at(0), text, "<Node>");
+    mVpz->configDynamicToDoc(id.split(",").at(0), text, "<Node>");
     reload();
 }
 
 void FileVpzDynamics::onSelectLibrary(const QString& id, const QString& text)
 {
     QStringList l = id.split(",");
-    mVpm->configDynamicToDoc(l.at(0), l.at(1), text);
+    mVpz->configDynamicToDoc(l.at(0), l.at(1), text);
     reload();
 }
 
@@ -202,18 +202,18 @@ FileVpzDynamics::onDynamicsTableMenu(const QPoint& pos)
         FVD_MENU actCode = (FVD_MENU) selAction->data().toInt();
         switch(actCode){
         case FVD_add_dynamic: {
-            QString dynName = mVpm->newDynamicNameToDoc();
-            mVpm->addDynamicToDoc(dynName, "<None>", "<None>");
+            QString dynName = mVpz->newDynamicNameToDoc();
+            mVpz->addDynamicToDoc(dynName, "<None>", "<None>");
             break;
         } case FVD_remove_dynamic: {
-            mVpm->removeDyn((qobject_cast<VleLineEdit*>(item))->text());
+            mVpz->removeDyn((qobject_cast<VleLineEdit*>(item))->text());
             break;
         }}
     }
 }
 
 void
-FileVpzDynamics::onUndoRedoVpm(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
+FileVpzDynamics::onUndoRedoVpz(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
         QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
 {
     reload();
@@ -223,7 +223,7 @@ void
 FileVpzDynamics::onTextUpdated(const QString& /*id*/, const QString& old,
         const QString& newval)
 {
-    mVpm->renameDynamicToDoc(old, newval);
+    mVpz->renameDynamicToDoc(old, newval);
     reload();
 }
 

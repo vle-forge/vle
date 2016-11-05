@@ -31,7 +31,7 @@
 #include "qcustomplot/qcustomplot.h"
 
 #include <vle/gvle/plugin_simpanel.h>
-#include <vle/gvle/vlevpz.h>
+#include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
 class simpanelleft;

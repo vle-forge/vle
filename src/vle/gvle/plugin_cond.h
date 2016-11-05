@@ -30,12 +30,10 @@
 #include <QWidget>
 #include <QSettings>
 #include <vle/gvle/logger.h>
-#include <vle/gvle/vlevpz.h>
+#include <vle/gvle/vlevpz.hpp>
 
 namespace vle {
 namespace gvle {
-
-class vleVpm;
 
 class PluginExpCond: public QObject
 {

@@ -49,7 +49,7 @@
 #include <vle/value/XML.hpp>
 #include <vle/gvle/gvle_plugins.h>
 #include <vle/gvle/gvle_widgets.h>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 
 #include "filevpzexpcond.h"
 
@@ -61,7 +61,7 @@ namespace vle {
 namespace gvle {
 
 FileVpzExpCond::FileVpzExpCond(gvle_plugins* plugs, QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzExpCond), mVpm(0), mCurrCondName(""),
+    QWidget(parent), ui(new Ui::FileVpzExpCond), mVpz(0), mCurrCondName(""),
     mCurrPortName(""), mCurrValIndex(-1),  mPlugin(0), mGvlePlugins(plugs)
 {
     ui->setupUi(this);
@@ -86,10 +86,10 @@ FileVpzExpCond::~FileVpzExpCond()
 
 
 void
-FileVpzExpCond::setVpm(vleVpm* vpm)
+FileVpzExpCond::setVpz(vleVpz* vpz)
 {
-    mVpm = vpm;
-    QObject::connect(mVpm,
+    mVpz = vpz;
+    QObject::connect(mVpz,
                      SIGNAL(experimentUpdated()),
                      this,
                      SLOT(onExpUpdated()));
@@ -102,14 +102,14 @@ FileVpzExpCond::resizeTable()
 {
     int nbRows = 0;
     int nbCols = 0;
-    QDomNodeList condList = mVpm->condsListFromConds(mVpm->condsFromDoc());
+    QDomNodeList condList = mVpz->condsListFromConds(mVpz->condsFromDoc());
     for (auto i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
-        QString name = mVpm->vdo()->attributeValue(cond, "name");
-        if (mVpm->getCondGUIplugin(name) != "") {
+        QString name = DomFunctions::attributeValue(cond, "name");
+        if (mVpz->getCondGUIplugin(name) != "") {
             nbRows++;
         } else {
-            QDomNodeList portList = mVpm->portsListFromDoc(name);
+            QDomNodeList portList = mVpz->portsListFromDoc(name);
             if (portList.length() == 0) {
                 nbRows++;
             }
@@ -117,7 +117,7 @@ FileVpzExpCond::resizeTable()
                 nbRows++;
                 QDomNode port = portList.at(j);
                 nbCols = std::max(nbCols,
-                        (int) vleDomObject::childNodesWithoutText(port).size());
+                        (int) DomFunctions::childNodesWithoutText(port).size());
             }
         }
     }
@@ -131,17 +131,18 @@ FileVpzExpCond::reload(bool resize)
 {
     ui->table->clearContents();
     resizeTable();
-    QDomNodeList condList = mVpm->condsListFromConds(mVpm->condsFromDoc());
+    QDomNodeList condList = mVpz->condsListFromConds(mVpz->condsFromDoc());
 
     int rows = 0;
     for (auto i = 0; i < condList.length(); i++) {
         QDomNode cond = condList.item(i);
-        QString name = mVpm->vdo()->attributeValue(cond, "name");
-        QDomNodeList portList = mVpm->portsListFromDoc(name);
-        if (mVpm->getCondGUIplugin(name) != ""){
+        QString name = DomFunctions::attributeValue(cond, "name");
+        QDomNodeList portList = mVpz->portsListFromDoc(name);
+        if (mVpz->getCondGUIplugin(name) != ""){
             insertTextEdit(rows, 0, name);
             insertTextEdit(rows, 1, QString("[plugin:%1]").arg(
-                    mVpm->getCondGUIplugin(name)));
+                    mVpz->getCondGUIplugin(name)));
+
             for (int j=2; j < ui->table->columnCount(); j++) {
                 insertNullWidget(rows, j);
             }
@@ -158,10 +159,10 @@ FileVpzExpCond::reload(bool resize)
             for (auto j = 0; j < portList.length(); j++) {
                 QDomNode port = portList.at(j);
                 insertTextEdit(rows, 0, name);
-                insertTextEdit(rows, 1, mVpm->vdo()->attributeValue(port,
+                insertTextEdit(rows, 1, DomFunctions::attributeValue(port,
                         "name"));
                 std::vector<std::unique_ptr<value::Value>> valuesToFill;
-                mVpm->fillWithMultipleValue(port, valuesToFill);
+                mVpz->fillWithMultipleValue(port, valuesToFill);
                 for (int k = 0; k < ui->table->columnCount()-2; k++) {
                     if (k < (int) valuesToFill.size()) {
                         std::unique_ptr<value::Value> val =
@@ -226,8 +227,8 @@ FileVpzExpCond::showEditPlace()
         currwid->deleteLater();
     }
 
-    if (mVpm->getCondGUIplugin(mCurrCondName) != "") {
-        mPlugin = mVpm->provideCondGUIplugin(mCurrCondName);
+    if (mVpz->getCondGUIplugin(mCurrCondName) != "") {
+        mPlugin = mVpz->provideCondGUIplugin(mCurrCondName);
         if (mPlugin) {
             mPlugin->getWidget()->setParent(this);
             ui->vlValue->addWidget(mPlugin->getWidget());
@@ -239,9 +240,9 @@ FileVpzExpCond::showEditPlace()
         return;
     }
 
-    QDomNode portNode = mVpm->portFromDoc(mCurrCondName, mCurrPortName);
+    QDomNode portNode = mVpz->portFromDoc(mCurrCondName, mCurrPortName);
     std::vector<std::unique_ptr<value::Value>> values;
-    mVpm->fillWithMultipleValue(portNode, values);
+    mVpz->fillWithMultipleValue(portNode, values);
     if (values.size() > (unsigned int) mCurrValIndex) {
         std::unique_ptr<vle::value::Value> val =
                 std::move(values[mCurrValIndex]);
@@ -312,17 +313,17 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
     action = menu.addAction("Add port");
     action->setData("EMenuPortAdd");
     action->setEnabled((index.column() == 1) and
-            (mVpm->getCondGUIplugin(condName) == ""));
+            (mVpz->getCondGUIplugin(condName) == ""));
     action = menu.addAction("Remove port");
     action->setData("EMenuPortRemove");
     action->setEnabled((index.column() == 1) and
-            (mVpm->getCondGUIplugin(condName) == ""));
+            (mVpz->getCondGUIplugin(condName) == ""));
     menu.addSeparator();
     subMenu = buildAddValueMenu(menu, "Add");
     subMenu->setEnabled((index.column() == 1) and
             (getLineEdit(index.row(), index.column())->text() !=
                     "<Click here to add a port>") and
-            (mVpm->getCondGUIplugin(condName) == ""));
+            (mVpz->getCondGUIplugin(condName) == ""));
     subMenu = buildAddValueMenu(menu, "Set");
     subMenu->setEnabled(ui->table->item(index.row(), index.column()) and
             (index.column() > 1) and
@@ -338,20 +339,20 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
         disconnectConds();
         QString actCode = act->data().toString();
         if (actCode == "EMenuCondAdd") {
-            mVpm->addConditionToDoc(mVpm->newCondNameToDoc());
+            mVpz->addConditionToDoc(mVpz->newCondNameToDoc());
             reload(false);
         } else if (actCode == "EMenuCondRemove") {
             QString cond = getLineEdit(index.row(),0)->text();
-            mVpm->rmConditionToDoc(cond);
+            mVpz->rmConditionToDoc(cond);
             reload(false);
         } else if (actCode == "EMenuPortAdd") {
             QString cond = getLineEdit(index.row(),0)->text();
-            mVpm->addCondPortToDoc(cond, mVpm->newCondPortNameToDoc(cond));
+            mVpz->addCondPortToDoc(cond, mVpz->newCondPortNameToDoc(cond));
             reload(false);
         } else if (actCode == "EMenuPortRemove") {
             QString cond = getLineEdit(index.row(),0)->text();
             QString port = getLineEdit(index.row(),1)->text();
-            mVpm->rmCondPortToDoc(cond, port);
+            mVpz->rmCondPortToDoc(cond, port);
             reload(false);
         } else if ((actCode == "EMenuValueAddBoolean") or
                 (actCode == "EMenuValueAddInteger") or
@@ -366,21 +367,21 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             QString port = getLineEdit(index.row(),1)->text();
             vle::value::Value* v = buildDefaultValue(actCode);
             if (index.column() == 1) {
-                mVpm->addValuePortCondToDoc(cond, port,*v);
+                mVpz->addValuePortCondToDoc(cond, port,*v);
             } else {
-                mVpm->fillWithValue(cond, port, index.column()-2, *v);
+                mVpz->fillWithValue(cond, port, index.column()-2, *v);
             }
             delete v;
             reload(false);
         } else if (actCode == "EMenuValueRemove") {
             QString cond = getLineEdit(index.row(),0)->text();
             QString port = getLineEdit(index.row(),1)->text();
-            mVpm->rmValuePortCondToDoc(cond, port, index.column()-2);
+            mVpz->rmValuePortCondToDoc(cond, port, index.column()-2);
             reload(false);
         } else {//add from plugin
 
-            mCurrCondName = mVpm->newCondNameToDoc();
-            mVpm->addConditionFromPluginToDoc(mCurrCondName, actCode);
+            mCurrCondName = mVpz->newCondNameToDoc();
+            mVpz->addConditionFromPluginToDoc(mCurrCondName, actCode);
             reload(false);
         }
         connectConds();
@@ -388,9 +389,31 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
 }
 
 void
-FileVpzExpCond::onUndoRedoVpm(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
+FileVpzExpCond::onUndoRedoVpz(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
         QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
 {
+    bool shouldreset = true;
+    if (mVpz->existCondFromDoc(mCurrCondName)) {
+        if (mVpz->getCondGUIplugin(mCurrCondName) != "") {
+            shouldreset = false;
+        } else {
+            std::unique_ptr<value::Value> v = vleDomStatic::getValueFromPortCond(
+                    mVpz->condFromConds(mVpz->condsFromDoc(), mCurrCondName),
+                    mCurrPortName, mCurrValIndex);
+            if (not v) {
+                shouldreset = true;
+            } else {
+                shouldreset = false;
+            }
+        }
+    } else {
+        shouldreset = true;
+    }
+    if (shouldreset){
+        mCurrCondName = "";
+        mCurrPortName = "";
+        mCurrValIndex = -1;
+    }
     showEditPlace();
     reload(false);
 }
@@ -419,22 +442,22 @@ FileVpzExpCond::onTextUpdated(const QString& id, const QString& oldVal,
     int col = split.at(1).toInt();
     QString cond = getLineEdit(row, 0)->text();
     if (col == 0) {//edit cond name
-        mVpm->renameConditionToDoc(oldVal, cond);
+        mVpz->renameConditionToDoc(oldVal, cond);
         mCurrCondName = cond;
     } else if (col == 1) {//edit port name
         mCurrCondName = cond;
         if (oldVal == "<Click here to add a port>"){
-            mVpm->addCondPortToDoc(cond, newVal);
+            mVpz->addCondPortToDoc(cond, newVal);
         } else {
-            mVpm->renameCondPortToDoc(cond, oldVal, newVal);
+            mVpz->renameCondPortToDoc(cond, oldVal, newVal);
             mCurrPortName = newVal;
         }
     } else {//edit value String
         QString port = getLineEdit(row, 1)->text();
         std::unique_ptr<value::Value> curr =
-                mVpm->buildValueFromDoc(cond, port, col-2);
+                mVpz->buildValueFromDoc(cond, port, col-2);
         curr->toString().set(newVal.toStdString());
-        mVpm->fillWithValue(cond, port, col-2, *curr);
+        mVpz->fillWithValue(cond, port, col-2, *curr);
     }
     reload(false);
     connectConds();
@@ -451,9 +474,9 @@ FileVpzExpCond::onIntUpdated(const QString& id, int newVal)
         QString cond = getLineEdit(row, 0)->text();
         QString port = getLineEdit(row, 1)->text();
         std::unique_ptr<value::Value> curr =
-                mVpm->buildValueFromDoc(cond, port, col-2);
+                mVpz->buildValueFromDoc(cond, port, col-2);
         curr->toInteger().set(newVal);
-        mVpm->fillWithValue(cond, port, col-2, *curr);
+        mVpz->fillWithValue(cond, port, col-2, *curr);
     }
     connectConds();
 }
@@ -469,9 +492,9 @@ FileVpzExpCond::onDoubleUpdated(const QString& id, double newVal)
         QString cond = getLineEdit(row, 0)->text();
         QString port = getLineEdit(row, 1)->text();
         std::unique_ptr<value::Value> curr =
-                mVpm->buildValueFromDoc(cond, port, col-2);
+                mVpz->buildValueFromDoc(cond, port, col-2);
         curr->toDouble().set(newVal);
-        mVpm->fillWithValue(cond, port, col-2, *curr);
+        mVpz->fillWithValue(cond, port, col-2, *curr);
     }
     connectConds();
 }
@@ -486,9 +509,9 @@ FileVpzExpCond::onBoolUpdated(const QString& id, const QString& newVal)
         QString cond = getLineEdit(row, 0)->text();
         QString port = getLineEdit(row, 1)->text();
         std::unique_ptr<value::Value> curr =
-                mVpm->buildValueFromDoc(cond, port, col-2);
+                mVpz->buildValueFromDoc(cond, port, col-2);
         curr->toBoolean().set(QVariant(newVal).toBool());
-        mVpm->fillWithValue(cond, port, col-2, *curr);
+        mVpz->fillWithValue(cond, port, col-2, *curr);
     }
     connectConds();
 }
@@ -497,7 +520,7 @@ void
 FileVpzExpCond::onValUpdated(const vle::value::Value& newVal)
 {
     disconnectConds();
-    mVpm->fillWithValue(mCurrCondName, mCurrPortName, mCurrValIndex, newVal);
+    mVpz->fillWithValue(mCurrCondName, mCurrPortName, mCurrValIndex, newVal);
     connectConds();
 }
 
@@ -661,8 +684,8 @@ FileVpzExpCond::getLineEdit(int row, int col)
 void
 FileVpzExpCond::disconnectConds()
 {
-    if (mVpm) {
-        QObject::disconnect(mVpm,
+    if (mVpz) {
+        QObject::disconnect(mVpz,
                 SIGNAL(conditionsUpdated()),
                 this,
                 SLOT(onCondUpdated()));
@@ -671,8 +694,8 @@ FileVpzExpCond::disconnectConds()
 void
 FileVpzExpCond::connectConds()
 {
-    if (mVpm) {
-        QObject::connect(mVpm,
+    if (mVpz) {
+        QObject::connect(mVpz,
                 SIGNAL(conditionsUpdated()),
                 this,
                 SLOT(onCondUpdated()));

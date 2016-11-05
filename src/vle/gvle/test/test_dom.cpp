@@ -31,7 +31,7 @@
 #include <limits>
 #include <fstream>
 #include <vle/devs/Simulator.hpp>
-#include <vle/gvle/vlevpz.h>
+#include <vle/gvle/vlevpz.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>

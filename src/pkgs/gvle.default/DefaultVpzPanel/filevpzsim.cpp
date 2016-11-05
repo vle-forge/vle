@@ -35,7 +35,7 @@ namespace gvle {
 
 FileVpzSim::FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
         Logger* log, QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzSim), mVpm(0), mGvlePlugins(plugs),
+    QWidget(parent), ui(new Ui::FileVpzSim), mVpz(0), mGvlePlugins(plugs),
     mPluginSimPanel(0), mPackage(pkg), mLog(log)
 {
     ui->setupUi(this);
@@ -50,9 +50,9 @@ FileVpzSim::~FileVpzSim()
 
 
 void
-FileVpzSim::setVpm(vleVpm* vpm)
+FileVpzSim::setVpz(vleVpz* vpz)
 {
-    mVpm = vpm;
+    mVpz = vpz;
 
     //update plugin list
     bool oldBlock = ui->pluginList->blockSignals(true);
@@ -69,7 +69,7 @@ FileVpzSim::setVpm(vleVpm* vpm)
     //TODO check if a plugin
     QString plug = "Default";
     mPluginSimPanel =  mGvlePlugins->newInstanceSimPanelPlugin(plug);
-    mPluginSimPanel->init(mVpm, mPackage, mLog);
+    mPluginSimPanel->init(mVpz, mPackage, mLog);
     setSimLeftWidget(mPluginSimPanel->leftWidget());
 
     emit rightWidgetChanged();
@@ -107,7 +107,7 @@ FileVpzSim::onPluginChanged(const QString& /*text*/)
 {
     delete mPluginSimPanel;
     mPluginSimPanel = mGvlePlugins->newInstanceSimPanelPlugin("Default");
-    mPluginSimPanel->init(mVpm, mPackage, mLog);
+    mPluginSimPanel->init(mVpz, mPackage, mLog);
     setSimLeftWidget(mPluginSimPanel->leftWidget());
 
     emit rightWidgetChanged();

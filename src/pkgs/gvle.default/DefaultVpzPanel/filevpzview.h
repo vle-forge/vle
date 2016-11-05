@@ -33,7 +33,7 @@
 #include <QTableWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/plugin_mainpanel.h>
 #include "widgetvpzproperty.h"
 #include "filevpzdynamics.h"
@@ -70,9 +70,9 @@ public:
             gvle_plugins* plugs, Logger* log, const utils::ContextPtr& ctx,
             QWidget *parent = 0);
     ~fileVpzView();
-    void setVpm(vleVpm *v);
+    void setVpz(vleVpz *v);
     void setRtool(FileVpzRtool* tool);
-    vleVpm* vpm();
+    vleVpz* vpz();
     bool isUsed(int *reason);
     void usedBySim(bool isUsed);
     void save();
@@ -84,12 +84,12 @@ public:
 
 public slots:
     void onTabClose(int index);
-    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);
 
 public:
-    bool             mUseSim;
     Ui::fileVpzView*         ui;
+    bool                     mUseSim;
     FileVpzDynamics*         mDynamicsTab;
     FileVpzExpCond*          mExpCondTab;
     FileVpzExpView*          mExpViewTab;
@@ -97,13 +97,13 @@ public:
     FileVpzProject*          mProjectTab;
     FileVpzClasses*          mClassesTab;
     FileVpzSim*              mSimTab;
-    vleVpm*                  mVpm;
+    vleVpz*                  mVpz;
     FileVpzRtool*            mRtool;
     QList<QTreeWidgetItem *> mViewsItems;
     gvle_plugins*            mGvlePlugins;
     vle::utils::Package*     mPackage;
     Logger*                  mLog;
-    VpzDiagScene       mScene;
+    VpzDiagScene             mScene;
 };
 
 }}  //namespaces

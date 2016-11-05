@@ -29,19 +29,20 @@
 #include <QString>
 #include <QWidget>
 #include "logger.h"
-#include "vlevpz.h"
 
 namespace vle {
 namespace gvle {
+
+class vleVpz;
 
 class PluginOutput: public QObject
 {
     Q_OBJECT
 public:
     virtual QString  getname()   = 0;
-    virtual QWidget *getWidget() = 0;
+    virtual QWidget* getWidget() = 0;
     virtual void     delWidget() = 0;
-    virtual void  setLogger(Logger *logger) = 0;
+    virtual void  setLogger(Logger* logger) = 0;
     virtual void  init(vleVpz* vpz, const QString& viewName) = 0;
 };
 

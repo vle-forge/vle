@@ -40,7 +40,7 @@ namespace gvle {
 
 FileVpzProject::FileVpzProject(QWidget *parent) :
     QWidget(parent), ui(new Ui::FileVpzProject), mTab(0), mId(0), mAuthor(0),
-    mDate(0), mVersion(0), mName(0), mDuration(0),  mBegin(0), mVpm(0),
+    mDate(0), mVersion(0), mName(0), mDuration(0),  mBegin(0), mVpz(0),
     maxPrecision(std::numeric_limits<double>::digits10)
 {
     ui->setupUi(this);
@@ -89,11 +89,11 @@ FileVpzProject::~FileVpzProject()
 }
 
 void
-FileVpzProject::setVpm(vleVpm* vpm)
+FileVpzProject::setVpz(vleVpz* vpz)
 {
-    mVpm = vpm;
+    mVpz = vpz;
 
-    QObject::connect(mVpm,
+    QObject::connect(mVpz,
                      SIGNAL(conditionsUpdated()),
                      this,
                      SLOT(reload()));
@@ -103,13 +103,13 @@ FileVpzProject::setVpm(vleVpm* vpm)
 
 void FileVpzProject::reload()
 {
-    mAuthor->setText(mVpm->getAuthor());
-    mDate->setDateTime(QDateTime::fromString(mVpm->getDate(),
+    mAuthor->setText(mVpz->getAuthor());
+    mDate->setDateTime(QDateTime::fromString(mVpz->getDate(),
                                              "dddd d MMMM yyyy hh:mm"));
-    mVersion->setText(mVpm->getVersion());
-    mName->setText(mVpm->getExpName());
-    mDuration->setText(mVpm->getExpDuration());
-    QString beginNumString = mVpm->getExpBegin();
+    mVersion->setText(mVpz->getVersion());
+    mName->setText(mVpz->getExpName());
+    mDuration->setText(mVpz->getExpDuration());
+    QString beginNumString = mVpz->getExpBegin();
     mBegin->setText(beginNumString);
     QDateTime beginDateTime;
     if (beginNumtoDate(beginNumString, beginDateTime)) {
@@ -119,43 +119,43 @@ void FileVpzProject::reload()
 
 void FileVpzProject::setAuthorToVpz()
 {
-    if (mAuthor->text() != mVpm->getAuthor()) {
-        mVpm->setAuthor(mAuthor->text());
+    if (mAuthor->text() != mVpz->getAuthor()) {
+        mVpz->setAuthor(mAuthor->text());
     }
 }
 
 void FileVpzProject::setDateToVpz()
 {
-    if (mDate->text() != mVpm->getDate()) {
-        mVpm->setDate(mDate->text());
+    if (mDate->text() != mVpz->getDate()) {
+        mVpz->setDate(mDate->text());
     }
 }
 void FileVpzProject::setVersionToVpz()
 {
-    if (mVersion->text() != mVpm->getVersion()) {
-        mVpm->setVersion(mVersion->text());
+    if (mVersion->text() != mVpz->getVersion()) {
+        mVpz->setVersion(mVersion->text());
     }
 }
 
 void FileVpzProject::setExpNameToVpz()
 {
-    if (mName->text() != mVpm->getExpName()) {
-        mVpm->setExpName(mName->text());
+    if (mName->text() != mVpz->getExpName()) {
+        mVpz->setExpName(mName->text());
     }
 }
 
 void FileVpzProject::setExpDurationToVpz()
 {
-    if (mDuration->text() != mVpm->getExpDuration()) {
-        mVpm->setExpDuration(mDuration->text());
+    if (mDuration->text() != mVpz->getExpDuration()) {
+        mVpz->setExpDuration(mDuration->text());
     }
 }
 
 void FileVpzProject::setExpBeginToVpz()
 {
-    if (mBegin->text() != mVpm->getExpBegin()) {
+    if (mBegin->text() != mVpz->getExpBegin()) {
         QString beginNumString = mBegin->text();
-        mVpm->setExpBegin(beginNumString);
+        mVpz->setExpBegin(beginNumString);
         QDateTime beginDateTime;
         if (beginNumtoDate(beginNumString, beginDateTime)) {
             mBeginDateTime->setDateTime(beginDateTime);
@@ -169,7 +169,7 @@ void FileVpzProject::setExpBeginDateTimeToVpz()
         mBeginDateTime->text().toStdString();
     try {
         double beginNum = vle::utils::DateTime::toJulianDay(beginDateTimeString);
-        mVpm->setExpBegin(QString::number(beginNum, 'g', maxPrecision));
+        mVpz->setExpBegin(QString::number(beginNum, 'g', maxPrecision));
         mBegin->setText(QString::number(beginNum, 'g', maxPrecision));
     } catch (...) {
     }
@@ -177,7 +177,7 @@ void FileVpzProject::setExpBeginDateTimeToVpz()
 
 void
 
-FileVpzProject::onUndoRedoVpm(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
+FileVpzProject::onUndoRedoVpz(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
         QDomNode /*oldVpm*/, QDomNode /*newVpm*/)
 {
     reload();
@@ -190,7 +190,7 @@ FileVpzProject::eventFilter(QObject *target, QEvent *event)
         switch(event->type()) {
         case QEvent::FocusOut:
             if (mDuration->text().isEmpty()) {
-                mDuration->setText(mVpm->getExpDuration());
+                mDuration->setText(mVpz->getExpDuration());
             }
             break;
         default:
@@ -200,7 +200,7 @@ FileVpzProject::eventFilter(QObject *target, QEvent *event)
         switch(event->type()) {
         case QEvent::FocusOut:
             if (mBegin->text().isEmpty()) {
-                mBegin->setText(mVpm->getExpBegin());
+                mBegin->setText(mVpz->getExpBegin());
             }
             break;
         default:

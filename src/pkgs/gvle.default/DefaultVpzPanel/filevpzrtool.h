@@ -33,7 +33,7 @@
 #include <QTableWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #include "ui_filevpzrtool.h"
 #include "widgetvpzproperty.h"
 #include "vpzDiagScene.h"
@@ -62,10 +62,10 @@ class FileVpzRtool : public QWidget
 public:
     explicit FileVpzRtool(QWidget *parent = 0);
     ~FileVpzRtool();
-    void setVpm(vleVpm* v);
+    void setVpz(vleVpz* v);
     void clear();
     void updateTree();
-    vleVpm* vpm();
+    vleVpz* vpz();
     QString getModelQuery(QTreeWidgetItem* item);
     QTreeWidgetItem* getTreeWidgetItem(const QString& model_query,
             QTreeWidgetItem* base = 0);
@@ -81,12 +81,12 @@ public slots:
     void onSelectionChanged();
     void onInitializationDone(VpzDiagScene* scene);
     void onDataUpdate();
-    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);
 public:
     Ui::fileVpzRtool*  ui;
 private:
-    vleVpm*          mVpm;
+    vleVpz*          mVpz;
     VpzDiagScene*    mCurrScene;
 };
 

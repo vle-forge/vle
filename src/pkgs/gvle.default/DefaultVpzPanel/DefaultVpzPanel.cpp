@@ -79,24 +79,24 @@ DefaultVpzPanel::init(const gvle_file& gf, utils::Package* pkg, Logger* log,
     QObject::connect(&(m_vpzview->mClassesTab->mScene), SIGNAL(initializationDone(VpzDiagScene*)),
             m_rtool, SLOT (onInitializationDone(VpzDiagScene*)));
 
-    vleVpm* vpm = new vleVpm(gf.source_file, gf.metadata_file, mGvlePlugins);
+    vleVpz* vpz = new vleVpz(gf.source_file, gf.metadata_file, mGvlePlugins);
 
-    vpm->setLogger(log);
+    vpz->setLogger(log);
 
-    m_rtool->setVpm(vpm);
-    m_vpzview->setVpm(vpm);
+    m_rtool->setVpz(vpz);
+    m_vpzview->setVpz(vpz);
     m_vpzview->setRtool(m_rtool);
 
-    QObject::connect(vpm, SIGNAL(undoAvailable(bool)),
+    QObject::connect(vpz, SIGNAL(undoAvailable(bool)),
                      this, SLOT (onUndoAvailable(bool)));
     QObject::connect(m_vpzview->ui->tabWidget,   SIGNAL(currentChanged(int)),
                      this, SLOT  (onCurrentChanged(int)));
     QObject::connect(m_vpzview->mSimTab,   SIGNAL(rightWidgetChanged()),
                      this, SLOT  (onRightSimWidgetChanged()));
-    QObject::connect(vpm,
+    QObject::connect(vpz,
             SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
             m_vpzview,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+            SLOT(onUndoRedoVpz(QDomNode, QDomNode, QDomNode, QDomNode)));
 }
 
 QString
@@ -152,13 +152,13 @@ DefaultVpzPanel::rightWidget()
 void
 DefaultVpzPanel::undo()
 {
-    m_vpzview->vpm()->undo();
+    m_vpzview->vpz()->undo();
 }
 
 void
 DefaultVpzPanel::redo()
 {
-    m_vpzview->vpm()->redo();
+    m_vpzview->vpz()->redo();
 }
 
 void
@@ -166,8 +166,8 @@ DefaultVpzPanel::onCurrentChanged(int /*index*/)
 {
 
     QString tab = m_vpzview->getCurrentTab();
-    QString previousTab = m_vpzview->vpm()->getCurrentSource();
-    m_vpzview->vpm()->setCurrentSource(tab);
+    QString previousTab = m_vpzview->vpz()->getCurrentSource();
+    m_vpzview->vpz()->setCurrentSource(tab);
     //return  m_plugin_sim->leftWidget();
     if (tab == "Diagram") {
         m_rtool->onInitializationDone(&m_vpzview->mScene);

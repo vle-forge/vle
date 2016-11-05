@@ -36,7 +36,7 @@
 #include <QUndoView>
 
 #include "ui_filevpzrtool.h"
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #include "vpzDiagScene.h"
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
@@ -60,10 +60,10 @@ public:
             const vle::utils::ContextPtr& ctx,
             QWidget *parent = 0);
     ~FileVpzClasses();
-    void setVpm(vleVpm* vpm);
+    void setVpz(vleVpz* vpz);
     void reload();
 public slots:
-    void onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode);
+    void onUndoRedoVpz(QDomNode, QDomNode, QDomNode, QDomNode);
     void onNewAtomicTriggered(bool checked);
     void onNewCoupledTriggered(bool checked);
     void onTextChanged(const QString & text);
@@ -79,7 +79,7 @@ public:
     VpzDiagScene        mScene;
 private:
     Ui::FileVpzClasses* ui;
-    vleVpm*             mVpm;
+    vleVpz*             mVpz;
     QString             mSelClass;
 
 };

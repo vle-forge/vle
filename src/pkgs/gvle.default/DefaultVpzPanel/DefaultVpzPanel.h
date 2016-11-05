@@ -29,7 +29,7 @@
 #include <QObject>
 #include <QDebug>
 
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/plugin_mainpanel.h>
 #include <vle/gvle/plugin_simpanel.h>
 #include <vle/gvle/gvle_file.h>

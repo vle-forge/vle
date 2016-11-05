@@ -21,10 +21,10 @@ QT5_WRAP_UI(help_h help.ui)
 
 SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h} gvle_widgets.h
    logger.h plugin_cond.h plugin_mainpanel.h plugin_simpanel.h plugin_output.h
-   vleDomDiffStack.h vlevpz.h vlevpm.h gvle_plugins.h gvle_file.h)
+   dom_tools.hpp vle_dom.hpp vlevpz.hpp gvle_plugins.h gvle_file.h)
 
 SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
-  helpbrowser.cpp logger.cpp vleDomDiffStack.cpp vlevpz.cpp vlevpm.cpp
+  helpbrowser.cpp logger.cpp dom_tools.cpp vle_dom.cpp vlevpz.cpp
   gvle_plugins.cpp gvle_file.cpp)
 
 if (WIN32)

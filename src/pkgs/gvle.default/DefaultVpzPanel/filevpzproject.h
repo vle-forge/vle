@@ -29,7 +29,7 @@
 #include <QUndoStack>
 #include <QTabWidget>
 #include <QDateTime>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
 class FileVpzProject;
@@ -45,7 +45,7 @@ class FileVpzProject : public QWidget
 public:
     explicit FileVpzProject(QWidget *parent = 0);
     ~FileVpzProject();
-    void setVpm(vleVpm* vpm);
+    void setVpz(vleVpz* vpz);
     void setTabId(int i)
     {mId = i;};
     void setTab(QTabWidget *tab)
@@ -61,7 +61,7 @@ public slots:
     void setExpDurationToVpz();
     void setExpBeginToVpz();
     void setExpBeginDateTimeToVpz();
-    void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
+    void onUndoRedoVpz(QDomNode oldVpz, QDomNode newVpz,
 		       QDomNode oldVpm, QDomNode newVpm);
     void reload();
 
@@ -84,7 +84,7 @@ private:
     QLineEdit*          mBegin;
     QDateTimeEdit*      mBeginDateTime;
 
-    vleVpm*             mVpm;
+    vleVpz*             mVpz;
 
     int                 maxPrecision;
 };

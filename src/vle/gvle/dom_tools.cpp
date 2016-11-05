@@ -34,28 +34,27 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Matrix.hpp>
-#include "vleDomDiffStack.h"
+#include "dom_tools.hpp"
 
 #include <iostream>
 
 namespace vle {
 namespace gvle {
 
-
-vleDomObject::vleDomObject(QDomDocument* doc): mDoc (doc)
-{
-}
-
-vleDomObject::~vleDomObject()
-{
-}
-
 /**************************************************
- * Static functions
+ * DomFunctions static functions
  **************************************************/
 
+DomFunctions::DomFunctions()
+{
+}
+
+DomFunctions::~DomFunctions()
+{
+}
+
 QString
-vleDomObject::attributeValue(const QDomNode& node,
+DomFunctions::attributeValue(const QDomNode& node,
         const QString& attrName)
 {
     if (node.attributes().contains(attrName)) {
@@ -65,7 +64,7 @@ vleDomObject::attributeValue(const QDomNode& node,
 }
 
 void
-vleDomObject::setAttributeValue(QDomNode& node, const QString& attrName,
+DomFunctions::setAttributeValue(QDomNode& node, const QString& attrName,
         const QString& val)
 {
     if (node.attributes().contains(attrName)) {
@@ -76,7 +75,7 @@ vleDomObject::setAttributeValue(QDomNode& node, const QString& attrName,
 }
 
 QDomNode
-vleDomObject::obtainChild(QDomNode node, const QString& nodeName,
+DomFunctions::obtainChild(QDomNode node, const QString& nodeName,
         QDomDocument* domDoc)
 {
     QDomNodeList chs = node.childNodes();
@@ -95,7 +94,7 @@ vleDomObject::obtainChild(QDomNode node, const QString& nodeName,
 }
 
 QDomNode
-vleDomObject::childWhithNameAttr(QDomNode& node,
+DomFunctions::childWhithNameAttr(QDomNode& node,
         const QString& nodeName, const QString& nameValue,
         QDomDocument* domDoc)
 {
@@ -104,7 +103,7 @@ vleDomObject::childWhithNameAttr(QDomNode& node,
     for (int i=0; i<childs.length();i++) {
         QDomNode ch = childs.at(i);
         if (not ch.isText() and ch.nodeName() == nodeName and
-                vleDomObject::attributeValue(ch, "name") == nameValue) {
+                DomFunctions::attributeValue(ch, "name") == nameValue) {
             return ch;
         }
     }
@@ -112,13 +111,13 @@ vleDomObject::childWhithNameAttr(QDomNode& node,
         return QDomNode();
     }
     QDomNode res = domDoc->createElement(nodeName);
-    vleDomObject::setAttributeValue(res, "name", nameValue);
+    DomFunctions::setAttributeValue(res, "name", nameValue);
     node.appendChild(res);
     return res;
 }
 
 QString
-vleDomObject::toQString(const QDomNode& node)
+DomFunctions::toQString(const QDomNode& node)
 {
     QString str;
     QTextStream stream(&str);
@@ -129,7 +128,7 @@ vleDomObject::toQString(const QDomNode& node)
 
 
 void
-vleDomObject::removeAllChilds(QDomNode node)
+DomFunctions::removeAllChilds(QDomNode node)
 {
     QDomNodeList childs = node.childNodes();
     while(node.hasChildNodes()) {
@@ -138,7 +137,7 @@ vleDomObject::removeAllChilds(QDomNode node)
 }
 
 QList<QDomNode>
-vleDomObject::childNodesWithoutText(QDomNode node, const QString& nodeName)
+DomFunctions::childNodesWithoutText(QDomNode node, const QString& nodeName)
 {
     QDomNodeList childs = node.childNodes();
     QList<QDomNode> childsWithoutText;
@@ -157,14 +156,17 @@ vleDomObject::childNodesWithoutText(QDomNode node, const QString& nodeName)
 
 
 
-/********************************************************************/
+/**************************************************
+ * DomDiffStack implementation
+ **************************************************/
 
-vleDomDiffStack::DomDiff::DomDiff():node_before(), node_after(), query(""),
+
+DomDiffStack::DomDiff::DomDiff():node_before(), node_after(), query(""),
         merge_type("null"), merge_args(0), source(""), isDefined(false)
 {
 }
 
-vleDomDiffStack::DomDiff::~DomDiff()
+DomDiffStack::DomDiff::~DomDiff()
 {
     if (merge_args) {
         delete merge_args;
@@ -172,7 +174,7 @@ vleDomDiffStack::DomDiff::~DomDiff()
     }
 }
 void
-vleDomDiffStack::DomDiff::reset()
+DomDiffStack::DomDiff::reset()
 {
     node_before = QDomNode();
     node_after = QDomNode();
@@ -186,13 +188,17 @@ vleDomDiffStack::DomDiff::reset()
     isDefined = false;
 }
 
-vleDomDiffStack::vleDomDiffStack(vleDomObject* vdo): diffs(), prevCurr(0),
+DomDiffStack::DomDiffStack(DomObject* vdo): diffs(), prevCurr(0),
         curr(0), saved(0), mVdo(vdo), current_source(""), snapshotEnabled(true)
 {
 }
 
+DomDiffStack::~DomDiffStack()
+{
+}
+
 void
-vleDomDiffStack::init(QDomNode node)
+DomDiffStack::init(QDomNode node)
 {
     diffs.resize(300);
     diffs[0].node_before = node.cloneNode();
@@ -202,7 +208,7 @@ vleDomDiffStack::init(QDomNode node)
 }
 
 bool
-vleDomDiffStack::enableSnapshot(bool enable)
+DomDiffStack::enableSnapshot(bool enable)
 {
     bool oldSnapshotEnabled = snapshotEnabled;
     snapshotEnabled = enable;
@@ -213,14 +219,14 @@ vleDomDiffStack::enableSnapshot(bool enable)
 
 
 void
-vleDomDiffStack::snapshot(QDomNode node)
+DomDiffStack::snapshot(QDomNode node)
 {
     snapshot(node, "null", 0);
 }
 
 
 void
-vleDomDiffStack::snapshot (QDomNode node,
+DomDiffStack::snapshot (QDomNode node,
         QString mergeType,
         vle::value::Map* mergeArgs)
 {
@@ -234,7 +240,7 @@ vleDomDiffStack::snapshot (QDomNode node,
         prevCurr = curr;
         curr ++;//TODO manage size
         if (curr >= diffs.size()) {
-            qDebug() << " Internal error vleDomDiffStack::snapshot (size to big) ";
+            qDebug() << " Internal error DomDiffStack::snapshot (size to big) ";
             return;
         }
         diffs[curr].query = "";
@@ -283,7 +289,7 @@ vleDomDiffStack::snapshot (QDomNode node,
             prevCurr = curr;
             curr ++;//TODO manage size
             if (curr >= diffs.size()) {
-                qDebug() << " Internal error vleDomDiffStack::snapshot (size to big) ";
+                qDebug() << " Internal error DomDiffStack::snapshot (size to big) ";
                 return;
             }
             diffs[curr].query = mVdo->getXQuery(node);
@@ -303,7 +309,7 @@ vleDomDiffStack::snapshot (QDomNode node,
 }
 
 void
-vleDomDiffStack::undo()
+DomDiffStack::undo()
 {
     if (curr <= 0) {
         return;
@@ -318,7 +324,7 @@ vleDomDiffStack::undo()
             QDomNode currN = mVdo->getNodeFromXQuery(diffs[curr].query);
             QDomNode parent = currN.parentNode();
             if (parent.isNull()) {
-                qDebug() << " Internal error vleDomDiffStack::undo() "
+                qDebug() << " Internal error DomDiffStack::undo() "
                         << diffs[curr].query;
             }
             parent.replaceChild(diffs[curr].node_before, currN);
@@ -331,7 +337,7 @@ vleDomDiffStack::undo()
 }
 
 void
-vleDomDiffStack::redo()
+DomDiffStack::redo()
 {
 
     if (diffs[curr+1].isDefined) {
@@ -349,14 +355,14 @@ vleDomDiffStack::redo()
 }
 
 void
-vleDomDiffStack::registerSaveState()
+DomDiffStack::registerSaveState()
 {
     saved = curr;
     tryEmitUndoAvailability();
 }
 
 void
-vleDomDiffStack::clear()
+DomDiffStack::clear()
 {
     for (unsigned int i = 0; i<diffs.size(); i++) {
         diffs[i].reset();
@@ -367,20 +373,21 @@ vleDomDiffStack::clear()
 }
 
 void
-vleDomDiffStack::print(std::ostream& out) const
+DomDiffStack::print(std::ostream& out) const
 {
     unsigned int diffSize = 1;
     while (diffs[diffSize].isDefined){
         diffSize++;
     }
-    out << " [vleDomDiffStack] nb stack size=" << diffSize
+    out << " [DomDiffStack] nb stack size=" << diffSize
             << ", saved=" << saved << ", curr=" << curr
             << ", prevCurr=" << prevCurr
-            << ", undoAvail=" << getUndoAvailability()<< "\n";
+            << ", undoAvail=" << computeUndoAvailability(prevCurr, curr, saved)
+            << "\n";
 }
 
 int
-vleDomDiffStack::computeUndoAvailability(
+DomDiffStack::computeUndoAvailability(
         unsigned int prevCurr,
         unsigned int curr,
         unsigned int saved)
@@ -394,16 +401,10 @@ vleDomDiffStack::computeUndoAvailability(
     return 0;
 }
 
-int
-vleDomDiffStack::getUndoAvailability() const
-{
-    return computeUndoAvailability(prevCurr, curr, saved);
-}
-
 void
-vleDomDiffStack::tryEmitUndoAvailability()
+DomDiffStack::tryEmitUndoAvailability()
 {
-    int undoAvailability = getUndoAvailability();
+    int undoAvailability = computeUndoAvailability(prevCurr, curr, saved);
     if (undoAvailability == 1) {
         emit undoAvailable(true);
     }

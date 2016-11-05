@@ -31,7 +31,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/gvle/plugin_cond.h>
 #include <vle/gvle/logger.h>
-#include <vle/gvle/vlevpz.h>
+#include <vle/gvle/vlevpz.hpp>
 
 //#include "tab.h"
 //#include "toolbar.h"

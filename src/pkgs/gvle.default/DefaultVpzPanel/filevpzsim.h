@@ -33,7 +33,7 @@
 #include <QTableWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/plugin_simpanel.h>
 #include "ui_filevpzrtool.h"
 
@@ -53,7 +53,7 @@ public:
     explicit FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
             Logger* log, QWidget *parent = 0);
     ~FileVpzSim();
-    void setVpm(vleVpm* v);
+    void setVpz(vleVpz* vpz);
     void setSimLeftWidget(QWidget* leftWidget);
     QWidget* rightWidget();
 
@@ -66,7 +66,7 @@ public slots:
 public:
     Ui::FileVpzSim*          ui;
 private:
-    vleVpm*                  mVpm;
+    vleVpz*                  mVpz;
     gvle_plugins*            mGvlePlugins;
     PluginSimPanel*          mPluginSimPanel;
     vle::utils::Package*     mPackage;

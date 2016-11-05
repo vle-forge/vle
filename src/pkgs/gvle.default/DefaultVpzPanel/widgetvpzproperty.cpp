@@ -32,7 +32,7 @@ namespace gvle {
 
 
 WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget *parent) :
-    QComboBox(parent), mVpm(0), mModQuery("")
+    QComboBox(parent), mVpz(0), mModQuery("")
 {
     QComboBox::setFocusPolicy(Qt::ClickFocus);
 
@@ -49,14 +49,14 @@ WidgetVpzPropertyDynamics::setModel(vleVpz* model, const QString& mod_query)
 {
     int index = 0;
     int count = 1;
-    mVpm = model;
+    mVpz = model;
     mModQuery = mod_query;
 
-    if (not mVpm)
+    if (not mVpz)
         return;
 
     // Get the Dynamic of the model
-    QString dyn = mVpm->modelDynFromDoc(mModQuery);
+    QString dyn = mVpz->modelDynFromDoc(mModQuery);
     bool oldBlockComboBox = QComboBox::blockSignals(true);
     while(QComboBox::count()) {
         QComboBox::removeItem(0);
@@ -64,7 +64,7 @@ WidgetVpzPropertyDynamics::setModel(vleVpz* model, const QString& mod_query)
     QComboBox::addItem( tr("<none>") );
 
     QList<QString> dynList;
-    mVpm->fillWithDynamicsList(dynList);
+    mVpz->fillWithDynamicsList(dynList);
     for (int i=0; i< dynList.length(); i++) {
         QComboBox::addItem(dynList.at(i));
         if (dyn == dynList.at(i)) {
@@ -84,18 +84,18 @@ WidgetVpzPropertyDynamics::onChange(int index)
     QString selectedName = QComboBox::itemText(index);
 
     // If the selected Dynamic exists
-    if (mVpm->existDynamicIntoDoc(selectedName)) {
+    if (mVpz->existDynamicIntoDoc(selectedName)) {
         // Update the model with the selected Dynamic
-        mVpm->setDynToAtomicModel(mModQuery, selectedName);
+        mVpz->setDynToAtomicModel(mModQuery, selectedName);
     } else if (selectedName == "<none>") {
-        mVpm->setDynToAtomicModel(mModQuery, "");
+        mVpz->setDynToAtomicModel(mModQuery, "");
     }
 }
 
 /****************************************************************************/
 
 WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget *parent) :
-        QListWidget(parent), mVpm(0), mModQuery("")
+        QListWidget(parent), mVpz(0), mModQuery("")
 {
 }
 
@@ -106,8 +106,8 @@ WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
 void
 WidgetVpzPropertyExpCond::setModel(vleVpz *model, const QString& model_query)
 {
-    mVpm = model;
-    QObject::connect(mVpm,   SIGNAL(conditionsUpdated()),
+    mVpz = model;
+    QObject::connect(mVpz,   SIGNAL(conditionsUpdated()),
                      this, SLOT(refresh()));
 
     mModQuery = model_query;
@@ -120,17 +120,17 @@ WidgetVpzPropertyExpCond::refresh()
     // First, clear the current list content
     bool oldBlock = QListWidget::blockSignals(true);
     QListWidget::clear();
-    QString dyn = mVpm->modelDynFromDoc(mModQuery);
+    QString dyn = mVpz->modelDynFromDoc(mModQuery);
     //TODO only way to see if it is an atomic model ??
-    QDomNodeList conds = mVpm->condsListFromConds(mVpm->condsFromDoc());
+    QDomNodeList conds = mVpz->condsListFromConds(mVpz->condsFromDoc());
     for (int i=0; i< conds.length(); i++) {
         QDomNode cond = conds.at(i);
-        QString condName = mVpm->vdo()->attributeValue(cond, "name");
+        QString condName = DomFunctions::attributeValue(cond, "name");
         QListWidgetItem *wi = new QListWidgetItem(this);
         QListWidget::addItem(wi);
         QCheckBox *cb = new QCheckBox(this);
         cb->setText( condName);
-        if (mVpm->isAttachedCond(mModQuery, condName)) {
+        if (mVpz->isAttachedCond(mModQuery, condName)) {
             cb->setCheckState( Qt::Checked );
         } else {
             cb->setCheckState( Qt::Unchecked );
@@ -150,24 +150,24 @@ WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
     QCheckBox *cb     = qobject_cast<QCheckBox *>(sender);
 
     // Sanity check ... if no model set or checkbox not found
-    if ( (mVpm == 0) || (cb == 0) )
+    if ( (mVpz == 0) || (cb == 0) )
         return;
 
     // Search the vleExpCond associated with the checkbox
-    //bool oldBlock = mVpm->blockSignals(true);
+    //bool oldBlock = mVpz->blockSignals(true);
     if (checked) {
-        mVpm->attachCondToAtomicModel(mModQuery, cb->text());
+        mVpz->attachCondToAtomicModel(mModQuery, cb->text());
     } else {
-        mVpm->detachCondToAtomicModel(mModQuery, cb->text());
+        mVpz->detachCondToAtomicModel(mModQuery, cb->text());
     }
-    //mVpm->blockSignals(oldBlock);
+    //mVpz->blockSignals(oldBlock);
 
 }
 
 /****************************************************************************/
 
 WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget *parent) :
-        QComboBox(parent), mVpm(0), mModQuery("")
+        QComboBox(parent), mVpz(0), mModQuery("")
 {
     QComboBox::setFocusPolicy(Qt::ClickFocus);
 
@@ -185,15 +185,15 @@ WidgetVpzPropertyObservables::refresh()
 
     bool oldBlock = QComboBox::blockSignals(true);
     QComboBox::clear();
-    QString dyn = mVpm->modelDynFromDoc(mModQuery);
-    QDomNodeList obss = mVpm->obssListFromObss(mVpm->obsFromDoc());
+    QString dyn = mVpz->modelDynFromDoc(mModQuery);
+    QDomNodeList obss = mVpz->obssListFromObss(mVpz->obsFromDoc());
     QComboBox::addItem("<none>");
     int selectIndex = 0;
     for (int i=0; i< obss.length(); i++) {
         QDomNode obs = obss.at(i);
-        QString obsName = mVpm->vdo()->attributeValue(obs, "name");
+        QString obsName = DomFunctions::attributeValue(obs, "name");
         QComboBox::addItem(obsName);
-        if (mVpm->modelObsFromDoc(mModQuery) == obsName) {
+        if (mVpz->modelObsFromDoc(mModQuery) == obsName) {
             selectIndex = i+1;
         }
     }
@@ -205,9 +205,9 @@ void
 WidgetVpzPropertyObservables::setModel(vleVpz *model,
         const QString& model_query)
 {
-    mVpm = model;
+    mVpz = model;
 
-    QObject::connect(mVpm, SIGNAL(observablesUpdated()),
+    QObject::connect(mVpz, SIGNAL(observablesUpdated()),
             this, SLOT(refresh()));
 
     mModQuery = model_query;
@@ -220,10 +220,10 @@ WidgetVpzPropertyObservables::onChange(int index)
 
     // Get the selected dynamic name from widget
     QString selectedObs = QComboBox::itemText(index);
-    if (mVpm->existObsFromDoc(selectedObs)) {
-        mVpm->setObsToAtomicModel(mModQuery, selectedObs);
+    if (mVpz->existObsFromDoc(selectedObs)) {
+        mVpz->setObsToAtomicModel(mModQuery, selectedObs);
     } else if (selectedObs == "<none>") {
-        mVpm->unsetObsFromAtomicModel(mModQuery);
+        mVpz->unsetObsFromAtomicModel(mModQuery);
     }
 }
 

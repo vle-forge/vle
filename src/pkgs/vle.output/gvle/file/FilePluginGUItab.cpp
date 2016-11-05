@@ -65,6 +65,7 @@ FilePluginGUItab::init(vle::gvle::vleVpz* vpz, const QString& viewName)
     mViewName = viewName;
 
     outputNodeConfig = std::move(mvleVpz->buildOutputConfigMap(mViewName));
+
     if (not wellFormed()) {
         buildDefaultConfig();
         mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);

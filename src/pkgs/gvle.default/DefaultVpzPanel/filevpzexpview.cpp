@@ -42,7 +42,7 @@ namespace gvle {
 
 FileVpzExpView::FileVpzExpView(const utils::ContextPtr& ctx,  Logger* log, 
     QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzExpView),mVpm(0), mPlugin(0),
+    QWidget(parent), ui(new Ui::FileVpzExpView),mVpz(0), mPlugin(0),
     currView(""), mCtx(ctx), mLog(log)
 {
     ui->setupUi(this);
@@ -61,9 +61,9 @@ FileVpzExpView::~FileVpzExpView()
     delete ui;
 }
 
-void FileVpzExpView::setVpm(vleVpm* vpm)
+void FileVpzExpView::setVpz(vleVpz* vpz)
 {
-    mVpm = vpm;
+    mVpz = vpz;
 
     QObject::connect(ui->vleViewList, SIGNAL(itemPressed (QListWidgetItem *)),
             this, SLOT(onViewSelected(QListWidgetItem *)));
@@ -92,20 +92,20 @@ void FileVpzExpView::setVpm(vleVpm* vpm)
 void
 FileVpzExpView::reload()
 {
-    if (!mVpm) {
+    if (!mVpz) {
         throw vle::utils::InternalError(
                 " gvle: error in FileVpzExpView::reloadViews");
     }
 
     if (currView != "") {
-        if (not mVpm->existViewFromDoc(currView)) {
+        if (not mVpz->existViewFromDoc(currView)) {
             currView = "";
         }
     }
 
     //reload views
     std::vector<std::string> outputNames;
-    mVpm->viewOutputNames(outputNames);
+    mVpz->viewOutputNames(outputNames);
     bool oldBlock = ui->vleViewList->blockSignals(true);
     ui->vleViewList->clear();
     QListWidgetItem* itemSelected = 0;
@@ -149,7 +149,7 @@ FileVpzExpView::reload()
     }
 
     if (currView != "") {
-        QString plug = mVpm->getOutputPluginFromDoc(currView);
+        QString plug = mVpz->getOutputPluginFromDoc(currView);
         ui->listVleOOV->setCurrentIndex(ui->listVleOOV->findText(plug));
         ui->listVleOOV->setEnabled(true);
     } else {
@@ -191,7 +191,7 @@ FileVpzExpView::updateViewType()
         ui->internalCheck->setCheckState(Qt::Unchecked);
         ui->externalCheck->setCheckState(Qt::Unchecked);
         ui->confluentCheck->setCheckState(Qt::Unchecked);
-        QStringList types = mVpm->getViewTypeFromDoc(currView);
+        QStringList types = mVpz->getViewTypeFromDoc(currView);
         for (int i =0; i<types.length();  i++) {
             QString type = types[i];
             if (type == "timed") {
@@ -209,7 +209,7 @@ FileVpzExpView::updateViewType()
             }
         }
         if (ui->timedCheck->checkState() == Qt::Checked) {
-            ui->timeStep->setValue(mVpm->timeStepFromDoc(currView));
+            ui->timeStep->setValue(mVpz->timeStepFromDoc(currView));
             ui->timeStep->setEnabled(true);
             ui->timeStep->blockSignals(false);
         } else {
@@ -248,7 +248,7 @@ FileVpzExpView::updatePlugin()
         mPlugin = 0;
     }
     if (currView != "") {
-        mPlugin = mVpm->provideOutputGUIplugin(currView);
+        mPlugin = mVpz->provideOutputGUIplugin(currView);
         if (mPlugin) {
             QWidget *w = mPlugin->getWidget();
             int index = ui->pluginHere->addWidget(w);
@@ -272,7 +272,6 @@ FileVpzExpView::getSelectedOutputPlugin()
 
 void FileVpzExpView::onViewSelected(QListWidgetItem* item)
 {
-	mLog->log(" dbg onViewSelected "+item->text());
     if (item->text() != currView) {
         currView = item->text();
         reload();
@@ -283,7 +282,7 @@ void
 FileVpzExpView::onOutputSelected(const QString& item)
 {
     if (item != "") {
-        mVpm->setOutputPluginToDoc(currView, item);
+        mVpz->setOutputPluginToDoc(currView, item);
         reload();
     }
 }
@@ -292,7 +291,7 @@ void
 FileVpzExpView::onTimeStepChanged(double v)
 {
     if (v > 0) {
-        mVpm->setTimeStepToDoc(currView, v);
+        mVpz->setTimeStepToDoc(currView, v);
     }
 
 }
@@ -302,9 +301,9 @@ FileVpzExpView::onTimedCheck(int v)
 {
     if (currView != "") {
         if (v) {
-            mVpm->addViewTypeToDoc(currView, "timed");
+            mVpz->addViewTypeToDoc(currView, "timed");
         } else {
-            mVpm->rmViewTypeToDoc(currView, "timed");
+            mVpz->rmViewTypeToDoc(currView, "timed");
         }
     }
     updateViewType();
@@ -315,9 +314,9 @@ FileVpzExpView::onOutputCheck(int v)
 {
     if (currView != "") {
         if (v) {
-            mVpm->addViewTypeToDoc(currView, "output");
+            mVpz->addViewTypeToDoc(currView, "output");
         } else {
-            mVpm->rmViewTypeToDoc(currView, "output");
+            mVpz->rmViewTypeToDoc(currView, "output");
         }
     }
     updateViewType();
@@ -327,9 +326,9 @@ FileVpzExpView::onInternalCheck(int v)
 {
     if (currView != "") {
         if (v) {
-            mVpm->addViewTypeToDoc(currView, "internal");
+            mVpz->addViewTypeToDoc(currView, "internal");
         } else {
-            mVpm->rmViewTypeToDoc(currView, "internal");
+            mVpz->rmViewTypeToDoc(currView, "internal");
         }
     }
     updateViewType();
@@ -339,9 +338,9 @@ FileVpzExpView::onExternalCheck(int v)
 {
     if (currView != "") {
         if (v) {
-            mVpm->addViewTypeToDoc(currView, "external");
+            mVpz->addViewTypeToDoc(currView, "external");
         } else {
-            mVpm->rmViewTypeToDoc(currView, "external");
+            mVpz->rmViewTypeToDoc(currView, "external");
         }
     }
     updateViewType();
@@ -351,9 +350,9 @@ FileVpzExpView::onConfluentCheck(int v)
 {
     if (currView != "") {
         if (v) {
-            mVpm->addViewTypeToDoc(currView, "confluent");
+            mVpz->addViewTypeToDoc(currView, "confluent");
         } else {
-            mVpm->rmViewTypeToDoc(currView, "confluent");
+            mVpz->rmViewTypeToDoc(currView, "confluent");
         }
     }
     updateViewType();
@@ -363,9 +362,9 @@ FileVpzExpView::onFinishCheck(int v)
 {
     if (currView != "") {
         if (v) {
-            mVpm->addViewTypeToDoc(currView, "finish");
+            mVpz->addViewTypeToDoc(currView, "finish");
         } else {
-            mVpm->rmViewTypeToDoc(currView, "finish");
+            mVpz->rmViewTypeToDoc(currView, "finish");
         }
     }
     updateViewType();
@@ -379,7 +378,7 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
     QListWidgetItem* item = ui->vleViewList->itemAt(pos);
 
     bool enable_view = true;
-    if (item and not mVpm->enabledViewFromDoc(item->text())) {
+    if (item and not mVpz->enabledViewFromDoc(item->text())) {
         enable_view = false;
     }
     QAction* action;
@@ -402,19 +401,19 @@ FileVpzExpView::onViewListMenu(const QPoint& pos)
     if (selectedItem) {
         int actCode = selectedItem->data().toInt();
         if (actCode == FVEVM_add_view) {
-            QString viewName = mVpm->newViewNameToDoc();
-            mVpm->addViewToDoc(viewName);
+            QString viewName = mVpz->newViewNameToDoc();
+            mVpz->addViewToDoc(viewName);
             currView = viewName;
             reload();
         } else if (actCode == FVEVM_remove_view) {
             if (item) {
-                mVpm->rmViewToDoc(item->text());
+                mVpz->rmViewToDoc(item->text());
                 currView = "";
                 reload();
             }
         } else if (actCode == FVEVM_disable_view) {
             if (item) {
-                mVpm->enableViewToDoc(item->text(), not enable_view);
+                mVpz->enableViewToDoc(item->text(), not enable_view);
             }
         }
     }
@@ -425,18 +424,18 @@ FileVpzExpView::onItemChanged(QListWidgetItem * item)
 {
     QString oldViewName = item->data( Qt::UserRole+0).toString();
     QString newName = item->text();
-    if (mVpm->existViewFromDoc(newName)) {
+    if (mVpz->existViewFromDoc(newName)) {
         bool oldBlock = ui->vleViewList->blockSignals(true);
         item->setText(oldViewName);
         ui->vleViewList->blockSignals(oldBlock);
     } else if (oldViewName != newName) {
-        mVpm->renameViewToDoc(oldViewName, newName);
+        mVpz->renameViewToDoc(oldViewName, newName);
     }
     reload();
 }
 
 void
-FileVpzExpView::onUndoRedoVpm(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
+FileVpzExpView::onUndoRedoVpz(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
         QDomNode /*oldVpm*/, QDomNode /*newVpm*/)
 {
     reload();

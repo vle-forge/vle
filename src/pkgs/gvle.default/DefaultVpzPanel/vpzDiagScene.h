@@ -35,7 +35,7 @@
 #include <QUndoStack>
 #include <QUndoView>
 
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif
@@ -83,7 +83,7 @@ enum VPZ_DIAG_MENU_ACTION {
 class VpzConnectionLineItem : public QGraphicsItem
 {
 public:
-    VpzConnectionLineItem(QDomNode node, vleVpm* vpz, QLineF l,
+    VpzConnectionLineItem(QDomNode node, vleVpz* vpz, QLineF l,
             QGraphicsItem* parent, VpzDiagScene* scene);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                 QWidget *widget = 0);
@@ -91,7 +91,7 @@ public:
     void update(const QRectF & rect = QRectF());
     int type() const;
 
-    vleVpm* mVpm;
+    vleVpz* mVpz;
     QDomNode mnode;
 };
 
@@ -99,7 +99,7 @@ class VpzPortItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    VpzPortItem(QDomNode node, vleVpm* vpz, bool input,
+    VpzPortItem(QDomNode node, vleVpz* vpz, bool input,
             QGraphicsItem* parent, VpzDiagScene* scene);
     QRectF boundingRect() const;
     void update(const QRectF & rect = QRectF());
@@ -114,7 +114,7 @@ public:
     void hoverEnterEvent(QGraphicsSceneHoverEvent * evt);
 
 public:
-    vleVpm* mVpm;
+    vleVpz* mVpz;
     QDomNode mnode;
     bool mInput;
 };
@@ -122,7 +122,7 @@ public:
 class VpzModelItem : public QGraphicsItem
 {
 public:
-    VpzModelItem(QDomNode node, vleVpm* vpz, QGraphicsItem* parent,
+    VpzModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
                 QGraphicsScene* scene);
     QGraphicsTextItem* getTitle() const;
     QGraphicsRectItem* getRectangle() const;
@@ -140,7 +140,7 @@ public:
     double heightPort();
     void setNameEdition(bool val);
 
-    vleVpm* mVpm;
+    vleVpz* mVpz;
     QDomNode mnode;
     double margin;
     double rectWidth;
@@ -152,7 +152,7 @@ class VpzSubModelItem : public VpzModelItem
 
 public:
 
-    VpzSubModelItem(QDomNode node, vleVpm* vpz, QGraphicsItem* parent,
+    VpzSubModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
             QGraphicsScene* scene);
     virtual ~VpzSubModelItem();
     QRectF boundingRect() const;
@@ -177,7 +177,7 @@ class VpzMainModelItem : public VpzModelItem
 public:
     enum SEL_TYPE {TOP, RIGHT, BOTTOM, LEFT, MIDDLE};
 
-    VpzMainModelItem(QDomNode node, vleVpm* vpz, QGraphicsItem* parent,
+    VpzMainModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
             QGraphicsScene* scene);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -215,13 +215,13 @@ class VpzDiagScene : public QGraphicsScene
 public:
     VpzDiagScene(Logger* log, const vle::utils::ContextPtr& ctx);
     /**
-     * @brief initialize the scene with a vpm file
-     * @param vpm, the vpm file
+     * @brief initialize the scene with a vpz file
+     * @param vpz, the vpz file
      * @param className, if empty then the main model is shown
      * @param emitter, the object that send the signal:
      *   undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)
      */
-    void init(vleVpm* vpm, const QString& className);
+    void init(vleVpz* vpz, const QString& className);
     QString getClass();
     void setFocus(QDomNode selModelNode);
     void clear();
@@ -273,11 +273,11 @@ signals:
 
 public slots:
     void onDragDestroyed(QObject *obj =0);
-    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);
 
 public:
-    vleVpm*                mVpm;
+    vleVpz*             mVpz;
     QString                mClass;
     VpzMainModelItem*      mCoupled;
     VpzPortItem*           mPortSel1;

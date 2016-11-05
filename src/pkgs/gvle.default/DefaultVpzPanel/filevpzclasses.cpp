@@ -41,7 +41,7 @@ namespace gvle {
 
 FileVpzClasses::FileVpzClasses(Logger* log, 
     const vle::utils::ContextPtr& ctx, QWidget *parent) :
-    QWidget(parent), mScene(log, ctx), ui(new Ui::FileVpzClasses), mVpm(0),
+    QWidget(parent), mScene(log, ctx), ui(new Ui::FileVpzClasses), mVpz(0),
     mSelClass("<None>")
 {
 
@@ -86,10 +86,9 @@ FileVpzClasses::~FileVpzClasses()
 }
 
 void
-FileVpzClasses::setVpm(vleVpm* vpm)
+FileVpzClasses::setVpz(vleVpz* vpz)
 {
-
-    mVpm = vpm;
+    mVpz = vpz;
     reload();
 }
 
@@ -103,7 +102,7 @@ FileVpzClasses::reload()
     ui->classesList->setEditable(true);
     ui->classesList->clear();
     std::vector<std::string> classes;
-    mVpm->fillWithClassesFromDoc(classes);
+    mVpz->fillWithClassesFromDoc(classes);
     ui->classesList->addItem(QString("<None>"));
     std::vector<std::string>::const_iterator itb = classes.begin();
     std::vector<std::string>::const_iterator ite = classes.end();
@@ -112,11 +111,11 @@ FileVpzClasses::reload()
     }
     ui->classesList->blockSignals(oldBlock);
     mSelClass = "<None>";
-    mScene.init(mVpm, mSelClass);
+    mScene.init(mVpz, mSelClass);
 }
 
 void
-FileVpzClasses::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+FileVpzClasses::onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
         QDomNode oldValVpm, QDomNode newValVpm)
 {
     if (oldValVpz.nodeName() == "classes") {
@@ -124,14 +123,14 @@ FileVpzClasses::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
         //except clearing the scene
         reload();
     } else {
-        mScene.onUndoRedoVpm(oldValVpz, newValVpz, oldValVpm, newValVpm);
+        mScene.onUndoRedoVpz(oldValVpz, newValVpz, oldValVpm, newValVpm);
     }
 }
 
 void
 FileVpzClasses::onNewAtomicTriggered(bool /*checked*/)
 {
-    QString name = mVpm->addClassToDoc(true);
+    QString name = mVpz->addClassToDoc(true);
     ui->classesList->addItem(name);
     ui->classesList->setCurrentIndex(ui->classesList->count()-1);
 }
@@ -139,7 +138,7 @@ FileVpzClasses::onNewAtomicTriggered(bool /*checked*/)
 void
 FileVpzClasses::onNewCoupledTriggered(bool /*checked*/)
 {
-    QString name = mVpm->addClassToDoc(false);
+    QString name = mVpz->addClassToDoc(false);
     ui->classesList->addItem(name);
     ui->classesList->setCurrentIndex(ui->classesList->count()-1);
 }
@@ -148,12 +147,12 @@ void
 FileVpzClasses::onTextChanged(const QString& text)
 {
     if (mSelClass != text and mSelClass != "<None>" and text != "<None>"
-            and not mVpm->existClassFromDoc(text) and text != "") {
-        mVpm->renameClassToDoc(mSelClass, text);
+            and not mVpz->existClassFromDoc(text) and text != "") {
+        mVpz->renameClassToDoc(mSelClass, text);
         int it = ui->classesList->currentIndex();
         ui->classesList->setItemText(it, text);
         mSelClass = text;
-        mScene.init(mVpm, mSelClass);
+        mScene.init(mVpz, mSelClass);
         //reload();
     }
 }
@@ -162,7 +161,7 @@ void
 FileVpzClasses::onPushCopy(bool /*checked*/)
 {
     if (mSelClass != "<None>") {
-        QString name = mVpm->copyClassToDoc(mSelClass);
+        QString name = mVpz->copyClassToDoc(mSelClass);
         ui->classesList->addItem(name);
         ui->classesList->setCurrentIndex(ui->classesList->count()-1);
     }
@@ -171,7 +170,7 @@ void
 FileVpzClasses::onPushDelete(bool /*checked*/)
 {
     if (mSelClass != "<None>") {
-        mVpm->removeClassToDoc(mSelClass);
+        mVpz->removeClassToDoc(mSelClass);
         ui->classesList->removeItem(ui->classesList->currentIndex());
         ui->classesList->setCurrentIndex(0);
     }
@@ -180,9 +179,9 @@ FileVpzClasses::onPushDelete(bool /*checked*/)
 void
 FileVpzClasses::onCurrentIndexChanged(const QString & /*text*/)
 {
-    if (mVpm) {
+    if (mVpz) {
         mSelClass = ui->classesList->currentText();
-        mScene.init(mVpm, mSelClass);
+        mScene.init(mVpz, mSelClass);
         ui->graphicsView->setSceneRect(QRect(0,0,0,0));
         ui->graphicsView->setScene(&mScene);
         mScene.update();

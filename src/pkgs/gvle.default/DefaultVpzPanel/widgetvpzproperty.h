@@ -27,7 +27,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QComboBox>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
 class WidgetVpzPropertyObservables;
@@ -44,7 +44,7 @@ class WidgetVpzPropertyDynamics : public QComboBox
 public:
     explicit WidgetVpzPropertyDynamics(QWidget *parent = 0);
     ~WidgetVpzPropertyDynamics();
-    void setModel(vleVpz *model, const QString& mod_query);
+    void setModel(vleVpz* vpz, const QString& mod_query);
 
 signals:
     void sigActivated(bool isActive);
@@ -53,7 +53,7 @@ private slots:
     void onChange(int index);
 
 private:
-    vleVpz *mVpm;
+    vleVpz* mVpz;
     QString mModQuery;
 };
 
@@ -63,7 +63,7 @@ class WidgetVpzPropertyExpCond : public QListWidget
 public:
     explicit WidgetVpzPropertyExpCond(QWidget *parent = 0);
     ~WidgetVpzPropertyExpCond();
-    void setModel(vleVpz *model, const QString& mod_query);
+    void setModel(vleVpz* vpz, const QString& mod_query);
 
 //protected:
 //    void mouseDoubleClickEvent (QMouseEvent *event);
@@ -73,7 +73,7 @@ private slots:
     void refresh();
 
 private:
-    vleVpz *mVpm;
+    vleVpz* mVpz;
     QString mModQuery;
 };
 
@@ -83,7 +83,7 @@ class WidgetVpzPropertyObservables : public QComboBox
 public:
     explicit WidgetVpzPropertyObservables(QWidget *parent = 0);
     ~WidgetVpzPropertyObservables();
-    void setModel(vleVpz *model, const QString& mod_query);
+    void setModel(vleVpz* model, const QString& mod_query);
 
 public slots:
     void refresh();
@@ -92,7 +92,7 @@ private slots:
     void onChange(int index);
 
 private:
-    vleVpz *mVpm;
+    vleVpz* mVpz;
     QString mModQuery;
 };
 

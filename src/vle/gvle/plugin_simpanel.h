@@ -27,7 +27,7 @@
 
 #include <QWidget>
 #include <vle/utils/Package.hpp>
-#include <vle/gvle/vlevpz.h>
+#include <vle/gvle/vlevpz.hpp>
 #include "logger.h"
 
 namespace vle {

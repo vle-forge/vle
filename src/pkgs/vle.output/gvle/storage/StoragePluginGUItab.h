@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QtXml>
-#include <vle/gvle/vlevpz.h>
+#include <vle/gvle/vlevpz.hpp>
 #include <vle/value/Map.hpp>
 
 

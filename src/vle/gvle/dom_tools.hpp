@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef gvle_VLEDOMDIFFSTACK_H
-#define gvle_VLEDOMDIFFSTACK_H
+#ifndef GVLE_DOM_TOOLS_H
+#define GVLE_DOM_TOOLS_H
 
 #include <QDebug>
 
@@ -49,17 +49,14 @@ namespace vle {
 namespace gvle {
 
 /**
- * @brief VleDomObject is an interface to be used into a vleDomDiffStack
+ * @brief DomFunctions provides static functions to handle Dom documents
  * (for undo/redo)
  */
-class vleDomObject
+class DomFunctions
 {
 public:
-    vleDomObject(QDomDocument* doc);
-    virtual ~vleDomObject();
-    virtual QString getXQuery(QDomNode node) = 0;
-    virtual QDomNode getNodeFromXQuery(const QString& query,
-            QDomNode d=QDomNode()) = 0;
+    DomFunctions();
+    virtual ~DomFunctions();
 
     /**************************************************
      * Static functions, generic XML DOM
@@ -96,7 +93,7 @@ public:
      * @param nameValue, used to create the QDomNode
      * @param domDoc, if not null and node is not found then the node
      * is created
-     * @param the (created or found) resulting node
+     * @param the (created or found or null) resulting node
      */
     static QDomNode childWhithNameAttr(QDomNode& node,
             const QString& nodeName, const QString& nameValue,
@@ -110,11 +107,28 @@ public:
 
     static QList<QDomNode> childNodesWithoutText(QDomNode node,
                          const QString& nodeName = "");
+};
 
+/**
+ * @brief DomObject is an interface to be used into a DomDiffStack
+ * (for undo/redo)
+ */
+class DomObject
+{
+public:
+    DomObject(QDomDocument* doc): mDoc(doc) {}
+    virtual ~DomObject() {}
+    virtual QString getXQuery(QDomNode node) = 0;
+    virtual QDomNode getNodeFromXQuery(const QString& query,
+            QDomNode d=QDomNode()) = 0;
     QDomDocument* mDoc;
 };
 
-class vleDomDiffStack : public QObject
+/**
+ * @brief DomDiffStack handle a stack of undo/redo objects based on the copy
+ * of registered QDomNode (via snapshots)
+ */
+class DomDiffStack : public QObject
 {
     Q_OBJECT
 public:
@@ -142,11 +156,12 @@ public:
      * state corresponding to the save
      */
     unsigned int saved;
-    vleDomObject* mVdo;
+    DomObject* mVdo;
     QString current_source;
     bool snapshotEnabled;
 
-    vleDomDiffStack(vleDomObject* vdo);
+    DomDiffStack(DomObject* vdo);
+    virtual ~DomDiffStack();
 
     void init (QDomNode node);
     bool enableSnapshot(bool enable);
@@ -190,7 +205,6 @@ public:
      *          0, if the stack did not changed undo availability
      *          1, if the stack changed undo action from not available to avail.
      */
-    int getUndoAvailability() const;
     static int computeUndoAvailability(
             unsigned int prevCurr,
             unsigned int curr,

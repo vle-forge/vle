@@ -41,18 +41,18 @@ class FilePluginGUI : public PluginOutput
 public:
     FilePluginGUI();
     ~FilePluginGUI();
-    QString getname();
-    QWidget *getWidget();
-    void     delWidget();
-    void setLogger(Logger *logger);
-    void init(vleVpz* vpz, const QString& viewName);
+    QString getname() override;
+    QWidget *getWidget() override;
+    void     delWidget() override;
+    void setLogger(Logger* logger) override;
+    void init(vleVpz* vpz, const QString& viewName) override;
 
 public slots:
     void onTabDeleted(QObject *obj);
 
 private:
-    Logger           *mLogger;
-    FilePluginGUItab *mWidgetTab;
+    Logger*           mLogger;
+    FilePluginGUItab* mWidgetTab;
 };
 
 }} //namespaces

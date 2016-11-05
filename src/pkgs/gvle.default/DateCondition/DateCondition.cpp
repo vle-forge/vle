@@ -92,11 +92,11 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
 
     QDomNode condXml = mVpz->condFromConds(mVpz->condsFromDoc(), cond);
 
-    if (not mVpz->existPortFromCond(condXml, "date")) {
+    if (not vleDomStatic::existPortFromCond(condXml, "date")) {
         value::Map portValues;
         portValues.addInt("date",utils::DateTime::toJulianDayNumber(
                 "2016-09-01"));
-        vleVpz::fillConditionWithMap(mVpz->getDomDoc(),condXml,portValues);
+        vleDomStatic::fillConditionWithMap(mVpz->getDomDoc(),condXml,portValues);
     }
 
     std::unique_ptr<value::Value> dateV = std::move(

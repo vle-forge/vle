@@ -31,8 +31,7 @@
 
 #ifndef Q_MOC_RUN
 #include <vle/utils/Context.hpp>
-#include <vle/gvle/vlevpz.h>
-#include <vle/gvle/vlevpm.h>
+#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/plugin_output.h>
 #endif
 
@@ -58,7 +57,7 @@ public:
     explicit FileVpzExpView(const utils::ContextPtr& ctx,  Logger* log, 
 	                        QWidget *parent = 0);
     ~FileVpzExpView();
-    void setVpm(vleVpm* vpm);
+    void setVpz(vleVpz* vpz);
     void reload();
 
 signals:
@@ -76,7 +75,7 @@ public slots:
     void onFinishCheck(int);
     void onViewListMenu(const QPoint&);
     void onItemChanged(QListWidgetItem* );
-    void onUndoRedoVpm(QDomNode oldVpz, QDomNode newVpz,
+    void onUndoRedoVpz(QDomNode oldVpz, QDomNode newVpz,
             QDomNode oldVpm, QDomNode newVpm);
 
 private:
@@ -86,7 +85,7 @@ private:
 
 
     Ui::FileVpzExpView* ui;
-    vleVpm*             mVpm;
+    vleVpz*             mVpz;
     PluginOutput*       mPlugin;
     QString             currView;
     utils::ContextPtr   mCtx;

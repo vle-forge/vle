@@ -35,7 +35,7 @@ namespace gvle {
 
 FileVpzRtool::FileVpzRtool(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::fileVpzRtool), mVpm(0), mCurrScene(0)
+    ui(new Ui::fileVpzRtool), mVpz(0), mCurrScene(0)
 {
     ui->setupUi(this);
 
@@ -52,18 +52,18 @@ FileVpzRtool::~FileVpzRtool()
 
 
 void
-FileVpzRtool::setVpm(vleVpm* vpm)
+FileVpzRtool::setVpz(vleVpz* vpz)
 {
-    mVpm = vpm;
+    mVpz = vpz;
     mCurrScene = 0;
-    QObject::connect(vpm, SIGNAL(modelsUpdated()),
+    QObject::connect(vpz, SIGNAL(modelsUpdated()),
                      this, SLOT (onDataUpdate()));
-    QObject::connect(vpm, SIGNAL(dynamicsUpdated()),
+    QObject::connect(vpz, SIGNAL(dynamicsUpdated()),
                      this, SLOT (onDataUpdate()));
-    QObject::connect(vpm,
+    QObject::connect(vpz,
             SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
             this,
-            SLOT(onUndoRedoVpm(QDomNode, QDomNode, QDomNode, QDomNode)));
+            SLOT(onUndoRedoVpz(QDomNode, QDomNode, QDomNode, QDomNode)));
 
 }
 
@@ -81,23 +81,23 @@ void
 FileVpzRtool::updateTree()
 {
     clear();
-    if (not mVpm) {
+    if (not mVpz) {
         return ;
     }
     // Insert root model into tree widget
     ui->modelTree->insertTopLevelItem(0, treeInsertModel(
-            mVpm->baseModelFromModelQuery(
-                    mVpm->vdo()->getXQuery(mCurrScene->mCoupled->mnode)), 0));
+            mVpz->baseModelFromModelQuery(
+                    mVpz->vdo()->getXQuery(mCurrScene->mCoupled->mnode)), 0));
 }
 
 
-vleVpm*
-FileVpzRtool::vpm()
+vleVpz*
+FileVpzRtool::vpz()
 {
-    //QString fileName = mVpm->getFilename();
+    //QString fileName = mVpz->getFilename();
     //mVleLibVpz = new vle::vpz::Vpz(fileName.toStdString());
 
-    return mVpm;
+    return mVpz;
 }
 
 
@@ -106,13 +106,13 @@ QTreeWidgetItem*
 FileVpzRtool::treeInsertModel(QDomNode model, QTreeWidgetItem *base)
 {
     QTreeWidgetItem *newItem = new QTreeWidgetItem();
-    newItem->setText(0, mVpm->vdo()->attributeValue(model, "name"));
-    QString model_query = mVpm->vdo()->getXQuery(model);
+    newItem->setText(0, DomFunctions::attributeValue(model, "name"));
+    QString model_query = mVpz->vdo()->getXQuery(model);
     newItem->setData(0, Qt::UserRole+0, model_query);
     if (base) {
         base->addChild(newItem);
     }
-    QList<QDomNode> subs = mVpm->submodelsFromModel(model);
+    QList<QDomNode> subs = mVpz->submodelsFromModel(model);
     for (int i =0; i< subs.size() ; i++) {
         treeInsertModel(subs[i], newItem);
     }
@@ -155,7 +155,7 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
     bool oldBlockModeProperty = ui->modelProperty->blockSignals(true);
     bool oldBlockStackProperty = ui->stackProperty->blockSignals(true);
 
-    if (not mVpm) {
+    if (not mVpz) {
         ui->stackProperty->setCurrentIndex(0);
         return ;
     }
@@ -168,27 +168,27 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
         return;
     }
 
-    QDomNode nodeSel = mVpm->vdo()->getNodeFromXQuery(model_query);
-    bool is_atomic = mVpm->vdo()->attributeValue(nodeSel, "type") == "atomic";
+    QDomNode nodeSel = mVpz->vdo()->getNodeFromXQuery(model_query);
+    bool is_atomic = DomFunctions::attributeValue(nodeSel, "type") == "atomic";
     if (is_atomic) {
         QTableWidgetItem *newItem = new QTableWidgetItem(
-                mVpm->vdo()->attributeValue(nodeSel, "name"));
+                DomFunctions::attributeValue(nodeSel, "name"));
         newItem->setFlags(newItem->flags() ^ Qt::ItemIsEditable);
         ui->modelProperty->setItem(ROW_NAME, 1, newItem);
         // This row Name is selected by default
         ui->modelProperty->setCurrentCell(ROW_NAME, 0);
 
         WidgetVpzPropertyDynamics *wpd = new WidgetVpzPropertyDynamics();
-        wpd->setModel(mVpm, model_query);
+        wpd->setModel(mVpz, model_query);
         ui->modelProperty->setCellWidget(ROW_DYN, 1, wpd);
 
         WidgetVpzPropertyObservables *wpo = new WidgetVpzPropertyObservables();
-        wpo->setModel(mVpm, model_query);
+        wpo->setModel(mVpz, model_query);
         ui->modelProperty->setCellWidget(ROW_OBS, 1, wpo);
 
 
         WidgetVpzPropertyExpCond *wpec = new WidgetVpzPropertyExpCond();
-        wpec->setModel(mVpm, model_query);
+        wpec->setModel(mVpz, model_query);
         ui->modelProperty->setCellWidget(ROW_EXP, 1, wpec);
 
         ui->modelProperty->resizeRowToContents(ROW_EXP);
@@ -231,12 +231,12 @@ FileVpzRtool::onTreeModelSelected()
     QTreeWidgetItem* item = ui->modelTree->currentItem();
     QString model_query = getModelQuery(item);
     if (mCurrScene and not model_query.isEmpty()) {
-        QDomNode nodeSel = mVpm->vdo()->getNodeFromXQuery(model_query);
+        QDomNode nodeSel = mVpz->vdo()->getNodeFromXQuery(model_query);
         QDomNode parent = nodeSel.parentNode().parentNode();
         if (parent.nodeName() == "model") {
             mCurrScene->setFocus(parent);
             mCurrScene->selectSubModel(
-                    mVpm->vdo()->attributeValue(nodeSel, "name"));
+                    DomFunctions::attributeValue(nodeSel, "name"));
         } else {
             mCurrScene->setFocus(nodeSel);
         }
@@ -248,7 +248,7 @@ FileVpzRtool::onTreeModelSelected()
 void
 FileVpzRtool::onEnterCoupledModel(QDomNode node)
 {
-    QTreeWidgetItem* item = getTreeWidgetItem(mVpm->vdo()->getXQuery(node));
+    QTreeWidgetItem* item = getTreeWidgetItem(mVpz->vdo()->getXQuery(node));
     if (item) {
         bool oldBlock = ui->modelTree->blockSignals(true);
         ui->modelTree->setCurrentItem(item);
@@ -261,6 +261,7 @@ FileVpzRtool::onSelectionChanged()
 {
     QStringList sels = mCurrScene->getSelectedModels();
     if (sels.size() == 1) {
+
         bool oldBlock = ui->modelTree->blockSignals(true);
         ui->modelTree->setCurrentItem(getTreeWidgetItem(sels.at(0)));
         QTreeWidgetItem* item = ui->modelTree->currentItem();
@@ -277,12 +278,12 @@ FileVpzRtool::onInitializationDone(VpzDiagScene* scene)
     bool oldBlock = ui->modelTree->blockSignals(true);
     mCurrScene = scene;
     QString theSelected = "";
-    if (mVpm and scene and scene->mCoupled) {
+    if (mVpz and scene and scene->mCoupled) {
         updateTree();
         theSelected = scene->getXQueryOfTheSelectedModel();
         if (theSelected.isEmpty() and
                 not scene->mCoupled->mnode.parentNode().isNull()) { //TODO pas tres propre
-            theSelected = mVpm->vdo()->getXQuery(scene->mCoupled->mnode);
+            theSelected = mVpz->vdo()->getXQuery(scene->mCoupled->mnode);
         }
         if (theSelected.isEmpty()) {
             ui->modelTree->expandToDepth(0);
@@ -305,7 +306,7 @@ FileVpzRtool::onDataUpdate()
 }
 
 void
-FileVpzRtool::onUndoRedoVpm(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
+FileVpzRtool::onUndoRedoVpz(QDomNode /*oldValVpz*/, QDomNode /*newValVpz*/,
         QDomNode /*oldValVpm*/, QDomNode /*newValVpm*/)
 {
     onInitializationDone(mCurrScene);

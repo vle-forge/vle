@@ -60,14 +60,14 @@ public:
     explicit FileVpzExpCond(gvle_plugins* plugs, QWidget *parent = 0);
 
     ~FileVpzExpCond();
-    void setVpm(vleVpm* vpm);
+    void setVpz(vleVpz* vpz);
     void resizeTable();
     void reload(bool resize=true);
     void showEditPlace();
 
 public slots:
     void onConditionMenu(const QPoint&);
-    void onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
             QDomNode oldValVpm, QDomNode newValVpm);
     void onExpUpdated();
     void onCondUpdated();
@@ -94,7 +94,7 @@ private:
     void connectConds();
 
     Ui::FileVpzExpCond* ui;
-    vleVpm*             mVpm;
+    vleVpz*             mVpz;
     QString             mCurrCondName;
     QString             mCurrPortName;
     int                 mCurrValIndex;

@@ -34,12 +34,12 @@ namespace gvle {
 
 fileVpzView::fileVpzView(vle::utils::Package* pkg, gvle_plugins* plugs,
         Logger* log,  const utils::ContextPtr& ctx, QWidget *parent) :
-    QWidget(parent), ui(new Ui::fileVpzView), mRtool(0), mGvlePlugins(plugs),
+    QWidget(parent), ui(new Ui::fileVpzView), mUseSim(false),
+    mVpz(0), mRtool(0), mGvlePlugins(plugs),
     mPackage(pkg), mLog(log), mScene(log, ctx)
 {
     ui->setupUi(this);
 
-    mVpm = 0;
     mUseSim = false;
     mDynamicsTab = 0;
     mExpCondTab = 0;
@@ -135,53 +135,53 @@ fileVpzView::~fileVpzView()
  *        Associate the tab with an allocated VPZ object
  *
  */
-void fileVpzView::setVpm(vleVpm* vpm)
+void fileVpzView::setVpz(vleVpz* vpz)
 {
-    mVpm = vpm;
+    mVpz = vpz;
 
-    mVpm->setCurrentSource(ui->tabWidget->tabText(
+    mVpz->setCurrentSource(ui->tabWidget->tabText(
             ui->tabWidget->currentIndex()));
 
     // ---- Dynamics Tab ----
     if (mDynamicsTab) {
-        mDynamicsTab->setVpm(mVpm);
+        mDynamicsTab->setVpz(mVpz);
         mDynamicsTab->reload();
     }
 
     // ---- Experimental Conditions Tab ----
     if (mExpCondTab) {
-        mExpCondTab->setVpm(mVpm);
+        mExpCondTab->setVpz(mVpz);
         mExpCondTab->reload();
     }
 
     // ---- Experimental Conditions Tab ----
     if (mObservablesTab) {
-        mObservablesTab->setVpm(mVpm);
+        mObservablesTab->setVpz(mVpz);
     }
 
     // ---- Experimental Conditions Tab ----
     if (mProjectTab) {
-        mProjectTab->setVpm(mVpm);
+        mProjectTab->setVpz(mVpz);
     }
 
     // ---- View Tab ----
     if (mExpViewTab) {
-        mExpViewTab->setVpm(mVpm);
+        mExpViewTab->setVpz(mVpz);
         mExpViewTab->reload();
     }
 
     // ---- View Tab ----
     if (mClassesTab) {
-        mClassesTab->setVpm(mVpm);
+        mClassesTab->setVpz(mVpz);
     }
 
     // ---- View Tab ----
     if (mSimTab) {
-        mSimTab->setVpm(mVpm);
+        mSimTab->setVpz(mVpz);
     }
 
     //Build Scene
-    mScene.init(mVpm, "");
+    mScene.init(mVpz, "");
     ui->graphicView->setSceneRect(QRect(0,0,0,0));
     ui->graphicView->setScene(&mScene);
     mScene.update();
@@ -195,10 +195,10 @@ void fileVpzView::setRtool(FileVpzRtool* tool)
 
 void fileVpzView::save()
 {
-    if ( ! mVpm)
+    if ( ! mVpz)
         return;
 
-    mVpm->save();
+    mVpz->save();
 }
 
 /**
@@ -206,12 +206,12 @@ void fileVpzView::save()
  *        Readback the VPZ currently used
  *
  */
-vleVpm* fileVpzView::vpm()
+vleVpz* fileVpzView::vpz()
 {
-    //QString fileName = mVpm->getFilename();
+    //QString fileName = mVpz->getFilename();
     //mVleLibVpz = new vle::vpz::Vpz(fileName.toStdString());
 
-    return mVpm;
+    return mVpz;
 }
 
 void fileVpzView::usedBySim(bool isUsed)
@@ -224,7 +224,7 @@ bool fileVpzView::isUsed(int *reason = 0)
     int flag = 0;
     if (mUseSim)
         flag = 1;
-    else if (mVpm)
+    else if (mVpz)
     {
         flag = 2;
     }
@@ -261,38 +261,38 @@ fileVpzView::onTabClose(int index)
 }
 
 void
-fileVpzView::onUndoRedoVpm(QDomNode oldValVpz, QDomNode newValVpz,
+fileVpzView::onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
         QDomNode oldValVpm, QDomNode newValVpm)
 {
     if (newValVpz.nodeName() == "vle_project") {
-        setVpm(mVpm);
+        setVpz(mVpz);
         return;
     }
 
     QString tab = getCurrentTab();
     if (tab == "Diagram") {
-        mScene.onUndoRedoVpm(oldValVpz, newValVpz,
+        mScene.onUndoRedoVpz(oldValVpz, newValVpz,
                 oldValVpm, newValVpm);
     } else if (tab == "Conditions") {
-        mExpCondTab->onUndoRedoVpm(oldValVpz, newValVpz,
+        mExpCondTab->onUndoRedoVpz(oldValVpz, newValVpz,
                 oldValVpm, newValVpm);
     } else if (tab == "Dynamics") {
-        mDynamicsTab->onUndoRedoVpm(oldValVpz, newValVpz,
+        mDynamicsTab->onUndoRedoVpz(oldValVpz, newValVpz,
                 oldValVpm, newValVpm);
     } else if (tab == "Observables") {
-        mObservablesTab->onUndoRedoVpm(oldValVpz, newValVpz,
+        mObservablesTab->onUndoRedoVpz(oldValVpz, newValVpz,
                 oldValVpm, newValVpm);
     } else if (tab == "Views") {
-        mExpViewTab->onUndoRedoVpm(oldValVpz, newValVpz,
+        mExpViewTab->onUndoRedoVpz(oldValVpz, newValVpz,
                 oldValVpm, newValVpm);
     } else if (tab == "Classes") {
-        mClassesTab->onUndoRedoVpm(oldValVpz, newValVpz,
+        mClassesTab->onUndoRedoVpz(oldValVpz, newValVpz,
                 oldValVpm, newValVpm);
     } else if (tab == "Simulation") {
-//        mSimTab->onUndoRedoVpm(oldValVpz, newValVpz,
+//        mSimTab->onUndoRedoVpz(oldValVpz, newValVpz,
 //                oldValVpm, newValVpm);
     } else if (tab == "Project") {
-        mProjectTab->onUndoRedoVpm(oldValVpz, newValVpz,
+        mProjectTab->onUndoRedoVpz(oldValVpz, newValVpz,
                 oldValVpm, newValVpm);
     }
 }
