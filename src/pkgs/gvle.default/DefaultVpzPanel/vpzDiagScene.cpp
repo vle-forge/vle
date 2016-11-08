@@ -391,6 +391,7 @@ VpzModelItem::heightPort()
 void
 VpzModelItem::setNameEdition(bool val)
 {
+
     QGraphicsTextItem* textItem = getTitle();
     if (val and textItem->textInteractionFlags() == Qt::NoTextInteraction) {
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -1475,17 +1476,8 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     QList<VpzSubModelItem*> selMods = mCoupled->getSelectedSubModels();
     QMenu menu;
     QAction* action;
-    action = menu.addAction("Copy models");
-    setActionType(action, VDMA_copy_models);
-    action->setEnabled(
-            (sel and isVpzSubModel(sel) and (selMods.size() >= 1)
-                 and (selMods.contains(static_cast<VpzSubModelItem*>(sel))))
-         or (sel and isVpzSubModel(sel) and (selMods.size() == 0)));
-    action = menu.addAction("Paste models");
-    setActionType(action, VDMA_paste_models);
-    action->setEnabled(sel and isVpzMainModel(sel) and not
-            (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
-    menu.addSeparator();
+    QMenu* submenu;
+
     action = menu.addAction("Edit name");
     setActionType(action, VDMA_Edit_name);
     action->setEnabled((sel and isVpzPort(sel))
@@ -1532,14 +1524,14 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     setActionType(action, VDMA_Zoom_Out);
     action->setEnabled(true);
     menu.addSeparator();
-    QMenu* submenuconfigure = menu.addMenu("Configure");
+    submenu = menu.addMenu("Configure");
     bool enabled = (sel and not isVpzMainModel(sel) and
                     (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
                     not isVpzSubModelConfigured(sel));
 
-    submenuconfigure->setEnabled(enabled);
+    submenu->setEnabled(enabled);
     if (enabled) {
-        populateConfigureMenu(submenuconfigure);
+        populateConfigureMenu(submenu);
     }
     action = menu.addAction("Unconfigure");
     setActionType(action, VDMA_Unconfigure_model);
@@ -1552,6 +1544,20 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                        (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
                        isVpzSubModelConfigured(sel));
     menu.addSeparator();
+    submenu = menu.addMenu("Copy");
+    submenu->setEnabled(
+            (sel and isVpzSubModel(sel) and (selMods.size() >= 1)
+                 and (selMods.contains(static_cast<VpzSubModelItem*>(sel))))
+         or (sel and isVpzSubModel(sel) and (selMods.size() == 0)));
+    action = submenu->addAction("Copy all");
+    setActionType(action, VDMA_copy_models_track);
+    action = submenu->addAction("Copy structure");
+    setActionType(action, VDMA_copy_models_notrack);
+    action = menu.addAction("Paste");
+    setActionType(action, VDMA_paste_models);
+    action->setEnabled(sel and isVpzMainModel(sel) and not
+            (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
+    menu.addSeparator();
     action = menu.addAction("Debug model");
     action->setCheckable(true);
     action->setChecked(debug_checked);
@@ -1563,31 +1569,22 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
         action = menu.exec(event->screenPos());
         if (action) {
             int actCode = getActionType(action);
-            if (actCode == VDMA_copy_models) {
-                mModelsCopies.clear();
+            if (actCode == VDMA_copy_models_track) {
+                QList<QDomNode>   copy_mods;
                 for (int i =0; i< selMods.size(); i++) {
-                    mModelsCopies.append(selMods.at(i)->mnode);
+                    copy_mods.append(selMods.at(i)->mnode);
                 }
-            } else if (actCode == VDMA_paste_models) {
+                mVpz->exportToClipboard(copy_mods, true);
 
-                if (mModelsCopies.size() > 0) {
-                    double x = DomFunctions::attributeValue(
-                            mModelsCopies[0], "x").toDouble();
-                    double y = DomFunctions::attributeValue(
-                            mModelsCopies[0], "y").toDouble();
-                    for (int i =1; i<mModelsCopies.size(); i++) {
-                        x = std::min(x, DomFunctions::attributeValue(
-                                mModelsCopies[i], "x").toDouble());
-                        y = std::min(y, DomFunctions::attributeValue(
-                                mModelsCopies[i], "y").toDouble());
-                    }
-                    QPointF pcopies(x, y);
-                    qreal xtranslation = event->scenePos().x() - pcopies.x();
-                    qreal ytranslation = event->scenePos().y() - pcopies.y();
-                    mVpz->copyModelsToModel(mModelsCopies, mCoupled->mnode,
-                            xtranslation, ytranslation);
-                    mCoupled->initializeFromDom();
+            } else if (actCode == VDMA_copy_models_notrack) {
+                QList<QDomNode>   copy_mods;
+                for (int i =0; i< selMods.size(); i++) {
+                    copy_mods.append(selMods.at(i)->mnode);
                 }
+                mVpz->exportToClipboard(copy_mods, false);
+            } else if (actCode == VDMA_paste_models) {
+                mVpz->importFromClipboard(mCoupled->mnode);
+                mCoupled->initializeFromDom();
             } else if (actCode == VDMA_Edit_name) {
                 if (isVpzPort(sel)) {
                     VpzPortItem* it = static_cast<VpzPortItem*>(sel);
@@ -1619,7 +1616,9 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
                         bool oldBlock = this->blockSignals(true);
                         for (int i =0; i< selMods.size(); i++) {
                             it = selMods.at(i);
-                            removeItem(it);
+                            //TODO not sure why a segfault occurs here
+                            //see http://stackoverflow.com/questions/27188538/how-to-delete-qgraphicsitem-properly
+                            //removeItem(it);
                             delete it;
                         }
                         this->blockSignals(oldBlock);

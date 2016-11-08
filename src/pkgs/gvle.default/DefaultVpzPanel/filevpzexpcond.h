@@ -83,6 +83,7 @@ private:
     QMenu* buildAddValueMenu(QMenu& menu, const QString& setOrAdd);
     vle::value::Value* buildDefaultValue(QString type);
     void insertNullWidget(int row, int col);
+    bool hasWidget(int row, int col);
     void insertTextEdit(int row, int col, const QString& val);
     void insertSpinBox(int row, int col, int val);
     void insertDoubleEdit(int row, int col, double val);

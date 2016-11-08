@@ -620,6 +620,29 @@ vleDomStatic::fillWithValue(QDomDocument& domDoc, QDomNode node,
     return true;
 }
 
+
+
+QSet<QString>
+vleDomStatic::dynamics(QDomNode atom)
+{
+    if (atom.nodeName() != "dynamics") {
+        qDebug() << "Internal error in dynamics " << atom.nodeName();
+        return QSet<QString>();
+    }
+    return DomFunctions::childNames(atom, "dynamic");
+}
+
+QString
+vleDomStatic::attachedDynToAtomic(QDomNode atom)
+{
+    if ((atom.nodeName() != "model") or
+            (DomFunctions::attributeValue(atom, "type") != "atomic")){
+        qDebug() << "Internal error in attachedDynToAtomic " << atom.nodeName();
+        return "";
+    }
+    return DomFunctions::attributeValue(atom, "dynamics");
+}
+
 QDomNode
 vleDomStatic::addCond(QDomNode atom, const QString& condName,
         QDomDocument* domDoc, DomDiffStack* snapObj)
@@ -638,8 +661,23 @@ vleDomStatic::addCond(QDomNode atom, const QString& condName,
 }
 
 QSet<QString>
+vleDomStatic::conditions(QDomNode atom)
+{
+    if (atom.nodeName() != "conditions") {
+        qDebug() << "Internal error in conditions " << atom.nodeName();
+        return QSet<QString>();
+    }
+    return DomFunctions::childNames(atom, "condition");
+}
+
+QSet<QString>
 vleDomStatic::attachedCondsToAtomic(const QDomNode& atom)
 {
+    if (atom.nodeName() != "model"){
+        qDebug() << "Internal error in attachedCondsToAtomic "
+                << atom.nodeName();
+        return QSet<QString>();
+    }
     QString attachedConds = DomFunctions::attributeValue(atom, "conditions");
     if (attachedConds == "") {
         return QSet<QString>();
@@ -839,6 +877,27 @@ vleDomStatic::fillConditionWithMap(QDomDocument& domDoc, QDomNode atom,
     return true;
 }
 
+QSet<QString>
+vleDomStatic::observables(QDomNode atom)
+{
+    if (atom.nodeName() != "observables") {
+        qDebug() << "Internal error in observables " << atom.nodeName();
+        return QSet<QString>();
+    }
+    return DomFunctions::childNames(atom, "observable");
+}
+
+QString
+vleDomStatic::attachedObsToAtomic(QDomNode atom)
+{
+    if ((atom.nodeName() != "model") or
+            (DomFunctions::attributeValue(atom, "type") != "atomic")){
+        qDebug() << "Internal error in attachedObsToAtomic " << atom.nodeName();
+        return "";
+    }
+    return DomFunctions::attributeValue(atom, "observables");
+}
+
 bool
 vleDomStatic::addObservablePort(QDomDocument& domDoc, QDomNode atom,
         const QString& portName, DomDiffStack* snapObj)
@@ -1016,6 +1075,190 @@ vleDomStatic::renamePortToOutNode(QDomNode atom,
     }
     DomFunctions::setAttributeValue(toRename, "name", newName);
     return true;
+}
+
+bool
+vleDomStatic::renameModelIntoCoupled(QDomDocument& domDoc, QDomNode atom,
+        QString old_model, QString new_model, DomDiffStack* snapObj)
+{
+    if ((atom.nodeName() != "model") or
+            (DomFunctions::attributeValue(atom, "type") != "coupled")) {
+        qDebug() << "Internal error in vleDomStatic::renameModelIntoCoupled "
+                << atom.nodeName();
+        return false;
+    }
+    QDomNode oldMod =  subModel(atom, old_model);
+    if (oldMod.isNull()) {
+        return false;
+    }
+    if (snapObj) {
+        snapObj->snapshot(atom);
+    }
+    if (DomFunctions::attributeValue(oldMod, "type") == "coupled") {
+        //rename connections at the submodels level
+        QList<QDomNode> consTag = DomFunctions::childNodesWithoutText(
+                oldMod, "connections");
+        if (consTag.size() != 1) {
+            qDebug() << "Internal error (2) in "
+                    "vleDomStatic::renameModelIntoCoupled ";
+        }
+        QList<QDomNode> cons = DomFunctions::childNodesWithoutText(
+                consTag.at(0), "connection");
+        for (int i=0; i<cons.size();i++) {
+            QDomNode con = cons.at(i);
+            QDomNode orig = con.toElement().elementsByTagName(
+                    "origin").at(0);
+            QDomNode dest = con.toElement().elementsByTagName(
+                    "destination").at(0);
+            if ((DomFunctions::attributeValue(con, "type") == "input") and
+                    (DomFunctions::attributeValue(orig, "model") == old_model)) {
+                DomFunctions::setAttributeValue(orig, "model", new_model);
+            } else if ((DomFunctions::attributeValue(con, "type") == "output")
+                    and (DomFunctions::attributeValue(dest, "model") == old_model)) {
+                DomFunctions::setAttributeValue(dest, "model", new_model);
+            }
+//            else if (DomFunctions::attributeValue(con, "type") == "internal") {
+//                if (DomFunctions::attributeValue(dest, "model") == old_model) {
+//                    DomFunctions::setAttributeValue(dest, "model", new_model);
+//                }
+//                if (DomFunctions::attributeValue(orig, "model") == old_model) {
+//                    DomFunctions::setAttributeValue(orig, "model", new_model);
+//                }
+//            }
+        }
+    }
+    //rename connections at the coupled level
+    QDomNode consNode = DomFunctions::obtainChild(atom, "connections", &domDoc);
+    QList<QDomNode> cons = DomFunctions::childNodesWithoutText(
+            consNode, "connection");
+    for (int i=0; i<cons.size();i++) {
+        QDomNode con = cons.at(i);
+        QDomNode orig = con.toElement().elementsByTagName("origin").at(0);
+        QDomNode dest = con.toElement().elementsByTagName("destination").at(0);
+        if ((DomFunctions::attributeValue(con, "type") == "input")  and
+            (DomFunctions::attributeValue(dest, "model") == old_model)) {
+            DomFunctions::setAttributeValue(dest, "model", new_model);
+        } else if ((DomFunctions::attributeValue(con, "type") == "output") and
+            (DomFunctions::attributeValue(orig, "model") == old_model)) {
+            DomFunctions::setAttributeValue(orig, "model", new_model);
+        } else if (DomFunctions::attributeValue(con, "type") == "internal") {
+            if (DomFunctions::attributeValue(dest, "model") == old_model) {
+                DomFunctions::setAttributeValue(dest, "model", new_model);
+            }
+            if (DomFunctions::attributeValue(orig, "model") == old_model) {
+                DomFunctions::setAttributeValue(orig, "model", new_model);
+            }
+        }
+    }
+    DomFunctions::setAttributeValue(oldMod, "name", new_model);
+    return true;
+}
+
+bool
+vleDomStatic::renameModelIntoStructures(QDomDocument& domDoc, QDomNode atom,
+        QString old_model, QString new_model, DomDiffStack* snapObj)
+{
+    if (atom.nodeName() != "structures") {
+        qDebug() << "Internal error in vleDomStatic::renameModelIntoStructures "
+                << atom.nodeName();
+        return false;
+    }
+    QDomNode mainMod =
+            DomFunctions::childWhithNameAttr(atom, "model", old_model);
+    if (mainMod.isNull()) {
+        qDebug() << "Internal error(2) in "
+                "vleDomStatic::renameModelIntoStructures ";
+        return false;
+    }
+    if (snapObj) {
+        snapObj->snapshot(atom);
+    }
+    if (DomFunctions::attributeValue(mainMod, "type") == "coupled") {
+        //rename connections at the submodels level
+        QDomNode consNode = DomFunctions::obtainChild(mainMod,
+                "connections", &domDoc);
+        QList<QDomNode> cons = DomFunctions::childNodesWithoutText(
+                consNode, "connection");
+        for (int i=0; i<cons.size();i++) {
+            QDomNode con = cons.at(i);
+            QDomNode orig = con.toElement().elementsByTagName(
+                    "origin").at(0);
+            QDomNode dest = con.toElement().elementsByTagName(
+                    "destination").at(0);
+            if ((DomFunctions::attributeValue(con, "type") == "input") and
+                    (DomFunctions::attributeValue(orig, "model") == old_model)) {
+                DomFunctions::setAttributeValue(orig, "model", new_model);
+            } else if ((DomFunctions::attributeValue(con, "type") == "output")
+                    and (DomFunctions::attributeValue(dest, "model") == old_model)) {
+                DomFunctions::setAttributeValue(dest, "model", new_model);
+            }
+        }
+    }
+    DomFunctions::setAttributeValue(mainMod, "name", new_model);
+    return true;
+
+}
+
+QStringList
+vleDomStatic::subModels(QDomNode atom)
+{
+    QStringList submodels;
+    if ((atom.nodeName() != "model") or
+            (DomFunctions::attributeValue(atom, "type") != "coupled")) {
+        qDebug() << "Internal error in vleDomStatic::subModels "
+                << atom.nodeName();
+        return submodels;
+    }
+    QDomNode submod_node = DomFunctions::obtainChild(atom, "submodels");
+    if (submod_node.isNull()) {
+        return submodels;
+    }
+    QList<QDomNode> sub =
+            DomFunctions::childNodesWithoutText(submod_node, "model");
+    for (int i=0; i<sub.size(); i++) {
+        submodels.append(DomFunctions::attributeValue(sub.at(i), "name"));
+    }
+    return submodels;
+}
+
+QDomNode
+vleDomStatic::subModel(QDomNode atom, QString model_name)
+{
+    if ((atom.nodeName() != "model") or
+            (DomFunctions::attributeValue(atom, "type") != "coupled")) {
+        qDebug() << "Internal error in vleDomStatic::subModel "
+                << atom.nodeName();
+        return QDomNode();
+    }
+    QDomNode submod_node = DomFunctions::obtainChild(atom, "submodels");
+    if (submod_node.isNull()) {
+        return QDomNode();
+    }
+    return DomFunctions::childWhithNameAttr(submod_node, "model", model_name);
+}
+
+QString
+vleDomStatic::connectionModOrig(QDomNode atom)
+{
+    if (atom.nodeName() != "connection") {
+        qDebug() << "Internal error in vleDomStatic::connectionOrig "
+                << atom.nodeName();
+        return "";
+    }
+    QDomNode orig = DomFunctions::obtainChild(atom, "origin");
+    return DomFunctions::attributeValue(orig, "model");
+}
+
+QString
+vleDomStatic::connectionModDest(QDomNode atom)
+{
+    if (atom.nodeName() != "connection") {
+        qDebug() << "Internal error in vleDomStatic::connectionDest "
+                << atom.nodeName();
+        return "";
+    }
+    QDomNode dest = DomFunctions::obtainChild(atom, "destination");
+    return DomFunctions::attributeValue(dest, "model");
 }
 
 QStringList

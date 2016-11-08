@@ -64,7 +64,8 @@ enum SEL_TYPE {
 };
 
 enum VPZ_DIAG_MENU_ACTION {
-    VDMA_copy_models,
+    VDMA_copy_models_notrack,
+    VDMA_copy_models_track,
     VDMA_paste_models,
     VDMA_Edit_name,
     VDMA_Remove,
@@ -287,7 +288,6 @@ public:
     QPointF                mDragCurrPoint;
     SEL_TYPE               mModelSelType;
     bool                   mIsEnteringCoupled;
-    QList<QDomNode>        mModelsCopies;
     Logger*                mLog;
     vle::utils::ContextPtr mCtx;
 };

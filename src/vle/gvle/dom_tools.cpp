@@ -93,28 +93,7 @@ DomFunctions::obtainChild(QDomNode node, const QString& nodeName,
     return res;
 }
 
-QDomNode
-DomFunctions::childWhithNameAttr(QDomNode& node,
-        const QString& nodeName, const QString& nameValue,
-        QDomDocument* domDoc)
-{
-    QDomNodeList childs = node.childNodes();
-    QList<QDomNode> childsWithoutText;
-    for (int i=0; i<childs.length();i++) {
-        QDomNode ch = childs.at(i);
-        if (not ch.isText() and ch.nodeName() == nodeName and
-                DomFunctions::attributeValue(ch, "name") == nameValue) {
-            return ch;
-        }
-    }
-    if (not domDoc) {
-        return QDomNode();
-    }
-    QDomNode res = domDoc->createElement(nodeName);
-    DomFunctions::setAttributeValue(res, "name", nameValue);
-    node.appendChild(res);
-    return res;
-}
+
 
 QString
 DomFunctions::toQString(const QDomNode& node)
@@ -136,6 +115,41 @@ DomFunctions::removeAllChilds(QDomNode node)
     }
 }
 
+QDomNode
+DomFunctions::childWhithNameAttr(QDomNode node,
+        const QString& nodeName, const QString& nameValue,
+        QDomDocument* domDoc)
+{
+    QDomNodeList childs = node.childNodes();
+    QList<QDomNode> childsWithoutText;
+    for (int i=0; i<childs.length();i++) {
+        QDomNode ch = childs.at(i);
+        if (not ch.isText() and ch.nodeName() == nodeName and
+                DomFunctions::attributeValue(ch, "name") == nameValue) {
+            return ch;
+        }
+    }
+    if (not domDoc) {
+        return QDomNode();
+    }
+    QDomNode res = domDoc->createElement(nodeName);
+    DomFunctions::setAttributeValue(res, "name", nameValue);
+    node.appendChild(res);
+    return res;
+}
+QSet<QString>
+DomFunctions::childNames(QDomNode node, QString child_node)
+{
+    QSet<QString> child_names;
+    QList<QDomNode> childNodes = DomFunctions::childNodesWithoutText(
+            node, child_node);
+    for (int i=0; i<childNodes.size(); i++) {
+        child_names.insert(
+                DomFunctions::attributeValue(childNodes.at(i), "name"));
+    }
+    return child_names;
+}
+
 QList<QDomNode>
 DomFunctions::childNodesWithoutText(QDomNode node, const QString& nodeName)
 {
@@ -154,7 +168,52 @@ DomFunctions::childNodesWithoutText(QDomNode node, const QString& nodeName)
     return childsWithoutText;
 }
 
+QString
+DomFunctions::childNameProvider(QDomNode node, QString child_node,
+                QString prefix, const QSet<QString>& exclude)
+{
+    QString new_name = prefix;
+    unsigned int id_name = 0;
+    while (true) {
+        if (id_name > 0) {
+            new_name = prefix;
+            new_name += "_";
+            new_name += QVariant(id_name).toString();
+        }
+        QString name = childNameProvider(node, child_node, new_name);
+        if(not exclude.contains(name)){
+            return name;
+        }
+        id_name ++;
+    }
+    return "";
+}
 
+QString
+DomFunctions::childNameProvider(QDomNode node, QString child_node,
+        QString prefix)
+{
+    QList<QDomNode> children = childNodesWithoutText(node, child_node);
+    QString new_name = prefix;
+    unsigned int id_name = 0;
+    bool new_name_found = false;
+    while (not new_name_found) {
+        bool new_name_found_i = false;
+        for (int j=0; j< children.length(); j++) {
+            new_name_found_i = new_name_found_i or
+                    (attributeValue(children.at(j), "name") == new_name);
+        }
+        if (new_name_found_i) {
+            id_name ++;
+            new_name = prefix;
+            new_name += "_";
+            new_name += QVariant(id_name).toString();
+        } else {
+            new_name_found = true;
+        }
+    }
+    return new_name;
+}
 
 /**************************************************
  * DomDiffStack implementation

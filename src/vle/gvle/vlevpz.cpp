@@ -34,6 +34,8 @@
 #include <QPalette>
 #include <QtDebug>
 #include <QDebug>
+#include <QClipboard>
+#include <QApplication>
 #include <vle/value/Value.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
@@ -1164,139 +1166,51 @@ vleVpz::renameCondPortToDoc(const QString& condName, const QString& oldName,
 }
 
 QString
-vleVpz::newDynamicNameToDoc() const
+vleVpz::newDynamicNameToDoc(QString prefix) const
 {
-    QString condName = "NewDynamic";
-    unsigned int idCond = 0;
-    bool condNameFound = false;
-    while (not condNameFound) {
-        if (existDynamicFromDoc(condName)) {
-            idCond ++;
-            condName = "NewDynamic";
-            condName += "_";
-            condName += QVariant(idCond).toString();
-        } else {
-            condNameFound = true;
-        }
-    }
-    return condName;
+    return DomFunctions::childNameProvider(dynamicsFromDoc(),
+            "dynamic", prefix);
 }
 
 QString
-vleVpz::newViewNameToDoc() const
+vleVpz::newViewNameToDoc(QString prefix) const
 {
-    QString condView = "NewView";
-    unsigned int idView = 0;
-    bool viewNameFound = false;
-    while (not viewNameFound) {
-        if (existViewFromDoc(condView)) {
-            idView ++;
-            condView = "NewView";
-            condView += "_";
-            condView += QVariant(idView).toString();
-        } else {
-            viewNameFound = true;
-        }
-    }
-    return condView;
+    return DomFunctions::childNameProvider(viewsFromDoc(),
+                "view", prefix);
 }
 
 QString
-vleVpz::newCondNameToDoc(QString name) const
+vleVpz::newCondNameToDoc(QString prefix) const
 {
-    QString condName = name;
-    unsigned int idCond = 0;
-    bool condNameFound = false;
-    while (not condNameFound) {
-        if (existCondFromDoc(condName)) {
-            idCond ++;
-            condName = name;
-            condName += "_";
-            condName += QVariant(idCond).toString();
-        } else {
-            condNameFound = true;
-        }
-    }
-    return condName;
+    return DomFunctions::childNameProvider(condsFromDoc(),
+                "condition", prefix);
+}
+
+
+
+QString
+vleVpz::newCondPortNameToDoc(QString cond, QString prefix) const
+{
+    QDomNode condAtom= condFromConds(condsFromDoc(), cond);
+    return DomFunctions::childNameProvider(condAtom,
+                "port", prefix);
 }
 
 QString
-vleVpz::newCondNameToDoc() const
+vleVpz::newObsNameToDoc(QString prefix) const
 {
-    QString condName = "NewCondition";
-    unsigned int idCond = 0;
-    bool condNameFound = false;
-    while (not condNameFound) {
-        if (existCondFromDoc(condName)) {
-            idCond ++;
-            condName = "NewCondition";
-            condName += "_";
-            condName += QVariant(idCond).toString();
-        } else {
-            condNameFound = true;
-        }
-    }
-    return condName;
+    QDomNode observables = obsFromDoc();
+    return DomFunctions::childNameProvider(observables,"observables", prefix);
 }
 
 QString
-vleVpz::newObsPortNameToDoc(const QString& obsName) const
+vleVpz::newObsPortNameToDoc(QString obsName, QString prefix) const
 {
-    QString portName = "NewPort";
-    unsigned int idPort = 0;
-    bool portNameFound = false;
-    while (not portNameFound) {
-        if (existObsPortFromDoc(obsName, portName)) {
-            idPort ++;
-            portName = "NewPort";
-            portName += "_";
-            portName += QVariant(idPort).toString();
-        } else {
-            portNameFound = true;
-        }
-    }
-    return portName;
+    QDomNode observables = obsFromDoc();
+    QDomNode obs = obsFromObss(observables, obsName);
+    return DomFunctions::childNameProvider(obs,"port", prefix);
 }
 
-QString
-vleVpz::newObsNameToDoc() const
-{
-    QString obsName = "NewObservable";
-    unsigned int idObs = 0;
-    bool obsNameFound = false;
-    while (not obsNameFound) {
-        if (existObsFromDoc(obsName)) {
-            idObs ++;
-            obsName = "NewObservable";
-            obsName += "_";
-            obsName += QVariant(idObs).toString();
-        } else {
-            obsNameFound = true;
-        }
-    }
-    return obsName;
-}
-
-QString
-vleVpz::newCondPortNameToDoc(const QString& condName) const
-{
-    QString portName = "NewPort";
-    unsigned int idPort = 0;
-    bool portNameFound = false;
-    QDomNode conds = condsFromDoc();
-    while (not portNameFound) {
-        if (vleDomStatic::existPortFromCond(
-                condFromConds(conds, condName), portName)) {
-            idPort ++;
-            portName = "NewPort";
-            portName += "_";
-            portName += QVariant(idPort).toString();
-        } else {
-            portNameFound = true;
-        }
-    }
-    return portName;
-}
 
 QDomNodeList
 vleVpz::obsPortsListFromDoc(const QString& obsName) const
@@ -1858,39 +1772,6 @@ vleVpz::rmObservableFromModel(QDomNode &node, const QString &obsName)
     emit observablesUpdated();
 }
 
-void
-vleVpz::renameObservableFromModel(QDomNode &node, const QString &oldName, const QString &newName)
-{
-    if (node.nodeName() != "model") {
-        qDebug() << ("Internal error in rmObservableFromModel (wrong main tag)");
-        return;
-    }
-    QDomNode currModel =
-        node.toElement().elementsByTagName("model").at(0);
-    QString currName = DomFunctions::attributeValue(currModel, "name");
-
-    QDomNodeList list = currModel.childNodes();
-    for (int j=0; j < list.length(); j++) {
-        QDomNode item = list.item(j);
-        if (item.nodeName() == "submodels") {
-            QDomNodeList list = item.childNodes();
-            for (int k=0; k < list.length(); k++) {
-                QDomNode item = list.item(k);
-                if (item.nodeName() == "model") {
-                    renameObservableFromModel(item, oldName, newName);
-                }
-            }
-        } else {
-            if (DomFunctions::attributeValue(currModel, "observables") == oldName) {
-                DomFunctions::setAttributeValue(currModel, "observables", newName);
-            }
-        }
-    }
-
-    emit observablesUpdated();
-}
-
-
 
 QDomNodeList
 vleVpz::obssListFromObss(const QDomNode& node) const
@@ -2022,84 +1903,26 @@ void
 vleVpz::renameModel(QDomNode node, const QString& newName)
 {
     if (node.nodeName() != "model") {
-        qDebug() << ("Internal error in renameModel (wrong main tag)");
+        qDebug() << "Internal error in renameModel " << node.nodeName();
         return;
     }
-
     QString oldName = DomFunctions::attributeValue(node, "name");
-    //rename connections at the coupled level
-    if (node.parentNode().parentNode().nodeName() == "model") {
-        undoStack->snapshot(node.parentNode().parentNode());//snapshot of the coupled
-        synchronizeUndoStack();
-        QDomNode parent = node.parentNode().parentNode();
-        QList<QDomNode> consTag =
-                DomFunctions::childNodesWithoutText(parent, "connections");
-        if (consTag.size() == 1) {
-            QList<QDomNode> cons =
-                    DomFunctions::childNodesWithoutText(consTag.at(0), "connection");
-            for (int i=0; i<cons.size();i++) {
-                QDomNode con = cons.at(i);
-                QDomNode orig = con.toElement()
-                        .elementsByTagName("origin").at(0);
-                QDomNode dest = con.toElement()
-                        .elementsByTagName("destination").at(0);
-                if (DomFunctions::attributeValue(con, "type") == "input") {
-                    if (DomFunctions::attributeValue(dest, "model") == oldName) {
-                        DomFunctions::setAttributeValue(dest, "model", newName);
-                    }
-                } else if (DomFunctions::attributeValue(con, "type") == "output") {
-                    if (DomFunctions::attributeValue(orig, "model") == oldName) {
-                        DomFunctions::setAttributeValue(orig, "model", newName);
-                    }
-                } else if (DomFunctions::attributeValue(con, "type") == "internal") {
-                    if (DomFunctions::attributeValue(dest, "model") == oldName) {
-                        DomFunctions::setAttributeValue(dest, "model", newName);
-                    }
-                    if (DomFunctions::attributeValue(orig, "model") == oldName) {
-                        DomFunctions::setAttributeValue(orig, "model", newName);
-                    }
-                }
-            }
-        }
+    bool modif = false;
+    if (node.parentNode().nodeName() == "structures") {
+        modif = vleDomStatic::renameModelIntoStructures(mDoc,
+                node.parentNode(),
+                oldName, newName, undoStack);
     } else {
-        undoStack->snapshot(node.parentNode());//snapshot of the container of
-                                               // the current model only
+        modif = vleDomStatic::renameModelIntoCoupled(mDoc,
+                node.parentNode().parentNode(),
+                oldName, newName, undoStack);
+    }
+    if (modif) {
         synchronizeUndoStack();
+        emit modelsUpdated();
     }
-    //rename connections at the submodels level
-    {
-        QList<QDomNode> consTag =
-                DomFunctions::childNodesWithoutText(node, "connections");
-        if (consTag.size() == 1) {
-            QList<QDomNode> cons =
-                    DomFunctions::childNodesWithoutText(consTag.at(0), "connection");
-            for (int i=0; i<cons.size();i++) {
-                QDomNode con = cons.at(i);
-                QDomNode orig = con.toElement()
-                                            .elementsByTagName("origin").at(0);
-                QDomNode dest = con.toElement()
-                                            .elementsByTagName("destination").at(0);
-                if (DomFunctions::attributeValue(con, "type") == "input") {
-                    if (DomFunctions::attributeValue(dest, "model") == oldName) {
-                        DomFunctions::setAttributeValue(dest, "model", newName);
-                    }
-                } else if (DomFunctions::attributeValue(con, "type") == "output") {
-                    if (DomFunctions::attributeValue(orig, "model") == oldName) {
-                        DomFunctions::setAttributeValue(orig, "model", newName);
-                    }
-                } else if (DomFunctions::attributeValue(con, "type") == "internal") {
-                    if (DomFunctions::attributeValue(dest, "model") == oldName) {
-                        DomFunctions::setAttributeValue(dest, "model", newName);
-                    }
-                    if (DomFunctions::attributeValue(orig, "model") == oldName) {
-                        DomFunctions::setAttributeValue(orig, "model", newName);
-                    }
-                }
-            }
-        }
-    }
-    DomFunctions::setAttributeValue(node, "name", newName);
-    emit modelsUpdated();
+
+
 }
 
 void
@@ -2143,6 +1966,7 @@ vleVpz::rmModel(QDomNode node, bool withEmit)
             }
         }
     }
+
     for (int i=0; i< toRemove.length(); i++) {
         toRemove.at(i).parentNode().removeChild(toRemove.at(i));
     }
@@ -2256,24 +2080,9 @@ vleVpz::addModel(QDomNode node, const QString& type, QPointF pos)
     undoStack->snapshot(subModels);
     synchronizeUndoStack();
 
-    QDomNodeList subList = subModels.elementsByTagName("model");
-    QString newModelName = "NewModel";
-    bool found = false;
-    unsigned int idInPort = 0;
-    while (not found) {
-        found = true;
-        for (int i=0; i< subList.length(); i++) {
-            if (DomFunctions::attributeValue(subList.at(i), "name") == newModelName) {
-                found = false;
-            }
-        }
-        if (not found) {
-            idInPort++;
-            newModelName = "NewModel";
-            newModelName += "_";
-            newModelName += QVariant(idInPort).toString();
-        }
-    }
+    QString newModelName =
+            DomFunctions::childNameProvider(subModels, "model", type);
+
     QDomNode newModel = getDomDoc().createElement("model");
     if (type == "coupled") {
         DomFunctions::setAttributeValue(newModel,"height","50");
@@ -3097,16 +2906,10 @@ vleVpz::modelObsFromDoc(const QString& model_query)
     return DomFunctions::attributeValue(atom, "observables");
 }
 
-QString
-vleVpz::getAtomicModelObs(QDomNode atom)
-{
-    return DomFunctions::attributeValue(atom, "observables");
-}
-
 bool
 vleVpz::isAtomicModelObsSet(QDomNode atom)
 {
-    return getAtomicModelObs(atom) != "";
+    return vleDomStatic::attachedObsToAtomic(atom) != "";
 }
 
 void
@@ -3793,6 +3596,172 @@ vleVpz::getDynamicLibrary(const QString& dyn) const
     return "";
 }
 
+void
+vleVpz::importFromClipboard(QDomNode node_dest)
+{
+
+    QString vpzFile = QDir::tempPath() +"/clipboard/exp/clipboard.vpz";
+    QString vpmFile = QDir::tempPath() +"/clipboard/metadata/exp/clipboard.vpm";
+    vleVpz src(vpzFile, vpmFile, mGvlePlugins);
+
+    //get clipboard
+    QStringList queries;
+    bool track = false;
+    {
+        QClipboard* clipboard = QApplication::clipboard();
+        QString clip_content = clipboard->text();
+        QStringList clip_content_list = clip_content.split(";;");
+        for (int i=0; i<clip_content_list.length(); i++) {
+            if (i < clip_content_list.length()-1){
+                queries.append(clip_content_list.at(i).split(":=").at(1));
+            } else {
+                QString track_str = clip_content_list.at(i);
+                track_str.remove("track=");
+                if (track_str == "yes") {
+                    track = true;
+                } else {
+                    track = false;
+                }
+            }
+        }
+    }
+    QString src_mod_query ="";
+    QSet<QString> elems = modifyImportSourceForImport(node_dest,
+            queries, track, src, src_mod_query);
+    if (elems.empty()) {
+        return ;
+    }
+
+    bool snapshot_all = false;
+
+    //localize snapshot
+    for (QSet<QString>::iterator i = elems.begin(); i!=elems.end(); i++) {
+        QStringList elem = i->split("::");
+        if ((elem.at(0) == "model") and track) {
+            snapshot_all = true;
+        }
+    }
+
+    if (snapshot_all) {
+        undoStack->snapshot(vleProjectFromDoc());
+    } else {
+        undoStack->snapshot(node_dest);
+    }
+    synchronizeUndoStack();
+
+    bool emit_cond = false;
+    bool emit_dyn = false;
+    bool emit_obs = false;
+    bool emit_mod = false;
+
+
+    //import conditions, condition port, dynamics and observables
+    for (QSet<QString>::iterator i = elems.begin(); i!=elems.end(); i++) {
+        QStringList elem = i->split("::");
+        if (elem.at(0) == "cond") {
+            condsFromDoc().appendChild(src.condFromConds(src.condsFromDoc(),
+                    elem.at(1)));
+            emit_cond = true;
+        } else if (elem.at(0) == "dyn") {
+            dynamicsFromDoc().appendChild(src.dynamicFromDoc(
+                    elem.at(1)));
+            emit_dyn = true;
+        } else if (elem.at(0) == "obs") {
+            obsFromDoc().appendChild(src.obsFromObss(src.obsFromDoc(),
+                    elem.at(1)));
+            emit_obs = true;
+        } else if (elem.at(0) == "cond_port") {
+            QString src_cond = elem.at(1).split("//").at(0);
+            QString dest_cond = elem.at(1).split("//").at(1);
+            QString src_cond_port = elem.at(1).split("//").at(2);
+            QDomNode dest_cond_node = condFromConds(condsFromDoc(), dest_cond);
+            QDomNode src_cond_node = src.condFromConds(src.condsFromDoc(), src_cond);
+            QDomNode src_port_node = src.portFromCond(src_cond_node, src_cond_port);
+
+            dest_cond_node.appendChild(src_port_node);
+            emit_cond = true;
+        }
+    }
+
+    if (src_mod_query != "") {
+        //import models
+        QDomNode dest_submodels = DomFunctions::obtainChild(node_dest,
+                        "submodels", &mDoc);
+        QDomNode src_mod = src.vdo()->getNodeFromXQuery(src_mod_query);
+        QSet<QString> mods_to_import;
+        for (QSet<QString>::iterator i = elems.begin(); i!=elems.end(); i++) {
+            QStringList elem = i->split("::");
+            if (elem.at(0) == "model") {
+                QDomNode model_node = vleDomStatic::subModel(src_mod,
+                        elem.at(1));
+                dest_submodels.appendChild(model_node);
+                mods_to_import.insert(elem.at(1));
+                emit_mod = true;
+            }
+        }
+        //import connections
+        QDomNode dest_connections = DomFunctions::obtainChild(node_dest,
+                "connections", &mDoc);
+        QDomNode src_connections = DomFunctions::obtainChild(src_mod,
+                        "connections");
+        QList<QDomNode> cons = DomFunctions::childNodesWithoutText(
+                src_connections, "connection");
+        for (int i =0; i<cons.size(); i++) {
+            QDomNode con = cons.at(i);
+            if (DomFunctions::attributeValue(con, "type") == "internal") {
+                if (mods_to_import.contains(vleDomStatic::connectionModOrig(con))
+                    and mods_to_import.contains(vleDomStatic::connectionModDest(con))) {
+                    dest_connections.appendChild(con);
+                }
+            }
+        }
+    }
+    if (emit_cond){
+        emit conditionsUpdated();
+    }
+    if (emit_dyn) {
+        emit dynamicsUpdated();
+    }
+    if (emit_obs) {
+        emit observablesUpdated();
+    }
+    if (emit_mod) {
+        emit modelsUpdated();
+    }
+}
+void
+vleVpz::exportToClipboard(QDomNode node_source)
+{
+    //save vpz and vpm files
+    saveTemp("clipboard", "clipboard");
+    //fill clipboard
+    QClipboard* clipboard = QApplication::clipboard();
+    QString query = vdo()->getXQuery(node_source);
+    QString clip_content = "query:="+query+";;"+"track=yes";
+    clipboard->setText(clip_content);
+}
+
+void
+vleVpz::exportToClipboard(QList<QDomNode> nodes_source, bool track)
+{
+    //save vpz and vpm files
+    saveTemp("clipboard", "clipboard");
+    //fill clipboard
+    QString clip_content;
+    QClipboard* clipboard = QApplication::clipboard();
+    for (int i = 0; i<nodes_source.length(); i++) {
+        clip_content += "query:="+vdo()->getXQuery(nodes_source.at(i))+";;";
+    }
+    clip_content+="track=";
+    if (track) {
+        clip_content+="yes";
+    } else {
+        clip_content+="no";
+    }
+    clipboard->setText(clip_content);
+
+}
+
 bool vleVpz::isAltered()
 {
     return false;
@@ -3805,50 +3774,68 @@ void vleVpz::removeDynamic(const QString& dynamic)
 
 void vleVpz::save()
 {
-    {
-        QFile file(mFilename);
-        if (not file.exists()) {
-            if (not file.open(QIODevice::WriteOnly)) {
-                qDebug() << "VPZ File (" << mFilename
-                        << ") can't be opened for write !";
-                return;
-            }
-            file.close();
-        }
-
-        QDomDocument doc;
-        xSaveDom(&doc);
-        file.open(QIODevice::Truncate | QIODevice::WriteOnly);
-        QByteArray xml = doc.toByteArray();
-        file.write(xml);
-        file.close();
-        undoStack->registerSaveState();
-    }
+    saveVpz(mFilename);
+    undoStack->registerSaveState();
     if (hasMeta) {
-        QFile file(mFileNameVpm);
-        QFileInfo fileInfo(file);
-        if (not fileInfo.dir().exists()) {
-            if (not QDir().mkpath(fileInfo.dir().path())) {
-                qDebug() << "Cannot create dir " << fileInfo.dir().path() ;
-                return;
-            }
-        }
-        if (not file.exists()) {
-            if (not file.open(QIODevice::WriteOnly)) {
-                qDebug() << "VPM File (" << mFileNameVpm
-                        << ") can't be opened for write !";
-                return;
-            }
-            file.close();
-        }
-        file.open(QIODevice::Truncate | QIODevice::WriteOnly);
-        QByteArray xml = mDocVpm->toByteArray();
-        file.write(xml);
-        file.close();
+        saveVpz(mFileNameVpm);
         undoStackVpm->registerSaveState();
     }
+}
 
+void
+vleVpz::saveVpz(QString filenameVpz)
+{
+    QFile file(filenameVpz);
+    if (not file.exists()) {
+        if (not file.open(QIODevice::WriteOnly)) {
+            qDebug() << "VPZ File (" << filenameVpz
+                    << ") can't be opened for write !";
+            return;
+        }
+        file.close();
+    }
 
+    file.open(QIODevice::Truncate | QIODevice::WriteOnly);
+    QByteArray xml = mDoc.toByteArray();
+    file.write(xml);
+    file.close();
+}
+void
+vleVpz::saveVpm(QString filenameVpm)
+{
+    QFile file(filenameVpm);
+    QFileInfo fileInfo(file);
+    if (not fileInfo.dir().exists()) {
+        if (not QDir().mkpath(fileInfo.dir().path())) {
+            qDebug() << "Cannot create dir " << fileInfo.dir().path() ;
+            return;
+        }
+    }
+    if (not file.exists()) {
+        if (not file.open(QIODevice::WriteOnly)) {
+            qDebug() << "VPM File (" << filenameVpm
+                    << ") can't be opened for write !";
+            return;
+        }
+        file.close();
+    }
+    file.open(QIODevice::Truncate | QIODevice::WriteOnly);
+    QByteArray xml = mDocVpm->toByteArray();
+    file.write(xml);
+    file.close();
+}
+
+void
+vleVpz::saveTemp(QString pkg, QString prefix)
+{
+    QDir().mkdir(QDir::tempPath() +"/"+pkg);
+    QDir().mkdir(QDir::tempPath() +"/"+pkg+"/exp");
+    QDir().mkdir(QDir::tempPath() +"/"+pkg+"/metadata");
+    QDir().mkdir(QDir::tempPath() +"/"+pkg+"/metadata/exp");
+    QString vpzFile = QDir::tempPath() +"/"+pkg+"/exp/"+prefix+".vpz";
+    QString vpmFile = QDir::tempPath() +"/"+pkg+"/metadata/exp/"+prefix+".vpm";
+    saveVpz(vpzFile);
+    saveVpm(vpmFile);
 }
 
 void
@@ -3857,6 +3844,10 @@ vleVpz::undo()
     waitUndoRedoVpz = true;
     waitUndoRedoVpm = hasMeta;
     if (hasMeta) {
+        if (undoStack->curr != undoStackVpm->curr) {
+            qDebug() << " Internal error vleVpz::undo() " << undoStack->curr
+                    << "!=" << undoStackVpm->curr;
+        }
         undoStackVpm->undo();
     }
     undoStack->undo();
@@ -3867,6 +3858,10 @@ vleVpz::redo()
     waitUndoRedoVpz = true;
     waitUndoRedoVpm = hasMeta;
     if (hasMeta) {
+        if (undoStack->curr != undoStackVpm->curr) {
+            qDebug() << " Internal error vleVpz::redo() " << undoStack->curr
+                    << "!=" << undoStackVpm->curr;
+        }
         undoStackVpm->redo();
     }
     undoStack->redo();
@@ -4200,6 +4195,211 @@ vleVpz::tryEmitUndoAvailability(unsigned int prevCurr,
         emit undoAvailable(false);
     }
 
+}
+
+QSet<QString>
+vleVpz::modifyImportSourceForImport(QDomNode dest_node,
+        const QStringList& import_queries, bool track, vleVpz& src,
+        QString& src_mod_query)
+{
+    src_mod_query = "";
+    QSet<QString> elems;
+    QStringList log_messages;
+    bool importing_cond = false;
+    bool importing_cond_ports = false;
+    bool importing_models = false;
+    QSet<QString> condsToExclude;
+    QSet<QString> condPortsToExclude;
+    QSet<QString> dynToExclude;
+    QSet<QString> obsToExclude;
+    QSet<QString> modelsToExclude;
+
+    for (int i=0; i<import_queries.size(); i++) {
+        QString query = import_queries.at(i);
+        QDomNode src_node = src.vdo()->getNodeFromXQuery(query);
+        QString src_node_name = src_node.nodeName();
+        QString dest_node_name = dest_node.nodeName();
+        if (src_node_name == "condition") {
+            if (dest_node_name != "conditions") {
+                elems.clear();
+                break;
+            }
+            QString src_cond = DomFunctions::attributeValue(src_node, "name");
+            if (not importing_cond) {
+                condsToExclude.unite(vleDomStatic::conditions(
+                        src.condsFromDoc()));
+                importing_cond = true;
+            }
+            QString dest_cond_new = src_cond;
+            if (not DomFunctions::childWhithNameAttr(
+                    condsFromDoc(), "condition", src_cond).isNull()) {
+                dest_cond_new = DomFunctions::childNameProvider(condsFromDoc(),
+                                    "condition", src_cond, condsToExclude);
+                src.renameConditionToDoc(src_cond, dest_cond_new);
+                condsToExclude.insert(dest_cond_new);
+                log_messages.append(QString(
+                        "condition '%1' is imported as '%2'")
+                        .arg(src_cond).arg(dest_cond_new));
+            }
+            elems.insert(QString("cond::%1").arg(dest_cond_new));
+        } else if((src_node_name == "port") and
+                (src_node.parentNode().nodeName() == "condition")) {
+            QString src_cond_port = DomFunctions::attributeValue(
+                    src_node, "name");
+            QString src_cond = DomFunctions::attributeValue(
+                    src_node.parentNode(), "name");
+            if (dest_node_name != "condition") {
+                elems.clear();
+                break;
+            }
+            QString dest_cond = DomFunctions::attributeValue(dest_node, "name");
+            if (getCondGUIplugin(dest_cond) != "") {
+                elems.clear();
+                break;
+            }
+            if (not importing_cond_ports) {
+                condPortsToExclude.unite(DomFunctions::childNames(
+                        src_node.parentNode(), "port"));
+                importing_cond_ports = true;
+            }
+            QString dest_cond_port_new = src_cond_port;
+            if (not DomFunctions::childWhithNameAttr(
+                    dest_node, "port", src_cond_port).isNull()) {
+                dest_cond_port_new = DomFunctions::childNameProvider(
+                        dest_node, "port", src_cond_port, condPortsToExclude);
+                src.renameCondPortToDoc(src_cond, src_cond_port,
+                        dest_cond_port_new);
+                condPortsToExclude.insert(dest_cond_port_new);
+                log_messages.append(QString("condition port '%1' from condition"
+                        " '%2' is imported as '%3'").arg(src_cond_port)
+                        .arg(dest_cond).arg(dest_cond_port_new));
+            }
+            elems.insert(QString("cond_port::%1//%2//%3")
+                    .arg(src_cond).arg(dest_cond).arg(dest_cond_port_new));
+        } else if (src_node_name == "model") {
+            if ((dest_node_name != "model") or (DomFunctions::attributeValue(
+                    dest_node, "type") != "coupled")) {
+                elems.clear();
+                break;
+            }
+            QDomNode src_mod_parent = src_node.parentNode().parentNode();
+            //check that copy comes from a coupled model
+            if (src_mod_parent.nodeName() != "model") {
+                elems.clear();
+                break;
+            }
+            //cheack that all imported models are contained nto the same model
+            if (src_mod_query == "") {
+                src_mod_query =  src.vdo()->getXQuery(src_mod_parent);
+            } else {
+                if (src.vdo()->getXQuery(src_mod_parent) != src_mod_query){
+                    elems.clear();
+                    break;
+                }
+            }
+
+            //modify source model name if present into dest
+            QString src_mod_name = DomFunctions::attributeValue(
+                    src_node, "name");
+            if (not importing_models) {
+                modelsToExclude.unite(DomFunctions::childNames(
+                        src_node.parentNode(), "model"));
+                condsToExclude.unite(vleDomStatic::conditions(
+                        src.condsFromDoc()));
+                obsToExclude.unite(vleDomStatic::observables(
+                        src.obsFromDoc()));
+                dynToExclude.unite(vleDomStatic::dynamics(
+                        src.dynamicsFromDoc()));
+                importing_models = true;
+            }
+            QString dest_mod_new = src_mod_name;
+            if (not DomFunctions::childWhithNameAttr(
+                    DomFunctions::obtainChild(dest_node, "submodels"), "model",
+                    src_mod_name).isNull()) {
+                dest_mod_new = DomFunctions::childNameProvider(
+                        DomFunctions::obtainChild(dest_node, "submodels"),
+                        "model", src_mod_name, modelsToExclude);
+                src.renameModel(src_node, dest_mod_new);
+                modelsToExclude.insert(dest_mod_new);
+                log_messages.append(QString("model '%1' is imported as '%2'")
+                        .arg(src_mod_name).arg(dest_mod_new));
+            }
+            elems.insert(QString("model::%1").arg(dest_mod_new));
+            if (track) {
+                //modify source model conditions attached to model to import
+                //by renaming cond if present in dest model
+                QSet<QString> src_conds_att =
+                        vleDomStatic::attachedCondsToAtomic(src_node);
+                for (int j =0; j<src_conds_att.size(); j++) {
+                    QString src_cond = src_conds_att.values().at(j);
+                    QString dest_cond_new = src_cond;
+                    if (not DomFunctions::childWhithNameAttr(condsFromDoc(),
+                            "condition", src_cond).isNull()){
+                        dest_cond_new = DomFunctions::childNameProvider(
+                                condsFromDoc(), "condition", src_cond,
+                                condsToExclude);
+                        src.renameConditionToDoc(src_cond, dest_cond_new);
+                        condsToExclude.insert(dest_cond_new);
+                        log_messages.append(QString(
+                                "condition '%1' is imported as '%2'")
+                                .arg(src_cond).arg(dest_cond_new));
+                    }
+                    elems.insert(QString("cond::%1").arg(dest_cond_new));
+                }
+                //modify source model observables attached to model to import
+                //by renaming obs if present in dest model
+                QString src_obs_att = vleDomStatic::attachedObsToAtomic(
+                        src_node);
+                if (src_obs_att != "") {
+                    QString dest_obs_new = src_obs_att;
+                    if (not DomFunctions::childWhithNameAttr(
+                            obsFromDoc(), "observable",src_obs_att).isNull()){
+                        dest_obs_new = DomFunctions::childNameProvider(
+                                obsFromDoc(), "observable", src_obs_att,
+                                obsToExclude);
+                        src.renameObservableToDoc(src_obs_att,
+                                dest_obs_new);
+                        obsToExclude.insert(dest_obs_new);
+                        log_messages.append(QString(
+                                "observable '%1' is imported as '%2'")
+                                .arg(src_obs_att).arg(dest_obs_new));
+                    }
+                    elems.insert(QString("obs::%1").arg(dest_obs_new));
+                }
+                //modify source model dyn attached to model to import
+                //by renaming dyn if present in dest model
+                QString src_dyn_att =
+                        vleDomStatic::attachedDynToAtomic(src_node);
+                if (src_dyn_att != "") {
+                    QString dest_dyn_new = src_dyn_att;
+                    if (not DomFunctions::childWhithNameAttr(dynamicsFromDoc(),
+                            "dynamic",src_dyn_att).isNull()){
+                        dest_dyn_new = DomFunctions::childNameProvider(
+                                dynamicsFromDoc(), "dynamic", src_dyn_att,
+                                dynToExclude);
+                        src.renameDynamicToDoc(src_dyn_att, dest_dyn_new);
+                        dynToExclude.insert(dest_dyn_new);
+                        log_messages.append(QString(
+                                "dynamic '%1' is imported as '%2'")
+                                .arg(src_dyn_att).arg(dest_dyn_new));
+                    }
+                    elems.insert(QString("dyn::%1").arg(dest_dyn_new));
+                }
+            } else {
+                //if not track remove all model dependencies into source
+                DomFunctions::setAttributeValue(src_node, "dynamics", "");
+                DomFunctions::setAttributeValue(src_node, "conditions", "");
+                DomFunctions::setAttributeValue(src_node, "observables", "");
+            }
+        }
+    }
+    if (elems.size() > 0 and log_messages.size() > 0) {
+        logger()->log(" During import:");
+        for (int i =0; i<log_messages.size(); i++) {
+            logger()->log(QString("--%1").arg(log_messages.at(i)));
+        }
+    }
+    return elems;
 }
 
 void vleVpz::clearConfModel(QDomNode model)

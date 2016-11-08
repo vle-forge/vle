@@ -323,12 +323,6 @@ public:
      */
     void renameObsPortToDoc(const QString& obsName,
             const QString& oldPortName, const QString& newPortName);
-    /**
-     * @brief set the 'name' attribute of tag <Observable> to a new value
-     * for the models configuration that needs that
-     */
-    void renameObservableFromModel(QDomNode &node,
-            const QString &oldName, const QString &newName);
 
     /**
      * @brief rename a model xpath = //model
@@ -492,16 +486,6 @@ public:
      */
     void unsetObsFromAtomicModel(const QString& model_query);
     /**
-     * @brief get a new port name for obs obsName not already in tag
-     * <observable> from the Vpz doc
-     */
-    QString newObsPortNameToDoc(const QString& obsName) const;
-    /**
-     * @brief get a new observable name not already in tag <observables>
-     * from the Vpz doc
-     */
-    QString newObsNameToDoc() const;
-    /**
      * @brief add a <observable> tag to a Vpz Doc
      * whith attribute 'name' obsName
      */
@@ -577,27 +561,32 @@ public:
             const QString& newName);
 
 
-    QString newDynamicNameToDoc() const;
+    QString newDynamicNameToDoc(QString prefix = "Dynamic") const;
     /**
      * @brief get a new view name not already in tag <views>
      * from the Vpz doc
      */
-    QString newViewNameToDoc() const;
+    QString newViewNameToDoc(QString prefix = "View") const;
     /**
      * @brief get a new condition name not already in tag <conditions>
      * from the Vpz doc
      */
-    QString newCondNameToDoc() const;
-    /**
-     * @brief get a new condition name not already in tag <conditions>
-     * from the Vpz doc
-     */
-    QString newCondNameToDoc(QString name) const;
+    QString newCondNameToDoc(QString prefix = "Condition") const;
     /**
      * @brief get a new port name for condition condName not already in tag
      * <condition> from the Vpz doc
      */
-    QString newCondPortNameToDoc(const QString& condName) const;
+    QString newCondPortNameToDoc(QString cond, QString prefix = "Port") const;
+    /**
+     * @brief get a new observable name not already in tag <observables>
+     * from the Vpz doc
+     */
+    QString newObsNameToDoc(QString prefix = "Observable") const;
+    /**
+     * @brief get a new port name for obs obsName not already in tag
+     * <observable> from the Vpz doc
+     */
+    QString newObsPortNameToDoc(QString obsName, QString prefix = "Port") const;
     /**
      * @brief Add a view (and output with the same name) to a Vpz Doc
      * (tag <view> with attr 'name' set to viewName and default config based
@@ -830,12 +819,6 @@ public:
      *
      */
     QString modelObsFromDoc(const QString& model_query);
-
-    /**
-     * @brief get the observable
-     * @param model node
-     */
-    QString getAtomicModelObs(QDomNode atom);
 
     /**
      * @brief check if the observable has already been set
@@ -1119,10 +1102,43 @@ public:
      * @return the name of the library containing dyn
      */
     QString getDynamicLibrary(const QString& dyn) const;
+    /**
+     * @brief Import from clipboard
+     * @param node_dest the destination of the paste
+     */
+    void importFromClipboard(QDomNode node_dest);
+    /**
+     * @brief export a node to the clipboard
+     * @param node_source, the node to export
+     */
+    void exportToClipboard(QDomNode node_source);
+    /**
+     * @brief export nodes to the clipboard
+     * @param nodes_source, the nodes to export
+     * @param track, if true all the depending nodes will be export also
+     * Eg: the conditions, observable and dynamic attached to an atomic model
+     * that one wants to export will be pasted into destination vpz.
+     */
+    void exportToClipboard(QList<QDomNode> nodes_source, bool track=false);
 
     void           setBasePath(const QString path);
     bool           isAltered();
     void save();
+    void saveVpz(QString filenameVpz);
+    void saveVpm(QString filenameVpm);
+
+
+    /**
+     * @brief Will save to temp destination:
+     *
+     * @param pkg, name of the package
+     * @param prefix, file prefix
+     *
+     * QDir::tempPath()/pkg/exp/prefix.vpz
+     * QDir::tempPath()/pkg/metadata/exp/prefix.vpm
+     */
+    void  saveTemp(QString pkg, QString prefix);
+
     void undo();
     void redo();
 
@@ -1218,6 +1234,24 @@ private:
     void synchronizeUndoStack();
     void tryEmitUndoAvailability(unsigned int prevCurr,
             unsigned int curr, unsigned int saved);
+    /**
+     * @brief modify the vpz source for an import, names of imported elements
+     * are modified in order to get no conflict with the destination
+     *
+     * @param[in]  dest_node, the node destination into the current vpz
+     * @param[in]  import_queries, queries of the element to import
+     * @param[in]  track, if true track dependencies
+     * @param[out] src, the source vpz to modify
+     * @param[out] src_mod_query, query of the src coupled model to import from
+     *
+     * @return a list of elements to import of the form 'key::name'
+     * where 'key' is amongst 'cond', 'cond_port', 'dyn', 'obs', 'model'
+     * where 'name' is the new name of the element to import in the modified 'src'
+     * if key is 'cond_port' name has the format src_cond//dest_cond//port
+     */
+    QSet<QString> modifyImportSourceForImport(QDomNode dest_node,
+            const QStringList& import_queries, bool track, vleVpz& src,
+            QString& src_mod_query);
 
     bool              hasMeta;
     QString           mFilename;

@@ -106,9 +106,27 @@ public:
     static bool fillWithValue(QDomDocument& domDoc, QDomNode node,
             const vle::value::Value& val);
 
+
+    /**
+     * @brief List dynamics names
+     * @param atom, is expected to be of the form
+     *    <dynamics>
+     *    ...
+     *    </dynamics>
+     * @return list of dynamics
+     */
+    static QSet<QString> dynamics(QDomNode atom);
+    /**
+     * @brief get the dynamic attached to an atomic model
+     * @param atom, is expected to be of the form
+     *    <model type="atomic" dynamics="" .../>
+     * @return the dyn attached to atom
+     */
+    static QString attachedDynToAtomic(QDomNode atom);
+
     /**
      * @brief Add condition
-     * @param conds, is expected to be of the form
+     * @param atom, is expected to be of the form
      *    <conditions>
      *    ...
      *    </conditions>
@@ -117,8 +135,9 @@ public:
      * @param snapObj, snapshot is performed on snapObj if not null
      * @return cond node if it is created or null node otherwise
      */
-    static QDomNode addCond(QDomNode conds, const QString& condName,
+    static QDomNode addCond(QDomNode atom, const QString& condName,
             QDomDocument* domDoc, DomDiffStack* snapObj=0);
+    static QSet<QString> conditions(QDomNode atom);
 
     /**
      * @brief get the list of attached cond
@@ -232,6 +251,25 @@ public:
     static bool fillConditionWithMap(QDomDocument& domDoc,
                   QDomNode atom, const vle::value::Map& val,
                   DomDiffStack* snapObj=0);
+
+    /**
+     * @brief List the observables
+     * @param atom, is expected to be of the form
+     *    <observables>
+     *      <observable name="someobs"/>
+     *      ...
+     *    </observables>
+     * @return the list of the observables
+     */
+    static QSet<QString> observables(QDomNode atom);
+    /**
+     * @brief get the observable attached to an atomic model
+     * @param atom, is expected to be of the form
+     *    <model type="atomic" observables="" .../>
+     * @return the obs attached to atom
+     */
+    static QString attachedObsToAtomic(QDomNode atom);
+
     /**
      * @brief Add a port to an observable
      * @param domDoc, a Dom document to create new QDomNode
@@ -292,6 +330,46 @@ public:
     static bool renamePortToOutNode(QDomNode atom,
                 const QString& oldName, const QString& newName,
                 DomDiffStack* snapObj=0);
+
+    /**
+     * @brief Rename a submodel of a coupled model, and update connections
+     * @brief domDoc, used to create QDomNode if necessary
+     * @brief atom, is expected to be a coupled model, eg:
+     *   <model type="coupled" ...>
+     *    <in/>
+     *    <out/>
+     *    <submodels>
+     *     <model name=old_model ..>
+     *      <in/>
+     *      <out>
+     *       <port name="A"/>
+     *      </out>
+     *     <model name="otherModel" ..>
+     *      <in>
+     *       <port name="B"/>
+     *      </in>
+     *      <out/>
+     *    </submodels>
+     *    <connections>
+     *      <connection type="internal">
+     *        <origin model=old_model port="A"/>
+     *        <destination model="otherModel" port=B/>
+     *      </connection>
+     *    </connections>
+     *   </model>
+     *  @return true if a modification has been performed
+     */
+    static bool renameModelIntoCoupled(QDomDocument& domDoc, QDomNode atom,
+            QString old_model, QString new_model, DomDiffStack* snapObj=0);
+    static bool renameModelIntoStructures(QDomDocument& domDoc, QDomNode atom,
+            QString old_model, QString new_model, DomDiffStack* snapObj=0);
+
+    static QStringList subModels(QDomNode atom);
+    static QDomNode subModel(QDomNode atom, QString model_name);
+
+    static QString connectionModOrig(QDomNode atom);
+    static QString connectionModDest(QDomNode atom);
+
 
     /**
      * @brief Get the types of an output

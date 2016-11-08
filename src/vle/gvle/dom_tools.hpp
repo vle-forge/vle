@@ -85,6 +85,14 @@ public:
     static QDomNode obtainChild(QDomNode node,
             const QString& nodeName, QDomDocument* domDoc=0);
 
+
+    static QString toQString(const QDomNode& node);
+    /**
+     * @brief Remove all childs from a QDomNode (keep attributes)
+     */
+    static void removeAllChilds(QDomNode node);
+
+
     /**
      * @brief get a child with a specific nodename and a specific value
      * for attribute "name".
@@ -95,18 +103,43 @@ public:
      * is created
      * @param the (created or found or null) resulting node
      */
-    static QDomNode childWhithNameAttr(QDomNode& node,
+    static QDomNode childWhithNameAttr(QDomNode node,
             const QString& nodeName, const QString& nameValue,
             QDomDocument* domDoc=0);
-
-    static QString toQString(const QDomNode& node);
     /**
-     * @brief Remove all childs from a QDomNode (keep attributes)
+     * @brief get values of attribute "name" of children for
+     * some child_node
+     * @param node, a node of the form
+     * <parent_node ... >
+     *   <child_node name="A"/>
+     *   <child_node name="B"/>
+     *   ...
+     * <parent_node/>
+     * @param child_node, the name of children nodes
+     * @param a list ("A", "B")
      */
-    static void removeAllChilds(QDomNode node);
-
+    static QSet<QString> childNames(QDomNode node, QString child_node);
     static QList<QDomNode> childNodesWithoutText(QDomNode node,
                          const QString& nodeName = "");
+
+    /**
+     * @brief get a new name for a child of QDomNode
+     * @param node, a node of the form
+     * <parent_node ... >
+     *   <child_node name="A"/>
+     *   <child_node name="B"/>
+     *   ...
+     * <parent_node/>
+     * @param child_node, the name of child nodes
+     * @param prefix, the prefix of the name to provide
+     * @param exclude, a list of name to exlude
+     * @retrun a name starting from prefix and different from "A", "B", etc..
+     */
+    static QString childNameProvider(QDomNode node, QString child_node,
+                    QString prefix, const QSet<QString>& exclude);
+    static QString childNameProvider(QDomNode node, QString child_node,
+            QString prefix);
+
 };
 
 /**

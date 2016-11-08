@@ -33,6 +33,7 @@
 #include <QTreeWidgetItem>
 #include <QDebug>
 #include <QTableWidgetItem>
+#include <QClipboard>
 #include <vle/value/Value.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
@@ -326,13 +327,18 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             (mVpz->getCondGUIplugin(condName) == ""));
     subMenu = buildAddValueMenu(menu, "Set");
     subMenu->setEnabled(ui->table->item(index.row(), index.column()) and
-            (index.column() > 1) and
-            (ui->table->cellWidget(index.row(), index.column()) != 0));
+            (index.column() > 1) and (hasWidget(index.row(), index.column())));
     action = menu.addAction("Remove value");
     action->setData("EMenuValueRemove");
     action->setEnabled(ui->table->item(index.row(), index.column()) and
-            (index.column() > 1) and
-            (ui->table->cellWidget(index.row(), index.column()) != 0));
+            (index.column() > 1) and (hasWidget(index.row(), index.column())));
+    menu.addSeparator();
+    action = menu.addAction("Copy");
+    action->setData("EMenuCopy");
+    action->setEnabled(hasWidget(index.row(), index.column()));
+    action = menu.addAction("Paste");
+    action->setData("EMenuPaste");
+    action->setEnabled(true);
 
     QAction* act = menu.exec(globalPos);
     if (act) {
@@ -378,8 +384,30 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
             QString port = getLineEdit(index.row(),1)->text();
             mVpz->rmValuePortCondToDoc(cond, port, index.column()-2);
             reload(false);
+        } else if (actCode == "EMenuCopy") {
+            QString cond = getLineEdit(index.row(),0)->text();
+            QDomNode condAtom = mVpz->condFromConds(mVpz->condsFromDoc(), cond);
+            if (index.column() == 0 or (index.column() == 1
+                    and (mVpz->getCondGUIplugin(cond) != ""))) {
+                mVpz->exportToClipboard(condAtom);
+            } else if (index.column() == 1) {
+                mVpz->exportToClipboard(mVpz->portFromCond(condAtom,
+                        getLineEdit(index.row(),1)->text()));
+            }
+        } else if (actCode == "EMenuPaste") {
+            if (not hasWidget(index.row(),index.column())) {
+                mVpz->importFromClipboard(mVpz->condsFromDoc());
+            } else if (index.column() == 0) {
+                QString cond = getLineEdit(index.row(),0)->text();
+                QDomNode condAtom = mVpz->condFromConds(mVpz->condsFromDoc(),
+                        cond);
+                if (mVpz->getCondGUIplugin(cond) != "") {
+                    return ;
+                }
+                mVpz->importFromClipboard(condAtom);
+            }
+            reload(false);
         } else {//add from plugin
-
             mCurrCondName = mVpz->newCondNameToDoc();
             mVpz->addConditionFromPluginToDoc(mCurrCondName, actCode);
             reload(false);
@@ -608,6 +636,17 @@ FileVpzExpCond::insertNullWidget(int row, int col)
     ui->table->setItem(row, col, new QTableWidgetItem);//used to find it
     QObject::connect(w, SIGNAL(selected(const QString&)),
             this, SLOT(onSelected(const QString&)));
+}
+
+bool
+FileVpzExpCond::hasWidget(int row, int col)
+{
+    QWidget* w = ui->table->cellWidget(row, col);
+    if (w == 0) {
+        return false;
+    }
+    VleNullWidget* wn = qobject_cast<VleNullWidget*>(w);
+    return (wn == 0);
 }
 
 void
