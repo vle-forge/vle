@@ -1,0 +1,13 @@
+Package: vle.generic.builder
+Version: 2.0.0
+Depends: vle.output
+Build-Depends:
+Conflicts:
+Maintainer: Gauthier Quesnel <gauthier.quesnel@toulouse.inra.fr>
+Description: A generic executive model to build graph, random graph or one or
+two dimentianal regular graph.
+ .
+Tags: builder
+Url: http://www.vle-project.org/pub/2.0
+Size: 0
+MD5sum: xxxx

@@ -123,20 +123,25 @@ respectively define a `vle::devs::Executive` or a
 ### Experimental frames
 
 Two new features:
-
-- Simulations can be start in subprocess so, if a simulation segfault, the
-  master process do not close.
-
+- Simulations can be start in subprocess so, if a simulation segmentation
+  fault, the master process do not close.
 - The `cvle`, `vle` and `mvle` accept an `--timeout [ms]` parameter to limit
   the duration of the simulation subprocess to avoid too long simulation
   process.
 
+### Graph and regular graph generators
+
+Provides a new `vle::translator` public API with:
+- random small-worfireld, random scale-free, random erdos renyi graphs generators.
+- regular 1d and 2d graph generator with wrap and mask neighborhood definition.
+- user defined graph (as in VLE 1.x).
+
+
 ### GVLE
 
-- GVLE is completely rewritten with QT 5. The old GVLE in Gtkmm [2,3]
-  is removed and all plug-ins are disabled or rewritten.
+GVLE is completely rewritten with QT 5. The old GVLE in Gtkmm [2,3] is removed
+and all plug-ins are disabled or rewritten.
 
 ### CMake
 
-- The users CMake scripts are updated to simplify the development of
-  packages.
+The users CMake scripts are updated to simplify the development of packages.

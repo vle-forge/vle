@@ -24,186 +24,254 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/bandwidth.hpp>
+#include <boost/graph/erdos_renyi_generator.hpp>
+#include <boost/graph/grid_graph.hpp>
+#include <boost/graph/plod_generator.hpp>
+#include <boost/graph/small_world_generator.hpp>
+#include <random>
 #include <vle/translator/GraphTranslator.hpp>
-#include <vle/utils/Array.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/tokenizer.hpp>
-#include <string>
-#include <vector>
 
-namespace vle { namespace translator {
-
-class VLE_API GraphTranslator
+namespace vle
 {
-public:
-    typedef vle::utils::Array<bool> BoolArray;
-    typedef BoolArray::iterator iterator;
-    typedef BoolArray::const_iterator const_iterator;
-    typedef BoolArray::size_type size_type;
-    typedef std::vector < std::string > Strings;
-    typedef Strings::size_type index;
-
-    /**
-     * @brief Build an empty GraphTranslator, zero node and the prefix of node
-     * is `vertex'.
-     * @param exe The executive to manipulate coupled model
-     * (graph::CoupledModel) and coordinator (devs::Coordinator)..
-     */
-    GraphTranslator(devs::Executive& exe)
-        : mExecutive(exe)
-        , mNodeNumber(0)
-        , mPrefix("vertex")
-    {}
-
-    /**
-     * @brief Build the graph translator.
-     * @param buffer A value::Map which contains the adjacency matrix, classes
-     * etc.
-     * @throw utils::ArgError if the value::Map contains bad parameters,
-     * utils::Exception if error in value.
-     */
-    void translate(const value::Map& buffer);
-
-    inline int getNodeNumber() const { return mNodeNumber; }
-    inline const std::string& getNode(index i) const { return mNode[i]; }
-    inline const std::string& getClass(index i) const { return mClass[i]; }
-
-    inline iterator begin() { return mGraph.begin(); }
-    inline iterator end() { return mGraph.end(); }
-    inline const_iterator begin() const { return mGraph.begin(); }
-    inline const_iterator end() const { return mGraph.end(); }
-    inline size_type size() const { return mGraph.size(); }
-
-    devs::Executive& mExecutive;
-    unsigned int mNodeNumber;
-    BoolArray mGraph;
-    std::vector < std::string > mNode;
-    std::vector < std::string > mClass;
-    std::string mPrefix;
-    std::string mPort;
-
-    void makeBigBang();
-    void createNewNode(const std::string& name, std::string& classname);
-    void connectNodes(unsigned int from, unsigned int to);
-};
-
-void GraphTranslator::translate(const value::Map& buffer)
+namespace translator
 {
-    const value::Map& init = toMapValue(buffer);
 
-    mNodeNumber = toInteger(init.get("number"));
-    if (mNodeNumber <= 0) {
-        throw utils::ArgError("GraphTranslator: bad node number");
-    } else {
-        mGraph.resize(mNodeNumber, mNodeNumber, false);
-    }
+using graphT =
+    boost::adjacency_list<boost::vecS,
+                          boost::vecS,
+                          boost::bidirectionalS,
+                          boost::property<boost::vertex_name_t, std::string>>;
 
-    if (init.exist("prefix")) {
-        mPrefix = toString(init.get("prefix"));
-        if (mPrefix.empty()) {
-            throw utils::ArgError("GraphTranslator: bad prefix");
-        }
-    }
-
-    if (init.exist("port")) {
-        mPort = toString(init.get("port"));
-    }
-
-    std::string adjmat = toString(init.get("adjacency matrix"));
-    std::string classes = toString(init.get("classes"));
-
-    typedef boost::tokenizer < boost::char_separator < char > > tokenizer;
-    boost::char_separator<char> sep(" \n\t\r");
-
-    {
-        tokenizer tok(adjmat, sep);
-
-        size_type i = 0, j = 0;
-        for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it) {
-            mGraph.set(i, j, (*it) == "1");
-
-            ++i;
-            if (i == mNodeNumber) {
-                i = 0;
-                ++j;
-            }
-        }
-
-        if (j * mNodeNumber + i != mNodeNumber * mNodeNumber)
-            throw utils::ArgError("GraphTranslator: bad node number in matrix");
-    }
-
-    {
-        tokenizer tok(classes, sep);
-
-        for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it) {
-            mClass.push_back(*it);
-        }
-    }
-
-    if (mClass.size() != mNodeNumber) {
-        throw utils::ArgError("GraphTranslator: bad node number in class");
-    }
-
-    makeBigBang();
+graph_generator::graph_generator(const parameter &params)
+    : m_params(params)
+    , m_metrics{-1, -1, -1}
+{
 }
 
-void GraphTranslator::makeBigBang()
+graph_generator::graph_metrics graph_generator::metrics() const
 {
-    for (size_type i = 0; i < mNodeNumber; ++i){
-        std::string name = (fmt("%1%-%2%") % mPrefix % i).str();
-        createNewNode(name, mClass[i]);
-    }
-
-    for (size_type row = 0; row < mNodeNumber; ++row)
-        for (size_type col = 0; col < mNodeNumber; ++col)
-            if (mGraph(col, row))
-                connectNodes(row, col);
+    return m_metrics;
 }
 
-void GraphTranslator::createNewNode(const std::string& name,
-                                    std::string& classname)
+graph_generator::graph_metrics init_metrics(const graphT &g)
 {
-    mExecutive.createModelFromClass(classname, name);
-    mNode.push_back(name);
-}
+    graph_generator::graph_metrics ret;
 
-void GraphTranslator::connectNodes(unsigned int from, unsigned int to)
-{
-    if (mPort == "in-out") {
-        mExecutive.addOutputPort(mNode[from], "out");
-        mExecutive.addInputPort(mNode[to], "in");
-        mExecutive.addConnection(mNode[from], "out", mNode[to], "in");
-    } else if (mPort == "in") {
-        mExecutive.addOutputPort(mNode[from], mNode[to]);
-        mExecutive.addInputPort(mNode[to], "in");
-        mExecutive.addConnection(mNode[from], mNode[to], mNode[to], "in");
-    } else if (mPort == "out") {
-        mExecutive.addOutputPort(mNode[from], "out");
-        mExecutive.addInputPort(mNode[to], mNode[from]);
-        mExecutive.addConnection(mNode[from], "out", mNode[to], mNode[from]);
-    } else {
-        mExecutive.addOutputPort(mNode[from], mNode[to]);
-        mExecutive.addInputPort(mNode[to], mNode[from]);
-        mExecutive.addConnection(mNode[from], mNode[to], mNode[to],
-                                 mNode[from]);
-    }
-}
-
-graph_result VLE_API make_graph(vle::devs::Executive& executive,
-                                const vle::value::Map& map)
-{
-    GraphTranslator translator(executive);
-    translator.translate(map);
-
-    graph_result ret;
-    ret.graph = translator.mGraph;
-    ret.nodes = translator.mNode;
-    ret.classes = translator.mClass;
-    ret.node_number = translator.mNodeNumber;
+    ret.vertices = boost::num_vertices(g);
+    ret.edges = boost::num_edges(g);
+    ret.bandwidth = boost::bandwidth(g);
 
     return ret;
 }
 
-}} //namespace vle translator
+void build(const graph_generator::parameter &params,
+           vle::devs::Executive &executive,
+           graphT &g)
+{
+    graphT::vertex_iterator vi, vi_end;
+    std::tie(vi, vi_end) = boost::vertices(g);
+
+    auto modelnames = boost::get(boost::vertex_name, g);
+
+    {
+        std::string name, classname;
+
+        int id = 0;
+        graph_generator::node_metrics metrics{0, 0, 0};
+        graphT::vertex_iterator vi, vi_end;
+        for (std::tie(vi, vi_end) = boost::vertices(g); vi != vi_end; ++vi) {
+            metrics.id = id++;
+            metrics.out_degree =
+                utils::numeric_cast<int>(boost::out_degree(*vi, g));
+            metrics.in_degree =
+                utils::numeric_cast<int>(boost::in_degree(*vi, g));
+
+            params.make_model(metrics, name, classname);
+
+            executive.createModelFromClass(classname, name);
+            modelnames[*vi] = name;
+        }
+    }
+
+    {
+        std::string src, dst;
+        graphT::vertex_iterator i;
+        graphT::out_edge_iterator ei, ei_end;
+
+        switch (params.type) {
+        case graph_generator::connectivity::IN_OUT:
+            for (i = vi; i != vi_end; ++i) {
+                std::tie(ei, ei_end) = boost::out_edges(*i, g);
+                for (; ei != ei_end; ++ei) {
+                    src = modelnames[boost::source(*ei, g)];
+                    dst = modelnames[boost::target(*ei, g)];
+                    executive.addConnection(src, "out", dst, "in");
+                }
+            }
+            break;
+        case graph_generator::connectivity::IN:
+            for (i = vi; i != vi_end; ++i) {
+                std::tie(ei, ei_end) = boost::out_edges(*i, g);
+                for (; ei != ei_end; ++ei) {
+                    src = modelnames[boost::source(*ei, g)];
+                    dst = modelnames[boost::target(*ei, g)];
+                    executive.addConnection(src, dst, dst, "in");
+                }
+            }
+            break;
+        case graph_generator::connectivity::OUT:
+            for (i = vi; i != vi_end; ++i) {
+                std::tie(ei, ei_end) = boost::out_edges(*i, g);
+                for (; ei != ei_end; ++ei) {
+                    src = modelnames[boost::source(*ei, g)];
+                    dst = modelnames[boost::target(*ei, g)];
+                    executive.addConnection(src, "out", dst, src);
+                }
+            }
+            break;
+        case graph_generator::connectivity::OTHER:
+            for (i = vi; i != vi_end; ++i) {
+                std::tie(ei, ei_end) = boost::out_edges(*i, g);
+                for (; ei != ei_end; ++ei) {
+                    src = modelnames[boost::source(*ei, g)];
+                    dst = modelnames[boost::target(*ei, g)];
+                    executive.addConnection(src, dst, dst, src);
+                }
+            }
+            break;
+        }
+    }
+}
+
+void graph_generator::make_graph(vle::devs::Executive &executive,
+                                 int number,
+                                 const vle::utils::Array<bool> &matrix)
+{
+    if (matrix.size() != utils::numeric_cast<std::size_t>(number * number))
+        throw vle::utils::ArgError(_("graph_generator: bad user matrix size"));
+
+    graphT g(number);
+
+    for (std::size_t r = 0, r_end = matrix.rows(); r != r_end; ++r) {
+        for (std::size_t c = 0, c_end = matrix.columns(); c != c_end; ++c) {
+            if (matrix(c, r)) {
+                auto vs = boost::vertices(g);
+                graphT::vertex_iterator from = vs.first + r;
+                graphT::vertex_iterator to = vs.first + c;
+
+                boost::add_edge(*from, *to, g);
+            }
+        }
+    }
+
+    m_metrics = init_metrics(g);
+    build(m_params, executive, g);
+}
+
+void graph_generator::make_smallworld(vle::devs::Executive &executive,
+                                      std::mt19937 &gen,
+                                      int number,
+                                      int k,
+                                      double probability,
+                                      bool allow_self_loops)
+{
+    if (number <= 0)
+        throw vle::utils::ArgError(_("graph_generator: bad model number"));
+
+    using graphgenT = boost::small_world_iterator<std::mt19937, graphT>;
+
+    graphT g(graphgenT(gen, number, k, probability, allow_self_loops),
+             graphgenT(),
+             number);
+
+    m_metrics = init_metrics(g);
+    build(m_params, executive, g);
+}
+
+void graph_generator::make_scalefree(vle::devs::Executive &executive,
+                                     std::mt19937 &gen,
+                                     int number,
+                                     double alpha,
+                                     double beta,
+                                     bool allow_self_loops)
+{
+    if (number <= 0)
+        throw vle::utils::ArgError(_("graph_generator: bad model number"));
+
+    using graphgenT = boost::plod_iterator<std::mt19937, graphT>;
+
+    graphT g(graphgenT(gen, number, alpha, beta, allow_self_loops),
+             graphgenT(),
+             number);
+
+    m_metrics = init_metrics(g);
+    build(m_params, executive, g);
+}
+
+void graph_generator::make_sorted_erdos_renyi(vle::devs::Executive &executive,
+                                              std::mt19937 &gen,
+                                              int number,
+                                              double probability,
+                                              bool allow_self_loops)
+{
+    if (number <= 0)
+        throw vle::utils::ArgError(_("graph_generator: bad model number"));
+
+    using graphgenT = boost::sorted_erdos_renyi_iterator<std::mt19937, graphT>;
+
+    graphT g(graphgenT(gen, number, probability, allow_self_loops),
+             graphgenT(),
+             number);
+
+    m_metrics = init_metrics(g);
+    build(m_params, executive, g);
+}
+
+void graph_generator::make_erdos_renyi(vle::devs::Executive &executive,
+                                       std::mt19937 &gen,
+                                       int number,
+                                       double fraction,
+                                       bool allow_self_loops)
+{
+    if (number <= 0)
+        throw vle::utils::ArgError(_("graph_generator: bad model number"));
+
+    using graphgenT = boost::erdos_renyi_iterator<std::mt19937, graphT>;
+
+    graphT g(graphgenT(gen, number, fraction, allow_self_loops),
+             graphgenT(),
+             number);
+
+    m_metrics = init_metrics(g);
+    build(m_params, executive, g);
+}
+
+void graph_generator::make_erdos_renyi(vle::devs::Executive &executive,
+                                       std::mt19937 &gen,
+                                       int number,
+                                       int edges_number,
+                                       bool allow_self_loops)
+{
+    if (number <= 0)
+        throw vle::utils::ArgError(_("graph_generator: bad model number"));
+
+    using graphgenT = boost::erdos_renyi_iterator<std::mt19937, graphT>;
+
+    graphT g(
+        graphgenT(gen,
+                  number,
+                  utils::numeric_cast<graphT::edges_size_type>(edges_number),
+                  allow_self_loops),
+        graphgenT(),
+        number);
+
+    m_metrics = init_metrics(g);
+    build(m_params, executive, g);
+}
+}
+} // namespace vle translator

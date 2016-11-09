@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-2.0.dtd">
+<vle_project version="2.0" date="Fri, 04 Nov 2016" author="Gauthier Quesnel">
+  <structures>
+    <model name="top" type="coupled">
+      <submodels>
+        <model name="executive" type="atomic" dynamics="executive" conditions="cond">
+        </model>
+      </submodels>
+      <connections>
+      </connections>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="transform" package="" library="dynamics_transform"  />
+    <dynamic name="executive" package="" library="exe_graph"  />
+  </dynamics>
+  <classes>
+    <class name="nothing">
+      <model name="T" type="atomic" dynamics="transform">
+        <in>
+          <port name="in" />
+        </in>
+        <out>
+          <port name="out" />
+        </out>\n"
+      </model>
+    </class>
+  </classes>
+  <experiment name="graph_generator">
+    <conditions>
+      <condition name="simulation_engine" >
+        <port name="begin" >
+          <double>0</double>
+        </port>
+        <port name="duration" >
+          <double>5</double>
+        </port>
+      </condition>
+      <condition name="cond">
+        <port name="generator">
+          <string>smallworld</string>
+        </port>
+      </condition>
+    </conditions>
+  </experiment>
+</vle_project>

@@ -24,566 +24,341 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/translator/MatrixTranslator.hpp>
-#include <vle/value/Boolean.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Tuple.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
-#include <vle/vpz/AtomicModel.hpp>
-#include <boost/cast.hpp>
 
-namespace vle { namespace translator {
-
-MatrixTranslator::~MatrixTranslator()
+namespace vle
 {
-    if (m_init) {
-        delete[] m_init;
-    }
+namespace translator
+{
+
+regular_graph_generator::regular_graph_generator(const parameter &params)
+    : m_params(params)
+    , m_metrics{-1}
+{
 }
 
-const vpz::AtomicModel*
-MatrixTranslator::getModel(const std::string& name) const
+regular_graph_generator::graph_metrics regular_graph_generator::metrics() const
 {
-    std::map < std::string, const vpz::AtomicModel* >::const_iterator it;
-    it = m_models.find(name);
-
-    if (it == m_models.end()) {
-        throw utils::InternalError(
-            (fmt(_("MatrixTranslator: unknow model '%1%'")) % name).str());
-    }
-
-    return it->second;
+    return m_metrics;
 }
 
-unsigned int MatrixTranslator::getSize(unsigned int i) const
+void make_1d_no_wrap(vle::devs::Executive &executive,
+                     regular_graph_generator::connectivity connectivity,
+                     const std::vector<std::string> &modelnames,
+                     int length,
+                     const std::vector<std::string> &mask,
+                     int x_mask)
 {
-    auto it(
-        m_size.find(i));
+    const int mask_length = vle::utils::numeric_cast<int>(mask.size());
 
-    if (it == m_size.end()) {
-        throw utils::InternalError(
-            (fmt(_("MatrixTranslator: unknow size '%1%'")) % i).str());
-    }
+    for (int i = 0; i != length; ++i) {
+        const int i_min = std::max(0, i - x_mask);
+        const int i_max = std::min(length, i + mask_length - x_mask);
+        const int x_mask_min = std::max(0, x_mask - i);
 
-    return it->second;
-}
+        for (int x = i_min, m = x_mask_min; x != i_max; ++x, ++m) {
+            if (not mask[m].empty()) {
+                switch (connectivity) {
+                case regular_graph_generator::connectivity::IN_OUT:
+                    executive.addOutputPort(modelnames[i], "out");
+                    executive.addInputPort(modelnames[x], "in");
 
-bool MatrixTranslator::existModel(unsigned int i, unsigned int j)
-{
-    if (m_dimension == 0) {
-        return true;
-    } else {
-        if (m_dimension == 1) {
-            return (!m_init or m_init[i + (j - 1) * m_size[0] - 1] != 0);
-        } else {
-            return false;
-        }
-    }
-}
+                    executive.addConnection(
+                        modelnames[i], "out", modelnames[x], "in");
+                    break;
 
-std::string MatrixTranslator::getDynamics(unsigned int i, unsigned int j)
-{
-    if (m_multiple) {
-        if (m_dimension == 0) {
-            return (fmt("dyn_cell_%1%") % m_init[i]).str();
-        } else {
-            if (m_dimension == 1) {
-                return (fmt("dyn_cell_%1%")
-                        % (m_init[i + (j - 1) * m_size[0] - 1])).str();
-            } else {
-                return std::string();
-            }
-        }
-    } else {
-        return "cell";
-    }
-}
+                case regular_graph_generator::connectivity::OTHER:
+                    executive.addOutputPort(modelnames[i], modelnames[x]);
+                    executive.addInputPort(modelnames[x], modelnames[i]);
 
-std::string MatrixTranslator::getClass(unsigned int i, unsigned int j)
-{
-    if (m_multiple) {
-        if (m_dimension == 0) {
-            return m_classes[m_init[i]];
-        } else {
-            if (m_dimension == 1) {
-                return m_classes[m_init[i + (j - 1) * m_size[0] - 1]];
-            } else {
-                return std::string();
-            }
-        }
-    } else {
-        return m_class;
-    }
-}
+                    executive.addConnection(modelnames[i],
+                                            modelnames[x],
+                                            modelnames[x],
+                                            modelnames[i]);
+                    break;
 
-std::string MatrixTranslator::getName(unsigned int i, unsigned int j) const
-{
-    if (m_dimension == 0) {
-        return (fmt("%1%_%2%") % m_prefix % i).str();
-    } else {
-        if (m_dimension == 1) {
-            return (fmt("%1%_%2%_%3%") % m_prefix % i % j).str();
-        }
-    }
+                case regular_graph_generator::connectivity::NAMED:
+                    executive.addOutputPort(modelnames[i], mask[m]);
+                    executive.addInputPort(modelnames[x], mask[m]);
 
-    return std::string();
-}
-
-void MatrixTranslator::parseXML(const value::Value& value)
-{
-    const value::Map& root = value::toMapValue(value);
-
-    {
-        const value::Tuple& grid = root.getTuple("grid");
-        m_dimension = grid.size() - 1;
-        int dim = 0;
-        for (auto it = grid.value().begin(); it !=
-             grid.value().end(); ++it, ++dim) {
-            m_size[dim] = boost::numeric_cast < int >(*it);
-        }
-    }
-
-    {
-        const value::Map& cells = root.getMap("cells");
-        const std::string& connectivity = cells.getString("connectivity");
-        if (connectivity == "von neumann") {
-            m_connectivity = VON_NEUMANN;
-        } else if (connectivity == "moore") {
-            m_connectivity = MOORE;
-        } else {
-            m_connectivity = LINEAR;
-        }
-
-        if (cells.exist("symmetricport")) {
-            m_symmetricport = cells.getBoolean("symmetricport");
-        }
-        m_prefix = cells.getString("prefix");
-
-        if (cells.exist("library")) {
-            m_library = cells.getString("library");
-            if (cells.exist("model")) {
-                m_model = cells.getString("model");
-            }
-            m_multiple = false;
-        } else if (cells.exist("libraries")) {
-            int index = 0;
-            const value::Set& libraries = cells.getSet("libraries");
-            for (auto it = libraries.begin();
-                 it != libraries.end(); ++it, ++index) {
-                const value::Map& library = (*it)->toMap();
-
-                const std::string& lib = library.getString("library");
-
-                if (library.exist("model")) {
-                    const std::string& model = library.getString("model");
-                    m_libraries[index] = std::make_pair(lib, model);
-                } else {
-                    m_libraries[index] = std::make_pair(lib, "");
-                }
-            }
-            m_multiple = true;
-        }
-
-        if (cells.exist("class")) {
-            m_class = cells.getString("class");
-            m_multiple = false;
-        } else if (cells.exist("classes")) {
-            const value::Set& classes = cells.getSet("classes");
-            for (const auto & classe : classes) {
-                m_classes.push_back(value::toString(classe));
-            }
-            m_multiple = true;
-        }
-
-        if (cells.exist("init")) {
-            if (m_dimension == 0) {
-                m_init = new unsigned int[m_size[0]];
-            } else {
-                m_init = new unsigned int[m_size[0]*m_size[1]];
-            }
-
-            const value::Tuple& init = cells.getTuple("init");
-            unsigned int i = 0;
-
-            for (const auto & elem : init.value()) {
-                m_init[i] = boost::numeric_cast < unsigned int >(elem);
-                ++i;
-            }
-        }
-    }
-}
-
-void MatrixTranslator::translate(const value::Value& buffer)
-{
-    try {
-        parseXML(buffer);
-
-        translateDynamics();
-        translateConditions();
-        translateStructures();
-    } catch (const std::exception& e) {
-        throw utils::InternalError(
-            (fmt(_("Matrix translator error: %1%")) % e.what()).str());
-    }
-}
-
-void MatrixTranslator::translateModel(unsigned int i,
-                                      unsigned int j)
-{
-    const vpz::AtomicModel* atomicModel;
-
-    if (not m_library.empty() or not m_libraries.empty()) {
-        std::vector < std::string > conditions;
-        conditions.push_back("cond_cell");
-        conditions.push_back((fmt("cond_%1%_%2%_%3%")
-                              % m_prefix % i % j).str());
-
-        atomicModel = m_exe.createModel(getName(i, j),
-                                        std::vector < std::string >(),
-                                        std::vector < std::string >(),
-                                        getDynamics(i, j),
-                                        conditions, "obs_cell");
-        m_models[getName(i,j)] = atomicModel;
-    } else {
-        atomicModel = dynamic_cast < const vpz::AtomicModel*>(
-            m_exe.createModelFromClass(getClass(i, j), getName(i, j)));
-    }
-
-    if (i != 1)
-        m_exe.addInputPort(atomicModel->getName(), "N");
-
-    if (j != 1)
-        m_exe.addInputPort(atomicModel->getName(), "W");
-
-    if (i != m_size[0])
-        m_exe.addInputPort(atomicModel->getName(), "S");
-
-    if (j != m_size[1])
-        m_exe.addInputPort(atomicModel->getName(), "E");
-
-    if (m_connectivity == VON_NEUMANN) {
-        if (i != 1 and j != 1) {
-            m_exe.addInputPort(atomicModel->getName(), "NW");
-        }
-
-        if (i != 1 and j != m_size[1]) {
-            m_exe.addInputPort(atomicModel->getName(), "NE");
-        }
-
-        if (i != m_size[0] and j != 1) {
-            m_exe.addInputPort(atomicModel->getName(), "SW");
-        }
-
-        if (i != m_size[0] and j != m_size[1]) {
-            m_exe.addInputPort(atomicModel->getName(), "SE");
-        }
-    }
-
-    if (m_symmetricport) {
-        if (i != 1) {
-            m_exe.addOutputPort(atomicModel->getName(), "N");
-        }
-
-        if (j != 1) {
-            m_exe.addOutputPort(atomicModel->getName(), "W");
-        }
-
-        if (i != m_size[0]) {
-            m_exe.addOutputPort(atomicModel->getName(), "S");
-        }
-
-        if (j != m_size[1]) {
-            m_exe.addOutputPort(atomicModel->getName(), "E");
-        }
-
-        if (m_connectivity == VON_NEUMANN) {
-            if (i != 1 and j != 1) {
-                m_exe.addOutputPort(atomicModel->getName(), "NW");
-            }
-
-            if (i != 1 and j != m_size[1]) {
-                m_exe.addOutputPort(atomicModel->getName(), "NE");
-            }
-
-            if (i != m_size[0] and j != 1) {
-                m_exe.addOutputPort(atomicModel->getName(), "SW");
-            }
-
-            if (i != m_size[0] and j != m_size[1]) {
-                m_exe.addOutputPort(atomicModel->getName(), "SE");
-            }
-        }
-    } else {
-        m_exe.addOutputPort(atomicModel->getName(), "out");
-    }
-}
-
-void MatrixTranslator::translateStructures()
-{
-    if (m_dimension == 0) {
-        for (unsigned int i = 1; i <= m_size[0]; i++) {
-            std::vector < std::string > conditions;
-
-            conditions.push_back("cond_cell");
-            conditions.push_back((fmt("cond_%1%_%2%") % m_prefix %
-                                  i).str());
-            const vpz::AtomicModel* atomicModel = m_exe.createModel(
-                getName(i), std::vector < std::string >(),
-                std::vector < std::string >(), getDynamics(i), conditions,
-                "obs_cell");
-            m_models[getName(i)] = atomicModel;
-
-            if (i != 1) {
-                m_exe.addInputPort(atomicModel->getName(), "L");
-            }
-
-            if (i != m_size[0]) {
-                m_exe.addInputPort(atomicModel->getName(), "R");
-            }
-
-            if (m_symmetricport) {
-                if (i != 1) {
-                    m_exe.addOutputPort(atomicModel->getName(), "L");
-                }
-
-                if (i != m_size[0]) {
-                    m_exe.addOutputPort(atomicModel->getName(), "R");
-                }
-            } else {
-                m_exe.addOutputPort(atomicModel->getName(), "out");
-            }
-        }
-    } else {
-        if (m_dimension == 1) {
-            for (unsigned int j = 1; j <= m_size[1]; j++) {
-                for (unsigned int i = 1; i <= m_size[0]; i++) {
-                    if (existModel(i, j)) {
-                        translateModel(i, j);
-                    }
-                }
-            }
-        }
-    }
-
-    if (m_dimension == 0) {
-        for (unsigned int i = 1; i <= m_size[0]; i++) {
-            if (m_symmetricport) {
-                if (i != 1) {
-                    m_exe.addConnection(getName(i), "L", getName(i - 1), "R");
-                }
-
-                if (i != m_size[0]) {
-                    m_exe.addConnection(getName(i), "R", getName(i + 1), "L");
-                }
-            } else {
-                if (i != 1) {
-                    m_exe.addConnection(getName(i), "out", getName(i - 1), "R");
-                }
-
-                if (i != m_size[0]) {
-                    m_exe.addConnection(getName(i), "out", getName(i + 1), "L");
-                }
-            }
-        }
-    } else {
-        if (m_dimension == 1) {
-            if (m_symmetricport) {
-                for (unsigned int j = 1; j <= m_size[1]; j++) {
-                    for (unsigned int i = 1; i <= m_size[0]; i++) {
-                        if (existModel(i, j)) {
-                            translateSymmetricConnection2D(i, j);
-                        }
-                    }
-                }
-            } else {
-                for (unsigned int j = 1; j <= m_size[1]; j++) {
-                    for (unsigned int i = 1; i <= m_size[0]; i++) {
-                        if (existModel(i, j)) {
-                            translateConnection2D(i, j);
-                        }
-                    }
+                    executive.addConnection(
+                        modelnames[i], mask[m], modelnames[x], mask[m]);
+                    break;
                 }
             }
         }
     }
 }
 
-void MatrixTranslator::translateSymmetricConnection2D(unsigned int i,
-                                                      unsigned int j)
+void make_1d_wrap(vle::devs::Executive &executive,
+                  regular_graph_generator::connectivity connectivity,
+                  const std::vector<std::string> &modelnames,
+                  int length,
+                  const std::vector<std::string> &mask,
+                  int x_mask)
 {
-    if (j != 1 and existModel(i, j - 1))
-        m_exe.addConnection(getName(i, j), "W", getName(i, j - 1), "E");
+    const int mask_length = vle::utils::numeric_cast<int>(mask.size());
 
-    if (i != 1 and existModel(i - 1, j))
-        m_exe.addConnection(getName(i, j), "N", getName(i - 1, j), "S");
+    for (int i = 0; i != length; ++i) {
+        const int x_min = i - x_mask;
+        const int x_max = i + mask_length - x_mask;
 
-    if (j != m_size[1] and existModel(i, j + 1))
-        m_exe.addConnection(getName(i, j), "E", getName(i, j + 1), "W");
+        for (int x = x_min, m = 0; x != x_max; ++x, ++m) {
+            int p = x;
 
-    if (i != m_size[0] and existModel(i + 1, j))
-        m_exe.addConnection(getName(i, j), "S", getName(i + 1, j), "N");
+            if (x < 0)
+                p = length + x;
+            else if (x >= length)
+                p = x % length;
 
-    if (m_connectivity == VON_NEUMANN) {
-        if (j != 1 and i != 1 and existModel(i - 1, j - 1))
-            m_exe.addConnection(getName(i, j), "SW", getName(i - 1, j - 1),
-                                "SE");
+            if (not mask[m].empty()) {
+                switch (connectivity) {
+                case regular_graph_generator::connectivity::IN_OUT:
+                    executive.addOutputPort(modelnames[i], "out");
+                    executive.addInputPort(modelnames[p], "in");
 
-        if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
-            m_exe.addConnection(getName(i, j), "SE", getName(i - 1, j + 1),
-                                "SW");
+                    executive.addConnection(
+                        modelnames[i], "out", modelnames[p], "in");
+                    break;
 
-        if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
-            m_exe.addConnection(getName(i, j), "NW", getName(i + 1, j - 1),
-                                "NE");
+                case regular_graph_generator::connectivity::OTHER:
+                    executive.addOutputPort(modelnames[i], modelnames[p]);
+                    executive.addInputPort(modelnames[p], modelnames[i]);
 
-        if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
-            m_exe.addConnection(getName(i, j), "NE", getName(i + 1, j + 1),
-                                "NW");
-    }
-}
+                    executive.addConnection(modelnames[i],
+                                            modelnames[p],
+                                            modelnames[p],
+                                            modelnames[i]);
+                    break;
 
-void MatrixTranslator::translateConnection2D(unsigned int i,
-                                             unsigned int j)
-{
-    if (j != 1 and existModel(i, j - 1))
-        m_exe.addConnection(getName(i, j), "out", getName(i, j - 1), "E");
+                case regular_graph_generator::connectivity::NAMED:
+                    executive.addOutputPort(modelnames[i], mask[m]);
+                    executive.addInputPort(modelnames[p], mask[m]);
 
-    if (i != 1 and existModel(i - 1, j))
-        m_exe.addConnection(getName(i, j), "out", getName(i - 1, j), "S");
-
-    if (j != m_size[1] and existModel(i, j + 1))
-        m_exe.addConnection(getName(i, j), "out", getName(i, j + 1), "W");
-
-    if (i != m_size[0] and existModel(i + 1, j))
-        m_exe.addConnection(getName(i, j), "out", getName(i + 1, j), "N");
-
-    if (m_connectivity == VON_NEUMANN) {
-        if (j != 1 and i != 1 and existModel(i - 1, j - 1))
-            m_exe.addConnection(getName(i, j), "out", getName(i - 1, j - 1),
-                                "SE");
-
-        if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
-            m_exe.addConnection(getName(i, j), "out", getName(i - 1, j + 1),
-                                "SW");
-
-        if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
-            m_exe.addConnection(getName(i, j), "out", getName(i + 1, j - 1),
-                                "NE");
-
-        if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
-            m_exe.addConnection(getName(i, j), "out", getName(i + 1, j + 1),
-                                "NW");
-    }
-}
-
-void MatrixTranslator::translateDynamics()
-{
-    if (m_multiple) {
-        if (not m_libraries.empty()) {
-            libraries_t::const_iterator it = m_libraries.begin();
-
-            while (it != m_libraries.end()) {
-                vpz::Dynamic dynamics((fmt("dyn_cell_%1%") %
-                                       it->first).str());
-
-                dynamics.setLibrary(it->second.first);
-                m_exe.dynamics().add(dynamics);
-                ++it;
-            }
-        }
-    } else {
-        if (not m_library.empty()) {
-            vpz::Dynamic dynamics("cell");
-
-            dynamics.setLibrary(m_library);
-            m_exe.dynamics().add(dynamics);
-        }
-    }
-}
-
-void MatrixTranslator::translateCondition1D(unsigned int i)
-{
-    std::string name = (fmt("cond_%1%_%2%")
-                        % m_prefix % i).str();
-    vpz::Condition condition(name);
-    auto neighbourhood = std::unique_ptr<value::Set>(new value::Set());
-
-    if (i != 1)
-        neighbourhood->add(value::String::create("L"));
-
-    if (i != m_size[0])
-        neighbourhood->add(value::String::create("R"));
-
-    condition.addValueToPort("Neighbourhood", std::move(neighbourhood));
-
-    condition.addValueToPort("_x", value::Integer::create(i));
-
-    m_exe.conditions().add(condition);
-}
-
-void MatrixTranslator::translateCondition2D(unsigned int i,
-                                            unsigned int j)
-{
-    std::string name = (fmt("cond_%1%_%2%_%3%")
-                        % m_prefix % i % j).str();
-    vpz::Condition condition(name);
-    auto neighbourhood = std::unique_ptr<value::Set>(new value::Set());
-
-    if (i != 1)
-        neighbourhood->add(value::String::create("N"));
-
-    if (j != m_size[1])
-        neighbourhood->add(value::String::create("E"));
-
-    if (i != m_size[0])
-        neighbourhood->add(value::String::create("S"));
-
-    if (j != 1)
-        neighbourhood->add(value::String::create("W"));
-
-    if (m_connectivity == VON_NEUMANN) {
-        if (i != 1 and j != 1)
-            neighbourhood->add(value::String::create("NW"));
-
-        if (i != 1 and j != m_size[1])
-            neighbourhood->add(value::String::create("NE"));
-
-        if (i != m_size[0] and j != 1)
-            neighbourhood->add(value::String::create("SW"));
-
-        if (i != m_size[0] and j != m_size[1])
-            neighbourhood->add(value::String::create("SE"));
-    }
-
-    condition.addValueToPort("Neighbourhood", std::move(neighbourhood));
-
-    condition.addValueToPort("_x", value::Integer::create(i));
-    condition.addValueToPort("_y", value::Integer::create(j));
-    m_exe.conditions().add(condition);
-}
-
-void MatrixTranslator::translateConditions()
-{
-    if (m_dimension == 0) {
-        for (unsigned int i = 1; i <= m_size[0]; i++) {
-            if (!m_init || m_init[i-1] != 0) {
-                translateCondition1D(i);
-            }
-        }
-    } else {
-        if (m_dimension == 1) {
-            for (unsigned int i = 1; i <= m_size[0]; i++) {
-                for (unsigned int j = 1; j <= m_size[1]; j++) {
-                    if (existModel(i, j)) {
-                        translateCondition2D(i, j);
-                    }
+                    executive.addConnection(
+                        modelnames[i], mask[m], modelnames[p], mask[m]);
+                    break;
                 }
             }
         }
     }
 }
 
-}} // namespace vle translator
+void regular_graph_generator::make_1d(vle::devs::Executive &executive,
+                                      int length,
+                                      bool wrap,
+                                      const std::vector<std::string> &mask,
+                                      int x_mask)
+{
+    if (length <= 0 or mask.size() == 0 or
+        utils::numeric_cast<int>(mask.size()) <= x_mask)
+        throw vle::utils::ArgError(
+            _("regular_graph_generator: bad model parameters"));
 
+    std::vector<std::string> modelnames(length);
+    std::string name, classname;
+    regular_graph_generator::node_metrics metrics{-1, -1, -1};
+
+    for (int i = 0; i != length; ++i) {
+        metrics.x = i;
+        m_params.make_model(metrics, name, classname);
+        executive.createModelFromClass(classname, name);
+        modelnames[i] = name;
+    }
+
+    m_metrics.vertices = length;
+
+    if (not wrap)
+        make_1d_no_wrap(
+            executive, m_params.type, modelnames, length, mask, x_mask);
+    else
+        make_1d_wrap(
+            executive, m_params.type, modelnames, length, mask, x_mask);
+}
+
+void apply_mask(vle::devs::Executive &executive,
+                const regular_graph_generator::parameter &params,
+                const utils::Array<std::string> &modelnames,
+                int c,
+                int r,
+                std::array<int, 2>(length),
+                utils::Array<std::string>(mask),
+                int x_mask,
+                int y_mask)
+{
+    const int mask_columns = utils::numeric_cast<int>(mask.columns());
+    const int mask_rows = utils::numeric_cast<int>(mask.rows());
+    const int x_min = std::max(0, c - x_mask);
+    const int x_max = std::min(length[0], c + mask_columns - x_mask);
+    const int y_min = std::max(0, r - y_mask);
+    const int y_max = std::min(length[1], r + mask_rows - y_mask);
+
+    const int x_mask_min = std::max(0, x_mask - c);
+    const int y_mask_min = std::max(0, y_mask - r);
+
+    for (int y = y_min, n = y_mask_min; y != y_max; ++y, ++n) {
+        for (int x = x_min, m = x_mask_min; x != x_max; ++x, ++m) {
+            switch (params.type) {
+            case regular_graph_generator::connectivity::IN_OUT:
+                executive.addOutputPort(modelnames(c, r), "out");
+                executive.addInputPort(modelnames(x, y), "in");
+
+                executive.addConnection(
+                    modelnames(c, r), "out", modelnames(x, y), "in");
+                break;
+
+            case regular_graph_generator::connectivity::OTHER:
+                executive.addOutputPort(modelnames(c, r), modelnames(x, y));
+                executive.addInputPort(modelnames(x, y), modelnames(c, r));
+
+                executive.addConnection(modelnames(c, r),
+                                        modelnames(x, y),
+                                        modelnames(x, y),
+                                        modelnames(c, r));
+                break;
+
+            case regular_graph_generator::connectivity::NAMED:
+                executive.addOutputPort(modelnames(c, r), mask(m, n));
+                executive.addInputPort(modelnames(x, y), mask(m, n));
+
+                executive.addConnection(modelnames(c, r),
+                                        mask(m, n),
+                                        modelnames(x, y),
+                                        mask(m, n));
+                break;
+            }
+        }
+    }
+}
+
+void apply_wrap_mask(vle::devs::Executive &executive,
+                     const std::array<bool, 2> &wrap,
+                     const regular_graph_generator::parameter &params,
+                     const utils::Array<std::string> &modelnames,
+                     int c,
+                     int r,
+                     std::array<int, 2>(length),
+                     utils::Array<std::string>(mask),
+                     int x_mask,
+                     int y_mask)
+{
+    const int mask_columns = utils::numeric_cast<int>(mask.columns());
+    const int mask_rows = utils::numeric_cast<int>(mask.rows());
+    const int x_min = c - x_mask;
+    const int x_max = c + mask_columns - x_mask;
+    const int y_min = r - y_mask;
+    const int y_max = r + mask_rows - y_mask;
+
+    for (int y = y_min, n = 0; y != y_max; ++y, ++n) {
+        int p = y;
+        if (wrap[1] == true) {
+            if (y < 0)
+                p = length[1] + y;
+            else if (y >= length[1])
+                p = y % length[1];
+        } else
+            continue;
+
+        for (int x = x_min, m = 0; x != x_max; ++x, ++m) {
+            int q = x;
+            if (wrap[0] == true) {
+                if (x < 0)
+                    q = length[0] + x;
+                else if (x >= length[0])
+                    q = x % length[0];
+            } else
+                continue;
+
+            switch (params.type) {
+            case regular_graph_generator::connectivity::IN_OUT:
+                executive.addOutputPort(modelnames(c, r), "out");
+                executive.addInputPort(modelnames(q, p), "in");
+
+                executive.addConnection(
+                    modelnames(c, r), "out", modelnames(q, p), "in");
+                break;
+
+            case regular_graph_generator::connectivity::OTHER:
+                executive.addOutputPort(modelnames(c, r), modelnames(q, p));
+                executive.addInputPort(modelnames(q, p), modelnames(c, r));
+
+                executive.addConnection(modelnames(c, r),
+                                        modelnames(q, p),
+                                        modelnames(q, p),
+                                        modelnames(c, r));
+                break;
+
+            case regular_graph_generator::connectivity::NAMED:
+                executive.addOutputPort(modelnames(c, r), mask(m, n));
+                executive.addInputPort(modelnames(q, p), mask(m, n));
+
+                executive.addConnection(modelnames(c, r),
+                                        mask(m, n),
+                                        modelnames(q, p),
+                                        mask(m, n));
+                break;
+            }
+        }
+    }
+}
+
+void regular_graph_generator::make_2d(vle::devs::Executive &executive,
+                                      const std::array<int, 2> &length,
+                                      const std::array<bool, 2> &wrap,
+                                      const utils::Array<std::string> &mask,
+                                      int x_mask,
+                                      int y_mask)
+{
+    if (length[0] * length[1] <= 0 or x_mask < 0 or y_mask < 0 or
+        utils::numeric_cast<std::size_t>(x_mask) >= mask.columns() or
+        utils::numeric_cast<std::size_t>(y_mask) >= mask.rows())
+        throw vle::utils::ArgError(
+            _("regular_graph_generator: bad parameters"));
+
+    utils::Array<std::string> modelnames(length[0], length[1]);
+    std::string name, classname;
+    regular_graph_generator::node_metrics metrics{-1, -1, -1};
+
+    m_metrics.vertices = length[0] * length[1];
+
+    for (int c = 0; c != length[0]; ++c) {
+        for (int r = 0; r != length[1]; ++r) {
+            metrics.x = c;
+            metrics.y = r;
+            m_params.make_model(metrics, name, classname);
+            executive.createModelFromClass(classname, name);
+            modelnames(c, r) = name;
+        }
+    }
+
+    if (not wrap[0] and not wrap[1])
+        for (int c = 0; c != length[0]; ++c)
+            for (int r = 0; r != length[1]; ++r)
+                apply_mask(executive,
+                           m_params,
+                           modelnames,
+                           c,
+                           r,
+                           length,
+                           mask,
+                           x_mask,
+                           y_mask);
+    else
+        for (int c = 0; c != length[0]; ++c)
+            for (int r = 0; r != length[1]; ++r)
+                apply_wrap_mask(executive,
+                                wrap,
+                                m_params,
+                                modelnames,
+                                c,
+                                r,
+                                length,
+                                mask,
+                                x_mask,
+                                y_mask);
+}
+}
+}
