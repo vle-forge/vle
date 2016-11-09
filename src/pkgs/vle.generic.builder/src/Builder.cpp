@@ -299,9 +299,9 @@ public:
         }
 
         rgg.make_2d(*this,
-                    {events.getInt("width"), events.getInt("height")},
-                    {events.getBoolean("wrap-width"),
-                     events.getBoolean("wrap-height")},
+                    {{events.getInt("width"), events.getInt("height")}},
+                    {{events.getBoolean("wrap-width"),
+                      events.getBoolean("wrap-height")}},
                     mask,
                     events.getInt("x-mask"),
                     events.getInt("y-mask"));

@@ -184,8 +184,8 @@ void apply_mask(vle::devs::Executive &executive,
                 const utils::Array<std::string> &modelnames,
                 int c,
                 int r,
-                std::array<int, 2>(length),
-                utils::Array<std::string>(mask),
+                const std::array<int, 2> &length,
+                const utils::Array<std::string> &mask,
                 int x_mask,
                 int y_mask)
 {
@@ -240,8 +240,8 @@ void apply_wrap_mask(vle::devs::Executive &executive,
                      const utils::Array<std::string> &modelnames,
                      int c,
                      int r,
-                     std::array<int, 2>(length),
-                     utils::Array<std::string>(mask),
+                     const std::array<int, 2> &length,
+                     const utils::Array<std::string> &mask,
                      int x_mask,
                      int y_mask)
 {
