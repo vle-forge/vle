@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DEVS_SIMULATOR_HPP
 #define VLE_DEVS_SIMULATOR_HPP
 
@@ -38,7 +37,10 @@
 #include <vle/devs/View.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 
-namespace vle { namespace devs {
+namespace vle
+{
+namespace devs
+{
 
 class Dynamics;
 
@@ -50,9 +52,8 @@ class Dynamics;
 class VLE_LOCAL Simulator
 {
 public:
-    typedef std::pair < Simulator*, std::string > TargetSimulator;
-    typedef std::multimap < std::string, TargetSimulator >
-        TargetSimulatorList;
+    typedef std::pair<Simulator *, std::string> TargetSimulator;
+    typedef std::multimap<std::string, TargetSimulator> TargetSimulatorList;
     typedef TargetSimulatorList::const_iterator const_iterator;
     typedef TargetSimulatorList::iterator iterator;
     typedef TargetSimulatorList::size_type size_type;
@@ -64,7 +65,7 @@ public:
      * @param a The atomic model.
      * @throw utils::InternalError if the atomic model does not exist.
      */
-    Simulator(vpz::AtomicModel* a);
+    Simulator(vpz::AtomicModel *a);
 
     /**
      * @brief Delete the attached devs::Dynamics user's model.
@@ -83,20 +84,22 @@ public:
      * @return the name of the vpz::AtomicModel.
      * @throw utils::InternalEvent if the model is destroyed.
      */
-    const std::string& getName() const;
+    const std::string &getName() const;
 
     /**
      * @brief Get the atomic model attached to the Simulator.
      * @return A reference.
      */
-    vpz::AtomicModel* getStructure() const
-    { return m_atomicModel; }
+    vpz::AtomicModel *getStructure() const
+    {
+        return m_atomicModel;
+    }
 
     /**
      * @brief Return a constant reference to the devs::Dynamics.
      * @return
      */
-    const std::unique_ptr<Dynamics>& dynamics() const
+    const std::unique_ptr<Dynamics> &dynamics() const
     {
         return m_dynamics;
     }
@@ -109,7 +112,7 @@ public:
      *
      * \param port The output port used to build simulators' target list.
      */
-    void updateSimulatorTargets(const std::string& port);
+    void updateSimulatorTargets(const std::string &port);
 
     /**
      * Get begin and end iterators to find Simulator connected to the
@@ -119,19 +122,19 @@ public:
      *
      * \return Two iterators.
      */
-    std::pair <iterator, iterator> targets(const std::string& port);
+    std::pair<iterator, iterator> targets(const std::string &port);
 
     /**
      * @brief Add an empty target port.
      * @param port Name of the port.
      */
-    void removeTargetPort(const std::string& port);
+    void removeTargetPort(const std::string &port);
 
     /**
      * @brief Remove a target port.
      * @param port Name of the port to remove.
      */
-    void addTargetPort(const std::string& port);
+    void addTargetPort(const std::string &port);
 
     /*-*-*-*-*-*-*-*-*-*/
 
@@ -142,9 +145,10 @@ public:
     Time internalTransition(Time time);
     Time externalTransition(Time time);
     Time confluentTransitions(Time time);
-    std::unique_ptr<value::Value> observation(const ObservationEvent& event) const;
+    std::unique_ptr<value::Value>
+    observation(const ObservationEvent &event) const;
 
-    inline const ExternalEventList& result() const noexcept
+    inline const ExternalEventList &result() const noexcept
     {
         return m_result;
     }
@@ -188,20 +192,9 @@ public:
 
     inline void addExternalEvents(Simulator *simulator,
                                   std::shared_ptr<value::Value> values,
-                                  const std::string& portname)
+                                  const std::string &portname)
     {
-        m_external_events_nextbag.emplace_back(simulator, values, portname);
-    }
-
-    inline void clearExternalEvents()
-    {
-        m_external_events.clear();
-    }
-
-    inline void swapExternalEvents()
-    {
-        m_external_events.clear();
-        m_external_events.swap(m_external_events_nextbag);
+        m_external_events.emplace_back(simulator, values, portname);
     }
 
     inline void setInternalEvent() noexcept
@@ -214,26 +207,30 @@ public:
         return m_have_internal;
     }
 
-    inline std::vector<Observation>& getObservations() noexcept
+    inline void resetInternalEvent() noexcept
+    {
+        m_have_internal = false;
+    }
+
+    inline std::vector<Observation> &getObservations() noexcept
     {
         return m_observations;
     }
 
 private:
     std::unique_ptr<Dynamics> m_dynamics;
-    vpz::AtomicModel*   m_atomicModel;
+    vpz::AtomicModel *m_atomicModel;
     TargetSimulatorList mTargets;
-    ExternalEventList   m_external_events;
-    ExternalEventList   m_external_events_nextbag;
-    ExternalEventList   m_result;
+    ExternalEventList m_external_events;
+    ExternalEventList m_result;
     std::vector<Observation> m_observations;
-    std::string         m_parents;
-    Time                m_tn;
-    HandleT             m_handle;
-    bool                m_have_handle;
-    bool                m_have_internal;
+    std::string m_parents;
+    Time m_tn;
+    HandleT m_handle;
+    bool m_have_handle;
+    bool m_have_internal;
 };
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

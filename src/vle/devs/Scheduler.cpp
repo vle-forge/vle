@@ -30,31 +30,33 @@
 #include <vector>
 #include <cassert>
 
-namespace vle { namespace devs {
+namespace vle
+{
+namespace devs
+{
 
 void Scheduler::init(Time time)
 {
+    // m_current_bag.dynamics.reserve(256);
+    // m_current_bag.executives.reserve(256);
     m_current_bag.clear();
-    m_next_bag.clear();
     m_current_time = time;
 
-    while (not m_scheduler.empty()
-           and m_scheduler.top().m_time <= m_current_time) {
+    while (not m_scheduler.empty() and
+           m_scheduler.top().m_time <= m_current_time) {
         Simulator *sim = m_scheduler.top().m_simulator;
 
         if (sim->dynamics()->isExecutive()) {
-            auto it = std::find(
-                std::begin(m_current_bag.executives),
-                std::end(m_current_bag.executives),
-                sim);
+            auto it = std::find(std::begin(m_current_bag.executives),
+                                std::end(m_current_bag.executives),
+                                sim);
 
             if (it == m_current_bag.executives.end())
                 m_current_bag.executives.emplace_back(sim);
         } else {
-            auto it = std::find(
-                std::begin(m_current_bag.dynamics),
-                std::end(m_current_bag.dynamics),
-                sim);
+            auto it = std::find(std::begin(m_current_bag.dynamics),
+                                std::end(m_current_bag.dynamics),
+                                sim);
 
             if (it == m_current_bag.dynamics.end())
                 m_current_bag.dynamics.emplace_back(sim);
@@ -83,22 +85,22 @@ void Scheduler::addInternal(Simulator *simulator, Time time)
 
 void Scheduler::addExternal(Simulator *simulator,
                             std::shared_ptr<value::Value> values,
-                            const std::string& portname)
+                            const std::string &portname)
 {
     if (simulator->dynamics()->isExecutive()) {
-        auto it = std::find(std::begin(m_next_bag.executives),
-                            std::end(m_next_bag.executives),
+        auto it = std::find(std::begin(m_current_bag.executives),
+                            std::end(m_current_bag.executives),
                             simulator);
 
-        if (it == m_next_bag.executives.end())
-            m_next_bag.executives.emplace_back(simulator);
+        if (it == m_current_bag.executives.end())
+            m_current_bag.executives.emplace_back(simulator);
     } else {
-        auto it = std::find(std::begin(m_next_bag.dynamics),
-                            std::end(m_next_bag.dynamics),
+        auto it = std::find(std::begin(m_current_bag.dynamics),
+                            std::end(m_current_bag.dynamics),
                             simulator);
 
-        if (it == m_next_bag.dynamics.end())
-            m_next_bag.dynamics.emplace_back(simulator);
+        if (it == m_current_bag.dynamics.end())
+            m_current_bag.dynamics.emplace_back(simulator);
     }
 
     simulator->addExternalEvents(simulator, values, portname);
@@ -111,6 +113,7 @@ void Scheduler::addExternal(Simulator *simulator,
     if (simulator->haveHandle() and simulator->getTn() > m_current_time) {
         m_scheduler.erase(simulator->handle());
         simulator->resetHandle();
+        assert(not simulator->haveInternalEvent() && "Bad scheduler");
     }
 }
 
@@ -132,76 +135,19 @@ void Scheduler::delSimulator(Simulator *simulator)
             m_current_bag.dynamics.erase(it);
     }
 
-    if (simulator->dynamics()->isExecutive()) {
-        auto it = std::find(std::begin(m_next_bag.executives),
-                            std::end(m_next_bag.executives),
-                            simulator);
-
-        if (it != m_next_bag.executives.end())
-            m_next_bag.executives.erase(it);
-    } else {
-        auto it = std::find(std::begin(m_next_bag.dynamics),
-                            std::end(m_next_bag.dynamics),
-                            simulator);
-
-        if (it != m_next_bag.dynamics.end())
-            m_next_bag.dynamics.erase(it);
+    if (simulator->haveHandle()) {
+        m_scheduler.erase(simulator->handle());
+        simulator->resetHandle();
     }
-
-     if (simulator->haveHandle()) {
-         m_scheduler.erase(simulator->handle());
-         simulator->resetHandle();
-     }
-}
-
-Time Scheduler::getNextTime() const noexcept
-{
-    if (not m_next_bag.empty())
-        return m_current_time;
-
-    if (not m_scheduler.empty())
-        return m_scheduler.top().m_time;
-
-    return infinity;
-}
-
-Bag& Scheduler::getCurrentBag() noexcept
-{
-    return m_current_bag;
 }
 
 void Scheduler::makeNextBag()
 {
     m_current_time = getNextTime();
-
-    //
-    // First step, we get all external events generated in the previous
-    // current_bag.
-    //
-
     m_current_bag.clear();
-    if (not m_next_bag.empty()) {
-        m_current_bag.dynamics.swap(m_next_bag.dynamics);
-        m_current_bag.executives.swap(m_next_bag.executives);
-    }
 
-    //
-    // We need to browse throug this new current_bag to swap all external
-    // events.
-    //
-
-    for (auto& elem : m_current_bag.dynamics)
-        elem->swapExternalEvents();
-
-    for (auto& elem : m_current_bag.executives)
-        elem->swapExternalEvents();
-
-    //
-    // Finally, we merge all simulator that tn equal current time.
-    //
-
-    while (not m_scheduler.empty()
-           and m_scheduler.top().m_time == m_current_time) {
+    while (not m_scheduler.empty() and
+           m_scheduler.top().m_time == m_current_time) {
 
         Simulator *sim = m_scheduler.top().m_simulator;
 
@@ -226,5 +172,5 @@ void Scheduler::makeNextBag()
         m_scheduler.pop();
     }
 }
-
-}} // namespace vle devs
+}
+} // namespace vle devs

@@ -34,15 +34,16 @@
 #include <atomic>
 #include <chrono>
 
-namespace vle { namespace devs {
+namespace vle
+{
+namespace devs
+{
 
 template <typename SimulatorT>
 bool simulator_process(SimulatorT *simulator, Time time) noexcept
 {
     try {
         if (simulator->haveInternalEvent()) {
-            simulator->output(time);
-
             if (not simulator->haveExternalEvents())
                 simulator->internalTransition(time);
             else
@@ -64,7 +65,7 @@ class SimulatorProcessParallel
     std::atomic<long int> m_block_count;
     std::atomic<bool> m_running_flag;
 
-    std::vector <Simulator*> *m_jobs;
+    std::vector<Simulator *> *m_jobs;
     Time m_time;
     long m_block_size;
 
@@ -83,6 +84,7 @@ class SimulatorProcessParallel
 
                 m_block_count.fetch_sub(1, std::memory_order_relaxed);
             } else {
+                //
                 // TODO: Maybe we can use a yield instead of this
                 // sleep_for function to reduce the overhead of the
                 // current thread.
@@ -114,8 +116,10 @@ public:
                 workers_count = 0l;
         }
 
-        vInfo(context, _("Simulation kernel: thread:%ld block-size:%ld\n"),
-              workers_count, m_block_size);
+        vInfo(context,
+              _("Simulation kernel: thread:%ld block-size:%ld\n"),
+              workers_count,
+              m_block_size);
 
         m_block_id.store(-1, std::memory_order_relaxed);
         m_block_count.store(-1, std::memory_order_relaxed);
@@ -135,7 +139,7 @@ public:
     {
         m_running_flag.store(false, std::memory_order_relaxed);
 
-        for (auto& thread : m_workers)
+        for (auto &thread : m_workers)
             if (thread.joinable())
                 thread.join();
     }
@@ -145,13 +149,13 @@ public:
         return not m_workers.empty();
     }
 
-    bool for_each(std::vector<Simulator*>& simulators, Time time) noexcept
+    bool for_each(std::vector<Simulator *> &simulators, Time time) noexcept
     {
         m_jobs = &simulators;
         m_time = time;
 
         auto sz = (simulators.size() / m_block_size) +
-            ((simulators.size() % m_block_size) ? 1 : 0);
+                  ((simulators.size() % m_block_size) ? 1 : 0);
 
         m_block_count.store(sz, std::memory_order_relaxed);
         m_block_id.store(sz, std::memory_order_relaxed);
@@ -180,7 +184,7 @@ public:
         return true;
     }
 };
-
-}}
+}
+}
 
 #endif

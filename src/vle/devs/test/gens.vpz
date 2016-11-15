@@ -4,7 +4,7 @@
   <structures>
     <model name="top" type="coupled" width="459"  >
       <submodels>
-        <model name="counter" type="atomic" dynamics="counter" observables="obs1" x="140" y="25" width="100" height="45" >
+        <model name="counter" type="atomic" dynamics="counter" observables="obs1" x="140" y="25" width="100" height="45" debug="yes">
           <in>
             <port name="in" />
           </in>
@@ -12,7 +12,7 @@
             <port name="out" />
           </out>
         </model>
-        <model name="executive" type="atomic" dynamics="executive" observables="obs2" x="140" y="85" width="100" height="30" >
+        <model name="executive" type="atomic" dynamics="executive" observables="obs2" x="140" y="85" width="100" height="30" debug="yes">
         </model>
       </submodels>
       <connections>
@@ -20,8 +20,8 @@
     </model>
   </structures>
   <dynamics>
-    <dynamic name="counter" package="" library="dynamics_counter"  />
-    <dynamic name="executive" package="" library="exe_genexecutive"  />
+    <dynamic name="counter" package="" library="dynamics_counter" />
+    <dynamic name="executive" package="" library="exe_genexecutive" />
   </dynamics>
   <experiment name="generatorexecutive" seed="123" >
     <conditions>

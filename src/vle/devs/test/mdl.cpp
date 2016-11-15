@@ -50,46 +50,42 @@ using namespace vle;
 #define xstringify(a) stringify(a)
 #define stringify(a) #a
 
-#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)        \
-    extern "C" {                                        \
-        VLE_MODULE vle::devs::Dynamics*                 \
-        symbol_(const vle::devs::DynamicsInit& init,    \
-                const vle::devs::InitEventList& events) \
-        {                                               \
-            return new model_(init, events);            \
-        }                                               \
+#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                              \
+    extern "C" {                                                              \
+    VLE_MODULE vle::devs::Dynamics *                                          \
+    symbol_(const vle::devs::DynamicsInit &init,                              \
+            const vle::devs::InitEventList &events)                           \
+    {                                                                         \
+        return new model_(init, events);                                      \
+    }                                                                         \
     }
 
-#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                       \
-    extern "C" {                                                        \
-        VLE_MODULE vle::devs::Dynamics*                                 \
-        symbol_(const vle::devs::ExecutiveInit& init,                   \
-                const vle::devs::InitEventList& events)                 \
-        {                                                               \
-            std::string symbol_test(xstringify(symbol_));               \
-            Ensures(symbol_test.length() > 4);                    \
-            Ensures(symbol_test.compare(0, 4, "exe_") == 0);      \
-            return new model_(init, events);                            \
-        }                                                               \
+#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                             \
+    extern "C" {                                                              \
+    VLE_MODULE vle::devs::Dynamics *                                          \
+    symbol_(const vle::devs::ExecutiveInit &init,                             \
+            const vle::devs::InitEventList &events)                           \
+    {                                                                         \
+        std::string symbol_test(xstringify(symbol_));                         \
+        Ensures(symbol_test.length() > 4);                                    \
+        Ensures(symbol_test.compare(0, 4, "exe_") == 0);                      \
+        return new model_(init, events);                                      \
+    }                                                                         \
     }
 
-#define DECLARE_OOV_SYMBOL(symbol_, model_)     \
-    extern "C" {                                \
-        VLE_MODULE vle::oov::Plugin*            \
-        symbol_(const std::string& location)    \
-        {                                       \
-            return new model_(location);        \
-        }                                       \
+#define DECLARE_OOV_SYMBOL(symbol_, model_)                                   \
+    extern "C" {                                                              \
+    VLE_MODULE vle::oov::Plugin *symbol_(const std::string &location)         \
+    {                                                                         \
+        return new model_(location);                                          \
+    }                                                                         \
     }
-
-
 
 class MyBeep : public devs::Dynamics
 {
 public:
-    MyBeep(const devs::DynamicsInit& model,
-         const devs::InitEventList& events) :
-        devs::Dynamics(model, events)
+    MyBeep(const devs::DynamicsInit &model, const devs::InitEventList &events)
+        : devs::Dynamics(model, events)
     {
     }
 
@@ -104,7 +100,7 @@ public:
     }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList& output) const override
+                        devs::ExternalEventList &output) const override
     {
         output.emplace_back("out");
     }
@@ -113,9 +109,10 @@ public:
 class Branch : public devs::Executive
 {
 public:
-    Branch(const devs::ExecutiveInit& mdl, const devs::InitEventList& events) :
-        devs::Executive(mdl, events)
-    {}
+    Branch(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
+        : devs::Executive(mdl, events)
+    {
+    }
 
     virtual devs::Time init(devs::Time /* time */) override
     {
@@ -149,21 +146,20 @@ public:
     }
 
     virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList& output) const override
+                        devs::ExternalEventList &output) const override
     {
         output.emplace_back("out");
-        output.back().addString("branch") ;
+        output.back().addString("branch");
     }
 };
 
 class Counter : public devs::Dynamics
 {
 public:
-    Counter(const devs::DynamicsInit& model,
-            const devs::InitEventList& events) :
-        devs::Dynamics(model, events),
-        m_counter(0),
-        m_active(false)
+    Counter(const devs::DynamicsInit &model, const devs::InitEventList &events)
+        : devs::Dynamics(model, events)
+        , m_counter(0)
+        , m_active(false)
     {
     }
 
@@ -174,7 +170,7 @@ public:
     }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList& /* output */) const override
+                        devs::ExternalEventList & /* output */) const override
     {
     }
 
@@ -191,7 +187,7 @@ public:
         m_active = false;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& events,
+    virtual void externalTransition(const devs::ExternalEventList &events,
                                     devs::Time /* time */) override
     {
         m_counter += events.size();
@@ -199,7 +195,7 @@ public:
     }
 
     virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent& ev) const override
+    observation(const devs::ObservationEvent &ev) const override
     {
         if (ev.onPort("c")) {
             if (m_counter > 100 and m_counter < 500)
@@ -221,21 +217,22 @@ private:
 class DeleteConnection : public devs::Executive
 {
 public:
-    DeleteConnection(const devs::ExecutiveInit& init,
-                     const devs::InitEventList& events)
+    DeleteConnection(const devs::ExecutiveInit &init,
+                     const devs::InitEventList &events)
         : devs::Executive(init, events)
     {
-       mAlarm = events.getDouble("alarm");
-       mModelSource = events.getString("model source");
-       mPortSource = events.getString("port source");
-       mModelDest = events.getString("model dest");
-       mPortDest = events.getString("port dest");
+        mAlarm = events.getDouble("alarm");
+        mModelSource = events.getString("model source");
+        mPortSource = events.getString("port source");
+        mModelDest = events.getString("model dest");
+        mPortDest = events.getString("port dest");
 
-       mRemaining = mAlarm;
+        mRemaining = mAlarm;
     }
 
     virtual ~DeleteConnection()
-    {}
+    {
+    }
 
     virtual devs::Time init(devs::Time /*time*/)
     {
@@ -249,10 +246,10 @@ public:
 
     virtual void internalTransition(devs::Time time)
     {
-        devs::Time tmp = std::abs(std::min(time, mAlarm) -
-                                  std::max(time, mAlarm));
+        devs::Time tmp =
+            std::abs(std::min(time, mAlarm) - std::max(time, mAlarm));
 
-       if (tmp < 0.1) {
+        if (tmp < 0.1) {
             mRemaining = devs::infinity;
             removeConnection(mModelSource, mPortSource, mModelDest, mPortDest);
         } else {
@@ -260,7 +257,7 @@ public:
         }
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
+    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
                                     devs::Time time)
     {
         mRemaining = std::abs(std::min(time, mAlarm) - std::max(time, mAlarm));
@@ -278,10 +275,11 @@ public:
 class Transform : public devs::Dynamics
 {
 public:
-    Transform(const devs::DynamicsInit& atom,
-              const devs::InitEventList& events) :
-        devs::Dynamics(atom, events)
-    {}
+    Transform(const devs::DynamicsInit &atom,
+              const devs::InitEventList &events)
+        : devs::Dynamics(atom, events)
+    {
+    }
 
     virtual devs::Time init(devs::Time /* time */) override
     {
@@ -299,22 +297,21 @@ public:
         m_counter = 1;
     }
 
-    virtual void externalTransition(
-        const devs::ExternalEventList& events,
-        devs::Time /* time */) override
+    virtual void externalTransition(const devs::ExternalEventList &events,
+                                    devs::Time /* time */) override
     {
         m_counter = m_counter + events.size();
     }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList& output) const override
+                        devs::ExternalEventList &output) const override
     {
         for (int i = 0; i < m_counter; ++i)
             output.emplace_back("out");
     }
 
     virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent&) const override
+    observation(const devs::ObservationEvent &) const override
     {
         return value::Integer::create(m_counter);
     }
@@ -326,14 +323,15 @@ private:
 class Confluent_transitionA : public devs::Dynamics
 {
 public:
-    Confluent_transitionA(const devs::DynamicsInit& atom,
-              const devs::InitEventList& events) :
-        devs::Dynamics(atom, events)
-    {}
+    Confluent_transitionA(const devs::DynamicsInit &atom,
+                          const devs::InitEventList &events)
+        : devs::Dynamics(atom, events)
+    {
+    }
 
     virtual devs::Time init(devs::Time /* time */) override
     {
-        return 0.0;
+        return 1.0;
     }
 
     virtual devs::Time timeAdvance() const override
@@ -345,26 +343,25 @@ public:
     {
     }
 
-    virtual void externalTransition(
-        const devs::ExternalEventList& /*events*/,
-        devs::Time /* time */) override
+    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
+                                    devs::Time /* time */) override
     {
     }
 
     virtual void confluentTransitions(
-            devs::Time /*time*/,
-            const devs::ExternalEventList& /*extEventlist*/) override
+        devs::Time /*time*/,
+        const devs::ExternalEventList & /*extEventlist*/) override
     {
     }
 
     virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList& output) const override
+                        devs::ExternalEventList &output) const override
     {
         output.emplace_back("out");
     }
 
     virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent&) const override
+    observation(const devs::ObservationEvent &) const override
     {
         return 0;
     }
@@ -373,19 +370,21 @@ public:
 class Confluent_transitionB : public devs::Dynamics
 {
 public:
-    Confluent_transitionB(const devs::DynamicsInit& atom,
-              const devs::InitEventList& events) :
-        devs::Dynamics(atom, events), state(0)
-    {}
+    Confluent_transitionB(const devs::DynamicsInit &atom,
+                          const devs::InitEventList &events)
+        : devs::Dynamics(atom, events)
+        , state(0)
+    {
+    }
 
     virtual devs::Time init(devs::Time /* time */) override
     {
-        return 0.0;
+        return 1.0;
     }
 
     virtual devs::Time timeAdvance() const override
     {
-        if (state<2) {
+        if (state < 2) {
             return 0;
         } else {
             return devs::infinity;
@@ -397,44 +396,129 @@ public:
         state++;
     }
 
-    virtual void externalTransition(
-        const devs::ExternalEventList& /*events*/,
-        devs::Time /* time */) override
+    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
+                                    devs::Time /* time */) override
     {
-        //should not have an external transition, rather a confluent
+        // should not have an external transition, rather a confluent
         throw "error confluent_transition::internalTransition";
     }
 
     virtual void confluentTransitions(
-            devs::Time /*time*/,
-            const devs::ExternalEventList& /*extEventlist*/) override
+        devs::Time /*time*/,
+        const devs::ExternalEventList & /*extEventlist*/) override
     {
     }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList& /*output*/) const override
+                        devs::ExternalEventList & /*output*/) const override
     {
     }
 
     virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent&) const override
+    observation(const devs::ObservationEvent &) const override
     {
         return 0;
     }
     int state;
 };
 
+class Confluent_transitionC : public devs::Dynamics
+{
+    mutable int i = 0;
+
+public:
+    Confluent_transitionC(const devs::DynamicsInit &atom,
+                          const devs::InitEventList &events)
+        : devs::Dynamics(atom, events)
+    {
+    }
+
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        Ensures(i == 0);
+        i++;
+
+        return 0;
+    }
+
+    virtual devs::Time timeAdvance() const override
+    {
+        Ensures(i == 3);
+        i = 1;
+        return 1.0;
+    }
+
+    virtual void internalTransition(devs::Time /* time */) override
+    {
+        Ensures(i == 2);
+        i++;
+    }
+
+    virtual void output(devs::Time /*time*/,
+                        devs::ExternalEventList &output) const override
+    {
+        Ensures(i == 1);
+        i++;
+        output.emplace_back("out");
+    }
+};
+
+class Confluent_transitionD : public devs::Dynamics
+{
+    int i = 0;
+
+public:
+    Confluent_transitionD(const devs::DynamicsInit &atom,
+                          const devs::InitEventList &events)
+        : devs::Dynamics(atom, events)
+    {
+        Ensures(i == 0);
+        i++;
+    }
+
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        Ensures(i == 1);
+        i++;
+
+        return 0;
+    }
+
+    virtual devs::Time timeAdvance() const override
+    {
+        return 1;
+    }
+
+    virtual void internalTransition(devs::Time /* time */) override
+    {
+        EnsuresNotReached();
+    }
+
+    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
+                                    devs::Time /* time */) override
+    {
+        EnsuresNotReached();
+    }
+
+    virtual void confluentTransitions(
+        devs::Time /*time*/,
+        const devs::ExternalEventList & /*extEventlist*/) override
+    {
+        Ensures(i > 1);
+    }
+};
+
 class GenExecutive : public devs::Executive
 {
     enum state { INIT, IDLE, ADDMODEL, DELMODEL };
 
-    std::stack < std::string >  m_stacknames;
-    state                       m_state;
+    std::stack<std::string> m_stacknames;
+    state m_state;
 
 public:
-    GenExecutive(const devs::ExecutiveInit& mdl,
-                 const devs::InitEventList& events) :
-        devs::Executive(mdl, events)
+    GenExecutive(const devs::ExecutiveInit &mdl,
+                 const devs::InitEventList &events)
+        : devs::Executive(mdl, events)
     {
     }
 
@@ -474,8 +558,7 @@ public:
         case IDLE:
             if (time < 50.0) {
                 m_state = ADDMODEL;
-            }
-            else {
+            } else {
                 m_state = DELMODEL;
             }
             break;
@@ -491,7 +574,7 @@ public:
     }
 
     virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent& ev) const override
+    observation(const devs::ObservationEvent &ev) const override
     {
         if (ev.onPort("nbmodel"))
             return value::Integer::create(get_nb_model());
@@ -505,18 +588,18 @@ public:
         if (ev.onPort("adjacency_matrix")) {
             auto set = value::Set::create();
             set->toSet().add(value::Integer::create(1));
-            if(get_nb_model() > 0 and ev.getTime() < 50.0){
+            if (get_nb_model() > 0 and ev.getTime() < 50.0) {
                 set->toSet().add(value::String::create("add"));
-                std::string name = (boost::format("MyBeep_%1%") %
-                                    m_stacknames.size()).str();
+                std::string name =
+                    (boost::format("MyBeep_%1%") % m_stacknames.size()).str();
                 set->toSet().add(value::String::create(name));
                 set->toSet().add(value::String::create("2"));
-                std::string edge =  name + std::string(" counter ");
+                std::string edge = name + std::string(" counter ");
                 set->toSet().add(value::String::create(edge));
-            } else if(get_nb_model() > 0){
+            } else if (get_nb_model() > 0) {
                 set->toSet().add(value::String::create("delete"));
-                std::string name = (boost::format("MyBeep_%1%")
-                                    % (get_nb_model())).str();
+                std::string name =
+                    (boost::format("MyBeep_%1%") % (get_nb_model())).str();
                 set->toSet().add(value::String::create(name));
             }
 
@@ -531,27 +614,30 @@ public:
 
     void add_new_model()
     {
-        std::string name((boost::format("MyBeep_%1%")
-                          % m_stacknames.size()).str());
+        printf("add_new_model starts\n");
+        std::string name(
+            (boost::format("MyBeep_%1%") % m_stacknames.size()).str());
 
-        std::vector < std::string > outputs;
-        outputs.push_back("out");
+        std::vector<std::string> outputs{"out"}, inputs{};
 
-        createModel(name, std::vector < std::string >(), outputs, "gensMyBeep");
+        createModel(name, inputs, outputs, "gensMyBeep");
         addConnection(name, "out", "counter", "in");
 
         m_stacknames.push(name);
+        printf("add_new_model finished: %s\n", name.c_str());
     }
 
     void del_first_model()
     {
+        printf("del_first_model starts\n");
         if (m_stacknames.empty()) {
-            throw utils::InternalError(boost::format(
-                    "Cannot delete any model, the executive have no "
-                    "element.").str());
+            throw utils::InternalError(
+                boost::format("Cannot delete any model, the executive have no "
+                              "element.").str());
         }
 
         delModel(m_stacknames.top());
+        printf("del_first_model finished: %s\n", m_stacknames.top().c_str());
         m_stacknames.pop();
     }
 
@@ -568,9 +654,10 @@ public:
 class Leaf : public devs::Executive
 {
 public:
-    Leaf(const devs::ExecutiveInit& mdl, const devs::InitEventList& events) :
-        devs::Executive(mdl, events)
-    {}
+    Leaf(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
+        : devs::Executive(mdl, events)
+    {
+    }
 
     virtual devs::Time init(devs::Time /* time */) override
     {
@@ -583,7 +670,7 @@ public:
     }
 
     virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList& output) const override
+                        devs::ExternalEventList &output) const override
     {
         output.emplace_back("out");
         output.back().addString("leaf");
@@ -593,9 +680,10 @@ public:
 class Root : public devs::Executive
 {
 public:
-    Root(const devs::ExecutiveInit& mdl, const devs::InitEventList& events)
+    Root(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
         : devs::Executive(mdl, events)
-    {}
+    {
+    }
 
     virtual devs::Time init(devs::Time /* time */) override
     {
@@ -619,7 +707,7 @@ public:
 
             for (; it != et; ++it)
                 if (it->first != getModelName())
-                    //and it->first != "counter")
+                    // and it->first != "counter")
                     modelname.push_back(it->first);
         }
 
@@ -635,6 +723,8 @@ DECLARE_DYNAMICS_SYMBOL(dynamics_counter, Counter)
 DECLARE_DYNAMICS_SYMBOL(dynamics_transform, Transform)
 DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionA, Confluent_transitionA)
 DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionB, Confluent_transitionB)
+DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionC, Confluent_transitionC)
+DECLARE_DYNAMICS_SYMBOL(dynamics_confluent_transitionD, Confluent_transitionD)
 DECLARE_EXECUTIVE_SYMBOL(exe_branch, Branch)
 DECLARE_EXECUTIVE_SYMBOL(exe_deleteconnection, DeleteConnection)
 DECLARE_EXECUTIVE_SYMBOL(exe_genexecutive, GenExecutive)
@@ -642,77 +732,107 @@ DECLARE_EXECUTIVE_SYMBOL(exe_leaf, Leaf)
 DECLARE_EXECUTIVE_SYMBOL(exe_root, Root)
 DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 
- void test_gensvpz()
- {
-     auto ctx = vle::utils::make_context();
-     vle::utils::Path p(DEVS_TEST_DIR);
-     vle::utils::Path::current_path(p);
+void test_normal_behaviour()
+{
+    auto ctx = vle::utils::make_context();
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
-     vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
-     devs::RootCoordinator root(ctx);
+    vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
+    devs::RootCoordinator root(ctx);
 
-     root.load(file);
-     file.clear();
-     root.init();
+    auto &dyna = file.project().dynamics().get("confluent_transitionA");
+    dyna.setLibrary("dynamics_confluent_transitionC");
+    auto &dynb = file.project().dynamics().get("confluent_transitionB");
+    dynb.setLibrary("dynamics_confluent_transitionD");
 
-     while (root.run());
-     std::unique_ptr<value::Map> out = root.outputs();
-     root.finish();
+    try {
+        root.load(file);
+        file.clear();
+        root.init();
 
+        while (root.run())
+            ;
+        std::unique_ptr<value::Map> out = root.outputs();
+        Ensures(not out);
+        root.finish();
+    } catch (const std::exception &e) {
+        EnsuresNotReached();
+    }
+}
 
-     Ensures(out);
-     EnsuresEqual(out->size(), 2);
+void test_gensvpz()
+{
+    auto ctx = vle::utils::make_context();
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
-     /* get result of simulation */
-     value::Matrix &matrix = out->getMatrix("view1");
-     std::cout << matrix << '\n';
+    vpz::Vpz file(DEVS_TEST_DIR "/gens.vpz");
+    devs::RootCoordinator root(ctx);
 
-     EnsuresEqual(matrix.rows(), (std::size_t)101);
-     EnsuresEqual(matrix.columns(), (std::size_t)3);
+    root.load(file);
+    file.clear();
+    root.init();
 
-     EnsuresEqual(value::toDouble(matrix(0, 0)), 0);
-     EnsuresEqual(value::toDouble(matrix(1, 0)), 0);
-     EnsuresEqual(value::toInteger(matrix(2, 0)), 1);
+    while (root.run())
+        ;
+    std::unique_ptr<value::Map> out = root.outputs();
+    root.finish();
 
-     EnsuresEqual(value::toDouble(matrix(0, 10)), 10);
-     EnsuresEqual(value::toDouble(matrix(1, 10)), 55);
-     EnsuresEqual(value::toInteger(matrix(2, 10)), 11);
+    Ensures(out);
+    EnsuresEqual(out->size(), 2);
 
-     EnsuresEqual(value::toDouble(matrix(0, 14)), 14);
-     Ensures(not matrix(1, 14));
-     EnsuresEqual(value::toInteger(matrix(2, 14)), 15);
+    /* get result of simulation */
+    value::Matrix &matrix = out->getMatrix("view1");
+    std::cout << matrix << '\n';
 
-     EnsuresEqual(value::toDouble(matrix(0, 31)), 31);
-     Ensures(not matrix(1, 31));
-     EnsuresEqual(value::toInteger(matrix(2, 31)), 32);
+    EnsuresEqual(matrix.rows(), (std::size_t)101);
+    EnsuresEqual(matrix.columns(), (std::size_t)3);
 
-     EnsuresEqual(value::toDouble(matrix(0, 100)), 100);
-     EnsuresEqual(value::toDouble(matrix(1, 100)), 2550);
-     EnsuresEqual(value::toInteger(matrix(2, 100)), 1);
- }
+    EnsuresEqual(value::toDouble(matrix(0, 0)), 0);
+    EnsuresEqual(value::toDouble(matrix(1, 0)), 0);
+    EnsuresEqual(value::toInteger(matrix(2, 0)), 1);
 
- void test_gens_delete_connection()
- {
-     auto ctx = vle::utils::make_context();
-     vle::utils::Path p(DEVS_TEST_DIR);
-     vle::utils::Path::current_path(p);
+    EnsuresEqual(value::toDouble(matrix(0, 10)), 10);
+    EnsuresEqual(value::toDouble(matrix(1, 10)), 55);
+    EnsuresEqual(value::toInteger(matrix(2, 10)), 11);
 
-     vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
-     devs::RootCoordinator root(ctx);
+    EnsuresEqual(value::toDouble(matrix(0, 14)), 14);
+    Ensures(not matrix(1, 14));
+    EnsuresEqual(value::toInteger(matrix(2, 14)), 15);
 
-     try {
-         root.load(file);
-         file.clear();
-         root.init();
+    EnsuresEqual(value::toDouble(matrix(0, 31)), 31);
+    Ensures(not matrix(1, 31));
+    EnsuresEqual(value::toInteger(matrix(2, 31)), 32);
 
-         while (root.run());
-         std::unique_ptr<value::Map> out = root.outputs();
-         Ensures(not out);
-         root.finish();
-     } catch (const std::exception& e) {
-         Ensures(false);
-     }
- }
+    EnsuresEqual(value::toDouble(matrix(0, 100)), 100);
+    EnsuresEqual(value::toDouble(matrix(1, 100)), 2550);
+    EnsuresEqual(value::toInteger(matrix(2, 100)), 1);
+}
+
+void test_gens_delete_connection()
+{
+    auto ctx = vle::utils::make_context();
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
+
+    vpz::Vpz file(DEVS_TEST_DIR "/gensdelete.vpz");
+    devs::RootCoordinator root(ctx);
+
+    try {
+        root.load(file);
+        file.clear();
+        root.init();
+
+        while (root.run())
+            ;
+        std::unique_ptr<value::Map> out = root.outputs();
+        Ensures(not out);
+        root.finish();
+    } catch (const std::exception &e) {
+        Ensures(false);
+    }
+}
 
 void test_gens_ordereddeleter()
 {
@@ -728,7 +848,8 @@ void test_gens_ordereddeleter()
         file.clear();
         root.init();
 
-        while (root.run());
+        while (root.run())
+            ;
         auto out = root.outputs();
         root.finish();
 
@@ -748,37 +869,71 @@ void test_gens_ordereddeleter()
     }
 }
 
- void test_confluent_transition()
- {
-     auto ctx = vle::utils::make_context();
-     vle::utils::Path p(DEVS_TEST_DIR);
-     vle::utils::Path::current_path(p);
+void test_confluent_transition()
+{
+    auto ctx = vle::utils::make_context();
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
 
-     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
-     devs::RootCoordinator root(ctx);
+    vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
+    devs::RootCoordinator root(ctx);
 
-     try {
-         root.load(file);
-         file.clear();
-         root.init();
+    try {
+        root.load(file);
+        file.clear();
+        root.init();
 
-         while (root.run());
-         std::unique_ptr<value::Map> out = root.outputs();
-         Ensures(not out);
-         root.finish();
-     } catch (const std::exception& e) {
-         Ensures(false);
-     } catch (...) {
-         Ensures(false);
-     }
- }
+        while (root.run())
+            ;
+        std::unique_ptr<value::Map> out = root.outputs();
+        Ensures(not out);
+        root.finish();
+    } catch (const std::exception &e) {
+        Ensures(false);
+    } catch (...) {
+        Ensures(false);
+    }
+}
+
+void test_confluent_transition_2()
+{
+    auto ctx = vle::utils::make_context();
+    vle::utils::Path p(DEVS_TEST_DIR);
+    vle::utils::Path::current_path(p);
+
+    vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
+    devs::RootCoordinator root(ctx);
+
+    auto &dyna = file.project().dynamics().get("confluent_transitionA");
+    dyna.setLibrary("dynamics_confluent_transitionC");
+    auto &dynb = file.project().dynamics().get("confluent_transitionB");
+    dynb.setLibrary("dynamics_confluent_transitionD");
+
+    try {
+        root.load(file);
+        file.clear();
+        root.init();
+
+        while (root.run())
+            ;
+        std::unique_ptr<value::Map> out = root.outputs();
+        Ensures(not out);
+        root.finish();
+    } catch (const std::exception &e) {
+        Ensures(false);
+    } catch (...) {
+        Ensures(false);
+    }
+}
 
 int main()
 {
+    test_normal_behaviour();
+    test_confluent_transition();
+    test_confluent_transition_2();
     test_gensvpz();
     test_gens_delete_connection();
     test_gens_ordereddeleter();
-    test_confluent_transition();
 
     return unit_test::report_errors();
 }

@@ -47,10 +47,11 @@ class Model : public vle::devs::Dynamics
     int state;
 
 public:
-    Model(const vle::devs::DynamicsInit& init,
-          const vle::devs::InitEventList& events)
+    Model(const vle::devs::DynamicsInit &init,
+          const vle::devs::InitEventList &events)
         : vle::devs::Dynamics(init, events)
-    {}
+    {
+    }
 
     virtual ~Model() = default;
 
@@ -61,7 +62,7 @@ public:
     }
 
     virtual void output(vle::devs::Time /* time */,
-                        vle::devs::ExternalEventList& output) const override
+                        vle::devs::ExternalEventList &output) const override
     {
         output.emplace_back("out");
 
@@ -74,30 +75,28 @@ public:
         return 1.;
     }
 
-    virtual void internalTransition(
-        vle::devs::Time /* time */) override
+    virtual void internalTransition(vle::devs::Time /* time */) override
     {
     }
 
-    virtual void externalTransition(
-        const vle::devs::ExternalEventList& events,
-        vle::devs::Time /* time */) override
+    virtual void externalTransition(const vle::devs::ExternalEventList &events,
+                                    vle::devs::Time /* time */) override
     {
-        for (const auto& elem : events)
+        for (const auto &elem : events)
             if (elem.onPort("x"))
                 state = 1;
     }
 
     virtual void confluentTransitions(
         vle::devs::Time time,
-        const vle::devs::ExternalEventList& extEventlist) override
+        const vle::devs::ExternalEventList &extEventlist) override
     {
         internalTransition(time);
         externalTransition(extEventlist, time);
     }
 
     virtual std::unique_ptr<vle::value::Value>
-    observation(const vle::devs::ObservationEvent& /* event */) const override
+    observation(const vle::devs::ObservationEvent & /* event */) const override
     {
         return vle::value::Integer::create(1);
     }
@@ -112,10 +111,11 @@ class ModelDbg : public vle::devs::Dynamics
     int state;
 
 public:
-    ModelDbg(const vle::devs::DynamicsInit& init,
-             const vle::devs::InitEventList& events)
+    ModelDbg(const vle::devs::DynamicsInit &init,
+             const vle::devs::InitEventList &events)
         : vle::devs::Dynamics(init, events)
-    {}
+    {
+    }
 
     virtual ~ModelDbg() = default;
 
@@ -126,7 +126,7 @@ public:
     }
 
     virtual void output(vle::devs::Time /* time */,
-                        vle::devs::ExternalEventList& output) const override
+                        vle::devs::ExternalEventList &output) const override
     {
         output.emplace_back("out");
 
@@ -135,31 +135,32 @@ public:
     }
 
     virtual vle::devs::Time timeAdvance() const override
-    { return .1; }
-
-    virtual void internalTransition(
-        vle::devs::Time /* time */) override
-    { }
-
-    virtual void externalTransition(
-        const vle::devs::ExternalEventList& events,
-        vle::devs::Time /* time */) override
     {
-        for (const auto& elem : events)
+        return .1;
+    }
+
+    virtual void internalTransition(vle::devs::Time /* time */) override
+    {
+    }
+
+    virtual void externalTransition(const vle::devs::ExternalEventList &events,
+                                    vle::devs::Time /* time */) override
+    {
+        for (const auto &elem : events)
             if (elem.onPort("x"))
                 state = 1;
     }
 
     virtual void confluentTransitions(
         vle::devs::Time time,
-        const vle::devs::ExternalEventList& extEventlist) override
+        const vle::devs::ExternalEventList &extEventlist) override
     {
         internalTransition(time);
         externalTransition(extEventlist, time);
     }
 
     virtual std::unique_ptr<vle::value::Value>
-    observation(const vle::devs::ObservationEvent& /* event */) const override
+    observation(const vle::devs::ObservationEvent & /* event */) const override
     {
         return vle::value::Integer::create(2);
     }
@@ -174,8 +175,8 @@ class Exe : public vle::devs::Executive
     int state;
 
 public:
-    Exe(const vle::devs::ExecutiveInit& init,
-        const vle::devs::InitEventList& events)
+    Exe(const vle::devs::ExecutiveInit &init,
+        const vle::devs::InitEventList &events)
         : vle::devs::Executive(init, events)
     {
     }
@@ -189,7 +190,7 @@ public:
     }
 
     virtual void output(vle::devs::Time /* time */,
-                        vle::devs::ExternalEventList& output) const override
+                        vle::devs::ExternalEventList &output) const override
     {
         output.emplace_back("out");
 
@@ -198,10 +199,11 @@ public:
     }
 
     virtual vle::devs::Time timeAdvance() const override
-    { return 2; }
+    {
+        return 2;
+    }
 
-    virtual void internalTransition(
-        vle::devs::Time /* time */) override
+    virtual void internalTransition(vle::devs::Time /* time */) override
     {
         if (state == 0) {
             addOutputPort("atom", "out2");
@@ -209,25 +211,24 @@ public:
         }
     }
 
-    virtual void externalTransition(
-        const vle::devs::ExternalEventList& events,
-        vle::devs::Time /* time */) override
+    virtual void externalTransition(const vle::devs::ExternalEventList &events,
+                                    vle::devs::Time /* time */) override
     {
-        for (const auto& elem : events)
+        for (const auto &elem : events)
             if (elem.onPort("x"))
                 state = 1;
     }
 
     virtual void confluentTransitions(
         vle::devs::Time time,
-        const vle::devs::ExternalEventList& extEventlist) override
+        const vle::devs::ExternalEventList &extEventlist) override
     {
         internalTransition(time);
         externalTransition(extEventlist, time);
     }
 
     virtual std::unique_ptr<vle::value::Value>
-    observation(const vle::devs::ObservationEvent& /* event */) const override
+    observation(const vle::devs::ObservationEvent & /* event */) const override
     {
         return vle::value::Integer::create(3);
     }
@@ -242,10 +243,11 @@ class ObservationModel : public vle::devs::Dynamics
     mutable int state;
 
 public:
-    ObservationModel(const vle::devs::DynamicsInit& init,
-          const vle::devs::InitEventList& events)
+    ObservationModel(const vle::devs::DynamicsInit &init,
+                     const vle::devs::InitEventList &events)
         : vle::devs::Dynamics(init, events)
-    {}
+    {
+    }
 
     virtual ~ObservationModel() = default;
 
@@ -255,9 +257,9 @@ public:
         return 1;
     }
 
-    virtual void output(vle::devs::Time /* time */,
-                        vle::devs::ExternalEventList& /* output */)
-        const override
+    virtual void
+    output(vle::devs::Time /* time */,
+           vle::devs::ExternalEventList & /* output */) const override
     {
         state++;
     }
@@ -267,28 +269,27 @@ public:
         return 1.;
     }
 
-    virtual void internalTransition(
-        vle::devs::Time /* time */) override
+    virtual void internalTransition(vle::devs::Time /* time */) override
     {
         state++;
     }
 
-    virtual void externalTransition(
-        const vle::devs::ExternalEventList& /* events */,
-        vle::devs::Time /* time */) override
+    virtual void
+    externalTransition(const vle::devs::ExternalEventList & /* events */,
+                       vle::devs::Time /* time */) override
     {
         state += 1000;
     }
 
     virtual void confluentTransitions(
         vle::devs::Time /* time */,
-        const vle::devs::ExternalEventList& /* extEventlist */) override
+        const vle::devs::ExternalEventList & /* extEventlist */) override
     {
         state += 1000000;
     }
 
     virtual std::unique_ptr<vle::value::Value>
-    observation(const vle::devs::ObservationEvent& /* event */) const override
+    observation(const vle::devs::ObservationEvent & /* event */) const override
     {
         return vle::value::Integer::create(state);
     }
@@ -306,10 +307,10 @@ class OutputPluginSimple : public vle::oov::Plugin
         int number;
     };
 
-    std::map <std::string, data> pp_D;
+    std::map<std::string, data> pp_D;
 
 public:
-    OutputPluginSimple(const std::string& location)
+    OutputPluginSimple(const std::string &location)
         : vle::oov::Plugin(location)
     {
         assert(location == "toto");
@@ -327,49 +328,49 @@ public:
         return false;
     }
 
-    virtual void onParameter(const std::string& /* plugin */,
-                             const std::string& /* location */,
-                             const std::string& /* file */,
+    virtual void onParameter(const std::string & /* plugin */,
+                             const std::string & /* location */,
+                             const std::string & /* file */,
                              std::unique_ptr<value::Value> /* parameters */,
-                             const double& /* time */) override
+                             const double & /* time */) override
     {
     }
 
-    virtual void onNewObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& port,
-                                 const std::string& /* view */,
-                                 const double& /* time */) override
+    virtual void onNewObservable(const std::string &simulator,
+                                 const std::string &parent,
+                                 const std::string &port,
+                                 const std::string & /* view */,
+                                 const double & /* time */) override
     {
         std::string key = parent + '.' + simulator + '.' + port;
 
-        pp_D[key] = { std::unique_ptr<vle::value::Value>(), 0 };
+        pp_D[key] = {std::unique_ptr<vle::value::Value>(), 0};
     }
 
-    virtual void onDelObservable(const std::string& /* simulator */,
-                                 const std::string& /* parent */,
-                                 const std::string& /* port */,
-                                 const std::string& /* view */,
-                                 const double& /* time */) override
+    virtual void onDelObservable(const std::string & /* simulator */,
+                                 const std::string & /* parent */,
+                                 const std::string & /* port */,
+                                 const std::string & /* view */,
+                                 const double & /* time */) override
     {
     }
 
-    virtual void onValue(const std::string& simulator,
-                         const std::string& parent,
-                         const std::string& port,
-                         const std::string& /* view */,
-                         const double& /* time */,
+    virtual void onValue(const std::string &simulator,
+                         const std::string &parent,
+                         const std::string &port,
+                         const std::string & /* view */,
+                         const double & /* time */,
                          std::unique_ptr<value::Value> value) override
     {
         std::string key = parent + '.' + simulator + '.' + port;
 
-        auto& data = pp_D[key];
+        auto &data = pp_D[key];
         data.value = std::move(value);
         data.number++;
     }
 
-    virtual std::unique_ptr<value::Matrix> finish(
-            const double& /* time */) override
+    virtual std::unique_ptr<value::Matrix>
+    finish(const double & /* time */) override
     {
         auto it = pp_D.find("depth0.atom.port");
         Ensures(it != pp_D.cend());
@@ -378,14 +379,14 @@ public:
         Ensures(it->second.value->isInteger());
         Ensures(it->second.value->toInteger().value() == 1);
 
-         it = pp_D.find("depth0.atom2.port");
+        it = pp_D.find("depth0.atom2.port");
         Ensures(it != pp_D.cend());
         EnsuresEqual(it->second.number, 101);
         Ensures(it->second.value);
         Ensures(it->second.value->isInteger());
         Ensures(it->second.value->toInteger().value() == 2);
 
-         it = pp_D.find("depth0.exe.port");
+        it = pp_D.find("depth0.exe.port");
         Ensures(it != pp_D.cend());
         EnsuresEqual(it->second.number, 101);
         Ensures(it->second.value);
@@ -401,45 +402,44 @@ public:
 
 extern "C" {
 
-    VLE_MODULE vle::devs::Dynamics* make_new_model(
-        const vle::devs::DynamicsInit& init,
-        const vle::devs::InitEventList& events)
-    {
-        return new ::Model(init, events);
-    }
+VLE_MODULE vle::devs::Dynamics *
+make_new_model(const vle::devs::DynamicsInit &init,
+               const vle::devs::InitEventList &events)
+{
+    return new ::Model(init, events);
+}
 
-    VLE_MODULE vle::devs::Dynamics* make_new_model_dbg(
-        const vle::devs::DynamicsInit& init,
-        const vle::devs::InitEventList& events)
-    {
-        return new ::ModelDbg(init, events);
-    }
+VLE_MODULE vle::devs::Dynamics *
+make_new_model_dbg(const vle::devs::DynamicsInit &init,
+                   const vle::devs::InitEventList &events)
+{
+    return new ::ModelDbg(init, events);
+}
 
-    VLE_MODULE vle::devs::Dynamics* exe_make_new_exe(
-        const vle::devs::ExecutiveInit& init,
-        const vle::devs::InitEventList& events)
-    {
-        return new ::Exe(init, events);
-    }
+VLE_MODULE vle::devs::Dynamics *
+exe_make_new_exe(const vle::devs::ExecutiveInit &init,
+                 const vle::devs::InitEventList &events)
+{
+    return new ::Exe(init, events);
+}
 
-    VLE_MODULE vle::devs::Dynamics* make_new_observation_model(
-        const vle::devs::DynamicsInit& init,
-        const vle::devs::InitEventList& events)
-    {
-        return new ::ObservationModel(init, events);
-    }
+VLE_MODULE vle::devs::Dynamics *
+make_new_observation_model(const vle::devs::DynamicsInit &init,
+                           const vle::devs::InitEventList &events)
+{
+    return new ::ObservationModel(init, events);
+}
 
-    VLE_MODULE vle::oov::Plugin* make_oovplugin(
-        const std::string& location)
-    {
-        return new ::OutputPluginSimple(location);
-    }
+VLE_MODULE vle::oov::Plugin *make_oovplugin(const std::string &location)
+{
+    return new ::OutputPluginSimple(location);
+}
 
-    VLE_MODULE vle::oov::Plugin* make_oovplugin_default(
-        const std::string& location)
-    {
-        return new ::vletest::OutputPlugin(location);
-    }
+VLE_MODULE vle::oov::Plugin *
+make_oovplugin_default(const std::string &location)
+{
+    return new ::vletest::OutputPlugin(location);
+}
 }
 
 void instantiate_mode()
@@ -468,9 +468,9 @@ void test_del_coupled_model()
     vpz::Experiment expe;
     devs::RootCoordinator root(ctx);
     devs::Coordinator coord(ctx, dyns, classes, expe);
-    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
-    vpz::CoupledModel* depth1(depth0->addCoupledModel("depth1"));
-    vpz::AtomicModel* depth2 = depth1->addAtomicModel("depth2");
+    vpz::CoupledModel *depth0 = new vpz::CoupledModel("depth0", nullptr);
+    vpz::CoupledModel *depth1(depth0->addCoupledModel("depth1"));
+    vpz::AtomicModel *depth2 = depth1->addAtomicModel("depth2");
 
     auto sim = coord.addModel(depth2);
 
@@ -495,9 +495,9 @@ void test_loading_dynamics_from_executable()
     vpz.project().experiment().views().add(
         vpz::View("The_view", vle::vpz::View::Type::TIMED, "output", 1.0));
 
-    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+    vpz::Observable &obs = vpz.project().experiment().views().addObservable(
         vpz::Observable("obs"));
-    vpz::ObservablePort& port = obs.add("port");
+    vpz::ObservablePort &port = obs.add("port");
     port.add("The_view");
 
     {
@@ -521,7 +521,7 @@ void test_loading_dynamics_from_executable()
         x.first->second.setLibrary("exe_make_new_exe");
     }
 
-    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
+    vpz::CoupledModel *depth0 = new vpz::CoupledModel("depth0", nullptr);
     auto *atom = depth0->addAtomicModel("atom");
     atom->setDynamics("dyn_1");
     atom->addOutputPort("out");
@@ -544,7 +544,8 @@ void test_loading_dynamics_from_executable()
     root.load(vpz);
     vpz.clear();
     root.init();
-    while (root.run());
+    while (root.run())
+        ;
     root.finish();
 }
 
@@ -559,18 +560,16 @@ void test_observation_event()
     vpz.project().experiment().views().addStreamOutput(
         "output", "toto", "make_oovplugin_default", "");
 
-    vpz.project().experiment().views().add(
-        vpz::View("The_view",
-                  vle::vpz::View::Type::FINISH |
-                  vle::vpz::View::Type::INTERNAL |
-                  vle::vpz::View::Type::EXTERNAL |
-                  vle::vpz::View::Type::CONFLUENT |
-                  vle::vpz::View::Type::OUTPUT,
-                  "output"));
+    vpz.project().experiment().views().add(vpz::View(
+        "The_view",
+        vle::vpz::View::Type::FINISH | vle::vpz::View::Type::INTERNAL |
+            vle::vpz::View::Type::EXTERNAL | vle::vpz::View::Type::CONFLUENT |
+            vle::vpz::View::Type::OUTPUT,
+        "output"));
 
-    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+    vpz::Observable &obs = vpz.project().experiment().views().addObservable(
         vpz::Observable("obs"));
-    vpz::ObservablePort& port = obs.add("port");
+    vpz::ObservablePort &port = obs.add("port");
     port.add("The_view");
 
     {
@@ -580,7 +579,7 @@ void test_observation_event()
         x.first->second.setLibrary("make_new_observation_model");
     }
 
-    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
+    vpz::CoupledModel *depth0 = new vpz::CoupledModel("depth0", nullptr);
     auto *atom = depth0->addAtomicModel("ObservationModel");
     atom->setDynamics("dyn_1");
     atom->addOutputPort("out");
@@ -592,7 +591,8 @@ void test_observation_event()
     root.load(vpz);
     vpz.clear();
     root.init();
-    while (root.run());
+    while (root.run())
+        ;
     std::unique_ptr<value::Map> out = root.outputs();
 
     Ensures(out);
@@ -620,18 +620,16 @@ void test_observation_event_disabled()
     vpz.project().experiment().views().addStreamOutput(
         "output", "toto", "make_oovplugin_default", "");
 
-    auto& v = vpz.project().experiment().views().add(
-        vpz::View("The_view",
-                  vle::vpz::View::Type::FINISH |
-                  vle::vpz::View::Type::INTERNAL |
-                  vle::vpz::View::Type::EXTERNAL |
-                  vle::vpz::View::Type::CONFLUENT |
-                  vle::vpz::View::Type::OUTPUT,
-                  "output"));
+    auto &v = vpz.project().experiment().views().add(vpz::View(
+        "The_view",
+        vle::vpz::View::Type::FINISH | vle::vpz::View::Type::INTERNAL |
+            vle::vpz::View::Type::EXTERNAL | vle::vpz::View::Type::CONFLUENT |
+            vle::vpz::View::Type::OUTPUT,
+        "output"));
 
-    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+    vpz::Observable &obs = vpz.project().experiment().views().addObservable(
         vpz::Observable("obs"));
-    vpz::ObservablePort& port = obs.add("port");
+    vpz::ObservablePort &port = obs.add("port");
     port.add("The_view");
 
     {
@@ -641,7 +639,7 @@ void test_observation_event_disabled()
         x.first->second.setLibrary("make_new_observation_model");
     }
 
-    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
+    vpz::CoupledModel *depth0 = new vpz::CoupledModel("depth0", nullptr);
     auto *atom = depth0->addAtomicModel("ObservationModel");
     atom->setDynamics("dyn_1");
     atom->addOutputPort("out");
@@ -656,7 +654,8 @@ void test_observation_event_disabled()
         copy.clear();
         root.init();
 
-        while (root.run());
+        while (root.run())
+            ;
 
         std::unique_ptr<value::Map> out = root.outputs();
 
@@ -674,7 +673,8 @@ void test_observation_event_disabled()
         copy.clear();
         root.init();
 
-        while (root.run());
+        while (root.run())
+            ;
 
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(out == nullptr);
@@ -691,7 +691,8 @@ void test_observation_event_disabled()
         copy.clear();
         root.init();
 
-        while (root.run());
+        while (root.run())
+            ;
 
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(out);
@@ -711,14 +712,12 @@ void test_observation_timed_disabled()
     vpz.project().experiment().views().addStreamOutput(
         "output", "toto", "make_oovplugin_default", "");
 
-    auto& v = vpz.project().experiment().views().add(
-        vpz::View("The_view",
-                  vle::vpz::View::Type::TIMED,
-                  "output", 1.0));
+    auto &v = vpz.project().experiment().views().add(
+        vpz::View("The_view", vle::vpz::View::Type::TIMED, "output", 1.0));
 
-    vpz::Observable& obs = vpz.project().experiment().views().addObservable(
+    vpz::Observable &obs = vpz.project().experiment().views().addObservable(
         vpz::Observable("obs"));
-    vpz::ObservablePort& port = obs.add("port");
+    vpz::ObservablePort &port = obs.add("port");
     port.add("The_view");
 
     {
@@ -728,7 +727,7 @@ void test_observation_timed_disabled()
         x.first->second.setLibrary("make_new_observation_model");
     }
 
-    vpz::CoupledModel* depth0 = new vpz::CoupledModel("depth0", nullptr);
+    vpz::CoupledModel *depth0 = new vpz::CoupledModel("depth0", nullptr);
     auto *atom = depth0->addAtomicModel("ObservationModel");
     atom->setDynamics("dyn_1");
     atom->addOutputPort("out");
@@ -743,7 +742,8 @@ void test_observation_timed_disabled()
         copy.clear();
         root.init();
 
-        while (root.run());
+        while (root.run())
+            ;
 
         std::unique_ptr<value::Map> out = root.outputs();
 
@@ -761,7 +761,8 @@ void test_observation_timed_disabled()
         copy.clear();
         root.init();
 
-        while (root.run());
+        while (root.run())
+            ;
 
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(out == nullptr);
@@ -778,7 +779,8 @@ void test_observation_timed_disabled()
         copy.clear();
         root.init();
 
-        while (root.run());
+        while (root.run())
+            ;
 
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(out);
