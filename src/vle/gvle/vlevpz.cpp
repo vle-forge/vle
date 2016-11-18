@@ -3777,7 +3777,7 @@ void vleVpz::save()
     saveVpz(mFilename);
     undoStack->registerSaveState();
     if (hasMeta) {
-        saveVpz(mFileNameVpm);
+        saveVpm(mFileNameVpm);
         undoStackVpm->registerSaveState();
     }
 }
