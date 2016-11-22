@@ -496,7 +496,7 @@ void PackageParser::extract(const std::string& filepath,
 
     if (not ifs)
         throw FileError(
-            (boost::format(_("Remote: fail to parse package file '%1'"))
+            (boost::format(_("Remote: fail to parse package file '%1%'"))
              % filepath).str());
 
     DescriptionParser parser(ifs, filepath);
