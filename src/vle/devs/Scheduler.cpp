@@ -103,7 +103,7 @@ void Scheduler::addExternal(Simulator *simulator,
             m_current_bag.dynamics.emplace_back(simulator);
     }
 
-    simulator->addExternalEvents(simulator, values, portname);
+    simulator->addExternalEvents(values, portname);
 
     //
     // If an external event exists in the scheduler and not for the next

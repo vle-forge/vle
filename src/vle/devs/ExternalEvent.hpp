@@ -51,19 +51,18 @@ public:
     ExternalEvent() = default;
     ExternalEvent(const ExternalEvent& other) = default;
     ExternalEvent& operator=(const ExternalEvent& other) = default;
+    ExternalEvent(ExternalEvent&& other) = default;
+    ExternalEvent& operator=(ExternalEvent&& other) = default;
     ~ExternalEvent() = default;
 
     ExternalEvent(const std::string& port)
-        : m_target(0)
-        , m_port(port)
+        : m_port(port)
     {
     }
 
-    ExternalEvent(Simulator* target,
-                  const std::shared_ptr<value::Value>& attributes,
+    ExternalEvent(const std::shared_ptr<value::Value>& attributes,
                   const std::string& port)
-        : m_target(target)
-        , m_attributes(attributes)
+        : m_attributes(attributes)
         , m_port(port)
     {
     }
@@ -71,11 +70,6 @@ public:
     const std::string& getPortName() const
     {
         return m_port;
-    }
-
-    Simulator* getTarget()
-    {
-        return m_target;
     }
 
     bool onPort(const std::string& port) const
@@ -410,7 +404,6 @@ public:
     }
 
 private:
-    Simulator                      *m_target;
     std::shared_ptr <value::Value>  m_attributes;
     std::string                     m_port;
 

@@ -190,11 +190,10 @@ public:
         return not m_external_events.empty();
     }
 
-    inline void addExternalEvents(Simulator *simulator,
-                                  std::shared_ptr<value::Value> values,
+    inline void addExternalEvents(std::shared_ptr<value::Value> values,
                                   const std::string &portname)
     {
-        m_external_events.emplace_back(simulator, values, portname);
+        m_external_events.emplace_back(values, portname);
     }
 
     inline void setInternalEvent() noexcept
