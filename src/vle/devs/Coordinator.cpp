@@ -24,30 +24,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Thread.hpp"
+#include <boost/bind.hpp>
+#include <functional>
 #include <vle/devs/Coordinator.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/Simulator.hpp>
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
+#include <vle/devs/InternalEvent.hpp>
+#include <vle/devs/Simulator.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
-#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include "Thread.hpp"
-#include <functional>
-#include <boost/bind.hpp>
 
 using std::vector;
 using std::map;
 using std::string;
 using std::pair;
 
-namespace
-{
+namespace {
 
 /** Compute the depth of the hierarchy.
  *
@@ -68,10 +67,8 @@ inline int depth(const std::unique_ptr<vle::devs::Dynamics> &mdl) noexcept
 }
 }
 
-namespace vle
-{
-namespace devs
-{
+namespace vle {
+namespace devs {
 
 Coordinator::Coordinator(utils::ContextPtr context,
                          const vpz::Dynamics &dyn,
@@ -99,12 +96,34 @@ void Coordinator::init(const vpz::Model &mdls, Time current, Time duration)
 void Coordinator::run()
 {
     Bag &bag = m_eventTable.getCurrentBag();
-    if (not bag.empty())
+    if (not bag.dynamics.empty() or not bag.executives.empty())
         m_currentTime = m_eventTable.getCurrentTime();
     else
         vDbg(m_context, "Coordinator::run bag is empty...\n");
 
     vDbg(m_context, _("-------- BAG [%f] --------\n"), m_currentTime);
+
+    //
+    // Call output functions for all executives and dynamics models then
+    // dispatches external events for all executives and dynamics.
+    //
+
+    const std::size_t nb_dynamics = bag.dynamics.size();
+    const std::size_t nb_executive = bag.executives.size();
+
+    if (nb_dynamics > 0) {
+        for (std::size_t i = 0; i != nb_dynamics; ++i)
+            bag.dynamics[i]->output(m_currentTime);
+
+        dispatchExternalEvent(bag.dynamics, nb_dynamics);
+    }
+
+    if (nb_executive > 0) {
+        for (std::size_t i = 0; i != nb_executive; ++i)
+            bag.executives[i]->output(m_currentTime);
+
+        dispatchExternalEvent(bag.executives, nb_executive);
+    }
 
     //
     // First we sort executives models according to the depth of the executive
@@ -120,41 +139,22 @@ void Coordinator::run()
     }
 
     //
-    // Call output functions for all executives and dynamics models then
-    // dispatch external events for all executives and dynamics.
-    //
-
-    if (not bag.dynamics.empty()) {
-        for (auto &elem : bag.dynamics)
-            if (elem->haveInternalEvent())
-                elem->output(m_currentTime);
-
-        dispatchExternalEvent(bag.dynamics);
-    }
-
-    if (not bag.executives.empty()) {
-        for (auto &elem : bag.executives)
-            if (elem->haveInternalEvent())
-                elem->output(m_currentTime);
-
-        dispatchExternalEvent(bag.executives);
-    }
-
-    //
     // Compute internal, confluent or external transition for dynamics models.
     // If parallelization is available, use it otherwise, compute transition
     // linearly.
     //
     if (m_simulators_thread_pool.parallelize()) {
         m_simulators_thread_pool.for_each(bag.dynamics, m_currentTime);
-    } else {
+    }
+    else {
         for (auto &elem : bag.dynamics) {
             if (elem->haveInternalEvent()) {
                 if (not elem->haveExternalEvents())
                     elem->internalTransition(m_currentTime);
                 else
                     elem->confluentTransitions(m_currentTime);
-            } else {
+            }
+            else {
                 elem->externalTransition(m_currentTime);
             }
         }
@@ -172,7 +172,8 @@ void Coordinator::run()
                 elem->internalTransition(m_currentTime);
             else
                 elem->confluentTransitions(m_currentTime);
-        } else {
+        }
+        else {
             elem->externalTransition(m_currentTime);
         }
     }
@@ -441,12 +442,10 @@ void Coordinator::addModels(const vpz::Model &model)
     m_modelFactory.createModels(*this, model);
 }
 
-void Coordinator::dispatchExternalEvent(std::vector<Simulator *> &simulators)
+void Coordinator::dispatchExternalEvent(std::vector<Simulator *> &simulators,
+                                        const std::size_t number)
 {
-    // We use index to browse the std::vector<Simulator*> since this vector
-    // size can grow when the m_eventTable.addExternal is call.
-
-    for (std::size_t i = 0, end_i = simulators.size(); i != end_i; ++i) {
+    for (std::size_t i = 0; i != number; ++i) {
         if (simulators[i]->result().empty())
             continue;
 
@@ -495,7 +494,8 @@ void Coordinator::buildViews()
 
                 m_timed_observation_scheduler.add(
                     &v, m_currentTime, elem.second.timestep());
-            } else {
+            }
+            else {
                 auto &v = m_eventViewList[elem.second.name()];
 
                 v.open(m_context,

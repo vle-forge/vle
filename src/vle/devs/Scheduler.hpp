@@ -27,17 +27,16 @@
 #ifndef VLE_DEVS_SCHEDULER_HPP
 #define VLE_DEVS_SCHEDULER_HPP
 
+#include <boost/heap/fibonacci_heap.hpp>
+#include <map>
+#include <unordered_set>
+#include <vector>
 #include <vle/DllDefines.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ViewEvent.hpp>
-#include <map>
-#include <vector>
-#include <boost/heap/fibonacci_heap.hpp>
 
-namespace vle
-{
-namespace devs
-{
+namespace vle {
+namespace devs {
 
 class Simulator;
 
@@ -116,24 +115,22 @@ using Heap =
 
 using HandleT = Heap::handle_type;
 
+/**
+ * @brief Bag stores \e Simulator that need to be call in this bag.
+ *
+ */
 struct Bag {
     std::vector<Simulator *> dynamics;
     std::vector<Simulator *> executives;
 
-    void clear() noexcept
-    {
-        dynamics.clear();
-        executives.clear();
-    }
-
-    bool empty() const noexcept
-    {
-        return dynamics.empty() and executives.empty();
-    }
+    //
+    // \e unique_simulators is used to ensures that \e dynamics and \e
+    // executives vectors have unique pointer through a \e simulator object.
+    //
+    std::unordered_set<Simulator *> unique_simulators;
 };
 
-class VLE_LOCAL Scheduler
-{
+class VLE_LOCAL Scheduler {
 public:
     Scheduler()
         : m_current_time(negativeInfinity)
@@ -155,15 +152,9 @@ public:
                      const std::string &portname);
     void delSimulator(Simulator *simulator);
 
-    Bag &getCurrentBag() noexcept
-    {
-        return m_current_bag;
-    }
+    Bag &getCurrentBag() noexcept { return m_current_bag; }
 
-    Time getCurrentTime() const noexcept
-    {
-        return m_current_time;
-    }
+    Time getCurrentTime() const noexcept { return m_current_time; }
 
     Time getNextTime() const noexcept
     {
@@ -181,8 +172,7 @@ private:
     Time m_current_time;
 };
 
-class VLE_LOCAL TimedObservationScheduler
-{
+class VLE_LOCAL TimedObservationScheduler {
     std::vector<ViewEvent> m_observation;
 
 public:

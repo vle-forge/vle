@@ -27,17 +27,16 @@
 #ifndef VLE_DEVS_THREAD_HPP
 #define VLE_DEVS_THREAD_HPP
 
+#include <atomic>
+#include <chrono>
+#include <thread>
+#include <vle/devs/Simulator.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/i18n.hpp>
-#include <thread>
-#include <atomic>
-#include <chrono>
 
-namespace vle
-{
-namespace devs
-{
+namespace vle {
+namespace devs {
 
 template <typename SimulatorT>
 bool simulator_process(SimulatorT *simulator, Time time) noexcept
@@ -48,18 +47,19 @@ bool simulator_process(SimulatorT *simulator, Time time) noexcept
                 simulator->internalTransition(time);
             else
                 simulator->confluentTransitions(time);
-        } else {
+        }
+        else {
             simulator->externalTransition(time);
         }
-    } catch (...) {
+    }
+    catch (...) {
         return false;
     }
 
     return true;
 }
 
-class SimulatorProcessParallel
-{
+class SimulatorProcessParallel {
     std::vector<std::thread> m_workers;
     std::atomic<long int> m_block_id;
     std::atomic<long int> m_block_count;
@@ -83,7 +83,8 @@ class SimulatorProcessParallel
                     simulator_process((*m_jobs)[begin], m_time);
 
                 m_block_count.fetch_sub(1, std::memory_order_relaxed);
-            } else {
+            }
+            else {
                 //
                 // TODO: Maybe we can use a yield instead of this
                 // sleep_for function to reduce the overhead of the
@@ -129,7 +130,8 @@ public:
             m_workers.reserve(workers_count);
             for (long i = 0; i != workers_count; ++i)
                 m_workers.emplace_back(&SimulatorProcessParallel::run, this);
-        } catch (...) {
+        }
+        catch (...) {
             m_running_flag.store(false, std::memory_order_relaxed);
             throw;
         }
@@ -144,10 +146,7 @@ public:
                 thread.join();
     }
 
-    bool parallelize() const noexcept
-    {
-        return not m_workers.empty();
-    }
+    bool parallelize() const noexcept { return not m_workers.empty(); }
 
     bool for_each(std::vector<Simulator *> &simulators, Time time) noexcept
     {
