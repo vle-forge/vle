@@ -36,10 +36,8 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 
-namespace vle
-{
-namespace translator
-{
+namespace vle {
+namespace translator {
 
 using graphT =
     boost::adjacency_list<boost::vecS,
@@ -110,6 +108,8 @@ void build(const graph_generator::parameter &params,
                 for (; ei != ei_end; ++ei) {
                     src = modelnames[boost::source(*ei, g)];
                     dst = modelnames[boost::target(*ei, g)];
+                    executive.addOutputPort(src, "out");
+                    executive.addInputPort(dst, "in");
                     executive.addConnection(src, "out", dst, "in");
                 }
             }
@@ -120,6 +120,8 @@ void build(const graph_generator::parameter &params,
                 for (; ei != ei_end; ++ei) {
                     src = modelnames[boost::source(*ei, g)];
                     dst = modelnames[boost::target(*ei, g)];
+                    executive.addOutputPort(src, dst);
+                    executive.addInputPort(dst, "in");
                     executive.addConnection(src, dst, dst, "in");
                 }
             }
@@ -130,6 +132,8 @@ void build(const graph_generator::parameter &params,
                 for (; ei != ei_end; ++ei) {
                     src = modelnames[boost::source(*ei, g)];
                     dst = modelnames[boost::target(*ei, g)];
+                    executive.addOutputPort(src, "out");
+                    executive.addInputPort(dst, src);
                     executive.addConnection(src, "out", dst, src);
                 }
             }
@@ -140,6 +144,8 @@ void build(const graph_generator::parameter &params,
                 for (; ei != ei_end; ++ei) {
                     src = modelnames[boost::source(*ei, g)];
                     dst = modelnames[boost::target(*ei, g)];
+                    executive.addOutputPort(src, dst);
+                    executive.addInputPort(dst, src);
                     executive.addConnection(src, dst, dst, src);
                 }
             }
