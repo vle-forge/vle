@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_ARRAY_HPP
 #define VLE_UTILS_ARRAY_HPP
 
-#include <vle/utils/Exception.hpp>
 #include <vector>
+#include <vle/utils/Exception.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * An \e Array defined a two-dimensional template array. Informations are
@@ -40,9 +40,7 @@ namespace vle { namespace utils {
  * \tparam T Type of element
  * \tparam Containre Type of container to store two-dimensional array.
  */
-template <typename T, class Container = std::vector<T>>
-class Array
-{
+template <typename T, class Container = std::vector<T>> class Array {
 public:
     using container_type = Container;
     using value_type = T;
@@ -63,31 +61,36 @@ public:
     Array();
 
     explicit Array(size_type cols, size_type rows);
-    explicit Array(size_type cols, size_type rows, const value_type& value);
+    explicit Array(size_type cols, size_type rows, const value_type &value);
 
     ~Array() = default;
 
-    Array(const Array& q) = default;
-    Array(Array&& q) = default;
+    Array(const Array &q) = default;
+    Array(Array &&q) = default;
 
-    Array& operator=(const Array& q) = default;
-    Array& operator=(Array&& q) = default;
+    Array &operator=(const Array &q) = default;
+    Array &operator=(Array &&q) = default;
+
+    Array &operator=(std::initializer_list<value_type> init);
 
     void resize(size_type cols, size_type rows);
-    void resize(size_type cols, size_type rows, const value_type& value);
+    void resize(size_type cols, size_type rows, const value_type &value);
 
-    iterator               begin() noexcept;
-    const_iterator         begin() const noexcept;
-    iterator               end() noexcept;
-    const_iterator         end() const noexcept;
+    template <class InputIterator>
+    void assign(InputIterator first, InputIterator last);
 
-    reverse_iterator       rbegin() noexcept;
+    iterator begin() noexcept;
+    const_iterator begin() const noexcept;
+    iterator end() noexcept;
+    const_iterator end() const noexcept;
+
+    reverse_iterator rbegin() noexcept;
     const_reverse_iterator rbegin() const noexcept;
-    reverse_iterator       rend() noexcept;
+    reverse_iterator rend() noexcept;
     const_reverse_iterator rend() const noexcept;
 
-    const_iterator         cbegin() const noexcept;
-    const_iterator         cend() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
     const_reverse_iterator crbegin() const noexcept;
     const_reverse_iterator crend() const noexcept;
 
@@ -97,16 +100,16 @@ public:
     size_type rows() const noexcept;
     size_type columns() const noexcept;
 
-    void set(size_type col, size_type row, const value_type& x);
-    void set(size_type col, size_type row, value_type&& x);
+    void set(size_type col, size_type row, const value_type &x);
+    void set(size_type col, size_type row, value_type &&x);
 
     template <class... Args>
-    void emplace(size_type col, size_type row, Args&&... args);
+    void emplace(size_type col, size_type row, Args &&... args);
 
     const_reference operator()(size_type col, size_type row) const;
     reference operator()(size_type col, size_type row);
 
-    void swap(Array& c) noexcept(noexcept(swap(m_c, c.m_c)));
+    void swap(Array &c) noexcept(noexcept(swap(m_c, c.m_c)));
 
 private:
     void m_check_index(size_type col, size_type) const;
@@ -117,7 +120,8 @@ Array<T, Container>::Array()
     : m_c()
     , m_rows(0)
     , m_columns(0)
-{}
+{
+}
 
 template <typename T, class Container>
 Array<T, Container>::Array(size_type columns, size_type rows)
@@ -128,8 +132,9 @@ Array<T, Container>::Array(size_type columns, size_type rows)
 }
 
 template <typename T, class Container>
-Array<T, Container>::Array(size_type columns, size_type rows,
-                           const value_type& value)
+Array<T, Container>::Array(size_type columns,
+                           size_type rows,
+                           const value_type &value)
     : m_c(rows * columns, value)
     , m_rows(rows)
     , m_columns(columns)
@@ -137,8 +142,15 @@ Array<T, Container>::Array(size_type columns, size_type rows,
 }
 
 template <typename T, class Container>
-void
-Array<T, Container>::resize(size_type cols, size_type rows)
+Array<T, Container> &Array<T, Container>::
+operator=(std::initializer_list<value_type> init)
+{
+    assign(init.begin(), init.end());
+    return *this;
+}
+
+template <typename T, class Container>
+void Array<T, Container>::resize(size_type cols, size_type rows)
 {
     container_type new_c(rows * cols);
 
@@ -155,9 +167,9 @@ Array<T, Container>::resize(size_type cols, size_type rows)
 }
 
 template <typename T, class Container>
-void
-Array<T, Container>::resize(size_type cols, size_type rows,
-                            const value_type& value)
+void Array<T, Container>::resize(size_type cols,
+                                 size_type rows,
+                                 const value_type &value)
 {
     m_c.resize(rows * cols);
     m_rows = rows;
@@ -167,29 +179,40 @@ Array<T, Container>::resize(size_type cols, size_type rows,
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::iterator
-Array<T, Container>::begin() noexcept
+template <class InputIterator>
+void Array<T, Container>::assign(InputIterator first, InputIterator last)
+{
+    for (size_type r = 0; r != m_rows; ++r) {
+        for (size_type c = 0; c != m_columns; ++c) {
+            set(c, r, *first++);
+            if (first == last)
+                return;
+        }
+    }
+}
+
+template <typename T, class Container>
+typename Array<T, Container>::iterator Array<T, Container>::begin() noexcept
 {
     return m_c.begin();
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::const_iterator
-Array<T, Container>::begin() const noexcept
+typename Array<T, Container>::const_iterator Array<T, Container>::begin() const
+    noexcept
 {
     return m_c.begin();
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::iterator
-Array<T, Container>::end() noexcept
+typename Array<T, Container>::iterator Array<T, Container>::end() noexcept
 {
     return m_c.end();
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::const_iterator
-Array<T, Container>::end() const noexcept
+typename Array<T, Container>::const_iterator Array<T, Container>::end() const
+    noexcept
 {
     return m_c.end();
 }
@@ -230,8 +253,8 @@ Array<T, Container>::cbegin() const noexcept
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::const_iterator
-Array<T, Container>::cend() const noexcept
+typename Array<T, Container>::const_iterator Array<T, Container>::cend() const
+    noexcept
 {
     return m_c.cend();
 }
@@ -251,57 +274,53 @@ Array<T, Container>::crend() const noexcept
 }
 
 template <typename T, class Container>
-bool
-Array<T, Container>::empty() const noexcept
+bool Array<T, Container>::empty() const noexcept
 {
     return m_c.empty();
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::size_type
-Array<T, Container>::size() const noexcept
+typename Array<T, Container>::size_type Array<T, Container>::size() const
+    noexcept
 {
     return m_c.size();
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::size_type
-Array<T, Container>::rows() const noexcept
+typename Array<T, Container>::size_type Array<T, Container>::rows() const
+    noexcept
 {
     return m_rows;
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::size_type
-Array<T, Container>::columns() const noexcept
+typename Array<T, Container>::size_type Array<T, Container>::columns() const
+    noexcept
 {
     return m_columns;
 }
 
 template <typename T, class Container>
-void
-Array<T, Container>::set(size_type column, size_type row,
-                         const value_type& x)
+void Array<T, Container>::set(size_type column,
+                              size_type row,
+                              const value_type &x)
 {
     m_check_index(column, row);
     m_c[row * m_columns + column] = x;
 }
 
 template <typename T, class Container>
-void
-Array<T, Container>::set(size_type column, size_type row,
-                         value_type&& x)
+void Array<T, Container>::set(size_type column, size_type row, value_type &&x)
 {
     m_check_index(column, row);
-    m_c.emplace(std::begin(m_c) + (row * m_columns + column),
-                std::move(x));
+    m_c.emplace(std::begin(m_c) + (row * m_columns + column), std::move(x));
 }
 
 template <typename T, class Container>
 template <class... Args>
-void
-Array<T, Container>::emplace(size_type column, size_type row,
-                             Args&&... args)
+void Array<T, Container>::emplace(size_type column,
+                                  size_type row,
+                                  Args &&... args)
 {
     m_check_index(column, row);
     m_c.emplace(std::begin(m_c) + (row * m_columns + column),
@@ -309,24 +328,23 @@ Array<T, Container>::emplace(size_type column, size_type row,
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::const_reference
-Array<T, Container>::operator()(size_type column, size_type row) const
+typename Array<T, Container>::const_reference Array<T, Container>::
+operator()(size_type column, size_type row) const
 {
     m_check_index(column, row);
     return m_c[row * m_columns + column];
 }
 
 template <typename T, class Container>
-typename Array<T, Container>::reference
-Array<T, Container>::operator()(size_type column, size_type row)
+typename Array<T, Container>::reference Array<T, Container>::
+operator()(size_type column, size_type row)
 {
     m_check_index(column, row);
     return m_c[row * m_columns + column];
 }
 
 template <typename T, class Container>
-void
-Array<T, Container>::swap(Array& c) noexcept(noexcept(swap(m_c, c.m_c)))
+void Array<T, Container>::swap(Array &c) noexcept(noexcept(swap(m_c, c.m_c)))
 {
     std::swap(m_c, c.m_c);
     std::swap(m_columns, c.m_columns);
@@ -334,13 +352,12 @@ Array<T, Container>::swap(Array& c) noexcept(noexcept(swap(m_c, c.m_c)))
 }
 
 template <typename T, class Container>
-void
-Array<T, Container>::m_check_index(size_type column, size_type row) const
+void Array<T, Container>::m_check_index(size_type column, size_type row) const
 {
     if (column >= m_columns or row >= m_rows)
         throw vle::utils::ArgError("Array: bad access");
 }
-
-}} // namespace vle value
+}
+} // namespace vle value
 
 #endif
