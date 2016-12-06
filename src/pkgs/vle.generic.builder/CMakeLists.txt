@@ -10,7 +10,7 @@ function(DeclareSimulator targetname package name sources)
   add_library(${targetname} MODULE ${sources})
 
   target_link_libraries(${targetname}
-    ${VLE_LIBRARIES})
+    vlelib ${VLE_LIBRARIES})
 
   set_target_properties(${targetname} PROPERTIES
     OUTPUT_NAME ${name}
