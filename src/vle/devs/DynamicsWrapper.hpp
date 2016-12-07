@@ -24,37 +24,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DEVS_DYNAMICSWRAPPER_HPP
 #define DEVS_DYNAMICSWRAPPER_HPP
 
+#include <string>
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/version.hpp>
-#include <string>
+#include <vle/vle.hpp>
 
-#define DECLARE_DYNAMICSWRAPPER(mdl)                                    \
-    extern "C" {                                                        \
-        VLE_MODULE vle::devs::Dynamics*                                 \
-        vle_make_new_dynamics_wrapper(                                  \
-            const vle::devs::DynamicsWrapperInit& init,                 \
-            const vle::devs::InitEventList& events)                     \
-        {                                                               \
-            return new mdl(init, events);                               \
-        }                                                               \
-                                                                        \
-        VLE_MODULE void                                                 \
-        vle_api_level(std::uint32_t* major,                             \
-                      std::uint32_t* minor,                             \
-                      std::uint32_t* patch)                             \
-        {                                                               \
-            *major = VLE_MAJOR_VERSION;                                 \
-            *minor = VLE_MINOR_VERSION;                                 \
-            *patch = VLE_PATCH_VERSION;                                 \
-        }                                                               \
+#define DECLARE_DYNAMICSWRAPPER(mdl)                                          \
+    extern "C" {                                                              \
+    VLE_MODULE vle::devs::Dynamics *                                          \
+    vle_make_new_dynamics_wrapper(const vle::devs::DynamicsWrapperInit &init, \
+                                  const vle::devs::InitEventList &events)     \
+    {                                                                         \
+        return new mdl(init, events);                                         \
+    }                                                                         \
+                                                                              \
+    VLE_MODULE void vle_api_level(std::uint32_t *major,                       \
+                                  std::uint32_t *minor,                       \
+                                  std::uint32_t *patch)                       \
+    {                                                                         \
+        auto version = vle::version();                                        \
+        *major = std::get<0>(version);                                        \
+        *minor = std::get<1>(version);                                        \
+        *patch = std::get<2>(version);                                        \
+    }                                                                         \
     }
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 struct DynamicsWrapperInit;
 
@@ -64,22 +63,20 @@ struct DynamicsWrapperInit;
  * programming language.
  *
  */
-class VLE_API DynamicsWrapper : public Dynamics
-{
+class VLE_API DynamicsWrapper : public Dynamics {
 public:
     /**
      * @brief Constructor of the dynamics wrapper of an atomic model
      * @param model the atomic model to which belongs the dynamics
      */
-    DynamicsWrapper(const DynamicsWrapperInit& init,
-                    const devs::InitEventList& events);
+    DynamicsWrapper(const DynamicsWrapperInit &init,
+                    const devs::InitEventList &events);
 
     /**
      * @brief Destructor (nothing to do).
      * @return none
      */
-    virtual ~DynamicsWrapper()
-    {}
+    virtual ~DynamicsWrapper() {}
 
     /**
      * @brief If this function return true, then a cast to a DynamicsWrapper
@@ -87,13 +84,12 @@ public:
      * call.
      * @return false if Dynamics is not a DynamicsWrapper.
      */
-    inline virtual bool isWrapper() const override
-    { return true; }
+    inline virtual bool isWrapper() const override { return true; }
 
 protected:
     std::string m_library;
 };
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

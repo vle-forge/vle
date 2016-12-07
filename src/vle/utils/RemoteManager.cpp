@@ -24,45 +24,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/RemoteManager.hpp>
-#include <vle/utils/ContextPrivate.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/cast.hpp>
+#include <boost/lexical_cast.hpp>
+#include <fstream>
+#include <iostream>
+#include <ostream>
+#include <regex>
+#include <string>
+#include <thread>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Package.hpp>
+#include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/details/Package.hpp>
-#include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/details/PackageManager.hpp>
-#include <vle/utils/Filesystem.hpp>
-#include <vle/version.hpp>
-#include <thread>
-#include <fstream>
-#include <ostream>
-#include <iostream>
-#include <string>
-#include <regex>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/cast.hpp>
+#include <vle/utils/details/PackageParser.hpp>
+#include <vle/utils/i18n.hpp>
 
 #define PACKAGESID_VECTOR_RESERVED_SIZE 100u
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
-static std::ostream& operator<<(std::ostream& os, const PackageLinkId& b)
+static std::ostream &operator<<(std::ostream &os, const PackageLinkId &b)
 {
-    static const char *sym[5] = { "=", "<", "<=", ">", ">=" };
+    static const char *sym[5] = {"=", "<", "<=", ">", ">="};
 
     os << b.name;
 
     if (b.major >= 0) {
         assert((unsigned)b.op < 5);
 
-        os << " (" << sym[static_cast < unsigned >(b.op)] << " " << b.major;
+        os << " (" << sym[static_cast<unsigned>(b.op)] << " " << b.major;
 
         if (b.minor >= 0) {
             os << "." << b.minor;
@@ -78,37 +77,29 @@ static std::ostream& operator<<(std::ostream& os, const PackageLinkId& b)
     return os;
 }
 
-static std::ostream& operator<<(std::ostream& os, const PackagesLinkId& b)
+static std::ostream &operator<<(std::ostream &os, const PackagesLinkId &b)
 {
-    utils::formatCopy(b.begin(),
-                      b.end(),
-                      os,
-                      ", ",
-                      std::string(),
-                      std::string());
+    utils::formatCopy(
+        b.begin(), b.end(), os, ", ", std::string(), std::string());
 
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const PackageId& b)
+std::ostream &operator<<(std::ostream &os, const PackageId &b)
 {
-    os << "Package: " <<  b.name << "\n"
-       << "Version: " << b.major
-       << "." << b.minor
-       << "." << b.patch << "\n"
+    os << "Package: " << b.name << "\n"
+       << "Version: " << b.major << "." << b.minor << "." << b.patch << "\n"
        << "Depends: " << b.depends << "\n"
        << "Build-Depends: " << b.builddepends << "\n"
        << "Conflicts: " << b.conflicts << "\n"
        << "Maintainer: " << b.maintainer << "\n"
-       << "Description: " << b.description << "\n" << " ." << "\n"
+       << "Description: " << b.description << "\n"
+       << " ."
+       << "\n"
        << "Tags: ";
 
-    utils::formatCopy(b.tags.begin(),
-                      b.tags.end(),
-                      os,
-                      ", ",
-                      std::string(),
-                      std::string());
+    utils::formatCopy(
+        b.tags.begin(), b.tags.end(), os, ", ", std::string(), std::string());
 
     return os << "\n"
               << "Url: " << b.url << "\n"
@@ -116,8 +107,7 @@ std::ostream& operator<<(std::ostream& os, const PackageId& b)
               << "MD5sum: " << b.md5sum << "\n";
 }
 
-class RemoteManager::Pimpl
-{
+class RemoteManager::Pimpl {
 public:
     Pimpl(ContextPtr ctx)
         : mContext(ctx)
@@ -147,12 +137,14 @@ public:
         try {
             join();
             save();
-        } catch (...) {
+        }
+        catch (...) {
         }
     }
 
-    void start(RemoteManagerActions action, const std::string& arg,
-               std::ostream* out)
+    void start(RemoteManagerActions action,
+               const std::string &arg,
+               std::ostream *out)
     {
         if (not mIsStarted) {
             mIsStarted = true;
@@ -165,35 +157,33 @@ public:
 
             switch (action) {
             case REMOTE_MANAGER_UPDATE:
-                mThread = std::thread(
-                    &RemoteManager::Pimpl::actionUpdate, this);
+                mThread =
+                    std::thread(&RemoteManager::Pimpl::actionUpdate, this);
                 break;
             case REMOTE_MANAGER_SOURCE:
-                mThread = std::thread(
-                    &RemoteManager::Pimpl::actionSource, this);
+                mThread =
+                    std::thread(&RemoteManager::Pimpl::actionSource, this);
                 break;
             case REMOTE_MANAGER_INSTALL:
-                mThread = std::thread(
-                    &RemoteManager::Pimpl::actionInstall, this);
+                mThread =
+                    std::thread(&RemoteManager::Pimpl::actionInstall, this);
                 break;
             case REMOTE_MANAGER_LOCAL_SEARCH:
-                mThread = std::thread(
-                    &RemoteManager::Pimpl::actionLocalSearch, this);
+                mThread = std::thread(&RemoteManager::Pimpl::actionLocalSearch,
+                                      this);
                 break;
             case REMOTE_MANAGER_SEARCH:
-                mThread = std::thread(
-                    &RemoteManager::Pimpl::actionSearch, this);
+                mThread =
+                    std::thread(&RemoteManager::Pimpl::actionSearch, this);
                 break;
             case REMOTE_MANAGER_SHOW:
-                mThread = std::thread(
-                    &RemoteManager::Pimpl::actionShow, this);
+                mThread = std::thread(&RemoteManager::Pimpl::actionShow, this);
                 break;
             case REMOTE_MANAGER_LOCAL_SHOW:
-                mThread = std::thread(
-                    &RemoteManager::Pimpl::actionLocalShow, this);
+                mThread =
+                    std::thread(&RemoteManager::Pimpl::actionLocalShow, this);
                 break;
-            default:
-                break;
+            default: break;
             }
         }
     }
@@ -204,9 +194,11 @@ public:
             if (mIsStarted and not mIsFinish and mThread.joinable()) {
                 mThread.join();
             }
-        } catch (const std::exception& e) {
-            vErr(mContext, _("Remote: internal error joining thread:`%s'\n"),
-                    e.what());
+        }
+        catch (const std::exception &e) {
+            vErr(mContext,
+                 _("Remote: internal error joining thread:`%s'\n"),
+                 e.what());
         }
     }
 
@@ -221,7 +213,7 @@ public:
      *
      * @param t
      */
-    template < typename T > void out(const T& t)
+    template <typename T> void out(const T &t)
     {
         if (mStream)
             *mStream << t;
@@ -231,19 +223,17 @@ public:
      * A functor to check if a @c Packages::value_type corresponds to the
      * regular expression provided in constructor.
      */
-    struct NotHaveExpression
-        : std::unary_function < PackageId, bool >
-    {
-        const std::regex& expression;
+    struct NotHaveExpression : std::unary_function<PackageId, bool> {
+        const std::regex &expression;
 
-        NotHaveExpression(const std::regex& expression)
+        NotHaveExpression(const std::regex &expression)
             : expression(expression)
         {
         }
 
-        bool operator()(const PackageId& pkg) const
+        bool operator()(const PackageId &pkg) const
         {
-            std::match_results < std::string::const_iterator > what;
+            std::match_results<std::string::const_iterator> what;
 
             if (std::regex_search(pkg.name,
                                   what,
@@ -267,29 +257,31 @@ public:
     {
         try {
             std::ofstream file;
-            file.exceptions(std::ios_base::eofbit |
-                            std::ios_base::failbit |
+            file.exceptions(std::ios_base::eofbit | std::ios_base::failbit |
                             std::ios_base::badbit);
 
             file.open(mContext->getLocalPackageFilename().string());
             file << local << std::endl;
-        } catch (const std::exception& e) {
-            vErr(mContext, _("Remote: failed to write local package `%s': %s\n"),
+        }
+        catch (const std::exception &e) {
+            vErr(mContext,
+                 _("Remote: failed to write local package `%s': %s\n"),
                  mContext->getLocalPackageFilename().string().c_str(),
                  e.what());
         }
 
-        try  {
+        try {
             std::ofstream file;
-            file.exceptions(std::ios_base::eofbit |
-                            std::ios_base::failbit |
+            file.exceptions(std::ios_base::eofbit | std::ios_base::failbit |
                             std::ios_base::badbit);
 
             file.open(mContext->getRemotePackageFilename().string());
             file << remote << std::endl;
-        } catch (const std::exception& e) {
-            vErr(mContext, _("Remote: failed to write remote package `%s': "
-                             "%s\n"),
+        }
+        catch (const std::exception &e) {
+            vErr(mContext,
+                 _("Remote: failed to write remote package `%s': "
+                   "%s\n"),
                  mContext->getRemotePackageFilename().string().c_str(),
                  e.what());
         }
@@ -299,19 +291,20 @@ public:
     // threaded slot
     //
 
-    struct Download
-        : public std::unary_function < std::string, void >
-    {
+    struct Download : public std::unary_function<std::string, void> {
         ContextPtr context;
-        PackageParser* parser;
-        bool* remoteHasError;
-        std::string* remoteMessageError;
+        PackageParser *parser;
+        bool *remoteHasError;
+        std::string *remoteMessageError;
 
-
-        Download(ContextPtr ctx, PackageParser *parser, bool *remoteHasError,
-                std::string* remoteMessageError)
-            : context(ctx), parser(parser), remoteHasError(remoteHasError),
-              remoteMessageError(remoteMessageError)
+        Download(ContextPtr ctx,
+                 PackageParser *parser,
+                 bool *remoteHasError,
+                 std::string *remoteMessageError)
+            : context(ctx)
+            , parser(parser)
+            , remoteHasError(remoteHasError)
+            , remoteMessageError(remoteMessageError)
         {
             assert(parser);
         }
@@ -331,18 +324,22 @@ public:
             if (not dl.hasError()) {
                 try {
                     parser->extract(filename.string(), url);
-                } catch (const utils::FileError& err) {
-                    *remoteHasError = true;
-                    remoteMessageError->assign((vle::fmt(
-                            "failed while parsing packages.pkg file: %1%\n")
-                                % err.what()).str());
-
                 }
-            } else {
+                catch (const utils::FileError &err) {
+                    *remoteHasError = true;
+                    remoteMessageError->assign(
+                        (vle::fmt(
+                             "failed while parsing packages.pkg file: %1%\n") %
+                         err.what())
+                            .str());
+                }
+            }
+            else {
                 if (!(*remoteHasError)) {
                     *remoteHasError = true;
-                    remoteMessageError->assign((vle::fmt("failed: %1%\n")
-                    % dl.getErrorMessage()).str());
+                    remoteMessageError->assign(
+                        (vle::fmt("failed: %1%\n") % dl.getErrorMessage())
+                            .str());
                 }
             }
         }
@@ -350,22 +347,25 @@ public:
 
     /**
      * @brief Update the remote.pkg and local.pkg files,
-     * the result of this command is the set of packages for which a new version
+     * the result of this command is the set of packages for which a new
+     * version
      * is available on remotes.
      */
     void actionUpdate() throw()
     {
         mHasError = false;
 
-        std::vector < std::string > urls;
+        std::vector<std::string> urls;
         try {
             std::string tmp;
             mContext->get_setting("vle.remote.url", &tmp);
 
-            boost::algorithm::split(urls, tmp,
+            boost::algorithm::split(urls,
+                                    tmp,
                                     boost::algorithm::is_any_of(","),
                                     boost::algorithm::token_compress_on);
-        } catch(const std::exception& /*e*/) {
+        }
+        catch (const std::exception & /*e*/) {
             std::ostringstream errorStream;
             errorStream << _("Failed to read preferences file");
             mErrorMessage.assign(errorStream.str());
@@ -374,13 +374,14 @@ public:
         }
 
         PackageParser parser;
-        std::for_each(urls.begin(), urls.end(),
+        std::for_each(urls.begin(),
+                      urls.end(),
                       Download(mContext, &parser, &mHasError, &mErrorMessage));
         remote.clear();
         {
             PackageParser::const_iterator itb = parser.begin();
             PackageParser::const_iterator ite = parser.end();
-            for (; itb!=ite; itb++) {
+            for (; itb != ite; itb++) {
                 remote.insert(*itb);
             }
         }
@@ -390,14 +391,15 @@ public:
             bool found;
             PackageIdUpdate pkgUpdateOp;
             std::pair<PackagesIdSet::const_iterator,
-                      PackagesIdSet::const_iterator> pkgs_range;
+                      PackagesIdSet::const_iterator>
+                pkgs_range;
 
-            for (; itlb!=itle; itlb++) {
-                const PackageId& ploc = *itlb;
+            for (; itlb != itle; itlb++) {
+                const PackageId &ploc = *itlb;
                 pkgs_range = remote.equal_range(ploc);
                 found = false;
                 while ((!found) && (pkgs_range.first != pkgs_range.second)) {
-                    const PackageId& premote = *(pkgs_range.first);
+                    const PackageId &premote = *(pkgs_range.first);
                     if (pkgUpdateOp(ploc, premote)) {
                         found = true;
                         mResults.push_back(premote);
@@ -425,8 +427,8 @@ public:
         pkgid.name = mArgs;
         std::string archname = pkgid.name;
         archname.append(".tar.bz2");
-        std::pair<PackagesIdSet::const_iterator,
-                  PackagesIdSet::const_iterator> pkgs_range;
+        std::pair<PackagesIdSet::const_iterator, PackagesIdSet::const_iterator>
+            pkgs_range;
         pkgs_range = remote.equal_range(pkgid);
         if (pkgs_range.first == remote.end()) {
             std::ostringstream errorStream;
@@ -447,12 +449,12 @@ public:
 
         PackagesIdSet::const_iterator locPkg = local.find(*it);
         if ((locPkg != local.end()) && (!pkgUpdateOp(*locPkg, *it))) {
-            out(fmt(_("Package `%1%` is already uptodate\n"))% pkgid.name);
+            out(fmt(_("Package `%1%` is already uptodate\n")) % pkgid.name);
             return;
         }
 
         DownloadManager dl(mContext);
-        std::string url = it->url +"/";
+        std::string url = it->url + "/";
         out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
 
         Path archfile(Path::temp_directory_path());
@@ -470,8 +472,8 @@ public:
                 FScurrent_path_restore restore(tempDir);
                 decompress(archpath.string(), dearchpath.string());
                 vle::utils::Package pkg(mContext, pkgid.name);
-                out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %
-                    dearchpath.string());
+                out(fmt(_("Building package '%1%' into '%2%': ")) %
+                    pkgid.name % dearchpath.string());
                 pkg.configure();
                 pkg.wait(std::cerr, std::cerr);
                 pkg.build();
@@ -481,11 +483,13 @@ public:
                 out(fmt(_("ok\n")));
             }
             mResults.push_back(*it);
-        } else {
+        }
+        else {
             out(fmt(_("failed\n")));
             std::ostringstream errorStream;
             errorStream << fmt(_("Error while downloading package "
-                    "`%1%'\n")) % mArgs;
+                                 "`%1%'\n")) %
+                               mArgs;
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
         }
@@ -515,19 +519,22 @@ public:
             if (not dl.hasError()) {
                 std::string filename = dl.filename();
                 Path::rename(filename, archname);
-            } else {
+            }
+            else {
                 std::ostringstream errorStream;
                 errorStream << fmt(_("Error while downloading "
-                        "source package `%1%'\n")) % mArgs;
+                                     "source package `%1%'\n")) %
+                                   mArgs;
                 mErrorMessage.assign(errorStream.str());
                 mHasError = true;
             }
-         } else {
-             std::ostringstream errorStream;
-             errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
-             mErrorMessage.assign(errorStream.str());
-             mHasError = true;
-         }
+        }
+        else {
+            std::ostringstream errorStream;
+            errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
+            mErrorMessage.assign(errorStream.str());
+            mHasError = true;
+        }
         mResults.push_back(pkgid);
         mStream = nullptr;
         mIsFinish = true;
@@ -535,12 +542,11 @@ public:
         mStop = false;
     }
 
-
     /**
      * @brief Search for packages installed on local machine. The result of
      * this command is the set of packages found.
      */
-    void actionLocalSearch() throw ()
+    void actionLocalSearch() throw()
     {
         std::regex expression(mArgs, std::regex::grep);
 
@@ -576,7 +582,6 @@ public:
         mHasError = false;
     }
 
-
     /**
      * @brief Show multiple versions of a package available on remotes.
      * The result of this command is the set of remote packages found.
@@ -588,8 +593,7 @@ public:
         PackageId pkgid;
         pkgid.name = mArgs;
 
-        std::pair < PackagesIdSet::iterator,
-                    PackagesIdSet::iterator > found;
+        std::pair<PackagesIdSet::iterator, PackagesIdSet::iterator> found;
 
         found = remote.equal_range(pkgid);
 
@@ -601,9 +605,7 @@ public:
             return;
         }
 
-        std::copy(found.first,
-                  found.second,
-                  std::back_inserter(mResults));
+        std::copy(found.first, found.second, std::back_inserter(mResults));
 
         mStream = nullptr;
         mIsFinish = true;
@@ -623,8 +625,7 @@ public:
         PackageId pkgid;
         pkgid.name = mArgs;
 
-        std::pair < PackagesIdSet::iterator,
-                    PackagesIdSet::iterator > found;
+        std::pair<PackagesIdSet::iterator, PackagesIdSet::iterator> found;
 
         found = local.equal_range(pkgid);
 
@@ -636,9 +637,7 @@ public:
             return;
         }
 
-        std::copy(found.first,
-                  found.second,
-                  std::back_inserter(mResults));
+        std::copy(found.first, found.second, std::back_inserter(mResults));
 
         mStream = nullptr;
         mIsFinish = true;
@@ -646,20 +645,23 @@ public:
         mStop = false;
     }
 
-    void compress(const Path& filepath, const Path& compressedfilepath)
+    void compress(const Path &filepath, const Path &compressedfilepath)
     {
         if (not filepath.exists())
             throw utils::InternalError(
                 (fmt(_("fail to compress '%1%': file or directory does not "
-                       "exist")) % filepath.string()).str());
+                       "exist")) %
+                 filepath.string())
+                    .str());
 
         Path pwd = Path::current_path();
         std::string command;
 
         try {
             mContext->get_setting("vle.command.tar", &command);
-            command = (vle::fmt(command) % compressedfilepath.string()
-                       % filepath.string()).str();
+            command = (vle::fmt(command) % compressedfilepath.string() %
+                       filepath.string())
+                          .str();
 
             utils::Spawn spawn(mContext);
             std::vector<std::string> argv = spawn.splitCommandLine(command);
@@ -678,8 +680,10 @@ public:
                     output.clear();
                     error.clear();
 
-                    std::this_thread::sleep_for(std::chrono::microseconds(200));
-                } else
+                    std::this_thread::sleep_for(
+                        std::chrono::microseconds(200));
+                }
+                else
                     break;
             }
 
@@ -691,29 +695,32 @@ public:
 
             if (not message.empty())
                 vErr(mContext, "Compress: %s\n", message.c_str());
-        } catch (const std::exception& e) {
-            vErr(mContext, _("Compress: unable to compress '%s' in '%s' with "
-                             "the '%s' command\n"),
+        }
+        catch (const std::exception &e) {
+            vErr(mContext,
+                 _("Compress: unable to compress '%s' in '%s' with "
+                   "the '%s' command\n"),
                  compressedfilepath.string().c_str(),
                  pwd.string().c_str(),
                  command.c_str());
         }
     }
 
-    void decompress(const Path& compressedfilepath,
-                    const Path& directorypath)
+    void decompress(const Path &compressedfilepath, const Path &directorypath)
     {
         if (not directorypath.is_directory())
             throw utils::InternalError(
                 (fmt(_("fail to extract '%1%' in directory '%2%': "
-                       " directory does not exist"))
-                 % compressedfilepath.string() % directorypath.string()).str());
+                       " directory does not exist")) %
+                 compressedfilepath.string() % directorypath.string())
+                    .str());
 
         if (not compressedfilepath.is_file())
             throw utils::InternalError(
                 (fmt(_("fail to extract '%1%' in directory '%2%': "
-                       "file does not exist"))
-                 % compressedfilepath.string() % directorypath.string()).str());
+                       "file does not exist")) %
+                 compressedfilepath.string() % directorypath.string())
+                    .str());
 
         Path pwd = Path::current_path();
 
@@ -739,8 +746,10 @@ public:
                     output.clear();
                     error.clear();
 
-                    std::this_thread::sleep_for(std::chrono::microseconds(200));
-                } else
+                    std::this_thread::sleep_for(
+                        std::chrono::microseconds(200));
+                }
+                else
                     break;
             }
 
@@ -752,9 +761,11 @@ public:
 
             if (not message.empty())
                 vErr(mContext, "Decompress: %s\n", message.c_str());
-        } catch (const std::exception& e) {
-            vErr(mContext, _("Decompress: unable to decompress '%s' "
-                             "in '%s' with the '%s' command\n"),
+        }
+        catch (const std::exception &e) {
+            vErr(mContext,
+                 _("Decompress: unable to decompress '%s' "
+                   "in '%s' with the '%s' command\n"),
                  compressedfilepath.string().c_str(),
                  pwd.string().c_str(),
                  command.c_str());
@@ -768,7 +779,7 @@ public:
     Packages mResults;
     std::thread mThread;
     std::string mArgs;
-    std::ostream* mStream;
+    std::ostream *mStream;
     bool mIsStarted;
     bool mIsFinish;
     bool mStop;
@@ -781,26 +792,18 @@ RemoteManager::RemoteManager(ContextPtr context)
 {
 }
 
-RemoteManager::~RemoteManager() noexcept
-{
-}
+RemoteManager::~RemoteManager() noexcept {}
 
 void RemoteManager::start(RemoteManagerActions action,
-                          const std::string& arg,
-                          std::ostream* os)
+                          const std::string &arg,
+                          std::ostream *os)
 {
     mPimpl->start(action, arg, os);
 }
 
-void RemoteManager::join()
-{
-    mPimpl->join();
-}
+void RemoteManager::join() { mPimpl->join(); }
 
-void RemoteManager::stop()
-{
-    mPimpl->stop();
-}
+void RemoteManager::stop() { mPimpl->stop(); }
 
 void RemoteManager::getResult(Packages *out)
 {
@@ -814,25 +817,23 @@ void RemoteManager::getResult(Packages *out)
     }
 }
 
-bool RemoteManager::hasError()
-{
-    return mPimpl->mHasError;
-}
+bool RemoteManager::hasError() { return mPimpl->mHasError; }
 
-const std::string& RemoteManager::messageError()
+const std::string &RemoteManager::messageError()
 {
     return mPimpl->mErrorMessage;
 }
 
-void RemoteManager::compress(const Path& filepath, const Path& compressedfilepath)
+void RemoteManager::compress(const Path &filepath,
+                             const Path &compressedfilepath)
 {
     mPimpl->compress(filepath, compressedfilepath);
 }
 
-void RemoteManager::decompress(const Path& compressedfilepath,
-                               const Path& directorypath)
+void RemoteManager::decompress(const Path &compressedfilepath,
+                               const Path &directorypath)
 {
     mPimpl->decompress(compressedfilepath, directorypath);
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils

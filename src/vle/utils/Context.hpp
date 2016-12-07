@@ -580,11 +580,31 @@ public:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * Find the absolute path to a program
-     * @param the program name
-     * @param the absolute path to a program
+     * Find the absolute path of the DESTDIR or CMAKE_INSTALL_DIR variable
+     * under posix or install directory under Win32.
+     * @return the absolute path to the install directory or empty Path.
+     *
+     * @code
+     * auto ctx = vle::make_context();
+     * std::cout << ctx->findInstallPrefix() << "\n";
+     * // May returns "/usr/local" or "/usr" or "C:\\Program Files\\vle".
+     * @endcode
+     */
+    Path findInstallPrefix();
+
+    /**
+     * Find the absolute path to a program.
+     * @param exe the program name.
+     * @return the absolute path to a program or empty Path.
      */
     Path findProgram(const std::string& exe);
+
+    /**
+     * Find the absolute path to a library.
+     * @param lib the library name.
+     * @return the absolute path to a library or empty Path.
+     */
+    Path findLibrary(const std::string& lib);
 
 private:
     std::unique_ptr<PrivateContextImpl> m_pimpl;

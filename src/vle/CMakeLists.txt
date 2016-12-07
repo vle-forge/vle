@@ -54,6 +54,13 @@ set_target_properties(vlelib PROPERTIES
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
   CLEAN_DIRECT_OUTPUT 1)
 
+target_compile_definitions(vlelib
+  PRIVATE
+  VERSION_MAJOR=${VLE_MAJOR}
+  VERSION_MINOR=${VLE_MINOR}
+  VERSION_PATCH=${VLE_PATCH}
+  VERSION_EXTRA="${VLE_EXTRA}")
+
 target_include_directories(vlelib PUBLIC ${VLEDEPS_INCLUDE_DIRS})
 
 target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
@@ -76,18 +83,15 @@ set_target_properties(vlelibstatic PROPERTIES
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden"
   CLEAN_DIRECT_OUTPUT 1)
 
+target_compile_definitions(vlelibstatic
+  PRIVATE
+  VERSION_MAJOR=${VLE_MAJOR}
+  VERSION_MINOR=${VLE_MINOR}
+  VERSION_PATCH=${VLE_PATCH}
+  VERSION_EXTRA="${VLE_EXTRA}")
+
 install(TARGETS vlelibstatic RUNTIME DESTINATION bin LIBRARY
   DESTINATION lib ARCHIVE DESTINATION lib)
-
-#
-# Configure the version.h.in file to produce in the binary directory a
-# filled header version.hpp.
-#
-
-configure_file(version.hpp.in ${VLE_BINARY_DIR}/src/vle/version.hpp)
-
-install(FILES ${VLE_BINARY_DIR}/src/vle/version.hpp DESTINATION
-  ${VLE_INCLUDE_DIRS})
 
 install(FILES vle.hpp DllDefines.hpp DESTINATION ${VLE_INCLUDE_DIRS})
 

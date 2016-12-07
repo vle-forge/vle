@@ -28,7 +28,6 @@
 #ifndef VLE_UTILS_I18N_HPP
 #define VLE_UTILS_I18N_HPP
 
-#include <vle/version.hpp>
 #include <boost/format.hpp>
 
 namespace vle {

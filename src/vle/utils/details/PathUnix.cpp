@@ -27,13 +27,70 @@
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Filesystem.hpp>
-#include <vle/version.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/vle.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <list>
 
 namespace vle { namespace utils {
+
+Path Context::findInstallPrefix()
+{
+    auto version = vle::version_abi();
+    Path path;
+
+    path = findProgram(
+        vle::utils::format(
+            "vle-%d.%d",
+            std::get<0>(version),
+            std::get<1>(version)));
+
+    if (not path.empty()) {
+        path = path.parent_path();     // remove filename
+        path = path.parent_path();     // remove bin
+        return path;
+    }
+
+    path = findLibrary(
+        vle::utils::format(
+            "libvle-%d.%d.so",
+            std::get<0>(version),
+            std::get<1>(version)));
+
+    if (not path.empty()) {
+        path = path.parent_path();     // remove filename
+        path = path.parent_path();     // remove lib
+        return path;
+    }
+
+    return path;
+}
+
+Path Context::findLibrary(const std::string& lib)
+{
+    char* env_p = std::getenv("LD_LIBRARY_PATH");
+
+    std::vector<std::string> splitVec;
+    boost::split(splitVec, env_p, boost::is_any_of(":"),
+            boost::token_compress_on);
+
+    splitVec.insert(splitVec.begin(), "/usr/lib");
+    splitVec.insert(splitVec.begin(), "/usr/local/lib");
+    splitVec.insert(splitVec.begin(), "/opt/lib");
+
+    std::vector<std::string>::const_iterator itb = splitVec.begin();
+    std::vector<std::string>::const_iterator ite = splitVec.end();
+    for (; itb != ite; itb++) {
+        Path p(*itb);
+        p /= lib;
+        if (p.exists())
+            return p.string();
+    }
+
+    return {};
+}
 
 Path Context::findProgram(const std::string& exe)
 {
@@ -80,7 +137,7 @@ void Context::initHomeDir()
 
 void Context::initPrefixDir()
 {
-    m_pimpl->m_prefix = VLE_PREFIX_DIR;
+    m_pimpl->m_prefix = findInstallPrefix();
 }
 
 }} // namespace vle utils

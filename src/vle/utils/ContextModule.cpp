@@ -29,7 +29,7 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Filesystem.hpp>
-#include <vle/version.hpp>
+#include <vle/vle.hpp>
 #include <unordered_map>
 #include <boost/version.hpp>
 
@@ -234,7 +234,9 @@ struct Module
                                        std::uint32_t*);
         void *symbol;
 
+        auto version = vle::version();
         uint32_t major, minor, patch;
+
         versionFunction fct;
 
         symbol = getSymbol("vle_api_level");
@@ -253,14 +255,15 @@ struct Module
 #endif
         fct(&major, &minor, &patch);
 
-        if (major != VLE_MAJOR_VERSION or minor != VLE_MINOR_VERSION) {
+        if (major != static_cast<std::uint32_t>(std::get<0>(version)) or
+            minor != static_cast<std::uint32_t>(std::get<1>(version))) {
             throw utils::InternalError(
                 (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
                        " not API/ABI compatible with the current VLE"
                        " %5%.%6%.%7%")) % mPath.string() % major % minor
-                 % patch % VLE_MAJOR_VERSION % VLE_MINOR_VERSION
-                 % VLE_PATCH_VERSION).str());
-        } else if (patch != VLE_PATCH_VERSION) {
+                 % patch % std::get<0>(version) % std::get<1>(version)
+                 % std::get<2>(version)).str());
+            } else if (patch != static_cast<std::uint32_t>(std::get<2>(version))) {
             // utils::Trace::send(
             //     (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
             //            " not be API/ABI compatible with the current VLE"

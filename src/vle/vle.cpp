@@ -24,11 +24,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vle.hpp>
 #include <libxml/parser.h>
+#include <vle/utils/Tools.hpp>
+#include <vle/vle.hpp>
 
 namespace vle {
+
+std::tuple<int, int, int, std::string> version()
+{
+    return std::make_tuple(
+        VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_EXTRA);
+}
+
+std::tuple<int, int> version_abi()
+{
+    return std::make_tuple(VERSION_MAJOR, VERSION_MINOR);
+}
+
+std::string string_version()
+{
+#ifdef VERSION_EXTRA
+    return vle::utils::format(
+        "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+#else
+    return vle::utils::format("%d.%d.%d-%s",
+                              VERSION_MAJOR,
+                              VERSION_MINOR,
+                              VERSION_PATCH,
+                              VERSION_EXTRA);
+#endif
+}
+
+std::string string_version_abi()
+{
+    return vle::utils::format("%d.%d", VERSION_MAJOR, VERSION_MINOR);
+}
 
 /* From libxml2 website: http://xmlsoft.org/threads.html
  *
@@ -41,14 +71,8 @@ namespace vle {
  *   libxml2 API (except possibly selecting a different memory allocator)
  */
 
-Init::Init()
-{
-    xmlInitParser();
-}
+Init::Init() { xmlInitParser(); }
 
-Init::~Init()
-{
-    xmlCleanupParser();
-}
+Init::~Init() { xmlCleanupParser(); }
 
 } // namespace vle

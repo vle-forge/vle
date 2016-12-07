@@ -24,13 +24,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_MAIN_INIT_HPP
 #define VLE_MAIN_INIT_HPP
 
+#include <tuple>
 #include <vle/DllDefines.hpp>
 
 namespace vle {
+
+/**
+ * @brief Returns major, minor, patch and extra version of the libvle library.
+ * @details This function returns a std::tuple with the major, minor and patch
+ * integer version and the extra version as a string (may be empty).
+ * @return A @c std::tuple.
+ */
+std::tuple<int, int, int, std::string> VLE_API version();
+
+/**
+ * @brief Returns major and minor version of the libvle library.
+ * @details This function returns the ABI version of the libvle library: the
+ * major and minor version.
+ * @return A @c std::tuple.
+ */
+std::tuple<int, int> VLE_API version_abi();
+
+/**
+ * @brief Returns a string representation of the version of the libvle library.
+ * @details Returns a string representation of the libvle version (for example
+ * "1.1.0, 2.0.0, 2.0.0-alpha1").
+ * @return A @c std::string that represents the version of the libvle library.
+ */
+std::string VLE_API string_version();
+
+/**
+ * @brief Returns a string representation of the ABI version of the libvle
+ * library.
+ * @details Returns a string representation of the ABI version (for example
+ * "1.1, 2.0").
+ * @return A @c std::string that represents the version of the libvle library.
+ */
+std::string VLE_API string_version_abi();
 
 /**
  * The \e vle::Init class is used to initialize the subsystem of VLE when
@@ -59,7 +92,6 @@ struct VLE_API Init {
      */
     ~Init();
 };
-
 }
 
 #endif

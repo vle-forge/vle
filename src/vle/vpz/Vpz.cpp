@@ -24,50 +24,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/SaxParser.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <fstream>
 #include <iomanip>
-#include <limits>
-#include <sstream>
-#include <vle/version.hpp>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <limits>
+#include <sstream>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/vle.hpp>
+#include <vle/vpz/SaxParser.hpp>
+#include <vle/vpz/Vpz.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
-Vpz::Vpz(const std::string& filename) :
-    m_filename(filename)
+Vpz::Vpz(const std::string &filename)
+    : m_filename(filename)
 {
     parseFile(filename);
 }
 
-Vpz::Vpz(const Vpz& vpz) :
-    Base(vpz),
-    m_isGzip(vpz.m_isGzip),
-    m_filename(vpz.m_filename),
-    m_project(vpz.m_project)
+Vpz::Vpz(const Vpz &vpz)
+    : Base(vpz)
+    , m_isGzip(vpz.m_isGzip)
+    , m_filename(vpz.m_filename)
+    , m_project(vpz.m_project)
 {
 }
 
-void Vpz::write(std::ostream& out) const
+void Vpz::write(std::ostream &out) const
 {
-    out << std::showpoint
-        << std::fixed
-        << std::setprecision(std::numeric_limits < double >::digits10)
+    out << std::showpoint << std::fixed
+        << std::setprecision(std::numeric_limits<double>::digits10)
         << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
         << "<!DOCTYPE vle_project PUBLIC \"-//VLE TEAM//DTD Strict//EN\" "
-        << "\"http://www.vle-project.org/vle-"
-        << VLE_MAJOR_VERSION << "." << VLE_MINOR_VERSION << ".dtd\">\n";
+        << "\"http://www.vle-project.org/vle-" << vle::string_version_abi()
+        << ".dtd\">\n";
 
     m_project.write(out);
 }
 
-void Vpz::parseFile(const std::string& filename)
+void Vpz::parseFile(const std::string &filename)
 {
     clear();
     project().experiment().conditions().deleteValueSet();
@@ -76,25 +75,27 @@ void Vpz::parseFile(const std::string& filename)
 
     try {
         saxparser.parseFile(filename);
-    } catch(const std::exception& sax) {
+    }
+    catch (const std::exception &sax) {
         try {
             validateFile(filename);
-        } catch(const std::exception& dom) {
+        }
+        catch (const std::exception &dom) {
             saxparser.clearParserState();
             throw utils::SaxParserError(
                 (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
         }
         throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
     }
-    Condition& cond_sim = project().experiment().conditions().get(
-            Experiment::defaultSimulationEngineCondName());
+    Condition &cond_sim = project().experiment().conditions().get(
+        Experiment::defaultSimulationEngineCondName());
     if (cond_sim.getSetValues("begin").empty()) {
         cond_sim.getSetValues("begin").add(value::Double::create(0));
         cond_sim.getSetValues("duration").add(value::Double::create(100));
     }
 }
 
-void Vpz::parseMemory(const std::string& buffer)
+void Vpz::parseMemory(const std::string &buffer)
 {
     clear();
     project().experiment().conditions().deleteValueSet();
@@ -103,25 +104,26 @@ void Vpz::parseMemory(const std::string& buffer)
     vpz::SaxParser saxparser(*this);
     try {
         saxparser.parseMemory(buffer);
-    } catch(const std::exception& sax) {
+    }
+    catch (const std::exception &sax) {
         try {
             validateMemory(buffer);
-        } catch(const std::exception& dom) {
+        }
+        catch (const std::exception &dom) {
             throw utils::SaxParserError(
                 (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
         }
         throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
     }
-    Condition& cond_sim = project().experiment().conditions().get(
-                Experiment::defaultSimulationEngineCondName());
+    Condition &cond_sim = project().experiment().conditions().get(
+        Experiment::defaultSimulationEngineCondName());
     if (cond_sim.getSetValues("begin").empty()) {
         cond_sim.getSetValues("begin").add(value::Double::create(0));
         cond_sim.getSetValues("duration").add(value::Double::create(100));
     }
 }
 
-std::unique_ptr<value::Value>
-Vpz::parseValue(const std::string& buffer)
+std::unique_ptr<value::Value> Vpz::parseValue(const std::string &buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -135,8 +137,8 @@ Vpz::parseValue(const std::string& buffer)
     return std::move(sax.getValues()[0]);
 }
 
-std::vector <std::unique_ptr<value::Value>>
-Vpz::parseValues(const std::string& buffer)
+std::vector<std::unique_ptr<value::Value>>
+Vpz::parseValues(const std::string &buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -156,17 +158,16 @@ void Vpz::write()
 
     if (out.fail() or out.bad()) {
         throw utils::FileError(
-            (fmt(_("Vpz: cannot open file '%1%' for writing"))
-             % m_filename).str());;
+            (fmt(_("Vpz: cannot open file '%1%' for writing")) % m_filename)
+                .str());
+        ;
     }
 
-    out << std::showpoint
-        << std::fixed
-        << std::setprecision(std::numeric_limits < double >::digits10)
-        << *this;
+    out << std::showpoint << std::fixed
+        << std::setprecision(std::numeric_limits<double>::digits10) << *this;
 }
 
-void Vpz::write(const std::string& filename)
+void Vpz::write(const std::string &filename)
 {
     m_filename.assign(filename);
     write();
@@ -176,10 +177,8 @@ std::string Vpz::writeToString() const
 {
     std::ostringstream out;
 
-    out << std::showpoint
-        << std::fixed
-        << std::setprecision(std::numeric_limits < double >::digits10)
-        << *this;
+    out << std::showpoint << std::fixed
+        << std::setprecision(std::numeric_limits<double>::digits10) << *this;
 
     return out.str();
 }
@@ -191,24 +190,26 @@ void Vpz::clear()
     m_isGzip = false;
 }
 
-void Vpz::fixExtension(std::string& filename)
+void Vpz::fixExtension(std::string &filename)
 {
     const std::string::size_type dot = filename.find_last_of('.');
     if (dot == std::string::npos) {
         filename += ".vpz";
-    } else {
+    }
+    else {
         if (filename.size() >= 4) {
             const std::string extension(filename, dot, 4);
             if (extension != ".vpz") {
                 filename += ".vpz";
             }
-        } else {
+        }
+        else {
             filename += ".vpz";
         }
     }
 }
 
-void Vpz::validateFile(const std::string& filename)
+void Vpz::validateFile(const std::string &filename)
 {
     xmlParserCtxtPtr ctxt;
     xmlDocPtr doc;
@@ -220,9 +221,10 @@ void Vpz::validateFile(const std::string& filename)
 
     doc = xmlCtxtReadFile(ctxt, filename.c_str(), nullptr, XML_PARSE_DTDVALID);
     if (not doc) {
-        std::string msg((fmt(_("Failed to parse '%1%': %2%")) % filename %
-                         (ctxt->lastError.message ? ctxt->lastError.message :
-                          "")).str());
+        std::string msg(
+            (fmt(_("Failed to parse '%1%': %2%")) % filename %
+             (ctxt->lastError.message ? ctxt->lastError.message : ""))
+                .str());
 
         xmlFreeParserCtxt(ctxt);
 
@@ -230,9 +232,10 @@ void Vpz::validateFile(const std::string& filename)
     }
 
     if (ctxt->valid == 0) {
-        std::string msg((fmt(_("Failed to validate '%1%': %2%")) % filename %
-                         (ctxt->lastError.message ? ctxt->lastError.message :
-                          "")).str());
+        std::string msg(
+            (fmt(_("Failed to validate '%1%': %2%")) % filename %
+             (ctxt->lastError.message ? ctxt->lastError.message : ""))
+                .str());
 
         xmlFreeDoc(doc);
         xmlFreeParserCtxt(ctxt);
@@ -242,7 +245,7 @@ void Vpz::validateFile(const std::string& filename)
     xmlFreeParserCtxt(ctxt);
 }
 
-void Vpz::validateMemory(const std::string& buffer)
+void Vpz::validateMemory(const std::string &buffer)
 {
     xmlParserCtxtPtr ctxt;
     xmlDocPtr doc;
@@ -252,8 +255,11 @@ void Vpz::validateMemory(const std::string& buffer)
         throw utils::SaxParserError(_("Failed to allocate parser context\n"));
     }
 
-    doc = xmlCtxtReadMemory(ctxt, buffer.c_str(), buffer.size(),
-                            nullptr, nullptr,
+    doc = xmlCtxtReadMemory(ctxt,
+                            buffer.c_str(),
+                            buffer.size(),
+                            nullptr,
+                            nullptr,
                             XML_PARSE_DTDVALID);
     if (not doc) {
         xmlFreeParserCtxt(ctxt);
@@ -268,15 +274,16 @@ void Vpz::validateMemory(const std::string& buffer)
     xmlFreeParserCtxt(ctxt);
 }
 
-std::set < std::string > Vpz::depends() const
+std::set<std::string> Vpz::depends() const
 {
-    std::set < std::string > dynamics = project().dynamics().depends();
-    std::set < std::string > outputs = project().experiment().views().outputs().depends();
+    std::set<std::string> dynamics = project().dynamics().depends();
+    std::set<std::string> outputs =
+        project().experiment().views().outputs().depends();
 
-    std::set < std::string > result(dynamics);
+    std::set<std::string> result(dynamics);
     result.insert(outputs.begin(), outputs.end());
 
     return result;
 }
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz

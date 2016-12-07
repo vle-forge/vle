@@ -24,22 +24,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/Project.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
-#include <vle/version.hpp>
+#include <vle/vle.hpp>
+#include <vle/vpz/Project.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
-Project::Project() :
-    m_version(VLE_VERSION),
-    m_instance(-1)
+Project::Project()
+    : m_version(vle::string_version())
+    , m_instance(-1)
 {
 }
 
-void Project::write(std::ostream& out) const
+void Project::write(std::ostream &out) const
 {
     out << "<vle_project"
         << " version=\"" << m_version.c_str() << "\""
@@ -51,10 +51,7 @@ void Project::write(std::ostream& out) const
     }
 
     out << ">\n"
-        << m_model
-        << m_dynamics
-        << m_classes
-        << m_experiment
+        << m_model << m_dynamics << m_classes << m_experiment
         << "</vle_project>\n";
 }
 
@@ -67,7 +64,7 @@ void Project::clear()
     m_classes.clear();
 }
 
-void Project::setAuthor(const std::string& name)
+void Project::setAuthor(const std::string &name)
 {
     if (name.empty()) {
         throw utils::ArgError(_("Project author unknow"));
@@ -76,13 +73,14 @@ void Project::setAuthor(const std::string& name)
     m_author.assign(name);
 }
 
-void Project::setDate(const std::string& date)
+void Project::setDate(const std::string &date)
 {
     if (date.empty()) {
         m_date.assign(utils::DateTime::currentDate());
-    } else {
+    }
+    else {
         m_date.assign(date);
     }
 }
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz
