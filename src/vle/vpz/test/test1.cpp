@@ -24,147 +24,153 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
-#include <stdexcept>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/SaxParser.hpp>
-#include <vle/value/Boolean.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/value/Matrix.hpp>
-#include <vle/value/Tuple.hpp>
-#include <vle/value/Table.hpp>
-#include <vle/value/XML.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/vle.hpp>
-#include <limits>
 #include <fstream>
 #include <iostream>
+#include <limits>
+#include <stdexcept>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/unit-test.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/XML.hpp>
+#include <vle/vle.hpp>
+#include <vle/vpz/SaxParser.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 using namespace vle;
 
 void value_bool()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n<boolean>true</boolean>";
-    const char* t2 = "<?xml version=\"1.0\"?>\n<boolean>false</boolean>";
-    const char* t3 = "<?xml version=\"1.0\"?>\n<boolean>1</boolean>";
-    const char* t4 = "<?xml version=\"1.0\"?>\n<boolean>0</boolean>";
+    const char *t1 = "<?xml version=\"1.0\"?>\n<boolean>true</boolean>";
+    const char *t2 = "<?xml version=\"1.0\"?>\n<boolean>false</boolean>";
+    const char *t3 = "<?xml version=\"1.0\"?>\n<boolean>1</boolean>";
+    const char *t4 = "<?xml version=\"1.0\"?>\n<boolean>0</boolean>";
 
-    std::unique_ptr<value::Value> v;
+    std::shared_ptr<value::Value> v;
 
     v = vpz::Vpz::parseValue(t1);
-    Ensures(value::toBoolean(v) == true);
+    Ensures(v->toBoolean().value() == true);
 
     v = vpz::Vpz::parseValue(t2);
-    Ensures(value::toBoolean(v) == false);
+    Ensures(v->toBoolean().value() == false);
 
     v = vpz::Vpz::parseValue(t3);
-    Ensures(value::toBoolean(v) == true);
+    Ensures(v->toBoolean().value() == true);
 
     v = vpz::Vpz::parseValue(t4);
-    Ensures(value::toBoolean(v) == false);
+    Ensures(v->toBoolean().value() == false);
 
     v = vpz::Vpz::parseValue(v->writeToXml());
-    Ensures(value::toBoolean(v) == false);
+    Ensures(v->toBoolean().value() == false);
 }
 
 void value_integer()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n<integer>100</integer>";
-    const char* t2 = "<?xml version=\"1.0\"?>\n<integer>-100</integer>";
+    const char *t1 = "<?xml version=\"1.0\"?>\n<integer>100</integer>";
+    const char *t2 = "<?xml version=\"1.0\"?>\n<integer>-100</integer>";
     const size_t bufferSize = 1000;
     char t3[bufferSize];
     char t4[bufferSize];
 
-    snprintf(t3, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-             utils::to < int32_t >(std::numeric_limits< int32_t >::max()).c_str());
-    snprintf(t4, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-             utils::to < int32_t >(std::numeric_limits< int32_t >::min()).c_str());
+    snprintf(t3,
+             bufferSize,
+             "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
+             utils::to<int32_t>(std::numeric_limits<int32_t>::max()).c_str());
+    snprintf(t4,
+             bufferSize,
+             "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
+             utils::to<int32_t>(std::numeric_limits<int32_t>::min()).c_str());
 
-    std::unique_ptr<value::Value> v;
+    std::shared_ptr<value::Value> v;
 
     v = vpz::Vpz::parseValue(t1);
-    Ensures(value::toInteger(v) == 100);
+    Ensures(v->toInteger().value() == 100);
 
     v = vpz::Vpz::parseValue(t2);
-    Ensures(value::toInteger(v) == -100);
+    Ensures(v->toInteger().value() == -100);
 
     v = vpz::Vpz::parseValue(t3);
-    EnsuresEqual(value::toInteger(v), std::numeric_limits < int32_t >::max());
+    EnsuresEqual(v->toInteger().value(), std::numeric_limits<int32_t>::max());
 
     v = vpz::Vpz::parseValue(t4);
 
-    EnsuresEqual(value::toInteger(v), std::numeric_limits < int32_t >::min());
+    EnsuresEqual(v->toInteger().value(), std::numeric_limits<int32_t>::min());
     std::string t5(v->writeToXml());
 
     v = vpz::Vpz::parseValue(t5);
-    EnsuresEqual(value::toInteger(v), std::numeric_limits < int32_t >::min());
+    EnsuresEqual(v->toInteger().value(), std::numeric_limits<int32_t>::min());
 }
 
 void value_double()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n<double>100.5</double>";
-    const char* t2 = "<?xml version=\"1.0\"?>\n<double>-100.5</double>";
+    const char *t1 = "<?xml version=\"1.0\"?>\n<double>100.5</double>";
+    const char *t2 = "<?xml version=\"1.0\"?>\n<double>-100.5</double>";
 
-    std::unique_ptr<value::Value> v;
+    std::shared_ptr<value::Value> v;
 
     v = vpz::Vpz::parseValue(t1);
-    EnsuresApproximatelyEqual(value::toDouble(v), 100.5, 1);
+    EnsuresApproximatelyEqual(v->toDouble().value(), 100.5, 1);
 
     v = vpz::Vpz::parseValue(t2);
-    EnsuresApproximatelyEqual(value::toDouble(v), -100.5, 1);
+    EnsuresApproximatelyEqual(v->toDouble().value(), -100.5, 1);
     std::string t3(v->writeToXml());
 
     v = vpz::Vpz::parseValue(t3);
-    EnsuresApproximatelyEqual(value::toDouble(v), -100.5, 1);
+    EnsuresApproximatelyEqual(v->toDouble().value(), -100.5, 1);
 }
 
 void value_string()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
-    const char* t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
-    const char* t4 = "<?xml version=\"1.0\"?>\n<string>é ç € â ô f Û « © ±</string>";
+    const char *t1 =
+        "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
+    const char *t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
+    const char *t4 =
+        "<?xml version=\"1.0\"?>\n<string>é ç € â ô f Û « © ±</string>";
 
-    std::unique_ptr<value::Value> v;
+    std::shared_ptr<value::Value> v;
 
     v = vpz::Vpz::parseValue(t1);
-    Ensures(value::toString(v) == "a b c d e f g h i j");
+    Ensures(v->toString().value() == "a b c d e f g h i j");
 
     v = vpz::Vpz::parseValue(t2);
-    Ensures(value::toString(v) == "a\nb\tc\n");
+    Ensures(v->toString().value() == "a\nb\tc\n");
     std::string t3(v->writeToXml());
     v = vpz::Vpz::parseValue(t3);
-    Ensures(value::toString(v) == "a\nb\tc\n");
+    Ensures(v->toString().value() == "a\nb\tc\n");
 
     v = vpz::Vpz::parseValue(t4);
-    Ensures(value::toString(v) == "é ç € â ô f Û « © ±");
+    Ensures(v->toString().value() == "é ç € â ô f Û « © ±");
 }
 
 void value_set()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<set>\n"
-        "<integer>1</integer>\n"
-        "<string>test</string>\n"
-        "</set>";
+    const char *t1 = "<?xml version=\"1.0\"?>\n"
+                     "<set>\n"
+                     "<integer>1</integer>\n"
+                     "<string>test</string>\n"
+                     "</set>";
 
-    const char* t2 = "<?xml version=\"1.0\"?>\n"
-        "<set>\n"
-        "  <integer>1</integer>\n"
-        "  <set>\n"
-        "    <string>test</string>\n"
-        "  </set>\n"
-        "</set>";
+    const char *t2 = "<?xml version=\"1.0\"?>\n"
+                     "<set>\n"
+                     "  <integer>1</integer>\n"
+                     "  <set>\n"
+                     "    <string>test</string>\n"
+                     "  </set>\n"
+                     "</set>";
 
     {
         auto ptr = vpz::Vpz::parseValue(t1);
-        const auto& v = ptr->toSet();
-        Ensures(value::toString(v.get(1)) == "test");
-        Ensures(value::toInteger(v.get(0)) == 1);
+        const auto &v = ptr->toSet();
+        Ensures(v.getString(1) == "test");
+        Ensures(v.getInt(0) == 1);
     }
 
     std::string t3;
@@ -174,11 +180,11 @@ void value_set()
 
         std::cout << ptr->writeToXml() << '\n';
 
-        const auto& v = ptr->toSet();
+        const auto &v = ptr->toSet();
         Ensures(value::toInteger(v.get(0)) == 1);
 
         {
-            const auto& v2 = v.get(1)->toSet();
+            const auto &v2 = v.get(1)->toSet();
             Ensures(v2.size() == 1);
             Ensures(v2.get(0)->toString().value() == "test");
         }
@@ -187,33 +193,33 @@ void value_set()
     }
 
     auto ptr = vpz::Vpz::parseValue(t3);
-    const auto& v = ptr->toSet();
+    const auto &v = ptr->toSet();
 
     Ensures(v.get(0)->toInteger().value() == 1);
     {
-        const value::Set& v2 = v.get(1)->toSet();
+        const value::Set &v2 = v.get(1)->toSet();
         Ensures(value::toString(v2.get(0)) == "test");
     }
 }
 
 void value_map()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<map>\n"
-        " <key name=\"a\">\n"
-        "  <integer>10</integer>\n"
-        " </key>\n"
-        "</map>\n";
+    const char *t1 = "<?xml version=\"1.0\"?>\n"
+                     "<map>\n"
+                     " <key name=\"a\">\n"
+                     "  <integer>10</integer>\n"
+                     " </key>\n"
+                     "</map>\n";
 
-    const char* t2 = "<?xml version=\"1.0\"?>\n"
-        "<map>\n"
-        " <key name=\"a\">\n"
-        "  <set>\n"
-        "   <integer>1</integer>\n"
-        "   <string>test</string>\n"
-        "  </set>\n"
-        " </key>\n"
-        "</map>\n";
+    const char *t2 = "<?xml version=\"1.0\"?>\n"
+                     "<map>\n"
+                     " <key name=\"a\">\n"
+                     "  <set>\n"
+                     "   <integer>1</integer>\n"
+                     "   <string>test</string>\n"
+                     "  </set>\n"
+                     " </key>\n"
+                     "</map>\n";
 
     {
         auto v = vpz::Vpz::parseValue(t1)->toMap();
@@ -244,8 +250,8 @@ void value_map()
 
 void value_tuple()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<tuple>1 2 3</tuple>\n";
+    const char *t1 = "<?xml version=\"1.0\"?>\n"
+                     "<tuple>1 2 3</tuple>\n";
 
     auto ptr = vpz::Vpz::parseValue(t1);
     auto v = ptr->toTuple();
@@ -254,18 +260,18 @@ void value_tuple()
     EnsuresApproximatelyEqual(v[1], 2.0, 0.1);
     EnsuresApproximatelyEqual(v[2], 3.0, 0.1);
 
-    const char* t2 = "<?xml version=\"1.0\"?>\n"
-        "<map>\n"
-        "   <key name=\"testtest\">\n"
-        "      <tuple>100 200 300</tuple>\n"
-        "   </key>\n"
-        "</map>\n";
+    const char *t2 = "<?xml version=\"1.0\"?>\n"
+                     "<map>\n"
+                     "   <key name=\"testtest\">\n"
+                     "      <tuple>100 200 300</tuple>\n"
+                     "   </key>\n"
+                     "</map>\n";
 
     auto ptr_m = vpz::Vpz::parseValue(t2);
     auto m = ptr_m->toMap();
 
     auto t = m.getTuple("testtest");
-    value::Tuple& v2(toTupleValue(t));
+    value::Tuple &v2(toTupleValue(t));
     EnsuresApproximatelyEqual(v2.operator[](0), 100.0, 0.1);
     EnsuresApproximatelyEqual(v2.operator[](1), 200.0, 0.1);
     EnsuresApproximatelyEqual(v2.operator[](2), 300.0, 0.1);
@@ -280,10 +286,10 @@ void value_tuple()
 
 void value_table()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<table width=\"2\" height=\"3\">\n"
-        "1 2 3 4 5 6"
-        "</table>\n";
+    const char *t1 = "<?xml version=\"1.0\"?>\n"
+                     "<table width=\"2\" height=\"3\">\n"
+                     "1 2 3 4 5 6"
+                     "</table>\n";
 
     auto ptr = vpz::Vpz::parseValue(t1);
     auto v = ptr->toTable();
@@ -313,39 +319,38 @@ void value_table()
     EnsuresApproximatelyEqual(w.get(1, 2), 6.0, 0.1);
 }
 
-
 void value_table_map()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<map>"
-        "<key name=\"a\"><double>0.1</double></key>"
-        "<key name=\"tr\">"
-        "<table width=\"2\" height=\"3\">\n"
-        "1 2 3 4 5 6"
-        "</table>\n"
-        "</key>"
-        "<key name=\"c\"><double>0.1</double></key>"
-        "</map>";
+    const char *t1 = "<?xml version=\"1.0\"?>\n"
+                     "<map>"
+                     "<key name=\"a\"><double>0.1</double></key>"
+                     "<key name=\"tr\">"
+                     "<table width=\"2\" height=\"3\">\n"
+                     "1 2 3 4 5 6"
+                     "</table>\n"
+                     "</key>"
+                     "<key name=\"c\"><double>0.1</double></key>"
+                     "</map>";
 
-    const char* t2 = "<?xml version=\"1.0\"?>\n"
-        "<map>"
-        "<key name=\"a\"><double>0.1</double></key>"
-        "<key name=\"tr\">"
-        "<table width=\"2\" height=\"3\">\n"
-        "1 2 3 4 5 6"
-        "</table>\n"
-        "</key>"
-        "</map>";
+    const char *t2 = "<?xml version=\"1.0\"?>\n"
+                     "<map>"
+                     "<key name=\"a\"><double>0.1</double></key>"
+                     "<key name=\"tr\">"
+                     "<table width=\"2\" height=\"3\">\n"
+                     "1 2 3 4 5 6"
+                     "</table>\n"
+                     "</key>"
+                     "</map>";
 
-    const char* t3 = "<?xml version=\"1.0\"?>\n"
-        "<map>"
-        "<key name=\"tr\">"
-        "<table width=\"2\" height=\"3\">\n"
-        "1 2 3 4 5 6"
-        "</table>\n"
-        "</key>"
-        "<key name=\"c\"><double>0.1</double></key>"
-        "</map>";
+    const char *t3 = "<?xml version=\"1.0\"?>\n"
+                     "<map>"
+                     "<key name=\"tr\">"
+                     "<table width=\"2\" height=\"3\">\n"
+                     "1 2 3 4 5 6"
+                     "</table>\n"
+                     "</key>"
+                     "<key name=\"c\"><double>0.1</double></key>"
+                     "</map>";
 
     {
         auto ptr = vpz::Vpz::parseValue(t1);
@@ -388,15 +393,14 @@ void value_table_map()
         EnsuresApproximatelyEqual(w.get(1, 1), 4.0, 0.1);
         EnsuresApproximatelyEqual(w.get(1, 2), 6.0, 0.1);
     }
-
 }
 
 void value_xml()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<xml>"
-        "<![CDATA[test 1 2 1 2]]>\n"
-        "</xml>";
+    const char *t1 = "<?xml version=\"1.0\"?>\n"
+                     "<xml>"
+                     "<![CDATA[test 1 2 1 2]]>\n"
+                     "</xml>";
 
     auto ptr = vpz::Vpz::parseValue(t1);
     auto str = ptr->toXml();
@@ -411,7 +415,8 @@ void value_xml()
 
 void value_matrix()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
+    const char *t1 =
+        "<?xml version=\"1.0\"?>\n"
         "<matrix rows=\"3\" columns=\"2\" columnmax=\"15\" "
         "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
         "<integer>1</integer>"
@@ -425,7 +430,7 @@ void value_matrix()
     auto ptr = vpz::Vpz::parseValue(t1);
     EnsuresEqual(ptr->isMatrix(), true);
 
-    auto& m = ptr->toMatrix();
+    auto &m = ptr->toMatrix();
 
     EnsuresEqual(m.rows(), (value::Matrix::size_type)3);
     EnsuresEqual(m.columns(), (value::Matrix::size_type)2);
@@ -436,12 +441,12 @@ void value_matrix()
 
     std::cout << "value_matrix:\n" << m.writeToString() << '\n';
 
-    EnsuresEqual(m(0,0)->isInteger(), true);
-    EnsuresEqual(m(0,1)->isInteger(), true);
-    EnsuresEqual(m(0,2)->isInteger(), true);
-    EnsuresEqual(m(1,0)->isInteger(), true);
-    EnsuresEqual(m(1,1)->isInteger(), true);
-    EnsuresEqual(m(1,2)->isInteger(), true);
+    EnsuresEqual(m(0, 0)->isInteger(), true);
+    EnsuresEqual(m(0, 1)->isInteger(), true);
+    EnsuresEqual(m(0, 2)->isInteger(), true);
+    EnsuresEqual(m(1, 0)->isInteger(), true);
+    EnsuresEqual(m(1, 1)->isInteger(), true);
+    EnsuresEqual(m(1, 2)->isInteger(), true);
 
     EnsuresEqual(value::toInteger(m(0, 0)), 1);
     EnsuresEqual(value::toInteger(m(1, 0)), 2);
@@ -478,7 +483,8 @@ void value_matrix()
 
 void value_matrix_of_matrix()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
+    const char *t1 =
+        "<?xml version=\"1.0\"?>\n"
         "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
         "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
         "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
@@ -504,7 +510,7 @@ void value_matrix_of_matrix()
     auto ptr = vpz::Vpz::parseValue(t1);
     EnsuresEqual(ptr->isMatrix(), true);
 
-    const auto& m = ptr->toMatrix();
+    const auto &m = ptr->toMatrix();
     std::cout << "matrix_of_matrix\n" << m.writeToXml() << '\n';
 
     EnsuresEqual(m.rows(), (value::Matrix::size_type)1);
@@ -531,7 +537,8 @@ void value_matrix_of_matrix()
 
 void value_matrix_of_matrix_io()
 {
-    const char* t1 = "<?xml version=\"1.0\"?>\n"
+    const char *t1 =
+        "<?xml version=\"1.0\"?>\n"
         "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
         "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
         "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "

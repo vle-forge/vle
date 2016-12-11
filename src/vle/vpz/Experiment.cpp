@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/Experiment.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Set.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/vpz/Experiment.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
 Experiment::Experiment()
 {
@@ -41,14 +41,13 @@ Experiment::Experiment()
     conditions().add(cond);
 }
 
-void Experiment::write(std::ostream& out) const
+void Experiment::write(std::ostream &out) const
 {
     out << "<experiment "
         << "name=\"" << m_name.c_str() << "\" ";
 
     if (not m_combination.empty()) {
-        out << "combination=\"" << m_combination.c_str()
-            << "\" ";
+        out << "combination=\"" << m_combination.c_str() << "\" ";
     }
 
     out << " >\n";
@@ -67,17 +66,17 @@ void Experiment::clear()
     m_views.clear();
 }
 
-void Experiment::addConditions(const Conditions& c)
+void Experiment::addConditions(const Conditions &c)
 {
     m_conditions.add(c);
 }
 
-void Experiment::addViews(const Views& m)
+void Experiment::addViews(const Views &m)
 {
     m_views.add(m);
 }
 
-void Experiment::setName(const std::string& name)
+void Experiment::setName(const std::string &name)
 {
     if (name.empty()) {
         throw utils::ArgError(_("Empty experiment name"));
@@ -90,48 +89,57 @@ void Experiment::setDuration(double duration)
 {
     if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
-                "does not exist"));
+                                "does not exist"));
 
-    vle::vpz::Condition& condSim = conditions().get(
-            defaultSimulationEngineCondName());
-    vle::value::Set& dur = condSim.getSetValues("duration");
+    auto &condSim = conditions().get(defaultSimulationEngineCondName());
+    auto &dur = condSim.getSetValues("duration");
     dur.clear();
-    dur.add(value::Double::create(duration));
+
+    dur.emplace_back(std::static_pointer_cast<vle::value::Value>(
+        std::make_shared<vle::value::Double>(duration)));
 }
 
 double Experiment::duration() const
 {
-    if (not conditions().exist(defaultSimulationEngineCondName())) {
+    if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
-                "does not exist"));
-    }
-    const vle::vpz::Condition& condSim = conditions().get(
-            defaultSimulationEngineCondName());
-    return condSim.getSetValues("duration").getDouble(0);
+                                "does not exist"));
+
+    const auto &condSim = conditions().get(defaultSimulationEngineCondName());
+    const auto &dur = condSim.getSetValues("duration");
+
+    if (dur.empty())
+        throw utils::ArgError(_("The simulation engine condition is empty"));
+
+    return dur[0]->toDouble().value();
 }
 
 void Experiment::setBegin(double begin)
 {
-    if (not conditions().exist(defaultSimulationEngineCondName())) {
+    if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
-                "does not exist"));
-    }
-    vle::vpz::Condition& condSim = conditions().get(
-            defaultSimulationEngineCondName());
-    vle::value::Set& dur = condSim.getSetValues("begin");
+                                "does not exist"));
+
+    auto &condSim = conditions().get(defaultSimulationEngineCondName());
+    auto &dur = condSim.getSetValues("begin");
     dur.clear();
-    dur.add(value::Double::create(begin));
+    dur.emplace_back(std::static_pointer_cast<vle::value::Value>(
+        std::make_shared<vle::value::Double>(begin)));
 }
 
 double Experiment::begin() const
 {
-    if (not conditions().exist(defaultSimulationEngineCondName())) {
+    if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
-                "does not exist"));
-    }
-    const vle::vpz::Condition& condSim = conditions().get(
-            defaultSimulationEngineCondName());
-    return condSim.getSetValues("begin").getDouble(0);
+                                "does not exist"));
+
+    const auto &condSim = conditions().get(defaultSimulationEngineCondName());
+    const auto &dur = condSim.getSetValues("begin");
+
+    if (dur.empty())
+        throw utils::ArgError(_("The simulation engine condition is empty"));
+
+    return dur[0]->toDouble().value();
 }
 
 void Experiment::cleanNoPermanent()
@@ -140,13 +148,14 @@ void Experiment::cleanNoPermanent()
     m_views.observables().cleanNoPermanent();
 }
 
-void Experiment::setCombination(const std::string& name)
+void Experiment::setCombination(const std::string &name)
 {
     if (name != "linear" and name != "total") {
-        throw utils::ArgError((fmt(_("Unknow combination '%1%'")) % name).str());
+        throw utils::ArgError(
+            (fmt(_("Unknow combination '%1%'")) % name).str());
     }
 
     m_combination.assign(name);
 }
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz

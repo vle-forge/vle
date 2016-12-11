@@ -323,6 +323,12 @@ private:
        modification of coupled model. */
     Coordinator &m_coordinator;
 
+    /*
+     * Stores a clone of condition if the user call the @c conditions()
+     * non constant function.
+     */
+    std::unique_ptr<vpz::Conditions> m_conditions;
+
     /**
      * @brief Get a reference to the current coupled model.
      * @return A reference to the coupled model.

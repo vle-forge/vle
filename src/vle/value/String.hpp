@@ -24,27 +24,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_VALUE_STRING_HPP
 #define VLE_VALUE_STRING_HPP 1
 
-#include <vle/value/Value.hpp>
 #include <vle/DllDefines.hpp>
+#include <vle/value/Value.hpp>
 
-namespace vle { namespace value {
+namespace vle {
+namespace value {
 
 /**
  * @brief String Value encapsulates a C++ std::string type into a class.
  */
-class VLE_API String : public Value
-{
+class VLE_API String : public Value {
 public:
     /**
      * @brief Build a String object with a default value as empty string.
      */
     String()
         : m_value()
-    {}
+    {
+    }
 
     /**
      * @brief Build a String object with a specified value.
@@ -52,21 +52,23 @@ public:
      */
     String(std::string value)
         : m_value(std::move(value))
-    {}
+    {
+    }
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    String(const String& value)
-        : Value(value), m_value(value.m_value)
-    {}
+    String(const String &value)
+        : Value(value)
+        , m_value(value.m_value)
+    {
+    }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~String()
-    {}
+    virtual ~String() {}
 
     ///
     ////
@@ -78,7 +80,7 @@ public:
      * @return A new String.
      */
     static std::unique_ptr<value::Value>
-        create(const std::string value = std::string())
+    create(const std::string value = std::string())
     {
         return std::unique_ptr<value::Value>(new String(value));
     }
@@ -92,26 +94,27 @@ public:
      * @return A new String.
      */
     virtual std::unique_ptr<Value> clone() const override
-    { return std::unique_ptr<Value>(new String(m_value)); }
+    {
+        return std::unique_ptr<Value>(new String(m_value));
+    }
 
     /**
      * @brief Get the type of this class.
      * @return Return Value::STRING.
      */
-    virtual Value::type getType() const override
-    { return Value::STRING; }
+    virtual Value::type getType() const override { return Value::STRING; }
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    virtual void writeFile(std::ostream &out) const override;
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    virtual void writeString(std::ostream &out) const override;
 
     /**
      * @brief Push the std::string into the stream. Be careful, the
@@ -124,51 +127,80 @@ public:
      * @endcode
      * @param out
      */
-    virtual void writeXml(std::ostream& out) const override;
+    virtual void writeXml(std::ostream &out) const override;
 
     /**
      * @brief Get a constant reference to the encapsulated std::string.
      * @return A constant reference to the encapsulated std::string.
      */
-    inline const std::string& value() const
-    { return m_value; }
+    inline const std::string &value() const { return m_value; }
 
     /**
      * @brief Get a reference to the encapsulated std::string.
      * @return A reference to the encapsulated std::string.
      */
-    inline std::string& value()
-    { return m_value; }
+    inline std::string &value() { return m_value; }
 
     /**
      * @brief Assign a value to the encapsulated std::string.
      * @param value The Value to set.
      */
-    inline void set(const std::string& value)
-    { m_value.assign(value); }
+    inline void set(const std::string &value) { m_value.assign(value); }
 
 private:
     std::string m_value;
 };
 
-inline const String& toStringValue(const std::unique_ptr<Value>& value)
-{ return value::reference(value).toString(); }
+inline const String &toStringValue(std::shared_ptr<Value> value)
+{
+    return value::reference(value).toString();
+}
 
-inline const String& toStringValue(const Value& value)
-{ return value.toString(); }
+inline const String &toStringValue(std::shared_ptr<const Value> value)
+{
+    return value::reference(value).toString();
+}
 
-inline String& toStringValue(Value& value)
-{ return value.toString(); }
+inline const String &toStringValue(const std::unique_ptr<Value> &value)
+{
+    return value::reference(value).toString();
+}
 
-inline const std::string& toString(const std::unique_ptr<Value>& value)
-{ return value::reference(value).toString().value(); }
+inline const String &toStringValue(const Value &value)
+{
+    return value.toString();
+}
 
-inline const std::string& toString(const Value& value)
-{ return value.toString().value(); }
+inline String &toStringValue(Value &value)
+{
+    return value.toString();
+}
 
-inline std::string& toString(Value& value)
-{ return value.toString().value(); }
+inline const std::string &toString(std::shared_ptr<Value> value)
+{
+    return value::reference(value).toString().value();
+}
 
-}} // namespace vle value
+inline const std::string &toString(std::shared_ptr<const Value> value)
+{
+    return value::reference(value).toString().value();
+}
+
+inline const std::string &toString(const std::unique_ptr<Value> &value)
+{
+    return value::reference(value).toString().value();
+}
+
+inline const std::string &toString(const Value &value)
+{
+    return value.toString().value();
+}
+
+inline std::string &toString(Value &value)
+{
+    return value.toString().value();
+}
+}
+} // namespace vle value
 
 #endif

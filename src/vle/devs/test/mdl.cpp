@@ -24,26 +24,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/unit-test.hpp>
+#include "oov.hpp"
+#include <boost/format.hpp>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <sstream>
+#include <stack>
+#include <stdexcept>
+#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/RootCoordinator.hpp>
+#include <vle/oov/Plugin.hpp>
+#include <vle/utils/Filesystem.hpp>
+#include <vle/utils/unit-test.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/vpz/Classes.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Experiment.hpp>
-#include <vle/vpz/Classes.hpp>
-#include <vle/oov/Plugin.hpp>
-#include <vle/utils/Filesystem.hpp>
-#include <boost/format.hpp>
-#include <iostream>
-#include <stack>
-#include <stdexcept>
-#include <limits>
-#include <fstream>
-#include <sstream>
-#include "oov.hpp"
 
 using namespace vle;
 
@@ -81,23 +82,16 @@ using namespace vle;
     }                                                                         \
     }
 
-class MyBeep : public devs::Dynamics
-{
+class MyBeep : public devs::Dynamics {
 public:
     MyBeep(const devs::DynamicsInit &model, const devs::InitEventList &events)
         : devs::Dynamics(model, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
-    {
-        return 0.0;
-    }
+    virtual devs::Time init(devs::Time /* time */) override { return 0.0; }
 
-    virtual devs::Time timeAdvance() const override
-    {
-        return 1.0;
-    }
+    virtual devs::Time timeAdvance() const override { return 1.0; }
 
     virtual void output(devs::Time /* time */,
                         devs::ExternalEventList &output) const override
@@ -106,23 +100,16 @@ public:
     }
 };
 
-class Branch : public devs::Executive
-{
+class Branch : public devs::Executive {
 public:
     Branch(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
         : devs::Executive(mdl, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
-    {
-        return 10.0;
-    }
+    virtual devs::Time init(devs::Time /* time */) override { return 10.0; }
 
-    virtual devs::Time timeAdvance() const override
-    {
-        return 10.0;
-    }
+    virtual devs::Time timeAdvance() const override { return 10.0; }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
@@ -153,8 +140,7 @@ public:
     }
 };
 
-class Counter : public devs::Dynamics
-{
+class Counter : public devs::Dynamics {
 public:
     Counter(const devs::DynamicsInit &model, const devs::InitEventList &events)
         : devs::Dynamics(model, events)
@@ -214,8 +200,7 @@ private:
     bool m_active;
 };
 
-class DeleteConnection : public devs::Executive
-{
+class DeleteConnection : public devs::Executive {
 public:
     DeleteConnection(const devs::ExecutiveInit &init,
                      const devs::InitEventList &events)
@@ -230,19 +215,11 @@ public:
         mRemaining = mAlarm;
     }
 
-    virtual ~DeleteConnection()
-    {
-    }
+    virtual ~DeleteConnection() {}
 
-    virtual devs::Time init(devs::Time /*time*/)
-    {
-        return timeAdvance();
-    }
+    virtual devs::Time init(devs::Time /*time*/) { return timeAdvance(); }
 
-    virtual devs::Time timeAdvance() const
-    {
-        return mRemaining;
-    }
+    virtual devs::Time timeAdvance() const { return mRemaining; }
 
     virtual void internalTransition(devs::Time time)
     {
@@ -252,7 +229,8 @@ public:
         if (tmp < 0.1) {
             mRemaining = devs::infinity;
             removeConnection(mModelSource, mPortSource, mModelDest, mPortDest);
-        } else {
+        }
+        else {
             mRemaining = tmp;
         }
     }
@@ -272,8 +250,7 @@ public:
     std::string mPortDest;
 };
 
-class Transform : public devs::Dynamics
-{
+class Transform : public devs::Dynamics {
 public:
     Transform(const devs::DynamicsInit &atom,
               const devs::InitEventList &events)
@@ -287,10 +264,7 @@ public:
         return 0.0;
     }
 
-    virtual devs::Time timeAdvance() const override
-    {
-        return 1.0;
-    }
+    virtual devs::Time timeAdvance() const override { return 1.0; }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
@@ -320,8 +294,7 @@ private:
     int m_counter;
 };
 
-class Confluent_transitionA : public devs::Dynamics
-{
+class Confluent_transitionA : public devs::Dynamics {
 public:
     Confluent_transitionA(const devs::DynamicsInit &atom,
                           const devs::InitEventList &events)
@@ -329,19 +302,11 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
-    {
-        return 1.0;
-    }
+    virtual devs::Time init(devs::Time /* time */) override { return 1.0; }
 
-    virtual devs::Time timeAdvance() const override
-    {
-        return devs::infinity;
-    }
+    virtual devs::Time timeAdvance() const override { return devs::infinity; }
 
-    virtual void internalTransition(devs::Time /* time */) override
-    {
-    }
+    virtual void internalTransition(devs::Time /* time */) override {}
 
     virtual void externalTransition(const devs::ExternalEventList & /*events*/,
                                     devs::Time /* time */) override
@@ -367,8 +332,7 @@ public:
     }
 };
 
-class Confluent_transitionB : public devs::Dynamics
-{
+class Confluent_transitionB : public devs::Dynamics {
 public:
     Confluent_transitionB(const devs::DynamicsInit &atom,
                           const devs::InitEventList &events)
@@ -377,16 +341,14 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
-    {
-        return 1.0;
-    }
+    virtual devs::Time init(devs::Time /* time */) override { return 1.0; }
 
     virtual devs::Time timeAdvance() const override
     {
         if (state < 2) {
             return 0;
-        } else {
+        }
+        else {
             return devs::infinity;
         }
     }
@@ -422,8 +384,7 @@ public:
     int state;
 };
 
-class Confluent_transitionC : public devs::Dynamics
-{
+class Confluent_transitionC : public devs::Dynamics {
     mutable int i = 0;
 
 public:
@@ -463,8 +424,7 @@ public:
     }
 };
 
-class Confluent_transitionD : public devs::Dynamics
-{
+class Confluent_transitionD : public devs::Dynamics {
     int i = 0;
 
 public:
@@ -484,10 +444,7 @@ public:
         return 0;
     }
 
-    virtual devs::Time timeAdvance() const override
-    {
-        return 1;
-    }
+    virtual devs::Time timeAdvance() const override { return 1; }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
@@ -508,8 +465,7 @@ public:
     }
 };
 
-class GenExecutive : public devs::Executive
-{
+class GenExecutive : public devs::Executive {
     enum state { INIT, IDLE, ADDMODEL, DELMODEL };
 
     std::stack<std::string> m_stacknames;
@@ -558,7 +514,8 @@ public:
         case IDLE:
             if (time < 50.0) {
                 m_state = ADDMODEL;
-            } else {
+            }
+            else {
                 m_state = DELMODEL;
             }
             break;
@@ -596,7 +553,8 @@ public:
                 set->toSet().add(value::String::create("2"));
                 std::string edge = name + std::string(" counter ");
                 set->toSet().add(value::String::create(edge));
-            } else if (get_nb_model() > 0) {
+            }
+            else if (get_nb_model() > 0) {
                 set->toSet().add(value::String::create("delete"));
                 std::string name =
                     (boost::format("MyBeep_%1%") % (get_nb_model())).str();
@@ -633,7 +591,8 @@ public:
         if (m_stacknames.empty()) {
             throw utils::InternalError(
                 boost::format("Cannot delete any model, the executive have no "
-                              "element.").str());
+                              "element.")
+                    .str());
         }
 
         delModel(m_stacknames.top());
@@ -651,23 +610,16 @@ public:
     }
 };
 
-class Leaf : public devs::Executive
-{
+class Leaf : public devs::Executive {
 public:
     Leaf(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
         : devs::Executive(mdl, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
-    {
-        return 10.0;
-    }
+    virtual devs::Time init(devs::Time /* time */) override { return 10.0; }
 
-    virtual devs::Time timeAdvance() const override
-    {
-        return 10.0;
-    }
+    virtual devs::Time timeAdvance() const override { return 10.0; }
 
     virtual void output(devs::Time /*time*/,
                         devs::ExternalEventList &output) const override
@@ -677,23 +629,16 @@ public:
     }
 };
 
-class Root : public devs::Executive
-{
+class Root : public devs::Executive {
 public:
     Root(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
         : devs::Executive(mdl, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
-    {
-        return 10.0;
-    }
+    virtual devs::Time init(devs::Time /* time */) override { return 10.0; }
 
-    virtual devs::Time timeAdvance() const override
-    {
-        return 10.0;
-    }
+    virtual devs::Time timeAdvance() const override { return 10.0; }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
@@ -756,7 +701,8 @@ void test_normal_behaviour()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
         EnsuresNotReached();
     }
 }
@@ -829,7 +775,8 @@ void test_gens_delete_connection()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
         Ensures(false);
     }
 }
@@ -888,9 +835,11 @@ void test_confluent_transition()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
         Ensures(false);
-    } catch (...) {
+    }
+    catch (...) {
         Ensures(false);
     }
 }
@@ -919,9 +868,11 @@ void test_confluent_transition_2()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
         Ensures(false);
-    } catch (...) {
+    }
+    catch (...) {
         Ensures(false);
     }
 }

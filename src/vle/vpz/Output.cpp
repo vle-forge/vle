@@ -24,17 +24,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/Output.hpp>
-#include <vle/value/Value.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/vpz/Output.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
 Output::Output() = default;
 
-Output::Output(const Output& output)
+Output::Output(const Output &output)
     : Base(output)
     , m_name(output.m_name)
     , m_plugin(output.m_plugin)
@@ -46,7 +46,7 @@ Output::Output(const Output& output)
         m_data = output.m_data->clone();
 }
 
-Output& Output::operator=(const Output& output)
+Output &Output::operator=(const Output &output)
 {
     Output tmp(output);
     swap(tmp);
@@ -58,7 +58,7 @@ Output::~Output()
     clearData();
 }
 
-void Output::swap(Output& output)
+void Output::swap(Output &output)
 {
     std::swap(m_name, output.m_name);
     std::swap(m_plugin, output.m_plugin);
@@ -67,7 +67,7 @@ void Output::swap(Output& output)
     std::swap(m_data, output.m_data);
 }
 
-void Output::write(std::ostream& out) const
+void Output::write(std::ostream &out) const
 {
     out << "<output name=\"" << m_name.c_str() << "\" "
         << "location=\"" << m_location.c_str() << "\" ";
@@ -81,14 +81,15 @@ void Output::write(std::ostream& out) const
         out << ">\n";
         m_data->writeXml(out);
         out << "</output>\n";
-    } else {
+    }
+    else {
         out << "/>\n";
     }
 }
 
-void Output::setStream(const std::string& location,
-                       const std::string& plugin,
-                       const std::string& package)
+void Output::setStream(const std::string &location,
+                       const std::string &plugin,
+                       const std::string &package)
 {
     if (plugin.empty()) {
         throw utils::ArgError(
@@ -102,13 +103,12 @@ void Output::setStream(const std::string& location,
     clearData();
 }
 
-void Output::setStreamLocation(const std::string& location)
+void Output::setStreamLocation(const std::string &location)
 {
     m_location.assign(location);
 }
 
-void Output::setStream(const std::string& location,
-                       const std::string& plugin)
+void Output::setStream(const std::string &location, const std::string &plugin)
 {
     if (plugin.empty()) {
         throw utils::ArgError(
@@ -122,22 +122,21 @@ void Output::setStream(const std::string& location,
     clearData();
 }
 
-void Output::setData(std::unique_ptr<value::Value> value)
+void Output::setData(std::shared_ptr<value::Value> value)
 {
     m_data = std::move(value);
 }
 
 void Output::clearData()
 {
-    m_data.reset(nullptr);
+    m_data.reset();
 }
 
-bool Output::operator==(const Output& output) const
+bool Output::operator==(const Output &output) const
 {
-    return m_name == output.name() and m_plugin == output.plugin()
-        and m_location == output.location() and m_package == output.package()
-        and m_data == output.data();
-
+    return m_name == output.name() and m_plugin == output.plugin() and
+           m_location == output.location() and
+           m_package == output.package() and m_data == output.data();
 }
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz

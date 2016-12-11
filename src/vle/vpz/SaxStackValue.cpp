@@ -24,21 +24,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/SaxStackValue.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/Tuple.hpp>
-#include <vle/value/Table.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/vpz/SaxStackValue.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
 bool ValueStackSax::isCompositeParent() const
 {
     if (not m_valuestack.empty()) {
-        const auto & val = m_valuestack.top();
+        const auto &val = m_valuestack.top();
 
         return val->isMap() or val->isSet() or val->isMatrix();
     }
@@ -89,10 +89,10 @@ void ValueStackSax::pushMap()
         }
     }
 
-    pushOnVectorValue(value::Map::create());
+    pushOnVectorValue<value::Map>();
 }
 
-void ValueStackSax::pushMapKey(const std::string& key)
+void ValueStackSax::pushMapKey(const std::string &key)
 {
     if (not m_valuestack.empty()) {
         if (not m_valuestack.top()->isMap()) {
@@ -111,7 +111,7 @@ void ValueStackSax::pushSet()
         }
     }
 
-    pushOnVectorValue(value::Set::create());
+    pushOnVectorValue<value::Set>();
 }
 
 void ValueStackSax::pushMatrix(value::Matrix::index col,
@@ -127,8 +127,8 @@ void ValueStackSax::pushMatrix(value::Matrix::index col,
         }
     }
 
-    pushOnVectorValue(value::Matrix::create(col, row, colmax, rowmax,
-                                                   colstep, rowstep));
+    pushOnVectorValue<value::Matrix>(
+        col, row, colmax, rowmax, colstep, rowstep);
 }
 
 void ValueStackSax::pushTuple()
@@ -139,7 +139,7 @@ void ValueStackSax::pushTuple()
         }
     }
 
-    pushOnVectorValue(value::Tuple::create());
+    pushOnVectorValue<value::Tuple>();
 }
 
 void ValueStackSax::pushTable(const size_t width, const size_t height)
@@ -150,7 +150,7 @@ void ValueStackSax::pushTable(const size_t width, const size_t height)
         }
     }
 
-    pushOnVectorValue(value::Table::create(width, height));
+    pushOnVectorValue<value::Table>(width, height);
 }
 
 void ValueStackSax::pushXml()
@@ -178,7 +178,7 @@ void ValueStackSax::popValue()
     }
 }
 
-value::Value*  ValueStackSax::topValue()
+value::Value *ValueStackSax::topValue()
 {
     if (m_valuestack.empty()) {
         throw utils::SaxParserError(
@@ -186,32 +186,6 @@ value::Value*  ValueStackSax::topValue()
     }
 
     return m_valuestack.top();
-}
-
-void ValueStackSax::pushOnVectorValue(std::unique_ptr<value::Value> val)
-{
-    auto pointer = val.get();
-
-    if (not m_valuestack.empty()) {
-        if (m_valuestack.top()->isSet()) {
-            m_valuestack.top()->toSet().add(std::move(val));
-        } else if (m_valuestack.top()->isMap()) {
-            m_valuestack.top()->toMap().add(m_lastkey, std::move(val));
-        } else if (m_valuestack.top()->isMatrix()) {
-            value::Matrix& mx(m_valuestack.top()->toMatrix());
-            if (not val->isNull())
-                mx.addToLastCell(std::move(val));
-
-            mx.moveLastCell();
-        }
-    } else {
-        m_result.push_back(std::move(val));
-    }
-
-    if (pointer->isSet() or pointer->isMap() or
-        pointer->isTuple() or pointer->isTable() or
-        pointer->isMatrix())
-        m_valuestack.push(pointer);
 }
 
 void ValueStackSax::clear()
@@ -222,12 +196,12 @@ void ValueStackSax::clear()
     m_result.clear();
 }
 
-void ValueStackSax::pushResult(std::unique_ptr<value::Value> val)
+void ValueStackSax::pushResult(std::shared_ptr<value::Value> val)
 {
     m_result.push_back(std::move(val));
 }
 
-const std::unique_ptr<value::Value>& ValueStackSax::getResult(size_t i) const
+const std::shared_ptr<value::Value> &ValueStackSax::getResult(size_t i) const
 {
     if (m_result.size() < i)
         throw utils::SaxParserError(
@@ -236,7 +210,7 @@ const std::unique_ptr<value::Value>& ValueStackSax::getResult(size_t i) const
     return m_result[i];
 }
 
-const std::unique_ptr<value::Value>& ValueStackSax::getLastResult() const
+const std::shared_ptr<value::Value> &ValueStackSax::getLastResult() const
 {
     if (m_result.empty())
         throw utils::SaxParserError(
@@ -244,5 +218,5 @@ const std::unique_ptr<value::Value>& ValueStackSax::getLastResult() const
 
     return m_result[m_result.size() - 1];
 }
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz

@@ -24,12 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/vpz/Dynamic.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
-void Dynamic::write(std::ostream& out) const
+void Dynamic::write(std::ostream &out) const
 {
     out << "<dynamic "
         << "name=\"" << m_name.c_str() << "\" "
@@ -46,12 +46,11 @@ void Dynamic::write(std::ostream& out) const
     out << " />";
 }
 
-bool Dynamic::operator==(const Dynamic& dynamic) const
+bool Dynamic::operator==(const Dynamic &dynamic) const
 {
-    return m_name == dynamic.name()
-        and m_library == dynamic.library()
-	and m_language == dynamic.language()
-	and m_ispermanent == dynamic.isPermanent();
+    return m_name == dynamic.name() and m_library == dynamic.library() and
+           m_language == dynamic.language() and
+           m_ispermanent == dynamic.isPermanent();
 }
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz

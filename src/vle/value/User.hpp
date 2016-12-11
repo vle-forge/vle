@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_VALUE_USER_HPP
 #define VLE_VALUE_USER_HPP 1
 
-#include <vle/value/Value.hpp>
 #include <vle/DllDefines.hpp>
+#include <vle/value/Value.hpp>
 
-namespace vle { namespace value {
+namespace vle {
+namespace value {
 
 /**
  * @brief A Value to encapsulates user's data type.
@@ -42,29 +42,29 @@ namespace vle { namespace value {
  *   functions
  * - provide @c id function to identify your own data
  */
-class VLE_API User : public Value
-{
+class VLE_API User : public Value {
 public:
     /**
      * @brief Build a User object.
      */
     User()
         : Value()
-    {}
+    {
+    }
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    User(const User& value)
+    User(const User &value)
         : Value(value)
-    {}
+    {
+    }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~User()
-    {}
+    virtual ~User() {}
 
     /**
      * @brief To identify your own data.
@@ -79,19 +79,34 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::User.
      */
-    virtual Value::type getType() const override
-    { return Value::USER; }
+    virtual Value::type getType() const override { return Value::USER; }
 };
 
-inline const User& toUserValue(const std::unique_ptr<Value>& value)
-{ return value::reference(value).toUser(); }
+inline const User &toUserValue(std::shared_ptr<Value> value)
+{
+    return value::reference(value).toUser();
+}
 
-inline const User& toUserValue(const Value& value)
-{ return value.toUser(); }
+inline const User &toUserValue(std::shared_ptr<const Value> value)
+{
+    return value::reference(value).toUser();
+}
 
-inline User& toUserValue(Value& value)
-{ return value.toUser(); }
+inline const User &toUserValue(const std::unique_ptr<Value> &value)
+{
+    return value::reference(value).toUser();
+}
 
-}} // namespace vle value
+inline const User &toUserValue(const Value &value)
+{
+    return value.toUser();
+}
+
+inline User &toUserValue(Value &value)
+{
+    return value.toUser();
+}
+}
+} // namespace vle value
 
 #endif

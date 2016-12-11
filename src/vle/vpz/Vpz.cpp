@@ -87,11 +87,13 @@ void Vpz::parseFile(const std::string &filename)
         }
         throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
     }
-    Condition &cond_sim = project().experiment().conditions().get(
+
+    auto &cnd = project().experiment().conditions().get(
         Experiment::defaultSimulationEngineCondName());
-    if (cond_sim.getSetValues("begin").empty()) {
-        cond_sim.getSetValues("begin").add(value::Double::create(0));
-        cond_sim.getSetValues("duration").add(value::Double::create(100));
+
+    if (cnd.getSetValues("begin").empty()) {
+        cnd.getSetValues("begin").emplace_back(new value::Double(0));
+        cnd.getSetValues("duration").emplace_back(new value::Double(100));
     }
 }
 
@@ -115,15 +117,16 @@ void Vpz::parseMemory(const std::string &buffer)
         }
         throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
     }
-    Condition &cond_sim = project().experiment().conditions().get(
+
+    auto &cnd = project().experiment().conditions().get(
         Experiment::defaultSimulationEngineCondName());
-    if (cond_sim.getSetValues("begin").empty()) {
-        cond_sim.getSetValues("begin").add(value::Double::create(0));
-        cond_sim.getSetValues("duration").add(value::Double::create(100));
+    if (cnd.getSetValues("begin").empty()) {
+        cnd.getSetValues("begin").emplace_back(new value::Double(0));
+        cnd.getSetValues("duration").emplace_back(new value::Double(100));
     }
 }
 
-std::unique_ptr<value::Value> Vpz::parseValue(const std::string &buffer)
+std::shared_ptr<value::Value> Vpz::parseValue(const std::string &buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -134,10 +137,10 @@ std::unique_ptr<value::Value> Vpz::parseValue(const std::string &buffer)
             (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
     }
 
-    return std::move(sax.getValues()[0]);
+    return sax.getValues()[0];
 }
 
-std::vector<std::unique_ptr<value::Value>>
+std::vector<std::shared_ptr<value::Value>>
 Vpz::parseValues(const std::string &buffer)
 {
     Vpz vpz;
@@ -149,7 +152,7 @@ Vpz::parseValues(const std::string &buffer)
             (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
     }
 
-    return std::move(sax.getValues());
+    return sax.getValues();
 }
 
 void Vpz::write()

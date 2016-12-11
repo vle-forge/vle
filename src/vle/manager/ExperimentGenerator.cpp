@@ -24,52 +24,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
+#include <vle/value/Null.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/XML.hpp>
+#include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/Condition.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/BaseModel.hpp>
 
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
 
 //
 // Private implementation of the ExperimentGenerator.
 //
 
-class ExperimentGenerator::Pimpl
-{
-    Pimpl(const Pimpl& other);
-    Pimpl& operator=(const Pimpl& other);
+class ExperimentGenerator::Pimpl {
+    Pimpl(const Pimpl &other);
+    Pimpl &operator=(const Pimpl &other);
 
     int computeMaximumValue()
     {
         int result = 0;
 
-        const vpz::Conditions& cnds(mVpz.project().experiment().conditions());
+        const vpz::Conditions &cnds(mVpz.project().experiment().conditions());
 
         auto it = cnds.conditionlist().begin();
         while (it != cnds.conditionlist().end()) {
-            const vpz::Condition& cnd(it->second);
+            const vpz::Condition &cnd(it->second);
             vpz::ConditionValues::const_iterator jt;
 
             if (not cnd.conditionvalues().empty()) {
-                for (jt = cnd.conditionvalues().begin(); jt !=
-                     cnd.conditionvalues().end(); ++jt) {
+                for (jt = cnd.conditionvalues().begin();
+                     jt != cnd.conditionvalues().end();
+                     ++jt) {
 
-                    int conditionsize = jt->second->size();
+                    int conditionsize = jt->second.size();
 
                     if (result == 0 or result == 1) {
                         result = conditionsize;
-                    } else {
-                        if (conditionsize != 0 and conditionsize != 1
-                            and result != conditionsize) {
+                    }
+                    else {
+                        if (conditionsize != 0 and conditionsize != 1 and
+                            result != conditionsize) {
                             throw utils::InternalError(
                                 (fmt(_("ExperimentGenerator: bad combination "
                                        "size for the condition `%1%' port "
-                                       "`%2%': %3%")) % it->first % jt->first %
-                                 conditionsize).str());
+                                       "`%2%': %3%")) %
+                                 it->first % jt->first % conditionsize)
+                                    .str());
                         }
                     }
                 }
@@ -87,10 +100,11 @@ class ExperimentGenerator::Pimpl
         uint32_t number = mCompleteSize / mWorld;
         uint32_t modulo = mCompleteSize % mWorld;
 
-        mMin = (number+1) * std::min(mRank, modulo) + number *
-                uint32_t(std::max((int32_t) 0, int32_t(mRank-modulo)));
+        mMin =
+            (number + 1) * std::min(mRank, modulo) +
+            number * uint32_t(std::max((int32_t)0, int32_t(mRank - modulo)));
         mMax = std::min(mCompleteSize,
-                mMin + number + 1 * uint32_t(mRank < modulo));
+                        mMin + number + 1 * uint32_t(mRank < modulo));
     }
 
 public:
@@ -101,9 +115,13 @@ public:
     uint32_t mMin;
     uint32_t mMax;
 
-    Pimpl(const std::string& filename, uint32_t rank, uint32_t size)
-        : mVpz(filename), mRank(rank), mWorld(size), mCompleteSize(0), mMin(0),
-        mMax(0)
+    Pimpl(const std::string &filename, uint32_t rank, uint32_t size)
+        : mVpz(filename)
+        , mRank(rank)
+        , mWorld(size)
+        , mCompleteSize(0)
+        , mMin(0)
+        , mMax(0)
     {
         if (rank >= size) {
             throw utils::InternalError(_("Bad rank"));
@@ -112,9 +130,13 @@ public:
         computeRange();
     }
 
-    Pimpl(const vpz::Vpz& vpz, uint32_t rank, uint32_t size)
-        : mVpz(vpz), mRank(rank), mWorld(size), mCompleteSize(0), mMin(0),
-        mMax(0)
+    Pimpl(const vpz::Vpz &vpz, uint32_t rank, uint32_t size)
+        : mVpz(vpz)
+        , mRank(rank)
+        , mWorld(size)
+        , mCompleteSize(0)
+        , mMin(0)
+        , mMax(0)
     {
         if (rank >= size) {
             throw utils::InternalError(_("Bad rank"));
@@ -125,34 +147,36 @@ public:
 
     void get(uint32_t index, vpz::Conditions *conditions)
     {
-        const vpz::Conditions& cnds(mVpz.project().experiment().conditions());
+        const vpz::Conditions &cnds(mVpz.project().experiment().conditions());
         conditions->deleteValueSet();
-        vpz::ConditionList& cdldst(conditions->conditionlist());
+        vpz::ConditionList &cdldst(conditions->conditionlist());
 
         vpz::ConditionList::const_iterator it;
         for (it = cnds.begin(); it != cnds.end(); ++it) {
 
-            std::pair < vpz::ConditionList::iterator, bool > r =
-                cdldst.insert(std::make_pair(
-                        it->first, vpz::Condition(it->first)));
+            std::pair<vpz::ConditionList::iterator, bool> r = cdldst.insert(
+                std::make_pair(it->first, vpz::Condition(it->first)));
 
-            const vpz::ConditionValues& cnvsrc = it->second.conditionvalues();
-            vpz::ConditionValues& cnvdst = r.first->second.conditionvalues();
+            const vpz::ConditionValues &cnvsrc = it->second.conditionvalues();
+            vpz::ConditionValues &cnvdst = r.first->second.conditionvalues();
 
-            for (const auto & elem : cnvsrc) {
+            for (const auto &elem : cnvsrc) {
+                std::vector<std::shared_ptr<value::Value>> cpy;
 
-                auto cpy = std::unique_ptr<value::Set>(new value::Set());
-
-                if (elem.second->size() == 1) {
-                    cpy->add(elem.second->get(0)->clone());
-                } else if (elem.second->size() > 1 and elem.second->size() >
-                           index) {
-                    cpy->add(elem.second->get(index)->clone());
-                } else {
+                if (elem.second.size() == 1) {
+                    cpy.emplace_back(elem.second[0]);
+                }
+                else if (elem.second.size() > 1 and
+                         elem.second.size() > index) {
+                    cpy.emplace_back(elem.second[index]);
+                }
+                else {
                     throw utils::InternalError(
-                        (fmt(_("ExperimentGenerator can not access to the index"
-                               " `%1%' of the condition `%2%' port `%3%' ")) %
-                         index % it->first % elem.first).str());
+                        (fmt(_(
+                             "ExperimentGenerator can not access to the index"
+                             " `%1%' of the condition `%2%' port `%3%' ")) %
+                         index % it->first % elem.first)
+                            .str());
                 }
 
                 cnvdst[elem.first] = std::move(cpy);
@@ -165,14 +189,15 @@ public:
 // Public API of the ExperimentGenerator
 //
 
-ExperimentGenerator::ExperimentGenerator(const std::string& vpz,
+ExperimentGenerator::ExperimentGenerator(const std::string &vpz,
                                          uint32_t rank,
                                          uint32_t size)
     : mPimpl(new ExperimentGenerator::Pimpl(vpz, rank, size))
 {
 }
 
-ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& vpz, uint32_t rank,
+ExperimentGenerator::ExperimentGenerator(const vpz::Vpz &vpz,
+                                         uint32_t rank,
                                          uint32_t size)
     : mPimpl(new ExperimentGenerator::Pimpl(vpz, rank, size))
 {
@@ -202,5 +227,5 @@ uint32_t ExperimentGenerator::size() const
 {
     return mPimpl->mCompleteSize;
 }
-
-}}  // namespace vle manager
+}
+} // namespace vle manager

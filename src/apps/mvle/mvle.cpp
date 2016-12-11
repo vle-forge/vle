@@ -206,7 +206,7 @@ void mvle_show(const std::string &vpz)
                 vle::vpz::Condition::const_iterator jt;
 
                 for (jt = cond.begin(); jt != cond.end(); ++jt) {
-                    printf("%s;", jt->second->get(0)->writeToFile().c_str());
+                    printf("%s;", jt->second[0]->writeToFile().c_str());
                 }
             }
             printf("\n");

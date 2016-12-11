@@ -24,41 +24,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_VALUE_NULL_HPP
 #define VLE_VALUE_NULL_HPP 1
 
-#include <vle/value/Value.hpp>
 #include <vle/DllDefines.hpp>
+#include <vle/value/Value.hpp>
 
-namespace vle { namespace value {
+namespace vle {
+namespace value {
 
 /**
  * @brief A null Value. This class is uses to build empty value into
  * container. Can be useful on Map, Set etc.
  */
-class VLE_API Null : public Value
-{
+class VLE_API Null : public Value {
 public:
     /**
      * @brief Build a Null object.
      */
-    Null()
-    {}
+    Null() {}
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Null(const Null& value)
+    Null(const Null &value)
         : Value(value)
-    {}
+    {
+    }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Null()
-    {}
+    virtual ~Null() {}
 
     ///
     ////
@@ -82,26 +80,27 @@ public:
      * @return A new Null.
      */
     virtual std::unique_ptr<Value> clone() const override
-    { return std::unique_ptr<Value>(new Null()); }
+    {
+        return std::unique_ptr<Value>(new Null());
+    }
 
     /**
      * @brief Get the type of this class.
      * @return Return Value::NIL.
      */
-    inline virtual Value::type getType() const override
-    { return Value::NIL; }
+    inline virtual Value::type getType() const override { return Value::NIL; }
 
     /**
      * @brief Push the string 'NA' into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    virtual void writeFile(std::ostream &out) const override;
 
     /**
      * @brief Push the string 'NA' into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    virtual void writeString(std::ostream &out) const override;
 
     /**
      * @brief Push a specific string into the stream. The XML representation of
@@ -111,7 +110,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    virtual void writeXml(std::ostream &out) const override;
 };
 
 /**
@@ -123,34 +122,53 @@ public:
  * it = std::find_if(v.begin(), v.end(), value::IsNullValue());
  * @endcode
  */
-struct VLE_API IsNullValue
-{
+struct VLE_API IsNullValue {
     /**
      * @brief Check if the value is a Null value.
      * @param value The value to check.
      * @return Ture if the value is a Null, false otherwise.
      */
-    bool operator()(const value::Value& value) const
-    { return value.getType() == Value::NIL; }
+    bool operator()(const value::Value &value) const
+    {
+        return value.getType() == Value::NIL;
+    }
 
     /**
      * @brief Check if the pointer value is 0 or a Null value.
      * @param value The pointer to check.
      * @return True if the value is 0 or a Null value, false otherwise.
      */
-    bool operator()(const std::unique_ptr<value::Value>& value) const
-    { return value and value->getType() == Value::NIL; }
+    bool operator()(const std::unique_ptr<value::Value> &value) const
+    {
+        return value and value->getType() == Value::NIL;
+    }
 };
 
-inline const Null& toNullValue(const std::unique_ptr<Value>& value)
-{ return value::reference(value).toNull(); }
+inline const Null &toNullValue(std::shared_ptr<Value> value)
+{
+    return value::reference(value).toNull();
+}
 
-inline const Null& toNullValue(const Value& value)
-{ return value.toNull(); }
+inline const Null &toNullValue(std::shared_ptr<const Value> value)
+{
+    return value::reference(value).toNull();
+}
 
-inline Null& toNullValue(Value& value)
-{ return value.toNull(); }
+inline const Null &toNullValue(const std::unique_ptr<Value> &value)
+{
+    return value::reference(value).toNull();
+}
 
-}} // namespace vle value
+inline const Null &toNullValue(const Value &value)
+{
+    return value.toNull();
+}
+
+inline Null &toNullValue(Value &value)
+{
+    return value.toNull();
+}
+}
+} // namespace vle value
 
 #endif

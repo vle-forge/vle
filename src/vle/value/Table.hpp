@@ -24,27 +24,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_VALUE_TABLE_HPP
 #define VLE_VALUE_TABLE_HPP 1
 
-#include <vle/value/Value.hpp>
-#include <vle/DllDefines.hpp>
 #include <vector>
+#include <vle/DllDefines.hpp>
+#include <vle/value/Value.hpp>
 
-namespace vle { namespace value {
+namespace vle {
+namespace value {
 
 /**
  * @brief Define an array of two dimensions of real.
  */
-typedef std::vector <double> TableValue;
+typedef std::vector<double> TableValue;
 
 /**
  * @brief A table is a container for double value into an
  * boost::multi_array < double, 2 >. The XML format is:
  */
-class VLE_API Table : public Value
-{
+class VLE_API Table : public Value {
 public:
     using index = TableValue::size_type;
     using size_type = TableValue::size_type;
@@ -69,13 +68,12 @@ public:
      *
      * @param value The value to copy.
      */
-    Table(const Table& value) = default;
+    Table(const Table &value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Table()
-    {}
+    virtual ~Table() {}
 
     ///
     ////
@@ -114,7 +112,9 @@ public:
      * @return A new Table.
      */
     virtual std::unique_ptr<Value> clone() const override
-    { return std::unique_ptr<Value>(new Table(*this)); }
+    {
+        return std::unique_ptr<Value>(new Table(*this));
+    }
 
     /**
      * @brief Get the type of this class.
@@ -133,7 +133,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    virtual void writeFile(std::ostream &out) const override;
 
     /**
      * @brief Push all real from the TableValue separated by colon for
@@ -145,7 +145,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    virtual void writeString(std::ostream &out) const override;
 
     /**
      * @brief Push all real from the TableValue into an XML representation.
@@ -157,7 +157,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    virtual void writeXml(std::ostream &out) const override;
 
     ///
     ////
@@ -168,40 +168,35 @@ public:
      *
      * @return A reference to the TableValue.
      */
-    inline TableValue& value()
-    { return m_value; }
+    inline TableValue &value() { return m_value; }
 
     /**
      * @brief Get a constant reference to the TableValue.
      *
      * @return A constant reference to the TableValue.
      */
-    inline const TableValue& value() const
-    { return m_value; }
+    inline const TableValue &value() const { return m_value; }
 
     /**
      * @brief Check if the TableValue is empty.
      *
      * @return True if TableValue is empty, false otherwise.
      */
-    inline bool empty() const
-    { return m_value.empty(); }
+    inline bool empty() const { return m_value.empty(); }
 
     /**
      * @brief Get the width of the TableValue.
      *
      * @return The width.
      */
-    inline std::size_t width() const
-    { return m_width; }
+    inline std::size_t width() const { return m_width; }
 
     /**
      * @brief Get the height of the TableValue.
      *
      * @return The height.
      */
-    inline std::size_t height() const
-    { return m_height; }
+    inline std::size_t height() const { return m_height; }
 
     /**
      * @brief Resize the Table with a new size. Be carrefull, data may be
@@ -230,7 +225,7 @@ public:
      *
      * @return a reference to the real.
      */
-    double& operator()(std::size_t x, std::size_t y);
+    double &operator()(std::size_t x, std::size_t y);
 
     /**
      * @brief get a constant reference to the value at the specified index.
@@ -250,7 +245,7 @@ public:
      *
      * @return a reference to the real.
      */
-    double& get(std::size_t x, std::size_t y);
+    double &get(std::size_t x, std::size_t y);
 
     /**
      * @brief Fill the current table with multiple reals read from a string.
@@ -261,32 +256,64 @@ public:
      * @throw utils::ArgError if string have problem like bad number of
      * real.
      */
-    void fill(const std::string& str);
+    void fill(const std::string &str);
 
 private:
-    TableValue      m_value;
-    index           m_width;
-    index           m_height;
+    TableValue m_value;
+    index m_width;
+    index m_height;
 };
 
-inline const Table& toTableValue(const std::unique_ptr<Value>& value)
-{ return value::reference(value).toTable(); }
+inline const Table &toTableValue(std::shared_ptr<Value> value)
+{
+    return value::reference(value).toTable();
+}
 
-inline const Table& toTableValue(const Value& value)
-{ return value.toTable(); }
+inline const Table &toTableValue(std::shared_ptr<const Value> value)
+{
+    return value::reference(value).toTable();
+}
 
-inline Table& toTableValue(Value& value)
-{ return value.toTable(); }
+inline const Table &toTableValue(const std::unique_ptr<Value> &value)
+{
+    return value::reference(value).toTable();
+}
 
-inline const TableValue& toTable(const std::unique_ptr<Value>& value)
-{ return value::reference(value).toTable().value(); }
+inline const Table &toTableValue(const Value &value)
+{
+    return value.toTable();
+}
 
-inline const TableValue& toTable(const Value& value)
-{ return value.toTable().value(); }
+inline Table &toTableValue(Value &value)
+{
+    return value.toTable();
+}
 
-inline TableValue& toTable(Value& value)
-{ return value.toTable().value(); }
+inline const TableValue &toTable(std::shared_ptr<Value> value)
+{
+    return value::reference(value).toTable().value();
+}
 
-}} // namespace vle value
+inline const TableValue &toTable(std::shared_ptr<const Value> value)
+{
+    return value::reference(value).toTable().value();
+}
+
+inline const TableValue &toTable(const std::unique_ptr<Value> &value)
+{
+    return value::reference(value).toTable().value();
+}
+
+inline const TableValue &toTable(const Value &value)
+{
+    return value.toTable().value();
+}
+
+inline TableValue &toTable(Value &value)
+{
+    return value.toTable().value();
+}
+}
+} // namespace vle value
 
 #endif

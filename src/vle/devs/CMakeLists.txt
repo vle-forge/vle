@@ -1,6 +1,6 @@
 add_sources(vlelib Coordinator.cpp Dynamics.cpp DynamicsDbg.cpp
   DynamicsWrapper.cpp Executive.cpp ExternalEvent.cpp
-  ExternalEventList.cpp InternalEvent.cpp ModelFactory.cpp
+  ExternalEventList.cpp InitEventList.cpp InternalEvent.cpp ModelFactory.cpp
   RootCoordinator.cpp Scheduler.cpp Simulator.cpp Time.cpp View.cpp
   ViewEvent.cpp)
 

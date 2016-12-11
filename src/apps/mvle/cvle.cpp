@@ -30,6 +30,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Matrix.hpp>
+#include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 
 #include <boost/algorithm/string.hpp>
@@ -71,7 +72,7 @@ typedef std::shared_ptr<vle::vpz::Vpz> VpzPtr;
 void generate_template_line(std::ostream &header,
                             std::ostream &firstline,
                             std::string name,
-                            const std::unique_ptr<vle::value::Value> &value)
+                            const std::shared_ptr<vle::value::Value> &value)
 {
     std::stack<std::tuple<std::string, const vle::value::Value *>> stack;
 
@@ -149,15 +150,14 @@ void generate_template(std::string file,
             auto endj = it->second.end();
 
             while (jt != endj) {
-                if (not jt->second or not jt->second->isSet() or
-                    not jt->second->get(0))
+                if (not jt->second.empty() or not jt->second[0])
                     continue;
 
                 std::string name = it->first;
                 name += '.';
                 name += jt->first;
 
-                generate_template_line(ofs, oss, name, jt->second->get(0));
+                generate_template_line(ofs, oss, name, jt->second[0]);
 
                 ++jt;
 
@@ -242,23 +242,23 @@ struct Access {
      * \c vle::value::Value pointer by browsing the experimental condition
      * of the \e vpz arguement.
      */
-    const std::unique_ptr<vle::value::Value> *value(VpzPtr vpz) const
+    vle::value::Value *value(VpzPtr vpz) const
     {
         auto &cnd = vpz->project().experiment().conditions().get(condition);
         auto &set = cnd.getSetValues(port);
 
         if (params.empty())
-            return &set.get(0);
+            return set[0].get();
 
-        const std::unique_ptr<vle::value::Value> *current = &set.get(0);
+        vle::value::Value *current = set[0].get();
         for (std::size_t i = 0, e = params.size(); i != e; ++i) {
-            if ((*current)->isSet()) {
+            if (current->isSet()) {
                 errno = 0;
                 long int val = strtol(params[i].c_str(), NULL, 10);
 
                 if (errno or val < 0 or
-                    val >= boost::numeric_cast<long int>(
-                               (*current)->toSet().size()))
+                    val >=
+                        boost::numeric_cast<long int>(current->toSet().size()))
                     throw vle::utils::ArgError(
                         _("Fails to convert '%s.%s' parameter '%zu'"
                           " as correct set index"),
@@ -266,12 +266,12 @@ struct Access {
                         port.c_str(),
                         i);
 
-                current = &(*current)->toSet().get(val);
+                current = current->toSet()[val].get();
             }
-            else if ((*current)->isMap()) {
-                auto it = (*current)->toMap().find(params[i]);
+            else if (current->isMap()) {
+                auto it = current->toMap().find(params[i]);
 
-                if (it == (*current)->toMap().end())
+                if (it == current->toMap().end())
                     throw vle::utils::ArgError(
                         _("Fails to convert '%s.%s' parameter '%zu'"
                           " as correct map index"),
@@ -279,7 +279,7 @@ struct Access {
                         port.c_str(),
                         i);
 
-                current = &it->second;
+                current = it->second.get();
             }
             else {
                 throw vle::utils::ArgError(
@@ -290,7 +290,7 @@ struct Access {
                     i);
             }
 
-            if (not current or not current->get())
+            if (not current)
                 throw vle::utils::ArgError(_("Fails to convert '%s'"),
                                            condition.c_str());
         }
@@ -335,28 +335,26 @@ static std::string cleanup_token(const std::string &str)
  *
  * @return [description]
  */
-static void
-assign_string_to_value(const std::unique_ptr<vle::value::Value> *value,
-                       const std::string &str)
+static void assign_string_to_value(vle::value::Value *value,
+                                   const std::string &str)
 {
     assert(value);
-    assert(value->get());
 
-    switch ((*value)->getType()) {
+    switch (value->getType()) {
     case vle::value::Value::BOOLEAN:
-        (*value)->toBoolean().value() = vle::utils::to<bool>(str);
+        value->toBoolean().value() = vle::utils::to<bool>(str);
         break;
 
     case vle::value::Value::INTEGER:
-        (*value)->toInteger().value() = vle::utils::to<std::int32_t>(str);
+        value->toInteger().value() = vle::utils::to<std::int32_t>(str);
         break;
 
     case vle::value::Value::DOUBLE:
-        (*value)->toDouble().value() = vle::utils::to<double>(str);
+        value->toDouble().value() = vle::utils::to<double>(str);
         break;
 
     case vle::value::Value::STRING:
-        (*value)->toString().value() = str;
+        value->toString().value() = str;
         break;
 
     default:
@@ -366,20 +364,20 @@ assign_string_to_value(const std::unique_ptr<vle::value::Value> *value,
 }
 
 struct ColumnDefinition {
-    ColumnDefinition(const std::string &str)
-        : str(str)
-        , value(NULL)
+    ColumnDefinition(const std::string &str_)
+        : str(str_)
+        , value(nullptr)
     {
     }
 
-    ColumnDefinition(const std::unique_ptr<vle::value::Value> *value)
-        : str(std::string())
-        , value(value)
+    ColumnDefinition(vle::value::Value *value_)
+        : str()
+        , value(value_)
     {
     }
 
     std::string str;
-    const std::unique_ptr<vle::value::Value> *value;
+    vle::value::Value *value;
 };
 
 struct Columns {
@@ -389,10 +387,7 @@ struct Columns {
 
     void add(const std::string &str) { data.emplace_back(str); }
 
-    void add(const std::unique_ptr<vle::value::Value> *value)
-    {
-        data.emplace_back(value);
-    }
+    void add(vle::value::Value *value) { data.emplace_back(value); }
 
     std::size_t size() const { return data.size(); }
 

@@ -27,12 +27,12 @@
 #ifndef VLE_UTILS_TOOLS_HPP
 #define VLE_UTILS_TOOLS_HPP
 
-#include <vle/DllDefines.hpp>
-#include <typeinfo>
-#include <string>
 #include <limits>
-#include <vector>
 #include <stdexcept>
+#include <string>
+#include <typeinfo>
+#include <vector>
+#include <vle/DllDefines.hpp>
 
 #if defined(__GNUC__)
 #define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                                 \
@@ -62,10 +62,8 @@
 #define VLE_CXX14_CONSTEXPR
 #endif
 
-namespace vle
-{
-namespace utils
-{
+namespace vle {
+namespace utils {
 
 /**
  * The function \c format() produce a \c std::string according to a C
@@ -81,8 +79,8 @@ namespace utils
  * \return a empty string if an error occured otherwise the \e printf()
  * formatted string.
  */
-std::string VLE_API
-format(const char *format, ...) noexcept GCC_ATTRIBUTE_FORMAT(1, 2);
+std::string VLE_API format(const char *format,
+                           ...) noexcept GCC_ATTRIBUTE_FORMAT(1, 2);
 
 /**
  * The function \c vformat() produces a \c std::string according to a C

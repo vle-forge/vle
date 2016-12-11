@@ -24,29 +24,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/Exception.hpp>
-#include <limits>
 #include <cstdarg>
 #include <cstdio>
+#include <limits>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 
 namespace {
 
 int default_buffer_size(std::size_t size) noexcept
 {
-    return static_cast<int>(
-        std::max(size,
-                 static_cast<size_t>(
-                     std::numeric_limits<int>::max())));
+    if (vle::utils::is_numeric_castable<int>(size))
+        return vle::utils::numeric_cast<int>(size);
+
+    return 4096;
+}
 }
 
-}
-
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 FileError::FileError(std::string message)
     : std::runtime_error("")
     , m_message(message)
-{}
+{
+}
 
 FileError::FileError(const char *format, ...)
     : std::runtime_error("")
@@ -74,7 +76,7 @@ FileError::FileError(const char *format, ...)
     }
 }
 
-const char* FileError::what() const noexcept
+const char *FileError::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -82,7 +84,8 @@ const char* FileError::what() const noexcept
 ParseError::ParseError(std::string message)
     : std::runtime_error("")
     , m_message(message)
-{}
+{
+}
 
 ParseError::ParseError(const char *format, ...)
     : std::runtime_error("")
@@ -110,7 +113,7 @@ ParseError::ParseError(const char *format, ...)
     }
 }
 
-const char* ParseError::what() const noexcept
+const char *ParseError::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -118,7 +121,8 @@ const char* ParseError::what() const noexcept
 ArgError::ArgError(std::string message)
     : std::logic_error("")
     , m_message(message)
-{}
+{
+}
 
 ArgError::ArgError(const char *format, ...)
     : std::logic_error("")
@@ -147,7 +151,7 @@ ArgError::ArgError(const char *format, ...)
     }
 }
 
-const char* ArgError::what() const noexcept
+const char *ArgError::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -155,7 +159,8 @@ const char* ArgError::what() const noexcept
 CastError::CastError(std::string message)
     : std::runtime_error("")
     , m_message(message)
-{}
+{
+}
 
 CastError::CastError(const char *format, ...)
     : std::runtime_error("")
@@ -184,7 +189,7 @@ CastError::CastError(const char *format, ...)
     }
 }
 
-const char* CastError::what() const noexcept
+const char *CastError::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -192,7 +197,8 @@ const char* CastError::what() const noexcept
 InternalError::InternalError(std::string message)
     : std::logic_error("")
     , m_message(message)
-{}
+{
+}
 
 InternalError::InternalError(const char *format, ...)
     : std::logic_error("")
@@ -221,7 +227,7 @@ InternalError::InternalError(const char *format, ...)
     }
 }
 
-const char* InternalError::what() const noexcept
+const char *InternalError::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -229,7 +235,8 @@ const char* InternalError::what() const noexcept
 ModellingError::ModellingError(std::string message)
     : std::runtime_error("")
     , m_message(message)
-{}
+{
+}
 
 ModellingError::ModellingError(const char *format, ...)
     : std::runtime_error("")
@@ -258,7 +265,7 @@ ModellingError::ModellingError(const char *format, ...)
     }
 }
 
-const char* ModellingError::what() const noexcept
+const char *ModellingError::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -266,7 +273,8 @@ const char* ModellingError::what() const noexcept
 NotYetImplemented::NotYetImplemented(std::string message)
     : std::logic_error("")
     , m_message(message)
-{}
+{
+}
 
 NotYetImplemented::NotYetImplemented(const char *format, ...)
     : std::logic_error("")
@@ -295,7 +303,7 @@ NotYetImplemented::NotYetImplemented(const char *format, ...)
     }
 }
 
-const char* NotYetImplemented::what() const noexcept
+const char *NotYetImplemented::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -303,7 +311,8 @@ const char* NotYetImplemented::what() const noexcept
 DevsGraphError::DevsGraphError(std::string message)
     : std::runtime_error("")
     , m_message(message)
-{}
+{
+}
 
 DevsGraphError::DevsGraphError(const char *format, ...)
     : std::runtime_error("")
@@ -332,7 +341,7 @@ DevsGraphError::DevsGraphError(const char *format, ...)
     }
 }
 
-const char* DevsGraphError::what() const noexcept
+const char *DevsGraphError::what() const noexcept
 {
     return m_message.c_str();
 }
@@ -340,7 +349,8 @@ const char* DevsGraphError::what() const noexcept
 SaxParserError::SaxParserError(std::string message)
     : std::runtime_error("")
     , m_message(message)
-{}
+{
+}
 
 SaxParserError::SaxParserError(const char *format, ...)
     : std::runtime_error("")
@@ -369,9 +379,9 @@ SaxParserError::SaxParserError(const char *format, ...)
     }
 }
 
-const char* SaxParserError::what() const noexcept
+const char *SaxParserError::what() const noexcept
 {
     return m_message.c_str();
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils

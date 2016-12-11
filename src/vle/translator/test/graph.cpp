@@ -68,8 +68,7 @@ using namespace vle;
     }                                                                         \
     }
 
-class Beep : public devs::Dynamics
-{
+class Beep : public devs::Dynamics {
 public:
     Beep(const devs::DynamicsInit &model, const devs::InitEventList &events)
         : devs::Dynamics(model, events)
@@ -87,8 +86,7 @@ public:
     }
 };
 
-class Transform : public devs::Dynamics
-{
+class Transform : public devs::Dynamics {
 public:
     Transform(const devs::DynamicsInit &atom,
               const devs::InitEventList &events)
@@ -131,8 +129,7 @@ private:
     int m_counter;
 };
 
-class GraphGenerator : public devs::Executive
-{
+class GraphGenerator : public devs::Executive {
     std::mt19937 generator;
     std::string generator_type;
 
@@ -195,7 +192,8 @@ public:
             Ensures(metrics.vertices == 1000);
             Ensures(metrics.edges > 0);
             Ensures(metrics.bandwidth > 0);
-        } else if (generator_type == "scalefree") {
+        }
+        else if (generator_type == "scalefree") {
             auto gg = make_gg();
             gg.make_scalefree(*this, generator, 1000, 2.5, 10000, false);
 
@@ -204,7 +202,8 @@ public:
             Ensures(metrics.vertices == 1000);
             Ensures(metrics.edges > 0);
             Ensures(metrics.bandwidth > 0);
-        } else if (generator_type == "sortederdosrenyi") {
+        }
+        else if (generator_type == "sortederdosrenyi") {
             auto gg = make_gg();
             gg.make_sorted_erdos_renyi(*this, generator, 1000, 0.01, false);
 
@@ -213,14 +212,16 @@ public:
             Ensures(metrics.vertices == 1000);
             Ensures(metrics.edges > 0);
             Ensures(metrics.bandwidth > 0);
-        } else if (generator_type == "1d") {
+        }
+        else if (generator_type == "1d") {
             auto rgg = make_rgg();
             std::vector<std::string> mask{"left", "", "right"};
             rgg.make_1d(*this, 1000, false, mask, 1);
 
             auto metrics = rgg.metrics();
             Ensures(metrics.vertices == 1000);
-        } else if (generator_type == "2d") {
+        }
+        else if (generator_type == "2d") {
             auto rgg = make_rgg();
 
             std::array<int, 2> length{{50, 20}};
@@ -235,14 +236,16 @@ public:
 
             auto metrics = rgg.metrics();
             Ensures(metrics.vertices == 1000);
-        } else if (generator_type == "1dwrap") {
+        }
+        else if (generator_type == "1dwrap") {
             auto rgg = make_rgg();
             std::vector<std::string> mask{"left", "", "right"};
             rgg.make_1d(*this, 1000, true, mask, 1);
 
             auto metrics = rgg.metrics();
             Ensures(metrics.vertices == 1000);
-        } else if (generator_type == "2dwrap") {
+        }
+        else if (generator_type == "2dwrap") {
             auto rgg = make_rgg();
 
             std::array<int, 2> length{{50, 20}};
@@ -257,7 +260,8 @@ public:
 
             auto metrics = rgg.metrics();
             Ensures(metrics.vertices == 1000);
-        } else {
+        }
+        else {
             EnsuresNotReached();
         }
 
@@ -284,11 +288,11 @@ void test_smallworld()
                      .experiment()
                      .conditions()
                      .get("cond")
-                     .getSetValues("generator")
-                     .get(0)
-                     ->toString();
+                     .getSetValues("generator")[0]
+                     ->toString()
+                     .value();
 
-    cond.value() = "smallworld";
+    cond = "smallworld";
 
     root.load(file);
     file.clear();
@@ -316,11 +320,11 @@ void test_scalefree()
                      .experiment()
                      .conditions()
                      .get("cond")
-                     .getSetValues("generator")
-                     .get(0)
-                     ->toString();
+                     .getSetValues("generator")[0]
+                     ->toString()
+                     .value();
 
-    cond.value() = "scalefree";
+    cond = "scalefree";
 
     root.load(file);
     file.clear();
@@ -348,11 +352,11 @@ void test_sorted_erdos_renyi()
                      .experiment()
                      .conditions()
                      .get("cond")
-                     .getSetValues("generator")
-                     .get(0)
-                     ->toString();
+                     .getSetValues("generator")[0]
+                     ->toString()
+                     .value();
 
-    cond.value() = "sortederdosrenyi";
+    cond = "sortederdosrenyi";
 
     root.load(file);
     file.clear();
@@ -380,11 +384,11 @@ void test_regular_1d()
                      .experiment()
                      .conditions()
                      .get("cond")
-                     .getSetValues("generator")
-                     .get(0)
-                     ->toString();
+                     .getSetValues("generator")[0]
+                     ->toString()
+                     .value();
 
-    cond.value() = "1d";
+    cond = "1d";
 
     root.load(file);
     file.clear();
@@ -412,11 +416,11 @@ void test_regular_2d()
                      .experiment()
                      .conditions()
                      .get("cond")
-                     .getSetValues("generator")
-                     .get(0)
-                     ->toString();
+                     .getSetValues("generator")[0]
+                     ->toString()
+                     .value();
 
-    cond.value() = "2d";
+    cond = "2d";
 
     root.load(file);
     file.clear();
@@ -444,11 +448,11 @@ void test_regular_1d_wrap()
                      .experiment()
                      .conditions()
                      .get("cond")
-                     .getSetValues("generator")
-                     .get(0)
-                     ->toString();
+                     .getSetValues("generator")[0]
+                     ->toString()
+                     .value();
 
-    cond.value() = "1dwrap";
+    cond = "1dwrap";
 
     root.load(file);
     file.clear();
@@ -476,11 +480,11 @@ void test_regular_2d_wrap()
                      .experiment()
                      .conditions()
                      .get("cond")
-                     .getSetValues("generator")
-                     .get(0)
-                     ->toString();
+                     .getSetValues("generator")[0]
+                     ->toString()
+                     .value();
 
-    cond.value() = "2dwrap";
+    cond = "2dwrap";
 
     root.load(file);
     file.clear();

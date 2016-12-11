@@ -16,16 +16,16 @@
 
 #include <algorithm>
 #include <random>
-#include <vle/value/Map.hpp>
-#include <vle/value/Tuple.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/translator/GraphTranslator.hpp>
 #include <vle/translator/MatrixTranslator.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Tuple.hpp>
 
-class Builder : public vle::devs::Executive
-{
+class Builder : public vle::devs::Executive {
     std::mt19937 generator;
     std::string model_prefix;
     std::string model_classname;
