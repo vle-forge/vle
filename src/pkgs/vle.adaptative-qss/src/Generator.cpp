@@ -15,8 +15,8 @@
  */
 
 #include <vle/devs/Dynamics.hpp>
-#include <vle/value/Map.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/value/Map.hpp>
 
 namespace vd = vle::devs;
 namespace vv = vle::value;
@@ -26,8 +26,8 @@ namespace vu = vle::utils;
 class Generator : public vd::Dynamics
 {
 public:
-    Generator(const vd::DynamicsInit &init, const vd::InitEventList &events)
-        : vd::Dynamics(init, events)
+    Generator(const vd::DynamicsInit& init, const vd::InitEventList& events)
+      : vd::Dynamics(init, events)
     {
         vg::ConnectionList my_list;
 
@@ -37,7 +37,9 @@ public:
             m_val = vv::toDouble(events.get("source_init_level"));
         } else {
             m_val = 1;
-            Trace(context(), 6, "Warning : Model %s got no init"
+            Trace(context(),
+                  6,
+                  "Warning : Model %s got no init"
                   " output level (source_init_level) : assuming 1\n",
                   getModelName().c_str());
         }
@@ -48,15 +50,20 @@ public:
                 m_quantum = vv::toDouble(events.get("source_quantum"));
             } else {
                 m_quantum = 0.01;
-                Trace(context(), 6, "Warning : Model %s got no output"
+                Trace(context(),
+                      6,
+                      "Warning : Model %s got no output"
                       " quantum (source_quantum) : assuming 0.01\n",
                       getModelName().c_str());
             }
         } else {
             m_trend = 0;
 
-            Trace(context(), 6, "%s got no output trend (source_trend)"
-                  " : assuming 0\n", getModelName().c_str());
+            Trace(context(),
+                  6,
+                  "%s got no output trend (source_trend)"
+                  " : assuming 0\n",
+                  getModelName().c_str());
 
             // no trend => quantum is useless but..
             m_quantum = 0.01;
@@ -76,8 +83,11 @@ public:
         }
 
         if (my_list.size() > 1) {
-            Trace(context(), 6, "Warning: multiple output ports."
-                  " Will use only port %s\n", m_output_port_label.c_str());
+            Trace(context(),
+                  6,
+                  "Warning: multiple output ports."
+                  " Will use only port %s\n",
+                  m_output_port_label.c_str());
         }
     }
 
@@ -85,10 +95,10 @@ public:
     {
     }
 
-    virtual vd::Time init(vd::Time  /* time */) override { return 0; }
+    virtual vd::Time init(vd::Time /* time */) override { return 0; }
 
     virtual void output(vd::Time time,
-                        vd::ExternalEventList &output) const override
+                        vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
             const double out_val = m_val + m_trend * time;
@@ -112,8 +122,8 @@ public:
         }
     }
 
-    std::unique_ptr<vv::Value>
-    observation(const vd::ObservationEvent & /*event*/) const override
+    std::unique_ptr<vv::Value> observation(
+      const vd::ObservationEvent& /*event*/) const override
     {
         return vv::Double::create(m_last_output);
     }

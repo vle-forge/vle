@@ -9,7 +9,7 @@ function(DeclareSimulator targetname package name sources)
 
   add_library(${targetname} MODULE ${sources})
 
-  target_link_libraries(${targetname} 
+  target_link_libraries(${targetname}
     vlelib ${VLEDEPS_LIBRARIES})
 
   set_target_properties(${targetname} PROPERTIES
@@ -30,3 +30,4 @@ DeclareSimulator(pkg-generator vle.adaptative-qss Generetor src/Generator.cpp)
 DeclareSimulator(pkg-quantifier vle.adaptative-qss AdaptativeQuantifier src/AdaptativeQuantifier.cpp)
 DeclareSimulator(pkg-integrator vle.adaptative-qss Integrator src/Integrator.cpp)
 DeclareSimulator(pkg-mult vle.adaptative-qss Mult src/Mult.cpp)
+DeclareSimulator(pkg-constant vle.adaptative-qss Constant src/Constant.cpp)

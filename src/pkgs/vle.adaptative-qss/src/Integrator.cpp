@@ -14,10 +14,10 @@
  * permissions and limitations under the License.
  */
 
+#include <deque>
+#include <vle/devs/Dynamics.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Tuple.hpp>
-#include <vle/devs/Dynamics.hpp>
-#include <deque>
 
 namespace vd = vle::devs;
 namespace vv = vle::value;
@@ -27,14 +27,16 @@ namespace vu = vle::utils;
 class Integrator : public vd::Dynamics
 {
 public:
-    Integrator(const vd::DynamicsInit &init, const vd::InitEventList &events)
-        : vd::Dynamics(init, events)
+    Integrator(const vd::DynamicsInit& init, const vd::InitEventList& events)
+      : vd::Dynamics(init, events)
     {
         double x_0_val;
         if (events.exist("X_0")) {
             x_0_val = vv::toDouble(events.get("X_0"));
         } else {
-            Trace(context(), 6, "%s: got no initial value : assuming 0.\n",
+            Trace(context(),
+                  6,
+                  "%s: got no initial value : assuming 0.\n",
                   getModelName().c_str());
 
             x_0_val = 0;
@@ -66,22 +68,23 @@ public:
         }
 
         if (my_list.size() > 1) {
-            Trace(context(), 6, "Warning: multiple output ports."
-                  " Will use only port %s.\n", m_output_port_label.c_str());
+            Trace(context(),
+                  6,
+                  "Warning: multiple output ports."
+                  " Will use only port %s.\n",
+                  m_output_port_label.c_str());
         }
     }
 
-    virtual ~Integrator()
-    {
-    }
+    virtual ~Integrator() {}
 
-    virtual vd::Time init(vd::Time  /* time */) override
+    virtual vd::Time init(vd::Time /* time */) override
     {
         m_state = INIT;
         return 0;
     }
 
-    virtual void externalTransition(const vd::ExternalEventList &events,
+    virtual void externalTransition(const vd::ExternalEventList& events,
                                     vd::Time time) override
     {
         double up_val, down_val;
@@ -123,50 +126,52 @@ public:
     {
         record_t record;
         switch (m_state) {
-        case RUNNING:
-            m_last_output_value = m_expected_value;
-            m_last_output_date = time;
-            double last_derivative_value;
-            last_derivative_value = archive.back().x_dot;
-            archive.clear();
-            record.date = time;
-            record.x_dot = last_derivative_value;
-            archive.push_back(record);
-            m_current_value = m_expected_value;
-            m_state = WAIT_FOR_QUANTA;
-            break;
-        case INIT:
-            m_state = WAIT_FOR_BOTH;
-            m_last_output_value = m_current_value;
-            m_last_output_date = time;
-            break;
-        default:
-            throw vu::ModellingError(
-                "Integrator %s tries an internal transition in state %d",
-                getModelName().c_str(), m_state);
+            case RUNNING:
+                m_last_output_value = m_expected_value;
+                m_last_output_date = time;
+                double last_derivative_value;
+                last_derivative_value = archive.back().x_dot;
+                archive.clear();
+                record.date = time;
+                record.x_dot = last_derivative_value;
+                archive.push_back(record);
+                m_current_value = m_expected_value;
+                m_state = WAIT_FOR_QUANTA;
+                break;
+            case INIT:
+                m_state = WAIT_FOR_BOTH;
+                m_last_output_value = m_current_value;
+                m_last_output_date = time;
+                break;
+            default:
+                throw vu::ModellingError(
+                  "Integrator %s tries an internal transition in state %d",
+                  getModelName().c_str(),
+                  m_state);
         }
     }
 
-    virtual void output(vd::Time  /*time*/,
-                        vd::ExternalEventList &output) const override
+    virtual void output(vd::Time /*time*/,
+                        vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
             double outval;
             switch (m_state) {
-            case RUNNING:
-                outval = m_expected_value;
-                output.emplace_back(m_output_port_label);
-                output.back().addMap().addDouble("d_val", outval);
-                break;
-            case INIT:
-                outval = m_current_value;
-                output.emplace_back(m_output_port_label);
-                output.back().addMap().addDouble("d_val", outval);
-                break;
-            default:
-                throw vu::ModellingError(
-                    "Integrator %s tries an output transition in state %d ",
-                    getModelName().c_str(), m_state);
+                case RUNNING:
+                    outval = m_expected_value;
+                    output.emplace_back(m_output_port_label);
+                    output.back().addMap().addDouble("d_val", outval);
+                    break;
+                case INIT:
+                    outval = m_current_value;
+                    output.emplace_back(m_output_port_label);
+                    output.back().addMap().addDouble("d_val", outval);
+                    break;
+                default:
+                    throw vu::ModellingError(
+                      "Integrator %s tries an output transition in state %d ",
+                      getModelName().c_str(),
+                      m_state);
             }
         }
     }
@@ -176,50 +181,55 @@ public:
         double current_derivative;
 
         switch (m_state) {
-        case RUNNING:
-            if (archive.size() < 1)
-                throw vu::ModellingError(
-                    "Integrator %s in state RUNNING without x dot "
-                    "value aviable ", getModelName().c_str());
+            case RUNNING:
+                if (archive.size() < 1)
+                    throw vu::ModellingError(
+                      "Integrator %s in state RUNNING without x dot "
+                      "value aviable ",
+                      getModelName().c_str());
 
-            current_derivative = archive.back().x_dot;
+                current_derivative = archive.back().x_dot;
 
-            if (0 == current_derivative)
+                if (0 == current_derivative)
+                    return vd::infinity;
+
+                if (current_derivative > 0) {
+                    if ((m_upthreshold - m_current_value) < 0)
+                        throw vu::ModellingError(
+                          "Integrator %s erroneous Ta computation with "
+                          "positive x dot (%f)",
+                          getModelName().c_str(),
+                          current_derivative);
+
+                    return (m_upthreshold - m_current_value) /
+                           current_derivative;
+                } else {
+                    if ((m_downthreshold - m_current_value) > 0)
+                        throw vu::ModellingError(
+                          "Integrator %s erroneous Ta computation with "
+                          "negative x dot (%f)",
+                          getModelName().c_str(),
+                          current_derivative);
+
+                    return (m_downthreshold - m_current_value) /
+                           current_derivative;
+                }
+                break;
+            default:
                 return vd::infinity;
-
-            if (current_derivative > 0) {
-                if ((m_upthreshold - m_current_value) < 0)
-                    throw vu::ModellingError(
-                        "Integrator %s erroneous Ta computation with "
-                        "positive x dot (%f)", getModelName().c_str(),
-                        current_derivative);
-
-                return (m_upthreshold - m_current_value) / current_derivative;
-            } else {
-                if ((m_downthreshold - m_current_value) > 0)
-                    throw vu::ModellingError(
-                        "Integrator %s erroneous Ta computation with "
-                        "negative x dot (%f)", getModelName().c_str(),
-                        current_derivative);
-
-                return (m_downthreshold - m_current_value) / current_derivative;
-            }
-            break;
-        default:
-            return vd::infinity;
-            break;
+                break;
         }
     }
 
     void confluentTransitions(vd::Time time,
-                              const vd::ExternalEventList &externals) override
+                              const vd::ExternalEventList& externals) override
     {
         internalTransition(time);
         externalTransition(externals, time);
     }
 
-    std::unique_ptr<vv::Value>
-    observation(const vd::ObservationEvent &event) const override
+    std::unique_ptr<vv::Value> observation(
+      const vd::ObservationEvent& event) const override
     {
         if (event.onPort("value"))
             return vle::value::Double::create(current_value(event.getTime()));
@@ -260,7 +270,8 @@ private:
     double m_current_value;
     double m_expected_value;
 
-    struct record_t {
+    struct record_t
+    {
         double x_dot;
         vd::Time date;
     };
@@ -275,14 +286,14 @@ private:
         if (archive.size() > 0) {
             for (size_t i = 0; i < archive.size() - 1; i++) {
                 val +=
-                    (archive[i + 1].date - archive[i].date) * archive[i].x_dot;
+                  (archive[i + 1].date - archive[i].date) * archive[i].x_dot;
             }
             val += (time - archive.back().date) * archive.back().x_dot;
         }
         return val;
     }
 
-    double expected_value(vd::Time  /* time */) const
+    double expected_value(vd::Time /* time */) const
     {
         double current_derivative;
         current_derivative = archive.back().x_dot;
