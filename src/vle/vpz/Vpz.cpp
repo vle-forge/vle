@@ -26,8 +26,6 @@
 
 #include <fstream>
 #include <iomanip>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
 #include <limits>
 #include <sstream>
 #include <vle/utils/Exception.hpp>
@@ -71,22 +69,9 @@ void Vpz::parseFile(const std::string &filename)
     clear();
     project().experiment().conditions().deleteValueSet();
     m_filename.assign(filename);
-    vpz::SaxParser saxparser(*this);
 
-    try {
-        saxparser.parseFile(filename);
-    }
-    catch (const std::exception &sax) {
-        try {
-            validateFile(filename);
-        }
-        catch (const std::exception &dom) {
-            saxparser.clearParserState();
-            throw utils::SaxParserError(
-                (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
-        }
-        throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
-    }
+    vpz::SaxParser saxparser(*this);
+    saxparser.parseFile(filename);
 
     auto &cnd = project().experiment().conditions().get(
         Experiment::defaultSimulationEngineCondName());
@@ -104,22 +89,11 @@ void Vpz::parseMemory(const std::string &buffer)
     m_filename.clear();
 
     vpz::SaxParser saxparser(*this);
-    try {
-        saxparser.parseMemory(buffer);
-    }
-    catch (const std::exception &sax) {
-        try {
-            validateMemory(buffer);
-        }
-        catch (const std::exception &dom) {
-            throw utils::SaxParserError(
-                (fmt(_("%2%\n\n%1%")) % dom.what() % sax.what()).str());
-        }
-        throw utils::SaxParserError(_("Vpz error: %s"), sax.what());
-    }
+    saxparser.parseMemory(buffer);
 
     auto &cnd = project().experiment().conditions().get(
         Experiment::defaultSimulationEngineCondName());
+
     if (cnd.getSetValues("begin").empty()) {
         cnd.getSetValues("begin").emplace_back(new value::Double(0));
         cnd.getSetValues("duration").emplace_back(new value::Double(100));
@@ -210,83 +184,6 @@ void Vpz::fixExtension(std::string &filename)
             filename += ".vpz";
         }
     }
-}
-
-void Vpz::validateFile(const std::string &filename)
-{
-    xmlParserCtxtPtr ctxt;
-    xmlDocPtr doc;
-
-    ctxt = xmlNewParserCtxt();
-    if (ctxt == nullptr) {
-        throw utils::SaxParserError(_("Failed to allocate parser context\n"));
-    }
-
-    doc = xmlCtxtReadFile(ctxt, filename.c_str(), nullptr, XML_PARSE_DTDVALID);
-    if (not doc) {
-        std::string msg(
-            (fmt(_("Failed to parse '%1%': %2%")) % filename %
-             (ctxt->lastError.message ? ctxt->lastError.message : ""))
-                .str());
-
-        xmlFreeParserCtxt(ctxt);
-
-        throw utils::SaxParserError(msg);
-    }
-
-    if (ctxt->valid == 0) {
-        std::string msg(
-            (fmt(_("Failed to validate '%1%': %2%")) % filename %
-             (ctxt->lastError.message ? ctxt->lastError.message : ""))
-                .str());
-
-        xmlFreeDoc(doc);
-        xmlFreeParserCtxt(ctxt);
-
-        throw utils::SaxParserError(msg);
-    }
-    xmlFreeParserCtxt(ctxt);
-}
-
-void Vpz::validateMemory(const std::string &buffer)
-{
-    xmlParserCtxtPtr ctxt;
-    xmlDocPtr doc;
-
-    ctxt = xmlNewParserCtxt();
-    if (ctxt == nullptr) {
-        throw utils::SaxParserError(_("Failed to allocate parser context\n"));
-    }
-
-    doc = xmlCtxtReadMemory(ctxt,
-                            buffer.c_str(),
-                            buffer.size(),
-                            nullptr,
-                            nullptr,
-                            XML_PARSE_DTDVALID);
-    if (not doc) {
-        xmlFreeParserCtxt(ctxt);
-        throw utils::SaxParserError(_("Failed to parse memory"));
-    }
-
-    if (ctxt->valid == 0) {
-        xmlFreeDoc(doc);
-        xmlFreeParserCtxt(ctxt);
-        throw utils::SaxParserError(_("Failed to validate memory"));
-    }
-    xmlFreeParserCtxt(ctxt);
-}
-
-std::set<std::string> Vpz::depends() const
-{
-    std::set<std::string> dynamics = project().dynamics().depends();
-    std::set<std::string> outputs =
-        project().experiment().views().outputs().depends();
-
-    std::set<std::string> result(dynamics);
-    result.insert(outputs.begin(), outputs.end());
-
-    return result;
 }
 }
 } // namespace vle vpz

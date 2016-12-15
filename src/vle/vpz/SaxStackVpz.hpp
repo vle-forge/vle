@@ -58,7 +58,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    ~SaxStackVpz() {}
+    ~SaxStackVpz();
 
     /**
      * @brief Clear all element of the stack.

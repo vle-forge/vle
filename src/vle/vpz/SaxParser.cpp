@@ -30,10 +30,13 @@
 #include <boost/cast.hpp>
 #include <cerrno>
 #include <cstring>
+#include <fstream>
 #include <libxml/SAX2.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
+#include <sstream>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
@@ -54,103 +57,227 @@
 namespace vle {
 namespace vpz {
 
+struct XmlCompare {
+    inline bool operator()(const xmlChar *s1, const xmlChar *s2) const
+    {
+        return xmlStrcmp(s1, s2) < 0;
+    }
+};
+
+using startfunc = void (SaxParser::*)(const xmlChar **);
+using endfunc = void (SaxParser::*)();
+using StartFuncList = std::map<const xmlChar *, startfunc, XmlCompare>;
+using EndFuncList = std::map<const xmlChar *, endfunc, XmlCompare>;
+
+StartFuncList &starts()
+{
+    static StartFuncList ret = {
+        {(const xmlChar *)"boolean", &SaxParser::onBoolean},
+        {(const xmlChar *)"integer", &SaxParser::onInteger},
+        {(const xmlChar *)"double", &SaxParser::onDouble},
+        {(const xmlChar *)"string", &SaxParser::onString},
+        {(const xmlChar *)"set", &SaxParser::onSet},
+        {(const xmlChar *)"matrix", &SaxParser::onMatrix},
+        {(const xmlChar *)"map", &SaxParser::onMap},
+        {(const xmlChar *)"key", &SaxParser::onKey},
+        {(const xmlChar *)"tuple", &SaxParser::onTuple},
+        {(const xmlChar *)"table", &SaxParser::onTable},
+        {(const xmlChar *)"xml", &SaxParser::onXML},
+        {(const xmlChar *)"null", &SaxParser::onNull},
+        {(const xmlChar *)"vle_project", &SaxParser::onVLEProject},
+        {(const xmlChar *)"structures", &SaxParser::onStructures},
+        {(const xmlChar *)"model", &SaxParser::onModel},
+        {(const xmlChar *)"in", &SaxParser::onIn},
+        {(const xmlChar *)"out", &SaxParser::onOut},
+        {(const xmlChar *)"port", &SaxParser::onPort},
+        {(const xmlChar *)"submodels", &SaxParser::onSubModels},
+        {(const xmlChar *)"connections", &SaxParser::onConnections},
+        {(const xmlChar *)"connection", &SaxParser::onConnection},
+        {(const xmlChar *)"origin", &SaxParser::onOrigin},
+        {(const xmlChar *)"destination", &SaxParser::onDestination},
+        {(const xmlChar *)"dynamics", &SaxParser::onDynamics},
+        {(const xmlChar *)"dynamic", &SaxParser::onDynamic},
+        {(const xmlChar *)"experiment", &SaxParser::onExperiment},
+        {(const xmlChar *)"conditions", &SaxParser::onConditions},
+        {(const xmlChar *)"condition", &SaxParser::onCondition},
+        {(const xmlChar *)"views", &SaxParser::onViews},
+        {(const xmlChar *)"outputs", &SaxParser::onOutputs},
+        {(const xmlChar *)"output", &SaxParser::onOutput},
+        {(const xmlChar *)"view", &SaxParser::onView},
+        {(const xmlChar *)"observables", &SaxParser::onObservables},
+        {(const xmlChar *)"observable", &SaxParser::onObservable},
+        {(const xmlChar *)"attachedview", &SaxParser::onAttachedView},
+        {(const xmlChar *)"classes", &SaxParser::onClasses},
+        {(const xmlChar *)"class", &SaxParser::onClass}};
+
+    return ret;
+}
+
+EndFuncList &ends()
+{
+    static EndFuncList ret = {
+        {(const xmlChar *)"boolean", &SaxParser::onEndBoolean},
+        {(const xmlChar *)"integer", &SaxParser::onEndInteger},
+        {(const xmlChar *)"double", &SaxParser::onEndDouble},
+        {(const xmlChar *)"string", &SaxParser::onEndString},
+        {(const xmlChar *)"set", &SaxParser::onEndSet},
+        {(const xmlChar *)"matrix", &SaxParser::onEndMatrix},
+        {(const xmlChar *)"map", &SaxParser::onEndMap},
+        {(const xmlChar *)"key", &SaxParser::onEndKey},
+        {(const xmlChar *)"tuple", &SaxParser::onEndTuple},
+        {(const xmlChar *)"table", &SaxParser::onEndTable},
+        {(const xmlChar *)"xml", &SaxParser::onEndXML},
+        {(const xmlChar *)"null", &SaxParser::onEndNull},
+        {(const xmlChar *)"vle_project", &SaxParser::onEndVLEProject},
+        {(const xmlChar *)"structures", &SaxParser::onEndStructures},
+        {(const xmlChar *)"model", &SaxParser::onEndModel},
+        {(const xmlChar *)"in", &SaxParser::onEndIn},
+        {(const xmlChar *)"out", &SaxParser::onEndOut},
+        {(const xmlChar *)"port", &SaxParser::onEndPort},
+        {(const xmlChar *)"submodels", &SaxParser::onEndSubModels},
+        {(const xmlChar *)"connections", &SaxParser::onEndConnections},
+        {(const xmlChar *)"connection", &SaxParser::onEndConnection},
+        {(const xmlChar *)"origin", &SaxParser::onEndOrigin},
+        {(const xmlChar *)"destination", &SaxParser::onEndDestination},
+        {(const xmlChar *)"dynamics", &SaxParser::onEndDynamics},
+        {(const xmlChar *)"dynamic", &SaxParser::onEndDynamic},
+        {(const xmlChar *)"experiment", &SaxParser::onEndExperiment},
+        {(const xmlChar *)"conditions", &SaxParser::onEndConditions},
+        {(const xmlChar *)"condition", &SaxParser::onEndCondition},
+        {(const xmlChar *)"views", &SaxParser::onEndViews},
+        {(const xmlChar *)"outputs", &SaxParser::onEndOutputs},
+        {(const xmlChar *)"output", &SaxParser::onEndOutput},
+        {(const xmlChar *)"view", &SaxParser::onEndView},
+        {(const xmlChar *)"observables", &SaxParser::onEndObservables},
+        {(const xmlChar *)"observable", &SaxParser::onEndObservable},
+        {(const xmlChar *)"attachedview", &SaxParser::onEndAttachedView},
+        {(const xmlChar *)"classes", &SaxParser::onEndClasses},
+        {(const xmlChar *)"class", &SaxParser::onEndClass}};
+
+    return ret;
+}
+
 SaxParser::SaxParser(Vpz &vpz)
-    : m_stop(false)
+    : m_ctxt(nullptr)
     , m_vpzstack(vpz)
     , m_vpz(vpz)
     , m_isValue(false)
     , m_isVPZ(false)
 {
-    fillTagList();
 }
 
-void SaxParser::parseFile(const std::string &filename)
-{
-    memset(&m_sax, 0, sizeof(xmlSAXHandler));
-    m_sax.initialized = XML_SAX2_MAGIC;
-    m_sax.startDocument = &SaxParser::onStartDocument;
-    m_sax.endDocument = &SaxParser::onEndDocument;
-    m_sax.startElement = &SaxParser::onStartElement;
-    m_sax.endElement = &SaxParser::onEndElement;
-    m_sax.characters = &SaxParser::onCharacters;
-    m_sax.cdataBlock = &SaxParser::onCDataBlock;
-    m_sax.warning = &SaxParser::onWarning;
-    m_sax.error = &SaxParser::onError;
-    m_sax.fatalError = &SaxParser::onFatalError;
+struct scope_exit {
+    std::function<void(void)> fn;
 
-    if (xmlSAXUserParseFile(&m_sax, this, filename.c_str())) {
-        if (m_error.empty()) {
-            throw utils::SaxParserError(
-                (fmt(_("Error parsing file '%1%'")) % filename).str());
+    scope_exit(std::function<void(void)> fn_)
+        : fn(fn_)
+    {
+    }
+
+    ~scope_exit() { fn(); }
+};
+
+void SaxParser::parse(std::istream &is, std::size_t size)
+{
+    std::vector<char> buffer(size == 0 ? 1024 : size);
+
+    xmlSAXHandler sax;
+    memset(&sax, 0, sizeof(xmlSAXHandler));
+    sax.initialized = XML_SAX2_MAGIC;
+    sax.startDocument = &SaxParser::onStartDocument;
+    sax.endDocument = &SaxParser::onEndDocument;
+    sax.startElement = &SaxParser::onStartElement;
+    sax.endElement = &SaxParser::onEndElement;
+    sax.characters = &SaxParser::onCharacters;
+    sax.cdataBlock = &SaxParser::onCDataBlock;
+    sax.warning = &SaxParser::onWarning;
+    sax.error = &SaxParser::onError;
+    sax.fatalError = &SaxParser::onFatalError;
+
+    is.read(buffer.data(), 4);
+
+    if (not is.good() or is.gcount() <= 0)
+        throw utils::SaxParserError(_("Error parsing the 4 first bytes)"));
+
+    xmlParserCtxtPtr ctx = xmlCreatePushParserCtxt(
+        &sax, this, buffer.data(), is.gcount(), nullptr);
+    m_ctxt = static_cast<void *>(ctx);
+
+    scope_exit se([this, ctx]() {
+        xmlFreeParserCtxt(ctx);
+        m_ctxt = nullptr;
+    });
+
+    while (is.good() and not is.eof()) {
+        is.read(buffer.data(), buffer.size());
+        int err = xmlParseChunk(ctx, buffer.data(), is.gcount(), is.eof());
+
+        if (err == 0)
+            continue;
+
+        if (err == XML_ERR_USER_STOP) {
+            throw utils::SaxParserError(_("Error parsing: %s"),
+                                        m_error.c_str());
         }
         else {
-            throw utils::SaxParserError(
-                (fmt(_("Error parsing file '%1%': %2%")) % filename % m_error)
-                    .str());
+            xmlErrorPtr error = xmlCtxtGetLastError(ctx);
+            if (error != nullptr) {
+                int line = error->line;
+                int column = error->int2;
+                std::string msg = error->message;
+
+                throw utils::SaxParserError(
+                    _("Error parsing at %d:%d (internal error %d: %s"),
+                    line,
+                    column,
+                    err,
+                    msg.c_str());
+            }
+            else {
+                throw utils::SaxParserError(
+                    _("Error parsing (internal error %d"), err);
+            }
         }
     }
-
-    if (m_stop) {
-        throw utils::SaxParserError(
-            (fmt(_("Error when parsing file '%1%': %2%")) % filename % m_error)
-                .str());
-    }
-
-    xmlMemoryDump();
-}
-
-void SaxParser::parseMemory(const std::string &buffer)
-{
-    memset(&m_sax, 0, sizeof(xmlSAXHandler));
-    m_sax.initialized = XML_SAX2_MAGIC;
-    m_sax.startDocument = &SaxParser::onStartDocument;
-    m_sax.endDocument = &SaxParser::onEndDocument;
-    m_sax.startElement = &SaxParser::onStartElement;
-    m_sax.endElement = &SaxParser::onEndElement;
-    m_sax.characters = &SaxParser::onCharacters;
-    m_sax.cdataBlock = &SaxParser::onCDataBlock;
-    m_sax.warning = &SaxParser::onWarning;
-    m_sax.error = &SaxParser::onError;
-    m_sax.fatalError = &SaxParser::onFatalError;
-
-    if (xmlSAXUserParseMemory(&m_sax, this, buffer.c_str(), buffer.size())) {
-        if (m_error.empty()) {
-            throw utils::SaxParserError(_("Error parsing memory"));
-        }
-        else {
-            throw utils::SaxParserError(
-                (fmt(_("Error parsing memory: %1%")) % m_error).str());
-        }
-    }
-
-    if (m_stop) {
-        throw utils::SaxParserError(
-            (fmt(_("Error when parsing memory: %1%")) % m_error).str());
-    }
-    xmlMemoryDump();
 }
 
 void SaxParser::stopParser(const std::string &error)
 {
+    xmlParserCtxtPtr ctxt = static_cast<xmlParserCtxtPtr>(m_ctxt);
+
+    xmlStopParser(ctxt);
     m_error.assign(error);
-    m_stop = true;
 }
 
-void SaxParser::clearParserState()
+void SaxParser::parseFile(const std::string &filename)
 {
-    m_vpzstack.clear();
-    m_valuestack.clear();
-    m_lastCharacters.clear();
-    m_isValue = false;
-    m_isVPZ = false;
-    m_stop = false;
+    std::ifstream ifs(filename);
+    if (not ifs.is_open())
+        throw utils::SaxParserError(_("Error opening file `%s'"),
+                                    filename.c_str());
+
+    parse(ifs, BUFSIZ);
+}
+
+void SaxParser::parseMemory(const std::string &buffer)
+{
+    std::istringstream iss(buffer);
+
+    parse(iss, buffer.size() + 1);
 }
 
 void SaxParser::onStartDocument(void *ctx)
 {
     SaxParser *sax = static_cast<SaxParser *>(ctx);
 
-    sax->clearParserState();
+    sax->m_error.clear();
+    sax->m_vpzstack.clear();
+    sax->m_valuestack.clear();
+    sax->m_lastCharacters.clear();
+    sax->m_cdata.clear();
+    sax->m_vpz.clear();
+    sax->m_isValue = false;
+    sax->m_isVPZ = false;
 }
 
 void SaxParser::onEndDocument(void *ctx)
@@ -170,21 +297,20 @@ void SaxParser::onStartElement(void *ctx,
 {
     SaxParser *sax = static_cast<SaxParser *>(ctx);
 
-    if (not sax->isStopped()) {
-        sax->clearLastCharactersStored();
-        auto it = sax->m_starts.find(name);
-        if (it != sax->m_starts.end()) {
-            try {
-                (sax->*(it->second))(atts);
-            }
-            catch (const std::exception &e) {
-                sax->stopParser(e.what());
-            }
+    sax->clearLastCharactersStored();
+
+    auto it = starts().find(name);
+    if (it != starts().end()) {
+        try {
+            (sax->*(it->second))(atts);
         }
-        else {
-            sax->stopParser(
-                (fmt(_("Unknow tag '%1%'")) % (const char *)name).str());
+        catch (const std::exception &e) {
+            sax->stopParser(e.what());
         }
+    }
+    else {
+        sax->stopParser(
+            (fmt(_("Unknown tag '%1%'")) % (const char *)name).str());
     }
 }
 
@@ -192,20 +318,18 @@ void SaxParser::onEndElement(void *ctx, const xmlChar *name)
 {
     SaxParser *sax = static_cast<SaxParser *>(ctx);
 
-    if (not sax->isStopped()) {
-        auto it = sax->m_ends.find(name);
-        if (it != sax->m_ends.end()) {
-            try {
-                (sax->*(it->second))();
-            }
-            catch (const std::exception &e) {
-                sax->stopParser(e.what());
-            }
+    auto it = ends().find(name);
+    if (it != ends().end()) {
+        try {
+            (sax->*(it->second))();
         }
-        else {
-            sax->stopParser(
-                (fmt(_("Unknow end tag '%1%'")) % (const char *)name).str());
+        catch (const std::exception &e) {
+            sax->stopParser(e.what());
         }
+    }
+    else {
+        sax->stopParser(
+            (fmt(_("Unknown end tag '%1%'")) % (const char *)name).str());
     }
 }
 
@@ -213,67 +337,52 @@ void SaxParser::onCharacters(void *ctx, const xmlChar *ch, int len)
 {
     SaxParser *sax = static_cast<SaxParser *>(ctx);
 
-    if (not sax->isStopped()) {
-        std::string buf((const char *)ch, len);
-
-        sax->addToCharacters(buf);
-    }
+    std::string buf((const char *)ch, len);
+    sax->addToCharacters(buf);
 }
 
 void SaxParser::onCDataBlock(void *ctx, const xmlChar *value, int len)
 {
     SaxParser *sax = static_cast<SaxParser *>(ctx);
 
-    if (not sax->isStopped()) {
-        std::string buf((const char *)value, len);
-
-        sax->m_cdata.assign(buf);
-    }
+    std::string buf((const char *)value, len);
+    sax->m_cdata.assign(buf);
 }
 
-void SaxParser::onWarning(void * /* ctx */, const char *msg, ...)
+void SaxParser::onWarning(void *ctx, const char *msg, ...)
 {
-    auto buffer = new char[1024];
-    memset(buffer, 0, 1024);
+    SaxParser *sax = static_cast<SaxParser *>(ctx);
 
     va_list args;
-
     va_start(args, msg);
-    vsnprintf(buffer, 1023, msg, args);
+    std::string buffer = utils::vformat(msg, args);
     va_end(args);
 
-    delete[] buffer;
+    sax->m_error = buffer;
 }
 
 void SaxParser::onError(void *ctx, const char *msg, ...)
 {
     SaxParser *sax = static_cast<SaxParser *>(ctx);
-    auto buffer = new char[1024];
-    memset(buffer, 0, 1024);
 
     va_list args;
     va_start(args, msg);
-    vsnprintf(buffer, 1023, msg, args);
+    std::string buffer = utils::vformat(msg, args);
     va_end(args);
 
     sax->stopParser(buffer);
-    delete[] buffer;
 }
 
 void SaxParser::onFatalError(void *ctx, const char *msg, ...)
 {
     SaxParser *sax = static_cast<SaxParser *>(ctx);
-    auto buffer = new char[1024];
-    memset(buffer, 0, 1024);
 
     va_list args;
-
     va_start(args, msg);
-    vsnprintf(buffer, 1023, msg, args);
+    std::string buffer = vle::utils::vformat(msg, args);
     va_end(args);
 
     sax->stopParser(buffer);
-    delete[] buffer;
 }
 
 //
@@ -337,7 +446,8 @@ void SaxParser::onMatrix(const xmlChar **att)
 
     if (not rows or not columns) {
         throw utils::SaxParserError(
-            _("Matrix tag does not have 'row' or 'column' attribute"));
+            _("Matrix tag does not have 'row' or 'column' "
+              "attribute"));
     }
 
     try {
@@ -354,7 +464,8 @@ void SaxParser::onMatrix(const xmlChar **att)
     }
     catch (const std::exception &e) {
         throw utils::SaxParserError(
-            (fmt(_("Matrix tag does not convert a attribute '%1%'")) %
+            (fmt(_("Matrix tag does not convert a attribute "
+                   "'%1%'")) %
              e.what())
                 .str());
     }
@@ -403,8 +514,8 @@ void SaxParser::onTable(const xmlChar **att)
     }
 
     if (not width or not height) {
-        throw utils::SaxParserError(
-            _("Table value tag does not have attributes 'width' or 'height'"));
+        throw utils::SaxParserError(_("Table value tag does not have "
+                                      "attributes 'width' or 'height'"));
     }
 
     try {
@@ -412,7 +523,9 @@ void SaxParser::onTable(const xmlChar **att)
     }
     catch (const std::exception &e) {
         throw utils::SaxParserError(
-            (fmt(_("Table value tag can not convert attributes 'width' or "
+            (fmt(_("Table value tag can not convert attributes "
+                   "'width' or "
+
                    "'height': %1%")) %
              e.what())
                 .str());
@@ -638,14 +751,15 @@ void SaxParser::onEndTable()
     }
     catch (const std::exception /*e*/) {
         throw utils::SaxParserError(
-            (fmt(_("VPZ parser: bad height (%1%) or width (%2%) table ")) %
+            (fmt(_("VPZ parser: bad height (%1%) or width (%2%) "
+                   "table ")) %
              table.width() % table.height())
                 .str());
     }
 
     if (result.size() != size) {
-        throw utils::SaxParserError(
-            _("VPZ parser: bad height or width for number of real in table"));
+        throw utils::SaxParserError(_("VPZ parser: bad height or width "
+                                      "for number of real in table"));
     }
 
     value::Table::index i = 0;

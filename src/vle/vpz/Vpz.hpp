@@ -153,22 +153,6 @@ public:
      */
     static void fixExtension(std::string &filename);
 
-    /**
-     * @brief Use the libxml-2.0 DOM parser to check the validation of the
-     * VPZ file.
-     * @param filename the file name to test.
-     * @throw std::exception on error.
-     */
-    static void validateFile(const std::string &filename);
-
-    /**
-     * @brief Use the libxml-2.0 DOM parser to check the validation of the
-     * VPZ buffer.
-     * @param buffer the content of the XML.
-     * @throw std::exception on error.
-     */
-    static void validateMemory(const std::string &buffer);
-
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
      * Get/Set functions
@@ -201,13 +185,6 @@ public:
      * @return A reference to the vpz::Project.
      */
     inline Project &project() { return m_project; }
-
-    /**
-     * @brief Fill the std::set with all the package dependencies of the
-     * VPZ.
-     * @return A list of package name.
-     */
-    std::set<std::string> depends() const;
 
 private:
     bool m_isGzip;

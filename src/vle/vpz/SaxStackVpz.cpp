@@ -69,6 +69,11 @@ std::ostream &operator<<(std::ostream &out, const SaxStackVpz &stack)
     return out;
 }
 
+SaxStackVpz::~SaxStackVpz()
+{
+    clear();
+}
+
 void SaxStackVpz::clear()
 {
     while (not m_stack.empty()) {
