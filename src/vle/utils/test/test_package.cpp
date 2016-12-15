@@ -24,40 +24,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/unit-test.hpp>
-#include <boost/version.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/config.hpp>
 #include <boost/assign.hpp>
-#include <stdexcept>
-#include <limits>
-#include <fstream>
-#include <vector>
-#include <map>
-#include <thread>
+#include <boost/config.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/version.hpp>
 #include <chrono>
-#include <string>
-#include <iterator>
+#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <numeric>
+#include <iterator>
+#include <limits>
+#include <map>
 #include <memory>
-#include <vle/utils/i18n.hpp>
+#include <numeric>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <vector>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/DateTime.hpp>
-#include <vle/utils/Package.hpp>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/Rand.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <vle/utils/Filesystem.hpp>
+#include <vle/utils/Package.hpp>
+#include <vle/utils/Rand.hpp>
+#include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/i18n.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/vle.hpp>
 
 using namespace vle;
 
-struct F
-{
+struct F {
     vle::Init a;
     vle::utils::Path current_path;
 
@@ -74,8 +72,8 @@ struct F
             throw std::runtime_error("Fails to found temporary directory");
 
 #ifdef _WIN32
-        ::_putenv((vle::fmt("VLE_HOME=%1%")
-                   % current_path.string()).str().c_str());
+        ::_putenv(
+            (vle::fmt("VLE_HOME=%1%") % current_path.string()).str().c_str());
 #else
         ::setenv("VLE_HOME", current_path.string().c_str(), 1);
 #endif
@@ -87,10 +85,7 @@ struct F
         ctx->write_settings();
     }
 
-    ~F()
-    {
-        std::cout << "test finish in " << current_path.string() << '\n';
-    }
+    ~F() { std::cout << "test finish in " << current_path.string() << '\n'; }
 };
 
 void show_package()
@@ -140,15 +135,13 @@ void show_package()
               << "\ngetExperiments      :";
     auto vpz = pkg.getExperiments();
 
-    for (const auto& elem : vpz)
+    for (const auto &elem : vpz)
         std::cout << elem.string() << ' ';
 
     Ensures(vpz.size() == 1);
 
-
     auto modules = ctx->get_dynamic_libraries(
-        "show_package",
-        vle::utils::Context::ModuleType::MODULE_DYNAMICS);
+        "show_package", vle::utils::Context::ModuleType::MODULE_DYNAMICS);
 
     Ensures(modules.size() == 1);
 }
@@ -194,7 +187,7 @@ void remote_package_check_package_tmp()
         Ensures(results.empty() == false);
         Ensures(results.size() == 2);
         Ensures(results[0].name == "MyProject" and
-                      results[1].name == "MyProject");
+                results[1].name == "MyProject");
     }
 }
 
@@ -210,23 +203,23 @@ void remote_package_local_remote()
     pkg.description = "too good";
     pkg.url = "http://www.vle-project.org";
     pkg.md5sum = "1234567890987654321";
-    pkg.tags = { "a", "b", "c" };
+    pkg.tags = {"a", "b", "c"};
 
     {
-        utils::PackageLinkId dep = { "a", 1, 1, 1,
-                                     utils::PACKAGE_OPERATOR_EQUAL };
+        utils::PackageLinkId dep = {
+            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
         pkg.depends = utils::PackagesLinkId(1, dep);
     }
 
     {
-        utils::PackageLinkId dep = { "a", 1, 1, 1,
-                                     utils::PACKAGE_OPERATOR_EQUAL };
+        utils::PackageLinkId dep = {
+            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
         pkg.builddepends = utils::PackagesLinkId(1, dep);
     }
 
     {
-        utils::PackageLinkId dep = { "a", 1, 1, 1,
-                                     utils::PACKAGE_OPERATOR_EQUAL };
+        utils::PackageLinkId dep = {
+            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
         pkg.conflicts = utils::PackagesLinkId(1, dep);
     }
 
@@ -265,7 +258,7 @@ void remote_package_local_remote()
         rmt.join();
         rmt.getResult(&results);
 
-        for (const auto& elem : results)
+        for (const auto &elem : results)
             std::cout << elem;
 
         EnsuresEqual(results.empty(), false);
@@ -291,23 +284,23 @@ void remote_package_read_write()
             pkg.description = "too good";
             pkg.url = "http://www.vle-project.org";
             pkg.md5sum = "1234567890987654321";
-            pkg.tags = { "a", "b", "c" };
+            pkg.tags = {"a", "b", "c"};
 
             {
-                utils::PackageLinkId dep = { "a", 1, 1, 1,
-                                             utils::PACKAGE_OPERATOR_EQUAL };
+                utils::PackageLinkId dep = {
+                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
                 pkg.depends = utils::PackagesLinkId(1, dep);
             }
 
             {
-                utils::PackageLinkId dep = { "a", 1, 1, 1,
-                                             utils::PACKAGE_OPERATOR_EQUAL };
+                utils::PackageLinkId dep = {
+                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
                 pkg.builddepends = utils::PackagesLinkId(1, dep);
             }
 
             {
-                utils::PackageLinkId dep = { "a", 1, 1, 1,
-                                             utils::PACKAGE_OPERATOR_EQUAL };
+                utils::PackageLinkId dep = {
+                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
                 pkg.conflicts = utils::PackagesLinkId(1, dep);
             }
 
@@ -441,7 +434,8 @@ void test_compress_filepath()
         pkg.install();
         filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
         uniquepath = unique.string();
-    } catch (...) {
+    }
+    catch (...) {
         Ensures(false);
     }
 
@@ -455,9 +449,9 @@ void test_compress_filepath()
     tarfile /= "check.tar.bz2";
 
     EnsuresNotThrow(rmt.compress(uniquepath, tarfile.string()),
-        std::exception);
+                    std::exception);
 
-    utils::Path t { tarfile };
+    utils::Path t{tarfile};
     Ensures(t.exists());
 
     utils::Path tmpfile(utils::Path::temp_directory_path());
@@ -466,8 +460,8 @@ void test_compress_filepath()
     tmpfile.create_directory();
 
     EnsuresNotThrow(rmt.decompress(tarfile.string(), tmpfile.string()),
-        std::exception);
-    utils::Path t2 { tmpfile };
+                    std::exception);
+    utils::Path t2{tmpfile};
     Ensures(t2.exists());
 
     t2 /= uniquepath;

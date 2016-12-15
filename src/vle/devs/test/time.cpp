@@ -24,12 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
-#include <stdexcept>
-#include <limits>
 #include <fstream>
+#include <limits>
+#include <stdexcept>
 #include <vle/devs/Simulator.hpp>
+#include <vle/utils/unit-test.hpp>
 
 using namespace vle;
 
@@ -183,6 +183,8 @@ void prefix_and_postfix_operator()
 
 int main()
 {
+    vle::Init app;
+
     compare();
     modify();
     modify_and_infinity();

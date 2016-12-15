@@ -24,27 +24,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
-#include <stdexcept>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/SaxParser.hpp>
-#include <vle/value/Boolean.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/value/Tuple.hpp>
-#include <vle/value/Table.hpp>
-#include <vle/value/XML.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/vle.hpp>
-#include <limits>
 #include <fstream>
-
+#include <limits>
+#include <stdexcept>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/unit-test.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Table.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/XML.hpp>
+#include <vle/vle.hpp>
+#include <vle/vpz/SaxParser.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 int main()
 {
+    vle::Init app;
+
     return 0;
 }

@@ -24,26 +24,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/unit-test.hpp>
-#include <stdexcept>
-#include <limits>
+#include "oov.hpp"
+#include <cstdio>
 #include <fstream>
+#include <limits>
+#include <stdexcept>
+#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/RootCoordinator.hpp>
+#include <vle/oov/Plugin.hpp>
+#include <vle/utils/unit-test.hpp>
+#include <vle/vpz/Classes.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Experiment.hpp>
-#include <vle/vpz/Classes.hpp>
-#include <vle/oov/Plugin.hpp>
-#include <cstdio>
-#include "oov.hpp"
 
 using namespace vle;
 
-class Model : public vle::devs::Dynamics
-{
+class Model : public vle::devs::Dynamics {
     int state;
 
 public:
@@ -70,14 +69,9 @@ public:
             std::make_shared<value::String>("My message");
     }
 
-    virtual vle::devs::Time timeAdvance() const override
-    {
-        return 1.;
-    }
+    virtual vle::devs::Time timeAdvance() const override { return 1.; }
 
-    virtual void internalTransition(vle::devs::Time /* time */) override
-    {
-    }
+    virtual void internalTransition(vle::devs::Time /* time */) override {}
 
     virtual void externalTransition(const vle::devs::ExternalEventList &events,
                                     vle::devs::Time /* time */) override
@@ -101,13 +95,10 @@ public:
         return vle::value::Integer::create(1);
     }
 
-    virtual void finish() override
-    {
-    }
+    virtual void finish() override {}
 };
 
-class ModelDbg : public vle::devs::Dynamics
-{
+class ModelDbg : public vle::devs::Dynamics {
     int state;
 
 public:
@@ -134,14 +125,9 @@ public:
             std::make_shared<value::String>("My message");
     }
 
-    virtual vle::devs::Time timeAdvance() const override
-    {
-        return .1;
-    }
+    virtual vle::devs::Time timeAdvance() const override { return .1; }
 
-    virtual void internalTransition(vle::devs::Time /* time */) override
-    {
-    }
+    virtual void internalTransition(vle::devs::Time /* time */) override {}
 
     virtual void externalTransition(const vle::devs::ExternalEventList &events,
                                     vle::devs::Time /* time */) override
@@ -165,13 +151,10 @@ public:
         return vle::value::Integer::create(2);
     }
 
-    virtual void finish() override
-    {
-    }
+    virtual void finish() override {}
 };
 
-class Exe : public vle::devs::Executive
-{
+class Exe : public vle::devs::Executive {
     int state;
 
 public:
@@ -198,10 +181,7 @@ public:
             std::make_shared<value::String>("My message");
     }
 
-    virtual vle::devs::Time timeAdvance() const override
-    {
-        return 2;
-    }
+    virtual vle::devs::Time timeAdvance() const override { return 2; }
 
     virtual void internalTransition(vle::devs::Time /* time */) override
     {
@@ -233,13 +213,10 @@ public:
         return vle::value::Integer::create(3);
     }
 
-    virtual void finish() override
-    {
-    }
+    virtual void finish() override {}
 };
 
-class ObservationModel : public vle::devs::Dynamics
-{
+class ObservationModel : public vle::devs::Dynamics {
     mutable int state;
 
 public:
@@ -264,10 +241,7 @@ public:
         state++;
     }
 
-    virtual vle::devs::Time timeAdvance() const override
-    {
-        return 1.;
-    }
+    virtual vle::devs::Time timeAdvance() const override { return 1.; }
 
     virtual void internalTransition(vle::devs::Time /* time */) override
     {
@@ -294,14 +268,10 @@ public:
         return vle::value::Integer::create(state);
     }
 
-    virtual void finish() override
-    {
-        state++;
-    }
+    virtual void finish() override { state++; }
 };
 
-class OutputPluginSimple : public vle::oov::Plugin
-{
+class OutputPluginSimple : public vle::oov::Plugin {
     struct data {
         std::unique_ptr<vle::value::Value> value;
         int number;
@@ -318,15 +288,9 @@ public:
 
     virtual ~OutputPluginSimple() = default;
 
-    virtual std::string name() const override
-    {
-        return "OutputPlugin";
-    }
+    virtual std::string name() const override { return "OutputPlugin"; }
 
-    virtual bool isCairo() const override
-    {
-        return false;
-    }
+    virtual bool isCairo() const override { return false; }
 
     virtual void onParameter(const std::string & /* plugin */,
                              const std::string & /* location */,
@@ -791,6 +755,8 @@ void test_observation_timed_disabled()
 
 int main()
 {
+    vle::Init app;
+
     instantiate_mode();
     test_del_coupled_model();
     test_loading_dynamics_from_executable();
