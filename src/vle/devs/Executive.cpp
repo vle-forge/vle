@@ -45,7 +45,10 @@ const vpz::Dynamics &Executive::dynamics() const
     return m_coordinator.dynamics();
 }
 
-vpz::Dynamics &Executive::dynamics() { return m_coordinator.dynamics(); }
+vpz::Dynamics &Executive::dynamics()
+{
+    return m_coordinator.dynamics();
+}
 
 const vpz::Conditions &Executive::conditions() const
 {
@@ -103,7 +106,7 @@ Executive::createModel(const std::string &name,
                        const std::vector<std::string> &inputs,
                        const std::vector<std::string> &outputs,
                        const std::string &dynamics,
-                       const std::vector<std::string> &conditions,
+                       const std::vector<std::string> &conds,
                        const std::string &observable)
 {
     auto model = new vpz::AtomicModel(name, cpled());
@@ -117,7 +120,9 @@ Executive::createModel(const std::string &name,
         model->addOutputPort(*it);
     }
 
-    m_coordinator.createModel(model, dynamics, conditions, observable);
+    m_coordinator.createModel(
+        model, conditions(), dynamics, conds, observable);
+
     return model;
 }
 
@@ -125,7 +130,8 @@ const vpz::BaseModel *
 Executive::createModelFromClass(const std::string &classname,
                                 const std::string &modelname)
 {
-    return m_coordinator.createModelFromClass(classname, cpled(), modelname);
+    return m_coordinator.createModelFromClass(
+        classname, cpled(), modelname, conditions());
 }
 
 void Executive::delModel(const std::string &modelname)

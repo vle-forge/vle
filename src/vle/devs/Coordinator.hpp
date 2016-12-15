@@ -91,6 +91,7 @@ public:
      * @throw utils::InternalError if dynamics not exist.
      */
     void createModel(vpz::AtomicModel *model,
+                     const vpz::Conditions &experiment_conditions,
                      const std::string &dynamics,
                      const std::vector<std::string> &conditions,
                      const std::string &observable);
@@ -104,7 +105,8 @@ public:
      */
     vpz::BaseModel *createModelFromClass(const std::string &classname,
                                          vpz::CoupledModel *parent,
-                                         const std::string &modelname);
+                                         const std::string &modelname,
+                                         const vpz::Conditions &conditions);
 
     /**
      * @brief Add an observable, ie. a reference and a model to the

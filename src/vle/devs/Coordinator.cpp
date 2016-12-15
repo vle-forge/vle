@@ -261,19 +261,23 @@ void Coordinator::run()
 }
 
 void Coordinator::createModel(vpz::AtomicModel *model,
+                              const vpz::Conditions &experiment_conditions,
                               const std::string &dynamics,
                               const std::vector<std::string> &conditions,
                               const std::string &observable)
 {
-    m_modelFactory.createModel(*this, model, dynamics, conditions, observable);
+    m_modelFactory.createModel(
+        *this, experiment_conditions, model, dynamics, conditions, observable);
 }
 
-vpz::BaseModel *Coordinator::createModelFromClass(const std::string &classname,
-                                                  vpz::CoupledModel *parent,
-                                                  const std::string &modelname)
+vpz::BaseModel *
+Coordinator::createModelFromClass(const std::string &classname,
+                                  vpz::CoupledModel *parent,
+                                  const std::string &modelname,
+                                  const vpz::Conditions &conditions)
 {
     return m_modelFactory.createModelFromClass(
-        *this, parent, classname, modelname);
+        *this, parent, classname, modelname, conditions);
 }
 
 void Coordinator::addObservableToView(vpz::AtomicModel *model,

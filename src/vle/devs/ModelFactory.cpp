@@ -58,6 +58,7 @@ ModelFactory::ModelFactory(utils::ContextPtr context,
 }
 
 void ModelFactory::createModel(Coordinator &coordinator,
+                               const vpz::Conditions &experiment_conditions,
                                vpz::AtomicModel *model,
                                const std::string &dynamics,
                                const std::vector<std::string> &conditions,
@@ -70,7 +71,7 @@ void ModelFactory::createModel(Coordinator &coordinator,
 
     if (not conditions.empty()) {
         for (const auto &elem : conditions) {
-            const auto &cnd = mExperiment.conditions().get(elem);
+            const auto &cnd = experiment_conditions.get(elem);
             auto vl = cnd.fillWithFirstValues();
 
             for (auto &elem : vl) {
@@ -119,6 +120,7 @@ void ModelFactory::createModels(Coordinator &coordinator,
 
         for (auto &elem : atomicmodellist) {
             createModel(coordinator,
+                        mExperiment.conditions(),
                         elem,
                         (elem)->dynamics(),
                         (elem)->conditions(),
@@ -131,7 +133,8 @@ vpz::BaseModel *
 ModelFactory::createModelFromClass(Coordinator &coordinator,
                                    vpz::CoupledModel *parent,
                                    const std::string &classname,
-                                   const std::string &modelname)
+                                   const std::string &modelname,
+                                   const vpz::Conditions &conditions)
 {
     vpz::Class &classe(mClasses.get(classname));
     vpz::BaseModel *mdl(classe.node()->clone());
@@ -141,6 +144,7 @@ ModelFactory::createModelFromClass(Coordinator &coordinator,
 
     for (auto &elem : atomicmodellist) {
         createModel(coordinator,
+                    conditions,
                     elem,
                     (elem)->dynamics(),
                     (elem)->conditions(),
