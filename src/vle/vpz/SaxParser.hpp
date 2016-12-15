@@ -27,7 +27,6 @@
 #ifndef VLE_VPZ_SAXPARSER_HPP
 #define VLE_VPZ_SAXPARSER_HPP
 
-#include <libxml/SAX2.h>
 #include <map>
 #include <vle/DllDefines.hpp>
 #include <vle/value/Value.hpp>
@@ -59,24 +58,30 @@ public:
     virtual ~SaxParser() {}
 
     /**
-     * @brief Open the VPZ file and parse it with libxml2 SAX2 interface.
+     * @brief Open the VPZ file and parse it with @c parse function.
      * @param filename The name of the file to parse.
      * @throw utils::SaxError if the file is not readable.
      */
     void parseFile(const std::string &filename);
 
     /**
-     * @brief Open the VPZ file and parse it with libxml2 SAX2 interface.
+     * @brief Open the VPZ file and parse it with @c parse function.
      * @param buffer the buffer to process.
      * @throw utils::SaxError if the buffer is not readable.
      */
     void parseMemory(const std::string &buffer);
 
     /**
-     * @brief Delete all information from Sax parser like stack, etc. Use it
-     * before restart a new parse.
+     * @brief Read vpz xml from the input stream.
+     * @details Use the libxml2 to parse the input stream using chunk of @c
+     * size bytes.
+     *
+     * @param is the input stream.
+     * @param size the size in byte of the chunk.
+     *
+     * @thow utils::SaxParserError if read or parse operation fails.
      */
-    void clearParserState();
+    void parse(std::istream &is, std::size_t size);
 
     /**
      * @brief Return true if the SaxParser have read a value.
@@ -122,7 +127,6 @@ public:
      */
     inline const vpz::Vpz &vpz() const { return m_vpz; }
 
-private:
     static void onStartDocument(void *ctx);
 
     static void onEndDocument(void *ctx);
@@ -170,39 +174,6 @@ private:
      * @param error The message to store into the error's buffer string.
      */
     void stopParser(const std::string &error);
-
-    /**
-     * @brief Return true if the parsing of the XML file has been stopped.
-     * @return true if the parser was stopped, false otherwise.
-     */
-    bool isStopped() const { return m_stop; }
-
-    xmlSAXHandler m_sax;
-    bool m_stop;
-    std::string m_error;
-    SaxStackVpz m_vpzstack;
-    ValueStackSax m_valuestack;
-    std::string m_lastCharacters;
-    std::string m_cdata;
-    Vpz &m_vpz;
-
-    bool m_isValue;
-    bool m_isVPZ;
-
-    struct XmlCompare {
-        inline bool operator()(const xmlChar *s1, const xmlChar *s2) const
-        {
-            return xmlStrcmp(s1, s2) < 0;
-        }
-    };
-
-    typedef void (SaxParser::*startfunc)(const xmlChar **);
-    typedef void (SaxParser::*endfunc)();
-    typedef std::map<const xmlChar *, startfunc, XmlCompare> StartFuncList;
-    typedef std::map<const xmlChar *, endfunc, XmlCompare> EndFuncList;
-
-    StartFuncList m_starts;
-    EndFuncList m_ends;
 
     void onBoolean(const xmlChar **att);
     void onInteger(const xmlChar **att);
@@ -282,72 +253,17 @@ private:
     void onEndClasses();
     void onEndClass();
 
-    void add(const char *name, startfunc fct, endfunc efct)
-    {
-        m_starts[(const xmlChar *)name] = fct;
-        m_ends[(const xmlChar *)name] = efct;
-    }
+private:
+    void *m_ctxt;
+    std::string m_error;
+    SaxStackVpz m_vpzstack;
+    ValueStackSax m_valuestack;
+    std::string m_lastCharacters;
+    std::string m_cdata;
+    Vpz &m_vpz;
 
-    void fillTagList()
-    {
-        add("boolean", &SaxParser::onBoolean, &SaxParser::onEndBoolean);
-        add("integer", &SaxParser::onInteger, &SaxParser::onEndInteger);
-        add("double", &SaxParser::onDouble, &SaxParser::onEndDouble);
-        add("string", &SaxParser::onString, &SaxParser::onEndString);
-        add("set", &SaxParser::onSet, &SaxParser::onEndSet);
-        add("matrix", &SaxParser::onMatrix, &SaxParser::onEndMatrix);
-        add("map", &SaxParser::onMap, &SaxParser::onEndMap);
-        add("key", &SaxParser::onKey, &SaxParser::onEndKey);
-        add("tuple", &SaxParser::onTuple, &SaxParser::onEndTuple);
-        add("table", &SaxParser::onTable, &SaxParser::onEndTable);
-        add("xml", &SaxParser::onXML, &SaxParser::onEndXML);
-        add("null", &SaxParser::onNull, &SaxParser::onEndNull);
-        add("vle_project",
-            &SaxParser::onVLEProject,
-            &SaxParser::onEndVLEProject);
-        add("structures",
-            &SaxParser::onStructures,
-            &SaxParser::onEndStructures);
-        add("model", &SaxParser::onModel, &SaxParser::onEndModel);
-        add("in", &SaxParser::onIn, &SaxParser::onEndIn);
-        add("out", &SaxParser::onOut, &SaxParser::onEndOut);
-        add("port", &SaxParser::onPort, &SaxParser::onEndPort);
-        add("submodels", &SaxParser::onSubModels, &SaxParser::onEndSubModels);
-        add("connections",
-            &SaxParser::onConnections,
-            &SaxParser::onEndConnections);
-        add("connection",
-            &SaxParser::onConnection,
-            &SaxParser::onEndConnection);
-        add("origin", &SaxParser::onOrigin, &SaxParser::onEndOrigin);
-        add("destination",
-            &SaxParser::onDestination,
-            &SaxParser::onEndDestination);
-        add("dynamics", &SaxParser::onDynamics, &SaxParser::onEndDynamics);
-        add("dynamic", &SaxParser::onDynamic, &SaxParser::onEndDynamic);
-        add("experiment",
-            &SaxParser::onExperiment,
-            &SaxParser::onEndExperiment);
-        add("conditions",
-            &SaxParser::onConditions,
-            &SaxParser::onEndConditions);
-        add("condition", &SaxParser::onCondition, &SaxParser::onEndCondition);
-        add("views", &SaxParser::onViews, &SaxParser::onEndViews);
-        add("outputs", &SaxParser::onOutputs, &SaxParser::onEndOutputs);
-        add("output", &SaxParser::onOutput, &SaxParser::onEndOutput);
-        add("view", &SaxParser::onView, &SaxParser::onEndView);
-        add("observables",
-            &SaxParser::onObservables,
-            &SaxParser::onEndObservables);
-        add("observable",
-            &SaxParser::onObservable,
-            &SaxParser::onEndObservable);
-        add("attachedview",
-            &SaxParser::onAttachedView,
-            &SaxParser::onEndAttachedView);
-        add("classes", &SaxParser::onClasses, &SaxParser::onEndClasses);
-        add("class", &SaxParser::onClass, &SaxParser::onEndClass);
-    }
+    bool m_isValue;
+    bool m_isVPZ;
 };
 
 /**
