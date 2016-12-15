@@ -24,12 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/unit-test.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/value/Value.hpp>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vle.hpp>
 #include <stdexcept>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/unit-test.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/vle.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 using namespace vle;
 using namespace vpz;
@@ -57,21 +57,20 @@ void vpz_add_output()
     views.addStreamOutput("out3", "", "storage", "");
 
     EnsuresNotThrow(views.addEventView("view1", View::FINISH, "out1"),
-        std::exception);
+                    std::exception);
     EnsuresNotThrow(views.addEventView("view2", View::OUTPUT, "out4"),
-        std::exception);
+                    std::exception);
 
     EnsuresNotThrow(views.addTimedView("view3", 1.0, "out3"), std::exception);
-    EnsuresThrow(views.addTimedView("view3", 1.0, "out1"),
-                        utils::ArgError);
-    EnsuresThrow(views.addTimedView("view4", 0.5, "out4"),
-                        utils::ArgError);
-    EnsuresThrow(views.addTimedView("view4", 0.0, "out2"),
-                        utils::ArgError);
+    EnsuresThrow(views.addTimedView("view3", 1.0, "out1"), utils::ArgError);
+    EnsuresThrow(views.addTimedView("view4", 0.5, "out4"), utils::ArgError);
+    EnsuresThrow(views.addTimedView("view4", 0.0, "out2"), utils::ArgError);
 }
 
 int main()
 {
+    vle::Init app;
+
     vpz_obs_port();
     vpz_add_output();
 

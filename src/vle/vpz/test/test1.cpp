@@ -169,6 +169,7 @@ void value_set()
     {
         auto ptr = vpz::Vpz::parseValue(t1);
         const auto &v = ptr->toSet();
+
         Ensures(v.getString(1) == "test");
         Ensures(v.getInt(0) == 1);
     }
@@ -594,6 +595,8 @@ void value_matrix_of_matrix_io()
 
 int main()
 {
+    vle::Init app;
+
     value_bool();
     value_integer();
     value_double();

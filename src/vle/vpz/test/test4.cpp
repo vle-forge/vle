@@ -300,6 +300,7 @@ void check_experiment_unittest_vpz(const vpz::Experiment &exp)
         Ensures(exp.conditions().exist("cd"));
         {
             const vpz::Condition &c(exp.conditions().get("ca"));
+
             const auto &x(c.getSetValues("x"));
             Ensures(not x.empty());
             Ensures(x[0]->isDouble());
@@ -842,6 +843,8 @@ void test_equal_views()
 
 int main()
 {
+    vle::Init app;
+
     test_remove_dyns();
     test_rename_dyns();
     test_remove_conds();

@@ -24,14 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/unit-test.hpp>
 #include <boost/version.hpp>
-#include <vle/utils/DownloadManager.hpp>
-#include <vle/utils/Context.hpp>
-#include <vle/utils/Filesystem.hpp>
-#include <vle/vle.hpp>
 #include <memory>
+#include <vle/utils/Context.hpp>
+#include <vle/utils/DownloadManager.hpp>
+#include <vle/utils/Filesystem.hpp>
+#include <vle/utils/unit-test.hpp>
+#include <vle/vle.hpp>
 
 using namespace vle;
 
@@ -52,7 +51,6 @@ void download_dtd()
     vle::utils::Path dowloaded(dm.filename());
     Ensures(dowloaded.is_file());
 }
-
 
 void download_package()
 {
@@ -92,6 +90,8 @@ void download_package_bis()
 
 int main()
 {
+    vle::Init app;
+
     download_dtd();
     download_package();
     download_package_bis();

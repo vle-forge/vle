@@ -24,16 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
-#include <stdexcept>
-#include <limits>
 #include <fstream>
-#include <iostream>
 #include <functional>
-#include <vle/value/Value.hpp>
+#include <iostream>
+#include <limits>
+#include <stdexcept>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -46,8 +45,8 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/User.hpp>
 #include <vle/value/Value.hpp>
+#include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/utils/Exception.hpp>
 #include <vle/vle.hpp>
 
 using namespace vle;
@@ -188,29 +187,30 @@ void check_null()
     st->addString("toto5");
     st->addNull();
 
-    EnsuresEqual(st->size(), (value::VectorValue::size_type) 10);
+    EnsuresEqual(st->size(), (value::VectorValue::size_type)10);
 
     auto it = st->value().begin();
 
-    while ((it = std::find_if(it, st->value().end(), value::IsNullValue()))
-            != st->value().end()) {
+    while ((it = std::find_if(it, st->value().end(), value::IsNullValue())) !=
+           st->value().end()) {
         *it = std::unique_ptr<value::Value>();
     }
 
-    it = std::remove_if(st->value().begin(), st->value().end(),
-                        [](const std::unique_ptr<value::Value>& value)
-                        {
+    it = std::remove_if(st->value().begin(),
+                        st->value().end(),
+                        [](const std::unique_ptr<value::Value> &value) {
                             return not value.get();
                         });
 
     st->value().erase(it, st->value().end());
 
-    EnsuresEqual(st->size(), (value::VectorValue::size_type) 5);
+    EnsuresEqual(st->size(), (value::VectorValue::size_type)5);
 }
 
 void check_matrix()
 {
-    auto mx = std::unique_ptr<value::Matrix>(new value::Matrix(100, 100, 10, 10));
+    auto mx =
+        std::unique_ptr<value::Matrix>(new value::Matrix(100, 100, 10, 10));
     EnsuresEqual(mx->rows(), (value::Matrix::size_type)100);
     EnsuresEqual(mx->columns(), (value::Matrix::size_type)100);
 
@@ -229,7 +229,7 @@ void check_matrix()
 
     auto cpy = std::unique_ptr<value::Matrix>(new value::Matrix(*mx));
 
-    EnsuresEqual(cpy->get(0,0)->isInteger(), true);
+    EnsuresEqual(cpy->get(0, 0)->isInteger(), true);
 
     cpy->get(0, 0)->toInteger().set(20);
     std::cout << cpy->writeToString() << '\n';
@@ -251,7 +251,7 @@ void check_matrix()
 
     EnsuresEqual(cpy->rows(), 3);
     EnsuresEqual(cpy->columns(), 5);
-    Ensures(cpy->getBoolean(4,2));
+    Ensures(cpy->getBoolean(4, 2));
 
     cpy->resize(10, 10, value::Boolean::create(false));
     std::cout << cpy->writeToString() << '\n';
@@ -259,62 +259,74 @@ void check_matrix()
 
 namespace test {
 
-    class MyData : public vle::value::User
+class MyData : public vle::value::User {
+public:
+    double x, y, z;
+    std::string name;
+
+    MyData()
+        : vle::value::User()
+        , x(0.0)
+        , y(0.0)
+        , z(0.0)
     {
-    public:
-        double x, y, z;
-        std::string name;
+    }
 
-        MyData()
-            : vle::value::User(), x(0.0), y(0.0), z(0.0)
-        {}
+    MyData(double x, double y, double z, std::string name)
+        : vle::value::User()
+        , x(x)
+        , y(y)
+        , z(z)
+        , name(std::move(name))
+    {
+    }
 
-        MyData(double x, double y, double z, std::string name)
-            : vle::value::User(), x(x), y(y), z(z), name(std::move(name))
-        {}
+    MyData(const MyData &value)
+        : vle::value::User(value)
+        , x(value.x)
+        , y(value.y)
+        , z(value.z)
+        , name(value.name)
+    {
+    }
 
-        MyData(const MyData &value)
-            : vle::value::User(value), x(value.x), y(value.y), z(value.z),
-            name(value.name)
-        {}
+    virtual ~MyData() {}
 
-        virtual ~MyData() {}
+    virtual size_t id() const override { return 15978462u; }
 
-        virtual size_t id() const override { return 15978462u; }
+    virtual std::unique_ptr<Value> clone() const override
+    {
+        return std::unique_ptr<Value>(new MyData(*this));
+    }
 
-        virtual std::unique_ptr<Value> clone() const override
-        {
-            return std::unique_ptr<Value>(new MyData(*this));
-        }
+    virtual void writeFile(std::ostream &out) const override
+    {
+        out << "(" << name << ": " << x << ", " << y << ", " << z << ")";
+    }
 
-        virtual void writeFile(std::ostream& out) const override
-        {
-            out << "(" << name << ": " << x << ", " << y <<  ", " << z << ")";
-        }
+    virtual void writeString(std::ostream &out) const override
+    {
+        writeFile(out);
+    }
 
-        virtual void writeString(std::ostream& out) const override
-        {
-            writeFile(out);
-        }
-
-        virtual void writeXml(std::ostream& out) const override
-        {
-            out << "<set><string>" << name << "</string><double>" << x <<
-                "</double><double>" << y << "</double> <double>" << z <<
-                "</double></set>";
-        }
-    };
+    virtual void writeXml(std::ostream &out) const override
+    {
+        out << "<set><string>" << name << "</string><double>" << x
+            << "</double><double>" << y << "</double> <double>" << z
+            << "</double></set>";
+    }
+};
 }
 
-void check_user_value(vle::value::Value& to_check)
+void check_user_value(vle::value::Value &to_check)
 {
     EnsuresEqual(to_check.getType(), vle::value::Value::USER);
 
-    auto& user = to_check.toUser();
+    auto &user = to_check.toUser();
     EnsuresEqual(user.getType(), vle::value::Value::USER);
     EnsuresEqual(user.id(), 15978462u);
 
-    test::MyData *mydata = dynamic_cast <test::MyData*>(&user);
+    test::MyData *mydata = dynamic_cast<test::MyData *>(&user);
     Ensures(mydata);
 
     EnsuresEqual(mydata->x, 1.);
@@ -325,7 +337,8 @@ void check_user_value(vle::value::Value& to_check)
 
 void test_user_value()
 {
-    auto data = std::unique_ptr<value::Value>(new test::MyData(1., 2., 3., "test-vle"));
+    auto data = std::unique_ptr<value::Value>(
+        new test::MyData(1., 2., 3., "test-vle"));
     check_user_value(*data.get());
 
     std::unique_ptr<vle::value::Value> cloned_data = data->clone();
@@ -338,7 +351,7 @@ void test_tuple()
 {
     value::Tuple t(4, 1.);
 
-    for (auto & v : t.value())
+    for (auto &v : t.value())
         Ensures(v == 1.);
 
     t(0) = 2;
@@ -351,7 +364,7 @@ void test_table()
 
     {
         double value = 0;
-        for (auto & v : t.value())
+        for (auto &v : t.value())
             v = value++;
     }
 
@@ -378,9 +391,10 @@ void test_table()
     Ensures(t(0, 2) == 4.);
 }
 
-
 int main()
 {
+    vle::Init app;
+
     check_simple_value();
     check_map_value();
     check_set_value();

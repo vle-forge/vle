@@ -24,19 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <vle/utils/unit-test.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/CoupledModel.hpp>
 #include <vle/vle.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 using namespace vle;
 
 void single_class()
 {
-    const char* xml=
+    const char *xml =
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
@@ -150,7 +150,8 @@ void single_class()
         "      </connection>\n"
         "     </connections>\n"
         "    </model>\n"
-        "    <model name=\"d\" type=\"atomic\" conditions=\"cd\" dynamics=\"unittest\" >\n"
+        "    <model name=\"d\" type=\"atomic\" conditions=\"cd\" "
+        "dynamics=\"unittest\" >\n"
         "     <in>\n"
         "      <port name=\"in\" />\n"
         "     </in>\n"
@@ -192,23 +193,22 @@ void single_class()
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const vpz::Classes& classes(vpz.project().classes());
+    const vpz::Classes &classes(vpz.project().classes());
     EnsuresEqual(classes.exist("xxx"), true);
 
-    const vpz::Class& classe(classes.get("xxx"));
+    const vpz::Class &classe(classes.get("xxx"));
     Ensures(classe.node() != nullptr);
 
-    const vpz::BaseModel* mdl = classe.node();
+    const vpz::BaseModel *mdl = classe.node();
     Ensures(mdl->isCoupled());
 
-    const vpz::CoupledModel* cpl(dynamic_cast < const
-                                   vpz::CoupledModel*>(mdl));
+    const vpz::CoupledModel *cpl(dynamic_cast<const vpz::CoupledModel *>(mdl));
     Ensures(cpl);
 }
 
 void single_class_utf8()
 {
-    const char* xml=
+    const char *xml =
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
@@ -322,7 +322,8 @@ void single_class_utf8()
         "      </connection>\n"
         "     </connections>\n"
         "    </model>\n"
-        "    <model name=\"d\" type=\"atomic\" conditions=\"cd\" dynamics=\"unittest\" >\n"
+        "    <model name=\"d\" type=\"atomic\" conditions=\"cd\" "
+        "dynamics=\"unittest\" >\n"
         "     <in>\n"
         "      <port name=\"in\" />\n"
         "     </in>\n"
@@ -364,22 +365,23 @@ void single_class_utf8()
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const vpz::Classes& classes(vpz.project().classes());
+    const vpz::Classes &classes(vpz.project().classes());
     EnsuresEqual(classes.exist("xx € ç x"), true);
 
-    const vpz::Class& classe(classes.get("xx € ç x"));
+    const vpz::Class &classe(classes.get("xx € ç x"));
     Ensures(classe.node() != nullptr);
 
-    const vpz::BaseModel* mdl = classe.node();
+    const vpz::BaseModel *mdl = classe.node();
     Ensures(mdl->isCoupled());
 
-    const vpz::CoupledModel* cpl(dynamic_cast < const
-                                   vpz::CoupledModel*>(mdl));
+    const vpz::CoupledModel *cpl(dynamic_cast<const vpz::CoupledModel *>(mdl));
     Ensures(cpl);
 }
 
 int main()
 {
+    vle::Init app;
+
     single_class();
     single_class_utf8();
 

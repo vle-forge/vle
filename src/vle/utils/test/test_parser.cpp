@@ -24,20 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/unit-test.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/Parser.hpp>
-#include <vle/vle.hpp>
 #include <sstream>
+#include <vle/utils/Parser.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/unit-test.hpp>
+#include <vle/vle.hpp>
 
 using namespace vle;
 
 const char *str = "# this file is a test\n"
-    "test { # comment\n"
-    "a = 1, 2, 3;"
-    "b = \"1\", \"2\", \"3\";"
-    "}\n";
+                  "test { # comment\n"
+                  "a = 1, 2, 3;"
+                  "b = \"1\", \"2\", \"3\";"
+                  "}\n";
 
 void ParserStr()
 {
@@ -46,14 +45,14 @@ void ParserStr()
 
     EnsuresEqual(parser.root().blocks.size(), 1);
 
-    const vle::utils::Block& block = parser.root().getBlock("test");
+    const vle::utils::Block &block = parser.root().getBlock("test");
     EnsuresEqual(block.name, "test");
     EnsuresEqual(block.strings.size(), 3);
     EnsuresEqual(block.reals.size(), 3);
 
     {
         typedef vle::utils::Block::Reals::const_iterator Iterator;
-        std::pair < Iterator, Iterator > r = block.reals.equal_range("a");
+        std::pair<Iterator, Iterator> r = block.reals.equal_range("a");
         EnsuresEqual(block.reals.count("a"), 3);
         EnsuresEqual(r.first++->second, 1);
         EnsuresEqual(r.first++->second, 2);
@@ -61,7 +60,7 @@ void ParserStr()
     }
     {
         typedef vle::utils::Block::Strings::const_iterator Iterator;
-        std::pair < Iterator, Iterator > r = block.strings.equal_range("b");
+        std::pair<Iterator, Iterator> r = block.strings.equal_range("b");
         EnsuresEqual(block.strings.count("b"), 3);
         EnsuresEqual(r.first++->second, "1");
         EnsuresEqual(r.first++->second, "2");
@@ -71,6 +70,8 @@ void ParserStr()
 
 int main()
 {
+    vle::Init app;
+
     ParserStr();
 
     return unit_test::report_errors();

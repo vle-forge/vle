@@ -24,17 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/unit-test.hpp>
 #include <boost/lexical_cast.hpp>
-#include <stdexcept>
 #include <iostream>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/BaseModel.hpp>
-#include <vle/manager/Manager.hpp>
+#include <stdexcept>
 #include <vle/manager/ExperimentGenerator.hpp>
-#include <vle/vle.hpp>
-#include <vle/value/Value.hpp>
+#include <vle/manager/Manager.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -47,58 +42,61 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/User.hpp>
 #include <vle/value/Value.hpp>
+#include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
+#include <vle/vle.hpp>
+#include <vle/vpz/BaseModel.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 using namespace vle;
 
-const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"A\" type=\"atomic\" >\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"test1\" duration=\"0.33\" >\n"
-        "  <conditions>"
-        "   <condition name=\"cond1\" >"
-        "    <port name=\"init1\" >"
-        "     <double>123.</double><integer>1</integer>"
-        "    </port>"
-        "    <port name=\"init2\" >"
-        "     <double>456.</double><integer>2</integer>"
-        "    </port>"
-        "   </condition>"
-        "   <condition name=\"cond2\" >"
-        "    <port name=\"init3\" >"
-        "     <double>.123</double><integer>-1</integer>"
-        "    </port>"
-        "    <port name=\"init4\" >"
-        "     <double>.456</double><integer>-2</integer>"
-        "    </port>"
-        "   </condition>"
-        "  </conditions>"
-        " </experiment>\n"
-        "</vle_project>\n";
+const char *xml = "<?xml version=\"1.0\"?>\n"
+                  "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+                  " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+                  " <structures>\n"
+                  "  <model name=\"A\" type=\"atomic\" >\n"
+                  "   <in>\n"
+                  "    <port name=\"in1\" />\n"
+                  "    <port name=\"in2\" />\n"
+                  "   </in>\n"
+                  "   <out>\n"
+                  "    <port name=\"out1\" />\n"
+                  "    <port name=\"out2\" />\n"
+                  "   </out>\n"
+                  "  </model>\n"
+                  " </structures>\n"
+                  " <experiment name=\"test1\" duration=\"0.33\" >\n"
+                  "  <conditions>"
+                  "   <condition name=\"cond1\" >"
+                  "    <port name=\"init1\" >"
+                  "     <double>123.</double><integer>1</integer>"
+                  "    </port>"
+                  "    <port name=\"init2\" >"
+                  "     <double>456.</double><integer>2</integer>"
+                  "    </port>"
+                  "   </condition>"
+                  "   <condition name=\"cond2\" >"
+                  "    <port name=\"init3\" >"
+                  "     <double>.123</double><integer>-1</integer>"
+                  "    </port>"
+                  "    <port name=\"init4\" >"
+                  "     <double>.456</double><integer>-2</integer>"
+                  "    </port>"
+                  "   </condition>"
+                  "  </conditions>"
+                  " </experiment>\n"
+                  "</vle_project>\n";
 
 void experimentgenerator_lower_than_exp()
 {
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    vpz::Project& project(vpz.project());
-    vpz::Conditions& cnds(project.experiment().conditions());
+    vpz::Project &project(vpz.project());
+    vpz::Conditions &cnds(project.experiment().conditions());
 
     {
-        vpz::Condition& cnd1(cnds.get("cond1"));
+        vpz::Condition &cnd1(cnds.get("cond1"));
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 10000; ++i) {
@@ -108,7 +106,7 @@ void experimentgenerator_lower_than_exp()
     }
 
     {
-        vpz::Condition& cnd2(cnds.get("cond2"));
+        vpz::Condition &cnd2(cnds.get("cond2"));
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 9999; i >= 0; --i) {
@@ -138,11 +136,11 @@ void experimentgenerator_greater_than_exp()
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    vpz::Project& project(vpz.project());
-    vpz::Conditions& cnds(project.experiment().conditions());
+    vpz::Project &project(vpz.project());
+    vpz::Conditions &cnds(project.experiment().conditions());
 
     {
-        vpz::Condition& cnd1(cnds.get("cond1"));
+        vpz::Condition &cnd1(cnds.get("cond1"));
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 3; ++i) {
@@ -152,7 +150,7 @@ void experimentgenerator_greater_than_exp()
     }
 
     {
-        vpz::Condition& cnd2(cnds.get("cond2"));
+        vpz::Condition &cnd2(cnds.get("cond2"));
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 2; i >= 0; --i) {
@@ -193,11 +191,11 @@ void experimentgenerator_max_1_max_1()
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    vpz::Project& project(vpz.project());
-    vpz::Conditions& cnds(project.experiment().conditions());
+    vpz::Project &project(vpz.project());
+    vpz::Conditions &cnds(project.experiment().conditions());
 
     {
-        vpz::Condition& cnd1(cnds.get("cond1"));
+        vpz::Condition &cnd1(cnds.get("cond1"));
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 7; ++i) {
@@ -207,7 +205,7 @@ void experimentgenerator_max_1_max_1()
     }
 
     {
-        vpz::Condition& cnd2(cnds.get("cond2"));
+        vpz::Condition &cnd2(cnds.get("cond2"));
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 7; i > 0; --i) {
@@ -224,6 +222,8 @@ void experimentgenerator_max_1_max_1()
 
 int main()
 {
+    vle::Init app;
+
     experimentgenerator_lower_than_exp();
     experimentgenerator_greater_than_exp();
     experimentgenerator_max_1_max_1();
