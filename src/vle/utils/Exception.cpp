@@ -37,9 +37,9 @@ int default_buffer_size(std::size_t size) noexcept
     if (vle::utils::is_numeric_castable<int>(size))
         return vle::utils::numeric_cast<int>(size);
 
-    return 4096;
+    return BUFSIZ;
 }
-}
+} // namespace anonymous
 
 namespace vle {
 namespace utils {
