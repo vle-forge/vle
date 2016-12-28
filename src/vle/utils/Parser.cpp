@@ -184,7 +184,7 @@ double Parser::readReal()
         } else if (c == '#') {
             forgetLine();
             break;
-        } else if (isdigit(c)) {
+        } else if (isdigit(c) or c == '-') {
             result += c;
         } else if (c == '.') {
             if (result.find(".") != std::string::npos)
@@ -259,7 +259,7 @@ Parser::Token Parser::nextToken()
         } else if (c == '#') {
             forgetLine();
             continue;
-        } else if (std::isdigit(c)) {
+        } else if (std::isdigit(c) or c == '-') {
             unget();
             return Parser::Real;
         } else if (c == '+') {
