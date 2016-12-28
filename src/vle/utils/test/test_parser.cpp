@@ -36,6 +36,7 @@ const char *str = "# this file is a test\n"
                   "test { # comment\n"
                   "a = 1, 2, 3;"
                   "b = \"1\", \"2\", \"3\";"
+                  "c = -1.1, -2.2;"
                   "}\n";
 
 void ParserStr()
@@ -48,7 +49,7 @@ void ParserStr()
     const vle::utils::Block &block = parser.root().getBlock("test");
     EnsuresEqual(block.name, "test");
     EnsuresEqual(block.strings.size(), 3);
-    EnsuresEqual(block.reals.size(), 3);
+    EnsuresEqual(block.reals.size(), 5);
 
     {
         typedef vle::utils::Block::Reals::const_iterator Iterator;
@@ -65,6 +66,13 @@ void ParserStr()
         EnsuresEqual(r.first++->second, "1");
         EnsuresEqual(r.first++->second, "2");
         EnsuresEqual(r.first++->second, "3");
+    }
+    {
+        typedef vle::utils::Block::Reals::const_iterator Iterator;
+        std::pair < Iterator, Iterator > r = block.reals.equal_range("c");
+        EnsuresEqual(block.reals.count("c"), 2);
+        EnsuresEqual(r.first++->second, -1.1);
+        EnsuresEqual(r.first++->second, -2.2);
     }
 }
 
