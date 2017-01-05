@@ -58,40 +58,48 @@ cpack.exe --debug --verbose -G NSIS
 #set QT_PLUGIN_PATH=%install_dir%\vle\share\qt5\plugins\
 
 
-*******************************************
-** Build RVLE natively on WIN32, using Msys2
-*******************************************
+## RVLE
 
-1) Downloads and pre install
-----------------------------
+First, install most recent version of
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) and
+[R](https://cran.r-project.org/bin/windows/base) programs. Then, we need to
+rebuild VLE with the compiler provided by Rtools to avoid ABI problem (msys2
+comes with gcc6):
 
-git clone rvle sources into %VLE_BUILD_ENV%  **** dev
-Download and install R                       **** R-3.0.2
-Download and install Rtools                  **** Rtools for R-3.0
+set PATH=C:\Rtools\mingw_32\bin;C:\Program Files\R\R-3.3.2\bin\i386;d:\msys64\usr\bin;D:\msys64\mingw32\bin;
+set VLE_DIR=d:\natifvle\vle
+set install_dir=d:\natifvle\install-rvle
+mkdir %VLE_DIR%\buildvle-rvle
+d:
+cd %VLE_DIR%\buildvle-rvle
+cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=OFF -DWITH_WIN32_INSTALLER=OFF -DCMAKE_INSTALL_PREFIX=%install_dir% -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+mingw32-make -j2
+mingw32-make install
 
-**** Install mingw autotools (in a windows cmd)
+Now, we install rvle dependencies with msys2:
 
-mingw-get install autoconf
-mingw-get install automake
-mingw-get install libtool
+pacman -S --force mingw-w64-i686-pkg-config
+pacman -S --force autoconf
+pacman -S --force automake
 
-**** Install rvle dependance : RUnit, and build rvle (in a MinGW shell, and R prompt)
 
-export PATH=/C/MinGW/msys/1.0/bin:/c/Program\ Files/R/R-3.0.2/bin/:/c/Rtools/bin:/c/gtkmm/bin:/c/natifvle/install/vle/bin:$PATH
-export PKG_CONFIG_PATH=/c/gtkmm/lib/pkgconfig:/C/MinGW/lib/pkgconfig:/c/natifvle/install/vle/lib/pkgconfig
-export BOOST_ROOT=/C/natifvle/install/boost
+# msys2
 
-R
-> install.packages("RUnit")
-> q()
+export PKG_CONFIG_PATH=/d/natifvle/install-rvle/lib/pkgconfig
+cp -r /d/vle-2.0.0-dev/lib/pkgconfig/*.pc /d/natifvle/install-rvle/lib/pkgconfig
+cp /d/vle-2.0.0-dev/lib/libxml2.* /d/natifvle/install-rvle/lib/
+cp /d/vle-2.0.0-dev/lib/libz.* /d/natifvle/install-rvle/lib/
+cp /d/vle-2.0.0-dev/lib/liblzma.* /d/natifvle/install-rvle/lib/
+cp /d/vle-2.0.0-dev/lib/libiconv.* /d/natifvle/install-rvle/lib/
 
-cd /c/natifvle/rvle
-echo "Running aclocal..." ; aclocal -I m4 $ACLOCAL_FLAGS
-echo "Running autoheader..." ; autoheader
-echo "Running autoconf..." ; autoconf
-echo "Running libtoolize..." ; (libtoolize --copy --automake || glibtoolize --automake)
-echo "Running automake..." ; automake --add-missing --copy --gnu
-./configure
-cd ..
-R CMD INSTALL --build rvle
+cd /d/natifvle/rvle
+./autogen.sh
 
+# cmd.exe
+
+set PATH=c:\Rtools\bin;C:\Rtools\mingw_32\bin;C:\Program Files\R\R-3.3.2\bin\i386;d:\msys64\usr\bin;D:\msys64\mingw32\bin;
+set PKG_CONFIG_PATH=D:\natifvle\install-rvle\lib\pkgconfig
+d:
+cd d:\natifvle
+R CMD INSTALL --build rvle --no-multiarch
+pause
