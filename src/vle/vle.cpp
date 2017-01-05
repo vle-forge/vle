@@ -28,12 +28,16 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
 
+#define _VLE_STRINGIFY(x) #x
+#define VLE_STRINGIFY(X)  _VLE_STRINGIFY(x)
+
 namespace vle {
 
 std::tuple<int, int, int, std::string> version()
 {
     return std::make_tuple(
-        VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_EXTRA);
+        VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
+        VLE_STRINGIFY(VERSION_EXTRA));
 }
 
 std::tuple<int, int> version_abi()

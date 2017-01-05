@@ -28,6 +28,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QWidget>
+#include <QMenu>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QListWidgetItem>

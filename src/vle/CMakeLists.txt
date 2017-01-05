@@ -59,7 +59,7 @@ target_compile_definitions(vlelib
   VERSION_MAJOR=${VLE_MAJOR}
   VERSION_MINOR=${VLE_MINOR}
   VERSION_PATCH=${VLE_PATCH}
-  VERSION_EXTRA="${VLE_EXTRA}")
+  VERSION_EXTRA=${VLE_EXTRA})
 
 target_include_directories(vlelib PUBLIC ${VLEDEPS_INCLUDE_DIRS})
 
@@ -88,7 +88,7 @@ target_compile_definitions(vlelibstatic
   VERSION_MAJOR=${VLE_MAJOR}
   VERSION_MINOR=${VLE_MINOR}
   VERSION_PATCH=${VLE_PATCH}
-  VERSION_EXTRA="${VLE_EXTRA}")
+  VERSION_EXTRA=${VLE_EXTRA})
 
 install(TARGETS vlelibstatic RUNTIME DESTINATION bin LIBRARY
   DESTINATION lib ARCHIVE DESTINATION lib)
