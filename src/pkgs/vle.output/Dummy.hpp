@@ -69,7 +69,4 @@ public:
 
 }}} // namespace vle oov plugin
 
-DECLARE_OOV_PLUGIN(vle::oov::plugin::Dummy)
-
 #endif
-

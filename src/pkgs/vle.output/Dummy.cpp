@@ -74,5 +74,7 @@ void Dummy::onValue(const std::string& /*simulator*/,
     value.reset(nullptr);
 }
 
-
 }}} // namespace vle oov plugin
+
+DECLARE_OOV_PLUGIN(vle::oov::plugin::Dummy)
+
