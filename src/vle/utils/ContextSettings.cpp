@@ -125,7 +125,7 @@ void Context::reset_settings() noexcept
 
     auto simulation =
         utils::format("vle-%s", vle::string_version_abi().c_str());
-    simulation += "--write-output '%1%' '%2%'";
+    simulation += " --write-output '%1%' '%2%'";
 
     m_pimpl->settings["vle.command.vle.simulation"] = simulation;
 }
