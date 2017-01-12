@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <iomanip>
 #include <getopt.h>
 #include <iostream>
 #include <iterator>
@@ -420,6 +421,9 @@ static int run_simulation(vle::utils::ContextPtr ctx,
                                 output_file.c_str());
                     }
                     else {
+                        ofs << std::showpoint << std::fixed
+                            << std::setprecision(
+                                    std::numeric_limits<double>::digits10);
                         res->writeXml(ofs);
                     }
                 }
