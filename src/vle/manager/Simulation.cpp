@@ -284,8 +284,12 @@ public:
 
                 while (not spawn.isfinish()) {
                     if (spawn.get(&output, &err)) {
-                        vInfo(m_context, "%s", output.c_str());
-                        vErr(m_context, "%s", err.c_str());
+                        if (not output.empty()) {
+                            vInfo(m_context, "%s", output.c_str());
+                        }
+                        if (not err.empty() ){
+                            vErr(m_context, "%s", err.c_str());
+                        }
                         output.clear();
                         err.clear();
 
@@ -308,8 +312,12 @@ public:
             else {
                 while (not spawn.isfinish()) {
                     if (spawn.get(&output, &err)) {
-                        vInfo(m_context, "%s", output.c_str());
-                        vErr(m_context, "%s", err.c_str());
+                        if (not output.empty()) {
+                            vInfo(m_context, "%s", output.c_str());
+                        }
+                        if (not err.empty() ){
+                            vErr(m_context, "%s", err.c_str());
+                        }
                         output.clear();
                         err.clear();
 
