@@ -321,13 +321,13 @@ VpzModelItem::clearPorts()
     QList<VpzPortItem*> inPorts = getInPorts();
      for (int i = 0; i<inPorts.length(); i++){
         scene()->removeItem(inPorts[i]);
-        delete inPorts[i];
+        inPorts[i]->deleteLater();
 
     }
     QList<VpzPortItem*> outPorts = getOutPorts();
      for (int i = 0; i<outPorts.length(); i++){
         scene()->removeItem(outPorts[i]);
-        delete outPorts[i];
+        outPorts[i]->deleteLater();
     }
 
 }
