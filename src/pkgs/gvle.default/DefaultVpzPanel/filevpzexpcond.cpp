@@ -734,6 +734,7 @@ void
 FileVpzExpCond::connectConds()
 {
     if (mVpz) {
+        disconnectConds();
         QObject::connect(mVpz,
                 SIGNAL(conditionsUpdated()),
                 this,

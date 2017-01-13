@@ -33,7 +33,7 @@ namespace gvle {
 
 
 DefaultVpzPanel::DefaultVpzPanel():
-            PluginMainPanel(), m_vpzview(0), m_rtool(0),
+            PluginMainPanel(), m_vpz(0), m_vpzview(0), m_rtool(0),
             mGvlePlugins(0)
 {
 
@@ -41,9 +41,10 @@ DefaultVpzPanel::DefaultVpzPanel():
 
 DefaultVpzPanel::~DefaultVpzPanel()
 {
-    delete m_vpzview;
     delete m_rtool;
-
+    delete m_vpzview;
+    delete m_vpz;
+    mGvlePlugins = 0;
 }
 
 
@@ -79,21 +80,21 @@ DefaultVpzPanel::init(const gvle_file& gf, utils::Package* pkg, Logger* log,
     QObject::connect(&(m_vpzview->mClassesTab->mScene), SIGNAL(initializationDone(VpzDiagScene*)),
             m_rtool, SLOT (onInitializationDone(VpzDiagScene*)));
 
-    vleVpz* vpz = new vleVpz(gf.source_file, gf.metadata_file, mGvlePlugins);
+    m_vpz = new vleVpz(gf.source_file, gf.metadata_file, mGvlePlugins);
 
-    vpz->setLogger(log);
+    m_vpz->setLogger(log);
 
-    m_rtool->setVpz(vpz);
-    m_vpzview->setVpz(vpz);
+    m_rtool->setVpz(m_vpz);
+    m_vpzview->setVpz(m_vpz);
     m_vpzview->setRtool(m_rtool);
 
-    QObject::connect(vpz, SIGNAL(undoAvailable(bool)),
+    QObject::connect(m_vpz, SIGNAL(undoAvailable(bool)),
                      this, SLOT (onUndoAvailable(bool)));
     QObject::connect(m_vpzview->ui->tabWidget,   SIGNAL(currentChanged(int)),
                      this, SLOT  (onCurrentChanged(int)));
     QObject::connect(m_vpzview->mSimTab,   SIGNAL(rightWidgetChanged()),
                      this, SLOT  (onRightSimWidgetChanged()));
-    QObject::connect(vpz,
+    QObject::connect(m_vpz,
             SIGNAL(undoRedo(QDomNode, QDomNode, QDomNode, QDomNode)),
             m_vpzview,
             SLOT(onUndoRedoVpz(QDomNode, QDomNode, QDomNode, QDomNode)));

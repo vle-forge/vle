@@ -305,7 +305,10 @@ DomDiffStack::snapshot (QDomNode node,
         diffs[curr].query = "";
         diffs[curr].node_before = QDomNode();
         diffs[curr].merge_type = "null";
-        diffs[curr].merge_args = 0;
+        if (diffs[curr].merge_args) {
+            delete diffs[curr].merge_args;
+            diffs[curr].merge_args = 0;
+        }
         diffs[curr].source = current_source;
         diffs[curr].isDefined = true;
 

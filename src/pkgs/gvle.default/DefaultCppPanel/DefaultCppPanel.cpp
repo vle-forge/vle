@@ -46,7 +46,7 @@ DefaultCppPanel::DefaultCppPanel():
 
 DefaultCppPanel::~DefaultCppPanel()
 {
-
+    delete m_edit;
 }
 
 

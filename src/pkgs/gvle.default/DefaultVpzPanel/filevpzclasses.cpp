@@ -68,16 +68,15 @@ FileVpzClasses::FileVpzClasses(Logger* log,
 //                SIGNAL(clicked(bool)),
 //                this, SLOT(onPushNew(bool)));
 
-    QMenu* menu = new QMenu();
-    QAction* act = menu->addAction("atomic");
+    QAction* act = mMenuButton.addAction("atomic");
     QObject::connect(act,
                     SIGNAL(triggered(bool)),
                     this, SLOT(onNewAtomicTriggered(bool)));
-    act = menu->addAction("coupled");
+    act = mMenuButton.addAction("coupled");
     QObject::connect(act,
                     SIGNAL(triggered(bool)),
                     this, SLOT(onNewCoupledTriggered(bool)));
-    ui->pushNew->setMenu(menu);
+    ui->pushNew->setMenu(&mMenuButton);
 }
 
 FileVpzClasses::~FileVpzClasses()

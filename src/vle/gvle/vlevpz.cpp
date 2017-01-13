@@ -88,6 +88,13 @@ vleVpz::vleVpz(QXmlInputSource& source): hasMeta(false),
 
 vleVpz::~vleVpz()
 {
+    delete mDocVpm;
+    delete mVdo;
+    delete mVdoVpm;
+    delete undoStack;
+    delete undoStackVpm;
+    mLogger = 0;
+    mGvlePlugins = 0;
 }
 
 vleVpz::vleVpz(const QString& vpzpath, const QString& vpmpath,

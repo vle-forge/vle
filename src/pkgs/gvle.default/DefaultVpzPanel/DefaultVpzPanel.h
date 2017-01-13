@@ -71,6 +71,7 @@ public slots:
     void onRightSimWidgetChanged();
 
 public:
+    vleVpz*       m_vpz;
     fileVpzView*  m_vpzview;
     FileVpzRtool* m_rtool;
     gvle_plugins*  mGvlePlugins;

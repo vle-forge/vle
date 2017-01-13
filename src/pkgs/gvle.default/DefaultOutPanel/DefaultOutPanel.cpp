@@ -42,7 +42,7 @@ DefaultOutPanel::DefaultOutPanel():
 
 DefaultOutPanel::~DefaultOutPanel()
 {
-
+    delete m_edit;
 }
 
 void
