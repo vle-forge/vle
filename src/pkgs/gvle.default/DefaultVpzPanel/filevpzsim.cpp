@@ -45,7 +45,12 @@ FileVpzSim::FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
 
 FileVpzSim::~FileVpzSim()
 {
+    delete ui;
+    mVpz = 0;
+    mGvlePlugins =0 ;
     delete mPluginSimPanel;
+    mPackage = 0;
+    mLog = 0;
 }
 
 

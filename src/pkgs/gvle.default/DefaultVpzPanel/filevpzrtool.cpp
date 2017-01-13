@@ -48,6 +48,9 @@ FileVpzRtool::FileVpzRtool(QWidget *parent) :
 
 FileVpzRtool::~FileVpzRtool()
 {
+    delete ui;
+    mVpz = 0;
+    mCurrScene = 0;
 }
 
 
@@ -72,9 +75,11 @@ FileVpzRtool::clear()
 {
 
     QTreeWidget *viewTree = ui->modelTree;
+    bool oldblock = viewTree->blockSignals(true);
     viewTree->clearSelection();
     viewTree->clear();
     viewTree->setColumnCount(1);
+    viewTree->blockSignals(oldblock);
 }
 
 void
@@ -94,9 +99,6 @@ FileVpzRtool::updateTree()
 vleVpz*
 FileVpzRtool::vpz()
 {
-    //QString fileName = mVpz->getFilename();
-    //mVleLibVpz = new vle::vpz::Vpz(fileName.toStdString());
-
     return mVpz;
 }
 

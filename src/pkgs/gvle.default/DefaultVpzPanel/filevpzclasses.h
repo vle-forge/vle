@@ -81,6 +81,7 @@ private:
     Ui::FileVpzClasses* ui;
     vleVpz*             mVpz;
     QString             mSelClass;
+    QMenu               mMenuButton;//either coupled or atomic
 
 };
 

@@ -107,6 +107,7 @@ gvle_plugins::registerPlugins()
                     if (expcond) {
                         mCondPlugins.insert(expcond->getname(),
                                 gvleplug(it.fileName(), libName));
+                        expcond->deleteLater();
                     }
 
                 }
@@ -127,6 +128,7 @@ gvle_plugins::registerPlugins()
                     if (outputPlug) {
                         mOutputPlugins.insert(outputPlug->getname(),
                                 gvleplug(it.fileName(), libName));
+                        outputPlug->deleteLater();
                     }
                 }
             }
@@ -147,6 +149,7 @@ gvle_plugins::registerPlugins()
                     if (modeling) {
                         mMainPanelPlugins.insert(modeling->getname(),
                                 gvleplug(it.fileName(), libName));
+                        modeling->deleteLater();
                     }
                 }
             }
@@ -166,6 +169,7 @@ gvle_plugins::registerPlugins()
                     if (modeling) {
                         mMainPanelOutPlugins.insert(modeling->getname(),
                                 gvleplug(it.fileName(), libName));
+                        modeling->deleteLater();
                     }
                 }
             }
@@ -186,6 +190,7 @@ gvle_plugins::registerPlugins()
                     if (simulating) {
                         mSimPanelPlugins.insert(simulating->getname(),
                                 gvleplug(it.fileName(), libName));
+                        simulating->deleteLater();
                     }
                 }
             }
@@ -207,6 +212,7 @@ gvle_plugins::registerPlugins()
                     if (vpz) {
                         mMainPanelVpzPlugins.insert(vpz->getname(),
                                 gvleplug(it.fileName(), libName));
+                        vpz->deleteLater();
                     }
                 }
             }

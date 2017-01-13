@@ -223,16 +223,11 @@ gvle_win::gvle_win( const utils::ContextPtr& ctx, QWidget *parent) :
 
 gvle_win::~gvle_win()
 {
+    ui->tabWidget->blockSignals(true);
     mSettings->sync();
     delete mSettings;
-
-    while(ui->tabWidget->count())
-    {
-        QWidget *w = ui->tabWidget->widget(0);
-
-        ui->tabWidget->removeTab(0);
-        delete w;
-    }
+    delete mLogger;
+    ui->tabWidget->clear();
     delete ui;
 }
 
