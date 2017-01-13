@@ -82,6 +82,7 @@ protected:
     bool insideSrc(QModelIndex index);
     bool insideOut(QModelIndex index);
     bool insideExp(QModelIndex index);
+    bool insideData(QModelIndex index);
 
 private slots:
     void onNewProject();

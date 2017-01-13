@@ -51,6 +51,7 @@ struct gvle_file {
 
     static gvle_file getNewCpp(const utils::Package& pkg);
     static gvle_file getNewVpz(const utils::Package& pkg);
+    static gvle_file getNewData(const utils::Package& pkg);
     static gvle_file getCopy(const utils::Package& pkg, gvle_file gf);
 
     QString                    relPath;
