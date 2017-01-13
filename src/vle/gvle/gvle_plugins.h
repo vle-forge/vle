@@ -54,6 +54,7 @@ struct gvleplug
         GVLE_PLUG_MAIN,       //a PluginMainPanel
         GVLE_PLUG_MAIN_OUT,   //a PluginMainPanel
         GVLE_PLUG_MAIN_VPZ,   //a PluginMainPanel
+        GVLE_PLUG_MAIN_DATA,  //a PluginMainPanel
         GVLE_PLUG_NONE        //nullptr
     };
     gvleplug();
@@ -105,6 +106,11 @@ public:
     QString          getMainPanelVpzPluginPackage(QString name);
     PluginMainPanel* newInstanceMainPanelVpzPlugin(QString name);
 
+    QStringList      getMainPanelDataPluginsList();
+    QString          getMainPanelDataPluginPath(QString name);
+    QString          getMainPanelDataPluginPackage(QString name);
+    PluginMainPanel* newInstanceMainPanelDataPlugin(QString name);
+
 private:
     QMap<QString,gvleplug>      mOutputPlugins;
     QMap<QString,gvleplug>      mCondPlugins;
@@ -112,6 +118,7 @@ private:
     QMap<QString,gvleplug>      mMainPanelPlugins;
     QMap<QString,gvleplug>      mMainPanelOutPlugins;
     QMap<QString,gvleplug>      mMainPanelVpzPlugins;
+    QMap<QString,gvleplug>      mMainPanelDataPlugins;
     utils::ContextPtr           mCtx;
 };
 

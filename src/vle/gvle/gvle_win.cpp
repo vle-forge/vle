@@ -1261,6 +1261,7 @@ gvle_win::onCustomContextMenu(const QPoint &point)
     bool inExp = insideExp(index);
     bool inSrc = insideSrc(index);
     bool inOut = insideOut(index);
+    bool inData = insideData(index);
     gvle_file gf = getGvleFileFromFSIndex(index);
     QString suffix = gf.suffix();
     gvle_win::StatusFile status_file = getStatus(gf);
@@ -1271,20 +1272,26 @@ gvle_win::onCustomContextMenu(const QPoint &point)
     QMenu ctxMenu;
     action = ctxMenu.addAction(tr("Remove File"));
     action->setData(1);
-    action->setDisabled(((suffix != "vpz") and (suffix != "cpp")) or
-                        (not (inExp or inSrc)) or
+    action->setDisabled((suffix != "vpz" and
+                         suffix != "cpp" and
+                         suffix != "txt") or
+                        (not (inExp or inSrc or inData)) or
                         (status_file == OPENED) or
                         (status_file == OPENED_AND_MODIFIED) );
     action = ctxMenu.addAction(tr("Rename File"));
     action->setData(2);
-    action->setDisabled(((suffix != "vpz") and (suffix != "cpp")) or
-                        (not (inExp or inSrc)) or
+    action->setDisabled((suffix != "vpz" and
+                         suffix != "cpp" and
+                         suffix != "txt") or
+                        (not (inExp or inSrc or inData)) or
                         (status_file == OPENED) or
                         (status_file == OPENED_AND_MODIFIED));
     action = ctxMenu.addAction(tr("Copy File"));
     action->setData(3);
-    action->setDisabled((suffix != "vpz" and suffix != "cpp") or
-                        (not (inExp or inSrc)));
+    action->setDisabled((suffix != "vpz" and
+                         suffix != "cpp" and
+                         suffix != "cpp") or
+                        (not (inExp or inSrc or inData)));
     ctxMenu.addSeparator();
     QMenu* subMenu = ctxMenu.addMenu("Add model");
     subMenu->setDisabled(gf.relPath != "exp");
@@ -1304,6 +1311,16 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             QString pluginName = plugList.at(i);
             action = subMenu->addAction(pluginName);
             action->setProperty("srcPlugin", pluginName);
+        }
+    }
+    subMenu = ctxMenu.addMenu("Add data");
+    subMenu->setDisabled(gf.relPath != "data");
+    if (gf.relPath == "data"){
+        QStringList plugList = mGvlePlugins.getMainPanelDataPluginsList();
+        for (int i =0; i<plugList.size(); i++) {
+            QString pluginName = plugList.at(i);
+            action = subMenu->addAction(pluginName);
+            action->setProperty("dataPlugin", pluginName);
         }
     }
     subMenu = ctxMenu.addMenu("Open output with");
@@ -1335,6 +1352,7 @@ gvle_win::onCustomContextMenu(const QPoint &point)
             QVariant srcPlugin = selectedItem->property("srcPlugin");
             QVariant outPlugin = selectedItem->property("outPlugin");
             QVariant vpzPlugin = selectedItem->property("vpzPlugin");
+            QVariant dataPlugin = selectedItem->property("dataPlugin");
             if (srcPlugin.isValid()) {
                 gfnew = gvle_file::getNewCpp(mCurrPackage);
                 newPanel = mGvlePlugins.newInstanceMainPanelPlugin(
@@ -1343,7 +1361,10 @@ gvle_win::onCustomContextMenu(const QPoint &point)
                 gfnew = gvle_file::getNewVpz(mCurrPackage);
                 newPanel = mGvlePlugins.newInstanceMainPanelVpzPlugin(
                                         vpzPlugin.toString());
-
+            } else if (dataPlugin.isValid()) {
+                gfnew = gvle_file::getNewData(mCurrPackage);
+                newPanel = mGvlePlugins.newInstanceMainPanelDataPlugin(
+                                        dataPlugin.toString());
             } else if (outPlugin.isValid()) {
                 gfnew = gf;
                 newPanel = mGvlePlugins.newInstanceMainPanelOutPlugin(
@@ -1380,6 +1401,15 @@ gvle_win::insideExp(QModelIndex index)
     QString filePath = mProjectFileSytem->filePath(index);
     QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
     QFile srcFile(pkgPath + "/exp");
+    return filePath.indexOf(srcFile.fileName()) == 0;
+}
+
+bool
+gvle_win::insideData(QModelIndex index)
+{
+    QString filePath = mProjectFileSytem->filePath(index);
+    QString pkgPath = QString(mCurrPackage.getDir(utils::PKG_SOURCE).c_str());
+    QFile srcFile(pkgPath + "/data");
     return filePath.indexOf(srcFile.fileName()) == 0;
 }
 

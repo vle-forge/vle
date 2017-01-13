@@ -48,7 +48,7 @@ gvle_file::gvle_file(const utils::Package& pkg, QString l_relPath):
     source_file = pkgPath + "/" + relPath;
     QFileInfo fileInfo = QFileInfo(source_file);
 
-    QString suffix = fileInfo.suffix();         // vpz, cpp or dat
+    QString suffix = fileInfo.suffix();         // vpz, cpp, dat or txt
     QString baseName = fileInfo.baseName();     // eg NewCpp
     QString dir = fileInfo.dir().dirName();     //src, exp or output
     QString suffix_metadata = "";               // vpm, sm or om
@@ -65,6 +65,10 @@ gvle_file::gvle_file(const utils::Package& pkg, QString l_relPath):
     } else if (suffix  == "dat" and dir =="output") {
         suffix_metadata = "om";
         plug_type = gvleplug::GVLE_PLUG_MAIN_OUT;
+        plug_name = "Default";
+    } else if (suffix  == "txt" and dir =="data") {
+        suffix_metadata = "dm";
+        plug_type = gvleplug::GVLE_PLUG_MAIN_DATA;
         plug_name = "Default";
     }
     //set metadata file
@@ -88,6 +92,8 @@ gvle_file::gvle_file(const utils::Package& pkg, QString l_relPath):
                 pluginNode = dom.elementsByTagName("srcPlugin").item(0);
             } else if (suffix_metadata == "dat") {
                 pluginNode = dom.elementsByTagName("outPlugin").item(0);
+            } else if (suffix_metadata == "dm") {
+                pluginNode = dom.elementsByTagName("dataPlugin").item(0);
             }
             if (not pluginNode.isNull()) {
                 plug_name =
@@ -122,6 +128,9 @@ gvle_file::newInstanceMainPanel(gvle_plugins& plugins)
         break;
     case gvleplug::GVLE_PLUG_MAIN_VPZ:
         return plugins.newInstanceMainPanelVpzPlugin(plug_name);
+        break;
+    case gvleplug::GVLE_PLUG_MAIN_DATA:
+        return plugins.newInstanceMainPanelDataPlugin(plug_name);
         break;
     case gvleplug::GVLE_PLUG_NONE:
         if (relPath == "Description.txt") {
@@ -186,6 +195,27 @@ gvle_file::getNewVpz(const utils::Package& pkg)
 }
 
 gvle_file
+gvle_file::getNewData(const utils::Package& pkg)
+{
+    QString pkgPath = QString(pkg.getDir(utils::PKG_SOURCE).c_str());
+    QString baseName = "NewData";
+    bool found = false;
+    int i = 0;
+    QString currName;
+    while (not found) {
+        currName = baseName;
+        if (i > 0) {
+            currName += "_" + QVariant(i).toString();
+        }
+        found= not QFile(pkgPath + "/data/" + currName+ ".txt").exists() and
+               not QFile(pkgPath + "/metadata/data/" + currName+ ".dm").exists();
+        i++;
+    }
+    QString relPath = "data/"+currName+".txt";
+    return gvle_file(pkg, relPath);
+}
+
+gvle_file
 gvle_file::getCopy(const utils::Package& pkg, gvle_file gf)
 {
     QString pkgPath = QString(pkg.getDir(utils::PKG_SOURCE).c_str());
@@ -203,6 +233,8 @@ gvle_file::getCopy(const utils::Package& pkg, gvle_file gf)
         suffix_metadata = "sm";
     } else if (suffix  == "dat" and dir =="output") {
         suffix_metadata = "om";
+    } else if (suffix  == "txt" and dir =="data") {
+        suffix_metadata = "dm";
     }
 
     QString currName;
