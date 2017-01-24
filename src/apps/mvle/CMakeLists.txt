@@ -29,7 +29,10 @@ install(FILES mvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
   "mvle-${VLE_VERSION_SHORT}.1")
 
 if (Boost_MPI_FOUND AND VLE_HAVE_CVLE)
-  add_executable(cvle cvle.cpp)
+  add_executable(cvle cvle.cpp
+       ${VLE_SOURCE_DIR}/src/vle/vpz/SaxParser.cpp
+       ${VLE_SOURCE_DIR}/src/vle/vpz/SaxStackValue.cpp
+       ${VLE_SOURCE_DIR}/src/vle/vpz/SaxStackVpz.cpp)
   set_target_properties(cvle PROPERTIES SOVERSION
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
   target_link_libraries(cvle ${VLEDEPS_LIBRARIES}

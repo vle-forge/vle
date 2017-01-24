@@ -32,6 +32,7 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
+#include <vle/vpz/SaxParser.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/mpi/collectives.hpp>
@@ -421,6 +422,116 @@ struct Columns {
     container_type data;
 };
 
+struct ConditionsBackup {
+    ConditionsBackup(const vle::vpz::Vpz& vpz) :
+        mconds(vpz.project().experiment().conditions())
+    {
+    }
+
+    static bool hasSimulationEngine(const vle::vpz::Conditions& other)
+    {
+        if (other.exist("_cvle_cond")) {
+            const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
+            for (auto port : cond_cvle) {
+                if (port.first == "has_simulation_engine") {
+                    const std::vector<std::shared_ptr<vle::value::Value>>&
+                         vals= port.second;
+                    if (vals.size() > 0) {
+                        return (vals.at(0)->isBoolean() and
+                                vals.at(0)->toBoolean().value());
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    void modify(vle::vpz::Vpz& toupdate, const vle::vpz::Conditions& other)
+    {
+        //check if one should modify simulation_engine
+        bool modif_engine = false;
+        if (other.exist("_cvle_cond")) {
+            const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
+            for (auto port : cond_cvle) {
+                if (port.first == "has_simulation_engine") {
+                    const std::vector<std::shared_ptr<vle::value::Value>>&
+                       vals= port.second;
+                    modif_engine = (vals.size() > 0)
+                                    and (vals.at(0)->isBoolean()
+                                    and vals.at(0)->toBoolean().value());
+                }
+            }
+        }
+
+        //modify
+        vle::vpz::Conditions& toup_conds =
+                toupdate.project().experiment().conditions();
+        for (auto cond : other) {
+            if (cond.first != "_cvle_cond" and
+                (cond.first != "simulation_engine" or modif_engine)) {
+                if (not mconds.exist(cond.first)) {
+                    throw vle::utils::InternalError(_("Unknown condition"));
+                }
+                vle::vpz::Condition& toup_cond = toup_conds.get(cond.first);
+                for (auto port : cond.second) {
+
+                    vle::vpz::ConditionValues::iterator toup_port =
+                            toup_cond.conditionvalues().find(port.first);
+                    if (toup_port != toup_cond.conditionvalues().end()) {
+                        toup_cond.conditionvalues().erase(toup_port);
+                    }
+                    if (port.second.size() == 0) {
+                        throw vle::utils::InternalError(_("No value"));
+                    }
+                    toup_cond.addValueToPort(port.first, port.second.at(0));
+                }
+            }
+        }
+    }
+
+    void restoreBackup(vle::vpz::Vpz& toupdate,
+            const vle::vpz::Conditions& other)
+    {
+        vle::vpz::Conditions& toup_conds =
+                toupdate.project().experiment().conditions();
+        for (auto cond : other) {
+            if (cond.first != "_cvle_cond") {
+                if (not mconds.exist(cond.first)) {
+                    throw vle::utils::InternalError(_("Unknown condition"));
+                }
+                toup_conds.del(cond.first);
+                toup_conds.add(mconds.get(cond.first));
+            }
+        }
+    }
+
+    std::string getId(const vle::vpz::Conditions& other) const
+    {
+        if (not other.exist("_cvle_cond")) {
+            return "no_id";
+        }
+        const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
+        vle::vpz::ConditionValues::const_iterator it_id =
+                cond_cvle.conditionvalues().find("id");
+        if (it_id == cond_cvle.conditionvalues().end()) {
+            return "no_id";
+        }
+        const std::vector<std::shared_ptr<vle::value::Value>>&
+                            vals= it_id->second;
+        if (vals.size() == 0) {
+            return "no_id";
+        }
+        if (not vals.at(0)->isString()) {
+            return "no_id";
+        }
+        return vals.at(0)->toString().value();
+    }
+
+    vle::vpz::Conditions mconds;
+};
+
+
 std::ostream &operator<<(std::ostream &os,
                          const std::unique_ptr<vle::value::Matrix> &value)
 {
@@ -474,7 +585,8 @@ private:
     std::string m_vpzfilename;
     std::unique_ptr<vle::manager::Simulation> m_simulator;
     VpzPtr m_vpz;
-    Columns m_columns;
+    std::unique_ptr<Columns> m_columns;//used for simple values
+    std::unique_ptr<ConditionsBackup> m_conditions;//used for complex values
     bool m_warnings;
 
     void simulate(std::ostream &os)
@@ -491,7 +603,9 @@ private:
                         _("Simulation failed. %s [code: %d] in "),
                         error.message.c_str(),
                         error.code);
-                m_columns.printf(stderr);
+                if (m_columns) {
+                    m_columns->printf(stderr);
+                }
             }
         }
         else if (result == NULL) {
@@ -499,7 +613,9 @@ private:
                 fprintf(stderr,
                         _("Simulation without result (try storage as"
                           " output plug-in) in"));
-                m_columns.printf(stderr);
+                if (m_columns) {
+                    m_columns->printf(stderr);
+                }
             }
         }
         else {
@@ -548,19 +664,24 @@ public:
 
     void init(const std::string &header)
     {
-        namespace ba = boost::algorithm;
+        if (header == "_cvle_complex_values") {
+            m_conditions.reset(new ConditionsBackup(*m_vpz));
+        } else {
+            namespace ba = boost::algorithm;
 
-        std::vector<std::string> tokens;
-        ba::split(tokens, header, ba::is_any_of(","));
+            m_columns.reset(new Columns());
+            std::vector<std::string> tokens;
+            ba::split(tokens, header, ba::is_any_of(","));
 
-        for (std::size_t i = 0, e = tokens.size(); i != e; ++i) {
-            Access access(cleanup_token(tokens[i]));
+            for (std::size_t i = 0, e = tokens.size(); i != e; ++i) {
+                Access access(cleanup_token(tokens[i]));
 
-            if (access.is_undefined_string()) {
-                m_columns.add(access.condition);
-            }
-            else {
-                m_columns.add(access.value(m_vpz));
+                if (access.is_undefined_string()) {
+                    m_columns->add(access.condition);
+                }
+                else {
+                    m_columns->add(access.value(m_vpz));
+                }
             }
         }
     }
@@ -579,17 +700,31 @@ public:
         for (begin = 0, end = block.find('\n'); begin < block.size();
              begin = end + 1, end = block.find('\n', end + 1)) {
             std::string buffer(block, begin, end - begin);
-            boost::algorithm::split(
-                output, buffer, boost::algorithm::is_any_of(","));
+            if (m_columns) { // use columns
+                boost::algorithm::split(
+                        output, buffer, boost::algorithm::is_any_of(","));
 
-            for (std::size_t i = 0, e = output.size(); i != e; ++i) {
-                std::string current = cleanup_token(output[i]);
-                m_columns.update(i, current);
+                for (std::size_t i = 0, e = output.size(); i != e; ++i) {
+                    std::string current = cleanup_token(output[i]);
+                    m_columns->update(i, current);
+                }
+
+                result << *m_columns << "\n";
+                simulate(result);
+                result << '\n';
+            } else { //use vpz
+                vle::vpz::Vpz temp;
+                vle::vpz::SaxParser parser(temp);
+                parser.parseMemory(buffer);
+                vle::vpz::Conditions conds =
+                        temp.project().experiment().conditions();
+                std::vector <std::string> condNames = conds.conditionnames();
+                m_conditions->modify(*m_vpz, conds);
+                result << m_conditions->getId(conds) << "\n";
+                simulate(result);
+                m_conditions->restoreBackup(*m_vpz, conds);
+                result << '\n';
             }
-
-            result << m_columns << "\n";
-            simulate(result);
-            result << '\n';
         }
 
         return result.str();
