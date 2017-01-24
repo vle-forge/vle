@@ -472,7 +472,7 @@ private:
     std::chrono::milliseconds m_timeout;
     std::string m_packagename;
     std::string m_vpzfilename;
-    vle::manager::Simulation m_simulator;
+    std::unique_ptr<vle::manager::Simulation> m_simulator;
     VpzPtr m_vpz;
     Columns m_columns;
     bool m_warnings;
@@ -483,7 +483,7 @@ private:
 
         auto vpz = std::make_unique<vle::vpz::Vpz>(*m_vpz.get());
 
-        auto result = m_simulator.run(std::move(vpz), &error);
+        auto result = m_simulator->run(std::move(vpz), &error);
 
         if (error.code) {
             if (m_warnings) {
@@ -517,18 +517,28 @@ public:
     Worker(const std::string &package,
            std::chrono::milliseconds timeout,
            const std::string &vpz,
+           bool withoutspawn,
            bool warnings)
         : m_context(vle::utils::make_context())
         , m_timeout(timeout)
         , m_packagename(package)
-        , m_simulator(m_context,
-                      vle::manager::LOG_NONE,
-                      vle::manager::SIMULATION_NONE |
-                          vle::manager::SIMULATION_SPAWN_PROCESS,
-                      timeout,
-                      nullptr)
+        , m_simulator(nullptr)
         , m_warnings(warnings)
     {
+        if (not withoutspawn) {
+            m_simulator.reset(new vle::manager::Simulation(m_context,
+                                  vle::manager::LOG_NONE,
+                                  vle::manager::SIMULATION_NONE |
+                                      vle::manager::SIMULATION_SPAWN_PROCESS,
+                                  timeout,
+                                  nullptr));
+        } else {
+            m_simulator.reset(new vle::manager::Simulation(m_context,
+                                  vle::manager::LOG_NONE,
+                                  vle::manager::SIMULATION_NONE,
+                                  timeout,
+                                  nullptr));
+        }
         m_context->set_log_priority(3);
         vle::utils::Package pack(m_context);
         pack.select(m_packagename);
@@ -728,13 +738,14 @@ int run_as_master(const std::string &inputfile,
 int run_as_worker(const std::string &package,
                   const std::string &vpz,
                   std::chrono::milliseconds timeout,
+                  bool withoutspawn,
                   bool warnings)
 {
     int ret = EXIT_SUCCESS;
 
     try {
         boost::mpi::communicator comm;
-        Worker w(package, timeout, vpz, warnings);
+        Worker w(package, timeout, vpz, withoutspawn, warnings);
         std::string block;
         boost::mpi::broadcast(comm, block, 0);
         w.init(block);
@@ -775,6 +786,8 @@ void show_help()
              "  package,P package file [file..] Set package name and files\n"
              "  input-file,i file               csv input file\n"
              "  output-file,o file              csv output file\n"
+             "  withoutspawn                    Perform simulation into "
+             "the worker process\n"
              "  warnings                        Show warnings in output\n"
              "  template,t file                 Generate a template csv input "
              "file\n"
@@ -787,6 +800,7 @@ int main(int argc, char *argv[])
     std::string package_name;
     std::string input_file, output_file, template_file;
     std::chrono::milliseconds timeout{std::chrono::milliseconds::zero()};
+    int withoutspawn = 0;
     int warnings = 0;
     int block_size = 5000;
     int ret = EXIT_SUCCESS;
@@ -798,6 +812,7 @@ int main(int argc, char *argv[])
                                        {"input-file", 1, nullptr, 'i'},
                                        {"output-file", 1, nullptr, 'o'},
                                        {"template", 1, nullptr, 't'},
+                                       {"withoutspawn", 0, &withoutspawn, 1},
                                        {"warnings", 0, &warnings, 1},
                                        {"block-size", 1, nullptr, 'b'},
                                        {0, 0, nullptr, 0}};
@@ -898,9 +913,8 @@ int main(int argc, char *argv[])
         for (const auto &elem : vpz)
             printf("%s ", elem.c_str());
         printf("\n");
-
         return run_as_master(input_file, output_file, block_size);
     }
-
-    return run_as_worker(package_name, vpz.front(), timeout, warnings);
+    return run_as_worker(package_name, vpz.front(), timeout,
+            withoutspawn, warnings);
 }
