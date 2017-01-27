@@ -262,7 +262,6 @@ public:
             command = (vle::fmt(command) % m_output_file.string() %
                        m_vpz_file.string())
                           .str();
-
             vle::utils::Spawn spawn(m_context);
             auto argv = spawn.splitCommandLine(command);
             auto exe = std::move(argv.front());
@@ -329,7 +328,6 @@ public:
                     }
                 }
             }
-
             spawn.wait();
             spawn.status(&message, &success);
 
@@ -340,17 +338,17 @@ public:
 
                 return {};
             }
-
             return read_value(m_output_file);
         }
         catch (const std::exception &e) {
             vErr(m_context,
                  _("VLE sub process: unable to start "
                    "'%s' in '%s' with "
-                   "the '%s' command\n"),
+                   "the '%s' command (%s)\n"),
                  m_vpz_file.string().c_str(),
                  pwd.string().c_str(),
-                 command.c_str());
+                 command.c_str(),
+                 e.what());
 
             error->code = -1;
             error->message = "fail to run";
