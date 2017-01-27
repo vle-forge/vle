@@ -263,7 +263,7 @@ void SaxParser::parseMemory(const std::string &buffer)
 {
     std::istringstream iss(buffer);
 
-    parse(iss, buffer.size() + 1);
+    parse(iss, BUFSIZ);
 }
 
 void SaxParser::onStartDocument(void *ctx)
