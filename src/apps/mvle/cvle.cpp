@@ -606,6 +606,8 @@ private:
                 if (m_columns) {
                     m_columns->printf(stderr);
                 }
+            } else {
+                os << error.message << "\n";
             }
         }
         else if (result == NULL) {
@@ -616,6 +618,9 @@ private:
                 if (m_columns) {
                     m_columns->printf(stderr);
                 }
+            } else {
+                os << "cvle worker error: no result "
+                   << " (try storage as output plugin)\n" ;
             }
         }
         else {
