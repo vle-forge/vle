@@ -9,6 +9,8 @@ TARGET_LINK_LIBRARIES(test_vpz_translator vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_io test4.cpp)
 TARGET_LINK_LIBRARIES(test_vpz_io vlelib ${CMAKE_THREAD_LIBS_INIT})
+set_target_properties(test_vpz_io PROPERTIES
+  COMPILE_DEFINITIONS VPZ_TEST_DIR=\"${CMAKE_SOURCE_DIR}/share/template\")
 
 ADD_EXECUTABLE(test_vpz_oov test5.cpp)
 TARGET_LINK_LIBRARIES(test_vpz_oov vlelib ${CMAKE_THREAD_LIBS_INIT})
@@ -21,6 +23,8 @@ TARGET_LINK_LIBRARIES(test_vpz_structures vlelib ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_EXECUTABLE(test_vpz_graph test8.cpp)
 TARGET_LINK_LIBRARIES(test_vpz_graph vlelib ${CMAKE_THREAD_LIBS_INIT})
+set_target_properties(test_vpz_graph PROPERTIES
+  COMPILE_DEFINITIONS VPZ_TEST_DIR=\"${CMAKE_SOURCE_DIR}/share/template\")
 
 ADD_TEST(vpztest_values test_vpz_values)
 ADD_TEST(vpztest_project test_vpz_project)

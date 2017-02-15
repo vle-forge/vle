@@ -40,62 +40,66 @@
 using namespace vle;
 using namespace vpz;
 
-void test_rename_model()
+void
+test_rename_model()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
 
-    CoupledModel *top =
-        dynamic_cast<CoupledModel *>(file.project().model().node());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
+
+    CoupledModel* top =
+      dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     EnsuresNotThrow(vpz::BaseModel::rename(top, "new_top"), std::exception);
 
-    AtomicModel *d = dynamic_cast<AtomicModel *>(top->findModel("d"));
+    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
     EnsuresThrow(vpz::BaseModel::rename(d, "e"), utils::DevsGraphError);
     EnsuresNotThrow(vpz::BaseModel::rename(d, "new_d"), std::exception);
 
-    CoupledModel *top1 = dynamic_cast<CoupledModel *>(top->findModel("top1"));
+    CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     EnsuresThrow(vpz::BaseModel::rename(top1, "top2"), utils::DevsGraphError);
     EnsuresNotThrow(vpz::BaseModel::rename(top1, "new_top1"), std::exception);
 }
 
-void test_findModelFromPath()
+void
+test_findModelFromPath()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
-    BaseModel *d = file.project().model().node()->findModelFromPath("d");
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
+    BaseModel* d = file.project().model().node()->findModelFromPath("d");
     bool found = (d != nullptr);
 
     EnsuresEqual(found, true);
-    BaseModel *top1 = file.project().model().node()->findModelFromPath("top1");
+    BaseModel* top1 = file.project().model().node()->findModelFromPath("top1");
     found = (top1 != nullptr);
     EnsuresEqual(found, true);
-    BaseModel *top2_g =
-        file.project().model().node()->findModelFromPath("top2,g");
+    BaseModel* top2_g =
+      file.project().model().node()->findModelFromPath("top2,g");
     found = (top2_g != nullptr);
     EnsuresEqual(found, true);
-    BaseModel *nomodel =
-        file.project().model().node()->findModelFromPath("nomodel");
+    BaseModel* nomodel =
+      file.project().model().node()->findModelFromPath("nomodel");
     found = (nomodel != nullptr);
     EnsuresEqual(found, false);
-    BaseModel *empty = file.project().model().node()->findModelFromPath("");
+    BaseModel* empty = file.project().model().node()->findModelFromPath("");
     found = (empty != nullptr);
     EnsuresEqual(found, false);
-    BaseModel *top1_a_nomodel =
-        file.project().model().node()->findModelFromPath("top1,a,nomodel");
+    BaseModel* top1_a_nomodel =
+      file.project().model().node()->findModelFromPath("top1,a,nomodel");
     found = (top1_a_nomodel != nullptr);
     EnsuresEqual(found, false);
 }
 
-void test_del_all_connection()
+void
+test_del_all_connection()
 {
-    CoupledModel *top = new CoupledModel("top", nullptr);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
-    AtomicModel *a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel *b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
@@ -111,19 +115,20 @@ void test_del_all_connection()
     delete top;
 }
 
-void test_have_connection()
+void
+test_have_connection()
 {
-    CoupledModel *top = new CoupledModel("top", nullptr);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
-    AtomicModel *a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel *b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel *c(top->addAtomicModel("c"));
+    AtomicModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -143,26 +148,27 @@ void test_have_connection()
     delete top;
 }
 
-void test_displace()
+void
+test_displace()
 {
-    CoupledModel *top = new CoupledModel("top", nullptr);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
-    AtomicModel *a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel *b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel *c(top->addAtomicModel("c"));
+    AtomicModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
     top->addInternalConnection("a", "out", "b", "in");
     top->addInternalConnection("b", "out", "a", "in");
 
-    CoupledModel *newtop = new CoupledModel("newtop", nullptr);
+    CoupledModel* newtop = new CoupledModel("newtop", nullptr);
 
     ModelList lst;
     lst["a"] = a;
@@ -181,19 +187,20 @@ void test_displace()
     delete newtop;
 }
 
-void test_complex_displace()
+void
+test_complex_displace()
 {
-    CoupledModel *top = new CoupledModel("top", nullptr);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
-    AtomicModel *a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel *b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel *c(top->addAtomicModel("c"));
+    AtomicModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -203,7 +210,7 @@ void test_complex_displace()
 
     EnsuresEqual(top->getModelList().size(), (ModelList::size_type)3);
 
-    CoupledModel *newtop = new CoupledModel("newtop", top);
+    CoupledModel* newtop = new CoupledModel("newtop", top);
 
     ModelList lst;
     lst["a"] = a;
@@ -222,19 +229,20 @@ void test_complex_displace()
     delete top;
 }
 
-void test_delinput_port()
+void
+test_delinput_port()
 {
-    CoupledModel *top = new CoupledModel("top", nullptr);
+    CoupledModel* top = new CoupledModel("top", nullptr);
 
-    AtomicModel *a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel *b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    AtomicModel *c(top->addAtomicModel("c"));
+    AtomicModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -253,19 +261,20 @@ void test_delinput_port()
     delete top;
 }
 
-void test_del_port()
+void
+test_del_port()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top =
-        dynamic_cast<CoupledModel *>(file.project().model().node());
+    CoupledModel* top =
+      dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     EnsuresEqual(top->existInternalConnection("top1", "out", "top2", "in"),
                  true);
 
     // Atomic Model
-    AtomicModel *d = dynamic_cast<AtomicModel *>(top->findModel("d"));
+    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
     Ensures(d);
     EnsuresEqual(d->existInputPort("in"), true);
     EnsuresEqual(d->existOutputPort("out"), true);
@@ -282,7 +291,7 @@ void test_del_port()
     EnsuresEqual(d->existOutputPort("out"), false);
 
     // Coupled Model
-    CoupledModel *top1 = dynamic_cast<CoupledModel *>(top->findModel("top1"));
+    CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     Ensures(top1);
 
     // Coupled Model -- Input Port
@@ -314,17 +323,18 @@ void test_del_port()
     EnsuresEqual(top1->existOutputConnection("x", "out", "out"), false);
 }
 
-void test_clone1()
+void
+test_clone1()
 {
-    CoupledModel *top = new CoupledModel("top", nullptr);
+    CoupledModel* top = new CoupledModel("top", nullptr);
     top->addInputPort("in");
     top->addOutputPort("out");
 
-    AtomicModel *a(top->addAtomicModel("top"));
+    AtomicModel* a(top->addAtomicModel("top"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    AtomicModel *b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
@@ -336,13 +346,13 @@ void test_clone1()
     Ensures(top->existInternalConnection("top", "out", "b", "in"));
     Ensures(top->existInternalConnection("b", "out", "top", "in"));
 
-    CoupledModel *newtop(dynamic_cast<CoupledModel *>(top->clone()));
+    CoupledModel* newtop(dynamic_cast<CoupledModel*>(top->clone()));
     Ensures(newtop != nullptr);
     Ensures(newtop->getModelList().size() == 2);
 
-    AtomicModel *newa = dynamic_cast<AtomicModel *>(newtop->findModel("top"));
+    AtomicModel* newa = dynamic_cast<AtomicModel*>(newtop->findModel("top"));
     Ensures(newa != a);
-    AtomicModel *newb = dynamic_cast<AtomicModel *>(newtop->findModel("b"));
+    AtomicModel* newb = dynamic_cast<AtomicModel*>(newtop->findModel("b"));
     Ensures(newb != b);
 
     Ensures(newtop->existInternalConnection("top", "out", "b", "in"));
@@ -363,41 +373,43 @@ void test_clone1()
     delete top;
 }
 
-void test_clone2()
+void
+test_clone2()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *oldtop =
-        dynamic_cast<CoupledModel *>(file.project().model().node());
+    CoupledModel* oldtop =
+      dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(oldtop);
 
-    CoupledModel *top = dynamic_cast<CoupledModel *>(oldtop->clone());
+    CoupledModel* top = dynamic_cast<CoupledModel*>(oldtop->clone());
     Ensures(top);
-    CoupledModel *top1(dynamic_cast<CoupledModel *>(top->findModel("top1")));
+    CoupledModel* top1(dynamic_cast<CoupledModel*>(top->findModel("top1")));
     Ensures(top1);
-    CoupledModel *top2(dynamic_cast<CoupledModel *>(top->findModel("top2")));
+    CoupledModel* top2(dynamic_cast<CoupledModel*>(top->findModel("top2")));
     Ensures(top2);
 
-    AtomicModel *f(dynamic_cast<AtomicModel *>(top2->findModel("f")));
+    AtomicModel* f(dynamic_cast<AtomicModel*>(top2->findModel("f")));
     Ensures(f);
-    AtomicModel *g(dynamic_cast<AtomicModel *>(top2->findModel("g")));
+    AtomicModel* g(dynamic_cast<AtomicModel*>(top2->findModel("g")));
     Ensures(g);
 
     delete top;
 }
 
-void test_clone_different_atomic()
+void
+test_clone_different_atomic()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file1(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file1(VPZ_TEST_DIR "/unittest.vpz");
 
     vpz::Vpz file2(file1);
 
-    CoupledModel *top1 =
-        dynamic_cast<CoupledModel *>(file1.project().model().node());
-    CoupledModel *top2 =
-        dynamic_cast<CoupledModel *>(file2.project().model().node());
+    CoupledModel* top1 =
+      dynamic_cast<CoupledModel*>(file1.project().model().node());
+    CoupledModel* top2 =
+      dynamic_cast<CoupledModel*>(file2.project().model().node());
 
     Ensures(top1 and top2);
     Ensures(top1 != top2);
@@ -419,13 +431,14 @@ void test_clone_different_atomic()
     Ensures(it == list1.end());
 }
 
-void test_get_port_index()
+void
+test_get_port_index()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top =
-        dynamic_cast<CoupledModel *>(file.project().model().node());
+    CoupledModel* top =
+      dynamic_cast<CoupledModel*>(file.project().model().node());
 
     Ensures(top);
 
@@ -433,7 +446,7 @@ void test_get_port_index()
     EnsuresEqual(top->getOutputPortList().size(),
                  (ConnectionList::size_type)0);
 
-    AtomicModel *e = dynamic_cast<AtomicModel *>(top->getModelList()["e"]);
+    AtomicModel* e = dynamic_cast<AtomicModel*>(top->getModelList()["e"]);
 
     Ensures(e);
 
@@ -443,19 +456,20 @@ void test_get_port_index()
     EnsuresEqual(e->getOutputPortList().size(), (ConnectionList::size_type)1);
 }
 
-void test_rename_port()
+void
+test_rename_port()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top =
-        dynamic_cast<CoupledModel *>(file.project().model().node());
+    CoupledModel* top =
+      dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     EnsuresEqual(top->existInternalConnection("top1", "out", "top2", "in"),
                  true);
 
     // Atomic Model
-    AtomicModel *d = dynamic_cast<AtomicModel *>(top->findModel("d"));
+    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
     Ensures(d);
     EnsuresEqual(d->existInputPort("in"), true);
     EnsuresEqual(d->existOutputPort("out"), true);
@@ -476,7 +490,7 @@ void test_rename_port()
     EnsuresEqual(d->existOutputPort("new_out"), true);
 
     // Coupled Model
-    CoupledModel *top1 = dynamic_cast<CoupledModel *>(top->findModel("top1"));
+    CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     Ensures(top1);
 
     // Coupled Model -- Input Port
@@ -520,20 +534,21 @@ void test_rename_port()
     EnsuresEqual(top1->nbOutputConnection("x", "out", "new_out"), 1);
 }
 
-void test_bug_rename_port()
+void
+test_bug_rename_port()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top =
-        dynamic_cast<CoupledModel *>(file.project().model().node());
+    CoupledModel* top =
+      dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     EnsuresEqual(top->existInternalConnection("top1", "out", "top2", "in"),
                  true);
-    CoupledModel *top1 = dynamic_cast<CoupledModel *>(top->findModel("top1"));
+    CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     Ensures(top1);
 
-    CoupledModel *top2 = dynamic_cast<CoupledModel *>(top->findModel("top2"));
+    CoupledModel* top2 = dynamic_cast<CoupledModel*>(top->findModel("top2"));
     Ensures(top2);
 
     EnsuresEqual(top->existInternalConnection("top2", "out", "top1", "in"),
@@ -554,18 +569,19 @@ void test_bug_rename_port()
                  false);
 }
 
-void test_bug_duplication_connections()
+void
+test_bug_duplication_connections()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top =
-        dynamic_cast<CoupledModel *>(file.project().model().node());
+    CoupledModel* top =
+      dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
 
-    AtomicModel *atom1(top->addAtomicModel("atom1"));
-    AtomicModel *atom2(top->addAtomicModel("atom2"));
-    CoupledModel *coupled = new CoupledModel("coupled", top);
+    AtomicModel* atom1(top->addAtomicModel("atom1"));
+    AtomicModel* atom2(top->addAtomicModel("atom2"));
+    CoupledModel* coupled = new CoupledModel("coupled", top);
     ModelList mSelectedModels;
 
     Ensures(atom1);
@@ -591,16 +607,17 @@ void test_bug_duplication_connections()
                  1);
 }
 
-void test_atomic_model_source()
+void
+test_atomic_model_source()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top((file.project().model().node())->toCoupled());
+    CoupledModel* top((file.project().model().node())->toCoupled());
     Ensures(top);
-    AtomicModel *e(top->findModel("e")->toAtomic());
+    AtomicModel* e(top->findModel("e")->toAtomic());
     Ensures(e);
-    AtomicModel *d(top->findModel("d")->toAtomic());
+    AtomicModel* d(top->findModel("d")->toAtomic());
     Ensures(d);
 
     vpz::ModelPortList result;
@@ -614,20 +631,20 @@ void test_atomic_model_source()
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
 
-    CoupledModel *top1(top->findModel("top1")->toCoupled());
+    CoupledModel* top1(top->findModel("top1")->toCoupled());
     Ensures(top1);
 
-    AtomicModel *a(top1->findModel("a")->toAtomic());
+    AtomicModel* a(top1->findModel("a")->toAtomic());
     Ensures(a);
     a->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
-    AtomicModel *b(top1->findModel("b")->toAtomic());
+    AtomicModel* b(top1->findModel("b")->toAtomic());
     Ensures(b);
     b->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
-    AtomicModel *c(top1->findModel("c")->toAtomic());
+    AtomicModel* c(top1->findModel("c")->toAtomic());
     Ensures(c);
     c->getAtomicModelsSource("in1", result);
     EnsuresEqual(result.size(), (size_t)1);
@@ -636,18 +653,18 @@ void test_atomic_model_source()
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
 
-    AtomicModel *x(top1->findModel("x")->toAtomic());
+    AtomicModel* x(top1->findModel("x")->toAtomic());
     Ensures(x);
     x->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
 
-    CoupledModel *top2(top->findModel("top2")->toCoupled());
+    CoupledModel* top2(top->findModel("top2")->toCoupled());
     Ensures(top2);
 
-    AtomicModel *f(top2->findModel("f")->toAtomic());
+    AtomicModel* f(top2->findModel("f")->toAtomic());
     Ensures(f);
-    AtomicModel *g(top2->findModel("g")->toAtomic());
+    AtomicModel* g(top2->findModel("g")->toAtomic());
     Ensures(g);
 
     f->getAtomicModelsSource("in", result);
@@ -658,25 +675,26 @@ void test_atomic_model_source()
     result.clear();
 }
 
-void test_atomic_model_source_2()
+void
+test_atomic_model_source_2()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top((file.project().model().node())->toCoupled());
-    CoupledModel *top1(top->findModel("top1")->toCoupled());
-    CoupledModel *top2(top->findModel("top2")->toCoupled());
+    CoupledModel* top((file.project().model().node())->toCoupled());
+    CoupledModel* top1(top->findModel("top1")->toCoupled());
+    CoupledModel* top2(top->findModel("top2")->toCoupled());
 
-    AtomicModel *e(top->findModel("e")->toAtomic());
-    AtomicModel *d(top->findModel("d")->toAtomic());
+    AtomicModel* e(top->findModel("e")->toAtomic());
+    AtomicModel* d(top->findModel("d")->toAtomic());
 
-    AtomicModel *a(top1->findModel("a")->toAtomic());
-    AtomicModel *b(top1->findModel("b")->toAtomic());
-    AtomicModel *c(top1->findModel("c")->toAtomic());
-    AtomicModel *x(top1->findModel("x")->toAtomic());
+    AtomicModel* a(top1->findModel("a")->toAtomic());
+    AtomicModel* b(top1->findModel("b")->toAtomic());
+    AtomicModel* c(top1->findModel("c")->toAtomic());
+    AtomicModel* x(top1->findModel("x")->toAtomic());
 
-    AtomicModel *f(top2->findModel("f")->toAtomic());
-    AtomicModel *g(top2->findModel("g")->toAtomic());
+    AtomicModel* f(top2->findModel("f")->toAtomic());
+    AtomicModel* g(top2->findModel("g")->toAtomic());
 
     top2->addOutputConnection(f, "out", "out");
     top2->addOutputConnection(g, "out", "out");
@@ -717,23 +735,25 @@ void test_atomic_model_source_2()
     result.clear();
 }
 
-void test_atomic_model_source_3()
+void
+test_atomic_model_source_3()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel *top((file.project().model().node())->toCoupled());
-    CoupledModel *top2(top->findModel("top2")->toCoupled());
+    CoupledModel* top((file.project().model().node())->toCoupled());
+    CoupledModel* top2(top->findModel("top2")->toCoupled());
     vpz::ModelPortList result;
 
     top2->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
 }
 
-void test_name()
+void
+test_name()
 {
     auto ctx = vle::utils::make_context();
-    vpz::Vpz file(ctx->getTemplate("unittest.vpz").string());
+    vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
     BaseModel *a, *b;
 
     a = file.project().model().node()->findModelFromPath("top2,g");
@@ -746,7 +766,8 @@ void test_name()
     EnsuresEqual(b->getCompleteName(), "top,top1,x");
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 
