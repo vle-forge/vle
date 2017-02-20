@@ -48,6 +48,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/utils/unit-test.hpp>
@@ -55,7 +56,8 @@
 
 using namespace vle;
 
-struct F {
+struct F
+{
     vle::Init a;
     vle::utils::Path current_path;
 
@@ -73,7 +75,7 @@ struct F {
 
 #ifdef _WIN32
         ::_putenv(
-            (vle::fmt("VLE_HOME=%1%") % current_path.string()).str().c_str());
+          (vle::fmt("VLE_HOME=%1%") % current_path.string()).str().c_str());
 #else
         ::setenv("VLE_HOME", current_path.string().c_str(), 1);
 #endif
@@ -88,25 +90,25 @@ struct F {
     ~F() { std::cout << "test finish in " << current_path.string() << '\n'; }
 };
 
-void show_package()
+void
+show_package(vle::utils::ContextPtr ctx)
 {
-    auto ctx = vle::utils::make_context();
     using vle::utils::PathList;
     using vle::utils::Package;
 
     Package pkg(ctx, "show_package");
+
     pkg.create();
     pkg.wait(std::cerr, std::cerr);
-
-    /* We need to ensure each file really installed. */
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
     pkg.configure();
     pkg.wait(std::cerr, std::cerr);
     pkg.build();
     pkg.wait(std::cerr, std::cerr);
     pkg.install();
     pkg.wait(std::cerr, std::cerr);
+
+    // Default, 2 binary package directories are available.
+    Ensures(ctx->getBinaryPackagesDir().size() == 2);
 
     std::cout << "getBinaryPackagesDir:\n";
     {
@@ -122,9 +124,6 @@ void show_package()
             std::cout << i << ": " << paths[i].string() << '\n';
     }
 
-    // Default, 2 binary package directories are available.
-    Ensures(ctx->getBinaryPackagesDir().size() == 2);
-
     // 4 binary packages: the show_package build previously and the
     // vle.output, gvle.default, vle.adaptative-qss packages provided with
     // VLE (perhaps 3 if gvle is not build).
@@ -135,21 +134,20 @@ void show_package()
               << "\ngetExperiments      :";
     auto vpz = pkg.getExperiments();
 
-    for (const auto &elem : vpz)
+    for (const auto& elem : vpz)
         std::cout << elem.string() << ' ';
 
     Ensures(vpz.size() == 1);
 
     auto modules = ctx->get_dynamic_libraries(
-        "show_package", vle::utils::Context::ModuleType::MODULE_DYNAMICS);
+      "show_package", vle::utils::Context::ModuleType::MODULE_DYNAMICS);
 
     Ensures(modules.size() == 1);
 }
 
-void remote_package_check_package_tmp()
+void
+remote_package_check_package_tmp(vle::utils::ContextPtr ctx)
 {
-    auto ctx = vle::utils::make_context();
-
     utils::Package pkg_tmp(ctx, "remote_package_check_package_tmp");
     pkg_tmp.create();
     pkg_tmp.wait(std::cerr, std::cerr);
@@ -191,9 +189,9 @@ void remote_package_check_package_tmp()
     }
 }
 
-void remote_package_local_remote()
+void
+remote_package_local_remote(vle::utils::ContextPtr ctx)
 {
-    auto ctx = vle::utils::make_context();
     utils::PackageId pkg;
 
     pkg.size = 0;
@@ -203,23 +201,26 @@ void remote_package_local_remote()
     pkg.description = "too good";
     pkg.url = "http://www.vle-project.org";
     pkg.md5sum = "1234567890987654321";
-    pkg.tags = {"a", "b", "c"};
+    pkg.tags = { "a", "b", "c" };
 
     {
         utils::PackageLinkId dep = {
-            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
+            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL
+        };
         pkg.depends = utils::PackagesLinkId(1, dep);
     }
 
     {
         utils::PackageLinkId dep = {
-            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
+            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL
+        };
         pkg.builddepends = utils::PackagesLinkId(1, dep);
     }
 
     {
         utils::PackageLinkId dep = {
-            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
+            "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL
+        };
         pkg.conflicts = utils::PackagesLinkId(1, dep);
     }
 
@@ -258,7 +259,7 @@ void remote_package_local_remote()
         rmt.join();
         rmt.getResult(&results);
 
-        for (const auto &elem : results)
+        for (const auto& elem : results)
             std::cout << elem;
 
         EnsuresEqual(results.empty(), false);
@@ -266,10 +267,9 @@ void remote_package_local_remote()
     }
 }
 
-void remote_package_read_write()
+void
+remote_package_read_write(vle::utils::ContextPtr ctx)
 {
-    auto ctx = vle::utils::make_context();
-
     {
         std::ofstream OX("/tmp/X.dat");
         std::ofstream ofs(ctx->getRemotePackageFilename().string());
@@ -284,23 +284,26 @@ void remote_package_read_write()
             pkg.description = "too good";
             pkg.url = "http://www.vle-project.org";
             pkg.md5sum = "1234567890987654321";
-            pkg.tags = {"a", "b", "c"};
+            pkg.tags = { "a", "b", "c" };
 
             {
                 utils::PackageLinkId dep = {
-                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
+                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL
+                };
                 pkg.depends = utils::PackagesLinkId(1, dep);
             }
 
             {
                 utils::PackageLinkId dep = {
-                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
+                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL
+                };
                 pkg.builddepends = utils::PackagesLinkId(1, dep);
             }
 
             {
                 utils::PackageLinkId dep = {
-                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL};
+                    "a", 1, 1, 1, utils::PACKAGE_OPERATOR_EQUAL
+                };
                 pkg.conflicts = utils::PackagesLinkId(1, dep);
             }
 
@@ -416,9 +419,9 @@ void remote_package_read_write()
     }
 }
 
-void test_compress_filepath()
+void
+test_compress_filepath(vle::utils::ContextPtr ctx)
 {
-    auto ctx = vle::utils::make_context();
     std::string filepath;
     std::string uniquepath;
 
@@ -434,8 +437,7 @@ void test_compress_filepath()
         pkg.install();
         filepath = pkg.getSrcDir(vle::utils::PKG_SOURCE);
         uniquepath = unique.string();
-    }
-    catch (...) {
+    } catch (...) {
         Ensures(false);
     }
 
@@ -451,7 +453,7 @@ void test_compress_filepath()
     EnsuresNotThrow(rmt.compress(uniquepath, tarfile.string()),
                     std::exception);
 
-    utils::Path t{tarfile};
+    utils::Path t{ tarfile };
     Ensures(t.exists());
 
     utils::Path tmpfile(utils::Path::temp_directory_path());
@@ -461,7 +463,7 @@ void test_compress_filepath()
 
     EnsuresNotThrow(rmt.decompress(tarfile.string(), tmpfile.string()),
                     std::exception);
-    utils::Path t2{tmpfile};
+    utils::Path t2{ tmpfile };
     Ensures(t2.exists());
 
     t2 /= uniquepath;
@@ -469,15 +471,23 @@ void test_compress_filepath()
     Ensures(t2.exists());
 }
 
-int main()
+int
+main()
 {
     F fixture;
+    auto ctx = vle::utils::make_context();
 
-    show_package();
-    remote_package_check_package_tmp();
-    remote_package_local_remote();
-    remote_package_read_write();
-    test_compress_filepath();
+    // We check if user use make install or not otherwise, configure(),
+    // build() and install() will fail.
+
+    if (ctx->getBinaryPackagesDir()[0].exists() and
+        ctx->getBinaryPackagesDir()[1].exists()) {
+        show_package(ctx);
+        remote_package_check_package_tmp(ctx);
+        remote_package_local_remote(ctx);
+        remote_package_read_write(ctx);
+        test_compress_filepath(ctx);
+    }
 
     return unit_test::report_errors();
 }
