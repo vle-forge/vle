@@ -439,7 +439,12 @@ DomDiffStack::print(std::ostream& out) const
 {
     unsigned int diffSize = 1;
     while (diffs[diffSize].isDefined){
+        out << " [DomDiffStack] diff " << diffSize << ": "
+                << " query=" << diffs[diffSize].query.toStdString()
+                << " source=" << diffs[diffSize].source.toStdString()
+                << "\n";
         diffSize++;
+
     }
     out << " [DomDiffStack] nb stack size=" << diffSize
             << ", saved=" << saved << ", curr=" << curr
