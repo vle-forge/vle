@@ -132,9 +132,9 @@ else (${_find_vle_using_cmake})
   PKG_CHECK_MODULES(VLE vle-${VLE_ABI_VERSION})
   # select only the directory of vle, containing the pkgs directory
   # to build VLE_SHARE_DIR
-  find_path(vle_lib_dir vle-${VLE_ABI_VERSION} PATHS
-            ${VLE_LIBRARY_DIRS} NO_DEFAULT_PATH)
-  set (VLE_SHARE_DIR "${vle_lib_dir}/../share/vle-${VLE_ABI_VERSION}")
+  find_path(vle_lib_dir vle PATHS
+            ${VLE_INCLUDE_DIRS} NO_DEFAULT_PATH)
+  set (VLE_SHARE_DIR "${vle_lib_dir}/../../share/vle-${VLE_ABI_VERSION}")
 endif (${_find_vle_using_cmake})
 
 
