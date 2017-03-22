@@ -87,7 +87,8 @@ DefaultSimSubpanelThread::onStarted()
     auto ctx = utils::make_context();
     if (mdebug) {
         ctx->set_log_priority(7);//VLE_LOG_DEBUG
-        ctx->set_log_function(std::make_unique<sim_log>(log_messages));
+        ctx->set_log_function(std::unique_ptr<sim_log>(
+                              new sim_log(log_messages)));
     } else {
         ctx->set_log_priority(3);//VLE_LOG_ERROR
     }
