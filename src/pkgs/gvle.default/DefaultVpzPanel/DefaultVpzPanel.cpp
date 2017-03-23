@@ -41,6 +41,9 @@ DefaultVpzPanel::DefaultVpzPanel():
 
 DefaultVpzPanel::~DefaultVpzPanel()
 {
+    if (m_vpzview) {
+        m_vpzview->ui->tabWidget->blockSignals(true);
+    }
     delete m_rtool;
     delete m_vpzview;
     delete m_vpz;
