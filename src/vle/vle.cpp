@@ -29,7 +29,7 @@
 #include <vle/vle.hpp>
 
 #define _VLE_STRINGIFY(x) #x
-#define VLE_STRINGIFY(X)  _VLE_STRINGIFY(x)
+#define VLE_STRINGIFY(x)  _VLE_STRINGIFY(x)
 
 namespace vle {
 
