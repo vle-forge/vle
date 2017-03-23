@@ -406,7 +406,7 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
      <x>0</x>
      <y>0</y>
      <width>851</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -624,6 +624,9 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -897,7 +900,7 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="gvle.qrc"/>
-  <include location="../../apps/gvle/gvle.qrc"/>
+  <include location="gvle.qrc"/>
  </resources>
  <connections/>
 </ui>
