@@ -42,8 +42,8 @@ class PluginMainPanel : public QObject
 {
     Q_OBJECT
 public:
-    PluginMainPanel(){};
-    virtual ~PluginMainPanel(){};
+    PluginMainPanel(){}
+    virtual ~PluginMainPanel(){}
 
     virtual QString  getname()                                              =0;
     virtual QWidget* leftWidget()                                           =0;
