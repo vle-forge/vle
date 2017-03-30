@@ -1477,6 +1477,7 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     QMenu menu;
     QAction* action;
     QMenu* submenu;
+    QMenu* datasubmenu;
 
     action = menu.addAction("Edit name");
     setActionType(action, VDMA_Edit_name);
@@ -1525,13 +1526,16 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     action->setEnabled(true);
     menu.addSeparator();
     submenu = menu.addMenu("Configure");
+    datasubmenu = menu.addMenu("Data configure");
     bool enabled = (sel and not isVpzMainModel(sel) and
                     (static_cast<VpzMainModelItem*>(sel)->isAtomic()) and
                     not isVpzSubModelConfigured(sel));
 
     submenu->setEnabled(enabled);
+    datasubmenu->setEnabled(enabled);
     if (enabled) {
         populateConfigureMenu(submenu);
+        populateDataConfigureMenu(datasubmenu);
     }
     action = menu.addAction("Unconfigure");
     setActionType(action, VDMA_Unconfigure_model);
@@ -1751,6 +1755,48 @@ VpzDiagScene::populateConfigureMenu(QMenu* menu)
                         QString packName = srcPluginNode.attributes().
                                 namedItem("package").nodeValue();
                         action = menu->addAction(packName + "/" + className);
+                        setActionType(action, VDMA_Configure_model);
+                        QVariantList dataList = action->data().toList();
+                        dataList << metaDataFileName;
+                        action->setData(dataList);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void
+VpzDiagScene::populateDataConfigureMenu(QMenu* menu)
+{
+    QString pathgvledm = "metadata/data";
+
+    for (auto binPkgDir : mCtx->getBinaryPackagesDir()) {
+
+        QString packagesDir = binPkgDir.string().c_str();
+        QDirIterator it(packagesDir, QDir::AllDirs);
+        QAction* action;
+
+        while (it.hasNext()) {
+            it.next();
+            if (QDir(it.filePath() + "/" + pathgvledm).exists()) {
+                QDirIterator itbis(it.filePath() + "/" + pathgvledm, QDir::Files);
+                while (itbis.hasNext()) {
+                    QString metaDataFileName =  itbis.next();
+                    if (QFile(metaDataFileName).exists()) {
+                        QFile file(metaDataFileName);
+                        QDomDocument dom("vle_project_metadata");
+                        QXmlInputSource source(&file);
+                        QXmlSimpleReader reader;
+                        dom.setContent(&source, &reader);
+                        QDomElement docElem = dom.documentElement();
+                        QDomNode dataModelNode =
+                            dom.elementsByTagName("dataModel").item(0);
+                        QString confName = dataModelNode.attributes().
+                            namedItem("conf").nodeValue();
+                        QString packName = dataModelNode.attributes().
+                            namedItem("package").nodeValue();
+                        action = menu->addAction(packName + "/" + confName);
                         setActionType(action, VDMA_Configure_model);
                         QVariantList dataList = action->data().toList();
                         dataList << metaDataFileName;

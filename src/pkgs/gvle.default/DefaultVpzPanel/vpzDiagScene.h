@@ -238,6 +238,7 @@ public:
     void dropEvent(QGraphicsSceneDragDropEvent * event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent);
     void populateConfigureMenu(QMenu* menu);
+    void populateDataConfigureMenu(QMenu* menu);
     void doConfigureMenu(QDomNode model, const QString& meta);
 
     QBrush getBrushAtomicModel();
