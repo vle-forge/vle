@@ -41,6 +41,9 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+    vle::Init m_app;
+
 #ifdef _WIN32
     {
         QDir qt5plugins_dir = QCoreApplication::applicationDirPath() +"/../share/qt5/plugins";
@@ -102,9 +105,7 @@ int main(int argc, char *argv[])
         }        
     }
 #endif
-    QApplication a(argc, argv);
-    
-    
+
     bool result;
 
     auto ctx = vle::utils::make_context();

@@ -100,7 +100,7 @@ DefaultSimSubpanelThread::onStarted()
     }
 
     vle::manager::Simulation sim(ctx, vle::manager::LOG_NONE,
-                                 vle::manager::SIMULATION_NONE,
+                                 vle::manager::SIMULATION_SPAWN_PROCESS,
                                  std::chrono::milliseconds::zero(),
                                  &std::cout);
     vle::manager::Error manerror;
