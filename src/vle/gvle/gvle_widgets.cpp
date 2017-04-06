@@ -367,8 +367,11 @@ VleLineEdit::~VleLineEdit()
 void
 VleLineEdit::setValue(const QString& val)
 {
-     setText(val);
-     home(false);
+    if (text() != val) {
+        backup = val;
+        setText(val);
+    }
+    home(false);
 }
 
 bool

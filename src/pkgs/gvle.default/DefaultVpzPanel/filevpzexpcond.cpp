@@ -300,8 +300,6 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
         action->setData(plugList.at(i));
     }
 
-
-
     QString condName = "";
     if (index.row() > -1) {
         condName = getLineEdit(index.row(), 0)->text();
@@ -310,6 +308,10 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
     action = menu.addAction("Remove condition");
     action->setData("EMenuCondRemove");
     action->setEnabled(index.column() == 0);
+    action = menu.addAction("Detach plugin");
+    action->setData("EMenuDetachPlugin");
+    action->setEnabled((index.column() == 0) and
+            (mVpz->getCondGUIplugin(condName) != ""));
     menu.addSeparator();
     action = menu.addAction("Add port");
     action->setData("EMenuPortAdd");
@@ -350,6 +352,10 @@ FileVpzExpCond::onConditionMenu(const QPoint& pos)
         } else if (actCode == "EMenuCondRemove") {
             QString cond = getLineEdit(index.row(),0)->text();
             mVpz->rmConditionToDoc(cond);
+            reload(false);
+        } else if (actCode == "EMenuDetachPlugin") {
+            QString cond = getLineEdit(index.row(),0)->text();
+            mVpz->removeCondGUIplugin(cond);
             reload(false);
         } else if (actCode == "EMenuPortAdd") {
             QString cond = getLineEdit(index.row(),0)->text();

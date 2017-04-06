@@ -1705,11 +1705,17 @@ vleVpz::addValuePortCondToDoc(const QString& condName, const QString& portName,
 
 bool
 vleVpz::fillConditionWithMapToDoc(const QString& condName,
-        const vle::value::Map& val)
+        const vle::value::Map& val, bool rm)
 {
     QDomNode cond = condFromConds(condsFromDoc(), condName);
     undoStack->snapshot(cond);
-    synchronizeUndoStack();
+    if (rm) {
+        QDomNodeList portList = portsListFromDoc(condName);
+        for (auto i = 0; i < portList.length(); i++) {
+            QDomNode node = portList.at(i);
+            node.parentNode().removeChild(node);
+        }
+    }
     synchronizeUndoStack();
     return vleDomStatic::fillConditionWithMap(mDoc, cond, val);
 }
@@ -3915,6 +3921,20 @@ vleVpz::getCondGUIplugin(const QString& condName) const
         }
     }
     return "";
+}
+
+bool
+vleVpz::removeCondGUIplugin(const QString& condName)
+{
+    if (not existCondFromDoc(condName)) {
+        return false;
+    }
+    //update vpm
+    setCondGUIplugin(condName, "");
+    synchronizeUndoStack();
+
+    emit conditionsUpdated();
+    return true;
 }
 
 PluginOutput*

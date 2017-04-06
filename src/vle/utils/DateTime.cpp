@@ -619,11 +619,15 @@ std::string DateTime::toJulianDay(double date)
 
 
 // parsing "2001-10-9 hh:mm:ss"
+// if error, then try parsing "2001-10-9"
 double DateTime::toJulianDay(const std::string& date)
 {
 
     intern_date d;
-    d.fromString(date, intern_date::extended);
+    bool error = d.fromString(date, intern_date::extended);
+    if (error) {
+        d.fromString(date, intern_date::ymd);
+    }
     return d.julianDay();
 }
 

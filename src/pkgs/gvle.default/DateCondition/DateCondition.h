@@ -28,10 +28,13 @@
 #include <QSettings>
 #include <QDate>
 #include <QtWidgets/QCalendarWidget>
+#include <QtWidgets/QComboBox>
 #include <vle/utils/Package.hpp>
+
 #include <vle/gvle/plugin_cond.h>
 #include <vle/gvle/logger.h>
 #include <vle/gvle/vlevpz.hpp>
+#include <vle/gvle/gvle_widgets.h>
 
 //#include "tab.h"
 //#include "toolbar.h"
@@ -60,6 +63,9 @@ public:
 public slots:
     void dateSelected(QDate date);
     void calendarDestroyed(QObject *obj);
+    void onTextUpdated(const QString& id,
+            const QString& old, const QString& neW);
+    void onTypeChanged(const QString & type);
 
 private:
     QSettings*  mSettings;
@@ -69,6 +75,9 @@ private:
 
     QString     mExpCond;
     vleVpz*     mVpz;
+    QWidget*    mWidget;
+    VleLineEdit* mNamePortField;
+    QComboBox*    mComboBox;
     QCalendarWidget* mcalendar;
 };
 

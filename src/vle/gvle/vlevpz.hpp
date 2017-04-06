@@ -678,16 +678,17 @@ public:
     void addValuePortCondToDoc(const QString& condName, const QString& portName,
             const vle::value::Value& val);
     /**
-     * @brief Set the port values to a cond, without removing others
+     * @brief Set the port values to a cond
      * @param condName, name of the condition
      * @param val, a map where keys are port names
+     * @param rm, if true remove other ports
      *
      * @note the ports are cleared (unless it is not into the map)
      * if present and only the first value can be filled handled
      */
 
     bool fillConditionWithMapToDoc(const QString& condName,
-            const vle::value::Map& val);
+            const vle::value::Map& val, bool rm=false);
     /**
      * @brief rm a value from a tag <port> tag from a condition into a Vpz doc
      * 'index' is the index of value in port
@@ -1181,6 +1182,8 @@ public:
      */
     PluginExpCond* provideCondGUIplugin(const QString& condName);
     QString getCondGUIplugin(const QString& condName) const;
+    bool removeCondGUIplugin(const QString& condName);
+
     /**
      * @brief Provides outputGUIplugin initialized with a view
      * without snapshot
