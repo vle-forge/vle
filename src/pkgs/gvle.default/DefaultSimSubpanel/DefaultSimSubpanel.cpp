@@ -99,8 +99,15 @@ DefaultSimSubpanelThread::onStarted()
         ctx->set_setting("vle.simulation.block-size", (long)mblockSize);
     }
 
-    vle::manager::Simulation sim(ctx, vle::manager::LOG_NONE,
-                                 vle::manager::SIMULATION_SPAWN_PROCESS,
+    vle::manager::SimulationOptions doSpawn;
+    if (mdebug) {
+        doSpawn = vle::manager::SIMULATION_NONE;
+    } else {
+        doSpawn = vle::manager::SIMULATION_SPAWN_PROCESS;
+    }
+
+    vle::manager::Simulation sim(ctx, vle::manager::LOG_RUN,
+                                 doSpawn,
                                  std::chrono::milliseconds::zero(),
                                  &std::cout);
     vle::manager::Error manerror;
