@@ -1225,7 +1225,6 @@ VpzDiagScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
         return ;
     }
     QGraphicsScene::mouseMoveEvent(mouseEvent);
-    mCoupled->update();
 }
 void
 VpzDiagScene::mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent)
