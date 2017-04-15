@@ -289,7 +289,6 @@ DomDiffStack::snapshot (QDomNode node,
         QString mergeType,
         vle::value::Map* mergeArgs)
 {
-
     if (not snapshotEnabled) {
         return;
     }
@@ -391,6 +390,7 @@ DomDiffStack::undo()
             }
             parent.replaceChild(diffs[curr].node_before, currN);
             emit undoRedoVdo(currN, diffs[curr].node_before);
+
         }
         prevCurr = curr;
         curr --;

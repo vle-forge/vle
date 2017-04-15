@@ -242,7 +242,6 @@ FileVpzRtool::onTreeModelSelected()
         } else {
             mCurrScene->setFocus(nodeSel);
         }
-        mCurrScene->update();
     }
     updateModelProperty(model_query);
 }

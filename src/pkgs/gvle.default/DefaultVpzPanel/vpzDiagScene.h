@@ -224,7 +224,7 @@ public:
      */
     void init(vleVpz* vpz, const QString& className);
     QString getClass();
-    void setFocus(QDomNode selModelNode);
+    void setFocus(QDomNode selModelNode, bool refreshAll=false);
     void clear();
     void update(const QRectF & rect = QRectF());
     void setScale (const qreal z);

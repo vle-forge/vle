@@ -1132,9 +1132,15 @@ VpzDiagScene::getClass()
 }
 
 void
-VpzDiagScene::setFocus(QDomNode selModelNode)
+VpzDiagScene::setFocus(QDomNode selModelNode, bool refreshAll)
 {
     if (mCoupled) {
+        QString oldCoupled = mVpz->vdo()->getXQuery(mCoupled->mnode);
+        QString newCoupled = mVpz->vdo()->getXQuery(selModelNode);
+        if ((oldCoupled == newCoupled) and not refreshAll) {
+            mCoupled->update();
+            return;
+        }
         bool oldBlock = this->blockSignals(true);
         delete mCoupled;
         this->blockSignals(oldBlock);
@@ -1142,9 +1148,8 @@ VpzDiagScene::setFocus(QDomNode selModelNode)
     mCoupled = new VpzMainModelItem(selModelNode, mVpz, 0, this);
     //addItem(mCoupled);
     mCoupled->setPos(QPointF(0,0));
-    mCoupled->update();
+    update();
     unselectAllSubModels();
-
     emit enterCoupledModel(mCoupled->mnode);
 }
 
@@ -1308,7 +1313,6 @@ VpzDiagScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
     mCoupled->update();
-    update(this->sceneRect());
 }
 
 
@@ -1373,7 +1377,10 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             if ((mDragCurrPoint.x() != prevDragPoint.x()) or
                     (mDragCurrPoint.y() != prevDragPoint.y())) {
                 //avoid a modif on a doubleClicked
+                //mod->setPos(x, y);
                 mVpz->setPositionToModel(mod->mnode, (int) x, (int) y);
+//                mCoupled->clearLines();
+//                mCoupled->addConnLines();
             }
             break;
         } default:
@@ -1382,6 +1389,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
         mod->update();
         mCoupled->update();
     } else {
+
         QRectF r = mCoupled->subModelsBoundingRect(true);
         double deltaX = std::max(
                 (mCoupled->widthInputPorts() + mCoupled->margin) - r.x(),
@@ -1969,6 +1977,7 @@ VpzDiagScene::selectSubModel(const QString& nameSub)
 {
     unselectAllSubModels();
     mCoupled->getSubModel(nameSub)->setSelected(true);
+    mCoupled->getSubModel(nameSub)->update();
 }
 
 bool
@@ -2091,7 +2100,7 @@ VpzDiagScene::onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
     if (cplNode.isNull()) {
         qDebug() << " Internal error in VpzDiagScene::onUndoRedoVpz";
     }
-    setFocus(cplNode);
+    setFocus(cplNode, true);
     emit initializationDone(this);
 }
 
