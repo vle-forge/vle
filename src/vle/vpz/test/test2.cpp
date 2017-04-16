@@ -214,6 +214,7 @@ void experiment_vpz()
         "</vle_project>\n";
 
     vpz::Vpz vpz;
+    vpz.project().experiment().conditions().deleteValueSet();
     vpz.parseMemory(xml);
 
     const vpz::Project &project(vpz.project());
