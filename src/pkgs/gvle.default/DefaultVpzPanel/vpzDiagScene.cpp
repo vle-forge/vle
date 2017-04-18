@@ -715,12 +715,21 @@ VpzMainModelItem::initializeFromDom()
 }
 
 void
-VpzMainModelItem::clearLines()
+VpzMainModelItem::clearLines(const QList<VpzSubModelItem*>& sels)
 {
+    QList<QString> selmodel_names;
+    for (int i =0; i<sels.size(); i++) {
+        selmodel_names.append(sels.at(i)->getModelName());
+    }
+
     QList<VpzConnectionLineItem *> lines = getConnLines();
     for (int i =0; i<lines.length() ; i++) {
-        scene()->removeItem(lines[i]);
-        delete lines[i];
+        VpzConnectionLineItem* con_item = lines[i];
+        if (sels.empty() or mVpz->isConnectionAssociatedTo(
+                con_item->mnode, selmodel_names)) {
+            scene()->removeItem(con_item);
+            delete con_item;
+        }
     }
 }
 
@@ -737,11 +746,15 @@ VpzMainModelItem::clearSubModels()
 
 
 void
-VpzMainModelItem::addConnLines()
+VpzMainModelItem::addConnLines(const QList<VpzSubModelItem*>& sels)
 {
+    QList<QString> selmodel_names;
+    for (int i =0; i<sels.size(); i++) {
+        selmodel_names.append(sels.at(i)->getModelName());
+    }
     //Add connections
-    QList<QDomNode> childList = DomFunctions::childNodesWithoutText(
-            mVpz->connectionsFromModel(mnode));
+    QList<QDomNode> childList = mVpz->connectionListFromModel(
+            mnode, selmodel_names);
 
     VpzDiagScene* vpzscene = static_cast<VpzDiagScene*>(this->scene());
 
@@ -789,6 +802,8 @@ VpzMainModelItem::addConnLines()
             port_b = DomFunctions::attributeValue(dest, "port");
 
             conn_type = DomFunctions::attributeValue(conn, "type");
+
+
             if (conn_type == "output") {
                 amod = getSubModel(model_a);
                 ap = amod->getOutPort(port_a);
@@ -1377,17 +1392,15 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             if ((mDragCurrPoint.x() != prevDragPoint.x()) or
                     (mDragCurrPoint.y() != prevDragPoint.y())) {
                 //avoid a modif on a doubleClicked
-                //mod->setPos(x, y);
+                mod->setPos(x, y);
                 mVpz->setPositionToModel(mod->mnode, (int) x, (int) y);
-//                mCoupled->clearLines();
-//                mCoupled->addConnLines();
+                mCoupled->clearLines(sels);
+                mCoupled->addConnLines(sels);
             }
             break;
         } default:
             break;
         }
-        mod->update();
-        mCoupled->update();
     } else {
 
         QRectF r = mCoupled->subModelsBoundingRect(true);
@@ -1407,6 +1420,7 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
             VpzSubModelItem* mod = sels.at(i);
             double x = mod->pos().x()+deltaX;
             double y = mod->pos().y()+deltaY;
+            mod->setPos(x, y);
             modsToMove.append(mod->mnode);
             newXs.append((int) x);
             newYs.append((int) y);
@@ -1416,7 +1430,8 @@ VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent * event)
                     QVariant(y).toString());
         }
         mVpz->setPositionToModel(modsToMove, newXs, newYs);
-        mCoupled->update();
+        mCoupled->clearLines(sels);
+        mCoupled->addConnLines(sels);
     }
 }
 

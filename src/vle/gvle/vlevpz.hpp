@@ -217,6 +217,16 @@ public:
      * @param node: QDomNode <model> with xpath = //model
      */
     QDomNode connectionsFromModel(const QDomNode& node) const;
+
+    /**
+     * @brief get a list of <connection> tag  from a tag <model>
+     * regarding a list of submodels
+     * @param node: QDomNode <model> with xpath = //model
+     * @param submodel_names: names of submodel
+     */
+    QList<QDomNode> connectionListFromModel(const QDomNode& node,
+            const QList<QString>& submodel_names) const;
+
     /**
      * @brief get <model> tag from a tag <model> into <submodels>,
      * @param node: QDomNode <model> with xpath = //model
@@ -439,6 +449,18 @@ public:
     bool existConnection(QDomNode connections, QString modelOrig,
             QString portOrig, QString modelDest, QString portDest,
             QString connType);
+
+    /**
+     * @brief tells if a connection node concerns one of sub model?
+     * @param connection: QDomNode <connection>
+     *   with xpath = //model/connections/connection
+     * @param submodel_names: names of sub models we are looking for
+     * @return true if one of the sub model listed in submodel_names
+     * is associated to the connection connection
+     */
+    bool isConnectionAssociatedTo(QDomNode connection,
+            const QList<QString>& submodel_names) const;
+
     /**
      * @brief add a connection between two port
      * @param node1: QDomNode <port> with xpath = //model//port

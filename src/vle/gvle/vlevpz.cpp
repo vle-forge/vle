@@ -623,6 +623,34 @@ vleVpz::connectionsFromModel(const QDomNode& node) const
 }
 
 QList<QDomNode>
+vleVpz::connectionListFromModel(const QDomNode& node,
+        const QList<QString>& submodel_names) const
+{
+    QList<QDomNode> ret;
+    if (node.nodeName() != "model") {
+        qDebug() << ("Internal error in connectionListFromModel (wrong main tag)");
+        return ret;
+    }
+    QDomNode conns = DomFunctions::obtainChild(node, "connections");
+    if (conns.isNull()) {
+        return ret;
+    }
+    QList<QDomNode> all_conns = DomFunctions::childNodesWithoutText(
+            conns,"connection");
+    if (submodel_names.empty()) {
+        return all_conns;
+    }
+
+    for (int i = 0; i<all_conns.size(); i++) {
+        QDomNode conn = all_conns.at(i);
+        if (isConnectionAssociatedTo(conn, submodel_names)) {
+            ret.append(conn);
+        }
+    }
+    return ret;
+}
+
+QList<QDomNode>
 vleVpz::submodelsFromModel(const QDomNode& node)
 {
     QDomNode sub = DomFunctions::obtainChild(node, "submodels");
@@ -2501,6 +2529,31 @@ vleVpz::existConnection(QDomNode connections, QString modelOrig,
                 return true;
             }
         }
+    }
+    return false;
+}
+
+bool
+vleVpz::isConnectionAssociatedTo(QDomNode connection,
+       const QList<QString>& submodel_names) const
+{
+    if (connection.nodeName() != "connection") {
+        qDebug() << ("Internal error in isConnectionAssociatedTo (wrong main tag)");
+        return false;
+    }
+
+    QDomNode orig = connection.toElement().elementsByTagName("origin").at(0);
+    QDomNode dest = connection.toElement().elementsByTagName("destination").at(0);
+    QString model_a = DomFunctions::attributeValue(orig, "model");
+    QString model_b = DomFunctions::attributeValue(dest, "model");
+    QString conn_type = DomFunctions::attributeValue(connection, "type");
+    if (conn_type == "internal" and (submodel_names.contains(model_a) or
+            submodel_names.contains(model_b))) {
+        return true;
+    } else if (conn_type == "output" and submodel_names.contains(model_a)) {
+        return true;
+    } else if (conn_type == "input" and submodel_names.contains(model_b)) {
+        return true;
     }
     return false;
 }

@@ -184,9 +184,11 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             QWidget *widget = 0);
     void initializeFromDom();
-    void clearLines();
+    void clearLines(const QList<VpzSubModelItem*>&
+            sels=QList<VpzSubModelItem*>());
     void clearSubModels();
-    void addConnLines();
+    void addConnLines(const QList<VpzSubModelItem*>&
+            sels=QList<VpzSubModelItem*>());
     void update(const QRectF & rect = QRectF());
 
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
