@@ -35,18 +35,21 @@ SUBDIRS += pkg_vle_generic_builder
 pkg_vle_generic_builder.file = src/pkgs/vle.generic.builder/vle_generic_builder.pro
 pkg_vle_generic_builder.depends = libvle
 
-SUBDIRS += pkg_vle_adapative_qss_adder pkg_vle_adapative_qss_generator pkg_vle_adapative_qss_adaptative-quantifier pkg_vle_adapative_qss_integrator pkg_vle_adapative_qss_mult
+SUBDIRS += pkg_vle_adapative_qss_adder pkg_vle_adapative_qss_generator pkg_vle_adapative_qss_adaptative-quantifier pkg_vle_adapative_qss_integrator pkg_vle_adapative_qss_mult pkg_vle_adapative_qss_plot
 
 pkg_vle_adapative_qss_adder.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_adder.pro
 pkg_vle_adapative_qss_generator.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_generator.pro
 pkg_vle_adapative_qss_adaptative-quantifier.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_adaptative-quantifier.pro
 pkg_vle_adapative_qss_integrator.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_integrator.pro
 pkg_vle_adapative_qss_mult.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_mult.pro
+pkg_vle_adapative_qss_plot.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_plot.pro
+
 pkg_vle_adapative_qss_adder.depends = libvle
 pkg_vle_adapative_qss_generator.depends = libvle
 pkg_vle_adapative_qss_adaptative-quantifier.depends = libvle
 pkg_vle_adapative_qss_integrator.depends = libvle
 pkg_vle_adapative_qss_mult.depends = libvle
+pkg_vle_adapative_qss_plot.depends = libvle
 
 SUBDIRS += pkg_gvle_datecondition pkg_gvle_default_cpp_panel pkg_gvle_default_data_panel pkg_gvle_default_out_panel pkg_gvle_default_simsub_panel pkg_gvle_default_vpz_panel
 

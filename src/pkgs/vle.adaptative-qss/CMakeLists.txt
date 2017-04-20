@@ -31,3 +31,4 @@ DeclareSimulator(pkg-quantifier vle.adaptative-qss AdaptativeQuantifier src/Adap
 DeclareSimulator(pkg-integrator vle.adaptative-qss Integrator src/Integrator.cpp)
 DeclareSimulator(pkg-mult vle.adaptative-qss Mult src/Mult.cpp)
 DeclareSimulator(pkg-constant vle.adaptative-qss Constant src/Constant.cpp)
+DeclareSimulator(pkg-plot vle.adaptative-qss Plot src/Plot.cpp)

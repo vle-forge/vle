@@ -76,7 +76,9 @@ public:
         }
     }
 
-    virtual ~Integrator() {}
+    virtual ~Integrator()
+    {
+    }
 
     virtual vd::Time init(vd::Time /* time */) override
     {
