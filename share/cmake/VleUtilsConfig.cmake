@@ -293,6 +293,24 @@ function(IntVleHomePkgs out)
 endfunction()
 
 ###
+# Get the VLE system packages directory:
+#   out: /usr/lib/vle-2.0/pkgs
+###
+
+function(IntVleSystemPkgs out)
+  find_path(_vle_install_dir vle PATHS ${VLE_INCLUDE_DIRS} NO_DEFAULT_PATH)
+  set(_vle_sys_pkgs "${_vle_install_dir}/../../lib/vle-${VLE_ABI_VERSION}/pkgs")
+  if (NOT EXISTS ${_vle_package_dir})
+    message(FATAL_ERROR "System packages directory does not exist: ${_vle_sys_pkgs}")
+  endif ()
+  if (_vle_debug)
+    message(STATUS "Found vle system packages dir: ${_vle_sys_pkgs}")
+  endif()
+  set (${out} ${_vle_sys_pkgs} PARENT_SCOPE)
+endfunction()
+
+
+###
 # Get the the version of a installed package from the Description file:
 #   in: mypkg
 #   out: 1.0.2
@@ -396,9 +414,23 @@ macro(VleCheckPackage _prefix _module_with_version)
       required:'${_module_version}', got:'${_installed_mod_version}'")
   endif ()
   IntVleHomePkgs(_vle_package_dir)
-  set(_vle_include_dirs "${_vle_package_dir}/${_module}/src")
-  set(_vle_lib_dirs "${_vle_package_dir}/${_module}/lib")
-  set(_vle_plugin_dirs "${_vle_package_dir}/${_module}/plugins")
+  IntVleSystemPkgs(_vle_sys_package_dir)
+  set(_vle_module_path "${_vle_package_dir}/${_module}")
+  if (NOT EXISTS "${_vle_module_path}")
+    if (_vle_debug)
+      message(STATUS "Pkg `${_module}' not found in user pkgs, "
+                     "trying the system directory: "
+                     "'${_vle_sys_package_dir}'")
+    endif ()
+    set(_vle_module_path "${_vle_sys_package_dir}/${_module}")
+    if (NOT EXISTS "${_vle_module_path}")
+      message(FATAL_ERROR "Package `${_module}' not found")
+    endif ()
+  endif()
+
+  set(_vle_include_dirs "${_vle_module_path}/src")
+  set(_vle_lib_dirs "${_vle_module_path}/lib")
+  set(_vle_plugin_dirs "${_vle_module_path}/plugins")
   if (EXISTS "${_vle_include_dirs}" OR EXISTS "${_vle_lib_dirs}"
       OR EXISTS "${_vle_plugin_dirs}")
     if (WIN32)
@@ -414,22 +446,7 @@ macro(VleCheckPackage _prefix _module_with_version)
                        "${_vle_include_dirs}")
     endif ()
   else ()#try system packages
-    set(_vle_plugin_dirs "")
-    foreach(_vle_lib_dir IN LISTS VLE_LIBRARY_DIRS)
-      if (EXISTS "${_vle_lib_dir}/vle-${VLE_ABI_VERSION}/pkgs/${_module}/plugins")
-         set(_vle_plugin_dirs
-            "${_vle_lib_dir}/vle-${VLE_ABI_VERSION}/pkgs/${_module}/plugins")
-      endif()
-    endforeach ()
-    if (EXISTS "${_vle_plugin_dirs}")
-      _vle_check_package_set(${_prefix}_FOUND 1)
-      if (_vle_debug)
-        message(STATUS "Found `${_module}' system: "
-                       "${_vle_plugin_dirs} into system pkgs")
-      endif ()
-    else ()
-      message(FATAL_ERROR "Package `${_module}' not found")
-    endif ()
+    message(FATAL_ERROR "Package `${_module}' empty")
   endif ()
 endmacro(VleCheckPackage)
 
