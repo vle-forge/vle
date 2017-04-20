@@ -581,7 +581,7 @@ struct Spawn::Pimpl
         return false;
     }
 
-    void format(LPTSTR function, DWORD error)
+    void format(const char *function, DWORD error)
     {
         LPVOID buffer;
         LPVOID displaybuffer;

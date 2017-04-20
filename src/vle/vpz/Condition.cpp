@@ -28,6 +28,7 @@
 #include <ostream>
 #include <string>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
@@ -211,7 +212,8 @@ Condition::nValue(const std::string &portname, size_t i) const
 
     if (set.size() <= i)
         throw utils::ArgError(
-            _("Condition %s have not %zu values"), portname.c_str(), i);
+            _("Condition %s have not %lu values"), portname.c_str(),
+            utils::numeric_cast<unsigned long>(i));
 
     return set[i];
 }

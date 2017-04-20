@@ -370,7 +370,7 @@ Path Path::current_path()
 #else
     std::wstring temp(MAX_PATH, '\0');
     if (!_wgetcwd(&temp[0], MAX_PATH))
-        throw FileError(_("Internal error in getcwd(): %d"),
+        throw FileError(_("Internal error in getcwd(): %lu"),
                         GetLastError());
     return Path(temp.c_str());
 #endif

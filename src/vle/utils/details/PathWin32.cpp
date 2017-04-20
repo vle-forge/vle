@@ -150,15 +150,20 @@ Path Context::findInstallPrefix()
 
     ErrorMessage("Failed to initialized prefix. Please, re-install VLE or "
                  "define a variable into the the register editor");
+
+    return {};
 }
 
 Path Context::findLibrary(const std::string &lib)
 {
     Path res = UtilsWin::convertPathTo83Path(getPrefixDir());
     res /= "bin";
-    res /= "willfail";
+    res /= lib;
 
-    return res;
+    if (res.exists())
+        return res.string();
+
+    return {};
 }
 
 Path Context::findProgram(const std::string &exe)

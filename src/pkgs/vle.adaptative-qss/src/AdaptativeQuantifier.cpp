@@ -18,6 +18,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vector>
 #include <deque>
 #include <cmath>
@@ -332,8 +333,9 @@ private:
         factor = 0; // return 0 is shift failure.
         if (oscillating(m_past_length - 1) &&
             (0 != (archive.back().date - archive.front().date))) {
-            Trace(context(), 7, "Oscillating, archive size = %zu (m_past_length = %u) ",
-                  archive.size(), m_past_length);
+            Trace(context(), 7, "Oscillating, archive size = %lu (m_past_length = %u) ",
+                  vle::utils::numeric_cast<unsigned long int>(archive.size()),
+                  m_past_length);
             double acc;
             double local_estim;
             int cnt;
