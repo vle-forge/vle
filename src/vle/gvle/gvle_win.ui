@@ -351,9 +351,16 @@ p, li { white-space: pre-wrap; }
                <height>0</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>open/close</string>
+             </property>
+             <property name="toolTipDuration">
+              <number>-1</number>
+             </property>
              <property name="styleSheet">
-              <string notr="true">QPushButton{background-image: url(:/icon/resources/arrow_up_bw.png);}
-QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
+              <string notr="true">QToolTip { color: #fff; background-color: #000; border: none; }
+QPushButton{background-image: url(:/icon/resources/icon/arrow_up_bw.png);}
+QPushButton:hover{background:url(:/icon/resources/icon/arrow_up_blue.png);}</string>
              </property>
              <property name="text">
               <string/>
@@ -406,7 +413,7 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
      <x>0</x>
      <y>0</y>
      <width>851</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -901,6 +908,7 @@ QPushButton:hover{background:url(:/icon/resources/arrow_up_blue.png);}</string>
  <resources>
   <include location="gvle.qrc"/>
   <include location="gvle.qrc"/>
+  <include location="../../../../../.designer/backup/gvle.qrc"/>
  </resources>
  <connections/>
 </ui>
