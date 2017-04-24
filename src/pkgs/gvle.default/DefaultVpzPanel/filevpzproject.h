@@ -50,7 +50,6 @@ public:
     {mId = i;};
     void setTab(QTabWidget *tab)
     {mTab = tab;};
-    bool eventFilter(QObject *target, QEvent *event);
 
 
 public slots:
@@ -80,9 +79,6 @@ private:
     QDateTimeEdit*      mDate;
     QLineEdit*          mVersion;
     QLineEdit*          mName;
-    QLineEdit*          mDuration;
-    QLineEdit*          mBegin;
-    QDateTimeEdit*      mBeginDateTime;
 
     vleVpz*             mVpz;
 
