@@ -24,25 +24,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/Package.hpp>
-#include <vle/utils/i18n.hpp>
+#include <boost/cast.hpp>
+#include <boost/format.hpp>
+#include <cstring>
+#include <fstream>
+#include <ostream>
+#include <stack>
+#include <thread>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Spawn.hpp>
 #include <vle/utils/Filesystem.hpp>
-#include <boost/cast.hpp>
-#include <boost/format.hpp>
-#include <fstream>
-#include <ostream>
-#include <cstring>
-#include <thread>
-#include <stack>
+#include <vle/utils/Package.hpp>
+#include <vle/utils/Spawn.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace {
 
-void remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
+void
+remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
 {
     if (not path.exists())
         return;
@@ -61,8 +61,8 @@ void remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
         auto exe = std::move(argv.front());
         argv.erase(argv.begin());
 
-        if (not spawn.start(exe, vle::utils::Path::current_path().string(),
-                            argv))
+        if (not spawn.start(
+              exe, vle::utils::Path::current_path().string(), argv))
             throw vle::utils::InternalError(_("fail to start cmake command"));
 
         spawn.wait();
@@ -73,31 +73,35 @@ void remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
         spawn.status(&message, &success);
 
         if (not success && not message.empty())
-            vErr(ctx, _("Error during remove directory operation: %s\n"),
+            vErr(ctx,
+                 _("Error during remove directory operation: %s\n"),
                  message.c_str());
     } catch (const std::exception& e) {
-        vErr(ctx, _("Package remove all: unable to remove `%s' with"
-                    " the `%s' command\n"), path.string().c_str(),
+        vErr(ctx,
+             _("Package remove all: unable to remove `%s' with"
+               " the `%s' command\n"),
+             path.string().c_str(),
              command.c_str());
     }
 }
 
 } // namespace anonymous
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 struct Package::Pimpl
 {
     Pimpl(ContextPtr context)
-        : m_context(context)
-        , m_spawn(context)
+      : m_context(context)
+      , m_spawn(context)
     {
     }
 
     Pimpl(ContextPtr context, std::string pkgname)
-        : m_context(context)
-        , m_pkgname(std::move(pkgname))
-        , m_spawn(context)
+      : m_context(context)
+      , m_pkgname(std::move(pkgname))
+      , m_spawn(context)
     {
         refreshPath();
     }
@@ -106,30 +110,31 @@ struct Package::Pimpl
 
     ContextPtr m_context;
 
-    std::string  m_pkgname;
-    std::string  m_pkgbinarypath;
-    std::string  m_pkgsourcepath;
+    std::string m_pkgname;
+    std::string m_pkgbinarypath;
+    std::string m_pkgsourcepath;
 
-    Spawn        m_spawn;
-    std::string  m_message;
-    std::string  m_strout;
-    std::string  m_strerr;
-    std::string  mCommandConfigure;
-    std::string  mCommandTest;
-    std::string  mCommandBuild;
-    std::string  mCommandInstall;
-    std::string  mCommandClean;
-    std::string  mCommandPack;
-    std::string  mCommandUnzip;
-    std::string  mCommandDirCopy;
-    bool         m_issuccess;
+    Spawn m_spawn;
+    std::string m_message;
+    std::string m_strout;
+    std::string m_strerr;
+    std::string mCommandConfigure;
+    std::string mCommandTest;
+    std::string mCommandBuild;
+    std::string mCommandInstall;
+    std::string mCommandClean;
+    std::string mCommandPack;
+    std::string mCommandUnzip;
+    std::string mCommandDirCopy;
+    bool m_issuccess;
 
     void process(const std::string& exe,
                  const std::string& workingDir,
-                 const std::vector < std::string >& argv)
+                 const std::vector<std::string>& argv)
     {
         if (m_spawn.isstart() and not m_spawn.isfinish()) {
-            vDbg(m_context, _("-[%s] Need to wait old process before\n"),
+            vDbg(m_context,
+                 _("-[%s] Need to wait old process before\n"),
                  exe.c_str());
 
             m_spawn.wait();
@@ -138,7 +143,7 @@ struct Package::Pimpl
 
         if (not m_spawn.start(exe, workingDir, argv))
             throw utils::ArgError(
-                (fmt(_("Failed to start `%1%'")) % exe).str());
+              (fmt(_("Failed to start `%1%'")) % exe).str());
     }
 
     void refreshPath()
@@ -167,38 +172,39 @@ struct Package::Pimpl
 };
 
 Package::Package(ContextPtr context)
-    : m_pimpl(std::make_unique<Package::Pimpl>(context))
+  : m_pimpl(std::make_unique<Package::Pimpl>(context))
 {
 }
 
 Package::Package(ContextPtr context, const std::string& pkgname)
-    : m_pimpl(std::make_unique<Package::Pimpl>(context, pkgname))
+  : m_pimpl(std::make_unique<Package::Pimpl>(context, pkgname))
 {
 }
 
 Package::~Package() = default;
 
-void Package::create()
+void
+Package::create()
 {
     if (m_pimpl->mCommandDirCopy.empty())
         refreshCommands();
 
     if (m_pimpl->mCommandDirCopy.empty())
-        throw utils::FileError(
-            _("Pkg configure error: empty command"));
+        throw utils::FileError(_("Pkg configure error: empty command"));
 
     Path source(m_pimpl->m_context->getTemplate("package"));
     Path destination(getDir(PKG_SOURCE));
 
     if (destination.exists())
-        throw utils::FileError(
-            (fmt(_("Pkg create error: "
-                   "the directory %1% already exists")) %
-             destination.string()).str());
+        throw utils::FileError((fmt(_("Pkg create error: "
+                                      "the directory %1% already exists")) %
+                                destination.string())
+                                 .str());
 
     Path::create_directory(destination);
     std::string command = (vle::fmt(m_pimpl->mCommandDirCopy) %
-                           source.string() % destination.string()).str();
+                           source.string() % destination.string())
+                            .str();
 
     utils::Spawn spawn(m_pimpl->m_context);
     std::vector<std::string> argv = spawn.splitCommandLine(command);
@@ -209,11 +215,12 @@ void Package::create()
         m_pimpl->process(exe, source.string(), argv);
     } catch (const std::exception& e) {
         throw utils::InternalError(
-            (fmt(_("Pkg create error: %1%")) % e.what()).str());
+          (fmt(_("Pkg create error: %1%")) % e.what()).str());
     }
 }
 
-void Package::configure()
+void
+Package::configure()
 {
     std::string pkg_buildir = getBuildDir(PKG_SOURCE);
 
@@ -224,19 +231,17 @@ void Package::configure()
         refreshPath();
 
     if (m_pimpl->mCommandConfigure.empty() || pkg_buildir.empty())
-        throw utils::FileError(
-            _("Pkg configure error: empty command"));
+        throw utils::FileError(_("Pkg configure error: empty command"));
 
     if (pkg_buildir.empty())
         throw utils::FileError(
-            _("Pkg configure error: building directory path is empty"));
+          _("Pkg configure error: building directory path is empty"));
 
-
-    Path path { pkg_buildir };
+    Path path{ pkg_buildir };
     if (not path.exists()) {
         if (not Path::create_directories(path))
             throw utils::FileError(
-                _("Pkg configure error: fails to build directories"));
+              _("Pkg configure error: fails to build directories"));
     }
 
     std::string pkg_binarydir = getDir(PKG_BINARY);
@@ -247,13 +252,14 @@ void Package::configure()
     argv.erase(argv.begin());
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw utils::InternalError(
-            (fmt(_("Pkg configure error: %1%")) % e.what()).str());
+          (fmt(_("Pkg configure error: %1%")) % e.what()).str());
     }
 }
 
-void Package::test()
+void
+Package::test()
 {
     std::string pkg_buildir = getBuildDir(PKG_SOURCE);
     if (m_pimpl->mCommandBuild.empty()) {
@@ -262,20 +268,21 @@ void Package::test()
     if (pkg_buildir.empty()) {
         refreshPath();
     }
-    if (m_pimpl->mCommandBuild.empty() ||
-            pkg_buildir.empty()) {
+    if (m_pimpl->mCommandBuild.empty() || pkg_buildir.empty()) {
         throw utils::FileError(_("Pkg test error: empty command"));
     }
     if (pkg_buildir.empty()) {
         throw utils::FileError(
-                _("Pkg test error: building directory path is empty"));
+          _("Pkg test error: building directory path is empty"));
     }
 
-    Path path { pkg_buildir };
+    Path path{ pkg_buildir };
     if (not path.exists())
         throw utils::FileError(
-            (fmt(_("Pkg test error: building directory '%1%' "
-                   "does not exist ")) % pkg_buildir).str());
+          (fmt(_("Pkg test error: building directory '%1%' "
+                 "does not exist ")) %
+           pkg_buildir)
+            .str());
 
     std::string cmd = (fmt(m_pimpl->mCommandTest) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
@@ -287,11 +294,12 @@ void Package::test()
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
         throw utils::InternalError(
-            (fmt(_("Pkg error: test launch failed %1%")) % e.what()).str());
+          (fmt(_("Pkg error: test launch failed %1%")) % e.what()).str());
     }
 }
 
-void Package::build()
+void
+Package::build()
 {
     std::string pkg_buildir = getBuildDir(PKG_SOURCE);
     if (m_pimpl->mCommandBuild.empty()) {
@@ -301,16 +309,15 @@ void Package::build()
     if (pkg_buildir.empty()) {
         refreshPath();
     }
-    if (m_pimpl->mCommandBuild.empty() ||
-            pkg_buildir.empty()) {
+    if (m_pimpl->mCommandBuild.empty() || pkg_buildir.empty()) {
         throw utils::FileError(_("Pkg build error: empty command"));
     }
     if (pkg_buildir.empty()) {
         throw utils::FileError(
-                _("Pkg build error: building directory path is empty"));
+          _("Pkg build error: building directory path is empty"));
     }
 
-    Path path { pkg_buildir };
+    Path path{ pkg_buildir };
     if (not path.exists())
         configure();
 
@@ -322,13 +329,14 @@ void Package::build()
 
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw utils::InternalError(
-            (fmt(_("Pkg build error: build failed %1%")) % e.what()).str());
+          (fmt(_("Pkg build error: build failed %1%")) % e.what()).str());
     }
 }
 
-void Package::install()
+void
+Package::install()
 {
 
     std::string pkg_buildir = getBuildDir(PKG_SOURCE);
@@ -338,20 +346,21 @@ void Package::install()
     if (pkg_buildir.empty()) {
         refreshPath();
     }
-    if (m_pimpl->mCommandBuild.empty() ||
-            pkg_buildir.empty()) {
+    if (m_pimpl->mCommandBuild.empty() || pkg_buildir.empty()) {
         throw utils::FileError(_("Pkg install error: empty command"));
     }
     if (pkg_buildir.empty()) {
         throw utils::FileError(
-                _("Pkg install error: building directory path is empty"));
+          _("Pkg install error: building directory path is empty"));
     }
 
-    Path path { pkg_buildir };
+    Path path{ pkg_buildir };
     if (not path.exists())
         throw utils::FileError(
-            (fmt(_("Pkg install error: building directory '%1%' "
-                   "does not exist ")) % pkg_buildir.c_str()).str());
+          (fmt(_("Pkg install error: building directory '%1%' "
+                 "does not exist ")) %
+           pkg_buildir.c_str())
+            .str());
 
     std::string cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
@@ -363,26 +372,29 @@ void Package::install()
 
     if (not builddir.exists()) {
         throw utils::ArgError(
-            (fmt(_("Pkg build error: directory '%1%' does not exist")) %
-             builddir.string()).str());
+          (fmt(_("Pkg build error: directory '%1%' does not exist")) %
+           builddir.string())
+            .str());
     }
 
     if (not builddir.is_directory()) {
         throw utils::ArgError(
-            (fmt(_("Pkg build error: '%1%' is not a directory")) %
-             builddir.string()).str());
+          (fmt(_("Pkg build error: '%1%' is not a directory")) %
+           builddir.string())
+            .str());
     }
 
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw utils::InternalError(
-            (fmt(_("Pkg build error: install lib failed %1%"))
-             % e.what()).str());
+          (fmt(_("Pkg build error: install lib failed %1%")) % e.what())
+            .str());
     }
 }
 
-void Package::clean()
+void
+Package::clean()
 {
     Path pkg_buildir = getBuildDir(PKG_SOURCE);
 
@@ -390,7 +402,8 @@ void Package::clean()
         ::remove_all(m_pimpl->m_context, pkg_buildir);
 }
 
-void Package::rclean()
+void
+Package::rclean()
 {
     Path pkg_buildir = getDir(PKG_BINARY);
 
@@ -398,7 +411,8 @@ void Package::rclean()
         ::remove_all(m_pimpl->m_context, pkg_buildir);
 }
 
-void Package::pack()
+void
+Package::pack()
 {
     std::string pkg_buildir = getBuildDir(PKG_SOURCE);
     if (m_pimpl->mCommandBuild.empty()) {
@@ -413,7 +427,7 @@ void Package::pack()
     }
     if (pkg_buildir.empty()) {
         throw utils::FileError(_("Pkg packaging error: "
-                "no building directory found"));
+                                 "no building directory found"));
     }
 
     Path::create_directory(pkg_buildir);
@@ -426,30 +440,33 @@ void Package::pack()
 
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw utils::InternalError(
-            (fmt(_("Pkg packaging error: package failed %1%")) % e.what()).str());
+          (fmt(_("Pkg packaging error: package failed %1%")) % e.what())
+            .str());
     }
 }
 
-bool Package::isFinish() const
+bool
+Package::isFinish() const
 {
     return m_pimpl->m_spawn.isfinish();
 }
 
-bool Package::isSuccess() const
+bool
+Package::isSuccess() const
 {
     if (not m_pimpl->m_spawn.isfinish()) {
         return false;
     }
 
-    m_pimpl->m_spawn.status(&m_pimpl->m_message,
-                            &m_pimpl->m_issuccess);
+    m_pimpl->m_spawn.status(&m_pimpl->m_message, &m_pimpl->m_issuccess);
 
     return m_pimpl->m_issuccess;
 }
 
-bool Package::wait(std::ostream& out, std::ostream& err)
+bool
+Package::wait(std::ostream& out, std::ostream& err)
 {
     std::string output;
     std::string error;
@@ -459,11 +476,16 @@ bool Package::wait(std::ostream& out, std::ostream& err)
 
     while (not m_pimpl->m_spawn.isfinish()) {
         if (m_pimpl->m_spawn.get(&output, &error)) {
-            out << output;
-            err << error;
+            if (not output.empty()) {
+                out << output;
+                output.clear();
+            }
 
-            output.clear();
-            error.clear();
+            if (not error.empty()) {
+                err << error;
+                error.clear();
+            }
+
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } else {
             break;
@@ -472,10 +494,28 @@ bool Package::wait(std::ostream& out, std::ostream& err)
 
     m_pimpl->m_spawn.wait();
 
+    //
+    // Force to get the latest spawn message. Indeed, spawn process can be
+    // finished but the output and error buffers may not clean.
+    //
+
+    if (m_pimpl->m_spawn.get(&output, &error)) {
+        if (not output.empty()) {
+            out << output;
+            output.clear();
+        }
+
+        if (not error.empty()) {
+            err << error;
+            error.clear();
+        }
+    }
+
     return m_pimpl->m_spawn.status(&m_pimpl->m_message, &m_pimpl->m_issuccess);
 }
 
-bool Package::get(std::string *out, std::string *err)
+bool
+Package::get(std::string* out, std::string* err)
 {
     out->reserve(Spawn::default_buffer_size);
     err->reserve(Spawn::default_buffer_size);
@@ -484,12 +524,14 @@ bool Package::get(std::string *out, std::string *err)
     return true;
 }
 
-void Package::select(const std::string& name)
+void
+Package::select(const std::string& name)
 {
     m_pimpl->select(name);
 }
 
-void Package::remove(const std::string& toremove, VLE_PACKAGE_TYPE type)
+void
+Package::remove(const std::string& toremove, VLE_PACKAGE_TYPE type)
 {
     std::string pkg_dir = getDir(type);
     Path torm(pkg_dir);
@@ -499,10 +541,11 @@ void Package::remove(const std::string& toremove, VLE_PACKAGE_TYPE type)
         ::remove_all(m_pimpl->m_context, torm);
 }
 
-std::string Package::getParentDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getParentDir(VLE_PACKAGE_TYPE type) const
 {
     std::string base_dir = getDir(type);
-    if (base_dir.empty()){
+    if (base_dir.empty()) {
         return "";
     } else {
         Path base_path = Path(base_dir);
@@ -510,20 +553,22 @@ std::string Package::getParentDir(VLE_PACKAGE_TYPE type) const
     }
 }
 
-std::string Package::getDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getDir(VLE_PACKAGE_TYPE type) const
 {
     switch (type) {
-    case PKG_SOURCE:
-        return m_pimpl->m_pkgsourcepath;
-        break;
-    case PKG_BINARY:
-        return m_pimpl->m_pkgbinarypath;
-        break;
+        case PKG_SOURCE:
+            return m_pimpl->m_pkgsourcepath;
+            break;
+        case PKG_BINARY:
+            return m_pimpl->m_pkgbinarypath;
+            break;
     }
     return "";
 }
 
-std::string Package::getLibDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getLibDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "lib";
@@ -531,7 +576,8 @@ std::string Package::getLibDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getSrcDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getSrcDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "src";
@@ -539,7 +585,8 @@ std::string Package::getSrcDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getDataDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getDataDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "data";
@@ -547,7 +594,8 @@ std::string Package::getDataDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getDocDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getDocDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "doc";
@@ -555,7 +603,8 @@ std::string Package::getDocDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getExpDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getExpDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "exp";
@@ -563,7 +612,8 @@ std::string Package::getExpDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getBuildDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getBuildDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "buildvle";
@@ -571,7 +621,8 @@ std::string Package::getBuildDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getOutputDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getOutputDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "output";
@@ -579,7 +630,8 @@ std::string Package::getOutputDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getPluginDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -587,7 +639,8 @@ std::string Package::getPluginDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getPluginSimulatorDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginSimulatorDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -596,7 +649,8 @@ std::string Package::getPluginSimulatorDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getPluginOutputDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginOutputDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -605,7 +659,8 @@ std::string Package::getPluginOutputDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getPluginGvleGlobalDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginGvleGlobalDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -615,7 +670,8 @@ std::string Package::getPluginGvleGlobalDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getPluginGvleModelingDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginGvleModelingDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -625,7 +681,8 @@ std::string Package::getPluginGvleModelingDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getPluginGvleOutputDir(VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginGvleOutputDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -635,8 +692,8 @@ std::string Package::getPluginGvleOutputDir(VLE_PACKAGE_TYPE type) const
     return p.string();
 }
 
-std::string Package::getFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= file;
@@ -644,8 +701,8 @@ std::string Package::getFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getLibFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getLibFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "lib";
@@ -654,8 +711,8 @@ std::string Package::getLibFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getSrcFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getSrcFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "src";
@@ -664,8 +721,8 @@ std::string Package::getSrcFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getDataFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getDataFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "data";
@@ -674,8 +731,8 @@ std::string Package::getDataFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getDocFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getDocFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "doc";
@@ -684,8 +741,8 @@ std::string Package::getDocFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getExpFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getExpFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "exp";
@@ -694,8 +751,8 @@ std::string Package::getExpFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getOutputFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getOutputFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "output";
@@ -704,8 +761,8 @@ std::string Package::getOutputFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getPluginFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginFile(const std::string& file, VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -714,8 +771,9 @@ std::string Package::getPluginFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getPluginSimulatorFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginSimulatorFile(const std::string& file,
+                                VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -725,8 +783,9 @@ std::string Package::getPluginSimulatorFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getPluginOutputFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginOutputFile(const std::string& file,
+                             VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -736,8 +795,9 @@ std::string Package::getPluginOutputFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getPluginGvleModelingFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginGvleModelingFile(const std::string& file,
+                                   VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -748,8 +808,9 @@ std::string Package::getPluginGvleModelingFile(const std::string& file,
     return p.string();
 }
 
-std::string Package::getPluginGvleOutputFile(const std::string& file,
-        VLE_PACKAGE_TYPE type) const
+std::string
+Package::getPluginGvleOutputFile(const std::string& file,
+                                 VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
@@ -760,19 +821,22 @@ std::string Package::getPluginGvleOutputFile(const std::string& file,
     return p.string();
 }
 
-bool Package::existsBinary() const
+bool
+Package::existsBinary() const
 {
     Path binary_dir = m_pimpl->m_pkgbinarypath;
 
     return binary_dir.is_directory();
 }
 
-bool Package::existsSource() const
+bool
+Package::existsSource() const
 {
     return (not m_pimpl->m_pkgsourcepath.empty());
 }
 
-bool Package::existsFile(const std::string& path, VLE_PACKAGE_TYPE type)
+bool
+Package::existsFile(const std::string& path, VLE_PACKAGE_TYPE type)
 {
     std::string base_dir = getDir(type);
     if (not base_dir.empty()) {
@@ -784,8 +848,10 @@ bool Package::existsFile(const std::string& path, VLE_PACKAGE_TYPE type)
     return false;
 }
 
-void Package::addDirectory(const std::string& path, const std::string& name,
-        VLE_PACKAGE_TYPE type)
+void
+Package::addDirectory(const std::string& path,
+                      const std::string& name,
+                      VLE_PACKAGE_TYPE type)
 {
     std::string base_dir = getDir(type);
     if (not base_dir.empty()) {
@@ -798,17 +864,19 @@ void Package::addDirectory(const std::string& path, const std::string& name,
     }
 }
 
-PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
+PathList
+Package::getExperiments(VLE_PACKAGE_TYPE type) const
 {
     Path pkg(getExpDir(type));
 
     if (not pkg.is_directory())
         throw utils::InternalError(
-            (fmt(_("Pkg list error: '%1%' is not an experiments directory")) %
-             pkg.string()).str());
+          (fmt(_("Pkg list error: '%1%' is not an experiments directory")) %
+           pkg.string())
+            .str());
 
     PathList result;
-    std::stack < Path > stack;
+    std::stack<Path> stack;
     stack.push(pkg);
 
     while (not stack.empty()) {
@@ -829,13 +897,14 @@ PathList Package::getExperiments(VLE_PACKAGE_TYPE type) const
     return result;
 }
 
-PathList Package::listLibraries(const std::string& path) const
+PathList
+Package::listLibraries(const std::string& path) const
 {
     PathList result;
     Path simdir(path);
 
     if (simdir.is_directory()) {
-        std::stack < Path > stack;
+        std::stack<Path> stack;
         stack.push(simdir);
         while (not stack.empty()) {
             Path dir = stack.top();
@@ -858,32 +927,37 @@ PathList Package::listLibraries(const std::string& path) const
                     }
                 }
             }
-       }
-   }
-   return result;
+        }
+    }
+    return result;
 }
 
-PathList Package::getPluginsSimulator() const
+PathList
+Package::getPluginsSimulator() const
 {
     return listLibraries(getPluginSimulatorDir(PKG_BINARY));
 }
 
-PathList Package::getPluginsOutput() const
+PathList
+Package::getPluginsOutput() const
 {
     return listLibraries(getPluginOutputDir(PKG_BINARY));
 }
 
-PathList Package::getPluginsGvleGlobal() const
+PathList
+Package::getPluginsGvleGlobal() const
 {
     return listLibraries(getPluginGvleGlobalDir(PKG_BINARY));
 }
 
-PathList Package::getPluginsGvleModeling() const
+PathList
+Package::getPluginsGvleModeling() const
 {
     return listLibraries(getPluginGvleModelingDir(PKG_BINARY));
 }
 
-PathList Package::getPluginsGvleOutput() const
+PathList
+Package::getPluginsGvleOutput() const
 {
     return listLibraries(getPluginGvleOutputDir(PKG_BINARY));
 }
@@ -899,18 +973,19 @@ Package::getMetadataExpDir(VLE_PACKAGE_TYPE type) const
 
 std::string
 Package::getMetadataExpFile(const std::string& expName,
-        VLE_PACKAGE_TYPE type) const
+                            VLE_PACKAGE_TYPE type) const
 {
     Path f = getDir(type);
     f /= "metadata";
     f /= "exp";
-    f /= (expName+".vpm");
+    f /= (expName + ".vpm");
     return f.string();
 }
 
-std::string Package::rename(const std::string& oldname,
-        const std::string& newname,
-        VLE_PACKAGE_TYPE type)
+std::string
+Package::rename(const std::string& oldname,
+                const std::string& newname,
+                VLE_PACKAGE_TYPE type)
 {
     Path oldfilepath = getDir(type);
     oldfilepath /= oldname;
@@ -920,8 +995,9 @@ std::string Package::rename(const std::string& oldname,
 
     if (not oldfilepath.exists() or newfilepath.exists()) {
         throw utils::ArgError(
-            (fmt(_("In Package `%1%', can not rename `%2%' in `%3%'")) %
-             name() % oldfilepath.string() % newfilepath.string()).str());
+          (fmt(_("In Package `%1%', can not rename `%2%' in `%3%'")) % name() %
+           oldfilepath.string() % newfilepath.string())
+            .str());
     }
 
     Path::rename(oldfilepath, newfilepath);
@@ -929,17 +1005,20 @@ std::string Package::rename(const std::string& oldname,
     return newfilepath.string();
 }
 
-void Package::copy(const std::string& source, std::string& target)
+void
+Package::copy(const std::string& source, std::string& target)
 {
     Path::copy_file(source, target);
 }
 
-const std::string& Package::name() const
+const std::string&
+Package::name() const
 {
     return m_pimpl->m_pkgname;
 }
 
-void Package::refreshCommands()
+void
+Package::refreshCommands()
 {
     m_pimpl->m_context->get_setting("vle.packages.configure",
                                     &m_pimpl->mCommandConfigure);
@@ -959,12 +1038,14 @@ void Package::refreshCommands()
                                     &m_pimpl->mCommandDirCopy);
 }
 
-void Package::refreshPath()
+void
+Package::refreshPath()
 {
     m_pimpl->refreshPath();
 }
 
-void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
+void
+Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
 {
     std::string header = "Package content from: ";
     header += getDir(vle::utils::PKG_BINARY);
@@ -979,7 +1060,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     std::sort(tmp.begin(), tmp.end());
 
     auto itb = tmp.cbegin(), ite = tmp.cend();
-    for (; itb != ite; itb++){
+    for (; itb != ite; itb++) {
         pkgcontent.push_back(itb->string());
     }
 
@@ -988,7 +1069,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     std::sort(tmp.begin(), tmp.end());
     itb = tmp.begin();
     ite = tmp.end();
-    for (; itb!=ite; itb++){
+    for (; itb != ite; itb++) {
         pkgcontent.push_back(itb->string());
     }
 
@@ -997,7 +1078,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     std::sort(tmp.begin(), tmp.end());
     itb = tmp.begin();
     ite = tmp.end();
-    for (; itb!=ite; itb++){
+    for (; itb != ite; itb++) {
         pkgcontent.push_back(itb->string());
     }
 
@@ -1006,7 +1087,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     std::sort(tmp.begin(), tmp.end());
     itb = tmp.begin();
     ite = tmp.end();
-    for (; itb!=ite; itb++){
+    for (; itb != ite; itb++) {
         pkgcontent.push_back(itb->string());
     }
 
@@ -1015,7 +1096,7 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     std::sort(tmp.begin(), tmp.end());
     itb = tmp.begin();
     ite = tmp.end();
-    for (; itb!=ite; itb++){
+    for (; itb != ite; itb++) {
         pkgcontent.push_back(itb->string());
     }
 
@@ -1024,27 +1105,28 @@ void Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     std::sort(tmp.begin(), tmp.end());
     itb = tmp.begin();
     ite = tmp.end();
-    for (; itb!=ite; itb++){
+    for (; itb != ite; itb++) {
         pkgcontent.push_back(itb->string());
     }
     return;
 }
 
-VLE_API std::ostream& operator<<(std::ostream& out,
-        const VLE_PACKAGE_TYPE& type)
+VLE_API std::ostream&
+operator<<(std::ostream& out, const VLE_PACKAGE_TYPE& type)
 {
     switch (type) {
-    case PKG_SOURCE:
-        out << "SOURCE";
-        break;
-    case PKG_BINARY:
-        out << "BINARY";
-        break;
+        case PKG_SOURCE:
+            out << "SOURCE";
+            break;
+        case PKG_BINARY:
+            out << "BINARY";
+            break;
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const Package& pkg)
+std::ostream&
+operator<<(std::ostream& out, const Package& pkg)
 {
     out << "\npackage name.....: " << pkg.m_pimpl->m_pkgname << "\n"
         << "source path........: " << pkg.m_pimpl->m_pkgsourcepath << "\n"
@@ -1053,5 +1135,5 @@ std::ostream& operator<<(std::ostream& out, const Package& pkg)
         << "\n";
     return out;
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils
