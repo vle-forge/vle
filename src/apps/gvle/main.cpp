@@ -41,8 +41,6 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    vle::Init m_app;
 
 #ifdef _WIN32
     {
@@ -105,6 +103,9 @@ int main(int argc, char *argv[])
         }        
     }
 #endif
+
+    QApplication a(argc, argv);
+    vle::Init m_app;
 
     bool result;
 
