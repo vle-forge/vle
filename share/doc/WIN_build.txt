@@ -49,7 +49,7 @@ cd %VLE_DIR%\buildvle
 cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DWITH_WIN32_INSTALLER=ON -DCMAKE_INSTALL_PREFIX=%install_dir% -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 mingw32-make install
 
-set PATH=%OLD_PATH%
+set PATH=%OLDPATH%
 set PATH=%install_dir%\bin;%PATH%
 mingw32-make test
 cpack.exe --debug --verbose -G NSIS
