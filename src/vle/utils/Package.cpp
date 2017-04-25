@@ -37,6 +37,7 @@
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 
 namespace {
@@ -1047,68 +1048,73 @@ Package::refreshPath()
 void
 Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
 {
-    std::string header = "Package content from: ";
-    header += getDir(vle::utils::PKG_BINARY);
+    auto header = vle::utils::format("Package content from: %s",
+                                     getDir(vle::utils::PKG_BINARY).c_str());
 
     pkgcontent.clear();
-    pkgcontent.push_back(header);
+    pkgcontent.emplace_back(header);
 
     vle::utils::PathList tmp;
 
-    tmp = getExperiments();
-    pkgcontent.push_back("-- experiments : ");
-    std::sort(tmp.begin(), tmp.end());
+    try {
+        tmp = getExperiments();
+        pkgcontent.push_back("-- experiments:");
+        std::sort(tmp.begin(), tmp.end());
 
-    auto itb = tmp.cbegin(), ite = tmp.cend();
-    for (; itb != ite; itb++) {
-        pkgcontent.push_back(itb->string());
+        for (auto& elem : tmp)
+            pkgcontent.emplace_back(elem.string());
+    } catch (const std::exception& /*e*/) {
     }
 
-    tmp = getPluginsSimulator();
-    pkgcontent.push_back("-- simulator plugins : ");
-    std::sort(tmp.begin(), tmp.end());
-    itb = tmp.begin();
-    ite = tmp.end();
-    for (; itb != ite; itb++) {
-        pkgcontent.push_back(itb->string());
+    try {
+        tmp = getPluginsSimulator();
+        pkgcontent.push_back("-- simulator plugins:");
+        std::sort(tmp.begin(), tmp.end());
+
+        for (auto& elem : tmp)
+            pkgcontent.emplace_back(elem.string());
+    } catch (const std::exception& /*e*/) {
     }
 
-    tmp = getPluginsOutput();
-    pkgcontent.push_back("-- output plugins : ");
-    std::sort(tmp.begin(), tmp.end());
-    itb = tmp.begin();
-    ite = tmp.end();
-    for (; itb != ite; itb++) {
-        pkgcontent.push_back(itb->string());
+    try {
+        tmp = getPluginsOutput();
+        pkgcontent.push_back("-- output plugins:");
+        std::sort(tmp.begin(), tmp.end());
+
+        for (auto& elem : tmp)
+            pkgcontent.emplace_back(elem.string());
+    } catch (const std::exception& /*e*/) {
     }
 
-    tmp = getPluginsGvleGlobal();
-    pkgcontent.push_back("-- gvle global plugins : ");
-    std::sort(tmp.begin(), tmp.end());
-    itb = tmp.begin();
-    ite = tmp.end();
-    for (; itb != ite; itb++) {
-        pkgcontent.push_back(itb->string());
+    try {
+        tmp = getPluginsGvleGlobal();
+        pkgcontent.push_back("-- gvle global plugins:");
+        std::sort(tmp.begin(), tmp.end());
+
+        for (auto& elem : tmp)
+            pkgcontent.emplace_back(elem.string());
+    } catch (const std::exception& /*e*/) {
     }
 
-    tmp = getPluginsGvleModeling();
-    pkgcontent.push_back("-- gvle modeling plugins : ");
-    std::sort(tmp.begin(), tmp.end());
-    itb = tmp.begin();
-    ite = tmp.end();
-    for (; itb != ite; itb++) {
-        pkgcontent.push_back(itb->string());
+    try {
+        tmp = getPluginsGvleModeling();
+        pkgcontent.push_back("-- gvle modeling plugins:");
+        std::sort(tmp.begin(), tmp.end());
+
+        for (auto& elem : tmp)
+            pkgcontent.emplace_back(elem.string());
+    } catch (const std::exception& /*e*/) {
     }
 
-    tmp = getPluginsGvleOutput();
-    pkgcontent.push_back("-- gvle output plugins : ");
-    std::sort(tmp.begin(), tmp.end());
-    itb = tmp.begin();
-    ite = tmp.end();
-    for (; itb != ite; itb++) {
-        pkgcontent.push_back(itb->string());
+    try{
+        tmp = getPluginsGvleOutput();
+        pkgcontent.push_back("-- gvle output plugins:");
+        std::sort(tmp.begin(), tmp.end());
+
+        for (auto& elem : tmp)
+            pkgcontent.emplace_back(elem.string());
+    } catch (const std::exception& /*e*/) {
     }
-    return;
 }
 
 VLE_API std::ostream&
