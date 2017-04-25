@@ -1039,8 +1039,8 @@ void
 vleVpz::renameViewToDoc(const QString& oldName, const QString& newName)
 {
     QDomNode views = viewsFromDoc();
+
     undoStack->snapshot(views);
-    synchronizeUndoStack();
     QList<QDomNode> viewList = DomFunctions::childNodesWithoutText(views, "view");
     for (int i =0; i< viewList.size(); i++) {
         QDomNode v = viewList[i];
@@ -1077,6 +1077,10 @@ vleVpz::renameViewToDoc(const QString& oldName, const QString& newName)
             }
         }
     }
+    QString gui_plugin = getOutputGUIplugin(oldName);
+    setOutputGUIplugin(oldName, "", true);
+    setOutputGUIplugin(newName, gui_plugin, false);
+
     emit viewsUpdated();
 }
 
@@ -4208,7 +4212,8 @@ vleVpz::renameCondGUIplugin(const QString& oldCond, const QString& newCond)
 }
 
 void
-vleVpz::setOutputGUIplugin(const QString& viewName, const QString& pluginName)
+vleVpz::setOutputGUIplugin(const QString& viewName, const QString& pluginName,
+        bool snapshot)
 {
     if (not hasMeta) {
         return;
@@ -4220,28 +4225,36 @@ vleVpz::setOutputGUIplugin(const QString& viewName, const QString& pluginName)
     if (outGUIplugs.isNull() ) {
         QDomNode metaData = mDocVpm->elementsByTagName(
                 "vle_project_metadata").item(0);
-        undoStackVpm->snapshot(metaData);
+        if (snapshot) {
+            undoStackVpm->snapshot(metaData);
+        }
         metaData.appendChild(mDocVpm->createElement("outputGUIplugins"));
         outGUIplugs =  mDocVpm->elementsByTagName("outputGUIplugins").item(0);
     } else {
-        undoStackVpm->snapshot(outGUIplugs);
+        if (snapshot) {
+          undoStackVpm->snapshot(outGUIplugs);
+        }
     }
+
     QDomNodeList plugins =
             outGUIplugs.toElement().elementsByTagName("outputGUIplugin");
     for (int i =0; i< plugins.length(); i++) {
         QDomNode plug = plugins.at(i);
-        for (int j=0; j< plug.attributes().size(); j++) {
-            if ((plug.attributes().item(j).nodeName() == "view") and
-                    (plug.attributes().item(j).nodeValue() == viewName))  {
-                plug.toElement().setAttribute("GUIplugin", pluginName);
-                return;
+        if (DomFunctions::attributeValue(plug, "view") == viewName) {
+            if (pluginName == ""){
+                outGUIplugs.removeChild(plug);
+                return ;
+            } else {
+                DomFunctions::setAttributeValue(plug, "GUIplugin", pluginName);
             }
         }
     }
-    QDomElement el = mDocVpm->createElement("outputGUIplugin");
-    el.setAttribute("view", viewName);
-    el.setAttribute("GUIplugin", pluginName);
-    outGUIplugs.appendChild(el);
+    if (pluginName != "") {
+      QDomElement el = mDocVpm->createElement("outputGUIplugin");
+      el.setAttribute("view", viewName);
+      el.setAttribute("GUIplugin", pluginName);
+      outGUIplugs.appendChild(el);
+    }
 }
 
 void

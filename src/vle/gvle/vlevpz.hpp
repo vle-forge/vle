@@ -1255,7 +1255,8 @@ private:
     void xCreateDomMetadata();
     void setCondGUIplugin(const QString& condName, const QString& name);
     void renameCondGUIplugin(const QString& oldCond, const QString& newCond);
-    void setOutputGUIplugin(const QString& viewName, const QString& pluginName);
+    void setOutputGUIplugin(const QString& viewName, const QString& pluginName,
+            bool snapshot=true);
     void synchronizeUndoStack();
     void tryEmitUndoAvailability(unsigned int prevCurr,
             unsigned int curr, unsigned int saved);
