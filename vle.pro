@@ -35,9 +35,10 @@ SUBDIRS += pkg_vle_generic_builder
 pkg_vle_generic_builder.file = src/pkgs/vle.generic.builder/vle_generic_builder.pro
 pkg_vle_generic_builder.depends = libvle
 
-SUBDIRS += pkg_vle_adapative_qss_adder pkg_vle_adapative_qss_generator pkg_vle_adapative_qss_adaptative-quantifier pkg_vle_adapative_qss_integrator pkg_vle_adapative_qss_mult pkg_vle_adapative_qss_plot
+SUBDIRS += pkg_vle_adapative_qss_adder pkg_vle_adapative_qss_constant pkg_vle_adapative_qss_generator pkg_vle_adapative_qss_adaptative-quantifier pkg_vle_adapative_qss_integrator pkg_vle_adapative_qss_mult pkg_vle_adapative_qss_plot
 
 pkg_vle_adapative_qss_adder.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_adder.pro
+pkg_vle_adapative_qss_constant.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_constant.pro
 pkg_vle_adapative_qss_generator.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_generator.pro
 pkg_vle_adapative_qss_adaptative-quantifier.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_adaptative-quantifier.pro
 pkg_vle_adapative_qss_integrator.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_integrator.pro
@@ -45,6 +46,7 @@ pkg_vle_adapative_qss_mult.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss
 pkg_vle_adapative_qss_plot.file = src/pkgs/vle.adaptative-qss/vle_adaptative_qss_plot.pro
 
 pkg_vle_adapative_qss_adder.depends = libvle
+pkg_vle_adapative_qss_constant.depends = libvle
 pkg_vle_adapative_qss_generator.depends = libvle
 pkg_vle_adapative_qss_adaptative-quantifier.depends = libvle
 pkg_vle_adapative_qss_integrator.depends = libvle
@@ -79,7 +81,7 @@ RESOURCES += \
 share_files.path = $$DATADIR/
 share_files.files = share/README.md share/COPYING
 
-share_template_files.path = $$DATADIR/template
+share_template_files.path = $$DATADIR/
 share_template_files.files = share/template/
 
 share_cmake_files.path = $$DATADIR/cmake
