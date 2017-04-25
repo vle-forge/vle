@@ -315,8 +315,9 @@ public:
                 return;
             }
             DownloadManager dl(context);
+
             Path filename(Path::temp_directory_path());
-            filename /= "packages.pkg";
+            filename /= Path::unique_path("vledl-%%%%%%%%.pkg");
 
             dl.start(url + "/packages.pkg", filename.string());
             dl.join();
@@ -364,8 +365,7 @@ public:
                                     tmp,
                                     boost::algorithm::is_any_of(","),
                                     boost::algorithm::token_compress_on);
-        }
-        catch (const std::exception & /*e*/) {
+        } catch (const std::exception & /*e*/) {
             std::ostringstream errorStream;
             errorStream << _("Failed to read preferences file");
             mErrorMessage.assign(errorStream.str());
