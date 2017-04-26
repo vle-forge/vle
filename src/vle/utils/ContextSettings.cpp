@@ -123,10 +123,14 @@ void Context::reset_settings() noexcept
 
     m_pimpl->settings["vle.remote.url"] = url;
 
-    auto simulation =
-        utils::format("vle-%s", vle::string_version_abi().c_str());
+    std::string simulation = "";
+#ifdef _WIN32
+    simulation = "vle.exe";
     simulation += " --write-output '%1%' '%2%'";
-
+#else
+    simulation = utils::format("vle-%s", vle::string_version_abi().c_str());
+    simulation += " --write-output '%1%' '%2%'";
+#endif
     m_pimpl->settings["vle.command.vle.simulation"] = simulation;
 }
 
