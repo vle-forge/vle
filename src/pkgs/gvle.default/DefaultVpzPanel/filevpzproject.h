@@ -57,9 +57,6 @@ public slots:
     void setDateToVpz();
     void setVersionToVpz();
     void setExpNameToVpz();
-    void setExpDurationToVpz();
-    void setExpBeginToVpz();
-    void setExpBeginDateTimeToVpz();
     void onUndoRedoVpz(QDomNode oldVpz, QDomNode newVpz,
 		       QDomNode oldVpm, QDomNode newVpm);
     void reload();
