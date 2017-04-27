@@ -137,6 +137,16 @@ public:
     double normal(double mean, double sigma);
 
     /**
+     * @brief Computes the cumulative distribution function for
+     * the normal law, with given parameters mean and sigma, at a given point x
+     * @param mean, mean parameter of the normal distribution
+     * @param sigma, standard deviation parameter of the normal distribution
+     * @param x, the point at which the cdf is required
+     * @return a real.
+     */
+    double normal_cdf(double mean, double sigma, double x);
+
+    /**
      * @brief Generate a real using the Log Normal law.
      * @param mean
      * @param sigma
@@ -180,6 +190,16 @@ public:
      * @return a real.
      */
     double gamma(double alpha);
+
+    /**
+     * @brief Computes the quantile function of the gamma distribution at a
+     * given point.
+     * @param shape, shape (or alpha) parameter of the distribution
+     * @param scale, scale (or beta) parameter of the distribution
+     * @param x, the point at which the quantile should be evaluated
+     * @param a real
+     */
+    double gamma_quantile(double shape, double scale, double x);
 
     /**
      * @brief Generate a real using the Binomial distribution.

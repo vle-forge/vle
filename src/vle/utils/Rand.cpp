@@ -24,6 +24,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/math/distributions/gamma.hpp>
+#include <boost/math/distributions/normal.hpp>
 #include <vle/utils/Rand.hpp>
 
 #define _USE_MATH_DEFINES
@@ -81,6 +83,12 @@ double Rand::normal(double mean, double sigma)
     return distrib(m_rand);
 }
 
+double Rand::normal_cdf(double mean, double sigma, double x)
+{
+    boost::math::normal_distribution<> norm_distr(mean, sigma);
+    return boost::math::cdf(norm_distr, x);
+}
+
 double Rand::logNormal(double mean, double sigma)
 {
     std::lognormal_distribution<double> distrib(mean, sigma);
@@ -103,6 +111,12 @@ double Rand::gamma(double alpha)
 {
     std::gamma_distribution <double> distrib(alpha);
     return distrib(m_rand);
+}
+
+double Rand::gamma_quantile(double shape, double scale, double x)
+{
+    boost::math::gamma_distribution<> gamma_distrib(shape, scale);
+    return boost::math::quantile(gamma_distrib, x);
 }
 
 double Rand::binomial(int t, double p)
