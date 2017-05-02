@@ -46,7 +46,7 @@ Model::Model(const Model& mdl)
         m_graph = std::unique_ptr<BaseModel>(mdl.m_graph->clone());
         m_node = m_graph.get();
     } else if (mdl.m_node)
-        m_node = m_node->clone();
+        m_node = mdl.m_node->clone();
 }
 
 Model::~Model() = default;
