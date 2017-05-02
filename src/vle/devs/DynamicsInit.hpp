@@ -27,7 +27,16 @@
 #ifndef VLE_DEVS_DYNAMICS_INIT_HPP
 #define VLE_DEVS_DYNAMICS_INIT_HPP
 
+#include <vle/utils/Context.hpp>
+#include <vle/utils/PackageTable.hpp>
+
 namespace vle {
+namespace vpz {
+
+class AtomicModel;
+
+} // vpz
+
 namespace devs {
 
 class Coordinator;
@@ -36,7 +45,7 @@ struct DynamicsInit
 {
     utils::ContextPtr context;
     const vpz::AtomicModel& model;
-    PackageId packageid;
+    utils::PackageTable::index packageid;
 };
 
 struct ExecutiveInit
@@ -44,7 +53,7 @@ struct ExecutiveInit
     Coordinator& coordinator;
     utils::ContextPtr context;
     const vpz::AtomicModel& model;
-    PackageId packageid;
+    utils::PackageTable::index packageid;
 };
 
 struct DynamicsWrapperInit
@@ -52,7 +61,7 @@ struct DynamicsWrapperInit
     const std::string& library;
     utils::ContextPtr context;
     const vpz::AtomicModel& model;
-    PackageId packageid;
+    utils::PackageTable::index packageid;
 };
 }
 } // namespace vle devs
