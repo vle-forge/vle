@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -29,28 +29,28 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 
-namespace vle
-{
-namespace translator
-{
+namespace vle {
+namespace translator {
 
-regular_graph_generator::regular_graph_generator(const parameter &params)
-    : m_params(params)
-    , m_metrics{-1}
+regular_graph_generator::regular_graph_generator(const parameter& params)
+  : m_params(params)
+  , m_metrics{ -1 }
 {
 }
 
-regular_graph_generator::graph_metrics regular_graph_generator::metrics() const
+regular_graph_generator::graph_metrics
+regular_graph_generator::metrics() const
 {
     return m_metrics;
 }
 
-void make_1d_no_wrap(vle::devs::Executive &executive,
-                     regular_graph_generator::connectivity connectivity,
-                     const std::vector<std::string> &modelnames,
-                     int length,
-                     const std::vector<std::string> &mask,
-                     int x_mask)
+void
+make_1d_no_wrap(vle::devs::Executive& executive,
+                regular_graph_generator::connectivity connectivity,
+                const std::vector<std::string>& modelnames,
+                int length,
+                const std::vector<std::string>& mask,
+                int x_mask)
 {
     const int mask_length = vle::utils::numeric_cast<int>(mask.size());
 
@@ -67,7 +67,7 @@ void make_1d_no_wrap(vle::devs::Executive &executive,
                     executive.addInputPort(modelnames[x], "in");
 
                     executive.addConnection(
-                        modelnames[i], "out", modelnames[x], "in");
+                      modelnames[i], "out", modelnames[x], "in");
                     break;
 
                 case regular_graph_generator::connectivity::OTHER:
@@ -85,7 +85,7 @@ void make_1d_no_wrap(vle::devs::Executive &executive,
                     executive.addInputPort(modelnames[x], mask[m]);
 
                     executive.addConnection(
-                        modelnames[i], mask[m], modelnames[x], mask[m]);
+                      modelnames[i], mask[m], modelnames[x], mask[m]);
                     break;
                 }
             }
@@ -93,12 +93,13 @@ void make_1d_no_wrap(vle::devs::Executive &executive,
     }
 }
 
-void make_1d_wrap(vle::devs::Executive &executive,
-                  regular_graph_generator::connectivity connectivity,
-                  const std::vector<std::string> &modelnames,
-                  int length,
-                  const std::vector<std::string> &mask,
-                  int x_mask)
+void
+make_1d_wrap(vle::devs::Executive& executive,
+             regular_graph_generator::connectivity connectivity,
+             const std::vector<std::string>& modelnames,
+             int length,
+             const std::vector<std::string>& mask,
+             int x_mask)
 {
     const int mask_length = vle::utils::numeric_cast<int>(mask.size());
 
@@ -121,7 +122,7 @@ void make_1d_wrap(vle::devs::Executive &executive,
                     executive.addInputPort(modelnames[p], "in");
 
                     executive.addConnection(
-                        modelnames[i], "out", modelnames[p], "in");
+                      modelnames[i], "out", modelnames[p], "in");
                     break;
 
                 case regular_graph_generator::connectivity::OTHER:
@@ -139,7 +140,7 @@ void make_1d_wrap(vle::devs::Executive &executive,
                     executive.addInputPort(modelnames[p], mask[m]);
 
                     executive.addConnection(
-                        modelnames[i], mask[m], modelnames[p], mask[m]);
+                      modelnames[i], mask[m], modelnames[p], mask[m]);
                     break;
                 }
             }
@@ -147,20 +148,21 @@ void make_1d_wrap(vle::devs::Executive &executive,
     }
 }
 
-void regular_graph_generator::make_1d(vle::devs::Executive &executive,
-                                      int length,
-                                      bool wrap,
-                                      const std::vector<std::string> &mask,
-                                      int x_mask)
+void
+regular_graph_generator::make_1d(vle::devs::Executive& executive,
+                                 int length,
+                                 bool wrap,
+                                 const std::vector<std::string>& mask,
+                                 int x_mask)
 {
     if (length <= 0 or mask.size() == 0 or
         utils::numeric_cast<int>(mask.size()) <= x_mask)
         throw vle::utils::ArgError(
-            _("regular_graph_generator: bad model parameters"));
+          _("regular_graph_generator: bad model parameters"));
 
     std::vector<std::string> modelnames(length);
     std::string name, classname;
-    regular_graph_generator::node_metrics metrics{-1, -1, -1};
+    regular_graph_generator::node_metrics metrics{ -1, -1, -1 };
 
     for (int i = 0; i != length; ++i) {
         metrics.x = i;
@@ -173,21 +175,22 @@ void regular_graph_generator::make_1d(vle::devs::Executive &executive,
 
     if (not wrap)
         make_1d_no_wrap(
-            executive, m_params.type, modelnames, length, mask, x_mask);
+          executive, m_params.type, modelnames, length, mask, x_mask);
     else
         make_1d_wrap(
-            executive, m_params.type, modelnames, length, mask, x_mask);
+          executive, m_params.type, modelnames, length, mask, x_mask);
 }
 
-void apply_mask(vle::devs::Executive &executive,
-                const regular_graph_generator::parameter &params,
-                const utils::Array<std::string> &modelnames,
-                int c,
-                int r,
-                const std::array<int, 2> &length,
-                const utils::Array<std::string> &mask,
-                int x_mask,
-                int y_mask)
+void
+apply_mask(vle::devs::Executive& executive,
+           const regular_graph_generator::parameter& params,
+           const utils::Array<std::string>& modelnames,
+           int c,
+           int r,
+           const std::array<int, 2>& length,
+           const utils::Array<std::string>& mask,
+           int x_mask,
+           int y_mask)
 {
     const int mask_columns = utils::numeric_cast<int>(mask.columns());
     const int mask_rows = utils::numeric_cast<int>(mask.rows());
@@ -207,7 +210,7 @@ void apply_mask(vle::devs::Executive &executive,
                 executive.addInputPort(modelnames(x, y), "in");
 
                 executive.addConnection(
-                    modelnames(c, r), "out", modelnames(x, y), "in");
+                  modelnames(c, r), "out", modelnames(x, y), "in");
                 break;
 
             case regular_graph_generator::connectivity::OTHER:
@@ -224,26 +227,25 @@ void apply_mask(vle::devs::Executive &executive,
                 executive.addOutputPort(modelnames(c, r), mask(m, n));
                 executive.addInputPort(modelnames(x, y), mask(m, n));
 
-                executive.addConnection(modelnames(c, r),
-                                        mask(m, n),
-                                        modelnames(x, y),
-                                        mask(m, n));
+                executive.addConnection(
+                  modelnames(c, r), mask(m, n), modelnames(x, y), mask(m, n));
                 break;
             }
         }
     }
 }
 
-void apply_wrap_mask(vle::devs::Executive &executive,
-                     const std::array<bool, 2> &wrap,
-                     const regular_graph_generator::parameter &params,
-                     const utils::Array<std::string> &modelnames,
-                     int c,
-                     int r,
-                     const std::array<int, 2> &length,
-                     const utils::Array<std::string> &mask,
-                     int x_mask,
-                     int y_mask)
+void
+apply_wrap_mask(vle::devs::Executive& executive,
+                const std::array<bool, 2>& wrap,
+                const regular_graph_generator::parameter& params,
+                const utils::Array<std::string>& modelnames,
+                int c,
+                int r,
+                const std::array<int, 2>& length,
+                const utils::Array<std::string>& mask,
+                int x_mask,
+                int y_mask)
 {
     const int mask_columns = utils::numeric_cast<int>(mask.columns());
     const int mask_rows = utils::numeric_cast<int>(mask.rows());
@@ -278,7 +280,7 @@ void apply_wrap_mask(vle::devs::Executive &executive,
                 executive.addInputPort(modelnames(q, p), "in");
 
                 executive.addConnection(
-                    modelnames(c, r), "out", modelnames(q, p), "in");
+                  modelnames(c, r), "out", modelnames(q, p), "in");
                 break;
 
             case regular_graph_generator::connectivity::OTHER:
@@ -295,32 +297,31 @@ void apply_wrap_mask(vle::devs::Executive &executive,
                 executive.addOutputPort(modelnames(c, r), mask(m, n));
                 executive.addInputPort(modelnames(q, p), mask(m, n));
 
-                executive.addConnection(modelnames(c, r),
-                                        mask(m, n),
-                                        modelnames(q, p),
-                                        mask(m, n));
+                executive.addConnection(
+                  modelnames(c, r), mask(m, n), modelnames(q, p), mask(m, n));
                 break;
             }
         }
     }
 }
 
-void regular_graph_generator::make_2d(vle::devs::Executive &executive,
-                                      const std::array<int, 2> &length,
-                                      const std::array<bool, 2> &wrap,
-                                      const utils::Array<std::string> &mask,
-                                      int x_mask,
-                                      int y_mask)
+void
+regular_graph_generator::make_2d(vle::devs::Executive& executive,
+                                 const std::array<int, 2>& length,
+                                 const std::array<bool, 2>& wrap,
+                                 const utils::Array<std::string>& mask,
+                                 int x_mask,
+                                 int y_mask)
 {
     if (length[0] * length[1] <= 0 or x_mask < 0 or y_mask < 0 or
         utils::numeric_cast<std::size_t>(x_mask) >= mask.columns() or
         utils::numeric_cast<std::size_t>(y_mask) >= mask.rows())
         throw vle::utils::ArgError(
-            _("regular_graph_generator: bad parameters"));
+          _("regular_graph_generator: bad parameters"));
 
     utils::Array<std::string> modelnames(length[0], length[1]);
     std::string name, classname;
-    regular_graph_generator::node_metrics metrics{-1, -1, -1};
+    regular_graph_generator::node_metrics metrics{ -1, -1, -1 };
 
     m_metrics.vertices = length[0] * length[1];
 

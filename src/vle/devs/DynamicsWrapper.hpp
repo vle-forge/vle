@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,16 +34,16 @@
 
 #define DECLARE_DYNAMICSWRAPPER(mdl)                                          \
     extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics *                                          \
-    vle_make_new_dynamics_wrapper(const vle::devs::DynamicsWrapperInit &init, \
-                                  const vle::devs::InitEventList &events)     \
+    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics_wrapper(            \
+      const vle::devs::DynamicsWrapperInit& init,                             \
+      const vle::devs::InitEventList& events)                                 \
     {                                                                         \
         return new mdl(init, events);                                         \
     }                                                                         \
                                                                               \
-    VLE_MODULE void vle_api_level(std::uint32_t *major,                       \
-                                  std::uint32_t *minor,                       \
-                                  std::uint32_t *patch)                       \
+    VLE_MODULE void vle_api_level(std::uint32_t* major,                       \
+                                  std::uint32_t* minor,                       \
+                                  std::uint32_t* patch)                       \
     {                                                                         \
         auto version = vle::version();                                        \
         *major = std::get<0>(version);                                        \
@@ -63,20 +63,23 @@ struct DynamicsWrapperInit;
  * programming language.
  *
  */
-class VLE_API DynamicsWrapper : public Dynamics {
+class VLE_API DynamicsWrapper : public Dynamics
+{
 public:
     /**
      * @brief Constructor of the dynamics wrapper of an atomic model
      * @param model the atomic model to which belongs the dynamics
      */
-    DynamicsWrapper(const DynamicsWrapperInit &init,
-                    const devs::InitEventList &events);
+    DynamicsWrapper(const DynamicsWrapperInit& init,
+                    const devs::InitEventList& events);
 
     /**
      * @brief Destructor (nothing to do).
      * @return none
      */
-    virtual ~DynamicsWrapper() {}
+    virtual ~DynamicsWrapper()
+    {
+    }
 
     /**
      * @brief If this function return true, then a cast to a DynamicsWrapper
@@ -84,7 +87,10 @@ public:
      * call.
      * @return false if Dynamics is not a DynamicsWrapper.
      */
-    inline virtual bool isWrapper() const override { return true; }
+    inline virtual bool isWrapper() const override
+    {
+        return true;
+    }
 
 protected:
     std::string m_library;

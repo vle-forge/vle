@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,7 +34,8 @@
 
 using namespace vle;
 
-void download_dtd()
+void
+download_dtd()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
@@ -52,7 +53,8 @@ void download_dtd()
     Ensures(dowloaded.is_file());
 }
 
-void download_package()
+void
+download_package()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
@@ -70,7 +72,8 @@ void download_package()
     Ensures(d.is_file());
 }
 
-void download_package_bis()
+void
+download_package_bis()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::DownloadManager dm(ctx);
@@ -88,7 +91,8 @@ void download_package_bis()
     Ensures(d.is_file());
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

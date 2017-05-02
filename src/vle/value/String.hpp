@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,13 +36,14 @@ namespace value {
 /**
  * @brief String Value encapsulates a C++ std::string type into a class.
  */
-class VLE_API String : public Value {
+class VLE_API String : public Value
+{
 public:
     /**
      * @brief Build a String object with a default value as empty string.
      */
     String()
-        : m_value()
+      : m_value()
     {
     }
 
@@ -51,7 +52,7 @@ public:
      * @param value The value to copy.
      */
     String(std::string value)
-        : m_value(std::move(value))
+      : m_value(std::move(value))
     {
     }
 
@@ -59,16 +60,18 @@ public:
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    String(const String &value)
-        : Value(value)
-        , m_value(value.m_value)
+    String(const String& value)
+      : Value(value)
+      , m_value(value.m_value)
     {
     }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~String() {}
+    virtual ~String()
+    {
+    }
 
     ///
     ////
@@ -79,8 +82,8 @@ public:
      * @param value the value of the string.
      * @return A new String.
      */
-    static std::unique_ptr<value::Value>
-    create(const std::string value = std::string())
+    static std::unique_ptr<value::Value> create(
+      const std::string value = std::string())
     {
         return std::unique_ptr<value::Value>(new String(value));
     }
@@ -102,19 +105,22 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::STRING.
      */
-    virtual Value::type getType() const override { return Value::STRING; }
+    virtual Value::type getType() const override
+    {
+        return Value::STRING;
+    }
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream &out) const override;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream &out) const override;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream. Be careful, the
@@ -127,76 +133,95 @@ public:
      * @endcode
      * @param out
      */
-    virtual void writeXml(std::ostream &out) const override;
+    virtual void writeXml(std::ostream& out) const override;
 
     /**
      * @brief Get a constant reference to the encapsulated std::string.
      * @return A constant reference to the encapsulated std::string.
      */
-    inline const std::string &value() const { return m_value; }
+    inline const std::string& value() const
+    {
+        return m_value;
+    }
 
     /**
      * @brief Get a reference to the encapsulated std::string.
      * @return A reference to the encapsulated std::string.
      */
-    inline std::string &value() { return m_value; }
+    inline std::string& value()
+    {
+        return m_value;
+    }
 
     /**
      * @brief Assign a value to the encapsulated std::string.
      * @param value The Value to set.
      */
-    inline void set(const std::string &value) { m_value.assign(value); }
+    inline void set(const std::string& value)
+    {
+        m_value.assign(value);
+    }
 
 private:
     std::string m_value;
 };
 
-inline const String &toStringValue(std::shared_ptr<Value> value)
+inline const String&
+toStringValue(std::shared_ptr<Value> value)
 {
     return value::reference(value).toString();
 }
 
-inline const String &toStringValue(std::shared_ptr<const Value> value)
+inline const String&
+toStringValue(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toString();
 }
 
-inline const String &toStringValue(const std::unique_ptr<Value> &value)
+inline const String&
+toStringValue(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toString();
 }
 
-inline const String &toStringValue(const Value &value)
+inline const String&
+toStringValue(const Value& value)
 {
     return value.toString();
 }
 
-inline String &toStringValue(Value &value)
+inline String&
+toStringValue(Value& value)
 {
     return value.toString();
 }
 
-inline const std::string &toString(std::shared_ptr<Value> value)
+inline const std::string&
+toString(std::shared_ptr<Value> value)
 {
     return value::reference(value).toString().value();
 }
 
-inline const std::string &toString(std::shared_ptr<const Value> value)
+inline const std::string&
+toString(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toString().value();
 }
 
-inline const std::string &toString(const std::unique_ptr<Value> &value)
+inline const std::string&
+toString(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toString().value();
 }
 
-inline const std::string &toString(const Value &value)
+inline const std::string&
+toString(const Value& value)
 {
     return value.toString().value();
 }
 
-inline std::string &toString(Value &value)
+inline std::string&
+toString(Value& value)
 {
     return value.toString().value();
 }

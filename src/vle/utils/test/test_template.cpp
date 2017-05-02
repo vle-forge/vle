@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -42,14 +42,14 @@
 
 using namespace vle;
 
-const char *tpl1 = "@@tag test1@package.name-ext1_ext2 @@"
+const char* tpl1 = "@@tag test1@package.name-ext1_ext2 @@"
                    "azertyuiop qsdfghjklm wxcvbn,;:!"
                    "@@end tag@@"
                    "a) My name is {{name}} and I am {{year}} old\n"
                    "b) My name is {{name}} and I am {{year}} old\n"
                    "c) My name is {{name}} and I am {{year}} olds\n";
 
-const char *tpl2 = "class {{name}} : public DifferenceEquation::Multiple\n"
+const char* tpl2 = "class {{name}} : public DifferenceEquation::Multiple\n"
                    "{\n"
                    "public:\n"
                    "    {{name}}(\n"
@@ -77,7 +77,7 @@ const char *tpl2 = "class {{name}} : public DifferenceEquation::Multiple\n"
                    "\n"
                    "};\n";
 
-const char *tpl3 = "class {{name}} : public DifferenceEquation::Multiple\n"
+const char* tpl3 = "class {{name}} : public DifferenceEquation::Multiple\n"
                    "{\n"
                    "public:\n"
                    "    {{name}}(\n"
@@ -112,21 +112,22 @@ const char *tpl3 = "class {{name}} : public DifferenceEquation::Multiple\n"
                    "\n"
                    "};\n";
 
-const char *tpl4 = "@tag test1@package.name-ext1_ext2 @@"
+const char* tpl4 = "@tag test1@package.name-ext1_ext2 @@"
                    "azertyuiop qsdfghjklm wxcvbn,;:!"
                    "@@end tag@@"
                    "a) My name is {{name}} and I am {{year}} old\n"
                    "b) My name is {{name}} and I am {{year}} old\n"
                    "c) My name is {{name}} and I am {{year}} olds\n";
 
-const char *tpl5 = "@@end tag@@"
+const char* tpl5 = "@@end tag@@"
                    "azertyuiop qsdfghjklm wxcvbn,;:!"
                    "@@tag tag@@"
                    "a) My name is {{name}} and I am {{year}} old\n"
                    "b) My name is {{name}} and I am {{year}} old\n"
                    "c) My name is {{name}} and I am {{year}} olds\n";
 
-void test_template_simple()
+void
+test_template_simple()
 {
     vle::utils::Template tpl(tpl1);
     tpl.stringSymbol().append("name", "toto");
@@ -146,7 +147,8 @@ void test_template_simple()
                  "c) My name is toto and I am 74 olds\n");
 }
 
-void test_template_for()
+void
+test_template_for()
 {
     vle::utils::Template tpl(tpl2);
 
@@ -203,7 +205,8 @@ void test_template_for()
                  "};\n");
 }
 
-void test_template_for_if()
+void
+test_template_for_if()
 {
     vle::utils::Template tpl(tpl3);
 
@@ -250,7 +253,8 @@ void test_template_for_if()
                  "};\n");
 }
 
-void test_template_for_ifnot()
+void
+test_template_for_ifnot()
 {
     vle::utils::Template tpl(tpl3);
 
@@ -300,7 +304,8 @@ void test_template_for_ifnot()
                  "};\n");
 }
 
-void test_template_tag()
+void
+test_template_tag()
 {
     std::string plugin, package, conf;
 
@@ -323,7 +328,8 @@ void test_template_tag()
     }
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

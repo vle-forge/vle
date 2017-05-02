@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,17 +24,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_MANAGER_MANAGER_HPP
 #define VLE_MANAGER_MANAGER_HPP
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/Context.hpp>
-#include <vle/manager/Types.hpp>
-#include <vle/vpz/Vpz.hpp>
 #include <chrono>
+#include <vle/DllDefines.hpp>
+#include <vle/manager/Types.hpp>
+#include <vle/utils/Context.hpp>
+#include <vle/vpz/Vpz.hpp>
 
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
 
 /**
  * @c manager::Manager permits to run experimental frames.
@@ -54,16 +54,16 @@ class VLE_API Manager
 public:
     using result_type = std::unique_ptr<value::Matrix>;
 
-    Manager(utils::ContextPtr     context,
-            LogOptions            logoptions,
-            SimulationOptions     simulationoptions,
-            std::ostream         *output);
+    Manager(utils::ContextPtr context,
+            LogOptions logoptions,
+            SimulationOptions simulationoptions,
+            std::ostream* output);
 
-    Manager(utils::ContextPtr          context,
-            LogOptions                 logoptions,
-            SimulationOptions          simulationoptions,
-            std::chrono::milliseconds  timeout,
-            std::ostream              *output);
+    Manager(utils::ContextPtr context,
+            LogOptions logoptions,
+            SimulationOptions simulationoptions,
+            std::chrono::milliseconds timeout,
+            std::ostream* output);
 
     ~Manager();
 
@@ -89,18 +89,17 @@ public:
      *
      * @return A @c value::Matrix to freed.
      */
-    std::unique_ptr<value::Matrix>
-        run(std::unique_ptr<vpz::Vpz> exp,
-            uint32_t thread,
-            uint32_t rank,
-            uint32_t world,
-            Error *error);
+    std::unique_ptr<value::Matrix> run(std::unique_ptr<vpz::Vpz> exp,
+                                       uint32_t thread,
+                                       uint32_t rank,
+                                       uint32_t world,
+                                       Error* error);
 
 private:
     class Pimpl;
     std::unique_ptr<Pimpl> mPimpl;
 };
-
-}} // namespace vle manager
+}
+} // namespace vle manager
 
 #endif

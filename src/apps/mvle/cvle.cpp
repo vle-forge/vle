@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2016 INRA http://www.inra.fr
+ * Copyright (c) 2014-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -70,35 +70,36 @@
 
 typedef std::shared_ptr<vle::vpz::Vpz> VpzPtr;
 
-void generate_template_line(std::ostream &header,
-                            std::ostream &firstline,
-                            std::string name,
-                            const std::shared_ptr<vle::value::Value> &value)
+void
+generate_template_line(std::ostream& header,
+                       std::ostream& firstline,
+                       std::string name,
+                       const std::shared_ptr<vle::value::Value>& value)
 {
-    std::stack<std::tuple<std::string, const vle::value::Value *>> stack;
+    std::stack<std::tuple<std::string, const vle::value::Value*>> stack;
 
     stack.push(std::make_tuple(name, value.get()));
 
     while (not stack.empty()) {
         std::string name;
-        const vle::value::Value *value;
+        const vle::value::Value* value;
 
         std::tie(name, value) = stack.top();
         stack.pop();
 
         switch (value->getType()) {
         case vle::value::Value::SET: {
-            auto &set = value->toSet();
+            auto& set = value->toSet();
             for (std::size_t i = 0, e = set.size(); i != e; ++i) {
                 std::string newname = name + '.' + std::to_string(i);
-                const vle::value::Value *newvalue = set.get(i).get();
+                const vle::value::Value* newvalue = set.get(i).get();
                 stack.emplace(newname, newvalue);
             }
         } break;
         case vle::value::Value::MAP:
-            for (auto &value_map : value->toMap()) {
+            for (auto& value_map : value->toMap()) {
                 std::string newname = name + '.' + value_map.first;
-                const vle::value::Value *newvalue = value_map.second.get();
+                const vle::value::Value* newvalue = value_map.second.get();
 
                 stack.emplace(newname, newvalue);
             }
@@ -123,15 +124,15 @@ void generate_template_line(std::ostream &header,
     }
 }
 
-void generate_template(std::string file,
-                       std::string package,
-                       std::string exp) noexcept
+void
+generate_template(std::string file,
+                  std::string package,
+                  std::string exp) noexcept
 {
     std::ofstream ofs(file);
     if (not ofs.is_open()) {
-        fprintf(stderr,
-                "Failed to open `%s' to generate template\n",
-                file.c_str());
+        fprintf(
+          stderr, "Failed to open `%s' to generate template\n", file.c_str());
         return;
     }
 
@@ -178,8 +179,7 @@ void generate_template(std::string file,
 
         ofs << '\n';
         ofs << oss.str() << '\n';
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         fprintf(stderr, "Failed to generate template file: %s\n", e.what());
     }
 }
@@ -191,8 +191,9 @@ void generate_template(std::string file,
  * Accessor c("cond.port.1.value");
  * @endcode
  */
-struct Access {
-    Access(const std::string &str)
+struct Access
+{
+    Access(const std::string& str)
     {
         namespace ba = boost::algorithm;
 
@@ -214,7 +215,7 @@ struct Access {
             condition = tokens[0];
             port = tokens[1];
             std::copy(
-                tokens.begin() + 2, tokens.end(), std::back_inserter(params));
+              tokens.begin() + 2, tokens.end(), std::back_inserter(params));
             break;
         }
 
@@ -223,7 +224,7 @@ struct Access {
                (params.empty() and not port.empty()) or port.empty());
     }
 
-    friend std::ostream &operator<<(std::ostream &os, const Access &access)
+    friend std::ostream& operator<<(std::ostream& os, const Access& access)
     {
         os << access.condition;
 
@@ -236,22 +237,25 @@ struct Access {
         return os;
     }
 
-    inline bool is_undefined_string() const { return port.empty(); }
+    inline bool is_undefined_string() const
+    {
+        return port.empty();
+    }
 
     /**
      * \c value function tries to convert the \c Access object into a
      * \c vle::value::Value pointer by browsing the experimental condition
      * of the \e vpz arguement.
      */
-    vle::value::Value *value(VpzPtr vpz) const
+    vle::value::Value* value(VpzPtr vpz) const
     {
-        auto &cnd = vpz->project().experiment().conditions().get(condition);
-        auto &set = cnd.getSetValues(port);
+        auto& cnd = vpz->project().experiment().conditions().get(condition);
+        auto& set = cnd.getSetValues(port);
 
         if (params.empty())
             return set[0].get();
 
-        vle::value::Value *current = set[0].get();
+        vle::value::Value* current = set[0].get();
         for (std::size_t i = 0, e = params.size(); i != e; ++i) {
             if (current->isSet()) {
                 errno = 0;
@@ -259,36 +263,34 @@ struct Access {
 
                 if (errno or val < 0 or
                     val >=
-                        boost::numeric_cast<long int>(current->toSet().size()))
+                      boost::numeric_cast<long int>(current->toSet().size()))
                     throw vle::utils::ArgError(
-                        _("Fails to convert '%s.%s' parameter '%zu'"
-                          " as correct set index"),
-                        condition.c_str(),
-                        port.c_str(),
-                        i);
+                      _("Fails to convert '%s.%s' parameter '%zu'"
+                        " as correct set index"),
+                      condition.c_str(),
+                      port.c_str(),
+                      i);
 
                 current = current->toSet()[val].get();
-            }
-            else if (current->isMap()) {
+            } else if (current->isMap()) {
                 auto it = current->toMap().find(params[i]);
 
                 if (it == current->toMap().end())
                     throw vle::utils::ArgError(
-                        _("Fails to convert '%s.%s' parameter '%zu'"
-                          " as correct map index"),
-                        condition.c_str(),
-                        port.c_str(),
-                        i);
+                      _("Fails to convert '%s.%s' parameter '%zu'"
+                        " as correct map index"),
+                      condition.c_str(),
+                      port.c_str(),
+                      i);
 
                 current = it->second.get();
-            }
-            else {
+            } else {
                 throw vle::utils::ArgError(
-                    _("Fails to convert '%s.%s' parameter '%zu' as correct "
-                      "map index"),
-                    condition.c_str(),
-                    port.c_str(),
-                    i);
+                  _("Fails to convert '%s.%s' parameter '%zu' as correct "
+                    "map index"),
+                  condition.c_str(),
+                  port.c_str(),
+                  i);
             }
 
             if (not current)
@@ -317,7 +319,8 @@ struct Access {
  * @param str [description]
  * @return [description]
  */
-static std::string cleanup_token(const std::string &str)
+static std::string
+cleanup_token(const std::string& str)
 {
     if (str.size() >= 2u and str[0] == '"' and str[str.size() - 1] == '"')
         return str.substr(1, str.size() - 2u);
@@ -336,8 +339,8 @@ static std::string cleanup_token(const std::string &str)
  *
  * @return [description]
  */
-static void assign_string_to_value(vle::value::Value *value,
-                                   const std::string &str)
+static void
+assign_string_to_value(vle::value::Value* value, const std::string& str)
 {
     assert(value);
 
@@ -360,39 +363,50 @@ static void assign_string_to_value(vle::value::Value *value,
 
     default:
         throw vle::utils::ArgError(
-            _("fail to assign string token `%s' to value"), str.c_str());
+          _("fail to assign string token `%s' to value"), str.c_str());
     }
 }
 
-struct ColumnDefinition {
-    ColumnDefinition(const std::string &str_)
-        : str(str_)
-        , value(nullptr)
+struct ColumnDefinition
+{
+    ColumnDefinition(const std::string& str_)
+      : str(str_)
+      , value(nullptr)
     {
     }
 
-    ColumnDefinition(vle::value::Value *value_)
-        : str()
-        , value(value_)
+    ColumnDefinition(vle::value::Value* value_)
+      : str()
+      , value(value_)
     {
     }
 
     std::string str;
-    vle::value::Value *value;
+    vle::value::Value* value;
 };
 
-struct Columns {
+struct Columns
+{
     typedef std::vector<ColumnDefinition> container_type;
     typedef container_type::iterator iterator;
     typedef container_type::const_iterator const_iterator;
 
-    void add(const std::string &str) { data.emplace_back(str); }
+    void add(const std::string& str)
+    {
+        data.emplace_back(str);
+    }
 
-    void add(vle::value::Value *value) { data.emplace_back(value); }
+    void add(vle::value::Value* value)
+    {
+        data.emplace_back(value);
+    }
 
-    std::size_t size() const { return data.size(); }
+    std::size_t size() const
+    {
+        return data.size();
+    }
 
-    void update(std::size_t id, const std::string &str)
+    void update(std::size_t id, const std::string& str)
     {
         if (id >= data.size())
             throw vle::utils::InternalError(_("Too many column data"));
@@ -403,14 +417,14 @@ struct Columns {
             assign_string_to_value(data[id].value, str);
     }
 
-    void printf(FILE *f) const
+    void printf(FILE* f) const
     {
         for (std::size_t i = 0, e = data.size(); i != e; ++i)
             if (not data[i].value)
                 fprintf(f, "%s ", data[i].str.c_str());
     }
 
-    friend std::ostream &operator<<(std::ostream &os, const Columns &columns)
+    friend std::ostream& operator<<(std::ostream& os, const Columns& columns)
     {
         for (std::size_t i = 0, e = columns.data.size(); i != e; ++i)
             if (not columns.data[i].value)
@@ -422,9 +436,10 @@ struct Columns {
     container_type data;
 };
 
-struct ConditionsBackup {
-    ConditionsBackup(const vle::vpz::Vpz& vpz) :
-        mconds(vpz.project().experiment().conditions())
+struct ConditionsBackup
+{
+    ConditionsBackup(const vle::vpz::Vpz& vpz)
+      : mconds(vpz.project().experiment().conditions())
     {
     }
 
@@ -435,7 +450,7 @@ struct ConditionsBackup {
             for (auto port : cond_cvle) {
                 if (port.first == "has_simulation_engine") {
                     const std::vector<std::shared_ptr<vle::value::Value>>&
-                         vals= port.second;
+                      vals = port.second;
                     if (vals.size() > 0) {
                         return (vals.at(0)->isBoolean() and
                                 vals.at(0)->toBoolean().value());
@@ -446,27 +461,26 @@ struct ConditionsBackup {
         return false;
     }
 
-
     void modify(vle::vpz::Vpz& toupdate, const vle::vpz::Conditions& other)
     {
-        //check if one should modify simulation_engine
+        // check if one should modify simulation_engine
         bool modif_engine = false;
         if (other.exist("_cvle_cond")) {
             const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
             for (auto port : cond_cvle) {
                 if (port.first == "has_simulation_engine") {
                     const std::vector<std::shared_ptr<vle::value::Value>>&
-                       vals= port.second;
-                    modif_engine = (vals.size() > 0)
-                                    and (vals.at(0)->isBoolean()
-                                    and vals.at(0)->toBoolean().value());
+                      vals = port.second;
+                    modif_engine =
+                      (vals.size() > 0) and (vals.at(0)->isBoolean() and
+                                             vals.at(0)->toBoolean().value());
                 }
             }
         }
 
-        //modify
+        // modify
         vle::vpz::Conditions& toup_conds =
-                toupdate.project().experiment().conditions();
+          toupdate.project().experiment().conditions();
         for (auto cond : other) {
             if (cond.first != "_cvle_cond" and
                 (cond.first != "simulation_engine" or modif_engine)) {
@@ -477,7 +491,7 @@ struct ConditionsBackup {
                 for (auto port : cond.second) {
 
                     vle::vpz::ConditionValues::iterator toup_port =
-                            toup_cond.conditionvalues().find(port.first);
+                      toup_cond.conditionvalues().find(port.first);
                     if (toup_port != toup_cond.conditionvalues().end()) {
                         toup_cond.conditionvalues().erase(toup_port);
                     }
@@ -491,10 +505,10 @@ struct ConditionsBackup {
     }
 
     void restoreBackup(vle::vpz::Vpz& toupdate,
-            const vle::vpz::Conditions& other)
+                       const vle::vpz::Conditions& other)
     {
         vle::vpz::Conditions& toup_conds =
-                toupdate.project().experiment().conditions();
+          toupdate.project().experiment().conditions();
         for (auto cond : other) {
             if (cond.first != "_cvle_cond") {
                 if (not mconds.exist(cond.first)) {
@@ -513,12 +527,12 @@ struct ConditionsBackup {
         }
         const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
         vle::vpz::ConditionValues::const_iterator it_id =
-                cond_cvle.conditionvalues().find("id");
+          cond_cvle.conditionvalues().find("id");
         if (it_id == cond_cvle.conditionvalues().end()) {
             return "no_id";
         }
-        const std::vector<std::shared_ptr<vle::value::Value>>&
-                            vals= it_id->second;
+        const std::vector<std::shared_ptr<vle::value::Value>>& vals =
+          it_id->second;
         if (vals.size() == 0) {
             return "no_id";
         }
@@ -531,9 +545,8 @@ struct ConditionsBackup {
     vle::vpz::Conditions mconds;
 };
 
-
-std::ostream &operator<<(std::ostream &os,
-                         const std::unique_ptr<vle::value::Matrix> &value)
+std::ostream&
+operator<<(std::ostream& os, const std::unique_ptr<vle::value::Matrix>& value)
 {
     if (value->rows() <= 0 or value->columns() <= 0)
         return os;
@@ -543,9 +556,9 @@ std::ostream &operator<<(std::ostream &os,
             switch (value->get(i, value->rows() - 1)->getType()) {
             case vle::value::Value::BOOLEAN:
                 os << (value->get(i, value->rows() - 1)->toBoolean().value() ==
-                               true
-                           ? "true"
-                           : "false");
+                           true
+                         ? "true"
+                         : "false");
                 break;
 
             case vle::value::Value::INTEGER:
@@ -563,8 +576,8 @@ std::ostream &operator<<(std::ostream &os,
 
             default:
                 throw vle::utils::FileError(
-                    _("fail to write a value (only bool, integer, double "
-                      "and string are available"));
+                  _("fail to write a value (only bool, integer, double "
+                    "and string are available"));
             }
         }
 
@@ -575,7 +588,8 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 }
 
-class Worker {
+class Worker
+{
 private:
     using MapPtr = std::unique_ptr<vle::value::Map>;
 
@@ -585,11 +599,11 @@ private:
     std::string m_vpzfilename;
     std::unique_ptr<vle::manager::Simulation> m_simulator;
     VpzPtr m_vpz;
-    std::unique_ptr<Columns> m_columns;//used for simple values
-    std::unique_ptr<ConditionsBackup> m_conditions;//used for complex values
+    std::unique_ptr<Columns> m_columns;             // used for simple values
+    std::unique_ptr<ConditionsBackup> m_conditions; // used for complex values
     bool m_warnings;
 
-    void simulate(std::ostream &os)
+    void simulate(std::ostream& os)
     {
         vle::manager::Error error;
 
@@ -609,8 +623,7 @@ private:
             } else {
                 os << error.message << "\n";
             }
-        }
-        else if (result == NULL) {
+        } else if (result == NULL) {
             if (m_warnings) {
                 fprintf(stderr,
                         _("Simulation without result (try storage as"
@@ -620,10 +633,9 @@ private:
                 }
             } else {
                 os << "cvle worker error: no result "
-                   << " (try storage as output plugin)\n" ;
+                   << " (try storage as output plugin)\n";
             }
-        }
-        else {
+        } else {
             for (auto it = result->begin(), et = result->end(); it != et;
                  ++it) {
                 if (it->second && it->second->isMatrix()) {
@@ -635,39 +647,41 @@ private:
     }
 
 public:
-    Worker(const std::string &package,
+    Worker(const std::string& package,
            std::chrono::milliseconds timeout,
-           const std::string &vpz,
+           const std::string& vpz,
            bool withoutspawn,
            bool warnings)
-        : m_context(vle::utils::make_context())
-        , m_timeout(timeout)
-        , m_packagename(package)
-        , m_simulator(nullptr)
-        , m_warnings(warnings)
+      : m_context(vle::utils::make_context())
+      , m_timeout(timeout)
+      , m_packagename(package)
+      , m_simulator(nullptr)
+      , m_warnings(warnings)
     {
         if (not withoutspawn) {
-            m_simulator.reset(new vle::manager::Simulation(m_context,
-                                  vle::manager::LOG_NONE,
-                                  vle::manager::SIMULATION_NONE |
-                                      vle::manager::SIMULATION_SPAWN_PROCESS,
-                                  timeout,
-                                  nullptr));
+            m_simulator.reset(new vle::manager::Simulation(
+              m_context,
+              vle::manager::LOG_NONE,
+              vle::manager::SIMULATION_NONE |
+                vle::manager::SIMULATION_SPAWN_PROCESS,
+              timeout,
+              nullptr));
         } else {
-            m_simulator.reset(new vle::manager::Simulation(m_context,
-                                  vle::manager::LOG_NONE,
-                                  vle::manager::SIMULATION_NONE,
-                                  timeout,
-                                  nullptr));
+            m_simulator.reset(
+              new vle::manager::Simulation(m_context,
+                                           vle::manager::LOG_NONE,
+                                           vle::manager::SIMULATION_NONE,
+                                           timeout,
+                                           nullptr));
         }
         m_context->set_log_priority(3);
         vle::utils::Package pack(m_context);
         pack.select(m_packagename);
         m_vpz = std::make_unique<vle::vpz::Vpz>(
-            pack.getExpFile(vpz, vle::utils::PKG_BINARY));
+          pack.getExpFile(vpz, vle::utils::PKG_BINARY));
     }
 
-    void init(const std::string &header)
+    void init(const std::string& header)
     {
         if (header == "_cvle_complex_values") {
             m_conditions.reset(new ConditionsBackup(*m_vpz));
@@ -683,15 +697,14 @@ public:
 
                 if (access.is_undefined_string()) {
                     m_columns->add(access.condition);
-                }
-                else {
+                } else {
                     m_columns->add(access.value(m_vpz));
                 }
             }
         }
     }
 
-    std::string run(const std::string &block)
+    std::string run(const std::string& block)
     {
         std::ostringstream result;
         std::vector<std::string> output;
@@ -699,7 +712,7 @@ public:
         std::string::size_type end;
         result.imbue(std::locale::classic());
         result << std::setprecision(std::floor(
-                      std::numeric_limits<double>::digits * std::log10(2) + 2))
+                    std::numeric_limits<double>::digits * std::log10(2) + 2))
                << std::scientific;
 
         for (begin = 0, end = block.find('\n'); begin < block.size();
@@ -707,7 +720,7 @@ public:
             std::string buffer(block, begin, end - begin);
             if (m_columns) { // use columns
                 boost::algorithm::split(
-                        output, buffer, boost::algorithm::is_any_of(","));
+                  output, buffer, boost::algorithm::is_any_of(","));
 
                 for (std::size_t i = 0, e = output.size(); i != e; ++i) {
                     std::string current = cleanup_token(output[i]);
@@ -717,13 +730,13 @@ public:
                 result << *m_columns << "\n";
                 simulate(result);
                 result << '\n';
-            } else { //use vpz
+            } else { // use vpz
                 vle::vpz::Vpz temp;
                 vle::vpz::SaxParser parser(temp);
                 parser.parseMemory(buffer);
                 vle::vpz::Conditions conds =
-                        temp.project().experiment().conditions();
-                std::vector <std::string> condNames = conds.conditionnames();
+                  temp.project().experiment().conditions();
+                std::vector<std::string> condNames = conds.conditionnames();
                 m_conditions->modify(*m_vpz, conds);
                 result << m_conditions->getId(conds) << "\n";
                 simulate(result);
@@ -736,11 +749,17 @@ public:
     }
 };
 
-template <typename T> struct no_deleter {
-    void operator()(T *) {}
+template <typename T>
+struct no_deleter
+{
+    void operator()(T*)
+    {
+    }
 };
 
-template <typename T> std::shared_ptr<T> open(const std::string &file)
+template <typename T>
+std::shared_ptr<T>
+open(const std::string& file)
 {
     auto fs = std::make_shared<T>(file.c_str());
 
@@ -750,17 +769,18 @@ template <typename T> std::shared_ptr<T> open(const std::string &file)
     return fs;
 }
 
-class Root {
+class Root
+{
     std::shared_ptr<std::istream> m_is;
     std::shared_ptr<std::ostream> m_os;
     std::ofstream m_ofs;
     int m_blocksize;
 
 public:
-    Root(const std::string &input, const std::string &output, int blocksize)
-        : m_is(&std::cin, no_deleter<std::istream>())
-        , m_os(&std::cout, no_deleter<std::ostream>())
-        , m_blocksize(blocksize)
+    Root(const std::string& input, const std::string& output, int blocksize)
+      : m_is(&std::cin, no_deleter<std::istream>())
+      , m_os(&std::cout, no_deleter<std::ostream>())
+      , m_blocksize(blocksize)
     {
         if (!input.empty())
             m_is = open<std::ifstream>(input);
@@ -769,13 +789,13 @@ public:
             m_os = open<std::ofstream>(output);
     }
 
-    bool header(std::string &header)
+    bool header(std::string& header)
     {
         std::getline(*m_is.get(), header);
         return m_is.get()->good();
     }
 
-    bool read(std::string &block)
+    bool read(std::string& block)
     {
         int i = 0;
         block.clear();
@@ -791,8 +811,7 @@ public:
                 block += tmp;
                 block += '\n';
                 ++i;
-            }
-            else {
+            } else {
                 return not block.empty();
             }
         }
@@ -800,22 +819,24 @@ public:
         return true;
     }
 
-    void write(const std::string &block)
+    void write(const std::string& block)
     {
         (*m_os.get()) << block;
         m_os->flush();
     }
 };
 
-enum CommunicationTag {
+enum CommunicationTag
+{
     worker_block_todo_tag,
     worker_block_end_tag,
     worker_end_tag
 };
 
-int run_as_master(const std::string &inputfile,
-                  const std::string &outputfile,
-                  int blocksize)
+int
+run_as_master(const std::string& inputfile,
+              const std::string& outputfile,
+              int blocksize)
 {
     int ret = EXIT_SUCCESS;
     int blockid = 0;
@@ -833,8 +854,7 @@ int run_as_master(const std::string &inputfile,
                 printf(_("master sends block %d to %d\n"), blockid++, child);
                 comm.send(child, worker_block_todo_tag, block);
                 workers[child] = true;
-            }
-            else
+            } else
                 break;
         }
 
@@ -848,9 +868,8 @@ int run_as_master(const std::string &inputfile,
             end = !r.read(block);
 
             if (!block.empty()) {
-                printf(_("master sends block %d to %d\n"),
-                       blockid++,
-                       msg.source());
+                printf(
+                  _("master sends block %d to %d\n"), blockid++, msg.source());
                 comm.send(msg.source(), worker_block_todo_tag, block);
                 workers[msg.source()] = true;
             }
@@ -866,8 +885,7 @@ int run_as_master(const std::string &inputfile,
 
         for (int child = 1; child < comm.size(); ++child)
             comm.send(child, worker_end_tag);
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         std::fprintf(stderr, "master fails: %s\n", e.what());
         ret = EXIT_SUCCESS;
     }
@@ -875,11 +893,12 @@ int run_as_master(const std::string &inputfile,
     return ret;
 }
 
-int run_as_worker(const std::string &package,
-                  const std::string &vpz,
-                  std::chrono::milliseconds timeout,
-                  bool withoutspawn,
-                  bool warnings)
+int
+run_as_worker(const std::string& package,
+              const std::string& vpz,
+              std::chrono::milliseconds timeout,
+              bool withoutspawn,
+              bool warnings)
 {
     int ret = EXIT_SUCCESS;
 
@@ -908,8 +927,7 @@ int run_as_worker(const std::string &package,
                 break;
             }
         }
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         std::fprintf(stderr, "worker fails: %s\n", e.what());
         ret = EXIT_FAILURE;
     }
@@ -917,7 +935,8 @@ int run_as_worker(const std::string &package,
     return ret;
 }
 
-void show_help()
+void
+show_help()
 {
     printf(_("cvle [options...]\n\n"
              "  help,h                          Produce help message\n"
@@ -935,32 +954,35 @@ void show_help()
              " [default 5000]\n"));
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
     std::string package_name;
     std::string input_file, output_file, template_file;
-    std::chrono::milliseconds timeout{std::chrono::milliseconds::zero()};
+    std::chrono::milliseconds timeout{ std::chrono::milliseconds::zero() };
     int withoutspawn = 0;
     int warnings = 0;
     int block_size = 5000;
     int ret = EXIT_SUCCESS;
 
-    const char *const short_opts = "hP:i:o:t:b:";
-    const struct option long_opts[] = {{"help", 0, nullptr, 'h'},
-                                       {"timeout", 1, nullptr, 0},
-                                       {"package", 1, nullptr, 'P'},
-                                       {"input-file", 1, nullptr, 'i'},
-                                       {"output-file", 1, nullptr, 'o'},
-                                       {"template", 1, nullptr, 't'},
-                                       {"withoutspawn", 0, &withoutspawn, 1},
-                                       {"warnings", 0, &warnings, 1},
-                                       {"block-size", 1, nullptr, 'b'},
-                                       {0, 0, nullptr, 0}};
+    const char* const short_opts = "hP:i:o:t:b:";
+    const struct option long_opts[] = {
+        { "help", 0, nullptr, 'h' },
+        { "timeout", 1, nullptr, 0 },
+        { "package", 1, nullptr, 'P' },
+        { "input-file", 1, nullptr, 'i' },
+        { "output-file", 1, nullptr, 'o' },
+        { "template", 1, nullptr, 't' },
+        { "withoutspawn", 0, &withoutspawn, 1 },
+        { "warnings", 0, &warnings, 1 },
+        { "block-size", 1, nullptr, 'b' },
+        { 0, 0, nullptr, 0 }
+    };
     int opt_index;
 
     for (;;) {
         const auto opt =
-            getopt_long(argc, argv, short_opts, long_opts, &opt_index);
+          getopt_long(argc, argv, short_opts, long_opts, &opt_index);
         if (opt == -1)
             break;
 
@@ -972,8 +994,7 @@ int main(int argc, char *argv[])
                     if (t <= 0)
                         throw std::exception();
                     timeout = std::chrono::milliseconds(t);
-                }
-                catch (const std::exception & /*e*/) {
+                } catch (const std::exception& /*e*/) {
                     fprintf(stderr,
                             _("Bad timeout: %s Assume no timeout\n"),
                             ::optarg);
@@ -998,8 +1019,7 @@ int main(int argc, char *argv[])
         case 'b':
             try {
                 block_size = std::stoi(::optarg);
-            }
-            catch (const std::exception & /* e */) {
+            } catch (const std::exception& /* e */) {
                 fprintf(stderr,
                         _("Bad block size: %s. "
                           "Assume block size=%d\n"),
@@ -1017,7 +1037,7 @@ int main(int argc, char *argv[])
 
     if (package_name.empty()) {
         printf(
-            _("Usage: cvle --package test tutu.vpz -i in.csv -o out.csv\n"));
+          _("Usage: cvle --package test tutu.vpz -i in.csv -o out.csv\n"));
         return ret;
     }
 
@@ -1027,7 +1047,7 @@ int main(int argc, char *argv[])
     std::vector<std::string> vpz(argv + ::optind, argv + argc);
     if (vpz.size() > 1)
         fprintf(
-            stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
+          stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
 
     if (comm.rank() == 0 and not template_file.empty())
         generate_template(template_file, package_name, vpz.front());
@@ -1050,11 +1070,11 @@ int main(int argc, char *argv[])
                (input_file.empty()) ? "stdin" : input_file.c_str(),
                (output_file.empty()) ? "stdout" : output_file.c_str());
 
-        for (const auto &elem : vpz)
+        for (const auto& elem : vpz)
             printf("%s ", elem.c_str());
         printf("\n");
         return run_as_master(input_file, output_file, block_size);
     }
-    return run_as_worker(package_name, vpz.front(), timeout,
-            withoutspawn, warnings);
+    return run_as_worker(
+      package_name, vpz.front(), timeout, withoutspawn, warnings);
 }

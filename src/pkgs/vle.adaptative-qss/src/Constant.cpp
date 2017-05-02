@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 INRA
+ * Copyright 2016-2017 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -79,9 +79,15 @@ public:
         }
     }
 
-    virtual vd::Time timeAdvance() const override { return vd::infinity; }
+    virtual vd::Time timeAdvance() const override
+    {
+        return vd::infinity;
+    }
 
-    void internalTransition(vd::Time /*time*/) override { m_outputs.clear(); }
+    void internalTransition(vd::Time /*time*/) override
+    {
+        m_outputs.clear();
+    }
 };
 
 DECLARE_DYNAMICS(Constant)

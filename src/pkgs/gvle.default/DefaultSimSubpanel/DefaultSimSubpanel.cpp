@@ -25,12 +25,12 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <vle/value/Matrix.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Context.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/manager/Simulation.hpp>
 #include "DefaultSimSubpanel.h"
+#include <vle/manager/Simulation.hpp>
+#include <vle/utils/Context.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/value/Matrix.hpp>
 
 #include "ui_simpanelleft.h"
 #include "ui_simpanelright.h"
@@ -41,12 +41,17 @@ namespace gvle {
 struct sim_log : utils::Context::LogFunctor
 {
     std::vector<std::string>& log_messages;
-    sim_log(std::vector<std::string>& logMessages):log_messages(logMessages)
+    sim_log(std::vector<std::string>& logMessages)
+      : log_messages(logMessages)
     {
     }
 
-    virtual void write(const utils::Context& ctx, int priority,
-            const char *file, int line, const char *fn, const char *format,
+    virtual void write(const utils::Context& ctx,
+                       int priority,
+                       const char* file,
+                       int line,
+                       const char* fn,
+                       const char* format,
                        va_list args) noexcept override
     {
         (void)ctx;
@@ -56,18 +61,22 @@ struct sim_log : utils::Context::LogFunctor
         (void)fn;
         log_messages.emplace_back(vle::utils::vformat(format, args));
     }
-    virtual ~sim_log()
-    {
-    };
+    virtual ~sim_log(){};
 };
 
-
-
 DefaultSimSubpanelThread::DefaultSimSubpanelThread(
-        std::vector<std::string>& logMessages, bool debug,
-        int nbthreads, int blockSize): output_map(nullptr),
-    mvpz(0), mpkg(0), error_simu(""), log_messages(logMessages), mdebug(debug),
-    mnbthreads(nbthreads), mblockSize(blockSize)
+  std::vector<std::string>& logMessages,
+  bool debug,
+  int nbthreads,
+  int blockSize)
+  : output_map(nullptr)
+  , mvpz(0)
+  , mpkg(0)
+  , error_simu("")
+  , log_messages(logMessages)
+  , mdebug(debug)
+  , mnbthreads(nbthreads)
+  , mblockSize(blockSize)
 {
 }
 
@@ -86,16 +95,16 @@ DefaultSimSubpanelThread::onStarted()
 {
     auto ctx = utils::make_context();
     if (mdebug) {
-        ctx->set_log_priority(7);//VLE_LOG_DEBUG
-        ctx->set_log_function(std::unique_ptr<sim_log>(
-                              new sim_log(log_messages)));
+        ctx->set_log_priority(7); // VLE_LOG_DEBUG
+        ctx->set_log_function(
+          std::unique_ptr<sim_log>(new sim_log(log_messages)));
     } else {
-        ctx->set_log_priority(3);//VLE_LOG_ERROR
+        ctx->set_log_priority(3); // VLE_LOG_ERROR
     }
-    if (mnbthreads>0) {
+    if (mnbthreads > 0) {
         ctx->set_setting("vle.simulation.thread", (long)mnbthreads);
     }
-    if (mblockSize!=8) {
+    if (mblockSize != 8) {
         ctx->set_setting("vle.simulation.block-size", (long)mblockSize);
     }
 
@@ -106,37 +115,38 @@ DefaultSimSubpanelThread::onStarted()
         doSpawn = vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
-    vle::manager::Simulation sim(ctx, vle::manager::LOG_RUN,
+    vle::manager::Simulation sim(ctx,
+                                 vle::manager::LOG_RUN,
                                  doSpawn,
                                  std::chrono::milliseconds::zero(),
                                  &std::cout);
     vle::manager::Error manerror;
     output_map.reset(nullptr);
     std::unique_ptr<vle::vpz::Vpz> vpz(nullptr);
-    try{
-         vpz.reset(new vle::vpz::Vpz(mvpz->getFilename().toStdString()));
-        //set default location of outputs
+    try {
+        vpz.reset(new vle::vpz::Vpz(mvpz->getFilename().toStdString()));
+        // set default location of outputs
         vle::vpz::Outputs::iterator itb =
-            vpz->project().experiment().views().outputs().begin();
+          vpz->project().experiment().views().outputs().begin();
         vle::vpz::Outputs::iterator ite =
-            vpz->project().experiment().views().outputs().end();
-        for (; itb!=ite; itb++) {
+          vpz->project().experiment().views().outputs().end();
+        for (; itb != ite; itb++) {
             vle::vpz::Output& output = itb->second;
             if (output.location().empty()) {
-                mpkg->addDirectory("","output",vle::utils::PKG_SOURCE);
-                output.setStreamLocation(mpkg->getOutputDir(
-                                             vle::utils::PKG_SOURCE));
+                mpkg->addDirectory("", "output", vle::utils::PKG_SOURCE);
+                output.setStreamLocation(
+                  mpkg->getOutputDir(vle::utils::PKG_SOURCE));
             }
         }
-    } catch(const vle::utils::SaxParserError& e) {
+    } catch (const vle::utils::SaxParserError& e) {
         error_simu = QString("Error before simulation '%1'").arg(e.what());
     }
     if (vpz) {
-        output_map =  sim.run(std::move(vpz), &manerror);
+        output_map = sim.run(std::move(vpz), &manerror);
     }
     if (manerror.code != 0) {
         error_simu = QString("Error during simulation '%1'")
-                                            .arg(manerror.message.c_str());
+                       .arg(manerror.message.c_str());
         output_map.reset();
     }
 
@@ -145,8 +155,9 @@ DefaultSimSubpanelThread::onStarted()
 
 /*************** Left widget ***************************/
 
-DefaultSimSubpanelLeftWidget::DefaultSimSubpanelLeftWidget():
-        ui(new Ui::simpanelleft), customPlot(0)
+DefaultSimSubpanelLeftWidget::DefaultSimSubpanelLeftWidget()
+  : ui(new Ui::simpanelleft)
+  , customPlot(0)
 {
     ui->setupUi(this);
 }
@@ -158,9 +169,8 @@ DefaultSimSubpanelLeftWidget::~DefaultSimSubpanelLeftWidget()
 
 /*************** Right widget ***************************/
 
-
-DefaultSimSubpanelRightWidget::DefaultSimSubpanelRightWidget():
-                ui(new Ui::simpanelright)
+DefaultSimSubpanelRightWidget::DefaultSimSubpanelRightWidget()
+  : ui(new Ui::simpanelright)
 {
     ui->setupUi(this);
 }
@@ -172,38 +182,48 @@ DefaultSimSubpanelRightWidget::~DefaultSimSubpanelRightWidget()
 
 /*************** Default Sim panel ***************************/
 
-DefaultSimSubpanel::DefaultSimSubpanel():
-            PluginSimPanel(), debug(false), nbthreads(0), blockSize(8),
-            left(new DefaultSimSubpanelLeftWidget),
-            right(new DefaultSimSubpanelRightWidget), sim_process(0),
-            thread(0), mvpz(0), mpkg(0),mLog(0), timer(this), portsToPlot(),
-            log_messages(), index_message(0)
+DefaultSimSubpanel::DefaultSimSubpanel()
+  : PluginSimPanel()
+  , debug(false)
+  , nbthreads(0)
+  , blockSize(8)
+  , left(new DefaultSimSubpanelLeftWidget)
+  , right(new DefaultSimSubpanelRightWidget)
+  , sim_process(0)
+  , thread(0)
+  , mvpz(0)
+  , mpkg(0)
+  , mLog(0)
+  , timer(this)
+  , portsToPlot()
+  , log_messages()
+  , index_message(0)
 {
-    QObject::connect(left->ui->runButton,  SIGNAL(pressed()),
-                     this, SLOT(onRunPressed()));
+    QObject::connect(
+      left->ui->runButton, SIGNAL(pressed()), this, SLOT(onRunPressed()));
     QObject::connect(left->ui->debugCombo,
-                      SIGNAL(currentTextChanged(QString)),
-                     this, SLOT(onDebugChanged(QString)));
+                     SIGNAL(currentTextChanged(QString)),
+                     this,
+                     SLOT(onDebugChanged(QString)));
     QObject::connect(left->ui->threadsSpinBox,
                      SIGNAL(valueChanged(int)),
-                     this, SLOT(onThreadsChanged(int)));
-    QObject::connect(left->ui->blockSizeSpinBox,
-            SIGNAL(valueChanged(int)),
-            this, SLOT(onBlockSizeChanged(int)));
-    QObject::connect(right->ui->butSimColor, SIGNAL(clicked()),
-                     this, SLOT(onToolColor()));
-    QObject::connect(right->ui->treeSimViews,
-                     SIGNAL(itemChanged(QTreeWidgetItem *, int)),
                      this,
-                     SLOT(onTreeItemChanged(QTreeWidgetItem *, int)));
+                     SLOT(onThreadsChanged(int)));
+    QObject::connect(left->ui->blockSizeSpinBox,
+                     SIGNAL(valueChanged(int)),
+                     this,
+                     SLOT(onBlockSizeChanged(int)));
+    QObject::connect(
+      right->ui->butSimColor, SIGNAL(clicked()), this, SLOT(onToolColor()));
+    QObject::connect(right->ui->treeSimViews,
+                     SIGNAL(itemChanged(QTreeWidgetItem*, int)),
+                     this,
+                     SLOT(onTreeItemChanged(QTreeWidgetItem*, int)));
     QObject::connect(right->ui->treeSimViews,
                      SIGNAL(itemSelectionChanged()),
                      this,
                      SLOT(onTreeItemSelected()));
-    QObject::connect(&timer,
-                     SIGNAL(timeout()),
-                     this,
-                     SLOT(onTimeout()));
+    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
 DefaultSimSubpanel::~DefaultSimSubpanel()
@@ -247,13 +267,11 @@ DefaultSimSubpanel::rightWidget()
 void
 DefaultSimSubpanel::undo()
 {
-
 }
 
 void
 DefaultSimSubpanel::redo()
 {
-
 }
 
 PluginSimPanel*
@@ -267,22 +285,21 @@ DefaultSimSubpanel::showCustomPlot(bool b)
 {
     int stackSize = left->ui->stackPlot->count();
     if (stackSize < 1 or stackSize > 2) {
-        return ;
+        return;
     }
-    if (stackSize == 2){
+    if (stackSize == 2) {
         left->ui->stackPlot->removeWidget(left->ui->stackPlot->widget(1));
     }
     if (b) {
         left->ui->stackPlot->addWidget(left->customPlot);
         left->ui->stackPlot->setCurrentIndex(1);
     }
-
 }
 
 void
 DefaultSimSubpanel::addPortToPlot(QString view, QString port)
 {
-    for (unsigned int i=0; i<portsToPlot.size(); i++) {
+    for (unsigned int i = 0; i < portsToPlot.size(); i++) {
         const portToPlot& p = portsToPlot[i];
         if (p.view == view and p.port == port) {
             return;
@@ -291,7 +308,6 @@ DefaultSimSubpanel::addPortToPlot(QString view, QString port)
     portsToPlot.push_back(portToPlot(view, port));
     onTreeItemSelected();
 }
-
 
 void
 DefaultSimSubpanel::removePortToPlot(QString view, QString port)
@@ -330,7 +346,7 @@ DefaultSimSubpanel::getPortToPlot(QString view, QString port)
 void
 DefaultSimSubpanel::updateCustomPlot()
 {
-    //get results
+    // get results
     left->customPlot->clearGraphs();
     if (not sim_process or not sim_process->output_map) {
         return;
@@ -340,25 +356,25 @@ DefaultSimSubpanel::updateCustomPlot()
     unsigned int nbGraphs = 0;
     std::vector<portToPlot>::iterator itb = portsToPlot.begin();
     std::vector<portToPlot>::iterator ite = portsToPlot.end();
-    //compute bounds
+    // compute bounds
     double minyi = 99999999;
     double maxyi = -99999999;
     double minxi = 99999999;
     double maxxi = -99999999;
     for (; itb != ite; itb++) {
-        const vle::value::Matrix& view = simu.getMatrix(
-                itb->view.toStdString());
+        const vle::value::Matrix& view =
+          simu.getMatrix(itb->view.toStdString());
         QString portName = itb->port;
-        int index=-1;
-        for (unsigned int j=0; j<view.columns(); ++j) {
-            if (view.getString(j,0) == portName.toStdString()) {
+        int index = -1;
+        for (unsigned int j = 0; j < view.columns(); ++j) {
+            if (view.getString(j, 0) == portName.toStdString()) {
                 index = j;
             }
         }
         if (index != -1) {
-            for (unsigned int i=1; i<view.rows(); ++i) {
-                double xi = view.getDouble(0,i);//time column
-                double yi = getDouble(view, index, i, i ==1);
+            for (unsigned int i = 1; i < view.rows(); ++i) {
+                double xi = view.getDouble(0, i); // time column
+                double yi = getDouble(view, index, i, i == 1);
                 if (yi < minyi) {
                     minyi = yi;
                 }
@@ -374,79 +390,81 @@ DefaultSimSubpanel::updateCustomPlot()
             }
         }
     }
-    //enlarge bounds to get points on the sides
-    if (maxxi <= minxi ) {
+    // enlarge bounds to get points on the sides
+    if (maxxi <= minxi) {
         minxi = minxi - 0.5;
         maxxi = maxxi + 0.5;
     }
-    minxi = minxi - (maxxi-minxi)/100;
-    maxxi = maxxi + (maxxi-minxi)/100;
+    minxi = minxi - (maxxi - minxi) / 100;
+    maxxi = maxxi + (maxxi - minxi) / 100;
 
-    if (maxyi <= minyi ) {
+    if (maxyi <= minyi) {
         minyi = minyi - 0.5;
         maxyi = maxyi + 0.5;
     }
-    minyi = minyi - (maxyi-minyi)/100;
-    maxyi = maxyi + (maxyi-minyi)/100;
+    minyi = minyi - (maxyi - minyi) / 100;
+    maxyi = maxyi + (maxyi - minyi) / 100;
 
-    //plot graphs
+    // plot graphs
     left->customPlot->xAxis->setRange(minxi, maxxi);
     left->customPlot->yAxis->setRange(minyi, maxyi);
     left->customPlot->xAxis->setLabel("time");
     itb = portsToPlot.begin();
     for (; itb != ite; itb++) {
-        const vle::value::Matrix& view = simu.getMatrix(
-                itb->view.toStdString());
+        const vle::value::Matrix& view =
+          simu.getMatrix(itb->view.toStdString());
         QString portName = itb->port;
-        int index=-1;
-        for (unsigned int j=0; j<view.columns(); ++j) {
-            if (view.getString(j,0) == portName.toStdString()) {
+        int index = -1;
+        for (unsigned int j = 0; j < view.columns(); ++j) {
+            if (view.getString(j, 0) == portName.toStdString()) {
                 index = j;
             }
         }
         if (index != -1) {
-            QVector<double> x(view.rows()-1), y(view.rows()-1);
-            for (unsigned int i=1; i<view.rows(); ++i) {
-                x[i-1] = view.getDouble(0,i); //time
-                y[i-1] = getDouble(view, index, i, false);
+            QVector<double> x(view.rows() - 1), y(view.rows() - 1);
+            for (unsigned int i = 1; i < view.rows(); ++i) {
+                x[i - 1] = view.getDouble(0, i); // time
+                y[i - 1] = getDouble(view, index, i, false);
             }
             // create graph and assign data to it:
             left->customPlot->addGraph();
             if (x.size() == 1) {
                 left->customPlot->graph(nbGraphs)->setLineStyle(
-                        QCPGraph::lsNone);
+                  QCPGraph::lsNone);
                 left->customPlot->graph(nbGraphs)->setScatterStyle(
-                        QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
+                  QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
             }
-            left->customPlot->graph(nbGraphs)->setPen(
-                                    QPen(itb->color));
+            left->customPlot->graph(nbGraphs)->setPen(QPen(itb->color));
             left->customPlot->graph(nbGraphs)->setData(x, y);
             nbGraphs++;
         }
     }
     left->customPlot->replot();
-    showCustomPlot((nbGraphs>0));
+    showCustomPlot((nbGraphs > 0));
 }
 
-
 double
-DefaultSimSubpanel::getDouble(const vle::value::Matrix& view, unsigned int col,
-        unsigned int row, bool error_message)
+DefaultSimSubpanel::getDouble(const vle::value::Matrix& view,
+                              unsigned int col,
+                              unsigned int row,
+                              bool error_message)
 {
-    if (not view.get(col,row)) {
+    if (not view.get(col, row)) {
         if (error_message) {
             mLog->logExt(QString("output '%1' is null")
-                    .arg(view.getString(col, 0).c_str()), true);
+                           .arg(view.getString(col, 0).c_str()),
+                         true);
         }
         return 0;
-    } else if (view.get(col,row)->isInteger()) {
-        return (double) view.getInt(col,row);
-    } else if (view.get(col,row)->isDouble()){
-        return (double) view.getDouble(col,row);
+    } else if (view.get(col, row)->isInteger()) {
+        return (double)view.getInt(col, row);
+    } else if (view.get(col, row)->isDouble()) {
+        return (double)view.getDouble(col, row);
     } else {
         if (error_message) {
             mLog->logExt(QString("output '%1' is neither an int nor a double")
-                    .arg(view.getString(col, 0).c_str()), true);
+                           .arg(view.getString(col, 0).c_str()),
+                         true);
         }
         return 0;
     }
@@ -466,7 +484,7 @@ DefaultSimSubpanel::onSimulationFinished()
         QList<QTreeWidgetItem*> views_items;
         vle::value::Map::const_iterator itb = simu.begin();
         vle::value::Map::const_iterator ite = simu.end();
-        for (; itb != ite; itb ++) {
+        for (; itb != ite; itb++) {
             QString viewName(itb->first.c_str());
             QStringList viewType = mvpz->getViewTypeFromDoc(viewName);
             if (viewType.contains("timed") or viewType.contains("finish")) {
@@ -474,27 +492,30 @@ DefaultSimSubpanel::onSimulationFinished()
                 QTreeWidgetItem* vItem = new QTreeWidgetItem();
                 if (viewType.contains("timed")) {
                     double ts = mvpz->timeStepFromDoc(viewName);
-                    vItem->setText(0, QString("%1 (%2:%3)").arg(viewName)
-                            .arg("timed").arg(QVariant(ts).toString()));
+                    vItem->setText(0,
+                                   QString("%1 (%2:%3)")
+                                     .arg(viewName)
+                                     .arg("timed")
+                                     .arg(QVariant(ts).toString()));
                 } else {
-                    vItem->setText(0, QString("%1 (%2)").arg(viewName)
-                            .arg("finish"));
+                    vItem->setText(
+                      0, QString("%1 (%2)").arg(viewName).arg("finish"));
                 }
-                vItem->setData(0, Qt::UserRole+0, "view");
-                vItem->setData(0, Qt::UserRole+1, viewName);
+                vItem->setData(0, Qt::UserRole + 0, "view");
+                vItem->setData(0, Qt::UserRole + 1, viewName);
                 const vle::value::Matrix& res = itb->second->toMatrix();
-                for (unsigned int i=0; i<res.columns(); i++) {
-                    if (res.get(i,0) and res.get(i,0)->isString()) {
-                        QString portName = res.getString(i,0).c_str();
+                for (unsigned int i = 0; i < res.columns(); i++) {
+                    if (res.get(i, 0) and res.get(i, 0)->isString()) {
+                        QString portName = res.getString(i, 0).c_str();
                         if (portName != "time") {
                             QTreeWidgetItem* pItem = new QTreeWidgetItem();
                             pItem->setText(0, portName);
-                            pItem->setFlags(vItem->flags()
-                                    | Qt::ItemIsUserCheckable);
+                            pItem->setFlags(vItem->flags() |
+                                            Qt::ItemIsUserCheckable);
                             pItem->setCheckState(0, Qt::Unchecked);
-                            pItem->setData(0, Qt::UserRole+0, "port");
-                            pItem->setData(0, Qt::UserRole+1, viewName);
-                            pItem->setData(0, Qt::UserRole+2, portName);
+                            pItem->setData(0, Qt::UserRole + 0, "port");
+                            pItem->setData(0, Qt::UserRole + 1, viewName);
+                            pItem->setData(0, Qt::UserRole + 2, portName);
                             vItem->addChild(pItem);
                         }
                     }
@@ -505,10 +526,8 @@ DefaultSimSubpanel::onSimulationFinished()
         right->ui->treeSimViews->addTopLevelItems(views_items);
     }
 
-
     updateCustomPlot();
     right->ui->treeSimViews->blockSignals(oldBlockTree);
-
 
     thread->quit();
     thread->wait();
@@ -516,41 +535,41 @@ DefaultSimSubpanel::onSimulationFinished()
     thread = 0;
 
     left->ui->runButton->setEnabled(true);
-
 }
 
 void
 DefaultSimSubpanel::onRunPressed()
 {
-    //disable buttons and menu
+    // disable buttons and menu
     left->ui->runButton->setEnabled(false);
     right->ui->widSimStyle->setVisible(false);
 
-    //delete custom plot
+    // delete custom plot
     delete left->customPlot;
     left->customPlot = new QCustomPlot();
     showCustomPlot(false);
     portsToPlot.erase(portsToPlot.begin(), portsToPlot.end());
 
-    //prepare new thread for simulation
+    // prepare new thread for simulation
     log_messages.clear();
     index_message = 0;
     delete sim_process;
-    sim_process = new DefaultSimSubpanelThread(log_messages, debug, nbthreads,
-            blockSize);
+    sim_process =
+      new DefaultSimSubpanelThread(log_messages, debug, nbthreads, blockSize);
     sim_process->init(mvpz, mpkg);
 
-    //delete set
+    // delete set
     delete thread;
     thread = new QThread();
 
-    //move to thread
+    // move to thread
     timer.start(1000);
     sim_process->moveToThread(thread);
-    connect(thread,  SIGNAL(started()),
-            sim_process, SLOT(onStarted()));
-    connect(sim_process, SIGNAL(simulationFinished()),
-            this, SLOT(onSimulationFinished()));
+    connect(thread, SIGNAL(started()), sim_process, SLOT(onStarted()));
+    connect(sim_process,
+            SIGNAL(simulationFinished()),
+            this,
+            SLOT(onSimulationFinished()));
     thread->start();
 }
 
@@ -568,19 +587,19 @@ void
 DefaultSimSubpanel::onThreadsChanged(int val)
 {
     if (val > 0) {
-        //set default debug value and disble it
+        // set default debug value and disble it
         int index = left->ui->debugCombo->findText("false");
-        if ( index != -1 ) {
+        if (index != -1) {
             left->ui->debugCombo->setCurrentIndex(index);
         }
         left->ui->debugCombo->setEnabled(false);
-        //enable block-size
+        // enable block-size
         left->ui->blockSizeSpinBox->setEnabled(true);
 
     } else {
-        //enable debug
+        // enable debug
         left->ui->debugCombo->setEnabled(true);
-        //set default block-size value and disable it
+        // set default block-size value and disable it
         left->ui->blockSizeSpinBox->setValue(8);
         left->ui->blockSizeSpinBox->setEnabled(false);
     }
@@ -597,8 +616,8 @@ void
 DefaultSimSubpanel::onTreeItemChanged(QTreeWidgetItem* item, int col)
 {
     int state = item->checkState(col);
-    QString viewName = item->data(0, Qt::UserRole+1).toString();
-    QString portName = item->data(0, Qt::UserRole+2).toString();
+    QString viewName = item->data(0, Qt::UserRole + 1).toString();
+    QString portName = item->data(0, Qt::UserRole + 2).toString();
 
     if (state == Qt::Checked) {
         addPortToPlot(viewName, portName);
@@ -611,12 +630,12 @@ DefaultSimSubpanel::onTreeItemChanged(QTreeWidgetItem* item, int col)
 void
 DefaultSimSubpanel::onTreeItemSelected()
 {
-    QTreeWidgetItem *item = right->ui->treeSimViews->currentItem();
+    QTreeWidgetItem* item = right->ui->treeSimViews->currentItem();
     bool itemVisility = false;
 
     if (item) {
-        QString viewName = item->data(0, Qt::UserRole+1).toString();
-        QString portName = item->data(0, Qt::UserRole+2).toString();
+        QString viewName = item->data(0, Qt::UserRole + 1).toString();
+        QString portName = item->data(0, Qt::UserRole + 2).toString();
         if (portName == "") {
             itemVisility = false;
         } else {
@@ -626,7 +645,8 @@ DefaultSimSubpanel::onTreeItemSelected()
                 portToPlot* port = getPortToPlot(viewName, portName);
                 QString style = "border:1px solid; ";
                 style += QString("background-color: rgb(%1, %2, %3);")
-                           .arg(port->color.red()).arg(port->color.green())
+                           .arg(port->color.red())
+                           .arg(port->color.green())
                            .arg(port->color.blue());
                 right->ui->butSimColor->setStyleSheet(style);
             } else {
@@ -640,7 +660,7 @@ DefaultSimSubpanel::onTreeItemSelected()
 void
 DefaultSimSubpanel::onTimeout()
 {
-    for (unsigned int i=index_message; i<log_messages.size();i++) {
+    for (unsigned int i = index_message; i < log_messages.size(); i++) {
         mLog->logExt(QString(log_messages[i].c_str()), false);
     }
     index_message = log_messages.size();
@@ -649,13 +669,13 @@ DefaultSimSubpanel::onTimeout()
 void
 DefaultSimSubpanel::onToolColor()
 {
-    QTreeWidgetItem *item = right->ui->treeSimViews->currentItem();
-    QString viewName = item->data(0, Qt::UserRole+1).toString();
-    QString portName = item->data(0, Qt::UserRole+2).toString();
+    QTreeWidgetItem* item = right->ui->treeSimViews->currentItem();
+    QString viewName = item->data(0, Qt::UserRole + 1).toString();
+    QString portName = item->data(0, Qt::UserRole + 2).toString();
     if (portName == "") {
-        return ;
+        return;
     } else {
-        QColorDialog *colorDialog = new QColorDialog(left);
+        QColorDialog* colorDialog = new QColorDialog(left);
         colorDialog->setOptions(QColorDialog::DontUseNativeDialog);
         if (colorDialog->exec()) {
             portToPlot* p = getPortToPlot(viewName, portName);
@@ -664,7 +684,6 @@ DefaultSimSubpanel::onToolColor()
             updateCustomPlot();
         }
     }
-
 }
-
-}} //namespaces
+}
+} // namespaces

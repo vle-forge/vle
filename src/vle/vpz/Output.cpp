@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,19 +34,20 @@ namespace vpz {
 
 Output::Output() = default;
 
-Output::Output(const Output &output)
-    : Base(output)
-    , m_name(output.m_name)
-    , m_plugin(output.m_plugin)
-    , m_location(output.m_location)
-    , m_package(output.m_package)
-    , m_data()
+Output::Output(const Output& output)
+  : Base(output)
+  , m_name(output.m_name)
+  , m_plugin(output.m_plugin)
+  , m_location(output.m_location)
+  , m_package(output.m_package)
+  , m_data()
 {
     if (output.m_data)
         m_data = output.m_data->clone();
 }
 
-Output &Output::operator=(const Output &output)
+Output&
+Output::operator=(const Output& output)
 {
     Output tmp(output);
     swap(tmp);
@@ -58,7 +59,8 @@ Output::~Output()
     clearData();
 }
 
-void Output::swap(Output &output)
+void
+Output::swap(Output& output)
 {
     std::swap(m_name, output.m_name);
     std::swap(m_plugin, output.m_plugin);
@@ -67,7 +69,8 @@ void Output::swap(Output &output)
     std::swap(m_data, output.m_data);
 }
 
-void Output::write(std::ostream &out) const
+void
+Output::write(std::ostream& out) const
 {
     out << "<output name=\"" << m_name.c_str() << "\" "
         << "location=\"" << m_location.c_str() << "\" ";
@@ -81,19 +84,19 @@ void Output::write(std::ostream &out) const
         out << ">\n";
         m_data->writeXml(out);
         out << "</output>\n";
-    }
-    else {
+    } else {
         out << "/>\n";
     }
 }
 
-void Output::setStream(const std::string &location,
-                       const std::string &plugin,
-                       const std::string &package)
+void
+Output::setStream(const std::string& location,
+                  const std::string& plugin,
+                  const std::string& package)
 {
     if (plugin.empty()) {
         throw utils::ArgError(
-            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
+          (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
     }
 
     m_location.assign(location);
@@ -103,16 +106,18 @@ void Output::setStream(const std::string &location,
     clearData();
 }
 
-void Output::setStreamLocation(const std::string &location)
+void
+Output::setStreamLocation(const std::string& location)
 {
     m_location.assign(location);
 }
 
-void Output::setStream(const std::string &location, const std::string &plugin)
+void
+Output::setStream(const std::string& location, const std::string& plugin)
 {
     if (plugin.empty()) {
         throw utils::ArgError(
-            (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
+          (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
     }
 
     m_location.assign(location);
@@ -122,17 +127,20 @@ void Output::setStream(const std::string &location, const std::string &plugin)
     clearData();
 }
 
-void Output::setData(std::shared_ptr<value::Value> value)
+void
+Output::setData(std::shared_ptr<value::Value> value)
 {
     m_data = std::move(value);
 }
 
-void Output::clearData()
+void
+Output::clearData()
 {
     m_data.reset();
 }
 
-bool Output::operator==(const Output &output) const
+bool
+Output::operator==(const Output& output) const
 {
     return m_name == output.name() and m_plugin == output.plugin() and
            m_location == output.location() and

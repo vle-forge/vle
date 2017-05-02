@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,13 +36,14 @@ namespace value {
 /**
  * @brief Double Value encapsulate a C++ 'double' type into a class.
  */
-class VLE_API Double : public Value {
+class VLE_API Double : public Value
+{
 public:
     /**
      * @brief Build a Double object with a default value as 0.0.
      */
     Double()
-        : m_value(0.0)
+      : m_value(0.0)
     {
     }
 
@@ -51,7 +52,7 @@ public:
      * @param value The value to copy.
      */
     Double(double value)
-        : m_value(value)
+      : m_value(value)
     {
     }
 
@@ -59,16 +60,18 @@ public:
      * @brief Copy constuctor.
      * @param value The value to copy.
      */
-    Double(const Double &value)
-        : Value(value)
-        , m_value(value.m_value)
+    Double(const Double& value)
+      : Value(value)
+      , m_value(value.m_value)
     {
     }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Double() {}
+    virtual ~Double()
+    {
+    }
 
     ///
     ////
@@ -111,14 +114,14 @@ public:
      * setprecision, fill etc. to manage the representation of this double.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream &out) const override;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the double in the stream. Use the stream operator
      * setprecision, fill etc. to manage the representation of this double.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream &out) const override;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the double in the stream. The string pushed in the stream:
@@ -128,7 +131,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream &out) const override;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -138,70 +141,89 @@ public:
      * @brief Get the value of the double.
      * @return A double.
      */
-    inline const double &value() const { return m_value; }
+    inline const double& value() const
+    {
+        return m_value;
+    }
 
     /**
      * @brief Get a reference to the encapsulated double.
      * @return A reference to the encapsulated double.
      */
-    inline double &value() { return m_value; }
+    inline double& value()
+    {
+        return m_value;
+    }
 
     /**
      * @brief Assign a value to the encapsulated double.
      * @param value The value to set.
      */
-    inline void set(double value) { m_value = value; }
+    inline void set(double value)
+    {
+        m_value = value;
+    }
 
 private:
     double m_value;
 };
 
-inline const Double &toDoubleValue(std::shared_ptr<Value> value)
+inline const Double&
+toDoubleValue(std::shared_ptr<Value> value)
 {
     return value::reference(value).toDouble();
 }
 
-inline const Double &toDoubleValue(std::shared_ptr<const Value> value)
+inline const Double&
+toDoubleValue(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toDouble();
 }
 
-inline const Double &toDoubleValue(const std::unique_ptr<Value> &value)
+inline const Double&
+toDoubleValue(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toDouble();
 }
 
-inline const Double &toDoubleValue(const Value &value)
+inline const Double&
+toDoubleValue(const Value& value)
 {
     return value.toDouble();
 }
 
-inline Double &toDoubleValue(Value &value)
+inline Double&
+toDoubleValue(Value& value)
 {
     return value.toDouble();
 }
 
-inline double toDouble(std::shared_ptr<Value> value)
+inline double
+toDouble(std::shared_ptr<Value> value)
 {
     return value::reference(value).toDouble().value();
 }
 
-inline double toDouble(std::shared_ptr<const Value> value)
+inline double
+toDouble(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toDouble().value();
 }
 
-inline double toDouble(const std::unique_ptr<Value> &value)
+inline double
+toDouble(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toDouble().value();
 }
 
-inline double toDouble(const Value &value)
+inline double
+toDouble(const Value& value)
 {
     return value.toDouble().value();
 }
 
-inline double &toDouble(Value &value)
+inline double&
+toDouble(Value& value)
 {
     return value.toDouble().value();
 }

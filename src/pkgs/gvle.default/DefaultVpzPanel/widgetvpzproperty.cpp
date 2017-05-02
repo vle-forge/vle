@@ -23,21 +23,22 @@
  */
 #include "widgetvpzproperty.h"
 #include <QCheckBox>
+#include <QDebug>
 #include <QRadioButton>
 #include <QVBoxLayout>
-#include <QDebug>
 
 namespace vle {
 namespace gvle {
 
-
-WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget *parent) :
-    QComboBox(parent), mVpz(0), mModQuery("")
+WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget* parent)
+  : QComboBox(parent)
+  , mVpz(0)
+  , mModQuery("")
 {
     QComboBox::setFocusPolicy(Qt::ClickFocus);
 
-    QObject::connect(this, SIGNAL(currentIndexChanged(int)),
-                     this,         SLOT  (onChange(int)));
+    QObject::connect(
+      this, SIGNAL(currentIndexChanged(int)), this, SLOT(onChange(int)));
 }
 
 WidgetVpzPropertyDynamics::~WidgetVpzPropertyDynamics()
@@ -58,23 +59,22 @@ WidgetVpzPropertyDynamics::setModel(vleVpz* model, const QString& mod_query)
     // Get the Dynamic of the model
     QString dyn = mVpz->modelDynFromDoc(mModQuery);
     bool oldBlockComboBox = QComboBox::blockSignals(true);
-    while(QComboBox::count()) {
+    while (QComboBox::count()) {
         QComboBox::removeItem(0);
     }
-    QComboBox::addItem( tr("<none>") );
+    QComboBox::addItem(tr("<none>"));
 
     QList<QString> dynList;
     mVpz->fillWithDynamicsList(dynList);
-    for (int i=0; i< dynList.length(); i++) {
+    for (int i = 0; i < dynList.length(); i++) {
         QComboBox::addItem(dynList.at(i));
         if (dyn == dynList.at(i)) {
             index = count;
         }
-        count ++;
+        count++;
     }
     QComboBox::setCurrentIndex(index);
     QComboBox::blockSignals(oldBlockComboBox);
-
 }
 
 void
@@ -94,8 +94,10 @@ WidgetVpzPropertyDynamics::onChange(int index)
 
 /****************************************************************************/
 
-WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget *parent) :
-        QListWidget(parent), mVpz(0), mModQuery("")
+WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget* parent)
+  : QListWidget(parent)
+  , mVpz(0)
+  , mModQuery("")
 {
 }
 
@@ -104,11 +106,10 @@ WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
 }
 
 void
-WidgetVpzPropertyExpCond::setModel(vleVpz *model, const QString& model_query)
+WidgetVpzPropertyExpCond::setModel(vleVpz* model, const QString& model_query)
 {
     mVpz = model;
-    QObject::connect(mVpz,   SIGNAL(conditionsUpdated()),
-                     this, SLOT(refresh()));
+    QObject::connect(mVpz, SIGNAL(conditionsUpdated()), this, SLOT(refresh()));
 
     mModQuery = model_query;
     refresh();
@@ -121,22 +122,22 @@ WidgetVpzPropertyExpCond::refresh()
     bool oldBlock = QListWidget::blockSignals(true);
     QListWidget::clear();
     QString dyn = mVpz->modelDynFromDoc(mModQuery);
-    //TODO only way to see if it is an atomic model ??
+    // TODO only way to see if it is an atomic model ??
     QDomNodeList conds = mVpz->condsListFromConds(mVpz->condsFromDoc());
-    for (int i=0; i< conds.length(); i++) {
+    for (int i = 0; i < conds.length(); i++) {
         QDomNode cond = conds.at(i);
         QString condName = DomFunctions::attributeValue(cond, "name");
-        QListWidgetItem *wi = new QListWidgetItem(this);
+        QListWidgetItem* wi = new QListWidgetItem(this);
         QListWidget::addItem(wi);
-        QCheckBox *cb = new QCheckBox(this);
-        cb->setText( condName);
+        QCheckBox* cb = new QCheckBox(this);
+        cb->setText(condName);
         if (mVpz->isAttachedCond(mModQuery, condName)) {
-            cb->setCheckState( Qt::Checked );
+            cb->setCheckState(Qt::Checked);
         } else {
-            cb->setCheckState( Qt::Unchecked );
+            cb->setCheckState(Qt::Unchecked);
         }
-        QObject::connect(cb,   SIGNAL(toggled(bool)),
-                this, SLOT(onCheckboxToggle(bool)));
+        QObject::connect(
+          cb, SIGNAL(toggled(bool)), this, SLOT(onCheckboxToggle(bool)));
         QListWidget::setItemWidget(wi, cb);
     }
     QListWidget::blockSignals(oldBlock);
@@ -146,33 +147,34 @@ void
 WidgetVpzPropertyExpCond::onCheckboxToggle(bool checked)
 {
     // Get the QCheckbox that emit signal
-    QObject   *sender = QObject::sender();
-    QCheckBox *cb     = qobject_cast<QCheckBox *>(sender);
+    QObject* sender = QObject::sender();
+    QCheckBox* cb = qobject_cast<QCheckBox*>(sender);
 
     // Sanity check ... if no model set or checkbox not found
-    if ( (mVpz == 0) || (cb == 0) )
+    if ((mVpz == 0) || (cb == 0))
         return;
 
     // Search the vleExpCond associated with the checkbox
-    //bool oldBlock = mVpz->blockSignals(true);
+    // bool oldBlock = mVpz->blockSignals(true);
     if (checked) {
         mVpz->attachCondToAtomicModel(mModQuery, cb->text());
     } else {
         mVpz->detachCondToAtomicModel(mModQuery, cb->text());
     }
-    //mVpz->blockSignals(oldBlock);
-
+    // mVpz->blockSignals(oldBlock);
 }
 
 /****************************************************************************/
 
-WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget *parent) :
-        QComboBox(parent), mVpz(0), mModQuery("")
+WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget* parent)
+  : QComboBox(parent)
+  , mVpz(0)
+  , mModQuery("")
 {
     QComboBox::setFocusPolicy(Qt::ClickFocus);
 
-    QObject::connect(this, SIGNAL(currentIndexChanged(int)),
-                     this,         SLOT  (onChange(int)));
+    QObject::connect(
+      this, SIGNAL(currentIndexChanged(int)), this, SLOT(onChange(int)));
 }
 
 WidgetVpzPropertyObservables::~WidgetVpzPropertyObservables()
@@ -189,12 +191,12 @@ WidgetVpzPropertyObservables::refresh()
     QDomNodeList obss = mVpz->obssListFromObss(mVpz->obsFromDoc());
     QComboBox::addItem("<none>");
     int selectIndex = 0;
-    for (int i=0; i< obss.length(); i++) {
+    for (int i = 0; i < obss.length(); i++) {
         QDomNode obs = obss.at(i);
         QString obsName = DomFunctions::attributeValue(obs, "name");
         QComboBox::addItem(obsName);
         if (mVpz->modelObsFromDoc(mModQuery) == obsName) {
-            selectIndex = i+1;
+            selectIndex = i + 1;
         }
     }
     QComboBox::setCurrentIndex(selectIndex);
@@ -202,13 +204,13 @@ WidgetVpzPropertyObservables::refresh()
 }
 
 void
-WidgetVpzPropertyObservables::setModel(vleVpz *model,
-        const QString& model_query)
+WidgetVpzPropertyObservables::setModel(vleVpz* model,
+                                       const QString& model_query)
 {
     mVpz = model;
 
-    QObject::connect(mVpz, SIGNAL(observablesUpdated()),
-            this, SLOT(refresh()));
+    QObject::connect(
+      mVpz, SIGNAL(observablesUpdated()), this, SLOT(refresh()));
 
     mModQuery = model_query;
     refresh();
@@ -226,5 +228,5 @@ WidgetVpzPropertyObservables::onChange(int index)
         mVpz->unsetObsFromAtomicModel(mModQuery);
     }
 }
-
-}}//namepsaces
+}
+} // namepsaces

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,16 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DEVS_TIME_HPP
 #define VLE_DEVS_TIME_HPP
 
-#include <vle/DllDefines.hpp>
+#include <cmath> /* for isnan */
 #include <limits>
 #include <string>
-#include <cmath> /* for isnan */
+#include <vle/DllDefines.hpp>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 /**
  * @e Time represents the definition of the simulation time.
@@ -52,8 +52,9 @@ typedef double Time;
 static_assert(std::numeric_limits<Time>::has_quiet_NaN == true,
               "Use an iec559 standard OS/Compiler");
 
-static const Time infinity = std::numeric_limits <Time>::infinity();
-static const Time negativeInfinity = -1 * std::numeric_limits <Time>::infinity();
+static const Time infinity = std::numeric_limits<Time>::infinity();
+static const Time negativeInfinity =
+  -1 * std::numeric_limits<Time>::infinity();
 static const Time nan = std::numeric_limits<double>::quiet_NaN();
 
 /**
@@ -63,7 +64,8 @@ static const Time nan = std::numeric_limits<double>::quiet_NaN();
  *
  * @return true if @e time is NaN.
  */
-inline static bool isNan(Time time)
+inline static bool
+isNan(Time time)
 {
     return std::isnan(time);
 }
@@ -75,7 +77,8 @@ inline static bool isNan(Time time)
  *
  * @return true if @e time is infinity or -infinity.
  */
-inline static bool isInfinity(Time time)
+inline static bool
+isInfinity(Time time)
 {
     return time == infinity or time == negativeInfinity;
 }
@@ -87,7 +90,8 @@ inline static bool isInfinity(Time time)
  *
  * @return true if @e time is infinity.
  */
-inline static bool isPositiveInfinity(Time time)
+inline static bool
+isPositiveInfinity(Time time)
 {
     return time == infinity;
 }
@@ -99,7 +103,8 @@ inline static bool isPositiveInfinity(Time time)
  *
  * @return true if @e time is -infinity.
  */
-inline static bool isNegativeInfinity(Time time)
+inline static bool
+isNegativeInfinity(Time time)
 {
     return time == negativeInfinity;
 }
@@ -117,7 +122,7 @@ inline static bool isNegativeInfinity(Time time)
  * @return An @e std::string representation of the @e Time time.
  */
 VLE_API std::string convertTimeToString(Time time);
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

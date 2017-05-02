@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -47,7 +47,8 @@ namespace vpz {
  * output, the name of the oov::Plugin, its location and the
  * parametrization of the plug-in).
  */
-class VLE_API Output : public Base {
+class VLE_API Output : public Base
+{
 public:
     /**
      * @brief Build a empty local output.
@@ -58,14 +59,14 @@ public:
      * @brief Copy constructor.
      * @param output The Output to copy. The m_data is cloned.
      */
-    Output(const Output &output);
+    Output(const Output& output);
 
     /**
      * @brief Affectation operator.
      * @param output The Output to assign. The m_data is cloned.
      * @return A reference to this.
      */
-    Output &operator=(const Output &output);
+    Output& operator=(const Output& output);
 
     /**
      * @brief Nothing to delete.
@@ -77,7 +78,7 @@ public:
      * m_data is not cloned.
      * @param output The Output to replace data.
      */
-    void swap(Output &output);
+    void swap(Output& output);
 
     /**
      * @brief Write the XML representation of the Output.
@@ -91,13 +92,16 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void write(std::ostream &out) const override;
+    virtual void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return OUTPUT.
      */
-    virtual Base::type getType() const override { return VLE_VPZ_OUTPUT; }
+    virtual Base::type getType() const override
+    {
+        return VLE_VPZ_OUTPUT;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -109,7 +113,10 @@ public:
      * @brief Assign a new package name to the output.
      * @param name new name of the package.
      */
-    void setPackage(const std::string &name) { m_package.assign(name); }
+    void setPackage(const std::string& name)
+    {
+        m_package.assign(name);
+    }
 
     /**
      * @brief Set the output with text stream information. The name is
@@ -119,9 +126,9 @@ public:
      * @param package the package of the plugin.
      * @throw utils::ArgError if name is empty.
      */
-    void setStream(const std::string &location,
-                   const std::string &plugin,
-                   const std::string &package);
+    void setStream(const std::string& location,
+                   const std::string& plugin,
+                   const std::string& package);
 
     /**
      * @brief Set the output with text stream information. The name is
@@ -130,13 +137,13 @@ public:
      * @param plugin to use in output stream.
      * @throw utils::ArgError if name is empty.
      */
-    void setStream(const std::string &location, const std::string &plugin);
+    void setStream(const std::string& location, const std::string& plugin);
 
     /**
      * @brief Set the location of the output plugin.
      * @param location the file name.
      */
-    void setStreamLocation(const std::string &location);
+    void setStreamLocation(const std::string& location);
 
     /**
      * @brief Assign data to the Output. If previous data exists, it will be
@@ -160,44 +167,62 @@ public:
      * @brief Get the plugin of this Output.
      * @return a string representation of plugin.
      */
-    const std::string &plugin() const { return m_plugin; }
+    const std::string& plugin() const
+    {
+        return m_plugin;
+    }
 
     /**
      * @brief Return the package name of this output.
      * @return a string represnetion of the package.
      */
-    const std::string &package() const { return m_package; }
+    const std::string& package() const
+    {
+        return m_package;
+    }
 
     /**
      * @brief Get the location of this Output.
      * @return a string representation of location.
      */
-    const std::string &location() const { return m_location; }
+    const std::string& location() const
+    {
+        return m_location;
+    }
 
     /**
      * @brief Get a reference to the data. The data can be null.
      * @return a string representation of the data.
      */
-    const std::shared_ptr<value::Value> &data() const { return m_data; }
+    const std::shared_ptr<value::Value>& data() const
+    {
+        return m_data;
+    }
 
     /**
      * @brief Get the name of this output.
      * @return The name of this output.
      */
-    const std::string &name() const { return m_name; }
+    const std::string& name() const
+    {
+        return m_name;
+    }
 
     /**
      * @brief Set the name of this output.
      * @param name The name of this output.
      */
-    void setName(const std::string &name) { m_name.assign(name); }
+    void setName(const std::string& name)
+    {
+        m_name.assign(name);
+    }
 
     /**
      * @brief A operator to compare two Views
      * @param view The View to compare
      * @return True if the views are equals
      */
-    bool operator==(const Output &output) const;
+    bool operator==(const Output& output) const;
 
 private:
     std::string m_name;

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -41,14 +41,14 @@ namespace vpz {
  * @brief Define the ConditionValues like a dictionnary, (portname, values).
  */
 using ConditionValues =
-    std::unordered_map<std::string,
-                       std::vector<std::shared_ptr<value::Value>>>;
+  std::unordered_map<std::string, std::vector<std::shared_ptr<value::Value>>>;
 
 /**
  * @brief A condition define a couple model name, port name and a Value.
  * This class allow loading and writing a condition.
  */
-class VLE_API Condition : public Base {
+class VLE_API Condition : public Base
+{
 public:
     typedef ConditionValues::iterator iterator;
     typedef ConditionValues::const_iterator const_iterator;
@@ -59,23 +59,25 @@ public:
      * @brief Build a new Condition with only a name.
      * @param name The name of the condition.
      */
-    Condition(const std::string &name);
+    Condition(const std::string& name);
 
     /**
      * @brief Copy constructor. All values are cloned.
      * @param cnd The Condition to copy.
      */
-    Condition(const Condition &cnd);
+    Condition(const Condition& cnd);
 
     /**
      * @brief Assignment operator. All values are cloned.
      */
-    Condition& operator=(const Condition &cnd);
+    Condition& operator=(const Condition& cnd);
 
     /**
      * @brief Delete all the values attached to this Conditon.
      */
-    virtual ~Condition() {}
+    virtual ~Condition()
+    {
+    }
 
     /**
      * @brief Add Condition informations to the stream.
@@ -89,7 +91,7 @@ public:
      *
      * @param out
      */
-    virtual void write(std::ostream &out) const override;
+    virtual void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
@@ -116,13 +118,13 @@ public:
      * @brief Add a port to the value list.
      * @param portname name of the port.
      */
-    void add(const std::string &portname);
+    void add(const std::string& portname);
 
     /**
      * @brief Remove a port of the value list.
      * @param portname name of the port.
      */
-    void del(const std::string &portname);
+    void del(const std::string& portname);
 
     /**
      * @brief Add a value to a specified port. If port does not exist, it
@@ -130,7 +132,7 @@ public:
      * @param portname name of the port to add value.
      * @param value the value to push.
      */
-    void addValueToPort(const std::string &portname,
+    void addValueToPort(const std::string& portname,
                         std::shared_ptr<value::Value> value);
 
     /**
@@ -140,14 +142,14 @@ public:
      * @param value the value to push.
      * @throw utils::ArgError if portname does not exist.
      */
-    void setValueToPort(const std::string &portname,
+    void setValueToPort(const std::string& portname,
                         std::shared_ptr<value::Value> value);
     /**
      * @brief Clear the specified port.
      * @param portname The name of the port to clear.
      * @throw utils::ArgError if portname does not exist.
      */
-    void clearValueOfPort(const std::string &portname);
+    void clearValueOfPort(const std::string& portname);
 
     /**
      * @brief Fill a MapValue with the first value::Value of each port
@@ -166,8 +168,8 @@ public:
      * @return A reference to a value::Set.
      * @throw utils::ArgError if portname not exist.
      */
-    const std::vector<std::shared_ptr<value::Value>> &
-    getSetValues(const std::string &portname) const;
+    const std::vector<std::shared_ptr<value::Value>>& getSetValues(
+      const std::string& portname) const;
 
     /**
      * @brief Get the value::Set attached to a port.
@@ -175,8 +177,8 @@ public:
      * @return A reference to a value::Set.
      * @throw utils::ArgError if portname not exist.
      */
-    std::vector<std::shared_ptr<value::Value>> &
-    getSetValues(const std::string &portname);
+    std::vector<std::shared_ptr<value::Value>>& getSetValues(
+      const std::string& portname);
 
     /**
      * @brief Return a reference to the first value::Value of the specified
@@ -185,8 +187,8 @@ public:
      * @return A reference to a value::Value.
      * @throw utils::ArgError if portname not exist.
      */
-    const std::shared_ptr<value::Value> &
-    firstValue(const std::string &portname) const;
+    const std::shared_ptr<value::Value>& firstValue(
+      const std::string& portname) const;
 
     /**
      * @brief Return a reference to the nth value::Value of the specified
@@ -197,7 +199,7 @@ public:
      * @throw utils::ArgError if portname not exist or if value list
      * have no nth value.
      */
-    const std::shared_ptr<value::Value> &nValue(const std::string &portname,
+    const std::shared_ptr<value::Value>& nValue(const std::string& portname,
                                                 size_t i) const;
 
     /**
@@ -206,7 +208,7 @@ public:
      * @return A reference to the value::Set of the port.
      * @throw utils::ArgError if port does not exist.
      */
-    std::vector<std::shared_ptr<value::Value>> &lastAddedPort();
+    std::vector<std::shared_ptr<value::Value>>& lastAddedPort();
 
     /**
      * @brief This function deletes on each port the values stored
@@ -224,51 +226,72 @@ public:
      * @brief Get a reference to the ConditionValues.
      * @return A constant reference to the ConditionValues.
      */
-    inline const ConditionValues &conditionvalues() const { return m_list; }
+    inline const ConditionValues& conditionvalues() const
+    {
+        return m_list;
+    }
 
     /**
      * @brief Get a reference to the ConditionValues.
      * @return A constant reference to the ConditionValues.
      */
-    inline ConditionValues &conditionvalues() { return m_list; }
+    inline ConditionValues& conditionvalues()
+    {
+        return m_list;
+    }
 
     /**
      * @brief Get a iterator the begin of the vpz::ConditionValues.
      * @return Get a iterator the begin of the vpz::ConditionValues.
      */
-    iterator begin() { return m_list.begin(); }
+    iterator begin()
+    {
+        return m_list.begin();
+    }
 
     /**
      * @brief Get a iterator the end of the vpz::ConditionValues.
      * @return Get a iterator the end of the vpz::ConditionValues.
      */
-    iterator end() { return m_list.end(); }
+    iterator end()
+    {
+        return m_list.end();
+    }
 
     /**
      * @brief Get a constant iterator the begin of the vpz::ConditionValues.
      * @return Get a constant iterator the begin of the
      * vpz::ConditionValues.
      */
-    const_iterator begin() const { return m_list.begin(); }
+    const_iterator begin() const
+    {
+        return m_list.begin();
+    }
 
     /**
      * @brief Get a constant iterator the end of the vpz::ConditionValues.
      * @return Get a constant iterator the end of the vpz::ConditionValues.
      */
-    const_iterator end() const { return m_list.end(); }
+    const_iterator end() const
+    {
+        return m_list.end();
+    }
 
     /**
      * @brief Return the name of the condition.
      * @return
      */
-    inline const std::string &name() const { return m_name; }
+    inline const std::string& name() const
+    {
+        return m_name;
+    }
 
     /**
      * @brief Set a new name to this condition.
      * @param new_name The new name for this condition.
      * @return
      */
-    inline void setName(const std::string &new_name)
+    inline void setName(const std::string& new_name)
     {
         m_name.assign(new_name);
     }
@@ -278,13 +301,19 @@ public:
      * devs::ModelFactory.
      * @return True if this condition is a permanent value.
      */
-    inline bool isPermanent() const { return m_ispermanent; }
+    inline bool isPermanent() const
+    {
+        return m_ispermanent;
+    }
 
     /**
      * @brief Set the permanent value of this condition.
      * @param value True to conserve this condition in devs::ModelFactory.
      */
-    inline void permanent(bool value = true) { m_ispermanent = value; }
+    inline void permanent(bool value = true)
+    {
+        m_ispermanent = value;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -303,13 +332,17 @@ public:
      *    std::find_if(v.beging(), v.end(), Condition::IsPermanent());
      * @endcode
      */
-    struct IsPermanent {
+    struct IsPermanent
+    {
         /**
          * @brief Check if the Condition is permanent.
          * @param x the Condition to check.
          * @return True if the Condition is permanent.
          */
-        bool operator()(const Condition &x) const { return x.isPermanent(); }
+        bool operator()(const Condition& x) const
+        {
+            return x.isPermanent();
+        }
     };
 
     /**
@@ -317,12 +350,16 @@ public:
      * To use with std::for_each
      * or vle::for_each.
      */
-    struct DeleteValueSet {
+    struct DeleteValueSet
+    {
         /**
          * @brief Delete and rebuild the Value of the specified Condition.
          * @param x the Condition to delete and rebuild the Value.
          */
-        void operator()(Condition &x) const { x.deleteValueSet(); }
+        void operator()(Condition& x) const
+        {
+            x.deleteValueSet();
+        }
     };
 
 private:

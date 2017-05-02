@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -50,7 +50,7 @@
 
 using namespace vle;
 
-const char *xml = "<?xml version=\"1.0\"?>\n"
+const char* xml = "<?xml version=\"1.0\"?>\n"
                   "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
                   " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
                   " <structures>\n"
@@ -87,16 +87,17 @@ const char *xml = "<?xml version=\"1.0\"?>\n"
                   " </experiment>\n"
                   "</vle_project>\n";
 
-void experimentgenerator_lower_than_exp()
+void
+experimentgenerator_lower_than_exp()
 {
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    vpz::Project &project(vpz.project());
-    vpz::Conditions &cnds(project.experiment().conditions());
+    vpz::Project& project(vpz.project());
+    vpz::Conditions& cnds(project.experiment().conditions());
 
     {
-        vpz::Condition &cnd1(cnds.get("cond1"));
+        vpz::Condition& cnd1(cnds.get("cond1"));
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 10000; ++i) {
@@ -106,7 +107,7 @@ void experimentgenerator_lower_than_exp()
     }
 
     {
-        vpz::Condition &cnd2(cnds.get("cond2"));
+        vpz::Condition& cnd2(cnds.get("cond2"));
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 9999; i >= 0; --i) {
@@ -131,16 +132,17 @@ void experimentgenerator_lower_than_exp()
     EnsuresEqual(expgen3.size(), 10000);
 }
 
-void experimentgenerator_greater_than_exp()
+void
+experimentgenerator_greater_than_exp()
 {
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    vpz::Project &project(vpz.project());
-    vpz::Conditions &cnds(project.experiment().conditions());
+    vpz::Project& project(vpz.project());
+    vpz::Conditions& cnds(project.experiment().conditions());
 
     {
-        vpz::Condition &cnd1(cnds.get("cond1"));
+        vpz::Condition& cnd1(cnds.get("cond1"));
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 3; ++i) {
@@ -150,7 +152,7 @@ void experimentgenerator_greater_than_exp()
     }
 
     {
-        vpz::Condition &cnd2(cnds.get("cond2"));
+        vpz::Condition& cnd2(cnds.get("cond2"));
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 2; i >= 0; --i) {
@@ -186,16 +188,17 @@ void experimentgenerator_greater_than_exp()
     EnsuresEqual(expgen5.size(), 3);
 }
 
-void experimentgenerator_max_1_max_1()
+void
+experimentgenerator_max_1_max_1()
 {
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    vpz::Project &project(vpz.project());
-    vpz::Conditions &cnds(project.experiment().conditions());
+    vpz::Project& project(vpz.project());
+    vpz::Conditions& cnds(project.experiment().conditions());
 
     {
-        vpz::Condition &cnd1(cnds.get("cond1"));
+        vpz::Condition& cnd1(cnds.get("cond1"));
         cnd1.clearValueOfPort("init1");
         cnd1.clearValueOfPort("init2");
         for (int i = 0; i < 7; ++i) {
@@ -205,7 +208,7 @@ void experimentgenerator_max_1_max_1()
     }
 
     {
-        vpz::Condition &cnd2(cnds.get("cond2"));
+        vpz::Condition& cnd2(cnds.get("cond2"));
         cnd2.clearValueOfPort("init3");
         cnd2.clearValueOfPort("init4");
         for (int i = 7; i > 0; --i) {
@@ -220,7 +223,8 @@ void experimentgenerator_max_1_max_1()
     EnsuresEqual(expgen1.size(), 7);
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

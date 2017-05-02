@@ -22,58 +22,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "filevpzsim.h"
+#include "ui_filevpzsim.h"
 #include <QComboBox>
 #include <QMenu>
 #include <QMessageBox>
 #include <QtDebug>
-#include "filevpzsim.h"
-#include "ui_filevpzsim.h"
 
 namespace vle {
 namespace gvle {
 
-
-FileVpzSim::FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
-        Logger* log, QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzSim), mVpz(0), mGvlePlugins(plugs),
-    mPluginSimPanel(0), mPackage(pkg), mLog(log)
+FileVpzSim::FileVpzSim(vle::utils::Package* pkg,
+                       gvle_plugins* plugs,
+                       Logger* log,
+                       QWidget* parent)
+  : QWidget(parent)
+  , ui(new Ui::FileVpzSim)
+  , mVpz(0)
+  , mGvlePlugins(plugs)
+  , mPluginSimPanel(0)
+  , mPackage(pkg)
+  , mLog(log)
 {
     ui->setupUi(this);
-    QObject::connect(ui->pluginList, SIGNAL(currentIndexChanged(const QString&)),
-                     this, SLOT (onPluginChanged(const QString&)));
+    QObject::connect(ui->pluginList,
+                     SIGNAL(currentIndexChanged(const QString&)),
+                     this,
+                     SLOT(onPluginChanged(const QString&)));
 }
 
 FileVpzSim::~FileVpzSim()
 {
     delete ui;
     mVpz = 0;
-    mGvlePlugins =0 ;
+    mGvlePlugins = 0;
     delete mPluginSimPanel;
     mPackage = 0;
     mLog = 0;
 }
-
 
 void
 FileVpzSim::setVpz(vleVpz* vpz)
 {
     mVpz = vpz;
 
-    //update plugin list
+    // update plugin list
     bool oldBlock = ui->pluginList->blockSignals(true);
     ui->pluginList->clear();
     ui->pluginList->addItem("Default");
     QStringList plugList = mGvlePlugins->getSimPanelPluginsList();
     ui->pluginList->addItems(plugList);
 
-    for (int i =0; i<plugList.size(); i++) {
+    for (int i = 0; i < plugList.size(); i++) {
         QString pluginName = plugList.at(i);
     }
     ui->pluginList->blockSignals(oldBlock);
 
-    //TODO check if a plugin
+    // TODO check if a plugin
     QString plug = "Default";
-    mPluginSimPanel =  mGvlePlugins->newInstanceSimPanelPlugin(plug);
+    mPluginSimPanel = mGvlePlugins->newInstanceSimPanelPlugin(plug);
     mPluginSimPanel->init(mVpz, mPackage, mLog);
     setSimLeftWidget(mPluginSimPanel->leftWidget());
 
@@ -87,10 +94,10 @@ FileVpzSim::setSimLeftWidget(QWidget* leftWidget)
     int stackSize = pluginStack->count();
     if (stackSize < 1 or stackSize > 2) {
         qDebug() << " Internal error DefaultVpzPanel::setSimLeftWidget ";
-        return ;
+        return;
     }
 
-    if (stackSize == 2){
+    if (stackSize == 2) {
         pluginStack->removeWidget(pluginStack->widget(1));
     }
     if (leftWidget) {
@@ -117,5 +124,5 @@ FileVpzSim::onPluginChanged(const QString& /*text*/)
 
     emit rightWidgetChanged();
 }
-
-}} //namespaces
+}
+} // namespaces

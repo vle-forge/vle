@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,13 +36,14 @@ namespace value {
 /**
  * @brief Boolean Value encapsulate a C++ 'bool' type into a class.
  */
-class VLE_API Boolean : public Value {
+class VLE_API Boolean : public Value
+{
 public:
     /**
      * @brief Build a Boolean object with a false as value.
      */
     Boolean()
-        : m_value(false)
+      : m_value(false)
     {
     }
 
@@ -51,7 +52,7 @@ public:
      * @param value The value to copy.
      */
     Boolean(bool value)
-        : m_value(value)
+      : m_value(value)
     {
     }
 
@@ -59,16 +60,18 @@ public:
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Boolean(const Boolean &value)
-        : Value(value)
-        , m_value(value.m_value)
+    Boolean(const Boolean& value)
+      : Value(value)
+      , m_value(value.m_value)
     {
     }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Boolean() {}
+    virtual ~Boolean()
+    {
+    }
 
     ///
     ////
@@ -111,14 +114,14 @@ public:
      * alphabool() to get true or false string instead of 0 an 1.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream &out) const override;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the bool in the stream. Use the ostream operator
      * alphabool() to get true or false string instead of 0 and 1.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream &out) const override;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the bool in the stream. The string pushed in the ostream:
@@ -128,7 +131,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream &out) const override;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -138,70 +141,89 @@ public:
      * @brief Get the value of the bool.
      * @return true or false.
      */
-    inline bool value() const { return m_value; }
+    inline bool value() const
+    {
+        return m_value;
+    }
 
     /**
      * @brief Get a reference to the bool.
      * @return A reference true or false.
      */
-    inline bool &value() { return m_value; }
+    inline bool& value()
+    {
+        return m_value;
+    }
 
     /**
      * @brief Assign a value to the bool.
      * @param value The value to set.
      */
-    inline void set(bool value) { m_value = value; }
+    inline void set(bool value)
+    {
+        m_value = value;
+    }
 
 private:
     bool m_value;
 };
 
-inline const Boolean &toBooleanValue(std::shared_ptr<Value> value)
+inline const Boolean&
+toBooleanValue(std::shared_ptr<Value> value)
 {
     return value::reference(value).toBoolean();
 }
 
-inline const Boolean &toBooleanValue(std::shared_ptr<const Value> value)
+inline const Boolean&
+toBooleanValue(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toBoolean();
 }
 
-inline const Boolean &toBooleanValue(const std::unique_ptr<Value> &value)
+inline const Boolean&
+toBooleanValue(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toBoolean();
 }
 
-inline const Boolean &toBooleanValue(const Value &value)
+inline const Boolean&
+toBooleanValue(const Value& value)
 {
     return value.toBoolean();
 }
 
-inline Boolean &toBooleanValue(Value &value)
+inline Boolean&
+toBooleanValue(Value& value)
 {
     return value.toBoolean();
 }
 
-inline bool toBoolean(std::shared_ptr<Value> value)
+inline bool
+toBoolean(std::shared_ptr<Value> value)
 {
     return value::reference(value).toBoolean().value();
 }
 
-inline bool toBoolean(std::shared_ptr<const Value> value)
+inline bool
+toBoolean(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toBoolean().value();
 }
 
-inline bool toBoolean(const std::unique_ptr<Value> &value)
+inline bool
+toBoolean(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toBoolean().value();
 }
 
-inline bool toBoolean(const Value &value)
+inline bool
+toBoolean(const Value& value)
 {
     return value.toBoolean().value();
 }
 
-inline bool &toBoolean(Value &value)
+inline bool&
+toBoolean(Value& value)
 {
     return value.toBoolean().value();
 }

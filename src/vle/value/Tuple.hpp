@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -43,7 +43,8 @@ typedef std::vector<double> TupleValue;
  * @brief A Tuple Value is a container to store a list of double value into
  * an std::vector standard container.
  */
-class VLE_API Tuple : public Value {
+class VLE_API Tuple : public Value
+{
 public:
     using size_type = TupleValue::size_type;
     using iterator = TupleValue::iterator;
@@ -66,12 +67,14 @@ public:
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Tuple(const Tuple &value) = default;
+    Tuple(const Tuple& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Tuple() {}
+    virtual ~Tuple()
+    {
+    }
 
     ///
     ////
@@ -122,13 +125,13 @@ public:
      * @brief Push all real from the TupleValue separated by space.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream &out) const override;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TupleValue separated by colon.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream &out) const override;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TupleValue. The XML representation of this
@@ -139,7 +142,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream &out) const override;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -149,31 +152,46 @@ public:
      * @brief Get a reference to the TupleValue.
      * @return A reference to the TupleValue.
      */
-    inline TupleValue &value() { return m_value; }
+    inline TupleValue& value()
+    {
+        return m_value;
+    }
 
     /**
      * @brief Get a constant reference to the TupleValue.
      * @return A constant reference to the TupleValue.
      */
-    inline const TupleValue &value() const { return m_value; }
+    inline const TupleValue& value() const
+    {
+        return m_value;
+    }
 
     /**
      * @brief Push a real at the end of the TupleValue.
      * @param value the value to push.
      */
-    inline void add(const double &value) { m_value.push_back(value); }
+    inline void add(const double& value)
+    {
+        m_value.push_back(value);
+    }
 
     /**
      * @brief Check if the TupleValue is empty.
      * @return True if the TupleValue is empty, false otherwise.
      */
-    inline bool empty() const { return m_value.empty(); }
+    inline bool empty() const
+    {
+        return m_value.empty();
+    }
 
     /**
      * @brief Return the number of element in the TupleValue.
      * @return An number
      */
-    inline size_type size() const { return m_value.size(); }
+    inline size_type size() const
+    {
+        return m_value.size();
+    }
 
     /**
      * @brief Get a constant reference to the real at the specified index. Be
@@ -189,7 +207,7 @@ public:
      * @param i The index of the value to get.
      * @return The real at the specified index.
      */
-    double &operator[](size_type i);
+    double& operator[](size_type i);
 
     /**
      * @brief Get a constant reference to the real at the specified index. Be
@@ -205,7 +223,7 @@ public:
      * @param i The index of the value to get.
      * @return The real at the specified index.
      */
-    double &operator()(size_type i);
+    double& operator()(size_type i);
 
     /**
      * @brief Get a constant reference to the real at the specified index.
@@ -221,7 +239,7 @@ public:
      * @return The real at the specified index.
      * @throw std::out_of_range if the index is too big.
      */
-    double &get(size_type i);
+    double& get(size_type i);
 
     /**
      * @brief Get a constant reference to the real at the specified index.
@@ -237,14 +255,14 @@ public:
      * @return The real at the specified index.
      * @throw std::out_of_range if the index is too big.
      */
-    double &at(size_type i);
+    double& at(size_type i);
 
     /**
      * @brief Fill the current tuple with multiple reals read from a string.
      * @param str A string with [0..n] reals.
      * @throw utils::ArgError if string have problem.
      */
-    void fill(const std::string &str);
+    void fill(const std::string& str);
 
     /**
      * @brief Remove an elemet of the tuple
@@ -262,52 +280,62 @@ private:
     TupleValue m_value;
 };
 
-inline const Tuple &toTupleValue(std::shared_ptr<Value> value)
+inline const Tuple&
+toTupleValue(std::shared_ptr<Value> value)
 {
     return value::reference(value).toTuple();
 }
 
-inline const Tuple &toTupleValue(std::shared_ptr<const Value> value)
+inline const Tuple&
+toTupleValue(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toTuple();
 }
 
-inline const Tuple &toTupleValue(const std::unique_ptr<Value> &value)
+inline const Tuple&
+toTupleValue(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toTuple();
 }
 
-inline const Tuple &toTupleValue(const Value &value)
+inline const Tuple&
+toTupleValue(const Value& value)
 {
     return value.toTuple();
 }
 
-inline Tuple &toTupleValue(Value &value)
+inline Tuple&
+toTupleValue(Value& value)
 {
     return value.toTuple();
 }
 
-inline const TupleValue &toTuple(std::shared_ptr<Value> value)
+inline const TupleValue&
+toTuple(std::shared_ptr<Value> value)
 {
     return value::reference(value).toTuple().value();
 }
 
-inline const TupleValue &toTuple(std::shared_ptr<const Value> value)
+inline const TupleValue&
+toTuple(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toTuple().value();
 }
 
-inline const TupleValue &toTuple(const std::unique_ptr<Value> &value)
+inline const TupleValue&
+toTuple(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toTuple().value();
 }
 
-inline const TupleValue &toTuple(const Value &value)
+inline const TupleValue&
+toTuple(const Value& value)
 {
     return value.toTuple().value();
 }
 
-inline TupleValue &toTuple(Value &value)
+inline TupleValue&
+toTuple(Value& value)
 {
     return value.toTuple().value();
 }

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,21 +24,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_TEMPLATE_HPP
 #define VLE_UTILS_TEMPLATE_HPP
 
-#include <vle/DllDefines.hpp>
-#include <string>
 #include <map>
+#include <string>
 #include <vector>
+#include <vle/DllDefines.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 class VLE_API SymbolString
 {
 public:
-    typedef std::map < std::string, std::string > symbols_t;
+    typedef std::map<std::string, std::string> symbols_t;
     typedef symbols_t::const_iterator const_iterator;
     typedef symbols_t::iterator iterator;
     typedef symbols_t::size_type size_type;
@@ -47,11 +47,26 @@ public:
     void remove(const std::string& key);
     const std::string& get(const std::string& key) const;
 
-    const_iterator begin() const { return lst_.begin(); }
-    const_iterator end() const { return lst_.end(); }
-    iterator begin() { return lst_.begin(); }
-    iterator end() { return lst_.end(); }
-    size_type size() const { return lst_.size(); }
+    const_iterator begin() const
+    {
+        return lst_.begin();
+    }
+    const_iterator end() const
+    {
+        return lst_.end();
+    }
+    iterator begin()
+    {
+        return lst_.begin();
+    }
+    iterator end()
+    {
+        return lst_.end();
+    }
+    size_type size() const
+    {
+        return lst_.size();
+    }
 
 private:
     symbols_t lst_;
@@ -60,7 +75,7 @@ private:
 class VLE_API SymbolBool
 {
 public:
-    typedef std::map < std::string, bool > symbols_t;
+    typedef std::map<std::string, bool> symbols_t;
     typedef symbols_t::const_iterator const_iterator;
     typedef symbols_t::iterator iterator;
     typedef symbols_t::size_type size_type;
@@ -69,11 +84,26 @@ public:
     void remove(const std::string& key);
     bool get(const std::string& key) const;
 
-    const_iterator begin() const { return lst_.begin(); }
-    const_iterator end() const { return lst_.end(); }
-    iterator begin() { return lst_.begin(); }
-    iterator end() { return lst_.end(); }
-    size_type size() const { return lst_.size(); }
+    const_iterator begin() const
+    {
+        return lst_.begin();
+    }
+    const_iterator end() const
+    {
+        return lst_.end();
+    }
+    iterator begin()
+    {
+        return lst_.begin();
+    }
+    iterator end()
+    {
+        return lst_.end();
+    }
+    size_type size() const
+    {
+        return lst_.size();
+    }
 
 private:
     symbols_t lst_;
@@ -82,8 +112,8 @@ private:
 class VLE_API SymbolList
 {
 public:
-    typedef std::vector < std::string > value_t;
-    typedef std::map < std::string, value_t > symbols_t;
+    typedef std::vector<std::string> value_t;
+    typedef std::map<std::string, value_t> symbols_t;
     typedef symbols_t::const_iterator const_iterator;
     typedef symbols_t::iterator iterator;
     typedef symbols_t::size_type size_type;
@@ -94,12 +124,30 @@ public:
     const std::string& get(const std::string& key, value_t::size_type i) const;
     value_t::size_type size(const std::string& key) const;
 
-    const_iterator begin() const { return lst_.begin(); }
-    const_iterator end() const { return lst_.end(); }
-    iterator begin() { return lst_.begin(); }
-    iterator end() { return lst_.end(); }
-    size_type size() const { return lst_.size(); }
-    const symbols_t& list() const { return lst_; }
+    const_iterator begin() const
+    {
+        return lst_.begin();
+    }
+    const_iterator end() const
+    {
+        return lst_.end();
+    }
+    iterator begin()
+    {
+        return lst_.begin();
+    }
+    iterator end()
+    {
+        return lst_.end();
+    }
+    size_type size() const
+    {
+        return lst_.size();
+    }
+    const symbols_t& list() const
+    {
+        return lst_;
+    }
 
 private:
     symbols_t lst_;
@@ -114,8 +162,9 @@ public:
      * @param buffer The template, can be empty.
      */
     Template(const std::string& buffer = std::string())
-        : buffer_(buffer)
-    {}
+      : buffer_(buffer)
+    {
+    }
 
     /**
      * @brief Open the specified template file and read the entire file into
@@ -166,13 +215,34 @@ public:
              std::string& packagename,
              std::string& conf);
 
-    const SymbolString& stringSymbol() const { return single_; }
-    SymbolString& stringSymbol() { return single_; }
-    const SymbolBool& boolSymbol() const { return bool_; }
-    SymbolBool& boolSymbol() { return bool_; }
-    const SymbolList& listSymbol() const { return list_; }
-    SymbolList& listSymbol() { return list_; }
-    const std::string& buffer() const { return buffer_; }
+    const SymbolString& stringSymbol() const
+    {
+        return single_;
+    }
+    SymbolString& stringSymbol()
+    {
+        return single_;
+    }
+    const SymbolBool& boolSymbol() const
+    {
+        return bool_;
+    }
+    SymbolBool& boolSymbol()
+    {
+        return bool_;
+    }
+    const SymbolList& listSymbol() const
+    {
+        return list_;
+    }
+    SymbolList& listSymbol()
+    {
+        return list_;
+    }
+    const std::string& buffer() const
+    {
+        return buffer_;
+    }
 
 private:
     std::string buffer_;
@@ -185,7 +255,7 @@ private:
     std::string processFor(const std::string& in) const;
     std::string processName(const std::string& in) const;
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

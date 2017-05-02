@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -49,7 +49,8 @@ namespace vpz {
  * more particulary, the complex value::Value like value::Set, value::Map,
  * value::Matrix.
  */
-class VLE_LOCAL ValueStackSax {
+class VLE_LOCAL ValueStackSax
+{
 public:
     /**
      * @brief Add an integer to the stack.
@@ -80,7 +81,7 @@ public:
      * @brief Add a key of a value::Map the to stack.
      * @param key the name of the key.
      */
-    void pushMapKey(const std::string &key);
+    void pushMapKey(const std::string& key);
 
     /**
      * @brief Add a value::Set to the stack.
@@ -136,7 +137,7 @@ public:
      * @return the latest value.
      * @throw utils::SaxParserError if the stack is empty.
      */
-    value::Value *topValue();
+    value::Value* topValue();
 
     /**
      * @brief Add to the lastest complex value (value::Set, value::Map,
@@ -144,9 +145,9 @@ public:
      * @param val the value to add.
      */
     template <typename T, typename... Args>
-    void pushOnVectorValue(Args &&... args)
+    void pushOnVectorValue(Args&&... args)
     {
-        vle::value::Value *pointer = nullptr;
+        vle::value::Value* pointer = nullptr;
 
         //
         // If the m_valuestack is not empty, we build a std::unique_ptr and
@@ -155,23 +156,21 @@ public:
         if (not m_valuestack.empty()) {
             if (m_valuestack.top()->isSet()) {
                 auto value = std::unique_ptr<vle::value::Value>(
-                    new T(std::forward<Args>(args)...));
+                  new T(std::forward<Args>(args)...));
 
                 pointer = value.get();
                 m_valuestack.top()->toSet().add(std::move(value));
-            }
-            else if (m_valuestack.top()->isMap()) {
+            } else if (m_valuestack.top()->isMap()) {
                 auto value = std::unique_ptr<vle::value::Value>(
-                    new T(std::forward<Args>(args)...));
+                  new T(std::forward<Args>(args)...));
 
                 pointer = value.get();
                 m_valuestack.top()->toMap().add(m_lastkey, std::move(value));
-            }
-            else if (m_valuestack.top()->isMatrix()) {
+            } else if (m_valuestack.top()->isMatrix()) {
                 auto value = std::unique_ptr<vle::value::Value>(
-                    new T(std::forward<Args>(args)...));
+                  new T(std::forward<Args>(args)...));
 
-                value::Matrix &mx(m_valuestack.top()->toMatrix());
+                value::Matrix& mx(m_valuestack.top()->toMatrix());
                 if (not value->isNull()) {
                     pointer = value.get();
                     mx.addToLastCell(std::move(value));
@@ -179,13 +178,12 @@ public:
 
                 mx.moveLastCell();
             }
-        }
-        else {
+        } else {
             //
             // Otherwise we are reading a @c std::vector of @c shared_ptr.
             //
             auto value = std::shared_ptr<vle::value::Value>(
-                new T(std::forward<Args>(args)...));
+              new T(std::forward<Args>(args)...));
 
             pointer = value.get();
             m_result.push_back(value);
@@ -200,14 +198,20 @@ public:
     /**
      * @brief Pop the current head. If stack is empty, do nothing.
      */
-    inline void pop() { m_valuestack.pop(); }
+    inline void pop()
+    {
+        m_valuestack.pop();
+    }
 
     /**
      * @brief Return true if this sax parser stack is empty.
      *
      * @return true if empty, false otherwise.
      */
-    inline bool empty() const { return m_valuestack.empty(); }
+    inline bool empty() const
+    {
+        return m_valuestack.empty();
+    }
 
     /**
      * @brief Clear stack value and result stack value.
@@ -234,20 +238,20 @@ public:
      * vector'size.
      * @return A constant reference to the value::Value.
      */
-    const std::shared_ptr<value::Value> &getResult(size_t i) const;
+    const std::shared_ptr<value::Value>& getResult(size_t i) const;
 
     /**
      * @brief Get latest value::Value pushed into the values'vector.
      * @throw utils::SaxParserError if the vector of result is empty.
      * @return A constant reference to the latest pushed value::Value.
      */
-    const std::shared_ptr<value::Value> &getLastResult() const;
+    const std::shared_ptr<value::Value>& getLastResult() const;
 
     /**
      * @brief Get the vector of value::Value.
      * @return A constant reference to the vector of value::Value.
      */
-    const std::vector<std::shared_ptr<value::Value>> &getResults() const
+    const std::vector<std::shared_ptr<value::Value>>& getResults() const
     {
         return m_result;
     }
@@ -256,7 +260,7 @@ public:
      * @brief Get the vector of value::Value.
      * @return A reference to the vector of value::Value.
      */
-    std::vector<std::shared_ptr<value::Value>> &getResults()
+    std::vector<std::shared_ptr<value::Value>>& getResults()
     {
         return m_result;
     }
@@ -275,7 +279,7 @@ private:
      * @c value::Value objects are stored in @c std::shared_ptr m_result or in
      * std::unique_ptr shared by composite value.
      */
-    std::stack<value::Value *> m_valuestack;
+    std::stack<value::Value*> m_valuestack;
 
     /**
      * @brief Store result of Values parsing from trame, simple value,

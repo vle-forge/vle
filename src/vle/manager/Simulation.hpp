@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,17 +24,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_MANGER_SIMULATION_HPP
 #define VLE_MANGER_SIMULATION_HPP
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/Context.hpp>
-#include <vle/manager/Types.hpp>
-#include <vle/vpz/Vpz.hpp>
 #include <chrono>
+#include <vle/DllDefines.hpp>
+#include <vle/manager/Types.hpp>
+#include <vle/utils/Context.hpp>
+#include <vle/vpz/Vpz.hpp>
 
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
 
 /**
  * @c manager::Simulation permits to run single simulation.
@@ -51,26 +51,25 @@ class VLE_API Simulation
 public:
     using result_type = std::unique_ptr<value::Map>;
 
-    Simulation(utils::ContextPtr          context,
-               LogOptions                 logoptions,
-               SimulationOptions          simulationoptionts,
-               std::chrono::milliseconds  timeout,
-               std::ostream              *output);
+    Simulation(utils::ContextPtr context,
+               LogOptions logoptions,
+               SimulationOptions simulationoptionts,
+               std::chrono::milliseconds timeout,
+               std::ostream* output);
 
-    Simulation(const Simulation &other) = delete;
-    Simulation& operator=(const Simulation &other) = delete;
+    Simulation(const Simulation& other) = delete;
+    Simulation& operator=(const Simulation& other) = delete;
 
     ~Simulation();
 
-    std::unique_ptr<value::Map>
-        run(std::unique_ptr<vpz::Vpz> vpz,
-            Error *error);
+    std::unique_ptr<value::Map> run(std::unique_ptr<vpz::Vpz> vpz,
+                                    Error* error);
 
 private:
     class Pimpl;
     std::unique_ptr<Pimpl> mPimpl;
 };
-
-}}
+}
+}
 
 #endif

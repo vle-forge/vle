@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,20 +24,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_PACKAGETABLE_HPP
 #define VLE_UTILS_PACKAGETABLE_HPP
 
-#include <vle/DllDefines.hpp>
 #include <set>
 #include <string>
+#include <vle/DllDefines.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 class VLE_API PackageTable
 {
 public:
-    typedef std::set < std::string > table_t;
+    typedef std::set<std::string> table_t;
     typedef table_t::const_iterator index;
     typedef table_t::const_iterator const_iterator;
     typedef table_t::iterator iterator;
@@ -61,16 +61,28 @@ public:
      */
     void remove(index id);
 
-    const_iterator begin() const { return m_table.begin(); }
-    const_iterator end() const { return m_table.end(); }
-    size_type size() const { return m_table.size(); }
-    bool empty() const { return m_table.empty(); }
+    const_iterator begin() const
+    {
+        return m_table.begin();
+    }
+    const_iterator end() const
+    {
+        return m_table.end();
+    }
+    size_type size() const
+    {
+        return m_table.size();
+    }
+    bool empty() const
+    {
+        return m_table.empty();
+    }
 
 private:
     table_t m_table;
     const_iterator m_current;
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

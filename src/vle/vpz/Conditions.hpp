@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -44,7 +44,8 @@ namespace vpz {
  * @param pair the key Condition pair.
  * @return CONDITION name.
  */
-inline std::string conditionKey(std::pair<std::string, Condition> pair)
+inline std::string
+conditionKey(std::pair<std::string, Condition> pair)
 {
     return pair.first;
 }
@@ -58,7 +59,8 @@ typedef std::unordered_map<std::string, Condition> ConditionList;
  * @brief This class describe a list of condition and allow loading and
  * writing a conditions and condition tags.
  */
-class VLE_API Conditions : public Base {
+class VLE_API Conditions : public Base
+{
 public:
     typedef ConditionList::iterator iterator;
     typedef ConditionList::const_iterator const_iterator;
@@ -71,13 +73,15 @@ public:
      */
     Conditions();
 
-    Conditions(const Conditions &cond) = default;
-    Conditions &operator=(const Conditions &cond) = default;
+    Conditions(const Conditions& cond) = default;
+    Conditions& operator=(const Conditions& cond) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Conditions() {}
+    virtual ~Conditions()
+    {
+    }
 
     /**
      * @brief A operator to retrieve the list of keys
@@ -98,13 +102,16 @@ public:
      * @endcode
      * @param out a output stream where write the classes tags.
      */
-    virtual void write(std::ostream &out) const override;
+    virtual void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return CONDITIONS.
      */
-    virtual Base::type getType() const override { return VLE_VPZ_CONDITIONS; }
+    virtual Base::type getType() const override
+    {
+        return VLE_VPZ_CONDITIONS;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -125,14 +132,14 @@ public:
      * @return An output string list.
      * @throw utils::ArgError if condition not exist.
      */
-    std::vector<std::string> portnames(const std::string &condition) const;
+    std::vector<std::string> portnames(const std::string& condition) const;
 
     /**
      * @brief Add a list of Conditions to the list.
      * @param conditions A Conditions object to add.
      * @throw utils::ArgError if a Condition already exist.
      */
-    void add(const Conditions &conditions);
+    void add(const Conditions& conditions);
 
     /**
      * @brief Add a condition into the conditions list.
@@ -140,29 +147,29 @@ public:
      * copied, replace the condition if it already exists
      * @return the newly created Condition.
      */
-    Condition &add(const Condition &condition);
+    Condition& add(const Condition& condition);
 
     /**
      * @brief Delete the specified condition from the condition list.
      * @param condition The name of the condition.
      */
-    void del(const std::string &condition);
+    void del(const std::string& condition);
 
     /**
       * @brief Rename the specified condition.
       * @param old_name The current condition name
       * @param new_name The new name for the condition
       */
-    void rename(const std::string &oldconditionname,
-                const std::string &newconditinname);
+    void rename(const std::string& oldconditionname,
+                const std::string& newconditinname);
 
     /**
       * @brief Copy the specified condition
       * @param conditionname The current condition name
       * @param copyconditionname The copy condition name
       */
-    void copy(const std::string &conditionname,
-              const std::string &copyconditionname);
+    void copy(const std::string& conditionname,
+              const std::string& copyconditionname);
 
     /**
      * @brief Clear the ConditionList object.
@@ -174,7 +181,7 @@ public:
      * @param name The name to check in ConditionList.
      * @return True if the name exist, false otherwise.
      */
-    inline bool exist(const std::string &name) const
+    inline bool exist(const std::string& name) const
     {
         return m_list.find(name) != m_list.end();
     }
@@ -184,14 +191,14 @@ public:
      * @param condition
      * @return
      */
-    const Condition &get(const std::string &condition) const;
+    const Condition& get(const std::string& condition) const;
 
     /**
      * @brief Get the specified condition from conditions list.
      * @param condition
      * @return
      */
-    Condition &get(const std::string &condition);
+    Condition& get(const std::string& condition);
 
     /**
      * @brief Remove all no permanent value of the list. This function is
@@ -215,38 +222,56 @@ public:
      * @brief Get a constant reference to the ConditionList.
      * @return A constant reference to the ConditionList.
      */
-    inline const ConditionList &conditionlist() const { return m_list; }
+    inline const ConditionList& conditionlist() const
+    {
+        return m_list;
+    }
 
     /**
      * @brief Get a reference to the ConditionList.
      * @return A reference to the ConditionList.
      */
-    inline ConditionList &conditionlist() { return m_list; }
+    inline ConditionList& conditionlist()
+    {
+        return m_list;
+    }
 
     /**
      * @brief Get a iterator the begin of the vpz::ConditionList.
      * @return Get a iterator the begin of the vpz::ConditionList.
      */
-    iterator begin() { return m_list.begin(); }
+    iterator begin()
+    {
+        return m_list.begin();
+    }
 
     /**
      * @brief Get a iterator the end of the vpz::ConditionList.
      * @return Get a iterator the end of the vpz::ConditionList.
      */
-    iterator end() { return m_list.end(); }
+    iterator end()
+    {
+        return m_list.end();
+    }
 
     /**
      * @brief Get a constant iterator the begin of the vpz::ConditionList.
      * @return Get a constant iterator the begin of the
      * vpz::ConditionList.
      */
-    const_iterator begin() const { return m_list.begin(); }
+    const_iterator begin() const
+    {
+        return m_list.begin();
+    }
 
     /**
      * @brief Get a constant iterator the end of the vpz::ConditionList.
      * @return Get a constant iterator the end of the vpz::ConditionList.
      */
-    const_iterator end() const { return m_list.end(); }
+    const_iterator end() const
+    {
+        return m_list.end();
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -258,13 +283,14 @@ public:
      * @brief Functor to add condition to the ConditionList. To use with the
      * std::for_each algorithm.
      */
-    struct AddCondition {
+    struct AddCondition
+    {
         /**
          * @brief A constructor to add Condition the the Conditions.
          * @param conditions The Conditions that sotres Condition.
          */
-        AddCondition(Conditions &conditions)
-            : m_conditions(conditions)
+        AddCondition(Conditions& conditions)
+          : m_conditions(conditions)
         {
         }
 
@@ -272,12 +298,12 @@ public:
          * @brief Add the ConditionList to the Conditions.
          * @param pair the ConditionList to add.
          */
-        void operator()(const ConditionList::value_type &pair)
+        void operator()(const ConditionList::value_type& pair)
         {
             m_conditions.add(pair.second);
         }
 
-        Conditions &m_conditions; //!< Output of this functor.
+        Conditions& m_conditions; //!< Output of this functor.
     };
 
 private:

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -44,225 +44,254 @@
 namespace vle {
 namespace value {
 
-std::string Value::writeToFile() const
+std::string
+Value::writeToFile() const
 {
     std::ostringstream out;
     writeFile(out);
     return out.str();
 }
 
-std::string Value::writeToString() const
+std::string
+Value::writeToString() const
 {
     std::ostringstream out;
     writeString(out);
     return out.str();
 }
 
-std::string Value::writeToXml() const
+std::string
+Value::writeToXml() const
 {
     std::ostringstream out;
     writeXml(out);
     return out.str();
 }
 
-const Boolean &Value::toBoolean() const
+const Boolean&
+Value::toBoolean() const
 {
     if (not isBoolean()) {
         throw utils::CastError(_("Value is not a boolean"));
     }
-    return static_cast<const Boolean &>(*this);
+    return static_cast<const Boolean&>(*this);
 }
 
-const Integer &Value::toInteger() const
+const Integer&
+Value::toInteger() const
 {
     if (not isInteger()) {
         throw utils::CastError(_("Value is not an integer"));
     }
-    return static_cast<const Integer &>(*this);
+    return static_cast<const Integer&>(*this);
 }
 
-const Double &Value::toDouble() const
+const Double&
+Value::toDouble() const
 {
     if (not isDouble()) {
         throw utils::CastError(_("Value is not a double"));
     }
-    return static_cast<const Double &>(*this);
+    return static_cast<const Double&>(*this);
 }
 
-const String &Value::toString() const
+const String&
+Value::toString() const
 {
     if (not isString()) {
         throw utils::CastError(_("Value is not a string"));
     }
-    return static_cast<const String &>(*this);
+    return static_cast<const String&>(*this);
 }
 
-const Set &Value::toSet() const
+const Set&
+Value::toSet() const
 {
     if (not isSet()) {
         throw utils::CastError(_("Value is not a set"));
     }
-    return static_cast<const Set &>(*this);
+    return static_cast<const Set&>(*this);
 }
 
-const Map &Value::toMap() const
+const Map&
+Value::toMap() const
 {
     if (not isMap()) {
         throw utils::CastError(_("Value is not a map"));
     }
-    return static_cast<const Map &>(*this);
+    return static_cast<const Map&>(*this);
 }
 
-const Tuple &Value::toTuple() const
+const Tuple&
+Value::toTuple() const
 {
     if (not isTuple()) {
         throw utils::CastError(_("Value is not a tuple"));
     }
-    return static_cast<const Tuple &>(*this);
+    return static_cast<const Tuple&>(*this);
 }
 
-const Table &Value::toTable() const
+const Table&
+Value::toTable() const
 {
     if (not isTable()) {
         throw utils::CastError(_("Value is not a table"));
     }
-    return static_cast<const Table &>(*this);
+    return static_cast<const Table&>(*this);
 }
 
-const Xml &Value::toXml() const
+const Xml&
+Value::toXml() const
 {
     if (not isXml()) {
         throw utils::CastError(_("Value is not an xml"));
     }
-    return static_cast<const Xml &>(*this);
+    return static_cast<const Xml&>(*this);
 }
 
-const Null &Value::toNull() const
+const Null&
+Value::toNull() const
 {
     if (not isNull()) {
         throw utils::CastError(_("Value is not a null"));
     }
-    return static_cast<const Null &>(*this);
+    return static_cast<const Null&>(*this);
 }
 
-const Matrix &Value::toMatrix() const
+const Matrix&
+Value::toMatrix() const
 {
     if (not isMatrix()) {
         throw utils::CastError(_("Value is not a matrix"));
     }
-    return static_cast<const Matrix &>(*this);
+    return static_cast<const Matrix&>(*this);
 }
 
-const User &Value::toUser() const
+const User&
+Value::toUser() const
 {
     if (not isUser()) {
         throw utils::CastError(_("Value is not a user value"));
     }
-    return static_cast<const User &>(*this);
+    return static_cast<const User&>(*this);
 }
 
-Boolean &Value::toBoolean()
+Boolean&
+Value::toBoolean()
 {
     if (not isBoolean()) {
         throw utils::CastError(_("Value is not a boolean"));
     }
-    return static_cast<Boolean &>(*this);
+    return static_cast<Boolean&>(*this);
 }
 
-Integer &Value::toInteger()
+Integer&
+Value::toInteger()
 {
     if (not isInteger()) {
         throw utils::CastError(_("Value is is not an integer"));
     }
-    return static_cast<Integer &>(*this);
+    return static_cast<Integer&>(*this);
 }
 
-Double &Value::toDouble()
+Double&
+Value::toDouble()
 {
     if (not isDouble()) {
         throw utils::CastError(_("Value is not a double"));
     }
-    return static_cast<Double &>(*this);
+    return static_cast<Double&>(*this);
 }
 
-String &Value::toString()
+String&
+Value::toString()
 {
     if (not isString()) {
         throw utils::CastError(_("Value is not a string"));
     }
-    return static_cast<String &>(*this);
+    return static_cast<String&>(*this);
 }
 
-Set &Value::toSet()
+Set&
+Value::toSet()
 {
     if (not isSet()) {
         throw utils::CastError(_("Value is not a set"));
     }
-    return static_cast<Set &>(*this);
+    return static_cast<Set&>(*this);
 }
 
-Map &Value::toMap()
+Map&
+Value::toMap()
 {
     if (not isMap()) {
         throw utils::CastError(_("Value is not a map"));
     }
-    return static_cast<Map &>(*this);
+    return static_cast<Map&>(*this);
 }
 
-Tuple &Value::toTuple()
+Tuple&
+Value::toTuple()
 {
     if (not isTuple()) {
         throw utils::CastError(_("Value is not a tuple"));
     }
-    return static_cast<Tuple &>(*this);
+    return static_cast<Tuple&>(*this);
 }
 
-Table &Value::toTable()
+Table&
+Value::toTable()
 {
     if (not isTable()) {
         throw utils::CastError(_("Value is not a table"));
     }
-    return static_cast<Table &>(*this);
+    return static_cast<Table&>(*this);
 }
 
-Xml &Value::toXml()
+Xml&
+Value::toXml()
 {
     if (not isXml()) {
         throw utils::CastError(_("Value is not an xml"));
     }
-    return static_cast<Xml &>(*this);
+    return static_cast<Xml&>(*this);
 }
 
-Null &Value::toNull()
+Null&
+Value::toNull()
 {
     if (not isNull()) {
         throw utils::CastError(_("Value is not a null"));
     }
-    return static_cast<Null &>(*this);
+    return static_cast<Null&>(*this);
 }
 
-Matrix &Value::toMatrix()
+Matrix&
+Value::toMatrix()
 {
     if (not isMatrix()) {
         throw utils::CastError(_("Value is not a matrix"));
     }
-    return static_cast<Matrix &>(*this);
+    return static_cast<Matrix&>(*this);
 }
 
-User &Value::toUser()
+User&
+Value::toUser()
 {
     if (not isUser()) {
         throw utils::CastError(_("Value is not a user value"));
     }
-    return static_cast<User &>(*this);
+    return static_cast<User&>(*this);
 }
 
-std::shared_ptr<Value> clone(std::shared_ptr<Value> v)
+std::shared_ptr<Value>
+clone(std::shared_ptr<Value> v)
 {
     return clone(std::const_pointer_cast<const Value>(v));
 }
 
-std::shared_ptr<Value> clone(std::shared_ptr<const Value> v)
+std::shared_ptr<Value>
+clone(std::shared_ptr<const Value> v)
 {
     if (not v)
         return std::shared_ptr<Value>();
@@ -270,37 +299,37 @@ std::shared_ptr<Value> clone(std::shared_ptr<const Value> v)
     switch (v->getType()) {
     case Value::INTEGER:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Integer>(v->toInteger()));
+          std::make_shared<Integer>(v->toInteger()));
     case Value::BOOLEAN:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Boolean>(v->toBoolean()));
+          std::make_shared<Boolean>(v->toBoolean()));
     case Value::DOUBLE:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Double>(v->toDouble()));
+          std::make_shared<Double>(v->toDouble()));
     case Value::STRING:
         return std::static_pointer_cast<Value>(
-            std::make_shared<String>(v->toString()));
+          std::make_shared<String>(v->toString()));
     case Value::SET:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Set>(v->toSet()));
+          std::make_shared<Set>(v->toSet()));
     case Value::MAP:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Map>(v->toMap()));
+          std::make_shared<Map>(v->toMap()));
     case Value::TUPLE:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Tuple>(v->toTuple()));
+          std::make_shared<Tuple>(v->toTuple()));
     case Value::TABLE:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Table>(v->toTable()));
+          std::make_shared<Table>(v->toTable()));
     case Value::XMLTYPE:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Xml>(v->toXml()));
+          std::make_shared<Xml>(v->toXml()));
     case Value::NIL:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Null>(v->toNull()));
+          std::make_shared<Null>(v->toNull()));
     case Value::MATRIX:
         return std::static_pointer_cast<Value>(
-            std::make_shared<Matrix>(v->toMatrix()));
+          std::make_shared<Matrix>(v->toMatrix()));
     case Value::USER:
         return std::shared_ptr<Value>();
     }
@@ -308,7 +337,8 @@ std::shared_ptr<Value> clone(std::shared_ptr<const Value> v)
     return std::shared_ptr<Value>();
 }
 
-bool is_composite(const std::unique_ptr<Value> &val)
+bool
+is_composite(const std::unique_ptr<Value>& val)
 {
     if (not val)
         return false;
@@ -324,7 +354,8 @@ bool is_composite(const std::unique_ptr<Value> &val)
     }
 }
 
-const Value &reference(const std::unique_ptr<Value> &value)
+const Value&
+reference(const std::unique_ptr<Value>& value)
 {
     if (not value)
         throw utils::ArgError(_("Null value"));
@@ -332,7 +363,8 @@ const Value &reference(const std::unique_ptr<Value> &value)
     return *value.get();
 }
 
-const Value &reference(std::shared_ptr<const Value> value)
+const Value&
+reference(std::shared_ptr<const Value> value)
 {
     if (not value)
         throw utils::ArgError(_("Null value"));
@@ -340,7 +372,8 @@ const Value &reference(std::shared_ptr<const Value> value)
     return *value.get();
 }
 
-const Value &reference(std::shared_ptr<Value> value)
+const Value&
+reference(std::shared_ptr<Value> value)
 {
     if (not value)
         throw utils::ArgError(_("Null value"));

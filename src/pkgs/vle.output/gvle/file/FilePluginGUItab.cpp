@@ -21,7 +21,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <QDebug>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
@@ -34,29 +33,41 @@
  * @brief FilePluginGUItab::FilePluginGUItab
  *        Default constructor
  */
-FilePluginGUItab::FilePluginGUItab(QWidget *parent) :
-    QWidget(parent), ui(new Ui::FilePluginGvle), mvleVpz(0), mViewName(""),
-    outputNodeConfig(nullptr)
+FilePluginGUItab::FilePluginGUItab(QWidget* parent)
+  : QWidget(parent)
+  , ui(new Ui::FilePluginGvle)
+  , mvleVpz(0)
+  , mViewName("")
+  , outputNodeConfig(nullptr)
 {
     ui->setupUi(this);
 
-    QObject::connect(ui->flushByBag, SIGNAL(stateChanged(int)),
-                     this,           SLOT(flushByBagChanged(int)));
-    QObject::connect(ui->julianDay, SIGNAL(stateChanged(int)),
-                     this,          SLOT(julianDayChanged(int)));
-    QObject::connect(ui->locale, SIGNAL(currentIndexChanged(const QString&)),
-                         this,   SLOT(localeChanged(const QString&)) );
-    QObject::connect(ui->destination, SIGNAL(currentIndexChanged(const QString&)),
-                         this,        SLOT(destinationChanged(const QString&)));
-    QObject::connect(ui->fileType, SIGNAL(currentIndexChanged(const QString&)),
-                     this,         SLOT(fileTypeChanged(const QString&)) );
+    QObject::connect(ui->flushByBag,
+                     SIGNAL(stateChanged(int)),
+                     this,
+                     SLOT(flushByBagChanged(int)));
+    QObject::connect(ui->julianDay,
+                     SIGNAL(stateChanged(int)),
+                     this,
+                     SLOT(julianDayChanged(int)));
+    QObject::connect(ui->locale,
+                     SIGNAL(currentIndexChanged(const QString&)),
+                     this,
+                     SLOT(localeChanged(const QString&)));
+    QObject::connect(ui->destination,
+                     SIGNAL(currentIndexChanged(const QString&)),
+                     this,
+                     SLOT(destinationChanged(const QString&)));
+    QObject::connect(ui->fileType,
+                     SIGNAL(currentIndexChanged(const QString&)),
+                     this,
+                     SLOT(fileTypeChanged(const QString&)));
 }
 
 FilePluginGUItab::~FilePluginGUItab()
 {
     delete ui;
 }
-
 
 void
 FilePluginGUItab::init(vle::gvle::vleVpz* vpz, const QString& viewName)
@@ -73,23 +84,24 @@ FilePluginGUItab::init(vle::gvle::vleVpz* vpz, const QString& viewName)
 
     bool oldBlock = ui->flushByBag->blockSignals(true);
     ui->flushByBag->setCheckState(Qt::CheckState(
-            getCheckState(outputNodeConfig->getBoolean("flush-by-bag"))));
+      getCheckState(outputNodeConfig->getBoolean("flush-by-bag"))));
     ui->flushByBag->blockSignals(oldBlock);
     oldBlock = ui->julianDay->blockSignals(true);
     ui->julianDay->setCheckState(Qt::CheckState(
-            getCheckState(outputNodeConfig->getBoolean("julian-day"))));
+      getCheckState(outputNodeConfig->getBoolean("julian-day"))));
     ui->julianDay->blockSignals(oldBlock);
     oldBlock = ui->locale->blockSignals(true);
     ui->locale->setCurrentIndex(ui->locale->findText(
-            QString(outputNodeConfig->getString("locale").c_str())));
+      QString(outputNodeConfig->getString("locale").c_str())));
     ui->locale->blockSignals(oldBlock);
     oldBlock = ui->destination->blockSignals(true);
-    ui->destination->setCurrentIndex(ui->destination->findText(QString("File")));
+    ui->destination->setCurrentIndex(
+      ui->destination->findText(QString("File")));
     ui->destination->setEnabled(false);
     ui->destination->blockSignals(oldBlock);
     oldBlock = ui->fileType->blockSignals(true);
     ui->fileType->setCurrentIndex(ui->fileType->findText(
-            QString(outputNodeConfig->getString("type").c_str())));
+      QString(outputNodeConfig->getString("type").c_str())));
     ui->fileType->blockSignals(oldBlock);
 }
 
@@ -97,8 +109,8 @@ void
 FilePluginGUItab::flushByBagChanged(int val)
 {
     bool& b = outputNodeConfig->getBoolean("flush-by-bag");
-    if (b != (bool) val) {
-        b = (bool) val;
+    if (b != (bool)val) {
+        b = (bool)val;
         mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 }
@@ -107,8 +119,8 @@ void
 FilePluginGUItab::julianDayChanged(int val)
 {
     bool& b = outputNodeConfig->getBoolean("julian-day");
-    if (b != (bool) val) {
-        b = (bool) val;
+    if (b != (bool)val) {
+        b = (bool)val;
         mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
     }
 }
@@ -147,9 +159,10 @@ int
 FilePluginGUItab::getCheckState(const vle::value::Boolean& v)
 {
     if (v.value()) {
-        return 2;/*Qt::CheckState::Checked*/;
+        return 2; /*Qt::CheckState::Checked*/
+        ;
     } else {
-        return 0;/*Qt::CheckState::Unchecked;*/
+        return 0; /*Qt::CheckState::Unchecked;*/
     }
     return 0;
 }
@@ -181,10 +194,10 @@ FilePluginGUItab::wellFormed()
                 return false;
             }
             if ((v->toString().value() != "C") and
-                    (v->toString().value() != "user")) {
+                (v->toString().value() != "user")) {
                 return false;
             }
-        }else if (key == "output") {
+        } else if (key == "output") {
             if (not v->isString()) {
                 return false;
             }
@@ -193,11 +206,11 @@ FilePluginGUItab::wellFormed()
                 return false;
             }
             if ((v->toString().value() != "csv") and
-                    (v->toString().value() != "rdata") and
-                    (v->toString().value() != "text")) {
+                (v->toString().value() != "rdata") and
+                (v->toString().value() != "text")) {
                 return false;
             }
-        }  else {
+        } else {
             return false;
         }
     }
@@ -209,12 +222,12 @@ FilePluginGUItab::buildDefaultConfig()
 {
     if (not outputNodeConfig) {
         qDebug() << " Internal Error FilePluginGUItab::buildDefaultConfig() ";
-        return ;
+        return;
     }
     outputNodeConfig.reset(new vle::value::Map());
-    outputNodeConfig->addBoolean("flush-by-bag",false);
-    outputNodeConfig->addBoolean("julian-day",false);
-    outputNodeConfig->addString("locale","C");
-    outputNodeConfig->addString("output","file");
-    outputNodeConfig->addString("type","text");
+    outputNodeConfig->addBoolean("flush-by-bag", false);
+    outputNodeConfig->addBoolean("julian-day", false);
+    outputNodeConfig->addString("locale", "C");
+    outputNodeConfig->addString("output", "file");
+    outputNodeConfig->addString("type", "text");
 }

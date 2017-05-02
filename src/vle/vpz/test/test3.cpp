@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -35,92 +35,94 @@
 
 using namespace vle;
 
-void atomicmodel_timed_vpz()
+void
+atomicmodel_timed_vpz()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"graphtester\" seed=\"123\" >\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
-        "plugin=\"storage\" />\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"obs\" >\n"
-        "     <port name=\"c\" >\n"
-        "      <attachedview name=\"view\" />\n"
-        "     </port>\n"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"view\" output=\"view\" type=\"timed\" "
-        "timestep=\"1.000000000000000\" />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      " <experiment name=\"graphtester\" seed=\"123\" >\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
+      "plugin=\"storage\" />\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"obs\" >\n"
+      "     <port name=\"c\" >\n"
+      "      <attachedview name=\"view\" />\n"
+      "     </port>\n"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"view\" output=\"view\" type=\"timed\" "
+      "timestep=\"1.000000000000000\" />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const auto &v = vpz.project().experiment().views().get("view");
+    const auto& v = vpz.project().experiment().views().get("view");
 
     Ensures(v.type() == vle::vpz::View::TIMED);
     Ensures(v.timestep() == 1.0);
 }
 
-void atomicmodel_vpz_event_output()
+void
+atomicmodel_vpz_event_output()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"graphtester\" seed=\"123\" >\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
-        "plugin=\"storage\" />\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"obs\" >\n"
-        "     <port name=\"c\" >\n"
-        "      <attachedview name=\"view\" />\n"
-        "     </port>\n"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"view\" output=\"view\" type=\"event,output\"  />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      " <experiment name=\"graphtester\" seed=\"123\" >\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
+      "plugin=\"storage\" />\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"obs\" >\n"
+      "     <port name=\"c\" >\n"
+      "      <attachedview name=\"view\" />\n"
+      "     </port>\n"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"view\" output=\"view\" type=\"event,output\"  />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const auto &v = vpz.project().experiment().views().get("view");
+    const auto& v = vpz.project().experiment().views().get("view");
 
     auto c = vle::vpz::View::INTERNAL | vle::vpz::View::CONFLUENT |
              vle::vpz::View::EXTERNAL | vle::vpz::View::OUTPUT;
@@ -128,108 +130,110 @@ void atomicmodel_vpz_event_output()
     Ensures(v.type() == c);
 }
 
-void atomicmodel_vpz_internal_output()
+void
+atomicmodel_vpz_internal_output()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"graphtester\" seed=\"123\" >\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
-        "plugin=\"storage\" />\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"obs\" >\n"
-        "     <port name=\"c\" >\n"
-        "      <attachedview name=\"view\" />\n"
-        "     </port>\n"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"view\" output=\"view\" type=\"internal,output\"  />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      " <experiment name=\"graphtester\" seed=\"123\" >\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
+      "plugin=\"storage\" />\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"obs\" >\n"
+      "     <port name=\"c\" >\n"
+      "      <attachedview name=\"view\" />\n"
+      "     </port>\n"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"view\" output=\"view\" type=\"internal,output\"  />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const auto &v = vpz.project().experiment().views().get("view");
+    const auto& v = vpz.project().experiment().views().get("view");
 
     auto c = vle::vpz::View::INTERNAL | vle::vpz::View::OUTPUT;
 
     Ensures(v.type() == c);
 }
 
-void atomicmodel_vpz_confluent()
+void
+atomicmodel_vpz_confluent()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"graphtester\" seed=\"123\" >\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
-        "plugin=\"storage\" />\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"obs\" >\n"
-        "     <port name=\"c\" >\n"
-        "      <attachedview name=\"view\" />\n"
-        "     </port>\n"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"view\" output=\"view\" type=\"confluent\"  />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      " <experiment name=\"graphtester\" seed=\"123\" >\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
+      "plugin=\"storage\" />\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"obs\" >\n"
+      "     <port name=\"c\" >\n"
+      "      <attachedview name=\"view\" />\n"
+      "     </port>\n"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"view\" output=\"view\" type=\"confluent\"  />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const auto &v = vpz.project().experiment().views().get("view");
+    const auto& v = vpz.project().experiment().views().get("view");
 
     auto c = vle::vpz::View::CONFLUENT;
 
     Ensures(v.type() == c);
 }
 
-void vpz_throw()
+void
+vpz_throw()
 {
-    const char *xml = "<?x";
+    const char* xml = "<?x";
 
     {
         try {
             vpz::Vpz vpz;
             vpz.parseMemory(xml);
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::cerr << __func__ << ": " << e.what() << '\n';
         }
     }
@@ -238,19 +242,19 @@ void vpz_throw()
     EnsuresThrow(vpz.parseMemory(xml), std::exception);
 }
 
-void vpz_throw_1()
+void
+vpz_throw_1()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n";
 
     {
         try {
             vpz::Vpz vpz;
             vpz.parseMemory(xml);
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::cerr << __func__ << ": " << e.what() << '\n';
         }
     }
@@ -259,47 +263,47 @@ void vpz_throw_1()
     EnsuresThrow(vpz.parseMemory(xml), std::exception);
 }
 
-void vpz_throw_2()
+void
+vpz_throw_2()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in2>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"graphtester\" seed=\"123\" >\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
-        "plugin=\"storage\" />\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"obs\" >\n"
-        "     <port name=\"c\" >\n"
-        "      <attachedview name=\"view\" />\n"
-        "     </port>\n"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"view\" output=\"view\" type=\"confluent,\"  />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in2>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      " <experiment name=\"graphtester\" seed=\"123\" >\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
+      "plugin=\"storage\" />\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"obs\" >\n"
+      "     <port name=\"c\" >\n"
+      "      <attachedview name=\"view\" />\n"
+      "     </port>\n"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"view\" output=\"view\" type=\"confluent,\"  />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
     {
         try {
             vpz::Vpz vpz;
             vpz.parseMemory(xml);
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::cerr << __func__ << ": " << e.what() << '\n';
         }
     }
@@ -308,48 +312,48 @@ void vpz_throw_2()
     EnsuresThrow(vpz.parseMemory(xml), std::exception);
 }
 
-void atomicmodel_vpz_throw1()
+void
+atomicmodel_vpz_throw1()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"graphtester\" seed=\"123\" >\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
-        "plugin=\"storage\" />\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"obs\" >\n"
-        "     <port name=\"c\" >\n"
-        "      <attachedview name=\"view\" />\n"
-        "     </port>\n"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"view\" output=\"view\" type=\"confluent,\"  />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      " <experiment name=\"graphtester\" seed=\"123\" >\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
+      "plugin=\"storage\" />\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"obs\" >\n"
+      "     <port name=\"c\" >\n"
+      "      <attachedview name=\"view\" />\n"
+      "     </port>\n"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"view\" output=\"view\" type=\"confluent,\"  />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     {
         try {
             vpz::Vpz vpz;
             vpz.parseMemory(xml);
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::cerr << __func__ << ": " << e.what() << '\n';
         }
     }
@@ -358,48 +362,48 @@ void atomicmodel_vpz_throw1()
     EnsuresThrow(vpz.parseMemory(xml), std::exception);
 }
 
-void atomicmodel_vpz_throw2()
+void
+atomicmodel_vpz_throw2()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <experiment name=\"graphtester\" seed=\"123\" >\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
-        "plugin=\"storage\" />\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"obs\" >\n"
-        "     <port name=\"c\" >\n"
-        "      <attachedview name=\"view\" />\n"
-        "     </port>\n"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"view\" output=\"view\" type=\"timed\"  />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" observables=\"obs\">\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      " <experiment name=\"graphtester\" seed=\"123\" >\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"view\" format=\"local\" package=\"vle.output\" "
+      "plugin=\"storage\" />\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"obs\" >\n"
+      "     <port name=\"c\" >\n"
+      "      <attachedview name=\"view\" />\n"
+      "     </port>\n"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"view\" output=\"view\" type=\"timed\"  />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     {
         try {
             vpz::Vpz vpz;
             vpz.parseMemory(xml);
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::cerr << __func__ << ": " << e.what() << '\n';
         }
     }
@@ -408,7 +412,8 @@ void atomicmodel_vpz_throw2()
     EnsuresThrow(vpz.parseMemory(xml), std::exception);
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

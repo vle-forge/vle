@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,13 +36,14 @@ namespace value {
 /**
  * @brief Integer Value encapsulate a C++ 'int32_t' type into a class.
  */
-class VLE_API Integer : public Value {
+class VLE_API Integer : public Value
+{
 public:
     /**
      * @brief Build an Integer object with a default value as zero.
      */
     Integer()
-        : m_value(0)
+      : m_value(0)
     {
     }
 
@@ -51,7 +52,7 @@ public:
      * @param value The value to copy.
      */
     Integer(int32_t value)
-        : m_value(value)
+      : m_value(value)
     {
     }
 
@@ -59,16 +60,18 @@ public:
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Integer(const Integer &value)
-        : Value(value)
-        , m_value(value.m_value)
+    Integer(const Integer& value)
+      : Value(value)
+      , m_value(value.m_value)
     {
     }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Integer() {}
+    virtual ~Integer()
+    {
+    }
 
     ///
     ////
@@ -101,19 +104,22 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::INTEGER.
      */
-    virtual Value::type getType() const override { return Value::INTEGER; }
+    virtual Value::type getType() const override
+    {
+        return Value::INTEGER;
+    }
 
     /**
      * @brief Push the long in the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream &out) const override;
+    virtual void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the long in the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream &out) const override;
+    virtual void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the long in the stream. The string pushed in the stream:
@@ -123,7 +129,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream &out) const override;
+    virtual void writeXml(std::ostream& out) const override;
 
     ///
     ////
@@ -133,70 +139,89 @@ public:
      * @brief Get the value of the long.
      * @return An integer.
      */
-    inline const int32_t &value() const { return m_value; }
+    inline const int32_t& value() const
+    {
+        return m_value;
+    }
 
     /**
      * @brief Get a reference to the encapsulated long.
      * @return A reference to the encapsulated long.
      */
-    inline int32_t &value() { return m_value; }
+    inline int32_t& value()
+    {
+        return m_value;
+    }
 
     /**
      * @brief Assign a value to the encapsulated long.
      * @param value The value to set.
      */
-    inline void set(int32_t value) { m_value = value; }
+    inline void set(int32_t value)
+    {
+        m_value = value;
+    }
 
 private:
     int32_t m_value;
 };
 
-inline const Integer &toIntegerValue(std::shared_ptr<Value> value)
+inline const Integer&
+toIntegerValue(std::shared_ptr<Value> value)
 {
     return value::reference(value).toInteger();
 }
 
-inline const Integer &toIntegerValue(std::shared_ptr<const Value> value)
+inline const Integer&
+toIntegerValue(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toInteger();
 }
 
-inline const Integer &toIntegerValue(const std::unique_ptr<Value> &value)
+inline const Integer&
+toIntegerValue(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toInteger();
 }
 
-inline const Integer &toIntegerValue(const Value &value)
+inline const Integer&
+toIntegerValue(const Value& value)
 {
     return value.toInteger();
 }
 
-inline Integer &toIntegerValue(Value &value)
+inline Integer&
+toIntegerValue(Value& value)
 {
     return value.toInteger();
 }
 
-inline int32_t toInteger(std::shared_ptr<Value> value)
+inline int32_t
+toInteger(std::shared_ptr<Value> value)
 {
     return value::reference(value).toInteger().value();
 }
 
-inline int32_t toInteger(std::shared_ptr<const Value> value)
+inline int32_t
+toInteger(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toInteger().value();
 }
 
-inline int32_t toInteger(const std::unique_ptr<Value> &value)
+inline int32_t
+toInteger(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toInteger().value();
 }
 
-inline int32_t toInteger(const Value &value)
+inline int32_t
+toInteger(const Value& value)
 {
     return value.toInteger().value();
 }
 
-inline int32_t &toInteger(Value &value)
+inline int32_t&
+toInteger(Value& value)
 {
     return value.toInteger().value();
 }

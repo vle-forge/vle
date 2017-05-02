@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,13 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DEVS_DYNAMICSDBG_HPP
 #define VLE_DEVS_DYNAMICSDBG_HPP
 
 #include <vle/devs/Dynamics.hpp>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 /**
  * A Dynamics proxy class that wraps an another Dynamics to show
@@ -48,8 +48,7 @@ public:
      * @param init The initialiser of Dynamics.
      * @param events The parameter from the experimental frame.
      */
-    DynamicsDbg(const DynamicsInit& init,
-                const InitEventList& events);
+    DynamicsDbg(const DynamicsInit& init, const InitEventList& events);
 
     /**
      * @brief Destructor.
@@ -128,9 +127,8 @@ public:
      * @param event the external event with of the port.
      * @param time the date of occurrence of this event.
      */
-    virtual void
-        externalTransition(const ExternalEventList& event,
-                           Time time) override;
+    virtual void externalTransition(const ExternalEventList& event,
+                                    Time time) override;
 
     /**
      * @brief Process the confluent transition: select the transition to
@@ -139,9 +137,9 @@ public:
      * @param internal the internal event.
      * @param extEventlist the external events list.
      */
-    virtual void
-        confluentTransitions(Time time,
-                             const ExternalEventList& extEventlist) override;
+    virtual void confluentTransitions(
+      Time time,
+      const ExternalEventList& extEventlist) override;
 
     /**
      * @brief Process an observation event: compute the current state of the
@@ -149,8 +147,8 @@ public:
      * @param event the state event with of the port
      * @return the value of state variable
      */
-    virtual std::unique_ptr<vle::value::Value>
-        observation(const ObservationEvent& event) const override;
+    virtual std::unique_ptr<vle::value::Value> observation(
+      const ObservationEvent& event) const override;
 
     /**
      * @brief When the simulation of the atomic model is finished, the
@@ -158,7 +156,7 @@ public:
      */
     virtual void finish() override;
 };
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

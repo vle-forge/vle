@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,46 +24,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_CONTEXT_PRIVATE_HPP
 #define VLE_UTILS_CONTEXT_PRIVATE_HPP
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/Context.hpp>
 #include <boost/variant.hpp>
 #include <map>
+#include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 
-#define VLE_LOG_EMERG   0               // system is unusable
-#define VLE_LOG_ALERT   1               // action must be taken immediately
-#define VLE_LOG_CRIT    2               // critical conditions
-#define VLE_LOG_ERR     3               // error conditions
-#define VLE_LOG_WARNING 4               // warning conditions
-#define VLE_LOG_NOTICE  5               // normal but significant condition
-#define VLE_LOG_INFO    6               // informational
-#define VLE_LOG_DEBUG   7               // debug-level messages
+#define VLE_LOG_EMERG 0   // system is unusable
+#define VLE_LOG_ALERT 1   // action must be taken immediately
+#define VLE_LOG_CRIT 2    // critical conditions
+#define VLE_LOG_ERR 3     // error conditions
+#define VLE_LOG_WARNING 4 // warning conditions
+#define VLE_LOG_NOTICE 5  // normal but significant condition
+#define VLE_LOG_INFO 6    // informational
+#define VLE_LOG_DEBUG 7   // debug-level messages
 
 static inline void
 #if defined(__GNUC__)
- __attribute__((always_inline, format(printf, 2, 3)))
+  __attribute__((always_inline, format(printf, 2, 3)))
 #endif
-vle_log_null(const vle::utils::ContextPtr&, const char *, ...)
+  vle_log_null(const vle::utils::ContextPtr&, const char*, ...)
 {
 }
 
 static inline void
 #if defined(__GNUC__)
- __attribute__((always_inline, format(printf, 2, 3)))
+  __attribute__((always_inline, format(printf, 2, 3)))
 #endif
-vle_log_null(const vle::utils::Context*, const char *, ...)
+  vle_log_null(const vle::utils::Context*, const char*, ...)
 {
 }
 
-#define vle_log_cond(ctx, prio, arg...)                                \
-    do {                                                               \
-        if (ctx->get_log_priority() >= prio) {                         \
-            ctx->log(prio, __FILE__, __LINE__,                         \
-                     __FUNCTION__, ## arg);                            \
-        }                                                              \
+#define vle_log_cond(ctx, prio, arg...)                                       \
+    do {                                                                      \
+        if (ctx->get_log_priority() >= prio) {                                \
+            ctx->log(prio, __FILE__, __LINE__, __FUNCTION__, ##arg);          \
+        }                                                                     \
     } while (0)
 
 /* Default, logging system is active and the \e dbg() macro checks log
@@ -73,20 +71,21 @@ vle_log_null(const vle::utils::Context*, const char *, ...)
  */
 
 #ifndef DISABLE_LOGGING
-#  ifndef NDEBUG
-#    define vDbg(ctx, arg...) vle_log_cond(ctx, VLE_LOG_DEBUG, ## arg)
-#  else
-#    define vDbg(ctx, arg...) vle_log_null(ctx, ## arg)
-#  endif
-#  define vInfo(ctx, arg...) vle_log_cond(ctx, VLE_LOG_INFO, ## arg)
-#  define vErr(ctx, arg...) vle_log_cond(ctx, VLE_LOG_ERR, ## arg)
+#ifndef NDEBUG
+#define vDbg(ctx, arg...) vle_log_cond(ctx, VLE_LOG_DEBUG, ##arg)
 #else
-#  define vDbg(ctx, arg...) vle_log_null(ctx, ## arg)
-#  define vInfo(ctx, arg...) vle_log_null(ctx, ## arg)
-#  define vErr(ctx, arg...) vle_log_null(ctx, ## arg)
+#define vDbg(ctx, arg...) vle_log_null(ctx, ##arg)
+#endif
+#define vInfo(ctx, arg...) vle_log_cond(ctx, VLE_LOG_INFO, ##arg)
+#define vErr(ctx, arg...) vle_log_cond(ctx, VLE_LOG_ERR, ##arg)
+#else
+#define vDbg(ctx, arg...) vle_log_null(ctx, ##arg)
+#define vInfo(ctx, arg...) vle_log_null(ctx, ##arg)
+#define vErr(ctx, arg...) vle_log_null(ctx, ##arg)
 #endif
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 //
 // API for settings
@@ -99,17 +98,17 @@ struct ModuleManager;
 
 struct PrivateContextImpl
 {
-    Path m_prefix;                      ///< dirname of $PREFIX of installation
-    Path m_home;                        ///< dirname of $VLEHOME directory
+    Path m_prefix; ///< dirname of $PREFIX of installation
+    Path m_home;   ///< dirname of $VLEHOME directory
 
-    PreferenceMap settings;             ///< global settings
+    PreferenceMap settings; ///< global settings
 
-    std::shared_ptr <ModuleManager> modules;
-    
-    std::unique_ptr <Context::LogFunctor> log_fn;
+    std::shared_ptr<ModuleManager> modules;
+
+    std::unique_ptr<Context::LogFunctor> log_fn;
     int log_priority;
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

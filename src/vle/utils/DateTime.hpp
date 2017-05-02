@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_DATETIME_HPP
 #define VLE_UTILS_DATETIME_HPP
 
-#include <vle/DllDefines.hpp>
 #include <string>
+#include <vle/DllDefines.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 enum DateTimeUnitOptions
 {
@@ -58,7 +58,7 @@ public:
      */
     static std::string currentDate();
 
-                                  /* * * * */
+    /* * * * */
 
     /**
      * @brief Get the year in the simulation time.
@@ -152,13 +152,19 @@ public:
      * @brief Get the number of day in a week.
      * @return Return 7.
      */
-    static inline double aWeek() { return 7; }
+    static inline double aWeek()
+    {
+        return 7;
+    }
 
     /**
      * @brief Get the number of day in a day.
      * @return Return 1.
      */
-    static inline double aDay() { return 1; }
+    static inline double aDay()
+    {
+        return 1;
+    }
 
     /**
      * @brief Get number of days in n-years from the simulation time.
@@ -188,14 +194,20 @@ public:
      * @param n Number of weeks.
      * @return n * 7.
      */
-    static inline double weeks(unsigned int n) { return (int)(7 * n); }
+    static inline double weeks(unsigned int n)
+    {
+        return (int)(7 * n);
+    }
 
     /**
      * @brief Get number of days in n-days.
      * @param n Number of days.
      * @return n.
      */
-    static inline double days(unsigned int n) { return (int)n; }
+    static inline double days(unsigned int n)
+    {
+        return (int)n;
+    }
 
     /**
      * @brief Convert std::string unit ("day", "week", "month", "year") into
@@ -217,7 +229,7 @@ public:
                            double duration,
                            DateTimeUnitOptions unit);
 
-                                  /* * * * */
+    /* * * * */
 
     /**
      * @brief Convert an julian day number into a string.
@@ -242,7 +254,8 @@ public:
     /**
      * @brief Convert a julian date into a string.
      * @code
-     * vle::utils::DateTime::toJulianDay(2454115.05486)) = "2001-10-9 hh:mm:ss";
+     * vle::utils::DateTime::toJulianDay(2454115.05486)) = "2001-10-9
+     * hh:mm:ss";
      * @endcode
      * @param date The date to convert.
      * @return A string representation of the julian day.
@@ -259,7 +272,7 @@ public:
      */
     static double toJulianDay(const std::string& date);
 
-                                  /* * * * */
+    /* * * * */
 
     /**
      * @brief Check if the date is a valid year in gregorian calendard.
@@ -303,11 +316,9 @@ public:
      * @param day Output parameter to represent day in a month (1..31).
      *
      */
-    static void currentDate(long& year,
-                            long& month,
-                            long& day);
+    static void currentDate(long& year, long& month, long& day);
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

@@ -27,30 +27,27 @@
 
 #include <QDebug>
 
-
-#include <QLabel>
-#include <QMouseEvent>
-#include <QString>
-#include <QWidget>
-#include <QPainter>
-#include <QPoint>
-#include <QStaticText>
-#include <QStyleOption>
+#include "gvle_plugins.h"
+#include "logger.h"
+#include "vle_dom.hpp"
+#include <QDateTimeEdit>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNamedNodeMap>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPoint>
+#include <QStaticText>
+#include <QString>
+#include <QStyleOption>
+#include <QWidget>
 #include <QXmlDefaultHandler>
-#include <QDateTimeEdit>
-#include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
-#include "gvle_plugins.h"
-#include "vle_dom.hpp"
-#include "logger.h"
-
+#include <vle/value/Value.hpp>
 
 namespace vle {
 namespace gvle {
-
 
 /**
  * @brief Main class
@@ -61,10 +58,10 @@ class vleVpz : public QObject
 public:
     vleVpz(const QString& filename);
     vleVpz(QXmlInputSource& filename);
-    vleVpz(const QString& vpzpath, const QString& vpmpath,
-            gvle_plugins* plugs);
+    vleVpz(const QString& vpzpath,
+           const QString& vpmpath,
+           gvle_plugins* plugs);
     virtual ~vleVpz();
-
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc
@@ -159,7 +156,8 @@ public:
      * @brief get <port> tag from Vpz Doc into condition condName
      * which attribute 'name' is portName
      */
-    QDomNode portFromDoc(const QString& condName, const QString& portName) const;
+    QDomNode portFromDoc(const QString& condName,
+                         const QString& portName) const;
     /**
      * @brief get the root model
      */
@@ -178,8 +176,9 @@ public:
      * @param destinationPort, the name of the dest port
      */
     QDomNode modelConnectionFromDoc(const QString& model_query,
-            const QString& destinationFullPath, const QString& sourcePort,
-            const QString& destinationPort);
+                                    const QString& destinationFullPath,
+                                    const QString& sourcePort,
+                                    const QString& destinationPort);
     /**
      * @brief get the list of atomic model nodes into the current vpz.
      * Atomic model are of the form
@@ -211,7 +210,7 @@ public:
      * which name is atom
      */
     QDomNode atomicModelFromModel(const QDomNode& node,
-            const QString& atom) const;
+                                  const QString& atom) const;
     /**
      * @brief get <connections> tag  from a tag <model>,
      * @param node: QDomNode <model> with xpath = //model
@@ -224,8 +223,9 @@ public:
      * @param node: QDomNode <model> with xpath = //model
      * @param submodel_names: names of submodel
      */
-    QList<QDomNode> connectionListFromModel(const QDomNode& node,
-            const QList<QString>& submodel_names) const;
+    QList<QDomNode> connectionListFromModel(
+      const QDomNode& node,
+      const QList<QString>& submodel_names) const;
 
     /**
      * @brief get <model> tag from a tag <model> into <submodels>,
@@ -241,7 +241,7 @@ public:
     /**
      * @brief remove children that are QDomText to a node
      */
-    void removeTextChilds(QDomNode node, bool recursively=true);
+    void removeTextChilds(QDomNode node, bool recursively = true);
 
     QString mergeQueries(const QString& query1, const QString& query2);
     QString subQuery(const QString& query, int begin, int end);
@@ -250,21 +250,21 @@ public:
      * TODO A TRIER
      *****************************************************/
 
-    QString        getFilename() const;
-    QString        getBasePath();
+    QString getFilename() const;
+    QString getBasePath();
 
-    QString        getAuthor() const;
-    void           setAuthor(const QString author);
-    QString        getDate() const;
-    void           setDate(const QString date);
-    QString        getVersion() const;
-    void           setVersion(const QString version);
-    QString        getExpName() const;
-    void           setExpName(const QString name);
-    QString        getExpDuration() const;
-    void           setExpDuration(const QString duration);
-    QString        getExpBegin() const;
-    void           setExpBegin(const QString begin);
+    QString getAuthor() const;
+    void setAuthor(const QString author);
+    QString getDate() const;
+    void setDate(const QString date);
+    QString getVersion() const;
+    void setVersion(const QString version);
+    QString getExpName() const;
+    void setExpName(const QString name);
+    QString getExpDuration() const;
+    void setExpDuration(const QString duration);
+    QString getExpBegin() const;
+    void setExpBegin(const QString begin);
 
     // Observables primitives
 
@@ -281,12 +281,13 @@ public:
      * @brief tells if the port portName exists in observable obsName
      */
     bool existObsPortFromDoc(const QString& condName,
-            const QString& portName) const;
+                             const QString& portName) const;
     /**
      * @brief tells if a observable port already has a view
      */
-    bool existViewFromObsPortDoc(const QString& obsName, const QString& obsPort,
-            const QString& viewName) const;
+    bool existViewFromObsPortDoc(const QString& obsName,
+                                 const QString& obsPort,
+                                 const QString& viewName) const;
     /**
      * @brief get <observables> tag from Vpz doc
      */
@@ -332,7 +333,8 @@ public:
      * @param newPortName, the new name of the port
      */
     void renameObsPortToDoc(const QString& obsName,
-            const QString& oldPortName, const QString& newPortName);
+                            const QString& oldPortName,
+                            const QString& newPortName);
 
     /**
      * @brief rename a model xpath = //model
@@ -348,7 +350,7 @@ public:
      * @param withEmit, emit a signal modelsUpdated or not
      * @note: update connections by getting ancestor node
      */
-    void rmModel(QDomNode node, bool withEmit=true);
+    void rmModel(QDomNode node, bool withEmit = true);
     /**
      * @brief remove many models from the same coupled model
      *   in one snapshot
@@ -388,8 +390,10 @@ public:
      * @param xtranslation:
      * @param ytranslation:
      */
-    void copyModelsToModel(QList<QDomNode> modsToCopy, QDomNode modDest,
-            qreal xtranslation, qreal ytranslation);
+    void copyModelsToModel(QList<QDomNode> modsToCopy,
+                           QDomNode modDest,
+                           qreal xtranslation,
+                           qreal ytranslation);
     /**
      * @brief set the 'name' attribute of tag <port> to a new value
      * @param node: QDomNode <port> with xpath = //model//in//port
@@ -446,9 +450,12 @@ public:
      * @param portDest: destination port from modelDest
      * @param connType: either internal, input or output
      */
-    bool existConnection(QDomNode connections, QString modelOrig,
-            QString portOrig, QString modelDest, QString portDest,
-            QString connType);
+    bool existConnection(QDomNode connections,
+                         QString modelOrig,
+                         QString portOrig,
+                         QString modelDest,
+                         QString portDest,
+                         QString connType);
 
     /**
      * @brief tells if a connection node concerns one of sub model?
@@ -459,7 +466,7 @@ public:
      * is associated to the connection connection
      */
     bool isConnectionAssociatedTo(QDomNode connection,
-            const QList<QString>& submodel_names) const;
+                                  const QList<QString>& submodel_names) const;
 
     /**
      * @brief add a connection between two port
@@ -472,12 +479,13 @@ public:
      * @param node: QDomNode <connection>
      *     with xpath = //model/connections/connection
      */
-    void rmModelConnection(QDomNode node, bool undo=true);
+    void rmModelConnection(QDomNode node, bool undo = true);
     /**
      * @brief rm a view from a observable port
      */
-    void rmViewToObsPortDoc(const QString& obsName, const QString& obsPort,
-            const QString& viewName);
+    void rmViewToObsPortDoc(const QString& obsName,
+                            const QString& obsPort,
+                            const QString& viewName);
 
     /**
      * @brief remove a <observable> tag from a Vpz Doc
@@ -490,7 +498,7 @@ public:
      * with attribute 'name' obsName
      * with attribute 'node' QDomNode model
      */
-    void rmObservableFromModel(QDomNode &node, const QString &obsName);
+    void rmObservableFromModel(QDomNode& node, const QString& obsName);
     /**
      * @brief remove <port> tag from a observable to a Vpz doc
      * which attribute 'name' is portName
@@ -521,7 +529,8 @@ public:
     /**
      * @brief add an <attachedview> to an observable port
      */
-    void attachViewToObsPortDoc(const QString& obsName, const QString& portName,
+    void attachViewToObsPortDoc(const QString& obsName,
+                                const QString& portName,
                                 const QString& viewName);
 
     /**
@@ -535,8 +544,9 @@ public:
 
     void setPositionToModel(QDomNode node, int x, int y);
 
-    void setPositionToModel(QList<QDomNode>& nodes, QList<int> xs,
-            QList<int> ys);
+    void setPositionToModel(QList<QDomNode>& nodes,
+                            QList<int> xs,
+                            QList<int> ys);
 
     /**
      * @brief set an observable to an anatomic model
@@ -544,7 +554,8 @@ public:
      * @param obsName, observable name
      *
      */
-    void setObsToAtomicModel(const QString& model_query, const QString& obsName);
+    void setObsToAtomicModel(const QString& model_query,
+                             const QString& obsName);
 
     /**
      * @brief build an empty node corresponding to the value type from Vpz doc
@@ -558,9 +569,9 @@ public:
 
     bool existDynamicFromDoc(const QString& dynName) const;
 
-     /**
-     * @brief tells if a condition exists
-     */
+    /**
+    * @brief tells if a condition exists
+    */
     bool existCondFromDoc(const QString& condName) const;
 
     /**
@@ -569,19 +580,20 @@ public:
      * @brief oldName, the old name of the view (and output)
      * @brief newName, the new name of the view (and output)
      */
-    virtual void renameViewToDoc(const QString& oldName, const QString& newName);
+    virtual void renameViewToDoc(const QString& oldName,
+                                 const QString& newName);
     /**
      * @brief set the 'name' attribute of tag <condition> to a new value
      */
     virtual void renameConditionToDoc(const QString& oldName,
-            const QString& newName);
+                                      const QString& newName);
     void renameDynamicToDoc(const QString& oldName, const QString& newName);
     /**
      * @brief set the 'name' attribute of tag <port> to a new value
      */
-    void renameCondPortToDoc(const QString& condName, const QString& oldName,
-            const QString& newName);
-
+    void renameCondPortToDoc(const QString& condName,
+                             const QString& oldName,
+                             const QString& newName);
 
     QString newDynamicNameToDoc(QString prefix = "Dynamic") const;
     /**
@@ -608,7 +620,8 @@ public:
      * @brief get a new port name for obs obsName not already in tag
      * <observable> from the Vpz doc
      */
-    QString newObsPortNameToDoc(QString obsName, QString prefix = "Port") const;
+    QString newObsPortNameToDoc(QString obsName,
+                                QString prefix = "Port") const;
     /**
      * @brief Add a view (and output with the same name) to a Vpz Doc
      * (tag <view> with attr 'name' set to viewName and default config based
@@ -641,7 +654,7 @@ public:
      */
     QDomNode addConditionToDoc(const QString& condName);
     void addConditionFromPluginToDoc(const QString& condName,
-            const QString& pluginName);
+                                     const QString& pluginName);
 
     /**
      * @brief create a <dynamic> tag
@@ -655,21 +668,19 @@ public:
      */
     QDomNode addDynamicToDoc(const QString& dyn);
 
-
     /**
      * @brief add a <dynamic> tag to a Vpz Doc
      * @param dyn, attribute 'name'  set to dyn
      * @param pkgName, attribute 'package'  set to pkgName
      * @param libName, attribute 'library'  set to libName
      */
-    QDomNode addDynamicToDoc(const QString& dyn, const QString& pkgName,
-            const QString& libName);
+    QDomNode addDynamicToDoc(const QString& dyn,
+                             const QString& pkgName,
+                             const QString& libName);
 
-
-
-    void configDynamicToDoc(const QString& dyn, const QString& pkgName,
-            const QString& libName);
-
+    void configDynamicToDoc(const QString& dyn,
+                            const QString& pkgName,
+                            const QString& libName);
 
     /**
      * @brief Copy a dynamic
@@ -682,7 +693,8 @@ public:
      * @brief add a <port> tag to a Vpz Doc
      * with attribute 'name'  portName for condition condName
      */
-    QDomNode addCondPortToDoc(const QString& condName, const QString& portName);
+    QDomNode addCondPortToDoc(const QString& condName,
+                              const QString& portName);
 
     /**
      * @brief remove a <condition> tag to a Vpz Doc
@@ -697,8 +709,9 @@ public:
     /**
      * @brief add a value to a tag <port> tag from a condition into a Vpz doc
      */
-    void addValuePortCondToDoc(const QString& condName, const QString& portName,
-            const vle::value::Value& val);
+    void addValuePortCondToDoc(const QString& condName,
+                               const QString& portName,
+                               const vle::value::Value& val);
     /**
      * @brief Set the port values to a cond
      * @param condName, name of the condition
@@ -710,13 +723,15 @@ public:
      */
 
     bool fillConditionWithMapToDoc(const QString& condName,
-            const vle::value::Map& val, bool rm=false);
+                                   const vle::value::Map& val,
+                                   bool rm = false);
     /**
      * @brief rm a value from a tag <port> tag from a condition into a Vpz doc
      * 'index' is the index of value in port
      */
-    void rmValuePortCondToDoc(const QString& condName, const QString& portName,
-            int index);
+    void rmValuePortCondToDoc(const QString& condName,
+                              const QString& portName,
+                              int index);
     /**
      * @brief get list of node with tag <condition> tag from tag <conditions>
      */
@@ -731,7 +746,8 @@ public:
      * @brief get <condition> tag from  tag <conditions>
      * which attribute 'name' is condName
      */
-    QDomNode condFromConds(const QDomNode& node, const QString& condName) const;
+    QDomNode condFromConds(const QDomNode& node,
+                           const QString& condName) const;
 
     /**
      * @brief get <port> tag from  tag <condition>
@@ -763,11 +779,7 @@ public:
      * @param condName, the condition name
      * @return true if condName is attached to model_query
      */
-    bool isAttachedCond(const QString& model_query,
-            const QString& condName);
-
-
-
+    bool isAttachedCond(const QString& model_query, const QString& condName);
 
     /**
      * @brief return the list of conditions that are attached to
@@ -793,7 +805,8 @@ public:
      *   ...
      *   </model>
      *
-     *  @return the string "" if the dynamic of atom if not shared with any other
+     *  @return the string "" if the dynamic of atom if not shared with any
+     * other
      *  atomic dynamic, otherwise the name odf the dynamic
      */
     QString sharedDynamic(const QString& atom_query) const;
@@ -814,7 +827,6 @@ public:
     QString sharedObservable(const QString& atom_query) const;
     QString sharedObservable(const QDomNode& atom) const;
 
-
     /**
      * @brief returns a string containing the list of conditions
      * attached to the model
@@ -823,11 +835,11 @@ public:
      */
     QString getAtomicModelConds(const QDomNode atom);
 
-     /**
-     * @brief to know if conditions are set to
-     * @param model node
-     * @return true if there is a condition attached
-     */
+    /**
+    * @brief to know if conditions are set to
+    * @param model node
+    * @return true if there is a condition attached
+    */
     bool isAtomicModelCondsSet(const QDomNode atom);
 
     /**
@@ -854,8 +866,9 @@ public:
      * @param model_query, a Xquery that points to a model
      *
      */
-    void setDynToAtomicModel(const QString& model_query, const QString& dyn,
-            bool undo=true);
+    void setDynToAtomicModel(const QString& model_query,
+                             const QString& dyn,
+                             bool undo = true);
 
     /**
      * @brief returns the dymaic name or an empty string
@@ -881,7 +894,7 @@ public:
      *
      */
     void attachCondToAtomicModel(const QString& model_query,
-            const QString& condName);
+                                 const QString& condName);
     /**
      * @brief detach a condition to an anatomic model
      * @param model_query, a Xquery that points to a model
@@ -889,7 +902,7 @@ public:
      *
      */
     void detachCondToAtomicModel(const QString& model_query,
-            const QString& condName);
+                                 const QString& condName);
 
     /**
      * @brief get <output> tag from <outputs> tag
@@ -897,14 +910,14 @@ public:
      */
     QDomNode outputFromOutputs(QDomNode node, const QString& outputName);
 
-
     /**
      * @brief build a map from an output configuration
      * (map under <output>)
      * @param outputName, the name of the output (=viewName)
      * @return the configuration map if present or 0
      */
-    std::unique_ptr<value::Map> buildOutputConfigMap(const QString& outputName);
+    std::unique_ptr<value::Map> buildOutputConfigMap(
+      const QString& outputName);
 
     /**
      * @brief fills the configuration of an output
@@ -913,7 +926,7 @@ public:
      * @param mapConfig, the map for configuration
      */
     void fillOutputConfigMap(const QString& outputName,
-            const vle::value::Map& mapConfig);
+                             const vle::value::Map& mapConfig);
 
     /**
      * @brief get the list of attribute values of 'name' of different <output>
@@ -922,7 +935,8 @@ public:
      */
     void viewOutputNames(std::vector<std::string>& v) const;
     /**
-     * @brief get the list of attribute values of 'name' of different <observable>
+     * @brief get the list of attribute values of 'name' of different
+     * <observable>
      * in <experiment>/<views>/<observables>
      * @param the values to fill
      */
@@ -948,52 +962,53 @@ public:
      *  (attribute 'type' of tag <view>)
      * @brief viewName, the name of the view
      */
-     QStringList getViewTypeFromDoc(const QString& viewName) const;
-     /**
-      * @brief add view type to a view:
-      * @param viewName, name of the view
-      * @param viewType: either :
-      * timed, output, internal, external, confluent or finish
-      * @param return true if a modification ha been performed
-      * @return true if modifications have been performed
-      *
-      * @note if viewType is "timed", other current viewTypes are removed,
-      * otherwise the viewType "timed" is removed (since "timed" cannot be
-      * associated to others)
-      */
-     bool addViewTypeToDoc(const QString& viewName, const QString& viewType);
-     bool rmViewTypeToDoc(const QString& viewName, const QString& viewType);
-     /**
-      * @brief get time step of a view
-      *  (attribute 'timestep' of tag <view>)
-      * @brief viewName, the name of the view
-      */
-     double timeStepFromDoc(const QString& viewName) const;
-     /**
-      * @brief set time step to a view
-      *  (attribute 'timestep' of tag <view>)
-      * @param viewName, the name of the view
-      * @param ts, the new timestep
-      * @return true if modifications have been performed
-      */
-     bool setTimeStepToDoc(const QString& viewName, double ts);
-     /**
-      * @brief set output plugin to a view
-      * @param outputPlugin, has to be of the form : package/plugin
-      */
-     virtual bool setOutputPluginToDoc(const QString& viewName,
-             const QString& outputPlugin);
-     /**
-     * @brief get output plugin from a tag <output>
-     * plugin name has the form :
-     *   package/plugin
+    QStringList getViewTypeFromDoc(const QString& viewName) const;
+    /**
+     * @brief add view type to a view:
+     * @param viewName, name of the view
+     * @param viewType: either :
+     * timed, output, internal, external, confluent or finish
+     * @param return true if a modification ha been performed
+     * @return true if modifications have been performed
+     *
+     * @note if viewType is "timed", other current viewTypes are removed,
+     * otherwise the viewType "timed" is removed (since "timed" cannot be
+     * associated to others)
      */
+    bool addViewTypeToDoc(const QString& viewName, const QString& viewType);
+    bool rmViewTypeToDoc(const QString& viewName, const QString& viewType);
+    /**
+     * @brief get time step of a view
+     *  (attribute 'timestep' of tag <view>)
+     * @brief viewName, the name of the view
+     */
+    double timeStepFromDoc(const QString& viewName) const;
+    /**
+     * @brief set time step to a view
+     *  (attribute 'timestep' of tag <view>)
+     * @param viewName, the name of the view
+     * @param ts, the new timestep
+     * @return true if modifications have been performed
+     */
+    bool setTimeStepToDoc(const QString& viewName, double ts);
+    /**
+     * @brief set output plugin to a view
+     * @param outputPlugin, has to be of the form : package/plugin
+     */
+    virtual bool setOutputPluginToDoc(const QString& viewName,
+                                      const QString& outputPlugin);
+    /**
+    * @brief get output plugin from a tag <output>
+    * plugin name has the form :
+    *   package/plugin
+    */
     QString getOutputPlugin(QDomNode node);
     /**
      * @brief gives the type of a value of
      */
     vle::value::Value::type valueType(const QString& condName,
-            const QString& portName, int index) const;
+                                      const QString& portName,
+                                      int index) const;
 
     /**
      * @brief build a vle value at a given index from a port
@@ -1003,11 +1018,12 @@ public:
      * the set of values attached to the port
      */
     std::unique_ptr<vle::value::Value> buildValueFromDoc(
-            const QString& condName, const QString& portName, int valIndex) const;
+      const QString& condName,
+      const QString& portName,
+      int valIndex) const;
 
     unsigned int nbValuesInPortFromDoc(const QString& condName,
-            const QString& portName);
-
+                                       const QString& portName);
 
     /**
      * @brief Fill a vector of vle values with the multipl values contained by
@@ -1017,9 +1033,10 @@ public:
      * @param values, the vector of values to fill
      * @note: values is first cleared
      */
-    bool fillWithMultipleValueFromDoc(const QString& condName,
-         const QString& portName,
-         std::vector<std::unique_ptr<value::Value>>& values) const;
+    bool fillWithMultipleValueFromDoc(
+      const QString& condName,
+      const QString& portName,
+      std::vector<std::unique_ptr<value::Value>>& values) const;
 
     /**
      * @brief Fill a vector of vle values with the multipl values contained by
@@ -1028,22 +1045,24 @@ public:
      * @param values, the vector of values to fill
      * @note: values is first cleared
      */
-    bool fillWithMultipleValue(QDomNode portNode,
-            std::vector<std::unique_ptr<value::Value>>& values) const;
+    bool fillWithMultipleValue(
+      QDomNode portNode,
+      std::vector<std::unique_ptr<value::Value>>& values) const;
 
     /**
      * @brief Fill a value at index of <port> portName of <condtion> condName
      * @note: the map is first cleared
      */
-    bool fillWithValue(const QString& condName, const QString& portName,
-            int index, const vle::value::Value& val);
+    bool fillWithValue(const QString& condName,
+                       const QString& portName,
+                       int index,
+                       const vle::value::Value& val);
 
     /**
      * @brief fill a vector of strings with classes names
      * @param the vector to fill
      */
     void fillWithClassesFromDoc(std::vector<std::string>& toFill);
-
 
     /**
      * @brief Fill a Node from a value
@@ -1074,15 +1093,13 @@ public:
     /**
      * @brief add an integer key in a <map>
      */
-    void addIntegerKeyInMap(QDomNode* node, const QString& key,
-            int val);
+    void addIntegerKeyInMap(QDomNode* node, const QString& key, int val);
 
     /**
      * @brief get <output>  from a tag <views>
      * @note : combine outputsFromViews, outputFromOutput
      */
-    QDomNode getOutputFromViews(QDomNode node,
-            const QString& outputName);
+    QDomNode getOutputFromViews(QDomNode node, const QString& outputName);
     /**
      * @brief Get vle output plugin attached to an output (=view)
      * @param outputName (=viewName), the name of the output or view
@@ -1094,7 +1111,7 @@ public:
      * @brief Fill a QList with names of the dynamics
      * @param toFill, the QList to fill with names of dynamics
      */
-    void fillWithDynamicsList(QList <QString>& toFill) const;
+    void fillWithDynamicsList(QList<QString>& toFill) const;
 
     /**
      * @brief Tells if a dynamic exists
@@ -1109,7 +1126,7 @@ public:
      * @return true if the dynamic dyn exists, false otherwise
      */
     bool existDynamicIntoDynList(const QString& dyn,
-            const QDomNodeList& dynList) const;
+                                 const QDomNodeList& dynList) const;
 
     /**
      * @brief Get the name of the package containing a dynamic
@@ -1142,14 +1159,13 @@ public:
      * Eg: the conditions, observable and dynamic attached to an atomic model
      * that one wants to export will be pasted into destination vpz.
      */
-    void exportToClipboard(QList<QDomNode> nodes_source, bool track=false);
+    void exportToClipboard(QList<QDomNode> nodes_source, bool track = false);
 
-    void           setBasePath(const QString path);
-    bool           isAltered();
+    void setBasePath(const QString path);
+    bool isAltered();
     void save();
     void saveVpz(QString filenameVpz);
     void saveVpm(QString filenameVpm);
-
 
     /**
      * @brief Will save to temp destination:
@@ -1160,12 +1176,12 @@ public:
      * QDir::tempPath()/pkg/exp/prefix.vpz
      * QDir::tempPath()/pkg/metadata/exp/prefix.vpm
      */
-    void  saveTemp(QString pkg, QString prefix);
+    void saveTemp(QString pkg, QString prefix);
 
     void undo();
     void redo();
 
-    void           removeDynamic(const QString& dynamic);
+    void removeDynamic(const QString& dynamic);
 
     /**
      * @brief totally unconfigure the model, and also remove
@@ -1189,9 +1205,12 @@ public:
      * @param the in node
      * @param the out node
      */
-    void configureModel(QDomNode model, QDomNode dynamic,
-            QDomNode observable, QDomNode condition,
-            QDomNode in, QDomNode out);
+    void configureModel(QDomNode model,
+                        QDomNode dynamic,
+                        QDomNode observable,
+                        QDomNode condition,
+                        QDomNode in,
+                        QDomNode out);
 
     inline DomDiffStack* getUndoStack()
     {
@@ -1222,7 +1241,7 @@ public:
     QString getCurrentSource();
 
     QByteArray xGetXml();
-    void setLogger(Logger *logger)
+    void setLogger(Logger* logger)
     {
         mLogger = logger;
     }
@@ -1238,28 +1257,32 @@ signals:
     void modelsUpdated();
     void dynamicsUpdated();
     void experimentUpdated();
-    void undoRedo(QDomNode oldValVpz, QDomNode newValVpz,
-            QDomNode oldValVpm, QDomNode newValVpm);
+    void undoRedo(QDomNode oldValVpz,
+                  QDomNode newValVpz,
+                  QDomNode oldValVpm,
+                  QDomNode newValVpm);
     void undoAvailable(bool);
 public slots:
-    //void onSnapshotVpz(QDomNode snapVpz, bool isMerged);
+    // void onSnapshotVpz(QDomNode snapVpz, bool isMerged);
     void onUndoRedoStackVpz(QDomNode oldValVpz, QDomNode newValVpz);
-    //void onSnapshotVpm(QDomNode snapVpm, bool isMerged);
+    // void onSnapshotVpm(QDomNode snapVpm, bool isMerged);
     void onUndoRedoStackVpm(QDomNode oldValVpm, QDomNode newValVpm);
     void onUndoAvailable(bool);
 
 private:
     void xReadDom();
     void xReadDomMetadata();
-    void xSaveDom(QDomDocument *doc);
+    void xSaveDom(QDomDocument* doc);
     void xCreateDomMetadata();
     void setCondGUIplugin(const QString& condName, const QString& name);
     void renameCondGUIplugin(const QString& oldCond, const QString& newCond);
-    void setOutputGUIplugin(const QString& viewName, const QString& pluginName,
-            bool snapshot=true);
+    void setOutputGUIplugin(const QString& viewName,
+                            const QString& pluginName,
+                            bool snapshot = true);
     void synchronizeUndoStack();
     void tryEmitUndoAvailability(unsigned int prevCurr,
-            unsigned int curr, unsigned int saved);
+                                 unsigned int curr,
+                                 unsigned int saved);
     /**
      * @brief modify the vpz source for an import, names of imported elements
      * are modified in order to get no conflict with the destination
@@ -1272,33 +1295,37 @@ private:
      *
      * @return a list of elements to import of the form 'key::name'
      * where 'key' is amongst 'cond', 'cond_port', 'dyn', 'obs', 'model'
-     * where 'name' is the new name of the element to import in the modified 'src'
+     * where 'name' is the new name of the element to import in the modified
+     * 'src'
      * if key is 'cond_port' name has the format src_cond//dest_cond//port
      */
-    QSet<QString> modifyImportSourceForImport(QDomNode dest_node,
-            const QStringList& import_queries, bool track, vleVpz& src,
-            QString& src_mod_query);
+    QSet<QString> modifyImportSourceForImport(
+      QDomNode dest_node,
+      const QStringList& import_queries,
+      bool track,
+      vleVpz& src,
+      QString& src_mod_query);
 
-    bool              hasMeta;
-    QString           mFilename;
-    QString           mFileNameVpm;
-    QDomDocument      mDoc;
-    QDomDocument*     mDocVpm;
-    vleDomVpz*        mVdo;
-    vleDomVpm*        mVdoVpm;
-    DomDiffStack*     undoStack;
-    DomDiffStack*     undoStackVpm;
-    bool              waitUndoRedoVpz;
-    bool              waitUndoRedoVpm;
-    QDomNode          oldValVpz;
-    QDomNode          newValVpz;
-    QDomNode          oldValVpm;
-    QDomNode          newValVpm;
-    Logger*           mLogger;
-    gvle_plugins*     mGvlePlugins;
-    int               maxPrecision;
+    bool hasMeta;
+    QString mFilename;
+    QString mFileNameVpm;
+    QDomDocument mDoc;
+    QDomDocument* mDocVpm;
+    vleDomVpz* mVdo;
+    vleDomVpm* mVdoVpm;
+    DomDiffStack* undoStack;
+    DomDiffStack* undoStackVpm;
+    bool waitUndoRedoVpz;
+    bool waitUndoRedoVpm;
+    QDomNode oldValVpz;
+    QDomNode newValVpz;
+    QDomNode oldValVpm;
+    QDomNode newValVpm;
+    Logger* mLogger;
+    gvle_plugins* mGvlePlugins;
+    int maxPrecision;
 };
-
-}}//namepsaces
+}
+} // namepsaces
 
 #endif

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,57 +24,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/ContextPrivate.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+#include <fstream>
+#include <list>
 #include <vle/utils/Context.hpp>
+#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
-#include <fstream>
-#include <list>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
-Path Context::findInstallPrefix()
+Path
+Context::findInstallPrefix()
 {
     auto version = vle::version_abi();
     Path path;
 
-    path = findProgram(
-        vle::utils::format(
-            "vle-%d.%d",
-            std::get<0>(version),
-            std::get<1>(version)));
+    path = findProgram(vle::utils::format(
+      "vle-%d.%d", std::get<0>(version), std::get<1>(version)));
 
     if (not path.empty()) {
-        path = path.parent_path();     // remove filename
-        path = path.parent_path();     // remove bin
+        path = path.parent_path(); // remove filename
+        path = path.parent_path(); // remove bin
         return path;
     }
 
-    path = findLibrary(
-        vle::utils::format(
-            "libvle-%d.%d.so",
-            std::get<0>(version),
-            std::get<1>(version)));
+    path = findLibrary(vle::utils::format(
+      "libvle-%d.%d.so", std::get<0>(version), std::get<1>(version)));
 
     if (not path.empty()) {
-        path = path.parent_path();     // remove filename
-        path = path.parent_path();     // remove lib
+        path = path.parent_path(); // remove filename
+        path = path.parent_path(); // remove lib
         return path;
     }
 
     return path;
 }
 
-Path Context::findLibrary(const std::string& lib)
+Path
+Context::findLibrary(const std::string& lib)
 {
     char* env_p = std::getenv("LD_LIBRARY_PATH");
 
     std::vector<std::string> splitVec;
-    boost::split(splitVec, env_p, boost::is_any_of(":"),
-            boost::token_compress_on);
+    boost::split(
+      splitVec, env_p, boost::is_any_of(":"), boost::token_compress_on);
 
     splitVec.insert(splitVec.begin(), "/usr/lib");
     splitVec.insert(splitVec.begin(), "/usr/local/lib");
@@ -92,13 +89,14 @@ Path Context::findLibrary(const std::string& lib)
     return {};
 }
 
-Path Context::findProgram(const std::string& exe)
+Path
+Context::findProgram(const std::string& exe)
 {
     char* env_p = std::getenv("PATH");
 
     std::vector<std::string> splitVec;
-    boost::split(splitVec, env_p, boost::is_any_of(":"),
-            boost::token_compress_on);
+    boost::split(
+      splitVec, env_p, boost::is_any_of(":"), boost::token_compress_on);
 
     std::vector<std::string>::const_iterator itb = splitVec.begin();
     std::vector<std::string>::const_iterator ite = splitVec.end();
@@ -112,7 +110,8 @@ Path Context::findProgram(const std::string& exe)
     return {};
 }
 
-void Context::initHomeDir()
+void
+Context::initHomeDir()
 {
     m_pimpl->m_home.clear();
 
@@ -135,9 +134,10 @@ void Context::initHomeDir()
     }
 }
 
-void Context::initPrefixDir()
+void
+Context::initPrefixDir()
 {
     m_pimpl->m_prefix = findInstallPrefix();
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils

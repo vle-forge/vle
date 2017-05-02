@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,13 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_MANAGER_TYPES_HPP
 #define VLE_MANAGER_TYPES_HPP
 
 #include <string>
 
-namespace vle { namespace manager  {
+namespace vle {
+namespace manager {
 
 /**
  * The @c vle::manager::Error structure permits to report error.
@@ -47,21 +47,23 @@ namespace vle { namespace manager  {
 struct Error
 {
     Error()
-        : code(0)
+      : code(0)
     {
     }
 
     Error(int code, const std::string& message)
-        : code(code), message(message)
+      : code(code)
+      , message(message)
     {
     }
 
-    Error(const Error &error)
-    : code(error.code), message(error.message)
+    Error(const Error& error)
+      : code(error.code)
+      , message(error.message)
     {
     }
 
-    Error& operator=(const Error &other)
+    Error& operator=(const Error& other)
     {
         Error tmp(other.code, other.message);
 
@@ -83,127 +85,120 @@ struct Error
  * Defines the type of log
  *
  */
-enum LogOptions {
-    LOG_NONE    = 0,            /**< Report nothing in output stream. */
-    LOG_SUMMARY = 1 << 0,       /**< Report summary of the experimental
-                                 * frame (size of the plan, number of
-                                 * replicas etc.). */
-    LOG_RUN     = 1 << 1        /**< Report information. */
+enum LogOptions
+{
+    LOG_NONE = 0,         /**< Report nothing in output stream. */
+    LOG_SUMMARY = 1 << 0, /**< Report summary of the experimental
+                              * frame (size of the plan, number of
+                              * replicas etc.). */
+    LOG_RUN = 1 << 1      /**< Report information. */
 };
 
 /**
  * Defines the option to launch simulation.
  *
  */
-enum SimulationOptions {
-    SIMULATION_NONE          = 0, /**< Default option. */
+enum SimulationOptions
+{
+    SIMULATION_NONE = 0,               /**< Default option. */
     SIMULATION_SPAWN_PROCESS = 1 << 0, /**< Launch the simulation in a
-                                        * subprocess.  */
-    SIMULATION_NO_RETURN     = 1 << 1 /**< The simulation result are empty. */
+                                           * subprocess.  */
+    SIMULATION_NO_RETURN = 1 << 1      /**< The simulation result are empty. */
 };
 
-inline LogOptions operator|(LogOptions lhs, LogOptions rhs)
+inline LogOptions
+operator|(LogOptions lhs, LogOptions rhs)
 {
-    return static_cast<LogOptions>(
-        static_cast<unsigned>(lhs) |
-        static_cast<unsigned>(rhs));
+    return static_cast<LogOptions>(static_cast<unsigned>(lhs) |
+                                   static_cast<unsigned>(rhs));
 }
 
 inline LogOptions operator&(LogOptions lhs, LogOptions rhs)
 {
-    return static_cast<LogOptions>(
-        static_cast<unsigned>(lhs) &
-        static_cast<unsigned>(rhs));
+    return static_cast<LogOptions>(static_cast<unsigned>(lhs) &
+                                   static_cast<unsigned>(rhs));
 }
 
-inline LogOptions operator^(LogOptions lhs, LogOptions rhs)
+inline LogOptions
+operator^(LogOptions lhs, LogOptions rhs)
 {
-    return static_cast<LogOptions>(
-        static_cast<unsigned>(lhs) ^
-        static_cast<unsigned>(rhs));
+    return static_cast<LogOptions>(static_cast<unsigned>(lhs) ^
+                                   static_cast<unsigned>(rhs));
 }
 
 inline LogOptions operator~(LogOptions flags)
 {
-    return static_cast<LogOptions>(
-        ~static_cast<unsigned>(flags));
+    return static_cast<LogOptions>(~static_cast<unsigned>(flags));
 }
 
-inline LogOptions& operator|=(LogOptions& lhs, LogOptions rhs)
+inline LogOptions&
+operator|=(LogOptions& lhs, LogOptions rhs)
 {
-    return (lhs = static_cast<LogOptions>(
-                static_cast<unsigned>(lhs) |
-                static_cast<unsigned>(rhs)));
+    return (lhs = static_cast<LogOptions>(static_cast<unsigned>(lhs) |
+                                          static_cast<unsigned>(rhs)));
 }
 
-inline LogOptions& operator&=(LogOptions& lhs, LogOptions rhs)
+inline LogOptions&
+operator&=(LogOptions& lhs, LogOptions rhs)
 {
-    return (lhs = static_cast<LogOptions>(
-                static_cast<unsigned>(lhs) &
-                static_cast<unsigned>(rhs)));
+    return (lhs = static_cast<LogOptions>(static_cast<unsigned>(lhs) &
+                                          static_cast<unsigned>(rhs)));
 }
 
-inline LogOptions& operator^=(LogOptions& lhs, LogOptions rhs)
+inline LogOptions&
+operator^=(LogOptions& lhs, LogOptions rhs)
 {
-    return (lhs = static_cast<LogOptions>(
-                static_cast<unsigned>(lhs) ^
-                static_cast<unsigned>(rhs)));
+    return (lhs = static_cast<LogOptions>(static_cast<unsigned>(lhs) ^
+                                          static_cast<unsigned>(rhs)));
 }
 
-inline SimulationOptions operator|(SimulationOptions lhs,
-                                   SimulationOptions rhs)
+inline SimulationOptions
+operator|(SimulationOptions lhs, SimulationOptions rhs)
 {
-    return static_cast<SimulationOptions>(
-        static_cast<unsigned>(lhs) |
-        static_cast<unsigned>(rhs));
+    return static_cast<SimulationOptions>(static_cast<unsigned>(lhs) |
+                                          static_cast<unsigned>(rhs));
 }
 
 inline SimulationOptions operator&(SimulationOptions lhs,
                                    SimulationOptions rhs)
 {
-    return static_cast<SimulationOptions>(
-        static_cast<unsigned>(lhs) &
-        static_cast<unsigned>(rhs));
+    return static_cast<SimulationOptions>(static_cast<unsigned>(lhs) &
+                                          static_cast<unsigned>(rhs));
 }
 
-inline SimulationOptions operator^(SimulationOptions lhs,
-                                   SimulationOptions rhs)
+inline SimulationOptions
+operator^(SimulationOptions lhs, SimulationOptions rhs)
 {
-    return static_cast<SimulationOptions>(
-        static_cast<unsigned>(lhs) ^
-        static_cast<unsigned>(rhs));
+    return static_cast<SimulationOptions>(static_cast<unsigned>(lhs) ^
+                                          static_cast<unsigned>(rhs));
 }
 
 inline SimulationOptions operator~(SimulationOptions flags)
 {
-    return static_cast<SimulationOptions>(
-        ~static_cast<unsigned>(flags));
+    return static_cast<SimulationOptions>(~static_cast<unsigned>(flags));
 }
 
-inline SimulationOptions& operator|=(SimulationOptions& lhs,
-                                     SimulationOptions rhs)
+inline SimulationOptions&
+operator|=(SimulationOptions& lhs, SimulationOptions rhs)
 {
-    return (lhs = static_cast<SimulationOptions>(
-                static_cast<unsigned>(lhs) |
-                static_cast<unsigned>(rhs)));
+    return (lhs = static_cast<SimulationOptions>(static_cast<unsigned>(lhs) |
+                                                 static_cast<unsigned>(rhs)));
 }
 
-inline SimulationOptions& operator&=(SimulationOptions& lhs,
-                                     SimulationOptions rhs)
+inline SimulationOptions&
+operator&=(SimulationOptions& lhs, SimulationOptions rhs)
 {
-    return (lhs = static_cast<SimulationOptions>(
-                static_cast<unsigned>(lhs) &
-                static_cast<unsigned>(rhs)));
+    return (lhs = static_cast<SimulationOptions>(static_cast<unsigned>(lhs) &
+                                                 static_cast<unsigned>(rhs)));
 }
 
-inline SimulationOptions& operator^=(SimulationOptions& lhs,
-                                     SimulationOptions rhs)
+inline SimulationOptions&
+operator^=(SimulationOptions& lhs, SimulationOptions rhs)
 {
-    return (lhs = static_cast<SimulationOptions>(
-                static_cast<unsigned>(lhs) ^
-                static_cast<unsigned>(rhs)));
+    return (lhs = static_cast<SimulationOptions>(static_cast<unsigned>(lhs) ^
+                                                 static_cast<unsigned>(rhs)));
 }
-
-}} // namespace vle manager
+}
+} // namespace vle manager
 
 #endif

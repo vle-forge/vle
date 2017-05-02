@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 INRA
+ * Copyright 2016-2017 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -149,69 +149,68 @@ public:
                         m_step_number--;
                     }
                     switch (m_adapt_state) {
-                        case IMPOSSIBLE:
-                            update_thresholds();
-                            break;
-                        case POSSIBLE:
+                    case IMPOSSIBLE:
+                        update_thresholds();
+                        break;
+                    case POSSIBLE:
+                        if (val >= m_upthreshold) {
+                            store_change(m_step_size, time);
+                        } else {
+                            store_change(-m_step_size, time);
+                        }
+                        shifting_factor = shift_quanta();
+                        if (0 > shifting_factor)
+                            throw vu::ModellingError(
+                              "Bad shifting value (value : %f, "
+                              "should be strictly positive)\n",
+                              shifting_factor);
+                        if (1 < shifting_factor)
+                            throw vu::ModellingError(
+                              "Bad shifting value ( value : %f, "
+                              "should be less than 1)\n",
+                              shifting_factor);
+                        ;
+                        if ((0 != shifting_factor) && (1 != shifting_factor)) {
                             if (val >= m_upthreshold) {
-                                store_change(m_step_size, time);
+                                update_thresholds(shifting_factor, DOWN);
                             } else {
-                                store_change(-m_step_size, time);
+                                update_thresholds(shifting_factor, UP);
                             }
-                            shifting_factor = shift_quanta();
-                            if (0 > shifting_factor)
-                                throw vu::ModellingError(
-                                  "Bad shifting value (value : %f, "
-                                  "should be strictly positive)\n",
+                            Trace(context(),
+                                  6,
+                                  "Quantifier %s new quantas while "
+                                  "treating new val %f at date %f",
+                                  getModelName().c_str(),
+                                  val,
+                                  time);
+
+                            Trace(context(),
+                                  6,
+                                  "Quantizer interval:  [%f, %f], "
+                                  "amplitude: %f "
+                                  "(default amplitude: %f)",
+                                  m_downthreshold,
+                                  m_upthreshold,
+                                  (m_upthreshold - m_downthreshold),
+                                  (2 * m_step_size));
+
+                            Trace(context(),
+                                  6,
+                                  "Quantifier %s shifting : %f",
+                                  getModelName().c_str(),
                                   shifting_factor);
-                            if (1 < shifting_factor)
-                                throw vu::ModellingError(
-                                  "Bad shifting value ( value : %f, "
-                                  "should be less than 1)\n",
-                                  shifting_factor);
-                            ;
-                            if ((0 != shifting_factor) &&
-                                (1 != shifting_factor)) {
-                                if (val >= m_upthreshold) {
-                                    update_thresholds(shifting_factor, DOWN);
-                                } else {
-                                    update_thresholds(shifting_factor, UP);
-                                }
-                                Trace(context(),
-                                      6,
-                                      "Quantifier %s new quantas while "
-                                      "treating new val %f at date %f",
-                                      getModelName().c_str(),
-                                      val,
-                                      time);
 
-                                Trace(context(),
-                                      6,
-                                      "Quantizer interval:  [%f, %f], "
-                                      "amplitude: %f "
-                                      "(default amplitude: %f)",
-                                      m_downthreshold,
-                                      m_upthreshold,
-                                      (m_upthreshold - m_downthreshold),
-                                      (2 * m_step_size));
-
-                                Trace(context(),
-                                      6,
-                                      "Quantifier %s shifting : %f",
-                                      getModelName().c_str(),
-                                      shifting_factor);
-
-                                m_adapt_state = DONE;
-                            } else {
-                                update_thresholds();
-                            }
-                            break;
-                        case DONE: // equiv to reinit
-                            init_step_number_and_offset(val);
-                            // archive.resize(0);
-                            m_adapt_state = POSSIBLE;
+                            m_adapt_state = DONE;
+                        } else {
                             update_thresholds();
-                            break;
+                        }
+                        break;
+                    case DONE: // equiv to reinit
+                        init_step_number_and_offset(val);
+                        // archive.resize(0);
+                        m_adapt_state = POSSIBLE;
+                        update_thresholds();
+                        break;
                     }
                 }
 
@@ -244,13 +243,13 @@ public:
     void internalTransition(vd::Time /*time*/) override
     {
         switch (m_state) {
-            case INIT:
-                break;
-            case IDLE:
-                break;
-            case RESPONSE:
-                m_state = IDLE;
-                break;
+        case INIT:
+            break;
+        case IDLE:
+            break;
+        case RESPONSE:
+            m_state = IDLE;
+            break;
         }
     }
 
@@ -275,11 +274,11 @@ public:
     virtual vd::Time timeAdvance() const override
     {
         switch (m_state) {
-            case INIT:
-            case IDLE:
-                return vd::infinity;
-            case RESPONSE:
-                return 0.0;
+        case INIT:
+        case IDLE:
+            return vd::infinity;
+        case RESPONSE:
+            return 0.0;
         }
         return vd::infinity; // useless. shut up compiler warning !
     }

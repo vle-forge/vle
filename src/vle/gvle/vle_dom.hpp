@@ -27,14 +27,12 @@
 
 #include <QDebug>
 
-
-#include <QString>
+#include "dom_tools.hpp"
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNamedNodeMap>
+#include <QString>
 #include <vle/value/Value.hpp>
-#include "dom_tools.hpp"
-
 
 namespace vle {
 namespace gvle {
@@ -47,9 +45,9 @@ class vleDomVpz : public DomObject
 public:
     vleDomVpz(QDomDocument* doc);
     ~vleDomVpz();
-    QString  getXQuery(QDomNode node) override;
+    QString getXQuery(QDomNode node) override;
     QDomNode getNodeFromXQuery(const QString& query,
-            QDomNode d=QDomNode()) override;
+                               QDomNode d = QDomNode()) override;
 };
 
 /**
@@ -60,10 +58,9 @@ class vleDomVpm : public DomObject
 public:
     vleDomVpm(QDomDocument* doc);
     ~vleDomVpm();
-    QString  getXQuery(QDomNode node);
-    QDomNode getNodeFromXQuery(const QString& query, QDomNode d=QDomNode());
+    QString getXQuery(QDomNode node);
+    QDomNode getNodeFromXQuery(const QString& query, QDomNode d = QDomNode());
 };
-
 
 /**
  * @brief Class that provides static functions to handle vpz files.
@@ -83,7 +80,7 @@ public:
      * @brief build an empty node corresponding to the value type from Vpz doc
      */
     static QDomElement buildEmptyValueFromDoc(QDomDocument& domDoc,
-                         vle::value::Value::type vleType);
+                                              vle::value::Value::type vleType);
 
     /**
      * @brief build a vle value from either tag
@@ -94,7 +91,7 @@ public:
      *
      */
     static std::unique_ptr<value::Value> buildValue(const QDomNode& valNode,
-                     bool buildText);
+                                                    bool buildText);
 
     /**
      * @brief Fill a Node from a value
@@ -103,9 +100,9 @@ public:
      * @note: the map is first cleared
      *
      */
-    static bool fillWithValue(QDomDocument& domDoc, QDomNode node,
-            const vle::value::Value& val);
-
+    static bool fillWithValue(QDomDocument& domDoc,
+                              QDomNode node,
+                              const vle::value::Value& val);
 
     /**
      * @brief List dynamics names
@@ -135,8 +132,10 @@ public:
      * @param snapObj, snapshot is performed on snapObj if not null
      * @return cond node if it is created or null node otherwise
      */
-    static QDomNode addCond(QDomNode atom, const QString& condName,
-            QDomDocument* domDoc, DomDiffStack* snapObj=0);
+    static QDomNode addCond(QDomNode atom,
+                            const QString& condName,
+                            QDomDocument* domDoc,
+                            DomDiffStack* snapObj = 0);
     static QSet<QString> conditions(QDomNode atom);
 
     /**
@@ -156,7 +155,8 @@ public:
      *    </model>
      * @param the list of conditions to attach to the atomic model
      */
-    static void attachCondsToAtomic(QDomNode& atom, const QSet<QString>& conds);
+    static void attachCondsToAtomic(QDomNode& atom,
+                                    const QSet<QString>& conds);
 
     /**
      * @brief tells if an atomic model is in debuging mode
@@ -167,8 +167,9 @@ public:
      * @return true if the atomic model is in debugging mode
      */
     static bool debuggingAtomic(const QDomNode& atom);
-    static bool setDebuggingToAtomic(QDomNode atom, bool val,
-            DomDiffStack* snapObj=0);
+    static bool setDebuggingToAtomic(QDomNode atom,
+                                     bool val,
+                                     DomDiffStack* snapObj = 0);
 
     /**
      * @brief Tells if a condition exists
@@ -210,8 +211,8 @@ public:
      * @param portName, the name of the port to search for
      * @return true if the condition port exists
      */
-    static std::unique_ptr<value::Value> getValueFromPortCond(QDomNode atom,
-            const QString& portName, int index);
+    static std::unique_ptr<value::Value>
+    getValueFromPortCond(QDomNode atom, const QString& portName, int index);
 
     /**
      * @brief Remove the port form a condition
@@ -226,10 +227,13 @@ public:
      * @param snapObj, snapshot is performed on snapObj if not null
      * @return true if the port has existed
      */
-    static bool rmPortFromCond(QDomNode atom, const QString& portName,
-            DomDiffStack* snapObj=0);
-    static bool renamePortFromCond(QDomNode atom, const QString& oldName,
-            const QString& newName, DomDiffStack* snapObj=0);
+    static bool rmPortFromCond(QDomNode atom,
+                               const QString& portName,
+                               DomDiffStack* snapObj = 0);
+    static bool renamePortFromCond(QDomNode atom,
+                                   const QString& oldName,
+                                   const QString& newName,
+                                   DomDiffStack* snapObj = 0);
 
     /**
      * @brief Set the port values to a cond, without removing others
@@ -249,8 +253,9 @@ public:
      * remain the same. Only the first value can be filled
      */
     static bool fillConditionWithMap(QDomDocument& domDoc,
-                  QDomNode atom, const vle::value::Map& val,
-                  DomDiffStack* snapObj=0);
+                                     QDomNode atom,
+                                     const vle::value::Map& val,
+                                     DomDiffStack* snapObj = 0);
 
     /**
      * @brief List the observables
@@ -282,13 +287,17 @@ public:
      * @param snapObj, snapshot is performed on snapObj if not null
      * @return false if already present or error has occured
      */
-    static bool addObservablePort(QDomDocument& domDoc, QDomNode atom,
-            const QString& portName, DomDiffStack* snapObj=0);
+    static bool addObservablePort(QDomDocument& domDoc,
+                                  QDomNode atom,
+                                  const QString& portName,
+                                  DomDiffStack* snapObj = 0);
     static bool rmObservablePort(QDomNode atom,
-            const QString& portName, DomDiffStack* snapObj=0);
+                                 const QString& portName,
+                                 DomDiffStack* snapObj = 0);
     static bool renameObservablePort(QDomNode atom,
-                const QString& oldName, const QString& newName,
-                DomDiffStack* snapObj=0);
+                                     const QString& oldName,
+                                     const QString& newName,
+                                     DomDiffStack* snapObj = 0);
 
     /**
      * @brief Add/remove a port to input list of a model
@@ -302,14 +311,17 @@ public:
      * @param snapObj, snapshot is performed on snapObj if not null
      * @return false if an error occurred or nothing is done
      */
-    static bool addPortToInNode(QDomDocument& domDoc, QDomNode atom,
-            const QString& portName, DomDiffStack* snapObj=0);
+    static bool addPortToInNode(QDomDocument& domDoc,
+                                QDomNode atom,
+                                const QString& portName,
+                                DomDiffStack* snapObj = 0);
     static bool rmPortToInNode(QDomNode atom,
-            const QString& portName, DomDiffStack* snapObj=0);
+                               const QString& portName,
+                               DomDiffStack* snapObj = 0);
     static bool renamePortToInNode(QDomNode atom,
-                const QString& oldName, const QString& newName,
-                DomDiffStack* snapObj=0);
-
+                                   const QString& oldName,
+                                   const QString& newName,
+                                   DomDiffStack* snapObj = 0);
 
     /**
      * @brief Add a port to output list of a model
@@ -323,13 +335,17 @@ public:
      * @param snapObj, snapshot is performed on snapObj if not null
      * @return false if already present or error has occured
      */
-    static bool addPortToOutNode(QDomDocument& domDoc, QDomNode atom,
-            const QString& portName, DomDiffStack* snapObj=0);
+    static bool addPortToOutNode(QDomDocument& domDoc,
+                                 QDomNode atom,
+                                 const QString& portName,
+                                 DomDiffStack* snapObj = 0);
     static bool rmPortToOutNode(QDomNode atom,
-            const QString& portName, DomDiffStack* snapObj=0);
+                                const QString& portName,
+                                DomDiffStack* snapObj = 0);
     static bool renamePortToOutNode(QDomNode atom,
-                const QString& oldName, const QString& newName,
-                DomDiffStack* snapObj=0);
+                                    const QString& oldName,
+                                    const QString& newName,
+                                    DomDiffStack* snapObj = 0);
 
     /**
      * @brief Rename a submodel of a coupled model, and update connections
@@ -359,17 +375,22 @@ public:
      *   </model>
      *  @return true if a modification has been performed
      */
-    static bool renameModelIntoCoupled(QDomDocument& domDoc, QDomNode atom,
-            QString old_model, QString new_model, DomDiffStack* snapObj=0);
-    static bool renameModelIntoStructures(QDomDocument& domDoc, QDomNode atom,
-            QString old_model, QString new_model, DomDiffStack* snapObj=0);
+    static bool renameModelIntoCoupled(QDomDocument& domDoc,
+                                       QDomNode atom,
+                                       QString old_model,
+                                       QString new_model,
+                                       DomDiffStack* snapObj = 0);
+    static bool renameModelIntoStructures(QDomDocument& domDoc,
+                                          QDomNode atom,
+                                          QString old_model,
+                                          QString new_model,
+                                          DomDiffStack* snapObj = 0);
 
     static QStringList subModels(QDomNode atom);
     static QDomNode subModel(QDomNode atom, QString model_name);
 
     static QString connectionModOrig(QDomNode atom);
     static QString connectionModDest(QDomNode atom);
-
 
     /**
      * @brief Get the types of an output
@@ -382,7 +403,7 @@ public:
      */
     static QStringList getViewTypeToView(const QDomNode& atom);
 };
-
-}}//namepsaces
+}
+} // namepsaces
 
 #endif

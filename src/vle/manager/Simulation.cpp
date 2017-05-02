@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -39,7 +39,8 @@
 namespace vle {
 namespace manager {
 
-utils::Path make_temp(const char *format)
+utils::Path
+make_temp(const char* format)
 {
     assert(format);
 
@@ -57,7 +58,8 @@ utils::Path make_temp(const char *format)
  TODO perhaps check if pointer counter is 1, and release and build the
  std::unique_ptr.
  */
-std::unique_ptr<value::Map> read_value(const utils::Path &p)
+std::unique_ptr<value::Map>
+read_value(const utils::Path& p)
 {
     std::ifstream ifs(p.string());
     if (ifs.is_open()) {
@@ -74,11 +76,12 @@ std::unique_ptr<value::Map> read_value(const utils::Path &p)
     return std::unique_ptr<value::Map>{};
 }
 
-class Simulation::Pimpl {
+class Simulation::Pimpl
+{
 public:
     utils::ContextPtr m_context;
     std::chrono::milliseconds m_timeout;
-    std::ostream *m_out;
+    std::ostream* m_out;
     utils::Path m_vpz_file;
     utils::Path m_output_file;
     LogOptions m_logoptions;
@@ -88,27 +91,28 @@ public:
           LogOptions logoptions,
           SimulationOptions simulationoptionts,
           std::chrono::milliseconds timeout,
-          std::ostream *output)
-        : m_context(context)
-        , m_timeout(timeout)
-        , m_out(output)
-        , m_vpz_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.vpz"))
-        , m_output_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.value"))
-        , m_logoptions(logoptions)
-        , m_simulationoptions(simulationoptionts)
+          std::ostream* output)
+      : m_context(context)
+      , m_timeout(timeout)
+      , m_out(output)
+      , m_vpz_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.vpz"))
+      , m_output_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.value"))
+      , m_logoptions(logoptions)
+      , m_simulationoptions(simulationoptionts)
     {
         if (timeout != std::chrono::milliseconds::zero())
             m_simulationoptions |= vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
-    template <typename T> void write(const T &t)
+    template <typename T>
+    void write(const T& t)
     {
         if (m_out)
             (*m_out) << t;
     }
 
     std::unique_ptr<value::Map> runVerboseRun(std::unique_ptr<vpz::Vpz> vpz,
-                                              Error *error)
+                                              Error* error)
     {
         std::unique_ptr<value::Map> result;
         boost::timer timer;
@@ -138,7 +142,7 @@ public:
             write(_(" - Simulation run................: "));
 
             boost::progress_display display(
-                100, *m_out, "\n   ", "   ", "   ");
+              100, *m_out, "\n   ", "   ", "   ");
             long previous = 0;
 
             while (root.run()) {
@@ -159,19 +163,19 @@ public:
                   timer.elapsed());
 
             error->code = 0;
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%")) %
                               utils::demangle(typeid(e)) % e.what())
-                                 .str();
+                               .str();
             error->code = -1;
         }
 
         return result;
     }
 
-    std::unique_ptr<value::Map>
-    runVerboseSummary(std::unique_ptr<vpz::Vpz> vpz, Error *error)
+    std::unique_ptr<value::Map> runVerboseSummary(
+      std::unique_ptr<vpz::Vpz> vpz,
+      Error* error)
     {
         std::unique_ptr<value::Map> result;
         boost::timer timer;
@@ -209,11 +213,10 @@ public:
                   timer.elapsed());
 
             error->code = 0;
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%")) %
                               utils::demangle(typeid(e)) % e.what())
-                                 .str();
+                               .str();
             error->code = -1;
         }
 
@@ -221,7 +224,7 @@ public:
     }
 
     std::unique_ptr<value::Map> runQuiet(std::unique_ptr<vpz::Vpz> vpz,
-                                         Error *error)
+                                         Error* error)
     {
         std::unique_ptr<value::Map> result;
 
@@ -238,11 +241,10 @@ public:
             result = root.finish();
 
             error->code = 0;
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%")) %
                               utils::demangle(typeid(e)) % e.what())
-                                 .str();
+                               .str();
             error->code = -1;
         }
 
@@ -250,7 +252,7 @@ public:
     }
 
     std::unique_ptr<value::Map> runSubProcess(std::unique_ptr<vpz::Vpz> vpz,
-                                              Error *error)
+                                              Error* error)
     {
         auto pwd = utils::Path::current_path();
         std::string command;
@@ -261,7 +263,7 @@ public:
             m_context->get_setting("vle.command.vle.simulation", &command);
             command = (vle::fmt(command) % m_output_file.string() %
                        m_vpz_file.string())
-                          .str();
+                        .str();
             vle::utils::Spawn spawn(m_context);
             auto argv = spawn.splitCommandLine(command);
             auto exe = std::move(argv.front());
@@ -286,14 +288,14 @@ public:
                         if (not output.empty()) {
                             vInfo(m_context, "%s", output.c_str());
                         }
-                        if (not err.empty() ){
+                        if (not err.empty()) {
                             vErr(m_context, "%s", err.c_str());
                         }
                         output.clear();
                         err.clear();
 
                         std::this_thread::sleep_for(
-                            std::chrono::microseconds(200));
+                          std::chrono::microseconds(200));
 
                         auto endtime = std::chrono::system_clock::now();
                         auto elapsed = endtime - starttime;
@@ -302,28 +304,25 @@ public:
                             spawn.kill();
                             break;
                         }
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
-            }
-            else {
+            } else {
                 while (not spawn.isfinish()) {
                     if (spawn.get(&output, &err)) {
                         if (not output.empty()) {
                             vInfo(m_context, "%s", output.c_str());
                         }
-                        if (not err.empty() ){
+                        if (not err.empty()) {
                             vErr(m_context, "%s", err.c_str());
                         }
                         output.clear();
                         err.clear();
 
                         std::this_thread::sleep_for(
-                            std::chrono::microseconds(200));
-                    }
-                    else {
+                          std::chrono::microseconds(200));
+                    } else {
                         break;
                     }
                 }
@@ -339,8 +338,7 @@ public:
                 return {};
             }
             return read_value(m_output_file);
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             vErr(m_context,
                  _("VLE sub process: unable to start "
                    "'%s' in '%s' with "
@@ -362,41 +360,40 @@ Simulation::Simulation(utils::ContextPtr context,
                        LogOptions logoptions,
                        SimulationOptions simulationoptionts,
                        std::chrono::milliseconds timeout,
-                       std::ostream *output)
-    : mPimpl(std::make_unique<Simulation::Pimpl>(
-          context, logoptions, simulationoptionts, timeout, output))
+                       std::ostream* output)
+  : mPimpl(std::make_unique<Simulation::Pimpl>(context,
+                                               logoptions,
+                                               simulationoptionts,
+                                               timeout,
+                                               output))
 {
 }
 
 Simulation::~Simulation() = default;
 
-std::unique_ptr<value::Map> Simulation::run(std::unique_ptr<vpz::Vpz> vpz,
-                                            Error *error)
+std::unique_ptr<value::Map>
+Simulation::run(std::unique_ptr<vpz::Vpz> vpz, Error* error)
 {
     error->code = 0;
     std::unique_ptr<value::Map> result;
 
     if (mPimpl->m_simulationoptions & SIMULATION_SPAWN_PROCESS) {
         result = mPimpl->runSubProcess(std::move(vpz), error);
-    }
-    else {
+    } else {
         if (mPimpl->m_logoptions != manager::LOG_NONE) {
             if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {
                 result = mPimpl->runVerboseRun(std::move(vpz), error);
-            }
-            else {
+            } else {
                 result = mPimpl->runVerboseSummary(std::move(vpz), error);
             }
-        }
-        else {
+        } else {
             result = mPimpl->runQuiet(std::move(vpz), error);
         }
     }
 
     if (mPimpl->m_simulationoptions & manager::SIMULATION_NO_RETURN) {
         return {};
-    }
-    else {
+    } else {
         return result;
     }
 }

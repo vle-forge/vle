@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -27,20 +27,22 @@
 #ifndef VLE_UTILS_DETAILS_PACKAGE_HPP
 #define VLE_UTILS_DETAILS_PACKAGE_HPP
 
-#include <vle/utils/RemoteManager.hpp>
-#include <unordered_set>
-#include <functional>
-#include <ostream>
-#include <iterator>
 #include <cstring>
+#include <functional>
+#include <iterator>
+#include <ostream>
+#include <unordered_set>
+#include <vle/utils/RemoteManager.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * A functor to hash @c PackageId.
  *
  */
-struct PackageIdHash {
+struct PackageIdHash
+{
     std::size_t operator()(const PackageId& lhs) const noexcept
     {
         return std::hash<std::string>()(lhs.name);
@@ -92,7 +94,8 @@ struct PackageIdUpdate
     }
 };
 
-inline void cleanup(PackageId& pkg)
+inline void
+cleanup(PackageId& pkg)
 {
     pkg.size = 0;
     pkg.name.clear();
@@ -110,7 +113,8 @@ inline void cleanup(PackageId& pkg)
     pkg.patch = -1;
 }
 
-inline void cleanup(PackageLinkId& pkglinkid)
+inline void
+cleanup(PackageLinkId& pkglinkid)
 {
     pkglinkid.name.clear();
     pkglinkid.major = -1;
@@ -119,26 +123,25 @@ inline void cleanup(PackageLinkId& pkglinkid)
     pkglinkid.op = PACKAGE_OPERATOR_EQUAL;
 }
 
-struct PackageIdClear {
+struct PackageIdClear
+{
     void operator()(PackageId& lhs) const noexcept
     {
         cleanup(lhs);
     }
 };
 
-typedef std::unordered_multiset <PackageId,
-                                 PackageIdHash,
-                                 PackageIdEqual > PackagesIdSet;
+typedef std::unordered_multiset<PackageId, PackageIdHash, PackageIdEqual>
+  PackagesIdSet;
 
-inline std::ostream& operator<<(std::ostream& os, const PackagesIdSet& b)
+inline std::ostream&
+operator<<(std::ostream& os, const PackagesIdSet& b)
 {
-    std::copy(b.begin(),
-              b.end(),
-              std::ostream_iterator < PackageId >(os));
+    std::copy(b.begin(), b.end(), std::ostream_iterator<PackageId>(os));
 
     return os;
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif /* VLE_UTILS_DETAILS_PACKAGE_HPP */

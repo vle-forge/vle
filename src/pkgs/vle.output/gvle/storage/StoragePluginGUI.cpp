@@ -21,17 +21,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "StoragePluginGUI.h"
 #include <QObject>
 #include <QtPlugin>
-#include "StoragePluginGUI.h"
 #include <iostream>
 
 namespace vle {
 namespace gvle {
 
-
-StoragePluginGUI::StoragePluginGUI() :
-    mLogger(0), mWidgetTab(0)
+StoragePluginGUI::StoragePluginGUI()
+  : mLogger(0)
+  , mWidgetTab(0)
 {
 }
 
@@ -48,7 +48,7 @@ StoragePluginGUI::getname()
 }
 
 void
-StoragePluginGUI::setLogger(Logger *logger)
+StoragePluginGUI::setLogger(Logger* logger)
 {
     mLogger = logger;
 }
@@ -64,12 +64,13 @@ QWidget*
 StoragePluginGUI::getWidget()
 {
     // If the widget has already been allocated
-    if (mWidgetTab == 0)
-    {
+    if (mWidgetTab == 0) {
         // Allocate a new tab widget
         mWidgetTab = new StoragePluginGUItab();
-        QObject::connect(mWidgetTab,  SIGNAL(destroyed(QObject*)),
-                                this, SLOT  (onTabDeleted(QObject *)));
+        QObject::connect(mWidgetTab,
+                         SIGNAL(destroyed(QObject*)),
+                         this,
+                         SLOT(onTabDeleted(QObject*)));
     }
     return mWidgetTab;
 }
@@ -87,12 +88,12 @@ StoragePluginGUI::delWidget()
 }
 
 void
-StoragePluginGUI::onTabDeleted(QObject *obj)
+StoragePluginGUI::onTabDeleted(QObject* obj)
 {
     // If the deleted object is the tab widget
     if (obj == mWidgetTab)
         // Update local pointer
         mWidgetTab = 0;
 }
-
-}}//namepsaces
+}
+} // namepsaces

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -39,13 +39,14 @@ namespace vpz {
  * @brief The vpz::Vpz class is the complete representation of the Vpz XML
  * file. To get reference to these objects, uses the project functions.
  */
-class VLE_API Vpz : public Base {
+class VLE_API Vpz : public Base
+{
 public:
     /**
      * @brief Build a empty Vpz XML file.
      */
     Vpz()
-        : m_isGzip(true)
+      : m_isGzip(true)
     {
     }
 
@@ -54,18 +55,20 @@ public:
      * @param filename The filename to open.
      * @throw utils::ArgError if an error occured during loading.
      */
-    Vpz(const std::string &filename);
+    Vpz(const std::string& filename);
 
     /**
      * @brief Copy constructor of the Vpz XML file.
      * @param vpz The source to copy.
      */
-    Vpz(const Vpz &vpz);
+    Vpz(const Vpz& vpz);
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Vpz() {}
+    virtual ~Vpz()
+    {
+    }
 
     /**
      * @brief Write into the output stream the XML representation of this
@@ -73,27 +76,30 @@ public:
      * vpz::Project object.
      * @param out The output parameter where send XML representation.
      */
-    virtual void write(std::ostream &out) const override;
+    virtual void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this object.
      * @return Return VPZ.
      */
-    virtual Base::type getType() const override { return VLE_VPZ_VPZ; }
+    virtual Base::type getType() const override
+    {
+        return VLE_VPZ_VPZ;
+    }
 
     /**
      * @brief Open a VPZ file project.
      * @param filename file to read.
      * @throw utils::ArgError if an error occured during loading.
      */
-    void parseFile(const std::string &filename);
+    void parseFile(const std::string& filename);
 
     /**
      * @brief Open a VPZ from a buffer.
      * @param buffer the buffer to parse XML.
      * @throw utils::ArgError if an error occured during loading.
      */
-    void parseMemory(const std::string &buffer);
+    void parseMemory(const std::string& buffer);
 
     /**
      * @brief Write file into the current VPZ filename open.
@@ -104,7 +110,7 @@ public:
      * @brief Write file into the specified filename open.
      * @param filename file to write.
      */
-    void write(const std::string &filename);
+    void write(const std::string& filename);
 
     /**
      * @brief Build an string with the write function.
@@ -121,7 +127,10 @@ public:
      * @brief Return true if the file is compressed.
      * @return true if the file is compressed, false otherwise.
      */
-    inline bool isGzip() const { return m_isGzip; }
+    inline bool isGzip() const
+    {
+        return m_isGzip;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -135,7 +144,7 @@ public:
      * @throw utils::ArgError if buffer is not a value.
      * @return value read from buffer.
      */
-    static std::shared_ptr<value::Value> parseValue(const std::string &buffer);
+    static std::shared_ptr<value::Value> parseValue(const std::string& buffer);
 
     /**
      * @brief Parse the buffer to find a list of values.
@@ -143,15 +152,15 @@ public:
      * @throw utils::ArgError if buffer is not a value.
      * @return a vector of values read from buffer.
      */
-    static std::vector<std::shared_ptr<value::Value>>
-    parseValues(const std::string &buffer);
+    static std::vector<std::shared_ptr<value::Value>> parseValues(
+      const std::string& buffer);
 
     /**
      * @brief Add the vpz extension to filename if does not exist, If
      * correct filename is passed, no modification is apply.
      * @param filename string to change if no extension exist.
      */
-    static void fixExtension(std::string &filename);
+    static void fixExtension(std::string& filename);
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -163,7 +172,7 @@ public:
      * @brief Assign a new filename when write file.
      * @param filename Assign a new filename when write file.
      */
-    inline void setFilename(const std::string &filename)
+    inline void setFilename(const std::string& filename)
     {
         m_filename.assign(filename);
     }
@@ -172,19 +181,28 @@ public:
      * @brief Get the current filename.
      * @return The current filename.
      */
-    inline const std::string &filename() const { return m_filename; }
+    inline const std::string& filename() const
+    {
+        return m_filename;
+    }
 
     /**
      * @brief Get a constant reference to the vpz::Project.
      * @return A constant reference to the vpz::Project.
      */
-    inline const Project &project() const { return m_project; }
+    inline const Project& project() const
+    {
+        return m_project;
+    }
 
     /**
      * @brief Get a reference to the vpz::Project.
      * @return A reference to the vpz::Project.
      */
-    inline Project &project() { return m_project; }
+    inline Project& project()
+    {
+        return m_project;
+    }
 
 private:
     bool m_isGzip;

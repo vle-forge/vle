@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,19 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_CONTEXT_HPP
 #define VLE_UTILS_CONTEXT_HPP
 
-#include <vle/utils/Filesystem.hpp>
-#include <vle/DllDefines.hpp>
+#include <cstdarg>
+#include <iosfwd>
 #include <memory>
 #include <string>
 #include <vector>
-#include <iosfwd>
-#include <cstdarg>
+#include <vle/DllDefines.hpp>
+#include <vle/utils/Filesystem.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * Define a list of directories.
@@ -51,7 +51,6 @@ class Context;
  * mutex.
  */
 using ContextPtr = std::shared_ptr<Context>;
-
 
 /**
  * \e Context manage all users and installation paths of VLE.
@@ -130,7 +129,8 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set_setting(const std::string& key, const std::string& value) noexcept;
+    bool set_setting(const std::string& key,
+                     const std::string& value) noexcept;
 
     /**
      * Insert an @c double into the specified key.
@@ -194,7 +194,8 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not an @c std::string.
      */
-    bool get_setting(const std::string& key, std::string* value) const noexcept;
+    bool get_setting(const std::string& key, std::string* value) const
+      noexcept;
 
     /**
      * Get a @c double from specified key.
@@ -305,11 +306,13 @@ public:
     /**
      * @brief A @e Module describes a dynamic loaded shared library.
      *
-     * @e Module is a public representation of @e ModuleManager's internal Module
+     * @e Module is a public representation of @e ModuleManager's internal
+     * Module
      * which store an handle to the shared library and a pointer to the symbol
      * referenced by the @e ModuleType.
      */
-    struct Module {
+    struct Module
+    {
         std::string package;
         std::string library;
         Path path;
@@ -368,7 +371,7 @@ public:
     void* get_symbol(const std::string& package,
                      const std::string& pluginname,
                      ModuleType type,
-                     ModuleType *newtype = nullptr);
+                     ModuleType* newtype = nullptr);
 
     /**
      * @brief Get a symbol directly in the executable.
@@ -412,9 +415,8 @@ public:
      *
      * \return All modules availables.
      */
-    std::vector<Module>
-        get_dynamic_libraries(const std::string& package,
-                              ModuleType type) const;
+    std::vector<Module> get_dynamic_libraries(const std::string& package,
+                                              ModuleType type) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -426,10 +428,10 @@ public:
     {
         virtual void write(const Context& ctx,
                            int priority,
-                           const char *file,
+                           const char* file,
                            int line,
-                           const char *fn,
-                           const char *format,
+                           const char* fn,
+                           const char* format,
                            va_list args) noexcept = 0;
         virtual ~LogFunctor(){};
     };
@@ -441,14 +443,15 @@ public:
     int get_log_priority() const noexcept;
 
     void log(int priority,
-             const char *file,
+             const char* file,
              int line,
-             const char *fn,
-             const char *format, ...)
+             const char* fn,
+             const char* format,
+             ...)
 #if defined(__GNUC__)
-        const noexcept __attribute__((format(printf, 6, 7)));
+      const noexcept __attribute__((format(printf, 6, 7)));
 #else
-        const noexcept;
+      const noexcept;
 #endif
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -631,8 +634,6 @@ private:
     void initPrefixDir();
 };
 
-
-
 /**
  * Build a std::shared_ptr<Context> without modifying the locale.
  *
@@ -644,7 +645,6 @@ private:
  *
  */
 VLE_API ContextPtr make_context(const Path& prefix = {});
-
 
 /**
  * Build a std::shared_ptr<Context> with locale.
@@ -659,7 +659,7 @@ VLE_API ContextPtr make_context(const Path& prefix = {});
  * \e return An initialized std::shared_ptr<Context>.
  */
 VLE_API ContextPtr make_context(std::string locale, const Path& prefix = {});
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

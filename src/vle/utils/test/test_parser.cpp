@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -32,21 +32,22 @@
 
 using namespace vle;
 
-const char *str = "# this file is a test\n"
+const char* str = "# this file is a test\n"
                   "test { # comment\n"
                   "a = 1, 2, 3;"
                   "b = \"1\", \"2\", \"3\";"
                   "c = -1.1, -2.2;"
                   "}\n";
 
-void ParserStr()
+void
+ParserStr()
 {
     std::istringstream in(str);
     vle::utils::Parser parser(in);
 
     EnsuresEqual(parser.root().blocks.size(), 1);
 
-    const vle::utils::Block &block = parser.root().getBlock("test");
+    const vle::utils::Block& block = parser.root().getBlock("test");
     EnsuresEqual(block.name, "test");
     EnsuresEqual(block.strings.size(), 3);
     EnsuresEqual(block.reals.size(), 5);
@@ -69,14 +70,15 @@ void ParserStr()
     }
     {
         typedef vle::utils::Block::Reals::const_iterator Iterator;
-        std::pair < Iterator, Iterator > r = block.reals.equal_range("c");
+        std::pair<Iterator, Iterator> r = block.reals.equal_range("c");
         EnsuresEqual(block.reals.count("c"), 2);
         EnsuresEqual(r.first++->second, -1.1);
         EnsuresEqual(r.first++->second, -2.2);
     }
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

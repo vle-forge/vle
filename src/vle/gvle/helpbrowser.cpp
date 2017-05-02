@@ -22,31 +22,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
 #include "helpbrowser.h"
+#include <QDebug>
 
-HelpBrowser::HelpBrowser(QWidget *parent)
-    : QTextBrowser(parent)
+HelpBrowser::HelpBrowser(QWidget* parent)
+  : QTextBrowser(parent)
 {
     mHelpEngine = 0;
 }
 
-void HelpBrowser::setHelp(QHelpEngineCore *h)
+void
+HelpBrowser::setHelp(QHelpEngineCore* h)
 {
     // Test validity of specified help
-    if ( ! h->setupData())
-    {
-        qDebug() << "HelpBrowser::setHelp() " <<
-            tr("Specified help file is invalid");
+    if (!h->setupData()) {
+        qDebug() << "HelpBrowser::setHelp() "
+                 << tr("Specified help file is invalid");
         return;
     }
 
     mHelpEngine = h;
 }
 
-void HelpBrowser::showHelpForKeyword(const QString &id)
+void
+HelpBrowser::showHelpForKeyword(const QString& id)
 {
-    if ( ! mHelpEngine)
+    if (!mHelpEngine)
         return;
 
     QMap<QString, QUrl> links = mHelpEngine->linksForIdentifier(id);
@@ -54,7 +55,8 @@ void HelpBrowser::showHelpForKeyword(const QString &id)
         setSource(links.constBegin().value());
 }
 
-QVariant HelpBrowser::loadResource(int type, const QUrl &name)
+QVariant
+HelpBrowser::loadResource(int type, const QUrl& name)
 {
     QByteArray ba;
     if (type < 4 && mHelpEngine) {

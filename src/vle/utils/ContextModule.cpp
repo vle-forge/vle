@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/version.hpp>
+#include <unordered_map>
+#include <vle/utils/Algo.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/utils/Algo.hpp>
 #include <vle/utils/Filesystem.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
-#include <unordered_map>
-#include <boost/version.hpp>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -39,7 +39,8 @@
 #include <dlfcn.h>
 #endif
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * @brief Get the plug-in name of the filename provided.
@@ -52,7 +53,8 @@ namespace vle { namespace utils {
  * @param path The path of the file to convert;
  * @return The plug-in name;
  */
-static std::string getLibraryName(const Path& file)
+static std::string
+getLibraryName(const Path& file)
 {
     std::string library;
 
@@ -82,10 +84,10 @@ struct Module
 #ifdef _WIN32
     HMODULE mHandle;
 #else
-    void *mHandle;
+    void* mHandle;
 #endif
 
-    void *mFunction;
+    void* mFunction;
     Context::ModuleType mType;
 
     /**
@@ -100,11 +102,16 @@ struct Module
      * @param library
      * @param type
      */
-    Module(Path path, std::string package, std::string library,
+    Module(Path path,
+           std::string package,
+           std::string library,
            Context::ModuleType type)
-        : mPath(std::move(path)), mPackage(std::move(package)),
-          mLibrary(std::move(library)), mHandle(nullptr),
-          mFunction(nullptr), mType(type)
+      : mPath(std::move(path))
+      , mPackage(std::move(package))
+      , mLibrary(std::move(library))
+      , mHandle(nullptr)
+      , mFunction(nullptr)
+      , mType(type)
     {
     }
 
@@ -145,28 +152,34 @@ struct Module
             case Context::ModuleType::MODULE_DYNAMICS:
             case Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
             case Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
-                if (! (mFunction = (getSymbol("vle_make_new_dynamics"))))
-                    if (! (mFunction = (getSymbol("vle_make_new_executive"))))
-                        if (! (mFunction = (getSymbol("vle_make_new_dynamics_wrapper"))))
+                if (!(mFunction = (getSymbol("vle_make_new_dynamics"))))
+                    if (!(mFunction = (getSymbol("vle_make_new_executive"))))
+                        if (!(mFunction =
+                                (getSymbol("vle_make_new_dynamics_wrapper"))))
                             throw utils::InternalError(
-                                (fmt(_("Module `%1%' is not a dynamic module"
-                                       " (symbol vle_make_new_dynamics,"
-                                       " vle_make_new_executive or"
-                                       " vle_make_new_dynamics_wrapper are not"
-                                       " found")) % mPath.string()).str());
+                              (fmt(_("Module `%1%' is not a dynamic module"
+                                     " (symbol vle_make_new_dynamics,"
+                                     " vle_make_new_executive or"
+                                     " vle_make_new_dynamics_wrapper are not"
+                                     " found")) %
+                               mPath.string())
+                                .str());
 
                         else
-                            mType = Context::ModuleType::MODULE_DYNAMICS_WRAPPER;
+                            mType =
+                              Context::ModuleType::MODULE_DYNAMICS_WRAPPER;
                     else
                         mType = Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE;
                 else
                     mType = Context::ModuleType::MODULE_DYNAMICS;
                 break;
             case Context::ModuleType::MODULE_OOV:
-                if (not (mFunction = (getSymbol("vle_make_new_oov"))))
+                if (not(mFunction = (getSymbol("vle_make_new_oov"))))
                     throw utils::InternalError(
-                        (fmt(_("Module `%1%' is not an oov module (symbol"
-                               " vle_make_new_oov not found)")) % mPath.string()).str());
+                      (fmt(_("Module `%1%' is not an oov module (symbol"
+                             " vle_make_new_oov not found)")) %
+                       mPath.string())
+                        .str());
                 break;
             default:
                 throw utils::InternalError(_("Missing type"));
@@ -193,8 +206,8 @@ struct Module
 #ifdef _WIN32
         HMODULE handle = ::LoadLibrary(mPath.string().c_str());
 #else
-        void *handle = ::dlopen(mPath.string().c_str(),
-                                RTLD_LAZY | RTLD_LOCAL);
+        void* handle =
+          ::dlopen(mPath.string().c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
 
         if (not handle) {
@@ -204,25 +217,27 @@ struct Module
             LPVOID msg;
 
             ::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                            FORMAT_MESSAGE_FROM_SYSTEM |
-                            FORMAT_MESSAGE_IGNORE_INSERTS,
+                              FORMAT_MESSAGE_FROM_SYSTEM |
+                              FORMAT_MESSAGE_IGNORE_INSERTS,
                             NULL,
                             errorcode,
                             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                            (LPTSTR) &msg,
-                            0, NULL);
+                            (LPTSTR)&msg,
+                            0,
+                            NULL);
 
             extra.assign((LPTSTR)msg);
             ::LocalFree(msg);
 #else
-            char *error = ::dlerror();
+            char* error = ::dlerror();
             if (error) {
                 extra.assign(error);
             }
 #endif
             throw utils::InternalError(
-                (fmt(_("Module can not open shared library `%1%': %2%"))
-                 % mPath.string() % extra).str());
+              (fmt(_("Module can not open shared library `%1%': %2%")) %
+               mPath.string() % extra)
+                .str());
         } else {
             mHandle = handle;
         }
@@ -230,9 +245,9 @@ struct Module
 
     void checkVersion()
     {
-        typedef void(*versionFunction)(std::uint32_t*, std::uint32_t*,
-                                       std::uint32_t*);
-        void *symbol;
+        typedef void (*versionFunction)(
+          std::uint32_t*, std::uint32_t*, std::uint32_t*);
+        void* symbol;
 
         auto version = vle::version();
         uint32_t major, minor, patch;
@@ -243,32 +258,36 @@ struct Module
 
         if (not symbol) {
             throw utils::InternalError(
-                (fmt(_("Module `%1%' does not have a vle_api_level symbol. "
-                       "This module seems to be too old."))
-                 % mPath.string()).str());
+              (fmt(_("Module `%1%' does not have a vle_api_level symbol. "
+                     "This module seems to be too old.")) %
+               mPath.string())
+                .str());
         }
 
 #ifdef _WIN32
         fct = (versionFunction)symbol;
 #else
-        fct = utils::functionCast < versionFunction >(symbol);
+        fct = utils::functionCast<versionFunction>(symbol);
 #endif
         fct(&major, &minor, &patch);
 
         if (major != static_cast<std::uint32_t>(std::get<0>(version)) or
             minor != static_cast<std::uint32_t>(std::get<1>(version))) {
             throw utils::InternalError(
-                (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
-                       " not API/ABI compatible with the current VLE"
-                       " %5%.%6%.%7%")) % mPath.string() % major % minor
-                 % patch % std::get<0>(version) % std::get<1>(version)
-                 % std::get<2>(version)).str());
-            } else if (patch != static_cast<std::uint32_t>(std::get<2>(version))) {
+              (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
+                     " not API/ABI compatible with the current VLE"
+                     " %5%.%6%.%7%")) %
+               mPath.string() % major % minor % patch % std::get<0>(version) %
+               std::get<1>(version) % std::get<2>(version))
+                .str());
+        } else if (patch != static_cast<std::uint32_t>(std::get<2>(version))) {
             // utils::Trace::send(
-            //     (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and may"
+            //     (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and
+            //     may"
             //            " not be API/ABI compatible with the current VLE"
             //            " %5%.%6%.%7%")) % mPath % major % minor % patch %
-            //      VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION).str());
+            //      VLE_MAJOR_VERSION % VLE_MINOR_VERSION %
+            //      VLE_PATCH_VERSION).str());
         }
     }
 
@@ -279,7 +298,7 @@ struct Module
      *
      * @return 0 if the symbol was not found, !0 otherwise.
      */
-    void *getSymbol(const char *symbol)
+    void* getSymbol(const char* symbol)
     {
 #ifdef _WIN32
         return (void*)::GetProcAddress(mHandle, symbol);
@@ -305,7 +324,7 @@ public:
     SymbolTable(const SymbolTable&) = delete;
     SymbolTable& operator=(const SymbolTable&) = delete;
 
-    void *get(const std::string& symbol)
+    void* get(const std::string& symbol)
     {
         const_iterator it = mLst.find(symbol);
 
@@ -316,7 +335,7 @@ public:
         // Otherwise, try to found symbol into the current process symbol
         // table.
 
-        void *result = nullptr;
+        void* result = nullptr;
 
 #ifdef _WIN32
         FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
@@ -327,8 +346,8 @@ public:
 
         if (not result)
             throw utils::InternalError(
-                (fmt(_("Module: `%1%' not found in global space"))
-                 % symbol).str());
+              (fmt(_("Module: `%1%' not found in global space")) % symbol)
+                .str());
 
         auto ret = mLst.emplace(symbol, result);
 
@@ -341,7 +360,8 @@ public:
 
 struct ModuleManager
 {
-    using ModuleTable = std::unordered_map<std::string,std::unique_ptr<Module>>;
+    using ModuleTable =
+      std::unordered_map<std::string, std::unique_ptr<Module>>;
     using value_type = ModuleTable::value_type;
     using const_iterator = ModuleTable::const_iterator;
     using iterator = ModuleTable::iterator;
@@ -352,7 +372,7 @@ struct ModuleManager
     SymbolTable mTableSymbols;
 
     ModuleManager(Context* ctx)
-        : mContext(ctx)
+      : mContext(ctx)
     {
         assert(ctx);
     }
@@ -394,22 +414,26 @@ struct ModuleManager
     /**
      * @brief An unary operator to convert pimpl::Module into Module.
      */
-    struct ModuleConvert {
+    struct ModuleConvert
+    {
         Context::Module operator()(const ModuleTable::value_type& module) const
         {
-            return { module.second->mPackage, module.second->mLibrary,
-                    module.second->mPath, module.second->mType };
+            return { module.second->mPackage,
+                     module.second->mLibrary,
+                     module.second->mPath,
+                     module.second->mType };
         }
     };
 
     /**
      * @brief A predicate to check if a pimpl::Module is in specified package.
      */
-    struct ModuleIsInPackage {
+    struct ModuleIsInPackage
+    {
         const std::string& mPackage;
 
         ModuleIsInPackage(const std::string& package)
-            : mPackage(package)
+          : mPackage(package)
         {
         }
 
@@ -428,10 +452,9 @@ struct ModuleManager
         return mTableOov.find(filepath) != mTableOov.cend();
     }
 
-    const std::unique_ptr<Module>&
-    getModule(const std::string& package,
-              const std::string& library,
-              Context::ModuleType type)
+    const std::unique_ptr<Module>& getModule(const std::string& package,
+                                             const std::string& library,
+                                             Context::ModuleType type)
     {
         Path path = buildModuleFilename(package, library, type);
         std::string strpath = path.string();
@@ -446,20 +469,20 @@ struct ModuleManager
             if (it != mTableSimulator.end())
                 return it->second;
 
-            return mTableSimulator.emplace(
-                strpath,
-                std::make_unique<Module>(path, package, library,
-                                         type)).first->second;
+            return mTableSimulator
+              .emplace(strpath,
+                       std::make_unique<Module>(path, package, library, type))
+              .first->second;
             break;
         case Context::ModuleType::MODULE_OOV:
             it = mTableOov.find(strpath);
             if (it != mTableOov.end())
                 return it->second;
 
-            return mTableOov.emplace(
-                strpath,
-                std::make_unique<Module>(path, package, library,
-                                         type)).first->second;
+            return mTableOov
+              .emplace(strpath,
+                       std::make_unique<Module>(path, package, library, type))
+              .first->second;
             break;
         default:
             break;
@@ -468,7 +491,7 @@ struct ModuleManager
         throw utils::InternalError(_("Missing type"));
     }
 
-    void *getSymbol(const std::string& symbol)
+    void* getSymbol(const std::string& symbol)
     {
         return mTableSymbols.get(symbol);
     }
@@ -498,7 +521,6 @@ struct ModuleManager
             }
         }
     }
-
 
     Path buildModuleFilename(const std::string& package,
                              const std::string& library,
@@ -537,9 +559,11 @@ struct ModuleManager
             current /= filename;
 
             if (not current.is_file()) {
-                vDbg(mContext, _("ModuleManager: library %s is missing"
-                                 " in binary package %s in %s\n"),
-                     library.c_str(), package.c_str(),
+                vDbg(mContext,
+                     _("ModuleManager: library %s is missing"
+                       " in binary package %s in %s\n"),
+                     library.c_str(),
+                     package.c_str(),
                      current.string().c_str());
                 continue;
             }
@@ -548,8 +572,10 @@ struct ModuleManager
         }
 
         throw utils::FileError(
-            (fmt(_("ModuleManager: library %1% package %2% not found"
-                   "in binary repositories")) % library % package).str());
+          (fmt(_("ModuleManager: library %1% package %2% not found"
+                 "in binary repositories")) %
+           library % package)
+            .str());
     }
 
     /*
@@ -568,8 +594,10 @@ struct ModuleManager
             Path pathoov = "plugins/output";
 
             if (not packages.is_directory()) {
-                vErr(mContext, _("ModuleManager: %s is not a packages "
-                                 "directory\n"), elem.string().c_str());
+                vErr(mContext,
+                     _("ModuleManager: %s is not a packages "
+                       "directory\n"),
+                     elem.string().c_str());
                 continue;
             }
 
@@ -583,20 +611,19 @@ struct ModuleManager
                     vInfo(mContext,
                           _("ModuleManager: package `%s' already"
                             " exists. Forget this path: `%s'\n"),
-                          package.c_str(), it->path().string().c_str());
+                          package.c_str(),
+                          it->path().string().c_str());
                     continue;
                 }
 
                 {
                     Path tmp = (*it) / "plugins" / "simulator";
-                    browse(tmp, package,
-                                   Context::ModuleType::MODULE_DYNAMICS);
+                    browse(tmp, package, Context::ModuleType::MODULE_DYNAMICS);
                 }
 
                 {
                     Path tmp = (*it) / "plugins" / "output";
-                    browse(tmp, package,
-                                   Context::ModuleType::MODULE_OOV);
+                    browse(tmp, package, Context::ModuleType::MODULE_OOV);
                 }
             }
         }
@@ -613,7 +640,7 @@ struct ModuleManager
      *
      * @param[out] lst An output parameter, all modules are pushed backward.
      */
-    void fill(std::vector<Context::Module> *lst) const
+    void fill(std::vector<Context::Module>* lst) const
     {
         std::transform(mTableSimulator.begin(),
                        mTableSimulator.end(),
@@ -632,7 +659,8 @@ struct ModuleManager
      * @param type The type of module to by retrieve.
      * @param[out] lst An output parameter, all modules are pushed backward.
      */
-    void fill(Context::ModuleType type, std::vector<Context::Module> *lst) const
+    void fill(Context::ModuleType type,
+              std::vector<Context::Module>* lst) const
     {
         switch (type) {
         case Context::ModuleType::MODULE_DYNAMICS:
@@ -661,7 +689,7 @@ struct ModuleManager
      * @param[out] lst An output parameter, all modules are pushed backward.
      */
     void fill(const std::string& package,
-              std::vector<Context::Module> *lst) const
+              std::vector<Context::Module>* lst) const
     {
         transformIf(mTableSimulator.begin(),
                     mTableSimulator.end(),
@@ -683,8 +711,9 @@ struct ModuleManager
      * @param type The type of module to by retrieve.
      * @param[out] lst An output parameter, all modules are pushed backward.
      */
-    void fill(const std::string& package, Context::ModuleType type,
-              std::vector<Context::Module> *lst) const
+    void fill(const std::string& package,
+              Context::ModuleType type,
+              std::vector<Context::Module>* lst) const
     {
         switch (type) {
         case Context::ModuleType::MODULE_DYNAMICS:
@@ -709,10 +738,11 @@ struct ModuleManager
     }
 };
 
-void* Context::get_symbol(const std::string& package,
-                          const std::string& library,
-                          Context::ModuleType type,
-                          Context::ModuleType *newtype)
+void*
+Context::get_symbol(const std::string& package,
+                    const std::string& library,
+                    Context::ModuleType type,
+                    Context::ModuleType* newtype)
 {
     if (not m_pimpl->modules)
         m_pimpl->modules = std::make_shared<ModuleManager>(this);
@@ -721,13 +751,14 @@ void* Context::get_symbol(const std::string& package,
         return m_pimpl->modules->getModule(package, library, type)->get();
 
     const auto& module = m_pimpl->modules->getModule(package, library, type);
-    auto *result = module->get();
+    auto* result = module->get();
     *newtype = module->mType;
 
     return result;
 }
 
-void* Context::get_symbol(const std::string& pluginname)
+void*
+Context::get_symbol(const std::string& pluginname)
 {
     if (not m_pimpl->modules)
         m_pimpl->modules = std::make_shared<ModuleManager>(this);
@@ -735,7 +766,8 @@ void* Context::get_symbol(const std::string& pluginname)
     return m_pimpl->modules->getSymbol(pluginname);
 }
 
-void Context::unload_dynamic_libraries() noexcept
+void
+Context::unload_dynamic_libraries() noexcept
 {
     m_pimpl.reset(nullptr);
 }
@@ -765,8 +797,10 @@ Context::get_dynamic_libraries(const std::string& package,
                     if (not it->is_file())
                         continue;
 
-                    ret.push_back({package, getLibraryName(it->path()),
-                        it->path(), ModuleType::MODULE_DYNAMICS});
+                    ret.push_back({ package,
+                                    getLibraryName(it->path()),
+                                    it->path(),
+                                    ModuleType::MODULE_DYNAMICS });
                 }
             }
         }
@@ -780,8 +814,10 @@ Context::get_dynamic_libraries(const std::string& package,
                     if (not it->is_file())
                         continue;
 
-                    ret.push_back({package, getLibraryName(it->path()),
-                        it->path(), ModuleType::MODULE_OOV});
+                    ret.push_back({ package,
+                                    getLibraryName(it->path()),
+                                    it->path(),
+                                    ModuleType::MODULE_OOV });
                 }
             }
         }
@@ -792,5 +828,5 @@ Context::get_dynamic_libraries(const std::string& package,
 
     return ret;
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils

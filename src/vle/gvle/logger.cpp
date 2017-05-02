@@ -32,12 +32,14 @@ Logger::Logger()
     mWidget = 0;
 }
 
-void Logger::setWidget(QPlainTextEdit *widget)
+void
+Logger::setWidget(QPlainTextEdit* widget)
 {
     mWidget = widget;
 }
 
-void Logger::log(QString message)
+void
+Logger::log(QString message)
 {
     if (mWidget == 0)
         return;
@@ -50,7 +52,8 @@ void Logger::log(QString message)
     mWidget->moveCursor(QTextCursor::End);
 }
 
-void Logger::logExt(QString message, bool isError)
+void
+Logger::logExt(QString message, bool isError)
 {
     if (mWidget == 0)
         return;
@@ -63,5 +66,5 @@ void Logger::logExt(QString message, bool isError)
     mWidget->appendHtml(logLine);
     mWidget->moveCursor(QTextCursor::End);
 }
-
-}}//namepsaces
+}
+} // namepsaces

@@ -22,15 +22,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QMessageBox>
 #include <QDebug>
-#include <QUndoCommand>
 #include <QDoubleValidator>
+#include <QMessageBox>
+#include <QUndoCommand>
 #include <QtGlobal>
-#include <vle/utils/DateTime.hpp>
 #include <float.h>
 #include <iostream>
 #include <limits>
+#include <vle/utils/DateTime.hpp>
 
 #include "filevpzproject.h"
 #include "ui_filevpzproject.h"
@@ -38,26 +38,32 @@
 namespace vle {
 namespace gvle {
 
-FileVpzProject::FileVpzProject(QWidget *parent) :
-    QWidget(parent), ui(new Ui::FileVpzProject), mTab(0), mId(0), mAuthor(0),
-    mDate(0), mVersion(0), mName(0), mVpz(0),
-    maxPrecision(std::numeric_limits<double>::digits10)
+FileVpzProject::FileVpzProject(QWidget* parent)
+  : QWidget(parent)
+  , ui(new Ui::FileVpzProject)
+  , mTab(0)
+  , mId(0)
+  , mAuthor(0)
+  , mDate(0)
+  , mVersion(0)
+  , mName(0)
+  , mVpz(0)
+  , maxPrecision(std::numeric_limits<double>::digits10)
 {
     ui->setupUi(this);
 
     mAuthor = ui->authorLineEdit;
-    mDate  = ui->dateTimeEdit;
+    mDate = ui->dateTimeEdit;
     mVersion = ui->versionEdit;
     mName = ui->nameEdit;
-    QObject::connect(mAuthor, SIGNAL(editingFinished()),
-                     this, SLOT(setAuthorToVpz()) );
-    QObject::connect(mDate, SIGNAL(editingFinished()),
-                     this, SLOT(setDateToVpz()) );
-    QObject::connect(mVersion, SIGNAL(editingFinished()),
-                     this, SLOT(setVersionToVpz()) );
-    QObject::connect(mName, SIGNAL(editingFinished()),
-                     this, SLOT(setExpNameToVpz()) );
-
+    QObject::connect(
+      mAuthor, SIGNAL(editingFinished()), this, SLOT(setAuthorToVpz()));
+    QObject::connect(
+      mDate, SIGNAL(editingFinished()), this, SLOT(setDateToVpz()));
+    QObject::connect(
+      mVersion, SIGNAL(editingFinished()), this, SLOT(setVersionToVpz()));
+    QObject::connect(
+      mName, SIGNAL(editingFinished()), this, SLOT(setExpNameToVpz()));
 }
 
 FileVpzProject::~FileVpzProject()
@@ -70,58 +76,60 @@ FileVpzProject::setVpz(vleVpz* vpz)
 {
     mVpz = vpz;
 
-    QObject::connect(mVpz,
-                     SIGNAL(conditionsUpdated()),
-                     this,
-                     SLOT(reload()));
+    QObject::connect(mVpz, SIGNAL(conditionsUpdated()), this, SLOT(reload()));
 
     reload();
 }
 
-void FileVpzProject::reload()
+void
+FileVpzProject::reload()
 {
     mAuthor->setText(mVpz->getAuthor());
-    mDate->setDateTime(QDateTime::fromString(mVpz->getDate(),
-                                             "dddd d MMMM yyyy hh:mm"));
+    mDate->setDateTime(
+      QDateTime::fromString(mVpz->getDate(), "dddd d MMMM yyyy hh:mm"));
     mVersion->setText(mVpz->getVersion());
     mName->setText(mVpz->getExpName());
 }
 
-void FileVpzProject::setAuthorToVpz()
+void
+FileVpzProject::setAuthorToVpz()
 {
     if (mAuthor->text() != mVpz->getAuthor()) {
         mVpz->setAuthor(mAuthor->text());
     }
 }
 
-void FileVpzProject::setDateToVpz()
+void
+FileVpzProject::setDateToVpz()
 {
     if (mDate->text() != mVpz->getDate()) {
         mVpz->setDate(mDate->text());
     }
 }
-void FileVpzProject::setVersionToVpz()
+void
+FileVpzProject::setVersionToVpz()
 {
     if (mVersion->text() != mVpz->getVersion()) {
         mVpz->setVersion(mVersion->text());
     }
 }
 
-void FileVpzProject::setExpNameToVpz()
+void
+FileVpzProject::setExpNameToVpz()
 {
     if (mName->text() != mVpz->getExpName()) {
         mVpz->setExpName(mName->text());
     }
 }
 
-
 void
 
-FileVpzProject::onUndoRedoVpz(QDomNode /*oldVpz*/, QDomNode /*newVpz*/,
-        QDomNode /*oldVpm*/, QDomNode /*newVpm*/)
+  FileVpzProject::onUndoRedoVpz(QDomNode /*oldVpz*/,
+                                QDomNode /*newVpz*/,
+                                QDomNode /*oldVpm*/,
+                                QDomNode /*newVpm*/)
 {
     reload();
 }
-
-
-}} //namespaces
+}
+} // namespaces

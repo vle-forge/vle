@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -41,25 +41,26 @@
 
 using namespace vle;
 
-void atomicmodel_vpz()
+void
+atomicmodel_vpz()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" >\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" >\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
@@ -68,7 +69,7 @@ void atomicmodel_vpz()
     EnsuresEqual(vpz.project().version(), "0.5");
     EnsuresEqual(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
 
-    const vpz::Model &mdl = vpz.project().model();
+    const vpz::Model& mdl = vpz.project().model();
     Ensures(mdl.node() != nullptr);
     EnsuresEqual(mdl.node()->isAtomic(), true);
     EnsuresEqual(mdl.node()->getInputPortNumber(), 2);
@@ -79,65 +80,66 @@ void atomicmodel_vpz()
     Ensures(mdl.node()->existOutputPort("out2") != 0);
 }
 
-void coupledmodel_vpz()
+void
+coupledmodel_vpz()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test2\" type=\"coupled\">\n"
-        "   <in><port name=\"i\"/></in>\n"
-        "   <out><port name=\"o\"/></out>\n"
-        "   <submodels>\n"
-        "    <model name=\"atom1\" type=\"atomic\""
-        "           observables=\"\" conditions=\"\" dynamics=\"\">\n"
-        "     <in><port name=\"in\"/></in>\n"
-        "     <out><port name=\"out\"/></out>\n"
-        "    </model>\n"
-        "    <model name=\"atom2\" type=\"atomic\""
-        "           observables=\"\" conditions=\"\" dynamics=\"\">\n"
-        "     <in><port name=\"in\"/></in>\n"
-        "     <out><port name=\"out\"/></out>\n"
-        "    </model>\n"
-        "   </submodels>\n"
-        "   <connections>\n"
-        "    <connection type=\"internal\">\n"
-        "     <origin model=\"atom1\" port=\"out\" />\n"
-        "     <destination model=\"atom2\" port=\"in\" />\n"
-        "    </connection>\n"
-        "    <connection type=\"input\">\n"
-        "     <origin model=\"test2\" port=\"i\" />\n"
-        "     <destination model=\"atom1\" port=\"in\" />\n"
-        "    </connection>\n"
-        "    <connection type=\"output\">"
-        "     <origin model=\"atom2\" port=\"out\" />\n"
-        "     <destination model=\"test2\" port=\"o\" />\n"
-        "    </connection>\n"
-        "   </connections>\n"
-        "  </model>\n"
-        " </structures>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test2\" type=\"coupled\">\n"
+      "   <in><port name=\"i\"/></in>\n"
+      "   <out><port name=\"o\"/></out>\n"
+      "   <submodels>\n"
+      "    <model name=\"atom1\" type=\"atomic\""
+      "           observables=\"\" conditions=\"\" dynamics=\"\">\n"
+      "     <in><port name=\"in\"/></in>\n"
+      "     <out><port name=\"out\"/></out>\n"
+      "    </model>\n"
+      "    <model name=\"atom2\" type=\"atomic\""
+      "           observables=\"\" conditions=\"\" dynamics=\"\">\n"
+      "     <in><port name=\"in\"/></in>\n"
+      "     <out><port name=\"out\"/></out>\n"
+      "    </model>\n"
+      "   </submodels>\n"
+      "   <connections>\n"
+      "    <connection type=\"internal\">\n"
+      "     <origin model=\"atom1\" port=\"out\" />\n"
+      "     <destination model=\"atom2\" port=\"in\" />\n"
+      "    </connection>\n"
+      "    <connection type=\"input\">\n"
+      "     <origin model=\"test2\" port=\"i\" />\n"
+      "     <destination model=\"atom1\" port=\"in\" />\n"
+      "    </connection>\n"
+      "    <connection type=\"output\">"
+      "     <origin model=\"atom2\" port=\"out\" />\n"
+      "     <destination model=\"test2\" port=\"o\" />\n"
+      "    </connection>\n"
+      "   </connections>\n"
+      "  </model>\n"
+      " </structures>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const vpz::Model &mdl(vpz.project().model());
+    const vpz::Model& mdl(vpz.project().model());
     Ensures(mdl.node() != nullptr);
     EnsuresEqual(mdl.node()->isCoupled(), true);
 
-    vpz::CoupledModel *cpl = mdl.node()->toCoupled();
+    vpz::CoupledModel* cpl = mdl.node()->toCoupled();
     Ensures(cpl != nullptr);
     Ensures(cpl->existOutputPort("o") != 0);
     Ensures(cpl->existInputPort("i") != 0);
 
-    vpz::BaseModel *mdl1 = cpl->findModel("atom1");
-    vpz::BaseModel *mdl2 = cpl->findModel("atom2");
+    vpz::BaseModel* mdl1 = cpl->findModel("atom1");
+    vpz::BaseModel* mdl2 = cpl->findModel("atom2");
     Ensures(mdl1 != nullptr);
     Ensures(mdl2 != nullptr);
 
-    vpz::AtomicModel *atom1 = dynamic_cast<vpz::AtomicModel *>(mdl1);
-    vpz::AtomicModel *atom2 = dynamic_cast<vpz::AtomicModel *>(mdl2);
+    vpz::AtomicModel* atom1 = dynamic_cast<vpz::AtomicModel*>(mdl1);
+    vpz::AtomicModel* atom2 = dynamic_cast<vpz::AtomicModel*>(mdl2);
     Ensures(atom1 != nullptr);
     Ensures(atom1->existOutputPort("out"));
     Ensures(atom1->existInputPort("in"));
@@ -150,75 +152,77 @@ void coupledmodel_vpz()
     Ensures(cpl->existInternalConnection("atom1", "out", "atom2", "in"));
 }
 
-void dynamic_vpz()
+void
+dynamic_vpz()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test3\" type=\"atomic\""
-        "         observables=\"\" dynamics=\"dyn1\" conditions=\"cnd1\" />\n"
-        " </structures>\n"
-        " <dynamics>\n"
-        "  <dynamic name=\"dyn1\" library=\"celldevs\""
-        "           type=\"local\" />\n"
-        " </dynamics>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test3\" type=\"atomic\""
+      "         observables=\"\" dynamics=\"dyn1\" conditions=\"cnd1\" />\n"
+      " </structures>\n"
+      " <dynamics>\n"
+      "  <dynamic name=\"dyn1\" library=\"celldevs\""
+      "           type=\"local\" />\n"
+      " </dynamics>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const vpz::Model &mdl(vpz.project().model());
+    const vpz::Model& mdl(vpz.project().model());
     Ensures(mdl.node() != nullptr);
     EnsuresEqual(mdl.node()->isAtomic(), true);
-    vpz::AtomicModel *atom = mdl.node()->toAtomic();
+    vpz::AtomicModel* atom = mdl.node()->toAtomic();
 
     Ensures(atom);
 }
 
-void experiment_vpz()
+void
+experiment_vpz()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\">\n"
-        "  <conditions>"
-        "   <condition name=\"simulation_engine\" >"
-        "    <port name=\"begin\" >"
-        "     <double>123.</double>"
-        "    </port>"
-        "    <port name=\"duration\" >"
-        "     <double>0.33</double><integer>2</integer>"
-        "    </port>"
-        "   </condition>"
-        "   <condition name=\"cond1\" >"
-        "    <port name=\"init1\" >"
-        "     <double>123.</double><integer>1</integer>"
-        "    </port>"
-        "    <port name=\"init2\" >"
-        "     <double>456.</double><integer>2</integer>"
-        "    </port>"
-        "   </condition>"
-        "   <condition name=\"cond2\" >"
-        "    <port name=\"init3\" >"
-        "     <double>.123</double><integer>-1</integer>"
-        "    </port>"
-        "    <port name=\"init4\" >"
-        "     <double>.456</double><integer>-2</integer>"
-        "    </port>"
-        "   </condition>"
-        "  </conditions>"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <experiment name=\"test1\">\n"
+      "  <conditions>"
+      "   <condition name=\"simulation_engine\" >"
+      "    <port name=\"begin\" >"
+      "     <double>123.</double>"
+      "    </port>"
+      "    <port name=\"duration\" >"
+      "     <double>0.33</double><integer>2</integer>"
+      "    </port>"
+      "   </condition>"
+      "   <condition name=\"cond1\" >"
+      "    <port name=\"init1\" >"
+      "     <double>123.</double><integer>1</integer>"
+      "    </port>"
+      "    <port name=\"init2\" >"
+      "     <double>456.</double><integer>2</integer>"
+      "    </port>"
+      "   </condition>"
+      "   <condition name=\"cond2\" >"
+      "    <port name=\"init3\" >"
+      "     <double>.123</double><integer>-1</integer>"
+      "    </port>"
+      "    <port name=\"init4\" >"
+      "     <double>.456</double><integer>-2</integer>"
+      "    </port>"
+      "   </condition>"
+      "  </conditions>"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    const vpz::Project &project(vpz.project());
-    const vpz::Experiment &experiment(project.experiment());
-    const vpz::Conditions &cnds(project.experiment().conditions());
+    const vpz::Project& project(vpz.project());
+    const vpz::Experiment& experiment(project.experiment());
+    const vpz::Conditions& cnds(project.experiment().conditions());
 
     EnsuresEqual(experiment.name(), "test1");
     EnsuresEqual(experiment.duration(), 0.33);
@@ -249,90 +253,91 @@ void experiment_vpz()
         Ensures(it != lst.end());
     }
 
-    const vpz::Condition &cnd1(cnds.get("cond1"));
-    const vpz::Condition &cnd2(cnds.get("cond2"));
+    const vpz::Condition& cnd1(cnds.get("cond1"));
+    const vpz::Condition& cnd2(cnds.get("cond2"));
 
     {
-        const auto &set(cnd1.getSetValues("init1"));
-        const value::Double &real(set[0]->toDouble());
+        const auto& set(cnd1.getSetValues("init1"));
+        const value::Double& real(set[0]->toDouble());
         EnsuresEqual(real.value(), 123.);
-        const value::Integer &integer(set[1]->toInteger());
+        const value::Integer& integer(set[1]->toInteger());
         EnsuresEqual(integer.value(), 1);
     }
 
     {
-        const auto &set(cnd1.getSetValues("init2"));
-        const value::Double &real(set[0]->toDouble());
+        const auto& set(cnd1.getSetValues("init2"));
+        const value::Double& real(set[0]->toDouble());
         EnsuresEqual(real.value(), 456.);
-        const value::Integer &integer(set[1]->toInteger());
+        const value::Integer& integer(set[1]->toInteger());
         EnsuresEqual(integer.value(), 2);
     }
 
     {
-        const auto &set = cnd2.getSetValues("init3");
-        const value::Double &real(set[0]->toDouble());
+        const auto& set = cnd2.getSetValues("init3");
+        const value::Double& real(set[0]->toDouble());
         EnsuresEqual(real.value(), .123);
-        const value::Integer &integer(set[1]->toInteger());
+        const value::Integer& integer(set[1]->toInteger());
         EnsuresEqual(integer.value(), -1);
     }
 
     {
-        const auto &set = cnd2.getSetValues("init4");
-        const value::Double &real(set[0]->toDouble());
+        const auto& set = cnd2.getSetValues("init4");
+        const value::Double& real(set[0]->toDouble());
         EnsuresEqual(real.value(), .456);
-        const value::Integer &integer(set[1]->toInteger());
+        const value::Integer& integer(set[1]->toInteger());
         EnsuresEqual(integer.value(), -2);
     }
 }
 
-void experiment_measures_vpz()
+void
+experiment_measures_vpz()
 {
-    const char *xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\">\n"
-        "  <views>\n"
-        "   <outputs>\n"
-        "    <output name=\"x\" plugin=\"yyy\" location=\"TEMP\">\n"
-        "     <string>test</string>"
-        "    </output>\n"
-        "    <output name=\"z\" plugin=\"xxx\" location=\"127.0.0.1:8888\" "
-        "/>\n"
-        "   </outputs>\n"
-        "   <observables>\n"
-        "    <observable name=\"oo\" >\n"
-        "     <port name=\"x1\">\n"
-        "      <attachedview name=\"x\" />\n"
-        "     </port>\n"
-        "     <port name=\"x2\" />"
-        "     <port name=\"x3\" />"
-        "    </observable>\n"
-        "    <observable name=\"xx\" >\n"
-        "     <port name=\"x4\" />"
-        "     <port name=\"x5\" />"
-        "     <port name=\"x6\" />"
-        "    </observable>\n"
-        "   </observables>\n"
-        "   <view name=\"x\" type=\"timed\" timestep=\".05\""
-        "            output=\"x\" library=\"lib\" enable=\"false\" />\n"
-        "  </views>\n"
-        " </experiment>\n"
-        "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <experiment name=\"test1\">\n"
+      "  <views>\n"
+      "   <outputs>\n"
+      "    <output name=\"x\" plugin=\"yyy\" location=\"TEMP\">\n"
+      "     <string>test</string>"
+      "    </output>\n"
+      "    <output name=\"z\" plugin=\"xxx\" location=\"127.0.0.1:8888\" "
+      "/>\n"
+      "   </outputs>\n"
+      "   <observables>\n"
+      "    <observable name=\"oo\" >\n"
+      "     <port name=\"x1\">\n"
+      "      <attachedview name=\"x\" />\n"
+      "     </port>\n"
+      "     <port name=\"x2\" />"
+      "     <port name=\"x3\" />"
+      "    </observable>\n"
+      "    <observable name=\"xx\" >\n"
+      "     <port name=\"x4\" />"
+      "     <port name=\"x5\" />"
+      "     <port name=\"x6\" />"
+      "    </observable>\n"
+      "   </observables>\n"
+      "   <view name=\"x\" type=\"timed\" timestep=\".05\""
+      "            output=\"x\" library=\"lib\" enable=\"false\" />\n"
+      "  </views>\n"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
-    vpz::Project &project(vpz.project());
-    vpz::Experiment &experiment(project.experiment());
-    vpz::Views &views(experiment.views());
+    vpz::Project& project(vpz.project());
+    vpz::Experiment& experiment(project.experiment());
+    vpz::Views& views(experiment.views());
 
-    vpz::Outputs &outputs(views.outputs());
+    vpz::Outputs& outputs(views.outputs());
     Ensures(outputs.outputlist().size() == 2);
 
     Ensures(outputs.outputlist().find("x") != outputs.outputlist().end());
     {
-        vpz::Output &out(outputs.outputlist().find("x")->second);
+        vpz::Output& out(outputs.outputlist().find("x")->second);
         EnsuresEqual(out.name(), "x");
         Ensures(out.data());
         EnsuresEqual(out.data()->isString(), true);
@@ -340,7 +345,7 @@ void experiment_measures_vpz()
     }
     Ensures(outputs.outputlist().find("z") != outputs.outputlist().end());
     {
-        vpz::Output &out(outputs.outputlist().find("z")->second);
+        vpz::Output& out(outputs.outputlist().find("z")->second);
         EnsuresEqual(out.name(), "z");
         EnsuresEqual(out.plugin(), "xxx");
         EnsuresEqual(out.location(), "127.0.0.1:8888");
@@ -350,7 +355,7 @@ void experiment_measures_vpz()
     Ensures((*views.viewlist().begin()).first ==
             (*views.viewlist().begin()).second.name());
 
-    vpz::View &view(views.viewlist().begin()->second);
+    vpz::View& view(views.viewlist().begin()->second);
     EnsuresEqual(view.name(), "x");
     EnsuresEqual(view.is_enable(), false);
     view.enable();
@@ -363,12 +368,12 @@ void experiment_measures_vpz()
     EnsuresEqual(view.timestep(), .05);
     EnsuresEqual(view.output(), "x");
 
-    const vpz::Observables &obs(views.observables());
+    const vpz::Observables& obs(views.observables());
     Ensures(obs.observablelist().size() == 2);
 
     Ensures(obs.observablelist().find("oo") != obs.observablelist().end());
     {
-        const vpz::Observable &ob = obs.observablelist().find("oo")->second;
+        const vpz::Observable& ob = obs.observablelist().find("oo")->second;
         EnsuresEqual(ob.name(), "oo");
         EnsuresEqual(ob.observableportlist().size(),
                      (vpz::ObservablePortList::size_type)3);
@@ -377,13 +382,13 @@ void experiment_measures_vpz()
         Ensures(ob.exist("x2"));
         Ensures(ob.exist("x3"));
 
-        const vpz::ObservablePort &port(ob.get("x1"));
+        const vpz::ObservablePort& port(ob.get("x1"));
         Ensures(port.exist("x"));
     }
 
     Ensures(obs.observablelist().find("xx") != obs.observablelist().end());
     {
-        const vpz::Observable &ob = obs.observablelist().find("xx")->second;
+        const vpz::Observable& ob = obs.observablelist().find("xx")->second;
         EnsuresEqual(ob.name(), "xx");
         EnsuresEqual(ob.observableportlist().size(),
                      (vpz::ObservablePortList::size_type)3);
@@ -397,7 +402,7 @@ void experiment_measures_vpz()
         vpz::Views views(experiment.views());
         EnsuresNotThrow(views.renameView(std::string("x"), std::string("y")),
                         std::exception);
-        const vpz::View &view(views.viewlist().begin()->second);
+        const vpz::View& view(views.viewlist().begin()->second);
         EnsuresEqual(view.name(), "y");
         EnsuresEqual(view.streamtype(), "timed");
         EnsuresEqual(view.timestep(), .05);
@@ -405,7 +410,8 @@ void experiment_measures_vpz()
     }
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

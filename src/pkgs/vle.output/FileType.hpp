@@ -5,7 +5,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
@@ -25,13 +25,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_OOV_PLUGINS_FILETYPE_HPP
 #define VLE_OOV_PLUGINS_FILETYPE_HPP 1
 
 #include "File.hpp"
 
-namespace vle { namespace oov { namespace plugin {
+namespace vle {
+namespace oov {
+namespace plugin {
 
 class Rdata : public File::FileType
 {
@@ -68,7 +69,8 @@ public:
 
     virtual void writeHead(std::ostream& out, const File::Strings& heads);
 };
-
-}}} // namespace vle oov plugin
+}
+}
+} // namespace vle oov plugin
 
 #endif

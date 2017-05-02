@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -33,7 +33,8 @@
 namespace vle {
 namespace devs {
 
-void Scheduler::init(Time time)
+void
+Scheduler::init(Time time)
 {
     m_current_time = time;
 
@@ -44,7 +45,7 @@ void Scheduler::init(Time time)
     while (not m_scheduler.empty() and
            m_scheduler.top().m_time <= m_current_time) {
 
-        Simulator *sim = m_scheduler.top().m_simulator;
+        Simulator* sim = m_scheduler.top().m_simulator;
 
         //
         // Add the simulator pointer into the unordered_set and into the
@@ -67,7 +68,8 @@ void Scheduler::init(Time time)
     }
 }
 
-void Scheduler::addInternal(Simulator *simulator, Time time)
+void
+Scheduler::addInternal(Simulator* simulator, Time time)
 {
     assert(not isInfinity(time) && "addInternal: infinity time?");
     assert(not isNegativeInfinity(time) && "addInternal: infinity time?");
@@ -76,16 +78,16 @@ void Scheduler::addInternal(Simulator *simulator, Time time)
     if (simulator->haveHandle()) {
         (*simulator->handle()).m_time = time;
         m_scheduler.update(simulator->handle());
-    }
-    else {
+    } else {
         HandleT handle = m_scheduler.emplace(time, simulator);
         simulator->setHandle(handle);
     }
 }
 
-void Scheduler::addExternal(Simulator *simulator,
-                            std::shared_ptr<value::Value> values,
-                            const std::string &portname)
+void
+Scheduler::addExternal(Simulator* simulator,
+                       std::shared_ptr<value::Value> values,
+                       const std::string& portname)
 {
     //
     // Tries to insert the simulator into the std::unordered_set. If insertion
@@ -115,7 +117,8 @@ void Scheduler::addExternal(Simulator *simulator,
     }
 }
 
-void Scheduler::delSimulator(Simulator *simulator)
+void
+Scheduler::delSimulator(Simulator* simulator)
 {
     //
     // Tries to delete the simulator from the \c Bag objects (\c std::vector
@@ -124,16 +127,16 @@ void Scheduler::delSimulator(Simulator *simulator)
 
     if (simulator->dynamics()->isExecutive())
         m_current_bag.executives.erase(
-            std::remove(m_current_bag.executives.begin(),
-                        m_current_bag.executives.end(),
-                        simulator),
-            m_current_bag.executives.end());
+          std::remove(m_current_bag.executives.begin(),
+                      m_current_bag.executives.end(),
+                      simulator),
+          m_current_bag.executives.end());
     else
         m_current_bag.dynamics.erase(
-            std::remove(m_current_bag.dynamics.begin(),
-                        m_current_bag.dynamics.end(),
-                        simulator),
-            m_current_bag.dynamics.end());
+          std::remove(m_current_bag.dynamics.begin(),
+                      m_current_bag.dynamics.end(),
+                      simulator),
+          m_current_bag.dynamics.end());
 
     m_current_bag.unique_simulators.erase(simulator);
 
@@ -143,7 +146,8 @@ void Scheduler::delSimulator(Simulator *simulator)
     }
 }
 
-void Scheduler::makeNextBag()
+void
+Scheduler::makeNextBag()
 {
     m_current_time = getNextTime();
 
@@ -154,7 +158,7 @@ void Scheduler::makeNextBag()
     while (not m_scheduler.empty() and
            m_scheduler.top().m_time == m_current_time) {
 
-        Simulator *sim = m_scheduler.top().m_simulator;
+        Simulator* sim = m_scheduler.top().m_simulator;
 
         //
         // Add the simulator pointer into the unordered_set and into the

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -37,16 +37,16 @@
 
 #define DECLARE_EXECUTIVE(mdl)                                                \
     extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics *                                          \
-    vle_make_new_executive(const vle::devs::ExecutiveInit &init,              \
-                           const vle::devs::InitEventList &events)            \
+    VLE_MODULE vle::devs::Dynamics* vle_make_new_executive(                   \
+      const vle::devs::ExecutiveInit& init,                                   \
+      const vle::devs::InitEventList& events)                                 \
     {                                                                         \
         return new mdl(init, events);                                         \
     }                                                                         \
                                                                               \
-    VLE_MODULE void vle_api_level(vle::uint32_t *major,                       \
-                                  vle::uint32_t *minor,                       \
-                                  vle::uint32_t *patch)                       \
+    VLE_MODULE void vle_api_level(vle::uint32_t* major,                       \
+                                  vle::uint32_t* minor,                       \
+                                  vle::uint32_t* patch)                       \
     {                                                                         \
         auto version = vle::version();                                        \
         *major = std::get<0>(version);                                        \
@@ -68,19 +68,22 @@ struct ExecutiveInit;
  * default, this model does nothing and it will be inherit to build
  * simulation components.
  */
-class VLE_API Executive : public Dynamics {
+class VLE_API Executive : public Dynamics
+{
 public:
     /**
      * @brief Constructor of the Executive of an atomic model
      * @param init The structure to initialise the Executive.
      * @param events Experimentales conditions.
      */
-    Executive(const ExecutiveInit &init, const InitEventList &events);
+    Executive(const ExecutiveInit& init, const InitEventList& events);
 
     /**
      * @brief Destructor (nothing to do).
      */
-    virtual ~Executive() {}
+    virtual ~Executive()
+    {
+    }
 
     /**
      * @brief If this function return true, then a cast to an Executive object
@@ -89,7 +92,10 @@ public:
      * simulation.
      * @return false if Dynamics is not an Executive.
      */
-    inline virtual bool isExecutive() const override { return true; }
+    inline virtual bool isExecutive() const override
+    {
+        return true;
+    }
 
     // / / / /
     //
@@ -101,39 +107,39 @@ public:
      * @brief Get a constant reference to the list of vpz::Dynamics objects.
      * @return A constant reference to the list of vpz::Dynamics objects.
      */
-    const vpz::Dynamics &dynamics() const;
+    const vpz::Dynamics& dynamics() const;
 
     /**
      * @brief Get a reference to the list of vpz::Dynamics objects.
      * @return A reference to the list of vpz::Dynamics objects.
      */
-    vpz::Dynamics &dynamics();
+    vpz::Dynamics& dynamics();
 
     /**
      * @brief Get a constant reference to the list of vpz::Conditions
      * objects.
      * @return A constant reference to the list of vpz::Conditions objects.
      */
-    const vpz::Conditions &conditions() const;
+    const vpz::Conditions& conditions() const;
 
     /**
      * @brief Get a reference to the list of vpz::Conditions objects.
      * @return A reference to the list of vpz::Conditions objects.
      */
-    vpz::Conditions &conditions();
+    vpz::Conditions& conditions();
 
     /**
      * @brief Get a constant reference to the list of vpz::Observables
      * objects.
      * @return A constant reference to the list of vpz::Observables objects.
      */
-    const vpz::Observables &observables() const;
+    const vpz::Observables& observables() const;
 
     /**
      * @brief Get a reference to the list of vpz::Conditions objects.
      * @return A reference to the list of vpz::Conditions objects.
      */
-    vpz::Observables &observables();
+    vpz::Observables& observables();
 
     /**
      * @brief Add an observable, ie. a reference and a model to the
@@ -144,9 +150,9 @@ public:
      * @throw utils::DevsGraphError if model does not exist or if model is
      * not an atomic model.
      */
-    void addObservableToView(const std::string &model,
-                             const std::string &portname,
-                             const std::string &view);
+    void addObservableToView(const std::string& model,
+                             const std::string& portname,
+                             const std::string& view);
 
     // / / / /
     //
@@ -165,13 +171,13 @@ public:
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    const vpz::AtomicModel *
-    createModel(const std::string &name,
-                const std::vector<std::string> &inputs = {},
-                const std::vector<std::string> &outputs = {},
-                const std::string &dynamics = {},
-                const std::vector<std::string> &conditions = {},
-                const std::string &observable = {});
+    const vpz::AtomicModel* createModel(
+      const std::string& name,
+      const std::vector<std::string>& inputs = {},
+      const std::vector<std::string>& outputs = {},
+      const std::string& dynamics = {},
+      const std::vector<std::string>& conditions = {},
+      const std::string& observable = {});
 
     /**
      * @brief Build a new devs::Simulator from the vpz::Classes information.
@@ -180,8 +186,8 @@ public:
      * @param modelname the new name of the model.
      * @throw utils::badArg if modelname already exist.
      */
-    const vpz::BaseModel *createModelFromClass(const std::string &classname,
-                                               const std::string &modelname);
+    const vpz::BaseModel* createModelFromClass(const std::string& classname,
+                                               const std::string& modelname);
 
     /**
      * @brief Delete the specified model from coupled model. All
@@ -191,7 +197,7 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    void delModel(const std::string &modelname);
+    void delModel(const std::string& modelname);
 
     /**
      * @brief Rename the specified model.
@@ -200,7 +206,7 @@ public:
      * @throw utils::ModelingError if model `oldname' does not exist or if a
      * model `newname' already exists.
      */
-    void renameModel(const std::string &oldname, const std::string &newname);
+    void renameModel(const std::string& oldname, const std::string& newname);
 
     /**
      * @brief Add an internal, input or output connection in coupled model.
@@ -214,10 +220,10 @@ public:
      *
      * @throw utils::DevsGraphError if models or ports do not exist.
      */
-    void addConnection(const std::string &modelsource,
-                       const std::string &outputport,
-                       const std::string &modeldestination,
-                       const std::string &inputport);
+    void addConnection(const std::string& modelsource,
+                       const std::string& outputport,
+                       const std::string& modeldestination,
+                       const std::string& inputport);
 
     /**
      * @brief Remove an internal, input or output connection in coupled model.
@@ -231,10 +237,10 @@ public:
      *
      * @throw utils::DevsGraphError if models or ports do not exist.
      */
-    void removeConnection(const std::string &modelsource,
-                          const std::string &outputport,
-                          const std::string &modeldestination,
-                          const std::string &inputport);
+    void removeConnection(const std::string& modelsource,
+                          const std::string& outputport,
+                          const std::string& modeldestination,
+                          const std::string& inputport);
 
     /**
      * @brief Add an input port for an internal model.
@@ -244,8 +250,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    void addInputPort(const std::string &modelName,
-                      const std::string &portName);
+    void addInputPort(const std::string& modelName,
+                      const std::string& portName);
 
     /**
      * @brief Add an output port for an internal model.
@@ -255,8 +261,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    void addOutputPort(const std::string &modelName,
-                       const std::string &portName);
+    void addOutputPort(const std::string& modelName,
+                       const std::string& portName);
 
     /**
      * @brief Remove an input port for an internal model.
@@ -266,8 +272,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    void removeInputPort(const std::string &modelName,
-                         const std::string &portName);
+    void removeInputPort(const std::string& modelName,
+                         const std::string& portName);
 
     /**
      * @brief Remove an output port for an internal model.
@@ -277,8 +283,8 @@ public:
      *
      * @throw utils::DevsGraphError if model does not exist.
      */
-    void removeOutputPort(const std::string &modelName,
-                          const std::string &portName);
+    void removeOutputPort(const std::string& modelName,
+                          const std::string& portName);
 
     // / / / /
     //
@@ -298,13 +304,13 @@ public:
      * }
      * @endcode
      */
-    void dump(std::ostream &out, const std::string &name = "default") const;
+    void dump(std::ostream& out, const std::string& name = "default") const;
 
     /**
      * @brief Get a reference to the current coupled model.
      * @return A constant reference to the coupled model.
      */
-    const vpz::CoupledModel &coupledmodel() const
+    const vpz::CoupledModel& coupledmodel() const
     {
         return *getModel().getParent();
     }
@@ -313,7 +319,7 @@ public:
      * @brief Get the name of the coupled model.
      * @return A constant reference to the name of the coupled model.
      */
-    const std::string &coupledmodelName() const
+    const std::string& coupledmodelName() const
     {
         return coupledmodel().getName();
     }
@@ -321,7 +327,7 @@ public:
 private:
     /**< A reference to the coordinator of this executive to allow
        modification of coupled model. */
-    Coordinator &m_coordinator;
+    Coordinator& m_coordinator;
 
     /*
      * Stores a clone of condition if the user call the @c conditions()
@@ -333,7 +339,10 @@ private:
      * @brief Get a reference to the current coupled model.
      * @return A reference to the coupled model.
      */
-    vpz::CoupledModel *cpled() { return getModel().getParent(); }
+    vpz::CoupledModel* cpled()
+    {
+        return getModel().getParent();
+    }
 };
 }
 } // namespace vle devs

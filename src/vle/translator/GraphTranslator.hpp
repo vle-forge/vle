@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,15 +34,14 @@
 #include <vle/utils/Array.hpp>
 #include <vle/vpz/Condition.hpp>
 
-namespace vle
-{
-namespace translator
-{
+namespace vle {
+namespace translator {
 
 class VLE_API graph_generator
 {
 public:
-    enum class connectivity {
+    enum class connectivity
+    {
         IN_OUT, /*!< @c in-out: add an output port @c out for source model and
                  an input port @c in for destination model. */
         IN,     /*!< @c in: add an output port with same name as the
@@ -54,7 +53,8 @@ public:
                  source model. */
     };
 
-    struct graph_metrics {
+    struct graph_metrics
+    {
         int vertices;  /*!< Number of vertices. */
         int edges;     /*!< Number of edges. */
         int bandwidth; /*!< The maximum distance between two adjacent
@@ -63,18 +63,21 @@ public:
                             intervals.*/
     };
 
-    struct node_metrics {
+    struct node_metrics
+    {
         int id;         /*!< Unique identifier for node. */
         int in_degree;  /*!< Number of edges entering vertex. */
         int out_degree; /*|< Number of edges leaving vertex. */
     };
 
-    struct parameter {
+    struct parameter
+    {
         /*!< Function to build the @c name, @c classname and @c condition for
          * the model defined by the @c metrics. */
-        std::function<void(const node_metrics &metrics,
-                           std::string &name,
-                           std::string &classname)> make_model;
+        std::function<void(const node_metrics& metrics,
+                           std::string& name,
+                           std::string& classname)>
+          make_model;
 
         /*!< The connectivity between each DEVS model.*/
         connectivity type;
@@ -83,42 +86,42 @@ public:
         bool directed;
     };
 
-    graph_generator(const parameter &params);
+    graph_generator(const parameter& params);
 
     graph_metrics metrics() const;
 
-    void make_graph(vle::devs::Executive &executive,
+    void make_graph(vle::devs::Executive& executive,
                     int number,
-                    const vle::utils::Array<bool> &graph);
+                    const vle::utils::Array<bool>& graph);
 
-    void make_smallworld(vle::devs::Executive &executive,
-                         std::mt19937 &gen,
+    void make_smallworld(vle::devs::Executive& executive,
+                         std::mt19937& gen,
                          int number,
                          int k,
                          double probability,
                          bool allow_self_loops);
 
-    void make_scalefree(vle::devs::Executive &executive,
-                        std::mt19937 &gen,
+    void make_scalefree(vle::devs::Executive& executive,
+                        std::mt19937& gen,
                         int number,
                         double alpha,
                         double beta,
                         bool allow_self_loops);
 
-    void make_sorted_erdos_renyi(vle::devs::Executive &executive,
-                                 std::mt19937 &gen,
+    void make_sorted_erdos_renyi(vle::devs::Executive& executive,
+                                 std::mt19937& gen,
                                  int number,
                                  double probability,
                                  bool allow_self_loops);
 
-    void make_erdos_renyi(vle::devs::Executive &executive,
-                          std::mt19937 &gen,
+    void make_erdos_renyi(vle::devs::Executive& executive,
+                          std::mt19937& gen,
                           int number,
                           double fraction,
                           bool allow_self_loops);
 
-    void make_erdos_renyi(vle::devs::Executive &executive,
-                          std::mt19937 &gen,
+    void make_erdos_renyi(vle::devs::Executive& executive,
+                          std::mt19937& gen,
                           int number,
                           int edges_number,
                           bool allow_self_loops);

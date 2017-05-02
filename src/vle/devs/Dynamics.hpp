@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -47,16 +47,16 @@
 
 #define DECLARE_DYNAMICS(mdl)                                                 \
     extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics *                                          \
-    vle_make_new_dynamics(const vle::devs::DynamicsInit &init,                \
-                          const vle::devs::InitEventList &events)             \
+    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics(                    \
+      const vle::devs::DynamicsInit& init,                                    \
+      const vle::devs::InitEventList& events)                                 \
     {                                                                         \
         return new mdl(init, events);                                         \
     }                                                                         \
                                                                               \
-    VLE_MODULE void vle_api_level(std::uint32_t *major,                       \
-                                  std::uint32_t *minor,                       \
-                                  std::uint32_t *patch)                       \
+    VLE_MODULE void vle_api_level(std::uint32_t* major,                       \
+                                  std::uint32_t* minor,                       \
+                                  std::uint32_t* patch)                       \
     {                                                                         \
         auto version = vle::version();                                        \
         *major = std::get<0>(version);                                        \
@@ -77,7 +77,8 @@ using PackageId = utils::PackageTable::index;
  * @brief Dynamics class represent a part of the DEVS simulator. This class
  * must be inherits to build simulation components.
  */
-class VLE_API Dynamics {
+class VLE_API Dynamics
+{
 public:
     /**
      * @brief Constructor of Dynamics for an atomic model.
@@ -85,12 +86,14 @@ public:
      * @param init The initialiser of Dynamics.
      * @param events The parameter from the experimental frame.
      */
-    Dynamics(const DynamicsInit &init, const InitEventList &events);
+    Dynamics(const DynamicsInit& init, const InitEventList& events);
 
     /**
      * @brief Destructor (nothing to do)
      */
-    virtual ~Dynamics() {}
+    virtual ~Dynamics()
+    {
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -103,7 +106,10 @@ public:
      * @param time the time of the creation of this model.
      * @return duration of the initial state.
      */
-    virtual Time init(Time /* time */) { return infinity; }
+    virtual Time init(Time /* time */)
+    {
+        return infinity;
+    }
 
     /**
      * @brief Process the output function: compute the output function.
@@ -134,8 +140,7 @@ public:
      * ...
      * @endcode
      */
-    virtual void output(Time /* time */,
-                        ExternalEventList & /* output */) const
+    virtual void output(Time /* time */, ExternalEventList& /* output */) const
     {
     }
 
@@ -144,14 +149,19 @@ public:
      * current state.
      * @return duration of the current state.
      */
-    virtual Time timeAdvance() const { return infinity; }
+    virtual Time timeAdvance() const
+    {
+        return infinity;
+    }
 
     /**
      * @brief Process an internal transition: compute the new state of the
      * model with the internal transition function.
      * @param time the date of occurence of this event.
      */
-    virtual void internalTransition(Time /* time */) {}
+    virtual void internalTransition(Time /* time */)
+    {
+    }
 
     /**
      * @brief Process an external transition: compute the new state of the
@@ -191,7 +201,7 @@ public:
      * ...
      * @endcode
      */
-    virtual void externalTransition(const ExternalEventList & /* event */,
+    virtual void externalTransition(const ExternalEventList& /* event */,
                                     Time /* time */)
     {
     }
@@ -204,7 +214,7 @@ public:
      * @param extEventlist the external events list.
      */
     virtual void confluentTransitions(Time time,
-                                      const ExternalEventList &extEventlist)
+                                      const ExternalEventList& extEventlist)
     {
         internalTransition(time);
         externalTransition(extEventlist, time);
@@ -240,8 +250,8 @@ public:
      * ...
      * @endcode
      */
-    virtual std::unique_ptr<vle::value::Value>
-    observation(const ObservationEvent & /* event */) const
+    virtual std::unique_ptr<vle::value::Value> observation(
+      const ObservationEvent& /* event */) const
     {
         return {};
     }
@@ -250,7 +260,9 @@ public:
      * @brief When the simulation of the atomic model is finished, the
      * finish method is invoked.
      */
-    virtual void finish() {}
+    virtual void finish()
+    {
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -263,14 +275,20 @@ public:
      * runtime of the simulation.
      * @return false if Dynamics is not an Executive.
      */
-    inline virtual bool isExecutive() const { return false; }
+    inline virtual bool isExecutive() const
+    {
+        return false;
+    }
 
     /**
      * @brief If this function return true, then a cast to a DynamicsWrapper
      * object is produce and the set_model and set_library function are call.
      * @return false if Dynamics is not a DynamicsWrapper.
      */
-    inline virtual bool isWrapper() const { return false; }
+    inline virtual bool isWrapper() const
+    {
+        return false;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -281,14 +299,17 @@ public:
      * dynamics
      * @return pointer on the atomic model
      */
-    inline const vle::vpz::AtomicModel &getModel() const { return m_model; }
+    inline const vle::vpz::AtomicModel& getModel() const
+    {
+        return m_model;
+    }
 
     /**
      * Return the name of the atomic model to which belongs the dynamics
      *
      * @return name of the atomic model
      */
-    inline const std::string &getModelName() const
+    inline const std::string& getModelName() const
     {
         return m_model.getName();
     }
@@ -301,7 +322,7 @@ public:
      *
      * @return the event list with the event
      */
-    ExternalEvent *buildEvent(const std::string &portName) const;
+    ExternalEvent* buildEvent(const std::string& portName) const;
 
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -346,56 +367,59 @@ public:
      * @param name The name of the file.
      * @return The patch of the file.
      */
-    std::string getPackageFile(const std::string &name) const;
+    std::string getPackageFile(const std::string& name) const;
 
     /**
      * @brief Get the path of a library package file.
      * @param name The name of the file.
      * @return The patch of the file.
      */
-    std::string getPackageLibFile(const std::string &name) const;
+    std::string getPackageLibFile(const std::string& name) const;
 
     /**
      * @brief Get the path of a source package file.
      * @param name The name of the file.
      * @return The patch of the file.
      */
-    std::string getPackageSrcFile(const std::string &name) const;
+    std::string getPackageSrcFile(const std::string& name) const;
 
     /**
      * @brief Get the path of a data package file.
      * @param name The name of the file.
      * @return The patch of the file.
      */
-    std::string getPackageDataFile(const std::string &name) const;
+    std::string getPackageDataFile(const std::string& name) const;
 
     /**
      * @brief Get the path of a document package file.
      * @param name The name of the file.
      * @return The patch of the file.
      */
-    std::string getPackageDocFile(const std::string &name) const;
+    std::string getPackageDocFile(const std::string& name) const;
 
     /**
      * @brief Get the path of an experiment package file.
      * @param name The name of the file.
      * @return The patch of the file.
      */
-    std::string getPackageExpFile(const std::string &name) const;
+    std::string getPackageExpFile(const std::string& name) const;
 
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
     /**
      * Get a Context shared pointer.
      */
-    utils::ContextPtr context() const noexcept { return m_context; }
+    utils::ContextPtr context() const noexcept
+    {
+        return m_context;
+    }
 
 private:
     ///< A reference to the context.
     utils::ContextPtr m_context;
 
     ///< A constant reference to the atomic model node of the graph.
-    const vpz::AtomicModel &m_model;
+    const vpz::AtomicModel& m_model;
 
     ///< An iterator to std::set of the vle::utils::PackageTable.
     PackageId m_packageid;

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,12 +34,13 @@ namespace vle {
 namespace vpz {
 
 Project::Project()
-    : m_version(vle::string_version())
-    , m_instance(-1)
+  : m_version(vle::string_version())
+  , m_instance(-1)
 {
 }
 
-void Project::write(std::ostream &out) const
+void
+Project::write(std::ostream& out) const
 {
     out << "<vle_project"
         << " version=\"" << m_version.c_str() << "\""
@@ -55,7 +56,8 @@ void Project::write(std::ostream &out) const
         << "</vle_project>\n";
 }
 
-void Project::clear()
+void
+Project::clear()
 {
     m_date.clear();
     m_model.clear();
@@ -64,7 +66,8 @@ void Project::clear()
     m_classes.clear();
 }
 
-void Project::setAuthor(const std::string &name)
+void
+Project::setAuthor(const std::string& name)
 {
     if (name.empty()) {
         throw utils::ArgError(_("Project author unknow"));
@@ -73,12 +76,12 @@ void Project::setAuthor(const std::string &name)
     m_author.assign(name);
 }
 
-void Project::setDate(const std::string &date)
+void
+Project::setDate(const std::string& date)
 {
     if (date.empty()) {
         m_date.assign(utils::DateTime::currentDate());
-    }
-    else {
+    } else {
         m_date.assign(date);
     }
 }

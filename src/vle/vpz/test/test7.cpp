@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,7 +34,8 @@
 using namespace vle;
 using namespace vpz;
 
-void vpz_obs_port()
+void
+vpz_obs_port()
 {
     Observable obs("Obs");
     EnsuresEqual(obs.exist("port"), false);
@@ -48,7 +49,8 @@ void vpz_obs_port()
     EnsuresEqual(obs.exist("port"), false);
 }
 
-void vpz_add_output()
+void
+vpz_add_output()
 {
     Views views;
 
@@ -67,7 +69,8 @@ void vpz_add_output()
     EnsuresThrow(views.addTimedView("view4", 0.0, "out2"), utils::ArgError);
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

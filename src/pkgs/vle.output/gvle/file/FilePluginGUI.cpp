@@ -21,17 +21,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <QObject>
-#include <QtPlugin>
 #include "FilePluginGUI.h"
 #include "FilePluginGUItab.h"
+#include <QObject>
+#include <QtPlugin>
+#include <iostream>
 
 namespace vle {
 namespace gvle {
 
-FilePluginGUI::FilePluginGUI() :
-    mLogger(0), mWidgetTab(0)
+FilePluginGUI::FilePluginGUI()
+  : mLogger(0)
+  , mWidgetTab(0)
 {
 }
 
@@ -48,7 +49,7 @@ FilePluginGUI::getname()
 }
 
 void
-FilePluginGUI::setLogger(Logger *logger)
+FilePluginGUI::setLogger(Logger* logger)
 {
     mLogger = logger;
 }
@@ -60,16 +61,17 @@ FilePluginGUI::init(vleVpz* vpz, const QString& viewName)
     mWidgetTab->init(vpz, viewName);
 }
 
-QWidget *
+QWidget*
 FilePluginGUI::getWidget()
 {
     // If the widget has already been allocated
-    if (mWidgetTab == 0)
-    {
+    if (mWidgetTab == 0) {
         // Allocate a new tab widget
         mWidgetTab = new FilePluginGUItab();
-        QObject::connect(mWidgetTab,  SIGNAL(destroyed(QObject*)),
-                                this, SLOT  (onTabDeleted(QObject *)));
+        QObject::connect(mWidgetTab,
+                         SIGNAL(destroyed(QObject*)),
+                         this,
+                         SLOT(onTabDeleted(QObject*)));
     }
     return mWidgetTab;
 }
@@ -87,13 +89,12 @@ FilePluginGUI::delWidget()
 }
 
 void
-FilePluginGUI::onTabDeleted(QObject *obj)
+FilePluginGUI::onTabDeleted(QObject* obj)
 {
     // If the deleted object is the tab widget
     if (obj == mWidgetTab)
         // Update local pointer
         mWidgetTab = 0;
 }
-
-
-}} //namespaces
+}
+} // namespaces

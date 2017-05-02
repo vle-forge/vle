@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -558,12 +558,12 @@ std::string
 Package::getDir(VLE_PACKAGE_TYPE type) const
 {
     switch (type) {
-        case PKG_SOURCE:
-            return m_pimpl->m_pkgsourcepath;
-            break;
-        case PKG_BINARY:
-            return m_pimpl->m_pkgbinarypath;
-            break;
+    case PKG_SOURCE:
+        return m_pimpl->m_pkgsourcepath;
+        break;
+    case PKG_BINARY:
+        return m_pimpl->m_pkgbinarypath;
+        break;
     }
     return "";
 }
@@ -1106,7 +1106,7 @@ Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     } catch (const std::exception& /*e*/) {
     }
 
-    try{
+    try {
         tmp = getPluginsGvleOutput();
         pkgcontent.push_back("-- gvle output plugins:");
         std::sort(tmp.begin(), tmp.end());
@@ -1121,12 +1121,12 @@ VLE_API std::ostream&
 operator<<(std::ostream& out, const VLE_PACKAGE_TYPE& type)
 {
     switch (type) {
-        case PKG_SOURCE:
-            out << "SOURCE";
-            break;
-        case PKG_BINARY:
-            out << "BINARY";
-            break;
+    case PKG_SOURCE:
+        out << "SOURCE";
+        break;
+    case PKG_BINARY:
+        out << "BINARY";
+        break;
     }
     return out;
 }

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -48,32 +48,49 @@
 
 using namespace vle;
 
-struct is_odd {
-    inline bool operator()(const int i) const { return i % 2; }
+struct is_odd
+{
+    inline bool operator()(const int i) const
+    {
+        return i % 2;
+    }
 };
 
-struct cout_map {
-    inline void operator()(int x) const { std::cout << x << "\n"; }
+struct cout_map
+{
+    inline void operator()(int x) const
+    {
+        std::cout << x << "\n";
+    }
 };
 
-struct clear_string {
-    inline void operator()(std::string &x) const { x.clear(); }
+struct clear_string
+{
+    inline void operator()(std::string& x) const
+    {
+        x.clear();
+    }
 };
 
-struct append_string {
+struct append_string
+{
     std::string str;
 
-    void operator()(const std::string &x) { str.append(x); }
+    void operator()(const std::string& x)
+    {
+        str.append(x);
+    }
 };
 
-void test_format()
+void
+test_format()
 {
     std::string A = vle::utils::format("%d is good!", 1);
     std::string B = vle::utils::format("%d is good!", 1);
 
     EnsuresEqual(A, B);
 
-    std::string C{"1 is good!"};
+    std::string C{ "1 is good!" };
     EnsuresEqual(A, C);
 
     A[0] = 2;
@@ -95,7 +112,8 @@ void test_format()
     Ensures(Big.size() > 256);
 }
 
-void test_algo()
+void
+test_algo()
 {
     std::vector<int> b(5);
     std::vector<int> out;
@@ -134,13 +152,14 @@ void test_algo()
 
     std::map<std::string, std::string>::iterator it;
     it = utils::findIf(
-        n.begin(),
-        n.end(),
-        std::bind1st(std::equal_to<std::string>(), std::string("ou")));
+      n.begin(),
+      n.end(),
+      std::bind1st(std::equal_to<std::string>(), std::string("ou")));
     Ensures(it != n.end());
 }
 
-void test_unary_function()
+void
+test_unary_function()
 {
     typedef std::map<std::string, std::string> TwoStrings;
     TwoStrings n;
@@ -172,7 +191,8 @@ void test_unary_function()
     }
 }
 
-void test_generator()
+void
+test_generator()
 {
     vle::utils::Rand r(123456789);
 
@@ -183,7 +203,8 @@ void test_generator()
     r.getDouble(-1.0, 1.0);
 }
 
-void date_time()
+void
+date_time()
 {
     std::cout << "Test date_time " << vle::utils::DateTime::currentDate()
               << "\n";
@@ -227,20 +248,21 @@ void date_time()
                  vle::utils::DATE_TIME_UNIT_DAY);
 
     EnsuresEqual(vle::utils::DateTime::duration(
-                     (2451545), 1, vle::utils::DATE_TIME_UNIT_YEAR),
+                   (2451545), 1, vle::utils::DATE_TIME_UNIT_YEAR),
                  366);
     EnsuresEqual(vle::utils::DateTime::duration(
-                     (2451545), 1, vle::utils::DATE_TIME_UNIT_MONTH),
+                   (2451545), 1, vle::utils::DATE_TIME_UNIT_MONTH),
                  31);
     EnsuresEqual(vle::utils::DateTime::duration(
-                     (2451545), 1, vle::utils::DATE_TIME_UNIT_WEEK),
+                   (2451545), 1, vle::utils::DATE_TIME_UNIT_WEEK),
                  7);
     EnsuresEqual(vle::utils::DateTime::duration(
-                     (2451545), 1, vle::utils::DATE_TIME_UNIT_DAY),
+                   (2451545), 1, vle::utils::DATE_TIME_UNIT_DAY),
                  1);
 }
 
-void julian_date()
+void
+julian_date()
 {
     std::cout << "\nJulian day number\n";
     EnsuresEqual(2452192,
@@ -260,25 +282,26 @@ void julian_date()
                  vle::utils::DateTime::toJulianDay("2007-01-14 01:18:59"));
 
     EnsuresEqual(
-        vle::utils::DateTime::toJulianDay(2454115.05486),
-        vle::utils::DateTime::toJulianDay(vle::utils::DateTime::toJulianDay(
-            vle::utils::DateTime::toJulianDay(2454115.05486))));
+      vle::utils::DateTime::toJulianDay(2454115.05486),
+      vle::utils::DateTime::toJulianDay(vle::utils::DateTime::toJulianDay(
+        vle::utils::DateTime::toJulianDay(2454115.05486))));
 
     EnsuresEqual(
-        vle::utils::DateTime::toJulianDay(
-            vle::utils::DateTime::toJulianDay(2454115.05486)),
+      vle::utils::DateTime::toJulianDay(
+        vle::utils::DateTime::toJulianDay(2454115.05486)),
+      vle::utils::DateTime::toJulianDay(
         vle::utils::DateTime::toJulianDay(vle::utils::DateTime::toJulianDay(
-            vle::utils::DateTime::toJulianDay(
-                vle::utils::DateTime::toJulianDay(2454115.05486)))));
+          vle::utils::DateTime::toJulianDay(2454115.05486)))));
 }
 
-void to_time_function()
+void
+to_time_function()
 {
     long year, month, day, hours, minutes, seconds;
     double date = 2452192.191273148;
 
     vle::utils::DateTime::toTime(
-        date, year, month, day, hours, minutes, seconds);
+      date, year, month, day, hours, minutes, seconds);
 
     EnsuresEqual(year, 2001);
     EnsuresEqual(month, 10);
@@ -288,17 +311,18 @@ void to_time_function()
     EnsuresEqual(seconds, 26);
 }
 
-void localized_conversion()
+void
+localized_conversion()
 {
     namespace vu = vle::utils;
 
     /* convert a C locale real */
     EnsuresApproximatelyEqual(
-        vu::convert<double>("123456789"), 123456789., 0.1);
+      vu::convert<double>("123456789"), 123456789., 0.1);
     EnsuresApproximatelyEqual(
-        vu::convert<double>("12.3456789"), 12.3456789, 0.1);
+      vu::convert<double>("12.3456789"), 12.3456789, 0.1);
     EnsuresApproximatelyEqual(
-        vu::convert<double>("12345678.9"), 12345678., 0.1);
+      vu::convert<double>("12345678.9"), 12345678., 0.1);
     EnsuresApproximatelyEqual(vu::convert<double>("-12345e5"), -12345e5, 0.1);
     EnsuresApproximatelyEqual(vu::convert<double>("12345e5"), 12345e5, 0.1);
     EnsuresApproximatelyEqual(vu::convert<double>("12345."), 12345., 0.1);
@@ -306,23 +330,22 @@ void localized_conversion()
     /* convert a fr_FR locale real */
     if (vu::isLocaleAvailable("fr_FR")) {
         EnsuresApproximatelyEqual(
-            vu::convert<double>("123 456 789", true, "fr_FR"),
-            123456789.,
-            0.1);
+          vu::convert<double>("123 456 789", true, "fr_FR"), 123456789., 0.1);
         EnsuresApproximatelyEqual(
-            vu::convert<double>("12,3456789", true, "fr_FR"), 12.3456789, 0.1);
+          vu::convert<double>("12,3456789", true, "fr_FR"), 12.3456789, 0.1);
         EnsuresApproximatelyEqual(
-            vu::convert<double>("12345678,9", true, "fr_FR"), 12345678., 0.1);
+          vu::convert<double>("12345678,9", true, "fr_FR"), 12345678., 0.1);
         EnsuresApproximatelyEqual(
-            vu::convert<double>("-12345,0e5", true, "fr_FR"), -12345e5, 0.1);
+          vu::convert<double>("-12345,0e5", true, "fr_FR"), -12345e5, 0.1);
         EnsuresApproximatelyEqual(
-            vu::convert<double>("12345,0e5", true, "fr_FR"), 12345e5, 0.1);
+          vu::convert<double>("12345,0e5", true, "fr_FR"), 12345e5, 0.1);
         EnsuresApproximatelyEqual(
-            vu::convert<double>("12345,", true, "fr_FR"), 12345., 0.1);
+          vu::convert<double>("12345,", true, "fr_FR"), 12345., 0.1);
     }
 }
 
-void to_scientific_string_function()
+void
+to_scientific_string_function()
 {
     namespace vu = vle::utils;
 
@@ -346,12 +369,13 @@ void to_scientific_string_function()
     EnsuresEqual(vu::toScientificString(1000.0001), "1000.0001");
 }
 
-void test_format_copy()
+void
+test_format_copy()
 {
     namespace vu = vle::utils;
 
     std::ostringstream out;
-    int myints[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int myints[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     vu::formatCopy(myints, myints + 9, out, ", ", ";", "\"");
 
     EnsuresEqual(out.str(),
@@ -359,7 +383,8 @@ void test_format_copy()
                  "\"8\", \"9\";");
 }
 
-void test_array()
+void
+test_array()
 {
     {
         vle::utils::Array<bool> a(2, 5);
@@ -442,7 +467,7 @@ void test_array()
         Ensures(a.rows() == 4);
 
         std::find_if_not(
-            std::begin(a), std::end(a), [](int i) { return i == -1; });
+          std::begin(a), std::end(a), [](int i) { return i == -1; });
     }
 
     {
@@ -454,7 +479,8 @@ void test_array()
     }
 }
 
-void test_tokenize()
+void
+test_tokenize()
 {
     {
         std::vector<std::string> tok;
@@ -477,7 +503,8 @@ void test_tokenize()
     }
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

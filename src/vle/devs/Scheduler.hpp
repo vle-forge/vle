@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -48,7 +48,8 @@ class Simulator;
  * \return true if Time e1 is more recent than devs::Time e2.
  */
 template <typename EventT>
-bool EventCompare(const EventT &e1, const EventT &e2) noexcept
+bool
+EventCompare(const EventT& e1, const EventT& e2) noexcept
 {
     return e1.mTime > e2.mTime;
 }
@@ -58,7 +59,9 @@ bool EventCompare(const EventT &e1, const EventT &e2) noexcept
  *
  * \param scheduler where to remove element.
  */
-template <typename SchedulerT> void pop(SchedulerT &scheduler) noexcept
+template <typename SchedulerT>
+void
+pop(SchedulerT& scheduler) noexcept
 {
     using event_type = typename SchedulerT::value_type;
 
@@ -66,7 +69,7 @@ template <typename SchedulerT> void pop(SchedulerT &scheduler) noexcept
         return;
 
     std::pop_heap(
-        scheduler.begin(), scheduler.end(), EventCompare<event_type>);
+      scheduler.begin(), scheduler.end(), EventCompare<event_type>);
 
     scheduler.pop_back();
 }
@@ -79,39 +82,42 @@ template <typename SchedulerT> void pop(SchedulerT &scheduler) noexcept
  * the scheduler.
  */
 template <typename SchedulerT, typename... Args>
-void push(SchedulerT &scheduler, Args &&... args)
+void
+push(SchedulerT& scheduler, Args&&... args)
 {
     using event_type = typename SchedulerT::value_type;
 
     scheduler.emplace_back(std::forward<Args>(args)...);
 
     std::push_heap(
-        scheduler.begin(), scheduler.end(), EventCompare<event_type>);
+      scheduler.begin(), scheduler.end(), EventCompare<event_type>);
 }
 
-struct HeapElementCompare {
+struct HeapElementCompare
+{
     template <typename HeapElementT>
-    bool operator()(const HeapElementT &lhs, const HeapElementT &rhs) const
-        noexcept
+    bool operator()(const HeapElementT& lhs, const HeapElementT& rhs) const
+      noexcept
     {
         return lhs.m_time >= rhs.m_time;
     }
 };
 
-struct HeapElement {
-    HeapElement(Time time, Simulator *Simulator)
-        : m_time(time)
-        , m_simulator(Simulator)
+struct HeapElement
+{
+    HeapElement(Time time, Simulator* Simulator)
+      : m_time(time)
+      , m_simulator(Simulator)
     {
     }
 
     Time m_time;
-    Simulator *m_simulator;
+    Simulator* m_simulator;
 };
 
 using Heap =
-    boost::heap::fibonacci_heap<HeapElement,
-                                boost::heap::compare<HeapElementCompare>>;
+  boost::heap::fibonacci_heap<HeapElement,
+                              boost::heap::compare<HeapElementCompare>>;
 
 using HandleT = Heap::handle_type;
 
@@ -119,42 +125,50 @@ using HandleT = Heap::handle_type;
  * @brief Bag stores \e Simulator that need to be call in this bag.
  *
  */
-struct Bag {
-    std::vector<Simulator *> dynamics;
-    std::vector<Simulator *> executives;
+struct Bag
+{
+    std::vector<Simulator*> dynamics;
+    std::vector<Simulator*> executives;
 
     //
     // \e unique_simulators is used to ensures that \e dynamics and \e
     // executives vectors have unique pointer through a \e simulator object.
     //
-    std::unordered_set<Simulator *> unique_simulators;
+    std::unordered_set<Simulator*> unique_simulators;
 };
 
-class VLE_LOCAL Scheduler {
+class VLE_LOCAL Scheduler
+{
 public:
     Scheduler()
-        : m_current_time(negativeInfinity)
+      : m_current_time(negativeInfinity)
     {
     }
 
     ~Scheduler() = default;
 
-    Scheduler(const Scheduler &) = delete;
-    Scheduler &operator=(const Scheduler &) = delete;
-    Scheduler(Scheduler &&) = delete;
-    Scheduler &operator=(Scheduler &&) = delete;
+    Scheduler(const Scheduler&) = delete;
+    Scheduler& operator=(const Scheduler&) = delete;
+    Scheduler(Scheduler&&) = delete;
+    Scheduler& operator=(Scheduler&&) = delete;
 
     void init(Time time);
 
-    void addInternal(Simulator *simulator, Time time);
-    void addExternal(Simulator *simulator,
+    void addInternal(Simulator* simulator, Time time);
+    void addExternal(Simulator* simulator,
                      std::shared_ptr<value::Value> values,
-                     const std::string &portname);
-    void delSimulator(Simulator *simulator);
+                     const std::string& portname);
+    void delSimulator(Simulator* simulator);
 
-    Bag &getCurrentBag() noexcept { return m_current_bag; }
+    Bag& getCurrentBag() noexcept
+    {
+        return m_current_bag;
+    }
 
-    Time getCurrentTime() const noexcept { return m_current_time; }
+    Time getCurrentTime() const noexcept
+    {
+        return m_current_time;
+    }
 
     Time getNextTime() const noexcept
     {
@@ -172,11 +186,12 @@ private:
     Time m_current_time;
 };
 
-class VLE_LOCAL TimedObservationScheduler {
+class VLE_LOCAL TimedObservationScheduler
+{
     std::vector<ViewEvent> m_observation;
 
 public:
-    void add(View *ptr, Time time, Time timestep)
+    void add(View* ptr, Time time, Time timestep)
     {
         assert(not isInfinity(time) && "addObservation: infinity time");
         assert(not isNegativeInfinity(time) &&
@@ -195,7 +210,7 @@ public:
 
     void finalize(Time time)
     {
-        for (auto &elem : m_observation)
+        for (auto& elem : m_observation)
             elem.run(time);
 
         m_observation.clear();

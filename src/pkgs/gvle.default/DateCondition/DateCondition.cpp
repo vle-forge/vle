@@ -25,26 +25,31 @@
 #include <QtPlugin>
 #include <QtWidgets/QVBoxLayout>
 
-
 #include <iostream>
-#include <vle/utils/DateTime.hpp>
-#include <vle/vpz/AtomicModel.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Double.hpp>
 #include <vle/gvle/gvle_widgets.h>
+#include <vle/utils/DateTime.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/String.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 
 #include "DateCondition.h"
 
-namespace vle{
-namespace gvle{
+namespace vle {
+namespace gvle {
 
 /**
  * @brief DateCondition::DateCondition
  *        Default constructor
  */
-DateCondition::DateCondition() :
-  mSettings(0), mLogger(0), mExpCond(), mVpz(0), mWidget(0),
-  mNamePortField(0), mComboBox(0), mcalendar(0)
+DateCondition::DateCondition()
+  : mSettings(0)
+  , mLogger(0)
+  , mExpCond()
+  , mVpz(0)
+  , mWidget(0)
+  , mNamePortField(0)
+  , mComboBox(0)
+  , mcalendar(0)
 
 {
     mWidget = new QWidget();
@@ -55,23 +60,26 @@ DateCondition::DateCondition() :
     mComboBox->addItem("real");
     mComboBox->addItem("character");
     mcalendar = new QCalendarWidget();
-    QObject::connect(mNamePortField,
-          SIGNAL(textUpdated(const QString&, const QString&, const QString&)),
-          this,
-          SLOT(onTextUpdated(const QString&, const QString&, const QString&)));
-    QObject::connect(mComboBox, SIGNAL(currentTextChanged(const QString &)),
-          this, SLOT(onTypeChanged(const QString &)));
-    QObject::connect(mcalendar, SIGNAL(destroyed(QObject*)),
-                         this,         SLOT(calendarDestroyed(QObject*)) );
-    QObject::connect(mcalendar, SIGNAL(clicked(QDate)),
-                     this,         SLOT(dateSelected(QDate)) );
+    QObject::connect(
+      mNamePortField,
+      SIGNAL(textUpdated(const QString&, const QString&, const QString&)),
+      this,
+      SLOT(onTextUpdated(const QString&, const QString&, const QString&)));
+    QObject::connect(mComboBox,
+                     SIGNAL(currentTextChanged(const QString&)),
+                     this,
+                     SLOT(onTypeChanged(const QString&)));
+    QObject::connect(mcalendar,
+                     SIGNAL(destroyed(QObject*)),
+                     this,
+                     SLOT(calendarDestroyed(QObject*)));
+    QObject::connect(
+      mcalendar, SIGNAL(clicked(QDate)), this, SLOT(dateSelected(QDate)));
 
     QVBoxLayout* layout = new QVBoxLayout(mWidget);
     layout->addWidget(mNamePortField);
     layout->addWidget(mComboBox);
     layout->addWidget(mcalendar);
-
-
 }
 
 DateCondition::~DateCondition()
@@ -86,15 +94,14 @@ DateCondition::getname()
     return name;
 }
 
-
 void
-DateCondition::setSettings(QSettings *s)
+DateCondition::setSettings(QSettings* s)
 {
     mSettings = s;
 }
 
 void
-DateCondition::setLogger(Logger *logger)
+DateCondition::setLogger(Logger* logger)
 {
     mLogger = logger;
 }
@@ -121,7 +128,7 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
     // Search the "date" port of the experimental condition
     QDomNode condXml = mVpz->condFromConds(mVpz->condsFromDoc(), cond);
     QDomNodeList portList = mVpz->portsListFromDoc(mExpCond);
-    if (portList.size() == 1){
+    if (portList.size() == 1) {
         datePort = DomFunctions::attributeValue(portList.at(0), "name");
         std::vector<std::unique_ptr<value::Value>> values;
         mVpz->fillWithMultipleValue(portList.at(0), values);
@@ -135,19 +142,18 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
     } else {
         datePort = "begin_date";
         value::Map portValues;
-        portValues.addString(datePort.toStdString(),"2016-09-01");
-        vleDomStatic::fillConditionWithMap(mVpz->getDomDoc(),condXml,
-                portValues);
+        portValues.addString(datePort.toStdString(), "2016-09-01");
+        vleDomStatic::fillConditionWithMap(
+          mVpz->getDomDoc(), condXml, portValues);
         mComboBox->setCurrentText("character");
     }
-    std::unique_ptr<value::Value> dateV = std::move(
-            mVpz->buildValueFromDoc(cond, datePort, 0));
+    std::unique_ptr<value::Value> dateV =
+      std::move(mVpz->buildValueFromDoc(cond, datePort, 0));
     double dateI = 0;
     if (dateV->isString()) {
-        dateI = utils::DateTime::toJulianDay(
-                dateV->toString().value());
+        dateI = utils::DateTime::toJulianDay(dateV->toString().value());
     } else if (dateV->isDouble()) {
-        dateI =  dateV->toDouble().value();
+        dateI = dateV->toDouble().value();
     }
     int dayI = utils::DateTime::dayOfMonth(dateI);
     int monthI = utils::DateTime::month(dateI);
@@ -155,7 +161,6 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
 
     QDate selDate;
     selDate.setDate(yearI, monthI, dayI);
-
 
     mNamePortField->setValue(datePort);
     mNamePortField->backup = datePort;
@@ -169,7 +174,6 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
     mcalendar->setCurrentPage(monthI, yearI);
     mcalendar->showSelectedDate();
 
-
     mNamePortField->blockSignals(oldBlock);
     mcalendar->blockSignals(oldBlock1);
     mComboBox->blockSignals(oldBlock2);
@@ -182,26 +186,26 @@ DateCondition::dateSelected(QDate date)
     if (mComboBox->currentText() == "real") {
         portValues.addDouble(mNamePortField->text().toStdString(),
                              utils::DateTime::toJulianDay(
-                                 date.toString("yyyy-MM-dd").toStdString()));
+                               date.toString("yyyy-MM-dd").toStdString()));
     } else {
         portValues.addString(mNamePortField->text().toStdString(),
                              date.toString("yyyy-MM-dd").toStdString());
     }
-    mVpz->fillConditionWithMapToDoc(mExpCond,portValues, true);
+    mVpz->fillConditionWithMapToDoc(mExpCond, portValues, true);
     mcalendar->setCurrentPage(date.month(), date.year());
     mcalendar->showSelectedDate();
 }
 
 void
-DateCondition::calendarDestroyed(QObject *obj)
+DateCondition::calendarDestroyed(QObject* obj)
 {
-    (void) obj;
+    (void)obj;
 }
-
 
 void
 DateCondition::onTextUpdated(const QString& /*id*/,
-        const QString& old, const QString& neW)
+                             const QString& old,
+                             const QString& neW)
 {
     value::Map portValues;
 
@@ -218,21 +222,20 @@ void
 DateCondition::onTypeChanged(const QString& type)
 {
 
-    QDomNode portNode = mVpz->portFromDoc(
-                mExpCond, mNamePortField->text());
+    QDomNode portNode = mVpz->portFromDoc(mExpCond, mNamePortField->text());
     std::vector<std::unique_ptr<value::Value>> values;
     mVpz->fillWithMultipleValue(portNode, values);
     value::Map portValues;
     if (type == "real") {
-        portValues.addDouble(mNamePortField->text().toStdString(),
-                       utils::DateTime::toJulianDay(
-                           values[0]->toString().value()));
+        portValues.addDouble(
+          mNamePortField->text().toStdString(),
+          utils::DateTime::toJulianDay(values[0]->toString().value()));
     } else if (type == "character") {
-        portValues.addString(mNamePortField->text().toStdString(),
-                       utils::DateTime::toJulianDay(
-                           values[0]->toDouble().value()));
+        portValues.addString(
+          mNamePortField->text().toStdString(),
+          utils::DateTime::toJulianDay(values[0]->toDouble().value()));
     }
     mVpz->fillConditionWithMapToDoc(mExpCond, portValues, true);
 }
-
-}}//namespaces
+}
+} // namespaces

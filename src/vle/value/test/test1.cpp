@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -51,7 +51,8 @@
 
 using namespace vle;
 
-void check_simple_value()
+void
+check_simple_value()
 {
     {
         auto b = std::unique_ptr<value::Boolean>(new value::Boolean(true));
@@ -89,7 +90,8 @@ void check_simple_value()
     }
 }
 
-void check_map_value()
+void
+check_map_value()
 {
     auto mp = std::unique_ptr<value::Map>(new value::Map());
 
@@ -114,7 +116,8 @@ void check_map_value()
     EnsuresThrow(mp->getInt("xml"), utils::CastError);
 }
 
-void check_set_value()
+void
+check_set_value()
 {
     auto st = std::unique_ptr<value::Set>(new value::Set());
 
@@ -139,7 +142,8 @@ void check_set_value()
     EnsuresThrow(st->getInt(4), utils::CastError);
 }
 
-void check_clone()
+void
+check_clone()
 {
     std::unique_ptr<value::Value> clone;
 
@@ -173,7 +177,8 @@ void check_clone()
     }
 }
 
-void check_null()
+void
+check_null()
 {
     auto st = std::unique_ptr<value::Set>(new value::Set());
     st->addString("toto1");
@@ -198,7 +203,7 @@ void check_null()
 
     it = std::remove_if(st->value().begin(),
                         st->value().end(),
-                        [](const std::unique_ptr<value::Value> &value) {
+                        [](const std::unique_ptr<value::Value>& value) {
                             return not value.get();
                         });
 
@@ -207,10 +212,11 @@ void check_null()
     EnsuresEqual(st->size(), (value::VectorValue::size_type)5);
 }
 
-void check_matrix()
+void
+check_matrix()
 {
     auto mx =
-        std::unique_ptr<value::Matrix>(new value::Matrix(100, 100, 10, 10));
+      std::unique_ptr<value::Matrix>(new value::Matrix(100, 100, 10, 10));
     EnsuresEqual(mx->rows(), (value::Matrix::size_type)100);
     EnsuresEqual(mx->columns(), (value::Matrix::size_type)100);
 
@@ -259,57 +265,63 @@ void check_matrix()
 
 namespace test {
 
-class MyData : public vle::value::User {
+class MyData : public vle::value::User
+{
 public:
     double x, y, z;
     std::string name;
 
     MyData()
-        : vle::value::User()
-        , x(0.0)
-        , y(0.0)
-        , z(0.0)
+      : vle::value::User()
+      , x(0.0)
+      , y(0.0)
+      , z(0.0)
     {
     }
 
     MyData(double x, double y, double z, std::string name)
-        : vle::value::User()
-        , x(x)
-        , y(y)
-        , z(z)
-        , name(std::move(name))
+      : vle::value::User()
+      , x(x)
+      , y(y)
+      , z(z)
+      , name(std::move(name))
     {
     }
 
-    MyData(const MyData &value)
-        : vle::value::User(value)
-        , x(value.x)
-        , y(value.y)
-        , z(value.z)
-        , name(value.name)
+    MyData(const MyData& value)
+      : vle::value::User(value)
+      , x(value.x)
+      , y(value.y)
+      , z(value.z)
+      , name(value.name)
     {
     }
 
-    virtual ~MyData() {}
+    virtual ~MyData()
+    {
+    }
 
-    virtual size_t id() const override { return 15978462u; }
+    virtual size_t id() const override
+    {
+        return 15978462u;
+    }
 
     virtual std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new MyData(*this));
     }
 
-    virtual void writeFile(std::ostream &out) const override
+    virtual void writeFile(std::ostream& out) const override
     {
         out << "(" << name << ": " << x << ", " << y << ", " << z << ")";
     }
 
-    virtual void writeString(std::ostream &out) const override
+    virtual void writeString(std::ostream& out) const override
     {
         writeFile(out);
     }
 
-    virtual void writeXml(std::ostream &out) const override
+    virtual void writeXml(std::ostream& out) const override
     {
         out << "<set><string>" << name << "</string><double>" << x
             << "</double><double>" << y << "</double> <double>" << z
@@ -318,15 +330,16 @@ public:
 };
 }
 
-void check_user_value(vle::value::Value &to_check)
+void
+check_user_value(vle::value::Value& to_check)
 {
     EnsuresEqual(to_check.getType(), vle::value::Value::USER);
 
-    auto &user = to_check.toUser();
+    auto& user = to_check.toUser();
     EnsuresEqual(user.getType(), vle::value::Value::USER);
     EnsuresEqual(user.id(), 15978462u);
 
-    test::MyData *mydata = dynamic_cast<test::MyData *>(&user);
+    test::MyData* mydata = dynamic_cast<test::MyData*>(&user);
     Ensures(mydata);
 
     EnsuresEqual(mydata->x, 1.);
@@ -335,10 +348,11 @@ void check_user_value(vle::value::Value &to_check)
     EnsuresEqual(mydata->name, "test-vle");
 }
 
-void test_user_value()
+void
+test_user_value()
 {
-    auto data = std::unique_ptr<value::Value>(
-        new test::MyData(1., 2., 3., "test-vle"));
+    auto data =
+      std::unique_ptr<value::Value>(new test::MyData(1., 2., 3., "test-vle"));
     check_user_value(*data.get());
 
     std::unique_ptr<vle::value::Value> cloned_data = data->clone();
@@ -347,24 +361,26 @@ void test_user_value()
     Ensures(data.get() != cloned_data.get());
 }
 
-void test_tuple()
+void
+test_tuple()
 {
     value::Tuple t(4, 1.);
 
-    for (auto &v : t.value())
+    for (auto& v : t.value())
         Ensures(v == 1.);
 
     t(0) = 2;
     Ensures(t.at(0) == t(0));
 }
 
-void test_table()
+void
+test_table()
 {
     value::Table t(2, 3);
 
     {
         double value = 0;
-        for (auto &v : t.value())
+        for (auto& v : t.value())
             v = value++;
     }
 
@@ -391,7 +407,8 @@ void test_table()
     Ensures(t(0, 2) == 4.);
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

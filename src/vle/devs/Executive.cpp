@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,23 +34,26 @@
 namespace vle {
 namespace devs {
 
-Executive::Executive(const ExecutiveInit &init, const InitEventList &events)
-    : Dynamics(DynamicsInit{init.context, init.model, init.packageid}, events)
-    , m_coordinator(init.coordinator)
+Executive::Executive(const ExecutiveInit& init, const InitEventList& events)
+  : Dynamics(DynamicsInit{ init.context, init.model, init.packageid }, events)
+  , m_coordinator(init.coordinator)
 {
 }
 
-const vpz::Dynamics &Executive::dynamics() const
-{
-    return m_coordinator.dynamics();
-}
-
-vpz::Dynamics &Executive::dynamics()
+const vpz::Dynamics&
+Executive::dynamics() const
 {
     return m_coordinator.dynamics();
 }
 
-const vpz::Conditions &Executive::conditions() const
+vpz::Dynamics&
+Executive::dynamics()
+{
+    return m_coordinator.dynamics();
+}
+
+const vpz::Conditions&
+Executive::conditions() const
 {
     if (not m_conditions)
         return m_coordinator.conditions();
@@ -58,56 +61,60 @@ const vpz::Conditions &Executive::conditions() const
     return *m_conditions;
 }
 
-vpz::Conditions &Executive::conditions()
+vpz::Conditions&
+Executive::conditions()
 {
     if (not m_conditions)
         m_conditions =
-            std::make_unique<vpz::Conditions>(m_coordinator.conditions());
+          std::make_unique<vpz::Conditions>(m_coordinator.conditions());
 
     return *m_conditions;
 }
 
-const vpz::Observables &Executive::observables() const
+const vpz::Observables&
+Executive::observables() const
 {
     return m_coordinator.observables();
 }
 
-vpz::Observables &Executive::observables()
+vpz::Observables&
+Executive::observables()
 {
     return m_coordinator.observables();
 }
 
-void Executive::addObservableToView(const std::string &model,
-                                    const std::string &portname,
-                                    const std::string &view)
+void
+Executive::addObservableToView(const std::string& model,
+                               const std::string& portname,
+                               const std::string& view)
 {
-    vpz::BaseModel *mdl = cpled()->findModel(model);
+    vpz::BaseModel* mdl = cpled()->findModel(model);
 
     if (mdl == nullptr) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: unknown model `%1%'")) % model).str());
+          (fmt(_("Executive error: unknown model `%1%'")) % model).str());
     }
 
     if (mdl->isCoupled()) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: can not add observable to coupled "
-                   "model %1%")) %
-             model)
-                .str());
+          (fmt(_("Executive error: can not add observable to coupled "
+                 "model %1%")) %
+           model)
+            .str());
     }
 
-    vpz::AtomicModel *atom = mdl->toAtomic();
+    vpz::AtomicModel* atom = mdl->toAtomic();
 
     m_coordinator.addObservableToView(atom, portname, view);
 }
 
-const vpz::AtomicModel *
-Executive::createModel(const std::string &name,
-                       const std::vector<std::string> &inputs,
-                       const std::vector<std::string> &outputs,
-                       const std::string &dynamics,
-                       const std::vector<std::string> &conds,
-                       const std::string &observable)
+const vpz::AtomicModel*
+Executive::createModel(const std::string& name,
+                       const std::vector<std::string>& inputs,
+                       const std::vector<std::string>& outputs,
+                       const std::string& dynamics,
+                       const std::vector<std::string>& conds,
+                       const std::string& observable)
 {
     auto model = new vpz::AtomicModel(name, cpled());
     std::vector<std::string>::const_iterator it;
@@ -121,22 +128,23 @@ Executive::createModel(const std::string &name,
     }
 
     m_coordinator.createModel(
-        model, conditions(), dynamics, conds, observable);
+      model, conditions(), dynamics, conds, observable);
 
     return model;
 }
 
-const vpz::BaseModel *
-Executive::createModelFromClass(const std::string &classname,
-                                const std::string &modelname)
+const vpz::BaseModel*
+Executive::createModelFromClass(const std::string& classname,
+                                const std::string& modelname)
 {
     return m_coordinator.createModelFromClass(
-        classname, cpled(), modelname, conditions());
+      classname, cpled(), modelname, conditions());
 }
 
-void Executive::delModel(const std::string &modelname)
+void
+Executive::delModel(const std::string& modelname)
 {
-    auto *mdl = cpled()->findModel(modelname);
+    auto* mdl = cpled()->findModel(modelname);
     if (not mdl)
         throw utils::DevsGraphError(_("Executive error: unknown model `%s'"),
                                     modelname.c_str());
@@ -144,93 +152,88 @@ void Executive::delModel(const std::string &modelname)
     m_coordinator.prepare_dynamic_deletion(mdl);
 }
 
-void Executive::renameModel(const std::string &oldname,
-                            const std::string &newname)
+void
+Executive::renameModel(const std::string& oldname, const std::string& newname)
 {
-    vpz::BaseModel *mdl = cpled()->findModel(oldname);
+    vpz::BaseModel* mdl = cpled()->findModel(oldname);
     if (mdl == nullptr) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: rename `%1%' into `%2%' failed, `%1%' "
-                   "does not exist")) %
-             oldname % newname)
-                .str());
+          (fmt(_("Executive error: rename `%1%' into `%2%' failed, `%1%' "
+                 "does not exist")) %
+           oldname % newname)
+            .str());
     }
 
     if (cpled()->exist(newname)) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: rename `%1%' into `%2%' failed, `%2%' "
-                   "already exists")) %
-             oldname % newname)
-                .str());
+          (fmt(_("Executive error: rename `%1%' into `%2%' failed, `%2%' "
+                 "already exists")) %
+           oldname % newname)
+            .str());
     }
 
     try {
         vpz::BaseModel::rename(mdl, newname);
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         throw utils::DevsGraphError(
-            (fmt(_(
-                 "Executive error: rename `%1%' into `%2%' failed: `%3%' ")) %
-             oldname % newname % e.what())
-                .str());
+          (fmt(_("Executive error: rename `%1%' into `%2%' failed: `%3%' ")) %
+           oldname % newname % e.what())
+            .str());
     }
 }
 
-void Executive::addConnection(const std::string &srcModelName,
-                              const std::string &srcPortName,
-                              const std::string &dstModelName,
-                              const std::string &dstPortName)
+void
+Executive::addConnection(const std::string& srcModelName,
+                         const std::string& srcPortName,
+                         const std::string& dstModelName,
+                         const std::string& dstPortName)
 {
-    const std::string &modelName(coupledmodelName());
-    vpz::BaseModel *srcModel = (modelName == srcModelName)
-                                   ? cpled()
-                                   : cpled()->findModel(srcModelName);
-    vpz::BaseModel *dstModel = (modelName == dstModelName)
-                                   ? cpled()
-                                   : cpled()->findModel(dstModelName);
+    const std::string& modelName(coupledmodelName());
+    vpz::BaseModel* srcModel =
+      (modelName == srcModelName) ? cpled() : cpled()->findModel(srcModelName);
+    vpz::BaseModel* dstModel =
+      (modelName == dstModelName) ? cpled() : cpled()->findModel(dstModelName);
 
     if (srcModel and dstModel) {
-        std::vector<std::pair<Simulator *, std::string>> toupdate;
+        std::vector<std::pair<Simulator*, std::string>> toupdate;
 
         if (modelName == srcModelName) {
             cpled()->addInputConnection(srcPortName, dstModel, dstPortName);
             m_coordinator.getSimulatorsSource(srcModel, srcPortName, toupdate);
-        }
-        else if (modelName == dstModelName) {
+        } else if (modelName == dstModelName) {
             cpled()->addOutputConnection(srcModel, srcPortName, dstPortName);
             vpz::ModelPortList lst;
             cpled()->getAtomicModelsTarget(dstPortName, lst);
 
-            for (auto &elem : lst) {
+            for (auto& elem : lst) {
                 m_coordinator.getSimulatorsSource(
-                    elem.first, elem.second, toupdate);
+                  elem.first, elem.second, toupdate);
             }
-        }
-        else {
+        } else {
             cpled()->addInternalConnection(
-                srcModel, srcPortName, dstModel, dstPortName);
+              srcModel, srcPortName, dstModel, dstPortName);
             m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
         }
 
         m_coordinator.updateSimulatorsTarget(toupdate);
-    }
-    else {
+    } else {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: cannot add connection (`%1%', `%2%') to "
-                   "(`%3%', `%4%'")) %
-             srcModelName % srcPortName % dstModelName % dstPortName)
-                .str());
+          (fmt(_("Executive error: cannot add connection (`%1%', `%2%') to "
+                 "(`%3%', `%4%'")) %
+           srcModelName % srcPortName % dstModelName % dstPortName)
+            .str());
     }
 }
 
-void Executive::removeConnection(const std::string &srcModelName,
-                                 const std::string &srcPortName,
-                                 const std::string &dstModelName,
-                                 const std::string &dstPortName)
+void
+Executive::removeConnection(const std::string& srcModelName,
+                            const std::string& srcPortName,
+                            const std::string& dstModelName,
+                            const std::string& dstPortName)
 {
-    const std::string &modelName(coupledmodelName());
-    vpz::BaseModel *srcModel = cpled()->findModel(srcModelName);
-    vpz::BaseModel *dstModel = cpled()->findModel(dstModelName);
+    const std::string& modelName(coupledmodelName());
+    vpz::BaseModel* srcModel = cpled()->findModel(srcModelName);
+    vpz::BaseModel* dstModel = cpled()->findModel(dstModelName);
 
     if (not srcModel and srcModelName == modelName) {
         srcModel = cpled();
@@ -241,102 +244,99 @@ void Executive::removeConnection(const std::string &srcModelName,
     }
 
     if (srcModel and dstModel) {
-        std::vector<std::pair<Simulator *, std::string>> toupdate;
+        std::vector<std::pair<Simulator*, std::string>> toupdate;
         if (cpled() == srcModel) {
             m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
             cpled()->delInputConnection(srcPortName, dstModel, dstPortName);
-        }
-        else if (cpled() == dstModel) {
+        } else if (cpled() == dstModel) {
             cpled()->delOutputConnection(srcModel, srcPortName, dstPortName);
-        }
-        else {
+        } else {
             m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
             cpled()->delInternalConnection(
-                srcModel, srcPortName, dstModel, dstPortName);
+              srcModel, srcPortName, dstModel, dstPortName);
         }
 
         m_coordinator.updateSimulatorsTarget(toupdate);
-    }
-    else {
+    } else {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: cannot remove connection (%1%, %2%) to "
-                   "(`%3%', `%4%')")) %
-             srcModelName % srcPortName % dstModelName % dstPortName)
-                .str());
+          (fmt(_("Executive error: cannot remove connection (%1%, %2%) to "
+                 "(`%3%', `%4%')")) %
+           srcModelName % srcPortName % dstModelName % dstPortName)
+            .str());
     }
 }
 
-void Executive::addInputPort(const std::string &modelName,
-                             const std::string &portName)
+void
+Executive::addInputPort(const std::string& modelName,
+                        const std::string& portName)
 {
-    vpz::BaseModel *mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: unknown model `%1%'")) % modelName)
-                .str());
+          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
     }
 
     mdl->addInputPort(portName);
 }
 
-void Executive::addOutputPort(const std::string &modelName,
-                              const std::string &portName)
+void
+Executive::addOutputPort(const std::string& modelName,
+                         const std::string& portName)
 {
-    vpz::BaseModel *mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: unknown model `%1%'")) % modelName)
-                .str());
+          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
     }
 
     mdl->addOutputPort(portName);
 }
 
-void Executive::removeInputPort(const std::string &modelName,
-                                const std::string &portName)
+void
+Executive::removeInputPort(const std::string& modelName,
+                           const std::string& portName)
 {
-    vpz::BaseModel *mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: unknown model `%1%'")) % modelName)
-                .str());
+          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
     }
 
-    std::vector<std::pair<Simulator *, std::string>> toupdate;
+    std::vector<std::pair<Simulator*, std::string>> toupdate;
     m_coordinator.getSimulatorsSource(mdl, portName, toupdate);
     mdl->delInputPort(portName);
     m_coordinator.updateSimulatorsTarget(toupdate);
 }
 
-void Executive::removeOutputPort(const std::string &modelName,
-                                 const std::string &portName)
+void
+Executive::removeOutputPort(const std::string& modelName,
+                            const std::string& portName)
 {
-    vpz::BaseModel *mdl = cpled()->findModel(modelName);
+    vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(
-            (fmt(_("Executive error: unknown model `%1%'")) % modelName)
-                .str());
+          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
     }
 
     if (mdl->isAtomic()) {
         mdl->delOutputPort(portName);
         m_coordinator.removeSimulatorTargetPort(mdl->toAtomic(), portName);
-    }
-    else {
-        std::vector<std::pair<Simulator *, std::string>> toupdate;
+    } else {
+        std::vector<std::pair<Simulator*, std::string>> toupdate;
         m_coordinator.getSimulatorsSource(mdl, portName, toupdate);
         mdl->delOutputPort(portName);
         m_coordinator.updateSimulatorsTarget(toupdate);
     }
 }
 
-void Executive::dump(std::ostream &out, const std::string &name) const
+void
+Executive::dump(std::ostream& out, const std::string& name) const
 {
     vpz::Vpz f;
 
     f.project().setAuthor(getModelName());
     f.project().model().setGraph(
-        std::unique_ptr<vpz::BaseModel>(coupledmodel().clone()));
+      std::unique_ptr<vpz::BaseModel>(coupledmodel().clone()));
     f.project().dynamics().add(m_coordinator.dynamics());
     f.project().experiment().addConditions(m_coordinator.conditions());
     f.project().experiment().setName(name);

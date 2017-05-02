@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,47 +24,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_VPZ_STRUCTURES_HPP
 #define VLE_VPZ_STRUCTURES_HPP
 
-#include <vle/vpz/Base.hpp>
 #include <vle/DllDefines.hpp>
+#include <vle/vpz/Base.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
+
+/**
+ * @brief The Structure, only used by the SaxParser.
+ */
+class VLE_API Structures : public Base
+{
+public:
+    /**
+     * @brief Build a new Structures.
+     */
+    Structures()
+    {
+    }
 
     /**
-     * @brief The Structure, only used by the SaxParser.
+     * @brief Nothing to output.
      */
-    class VLE_API Structures : public Base
+    virtual void write(std::ostream& /* out */) const override
     {
-    public:
-        /**
-         * @brief Build a new Structures.
-         */
-        Structures()
-        {}
+    }
 
-        /**
-         * @brief Nothing to output.
-         */
-        virtual void write(std::ostream& /* out */) const override
-        {}
+    /**
+     * @brief Nothing to delete.
+     */
+    virtual ~Structures()
+    {
+    }
 
-        /**
-         * @brief Nothing to delete.
-         */
-        virtual ~Structures()
-        {}
-
-        /**
-         * @brief Get the type of this class.
-         * @return STRUCTURES.
-         */
-        virtual Base::type getType() const override
-        { return VLE_VPZ_STRUCTURES; }
-    };
-
-}} // namespace vle vpz
+    /**
+     * @brief Get the type of this class.
+     * @return STRUCTURES.
+     */
+    virtual Base::type getType() const override
+    {
+        return VLE_VPZ_STRUCTURES;
+    }
+};
+}
+} // namespace vle vpz
 
 #endif

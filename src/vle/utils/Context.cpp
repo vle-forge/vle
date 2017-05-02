@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -37,13 +37,14 @@
 namespace vle {
 namespace utils {
 
-struct vle_log_stderr : Context::LogFunctor {
-    virtual void write(const Context &ctx,
+struct vle_log_stderr : Context::LogFunctor
+{
+    virtual void write(const Context& ctx,
                        int priority,
-                       const char *file,
+                       const char* file,
                        int line,
-                       const char *fn,
-                       const char *format,
+                       const char* fn,
+                       const char* format,
                        va_list args) noexcept override
     {
         (void)ctx;
@@ -56,18 +57,20 @@ struct vle_log_stderr : Context::LogFunctor {
     }
 };
 
-ContextPtr make_context(const Path &prefix)
+ContextPtr
+make_context(const Path& prefix)
 {
     return std::make_shared<Context>(prefix);
 }
 
-ContextPtr make_context(std::string locale, const Path &prefix)
+ContextPtr
+make_context(std::string locale, const Path& prefix)
 {
     return std::make_shared<Context>(locale, prefix);
 }
 
-Context::Context(const Path & /* prefix */)
-    : m_pimpl(std::make_unique<PrivateContextImpl>())
+Context::Context(const Path& /* prefix */)
+  : m_pimpl(std::make_unique<PrivateContextImpl>())
 {
 
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
@@ -100,8 +103,8 @@ Context::Context(const Path & /* prefix */)
 #endif
 }
 
-Context::Context(std::string locale, const Path & /* prefix */)
-    : m_pimpl(std::make_unique<PrivateContextImpl>())
+Context::Context(std::string locale, const Path& /* prefix */)
+  : m_pimpl(std::make_unique<PrivateContextImpl>())
 {
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
 #ifndef NDEBUG
@@ -139,7 +142,8 @@ Context::Context(std::string locale, const Path & /* prefix */)
 #endif
 }
 
-ContextPtr Context::clone()
+ContextPtr
+Context::clone()
 {
     ContextPtr nctx = std::make_shared<Context>();
     nctx->m_pimpl->m_prefix = m_pimpl->m_prefix;
@@ -158,11 +162,20 @@ ContextPtr Context::clone()
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-const Path &Context::getPrefixDir() const { return m_pimpl->m_prefix; }
+const Path&
+Context::getPrefixDir() const
+{
+    return m_pimpl->m_prefix;
+}
 
-const Path &Context::getHomeDir() const { return m_pimpl->m_home; }
+const Path&
+Context::getHomeDir() const
+{
+    return m_pimpl->m_home;
+}
 
-Path Context::getLocaleDir() const
+Path
+Context::getLocaleDir() const
 {
     Path p(m_pimpl->m_prefix);
     p /= "share";
@@ -171,7 +184,8 @@ Path Context::getLocaleDir() const
     return p;
 }
 
-Path Context::getHomeFile(const std::string &name) const
+Path
+Context::getHomeFile(const std::string& name) const
 {
     Path p(m_pimpl->m_home);
     p /= name;
@@ -179,23 +193,26 @@ Path Context::getHomeFile(const std::string &name) const
     return p;
 }
 
-Path Context::getConfigurationFile() const
+Path
+Context::getConfigurationFile() const
 {
     auto version = vle::version_abi();
 
     return getHomeFile(utils::format(
-        "vle-%d.%d.conf", std::get<0>(version), std::get<1>(version)));
+      "vle-%d.%d.conf", std::get<0>(version), std::get<1>(version)));
 }
 
-Path Context::getLogFile() const
+Path
+Context::getLogFile() const
 {
     auto version = vle::version_abi();
 
     return getHomeFile(utils::format(
-        "vle-%d.%d.log", std::get<0>(version), std::get<1>(version)));
+      "vle-%d.%d.log", std::get<0>(version), std::get<1>(version)));
 }
 
-Path Context::getLogFile(const std::string &prefix) const
+Path
+Context::getLogFile(const std::string& prefix) const
 {
     auto version = vle::version_abi();
 
@@ -207,7 +224,8 @@ Path Context::getLogFile(const std::string &prefix) const
     return getHomeFile(lf);
 }
 
-std::vector<Path> Context::getBinaryPackagesDir() const
+std::vector<Path>
+Context::getBinaryPackagesDir() const
 {
     std::vector<Path> ret(2);
 
@@ -222,12 +240,13 @@ std::vector<Path> Context::getBinaryPackagesDir() const
     return ret;
 }
 
-std::vector<Path> Context::getBinaryPackages() const
+std::vector<Path>
+Context::getBinaryPackages() const
 {
     std::vector<Path> result;
-    const auto &paths = getBinaryPackagesDir();
+    const auto& paths = getBinaryPackagesDir();
 
-    for (const auto &elem : paths) {
+    for (const auto& elem : paths) {
         if (not elem.is_directory()) {
             vErr(this,
                  _("Package error: '%s' is not a directory\n"),
@@ -243,7 +262,8 @@ std::vector<Path> Context::getBinaryPackages() const
     return result;
 }
 
-Path Context::getLocalPackageFilename() const
+Path
+Context::getLocalPackageFilename() const
 {
     Path p = getHomeDir();
     p /= "local.pkg";
@@ -251,7 +271,8 @@ Path Context::getLocalPackageFilename() const
     return p;
 }
 
-Path Context::getRemotePackageFilename() const
+Path
+Context::getRemotePackageFilename() const
 {
     Path p = getHomeDir();
     p /= "remote.pkg";
@@ -259,7 +280,8 @@ Path Context::getRemotePackageFilename() const
     return p;
 }
 
-Path Context::getTemplateDir() const
+Path
+Context::getTemplateDir() const
 {
     Path p(m_pimpl->m_prefix);
     p /= "share";
@@ -269,7 +291,8 @@ Path Context::getTemplateDir() const
     return p;
 }
 
-Path Context::getTemplate(const std::string &name) const
+Path
+Context::getTemplate(const std::string& name) const
 {
     Path p(m_pimpl->m_prefix);
     p /= "share";
@@ -280,31 +303,33 @@ Path Context::getTemplate(const std::string &name) const
     return p;
 }
 
-void Context::initVleHomeDirectory()
+void
+Context::initVleHomeDirectory()
 {
     auto version = vle::version_abi();
 
     Path homedir = getHomeDir();
-    homedir /= utils::format(
-        "pkgs-%d.%d", std::get<0>(version), std::get<1>(version));
+    homedir /=
+      utils::format("pkgs-%d.%d", std::get<0>(version), std::get<1>(version));
 
     if (not homedir.is_directory()) {
         if (homedir.is_file())
-            throw FileError((fmt(_("VLE_HOME must be a directory (%1%)")) %
-                             homedir.string())
-                                .str());
+            throw FileError(
+              (fmt(_("VLE_HOME must be a directory (%1%)")) % homedir.string())
+                .str());
 
         if (not Path::create_directories(homedir))
             throw FileError(
-                (fmt(_("Failed to build VLE_HOME directory (%1%)")) %
-                 homedir.string())
-                    .str());
+              (fmt(_("Failed to build VLE_HOME directory (%1%)")) %
+               homedir.string())
+                .str());
     }
 }
 
-void Context::readHomeDir()
+void
+Context::readHomeDir()
 {
-    const char *path_str = std::getenv("VLE_HOME");
+    const char* path_str = std::getenv("VLE_HOME");
     std::string path("");
     if (path_str) {
         path.assign(path_str);
@@ -312,13 +337,11 @@ void Context::readHomeDir()
     if (not path.empty()) {
         if (Path::is_directory(path)) {
             m_pimpl->m_home = path;
-        }
-        else {
+        } else {
             throw FileError(
-                (fmt(_("Path: VLE_HOME '%1%' does not exist")) % path).str());
+              (fmt(_("Path: VLE_HOME '%1%' does not exist")) % path).str());
         }
-    }
-    else {
+    } else {
         m_pimpl->m_home.clear();
     }
 }
@@ -329,19 +352,22 @@ void Context::readHomeDir()
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void Context::set_log_function(std::unique_ptr<LogFunctor> fn) noexcept
+void
+Context::set_log_function(std::unique_ptr<LogFunctor> fn) noexcept
 {
     m_pimpl->log_fn = std::move(fn);
 
     vInfo(this, "custom logging function registered\n");
 }
 
-void Context::set_log_priority(int priority) noexcept
+void
+Context::set_log_priority(int priority) noexcept
 {
     m_pimpl->log_priority = priority % 8;
 }
 
-int Context::get_log_priority() const noexcept
+int
+Context::get_log_priority() const noexcept
 {
     return m_pimpl->log_priority;
 }
@@ -352,12 +378,13 @@ int Context::get_log_priority() const noexcept
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void Context::log(int priority,
-                  const char *file,
-                  int line,
-                  const char *fn,
-                  const char *format,
-                  ...) const noexcept
+void
+Context::log(int priority,
+             const char* file,
+             int line,
+             const char* fn,
+             const char* format,
+             ...) const noexcept
 {
     va_list args;
 

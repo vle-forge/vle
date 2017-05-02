@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,19 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DEVS_VIEW_HPP
 #define VLE_DEVS_VIEW_HPP 1
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/Context.hpp>
-#include <vle/devs/Time.hpp>
-#include <vle/value/Matrix.hpp>
-#include <vle/oov/Plugin.hpp>
-#include <string>
 #include <map>
+#include <string>
+#include <vle/DllDefines.hpp>
+#include <vle/devs/Time.hpp>
+#include <vle/oov/Plugin.hpp>
+#include <vle/utils/Context.hpp>
+#include <vle/value/Matrix.hpp>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 class Dynamics;
 class View;
@@ -45,8 +45,9 @@ class View;
  * A simple structure that stores observation values for a specific view
  * and portname tuple.
  */
-struct Observation {
-    View *view = nullptr;
+struct Observation
+{
+    View* view = nullptr;
     std::string portname;
     std::unique_ptr<value::Value> value;
 };
@@ -90,9 +91,11 @@ public:
 
     void run(Time current);
 
-    void run(const Dynamics *dynamics, Time current, const std::string& port);
+    void run(const Dynamics* dynamics, Time current, const std::string& port);
 
-    void run(const Dynamics *dynamics, Time current, const std::string& port,
+    void run(const Dynamics* dynamics,
+             Time current,
+             const std::string& port,
              std::unique_ptr<value::Value> value);
 
     /**
@@ -135,23 +138,26 @@ public:
      *
      * @return A name
      */
-    std::string name() const { return m_name; }
+    std::string name() const
+    {
+        return m_name;
+    }
 
     /**
      * Return a pointer to the \c value::Matrix managed by te plugin.
      *
      * @param current, the current time (finish time)
      */
-    std::unique_ptr<value::Matrix> finish(Time current) ;
+    std::unique_ptr<value::Matrix> finish(Time current);
 
 protected:
     using ObservableList = std::multimap<Dynamics*, std::string>;
 
     ObservableList m_observableList;
-    std::string    m_name;
+    std::string m_name;
     oov::PluginPtr m_plugin;
 };
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

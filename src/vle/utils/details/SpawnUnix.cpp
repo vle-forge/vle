@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,43 +24,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/Spawn.hpp>
-#include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/utils/details/ShellUtils.hpp>
 #include <algorithm>
+#include <cassert>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <thread>
-#include <cerrno>
-#include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
+#include <vle/utils/ContextPrivate.hpp>
+#include <vle/utils/Spawn.hpp>
+#include <vle/utils/details/ShellUtils.hpp>
+#include <vle/utils/i18n.hpp>
 
 #include <sys/wait.h>
 #include <unistd.h>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
-extern "C" char ** environ = *_NSGetEnviron();
+extern "C" char** environ = *_NSGetEnviron();
 #endif
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 const unsigned long int Spawn::default_buffer_size = BUFSIZ;
 
-struct strdup_functor
-    : std::unary_function < std::string, char* >
+struct strdup_functor : std::unary_function<std::string, char*>
 {
-    char * operator()(const std::string& str) const
+    char* operator()(const std::string& str) const
     {
         return strdup(str.c_str());
     }
 };
 
-void free_str_array(char **args)
+void
+free_str_array(char** args)
 {
-    char **tmp;
+    char** tmp;
 
     for (tmp = args; *tmp; ++tmp) {
         free(*tmp);
@@ -69,27 +70,26 @@ void free_str_array(char **args)
     delete[] args;
 }
 
-char ** convert_string_str_array(const std::vector < std::string >& args)
+char**
+convert_string_str_array(const std::vector<std::string>& args)
 {
-    char **result = nullptr;
+    char** result = nullptr;
 
     result = new char*[args.size() + 1];
 
-    std::transform(args.begin(),
-                   args.end(),
-                   result,
-                   strdup_functor());
+    std::transform(args.begin(), args.end(), result, strdup_functor());
 
     result[args.size()] = nullptr;
 
     return result;
 }
 
-static char ** prepare_environment_variable(void)
+static char**
+prepare_environment_variable(void)
 {
-    char **it = ::environ;
-    char **jt = nullptr;
-    char **result = nullptr;
+    char** it = ::environ;
+    char** jt = nullptr;
+    char** result = nullptr;
     int size = 0;
 
     while (*it++) {
@@ -119,14 +119,15 @@ static char ** prepare_environment_variable(void)
  *
  * @return returns 0 if timeout, 1 if input available, -1 if error.
  */
-static int input_timeout(int fd, std::chrono::milliseconds wait)
+static int
+input_timeout(int fd, std::chrono::milliseconds wait)
 {
     fd_set set;
     struct timeval timeout;
     long int result;
 
-    FD_ZERO (&set);
-    FD_SET (fd, &set);
+    FD_ZERO(&set);
+    FD_SET(fd, &set);
 
     wait *= 1000;
 
@@ -134,7 +135,7 @@ static int input_timeout(int fd, std::chrono::milliseconds wait)
     timeout.tv_usec = wait.count();
 
     do {
-        result = select (FD_SETSIZE, &set, nullptr, nullptr, &timeout);
+        result = select(FD_SETSIZE, &set, nullptr, nullptr, &timeout);
     } while (result == -1L && errno == EINTR);
 
     return result;
@@ -155,12 +156,12 @@ public:
     std::string m_command;
 
     Pimpl(ContextPtr ctx, std::chrono::milliseconds waitchildtimeout)
-        : m_context(ctx)
-        , m_waitchildtimeout(waitchildtimeout)
-        , m_pid(-1)
-        , m_status(0)
-        , m_start(false)
-        , m_finish(true)
+      : m_context(ctx)
+      , m_waitchildtimeout(waitchildtimeout)
+      , m_pid(-1)
+      , m_status(0)
+      , m_start(false)
+      , m_finish(true)
     {
     }
 
@@ -209,7 +210,8 @@ public:
             m_finish = false;
             return true;
         case -1:
-            vErr(m_context, _("Spawn: check running child fail: %s\n"),
+            vErr(m_context,
+                 _("Spawn: check running child fail: %s\n"),
                  strerror(errno));
             return false;
         default:
@@ -218,13 +220,13 @@ public:
         }
     }
 
-    bool get(std::string *output, std::string *error)
+    bool get(std::string* output, std::string* error)
     {
         assert(m_start);
 
         is_running();
 
-        std::vector <char> buffer;
+        std::vector<char> buffer;
         buffer.reserve(BUFSIZ);
         int result;
 
@@ -251,12 +253,15 @@ public:
         return true;
     }
 
-    bool initchild(const std::string& exe, const std::string& workingdir,
-                   std::vector <std::string> args)
+    bool initchild(const std::string& exe,
+                   const std::string& workingdir,
+                   std::vector<std::string> args)
     {
         if (::chdir(workingdir.c_str())) {
-            vErr(m_context, _("Spawn: child fails to change current directory:"
-                              " to `%s'\n"), workingdir.c_str());
+            vErr(m_context,
+                 _("Spawn: child fails to change current directory:"
+                   " to `%s'\n"),
+                 workingdir.c_str());
             std::abort();
         }
 
@@ -270,8 +275,8 @@ public:
 
         args.insert(args.begin(), exe);
 
-        char **localenvp = prepare_environment_variable();
-        char **localargv = convert_string_str_array(args);
+        char** localenvp = prepare_environment_variable();
+        char** localargv = convert_string_str_array(args);
 
         ::execve(exe.c_str(), localargv, localenvp);
 
@@ -295,7 +300,7 @@ public:
 
     bool start(const std::string& exe,
                const std::string& workingdir,
-               const std::vector <std::string> &args)
+               const std::vector<std::string>& args)
     {
         assert(m_finish);
         m_start = true;
@@ -321,7 +326,7 @@ public:
         }
 
         if (localpid == 0)
-           return initchild(exe, workingdir, args);
+            return initchild(exe, workingdir, args);
 
         return initparent(localpid);
 
@@ -380,26 +385,29 @@ public:
         return m_start;
     }
 
-    bool status(std::string *msg, bool *success)
+    bool status(std::string* msg, bool* success)
     {
         assert(m_start);
         assert(m_finish);
 
         if (WIFEXITED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) exited, status=%3%\n") %
-                      m_command % m_pid % WEXITSTATUS(m_status)).str();
+            m_msg += (fmt("[%1%] (%2%) exited, status=%3%\n") % m_command %
+                      m_pid % WEXITSTATUS(m_status))
+                       .str();
             *success = !WEXITSTATUS(m_status);
         } else if (WIFSIGNALED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) killed by signal %3%\n") %
-                      m_command % m_pid % WTERMSIG(m_status)).str();
+            m_msg += (fmt("[%1%] (%2%) killed by signal %3%\n") % m_command %
+                      m_pid % WTERMSIG(m_status))
+                       .str();
             *success = false;
         } else if (WIFSTOPPED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) stopped by signal %3%\n") %
-                      m_command % m_pid % WSTOPSIG(m_status)).str();
+            m_msg += (fmt("[%1%] (%2%) stopped by signal %3%\n") % m_command %
+                      m_pid % WSTOPSIG(m_status))
+                       .str();
             *success = false;
         } else if (WIFCONTINUED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) continued\n") %
-                      m_command % m_pid).str();
+            m_msg +=
+              (fmt("[%1%] (%2%) continued\n") % m_command % m_pid).str();
             *success = false;
         }
 
@@ -410,24 +418,25 @@ public:
 };
 
 Spawn::Spawn(ContextPtr ctx)
-    : m_pimpl(
-        std::make_unique<Spawn::Pimpl>(
-            ctx,
-            std::chrono::milliseconds {5}))
+  : m_pimpl(
+      std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
 {
 }
 
 Spawn::~Spawn() = default;
 
-bool Spawn::start(const std::string& exe,
-                  const std::string& workingdir,
-                  const std::vector < std::string > &args,
-                  std::chrono::milliseconds waitchildtimeout)
+bool
+Spawn::start(const std::string& exe,
+             const std::string& workingdir,
+             const std::vector<std::string>& args,
+             std::chrono::milliseconds waitchildtimeout)
 {
     m_pimpl->init(waitchildtimeout);
 
-    vDbg(m_pimpl->m_context, _("Spawn: command: `%s' chdir: `%s'\n"),
-         exe.c_str(), workingdir.c_str());
+    vDbg(m_pimpl->m_context,
+         _("Spawn: command: `%s' chdir: `%s'\n"),
+         exe.c_str(),
+         workingdir.c_str());
 
     for (const auto& elem : args) {
         vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());
@@ -436,32 +445,38 @@ bool Spawn::start(const std::string& exe,
     return m_pimpl->start(exe, workingdir, args);
 }
 
-bool Spawn::wait()
+bool
+Spawn::wait()
 {
     return m_pimpl->wait();
 }
 
-void Spawn::kill()
+void
+Spawn::kill()
 {
     m_pimpl->kill();
 }
 
-bool Spawn::isstart()
+bool
+Spawn::isstart()
 {
     return m_pimpl->isstart();
 }
 
-bool Spawn::isfinish()
+bool
+Spawn::isfinish()
 {
     return m_pimpl->isfinish();
 }
 
-bool Spawn::get(std::string *output, std::string *error)
+bool
+Spawn::get(std::string* output, std::string* error)
 {
     return m_pimpl->get(output, error);
 }
 
-bool Spawn::status(std::string *msg, bool *success)
+bool
+Spawn::status(std::string* msg, bool* success)
 {
     return m_pimpl->status(msg, success);
 }
@@ -476,12 +491,13 @@ Spawn::splitCommandLine(const std::string& command)
 
     if (argv.empty())
         throw utils::ArgError(
-            (fmt(_("Package command line: error, empty command `%1%'"))
-             % command).str());
+          (fmt(_("Package command line: error, empty command `%1%'")) %
+           command)
+            .str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
 
     return argv;
 }
-
-}}
+}
+}

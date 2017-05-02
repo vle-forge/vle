@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -41,7 +41,8 @@ Experiment::Experiment()
     conditions().add(cond);
 }
 
-void Experiment::write(std::ostream &out) const
+void
+Experiment::write(std::ostream& out) const
 {
     out << "<experiment "
         << "name=\"" << m_name.c_str() << "\" ";
@@ -58,7 +59,8 @@ void Experiment::write(std::ostream &out) const
     out << "</experiment>\n";
 }
 
-void Experiment::clear()
+void
+Experiment::clear()
 {
     m_name.clear();
 
@@ -66,17 +68,20 @@ void Experiment::clear()
     m_views.clear();
 }
 
-void Experiment::addConditions(const Conditions &c)
+void
+Experiment::addConditions(const Conditions& c)
 {
     m_conditions.add(c);
 }
 
-void Experiment::addViews(const Views &m)
+void
+Experiment::addViews(const Views& m)
 {
     m_views.add(m);
 }
 
-void Experiment::setName(const std::string &name)
+void
+Experiment::setName(const std::string& name)
 {
     if (name.empty()) {
         throw utils::ArgError(_("Empty experiment name"));
@@ -85,28 +90,30 @@ void Experiment::setName(const std::string &name)
     m_name.assign(name);
 }
 
-void Experiment::setDuration(double duration)
+void
+Experiment::setDuration(double duration)
 {
     if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
                                 "does not exist"));
 
-    auto &condSim = conditions().get(defaultSimulationEngineCondName());
-    auto &dur = condSim.getSetValues("duration");
+    auto& condSim = conditions().get(defaultSimulationEngineCondName());
+    auto& dur = condSim.getSetValues("duration");
     dur.clear();
 
     dur.emplace_back(std::static_pointer_cast<vle::value::Value>(
-        std::make_shared<vle::value::Double>(duration)));
+      std::make_shared<vle::value::Double>(duration)));
 }
 
-double Experiment::duration() const
+double
+Experiment::duration() const
 {
     if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
                                 "does not exist"));
 
-    const auto &condSim = conditions().get(defaultSimulationEngineCondName());
-    const auto &dur = condSim.getSetValues("duration");
+    const auto& condSim = conditions().get(defaultSimulationEngineCondName());
+    const auto& dur = condSim.getSetValues("duration");
 
     if (dur.empty())
         throw utils::ArgError(_("The simulation engine condition is empty"));
@@ -114,27 +121,29 @@ double Experiment::duration() const
     return dur[0]->toDouble().value();
 }
 
-void Experiment::setBegin(double begin)
+void
+Experiment::setBegin(double begin)
 {
     if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
                                 "does not exist"));
 
-    auto &condSim = conditions().get(defaultSimulationEngineCondName());
-    auto &dur = condSim.getSetValues("begin");
+    auto& condSim = conditions().get(defaultSimulationEngineCondName());
+    auto& dur = condSim.getSetValues("begin");
     dur.clear();
     dur.emplace_back(std::static_pointer_cast<vle::value::Value>(
-        std::make_shared<vle::value::Double>(begin)));
+      std::make_shared<vle::value::Double>(begin)));
 }
 
-double Experiment::begin() const
+double
+Experiment::begin() const
 {
     if (not conditions().exist(defaultSimulationEngineCondName()))
         throw utils::ArgError(_("The simulation engine condition"
                                 "does not exist"));
 
-    const auto &condSim = conditions().get(defaultSimulationEngineCondName());
-    const auto &dur = condSim.getSetValues("begin");
+    const auto& condSim = conditions().get(defaultSimulationEngineCondName());
+    const auto& dur = condSim.getSetValues("begin");
 
     if (dur.empty())
         throw utils::ArgError(_("The simulation engine condition is empty"));
@@ -142,17 +151,19 @@ double Experiment::begin() const
     return dur[0]->toDouble().value();
 }
 
-void Experiment::cleanNoPermanent()
+void
+Experiment::cleanNoPermanent()
 {
     m_conditions.cleanNoPermanent();
     m_views.observables().cleanNoPermanent();
 }
 
-void Experiment::setCombination(const std::string &name)
+void
+Experiment::setCombination(const std::string& name)
 {
     if (name != "linear" and name != "total") {
         throw utils::ArgError(
-            (fmt(_("Unknow combination '%1%'")) % name).str());
+          (fmt(_("Unknow combination '%1%'")) % name).str());
     }
 
     m_combination.assign(name);

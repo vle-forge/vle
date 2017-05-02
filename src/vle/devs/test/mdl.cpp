@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -53,9 +53,9 @@ using namespace vle;
 
 #define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                              \
     extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics *                                          \
-    symbol_(const vle::devs::DynamicsInit &init,                              \
-            const vle::devs::InitEventList &events)                           \
+    VLE_MODULE vle::devs::Dynamics* symbol_(                                  \
+      const vle::devs::DynamicsInit& init,                                    \
+      const vle::devs::InitEventList& events)                                 \
     {                                                                         \
         return new model_(init, events);                                      \
     }                                                                         \
@@ -63,9 +63,9 @@ using namespace vle;
 
 #define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                             \
     extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics *                                          \
-    symbol_(const vle::devs::ExecutiveInit &init,                             \
-            const vle::devs::InitEventList &events)                           \
+    VLE_MODULE vle::devs::Dynamics* symbol_(                                  \
+      const vle::devs::ExecutiveInit& init,                                   \
+      const vle::devs::InitEventList& events)                                 \
     {                                                                         \
         std::string symbol_test(xstringify(symbol_));                         \
         Ensures(symbol_test.length() > 4);                                    \
@@ -76,40 +76,54 @@ using namespace vle;
 
 #define DECLARE_OOV_SYMBOL(symbol_, model_)                                   \
     extern "C" {                                                              \
-    VLE_MODULE vle::oov::Plugin *symbol_(const std::string &location)         \
+    VLE_MODULE vle::oov::Plugin* symbol_(const std::string& location)         \
     {                                                                         \
         return new model_(location);                                          \
     }                                                                         \
     }
 
-class MyBeep : public devs::Dynamics {
+class MyBeep : public devs::Dynamics
+{
 public:
-    MyBeep(const devs::DynamicsInit &model, const devs::InitEventList &events)
-        : devs::Dynamics(model, events)
+    MyBeep(const devs::DynamicsInit& model, const devs::InitEventList& events)
+      : devs::Dynamics(model, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override { return 0.0; }
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 0.0;
+    }
 
-    virtual devs::Time timeAdvance() const override { return 1.0; }
+    virtual devs::Time timeAdvance() const override
+    {
+        return 1.0;
+    }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList &output) const override
+                        devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
     }
 };
 
-class Branch : public devs::Executive {
+class Branch : public devs::Executive
+{
 public:
-    Branch(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
-        : devs::Executive(mdl, events)
+    Branch(const devs::ExecutiveInit& mdl, const devs::InitEventList& events)
+      : devs::Executive(mdl, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override { return 10.0; }
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 10.0;
+    }
 
-    virtual devs::Time timeAdvance() const override { return 10.0; }
+    virtual devs::Time timeAdvance() const override
+    {
+        return 10.0;
+    }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
@@ -117,9 +131,9 @@ public:
 
         {
             vpz::ModelList::const_iterator it =
-                coupledmodel().getModelList().begin();
+              coupledmodel().getModelList().begin();
             vpz::ModelList::const_iterator et =
-                coupledmodel().getModelList().end();
+              coupledmodel().getModelList().end();
 
             for (; it != et; ++it)
                 if (it->first != getModelName())
@@ -133,19 +147,20 @@ public:
     }
 
     virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList &output) const override
+                        devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
         output.back().addString("branch");
     }
 };
 
-class Counter : public devs::Dynamics {
+class Counter : public devs::Dynamics
+{
 public:
-    Counter(const devs::DynamicsInit &model, const devs::InitEventList &events)
-        : devs::Dynamics(model, events)
-        , m_counter(0)
-        , m_active(false)
+    Counter(const devs::DynamicsInit& model, const devs::InitEventList& events)
+      : devs::Dynamics(model, events)
+      , m_counter(0)
+      , m_active(false)
     {
     }
 
@@ -156,7 +171,7 @@ public:
     }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList & /* output */) const override
+                        devs::ExternalEventList& /* output */) const override
     {
     }
 
@@ -173,15 +188,15 @@ public:
         m_active = false;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList &events,
+    virtual void externalTransition(const devs::ExternalEventList& events,
                                     devs::Time /* time */) override
     {
         m_counter += events.size();
         m_active = true;
     }
 
-    virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent &ev) const override
+    virtual std::unique_ptr<value::Value> observation(
+      const devs::ObservationEvent& ev) const override
     {
         if (ev.onPort("c")) {
             if (m_counter > 100 and m_counter < 500)
@@ -200,11 +215,12 @@ private:
     bool m_active;
 };
 
-class DeleteConnection : public devs::Executive {
+class DeleteConnection : public devs::Executive
+{
 public:
-    DeleteConnection(const devs::ExecutiveInit &init,
-                     const devs::InitEventList &events)
-        : devs::Executive(init, events)
+    DeleteConnection(const devs::ExecutiveInit& init,
+                     const devs::InitEventList& events)
+      : devs::Executive(init, events)
     {
         mAlarm = events.getDouble("alarm");
         mModelSource = events.getString("model source");
@@ -215,27 +231,34 @@ public:
         mRemaining = mAlarm;
     }
 
-    virtual ~DeleteConnection() {}
+    virtual ~DeleteConnection()
+    {
+    }
 
-    virtual devs::Time init(devs::Time /*time*/) { return timeAdvance(); }
+    virtual devs::Time init(devs::Time /*time*/)
+    {
+        return timeAdvance();
+    }
 
-    virtual devs::Time timeAdvance() const { return mRemaining; }
+    virtual devs::Time timeAdvance() const
+    {
+        return mRemaining;
+    }
 
     virtual void internalTransition(devs::Time time)
     {
         devs::Time tmp =
-            std::abs(std::min(time, mAlarm) - std::max(time, mAlarm));
+          std::abs(std::min(time, mAlarm) - std::max(time, mAlarm));
 
         if (tmp < 0.1) {
             mRemaining = devs::infinity;
             removeConnection(mModelSource, mPortSource, mModelDest, mPortDest);
-        }
-        else {
+        } else {
             mRemaining = tmp;
         }
     }
 
-    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
+    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time time)
     {
         mRemaining = std::abs(std::min(time, mAlarm) - std::max(time, mAlarm));
@@ -250,11 +273,12 @@ public:
     std::string mPortDest;
 };
 
-class Transform : public devs::Dynamics {
+class Transform : public devs::Dynamics
+{
 public:
-    Transform(const devs::DynamicsInit &atom,
-              const devs::InitEventList &events)
-        : devs::Dynamics(atom, events)
+    Transform(const devs::DynamicsInit& atom,
+              const devs::InitEventList& events)
+      : devs::Dynamics(atom, events)
     {
     }
 
@@ -264,28 +288,31 @@ public:
         return 0.0;
     }
 
-    virtual devs::Time timeAdvance() const override { return 1.0; }
+    virtual devs::Time timeAdvance() const override
+    {
+        return 1.0;
+    }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
         m_counter = 1;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList &events,
+    virtual void externalTransition(const devs::ExternalEventList& events,
                                     devs::Time /* time */) override
     {
         m_counter = m_counter + events.size();
     }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList &output) const override
+                        devs::ExternalEventList& output) const override
     {
         for (int i = 0; i < m_counter; ++i)
             output.emplace_back("out");
     }
 
-    virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent &) const override
+    virtual std::unique_ptr<value::Value> observation(
+      const devs::ObservationEvent&) const override
     {
         return value::Integer::create(m_counter);
     }
@@ -294,61 +321,73 @@ private:
     int m_counter;
 };
 
-class Confluent_transitionA : public devs::Dynamics {
+class Confluent_transitionA : public devs::Dynamics
+{
 public:
-    Confluent_transitionA(const devs::DynamicsInit &atom,
-                          const devs::InitEventList &events)
-        : devs::Dynamics(atom, events)
+    Confluent_transitionA(const devs::DynamicsInit& atom,
+                          const devs::InitEventList& events)
+      : devs::Dynamics(atom, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override { return 1.0; }
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 1.0;
+    }
 
-    virtual devs::Time timeAdvance() const override { return devs::infinity; }
+    virtual devs::Time timeAdvance() const override
+    {
+        return devs::infinity;
+    }
 
-    virtual void internalTransition(devs::Time /* time */) override {}
+    virtual void internalTransition(devs::Time /* time */) override
+    {
+    }
 
-    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
+    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time /* time */) override
     {
     }
 
     virtual void confluentTransitions(
-        devs::Time /*time*/,
-        const devs::ExternalEventList & /*extEventlist*/) override
+      devs::Time /*time*/,
+      const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 
     virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList &output) const override
+                        devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
     }
 
-    virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent &) const override
+    virtual std::unique_ptr<value::Value> observation(
+      const devs::ObservationEvent&) const override
     {
         return 0;
     }
 };
 
-class Confluent_transitionB : public devs::Dynamics {
+class Confluent_transitionB : public devs::Dynamics
+{
 public:
-    Confluent_transitionB(const devs::DynamicsInit &atom,
-                          const devs::InitEventList &events)
-        : devs::Dynamics(atom, events)
-        , state(0)
+    Confluent_transitionB(const devs::DynamicsInit& atom,
+                          const devs::InitEventList& events)
+      : devs::Dynamics(atom, events)
+      , state(0)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override { return 1.0; }
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 1.0;
+    }
 
     virtual devs::Time timeAdvance() const override
     {
         if (state < 2) {
             return 0;
-        }
-        else {
+        } else {
             return devs::infinity;
         }
     }
@@ -358,7 +397,7 @@ public:
         state++;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
+    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time /* time */) override
     {
         // should not have an external transition, rather a confluent
@@ -366,31 +405,32 @@ public:
     }
 
     virtual void confluentTransitions(
-        devs::Time /*time*/,
-        const devs::ExternalEventList & /*extEventlist*/) override
+      devs::Time /*time*/,
+      const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 
     virtual void output(devs::Time /* time */,
-                        devs::ExternalEventList & /*output*/) const override
+                        devs::ExternalEventList& /*output*/) const override
     {
     }
 
-    virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent &) const override
+    virtual std::unique_ptr<value::Value> observation(
+      const devs::ObservationEvent&) const override
     {
         return 0;
     }
     int state;
 };
 
-class Confluent_transitionC : public devs::Dynamics {
+class Confluent_transitionC : public devs::Dynamics
+{
     mutable int i = 0;
 
 public:
-    Confluent_transitionC(const devs::DynamicsInit &atom,
-                          const devs::InitEventList &events)
-        : devs::Dynamics(atom, events)
+    Confluent_transitionC(const devs::DynamicsInit& atom,
+                          const devs::InitEventList& events)
+      : devs::Dynamics(atom, events)
     {
     }
 
@@ -416,7 +456,7 @@ public:
     }
 
     virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList &output) const override
+                        devs::ExternalEventList& output) const override
     {
         Ensures(i == 1);
         i++;
@@ -424,13 +464,14 @@ public:
     }
 };
 
-class Confluent_transitionD : public devs::Dynamics {
+class Confluent_transitionD : public devs::Dynamics
+{
     int i = 0;
 
 public:
-    Confluent_transitionD(const devs::DynamicsInit &atom,
-                          const devs::InitEventList &events)
-        : devs::Dynamics(atom, events)
+    Confluent_transitionD(const devs::DynamicsInit& atom,
+                          const devs::InitEventList& events)
+      : devs::Dynamics(atom, events)
     {
         Ensures(i == 0);
         i++;
@@ -444,37 +485,47 @@ public:
         return 0;
     }
 
-    virtual devs::Time timeAdvance() const override { return 1; }
+    virtual devs::Time timeAdvance() const override
+    {
+        return 1;
+    }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
         EnsuresNotReached();
     }
 
-    virtual void externalTransition(const devs::ExternalEventList & /*events*/,
+    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time /* time */) override
     {
         EnsuresNotReached();
     }
 
     virtual void confluentTransitions(
-        devs::Time /*time*/,
-        const devs::ExternalEventList & /*extEventlist*/) override
+      devs::Time /*time*/,
+      const devs::ExternalEventList& /*extEventlist*/) override
     {
         Ensures(i > 1);
     }
 };
 
-class GenExecutive : public devs::Executive {
-    enum state { INIT, IDLE, ADDMODEL, DELMODEL };
+class GenExecutive : public devs::Executive
+{
+    enum state
+    {
+        INIT,
+        IDLE,
+        ADDMODEL,
+        DELMODEL
+    };
 
     std::stack<std::string> m_stacknames;
     state m_state;
 
 public:
-    GenExecutive(const devs::ExecutiveInit &mdl,
-                 const devs::InitEventList &events)
-        : devs::Executive(mdl, events)
+    GenExecutive(const devs::ExecutiveInit& mdl,
+                 const devs::InitEventList& events)
+      : devs::Executive(mdl, events)
     {
     }
 
@@ -514,8 +565,7 @@ public:
         case IDLE:
             if (time < 50.0) {
                 m_state = ADDMODEL;
-            }
-            else {
+            } else {
                 m_state = DELMODEL;
             }
             break;
@@ -530,8 +580,8 @@ public:
         }
     }
 
-    virtual std::unique_ptr<value::Value>
-    observation(const devs::ObservationEvent &ev) const override
+    virtual std::unique_ptr<value::Value> observation(
+      const devs::ObservationEvent& ev) const override
     {
         if (ev.onPort("nbmodel"))
             return value::Integer::create(get_nb_model());
@@ -548,16 +598,15 @@ public:
             if (get_nb_model() > 0 and ev.getTime() < 50.0) {
                 set->toSet().add(value::String::create("add"));
                 std::string name =
-                    (boost::format("MyBeep_%1%") % m_stacknames.size()).str();
+                  (boost::format("MyBeep_%1%") % m_stacknames.size()).str();
                 set->toSet().add(value::String::create(name));
                 set->toSet().add(value::String::create("2"));
                 std::string edge = name + std::string(" counter ");
                 set->toSet().add(value::String::create(edge));
-            }
-            else if (get_nb_model() > 0) {
+            } else if (get_nb_model() > 0) {
                 set->toSet().add(value::String::create("delete"));
                 std::string name =
-                    (boost::format("MyBeep_%1%") % (get_nb_model())).str();
+                  (boost::format("MyBeep_%1%") % (get_nb_model())).str();
                 set->toSet().add(value::String::create(name));
             }
 
@@ -574,9 +623,9 @@ public:
     {
         printf("add_new_model starts\n");
         std::string name(
-            (boost::format("MyBeep_%1%") % m_stacknames.size()).str());
+          (boost::format("MyBeep_%1%") % m_stacknames.size()).str());
 
-        std::vector<std::string> outputs{"out"}, inputs{};
+        std::vector<std::string> outputs{ "out" }, inputs{};
 
         createModel(name, inputs, outputs, "gensMyBeep");
         addConnection(name, "out", "counter", "in");
@@ -590,9 +639,9 @@ public:
         printf("del_first_model starts\n");
         if (m_stacknames.empty()) {
             throw utils::InternalError(
-                boost::format("Cannot delete any model, the executive have no "
-                              "element.")
-                    .str());
+              boost::format("Cannot delete any model, the executive have no "
+                            "element.")
+                .str());
         }
 
         delModel(m_stacknames.top());
@@ -610,35 +659,49 @@ public:
     }
 };
 
-class Leaf : public devs::Executive {
+class Leaf : public devs::Executive
+{
 public:
-    Leaf(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
-        : devs::Executive(mdl, events)
+    Leaf(const devs::ExecutiveInit& mdl, const devs::InitEventList& events)
+      : devs::Executive(mdl, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override { return 10.0; }
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 10.0;
+    }
 
-    virtual devs::Time timeAdvance() const override { return 10.0; }
+    virtual devs::Time timeAdvance() const override
+    {
+        return 10.0;
+    }
 
     virtual void output(devs::Time /*time*/,
-                        devs::ExternalEventList &output) const override
+                        devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
         output.back().addString("leaf");
     }
 };
 
-class Root : public devs::Executive {
+class Root : public devs::Executive
+{
 public:
-    Root(const devs::ExecutiveInit &mdl, const devs::InitEventList &events)
-        : devs::Executive(mdl, events)
+    Root(const devs::ExecutiveInit& mdl, const devs::InitEventList& events)
+      : devs::Executive(mdl, events)
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override { return 10.0; }
+    virtual devs::Time init(devs::Time /* time */) override
+    {
+        return 10.0;
+    }
 
-    virtual devs::Time timeAdvance() const override { return 10.0; }
+    virtual devs::Time timeAdvance() const override
+    {
+        return 10.0;
+    }
 
     virtual void internalTransition(devs::Time /* time */) override
     {
@@ -646,9 +709,9 @@ public:
 
         {
             vpz::ModelList::const_iterator it =
-                coupledmodel().getModelList().begin();
+              coupledmodel().getModelList().begin();
             vpz::ModelList::const_iterator et =
-                coupledmodel().getModelList().end();
+              coupledmodel().getModelList().end();
 
             for (; it != et; ++it)
                 if (it->first != getModelName())
@@ -677,7 +740,8 @@ DECLARE_EXECUTIVE_SYMBOL(exe_leaf, Leaf)
 DECLARE_EXECUTIVE_SYMBOL(exe_root, Root)
 DECLARE_OOV_SYMBOL(oov_plugin, vletest::OutputPlugin)
 
-void test_normal_behaviour()
+void
+test_normal_behaviour()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(DEVS_TEST_DIR);
@@ -686,9 +750,9 @@ void test_normal_behaviour()
     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
     devs::RootCoordinator root(ctx);
 
-    auto &dyna = file.project().dynamics().get("confluent_transitionA");
+    auto& dyna = file.project().dynamics().get("confluent_transitionA");
     dyna.setLibrary("dynamics_confluent_transitionC");
-    auto &dynb = file.project().dynamics().get("confluent_transitionB");
+    auto& dynb = file.project().dynamics().get("confluent_transitionB");
     dynb.setLibrary("dynamics_confluent_transitionD");
 
     try {
@@ -701,13 +765,13 @@ void test_normal_behaviour()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         EnsuresNotReached();
     }
 }
 
-void test_gensvpz()
+void
+test_gensvpz()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(DEVS_TEST_DIR);
@@ -729,7 +793,7 @@ void test_gensvpz()
     EnsuresEqual(out->size(), 2);
 
     /* get result of simulation */
-    value::Matrix &matrix = out->getMatrix("view1");
+    value::Matrix& matrix = out->getMatrix("view1");
     std::cout << matrix << '\n';
 
     EnsuresEqual(matrix.rows(), (std::size_t)101);
@@ -756,7 +820,8 @@ void test_gensvpz()
     EnsuresEqual(value::toInteger(matrix(2, 100)), 1);
 }
 
-void test_gens_delete_connection()
+void
+test_gens_delete_connection()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(DEVS_TEST_DIR);
@@ -775,13 +840,13 @@ void test_gens_delete_connection()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         Ensures(false);
     }
 }
 
-void test_gens_ordereddeleter()
+void
+test_gens_ordereddeleter()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(DEVS_TEST_DIR);
@@ -805,7 +870,7 @@ void test_gens_ordereddeleter()
         EnsuresEqual(out->size(), 1);
 
         /* get result of simulation */
-        value::Matrix &matrix = out->getMatrix("view1");
+        value::Matrix& matrix = out->getMatrix("view1");
 
         EnsuresEqual(matrix.columns(), (std::size_t)2);
 
@@ -816,7 +881,8 @@ void test_gens_ordereddeleter()
     }
 }
 
-void test_confluent_transition()
+void
+test_confluent_transition()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(DEVS_TEST_DIR);
@@ -835,16 +901,15 @@ void test_confluent_transition()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         Ensures(false);
-    }
-    catch (...) {
+    } catch (...) {
         Ensures(false);
     }
 }
 
-void test_confluent_transition_2()
+void
+test_confluent_transition_2()
 {
     auto ctx = vle::utils::make_context();
     vle::utils::Path p(DEVS_TEST_DIR);
@@ -853,9 +918,9 @@ void test_confluent_transition_2()
     vpz::Vpz file(DEVS_TEST_DIR "/confluent_transition.vpz");
     devs::RootCoordinator root(ctx);
 
-    auto &dyna = file.project().dynamics().get("confluent_transitionA");
+    auto& dyna = file.project().dynamics().get("confluent_transitionA");
     dyna.setLibrary("dynamics_confluent_transitionC");
-    auto &dynb = file.project().dynamics().get("confluent_transitionB");
+    auto& dynb = file.project().dynamics().get("confluent_transitionB");
     dynb.setLibrary("dynamics_confluent_transitionD");
 
     try {
@@ -868,16 +933,15 @@ void test_confluent_transition_2()
         std::unique_ptr<value::Map> out = root.outputs();
         Ensures(not out);
         root.finish();
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         Ensures(false);
-    }
-    catch (...) {
+    } catch (...) {
         Ensures(false);
     }
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

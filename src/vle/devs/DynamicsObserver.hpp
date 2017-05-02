@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,15 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DEVS_DYNAMICSOBSERVER_HPP
 #define VLE_DEVS_DYNAMICSOBSERVER_HPP
 
+#include <cassert>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/View.hpp>
-#include <cassert>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 /**
  * A Dynamics proxy class that wraps an another Dynamics to use
@@ -121,8 +121,7 @@ public:
      * @param time the time of the occurrence of output function.
      * @param output the list of external events (output parameter).
      */
-    virtual void output(Time time,
-                        ExternalEventList& output) const override;
+    virtual void output(Time time, ExternalEventList& output) const override;
 
     /**
      * Process the time advance function: compute the duration of the
@@ -144,9 +143,8 @@ public:
      * @param event the external event with of the port.
      * @param time the date of occurrence of this event.
      */
-    virtual void
-    externalTransition(const ExternalEventList& event,
-                       Time time) override;
+    virtual void externalTransition(const ExternalEventList& event,
+                                    Time time) override;
 
     /**
      * Process the confluent transition: select the transition to
@@ -155,9 +153,9 @@ public:
      * @param internal the internal event.
      * @param extEventlist the external events list.
      */
-    virtual void
-    confluentTransitions(Time time,
-                         const ExternalEventList& extEventlist) override;
+    virtual void confluentTransitions(
+      Time time,
+      const ExternalEventList& extEventlist) override;
 
     /**
      * Process an observation event: compute the current state of the
@@ -165,8 +163,8 @@ public:
      * @param event the state event with of the port
      * @return the value of state variable
      */
-    virtual std::unique_ptr<vle::value::Value>
-    observation(const ObservationEvent& event) const override;
+    virtual std::unique_ptr<vle::value::Value> observation(
+      const ObservationEvent& event) const override;
 
     /**
      * When the simulation of the atomic model is finished, the
@@ -175,56 +173,55 @@ public:
     virtual void finish() override;
 };
 
-inline
-DynamicsObserver::DynamicsObserver(const DynamicsInit& init,
-                                   const InitEventList& events,
-                                   std::vector<Observation>& observations)
-    : Dynamics(init, events)
-    , mObservations(observations)
+inline DynamicsObserver::DynamicsObserver(
+  const DynamicsInit& init,
+  const InitEventList& events,
+  std::vector<Observation>& observations)
+  : Dynamics(init, events)
+  , mObservations(observations)
 {
 }
 
-inline
-bool DynamicsObserver::isExecutive() const
+inline bool
+DynamicsObserver::isExecutive() const
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     return mDynamics->isExecutive();
 }
 
-inline
-bool DynamicsObserver::isWrapper() const
+inline bool
+DynamicsObserver::isWrapper() const
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     return mDynamics->isWrapper();
 }
 
-inline
-void DynamicsObserver::set(std::unique_ptr<Dynamics> dyn) noexcept
+inline void
+DynamicsObserver::set(std::unique_ptr<Dynamics> dyn) noexcept
 {
     mDynamics = std::move(dyn);
 }
 
-inline
-Time DynamicsObserver::init(Time time)
+inline Time
+DynamicsObserver::init(Time time)
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     return mDynamics->init(time);
 }
 
-inline
-void DynamicsObserver::output(Time time, ExternalEventList& output) const
+inline void
+DynamicsObserver::output(Time time, ExternalEventList& output) const
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     mDynamics->output(time, output);
 
     for (const auto& elem : ppOutput) {
-        ObservationEvent event(time,
-                               std::get<0>(elem)->name(),
-                               std::get<1>(elem));
+        ObservationEvent event(
+          time, std::get<0>(elem)->name(), std::get<1>(elem));
 
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
@@ -233,25 +230,24 @@ void DynamicsObserver::output(Time time, ExternalEventList& output) const
     }
 }
 
-inline
-Time DynamicsObserver::timeAdvance() const
+inline Time
+DynamicsObserver::timeAdvance() const
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     return mDynamics->timeAdvance();
 }
 
-inline
-void DynamicsObserver::internalTransition(Time time)
+inline void
+DynamicsObserver::internalTransition(Time time)
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     mDynamics->internalTransition(time);
 
     for (const auto& elem : ppInternal) {
-        ObservationEvent event(time,
-                               std::get<0>(elem)->name(),
-                               std::get<1>(elem));
+        ObservationEvent event(
+          time, std::get<0>(elem)->name(), std::get<1>(elem));
 
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
@@ -260,18 +256,16 @@ void DynamicsObserver::internalTransition(Time time)
     }
 }
 
-inline
-void DynamicsObserver::externalTransition(const ExternalEventList& event,
-                                          Time time)
+inline void
+DynamicsObserver::externalTransition(const ExternalEventList& event, Time time)
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     mDynamics->externalTransition(event, time);
 
     for (const auto& elem : ppExternal) {
-        ObservationEvent event(time,
-                               std::get<0>(elem)->name(),
-                               std::get<1>(elem));
+        ObservationEvent event(
+          time, std::get<0>(elem)->name(), std::get<1>(elem));
 
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
@@ -280,17 +274,15 @@ void DynamicsObserver::externalTransition(const ExternalEventList& event,
     }
 }
 
-inline
-void DynamicsObserver::confluentTransitions(
-    Time time,
-    const ExternalEventList& extEventlist)
+inline void
+DynamicsObserver::confluentTransitions(Time time,
+                                       const ExternalEventList& extEventlist)
 {
     mDynamics->confluentTransitions(time, extEventlist);
 
     for (const auto& elem : ppConfluent) {
-        ObservationEvent event(time,
-                               std::get<0>(elem)->name(),
-                               std::get<1>(elem));
+        ObservationEvent event(
+          time, std::get<0>(elem)->name(), std::get<1>(elem));
 
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
@@ -299,8 +291,7 @@ void DynamicsObserver::confluentTransitions(
     }
 }
 
-inline
-std::unique_ptr<vle::value::Value>
+inline std::unique_ptr<vle::value::Value>
 DynamicsObserver::observation(const ObservationEvent& event) const
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
@@ -308,17 +299,16 @@ DynamicsObserver::observation(const ObservationEvent& event) const
     return mDynamics->observation(event);
 }
 
-inline
-void DynamicsObserver::finish()
+inline void
+DynamicsObserver::finish()
 {
     assert(mDynamics && "DynamicsObserver: missing set(Dynamics)");
 
     mDynamics->finish();
 
     for (const auto& elem : ppFinish) {
-        ObservationEvent event(devs::infinity,
-                               std::get<0>(elem)->name(),
-                               std::get<1>(elem));
+        ObservationEvent event(
+          devs::infinity, std::get<0>(elem)->name(), std::get<1>(elem));
 
         mObservations.emplace_back();
         mObservations.back().view = std::get<0>(elem);
@@ -326,7 +316,7 @@ void DynamicsObserver::finish()
         mObservations.back().value = mDynamics->observation(event);
     }
 }
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

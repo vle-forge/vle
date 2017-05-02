@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,128 +36,146 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 Rand::Rand(result_type seed)
-    : m_rand(seed)
+  : m_rand(seed)
 {
 }
 
-void Rand::seed(result_type seed)
+void
+Rand::seed(result_type seed)
 {
     m_rand.seed(seed);
 }
 
-bool Rand::getBool()
+bool
+Rand::getBool()
 {
     std::bernoulli_distribution distrib(0.5);
     return distrib(m_rand);
 }
 
-Rand::result_type Rand::getInt()
+Rand::result_type
+Rand::getInt()
 {
     return m_rand();
 }
 
-int Rand::getInt(int begin, int end)
+int
+Rand::getInt(int begin, int end)
 {
     std::uniform_int_distribution<int> distrib(begin, end);
     return distrib(m_rand);
 }
 
-double Rand::getDouble()
+double
+Rand::getDouble()
 {
     std::uniform_real_distribution<double> distrib(0.0, 1.0);
     return distrib(m_rand);
 }
 
-double Rand::getDouble(double begin, double end)
+double
+Rand::getDouble(double begin, double end)
 {
     std::uniform_real_distribution<double> distrib(begin, end);
     return distrib(m_rand);
 }
 
-double Rand::normal(double mean, double sigma)
+double
+Rand::normal(double mean, double sigma)
 {
     std::normal_distribution<double> distrib(mean, sigma);
     return distrib(m_rand);
 }
 
-double Rand::normal_cdf(double mean, double sigma, double x)
+double
+Rand::normal_cdf(double mean, double sigma, double x)
 {
     boost::math::normal_distribution<> norm_distr(mean, sigma);
     return boost::math::cdf(norm_distr, x);
 }
 
-double Rand::logNormal(double mean, double sigma)
+double
+Rand::logNormal(double mean, double sigma)
 {
     std::lognormal_distribution<double> distrib(mean, sigma);
     return distrib(m_rand);
 }
 
-double Rand::exponential(double rate)
+double
+Rand::exponential(double rate)
 {
-    std::exponential_distribution <double> distrib(rate);
+    std::exponential_distribution<double> distrib(rate);
     return distrib(m_rand);
 }
 
-double Rand::poisson(double mean)
+double
+Rand::poisson(double mean)
 {
-    std::poisson_distribution <int> distrib(mean);
+    std::poisson_distribution<int> distrib(mean);
     return distrib(m_rand);
 }
 
-double Rand::gamma(double alpha)
+double
+Rand::gamma(double alpha)
 {
-    std::gamma_distribution <double> distrib(alpha);
+    std::gamma_distribution<double> distrib(alpha);
     return distrib(m_rand);
 }
 
-double Rand::gamma_quantile(double shape, double scale, double x)
+double
+Rand::gamma_quantile(double shape, double scale, double x)
 {
     boost::math::gamma_distribution<> gamma_distrib(shape, scale);
     return boost::math::quantile(gamma_distrib, x);
 }
 
-double Rand::binomial(int t, double p)
+double
+Rand::binomial(int t, double p)
 {
-    std::binomial_distribution <int> distrib(t, p);
+    std::binomial_distribution<int> distrib(t, p);
     return distrib(m_rand);
 }
 
-double Rand::geometric(double p)
+double
+Rand::geometric(double p)
 {
-    std::geometric_distribution <int> distrib(p);
+    std::geometric_distribution<int> distrib(p);
     return distrib(m_rand);
 }
 
-double Rand::cauchy(double median, double sigma)
+double
+Rand::cauchy(double median, double sigma)
 {
-    std::cauchy_distribution <double> distrib(median, sigma);
+    std::cauchy_distribution<double> distrib(median, sigma);
     return distrib(m_rand);
 }
 
-double Rand::vonMises(const double kappa, const double mu)
+double
+Rand::vonMises(const double kappa, const double mu)
 {
     // FIXME: get_double_included instead of getDouble()
-    if (kappa <= 1e-6){
+    if (kappa <= 1e-6) {
         return 2. * M_PI * getDouble();
     }
 
     double a = 1.0 + sqrt(1.0 + 4.0 * kappa * kappa);
-    double b = (a  - sqrt(2.0 * a))/(2.0 * kappa);
-    double r = (1.0 + b * b)/(2.0 * b);
+    double b = (a - sqrt(2.0 * a)) / (2.0 * kappa);
+    double r = (1.0 + b * b) / (2.0 * b);
     double f;
 
     for (;;) {
         double u1 = getDouble();
         double z = cos(M_PI * u1);
 
-        f = (1.0 + r * z)/(r + z);
+        f = (1.0 + r * z) / (r + z);
         double c = kappa * (r - f);
         double u2 = getDouble();
 
-        if (not (u2 >= c * (2.0 - c) and u2 > c * exp(1.0 - c)))
+        if (not(u2 >= c * (2.0 - c) and u2 > c * exp(1.0 - c)))
             break;
     }
     double u3 = getDouble();
@@ -165,18 +183,19 @@ double Rand::vonMises(const double kappa, const double mu)
     return (u3 > 0.5) ? mu + acos(f) : mu - acos(f);
 }
 
-double Rand::getDoubleExcluded()
+double
+Rand::getDoubleExcluded()
 {
-    double x ;
+    double x;
     do {
         x = getDouble();
-    }
-    while (x == 0);
+    } while (x == 0);
 
-    return x ;
+    return x;
 }
 
-double Rand::triangle(double a, double b, double c)
+double
+Rand::triangle(double a, double b, double c)
 {
     double u = getDouble();
     double f = (c - a) / (b - a);
@@ -187,17 +206,19 @@ double Rand::triangle(double a, double b, double c)
     return b - std::sqrt((1 - u) * (b - a) * (b - c));
 }
 
-double Rand::weibull(const double a, const double b)
+double
+Rand::weibull(const double a, const double b)
 {
     std::weibull_distribution<double> distrib(a, b);
     return distrib(m_rand);
 }
 
-double Rand::weibull3(const double a, const double b, const double c)
+double
+Rand::weibull3(const double a, const double b, const double c)
 {
     double x = pow(-log(getDoubleExcluded()), 1.0 / a);
 
     return c + b * x;
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils

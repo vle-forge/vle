@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -40,23 +40,25 @@ namespace vle {
 namespace translator {
 
 using graphT =
-    boost::adjacency_list<boost::vecS,
-                          boost::vecS,
-                          boost::bidirectionalS,
-                          boost::property<boost::vertex_name_t, std::string>>;
+  boost::adjacency_list<boost::vecS,
+                        boost::vecS,
+                        boost::bidirectionalS,
+                        boost::property<boost::vertex_name_t, std::string>>;
 
-graph_generator::graph_generator(const parameter &params)
-    : m_params(params)
-    , m_metrics{-1, -1, -1}
+graph_generator::graph_generator(const parameter& params)
+  : m_params(params)
+  , m_metrics{ -1, -1, -1 }
 {
 }
 
-graph_generator::graph_metrics graph_generator::metrics() const
+graph_generator::graph_metrics
+graph_generator::metrics() const
 {
     return m_metrics;
 }
 
-graph_generator::graph_metrics init_metrics(const graphT &g)
+graph_generator::graph_metrics
+init_metrics(const graphT& g)
 {
     graph_generator::graph_metrics ret;
 
@@ -67,9 +69,10 @@ graph_generator::graph_metrics init_metrics(const graphT &g)
     return ret;
 }
 
-void build(const graph_generator::parameter &params,
-           vle::devs::Executive &executive,
-           graphT &g)
+void
+build(const graph_generator::parameter& params,
+      vle::devs::Executive& executive,
+      graphT& g)
 {
     graphT::vertex_iterator vi, vi_end;
     std::tie(vi, vi_end) = boost::vertices(g);
@@ -80,14 +83,14 @@ void build(const graph_generator::parameter &params,
         std::string name, classname;
 
         int id = 0;
-        graph_generator::node_metrics metrics{0, 0, 0};
+        graph_generator::node_metrics metrics{ 0, 0, 0 };
         graphT::vertex_iterator vi, vi_end;
         for (std::tie(vi, vi_end) = boost::vertices(g); vi != vi_end; ++vi) {
             metrics.id = id++;
             metrics.out_degree =
-                utils::numeric_cast<int>(boost::out_degree(*vi, g));
+              utils::numeric_cast<int>(boost::out_degree(*vi, g));
             metrics.in_degree =
-                utils::numeric_cast<int>(boost::in_degree(*vi, g));
+              utils::numeric_cast<int>(boost::in_degree(*vi, g));
 
             params.make_model(metrics, name, classname);
 
@@ -154,9 +157,10 @@ void build(const graph_generator::parameter &params,
     }
 }
 
-void graph_generator::make_graph(vle::devs::Executive &executive,
-                                 int number,
-                                 const vle::utils::Array<bool> &matrix)
+void
+graph_generator::make_graph(vle::devs::Executive& executive,
+                            int number,
+                            const vle::utils::Array<bool>& matrix)
 {
     if (matrix.size() != utils::numeric_cast<std::size_t>(number * number))
         throw vle::utils::ArgError(_("graph_generator: bad user matrix size"));
@@ -179,12 +183,13 @@ void graph_generator::make_graph(vle::devs::Executive &executive,
     build(m_params, executive, g);
 }
 
-void graph_generator::make_smallworld(vle::devs::Executive &executive,
-                                      std::mt19937 &gen,
-                                      int number,
-                                      int k,
-                                      double probability,
-                                      bool allow_self_loops)
+void
+graph_generator::make_smallworld(vle::devs::Executive& executive,
+                                 std::mt19937& gen,
+                                 int number,
+                                 int k,
+                                 double probability,
+                                 bool allow_self_loops)
 {
     if (number <= 0)
         throw vle::utils::ArgError(_("graph_generator: bad model number"));
@@ -199,12 +204,13 @@ void graph_generator::make_smallworld(vle::devs::Executive &executive,
     build(m_params, executive, g);
 }
 
-void graph_generator::make_scalefree(vle::devs::Executive &executive,
-                                     std::mt19937 &gen,
-                                     int number,
-                                     double alpha,
-                                     double beta,
-                                     bool allow_self_loops)
+void
+graph_generator::make_scalefree(vle::devs::Executive& executive,
+                                std::mt19937& gen,
+                                int number,
+                                double alpha,
+                                double beta,
+                                bool allow_self_loops)
 {
     if (number <= 0)
         throw vle::utils::ArgError(_("graph_generator: bad model number"));
@@ -219,11 +225,12 @@ void graph_generator::make_scalefree(vle::devs::Executive &executive,
     build(m_params, executive, g);
 }
 
-void graph_generator::make_sorted_erdos_renyi(vle::devs::Executive &executive,
-                                              std::mt19937 &gen,
-                                              int number,
-                                              double probability,
-                                              bool allow_self_loops)
+void
+graph_generator::make_sorted_erdos_renyi(vle::devs::Executive& executive,
+                                         std::mt19937& gen,
+                                         int number,
+                                         double probability,
+                                         bool allow_self_loops)
 {
     if (number <= 0)
         throw vle::utils::ArgError(_("graph_generator: bad model number"));
@@ -238,30 +245,12 @@ void graph_generator::make_sorted_erdos_renyi(vle::devs::Executive &executive,
     build(m_params, executive, g);
 }
 
-void graph_generator::make_erdos_renyi(vle::devs::Executive &executive,
-                                       std::mt19937 &gen,
-                                       int number,
-                                       double fraction,
-                                       bool allow_self_loops)
-{
-    if (number <= 0)
-        throw vle::utils::ArgError(_("graph_generator: bad model number"));
-
-    using graphgenT = boost::erdos_renyi_iterator<std::mt19937, graphT>;
-
-    graphT g(graphgenT(gen, number, fraction, allow_self_loops),
-             graphgenT(),
-             number);
-
-    m_metrics = init_metrics(g);
-    build(m_params, executive, g);
-}
-
-void graph_generator::make_erdos_renyi(vle::devs::Executive &executive,
-                                       std::mt19937 &gen,
-                                       int number,
-                                       int edges_number,
-                                       bool allow_self_loops)
+void
+graph_generator::make_erdos_renyi(vle::devs::Executive& executive,
+                                  std::mt19937& gen,
+                                  int number,
+                                  double fraction,
+                                  bool allow_self_loops)
 {
     if (number <= 0)
         throw vle::utils::ArgError(_("graph_generator: bad model number"));
@@ -269,12 +258,31 @@ void graph_generator::make_erdos_renyi(vle::devs::Executive &executive,
     using graphgenT = boost::erdos_renyi_iterator<std::mt19937, graphT>;
 
     graphT g(
-        graphgenT(gen,
-                  number,
-                  utils::numeric_cast<graphT::edges_size_type>(edges_number),
-                  allow_self_loops),
-        graphgenT(),
-        number);
+      graphgenT(gen, number, fraction, allow_self_loops), graphgenT(), number);
+
+    m_metrics = init_metrics(g);
+    build(m_params, executive, g);
+}
+
+void
+graph_generator::make_erdos_renyi(vle::devs::Executive& executive,
+                                  std::mt19937& gen,
+                                  int number,
+                                  int edges_number,
+                                  bool allow_self_loops)
+{
+    if (number <= 0)
+        throw vle::utils::ArgError(_("graph_generator: bad model number"));
+
+    using graphgenT = boost::erdos_renyi_iterator<std::mt19937, graphT>;
+
+    graphT g(
+      graphgenT(gen,
+                number,
+                utils::numeric_cast<graphT::edges_size_type>(edges_number),
+                allow_self_loops),
+      graphgenT(),
+      number);
 
     m_metrics = init_metrics(g);
     build(m_params, executive, g);

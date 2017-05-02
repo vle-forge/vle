@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -28,19 +28,17 @@
 #define VLE_DEVS_SIMULATOR_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/devs/Time.hpp>
+#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/Scheduler.hpp>
-#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/Time.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 
-namespace vle
-{
-namespace devs
-{
+namespace vle {
+namespace devs {
 
 class Dynamics;
 
@@ -52,7 +50,7 @@ class Dynamics;
 class VLE_LOCAL Simulator
 {
 public:
-    typedef std::pair<Simulator *, std::string> TargetSimulator;
+    typedef std::pair<Simulator*, std::string> TargetSimulator;
     typedef std::multimap<std::string, TargetSimulator> TargetSimulatorList;
     typedef TargetSimulatorList::const_iterator const_iterator;
     typedef TargetSimulatorList::iterator iterator;
@@ -65,7 +63,7 @@ public:
      * @param a The atomic model.
      * @throw utils::InternalError if the atomic model does not exist.
      */
-    Simulator(vpz::AtomicModel *a);
+    Simulator(vpz::AtomicModel* a);
 
     /**
      * @brief Delete the attached devs::Dynamics user's model.
@@ -84,13 +82,13 @@ public:
      * @return the name of the vpz::AtomicModel.
      * @throw utils::InternalEvent if the model is destroyed.
      */
-    const std::string &getName() const;
+    const std::string& getName() const;
 
     /**
      * @brief Get the atomic model attached to the Simulator.
      * @return A reference.
      */
-    vpz::AtomicModel *getStructure() const
+    vpz::AtomicModel* getStructure() const
     {
         return m_atomicModel;
     }
@@ -99,7 +97,7 @@ public:
      * @brief Return a constant reference to the devs::Dynamics.
      * @return
      */
-    const std::unique_ptr<Dynamics> &dynamics() const
+    const std::unique_ptr<Dynamics>& dynamics() const
     {
         return m_dynamics;
     }
@@ -112,7 +110,7 @@ public:
      *
      * \param port The output port used to build simulators' target list.
      */
-    void updateSimulatorTargets(const std::string &port);
+    void updateSimulatorTargets(const std::string& port);
 
     /**
      * Get begin and end iterators to find Simulator connected to the
@@ -122,19 +120,19 @@ public:
      *
      * \return Two iterators.
      */
-    std::pair<iterator, iterator> targets(const std::string &port);
+    std::pair<iterator, iterator> targets(const std::string& port);
 
     /**
      * @brief Add an empty target port.
      * @param port Name of the port.
      */
-    void removeTargetPort(const std::string &port);
+    void removeTargetPort(const std::string& port);
 
     /**
      * @brief Remove a target port.
      * @param port Name of the port to remove.
      */
-    void addTargetPort(const std::string &port);
+    void addTargetPort(const std::string& port);
 
     /*-*-*-*-*-*-*-*-*-*/
 
@@ -145,10 +143,10 @@ public:
     Time internalTransition(Time time);
     Time externalTransition(Time time);
     Time confluentTransitions(Time time);
-    std::unique_ptr<value::Value>
-    observation(const ObservationEvent &event) const;
+    std::unique_ptr<value::Value> observation(
+      const ObservationEvent& event) const;
 
-    inline const ExternalEventList &result() const noexcept
+    inline const ExternalEventList& result() const noexcept
     {
         return m_result;
     }
@@ -191,7 +189,7 @@ public:
     }
 
     inline void addExternalEvents(std::shared_ptr<value::Value> values,
-                                  const std::string &portname)
+                                  const std::string& portname)
     {
         m_external_events.emplace_back(values, portname);
     }
@@ -211,14 +209,14 @@ public:
         m_have_internal = false;
     }
 
-    inline std::vector<Observation> &getObservations() noexcept
+    inline std::vector<Observation>& getObservations() noexcept
     {
         return m_observations;
     }
 
 private:
     std::unique_ptr<Dynamics> m_dynamics;
-    vpz::AtomicModel *m_atomicModel;
+    vpz::AtomicModel* m_atomicModel;
     TargetSimulatorList mTargets;
     ExternalEventList m_external_events;
     ExternalEventList m_result;

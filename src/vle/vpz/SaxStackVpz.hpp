@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -44,14 +44,15 @@ class Class;
 /**
  * @brief The SaxStackVpz is used to construct the vpz::Base hierarchy.
  */
-class VLE_LOCAL SaxStackVpz {
+class VLE_LOCAL SaxStackVpz
+{
 public:
     /**
      * @brief Build a new SaxStackVpz which fill the vpz::Vpz parameter.
      * @param vpz The vpz::Vpz to fill.
      */
-    SaxStackVpz(Vpz &vpz)
-        : m_vpz(vpz)
+    SaxStackVpz(Vpz& vpz)
+      : m_vpz(vpz)
     {
     }
 
@@ -77,7 +78,7 @@ public:
      * @return A reference to the vpz::Vpz.
      * @throw utils::SaxParserError if stack is not empty.
      */
-    vpz::Vpz *pushVpz(const xmlChar **name);
+    vpz::Vpz* pushVpz(const xmlChar** name);
 
     /**
      * @brief Push the structure into the stack.
@@ -91,7 +92,7 @@ public:
      * @throw utils::SaxParserError if stack is empty and parent it not
      * Structures, Submodels or Class.
      */
-    void pushModel(const xmlChar **att);
+    void pushModel(const xmlChar** att);
 
     /**
      * @brief Push Port (condition or observation) into the stack.
@@ -99,7 +100,7 @@ public:
      * @throw utils::SaxParserError if stack is empty and parent it not
      * Conditions, Observables or Connection (In or Out).
      */
-    void pushPort(const xmlChar **att);
+    void pushPort(const xmlChar** att);
 
     /**
      * @brief Push the type of port.
@@ -107,7 +108,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not a
      * model.
      */
-    void pushPortType(const char *name);
+    void pushPortType(const char* name);
 
     /**
      * @brief Push a Submodels into the stack.
@@ -130,7 +131,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Connections.
      */
-    void pushConnection(const xmlChar **att);
+    void pushConnection(const xmlChar** att);
 
     /**
      * @brief Push an Origin of Connection into the stack.
@@ -138,7 +139,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * InternalConnection, InputConnection or OutputConnection.
      */
-    void pushOrigin(const xmlChar **att);
+    void pushOrigin(const xmlChar** att);
 
     /**
      * @brief Push an Destination of Connection into the stack.
@@ -146,7 +147,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * InternalConnection, InputConnection or OutputConnection.
      */
-    void pushDestination(const xmlChar **att);
+    void pushDestination(const xmlChar** att);
 
     /**
      * @brief Push a Dynamics into the stack.
@@ -160,14 +161,14 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not a
      * Dynamics.
      */
-    void pushDynamic(const xmlChar **att);
+    void pushDynamic(const xmlChar** att);
 
     /**
      * @brief Push an Experiment into the stack.
      * @param att The attribute list.
      * @throw utils::SaxParserError if stack is empty or parent is not Vpz.
      */
-    void pushExperiment(const xmlChar **att);
+    void pushExperiment(const xmlChar** att);
 
     /**
      * @brief Push a Conditions into th stack.
@@ -182,7 +183,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Conditions.
      */
-    void pushCondition(const xmlChar **att);
+    void pushCondition(const xmlChar** att);
 
     /**
      * @brief Push a ConditionPort into a Condition.
@@ -190,7 +191,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Condition.
      */
-    void pushConditionPort(const xmlChar **att);
+    void pushConditionPort(const xmlChar** att);
 
     /**
      * @brief Push a Views into th stack.
@@ -212,7 +213,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Outputs.
      */
-    void pushOutput(const xmlChar **att);
+    void pushOutput(const xmlChar** att);
 
     /**
      * @brief Push an View into th stack.
@@ -220,7 +221,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Views.
      */
-    void pushView(const xmlChar **att);
+    void pushView(const xmlChar** att);
 
     /**
      * @brief Push an attachedview into th stack.
@@ -228,7 +229,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * ObservablePort.
      */
-    void pushAttachedView(const xmlChar **att);
+    void pushAttachedView(const xmlChar** att);
 
     /**
      * @brief Push an Observables into th stack.
@@ -243,7 +244,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Observables.
      */
-    void pushObservable(const xmlChar **att);
+    void pushObservable(const xmlChar** att);
 
     /**
      * @brief Push an ObservablePort into th stack.
@@ -251,7 +252,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Observable.
      */
-    void pushObservablePort(const xmlChar **att);
+    void pushObservablePort(const xmlChar** att);
 
     /**
      * @brief Push a View to an ObservablePort.
@@ -259,7 +260,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * ObservablePort.
      */
-    void pushObservablePortOnView(const xmlChar **att);
+    void pushObservablePortOnView(const xmlChar** att);
 
     /**
      * @brief Push a Classes into the stack.
@@ -274,7 +275,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Classes.
      */
-    void pushClass(const xmlChar **att);
+    void pushClass(const xmlChar** att);
 
     /**
      * @brief Pop the Classes
@@ -294,7 +295,7 @@ public:
      * @brief Pop the ConditionPort.
      * @return The value::Set read.
      */
-    std::vector<std::shared_ptr<value::Value>> &popConditionPort();
+    std::vector<std::shared_ptr<value::Value>>& popConditionPort();
 
     /**
      * @brief Pop the Output.
@@ -307,7 +308,7 @@ public:
      * @throw utils::SaxParserError if stack is empty.
      * @return A pointer to the vpz::Base class.
      */
-    vpz::Base *pop();
+    vpz::Base* pop();
 
     /**
      * @brief Build the connection into the graph::Model from the three
@@ -323,20 +324,23 @@ public:
      * @return A constant pointer to the stack.
      * @throw utils::SaxParserError if stack is empty.
      */
-    const vpz::Base *top() const;
+    const vpz::Base* top() const;
 
     /**
      * @brief Get the top of the stack.
      * @return A pointer to the stack.
      * @throw utils::SaxParserError if stack is empty.
      */
-    vpz::Base *top();
+    vpz::Base* top();
 
     /**
      * @brief Get a reference to the Vpz.
      * @return A reference to the Vpz.
      */
-    inline vpz::Vpz &vpz() { return m_vpz; }
+    inline vpz::Vpz& vpz()
+    {
+        return m_vpz;
+    }
 
     /**
      * @brief Output stream operator.
@@ -344,28 +348,52 @@ public:
      * @param stack The stack to show.
      * @return The output stream.
      */
-    friend std::ostream &operator<<(std::ostream &out,
-                                    const SaxStackVpz &stack);
+    friend std::ostream& operator<<(std::ostream& out,
+                                    const SaxStackVpz& stack);
 
 private:
-    inline void push(vpz::Base *base) { m_stack.push_front(base); }
+    inline void push(vpz::Base* base)
+    {
+        m_stack.push_front(base);
+    }
 
-    inline bool haveParent() { return not m_stack.empty(); }
+    inline bool haveParent()
+    {
+        return not m_stack.empty();
+    }
 
-    inline bool haveGrandParent() { return m_stack.size() > 1; }
+    inline bool haveGrandParent()
+    {
+        return m_stack.size() > 1;
+    }
 
-    inline vpz::Base *parent() { return m_stack.front(); }
+    inline vpz::Base* parent()
+    {
+        return m_stack.front();
+    }
 
-    inline vpz::Base *grandparent() { return *m_stack.begin()++; }
+    inline vpz::Base* grandparent()
+    {
+        return *m_stack.begin()++;
+    }
 
-    inline const vpz::Base *parent() const { return m_stack.front(); }
+    inline const vpz::Base* parent() const
+    {
+        return m_stack.front();
+    }
 
-    inline const vpz::Base *grandparent() const { return *m_stack.begin()++; }
+    inline const vpz::Base* grandparent() const
+    {
+        return *m_stack.begin()++;
+    }
 
-    inline bool empty() const { return m_stack.empty(); }
+    inline bool empty() const
+    {
+        return m_stack.empty();
+    }
 
-    std::list<vpz::Base *> m_stack;
-    vpz::Vpz &m_vpz;
+    std::list<vpz::Base*> m_stack;
+    vpz::Vpz& m_vpz;
 
     /**
      * @brief Assign the to graph::Model mdl the graphics information from
@@ -377,11 +405,11 @@ private:
      * @param width
      * @param height
      */
-    void buildModelGraphics(vpz::BaseModel *mdl,
-                            const std::string &x,
-                            const std::string &y,
-                            const std::string &width,
-                            const std::string &height);
+    void buildModelGraphics(vpz::BaseModel* mdl,
+                            const std::string& x,
+                            const std::string& y,
+                            const std::string& width,
+                            const std::string& height);
 
     /**
      * @brief Get the latest vpz::Class pushed in the list from the top of
@@ -389,7 +417,7 @@ private:
      * @return A reference to the class founded or 0 if no class in the
      * stack.
      */
-    vpz::Class *getLastClass() const;
+    vpz::Class* getLastClass() const;
 
 private:
     void checkParentIsVpz() const;

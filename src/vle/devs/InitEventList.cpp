@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -42,66 +42,67 @@
 namespace {
 
 inline vle::devs::InitEventList::container_type::iterator
-pp_get(vle::devs::InitEventList::container_type &m, const std::string &name)
+pp_get(vle::devs::InitEventList::container_type& m, const std::string& name)
 {
     auto it = m.find(name);
 
     if (it == m.end())
         throw vle::utils::ArgError(
-            (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
+          (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
 
     return it;
 }
 
 inline vle::devs::InitEventList::container_type::const_iterator
-pp_get(const vle::devs::InitEventList::container_type &m,
-       const std::string &name)
+pp_get(const vle::devs::InitEventList::container_type& m,
+       const std::string& name)
 {
     auto it = m.find(name);
 
     if (it == m.end())
         throw vle::utils::ArgError(
-            (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
+          (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
 
     return it;
 }
 
-inline const vle::value::Value &
-pp_get_value(vle::devs::InitEventList::container_type &m,
-             const std::string &name)
+inline const vle::value::Value&
+pp_get_value(vle::devs::InitEventList::container_type& m,
+             const std::string& name)
 {
     auto it = pp_get(m, name);
 
     if (not it->second)
         throw vle::utils::ArgError(
-            (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
-                .str());
+          (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
+            .str());
 
     return *it->second.get();
 }
 
-inline const vle::value::Value &
-pp_get_value(const vle::devs::InitEventList::container_type &m,
-             const std::string &name)
+inline const vle::value::Value&
+pp_get_value(const vle::devs::InitEventList::container_type& m,
+             const std::string& name)
 {
     auto it = pp_get(m, name);
 
     if (not it->second)
         throw vle::utils::ArgError(
-            (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
-                .str());
+          (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
+            .str());
 
     return *it->second.get();
 }
 
 template <typename T, typename... Args>
-T &pp_add(vle::devs::InitEventList::container_type &m,
-          const std::string &name,
-          Args &&... args)
+T&
+pp_add(vle::devs::InitEventList::container_type& m,
+       const std::string& name,
+       Args&&... args)
 {
     auto value = std::shared_ptr<const vle::value::Value>(
-        new T(std::forward<Args>(args)...));
-    auto *ret = static_cast<T *>(value.get());
+      new T(std::forward<Args>(args)...));
+    auto* ret = static_cast<T*>(value.get());
 
     std::swap(m[name], value);
 
@@ -112,70 +113,81 @@ T &pp_add(vle::devs::InitEventList::container_type &m,
 namespace vle {
 namespace devs {
 
-void InitEventList::add(const std::string &name,
-                        std::shared_ptr<const value::Value> value)
+void
+InitEventList::add(const std::string& name,
+                   std::shared_ptr<const value::Value> value)
 {
     std::swap(m_value[name], value);
 }
 
-const std::shared_ptr<const value::Value> &InitEventList::
-operator[](const std::string &name) const
+const std::shared_ptr<const value::Value>& InitEventList::operator[](
+  const std::string& name) const
 {
     return ::pp_get(m_value, name)->second;
 }
 
-const std::shared_ptr<const value::Value> &
-InitEventList::get(const std::string &name) const
+const std::shared_ptr<const value::Value>&
+InitEventList::get(const std::string& name) const
 {
     return ::pp_get(m_value, name)->second;
 }
 
-const value::Map &InitEventList::getMap(const std::string &name) const
+const value::Map&
+InitEventList::getMap(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toMap();
 }
 
-const value::Set &InitEventList::getSet(const std::string &name) const
+const value::Set&
+InitEventList::getSet(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toSet();
 }
 
-const value::Matrix &InitEventList::getMatrix(const std::string &name) const
+const value::Matrix&
+InitEventList::getMatrix(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toMatrix();
 }
 
-const std::string &InitEventList::getString(const std::string &name) const
+const std::string&
+InitEventList::getString(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toString().value();
 }
 
-bool InitEventList::getBoolean(const std::string &name) const
+bool
+InitEventList::getBoolean(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toBoolean().value();
 }
 
-int32_t InitEventList::getInt(const std::string &name) const
+int32_t
+InitEventList::getInt(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toInteger().value();
 }
 
-double InitEventList::getDouble(const std::string &name) const
+double
+InitEventList::getDouble(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toDouble().value();
 }
 
-const std::string &InitEventList::getXml(const std::string &name) const
+const std::string&
+InitEventList::getXml(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toXml().value();
 }
 
-const value::Table &InitEventList::getTable(const std::string &name) const
+const value::Table&
+InitEventList::getTable(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toTable();
 }
 
-const value::Tuple &InitEventList::getTuple(const std::string &name) const
+const value::Tuple&
+InitEventList::getTuple(const std::string& name) const
 {
     return ::pp_get_value(m_value, name).toTuple();
 }

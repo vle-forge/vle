@@ -22,27 +22,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtGui>
 #include <QGraphicsSceneMouseEvent>
+#include <QtGui>
 
-#include <QScrollBar>
+#include "filevpzclasses.h"
+#include "ui_filevpzclasses.h"
 #include <QComboBox>
 #include <QMenu>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QtDebug>
-#include "filevpzclasses.h"
-#include "ui_filevpzclasses.h"
-
 
 namespace vle {
 namespace gvle {
 
-
-
-FileVpzClasses::FileVpzClasses(Logger* log, 
-    const vle::utils::ContextPtr& ctx, QWidget *parent) :
-    QWidget(parent), mScene(log, ctx), ui(new Ui::FileVpzClasses), mVpz(0),
-    mSelClass("<None>")
+FileVpzClasses::FileVpzClasses(Logger* log,
+                               const vle::utils::ContextPtr& ctx,
+                               QWidget* parent)
+  : QWidget(parent)
+  , mScene(log, ctx)
+  , ui(new Ui::FileVpzClasses)
+  , mVpz(0)
+  , mSelClass("<None>")
 {
 
     this->setAcceptDrops(true);
@@ -53,29 +54,27 @@ FileVpzClasses::FileVpzClasses(Logger* log,
     ui->classesList->setEnabled(false);
 
     QObject::connect(ui->classesList,
-            SIGNAL(currentIndexChanged(const QString &)),
-            this, SLOT(onCurrentIndexChanged(const QString &)));
+                     SIGNAL(currentIndexChanged(const QString&)),
+                     this,
+                     SLOT(onCurrentIndexChanged(const QString&)));
     QObject::connect(ui->classesList,
-            SIGNAL(editTextChanged(const QString &)),
-            this, SLOT(onTextChanged(const QString &)));
-    QObject::connect(ui->pushCopy,
-                SIGNAL(clicked(bool)),
-                this, SLOT(onPushCopy(bool)));
-    QObject::connect(ui->pushDelete,
-                SIGNAL(clicked(bool)),
-                this, SLOT(onPushDelete(bool)));
-//    QObject::connect(ui->pushNew,
-//                SIGNAL(clicked(bool)),
-//                this, SLOT(onPushNew(bool)));
+                     SIGNAL(editTextChanged(const QString&)),
+                     this,
+                     SLOT(onTextChanged(const QString&)));
+    QObject::connect(
+      ui->pushCopy, SIGNAL(clicked(bool)), this, SLOT(onPushCopy(bool)));
+    QObject::connect(
+      ui->pushDelete, SIGNAL(clicked(bool)), this, SLOT(onPushDelete(bool)));
+    //    QObject::connect(ui->pushNew,
+    //                SIGNAL(clicked(bool)),
+    //                this, SLOT(onPushNew(bool)));
 
     QAction* act = mMenuButton.addAction("atomic");
-    QObject::connect(act,
-                    SIGNAL(triggered(bool)),
-                    this, SLOT(onNewAtomicTriggered(bool)));
+    QObject::connect(
+      act, SIGNAL(triggered(bool)), this, SLOT(onNewAtomicTriggered(bool)));
     act = mMenuButton.addAction("coupled");
-    QObject::connect(act,
-                    SIGNAL(triggered(bool)),
-                    this, SLOT(onNewCoupledTriggered(bool)));
+    QObject::connect(
+      act, SIGNAL(triggered(bool)), this, SLOT(onNewCoupledTriggered(bool)));
     ui->pushNew->setMenu(&mMenuButton);
 }
 
@@ -95,7 +94,7 @@ void
 FileVpzClasses::reload()
 {
 
-    //reload classes list
+    // reload classes list
     bool oldBlock = ui->classesList->blockSignals(true);
     ui->classesList->setEnabled(true);
     ui->classesList->setEditable(true);
@@ -114,12 +113,15 @@ FileVpzClasses::reload()
 }
 
 void
-FileVpzClasses::onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
-        QDomNode oldValVpm, QDomNode newValVpm)
+FileVpzClasses::onUndoRedoVpz(QDomNode oldValVpz,
+                              QDomNode newValVpz,
+                              QDomNode oldValVpm,
+                              QDomNode newValVpm)
 {
     if (oldValVpz.nodeName() == "classes") {
-        //the action is the creation of a class, nothing to do do for the scene
-        //except clearing the scene
+        // the action is the creation of a class, nothing to do do for the
+        // scene
+        // except clearing the scene
         reload();
     } else {
         mScene.onUndoRedoVpz(oldValVpz, newValVpz, oldValVpm, newValVpm);
@@ -131,7 +133,7 @@ FileVpzClasses::onNewAtomicTriggered(bool /*checked*/)
 {
     QString name = mVpz->addClassToDoc(true);
     ui->classesList->addItem(name);
-    ui->classesList->setCurrentIndex(ui->classesList->count()-1);
+    ui->classesList->setCurrentIndex(ui->classesList->count() - 1);
 }
 
 void
@@ -139,20 +141,20 @@ FileVpzClasses::onNewCoupledTriggered(bool /*checked*/)
 {
     QString name = mVpz->addClassToDoc(false);
     ui->classesList->addItem(name);
-    ui->classesList->setCurrentIndex(ui->classesList->count()-1);
+    ui->classesList->setCurrentIndex(ui->classesList->count() - 1);
 }
 
 void
 FileVpzClasses::onTextChanged(const QString& text)
 {
-    if (mSelClass != text and mSelClass != "<None>" and text != "<None>"
-            and not mVpz->existClassFromDoc(text) and text != "") {
+    if (mSelClass != text and mSelClass != "<None>" and text != "<None>" and
+        not mVpz->existClassFromDoc(text) and text != "") {
         mVpz->renameClassToDoc(mSelClass, text);
         int it = ui->classesList->currentIndex();
         ui->classesList->setItemText(it, text);
         mSelClass = text;
         mScene.init(mVpz, mSelClass);
-        //reload();
+        // reload();
     }
 }
 
@@ -162,7 +164,7 @@ FileVpzClasses::onPushCopy(bool /*checked*/)
     if (mSelClass != "<None>") {
         QString name = mVpz->copyClassToDoc(mSelClass);
         ui->classesList->addItem(name);
-        ui->classesList->setCurrentIndex(ui->classesList->count()-1);
+        ui->classesList->setCurrentIndex(ui->classesList->count() - 1);
     }
 }
 void
@@ -176,16 +178,16 @@ FileVpzClasses::onPushDelete(bool /*checked*/)
 }
 
 void
-FileVpzClasses::onCurrentIndexChanged(const QString & /*text*/)
+FileVpzClasses::onCurrentIndexChanged(const QString& /*text*/)
 {
     if (mVpz) {
         mSelClass = ui->classesList->currentText();
         mScene.init(mVpz, mSelClass);
-        ui->graphicsView->setSceneRect(QRect(0,0,0,0));
+        ui->graphicsView->setSceneRect(QRect(0, 0, 0, 0));
         ui->graphicsView->setScene(&mScene);
         mScene.update();
         if (mSelClass != "<None>") {
-            //vpz get first model of class
+            // vpz get first model of class
             ui->pushCopy->setEnabled(true);
             ui->pushDelete->setEnabled(true);
         } else {
@@ -196,25 +198,24 @@ FileVpzClasses::onCurrentIndexChanged(const QString & /*text*/)
 }
 
 void
-FileVpzClasses::onChanged(const QList<QRectF> & /*region*/)
+FileVpzClasses::onChanged(const QList<QRectF>& /*region*/)
 {
-    //qDebug() << " FileVpzClasses::onChanged " << region << "\n";
+    // qDebug() << " FileVpzClasses::onChanged " << region << "\n";
 }
 void
 FileVpzClasses::onSceneRectChanged(const QRectF& /*rect*/)
 {
-    //qDebug() << " FileVpzClasses::onSceneRectChanged " << rect << "\n";
+    // qDebug() << " FileVpzClasses::onSceneRectChanged " << rect << "\n";
 }
 void
 FileVpzClasses::onSelectionChanged()
 {
-    //qDebug() << " FileVpzClasses::onSelectionChanged " << "\n";
+    // qDebug() << " FileVpzClasses::onSelectionChanged " << "\n";
 }
-
 
 void
 FileVpzClasses::onMenu(const QPoint& /*pt*/)
 {
 }
-
-}}//namespaces
+}
+} // namespaces

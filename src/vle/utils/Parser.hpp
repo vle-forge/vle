@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,37 +24,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_PARSER_HPP
 #define VLE_UTILS_PARSER_HPP 1
 
+#include <istream>
+#include <map>
+#include <string>
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
-#include <istream>
-#include <string>
-#include <map>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 struct VLE_API Block
 {
-    typedef std::multimap < std::string, std::string > Strings;
-    typedef std::multimap < std::string, double > Reals;
-    typedef std::multimap < std::string, double > RelativeReals;
-    typedef std::multimap < std::string, Block > Blocks;
+    typedef std::multimap<std::string, std::string> Strings;
+    typedef std::multimap<std::string, double> Reals;
+    typedef std::multimap<std::string, double> RelativeReals;
+    typedef std::multimap<std::string, Block> Blocks;
 
-    typedef std::pair < Reals::const_iterator,
-            Reals::const_iterator > RealsResult;
-    typedef std::pair < RelativeReals::const_iterator,
-            RelativeReals::const_iterator > RelativeRealsResult;
-    typedef std::pair < Strings::const_iterator,
-            Strings::const_iterator > StringsResult;
-    typedef std::pair < Blocks::const_iterator,
-            Blocks::const_iterator > BlocksResult;
+    typedef std::pair<Reals::const_iterator, Reals::const_iterator>
+      RealsResult;
+    typedef std::pair<RelativeReals::const_iterator,
+                      RelativeReals::const_iterator>
+      RelativeRealsResult;
+    typedef std::pair<Strings::const_iterator, Strings::const_iterator>
+      StringsResult;
+    typedef std::pair<Blocks::const_iterator, Blocks::const_iterator>
+      BlocksResult;
 
     Block(const std::string& name)
-        : name(name)
-    {}
+      : name(name)
+    {
+    }
 
     void addString(const std::string& key, const std::string& str);
 
@@ -106,7 +108,10 @@ public:
      *
      * @return A constant reference to the root.
      */
-    inline const Block& root() const { return mRoot; }
+    inline const Block& root() const
+    {
+        return mRoot;
+    }
 
 private:
     inline char get()
@@ -146,7 +151,8 @@ private:
         mOldLine = mLine++;
     }
 
-    enum Token {
+    enum Token
+    {
         QuoteStr,
         Str,
         Begin,
@@ -173,12 +179,30 @@ private:
     std::string readQuotedString();
 
     void readChar(char r);
-    void readBegin() { readChar('{'); }
-    void readEnd() { readChar('}'); }
-    void readComma() { readChar(','); }
-    void readQuote() { readChar('"'); }
-    void readEqual() { readChar('='); }
-    void readSemicolon() { readChar(';'); }
+    void readBegin()
+    {
+        readChar('{');
+    }
+    void readEnd()
+    {
+        readChar('}');
+    }
+    void readComma()
+    {
+        readChar(',');
+    }
+    void readQuote()
+    {
+        readChar('"');
+    }
+    void readEqual()
+    {
+        readChar('=');
+    }
+    void readSemicolon()
+    {
+        readChar(';');
+    }
 
     Token nextToken();
 
@@ -186,15 +210,15 @@ private:
     // attributes
     //
 
-    Block mRoot; ///< the main data.
+    Block mRoot;           ///< the main data.
     std::istream& mStream; ///< the input stream
-    long mLine; ///< number of line readed
-    long mOldLine; ///< previous number of line readed (when use unget)
-    long mColumn; ///< number of character readed
-    long mOldColumn; ///< previous number of column read (when use unged)
-    char mLast; ///< latest character readed from the stream
+    long mLine;            ///< number of line readed
+    long mOldLine;         ///< previous number of line readed (when use unget)
+    long mColumn;          ///< number of character readed
+    long mOldColumn;       ///< previous number of column read (when use unged)
+    char mLast;            ///< latest character readed from the stream
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

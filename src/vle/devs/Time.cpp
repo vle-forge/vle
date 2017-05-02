@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,15 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/devs/Time.hpp>
-#include <sstream>
 #include <iomanip>
 #include <limits>
+#include <sstream>
+#include <vle/devs/Time.hpp>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
-std::string convertTimeToString(Time time)
+std::string
+convertTimeToString(Time time)
 {
     if (isPositiveInfinity(time))
         return std::string("+infinity");
@@ -45,12 +46,10 @@ std::string convertTimeToString(Time time)
 
     std::ostringstream out;
 
-    out << std::showpoint
-        << std::fixed
-        << std::setprecision(std::numeric_limits < double >::digits10)
-        << time;
+    out << std::showpoint << std::fixed
+        << std::setprecision(std::numeric_limits<double>::digits10) << time;
 
     return out.str();
 }
-
-}} // namespace vle devs
+}
+} // namespace vle devs

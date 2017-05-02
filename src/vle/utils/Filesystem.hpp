@@ -5,8 +5,8 @@
     BSD-style license that can be found in the LICENSE file.
 
     Filesystem.hpp -- A modified path.h with little changes
-    Copyright (c) 2016 INRA
-    gauthier.quesnel@toulouse.inra.fr
+    Copyright (c) 2016-2017 INRA
+    gauthier.quesnel@inra.fr
     - Remove make_absolute() functionality useless for VLE.
     - Add temp_directory_path() and unique_path() for tempory path.
     - Add DirectoryEntry and DirectoryIterator to pass trough repertory.
@@ -15,12 +15,13 @@
 #ifndef VLE_UTILS_FILESYSTEM_HPP
 #define VLE_UTILS_FILESYSTEM_HPP
 
-#include <vle/DllDefines.hpp>
 #include <memory>
 #include <string>
 #include <vector>
+#include <vle/DllDefines.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 class VLE_API Path
 {
@@ -32,18 +33,49 @@ public:
     using reverse_iterator = container_type::reverse_iterator;
     using const_reverse_iterator = container_type::const_reverse_iterator;
 
-    inline iterator begin() noexcept { return m_path.begin(); }
-    inline const_iterator begin() const noexcept { return m_path.cbegin(); }
-    inline const_iterator cbegin() const noexcept { return m_path.cbegin(); }
-    inline reverse_iterator rbegin() noexcept { return m_path.rbegin(); }
-    inline const_reverse_iterator crbegin() const noexcept { return m_path.crbegin(); }
-    inline iterator end() noexcept { return m_path.end(); }
-    inline const_iterator end() const noexcept { return m_path.cend(); }
-    inline const_iterator cend() const noexcept { return m_path.cend(); }
-    inline reverse_iterator rend() noexcept { return m_path.rend(); }
-    inline const_reverse_iterator crend() const noexcept { return m_path.crend(); }
+    inline iterator begin() noexcept
+    {
+        return m_path.begin();
+    }
+    inline const_iterator begin() const noexcept
+    {
+        return m_path.cbegin();
+    }
+    inline const_iterator cbegin() const noexcept
+    {
+        return m_path.cbegin();
+    }
+    inline reverse_iterator rbegin() noexcept
+    {
+        return m_path.rbegin();
+    }
+    inline const_reverse_iterator crbegin() const noexcept
+    {
+        return m_path.crbegin();
+    }
+    inline iterator end() noexcept
+    {
+        return m_path.end();
+    }
+    inline const_iterator end() const noexcept
+    {
+        return m_path.cend();
+    }
+    inline const_iterator cend() const noexcept
+    {
+        return m_path.cend();
+    }
+    inline reverse_iterator rend() noexcept
+    {
+        return m_path.rend();
+    }
+    inline const_reverse_iterator crend() const noexcept
+    {
+        return m_path.crend();
+    }
 
-    enum path_type {
+    enum path_type
+    {
         windows_path = 0,
         posix_path = 1,
 #if defined(_WIN32)
@@ -56,17 +88,17 @@ public:
     Path();
     ~Path() = default;
 
-    Path(const char *string);
-    Path(const std::string &string);
+    Path(const char* string);
+    Path(const std::string& string);
 #if defined(_WIN32)
-    Path(const std::wstring &wstring);
-    Path(const wchar_t *wstring);
-    Path &operator=(const std::wstring& str);
+    Path(const std::wstring& wstring);
+    Path(const wchar_t* wstring);
+    Path& operator=(const std::wstring& str);
 #endif
-    Path(const Path &path);
-    Path(Path &&path);
-    Path &operator=(const Path &path);
-    Path &operator=(Path &&path);
+    Path(const Path& path);
+    Path(Path&& path);
+    Path& operator=(const Path& path);
+    Path& operator=(Path&& path);
 
     size_t length() const;
 
@@ -115,19 +147,19 @@ public:
 
     Path parent_path() const;
 
-    Path operator/(const Path &other) const;
+    Path operator/(const Path& other) const;
 
-    Path& operator/=(const Path &other);
+    Path& operator/=(const Path& other);
 
     std::string string(path_type type = native_path) const;
 
 #if defined(_WIN32)
     std::wstring wstring(path_type type = native_path) const;
 
-    void set(const std::wstring &wstring, path_type type = native_path);
+    void set(const std::wstring& wstring, path_type type = native_path);
 #endif
 
-    void set(const std::string &str, path_type type = native_path);
+    void set(const std::string& str, path_type type = native_path);
 
     bool remove() const;
 
@@ -181,9 +213,9 @@ public:
 
     static bool create_directories(const Path& p);
 
-    friend bool operator==(const Path &p, const Path &q);
-    friend bool operator!=(const Path &p, const Path &q);
-    friend bool operator<(const Path &p, const Path &q);
+    friend bool operator==(const Path& p, const Path& q);
+    friend bool operator!=(const Path& p, const Path& q);
+    friend bool operator<(const Path& p, const Path& q);
 
 private:
     std::vector<std::string> m_path;
@@ -201,7 +233,7 @@ class FScurrent_path_restore
 
 public:
     FScurrent_path_restore(const Path& p)
-        : old(Path::current_path())
+      : old(Path::current_path())
     {
         if (not Path::current_path(p))
             old.clear();
@@ -247,14 +279,13 @@ public:
     Path operator*() const;
     DirectoryEntry* operator->() const;
 
-    friend void swap(DirectoryIterator& lhs,
-                     DirectoryIterator& rhs);
+    friend void swap(DirectoryIterator& lhs, DirectoryIterator& rhs);
     friend bool operator==(const DirectoryIterator& lhs,
                            const DirectoryIterator& rhs);
     friend bool operator!=(const DirectoryIterator& lhs,
                            const DirectoryIterator& rhs);
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif
