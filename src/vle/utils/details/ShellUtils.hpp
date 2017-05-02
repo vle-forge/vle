@@ -372,7 +372,10 @@ public:
         if (current_token_exist) {
             retval.push_back(current_token);
             current_token = "";
-            current_token_exist = false;
+            //
+            // current_token_exist is never read after.
+            //
+            // current_token_exist = false;
         }
 
         if (current_quote) {
