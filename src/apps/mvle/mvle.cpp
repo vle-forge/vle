@@ -100,6 +100,7 @@ mvle_mpi_error(int error)
     buffer[len] = '\0';
 
     fprintf(stderr, "%s", buffer);
+    delete[] buffer;
 }
 
 bool
