@@ -47,7 +47,7 @@ Class::Class(const Class& cls)
         m_graph = std::unique_ptr<BaseModel>(cls.m_graph->clone());
         m_node = m_graph.get();
     } else if (cls.m_node)
-        m_node = m_node->clone();
+        m_node = cls.m_node->clone();
 }
 
 Class::~Class() = default;
