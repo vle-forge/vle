@@ -5,7 +5,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
@@ -25,29 +25,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "FileType.hpp"
 
-namespace vle { namespace oov { namespace plugin {
+namespace vle {
+namespace oov {
+namespace plugin {
 
 CSV::~CSV()
 {
 }
 
-std::string CSV::extension() const
+std::string
+CSV::extension() const
 {
     return ".csv";
 }
 
-void CSV::writeSeparator(std::ostream& out)
+void
+CSV::writeSeparator(std::ostream& out)
 {
     out << ';';
 }
 
-void CSV::writeHead(std::ostream& out, const std::vector < std::string >& heads)
+void
+CSV::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
     if (not heads.empty()) {
-        std::vector < std::string >::const_iterator it = heads.begin();
+        std::vector<std::string>::const_iterator it = heads.begin();
         out << *it;
         it++;
 
@@ -63,22 +67,25 @@ Text::~Text()
 {
 }
 
-std::string Text::extension() const
+std::string
+Text::extension() const
 {
     return ".dat";
 }
 
-void Text::writeSeparator(std::ostream& out)
+void
+Text::writeSeparator(std::ostream& out)
 {
     out << '\t';
 }
 
-void Text::writeHead(std::ostream& out,
-                     const std::vector < std::string >& heads)
+void
+Text::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
     out << '#';
-    for (std::vector < std::string >::const_iterator it = heads.begin();
-         it != heads.end(); ++it) {
+    for (std::vector<std::string>::const_iterator it = heads.begin();
+         it != heads.end();
+         ++it) {
         out << "\"" << *it << "\"\t";
     }
     out << '\n';
@@ -88,24 +95,28 @@ Rdata::~Rdata()
 {
 }
 
-std::string Rdata::extension() const
+std::string
+Rdata::extension() const
 {
     return ".rdata";
 }
 
-void Rdata::writeSeparator(std::ostream& out)
+void
+Rdata::writeSeparator(std::ostream& out)
 {
     out << '\t';
 }
 
-void Rdata::writeHead(std::ostream& out,
-                      const std::vector < std::string >& heads)
+void
+Rdata::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
-    for (std::vector < std::string >::const_iterator it = heads.begin();
-         it != heads.end(); ++it) {
+    for (std::vector<std::string>::const_iterator it = heads.begin();
+         it != heads.end();
+         ++it) {
         out << "\"" << *it << "\"\t";
     }
     out << '\n';
 }
-
-}}} // namespace vle oov plugin
+}
+}
+} // namespace vle oov plugin

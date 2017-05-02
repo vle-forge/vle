@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,30 +24,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/Spawn.hpp>
+#include <algorithm>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <string>
+#include <strsafe.h>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/details/UtilsWin.hpp>
+#include <vle/utils/Spawn.hpp>
 #include <vle/utils/details/ShellUtils.hpp>
+#include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/i18n.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <fstream>
 #include <windows.h>
-#include <strsafe.h>
-#include <iostream>
 
-
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 // Max default size of command line buffer. See the CreateProcess
 // function in msdn.
 const unsigned long int Spawn::default_buffer_size = 32768;
 
-typedef std::vector < std::pair < std::string, std::string > > Envp;
+typedef std::vector<std::pair<std::string, std::string>> Envp;
 
 /**
  * A specific \b Win32 function to build a new environment
@@ -59,12 +59,13 @@ typedef std::vector < std::pair < std::string, std::string > > Envp;
  * @param append either with in places values or in env vars
  *
  */
-static void replaceEnvironmentVariable(Envp& envp,
-        const std::string& variable,
-        const std::string& value,
-        bool append)
+static void
+replaceEnvironmentVariable(Envp& envp,
+                           const std::string& variable,
+                           const std::string& value,
+                           bool append)
 {
-    //check if in envp
+    // check if in envp
     Envp::iterator itb = envp.begin();
     Envp::iterator ite = envp.end();
     Envp::iterator itf = ite;
@@ -74,20 +75,20 @@ static void replaceEnvironmentVariable(Envp& envp,
         }
     }
 
-    if (itf != ite) {//found in envp
+    if (itf != ite) { // found in envp
         Envp::value_type& result = *itf;
         if (append) {
-            result.second = value + ";" +result.second;
+            result.second = value + ";" + result.second;
         } else {
             result.second = value;
         }
-    } else {//not in envp
+    } else { // not in envp
         Envp::value_type result;
         result.first = variable;
         result.second = value;
-        if(append) {
+        if (append) {
             char* env = std::getenv(variable.c_str());
-            if(env != NULL) {
+            if (env != NULL) {
                 std::string old(env, std::strlen(env));
                 result.second += ";";
                 result.second += old;
@@ -108,28 +109,33 @@ static void replaceEnvironmentVariable(Envp& envp,
  *
  * @return A list of string.
  */
-static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
+static Envp
+prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
 {
     Envp envp;
     char* env_char = ::GetEnvironmentStrings();
     if (env_char == NULL) {
         throw vle::utils::InternalError(
-                "[SpawnWin] error reading environmental variables");
+          "[SpawnWin] error reading environmental variables");
     }
     unsigned int prev = 0;
     std::string env_string;
-    for(unsigned int i = 0; ; i++) {
+    for (unsigned int i = 0;; i++) {
         if (env_char[i] == '\0') {
             env_string.assign(std::string(env_char + prev, env_char + i));
             std::vector<std::string> splitvec;
-            boost::algorithm::split(splitvec, env_string, boost::is_any_of("="),
-                    boost::algorithm::token_compress_on);
-            if ((splitvec.size() == 2) and (not splitvec[0].empty())
-                    and (splitvec[0].size() > 1)) {
-                replaceEnvironmentVariable(envp,
-                        splitvec[0].substr(1),//don't know why we
-                        //have to remove a blank
-                        splitvec[1], false);
+            boost::algorithm::split(splitvec,
+                                    env_string,
+                                    boost::is_any_of("="),
+                                    boost::algorithm::token_compress_on);
+            if ((splitvec.size() == 2) and (not splitvec[0].empty()) and
+                (splitvec[0].size() > 1)) {
+                replaceEnvironmentVariable(
+                  envp,
+                  splitvec[0].substr(1), // don't know why we
+                  // have to remove a blank
+                  splitvec[1],
+                  false);
             }
             prev = i;
             if (env_char[i + 1] == '\0') {
@@ -154,24 +160,24 @@ static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
         lib /= "lib";
         lib /= "pkgconfig";
 
-        replaceEnvironmentVariable(envp, "PKG_CONFIG_PATH",
-                                   lib.string(), false);
+        replaceEnvironmentVariable(
+          envp, "PKG_CONFIG_PATH", lib.string(), false);
     }
 
     {
         Path inc = prefix;
         inc /= "include";
 
-        replaceEnvironmentVariable(envp, "BOOST_INCLUDEDIR",
-                                   inc.string(), false);
+        replaceEnvironmentVariable(
+          envp, "BOOST_INCLUDEDIR", inc.string(), false);
     }
 
     {
         Path lib = prefix;
         lib /= "lib";
 
-        replaceEnvironmentVariable(envp, "BOOST_LIBRARYDIR",
-                                   lib.string(), false);
+        replaceEnvironmentVariable(
+          envp, "BOOST_LIBRARYDIR", lib.string(), false);
     }
 
     replaceEnvironmentVariable(envp, "BOOST_ROOT", prefix.string(), false);
@@ -179,7 +185,8 @@ static Envp prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
     return envp;
 }
 
-static std::string win32_quote(const std::string& arg)
+static std::string
+win32_quote(const std::string& arg)
 {
     std::string result;
 
@@ -188,15 +195,15 @@ static std::string win32_quote(const std::string& arg)
     } else {
         result.push_back('"');
 
-        for (std::string::const_iterator it = arg.begin() ; ; ++it) {
+        for (std::string::const_iterator it = arg.begin();; ++it) {
             unsigned NumberBackslashes = 0;
 
-            while (it != arg.end () and *it == '\\') {
+            while (it != arg.end() and *it == '\\') {
                 ++it;
                 ++NumberBackslashes;
             }
 
-            if (it == arg.end ()) {
+            if (it == arg.end()) {
                 result.append(NumberBackslashes * 2, '\\');
                 break;
             } else if (*it == '"') {
@@ -214,18 +221,20 @@ static std::string win32_quote(const std::string& arg)
     return result;
 }
 
-struct win32_argv_quote
-        : public std::unary_function < std::string, void >
+struct win32_argv_quote : public std::unary_function<std::string, void>
 {
-    std::string *cmd;
+    std::string* cmd;
     char separator;
 
-    win32_argv_quote(std::string *cmd, char separator)
-    : cmd(cmd), separator(separator)
-    {}
+    win32_argv_quote(std::string* cmd, char separator)
+      : cmd(cmd)
+      , separator(separator)
+    {
+    }
 
     ~win32_argv_quote()
-    {}
+    {
+    }
 
     void operator()(const std::string& arg)
     {
@@ -234,44 +243,48 @@ struct win32_argv_quote
     }
 };
 
-struct win32_envp_quote
-        : public std::unary_function < Envp::value_type, void >
+struct win32_envp_quote : public std::unary_function<Envp::value_type, void>
 {
-    std::string *cmd;
+    std::string* cmd;
 
-    win32_envp_quote(std::string *cmd)
-    : cmd(cmd)
-    {}
+    win32_envp_quote(std::string* cmd)
+      : cmd(cmd)
+    {
+    }
 
     ~win32_envp_quote()
-    {}
+    {
+    }
 
     void operator()(const Envp::value_type& arg)
     {
         if (not arg.first.empty()) {
-            std::vector < std::string > tokens;
+            std::vector<std::string> tokens;
 
-            boost::algorithm::split(tokens, arg.second,
-                    boost::algorithm::is_any_of(";"),
-                    boost::algorithm::token_compress_on);
+            boost::algorithm::split(tokens,
+                                    arg.second,
+                                    boost::algorithm::is_any_of(";"),
+                                    boost::algorithm::token_compress_on);
 
             cmd->append(arg.first);
             cmd->push_back('=');
 
-            std::for_each(tokens.begin(), tokens.end(),
-                    win32_argv_quote(cmd, ';'));
+            std::for_each(
+              tokens.begin(), tokens.end(), win32_argv_quote(cmd, ';'));
 
-            cmd->operator[](cmd->size() - 1) = '\0'; /**< remove the last `;' to
-                                                      * avoid bad environment.*/
+            cmd->operator[](cmd->size() - 1) =
+              '\0'; /**< remove the last `;' to
+                     * avoid bad environment.*/
         }
     }
 };
 
-static char* build_command_line(const std::string& exe,
-        const std::vector < std::string >&args)
+static char*
+build_command_line(const std::string& exe,
+                   const std::vector<std::string>& args)
 {
     std::string cmd;
-    char *buf;
+    char* buf;
 
     cmd.reserve(Spawn::default_buffer_size);
     cmd.append(win32_quote(exe));
@@ -288,7 +301,8 @@ static char* build_command_line(const std::string& exe,
     return buf;
 }
 
-static char * prepare_environment_variable(vle::utils::ContextPtr ctx)
+static char*
+prepare_environment_variable(vle::utils::ContextPtr ctx)
 {
     Envp envp = prepareEnvironmentVariable(ctx);
 
@@ -298,7 +312,7 @@ static char * prepare_environment_variable(vle::utils::ContextPtr ctx)
     std::for_each(envp.begin(), envp.end(), win32_envp_quote(&cmd));
     cmd.push_back('\0');
 
-    char *result = (char*)malloc(sizeof(char) * (cmd.size() + 1));
+    char* result = (char*)malloc(sizeof(char) * (cmd.size() + 1));
 
     std::copy(cmd.begin(), cmd.end(), result);
 
@@ -308,26 +322,26 @@ static char * prepare_environment_variable(vle::utils::ContextPtr ctx)
 struct Spawn::Pimpl
 {
     ContextPtr m_context;
-    HANDLE     hOutputRead;
-    HANDLE     hErrorRead;
+    HANDLE hOutputRead;
+    HANDLE hErrorRead;
 
-    PROCESS_INFORMATION       m_pi;
-    DWORD                     m_status;
-    std::string               m_msg;
+    PROCESS_INFORMATION m_pi;
+    DWORD m_status;
+    std::string m_msg;
     std::chrono::milliseconds m_waitchildtimeout;
-    bool                      m_start;
-    bool                      m_finish;
+    bool m_start;
+    bool m_finish;
 
     std::ofstream ouputfs, errorfs;
 
     Pimpl(ContextPtr ctx, std::chrono::milliseconds waitchildtimeout)
-        : m_context(ctx)
-        , hOutputRead(INVALID_HANDLE_VALUE)
-        , hErrorRead(INVALID_HANDLE_VALUE)
-        , m_status(0)
-        , m_waitchildtimeout(waitchildtimeout)
-        , m_start(false)
-        , m_finish(true)
+      : m_context(ctx)
+      , hOutputRead(INVALID_HANDLE_VALUE)
+      , hErrorRead(INVALID_HANDLE_VALUE)
+      , m_status(0)
+      , m_waitchildtimeout(waitchildtimeout)
+      , m_start(false)
+      , m_finish(true)
     {
         utils::Path tmp(utils::Path::temp_directory_path());
 
@@ -378,39 +392,45 @@ struct Spawn::Pimpl
         return false;
     }
 
-    bool get(std::string *output, std::string *error)
+    bool get(std::string* output, std::string* error)
     {
         assert(m_start);
 
         is_running();
 
-        std::vector < char > buffer(4096, '\0');
+        std::vector<char> buffer(4096, '\0');
         unsigned long bread;
         unsigned long avail;
 
         {
-            PeekNamedPipe(hOutputRead, &buffer[0], buffer.size() - 1,
-                    &bread, &avail, NULL);
+            PeekNamedPipe(hOutputRead,
+                          &buffer[0],
+                          buffer.size() - 1,
+                          &bread,
+                          &avail,
+                          NULL);
 
             if (bread) {
-                ouputfs << "get PeekNamedPipe success " << bread
-                        << " " <<  avail << "\n";
+                ouputfs << "get PeekNamedPipe success " << bread << " "
+                        << avail << "\n";
 
                 std::fill(buffer.begin(), buffer.end(), '\0');
                 if (avail > buffer.size() - 1) {
                     ouputfs << "get PeekNamedPipe " << avail << "\n"
                             << buffer.size() - 1 << "\n";
                     while (bread >= buffer.size() - 1) {
-                        ReadFile(hOutputRead, &buffer[0],
-                                buffer.size() - 1, &bread, NULL);
+                        ReadFile(hOutputRead,
+                                 &buffer[0],
+                                 buffer.size() - 1,
+                                 &bread,
+                                 NULL);
 
                         ouputfs << "get: " << bread << "\n";
 
                         if (bread > 0) {
                             unsigned long sz = std::min(
-                                    bread,
-                                    static_cast < unsigned long >(
-                                            buffer.size() - 1));
+                              bread,
+                              static_cast<unsigned long>(buffer.size() - 1));
 
                             output->append(&buffer[0], sz);
                             ouputfs.write(&buffer[0], sz);
@@ -419,19 +439,21 @@ struct Spawn::Pimpl
                         std::fill(buffer.begin(), buffer.end(), '\0');
                     }
                 } else {
-                    ouputfs << "get PeekNamedPipe success (else) "
-                            << bread << " " <<  avail << "\n";
+                    ouputfs << "get PeekNamedPipe success (else) " << bread
+                            << " " << avail << "\n";
 
-                    ReadFile(hOutputRead, &buffer[0],
-                            buffer.size() - 1, &bread, NULL);
+                    ReadFile(hOutputRead,
+                             &buffer[0],
+                             buffer.size() - 1,
+                             &bread,
+                             NULL);
 
                     ouputfs << "get: " << bread << "\n";
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                                bread,
-                                static_cast < unsigned long >(
-                                        buffer.size() - 1));
+                          bread,
+                          static_cast<unsigned long>(buffer.size() - 1));
 
                         output->append(&buffer[0], sz);
                         ouputfs.write(&buffer[0], sz);
@@ -441,23 +463,25 @@ struct Spawn::Pimpl
         }
 
         {
-            PeekNamedPipe(hErrorRead, &buffer[0], buffer.size() - 1,
-                    &bread, &avail, NULL);
+            PeekNamedPipe(
+              hErrorRead, &buffer[0], buffer.size() - 1, &bread, &avail, NULL);
 
             if (bread) {
-                errorfs << "[err] get PeekNamedPipe success " <<  avail << "\n";
+                errorfs << "[err] get PeekNamedPipe success " << avail << "\n";
 
                 std::fill(buffer.begin(), buffer.end(), '\0');
                 if (avail > buffer.size() - 1) {
                     while (bread >= buffer.size() - 1) {
-                        ReadFile(hErrorRead, &buffer[0],
-                                buffer.size() - 1, &bread, NULL);
+                        ReadFile(hErrorRead,
+                                 &buffer[0],
+                                 buffer.size() - 1,
+                                 &bread,
+                                 NULL);
 
                         if (bread > 0) {
                             unsigned long sz = std::min(
-                                    bread,
-                                    static_cast < unsigned long >(
-                                            buffer.size() - 1));
+                              bread,
+                              static_cast<unsigned long>(buffer.size() - 1));
 
                             error->append(&buffer[0], sz);
                             errorfs.write(&buffer[0], sz);
@@ -466,14 +490,13 @@ struct Spawn::Pimpl
                         std::fill(buffer.begin(), buffer.end(), '\0');
                     }
                 } else {
-                    ReadFile(hErrorRead, &buffer[0],
-                            buffer.size() - 1, &bread, NULL);
+                    ReadFile(
+                      hErrorRead, &buffer[0], buffer.size() - 1, &bread, NULL);
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                                bread,
-                                static_cast < unsigned long >(
-                                        buffer.size() - 1));
+                          bread,
+                          static_cast<unsigned long>(buffer.size() - 1));
 
                         error->append(&buffer[0], sz);
                         errorfs.write(&buffer[0], sz);
@@ -486,8 +509,8 @@ struct Spawn::Pimpl
     }
 
     bool start(const std::string& exe,
-            const std::string& workingdir,
-            const std::vector < std::string > &args)
+               const std::string& workingdir,
+               const std::vector<std::string>& args)
     {
         m_start = true;
         m_finish = false;
@@ -499,11 +522,11 @@ struct Spawn::Pimpl
         STARTUPINFO startupinfo;
         SECURITY_ATTRIBUTES securityatt;
         SECURITY_DESCRIPTOR securitydescriptor;
-        char *cmdline = NULL;
+        char* cmdline = NULL;
         LPVOID envp;
 
         InitializeSecurityDescriptor(&securitydescriptor,
-                SECURITY_DESCRIPTOR_REVISION);
+                                     SECURITY_DESCRIPTOR_REVISION);
 
         SetSecurityDescriptorDacl(&securitydescriptor, TRUE, NULL, FALSE);
         securityatt.lpSecurityDescriptor = &securitydescriptor;
@@ -511,15 +534,23 @@ struct Spawn::Pimpl
         securityatt.bInheritHandle = TRUE;
 
         if (!CreatePipe(&hOutputReadTmp, &hOutputWrite, &securityatt, 0) ||
-                !DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,
-                        GetCurrentProcess(), &hOutputRead, 0,
-                        FALSE, DUPLICATE_SAME_ACCESS))
+            !DuplicateHandle(GetCurrentProcess(),
+                             hOutputReadTmp,
+                             GetCurrentProcess(),
+                             &hOutputRead,
+                             0,
+                             FALSE,
+                             DUPLICATE_SAME_ACCESS))
             goto pipe_out_failure;
 
         if (!CreatePipe(&hErrorReadTmp, &hErrorWrite, &securityatt, 0) ||
-                !DuplicateHandle(GetCurrentProcess(), hErrorReadTmp,
-                        GetCurrentProcess(), &hErrorRead, 0,
-                        TRUE, DUPLICATE_SAME_ACCESS))
+            !DuplicateHandle(GetCurrentProcess(),
+                             hErrorReadTmp,
+                             GetCurrentProcess(),
+                             &hErrorRead,
+                             0,
+                             TRUE,
+                             DUPLICATE_SAME_ACCESS))
             goto pipe_err_failure;
 
         CloseHandle(hOutputReadTmp);
@@ -529,7 +560,7 @@ struct Spawn::Pimpl
         startupinfo.cb = sizeof(STARTUPINFO);
         startupinfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
         startupinfo.hStdOutput = hOutputWrite;
-        startupinfo.hStdInput  = GetStdHandle(STD_INPUT_HANDLE);
+        startupinfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
         startupinfo.hStdError = hErrorWrite;
         startupinfo.wShowWindow = SW_SHOWDEFAULT;
 
@@ -546,10 +577,16 @@ struct Spawn::Pimpl
 
         ZeroMemory(&m_pi, sizeof(PROCESS_INFORMATION));
 
-        if (!(CreateProcess(NULL, cmdline, NULL, NULL, TRUE,
-                CREATE_NO_WINDOW,
-                envp,
-                workingdir.c_str(), &startupinfo, &m_pi)))
+        if (!(CreateProcess(NULL,
+                            cmdline,
+                            NULL,
+                            NULL,
+                            TRUE,
+                            CREATE_NO_WINDOW,
+                            envp,
+                            workingdir.c_str(),
+                            &startupinfo,
+                            &m_pi)))
             goto create_process_failure;
 
         free(cmdline);
@@ -564,45 +601,49 @@ struct Spawn::Pimpl
 
         return true;
 
-        create_process_failure:
+    create_process_failure:
         free(cmdline);
 
-        malloc_failure:
+    malloc_failure:
         CloseHandle(hErrorReadTmp);
         CloseHandle(hErrorRead);
         CloseHandle(hErrorWrite);
 
-        pipe_err_failure:
+    pipe_err_failure:
         CloseHandle(hOutputReadTmp);
         CloseHandle(hOutputRead);
         CloseHandle(hOutputWrite);
 
-        pipe_out_failure:
+    pipe_out_failure:
         return false;
     }
 
-    void format(const char *function, DWORD error)
+    void format(const char* function, DWORD error)
     {
         LPVOID buffer;
         LPVOID displaybuffer;
 
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                      FORMAT_MESSAGE_FROM_SYSTEM |
-                      FORMAT_MESSAGE_IGNORE_INSERTS,
+                        FORMAT_MESSAGE_FROM_SYSTEM |
+                        FORMAT_MESSAGE_IGNORE_INSERTS,
                       NULL,
                       error,
                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                      (LPTSTR) &buffer,
-                      0, NULL );
+                      (LPTSTR)&buffer,
+                      0,
+                      NULL);
 
-        displaybuffer = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-            (lstrlen((LPCTSTR)buffer) + lstrlen((LPCTSTR)function) + 40) *
-             sizeof(TCHAR));
+        displaybuffer = (LPVOID)LocalAlloc(
+          LMEM_ZEROINIT,
+          (lstrlen((LPCTSTR)buffer) + lstrlen((LPCTSTR)function) + 40) *
+            sizeof(TCHAR));
 
         StringCchPrintf((LPTSTR)displaybuffer,
-            LocalSize(displaybuffer) / sizeof(TCHAR),
-            TEXT("%s failed with error %d: %s"),
-            function, error, buffer);
+                        LocalSize(displaybuffer) / sizeof(TCHAR),
+                        TEXT("%s failed with error %d: %s"),
+                        function,
+                        error,
+                        buffer);
 
         // MessageBox(NULL, (LPCTSTR)displaybuffer, TEXT("Error"), MB_OK);
 
@@ -640,7 +681,6 @@ struct Spawn::Pimpl
 
         if (TerminateProcess(m_pi.hProcess, 0) == 0)
             format("TerminateProcess", GetLastError());
-            
     }
 
     bool isfinish()
@@ -655,7 +695,7 @@ struct Spawn::Pimpl
         return m_start;
     }
 
-    bool status(std::string *msg, bool *success)
+    bool status(std::string* msg, bool* success)
     {
         assert(m_start);
         assert(m_finish);
@@ -673,23 +713,25 @@ struct Spawn::Pimpl
 };
 
 Spawn::Spawn(ContextPtr ctx)
-    : m_pimpl(std::make_unique<Spawn::Pimpl>(
-                  ctx,
-                  std::chrono::milliseconds {5}))
+  : m_pimpl(
+      std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
 {
 }
 
 Spawn::~Spawn() = default;
 
-bool Spawn::start(const std::string& exe,
-                  const std::string& workingdir,
-                  const std::vector < std::string > &args,
-                  std::chrono::milliseconds waitchildtimeout)
+bool
+Spawn::start(const std::string& exe,
+             const std::string& workingdir,
+             const std::vector<std::string>& args,
+             std::chrono::milliseconds waitchildtimeout)
 {
     m_pimpl->init(waitchildtimeout);
 
-    vDbg(m_pimpl->m_context, _("Spawn: command: `%s' chdir: `%s'\n"),
-         exe.c_str(), workingdir.c_str());
+    vDbg(m_pimpl->m_context,
+         _("Spawn: command: `%s' chdir: `%s'\n"),
+         exe.c_str(),
+         workingdir.c_str());
 
     for (const auto& elem : args) {
         vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());
@@ -698,32 +740,38 @@ bool Spawn::start(const std::string& exe,
     return m_pimpl->start(exe, workingdir, args);
 }
 
-bool Spawn::wait()
+bool
+Spawn::wait()
 {
     return m_pimpl->wait();
 }
 
-void Spawn::kill()
+void
+Spawn::kill()
 {
     m_pimpl->kill();
 }
 
-bool Spawn::isstart()
+bool
+Spawn::isstart()
 {
     return m_pimpl->isstart();
 }
 
-bool Spawn::isfinish()
+bool
+Spawn::isfinish()
 {
     return m_pimpl->isfinish();
 }
 
-bool Spawn::get(std::string *output, std::string *error)
+bool
+Spawn::get(std::string* output, std::string* error)
 {
     return m_pimpl->get(output, error);
 }
 
-bool Spawn::status(std::string *msg, bool *success)
+bool
+Spawn::status(std::string* msg, bool* success)
 {
     return m_pimpl->status(msg, success);
 }
@@ -738,12 +786,13 @@ Spawn::splitCommandLine(const std::string& command)
 
     if (argv.empty())
         throw utils::ArgError(
-            (fmt(_("Package command line: error, empty command `%1%'"))
-             % command).str());
+          (fmt(_("Package command line: error, empty command `%1%'")) %
+           command)
+            .str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
 
     return argv;
 }
-
-}}
+}
+}

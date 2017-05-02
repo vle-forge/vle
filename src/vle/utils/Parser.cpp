@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,64 +24,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/Parser.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <boost/lexical_cast.hpp>
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Parser.hpp>
+#include <vle/utils/i18n.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
-void Block::addString(const std::string& key, const std::string& str)
+void
+Block::addString(const std::string& key, const std::string& str)
 {
     strings.insert(std::make_pair(key, str));
 }
 
-void Block::addReal(const std::string& key, const double& val)
+void
+Block::addReal(const std::string& key, const double& val)
 {
     reals.insert(std::make_pair(key, val));
 }
 
-void Block::addRelativeReal(const std::string& key, const double& val)
+void
+Block::addRelativeReal(const std::string& key, const double& val)
 {
     relativeReals.insert(std::make_pair(key, val));
 }
 
-Block& Block::addBlock(const std::string& name)
+Block&
+Block::addBlock(const std::string& name)
 {
-    auto it =
-        blocks.insert(std::make_pair(name, Block(name)));
+    auto it = blocks.insert(std::make_pair(name, Block(name)));
 
     return it->second;
 }
 
-const Block& Block::getBlock(const std::string& name) const
+const Block&
+Block::getBlock(const std::string& name) const
 {
     auto it = blocks.find(name);
     if (it == blocks.end()) {
         throw utils::ParseError(
-            (fmt(_("The block `%1%' does not exist")) % name).str());
+          (fmt(_("The block `%1%' does not exist")) % name).str());
     }
     return it->second;
 }
 
 Parser::Parser(std::istream& stream) throw(utils::ParseError)
-    : mRoot(std::string()), mStream(stream), mLine(0), mOldLine(0), mColumn(0),
-    mOldColumn(0), mLast(0)
+  : mRoot(std::string())
+  , mStream(stream)
+  , mLine(0)
+  , mOldLine(0)
+  , mColumn(0)
+  , mOldColumn(0)
+  , mLast(0)
 {
     try {
         readBlock(mRoot);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw utils::ParseError(
-            (fmt(_("Parser error before line %1% column %2%:\t%3%")) % mLine %
-             mColumn % e.what()).str());
+          (fmt(_("Parser error before line %1% column %2%:\t%3%")) % mLine %
+           mColumn % e.what())
+            .str());
     }
 }
 
-std::string Parser::readKeyword()
+std::string
+Parser::readKeyword()
 {
     do {
         char c = get();
@@ -119,7 +130,8 @@ std::string Parser::readKeyword()
     return result;
 }
 
-std::string Parser::readString()
+std::string
+Parser::readString()
 {
     do {
         char c = get();
@@ -154,7 +166,8 @@ std::string Parser::readString()
     return result;
 }
 
-double Parser::readReal()
+double
+Parser::readReal()
 {
     do {
         char c = get();
@@ -189,8 +202,7 @@ double Parser::readReal()
         } else if (c == '.') {
             if (result.find(".") != std::string::npos)
                 throw utils::ParseError(
-                    _("Multiple '.' while parsing real `%s'"),
-                    result.c_str());
+                  _("Multiple '.' while parsing real `%s'"), result.c_str());
 
             result += c;
         } else {
@@ -202,13 +214,15 @@ double Parser::readReal()
     return boost::lexical_cast<double>(result);
 }
 
-double Parser::readRelativeReal()
+double
+Parser::readRelativeReal()
 {
     readChar('+');
     return readReal();
 }
 
-std::string Parser::readQuotedString()
+std::string
+Parser::readQuotedString()
 {
     readChar('"');
     std::string result;
@@ -227,7 +241,8 @@ std::string Parser::readQuotedString()
     throw utils::ParseError(_("End of file"));
 }
 
-void Parser::readChar(char r)
+void
+Parser::readChar(char r)
 {
     do {
         char c = get();
@@ -247,7 +262,8 @@ void Parser::readChar(char r)
     throw utils::ParseError(_("End of file"));
 }
 
-Parser::Token Parser::nextToken()
+Parser::Token
+Parser::nextToken()
 {
     while (mStream) {
         char c = get();
@@ -292,7 +308,8 @@ Parser::Token Parser::nextToken()
     return Parser::Error;
 }
 
-void Parser::readBlock(Block& block)
+void
+Parser::readBlock(Block& block)
 {
     do {
         std::string str = readKeyword();
@@ -341,5 +358,5 @@ void Parser::readBlock(Block& block)
         };
     } while (nextToken() != Parser::End and mStream);
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils

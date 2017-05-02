@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,19 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <cassert>
+#include <limits>
+#include <sstream>
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/DynamicsInit.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/i18n.hpp>
-#include <sstream>
-#include <limits>
-#include <cassert>
 
 namespace {
 
-void print_external_event(const vle::devs::ExternalEventList& events,
-                          vle::utils::ContextPtr ctx) noexcept
+void
+print_external_event(const vle::devs::ExternalEventList& events,
+                     vle::utils::ContextPtr ctx) noexcept
 {
     std::ostringstream oss;
 
@@ -57,43 +57,54 @@ void print_external_event(const vle::devs::ExternalEventList& events,
 
 } // anonymous namespace
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
-DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
-                         const InitEventList& events)
-    : Dynamics(init, events)
-    , mName(init.model.getCompleteName())
+DynamicsDbg::DynamicsDbg(const DynamicsInit& init, const InitEventList& events)
+  : Dynamics(init, events)
+  , mName(init.model.getCompleteName())
 {
-    vDbg(context(), _("                     %s [DEVS] constructor\n"),
+    vDbg(context(),
+         _("                     %s [DEVS] constructor\n"),
          mName.c_str());
 }
 
-Time DynamicsDbg::init(Time time)
+Time
+DynamicsDbg::init(Time time)
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] init\n"),
-         std::numeric_limits<double>::max_digits10, time, mName.c_str());
+    vDbg(context(),
+         _("%.*g %s [DEVS] init\n"),
+         std::numeric_limits<double>::max_digits10,
+         time,
+         mName.c_str());
 
     Time duration(mDynamics->init(time));
 
-    vDbg(context(), _("                .... %s [DEVS] init returns %.*g\n"),
-         mName.c_str(), std::numeric_limits<double>::max_digits10,
+    vDbg(context(),
+         _("                .... %s [DEVS] init returns %.*g\n"),
+         mName.c_str(),
+         std::numeric_limits<double>::max_digits10,
          duration);
 
     return duration;
 }
 
-void DynamicsDbg::output(Time time, ExternalEventList& output) const
+void
+DynamicsDbg::output(Time time, ExternalEventList& output) const
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] output\n"),
-         std::numeric_limits<double>::max_digits10, time,
+    vDbg(context(),
+         _("%.*g %s [DEVS] output\n"),
+         std::numeric_limits<double>::max_digits10,
+         time,
          mName.c_str());
 
     mDynamics->output(time, output);
-    vDbg(context(), _("                .... %s [DEVS] output returns \n"),
+    vDbg(context(),
+         _("                .... %s [DEVS] output returns \n"),
          mName.c_str());
 
     if (output.empty()) {
@@ -103,39 +114,47 @@ void DynamicsDbg::output(Time time, ExternalEventList& output) const
     }
 }
 
-Time DynamicsDbg::timeAdvance() const
+Time
+DynamicsDbg::timeAdvance() const
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("                     %s [DEVS] ta\n"),
-         mName.c_str());
+    vDbg(context(), _("                     %s [DEVS] ta\n"), mName.c_str());
 
     Time time(mDynamics->timeAdvance());
 
-    vDbg(context(), _("                .... %s [DEVS] ta returns %.*g\n"),
-         mName.c_str(), std::numeric_limits<double>::max_digits10, time);
+    vDbg(context(),
+         _("                .... %s [DEVS] ta returns %.*g\n"),
+         mName.c_str(),
+         std::numeric_limits<double>::max_digits10,
+         time);
 
     return time;
 }
 
-void DynamicsDbg::internalTransition(Time time)
+void
+DynamicsDbg::internalTransition(Time time)
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] internal transition\n"),
+    vDbg(context(),
+         _("%.*g %s [DEVS] internal transition\n"),
          std::numeric_limits<double>::max_digits10,
-         time, mName.c_str());
+         time,
+         mName.c_str());
 
     mDynamics->internalTransition(time);
 }
 
-void DynamicsDbg::externalTransition(const ExternalEventList& event,
-                                     Time time)
+void
+DynamicsDbg::externalTransition(const ExternalEventList& event, Time time)
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] external transition:\n"),
-         std::numeric_limits<double>::max_digits10, time,
+    vDbg(context(),
+         _("%.*g %s [DEVS] external transition:\n"),
+         std::numeric_limits<double>::max_digits10,
+         time,
          mName.c_str());
 
     ::print_external_event(event, context());
@@ -143,14 +162,17 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
     mDynamics->externalTransition(event, time);
 }
 
-void DynamicsDbg::confluentTransitions(
-    Time time,
-    const ExternalEventList& extEventlist)
+void
+DynamicsDbg::confluentTransitions(Time time,
+                                  const ExternalEventList& extEventlist)
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] confluent transition:\n"),
-         std::numeric_limits<double>::max_digits10, time, mName.c_str());
+    vDbg(context(),
+         _("%.*g %s [DEVS] confluent transition:\n"),
+         std::numeric_limits<double>::max_digits10,
+         time,
+         mName.c_str());
 
     ::print_external_event(extEventlist, context());
 
@@ -162,23 +184,27 @@ DynamicsDbg::observation(const ObservationEvent& event) const
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("%.*g %s [DEVS] observation: [from: '%s' port:"
-                      " '%s']\n"),
-         std::numeric_limits<double>::max_digits10, event.getTime(),
-         mName.c_str(), event.getViewName().c_str(),
+    vDbg(context(),
+         _("%.*g %s [DEVS] observation: [from: '%s' port:"
+           " '%s']\n"),
+         std::numeric_limits<double>::max_digits10,
+         event.getTime(),
+         mName.c_str(),
+         event.getViewName().c_str(),
          event.getPortName().c_str());
 
     return mDynamics->observation(event);
 }
 
-void DynamicsDbg::finish()
+void
+DynamicsDbg::finish()
 {
     assert(mDynamics && "DynamicsDbg: missing set(Dynamics)");
 
-    vDbg(context(), _("                     %s [DEVS] finish\n"),
-         mName.c_str());
+    vDbg(
+      context(), _("                     %s [DEVS] finish\n"), mName.c_str());
 
     mDynamics->finish();
 }
-
-}} // namespace vle devs
+}
+} // namespace vle devs

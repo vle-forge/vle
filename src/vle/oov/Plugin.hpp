@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,15 +36,15 @@
 
 #define DECLARE_OOV_PLUGIN(x)                                                 \
     extern "C" {                                                              \
-    VLE_MODULE vle::oov::Plugin *                                             \
-    vle_make_new_oov(const std::string &location)                             \
+    VLE_MODULE vle::oov::Plugin* vle_make_new_oov(                            \
+      const std::string& location)                                            \
     {                                                                         \
         return new x(location);                                               \
     }                                                                         \
                                                                               \
-    VLE_MODULE void vle_api_level(std::uint32_t *major,                       \
-                                  std::uint32_t *minor,                       \
-                                  std::uint32_t *patch)                       \
+    VLE_MODULE void vle_api_level(std::uint32_t* major,                       \
+                                  std::uint32_t* minor,                       \
+                                  std::uint32_t* patch)                       \
     {                                                                         \
         auto version = vle::version();                                        \
         *major = std::get<0>(version);                                        \
@@ -75,7 +75,8 @@ namespace oov {
  * DECLARE_OOV_PLUGIN(Csv);
  * @endcode
  */
-class VLE_API Plugin {
+class VLE_API Plugin
+{
 public:
     /**
      * Default constructor of the Plugin.
@@ -83,15 +84,17 @@ public:
      * @param location this string represents the name of the default
      * directory
      */
-    Plugin(const std::string &location)
-        : m_location(location)
+    Plugin(const std::string& location)
+      : m_location(location)
     {
     }
 
     /**
      * Nothing to delete.
      */
-    virtual ~Plugin() {}
+    virtual ~Plugin()
+    {
+    }
 
     /**
      * Return a clone of the \c value::Matrix.
@@ -101,14 +104,20 @@ public:
      * value::Matrix managed by the plug-in.
      *
      */
-    virtual std::unique_ptr<value::Matrix> matrix() const { return {}; }
+    virtual std::unique_ptr<value::Matrix> matrix() const
+    {
+        return {};
+    }
 
     /**
      * Get the name of the Plugin class.
      *
      * @return The name of the plugin class.
      */
-    virtual std::string name() const { return std::string(); }
+    virtual std::string name() const
+    {
+        return std::string();
+    }
 
     ///
     ////
@@ -119,7 +128,10 @@ public:
      *
      * @return false.
      */
-    virtual bool isCairo() const { return false; }
+    virtual bool isCairo() const
+    {
+        return false;
+    }
 
     /**
      * Call to initialise plugin.
@@ -128,47 +140,47 @@ public:
      * initialise the Plugin with parameter provided by the
      * devs::StreamWriter.
      */
-    virtual void onParameter(const std::string &plugin,
-                             const std::string &location,
-                             const std::string &file,
+    virtual void onParameter(const std::string& plugin,
+                             const std::string& location,
+                             const std::string& file,
                              std::unique_ptr<value::Value> parameters,
-                             const double &time) = 0;
+                             const double& time) = 0;
 
     /**
      * Call when a new observable (the devs::Simulator and port name)
      * is attached to a view.
      */
-    virtual void onNewObservable(const std::string &simulator,
-                                 const std::string &parent,
-                                 const std::string &port,
-                                 const std::string &view,
-                                 const double &time) = 0;
+    virtual void onNewObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& port,
+                                 const std::string& view,
+                                 const double& time) = 0;
 
     /**
      * Call whe a observable (the devs::Simulator and port name) is
      * deleted from a view.
      */
-    virtual void onDelObservable(const std::string &simulator,
-                                 const std::string &parent,
-                                 const std::string &port,
-                                 const std::string &view,
-                                 const double &time) = 0;
+    virtual void onDelObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& port,
+                                 const std::string& view,
+                                 const double& time) = 0;
 
     /**
      * Call when an external event is send to the view.
      */
-    virtual void onValue(const std::string &simulator,
-                         const std::string &parent,
-                         const std::string &port,
-                         const std::string &view,
-                         const double &time,
+    virtual void onValue(const std::string& simulator,
+                         const std::string& parent,
+                         const std::string& port,
+                         const std::string& view,
+                         const double& time,
                          std::unique_ptr<value::Value> value) = 0;
 
     /**
      * Call when the simulation is finished.
      * Return a pointer to the Matrix built during simulation, or NULL.
      */
-    virtual std::unique_ptr<value::Matrix> finish(const double & /*time*/)
+    virtual std::unique_ptr<value::Matrix> finish(const double& /*time*/)
     {
         return {};
     }
@@ -184,7 +196,10 @@ public:
      * devs::LocalStreamWriter or a host:port:directory for a
      * devs::DistantStreamWriter.
      */
-    inline const std::string &location() const { return m_location; }
+    inline const std::string& location() const
+    {
+        return m_location;
+    }
 
 private:
     std::string m_location;
@@ -201,7 +216,7 @@ using PluginPtr = std::unique_ptr<Plugin>;
  * @param The output location of the oov::Plugin.
  * @return A pointer to the oov::Plugin newly build.
  */
-using OovPluginSlot = Plugin *(*)(const std::string &);
+using OovPluginSlot = Plugin* (*)(const std::string&);
 
 /**
  * This typedef is used to defined the dictionnary of key view name

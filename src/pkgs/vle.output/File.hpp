@@ -5,7 +5,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
@@ -27,13 +27,15 @@
 #ifndef VLE_OOV_PLUGINS_FILE_HPP
 #define VLE_OOV_PLUGINS_FILE_HPP 1
 
-#include <vle/oov/Plugin.hpp>
-#include <vle/value/Set.hpp>
 #include <fstream>
 #include <map>
 #include <vector>
+#include <vle/oov/Plugin.hpp>
+#include <vle/value/Set.hpp>
 
-namespace vle { namespace oov { namespace plugin {
+namespace vle {
+namespace oov {
+namespace plugin {
 
 /**
  * @brief File is a virtual class for the csv, text, and rdata
@@ -70,7 +72,7 @@ public:
     /**
      * @brief Defines the names of the columns.
      */
-    typedef std::vector < std::string > Strings;
+    typedef std::vector<std::string> Strings;
 
     File(const std::string& location);
 
@@ -79,7 +81,6 @@ public:
     ///
     //// the interface provided by oov::Plugin.
     ///
-
 
     virtual void onParameter(const std::string& plugin,
                              const std::string& location,
@@ -111,7 +112,9 @@ public:
     class FileType
     {
     public:
-        virtual ~FileType() {}
+        virtual ~FileType()
+        {
+        }
 
         virtual std::string extension() const = 0;
 
@@ -122,47 +125,48 @@ public:
 
 private:
     /** Define a dictionary (model's name, index) */
-    typedef std::map < std::string, int > Columns;
+    typedef std::map<std::string, int> Columns;
 
     /** Define the buffer of values. */
-    typedef std::vector < value::Value* > Line;
+    typedef std::vector<value::Value*> Line;
 
     /** Define the buffer for valid values (model observed). */
-    typedef std::vector < bool > ValidElement;
+    typedef std::vector<bool> ValidElement;
 
     /** Define a new bag indicator*/
-    typedef std::map < std::string, double> NewBagWatcher;
+    typedef std::map<std::string, double> NewBagWatcher;
 
-    enum OutputType {
-        FILE, /*!< classical file stream (std::ofstream). */
-        STANDARD_OUT, /*!< use the standard output (std::cout). */
+    enum OutputType
+    {
+        FILE,          /*!< classical file stream (std::ofstream). */
+        STANDARD_OUT,  /*!< use the standard output (std::cout). */
         STANDARD_ERROR /*!< use the error output (std::cerr). */
     };
 
-    FileType*       m_filetype;
-    Columns         m_columns;
-    value::Set      m_buffer;
-    ValidElement    m_valid;
-    NewBagWatcher   m_newbagwatcher;
-    double          m_time;
-    std::ofstream   m_file;
-    std::string     m_filename;
-    std::string     m_filenametmp;
-    bool            m_isstart;
-    bool            m_havefirstevent;
-    bool            m_julian;
-    OutputType      m_type;
-    bool            m_flushbybag;
+    FileType* m_filetype;
+    Columns m_columns;
+    value::Set m_buffer;
+    ValidElement m_valid;
+    NewBagWatcher m_newbagwatcher;
+    double m_time;
+    std::ofstream m_file;
+    std::string m_filename;
+    std::string m_filenametmp;
+    bool m_isstart;
+    bool m_havefirstevent;
+    bool m_julian;
+    OutputType m_type;
+    bool m_flushbybag;
 
     void flush();
 
     void finalFlush(double trame_time);
 
     void copyToFile(const std::string& filename,
-                    const std::vector < std::string >& array);
+                    const std::vector<std::string>& array);
 
     void copyToStream(std::ostream& out,
-                      const std::vector < std::string >& array);
+                      const std::vector<std::string>& array);
 
     /**
      * @brief This function is use to build uniq name to each row of the
@@ -176,7 +180,8 @@ private:
                           const std::string& simulator,
                           const std::string& port);
 };
-
-}}} // namespace vle oov plugin
+}
+}
+} // namespace vle oov plugin
 
 #endif

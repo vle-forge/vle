@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -39,12 +39,13 @@
 namespace vle {
 namespace utils {
 
-static void ErrorMessage(LPCSTR description)
+static void
+ErrorMessage(LPCSTR description)
 {
     LPVOID msg;
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-                      FORMAT_MESSAGE_IGNORE_INSERTS,
+                    FORMAT_MESSAGE_IGNORE_INSERTS,
                   NULL,
                   GetLastError(),
                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -53,7 +54,7 @@ static void ErrorMessage(LPCSTR description)
                   NULL);
 
     std::string finalmsg =
-        (boost::format("%1%: %2%") % description % msg).str();
+      (boost::format("%1%: %2%") % description % msg).str();
 
     MessageBox(NULL, (LPCTSTR)finalmsg.c_str(), TEXT("Error"), MB_ICONERROR);
 
@@ -61,23 +62,23 @@ static void ErrorMessage(LPCSTR description)
     ExitProcess(1);
 }
 
-static bool win32_RegQueryValue(HKEY hkey, std::string *path)
+static bool
+win32_RegQueryValue(HKEY hkey, std::string* path)
 {
     DWORD sz;
     std::vector<TCHAR> buf(MAX_PATH, '\0');
 
     if (RegQueryValueEx(
-            hkey, (LPCTSTR) "", NULL, NULL, (LPBYTE)&buf[0], &sz) ==
+          hkey, (LPCTSTR) "", NULL, NULL, (LPBYTE)&buf[0], &sz) ==
         ERROR_SUCCESS) {
         buf[sz] = '\0';
         path->assign(&buf[0]);
 
         return true;
-    }
-    else {
+    } else {
         sz = MAX_PATH;
         if (RegQueryValueEx(
-                hkey, (LPCTSTR) "Path", NULL, NULL, (LPBYTE)&buf[0], &sz) ==
+              hkey, (LPCTSTR) "Path", NULL, NULL, (LPBYTE)&buf[0], &sz) ==
             ERROR_SUCCESS) {
             buf[sz] = '\0';
             path->assign(&buf[0]);
@@ -89,7 +90,8 @@ static bool win32_RegQueryValue(HKEY hkey, std::string *path)
     return false;
 }
 
-Path Context::findInstallPrefix()
+Path
+Context::findInstallPrefix()
 {
     {
         /*
@@ -108,7 +110,7 @@ Path Context::findInstallPrefix()
         std::string prefix;
 
         if (RegOpenKeyEx(
-                HKEY_LOCAL_MACHINE, key.c_str(), 0, KEY_QUERY_VALUE, &hkey) ==
+              HKEY_LOCAL_MACHINE, key.c_str(), 0, KEY_QUERY_VALUE, &hkey) ==
             ERROR_SUCCESS) {
             result = win32_RegQueryValue(hkey, &prefix);
             RegCloseKey(hkey);
@@ -118,7 +120,7 @@ Path Context::findInstallPrefix()
         }
 
         if (RegOpenKeyEx(
-                HKEY_CURRENT_USER, key.c_str(), 0, KEY_QUERY_VALUE, &hkey) ==
+              HKEY_CURRENT_USER, key.c_str(), 0, KEY_QUERY_VALUE, &hkey) ==
             ERROR_SUCCESS) {
             result = win32_RegQueryValue(hkey, &prefix);
             RegCloseKey(hkey);
@@ -154,7 +156,8 @@ Path Context::findInstallPrefix()
     return {};
 }
 
-Path Context::findLibrary(const std::string &lib)
+Path
+Context::findLibrary(const std::string& lib)
 {
     Path res = UtilsWin::convertPathTo83Path(getPrefixDir());
     res /= "bin";
@@ -166,7 +169,8 @@ Path Context::findLibrary(const std::string &lib)
     return {};
 }
 
-Path Context::findProgram(const std::string &exe)
+Path
+Context::findProgram(const std::string& exe)
 {
     Path res = UtilsWin::convertPathTo83Path(getPrefixDir());
     res /= "bin";
@@ -185,7 +189,8 @@ Path Context::findProgram(const std::string &exe)
     return res;
 }
 
-void Context::initHomeDir()
+void
+Context::initHomeDir()
 {
     m_pimpl->m_home.clear();
 
@@ -195,12 +200,12 @@ void Context::initHomeDir()
      * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
      */
     if (m_pimpl->m_home.empty()) {
-        const char *homedrive_str = std::getenv("HOMEDRIVE");
+        const char* homedrive_str = std::getenv("HOMEDRIVE");
         std::string homedrive("");
         if (homedrive_str) {
             homedrive.assign(homedrive_str);
         }
-        const char *homepath_str = std::getenv("HOMEPATH");
+        const char* homepath_str = std::getenv("HOMEPATH");
         std::string homepath("");
         if (homepath_str) {
             homepath.assign(homepath_str);
@@ -212,7 +217,8 @@ void Context::initHomeDir()
     }
 }
 
-void Context::initPrefixDir()
+void
+Context::initPrefixDir()
 {
     m_pimpl->m_prefix = findInstallPrefix();
 }

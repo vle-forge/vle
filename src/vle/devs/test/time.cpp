@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -33,7 +33,8 @@
 
 using namespace vle;
 
-void compare()
+void
+compare()
 {
     devs::Time a(1.0);
     devs::Time b(2.0);
@@ -77,7 +78,8 @@ void compare()
     Ensures(a >= -1.0);
 }
 
-void modify()
+void
+modify()
 {
     devs::Time a(1.0);
     devs::Time b(2.0);
@@ -105,7 +107,8 @@ void modify()
     EnsuresEqual(z, a);
 }
 
-void modify_and_infinity()
+void
+modify_and_infinity()
 {
     devs::Time a(1.0);
 
@@ -150,7 +153,8 @@ void modify_and_infinity()
     }
 }
 
-void prefix_and_postfix_operator()
+void
+prefix_and_postfix_operator()
 {
     devs::Time a(1.0);
 
@@ -181,7 +185,8 @@ void prefix_and_postfix_operator()
     EnsuresEqual(a, 0.0);
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

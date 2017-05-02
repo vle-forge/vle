@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,44 +24,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/value/Integer.hpp>
 #include <iomanip>
 #include <limits>
+#include <vle/value/Integer.hpp>
 
-namespace vle { namespace value {
+namespace vle {
+namespace value {
 
-void Integer::writeFile(std::ostream& out) const
+void
+Integer::writeFile(std::ostream& out) const
 {
     std::streamsize old = out.precision();
 
-    out << std::setprecision(std::numeric_limits < int32_t >::digits10)
+    out << std::setprecision(std::numeric_limits<int32_t>::digits10)
         << m_value;
 
     out.precision(old);
 }
 
-void Integer::writeString(std::ostream& out) const
+void
+Integer::writeString(std::ostream& out) const
 {
     std::streamsize old = out.precision();
 
-    out << std::setprecision(std::numeric_limits < int32_t >::digits10)
+    out << std::setprecision(std::numeric_limits<int32_t>::digits10)
         << m_value;
 
     out.precision(old);
 }
 
-void Integer::writeXml(std::ostream& out) const
+void
+Integer::writeXml(std::ostream& out) const
 {
     std::streamsize old = out.precision();
 
     out << "<integer>"
-        << std::setprecision(std::numeric_limits < int32_t >::digits10)
-        << m_value
+        << std::setprecision(std::numeric_limits<int32_t>::digits10) << m_value
         << "</integer>";
 
     out.precision(old);
 }
-
-}} // namespace vle value
-
+}
+} // namespace vle value

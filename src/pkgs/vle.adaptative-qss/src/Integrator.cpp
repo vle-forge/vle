@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 INRA
+ * Copyright 2016-2017 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -128,28 +128,28 @@ public:
     {
         record_t record;
         switch (m_state) {
-            case RUNNING:
-                m_last_output_value = m_expected_value;
-                m_last_output_date = time;
-                double last_derivative_value;
-                last_derivative_value = archive.back().x_dot;
-                archive.clear();
-                record.date = time;
-                record.x_dot = last_derivative_value;
-                archive.push_back(record);
-                m_current_value = m_expected_value;
-                m_state = WAIT_FOR_QUANTA;
-                break;
-            case INIT:
-                m_state = WAIT_FOR_BOTH;
-                m_last_output_value = m_current_value;
-                m_last_output_date = time;
-                break;
-            default:
-                throw vu::ModellingError(
-                  "Integrator %s tries an internal transition in state %d",
-                  getModelName().c_str(),
-                  m_state);
+        case RUNNING:
+            m_last_output_value = m_expected_value;
+            m_last_output_date = time;
+            double last_derivative_value;
+            last_derivative_value = archive.back().x_dot;
+            archive.clear();
+            record.date = time;
+            record.x_dot = last_derivative_value;
+            archive.push_back(record);
+            m_current_value = m_expected_value;
+            m_state = WAIT_FOR_QUANTA;
+            break;
+        case INIT:
+            m_state = WAIT_FOR_BOTH;
+            m_last_output_value = m_current_value;
+            m_last_output_date = time;
+            break;
+        default:
+            throw vu::ModellingError(
+              "Integrator %s tries an internal transition in state %d",
+              getModelName().c_str(),
+              m_state);
         }
     }
 
@@ -159,21 +159,21 @@ public:
         if (m_has_output_port) {
             double outval;
             switch (m_state) {
-                case RUNNING:
-                    outval = m_expected_value;
-                    output.emplace_back(m_output_port_label);
-                    output.back().addMap().addDouble("d_val", outval);
-                    break;
-                case INIT:
-                    outval = m_current_value;
-                    output.emplace_back(m_output_port_label);
-                    output.back().addMap().addDouble("d_val", outval);
-                    break;
-                default:
-                    throw vu::ModellingError(
-                      "Integrator %s tries an output transition in state %d ",
-                      getModelName().c_str(),
-                      m_state);
+            case RUNNING:
+                outval = m_expected_value;
+                output.emplace_back(m_output_port_label);
+                output.back().addMap().addDouble("d_val", outval);
+                break;
+            case INIT:
+                outval = m_current_value;
+                output.emplace_back(m_output_port_label);
+                output.back().addMap().addDouble("d_val", outval);
+                break;
+            default:
+                throw vu::ModellingError(
+                  "Integrator %s tries an output transition in state %d ",
+                  getModelName().c_str(),
+                  m_state);
             }
         }
     }
@@ -183,43 +183,42 @@ public:
         double current_derivative;
 
         switch (m_state) {
-            case RUNNING:
-                if (archive.size() < 1)
-                    throw vu::ModellingError(
-                      "Integrator %s in state RUNNING without x dot "
-                      "value aviable ",
-                      getModelName().c_str());
+        case RUNNING:
+            if (archive.size() < 1)
+                throw vu::ModellingError(
+                  "Integrator %s in state RUNNING without x dot "
+                  "value aviable ",
+                  getModelName().c_str());
 
-                current_derivative = archive.back().x_dot;
+            current_derivative = archive.back().x_dot;
 
-                if (0 == current_derivative)
-                    return vd::infinity;
-
-                if (current_derivative > 0) {
-                    if ((m_upthreshold - m_current_value) < 0)
-                        throw vu::ModellingError(
-                          "Integrator %s erroneous Ta computation with "
-                          "positive x dot (%f)",
-                          getModelName().c_str(),
-                          current_derivative);
-
-                    return (m_upthreshold - m_current_value) /
-                           current_derivative;
-                } else {
-                    if ((m_downthreshold - m_current_value) > 0)
-                        throw vu::ModellingError(
-                          "Integrator %s erroneous Ta computation with "
-                          "negative x dot (%f)",
-                          getModelName().c_str(),
-                          current_derivative);
-
-                    return (m_downthreshold - m_current_value) /
-                           current_derivative;
-                }
-                break;
-            default:
+            if (0 == current_derivative)
                 return vd::infinity;
-                break;
+
+            if (current_derivative > 0) {
+                if ((m_upthreshold - m_current_value) < 0)
+                    throw vu::ModellingError(
+                      "Integrator %s erroneous Ta computation with "
+                      "positive x dot (%f)",
+                      getModelName().c_str(),
+                      current_derivative);
+
+                return (m_upthreshold - m_current_value) / current_derivative;
+            } else {
+                if ((m_downthreshold - m_current_value) > 0)
+                    throw vu::ModellingError(
+                      "Integrator %s erroneous Ta computation with "
+                      "negative x dot (%f)",
+                      getModelName().c_str(),
+                      current_derivative);
+
+                return (m_downthreshold - m_current_value) /
+                       current_derivative;
+            }
+            break;
+        default:
+            return vd::infinity;
+            break;
         }
     }
 

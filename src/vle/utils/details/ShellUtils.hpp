@@ -20,7 +20,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-
 #include <string.h>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
@@ -56,16 +55,15 @@
  * Error codes returned by shell functions.
  **/
 
-
 namespace vle {
 namespace utils {
 namespace details {
 
-
-class ShellUtils {
+class ShellUtils
+{
 public:
-    ShellUtils() {};
-    ~ShellUtils() {};
+    ShellUtils(){};
+    ~ShellUtils(){};
 
     /* Single quotes preserve the literal string exactly. escape
      * sequences are not allowed; not even \' - if you want a '
@@ -74,15 +72,15 @@ public:
      * Double quotes allow $ ` " \ and newline to be escaped with backslash.
      * Otherwise double quotes preserve things literally.
      */
-    std::pair<std::string, std::string::iterator>
-    unquote_string_inplace(std::string::iterator it,
-            std::string::iterator end)
+    std::pair<std::string, std::string::iterator> unquote_string_inplace(
+      std::string::iterator it,
+      std::string::iterator end)
     {
         std::string retval;
         char quote_char = *it;
 
-        if (not (quote_char == '"' or quote_char == '\'') ) {
-            throw ("Quoted text doesn't begin with a quotation mark");
+        if (not(quote_char == '"' or quote_char == '\'')) {
+            throw("Quoted text doesn't begin with a quotation mark");
         }
 
         ++it;
@@ -90,56 +88,54 @@ public:
             while (it != end) {
                 switch (*it) {
                 case '"':
-                  /* End of the string, return now */
-                  it ++;
-                  return std::make_pair(retval, it);
-                  break;
+                    /* End of the string, return now */
+                    it++;
+                    return std::make_pair(retval, it);
+                    break;
                 case '\\':
-                  /* Possible escaped quote or \ */
-                  it++;
-                  switch (*it) {
+                    /* Possible escaped quote or \ */
+                    it++;
+                    switch (*it) {
                     case '"':
                     case '\\':
                     case '`':
                     case '$':
                     case '\n':
-                      retval += *it;
-                      it++;
-                      break;
+                        retval += *it;
+                        it++;
+                        break;
                     default:
-                      /* not an escaped char */
-                      retval += '\\';
-                      break;
+                        /* not an escaped char */
+                        retval += '\\';
+                        break;
                     }
-                  break;
+                    break;
                 default:
-                  retval += *it;
-                  it++;
-                  break;
+                    retval += *it;
+                    it++;
+                    break;
                 }
             }
         } else {
-          while (it != end) {
-              if (*it == '\'') {
-                  /* End of the string, return now */
-                  it++;
-                  return std::make_pair(retval, it);
-              } else {
-                  retval += *it;
-                  it++;
-              }
-
+            while (it != end) {
+                if (*it == '\'') {
+                    /* End of the string, return now */
+                    it++;
+                    return std::make_pair(retval, it);
+                } else {
+                    retval += *it;
+                    it++;
+                }
             }
         }
 
         /* If we reach here this means the close quote was never
          * encountered */
-      throw vle::utils::CastError(
-          boost::str(
-              vle::fmt("Unmatched quotation mark in command line "
-                       "or other shell-quoted text: %1%") % retval));
+        throw vle::utils::CastError(
+          boost::str(vle::fmt("Unmatched quotation mark in command line "
+                              "or other shell-quoted text: %1%") %
+                     retval));
     }
-
 
     /**
      * g_shell_quote:
@@ -154,32 +150,31 @@ public:
      *
      * Returns: quoted string
      **/
-    std::string
-    g_shell_quote (const std::string& unquoted_string)
+    std::string g_shell_quote(const std::string& unquoted_string)
     {
-      /* We always use single quotes, because the algorithm is cheesier.
-       * We could use double if we felt like it, that might be more
-       * human-readable.
-       */
+        /* We always use single quotes, because the algorithm is cheesier.
+         * We could use double if we felt like it, that might be more
+         * human-readable.
+         */
 
-      std::string p = unquoted_string;
-      std::string dest = "'";
+        std::string p = unquoted_string;
+        std::string dest = "'";
 
-      /* could speed this up a lot by appending chunks of text at a
-       * time.
-       */
-      std::string::const_iterator itb = p.begin();
-      while (itb != p.end()) {
-          /* Replace literal ' with a close ', a \', and a open ' */
-          if (*itb == '\'') {
-              dest += "'\\''";
-          } else {
-              dest += *itb;
-          }
-          itb++;
-      }
-      dest += '\'';
-      return dest;
+        /* could speed this up a lot by appending chunks of text at a
+         * time.
+         */
+        std::string::const_iterator itb = p.begin();
+        while (itb != p.end()) {
+            /* Replace literal ' with a close ', a \', and a open ' */
+            if (*itb == '\'') {
+                dest += "'\\''";
+            } else {
+                dest += *itb;
+            }
+            itb++;
+        }
+        dest += '\'';
+        return dest;
     }
 
     /**
@@ -211,199 +206,195 @@ public:
      *
      * Returns: an unquoted string
      **/
-    std::string
-    g_shell_unquote (std::string& quoted_string)
+    std::string g_shell_unquote(std::string& quoted_string)
     {
-      std::string unquoted = quoted_string;
-      std::string retval;
+        std::string unquoted = quoted_string;
+        std::string retval;
 
-      std::string::iterator start = quoted_string.begin();
+        std::string::iterator start = quoted_string.begin();
 
-      /* The loop allows cases such as
-       * "foo"blah blah'bar'woo foo"baz"la la la\'\''foo'
-       */
-      while(start != quoted_string.end()) {
-          /* Append all non-quoted chars, honoring backslash escape
-           */
+        /* The loop allows cases such as
+         * "foo"blah blah'bar'woo foo"baz"la la la\'\''foo'
+         */
+        while (start != quoted_string.end()) {
+            /* Append all non-quoted chars, honoring backslash escape
+             */
 
-          while ((start != quoted_string.end()) &&
-                  not (*start == '"' or *start == '\'')) {
-              if (*start == '\\') {
-                  /* all characters can get escaped by backslash,
-                   * except newline, which is removed if it follows
-                   * a backslash outside of quotes
-                   */
-                  start ++;
-                  if (start != quoted_string.end()) {
-                      if (*start != '\n') {
-                          retval += *start;
-                      }
-                      start ++;
-                  }
-              } else {
-                  retval += *start;
-                  start++;
-              }
-          }
-          if (start != quoted_string.end())
-          {
-              std::pair<std::string, std::string::iterator> res =
-              unquote_string_inplace (start, quoted_string.end());
+            while ((start != quoted_string.end()) &&
+                   not(*start == '"' or *start == '\'')) {
+                if (*start == '\\') {
+                    /* all characters can get escaped by backslash,
+                     * except newline, which is removed if it follows
+                     * a backslash outside of quotes
+                     */
+                    start++;
+                    if (start != quoted_string.end()) {
+                        if (*start != '\n') {
+                            retval += *start;
+                        }
+                        start++;
+                    }
+                } else {
+                    retval += *start;
+                    start++;
+                }
+            }
+            if (start != quoted_string.end()) {
+                std::pair<std::string, std::string::iterator> res =
+                  unquote_string_inplace(start, quoted_string.end());
 
-              retval += res.first;
-              start = res.second;
-          }
-      }
-      return retval;
+                retval += res.first;
+                start = res.second;
+            }
+        }
+        return retval;
     }
 
-
-
-    std::vector<std::string>
-    tokenize_command_line (std::vector<std::string>& retval,
-            const std::string& cmd)
+    std::vector<std::string> tokenize_command_line(
+      std::vector<std::string>& retval,
+      const std::string& cmd)
     {
-      char current_quote = '\0';
-      std::string::const_iterator p = cmd.begin();
-      std::string current_token;
-      bool current_token_exist = false;
-      bool quoted = false;
+        char current_quote = '\0';
+        std::string::const_iterator p = cmd.begin();
+        std::string current_token;
+        bool current_token_exist = false;
+        bool quoted = false;
 
-      while (p != cmd.end()) {
-          if (current_quote == '\\') {
-              if (*p == '\n') {
-                  /* we append nothing; backslash-newline become nothing */
-              } else {
-                  /* we append the backslash and the current char,
-                   * to be interpreted later after tokenization
-                   */
-                  current_token_exist = true;
-                  current_token += '\\';
-                  current_token += *p;
-              }
-              current_quote = '\0';
-          } else if (current_quote == '#') {
-              /* Discard up to and including next newline */
-              while (*p and (*p != '\n')) {
-                ++p;
-              }
-              current_quote = '\0';
+        while (p != cmd.end()) {
+            if (current_quote == '\\') {
+                if (*p == '\n') {
+                    /* we append nothing; backslash-newline become nothing */
+                } else {
+                    /* we append the backslash and the current char,
+                     * to be interpreted later after tokenization
+                     */
+                    current_token_exist = true;
+                    current_token += '\\';
+                    current_token += *p;
+                }
+                current_quote = '\0';
+            } else if (current_quote == '#') {
+                /* Discard up to and including next newline */
+                while (*p and (*p != '\n')) {
+                    ++p;
+                }
+                current_quote = '\0';
 
-              if (*p == '\0') {
-                break;
-              }
-          } else if (current_quote) {
-              if ((*p == current_quote) and
-                      /* check that it isn't an escaped double quote */
-                      not (current_quote == '"' and quoted)) {
-                  /* close the quote */
-                  current_token_exist = true;
-                  current_quote = '\0';
-              }
-              /* Everything inside quotes, and the close quote,
-               * gets appended literally.
-               */
-              current_token += *p;
-          } else {
-              switch (*p) {
-              case '\n':
-                  retval.push_back(current_token);
-                  current_token = "";
-                  current_token_exist = false;
-                  break;
-              case ' ':
-              case '\t':
-                  /* If the current token contains the previous char, delimit
-                   * the current token. A nonzero length
-                   * token should always contain the previous char.
-                   */
-                  if ((current_token != "") and current_token.size() > 0) {
-                      retval.push_back(current_token);
-                      current_token = "";
-                      current_token_exist = false;
-                  }
-                  /* discard all unquoted blanks (don't add them to a token) */
-                  break;
-                  /* single/double quotes are appended to the token,
-                   * escapes are maybe appended next time through the loop,
-                   * comment chars are never appended.
-                   */
+                if (*p == '\0') {
+                    break;
+                }
+            } else if (current_quote) {
+                if ((*p == current_quote) and
+                    /* check that it isn't an escaped double quote */
+                    not(current_quote == '"' and quoted)) {
+                    /* close the quote */
+                    current_token_exist = true;
+                    current_quote = '\0';
+                }
+                /* Everything inside quotes, and the close quote,
+                 * gets appended literally.
+                 */
+                current_token += *p;
+            } else {
+                switch (*p) {
+                case '\n':
+                    retval.push_back(current_token);
+                    current_token = "";
+                    current_token_exist = false;
+                    break;
+                case ' ':
+                case '\t':
+                    /* If the current token contains the previous char, delimit
+                     * the current token. A nonzero length
+                     * token should always contain the previous char.
+                     */
+                    if ((current_token != "") and current_token.size() > 0) {
+                        retval.push_back(current_token);
+                        current_token = "";
+                        current_token_exist = false;
+                    }
+                    /* discard all unquoted blanks (don't add them to a token)
+                     */
+                    break;
+                /* single/double quotes are appended to the token,
+                 * escapes are maybe appended next time through the loop,
+                 * comment chars are never appended.
+                 */
 
-              case '\'':
-              case '"':
-                  current_token_exist = true;
-                  current_token += *p;
-                  current_quote = *p;
-		  break;
-              case '\\':
-                  current_quote = *p;
-                  break;
-              case '#':
-                  if (p == cmd.begin()) {
-                      /* '#' was the first char */
-                      current_quote = *p;
-                      break;
-                  }
-                  switch(*(p-1))
-                  {
-                  case ' ':
-                  case '\n':
-                  case '\0':
-                      current_quote = *p;
-                      break;
-                  default:
-                      current_token_exist = true;
-                      current_token += *p;
-                      break;
-                  }
-                  break;
+                case '\'':
+                case '"':
+                    current_token_exist = true;
+                    current_token += *p;
+                    current_quote = *p;
+                    break;
+                case '\\':
+                    current_quote = *p;
+                    break;
+                case '#':
+                    if (p == cmd.begin()) {
+                        /* '#' was the first char */
+                        current_quote = *p;
+                        break;
+                    }
+                    switch (*(p - 1)) {
+                    case ' ':
+                    case '\n':
+                    case '\0':
+                        current_quote = *p;
+                        break;
+                    default:
+                        current_token_exist = true;
+                        current_token += *p;
+                        break;
+                    }
+                    break;
 
-                  default:
-                      /* Combines rules 4) and 6) - if we have a token, append to it,
-                       * otherwise create a new token.
-                       */
-                      current_token_exist = true;
-                      current_token += *p;
-                      break;
-              }
-          }
-          /* We need to count consecutive backslashes mod 2,
-           * to detect escaped doublequotes.
-           */
-          if (*p != '\\') {
-              quoted = false;
-          } else {
-              quoted = !quoted;
-          }
-          ++p;
-      }
-      if (current_token_exist) {
-          retval.push_back(current_token);
-          current_token = "";
-          current_token_exist = false;
-      }
+                default:
+                    /* Combines rules 4) and 6) - if we have a token, append to
+                     * it,
+                     * otherwise create a new token.
+                     */
+                    current_token_exist = true;
+                    current_token += *p;
+                    break;
+                }
+            }
+            /* We need to count consecutive backslashes mod 2,
+             * to detect escaped doublequotes.
+             */
+            if (*p != '\\') {
+                quoted = false;
+            } else {
+                quoted = !quoted;
+            }
+            ++p;
+        }
+        if (current_token_exist) {
+            retval.push_back(current_token);
+            current_token = "";
+            current_token_exist = false;
+        }
 
-      if (current_quote) {
-          if (current_quote == '\\') {
-              throw vle::utils::CastError(
-                      _("Text ended just after a '\\' character."));
-          } else {
-              throw vle::utils::CastError(
-                      _("Text ended before matching quote was found"));
-          }
-          throw vle::utils::CastError("error");
-      }
+        if (current_quote) {
+            if (current_quote == '\\') {
+                throw vle::utils::CastError(
+                  _("Text ended just after a '\\' character."));
+            } else {
+                throw vle::utils::CastError(
+                  _("Text ended before matching quote was found"));
+            }
+            throw vle::utils::CastError("error");
+        }
 
-      if (retval.empty()) {
-          throw vle::utils::CastError(
-                  _("Text was empty (or contained only whitespace)"));
+        if (retval.empty()) {
+            throw vle::utils::CastError(
+              _("Text was empty (or contained only whitespace)"));
+        }
 
-      }
+        /* we appended backward */
+        // retval = retval.reverse; //TODO
 
-      /* we appended backward */
-      //retval = retval.reverse; //TODO
-
-      return retval;
+        return retval;
     }
 
     /**
@@ -426,15 +417,14 @@ public:
      *
      * Returns: %TRUE on success, %FALSE if error set
      **/
-    bool
-    g_shell_parse_argv (const std::string& cmd,
-            int&  argcp,
-            std::vector<std::string>& argvp)
+    bool g_shell_parse_argv(const std::string& cmd,
+                            int& argcp,
+                            std::vector<std::string>& argvp)
     {
         /* Code based on poptParseArgvString() from libpopt */
         std::vector<std::string> tokens;
 
-        tokenize_command_line (tokens, cmd);
+        tokenize_command_line(tokens, cmd);
         if (tokens.empty()) {
             return false;
         }
@@ -455,13 +445,12 @@ public:
 
         argcp = tokens.size();
         argvp.resize(argcp);
-        for (unsigned int i=0; i< tokens.size(); i++) {
-            argvp[i] = g_shell_unquote (tokens[i]);
+        for (unsigned int i = 0; i < tokens.size(); i++) {
+            argvp[i] = g_shell_unquote(tokens[i]);
         }
         return true;
     }
-
 };
-
-}}}//namespaces
-
+}
+}
+} // namespaces

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -27,13 +27,14 @@
 #ifndef VLE_UTILS_DOWNLOAD_MANAGER_HPP
 #define VLE_UTILS_DOWNLOAD_MANAGER_HPP
 
+#include <memory>
+#include <string>
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Types.hpp>
-#include <memory>
-#include <string>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * @brief An http file download process.
@@ -127,7 +128,7 @@ private:
     struct Pimpl;
     std::unique_ptr<Pimpl> mPimpl;
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

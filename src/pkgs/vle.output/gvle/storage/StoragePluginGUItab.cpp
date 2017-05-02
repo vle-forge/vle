@@ -21,37 +21,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
 #include "StoragePluginGUItab.h"
 #include "ui_StoragePluginGvle.h"
+#include <QDebug>
 
 /**
  * @brief StoragePluginGUItab::StoragePluginGUItab
  *        Default constructor
  */
-StoragePluginGUItab::StoragePluginGUItab(QWidget *parent) :
-    QWidget(parent), ui(new Ui::StoragePluginGvle), mvleVpz(0), mViewName(""),
-    outputNodeConfig(nullptr)
+StoragePluginGUItab::StoragePluginGUItab(QWidget* parent)
+  : QWidget(parent)
+  , ui(new Ui::StoragePluginGvle)
+  , mvleVpz(0)
+  , mViewName("")
+  , outputNodeConfig(nullptr)
 {
-//
+    //
     ui->setupUi(this);
-    QObject::connect(ui->spinBoxRows, SIGNAL(valueChanged(int)),
-                     this,         SLOT(rowsChanged(int)) );
-    QObject::connect(ui->spinBoxColumns, SIGNAL(valueChanged(int)),
-                     this,         SLOT(columnsChanged(int)) );
-    QObject::connect(ui->spinBoxUpdateRows, SIGNAL(valueChanged(int)),
-                     this,         SLOT(incRowsChanged(int)) );
-    QObject::connect(ui->spinBoxUpdateColumns, SIGNAL(valueChanged(int)),
-                     this,         SLOT(incColumnsChanged(int)) );
-    QObject::connect(ui->checkBoxHeader, SIGNAL(clicked(bool)),
-                     this,         SLOT(headerOnTopChanged(bool)) );
+    QObject::connect(ui->spinBoxRows,
+                     SIGNAL(valueChanged(int)),
+                     this,
+                     SLOT(rowsChanged(int)));
+    QObject::connect(ui->spinBoxColumns,
+                     SIGNAL(valueChanged(int)),
+                     this,
+                     SLOT(columnsChanged(int)));
+    QObject::connect(ui->spinBoxUpdateRows,
+                     SIGNAL(valueChanged(int)),
+                     this,
+                     SLOT(incRowsChanged(int)));
+    QObject::connect(ui->spinBoxUpdateColumns,
+                     SIGNAL(valueChanged(int)),
+                     this,
+                     SLOT(incColumnsChanged(int)));
+    QObject::connect(ui->checkBoxHeader,
+                     SIGNAL(clicked(bool)),
+                     this,
+                     SLOT(headerOnTopChanged(bool)));
 }
 
 StoragePluginGUItab::~StoragePluginGUItab()
 {
     delete ui;
 }
-
 
 void
 StoragePluginGUItab::init(vle::gvle::vleVpz* vpz, const QString& viewName)
@@ -77,19 +89,18 @@ StoragePluginGUItab::init(vle::gvle::vleVpz* vpz, const QString& viewName)
     ui->spinBoxUpdateRows->blockSignals(oldBlock);
 
     oldBlock = ui->spinBoxUpdateColumns->blockSignals(true);
-    ui->spinBoxUpdateColumns->setValue(outputNodeConfig->getInt("inc_columns"));
+    ui->spinBoxUpdateColumns->setValue(
+      outputNodeConfig->getInt("inc_columns"));
     ui->spinBoxUpdateColumns->blockSignals(oldBlock);
 
     oldBlock = ui->checkBoxHeader->blockSignals(true);
-    if (outputNodeConfig->getString("header") ==  "top") {
+    if (outputNodeConfig->getString("header") == "top") {
         ui->checkBoxHeader->setCheckState(Qt::Checked);
     } else {
         ui->checkBoxHeader->setCheckState(Qt::Unchecked);
     }
     ui->checkBoxHeader->blockSignals(oldBlock);
 }
-
-
 
 void
 StoragePluginGUItab::rowsChanged(int v)
@@ -135,7 +146,8 @@ StoragePluginGUItab::headerOnTopChanged(bool v)
     mvleVpz->fillOutputConfigMap(mViewName, *outputNodeConfig);
 }
 
-bool StoragePluginGUItab::wellFormed()
+bool
+StoragePluginGUItab::wellFormed()
 {
     if (not outputNodeConfig) {
         return false;
@@ -167,8 +179,8 @@ bool StoragePluginGUItab::wellFormed()
         } else if (key == "header") {
             if (not v->isString()) {
                 return false;
-            } else if (outputNodeConfig->getString("header") !=  "top" &&
-                       outputNodeConfig->getString("header") !=  "none") {
+            } else if (outputNodeConfig->getString("header") != "top" &&
+                       outputNodeConfig->getString("header") != "none") {
                 return false;
             }
         } else {
@@ -178,7 +190,8 @@ bool StoragePluginGUItab::wellFormed()
     return true;
 }
 
-void StoragePluginGUItab::buildDefaultConfig()
+void
+StoragePluginGUItab::buildDefaultConfig()
 {
     outputNodeConfig.reset(new vle::value::Map());
     outputNodeConfig->addInt("rows", 15);

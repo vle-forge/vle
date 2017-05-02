@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,19 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_REMOTEMANAGER_HPP
 #define VLE_UTILS_REMOTEMANAGER_HPP
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/Context.hpp>
-#include <vle/utils/Types.hpp>
 #include <iosfwd>
 #include <memory>
 #include <string>
 #include <vector>
+#include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
+#include <vle/utils/Types.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * @e PackageOperatorType defines the relation of an identified with
@@ -46,10 +46,10 @@ namespace vle { namespace utils {
  */
 enum PackageOperatorType
 {
-    PACKAGE_OPERATOR_EQUAL,     /**< = */
-    PACKAGE_OPERATOR_LESS,      /**< < */
-    PACKAGE_OPERATOR_LESS_OR_EQUAL, /**< <= */
-    PACKAGE_OPERATOR_GREATER,   /**< > */
+    PACKAGE_OPERATOR_EQUAL,           /**< = */
+    PACKAGE_OPERATOR_LESS,            /**< < */
+    PACKAGE_OPERATOR_LESS_OR_EQUAL,   /**< <= */
+    PACKAGE_OPERATOR_GREATER,         /**< > */
     PACKAGE_OPERATOR_GREATER_OR_EQUAL /**< >= */
 };
 
@@ -61,23 +61,23 @@ enum PackageOperatorType
  */
 struct PackageLinkId
 {
-    std::string name;           /**< Name of the package. */
-    int32_t major;              /**< -1 defines undefined major
-                                 * version. */
-    int32_t minor;              /**< -1 defines undefined minor
-                                 * version. */
-    int32_t patch;              /**< -1 defines undefined patch
-                                 * version. */
-    PackageOperatorType op;     /**< The relation between the
-                                   * identified package and this
-                                   * identified operator package. */
+    std::string name;       /**< Name of the package. */
+    int32_t major;          /**< -1 defines undefined major
+                             * version. */
+    int32_t minor;          /**< -1 defines undefined minor
+                             * version. */
+    int32_t patch;          /**< -1 defines undefined patch
+                             * version. */
+    PackageOperatorType op; /**< The relation between the
+                               * identified package and this
+                               * identified operator package. */
 };
 
-typedef std::vector < PackageLinkId > PackagesLinkId;
+typedef std::vector<PackageLinkId> PackagesLinkId;
 
 typedef std::string Tag;
 
-typedef std::vector < Tag > Tags;
+typedef std::vector<Tag> Tags;
 
 struct PackageId
 {
@@ -105,18 +105,18 @@ struct PackageId
  */
 enum RemoteManagerActions
 {
-    REMOTE_MANAGER_UPDATE,      /**< vle --remote update. */
-    REMOTE_MANAGER_SOURCE,      /**< vle --remote source glue. */
-    REMOTE_MANAGER_INSTALL,     /**< vle --remove install glue. */
+    REMOTE_MANAGER_UPDATE,       /**< vle --remote update. */
+    REMOTE_MANAGER_SOURCE,       /**< vle --remote source glue. */
+    REMOTE_MANAGER_INSTALL,      /**< vle --remove install glue. */
     REMOTE_MANAGER_LOCAL_SEARCH, /**< vle --remote localsearch '.*' */
-    REMOTE_MANAGER_SEARCH,      /**< vle --remote search '*lu*'. */
+    REMOTE_MANAGER_SEARCH,       /**< vle --remote search '*lu*'. */
     REMOTE_MANAGER_SHOW,         /**< vle --remote show glue. */
     REMOTE_MANAGER_LOCAL_SHOW    /**< vle --remote localshow glue. */
 };
 
 VLE_API std::ostream& operator<<(std::ostream& os, const PackageId& b);
 
-typedef std::vector < PackageId > Packages;
+typedef std::vector<PackageId> Packages;
 
 /**
  * \c RemoteManager allow to manager ftp/http repositories.
@@ -146,7 +146,8 @@ public:
      * Build a new RemoteManager object by reading packages list from
      * the standard location:
      * - Read the \c VLE_HOME/vle.conf file to get the list of remote host.
-     * - Read the \c VLE_HOME/package file to get the list of available package.
+     * - Read the \c VLE_HOME/package file to get the list of available
+     * package.
      */
     RemoteManager(ContextPtr ctx);
 
@@ -165,8 +166,8 @@ public:
      * @param[out] os The output stream of the action.
      */
     void start(RemoteManagerActions action,
-               const std::string&   arg,
-               std::ostream*        os);
+               const std::string& arg,
+               std::ostream* os);
 
     /**
      * Join the current thread: wait until the thread stop.
@@ -194,7 +195,7 @@ public:
      */
     void stop();
 
-    void getResult(Packages *out);
+    void getResult(Packages* out);
 
     /**
      * Returns true if the download fail or any other step (copy file,
@@ -208,17 +209,15 @@ public:
      */
     const std::string& messageError();
 
-    void compress(const Path& filepath,
-                  const Path& compressedfilepath);
+    void compress(const Path& filepath, const Path& compressedfilepath);
 
-    void decompress(const Path& compressedfilepath,
-                    const Path& directorypath);
+    void decompress(const Path& compressedfilepath, const Path& directorypath);
 
 private:
     class Pimpl;
     std::unique_ptr<Pimpl> mPimpl;
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

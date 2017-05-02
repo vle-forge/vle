@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -39,7 +39,8 @@ namespace vle {
 namespace devs {
 
 template <typename SimulatorT>
-bool simulator_process(SimulatorT *simulator, Time time) noexcept
+bool
+simulator_process(SimulatorT* simulator, Time time) noexcept
 {
     try {
         if (simulator->haveInternalEvent()) {
@@ -47,25 +48,24 @@ bool simulator_process(SimulatorT *simulator, Time time) noexcept
                 simulator->internalTransition(time);
             else
                 simulator->confluentTransitions(time);
-        }
-        else {
+        } else {
             simulator->externalTransition(time);
         }
-    }
-    catch (...) {
+    } catch (...) {
         return false;
     }
 
     return true;
 }
 
-class SimulatorProcessParallel {
+class SimulatorProcessParallel
+{
     std::vector<std::thread> m_workers;
     std::atomic<long int> m_block_id;
     std::atomic<long int> m_block_count;
     std::atomic<bool> m_running_flag;
 
-    std::vector<Simulator *> *m_jobs;
+    std::vector<Simulator*>* m_jobs;
     Time m_time;
     long m_block_size;
 
@@ -83,8 +83,7 @@ class SimulatorProcessParallel {
                     simulator_process((*m_jobs)[begin], m_time);
 
                 m_block_count.fetch_sub(1, std::memory_order_relaxed);
-            }
-            else {
+            } else {
                 //
                 // TODO: Maybe we can use a yield instead of this
                 // sleep_for function to reduce the overhead of the
@@ -97,7 +96,7 @@ class SimulatorProcessParallel {
 
 public:
     SimulatorProcessParallel(utils::ContextPtr context)
-        : m_jobs(nullptr)
+      : m_jobs(nullptr)
     {
         long block_size = 8;
         {
@@ -130,8 +129,7 @@ public:
             m_workers.reserve(workers_count);
             for (long i = 0; i != workers_count; ++i)
                 m_workers.emplace_back(&SimulatorProcessParallel::run, this);
-        }
-        catch (...) {
+        } catch (...) {
             m_running_flag.store(false, std::memory_order_relaxed);
             throw;
         }
@@ -141,14 +139,17 @@ public:
     {
         m_running_flag.store(false, std::memory_order_relaxed);
 
-        for (auto &thread : m_workers)
+        for (auto& thread : m_workers)
             if (thread.joinable())
                 thread.join();
     }
 
-    bool parallelize() const noexcept { return not m_workers.empty(); }
+    bool parallelize() const noexcept
+    {
+        return not m_workers.empty();
+    }
 
-    bool for_each(std::vector<Simulator *> &simulators, Time time) noexcept
+    bool for_each(std::vector<Simulator*>& simulators, Time time) noexcept
     {
         m_jobs = &simulators;
         m_time = time;

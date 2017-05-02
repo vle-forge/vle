@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -79,7 +79,7 @@ namespace utils {
  * \return a empty string if an error occured otherwise the \e printf()
  * formatted string.
  */
-std::string VLE_API format(const char *format,
+std::string VLE_API format(const char* format,
                            ...) noexcept GCC_ATTRIBUTE_FORMAT(1, 2);
 
 /**
@@ -92,7 +92,7 @@ std::string VLE_API format(const char *format,
  * \return a empty string if an error occured otherwise the \e printf()
  * formatted string.
  */
-std::string VLE_API vformat(const char *format, va_list ap) noexcept;
+std::string VLE_API vformat(const char* format, va_list ap) noexcept;
 
 /**
  * Return true if the string \c str can be translated the template type \c T.
@@ -103,7 +103,8 @@ std::string VLE_API vformat(const char *format, va_list ap) noexcept;
  *
  * @return true if string can be translated into the type \c T.
  */
-template <typename T> bool is(const std::string &str);
+template <typename T>
+bool is(const std::string& str);
 
 /**
  * Convert the template type \c T into the string representation.
@@ -114,7 +115,8 @@ template <typename T> bool is(const std::string &str);
  *
  * @return A string representation.
  */
-template <typename T> std::string to(const T t);
+template <typename T>
+std::string to(const T t);
 
 /**
  * Convert the string \c str into the template type \c T. The template type
@@ -127,7 +129,8 @@ template <typename T> std::string to(const T t);
  *
  * @return A instance of the type \c T.
  */
-template <typename T> T to(const std::string &str);
+template <typename T>
+T to(const std::string& str);
 
 /**
  * Convert the string to the output template type with or without
@@ -151,16 +154,16 @@ template <typename T> T to(const std::string &str);
  * @return A template output type.
  */
 template <typename T>
-T convert(const std::string &value,
+T convert(const std::string& value,
           bool locale = false,
-          const std::string &loc = std::string());
+          const std::string& loc = std::string());
 
 /**
  * Check if the locale exists on this operating system.
  * @param locale The locale to check.
  * @return True if the locale exists, false otherwise.
  */
-VLE_API bool isLocaleAvailable(const std::string &locale);
+VLE_API bool isLocaleAvailable(const std::string& locale);
 
 /**
  * Return the a string version of v, in scientific notation
@@ -170,7 +173,7 @@ VLE_API bool isLocaleAvailable(const std::string &locale);
  * @param locale  if true, use "," else use "."
  * @return the string representation of the double.
  */
-VLE_API std::string toScientificString(const double &v, bool locale = false);
+VLE_API std::string toScientificString(const double& v, bool locale = false);
 
 /**
  * Demangle the input type info from C++ compiler.
@@ -180,7 +183,7 @@ VLE_API std::string toScientificString(const double &v, bool locale = false);
  *
  * @return the demangled string or the same if libcwd is not linked.
  */
-VLE_API std::string demangle(const std::type_info &in);
+VLE_API std::string demangle(const std::type_info& in);
 
 /**
  * Demangle the input string from C++ compiler.
@@ -190,7 +193,7 @@ VLE_API std::string demangle(const std::type_info &in);
  *
  * @return the demangled string or the same if libcwd is not linked.
  */
-VLE_API std::string demangle(const std::string &in);
+VLE_API std::string demangle(const std::string& in);
 
 /**
  * Tokenize a string with a delimiter
@@ -200,9 +203,9 @@ VLE_API std::string demangle(const std::string &in);
  * @param[in]  trimEmpty, if true remove empty tokens
  * @return the tokens
  */
-VLE_API void tokenize(const std::string &str,
-                      std::vector<std::string> &toks,
-                      const std::string &delim,
+VLE_API void tokenize(const std::string& str,
+                      std::vector<std::string>& toks,
+                      const std::string& delim,
                       bool trimEmpty);
 
 /**
@@ -216,7 +219,8 @@ VLE_API void tokenize(const std::string &str,
  * @return true if @c static_cast<Target>(Source) is valid.
  */
 template <typename Target, typename Source>
-VLE_CXX14_CONSTEXPR inline bool is_numeric_castable(Source arg)
+VLE_CXX14_CONSTEXPR inline bool
+is_numeric_castable(Source arg)
 {
     static_assert(std::is_integral<Source>::value, "Integer required.");
     static_assert(std::is_integral<Target>::value, "Integer required.");
@@ -244,8 +248,9 @@ VLE_CXX14_CONSTEXPR inline bool is_numeric_castable(Source arg)
  * @e vle::utils::numerci_cast<TargetT>(SourceT) function that cast
  * integer type to another.
  */
-struct VLE_API numeric_cast_error : public std::exception {
-    virtual const char *what() const noexcept
+struct VLE_API numeric_cast_error : public std::exception
+{
+    virtual const char* what() const noexcept
     {
         return "numeric cast error: loss of range in numeric_cast";
     }
@@ -269,7 +274,8 @@ struct VLE_API numeric_cast_error : public std::exception {
  * @return @c static_cast<Target>(Source) integer.
  */
 template <typename Target, typename Source>
-VLE_CXX14_CONSTEXPR inline Target numeric_cast(Source s)
+VLE_CXX14_CONSTEXPR inline Target
+numeric_cast(Source s)
 {
     if (not is_numeric_castable<Target>(s))
         throw vle::utils::numeric_cast_error();

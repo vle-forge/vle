@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -52,9 +52,11 @@ class User;
 /**
  * @brief Virtual class to assign Value into Event object.
  */
-class VLE_API Value {
+class VLE_API Value
+{
 public:
-    enum type {
+    enum type
+    {
         BOOLEAN,
         INTEGER,
         DOUBLE,
@@ -82,12 +84,14 @@ public:
      * @brief Copy constructor. In subclass, all datas are cloned.
      * @param value The value to clone;
      */
-    Value(const Value &value) = default;
+    Value(const Value& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Value() {}
+    virtual ~Value()
+    {
+    }
 
     ///
     //// Abstract functions
@@ -103,19 +107,19 @@ public:
      * @brief Transform value into a simple std::string for text file.
      * @return std::string representation of Value.
      */
-    virtual void writeFile(std::ostream & /* out */) const = 0;
+    virtual void writeFile(std::ostream& /* out */) const = 0;
 
     /**
      * @brief Transform value into a simple std::string.
      * @return std::string representation of Value.
      */
-    virtual void writeString(std::ostream & /* out */) const = 0;
+    virtual void writeString(std::ostream& /* out */) const = 0;
 
     /**
      * @brief Transform value into XML structure.
      * @return std::string representation of XML structure of Value.
      */
-    virtual void writeXml(std::ostream & /* out */) const = 0;
+    virtual void writeXml(std::ostream& /* out */) const = 0;
 
     /**
      * @brief Return the type of value. The type is one of the 'type'
@@ -149,55 +153,91 @@ public:
      */
     std::string writeToXml() const;
 
-    inline bool isInteger() const { return getType() == Value::INTEGER; }
+    inline bool isInteger() const
+    {
+        return getType() == Value::INTEGER;
+    }
 
-    inline bool isBoolean() const { return getType() == Value::BOOLEAN; }
+    inline bool isBoolean() const
+    {
+        return getType() == Value::BOOLEAN;
+    }
 
-    inline bool isDouble() const { return getType() == Value::DOUBLE; }
+    inline bool isDouble() const
+    {
+        return getType() == Value::DOUBLE;
+    }
 
-    inline bool isString() const { return getType() == Value::STRING; }
+    inline bool isString() const
+    {
+        return getType() == Value::STRING;
+    }
 
-    inline bool isSet() const { return getType() == Value::SET; }
+    inline bool isSet() const
+    {
+        return getType() == Value::SET;
+    }
 
-    inline bool isMap() const { return getType() == Value::MAP; }
+    inline bool isMap() const
+    {
+        return getType() == Value::MAP;
+    }
 
-    inline bool isTuple() const { return getType() == Value::TUPLE; }
+    inline bool isTuple() const
+    {
+        return getType() == Value::TUPLE;
+    }
 
-    inline bool isTable() const { return getType() == Value::TABLE; }
+    inline bool isTable() const
+    {
+        return getType() == Value::TABLE;
+    }
 
-    inline bool isXml() const { return getType() == Value::XMLTYPE; }
+    inline bool isXml() const
+    {
+        return getType() == Value::XMLTYPE;
+    }
 
-    inline bool isNull() const { return getType() == Value::NIL; }
+    inline bool isNull() const
+    {
+        return getType() == Value::NIL;
+    }
 
-    inline bool isMatrix() const { return getType() == Value::MATRIX; }
+    inline bool isMatrix() const
+    {
+        return getType() == Value::MATRIX;
+    }
 
-    inline bool isUser() const { return getType() == Value::USER; }
+    inline bool isUser() const
+    {
+        return getType() == Value::USER;
+    }
 
-    const Boolean &toBoolean() const;
-    const Integer &toInteger() const;
-    const Double &toDouble() const;
-    const String &toString() const;
-    const Set &toSet() const;
-    const Map &toMap() const;
-    const Tuple &toTuple() const;
-    const Table &toTable() const;
-    const Xml &toXml() const;
-    const Null &toNull() const;
-    const Matrix &toMatrix() const;
-    const User &toUser() const;
+    const Boolean& toBoolean() const;
+    const Integer& toInteger() const;
+    const Double& toDouble() const;
+    const String& toString() const;
+    const Set& toSet() const;
+    const Map& toMap() const;
+    const Tuple& toTuple() const;
+    const Table& toTable() const;
+    const Xml& toXml() const;
+    const Null& toNull() const;
+    const Matrix& toMatrix() const;
+    const User& toUser() const;
 
-    Boolean &toBoolean();
-    Integer &toInteger();
-    Double &toDouble();
-    String &toString();
-    Set &toSet();
-    Map &toMap();
-    Tuple &toTuple();
-    Table &toTable();
-    Xml &toXml();
-    Null &toNull();
-    Matrix &toMatrix();
-    User &toUser();
+    Boolean& toBoolean();
+    Integer& toInteger();
+    Double& toDouble();
+    String& toString();
+    Set& toSet();
+    Map& toMap();
+    Tuple& toTuple();
+    Table& toTable();
+    Xml& toXml();
+    Null& toNull();
+    Matrix& toMatrix();
+    User& toUser();
 
     /**
      * @brief Stream operator for the value classes. This operator call the
@@ -207,7 +247,7 @@ public:
      * @param obj the sub class of value::Value to write.
      * @return the std::stream.
      */
-    friend std::ostream &operator<<(std::ostream &out, const Value &obj)
+    friend std::ostream& operator<<(std::ostream& out, const Value& obj)
     {
         obj.writeString(out);
         return out;
@@ -230,7 +270,7 @@ VLE_API std::shared_ptr<Value> clone(std::shared_ptr<const Value> v);
  * @param val The Value to check.
  * @return True if the Value is a Map, a Set or a Matrix.
  */
-VLE_API bool is_composite(const std::unique_ptr<Value> &val);
+VLE_API bool is_composite(const std::unique_ptr<Value>& val);
 
 /**
  * @brief Convert a constant value::Value @c std::unique_ptr to a constant
@@ -239,7 +279,7 @@ VLE_API bool is_composite(const std::unique_ptr<Value> &val);
  * @return A reference.
  * @throw utils::ArgError if value is NULL.
  */
-VLE_API const Value &reference(const std::unique_ptr<Value> &value);
+VLE_API const Value& reference(const std::unique_ptr<Value>& value);
 
 /**
  * @brief Convert a constant value::Value @c std::shared_ptr to a constant
@@ -248,7 +288,7 @@ VLE_API const Value &reference(const std::unique_ptr<Value> &value);
  * @return A reference.
  * @throw utils::ArgError if value is NULL.
  */
-VLE_API const Value &reference(std::shared_ptr<const Value> value);
+VLE_API const Value& reference(std::shared_ptr<const Value> value);
 
 /**
  * @brief Convert a constant value::Value @c std::shared_ptr to a constant
@@ -257,7 +297,7 @@ VLE_API const Value &reference(std::shared_ptr<const Value> value);
  * @return A reference.
  * @throw utils::ArgError if value is NULL.
  */
-VLE_API const Value &reference(std::shared_ptr<Value> value);
+VLE_API const Value& reference(std::shared_ptr<Value> value);
 }
 }
 

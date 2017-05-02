@@ -27,23 +27,21 @@
 
 #include <QDebug>
 
-
-#include <QLabel>
-#include <QMouseEvent>
-#include <QString>
-#include <QWidget>
-#include <QPainter>
-#include <QPoint>
-#include <QStaticText>
-#include <QStyleOption>
+#include <QDateTimeEdit>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNamedNodeMap>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPoint>
+#include <QStaticText>
+#include <QString>
+#include <QStyleOption>
+#include <QWidget>
 #include <QXmlDefaultHandler>
-#include <QDateTimeEdit>
-#include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
-
+#include <vle/value/Value.hpp>
 
 namespace vle {
 namespace gvle {
@@ -67,12 +65,13 @@ public:
      * @brief get attribute value of a node which name is attrName
      */
     static QString attributeValue(const QDomNode& node,
-            const QString& attrName);
+                                  const QString& attrName);
     /**
      * @brief set an attribute value to a node
      */
-    static void setAttributeValue(QDomNode& node, const QString& attrName,
-            const QString& val);
+    static void setAttributeValue(QDomNode& node,
+                                  const QString& attrName,
+                                  const QString& val);
     /**
      * @brief get the first child corresponding to the name and add it
      * if not present
@@ -83,15 +82,14 @@ public:
      * @param the (created or found) resulting node
      */
     static QDomNode obtainChild(QDomNode node,
-            const QString& nodeName, QDomDocument* domDoc=0);
-
+                                const QString& nodeName,
+                                QDomDocument* domDoc = 0);
 
     static QString toQString(const QDomNode& node);
     /**
      * @brief Remove all childs from a QDomNode (keep attributes)
      */
     static void removeAllChilds(QDomNode node);
-
 
     /**
      * @brief get a child with a specific nodename and a specific value
@@ -104,8 +102,9 @@ public:
      * @param the (created or found or null) resulting node
      */
     static QDomNode childWhithNameAttr(QDomNode node,
-            const QString& nodeName, const QString& nameValue,
-            QDomDocument* domDoc=0);
+                                       const QString& nodeName,
+                                       const QString& nameValue,
+                                       QDomDocument* domDoc = 0);
     /**
      * @brief get values of attribute "name" of children for
      * some child_node
@@ -120,7 +119,7 @@ public:
      */
     static QSet<QString> childNames(QDomNode node, QString child_node);
     static QList<QDomNode> childNodesWithoutText(QDomNode node,
-                         const QString& nodeName = "");
+                                                 const QString& nodeName = "");
 
     /**
      * @brief get a new name for a child of QDomNode
@@ -135,11 +134,13 @@ public:
      * @param exclude, a list of name to exlude
      * @retrun a name starting from prefix and different from "A", "B", etc..
      */
-    static QString childNameProvider(QDomNode node, QString child_node,
-                    QString prefix, const QSet<QString>& exclude);
-    static QString childNameProvider(QDomNode node, QString child_node,
-            QString prefix);
-
+    static QString childNameProvider(QDomNode node,
+                                     QString child_node,
+                                     QString prefix,
+                                     const QSet<QString>& exclude);
+    static QString childNameProvider(QDomNode node,
+                                     QString child_node,
+                                     QString prefix);
 };
 
 /**
@@ -149,11 +150,16 @@ public:
 class DomObject
 {
 public:
-    DomObject(QDomDocument* doc): mDoc(doc) {}
-    virtual ~DomObject() {}
+    DomObject(QDomDocument* doc)
+      : mDoc(doc)
+    {
+    }
+    virtual ~DomObject()
+    {
+    }
     virtual QString getXQuery(QDomNode node) = 0;
     virtual QDomNode getNodeFromXQuery(const QString& query,
-            QDomNode d=QDomNode()) = 0;
+                                       QDomNode d = QDomNode()) = 0;
     QDomDocument* mDoc;
 };
 
@@ -165,7 +171,8 @@ class DomDiffStack : public QObject
 {
     Q_OBJECT
 public:
-    struct DomDiff {
+    struct DomDiff
+    {
         QDomNode node_before;
         QDomNode node_after;
         QString query;
@@ -196,9 +203,9 @@ public:
     DomDiffStack(DomObject* vdo);
     virtual ~DomDiffStack();
 
-    void init (QDomNode node);
+    void init(QDomNode node);
     bool enableSnapshot(bool enable);
-    void snapshot (QDomNode node);
+    void snapshot(QDomNode node);
     /**
      * @brief  specific snapshot for possible merge
      * @param node, the node to save
@@ -211,8 +218,9 @@ public:
      *  DOM object concerned with the action
      *  The queries should be the same in order to merge with previous snapshot
      */
-    void snapshot (QDomNode node, QString mergeType,
-            vle::value::Map* mergeArgs);
+    void snapshot(QDomNode node,
+                  QString mergeType,
+                  vle::value::Map* mergeArgs);
 
     void undo();
     void redo();
@@ -230,27 +238,24 @@ public:
      */
     void print(std::ostream& out) const;
 
-
     /**
      * @brief tells if the last action (snapshot, undo or redo)
      * changed the state of undo availability
      * @return -1, if the stack changed undo action from available to not.
      *          0, if the stack did not changed undo availability
-     *          1, if the stack changed undo action from not available to avail.
+     *          1, if the stack changed undo action from not available to
+     * avail.
      */
-    static int computeUndoAvailability(
-            unsigned int prevCurr,
-            unsigned int curr,
-            unsigned int saved);
+    static int computeUndoAvailability(unsigned int prevCurr,
+                                       unsigned int curr,
+                                       unsigned int saved);
     void tryEmitUndoAvailability();
 signals:
     void undoRedoVdo(QDomNode oldVal, QDomNode newVal);
     void snapshotVdo(QDomNode snapshot, bool isMerged);
     void undoAvailable(bool);
-
-
 };
-
-}}//namepsaces
+}
+} // namepsaces
 
 #endif

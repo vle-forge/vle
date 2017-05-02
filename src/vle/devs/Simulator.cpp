@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,30 +24,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/vpz/AtomicModel.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 
-namespace vle
-{
-namespace devs
-{
+namespace vle {
+namespace devs {
 
-Simulator::Simulator(vpz::AtomicModel *atomic)
-    : m_atomicModel(atomic)
-    , m_tn(negativeInfinity)
-    , m_have_handle(false)
-    , m_have_internal(false)
+Simulator::Simulator(vpz::AtomicModel* atomic)
+  : m_atomicModel(atomic)
+  , m_tn(negativeInfinity)
+  , m_have_handle(false)
+  , m_have_internal(false)
 {
     assert(atomic && "Simulator: missing vpz::AtomicMOdel");
 
     m_atomicModel->m_simulator = this;
 }
 
-void Simulator::updateSimulatorTargets(const std::string &port)
+void
+Simulator::updateSimulatorTargets(const std::string& port)
 {
     assert(m_atomicModel);
 
@@ -61,15 +60,16 @@ void Simulator::updateSimulatorTargets(const std::string &port)
         return;
     }
 
-    for (auto &elem : result)
-        mTargets.emplace(port,
-                         TargetSimulator(static_cast<vpz::AtomicModel *>(
-                                             elem.first)->get_simulator(),
-                                         elem.second));
+    for (auto& elem : result)
+        mTargets.emplace(
+          port,
+          TargetSimulator(
+            static_cast<vpz::AtomicModel*>(elem.first)->get_simulator(),
+            elem.second));
 }
 
 std::pair<Simulator::iterator, Simulator::iterator>
-Simulator::targets(const std::string &port)
+Simulator::targets(const std::string& port)
 {
     auto x = mTargets.equal_range(port);
 
@@ -82,12 +82,13 @@ Simulator::targets(const std::string &port)
     }
 
     if (x.first->second.first == nullptr)
-        return {mTargets.end(), mTargets.end()};
+        return { mTargets.end(), mTargets.end() };
 
     return x;
 }
 
-void Simulator::removeTargetPort(const std::string &port)
+void
+Simulator::removeTargetPort(const std::string& port)
 {
     auto it = mTargets.find(port);
 
@@ -96,20 +97,23 @@ void Simulator::removeTargetPort(const std::string &port)
     }
 }
 
-void Simulator::addTargetPort(const std::string &port)
+void
+Simulator::addTargetPort(const std::string& port)
 {
     assert(mTargets.find(port) == mTargets.end());
 
-    mTargets.insert(value_type(
-        port, TargetSimulator((Simulator *)nullptr, std::string())));
+    mTargets.insert(
+      value_type(port, TargetSimulator((Simulator*)nullptr, std::string())));
 }
 
-void Simulator::addDynamics(std::unique_ptr<Dynamics> dynamics)
+void
+Simulator::addDynamics(std::unique_ptr<Dynamics> dynamics)
 {
     m_dynamics = std::unique_ptr<Dynamics>(std::move(dynamics));
 }
 
-const std::string &Simulator::getName() const
+const std::string&
+Simulator::getName() const
 {
     if (not m_atomicModel)
         throw utils::InternalError(_("Simulator destroyed"));
@@ -117,41 +121,49 @@ const std::string &Simulator::getName() const
     return m_atomicModel->getName();
 }
 
-void Simulator::finish() { m_dynamics->finish(); }
+void
+Simulator::finish()
+{
+    m_dynamics->finish();
+}
 
-void Simulator::output(Time time)
+void
+Simulator::output(Time time)
 {
     assert(m_result.empty());
 
     m_dynamics->output(time, m_result);
 }
 
-Time Simulator::timeAdvance()
+Time
+Simulator::timeAdvance()
 {
     Time tn = m_dynamics->timeAdvance();
 
     if (tn < 0.0)
         throw utils::ModellingError(
-            (fmt(_("Negative time advance in '%1%' (%2%)")) % getName() % tn)
-                .str());
+          (fmt(_("Negative time advance in '%1%' (%2%)")) % getName() % tn)
+            .str());
 
     return tn;
 }
 
-Time Simulator::init(Time time)
+Time
+Simulator::init(Time time)
 {
     Time tn = m_dynamics->init(time);
 
     if (tn < 0.0)
         throw utils::ModellingError(
-            (fmt(_("Negative init function in '%1%' (%2%)")) % getName() % tn)
-                .str());
+          (fmt(_("Negative init function in '%1%' (%2%)")) % getName() % tn)
+            .str());
 
     m_tn = tn + time;
     return m_tn;
 }
 
-Time Simulator::confluentTransitions(Time time)
+Time
+Simulator::confluentTransitions(Time time)
 {
     assert(not m_external_events.empty() and "Simulator d-conf error");
     assert(m_have_internal == true and "Simulator d-conf error");
@@ -164,7 +176,8 @@ Time Simulator::confluentTransitions(Time time)
     return m_tn;
 }
 
-Time Simulator::internalTransition(Time time)
+Time
+Simulator::internalTransition(Time time)
 {
     assert(m_have_internal == true and "Simulator d-int error");
     m_dynamics->internalTransition(time);
@@ -175,7 +188,8 @@ Time Simulator::internalTransition(Time time)
     return m_tn;
 }
 
-Time Simulator::externalTransition(Time time)
+Time
+Simulator::externalTransition(Time time)
 {
     assert(not m_external_events.empty() and "Simulator d-ext error");
     m_dynamics->externalTransition(m_external_events, time);
@@ -187,7 +201,7 @@ Time Simulator::externalTransition(Time time)
 }
 
 std::unique_ptr<value::Value>
-Simulator::observation(const ObservationEvent &event) const
+Simulator::observation(const ObservationEvent& event) const
 {
     return m_dynamics->observation(event);
 }

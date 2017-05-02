@@ -1,4 +1,4 @@
-/* Copyright (C) 2016 INRA
+/* Copyright (C) 2016-2017 INRA
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -23,20 +23,19 @@
 #ifndef ORG_VLEPROJECT_UNIT_TEST_HPP
 #define ORG_VLEPROJECT_UNIT_TEST_HPP
 
-#include <iostream>
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <iostream>
 
-namespace unit_test
-{
-namespace detail
-{
+namespace unit_test {
+namespace detail {
 
-struct tester {
+struct tester
+{
     int errors = 0;
     bool called_report_function = false;
 
-    tester &operator++() noexcept
+    tester& operator++() noexcept
     {
         errors++;
 
@@ -58,17 +57,19 @@ struct tester {
     }
 };
 
-inline tester &test_errors()
+inline tester&
+test_errors()
 {
     static tester t;
 
     return t;
 }
 
-inline void ensures_impl(const char *expr,
-                         const char *file,
-                         int line,
-                         const char *function)
+inline void
+ensures_impl(const char* expr,
+             const char* file,
+             int line,
+             const char* function)
 {
     std::cerr << file << "(" << line << "): test '" << expr
               << "' failed in function '" << function << "'\n";
@@ -76,11 +77,12 @@ inline void ensures_impl(const char *expr,
     ++test_errors();
 }
 
-inline void ensures_equal_impl(const char *expr1,
-                               const char *expr2,
-                               const char *file,
-                               int line,
-                               const char *function)
+inline void
+ensures_equal_impl(const char* expr1,
+                   const char* expr2,
+                   const char* file,
+                   int line,
+                   const char* function)
 {
     std::cerr << file << "(" << line << "): test '" << expr1 << " == " << expr2
               << "' failed in function '" << function << "'\n";
@@ -88,11 +90,12 @@ inline void ensures_equal_impl(const char *expr1,
     ++test_errors();
 }
 
-inline void ensures_not_equal_impl(const char *expr1,
-                                   const char *expr2,
-                                   const char *file,
-                                   int line,
-                                   const char *function)
+inline void
+ensures_not_equal_impl(const char* expr1,
+                       const char* expr2,
+                       const char* file,
+                       int line,
+                       const char* function)
 {
     std::cerr << file << "(" << line << "): test '" << expr1 << " != " << expr2
               << "' failed in function '" << function << "'\n";
@@ -100,10 +103,11 @@ inline void ensures_not_equal_impl(const char *expr1,
     ++test_errors();
 }
 
-inline void ensures_throw_impl(const char *excep,
-                               const char *file,
-                               int line,
-                               const char *function)
+inline void
+ensures_throw_impl(const char* excep,
+                   const char* file,
+                   int line,
+                   const char* function)
 {
     std::cerr << file << "(" << line << "): exception '" << excep
               << "' throw failed in function '" << function << "'\n";
@@ -111,10 +115,11 @@ inline void ensures_throw_impl(const char *excep,
     ++test_errors();
 }
 
-inline void ensures_not_throw_impl(const char *excep,
-                                   const char *file,
-                                   int line,
-                                   const char *function)
+inline void
+ensures_not_throw_impl(const char* excep,
+                       const char* file,
+                       int line,
+                       const char* function)
 {
     std::cerr << file << "(" << line << "): exception '" << excep
               << "' not throw failed in function '" << function << "'\n";
@@ -122,12 +127,13 @@ inline void ensures_not_throw_impl(const char *excep,
     ++test_errors();
 }
 
-inline void ensures_approximately_equal(const char *expr1,
-                                        const char *expr2,
-                                        const char *epsilon,
-                                        const char *file,
-                                        int line,
-                                        const char *function)
+inline void
+ensures_approximately_equal(const char* expr1,
+                            const char* expr2,
+                            const char* epsilon,
+                            const char* file,
+                            int line,
+                            const char* function)
 {
     std::cerr << file << "(" << line << "): test '" << expr1 << " != " << expr2
               << " (epsilon: " << epsilon << ")"
@@ -137,7 +143,7 @@ inline void ensures_approximately_equal(const char *expr1,
 }
 
 inline void
-ensures_not_reached(const char *file, int line, const char *function)
+ensures_not_reached(const char* file, int line, const char* function)
 {
     std::cerr << file << "(" << line << "): reached in function " << function
               << "'\n";
@@ -147,9 +153,10 @@ ensures_not_reached(const char *file, int line, const char *function)
 
 } // namespace details
 
-inline int report_errors()
+inline int
+report_errors()
 {
-    auto &tester = unit_test::detail::test_errors();
+    auto& tester = unit_test::detail::test_errors();
     tester.called_report_function = true;
     int errors = tester.errors;
 
@@ -168,7 +175,7 @@ inline int report_errors()
     do {                                                                      \
         if (not(expr)) {                                                      \
             unit_test::detail::ensures_impl(                                  \
-                #expr, __FILE__, __LINE__, __func__);                         \
+              #expr, __FILE__, __LINE__, __func__);                           \
         }                                                                     \
     } while (0)
 
@@ -176,7 +183,7 @@ inline int report_errors()
     do {                                                                      \
         if (not((expr1) == (expr2))) {                                        \
             unit_test::detail::ensures_equal_impl(                            \
-                #expr1, #expr2, __FILE__, __LINE__, __func__);                \
+              #expr1, #expr2, __FILE__, __LINE__, __func__);                  \
         }                                                                     \
     } while (0)
 
@@ -184,7 +191,7 @@ inline int report_errors()
     do {                                                                      \
         if (not((expr1) != (expr2))) {                                        \
             unit_test::detail::ensures_not_equal_impl(                        \
-                #expr1, #expr2, __FILE__, __LINE__, __func__);                \
+              #expr1, #expr2, __FILE__, __LINE__, __func__);                  \
         }                                                                     \
     } while (0)
 
@@ -193,11 +200,11 @@ inline int report_errors()
         try {                                                                 \
             expr;                                                             \
             unit_test::detail::ensures_throw_impl(                            \
-                #Excep, __FILE__, __LINE__, __func__);                        \
-        } catch (const Excep &) {                                             \
+              #Excep, __FILE__, __LINE__, __func__);                          \
+        } catch (const Excep&) {                                              \
         } catch (...) {                                                       \
             unit_test::detail::ensures_throw_impl(                            \
-                #Excep, __FILE__, __LINE__, __func__);                        \
+              #Excep, __FILE__, __LINE__, __func__);                          \
         }                                                                     \
     } while (0)
 
@@ -205,9 +212,9 @@ inline int report_errors()
     do {                                                                      \
         try {                                                                 \
             expr;                                                             \
-        } catch (const Excep &) {                                             \
+        } catch (const Excep&) {                                              \
             unit_test::detail::ensures_not_throw_impl(                        \
-                #Excep, __FILE__, __LINE__, __func__);                        \
+              #Excep, __FILE__, __LINE__, __func__);                          \
         } catch (...) {                                                       \
         }                                                                     \
     } while (0)
@@ -219,7 +226,7 @@ inline int report_errors()
                                                     : std::abs(expr1)) *      \
                  (epsilon)))) {                                               \
             unit_test::detail::ensures_approximately_equal(                   \
-                #expr1, #expr2, #epsilon, __FILE__, __LINE__, __func__);      \
+              #expr1, #expr2, #epsilon, __FILE__, __LINE__, __func__);        \
         }                                                                     \
     } while (0)
 
@@ -230,7 +237,7 @@ inline int report_errors()
                                                     : std::abs(expr1)) *      \
                  (epsilon)))) {                                               \
             unit_test::detail::ensures_approximately_equal(                   \
-                #expr1, #expr2, #epsilon, __FILE__, __LINE__, __func__);      \
+              #expr1, #expr2, #epsilon, __FILE__, __LINE__, __func__);        \
         }                                                                     \
     } while (0)
 

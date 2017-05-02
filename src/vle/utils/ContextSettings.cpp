@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -78,42 +78,45 @@
 namespace vle {
 namespace utils {
 
-void Context::reset_settings() noexcept
+void
+Context::reset_settings() noexcept
 {
     m_pimpl->settings = {
-        {"gvle.packages.auto-build", true},
-        {"gvle.editor.auto-indent", true},
-        {"gvle.editor.font", std::string("Monospace 10")},
-        {"gvle.editor.highlight-line", true},
-        {"gvle.editor.highlight-brackets", true},
-        {"gvle.editor.highlight-syntax", true},
-        {"gvle.editor.indent-on-tab", true},
-        {"gvle.editor.indent-size", 4l},
-        {"gvle.editor.show-line-numbers", true},
-        {"gvle.editor.show-right-margin", true},
-        {"gvle.editor.smart-home-end", true},
-        {"gvle.graphics.background-color", std::string("#ffffffffffff")},
-        {"gvle.graphics.foreground-color", std::string("#000000000000")},
-        {"gvle.graphics.atomic-color", std::string("#0000ffff0000")},
-        {"gvle.graphics.coupled-color", std::string("#00000000ffff")},
-        {"gvle.graphics.selected-color", std::string("#ffff00000000")},
-        {"gvle.graphics.connection-color", std::string("#000000000000")},
-        {"gvle.graphics.font", std::string("Monospace 10")},
-        {"gvle.graphics.font-size", 10.0},
-        {"gvle.graphics.line-width", 3.0},
-        {"vle.simulation.thread", 0l},
-        {"vle.simulation.block-size", 8l},
-        {"vle.packages.configure", std::string(VLE_PACKAGE_COMMAND_CONFIGURE)},
-        {"vle.packages.test", std::string(VLE_PACKAGE_COMMAND_TEST)},
-        {"vle.packages.build", std::string(VLE_PACKAGE_COMMAND_BUILD)},
-        {"vle.packages.install", std::string(VLE_PACKAGE_COMMAND_INSTALL)},
-        {"vle.packages.clean", std::string(VLE_PACKAGE_COMMAND_CLEAN)},
-        {"vle.packages.package", std::string(VLE_PACKAGE_COMMAND_PACKAGE)},
-        {"vle.command.tar", std::string(VLE_COMMAND_TAR)},
-        {"vle.command.untar", std::string(VLE_COMMAND_UNTAR)},
-        {"vle.command.url.get", std::string(VLE_COMMAND_URL_GET)},
-        {"vle.command.dir.copy", std::string(VLE_COMMAND_DIR_COPY)},
-        {"vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE)}};
+        { "gvle.packages.auto-build", true },
+        { "gvle.editor.auto-indent", true },
+        { "gvle.editor.font", std::string("Monospace 10") },
+        { "gvle.editor.highlight-line", true },
+        { "gvle.editor.highlight-brackets", true },
+        { "gvle.editor.highlight-syntax", true },
+        { "gvle.editor.indent-on-tab", true },
+        { "gvle.editor.indent-size", 4l },
+        { "gvle.editor.show-line-numbers", true },
+        { "gvle.editor.show-right-margin", true },
+        { "gvle.editor.smart-home-end", true },
+        { "gvle.graphics.background-color", std::string("#ffffffffffff") },
+        { "gvle.graphics.foreground-color", std::string("#000000000000") },
+        { "gvle.graphics.atomic-color", std::string("#0000ffff0000") },
+        { "gvle.graphics.coupled-color", std::string("#00000000ffff") },
+        { "gvle.graphics.selected-color", std::string("#ffff00000000") },
+        { "gvle.graphics.connection-color", std::string("#000000000000") },
+        { "gvle.graphics.font", std::string("Monospace 10") },
+        { "gvle.graphics.font-size", 10.0 },
+        { "gvle.graphics.line-width", 3.0 },
+        { "vle.simulation.thread", 0l },
+        { "vle.simulation.block-size", 8l },
+        { "vle.packages.configure",
+          std::string(VLE_PACKAGE_COMMAND_CONFIGURE) },
+        { "vle.packages.test", std::string(VLE_PACKAGE_COMMAND_TEST) },
+        { "vle.packages.build", std::string(VLE_PACKAGE_COMMAND_BUILD) },
+        { "vle.packages.install", std::string(VLE_PACKAGE_COMMAND_INSTALL) },
+        { "vle.packages.clean", std::string(VLE_PACKAGE_COMMAND_CLEAN) },
+        { "vle.packages.package", std::string(VLE_PACKAGE_COMMAND_PACKAGE) },
+        { "vle.command.tar", std::string(VLE_COMMAND_TAR) },
+        { "vle.command.untar", std::string(VLE_COMMAND_UNTAR) },
+        { "vle.command.url.get", std::string(VLE_COMMAND_URL_GET) },
+        { "vle.command.dir.copy", std::string(VLE_COMMAND_DIR_COPY) },
+        { "vle.command.dir.remove", std::string(VLE_COMMAND_DIR_REMOVE) }
+    };
 
     auto version = vle::version_abi();
 
@@ -134,7 +137,8 @@ void Context::reset_settings() noexcept
     m_pimpl->settings["vle.command.vle.simulation"] = simulation;
 }
 
-bool Context::load_settings() noexcept
+bool
+Context::load_settings() noexcept
 {
     std::ifstream ifs(getConfigurationFile().string());
     if (not ifs.is_open()) {
@@ -180,29 +184,24 @@ bool Context::load_settings() noexcept
                        " at line %d in %s\n"),
                      l,
                      value.c_str());
-        }
-        else if (boost::get<std::string>(&it->second)) {
+        } else if (boost::get<std::string>(&it->second)) {
             it->second = value;
-        }
-        else if (boost::get<long>(&it->second)) {
+        } else if (boost::get<long>(&it->second)) {
             try {
                 long r = std::stol(value);
                 it->second = r;
-            }
-            catch (const std::exception & /* e */) {
+            } catch (const std::exception& /* e */) {
                 vErr(this,
                      _("Settings: fail reading integer value"
                        " at line %d in %s\n"),
                      l,
                      value.c_str());
             }
-        }
-        else if (boost::get<long>(&it->second)) {
+        } else if (boost::get<long>(&it->second)) {
             try {
                 double r = std::stod(value);
                 it->second = r;
-            }
-            catch (const std::exception & /* e */) {
+            } catch (const std::exception& /* e */) {
                 vErr(this,
                      _("Settings: fail reading double value"
                        " at line %d in %s\n"),
@@ -216,7 +215,8 @@ bool Context::load_settings() noexcept
     return true;
 }
 
-bool Context::write_settings() const noexcept
+bool
+Context::write_settings() const noexcept
 {
     std::ofstream ofs(getConfigurationFile().string());
     if (not ofs.is_open()) {
@@ -227,7 +227,7 @@ bool Context::write_settings() const noexcept
     }
 
     ofs << std::boolalpha;
-    for (const auto &elem : m_pimpl->settings)
+    for (const auto& elem : m_pimpl->settings)
         ofs << elem.first << '=' << elem.second << '\n';
 
     if (ofs.bad()) {
@@ -240,8 +240,8 @@ bool Context::write_settings() const noexcept
     return true;
 }
 
-bool Context::set_setting(const std::string &key,
-                          const std::string &value) noexcept
+bool
+Context::set_setting(const std::string& key, const std::string& value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -255,7 +255,8 @@ bool Context::set_setting(const std::string &key,
     return true;
 }
 
-bool Context::set_setting(const std::string &key, double value) noexcept
+bool
+Context::set_setting(const std::string& key, double value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -269,7 +270,8 @@ bool Context::set_setting(const std::string &key, double value) noexcept
     return true;
 }
 
-bool Context::set_setting(const std::string &key, long value) noexcept
+bool
+Context::set_setting(const std::string& key, long value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -283,7 +285,8 @@ bool Context::set_setting(const std::string &key, long value) noexcept
     return true;
 }
 
-bool Context::set_setting(const std::string &key, bool value) noexcept
+bool
+Context::set_setting(const std::string& key, bool value) noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -297,8 +300,8 @@ bool Context::set_setting(const std::string &key, bool value) noexcept
     return true;
 }
 
-bool Context::get_setting(const std::string &key, std::string *value) const
-    noexcept
+bool
+Context::get_setting(const std::string& key, std::string* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -313,7 +316,8 @@ bool Context::get_setting(const std::string &key, std::string *value) const
     return true;
 }
 
-bool Context::get_setting(const std::string &key, double *value) const noexcept
+bool
+Context::get_setting(const std::string& key, double* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -328,7 +332,8 @@ bool Context::get_setting(const std::string &key, double *value) const noexcept
     return true;
 }
 
-bool Context::get_setting(const std::string &key, long *value) const noexcept
+bool
+Context::get_setting(const std::string& key, long* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())
@@ -343,7 +348,8 @@ bool Context::get_setting(const std::string &key, long *value) const noexcept
     return true;
 }
 
-bool Context::get_setting(const std::string &key, bool *value) const noexcept
+bool
+Context::get_setting(const std::string& key, bool* value) const noexcept
 {
     auto it = m_pimpl->settings.find(key);
     if (it == m_pimpl->settings.end())

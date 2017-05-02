@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,22 +24,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_EXCEPTION_HPP
 #define VLE_UTILS_EXCEPTION_HPP
 
-#include <vle/DllDefines.hpp>
 #include <stdexcept>
 #include <string>
+#include <vle/DllDefines.hpp>
 
 #if defined(__GNUC__)
-#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                   \
+#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                                 \
     __attribute__((format(printf, (idformat), (idarg))))
 #else
 #define GCC_ATTRIBUTE_FORMAT(idformat, idarg)
 #endif
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * @brief Throw to report a bad file access (read, write, open).
@@ -52,7 +52,7 @@ class VLE_API FileError : public std::runtime_error
 public:
     FileError(std::string message);
 
-    FileError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    FileError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
@@ -68,7 +68,7 @@ class VLE_API ParseError : public std::runtime_error
 public:
     ParseError(std::string message);
 
-    ParseError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    ParseError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
@@ -84,7 +84,7 @@ class VLE_API ArgError : public std::logic_error
 public:
     ArgError(std::string message);
 
-    ArgError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    ArgError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
@@ -100,7 +100,7 @@ class VLE_API CastError : public std::runtime_error
 public:
     CastError(std::string message);
 
-    CastError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    CastError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
@@ -116,7 +116,7 @@ class VLE_API InternalError : public std::logic_error
 public:
     InternalError(std::string message);
 
-    InternalError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    InternalError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
@@ -131,11 +131,10 @@ class VLE_API ModellingError : public std::runtime_error
 public:
     ModellingError(std::string message);
 
-    ModellingError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    ModellingError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
-
 
 /**
  * @brief Throw to report an unimplemted feature.
@@ -147,7 +146,7 @@ class VLE_API NotYetImplemented : public std::logic_error
 public:
     NotYetImplemented(std::string message);
 
-    NotYetImplemented(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    NotYetImplemented(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
@@ -162,7 +161,7 @@ class VLE_API DevsGraphError : public std::runtime_error
 public:
     DevsGraphError(std::string message);
 
-    DevsGraphError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    DevsGraphError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
@@ -177,11 +176,11 @@ class VLE_API SaxParserError : public std::runtime_error
 public:
     SaxParserError(std::string message);
 
-    SaxParserError(const char *format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
+    SaxParserError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
     virtual const char* what() const noexcept;
 };
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

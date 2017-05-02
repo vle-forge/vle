@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -34,10 +34,11 @@
 #include <vle/value/Double.hpp>
 
 namespace vletest {
-inline std::string make_id(const std::string &view,
-                           const std::string &simulator,
-                           const std::string &parent,
-                           const std::string &port)
+inline std::string
+make_id(const std::string& view,
+        const std::string& simulator,
+        const std::string& parent,
+        const std::string& port)
 {
     std::string ret;
     ret.reserve(view.size() + simulator.size() + parent.size() + port.size() +
@@ -54,16 +55,17 @@ inline std::string make_id(const std::string &view,
     return ret;
 }
 
-class OutputPlugin : public vle::oov::Plugin {
+class OutputPlugin : public vle::oov::Plugin
+{
     using data_type = std::map<
-        std::string,
-        std::vector<std::pair<double, std::unique_ptr<vle::value::Value>>>>;
+      std::string,
+      std::vector<std::pair<double, std::unique_ptr<vle::value::Value>>>>;
 
     data_type ppD;
 
 public:
-    OutputPlugin(const std::string &location)
-        : vle::oov::Plugin(location)
+    OutputPlugin(const std::string& location)
+      : vle::oov::Plugin(location)
     {
     }
 
@@ -76,26 +78,26 @@ public:
                                                // observation + a time column.
         size_t rows = 0;
 
-        for (auto &elem : ppD)
+        for (auto& elem : ppD)
             for (std::size_t i = 0, e = elem.second.size(); i != e; ++i)
-                rows = std::max(rows,
-                                static_cast<std::size_t>(
-                                    std::floor(elem.second[i].first)));
+                rows = std::max(
+                  rows,
+                  static_cast<std::size_t>(std::floor(elem.second[i].first)));
 
         auto matrix = std::unique_ptr<vle::value::Matrix>(
-            new vle::value::Matrix{columns, rows + 1, 100, 100});
+          new vle::value::Matrix{ columns, rows + 1, 100, 100 });
 
         size_t col = 1;
-        for (auto &elem : ppD) {
+        for (auto& elem : ppD) {
             for (std::size_t i = 0, e = elem.second.size(); i != e; ++i) {
                 std::size_t row =
-                    static_cast<std::size_t>(std::floor(elem.second[i].first));
+                  static_cast<std::size_t>(std::floor(elem.second[i].first));
 
                 if (elem.second[i].second)
                     matrix->set(col, row, elem.second[i].second->clone());
 
                 matrix->set(
-                    0, row, vle::value::Double::create(elem.second[i].first));
+                  0, row, vle::value::Double::create(elem.second[i].first));
             }
             col++;
         }
@@ -103,15 +105,21 @@ public:
         return matrix;
     }
 
-    virtual std::string name() const override { return "OutputPlugin"; }
+    virtual std::string name() const override
+    {
+        return "OutputPlugin";
+    }
 
-    virtual bool isCairo() const override { return false; }
+    virtual bool isCairo() const override
+    {
+        return false;
+    }
 
-    virtual void onParameter(const std::string &plugin,
-                             const std::string &location,
-                             const std::string &file,
+    virtual void onParameter(const std::string& plugin,
+                             const std::string& location,
+                             const std::string& file,
                              std::unique_ptr<vle::value::Value> parameters,
-                             const double &time) override
+                             const double& time) override
     {
         (void)plugin;
         (void)location;
@@ -120,11 +128,11 @@ public:
         (void)time;
     }
 
-    virtual void onNewObservable(const std::string &simulator,
-                                 const std::string &parent,
-                                 const std::string &port,
-                                 const std::string &view,
-                                 const double &time) override
+    virtual void onNewObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& port,
+                                 const std::string& view,
+                                 const double& time) override
     {
         (void)time;
 
@@ -135,11 +143,11 @@ public:
         ppD[id].reserve(100);
     }
 
-    virtual void onDelObservable(const std::string &simulator,
-                                 const std::string &parent,
-                                 const std::string &port,
-                                 const std::string &view,
-                                 const double &time) override
+    virtual void onDelObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& port,
+                                 const std::string& view,
+                                 const double& time) override
     {
         (void)time;
 
@@ -148,11 +156,11 @@ public:
         assert(ppD.find(id) != ppD.cend());
     }
 
-    virtual void onValue(const std::string &simulator,
-                         const std::string &parent,
-                         const std::string &port,
-                         const std::string &view,
-                         const double &time,
+    virtual void onValue(const std::string& simulator,
+                         const std::string& parent,
+                         const std::string& port,
+                         const std::string& view,
+                         const double& time,
                          std::unique_ptr<vle::value::Value> value) override
     {
         if (simulator.empty()) /** TODO this is a strange

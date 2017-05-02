@@ -5,7 +5,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
@@ -25,22 +25,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/oov/Plugin.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Matrix.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/devs/Time.hpp>
+#include <list>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <list>
+#include <vle/devs/Time.hpp>
+#include <vle/oov/Plugin.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
+#include <vle/value/String.hpp>
 
-namespace vle { namespace oov { namespace plugin {
+namespace vle {
+namespace oov {
+namespace plugin {
 
-static std::string buildKey(const std::string& parent,
-                            const std::string& simulator,
-                            const std::string& port)
+static std::string
+buildKey(const std::string& parent,
+         const std::string& simulator,
+         const std::string& port)
 {
     std::string result;
 
@@ -57,25 +60,25 @@ static std::string buildKey(const std::string& parent,
 
 typedef value::Matrix::index Index;
 
-typedef std::map < std::string, Index > MapPairIndex;
+typedef std::map<std::string, Index> MapPairIndex;
 
 enum StorageHeaderType
 {
-    STORAGE_HEADER_NONE,        /**< No header are provided, ie. the
-                                 * names of the simulators are hidden  */
-    STORAGE_HEADER_TOP          /**< Header (the names of the colums
-                                 * are stored into the first line of
-                                 * the matrix results. */
+    STORAGE_HEADER_NONE, /**< No header are provided, ie. the
+                          * names of the simulators are hidden  */
+    STORAGE_HEADER_TOP   /**< Header (the names of the colums
+                          * are stored into the first line of
+                          * the matrix results. */
 };
 
 class Storage : public Plugin
 {
 public:
     Storage(const std::string& location)
-        : Plugin(location),
-          m_matrix(nullptr),
-          m_time(devs::negativeInfinity),
-          m_headertype(STORAGE_HEADER_NONE)
+      : Plugin(location)
+      , m_matrix(nullptr)
+      , m_time(devs::negativeInfinity)
+      , m_headertype(STORAGE_HEADER_NONE)
     {
     }
 
@@ -96,7 +99,8 @@ public:
     virtual std::unique_ptr<value::Matrix> matrix() const override
     {
         if (m_matrix) {
-            return std::unique_ptr<value::Matrix>(new value::Matrix(*m_matrix));
+            return std::unique_ptr<value::Matrix>(
+              new value::Matrix(*m_matrix));
         }
         return {};
     }
@@ -121,7 +125,6 @@ public:
         if (parameters and parameters->isMap()) {
             const value::Map& map = parameters->toMap();
 
-
             if (map.exist("inc_columns")) {
                 rzcolumns = map.getInt("inc_columns");
             }
@@ -140,14 +143,15 @@ public:
             parameters.reset();
         }
         if (m_headertype == STORAGE_HEADER_TOP) {
-            m_matrix.reset(new value::Matrix(1, 1, rzcolumns, rzrows,
-                 rzcolumns, rzrows));
-            m_matrix->add(0, 0, std::unique_ptr<value::Value>(
-                    new vle::value::String("time")));
+            m_matrix.reset(
+              new value::Matrix(1, 1, rzcolumns, rzrows, rzcolumns, rzrows));
+            m_matrix->add(
+              0,
+              0,
+              std::unique_ptr<value::Value>(new vle::value::String("time")));
         } else {
-            m_matrix.reset(new value::Matrix(1, 0, rzcolumns, rzrows,
-                    rzcolumns, rzrows));
-
+            m_matrix.reset(
+              new value::Matrix(1, 0, rzcolumns, rzrows, rzcolumns, rzrows));
         }
     }
 
@@ -162,12 +166,13 @@ public:
 
         m_colAccess.insert(std::make_pair(key, m_matrix->columns()));
 
-
         m_matrix->addColumn();
 
         if (m_headertype == STORAGE_HEADER_TOP) {
-            m_matrix->add(idx, 0, std::unique_ptr<value::Value>
-                                   (new vle::value::String(key)));
+            m_matrix->add(
+              idx,
+              0,
+              std::unique_ptr<value::Value>(new vle::value::String(key)));
         }
     }
 
@@ -192,21 +197,21 @@ public:
             std::string key = buildKey(parent, simulator, port);
 
             MapPairIndex::const_iterator it = m_colAccess.find(key);
-            m_matrix->set(it->second, m_matrix->rows()-1, std::move(value));
+            m_matrix->set(it->second, m_matrix->rows() - 1, std::move(value));
         }
     }
 
-    virtual std::unique_ptr<value::Matrix>
-    finish(const double& /*time*/) override
+    virtual std::unique_ptr<value::Matrix> finish(
+      const double& /*time*/) override
     {
         return std::move(m_matrix);
     }
 
 private:
-    std::unique_ptr<value::Matrix>  m_matrix;
-    MapPairIndex                    m_colAccess;
-    double                          m_time;
-    StorageHeaderType               m_headertype;
+    std::unique_ptr<value::Matrix> m_matrix;
+    MapPairIndex m_colAccess;
+    double m_time;
+    StorageHeaderType m_headertype;
 
     inline void nextTime(double trame_time)
     {
@@ -220,11 +225,14 @@ private:
     {
         value::Matrix::size_type row(m_matrix->rows());
         m_matrix->addRow();
-        m_matrix->add(0, row, std::unique_ptr<value::Value>(
-                new vle::value::Double(m_time)));
+        m_matrix->add(
+          0,
+          row,
+          std::unique_ptr<value::Value>(new vle::value::Double(m_time)));
     }
 };
-
-}}} // namespace vle oov plugin
+}
+}
+} // namespace vle oov plugin
 
 DECLARE_OOV_PLUGIN(vle::oov::plugin::Storage)

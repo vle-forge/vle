@@ -24,16 +24,16 @@
 
 #include "help.h"
 #include "ui_help.h"
-#include <QResource>
 #include <QDebug>
+#include <QResource>
 
 /**
  * @brief help::help Default constructor
  *        Load the index page into the help tab (according to language)
  */
-help::help(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::help)
+help::help(QWidget* parent)
+  : QWidget(parent)
+  , ui(new Ui::help)
 {
     mhelpEngine = 0;
 
@@ -58,7 +58,8 @@ help::~help()
  *        Load help page from internal resource (old help support)
  *
  */
-void help::loadResource()
+void
+help::loadResource()
 {
     mLocaleName = QLocale::system().name();
     QString lang = mLocaleName.left(mLocaleName.indexOf("_"));
@@ -66,12 +67,11 @@ void help::loadResource()
     QString rc = ":/help/help/index";
 
     QResource r(rc + "-" + lang);
-    if ( ! r.isValid())
+    if (!r.isValid())
         r.setFileName(rc);
 
-    if ( r.isValid() )
-    {
-        QString pageContent((char *)r.data());
+    if (r.isValid()) {
+        QString pageContent((char*)r.data());
         ui->textBrowser->setHtml(pageContent);
     }
 }
@@ -81,19 +81,18 @@ void help::loadResource()
  *        Load help page using QHelp framework
  *
  */
-void help::loadHelp(QString topic)
+void
+help::loadHelp(QString topic)
 {
-    if (mhelpEngine == 0)
-    {
+    if (mhelpEngine == 0) {
         QString colFile;
-        colFile  = qApp->property("manPath").toString();
+        colFile = qApp->property("manPath").toString();
         colFile += "/gvle.qhc";
 
         // ToDo : select translated QHC file accoding to locales
 
         mhelpEngine = new QHelpEngineCore(colFile, this);
-        if ( ! mhelpEngine->setupData())
-        {
+        if (!mhelpEngine->setupData()) {
             delete mhelpEngine;
             mhelpEngine = 0;
             qDebug() << tr("Fail to load help file : ") << colFile;

@@ -22,6 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "dom_tools.hpp"
 #include <QClipboard>
 #include <QFlags>
 #include <QMenu>
@@ -30,11 +31,10 @@
 #include <QtDebug>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Integer.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Matrix.hpp>
-#include "dom_tools.hpp"
+#include <vle/value/Set.hpp>
+#include <vle/value/String.hpp>
 
 #include <iostream>
 
@@ -54,8 +54,7 @@ DomFunctions::~DomFunctions()
 }
 
 QString
-DomFunctions::attributeValue(const QDomNode& node,
-        const QString& attrName)
+DomFunctions::attributeValue(const QDomNode& node, const QString& attrName)
 {
     if (node.attributes().contains(attrName)) {
         return node.attributes().namedItem(attrName).nodeValue();
@@ -64,22 +63,24 @@ DomFunctions::attributeValue(const QDomNode& node,
 }
 
 void
-DomFunctions::setAttributeValue(QDomNode& node, const QString& attrName,
-        const QString& val)
+DomFunctions::setAttributeValue(QDomNode& node,
+                                const QString& attrName,
+                                const QString& val)
 {
     if (node.attributes().contains(attrName)) {
-         node.attributes().namedItem(attrName).setNodeValue(val);
+        node.attributes().namedItem(attrName).setNodeValue(val);
     } else {
         node.toElement().setAttribute(attrName, val);
     }
 }
 
 QDomNode
-DomFunctions::obtainChild(QDomNode node, const QString& nodeName,
-        QDomDocument* domDoc)
+DomFunctions::obtainChild(QDomNode node,
+                          const QString& nodeName,
+                          QDomDocument* domDoc)
 {
     QDomNodeList chs = node.childNodes();
-    for(int i = 0; i<chs.size(); i++) {
+    for (int i = 0; i < chs.size(); i++) {
         QDomNode ch = chs.at(i);
         if (ch.nodeName() == nodeName) {
             return ch;
@@ -93,8 +94,6 @@ DomFunctions::obtainChild(QDomNode node, const QString& nodeName,
     return res;
 }
 
-
-
 QString
 DomFunctions::toQString(const QDomNode& node)
 {
@@ -104,28 +103,27 @@ DomFunctions::toQString(const QDomNode& node)
     return str;
 }
 
-
-
 void
 DomFunctions::removeAllChilds(QDomNode node)
 {
     QDomNodeList childs = node.childNodes();
-    while(node.hasChildNodes()) {
+    while (node.hasChildNodes()) {
         node.removeChild(childs.item(0));
     }
 }
 
 QDomNode
 DomFunctions::childWhithNameAttr(QDomNode node,
-        const QString& nodeName, const QString& nameValue,
-        QDomDocument* domDoc)
+                                 const QString& nodeName,
+                                 const QString& nameValue,
+                                 QDomDocument* domDoc)
 {
     QDomNodeList childs = node.childNodes();
     QList<QDomNode> childsWithoutText;
-    for (int i=0; i<childs.length();i++) {
+    for (int i = 0; i < childs.length(); i++) {
         QDomNode ch = childs.at(i);
         if (not ch.isText() and ch.nodeName() == nodeName and
-                DomFunctions::attributeValue(ch, "name") == nameValue) {
+            DomFunctions::attributeValue(ch, "name") == nameValue) {
             return ch;
         }
     }
@@ -141,11 +139,11 @@ QSet<QString>
 DomFunctions::childNames(QDomNode node, QString child_node)
 {
     QSet<QString> child_names;
-    QList<QDomNode> childNodes = DomFunctions::childNodesWithoutText(
-            node, child_node);
-    for (int i=0; i<childNodes.size(); i++) {
+    QList<QDomNode> childNodes =
+      DomFunctions::childNodesWithoutText(node, child_node);
+    for (int i = 0; i < childNodes.size(); i++) {
         child_names.insert(
-                DomFunctions::attributeValue(childNodes.at(i), "name"));
+          DomFunctions::attributeValue(childNodes.at(i), "name"));
     }
     return child_names;
 }
@@ -155,7 +153,7 @@ DomFunctions::childNodesWithoutText(QDomNode node, const QString& nodeName)
 {
     QDomNodeList childs = node.childNodes();
     QList<QDomNode> childsWithoutText;
-    for (int i=0; i<childs.length();i++) {
+    for (int i = 0; i < childs.length(); i++) {
         QDomNode ch = childs.at(i);
         if (not ch.isText()) {
             if (nodeName == "") {
@@ -169,8 +167,10 @@ DomFunctions::childNodesWithoutText(QDomNode node, const QString& nodeName)
 }
 
 QString
-DomFunctions::childNameProvider(QDomNode node, QString child_node,
-                QString prefix, const QSet<QString>& exclude)
+DomFunctions::childNameProvider(QDomNode node,
+                                QString child_node,
+                                QString prefix,
+                                const QSet<QString>& exclude)
 {
     QString new_name = prefix;
     unsigned int id_name = 0;
@@ -181,17 +181,18 @@ DomFunctions::childNameProvider(QDomNode node, QString child_node,
             new_name += QVariant(id_name).toString();
         }
         QString name = childNameProvider(node, child_node, new_name);
-        if(not exclude.contains(name)){
+        if (not exclude.contains(name)) {
             return name;
         }
-        id_name ++;
+        id_name++;
     }
     return "";
 }
 
 QString
-DomFunctions::childNameProvider(QDomNode node, QString child_node,
-        QString prefix)
+DomFunctions::childNameProvider(QDomNode node,
+                                QString child_node,
+                                QString prefix)
 {
     QList<QDomNode> children = childNodesWithoutText(node, child_node);
     QString new_name = prefix;
@@ -199,12 +200,13 @@ DomFunctions::childNameProvider(QDomNode node, QString child_node,
     bool new_name_found = false;
     while (not new_name_found) {
         bool new_name_found_i = false;
-        for (int j=0; j< children.length(); j++) {
-            new_name_found_i = new_name_found_i or
-                    (attributeValue(children.at(j), "name") == new_name);
+        for (int j = 0; j < children.length(); j++) {
+            new_name_found_i =
+              new_name_found_i or
+              (attributeValue(children.at(j), "name") == new_name);
         }
         if (new_name_found_i) {
-            id_name ++;
+            id_name++;
             new_name = prefix;
             new_name += "_";
             new_name += QVariant(id_name).toString();
@@ -219,9 +221,14 @@ DomFunctions::childNameProvider(QDomNode node, QString child_node,
  * DomDiffStack implementation
  **************************************************/
 
-
-DomDiffStack::DomDiff::DomDiff():node_before(), node_after(), query(""),
-        merge_type("null"), merge_args(0), source(""), isDefined(false)
+DomDiffStack::DomDiff::DomDiff()
+  : node_before()
+  , node_after()
+  , query("")
+  , merge_type("null")
+  , merge_args(0)
+  , source("")
+  , isDefined(false)
 {
 }
 
@@ -247,8 +254,14 @@ DomDiffStack::DomDiff::reset()
     isDefined = false;
 }
 
-DomDiffStack::DomDiffStack(DomObject* vdo): diffs(), prevCurr(0),
-        curr(0), saved(0), mVdo(vdo), current_source(""), snapshotEnabled(true)
+DomDiffStack::DomDiffStack(DomObject* vdo)
+  : diffs()
+  , prevCurr(0)
+  , curr(0)
+  , saved(0)
+  , mVdo(vdo)
+  , current_source("")
+  , snapshotEnabled(true)
 {
 }
 
@@ -274,31 +287,28 @@ DomDiffStack::enableSnapshot(bool enable)
     return oldSnapshotEnabled;
 }
 
-
-
-
 void
 DomDiffStack::snapshot(QDomNode node)
 {
     snapshot(node, "null", 0);
 }
 
-
 void
-DomDiffStack::snapshot (QDomNode node,
-        QString mergeType,
-        vle::value::Map* mergeArgs)
+DomDiffStack::snapshot(QDomNode node,
+                       QString mergeType,
+                       vle::value::Map* mergeArgs)
 {
     if (not snapshotEnabled) {
         return;
     }
     bool isMerged = false;
     if (node.isNull()) {
-        //false snaphot
+        // false snaphot
         prevCurr = curr;
-        curr ++;//TODO manage size
+        curr++; // TODO manage size
         if (curr >= diffs.size()) {
-            qDebug() << " Internal error DomDiffStack::snapshot (size to big) ";
+            qDebug()
+              << " Internal error DomDiffStack::snapshot (size to big) ";
             return;
         }
         diffs[curr].query = "";
@@ -311,15 +321,15 @@ DomDiffStack::snapshot (QDomNode node,
         diffs[curr].source = current_source;
         diffs[curr].isDefined = true;
 
-        //unvalidate all undo stack
-        for (unsigned int i = curr+1; i<diffs.size(); i++) {
+        // unvalidate all undo stack
+        for (unsigned int i = curr + 1; i < diffs.size(); i++) {
             diffs[i].reset();
         }
     } else {
-        //check if it is possibly mergeable to top undo command
-        if ((curr > 0) and (mergeType != "null") and curr != saved
-                and (diffs[curr].merge_type == mergeType) and
-                (diffs[curr].query == mVdo->getXQuery(node))){
+        // check if it is possibly mergeable to top undo command
+        if ((curr > 0) and (mergeType != "null") and curr != saved and
+            (diffs[curr].merge_type == mergeType) and
+            (diffs[curr].query == mVdo->getXQuery(node))) {
             if (mergeArgs->exist("query")) {
                 std::string q1 = diffs[curr].merge_args->getString("query");
                 std::string q2 = mergeArgs->getString("query");
@@ -328,16 +338,16 @@ DomDiffStack::snapshot (QDomNode node,
                 }
             } else if (mergeArgs->exist("queries")) {
                 const vle::value::Set& q1 =
-                        diffs[curr].merge_args->getSet("queries");
+                  diffs[curr].merge_args->getSet("queries");
                 const vle::value::Set& q2 = mergeArgs->getSet("queries");
-                //check if q1 and q2 contains the same model queries
+                // check if q1 and q2 contains the same model queries
                 if ((q1.size() == q2.size()) and (q1.size() > 0)) {
                     bool allFound = true;
-                    for (unsigned int i=0; i<q1.size(); i++) {
+                    for (unsigned int i = 0; i < q1.size(); i++) {
                         std::string q1i = q1.getString(i);
                         bool found = false;
-                        for (unsigned int j=0; j<q2.size(); j++) {
-                            found = found or (q1i ==  q2.getString(j));
+                        for (unsigned int j = 0; j < q2.size(); j++) {
+                            found = found or (q1i == q2.getString(j));
                         }
                         allFound = allFound and found;
                     }
@@ -348,9 +358,10 @@ DomDiffStack::snapshot (QDomNode node,
 
         if (not isMerged) {
             prevCurr = curr;
-            curr ++;//TODO manage size
+            curr++; // TODO manage size
             if (curr >= diffs.size()) {
-                qDebug() << " Internal error DomDiffStack::snapshot (size to big) ";
+                qDebug()
+                  << " Internal error DomDiffStack::snapshot (size to big) ";
                 return;
             }
             diffs[curr].query = mVdo->getXQuery(node);
@@ -359,8 +370,8 @@ DomDiffStack::snapshot (QDomNode node,
             diffs[curr].merge_args = mergeArgs;
             diffs[curr].source = current_source;
             diffs[curr].isDefined = true;
-            //unvalidate all undo stack
-            for (unsigned int i = curr+1; i<diffs.size(); i++) {
+            // unvalidate all undo stack
+            for (unsigned int i = curr + 1; i < diffs.size(); i++) {
                 diffs[i].reset();
             }
         }
@@ -377,23 +388,22 @@ DomDiffStack::undo()
     }
 
     if ((diffs[curr].source == current_source) and (diffs[curr].isDefined)) {
-        if (diffs[curr].query == ""){
+        if (diffs[curr].query == "") {
             emit undoRedoVdo(QDomNode(), QDomNode());
         } else {
             diffs[curr].node_after =
-                    mVdo->getNodeFromXQuery(diffs[curr].query).cloneNode();
+              mVdo->getNodeFromXQuery(diffs[curr].query).cloneNode();
             QDomNode currN = mVdo->getNodeFromXQuery(diffs[curr].query);
             QDomNode parent = currN.parentNode();
             if (parent.isNull()) {
                 qDebug() << " Internal error DomDiffStack::undo() "
-                        << diffs[curr].query;
+                         << diffs[curr].query;
             }
             parent.replaceChild(diffs[curr].node_before, currN);
             emit undoRedoVdo(currN, diffs[curr].node_before);
-
         }
         prevCurr = curr;
-        curr --;
+        curr--;
     }
     tryEmitUndoAvailability();
 }
@@ -402,9 +412,9 @@ void
 DomDiffStack::redo()
 {
 
-    if (diffs[curr+1].isDefined) {
-        if ((diffs[curr+1].source == current_source) or
-                (diffs[curr+1].source.isEmpty())){
+    if (diffs[curr + 1].isDefined) {
+        if ((diffs[curr + 1].source == current_source) or
+            (diffs[curr + 1].source.isEmpty())) {
             prevCurr = curr;
             curr++;
             QDomNode currN = mVdo->getNodeFromXQuery(diffs[curr].query);
@@ -426,7 +436,7 @@ DomDiffStack::registerSaveState()
 void
 DomDiffStack::clear()
 {
-    for (unsigned int i = 0; i<diffs.size(); i++) {
+    for (unsigned int i = 0; i < diffs.size(); i++) {
         diffs[i].reset();
     }
     prevCurr = curr;
@@ -438,31 +448,27 @@ void
 DomDiffStack::print(std::ostream& out) const
 {
     unsigned int diffSize = 1;
-    while (diffs[diffSize].isDefined){
+    while (diffs[diffSize].isDefined) {
         out << " [DomDiffStack] diff " << diffSize << ": "
-                << " query=" << diffs[diffSize].query.toStdString()
-                << " source=" << diffs[diffSize].source.toStdString()
-                << "\n";
+            << " query=" << diffs[diffSize].query.toStdString()
+            << " source=" << diffs[diffSize].source.toStdString() << "\n";
         diffSize++;
-
     }
-    out << " [DomDiffStack] nb stack size=" << diffSize
-            << ", saved=" << saved << ", curr=" << curr
-            << ", prevCurr=" << prevCurr
-            << ", undoAvail=" << computeUndoAvailability(prevCurr, curr, saved)
-            << "\n";
+    out << " [DomDiffStack] nb stack size=" << diffSize << ", saved=" << saved
+        << ", curr=" << curr << ", prevCurr=" << prevCurr
+        << ", undoAvail=" << computeUndoAvailability(prevCurr, curr, saved)
+        << "\n";
 }
 
 int
-DomDiffStack::computeUndoAvailability(
-        unsigned int prevCurr,
-        unsigned int curr,
-        unsigned int saved)
+DomDiffStack::computeUndoAvailability(unsigned int prevCurr,
+                                      unsigned int curr,
+                                      unsigned int saved)
 {
-    if (prevCurr != saved and curr == saved ) {
+    if (prevCurr != saved and curr == saved) {
         return -1;
     }
-    if (prevCurr == saved and curr != saved ) {
+    if (prevCurr == saved and curr != saved) {
         return 1;
     }
     return 0;
@@ -479,5 +485,5 @@ DomDiffStack::tryEmitUndoAvailability()
         emit undoAvailable(false);
     }
 }
-
-}}//namespaces
+}
+} // namespaces

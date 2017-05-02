@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -38,21 +38,22 @@
 namespace vle {
 namespace vpz {
 
-Vpz::Vpz(const std::string &filename)
-    : m_filename(filename)
+Vpz::Vpz(const std::string& filename)
+  : m_filename(filename)
 {
     parseFile(filename);
 }
 
-Vpz::Vpz(const Vpz &vpz)
-    : Base(vpz)
-    , m_isGzip(vpz.m_isGzip)
-    , m_filename(vpz.m_filename)
-    , m_project(vpz.m_project)
+Vpz::Vpz(const Vpz& vpz)
+  : Base(vpz)
+  , m_isGzip(vpz.m_isGzip)
+  , m_filename(vpz.m_filename)
+  , m_project(vpz.m_project)
 {
 }
 
-void Vpz::write(std::ostream &out) const
+void
+Vpz::write(std::ostream& out) const
 {
     out << std::showpoint << std::fixed
         << std::setprecision(std::numeric_limits<double>::digits10)
@@ -64,7 +65,8 @@ void Vpz::write(std::ostream &out) const
     m_project.write(out);
 }
 
-void Vpz::parseFile(const std::string &filename)
+void
+Vpz::parseFile(const std::string& filename)
 {
     clear();
     project().experiment().conditions().deleteValueSet();
@@ -73,8 +75,8 @@ void Vpz::parseFile(const std::string &filename)
     vpz::SaxParser saxparser(*this);
     saxparser.parseFile(filename);
 
-    auto &cnd = project().experiment().conditions().get(
-        Experiment::defaultSimulationEngineCondName());
+    auto& cnd = project().experiment().conditions().get(
+      Experiment::defaultSimulationEngineCondName());
 
     if (cnd.getSetValues("begin").empty()) {
         cnd.getSetValues("begin").emplace_back(new value::Double(0));
@@ -82,7 +84,8 @@ void Vpz::parseFile(const std::string &filename)
     }
 }
 
-void Vpz::parseMemory(const std::string &buffer)
+void
+Vpz::parseMemory(const std::string& buffer)
 {
     clear();
     project().experiment().conditions().deleteValueSet();
@@ -91,8 +94,8 @@ void Vpz::parseMemory(const std::string &buffer)
     vpz::SaxParser saxparser(*this);
     saxparser.parseMemory(buffer);
 
-    auto &cnd = project().experiment().conditions().get(
-        Experiment::defaultSimulationEngineCondName());
+    auto& cnd = project().experiment().conditions().get(
+      Experiment::defaultSimulationEngineCondName());
 
     if (cnd.getSetValues("begin").empty()) {
         cnd.getSetValues("begin").emplace_back(new value::Double(0));
@@ -100,7 +103,8 @@ void Vpz::parseMemory(const std::string &buffer)
     }
 }
 
-std::shared_ptr<value::Value> Vpz::parseValue(const std::string &buffer)
+std::shared_ptr<value::Value>
+Vpz::parseValue(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -108,14 +112,14 @@ std::shared_ptr<value::Value> Vpz::parseValue(const std::string &buffer)
 
     if (not sax.isValue()) {
         throw utils::ArgError(
-            (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
+          (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
     }
 
     return sax.getValues()[0];
 }
 
 std::vector<std::shared_ptr<value::Value>>
-Vpz::parseValues(const std::string &buffer)
+Vpz::parseValues(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -123,20 +127,21 @@ Vpz::parseValues(const std::string &buffer)
 
     if (not sax.isValue()) {
         throw utils::ArgError(
-            (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
+          (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
     }
 
     return sax.getValues();
 }
 
-void Vpz::write()
+void
+Vpz::write()
 {
     std::ofstream out(m_filename.c_str());
 
     if (out.fail() or out.bad()) {
         throw utils::FileError(
-            (fmt(_("Vpz: cannot open file '%1%' for writing")) % m_filename)
-                .str());
+          (fmt(_("Vpz: cannot open file '%1%' for writing")) % m_filename)
+            .str());
         ;
     }
 
@@ -144,13 +149,15 @@ void Vpz::write()
         << std::setprecision(std::numeric_limits<double>::digits10) << *this;
 }
 
-void Vpz::write(const std::string &filename)
+void
+Vpz::write(const std::string& filename)
 {
     m_filename.assign(filename);
     write();
 }
 
-std::string Vpz::writeToString() const
+std::string
+Vpz::writeToString() const
 {
     std::ostringstream out;
 
@@ -160,27 +167,27 @@ std::string Vpz::writeToString() const
     return out.str();
 }
 
-void Vpz::clear()
+void
+Vpz::clear()
 {
     m_filename.clear();
     m_project.clear();
     m_isGzip = false;
 }
 
-void Vpz::fixExtension(std::string &filename)
+void
+Vpz::fixExtension(std::string& filename)
 {
     const std::string::size_type dot = filename.find_last_of('.');
     if (dot == std::string::npos) {
         filename += ".vpz";
-    }
-    else {
+    } else {
         if (filename.size() >= 4) {
             const std::string extension(filename, dot, 4);
             if (extension != ".vpz") {
                 filename += ".vpz";
             }
-        }
-        else {
+        } else {
             filename += ".vpz";
         }
     }

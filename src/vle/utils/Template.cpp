@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,26 +24,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/utils/Template.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <regex>
 #include <fstream>
+#include <regex>
 #include <sstream>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Template.hpp>
+#include <vle/utils/i18n.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
-void SymbolString::append(const std::string& key, const std::string& value)
+void
+SymbolString::append(const std::string& key, const std::string& value)
 {
     auto it = lst_.find(key);
     if (it != end()) {
-        throw utils::ArgError((fmt(_("Symbol '%1%' already exist")) % key).str());
+        throw utils::ArgError(
+          (fmt(_("Symbol '%1%' already exist")) % key).str());
     }
     lst_.insert(std::make_pair(key, value));
 }
 
-void SymbolString::remove(const std::string& key)
+void
+SymbolString::remove(const std::string& key)
 {
     auto it = lst_.find(key);
     if (it != end()) {
@@ -51,27 +54,32 @@ void SymbolString::remove(const std::string& key)
     }
 }
 
-const std::string& SymbolString::get(const std::string& key) const
+const std::string&
+SymbolString::get(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknown single symbol '%1%'")) % key).str());
+        throw utils::ArgError(
+          (fmt(_("Unknown single symbol '%1%'")) % key).str());
     }
     return it->second;
 }
 
-         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-void SymbolBool::append(const std::string& key, bool value)
+void
+SymbolBool::append(const std::string& key, bool value)
 {
     auto it = lst_.find(key);
     if (it != end()) {
-        throw utils::ArgError((fmt(_("Symbol '%1%' already exist")) % key).str());
+        throw utils::ArgError(
+          (fmt(_("Symbol '%1%' already exist")) % key).str());
     }
     lst_.insert(std::make_pair(key, value));
 }
 
-void SymbolBool::remove(const std::string& key)
+void
+SymbolBool::remove(const std::string& key)
 {
     auto it = lst_.find(key);
     if (it != end()) {
@@ -79,18 +87,21 @@ void SymbolBool::remove(const std::string& key)
     }
 }
 
-bool SymbolBool::get(const std::string& key) const
+bool
+SymbolBool::get(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknown bool symbol '%1%'")) % key).str());
+        throw utils::ArgError(
+          (fmt(_("Unknown bool symbol '%1%'")) % key).str());
     }
     return it->second;
 }
 
-         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-void SymbolList::append(const std::string& key)
+void
+SymbolList::append(const std::string& key)
 {
     auto it = lst_.find(key);
     if (it == end()) {
@@ -98,18 +109,21 @@ void SymbolList::append(const std::string& key)
     }
 }
 
-void SymbolList::append(const std::string& key, const std::string& value)
+void
+SymbolList::append(const std::string& key, const std::string& value)
 {
     auto it = lst_.find(key);
     if (it != end()) {
         it->second.push_back(value);
     } else {
-        std::pair < iterator, bool > r = lst_.insert(std::make_pair(key, value_t()));
+        std::pair<iterator, bool> r =
+          lst_.insert(std::make_pair(key, value_t()));
         r.first->second.push_back(value);
     }
 }
 
-void SymbolList::remove(const std::string& key)
+void
+SymbolList::remove(const std::string& key)
 {
     auto it = lst_.find(key);
     if (it != end()) {
@@ -122,7 +136,8 @@ SymbolList::get(const std::string& key, value_t::size_type i) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknown list symbol '%1%'")) % key).str());
+        throw utils::ArgError(
+          (fmt(_("Unknown list symbol '%1%'")) % key).str());
     }
 
     if (it->second.size() < i) {
@@ -137,15 +152,17 @@ SymbolList::size(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknown list symbol '%1%'")) % key).str());
+        throw utils::ArgError(
+          (fmt(_("Unknown list symbol '%1%'")) % key).str());
     }
 
     return it->second.size();
 }
 
-         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-void Template::open(const std::string& filename)
+void
+Template::open(const std::string& filename)
 {
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -157,13 +174,15 @@ void Template::open(const std::string& filename)
         output << file.rdbuf();
 
         buffer_ = output.str();
-    } catch(const std::ios_base::failure& e) {
+    } catch (const std::ios_base::failure& e) {
         throw utils::ArgError(
-            (fmt(_("Template error, can not open file '%1%'")) % filename).str());
+          (fmt(_("Template error, can not open file '%1%'")) % filename)
+            .str());
     }
 }
 
-void Template::process(std::ostream& result) const
+void
+Template::process(std::ostream& result) const
 {
     std::string buffer(buffer_);
 
@@ -175,8 +194,10 @@ void Template::process(std::ostream& result) const
     result << buffer;
 }
 
-void Template::tag(std::string& pluginname, std::string& packagename,
-                   std::string& conf)
+void
+Template::tag(std::string& pluginname,
+              std::string& packagename,
+              std::string& conf)
 {
     std::regex tagbegin("@@tag [[:alnum:]_]*@", std::regex::grep);
     std::regex tagmiddle("@[[:alnum:]_\\.\\-]* @@", std::regex::grep);
@@ -200,7 +221,8 @@ void Template::tag(std::string& pluginname, std::string& packagename,
     conf.assign((*jt)[0].second, (*kt)[0].first);
 }
 
-std::string Template::processIf(const std::string& buffer) const
+std::string
+Template::processIf(const std::string& buffer) const
 {
     std::regex expif("{{if [[:alnum:]_]*}}", std::regex::grep);
     std::regex expendif("{{end if}}", std::regex::grep);
@@ -239,7 +261,8 @@ std::string Template::processIf(const std::string& buffer) const
     }
 }
 
-std::string Template::processIfnot(const std::string& buffer) const
+std::string
+Template::processIfnot(const std::string& buffer) const
 {
     std::regex expifnot("{{ifnot [[:alnum:]_]*}}", std::regex::grep);
     std::regex expendifnot("{{end ifnot}}", std::regex::grep);
@@ -278,7 +301,8 @@ std::string Template::processIfnot(const std::string& buffer) const
     }
 }
 
-std::string Template::processFor(const std::string& buffer) const
+std::string
+Template::processFor(const std::string& buffer) const
 {
     std::regex expression("{{[[:alnum:]_]*}}", std::regex::grep);
 
@@ -305,9 +329,11 @@ std::string Template::processFor(const std::string& buffer) const
     }
 }
 
-std::string Template::processName(const std::string& buffer) const
+std::string
+Template::processName(const std::string& buffer) const
 {
-    std::regex expfor("{{for [[:alnum:]_] in [[:alnum:]_]*}}", std::regex::grep);
+    std::regex expfor("{{for [[:alnum:]_] in [[:alnum:]_]*}}",
+                      std::regex::grep);
     std::regex expendfor("{{end for}}", std::regex::grep);
     std::regex var("{{[[:alnum:]_]*\\^[[:alnum:]_]}}", std::regex::grep);
 
@@ -368,5 +394,5 @@ std::string Template::processName(const std::string& buffer) const
         return buffer;
     }
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils

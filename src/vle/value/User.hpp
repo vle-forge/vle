@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -42,13 +42,14 @@ namespace value {
  *   functions
  * - provide @c id function to identify your own data
  */
-class VLE_API User : public Value {
+class VLE_API User : public Value
+{
 public:
     /**
      * @brief Build a User object.
      */
     User()
-        : Value()
+      : Value()
     {
     }
 
@@ -56,15 +57,17 @@ public:
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    User(const User &value)
-        : Value(value)
+    User(const User& value)
+      : Value(value)
     {
     }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~User() {}
+    virtual ~User()
+    {
+    }
 
     /**
      * @brief To identify your own data.
@@ -79,30 +82,38 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::User.
      */
-    virtual Value::type getType() const override { return Value::USER; }
+    virtual Value::type getType() const override
+    {
+        return Value::USER;
+    }
 };
 
-inline const User &toUserValue(std::shared_ptr<Value> value)
+inline const User&
+toUserValue(std::shared_ptr<Value> value)
 {
     return value::reference(value).toUser();
 }
 
-inline const User &toUserValue(std::shared_ptr<const Value> value)
+inline const User&
+toUserValue(std::shared_ptr<const Value> value)
 {
     return value::reference(value).toUser();
 }
 
-inline const User &toUserValue(const std::unique_ptr<Value> &value)
+inline const User&
+toUserValue(const std::unique_ptr<Value>& value)
 {
     return value::reference(value).toUser();
 }
 
-inline const User &toUserValue(const Value &value)
+inline const User&
+toUserValue(const Value& value)
 {
     return value.toUser();
 }
 
-inline User &toUserValue(Value &value)
+inline User&
+toUserValue(Value& value)
 {
     return value.toUser();
 }

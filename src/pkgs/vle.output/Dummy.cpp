@@ -5,7 +5,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
@@ -25,13 +25,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "Dummy.hpp"
 
-namespace vle { namespace oov { namespace plugin {
+namespace vle {
+namespace oov {
+namespace plugin {
 
-Dummy::Dummy(const std::string& location) :
-    Plugin(location)
+Dummy::Dummy(const std::string& location)
+  : Plugin(location)
 {
 }
 
@@ -39,42 +40,46 @@ Dummy::~Dummy()
 {
 }
 
-void Dummy::onParameter(const std::string& /*plugin*/,
-        const std::string& /*location*/,
-        const std::string& /*file*/,
-        std::unique_ptr<value::Value> parameters,
-        const double& /*time*/)
+void
+Dummy::onParameter(const std::string& /*plugin*/,
+                   const std::string& /*location*/,
+                   const std::string& /*file*/,
+                   std::unique_ptr<value::Value> parameters,
+                   const double& /*time*/)
 {
     parameters.reset(nullptr);
 }
 
-void Dummy::onNewObservable(const std::string& /*simulator*/,
-        const std::string& /*parent*/,
-        const std::string& /*port*/,
-        const std::string& /*view*/,
-        const double& /*time*/)
+void
+Dummy::onNewObservable(const std::string& /*simulator*/,
+                       const std::string& /*parent*/,
+                       const std::string& /*port*/,
+                       const std::string& /*view*/,
+                       const double& /*time*/)
 {
 }
 
-void Dummy::onDelObservable(const std::string& /*simulator*/,
-        const std::string& /*parent*/,
-        const std::string& /*port*/,
-        const std::string& /*view*/,
-        const double& /*time*/)
+void
+Dummy::onDelObservable(const std::string& /*simulator*/,
+                       const std::string& /*parent*/,
+                       const std::string& /*port*/,
+                       const std::string& /*view*/,
+                       const double& /*time*/)
 {
 }
 
-void Dummy::onValue(const std::string& /*simulator*/,
-        const std::string& /*parent*/,
-        const std::string& /*port*/,
-        const std::string& /*view*/,
-        const double& /*time*/,
-        std::unique_ptr<value::Value> value)
+void
+Dummy::onValue(const std::string& /*simulator*/,
+               const std::string& /*parent*/,
+               const std::string& /*port*/,
+               const std::string& /*view*/,
+               const double& /*time*/,
+               std::unique_ptr<value::Value> value)
 {
     value.reset(nullptr);
 }
-
-}}} // namespace vle oov plugin
+}
+}
+} // namespace vle oov plugin
 
 DECLARE_OOV_PLUGIN(vle::oov::plugin::Dummy)
-

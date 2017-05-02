@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -27,244 +27,268 @@
 #ifndef VLE_GRAPH_ATOMIC_MODEL_HPP
 #define VLE_GRAPH_ATOMIC_MODEL_HPP
 
-#include <vle/vpz/BaseModel.hpp>
-#include <vle/DllDefines.hpp>
 #include <iterator>
-#include <string>
 #include <set>
+#include <string>
+#include <vle/DllDefines.hpp>
+#include <vle/vpz/BaseModel.hpp>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 class Simulator;
+}
+} // namespace vle devs
 
-}} // namespace vle devs
+namespace vle {
+namespace vpz {
 
-namespace vle { namespace vpz {
+/**
+ * @brief Represent the Atomic Model in DEVS formalism. This class just
+ * represent the graph not the DEVS Simulator.
+ */
+class VLE_API AtomicModel : public BaseModel
+{
+public:
+    /**
+     * @brief Constructor to intialize parent, position (0,0), size (0,0)
+     * and name.
+     * @param name the new name of this atomic model.
+     * @param parent the parent of this atomic model, can be null if parent
+     * does not exist.
+     */
+    AtomicModel(const std::string& name, CoupledModel* parent);
 
     /**
-     * @brief Represent the Atomic Model in DEVS formalism. This class just
-     * represent the graph not the DEVS Simulator.
+     * @brief Build a new AtomicModel from specific conditions, dynamics and
+     * observables, initialize parent position (0,0), size (0,0)
+     * and name.
+     * @param name the new name of this atomic model.
+     * @param parent the parent of this atomic model, can be null if parent
+     * @param condition The condition to attach.
+     * @param dynamic The dynamics to attach.
+     * @param observable The observable to attach.
      */
-    class VLE_API AtomicModel : public BaseModel
+    AtomicModel(const std::string& name,
+                CoupledModel* parent,
+                const std::string& condition,
+                const std::string& dynamic,
+                const std::string& observable);
+
+    AtomicModel(const AtomicModel& mdl);
+
+    AtomicModel& operator=(const AtomicModel& mdl);
+
+    virtual vpz::BaseModel* clone() const override
     {
-    public:
-        /**
-         * @brief Constructor to intialize parent, position (0,0), size (0,0)
-         * and name.
-         * @param name the new name of this atomic model.
-         * @param parent the parent of this atomic model, can be null if parent
-         * does not exist.
-         */
-        AtomicModel(const std::string& name,
-                         CoupledModel* parent);
+        return new AtomicModel(*this);
+    }
 
-        /**
-         * @brief Build a new AtomicModel from specific conditions, dynamics and
-         * observables, initialize parent position (0,0), size (0,0)
-         * and name.
-         * @param name the new name of this atomic model.
-         * @param parent the parent of this atomic model, can be null if parent
-         * @param condition The condition to attach.
-         * @param dynamic The dynamics to attach.
-         * @param observable The observable to attach.
-         */
-        AtomicModel(const std::string& name,
-                    CoupledModel* parent,
-                    const std::string& condition,
-                    const std::string& dynamic,
-                    const std::string& observable);
+    /**
+     * @brief Nothing to delete.
+     */
+    virtual ~AtomicModel()
+    {
+    }
 
-        AtomicModel(const AtomicModel& mdl);
+    /**
+     * @brief Return true, AtomicModel is an atomic model.
+     * @return true.
+     */
+    virtual bool isAtomic() const override
+    {
+        return true;
+    }
 
-        AtomicModel& operator=(const AtomicModel& mdl);
+    /**
+     * @brief Get the list of conditions.
+     * @return List of conditions.
+     */
+    inline const std::vector<std::string>& conditions() const
+    {
+        return m_conditions;
+    }
 
-        virtual vpz::BaseModel* clone() const override
-        { return new AtomicModel(*this); }
+    /**
+     * @brief Get the dynamic.
+     * @return The dynamic.
+     */
+    inline const std::string& dynamics() const
+    {
+        return m_dynamics;
+    }
 
-        /**
-         * @brief Nothing to delete.
-         */
-        virtual ~AtomicModel() { }
+    /**
+     * @brief Get the observable.
+     * @return The observable.
+     */
+    inline const std::string& observables() const
+    {
+        return m_observables;
+    }
 
-        /**
-         * @brief Return true, AtomicModel is an atomic model.
-         * @return true.
-         */
-        virtual bool isAtomic() const override { return true; }
+    /**
+     * @brief Assign a list of condition.
+     * @param vect A list of condition.
+     */
+    inline void setConditions(const std::vector<std::string>& vect)
+    {
+        m_conditions = vect;
+    }
 
-        /**
-         * @brief Get the list of conditions.
-         * @return List of conditions.
-         */
-        inline const std::vector < std::string >& conditions() const
-        { return m_conditions; }
+    /**
+     * @brief Add a new condition.
+     * @param str The new condition to add.
+     */
+    inline void addCondition(const std::string& str)
+    {
+        m_conditions.push_back(str);
+    }
 
-        /**
-         * @brief Get the dynamic.
-         * @return The dynamic.
-         */
-        inline const std::string& dynamics() const
-        { return m_dynamics; }
+    /**
+     * @brief Del a condition.
+     * @param str The condition to delete.
+     */
+    void delCondition(const std::string& str);
 
-        /**
-         * @brief Get the observable.
-         * @return The observable.
-         */
-        inline const std::string& observables() const
-        { return m_observables; }
+    /**
+     * @brief Assign the dynamic.
+     * @param str The dynamic.
+     */
+    inline void setDynamics(const std::string& str)
+    {
+        m_dynamics = str;
+    }
 
-        /**
-         * @brief Assign a list of condition.
-         * @param vect A list of condition.
-         */
-        inline void setConditions(const std::vector < std::string >& vect)
-        { m_conditions = vect; }
+    /**
+     * @brief Assign an observable.
+     * @param str The observable.
+     */
+    inline void setObservables(const std::string& str)
+    {
+        m_observables = str;
+    }
 
-        /**
-         * @brief Add a new condition.
-         * @param str The new condition to add.
-         */
-        inline void addCondition(const std::string& str)
-        { m_conditions.push_back(str); }
+    /**
+     * @brief Return this if name is equal to the model's name.
+     * @param name The name of the model to find.
+     * @return this if name is equal to the model's name, null otherwise.
+     * @deprecated
+     */
+    virtual BaseModel* findModel(const std::string& name) const override;
 
-        /**
-         * @brief Del a condition.
-         * @param str The condition to delete.
-         */
-        void delCondition(const std::string& str);
+    /**
+     * @brief Write the atomic model in the output stream.
+     * @param out output stream.
+     */
+    virtual void writeXML(std::ostream& out) const override;
 
-        /**
-         * @brief Assign the dynamic.
-         * @param str The dynamic.
-         */
-        inline void setDynamics(const std::string& str)
-        { m_dynamics = str; }
+    /**
+     * @brief Output the AtomicModel informations into a std::ostream.
+     * @param out Output paramter.
+     * @param a An AtomicModel.
+     * @return the out parameter.
+     */
+    friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
+    {
+        out << "conditions: ";
+        std::copy(a.m_conditions.begin(),
+                  a.m_conditions.end(),
+                  std::ostream_iterator<std::string>(out, " "));
+        return out << "\ndynamics: " << a.m_dynamics
+                   << "\nobservables: " << a.m_observables << "\n";
+    }
 
-        /**
-         * @brief Assign an observable.
-         * @param str The observable.
-         */
-        inline void setObservables(const std::string& str)
-        { m_observables = str; }
+    /**
+     * @brief Write the model into the output stream.
+     * @param out The output stream.
+     */
+    void write(std::ostream& out) const override;
 
-        /**
-         * @brief Return this if name is equal to the model's name.
-         * @param name The name of the model to find.
-         * @return this if name is equal to the model's name, null otherwise.
-         * @deprecated
-         */
-        virtual BaseModel* findModel(const std::string & name) const override;
+    /**
+     * @brief Update the dynamics the AtomicModel
+     * where an oldname became newname.
+     * @param oldname the old name of the dynamics.
+     * @param newname the new name of the dynamics.
+     */
+    virtual void updateDynamics(const std::string& oldname,
+                                const std::string& newname) override;
 
-        /**
-         * @brief Write the atomic model in the output stream.
-         * @param out output stream.
-         */
-        virtual void writeXML(std::ostream& out) const override;
+    /**
+     * @brief purge the dymamics not present in the list.
+     * @param dynamicslist a list of dynamics name
+     */
+    virtual void purgeDynamics(
+      const std::set<std::string>& dynamicslist) override;
 
-        /**
-         * @brief Output the AtomicModel informations into a std::ostream.
-         * @param out Output paramter.
-         * @param a An AtomicModel.
-         * @return the out parameter.
-         */
-        friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
-        {
-            out << "conditions: ";
-            std::copy(a.m_conditions.begin(), a.m_conditions.end(),
-                      std::ostream_iterator < std::string >(out, " "));
-            return out << "\ndynamics: " << a.m_dynamics << "\nobservables: "
-                << a.m_observables << "\n";
-        }
+    /**
+     * @brief Update the Observable of the AtomicModel where an
+     * oldname became newname, for each model.
+     * @param oldname the old name of the observable.
+     * @param newname the new name of the observable.
+     */
+    virtual void updateObservable(const std::string& oldname,
+                                  const std::string& newname) override;
 
-        /**
-         * @brief Write the model into the output stream.
-         * @param out The output stream.
-         */
-        void write(std::ostream& out) const override;
+    /**
+     * @brief purge the observable reference of the AtomicModel
+     * where the observable is not present in the list.
+     * @param observablelist a list of observable name
+     */
+    virtual void purgeObservable(
+      const std::set<std::string>& observablelist) override;
 
-        /**
-         * @brief Update the dynamics the AtomicModel
-         * where an oldname became newname.
-         * @param oldname the old name of the dynamics.
-         * @param newname the new name of the dynamics.
-         */
-        virtual void updateDynamics(const std::string& oldname,
-                            const std::string& newname) override;
+    /**
+     * @brief Update the Conditions of the AtomicModel where an
+     * oldname became newname, for the model.
+     * @param oldname the old name of the observable.
+     * @param newname the new name of the observable.
+     */
+    virtual void updateConditions(const std::string& oldname,
+                                  const std::string& newname) override;
 
-        /**
-         * @brief purge the dymamics not present in the list.
-         * @param dynamicslist a list of dynamics name
-         */
-        virtual void purgeDynamics(const std::set < std::string >& dynamicslist) override;
+    /**
+     * @brief purge the Conditions references of the model where the
+     * Condition is not present in the list
+     * @param conditionlist a list of condition name
+     */
+    virtual void purgeConditions(
+      const std::set<std::string>& conditionlist) override;
 
-        /**
-         * @brief Update the Observable of the AtomicModel where an
-         * oldname became newname, for each model.
-         * @param oldname the old name of the observable.
-         * @param newname the new name of the observable.
-         */
-        virtual void updateObservable(const std::string& oldname,
-                                      const std::string& newname) override;
+    bool needDebug() const noexcept
+    {
+        return m_debug;
+    }
 
-        /**
-         * @brief purge the observable reference of the AtomicModel
-         * where the observable is not present in the list.
-         * @param observablelist a list of observable name
-         */
-        virtual void purgeObservable(const std::set < std::string >& observablelist) override;
+    void setDebug() noexcept
+    {
+        m_debug = true;
+    }
 
-        /**
-         * @brief Update the Conditions of the AtomicModel where an
-         * oldname became newname, for the model.
-         * @param oldname the old name of the observable.
-         * @param newname the new name of the observable.
-         */
-        virtual void updateConditions(const std::string& oldname,
-                                      const std::string& newname) override;
+    void resetDebug() noexcept
+    {
+        m_debug = false;
+    }
 
-        /**
-         * @brief purge the Conditions references of the model where the
-         * Condition is not present in the list
-         * @param conditionlist a list of condition name
-         */
-        virtual void purgeConditions(const std::set < std::string >& conditionlist) override;
+    inline devs::Simulator* get_simulator() const noexcept
+    {
+        return m_simulator;
+    }
 
+    /* \c AtomicModel is friend with the \c devs::Simulator to enable
+     * \c devs::Simulator class to assign the m_simulator pointer
+     * without providing a specific API for this.
+     */
+    friend devs::Simulator;
 
-        bool needDebug() const noexcept
-        {
-            return m_debug;
-        }
-
-        void setDebug() noexcept
-        {
-            m_debug = true;
-        }
-
-        void resetDebug() noexcept
-        {
-            m_debug = false;
-        }
-
-        inline
-        devs::Simulator* get_simulator() const noexcept
-        {
-            return m_simulator;
-        }
-
-        /* \c AtomicModel is friend with the \c devs::Simulator to enable
-         * \c devs::Simulator class to assign the m_simulator pointer
-         * without providing a specific API for this.
-         */
-        friend devs::Simulator;
-
-    private:
-        devs::Simulator* m_simulator;
-        std::vector < std::string > m_conditions;
-        std::string m_dynamics;
-        std::string m_observables;
-        bool m_debug;
-    };
-
-}} // namespace vle vpz
+private:
+    devs::Simulator* m_simulator;
+    std::vector<std::string> m_conditions;
+    std::string m_dynamics;
+    std::string m_observables;
+    bool m_debug;
+};
+}
+} // namespace vle vpz
 
 #endif

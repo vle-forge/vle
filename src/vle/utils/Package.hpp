@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,16 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_PACKAGE_HPP
 #define VLE_UTILS_PACKAGE_HPP
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/PackageTable.hpp>
-#include <vle/utils/Context.hpp>
 #include <string>
+#include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
+#include <vle/utils/PackageTable.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * A class to manage VLE packages, ie. to build a new package, to
@@ -49,13 +49,14 @@ namespace vle { namespace utils {
  * @endcode
  */
 
-enum VLE_PACKAGE_TYPE {
+enum VLE_PACKAGE_TYPE
+{
     PKG_BINARY,
     PKG_SOURCE
 };
 
 VLE_API std::ostream& operator<<(std::ostream& out,
-        const VLE_PACKAGE_TYPE& type);
+                                 const VLE_PACKAGE_TYPE& type);
 
 class VLE_API Package
 {
@@ -153,7 +154,7 @@ public:
      *
      * @return true if get is a success, false otherwise.
      */
-    bool get(std::string *out, std::string *err);
+    bool get(std::string* out, std::string* err);
 
     /**
      * Test if the specified package exists in the user directory.
@@ -183,39 +184,43 @@ public:
     std::string getBuildDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getOutputDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
-    std::string getPluginSimulatorDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginSimulatorDir(
+      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginOutputDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginGvleGlobalDir(
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginGvleModelingDir(
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginGvleOutputDir(
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
     std::string getFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                        VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getLibFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                           VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getSrcFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                           VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getDataFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getDocFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                           VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getExpFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                           VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getOutputFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                              VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
-    std::string getPluginSimulatorFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                              VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginSimulatorFile(
+      const std::string& file,
+      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginOutputFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
-    std::string getPluginGvleModelingFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
-    std::string getPluginGvleOutputFile(const std::string& file,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                                    VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleModelingFile(
+      const std::string& file,
+      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleOutputFile(
+      const std::string& file,
+      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
     PathList getExperiments(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
@@ -228,7 +233,7 @@ public:
     std::string getMetadataExpDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
     std::string getMetadataExpFile(const std::string& expName,
-            VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+                                   VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
     /**
      * Return true if a file package/path/to/file exists in the
@@ -242,8 +247,7 @@ public:
      * @return true if file exists, false otherwise.
      */
     bool existsFile(const std::string& path,
-            VLE_PACKAGE_TYPE type = PKG_BINARY);
-
+                    VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Add an empty directgory into the current Package.
@@ -253,8 +257,9 @@ public:
      * @param name The name of the directory.
      * @param type The type of package
      */
-    void addDirectory(const std::string& path, const std::string& name,
-            VLE_PACKAGE_TYPE type = PKG_BINARY);
+    void addDirectory(const std::string& path,
+                      const std::string& name,
+                      VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Return true if a directory package/path/to/file exists in the
@@ -267,7 +272,7 @@ public:
      * @return true if directory exists, false otherwise.
      */
     bool existsDirectory(const std::string& path,
-            VLE_PACKAGE_TYPE type = PKG_BINARY);
+                         VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Remove file or directory and (recursively) the specified path.
@@ -276,7 +281,7 @@ public:
      * @param type The type of package
      */
     void remove(const std::string& toremove,
-            VLE_PACKAGE_TYPE type = PKG_BINARY);
+                VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Rename the path oldname to the new name newname.
@@ -295,8 +300,9 @@ public:
      * @throw utils::ArgError if the file already exists or if the old file
      * does not exist.
      */
-    std::string rename(const std::string& oldname, const std::string& newname,
-            VLE_PACKAGE_TYPE type = PKG_BINARY);
+    std::string rename(const std::string& oldname,
+                       const std::string& newname,
+                       VLE_PACKAGE_TYPE type = PKG_BINARY);
 
     /**
      * Copy the file.
@@ -332,7 +338,7 @@ private:
 };
 
 VLE_API std::ostream& operator<<(std::ostream& out, const Package& pkg);
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif

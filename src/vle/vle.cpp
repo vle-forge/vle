@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -29,27 +29,31 @@
 #include <vle/vle.hpp>
 
 #define _VLE_STRINGIFY(x) #x
-#define VLE_STRINGIFY(x)  _VLE_STRINGIFY(x)
+#define VLE_STRINGIFY(x) _VLE_STRINGIFY(x)
 
 namespace vle {
 
-std::tuple<int, int, int, std::string> version()
+std::tuple<int, int, int, std::string>
+version()
 {
-    return std::make_tuple(
-        VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
-        VLE_STRINGIFY(VERSION_EXTRA));
+    return std::make_tuple(VERSION_MAJOR,
+                           VERSION_MINOR,
+                           VERSION_PATCH,
+                           VLE_STRINGIFY(VERSION_EXTRA));
 }
 
-std::tuple<int, int> version_abi()
+std::tuple<int, int>
+version_abi()
 {
     return std::make_tuple(VERSION_MAJOR, VERSION_MINOR);
 }
 
-std::string string_version()
+std::string
+string_version()
 {
 #ifdef VERSION_EXTRA
     return vle::utils::format(
-        "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+      "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 #else
     return vle::utils::format("%d.%d.%d-%s",
                               VERSION_MAJOR,
@@ -59,7 +63,8 @@ std::string string_version()
 #endif
 }
 
-std::string string_version_abi()
+std::string
+string_version_abi()
 {
     return vle::utils::format("%d.%d", VERSION_MAJOR, VERSION_MINOR);
 }
@@ -75,8 +80,14 @@ std::string string_version_abi()
  *   libxml2 API (except possibly selecting a different memory allocator)
  */
 
-Init::Init() { xmlInitParser(); }
+Init::Init()
+{
+    xmlInitParser();
+}
 
-Init::~Init() { xmlCleanupParser(); }
+Init::~Init()
+{
+    xmlCleanupParser();
+}
 
 } // namespace vle

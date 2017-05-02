@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -30,7 +30,8 @@
 #include <vle/utils/unit-test.hpp>
 #include <vle/vle.hpp>
 
-void g_shell()
+void
+g_shell()
 {
     // tests taken from glib-2.47.3 (shell.c)
 
@@ -388,7 +389,8 @@ void g_shell()
     Ensures((res == "/bar/summer'09 tours.pdf"));
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

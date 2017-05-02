@@ -22,22 +22,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "DefaultOutPanel.h"
 
 namespace vle {
 namespace gvle {
 
-
-
-DefaultOutPanel::DefaultOutPanel():
-            PluginMainPanel(), m_edit(0), m_file("")
+DefaultOutPanel::DefaultOutPanel()
+  : PluginMainPanel()
+  , m_edit(0)
+  , m_file("")
 {
 
     m_edit = new QTextEdit();
-    QObject::connect(m_edit, SIGNAL(undoAvailable(bool)),
-                     this, SLOT(onUndoAvailable(bool)));
-
+    QObject::connect(
+      m_edit, SIGNAL(undoAvailable(bool)), this, SLOT(onUndoAvailable(bool)));
 }
 
 DefaultOutPanel::~DefaultOutPanel()
@@ -46,14 +44,16 @@ DefaultOutPanel::~DefaultOutPanel()
 }
 
 void
-DefaultOutPanel::init(const gvle_file& gf, utils::Package* pkg,
-        Logger* /*log*/, gvle_plugins* /*plugs*/,
-        const utils::ContextPtr& /*ctx*/)
+DefaultOutPanel::init(const gvle_file& gf,
+                      utils::Package* pkg,
+                      Logger* /*log*/,
+                      gvle_plugins* /*plugs*/,
+                      const utils::ContextPtr& /*ctx*/)
 {
     QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
 
     m_file = gf.source_file;
-    QFile outFile (m_file);
+    QFile outFile(m_file);
 
     if (!outFile.open(QFile::ReadOnly | QFile::Text)) {
         qDebug() << " Error DefaultOutPanel::init ";
@@ -75,7 +75,7 @@ DefaultOutPanel::save()
     if (m_file != "") {
         QFile file(m_file);
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-            file.write(m_edit->toPlainText().toStdString().c_str()) ;
+            file.write(m_edit->toPlainText().toStdString().c_str());
             file.flush();
             file.close();
         }
@@ -108,7 +108,6 @@ DefaultOutPanel::undo()
 void
 DefaultOutPanel::redo()
 {
-
 }
 
 void
@@ -117,5 +116,5 @@ DefaultOutPanel::onUndoAvailable(bool b)
 {
     emit undoAvailable(b);
 }
-
-}} //namespaces
+}
+} // namespaces

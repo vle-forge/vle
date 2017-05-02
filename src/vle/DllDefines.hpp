@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DLLDEFINES_HPP
 #define VLE_DLLDEFINES_HPP
 
@@ -33,19 +32,19 @@
  */
 
 #if defined _WIN32 || defined __CYGWIN__
-#  define VLE_HELPER_DLL_IMPORT __declspec(dllimport)
-#  define VLE_HELPER_DLL_EXPORT __declspec(dllexport)
-#  define VLE_HELPER_DLL_LOCAL
+#define VLE_HELPER_DLL_IMPORT __declspec(dllimport)
+#define VLE_HELPER_DLL_EXPORT __declspec(dllexport)
+#define VLE_HELPER_DLL_LOCAL
 #else
-#  if __GNUC__ >= 4
-#    define VLE_HELPER_DLL_IMPORT __attribute__ ((visibility ("default")))
-#    define VLE_HELPER_DLL_EXPORT __attribute__ ((visibility ("default")))
-#    define VLE_HELPER_DLL_LOCAL  __attribute__ ((visibility ("hidden")))
+#if __GNUC__ >= 4
+#define VLE_HELPER_DLL_IMPORT __attribute__((visibility("default")))
+#define VLE_HELPER_DLL_EXPORT __attribute__((visibility("default")))
+#define VLE_HELPER_DLL_LOCAL __attribute__((visibility("hidden")))
 #else
-#    define VLE_HELPER_DLL_IMPORT
-#    define VLE_HELPER_DLL_EXPORT
-#    define VLE_HELPER_DLL_LOCAL
-#  endif
+#define VLE_HELPER_DLL_IMPORT
+#define VLE_HELPER_DLL_EXPORT
+#define VLE_HELPER_DLL_LOCAL
+#endif
 #endif
 
 /*
@@ -56,17 +55,17 @@
  */
 
 #ifdef VLE_DLL
-#  ifdef vlelib_EXPORTS
-#    define VLE_API VLE_HELPER_DLL_EXPORT
-#  else
-#    define VLE_API VLE_HELPER_DLL_IMPORT
-#  endif
-#  define VLE_LOCAL VLE_HELPER_DLL_LOCAL
-#  define VLE_MODULE VLE_HELPER_DLL_EXPORT
+#ifdef vlelib_EXPORTS
+#define VLE_API VLE_HELPER_DLL_EXPORT
 #else
-#  define VLE_API
-#  define VLE_LOCAL
-#  define VLE_MODULE VLE_HELPER_DLL_EXPORT
+#define VLE_API VLE_HELPER_DLL_IMPORT
+#endif
+#define VLE_LOCAL VLE_HELPER_DLL_LOCAL
+#define VLE_MODULE VLE_HELPER_DLL_EXPORT
+#else
+#define VLE_API
+#define VLE_LOCAL
+#define VLE_MODULE VLE_HELPER_DLL_EXPORT
 #endif
 
 #endif

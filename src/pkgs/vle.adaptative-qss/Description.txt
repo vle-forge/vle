@@ -3,7 +3,7 @@ Version: 2.0.0
 Depends: vle.output
 Build-Depends:
 Conflicts:
-Maintainer: Gauthier Quesnel <gauthier.quesnel@toulouse.inra.fr>
+Maintainer: Gauthier Quesnel <gauthier.quesnel@inra.fr>
 Description: A set of simulators to build ordinary differential equation systems using the quantized state systems (QSS) methods for numerical integration solvers.
  .
 Tags: qss

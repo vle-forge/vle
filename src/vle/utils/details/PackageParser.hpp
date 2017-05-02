@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -27,10 +27,11 @@
 #ifndef VLE_UTILS_DETAILS_PACKAGEPARSER_HPP
 #define VLE_UTILS_DETAILS_PACKAGEPARSER_HPP
 
-#include <vle/utils/RemoteManager.hpp>
 #include <string>
+#include <vle/utils/RemoteManager.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * A class to parse and extract packages from package files.
@@ -107,36 +108,42 @@ inline PackageParser::~PackageParser()
 {
 }
 
-inline Packages::iterator PackageParser::begin()
+inline Packages::iterator
+PackageParser::begin()
 {
     return m_packages.begin();
 }
 
-inline Packages::const_iterator PackageParser::begin() const
+inline Packages::const_iterator
+PackageParser::begin() const
 {
     return m_packages.begin();
 }
 
-inline Packages::iterator PackageParser::end()
+inline Packages::iterator
+PackageParser::end()
 {
     return m_packages.end();
 }
 
-inline Packages::const_iterator PackageParser::end() const
+inline Packages::const_iterator
+PackageParser::end() const
 {
     return m_packages.end();
 }
 
-inline Packages::size_type PackageParser::size() const
+inline Packages::size_type
+PackageParser::size() const
 {
     return m_packages.size();
 }
 
-inline bool PackageParser::empty() const
+inline bool
+PackageParser::empty() const
 {
     return m_packages.empty();
 }
-
-}} // namespace vle utils
+}
+} // namespace vle utils
 
 #endif /* VLE_UTILS_DETAILS_PACKAGEPARSER_HPP */

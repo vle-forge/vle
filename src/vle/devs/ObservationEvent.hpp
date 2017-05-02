@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,16 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DEVS_OBSERVATION_EVENT_HPP
 #define VLE_DEVS_OBSERVATION_EVENT_HPP 1
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/devs/Time.hpp>
 #include <vector>
+#include <vle/DllDefines.hpp>
+#include <vle/devs/Time.hpp>
+#include <vle/utils/Exception.hpp>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 class Simulator;
 
@@ -52,35 +52,43 @@ public:
     ObservationEvent(const Time& time,
                      const std::string& viewname,
                      const std::string& portName)
-        : m_time(time)
-        , m_viewName(viewname)
-        , m_portName(portName)
+      : m_time(time)
+      , m_viewName(viewname)
+      , m_portName(portName)
     {
     }
 
     ~ObservationEvent() = default;
 
     const std::string& getViewName() const
-    { return m_viewName; }
+    {
+        return m_viewName;
+    }
 
     const std::string& getPortName() const
-    { return m_portName; }
+    {
+        return m_portName;
+    }
 
     bool onPort(std::string const& portName) const
-    { return m_portName == portName; }
+    {
+        return m_portName == portName;
+    }
 
     /**
      * @return arrived time.
      */
     const Time& getTime() const
-    { return m_time; }
+    {
+        return m_time;
+    }
 
 private:
-    Time        m_time;
+    Time m_time;
     std::string m_viewName;
     std::string m_portName;
 };
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

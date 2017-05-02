@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -43,30 +43,37 @@ namespace devs {
  * function.
  *
  */
-class VLE_API ExternalEvent {
+class VLE_API ExternalEvent
+{
 public:
     ExternalEvent() = default;
-    ExternalEvent(const ExternalEvent &other) = default;
-    ExternalEvent &operator=(const ExternalEvent &other) = default;
-    ExternalEvent(ExternalEvent &&other) = default;
-    ExternalEvent &operator=(ExternalEvent &&other) = default;
+    ExternalEvent(const ExternalEvent& other) = default;
+    ExternalEvent& operator=(const ExternalEvent& other) = default;
+    ExternalEvent(ExternalEvent&& other) = default;
+    ExternalEvent& operator=(ExternalEvent&& other) = default;
     ~ExternalEvent() = default;
 
-    ExternalEvent(const std::string &port)
-        : m_port(port)
+    ExternalEvent(const std::string& port)
+      : m_port(port)
     {
     }
 
-    ExternalEvent(const std::shared_ptr<value::Value> &attributes,
-                  const std::string &port)
-        : m_attributes(attributes)
-        , m_port(port)
+    ExternalEvent(const std::shared_ptr<value::Value>& attributes,
+                  const std::string& port)
+      : m_attributes(attributes)
+      , m_port(port)
     {
     }
 
-    const std::string &getPortName() const { return m_port; }
+    const std::string& getPortName() const
+    {
+        return m_port;
+    }
 
-    bool onPort(const std::string &port) const { return m_port == port; }
+    bool onPort(const std::string& port) const
+    {
+        return m_port == port;
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -76,7 +83,7 @@ public:
      * \param value default value.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Boolean &addBoolean(bool value = true);
+    value::Boolean& addBoolean(bool value = true);
 
     /**
      * Initialize the \e attributes with a Double.
@@ -84,7 +91,7 @@ public:
      * \param value default value.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Double &addDouble(double value = 0.0);
+    value::Double& addDouble(double value = 0.0);
 
     /**
      * Initialize the \e attributes with a Integer.
@@ -92,7 +99,7 @@ public:
      * \param value default value.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Integer &addInteger(int32_t value = 0);
+    value::Integer& addInteger(int32_t value = 0);
 
     /**
      * Initialize the \e attributes with a String.
@@ -100,7 +107,7 @@ public:
      * \param value default value.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::String &addString(const std::string &value = std::string());
+    value::String& addString(const std::string& value = std::string());
 
     /**
      * Initialize the \e attributes with a Xml.
@@ -108,7 +115,7 @@ public:
      * \param value default value.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Xml &addXml(const std::string &value = std::string());
+    value::Xml& addXml(const std::string& value = std::string());
 
     /**
      * Initialize the \e attributes with a Tuple.
@@ -117,7 +124,7 @@ public:
      * \param value default value.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Tuple &addTuple(std::size_t size, double value);
+    value::Tuple& addTuple(std::size_t size, double value);
 
     /**
      * Initialize the \e attributes with a Table.
@@ -126,21 +133,21 @@ public:
      * \param height Default height of the Table.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Table &addTable(std::size_t width, std::size_t height);
+    value::Table& addTable(std::size_t width, std::size_t height);
 
     /**
      * Initialize the \e attributes with a Map.
      *
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Map &addMap();
+    value::Map& addMap();
 
     /**
      * Initialize the \e attributes with a Set.
      *
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Set &addSet();
+    value::Set& addSet();
 
     /**
      * Initialize the \e attributes with a Matrix.
@@ -154,7 +161,7 @@ public:
      * \param resizeRow the number of rows to add when resize the matrix.
      * \return a reference to the newly allocated \e attributes.
      */
-    value::Matrix &addMatrix(std::size_t columns,
+    value::Matrix& addMatrix(std::size_t columns,
                              std::size_t rows,
                              std::size_t columnmax,
                              std::size_t rowmax,
@@ -169,7 +176,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Boolean.
      */
-    const value::Boolean &getBoolean() const;
+    const value::Boolean& getBoolean() const;
 
     /**
      * Return the map attached to the event.
@@ -179,7 +186,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Boolean.
      */
-    value::Boolean &getBoolean();
+    value::Boolean& getBoolean();
 
     /**
      * Return the map attached to the event.
@@ -189,7 +196,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Double.
      */
-    const value::Double &getDouble() const;
+    const value::Double& getDouble() const;
 
     /**
      * Return the map attached to the event.
@@ -199,7 +206,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Double.
      */
-    value::Double &getDouble();
+    value::Double& getDouble();
 
     /**
      * Return the map attached to the event.
@@ -209,7 +216,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Integer.
      */
-    const value::Integer &getInteger() const;
+    const value::Integer& getInteger() const;
 
     /**
      * Return the map attached to the event.
@@ -219,7 +226,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Integer.
      */
-    value::Integer &getInteger();
+    value::Integer& getInteger();
 
     /**
      * Return the map attached to the event.
@@ -229,7 +236,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::String.
      */
-    const value::String &getString() const;
+    const value::String& getString() const;
 
     /**
      * Return the map attached to the event.
@@ -239,7 +246,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::String.
      */
-    value::String &getString();
+    value::String& getString();
 
     /**
      * Return the map attached to the event.
@@ -249,7 +256,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Xml.
      */
-    const value::Xml &getXml() const;
+    const value::Xml& getXml() const;
 
     /**
      * Return the map attached to the event.
@@ -259,7 +266,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Xml.
      */
-    value::Xml &getXml();
+    value::Xml& getXml();
 
     /**
      * Return the map attached to the event.
@@ -269,7 +276,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Tuple.
      */
-    const value::Tuple &getTuple() const;
+    const value::Tuple& getTuple() const;
 
     /**
      * Return the map attached to the event.
@@ -279,7 +286,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Tuple.
      */
-    value::Tuple &getTuple();
+    value::Tuple& getTuple();
 
     /**
      * Return the map attached to the event.
@@ -289,7 +296,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Table.
      */
-    const value::Table &getTable() const;
+    const value::Table& getTable() const;
 
     /**
      * Return the map attached to the event.
@@ -299,7 +306,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Table.
      */
-    value::Table &getTable();
+    value::Table& getTable();
 
     /**
      * Return the map attached to the event.
@@ -309,7 +316,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Set.
      */
-    const value::Set &getSet() const;
+    const value::Set& getSet() const;
 
     /**
      * Return the map attached to the event.
@@ -319,7 +326,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Set.
      */
-    value::Set &getSet();
+    value::Set& getSet();
 
     /**
      * Return the map attached to the event.
@@ -329,7 +336,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Map.
      */
-    const value::Map &getMap() const;
+    const value::Map& getMap() const;
 
     /**
      * Return the map attached to the event.
@@ -339,7 +346,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Map.
      */
-    value::Map &getMap();
+    value::Map& getMap();
 
     /**
      * Return the map attached to the event.
@@ -349,7 +356,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Matrix.
      */
-    const value::Matrix &getMatrix() const;
+    const value::Matrix& getMatrix() const;
 
     /**
      * Return the map attached to the event.
@@ -359,7 +366,7 @@ public:
      * \exception can throw \e utils::ArgError if \e attributes() is empty
      * or if \e attributes() is not a \e value::Matrix.
      */
-    value::Matrix &getMatrix();
+    value::Matrix& getMatrix();
 
     //
     // End of the deprecated part.
@@ -371,21 +378,27 @@ public:
      * \return true if m_attributes.get() != nullptr and if
      * m_attribute.isMap() is true.
      */
-    bool haveAttributes() const { return m_attributes.get() != nullptr; }
+    bool haveAttributes() const
+    {
+        return m_attributes.get() != nullptr;
+    }
 
     /**
      * Get direct access to the underlying attributes (value::Value).
      *
      * \return a std::shared_ptr<value::Value> without or without values.
      */
-    std::shared_ptr<value::Value> &attributes() { return m_attributes; }
+    std::shared_ptr<value::Value>& attributes()
+    {
+        return m_attributes;
+    }
 
     /**
      * Get direct access to the underlying attributes (value::Value).
      *
      * \return a std::shared_ptr<value::Value> without or without values.
      */
-    const std::shared_ptr<value::Value> &attributes() const
+    const std::shared_ptr<value::Value>& attributes() const
     {
         return m_attributes;
     }
@@ -394,7 +407,8 @@ private:
     std::shared_ptr<value::Value> m_attributes;
     std::string m_port;
 
-    template <typename T, typename... Args> T &pp_add(Args &&... args)
+    template <typename T, typename... Args>
+    T& pp_add(Args&&... args)
     {
         auto value = std::make_shared<T>(std::forward<Args>(args)...);
         auto ret = value.get();

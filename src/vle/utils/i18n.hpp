@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_I18N_HPP
 #define VLE_UTILS_I18N_HPP
 
@@ -33,21 +32,20 @@
 namespace vle {
 
 using fmt = boost::format;
-
 }
 
 #ifdef VLE_HAVE_NLS
-# ifndef ENABLE_NLS
-#  define ENABLE_NLS
-# endif
-#  include <libintl.h>
-#  include <locale.h>
-#  define _(x) gettext(x)
-#  define gettext_noop(x) x
-#  define N_(x) gettext_noop(x)
+#ifndef ENABLE_NLS
+#define ENABLE_NLS
+#endif
+#include <libintl.h>
+#include <locale.h>
+#define _(x) gettext(x)
+#define gettext_noop(x) x
+#define N_(x) gettext_noop(x)
 #else
-#  define _(x) x
-#  define N_(x) x
+#define _(x) x
+#define N_(x) x
 #endif
 
 #endif

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,15 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_DEVS_VIEWEVENT_HPP
 #define VLE_DEVS_VIEWEVENT_HPP 1
 
+#include <cassert>
 #include <vle/DllDefines.hpp>
 #include <vle/devs/View.hpp>
-#include <cassert>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 /**
  * ViewEvent is used in scheduller to store the date to launch observation of
@@ -41,9 +41,9 @@ namespace vle { namespace devs {
 struct VLE_LOCAL ViewEvent
 {
     ViewEvent(View* view, Time currenttime, Time timestep)
-        : mView(view)
-        , mTime(currenttime)
-        , mTimestep(timestep)
+      : mView(view)
+      , mTime(currenttime)
+      , mTimestep(timestep)
     {
         assert(view && "ViewEvent: view is null");
         assert(not isInfinity(currenttime) && "ViewEvent: bad current time");
@@ -56,7 +56,8 @@ struct VLE_LOCAL ViewEvent
      */
     void run()
     {
-        assert(mView && "ViewEvent::run(Time) was called previously. Mistake.");
+        assert(mView &&
+               "ViewEvent::run(Time) was called previously. Mistake.");
 
         mView->run(mTime);
     }
@@ -71,7 +72,8 @@ struct VLE_LOCAL ViewEvent
      */
     void run(Time time)
     {
-        assert(mView && "ViewEvent::run(Time) was called previously. Mistake.");
+        assert(mView &&
+               "ViewEvent::run(Time) was called previously. Mistake.");
 
         mView->run(time);
         mView = nullptr;
@@ -86,10 +88,10 @@ struct VLE_LOCAL ViewEvent
     }
 
     View* mView;
-    Time  mTime;
-    Time  mTimestep;
+    Time mTime;
+    Time mTimestep;
 };
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

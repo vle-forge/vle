@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,18 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_UTILS_DEPRECATED_HPP
 #define VLE_UTILS_DEPRECATED_HPP
 
 #if defined(__GNUC__)
-# define DEPRECATED __attribute__ ((deprecated))
+#define DEPRECATED __attribute__((deprecated))
 #elif defined(__MSC_VER)
-# define DEPRECATED __declspec(deprecated)
+#define DEPRECATED __declspec(deprecated)
 #else
-# define DEPRECATED
-# pragma message("DEPRECATED is not defined for this compiler")
+#define DEPRECATED
+#pragma message("DEPRECATED is not defined for this compiler")
 #endif
 
 #endif
-

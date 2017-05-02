@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -27,13 +27,14 @@
 #ifndef VLE_UTILS_DETAILS_SPAWN_HPP
 #define VLE_UTILS_DETAILS_SPAWN_HPP
 
-#include <vle/DllDefines.hpp>
-#include <vle/utils/Context.hpp>
 #include <chrono>
 #include <string>
 #include <vector>
+#include <vle/DllDefines.hpp>
+#include <vle/utils/Context.hpp>
 
-namespace vle { namespace utils {
+namespace vle {
+namespace utils {
 
 /**
  * @e Spawn use fork, exec and pipe function (unix) or CreateProcess,
@@ -102,9 +103,9 @@ public:
      */
     bool start(const std::string& exe,
                const std::string& workingdir,
-               const std::vector < std::string > &args,
+               const std::vector<std::string>& args,
                std::chrono::milliseconds waitchildtimeout =
-               std::chrono::milliseconds {5});
+                 std::chrono::milliseconds{ 5 });
 
     /**
      * Build a vector of string from a command line.
@@ -113,8 +114,7 @@ public:
      * @return a vector of arrgument. The first is the program name
      * executable.
      */
-    std::vector<std::string>
-        splitCommandLine(const std::string& command);
+    std::vector<std::string> splitCommandLine(const std::string& command);
 
     /**
      * Wait the process.
@@ -167,7 +167,7 @@ public:
      *
      * @return true if success, false otherwise.
      */
-    bool get(std::string *output, std::string *error);
+    bool get(std::string* output, std::string* error);
 
     /**
      * Retrieves the status of the ended sub-process. @e status()
@@ -180,13 +180,13 @@ public:
      *
      * @return true if success, false otherwise.
      */
-    bool status(std::string *msg, bool *success);
+    bool status(std::string* msg, bool* success);
 
 private:
     class Pimpl;
     std::unique_ptr<Pimpl> m_pimpl;
 };
-
-}}
+}
+}
 
 #endif /* VLE_UTILS_DETAILS_SPAWN_HPP */

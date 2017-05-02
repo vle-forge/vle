@@ -24,59 +24,66 @@
 
 #include "gvle_file.h"
 
-
 namespace vle {
 namespace gvle {
 
-gvle_file::gvle_file():
-        relPath(""),source_file(""), metadata_file(""),
-        plug_type(gvleplug::GVLE_PLUG_NONE), plug_name("")
+gvle_file::gvle_file()
+  : relPath("")
+  , source_file("")
+  , metadata_file("")
+  , plug_type(gvleplug::GVLE_PLUG_NONE)
+  , plug_name("")
 {
 }
-gvle_file::gvle_file(const gvle_file& f):
-            relPath(f.relPath), source_file(f.source_file),
-            metadata_file(f.metadata_file), plug_type(f.plug_type),
-            plug_name(f.plug_name)
+gvle_file::gvle_file(const gvle_file& f)
+  : relPath(f.relPath)
+  , source_file(f.source_file)
+  , metadata_file(f.metadata_file)
+  , plug_type(f.plug_type)
+  , plug_name(f.plug_name)
 {
 }
 
-gvle_file::gvle_file(const utils::Package& pkg, QString l_relPath):
-        relPath(l_relPath), source_file(""), metadata_file(""),
-        plug_type(gvleplug::GVLE_PLUG_NONE),  plug_name("")
+gvle_file::gvle_file(const utils::Package& pkg, QString l_relPath)
+  : relPath(l_relPath)
+  , source_file("")
+  , metadata_file("")
+  , plug_type(gvleplug::GVLE_PLUG_NONE)
+  , plug_name("")
 {
     QString pkgPath = QString(pkg.getDir(utils::PKG_SOURCE).c_str());
     source_file = pkgPath + "/" + relPath;
     QFileInfo fileInfo = QFileInfo(source_file);
 
-    QString suffix = fileInfo.suffix();         // vpz, cpp, dat or txt
-    QString baseName = fileInfo.baseName();     // eg NewCpp
-    QString dir = fileInfo.dir().dirName();     //src, exp or output
-    QString suffix_metadata = "";               // vpm, sm or om
+    QString suffix = fileInfo.suffix();     // vpz, cpp, dat or txt
+    QString baseName = fileInfo.baseName(); // eg NewCpp
+    QString dir = fileInfo.dir().dirName(); // src, exp or output
+    QString suffix_metadata = "";           // vpm, sm or om
 
-    //get suffix_metadata and set plugin informations
+    // get suffix_metadata and set plugin informations
     if (suffix == "vpz" and dir == "exp") {
         suffix_metadata = "vpm";
         plug_type = gvleplug::GVLE_PLUG_MAIN_VPZ;
         plug_name = "Default";
-    } else if(suffix == "cpp" and dir == "src") {
+    } else if (suffix == "cpp" and dir == "src") {
         suffix_metadata = "sm";
         plug_type = gvleplug::GVLE_PLUG_MAIN;
         plug_name = "Default";
-    } else if (suffix  == "dat" and dir =="output") {
+    } else if (suffix == "dat" and dir == "output") {
         suffix_metadata = "om";
         plug_type = gvleplug::GVLE_PLUG_MAIN_OUT;
         plug_name = "Default";
-    } else if (suffix  == "txt" and dir =="data") {
+    } else if (suffix == "txt" and dir == "data") {
         suffix_metadata = "dm";
         plug_type = gvleplug::GVLE_PLUG_MAIN_DATA;
         plug_name = "Default";
     }
-    //set metadata file
+    // set metadata file
     if (suffix_metadata != "") {
-        metadata_file = pkgPath + "/metadata/" + dir + "/" + baseName + "."
-                            + suffix_metadata;
+        metadata_file = pkgPath + "/metadata/" + dir + "/" + baseName + "." +
+                        suffix_metadata;
     }
-    //set plug type
+    // set plug type
     if (metadata_file != "") {
         QFile file(metadata_file);
         if (file.exists()) {
@@ -97,12 +104,11 @@ gvle_file::gvle_file(const utils::Package& pkg, QString l_relPath):
             }
             if (not pluginNode.isNull()) {
                 plug_name =
-                        pluginNode.attributes().namedItem("name").nodeValue();
+                  pluginNode.attributes().namedItem("name").nodeValue();
             }
         }
     }
 }
-
 
 QString
 gvle_file::baseName() const
@@ -114,7 +120,7 @@ gvle_file::baseName() const
 PluginMainPanel*
 gvle_file::newInstanceMainPanel(gvle_plugins& plugins)
 {
-    switch(plug_type) {
+    switch (plug_type) {
     case gvleplug::GVLE_PLUG_OUTPUT:
     case gvleplug::GVLE_PLUG_COND:
     case gvleplug::GVLE_PLUG_SIM:
@@ -165,11 +171,12 @@ gvle_file::getNewCpp(const utils::Package& pkg)
         if (i > 0) {
             currName += "_" + QVariant(i).toString();
         }
-        found= not QFile(pkgPath + "/src/" + currName+ ".cpp").exists() and
-               not QFile(pkgPath + "/metadata/src/" + currName+ ".sm").exists();
+        found =
+          not QFile(pkgPath + "/src/" + currName + ".cpp").exists() and
+          not QFile(pkgPath + "/metadata/src/" + currName + ".sm").exists();
         i++;
     }
-    QString relPath = "src/"+currName+".cpp";
+    QString relPath = "src/" + currName + ".cpp";
     return gvle_file(pkg, relPath);
 }
 
@@ -186,11 +193,12 @@ gvle_file::getNewVpz(const utils::Package& pkg)
         if (i > 0) {
             currName += "_" + QVariant(i).toString();
         }
-        found= not QFile(pkgPath + "/exp/" + currName+ ".vpz").exists() and
-               not QFile(pkgPath + "/metadata/exp/" + currName+ ".vpm").exists();
+        found =
+          not QFile(pkgPath + "/exp/" + currName + ".vpz").exists() and
+          not QFile(pkgPath + "/metadata/exp/" + currName + ".vpm").exists();
         i++;
     }
-    QString relPath = "exp/"+currName+".vpz";
+    QString relPath = "exp/" + currName + ".vpz";
     return gvle_file(pkg, relPath);
 }
 
@@ -207,11 +215,12 @@ gvle_file::getNewData(const utils::Package& pkg)
         if (i > 0) {
             currName += "_" + QVariant(i).toString();
         }
-        found= not QFile(pkgPath + "/data/" + currName+ ".txt").exists() and
-               not QFile(pkgPath + "/metadata/data/" + currName+ ".dm").exists();
+        found =
+          not QFile(pkgPath + "/data/" + currName + ".txt").exists() and
+          not QFile(pkgPath + "/metadata/data/" + currName + ".dm").exists();
         i++;
     }
-    QString relPath = "data/"+currName+".txt";
+    QString relPath = "data/" + currName + ".txt";
     return gvle_file(pkg, relPath);
 }
 
@@ -221,19 +230,19 @@ gvle_file::getCopy(const utils::Package& pkg, gvle_file gf)
     QString pkgPath = QString(pkg.getDir(utils::PKG_SOURCE).c_str());
     QFileInfo fileInfo = QFileInfo(gf.source_file);
 
-    QString suffix = fileInfo.suffix();         // vpz, cpp or dat
-    QString baseName = fileInfo.baseName();     // eg NewCpp
-    QString dir = fileInfo.dir().dirName();     //src, exp or output
-    QString suffix_metadata = "";               // vpm, sm or om
+    QString suffix = fileInfo.suffix();     // vpz, cpp or dat
+    QString baseName = fileInfo.baseName(); // eg NewCpp
+    QString dir = fileInfo.dir().dirName(); // src, exp or output
+    QString suffix_metadata = "";           // vpm, sm or om
 
-    //get suffix_metadata
+    // get suffix_metadata
     if (suffix == "vpz" and dir == "exp") {
         suffix_metadata = "vpm";
-    } else if(suffix == "cpp" and dir == "src") {
+    } else if (suffix == "cpp" and dir == "src") {
         suffix_metadata = "sm";
-    } else if (suffix  == "dat" and dir =="output") {
+    } else if (suffix == "dat" and dir == "output") {
         suffix_metadata = "om";
-    } else if (suffix  == "txt" and dir =="data") {
+    } else if (suffix == "txt" and dir == "data") {
         suffix_metadata = "dm";
     }
 
@@ -245,15 +254,17 @@ gvle_file::getCopy(const utils::Package& pkg, gvle_file gf)
         if (i > 0) {
             currName += "_" + QVariant(i).toString();
         }
-        found= not QFile(pkgPath+"/"+dir+"/"+currName+ "."+suffix).exists() and
-               not QFile(pkgPath+"/metadata/"+dir
-                       +"/"+currName+"."+suffix_metadata).exists();
+        found = not QFile(pkgPath + "/" + dir + "/" + currName + "." + suffix)
+                      .exists() and
+                not QFile(pkgPath + "/metadata/" + dir + "/" + currName + "." +
+                          suffix_metadata)
+                      .exists();
         i++;
     }
-    gvle_file gfcopy(pkg, dir+"/"+currName+"."+suffix);
+    gvle_file gfcopy(pkg, dir + "/" + currName + "." + suffix);
     gfcopy.plug_name = gf.plug_name;
     gfcopy.plug_type = gf.plug_type;
     return gfcopy;
 }
-
-}} //namespaces
+}
+} // namespaces

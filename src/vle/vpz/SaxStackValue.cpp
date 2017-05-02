@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -35,17 +35,19 @@
 namespace vle {
 namespace vpz {
 
-bool ValueStackSax::isCompositeParent() const
+bool
+ValueStackSax::isCompositeParent() const
 {
     if (not m_valuestack.empty()) {
-        const auto &val = m_valuestack.top();
+        const auto& val = m_valuestack.top();
 
         return val->isMap() or val->isSet() or val->isMatrix();
     }
     return false;
 }
 
-void ValueStackSax::pushInteger()
+void
+ValueStackSax::pushInteger()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -54,7 +56,8 @@ void ValueStackSax::pushInteger()
     }
 }
 
-void ValueStackSax::pushBoolean()
+void
+ValueStackSax::pushBoolean()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -63,7 +66,8 @@ void ValueStackSax::pushBoolean()
     }
 }
 
-void ValueStackSax::pushString()
+void
+ValueStackSax::pushString()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -72,7 +76,8 @@ void ValueStackSax::pushString()
     }
 }
 
-void ValueStackSax::pushDouble()
+void
+ValueStackSax::pushDouble()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -81,7 +86,8 @@ void ValueStackSax::pushDouble()
     }
 }
 
-void ValueStackSax::pushMap()
+void
+ValueStackSax::pushMap()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -92,7 +98,8 @@ void ValueStackSax::pushMap()
     pushOnVectorValue<value::Map>();
 }
 
-void ValueStackSax::pushMapKey(const std::string &key)
+void
+ValueStackSax::pushMapKey(const std::string& key)
 {
     if (not m_valuestack.empty()) {
         if (not m_valuestack.top()->isMap()) {
@@ -103,7 +110,8 @@ void ValueStackSax::pushMapKey(const std::string &key)
     m_lastkey.assign(key);
 }
 
-void ValueStackSax::pushSet()
+void
+ValueStackSax::pushSet()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -114,12 +122,13 @@ void ValueStackSax::pushSet()
     pushOnVectorValue<value::Set>();
 }
 
-void ValueStackSax::pushMatrix(value::Matrix::index col,
-                               value::Matrix::index row,
-                               value::Matrix::index colmax,
-                               value::Matrix::index rowmax,
-                               value::Matrix::index colstep,
-                               value::Matrix::index rowstep)
+void
+ValueStackSax::pushMatrix(value::Matrix::index col,
+                          value::Matrix::index row,
+                          value::Matrix::index colmax,
+                          value::Matrix::index rowmax,
+                          value::Matrix::index colstep,
+                          value::Matrix::index rowstep)
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -128,10 +137,11 @@ void ValueStackSax::pushMatrix(value::Matrix::index col,
     }
 
     pushOnVectorValue<value::Matrix>(
-        col, row, colmax, rowmax, colstep, rowstep);
+      col, row, colmax, rowmax, colstep, rowstep);
 }
 
-void ValueStackSax::pushTuple()
+void
+ValueStackSax::pushTuple()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -142,7 +152,8 @@ void ValueStackSax::pushTuple()
     pushOnVectorValue<value::Tuple>();
 }
 
-void ValueStackSax::pushTable(const size_t width, const size_t height)
+void
+ValueStackSax::pushTable(const size_t width, const size_t height)
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -153,7 +164,8 @@ void ValueStackSax::pushTable(const size_t width, const size_t height)
     pushOnVectorValue<value::Table>(width, height);
 }
 
-void ValueStackSax::pushXml()
+void
+ValueStackSax::pushXml()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -162,7 +174,8 @@ void ValueStackSax::pushXml()
     }
 }
 
-void ValueStackSax::pushNull()
+void
+ValueStackSax::pushNull()
 {
     if (not m_valuestack.empty()) {
         if (not isCompositeParent()) {
@@ -171,24 +184,27 @@ void ValueStackSax::pushNull()
     }
 }
 
-void ValueStackSax::popValue()
+void
+ValueStackSax::popValue()
 {
     if (not m_valuestack.empty()) {
         m_valuestack.pop();
     }
 }
 
-value::Value *ValueStackSax::topValue()
+value::Value*
+ValueStackSax::topValue()
 {
     if (m_valuestack.empty()) {
         throw utils::SaxParserError(
-            _("Empty sax parser value stack for the top operation"));
+          _("Empty sax parser value stack for the top operation"));
     }
 
     return m_valuestack.top();
 }
 
-void ValueStackSax::clear()
+void
+ValueStackSax::clear()
 {
     while (not m_valuestack.empty())
         m_valuestack.pop();
@@ -196,25 +212,28 @@ void ValueStackSax::clear()
     m_result.clear();
 }
 
-void ValueStackSax::pushResult(std::shared_ptr<value::Value> val)
+void
+ValueStackSax::pushResult(std::shared_ptr<value::Value> val)
 {
     m_result.push_back(std::move(val));
 }
 
-const std::shared_ptr<value::Value> &ValueStackSax::getResult(size_t i) const
+const std::shared_ptr<value::Value>&
+ValueStackSax::getResult(size_t i) const
 {
     if (m_result.size() < i)
         throw utils::SaxParserError(
-            (fmt(_("Get result value with to big index %1%.")) % i).str());
+          (fmt(_("Get result value with to big index %1%.")) % i).str());
 
     return m_result[i];
 }
 
-const std::shared_ptr<value::Value> &ValueStackSax::getLastResult() const
+const std::shared_ptr<value::Value>&
+ValueStackSax::getLastResult() const
 {
     if (m_result.empty())
         throw utils::SaxParserError(
-            _("Get last result value with empty result vector"));
+          _("Get last result value with empty result vector"));
 
     return m_result[m_result.size() - 1];
 }

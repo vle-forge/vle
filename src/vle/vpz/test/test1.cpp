@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -47,12 +47,13 @@
 
 using namespace vle;
 
-void value_bool()
+void
+value_bool()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n<boolean>true</boolean>";
-    const char *t2 = "<?xml version=\"1.0\"?>\n<boolean>false</boolean>";
-    const char *t3 = "<?xml version=\"1.0\"?>\n<boolean>1</boolean>";
-    const char *t4 = "<?xml version=\"1.0\"?>\n<boolean>0</boolean>";
+    const char* t1 = "<?xml version=\"1.0\"?>\n<boolean>true</boolean>";
+    const char* t2 = "<?xml version=\"1.0\"?>\n<boolean>false</boolean>";
+    const char* t3 = "<?xml version=\"1.0\"?>\n<boolean>1</boolean>";
+    const char* t4 = "<?xml version=\"1.0\"?>\n<boolean>0</boolean>";
 
     std::shared_ptr<value::Value> v;
 
@@ -72,10 +73,11 @@ void value_bool()
     Ensures(v->toBoolean().value() == false);
 }
 
-void value_integer()
+void
+value_integer()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n<integer>100</integer>";
-    const char *t2 = "<?xml version=\"1.0\"?>\n<integer>-100</integer>";
+    const char* t1 = "<?xml version=\"1.0\"?>\n<integer>100</integer>";
+    const char* t2 = "<?xml version=\"1.0\"?>\n<integer>-100</integer>";
     const size_t bufferSize = 1000;
     char t3[bufferSize];
     char t4[bufferSize];
@@ -109,10 +111,11 @@ void value_integer()
     EnsuresEqual(v->toInteger().value(), std::numeric_limits<int32_t>::min());
 }
 
-void value_double()
+void
+value_double()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n<double>100.5</double>";
-    const char *t2 = "<?xml version=\"1.0\"?>\n<double>-100.5</double>";
+    const char* t1 = "<?xml version=\"1.0\"?>\n<double>100.5</double>";
+    const char* t2 = "<?xml version=\"1.0\"?>\n<double>-100.5</double>";
 
     std::shared_ptr<value::Value> v;
 
@@ -127,13 +130,14 @@ void value_double()
     EnsuresApproximatelyEqual(v->toDouble().value(), -100.5, 1);
 }
 
-void value_string()
+void
+value_string()
 {
-    const char *t1 =
-        "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
-    const char *t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
-    const char *t4 =
-        "<?xml version=\"1.0\"?>\n<string>é ç € â ô f Û « © ±</string>";
+    const char* t1 =
+      "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
+    const char* t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
+    const char* t4 =
+      "<?xml version=\"1.0\"?>\n<string>é ç € â ô f Û « © ±</string>";
 
     std::shared_ptr<value::Value> v;
 
@@ -150,15 +154,16 @@ void value_string()
     Ensures(v->toString().value() == "é ç € â ô f Û « © ±");
 }
 
-void value_set()
+void
+value_set()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n"
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
                      "<set>\n"
                      "<integer>1</integer>\n"
                      "<string>test</string>\n"
                      "</set>";
 
-    const char *t2 = "<?xml version=\"1.0\"?>\n"
+    const char* t2 = "<?xml version=\"1.0\"?>\n"
                      "<set>\n"
                      "  <integer>1</integer>\n"
                      "  <set>\n"
@@ -168,7 +173,7 @@ void value_set()
 
     {
         auto ptr = vpz::Vpz::parseValue(t1);
-        const auto &v = ptr->toSet();
+        const auto& v = ptr->toSet();
 
         Ensures(v.getString(1) == "test");
         Ensures(v.getInt(0) == 1);
@@ -181,11 +186,11 @@ void value_set()
 
         std::cout << ptr->writeToXml() << '\n';
 
-        const auto &v = ptr->toSet();
+        const auto& v = ptr->toSet();
         Ensures(value::toInteger(v.get(0)) == 1);
 
         {
-            const auto &v2 = v.get(1)->toSet();
+            const auto& v2 = v.get(1)->toSet();
             Ensures(v2.size() == 1);
             Ensures(v2.get(0)->toString().value() == "test");
         }
@@ -194,25 +199,26 @@ void value_set()
     }
 
     auto ptr = vpz::Vpz::parseValue(t3);
-    const auto &v = ptr->toSet();
+    const auto& v = ptr->toSet();
 
     Ensures(v.get(0)->toInteger().value() == 1);
     {
-        const value::Set &v2 = v.get(1)->toSet();
+        const value::Set& v2 = v.get(1)->toSet();
         Ensures(value::toString(v2.get(0)) == "test");
     }
 }
 
-void value_map()
+void
+value_map()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n"
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
                      "<map>\n"
                      " <key name=\"a\">\n"
                      "  <integer>10</integer>\n"
                      " </key>\n"
                      "</map>\n";
 
-    const char *t2 = "<?xml version=\"1.0\"?>\n"
+    const char* t2 = "<?xml version=\"1.0\"?>\n"
                      "<map>\n"
                      " <key name=\"a\">\n"
                      "  <set>\n"
@@ -249,9 +255,10 @@ void value_map()
     }
 }
 
-void value_tuple()
+void
+value_tuple()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n"
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
                      "<tuple>1 2 3</tuple>\n";
 
     auto ptr = vpz::Vpz::parseValue(t1);
@@ -261,7 +268,7 @@ void value_tuple()
     EnsuresApproximatelyEqual(v[1], 2.0, 0.1);
     EnsuresApproximatelyEqual(v[2], 3.0, 0.1);
 
-    const char *t2 = "<?xml version=\"1.0\"?>\n"
+    const char* t2 = "<?xml version=\"1.0\"?>\n"
                      "<map>\n"
                      "   <key name=\"testtest\">\n"
                      "      <tuple>100 200 300</tuple>\n"
@@ -272,7 +279,7 @@ void value_tuple()
     auto m = ptr_m->toMap();
 
     auto t = m.getTuple("testtest");
-    value::Tuple &v2(toTupleValue(t));
+    value::Tuple& v2(toTupleValue(t));
     EnsuresApproximatelyEqual(v2.operator[](0), 100.0, 0.1);
     EnsuresApproximatelyEqual(v2.operator[](1), 200.0, 0.1);
     EnsuresApproximatelyEqual(v2.operator[](2), 300.0, 0.1);
@@ -285,9 +292,10 @@ void value_tuple()
     EnsuresApproximatelyEqual(v3.operator[](2), 300.0, 0.1);
 }
 
-void value_table()
+void
+value_table()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n"
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
                      "<table width=\"2\" height=\"3\">\n"
                      "1 2 3 4 5 6"
                      "</table>\n";
@@ -320,9 +328,10 @@ void value_table()
     EnsuresApproximatelyEqual(w.get(1, 2), 6.0, 0.1);
 }
 
-void value_table_map()
+void
+value_table_map()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n"
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
                      "<map>"
                      "<key name=\"a\"><double>0.1</double></key>"
                      "<key name=\"tr\">"
@@ -333,7 +342,7 @@ void value_table_map()
                      "<key name=\"c\"><double>0.1</double></key>"
                      "</map>";
 
-    const char *t2 = "<?xml version=\"1.0\"?>\n"
+    const char* t2 = "<?xml version=\"1.0\"?>\n"
                      "<map>"
                      "<key name=\"a\"><double>0.1</double></key>"
                      "<key name=\"tr\">"
@@ -343,7 +352,7 @@ void value_table_map()
                      "</key>"
                      "</map>";
 
-    const char *t3 = "<?xml version=\"1.0\"?>\n"
+    const char* t3 = "<?xml version=\"1.0\"?>\n"
                      "<map>"
                      "<key name=\"tr\">"
                      "<table width=\"2\" height=\"3\">\n"
@@ -396,9 +405,10 @@ void value_table_map()
     }
 }
 
-void value_xml()
+void
+value_xml()
 {
-    const char *t1 = "<?xml version=\"1.0\"?>\n"
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
                      "<xml>"
                      "<![CDATA[test 1 2 1 2]]>\n"
                      "</xml>";
@@ -414,24 +424,25 @@ void value_xml()
     EnsuresEqual(str2.value(), "test 1 2 1 2");
 }
 
-void value_matrix()
+void
+value_matrix()
 {
-    const char *t1 =
-        "<?xml version=\"1.0\"?>\n"
-        "<matrix rows=\"3\" columns=\"2\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<integer>1</integer>"
-        "<integer>2</integer>"
-        "<integer>3</integer>"
-        "<integer>4</integer>"
-        "<integer>5</integer>"
-        "<integer>6</integer>"
-        "</matrix>";
+    const char* t1 =
+      "<?xml version=\"1.0\"?>\n"
+      "<matrix rows=\"3\" columns=\"2\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<integer>1</integer>"
+      "<integer>2</integer>"
+      "<integer>3</integer>"
+      "<integer>4</integer>"
+      "<integer>5</integer>"
+      "<integer>6</integer>"
+      "</matrix>";
 
     auto ptr = vpz::Vpz::parseValue(t1);
     EnsuresEqual(ptr->isMatrix(), true);
 
-    auto &m = ptr->toMatrix();
+    auto& m = ptr->toMatrix();
 
     EnsuresEqual(m.rows(), (value::Matrix::size_type)3);
     EnsuresEqual(m.columns(), (value::Matrix::size_type)2);
@@ -482,36 +493,37 @@ void value_matrix()
     EnsuresEqual(value::toInteger(m2(1, 2)), 6);
 }
 
-void value_matrix_of_matrix()
+void
+value_matrix_of_matrix()
 {
-    const char *t1 =
-        "<?xml version=\"1.0\"?>\n"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<integer>1</integer>"
-        "<integer>2</integer>"
-        "<integer>3</integer>"
-        "</matrix>"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<integer>4</integer>"
-        "<integer>5</integer>"
-        "<integer>6</integer>"
-        "</matrix>"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<integer>7</integer>"
-        "<integer>8</integer>"
-        "<integer>9</integer>"
-        "</matrix>"
-        "</matrix>";
+    const char* t1 =
+      "<?xml version=\"1.0\"?>\n"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<integer>1</integer>"
+      "<integer>2</integer>"
+      "<integer>3</integer>"
+      "</matrix>"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<integer>4</integer>"
+      "<integer>5</integer>"
+      "<integer>6</integer>"
+      "</matrix>"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<integer>7</integer>"
+      "<integer>8</integer>"
+      "<integer>9</integer>"
+      "</matrix>"
+      "</matrix>";
 
     auto ptr = vpz::Vpz::parseValue(t1);
     EnsuresEqual(ptr->isMatrix(), true);
 
-    const auto &m = ptr->toMatrix();
+    const auto& m = ptr->toMatrix();
     std::cout << "matrix_of_matrix\n" << m.writeToXml() << '\n';
 
     EnsuresEqual(m.rows(), (value::Matrix::size_type)1);
@@ -536,31 +548,32 @@ void value_matrix_of_matrix()
     EnsuresEqual(m3(2, 0)->toInteger().value(), 9);
 }
 
-void value_matrix_of_matrix_io()
+void
+value_matrix_of_matrix_io()
 {
-    const char *t1 =
-        "<?xml version=\"1.0\"?>\n"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<null />"
-        "<integer>2</integer>"
-        "<integer>3</integer>"
-        "</matrix>"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<integer>4</integer>"
-        "<integer>5</integer>"
-        "<null />"
-        "</matrix>"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
-        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
-        "<integer>7</integer>"
-        "<null />"
-        "<integer>9</integer>"
-        "</matrix>"
-        "</matrix>";
+    const char* t1 =
+      "<?xml version=\"1.0\"?>\n"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<null />"
+      "<integer>2</integer>"
+      "<integer>3</integer>"
+      "</matrix>"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<integer>4</integer>"
+      "<integer>5</integer>"
+      "<null />"
+      "</matrix>"
+      "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+      "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+      "<integer>7</integer>"
+      "<null />"
+      "<integer>9</integer>"
+      "</matrix>"
+      "</matrix>";
 
     auto ptr = vpz::Vpz::parseValue(t1);
 
@@ -593,7 +606,8 @@ void value_matrix_of_matrix_io()
     EnsuresEqual(value::toInteger(m3(2, 0)), 9);
 }
 
-int main()
+int
+main()
 {
     vle::Init app;
 

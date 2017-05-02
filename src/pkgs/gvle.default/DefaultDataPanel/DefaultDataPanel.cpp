@@ -22,39 +22,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sstream>
-#include <QFileInfo>
-#include <vle/utils/Template.hpp>
 #include "DefaultDataPanel.h"
+#include <QFileInfo>
+#include <sstream>
+#include <vle/utils/Template.hpp>
 
 namespace vle {
 namespace gvle {
 
-
-
-
-
-DefaultDataPanel::DefaultDataPanel():
-            PluginMainPanel(), m_edit(0), m_file("")
+DefaultDataPanel::DefaultDataPanel()
+  : PluginMainPanel()
+  , m_edit(0)
+  , m_file("")
 {
 
     m_edit = new QTextEdit();
-    QObject::connect(m_edit, SIGNAL(undoAvailable(bool)),
-                     this, SLOT(onUndoAvailable(bool)));
-
+    QObject::connect(
+      m_edit, SIGNAL(undoAvailable(bool)), this, SLOT(onUndoAvailable(bool)));
 }
 
 DefaultDataPanel::~DefaultDataPanel()
 {
-
 }
-
 
 void
 DefaultDataPanel::initData(QString pkg, QString classname, QString filePath)
 {
-    std::string tpl =
-        "# data file";
+    std::string tpl = "# data file";
 
     vle::utils::Template vleTpl(tpl);
     vleTpl.stringSymbol().append("classname", classname.toStdString());
@@ -66,29 +60,32 @@ DefaultDataPanel::initData(QString pkg, QString classname, QString filePath)
     QFile datafile(filePath);
     datafile.open(QIODevice::WriteOnly | QIODevice::Text);
 
-    if(!datafile.isOpen()){
-        qDebug() << "- Error, unable to open" << "dataFilename" << "for data";
+    if (!datafile.isOpen()) {
+        qDebug() << "- Error, unable to open"
+                 << "dataFilename"
+                 << "for data";
     }
     QTextStream outStream(&datafile);
     outStream << out.str().c_str();
     datafile.close();
 }
 
-
 void
-DefaultDataPanel::init(const gvle_file& gf, utils::Package* pkg,
-        Logger* /*log*/, gvle_plugins* /*plugs*/,
-        const utils::ContextPtr& /*ctx*/)
+DefaultDataPanel::init(const gvle_file& gf,
+                       utils::Package* pkg,
+                       Logger* /*log*/,
+                       gvle_plugins* /*plugs*/,
+                       const utils::ContextPtr& /*ctx*/)
 {
     QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
     m_file = gf.source_file;
 
-    if (not QFile(m_file).exists()){
-        initData(QString(pkg->name().c_str()),QFileInfo(m_file).baseName(),
-                m_file);
+    if (not QFile(m_file).exists()) {
+        initData(
+          QString(pkg->name().c_str()), QFileInfo(m_file).baseName(), m_file);
     }
 
-    QFile dataFile (m_file);
+    QFile dataFile(m_file);
 
     if (!dataFile.open(QFile::ReadOnly | QFile::Text)) {
         qDebug() << " Error DefaultDataPanel::init ";
@@ -110,7 +107,7 @@ DefaultDataPanel::save()
     if (m_file != "") {
         QFile file(m_file);
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-            file.write(m_edit->toPlainText().toStdString().c_str()) ;
+            file.write(m_edit->toPlainText().toStdString().c_str());
             file.flush();
             file.close();
         }
@@ -144,7 +141,6 @@ DefaultDataPanel::undo()
 void
 DefaultDataPanel::redo()
 {
-
 }
 
 void
@@ -152,5 +148,5 @@ DefaultDataPanel::onUndoAvailable(bool b)
 {
     emit undoAvailable(b);
 }
-
-}} //namespaces
+}
+} // namespaces

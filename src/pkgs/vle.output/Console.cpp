@@ -5,7 +5,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
@@ -25,29 +25,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <boost/format.hpp>
+#include <iostream>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
-#include <boost/format.hpp>
-#include <vle/value/String.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
-#include <iostream>
+#include <vle/value/String.hpp>
 
-namespace vle { namespace oov { namespace plugin {
+namespace vle {
+namespace oov {
+namespace plugin {
 
 class Console : public Plugin
 {
     /** Define a dictionary (model's name & port, index) */
-    typedef std::map < std::string, int > Columns;
+    typedef std::map<std::string, int> Columns;
 
     /** Define the buffer for valid values (model observed). */
-    typedef std::vector < bool > ValidElement;
+    typedef std::vector<bool> ValidElement;
 
     /** Define a new bag indicator*/
-    typedef std::map < std::string, double> NewBagWatcher;
+    typedef std::map<std::string, double> NewBagWatcher;
 
     bool mFlushByBag;
     bool mJulian;
@@ -62,13 +63,19 @@ class Console : public Plugin
 
 public:
     Console(const std::string& location)
-        : Plugin(location), mFlushByBag(false), mJulian(false),
-          mIsStart(false), mTime(-1.0), mHaveFirstEvent(false),
-          mHeader(true)
-    {}
+      : Plugin(location)
+      , mFlushByBag(false)
+      , mJulian(false)
+      , mIsStart(false)
+      , mTime(-1.0)
+      , mHaveFirstEvent(false)
+      , mHeader(true)
+    {
+    }
 
     virtual ~Console()
-    {}
+    {
+    }
 
     virtual void onParameter(const std::string& /*plugin*/,
                              const std::string& /*location*/,
@@ -104,7 +111,7 @@ public:
 
             if (map.exist("header")) {
                 if (map.get("header")->isString()) {
-                    if(map.getString("header") == "top") {
+                    if (map.getString("header") == "top") {
                         mHeader = true;
                     } else {
                         mHeader = false;
@@ -138,8 +145,10 @@ public:
 
         if (mColumns.find(name) != mColumns.end()) {
             throw utils::InternalError(
-                (boost::format("Output plug-in: observable '%1%' already exist")
-                                % name).str());
+              (boost::format(
+                 "Output plug-in: observable '%1%' already exist") %
+               name)
+                .str());
         }
 
         mNewBagWatcher[name] = -1.0;
@@ -174,15 +183,17 @@ public:
             it = mColumns.find(name);
 
             if (it == mColumns.end()) {
-                throw utils::InternalError((boost::format(
-                        "Output plugin: columns '%1%' does not exist. "
-                                        "No observable ?") % name).str());
+                throw utils::InternalError(
+                  (boost::format(
+                     "Output plugin: columns '%1%' does not exist. "
+                     "No observable ?") %
+                   name)
+                    .str());
             }
 
             if (mIsStart) {
                 if (time != mTime ||
-                        (mFlushByBag &&
-                                mNewBagWatcher[name] == time)) {
+                    (mFlushByBag && mNewBagWatcher[name] == time)) {
                     flush();
                 }
             } else {
@@ -207,7 +218,7 @@ public:
         finalFlush(time);
 
         if (mHeader) {
-            std::vector < std::string > array(mColumns.size());
+            std::vector<std::string> array(mColumns.size());
 
             {
                 Columns::iterator it = mColumns.begin();
@@ -219,7 +230,7 @@ public:
             std::cout << "time";
 
             if (not array.empty()) {
-                std::vector < std::string >::iterator it = array.begin();
+                std::vector<std::string>::iterator it = array.begin();
                 while (it != array.end()) {
                     std::cout << *it;
                     ++it;
@@ -237,8 +248,8 @@ public:
 
     void flush()
     {
-        if (mValid.empty() or std::find(mValid.begin(), mValid.end(),
-                                        true) != mValid.end()) {
+        if (mValid.empty() or
+            std::find(mValid.begin(), mValid.end(), true) != mValid.end()) {
             std::cout << mTime;
             if (mJulian) {
                 std::cout << '\t';
@@ -246,8 +257,8 @@ public:
                     std::cout << utils::DateTime::toJulianDay(mTime);
                 } catch (const std::exception& /*e*/) {
                     throw utils::ModellingError(
-                            "Output plug-in: Year is out of valid range "
-                          "in julian day: 1400..10000");
+                      "Output plug-in: Year is out of valid range "
+                      "in julian day: 1400..10000");
                 }
             }
 
@@ -274,11 +285,12 @@ public:
     {
         flush();
 
-        if (mValid.empty() or std::find(mValid.begin(), mValid.end(), true) !=
-            mValid.end()) {
+        if (mValid.empty() or
+            std::find(mValid.begin(), mValid.end(), true) != mValid.end()) {
             std::cout << trameTime << '\t';
             for (value::Set::iterator it = mBuffer.begin();
-                    it != mBuffer.end(); ++it) {
+                 it != mBuffer.end();
+                 ++it) {
                 if (*it) {
                     (*it)->writeFile(std::cout);
                 } else {
@@ -308,7 +320,8 @@ public:
         return r;
     }
 };
-
-}}} // namespace vle oov plugin
+}
+}
+} // namespace vle oov plugin
 
 DECLARE_OOV_PLUGIN(vle::oov::plugin::Console)

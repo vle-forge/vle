@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,17 +24,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 #define VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 
 #include <vle/DllDefines.hpp>
 
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/Conditions.hpp>
 #include <string>
+#include <vle/vpz/Conditions.hpp>
+#include <vle/vpz/Vpz.hpp>
 
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
 
 /**
  * ExperimentGenerator build @e vpz::Conditions from an experimental frame.
@@ -95,7 +95,7 @@ public:
      * @param[in] index The index in the experiment generator table.
      * @param[out] conditions Conditions to fill with new conditions.
      */
-    void get(uint32_t index, vpz::Conditions *conditions);
+    void get(uint32_t index, vpz::Conditions* conditions);
 
     /**
      * The minimal index of experiences produce by the object.
@@ -123,9 +123,9 @@ private:
     ExperimentGenerator& operator=(const ExperimentGenerator& other);
 
     class Pimpl;
-    Pimpl *mPimpl;
+    Pimpl* mPimpl;
 };
-
-}} // namespace vle manager
+}
+} // namespace vle manager
 
 #endif

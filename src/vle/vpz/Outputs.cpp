@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,30 +24,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/Outputs.hpp>
+#include <iterator>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
-#include <iterator>
+#include <vle/vpz/Outputs.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
-void Outputs::write(std::ostream& out) const
+void
+Outputs::write(std::ostream& out) const
 {
     if (not m_list.empty()) {
         out << "<outputs>\n";
-        std::transform(begin(), end(),
-                       std::ostream_iterator < Output >(out, "\n"),
-                       utils::select2nd < OutputList::value_type >());
+        std::transform(begin(),
+                       end(),
+                       std::ostream_iterator<Output>(out, "\n"),
+                       utils::select2nd<OutputList::value_type>());
         out << "</outputs>\n";
     }
 }
 
-Output& Outputs::addStream(const std::string& name,
-                                const std::string& location,
-                                const std::string& plugin,
-                                const std::string& package)
+Output&
+Outputs::addStream(const std::string& name,
+                   const std::string& location,
+                   const std::string& plugin,
+                   const std::string& package)
 {
     Output o;
     o.setName(name);
@@ -55,9 +58,10 @@ Output& Outputs::addStream(const std::string& name,
     return add(o);
 }
 
-Output& Outputs::addStream(const std::string& name,
-                                const std::string& location,
-                                const std::string& plugin)
+Output&
+Outputs::addStream(const std::string& name,
+                   const std::string& location,
+                   const std::string& plugin)
 {
     Output o;
     o.setName(name);
@@ -65,7 +69,8 @@ Output& Outputs::addStream(const std::string& name,
     return add(o);
 }
 
-void Outputs::del(const std::string& name)
+void
+Outputs::del(const std::string& name)
 {
     auto it = m_list.find(name);
 
@@ -74,27 +79,30 @@ void Outputs::del(const std::string& name)
     }
 }
 
-void Outputs::add(const Outputs& o)
+void
+Outputs::add(const Outputs& o)
 {
     std::for_each(o.begin(), o.end(), AddOutput(*this));
 }
 
-Output& Outputs::add(const Output& o)
+Output&
+Outputs::add(const Output& o)
 {
-    std::pair < iterator, bool > x;
+    std::pair<iterator, bool> x;
 
-    x = m_list.insert(value_type( o.name(), o));
+    x = m_list.insert(value_type(o.name(), o));
 
     if (not x.second) {
         throw utils::ArgError(
-            (fmt(_("An output have already this name '%1%'\n"))
-             % o.name()).str());
+          (fmt(_("An output have already this name '%1%'\n")) % o.name())
+            .str());
     }
 
     return x.first->second;
 }
 
-Output& Outputs::get(const std::string& name)
+Output&
+Outputs::get(const std::string& name)
 {
     auto it = m_list.find(name);
 
@@ -105,7 +113,8 @@ Output& Outputs::get(const std::string& name)
     return it->second;
 }
 
-const Output& Outputs::get(const std::string& name) const
+const Output&
+Outputs::get(const std::string& name) const
 {
     auto it = m_list.find(name);
 
@@ -116,8 +125,9 @@ const Output& Outputs::get(const std::string& name) const
     return it->second;
 }
 
-void Outputs::rename(const std::string& oldoutputname,
-		     const std::string& newoutputname)
+void
+Outputs::rename(const std::string& oldoutputname,
+                const std::string& newoutputname)
 {
     Output copy = get(oldoutputname);
     del(oldoutputname);
@@ -125,11 +135,12 @@ void Outputs::rename(const std::string& oldoutputname,
     addStream(newoutputname, copy.location(), copy.plugin(), copy.package());
 }
 
-std::set < std::string > Outputs::depends() const
+std::set<std::string>
+Outputs::depends() const
 {
-    std::set < std::string > result;
+    std::set<std::string> result;
 
-    for (const auto & elem : *this) {
+    for (const auto& elem : *this) {
         if (not elem.second.package().empty()) {
             result.insert(elem.second.package());
         }
@@ -138,14 +149,17 @@ std::set < std::string > Outputs::depends() const
     return result;
 }
 
-std::vector < std::string > Outputs::outputsname() const
+std::vector<std::string>
+Outputs::outputsname() const
 {
-    std::vector < std::string > result(m_list.size());
+    std::vector<std::string> result(m_list.size());
 
-    std::transform(begin(), end(), result.begin(),
-                   utils::select1st < OutputList::value_type >());
+    std::transform(begin(),
+                   end(),
+                   result.begin(),
+                   utils::select1st<OutputList::value_type>());
 
     return result;
 }
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz

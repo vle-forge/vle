@@ -23,84 +23,94 @@
  */
 
 #include "vle/gvle/gvle_win.h"
-#include <vle/utils/Filesystem.hpp>
-#include <vle/utils/Tools.hpp>
 #include <QApplication>
 #include <QCoreApplication>
+#include <QDir>
+#include <QLibraryInfo>
 #include <QSettings>
 #include <QTranslator>
-#include <QLibraryInfo>
 #include <QTranslator>
 #include <QtDebug>
-#include <QDir>
 #include <iostream>
 #include <iostream>
 #include <vle/utils/Filesystem.hpp>
+#include <vle/utils/Filesystem.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
 
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
 
 #ifdef _WIN32
     {
-        QDir qt5plugins_dir = QCoreApplication::applicationDirPath() +"/../share/qt5/plugins";
+        QDir qt5plugins_dir =
+          QCoreApplication::applicationDirPath() + "/../share/qt5/plugins";
         if (not qt5plugins_dir.exists()) {
-            qDebug() << " building lib path error :  " << qt5plugins_dir.absolutePath();
+            qDebug() << " building lib path error :  "
+                     << qt5plugins_dir.absolutePath();
         } else {
             QCoreApplication::addLibraryPath(qt5plugins_dir.absolutePath());
         }
     }
     {
         bool found = false;
-        for (unsigned int i=0; (i<2) and not found; i++) {
-          QString reg_str = "";
-          if (i == 0) {
-            reg_str = vle::utils::format(
-               "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE %s.0",
-               vle::string_version_abi().c_str()).c_str();
-          } else {
-            reg_str = vle::utils::format(
-               "HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE %s.0",
-               vle::string_version_abi().c_str()).c_str();
-          }
-          QSettings reg_vle(reg_str, QSettings::NativeFormat);
-        
-          QVariant reg_path;
-          {
-            reg_path = reg_vle.value(".");
-            if(reg_path.isValid()) {
-                QDir tmp(QDir(reg_path.toString()).filePath("share/qt5/plugins"));
-                if(tmp.exists()) {
-                    QCoreApplication::addLibraryPath(tmp.absolutePath());
-                    found = true;
+        for (unsigned int i = 0; (i < 2) and not found; i++) {
+            QString reg_str = "";
+            if (i == 0) {
+                reg_str = vle::utils::format("HKEY_LOCAL_"
+                                             "MACHINE\\SOFTWARE\\Wow6432Node\\"
+                                             "VLE Development Team\\VLE %s.0",
+                                             vle::string_version_abi().c_str())
+                            .c_str();
+            } else {
+                reg_str =
+                  vle::utils::format("HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE "
+                                     "Development Team\\VLE %s.0",
+                                     vle::string_version_abi().c_str())
+                    .c_str();
+            }
+            QSettings reg_vle(reg_str, QSettings::NativeFormat);
+
+            QVariant reg_path;
+            {
+                reg_path = reg_vle.value(".");
+                if (reg_path.isValid()) {
+                    QDir tmp(
+                      QDir(reg_path.toString()).filePath("share/qt5/plugins"));
+                    if (tmp.exists()) {
+                        QCoreApplication::addLibraryPath(tmp.absolutePath());
+                        found = true;
+                    }
                 }
             }
-          }
-          {
-            reg_path = reg_vle.value("Default");
-            if(reg_path.isValid()) {
-                QDir tmp(QDir(reg_path.toString()).filePath("/share/qt5/plugins"));
-                if(tmp.exists()) {
-                    QCoreApplication::addLibraryPath(tmp.absolutePath());
-                    found = true;
+            {
+                reg_path = reg_vle.value("Default");
+                if (reg_path.isValid()) {
+                    QDir tmp(QDir(reg_path.toString())
+                               .filePath("/share/qt5/plugins"));
+                    if (tmp.exists()) {
+                        QCoreApplication::addLibraryPath(tmp.absolutePath());
+                        found = true;
+                    }
                 }
             }
-          }
-          {
-            reg_path = reg_vle.value("path");
-            if(reg_path.isValid()) {
-                QDir tmp(QDir(reg_path.toString()).filePath("/share/qt5/plugins"));
-                if(tmp.exists()) {
-                    QCoreApplication::addLibraryPath(tmp.absolutePath());
-                    found = true;
+            {
+                reg_path = reg_vle.value("path");
+                if (reg_path.isValid()) {
+                    QDir tmp(QDir(reg_path.toString())
+                               .filePath("/share/qt5/plugins"));
+                    if (tmp.exists()) {
+                        QCoreApplication::addLibraryPath(tmp.absolutePath());
+                        found = true;
+                    }
                 }
             }
-          }
         }
         if (not found) {
             qDebug() << " building lib path error : qt plugins not found ";
-        }        
+        }
     }
 #endif
 
@@ -115,7 +125,7 @@ int main(int argc, char *argv[])
     vle::utils::Path localesPath(prefix);
     localesPath /= "share";
     localesPath /=
-        vle::utils::format("vle-%s", vle::string_version_abi().c_str());
+      vle::utils::format("vle-%s", vle::string_version_abi().c_str());
     localesPath /= "translations";
 
     vle::utils::Path manPath(prefix);
@@ -139,7 +149,7 @@ int main(int argc, char *argv[])
     vle::gvle::gvle_win w(ctx);
 
     w.show();
-    
+
     result = a.exec();
 
     return result ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -47,12 +47,13 @@ class Executive;
  * model.
  *
  */
-class VLE_LOCAL Coordinator {
+class VLE_LOCAL Coordinator
+{
 public:
     Coordinator(utils::ContextPtr context,
-                const vpz::Dynamics &dyn,
-                const vpz::Classes &cls,
-                const vpz::Experiment &experiment);
+                const vpz::Dynamics& dyn,
+                const vpz::Classes& cls,
+                const vpz::Experiment& experiment);
 
     ~Coordinator() = default;
 
@@ -65,7 +66,7 @@ public:
      * @throw Exception::Internal if a condition have no model port name
      * associed.
      */
-    void init(const vpz::Model &mdls, Time current, Time duration);
+    void init(const vpz::Model& mdls, Time current, Time duration);
 
     /**
      * \brief Returns the next time.
@@ -90,11 +91,11 @@ public:
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    void createModel(vpz::AtomicModel *model,
-                     const vpz::Conditions &experiment_conditions,
-                     const std::string &dynamics,
-                     const std::vector<std::string> &conditions,
-                     const std::string &observable);
+    void createModel(vpz::AtomicModel* model,
+                     const vpz::Conditions& experiment_conditions,
+                     const std::string& dynamics,
+                     const std::vector<std::string>& conditions,
+                     const std::string& observable);
 
     /**
      * @brief Build a new devs::Simulator from the vpz::Classes information.
@@ -103,10 +104,10 @@ public:
      * @param modelname the new name of the model.
      * @throw utils::badArg if modelname already exist.
      */
-    vpz::BaseModel *createModelFromClass(const std::string &classname,
-                                         vpz::CoupledModel *parent,
-                                         const std::string &modelname,
-                                         const vpz::Conditions &conditions);
+    vpz::BaseModel* createModelFromClass(const std::string& classname,
+                                         vpz::CoupledModel* parent,
+                                         const std::string& modelname,
+                                         const vpz::Conditions& conditions);
 
     /**
      * @brief Add an observable, ie. a reference and a model to the
@@ -115,9 +116,9 @@ public:
      * @param portname the port of the model to attach.
      * @param view the view.
      */
-    void addObservableToView(vpz::AtomicModel *model,
-                             const std::string &portname,
-                             const std::string &view);
+    void addObservableToView(vpz::AtomicModel* model,
+                             const std::string& portname,
+                             const std::string& view);
 
     /**
      * @brief Delete the specified model from coupled model. All
@@ -129,20 +130,20 @@ public:
     // void delModel(vpz::CoupledModel* parent,
     //               const std::string& modelname);
 
-    void
-    getSimulatorsSource(vpz::BaseModel *model,
-                        std::vector<std::pair<Simulator *, std::string>> &lst);
+    void getSimulatorsSource(
+      vpz::BaseModel* model,
+      std::vector<std::pair<Simulator*, std::string>>& lst);
 
-    void
-    getSimulatorsSource(vpz::BaseModel *model,
-                        const std::string &port,
-                        std::vector<std::pair<Simulator *, std::string>> &lst);
+    void getSimulatorsSource(
+      vpz::BaseModel* model,
+      const std::string& port,
+      std::vector<std::pair<Simulator*, std::string>>& lst);
 
     void updateSimulatorsTarget(
-        std::vector<std::pair<Simulator *, std::string>> &lst);
+      std::vector<std::pair<Simulator*, std::string>>& lst);
 
-    void removeSimulatorTargetPort(vpz::AtomicModel *model,
-                                   const std::string &port);
+    void removeSimulatorTargetPort(vpz::AtomicModel* model,
+                                   const std::string& port);
 
     //
     ///
@@ -159,7 +160,7 @@ public:
      *
      * \return A pointer the the newly allocated Simulator.
      */
-    Simulator *addModel(vpz::AtomicModel *model);
+    Simulator* addModel(vpz::AtomicModel* model);
 
     //
     ///
@@ -167,26 +168,35 @@ public:
     ///
     //
 
-    inline Time getCurrentTime() const { return m_currentTime; }
+    inline Time getCurrentTime() const
+    {
+        return m_currentTime;
+    }
 
     /**
      * @brief Get a constant reference to the list of vpz::Dynamics objects.
      * @return A constant reference to the list of vpz::Dynamics objects.
      */
-    const vpz::Dynamics &dynamics() const { return m_modelFactory.dynamics(); }
+    const vpz::Dynamics& dynamics() const
+    {
+        return m_modelFactory.dynamics();
+    }
 
     /**
      * @brief Get a reference to the list of vpz::Dynamics objects.
      * @return A reference to the list of vpz::Dynamics objects.
      */
-    vpz::Dynamics &dynamics() { return m_modelFactory.dynamics(); }
+    vpz::Dynamics& dynamics()
+    {
+        return m_modelFactory.dynamics();
+    }
 
     /**
      * @brief Get a constant reference to the list of vpz::Conditions
      * objects.
      * @return A constant reference to the list of vpz::Conditions objects.
      */
-    const vpz::Conditions &conditions() const
+    const vpz::Conditions& conditions() const
     {
         return m_modelFactory.conditions();
     }
@@ -195,14 +205,17 @@ public:
      * @brief Get a reference to the list of vpz::Conditions objects.
      * @return A reference to the list of vpz::Conditions objects.
      */
-    vpz::Conditions &conditions() { return m_modelFactory.conditions(); }
+    vpz::Conditions& conditions()
+    {
+        return m_modelFactory.conditions();
+    }
 
     /**
      * @brief Get a constant reference to the list of vpz::Observables
      * objects.
      * @return A constant reference to the list of vpz::Observables objects.
      */
-    const vpz::Observables &observables() const
+    const vpz::Observables& observables() const
     {
         return m_modelFactory.observables();
     }
@@ -211,11 +224,17 @@ public:
      * @brief Get a reference to the list of vpz::Conditions objects.
      * @return A reference to the list of vpz::Conditions objects.
      */
-    vpz::Observables &observables() { return m_modelFactory.observables(); }
+    vpz::Observables& observables()
+    {
+        return m_modelFactory.observables();
+    }
 
-    bool isStarted() const { return m_isStarted; }
+    bool isStarted() const
+    {
+        return m_isStarted;
+    }
 
-    void processInit(Simulator *simulator);
+    void processInit(Simulator* simulator);
 
     /**
      * Retrieves for all Views the \c vle::value::Matrix result.
@@ -238,14 +257,14 @@ public:
      *
      * @return A constatn
      */
-    const std::map<std::string, View> &getEventViewList() const;
+    const std::map<std::string, View>& getEventViewList() const;
 
     /** An executive adds a model (atomic or coupled) to be delete at the
      * end of the \e Coordinator::run() function.
      *
      * \param model The model (Atomic or Coupled) to delete.
      */
-    void prepare_dynamic_deletion(vpz::BaseModel *);
+    void prepare_dynamic_deletion(vpz::BaseModel*);
 
     /** For each element of the \e m_delete_model list, delete the \c
      * vpz::BaseModel information from the structure of the model. Delete
@@ -254,8 +273,8 @@ public:
     void dynamic_deletion();
 
 private:
-    Coordinator(const Coordinator &other);
-    Coordinator &operator=(const Coordinator &other);
+    Coordinator(const Coordinator& other);
+    Coordinator& operator=(const Coordinator& other);
 
     utils::ContextPtr m_context;
     Time m_currentTime;
@@ -268,7 +287,7 @@ private:
     std::map<std::string, View> m_timedViewList;
     ModelFactory m_modelFactory;
 
-    std::vector<vpz::BaseModel *> m_delete_model;
+    std::vector<vpz::BaseModel*> m_delete_model;
 
     bool m_isStarted;
 
@@ -282,7 +301,7 @@ private:
      * @brief build the simulator from the vpz::BaseModel stock.
      * @param model
      */
-    void addModels(const vpz::Model &model);
+    void addModels(const vpz::Model& model);
 
     /**
      * Read all ExternalEventList including External and Instantaneous
@@ -293,7 +312,7 @@ private:
      *
      * @param sim the simulator that dispatch external events.
      */
-    void dispatchExternalEvent(std::vector<Simulator *> &sim,
+    void dispatchExternalEvent(std::vector<Simulator*>& sim,
                                const std::size_t number);
 
     /**
@@ -303,8 +322,8 @@ private:
      *
      * @param atom the model to delete.
      */
-    void delAtomicModel(vpz::AtomicModel *atom,
-                        std::vector<Simulator *> &to_delete);
+    void delAtomicModel(vpz::AtomicModel* atom,
+                        std::vector<Simulator*>& to_delete);
 
     /**
      * @brief Delete the coupled model from Devs::Graph. All the
@@ -315,14 +334,17 @@ private:
      *
      * @param mdl the model to delete.
      */
-    void delCoupledModel(vpz::CoupledModel *mdl,
-                         std::vector<Simulator *> &to_delete);
+    void delCoupledModel(vpz::CoupledModel* mdl,
+                         std::vector<Simulator*>& to_delete);
 
     /**
      * Set a new date to the Coordinator.
      * @param time the new date to affect Coordinator.
      */
-    inline void updateCurrentTime(const Time &time) { m_currentTime = time; }
+    inline void updateCurrentTime(const Time& time)
+    {
+        m_currentTime = time;
+    }
 };
 }
 } // namespace vle devs

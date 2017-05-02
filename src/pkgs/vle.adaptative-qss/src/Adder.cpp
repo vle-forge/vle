@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 INRA
+ * Copyright 2016-2017 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -91,7 +91,9 @@ public:
         }
     }
 
-    virtual ~Adder() {}
+    virtual ~Adder()
+    {
+    }
 
     virtual vd::Time init(vd::Time /*time*/) override
     {
@@ -103,27 +105,27 @@ public:
                         vd::ExternalEventList& output) const override
     {
         switch (m_state) {
-            case INIT:
-                break;
-            case WAIT:
-                break;
-            case RESPONSE:
-                if (m_has_output_port) {
-                    output.emplace_back(m_output_port_label);
-                    output.back().addMap().addDouble("d_val", m_output_value);
-                }
+        case INIT:
+            break;
+        case WAIT:
+            break;
+        case RESPONSE:
+            if (m_has_output_port) {
+                output.emplace_back(m_output_port_label);
+                output.back().addMap().addDouble("d_val", m_output_value);
+            }
         }
     }
 
     virtual vd::Time timeAdvance() const override
     {
         switch (m_state) {
-            case INIT:
-                return vd::infinity;
-            case WAIT:
-                return vd::infinity;
-            case RESPONSE:
-                return 0;
+        case INIT:
+            return vd::infinity;
+        case WAIT:
+            return vd::infinity;
+        case RESPONSE:
+            return 0;
         }
         return vd::infinity; // useless, only for keeping compiler quiet
     }
@@ -152,22 +154,21 @@ public:
               (*it).getMap().getDouble((*it).getMap().begin()->first);
 
             switch (m_state) {
-                case INIT:
-                    if (input_values.size() !=
-                        connected_input_port_list.size())
-                        break;
-                    else {
-                        m_output_value = compute_output_val();
-                        m_state = RESPONSE;
-                        break;
-                    }
-                case WAIT:
-                case RESPONSE:
-                    if (compute_output_val() != m_last_output) {
-                        m_output_value = compute_output_val();
-                        m_state = RESPONSE;
-                    } else
-                        m_state = WAIT;
+            case INIT:
+                if (input_values.size() != connected_input_port_list.size())
+                    break;
+                else {
+                    m_output_value = compute_output_val();
+                    m_state = RESPONSE;
+                    break;
+                }
+            case WAIT:
+            case RESPONSE:
+                if (compute_output_val() != m_last_output) {
+                    m_output_value = compute_output_val();
+                    m_state = RESPONSE;
+                } else
+                    m_state = WAIT;
             }
         }
     }
@@ -186,7 +187,9 @@ public:
         return vv::Double::create(m_last_output);
     }
 
-    virtual void finish() override {}
+    virtual void finish() override
+    {
+    }
 
 private:
     typedef enum { INIT, WAIT, RESPONSE } State;

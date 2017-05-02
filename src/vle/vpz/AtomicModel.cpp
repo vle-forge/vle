@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,18 +24,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/vpz/AtomicModel.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <vle/vpz/AtomicModel.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
-AtomicModel::AtomicModel(const std::string& name,
-                         CoupledModel* parent)
-    : BaseModel(name, parent)
-    , m_simulator(nullptr)
-    , m_debug(false)
+AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent)
+  : BaseModel(name, parent)
+  , m_simulator(nullptr)
+  , m_debug(false)
 {
 }
 
@@ -44,17 +44,19 @@ AtomicModel::AtomicModel(const std::string& name,
                          const std::string& condition,
                          const std::string& dynamic,
                          const std::string& observable)
-    : BaseModel(name, parent)
-    , m_simulator(nullptr)
-    , m_dynamics(dynamic)
-    , m_observables(observable)
-    , m_debug(false)
+  : BaseModel(name, parent)
+  , m_simulator(nullptr)
+  , m_dynamics(dynamic)
+  , m_observables(observable)
+  , m_debug(false)
 {
     std::string conditionList(condition);
     boost::trim(conditionList);
 
     if (not conditionList.empty()) {
-        boost::split(m_conditions, conditionList, boost::is_any_of(","),
+        boost::split(m_conditions,
+                     conditionList,
+                     boost::is_any_of(","),
                      boost::algorithm::token_compress_on);
         if (m_conditions.front().empty()) {
             m_conditions.pop_back();
@@ -63,38 +65,41 @@ AtomicModel::AtomicModel(const std::string& name,
 }
 
 AtomicModel::AtomicModel(const AtomicModel& mdl)
-    : BaseModel(mdl)
-    , m_simulator(nullptr)
-    , m_dynamics(mdl.dynamics())
-    , m_observables(mdl.observables())
-    , m_debug(mdl.m_debug)
+  : BaseModel(mdl)
+  , m_simulator(nullptr)
+  , m_dynamics(mdl.dynamics())
+  , m_observables(mdl.observables())
+  , m_debug(mdl.m_debug)
 {
     m_conditions = mdl.m_conditions;
 }
 
-AtomicModel& AtomicModel::operator=(const AtomicModel& mdl)
+AtomicModel&
+AtomicModel::operator=(const AtomicModel& mdl)
 {
     AtomicModel m(mdl);
     swap(m);
     return *this;
 }
 
-void AtomicModel::delCondition(const std::string& str)
+void
+AtomicModel::delCondition(const std::string& str)
 {
-    auto itfind =
-	std::find(m_conditions.begin(), m_conditions.end(), str);
+    auto itfind = std::find(m_conditions.begin(), m_conditions.end(), str);
 
     m_conditions.erase(itfind);
 }
 
-BaseModel* AtomicModel::findModel(const std::string& name) const
+BaseModel*
+AtomicModel::findModel(const std::string& name) const
 {
-    return (getName() == name) ?
-        const_cast < BaseModel* >(
-            reinterpret_cast < const BaseModel* >(this)) : nullptr;
+    return (getName() == name)
+             ? const_cast<BaseModel*>(reinterpret_cast<const BaseModel*>(this))
+             : nullptr;
 }
 
-void AtomicModel::writeXML(std::ostream& out) const
+void
+AtomicModel::writeXML(std::ostream& out) const
 {
     out << "<model name=\"" << getName().c_str() << "\" type=\"atomic\""
         << ">\n";
@@ -102,16 +107,16 @@ void AtomicModel::writeXML(std::ostream& out) const
     out << "</model>\n";
 }
 
-void AtomicModel::write(std::ostream& out) const
+void
+AtomicModel::write(std::ostream& out) const
 {
     out << "<model name=\"" << getName().c_str() << "\" "
         << "type=\"atomic\" ";
 
     if (not conditions().empty()) {
-	out << "conditions=\"";
+        out << "conditions=\"";
 
-        auto it =
-            conditions().begin();
+        auto it = conditions().begin();
         while (it != conditions().end()) {
             out << it->c_str();
             ++it;
@@ -138,57 +143,58 @@ void AtomicModel::write(std::ostream& out) const
     out << "</model>\n";
 }
 
-void AtomicModel::updateDynamics(const std::string& oldname,
-                                      const std::string& newname)
+void
+AtomicModel::updateDynamics(const std::string& oldname,
+                            const std::string& newname)
 {
     if (dynamics() == oldname) {
         setDynamics(newname);
     }
 }
 
-void AtomicModel::purgeDynamics(const std::set < std::string >&
-                                     dynamicslist)
+void
+AtomicModel::purgeDynamics(const std::set<std::string>& dynamicslist)
 {
     if (dynamicslist.find(dynamics()) == dynamicslist.end()) {
         setDynamics("");
     }
 }
 
-void AtomicModel::updateObservable(const std::string& oldname,
-                                        const std::string& newname)
+void
+AtomicModel::updateObservable(const std::string& oldname,
+                              const std::string& newname)
 {
     if (observables() == oldname) {
         setObservables(newname);
     }
 }
 
-void AtomicModel::purgeObservable(const std::set < std::string >&
-                                       observablelist)
+void
+AtomicModel::purgeObservable(const std::set<std::string>& observablelist)
 {
     if (observablelist.find(observables()) == observablelist.end()) {
         setObservables("");
     }
 }
 
-void AtomicModel::updateConditions(const std::string& oldname,
-                                        const std::string& newname)
+void
+AtomicModel::updateConditions(const std::string& oldname,
+                              const std::string& newname)
 {
-    std::replace(m_conditions.begin(),
-                 m_conditions.end(), oldname, newname);
+    std::replace(m_conditions.begin(), m_conditions.end(), oldname, newname);
 }
 
-void AtomicModel::purgeConditions(const std::set < std::string >&
-                                       conditionlist)
+void
+AtomicModel::purgeConditions(const std::set<std::string>& conditionlist)
 {
     for (int i = m_conditions.size() - 1; i >= 0; --i) {
 
-        auto itfind =
-            conditionlist.find(m_conditions[i]);
+        auto itfind = conditionlist.find(m_conditions[i]);
 
         if (itfind == conditionlist.end()) {
             m_conditions.erase(m_conditions.begin() + i);
         }
     }
 }
-
-}} // namespace vpz graph
+}
+} // namespace vpz graph

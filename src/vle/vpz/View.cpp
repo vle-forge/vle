@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,40 +24,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/View.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/vpz/View.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
-View::View(const std::string& name, View::Type type,
-           const std::string& output, double timestep, bool enable)
-    : m_timestep(timestep)
-    , m_name(name)
-    , m_output(output)
-    , m_enabled(enable)
-    , m_type(type)
+View::View(const std::string& name,
+           View::Type type,
+           const std::string& output,
+           double timestep,
+           bool enable)
+  : m_timestep(timestep)
+  , m_name(name)
+  , m_output(output)
+  , m_enabled(enable)
+  , m_type(type)
 {
     if (m_type == View::TIMED) {
         if (m_timestep <= 0.0) {
             throw utils::ArgError(
-                (fmt(_("Cannont define the View '%1%' with a timestep '%2%'")) %
-                 m_name % m_timestep).str());
+              (fmt(_("Cannont define the View '%1%' with a timestep '%2%'")) %
+               m_name % m_timestep)
+                .str());
         }
     }
 }
 
 View::View(const std::string& name)
-    : m_timestep(0.0)
-    , m_name(name)
-    , m_enabled(true)
-    , m_type(static_cast<Type>(View::INTERNAL | View::EXTERNAL |
-                               View::CONFLUENT))
+  : m_timestep(0.0)
+  , m_name(name)
+  , m_enabled(true)
+  , m_type(
+      static_cast<Type>(View::INTERNAL | View::EXTERNAL | View::CONFLUENT))
 {
 }
 
-void View::write(std::ostream& out) const
+void
+View::write(std::ostream& out) const
 {
     out << "<view "
         << "name=\"" << m_name.c_str() << "\" "
@@ -72,13 +77,13 @@ void View::write(std::ostream& out) const
     } else {
         out << ">\n"
             << "<![CDATA[\n"
-            << m_data.c_str()
-            << "]]>\n"
+            << m_data.c_str() << "]]>\n"
             << "</view>\n";
     }
 }
 
-std::string View::streamtype() const
+std::string
+View::streamtype() const
 {
     if (m_type == TIMED)
         return "timed";
@@ -114,22 +119,23 @@ std::string View::streamtype() const
     return ret;
 }
 
-void View::setTimestep(double time)
+void
+View::setTimestep(double time)
 {
     if ((m_type == View::TIMED) && (time <= 0.0)) {
         throw utils::ArgError(
-            (fmt(_("Bad time step %1% for view %2%")) % time % m_name).str());
+          (fmt(_("Bad time step %1% for view %2%")) % time % m_name).str());
     }
 
     m_timestep = time;
 }
 
-bool View::operator==(const View& view) const
+bool
+View::operator==(const View& view) const
 {
-    return m_name == view.name() and m_type == view.type()
-	and m_output == view.output()
-	and m_timestep == view.timestep() and m_data == view.data();
+    return m_name == view.name() and m_type == view.type() and
+           m_output == view.output() and m_timestep == view.timestep() and
+           m_data == view.data();
 }
-
-
-}} // namespace vle vpz
+}
+} // namespace vle vpz

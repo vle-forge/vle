@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,27 +24,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/manager/Manager.hpp>
-#include <vle/manager/ExperimentGenerator.hpp>
-#include <vle/manager/Simulation.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/value/Matrix.hpp>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/BaseModel.hpp>
 #include <sstream>
 #include <thread>
+#include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/manager/Manager.hpp>
+#include <vle/manager/Simulation.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/i18n.hpp>
+#include <vle/value/Matrix.hpp>
+#include <vle/vpz/BaseModel.hpp>
+#include <vle/vpz/Vpz.hpp>
 
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
 
 struct vle_log_manager_thread : vle::utils::Context::LogFunctor
 {
-    FILE *fp;
+    FILE* fp;
     unsigned int th;
 
     vle_log_manager_thread(unsigned int _th)
-        : fp(nullptr), th(_th)
+      : fp(nullptr)
+      , th(_th)
     {
     }
 
@@ -55,9 +57,11 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
     }
 
     virtual void write(const vle::utils::Context& /*ctx*/,
-                       int priority, const char *file,
-                       int line, const char *fn,
-                       const char *format,
+                       int priority,
+                       const char* file,
+                       int line,
+                       const char* fn,
+                       const char* format,
                        va_list args) noexcept override
     {
         if (not fp) {
@@ -89,15 +93,16 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
  * @param name The base name of the experiment.
  * @param number The combination number.
  */
-static void setExperimentName(const std::unique_ptr<vpz::Vpz>& destination,
-                              const std::string&  name,
-                              uint32_t            number)
+static void
+setExperimentName(const std::unique_ptr<vpz::Vpz>& destination,
+                  const std::string& name,
+                  uint32_t number)
 {
     std::string result(name.size() + 12, '-');
 
     result.replace(0, name.size(), name);
-    result.replace(name.size() + 1, std::string::npos,
-                   utils::to < uint32_t >(number));
+    result.replace(
+      name.size() + 1, std::string::npos, utils::to<uint32_t>(number));
 
     destination->project().setInstance(number);
     destination->project().experiment().setName(result);
@@ -106,29 +111,29 @@ static void setExperimentName(const std::unique_ptr<vpz::Vpz>& destination,
 class Manager::Pimpl
 {
 public:
-    Pimpl(utils::ContextPtr          context,
-          LogOptions                 logoptions,
-          SimulationOptions          simulationoptions,
-          std::chrono::milliseconds  timeout,
-          std::ostream              *output)
-        : mContext(context)
-        , mTimeout(timeout)
-        , mOutputStream(output)
-        , mLogOption(logoptions)
-        , mSimulationOption(simulationoptions)
+    Pimpl(utils::ContextPtr context,
+          LogOptions logoptions,
+          SimulationOptions simulationoptions,
+          std::chrono::milliseconds timeout,
+          std::ostream* output)
+      : mContext(context)
+      , mTimeout(timeout)
+      , mOutputStream(output)
+      , mLogOption(logoptions)
+      , mSimulationOption(simulationoptions)
     {
         if (timeout != std::chrono::milliseconds::zero())
             mSimulationOption |= vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
-    template <typename T >
+    template <typename T>
     void writeSummaryLog(const T& fmt)
     {
         if (mLogOption & manager::LOG_SUMMARY and mOutputStream)
             *mOutputStream << fmt;
     }
 
-    template <typename T >
+    template <typename T>
     void writeRunLog(const T& fmt)
     {
         if (mLogOption & manager::LOG_RUN and mOutputStream)
@@ -142,27 +147,27 @@ public:
      */
     struct worker
     {
-        utils::ContextPtr                 context;
-        const std::unique_ptr<vpz::Vpz>&  vpz;
-        std::chrono::milliseconds         mTimeout;
-        ExperimentGenerator              &expgen;
-        LogOptions                        mLogOption;
-        SimulationOptions                 mSimulationOption;
-        uint32_t                          index;
-        uint32_t                          threads;
-        value::Matrix                    *result;
-        Error                            *error;
+        utils::ContextPtr context;
+        const std::unique_ptr<vpz::Vpz>& vpz;
+        std::chrono::milliseconds mTimeout;
+        ExperimentGenerator& expgen;
+        LogOptions mLogOption;
+        SimulationOptions mSimulationOption;
+        uint32_t index;
+        uint32_t threads;
+        value::Matrix* result;
+        Error* error;
 
-        worker(utils::ContextPtr                 context,
-               const std::unique_ptr<vpz::Vpz>&  vpz,
-               std::chrono::milliseconds         timeout,
-               ExperimentGenerator&              expgen,
-               LogOptions                        logoptions,
-               SimulationOptions                 simulationoptions,
-               uint32_t                          index,
-               uint32_t                          threads,
-               value::Matrix                    *result,
-               Error                            *error)
+        worker(utils::ContextPtr context,
+               const std::unique_ptr<vpz::Vpz>& vpz,
+               std::chrono::milliseconds timeout,
+               ExperimentGenerator& expgen,
+               LogOptions logoptions,
+               SimulationOptions simulationoptions,
+               uint32_t index,
+               uint32_t threads,
+               value::Matrix* result,
+               Error* error)
           : context(context)
           , vpz(vpz)
           , mTimeout(timeout)
@@ -186,13 +191,11 @@ public:
 
             for (uint32_t i = expgen.min() + index; i < expgen.max();
                  i += threads) {
-                Simulation sim(context, mLogOption, mSimulationOption, mTimeout,
-                               nullptr);
+                Simulation sim(
+                  context, mLogOption, mSimulationOption, mTimeout, nullptr);
                 Error err;
 
-                auto file =
-                    std::unique_ptr<vpz::Vpz>(
-                        new vpz::Vpz(*vpz));
+                auto file = std::unique_ptr<vpz::Vpz>(new vpz::Vpz(*vpz));
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
@@ -210,28 +213,34 @@ public:
         }
     };
 
-    std::unique_ptr<value::Matrix>
-    runManagerThread(std::unique_ptr<vpz::Vpz> vpz,
-                     uint32_t               threads,
-                     uint32_t               rank,
-                     uint32_t               world,
-                     Error                 *error)
+    std::unique_ptr<value::Matrix> runManagerThread(
+      std::unique_ptr<vpz::Vpz> vpz,
+      uint32_t threads,
+      uint32_t rank,
+      uint32_t world,
+      Error* error)
     {
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
 
         auto result = std::unique_ptr<value::Matrix>(
-            new value::Matrix(expgen.size(), 1, expgen.size(), 1));
+          new value::Matrix(expgen.size(), 1, expgen.size(), 1));
 
         std::vector<std::thread> gp;
         for (uint32_t i = 0; i < threads; ++i) {
             utils::ContextPtr ctx = mContext->clone();
-            ctx->set_log_function(
-                    std::unique_ptr<utils::Context::LogFunctor>(
-                            new vle_log_manager_thread(i)));
-            gp.emplace_back(worker(ctx, vpz, mTimeout, expgen,
-                       mLogOption, mSimulationOption,
-                       i, threads, result.get(), error));
+            ctx->set_log_function(std::unique_ptr<utils::Context::LogFunctor>(
+              new vle_log_manager_thread(i)));
+            gp.emplace_back(worker(ctx,
+                                   vpz,
+                                   mTimeout,
+                                   expgen,
+                                   mLogOption,
+                                   mSimulationOption,
+                                   i,
+                                   threads,
+                                   result.get(),
+                                   error));
         }
 
         for (uint32_t i = 0; i < threads; ++i)
@@ -240,14 +249,14 @@ public:
         return result;
     }
 
-    std::unique_ptr<value::Matrix>
-    runManagerMono(std::unique_ptr<vpz::Vpz> vpz,
-                   uint32_t rank,
-                   uint32_t world,
-                   Error *error)
+    std::unique_ptr<value::Matrix> runManagerMono(
+      std::unique_ptr<vpz::Vpz> vpz,
+      uint32_t rank,
+      uint32_t world,
+      Error* error)
     {
-        Simulation sim(mContext, mLogOption, mSimulationOption, mTimeout,
-                       nullptr);
+        Simulation sim(
+          mContext, mLogOption, mSimulationOption, mTimeout, nullptr);
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
         std::unique_ptr<value::Matrix> result;
@@ -275,7 +284,7 @@ public:
             }
         } else {
             result = std::unique_ptr<value::Matrix>(
-                new value::Matrix(expgen.size(), 1, expgen.size(), 1));
+              new value::Matrix(expgen.size(), 1, expgen.size(), 1));
 
             for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
@@ -301,77 +310,82 @@ public:
         return result;
     }
 
-    utils::ContextPtr          mContext;
-    std::chrono::milliseconds  mTimeout;
-    std::ostream              *mOutputStream;
-    LogOptions                 mLogOption;
-    SimulationOptions          mSimulationOption;
+    utils::ContextPtr mContext;
+    std::chrono::milliseconds mTimeout;
+    std::ostream* mOutputStream;
+    LogOptions mLogOption;
+    SimulationOptions mSimulationOption;
 };
 
-Manager::Manager(utils::ContextPtr     context,
-                 LogOptions            logoptions,
-                 SimulationOptions     simulationoptions,
-                 std::ostream         *output)
-    : mPimpl(std::make_unique<Manager::Pimpl>(
-                 context, logoptions,
-                 simulationoptions,
-                 std::chrono::milliseconds(0), output))
+Manager::Manager(utils::ContextPtr context,
+                 LogOptions logoptions,
+                 SimulationOptions simulationoptions,
+                 std::ostream* output)
+  : mPimpl(std::make_unique<Manager::Pimpl>(context,
+                                            logoptions,
+                                            simulationoptions,
+                                            std::chrono::milliseconds(0),
+                                            output))
 {
 }
 
-Manager::Manager(utils::ContextPtr     context,
-                 LogOptions            logoptions,
-                 SimulationOptions     simulationoptions,
-                 std::chrono::milliseconds  timeout,
-                 std::ostream         *output)
-    : mPimpl(std::make_unique<Manager::Pimpl>(
-                 context, logoptions,
-                 simulationoptions, timeout, output))
+Manager::Manager(utils::ContextPtr context,
+                 LogOptions logoptions,
+                 SimulationOptions simulationoptions,
+                 std::chrono::milliseconds timeout,
+                 std::ostream* output)
+  : mPimpl(std::make_unique<Manager::Pimpl>(context,
+                                            logoptions,
+                                            simulationoptions,
+                                            timeout,
+                                            output))
 {
 }
 
 Manager::~Manager() = default;
 
 std::unique_ptr<value::Matrix>
-Manager::run(std::unique_ptr<vpz::Vpz>  exp,
-             uint32_t                   thread,
-             uint32_t                   rank,
-             uint32_t                   world,
-             Error                     *error)
+Manager::run(std::unique_ptr<vpz::Vpz> exp,
+             uint32_t thread,
+             uint32_t rank,
+             uint32_t world,
+             Error* error)
 {
     std::unique_ptr<value::Matrix> result;
 
     if (thread <= 0) {
         throw vle::utils::ArgError(
-            (fmt(_("Manager error: thread must be superior to 0 (%1%)"))
-             % thread).str());
+          (fmt(_("Manager error: thread must be superior to 0 (%1%)")) %
+           thread)
+            .str());
     }
 
     if (world <= rank) {
         throw vle::utils::ArgError(
-            (fmt(_("Manager error: rank (%1%) must be inferior"
-                   " to world (%2%)"))  % rank % world).str());
+          (fmt(_("Manager error: rank (%1%) must be inferior"
+                 " to world (%2%)")) %
+           rank % world)
+            .str());
     }
 
     if (world <= 0) {
         throw vle::utils::ArgError(
-            (fmt(_("Manager error: world (%1%) must be superior to 0."))
-             % world).str());
+          (fmt(_("Manager error: world (%1%) must be superior to 0.")) % world)
+            .str());
     }
 
     mPimpl->writeSummaryLog(_("Manager started"));
 
     if (thread > 1) {
-        result = mPimpl->runManagerThread(std::move(exp), thread, rank,
-                                          world, error);
+        result =
+          mPimpl->runManagerThread(std::move(exp), thread, rank, world, error);
     } else {
-        result = mPimpl->runManagerMono(std::move(exp), rank,
-                                        world, error);
+        result = mPimpl->runManagerMono(std::move(exp), rank, world, error);
     }
 
     mPimpl->writeSummaryLog(_("Manager ended"));
 
     return result;
 }
-
-}} // namespace vle manager
+}
+} // namespace vle manager

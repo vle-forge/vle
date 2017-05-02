@@ -5,7 +5,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
  * Copyright (c) 2007-2011 INRA http://www.inra.fr
  *
@@ -25,25 +25,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "File.hpp"
 #include "FileType.hpp"
-#include <vle/utils/DateTime.hpp>
-#include <vle/utils/Filesystem.hpp>
-#include <vle/utils/Exception.hpp>
 #include <boost/format.hpp>
-#include <vle/value/String.hpp>
+#include <iomanip>
+#include <iostream>
+#include <vle/utils/DateTime.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Map.hpp>
-#include <iostream>
-#include <iomanip>
+#include <vle/value/String.hpp>
 
-namespace vle { namespace oov { namespace plugin {
+namespace vle {
+namespace oov {
+namespace plugin {
 
 File::File(const std::string& location)
-: Plugin(location), m_filetype(0), m_time(-1.0), m_isstart(false),
-  m_havefirstevent(false), m_julian(false), m_type(File::FILE),
-  m_flushbybag(false)
+  : Plugin(location)
+  , m_filetype(0)
+  , m_time(-1.0)
+  , m_isstart(false)
+  , m_havefirstevent(false)
+  , m_julian(false)
+  , m_type(File::FILE)
+  , m_flushbybag(false)
 {
 }
 
@@ -54,11 +60,12 @@ File::~File()
     delete m_filetype;
 }
 
-void File::onParameter(const std::string& plugin,
-        const std::string& location,
-        const std::string& file,
-        std::unique_ptr<value::Value> parameters,
-        const double& /*time*/)
+void
+File::onParameter(const std::string& plugin,
+                  const std::string& location,
+                  const std::string& file,
+                  std::unique_ptr<value::Value> parameters,
+                  const double& /*time*/)
 {
     if (parameters and parameters->isMap()) {
         const value::Map& map = parameters->toMap();
@@ -89,9 +96,10 @@ void File::onParameter(const std::string& plugin,
             } else if (type == "text") {
                 m_filetype = new Text();
             } else {
-                throw utils::ArgError((boost::format(
-                        "Output plug-in '%1%': unknow type '%2%'")
-                % plugin % type).str());
+                throw utils::ArgError(
+                  (boost::format("Output plug-in '%1%': unknow type '%2%'") %
+                   plugin % type)
+                    .str());
             }
         }
 
@@ -101,13 +109,13 @@ void File::onParameter(const std::string& plugin,
                 m_type = File::STANDARD_OUT;
             } else if (type == "error") {
                 m_type = File::STANDARD_ERROR;
-            } else if (type == "file"){
+            } else if (type == "file") {
                 m_type = File::FILE;
             } else {
-                throw utils::ArgError((boost::format(
-                        "Output plug-in '%1%': unknow type '%2%'")
-                % plugin
-                % type).str());
+                throw utils::ArgError(
+                  (boost::format("Output plug-in '%1%': unknow type '%2%'") %
+                   plugin % type)
+                    .str());
             }
         }
 
@@ -131,7 +139,6 @@ void File::onParameter(const std::string& plugin,
         p.set(location);
     }
 
-
     p /= file;
 
     m_filenametmp = p.string();
@@ -141,20 +148,22 @@ void File::onParameter(const std::string& plugin,
     m_file.open(m_filenametmp.c_str());
 
     if (not m_file.is_open()) {
-        throw utils::ArgError((boost::format(
-                "Output plug-in '%1%': cannot open file '%2%'\n") % plugin %
-                        m_filenametmp).str());
+        throw utils::ArgError(
+          (boost::format("Output plug-in '%1%': cannot open file '%2%'\n") %
+           plugin % m_filenametmp)
+            .str());
     }
 
-    m_file << std::setprecision(std::numeric_limits <double>::digits10);
+    m_file << std::setprecision(std::numeric_limits<double>::digits10);
     parameters.reset();
 }
 
-void File::onNewObservable(const std::string& simulator,
-        const std::string& parent,
-        const std::string& portname,
-        const std::string& /* view */,
-        const double& time)
+void
+File::onNewObservable(const std::string& simulator,
+                      const std::string& parent,
+                      const std::string& portname,
+                      const std::string& /* view */,
+                      const double& time)
 {
     if (m_isstart) {
         flush();
@@ -171,9 +180,10 @@ void File::onNewObservable(const std::string& simulator,
     std::string name(buildname(parent, simulator, portname));
 
     if (m_columns.find(name) != m_columns.end()) {
-        throw utils::InternalError((boost::format(
-                "Output plug-in: observable '%1%' already exist") %
-                        name).str());
+        throw utils::InternalError(
+          (boost::format("Output plug-in: observable '%1%' already exist") %
+           name)
+            .str());
     }
 
     m_newbagwatcher[name] = -1.0;
@@ -182,20 +192,22 @@ void File::onNewObservable(const std::string& simulator,
     m_valid.push_back(false);
 }
 
-void File::onDelObservable(const std::string& /* simulator */,
-        const std::string& /* parent */,
-        const std::string& /* portname */,
-        const std::string& /* view */,
-        const double& /* time */)
+void
+File::onDelObservable(const std::string& /* simulator */,
+                      const std::string& /* parent */,
+                      const std::string& /* portname */,
+                      const std::string& /* view */,
+                      const double& /* time */)
 {
 }
 
-void File::onValue(const std::string& simulator,
-        const std::string& parent,
-        const std::string& port,
-        const std::string& /*view*/,
-        const double& time,
-        std::unique_ptr<value::Value> value)
+void
+File::onValue(const std::string& simulator,
+              const std::string& parent,
+              const std::string& port,
+              const std::string& /*view*/,
+              const double& time,
+              std::unique_ptr<value::Value> value)
 {
     std::string name(buildname(parent, simulator, port));
     Columns::iterator it;
@@ -206,14 +218,15 @@ void File::onValue(const std::string& simulator,
 
         if (it == m_columns.end()) {
             throw utils::InternalError(
-                    (boost::format("Output plugin: columns '%1%' does not exist. "
-                            "No observable ?") % name).str());
+              (boost::format("Output plugin: columns '%1%' does not exist. "
+                             "No observable ?") %
+               name)
+                .str());
         }
 
         if (m_isstart) {
             if (time != m_time ||
-                    (m_flushbybag &&
-                            m_newbagwatcher[name] == time)) {
+                (m_flushbybag && m_newbagwatcher[name] == time)) {
                 flush();
             }
         } else {
@@ -232,11 +245,12 @@ void File::onValue(const std::string& simulator,
     m_time = time;
 }
 
-std::unique_ptr<value::Matrix> File::finish(const double& time)
+std::unique_ptr<value::Matrix>
+File::finish(const double& time)
 {
-    //build the final file
+    // build the final file
     finalFlush(time);
-    std::vector < std::string > array(m_columns.size());
+    std::vector<std::string> array(m_columns.size());
 
     Columns::iterator it = m_columns.begin();
     for (it = m_columns.begin(); it != m_columns.end(); ++it) {
@@ -248,18 +262,19 @@ std::unique_ptr<value::Matrix> File::finish(const double& time)
     if (m_type == File::FILE) {
         copyToFile(m_filename, array);
     } else {
-        copyToStream((m_type == File::STANDARD_OUT) ? std::cout :
-                std::cerr, array);
+        copyToStream((m_type == File::STANDARD_OUT) ? std::cout : std::cerr,
+                     array);
     }
     std::remove(m_filenametmp.c_str());
 
     return {};
 }
 
-void File::flush()
+void
+File::flush()
 {
-    if (m_valid.empty() or std::find(m_valid.begin(), m_valid.end(), true)
-    != m_valid.end()) {
+    if (m_valid.empty() or
+        std::find(m_valid.begin(), m_valid.end(), true) != m_valid.end()) {
         m_file << m_time;
         if (m_julian) {
             m_filetype->writeSeparator(m_file);
@@ -267,8 +282,8 @@ void File::flush()
                 m_file << utils::DateTime::toJulianDay(m_time);
             } catch (const std::exception& /*e*/) {
                 throw utils::ModellingError(
-                        "Output plug-in: Year is out of valid range "
-                                "in julian day: 1400..10000");
+                  "Output plug-in: Year is out of valid range "
+                  "in julian day: 1400..10000");
             }
         }
         m_filetype->writeSeparator(m_file);
@@ -290,7 +305,8 @@ void File::flush()
     }
 }
 
-void File::finalFlush(double trame_time)
+void
+File::finalFlush(double trame_time)
 {
     flush();
 
@@ -302,13 +318,13 @@ void File::finalFlush(double trame_time)
                 m_file << utils::DateTime::toJulianDay(m_time);
             } catch (const std::exception& /*e*/) {
                 throw utils::ModellingError(
-                        "Output plug-in: Year is out of valid range "
-                                "in julian day: 1400..10000");
+                  "Output plug-in: Year is out of valid range "
+                  "in julian day: 1400..10000");
             }
         }
         m_filetype->writeSeparator(m_file);
-        for (value::Set::iterator it = m_buffer.begin();
-                it != m_buffer.end(); ++it) {
+        for (value::Set::iterator it = m_buffer.begin(); it != m_buffer.end();
+             ++it) {
             if (*it) {
                 (*it)->writeFile(m_file);
             } else {
@@ -324,12 +340,13 @@ void File::finalFlush(double trame_time)
     }
 }
 
-void File::copyToFile(const std::string& filename,
-        const std::vector < std::string >& array)
+void
+File::copyToFile(const std::string& filename,
+                 const std::vector<std::string>& array)
 {
     std::ofstream file(filename.c_str());
 
-    std::vector < std::string > tmp(array);
+    std::vector<std::string> tmp(array);
     if (m_julian) {
         tmp.insert(tmp.begin(), "julian-day");
     }
@@ -344,10 +361,10 @@ void File::copyToFile(const std::string& filename,
     }
 }
 
-void File::copyToStream(std::ostream& stream,
-        const std::vector < std::string >& array)
+void
+File::copyToStream(std::ostream& stream, const std::vector<std::string>& array)
 {
-    std::vector < std::string > tmp(array);
+    std::vector<std::string> tmp(array);
     if (m_julian) {
         tmp.insert(tmp.begin(), "julian-day");
     }
@@ -362,9 +379,10 @@ void File::copyToStream(std::ostream& stream,
     }
 }
 
-std::string File::buildname(const std::string& parent,
-        const std::string& simulator,
-        const std::string& port)
+std::string
+File::buildname(const std::string& parent,
+                const std::string& simulator,
+                const std::string& port)
 {
     std::string r(parent);
     r += ':';
@@ -373,7 +391,8 @@ std::string File::buildname(const std::string& parent,
     r += port;
     return r;
 }
-
-}}} // namespace vle oov plugin
+}
+}
+} // namespace vle oov plugin
 
 DECLARE_OOV_PLUGIN(vle::oov::plugin::File)

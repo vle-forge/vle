@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -32,15 +32,14 @@
 #include <vle/utils/Array.hpp>
 #include <vle/vpz/Condition.hpp>
 
-namespace vle
-{
-namespace translator
-{
+namespace vle {
+namespace translator {
 
 class VLE_API regular_graph_generator
 {
 public:
-    enum class connectivity {
+    enum class connectivity
+    {
         IN_OUT, /*!< @c in-out: add an output port @c out for source model and
                      an input port @c in for destination model. */
         OTHER,  /*!< @c other: add an output port with same name as the
@@ -50,41 +49,45 @@ public:
                      port name. */
     };
 
-    struct graph_metrics {
+    struct graph_metrics
+    {
         int vertices; /*!< Number of vertices. */
     };
 
-    struct node_metrics {
+    struct node_metrics
+    {
         int x; /*!< Identifier for 1d, 2d and 3d model. */
         int y; /*!< Used by regular_graph 2d amd 3d to build unique
                     identifier. */
         int z; /*!< Used by regular_graph 3d to build unique identifier. */
     };
 
-    struct parameter {
+    struct parameter
+    {
         /*!< Function to build the @c name, @c classname and @c condition for
              the model defined by the @c metrics. */
-        std::function<void(const node_metrics &n,
-                           std::string &name,
-                           std::string &classname)> make_model;
+        std::function<void(const node_metrics& n,
+                           std::string& name,
+                           std::string& classname)>
+          make_model;
 
         connectivity type; /*!< The connectivity between each DEVS model.*/
     };
 
-    regular_graph_generator(const parameter &params);
+    regular_graph_generator(const parameter& params);
 
     graph_metrics metrics() const;
 
-    void make_1d(vle::devs::Executive &executive,
+    void make_1d(vle::devs::Executive& executive,
                  int length,
                  bool wrap,
-                 const std::vector<std::string> &mask,
+                 const std::vector<std::string>& mask,
                  int x_mask);
 
-    void make_2d(vle::devs::Executive &executive,
-                 const std::array<int, 2> &length,
-                 const std::array<bool, 2> &wrap,
-                 const utils::Array<std::string> &mask,
+    void make_2d(vle::devs::Executive& executive,
+                 const std::array<int, 2>& length,
+                 const std::array<bool, 2>& wrap,
+                 const utils::Array<std::string>& mask,
                  int x_mask,
                  int y_mask);
 

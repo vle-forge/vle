@@ -25,7 +25,8 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/Tuple.hpp>
 
-class Builder : public vle::devs::Executive {
+class Builder : public vle::devs::Executive
+{
     std::mt19937 generator;
     std::string model_prefix;
     std::string model_classname;
@@ -36,23 +37,23 @@ class Builder : public vle::devs::Executive {
     bool directed;
 
     void regular_graph_generator_make_model(
-        const vle::translator::regular_graph_generator::node_metrics &n,
-        std::string &name,
-        std::string &classname)
+      const vle::translator::regular_graph_generator::node_metrics& n,
+      std::string& name,
+      std::string& classname)
     {
         if (n.y == -1)
             name = vle::utils::format("%s-%d", model_prefix.c_str(), n.x);
         else
             name =
-                vle::utils::format("%s-%d-%d", model_prefix.c_str(), n.x, n.y);
+              vle::utils::format("%s-%d-%d", model_prefix.c_str(), n.x, n.y);
 
         classname = model_classname;
     }
 
     void graph_generator_make_model(
-        const vle::translator::graph_generator::node_metrics &n,
-        std::string &name,
-        std::string &classname)
+      const vle::translator::graph_generator::node_metrics& n,
+      std::string& name,
+      std::string& classname)
     {
         name = vle::utils::format("%s-%d", model_prefix.c_str(), n.id);
         classname = model_classname;
@@ -80,27 +81,27 @@ public:
     {
         if (graph_connectivity == "in-out")
             return vle::translator::regular_graph_generator::connectivity::
-                IN_OUT;
+              IN_OUT;
         if (graph_connectivity == "other")
             return vle::translator::regular_graph_generator::connectivity::
-                OTHER;
+              OTHER;
         if (graph_connectivity == "named")
             return vle::translator::regular_graph_generator::connectivity::
-                NAMED;
+              NAMED;
         throw vle::utils::ModellingError("Unknown graph connectivity: %s",
                                          graph_connectivity.c_str());
     }
 
-    void use_defined_graph_generator(const vle::devs::InitEventList &events)
+    void use_defined_graph_generator(const vle::devs::InitEventList& events)
     {
         vle::utils::Array<bool> userdefined(model_number, model_number);
 
         {
-            const auto &v = events.getTuple("user-defined");
+            const auto& v = events.getTuple("user-defined");
             if (v.size() != vle::utils::numeric_cast<std::size_t>(
-                                model_number * model_number))
+                              model_number * model_number))
                 throw vle::utils::ModellingError(
-                    "User defined model size error");
+                  "User defined model size error");
 
             int pos = 0;
             for (int i = 0; i != model_number; ++i)
@@ -115,14 +116,15 @@ public:
                       std::placeholders::_2,
                       std::placeholders::_3),
             graph_generator_connectivity(),
-            directed};
+            directed
+        };
 
         vle::translator::graph_generator gg(param);
 
         gg.make_graph(*this, model_number, userdefined);
     }
 
-    void use_smallworld_graph_generator(const vle::devs::InitEventList &events)
+    void use_smallworld_graph_generator(const vle::devs::InitEventList& events)
     {
         vle::translator::graph_generator::parameter param{
             std::bind(&Builder::graph_generator_make_model,
@@ -131,7 +133,8 @@ public:
                       std::placeholders::_2,
                       std::placeholders::_3),
             graph_generator_connectivity(),
-            directed};
+            directed
+        };
 
         vle::translator::graph_generator gg(param);
 
@@ -143,7 +146,7 @@ public:
                            events.getBoolean("allow-self-loops"));
     }
 
-    void use_scalefree_graph_generator(const vle::devs::InitEventList &events)
+    void use_scalefree_graph_generator(const vle::devs::InitEventList& events)
     {
         vle::translator::graph_generator::parameter param{
             std::bind(&Builder::graph_generator_make_model,
@@ -152,7 +155,8 @@ public:
                       std::placeholders::_2,
                       std::placeholders::_3),
             graph_generator_connectivity(),
-            directed};
+            directed
+        };
 
         vle::translator::graph_generator gg(param);
 
@@ -165,7 +169,7 @@ public:
     }
 
     void use_sortederdesrenyi_graph_generator(
-        const vle::devs::InitEventList &events)
+      const vle::devs::InitEventList& events)
     {
         vle::translator::graph_generator::parameter param{
             std::bind(&Builder::graph_generator_make_model,
@@ -174,7 +178,8 @@ public:
                       std::placeholders::_2,
                       std::placeholders::_3),
             graph_generator_connectivity(),
-            directed};
+            directed
+        };
 
         vle::translator::graph_generator gg(param);
 
@@ -185,7 +190,7 @@ public:
                                    events.getBoolean("allow-self-loops"));
     }
 
-    void use_erdosrenyi_graph_generator(const vle::devs::InitEventList &events)
+    void use_erdosrenyi_graph_generator(const vle::devs::InitEventList& events)
     {
         vle::translator::graph_generator::parameter param{
             std::bind(&Builder::graph_generator_make_model,
@@ -194,7 +199,8 @@ public:
                       std::placeholders::_2,
                       std::placeholders::_3),
             graph_generator_connectivity(),
-            directed};
+            directed
+        };
 
         vle::translator::graph_generator gg(param);
 
@@ -212,7 +218,7 @@ public:
                                 events.getBoolean("allow-self-loops"));
     }
 
-    void use_graph_generator(const vle::devs::InitEventList &events)
+    void use_graph_generator(const vle::devs::InitEventList& events)
     {
         model_number = events.getInt("model-number");
         std::string generator_name = events.getString("graph-generator");
@@ -235,7 +241,7 @@ public:
                                              generator_name.c_str());
     }
 
-    void use_1d_regular_graph_generator(const vle::devs::InitEventList &events)
+    void use_1d_regular_graph_generator(const vle::devs::InitEventList& events)
     {
         vle::translator::regular_graph_generator::parameter param{
             std::bind(&Builder::regular_graph_generator_make_model,
@@ -243,17 +249,18 @@ public:
                       std::placeholders::_1,
                       std::placeholders::_2,
                       std::placeholders::_3),
-            regular_graph_generator_connectivity()};
+            regular_graph_generator_connectivity()
+        };
 
         vle::translator::regular_graph_generator rgg(param);
 
-        const auto &v = events.getSet("mask").value();
+        const auto& v = events.getSet("mask").value();
         std::vector<std::string> mask;
 
         std::transform(v.begin(),
                        v.end(),
                        std::back_inserter(mask),
-                       [](const auto &v) { return v->toString().value(); });
+                       [](const auto& v) { return v->toString().value(); });
 
         rgg.make_1d(*this,
                     events.getInt("lenght"),
@@ -262,7 +269,7 @@ public:
                     events.getInt("x-mask"));
     }
 
-    void use_2d_regular_graph_generator(const vle::devs::InitEventList &events)
+    void use_2d_regular_graph_generator(const vle::devs::InitEventList& events)
     {
         vle::translator::regular_graph_generator::parameter param{
             std::bind(&Builder::regular_graph_generator_make_model,
@@ -270,7 +277,8 @@ public:
                       std::placeholders::_1,
                       std::placeholders::_2,
                       std::placeholders::_3),
-            regular_graph_generator_connectivity()};
+            regular_graph_generator_connectivity()
+        };
 
         vle::translator::regular_graph_generator rgg(param);
 
@@ -278,7 +286,7 @@ public:
         int height_mask = events.getInt("mask-height");
         vle::utils::Array<std::string> mask(width_mask, height_mask);
 
-        const auto &v = events.getSet("mask").value();
+        const auto& v = events.getSet("mask").value();
 
         {
             if (vle::utils::numeric_cast<int>(mask.size()) !=
@@ -287,7 +295,7 @@ public:
 
             int i = 0, j = 0;
 
-            for (const auto &str : v) {
+            for (const auto& str : v) {
                 mask(i, j) = str->toString().value();
                 ++j;
 
@@ -299,15 +307,15 @@ public:
         }
 
         rgg.make_2d(*this,
-                    {{events.getInt("width"), events.getInt("height")}},
-                    {{events.getBoolean("wrap-width"),
-                      events.getBoolean("wrap-height")}},
+                    { { events.getInt("width"), events.getInt("height") } },
+                    { { events.getBoolean("wrap-width"),
+                        events.getBoolean("wrap-height") } },
                     mask,
                     events.getInt("x-mask"),
                     events.getInt("y-mask"));
     }
 
-    void use_regular_graph_generator(const vle::devs::InitEventList &events)
+    void use_regular_graph_generator(const vle::devs::InitEventList& events)
     {
         int dimension = events.getInt("graph-dimension");
 
@@ -317,13 +325,13 @@ public:
             use_2d_regular_graph_generator(events);
         else
             throw vle::utils::ModellingError(
-                "Undefined regular graph with %d dimension", dimension);
+              "Undefined regular graph with %d dimension", dimension);
     }
 
 public:
-    Builder(const vle::devs::ExecutiveInit &init,
-            const vle::devs::InitEventList &events)
-        : vle::devs::Executive(init, events)
+    Builder(const vle::devs::ExecutiveInit& init,
+            const vle::devs::InitEventList& events)
+      : vle::devs::Executive(init, events)
     {
         model_prefix = events.getString("model-prefix");
         model_classname = events.getString("model-class");
@@ -341,7 +349,9 @@ public:
                                              graph_type.c_str());
     }
 
-    virtual ~Builder() override {}
+    virtual ~Builder() override
+    {
+    }
 };
 
 DECLARE_EXECUTIVE(Builder)

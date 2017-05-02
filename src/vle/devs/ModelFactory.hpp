@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -49,7 +49,8 @@ class Dynamics;
  * @brief Read simulations plugin from models directories and manage models
  * classes.
  */
-class VLE_LOCAL ModelFactory {
+class VLE_LOCAL ModelFactory
+{
 public:
     /**
      * @brief Build a new ModelFactory using specified dynamics.
@@ -59,22 +60,22 @@ public:
      * @param cls the vpz::classes to parse vpz::Dynamics to load.
      */
     ModelFactory(utils::ContextPtr context,
-                 std::map<std::string, View> &eventviews,
-                 const vpz::Dynamics &dyn,
-                 const vpz::Classes &cls,
-                 const vpz::Experiment &experiment);
+                 std::map<std::string, View>& eventviews,
+                 const vpz::Dynamics& dyn,
+                 const vpz::Classes& cls,
+                 const vpz::Experiment& experiment);
 
-    ModelFactory(const ModelFactory &other) = delete;
-    ModelFactory &operator=(const ModelFactory &other) = delete;
-    ModelFactory(ModelFactory &&other) = delete;
-    ModelFactory &operator=(ModelFactory &&other) = delete;
+    ModelFactory(const ModelFactory& other) = delete;
+    ModelFactory& operator=(const ModelFactory& other) = delete;
+    ModelFactory(ModelFactory&& other) = delete;
+    ModelFactory& operator=(ModelFactory&& other) = delete;
 
     /**
      * @brief Return the reference to the list of initiale conditions for
      * each models.
      * @return A constant reference to the vpz::Conditions.
      */
-    inline const vpz::Conditions &conditions() const
+    inline const vpz::Conditions& conditions() const
     {
         return mExperiment.conditions();
     }
@@ -83,19 +84,25 @@ public:
      * @brief Return the reference to the list of dynamcis.
      * @return A constant reference to the vpz::Dynamics.
      */
-    inline const vpz::Dynamics &dynamics() const { return mDynamics; }
+    inline const vpz::Dynamics& dynamics() const
+    {
+        return mDynamics;
+    }
 
     /**
      * @brief Return the reference to the list of views.
      * @return A constant reference to the vpz::Views.
      */
-    inline const vpz::Views &views() const { return mExperiment.views(); }
+    inline const vpz::Views& views() const
+    {
+        return mExperiment.views();
+    }
 
     /**
      * @brief Return the reference to the list of outputs.
      * @return A constant reference to the vpz::Outputs.
      */
-    inline const vpz::Outputs &outputs() const
+    inline const vpz::Outputs& outputs() const
     {
         return mExperiment.views().outputs();
     }
@@ -104,13 +111,16 @@ public:
      * @brief Return the reference to the experiment object.
      * @return A constant reference to the vpz::Experiment.
      */
-    inline const vpz::Experiment &experiment() const { return mExperiment; }
+    inline const vpz::Experiment& experiment() const
+    {
+        return mExperiment;
+    }
 
     /**
      * @brief Return the reference to the observables object.
      * @return A constant reference to the vpz::Observables.
      */
-    inline const vpz::Observables &observables() const
+    inline const vpz::Observables& observables() const
     {
         return mExperiment.views().observables();
     }
@@ -120,37 +130,52 @@ public:
      * each models.
      * @return A reference to the vpz::Conditions.
      */
-    inline vpz::Conditions &conditions() { return mExperiment.conditions(); }
+    inline vpz::Conditions& conditions()
+    {
+        return mExperiment.conditions();
+    }
 
     /**
      * @brief Return the reference to the list of dynamcis.
      * @return A constant reference to the vpz::Dynamics.
      */
-    inline vpz::Dynamics &dynamics() { return mDynamics; }
+    inline vpz::Dynamics& dynamics()
+    {
+        return mDynamics;
+    }
 
     /**
      * @brief Return the reference to the list of views.
      * @return A reference to the vpz::Views.
      */
-    inline vpz::Views &views() { return mExperiment.views(); }
+    inline vpz::Views& views()
+    {
+        return mExperiment.views();
+    }
 
     /**
      * @brief Return the reference to the list of outputs.
      * @return A reference to the vpz::Outputs.
      */
-    inline vpz::Outputs &outputs() { return mExperiment.views().outputs(); }
+    inline vpz::Outputs& outputs()
+    {
+        return mExperiment.views().outputs();
+    }
 
     /**
      * @brief Return the reference to the experiment object.
      * @return A reference to the vpz::Experiment.
      */
-    inline vpz::Experiment &experiment() { return mExperiment; }
+    inline vpz::Experiment& experiment()
+    {
+        return mExperiment;
+    }
 
     /**
      * @brief Return the reference to the observables object.
      * @return A constant reference to the vpz::Observables.
      */
-    inline vpz::Observables &observables()
+    inline vpz::Observables& observables()
     {
         return mExperiment.views().observables();
     }
@@ -173,12 +198,12 @@ public:
      * @param observable the name of the observable to attach.
      * @throw utils::InternalError if dynamics not exist.
      */
-    void createModel(Coordinator &coordinator,
-                     const vpz::Conditions &experiment_conditions,
-                     vpz::AtomicModel *model,
-                     const std::string &dynamics,
-                     const std::vector<std::string> &conditions,
-                     const std::string &observable);
+    void createModel(Coordinator& coordinator,
+                     const vpz::Conditions& experiment_conditions,
+                     vpz::AtomicModel* model,
+                     const std::string& dynamics,
+                     const std::vector<std::string>& conditions,
+                     const std::string& observable);
 
     /**
      * @brief Build a list of devs::Simulator from the dynamics library
@@ -187,7 +212,7 @@ public:
      * @param coordinator the coordinator where attach the simulator.
      * @param model the hierachy of model (coupled model) or atomic model.
      */
-    void createModels(Coordinator &coordinator, const vpz::Model &vpmdl);
+    void createModels(Coordinator& coordinator, const vpz::Model& vpmdl);
 
     /**
      * @brief Build a new devs::Simulator from the vpz::Classes information.
@@ -196,15 +221,15 @@ public:
      * @throw utils::badArg if modelname already exist or if the classname
      * doest not exist.
      */
-    vpz::BaseModel *createModelFromClass(Coordinator &coordinator,
-                                         vpz::CoupledModel *parent,
-                                         const std::string &classname,
-                                         const std::string &modelname,
-                                         const vpz::Conditions &conditions);
+    vpz::BaseModel* createModelFromClass(Coordinator& coordinator,
+                                         vpz::CoupledModel* parent,
+                                         const std::string& classname,
+                                         const std::string& modelname,
+                                         const vpz::Conditions& conditions);
 
 private:
     utils::ContextPtr mContext;
-    std::map<std::string, View> &mEventViews;
+    std::map<std::string, View>& mEventViews;
 
     vpz::Dynamics mDynamics;     /**< List of available vpz::Dynamics. */
     vpz::Classes mClasses;       /**< List of available vpz::Classes. */
@@ -223,8 +248,8 @@ private:
      *
      * @return Return a constant.
      */
-    utils::Context::ModuleType open(const vpz::Dynamic &dyn,
-                                    std::string *path);
+    utils::Context::ModuleType open(const vpz::Dynamic& dyn,
+                                    std::string* path);
 
     /**
      * @brief Attach to the specified devs::Simulator reference a
@@ -236,11 +261,11 @@ private:
      * @return A pointer to the allocated dynamics.
      * @throw Exception::Internal if XML cannot be parse.
      */
-    std::unique_ptr<Dynamics> attachDynamics(Coordinator &coordinator,
-                                             devs::Simulator *atom,
-                                             const vpz::Dynamic &dyn,
-                                             const InitEventList &events,
-                                             const std::string &observable);
+    std::unique_ptr<Dynamics> attachDynamics(Coordinator& coordinator,
+                                             devs::Simulator* atom,
+                                             const vpz::Dynamic& dyn,
+                                             const InitEventList& events,
+                                             const std::string& observable);
 };
 }
 } // namespace vle devs

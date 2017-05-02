@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,44 +24,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/vpz/Classes.hpp>
+#include <iterator>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
-#include <iterator>
+#include <vle/vpz/Classes.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+namespace vpz {
 
-void Classes::write(std::ostream& out) const
+void
+Classes::write(std::ostream& out) const
 {
     if (not m_lst.empty()) {
         out << "<classes>\n";
-        std::transform(begin(), end(),
-                       std::ostream_iterator < Class >(out),
-                       utils::select2nd < ClassList::value_type >());
+        std::transform(begin(),
+                       end(),
+                       std::ostream_iterator<Class>(out),
+                       utils::select2nd<ClassList::value_type>());
         out << "</classes>\n";
     }
 }
 
-Class& Classes::add(const std::string& name)
+Class&
+Classes::add(const std::string& name)
 {
-    std::pair < iterator, bool > x;
+    std::pair<iterator, bool> x;
     x = m_lst.insert(value_type(name, Class(name)));
 
     if (not x.second) {
-        throw utils::ArgError((fmt(_("Class '%1%' already exists")) % name).str());
+        throw utils::ArgError(
+          (fmt(_("Class '%1%' already exists")) % name).str());
     }
 
     return x.first->second;
 }
 
-void Classes::del(const std::string& name)
+void
+Classes::del(const std::string& name)
 {
     m_lst.erase(name);
 }
 
-const Class& Classes::get(const std::string& name) const
+const Class&
+Classes::get(const std::string& name) const
 {
     auto it = m_lst.find(name);
 
@@ -72,7 +78,8 @@ const Class& Classes::get(const std::string& name) const
     return it->second;
 }
 
-Class& Classes::get(const std::string& name)
+Class&
+Classes::get(const std::string& name)
 {
     auto it = m_lst.find(name);
 
@@ -83,10 +90,12 @@ Class& Classes::get(const std::string& name)
     return it->second;
 }
 
-void Classes::rename(const std::string& oldname, const std::string& newname)
+void
+Classes::rename(const std::string& oldname, const std::string& newname)
 {
     if (exist(newname)) {
-        throw utils::ArgError((fmt(_("Class '%1%' already exists")) % newname).str());
+        throw utils::ArgError(
+          (fmt(_("Class '%1%' already exists")) % newname).str());
     }
 
     auto it = m_lst.find(oldname);
@@ -94,15 +103,15 @@ void Classes::rename(const std::string& oldname, const std::string& newname)
         throw utils::ArgError((fmt(_("Unknow class '%1%'")) % oldname).str());
     }
 
-    std::pair < iterator, bool > x;
+    std::pair<iterator, bool> x;
     x = m_lst.insert(value_type(newname, it->second));
     x.first->second.setName(newname);
 
     m_lst.erase(it);
 }
 
-void Classes::updateDynamics(const std::string& oldname,
-                             const std::string& newname)
+void
+Classes::updateDynamics(const std::string& oldname, const std::string& newname)
 {
     auto it = m_lst.begin();
     while (it != m_lst.end()) {
@@ -111,7 +120,8 @@ void Classes::updateDynamics(const std::string& oldname,
     }
 }
 
-void Classes::purgeDynamics(const std::set < std::string >& dynamicslist)
+void
+Classes::purgeDynamics(const std::set<std::string>& dynamicslist)
 {
     auto it = m_lst.begin();
     while (it != m_lst.end()) {
@@ -120,36 +130,40 @@ void Classes::purgeDynamics(const std::set < std::string >& dynamicslist)
     }
 }
 
-void Classes::updateObservable(const std::string& oldname,
-                               const std::string& newname)
+void
+Classes::updateObservable(const std::string& oldname,
+                          const std::string& newname)
 {
     auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.updateObservable(oldname, newname);
-         ++it;
+        ++it;
     }
 }
 
-void Classes::purgeObservable(const std::set < std::string >& observablelist)
+void
+Classes::purgeObservable(const std::set<std::string>& observablelist)
 {
     auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.purgeObservable(observablelist);
-         ++it;
+        ++it;
     }
 }
 
-void Classes::updateConditions(const std::string& oldname,
-                              const std::string& newname)
+void
+Classes::updateConditions(const std::string& oldname,
+                          const std::string& newname)
 {
     auto it = m_lst.begin();
     while (it != m_lst.end()) {
         it->second.updateConditions(oldname, newname);
-         ++it;
+        ++it;
     }
 }
 
-void Classes::purgeConditions(const std::set < std::string >& conditionlist)
+void
+Classes::purgeConditions(const std::set<std::string>& conditionlist)
 {
     auto it = m_lst.begin();
     while (it != m_lst.end()) {
@@ -157,6 +171,5 @@ void Classes::purgeConditions(const std::set < std::string >& conditionlist)
         ++it;
     }
 }
-
-}} // namespace vle vpz
-
+}
+} // namespace vle vpz
