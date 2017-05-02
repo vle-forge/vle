@@ -148,7 +148,7 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
         mComboBox->setCurrentText("character");
     }
     std::unique_ptr<value::Value> dateV =
-      std::move(mVpz->buildValueFromDoc(cond, datePort, 0));
+      mVpz->buildValueFromDoc(cond, datePort, 0);
     double dateI = 0;
     if (dateV->isString()) {
         dateI = utils::DateTime::toJulianDay(dateV->toString().value());

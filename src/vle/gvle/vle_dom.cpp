@@ -793,7 +793,7 @@ vleDomStatic::getValueFromPortCond(QDomNode atom,
     // note: how to detecte the number of values. For the moment each time one
     // succeeds in buildding a vle value.
     for (int k = 0; k < valueList.length(); k++) {
-        val = std::move(buildValue(valueList.at(k), false));
+        val = buildValue(valueList.at(k), false);
         if (val) {
             if (index == ii) {
                 return val;
