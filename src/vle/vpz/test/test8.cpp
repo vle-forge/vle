@@ -50,13 +50,27 @@ test_rename_model()
     CoupledModel* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
+
+    if (not top)
+        return;
+
     EnsuresNotThrow(vpz::BaseModel::rename(top, "new_top"), std::exception);
 
     AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
+    Ensures(d);
+
+    if (not d)
+        return;
+
     EnsuresThrow(vpz::BaseModel::rename(d, "e"), utils::DevsGraphError);
     EnsuresNotThrow(vpz::BaseModel::rename(d, "new_d"), std::exception);
 
     CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
+    Ensures(top1);
+
+    if (not top1)
+        return;
+
     EnsuresThrow(vpz::BaseModel::rename(top1, "top2"), utils::DevsGraphError);
     EnsuresNotThrow(vpz::BaseModel::rename(top1, "new_top1"), std::exception);
 }
@@ -270,12 +284,17 @@ test_del_port()
     CoupledModel* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
+    if (not top)
+        return;
     EnsuresEqual(top->existInternalConnection("top1", "out", "top2", "in"),
                  true);
 
     // Atomic Model
     AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
     Ensures(d);
+    if (not d)
+        return;
+
     EnsuresEqual(d->existInputPort("in"), true);
     EnsuresEqual(d->existOutputPort("out"), true);
     EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"), true);
@@ -293,6 +312,8 @@ test_del_port()
     // Coupled Model
     CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     Ensures(top1);
+    if (not top1)
+        return;
 
     // Coupled Model -- Input Port
     EnsuresEqual(top1->existInputPort("in"), true);
@@ -326,7 +347,7 @@ test_del_port()
 void
 test_clone1()
 {
-    CoupledModel* top = new CoupledModel("top", nullptr);
+    auto top = std::make_unique<CoupledModel>("top", nullptr);
     top->addInputPort("in");
     top->addOutputPort("out");
 
@@ -346,8 +367,13 @@ test_clone1()
     Ensures(top->existInternalConnection("top", "out", "b", "in"));
     Ensures(top->existInternalConnection("b", "out", "top", "in"));
 
-    CoupledModel* newtop(dynamic_cast<CoupledModel*>(top->clone()));
+    auto newtop =
+      std::unique_ptr<CoupledModel>(dynamic_cast<CoupledModel*>(top->clone()));
+
     Ensures(newtop != nullptr);
+    if (not newtop)
+        return;
+
     Ensures(newtop->getModelList().size() == 2);
 
     AtomicModel* newa = dynamic_cast<AtomicModel*>(newtop->findModel("top"));
@@ -368,9 +394,6 @@ test_clone1()
     Ensures(top->existInternalConnection("b", "out", "top", "in"));
     Ensures(top->existInputConnection("in", "top", "in"));
     Ensures(top->existOutputConnection("top", "out", "out"));
-
-    delete newtop;
-    delete top;
 }
 
 void
@@ -383,19 +406,27 @@ test_clone2()
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(oldtop);
 
-    CoupledModel* top = dynamic_cast<CoupledModel*>(oldtop->clone());
+    auto top = std::unique_ptr<CoupledModel>(
+      dynamic_cast<CoupledModel*>(oldtop->clone()));
+
     Ensures(top);
+    if (not top)
+        return;
+
     CoupledModel* top1(dynamic_cast<CoupledModel*>(top->findModel("top1")));
     Ensures(top1);
+    if (not top1)
+        return;
+
     CoupledModel* top2(dynamic_cast<CoupledModel*>(top->findModel("top2")));
     Ensures(top2);
+    if (not top2)
+        return;
 
     AtomicModel* f(dynamic_cast<AtomicModel*>(top2->findModel("f")));
     Ensures(f);
     AtomicModel* g(dynamic_cast<AtomicModel*>(top2->findModel("g")));
     Ensures(g);
-
-    delete top;
 }
 
 void
@@ -413,6 +444,9 @@ test_clone_different_atomic()
 
     Ensures(top1 and top2);
     Ensures(top1 != top2);
+
+    if (not top1 or not top2)
+        return;
 
     AtomicModelVector list1, list2;
 
@@ -441,14 +475,17 @@ test_get_port_index()
       dynamic_cast<CoupledModel*>(file.project().model().node());
 
     Ensures(top);
+    if (not top)
+        return;
 
     EnsuresEqual(top->getInputPortList().size(), (ConnectionList::size_type)0);
     EnsuresEqual(top->getOutputPortList().size(),
                  (ConnectionList::size_type)0);
 
     AtomicModel* e = dynamic_cast<AtomicModel*>(top->getModelList()["e"]);
-
     Ensures(e);
+    if (not e)
+        return;
 
     EnsuresEqual(e->getInputPortList().size(), (ConnectionList::size_type)2);
     EnsuresEqual(e->getInputPortIndex("in1"), 0);
@@ -465,12 +502,18 @@ test_rename_port()
     CoupledModel* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
+    if (not top)
+        return;
+
     EnsuresEqual(top->existInternalConnection("top1", "out", "top2", "in"),
                  true);
 
     // Atomic Model
     AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
     Ensures(d);
+    if (not d)
+        return;
+
     EnsuresEqual(d->existInputPort("in"), true);
     EnsuresEqual(d->existOutputPort("out"), true);
     EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"), true);
@@ -492,6 +535,8 @@ test_rename_port()
     // Coupled Model
     CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     Ensures(top1);
+    if (not top1)
+        return;
 
     // Coupled Model -- Input Port
     EnsuresEqual(top1->existInputPort("in"), true);
@@ -543,13 +588,20 @@ test_bug_rename_port()
     CoupledModel* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
+    if (not top)
+        return;
+
     EnsuresEqual(top->existInternalConnection("top1", "out", "top2", "in"),
                  true);
     CoupledModel* top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
     Ensures(top1);
+    if (not top1)
+        return;
 
     CoupledModel* top2 = dynamic_cast<CoupledModel*>(top->findModel("top2"));
     Ensures(top2);
+    if (not top2)
+        return;
 
     EnsuresEqual(top->existInternalConnection("top2", "out", "top1", "in"),
                  true);
@@ -578,6 +630,8 @@ test_bug_duplication_connections()
     CoupledModel* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
+    if (not top)
+        return;
 
     AtomicModel* atom1(top->addAtomicModel("atom1"));
     AtomicModel* atom2(top->addAtomicModel("atom2"));
@@ -587,6 +641,9 @@ test_bug_duplication_connections()
     Ensures(atom1);
     Ensures(atom2);
     Ensures(coupled);
+
+    if (not atom1 or not atom2 or not coupled)
+        return;
 
     atom1->addOutputPort("out");
     atom2->addInputPort("in");
@@ -615,10 +672,16 @@ test_atomic_model_source()
 
     CoupledModel* top((file.project().model().node())->toCoupled());
     Ensures(top);
+    if (not top)
+        return;
+
     AtomicModel* e(top->findModel("e")->toAtomic());
     Ensures(e);
     AtomicModel* d(top->findModel("d")->toAtomic());
     Ensures(d);
+
+    if (not e or not d)
+        return;
 
     vpz::ModelPortList result;
     e->getAtomicModelsSource("in1", result);
@@ -633,19 +696,30 @@ test_atomic_model_source()
 
     CoupledModel* top1(top->findModel("top1")->toCoupled());
     Ensures(top1);
+    if (not top1)
+        return;
 
     AtomicModel* a(top1->findModel("a")->toAtomic());
     Ensures(a);
+    if (not a)
+        return;
+
     a->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
     AtomicModel* b(top1->findModel("b")->toAtomic());
     Ensures(b);
+    if (not b)
+        return;
+
     b->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
     AtomicModel* c(top1->findModel("c")->toAtomic());
     Ensures(c);
+    if (not c)
+        return;
+
     c->getAtomicModelsSource("in1", result);
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
@@ -655,17 +729,25 @@ test_atomic_model_source()
 
     AtomicModel* x(top1->findModel("x")->toAtomic());
     Ensures(x);
+    if (not x)
+        return;
+
     x->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
     result.clear();
 
     CoupledModel* top2(top->findModel("top2")->toCoupled());
     Ensures(top2);
+    if (not top2)
+        return;
 
     AtomicModel* f(top2->findModel("f")->toAtomic());
     Ensures(f);
     AtomicModel* g(top2->findModel("g")->toAtomic());
     Ensures(g);
+
+    if (not f or not g)
+        return;
 
     f->getAtomicModelsSource("in", result);
     EnsuresEqual(result.size(), (size_t)1);
@@ -761,6 +843,9 @@ test_name()
 
     Ensures(a);
     Ensures(b);
+
+    if (not a or not b)
+        return;
 
     EnsuresEqual(a->getCompleteName(), "top,top2,g");
     EnsuresEqual(b->getCompleteName(), "top,top1,x");
