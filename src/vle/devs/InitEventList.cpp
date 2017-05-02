@@ -41,18 +41,6 @@
 
 namespace {
 
-inline vle::devs::InitEventList::container_type::iterator
-pp_get(vle::devs::InitEventList::container_type& m, const std::string& name)
-{
-    auto it = m.find(name);
-
-    if (it == m.end())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
-
-    return it;
-}
-
 inline vle::devs::InitEventList::container_type::const_iterator
 pp_get(const vle::devs::InitEventList::container_type& m,
        const std::string& name)
@@ -64,20 +52,6 @@ pp_get(const vle::devs::InitEventList::container_type& m,
           (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
 
     return it;
-}
-
-inline const vle::value::Value&
-pp_get_value(vle::devs::InitEventList::container_type& m,
-             const std::string& name)
-{
-    auto it = pp_get(m, name);
-
-    if (not it->second)
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
-            .str());
-
-    return *it->second.get();
 }
 
 inline const vle::value::Value&
