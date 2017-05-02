@@ -305,10 +305,12 @@ SaxStackVpz::pushPort(const xmlChar** att)
             throw utils::SaxParserError(_("Port without name"));
         }
 
-        if (type->isIn()) {
-            gmdl->addInputPort(name);
-        } else if (type->isOut()) {
-            gmdl->addOutputPort(name);
+        if (gmdl) {
+            if (type->isIn()) {
+                gmdl->addInputPort(name);
+            } else if (type->isOut()) {
+                gmdl->addOutputPort(name);
+            }
         }
         push(type);
     }
