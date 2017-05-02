@@ -342,6 +342,9 @@ check_user_value(vle::value::Value& to_check)
     test::MyData* mydata = dynamic_cast<test::MyData*>(&user);
     Ensures(mydata);
 
+    if (not mydata)
+        return;
+
     EnsuresEqual(mydata->x, 1.);
     EnsuresEqual(mydata->y, 2.);
     EnsuresEqual(mydata->z, 3.);
