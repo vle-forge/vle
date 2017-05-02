@@ -130,20 +130,37 @@ coupledmodel_vpz()
 
     vpz::CoupledModel* cpl = mdl.node()->toCoupled();
     Ensures(cpl != nullptr);
+
+    if (not cpl)
+        return;
+
     Ensures(cpl->existOutputPort("o") != 0);
     Ensures(cpl->existInputPort("i") != 0);
 
     vpz::BaseModel* mdl1 = cpl->findModel("atom1");
     vpz::BaseModel* mdl2 = cpl->findModel("atom2");
+
     Ensures(mdl1 != nullptr);
+    if (not mdl1)
+        return;
+
     Ensures(mdl2 != nullptr);
+    if (not mdl2)
+        return;
 
     vpz::AtomicModel* atom1 = dynamic_cast<vpz::AtomicModel*>(mdl1);
     vpz::AtomicModel* atom2 = dynamic_cast<vpz::AtomicModel*>(mdl2);
     Ensures(atom1 != nullptr);
+    if (not atom1)
+        return;
+
     Ensures(atom1->existOutputPort("out"));
     Ensures(atom1->existInputPort("in"));
+
     Ensures(atom2 != nullptr);
+    if (not atom2)
+        return;
+
     Ensures(atom2->existInputPort("in"));
     Ensures(atom2->existOutputPort("out"));
 
