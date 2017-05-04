@@ -31,7 +31,6 @@
 #include <functional>
 #include <iostream>
 #include <string>
-#include <strsafe.h>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
@@ -39,6 +38,7 @@
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/i18n.hpp>
 #include <windows.h>
+#include <strsafe.h>
 
 namespace vle {
 namespace utils {
