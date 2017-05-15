@@ -45,7 +45,7 @@ namespace {
 inline void
 pp_check_index(const vle::value::Set& s, std::size_t i)
 {
-#ifndef NDEBUG
+#ifndef VLE_FULL_OPTIMIZATION
     if (i >= s.size())
         throw vle::utils::ArgError(
           (vle::fmt(_("Set: too big index '%1%' (max %2%)")) % i % s.size())

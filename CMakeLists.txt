@@ -6,6 +6,8 @@ enable_testing()
 # Options
 #
 
+option(WITH_FULL_OPTIMIZATION "disable all logging facilities and active heavy optimization code to speed up simulation. [default: off]" OFF)
+option(WITH_DEBUG "enable debug log message. It slows simulation [default: ON]" ON)
 option(WITH_GVLE "use QT to build gvle [default: on]" ON)
 option(WITH_TEST "build unit test [default: on]" ON)
 option(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
@@ -304,7 +306,7 @@ endif (WITH_DOXYGEN)
 
 #
 # Build a generic make uninstall command
-# 
+#
 
 # uninstall target
 configure_file(
@@ -327,6 +329,8 @@ message(STATUS "- - - -")
 message(STATUS "${VLE_NAME_COMPLETE} configured successfully")
 message(STATUS "Using ${CMAKE_INSTALL_PREFIX} for installation")
 message(STATUS "Build type ${CMAKE_BUILD_TYPE}")
+message(STATUS "Full optimization.............: ${WITH_FULL_OPTIMIZATION}")
+message(STATUS "Show debug message............. ${WITH_DEBUG}")
 message(STATUS "Build with GCC ABI Demangle...: ${VLE_HAVE_GCC_ABI_DEMANGLE}")
 message(STATUS "Build with execinfo.h.........: ${VLE_HAVE_EXECINFO}")
 message(STATUS "Build unit test...............: ${VLE_HAVE_UNITTESTFRAMEWORK}")

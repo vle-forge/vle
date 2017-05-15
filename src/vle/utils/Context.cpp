@@ -74,7 +74,7 @@ Context::Context(const Path& /* prefix */)
 {
 
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
-#ifndef NDEBUG
+#ifndef VLE_DISABLE_DEBUG
     m_pimpl->log_priority = VLE_LOG_DEBUG;
 #else
     m_pimpl->log_priority = VLE_LOG_ERR;
@@ -107,7 +107,7 @@ Context::Context(std::string locale, const Path& /* prefix */)
   : m_pimpl(std::make_unique<PrivateContextImpl>())
 {
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
-#ifndef NDEBUG
+#ifndef VLE_DISABLE_DEBUG
     m_pimpl->log_priority = VLE_LOG_DEBUG;
 #else
     m_pimpl->log_priority = VLE_LOG_ERR;

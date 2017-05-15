@@ -66,12 +66,12 @@ static inline void
 
 /* Default, logging system is active and the \e dbg() macro checks log
  * priority argument.
- * Define DISABLE_LOGGING to hide all logging message.
- * Define NDEBUG to remove dbg() macro.
+ * Define VLE_FULL_OPTIMIZATION to hide all logging message (and more).
+ * Define VLE_DISABLE_DEBUG to remove vDbg() macro.
  */
 
-#ifndef DISABLE_LOGGING
-#ifndef NDEBUG
+#ifndef VLE_FULL_OPTIMIZATION
+#ifndef VLE_DISABLE_DEBUG
 #define vDbg(ctx, arg...) vle_log_cond(ctx, VLE_LOG_DEBUG, ##arg)
 #else
 #define vDbg(ctx, arg...) vle_log_null(ctx, ##arg)

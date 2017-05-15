@@ -47,7 +47,7 @@ pp_check_index(const vle::value::Matrix& m,
                vle::value::Matrix::index column,
                vle::value::Matrix::index row)
 {
-#ifndef NDEBUG
+#ifndef VLE_FULL_OPTIMIZATION
     if (not(column < m.columns() and row <= m.rows()))
         throw vle::utils::ArgError(
           (vle::fmt(_("Matrix: bad access %1% %2% for %3%x%4% matrix")) %

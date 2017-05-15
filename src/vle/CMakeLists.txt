@@ -56,6 +56,8 @@ set_target_properties(vlelib PROPERTIES
 
 target_compile_definitions(vlelib
   PRIVATE
+  $<$<BOOL:${WITH_FULL_OPTIMIZATION}>:VLE_FULL_OPTIMIZATION>
+  $<$<BOOL:${WITH_DEBUG}>:VLE_DISABLE_DEBUG>
   VERSION_MAJOR=${VLE_MAJOR}
   VERSION_MINOR=${VLE_MINOR}
   VERSION_PATCH=${VLE_PATCH}
@@ -85,6 +87,8 @@ set_target_properties(vlelibstatic PROPERTIES
 
 target_compile_definitions(vlelibstatic
   PRIVATE
+  $<$<BOOL:${WITH_FULL_OPTIMIZATION}>:VLE_FULL_OPTIMIZATION>
+  $<$<BOOL:${WITH_DEBUG}>:VLE_DISABLE_DEBUG>
   VERSION_MAJOR=${VLE_MAJOR}
   VERSION_MINOR=${VLE_MINOR}
   VERSION_PATCH=${VLE_PATCH}
