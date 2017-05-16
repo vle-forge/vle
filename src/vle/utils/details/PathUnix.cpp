@@ -52,8 +52,13 @@ Context::findInstallPrefix()
         return path;
     }
 
+#ifdef __APPLE__
+    path = findLibrary(vle::utils::format(
+      "libvle-%d.%d.dylib", std::get<0>(version), std::get<1>(version)));
+#else
     path = findLibrary(vle::utils::format(
       "libvle-%d.%d.so", std::get<0>(version), std::get<1>(version)));
+#endif
 
     if (not path.empty()) {
         path = path.parent_path(); // remove filename
@@ -69,7 +74,11 @@ Context::findInstallPrefix()
         return path;
     }
 
+#ifdef __APPLE__
+    path = findLibrary("libvle.dylib");
+#else
     path = findLibrary("libvle.so");
+#endif
 
     if (not path.empty()) {
         path = path.parent_path(); // remove filename
@@ -83,7 +92,11 @@ Context::findInstallPrefix()
 Path
 Context::findLibrary(const std::string& lib)
 {
+#ifdef __APPLE__
+    char* env_p = std::getenv("DYLD_LIBRARY_PATH");
+#else
     char* env_p = std::getenv("LD_LIBRARY_PATH");
+#endif
 
     std::vector<std::string> splitVec;
     boost::split(
