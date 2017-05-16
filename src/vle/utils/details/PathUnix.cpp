@@ -61,6 +61,22 @@ Context::findInstallPrefix()
         return path;
     }
 
+    path = findProgram("vle");
+
+    if (not path.empty()) {
+        path = path.parent_path(); // remove filename
+        path = path.parent_path(); // remove bin
+        return path;
+    }
+
+    path = findLibrary("libvle.so");
+
+    if (not path.empty()) {
+        path = path.parent_path(); // remove filename
+        path = path.parent_path(); // remove lib
+        return path;
+    }
+
     return path;
 }
 
