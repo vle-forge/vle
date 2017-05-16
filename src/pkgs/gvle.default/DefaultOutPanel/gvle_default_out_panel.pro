@@ -24,3 +24,8 @@ SOURCES = DefaultOutPanel.cpp
 target.path = $$LIBSDIR/pkgs/gvle.default/plugins/gvle/out
 
 INSTALLS += target
+
+macx {
+  LIBS += -L../../../../src -lvle-2.0
+  LIBS += -L../../../../src/vle/gvle -lgvle-2.0
+}

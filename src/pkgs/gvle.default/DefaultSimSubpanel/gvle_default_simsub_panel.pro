@@ -12,6 +12,7 @@ QT += gui
 QT += widgets
 QT += help
 QT += xml
+QT += printsupport
 
 TEMPLATE = lib
 
@@ -26,3 +27,8 @@ SOURCES = DefaultSimSubpanel.cpp qcustomplot/qcustomplot.cpp
 target.path = $$LIBSDIR/pkgs/gvle.default/plugins/gvle/simulating
 
 INSTALLS += target
+
+macx {
+  LIBS += -L../../../../src -lvle-2.0
+  LIBS += -L../../../../src/vle/gvle -lgvle-2.0
+}

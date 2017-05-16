@@ -183,20 +183,23 @@ SOURCES = vle/manager/ExperimentGenerator.cpp \
   vle/vpz/Experiment.cpp \
   vle/vpz/ModelPortList.cpp
 
-mac {
+macx {
   SOURCES += vle/utils/details/SpawnUnix.cpp \
     vle/utils/details/PathUnix.cpp
 
   QMAKE_CXXFLAGS += -iwithsysroot /usr/include/libxml2
+  QMAKE_CXXFLAGS += -I/usr/local/opt/boost/include
 
   LIBS += -lxml2
 }
+
 win32 {
   SOURCES += vle/utils/details/SpawnWin.cpp \
     vle/utils/details/UtilsWin.cpp \
     vle/utils/details/PathWin32.cpp \
 }
-unix {
+
+unix:!macx {
   SOURCES += vle/utils/details/SpawnUnix.cpp \
     vle/utils/details/PathUnix.cpp
 

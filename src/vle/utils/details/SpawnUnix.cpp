@@ -41,6 +41,7 @@
 #include <unistd.h>
 
 #ifdef __APPLE__
+#include <signal.h>
 #include <crt_externs.h>
 extern "C" char** environ = *_NSGetEnviron();
 #endif

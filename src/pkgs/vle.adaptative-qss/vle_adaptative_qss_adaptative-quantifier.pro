@@ -19,3 +19,7 @@ other.path = $$LIBSDIR/pkgs/vle.adaptative-qss
 other.files = Authors.txt Description.txt License.txt News.txt Readme.txt
 
 INSTALLS += target other
+
+macx {
+  LIBS += -L../../../src -lvle-2.0
+}

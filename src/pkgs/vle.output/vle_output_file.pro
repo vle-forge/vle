@@ -18,3 +18,9 @@ SOURCES = File.cpp FileType.cpp
 target.path = $$LIBSDIR/pkgs/vle.output/plugins/output
 
 INSTALLS += target
+
+macx {
+  QMAKE_CXXFLAGS += -I/usr/local/opt/boost/include
+  LIBS += -L../../../src -lvle-2.0
+}
+

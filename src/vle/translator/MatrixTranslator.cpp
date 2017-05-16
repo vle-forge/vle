@@ -195,9 +195,9 @@ apply_mask(vle::devs::Executive& executive,
     const int mask_columns = utils::numeric_cast<int>(mask.columns());
     const int mask_rows = utils::numeric_cast<int>(mask.rows());
     const int x_min = std::max(0, c - x_mask);
-    const int x_max = std::min(length[0], c + mask_columns - x_mask);
+    const int x_max = std::min(length.front(), c + mask_columns - x_mask);
     const int y_min = std::max(0, r - y_mask);
-    const int y_max = std::min(length[1], r + mask_rows - y_mask);
+    const int y_max = std::min(std::get<1>(length), r + mask_rows - y_mask);
 
     const int x_mask_min = std::max(0, x_mask - c);
     const int y_mask_min = std::max(0, y_mask - r);
@@ -256,21 +256,21 @@ apply_wrap_mask(vle::devs::Executive& executive,
 
     for (int y = y_min, n = 0; y != y_max; ++y, ++n) {
         int p = y;
-        if (wrap[1] == true) {
+        if (std::get<1>(wrap) == true) {
             if (y < 0)
-                p = length[1] + y;
-            else if (y >= length[1])
-                p = y % length[1];
+                p = std::get<1>(length) + y;
+            else if (y >= std::get<1>(length))
+                p = y % std::get<1>(length);
         } else
             continue;
 
         for (int x = x_min, m = 0; x != x_max; ++x, ++m) {
             int q = x;
-            if (wrap[0] == true) {
+            if (std::get<0>(wrap) == true) {
                 if (x < 0)
-                    q = length[0] + x;
-                else if (x >= length[0])
-                    q = x % length[0];
+                    q = length.front() + x;
+                else if (x >= length.front())
+                    q = x % length.front();
             } else
                 continue;
 
@@ -313,20 +313,20 @@ regular_graph_generator::make_2d(vle::devs::Executive& executive,
                                  int x_mask,
                                  int y_mask)
 {
-    if (length[0] * length[1] <= 0 or x_mask < 0 or y_mask < 0 or
+    if (length.front() * std::get<1>(length) <= 0 or x_mask < 0 or y_mask < 0 or
         utils::numeric_cast<std::size_t>(x_mask) >= mask.columns() or
         utils::numeric_cast<std::size_t>(y_mask) >= mask.rows())
         throw vle::utils::ArgError(
           _("regular_graph_generator: bad parameters"));
 
-    utils::Array<std::string> modelnames(length[0], length[1]);
+    utils::Array<std::string> modelnames(length.front(), std::get<1>(length));
     std::string name, classname;
     regular_graph_generator::node_metrics metrics{ -1, -1, -1 };
 
-    m_metrics.vertices = length[0] * length[1];
+    m_metrics.vertices = length.front() * std::get<1>(length);
 
-    for (int c = 0; c != length[0]; ++c) {
-        for (int r = 0; r != length[1]; ++r) {
+    for (int c = 0; c != length.front(); ++c) {
+        for (int r = 0; r != std::get<1>(length); ++r) {
             metrics.x = c;
             metrics.y = r;
             m_params.make_model(metrics, name, classname);
@@ -335,9 +335,9 @@ regular_graph_generator::make_2d(vle::devs::Executive& executive,
         }
     }
 
-    if (not wrap[0] and not wrap[1])
-        for (int c = 0; c != length[0]; ++c)
-            for (int r = 0; r != length[1]; ++r)
+    if (not std::get<0>(wrap) and not std::get<1>(wrap))
+        for (int c = 0; c != length.front(); ++c)
+            for (int r = 0; r != std::get<1>(length); ++r)
                 apply_mask(executive,
                            m_params,
                            modelnames,
@@ -348,8 +348,8 @@ regular_graph_generator::make_2d(vle::devs::Executive& executive,
                            x_mask,
                            y_mask);
     else
-        for (int c = 0; c != length[0]; ++c)
-            for (int r = 0; r != length[1]; ++r)
+        for (int c = 0; c != length.front(); ++c)
+            for (int r = 0; r != std::get<1>(length); ++r)
                 apply_wrap_mask(executive,
                                 wrap,
                                 m_params,

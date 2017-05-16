@@ -13,19 +13,23 @@ QT += xml
 
 TEMPLATE = app
 
-TARGET = gvle
+TARGET = gvle-$$VERSION_ABI
+
+VERSION = 0
 
 SOURCES = main.cpp
 
-mac {
+macx {
   QMAKE_CXXFLAGS += -iwithsysroot /usr/include/libxml2
   LIBS += -lxml2
-  LIBS += -L../../../src -llibvle
-  LIBS += -L../../../src/vle/gvle -llibgvle
+  LIBS += -L../../../src -lvle-2.0
+  LIBS += -L../../../src/vle/gvle -lgvle-2.0
 }
+
 win32 {
 }
-unix {
+
+unix:!macx {
   PKGCONFIG += libxml-2.0
   CONFIG += link_pkgconfig
   LIBS += -L../../../src -lvle-2.0

@@ -26,3 +26,10 @@ SOURCES = DefaultVpzPanel.cpp filevpzdynamics.cpp filevpzexpview.cpp  filevpzpro
 target.path = $$LIBSDIR/pkgs/gvle.default/plugins/gvle/vpz
 
 INSTALLS += target
+
+macx {
+  QMAKE_CXXFLAGS += -I/usr/local/opt/boost/include
+
+  LIBS += -L../../../../src -lvle-2.0
+  LIBS += -L../../../../src/vle/gvle -lgvle-2.0
+}

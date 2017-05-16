@@ -8,12 +8,15 @@ CONFIG -= qt
 
 TEMPLATE = app
 
-TARGET = vle
+TARGET = vle-$$VERSION_ABI
+
+VERSION = 0
 
 SOURCES = main.cpp
 
-mac {
+macx {
   QMAKE_CXXFLAGS += -iwithsysroot /usr/include/libxml2
+  QMAKE_CXXFLAGS += -I/usr/local/opt/boost/include
   LIBS += -lxml2
   LIBS += -L../../../src -lvle-2.0
 }
@@ -21,7 +24,7 @@ mac {
 win32 {
 }
 
-unix {
+unix:!macx {
   PKGCONFIG += libxml-2.0
   CONFIG += link_pkgconfig
   LIBS += -L../../../src -lvle-2.0

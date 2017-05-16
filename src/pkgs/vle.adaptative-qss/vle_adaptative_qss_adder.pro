@@ -16,3 +16,7 @@ SOURCES = src/Adder.cpp
 target.path = $$LIBSDIR/pkgs/vle.adaptative-qss/plugins/simulator
 
 INSTALLS += target
+
+macx {
+  LIBS += -L../../../src -lvle-2.0
+}

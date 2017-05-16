@@ -31,6 +31,7 @@
 #include <vle/devs/Executive.hpp>
 #include <vle/utils/Array.hpp>
 #include <vle/vpz/Condition.hpp>
+#include <array>
 
 namespace vle {
 namespace translator {

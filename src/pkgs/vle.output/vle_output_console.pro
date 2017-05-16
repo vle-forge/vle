@@ -19,3 +19,8 @@ other.path = $$LIBSDIR/pkgs/vle.output
 other.files = Authors.txt Description.txt License.txt News.txt Readme.txt
 
 INSTALLS += target other
+
+macx {
+  QMAKE_CXXFLAGS += -I/usr/local/opt/boost/include
+  LIBS += -L../../../src -lvle-2.0
+}

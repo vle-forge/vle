@@ -26,3 +26,8 @@ HEADERS = StoragePluginGUI.h  StoragePluginGUItab.h
 target.path = $$LIBSDIR/pkgs/vle.output/plugins/gvle/output
 
 INSTALLS += target
+
+macx {
+  LIBS += -L../../../../../src -lvle-2.0
+  LIBS += -L../../../../../src/vle/gvle -lgvle-2.0
+}

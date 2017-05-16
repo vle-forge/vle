@@ -17,6 +17,10 @@ VERSION = 0
 
 TEMPLATE = lib
 
+macx {
+  LIBS += -L../../../src -lvle-2.0
+}
+
 TARGET = gvle-$$VERSION_ABI
 
 FORMS = aboutbox.ui gvle_win.ui help.ui

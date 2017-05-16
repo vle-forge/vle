@@ -27,6 +27,8 @@
 #ifndef VLE_UTILS_ALGO_HPP
 #define VLE_UTILS_ALGO_HPP
 
+#include <string>
+
 namespace vle {
 namespace utils {
 
