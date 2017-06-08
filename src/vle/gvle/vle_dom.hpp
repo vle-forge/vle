@@ -348,6 +348,20 @@ public:
                                     DomDiffStack* snapObj = 0);
 
     /**
+     * @brief Return the list of connections from a coupled model
+     * @param coupled, the coupled model : <model type="coupled">
+     * @param connType, either "input", "internal" or "output"
+     * @param origin, true or false
+     * @param submodel, name of the submodel
+     * @param port, name of the submodel port
+     *
+     * @return the list of <connection> of type connType such as the origin
+     * (or the destination depending on 'origin') is the submodel port given
+     * in parameters.
+     */
+    static QList<QDomNode> getConnectionsFromCoupled(QDomNode coupled,
+            QString connType, bool origin, QString submodel, QString port);
+    /**
      * @brief Rename a submodel of a coupled model, and update connections
      * @brief domDoc, used to create QDomNode if necessary
      * @brief atom, is expected to be a coupled model, eg:

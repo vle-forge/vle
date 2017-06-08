@@ -1117,6 +1117,30 @@ vleDomStatic::renamePortToOutNode(QDomNode atom,
     return true;
 }
 
+QList<QDomNode>
+vleDomStatic::getConnectionsFromCoupled(QDomNode coupled,
+        QString connType, bool origin, QString submodel, QString port)
+{
+    QList<QDomNode> ret;
+    QDomNode conns = DomFunctions::obtainChild(coupled, "connections");
+    if (conns.isNull()) {
+        return ret;
+    }
+    QList<QDomNode> connList = DomFunctions::childNodesWithoutText(
+            conns, "connection");
+    for (auto conn : connList) {
+        if (DomFunctions::attributeValue(conn, "type") == connType) {
+            QString toget = origin ? "origin" : "destination";
+            QDomNode el = DomFunctions::obtainChild(conn, toget);
+            if ((DomFunctions::attributeValue(el, "model") == submodel) and
+                    (DomFunctions::attributeValue(el, "port") == port)) {
+                ret.append(conn);
+            }
+        }
+    }
+    return ret;
+}
+
 bool
 vleDomStatic::renameModelIntoCoupled(QDomDocument& domDoc,
                                      QDomNode atom,

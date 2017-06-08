@@ -29,6 +29,8 @@
 #include <QMessageBox>
 #include <QPalette>
 #include <QtDebug>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Map.hpp>
@@ -100,7 +102,26 @@ DomFunctions::toQString(const QDomNode& node)
     QString str;
     QTextStream stream(&str);
     node.save(stream, node.nodeType());
+
     return str;
+}
+
+QStringList
+DomFunctions::toQStringFormat(const QDomNode& node)
+{
+    QString xmlIn = DomFunctions::toQString(node);
+    QString xmlOut;
+    QXmlStreamReader reader(xmlIn);
+    QXmlStreamWriter writer(&xmlOut);
+    writer.setAutoFormatting(true);
+
+    while (!reader.atEnd()) {
+        reader.readNext();
+        if (!reader.isWhitespace()) {
+            writer.writeCurrentToken(reader);
+        }
+    }
+    return xmlOut.split("\n");
 }
 
 void

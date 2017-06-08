@@ -2446,84 +2446,48 @@ vleVpz::rmModelPort(QDomNode node)
     }
     QString ownerModel = DomFunctions::attributeValue(parent, "name");
     if (parent.parentNode().nodeName() == "submodels") {
-        undoStack->snapshot(parent.parentNode().parentNode());
+        // adapt connections at the coupled level (grand_parent)
+        QDomNode grand_parent = parent.parentNode().parentNode();
+        undoStack->snapshot(grand_parent);
         synchronizeUndoStack();
-        // adapt connections at the coupled level
-        QDomNodeList conList = parent.parentNode()
-                                 .parentNode()
-                                 .toElement()
-                                 .elementsByTagName("connections")
-                                 .at(0)
-                                 .toElement()
-                                 .elementsByTagName("connection");
-        for (int i = 0; i < conList.length(); i++) {
-            QDomNode con = conList.at(i);
-            if (portType == "in") {
-                if ((DomFunctions::attributeValue(con, "type") == "input") or
-                    (DomFunctions::attributeValue(con, "type") ==
-                     "internal")) {
-                    QDomNode dest =
-                      con.toElement().elementsByTagName("destination").at(0);
-                    if ((DomFunctions::attributeValue(dest, "model") ==
-                         ownerModel) and
-                        (DomFunctions::attributeValue(dest, "port") ==
-                         oldName)) {
-                        rmModelConnection(con, false);
-                    }
-                }
-            } else if (portType == "out") {
+        // delete internal connections
+        for (auto conn : vleDomStatic::getConnectionsFromCoupled(grand_parent,
+                "internal",(portType=="out"), ownerModel, oldName)) {
+            rmModelConnection(conn, false);
+        }
+        if (portType == "in") {
+            //delete input connections
+            for (auto conn : vleDomStatic::getConnectionsFromCoupled(
+                    grand_parent, "input", false, ownerModel, oldName)) {
+                rmModelConnection(conn, false);
+            }
 
-                if ((DomFunctions::attributeValue(con, "type") == "output") or
-                    (DomFunctions::attributeValue(con, "type") ==
-                     "internal")) {
-                    QDomNode orig =
-                      con.toElement().elementsByTagName("origin").at(0);
-                    if ((DomFunctions::attributeValue(orig, "model") ==
-                         ownerModel) and
-                        (DomFunctions::attributeValue(orig, "port") ==
-                         oldName)) {
-                        rmModelConnection(con, false);
-                    }
-                }
+        } else if (portType == "out") {
+            //delete output connections
+            for (auto conn : vleDomStatic::getConnectionsFromCoupled(
+                    grand_parent, "output", true, ownerModel, oldName)) {
+                rmModelConnection(conn, false);
             }
         }
     } else {
         undoStack->snapshot(parent);
         synchronizeUndoStack();
     }
-    QDomNodeList connSubModels =
-      parent.toElement().elementsByTagName("connections");
-    if (connSubModels.length() == 1) {
-        // adapt the connections at internal level (if submodels)
-        QDomNodeList conList =
-          connSubModels.at(0).toElement().elementsByTagName("connection");
-        for (int i = 0; i < conList.length(); i++) {
-            QDomNode con = conList.at(i);
-            if (portType == "in") {
-                if (DomFunctions::attributeValue(con, "type") == "input") {
-                    QDomNode orig =
-                      con.toElement().elementsByTagName("origin").at(0);
-                    if ((DomFunctions::attributeValue(orig, "model") ==
-                         ownerModel) and
-                        (DomFunctions::attributeValue(orig, "port") ==
-                         oldName)) {
-                        rmModelConnection(con, false);
-                    }
-                }
-            } else if (portType == "out") {
-                if (DomFunctions::attributeValue(con, "type") == "output") {
-                    QDomNode dest =
-                      con.toElement().elementsByTagName("destination").at(0);
-                    if ((DomFunctions::attributeValue(dest, "model") ==
-                         ownerModel) and
-                        (DomFunctions::attributeValue(dest, "port") ==
-                         oldName)) {
-                        rmModelConnection(con, false);
-                    }
-                }
-            }
+    // adapt connections at the parent level (if it's a coupled model)
+    if (portType == "in") {
+        //delete input connections
+        for (auto conn : vleDomStatic::getConnectionsFromCoupled(
+                parent, "input", true, ownerModel, oldName)) {
+            rmModelConnection(conn, false);
+        }
+    } else if (portType == "out") {
+        //delete output connections
+        for (auto conn : vleDomStatic::getConnectionsFromCoupled(
+                parent, "output", false, ownerModel, oldName)) {
+            rmModelConnection(conn, false);
         }
     }
+
     QDomNode outsTag = node.parentNode();
     outsTag.removeChild(node);
     removeTextChilds(outsTag);

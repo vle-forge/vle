@@ -86,6 +86,7 @@ public:
                                 QDomDocument* domDoc = 0);
 
     static QString toQString(const QDomNode& node);
+    static QStringList toQStringFormat(const QDomNode& node);
     /**
      * @brief Remove all childs from a QDomNode (keep attributes)
      */
