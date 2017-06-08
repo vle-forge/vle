@@ -387,6 +387,9 @@ QPushButton:hover{background:url(:/icon/resources/icon/arrow_up_blue.png);}</str
             <height>20</height>
            </size>
           </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::DefaultContextMenu</enum>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(255, 255, 255);</string>
           </property>
@@ -394,7 +397,7 @@ QPushButton:hover{background:url(:/icon/resources/icon/arrow_up_blue.png);}</str
            <bool>false</bool>
           </property>
           <property name="readOnly">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="plainText">
            <string notr="true"/>
