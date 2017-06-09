@@ -112,11 +112,10 @@ private slots:
     void onItemChanged(QTreeWidgetItem* item, int col);
     void onDataChanged(QModelIndex indexTL, QModelIndex indexBR);
     void onFileRenamed(const QString& path, const QString& oldName,
-		       const QString& newName);
+            const QString& newName);
     void onCurrentChanged(const QModelIndex& index);
     void projectConfigureTimer();
     void projectBuildTimer();
-    void projectInstallTimer();
     void remoteInstallTimer();
     void onRefreshFiles();
     void onRightWidgetChanged();
@@ -127,10 +126,6 @@ private slots:
     void onPackageUninstall();
 
 private:
-    void projectInstall();
-
-
-
     Ui::gvleWin*                    ui;
     Logger*                         mLogger;
     QTimer*                         mTimer;
