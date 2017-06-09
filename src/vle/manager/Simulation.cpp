@@ -45,7 +45,8 @@ make_temp(const char* format)
     assert(format);
 
     utils::Path tmp = utils::Path::temp_directory_path();
-    tmp /= utils::Path::unique_path(format);
+    tmp /= format;
+    tmp = utils::Path::unique_path(tmp.string());
 
     return tmp;
 }

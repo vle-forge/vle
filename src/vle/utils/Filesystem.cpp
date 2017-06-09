@@ -446,8 +446,11 @@ Path
 Path::unique_path(const std::string& model)
 {
     std::mt19937 rng;
-
-    rng.seed(std::random_device()());
+#if defined _WIN32
+    rng.seed(std::time(0));
+#else
+    rng.seed(std::random_device{}());
+#endif
     std::uniform_int_distribution<std::mt19937::result_type> distribution(0,
                                                                           16);
 

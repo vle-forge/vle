@@ -64,7 +64,8 @@ struct F
     F()
     {
         current_path = vle::utils::Path::temp_directory_path();
-        current_path /= vle::utils::Path::unique_path("vle-%%%%-%%%%-%%%%");
+        current_path /= "vle-%%%%-%%%%-%%%%";
+        current_path = vle::utils::Path::unique_path(current_path.string());
         current_path.create_directory();
 
         /* We need to ensure each file really installed. */

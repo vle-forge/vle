@@ -321,7 +321,8 @@ public:
             DownloadManager dl(context);
 
             Path filename(Path::temp_directory_path());
-            filename /= Path::unique_path("vledl-%%%%%%%%.pkg");
+            filename /= "vledl-%%%%%%%%.pkg";
+            filename = Path::unique_path(filename.string());
 
             dl.start(url + "/packages.pkg", filename.string());
             dl.join();
