@@ -204,32 +204,34 @@ apply_mask(vle::devs::Executive& executive,
 
     for (int y = y_min, n = y_mask_min; y != y_max; ++y, ++n) {
         for (int x = x_min, m = x_mask_min; x != x_max; ++x, ++m) {
-            switch (params.type) {
-            case regular_graph_generator::connectivity::IN_OUT:
-                executive.addOutputPort(modelnames(c, r), "out");
-                executive.addInputPort(modelnames(x, y), "in");
+            if (not mask(m,n).empty()) {
+                switch (params.type) {
+                case regular_graph_generator::connectivity::IN_OUT:
+                    executive.addOutputPort(modelnames(c, r), "out");
+                    executive.addInputPort(modelnames(x, y), "in");
 
-                executive.addConnection(
-                  modelnames(c, r), "out", modelnames(x, y), "in");
-                break;
+                    executive.addConnection(
+                      modelnames(c, r), "out", modelnames(x, y), "in");
+                    break;
 
-            case regular_graph_generator::connectivity::OTHER:
-                executive.addOutputPort(modelnames(c, r), modelnames(x, y));
-                executive.addInputPort(modelnames(x, y), modelnames(c, r));
+                case regular_graph_generator::connectivity::OTHER:
+                    executive.addOutputPort(modelnames(c, r), modelnames(x, y));
+                    executive.addInputPort(modelnames(x, y), modelnames(c, r));
 
-                executive.addConnection(modelnames(c, r),
-                                        modelnames(x, y),
-                                        modelnames(x, y),
-                                        modelnames(c, r));
-                break;
+                    executive.addConnection(modelnames(c, r),
+                                            modelnames(x, y),
+                                            modelnames(x, y),
+                                            modelnames(c, r));
+                    break;
 
-            case regular_graph_generator::connectivity::NAMED:
-                executive.addOutputPort(modelnames(c, r), mask(m, n));
-                executive.addInputPort(modelnames(x, y), mask(m, n));
+                case regular_graph_generator::connectivity::NAMED:
+                    executive.addOutputPort(modelnames(c, r), mask(m, n));
+                    executive.addInputPort(modelnames(x, y), mask(m, n));
 
-                executive.addConnection(
-                  modelnames(c, r), mask(m, n), modelnames(x, y), mask(m, n));
-                break;
+                    executive.addConnection(
+                      modelnames(c, r), mask(m, n), modelnames(x, y), mask(m, n));
+                    break;
+                }
             }
         }
     }
@@ -274,32 +276,34 @@ apply_wrap_mask(vle::devs::Executive& executive,
             } else
                 continue;
 
-            switch (params.type) {
-            case regular_graph_generator::connectivity::IN_OUT:
-                executive.addOutputPort(modelnames(c, r), "out");
-                executive.addInputPort(modelnames(q, p), "in");
+            if (not mask(m,n).empty()) {
+                switch (params.type) {
+                case regular_graph_generator::connectivity::IN_OUT:
+                    executive.addOutputPort(modelnames(c, r), "out");
+                    executive.addInputPort(modelnames(q, p), "in");
 
-                executive.addConnection(
-                  modelnames(c, r), "out", modelnames(q, p), "in");
-                break;
+                    executive.addConnection(
+                      modelnames(c, r), "out", modelnames(q, p), "in");
+                    break;
 
-            case regular_graph_generator::connectivity::OTHER:
-                executive.addOutputPort(modelnames(c, r), modelnames(q, p));
-                executive.addInputPort(modelnames(q, p), modelnames(c, r));
+                case regular_graph_generator::connectivity::OTHER:
+                    executive.addOutputPort(modelnames(c, r), modelnames(q, p));
+                    executive.addInputPort(modelnames(q, p), modelnames(c, r));
 
-                executive.addConnection(modelnames(c, r),
-                                        modelnames(q, p),
-                                        modelnames(q, p),
-                                        modelnames(c, r));
-                break;
+                    executive.addConnection(modelnames(c, r),
+                                            modelnames(q, p),
+                                            modelnames(q, p),
+                                            modelnames(c, r));
+                    break;
 
-            case regular_graph_generator::connectivity::NAMED:
-                executive.addOutputPort(modelnames(c, r), mask(m, n));
-                executive.addInputPort(modelnames(q, p), mask(m, n));
+                case regular_graph_generator::connectivity::NAMED:
+                    executive.addOutputPort(modelnames(c, r), mask(m, n));
+                    executive.addInputPort(modelnames(q, p), mask(m, n));
 
-                executive.addConnection(
-                  modelnames(c, r), mask(m, n), modelnames(q, p), mask(m, n));
-                break;
+                    executive.addConnection(
+                      modelnames(c, r), mask(m, n), modelnames(q, p), mask(m, n));
+                    break;
+                }
             }
         }
     }
