@@ -299,7 +299,7 @@ public:
                 mask(i, j) = str->toString().value();
                 ++j;
 
-                if (j >= width_mask) {
+                if (j >= height_mask) {
                     i++;
                     j = 0;
                 }
