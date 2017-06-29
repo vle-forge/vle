@@ -160,7 +160,7 @@ public:
 
         vle::translator::graph_generator gg(param);
 
-        gg.make_smallworld(*this,
+        gg.make_scalefree(*this,
                            generator,
                            model_number,
                            events.getDouble("alpha"),
