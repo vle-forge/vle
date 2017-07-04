@@ -80,7 +80,6 @@ void
 Views::delObservable(const std::string& name)
 {
     m_observables.del(name);
-    m_list.clear();
 }
 
 void
