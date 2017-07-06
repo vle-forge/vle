@@ -2503,7 +2503,14 @@ vleVpz::addModelPort(QDomNode node, const QString& type)
     }
     QString newPortName = "NewPort";
 
+    int nbChildren = node.childNodes().size();
     QDomNode portsType = DomFunctions::obtainChild(node, type, &mDoc);
+    if (nbChildren != node.childNodes().size()) {
+        if (portsType != node.firstChild()) {
+            node.insertBefore(portsType, node.firstChild());
+        }
+    }
+
     undoStack->snapshot(portsType);
     synchronizeUndoStack();
 
