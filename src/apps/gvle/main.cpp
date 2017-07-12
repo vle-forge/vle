@@ -31,6 +31,7 @@
 #include <QTranslator>
 #include <QTranslator>
 #include <QtDebug>
+#include <QtGlobal>
 #include <iostream>
 #include <iostream>
 #include <vle/utils/Filesystem.hpp>
@@ -113,6 +114,9 @@ main(int argc, char* argv[])
         }
     }
 #endif
+
+    qunsetenv("QT_HASH_SEED");
+    qputenv("QT_HASH_SEED","0");
 
     QApplication a(argc, argv);
     vle::Init m_app;
