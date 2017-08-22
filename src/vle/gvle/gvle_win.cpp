@@ -979,7 +979,6 @@ gvle_win::menuDistributionsRefresh()
     }
 
     ui->menuDistributions->clear();
-    Distributions::iterator ite = mDistributions.end();
     for (auto& d : mDistributions) {
         QString el = d.first.c_str();
         el += " (";
