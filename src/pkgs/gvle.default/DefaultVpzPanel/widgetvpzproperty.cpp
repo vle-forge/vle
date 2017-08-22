@@ -46,7 +46,7 @@ WidgetVpzPropertyDynamics::~WidgetVpzPropertyDynamics()
 }
 
 void
-WidgetVpzPropertyDynamics::setModel(vleVpz* model, const QString& mod_query)
+WidgetVpzPropertyDynamics::selectModel(vleVpz* model, const QString& mod_query)
 {
     int index = 0;
     int count = 1;
@@ -106,7 +106,7 @@ WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
 }
 
 void
-WidgetVpzPropertyExpCond::setModel(vleVpz* model, const QString& model_query)
+WidgetVpzPropertyExpCond::selectModel(vleVpz* model, const QString& model_query)
 {
     mVpz = model;
     QObject::connect(mVpz, SIGNAL(conditionsUpdated()), this, SLOT(refresh()));
@@ -204,7 +204,7 @@ WidgetVpzPropertyObservables::refresh()
 }
 
 void
-WidgetVpzPropertyObservables::setModel(vleVpz* model,
+WidgetVpzPropertyObservables::selectModel(vleVpz* model,
                                        const QString& model_query)
 {
     mVpz = model;

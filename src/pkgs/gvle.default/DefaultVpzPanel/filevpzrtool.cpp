@@ -180,15 +180,15 @@ FileVpzRtool::updateModelProperty(const QString& model_query)
         ui->modelProperty->setCurrentCell(ROW_NAME, 0);
 
         WidgetVpzPropertyDynamics* wpd = new WidgetVpzPropertyDynamics();
-        wpd->setModel(mVpz, model_query);
+        wpd->selectModel(mVpz, model_query);
         ui->modelProperty->setCellWidget(ROW_DYN, 1, wpd);
 
         WidgetVpzPropertyObservables* wpo = new WidgetVpzPropertyObservables();
-        wpo->setModel(mVpz, model_query);
+        wpo->selectModel(mVpz, model_query);
         ui->modelProperty->setCellWidget(ROW_OBS, 1, wpo);
 
         WidgetVpzPropertyExpCond* wpec = new WidgetVpzPropertyExpCond();
-        wpec->setModel(mVpz, model_query);
+        wpec->selectModel(mVpz, model_query);
         ui->modelProperty->setCellWidget(ROW_EXP, 1, wpec);
 
         ui->modelProperty->resizeRowToContents(ROW_EXP);

@@ -44,7 +44,7 @@ class WidgetVpzPropertyDynamics : public QComboBox
 public:
     explicit WidgetVpzPropertyDynamics(QWidget *parent = 0);
     ~WidgetVpzPropertyDynamics();
-    void setModel(vleVpz* vpz, const QString& mod_query);
+    void selectModel(vleVpz* vpz, const QString& mod_query);
 
 signals:
     void sigActivated(bool isActive);
@@ -63,7 +63,7 @@ class WidgetVpzPropertyExpCond : public QListWidget
 public:
     explicit WidgetVpzPropertyExpCond(QWidget *parent = 0);
     ~WidgetVpzPropertyExpCond();
-    void setModel(vleVpz* vpz, const QString& mod_query);
+    void selectModel(vleVpz* vpz, const QString& mod_query);
 
 //protected:
 //    void mouseDoubleClickEvent (QMouseEvent *event);
@@ -83,7 +83,7 @@ class WidgetVpzPropertyObservables : public QComboBox
 public:
     explicit WidgetVpzPropertyObservables(QWidget *parent = 0);
     ~WidgetVpzPropertyObservables();
-    void setModel(vleVpz* model, const QString& mod_query);
+    void selectModel(vleVpz* model, const QString& mod_query);
 
 public slots:
     void refresh();
