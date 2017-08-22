@@ -36,22 +36,6 @@
 #include <io.h>
 #endif
 
-#ifdef VLE_HAVE_EXECINFO_H
-#include <execinfo.h>
-#endif
-
-#ifdef VLE_HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-
-#ifdef VLE_HAVE_GCC_ABI_DEMANGLE
-#include <cxxabi.h>
-#endif
-
-#ifdef G_OS_UNIX
-#include <unistd.h>
-#endif
-
 namespace vle {
 namespace utils {
 
@@ -305,37 +289,6 @@ toScientificString(const double& v, bool locale)
     o << std::setprecision(std::numeric_limits<double>::digits10) << v;
 
     return o.str();
-}
-
-std::string
-demangle(const std::type_info& in)
-{
-    std::string result;
-#ifdef VLE_HAVE_GCC_ABI_DEMANGLE
-    result.assign(utils::demangle(in.name()));
-#else
-    result.assign(in.name());
-#endif
-    return result;
-}
-
-std::string
-demangle(const std::string& in)
-{
-    std::string result;
-#ifdef VLE_HAVE_GCC_ABI_DEMANGLE
-    char* output = nullptr;
-    int status;
-    output = abi::__cxa_demangle(in.c_str(), nullptr, nullptr, &status);
-    if (status == 0 and output) {
-        result.assign(output);
-    }
-
-    free(output);
-#else
-    result.assign(in);
-#endif
-    return result;
 }
 
 void

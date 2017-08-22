@@ -165,9 +165,8 @@ public:
 
             error->code = 0;
         } catch (const std::exception& e) {
-            error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%")) %
-                              utils::demangle(typeid(e)) % e.what())
-                               .str();
+            error->message = utils::format(_("\n/!\\ error reported: %s\n"),
+                                           e.what());
             error->code = -1;
         }
 
@@ -215,9 +214,8 @@ public:
 
             error->code = 0;
         } catch (const std::exception& e) {
-            error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%")) %
-                              utils::demangle(typeid(e)) % e.what())
-                               .str();
+            error->message = utils::format(_("\n/!\\ error reported: %s\n"),
+                                           e.what());
             error->code = -1;
         }
 
@@ -243,9 +241,8 @@ public:
 
             error->code = 0;
         } catch (const std::exception& e) {
-            error->message = (fmt(_("\n/!\\ vle error reported: %1%\n%2%")) %
-                              utils::demangle(typeid(e)) % e.what())
-                               .str();
+            error->message = utils::format(_("\n/!\\ error reported: %s\n"),
+                                           e.what());
             error->code = -1;
         }
 

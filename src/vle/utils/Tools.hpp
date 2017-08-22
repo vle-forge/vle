@@ -176,26 +176,6 @@ VLE_API bool isLocaleAvailable(const std::string& locale);
 VLE_API std::string toScientificString(const double& v, bool locale = false);
 
 /**
- * Demangle the input type info from C++ compiler.
- * http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/namespaceabi.html
- *
- * @param in the std::type_info to demangle.
- *
- * @return the demangled string or the same if libcwd is not linked.
- */
-VLE_API std::string demangle(const std::type_info& in);
-
-/**
- * Demangle the input string from C++ compiler.
- * http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/namespaceabi.html
- *
- * @param in the string to demangle.
- *
- * @return the demangled string or the same if libcwd is not linked.
- */
-VLE_API std::string demangle(const std::string& in);
-
-/**
  * Tokenize a string with a delimiter
  * @param[in]  str, the string to tokenize
  * @param[out] toks, vector filled with tokens
