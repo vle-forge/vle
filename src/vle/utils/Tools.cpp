@@ -124,7 +124,7 @@ is(const std::string& str)
 }
 
 template <>
-bool
+bool VLE_API
 is<bool>(const std::string& str)
 {
     if (str == "true")
@@ -140,7 +140,6 @@ is<bool>(const std::string& str)
     return not s.fail();
 }
 
-template VLE_API bool is<bool>(const std::string& str);
 template VLE_API bool is<int8_t>(const std::string& str);
 template VLE_API bool is<int16_t>(const std::string& str);
 template VLE_API bool is<int32_t>(const std::string& str);
@@ -160,7 +159,7 @@ to(const T t)
 }
 
 template <>
-std::string
+std::string VLE_API
 to<bool>(const bool t)
 {
     if (t) {
@@ -170,7 +169,6 @@ to<bool>(const bool t)
     }
 }
 
-template VLE_API std::string to<bool>(const bool t);
 template VLE_API std::string to<int8_t>(const int8_t t);
 template VLE_API std::string to<int16_t>(const int16_t t);
 template VLE_API std::string to<int32_t>(const int32_t t);
