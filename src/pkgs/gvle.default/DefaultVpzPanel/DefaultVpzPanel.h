@@ -60,7 +60,7 @@ public:
     void init(const gvle_file& file, utils::Package* pkg, Logger*,
             gvle_plugins* plugs, const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
-    void discard(){};
+    void discard() override {}
     void save() override;
     void setSimLeftWidget(QWidget*);
     PluginMainPanel* newInstance() override {return new DefaultVpzPanel();}

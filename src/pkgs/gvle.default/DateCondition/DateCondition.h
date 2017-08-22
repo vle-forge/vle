@@ -58,7 +58,7 @@ public:
     void setSettings(QSettings *s) override;
     void setLogger(Logger *logger) override;
     void init(vleVpz* vpz, const QString& cond) override;
-    PluginExpCond* newInstance() {return new DateCondition();}
+    PluginExpCond* newInstance() override {return new DateCondition();}
 
 public slots:
     void dateSelected(QDate date);
