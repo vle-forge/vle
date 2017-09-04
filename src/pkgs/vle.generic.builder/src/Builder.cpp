@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <random>
+#include <functional>
 #include <vle/devs/Executive.hpp>
 #include <vle/translator/GraphTranslator.hpp>
 #include <vle/translator/MatrixTranslator.hpp>
