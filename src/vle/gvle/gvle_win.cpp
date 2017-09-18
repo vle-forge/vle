@@ -1298,7 +1298,10 @@ gvle_win::onCustomContextMenu(const QPoint& point)
     action = ctxMenu.addAction(tr("Copy File"));
     action->setData(3);
     action->setDisabled(
-      (suffix != "vpz" and suffix != "cpp" and suffix != "cpp") or
+      (suffix != "vpz" and
+       suffix != "cpp" and
+       suffix != "txt" and
+       suffix != "cpp") or
       (not(inExp or inSrc or inData)));
     ctxMenu.addSeparator();
     QMenu* subMenu = ctxMenu.addMenu("Add model");
