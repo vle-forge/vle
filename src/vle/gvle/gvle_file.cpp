@@ -136,7 +136,11 @@ gvle_file::newInstanceMainPanel(gvle_plugins& plugins)
         return plugins.newInstanceMainPanelVpzPlugin(plug_name);
         break;
     case gvleplug::GVLE_PLUG_MAIN_DATA:
-        return plugins.newInstanceMainPanelDataPlugin(plug_name);
+        if (relPath != "data/CMakeLists.txt") {
+            return plugins.newInstanceMainPanelDataPlugin(plug_name);
+        } else {
+            return 0;
+        }
         break;
     case gvleplug::GVLE_PLUG_NONE:
         if (relPath == "Description.txt") {
