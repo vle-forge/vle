@@ -1554,7 +1554,7 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
     setActionType(action, VDMA_Add_atomic_model);
     action->setEnabled(sel and isVpzMainModel(sel) and
                        not(static_cast<VpzMainModelItem*>(sel)->isAtomic()));
-    action = menu.addAction("Add coupled port");
+    action = menu.addAction("Add coupled model");
     setActionType(action, VDMA_Add_coupled_model);
     action->setEnabled(sel and isVpzMainModel(sel) and
                        not(static_cast<VpzMainModelItem*>(sel)->isAtomic()));
