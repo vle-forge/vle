@@ -2212,6 +2212,12 @@ vleVpz::addModel(QDomNode node, const QString& type, QPointF pos)
     QDomNode outPort = getDomDoc().createElement("out");
     newModel.appendChild(inPort);
     newModel.appendChild(outPort);
+    if (type == "coupled") {
+        QDomNode sub = getDomDoc().createElement("submodels");
+        newModel.appendChild(sub);
+        QDomNode con = getDomDoc().createElement("connections");
+        newModel.appendChild(con);
+    }
     subModels.appendChild(newModel);
     emit modelsUpdated();
 }
