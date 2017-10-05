@@ -165,6 +165,7 @@ public:
     std::vector<std::string> log_messages;
     unsigned int index_message;
 
+    bool mNormalized;
 
 public slots:
     void onSimulationFinished();
@@ -176,6 +177,7 @@ public slots:
     void onTreeItemSelected();
     void onTimeout();
     void onToolColor();
+    void onNormalized(int state);
 };
 
 }} //namespaces
