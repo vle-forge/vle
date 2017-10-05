@@ -198,6 +198,7 @@ DefaultSimSubpanel::DefaultSimSubpanel()
   , portsToPlot()
   , log_messages()
   , index_message(0)
+  , mNormalized(false)
 {
     QObject::connect(
       left->ui->runButton, SIGNAL(pressed()), this, SLOT(onRunPressed()));
@@ -213,8 +214,14 @@ DefaultSimSubpanel::DefaultSimSubpanel()
                      SIGNAL(valueChanged(int)),
                      this,
                      SLOT(onBlockSizeChanged(int)));
-    QObject::connect(
-      right->ui->butSimColor, SIGNAL(clicked()), this, SLOT(onToolColor()));
+    QObject::connect(right->ui->butSimColor,
+                     SIGNAL(clicked()),
+                     this,
+                     SLOT(onToolColor()));
+    QObject::connect(right->ui->Normalized,
+                     SIGNAL(stateChanged(int)),
+                     this,
+                     SLOT(onNormalized(int)));
     QObject::connect(right->ui->treeSimViews,
                      SIGNAL(itemChanged(QTreeWidgetItem*, int)),
                      this,
@@ -398,6 +405,9 @@ DefaultSimSubpanel::updateCustomPlot()
     minxi = minxi - (maxxi - minxi) / 100;
     maxxi = maxxi + (maxxi - minxi) / 100;
 
+    double ominyi = minyi;
+    double omaxyi = maxyi;
+
     if (maxyi <= minyi) {
         minyi = minyi - 0.5;
         maxyi = maxyi + 0.5;
@@ -422,9 +432,26 @@ DefaultSimSubpanel::updateCustomPlot()
         }
         if (index != -1) {
             QVector<double> x(view.rows() - 1), y(view.rows() - 1);
+            double localminyi = 99999999;
+            double localmaxyi = -99999999;
+            for (unsigned int i = 1; i < view.rows(); ++i) {
+                double yi = getDouble(view, index, i, false);
+                if (yi < localminyi) {
+                    localminyi = yi;
+                }
+                if (yi > localmaxyi) {
+                    localmaxyi = yi;
+                }
+            }
+
+            double ratio = 1;
+
+            if (mNormalized) {
+                ratio = (omaxyi - ominyi) / (localmaxyi - localminyi);
+            }
             for (unsigned int i = 1; i < view.rows(); ++i) {
                 x[i - 1] = view.getDouble(0, i); // time
-                y[i - 1] = getDouble(view, index, i, false);
+                y[i - 1] = ratio * getDouble(view, index, i, false);
             }
             // create graph and assign data to it:
             left->customPlot->addGraph();
@@ -547,6 +574,7 @@ DefaultSimSubpanel::onRunPressed()
     // delete custom plot
     delete left->customPlot;
     left->customPlot = new QCustomPlot();
+    left->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
     showCustomPlot(false);
     portsToPlot.erase(portsToPlot.begin(), portsToPlot.end());
 
@@ -624,6 +652,13 @@ DefaultSimSubpanel::onTreeItemChanged(QTreeWidgetItem* item, int col)
     } else {
         removePortToPlot(viewName, portName);
     }
+    updateCustomPlot();
+}
+
+void
+    DefaultSimSubpanel::onNormalized(int state)
+{
+    mNormalized = (state == 2);
     updateCustomPlot();
 }
 
