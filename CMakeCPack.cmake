@@ -144,6 +144,10 @@ if (WITH_WIN32_INSTALLER)
     FILES_MATCHING PATTERN "Qt5CLucene*.dll")
   install(DIRECTORY "${MINGW_INSTALL}/bin/" DESTINATION bin 
     FILES_MATCHING PATTERN "Qt5PrintSupport*.dll")
+  install(DIRECTORY "${MINGW_INSTALL}/bin/" DESTINATION bin
+    FILES_MATCHING PATTERN "Qt5Svg*.dll")
+  install(DIRECTORY "${MINGW_INSTALL}/bin/" DESTINATION bin 
+    FILES_MATCHING PATTERN "Qt5XmlPatterns*.dll")
   install(DIRECTORY "${MINGW_INSTALL}/bin/" DESTINATION bin 
     PATTERN "Qt*.dll" EXCLUDE
     PATTERN "windeployqt.exe" EXCLUDE
@@ -171,6 +175,10 @@ if (WITH_WIN32_INSTALLER)
   install(DIRECTORY "${MINGW_INSTALL}/lib/" DESTINATION lib 
     FILES_MATCHING PATTERN "libQt5PrintSupport*.dll.a")
   install(DIRECTORY "${MINGW_INSTALL}/lib/" DESTINATION lib
+    FILES_MATCHING PATTERN "libQt5Svg*.dll.a")
+  install(DIRECTORY "${MINGW_INSTALL}/lib/" DESTINATION lib
+    FILES_MATCHING PATTERN "libQt5XmlPatterns*.dll.a")
+  install(DIRECTORY "${MINGW_INSTALL}/lib/" DESTINATION lib
     PATTERN "libQt5*" EXCLUDE
     PATTERN "libboost*" EXCLUDE
     PATTERN "terminfo" EXCLUDE)
@@ -182,6 +190,8 @@ if (WITH_WIN32_INSTALLER)
   install(DIRECTORY "${MINGW_INSTALL}/include/QtSql" DESTINATION include)
   install(DIRECTORY "${MINGW_INSTALL}/include/QtWidgets" DESTINATION include)
   install(DIRECTORY "${MINGW_INSTALL}/include/QtCLucene" DESTINATION include)
+  install(DIRECTORY "${MINGW_INSTALL}/include/QtSvg" DESTINATION include)
+  install(DIRECTORY "${MINGW_INSTALL}/include/QtXmlPatterns" DESTINATION include)
   install(DIRECTORY "${MINGW_INSTALL}/include/" DESTINATION include
     PATTERN "Qt*" EXCLUDE
     PATTERN "boost" EXCLUDE)
