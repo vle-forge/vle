@@ -104,7 +104,7 @@ VpzPortItem::VpzPortItem(QDomNode node,
     this->setAcceptHoverEvents(true);
 
     QPixmap pix(":/icon/resources/icon/vpz_inport.png");
-    QGraphicsTextItem* textItem = new QGraphicsTextItem(getPortName(), this);
+    VleLineEditItem* textItem = new VleLineEditItem(getPortName(), this);
     textItem->setFont(scene->getFontPort());
     //    textItem->setDefaultTextColor(Qt::black);
     // textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -129,7 +129,7 @@ void
 VpzPortItem::update(const QRectF& /*rect*/)
 {
     QGraphicsPixmapItem* pixItem = getPixItem();
-    QGraphicsTextItem* textItem = getTextItem();
+    VleLineEditItem* textItem = getTextItem();
     if (mInput) {
         pixItem->setPos(0,
                         textItem->boundingRect().height() / 2 -
@@ -174,13 +174,13 @@ VpzPortItem::getPortName()
     return DomFunctions::attributeValue(mnode, "name");
 }
 
-QGraphicsTextItem*
+VleLineEditItem*
 VpzPortItem::getTextItem() const
 {
     QList<QGraphicsItem*> chs = QGraphicsItem::childItems();
     for (int i = 0; i < chs.length(); i++) {
-        if (chs.at(i)->type() == 8) { // 8 is for QGraphicsTextItem
-            return static_cast<QGraphicsTextItem*>(chs.at(i));
+        if (chs.at(i)->type() == 8) { // 8 is for VleLineEditItem
+            return static_cast<VleLineEditItem*>(chs.at(i));
         }
     }
     return 0;
@@ -201,7 +201,7 @@ VpzPortItem::getPixItem() const
 void
 VpzPortItem::setNameEdition(bool val)
 {
-    QGraphicsTextItem* textItem = getTextItem();
+    VleLineEditItem* textItem = getTextItem();
     if (val and textItem->textInteractionFlags() == Qt::NoTextInteraction) {
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         textItem->setFocus(
@@ -254,13 +254,13 @@ VpzModelItem::VpzModelItem(QDomNode node,
 {
 }
 
-QGraphicsTextItem*
+VleLineEditItem*
 VpzModelItem::getTitle() const
 {
     QList<QGraphicsItem*> children = childItems();
     for (int i = 0; i < children.length(); i++) {
-        if (children.at(i)->type() == 8) { // 8 for QGraphicsTextItem
-            return static_cast<QGraphicsTextItem*>(children.at(i));
+        if (children.at(i)->type() == 8) { // 8 for VleLineEditItem
+            return static_cast<VleLineEditItem*>(children.at(i));
         }
     }
     return 0;
@@ -404,7 +404,7 @@ void
 VpzModelItem::setNameEdition(bool val)
 {
 
-    QGraphicsTextItem* textItem = getTitle();
+    VleLineEditItem* textItem = getTitle();
     if (val and textItem->textInteractionFlags() == Qt::NoTextInteraction) {
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         textItem->setFocus(
@@ -472,7 +472,7 @@ VpzSubModelItem::initializeFromDom()
     VpzDiagScene* vpzscene = static_cast<VpzDiagScene*>(scene());
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsMovable, false);
     QGraphicsItem::setFlag(QGraphicsItem::ItemIsSelectable, true);
-    QGraphicsTextItem* it = new QGraphicsTextItem(getModelName(), this);
+    VleLineEditItem* it = new VleLineEditItem(getModelName(), this);
     it->setFont(vpzscene->getFontModel());
 
     QGraphicsRectItem* rec = new QGraphicsRectItem(QRectF(), this);
@@ -722,7 +722,7 @@ VpzMainModelItem::initializeFromDom()
         VpzSubModelItem* mod = new VpzSubModelItem(n, mVpz, this, vpzscene);
         mod->setPos(QPointF(std::max(wports + margin, x), std::max(0.0, y)));
     }
-    QGraphicsTextItem* it = new QGraphicsTextItem(getModelName(), this);
+    VleLineEditItem* it = new VleLineEditItem(getModelName(), this);
     it->setFont(vpzscene->getFontModel());
     it->setDefaultTextColor(vpzscene->getColorModelNameNotSelected());
     update();
