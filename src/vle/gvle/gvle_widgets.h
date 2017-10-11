@@ -39,6 +39,7 @@
 #include <vle/value/Value.hpp>
 //#include <QtWidgets/QStackedWidget>
 #include <QStackedWidget>
+#include <QSyntaxHighlighter>
 
 #include <iostream>
 
@@ -392,6 +393,98 @@ protected:
             QGraphicsTextItem::keyPressEvent(event);
         }
     }
+};
+
+/**
+ * C++ code Editor
+ */
+
+class VleCodeEdit;
+
+class VleCodeHighlighter : public QSyntaxHighlighter
+{
+    Q_OBJECT
+
+public:
+    VleCodeHighlighter(QTextDocument *parent = 0);
+
+protected:
+    void highlightBlock(const QString &text) override;
+
+private:
+    struct HighlightingRule
+    {
+        QRegExp pattern;
+        QTextCharFormat format;
+    };
+
+    QVector<HighlightingRule> highlightingRules;
+
+    QRegExp commentStartExpression;
+    QRegExp commentEndExpression;
+
+    QTextCharFormat keywordFormat;
+    QTextCharFormat classFormat;
+    QTextCharFormat singleLineCommentFormat;
+    QTextCharFormat multiLineCommentFormat;
+    QTextCharFormat quotationFormat;
+    QTextCharFormat functionFormat;
+};
+
+class VleCodeLineNumberArea : public QWidget
+{
+public:
+    VleCodeLineNumberArea(VleCodeEdit *editor);
+
+    QSize sizeHint() const override;
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    VleCodeEdit *codeEditor;
+};
+
+class VleCodeEdit : public QPlainTextEdit
+{
+    Q_OBJECT
+
+public:
+    VleCodeEdit(QWidget *parent = 0);
+    VleCodeEdit(QWidget* parent, const QString& text, const QString& id="",
+		bool editOnDbleClick = false);
+
+    void VleCodelineNumberAreaPaintEvent(QPaintEvent *event);
+    int VleCodelineNumberAreaWidth();
+
+    void setText(const QString& text);
+    void setTextEdition(bool val);
+    QString getSavedText();
+    QString getCurrentText();
+
+    void focusOutEvent(QFocusEvent* e);
+    void focusInEvent(QFocusEvent* e);
+    void mouseDoubleClickEvent(QMouseEvent* e);
+    QString saved_value;
+    QString id;
+    bool edit_on_dble_click;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
+private slots:
+    void updateVleCodeLineNumberAreaWidth(int newBlockCount);
+    void highlightCurrentLine();
+    void updateVleCodeLineNumberArea(const QRect &, int);
+
+private:
+    VleCodeHighlighter* m_highlighter;
+    QWidget *m_lineNumberArea;
+
+signals:
+    void textUpdated(const QString& id, const QString& old,
+		     const QString& newVal);
+    void selected(const QString& id);
 };
 
 }}//namespaces

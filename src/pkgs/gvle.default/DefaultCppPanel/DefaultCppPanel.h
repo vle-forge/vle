@@ -27,82 +27,12 @@
 
 #include <QWidget>
 #include <QObject>
-#include <QTextEdit>
-#include <QSyntaxHighlighter>
 #include <vle/gvle/plugin_mainpanel.h>
 #include <vle/gvle/gvle_file.h>
+#include <vle/gvle/gvle_widgets.h>
 
 namespace vle {
 namespace gvle {
-
-class CodeEditor;
-
-class Highlighter : public QSyntaxHighlighter
-{
-    Q_OBJECT
-
-public:
-    Highlighter(QTextDocument *parent = 0);
-
-protected:
-    void highlightBlock(const QString &text) override;
-
-private:
-    struct HighlightingRule
-    {
-        QRegExp pattern;
-        QTextCharFormat format;
-    };
-
-    QVector<HighlightingRule> highlightingRules;
-
-    QRegExp commentStartExpression;
-    QRegExp commentEndExpression;
-
-    QTextCharFormat keywordFormat;
-    QTextCharFormat classFormat;
-    QTextCharFormat singleLineCommentFormat;
-    QTextCharFormat multiLineCommentFormat;
-    QTextCharFormat quotationFormat;
-    QTextCharFormat functionFormat;
-};
-
-class LineNumberArea : public QWidget
-{
-public:
-    LineNumberArea(CodeEditor *editor);
-
-    QSize sizeHint() const override;
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-
-private:
-    CodeEditor *codeEditor;
-};
-
-class CodeEditor : public QPlainTextEdit
-{
-    Q_OBJECT
-
-public:
-    CodeEditor(QWidget *parent = 0);
-
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
-    int lineNumberAreaWidth();
-
-protected:
-    void resizeEvent(QResizeEvent *event) override;
-
-private slots:
-    void updateLineNumberAreaWidth(int newBlockCount);
-    void highlightCurrentLine();
-    void updateLineNumberArea(const QRect &, int);
-
-private:
-    Highlighter* m_highlighter;
-    QWidget *m_lineNumberArea;
-};
 
 class DefaultCppPanel : public PluginMainPanel
 {
@@ -129,7 +59,7 @@ public:
 public slots:
     void onUndoAvailable(bool);
 public:
-    CodeEditor* m_edit;
+    VleCodeEdit* m_edit;
     QString m_file;
 
 private:
