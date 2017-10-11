@@ -63,49 +63,46 @@ cpack.exe --debug --verbose -G NSIS
 #set QT_QPA_PLATFORM_PLUGIN_PATH=%install_dir%\vle\share\qt5\plugins\platforms\
 #set QT_PLUGIN_PATH=%install_dir%\vle\share\qt5\plugins\
 
+**************************************************************
+** Build RVLE natively on WIN32, 32 bits
+**************************************************************
+Install MSYS2:   msys2-i686-20161025.exe
+Install R-3.4.0-win
+Install Rtools34
 
-## RVLE
+#####
+#
+# In c:\msys32\etc\pacman.conf
+# use curl for downloading uncomment line (if required):
+# 
+# XferCommand = /usr/bin/curl -C - -f %u > %o
+#
+###
 
-First, install most recent version of
-[Rtools](https://cran.r-project.org/bin/windows/Rtools/) and
-[R](https://cran.r-project.org/bin/windows/base) programs. Then, we need to
-rebuild VLE with the compiler provided by Rtools to avoid ABI problem (msys2
-comes with gcc6):
+pacman -S --force mingw-w64-i686-cmake          ## 3.6.2-1
+pacman -S --force mingw-w64-i686-gcc            ## 6.2.0-2
+pacman -S --force mingw-w64-i686-make           ## 4.1.2351.a80a8b8-1
+pacman -S --force mingw-w64-i686-boost          ## 1.62.0-1
+pacman -S --force mingw-w64-i686-gdb            ## 7.12-1
+pacman -S --force mingw-w64-i686-libxml2        ## 2-2.9.4-2
 
-set PATH=C:\Rtools\mingw_32\bin;C:\Program Files\R\R-3.3.2\bin\i386;d:\msys64\usr\bin;D:\msys64\mingw32\bin;
-set VLE_DIR=d:\natifvle\vle
-set install_dir=d:\natifvle\install-rvle
-mkdir %VLE_DIR%\buildvle-rvle
-d:
-cd %VLE_DIR%\buildvle-rvle
-cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=OFF -DWITH_WIN32_INSTALLER=OFF -DCMAKE_INSTALL_PREFIX=%install_dir% -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+
+## In CMD
+
+set VLE_DIR=c:\natifvle\vle
+set PATH=C:\Rtools\mingw_32\bin;C:\Program Files\R\R-3.4.0\bin\i386;c:\msys32\mingw32\bin
+mkdir %VLE_DIR%\buildrvle-32
+cd %VLE_DIR%\buildrvle-32
+cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=OFF -DWITH_WIN32_INSTALLER=OFF -DCMAKE_INSTALL_PREFIX=c:/natifvle/install/rvle/32 -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 mingw32-make -j2
 mingw32-make install
 
-Now, we install rvle dependencies with msys2:
 
-pacman -S --force mingw-w64-i686-pkg-config
-pacman -S --force autoconf
-pacman -S --force automake
+set PATH=C:\Program Files\R\R-3.4.0\bin;c:\msys32\usr\bin;C:\Rtools\bin
+set MINGW_PATH=c:/msys32
+set VLE_PATH=c:/natifvle/install/rvle
+cd c:\natifvle
+R CMD build rvle
+R CMD INSTALL --build rvle
 
 
-# msys2
-
-export PKG_CONFIG_PATH=/d/natifvle/install-rvle/lib/pkgconfig
-cp -r /d/vle-2.0.0-dev/lib/pkgconfig/*.pc /d/natifvle/install-rvle/lib/pkgconfig
-cp /d/vle-2.0.0-dev/lib/libxml2.* /d/natifvle/install-rvle/lib/
-cp /d/vle-2.0.0-dev/lib/libz.* /d/natifvle/install-rvle/lib/
-cp /d/vle-2.0.0-dev/lib/liblzma.* /d/natifvle/install-rvle/lib/
-cp /d/vle-2.0.0-dev/lib/libiconv.* /d/natifvle/install-rvle/lib/
-
-cd /d/natifvle/rvle
-./autogen.sh
-
-# cmd.exe
-
-set PATH=c:\Rtools\bin;C:\Rtools\mingw_32\bin;C:\Program Files\R\R-3.3.2\bin\i386;d:\msys64\usr\bin;D:\msys64\mingw32\bin;
-set PKG_CONFIG_PATH=D:\natifvle\install-rvle\lib\pkgconfig
-d:
-cd d:\natifvle
-R CMD INSTALL --build rvle --no-multiarch
-pause
