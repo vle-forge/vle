@@ -1236,7 +1236,8 @@ vleDomStatic::renameModelIntoStructures(QDomDocument& domDoc,
                                         QString new_model,
                                         DomDiffStack* snapObj)
 {
-    if (atom.nodeName() != "structures") {
+    if (atom.nodeName() != "structures" &&
+        atom.nodeName() != "class") {
         qDebug()
           << "Internal error in vleDomStatic::renameModelIntoStructures "
           << atom.nodeName();
