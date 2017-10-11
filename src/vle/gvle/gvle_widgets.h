@@ -35,6 +35,7 @@
 #include <QTableWidget>
 #include <QLabel>
 #include <QLineEdit>
+#include <QGraphicsTextItem>
 #include <vle/value/Value.hpp>
 //#include <QtWidgets/QStackedWidget>
 #include <QStackedWidget>
@@ -366,6 +367,31 @@ private:
     void setComplexWidget(const QString& id, const vle::value::Value& val,
             int r, int c);
 
+};
+
+/**
+ * single line QGraphicsTextItem
+ */
+
+class VleLineEditItem : public QGraphicsTextItem {
+    Q_OBJECT
+public:
+    explicit VleLineEditItem(const QString& text, QGraphicsItem* parent = 0) :
+    QGraphicsTextItem(text, parent) {}
+signals:
+    void returnPressed();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) {
+        switch (event->key()) {
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+            emit returnPressed();
+            break;
+        default:
+            QGraphicsTextItem::keyPressEvent(event);
+        }
+    }
 };
 
 }}//namespaces

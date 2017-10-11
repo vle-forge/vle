@@ -36,6 +36,7 @@
 #include <QUndoView>
 
 #include <vle/gvle/vlevpz.hpp>
+#include <vle/gvle/gvle_widgets.h>
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif
@@ -108,7 +109,7 @@ public:
                 QWidget *widget = 0);
     QPointF getConnectionPoint();
     QString getPortName();
-    QGraphicsTextItem* getTextItem() const;
+    VleLineEditItem* getTextItem() const;
     QGraphicsPixmapItem* getPixItem() const;
     void setNameEdition(bool val);
     int type() const;
@@ -125,7 +126,7 @@ class VpzModelItem : public QGraphicsItem
 public:
     VpzModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
                 QGraphicsScene* scene);
-    QGraphicsTextItem* getTitle() const;
+    VleLineEditItem* getTitle() const;
     QGraphicsRectItem* getRectangle() const;
 
     QList<VpzPortItem*> getInPorts();
