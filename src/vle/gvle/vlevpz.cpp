@@ -2008,7 +2008,8 @@ vleVpz::renameModel(QDomNode node, const QString& newName)
     }
     QString oldName = DomFunctions::attributeValue(node, "name");
     bool modif = false;
-    if (node.parentNode().nodeName() == "structures") {
+    if (node.parentNode().nodeName() == "structures" ||
+        node.parentNode().nodeName() == "class") {
         modif = vleDomStatic::renameModelIntoStructures(
           mDoc, node.parentNode(), oldName, newName, undoStack);
     } else {
