@@ -195,7 +195,7 @@ public:
     void join() noexcept
     {
         try {
-            if (mIsStarted and not mIsFinish and mThread.joinable()) {
+            if (mThread.joinable()) {
                 mThread.join();
             }
         } catch (const std::exception& e) {
