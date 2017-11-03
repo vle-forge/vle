@@ -217,9 +217,10 @@ public:
             }
             break;
         default:
-            return vd::infinity;
             break;
         }
+
+        return vd::infinity;
     }
 
     void confluentTransitions(vd::Time time,
