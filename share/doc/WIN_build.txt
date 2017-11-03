@@ -14,13 +14,13 @@ Install NSIS:    3.0
 ###
 
 pacman -S --force mingw-w64-i686-cmake          ## 3.6.2-1
-pacman -S --force mingw-w64-i686-gcc            ## 6.2.0-2
-pacman -S --force mingw-w64-i686-make           ## 4.1.2351.a80a8b8-1
-pacman -S --force mingw-w64-i686-libxml2        ## 2-2.9.4-2
-pacman -S --force mingw-w64-i686-qt5            ## 5.6.2-4
-pacman -S --force mingw-w64-i686-boost          ## 1.62.0-1
-pacman -S --force mingw-w64-i686-gdb            ## 7.12-1
-pacman -S --force mingw-w64-i686-gcc-fortran    ## 6.2.0-2
+pacman -S --force mingw-w64-i686-gcc            ## 6.3.0-1
+pacman -S --force mingw-w64-i686-make           ## 4.2.1-1
+pacman -S --force mingw-w64-i686-libxml2        ## 2.9.5-1
+pacman -S --force mingw-w64-i686-qt5            ## 5.9.2-2
+pacman -S --force mingw-w64-i686-boost          ## 1.64.0-3
+pacman -S --force mingw-w64-i686-gdb            ## 8.0.1-2
+pacman -S --force mingw-w64-i686-gcc-fortran    ## 7.2.0-1
 
 ## Note pb gdb : see issue : https://github.com/Alexpux/MINGW-packages/issues/2203
 # wget http://repo.msys2.org/mingw/i686/mingw-w64-i686-gdb-7.11.1-4-any.pkg.tar.xz
