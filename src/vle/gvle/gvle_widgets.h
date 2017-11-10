@@ -35,6 +35,7 @@
 #include <QTableWidget>
 #include <QLabel>
 #include <QLineEdit>
+#include <QDateEdit>
 #include <QGraphicsTextItem>
 #include <vle/value/Value.hpp>
 //#include <QtWidgets/QStackedWidget>
@@ -106,6 +107,32 @@ public slots:
     void onValueChanged();
 signals:
     void valUpdated(const QString& id, double v);
+    void selected(const QString& id);
+};
+
+/**
+ * A day editor Editor
+ */
+class VleDayEdit : public QDateEdit
+{
+    Q_OBJECT
+public:
+
+    VleDayEdit(QWidget* parent, const QString day,
+	       const QString format="yyyy-M-d",
+	       const QString& idStr="",
+	       bool withDefaultMenu = true);
+    ~VleDayEdit();
+    void focusInEvent(QFocusEvent* e);
+    bool eventFilter(QObject *target, QEvent *event);
+    void setValue(const QString day);
+
+    QString id;
+    QString backup;
+public slots:
+    void onValueChanged();
+signals:
+    void valUpdated(const QString& id, const QString& d);
     void selected(const QString& id);
 };
 

@@ -196,6 +196,74 @@ VleDoubleEdit::onValueChanged()
     }
 }
 
+VleDayEdit::VleDayEdit(QWidget* parent,
+                       const QString day,
+                       const QString format,
+                       const QString& idStr,
+                       bool withDefaultMenu)
+  : QDateEdit(parent)
+  , id(idStr)
+  , backup(day)
+{
+    if (not withDefaultMenu) {
+        setContextMenuPolicy(Qt::NoContextMenu);
+    }
+
+    setDisplayFormat(format);
+    setDate(QDate::fromString(day, format));
+
+    QObject::connect(
+        this, SIGNAL(editingFinished()), this, SLOT(onValueChanged()));
+
+    installEventFilter(this);
+}
+
+VleDayEdit::~VleDayEdit()
+{
+}
+
+void
+VleDayEdit::setValue(QString day)
+{
+    setDate(QDate::fromString(day,
+                              "yyyy-M-d"));
+}
+
+bool
+VleDayEdit::eventFilter(QObject* target, QEvent* event)
+{
+    if (target == this) {
+        switch (event->type()) {
+        case QEvent::FocusOut:
+            if (text().isEmpty()) {
+                setValue(backup);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return QWidget::eventFilter(target, event);
+}
+
+void
+VleDayEdit::focusInEvent(QFocusEvent* e)
+{
+    QDateEdit::focusInEvent(e);
+    emit selected(id);
+}
+
+void
+VleDayEdit::onValueChanged()
+{
+    QString v = text();
+    if (v != backup) {
+        backup = v;
+        emit valUpdated(id, v);
+    }
+}
+
 VlePushButton::VlePushButton(QWidget* parent,
                              const QString& text,
                              const QString& idStr)
@@ -504,10 +572,14 @@ void
 VleTextEdit::focusInEvent(QFocusEvent* e)
 {
     if (e->reason() == Qt::MouseFocusReason) {
-        QPalette p = this->palette();
-        p.setBrush(QPalette::Base,
-                   QBrush(QColor(255, 127, 80, 200), Qt::SolidPattern));
-        setPalette(p);
+        if (not edit_on_dble_click) {
+            QPalette p = this->palette();
+            p.setBrush(QPalette::Base,
+                       QBrush(QColor(255, 127, 80, 200), Qt::SolidPattern));
+            setPalette(p);
+        } else {
+            setTextEdition(true);
+        }
         QPlainTextEdit::focusInEvent(e);
         emit selected(id);
     }
@@ -1792,7 +1864,6 @@ VleValueWidget::setComplexWidget(const QString& id,
                                  int r,
                                  int c)
 {
-
     VleTextEdit* w =
       new VleTextEdit(table, getValueDisplay(val, Insight), id, false);
     table->setCellWidget(r, c, w);
