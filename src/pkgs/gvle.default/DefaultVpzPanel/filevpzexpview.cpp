@@ -27,8 +27,6 @@
 #include <QMessageBox>
 #include <QtCore/qdebug.h>
 #include <QtXml>
-#include <boost/unordered_map.hpp>
-#include <boost/version.hpp>
 
 #include "filevpzexpview.h"
 #include "ui_filevpzexpview.h"
