@@ -221,11 +221,14 @@ public:
      * @throw utils::badArg if modelname already exist or if the classname
      * doest not exist.
      */
-    vpz::BaseModel* createModelFromClass(Coordinator& coordinator,
-                                         vpz::CoupledModel* parent,
-                                         const std::string& classname,
-                                         const std::string& modelname,
-                                         const vpz::Conditions& conditions);
+    vpz::BaseModel* createModelFromClass(
+      Coordinator& coordinator,
+      vpz::CoupledModel* parent,
+      const std::string& classname,
+      const std::string& modelname,
+      const vpz::Conditions& conditions,
+      const std::vector<std::string>& inputs,
+      const std::vector<std::string>& outputs);
 
 private:
     utils::ContextPtr mContext;

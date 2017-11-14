@@ -135,10 +135,12 @@ Executive::createModel(const std::string& name,
 
 const vpz::BaseModel*
 Executive::createModelFromClass(const std::string& classname,
-                                const std::string& modelname)
+                                const std::string& modelname,
+                                const std::vector<std::string>& inputs,
+                                const std::vector<std::string>& outputs)
 {
     return m_coordinator.createModelFromClass(
-      classname, cpled(), modelname, conditions());
+      classname, cpled(), modelname, conditions(), inputs, outputs);
 }
 
 void

@@ -134,10 +134,19 @@ ModelFactory::createModelFromClass(Coordinator& coordinator,
                                    vpz::CoupledModel* parent,
                                    const std::string& classname,
                                    const std::string& modelname,
-                                   const vpz::Conditions& conditions)
+                                   const vpz::Conditions& conditions,
+                                   const std::vector<std::string>& inputs,
+                                   const std::vector<std::string>& outputs)
 {
     vpz::Class& classe(mClasses.get(classname));
     vpz::BaseModel* mdl(classe.node()->clone());
+
+    for (const auto& elem : inputs)
+        mdl->addInputPort(elem);
+
+    for (const auto& elem : outputs)
+        mdl->addOutputPort(elem);
+
     vpz::AtomicModelVector atomicmodellist;
     vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
     parent->addModel(mdl, modelname);

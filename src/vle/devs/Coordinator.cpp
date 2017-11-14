@@ -275,10 +275,12 @@ vpz::BaseModel*
 Coordinator::createModelFromClass(const std::string& classname,
                                   vpz::CoupledModel* parent,
                                   const std::string& modelname,
-                                  const vpz::Conditions& conditions)
+                                  const vpz::Conditions& conditions,
+                                  const std::vector<std::string>& inputs,
+                                  const std::vector<std::string>& outputs)
 {
     return m_modelFactory.createModelFromClass(
-      *this, parent, classname, modelname, conditions);
+      *this, parent, classname, modelname, conditions, inputs, outputs);
 }
 
 void

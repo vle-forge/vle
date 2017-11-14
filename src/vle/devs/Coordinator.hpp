@@ -102,12 +102,18 @@ public:
      * @param classname the name of the class to clone.
      * @param parent the parent of the model.
      * @param modelname the new name of the model.
+     * @param conditions, the conditions for initalization of the models.
+     * @param inputs the list of input ports to add.
+     * @param outputs the list of output ports to add.
      * @throw utils::badArg if modelname already exist.
      */
-    vpz::BaseModel* createModelFromClass(const std::string& classname,
-                                         vpz::CoupledModel* parent,
-                                         const std::string& modelname,
-                                         const vpz::Conditions& conditions);
+    vpz::BaseModel* createModelFromClass(
+      const std::string& classname,
+      vpz::CoupledModel* parent,
+      const std::string& modelname,
+      const vpz::Conditions& conditions,
+      const std::vector<std::string>& inputs,
+      const std::vector<std::string>& outputs);
 
     /**
      * @brief Add an observable, ie. a reference and a model to the
