@@ -298,7 +298,24 @@ public:
                                      const QString& oldName,
                                      const QString& newName,
                                      DomDiffStack* snapObj = 0);
-
+    /**
+     * @brief detach views to observable port
+     * @param atom, is expected to be of the form
+     *    <observable name="someobs">
+     *      <port name="someport">
+     *       <attachedview name="someview"/>
+     *      </port>
+     *      ...
+     *    </observable>
+     * @param portName, the name of the port, if empty all ports
+     * @param viewName, the name of the view, if empty all views
+     * @param snapObj, snapshot is performed on snapObj if not null
+     * @return false if error has occurred
+     */
+    static bool detachViewsToObsPorts(QDomNode atom,
+            const QString& portName = "",
+            const QString& viewName = "",
+            DomDiffStack* snapObj = 0);
     /**
      * @brief Add/remove a port to input list of a model
      * @param domDoc, a Dom document to create new QDomNode

@@ -985,6 +985,42 @@ vleDomStatic::renameObservablePort(QDomNode atom,
     return true;
 }
 
+
+bool
+vleDomStatic::detachViewsToObsPorts(QDomNode atom, const QString& portName,
+        const QString& viewName, DomDiffStack* snapObj)
+{
+    if (atom.nodeName() != "observable") {
+        qDebug() << "Internal error in detachViewsToObsPorts "
+                << atom.nodeName();
+        return false;
+    }
+    QList<QDomNode> ports = DomFunctions::childNodesWithoutText(atom, "port");
+    bool has_snap = false;
+    for (QDomNode port : ports) {
+        QString portName_i = DomFunctions::attributeValue(port, "name");
+        if (portName == "" or portName == portName_i) {
+            QDomNode toClear = DomFunctions::childWhithNameAttr(
+                    atom, "port", portName_i);
+            QList<QDomNode> attviews =  DomFunctions::childNodesWithoutText(
+                    toClear, "attachedview");
+            for (QDomNode attview : attviews)  {
+                QString attview_i = DomFunctions::attributeValue(
+                        attview, "name");
+                if (viewName == "" or viewName == attview_i) {
+                    if (not has_snap and snapObj) {
+                        snapObj->snapshot(atom);
+                    }
+                    toClear.removeChild(attview);
+                }
+            }
+        }
+    }
+    return has_snap;
+}
+
+
+
 bool
 vleDomStatic::addPortToInNode(QDomDocument& domDoc,
                               QDomNode atom,

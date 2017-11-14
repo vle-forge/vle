@@ -4495,7 +4495,7 @@ vleVpz::modifyImportSourceForImport(QDomNode dest_node,
                 elems.clear();
                 break;
             }
-            // cheack that all imported models are contained nto the same model
+            // cheack that all imported models are contained into the same model
             if (src_mod_query == "") {
                 src_mod_query = src.vdo()->getXQuery(src_mod_parent);
             } else {
@@ -4566,6 +4566,9 @@ vleVpz::modifyImportSourceForImport(QDomNode dest_node,
                 // by renaming obs if present in dest model
                 QString src_obs_att =
                   vleDomStatic::attachedObsToAtomic(src_node);
+                //detach all views of the observable
+                vleDomStatic::detachViewsToObsPorts(src.obsFromObss(
+                        src.obsFromDoc(), src_obs_att));
                 if (src_obs_att != "") {
                     QString dest_obs_new = src_obs_att;
                     if (not DomFunctions::childWhithNameAttr(
