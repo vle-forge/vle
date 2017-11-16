@@ -11,6 +11,4 @@ install(FILES Algo.hpp Array.hpp Context.hpp DateTime.hpp
   Spawn.hpp Template.hpp Tools.hpp Types.hpp unit-test.hpp DESTINATION
   ${VLE_INCLUDE_DIRS}/utils)
 
-if (VLE_HAVE_UNITTESTFRAMEWORK)
-  add_subdirectory(test)
-endif ()
+add_subdirectory(test)

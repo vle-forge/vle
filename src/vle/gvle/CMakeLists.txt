@@ -94,6 +94,4 @@ configure_file(gvle.pc.in
 install(FILES ${VLE_BINARY_DIR}/src/vle/gvle-${VLE_VERSION_SHORT}.pc
   DESTINATION lib/pkgconfig)
 
-if (VLE_HAVE_UNITTESTFRAMEWORK)
-  add_subdirectory(test)
-endif ()
+add_subdirectory(test)

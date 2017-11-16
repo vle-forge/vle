@@ -8,6 +8,4 @@ install(FILES Dynamics.hpp DynamicsWrapper.hpp Executive.hpp
   ExternalEvent.hpp ExternalEventList.hpp InitEventList.hpp
   ObservationEvent.hpp Time.hpp DESTINATION ${VLE_INCLUDE_DIRS}/devs)
 
-if (VLE_HAVE_UNITTESTFRAMEWORK)
-  add_subdirectory(test)
-endif ()
+add_subdirectory(test)

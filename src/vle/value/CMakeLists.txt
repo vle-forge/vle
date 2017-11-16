@@ -8,6 +8,4 @@ install(FILES Boolean.hpp Double.hpp Integer.hpp Map.hpp Matrix.hpp
   Null.hpp Set.hpp String.hpp Table.hpp Tuple.hpp User.hpp Value.hpp
   XML.hpp DESTINATION ${VLE_INCLUDE_DIRS}/value)
 
-if (VLE_HAVE_UNITTESTFRAMEWORK)
-  add_subdirectory(test)
-endif ()
+add_subdirectory(test)
