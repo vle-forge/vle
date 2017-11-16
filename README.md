@@ -34,23 +34,31 @@ The source tree is currently hosted on Github and Sourceforge. To view
 the repository online: https://github.com/vle-forge/vle The URL to
 clone it:
 
-    git clone git://github.com/vle-forge/vle.git
+```
+cd $HOME/
+git clone git://github.com/vle-forge/vle.git
+```
 
-Install dependencies (recent ubuntu/debian):
+Install dependencies (recent ubuntu/debian). Copy/paste the following lines:
 
-    apt-get install libxml2-dev libboost-dev cmake pkg-config g++ \
-            qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools \
-            qtchooser qt5-default
+```bash
+apt-get install curl libxml2-dev libboost-dev cmake pkg-config g++ \
+        qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools \
+        qtchooser qt5-default
+```
 
-Once you have met requirements, compiling and installing is simple:
+Once you have met requirements, compiling and installing is simple. Copy/paste
+the following lines:
 
-    cd vle
-    mkdir build
-    cd build
-    export QT_SELECT=qt5
-    cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-    make
-    make install
+```bash
+cd vle
+mkdir build
+cd build
+export QT_SELECT=qt5
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+make
+make install
+```
 
 ## License
 
@@ -65,12 +73,12 @@ analys them.  To more information, see the VLE website
 
 To build a new package::
 
-    vle -P mypackage create
+    vle-2.0 -P mypackage create
 
 To configure, build a package::
 
-    vle -P mypackage configure build
+    vle-2.0 -P mypackage configure build
 
 To run vpz in a package::
 
-    vle -P mypackage file.vpz
+    vle-2.0 -P mypackage file.vpz
