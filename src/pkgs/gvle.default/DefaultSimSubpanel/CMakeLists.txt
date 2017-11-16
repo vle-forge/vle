@@ -22,7 +22,7 @@ QT5_WRAP_UI(simpanelright_h simpanelright.ui)
 set(DefaultSimSubpanel_SOURCES_CPP DefaultSimSubpanel.cpp
     ${simpanelleft_h} ${simpanelright_h})
 
-add_library(DefaultSimSubpanel SHARED ${DefaultSimSubpanel_SOURCES_CPP}
+add_library(DefaultSimSubpanel MODULE ${DefaultSimSubpanel_SOURCES_CPP}
             ${simpanelleft_h} ${simpanelright_h} qcustomplot/qcustomplot.cpp)
 
 target_link_libraries(DefaultSimSubpanel vlelib gvlelib

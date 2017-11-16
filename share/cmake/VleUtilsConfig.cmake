@@ -532,7 +532,7 @@ endmacro (VleBuildTest)
 
 macro (VleBuildOovPlugin _pluginname _cppfile)
   link_directories(${VLE_LIBRARY_DIRS})
-  add_library(${_pluginname} SHARED ${_cppfile})
+  add_library(${_pluginname} MODULE ${_cppfile})
   if (CMAKE_VERSION VERSION_LESS 2.8.12)
     include_directories(
        "${CMAKE_SOURCE_DIR}/src;${VLE_INCLUDE_DIRS};"

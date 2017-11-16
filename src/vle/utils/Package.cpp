@@ -916,8 +916,6 @@ Package::listLibraries(const std::string& path) const
 
 #if defined _WIN32
                     if (ext == ".dll") {
-#elif defined __APPLE__
-                    if (ext == ".dylib") {
 #else
                     if (ext == ".so") {
 #endif

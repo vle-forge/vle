@@ -64,9 +64,6 @@ getLibraryName(const Path& file)
 #if defined(_WIN32)
     if (file.extension() == ".dll")
         library.assign(library, 0, library.size() - 4);
-#elif __APPLE__
-    if (file.extension() == ".dylib")
-        library.assign(library, 0, library.size() - 6);
 #else
     if (file.extension() == ".so")
         library.assign(library, 0, library.size() - 3);
@@ -550,8 +547,6 @@ struct ModuleManager
 
 #if defined(_WIN32)
             std::string filename = "lib" + library + ".dll";
-#elif defined(__APPLE__)
-            std::string filename = "lib" + library + ".dylib";
 #else
             std::string filename = "lib" + library + ".so";
 #endif

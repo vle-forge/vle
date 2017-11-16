@@ -18,7 +18,7 @@ ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS} ${Qt5Gui_DEFINITIONS}
 
 ADD_DEFINITIONS(-DQT_PLUGIN)
 
-ADD_LIBRARY(gvleOutputFile SHARED
+ADD_LIBRARY(gvleOutputFile MODULE
   ${FilePlugin_SOURCES}
   ${FilePluginGvle_h} )
 

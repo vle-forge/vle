@@ -17,7 +17,7 @@ ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS} ${Qt5Gui_DEFINITIONS}
 
 ADD_DEFINITIONS(-DQT_PLUGIN)
 
-ADD_LIBRARY(gvleOutputStorage SHARED
+ADD_LIBRARY(gvleOutputStorage MODULE
   ${StoragePlugin_SOURCES}
   ${StoragePluginGvle_h} )
 

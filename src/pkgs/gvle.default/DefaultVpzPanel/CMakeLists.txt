@@ -34,7 +34,7 @@ set(DefaultVpzPanel_SOURCES_CPP filevpzdynamics.cpp filevpzclasses.cpp
   filevpzsim.cpp DefaultVpzPanel.cpp)
 
 
-add_library(DefaultVpzPanel SHARED ${DefaultVpzPanel_SOURCES_CPP}
+add_library(DefaultVpzPanel MODULE ${DefaultVpzPanel_SOURCES_CPP}
   ${filevpzview_h} ${filevpzdynamics_h} ${filevpzproject_h} 
   ${filevpzobservables_h} ${filevpzexpcond_h} ${filevpzexpview_h}
   ${filevpzclasses_h} ${filevpzsim_h} ${filevpztooltip_h}

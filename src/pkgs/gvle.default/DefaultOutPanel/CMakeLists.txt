@@ -18,7 +18,7 @@ add_definitions(-DQT_PLUGIN)
 
 set(DefaultOutPanel_SOURCES_CPP DefaultOutPanel.cpp)
 
-add_library(DefaultOutPanel SHARED ${DefaultOutPanel_SOURCES_CPP})
+add_library(DefaultOutPanel MODULE ${DefaultOutPanel_SOURCES_CPP})
 
 target_link_libraries(DefaultOutPanel 
    gvlelib ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} 

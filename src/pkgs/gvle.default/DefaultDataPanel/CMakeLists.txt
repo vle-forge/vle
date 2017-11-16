@@ -19,7 +19,7 @@ add_definitions(-DQT_PLUGIN)
 
 set(DefaultDataPanel_SOURCES_CPP DefaultDataPanel.cpp)
 
-add_library(DefaultDataPanel SHARED ${DefaultDataPanel_SOURCES_CPP})
+add_library(DefaultDataPanel MODULE ${DefaultDataPanel_SOURCES_CPP})
 
 target_link_libraries(DefaultDataPanel
    gvlelib vlelib ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES}

@@ -19,7 +19,7 @@ add_definitions(-DQT_PLUGIN)
 
 set(DateCond_SOURCES DateCondition.cpp)
 
-add_library(DateCondition SHARED ${DateCond_SOURCES})
+add_library(DateCondition MODULE ${DateCond_SOURCES})
 
 target_link_libraries(DateCondition 
    gvlelib vlelib ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} 
