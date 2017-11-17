@@ -58,8 +58,8 @@ FileError::FileError(const char* format, ...)
     int n;
     int size = ::default_buffer_size(m_message.size());
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -97,8 +97,8 @@ ParseError::ParseError(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -135,8 +135,8 @@ ArgError::ArgError(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -174,8 +174,8 @@ CastError::CastError(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -213,8 +213,8 @@ InternalError::InternalError(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -252,8 +252,8 @@ ModellingError::ModellingError(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -291,8 +291,8 @@ NotYetImplemented::NotYetImplemented(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -330,8 +330,8 @@ DevsGraphError::DevsGraphError(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
@@ -369,8 +369,8 @@ SaxParserError::SaxParserError(const char* format, ...)
     int size = ::default_buffer_size(m_message.size());
     std::string ret(size, '\0');
 
-    va_list ap;
     for (;;) {
+        va_list ap;
         va_start(ap, format);
         n = vsnprintf(&m_message[0], size, format, ap);
         va_end(ap);
