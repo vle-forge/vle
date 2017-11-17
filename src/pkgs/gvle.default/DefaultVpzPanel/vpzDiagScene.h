@@ -88,10 +88,10 @@ public:
     VpzConnectionLineItem(QDomNode node, vleVpz* vpz, QLineF l,
             QGraphicsItem* parent, VpzDiagScene* scene);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                QWidget *widget = 0);
-    QRectF boundingRect() const;
+                QWidget *widget = 0) override;
+    QRectF boundingRect() const override;
     void update(const QRectF & rect = QRectF());
-    int type() const;
+    int type() const override;
 
     vleVpz* mVpz;
     QDomNode mnode;
@@ -103,17 +103,17 @@ class VpzPortItem : public QGraphicsObject
 public:
     VpzPortItem(QDomNode node, vleVpz* vpz, bool input,
             QGraphicsItem* parent, VpzDiagScene* scene);
-    QRectF boundingRect() const;
+    QRectF boundingRect() const override;
     void update(const QRectF & rect = QRectF());
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                QWidget *widget = 0);
+                QWidget *widget = 0) override;
     QPointF getConnectionPoint();
     QString getPortName();
     VleLineEditItem* getTextItem() const;
     QGraphicsPixmapItem* getPixItem() const;
     void setNameEdition(bool val);
-    int type() const;
-    void hoverEnterEvent(QGraphicsSceneHoverEvent * evt);
+    int type() const override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent * evt) override;
 
 public:
     vleVpz* mVpz;
@@ -156,20 +156,20 @@ public:
 
     VpzSubModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
             QGraphicsScene* scene);
-    virtual ~VpzSubModelItem();
-    QRectF boundingRect() const;
+    ~VpzSubModelItem() override;
+    QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-            QWidget *widget = 0);
+            QWidget *widget = 0) override;
     void initializeFromDom();
     void update(const QRectF & rect = QRectF());
-    void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent);
+    void hoverMoveEvent(QGraphicsSceneHoverEvent * event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
     SEL_TYPE getSelType(QPointF selPoint);
     QString getModelName();
-    int type() const;
+    int type() const override;
     void removeNameEditionMode();
 };
 
@@ -181,9 +181,9 @@ public:
 
     VpzMainModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
             QGraphicsScene* scene);
-    QRectF boundingRect() const;
+    QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-            QWidget *widget = 0);
+            QWidget *widget = 0) override;
     void initializeFromDom();
     void clearLines(const QList<VpzSubModelItem*>&
             sels=QList<VpzSubModelItem*>());
@@ -192,13 +192,13 @@ public:
             sels=QList<VpzSubModelItem*>());
     void update(const QRectF & rect = QRectF());
 
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void dragEnterEvent(QGraphicsSceneDragDropEvent * event);
-    void dragLeaveEvent(QGraphicsSceneDragDropEvent * event);
-    void dragMoveEvent(QGraphicsSceneDragDropEvent * event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void dragEnterEvent(QGraphicsSceneDragDropEvent * event) override;
+    void dragLeaveEvent(QGraphicsSceneDragDropEvent * event) override;
+    void dragMoveEvent(QGraphicsSceneDragDropEvent * event) override;
 
     QRectF subModelsBoundingRect(bool onlySelected);
     VpzSubModelItem* getSubModel(const QString& subMod);
@@ -208,7 +208,7 @@ public:
     QList<VpzConnectionLineItem *> getConnLines();
     void removeNameEditionMode();
     bool isAtomic();
-    int type() const;
+    int type() const override;
 
 };
 
@@ -231,15 +231,15 @@ public:
     void clear();
     void update(const QRectF & rect = QRectF());
     void setScale (const qreal z);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    void dragEnterEvent(QGraphicsSceneDragDropEvent * event);
-    void dragLeaveEvent(QGraphicsSceneDragDropEvent * event);
-    void dragMoveEvent(QGraphicsSceneDragDropEvent * event);
-    void dropEvent(QGraphicsSceneDragDropEvent * event);
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void dragEnterEvent(QGraphicsSceneDragDropEvent * event) override;
+    void dragLeaveEvent(QGraphicsSceneDragDropEvent * event) override;
+    void dragMoveEvent(QGraphicsSceneDragDropEvent * event) override;
+    void dropEvent(QGraphicsSceneDragDropEvent * event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent) override;
     void populateConfigureMenu(QMenu* menu);
     void populateDataConfigureMenu(QMenu* menu);
     void doConfigureMenu(QDomNode model, const QString& meta);

@@ -37,7 +37,7 @@ class AboutBox : public QDialog
 
 public:
     explicit AboutBox(QWidget *parent = 0);
-    ~AboutBox();
+    ~AboutBox() override;
 
 private:
     Ui::AboutBox *ui;

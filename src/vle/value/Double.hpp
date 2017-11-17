@@ -69,7 +69,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Double()
+    ~Double() override
     {
     }
 
@@ -95,7 +95,7 @@ public:
      * @brief Clone the current Double with the same value.
      * @return A new Double.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new Double(m_value));
     }
@@ -104,7 +104,7 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::DOUBLE.
      */
-    inline virtual Value::type getType() const override
+    inline Value::type getType() const override
     {
         return Value::DOUBLE;
     }
@@ -114,14 +114,14 @@ public:
      * setprecision, fill etc. to manage the representation of this double.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the double in the stream. Use the stream operator
      * setprecision, fill etc. to manage the representation of this double.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the double in the stream. The string pushed in the stream:
@@ -131,7 +131,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 
     ///
     ////

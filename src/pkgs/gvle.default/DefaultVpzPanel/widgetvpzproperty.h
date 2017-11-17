@@ -43,7 +43,7 @@ class WidgetVpzPropertyDynamics : public QComboBox
 
 public:
     explicit WidgetVpzPropertyDynamics(QWidget *parent = 0);
-    ~WidgetVpzPropertyDynamics();
+    ~WidgetVpzPropertyDynamics() override;
     void selectModel(vleVpz* vpz, const QString& mod_query);
 
 signals:
@@ -62,7 +62,7 @@ class WidgetVpzPropertyExpCond : public QListWidget
     Q_OBJECT
 public:
     explicit WidgetVpzPropertyExpCond(QWidget *parent = 0);
-    ~WidgetVpzPropertyExpCond();
+    ~WidgetVpzPropertyExpCond() override;
     void selectModel(vleVpz* vpz, const QString& mod_query);
 
 //protected:
@@ -82,7 +82,7 @@ class WidgetVpzPropertyObservables : public QComboBox
     Q_OBJECT
 public:
     explicit WidgetVpzPropertyObservables(QWidget *parent = 0);
-    ~WidgetVpzPropertyObservables();
+    ~WidgetVpzPropertyObservables() override;
     void selectModel(vleVpz* model, const QString& mod_query);
 
 public slots:

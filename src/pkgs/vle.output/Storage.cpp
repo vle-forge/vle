@@ -88,7 +88,7 @@ public:
      * devs::RootCoordinator. Users have in charge to freed the
      * m_matrix.
      */
-    virtual ~Storage()
+    ~Storage() override
     {
     }
 
@@ -96,7 +96,7 @@ public:
      * Return a clone of the current matrix
      * The pointer is given in the finish function
      */
-    virtual std::unique_ptr<value::Matrix> matrix() const override
+    std::unique_ptr<value::Matrix> matrix() const override
     {
         if (m_matrix) {
             return std::unique_ptr<value::Matrix>(
@@ -105,7 +105,7 @@ public:
         return {};
     }
 
-    virtual std::string name() const override
+    std::string name() const override
     {
         return std::string("storage");
     }
@@ -114,7 +114,7 @@ public:
     ////
     ///
 
-    virtual void onParameter(const std::string& /*plugin*/,
+    void onParameter(const std::string& /*plugin*/,
                              const std::string& /*location*/,
                              const std::string& /*file*/,
                              std::unique_ptr<value::Value> parameters,
@@ -155,7 +155,7 @@ public:
         }
     }
 
-    virtual void onNewObservable(const std::string& simulator,
+    void onNewObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& port,
                                  const std::string& /*view*/,
@@ -176,7 +176,7 @@ public:
         }
     }
 
-    virtual void onDelObservable(const std::string& /*simulator*/,
+    void onDelObservable(const std::string& /*simulator*/,
                                  const std::string& /*parent*/,
                                  const std::string& /*port*/,
                                  const std::string& /*view*/,
@@ -184,7 +184,7 @@ public:
     {
     }
 
-    virtual void onValue(const std::string& simulator,
+    void onValue(const std::string& simulator,
                          const std::string& parent,
                          const std::string& port,
                          const std::string& /*view*/,
@@ -201,7 +201,7 @@ public:
         }
     }
 
-    virtual std::unique_ptr<value::Matrix> finish(
+    std::unique_ptr<value::Matrix> finish(
       const double& /*time*/) override
     {
         return std::move(m_matrix);

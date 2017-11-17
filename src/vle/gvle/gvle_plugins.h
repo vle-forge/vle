@@ -72,7 +72,7 @@ class gvle_plugins : public QObject
 
 public:
     gvle_plugins(const utils::ContextPtr& ctx);
-    ~gvle_plugins();
+    ~gvle_plugins() override;
 
     void             registerPlugins();
 

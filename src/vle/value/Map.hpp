@@ -67,7 +67,7 @@ public:
     /**
      * @brief Delete all Value in the Set.
      */
-    virtual ~Map()
+    ~Map() override
     {
     }
 
@@ -90,13 +90,13 @@ public:
      * MapValue.
      * @return A new Map.
      */
-    virtual std::unique_ptr<Value> clone() const override final;
+    std::unique_ptr<Value> clone() const final;
 
     /**
      * @brief Get the type of this class.
      * @return Value::MAP.
      */
-    virtual Value::type getType() const override final;
+    Value::type getType() const final;
 
     /**
      * @brief Push all Value from the MapValue, recursively and colon
@@ -106,7 +106,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override final;
+    void writeFile(std::ostream& out) const final;
 
     /**
      * @brief Push all VAlue from the MapValue, recursively and colon
@@ -115,7 +115,7 @@ public:
      * (key,value), key2,123) (key3, true)
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override final;
+    void writeString(std::ostream& out) const final;
 
     /**
      * @brief Push all Value from the MapValue recursively in an XML
@@ -135,7 +135,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override final;
+    void writeXml(std::ostream& out) const final;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

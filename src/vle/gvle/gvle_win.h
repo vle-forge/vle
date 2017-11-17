@@ -71,11 +71,11 @@ public:
     };
 
     explicit gvle_win( const vle::utils::ContextPtr& ctx, QWidget* parent =0);
-    virtual ~gvle_win();
+    ~gvle_win() override;
 
 protected:
-    void showEvent(QShowEvent* event);
-    void closeEvent(QCloseEvent* event);
+    void showEvent(QShowEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
     void openMainPanel(gvle_file gf, PluginMainPanel* p);
     void setRightWidget(QWidget* rightWidget);
     int findTabIndex(gvle_file gf);

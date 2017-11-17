@@ -66,7 +66,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Vpz()
+    ~Vpz() override
     {
     }
 
@@ -76,13 +76,13 @@ public:
      * vpz::Project object.
      * @param out The output parameter where send XML representation.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this object.
      * @return Return VPZ.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_VPZ;
     }

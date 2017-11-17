@@ -52,7 +52,7 @@ class FileVpzSim : public QWidget
 public:
     explicit FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
             Logger* log, QWidget *parent = 0);
-    ~FileVpzSim();
+    ~FileVpzSim() override;
     void setVpz(vleVpz* vpz);
     void setSimLeftWidget(QWidget* leftWidget);
     QWidget* rightWidget();

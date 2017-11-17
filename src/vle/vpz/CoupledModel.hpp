@@ -58,7 +58,7 @@ public:
 
     CoupledModel& operator=(const CoupledModel& mdl);
 
-    virtual BaseModel* clone() const override
+    BaseModel* clone() const override
     {
         return new CoupledModel(*this);
     }
@@ -66,13 +66,13 @@ public:
     /**
      * @brief Delete his children.
      */
-    virtual ~CoupledModel();
+    ~CoupledModel() override;
 
     /**
      * @brief Return true, CoupledModel is a coupled model.
      * @return true.
      */
-    virtual bool isCoupled() const override
+    bool isCoupled() const override
     {
         return true;
     }
@@ -790,14 +790,14 @@ public:
      * @param oldname the old name of the dynamics.
      * @param newname the new name of the dynamics.
      */
-    virtual void updateDynamics(const std::string& oldname,
+    void updateDynamics(const std::string& oldname,
                                 const std::string& newname) override;
 
     /**
      * @brief purge the dymamics not present in the list
      * @param dynamicslist a list of dynamics name
      */
-    virtual void purgeDynamics(
+    void purgeDynamics(
       const std::set<std::string>& dynamicslist) override;
 
     /**
@@ -806,7 +806,7 @@ public:
      * @param oldname the old name of the observable.
      * @param newname the new name of the observable.
      */
-    virtual void updateObservable(const std::string& oldname,
+    void updateObservable(const std::string& oldname,
                                   const std::string& newname) override;
 
     /**
@@ -814,7 +814,7 @@ public:
      * where the observable is not present in the list, for each model.
      * @param observablelist a list of observable name
      */
-    virtual void purgeObservable(
+    void purgeObservable(
       const std::set<std::string>& observablelist) override;
 
     /**
@@ -823,7 +823,7 @@ public:
      * @param oldname the old name of the observable.
      * @param newname the new name of the observable.
      */
-    virtual void updateConditions(const std::string& oldname,
+    void updateConditions(const std::string& oldname,
                                   const std::string& newname) override;
 
     /**
@@ -831,7 +831,7 @@ public:
      * Condition is not present in the list, for each model.
      * @param conditionlist a list of condition name
      */
-    virtual void purgeConditions(
+    void purgeConditions(
       const std::set<std::string>& conditionlist) override;
 
 private:

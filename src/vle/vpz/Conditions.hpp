@@ -79,7 +79,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Conditions()
+    ~Conditions() override
     {
     }
 
@@ -102,13 +102,13 @@ public:
      * @endcode
      * @param out a output stream where write the classes tags.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return CONDITIONS.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_CONDITIONS;
     }

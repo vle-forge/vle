@@ -54,7 +54,7 @@ public:
 
     FileError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -70,7 +70,7 @@ public:
 
     ParseError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -86,7 +86,7 @@ public:
 
     ArgError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -102,7 +102,7 @@ public:
 
     CastError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -118,7 +118,7 @@ public:
 
     InternalError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -133,7 +133,7 @@ public:
 
     ModellingError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -148,7 +148,7 @@ public:
 
     NotYetImplemented(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -163,7 +163,7 @@ public:
 
     DevsGraphError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 
 /**
@@ -178,7 +178,7 @@ public:
 
     SaxParserError(const char* format, ...) GCC_ATTRIBUTE_FORMAT(2, 3);
 
-    virtual const char* what() const noexcept;
+    const char* what() const noexcept override;
 };
 }
 } // namespace vle utils

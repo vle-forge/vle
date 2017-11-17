@@ -75,7 +75,7 @@ public:
     /**
      * @brief Delete all the values attached to this Conditon.
      */
-    virtual ~Condition()
+    ~Condition() override
     {
     }
 
@@ -91,13 +91,13 @@ public:
      *
      * @param out
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return CONDITION.
      */
-    inline virtual Base::type getType() const override
+    inline Base::type getType() const override
     {
         return VLE_VPZ_CONDITION;
     }

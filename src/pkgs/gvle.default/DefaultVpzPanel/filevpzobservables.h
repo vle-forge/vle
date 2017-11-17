@@ -47,7 +47,7 @@ public:
 		       EObsOut};
 
     explicit FileVpzObservables(QWidget *parent = 0);
-    ~FileVpzObservables();
+    ~FileVpzObservables() override;
     void setVpz(vleVpz* vpz);
     void reload();
 

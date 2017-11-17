@@ -97,18 +97,18 @@ public:
         }
     }
 
-    virtual ~AdaptativeQuantifier() // This is mandatory
+    ~AdaptativeQuantifier() override // This is mandatory
     {
     }
 
-    virtual vd::Time init(vd::Time /* time */) override
+    vd::Time init(vd::Time /* time */) override
     {
         m_offset = 0;
         m_state = INIT;
         return vd::infinity;
     }
 
-    virtual void externalTransition(const vd::ExternalEventList& events,
+    void externalTransition(const vd::ExternalEventList& events,
                                     vd::Time time) override
     {
         double val, shifting_factor;
@@ -260,7 +260,7 @@ public:
         externalTransition(externals, time);
     }
 
-    virtual void output(vd::Time /*time*/,
+    void output(vd::Time /*time*/,
                         vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
@@ -271,7 +271,7 @@ public:
         }
     }
 
-    virtual vd::Time timeAdvance() const override
+    vd::Time timeAdvance() const override
     {
         switch (m_state) {
         case INIT:

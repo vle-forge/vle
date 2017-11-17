@@ -69,7 +69,7 @@ public:
     /**
      * @brief Delete all Value in the set.
      */
-    virtual ~Set()
+    ~Set() override
     {
     }
 
@@ -90,7 +90,7 @@ public:
      * @brief Clone the Set and recursively cloned each cells.
      * @return A new allocated Set.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new Set(*this));
     }
@@ -99,7 +99,7 @@ public:
      * @brief Get the type of this class.
      * @return Value::SET.
      */
-    virtual Value::type getType() const override;
+    Value::type getType() const override;
 
     /**
      * @brief Push all Value from the Set, recursively and colon separated.
@@ -108,7 +108,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the Set, recursively and colon separated with
@@ -118,7 +118,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the Set recursively in an XML representation:
@@ -134,7 +134,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

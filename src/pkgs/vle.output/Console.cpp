@@ -73,11 +73,11 @@ public:
     {
     }
 
-    virtual ~Console()
+    ~Console() override
     {
     }
 
-    virtual void onParameter(const std::string& /*plugin*/,
+    void onParameter(const std::string& /*plugin*/,
                              const std::string& /*location*/,
                              const std::string& /*file*/,
                              std::unique_ptr<value::Value> parameters,
@@ -168,7 +168,7 @@ public:
     /**
      * Call when an external event is send to the view.
      */
-    virtual void onValue(const std::string& simulator,
+    void onValue(const std::string& simulator,
                          const std::string& parent,
                          const std::string& port,
                          const std::string& /*view*/,

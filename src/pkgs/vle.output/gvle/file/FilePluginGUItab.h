@@ -40,7 +40,7 @@ class FilePluginGUItab : public QWidget
 
 public:
     explicit FilePluginGUItab(QWidget *parent = 0);
-    ~FilePluginGUItab();
+    ~FilePluginGUItab() override;
     void init(vle::gvle::vleVpz* vpz, const QString& viewName);
 
 private slots:

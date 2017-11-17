@@ -39,7 +39,7 @@ namespace utils {
 
 struct vle_log_stderr : Context::LogFunctor
 {
-    virtual void write(const Context& ctx,
+    void write(const Context& ctx,
                        int priority,
                        const char* file,
                        int line,

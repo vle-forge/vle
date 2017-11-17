@@ -69,7 +69,7 @@ public:
     explicit fileVpzView(vle::utils::Package* pkg,
             gvle_plugins* plugs, Logger* log, const utils::ContextPtr& ctx,
             QWidget *parent = 0);
-    ~fileVpzView();
+    ~fileVpzView() override;
     void setVpz(vleVpz *v);
     void setRtool(FileVpzRtool* tool);
     vleVpz* vpz();

@@ -39,7 +39,7 @@ class help : public QWidget
 
 public:
     explicit help(QWidget *parent = 0);
-    ~help();
+    ~help() override;
     void loadResource();
     void loadHelp(QString topic);
 

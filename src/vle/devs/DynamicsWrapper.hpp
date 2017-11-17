@@ -77,7 +77,7 @@ public:
      * @brief Destructor (nothing to do).
      * @return none
      */
-    virtual ~DynamicsWrapper()
+    ~DynamicsWrapper() override
     {
     }
 
@@ -87,7 +87,7 @@ public:
      * call.
      * @return false if Dynamics is not a DynamicsWrapper.
      */
-    inline virtual bool isWrapper() const override
+    inline bool isWrapper() const override
     {
         return true;
     }

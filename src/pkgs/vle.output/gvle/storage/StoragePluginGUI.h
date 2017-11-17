@@ -41,12 +41,12 @@ class StoragePluginGUI : public PluginOutput
 
 public:
     StoragePluginGUI();
-    ~StoragePluginGUI();
-    QString getname();
-    QWidget *getWidget();
-    void     delWidget();
-    void setLogger(Logger *logger);
-    void init(vleVpz* vpz, const QString& viewName);
+    ~StoragePluginGUI() override;
+    QString getname() override;
+    QWidget *getWidget() override;
+    void     delWidget() override;
+    void setLogger(Logger *logger) override;
+    void init(vleVpz* vpz, const QString& viewName) override;
 
 public slots:
     void onTabDeleted(QObject *obj);

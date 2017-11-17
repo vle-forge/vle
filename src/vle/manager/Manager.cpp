@@ -50,13 +50,13 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
     {
     }
 
-    virtual ~vle_log_manager_thread()
+    ~vle_log_manager_thread() override
     {
         if (fp)
             fclose(fp);
     }
 
-    virtual void write(const vle::utils::Context& /*ctx*/,
+    void write(const vle::utils::Context& /*ctx*/,
                        int priority,
                        const char* file,
                        int line,

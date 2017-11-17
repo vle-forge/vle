@@ -61,7 +61,7 @@ class FileVpzRtool : public QWidget
 
 public:
     explicit FileVpzRtool(QWidget *parent = 0);
-    ~FileVpzRtool();
+    ~FileVpzRtool() override;
     void setVpz(vleVpz* v);
     void clear();
     void updateTree();

@@ -58,7 +58,7 @@ public:
 
     DefaultSimSubpanelThread(std::vector<std::string>& logMessages,
             bool debug, int nbthreads, int blockSize);
-    ~DefaultSimSubpanelThread();
+    ~DefaultSimSubpanelThread() override;
     void init(vleVpz* vpz, vle::utils::Package* pkg);
 public slots:
    void onStarted();
@@ -75,7 +75,7 @@ class DefaultSimSubpanelLeftWidget : public QWidget
     Q_OBJECT
 public:
     DefaultSimSubpanelLeftWidget();
-    ~DefaultSimSubpanelLeftWidget();
+    ~DefaultSimSubpanelLeftWidget() override;
     Ui::simpanelleft* ui;
     QCustomPlot* customPlot;
 
@@ -91,7 +91,7 @@ class DefaultSimSubpanelRightWidget : public QWidget
     Q_OBJECT
 public:
     DefaultSimSubpanelRightWidget();
-    ~DefaultSimSubpanelRightWidget();
+    ~DefaultSimSubpanelRightWidget() override;
     Ui::simpanelright* ui;
 
 };
@@ -129,14 +129,14 @@ class DefaultSimSubpanel : public PluginSimPanel
     Q_INTERFACES(vle::gvle::PluginSimPanel)
 public:
     DefaultSimSubpanel();
-    virtual ~DefaultSimSubpanel();
-    void init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log);
-    QString  getname();
-    QWidget* leftWidget();
-    QWidget* rightWidget();
-    void undo();
-    void redo();
-    PluginSimPanel* newInstance();
+    ~DefaultSimSubpanel() override;
+    void init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log) override;
+    QString  getname() override;
+    QWidget* leftWidget() override;
+    QWidget* rightWidget() override;
+    void undo() override;
+    void redo() override;
+    PluginSimPanel* newInstance() override;
 
     void showCustomPlot(bool b);
     void addPortToPlot(QString view, QString port);

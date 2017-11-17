@@ -49,14 +49,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~In()
+    ~In() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -64,7 +64,7 @@ public:
      * @brief Get the type of this class.
      * @return IN.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_IN;
     }
@@ -86,14 +86,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Out()
+    ~Out() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -101,7 +101,7 @@ public:
      * @brief Get the type of this class.
      * @return OUT.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_OUT;
     }
@@ -123,14 +123,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Init()
+    ~Init() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -138,7 +138,7 @@ public:
      * @brief Get the type of this class.
      * @return INIT.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_INIT;
     }
@@ -160,14 +160,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~State()
+    ~State() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -175,7 +175,7 @@ public:
      * @brief Get the type of this class.
      * @return STATE.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_STATE;
     }
@@ -197,14 +197,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Port()
+    ~Port() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -212,7 +212,7 @@ public:
      * @brief Get the type of this class.
      * @return PORT.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_PORT;
     }

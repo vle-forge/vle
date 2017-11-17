@@ -46,7 +46,7 @@ public:
     enum FVD_MENU { FVD_add_dynamic,  FVD_remove_dynamic };
 public:
     explicit FileVpzDynamics(const utils::ContextPtr& ctx, QWidget* parent=0);
-    ~FileVpzDynamics();
+    ~FileVpzDynamics() override;
     void setVpz(vleVpz* vpz);
 
 public slots:

@@ -76,7 +76,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~ObservablePort()
+    ~ObservablePort() override
     {
     }
 
@@ -90,13 +90,13 @@ public:
      * @endcode
      * @param out
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return OBSERVABLEPORT.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_OBSERVABLEPORT;
     }
@@ -240,7 +240,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Observable()
+    ~Observable() override
     {
     }
 
@@ -253,13 +253,13 @@ public:
      * @endcode
      * @param out The output stream parameter.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return OBSERVABLE.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_OBSERVABLE;
     }

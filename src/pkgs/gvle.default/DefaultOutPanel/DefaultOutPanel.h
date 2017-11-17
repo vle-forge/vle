@@ -42,7 +42,7 @@ class DefaultOutPanel : public PluginMainPanel
 
 public:
     DefaultOutPanel();
-    virtual ~DefaultOutPanel();
+    ~DefaultOutPanel() override;
 
     QString  getname() override;
     QWidget* leftWidget() override;

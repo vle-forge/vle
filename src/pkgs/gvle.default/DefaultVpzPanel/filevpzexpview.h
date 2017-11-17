@@ -56,7 +56,7 @@ class FileVpzExpView : public QWidget
 public:
     explicit FileVpzExpView(const utils::ContextPtr& ctx,  Logger* log, 
 	                        QWidget *parent = 0);
-    ~FileVpzExpView();
+    ~FileVpzExpView() override;
     void setVpz(vleVpz* vpz);
     void reload();
 

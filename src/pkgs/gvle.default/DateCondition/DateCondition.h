@@ -52,7 +52,7 @@ class DateCondition : public PluginExpCond
 
 public:
     DateCondition();
-    ~DateCondition();
+    ~DateCondition() override;
     QString getname() override;
     QWidget* getWidget() override;
     void setSettings(QSettings *s) override;

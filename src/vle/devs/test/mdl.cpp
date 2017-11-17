@@ -90,17 +90,17 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 0.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 1.0;
     }
 
-    virtual void output(devs::Time /* time */,
+    void output(devs::Time /* time */,
                         devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
@@ -115,17 +115,17 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 10.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 10.0;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         std::vector<std::string> modelname;
 
@@ -146,7 +146,7 @@ public:
         }
     }
 
-    virtual void output(devs::Time /*time*/,
+    void output(devs::Time /*time*/,
                         devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
@@ -164,18 +164,18 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         m_counter = 0;
         return devs::infinity;
     }
 
-    virtual void output(devs::Time /* time */,
+    void output(devs::Time /* time */,
                         devs::ExternalEventList& /* output */) const override
     {
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         if (m_active)
             return devs::Time(0.0);
@@ -183,19 +183,19 @@ public:
         return devs::infinity;
     }
 
-    virtual void internalTransition(devs::Time /* event */) override
+    void internalTransition(devs::Time /* event */) override
     {
         m_active = false;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& events,
+    void externalTransition(const devs::ExternalEventList& events,
                                     devs::Time /* time */) override
     {
         m_counter += events.size();
         m_active = true;
     }
 
-    virtual std::unique_ptr<value::Value> observation(
+    std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent& ev) const override
     {
         if (ev.onPort("c")) {
@@ -231,21 +231,21 @@ public:
         mRemaining = mAlarm;
     }
 
-    virtual ~DeleteConnection()
+    ~DeleteConnection() override
     {
     }
 
-    virtual devs::Time init(devs::Time /*time*/)
+    devs::Time init(devs::Time /*time*/) override
     {
         return timeAdvance();
     }
 
-    virtual devs::Time timeAdvance() const
+    devs::Time timeAdvance() const override
     {
         return mRemaining;
     }
 
-    virtual void internalTransition(devs::Time time)
+    void internalTransition(devs::Time time) override
     {
         devs::Time tmp =
           std::abs(std::min(time, mAlarm) - std::max(time, mAlarm));
@@ -258,8 +258,8 @@ public:
         }
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
-                                    devs::Time time)
+    void externalTransition(const devs::ExternalEventList& /*events*/,
+                                    devs::Time time) override
     {
         mRemaining = std::abs(std::min(time, mAlarm) - std::max(time, mAlarm));
     }
@@ -282,36 +282,36 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         m_counter = 0;
         return 0.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 1.0;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         m_counter = 1;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& events,
+    void externalTransition(const devs::ExternalEventList& events,
                                     devs::Time /* time */) override
     {
         m_counter = m_counter + events.size();
     }
 
-    virtual void output(devs::Time /* time */,
+    void output(devs::Time /* time */,
                         devs::ExternalEventList& output) const override
     {
         for (int i = 0; i < m_counter; ++i)
             output.emplace_back("out");
     }
 
-    virtual std::unique_ptr<value::Value> observation(
+    std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
         return value::Integer::create(m_counter);
@@ -330,38 +330,38 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 1.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return devs::infinity;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
+    void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time /* time */) override
     {
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       devs::Time /*time*/,
       const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 
-    virtual void output(devs::Time /*time*/,
+    void output(devs::Time /*time*/,
                         devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
     }
 
-    virtual std::unique_ptr<value::Value> observation(
+    std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
         return 0;
@@ -378,12 +378,12 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 1.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         if (state < 2) {
             return 0;
@@ -392,30 +392,30 @@ public:
         }
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         state++;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
+    void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time /* time */) override
     {
         // should not have an external transition, rather a confluent
         throw "error confluent_transition::internalTransition";
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       devs::Time /*time*/,
       const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 
-    virtual void output(devs::Time /* time */,
+    void output(devs::Time /* time */,
                         devs::ExternalEventList& /*output*/) const override
     {
     }
 
-    virtual std::unique_ptr<value::Value> observation(
+    std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
         return 0;
@@ -434,7 +434,7 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         Ensures(i == 0);
         i++;
@@ -442,20 +442,20 @@ public:
         return 0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         Ensures(i == 3);
         i = 1;
         return 1.0;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         Ensures(i == 2);
         i++;
     }
 
-    virtual void output(devs::Time /*time*/,
+    void output(devs::Time /*time*/,
                         devs::ExternalEventList& output) const override
     {
         Ensures(i == 1);
@@ -477,7 +477,7 @@ public:
         i++;
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         Ensures(i == 1);
         i++;
@@ -485,23 +485,23 @@ public:
         return 0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 1;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         EnsuresNotReached();
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
+    void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time /* time */) override
     {
         EnsuresNotReached();
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       devs::Time /*time*/,
       const devs::ExternalEventList& /*extEventlist*/) override
     {
@@ -529,7 +529,7 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         vpz::Dynamic dyn("gensMyBeep");
         dyn.setPackage("");
@@ -541,7 +541,7 @@ public:
         return 0.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         switch (m_state) {
         case INIT:
@@ -556,7 +556,7 @@ public:
         throw utils::InternalError("GenExecutive ta");
     }
 
-    virtual void internalTransition(devs::Time time) override
+    void internalTransition(devs::Time time) override
     {
         switch (m_state) {
         case INIT:
@@ -580,7 +580,7 @@ public:
         }
     }
 
-    virtual std::unique_ptr<value::Value> observation(
+    std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent& ev) const override
     {
         if (ev.onPort("nbmodel"))
@@ -667,17 +667,17 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 10.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 10.0;
     }
 
-    virtual void output(devs::Time /*time*/,
+    void output(devs::Time /*time*/,
                         devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
@@ -693,17 +693,17 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 10.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 10.0;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         std::vector<std::string> modelname;
 

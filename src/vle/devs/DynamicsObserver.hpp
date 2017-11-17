@@ -70,7 +70,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~DynamicsObserver() = default;
+    ~DynamicsObserver() override = default;
 
     //
     // \e isExecutive and \e isWrapper use the wrapped \e Dynamics instead
@@ -84,14 +84,14 @@ public:
      * runtime of the simulation.
      * @return false if Dynamics is not an Executive.
      */
-    inline virtual bool isExecutive() const override;
+    inline bool isExecutive() const override;
 
     /**
      * @brief If this function return true, then a cast to a DynamicsWrapper
      * object is produce and the set_model and set_library function are call.
      * @return false if Dynamics is not a DynamicsWrapper.
      */
-    virtual bool isWrapper() const override;
+    bool isWrapper() const override;
 
     // Specifics functions.
 
@@ -114,28 +114,28 @@ public:
      * @param time the time of the creation of this model.
      * @return duration of the initial state.
      */
-    virtual Time init(Time time) override;
+    Time init(Time time) override;
 
     /**
      * Process the output function: compute the output function.
      * @param time the time of the occurrence of output function.
      * @param output the list of external events (output parameter).
      */
-    virtual void output(Time time, ExternalEventList& output) const override;
+    void output(Time time, ExternalEventList& output) const override;
 
     /**
      * Process the time advance function: compute the duration of the
      * current state.
      * @return duration of the current state.
      */
-    virtual Time timeAdvance() const override;
+    Time timeAdvance() const override;
 
     /**
      * Process an internal transition: compute the new state of the
      * model with the internal transition function.
      * @param time the date of occurence of this event.
      */
-    virtual void internalTransition(Time time) override;
+    void internalTransition(Time time) override;
 
     /**
      * Process an external transition: compute the new state of the
@@ -143,7 +143,7 @@ public:
      * @param event the external event with of the port.
      * @param time the date of occurrence of this event.
      */
-    virtual void externalTransition(const ExternalEventList& event,
+    void externalTransition(const ExternalEventList& event,
                                     Time time) override;
 
     /**
@@ -153,7 +153,7 @@ public:
      * @param internal the internal event.
      * @param extEventlist the external events list.
      */
-    virtual void confluentTransitions(
+    void confluentTransitions(
       Time time,
       const ExternalEventList& extEventlist) override;
 
@@ -163,14 +163,14 @@ public:
      * @param event the state event with of the port
      * @return the value of state variable
      */
-    virtual std::unique_ptr<vle::value::Value> observation(
+    std::unique_ptr<vle::value::Value> observation(
       const ObservationEvent& event) const override;
 
     /**
      * When the simulation of the atomic model is finished, the
      * finish method is invoked.
      */
-    virtual void finish() override;
+    void finish() override;
 };
 
 inline DynamicsObserver::DynamicsObserver(

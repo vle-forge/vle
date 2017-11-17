@@ -64,7 +64,7 @@ public:
     /**
      * @brief Delete the vpz::Model hierarchy.
      */
-    virtual ~Class();
+    ~Class() override;
 
     /**
      * @brief Write the class XML representation into the output stream.
@@ -77,13 +77,13 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return CLASS.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_CLASS;
     }

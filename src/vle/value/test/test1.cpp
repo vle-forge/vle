@@ -297,31 +297,31 @@ public:
     {
     }
 
-    virtual ~MyData()
+    ~MyData() override
     {
     }
 
-    virtual size_t id() const override
+    size_t id() const override
     {
         return 15978462u;
     }
 
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new MyData(*this));
     }
 
-    virtual void writeFile(std::ostream& out) const override
+    void writeFile(std::ostream& out) const override
     {
         out << "(" << name << ": " << x << ", " << y << ", " << z << ")";
     }
 
-    virtual void writeString(std::ostream& out) const override
+    void writeString(std::ostream& out) const override
     {
         writeFile(out);
     }
 
-    virtual void writeXml(std::ostream& out) const override
+    void writeXml(std::ostream& out) const override
     {
         out << "<set><string>" << name << "</string><double>" << x
             << "</double><double>" << y << "</double> <double>" << z

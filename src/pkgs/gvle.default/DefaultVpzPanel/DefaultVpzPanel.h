@@ -50,7 +50,7 @@ class DefaultVpzPanel : public PluginMainPanel
     Q_INTERFACES(vle::gvle::PluginMainPanel)
 public:
     DefaultVpzPanel();
-    virtual ~DefaultVpzPanel();
+    ~DefaultVpzPanel() override;
 
     QString  getname() override;
     QWidget* leftWidget() override;

@@ -41,7 +41,7 @@ class StoragePluginGUItab : public QWidget
 
 public:
     explicit StoragePluginGUItab(QWidget *parent = 0);
-    ~StoragePluginGUItab();
+    ~StoragePluginGUItab() override;
     void init(vle::gvle::vleVpz* vpz, const QString& viewName);
 
 private slots:

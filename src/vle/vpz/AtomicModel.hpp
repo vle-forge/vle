@@ -79,7 +79,7 @@ public:
 
     AtomicModel& operator=(const AtomicModel& mdl);
 
-    virtual vpz::BaseModel* clone() const override
+    vpz::BaseModel* clone() const override
     {
         return new AtomicModel(*this);
     }
@@ -87,7 +87,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~AtomicModel()
+    ~AtomicModel() override
     {
     }
 
@@ -95,7 +95,7 @@ public:
      * @brief Return true, AtomicModel is an atomic model.
      * @return true.
      */
-    virtual bool isAtomic() const override
+    bool isAtomic() const override
     {
         return true;
     }
@@ -175,13 +175,13 @@ public:
      * @return this if name is equal to the model's name, null otherwise.
      * @deprecated
      */
-    virtual BaseModel* findModel(const std::string& name) const override;
+    BaseModel* findModel(const std::string& name) const override;
 
     /**
      * @brief Write the atomic model in the output stream.
      * @param out output stream.
      */
-    virtual void writeXML(std::ostream& out) const override;
+    void writeXML(std::ostream& out) const override;
 
     /**
      * @brief Output the AtomicModel informations into a std::ostream.
@@ -211,14 +211,14 @@ public:
      * @param oldname the old name of the dynamics.
      * @param newname the new name of the dynamics.
      */
-    virtual void updateDynamics(const std::string& oldname,
+    void updateDynamics(const std::string& oldname,
                                 const std::string& newname) override;
 
     /**
      * @brief purge the dymamics not present in the list.
      * @param dynamicslist a list of dynamics name
      */
-    virtual void purgeDynamics(
+    void purgeDynamics(
       const std::set<std::string>& dynamicslist) override;
 
     /**
@@ -227,7 +227,7 @@ public:
      * @param oldname the old name of the observable.
      * @param newname the new name of the observable.
      */
-    virtual void updateObservable(const std::string& oldname,
+    void updateObservable(const std::string& oldname,
                                   const std::string& newname) override;
 
     /**
@@ -235,7 +235,7 @@ public:
      * where the observable is not present in the list.
      * @param observablelist a list of observable name
      */
-    virtual void purgeObservable(
+    void purgeObservable(
       const std::set<std::string>& observablelist) override;
 
     /**
@@ -244,7 +244,7 @@ public:
      * @param oldname the old name of the observable.
      * @param newname the new name of the observable.
      */
-    virtual void updateConditions(const std::string& oldname,
+    void updateConditions(const std::string& oldname,
                                   const std::string& newname) override;
 
     /**
@@ -252,7 +252,7 @@ public:
      * Condition is not present in the list
      * @param conditionlist a list of condition name
      */
-    virtual void purgeConditions(
+    void purgeConditions(
       const std::set<std::string>& conditionlist) override;
 
     bool needDebug() const noexcept

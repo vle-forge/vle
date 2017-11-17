@@ -42,7 +42,7 @@ class DefaultCppPanel : public PluginMainPanel
 
 public:
     DefaultCppPanel();
-    virtual ~DefaultCppPanel();
+    ~DefaultCppPanel() override;
 
     QString  getname() override;
     QWidget* leftWidget() override;

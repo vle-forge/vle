@@ -39,27 +39,27 @@ class Dummy : public Plugin
 public:
     Dummy(const std::string& location);
 
-    virtual ~Dummy();
+    ~Dummy() override;
 
-    virtual void onParameter(const std::string& plugin,
+    void onParameter(const std::string& plugin,
                              const std::string& location,
                              const std::string& file,
                              std::unique_ptr<value::Value> parameters,
                              const double& time) override;
 
-    virtual void onNewObservable(const std::string& simulator,
+    void onNewObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& port,
                                  const std::string& view,
                                  const double& time) override;
 
-    virtual void onDelObservable(const std::string& simulator,
+    void onDelObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& port,
                                  const std::string& view,
                                  const double& time) override;
 
-    virtual void onValue(const std::string& simulator,
+    void onValue(const std::string& simulator,
                          const std::string& parent,
                          const std::string& port,
                          const std::string& view,

@@ -59,7 +59,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Null()
+    ~Null() override
     {
     }
 
@@ -84,7 +84,7 @@ public:
      * @brief Clone the current Null.
      * @return A new Null.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new Null());
     }
@@ -93,7 +93,7 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::NIL.
      */
-    inline virtual Value::type getType() const override
+    inline Value::type getType() const override
     {
         return Value::NIL;
     }
@@ -102,13 +102,13 @@ public:
      * @brief Push the string 'NA' into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the string 'NA' into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push a specific string into the stream. The XML representation of
@@ -118,7 +118,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 };
 
 /**

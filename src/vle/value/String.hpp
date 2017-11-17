@@ -69,7 +69,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~String()
+    ~String() override
     {
     }
 
@@ -96,7 +96,7 @@ public:
      * @brief Clone the current String with the same value.
      * @return A new String.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new String(m_value));
     }
@@ -105,7 +105,7 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::STRING.
      */
-    virtual Value::type getType() const override
+    Value::type getType() const override
     {
         return Value::STRING;
     }
@@ -114,13 +114,13 @@ public:
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the std::string into the stream. Be careful, the
@@ -133,7 +133,7 @@ public:
      * @endcode
      * @param out
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 
     /**
      * @brief Get a constant reference to the encapsulated std::string.

@@ -69,7 +69,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Boolean()
+    ~Boolean() override
     {
     }
 
@@ -95,7 +95,7 @@ public:
      * @brief Clone the current Boolean with the same value.
      * @return A new Boolean.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new Boolean(m_value));
     }
@@ -104,7 +104,7 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::BOOLEAN.
      */
-    inline virtual Value::type getType() const override
+    inline Value::type getType() const override
     {
         return Value::BOOLEAN;
     }
@@ -114,14 +114,14 @@ public:
      * alphabool() to get true or false string instead of 0 an 1.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the bool in the stream. Use the ostream operator
      * alphabool() to get true or false string instead of 0 and 1.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the bool in the stream. The string pushed in the ostream:
@@ -131,7 +131,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 
     ///
     ////

@@ -44,7 +44,7 @@ class vleDomVpz : public DomObject
 {
 public:
     vleDomVpz(QDomDocument* doc);
-    ~vleDomVpz();
+    ~vleDomVpz() override;
     QString getXQuery(QDomNode node) override;
     QDomNode getNodeFromXQuery(const QString& query,
                                QDomNode d = QDomNode()) override;
@@ -57,9 +57,9 @@ class vleDomVpm : public DomObject
 {
 public:
     vleDomVpm(QDomDocument* doc);
-    ~vleDomVpm();
-    QString getXQuery(QDomNode node);
-    QDomNode getNodeFromXQuery(const QString& query, QDomNode d = QDomNode());
+    ~vleDomVpm() override;
+    QString getXQuery(QDomNode node) override;
+    QDomNode getNodeFromXQuery(const QString& query, QDomNode d = QDomNode()) override;
 };
 
 /**

@@ -350,7 +350,7 @@ public:
                                              graph_type.c_str());
     }
 
-    virtual ~Builder() override
+    ~Builder() override
     {
     }
 };

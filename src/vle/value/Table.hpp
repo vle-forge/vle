@@ -74,7 +74,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Table()
+    ~Table() override
     {
     }
 
@@ -114,7 +114,7 @@ public:
      * @brief Clone the current Table with the same TableValue datas.
      * @return A new Table.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new Table(*this));
     }
@@ -124,7 +124,7 @@ public:
      *
      * @return Value::TABLE.
      */
-    virtual Value::type getType() const override;
+    Value::type getType() const override;
 
     /**
      * @brief Push all real from the TableValue separated by space for columns
@@ -136,7 +136,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TableValue separated by colon for
@@ -148,7 +148,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all real from the TableValue into an XML representation.
@@ -160,7 +160,7 @@ public:
      *
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 
     ///
     ////

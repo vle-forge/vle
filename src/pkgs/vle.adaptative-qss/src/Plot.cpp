@@ -36,7 +36,7 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
     {
     }
 
-    ~gnuplot_log()
+    ~gnuplot_log() override
     {
         if (fp)
             fclose(fp);

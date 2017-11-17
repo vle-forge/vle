@@ -94,17 +94,17 @@ public:
         }
     }
 
-    virtual ~Mult()
+    ~Mult() override
     {
     }
 
-    virtual vd::Time init(vd::Time /*time*/) override
+    vd::Time init(vd::Time /*time*/) override
     {
         m_state = INIT;
         return vd::infinity;
     }
 
-    virtual void output(vd::Time /*time*/,
+    void output(vd::Time /*time*/,
                         vd::ExternalEventList& output) const override
     {
         switch (m_state) {
@@ -120,7 +120,7 @@ public:
         }
     }
 
-    virtual vd::Time timeAdvance() const override
+    vd::Time timeAdvance() const override
     {
         switch (m_state) {
         case INIT:
@@ -132,7 +132,7 @@ public:
         return vd::infinity; // useless, only for keeping compiler quiet
     }
 
-    virtual void internalTransition(vd::Time /*time*/) override
+    void internalTransition(vd::Time /*time*/) override
     {
         if (RESPONSE == m_state) {
             m_last_output = m_output_value;
@@ -140,7 +140,7 @@ public:
         m_state = WAIT;
     }
 
-    virtual void externalTransition(const vd::ExternalEventList& lst,
+    void externalTransition(const vd::ExternalEventList& lst,
                                     vd::Time /*time*/) override
     {
         vd::ExternalEventList::const_iterator it;
@@ -175,7 +175,7 @@ public:
         }
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       vd::Time time,
       const vd::ExternalEventList& events) override
     {
@@ -183,13 +183,13 @@ public:
         externalTransition(events, time);
     }
 
-    virtual std::unique_ptr<vv::Value> observation(
+    std::unique_ptr<vv::Value> observation(
       const vd::ObservationEvent& /*event*/) const override
     {
         return vv::Double::create(m_last_output);
     }
 
-    virtual void finish() override
+    void finish() override
     {
     }
 

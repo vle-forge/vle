@@ -69,7 +69,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Integer()
+    ~Integer() override
     {
     }
 
@@ -95,7 +95,7 @@ public:
      * @brief Clone the current Integer with the same value.
      * @return A new Integer.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new Integer(m_value));
     }
@@ -104,7 +104,7 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::INTEGER.
      */
-    virtual Value::type getType() const override
+    Value::type getType() const override
     {
         return Value::INTEGER;
     }
@@ -113,13 +113,13 @@ public:
      * @brief Push the long in the stream.
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push the long in the stream.
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push the long in the stream. The string pushed in the stream:
@@ -129,7 +129,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 
     ///
     ////

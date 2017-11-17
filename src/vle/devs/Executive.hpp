@@ -81,7 +81,7 @@ public:
     /**
      * @brief Destructor (nothing to do).
      */
-    virtual ~Executive()
+    ~Executive() override
     {
     }
 
@@ -92,7 +92,7 @@ public:
      * simulation.
      * @return false if Dynamics is not an Executive.
      */
-    inline virtual bool isExecutive() const override
+    inline bool isExecutive() const override
     {
         return true;
     }

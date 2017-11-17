@@ -69,9 +69,9 @@ public:
     {
     }
 
-    virtual ~OutputPlugin() = default;
+    ~OutputPlugin() override = default;
 
-    virtual std::unique_ptr<vle::value::Matrix> matrix() const override
+    std::unique_ptr<vle::value::Matrix> matrix() const override
     {
         assert(not ppD.empty());
         const size_t columns = ppD.size() + 1; // colums = number of
@@ -105,17 +105,17 @@ public:
         return matrix;
     }
 
-    virtual std::string name() const override
+    std::string name() const override
     {
         return "OutputPlugin";
     }
 
-    virtual bool isCairo() const override
+    bool isCairo() const override
     {
         return false;
     }
 
-    virtual void onParameter(const std::string& plugin,
+    void onParameter(const std::string& plugin,
                              const std::string& location,
                              const std::string& file,
                              std::unique_ptr<vle::value::Value> parameters,
@@ -128,7 +128,7 @@ public:
         (void)time;
     }
 
-    virtual void onNewObservable(const std::string& simulator,
+    void onNewObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& port,
                                  const std::string& view,
@@ -143,7 +143,7 @@ public:
         ppD[id].reserve(100);
     }
 
-    virtual void onDelObservable(const std::string& simulator,
+    void onDelObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& port,
                                  const std::string& view,
@@ -156,7 +156,7 @@ public:
         assert(ppD.find(id) != ppD.cend());
     }
 
-    virtual void onValue(const std::string& simulator,
+    void onValue(const std::string& simulator,
                          const std::string& parent,
                          const std::string& port,
                          const std::string& view,

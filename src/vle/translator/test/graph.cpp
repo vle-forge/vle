@@ -76,17 +76,17 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 0.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 1.0;
     }
 
-    virtual void output(devs::Time /* time */,
+    void output(devs::Time /* time */,
                         devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
@@ -102,35 +102,35 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         m_counter = 0;
         return 0.0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return 1.0;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         m_counter = 1;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& events,
+    void externalTransition(const devs::ExternalEventList& events,
                                     devs::Time /* time */) override
     {
         m_counter = m_counter + events.size();
     }
 
-    virtual void output(devs::Time /* time */,
+    void output(devs::Time /* time */,
                         devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
     }
 
-    virtual std::unique_ptr<value::Value> observation(
+    std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
         return value::Integer::create(m_counter);
@@ -193,7 +193,7 @@ public:
         classname = "nothing";
     }
 
-    virtual devs::Time init(devs::Time time) override
+    devs::Time init(devs::Time time) override
     {
         if (generator_type == "smallworld") {
             auto gg = make_gg();

@@ -80,7 +80,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~View() = default;
+    ~View() override = default;
 
     /**
      * @brief Write the XML representation of this class.
@@ -90,13 +90,13 @@ public:
      * @endcode
      * @param out Output stream.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return VIEW.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_VIEW;
     }

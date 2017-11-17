@@ -202,7 +202,7 @@ public:
     bool snapshotEnabled;
 
     DomDiffStack(DomObject* vdo);
-    virtual ~DomDiffStack();
+    ~DomDiffStack() override;
 
     void init(QDomNode node);
     bool enableSnapshot(bool enable);

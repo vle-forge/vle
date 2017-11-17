@@ -52,7 +52,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Experiment()
+    ~Experiment() override
     {
     }
 
@@ -66,13 +66,13 @@ public:
      * </experiment>
      * @endcode
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return The Base::EXPERIMENT.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_EXPERIMENT;
     }

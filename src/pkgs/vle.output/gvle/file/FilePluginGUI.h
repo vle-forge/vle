@@ -40,7 +40,7 @@ class FilePluginGUI : public PluginOutput
 
 public:
     FilePluginGUI();
-    ~FilePluginGUI();
+    ~FilePluginGUI() override;
     QString getname() override;
     QWidget *getWidget() override;
     void     delWidget() override;

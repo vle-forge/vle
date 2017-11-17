@@ -65,7 +65,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~User()
+    ~User() override
     {
     }
 
@@ -82,7 +82,7 @@ public:
      * @brief Get the type of this class.
      * @return Return Value::User.
      */
-    virtual Value::type getType() const override
+    Value::type getType() const override
     {
         return Value::USER;
     }

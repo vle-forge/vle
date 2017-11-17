@@ -76,17 +76,17 @@ public:
         }
     }
 
-    virtual ~Integrator()
+    ~Integrator() override
     {
     }
 
-    virtual vd::Time init(vd::Time /* time */) override
+    vd::Time init(vd::Time /* time */) override
     {
         m_state = INIT;
         return 0;
     }
 
-    virtual void externalTransition(const vd::ExternalEventList& events,
+    void externalTransition(const vd::ExternalEventList& events,
                                     vd::Time time) override
     {
         double up_val, down_val;
@@ -153,7 +153,7 @@ public:
         }
     }
 
-    virtual void output(vd::Time /*time*/,
+    void output(vd::Time /*time*/,
                         vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
@@ -178,7 +178,7 @@ public:
         }
     }
 
-    virtual vd::Time timeAdvance() const override
+    vd::Time timeAdvance() const override
     {
         double current_derivative;
 

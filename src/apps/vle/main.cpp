@@ -77,7 +77,7 @@ struct vle_log_standard : vle::utils::Context::LogFunctor
     {
     }
 
-    virtual void write(const vle::utils::Context& ctx,
+    void write(const vle::utils::Context& ctx,
                        int priority,
                        const char* file,
                        int line,
@@ -117,13 +117,13 @@ struct vle_log_file : vle::utils::Context::LogFunctor
     {
     }
 
-    ~vle_log_file()
+    ~vle_log_file() override
     {
         if (fp)
             fclose(fp);
     }
 
-    virtual void write(const vle::utils::Context& ctx,
+    void write(const vle::utils::Context& ctx,
                        int priority,
                        const char* file,
                        int line,

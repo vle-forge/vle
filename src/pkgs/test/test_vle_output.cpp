@@ -88,38 +88,38 @@ public:
     {
     }
 
-    virtual devs::Time init(devs::Time /* time */) override
+    devs::Time init(devs::Time /* time */) override
     {
         return 0;
     }
 
-    virtual devs::Time timeAdvance() const override
+    devs::Time timeAdvance() const override
     {
         return devs::infinity;
     }
 
-    virtual void internalTransition(devs::Time /* time */) override
+    void internalTransition(devs::Time /* time */) override
     {
         d = 3.9;
     }
 
-    virtual void externalTransition(const devs::ExternalEventList& /*events*/,
+    void externalTransition(const devs::ExternalEventList& /*events*/,
                                     devs::Time /* time */) override
     {
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       devs::Time /*time*/,
       const devs::ExternalEventList& /*extEventlist*/) override
     {
     }
 
-    virtual void output(devs::Time /*time*/,
+    void output(devs::Time /*time*/,
                         devs::ExternalEventList& /*output*/) const override
     {
     }
 
-    virtual std::unique_ptr<value::Value> observation(
+    std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
         return vle::value::Double::create(d);

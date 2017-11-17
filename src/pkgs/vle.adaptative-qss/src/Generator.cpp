@@ -91,16 +91,16 @@ public:
         }
     }
 
-    virtual ~Generator() // This is mandatory
+    ~Generator() override // This is mandatory
     {
     }
 
-    virtual vd::Time init(vd::Time /* time */) override
+    vd::Time init(vd::Time /* time */) override
     {
         return 0;
     }
 
-    virtual void output(vd::Time time,
+    void output(vd::Time time,
                         vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
@@ -116,7 +116,7 @@ public:
         m_last_output = m_val + m_trend * time;
     }
 
-    virtual vd::Time timeAdvance() const override
+    vd::Time timeAdvance() const override
     {
         if (0 == m_trend) {
             return vd::infinity;

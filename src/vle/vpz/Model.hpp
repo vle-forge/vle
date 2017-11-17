@@ -62,7 +62,7 @@ public:
     /**
      * @brief Nothing to delete. Be carefull, you must delete the graph.
      */
-    virtual ~Model();
+    ~Model() override;
 
     /**
      * @brief Write the XML representation of this class.
@@ -73,13 +73,13 @@ public:
      * @endcode
      * @param out an output stream.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return MODEL.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_MODEL;
     }
@@ -200,14 +200,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Submodels()
+    ~Submodels() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -215,7 +215,7 @@ public:
      * @brief Get the type of this class.
      * @return SUBMODELS.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_SUBMODELS;
     }
@@ -237,14 +237,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Connections()
+    ~Connections() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -252,7 +252,7 @@ public:
      * @brief Get the type of this class.
      * @return CONNECTIONS.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_CONNECTIONS;
     }
@@ -274,14 +274,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~InternalConnection()
+    ~InternalConnection() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -289,7 +289,7 @@ public:
      * @brief Get the type of this class.
      * @return INTERNAL_CONNECTION.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_INTERNAL_CONNECTION;
     }
@@ -311,14 +311,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~InputConnection()
+    ~InputConnection() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -326,7 +326,7 @@ public:
      * @brief Get the type of this class.
      * @return INPUT_CONNECTION.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_INPUT_CONNECTION;
     }
@@ -348,14 +348,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~OutputConnection()
+    ~OutputConnection() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -363,7 +363,7 @@ public:
      * @brief Get the type of this class.
      * @return OUTPUT_CONNECTION.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_OUTPUT_CONNECTION;
     }
@@ -389,14 +389,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Origin()
+    ~Origin() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -404,7 +404,7 @@ public:
      * @brief Get the type of this class.
      * @return ORIGIN.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_ORIGIN;
     }
@@ -433,14 +433,14 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Destination()
+    ~Destination() override
     {
     }
 
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
@@ -448,7 +448,7 @@ public:
      * @brief Get the type of this class.
      * @return DESTINATION.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_DESTINATION;
     }

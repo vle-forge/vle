@@ -60,7 +60,7 @@ public:
     explicit FileVpzClasses(Logger* log,
             const vle::utils::ContextPtr& ctx,
             QWidget *parent = 0);
-    ~FileVpzClasses();
+    ~FileVpzClasses() override;
     void setVpz(vleVpz* vpz);
     void reload();
 public slots:

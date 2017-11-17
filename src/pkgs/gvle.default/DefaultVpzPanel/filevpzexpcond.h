@@ -59,7 +59,7 @@ public:
 public:
     explicit FileVpzExpCond(gvle_plugins* plugs, QWidget *parent = 0);
 
-    ~FileVpzExpCond();
+    ~FileVpzExpCond() override;
     void setVpz(vleVpz* vpz);
     void resizeTable();
     void reload(bool resize=true);

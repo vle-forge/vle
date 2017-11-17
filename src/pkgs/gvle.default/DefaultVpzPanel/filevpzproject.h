@@ -44,7 +44,7 @@ class FileVpzProject : public QWidget
 
 public:
     explicit FileVpzProject(QWidget *parent = 0);
-    ~FileVpzProject();
+    ~FileVpzProject() override;
     void setVpz(vleVpz* vpz);
     void setTabId(int i)
     {mId = i;};

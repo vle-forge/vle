@@ -38,7 +38,7 @@ class PluginSimPanel :public QObject
     Q_OBJECT
 public:
     PluginSimPanel(){};
-    virtual ~PluginSimPanel(){};
+    ~PluginSimPanel() override{};
     virtual void init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log) = 0;
     virtual QString  getname()                                            = 0;
     virtual QWidget* leftWidget()                                         = 0;

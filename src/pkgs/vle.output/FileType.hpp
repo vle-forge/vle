@@ -37,37 +37,37 @@ namespace plugin {
 class Rdata : public File::FileType
 {
 public:
-    virtual ~Rdata();
+    ~Rdata() override;
 
-    virtual std::string extension() const;
+    std::string extension() const override;
 
-    virtual void writeSeparator(std::ostream& out);
+    void writeSeparator(std::ostream& out) override;
 
-    virtual void writeHead(std::ostream& out, const File::Strings& heads);
+    void writeHead(std::ostream& out, const File::Strings& heads) override;
 };
 
 class CSV : public File::FileType
 {
 public:
-    virtual ~CSV();
+    ~CSV() override;
 
-    virtual std::string extension() const;
+    std::string extension() const override;
 
-    virtual void writeSeparator(std::ostream& out);
+    void writeSeparator(std::ostream& out) override;
 
-    virtual void writeHead(std::ostream& out, const File::Strings& heads);
+    void writeHead(std::ostream& out, const File::Strings& heads) override;
 };
 
 class Text : public File::FileType
 {
 public:
-    virtual ~Text();
+    ~Text() override;
 
-    virtual std::string extension() const;
+    std::string extension() const override;
 
-    virtual void writeSeparator(std::ostream& out);
+    void writeSeparator(std::ostream& out) override;
 
-    virtual void writeHead(std::ostream& out, const File::Strings& heads);
+    void writeHead(std::ostream& out, const File::Strings& heads) override;
 };
 }
 }

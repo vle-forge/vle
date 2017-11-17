@@ -46,7 +46,7 @@ struct sim_log : utils::Context::LogFunctor
     {
     }
 
-    virtual void write(const utils::Context& ctx,
+    void write(const utils::Context& ctx,
                        int priority,
                        const char* file,
                        int line,
@@ -61,7 +61,7 @@ struct sim_log : utils::Context::LogFunctor
         (void)fn;
         log_messages.emplace_back(vle::utils::vformat(format, args));
     }
-    virtual ~sim_log(){};
+    ~sim_log() override{};
 };
 
 DefaultSimSubpanelThread::DefaultSimSubpanelThread(

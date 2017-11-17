@@ -78,7 +78,7 @@ public:
     /**
      * @brief Nothing to clean.
      */
-    virtual ~Dynamic()
+    ~Dynamic() override
     {
     }
 
@@ -87,13 +87,13 @@ public:
      * stream.
      * @param out Output stream where flush this class.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return Return DYNAMIC.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_DYNAMIC;
     }

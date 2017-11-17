@@ -94,7 +94,7 @@ public:
     /**
      * @brief Delete all data.
      */
-    virtual ~Matrix()
+    ~Matrix() override
     {
     }
 
@@ -144,7 +144,7 @@ public:
      * @brief Clone the Matrix and all value::Value.
      * @return A new Matrix.
      */
-    virtual std::unique_ptr<Value> clone() const override
+    std::unique_ptr<Value> clone() const override
     {
         return std::unique_ptr<Value>(new Matrix(*this));
     }
@@ -153,7 +153,7 @@ public:
      * @brief Get the type of this class.
      * @return Value::MATRIX.
      */
-    inline virtual Value::type getType() const override;
+    inline Value::type getType() const override;
 
     /**
      * @brief Push all Value from the MatrixValue, recursively and space
@@ -164,7 +164,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeFile(std::ostream& out) const override;
+    void writeFile(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the MatrixValue, recursively and space
@@ -175,7 +175,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeString(std::ostream& out) const override;
+    void writeString(std::ostream& out) const override;
 
     /**
      * @brief Push all Value from the MatrixValue recursively in an XML
@@ -201,7 +201,7 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void writeXml(std::ostream& out) const override;
+    void writeXml(std::ostream& out) const override;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

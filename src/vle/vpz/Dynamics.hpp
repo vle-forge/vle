@@ -74,7 +74,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Dynamics()
+    ~Dynamics() override
     {
     }
 
@@ -94,13 +94,13 @@ public:
      * @endcode
      * @param out the output stream.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return DYNAMICS.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_DYNAMICS;
     }

@@ -43,7 +43,7 @@ class DefaultDataPanel : public PluginMainPanel
 
 public:
     DefaultDataPanel();
-    virtual ~DefaultDataPanel();
+    ~DefaultDataPanel() override;
 
     QString  getname() override;
     QWidget* leftWidget() override;

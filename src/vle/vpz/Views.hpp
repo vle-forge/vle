@@ -64,7 +64,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Views()
+    ~Views() override
     {
     }
 
@@ -79,13 +79,13 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return VIEWS.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_VIEWS;
     }

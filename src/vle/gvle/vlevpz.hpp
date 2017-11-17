@@ -61,7 +61,7 @@ public:
     vleVpz(const QString& vpzpath,
            const QString& vpmpath,
            gvle_plugins* plugs);
-    virtual ~vleVpz();
+    ~vleVpz() override;
 
     /******************************************************
      * Access to specific nodes in the vpz from Doc

@@ -59,11 +59,11 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
     {
     }
 
-    virtual ~gvle_ctx_log()
+    ~gvle_ctx_log() override
     {
     }
 
-    virtual void write(const vle::utils::Context& ctx,
+    void write(const vle::utils::Context& ctx,
                        int priority,
                        const char* file,
                        int line,

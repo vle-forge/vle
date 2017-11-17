@@ -49,14 +49,14 @@ public:
     /**
      * @brief Nothing to output.
      */
-    virtual void write(std::ostream& /* out */) const override
+    void write(std::ostream& /* out */) const override
     {
     }
 
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Structures()
+    ~Structures() override
     {
     }
 
@@ -64,7 +64,7 @@ public:
      * @brief Get the type of this class.
      * @return STRUCTURES.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_STRUCTURES;
     }

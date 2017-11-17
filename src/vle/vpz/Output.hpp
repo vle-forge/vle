@@ -71,7 +71,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    virtual ~Output();
+    ~Output() override;
 
     /**
      * @brief Swap all the value between this output and the parameter. The
@@ -92,13 +92,13 @@ public:
      * @endcode
      * @param out The output stream.
      */
-    virtual void write(std::ostream& out) const override;
+    void write(std::ostream& out) const override;
 
     /**
      * @brief Get the type of this class.
      * @return OUTPUT.
      */
-    virtual Base::type getType() const override
+    Base::type getType() const override
     {
         return VLE_VPZ_OUTPUT;
     }

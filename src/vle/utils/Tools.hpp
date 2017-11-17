@@ -230,7 +230,7 @@ is_numeric_castable(Source arg)
  */
 struct VLE_API numeric_cast_error : public std::exception
 {
-    virtual const char* what() const noexcept
+    const char* what() const noexcept override
     {
         return "numeric cast error: loss of range in numeric_cast";
     }

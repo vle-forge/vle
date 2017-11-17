@@ -53,15 +53,15 @@ public:
     {
     }
 
-    virtual ~Model() = default;
+    ~Model() override = default;
 
-    virtual vle::devs::Time init(vle::devs::Time /* time */) override
+    vle::devs::Time init(vle::devs::Time /* time */) override
     {
         state = 0;
         return 1;
     }
 
-    virtual void output(vle::devs::Time /* time */,
+    void output(vle::devs::Time /* time */,
                         vle::devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
@@ -70,16 +70,16 @@ public:
           std::make_shared<value::String>("My message");
     }
 
-    virtual vle::devs::Time timeAdvance() const override
+    vle::devs::Time timeAdvance() const override
     {
         return 1.;
     }
 
-    virtual void internalTransition(vle::devs::Time /* time */) override
+    void internalTransition(vle::devs::Time /* time */) override
     {
     }
 
-    virtual void externalTransition(const vle::devs::ExternalEventList& events,
+    void externalTransition(const vle::devs::ExternalEventList& events,
                                     vle::devs::Time /* time */) override
     {
         for (const auto& elem : events)
@@ -87,7 +87,7 @@ public:
                 state = 1;
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       vle::devs::Time time,
       const vle::devs::ExternalEventList& extEventlist) override
     {
@@ -95,13 +95,13 @@ public:
         externalTransition(extEventlist, time);
     }
 
-    virtual std::unique_ptr<vle::value::Value> observation(
+    std::unique_ptr<vle::value::Value> observation(
       const vle::devs::ObservationEvent& /* event */) const override
     {
         return vle::value::Integer::create(1);
     }
 
-    virtual void finish() override
+    void finish() override
     {
     }
 };
@@ -117,15 +117,15 @@ public:
     {
     }
 
-    virtual ~ModelDbg() = default;
+    ~ModelDbg() override = default;
 
-    virtual vle::devs::Time init(vle::devs::Time /* time */) override
+    vle::devs::Time init(vle::devs::Time /* time */) override
     {
         state = 0;
         return 3;
     }
 
-    virtual void output(vle::devs::Time /* time */,
+    void output(vle::devs::Time /* time */,
                         vle::devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
@@ -134,16 +134,16 @@ public:
           std::make_shared<value::String>("My message");
     }
 
-    virtual vle::devs::Time timeAdvance() const override
+    vle::devs::Time timeAdvance() const override
     {
         return .1;
     }
 
-    virtual void internalTransition(vle::devs::Time /* time */) override
+    void internalTransition(vle::devs::Time /* time */) override
     {
     }
 
-    virtual void externalTransition(const vle::devs::ExternalEventList& events,
+    void externalTransition(const vle::devs::ExternalEventList& events,
                                     vle::devs::Time /* time */) override
     {
         for (const auto& elem : events)
@@ -151,7 +151,7 @@ public:
                 state = 1;
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       vle::devs::Time time,
       const vle::devs::ExternalEventList& extEventlist) override
     {
@@ -159,13 +159,13 @@ public:
         externalTransition(extEventlist, time);
     }
 
-    virtual std::unique_ptr<vle::value::Value> observation(
+    std::unique_ptr<vle::value::Value> observation(
       const vle::devs::ObservationEvent& /* event */) const override
     {
         return vle::value::Integer::create(2);
     }
 
-    virtual void finish() override
+    void finish() override
     {
     }
 };
@@ -181,15 +181,15 @@ public:
     {
     }
 
-    virtual ~Exe() = default;
+    ~Exe() override = default;
 
-    virtual vle::devs::Time init(vle::devs::Time /* time */) override
+    vle::devs::Time init(vle::devs::Time /* time */) override
     {
         state = 0;
         return 0.1;
     }
 
-    virtual void output(vle::devs::Time /* time */,
+    void output(vle::devs::Time /* time */,
                         vle::devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
@@ -198,12 +198,12 @@ public:
           std::make_shared<value::String>("My message");
     }
 
-    virtual vle::devs::Time timeAdvance() const override
+    vle::devs::Time timeAdvance() const override
     {
         return 2;
     }
 
-    virtual void internalTransition(vle::devs::Time /* time */) override
+    void internalTransition(vle::devs::Time /* time */) override
     {
         if (state == 0) {
             addOutputPort("atom", "out2");
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    virtual void externalTransition(const vle::devs::ExternalEventList& events,
+    void externalTransition(const vle::devs::ExternalEventList& events,
                                     vle::devs::Time /* time */) override
     {
         for (const auto& elem : events)
@@ -219,7 +219,7 @@ public:
                 state = 1;
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       vle::devs::Time time,
       const vle::devs::ExternalEventList& extEventlist) override
     {
@@ -227,13 +227,13 @@ public:
         externalTransition(extEventlist, time);
     }
 
-    virtual std::unique_ptr<vle::value::Value> observation(
+    std::unique_ptr<vle::value::Value> observation(
       const vle::devs::ObservationEvent& /* event */) const override
     {
         return vle::value::Integer::create(3);
     }
 
-    virtual void finish() override
+    void finish() override
     {
     }
 };
@@ -249,52 +249,52 @@ public:
     {
     }
 
-    virtual ~ObservationModel() = default;
+    ~ObservationModel() override = default;
 
-    virtual vle::devs::Time init(vle::devs::Time /* time */) override
+    vle::devs::Time init(vle::devs::Time /* time */) override
     {
         state = 0;
         return 1;
     }
 
-    virtual void output(
+    void output(
       vle::devs::Time /* time */,
       vle::devs::ExternalEventList& /* output */) const override
     {
         state++;
     }
 
-    virtual vle::devs::Time timeAdvance() const override
+    vle::devs::Time timeAdvance() const override
     {
         return 1.;
     }
 
-    virtual void internalTransition(vle::devs::Time /* time */) override
+    void internalTransition(vle::devs::Time /* time */) override
     {
         state++;
     }
 
-    virtual void externalTransition(
+    void externalTransition(
       const vle::devs::ExternalEventList& /* events */,
       vle::devs::Time /* time */) override
     {
         state += 1000;
     }
 
-    virtual void confluentTransitions(
+    void confluentTransitions(
       vle::devs::Time /* time */,
       const vle::devs::ExternalEventList& /* extEventlist */) override
     {
         state += 1000000;
     }
 
-    virtual std::unique_ptr<vle::value::Value> observation(
+    std::unique_ptr<vle::value::Value> observation(
       const vle::devs::ObservationEvent& /* event */) const override
     {
         return vle::value::Integer::create(state);
     }
 
-    virtual void finish() override
+    void finish() override
     {
         state++;
     }
@@ -317,19 +317,19 @@ public:
         assert(location == "toto");
     }
 
-    virtual ~OutputPluginSimple() = default;
+    ~OutputPluginSimple() override = default;
 
-    virtual std::string name() const override
+    std::string name() const override
     {
         return "OutputPlugin";
     }
 
-    virtual bool isCairo() const override
+    bool isCairo() const override
     {
         return false;
     }
 
-    virtual void onParameter(const std::string& /* plugin */,
+    void onParameter(const std::string& /* plugin */,
                              const std::string& /* location */,
                              const std::string& /* file */,
                              std::unique_ptr<value::Value> /* parameters */,
@@ -337,7 +337,7 @@ public:
     {
     }
 
-    virtual void onNewObservable(const std::string& simulator,
+    void onNewObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& port,
                                  const std::string& /* view */,
@@ -348,7 +348,7 @@ public:
         pp_D[key] = { std::unique_ptr<vle::value::Value>(), 0 };
     }
 
-    virtual void onDelObservable(const std::string& /* simulator */,
+    void onDelObservable(const std::string& /* simulator */,
                                  const std::string& /* parent */,
                                  const std::string& /* port */,
                                  const std::string& /* view */,
@@ -356,7 +356,7 @@ public:
     {
     }
 
-    virtual void onValue(const std::string& simulator,
+    void onValue(const std::string& simulator,
                          const std::string& parent,
                          const std::string& port,
                          const std::string& /* view */,
@@ -370,7 +370,7 @@ public:
         data.number++;
     }
 
-    virtual std::unique_ptr<value::Matrix> finish(
+    std::unique_ptr<value::Matrix> finish(
       const double& /* time */) override
     {
         auto it = pp_D.find("depth0.atom.port");

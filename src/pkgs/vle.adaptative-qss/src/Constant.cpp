@@ -49,7 +49,7 @@ public:
 
     ~Constant() override = default;
 
-    virtual vd::Time init(vd::Time /* time */) override
+    vd::Time init(vd::Time /* time */) override
     {
         if (m_outputs.empty()) {
             Trace(context(),
@@ -63,7 +63,7 @@ public:
         return 0;
     }
 
-    virtual void output(vd::Time /*time*/,
+    void output(vd::Time /*time*/,
                         vd::ExternalEventList& output) const override
     {
         for (const auto& port : m_outputs) {
@@ -79,7 +79,7 @@ public:
         }
     }
 
-    virtual vd::Time timeAdvance() const override
+    vd::Time timeAdvance() const override
     {
         return vd::infinity;
     }
