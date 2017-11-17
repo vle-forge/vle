@@ -23,7 +23,7 @@
  */
 
 #include <algorithm>
-#include <float.h>
+#include <cfloat>
 #include <iostream>
 
 #include <QApplication>

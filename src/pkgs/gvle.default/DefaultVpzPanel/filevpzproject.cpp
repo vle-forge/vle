@@ -27,7 +27,7 @@
 #include <QMessageBox>
 #include <QUndoCommand>
 #include <QtGlobal>
-#include <float.h>
+#include <cfloat>
 #include <iostream>
 #include <limits>
 #include <vle/utils/DateTime.hpp>

@@ -20,7 +20,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <string.h>
+#include <cstring>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 
