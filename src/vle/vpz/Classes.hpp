@@ -47,10 +47,10 @@ typedef std::map<std::string, Class> ClassList;
 class VLE_API Classes : public Base
 {
 public:
-    typedef ClassList::iterator iterator;
-    typedef ClassList::const_iterator const_iterator;
-    typedef ClassList::size_type size_type;
-    typedef ClassList::value_type value_type;
+    using iterator = ClassList::iterator;
+    using const_iterator = ClassList::const_iterator;
+    using size_type = ClassList::size_type;
+    using value_type = ClassList::value_type;
 
     /**
      * @brief Empty constructor.

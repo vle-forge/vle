@@ -170,8 +170,7 @@ buildNewDynamicsWrapper(utils::ContextPtr context,
                         const InitEventList& events,
                         void* symbol)
 {
-    typedef Dynamics* (*fctdw)(const DynamicsWrapperInit&,
-                               const InitEventList&);
+    using fctdw = vle::devs::Dynamics *(*)(const vle::devs::DynamicsWrapperInit &, const vle::devs::InitEventList &);
 
     fctdw fct = utils::functionCast<fctdw>(symbol);
 
@@ -272,7 +271,7 @@ buildNewDynamics(utils::ContextPtr context,
                  const InitEventList& events,
                  void* symbol)
 {
-    typedef Dynamics* (*fctdyn)(const DynamicsInit&, const InitEventList&);
+    using fctdyn = vle::devs::Dynamics *(*)(const vle::devs::DynamicsInit &, const vle::devs::InitEventList &);
 
     fctdyn fct = utils::functionCast<fctdyn>(symbol);
 
@@ -331,7 +330,7 @@ buildNewExecutive(utils::ContextPtr context,
                   const InitEventList& events,
                   void* symbol)
 {
-    typedef Dynamics* (*fctexe)(const ExecutiveInit&, const InitEventList&);
+    using fctexe = vle::devs::Dynamics *(*)(const vle::devs::ExecutiveInit &, const vle::devs::InitEventList &);
 
     fctexe fct = utils::functionCast<fctexe>(symbol);
 

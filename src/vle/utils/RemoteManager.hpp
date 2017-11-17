@@ -73,11 +73,11 @@ struct PackageLinkId
                                * identified operator package. */
 };
 
-typedef std::vector<PackageLinkId> PackagesLinkId;
+using PackagesLinkId = std::vector<PackageLinkId>;
 
-typedef std::string Tag;
+using Tag = std::string;
 
-typedef std::vector<Tag> Tags;
+using Tags = std::vector<Tag>;
 
 struct PackageId
 {
@@ -116,7 +116,7 @@ enum RemoteManagerActions
 
 VLE_API std::ostream& operator<<(std::ostream& os, const PackageId& b);
 
-typedef std::vector<PackageId> Packages;
+using Packages = std::vector<PackageId>;
 
 /**
  * \c RemoteManager allow to manager ftp/http repositories.

@@ -37,7 +37,7 @@ namespace value {
 /**
  * @brief Define a array of double.
  */
-typedef std::vector<double> TupleValue;
+using TupleValue = std::vector<double>;
 
 /**
  * @brief A Tuple Value is a container to store a list of double value into

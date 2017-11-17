@@ -42,7 +42,7 @@ namespace vpz {
 class VLE_API CoupledModel : public BaseModel
 {
 public:
-    typedef std::vector<std::string> StringList;
+    using StringList = std::vector<std::string>;
     typedef std::map<std::string, ConnectionList> ModelConnections;
 
     /**

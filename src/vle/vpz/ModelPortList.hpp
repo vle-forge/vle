@@ -40,10 +40,10 @@ class VLE_API ModelPortList
 {
 public:
     typedef std::multimap<BaseModel*, std::string> Values;
-    typedef Values::iterator iterator;
-    typedef Values::const_iterator const_iterator;
-    typedef Values::size_type size_type;
-    typedef Values::value_type value_type;
+    using iterator = Values::iterator;
+    using const_iterator = Values::const_iterator;
+    using size_type = Values::size_type;
+    using value_type = Values::value_type;
 
     ModelPortList()
     {

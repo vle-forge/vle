@@ -965,8 +965,8 @@ CoupledModel::writeConnections(std::ostream& out) const
 void
 CoupledModel::write(std::ostream& out) const
 {
-    typedef std::stack<const vpz::CoupledModel*> CoupledModelList;
-    typedef std::stack<bool> IsWritedCoupledModel;
+    using CoupledModelList = std::stack<const vpz::CoupledModel *>;
+    using IsWritedCoupledModel = std::stack<bool>;
 
     CoupledModelList cms;
     IsWritedCoupledModel writed;
@@ -1183,7 +1183,7 @@ CoupledModel::copyInternalPort(const ModelPortList& src,
                                const BaseModel& parentSrc,
                                BaseModel& parentDst)
 {
-    typedef ModelPortList::const_iterator const_iterator;
+    using const_iterator = ModelPortList::const_iterator;
 
     for (const_iterator it = src.begin(); it != src.end(); ++it) {
         if (it->first == &parentSrc) {
@@ -1214,7 +1214,7 @@ CoupledModel::copyConnection(const ConnectionList& src, ConnectionList& dst)
 void
 CoupledModel::copyPort(const ModelPortList& src, ModelPortList& dst)
 {
-    typedef ModelPortList::const_iterator const_iterator;
+    using const_iterator = ModelPortList::const_iterator;
 
     for (const_iterator it = src.begin(); it != src.end(); ++it) {
         BaseModel* dstmodel = findModel(it->first->getName());

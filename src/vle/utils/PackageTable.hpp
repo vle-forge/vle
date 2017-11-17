@@ -37,11 +37,11 @@ namespace utils {
 class VLE_API PackageTable
 {
 public:
-    typedef std::set<std::string> table_t;
-    typedef table_t::const_iterator index;
-    typedef table_t::const_iterator const_iterator;
-    typedef table_t::iterator iterator;
-    typedef table_t::size_type size_type;
+    using table_t = std::set<std::string>;
+    using index = table_t::const_iterator;
+    using const_iterator = table_t::const_iterator;
+    using iterator = table_t::iterator;
+    using size_type = table_t::size_type;
 
     PackageTable();
 

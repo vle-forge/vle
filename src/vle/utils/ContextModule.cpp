@@ -242,8 +242,7 @@ struct Module
 
     void checkVersion()
     {
-        typedef void (*versionFunction)(
-          std::uint32_t*, std::uint32_t*, std::uint32_t*);
+        using versionFunction = void (*)(std::uint32_t *, std::uint32_t *, std::uint32_t *);
         void* symbol;
 
         auto version = vle::version();

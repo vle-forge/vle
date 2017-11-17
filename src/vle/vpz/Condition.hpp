@@ -50,10 +50,10 @@ using ConditionValues =
 class VLE_API Condition : public Base
 {
 public:
-    typedef ConditionValues::iterator iterator;
-    typedef ConditionValues::const_iterator const_iterator;
-    typedef ConditionValues::size_type size_type;
-    typedef ConditionValues::value_type value_type;
+    using iterator = ConditionValues::iterator;
+    using const_iterator = ConditionValues::const_iterator;
+    using size_type = ConditionValues::size_type;
+    using value_type = ConditionValues::value_type;
 
     /**
      * @brief Build a new Condition with only a name.

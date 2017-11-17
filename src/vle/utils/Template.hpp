@@ -39,9 +39,9 @@ class VLE_API SymbolString
 {
 public:
     typedef std::map<std::string, std::string> symbols_t;
-    typedef symbols_t::const_iterator const_iterator;
-    typedef symbols_t::iterator iterator;
-    typedef symbols_t::size_type size_type;
+    using const_iterator = symbols_t::const_iterator;
+    using iterator = symbols_t::iterator;
+    using size_type = symbols_t::size_type;
 
     void append(const std::string& key, const std::string& value);
     void remove(const std::string& key);
@@ -76,9 +76,9 @@ class VLE_API SymbolBool
 {
 public:
     typedef std::map<std::string, bool> symbols_t;
-    typedef symbols_t::const_iterator const_iterator;
-    typedef symbols_t::iterator iterator;
-    typedef symbols_t::size_type size_type;
+    using const_iterator = symbols_t::const_iterator;
+    using iterator = symbols_t::iterator;
+    using size_type = symbols_t::size_type;
 
     void append(const std::string& key, bool value);
     void remove(const std::string& key);
@@ -112,11 +112,11 @@ private:
 class VLE_API SymbolList
 {
 public:
-    typedef std::vector<std::string> value_t;
+    using value_t = std::vector<std::string>;
     typedef std::map<std::string, value_t> symbols_t;
-    typedef symbols_t::const_iterator const_iterator;
-    typedef symbols_t::iterator iterator;
-    typedef symbols_t::size_type size_type;
+    using const_iterator = symbols_t::const_iterator;
+    using iterator = symbols_t::iterator;
+    using size_type = symbols_t::size_type;
 
     void append(const std::string& key);
     void append(const std::string& key, const std::string& value);

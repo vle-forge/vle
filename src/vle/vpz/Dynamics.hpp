@@ -59,10 +59,10 @@ typedef std::map<std::string, Dynamic> DynamicList;
 class VLE_API Dynamics : public Base
 {
 public:
-    typedef DynamicList::iterator iterator;
-    typedef DynamicList::const_iterator const_iterator;
-    typedef DynamicList::size_type size_type;
-    typedef DynamicList::value_type value_type;
+    using iterator = DynamicList::iterator;
+    using const_iterator = DynamicList::const_iterator;
+    using size_type = DynamicList::size_type;
+    using value_type = DynamicList::value_type;
 
     /**
      * @brief Build a new Dynamics.

@@ -62,10 +62,10 @@ namespace utils {
 class PackageParser
 {
 public:
-    typedef Packages::value_type value_type;
-    typedef Packages::iterator iterator;
-    typedef Packages::const_iterator const_iterator;
-    typedef Packages::size_type size_type;
+    using value_type = Packages::value_type;
+    using iterator = Packages::iterator;
+    using const_iterator = Packages::const_iterator;
+    using size_type = Packages::size_type;
 
     PackageParser();
 

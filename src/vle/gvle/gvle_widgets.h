@@ -316,7 +316,7 @@ public:
         value_stack();
         ~value_stack();
         std::unique_ptr<value::Value> startValue;
-        typedef  std::vector<std::unique_ptr<value::Value>> cont;
+        using cont = std::vector<std::unique_ptr<value::Value> >;
         cont stack;
         void setStartValue(std::unique_ptr<vle::value::Value> val);
         /*

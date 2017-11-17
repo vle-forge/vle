@@ -58,7 +58,7 @@ buildKey(const std::string& parent,
     return result;
 }
 
-typedef value::Matrix::index Index;
+using Index = value::Matrix::index;
 
 typedef std::map<std::string, Index> MapPairIndex;
 

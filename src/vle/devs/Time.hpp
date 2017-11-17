@@ -47,7 +47,7 @@ namespace devs {
  * representable double value. This value is returned by many run-time
  * math functions when an error occurs.
  */
-typedef double Time;
+using Time = double;
 
 static_assert(std::numeric_limits<Time>::has_quiet_NaN == true,
               "Use an iec559 standard OS/Compiler");

@@ -52,10 +52,10 @@ class VLE_LOCAL Simulator
 public:
     typedef std::pair<Simulator*, std::string> TargetSimulator;
     typedef std::multimap<std::string, TargetSimulator> TargetSimulatorList;
-    typedef TargetSimulatorList::const_iterator const_iterator;
-    typedef TargetSimulatorList::iterator iterator;
-    typedef TargetSimulatorList::size_type size_type;
-    typedef TargetSimulatorList::value_type value_type;
+    using const_iterator = TargetSimulatorList::const_iterator;
+    using iterator = TargetSimulatorList::iterator;
+    using size_type = TargetSimulatorList::size_type;
+    using value_type = TargetSimulatorList::value_type;
 
     /**
      * @brief Build a new devs::Simulator with an empty devs::Dynamics, a

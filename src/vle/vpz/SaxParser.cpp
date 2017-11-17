@@ -467,7 +467,7 @@ SaxParser::onMatrix(const xmlChar** att)
 
     try {
         using boost::numeric_cast;
-        typedef value::Matrix::index m_t;
+        using m_t = value::Matrix::index;
 
         m_valuestack.pushMatrix(
           numeric_cast<m_t>(xmlCharToInt(columns)),

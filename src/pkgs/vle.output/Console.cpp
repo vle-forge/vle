@@ -45,7 +45,7 @@ class Console : public Plugin
     typedef std::map<std::string, int> Columns;
 
     /** Define the buffer for valid values (model observed). */
-    typedef std::vector<bool> ValidElement;
+    using ValidElement = std::vector<bool>;
 
     /** Define a new bag indicator*/
     typedef std::map<std::string, double> NewBagWatcher;

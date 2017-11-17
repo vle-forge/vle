@@ -53,7 +53,7 @@ ParserStr()
     EnsuresEqual(block.reals.size(), 5);
 
     {
-        typedef vle::utils::Block::Reals::const_iterator Iterator;
+        using Iterator = vle::utils::Block::Reals::const_iterator;
         std::pair<Iterator, Iterator> r = block.reals.equal_range("a");
         EnsuresEqual(block.reals.count("a"), 3);
         EnsuresEqual(r.first++->second, 1);
@@ -61,7 +61,7 @@ ParserStr()
         EnsuresEqual(r.first++->second, 3);
     }
     {
-        typedef vle::utils::Block::Strings::const_iterator Iterator;
+        using Iterator = vle::utils::Block::Strings::const_iterator;
         std::pair<Iterator, Iterator> r = block.strings.equal_range("b");
         EnsuresEqual(block.strings.count("b"), 3);
         EnsuresEqual(r.first++->second, "1");
@@ -69,7 +69,7 @@ ParserStr()
         EnsuresEqual(r.first++->second, "3");
     }
     {
-        typedef vle::utils::Block::Reals::const_iterator Iterator;
+        using Iterator = vle::utils::Block::Reals::const_iterator;
         std::pair<Iterator, Iterator> r = block.reals.equal_range("c");
         EnsuresEqual(block.reals.count("c"), 2);
         EnsuresEqual(r.first++->second, -1.1);

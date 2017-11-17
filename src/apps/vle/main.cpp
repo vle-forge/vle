@@ -254,7 +254,7 @@ enum cli_mode
     CLI_MODE_PACKAGE = 1 << 4
 };
 
-typedef std::vector<std::string> CmdArgs;
+using CmdArgs = std::vector<std::string>;
 
 static void
 remove_configuration_file()

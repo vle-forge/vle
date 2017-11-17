@@ -72,7 +72,7 @@ public:
     /**
      * @brief Defines the names of the columns.
      */
-    typedef std::vector<std::string> Strings;
+    using Strings = std::vector<std::string>;
 
     File(const std::string& location);
 
@@ -128,10 +128,10 @@ private:
     typedef std::map<std::string, int> Columns;
 
     /** Define the buffer of values. */
-    typedef std::vector<value::Value*> Line;
+    using Line = std::vector<value::Value *>;
 
     /** Define the buffer for valid values (model observed). */
-    typedef std::vector<bool> ValidElement;
+    using ValidElement = std::vector<bool>;
 
     /** Define a new bag indicator*/
     typedef std::map<std::string, double> NewBagWatcher;

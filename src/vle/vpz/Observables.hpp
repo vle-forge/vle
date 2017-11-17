@@ -61,10 +61,10 @@ typedef std::map<std::string, Observable> ObservableList;
 class VLE_API Observables : public Base
 {
 public:
-    typedef ObservableList::iterator iterator;
-    typedef ObservableList::const_iterator const_iterator;
-    typedef ObservableList::size_type size_type;
-    typedef ObservableList::value_type value_type;
+    using iterator = ObservableList::iterator;
+    using const_iterator = ObservableList::const_iterator;
+    using size_type = ObservableList::size_type;
+    using value_type = ObservableList::value_type;
 
     /**
      * @brief Build a empty Observables.

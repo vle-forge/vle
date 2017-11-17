@@ -49,10 +49,10 @@ typedef std::map<std::string, View> ViewList;
 class VLE_API Views : public Base
 {
 public:
-    typedef ViewList::iterator iterator;
-    typedef ViewList::const_iterator const_iterator;
-    typedef ViewList::size_type size_type;
-    typedef ViewList::value_type value_type;
+    using iterator = ViewList::iterator;
+    using const_iterator = ViewList::const_iterator;
+    using size_type = ViewList::size_type;
+    using value_type = ViewList::value_type;
 
     /**
      * @brief Build an empty Views.

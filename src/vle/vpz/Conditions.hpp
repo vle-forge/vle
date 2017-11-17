@@ -62,10 +62,10 @@ typedef std::unordered_map<std::string, Condition> ConditionList;
 class VLE_API Conditions : public Base
 {
 public:
-    typedef ConditionList::iterator iterator;
-    typedef ConditionList::const_iterator const_iterator;
-    typedef ConditionList::size_type size_type;
-    typedef ConditionList::value_type value_type;
+    using iterator = ConditionList::iterator;
+    using const_iterator = ConditionList::const_iterator;
+    using size_type = ConditionList::size_type;
+    using value_type = ConditionList::value_type;
 
     /**
      * @brief Build a new @e vpz::Conditions with the default simulation

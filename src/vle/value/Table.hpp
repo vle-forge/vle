@@ -37,7 +37,7 @@ namespace value {
 /**
  * @brief Define an array of two dimensions of real.
  */
-typedef std::vector<double> TableValue;
+using TableValue = std::vector<double>;
 
 /**
  * @brief A table is a container for double value into an

@@ -32,7 +32,7 @@ namespace vle {
 namespace gvle {
 
 typedef QList<QPair<QString, QString>> obsPortList;
-typedef QList<QList<QString>> obsPortViewList;
+using obsPortViewList = QList<QList<QString> >;
 
 FileVpzObservables::FileVpzObservables(QWidget* parent)
   : QWidget(parent)

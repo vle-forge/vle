@@ -50,10 +50,10 @@ typedef std::map<std::string, Output> OutputList;
 class VLE_API Outputs : public Base
 {
 public:
-    typedef OutputList::iterator iterator;
-    typedef OutputList::const_iterator const_iterator;
-    typedef OutputList::size_type size_type;
-    typedef OutputList::value_type value_type;
+    using iterator = OutputList::iterator;
+    using const_iterator = OutputList::const_iterator;
+    using size_type = OutputList::size_type;
+    using value_type = OutputList::value_type;
 
     /**
      * @brief Build an empty Outputs.

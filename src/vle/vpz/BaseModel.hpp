@@ -43,9 +43,9 @@ class AtomicModel;
 class CoupledModel;
 
 typedef std::map<std::string, ModelPortList> ConnectionList;
-typedef std::set<std::string> PortList;
-typedef std::vector<AtomicModel*> AtomicModelVector;
-typedef std::vector<CoupledModel*> CoupledModelVector;
+using PortList = std::set<std::string>;
+using AtomicModelVector = std::vector<AtomicModel *>;
+using CoupledModelVector = std::vector<CoupledModel *>;
 typedef std::map<std::string, BaseModel*> ModelList;
 
 /**

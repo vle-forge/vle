@@ -39,12 +39,12 @@ namespace vpz {
 /**
  * @brief Define a list of string like a list of view name.
  */
-typedef std::list<std::string> ViewNameList;
+using ViewNameList = std::list<std::string>;
 
 /**
  * @brief Define a list of string like a list of port name.
  */
-typedef std::list<std::string> PortNameList;
+using PortNameList = std::list<std::string>;
 
 /**
  * @brief ObservablePort represents the list of views names that an
@@ -59,10 +59,10 @@ typedef std::list<std::string> PortNameList;
 class VLE_API ObservablePort : public Base
 {
 public:
-    typedef ViewNameList::iterator iterator;
-    typedef ViewNameList::const_iterator const_iterator;
-    typedef ViewNameList::size_type size_type;
-    typedef ViewNameList::value_type value_type;
+    using iterator = ViewNameList::iterator;
+    using const_iterator = ViewNameList::const_iterator;
+    using size_type = ViewNameList::size_type;
+    using value_type = ViewNameList::value_type;
 
     /**
      * @brief Build a new ObservablePort with a specific name.
@@ -223,10 +223,10 @@ typedef std::map<std::string, ObservablePort> ObservablePortList;
 class VLE_API Observable : public Base
 {
 public:
-    typedef ObservablePortList::iterator iterator;
-    typedef ObservablePortList::const_iterator const_iterator;
-    typedef ObservablePortList::size_type size_type;
-    typedef ObservablePortList::value_type value_type;
+    using iterator = ObservablePortList::iterator;
+    using const_iterator = ObservablePortList::const_iterator;
+    using size_type = ObservablePortList::size_type;
+    using value_type = ObservablePortList::value_type;
 
     /**
      * @brief Build a new Observable with specified name.

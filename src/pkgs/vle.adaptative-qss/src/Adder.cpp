@@ -195,7 +195,7 @@ private:
     typedef enum { INIT, WAIT, RESPONSE } State;
     State m_state;
 
-    typedef std::vector<std::string> t_port_vector;
+    using t_port_vector = std::vector<std::string>;
     t_port_vector connected_input_port_list;
 
     std::string m_weights_label;
