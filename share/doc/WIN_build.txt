@@ -13,10 +13,10 @@ Install NSIS:    3.0
 #
 ###
 
-pacman -S --force mingw-w64-i686-cmake          ## 3.6.2-1
-pacman -S --force mingw-w64-i686-gcc            ## 6.3.0-1
+pacman -S --force mingw-w64-i686-cmake          ## 3.9.6-1
+pacman -S --force mingw-w64-i686-gcc            ## 7.2.0-1
 pacman -S --force mingw-w64-i686-make           ## 4.2.1-1
-pacman -S --force mingw-w64-i686-libxml2        ## 2.9.5-1
+pacman -S --force mingw-w64-i686-libxml2        ## 2.9.6-1
 pacman -S --force mingw-w64-i686-qt5            ## 5.9.2-2
 pacman -S --force mingw-w64-i686-boost          ## 1.64.0-3
 pacman -S --force mingw-w64-i686-gdb            ## 8.0.1-2
