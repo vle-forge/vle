@@ -423,6 +423,91 @@ VleCombo::onValueChanged(const QString& v)
     emit valUpdated(id, v);
 }
 
+/************************** VleComboLineEdit ******************************/
+
+VleComboLineEdit::VleComboLineEdit(QWidget* parent,
+                                   const QStringList& list,
+                                   const QString& val,
+                                   const QString& idStr,
+                                   bool withDefaultMenu)
+  : QComboBox(parent)
+  , id(idStr)
+  , backup(val)
+{
+    setEditable(true);
+
+    if (not withDefaultMenu) {
+        lineEdit()->setContextMenuPolicy(Qt::NoContextMenu);
+    }
+    lineEdit()->setAlignment(Qt::AlignLeft);
+
+    addItems(list);
+    setCurrentIndex(findText(val));
+
+
+    QObject::connect(
+        lineEdit(), SIGNAL(editingFinished()), this, SLOT(onValueChanged()));
+    QObject::connect(this,
+                     SIGNAL(currentIndexChanged(const QString&)),
+                     this,
+                     SLOT(onValueChanged(const QString&)));
+
+    lineEdit()->installEventFilter(this);
+}
+
+VleComboLineEdit::~VleComboLineEdit()
+{
+}
+
+void
+VleComboLineEdit::setValue(const QString& val)
+{
+    if (lineEdit()->text() != val) {
+        backup = val;
+        setCurrentIndex(findText(val));
+    }
+    lineEdit()->home(false);
+}
+
+bool
+VleComboLineEdit::eventFilter(QObject* target, QEvent* event)
+{
+    if (target == this) {
+        switch (event->type()) {
+        case QEvent::FocusOut:
+            if (lineEdit()->text().isEmpty()) {
+                setValue(backup);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return QWidget::eventFilter(target, event);
+}
+
+void
+VleComboLineEdit::focusInEvent(QFocusEvent* e)
+{
+    QComboBox::focusInEvent(e);
+    emit selected(id);
+}
+
+void
+VleComboLineEdit::onValueChanged()
+{
+    if (lineEdit()->text() != backup) {
+        emit textUpdated(id, backup, lineEdit()->text());
+        backup = lineEdit()->text();
+    }
+}
+
+void
+VleComboLineEdit::onValueChanged(const QString& v)
+{
+    emit valUpdated(id, v);
+}
 /************************** VleLineEdit ******************************/
 
 VleLineEdit::VleLineEdit(QWidget* parent,

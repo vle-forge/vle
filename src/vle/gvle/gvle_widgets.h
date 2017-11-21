@@ -223,6 +223,29 @@ signals:
     void selected(const QString& id);
 };
 
+class VleComboLineEdit: public QComboBox
+{
+    Q_OBJECT
+public:
+
+    VleComboLineEdit(QWidget* parent, const QStringList& list,
+		     const QString& val, const QString& idStr="",
+		     bool withDefaultMenu = true);
+    ~VleComboLineEdit();
+    void focusInEvent(QFocusEvent* e);
+    bool eventFilter(QObject *target, QEvent *event);
+    void setValue(const QString& val);
+
+    QString id;
+    QString backup;
+public slots:
+    void onValueChanged();
+    void onValueChanged(const QString& v);
+signals:
+    void valUpdated(const QString& id, const QString& v);
+    void textUpdated(const QString& id, const QString& old, const QString& neW);
+    void selected(const QString& id);
+};
 
 /**
  * A line Editor (TODO validator for c++ names)
