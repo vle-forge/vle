@@ -335,7 +335,10 @@ public:
 
                 return {};
             }
-            return read_value(m_output_file);
+            std::unique_ptr<value::Map> results = read_value(m_output_file);
+            m_output_file.remove();
+            m_vpz_file.remove();
+            return results;
         } catch (const std::exception& e) {
             vErr(m_context,
                  _("VLE sub process: unable to start "
