@@ -73,13 +73,20 @@ rebuild(vle::utils::ContextPtr ctx, vle::utils::Packages* out) noexcept
             vle::utils::Path descfile = *it;
             descfile /= "Description.txt";
 
-            if (descfile.is_file()) {
-                parser.extract(descfile.string(), std::string());
-            } else {
+            try {
+                if (descfile.is_file()) {
+                    parser.extract(descfile.string(), std::string());
+                } else {
+                    vErr(ctx,
+                         _("Remote: failed to open Description.txt "
+                           "from `%s'\n"),
+                         descfile.string().c_str());
+                }
+            } catch (const std::exception& e) {
                 vErr(ctx,
-                     _("Remote: failed to open Description "
-                       "from `%s'\n"),
-                     descfile.string().c_str());
+                     _("Remote: error reading file `%s': %s\n"),
+                     descfile.string().c_str(),
+                     e.what());
             }
         }
     }
