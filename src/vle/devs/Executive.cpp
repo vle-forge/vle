@@ -114,10 +114,15 @@ Executive::createModel(const std::string& name,
                        const std::vector<std::string>& outputs,
                        const std::string& dynamics,
                        const std::vector<std::string>& conds,
-                       const std::string& observable)
+                       const std::string& observable,
+                       bool debug)
 {
     auto model = new vpz::AtomicModel(name, cpled());
+    if (debug) {
+        model->setDebug();
+    }
     std::vector<std::string>::const_iterator it;
+
 
     for (it = inputs.begin(); it != inputs.end(); ++it) {
         model->addInputPort(*it);

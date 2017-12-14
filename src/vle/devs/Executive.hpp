@@ -169,6 +169,7 @@ public:
      * @param dynamics the name of the dynamics to attach.
      * @param condition the list of condition to attach.
      * @param observable the name of the observable to attach.
+     * @param debug if true, the mode will be instantiated with debug option.
      * @throw utils::InternalError if dynamics not exist.
      */
     const vpz::AtomicModel* createModel(
@@ -177,7 +178,8 @@ public:
       const std::vector<std::string>& outputs = {},
       const std::string& dynamics = {},
       const std::vector<std::string>& conditions = {},
-      const std::string& observable = {});
+      const std::string& observable = {},
+      bool debug = false);
 
     /**
      * @brief Build a new devs::Simulator from the vpz::Classes information.
