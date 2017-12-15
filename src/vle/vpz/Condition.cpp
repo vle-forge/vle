@@ -115,6 +115,12 @@ Condition::portnames() const
     return lst;
 }
 
+bool
+Condition::exist(const std::string& portname) const
+{
+    return m_list.find(portname) != m_list.end();
+}
+
 void
 Condition::add(const std::string& portname)
 {

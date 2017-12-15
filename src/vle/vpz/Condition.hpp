@@ -115,6 +115,13 @@ public:
     std::vector<std::string> portnames() const;
 
     /**
+     * @brief Tells if a port exist on this condition
+     * @param portname name of the port.
+     * @param true if the port portname exists on this condition.
+     */
+    bool exist(const std::string& portname) const;
+
+    /**
      * @brief Add a port to the value list.
      * @param portname name of the port.
      */
