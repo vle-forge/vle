@@ -8,7 +8,7 @@
  </structures>
  <dynamics>
  </dynamics>
- <experiment name="test" seed="123456789">
+ <experiment name="test">
    <conditions>
     <condition name="simulation_engine">
      <port name="begin">
