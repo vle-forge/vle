@@ -661,34 +661,11 @@ Package::getPluginOutputDir(VLE_PACKAGE_TYPE type) const
 }
 
 std::string
-Package::getPluginGvleGlobalDir(VLE_PACKAGE_TYPE type) const
+Package::getPluginGvleDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
     p /= "plugins";
     p /= "gvle";
-    p /= "global";
-
-    return p.string();
-}
-
-std::string
-Package::getPluginGvleModelingDir(VLE_PACKAGE_TYPE type) const
-{
-    Path p(getDir(type));
-    p /= "plugins";
-    p /= "gvle";
-    p /= "modeling";
-
-    return p.string();
-}
-
-std::string
-Package::getPluginGvleOutputDir(VLE_PACKAGE_TYPE type) const
-{
-    Path p(getDir(type));
-    p /= "plugins";
-    p /= "gvle";
-    p /= "output";
 
     return p.string();
 }
@@ -796,32 +773,6 @@ Package::getPluginOutputFile(const std::string& file,
     return p.string();
 }
 
-std::string
-Package::getPluginGvleModelingFile(const std::string& file,
-                                   VLE_PACKAGE_TYPE type) const
-{
-    Path p(getDir(type));
-    p /= "plugins";
-    p /= "gvle";
-    p /= "modeling";
-    p /= file;
-
-    return p.string();
-}
-
-std::string
-Package::getPluginGvleOutputFile(const std::string& file,
-                                 VLE_PACKAGE_TYPE type) const
-{
-    Path p(getDir(type));
-    p /= "plugins";
-    p /= "gvle";
-    p /= "output";
-    p /= file;
-
-    return p.string();
-}
-
 bool
 Package::existsBinary() const
 {
@@ -898,8 +849,8 @@ Package::getExperiments(VLE_PACKAGE_TYPE type) const
     return result;
 }
 
-PathList
-Package::listLibraries(const std::string& path) const
+static PathList
+getLibrariesAbsolutePath(const std::string& path)
 {
     PathList result;
     Path simdir(path);
@@ -932,33 +883,21 @@ Package::listLibraries(const std::string& path) const
 }
 
 PathList
+Package::listLibraries(const std::string& path) const
+{
+    return getLibrariesAbsolutePath(path);
+}
+
+PathList
 Package::getPluginsSimulator() const
 {
-    return listLibraries(getPluginSimulatorDir(PKG_BINARY));
+    return getLibrariesAbsolutePath(getPluginSimulatorDir(PKG_BINARY));
 }
 
 PathList
 Package::getPluginsOutput() const
 {
-    return listLibraries(getPluginOutputDir(PKG_BINARY));
-}
-
-PathList
-Package::getPluginsGvleGlobal() const
-{
-    return listLibraries(getPluginGvleGlobalDir(PKG_BINARY));
-}
-
-PathList
-Package::getPluginsGvleModeling() const
-{
-    return listLibraries(getPluginGvleModelingDir(PKG_BINARY));
-}
-
-PathList
-Package::getPluginsGvleOutput() const
-{
-    return listLibraries(getPluginGvleOutputDir(PKG_BINARY));
+    return getLibrariesAbsolutePath(getPluginOutputDir(PKG_BINARY));
 }
 
 std::string
@@ -1043,6 +982,79 @@ Package::refreshPath()
     m_pimpl->refreshPath();
 }
 
+template<class T, size_t N>
+constexpr size_t
+size(T (&)[N])
+{
+    return N;
+}
+
+enum class PluginType
+{
+    VLE_PLUG_SIMULATORS = 0,
+    VLE_PLUG_OUT,
+    GVLE_PLUG_OUTPUT,
+    GVLE_PLUG_COND,
+    GVLE_PLUG_SIM,
+    GVLE_PLUG_MAIN,
+    GVLE_PLUG_MAIN_OUT,
+    GVLE_PLUG_MAIN_VPZ,
+    GVLE_PLUG_MAIN_DATA,
+    PLUG_COUNT = 9,
+};
+
+static std::string
+getPluginGVLEName(PluginType type) noexcept
+{
+    static const char* ret[] = {
+        "plugins/simulator",       "plugins/output",
+        "plugins/gvle/output",     "plugins/gvle/condition",
+        "plugins/gvle/simulating", "plugins/gvle/modeling",
+        "plugins/gvle/out",        "plugins/gvle/vpz",
+        "plugins/gvle/data",
+    };
+
+    return ret[static_cast<int>(type)];
+}
+
+static std::string
+getPluginGVLETopic(PluginType type) noexcept
+{
+    static const char* ret[] = {
+        "-- simulator plugins:",       "-- output plugins:",
+        "-- gvle output plugins:",     "-- gvle condition plugins:",
+        "-- gvle simulating plugins:", "-- gvle modeling plugins:",
+        "-- gvle out plugins:",        "-- gvle vpz plugins:",
+        "-- gvle data plugins:"
+    };
+
+    return ret[static_cast<int>(type)];
+}
+
+template<typename T>
+static void
+getPlugins(std::string prefix_path, T& lst)
+{
+    int e = static_cast<int>(PluginType::PLUG_COUNT);
+
+    for (int i = 0; i < e; ++i) {
+        try {
+            Path path(prefix_path);
+            path /= getPluginGVLEName(static_cast<PluginType>(i));
+
+            auto files = getLibrariesAbsolutePath(path.string());
+            std::sort(files.begin(), files.end());
+
+            lst.emplace_back(getPluginGVLETopic(static_cast<PluginType>(i)));
+            lst.reserve(lst.size() + files.size());
+
+            for (auto& elem : files)
+                lst.emplace_back(elem.string());
+        } catch (const std::exception& /*e*/) {
+        }
+    }
+}
+
 void
 Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
 {
@@ -1064,55 +1076,7 @@ Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
     } catch (const std::exception& /*e*/) {
     }
 
-    try {
-        tmp = getPluginsSimulator();
-        pkgcontent.push_back("-- simulator plugins:");
-        std::sort(tmp.begin(), tmp.end());
-
-        for (auto& elem : tmp)
-            pkgcontent.emplace_back(elem.string());
-    } catch (const std::exception& /*e*/) {
-    }
-
-    try {
-        tmp = getPluginsOutput();
-        pkgcontent.push_back("-- output plugins:");
-        std::sort(tmp.begin(), tmp.end());
-
-        for (auto& elem : tmp)
-            pkgcontent.emplace_back(elem.string());
-    } catch (const std::exception& /*e*/) {
-    }
-
-    try {
-        tmp = getPluginsGvleGlobal();
-        pkgcontent.push_back("-- gvle global plugins:");
-        std::sort(tmp.begin(), tmp.end());
-
-        for (auto& elem : tmp)
-            pkgcontent.emplace_back(elem.string());
-    } catch (const std::exception& /*e*/) {
-    }
-
-    try {
-        tmp = getPluginsGvleModeling();
-        pkgcontent.push_back("-- gvle modeling plugins:");
-        std::sort(tmp.begin(), tmp.end());
-
-        for (auto& elem : tmp)
-            pkgcontent.emplace_back(elem.string());
-    } catch (const std::exception& /*e*/) {
-    }
-
-    try {
-        tmp = getPluginsGvleOutput();
-        pkgcontent.push_back("-- gvle output plugins:");
-        std::sort(tmp.begin(), tmp.end());
-
-        for (auto& elem : tmp)
-            pkgcontent.emplace_back(elem.string());
-    } catch (const std::exception& /*e*/) {
-    }
+    getPlugins(getDir(PKG_BINARY), pkgcontent);
 }
 
 VLE_API std::ostream&

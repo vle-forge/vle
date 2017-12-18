@@ -55,8 +55,8 @@ enum VLE_PACKAGE_TYPE
     PKG_SOURCE
 };
 
-VLE_API std::ostream& operator<<(std::ostream& out,
-                                 const VLE_PACKAGE_TYPE& type);
+VLE_API std::ostream&
+operator<<(std::ostream& out, const VLE_PACKAGE_TYPE& type);
 
 class VLE_API Package
 {
@@ -187,12 +187,7 @@ public:
     std::string getPluginSimulatorDir(
       VLE_PACKAGE_TYPE type = PKG_BINARY) const;
     std::string getPluginOutputDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
-    std::string getPluginGvleGlobalDir(
-      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
-    std::string getPluginGvleModelingDir(
-      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
-    std::string getPluginGvleOutputDir(
-      VLE_PACKAGE_TYPE type = PKG_BINARY) const;
+    std::string getPluginGvleDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
     std::string getFile(const std::string& file,
                         VLE_PACKAGE_TYPE type = PKG_BINARY) const;
@@ -226,9 +221,6 @@ public:
 
     PathList getPluginsSimulator() const;
     PathList getPluginsOutput() const;
-    PathList getPluginsGvleGlobal() const;
-    PathList getPluginsGvleModeling() const;
-    PathList getPluginsGvleOutput() const;
 
     std::string getMetadataExpDir(VLE_PACKAGE_TYPE type = PKG_BINARY) const;
 
@@ -337,7 +329,8 @@ private:
     std::unique_ptr<Pimpl> m_pimpl;
 };
 
-VLE_API std::ostream& operator<<(std::ostream& out, const Package& pkg);
+VLE_API std::ostream&
+operator<<(std::ostream& out, const Package& pkg);
 }
 } // namespace vle utils
 
