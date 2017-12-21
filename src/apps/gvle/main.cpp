@@ -29,14 +29,10 @@
 #include <QLibraryInfo>
 #include <QSettings>
 #include <QTranslator>
-#include <QTranslator>
 #include <QtDebug>
 #include <QtGlobal>
 #include <iostream>
-#include <iostream>
 #include <vle/utils/Filesystem.hpp>
-#include <vle/utils/Filesystem.hpp>
-#include <vle/utils/Tools.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
 
@@ -116,42 +112,45 @@ main(int argc, char* argv[])
 #endif
 
     qunsetenv("QT_HASH_SEED");
-    qputenv("QT_HASH_SEED","0");
+    qputenv("QT_HASH_SEED", "0");
 
     QApplication a(argc, argv);
     vle::Init m_app;
 
     bool result;
 
-    auto ctx = vle::utils::make_context();
+    {
+        auto ctx = vle::utils::make_context();
 
-    vle::utils::Path prefix(ctx->getPrefixDir());
-    vle::utils::Path localesPath(prefix);
-    localesPath /= "share";
-    localesPath /=
-      vle::utils::format("vle-%s", vle::string_version_abi().c_str());
-    localesPath /= "translations";
+        vle::utils::Path prefix(ctx->getPrefixDir());
+        vle::utils::Path localesPath(prefix);
+        localesPath /= "share";
+        localesPath /=
+          vle::utils::format("vle-%s", vle::string_version_abi().c_str());
+        localesPath /= "translations";
 
-    vle::utils::Path manPath(prefix);
-    manPath /= "share";
-    manPath /= vle::utils::format("vle-%s", vle::string_version_abi().c_str());
-    manPath /= "man";
+        vle::utils::Path manPath(prefix);
+        manPath /= "share";
+        manPath /=
+          vle::utils::format("vle-%s", vle::string_version_abi().c_str());
+        manPath /= "man";
 
-    a.setProperty("localesPath", QString(localesPath.string().c_str()));
-    a.setProperty("manPath", QString(manPath.string().c_str()));
+        a.setProperty("localesPath", QString(localesPath.string().c_str()));
+        a.setProperty("manPath", QString(manPath.string().c_str()));
 
-    QTranslator qtTranslator;
-    result = qtTranslator.load("gvle_" + QLocale::system().name() + ".qm",
-                               localesPath.string().c_str());
-    if (result == false) {
-        qDebug() << "Load Translator : " << QLocale::system().name()
-                 << " not found "
-                 << "here : " << localesPath.string().c_str();
+        QTranslator qtTranslator;
+        result = qtTranslator.load("gvle_" + QLocale::system().name() + ".qm",
+                                   localesPath.string().c_str());
+        if (result == false) {
+            qDebug() << "Load Translator : " << QLocale::system().name()
+                     << " not found "
+                     << "here : " << localesPath.string().c_str();
+        }
+
+        a.installTranslator(&qtTranslator);
     }
-    a.installTranslator(&qtTranslator);
 
-    vle::gvle::gvle_win w(ctx);
-
+    vle::gvle::gvle_win w;
     w.show();
 
     result = a.exec();

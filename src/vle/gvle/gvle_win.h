@@ -26,27 +26,27 @@
 #define gvle_gvle_win_H
 
 #include "vle/gvle/logger.h"
-#include <QMainWindow>
-#include <QTranslator>
-#include <QFileInfo>
-#include <QTreeWidgetItem>
 #include <QActionGroup>
+#include <QFileInfo>
+#include <QFileSystemModel>
+#include <QMainWindow>
 #include <QPluginLoader>
 #include <QSettings>
 #include <QTimer>
+#include <QTranslator>
+#include <QTreeWidgetItem>
 #include <QtCore>
 #include <QtGui>
-#include <QFileSystemModel>
 
 #ifndef Q_MOC_RUN
-#include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/Template.hpp>
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/Template.hpp>
+#include <vle/vpz/Vpz.hpp>
 #endif
 
-#include "plugin_mainpanel.h"
 #include "gvle_file.h"
+#include "plugin_mainpanel.h"
 
 namespace Ui {
 class gvleWin;
@@ -60,17 +60,18 @@ class gvle_win : public QMainWindow
     Q_OBJECT
 
 public:
-    typedef std::map<std::string,std::pair<std::string, bool>> Distributions;
+    typedef std::map<std::string, std::pair<std::string, bool>> Distributions;
 
     static std::map<std::string, std::string> defaultDistrib();
 
-    enum StatusFile {
-        NOT_OPENED, //no tab opened
-        OPENED, //tab opened but content not modified
-        OPENED_AND_MODIFIED //tab opened and modified
+    enum StatusFile
+    {
+        NOT_OPENED,         // no tab opened
+        OPENED,             // tab opened but content not modified
+        OPENED_AND_MODIFIED // tab opened and modified
     };
 
-    explicit gvle_win( const vle::utils::ContextPtr& ctx, QWidget* parent =0);
+    explicit gvle_win(QWidget* parent = 0);
     ~gvle_win() override;
 
 protected:
@@ -111,8 +112,9 @@ private slots:
     void onCustomContextMenu(const QPoint& point);
     void onItemChanged(QTreeWidgetItem* item, int col);
     void onDataChanged(QModelIndex indexTL, QModelIndex indexBR);
-    void onFileRenamed(const QString& path, const QString& oldName,
-		       const QString& newName);
+    void onFileRenamed(const QString& path,
+                       const QString& oldName,
+                       const QString& newName);
     void onCurrentChanged(const QModelIndex& index);
     void projectConfigureTimer();
     void projectBuildTimer();
@@ -129,35 +131,32 @@ private slots:
 private:
     void projectInstall();
 
-
-
-    Ui::gvleWin*                    ui;
-    Logger*                         mLogger;
-    QTimer                          mTimerRemote;
-    QTimer                          mTimerConfigure;
-    QTimer                          mTimerBuild;
-    QTimer                          mTimerInstall;
-    QSettings*                      mSettings;
-    bool                            mSimOpened;
-    QActionGroup*                   mMenuSimGroup;
-    QMap<QString,QString>           mSimulatorPlugins;
-    QString                         mCurrentSimName;
+    Ui::gvleWin* ui;
+    Logger* mLogger;
+    QTimer mTimerRemote;
+    QTimer mTimerConfigure;
+    QTimer mTimerBuild;
+    QTimer mTimerInstall;
+    QSettings* mSettings;
+    utils::ContextPtr mCtx;
+    bool mSimOpened;
+    QActionGroup* mMenuSimGroup;
+    QMap<QString, QString> mSimulatorPlugins;
+    QString mCurrentSimName;
     QMap<QString, PluginMainPanel*> mPanels;
-    QFileSystemModel*               mProjectFileSytem;
-    gvle_plugins                    mGvlePlugins;
-    utils::ContextPtr               mCtx;
-    utils::Package                  mCurrPackage;
-    utils::Spawn                    mSpawn;
-    Distributions                   mDistributions;
-
+    QFileSystemModel* mProjectFileSytem;
+    gvle_plugins mGvlePlugins;
+    utils::Package mCurrPackage;
+    utils::Spawn mSpawn;
+    Distributions mDistributions;
 
 protected:
     void newProject(QString pathName);
     void openProject(QString pathName);
-private:
 
+private:
     void menuRecentProjectRefresh();
-    void menuRecentProjectSet(QString path, QAction *menu);
+    void menuRecentProjectSet(QString path, QAction* menu);
     void menuRecentProjectUpdate(QString path);
     void menuDistributionsRefresh();
     void menuPackagesInstallRefresh();
@@ -223,7 +222,6 @@ private:
      */
     int getTabIndex(gvle_file gf);
 
-
     /**
      * @brief get status ogf a file idetified by relative path
      * (eg. src/Simple.cpp).
@@ -231,7 +229,6 @@ private:
      * @return the status of this file.
      */
     StatusFile getStatus(gvle_file gf);
-
 
     bool removeDir(const QString& dirName);
     /**
@@ -242,10 +239,8 @@ private:
     void copyFile(QModelIndex index);
     void removeFile(QModelIndex index);
 
-
     QStringList getDescriptionFileContent();
     int setDescriptionFileContent(const QStringList& content);
-
 
     /**
      * @brief Open the Description.txt file and add or rm a package as a build
@@ -256,9 +251,8 @@ private:
      */
     int setPackageToBuildDepends(const QString& pkg, bool add);
     QStringList getPackageToBuildDepends();
-
 };
-
-}}//namespaces
+}
+} // namespaces
 
 #endif // gvle_win_H

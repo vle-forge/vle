@@ -26,6 +26,7 @@
 #include <iostream>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
+#include <vle/utils/Tools.hpp>
 
 #include <QActionGroup>
 #include <QDebug>
@@ -35,7 +36,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStyleFactory>
-#include <vle/utils/Tools.hpp>
 
 #include "aboutbox.h"
 #include "gvle_file.h"
@@ -46,6 +46,8 @@
 #include "plugin_output.h"
 #include "ui_gvle_win.h"
 
+#include <cassert>
+
 namespace vu = vle::utils;
 
 namespace vle {
@@ -53,42 +55,36 @@ namespace gvle {
 
 struct gvle_ctx_log : vle::utils::Context::LogFunctor
 {
-    bool first;
-    gvle_ctx_log()
-      : first(true)
+    Logger* m_logger;
+
+    gvle_ctx_log(Logger* logger)
+      : m_logger(logger)
     {
+        assert(logger);
     }
 
-    ~gvle_ctx_log() override
-    {
-    }
+    ~gvle_ctx_log() override = default;
 
-    void write(const vle::utils::Context& ctx,
-                       int priority,
-                       const char* file,
-                       int line,
-                       const char* fn,
-                       const char* format,
-                       va_list args) noexcept override
+    void write(const vle::utils::Context& /*ctx*/,
+               int priority,
+               const char* file,
+               int line,
+               const char* fn,
+               const char* format,
+               va_list args) noexcept override
     {
-        FILE* fp;
-        if (first) {
-            first = false;
-            fp = fopen(ctx.getLogFile("gvle").string().c_str(), "w");
-        } else {
-            fp = fopen(ctx.getLogFile("gvle").string().c_str(), "a");
-        }
-        if (fp) {
-            if (priority == 7)
-                fprintf(fp, "[dbg] %s:%d %s: ", file, line, fn);
-            else if (priority == 6)
-                fprintf(fp, "%s: ", fn);
-            else
-                fprintf(fp, "[Error] %s: ", fn);
+        QString msg;
 
-            vfprintf(fp, format, args);
-            fclose(fp);
-        }
+        if (priority <= 3)
+            msg = QString("Error (level %1) :").arg(priority);
+        else if (priority <= 5)
+            msg = QString("Note: ");
+        else if (priority > 6)
+            msg = QString("[debug] %1:%2 %3: ").arg(file).arg(line).arg(fn);
+
+        msg += QString::vasprintf(format, args);
+
+        m_logger->log(msg);
     }
 };
 
@@ -101,7 +97,7 @@ gvle_win::defaultDistrib()
     return ret;
 }
 
-gvle_win::gvle_win(const utils::ContextPtr& ctx, QWidget* parent)
+gvle_win::gvle_win(QWidget* parent)
   : QMainWindow(parent)
   , ui(new Ui::gvleWin)
   , mLogger(0)
@@ -110,16 +106,16 @@ gvle_win::gvle_win(const utils::ContextPtr& ctx, QWidget* parent)
   , mTimerBuild()
   , mTimerInstall()
   , mSettings(0)
+  , mCtx(vle::utils::make_context())
   , mSimOpened(false)
   , mMenuSimGroup(0)
   , mSimulatorPlugins()
   , mCurrentSimName("")
   , mPanels()
   , mProjectFileSytem(0)
-  , mGvlePlugins(ctx)
-  , mCtx(ctx)
-  , mCurrPackage(ctx)
-  , mSpawn(ctx)
+  , mGvlePlugins(mCtx)
+  , mCurrPackage(mCtx)
+  , mSpawn(mCtx)
   , mDistributions()
 {
     // GUI init
@@ -129,7 +125,7 @@ gvle_win::gvle_win(const utils::ContextPtr& ctx, QWidget* parent)
     mLogger = new Logger();
     mLogger->setWidget(ui->statusLog);
     mCtx->set_log_function(
-      std::unique_ptr<utils::Context::LogFunctor>(new gvle_ctx_log()));
+      std::unique_ptr<utils::Context::LogFunctor>(new gvle_ctx_log(mLogger)));
     // VLE init
     mCurrPackage.refreshPath();
 
@@ -234,13 +230,15 @@ gvle_win::gvle_win(const utils::ContextPtr& ctx, QWidget* parent)
     ui->menuDependencies->setEnabled(false);
 
     QObject::connect(
-        &mTimerRemote, SIGNAL(timeout()), this, SLOT(remoteInstallTimer()));
+      &mTimerRemote, SIGNAL(timeout()), this, SLOT(remoteInstallTimer()));
+    QObject::connect(&mTimerConfigure,
+                     SIGNAL(timeout()),
+                     this,
+                     SLOT(projectConfigureTimer()));
     QObject::connect(
-        &mTimerConfigure, SIGNAL(timeout()), this, SLOT(projectConfigureTimer()));
+      &mTimerBuild, SIGNAL(timeout()), this, SLOT(projectBuildTimer()));
     QObject::connect(
-        &mTimerBuild, SIGNAL(timeout()), this, SLOT(projectBuildTimer()));
-    QObject::connect(
-        &mTimerInstall, SIGNAL(timeout()), this, SLOT(projectInstallTimer()));
+      &mTimerInstall, SIGNAL(timeout()), this, SLOT(projectInstallTimer()));
 }
 
 gvle_win::~gvle_win()
@@ -1297,12 +1295,9 @@ gvle_win::onCustomContextMenu(const QPoint& point)
       (status_file == OPENED_AND_MODIFIED));
     action = ctxMenu.addAction(tr("Copy File"));
     action->setData(3);
-    action->setDisabled(
-      (suffix != "vpz" and
-       suffix != "cpp" and
-       suffix != "txt" and
-       suffix != "cpp") or
-      (not(inExp or inSrc or inData)));
+    action->setDisabled((suffix != "vpz" and suffix != "cpp" and
+                         suffix != "txt" and suffix != "cpp") or
+                        (not(inExp or inSrc or inData)));
     ctxMenu.addSeparator();
     QMenu* subMenu = ctxMenu.addMenu("Add model");
     subMenu->setDisabled(gf.relPath != "exp");
