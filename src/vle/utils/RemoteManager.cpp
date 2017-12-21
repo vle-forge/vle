@@ -192,7 +192,7 @@ public:
         }
     }
 
-    void join() noexcept
+    void join()
     {
         try {
             if (mThread.joinable()) {
@@ -216,7 +216,7 @@ public:
      *
      * @param t
      */
-    template <typename T>
+    template<typename T>
     void out(const T& t)
     {
         if (mStream)
@@ -258,7 +258,7 @@ public:
         }
     };
 
-    void save() const noexcept
+    void save() const
     {
         try {
             std::ofstream file;

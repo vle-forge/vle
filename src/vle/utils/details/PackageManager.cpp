@@ -34,28 +34,26 @@
 
 namespace {
 
-bool
+void
 extract(vle::utils::ContextPtr ctx,
         vle::utils::Packages* out,
-        const std::string& filepath) noexcept
+        const std::string& filepath)
 {
     vle::utils::Path pkg(filepath);
     vle::utils::PackageParser parser;
 
-    if (pkg.is_file()) {
+    if (not pkg.is_file()) {
+        vErr(
+          ctx, _("Package: can not open file `%s'\n"), pkg.string().c_str());
+    } else {
         parser.extract(pkg.string(), std::string());
         out->reserve(parser.size());
         out->insert(out->rbegin().base(), parser.begin(), parser.end());
-        return true;
     }
-
-    vErr(ctx, _("Package: can not open file `%s'\n"), pkg.string().c_str());
-
-    return false;
 }
 
-bool
-rebuild(vle::utils::ContextPtr ctx, vle::utils::Packages* out) noexcept
+void
+rebuild(vle::utils::ContextPtr ctx, vle::utils::Packages* out)
 {
     // We only use the user's binary package repository.
     auto pkgsdir = ctx->getBinaryPackagesDir()[0];
@@ -65,7 +63,7 @@ rebuild(vle::utils::ContextPtr ctx, vle::utils::Packages* out) noexcept
         vErr(ctx,
              _("Remote: failed to open directory `%s'\n"),
              pkgsdir.string().c_str());
-        return false;
+        return;
     }
 
     for (vle::utils::DirectoryIterator it(pkgsdir), end; it != end; ++it) {
@@ -93,8 +91,6 @@ rebuild(vle::utils::ContextPtr ctx, vle::utils::Packages* out) noexcept
 
     out->reserve(parser.size());
     out->insert(out->rbegin().base(), parser.begin(), parser.end());
-
-    return true;
 }
 
 } // anonymous namespace
@@ -106,7 +102,7 @@ bool
 LocalPackageManager::extract(ContextPtr ctx, Packages* out)
 {
     try {
-        return ::extract(ctx, out, ctx->getLocalPackageFilename().string());
+        ::extract(ctx, out, ctx->getLocalPackageFilename().string());
     } catch (const std::exception& e) {
         vErr(ctx,
              _("Remote: internal error when reading local package:"
@@ -115,13 +111,15 @@ LocalPackageManager::extract(ContextPtr ctx, Packages* out)
 
         return false;
     }
+
+    return true;
 }
 
 bool
 LocalPackageManager::rebuild(ContextPtr ctx, Packages* out)
 {
     try {
-        return ::rebuild(ctx, out);
+        ::rebuild(ctx, out);
     } catch (const std::exception& e) {
         vErr(ctx,
              _("Remote: failed to rebuild cache of installed"
@@ -130,13 +128,15 @@ LocalPackageManager::rebuild(ContextPtr ctx, Packages* out)
 
         return false;
     }
+
+    return true;
 }
 
 bool
 RemotePackageManager::extract(ContextPtr ctx, Packages* out)
 {
     try {
-        return ::extract(ctx, out, ctx->getRemotePackageFilename().string());
+        ::extract(ctx, out, ctx->getRemotePackageFilename().string());
     } catch (const std::exception& e) {
         vErr(ctx,
              _("Remote: internal error when reading remote"
@@ -145,6 +145,8 @@ RemotePackageManager::extract(ContextPtr ctx, Packages* out)
 
         return false;
     }
+
+    return true;
 }
 }
 } // namespace vle utils
