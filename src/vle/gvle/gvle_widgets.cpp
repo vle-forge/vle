@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -30,13 +30,11 @@
 #include <QDebug>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPainter>
 #include <QPushButton>
 #include <QScrollBar>
 #include <QTableWidget>
 #include <QtDebug>
-#include <QPainter>
-////#include <QtWidgets/QStackedWidget>
-//#include <QStackedWidget>
 
 #include "gvle_widgets.h"
 #include <vle/value/Boolean.hpp>
@@ -50,7 +48,6 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/User.hpp>
-#include <vle/value/Value.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
 
@@ -213,7 +210,7 @@ VleDayEdit::VleDayEdit(QWidget* parent,
     setDate(QDate::fromString(day, format));
 
     QObject::connect(
-        this, SIGNAL(editingFinished()), this, SLOT(onValueChanged()));
+      this, SIGNAL(editingFinished()), this, SLOT(onValueChanged()));
 
     installEventFilter(this);
 }
@@ -225,8 +222,7 @@ VleDayEdit::~VleDayEdit()
 void
 VleDayEdit::setValue(QString day)
 {
-    setDate(QDate::fromString(day,
-                              "yyyy-M-d"));
+    setDate(QDate::fromString(day, "yyyy-M-d"));
 }
 
 bool
@@ -444,9 +440,8 @@ VleComboLineEdit::VleComboLineEdit(QWidget* parent,
     addItems(list);
     setCurrentIndex(findText(val));
 
-
     QObject::connect(
-        lineEdit(), SIGNAL(editingFinished()), this, SLOT(onValueChanged()));
+      lineEdit(), SIGNAL(editingFinished()), this, SLOT(onValueChanged()));
     QObject::connect(this,
                      SIGNAL(currentIndexChanged(const QString&)),
                      this,
@@ -2148,7 +2143,7 @@ VleCodeEdit::VleCodeEdit(QWidget* parent,
     // this->setContextMenuPolicy(Qt::NoContextMenu);
     this->setFocusPolicy(Qt::ClickFocus);
 
-    const int tabStop = 4;  // 4 characters
+    const int tabStop = 4; // 4 characters
 
     QFontMetrics metrics(font);
     this->setTabStopWidth(tabStop * metrics.width(' '));
@@ -2196,7 +2191,7 @@ VleCodeEdit::setText(const QString& text)
 void
 VleCodeEdit::focusOutEvent(QFocusEvent* e)
 {
-    //setPalette(QApplication::palette());
+    // setPalette(QApplication::palette());
     setTextEdition(false);
     update();
     QPlainTextEdit::focusOutEvent(e);
@@ -2206,10 +2201,10 @@ void
 VleCodeEdit::focusInEvent(QFocusEvent* e)
 {
     if (e->reason() == Qt::MouseFocusReason) {
-        //QPalette p = this->palette();
-        //p.setBrush(QPalette::Base,
+        // QPalette p = this->palette();
+        // p.setBrush(QPalette::Base,
         //           QBrush(QColor(255, 127, 80, 200), Qt::SolidPattern));
-    //setPalette(p);
+        // setPalette(p);
         QPlainTextEdit::focusInEvent(e);
         emit selected(id);
     }
@@ -2317,6 +2312,5 @@ VleCodeEdit::VleCodelineNumberAreaPaintEvent(QPaintEvent* event)
         ++blockNumber;
     }
 }
-
 }
 } // namespaces

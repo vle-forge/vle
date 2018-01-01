@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -38,8 +38,8 @@ class ExternalEvent;
 
 using ExternalEventList = std::vector<ExternalEvent>;
 
-VLE_API std::ostream& operator<<(std::ostream& o,
-                                 const ExternalEventList& evts);
+VLE_API std::ostream&
+operator<<(std::ostream& o, const ExternalEventList& evts);
 }
 } // namespace vle devs
 

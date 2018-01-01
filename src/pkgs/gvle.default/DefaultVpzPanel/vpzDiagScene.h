@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,18 +25,18 @@
 #ifndef gvle_VPZ_DIAG_SCENE_H
 #define gvle_VPZ_DIAG_SCENE_H
 
-#include <QGraphicsScene>
 #include <QGraphicsRectItem>
-#include <QWidget>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
+#include <QGraphicsScene>
 #include <QListWidgetItem>
 #include <QTableWidgetItem>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
+#include <QWidget>
 
-#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/gvle_widgets.h>
+#include <vle/gvle/vlevpz.hpp>
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif
@@ -46,17 +46,18 @@
 namespace vle {
 namespace gvle {
 
-
 class VpzDiagScene;
 
-enum {
-    VpzPortTypeIn         = QGraphicsItem::UserType + 1,
-    VpzPortTypeOut        = QGraphicsItem::UserType + 2,
-    VpzSubModelType       = QGraphicsItem::UserType + 3,
-    VpzMainModelType      = QGraphicsItem::UserType + 4,
+enum
+{
+    VpzPortTypeIn = QGraphicsItem::UserType + 1,
+    VpzPortTypeOut = QGraphicsItem::UserType + 2,
+    VpzSubModelType = QGraphicsItem::UserType + 3,
+    VpzMainModelType = QGraphicsItem::UserType + 4,
     VpzConnectionLineType = QGraphicsItem::UserType + 5
 };
-enum SEL_TYPE {
+enum SEL_TYPE
+{
     TOP,
     RIGHT,
     BOTTOM,
@@ -64,7 +65,8 @@ enum SEL_TYPE {
     MIDDLE
 };
 
-enum VPZ_DIAG_MENU_ACTION {
+enum VPZ_DIAG_MENU_ACTION
+{
     VDMA_copy_models_notrack,
     VDMA_copy_models_track,
     VDMA_paste_models,
@@ -85,12 +87,16 @@ enum VPZ_DIAG_MENU_ACTION {
 class VpzConnectionLineItem : public QGraphicsItem
 {
 public:
-    VpzConnectionLineItem(QDomNode node, vleVpz* vpz, QLineF l,
-            QGraphicsItem* parent, VpzDiagScene* scene);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                QWidget *widget = 0) override;
+    VpzConnectionLineItem(QDomNode node,
+                          vleVpz* vpz,
+                          QLineF l,
+                          QGraphicsItem* parent,
+                          VpzDiagScene* scene);
+    void paint(QPainter* painter,
+               const QStyleOptionGraphicsItem* option,
+               QWidget* widget = 0) override;
     QRectF boundingRect() const override;
-    void update(const QRectF & rect = QRectF());
+    void update(const QRectF& rect = QRectF());
     int type() const override;
 
     vleVpz* mVpz;
@@ -101,19 +107,23 @@ class VpzPortItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    VpzPortItem(QDomNode node, vleVpz* vpz, bool input,
-            QGraphicsItem* parent, VpzDiagScene* scene);
+    VpzPortItem(QDomNode node,
+                vleVpz* vpz,
+                bool input,
+                QGraphicsItem* parent,
+                VpzDiagScene* scene);
     QRectF boundingRect() const override;
-    void update(const QRectF & rect = QRectF());
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                QWidget *widget = 0) override;
+    void update(const QRectF& rect = QRectF());
+    void paint(QPainter* painter,
+               const QStyleOptionGraphicsItem* option,
+               QWidget* widget = 0) override;
     QPointF getConnectionPoint();
     QString getPortName();
     VleLineEditItem* getTextItem() const;
     QGraphicsPixmapItem* getPixItem() const;
     void setNameEdition(bool val);
     int type() const override;
-    void hoverEnterEvent(QGraphicsSceneHoverEvent * evt) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* evt) override;
 
 public:
     vleVpz* mVpz;
@@ -124,8 +134,10 @@ public:
 class VpzModelItem : public QGraphicsItem
 {
 public:
-    VpzModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
-                QGraphicsScene* scene);
+    VpzModelItem(QDomNode node,
+                 vleVpz* vpz,
+                 QGraphicsItem* parent,
+                 QGraphicsScene* scene);
     VleLineEditItem* getTitle() const;
     QGraphicsRectItem* getRectangle() const;
 
@@ -153,20 +165,22 @@ class VpzSubModelItem : public VpzModelItem
 {
 
 public:
-
-    VpzSubModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
-            QGraphicsScene* scene);
+    VpzSubModelItem(QDomNode node,
+                    vleVpz* vpz,
+                    QGraphicsItem* parent,
+                    QGraphicsScene* scene);
     ~VpzSubModelItem() override;
     QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-            QWidget *widget = 0) override;
+    void paint(QPainter* painter,
+               const QStyleOptionGraphicsItem* option,
+               QWidget* widget = 0) override;
     void initializeFromDom();
-    void update(const QRectF & rect = QRectF());
-    void hoverMoveEvent(QGraphicsSceneHoverEvent * event) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
+    void update(const QRectF& rect = QRectF());
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
     SEL_TYPE getSelType(QPointF selPoint);
     QString getModelName();
     int type() const override;
@@ -177,41 +191,49 @@ class VpzMainModelItem : public VpzModelItem
 {
 
 public:
-    enum SEL_TYPE {TOP, RIGHT, BOTTOM, LEFT, MIDDLE};
+    enum SEL_TYPE
+    {
+        TOP,
+        RIGHT,
+        BOTTOM,
+        LEFT,
+        MIDDLE
+    };
 
-    VpzMainModelItem(QDomNode node, vleVpz* vpz, QGraphicsItem* parent,
-            QGraphicsScene* scene);
+    VpzMainModelItem(QDomNode node,
+                     vleVpz* vpz,
+                     QGraphicsItem* parent,
+                     QGraphicsScene* scene);
     QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-            QWidget *widget = 0) override;
+    void paint(QPainter* painter,
+               const QStyleOptionGraphicsItem* option,
+               QWidget* widget = 0) override;
     void initializeFromDom();
-    void clearLines(const QList<VpzSubModelItem*>&
-            sels=QList<VpzSubModelItem*>());
+    void clearLines(
+      const QList<VpzSubModelItem*>& sels = QList<VpzSubModelItem*>());
     void clearSubModels();
-    void addConnLines(const QList<VpzSubModelItem*>&
-            sels=QList<VpzSubModelItem*>());
-    void update(const QRectF & rect = QRectF());
+    void addConnLines(
+      const QList<VpzSubModelItem*>& sels = QList<VpzSubModelItem*>());
+    void update(const QRectF& rect = QRectF());
 
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void dragEnterEvent(QGraphicsSceneDragDropEvent * event) override;
-    void dragLeaveEvent(QGraphicsSceneDragDropEvent * event) override;
-    void dragMoveEvent(QGraphicsSceneDragDropEvent * event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
+    void dragLeaveEvent(QGraphicsSceneDragDropEvent* event) override;
+    void dragMoveEvent(QGraphicsSceneDragDropEvent* event) override;
 
     QRectF subModelsBoundingRect(bool onlySelected);
     VpzSubModelItem* getSubModel(const QString& subMod);
     QList<VpzSubModelItem*> getSubModels();
     QList<VpzSubModelItem*> getSelectedSubModels();
     QList<QDomNode> getSelectedSubModelsNode();
-    QList<VpzConnectionLineItem *> getConnLines();
+    QList<VpzConnectionLineItem*> getConnLines();
     void removeNameEditionMode();
     bool isAtomic();
     int type() const override;
-
 };
-
 
 class VpzDiagScene : public QGraphicsScene
 {
@@ -227,19 +249,20 @@ public:
      */
     void init(vleVpz* vpz, const QString& className);
     QString getClass();
-    void setFocus(QDomNode selModelNode, bool refreshAll=false);
+    void setFocus(QDomNode selModelNode, bool refreshAll = false);
     void clear();
-    void update(const QRectF & rect = QRectF());
-    void setScale (const qreal z);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) override;
-    void dragEnterEvent(QGraphicsSceneDragDropEvent * event) override;
-    void dragLeaveEvent(QGraphicsSceneDragDropEvent * event) override;
-    void dragMoveEvent(QGraphicsSceneDragDropEvent * event) override;
-    void dropEvent(QGraphicsSceneDragDropEvent * event) override;
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent) override;
+    void update(const QRectF& rect = QRectF());
+    void setScale(const qreal z);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
+    void dragLeaveEvent(QGraphicsSceneDragDropEvent* event) override;
+    void dragMoveEvent(QGraphicsSceneDragDropEvent* event) override;
+    void dropEvent(QGraphicsSceneDragDropEvent* event) override;
+    void contextMenuEvent(
+      QGraphicsSceneContextMenuEvent* contextMenuEvent) override;
     void populateConfigureMenu(QMenu* menu);
     void populateDataConfigureMenu(QMenu* menu);
     void doConfigureMenu(QDomNode model, const QString& meta);
@@ -277,26 +300,27 @@ signals:
     void initializationDone(VpzDiagScene* scene);
 
 public slots:
-    void onDragDestroyed(QObject *obj =0);
-    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
-            QDomNode oldValVpm, QDomNode newValVpm);
+    void onDragDestroyed(QObject* obj = 0);
+    void onUndoRedoVpz(QDomNode oldValVpz,
+                       QDomNode newValVpz,
+                       QDomNode oldValVpm,
+                       QDomNode newValVpm);
 
 public:
-    vleVpz*             mVpz;
-    QString                mClass;
-    VpzMainModelItem*      mCoupled;
-    VpzPortItem*           mPortSel1;
-    VpzPortItem*           mPortSel2;
-    QGraphicsLineItem*     mConnection;
-    QPointF                mDragStartPoint;
-    QPointF                mDragCurrPoint;
-    SEL_TYPE               mModelSelType;
-    bool                   mIsEnteringCoupled;
-    Logger*                mLog;
+    vleVpz* mVpz;
+    QString mClass;
+    VpzMainModelItem* mCoupled;
+    VpzPortItem* mPortSel1;
+    VpzPortItem* mPortSel2;
+    QGraphicsLineItem* mConnection;
+    QPointF mDragStartPoint;
+    QPointF mDragCurrPoint;
+    SEL_TYPE mModelSelType;
+    bool mIsEnteringCoupled;
+    Logger* mLog;
     vle::utils::ContextPtr mCtx;
 };
-
-}}//namespaces
-
+}
+} // namespaces
 
 #endif

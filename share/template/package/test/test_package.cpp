@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -28,14 +28,16 @@
 
 #include <vle/utils/unit-test.hpp>
 
-void test_1()
+void
+test_1()
 {
     EnsuresEqual(1, 1);
     EnsuresApproximatelyEqual(1000.0, 1000.1, 10.);
     Ensures(1 == 1);
 }
 
-int main()
+int
+main()
 {
     test_1();
 

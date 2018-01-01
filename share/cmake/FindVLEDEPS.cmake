@@ -4,7 +4,7 @@
 # Try to find VLE dependencies (libXml2, zlib, iconv, intl without)
 # pkg-config (for windows install only)
 #
-# Copyright 2015-2016 INRA
+# Copyright 2015-2018 INRA
 # Gauthier Quesnel <quesnel@users.sourceforge.net>
 # Ronan Trépos <ronan.trepos@toulouse.inra.fr>
 #

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -170,7 +170,9 @@ buildNewDynamicsWrapper(utils::ContextPtr context,
                         const InitEventList& events,
                         void* symbol)
 {
-    using fctdw = vle::devs::Dynamics *(*)(const vle::devs::DynamicsWrapperInit &, const vle::devs::InitEventList &);
+    using fctdw =
+      vle::devs::Dynamics* (*)(const vle::devs::DynamicsWrapperInit&,
+                               const vle::devs::InitEventList&);
 
     fctdw fct = utils::functionCast<fctdw>(symbol);
 
@@ -271,7 +273,8 @@ buildNewDynamics(utils::ContextPtr context,
                  const InitEventList& events,
                  void* symbol)
 {
-    using fctdyn = vle::devs::Dynamics *(*)(const vle::devs::DynamicsInit &, const vle::devs::InitEventList &);
+    using fctdyn = vle::devs::Dynamics* (*)(const vle::devs::DynamicsInit&,
+                                            const vle::devs::InitEventList&);
 
     fctdyn fct = utils::functionCast<fctdyn>(symbol);
 
@@ -330,7 +333,8 @@ buildNewExecutive(utils::ContextPtr context,
                   const InitEventList& events,
                   void* symbol)
 {
-    using fctexe = vle::devs::Dynamics *(*)(const vle::devs::ExecutiveInit &, const vle::devs::InitEventList &);
+    using fctexe = vle::devs::Dynamics* (*)(const vle::devs::ExecutiveInit&,
+                                            const vle::devs::InitEventList&);
 
     fctexe fct = utils::functionCast<fctexe>(symbol);
 

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -48,8 +48,7 @@ check_remove_dyns_unittest_vpz(vpz::Project& project)
     Ensures(not project.dynamics().exist("new_unittest"));
 
     vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
-    vpz::CoupledModel* top1 =
-      vpz::BaseModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set<std::string> dynamics = dyns.getKeys();
 
@@ -179,8 +178,7 @@ check_remove_obs_unittest_vpz(vpz::Project& project)
     Ensures(not obs_list.exist("obs1"));
 
     vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
-    vpz::CoupledModel* top1 =
-      vpz::BaseModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set<std::string> obs = obs_list.getKeys();
 
@@ -211,8 +209,7 @@ check_rename_observables_unittest_vpz(vpz::Project& project)
     Ensures(not obs_list.exist("obs2"));
 
     vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
-    vpz::CoupledModel* top1 =
-      vpz::BaseModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     EnsuresNotThrow(top->updateObservable("obs2", "new_obs2"), std::exception);
     EnsuresNotThrow(top->updateObservable("obs1", "new_obs1"), std::exception);

@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,29 +25,28 @@
 #ifndef FILEVPZCLASSES_H
 #define FILEVPZCLASSES_H
 
-#include <QGraphicsScene>
 #include <QGraphicsRectItem>
-#include <QWidget>
+#include <QGraphicsScene>
+#include <QListWidgetItem>
 #include <QMenu>
+#include <QTableWidgetItem>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QListWidgetItem>
-#include <QTableWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
+#include <QWidget>
 
 #include "ui_filevpzrtool.h"
-#include <vle/gvle/vlevpz.hpp>
 #include "vpzDiagScene.h"
+#include <vle/gvle/vlevpz.hpp>
 #ifndef Q_MOC_RUN
 #include <vle/vpz/Vpz.hpp>
 #endif
 
 #include <QtDebug>
 
-
 namespace Ui {
-    class FileVpzClasses;
+class FileVpzClasses;
 }
 
 namespace vle {
@@ -58,8 +57,8 @@ class FileVpzClasses : public QWidget
     Q_OBJECT
 public:
     explicit FileVpzClasses(Logger* log,
-            const vle::utils::ContextPtr& ctx,
-            QWidget *parent = 0);
+                            const vle::utils::ContextPtr& ctx,
+                            QWidget* parent = 0);
     ~FileVpzClasses() override;
     void setVpz(vleVpz* vpz);
     void reload();
@@ -67,25 +66,25 @@ public slots:
     void onUndoRedoVpz(QDomNode, QDomNode, QDomNode, QDomNode);
     void onNewAtomicTriggered(bool checked);
     void onNewCoupledTriggered(bool checked);
-    void onTextChanged(const QString & text);
+    void onTextChanged(const QString& text);
     void onPushCopy(bool checked);
     void onPushDelete(bool checked);
-    void onCurrentIndexChanged(const QString & text);
-    void onChanged(const QList<QRectF> & region);
+    void onCurrentIndexChanged(const QString& text);
+    void onChanged(const QList<QRectF>& region);
     void onSceneRectChanged(const QRectF& rect);
     void onSelectionChanged();
     void onMenu(const QPoint& pt);
 
 public:
-    VpzDiagScene        mScene;
+    VpzDiagScene mScene;
+
 private:
     Ui::FileVpzClasses* ui;
-    vleVpz*             mVpz;
-    QString             mSelClass;
-    QMenu               mMenuButton;//either coupled or atomic
-
+    vleVpz* mVpz;
+    QString mSelClass;
+    QMenu mMenuButton; // either coupled or atomic
 };
-
-}}
+}
+}
 
 #endif // FILEVPZCLASSES_H

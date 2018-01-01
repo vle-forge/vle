@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -35,7 +35,7 @@
 #include <vle/DllDefines.hpp>
 
 #if defined(__GNUC__)
-#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                                 \
+#define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                                  \
     __attribute__((format(printf, (idformat), (idarg))))
 #else
 #define GCC_ATTRIBUTE_FORMAT(idformat, idarg)
@@ -79,8 +79,8 @@ namespace utils {
  * \return a empty string if an error occured otherwise the \e printf()
  * formatted string.
  */
-std::string VLE_API format(const char* format,
-                           ...) noexcept GCC_ATTRIBUTE_FORMAT(1, 2);
+std::string VLE_API
+format(const char* format, ...) noexcept GCC_ATTRIBUTE_FORMAT(1, 2);
 
 /**
  * The function \c vformat() produces a \c std::string according to a C
@@ -92,7 +92,8 @@ std::string VLE_API format(const char* format,
  * \return a empty string if an error occured otherwise the \e printf()
  * formatted string.
  */
-std::string VLE_API vformat(const char* format, va_list ap) noexcept;
+std::string VLE_API
+vformat(const char* format, va_list ap) noexcept;
 
 /**
  * Return true if the string \c str can be translated the template type \c T.
@@ -103,8 +104,9 @@ std::string VLE_API vformat(const char* format, va_list ap) noexcept;
  *
  * @return true if string can be translated into the type \c T.
  */
-template <typename T>
-bool is(const std::string& str);
+template<typename T>
+bool
+is(const std::string& str);
 
 /**
  * Convert the template type \c T into the string representation.
@@ -115,8 +117,9 @@ bool is(const std::string& str);
  *
  * @return A string representation.
  */
-template <typename T>
-std::string to(const T t);
+template<typename T>
+std::string
+to(const T t);
 
 /**
  * Convert the string \c str into the template type \c T. The template type
@@ -129,8 +132,9 @@ std::string to(const T t);
  *
  * @return A instance of the type \c T.
  */
-template <typename T>
-T to(const std::string& str);
+template<typename T>
+T
+to(const std::string& str);
 
 /**
  * Convert the string to the output template type with or without
@@ -153,17 +157,19 @@ T to(const std::string& str);
  *
  * @return A template output type.
  */
-template <typename T>
-T convert(const std::string& value,
-          bool locale = false,
-          const std::string& loc = std::string());
+template<typename T>
+T
+convert(const std::string& value,
+        bool locale = false,
+        const std::string& loc = std::string());
 
 /**
  * Check if the locale exists on this operating system.
  * @param locale The locale to check.
  * @return True if the locale exists, false otherwise.
  */
-VLE_API bool isLocaleAvailable(const std::string& locale);
+VLE_API bool
+isLocaleAvailable(const std::string& locale);
 
 /**
  * Return the a string version of v, in scientific notation
@@ -173,7 +179,8 @@ VLE_API bool isLocaleAvailable(const std::string& locale);
  * @param locale  if true, use "," else use "."
  * @return the string representation of the double.
  */
-VLE_API std::string toScientificString(const double& v, bool locale = false);
+VLE_API std::string
+toScientificString(const double& v, bool locale = false);
 
 /**
  * Tokenize a string with a delimiter
@@ -183,10 +190,11 @@ VLE_API std::string toScientificString(const double& v, bool locale = false);
  * @param[in]  trimEmpty, if true remove empty tokens
  * @return the tokens
  */
-VLE_API void tokenize(const std::string& str,
-                      std::vector<std::string>& toks,
-                      const std::string& delim,
-                      bool trimEmpty);
+VLE_API void
+tokenize(const std::string& str,
+         std::vector<std::string>& toks,
+         const std::string& delim,
+         bool trimEmpty);
 
 /**
  * @brief Return true if @c Source can be casted into @c Target integer
@@ -198,7 +206,7 @@ VLE_API void tokenize(const std::string& str,
  * @tparam Target An integer type.
  * @return true if @c static_cast<Target>(Source) is valid.
  */
-template <typename Target, typename Source>
+template<typename Target, typename Source>
 VLE_CXX14_CONSTEXPR inline bool
 is_numeric_castable(Source arg)
 {
@@ -253,7 +261,7 @@ struct VLE_API numeric_cast_error : public std::exception
  * @tparam Target An integer type.
  * @return @c static_cast<Target>(Source) integer.
  */
-template <typename Target, typename Source>
+template<typename Target, typename Source>
 VLE_CXX14_CONSTEXPR inline Target
 numeric_cast(Source s)
 {

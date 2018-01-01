@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -41,8 +41,8 @@
 #include <unistd.h>
 
 #ifdef __APPLE__
-#include <signal.h>
 #include <crt_externs.h>
+#include <signal.h>
 extern "C" char** environ = *_NSGetEnviron();
 #endif
 
@@ -407,8 +407,7 @@ public:
                        .str();
             *success = false;
         } else if (WIFCONTINUED(m_status)) {
-            m_msg +=
-              (fmt("[%1%] (%2%) continued\n") % m_command % m_pid).str();
+            m_msg += (fmt("[%1%] (%2%) continued\n") % m_command % m_pid).str();
             *success = false;
         }
 
@@ -419,8 +418,7 @@ public:
 };
 
 Spawn::Spawn(ContextPtr ctx)
-  : m_pimpl(
-      std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
+  : m_pimpl(std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
 {
 }
 
@@ -492,8 +490,7 @@ Spawn::splitCommandLine(const std::string& command)
 
     if (argv.empty())
         throw utils::ArgError(
-          (fmt(_("Package command line: error, empty command `%1%'")) %
-           command)
+          (fmt(_("Package command line: error, empty command `%1%'")) % command)
             .str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();

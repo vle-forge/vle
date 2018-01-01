@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -72,10 +72,10 @@ ObservablePort::del(const std::string& portname)
 bool
 ObservablePort::exist(const std::string& portname) const
 {
-    return std::find_if(
-             begin(),
-             end(),
-             std::bind2nd(std::equal_to<std::string>(), portname)) != end();
+    return std::find_if(begin(),
+                        end(),
+                        std::bind2nd(std::equal_to<std::string>(), portname)) !=
+           end();
 }
 
 void

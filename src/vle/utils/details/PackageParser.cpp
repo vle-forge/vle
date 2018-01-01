@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -221,11 +221,10 @@ class DescriptionParser
                       ? PACKAGE_OPERATOR_LESS
                       : (str == "<=")
                           ? PACKAGE_OPERATOR_LESS_OR_EQUAL
-                          : (str == ">")
-                              ? PACKAGE_OPERATOR_GREATER
-                              : (str == ">=")
-                                  ? PACKAGE_OPERATOR_GREATER_OR_EQUAL
-                                  : PACKAGE_OPERATOR_EQUAL;
+                          : (str == ">") ? PACKAGE_OPERATOR_GREATER
+                                         : (str == ">=")
+                                             ? PACKAGE_OPERATOR_GREATER_OR_EQUAL
+                                             : PACKAGE_OPERATOR_EQUAL;
 
         return true;
     }
@@ -434,8 +433,7 @@ class DescriptionParser
         if (not(read_word("Conflicts:") and read_linkid(&pkg->conflicts)))
             return -5;
 
-        if (not(read_word("Maintainer:") and
-                read_maintainer(&pkg->maintainer)))
+        if (not(read_word("Maintainer:") and read_maintainer(&pkg->maintainer)))
             return -6;
 
         if (not(read_word("Description:") and

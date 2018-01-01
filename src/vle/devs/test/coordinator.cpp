@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -62,7 +62,7 @@ public:
     }
 
     void output(vle::devs::Time /* time */,
-                        vle::devs::ExternalEventList& output) const override
+                vle::devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
 
@@ -80,7 +80,7 @@ public:
     }
 
     void externalTransition(const vle::devs::ExternalEventList& events,
-                                    vle::devs::Time /* time */) override
+                            vle::devs::Time /* time */) override
     {
         for (const auto& elem : events)
             if (elem.onPort("x"))
@@ -126,7 +126,7 @@ public:
     }
 
     void output(vle::devs::Time /* time */,
-                        vle::devs::ExternalEventList& output) const override
+                vle::devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
 
@@ -144,7 +144,7 @@ public:
     }
 
     void externalTransition(const vle::devs::ExternalEventList& events,
-                                    vle::devs::Time /* time */) override
+                            vle::devs::Time /* time */) override
     {
         for (const auto& elem : events)
             if (elem.onPort("x"))
@@ -190,7 +190,7 @@ public:
     }
 
     void output(vle::devs::Time /* time */,
-                        vle::devs::ExternalEventList& output) const override
+                vle::devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
 
@@ -212,7 +212,7 @@ public:
     }
 
     void externalTransition(const vle::devs::ExternalEventList& events,
-                                    vle::devs::Time /* time */) override
+                            vle::devs::Time /* time */) override
     {
         for (const auto& elem : events)
             if (elem.onPort("x"))
@@ -257,9 +257,8 @@ public:
         return 1;
     }
 
-    void output(
-      vle::devs::Time /* time */,
-      vle::devs::ExternalEventList& /* output */) const override
+    void output(vle::devs::Time /* time */,
+                vle::devs::ExternalEventList& /* output */) const override
     {
         state++;
     }
@@ -274,9 +273,8 @@ public:
         state++;
     }
 
-    void externalTransition(
-      const vle::devs::ExternalEventList& /* events */,
-      vle::devs::Time /* time */) override
+    void externalTransition(const vle::devs::ExternalEventList& /* events */,
+                            vle::devs::Time /* time */) override
     {
         state += 1000;
     }
@@ -330,18 +328,18 @@ public:
     }
 
     void onParameter(const std::string& /* plugin */,
-                             const std::string& /* location */,
-                             const std::string& /* file */,
-                             std::unique_ptr<value::Value> /* parameters */,
-                             const double& /* time */) override
+                     const std::string& /* location */,
+                     const std::string& /* file */,
+                     std::unique_ptr<value::Value> /* parameters */,
+                     const double& /* time */) override
     {
     }
 
     void onNewObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& port,
-                                 const std::string& /* view */,
-                                 const double& /* time */) override
+                         const std::string& parent,
+                         const std::string& port,
+                         const std::string& /* view */,
+                         const double& /* time */) override
     {
         std::string key = parent + '.' + simulator + '.' + port;
 
@@ -349,19 +347,19 @@ public:
     }
 
     void onDelObservable(const std::string& /* simulator */,
-                                 const std::string& /* parent */,
-                                 const std::string& /* port */,
-                                 const std::string& /* view */,
-                                 const double& /* time */) override
+                         const std::string& /* parent */,
+                         const std::string& /* port */,
+                         const std::string& /* view */,
+                         const double& /* time */) override
     {
     }
 
     void onValue(const std::string& simulator,
-                         const std::string& parent,
-                         const std::string& port,
-                         const std::string& /* view */,
-                         const double& /* time */,
-                         std::unique_ptr<value::Value> value) override
+                 const std::string& parent,
+                 const std::string& port,
+                 const std::string& /* view */,
+                 const double& /* time */,
+                 std::unique_ptr<value::Value> value) override
     {
         std::string key = parent + '.' + simulator + '.' + port;
 
@@ -370,8 +368,7 @@ public:
         data.number++;
     }
 
-    std::unique_ptr<value::Matrix> finish(
-      const double& /* time */) override
+    std::unique_ptr<value::Matrix> finish(const double& /* time */) override
     {
         auto it = pp_D.find("depth0.atom.port");
         Ensures(it != pp_D.cend());

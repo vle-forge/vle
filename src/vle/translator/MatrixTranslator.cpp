@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -204,7 +204,7 @@ apply_mask(vle::devs::Executive& executive,
 
     for (int y = y_min, n = y_mask_min; y != y_max; ++y, ++n) {
         for (int x = x_min, m = x_mask_min; x != x_max; ++x, ++m) {
-            if (not mask(m,n).empty()) {
+            if (not mask(m, n).empty()) {
                 switch (params.type) {
                 case regular_graph_generator::connectivity::IN_OUT:
                     executive.addOutputPort(modelnames(c, r), "out");
@@ -228,8 +228,10 @@ apply_mask(vle::devs::Executive& executive,
                     executive.addOutputPort(modelnames(c, r), mask(m, n));
                     executive.addInputPort(modelnames(x, y), mask(m, n));
 
-                    executive.addConnection(
-                      modelnames(c, r), mask(m, n), modelnames(x, y), mask(m, n));
+                    executive.addConnection(modelnames(c, r),
+                                            mask(m, n),
+                                            modelnames(x, y),
+                                            mask(m, n));
                     break;
                 }
             }
@@ -276,7 +278,7 @@ apply_wrap_mask(vle::devs::Executive& executive,
             } else
                 continue;
 
-            if (not mask(m,n).empty()) {
+            if (not mask(m, n).empty()) {
                 switch (params.type) {
                 case regular_graph_generator::connectivity::IN_OUT:
                     executive.addOutputPort(modelnames(c, r), "out");
@@ -300,8 +302,10 @@ apply_wrap_mask(vle::devs::Executive& executive,
                     executive.addOutputPort(modelnames(c, r), mask(m, n));
                     executive.addInputPort(modelnames(q, p), mask(m, n));
 
-                    executive.addConnection(
-                      modelnames(c, r), mask(m, n), modelnames(q, p), mask(m, n));
+                    executive.addConnection(modelnames(c, r),
+                                            mask(m, n),
+                                            modelnames(q, p),
+                                            mask(m, n));
                     break;
                 }
             }

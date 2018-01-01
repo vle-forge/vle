@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -39,7 +39,7 @@
 
 namespace {
 
-template <typename T>
+template<typename T>
 inline void
 checkEmptyStack(const T& t)
 {
@@ -47,7 +47,7 @@ checkEmptyStack(const T& t)
         throw vle::utils::SaxParserError("Not empty vpz stack");
 }
 
-template <typename T>
+template<typename T>
 inline void
 checkNotEmptyStack(const T& t)
 {
@@ -196,8 +196,8 @@ SaxStackVpz::pushModel(const xmlChar** att)
             gmdl = ptr;
         } catch (const utils::DevsGraphError& e) {
             throw utils::SaxParserError(
-              (fmt(_("Error build atomic model '%1%' with error: %2%")) %
-               name % e.what())
+              (fmt(_("Error build atomic model '%1%' with error: %2%")) % name %
+               e.what())
                 .str());
         }
     } else if (xmlStrcmp(type, (const xmlChar*)"coupled") == 0) {
@@ -472,8 +472,8 @@ SaxStackVpz::buildConnection()
 
     vpz::Origin* orig = static_cast<vpz::Origin*>(pop());
 
-    if (not(parent()->isInternalConnection() or
-            parent()->isInputConnection() or parent()->isOutputConnection())) {
+    if (not(parent()->isInternalConnection() or parent()->isInputConnection() or
+            parent()->isOutputConnection())) {
         throw utils::SaxParserError(_("Bad file format"));
     }
 
@@ -797,8 +797,7 @@ SaxStackVpz::pushView(const xmlChar** att)
                 viewtype |= View::FINISH;
             else
                 throw utils::SaxParserError(
-                  (fmt(_("View tag does not accept type '%1%'")) % type)
-                    .str());
+                  (fmt(_("View tag does not accept type '%1%'")) % type).str());
 
             if (it != std::string::npos)
                 begin = std::min(it + 1, typestr.size());

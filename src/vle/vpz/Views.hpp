@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -271,8 +271,7 @@ public:
      * @param outputname the name of the original vpz::Output
      * @param copyname the name of the copy vpz::Output
      */
-    void copyOutput(const std::string& outputname,
-                    const std::string& copyname);
+    void copyOutput(const std::string& outputname, const std::string& copyname);
 
     /**
      * @brief Copy a specified vpz::View.

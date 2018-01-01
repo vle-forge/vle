@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -75,7 +75,7 @@ namespace utils {
  * @param last The string to push at the end of the sequence.
  * @param around Strings to push around each element of the sequence.
  */
-template <typename InputIterator>
+template<typename InputIterator>
 void
 formatCopy(InputIterator first,
            InputIterator end,
@@ -145,7 +145,7 @@ formatCopy(InputIterator first,
  * @param pred Unary predicate taking an element in the range as argument,
  * and returning a value.
  */
-template <typename InputIterator, typename OutputIterator, typename Predicate>
+template<typename InputIterator, typename OutputIterator, typename Predicate>
 void
 copyIf(InputIterator first,
        InputIterator end,
@@ -199,10 +199,10 @@ copyIf(InputIterator first,
  * function results are stored. The range includes as many elements as
  * [first1,last1) which valid @e pred.
  */
-template <typename InputIterator,
-          typename OutputIterator,
-          typename Predicate,
-          typename UnaryOperator>
+template<typename InputIterator,
+         typename OutputIterator,
+         typename Predicate,
+         typename UnaryOperator>
 OutputIterator
 transformIf(InputIterator first,
             InputIterator end,
@@ -239,7 +239,7 @@ transformIf(InputIterator first,
  * @return The iterator which reference to element found or end if not
  * found.
  */
-template <typename Iterator, typename Predicate>
+template<typename Iterator, typename Predicate>
 Iterator
 findIf(Iterator first, Iterator end, Predicate pred)
 {
@@ -296,7 +296,7 @@ findIf(Iterator first, Iterator end, Predicate pred)
  *
  * @return A copy of the Function f.
  */
-template <typename InputIterator, typename Function>
+template<typename InputIterator, typename Function>
 Function
 forEach(InputIterator first, InputIterator end, Function f)
 {
@@ -315,7 +315,7 @@ forEach(InputIterator first, InputIterator end, Function f)
  * passed by reference in vle::utils::generator instead of value in
  * std::generate.
  */
-template <typename ForwardIterator, typename Generator>
+template<typename ForwardIterator, typename Generator>
 void
 generate(ForwardIterator first, ForwardIterator end, Generator& f)
 {
@@ -327,7 +327,7 @@ generate(ForwardIterator first, ForwardIterator end, Generator& f)
 /**
  * @brief A std::unary_function to select the first element of a std::pair.
  */
-template <class __vle_pair>
+template<class __vle_pair>
 struct select1st
   : public std::unary_function<__vle_pair, typename __vle_pair::first_type>
 {
@@ -336,8 +336,7 @@ struct select1st
      * @param x The pair.
      * @return A constant reference to the first element.
      */
-    const typename __vle_pair::first_type& operator()(
-      const __vle_pair& x) const
+    const typename __vle_pair::first_type& operator()(const __vle_pair& x) const
     {
         return x.first;
     }
@@ -356,7 +355,7 @@ struct select1st
 /**
  * @brief A std::unary_function to select the second element of a std::pair.
  */
-template <class __vle_pair>
+template<class __vle_pair>
 struct select2nd
   : public std::unary_function<__vle_pair, typename __vle_pair::second_type>
 {
@@ -400,7 +399,7 @@ struct select2nd
  * @param x The void* to cast.
  * @return The pointer to fonction.
  */
-template <typename __v_result>
+template<typename __v_result>
 __v_result
 functionCast(void* x)
 {

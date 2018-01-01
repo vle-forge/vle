@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2015 INRA http://www.inra.fr
+ * Copyright (c) 2015-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and contributors
  *
@@ -25,8 +25,8 @@
 #define FilePluginGUItab_H
 
 #include <QObject>
-#include <QtXml>
 #include <QtCore/qnamespace.h>
+#include <QtXml>
 #include <vle/gvle/vlevpz.hpp>
 #include <vle/value/Map.hpp>
 
@@ -39,7 +39,7 @@ class FilePluginGUItab : public QWidget
     Q_OBJECT
 
 public:
-    explicit FilePluginGUItab(QWidget *parent = 0);
+    explicit FilePluginGUItab(QWidget* parent = 0);
     ~FilePluginGUItab() override;
     void init(vle::gvle::vleVpz* vpz, const QString& viewName);
 
@@ -50,16 +50,15 @@ private slots:
     void destinationChanged(const QString& val);
     void fileTypeChanged(const QString& val);
 
-
 private:
     int getCheckState(const vle::value::Boolean& v);
     bool wellFormed();
     void buildDefaultConfig();
 
     Ui::FilePluginGvle* ui;
-    vle::gvle::vleVpz*  mvleVpz;
-    QString             mViewName;
-    std::unique_ptr<vle::value::Map>    outputNodeConfig;
+    vle::gvle::vleVpz* mvleVpz;
+    QString mViewName;
+    std::unique_ptr<vle::value::Map> outputNodeConfig;
 };
 
 #endif

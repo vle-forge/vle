@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,28 +25,27 @@
 #ifndef gvle_FILE_VPZ_RTOOL_H
 #define gvle_FILE_VPZ_RTOOL_H
 
+#include "ui_filevpzrtool.h"
+#include "vpzDiagScene.h"
+#include "widgetvpzproperty.h"
 #include <QGraphicsScene>
-#include <QWidget>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
 #include <QListWidgetItem>
 #include <QTableWidgetItem>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
+#include <QWidget>
 #include <vle/gvle/vlevpz.hpp>
-#include "ui_filevpzrtool.h"
-#include "widgetvpzproperty.h"
-#include "vpzDiagScene.h"
 
 //#ifndef Q_MOC_RUN
 //#include <vle/vpz/Vpz.hpp>
 //#endif
 
 #define ROW_NAME 0
-#define ROW_DYN  1
-#define ROW_OBS  2
-#define ROW_EXP  3
-
+#define ROW_DYN 1
+#define ROW_OBS 2
+#define ROW_EXP 3
 
 namespace Ui {
 class fileVpzRTool;
@@ -60,7 +59,7 @@ class FileVpzRtool : public QWidget
     Q_OBJECT
 
 public:
-    explicit FileVpzRtool(QWidget *parent = 0);
+    explicit FileVpzRtool(QWidget* parent = 0);
     ~FileVpzRtool() override;
     void setVpz(vleVpz* v);
     void clear();
@@ -68,12 +67,13 @@ public:
     vleVpz* vpz();
     QString getModelQuery(QTreeWidgetItem* item);
     QTreeWidgetItem* getTreeWidgetItem(const QString& model_query,
-            QTreeWidgetItem* base = 0);
+                                       QTreeWidgetItem* base = 0);
     void updateModelProperty(const QString& model_query);
     void updateModelLabel();
-    QTreeWidgetItem* treeInsertModel(QDomNode mode, QTreeWidgetItem *base);
-//    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
-//    void treeUpdateModel(vleVpzModel *model, QString oldName, QString newName);
+    QTreeWidgetItem* treeInsertModel(QDomNode mode, QTreeWidgetItem* base);
+    //    void diagSelectModel(vleVpzModel *base, bool force = FALSE);
+    //    void treeUpdateModel(vleVpzModel *model, QString oldName, QString
+    //    newName);
 
 public slots:
     void onTreeModelSelected();
@@ -81,15 +81,19 @@ public slots:
     void onSelectionChanged();
     void onInitializationDone(VpzDiagScene* scene);
     void onDataUpdate();
-    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
-            QDomNode oldValVpm, QDomNode newValVpm);
-public:
-    Ui::fileVpzRtool*  ui;
-private:
-    vleVpz*          mVpz;
-    VpzDiagScene*    mCurrScene;
-};
+    void onUndoRedoVpz(QDomNode oldValVpz,
+                       QDomNode newValVpz,
+                       QDomNode oldValVpm,
+                       QDomNode newValVpm);
 
-}} //namespaces
+public:
+    Ui::fileVpzRtool* ui;
+
+private:
+    vleVpz* mVpz;
+    VpzDiagScene* mCurrScene;
+};
+}
+} // namespaces
 
 #endif

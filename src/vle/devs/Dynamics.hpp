@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -45,24 +45,24 @@
 #include <vle/vle.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 
-#define DECLARE_DYNAMICS(mdl)                                                 \
-    extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics(                    \
-      const vle::devs::DynamicsInit& init,                                    \
-      const vle::devs::InitEventList& events)                                 \
-    {                                                                         \
-        return new mdl(init, events);                                         \
-    }                                                                         \
-                                                                              \
-    VLE_MODULE void vle_api_level(std::uint32_t* major,                       \
-                                  std::uint32_t* minor,                       \
-                                  std::uint32_t* patch)                       \
-    {                                                                         \
-        auto version = vle::version();                                        \
-        *major = std::get<0>(version);                                        \
-        *minor = std::get<1>(version);                                        \
-        *patch = std::get<2>(version);                                        \
-    }                                                                         \
+#define DECLARE_DYNAMICS(mdl)                                                  \
+    extern "C" {                                                               \
+    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics(                     \
+      const vle::devs::DynamicsInit& init,                                     \
+      const vle::devs::InitEventList& events)                                  \
+    {                                                                          \
+        return new mdl(init, events);                                          \
+    }                                                                          \
+                                                                               \
+    VLE_MODULE void vle_api_level(std::uint32_t* major,                        \
+                                  std::uint32_t* minor,                        \
+                                  std::uint32_t* patch)                        \
+    {                                                                          \
+        auto version = vle::version();                                         \
+        *major = std::get<0>(version);                                         \
+        *minor = std::get<1>(version);                                         \
+        *patch = std::get<2>(version);                                         \
+    }                                                                          \
     }
 
 namespace vle {
@@ -425,11 +425,11 @@ private:
     PackageId m_packageid;
 };
 
-#define Trace(ctx, priority, arg...)                                          \
-    do {                                                                      \
-        if (ctx->get_log_priority() >= priority) {                            \
-            ctx->log(priority, __FILE__, __LINE__, __FUNCTION__, ##arg);      \
-        }                                                                     \
+#define Trace(ctx, priority, arg...)                                           \
+    do {                                                                       \
+        if (ctx->get_log_priority() >= priority) {                             \
+            ctx->log(priority, __FILE__, __LINE__, __FUNCTION__, ##arg);       \
+        }                                                                      \
     } while (0)
 }
 } // namespace vle devs

@@ -8,7 +8,7 @@ Install NSIS:    3.0
 #
 # In c:\msys32\etc\pacman.conf
 # use curl for downloading uncomment line (if required):
-# 
+#
 # XferCommand = /usr/bin/curl -C - -f %u > %o
 #
 ###
@@ -67,7 +67,7 @@ cpack.exe --debug --verbose -G NSIS
 **************************************************************
 ** Build RVLE natively on WIN32, 32 bits
 **************************************************************
-Install MSYS2:   msys2-i686-20161025.exe
+Install MSYS2:   msys2-i686-20181025.exe
 Install R-3.4.0-win
 Install Rtools34
 
@@ -75,7 +75,7 @@ Install Rtools34
 #
 # In c:\msys32\etc\pacman.conf
 # use curl for downloading uncomment line (if required):
-# 
+#
 # XferCommand = /usr/bin/curl -C - -f %u > %o
 #
 ###

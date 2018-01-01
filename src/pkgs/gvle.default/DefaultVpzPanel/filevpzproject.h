@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,10 +25,10 @@
 #ifndef gvle_FILEVPZPROJECT_H
 #define gvle_FILEVPZPROJECT_H
 
-#include <QWidget>
-#include <QUndoStack>
-#include <QTabWidget>
 #include <QDateTime>
+#include <QTabWidget>
+#include <QUndoStack>
+#include <QWidget>
 #include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
@@ -43,45 +43,49 @@ class FileVpzProject : public QWidget
     Q_OBJECT
 
 public:
-    explicit FileVpzProject(QWidget *parent = 0);
+    explicit FileVpzProject(QWidget* parent = 0);
     ~FileVpzProject() override;
     void setVpz(vleVpz* vpz);
     void setTabId(int i)
-    {mId = i;};
-    void setTab(QTabWidget *tab)
-    {mTab = tab;};
-
+    {
+        mId = i;
+    };
+    void setTab(QTabWidget* tab)
+    {
+        mTab = tab;
+    };
 
 public slots:
     void setAuthorToVpz();
     void setDateToVpz();
     void setVersionToVpz();
     void setExpNameToVpz();
-    void onUndoRedoVpz(QDomNode oldVpz, QDomNode newVpz,
-		       QDomNode oldVpm, QDomNode newVpm);
+    void onUndoRedoVpz(QDomNode oldVpz,
+                       QDomNode newVpz,
+                       QDomNode oldVpm,
+                       QDomNode newVpm);
     void reload();
 
 protected:
-
 private:
     bool beginNumtoDate(const QString& num, QDateTime& date) const;
 
 private:
     Ui::FileVpzProject* ui;
 
-    QTabWidget*         mTab;
-    int                 mId;
+    QTabWidget* mTab;
+    int mId;
 
-    QLineEdit*          mAuthor;
-    QDateTimeEdit*      mDate;
-    QLineEdit*          mVersion;
-    QLineEdit*          mName;
+    QLineEdit* mAuthor;
+    QDateTimeEdit* mDate;
+    QLineEdit* mVersion;
+    QLineEdit* mName;
 
-    vleVpz*             mVpz;
+    vleVpz* mVpz;
 
-    int                 maxPrecision;
+    int maxPrecision;
 };
-
-}} //namepsaces
+}
+} // namepsaces
 
 #endif // FILEVPZPROJECT_H

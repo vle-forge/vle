@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -106,7 +106,8 @@ WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
 }
 
 void
-WidgetVpzPropertyExpCond::selectModel(vleVpz* model, const QString& model_query)
+WidgetVpzPropertyExpCond::selectModel(vleVpz* model,
+                                      const QString& model_query)
 {
     mVpz = model;
     QObject::connect(mVpz, SIGNAL(conditionsUpdated()), this, SLOT(refresh()));
@@ -205,7 +206,7 @@ WidgetVpzPropertyObservables::refresh()
 
 void
 WidgetVpzPropertyObservables::selectModel(vleVpz* model,
-                                       const QString& model_query)
+                                          const QString& model_query)
 {
     mVpz = model;
 

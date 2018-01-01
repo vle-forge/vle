@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2015 INRA http://www.inra.fr
+ * Copyright (c) 2015-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and contributors
  *
@@ -30,7 +30,6 @@
 #include <vle/gvle/vlevpz.hpp>
 #include <vle/value/Map.hpp>
 
-
 namespace Ui {
 class StoragePluginGvle;
 }
@@ -40,7 +39,7 @@ class StoragePluginGUItab : public QWidget
     Q_OBJECT
 
 public:
-    explicit StoragePluginGUItab(QWidget *parent = 0);
+    explicit StoragePluginGUItab(QWidget* parent = 0);
     ~StoragePluginGUItab() override;
     void init(vle::gvle::vleVpz* vpz, const QString& viewName);
 
@@ -56,9 +55,9 @@ private:
     void buildDefaultConfig();
 
     Ui::StoragePluginGvle* ui;
-    vle::gvle::vleVpz*    mvleVpz;
-    QString               mViewName;
-    std::unique_ptr<vle::value::Map>       outputNodeConfig;
+    vle::gvle::vleVpz* mvleVpz;
+    QString mViewName;
+    std::unique_ptr<vle::value::Map> outputNodeConfig;
 };
 
 #endif

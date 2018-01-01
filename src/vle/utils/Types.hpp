@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,26 +36,26 @@
 
 namespace vle {
 
-using std::int8_t;
 using std::int16_t;
 using std::int32_t;
-using std::uint8_t;
+using std::int8_t;
 using std::uint16_t;
 using std::uint32_t;
+using std::uint8_t;
 
-using std::int_fast8_t;
 using std::int_fast16_t;
 using std::int_fast32_t;
-using std::uint_fast8_t;
+using std::int_fast8_t;
 using std::uint_fast16_t;
 using std::uint_fast32_t;
+using std::uint_fast8_t;
 
-using std::int_least8_t;
 using std::int_least16_t;
 using std::int_least32_t;
-using std::uint_least8_t;
+using std::int_least8_t;
 using std::uint_least16_t;
 using std::uint_least32_t;
+using std::uint_least8_t;
 
 } // namespace vle utils
 

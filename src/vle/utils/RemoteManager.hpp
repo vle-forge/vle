@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -69,8 +69,8 @@ struct PackageLinkId
     int32_t patch;          /**< -1 defines undefined patch
                              * version. */
     PackageOperatorType op; /**< The relation between the
-                               * identified package and this
-                               * identified operator package. */
+                             * identified package and this
+                             * identified operator package. */
 };
 
 using PackagesLinkId = std::vector<PackageLinkId>;
@@ -114,7 +114,8 @@ enum RemoteManagerActions
     REMOTE_MANAGER_LOCAL_SHOW    /**< vle --remote localshow glue. */
 };
 
-VLE_API std::ostream& operator<<(std::ostream& os, const PackageId& b);
+VLE_API std::ostream&
+operator<<(std::ostream& os, const PackageId& b);
 
 using Packages = std::vector<PackageId>;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 INRA
+ * Copyright 2017-2018 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -237,8 +237,7 @@ public:
                 if (v > 0.0)
                     m_duration = v;
                 else
-                    Trace(
-                      context(), 4, "Plot warning: bad gnuplot-duration\n");
+                    Trace(context(), 4, "Plot warning: bad gnuplot-duration\n");
             }
         }
 
@@ -282,8 +281,7 @@ public:
                 else if (m.exist("up"))
                     m_data.emplace_back(idx, t, m.getDouble("up"));
                 else
-                    Trace(
-                      context(), 4, "Plot warning: fail to convert data\n");
+                    Trace(context(), 4, "Plot warning: fail to convert data\n");
             } else
                 Trace(context(), 4, "Plot warning: fail to convert data\n");
         }

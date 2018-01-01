@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -212,14 +212,13 @@ public:
      * @param newname the new name of the dynamics.
      */
     void updateDynamics(const std::string& oldname,
-                                const std::string& newname) override;
+                        const std::string& newname) override;
 
     /**
      * @brief purge the dymamics not present in the list.
      * @param dynamicslist a list of dynamics name
      */
-    void purgeDynamics(
-      const std::set<std::string>& dynamicslist) override;
+    void purgeDynamics(const std::set<std::string>& dynamicslist) override;
 
     /**
      * @brief Update the Observable of the AtomicModel where an
@@ -228,15 +227,14 @@ public:
      * @param newname the new name of the observable.
      */
     void updateObservable(const std::string& oldname,
-                                  const std::string& newname) override;
+                          const std::string& newname) override;
 
     /**
      * @brief purge the observable reference of the AtomicModel
      * where the observable is not present in the list.
      * @param observablelist a list of observable name
      */
-    void purgeObservable(
-      const std::set<std::string>& observablelist) override;
+    void purgeObservable(const std::set<std::string>& observablelist) override;
 
     /**
      * @brief Update the Conditions of the AtomicModel where an
@@ -245,15 +243,14 @@ public:
      * @param newname the new name of the observable.
      */
     void updateConditions(const std::string& oldname,
-                                  const std::string& newname) override;
+                          const std::string& newname) override;
 
     /**
      * @brief purge the Conditions references of the model where the
      * Condition is not present in the list
      * @param conditionlist a list of condition name
      */
-    void purgeConditions(
-      const std::set<std::string>& conditionlist) override;
+    void purgeConditions(const std::set<std::string>& conditionlist) override;
 
     bool needDebug() const noexcept
     {

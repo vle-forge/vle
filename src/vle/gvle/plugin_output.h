@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,28 +25,28 @@
 #ifndef gvle_PLUGIN_OUTPUT_H
 #define gvle_PLUGIN_OUTPUT_H
 
+#include "logger.h"
 #include <QObject>
 #include <QString>
 #include <QWidget>
-#include "logger.h"
 
 namespace vle {
 namespace gvle {
 
 class vleVpz;
 
-class PluginOutput: public QObject
+class PluginOutput : public QObject
 {
     Q_OBJECT
 public:
-    virtual QString  getname()   = 0;
+    virtual QString getname() = 0;
     virtual QWidget* getWidget() = 0;
-    virtual void     delWidget() = 0;
-    virtual void  setLogger(Logger* logger) = 0;
-    virtual void  init(vleVpz* vpz, const QString& viewName) = 0;
+    virtual void delWidget() = 0;
+    virtual void setLogger(Logger* logger) = 0;
+    virtual void init(vleVpz* vpz, const QString& viewName) = 0;
 };
-
-}}//namespaces
+}
+} // namespaces
 
 Q_DECLARE_INTERFACE(vle::gvle::PluginOutput, "fr.inra.vle.gvle.PluginOutput")
 

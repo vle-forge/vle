@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,25 +25,24 @@
 #ifndef gvle_LOGGER_H
 #define gvle_LOGGER_H
 
-#include <QTime>
 #include <QPlainTextEdit>
+#include <QTime>
 
 namespace vle {
 namespace gvle {
-
 
 class Logger
 {
 public:
     Logger();
-    void setWidget(QPlainTextEdit *widget);
+    void setWidget(QPlainTextEdit* widget);
     void log(QString message);
     void logExt(QString message, bool isError = false);
 
 private:
-    QPlainTextEdit *mWidget;
+    QPlainTextEdit* mWidget;
 };
-
-}}//namespaces
+}
+} // namespaces
 
 #endif // LOGGER_H

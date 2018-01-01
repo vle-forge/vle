@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -123,7 +123,6 @@ Executive::createModel(const std::string& name,
     }
     std::vector<std::string>::const_iterator it;
 
-
     for (it = inputs.begin(); it != inputs.end(); ++it) {
         model->addInputPort(*it);
     }
@@ -132,8 +131,7 @@ Executive::createModel(const std::string& name,
         model->addOutputPort(*it);
     }
 
-    m_coordinator.createModel(
-      model, conditions(), dynamics, conds, observable);
+    m_coordinator.createModel(model, conditions(), dynamics, conds, observable);
 
     return model;
 }

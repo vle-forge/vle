@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,8 +24,8 @@
 #ifndef gvle_FILEVPZEXPCOND_H
 #define gvle_FILEVPZEXPCOND_H
 
-#include <vle/gvle/plugin_cond.h>
 #include <vle/gvle/gvle_widgets.h>
+#include <vle/gvle/plugin_cond.h>
 
 #include <iostream>
 
@@ -36,43 +36,79 @@ class FileVpzExpCond;
 namespace vle {
 namespace gvle {
 
-
 class FileVpzExpCond : public QWidget
 {
     Q_OBJECT
 
 public:
-    enum ExpCondTreeType { ECondNone, ECondCondition, ECondPort,
-                           ECondValue };
-    enum PageEditType {PageBoolean, PageInteger, PageDouble,
-         PageString, PageSet, PageMap, PageTuple, PageTable,
-         PageMatrix, PageBlank};
-    enum eCondMenuActions { EMenuCondAdd, EMenuCondRename, EMenuCondRemove,
-      EMenuPortAdd, EMenuPortRename, EMenuPortRemove, EMenuPlugins,
-      EMenuValueAddBoolean, EMenuValueAddInteger, EMenuValueAddDouble,
-      EMenuValueAddString, EMenuValueAddSet, EMenuValueAddMap,
-      EMenuValueAddTuple, EMenuValueAddTable, EMenuValueAddMatrix,
-      EMenuValueRemove };
+    enum ExpCondTreeType
+    {
+        ECondNone,
+        ECondCondition,
+        ECondPort,
+        ECondValue
+    };
+    enum PageEditType
+    {
+        PageBoolean,
+        PageInteger,
+        PageDouble,
+        PageString,
+        PageSet,
+        PageMap,
+        PageTuple,
+        PageTable,
+        PageMatrix,
+        PageBlank
+    };
+    enum eCondMenuActions
+    {
+        EMenuCondAdd,
+        EMenuCondRename,
+        EMenuCondRemove,
+        EMenuPortAdd,
+        EMenuPortRename,
+        EMenuPortRemove,
+        EMenuPlugins,
+        EMenuValueAddBoolean,
+        EMenuValueAddInteger,
+        EMenuValueAddDouble,
+        EMenuValueAddString,
+        EMenuValueAddSet,
+        EMenuValueAddMap,
+        EMenuValueAddTuple,
+        EMenuValueAddTable,
+        EMenuValueAddMatrix,
+        EMenuValueRemove
+    };
 
-    enum eMapMenuActions { EMapBooleanAdd, EMapValueRename, EMapValueRemove};
+    enum eMapMenuActions
+    {
+        EMapBooleanAdd,
+        EMapValueRename,
+        EMapValueRemove
+    };
 
 public:
-    explicit FileVpzExpCond(gvle_plugins* plugs, QWidget *parent = 0);
+    explicit FileVpzExpCond(gvle_plugins* plugs, QWidget* parent = 0);
 
     ~FileVpzExpCond() override;
     void setVpz(vleVpz* vpz);
     void resizeTable();
-    void reload(bool resize=true);
+    void reload(bool resize = true);
     void showEditPlace();
 
 public slots:
     void onConditionMenu(const QPoint&);
-    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
-            QDomNode oldValVpm, QDomNode newValVpm);
+    void onUndoRedoVpz(QDomNode oldValVpz,
+                       QDomNode newValVpz,
+                       QDomNode oldValVpm,
+                       QDomNode newValVpm);
     void onExpUpdated();
     void onCondUpdated();
-    void onTextUpdated(const QString& id, const QString& oldVal,
-            const QString& newVal);
+    void onTextUpdated(const QString& id,
+                       const QString& oldVal,
+                       const QString& newVal);
     void onIntUpdated(const QString& id, int newVal);
     void onDoubleUpdated(const QString& id, double newVal);
     void onBoolUpdated(const QString& id, const QString& newVal);
@@ -95,13 +131,13 @@ private:
     void connectConds();
 
     Ui::FileVpzExpCond* ui;
-    vleVpz*             mVpz;
-    QString             mCurrCondName;
-    QString             mCurrPortName;
-    int                 mCurrValIndex;
-    PluginExpCond*      mPlugin;
-    gvle_plugins*       mGvlePlugins;
+    vleVpz* mVpz;
+    QString mCurrCondName;
+    QString mCurrPortName;
+    int mCurrValIndex;
+    PluginExpCond* mPlugin;
+    gvle_plugins* mGvlePlugins;
 };
-
-}}//namespaces
+}
+} // namespaces
 #endif

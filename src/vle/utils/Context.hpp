@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -129,8 +129,7 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set_setting(const std::string& key,
-                     const std::string& value) noexcept;
+    bool set_setting(const std::string& key, const std::string& value) noexcept;
 
     /**
      * Insert an @c double into the specified key.
@@ -194,8 +193,7 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not an @c std::string.
      */
-    bool get_setting(const std::string& key, std::string* value) const
-      noexcept;
+    bool get_setting(const std::string& key, std::string* value) const noexcept;
 
     /**
      * Get a @c double from specified key.
@@ -644,7 +642,8 @@ private:
  * \e return An initialized std::shared_ptr<Context>.
  *
  */
-VLE_API ContextPtr make_context(const Path& prefix = {});
+VLE_API ContextPtr
+make_context(const Path& prefix = {});
 
 /**
  * Build a std::shared_ptr<Context> with locale.
@@ -658,7 +657,8 @@ VLE_API ContextPtr make_context(const Path& prefix = {});
  *
  * \e return An initialized std::shared_ptr<Context>.
  */
-VLE_API ContextPtr make_context(std::string locale, const Path& prefix = {});
+VLE_API ContextPtr
+make_context(std::string locale, const Path& prefix = {});
 }
 } // namespace vle utils
 

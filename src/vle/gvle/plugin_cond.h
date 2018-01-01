@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -26,29 +26,30 @@
 #define gvle_PLUGIN_COND_H
 
 #include <QObject>
+#include <QSettings>
 #include <QString>
 #include <QWidget>
-#include <QSettings>
 #include <vle/gvle/logger.h>
 #include <vle/gvle/vlevpz.hpp>
 
 namespace vle {
 namespace gvle {
 
-class PluginExpCond: public QObject
+class PluginExpCond : public QObject
 {
     Q_OBJECT
 public:
-    virtual QString  getname()   = 0;
+    virtual QString getname() = 0;
     virtual QWidget* getWidget() = 0;
-    virtual void  setSettings(QSettings *s) = 0;
-    virtual void  setLogger(Logger *logger) = 0;
-    virtual void  init(vleVpz* vpz, const QString& condName) = 0;
+    virtual void setSettings(QSettings* s) = 0;
+    virtual void setLogger(Logger* logger) = 0;
+    virtual void init(vleVpz* vpz, const QString& condName) = 0;
     virtual PluginExpCond* newInstance() = 0;
 };
+}
+} // namepsaces
 
-}} //namepsaces
-
-Q_DECLARE_INTERFACE(vle::gvle::PluginExpCond, "fr.inra.vle.gvle.PluginExpCond/1.0")
+Q_DECLARE_INTERFACE(vle::gvle::PluginExpCond,
+                    "fr.inra.vle.gvle.PluginExpCond/1.0")
 
 #endif

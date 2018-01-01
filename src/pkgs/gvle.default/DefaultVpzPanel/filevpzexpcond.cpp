@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -48,7 +48,6 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/User.hpp>
-#include <vle/value/Value.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
 

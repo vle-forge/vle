@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,27 +25,27 @@
 #ifndef gvle_FILEVPZVIEW_H
 #define gvle_FILEVPZVIEW_H
 
-#include <QGraphicsScene>
-#include <QWidget>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QListWidgetItem>
-#include <QTableWidgetItem>
-#include <QUndoStack>
-#include <QUndoView>
-#include <vle/gvle/vlevpz.hpp>
-#include <vle/gvle/plugin_mainpanel.h>
-#include "widgetvpzproperty.h"
+#include "filevpzclasses.h"
 #include "filevpzdynamics.h"
 #include "filevpzexpcond.h"
 #include "filevpzexpview.h"
 #include "filevpzobservables.h"
 #include "filevpzproject.h"
-#include "filevpzclasses.h"
-#include "filevpzsim.h"
 #include "filevpzrtool.h"
-#include "vpzDiagScene.h"
+#include "filevpzsim.h"
 #include "ui_filevpzrtool.h"
+#include "vpzDiagScene.h"
+#include "widgetvpzproperty.h"
+#include <QGraphicsScene>
+#include <QListWidgetItem>
+#include <QTableWidgetItem>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QUndoStack>
+#include <QUndoView>
+#include <QWidget>
+#include <vle/gvle/plugin_mainpanel.h>
+#include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
 class fileVpzView;
@@ -59,7 +59,12 @@ class fileVpzView : public QWidget
 {
     Q_OBJECT
 public:
-    enum ExpCondTreeType { ECondNone, ECondCondition, ECondParameter };
+    enum ExpCondTreeType
+    {
+        ECondNone,
+        ECondCondition,
+        ECondParameter
+    };
 
 public:
     /**
@@ -67,45 +72,49 @@ public:
      *        Default constructor for VPZ tab
      */
     explicit fileVpzView(vle::utils::Package* pkg,
-            gvle_plugins* plugs, Logger* log, const utils::ContextPtr& ctx,
-            QWidget *parent = 0);
+                         gvle_plugins* plugs,
+                         Logger* log,
+                         const utils::ContextPtr& ctx,
+                         QWidget* parent = 0);
     ~fileVpzView() override;
-    void setVpz(vleVpz *v);
+    void setVpz(vleVpz* v);
     void setRtool(FileVpzRtool* tool);
     vleVpz* vpz();
-    bool isUsed(int *reason);
+    bool isUsed(int* reason);
     void usedBySim(bool isUsed);
     void save();
-    QWidget *getTool();
-    QString  getname();
+    QWidget* getTool();
+    QString getname();
     QWidget* leftPanel();
     QWidget* rigthPanel();
     QString getCurrentTab();
 
 public slots:
     void onTabClose(int index);
-    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
-            QDomNode oldValVpm, QDomNode newValVpm);
+    void onUndoRedoVpz(QDomNode oldValVpz,
+                       QDomNode newValVpz,
+                       QDomNode oldValVpm,
+                       QDomNode newValVpm);
 
 public:
-    Ui::fileVpzView*         ui;
-    bool                     mUseSim;
-    FileVpzDynamics*         mDynamicsTab;
-    FileVpzExpCond*          mExpCondTab;
-    FileVpzExpView*          mExpViewTab;
-    FileVpzObservables*      mObservablesTab;
-    FileVpzProject*          mProjectTab;
-    FileVpzClasses*          mClassesTab;
-    FileVpzSim*              mSimTab;
-    vleVpz*                  mVpz;
-    FileVpzRtool*            mRtool;
-    QList<QTreeWidgetItem *> mViewsItems;
-    gvle_plugins*            mGvlePlugins;
-    vle::utils::Package*     mPackage;
-    Logger*                  mLog;
-    VpzDiagScene             mScene;
+    Ui::fileVpzView* ui;
+    bool mUseSim;
+    FileVpzDynamics* mDynamicsTab;
+    FileVpzExpCond* mExpCondTab;
+    FileVpzExpView* mExpViewTab;
+    FileVpzObservables* mObservablesTab;
+    FileVpzProject* mProjectTab;
+    FileVpzClasses* mClassesTab;
+    FileVpzSim* mSimTab;
+    vleVpz* mVpz;
+    FileVpzRtool* mRtool;
+    QList<QTreeWidgetItem*> mViewsItems;
+    gvle_plugins* mGvlePlugins;
+    vle::utils::Package* mPackage;
+    Logger* mLog;
+    VpzDiagScene mScene;
 };
-
-}}  //namespaces
+}
+} // namespaces
 
 #endif // FILEVPZVIEW_H

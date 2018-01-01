@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -31,7 +31,6 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Map.hpp>
-#include <vle/value/Matrix.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/value/Null.hpp>
 #include <vle/value/Set.hpp>
@@ -96,7 +95,7 @@ pp_get_value(const vle::value::Matrix& m,
     return *pointer;
 }
 
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 T&
 pp_add(vle::value::Matrix& m,
        vle::value::Matrix::index column,
@@ -130,10 +129,7 @@ Matrix::Matrix()
 {
 }
 
-Matrix::Matrix(index columns,
-               index rows,
-               index resizeColumns,
-               index resizeRows)
+Matrix::Matrix(index columns, index rows, index resizeColumns, index resizeRows)
   : m_matrix(columns * rows)
   , m_nbcol(columns)
   , m_nbrow(rows)
@@ -387,10 +383,7 @@ Matrix::getTuple(index column, index row)
 }
 
 Table&
-Matrix::addTable(index column,
-                 index row,
-                 std::size_t width,
-                 std::size_t height)
+Matrix::addTable(index column, index row, std::size_t width, std::size_t height)
 {
     return ::pp_add<Table>(*this, column, row, width, height);
 }
@@ -466,8 +459,7 @@ Matrix::reserve(size_type columnmax, size_type rowmax)
 {
     if (columnmax * rowmax <= 0)
         throw utils::ArgError(
-          (fmt(_("Matrix: bad reserve operation %1%x%2%")) % columnmax %
-           rowmax)
+          (fmt(_("Matrix: bad reserve operation %1%x%2%")) % columnmax % rowmax)
             .str());
 
     if (columnmax <= m_nbcolmax and rowmax <= m_nbrowmax)

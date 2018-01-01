@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -47,7 +47,7 @@ class Simulator;
  * \param e2 second event to compare.
  * \return true if Time e1 is more recent than devs::Time e2.
  */
-template <typename EventT>
+template<typename EventT>
 bool
 EventCompare(const EventT& e1, const EventT& e2) noexcept
 {
@@ -59,7 +59,7 @@ EventCompare(const EventT& e1, const EventT& e2) noexcept
  *
  * \param scheduler where to remove element.
  */
-template <typename SchedulerT>
+template<typename SchedulerT>
 void
 pop(SchedulerT& scheduler) noexcept
 {
@@ -68,8 +68,7 @@ pop(SchedulerT& scheduler) noexcept
     if (scheduler.empty())
         return;
 
-    std::pop_heap(
-      scheduler.begin(), scheduler.end(), EventCompare<event_type>);
+    std::pop_heap(scheduler.begin(), scheduler.end(), EventCompare<event_type>);
 
     scheduler.pop_back();
 }
@@ -81,7 +80,7 @@ pop(SchedulerT& scheduler) noexcept
  * \param args list of argument to build inplace the element to push into
  * the scheduler.
  */
-template <typename SchedulerT, typename... Args>
+template<typename SchedulerT, typename... Args>
 void
 push(SchedulerT& scheduler, Args&&... args)
 {
@@ -95,7 +94,7 @@ push(SchedulerT& scheduler, Args&&... args)
 
 struct HeapElementCompare
 {
-    template <typename HeapElementT>
+    template<typename HeapElementT>
     bool operator()(const HeapElementT& lhs, const HeapElementT& rhs) const
       noexcept
     {

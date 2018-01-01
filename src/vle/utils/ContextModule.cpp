@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -203,8 +203,7 @@ struct Module
 #ifdef _WIN32
         HMODULE handle = ::LoadLibrary(mPath.string().c_str());
 #else
-        void* handle =
-          ::dlopen(mPath.string().c_str(), RTLD_LAZY | RTLD_LOCAL);
+        void* handle = ::dlopen(mPath.string().c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
 
         if (not handle) {
@@ -242,7 +241,8 @@ struct Module
 
     void checkVersion()
     {
-        using versionFunction = void (*)(std::uint32_t *, std::uint32_t *, std::uint32_t *);
+        using versionFunction =
+          void (*)(std::uint32_t*, std::uint32_t*, std::uint32_t*);
         void* symbol;
 
         auto version = vle::version();
@@ -653,8 +653,7 @@ struct ModuleManager
      * @param type The type of module to by retrieve.
      * @param[out] lst An output parameter, all modules are pushed backward.
      */
-    void fill(Context::ModuleType type,
-              std::vector<Context::Module>* lst) const
+    void fill(Context::ModuleType type, std::vector<Context::Module>* lst) const
     {
         switch (type) {
         case Context::ModuleType::MODULE_DYNAMICS:

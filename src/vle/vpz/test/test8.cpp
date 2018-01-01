@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -302,8 +302,7 @@ test_del_port()
     // Atomic Model -- Input Port
     d->delInputPort("in");
     EnsuresEqual(d->existInputPort("in"), false);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"),
-                 false);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"), false);
 
     // Atomic Model -- Output Port
     d->delOutputPort("out");
@@ -329,10 +328,8 @@ test_del_port()
 
     // Coupled Model -- Output Port
     EnsuresEqual(top1->existOutputPort("out"), true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"),
-                 true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"),
-                 true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"), true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"), true);
     EnsuresEqual(top1->existOutputConnection("x", "out", "out"), true);
 
     top1->delOutputPort("out");
@@ -479,8 +476,7 @@ test_get_port_index()
         return;
 
     EnsuresEqual(top->getInputPortList().size(), (ConnectionList::size_type)0);
-    EnsuresEqual(top->getOutputPortList().size(),
-                 (ConnectionList::size_type)0);
+    EnsuresEqual(top->getOutputPortList().size(), (ConnectionList::size_type)0);
 
     AtomicModel* e = dynamic_cast<AtomicModel*>(top->getModelList()["e"]);
     Ensures(e);
@@ -521,8 +517,7 @@ test_rename_port()
     // Atomic Model -- Input Port
     d->renameInputPort("in", "new_in");
     EnsuresEqual(d->existInputPort("in"), false);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"),
-                 false);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"), false);
     EnsuresEqual(d->existInputPort("new_in"), true);
     EnsuresEqual(top->existInternalConnection("top1", "out", "d", "new_in"),
                  true);
@@ -557,10 +552,8 @@ test_rename_port()
 
     // Coupled Model -- Output Port
     EnsuresEqual(top1->existOutputPort("out"), true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"),
-                 true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"),
-                 true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"), true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"), true);
     EnsuresEqual(top1->existOutputConnection("x", "out", "out"), true);
 
     top1->renameOutputPort("out", "new_out");

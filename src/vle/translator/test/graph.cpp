@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -37,35 +37,35 @@ using namespace vle;
 #define xstringify(a) stringify(a)
 #define stringify(a) #a
 
-#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                              \
-    extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics* symbol_(                                  \
-      const vle::devs::DynamicsInit& init,                                    \
-      const vle::devs::InitEventList& events)                                 \
-    {                                                                         \
-        return new model_(init, events);                                      \
-    }                                                                         \
+#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                               \
+    extern "C" {                                                               \
+    VLE_MODULE vle::devs::Dynamics* symbol_(                                   \
+      const vle::devs::DynamicsInit& init,                                     \
+      const vle::devs::InitEventList& events)                                  \
+    {                                                                          \
+        return new model_(init, events);                                       \
+    }                                                                          \
     }
 
-#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                             \
-    extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics* symbol_(                                  \
-      const vle::devs::ExecutiveInit& init,                                   \
-      const vle::devs::InitEventList& events)                                 \
-    {                                                                         \
-        std::string symbol_test(xstringify(symbol_));                         \
-        Ensures(symbol_test.length() > 4);                                    \
-        Ensures(symbol_test.compare(0, 4, "exe_") == 0);                      \
-        return new model_(init, events);                                      \
-    }                                                                         \
+#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                              \
+    extern "C" {                                                               \
+    VLE_MODULE vle::devs::Dynamics* symbol_(                                   \
+      const vle::devs::ExecutiveInit& init,                                    \
+      const vle::devs::InitEventList& events)                                  \
+    {                                                                          \
+        std::string symbol_test(xstringify(symbol_));                          \
+        Ensures(symbol_test.length() > 4);                                     \
+        Ensures(symbol_test.compare(0, 4, "exe_") == 0);                       \
+        return new model_(init, events);                                       \
+    }                                                                          \
     }
 
-#define DECLARE_OOV_SYMBOL(symbol_, model_)                                   \
-    extern "C" {                                                              \
-    VLE_MODULE vle::oov::Plugin* symbol_(const std::string& location)         \
-    {                                                                         \
-        return new model_(location);                                          \
-    }                                                                         \
+#define DECLARE_OOV_SYMBOL(symbol_, model_)                                    \
+    extern "C" {                                                               \
+    VLE_MODULE vle::oov::Plugin* symbol_(const std::string& location)          \
+    {                                                                          \
+        return new model_(location);                                           \
+    }                                                                          \
     }
 
 class Beep : public devs::Dynamics
@@ -87,7 +87,7 @@ public:
     }
 
     void output(devs::Time /* time */,
-                        devs::ExternalEventList& output) const override
+                devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
     }
@@ -96,8 +96,7 @@ public:
 class Transform : public devs::Dynamics
 {
 public:
-    Transform(const devs::DynamicsInit& atom,
-              const devs::InitEventList& events)
+    Transform(const devs::DynamicsInit& atom, const devs::InitEventList& events)
       : devs::Dynamics(atom, events)
     {
     }
@@ -119,13 +118,13 @@ public:
     }
 
     void externalTransition(const devs::ExternalEventList& events,
-                                    devs::Time /* time */) override
+                            devs::Time /* time */) override
     {
         m_counter = m_counter + events.size();
     }
 
     void output(devs::Time /* time */,
-                        devs::ExternalEventList& output) const override
+                devs::ExternalEventList& output) const override
     {
         output.emplace_back("out");
     }

@@ -4,16 +4,16 @@ VLE development team
 ## Copyright owners
 
 - Gauthier Quesnel
-  - Copyright © 2003-2014
-  - quesnel@users.sourceforge.net
+  - Copyright © 2003-2018
+  - gauthier.quesnel@inra.fr
 
 - ULCO
-  - Copyright © 2003-2014
+  - Copyright © 2003-2018
   - Université du Littoral Côte d'Opale
   - http://www.univ-littoral.fr
 
 - INRA
-  - Copyright © 2007-2014
+  - Copyright © 2007-2018
   - French National Institute for Agricultural Research
   - Institut National de la Recherche Agronomique
   - http://www.inra.fr
@@ -22,37 +22,39 @@ VLE development team
 
 ### Integrator / Release manager
 
-- Gauthier Quesnel <quesnel@users.sourceforge.net>
+Gauthier Quesnel <gauthier.quesnel@inra.fr>
 
+### Main programmer
 
-### Main programmer and founder
-
-- Gauthier Quesnel <quesnel@users.sourceforge.net>
-- Eric Ramat <eramat@users.sourceforge.net>
+- Eric Ramat <eric.ramat@lisic.univ-littoral.fr>
+- Ronan Trépos <ronan.trepos@inra.fr>
+- Patrick Chabrier <patrick.chabrier@inra.fr>
 
 ### Contributors
 
-- Mahuna Akplogan <makploga@users.sourceforge.net>
-- Aurélien Ansel <camumus@gmail.com>
-- Guillaume Ansel <anselg@users.sourceforge.net>
-- Jennifer Baudet <jennifer.baudet@toulouse.inra.fr>
-- Philippe Blangi <blangi@users.sourceforge.net>
-- Aurélie Blot <ablot@users.sourceforge.net>
-- Bruno Bonté <bruno.bonte@cirad.fr>
-- Éric Casellas <eric.casellas@toulouse.inra.fr>
-- Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
-- Rémy Desrivières <remy.desrivieres@gmail.com>
-- Raphael Duboz <duboz@users.sourceforge.net>
-- David Duvivier <duvivier@lil.univ-littoral.fr>
-- Mikael Grialou <mikael.grialou@toulouse.inra.fr>
-- Romain Hennuyer <romain.hennuyer@gmail.com>
-- Cyril Marcq <cmarcq@users.sourceforge.net>
-- Rémy Phelipot <remy.phelipot@toulouse.inra.fr>
-- Tatiana Pruvost <tatiana.pruvost@gmail.com>
-- Guillaume Radenne <guillaume.radenne@gmail.com>
-- Daniel Salomé <dansal62@users.sourceforge.net>
-- Jérome Thiard <jerome.thiard@toulouse.inra.fr>
-- Ronan Trépos <rtrepos@toulouse.inra.fr>
-- Gaëtan Vergeot <gaetan.vergeot@toulouse.inra.fr>
-- David Versmisse <versmisse@users.sourceforge.net>
-- Geoffroy Weisenhorn <geoffroy.weisenhorn@gmail.com>
+- Mahuna Akplogan
+- Aurélien Ansel
+- Guillaume Ansel
+- Jennifer Baudet
+- Aurélie Blot
+- Bruno Bonté
+- Pierre Casadebaig
+- Éric Casellas
+- Genevieve Cirera
+- Rémy Desrivieres
+- Raphaël Duboz
+- David Duvivier
+- Mikaël Grialou
+- Nathanaël Jourdane
+- Cyril Marcq
+- Rémy Phelipot
+- Tatiana Pruvost
+- Guillaume Radenne
+- Hennuyer Romain
+- Nathalie Rousse
+- Daniel Salomé
+- David Sauvage
+- Jerome Thiard
+- Gaetan Vergeot
+- Grégory Wisniewski
+- Arezki Zerourou

@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -40,28 +40,28 @@ namespace gvle {
  * @brief the couple of a source file (either cpp or vpz) with the metadata
  * file
  */
-struct gvle_file {
+struct gvle_file
+{
     gvle_file();
     gvle_file(const gvle_file& f);
     gvle_file(const utils::Package& pkg, QString relPath);
 
-    QString baseName() const; //eg NewCpp
+    QString baseName() const; // eg NewCpp
     PluginMainPanel* newInstanceMainPanel(gvle_plugins& plugins);
-    QString suffix(); //eg cpp or vpz or dat
+    QString suffix(); // eg cpp or vpz or dat
 
     static gvle_file getNewCpp(const utils::Package& pkg);
     static gvle_file getNewVpz(const utils::Package& pkg);
     static gvle_file getNewData(const utils::Package& pkg);
     static gvle_file getCopy(const utils::Package& pkg, gvle_file gf);
 
-    QString                    relPath;
-    QString                    source_file;
-    QString                    metadata_file;
+    QString relPath;
+    QString source_file;
+    QString metadata_file;
     gvleplug::GVLE_PLUGIN_TYPE plug_type;
-    QString                    plug_name;
-
+    QString plug_name;
 };
-
-}}//namespaces
+}
+} // namespaces
 
 #endif // gvle_gvle_file_H

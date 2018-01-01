@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -38,7 +38,8 @@ namespace vle {
  * integer version and the extra version as a string (may be empty).
  * @return A @c std::tuple.
  */
-std::tuple<int, int, int, std::string> VLE_API version();
+std::tuple<int, int, int, std::string> VLE_API
+version();
 
 /**
  * @brief Returns major and minor version of the libvle library.
@@ -46,7 +47,8 @@ std::tuple<int, int, int, std::string> VLE_API version();
  * major and minor version.
  * @return A @c std::tuple.
  */
-std::tuple<int, int> VLE_API version_abi();
+std::tuple<int, int> VLE_API
+version_abi();
 
 /**
  * @brief Returns a string representation of the version of the libvle library.
@@ -54,7 +56,8 @@ std::tuple<int, int> VLE_API version_abi();
  * "1.1.0, 2.0.0, 2.0.0-alpha1").
  * @return A @c std::string that represents the version of the libvle library.
  */
-std::string VLE_API string_version();
+std::string VLE_API
+string_version();
 
 /**
  * @brief Returns a string representation of the ABI version of the libvle
@@ -63,7 +66,8 @@ std::string VLE_API string_version();
  * "1.1, 2.0").
  * @return A @c std::string that represents the version of the libvle library.
  */
-std::string VLE_API string_version_abi();
+std::string VLE_API
+string_version_abi();
 
 /**
  * The \e vle::Init class is used to initialize the subsystem of VLE when

@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -43,20 +43,28 @@ class FileVpzDynamics : public QWidget
     Q_OBJECT
 
 public:
-    enum FVD_MENU { FVD_add_dynamic,  FVD_remove_dynamic };
+    enum FVD_MENU
+    {
+        FVD_add_dynamic,
+        FVD_remove_dynamic
+    };
+
 public:
-    explicit FileVpzDynamics(const utils::ContextPtr& ctx, QWidget* parent=0);
+    explicit FileVpzDynamics(const utils::ContextPtr& ctx,
+                             QWidget* parent = 0);
     ~FileVpzDynamics() override;
     void setVpz(vleVpz* vpz);
 
 public slots:
 
     void reload();
-    void onSelectPackage(const QString & id, const QString & text);
-    void onSelectLibrary(const QString & id, const QString& text);
+    void onSelectPackage(const QString& id, const QString& text);
+    void onSelectLibrary(const QString& id, const QString& text);
     void onDynamicsTableMenu(const QPoint&);
-    void onUndoRedoVpz(QDomNode oldValVpz, QDomNode newValVpz,
-            QDomNode oldValVpm, QDomNode newValVpm);
+    void onUndoRedoVpz(QDomNode oldValVpz,
+                       QDomNode newValVpz,
+                       QDomNode oldValVpm,
+                       QDomNode newValVpm);
     void onTextUpdated(const QString& id, const QString&, const QString&);
 
 protected:
@@ -64,14 +72,12 @@ protected:
     void updateLibraryList(QString package = "", QString name = "");
     QString getSelected();
 
-
 private:
     Ui::FileVpzDynamics* ui;
-    vleVpz*              mVpz;
-    utils::ContextPtr    mCtx;
-
+    vleVpz* mVpz;
+    utils::ContextPtr mCtx;
 };
-
-}}//namespaces
+}
+} // namespaces
 
 #endif

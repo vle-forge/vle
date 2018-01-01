@@ -5,7 +5,7 @@
     BSD-style license that can be found in the LICENSE file.
 
     Filesystem.hpp -- A modified path.h with little changes
-    Copyright (c) 2016-2017 INRA
+    Copyright (c) 2016-2018 INRA
     gauthier.quesnel@inra.fr
     - Remove make_absolute() functionality useless for VLE.
     - Add temp_directory_path() and unique_path() for tempory path.

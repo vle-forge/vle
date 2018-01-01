@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -127,8 +127,7 @@ public:
      * @param event the external event with of the port.
      * @param time the date of occurrence of this event.
      */
-    void externalTransition(const ExternalEventList& event,
-                                    Time time) override;
+    void externalTransition(const ExternalEventList& event, Time time) override;
 
     /**
      * @brief Process the confluent transition: select the transition to
@@ -137,9 +136,8 @@ public:
      * @param internal the internal event.
      * @param extEventlist the external events list.
      */
-    void confluentTransitions(
-      Time time,
-      const ExternalEventList& extEventlist) override;
+    void confluentTransitions(Time time,
+                              const ExternalEventList& extEventlist) override;
 
     /**
      * @brief Process an observation event: compute the current state of the

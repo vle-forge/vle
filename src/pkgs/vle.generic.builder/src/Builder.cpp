@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 INRA
+ * Copyright 2016-2018 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -15,8 +15,8 @@
  */
 
 #include <algorithm>
-#include <random>
 #include <functional>
+#include <random>
 #include <vle/devs/Executive.hpp>
 #include <vle/translator/GraphTranslator.hpp>
 #include <vle/translator/MatrixTranslator.hpp>
@@ -162,11 +162,11 @@ public:
         vle::translator::graph_generator gg(param);
 
         gg.make_scalefree(*this,
-                           generator,
-                           model_number,
-                           events.getDouble("alpha"),
-                           events.getDouble("beta"),
-                           events.getBoolean("allow-self-loops"));
+                          generator,
+                          model_number,
+                          events.getDouble("alpha"),
+                          events.getDouble("beta"),
+                          events.getBoolean("allow-self-loops"));
     }
 
     void use_sortederdesrenyi_graph_generator(

@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,9 +24,9 @@
 #ifndef gvle_WIDGETVPZPROPERTY_H
 #define gvle_WIDGETVPZPROPERTY_H
 
-#include <QWidget>
-#include <QListWidget>
 #include <QComboBox>
+#include <QListWidget>
+#include <QWidget>
 #include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
@@ -36,13 +36,12 @@ class WidgetVpzPropertyObservables;
 namespace vle {
 namespace gvle {
 
-
 class WidgetVpzPropertyDynamics : public QComboBox
 {
     Q_OBJECT
 
 public:
-    explicit WidgetVpzPropertyDynamics(QWidget *parent = 0);
+    explicit WidgetVpzPropertyDynamics(QWidget* parent = 0);
     ~WidgetVpzPropertyDynamics() override;
     void selectModel(vleVpz* vpz, const QString& mod_query);
 
@@ -61,12 +60,12 @@ class WidgetVpzPropertyExpCond : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit WidgetVpzPropertyExpCond(QWidget *parent = 0);
+    explicit WidgetVpzPropertyExpCond(QWidget* parent = 0);
     ~WidgetVpzPropertyExpCond() override;
     void selectModel(vleVpz* vpz, const QString& mod_query);
 
-//protected:
-//    void mouseDoubleClickEvent (QMouseEvent *event);
+    // protected:
+    //    void mouseDoubleClickEvent (QMouseEvent *event);
 
 private slots:
     void onCheckboxToggle(bool checked);
@@ -81,7 +80,7 @@ class WidgetVpzPropertyObservables : public QComboBox
 {
     Q_OBJECT
 public:
-    explicit WidgetVpzPropertyObservables(QWidget *parent = 0);
+    explicit WidgetVpzPropertyObservables(QWidget* parent = 0);
     ~WidgetVpzPropertyObservables() override;
     void selectModel(vleVpz* model, const QString& mod_query);
 
@@ -95,7 +94,7 @@ private:
     vleVpz* mVpz;
     QString mModQuery;
 };
-
-}}//namepsaces
+}
+} // namepsaces
 
 #endif // WIDGETVPZPROPERTY_H

@@ -1,4 +1,4 @@
 Authors
 -------
-- Sylvain Jasson <sylvain.jasson@toulouse.inra.fr>
+- Sylvain Jasson <sylvain.jasson@inra.fr>
 - Gauthier Quesnel <gauthier.quesnel@inra.fr>

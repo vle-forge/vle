@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -96,7 +96,7 @@ vformat(const char* fmt, va_list ap) noexcept
     }
 }
 
-template <typename T>
+template<typename T>
 bool
 is(const std::string& str)
 {
@@ -107,7 +107,7 @@ is(const std::string& str)
     return not s.fail();
 }
 
-template <>
+template<>
 bool VLE_API
 is<bool>(const std::string& str)
 {
@@ -124,16 +124,24 @@ is<bool>(const std::string& str)
     return not s.fail();
 }
 
-template VLE_API bool is<int8_t>(const std::string& str);
-template VLE_API bool is<int16_t>(const std::string& str);
-template VLE_API bool is<int32_t>(const std::string& str);
-template VLE_API bool is<uint8_t>(const std::string& str);
-template VLE_API bool is<uint16_t>(const std::string& str);
-template VLE_API bool is<uint32_t>(const std::string& str);
-template VLE_API bool is<double>(const std::string& str);
-template VLE_API bool is<float>(const std::string& str);
+template VLE_API bool
+is<int8_t>(const std::string& str);
+template VLE_API bool
+is<int16_t>(const std::string& str);
+template VLE_API bool
+is<int32_t>(const std::string& str);
+template VLE_API bool
+is<uint8_t>(const std::string& str);
+template VLE_API bool
+is<uint16_t>(const std::string& str);
+template VLE_API bool
+is<uint32_t>(const std::string& str);
+template VLE_API bool
+is<double>(const std::string& str);
+template VLE_API bool
+is<float>(const std::string& str);
 
-template <typename T>
+template<typename T>
 std::string
 to(const T t)
 {
@@ -142,7 +150,7 @@ to(const T t)
     return o.str();
 }
 
-template <>
+template<>
 std::string VLE_API
 to<bool>(const bool t)
 {
@@ -153,16 +161,24 @@ to<bool>(const bool t)
     }
 }
 
-template VLE_API std::string to<int8_t>(const int8_t t);
-template VLE_API std::string to<int16_t>(const int16_t t);
-template VLE_API std::string to<int32_t>(const int32_t t);
-template VLE_API std::string to<uint8_t>(const uint8_t t);
-template VLE_API std::string to<uint16_t>(const uint16_t t);
-template VLE_API std::string to<uint32_t>(const uint32_t t);
-template VLE_API std::string to<double>(const double t);
-template VLE_API std::string to<float>(const float t);
+template VLE_API std::string
+to<int8_t>(const int8_t t);
+template VLE_API std::string
+to<int16_t>(const int16_t t);
+template VLE_API std::string
+to<int32_t>(const int32_t t);
+template VLE_API std::string
+to<uint8_t>(const uint8_t t);
+template VLE_API std::string
+to<uint16_t>(const uint16_t t);
+template VLE_API std::string
+to<uint32_t>(const uint32_t t);
+template VLE_API std::string
+to<double>(const double t);
+template VLE_API std::string
+to<float>(const float t);
 
-template <typename T>
+template<typename T>
 T
 to(const std::string& str)
 {
@@ -174,17 +190,26 @@ to(const std::string& str)
     throw utils::ArgError((fmt(_("Can not convert `%1%'")) % str).str());
 }
 
-template VLE_API bool to<bool>(const std::string& str);
-template VLE_API int8_t to<int8_t>(const std::string& str);
-template VLE_API int16_t to<int16_t>(const std::string& str);
-template VLE_API int32_t to<int32_t>(const std::string& str);
-template VLE_API uint8_t to<uint8_t>(const std::string& str);
-template VLE_API uint16_t to<uint16_t>(const std::string& str);
-template VLE_API uint32_t to<uint32_t>(const std::string& str);
-template VLE_API double to<double>(const std::string& str);
-template VLE_API float to<float>(const std::string& str);
+template VLE_API bool
+to<bool>(const std::string& str);
+template VLE_API int8_t
+to<int8_t>(const std::string& str);
+template VLE_API int16_t
+to<int16_t>(const std::string& str);
+template VLE_API int32_t
+to<int32_t>(const std::string& str);
+template VLE_API uint8_t
+to<uint8_t>(const std::string& str);
+template VLE_API uint16_t
+to<uint16_t>(const std::string& str);
+template VLE_API uint32_t
+to<uint32_t>(const std::string& str);
+template VLE_API double
+to<double>(const std::string& str);
+template VLE_API float
+to<float>(const std::string& str);
 
-template <typename output>
+template<typename output>
 output
 convert(const std::string& value, bool locale, const std::string& loc)
 {
@@ -241,41 +266,36 @@ isLocaleAvailable(const std::string& locale)
     }
 }
 
-template VLE_API bool convert<bool>(const std::string& value,
-                                    bool locale,
-                                    const std::string& loc);
+template VLE_API bool
+convert<bool>(const std::string& value, bool locale, const std::string& loc);
 
-template VLE_API int8_t convert<int8_t>(const std::string& value,
-                                        bool locale,
-                                        const std::string& loc);
+template VLE_API int8_t
+convert<int8_t>(const std::string& value, bool locale, const std::string& loc);
 
-template VLE_API int16_t convert<int16_t>(const std::string& value,
-                                          bool locale,
-                                          const std::string& loc);
+template VLE_API int16_t
+convert<int16_t>(const std::string& value, bool locale, const std::string& loc);
 
-template VLE_API int32_t convert<int32_t>(const std::string& value,
-                                          bool locale,
-                                          const std::string& loc);
+template VLE_API int32_t
+convert<int32_t>(const std::string& value, bool locale, const std::string& loc);
 
-template VLE_API uint8_t convert<uint8_t>(const std::string& value,
-                                          bool locale,
-                                          const std::string& loc);
+template VLE_API uint8_t
+convert<uint8_t>(const std::string& value, bool locale, const std::string& loc);
 
-template VLE_API uint16_t convert<uint16_t>(const std::string& value,
-                                            bool locale,
-                                            const std::string& loc);
+template VLE_API uint16_t
+convert<uint16_t>(const std::string& value,
+                  bool locale,
+                  const std::string& loc);
 
-template VLE_API uint32_t convert<uint32_t>(const std::string& value,
-                                            bool locale,
-                                            const std::string& loc);
+template VLE_API uint32_t
+convert<uint32_t>(const std::string& value,
+                  bool locale,
+                  const std::string& loc);
 
-template VLE_API double convert<double>(const std::string& value,
-                                        bool locale,
-                                        const std::string& loc);
+template VLE_API double
+convert<double>(const std::string& value, bool locale, const std::string& loc);
 
-template VLE_API float convert<float>(const std::string& value,
-                                      bool locale,
-                                      const std::string& loc);
+template VLE_API float
+convert<float>(const std::string& value, bool locale, const std::string& loc);
 
 std::string
 toScientificString(const double& v, bool locale)

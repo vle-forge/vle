@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -97,8 +97,8 @@ struct F
 void
 show_package(vle::utils::ContextPtr ctx)
 {
-    using vle::utils::PathList;
     using vle::utils::Package;
+    using vle::utils::PathList;
 
     Package pkg(ctx, "show_package");
 
@@ -454,8 +454,7 @@ test_compress_filepath(vle::utils::ContextPtr ctx)
     utils::Path tarfile(utils::Path::temp_directory_path());
     tarfile /= "check.tar.bz2";
 
-    EnsuresNotThrow(rmt.compress(uniquepath, tarfile.string()),
-                    std::exception);
+    EnsuresNotThrow(rmt.compress(uniquepath, tarfile.string()), std::exception);
 
     utils::Path t{ tarfile };
     Ensures(t.exists());

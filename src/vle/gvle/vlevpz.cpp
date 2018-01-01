@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -29,7 +29,6 @@
 #include "vlevpz.hpp"
 #include <QApplication>
 #include <QClipboard>
-#include <QClipboard>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -51,7 +50,6 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/User.hpp>
-#include <vle/value/Value.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
 
@@ -2458,21 +2456,25 @@ vleVpz::rmModelPort(QDomNode node)
         undoStack->snapshot(grand_parent);
         synchronizeUndoStack();
         // delete internal connections
-        for (auto conn : vleDomStatic::getConnectionsFromCoupled(grand_parent,
-                "internal",(portType=="out"), ownerModel, oldName)) {
+        for (auto conn :
+             vleDomStatic::getConnectionsFromCoupled(grand_parent,
+                                                     "internal",
+                                                     (portType == "out"),
+                                                     ownerModel,
+                                                     oldName)) {
             rmModelConnection(conn, false);
         }
         if (portType == "in") {
-            //delete input connections
+            // delete input connections
             for (auto conn : vleDomStatic::getConnectionsFromCoupled(
-                    grand_parent, "input", false, ownerModel, oldName)) {
+                   grand_parent, "input", false, ownerModel, oldName)) {
                 rmModelConnection(conn, false);
             }
 
         } else if (portType == "out") {
-            //delete output connections
+            // delete output connections
             for (auto conn : vleDomStatic::getConnectionsFromCoupled(
-                    grand_parent, "output", true, ownerModel, oldName)) {
+                   grand_parent, "output", true, ownerModel, oldName)) {
                 rmModelConnection(conn, false);
             }
         }
@@ -2482,15 +2484,15 @@ vleVpz::rmModelPort(QDomNode node)
     }
     // adapt connections at the parent level (if it's a coupled model)
     if (portType == "in") {
-        //delete input connections
+        // delete input connections
         for (auto conn : vleDomStatic::getConnectionsFromCoupled(
-                parent, "input", true, ownerModel, oldName)) {
+               parent, "input", true, ownerModel, oldName)) {
             rmModelConnection(conn, false);
         }
     } else if (portType == "out") {
-        //delete output connections
+        // delete output connections
         for (auto conn : vleDomStatic::getConnectionsFromCoupled(
-                parent, "output", false, ownerModel, oldName)) {
+               parent, "output", false, ownerModel, oldName)) {
             rmModelConnection(conn, false);
         }
     }
@@ -4495,7 +4497,8 @@ vleVpz::modifyImportSourceForImport(QDomNode dest_node,
                 elems.clear();
                 break;
             }
-            // cheack that all imported models are contained into the same model
+            // cheack that all imported models are contained into the same
+            // model
             if (src_mod_query == "") {
                 src_mod_query = src.vdo()->getXQuery(src_mod_parent);
             } else {
@@ -4566,9 +4569,9 @@ vleVpz::modifyImportSourceForImport(QDomNode dest_node,
                 // by renaming obs if present in dest model
                 QString src_obs_att =
                   vleDomStatic::attachedObsToAtomic(src_node);
-                //detach all views of the observable
-                vleDomStatic::detachViewsToObsPorts(src.obsFromObss(
-                        src.obsFromDoc(), src_obs_att));
+                // detach all views of the observable
+                vleDomStatic::detachViewsToObsPorts(
+                  src.obsFromObss(src.obsFromDoc(), src_obs_att));
                 if (src_obs_att != "") {
                     QString dest_obs_new = src_obs_att;
                     if (not DomFunctions::childWhithNameAttr(

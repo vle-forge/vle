@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2017 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -749,7 +749,7 @@ public:
     }
 };
 
-template <typename T>
+template<typename T>
 struct no_deleter
 {
     void operator()(T*)
@@ -757,7 +757,7 @@ struct no_deleter
     }
 };
 
-template <typename T>
+template<typename T>
 std::shared_ptr<T>
 open(const std::string& file)
 {
@@ -966,18 +966,16 @@ main(int argc, char* argv[])
     int ret = EXIT_SUCCESS;
 
     const char* const short_opts = "hP:i:o:t:b:";
-    const struct option long_opts[] = {
-        { "help", 0, nullptr, 'h' },
-        { "timeout", 1, nullptr, 0 },
-        { "package", 1, nullptr, 'P' },
-        { "input-file", 1, nullptr, 'i' },
-        { "output-file", 1, nullptr, 'o' },
-        { "template", 1, nullptr, 't' },
-        { "withoutspawn", 0, &withoutspawn, 1 },
-        { "warnings", 0, &warnings, 1 },
-        { "block-size", 1, nullptr, 'b' },
-        { 0, 0, nullptr, 0 }
-    };
+    const struct option long_opts[] = { { "help", 0, nullptr, 'h' },
+                                        { "timeout", 1, nullptr, 0 },
+                                        { "package", 1, nullptr, 'P' },
+                                        { "input-file", 1, nullptr, 'i' },
+                                        { "output-file", 1, nullptr, 'o' },
+                                        { "template", 1, nullptr, 't' },
+                                        { "withoutspawn", 0, &withoutspawn, 1 },
+                                        { "warnings", 0, &warnings, 1 },
+                                        { "block-size", 1, nullptr, 'b' },
+                                        { 0, 0, nullptr, 0 } };
     int opt_index;
 
     for (;;) {
@@ -1036,8 +1034,7 @@ main(int argc, char* argv[])
     }
 
     if (package_name.empty()) {
-        printf(
-          _("Usage: cvle --package test tutu.vpz -i in.csv -o out.csv\n"));
+        printf(_("Usage: cvle --package test tutu.vpz -i in.csv -o out.csv\n"));
         return ret;
     }
 
@@ -1046,8 +1043,7 @@ main(int argc, char* argv[])
 
     std::vector<std::string> vpz(argv + ::optind, argv + argc);
     if (vpz.size() > 1)
-        fprintf(
-          stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
+        fprintf(stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
 
     if (comm.rank() == 0 and not template_file.empty())
         generate_template(template_file, package_name, vpz.front());

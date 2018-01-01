@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,23 +25,21 @@
 #ifndef GVLE_DEFAULT_VPZ_PANEL_H
 #define GVLE_DEFAULT_VPZ_PANEL_H
 
-#include <QWidget>
-#include <QObject>
 #include <QDebug>
+#include <QObject>
+#include <QWidget>
 
-#include <vle/gvle/vlevpz.hpp>
+#include <vle/gvle/gvle_file.h>
 #include <vle/gvle/plugin_mainpanel.h>
 #include <vle/gvle/plugin_simpanel.h>
-#include <vle/gvle/gvle_file.h>
+#include <vle/gvle/vlevpz.hpp>
 
-#include "filevpzview.h"
 #include "filevpzrtool.h"
+#include "filevpzview.h"
 #include "ui_filevpzview.h"
-
 
 namespace vle {
 namespace gvle {
-
 
 class DefaultVpzPanel : public PluginMainPanel
 {
@@ -52,18 +50,26 @@ public:
     DefaultVpzPanel();
     ~DefaultVpzPanel() override;
 
-    QString  getname() override;
+    QString getname() override;
     QWidget* leftWidget() override;
     QWidget* rightWidget() override;
     void undo() override;
     void redo() override;
-    void init(const gvle_file& file, utils::Package* pkg, Logger*,
-            gvle_plugins* plugs, const utils::ContextPtr& ctx) override;
+    void init(const gvle_file& file,
+              utils::Package* pkg,
+              Logger*,
+              gvle_plugins* plugs,
+              const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
-    void discard() override {}
+    void discard() override
+    {
+    }
     void save() override;
     void setSimLeftWidget(QWidget*);
-    PluginMainPanel* newInstance() override {return new DefaultVpzPanel();}
+    PluginMainPanel* newInstance() override
+    {
+        return new DefaultVpzPanel();
+    }
 
 public slots:
     void onCurrentChanged(int index);
@@ -71,13 +77,12 @@ public slots:
     void onRightSimWidgetChanged();
 
 public:
-    vleVpz*       m_vpz;
-    fileVpzView*  m_vpzview;
+    vleVpz* m_vpz;
+    fileVpzView* m_vpzview;
     FileVpzRtool* m_rtool;
-    gvle_plugins*  mGvlePlugins;
+    gvle_plugins* mGvlePlugins;
 };
-
-}} //namespaces
-
+}
+} // namespaces
 
 #endif

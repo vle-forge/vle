@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -300,7 +300,8 @@ xmlCharToString(const xmlChar* str)
  * boolean
  * @return The boolean.
  */
-VLE_LOCAL bool xmlCharToBoolean(const xmlChar* str);
+VLE_LOCAL bool
+xmlCharToBoolean(const xmlChar* str);
 
 /**
  * @brief Convert the xmlChar pointer to a long integer.
@@ -309,7 +310,8 @@ VLE_LOCAL bool xmlCharToBoolean(const xmlChar* str);
  * long integer.
  * @return The long integer.
  */
-VLE_LOCAL long int xmlCharToInt(const xmlChar* str);
+VLE_LOCAL long int
+xmlCharToInt(const xmlChar* str);
 
 /**
  * @brief Convert the xmlChar pointer to an unsigned long integer.
@@ -318,7 +320,8 @@ VLE_LOCAL long int xmlCharToInt(const xmlChar* str);
  * unsigned long integer.
  * @return The unsigned long integer.
  */
-VLE_LOCAL unsigned long int xmlCharToUnsignedInt(const xmlChar* str);
+VLE_LOCAL unsigned long int
+xmlCharToUnsignedInt(const xmlChar* str);
 }
 } // namespace vle vpz
 

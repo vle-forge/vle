@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -26,8 +26,8 @@
 #define HELP_H
 
 #include <QHelpEngineCore>
-#include <QWidget>
 #include <QTextBrowser>
+#include <QWidget>
 
 namespace Ui {
 class help;
@@ -38,7 +38,7 @@ class help : public QWidget
     Q_OBJECT
 
 public:
-    explicit help(QWidget *parent = 0);
+    explicit help(QWidget* parent = 0);
     ~help() override;
     void loadResource();
     void loadHelp(QString topic);
@@ -47,8 +47,8 @@ protected:
     QString mLocaleName;
 
 private:
-    Ui::help *ui;
-    QHelpEngineCore *mhelpEngine;
+    Ui::help* ui;
+    QHelpEngineCore* mhelpEngine;
 };
 
 #endif // HELP_H

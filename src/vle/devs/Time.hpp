@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -53,8 +53,7 @@ static_assert(std::numeric_limits<Time>::has_quiet_NaN == true,
               "Use an iec559 standard OS/Compiler");
 
 static const Time infinity = std::numeric_limits<Time>::infinity();
-static const Time negativeInfinity =
-  -1 * std::numeric_limits<Time>::infinity();
+static const Time negativeInfinity = -1 * std::numeric_limits<Time>::infinity();
 static const Time nan = std::numeric_limits<double>::quiet_NaN();
 
 /**
@@ -121,7 +120,8 @@ isNegativeInfinity(Time time)
  *
  * @return An @e std::string representation of the @e Time time.
  */
-VLE_API std::string convertTimeToString(Time time);
+VLE_API std::string
+convertTimeToString(Time time);
 }
 } // namespace vle devs
 

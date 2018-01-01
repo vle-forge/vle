@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,18 +25,18 @@
 #ifndef gvle_WIDGETS_H
 #define gvle_WIDGETS_H
 
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QPushButton>
-#include <QComboBox>
 #include <QCheckBox>
-#include <QPlainTextEdit>
+#include <QComboBox>
+#include <QDateEdit>
+#include <QDoubleSpinBox>
+#include <QGraphicsTextItem>
 #include <QHBoxLayout>
-#include <QTableWidget>
 #include <QLabel>
 #include <QLineEdit>
-#include <QDateEdit>
-#include <QGraphicsTextItem>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QTableWidget>
 #include <vle/value/Value.hpp>
 //#include <QtWidgets/QStackedWidget>
 #include <QStackedWidget>
@@ -47,8 +47,6 @@
 namespace vle {
 namespace gvle {
 
-
-
 /**
  * A Null widget allows to get the selected signal
  */
@@ -56,7 +54,7 @@ class VleNullWidget : public QWidget
 {
     Q_OBJECT
 public:
-    VleNullWidget(QWidget* parent, const QString& idStr="");
+    VleNullWidget(QWidget* parent, const QString& idStr = "");
     ~VleNullWidget() override;
     void focusInEvent(QFocusEvent* e) override;
 
@@ -65,7 +63,6 @@ signals:
     void selected(const QString& id);
 };
 
-
 /**
  * A Bool Editor
  */
@@ -73,7 +70,7 @@ class VleBooleanEdit : public QCheckBox
 {
     Q_OBJECT
 public:
-    VleBooleanEdit(QWidget* parent, bool val, const QString& idStr="");
+    VleBooleanEdit(QWidget* parent, bool val, const QString& idStr = "");
     ~VleBooleanEdit() override;
     void focusInEvent(QFocusEvent* e) override;
     void setValue(bool val);
@@ -93,12 +90,13 @@ class VleDoubleEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-
-    VleDoubleEdit(QWidget* parent, double val, const QString& idStr="",
-            bool withDefaultMenu = true);
+    VleDoubleEdit(QWidget* parent,
+                  double val,
+                  const QString& idStr = "",
+                  bool withDefaultMenu = true);
     ~VleDoubleEdit() override;
     void focusInEvent(QFocusEvent* e) override;
-    bool eventFilter(QObject *target, QEvent *event) override;
+    bool eventFilter(QObject* target, QEvent* event) override;
     void setValue(double val);
 
     QString id;
@@ -117,14 +115,14 @@ class VleDayEdit : public QDateEdit
 {
     Q_OBJECT
 public:
-
-    VleDayEdit(QWidget* parent, const QString day,
-	       const QString format="yyyy-M-d",
-	       const QString& idStr="",
-	       bool withDefaultMenu = true);
+    VleDayEdit(QWidget* parent,
+               const QString day,
+               const QString format = "yyyy-M-d",
+               const QString& idStr = "",
+               bool withDefaultMenu = true);
     ~VleDayEdit() override;
     void focusInEvent(QFocusEvent* e) override;
-    bool eventFilter(QObject *target, QEvent *event) override;
+    bool eventFilter(QObject* target, QEvent* event) override;
     void setValue(const QString day);
 
     QString id;
@@ -143,8 +141,9 @@ class VlePushButton : public QPushButton
 {
     Q_OBJECT
 public:
-    VlePushButton(QWidget *parent, const QString& text,
-            const QString& idStr="");
+    VlePushButton(QWidget* parent,
+                  const QString& text,
+                  const QString& idStr = "");
     ~VlePushButton() override;
     QString id;
 public slots:
@@ -161,11 +160,14 @@ class VleSpinBox : public QSpinBox
 {
     Q_OBJECT
 public:
-    VleSpinBox(QWidget *parent, int val, const QString& idStr = "",
-	       int min = -10000000, int max = 10000000);
+    VleSpinBox(QWidget* parent,
+               int val,
+               const QString& idStr = "",
+               int min = -10000000,
+               int max = 10000000);
     ~VleSpinBox() override;
     void setMin(int min);
-    void wheelEvent(QWheelEvent *event) override;
+    void wheelEvent(QWheelEvent* event) override;
     void focusInEvent(QFocusEvent* e) override;
     QString id;
 public slots:
@@ -186,10 +188,13 @@ class VleDoubleSpinBox : public QDoubleSpinBox
 {
     Q_OBJECT
 public:
-    VleDoubleSpinBox(QWidget* parent, double val, const QString& idStr = "",
-	 int min = -10000000, int max = 10000000);
+    VleDoubleSpinBox(QWidget* parent,
+                     double val,
+                     const QString& idStr = "",
+                     int min = -10000000,
+                     int max = 10000000);
     ~VleDoubleSpinBox() override;
-    void wheelEvent(QWheelEvent *event) override;
+    void wheelEvent(QWheelEvent* event) override;
     void focusInEvent(QFocusEvent* e) override;
 
     QString id;
@@ -209,11 +214,12 @@ class VleCombo : public QComboBox
 {
     Q_OBJECT
 public:
-    VleCombo(QWidget *parent, const QString& idStr="");
+    VleCombo(QWidget* parent, const QString& idStr = "");
     ~VleCombo() override;
-    void wheelEvent(QWheelEvent *event) override;
-    static VleCombo* buildVleBoolCombo(QWidget* parent, const QString& idStr,
-            bool val);
+    void wheelEvent(QWheelEvent* event) override;
+    static VleCombo* buildVleBoolCombo(QWidget* parent,
+                                       const QString& idStr,
+                                       bool val);
     void focusInEvent(QFocusEvent* e) override;
     QString id;
 public slots:
@@ -223,17 +229,18 @@ signals:
     void selected(const QString& id);
 };
 
-class VleComboLineEdit: public QComboBox
+class VleComboLineEdit : public QComboBox
 {
     Q_OBJECT
 public:
-
-    VleComboLineEdit(QWidget* parent, const QStringList& list,
-		     const QString& val, const QString& idStr="",
-		     bool withDefaultMenu = true);
+    VleComboLineEdit(QWidget* parent,
+                     const QStringList& list,
+                     const QString& val,
+                     const QString& idStr = "",
+                     bool withDefaultMenu = true);
     ~VleComboLineEdit();
     void focusInEvent(QFocusEvent* e);
-    bool eventFilter(QObject *target, QEvent *event);
+    bool eventFilter(QObject* target, QEvent* event);
     void setValue(const QString& val);
 
     QString id;
@@ -243,7 +250,9 @@ public slots:
     void onValueChanged(const QString& v);
 signals:
     void valUpdated(const QString& id, const QString& v);
-    void textUpdated(const QString& id, const QString& old, const QString& neW);
+    void textUpdated(const QString& id,
+                     const QString& old,
+                     const QString& neW);
     void selected(const QString& id);
 };
 
@@ -254,12 +263,13 @@ class VleLineEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-
-    VleLineEdit(QWidget* parent, const QString& val, const QString& idStr="",
-            bool withDefaultMenu = true);
+    VleLineEdit(QWidget* parent,
+                const QString& val,
+                const QString& idStr = "",
+                bool withDefaultMenu = true);
     ~VleLineEdit() override;
     void focusInEvent(QFocusEvent* e) override;
-    bool eventFilter(QObject *target, QEvent *event) override;
+    bool eventFilter(QObject* target, QEvent* event) override;
     void setValue(const QString& val);
 
     QString id;
@@ -267,7 +277,9 @@ public:
 public slots:
     void onValueChanged();
 signals:
-    void textUpdated(const QString& id, const QString& old, const QString& neW);
+    void textUpdated(const QString& id,
+                     const QString& old,
+                     const QString& neW);
     void selected(const QString& id);
 };
 
@@ -277,14 +289,16 @@ signals:
  * TODO should contain text rules no comma, no '<', etc..
  * send textUpdated on lost focus
  */
-class VleTextEdit: public QPlainTextEdit
+class VleTextEdit : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    VleTextEdit(QWidget* parent, const QString& text, const QString& id="",
-            bool editOnDbleClick = false);
+    VleTextEdit(QWidget* parent,
+                const QString& text,
+                const QString& id = "",
+                bool editOnDbleClick = false);
     ~VleTextEdit() override;
-    void wheelEvent(QWheelEvent *event) override;
+    void wheelEvent(QWheelEvent* event) override;
     void setText(const QString& text);
     void setTextEdition(bool val);
     QString getSavedText();
@@ -298,21 +312,21 @@ public:
     bool edit_on_dble_click;
 
 signals:
-    void textUpdated(const QString& id, const QString& old,
-            const QString& newVal);
+    void textUpdated(const QString& id,
+                     const QString& old,
+                     const QString& newVal);
     void selected(const QString& id);
-
 };
-
 
 /**
  * @brief A resizeable QStackedWidget, size is adapted from the current widget
- * see: http://stackoverflow.com/questions/23511430/qt-qstackedwidget-resizing-issue
+ * see:
+ * http://stackoverflow.com/questions/23511430/qt-qstackedwidget-resizing-issue
  */
 class VleStackedWidget : public QStackedWidget
 {
-  QSize sizeHint() const override;
-  QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 };
 
 /**
@@ -324,22 +338,42 @@ class VleValueWidget : public QWidget
     Q_OBJECT
 
 public:
-    enum eValueWidgetMenu {
-      EMenuValueAddBoolean, EMenuValueAddInteger, EMenuValueAddDouble,
-      EMenuValueAddString, EMenuValueAddSet, EMenuValueAddMap,
-      EMenuValueAddTuple, EMenuValueAddTable, EMenuValueAddMatrix,
-      EMenuValueSetBoolean, EMenuValueSetInteger, EMenuValueSetDouble,
-      EMenuValueSetString, EMenuValueSetSet, EMenuValueSetMap,
-      EMenuValueSetTuple, EMenuValueSetTable, EMenuValueSetMatrix,
-      EMenuValueRemove};
-    enum ValueDisplayType {TypeOnly, Insight, ValueOnly};
+    enum eValueWidgetMenu
+    {
+        EMenuValueAddBoolean,
+        EMenuValueAddInteger,
+        EMenuValueAddDouble,
+        EMenuValueAddString,
+        EMenuValueAddSet,
+        EMenuValueAddMap,
+        EMenuValueAddTuple,
+        EMenuValueAddTable,
+        EMenuValueAddMatrix,
+        EMenuValueSetBoolean,
+        EMenuValueSetInteger,
+        EMenuValueSetDouble,
+        EMenuValueSetString,
+        EMenuValueSetSet,
+        EMenuValueSetMap,
+        EMenuValueSetTuple,
+        EMenuValueSetTable,
+        EMenuValueSetMatrix,
+        EMenuValueRemove
+    };
+    enum ValueDisplayType
+    {
+        TypeOnly,
+        Insight,
+        ValueOnly
+    };
     static QString getValueDisplay(const vle::value::Value& v,
-            ValueDisplayType displayType);
-    struct value_stack {
+                                   ValueDisplayType displayType);
+    struct value_stack
+    {
         value_stack();
         ~value_stack();
         std::unique_ptr<value::Value> startValue;
-        using cont = std::vector<std::unique_ptr<value::Value> >;
+        using cont = std::vector<std::unique_ptr<value::Value>>;
         cont stack;
         void setStartValue(std::unique_ptr<vle::value::Value> val);
         /*
@@ -359,16 +393,14 @@ public:
         std::vector<std::string> toString();
     };
 
-
     value_stack mValueStack;
 
     VleStackedWidget* stack;
-    VleCombo*       value_bool;
-    VleSpinBox*     value_int;
-    VleDoubleEdit*  value_double;
-    VleTextEdit*    value_string;
-    QWidget*        value_complex;
-
+    VleCombo* value_bool;
+    VleSpinBox* value_int;
+    VleDoubleEdit* value_double;
+    VleTextEdit* value_string;
+    QWidget* value_complex;
 
     QWidget* stack_buttons;
     QTableWidget* table;
@@ -382,8 +414,9 @@ public:
     /*
      * @brief limited provide a limited mode
      */
-    explicit VleValueWidget(QWidget *parent = 0, bool limited = false,
-            const QString& header ="");
+    explicit VleValueWidget(QWidget* parent = 0,
+                            bool limited = false,
+                            const QString& header = "");
     ~VleValueWidget() override;
     void showCurrentValueDetail();
     void setId(const QString& id);
@@ -398,42 +431,55 @@ public slots:
     void onValUpdated(const QString& id, int newVal);
     void onValUpdated(const QString& id, double newVal);
     void onValUpdated(const QString& id, const QString& boolVal);
-    void onTextUpdated(const QString& id, const QString& old,
-            const QString& newVal);
+    void onTextUpdated(const QString& id,
+                       const QString& old,
+                       const QString& newVal);
     void onResize(bool b);
     void onStackButtonClicked(const QString& id, bool b);
 
 private:
-    void setBoolWidget(const QString& id, const vle::value::Value& val,
-            int r, int c);
-    void setIntWidget(const QString& id, const vle::value::Value& val,
-            int r, int c);
-    void setDoubleWidget(const QString& id, const vle::value::Value& val,
-            int r, int c);
+    void setBoolWidget(const QString& id,
+                       const vle::value::Value& val,
+                       int r,
+                       int c);
+    void setIntWidget(const QString& id,
+                      const vle::value::Value& val,
+                      int r,
+                      int c);
+    void setDoubleWidget(const QString& id,
+                         const vle::value::Value& val,
+                         int r,
+                         int c);
     void setDoubleWidget(const QString& id, double val, int r, int c);
-    void setStringWidget(const QString& id, const vle::value::Value& val,
-            int r, int c);
-    void setStringWidget(const QString& id, const QString&  val,
-            int r, int c);
-    void setComplexWidget(const QString& id, const vle::value::Value& val,
-            int r, int c);
-
+    void setStringWidget(const QString& id,
+                         const vle::value::Value& val,
+                         int r,
+                         int c);
+    void setStringWidget(const QString& id, const QString& val, int r, int c);
+    void setComplexWidget(const QString& id,
+                          const vle::value::Value& val,
+                          int r,
+                          int c);
 };
 
 /**
  * single line QGraphicsTextItem
  */
 
-class VleLineEditItem : public QGraphicsTextItem {
+class VleLineEditItem : public QGraphicsTextItem
+{
     Q_OBJECT
 public:
-    explicit VleLineEditItem(const QString& text, QGraphicsItem* parent = 0) :
-    QGraphicsTextItem(text, parent) {}
+    explicit VleLineEditItem(const QString& text, QGraphicsItem* parent = 0)
+      : QGraphicsTextItem(text, parent)
+    {
+    }
 signals:
     void returnPressed();
 
 protected:
-    void keyPressEvent(QKeyEvent *event) override {
+    void keyPressEvent(QKeyEvent* event) override
+    {
         switch (event->key()) {
         case Qt::Key_Return:
         case Qt::Key_Enter:
@@ -456,10 +502,10 @@ class VleCodeHighlighter : public QSyntaxHighlighter
     Q_OBJECT
 
 public:
-    VleCodeHighlighter(QTextDocument *parent = 0);
+    VleCodeHighlighter(QTextDocument* parent = 0);
 
 protected:
-    void highlightBlock(const QString &text) override;
+    void highlightBlock(const QString& text) override;
 
 private:
     struct HighlightingRule
@@ -484,15 +530,15 @@ private:
 class VleCodeLineNumberArea : public QWidget
 {
 public:
-    VleCodeLineNumberArea(VleCodeEdit *editor);
+    VleCodeLineNumberArea(VleCodeEdit* editor);
 
     QSize sizeHint() const override;
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
-    VleCodeEdit *codeEditor;
+    VleCodeEdit* codeEditor;
 };
 
 class VleCodeEdit : public QPlainTextEdit
@@ -500,11 +546,13 @@ class VleCodeEdit : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    VleCodeEdit(QWidget *parent = 0);
-    VleCodeEdit(QWidget* parent, const QString& text, const QString& id="",
-		bool editOnDbleClick = false);
+    VleCodeEdit(QWidget* parent = 0);
+    VleCodeEdit(QWidget* parent,
+                const QString& text,
+                const QString& id = "",
+                bool editOnDbleClick = false);
 
-    void VleCodelineNumberAreaPaintEvent(QPaintEvent *event);
+    void VleCodelineNumberAreaPaintEvent(QPaintEvent* event);
     int VleCodelineNumberAreaWidth();
 
     void setText(const QString& text);
@@ -520,24 +568,24 @@ public:
     bool edit_on_dble_click;
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private slots:
     void updateVleCodeLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
-    void updateVleCodeLineNumberArea(const QRect &, int);
+    void updateVleCodeLineNumberArea(const QRect&, int);
 
 private:
     VleCodeHighlighter* m_highlighter;
-    QWidget *m_lineNumberArea;
+    QWidget* m_lineNumberArea;
 
 signals:
-    void textUpdated(const QString& id, const QString& old,
-		     const QString& newVal);
+    void textUpdated(const QString& id,
+                     const QString& old,
+                     const QString& newVal);
     void selected(const QString& id);
 };
-
-}}//namespaces
-
+}
+} // namespaces
 
 #endif

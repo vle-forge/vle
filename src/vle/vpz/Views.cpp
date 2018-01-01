@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -93,9 +93,8 @@ Views::clear()
 void
 Views::add(const Views& views)
 {
-    std::for_each(views.viewlist().begin(),
-                  views.viewlist().end(),
-                  Views::AddViews(*this));
+    std::for_each(
+      views.viewlist().begin(), views.viewlist().end(), Views::AddViews(*this));
 
     m_outputs.add(views.outputs());
     m_observables.add(views.observables());
@@ -123,8 +122,7 @@ Views::addEventView(const std::string& name,
 {
     if (isUsedOutput(output)) {
         throw utils::ArgError(
-          (fmt(_("Output '%1%' of view '%2%' is already used")) % output %
-           name)
+          (fmt(_("Output '%1%' of view '%2%' is already used")) % output % name)
             .str());
     }
 
@@ -139,8 +137,7 @@ Views::addTimedView(const std::string& name,
 {
     if (isUsedOutput(output)) {
         throw utils::ArgError(
-          (fmt(_("Output '%1%' of view '%2%' is already used")) % output %
-           name)
+          (fmt(_("Output '%1%' of view '%2%' is already used")) % output % name)
             .str());
     }
 

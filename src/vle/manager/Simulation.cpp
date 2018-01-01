@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -105,7 +105,7 @@ public:
             m_simulationoptions |= vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
-    template <typename T>
+    template<typename T>
     void write(const T& t)
     {
         if (m_out)
@@ -142,13 +142,12 @@ public:
 
             write(_(" - Simulation run................: "));
 
-            boost::progress_display display(
-              100, *m_out, "\n   ", "   ", "   ");
+            boost::progress_display display(100, *m_out, "\n   ", "   ", "   ");
             long previous = 0;
 
             while (root.run()) {
-                long pc = std::floor(100. * (root.getCurrentTime() - begin) /
-                                     duration);
+                long pc =
+                  std::floor(100. * (root.getCurrentTime() - begin) / duration);
 
                 display += pc - previous;
                 previous = pc;
@@ -165,17 +164,16 @@ public:
 
             error->code = 0;
         } catch (const std::exception& e) {
-            error->message = utils::format(_("\n/!\\ error reported: %s\n"),
-                                           e.what());
+            error->message =
+              utils::format(_("\n/!\\ error reported: %s\n"), e.what());
             error->code = -1;
         }
 
         return result;
     }
 
-    std::unique_ptr<value::Map> runVerboseSummary(
-      std::unique_ptr<vpz::Vpz> vpz,
-      Error* error)
+    std::unique_ptr<value::Map> runVerboseSummary(std::unique_ptr<vpz::Vpz> vpz,
+                                                  Error* error)
     {
         std::unique_ptr<value::Map> result;
         boost::timer timer;
@@ -214,8 +212,8 @@ public:
 
             error->code = 0;
         } catch (const std::exception& e) {
-            error->message = utils::format(_("\n/!\\ error reported: %s\n"),
-                                           e.what());
+            error->message =
+              utils::format(_("\n/!\\ error reported: %s\n"), e.what());
             error->code = -1;
         }
 
@@ -241,8 +239,8 @@ public:
 
             error->code = 0;
         } catch (const std::exception& e) {
-            error->message = utils::format(_("\n/!\\ error reported: %s\n"),
-                                           e.what());
+            error->message =
+              utils::format(_("\n/!\\ error reported: %s\n"), e.what());
             error->code = -1;
         }
 
@@ -259,9 +257,9 @@ public:
 
         try {
             m_context->get_setting("vle.command.vle.simulation", &command);
-            command = (vle::fmt(command) % m_output_file.string() %
-                       m_vpz_file.string())
-                        .str();
+            command =
+              (vle::fmt(command) % m_output_file.string() % m_vpz_file.string())
+                .str();
             vle::utils::Spawn spawn(m_context);
             auto argv = spawn.splitCommandLine(command);
             auto exe = std::move(argv.front());

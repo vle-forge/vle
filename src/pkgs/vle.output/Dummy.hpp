@@ -5,9 +5,9 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2007 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2011 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2011 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and contributors
  *
@@ -42,29 +42,29 @@ public:
     ~Dummy() override;
 
     void onParameter(const std::string& plugin,
-                             const std::string& location,
-                             const std::string& file,
-                             std::unique_ptr<value::Value> parameters,
-                             const double& time) override;
+                     const std::string& location,
+                     const std::string& file,
+                     std::unique_ptr<value::Value> parameters,
+                     const double& time) override;
 
     void onNewObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& port,
-                                 const std::string& view,
-                                 const double& time) override;
-
-    void onDelObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& port,
-                                 const std::string& view,
-                                 const double& time) override;
-
-    void onValue(const std::string& simulator,
                          const std::string& parent,
                          const std::string& port,
                          const std::string& view,
-                         const double& time,
-                         std::unique_ptr<value::Value> value) override;
+                         const double& time) override;
+
+    void onDelObservable(const std::string& simulator,
+                         const std::string& parent,
+                         const std::string& port,
+                         const std::string& view,
+                         const double& time) override;
+
+    void onValue(const std::string& simulator,
+                 const std::string& parent,
+                 const std::string& port,
+                 const std::string& view,
+                 const double& time,
+                 std::unique_ptr<value::Value> value) override;
 };
 }
 }

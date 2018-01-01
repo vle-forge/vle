@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -78,12 +78,12 @@ struct vle_log_standard : vle::utils::Context::LogFunctor
     }
 
     void write(const vle::utils::Context& ctx,
-                       int priority,
-                       const char* file,
-                       int line,
-                       const char* fn,
-                       const char* format,
-                       va_list args) noexcept override
+               int priority,
+               const char* file,
+               int line,
+               const char* fn,
+               const char* format,
+               va_list args) noexcept override
     {
         (void)ctx;
 
@@ -124,12 +124,12 @@ struct vle_log_file : vle::utils::Context::LogFunctor
     }
 
     void write(const vle::utils::Context& ctx,
-                       int priority,
-                       const char* file,
-                       int line,
-                       const char* fn,
-                       const char* format,
-                       va_list args) noexcept override
+               int priority,
+               const char* file,
+               int line,
+               const char* fn,
+               const char* format,
+               va_list args) noexcept override
     {
         if (not fp)
             fp = fopen(ctx.getLogFile().string().c_str(), "w");
@@ -175,7 +175,7 @@ static void
 show_version() noexcept
 {
     printf(_("Virtual Laboratory Environment - VLE %s\n"
-             "Copyright (C) 2003 - 2016 The VLE Development Team.\n"
+             "Copyright (C) 2003 - 2018 The VLE Development Team.\n"
              "VLE comes with ABSOLUTELY NO WARRANTY.\n"
              "You may redistribute copies of VLE\n"
              "under the terms of the GNU General Public License.\n"

@@ -3,7 +3,7 @@
 #
 # Check the dependencies of the current package
 #
-# Copyright (c) 2014-2016 INRA
+# Copyright (c) 2014-2018 INRA
 # Ronan Trépos <rtrepos@toulouse.inra.fr>
 #
 # Distributed under the OS-approved BSD License (the "License");

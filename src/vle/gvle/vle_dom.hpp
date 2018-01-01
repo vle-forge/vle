@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -59,7 +59,8 @@ public:
     vleDomVpm(QDomDocument* doc);
     ~vleDomVpm() override;
     QString getXQuery(QDomNode node) override;
-    QDomNode getNodeFromXQuery(const QString& query, QDomNode d = QDomNode()) override;
+    QDomNode getNodeFromXQuery(const QString& query,
+                               QDomNode d = QDomNode()) override;
 };
 
 /**
@@ -313,9 +314,9 @@ public:
      * @return false if error has occurred
      */
     static bool detachViewsToObsPorts(QDomNode atom,
-            const QString& portName = "",
-            const QString& viewName = "",
-            DomDiffStack* snapObj = 0);
+                                      const QString& portName = "",
+                                      const QString& viewName = "",
+                                      DomDiffStack* snapObj = 0);
     /**
      * @brief Add/remove a port to input list of a model
      * @param domDoc, a Dom document to create new QDomNode
@@ -377,7 +378,10 @@ public:
      * in parameters.
      */
     static QList<QDomNode> getConnectionsFromCoupled(QDomNode coupled,
-            QString connType, bool origin, QString submodel, QString port);
+                                                     QString connType,
+                                                     bool origin,
+                                                     QString submodel,
+                                                     QString port);
     /**
      * @brief Rename a submodel of a coupled model, and update connections
      * @brief domDoc, used to create QDomNode if necessary

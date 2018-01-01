@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -389,8 +389,7 @@ Package::install()
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
         throw utils::InternalError(
-          (fmt(_("Pkg build error: install lib failed %1%")) % e.what())
-            .str());
+          (fmt(_("Pkg build error: install lib failed %1%")) % e.what()).str());
     }
 }
 
@@ -443,8 +442,7 @@ Package::pack()
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
         throw utils::InternalError(
-          (fmt(_("Pkg packaging error: package failed %1%")) % e.what())
-            .str());
+          (fmt(_("Pkg packaging error: package failed %1%")) % e.what()).str());
     }
 }
 
@@ -983,8 +981,7 @@ Package::refreshPath()
 }
 
 template<class T, size_t N>
-constexpr size_t
-size(T (&)[N])
+constexpr size_t size(T (&)[N])
 {
     return N;
 }

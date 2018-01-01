@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 INRA
+ * Copyright 2016-2018 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -87,7 +87,7 @@ public:
     }
 
     void externalTransition(const vd::ExternalEventList& events,
-                                    vd::Time time) override
+                            vd::Time time) override
     {
         double up_val, down_val;
         double x_dot_val;
@@ -153,8 +153,7 @@ public:
         }
     }
 
-    void output(vd::Time /*time*/,
-                        vd::ExternalEventList& output) const override
+    void output(vd::Time /*time*/, vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
             double outval;
@@ -212,8 +211,7 @@ public:
                       getModelName().c_str(),
                       current_derivative);
 
-                return (m_downthreshold - m_current_value) /
-                       current_derivative;
+                return (m_downthreshold - m_current_value) / current_derivative;
             }
             break;
         default:

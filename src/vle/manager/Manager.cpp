@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -57,12 +57,12 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
     }
 
     void write(const vle::utils::Context& /*ctx*/,
-                       int priority,
-                       const char* file,
-                       int line,
-                       const char* fn,
-                       const char* format,
-                       va_list args) noexcept override
+               int priority,
+               const char* file,
+               int line,
+               const char* fn,
+               const char* format,
+               va_list args) noexcept override
     {
         if (not fp) {
             std::stringstream s;
@@ -126,14 +126,14 @@ public:
             mSimulationOption |= vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
-    template <typename T>
+    template<typename T>
     void writeSummaryLog(const T& fmt)
     {
         if (mLogOption & manager::LOG_SUMMARY and mOutputStream)
             *mOutputStream << fmt;
     }
 
-    template <typename T>
+    template<typename T>
     void writeRunLog(const T& fmt)
     {
         if (mLogOption & manager::LOG_RUN and mOutputStream)
@@ -249,11 +249,10 @@ public:
         return result;
     }
 
-    std::unique_ptr<value::Matrix> runManagerMono(
-      std::unique_ptr<vpz::Vpz> vpz,
-      uint32_t rank,
-      uint32_t world,
-      Error* error)
+    std::unique_ptr<value::Matrix> runManagerMono(std::unique_ptr<vpz::Vpz> vpz,
+                                                  uint32_t rank,
+                                                  uint32_t world,
+                                                  Error* error)
     {
         Simulation sim(
           mContext, mLogOption, mSimulationOption, mTimeout, nullptr);
@@ -355,8 +354,7 @@ Manager::run(std::unique_ptr<vpz::Vpz> exp,
 
     if (thread <= 0) {
         throw vle::utils::ArgError(
-          (fmt(_("Manager error: thread must be superior to 0 (%1%)")) %
-           thread)
+          (fmt(_("Manager error: thread must be superior to 0 (%1%)")) % thread)
             .str());
     }
 

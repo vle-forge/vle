@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -108,22 +108,23 @@ struct intern_date
         hms       //"%H:%M:%S"
     };
 
-    intern_date() noexcept : myear(1400),
-                             mmonth(1),
-                             mday(1),
-                             mhours(0),
-                             mminutes(0),
-                             mseconds(0)
+    intern_date() noexcept
+      : myear(1400)
+      , mmonth(1)
+      , mday(1)
+      , mhours(0)
+      , mminutes(0)
+      , mseconds(0)
     {
     }
 
     intern_date(long year, long month, long day, double partofday) noexcept
-      : myear(year),
-        mmonth(month),
-        mday(day),
-        mhours(0),
-        mminutes(0),
-        mseconds(0)
+      : myear(year)
+      , mmonth(month)
+      , mday(day)
+      , mhours(0)
+      , mminutes(0)
+      , mseconds(0)
     {
         initPartOfDay(partofday);
     }

@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2015 INRA http://www.inra.fr
+ * Copyright (c) 2015-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and contributors
  *
@@ -24,25 +24,23 @@
 #ifndef GVLE_CONDDATEPLUGIN_H
 #define GVLE_CONDDATEPLUGIN_H
 
+#include <QDate>
 #include <QObject>
 #include <QSettings>
-#include <QDate>
 #include <QtWidgets/QCalendarWidget>
 #include <QtWidgets/QComboBox>
 #include <vle/utils/Package.hpp>
 
-#include <vle/gvle/plugin_cond.h>
-#include <vle/gvle/logger.h>
-#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/gvle_widgets.h>
+#include <vle/gvle/logger.h>
+#include <vle/gvle/plugin_cond.h>
+#include <vle/gvle/vlevpz.hpp>
 
 //#include "tab.h"
 //#include "toolbar.h"
 
-namespace vle{
-namespace gvle{
-
-
+namespace vle {
+namespace gvle {
 
 class DateCondition : public PluginExpCond
 {
@@ -55,32 +53,36 @@ public:
     ~DateCondition() override;
     QString getname() override;
     QWidget* getWidget() override;
-    void setSettings(QSettings *s) override;
-    void setLogger(Logger *logger) override;
+    void setSettings(QSettings* s) override;
+    void setLogger(Logger* logger) override;
     void init(vleVpz* vpz, const QString& cond) override;
-    PluginExpCond* newInstance() override {return new DateCondition();}
+    PluginExpCond* newInstance() override
+    {
+        return new DateCondition();
+    }
 
 public slots:
     void dateSelected(QDate date);
-    void calendarDestroyed(QObject *obj);
+    void calendarDestroyed(QObject* obj);
     void onTextUpdated(const QString& id,
-            const QString& old, const QString& neW);
-    void onTypeChanged(const QString & type);
+                       const QString& old,
+                       const QString& neW);
+    void onTypeChanged(const QString& type);
 
 private:
-    QSettings*  mSettings;
-    Logger*     mLogger;
-    //MainTab*    mWidgetTab;
-    //widToolbar* mWidgetToolbar;
+    QSettings* mSettings;
+    Logger* mLogger;
+    // MainTab*    mWidgetTab;
+    // widToolbar* mWidgetToolbar;
 
-    QString     mExpCond;
-    vleVpz*     mVpz;
-    QWidget*    mWidget;
+    QString mExpCond;
+    vleVpz* mVpz;
+    QWidget* mWidget;
     VleLineEdit* mNamePortField;
-    QComboBox*    mComboBox;
+    QComboBox* mComboBox;
     QCalendarWidget* mcalendar;
 };
-
-}}//namespaces
+}
+} // namespaces
 
 #endif // EXPCOND_DUMMY_H

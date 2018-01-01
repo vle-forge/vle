@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,15 +25,14 @@
 #ifndef GVLE_DEFAULT_DATA_PANEL_H
 #define GVLE_DEFAULT_DATA_PANEL_H
 
-#include <QWidget>
-#include <QObject>
 #include <QDebug>
-#include <vle/gvle/plugin_mainpanel.h>
+#include <QObject>
+#include <QWidget>
 #include <vle/gvle/gvle_file.h>
+#include <vle/gvle/plugin_mainpanel.h>
 
 namespace vle {
 namespace gvle {
-
 
 class DefaultDataPanel : public PluginMainPanel
 {
@@ -45,28 +44,36 @@ public:
     DefaultDataPanel();
     ~DefaultDataPanel() override;
 
-    QString  getname() override;
+    QString getname() override;
     QWidget* leftWidget() override;
     QWidget* rightWidget() override;
     void undo() override;
     void redo() override;
-    void init(const gvle_file& file, utils::Package* pkg, Logger*,
-            gvle_plugins* plugs, const utils::ContextPtr& ctx) override;
+    void init(const gvle_file& file,
+              utils::Package* pkg,
+              Logger*,
+              gvle_plugins* plugs,
+              const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
     void save() override;
-    void discard() override {}
-    PluginMainPanel* newInstance() override {return new DefaultDataPanel();}
+    void discard() override
+    {
+    }
+    PluginMainPanel* newInstance() override
+    {
+        return new DefaultDataPanel();
+    }
 public slots:
     void onUndoAvailable(bool);
+
 public:
-    QTextEdit*  m_edit;
+    QTextEdit* m_edit;
     QString m_file;
 
 private:
     void initData(QString pkg, QString classname, QString filePath);
 };
-
-}} //namespaces
-
+}
+} // namespaces
 
 #endif

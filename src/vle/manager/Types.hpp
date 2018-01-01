@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -89,8 +89,8 @@ enum LogOptions
 {
     LOG_NONE = 0,         /**< Report nothing in output stream. */
     LOG_SUMMARY = 1 << 0, /**< Report summary of the experimental
-                              * frame (size of the plan, number of
-                              * replicas etc.). */
+                           * frame (size of the plan, number of
+                           * replicas etc.). */
     LOG_RUN = 1 << 1      /**< Report information. */
 };
 
@@ -102,7 +102,7 @@ enum SimulationOptions
 {
     SIMULATION_NONE = 0,               /**< Default option. */
     SIMULATION_SPAWN_PROCESS = 1 << 0, /**< Launch the simulation in a
-                                           * subprocess.  */
+                                        * subprocess.  */
     SIMULATION_NO_RETURN = 1 << 1      /**< The simulation result are empty. */
 };
 
@@ -159,8 +159,7 @@ operator|(SimulationOptions lhs, SimulationOptions rhs)
                                           static_cast<unsigned>(rhs));
 }
 
-inline SimulationOptions operator&(SimulationOptions lhs,
-                                   SimulationOptions rhs)
+inline SimulationOptions operator&(SimulationOptions lhs, SimulationOptions rhs)
 {
     return static_cast<SimulationOptions>(static_cast<unsigned>(lhs) &
                                           static_cast<unsigned>(rhs));

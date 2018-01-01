@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,18 +25,17 @@
 #ifndef gvle_FILE_VPZ_SIM_H
 #define gvle_FILE_VPZ_SIM_H
 
+#include "ui_filevpzrtool.h"
 #include <QGraphicsScene>
-#include <QWidget>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
 #include <QListWidgetItem>
 #include <QTableWidgetItem>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QUndoStack>
 #include <QUndoView>
-#include <vle/gvle/vlevpz.hpp>
+#include <QWidget>
 #include <vle/gvle/plugin_simpanel.h>
-#include "ui_filevpzrtool.h"
-
+#include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
 class FileVpzSim;
@@ -50,8 +49,10 @@ class FileVpzSim : public QWidget
     Q_OBJECT
 
 public:
-    explicit FileVpzSim(vle::utils::Package* pkg, gvle_plugins* plugs,
-            Logger* log, QWidget *parent = 0);
+    explicit FileVpzSim(vle::utils::Package* pkg,
+                        gvle_plugins* plugs,
+                        Logger* log,
+                        QWidget* parent = 0);
     ~FileVpzSim() override;
     void setVpz(vleVpz* vpz);
     void setSimLeftWidget(QWidget* leftWidget);
@@ -62,17 +63,17 @@ signals:
 public slots:
     void onPluginChanged(const QString& text);
 
-
 public:
-    Ui::FileVpzSim*          ui;
-private:
-    vleVpz*                  mVpz;
-    gvle_plugins*            mGvlePlugins;
-    PluginSimPanel*          mPluginSimPanel;
-    vle::utils::Package*     mPackage;
-    Logger*                  mLog;
-};
+    Ui::FileVpzSim* ui;
 
-}} //namespaces
+private:
+    vleVpz* mVpz;
+    gvle_plugins* mGvlePlugins;
+    PluginSimPanel* mPluginSimPanel;
+    vle::utils::Package* mPackage;
+    Logger* mLog;
+};
+}
+} // namespaces
 
 #endif

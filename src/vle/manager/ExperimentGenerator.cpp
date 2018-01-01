@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -100,11 +100,10 @@ class ExperimentGenerator::Pimpl
         uint32_t number = mCompleteSize / mWorld;
         uint32_t modulo = mCompleteSize % mWorld;
 
-        mMin =
-          (number + 1) * std::min(mRank, modulo) +
-          number * uint32_t(std::max((int32_t)0, int32_t(mRank - modulo)));
-        mMax = std::min(mCompleteSize,
-                        mMin + number + 1 * uint32_t(mRank < modulo));
+        mMin = (number + 1) * std::min(mRank, modulo) +
+               number * uint32_t(std::max((int32_t)0, int32_t(mRank - modulo)));
+        mMax =
+          std::min(mCompleteSize, mMin + number + 1 * uint32_t(mRank < modulo));
     }
 
 public:

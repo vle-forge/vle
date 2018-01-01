@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,11 +25,11 @@
 #ifndef GVLE_DEFAULT_CPP_PANEL_H
 #define GVLE_DEFAULT_CPP_PANEL_H
 
-#include <QWidget>
 #include <QObject>
-#include <vle/gvle/plugin_mainpanel.h>
+#include <QWidget>
 #include <vle/gvle/gvle_file.h>
 #include <vle/gvle/gvle_widgets.h>
+#include <vle/gvle/plugin_mainpanel.h>
 
 namespace vle {
 namespace gvle {
@@ -44,20 +44,29 @@ public:
     DefaultCppPanel();
     ~DefaultCppPanel() override;
 
-    QString  getname() override;
+    QString getname() override;
     QWidget* leftWidget() override;
     QWidget* rightWidget() override;
     void undo() override;
     void redo() override;
-    void init(const gvle_file& file, utils::Package* pkg, Logger*,
-            gvle_plugins* plugs, const utils::ContextPtr& ctx) override;
+    void init(const gvle_file& file,
+              utils::Package* pkg,
+              Logger*,
+              gvle_plugins* plugs,
+              const utils::ContextPtr& ctx) override;
     QString canBeClosed() override;
     void save() override;
-    void discard() override {}
-    PluginMainPanel* newInstance() override {return new DefaultCppPanel();}
+    void discard() override
+    {
+    }
+    PluginMainPanel* newInstance() override
+    {
+        return new DefaultCppPanel();
+    }
 
 public slots:
     void onUndoAvailable(bool);
+
 public:
     VleCodeEdit* m_edit;
     QString m_file;
@@ -65,8 +74,7 @@ public:
 private:
     void initCpp(QString pkg, QString classname, QString filePath);
 };
-
-}} //namespaces
-
+}
+} // namespaces
 
 #endif

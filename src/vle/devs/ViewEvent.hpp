@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -56,8 +56,7 @@ struct VLE_LOCAL ViewEvent
      */
     void run()
     {
-        assert(mView &&
-               "ViewEvent::run(Time) was called previously. Mistake.");
+        assert(mView && "ViewEvent::run(Time) was called previously. Mistake.");
 
         mView->run(mTime);
     }
@@ -72,8 +71,7 @@ struct VLE_LOCAL ViewEvent
      */
     void run(Time time)
     {
-        assert(mView &&
-               "ViewEvent::run(Time) was called previously. Mistake.");
+        assert(mView && "ViewEvent::run(Time) was called previously. Mistake.");
 
         mView->run(time);
         mView = nullptr;

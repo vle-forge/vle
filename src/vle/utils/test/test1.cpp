@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -265,8 +265,7 @@ void
 julian_date()
 {
     std::cout << "\nJulian day number\n";
-    EnsuresEqual(2452192,
-                 vle::utils::DateTime::toJulianDayNumber("2001-10-9"));
+    EnsuresEqual(2452192, vle::utils::DateTime::toJulianDayNumber("2001-10-9"));
 
     std::cout << "\nJulian day\n";
 
@@ -360,8 +359,7 @@ to_scientific_string_function()
 #else
     EnsuresEqual(vu::toScientificString(123456789123456789.0),
                  "1.23456789123457e+17");
-    EnsuresEqual(vu::toScientificString(0.00000000000000000000982),
-                 "9.82e-21");
+    EnsuresEqual(vu::toScientificString(0.00000000000000000000982), "9.82e-21");
 #endif
     EnsuresEqual(vu::toScientificString(-0.12345), "-0.12345");
     EnsuresEqual(vu::toScientificString(0.12345), "0.12345");

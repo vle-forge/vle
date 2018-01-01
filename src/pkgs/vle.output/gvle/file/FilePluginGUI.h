@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems
  * http://www.vle-project.org
  *
- * Copyright (c) 2015 INRA http://www.inra.fr
+ * Copyright (c) 2015-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and contributors
  *
@@ -24,10 +24,10 @@
 #ifndef FilePluginGUI_H
 #define FilePluginGUI_H
 
+#include "FilePluginGUItab.h"
 #include <QObject>
 #include <QtXml/qdom.h>
 #include <vle/gvle/plugin_output.h>
-#include "FilePluginGUItab.h"
 
 namespace vle {
 namespace gvle {
@@ -42,19 +42,19 @@ public:
     FilePluginGUI();
     ~FilePluginGUI() override;
     QString getname() override;
-    QWidget *getWidget() override;
-    void     delWidget() override;
+    QWidget* getWidget() override;
+    void delWidget() override;
     void setLogger(Logger* logger) override;
     void init(vleVpz* vpz, const QString& viewName) override;
 
 public slots:
-    void onTabDeleted(QObject *obj);
+    void onTabDeleted(QObject* obj);
 
 private:
-    Logger*           mLogger;
+    Logger* mLogger;
     FilePluginGUItab* mWidgetTab;
 };
-
-}} //namespaces
+}
+} // namespaces
 
 #endif

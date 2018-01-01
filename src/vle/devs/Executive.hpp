@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -35,24 +35,24 @@
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Observables.hpp>
 
-#define DECLARE_EXECUTIVE(mdl)                                                \
-    extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics* vle_make_new_executive(                   \
-      const vle::devs::ExecutiveInit& init,                                   \
-      const vle::devs::InitEventList& events)                                 \
-    {                                                                         \
-        return new mdl(init, events);                                         \
-    }                                                                         \
-                                                                              \
-    VLE_MODULE void vle_api_level(vle::uint32_t* major,                       \
-                                  vle::uint32_t* minor,                       \
-                                  vle::uint32_t* patch)                       \
-    {                                                                         \
-        auto version = vle::version();                                        \
-        *major = std::get<0>(version);                                        \
-        *minor = std::get<1>(version);                                        \
-        *patch = std::get<2>(version);                                        \
-    }                                                                         \
+#define DECLARE_EXECUTIVE(mdl)                                                 \
+    extern "C" {                                                               \
+    VLE_MODULE vle::devs::Dynamics* vle_make_new_executive(                    \
+      const vle::devs::ExecutiveInit& init,                                    \
+      const vle::devs::InitEventList& events)                                  \
+    {                                                                          \
+        return new mdl(init, events);                                          \
+    }                                                                          \
+                                                                               \
+    VLE_MODULE void vle_api_level(vle::uint32_t* major,                        \
+                                  vle::uint32_t* minor,                        \
+                                  vle::uint32_t* patch)                        \
+    {                                                                          \
+        auto version = vle::version();                                         \
+        *major = std::get<0>(version);                                         \
+        *minor = std::get<1>(version);                                         \
+        *patch = std::get<2>(version);                                         \
+    }                                                                          \
     }
 
 namespace vle {

@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,55 +24,59 @@
 #ifndef gvle_FILEVPZOBSERVABLES_H
 #define gvle_FILEVPZOBSERVABLES_H
 
-#include <QWidget>
-#include <QMenu>
 #include <QListWidgetItem>
+#include <QMenu>
 #include <QTreeWidgetItem>
+#include <QWidget>
 #include <vle/gvle/vlevpz.hpp>
 
 namespace Ui {
-    class FileVpzObservables;
+class FileVpzObservables;
 }
 
 namespace vle {
 namespace gvle {
-
 
 class FileVpzObservables : public QWidget
 {
     Q_OBJECT
 
 public:
-    enum ObsTreeType { EObsNone, EObsObs, EObsPort,
-		       EObsOut};
+    enum ObsTreeType
+    {
+        EObsNone,
+        EObsObs,
+        EObsPort,
+        EObsOut
+    };
 
-    explicit FileVpzObservables(QWidget *parent = 0);
+    explicit FileVpzObservables(QWidget* parent = 0);
     ~FileVpzObservables() override;
     void setVpz(vleVpz* vpz);
     void reload();
 
 public slots:
     void onViewTreeMenu(const QPoint pos);
-    void onItemChanged(QTreeWidgetItem *item,
-                             int /*column*/);
+    void onItemChanged(QTreeWidgetItem* item, int /*column*/);
     void onViewsUpdated();
     void onObservablesUpdated();
-    void onUndoRedoVpz(QDomNode oldVpz, QDomNode newVpz,
-            QDomNode oldVpm, QDomNode newVpm);
+    void onUndoRedoVpz(QDomNode oldVpz,
+                       QDomNode newVpz,
+                       QDomNode oldVpm,
+                       QDomNode newVpm);
 
 private:
-    int itemType(const QTreeWidgetItem * item) const;
-    QString itemName(QTreeWidgetItem * item) const;
+    int itemType(const QTreeWidgetItem* item) const;
+    QString itemName(QTreeWidgetItem* item) const;
     QTreeWidgetItem* newItem(const ObsTreeType type, const QString name);
     void reloadObservables();
-    void reloadPorts(const QString& obsName,
-                    QTreeWidgetItem *obsItem = 0);
+    void reloadPorts(const QString& obsName, QTreeWidgetItem* obsItem = 0);
     void reloadViews();
 
     Ui::FileVpzObservables* ui;
     vleVpz* mVpz;
 };
-
-}} //namespaces
+}
+} // namespaces
 
 #endif // FILEVPZOBSERVABLES_H

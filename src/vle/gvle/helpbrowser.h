@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -33,14 +33,14 @@ class HelpBrowser : public QTextBrowser
     Q_OBJECT
 
 public:
-    HelpBrowser(QWidget *parent);
-    void setHelp(QHelpEngineCore *h);
-    void showHelpForKeyword(const QString &id);
+    HelpBrowser(QWidget* parent);
+    void setHelp(QHelpEngineCore* h);
+    void showHelpForKeyword(const QString& id);
 
 private:
-    QVariant loadResource(int type, const QUrl &name) override;
+    QVariant loadResource(int type, const QUrl& name) override;
 
-    QHelpEngineCore *mHelpEngine;
+    QHelpEngineCore* mHelpEngine;
 };
 
 #endif // HELPBROWSER_H

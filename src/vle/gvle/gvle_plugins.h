@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,16 +25,14 @@
 #ifndef gvle_gvle_plugins_H
 #define gvle_gvle_plugins_H
 
-#include <QObject>
 #include <QMap>
-#include <QStringList>
+#include <QObject>
 #include <QPluginLoader>
+#include <QStringList>
 
 #ifndef Q_MOC_RUN
 #include <vle/utils/Context.hpp>
 #endif
-
-
 
 namespace vle {
 namespace gvle {
@@ -44,25 +42,25 @@ class PluginExpCond;
 class PluginSimPanel;
 class PluginMainPanel;
 
-
 struct gvleplug
 {
-    enum GVLE_PLUGIN_TYPE {
-        GVLE_PLUG_OUTPUT,     //a PluginOutput
-        GVLE_PLUG_COND,       //a PluginExpCond
-        GVLE_PLUG_SIM,        //a PluginSimPanel
-        GVLE_PLUG_MAIN,       //a PluginMainPanel
-        GVLE_PLUG_MAIN_OUT,   //a PluginMainPanel
-        GVLE_PLUG_MAIN_VPZ,   //a PluginMainPanel
-        GVLE_PLUG_MAIN_DATA,  //a PluginMainPanel
-        GVLE_PLUG_NONE        //nullptr
+    enum GVLE_PLUGIN_TYPE
+    {
+        GVLE_PLUG_OUTPUT,    // a PluginOutput
+        GVLE_PLUG_COND,      // a PluginExpCond
+        GVLE_PLUG_SIM,       // a PluginSimPanel
+        GVLE_PLUG_MAIN,      // a PluginMainPanel
+        GVLE_PLUG_MAIN_OUT,  // a PluginMainPanel
+        GVLE_PLUG_MAIN_VPZ,  // a PluginMainPanel
+        GVLE_PLUG_MAIN_DATA, // a PluginMainPanel
+        GVLE_PLUG_NONE       // nullptr
     };
     gvleplug();
     gvleplug(QString pkg, QString libPath);
     virtual ~gvleplug();
 
-    QString        package;
-    QString        libPath;
+    QString package;
+    QString libPath;
     QPluginLoader* loader;
 };
 
@@ -74,54 +72,54 @@ public:
     gvle_plugins(const utils::ContextPtr& ctx);
     ~gvle_plugins() override;
 
-    void             registerPlugins();
+    void registerPlugins();
 
-    QStringList      getOutputPluginsList();
-    QString          getOutputPluginPath(QString name);
-    QString          getOutputPluginPackage(QString name);
-    PluginOutput*    provideOutputPlugin(QString name);
+    QStringList getOutputPluginsList();
+    QString getOutputPluginPath(QString name);
+    QString getOutputPluginPackage(QString name);
+    PluginOutput* provideOutputPlugin(QString name);
 
-    QStringList      getCondPluginsList();
-    QString          getCondPluginPath(QString name);
-    QString          getCondPluginPackage(QString name);
-    PluginExpCond*   newInstanceCondPlugin(QString name);
+    QStringList getCondPluginsList();
+    QString getCondPluginPath(QString name);
+    QString getCondPluginPackage(QString name);
+    PluginExpCond* newInstanceCondPlugin(QString name);
 
-    QStringList      getSimPanelPluginsList();
-    QString          getSimPanelPluginPath(QString name);
-    QString          getSimPanelPluginPackage(QString name);
-    PluginSimPanel*  newInstanceSimPanelPlugin(QString name);
+    QStringList getSimPanelPluginsList();
+    QString getSimPanelPluginPath(QString name);
+    QString getSimPanelPluginPackage(QString name);
+    PluginSimPanel* newInstanceSimPanelPlugin(QString name);
 
-    QStringList      getMainPanelPluginsList();
-    QString          getMainPanelPluginPath(QString name);
-    QString          getMainPanelPluginPackage(QString name);
+    QStringList getMainPanelPluginsList();
+    QString getMainPanelPluginPath(QString name);
+    QString getMainPanelPluginPackage(QString name);
     PluginMainPanel* newInstanceMainPanelPlugin(QString name);
 
-    QStringList      getMainPanelOutPluginsList();
-    QString          getMainPanelOutPluginPath(QString name);
-    QString          getMainPanelOutPluginPackage(QString name);
+    QStringList getMainPanelOutPluginsList();
+    QString getMainPanelOutPluginPath(QString name);
+    QString getMainPanelOutPluginPackage(QString name);
     PluginMainPanel* newInstanceMainPanelOutPlugin(QString name);
 
-    QStringList      getMainPanelVpzPluginsList();
-    QString          getMainPanelVpzPluginPath(QString name);
-    QString          getMainPanelVpzPluginPackage(QString name);
+    QStringList getMainPanelVpzPluginsList();
+    QString getMainPanelVpzPluginPath(QString name);
+    QString getMainPanelVpzPluginPackage(QString name);
     PluginMainPanel* newInstanceMainPanelVpzPlugin(QString name);
 
-    QStringList      getMainPanelDataPluginsList();
-    QString          getMainPanelDataPluginPath(QString name);
-    QString          getMainPanelDataPluginPackage(QString name);
+    QStringList getMainPanelDataPluginsList();
+    QString getMainPanelDataPluginPath(QString name);
+    QString getMainPanelDataPluginPackage(QString name);
     PluginMainPanel* newInstanceMainPanelDataPlugin(QString name);
 
 private:
-    QMap<QString,gvleplug>      mOutputPlugins;
-    QMap<QString,gvleplug>      mCondPlugins;
-    QMap<QString,gvleplug>      mSimPanelPlugins;
-    QMap<QString,gvleplug>      mMainPanelPlugins;
-    QMap<QString,gvleplug>      mMainPanelOutPlugins;
-    QMap<QString,gvleplug>      mMainPanelVpzPlugins;
-    QMap<QString,gvleplug>      mMainPanelDataPlugins;
-    utils::ContextPtr           mCtx;
+    QMap<QString, gvleplug> mOutputPlugins;
+    QMap<QString, gvleplug> mCondPlugins;
+    QMap<QString, gvleplug> mSimPanelPlugins;
+    QMap<QString, gvleplug> mMainPanelPlugins;
+    QMap<QString, gvleplug> mMainPanelOutPlugins;
+    QMap<QString, gvleplug> mMainPanelVpzPlugins;
+    QMap<QString, gvleplug> mMainPanelDataPlugins;
+    utils::ContextPtr mCtx;
 };
-
-}}//namespaces
+}
+} // namespaces
 
 #endif // gvle_win_H

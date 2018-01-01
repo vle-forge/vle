@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 INRA
+ * Copyright 2016-2018 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -104,8 +104,7 @@ public:
         return vd::infinity;
     }
 
-    void output(vd::Time /*time*/,
-                        vd::ExternalEventList& output) const override
+    void output(vd::Time /*time*/, vd::ExternalEventList& output) const override
     {
         switch (m_state) {
         case INIT:
@@ -141,7 +140,7 @@ public:
     }
 
     void externalTransition(const vd::ExternalEventList& lst,
-                                    vd::Time /*time*/) override
+                            vd::Time /*time*/) override
     {
         vd::ExternalEventList::const_iterator it;
         for (it = lst.begin(); it != lst.end(); ++it) {
@@ -175,9 +174,8 @@ public:
         }
     }
 
-    void confluentTransitions(
-      vd::Time time,
-      const vd::ExternalEventList& events) override
+    void confluentTransitions(vd::Time time,
+                              const vd::ExternalEventList& events) override
     {
         internalTransition(time);
         externalTransition(events, time);

@@ -4,7 +4,7 @@ SRC_DIR = $$PWD
 VERSION_MAJOR = 2
 VERSION_MINOR = 0
 VERSION_PATCH = 0
-VERSION_EXTRA = alpha1
+VERSION_EXTRA = alpha3
 VERSION_ABI = "2.0"
 
 # Disable all logging facilities and active heavy optimization code to speed up

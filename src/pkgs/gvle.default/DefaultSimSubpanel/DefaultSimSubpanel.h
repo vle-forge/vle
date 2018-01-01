@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,10 +25,10 @@
 #ifndef GVLE_DEFAULT_SIM_SUB_PANEL_H
 #define GVLE_DEFAULT_SIM_SUB_PANEL_H
 
-#include <QWidget>
-#include <QObject>
-#include <QDebug>
 #include "qcustomplot/qcustomplot.h"
+#include <QDebug>
+#include <QObject>
+#include <QWidget>
 
 #include <vle/gvle/plugin_simpanel.h>
 #include <vle/gvle/vlevpz.hpp>
@@ -41,29 +41,30 @@ class simpanelright;
 namespace vle {
 namespace gvle {
 
-
 class DefaultSimSubpanelThread : public QObject
 {
     Q_OBJECT
 public:
-    std::unique_ptr<vle::value::Map>     output_map;
-    vleVpz*                   mvpz;
-    vle::utils::Package*      mpkg;
-    QString                   error_simu;
+    std::unique_ptr<vle::value::Map> output_map;
+    vleVpz* mvpz;
+    vle::utils::Package* mpkg;
+    QString error_simu;
     std::vector<std::string>& log_messages;
-    //parameters
+    // parameters
     bool mdebug;
     int mnbthreads;
     int mblockSize;
 
     DefaultSimSubpanelThread(std::vector<std::string>& logMessages,
-            bool debug, int nbthreads, int blockSize);
+                             bool debug,
+                             int nbthreads,
+                             int blockSize);
     ~DefaultSimSubpanelThread() override;
     void init(vleVpz* vpz, vle::utils::Package* pkg);
 public slots:
-   void onStarted();
+    void onStarted();
 signals:
-   void simulationFinished();
+    void simulationFinished();
 };
 
 /**
@@ -78,8 +79,6 @@ public:
     ~DefaultSimSubpanelLeftWidget() override;
     Ui::simpanelleft* ui;
     QCustomPlot* customPlot;
-
-
 };
 
 /**
@@ -93,29 +92,33 @@ public:
     DefaultSimSubpanelRightWidget();
     ~DefaultSimSubpanelRightWidget() override;
     Ui::simpanelright* ui;
-
 };
-
 
 struct portToPlot
 {
-    portToPlot() : view(), port(), color()
+    portToPlot()
+      : view()
+      , port()
+      , color()
     {
     }
-    portToPlot(QString viewN, QString portN): view(viewN), port(portN),
-            color(70,130,180)
+    portToPlot(QString viewN, QString portN)
+      : view(viewN)
+      , port(portN)
+      , color(70, 130, 180)
     {
     }
 
-    portToPlot(const portToPlot& p) : view(p.view), port(p.port),
-            color(p.color)
+    portToPlot(const portToPlot& p)
+      : view(p.view)
+      , port(p.port)
+      , color(p.color)
     {
     }
 
     QString view;
     QString port;
-    QColor  color;
-
+    QColor color;
 };
 
 /**
@@ -131,7 +134,7 @@ public:
     DefaultSimSubpanel();
     ~DefaultSimSubpanel() override;
     void init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log) override;
-    QString  getname() override;
+    QString getname() override;
     QWidget* leftWidget() override;
     QWidget* rightWidget() override;
     void undo() override;
@@ -143,10 +146,12 @@ public:
     void removePortToPlot(QString view, QString port);
     portToPlot* getPortToPlot(QString view, QString port);
     void updateCustomPlot();
-    double getDouble(const vle::value::Matrix& view, unsigned int col,
-            unsigned int row, bool error_message);
+    double getDouble(const vle::value::Matrix& view,
+                     unsigned int col,
+                     unsigned int row,
+                     bool error_message);
 
-    //parameters
+    // parameters
     bool debug;
     int nbthreads;
     int blockSize;
@@ -159,7 +164,6 @@ public:
     vle::utils::Package* mpkg;
     Logger* mLog;
     QTimer timer;
-
 
     std::vector<portToPlot> portsToPlot;
     std::vector<std::string> log_messages;
@@ -179,8 +183,7 @@ public slots:
     void onToolColor();
     void onNormalized(int state);
 };
-
-}} //namespaces
-
+}
+} // namespaces
 
 #endif

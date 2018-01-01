@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -36,11 +36,11 @@ class AboutBox : public QDialog
     Q_OBJECT
 
 public:
-    explicit AboutBox(QWidget *parent = 0);
+    explicit AboutBox(QWidget* parent = 0);
     ~AboutBox() override;
 
 private:
-    Ui::AboutBox *ui;
+    Ui::AboutBox* ui;
 };
 
-#endif //ABOUTBOX_H
+#endif // ABOUTBOX_H

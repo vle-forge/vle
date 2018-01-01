@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -47,12 +47,12 @@ struct sim_log : utils::Context::LogFunctor
     }
 
     void write(const utils::Context& ctx,
-                       int priority,
-                       const char* file,
-                       int line,
-                       const char* fn,
-                       const char* format,
-                       va_list args) noexcept override
+               int priority,
+               const char* file,
+               int line,
+               const char* fn,
+               const char* format,
+               va_list args) noexcept override
     {
         (void)ctx;
         (void)priority;
@@ -214,10 +214,8 @@ DefaultSimSubpanel::DefaultSimSubpanel()
                      SIGNAL(valueChanged(int)),
                      this,
                      SLOT(onBlockSizeChanged(int)));
-    QObject::connect(right->ui->butSimColor,
-                     SIGNAL(clicked()),
-                     this,
-                     SLOT(onToolColor()));
+    QObject::connect(
+      right->ui->butSimColor, SIGNAL(clicked()), this, SLOT(onToolColor()));
     QObject::connect(right->ui->Normalized,
                      SIGNAL(stateChanged(int)),
                      this,
@@ -656,7 +654,7 @@ DefaultSimSubpanel::onTreeItemChanged(QTreeWidgetItem* item, int col)
 }
 
 void
-    DefaultSimSubpanel::onNormalized(int state)
+DefaultSimSubpanel::onNormalized(int state)
 {
     mNormalized = (state == 2);
     updateCustomPlot();

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -44,8 +44,8 @@ class CoupledModel;
 
 typedef std::map<std::string, ModelPortList> ConnectionList;
 using PortList = std::set<std::string>;
-using AtomicModelVector = std::vector<AtomicModel *>;
-using CoupledModelVector = std::vector<CoupledModel *>;
+using AtomicModelVector = std::vector<AtomicModel*>;
+using CoupledModelVector = std::vector<CoupledModel*>;
 typedef std::map<std::string, BaseModel*> ModelList;
 
 /**
@@ -192,8 +192,7 @@ public:
      * @param name the model to find.
      * @return A reference to the AtomicModel found.
      */
-    BaseModel* getModel(const CoupledModelVector& lst,
-                        const std::string& name);
+    BaseModel* getModel(const CoupledModelVector& lst, const std::string& name);
 
     /**
      * @brief Get the parent node of this model. Can be null if parent does

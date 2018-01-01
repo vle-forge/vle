@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -985,14 +985,15 @@ vleDomStatic::renameObservablePort(QDomNode atom,
     return true;
 }
 
-
 bool
-vleDomStatic::detachViewsToObsPorts(QDomNode atom, const QString& portName,
-        const QString& viewName, DomDiffStack* snapObj)
+vleDomStatic::detachViewsToObsPorts(QDomNode atom,
+                                    const QString& portName,
+                                    const QString& viewName,
+                                    DomDiffStack* snapObj)
 {
     if (atom.nodeName() != "observable") {
         qDebug() << "Internal error in detachViewsToObsPorts "
-                << atom.nodeName();
+                 << atom.nodeName();
         return false;
     }
     QList<QDomNode> ports = DomFunctions::childNodesWithoutText(atom, "port");
@@ -1000,13 +1001,13 @@ vleDomStatic::detachViewsToObsPorts(QDomNode atom, const QString& portName,
     for (QDomNode port : ports) {
         QString portName_i = DomFunctions::attributeValue(port, "name");
         if (portName == "" or portName == portName_i) {
-            QDomNode toClear = DomFunctions::childWhithNameAttr(
-                    atom, "port", portName_i);
-            QList<QDomNode> attviews =  DomFunctions::childNodesWithoutText(
-                    toClear, "attachedview");
-            for (QDomNode attview : attviews)  {
-                QString attview_i = DomFunctions::attributeValue(
-                        attview, "name");
+            QDomNode toClear =
+              DomFunctions::childWhithNameAttr(atom, "port", portName_i);
+            QList<QDomNode> attviews =
+              DomFunctions::childNodesWithoutText(toClear, "attachedview");
+            for (QDomNode attview : attviews) {
+                QString attview_i =
+                  DomFunctions::attributeValue(attview, "name");
                 if (viewName == "" or viewName == attview_i) {
                     if (not has_snap and snapObj) {
                         snapObj->snapshot(atom);
@@ -1018,8 +1019,6 @@ vleDomStatic::detachViewsToObsPorts(QDomNode atom, const QString& portName,
     }
     return has_snap;
 }
-
-
 
 bool
 vleDomStatic::addPortToInNode(QDomDocument& domDoc,
@@ -1155,21 +1154,24 @@ vleDomStatic::renamePortToOutNode(QDomNode atom,
 
 QList<QDomNode>
 vleDomStatic::getConnectionsFromCoupled(QDomNode coupled,
-        QString connType, bool origin, QString submodel, QString port)
+                                        QString connType,
+                                        bool origin,
+                                        QString submodel,
+                                        QString port)
 {
     QList<QDomNode> ret;
     QDomNode conns = DomFunctions::obtainChild(coupled, "connections");
     if (conns.isNull()) {
         return ret;
     }
-    QList<QDomNode> connList = DomFunctions::childNodesWithoutText(
-            conns, "connection");
+    QList<QDomNode> connList =
+      DomFunctions::childNodesWithoutText(conns, "connection");
     for (auto conn : connList) {
         if (DomFunctions::attributeValue(conn, "type") == connType) {
             QString toget = origin ? "origin" : "destination";
             QDomNode el = DomFunctions::obtainChild(conn, toget);
             if ((DomFunctions::attributeValue(el, "model") == submodel) and
-                    (DomFunctions::attributeValue(el, "port") == port)) {
+                (DomFunctions::attributeValue(el, "port") == port)) {
                 ret.append(conn);
             }
         }
@@ -1272,8 +1274,7 @@ vleDomStatic::renameModelIntoStructures(QDomDocument& domDoc,
                                         QString new_model,
                                         DomDiffStack* snapObj)
 {
-    if (atom.nodeName() != "structures" &&
-        atom.nodeName() != "class") {
+    if (atom.nodeName() != "structures" && atom.nodeName() != "class") {
         qDebug()
           << "Internal error in vleDomStatic::renameModelIntoStructures "
           << atom.nodeName();

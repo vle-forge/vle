@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -257,12 +257,14 @@ public:
 /**
  * @brief Clone value data.
  */
-VLE_API std::shared_ptr<Value> clone(std::shared_ptr<Value> v);
+VLE_API std::shared_ptr<Value>
+clone(std::shared_ptr<Value> v);
 
 /**
  * @brief Clone value data.
  */
-VLE_API std::shared_ptr<Value> clone(std::shared_ptr<const Value> v);
+VLE_API std::shared_ptr<Value>
+clone(std::shared_ptr<const Value> v);
 
 /**
  * @brief Check if the Value is a composite value, ie., a Map, a Set or
@@ -270,7 +272,8 @@ VLE_API std::shared_ptr<Value> clone(std::shared_ptr<const Value> v);
  * @param val The Value to check.
  * @return True if the Value is a Map, a Set or a Matrix.
  */
-VLE_API bool is_composite(const std::unique_ptr<Value>& val);
+VLE_API bool
+is_composite(const std::unique_ptr<Value>& val);
 
 /**
  * @brief Convert a constant value::Value @c std::unique_ptr to a constant
@@ -279,7 +282,8 @@ VLE_API bool is_composite(const std::unique_ptr<Value>& val);
  * @return A reference.
  * @throw utils::ArgError if value is NULL.
  */
-VLE_API const Value& reference(const std::unique_ptr<Value>& value);
+VLE_API const Value&
+reference(const std::unique_ptr<Value>& value);
 
 /**
  * @brief Convert a constant value::Value @c std::shared_ptr to a constant
@@ -288,7 +292,8 @@ VLE_API const Value& reference(const std::unique_ptr<Value>& value);
  * @return A reference.
  * @throw utils::ArgError if value is NULL.
  */
-VLE_API const Value& reference(std::shared_ptr<const Value> value);
+VLE_API const Value&
+reference(std::shared_ptr<const Value> value);
 
 /**
  * @brief Convert a constant value::Value @c std::shared_ptr to a constant
@@ -297,7 +302,8 @@ VLE_API const Value& reference(std::shared_ptr<const Value> value);
  * @return A reference.
  * @throw utils::ArgError if value is NULL.
  */
-VLE_API const Value& reference(std::shared_ptr<Value> value);
+VLE_API const Value&
+reference(std::shared_ptr<Value> value);
 }
 }
 

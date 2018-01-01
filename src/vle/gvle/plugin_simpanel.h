@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,32 +25,32 @@
 #ifndef GVLE_PLUGIN_SIMPANEL_H
 #define GVLE_PLUGIN_SIMPANEL_H
 
-#include <QWidget>
-#include <vle/utils/Package.hpp>
-#include <vle/gvle/vlevpz.hpp>
 #include "logger.h"
+#include <QWidget>
+#include <vle/gvle/vlevpz.hpp>
+#include <vle/utils/Package.hpp>
 
 namespace vle {
 namespace gvle {
 
-class PluginSimPanel :public QObject
+class PluginSimPanel : public QObject
 {
     Q_OBJECT
 public:
     PluginSimPanel(){};
     ~PluginSimPanel() override{};
     virtual void init(vleVpz* vpz, vle::utils::Package* pkg, Logger* log) = 0;
-    virtual QString  getname()                                            = 0;
-    virtual QWidget* leftWidget()                                         = 0;
-    virtual QWidget* rightWidget()                                        = 0;
-    virtual void undo()                                                   = 0;
-    virtual void redo()                                                   = 0;
-    virtual PluginSimPanel* newInstance()                                 = 0;
-
+    virtual QString getname() = 0;
+    virtual QWidget* leftWidget() = 0;
+    virtual QWidget* rightWidget() = 0;
+    virtual void undo() = 0;
+    virtual void redo() = 0;
+    virtual PluginSimPanel* newInstance() = 0;
 };
+}
+} // namespaces
 
-}} //namespaces
-
-Q_DECLARE_INTERFACE(vle::gvle::PluginSimPanel, "fr.inra.vle.gvle.PluginSimPanel")
+Q_DECLARE_INTERFACE(vle::gvle::PluginSimPanel,
+                    "fr.inra.vle.gvle.PluginSimPanel")
 
 #endif

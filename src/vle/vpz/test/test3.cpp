@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -245,10 +245,9 @@ vpz_throw()
 void
 vpz_throw_1()
 {
-    const char* xml =
-      "<?xml version=\"1.0\"?>\n"
-      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n";
+    const char* xml = "<?xml version=\"1.0\"?>\n"
+                      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+                      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n";
 
     {
         try {

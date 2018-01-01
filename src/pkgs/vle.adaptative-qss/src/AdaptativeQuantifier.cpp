@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 INRA
+ * Copyright 2016-2018 INRA
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.  You may
@@ -90,10 +90,9 @@ public:
         }
 
         if (2 >= m_past_length) {
-            throw vu::ModellingError(
-              "Bad archive length value ( provided value"
-              ": %u, should at least 3)",
-              m_past_length);
+            throw vu::ModellingError("Bad archive length value ( provided value"
+                                     ": %u, should at least 3)",
+                                     m_past_length);
         }
     }
 
@@ -109,7 +108,7 @@ public:
     }
 
     void externalTransition(const vd::ExternalEventList& events,
-                                    vd::Time time) override
+                            vd::Time time) override
     {
         double val, shifting_factor;
         int cnt;
@@ -260,8 +259,7 @@ public:
         externalTransition(externals, time);
     }
 
-    void output(vd::Time /*time*/,
-                        vd::ExternalEventList& output) const override
+    void output(vd::Time /*time*/, vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
             output.emplace_back(m_output_port_label);
@@ -337,8 +335,7 @@ private:
 
     void update_thresholds(double factor)
     {
-        m_upthreshold =
-          m_offset + m_step_size * (m_step_number + (1 - factor));
+        m_upthreshold = m_offset + m_step_size * (m_step_number + (1 - factor));
         m_downthreshold =
           m_offset + m_step_size * (m_step_number - (1 - factor));
     }
@@ -389,9 +386,8 @@ private:
                         0) // same direction as last move
                     {
                         local_estim =
-                          1 -
-                          (archive[i + 1].date - archive[i].date) /
-                            (archive[i + 2].date - archive[i].date);
+                          1 - (archive[i + 1].date - archive[i].date) /
+                                (archive[i + 2].date - archive[i].date);
                     } else {
                         local_estim = (archive[i + 1].date - archive[i].date) /
                                       (archive[i + 2].date - archive[i].date);

@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -56,8 +56,7 @@ View::View(const std::string& name)
   : m_timestep(0.0)
   , m_name(name)
   , m_enabled(true)
-  , m_type(
-      static_cast<Type>(View::INTERNAL | View::EXTERNAL | View::CONFLUENT))
+  , m_type(static_cast<Type>(View::INTERNAL | View::EXTERNAL | View::CONFLUENT))
 {
 }
 

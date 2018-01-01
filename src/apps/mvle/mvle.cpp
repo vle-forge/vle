@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
- * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2017 INRA http://www.inra.fr
+ * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -79,7 +79,7 @@ mvle_show_version()
 {
     printf(_("mvle - MPI manager for VLE\n"
              "Virtual Laboratory Environment - VLE %s\n"
-             "Copyright (C) 2003 - 2016 The VLE Development Team.\n"
+             "Copyright (C) 2003 - 2018 The VLE Development Team.\n"
              "VLE is a multi-modeling environment to build,\nsimulate "
              "and analyse models of dynamic complex systems.\n"
              "For more information, see manuals with 'man mvle' or\n"

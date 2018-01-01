@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -25,9 +25,9 @@
 #ifndef GVLE_PLUGIN_MAINPANEL_H
 #define GVLE_PLUGIN_MAINPANEL_H
 
-#include <QWidget>
-#include <QDebug>
 #include "gvle_plugins.h"
+#include <QDebug>
+#include <QWidget>
 
 #include "logger.h"
 
@@ -42,33 +42,41 @@ class PluginMainPanel : public QObject
 {
     Q_OBJECT
 public:
-    PluginMainPanel(){}
-    ~PluginMainPanel() override{}
+    PluginMainPanel()
+    {
+    }
+    ~PluginMainPanel() override
+    {
+    }
 
-    virtual QString  getname()                                              =0;
-    virtual QWidget* leftWidget()                                           =0;
-    virtual QWidget* rightWidget()                                          =0;
-    virtual void undo()                                                     =0;
-    virtual void redo()                                                     =0;
+    virtual QString getname() = 0;
+    virtual QWidget* leftWidget() = 0;
+    virtual QWidget* rightWidget() = 0;
+    virtual void undo() = 0;
+    virtual void redo() = 0;
     /**
      * Note: this function is in charge of creating files (including metadata)
      * at the creation time. Also it has to handle renaming of files and
      * copies from the QFileSystem.
      */
-    virtual void init(const gvle_file& file, utils::Package* pkg,
-            Logger* log, gvle_plugins* plugs, const utils::ContextPtr& ctx) =0;
-    virtual QString canBeClosed()                                           =0;
-    virtual void save()                                                     =0;
-    virtual void discard()                                                  =0;
-    virtual PluginMainPanel* newInstance()                                  =0;
+    virtual void init(const gvle_file& file,
+                      utils::Package* pkg,
+                      Logger* log,
+                      gvle_plugins* plugs,
+                      const utils::ContextPtr& ctx) = 0;
+    virtual QString canBeClosed() = 0;
+    virtual void save() = 0;
+    virtual void discard() = 0;
+    virtual PluginMainPanel* newInstance() = 0;
 
 signals:
     void rightWidgetChanged();
     void undoAvailable(bool);
 };
+}
+} // namespaces
 
-}} //namespaces
-
-Q_DECLARE_INTERFACE(vle::gvle::PluginMainPanel, "fr.inra.vle.gvle.PluginMainPanel")
+Q_DECLARE_INTERFACE(vle::gvle::PluginMainPanel,
+                    "fr.inra.vle.gvle.PluginMainPanel")
 
 #endif

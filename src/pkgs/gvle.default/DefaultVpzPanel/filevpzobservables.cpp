@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -32,7 +32,7 @@ namespace vle {
 namespace gvle {
 
 typedef QList<QPair<QString, QString>> obsPortList;
-using obsPortViewList = QList<QList<QString> >;
+using obsPortViewList = QList<QList<QString>>;
 
 FileVpzObservables::FileVpzObservables(QWidget* parent)
   : QWidget(parent)

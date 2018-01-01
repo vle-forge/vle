@@ -3,7 +3,7 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2014-2015 INRA http://www.inra.fr
+ * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,15 +24,15 @@
 #ifndef FILEVPZEXPVIEW_H
 #define FILEVPZEXPVIEW_H
 
-#include <QWidget>
-#include <QMenu>
 #include <QListWidgetItem>
+#include <QMenu>
 #include <QTreeWidgetItem>
+#include <QWidget>
 
 #ifndef Q_MOC_RUN
-#include <vle/utils/Context.hpp>
-#include <vle/gvle/vlevpz.hpp>
 #include <vle/gvle/plugin_output.h>
+#include <vle/gvle/vlevpz.hpp>
+#include <vle/utils/Context.hpp>
 #endif
 
 namespace Ui {
@@ -42,7 +42,8 @@ class FileVpzExpView;
 namespace vle {
 namespace gvle {
 
-enum FILE_VPZ_EXP_VIEW_MENU {
+enum FILE_VPZ_EXP_VIEW_MENU
+{
     FVEVM_add_view,
     FVEVM_remove_view,
     FVEVM_rename_view,
@@ -54,8 +55,9 @@ class FileVpzExpView : public QWidget
     Q_OBJECT
 
 public:
-    explicit FileVpzExpView(const utils::ContextPtr& ctx,  Logger* log, 
-	                        QWidget *parent = 0);
+    explicit FileVpzExpView(const utils::ContextPtr& ctx,
+                            Logger* log,
+                            QWidget* parent = 0);
     ~FileVpzExpView() override;
     void setVpz(vleVpz* vpz);
     void reload();
@@ -64,7 +66,7 @@ signals:
     void outputChange(QString viewName, QString outputName);
 
 public slots:
-    void onViewSelected(QListWidgetItem * item);
+    void onViewSelected(QListWidgetItem* item);
     void onOutputSelected(const QString& item);
     void onTimeStepChanged(double v);
     void onTimedCheck(int);
@@ -74,23 +76,24 @@ public slots:
     void onConfluentCheck(int);
     void onFinishCheck(int);
     void onViewListMenu(const QPoint&);
-    void onItemChanged(QListWidgetItem* );
-    void onUndoRedoVpz(QDomNode oldVpz, QDomNode newVpz,
-            QDomNode oldVpm, QDomNode newVpm);
+    void onItemChanged(QListWidgetItem*);
+    void onUndoRedoVpz(QDomNode oldVpz,
+                       QDomNode newVpz,
+                       QDomNode oldVpm,
+                       QDomNode newVpm);
 
 private:
     QString getSelectedOutputPlugin();
     void updateViewType();
     void updatePlugin();
 
-
     Ui::FileVpzExpView* ui;
-    vleVpz*             mVpz;
-    PluginOutput*       mPlugin;
-    QString             currView;
-    utils::ContextPtr   mCtx;
-	Logger*             mLog;
-
+    vleVpz* mVpz;
+    PluginOutput* mPlugin;
+    QString currView;
+    utils::ContextPtr mCtx;
+    Logger* mLog;
 };
-}}//namespaces
+}
+} // namespaces
 #endif // FILEVPZEXPVIEW_H
