@@ -82,7 +82,11 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
         else if (priority > 6)
             msg = QString("[debug] %1:%2 %3: ").arg(file).arg(line).arg(fn);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
         msg += QString::vasprintf(format, args);
+#else
+        msg += QString::fromStdString(vu::vformat(format, args));
+#endif
 
         m_logger->log(msg);
     }
