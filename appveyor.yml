@@ -1,43 +1,85 @@
-version: '2.0.{build}'
-clone_depth: 5
-image: Visual Studio 2015
-skip_tags: true
-clone_folder: C:\projects\vle
+version: "{branch}-ci-{build}"
+os: Visual Studio 2015
 
 branches:
   only:
     - master
+    - master1.1
     - test
-    - test_appveyor
-
-install:
-  - ps: Start-FileDownload 'ftp://ftp.zlatkovic.com/libxml/iconv-1.9.2.win32.zip' -Timeout 1200000
-  - ps: Start-FileDownload 'ftp://ftp.zlatkovic.com/libxml/libxml2-2.7.8.win32.zip' -Timeout 1200000
-  - ps: Start-FileDownload 'ftp://ftp.zlatkovic.com/libxml/zlib-1.2.5.win32.zip' -Timeout 1200000
-  - cmd: 7z x "iconv-1.9.2.win32.zip" -o"C:\projects\deps\"
-  - cmd: xcopy "C:\projects\deps\iconv-1.9.2.win32\*" "C:\projects\deps\*" /s /e /i /Y
-  - cmd: 7z x "libxml2-2.7.8.win32.zip" -o"C:\projects\deps\"
-  - cmd: xcopy "C:\projects\deps\libxml2-2.7.8.win32\*" "C:\projects\deps\*" /s /e /i /Y
-  - cmd: 7z x "zlib-1.2.5.win32.zip" -o"C:\projects\deps\"
-  - cmd: xcopy "C:\projects\deps\zlib-1.2.5\*" "C:\projects\deps\*" /s /e /i /Y
 
 environment:
-  CMAKE_GENERATOR: "Visual Studio 14 2015"
-  QT5: C:\Qt\5.7\msvc2015
-  MSBUILD_FLAGS: /verbosity:minimal /maxcpucount
-  BOOST_ROOT: C:\Libraries\boost_1_60_0
-  BOOST_INCLUDEDIR: C:\Libraries\boost_1_60_0
-  BOOST_LIBRARYDIR: C:\Libraries\boost_1_60_0\lib32-msvc-14.0
-  VLEDEPS_BASEPATH: C:\projects\deps
+  matrix:
+    - CMAKE_GENERATOR: 'MinGW Makefiles'
+      MINGW_ROOT: C:\Qt\Tools\mingw530_32
+      QT_DIR: C:\Qt\5.9\mingw53_32
+      BOOST_ROOT: C:\Libraries\boost_1_63_0
+
+init:
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+
+install:
+  - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S mingw-w64-i686-libxml2"
 
 before_build:
-  - set Path=%QT5%\bin;%Path%
-  - cmd: cd C:\projects\vle
-  - cmd: mkdir build 
-  - cmd: cd build 
-  - cmd: cmake -G "%CMAKE_GENERATOR%" -DCMAKE_SYSTEM_VERSION=10.0 "-DCMAKE_PREFIX_PATH=%QT5%" -DWITH_GVLE=ON -DWITH_DOC=OFF ..
+  - set PATH=%MINGW_ROOT%\bin;%QT_DIR%\bin;%PATH%
+  - set VLEDEPS_BASEPATH=C:\msys64\mingw32
+  - set prefix=%APPVEYOR_BUILD_FOLDER%\install
 
-configuration: Release
-  
-build:
-  project: C:\projects\vle\build\vle.sln
+build_script:
+  - cmake -E make_directory build
+  - cmake -E chdir build cmake -G "%CMAKE_GENERATOR%" -DCMAKE_SH="CMAKE_SH-NOTFOUND" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DWITH_WIN32_INSTALLER=OFF -DCMAKE_INSTALL_PREFIX="%prefix%" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBOOST_ROOT="%BOOST_ROOT%" -DCMAKE_PREFIX_PATH="%QT_DIR%" ..
+  - cmake --build build
+  - cmake --build build --target install
+
+after_build:
+  - windeployqt --list mapping --compiler-runtime --dir %prefix% %prefix%\bin\gvle.exe
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Core*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Core*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Gui*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Xml.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Xmld.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Help*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Network*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Sql*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Widgets*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5PrintSupport*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Svg*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5XmlPatterns*.dll %prefix%\bin\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin %prefix%\bin /exclude:Qt*.dll+windeployqt.exe+designer.exe+assistant.exe
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Core*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Gui*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Xml.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Xmld.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Help*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Network*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Sql*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Widgets*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5PrintSupport*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Svg*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5XmlPatterns*.dll.a %prefix%\lib
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib %prefix%\lib /exclude:libQt5*.*+terminfo
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtCore" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtGui" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtXml" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtHelp" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtNetwork" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtSql" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtWidgets" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtSvg" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtXmlPatterns" %prefix%\include\
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include %prefix%\include\ /exclude:Qt*.*+
+  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\share %prefix%\share\ /exclude:qt5/examples+qt5/doc+qt5/qml+doc+man+gtk-doc+terminfo+
+  - xcopy /C /Q /Y /S /E /T %MINGW_ROOT% %prefix%\
+  - cmake --build build --target package
+  - 7z a vle.zip %APPVEYOR_BUILD_FOLDER%\build\*.exe
+
+test_script:
+  - set PATH=%prefix%\bin;%PATH%
+  - set CTEST_OUTPUT_ON_FAILURE=ON
+  # - cmake --build build --target test
+
+artifacts:
+  - path: vle.zip
+    name: app

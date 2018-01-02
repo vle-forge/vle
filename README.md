@@ -2,6 +2,7 @@ Virtual Laboratory Environment 2.0
 ==================================
 
 [![Build Status](https://travis-ci.org/vle-forge/vle.png?branch=master)](https://travis-ci.org/vle-forge/vle)
+[![Win32 Status](https://ci.appveyor.com/project/quesnel/vle?svg=true)](https://ci.appveyor.com/project/quesnel/vle?svg=true)
 
 See AUTHORS and COPYRIGHT for the list of contributors.
 

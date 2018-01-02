@@ -24,6 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <windows.h>
+
+#include <direct.h>
+
+#include <winbase.h>
+
 #include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -38,7 +44,6 @@
 #include <vle/utils/details/ShellUtils.hpp>
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/i18n.hpp>
-#include <windows.h>
 
 namespace vle {
 namespace utils {
@@ -229,12 +234,10 @@ struct win32_argv_quote : public std::unary_function<std::string, void>
     win32_argv_quote(std::string* cmd, char separator)
       : cmd(cmd)
       , separator(separator)
-    {
-    }
+    {}
 
     ~win32_argv_quote()
-    {
-    }
+    {}
 
     void operator()(const std::string& arg)
     {
@@ -249,12 +252,10 @@ struct win32_envp_quote : public std::unary_function<Envp::value_type, void>
 
     win32_envp_quote(std::string* cmd)
       : cmd(cmd)
-    {
-    }
+    {}
 
     ~win32_envp_quote()
-    {
-    }
+    {}
 
     void operator()(const Envp::value_type& arg)
     {
@@ -272,14 +273,16 @@ struct win32_envp_quote : public std::unary_function<Envp::value_type, void>
             std::for_each(
               tokens.begin(), tokens.end(), win32_argv_quote(cmd, ';'));
 
-            cmd->operator[](cmd->size() - 1) = '\0'; /**< remove the last `;' to
-                                                      * avoid bad environment.*/
+            cmd->operator[](cmd->size() - 1) =
+              '\0'; /**< remove the last `;' to
+                     * avoid bad environment.*/
         }
     }
 };
 
 static char*
-build_command_line(const std::string& exe, const std::vector<std::string>& args)
+build_command_line(const std::string& exe,
+                   const std::vector<std::string>& args)
 {
     std::string cmd;
     char* buf;
@@ -401,12 +404,16 @@ struct Spawn::Pimpl
         unsigned long avail;
 
         {
-            PeekNamedPipe(
-              hOutputRead, &buffer[0], buffer.size() - 1, &bread, &avail, NULL);
+            PeekNamedPipe(hOutputRead,
+                          &buffer[0],
+                          buffer.size() - 1,
+                          &bread,
+                          &avail,
+                          NULL);
 
             if (bread) {
-                ouputfs << "get PeekNamedPipe success " << bread << " " << avail
-                        << "\n";
+                ouputfs << "get PeekNamedPipe success " << bread << " "
+                        << avail << "\n";
 
                 std::fill(buffer.begin(), buffer.end(), '\0');
                 if (avail > buffer.size() - 1) {
@@ -436,14 +443,18 @@ struct Spawn::Pimpl
                     ouputfs << "get PeekNamedPipe success (else) " << bread
                             << " " << avail << "\n";
 
-                    ReadFile(
-                      hOutputRead, &buffer[0], buffer.size() - 1, &bread, NULL);
+                    ReadFile(hOutputRead,
+                             &buffer[0],
+                             buffer.size() - 1,
+                             &bread,
+                             NULL);
 
                     ouputfs << "get: " << bread << "\n";
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                          bread, static_cast<unsigned long>(buffer.size() - 1));
+                          bread,
+                          static_cast<unsigned long>(buffer.size() - 1));
 
                         output->append(&buffer[0], sz);
                         ouputfs.write(&buffer[0], sz);
@@ -485,7 +496,8 @@ struct Spawn::Pimpl
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                          bread, static_cast<unsigned long>(buffer.size() - 1));
+                          bread,
+                          static_cast<unsigned long>(buffer.size() - 1));
 
                         error->append(&buffer[0], sz);
                         errorfs.write(&buffer[0], sz);
@@ -702,9 +714,9 @@ struct Spawn::Pimpl
 };
 
 Spawn::Spawn(ContextPtr ctx)
-  : m_pimpl(std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
-{
-}
+  : m_pimpl(
+      std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
+{}
 
 Spawn::~Spawn() = default;
 
@@ -774,7 +786,8 @@ Spawn::splitCommandLine(const std::string& command)
 
     if (argv.empty())
         throw utils::ArgError(
-          (fmt(_("Package command line: error, empty command `%1%'")) % command)
+          (fmt(_("Package command line: error, empty command `%1%'")) %
+           command)
             .str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
