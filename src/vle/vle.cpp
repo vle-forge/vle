@@ -28,6 +28,10 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
 
+#ifdef _WIN32
+#include <vle/utils/details/UtilsWin.hpp>
+#endif
+
 #define _VLE_STRINGIFY(x) #x
 #define VLE_STRINGIFY(x) _VLE_STRINGIFY(x)
 
@@ -79,7 +83,6 @@ string_version_abi()
  * - call xmlInitParser() in the "main" thread before using any of the
  *   libxml2 API (except possibly selecting a different memory allocator)
  */
-
 Init::Init()
 {
     xmlInitParser();

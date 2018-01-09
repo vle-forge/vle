@@ -24,6 +24,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef _WIN32
+#include <vle/utils/details/UtilsWin.hpp>
+#endif
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <vle/utils/Context.hpp>
@@ -91,6 +95,80 @@ Context::Context(const Path& /* prefix */)
         write_settings();
     else
         load_settings();
+
+#ifdef _WIN32
+    /* Starting from VLE 2.0, Windows port changes is own environment
+     * variables PATH, CMAKE_MODULE_PATH and PKG_CONFIG_PATH simplify source
+     * code of VLE.
+     *
+     * https://msdn.microsoft.com/en-us/library/windows/desktop/ms682009(v=vs.85).aspx
+     */
+
+    {
+        auto path = getPrefixDir();
+        path /= L"bin";
+
+        auto str = path.wstring();
+        auto var = get_environment_variable_wide(L"PATH");
+
+        if (var.find(str) == var.npos) {
+            if (not var.empty()) {
+                str += L';';
+                str += var;
+            }
+
+            set_environment_variable_wide(L"PATH", str);
+        }
+    }
+
+    {
+        auto path = getPrefixDir();
+        path /= L"bin";
+
+        auto str = path.wstring();
+        auto var = get_environment_variable_wide(L"CMAKE_MODULE_PATH");
+
+        if (var.find(str) == var.npos) {
+            if (not var.empty()) {
+                str += L';';
+                str += var;
+            }
+
+            set_environment_variable_wide(L"CMAKE_MODULE_PATH", str);
+        }
+    }
+
+    {
+        auto path = getPrefixDir();
+        path /= L"lib";
+        path /= L"pkgconfig";
+
+        set_environment_variable_wide(L"PKG_CONFIG_PATH", path.wstring());
+    }
+
+    {
+        auto path = getPrefixDir();
+        set_environment_variable_wide(L"VLE_BASEPATH", path.wstring());
+    }
+
+    {
+        vDbg(this, "Environment\n");
+        LPWCH env = ::GetEnvironmentStringsW();
+        for (LPWSTR vars = static_cast<PWSTR>(env); *vars;
+             vars += wcslen(vars) + 1) {
+            try {
+                std::wstring str(vars);
+
+                if (not str.empty() or str[0] != L'=' or
+                    str.find(L'=') != str.npos)
+                    vDbg(this, "%s\n", from_wide_to_utf8(str).c_str());
+            } catch (const std::exception& /*e*/) {
+            }
+        }
+
+        FreeEnvironmentStringsW(env);
+    }
+#endif
 
     vInfo(this,
           "Context initialized [prefix=%s] [home=%s]\n",
@@ -177,46 +255,45 @@ Context::getHomeDir() const
 Path
 Context::getLocaleDir() const
 {
-    Path p(m_pimpl->m_prefix);
-    p /= "share";
-    p /= "locale";
+    Path path = getPrefixDir();
+    path /= "share";
+    path /= "locale";
 
-    return p;
+    return path;
 }
 
 Path
 Context::getHomeFile(const std::string& name) const
 {
-    Path p(m_pimpl->m_home);
-    p /= name;
+    Path path = getHomeDir();
+    path /= name;
 
-    return p;
+    return path;
 }
 
 Path
 Context::getConfigurationFile() const
 {
-    auto version = vle::version_abi();
+    auto path = getHomeDir();
+    path /= "vle.conf";
 
-    return getHomeFile(utils::format(
-      "vle-%d.%d.conf", std::get<0>(version), std::get<1>(version)));
+    return path;
 }
 
 Path
 Context::getLogFile() const
 {
-    auto version = vle::version_abi();
+    auto path = getHomeDir();
+    path /= "vle.log";
 
-    return getHomeFile(utils::format(
-      "vle-%d.%d.log", std::get<0>(version), std::get<1>(version)));
+    return path;
 }
 
 Path
 Context::getLogFile(const std::string& prefix) const
 {
     auto version = vle::version_abi();
-
-    auto lf = utils::format("%s-%d.%d.log",
+    auto lf = utils::format("%s-%d_%d.log",
                             prefix.c_str(),
                             std::get<0>(version),
                             std::get<1>(version));
@@ -329,21 +406,85 @@ Context::initVleHomeDirectory()
 void
 Context::readHomeDir()
 {
-    const char* path_str = std::getenv("VLE_HOME");
-    std::string path("");
-    if (path_str) {
-        path.assign(path_str);
-    }
-    if (not path.empty()) {
-        if (Path::is_directory(path)) {
+#ifdef _WIN32
+    auto vlehome = get_environment_variable("VLE_HOME");
+
+    if (not vlehome.empty()) {
+        Path path(vlehome);
+
+        if (path.is_directory()) {
             m_pimpl->m_home = path;
-        } else {
-            throw FileError(
-              (fmt(_("Path: VLE_HOME '%1%' does not exist")) % path).str());
+            return;
         }
-    } else {
-        m_pimpl->m_home.clear();
+
+        if (path.create_directories()) {
+            m_pimpl->m_home = path;
+            return;
+        }
     }
+
+    auto homedrive = get_environment_variable("HOMEDRIVE");
+    auto homepath = get_environment_variable("HOMEPATH");
+
+    Path home(homedrive);
+    home /= homepath;
+    home /= "vle";
+
+    if (home.is_directory()) {
+        m_pimpl->m_home = home;
+        return;
+    }
+
+    if (home.create_directories()) {
+        m_pimpl->m_home = home;
+        return;
+    }
+
+    std::string description("Failed to initialize home directory in `");
+    description += home.string();
+    description += "` or using the VLE_HOME environment variable.";
+
+    show_message_box(description);
+#else
+    char* cvlehome = std::getenv("VLE_HOME");
+    if (cvlehome) {
+        Path home(cvlehome);
+
+        if (home.is_directory()) {
+            m_pimpl->m_home = home;
+            return;
+        }
+
+        if (home.create_directories()) {
+            m_pimpl->m_home = home;
+            return;
+        }
+
+        vInfo(this,
+              "$VLE_HOME (%s) defined but not usable.\n",
+              home.string().c_str());
+    }
+
+    char* chome = std::getenv("HOME");
+    if (chome) {
+        Path home(chome);
+        home /= ".vle";
+
+        if (home.is_directory()) {
+            m_pimpl->m_home = home;
+            return;
+        }
+
+        if (home.create_directories()) {
+            m_pimpl->m_home = home;
+            return;
+        }
+
+        vInfo(this, "$HOME/.vle (%s) not usable.\n", home.string().c_str());
+    }
+#endif
+
+    m_pimpl->m_home = ".";
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

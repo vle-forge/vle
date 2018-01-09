@@ -163,8 +163,7 @@ public:
       , m_status(0)
       , m_start(false)
       , m_finish(true)
-    {
-    }
+    {}
 
     void init(std::chrono::milliseconds waitchildtimeout)
     {
@@ -254,15 +253,15 @@ public:
         return true;
     }
 
-    bool initchild(const std::string& exe,
-                   const std::string& workingdir,
+    bool initchild(const Path& exe,
+                   const Path& workingdir,
                    std::vector<std::string> args)
     {
-        if (::chdir(workingdir.c_str())) {
+        if (::chdir(workingdir.string().c_str())) {
             vErr(m_context,
                  _("Spawn: child fails to change current directory:"
                    " to `%s'\n"),
-                 workingdir.c_str());
+                 workingdir.string().c_str());
             std::abort();
         }
 
@@ -274,12 +273,12 @@ public:
         ::close(m_pipeout[0]);
         ::close(m_pipeerr[0]);
 
-        args.insert(args.begin(), exe);
+        args.insert(args.begin(), exe.string());
 
         char** localenvp = prepare_environment_variable();
         char** localargv = convert_string_str_array(args);
 
-        ::execve(exe.c_str(), localargv, localenvp);
+        ::execve(exe.string().c_str(), localargv, localenvp);
 
         free_str_array(localargv);
         free_str_array(localenvp);
@@ -299,15 +298,15 @@ public:
         return is_running();
     }
 
-    bool start(const std::string& exe,
-               const std::string& workingdir,
+    bool start(const Path& exe,
+               const Path& workingdir,
                const std::vector<std::string>& args)
     {
         assert(m_finish);
         m_start = true;
         m_finish = false;
 
-        m_command = exe;
+        m_command = exe.string();
         pid_t localpid;
         int err;
 
@@ -407,7 +406,8 @@ public:
                        .str();
             *success = false;
         } else if (WIFCONTINUED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) continued\n") % m_command % m_pid).str();
+            m_msg +=
+              (fmt("[%1%] (%2%) continued\n") % m_command % m_pid).str();
             *success = false;
         }
 
@@ -418,15 +418,15 @@ public:
 };
 
 Spawn::Spawn(ContextPtr ctx)
-  : m_pimpl(std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
-{
-}
+  : m_pimpl(
+      std::make_unique<Spawn::Pimpl>(ctx, std::chrono::milliseconds{ 5 }))
+{}
 
 Spawn::~Spawn() = default;
 
 bool
-Spawn::start(const std::string& exe,
-             const std::string& workingdir,
+Spawn::start(const Path& exe,
+             const Path& workingdir,
              const std::vector<std::string>& args,
              std::chrono::milliseconds waitchildtimeout)
 {
@@ -434,8 +434,8 @@ Spawn::start(const std::string& exe,
 
     vDbg(m_pimpl->m_context,
          _("Spawn: command: `%s' chdir: `%s'\n"),
-         exe.c_str(),
-         workingdir.c_str());
+         exe.string().c_str(),
+         workingdir.string().c_str());
 
     for (const auto& elem : args) {
         vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());
@@ -490,7 +490,8 @@ Spawn::splitCommandLine(const std::string& command)
 
     if (argv.empty())
         throw utils::ArgError(
-          (fmt(_("Package command line: error, empty command `%1%'")) % command)
+          (fmt(_("Package command line: error, empty command `%1%'")) %
+           command)
             .str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();

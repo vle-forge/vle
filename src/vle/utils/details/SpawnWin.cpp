@@ -24,11 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <windows.h>
-
-#include <direct.h>
-
-#include <winbase.h>
+#include <vle/utils/details/UtilsWin.hpp>
 
 #include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
@@ -41,6 +37,7 @@
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/details/ShellUtils.hpp>
 #include <vle/utils/details/UtilsWin.hpp>
 #include <vle/utils/i18n.hpp>
@@ -48,276 +45,65 @@
 namespace vle {
 namespace utils {
 
-// Max default size of command line buffer. See the CreateProcess
-// function in msdn.
+/* Max default size of command line buffer. See the CreateProcess function
+ * in msdn. */
 const unsigned long int Spawn::default_buffer_size = 32768;
 
-typedef std::vector<std::pair<std::string, std::string>> Envp;
+/* Envp is used to store the environment variables in utf-8. */
+using Envp = std::vector<std::pair<std::string, std::string>>;
 
-/**
- * A specific \b Win32 function to build a new environment
- * variable.
- *
- * @param[out] envp
- * @param variable
- * @param value
- * @param append either with in places values or in env vars
- *
- */
-static void
-replaceEnvironmentVariable(Envp& envp,
-                           const std::string& variable,
-                           const std::string& value,
-                           bool append)
+static std::wstring
+win32_quote(const std::wstring& arg)
 {
-    // check if in envp
-    Envp::iterator itb = envp.begin();
-    Envp::iterator ite = envp.end();
-    Envp::iterator itf = ite;
-    for (; (itb != ite) and (itf == ite); itb++) {
-        if (itb->first == variable) {
-            itf = itb;
-        }
-    }
+    if (not arg.empty() and arg.find_first_of(L" \t\n\v\"") == arg.npos)
+        return arg;
 
-    if (itf != ite) { // found in envp
-        Envp::value_type& result = *itf;
-        if (append) {
-            result.second = value + ";" + result.second;
+    std::wstring result;
+    result += L'"';
+
+    for (auto it = arg.begin();; ++it) {
+        unsigned NumberBackslashes = 0;
+
+        while (it != arg.end() and *it == L'\\') {
+            ++it;
+            ++NumberBackslashes;
+        }
+
+        if (it == arg.end()) {
+            result.append(NumberBackslashes * 2, L'\\');
+            break;
+        } else if (*it == '"') {
+            result.append(NumberBackslashes * 2 + 1, L'\\');
+            result.push_back(*it);
         } else {
-            result.second = value;
-        }
-    } else { // not in envp
-        Envp::value_type result;
-        result.first = variable;
-        result.second = value;
-        if (append) {
-            char* env = std::getenv(variable.c_str());
-            if (env != NULL) {
-                std::string old(env, std::strlen(env));
-                result.second += ";";
-                result.second += old;
-            }
-        }
-        envp.push_back(result);
-    }
-}
-
-/**
- * Build list of string which represents the 'VARIABLE=VALUE'
- * environment variable.
- *
- * @attention @b Win32: the PKG_CONFIG_FILE is path is update with the
- * vle's pkgconfig directory. The BOOST_ROOT, BOOST_INCLUDEDIR and
- * BOOST_LIBRARYDIR are assigned with the vle's patch to avoid
- * conflict with different boost version.
- *
- * @return A list of string.
- */
-static Envp
-prepareEnvironmentVariable(vle::utils::ContextPtr ctx)
-{
-    Envp envp;
-    char* env_char = ::GetEnvironmentStrings();
-    if (env_char == NULL) {
-        throw vle::utils::InternalError(
-          "[SpawnWin] error reading environmental variables");
-    }
-    unsigned int prev = 0;
-    std::string env_string;
-    for (unsigned int i = 0;; i++) {
-        if (env_char[i] == '\0') {
-            env_string.assign(std::string(env_char + prev, env_char + i));
-            std::vector<std::string> splitvec;
-            boost::algorithm::split(splitvec,
-                                    env_string,
-                                    boost::is_any_of("="),
-                                    boost::algorithm::token_compress_on);
-            if ((splitvec.size() == 2) and (not splitvec[0].empty()) and
-                (splitvec[0].size() > 1)) {
-                replaceEnvironmentVariable(
-                  envp,
-                  splitvec[0].substr(1), // don't know why we
-                  // have to remove a blank
-                  splitvec[1],
-                  false);
-            }
-            prev = i;
-            if (env_char[i + 1] == '\0') {
-                break;
-            }
+            result.append(NumberBackslashes, L'\\');
+            result.push_back(*it);
         }
     }
-    ::FreeEnvironmentStrings(env_char);
 
-    Path prefix = UtilsWin::convertPathTo83Path(ctx->getPrefixDir());
-
-    {
-        Path bin = prefix;
-        bin /= "bin";
-
-        replaceEnvironmentVariable(envp, "PATH", bin.string(), true);
-        replaceEnvironmentVariable(envp, "Path", bin.string(), true);
-    }
-
-    {
-        Path lib = prefix;
-        lib /= "lib";
-        lib /= "pkgconfig";
-
-        replaceEnvironmentVariable(
-          envp, "PKG_CONFIG_PATH", lib.string(), false);
-    }
-
-    {
-        Path inc = prefix;
-        inc /= "include";
-
-        replaceEnvironmentVariable(
-          envp, "BOOST_INCLUDEDIR", inc.string(), false);
-    }
-
-    {
-        Path lib = prefix;
-        lib /= "lib";
-
-        replaceEnvironmentVariable(
-          envp, "BOOST_LIBRARYDIR", lib.string(), false);
-    }
-
-    replaceEnvironmentVariable(envp, "BOOST_ROOT", prefix.string(), false);
-
-    return envp;
-}
-
-static std::string
-win32_quote(const std::string& arg)
-{
-    std::string result;
-
-    if (not arg.empty() and arg.find_first_of(" \t\n\v\"") == arg.npos) {
-        result.append(arg);
-    } else {
-        result.push_back('"');
-
-        for (std::string::const_iterator it = arg.begin();; ++it) {
-            unsigned NumberBackslashes = 0;
-
-            while (it != arg.end() and *it == '\\') {
-                ++it;
-                ++NumberBackslashes;
-            }
-
-            if (it == arg.end()) {
-                result.append(NumberBackslashes * 2, '\\');
-                break;
-            } else if (*it == '"') {
-                result.append(NumberBackslashes * 2 + 1, '\\');
-                result.push_back(*it);
-            } else {
-                result.append(NumberBackslashes, '\\');
-                result.push_back(*it);
-            }
-        }
-
-        result.push_back('"');
-    }
+    result += L'"';
 
     return result;
 }
 
-struct win32_argv_quote : public std::unary_function<std::string, void>
+static std::wstring
+build_command_line(const Path& exe, const std::vector<std::string>& args)
 {
-    std::string* cmd;
-    char separator;
+    std::wstring ret;
+    ret.reserve(Spawn::default_buffer_size);
 
-    win32_argv_quote(std::string* cmd, char separator)
-      : cmd(cmd)
-      , separator(separator)
-    {}
+    ret = win32_quote(exe.wstring());
+    ret += L' ';
 
-    ~win32_argv_quote()
-    {}
-
-    void operator()(const std::string& arg)
-    {
-        cmd->append(win32_quote(arg));
-        cmd->push_back(separator);
+    for (auto elem : args) {
+        ret += win32_quote(from_utf8_to_wide(elem));
+        ret += L' ';
     }
-};
 
-struct win32_envp_quote : public std::unary_function<Envp::value_type, void>
-{
-    std::string* cmd;
+    /* Remove the latest ` ' to avoid bad variable string. */
+    ret.resize(ret.size() - 1);
 
-    win32_envp_quote(std::string* cmd)
-      : cmd(cmd)
-    {}
-
-    ~win32_envp_quote()
-    {}
-
-    void operator()(const Envp::value_type& arg)
-    {
-        if (not arg.first.empty()) {
-            std::vector<std::string> tokens;
-
-            boost::algorithm::split(tokens,
-                                    arg.second,
-                                    boost::algorithm::is_any_of(";"),
-                                    boost::algorithm::token_compress_on);
-
-            cmd->append(arg.first);
-            cmd->push_back('=');
-
-            std::for_each(
-              tokens.begin(), tokens.end(), win32_argv_quote(cmd, ';'));
-
-            cmd->operator[](cmd->size() - 1) =
-              '\0'; /**< remove the last `;' to
-                     * avoid bad environment.*/
-        }
-    }
-};
-
-static char*
-build_command_line(const std::string& exe,
-                   const std::vector<std::string>& args)
-{
-    std::string cmd;
-    char* buf;
-
-    cmd.reserve(Spawn::default_buffer_size);
-    cmd.append(win32_quote(exe));
-    cmd.push_back(' ');
-
-    std::for_each(args.begin(), args.end(), win32_argv_quote(&cmd, ' '));
-
-    buf = (char*)malloc(cmd.size() + 1);
-    if (buf) {
-        strncpy(buf, cmd.c_str(), cmd.size());
-    }
-    buf[cmd.size()] = '\0';
-
-    return buf;
-}
-
-static char*
-prepare_environment_variable(vle::utils::ContextPtr ctx)
-{
-    Envp envp = prepareEnvironmentVariable(ctx);
-
-    std::string cmd;
-    cmd.reserve(Spawn::default_buffer_size);
-
-    std::for_each(envp.begin(), envp.end(), win32_envp_quote(&cmd));
-    cmd.push_back('\0');
-
-    char* result = (char*)malloc(sizeof(char) * (cmd.size() + 1));
-
-    std::copy(cmd.begin(), cmd.end(), result);
-
-    return result;
+    return ret;
 }
 
 struct Spawn::Pimpl
@@ -509,8 +295,8 @@ struct Spawn::Pimpl
         return true;
     }
 
-    bool start(const std::string& exe,
-               const std::string& workingdir,
+    bool start(const Path& exe,
+               const Path& workingdir,
                const std::vector<std::string>& args)
     {
         m_start = true;
@@ -520,11 +306,9 @@ struct Spawn::Pimpl
         HANDLE hErrorReadTmp = INVALID_HANDLE_VALUE;
         HANDLE hOutputWrite = INVALID_HANDLE_VALUE;
         HANDLE hErrorWrite = INVALID_HANDLE_VALUE;
-        STARTUPINFO startupinfo;
+        STARTUPINFOW startupinfo;
         SECURITY_ATTRIBUTES securityatt;
         SECURITY_DESCRIPTOR securitydescriptor;
-        char* cmdline = NULL;
-        LPVOID envp;
 
         InitializeSecurityDescriptor(&securitydescriptor,
                                      SECURITY_DESCRIPTOR_REVISION);
@@ -542,7 +326,7 @@ struct Spawn::Pimpl
                              0,
                              FALSE,
                              DUPLICATE_SAME_ACCESS))
-            goto pipe_out_failure;
+            return false;
 
         if (!CreatePipe(&hErrorReadTmp, &hErrorWrite, &securityatt, 0) ||
             !DuplicateHandle(GetCurrentProcess(),
@@ -551,13 +335,17 @@ struct Spawn::Pimpl
                              &hErrorRead,
                              0,
                              TRUE,
-                             DUPLICATE_SAME_ACCESS))
-            goto pipe_err_failure;
+                             DUPLICATE_SAME_ACCESS)) {
+            CloseHandle(hOutputReadTmp);
+            CloseHandle(hOutputRead);
+            CloseHandle(hOutputWrite);
+            return false;
+        }
 
         CloseHandle(hOutputReadTmp);
         CloseHandle(hErrorReadTmp);
 
-        GetStartupInfo(&startupinfo);
+        GetStartupInfoW(&startupinfo);
         startupinfo.cb = sizeof(STARTUPINFO);
         startupinfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
         startupinfo.hStdOutput = hOutputWrite;
@@ -565,32 +353,32 @@ struct Spawn::Pimpl
         startupinfo.hStdError = hErrorWrite;
         startupinfo.wShowWindow = SW_SHOWDEFAULT;
 
-        cmdline = build_command_line(exe, args);
-        if (!cmdline)
-            goto malloc_failure;
+        std::wstring cmdline = build_command_line(exe, args);
+        // std::wstring envp = w_prepare_environment_variable(m_context);
 
-        envp = prepare_environment_variable(m_context);
-        if (!envp)
-            goto malloc_failure;
+        if (cmdline.empty())
+            goto create_process_failure;
 
-        ouputfs << "Cmd: [" << cmdline << "]\n";
-        errorfs << "Cmd: [" << cmdline << "]\n";
+        ouputfs << "Command: [" << from_wide_to_utf8(cmdline) << "]\n";
 
         ZeroMemory(&m_pi, sizeof(PROCESS_INFORMATION));
 
-        if (!(CreateProcess(NULL,
-                            cmdline,
-                            NULL,
-                            NULL,
-                            TRUE,
-                            CREATE_NO_WINDOW,
-                            envp,
-                            workingdir.c_str(),
-                            &startupinfo,
-                            &m_pi)))
-            goto create_process_failure;
+        if (!(CreateProcessW(NULL,
+                             &cmdline[0],
+                             NULL,
+                             NULL,
+                             TRUE,
+                             CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT,
+                             NULL,
+                             workingdir.wstring().c_str(),
+                             &startupinfo,
+                             &m_pi))) {
 
-        free(cmdline);
+            auto msg = format_message(GetLastError());
+            show_message_box(msg);
+
+            goto create_process_failure;
+        }
 
         CloseHandle(hOutputWrite);
         CloseHandle(hErrorWrite);
@@ -598,60 +386,22 @@ struct Spawn::Pimpl
         Sleep(25);
 
         ouputfs << "CreateProcess success\n";
-        errorfs << "CreateProcess success\n";
-
         return true;
 
     create_process_failure:
-        free(cmdline);
-
-    malloc_failure:
-        CloseHandle(hErrorReadTmp);
         CloseHandle(hErrorRead);
         CloseHandle(hErrorWrite);
-
-    pipe_err_failure:
-        CloseHandle(hOutputReadTmp);
         CloseHandle(hOutputRead);
         CloseHandle(hOutputWrite);
-
-    pipe_out_failure:
         return false;
     }
 
     void format(const char* function, DWORD error)
     {
-        LPVOID buffer;
-        LPVOID displaybuffer;
-
-        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                        FORMAT_MESSAGE_FROM_SYSTEM |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                      NULL,
-                      error,
-                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                      (LPTSTR)&buffer,
-                      0,
-                      NULL);
-
-        displaybuffer = (LPVOID)LocalAlloc(
-          LMEM_ZEROINIT,
-          (lstrlen((LPCTSTR)buffer) + lstrlen((LPCTSTR)function) + 40) *
-            sizeof(TCHAR));
-
-        StringCchPrintf((LPTSTR)displaybuffer,
-                        LocalSize(displaybuffer) / sizeof(TCHAR),
-                        TEXT("%s failed with error %d: %s"),
-                        function,
-                        error,
-                        buffer);
-
-        // MessageBox(NULL, (LPCTSTR)displaybuffer, TEXT("Error"), MB_OK);
-
-        vDbg(m_context, "%s\n", (char*)displaybuffer);
-
-        LocalFree(buffer);
-        LocalFree(displaybuffer);
+        vErr(m_context,
+             "%s failed: %s\n",
+             function,
+             format_message(error).c_str());
     }
 
     bool wait()
@@ -721,8 +471,8 @@ Spawn::Spawn(ContextPtr ctx)
 Spawn::~Spawn() = default;
 
 bool
-Spawn::start(const std::string& exe,
-             const std::string& workingdir,
+Spawn::start(const Path& exe,
+             const Path& workingdir,
              const std::vector<std::string>& args,
              std::chrono::milliseconds waitchildtimeout)
 {
@@ -730,8 +480,8 @@ Spawn::start(const std::string& exe,
 
     vDbg(m_pimpl->m_context,
          _("Spawn: command: `%s' chdir: `%s'\n"),
-         exe.c_str(),
-         workingdir.c_str());
+         exe.string().c_str(),
+         workingdir.string().c_str());
 
     for (const auto& elem : args) {
         vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());

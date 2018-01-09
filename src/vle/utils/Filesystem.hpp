@@ -93,7 +93,6 @@ public:
 #if defined(_WIN32)
     Path(const std::wstring& wstring);
     Path(const wchar_t* wstring);
-    Path& operator=(const std::wstring& str);
 #endif
     Path(const Path& path);
     Path(Path&& path);

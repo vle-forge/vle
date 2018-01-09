@@ -32,6 +32,7 @@
 #include <vector>
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Context.hpp>
+#include <vle/utils/Filesystem.hpp>
 
 namespace vle {
 namespace utils {
@@ -101,8 +102,8 @@ public:
      *
      * @return
      */
-    bool start(const std::string& exe,
-               const std::string& workingdir,
+    bool start(const Path& exe,
+               const Path& workingdir,
                const std::vector<std::string>& args,
                std::chrono::milliseconds waitchildtimeout =
                  std::chrono::milliseconds{ 5 });

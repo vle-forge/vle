@@ -12,6 +12,10 @@
     - Add DirectoryEntry and DirectoryIterator to pass trough repertory.
 */
 
+#ifdef _WIN32
+#include <vle/utils/details/UtilsWin.hpp>
+#endif
+
 #include <array>
 #include <cassert>
 #include <cctype>
@@ -20,7 +24,6 @@
 #include <cstring>
 #include <fstream>
 #include <random>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -29,10 +32,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 
-#if defined(_WIN32)
-#include <direct.h>
-#include <windows.h>
-#else
+#if !defined(_WIN32)
 #include <unistd.h>
 #endif
 
@@ -54,22 +54,19 @@ namespace utils {
 Path::Path()
   : m_type(native_path)
   , m_absolute(false)
-{
-}
+{}
 
 Path::Path(const Path& path)
   : m_path(path.m_path)
   , m_type(path.m_type)
   , m_absolute(path.m_absolute)
-{
-}
+{}
 
 Path::Path(Path&& path)
   : m_path(std::move(path.m_path))
   , m_type(path.m_type)
   , m_absolute(path.m_absolute)
-{
-}
+{}
 
 Path::Path(const char* string)
 {
@@ -90,7 +87,8 @@ Path::Path(const std::wstring& wstring)
 
 Path::Path(const wchar_t* wstring)
 {
-    set(wstring);
+    if (wstring)
+        set(wstring);
 }
 #endif
 
@@ -122,7 +120,7 @@ bool
 Path::exists() const
 {
 #if defined(_WIN32)
-    return GetFileAttributesW(wstring().c_str()) != INVALID_FILE_ATTRIBUTES;
+    return ::GetFileAttributesW(wstring().c_str()) != INVALID_FILE_ATTRIBUTES;
 #else
     struct stat sb;
     return stat(string().c_str(), &sb) == 0;
@@ -150,10 +148,9 @@ bool
 Path::is_directory() const
 {
 #if defined(_WIN32)
-    DWORD result = GetFileAttributesW(wstring().c_str());
-    if (result == INVALID_FILE_ATTRIBUTES)
-        return false;
-    return (result & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    DWORD result = ::GetFileAttributesW(wstring().c_str());
+    return ((result != INVALID_FILE_ATTRIBUTES) &&
+            (result & FILE_ATTRIBUTE_DIRECTORY) != 0);
 #else
     struct stat sb;
     if (stat(string().c_str(), &sb))
@@ -166,9 +163,9 @@ bool
 Path::is_file() const
 {
 #if defined(_WIN32)
-    DWORD attr = GetFileAttributesW(wstring().c_str());
-    return (attr != INVALID_FILE_ATTRIBUTES &&
-            (attr & FILE_ATTRIBUTE_DIRECTORY) == 0);
+    DWORD result = ::GetFileAttributesW(wstring().c_str());
+    return ((result != INVALID_FILE_ATTRIBUTES) &&
+            (result & FILE_ATTRIBUTE_DIRECTORY) == 0);
 #else
     struct stat sb;
     if (stat(string().c_str(), &sb))
@@ -253,8 +250,8 @@ Path::operator/=(const Path& other)
     if (other.m_absolute)
         throw FileError(_("Path::operator/(): expected a relative path"));
 
-    std::copy(
-      other.m_path.begin(), other.m_path.end(), std::back_inserter(m_path));
+    for (const auto& elem : other.m_path)
+        m_path.push_back(elem);
 
     return *this;
 }
@@ -262,22 +259,32 @@ Path::operator/=(const Path& other)
 std::string
 Path::string(path_type type) const
 {
-    std::ostringstream oss;
+    std::size_t size =
+      std::accumulate(m_path.cbegin(),
+                      m_path.cend(),
+                      static_cast<std::size_t>(0),
+                      [](std::size_t size, const std::string& str) {
+                          return size + str.size();
+                      });
 
-    if (m_type == posix_path && m_absolute)
-        oss << "/";
+    std::string ret;
+    ret.reserve(size + m_path.size());
 
-    for (size_t i = 0; i < m_path.size(); ++i) {
-        oss << m_path[i];
-        if (i + 1 < m_path.size()) {
+    if (m_type == posix_path and m_absolute)
+        ret += "/";
+
+    for (std::size_t i = 0, e = m_path.size(); i != e; ++i) {
+        ret += m_path[i].c_str();
+
+        if ((i + 1) < m_path.size()) {
             if (type == posix_path)
-                oss << '/';
+                ret += '/';
             else
-                oss << '\\';
+                ret += '\\';
         }
     }
 
-    return oss.str();
+    return ret;
 }
 
 void
@@ -322,13 +329,13 @@ Path::remove() const
 #if !defined(_WIN32)
         return std::remove(string().c_str()) == 0;
 #else
-        return DeleteFileW(wstring().c_str()) != 0;
+        return ::DeleteFileW(wstring().c_str()) != 0;
 #endif
     } else {
 #if !defined(_WIN32)
         return rmdir(string().c_str()) == 0;
 #else
-        return _rmdir(string().c_str()) == 0;
+        return ::RemoveDirectoryW(wstring().c_str());
 #endif
     }
 }
@@ -391,10 +398,19 @@ Path::current_path()
         throw FileError(_("Internal error in getcwd(): %s"), strerror(errno));
     return Path(temp);
 #else
-    std::wstring temp(MAX_PATH, '\0');
-    if (!_wgetcwd(&temp[0], MAX_PATH))
+    std::wstring buffer(MAX_PATH, '\0');
+    DWORD ret = ::GetCurrentDirectoryW(buffer.size(), &buffer[0]);
+
+    while (ret > buffer.size()) {
+        buffer.resize(ret, '\0');
+        ret = ::GetCurrentDirectoryW(ret, &buffer[0]);
+    }
+
+    if (ret == 0)
         throw FileError(_("Internal error in getcwd(): %lu"), GetLastError());
-    return Path(temp.c_str());
+
+    buffer.resize(ret);
+    return Path(buffer);
 #endif
 }
 
@@ -404,7 +420,7 @@ Path::current_path(const Path& p)
 #if !defined(_WIN32)
     return ::chdir(p.string().c_str()) == 0;
 #else
-    return ::_chdir(p.string().c_str()) == 0;
+    return ::SetCurrentDirectoryW(p.wstring().c_str());
 #endif
 }
 
@@ -428,17 +444,19 @@ Path::temp_directory_path()
 
     return { "/tmp" };
 #else
-    const DWORD nBufferLength = MAX_PATH + 1;
-    char buffer[nBufferLength];
-    Path path;
+    std::wstring buffer(MAX_PATH, '\0');
+    auto ret = ::GetTempPathW(buffer.size(), &buffer[0]);
 
-    auto result = GetTempPath(nBufferLength, static_cast<LPSTR>(&buffer[0]));
-    if (result > 0) {
-        buffer[result] = '\0';
-        path = buffer;
+    while (ret > buffer.size()) {
+        buffer.resize(ret, '\0');
+        ret = ::GetTempPathW(buffer.size(), &buffer[0]);
     }
 
-    return path;
+    if (ret == 0)
+        return Path(L"C:\\Windows\\Temp");
+
+    buffer.resize(ret);
+    return Path(buffer);
 #endif
 }
 
@@ -493,41 +511,15 @@ Path::copy_file(const Path& from, const Path& to)
 std::wstring
 Path::wstring(path_type type) const
 {
-    std::string temp = string(type);
-    int size =
-      MultiByteToWideChar(CP_UTF8, 0, &temp[0], (int)temp.size(), NULL, 0);
-    std::wstring result(size, 0);
-    MultiByteToWideChar(
-      CP_UTF8, 0, &temp[0], (int)temp.size(), &result[0], size);
-    return result;
+    return from_utf8_to_wide(string(type));
 }
 
 void
 Path::set(const std::wstring& wstring, path_type type)
 {
-    std::string string;
-    if (!wstring.empty()) {
-        int size = WideCharToMultiByte(
-          CP_UTF8, 0, &wstring[0], (int)wstring.size(), NULL, 0, NULL, NULL);
-        string.resize(size, 0);
-        WideCharToMultiByte(CP_UTF8,
-                            0,
-                            &wstring[0],
-                            (int)wstring.size(),
-                            &string[0],
-                            size,
-                            NULL,
-                            NULL);
-    }
-    set(string, type);
+    set(from_wide_to_utf8(wstring), type);
 }
 
-Path&
-Path::operator=(const std::wstring& str)
-{
-    set(str);
-    return *this;
-}
 #endif
 
 bool
@@ -598,8 +590,7 @@ DirectoryEntry::DirectoryEntry()
   : m_path()
   , m_is_file(false)
   , m_is_directory(false)
-{
-}
+{}
 
 const Path&
 DirectoryEntry::path() const
@@ -630,7 +621,7 @@ struct DirectoryIterator::Pimpl
 
 #if defined(_WIN32)
     HANDLE hFind = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATA ffd;
+    WIN32_FIND_DATAW ffd;
 #else
     DIR* m_directory;
 #endif
@@ -647,23 +638,22 @@ public:
     {
         Path spec = m_path / "*.*";
 
-        hFind = FindFirstFile(spec.string().c_str(), &ffd);
+        hFind = FindFirstFileW(spec.wstring().c_str(), &ffd);
         if (hFind == INVALID_HANDLE_VALUE)
             throw FileError(
               _("DirectoryEntry: Path does not exist or could not be read."));
 
         do {
-            if (strcmp(ffd.cFileName, ".") == 0 or
-                strcmp(ffd.cFileName, "..") == 0) {
-                continue;
-            } else {
-                m_entry.m_path = m_path / ffd.cFileName;
+            std::string filename(from_tchar(ffd.cFileName));
+
+            if (filename != "." and filename != "..") {
+                m_entry.m_path = m_path / filename;
                 m_entry.m_is_directory =
                   ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
                 m_entry.m_is_file = not m_entry.m_is_directory;
                 return;
             }
-        } while (FindNextFile(hFind, &ffd) != 0);
+        } while (FindNextFileW(hFind, &ffd) != 0);
 
         m_finish = true;
     }
@@ -685,12 +675,11 @@ public:
     {
         assert(not m_finish);
 #if defined(_WIN32)
-        while (FindNextFile(hFind, &ffd) != 0) {
-            if (strcmp(ffd.cFileName, ".") == 0 or
-                strcmp(ffd.cFileName, "..") == 0) {
-                continue;
-            } else {
-                m_entry.m_path = m_path / ffd.cFileName;
+        while (FindNextFileW(hFind, &ffd) != 0) {
+            std::string filename(from_tchar(ffd.cFileName));
+
+            if (filename != "." and filename != "..") {
+                m_entry.m_path = m_path / filename;
                 m_entry.m_is_directory =
                   ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
                 m_entry.m_is_file = not m_entry.m_is_directory;
@@ -733,8 +722,7 @@ public:
 
 DirectoryIterator::DirectoryIterator()
   : m_pimpl()
-{
-}
+{}
 
 DirectoryIterator::DirectoryIterator(const Path& p)
   : m_pimpl(std::make_shared<DirectoryIterator::Pimpl>(p))

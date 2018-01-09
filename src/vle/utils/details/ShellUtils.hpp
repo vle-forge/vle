@@ -316,10 +316,10 @@ public:
                     /* discard all unquoted blanks (don't add them to a token)
                      */
                     break;
-                /* single/double quotes are appended to the token,
-                 * escapes are maybe appended next time through the loop,
-                 * comment chars are never appended.
-                 */
+                    /* single/double quotes are appended to the token,
+                     * escapes are maybe appended next time through the loop,
+                     * comment chars are never appended.
+                     */
 
                 case '\'':
                 case '"':

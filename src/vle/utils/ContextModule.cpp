@@ -24,6 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef _WIN32
+#include <vle/utils/details/UtilsWin.hpp>
+#else
+#include <dlfcn.h>
+#endif
+
 #include <boost/version.hpp>
 #include <unordered_map>
 #include <vle/utils/Algo.hpp>
@@ -32,12 +38,6 @@
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <dlfcn.h>
-#endif
 
 namespace vle {
 namespace utils {
@@ -109,8 +109,7 @@ struct Module
       , mHandle(nullptr)
       , mFunction(nullptr)
       , mType(type)
-    {
-    }
+    {}
 
     /**
      * @brief Delete the instance of the shared library.
@@ -201,29 +200,17 @@ struct Module
         assert(not mHandle);
 
 #ifdef _WIN32
-        HMODULE handle = ::LoadLibrary(mPath.string().c_str());
+        HMODULE handle = ::LoadLibraryW(mPath.wstring().c_str());
 #else
-        void* handle = ::dlopen(mPath.string().c_str(), RTLD_LAZY | RTLD_LOCAL);
+        void* handle =
+          ::dlopen(mPath.string().c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
 
         if (not handle) {
             std::string extra;
 #ifdef _WIN32
             DWORD errorcode = ::GetLastError();
-            LPVOID msg;
-
-            ::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                              FORMAT_MESSAGE_FROM_SYSTEM |
-                              FORMAT_MESSAGE_IGNORE_INSERTS,
-                            NULL,
-                            errorcode,
-                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                            (LPTSTR)&msg,
-                            0,
-                            NULL);
-
-            extra.assign((LPTSTR)msg);
-            ::LocalFree(msg);
+            extra = format_message(errorcode);
 #else
             char* error = ::dlerror();
             if (error) {
@@ -334,7 +321,8 @@ public:
         void* result = nullptr;
 
 #ifdef _WIN32
-        FARPROC ptr = ::GetProcAddress(NULL, symbol.c_str());
+        FARPROC ptr =
+          ::GetProcAddress(::GetModuleHandleW(NULL), symbol.c_str());
         result = (void*)ptr;
 #else
         result = ::dlsym(nullptr, symbol.c_str());
@@ -430,8 +418,7 @@ struct ModuleManager
 
         ModuleIsInPackage(const std::string& package)
           : mPackage(package)
-        {
-        }
+        {}
 
         bool operator()(const ModuleTable::value_type& module) const
         {
@@ -653,7 +640,8 @@ struct ModuleManager
      * @param type The type of module to by retrieve.
      * @param[out] lst An output parameter, all modules are pushed backward.
      */
-    void fill(Context::ModuleType type, std::vector<Context::Module>* lst) const
+    void fill(Context::ModuleType type,
+              std::vector<Context::Module>* lst) const
     {
         switch (type) {
         case Context::ModuleType::MODULE_DYNAMICS:

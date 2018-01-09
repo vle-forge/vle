@@ -64,9 +64,16 @@ struct F
     F()
     {
         current_path = vle::utils::Path::temp_directory_path();
+        printf("directory 1: %s\n", current_path.string().c_str());
         current_path /= "vle-%%%%-%%%%-%%%%";
+        printf("directory 2: %s\n", current_path.string().c_str());
+
+        printf("directory is_absolute: %d\n", current_path.is_absolute());
+
         current_path = vle::utils::Path::unique_path(current_path.string());
+        printf("directory 3: %s\n", current_path.string().c_str());
         current_path.create_directory();
+        printf("directory 4: %s\n", current_path.string().c_str());
 
         /* We need to ensure each file really installed. */
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -454,7 +461,8 @@ test_compress_filepath(vle::utils::ContextPtr ctx)
     utils::Path tarfile(utils::Path::temp_directory_path());
     tarfile /= "check.tar.bz2";
 
-    EnsuresNotThrow(rmt.compress(uniquepath, tarfile.string()), std::exception);
+    EnsuresNotThrow(rmt.compress(uniquepath, tarfile.string()),
+                    std::exception);
 
     utils::Path t{ tarfile };
     Ensures(t.exists());
