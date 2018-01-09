@@ -82,7 +82,7 @@ public:
      * @code
      * # the `#' character to build a comment.
      * test { # a block
-     *    a = "a"; # a list of value
+     *    a = "a"; # a list of value
      *    b = 12.345;
      *    c = "a", "b", "c";
      *
@@ -100,7 +100,7 @@ public:
      * @param stream A standard input stream to read data.
      * @throw utils::ParseError if an error occured during parsing file.
      */
-    Parser(std::istream& stream) throw(utils::ParseError);
+    Parser(std::istream& stream);
 
     /**
      * @brief Access to the root of the data.

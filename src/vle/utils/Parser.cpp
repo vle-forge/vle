@@ -72,7 +72,7 @@ Block::getBlock(const std::string& name) const
     return it->second;
 }
 
-Parser::Parser(std::istream& stream) throw(utils::ParseError)
+Parser::Parser(std::istream& stream)
   : mRoot(std::string())
   , mStream(stream)
   , mLine(0)
