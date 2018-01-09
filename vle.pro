@@ -78,16 +78,21 @@ OTHER_FILES += defaults.pri
 RESOURCES += \
     src/vle/gvle/gvle.qrc
 
-share_files.path = $$DATADIR/
-share_files.files = share/README.md share/COPYING
+QMAKE_EXTRA_TARGETS += share_directory share_copy
+share_directory.target = $$DATADIR
+share_directory.commands = $(MKDIR) $$DATADIR
 
-share_template_files.path = $$DATADIR/
-share_template_files.files = share/template/
+share_copy.target = $$DATADIR/README.md
+share_copy.commands = $(COPY_DIR) share/ $$DATADIR/
+share_copy.depends = share_directory
 
-share_cmake_files.path = $$DATADIR/cmake
-share_cmake_files.files = share/cmake/FindGVLE.cmake share/cmake/FindQwt.cmake share/cmake/FindVLEDEPS.cmake share/cmake/VleUtilsConfig.cmake
+#share_template_files.path = $$DATADIR/
+#share_template_files.commands = $(COPY_DIR) share/template/ $$DATADIR
 
-share_dtd_files.path = $$DATADIR/dtd
-share_dtd_files.files = vle-0.5.0.dtd  vle-0.6.0.dtd  vle-0.7.0.dtd  vle-0.8.0.dtd  vle-0.9.0.dtd  vle-1.0.0.dtd  vle-1.1.0.dtd  vle-1.2.0.dtd  vle-1.3.0.dtd  vle-2.0.dtd
+#share_cmake_files.path = $$DATADIR/cmake
+#share_cmake_files.files = share/cmake/FindGVLE.cmake share/cmake/FindQwt.cmake share/cmake/FindVLEDEPS.cmake share/cmake/VleUtilsConfig.cmake
 
-INSTALLS += share_files share_template_files share_cmake_files share_dtd_files
+#share_dtd_files.path = $$DATADIR/dtd
+#share_dtd_files.files = vle-0.5.0.dtd  vle-0.6.0.dtd  vle-0.7.0.dtd  vle-0.8.0.dtd  vle-0.9.0.dtd  vle-1.0.0.dtd  vle-1.1.0.dtd  vle-1.2.0.dtd  vle-1.3.0.dtd  vle-2.0.dtd
+
+#INSTALLS += share_files share_template_files share_cmake_files share_dtd_files

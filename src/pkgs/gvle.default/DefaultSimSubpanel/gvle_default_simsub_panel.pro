@@ -24,11 +24,32 @@ HEADERS = DefaultSimSubpanel.h qcustomplot/qcustomplot.h
 
 SOURCES = DefaultSimSubpanel.cpp qcustomplot/qcustomplot.cpp
 
-target.path = $$LIBSDIR/pkgs/gvle.default/plugins/gvle/simulating
+target.path = $$LIBDIR/pkgs/gvle.default/plugins/gvle/simulating
 
 INSTALLS += target
 
+win32:CONFIG(release, debug|release): LIBS += $$OUT_PWD/../../../../src/release/vle-2.0.dll
+else:win32:CONFIG(debug, debug|release): LIBS += $$OUT_PWD/../../../../src/debug/vle-2.0.dll
+else:unix: LIBS += -L$$OUT_PWD/../../../src/ -lvle-2.0
+
+win32:CONFIG(release, debug|release): LIBS += $$OUT_PWD/../../../../src/vle/gvle/release/gvle-2.0.dll
+else:win32:CONFIG(debug, debug|release): LIBS += $$OUT_PWD/../../../../src/vle/gvle/debug/gvle-2.0.dll
+else:unix: LIBS += -L$$OUT_PWD/../../../src/ -lvle-2.0
+
+DEPENDPATH += $$PWD/../../../src
+
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../src/release/libvle-2.0.a
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../src/debug/libvle-2.0.a
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../src/libvle-2.0.a
+
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../src/vle/gvle/release/libgvle-2.0.a
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../src/vle/gvle/debug/libgvle-2.0.a
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../src/libvle-2.0.a
+
 macx {
-  LIBS += -L../../../../src -lvle-2.0
-  LIBS += -L../../../../src/vle/gvle -lgvle-2.0
+  QMAKE_CXXFLAGS += -I/usr/local/opt/boost/include
+}
+
+win32 {
+  QMAKE_INCDIR += d:\msys64\mingw32\include
 }

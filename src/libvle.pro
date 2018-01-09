@@ -7,16 +7,16 @@ CONFIG -= qt
 CONFIG += object_parallel_to_source
 CONFIG += create_pc create_prl no_install_prl
 
+win32:VERSION = $$VERSION_MAJOR.$$VERSION_MINOR.$$VERSION_PATCH.0
+else:VERSION = $$VERSION_MAJOR.$$VERSION_MINOR.$$VERSION_PATCH
+
+TEMPLATE = lib
+TARGET = vle-$$VERSION_ABI
+
 DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR" \
            "VERSION_MINOR=$$VERSION_MINOR" \
            "VERSION_PATCH=$$VERSION_PATCH" \
            "VERSION_EXTRA=\"$$VERSION_EXTRA\""
-
-VERSION = 0
-
-TEMPLATE = lib
-
-TARGET = vle-$$VERSION_ABI
 
 HEADERS = vle/manager/ExperimentGenerator.hpp \
   vle/manager/Simulation.hpp \
@@ -106,7 +106,8 @@ HEADERS = vle/manager/ExperimentGenerator.hpp \
   vle/vpz/ModelPortList.hpp \
   vle/vpz/Class.hpp \
   vle/vpz/Experiment.hpp \
-  vle/vle.hpp
+  vle/vle.hpp \
+    vle/utils/details/commonwin32.hpp
 
 SOURCES = vle/manager/ExperimentGenerator.cpp \
   vle/manager/Simulation.cpp \
@@ -197,6 +198,11 @@ win32 {
   SOURCES += vle/utils/details/SpawnWin.cpp \
     vle/utils/details/UtilsWin.cpp \
     vle/utils/details/PathWin32.cpp \
+
+  QMAKE_INCDIR += d:\msys64\mingw32\include
+  QMAKE_INCDIR += d:\msys64\mingw32\include\libxml2
+
+  LIBS += -L"d:\msys64\mingw32\lib" -lxml2
 }
 
 unix:!macx {
