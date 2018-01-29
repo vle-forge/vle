@@ -9,5 +9,5 @@ cmake    2.8  http://www.cmake.org
 Installation
 ============
 
-$ vle --package=MyProject configure
-$ vle --package=MyProject build
+$ vle --package MyProject configure
+$ vle --package MyProject build
