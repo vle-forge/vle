@@ -25,7 +25,7 @@ install:
 before_build:
   - set PATH=%MINGW_ROOT%\bin;%QT_DIR%\bin;%PATH%
   - set VLEDEPS_BASEPATH=C:\msys64\mingw32
-  - set prefix=%APPVEYOR_BUILD_FOLDER%\install
+  - set prefix=%APPVEYOR_BUILD_FOLDER%\release
 
 build_script:
   - cmake -E make_directory build
@@ -35,50 +35,23 @@ build_script:
 
 after_build:
   - windeployqt --list mapping --compiler-runtime --dir %prefix% %prefix%\bin\gvle.exe
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Core*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Core*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Gui*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Xml.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Xmld.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Help*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Network*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Sql*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Widgets*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5PrintSupport*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5Svg*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin\Qt5XmlPatterns*.dll %prefix%\bin\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\bin %prefix%\bin /exclude:Qt*.dll+windeployqt.exe+designer.exe+assistant.exe
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Core*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Gui*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Xml.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Xmld.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Help*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Network*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Sql*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Widgets*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5PrintSupport*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5Svg*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib\libQt5XmlPatterns*.dll.a %prefix%\lib
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\lib %prefix%\lib /exclude:libQt5*.*+terminfo
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtCore" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtGui" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtXml" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtHelp" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtNetwork" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtSql" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtWidgets" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtSvg" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include QtXmlPatterns" %prefix%\include\
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\include %prefix%\include\ /exclude:Qt*.*+
-  # - xcopy /C /Q /Y /S /E /T %QT_DIR%\share %prefix%\share\ /exclude:qt5/examples+qt5/doc+qt5/qml+doc+man+gtk-doc+terminfo+
-  - xcopy /C /Q /Y /S /E /T %MINGW_ROOT% %prefix%\
+  - xcopy -s -i -y C:/msys64/mingw32/bin/libxml2-2.dll %prefix%\bin
+  - xcopy -s -i -y C:/msys64/mingw32/bin/zlib1.dll %prefix%\bin
+  - xcopy -s -i -y C:/msys64/mingw32/bin/libiconv-2.dll %prefix%\bin
+  - xcopy -s -i -y C:/msys64/mingw32/bin/libintl-8.dll %prefix%\bin
+  - xcopy -s -i -y C:/msys64/mingw32/lib/libxml2.dll.a %prefix%\lib
+  - xcopy -s -i -y C:/msys64/mingw32/lib/libz.dll.a %prefix%\lib
+  - xcopy -s -i -y C:/msys64/mingw32/lib/libiconv.dll.a %prefix%\lib
+  - xcopy -s -i -y C:/msys64/mingw32/lib/libintl.dll.a %prefix%\lib
+  - md %prefix%/mingw530_32
+  - xcopy -s -i -y %MINGW_ROOT% %prefix%/mingw530_32
   - cmake --build build --target package
   - 7z a vle.zip %APPVEYOR_BUILD_FOLDER%\build\*.exe
+  - xcopy -s -i -y c:\Program Files\CMake %prefix%\
 
 test_script:
   - set PATH=%prefix%\bin;%PATH%
   - set CTEST_OUTPUT_ON_FAILURE=ON
-  # - cmake --build build --target test
 
 artifacts:
   - path: vle.zip
