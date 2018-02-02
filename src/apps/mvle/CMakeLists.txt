@@ -41,6 +41,5 @@ if (Boost_MPI_FOUND AND VLE_HAVE_CVLE)
 
   install(TARGETS cvle DESTINATION bin)
   install(FILES cvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
-    "mvle-${VLE_VERSION_SHORT}.1")
+    "cvle-${VLE_VERSION_SHORT}.1")
 endif()
-
