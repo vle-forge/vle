@@ -69,7 +69,7 @@ else (WIN32)
 endif (WIN32)
 
 if (DEFINED VLE_DEBUG)
-  set (_vle_debug  ${VLE_DEBUG})
+  set (_vle_debug ${VLE_DEBUG})
 else ()
   set (_vle_debug 0)
 endif ()
@@ -86,7 +86,8 @@ if (${_find_vle_using_cmake})
     ${VLE_BASEPATH_LOCAL}/include
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
 	NO_DEFAULT_PATH)
 
   find_path(_vle_base_bin vle.exe PATHS
@@ -94,7 +95,8 @@ if (${_find_vle_using_cmake})
     ${VLE_BASEPATH_LOCAL}/bin
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
 	NO_DEFAULT_PATH)
 
   find_path(_vle_base_lib libvle-${VLE_ABI_VERSION}.a PATHS
@@ -102,7 +104,8 @@ if (${_find_vle_using_cmake})
     ${VLE_BASEPATH_LOCAL}/lib
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${VLE_ABI_VERSION}.0;]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
 	NO_DEFAULT_PATH)
 
   if (${_vle_debug})
