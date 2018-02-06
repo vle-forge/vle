@@ -196,8 +196,8 @@ SaxStackVpz::pushModel(const xmlChar** att)
             gmdl = ptr;
         } catch (const utils::DevsGraphError& e) {
             throw utils::SaxParserError(
-              (fmt(_("Error build atomic model '%1%' with error: %2%")) % name %
-               e.what())
+              (fmt(_("Error build atomic model '%1%' with error: %2%")) %
+               name % e.what())
                 .str());
         }
     } else if (xmlStrcmp(type, (const xmlChar*)"coupled") == 0) {
@@ -472,8 +472,8 @@ SaxStackVpz::buildConnection()
 
     vpz::Origin* orig = static_cast<vpz::Origin*>(pop());
 
-    if (not(parent()->isInternalConnection() or parent()->isInputConnection() or
-            parent()->isOutputConnection())) {
+    if (not(parent()->isInternalConnection() or
+            parent()->isInputConnection() or parent()->isOutputConnection())) {
         throw utils::SaxParserError(_("Bad file format"));
     }
 
@@ -781,7 +781,7 @@ SaxStackVpz::pushView(const xmlChar** att)
 
         while (begin != std::string::npos) {
             auto it = typestr.find(',', begin);
-            auto tmp = typestr.substr(begin, it);
+            auto tmp = typestr.substr(begin, it - begin);
 
             if (tmp == (const xmlChar*)"event")
                 viewtype = View::INTERNAL | View::CONFLUENT | View::EXTERNAL;
@@ -797,7 +797,8 @@ SaxStackVpz::pushView(const xmlChar** att)
                 viewtype |= View::FINISH;
             else
                 throw utils::SaxParserError(
-                  (fmt(_("View tag does not accept type '%1%'")) % type).str());
+                  (fmt(_("View tag does not accept type '%1%'")) % type)
+                    .str());
 
             if (it != std::string::npos)
                 begin = std::min(it + 1, typestr.size());
