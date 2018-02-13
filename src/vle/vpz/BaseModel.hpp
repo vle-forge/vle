@@ -234,12 +234,12 @@ public:
     ModelPortList& getInPort(const std::string& name);
     ModelPortList& getOutPort(const std::string& name);
 
-    int getInputPortNumber() const
+    std::size_t getInputPortNumber() const
     {
         return m_inPortList.size();
     }
 
-    int getOutputPortNumber() const
+    std::size_t getOutputPortNumber() const
     {
         return m_outPortList.size();
     }
