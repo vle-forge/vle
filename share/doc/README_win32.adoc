@@ -1,0 +1,156 @@
+= Windows Build Guide
+Gauthier Quesnel <gauthier.quesnel@inra.fr>
+2018-02-12
+:appversion: 2.0.0
+:homepage: http://www.vle-project.org
+
+== Dependencies
+
+=== MSYS2
+
+MSYS provides `libxml2` dependencies for both VLE and RVLE. We use Msys2
+compiler to build RVLE. Install msys2 (For example c:\mingw32 and c:\wingw64):
+
+[source,bash]
+-------------
+pacman -S --force mingw-w64-i686-curl
+pacman -S --force mingw-w64-i686-gcc
+pacman -S --force mingw-w64-i686-make
+pacman -S --force mingw-w64-i686-libxml2
+
+pacman -S --force mingw-w64-x86_64-gcc
+pacman -S --force mingw-w64-x86_64-make
+pacman -S --force mingw-w64-x86_64-libxml2
+-------------
+
+=== CMake 32 bits https://cmake.org/
+
+Install https://cmake.org/files/v3.10/cmake-3.10.2-win32-x86.msi[CMake 32 bits^] in default program files folder.
+
+=== Qt 5.9.4 https://www.qt.io/download
+
+Install https://www.qt.io/download[Qt 5.9.4^] with `mingw-5.3.0` 32 bits, `Qt
+installer framework 3` and `mingw-5.3` from `tools menu` in default proposed
+folder (For example `c:\Qt` or `d:\Qt`).
+
+=== Inno setup http://www.jrsoftware.org
+
+Install http://www.jrsoftware.org/isdl.php[Innosetup 5.5.9^] in default program files folder.
+
+## Build VLE 2.0
+
+First part, update paths of the following variables the run the scripts. In a `cmd.exe` console:
+
+[source,cmd]
+------------
+set OLD_PATH=%PATH%
+
+set ArchVersion=32
+set SourcePath=d:\natifvle\vle
+set QtDir=D:\Qt\Qt5.9.3\5.9.3\mingw53_32
+set QtDirTools=D:\Qt\Qt5.9.3\Tools\mingw530_32
+set BoostPath=D:\Boost
+set VleDeps=D:\VleDeps
+set MingwPath=d:\msys64\mingw32
+set InstallPath=D:\natifvle\install-iss-%ArchVersion%
+set BuildPath=%SourcePath%\build-iss-%ArchVersion%
+set CMakePath=%ProgramFiles(x86)%\CMake
+set InnoSetupPath="%ProgramFiles(x86)%\Inno Setup 5"
+
+rem Build the VLE VleDeps
+rem ---------------------
+
+md %VleDeps%
+md %VleDeps%\bin
+md %VleDeps%\lib
+md %VleDeps%\include
+md %VleDeps%\include\lzma
+md %VleDeps%\include\libxml2
+cd %MingwPath%
+xcopy -i bin\curl.exe %VleDeps%\bin
+xcopy -i include\iconv.h %VleDeps%\include
+xcopy -i include\libintl.h %VleDeps%\include
+xcopy -i include\lzma.h %VleDeps%\include
+xcopy -i include\zlib.h %VleDeps%\include
+xcopy -si include\lzma\* %VleDeps%\include\lzma\
+xcopy -si include\libxml2\* %VleDeps%\include\libxml2\
+xcopy -si bin\libcurl-4.dll %VleDeps%\bin
+xcopy -si bin\libeay32.dll %VleDeps%\bin
+xcopy -si bin\libexpat-1.dll %VleDeps%\bin
+xcopy -si bin\libiconv-2.dll %VleDeps%\bin
+xcopy -si bin\libidn2-0.dll %VleDeps%\bin
+xcopy -si bin\libintl-8.dll %VleDeps%\bin
+xcopy -si bin\liblzma-5.dll %VleDeps%\bin
+xcopy -si bin\libmetalink-3.dll %VleDeps%\bin
+xcopy -si bin\libnghttp2-14.dll %VleDeps%\bin
+xcopy -si bin\libssh2-1.dll %VleDeps%\bin
+xcopy -si bin\libunistring-2.dll %VleDeps%\bin
+xcopy -si bin\libxml2-2.dll %VleDeps%\bin
+xcopy -si bin\ssleay32.dll %VleDeps%\bin
+xcopy -si bin\zlib1.dll %VleDeps%\bin
+xcopy -si bin\curl.exe %VleDeps%\bin
+xcopy -si lib\liblzma.a %VleDeps%\lib
+xcopy -si lib\liblzma.dll.a %VleDeps%\lib
+xcopy -si lib\libxml2.a %VleDeps%\lib
+xcopy -si lib\libxml2.dll.a %VleDeps%\lib
+xcopy -si lib\libz.a %VleDeps%\lib
+xcopy -si lib\libz.dll.a %VleDeps%\lib
+xcopy -si lib\libiconv.a %VleDeps%\lib
+xcopy -si lib\libiconv.dll.a %VleDeps%\lib
+xcopy -si lib\libintl.a %VleDeps%\lib
+xcopy -si lib\libintl.dll.a %VleDeps%\lib
+
+rem Build the VLE software
+rem ----------------------
+
+set PATH=%QtDirTools%\bin;%QtDir%\bin;%CMakePath%\bin;%OLD_PATH%
+mkdir %BuildPath%
+cd /d %BuildPath%
+cmake.exe -G "MinGW Makefiles" -DVLEDEPS_PATH=%VleDeps% -DBOOST_ROOT=%BoostPath% -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+mingw32-make VERBOSE=1 -j4
+mingw32-make install
+
+rem Build the package
+rem -----------------
+
+set PATH=%InnoSetupPath%;%OLD_PATH%
+
+cd %SourcePath%\..
+iscc.exe %SourcePath%\share\vle.iss
+pause
+------------
+
+## Build RVLE 2.0
+
+In a `cmd.exe` console:
+
+[source,cmd]
+------------
+set OLD_PATH=%PATH%
+
+set VERSION=32
+set SourceDir=d:\natifvle\vle
+set MingwPath=d:\msys64\mingw%VERSION%
+set InstallPath=d:\natifvle\install%VERSION%
+set PATH=%MingwPath%\bin;%OLD_PATH%
+set BuildPath=%SourceDir%\buildvle%VERSION%
+
+mkdir %BuildPath%
+cd /d %BuildPath%
+cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+mingw32-make -j4
+mingw32-make install
+
+set VERSION=64
+set SourceDir=d:\natifvle\vle
+set MingwPath=d:\msys64\mingw%VERSION%
+set InstallPath=d:\natifvle\install%VERSION%
+set PATH=%MingwPath%\bin;%OLD_PATH%
+set BuildPath=%SourceDir%\buildvle%VERSION%
+
+mkdir %BuildPath%
+cd /d %BuildPath%
+cmake.exe -G "MinGW Makefiles" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+mingw32-make -j4
+mingw32-make install
+------------

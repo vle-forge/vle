@@ -18,3 +18,7 @@ CONFIGURE_FILE(
 
 install(FILES convert-vpz11-vpz12.py DESTINATION
   "${VLE_SHARE_DIRS}/scripts")
+
+if(WIN32)
+  install(FILES vle.iss qt.conf DESTINATION "${VLE_SHARE_DIRS}/")
+endif()
