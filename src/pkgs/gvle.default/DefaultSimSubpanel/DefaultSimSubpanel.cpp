@@ -199,6 +199,8 @@ DefaultSimSubpanel::DefaultSimSubpanel()
   , log_messages()
   , index_message(0)
   , mNormalized(false)
+  , mHorizontalZoom(true)
+  , mVerticalZoom(true)
 {
     QObject::connect(
       left->ui->runButton, SIGNAL(pressed()), this, SLOT(onRunPressed()));
@@ -220,6 +222,14 @@ DefaultSimSubpanel::DefaultSimSubpanel()
                      SIGNAL(stateChanged(int)),
                      this,
                      SLOT(onNormalized(int)));
+    QObject::connect(right->ui->horizontalZoom,
+                     SIGNAL(stateChanged(int)),
+                     this,
+                     SLOT(onHorizontalZoom(int)));
+    QObject::connect(right->ui->verticalZoom,
+                     SIGNAL(stateChanged(int)),
+                     this,
+                     SLOT(onVerticalZoom(int)));
     QObject::connect(right->ui->treeSimViews,
                      SIGNAL(itemChanged(QTreeWidgetItem*, int)),
                      this,
@@ -464,6 +474,10 @@ DefaultSimSubpanel::updateCustomPlot()
             nbGraphs++;
         }
     }
+    left->customPlot->axisRect(0)->setRangeZoomAxes(
+        (mHorizontalZoom)?left->customPlot->xAxis:0,
+        (mVerticalZoom)?left->customPlot->yAxis:0);
+
     left->customPlot->replot();
     showCustomPlot((nbGraphs > 0));
 }
@@ -658,6 +672,24 @@ DefaultSimSubpanel::onNormalized(int state)
 {
     mNormalized = (state == 2);
     updateCustomPlot();
+}
+
+void
+DefaultSimSubpanel::onHorizontalZoom(int state)
+{
+    mHorizontalZoom = (state == 2);
+    left->customPlot->axisRect(0)->setRangeZoomAxes(
+        (mHorizontalZoom)?left->customPlot->xAxis:0,
+        (mVerticalZoom)?left->customPlot->yAxis:0);
+}
+
+void
+DefaultSimSubpanel::onVerticalZoom(int state)
+{
+    mVerticalZoom = (state == 2);
+    left->customPlot->axisRect(0)->setRangeZoomAxes(
+        (mHorizontalZoom)?left->customPlot->xAxis:0,
+        (mVerticalZoom)?left->customPlot->yAxis:0);
 }
 
 void
