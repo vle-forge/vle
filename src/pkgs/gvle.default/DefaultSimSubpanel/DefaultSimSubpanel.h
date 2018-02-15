@@ -170,6 +170,8 @@ public:
     unsigned int index_message;
 
     bool mNormalized;
+    bool mHorizontalZoom;
+    bool mVerticalZoom;
 
 public slots:
     void onSimulationFinished();
@@ -182,6 +184,8 @@ public slots:
     void onTimeout();
     void onToolColor();
     void onNormalized(int state);
+    void onHorizontalZoom(int state);
+    void onVerticalZoom(int state);
 };
 }
 } // namespaces
