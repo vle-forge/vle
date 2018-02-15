@@ -7,52 +7,91 @@ branches:
     - master1.1
     - test
 
-environment:
-  matrix:
-    - CMAKE_GENERATOR: 'MinGW Makefiles'
-      MINGW_ROOT: C:\Qt\Tools\mingw530_32
-      QT_DIR: C:\Qt\5.9\mingw53_32
-      BOOST_ROOT: C:\Libraries\boost_1_63_0
-
 init:
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+  - set APPVEYOR_PATH=%PATH%
 
 install:
   - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S mingw-w64-i686-libxml2"
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S mingw-w64-i686-curl"
 
 before_build:
-  - set PATH=%MINGW_ROOT%\bin;%QT_DIR%\bin;%PATH%
-  - set VLEDEPS_BASEPATH=C:\msys64\mingw32
-  - set prefix=%APPVEYOR_BUILD_FOLDER%\release
+  - cmd: set OLD_PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\
+  - cmd: set SourcePath=c:\projects\vle
+  - cmd: set QtDir=c:\Qt\5.9\mingw53_32
+  - cmd: set QtDirTools=c:\Qt\Tools\mingw530_32
+  - cmd: set BoostPath=C:\Libraries\boost_1_63_0
+  - cmd: set VleDeps=%APPVEYOR_BUILD_FOLDER%\VleDeps
+  - cmd: set MingwPath=c:\msys64\mingw32
+  - cmd: set InstallPath=%APPVEYOR_BUILD_FOLDER%\install-iss
+  - cmd: set BuildPath=%APPVEYOR_BUILD_FOLDER%\build
+  - cmd: set CMakePath=%ProgramFiles(x86)%\CMake
+  - cmd: set InnoSetupPath="%ProgramFiles(x86)%\Inno Setup 5"
+  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_MAJOR"') do (set tmp_major=%%A)
+  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_MINOR"') do (set tmp_minor=%%A)
+  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_PATCH"') do (set tmp_patch=%%A)
+  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_EXTRA"') do (set tmp_extra=%%A)
+  - cmd: set major=%tmp_major:~0,-1%
+  - cmd: set minor=%tmp_minor:~0,-1%
+  - cmd: set patch=%tmp_patch:~0,-1%
+  - cmd: set extra=%tmp_extra:~1,-2%
+  - cmd: set VLE_ABI=%major%.%minor%
+  - cmd: if "[%extra%]" == "[]" (set VLE_VERSION=%major%.%minor%.%patch%) else (set VLE_VERSION=%major%.%minor%.%patch%-%extra%)
+  - cmd: md %VleDeps%
+  - cmd: md %VleDeps%\bin
+  - cmd: md %VleDeps%\lib
+  - cmd: md %VleDeps%\include
+  - cmd: md %VleDeps%\include\lzma
+  - cmd: md %VleDeps%\include\libxml2
+  - cmd: xcopy /s /i %MingwPath%\bin\curl.exe %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\include\iconv.h %VleDeps%\include
+  - cmd: xcopy /s /i %MingwPath%\include\libintl.h %VleDeps%\include
+  - cmd: xcopy /s /i %MingwPath%\include\lzma.h %VleDeps%\include
+  - cmd: xcopy /s /i %MingwPath%\include\zlib.h %VleDeps%\include
+  - cmd: xcopy /s /i %MingwPath%\include\lzma\* %VleDeps%\include\lzma\
+  - cmd: xcopy /s /i %MingwPath%\include\libxml2\* %VleDeps%\include\libxml2\
+  - cmd: xcopy /s /i %MingwPath%\bin\libcurl-4.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libeay32.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libexpat-1.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libiconv-2.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libidn2-0.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libintl-8.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\liblzma-5.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libmetalink-3.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libnghttp2-14.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libssh2-1.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libunistring-2.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\libxml2-2.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\ssleay32.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\bin\zlib1.dll %VleDeps%\bin
+  - cmd: xcopy /s /i %MingwPath%\lib\liblzma.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\liblzma.dll.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libxml2.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libxml2.dll.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libz.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libz.dll.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libiconv.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libiconv.dll.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libintl.a %VleDeps%\lib
+  - cmd: xcopy /s /i %MingwPath%\lib\libintl.dll.a %VleDeps%\lib
 
 build_script:
-  - cmake -E make_directory build
-  - cmake -E chdir build cmake -G "%CMAKE_GENERATOR%" -DCMAKE_SH="CMAKE_SH-NOTFOUND" -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DWITH_WIN32_INSTALLER=OFF -DCMAKE_INSTALL_PREFIX="%prefix%" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBOOST_ROOT="%BOOST_ROOT%" -DCMAKE_PREFIX_PATH="%QT_DIR%" ..
-  - cmake --build build
-  - cmake --build build --target install
+  - cmd: set PATH=%QtDirTools%\bin;%QtDir%\bin;%CMakePath%\bin;%OLD_PATH%
+  - cmd: mkdir %BuildPath%
+  - cmd: cd %BuildPath%
+  - cmd: cmake.exe -G "MinGW Makefiles" -DVLEDEPS_PATH=%VleDeps% -DBOOST_ROOT=%BoostPath% -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo %SourcePath%
+  - cmd: mingw32-make VERBOSE=1 -j4
+  - cmd: mingw32-make install
 
 after_build:
-  - windeployqt --list mapping --compiler-runtime --dir %prefix% %prefix%\bin\gvle.exe
-  - xcopy -s -i -y C:/msys64/mingw32/bin/libxml2-2.dll %prefix%\bin
-  - xcopy -s -i -y C:/msys64/mingw32/bin/zlib1.dll %prefix%\bin
-  - xcopy -s -i -y C:/msys64/mingw32/bin/libiconv-2.dll %prefix%\bin
-  - xcopy -s -i -y C:/msys64/mingw32/bin/libintl-8.dll %prefix%\bin
-  - xcopy -s -i -y C:/msys64/mingw32/lib/libxml2.dll.a %prefix%\lib
-  - xcopy -s -i -y C:/msys64/mingw32/lib/libz.dll.a %prefix%\lib
-  - xcopy -s -i -y C:/msys64/mingw32/lib/libiconv.dll.a %prefix%\lib
-  - xcopy -s -i -y C:/msys64/mingw32/lib/libintl.dll.a %prefix%\lib
-  - md %prefix%/mingw530_32
-  - xcopy -s -i -y %MINGW_ROOT% %prefix%/mingw530_32
-  - cmake --build build --target package
-  - 7z a vle.zip %APPVEYOR_BUILD_FOLDER%\build\*.exe
-  - xcopy -s -i -y c:\Program Files\CMake %prefix%\
-
-test_script:
-  - set PATH=%prefix%\bin;%PATH%
-  - set CTEST_OUTPUT_ON_FAILURE=ON
+  - cmd: set PATH=%InnoSetupPath%;%OLD_PATH%
+  - cmd: cd %SourcePath%\share
+  - cmd: iscc.exe vle.iss
+  - cmd: set PATH=%APPVEYOR_PATH%
+  - cmd: 7z a vle.zip Output\*.exe
 
 artifacts:
-  - path: vle.zip
+  - path: share\vle.zip
     name: app
