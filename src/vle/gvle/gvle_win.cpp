@@ -1004,45 +1004,68 @@ gvle_win::menuPackagesInstallRefresh()
 {
     // update packages to install
     utils::RemoteManager rm(mCtx);
-    rm.start(utils::REMOTE_MANAGER_UPDATE, "", &std::cout);
-    rm.join();
-    if (rm.hasError()) {
-        mLogger->logExt(QString(rm.messageError().c_str()), true);
-        return;
-    }
-    rm.start(utils::REMOTE_MANAGER_SEARCH, ".*", &std::cout);
-    rm.join();
-    if (rm.hasError()) {
-        mLogger->logExt(QString(rm.messageError().c_str()), true);
-        return;
-    }
+    {
+		rm.start(utils::REMOTE_MANAGER_UPDATE, "", &std::cout);
+		rm.join();
+		if (rm.hasError()) {
+			mLogger->logExt(QString(rm.messageError().c_str()), true);
+			return;
+		}
 
-    vle::utils::Packages res;
-    rm.getResult(&res);
-    std::sort(res.begin(),
-              res.end(),
-              [](const utils::PackageId& a, const utils::PackageId& b) {
-                  return a.name < b.name;
-              });
-
-    vle::utils::Packages::const_iterator itb = res.begin();
-    vle::utils::Packages::const_iterator ite = res.end();
-    ui->menuInstall->clear();
-    for (; itb != ite; itb++) {
-        QString distrib = "";
-        for (auto& d : mDistributions) {
-            if (d.second.first == itb->url) {
-                distrib = QString(d.first.c_str());
-            }
+		vle::utils::Packages res;
+        rm.getResult(&res);
+        vle::utils::Packages::const_iterator itb = res.begin();
+        vle::utils::Packages::const_iterator ite = res.end();
+        if (itb == ite) {
+			mLogger->logExt(QString("No package has to be updated\n"), true);
+        } else {
+			mLogger->log(QString("Packages to update (re-install them):"));
+            for (; itb != ite; itb++) {
+                mLogger->log(QString(utils::format("%s\tfrom %s\t (new version: %d.%d.%d)\n",
+                           itb->name.c_str(),
+                           itb->url.c_str(),
+                           itb->major,
+                           itb->minor,
+                           itb->patch).c_str()));
+			}
         }
-        QString el = itb->name.c_str();
-        el += " from ";
-        el += distrib;
-        QAction* action = ui->menuInstall->addAction(el);
-        action->setData(QString(itb->name.c_str()));
-        QObject::connect(
-          action, SIGNAL(triggered()), this, SLOT(onPackageInstall()));
-    }
+	}
+	
+	{
+		rm.start(utils::REMOTE_MANAGER_SEARCH, ".*", &std::cout);
+		rm.join();
+		if (rm.hasError()) {
+			mLogger->logExt(QString(rm.messageError().c_str()), true);
+			return;
+		}
+
+		vle::utils::Packages res;
+		rm.getResult(&res);
+		std::sort(res.begin(),
+				  res.end(),
+				  [](const utils::PackageId& a, const utils::PackageId& b) {
+					  return a.name < b.name;
+				  });
+
+		vle::utils::Packages::const_iterator itb = res.begin();
+		vle::utils::Packages::const_iterator ite = res.end();
+		ui->menuInstall->clear();
+		for (; itb != ite; itb++) {
+			QString distrib = "";
+			for (auto& d : mDistributions) {
+				if (d.second.first == itb->url) {
+					distrib = QString(d.first.c_str());
+				}
+			}
+			QString el = itb->name.c_str();
+			el += " from ";
+			el += distrib;
+			QAction* action = ui->menuInstall->addAction(el);
+			action->setData(QString(itb->name.c_str()));
+			QObject::connect(
+			  action, SIGNAL(triggered()), this, SLOT(onPackageInstall()));
+		}
+	}
 }
 
 void
