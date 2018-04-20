@@ -32,6 +32,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QFileDialog>
+#include <QSvgGenerator>
 #include <QtDebug>
 
 namespace vle {
@@ -1609,6 +1611,10 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
     setActionType(action, VDMA_Debug_atomic);
     action->setEnabled(sel and not isVpzMainModel(sel) and
                        (static_cast<VpzMainModelItem*>(sel)->isAtomic()));
+    menu.addSeparator();
+    action = menu.addAction("save to SVG");
+    setActionType(action, VDMA_Save_SVG);
+    action->setEnabled(true);
 
     if (sel) {
         action = menu.exec(event->screenPos());
@@ -1760,6 +1766,8 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
                 VpzSubModelItem* it = static_cast<VpzSubModelItem*>(sel);
                 vleDomStatic::setDebuggingToAtomic(
                   it->mnode, not debug_checked, mVpz->getUndoStack());
+            } else if (actCode == VDMA_Save_SVG) {
+                VpzDiagScene::saveSVG();
             }
         }
     }
@@ -2150,6 +2158,30 @@ bool
 VpzDiagScene::isVpzMainModel(QGraphicsItem* item)
 {
     return item->type() == VpzMainModelType;
+}
+
+void
+VpzDiagScene::saveSVG()
+{
+    QString path = QFileDialog::getSaveFileName(0, "Save SVG",
+                                                QDir::currentPath(),
+                                                "SVG files (*.svg)",
+                                                new QString("SVG files (*.svg)"));
+
+    if (path.isEmpty())
+        return;
+
+    QSvgGenerator generator;        // Create a file generator object
+    generator.setFileName(path);    // We set the path to the file where to save vector graphics
+    generator.setSize(QSize(width(), height()));  // Set the dimensions of the working area of the document in millimeters
+    generator.setViewBox(QRect(0, 0, width(), height())); // Set the work area in the coordinates
+    generator.setTitle(trUtf8("SVG Example"));                          // The title document
+    generator.setDescription(trUtf8("File created by SVG Example"));
+
+    QPainter painter;
+    painter.begin(&generator);
+    render(&painter);
+    painter.end();
 }
 }
 } // namespaces

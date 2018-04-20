@@ -18,6 +18,7 @@ addons:
       - qttools5-dev-tools
       - qtbase5-dev
       - qtbase5-dev-tools
+      - libqt5svg5-dev
       - qtchooser
       - qt5-default
 

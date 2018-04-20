@@ -81,7 +81,8 @@ enum VPZ_DIAG_MENU_ACTION
     VDMA_Configure_model,
     VDMA_Unconfigure_model,
     VDMA_Clear_conf_model,
-    VDMA_Debug_atomic
+    VDMA_Debug_atomic,
+    VDMA_Save_SVG
 };
 
 class VpzConnectionLineItem : public QGraphicsItem
@@ -295,6 +296,8 @@ public:
     static VPZ_DIAG_MENU_ACTION getActionType(QAction* action);
 
     bool isVpzSubModelConfigured(QGraphicsItem* item);
+
+    void saveSVG();
 signals:
     void enterCoupledModel(QDomNode node);
     void initializationDone(VpzDiagScene* scene);

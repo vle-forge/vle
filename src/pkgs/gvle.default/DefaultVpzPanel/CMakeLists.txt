@@ -3,16 +3,16 @@
 
 ##
 ## build DefaultVpzPanel
-## 
+##
 
 include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS}
   ${Qt5Gui_INCLUDE_DIRS} ${Qt5Help_INCLUDE_DIRS}
-  ${Qt5PrintSupport_INCLUDE_DIRS})
+  ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS})
 
 include_directories(${VLE_BINARY_DIR}/src/pkgs/gvle.default/DefaultVpzPanel
   ${VLE_SOURCE_DIR}/src ${VLEDEPS_INCLUDE_DIRS})
 
-add_definitions(${Qt5Widgets_DEFINITIONS} ${Qt5Gui_DEFINITIONS} 
+add_definitions(${Qt5Widgets_DEFINITIONS} ${Qt5Gui_DEFINITIONS}
                 ${Qt5Xml_DEFINITIONS})
 add_definitions(-DQT_PLUGIN)
 
@@ -35,17 +35,18 @@ set(DefaultVpzPanel_SOURCES_CPP filevpzdynamics.cpp filevpzclasses.cpp
 
 
 add_library(DefaultVpzPanel MODULE ${DefaultVpzPanel_SOURCES_CPP}
-  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzproject_h} 
+  ${filevpzview_h} ${filevpzdynamics_h} ${filevpzproject_h}
   ${filevpzobservables_h} ${filevpzexpcond_h} ${filevpzexpview_h}
   ${filevpzclasses_h} ${filevpzsim_h} ${filevpztooltip_h}
   ${filevpzrtool_h})
-target_link_libraries(DefaultVpzPanel 
-   gvlelib vlelib ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Xml_LIBRARIES})
+target_link_libraries(DefaultVpzPanel
+   gvlelib vlelib ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES}
+  ${Qt5Xml_LIBRARIES} ${Qt5Svg_LIBRARIES})
 
 
 set(DefaultVpzPanel_INST
   lib/vle-${VLE_VERSION_SHORT}/pkgs/gvle.default/plugins/gvle/vpz)
-install(TARGETS DefaultVpzPanel 
+install(TARGETS DefaultVpzPanel
   RUNTIME DESTINATION ${DefaultVpzPanel_INST}
   LIBRARY DESTINATION ${DefaultVpzPanel_INST}
   ARCHIVE DESTINATION ${DefaultVpzPanel_INST})
