@@ -1030,7 +1030,7 @@ gvle_win::menuPackagesInstallRefresh()
 			}
         }
 	}
-	
+
 	{
 		rm.start(utils::REMOTE_MANAGER_SEARCH, ".*", &std::cout);
 		rm.join();
@@ -1278,9 +1278,19 @@ gvle_win::onTreeDblClick(QModelIndex index)
         ui->tabWidget->setCurrentIndex(alreadyOpened);
         return;
     }
+
+
     PluginMainPanel* newPanel = gf.newInstanceMainPanel(mGvlePlugins);
+
     if (newPanel) {
-        openMainPanel(gf, newPanel);
+        try {
+            openMainPanel(gf, newPanel);
+        } catch (const std::exception& e) {
+            QString logMessage = QString("%1").arg(e.what());
+            mLogger->logExt(logMessage, true);
+            mLogger->log(tr("File opening failed"));
+            return;
+        }
     }
     // set undo redo enabled
     ui->actionUndo->setEnabled(true);
