@@ -42,8 +42,7 @@ Dynamics::Dynamics(const DynamicsInit& init, const InitEventList& /* events */)
   : m_context(init.context)
   , m_model(init.model)
   , m_packageid(init.packageid)
-{
-}
+{}
 
 std::string
 Dynamics::getPackageDir() const
@@ -192,6 +191,22 @@ Dynamics::getPackageExpFile(const std::string& name) const
     } else {
         throw vle::utils::FileError(
           (fmt(_("Package '%1%' is not installed")) % *m_packageid).str());
+    }
+}
+
+void
+Trace(utils::ContextPtr ctx, int priority, const char* format, ...) noexcept
+{
+    if (ctx->get_log_priority() < priority)
+        return;
+
+    va_list ap;
+    try {
+        va_start(ap);
+        ctx->log(priority, nullptr, -1, nullptr, format, ap);
+        va_end(ap);
+    } catch (...) {
+        va_end(ap);
     }
 }
 }

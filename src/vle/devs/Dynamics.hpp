@@ -45,24 +45,24 @@
 #include <vle/vle.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 
-#define DECLARE_DYNAMICS(mdl)                                                  \
-    extern "C" {                                                               \
-    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics(                     \
-      const vle::devs::DynamicsInit& init,                                     \
-      const vle::devs::InitEventList& events)                                  \
-    {                                                                          \
-        return new mdl(init, events);                                          \
-    }                                                                          \
-                                                                               \
-    VLE_MODULE void vle_api_level(std::uint32_t* major,                        \
-                                  std::uint32_t* minor,                        \
-                                  std::uint32_t* patch)                        \
-    {                                                                          \
-        auto version = vle::version();                                         \
-        *major = std::get<0>(version);                                         \
-        *minor = std::get<1>(version);                                         \
-        *patch = std::get<2>(version);                                         \
-    }                                                                          \
+#define DECLARE_DYNAMICS(mdl)                                                 \
+    extern "C" {                                                              \
+    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics(                    \
+      const vle::devs::DynamicsInit& init,                                    \
+      const vle::devs::InitEventList& events)                                 \
+    {                                                                         \
+        return new mdl(init, events);                                         \
+    }                                                                         \
+                                                                              \
+    VLE_MODULE void vle_api_level(std::uint32_t* major,                       \
+                                  std::uint32_t* minor,                       \
+                                  std::uint32_t* patch)                       \
+    {                                                                         \
+        auto version = vle::version();                                        \
+        *major = std::get<0>(version);                                        \
+        *minor = std::get<1>(version);                                        \
+        *patch = std::get<2>(version);                                        \
+    }                                                                         \
     }
 
 namespace vle {
@@ -92,8 +92,7 @@ public:
      * @brief Destructor (nothing to do)
      */
     virtual ~Dynamics()
-    {
-    }
+    {}
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -141,8 +140,7 @@ public:
      * @endcode
      */
     virtual void output(Time /* time */, ExternalEventList& /* output */) const
-    {
-    }
+    {}
 
     /**
      * @brief Process the time advance function: compute the duration of the
@@ -160,8 +158,7 @@ public:
      * @param time the date of occurence of this event.
      */
     virtual void internalTransition(Time /* time */)
-    {
-    }
+    {}
 
     /**
      * @brief Process an external transition: compute the new state of the
@@ -203,8 +200,7 @@ public:
      */
     virtual void externalTransition(const ExternalEventList& /* event */,
                                     Time /* time */)
-    {
-    }
+    {}
 
     /**
      * @brief Process the confluent transition, by default,
@@ -261,8 +257,7 @@ public:
      * finish method is invoked.
      */
     virtual void finish()
-    {
-    }
+    {}
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -425,12 +420,17 @@ private:
     PackageId m_packageid;
 };
 
-#define Trace(ctx, priority, arg...)                                           \
-    do {                                                                       \
-        if (ctx->get_log_priority() >= priority) {                             \
-            ctx->log(priority, __FILE__, __LINE__, __FUNCTION__, ##arg);       \
-        }                                                                      \
-    } while (0)
+/** @brief Sends message to the ContextPtr logging system.
+ *
+ * Sends the message produced by :c format and @c ... to the ContextPtr logging
+ * system if the priority less than ContextPtr get_log_priority function.
+ *
+ * @param ctx ContextPtr to store message.
+ * @param priority An integer in range [0-7] define message type.
+ * @param format The printf function like message type.
+ */
+void
+Trace(utils::ContextPtr ctx, int priority, const char* format, ...) noexcept;
 }
 } // namespace vle devs
 
