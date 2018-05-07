@@ -26,6 +26,7 @@
 
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
@@ -70,7 +71,8 @@ class ExperimentGenerator::Pimpl
                      jt != cnd.conditionvalues().end();
                      ++jt) {
 
-                    int conditionsize = jt->second.size();
+                    int conditionsize =
+                      utils::numeric_cast<int>(jt->second.size());
 
                     if (result == 0 or result == 1) {
                         result = conditionsize;
@@ -100,10 +102,11 @@ class ExperimentGenerator::Pimpl
         uint32_t number = mCompleteSize / mWorld;
         uint32_t modulo = mCompleteSize % mWorld;
 
-        mMin = (number + 1) * std::min(mRank, modulo) +
-               number * uint32_t(std::max((int32_t)0, int32_t(mRank - modulo)));
-        mMax =
-          std::min(mCompleteSize, mMin + number + 1 * uint32_t(mRank < modulo));
+        mMin =
+          (number + 1) * std::min(mRank, modulo) +
+          number * uint32_t(std::max((int32_t)0, int32_t(mRank - modulo)));
+        mMax = std::min(mCompleteSize,
+                        mMin + number + 1 * uint32_t(mRank < modulo));
     }
 
 public:

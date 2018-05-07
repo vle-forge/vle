@@ -95,7 +95,7 @@ std::string
 Parser::readKeyword()
 {
     do {
-        char c = get();
+        auto c = get();
 
         if (isspace(c)) {
             continue;
@@ -114,7 +114,7 @@ Parser::readKeyword()
     std::string result;
 
     do {
-        char c = get();
+        auto c = get();
 
         if (isspace(c)) {
             unget();
@@ -123,7 +123,7 @@ Parser::readKeyword()
             forgetLine();
             break;
         } else {
-            result += c;
+            result += static_cast<char>(c);
         }
     } while (mStream);
 
@@ -134,7 +134,7 @@ std::string
 Parser::readString()
 {
     do {
-        char c = get();
+        auto c = get();
 
         if (isspace(c)) {
             continue;
@@ -153,10 +153,10 @@ Parser::readString()
     std::string result;
 
     do {
-        char c = get();
+        auto c = get();
 
         if (isalnum(c)) {
-            result += c;
+            result += static_cast<char>(c);
         } else {
             unget();
             return result;
@@ -170,7 +170,7 @@ double
 Parser::readReal()
 {
     do {
-        char c = get();
+        auto c = get();
 
         if (isspace(c)) {
             continue;
@@ -189,7 +189,7 @@ Parser::readReal()
     std::string result;
 
     do {
-        char c = get();
+        auto c = get();
 
         if (isspace(c)) {
             unget();
@@ -198,13 +198,13 @@ Parser::readReal()
             forgetLine();
             break;
         } else if (isdigit(c) or c == '-') {
-            result += c;
+            result += static_cast<char>(c);
         } else if (c == '.') {
             if (result.find(".") != std::string::npos)
                 throw utils::ParseError(
                   _("Multiple '.' while parsing real `%s'"), result.c_str());
 
-            result += c;
+            result += static_cast<char>(c);
         } else {
             unget();
             break;
@@ -228,12 +228,12 @@ Parser::readQuotedString()
     std::string result;
 
     do {
-        char c = get();
+        auto c = get();
 
         if (c == '"') {
             return result;
         } else {
-            result += c;
+            result += static_cast<char>(c);
             continue;
         }
     } while (mStream);
@@ -245,7 +245,7 @@ void
 Parser::readChar(char r)
 {
     do {
-        char c = get();
+        auto c = get();
 
         if (isspace(c)) {
             continue;
@@ -266,7 +266,7 @@ Parser::Token
 Parser::nextToken()
 {
     while (mStream) {
-        char c = get();
+        auto c = get();
 
         if (not mStream) {
             return Parser::Error;

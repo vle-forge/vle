@@ -139,7 +139,7 @@ input_timeout(int fd, std::chrono::milliseconds wait)
         result = select(FD_SETSIZE, &set, nullptr, nullptr, &timeout);
     } while (result == -1L && errno == EINTR);
 
-    return result;
+    return static_cast<int>(result);
 }
 
 class Spawn::Pimpl
@@ -234,7 +234,7 @@ public:
             return false;
 
         if (result) {
-            int size = read(m_pipeout[0], &buffer[0], BUFSIZ);
+            auto size = read(m_pipeout[0], &buffer[0], BUFSIZ);
             if (size > 0 and output) {
                 output->append(&buffer[0], size);
             }
@@ -244,7 +244,7 @@ public:
             return false;
 
         if (result) {
-            int size = read(m_pipeerr[0], &buffer[0], BUFSIZ);
+            auto size = read(m_pipeerr[0], &buffer[0], BUFSIZ);
             if (size > 0 and error) {
                 error->append(&buffer[0], size);
             }

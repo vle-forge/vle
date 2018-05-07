@@ -125,7 +125,7 @@ public:
 
 private:
     /** Define a dictionary (model's name, index) */
-    typedef std::map<std::string, int> Columns;
+    typedef std::map<std::string, std::size_t> Columns;
 
     /** Define the buffer of values. */
     using Line = std::vector<value::Value*>;

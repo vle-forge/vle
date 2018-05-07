@@ -201,7 +201,7 @@ public:
         if (ev.onPort("c")) {
             if (m_counter > 100 and m_counter < 500)
                 return {};
-            return value::Double::create(m_counter);
+            return value::Double::create(static_cast<double>(m_counter));
         }
 
         if (ev.onPort("value"))
@@ -300,24 +300,24 @@ public:
     void externalTransition(const devs::ExternalEventList& events,
                             devs::Time /* time */) override
     {
-        m_counter = m_counter + events.size();
+        m_counter += events.size();
     }
 
     void output(devs::Time /* time */,
                 devs::ExternalEventList& output) const override
     {
-        for (int i = 0; i < m_counter; ++i)
+        for (std::size_t i = 0; i < m_counter; ++i)
             output.emplace_back("out");
     }
 
     std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
-        return value::Integer::create(m_counter);
+        return value::Integer::create(static_cast<int>(m_counter));
     }
 
 private:
-    int m_counter;
+    std::size_t m_counter;
 };
 
 class Confluent_transitionA : public devs::Dynamics

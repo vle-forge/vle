@@ -43,7 +43,8 @@ struct VLE_API Block
     typedef std::multimap<std::string, double> RelativeReals;
     typedef std::multimap<std::string, Block> Blocks;
 
-    typedef std::pair<Reals::const_iterator, Reals::const_iterator> RealsResult;
+    typedef std::pair<Reals::const_iterator, Reals::const_iterator>
+      RealsResult;
     typedef std::pair<RelativeReals::const_iterator,
                       RelativeReals::const_iterator>
       RelativeRealsResult;
@@ -54,8 +55,7 @@ struct VLE_API Block
 
     Block(const std::string& name)
       : name(name)
-    {
-    }
+    {}
 
     void addString(const std::string& key, const std::string& str);
 
@@ -113,7 +113,7 @@ public:
     }
 
 private:
-    inline char get()
+    inline int get()
     {
         mLast = mStream.get();
 
@@ -215,7 +215,7 @@ private:
     long mOldLine;         ///< previous number of line readed (when use unget)
     long mColumn;          ///< number of character readed
     long mOldColumn;       ///< previous number of column read (when use unged)
-    char mLast;            ///< latest character readed from the stream
+    int mLast;             ///< latest character readed from the stream
 };
 }
 } // namespace vle utils

@@ -37,6 +37,8 @@
 #include <QtDebug>
 
 #include "gvle_widgets.h"
+
+#include <vle/utils/Tools.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -1071,7 +1073,7 @@ VleValueWidget::showCurrentValueDetail()
     }
     case value::Value::SET: {
         table->clear();
-        table->setRowCount(editingValue.toSet().size());
+        table->setRowCount(utils::numeric_cast<int>(editingValue.toSet().size()));
         table->setColumnCount(1);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("set values"));
         value::Set::const_iterator itb = editingValue.toSet().begin();
@@ -1108,7 +1110,7 @@ VleValueWidget::showCurrentValueDetail()
     case value::Value::MAP: {
         const value::Map& map = editingValue.toMap();
         table->clear();
-        table->setRowCount(map.size());
+        table->setRowCount(utils::numeric_cast<int>(map.size()));
         table->setColumnCount(2);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("map keys"));
         table->setHorizontalHeaderItem(1, new QTableWidgetItem("map values"));
@@ -1151,7 +1153,7 @@ VleValueWidget::showCurrentValueDetail()
     }
     case value::Value::TUPLE: {
         table->clear();
-        table->setRowCount(editingValue.toTuple().size());
+        table->setRowCount(utils::numeric_cast<int>(editingValue.toTuple().size()));
         table->setColumnCount(1);
         table->setHorizontalHeaderItem(0,
                                        new QTableWidgetItem("tuple values"));
@@ -1164,8 +1166,8 @@ VleValueWidget::showCurrentValueDetail()
     case value::Value::TABLE: {
         const value::Table& tableVal = editingValue.toTable();
         table->clear();
-        table->setRowCount(tableVal.height());
-        table->setColumnCount(tableVal.width());
+        table->setRowCount(utils::numeric_cast<int>(tableVal.height()));
+        table->setColumnCount(utils::numeric_cast<int>(tableVal.width()));
         for (unsigned int r = 0; r < tableVal.height(); r++) {
             for (unsigned int c = 0; c < tableVal.width(); c++) {
                 setDoubleWidget(QString("(%1,%2)").arg(r).arg(c),
@@ -1179,8 +1181,8 @@ VleValueWidget::showCurrentValueDetail()
     case value::Value::MATRIX: {
         const value::Matrix& matrixVal = editingValue.toMatrix();
         table->clear();
-        table->setRowCount(matrixVal.rows());
-        table->setColumnCount(matrixVal.columns());
+        table->setRowCount(utils::numeric_cast<int>(matrixVal.rows()));
+        table->setColumnCount(utils::numeric_cast<int>(matrixVal.columns()));
         for (unsigned int i = 0; i < matrixVal.rows(); i++) {
             for (unsigned int j = 0; j < matrixVal.columns(); j++) {
                 QString id = QString("(%1,%2)").arg(i).arg(j);
@@ -1216,7 +1218,7 @@ VleValueWidget::showCurrentValueDetail()
     }
     }
 
-    int nbRows = (editType == value::Value::TABLE)
+    std::size_t nbRows = (editType == value::Value::TABLE)
                    ? editingValue.toTable().height()
                    : (editType == value::Value::MATRIX)
                        ? editingValue.toMatrix().rows()
@@ -1227,13 +1229,14 @@ VleValueWidget::showCurrentValueDetail()
                                : (editType == value::Value::TUPLE)
                                    ? editingValue.toTuple().size()
                                    : 0;
-    int nbCols = (editType == value::Value::TABLE)
+    std::size_t nbCols = (editType == value::Value::TABLE)
                    ? editingValue.toTable().width()
                    : (editType == value::Value::MATRIX)
                        ? editingValue.toMatrix().columns()
                        : 0;
-    resize_row->setValue(nbRows);
-    resize_col->setValue(nbCols);
+
+    resize_row->setValue(utils::numeric_cast<int>(nbRows));
+    resize_col->setValue(utils::numeric_cast<int>(nbCols));
     resize_row->setEnabled((editType == value::Value::TABLE) or
                            (editType == value::Value::MATRIX) or
                            (editType == value::Value::TUPLE) or

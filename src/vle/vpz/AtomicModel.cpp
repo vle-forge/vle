@@ -187,7 +187,10 @@ AtomicModel::updateConditions(const std::string& oldname,
 void
 AtomicModel::purgeConditions(const std::set<std::string>& conditionlist)
 {
-    for (int i = m_conditions.size() - 1; i >= 0; --i) {
+    if (m_conditions.empty())
+        return;
+
+    for (auto i = static_cast<long>(m_conditions.size()) - 1; i >= 0; --i) {
 
         auto itfind = conditionlist.find(m_conditions[i]);
 

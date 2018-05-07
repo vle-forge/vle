@@ -209,7 +209,8 @@ Table::fill(const std::string& str)
                 result = boost::lexical_cast<double>(elem);
             } catch (const boost::bad_lexical_cast& e) {
                 try {
-                    result = boost::lexical_cast<long>(elem);
+                    result =
+                      static_cast<double>(boost::lexical_cast<long>(elem));
                 } catch (const boost::bad_lexical_cast& e) {
                     throw vle::utils::ArgError(
                       (fmt(_("Can not convert string \'%1%\' into"

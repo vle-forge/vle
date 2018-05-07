@@ -478,9 +478,9 @@ Path::unique_path(const std::string& model)
             if (car == '%') {
                 auto v = distribution(rng);
                 if (v < 10)
-                    car = '0' + v;
+                    car = static_cast<char>(v + '0');
                 else
-                    car = 'a' + v - 10;
+                    car = static_cast<char>(v + 'a' - 10);
             }
         }
 

@@ -154,7 +154,7 @@ public:
         }
 
         mNewBagWatcher[name] = -1.0;
-        mColumns[name] = mBuffer.size();
+        mColumns[name] = utils::numeric_cast<int>(mBuffer.size());
         mBuffer.add(std::unique_ptr<value::Value>());
         mValid.push_back(false);
     }

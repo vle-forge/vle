@@ -29,6 +29,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <stack>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -608,7 +609,7 @@ BaseModel::getInputPortIndex(const std::string& name) const
             .str());
     }
 
-    return std::distance(m_inPortList.begin(), it);
+    return utils::numeric_cast<int>(std::distance(m_inPortList.begin(), it));
 }
 
 int
@@ -622,7 +623,7 @@ BaseModel::getOutputPortIndex(const std::string& name) const
             .str());
     }
 
-    return std::distance(m_outPortList.begin(), it);
+    return utils::numeric_cast<int>(std::distance(m_outPortList.begin(), it));
 }
 
 void

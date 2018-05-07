@@ -321,37 +321,45 @@ private:
 
     void update_thresholds()
     {
-        m_upthreshold = m_offset + m_step_size * (m_step_number + 1);
-        m_downthreshold = m_offset + m_step_size * (m_step_number - 1);
+        double step_number = static_cast<double>(m_step_number);
+
+        m_upthreshold = m_offset + m_step_size * (step_number + 1);
+        m_downthreshold = m_offset + m_step_size * (step_number - 1);
     }
 
     void update_thresholds(double factor)
     {
-        m_upthreshold = m_offset + m_step_size * (m_step_number + (1 - factor));
+        double step_number = static_cast<double>(m_step_number);
+        
+        m_upthreshold =
+          m_offset + m_step_size * (step_number + (1 - factor));
         m_downthreshold =
-          m_offset + m_step_size * (m_step_number - (1 - factor));
+          m_offset + m_step_size * (step_number - (1 - factor));
     }
 
     void update_thresholds(double factor, Direction d)
     {
+        double step_number = static_cast<double>(m_step_number);
+
         if (UP == d) {
             m_upthreshold =
-              m_offset + m_step_size * (m_step_number + (1 - factor));
-            m_downthreshold = m_offset + m_step_size * (m_step_number - 1);
+              m_offset + m_step_size * (step_number + (1 - factor));
+            m_downthreshold = m_offset + m_step_size * (step_number - 1);
         } else {
-            m_upthreshold = m_offset + m_step_size * (m_step_number + 1);
+            m_upthreshold = m_offset + m_step_size * (step_number + 1);
             m_downthreshold =
-              m_offset + m_step_size * (m_step_number - (1 - factor));
+              m_offset + m_step_size * (step_number - (1 - factor));
         }
     }
 
     void init_step_number_and_offset(double value)
     {
-        m_step_number = floor(value / m_step_size);
+        m_step_number = static_cast<long int>(floor(value / m_step_size));
+
         if (m_zero_init_offset) {
             m_offset = 0;
         } else {
-            m_offset = value - m_step_number * m_step_size;
+            m_offset = value - static_cast<double>(m_step_number) * m_step_size;
         }
     }
 

@@ -209,8 +209,8 @@ SaxParser::parse(std::istream& is, std::size_t size)
     if (not is.good() or is.gcount() <= 0)
         throw utils::SaxParserError(_("Error parsing the 4 first bytes)"));
 
-    xmlParserCtxtPtr ctx =
-      xmlCreatePushParserCtxt(&sax, this, buffer.data(), is.gcount(), nullptr);
+    xmlParserCtxtPtr ctx = xmlCreatePushParserCtxt(
+      &sax, this, buffer.data(), static_cast<int>(is.gcount()), nullptr);
     m_ctxt = static_cast<void*>(ctx);
 
     scope_exit se([this, ctx]() {
@@ -220,7 +220,8 @@ SaxParser::parse(std::istream& is, std::size_t size)
 
     while (is.good() and not is.eof()) {
         is.read(buffer.data(), buffer.size());
-        int err = xmlParseChunk(ctx, buffer.data(), is.gcount(), is.eof());
+        int err = xmlParseChunk(
+          ctx, buffer.data(), static_cast<int>(is.gcount()), is.eof());
 
         if (err == 0)
             continue;
@@ -723,8 +724,8 @@ SaxParser::onEndBoolean()
 void
 SaxParser::onEndInteger()
 {
-    m_valuestack.pushOnVectorValue<value::Integer>(
-      xmlCharToInt(((xmlChar*)lastCharactersStored().c_str())));
+    m_valuestack.pushOnVectorValue<value::Integer>(static_cast<int>(
+      xmlCharToInt(((xmlChar*)lastCharactersStored().c_str()))));
 }
 
 void

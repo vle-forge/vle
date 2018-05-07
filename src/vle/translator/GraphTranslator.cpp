@@ -62,9 +62,9 @@ init_metrics(const graphT& g)
 {
     graph_generator::graph_metrics ret;
 
-    ret.vertices = boost::num_vertices(g);
-    ret.edges = boost::num_edges(g);
-    ret.bandwidth = boost::bandwidth(g);
+    ret.vertices = static_cast<int>(boost::num_vertices(g));
+    ret.edges = static_cast<int>(boost::num_edges(g));
+    ret.bandwidth = static_cast<int>(boost::bandwidth(g));
 
     return ret;
 }

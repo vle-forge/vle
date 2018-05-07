@@ -43,9 +43,9 @@ class DescriptionParser
     unsigned int oldline;
     unsigned int column;
     unsigned int oldcolumn;
-    char last;
+    int last;
 
-    char get()
+    int get()
     {
         last = in.get();
 
@@ -132,12 +132,12 @@ class DescriptionParser
         if (not read_blank())
             return false;
 
-        char c = get();
+        int c = get();
         if (!isalnum(c)) /* check if the first character is an alphanum
                             character */
             return false;
 
-        output->append(1, c);
+        output->append(1, static_cast<char>(c));
 
         do {
             c = get();
@@ -145,7 +145,7 @@ class DescriptionParser
             if (not(isalnum(c) or c == '_' or c == '.' or c == '-'))
                 break;
 
-            output->append(1, c);
+            output->append(1, static_cast<char>(c));
         } while (in);
 
         unget();
@@ -162,12 +162,12 @@ class DescriptionParser
         str.reserve(std::numeric_limits<int32_t>::digits10 + 2);
 
         do {
-            char c = get();
+            int c = get();
 
             if (not isdigit(c))
                 break;
 
-            str.append(1, c);
+            str.append(1, static_cast<char>(c));
         } while (in);
 
         unget();
@@ -197,20 +197,20 @@ class DescriptionParser
 
         std::string str;
         str.reserve(3);
-        char c;
+        int c;
 
         c = get();
 
         if (not(c == '=' or c == '<' or c == '>'))
             return false;
 
-        str.append(1, c);
+        str.append(1, static_cast<char>(c));
 
         if (c == '<' or c == '>') {
             c = get();
 
             if (c == '=' or c == '=')
-                str.append(1, c);
+                str.append(1, static_cast<char>(c));
             else
                 unget();
         }
@@ -221,10 +221,11 @@ class DescriptionParser
                       ? PACKAGE_OPERATOR_LESS
                       : (str == "<=")
                           ? PACKAGE_OPERATOR_LESS_OR_EQUAL
-                          : (str == ">") ? PACKAGE_OPERATOR_GREATER
-                                         : (str == ">=")
-                                             ? PACKAGE_OPERATOR_GREATER_OR_EQUAL
-                                             : PACKAGE_OPERATOR_EQUAL;
+                          : (str == ">")
+                              ? PACKAGE_OPERATOR_GREATER
+                              : (str == ">=")
+                                  ? PACKAGE_OPERATOR_GREATER_OR_EQUAL
+                                  : PACKAGE_OPERATOR_EQUAL;
 
         return true;
     }
@@ -300,12 +301,12 @@ class DescriptionParser
             return false;
 
         do {
-            char c = get();
+            int c = get();
 
             if (c == '\n' or c == '\r')
                 break;
 
-            maintainer->append(1, c);
+            maintainer->append(1, static_cast<char>(c));
         } while (in);
 
         boost::trim(*maintainer);
@@ -319,27 +320,27 @@ class DescriptionParser
             return false;
 
         do {
-            char c = get();
+            int c = get();
 
             if (c == '\n' or c == '\r') {
                 if (in) {
-                    char c2 = get();
+                    int c2 = get();
                     if (in and c2 == ' ') {
-                        char c3 = get();
+                        int c3 = get();
                         if (in and c3 == '.') {
                             break;
                         } else {
-                            description->append(1, c3);
+                            description->append(1, static_cast<char>(c3));
                         }
                     } else {
-                        description->append(1, c2);
+                        description->append(1, static_cast<char>(c2));
                     }
                 } else {
-                    description->append(1, c);
+                    description->append(1, static_cast<char>(c));
                 }
             }
 
-            description->append(1, c);
+            description->append(1, static_cast<char>(c));
         } while (in);
 
         boost::trim(*description);
@@ -360,7 +361,7 @@ class DescriptionParser
             str.reserve(32);
 
             do {
-                char c = get();
+                int c = get();
 
                 if (c == ',' or c == '\n') {
                     if (not str.empty()) {
@@ -375,7 +376,7 @@ class DescriptionParser
 
                     break;
                 }
-                str.append(1, c);
+                str.append(1, static_cast<char>(c));
             } while (in);
         } while (in);
 
@@ -391,12 +392,12 @@ class DescriptionParser
         str.reserve(std::numeric_limits<uint64_t>::digits10 + 1);
 
         do {
-            char c = get();
+            int c = get();
 
             if (not isdigit(c))
                 break;
 
-            str.append(1, c);
+            str.append(1, static_cast<char>(c));
         } while (in);
 
         try {
@@ -433,7 +434,8 @@ class DescriptionParser
         if (not(read_word("Conflicts:") and read_linkid(&pkg->conflicts)))
             return -5;
 
-        if (not(read_word("Maintainer:") and read_maintainer(&pkg->maintainer)))
+        if (not(read_word("Maintainer:") and
+                read_maintainer(&pkg->maintainer)))
             return -6;
 
         if (not(read_word("Description:") and

@@ -108,7 +108,8 @@ SaxStackVpz::pushVpz(const xmlChar** att)
         } else if (xmlStrcmp(att[i], (const xmlChar*)"version") == 0) {
             m_vpz.project().setVersion(xmlCharToString(att[i + 1]));
         } else if (xmlStrcmp(att[i], (const xmlChar*)"instance") == 0) {
-            m_vpz.project().setInstance(xmlCharToInt(att[i + 1]));
+            m_vpz.project().setInstance(
+              static_cast<int>(xmlCharToInt(att[i + 1])));
         }
     }
 

@@ -169,7 +169,8 @@ Tuple::fill(const std::string& str)
                 m_value.push_back(boost::lexical_cast<double>(elem));
             } catch (const boost::bad_lexical_cast& e) {
                 try {
-                    m_value.push_back(boost::lexical_cast<long>(elem));
+                    m_value.push_back(
+                      static_cast<double>(boost::lexical_cast<long>(elem)));
                 } catch (const boost::bad_lexical_cast& e) {
                     throw vle::utils::ArgError(
                       (fmt("Can not convert string '%1%' into"

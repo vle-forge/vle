@@ -296,7 +296,7 @@ julian_date()
 void
 to_time_function()
 {
-    long year, month, day, hours, minutes, seconds;
+    int year, month, day, hours, minutes, seconds;
     double date = 2452192.191273148;
 
     vle::utils::DateTime::toTime(

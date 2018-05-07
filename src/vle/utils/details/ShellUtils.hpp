@@ -446,7 +446,7 @@ public:
          * such things.
          */
 
-        argcp = tokens.size();
+        argcp = static_cast<int>(tokens.size());
         argvp.resize(argcp);
         for (unsigned int i = 0; i < tokens.size(); i++) {
             argvp[i] = g_shell_unquote(tokens[i]);

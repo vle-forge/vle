@@ -29,6 +29,7 @@
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/translator/GraphTranslator.hpp>
 #include <vle/translator/MatrixTranslator.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/unit-test.hpp>
 #include <vle/vpz/Vpz.hpp>
 
@@ -120,7 +121,7 @@ public:
     void externalTransition(const devs::ExternalEventList& events,
                             devs::Time /* time */) override
     {
-        m_counter = m_counter + events.size();
+        m_counter = m_counter + utils::numeric_cast<int>(events.size());
     }
 
     void output(devs::Time /* time */,

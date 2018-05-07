@@ -25,7 +25,9 @@
 #include "vle_dom.hpp"
 #include "dom_tools.hpp"
 #include <QtDebug>
+
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -585,12 +587,12 @@ vleDomStatic::fillWithValue(QDomDocument& domDoc,
             return false;
         }
         const vle::value::Matrix& mat = val.toMatrix();
-        int columns = mat.columns();
-        int rows = mat.rows();
-        int columns_max = mat.columns_max();
-        int rows_max = mat.rows_max();
-        int columnstep = mat.resizeColumn();
-        int rowstep = mat.resizeRow();
+        int columns = utils::numeric_cast<int>(mat.columns());
+        int rows = utils::numeric_cast<int>(mat.rows());
+        int columns_max = utils::numeric_cast<int>(mat.columns_max());
+        int rows_max = utils::numeric_cast<int>(mat.rows_max());
+        int columnstep = utils::numeric_cast<int>(mat.resizeColumn());
+        int rowstep = utils::numeric_cast<int>(mat.resizeRow());
 
         DomFunctions::setAttributeValue(
           node, "columns", QVariant(columns).toString());

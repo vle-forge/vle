@@ -451,7 +451,9 @@ DefaultSimSubpanel::updateCustomPlot()
             }
         }
         if (index != -1) {
-            QVector<double> x(view.rows() - 1), y(view.rows() - 1);
+            QVector<double> x(utils::numeric_cast<int>(view.rows() - 1)),
+                y(utils::numeric_cast<int>(view.rows() - 1));
+
             double localminyi = 99999999;
             double localmaxyi = -99999999;
             for (unsigned int i = 1; i < view.rows(); ++i) {
@@ -740,7 +742,8 @@ DefaultSimSubpanel::onTimeout()
     for (unsigned int i = index_message; i < log_messages.size(); i++) {
         mLog->logExt(QString(log_messages[i].c_str()), false);
     }
-    index_message = log_messages.size();
+
+    index_message = utils::numeric_cast<int>(log_messages.size());
 }
 
 void

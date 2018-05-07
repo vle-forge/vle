@@ -142,12 +142,13 @@ public:
 
             write(_(" - Simulation run................: "));
 
-            boost::progress_display display(100, *m_out, "\n   ", "   ", "   ");
+            boost::progress_display display(
+              100, *m_out, "\n   ", "   ", "   ");
             long previous = 0;
 
             while (root.run()) {
-                long pc =
-                  std::floor(100. * (root.getCurrentTime() - begin) / duration);
+                long pc = static_cast<long>(std::floor(
+                  100. * (root.getCurrentTime() - begin) / duration));
 
                 display += pc - previous;
                 previous = pc;
