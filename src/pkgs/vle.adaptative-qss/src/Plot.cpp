@@ -42,6 +42,35 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
             fclose(fp);
     }
 
+    void try_open(const vle::utils::Context& ctx)
+    {
+        auto home = ctx.getHomeDir();
+        const std::uintptr_t adr = reinterpret_cast<std::uintptr_t>(&ctx);
+        std::string filename("gnuplot-");
+        filename += std::to_string(adr);
+
+        fp = fopen(home.string().c_str(), "w");
+    }
+
+    void write(const vle::utils::Context& ctx,
+               int priority,
+               const std::string& str) noexcept override
+    {
+        if (not fp)
+            try_open(ctx);
+
+        if (fp) {
+            if (priority == 7)
+                fprintf(fp, "Gnuplot log: [Debug]: ");
+            else if (priority == 6)
+                fprintf(fp, "Gnuplot log:");
+            else
+                fprintf(fp, "Gnuplot log: [Error]");
+
+            fprintf(fp, "%s", str.c_str());
+        }
+    }
+
     void write(const vle::utils::Context& ctx,
                int priority,
                const char* file,
@@ -50,14 +79,8 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
                const char* format,
                va_list args) noexcept override
     {
-        if (not fp) {
-            auto home = ctx.getHomeDir();
-            const std::uintptr_t adr = reinterpret_cast<std::uintptr_t>(&ctx);
-            std::string filename("gnuplot-");
-            filename += std::to_string(adr);
-
-            fp = fopen(home.string().c_str(), "w");
-        }
+        if (not fp)
+            try_open(ctx);
 
         if (fp) {
             if (priority == 7)
@@ -123,8 +146,7 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
         spawn.start(
           command.string(), vle::utils::Path::current_path().string(), args);
     } catch (const std::exception& e) {
-        Trace(ctx,
-              3,
+        vle::devs::Trace(ctx, 3,
               "Plot error: fail to start GNUplot. Data are stored in file "
               "`%s'\n",
               gnuplot_script.string().c_str());
@@ -139,12 +161,12 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
     while (not spawn.isfinish()) {
         if (spawn.get(&output, &error)) {
             if (not output.empty()) {
-                Trace(ctx, 5, "%s\n", output.c_str());
+                vle::devs::Trace(ctx, 5, "%s\n", output.c_str());
                 output.clear();
             }
 
             if (not error.empty()) {
-                Trace(ctx, 5, "%s\n", error.c_str());
+                vle::devs::Trace(ctx, 5, "%s\n", error.c_str());
                 error.clear();
             }
 
@@ -158,12 +180,12 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
 
     if (spawn.get(&output, &error)) {
         if (not output.empty()) {
-            Trace(ctx, 5, "%s\n", output.c_str());
+            vle::devs::Trace(ctx, 5, "%s\n", output.c_str());
             output.clear();
         }
 
         if (not error.empty()) {
-            Trace(ctx, 5, "%s\n", error.c_str());
+            vle::devs::Trace(ctx, 5, "%s\n", error.c_str());
             error.clear();
         }
     }
@@ -173,11 +195,10 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
 
     spawn.status(&msg, &success);
 
-    Trace(ctx, 5, "Plot info: spawn msg %s\n", msg.c_str());
+    vle::devs::Trace(ctx, 5, "Plot info: spawn msg %s\n", msg.c_str());
 
     if (not success) {
-        Trace(ctx,
-              3,
+        vle::devs::Trace(ctx, 3,
               "Plot error: fail to start GNUplot. Data are stored in file "
               "`%s'. Error: %s\n",
               gnuplot_script.string().c_str(),
@@ -218,8 +239,7 @@ public:
       , m_gnuplot_started(false)
     {
         if (not m_data_os.is_open()) {
-            Trace(context(),
-                  3,
+            Trace(3,
                   "Plot error: fail to open file `%s' to store data\n",
                   m_data_file.string().c_str());
 
@@ -237,7 +257,7 @@ public:
                 if (v > 0.0)
                     m_duration = v;
                 else
-                    Trace(context(), 4, "Plot warning: bad gnuplot-duration\n");
+                    Trace(4, "Plot warning: bad gnuplot-duration\n");
             }
         }
 
@@ -249,7 +269,7 @@ public:
                 if (v.is_file())
                     m_command = v;
                 else
-                    Trace(context(), 4, "Plot warning: bad gnuplot-command\n");
+                    Trace(4, "Plot warning: bad gnuplot-command\n");
             }
         }
     }
@@ -281,9 +301,9 @@ public:
                 else if (m.exist("up"))
                     m_data.emplace_back(idx, t, m.getDouble("up"));
                 else
-                    Trace(context(), 4, "Plot warning: fail to convert data\n");
+                    Trace(4, "Plot warning: fail to convert data\n");
             } else
-                Trace(context(), 4, "Plot warning: fail to convert data\n");
+                Trace(4, "Plot warning: fail to convert data\n");
         }
 
         auto now = std::chrono::steady_clock::now();
@@ -313,8 +333,7 @@ public:
     {
         std::ofstream ofs(m_config_file.string());
         if (not ofs.is_open()) {
-            Trace(context(),
-                  3,
+            Trace(3,
                   "Plot error: fail to write configuration file `%s'\n",
                   m_config_file.string().c_str());
 
@@ -386,8 +405,7 @@ public:
     {
         std::ofstream os(m_gp_file.string());
         if (not os.is_open()) {
-            Trace(context(),
-                  3,
+            Trace(3,
                   "Plot error: fail to open gp file %s to store gnuplot "
                   "script\n",
                   m_gp_file.string().c_str());
@@ -417,7 +435,7 @@ public:
     void finish() override
     {
         if (m_labels.empty()) {
-            Trace(context(), 4, "Plot warning: empty data to draw\n");
+            Trace(4, "Plot warning: empty data to draw\n");
             return;
         }
 
@@ -430,8 +448,7 @@ public:
             m_data_os.open(m_data_file.string());
 
             if (not m_data_os.is_open()) {
-                Trace(context(),
-                      3,
+                Trace(3,
                       "Plot error: fail to open file `%s' to store data\n",
                       m_data_file.string().c_str());
 

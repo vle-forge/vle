@@ -28,8 +28,10 @@
 #include <boost/format.hpp>
 #include <iostream>
 #include <vle/oov/Plugin.hpp>
+
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>

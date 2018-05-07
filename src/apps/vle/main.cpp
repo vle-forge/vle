@@ -79,6 +79,29 @@ struct vle_log_standard : vle::utils::Context::LogFunctor
 
     void write(const vle::utils::Context& ctx,
                int priority,
+               const std::string& str) noexcept override
+    {
+        (void)ctx;
+
+        if (color) {
+            if (priority == 7)
+                fprintf(stream, "\e[90m[dbg] %s\e[39m", str.c_str());
+            else if (priority == 6)
+                fprintf(stream, "%s\e[39m", str.c_str());
+            else
+                fprintf(stream, "\e[91m[Error]\e[31m %s\e[39m ", str.c_str());
+        } else {
+            if (priority == 7)
+                fprintf(stream, "[dbg] %s", str.c_str());
+            else if (priority == 6)
+                fprintf(stream, "%s", str.c_str());
+            else
+                fprintf(stream, "[Error] %s", str.c_str());
+        }
+    }
+
+    void write(const vle::utils::Context& ctx,
+               int priority,
                const char* file,
                int line,
                const char* fn,
@@ -121,6 +144,23 @@ struct vle_log_file : vle::utils::Context::LogFunctor
     {
         if (fp)
             fclose(fp);
+    }
+
+    void write(const vle::utils::Context& ctx,
+               int priority,
+               const std::string& str) noexcept override
+    {
+        if (not fp)
+            fp = fopen(ctx.getLogFile().string().c_str(), "w");
+
+        if (fp) {
+            if (priority == 7)
+                fprintf(fp, "[dbg] %s", str.c_str());
+            else if (priority == 6)
+                fprintf(fp, "%s", str.c_str());
+            else
+                fprintf(fp, "[Error] %s", str.c_str());
+        }
     }
 
     void write(const vle::utils::Context& ctx,

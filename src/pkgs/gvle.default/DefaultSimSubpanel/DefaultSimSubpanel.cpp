@@ -48,6 +48,16 @@ struct sim_log : utils::Context::LogFunctor
 
     void write(const utils::Context& ctx,
                int priority,
+               const std::string& msg) noexcept override
+    {
+        (void)ctx;
+        (void)priority;
+
+        log_messages.emplace_back(msg);
+    }
+
+    void write(const utils::Context& ctx,
+               int priority,
                const char* file,
                int line,
                const char* fn,
@@ -59,9 +69,11 @@ struct sim_log : utils::Context::LogFunctor
         (void)file;
         (void)line;
         (void)fn;
+
         log_messages.emplace_back(vle::utils::vformat(format, args));
     }
-    ~sim_log() override{};
+
+    ~sim_log() override = default;
 };
 
 DefaultSimSubpanelThread::DefaultSimSubpanelThread(

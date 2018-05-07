@@ -43,8 +43,7 @@ public:
         }
 
         if (my_list.size() > 1)
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning: multiple output ports."
                   " Will use only port %s\n",
                   m_output_port_label.c_str());
@@ -69,8 +68,7 @@ public:
         if (events.end() != events.find("quantum")) {
             m_step_size = vv::toDouble(events.get("quantum"));
         } else {
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning : no quantum value provided for"
                   " Quantifier %s. Using default value (0.1)\n",
                   getModelName().c_str());
@@ -90,15 +88,15 @@ public:
         }
 
         if (2 >= m_past_length) {
-            throw vu::ModellingError("Bad archive length value ( provided value"
-                                     ": %u, should at least 3)",
-                                     m_past_length);
+            throw vu::ModellingError(
+              "Bad archive length value ( provided value"
+              ": %u, should at least 3)",
+              m_past_length);
         }
     }
 
     ~AdaptativeQuantifier() override // This is mandatory
-    {
-    }
+    {}
 
     vd::Time init(vd::Time /* time */) override
     {
@@ -114,8 +112,7 @@ public:
         int cnt;
 
         if (events.size() > 1)
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning: %s got multiple events at date: %f\n",
                   getModelName().c_str(),
                   time);
@@ -130,8 +127,7 @@ public:
             } else {
                 cnt = 0;
                 if ((val > m_upthreshold) || (val < m_downthreshold))
-                    Trace(context(),
-                          6,
+                    Trace(6,
                           "%s: treating out of bonds val: %f "
                           "(quantizer interval : [%f,%f] at date: %f",
                           getModelName().c_str(),
@@ -175,16 +171,14 @@ public:
                             } else {
                                 update_thresholds(shifting_factor, UP);
                             }
-                            Trace(context(),
-                                  6,
+                            Trace(6,
                                   "Quantifier %s new quantas while "
                                   "treating new val %f at date %f",
                                   getModelName().c_str(),
                                   val,
                                   time);
 
-                            Trace(context(),
-                                  6,
+                            Trace(6,
                                   "Quantizer interval:  [%f, %f], "
                                   "amplitude: %f "
                                   "(default amplitude: %f)",
@@ -193,8 +187,7 @@ public:
                                   (m_upthreshold - m_downthreshold),
                                   (2 * m_step_size));
 
-                            Trace(context(),
-                                  6,
+                            Trace(6,
                                   "Quantifier %s shifting : %f",
                                   getModelName().c_str(),
                                   shifting_factor);
@@ -214,8 +207,7 @@ public:
                 }
 
                 if (cnt > 1)
-                    Trace(context(),
-                          6,
+                    Trace(6,
                           "Warning : in %s multiple quanta change"
                           " at date : %f %d\n",
                           getModelName().c_str(),
@@ -223,8 +215,7 @@ public:
                           cnt);
 
                 if (0 == cnt)
-                    Trace(context(),
-                          6,
+                    Trace(6,
                           "Warning : in %s useless ext transition"
                           "call: no quanta change! input val %f (quantizer "
                           "interval : [%f,%f] at date %f\n",
@@ -259,7 +250,8 @@ public:
         externalTransition(externals, time);
     }
 
-    void output(vd::Time /*time*/, vd::ExternalEventList& output) const override
+    void output(vd::Time /*time*/,
+                vd::ExternalEventList& output) const override
     {
         if (m_has_output_port) {
             output.emplace_back(m_output_port_label);
@@ -369,8 +361,7 @@ private:
         factor = 0; // return 0 is shift failure.
         if (oscillating(m_past_length - 1) &&
             (0 != (archive.back().date - archive.front().date))) {
-            Trace(context(),
-                  7,
+            Trace(7,
                   "Oscillating, archive size = %lu (m_past_length = %u) ",
                   vle::utils::numeric_cast<unsigned long int>(archive.size()),
                   m_past_length);

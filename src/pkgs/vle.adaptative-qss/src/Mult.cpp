@@ -40,8 +40,7 @@ public:
         }
 
         if (my_list.size() > 1)
-            Trace(context(),
-                  3,
+            Trace(3,
                   "Warning: multiple output ports. Will use "
                   "only port: %s\n",
                   m_output_port_label.c_str());
@@ -52,7 +51,7 @@ public:
         for (auto& elem : my_list) {
             if (0 == elem.second.size()) {
                 Trace(
-                  context(), 3, "%s without connection\n", elem.first.c_str());
+                  3, "%s without connection\n", elem.first.c_str());
             } else {
                 connected_input_port_list.push_back((elem).first);
             }
@@ -70,8 +69,7 @@ public:
 
             for (auto& elem : connected_input_port_list) {
                 if (0 == input_coeffs.count(elem)) {
-                    Trace(context(),
-                          6,
+                    Trace(6,
                           "Warning: no power found for input port %s"
                           " of model %s\nAssuming 1 value!",
                           elem.c_str(),
@@ -81,8 +79,7 @@ public:
             }
 
         } else {
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning : no powers values provided for multiplier %s.\n"
                   "Using default value (output is the product of connected "
                   "inputs)\n",
@@ -145,8 +142,7 @@ public:
         vd::ExternalEventList::const_iterator it;
         for (it = lst.begin(); it != lst.end(); ++it) {
             if (1 < (*it).getMap().value().size()) {
-                Trace(context(),
-                      3,
+                Trace(3,
                       "Warning : getting multiple attributes on port %s\n",
                       it->getPortName().c_str());
             }
@@ -210,10 +206,10 @@ private:
 
     void dump_input_values()
     {
-        Trace(context(), 6, "Input values :");
+        Trace(6, "Input values :");
 
         for (auto& elem : input_values)
-            Trace(context(), 6, "%s => %f\n", elem.first.c_str(), elem.second);
+            Trace(6, "%s => %f\n", elem.first.c_str(), elem.second);
     }
 
     double compute_output_val()

@@ -66,6 +66,22 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
     ~gvle_ctx_log() override = default;
 
     void write(const vle::utils::Context& /*ctx*/,
+            int priority,
+            const std::string& str) noexcept override
+    {
+        QString msg = QString::fromStdString(str);
+
+        if (priority <= 3)
+            msg = QString("Error (level %1) :").arg(priority);
+        else if (priority <= 5)
+            msg = QString("Note: ");
+        else if (priority > 6)
+            msg = QString("[debug]: ");
+
+        m_logger->log(msg);
+    }
+
+    void write(const vle::utils::Context& /*ctx*/,
                int priority,
                const char* file,
                int line,

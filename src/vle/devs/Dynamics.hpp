@@ -409,6 +409,29 @@ public:
         return m_context;
     }
 
+    /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+    /** @brief Sends message to the ContextPtr logging system.
+     *
+     * Sends the message produced by :c format and @c ... to the ContextPtr
+     * logging system if the priority less than ContextPtr get_log_priority
+     * function.
+     *
+     * @param priority An integer in range [0-7] define message type.
+     * @param format The printf function like message type.
+     */
+    void Trace(int priority, const char* format, ...) const;
+
+    /** @brief Sends message to the ContextPtr logging system.
+     *
+     * Sends the string message to the ContextPtr logging system if the
+     * priority less than ContextPtr get_log_priority function.
+     *
+     * @param priority An integer in range [0-7] define message type.
+     * @param str The message to be send.
+     */
+    void Trace(int priority, const std::string& str) const;
+
 private:
     ///< A reference to the context.
     utils::ContextPtr m_context;
@@ -430,7 +453,8 @@ private:
  * @param format The printf function like message type.
  */
 void
-Trace(utils::ContextPtr ctx, int priority, const char* format, ...) noexcept;
+Trace(utils::ContextPtr ctx, int priority, const char* format, ...);
+
 }
 } // namespace vle devs
 

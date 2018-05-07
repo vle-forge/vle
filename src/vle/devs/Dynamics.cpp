@@ -35,6 +35,8 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
 
+#include <cstdarg>
+
 namespace vle {
 namespace devs {
 
@@ -195,19 +197,45 @@ Dynamics::getPackageExpFile(const std::string& name) const
 }
 
 void
-Trace(utils::ContextPtr ctx, int priority, const char* format, ...) noexcept
+Dynamics::Trace(int priority, const char* format, ...) const 
+{
+    if (m_context->get_log_priority() < priority)
+        return;
+
+    va_list ap;
+    try {
+        va_start(ap, format);
+        m_context->log(priority, nullptr, -1, nullptr, format, ap);
+        va_end(ap);
+    } catch (...) {
+        va_end(ap);
+    }
+}
+
+void
+Dynamics::Trace(int priority, const std::string& str) const
+{
+    if (m_context->get_log_priority() < priority)
+        return;
+
+    m_context->log(priority, str);
+}
+
+void
+Trace(utils::ContextPtr ctx, int priority, const char* format, ...)
 {
     if (ctx->get_log_priority() < priority)
         return;
 
     va_list ap;
     try {
-        va_start(ap);
+        va_start(ap, format);
         ctx->log(priority, nullptr, -1, nullptr, format, ap);
         va_end(ap);
     } catch (...) {
         va_end(ap);
     }
 }
+
 }
 } // namespace vle devs

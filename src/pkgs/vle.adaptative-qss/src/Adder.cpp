@@ -40,8 +40,7 @@ public:
         }
 
         if (my_list.size() > 1)
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning: %s multiple output ports. Will use"
                   " only port %s\n",
                   getModelName().c_str(),
@@ -68,8 +67,7 @@ public:
 
             for (auto& elem : connected_input_port_list) {
                 if (0 == input_coeffs.count(elem)) {
-                    Trace(context(),
-                          6,
+                    Trace(6,
                           "Warning: no weight found for input"
                           " port %s of model %s. Assuming 0 value !\n",
                           elem.c_str(),
@@ -80,14 +78,13 @@ public:
             }
         } else {
             Trace(
-              context(),
               6,
               "Warning : no weights values provided for adder %s"
               "Using default value (output is the mean of connected inputs)\n",
               getModelName().c_str());
 
             for (auto& elem : connected_input_port_list)
-                input_coeffs[elem] = 1 / connected_input_port_list.size();
+                input_coeffs[elem] = 1.0 / static_cast<double>(connected_input_port_list.size());
         }
     }
 
@@ -143,8 +140,7 @@ public:
         vd::ExternalEventList::const_iterator it;
         for (it = lst.begin(); it != lst.end(); ++it) {
             if (1 < (*it).getMap().value().size())
-                Trace(context(),
-                      6,
+                Trace(6,
                       "Warning : getting multiple attributes on"
                       " port %s. Using only one\n",
                       (*it).getPortName().c_str());
@@ -208,10 +204,10 @@ private:
 
     void dump_input_values()
     {
-        Trace(context(), 6, "Input values :");
+        Trace(6, "Input values :");
 
         for (auto elem : input_values)
-            Trace(context(), 6, "%s => %f\n", elem.first.c_str(), elem.second);
+            Trace(6, "%s => %f\n", elem.first.c_str(), elem.second);
     }
 
     double compute_output_val()

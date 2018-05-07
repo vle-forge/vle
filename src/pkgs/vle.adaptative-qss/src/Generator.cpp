@@ -37,8 +37,7 @@ public:
             m_val = vv::toDouble(events.get("source_init_level"));
         } else {
             m_val = 1;
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning : Model %s got no init"
                   " output level (source_init_level) : assuming 1\n",
                   getModelName().c_str());
@@ -50,8 +49,7 @@ public:
                 m_quantum = vv::toDouble(events.get("source_quantum"));
             } else {
                 m_quantum = 0.01;
-                Trace(context(),
-                      6,
+                Trace(6,
                       "Warning : Model %s got no output"
                       " quantum (source_quantum) : assuming 0.01\n",
                       getModelName().c_str());
@@ -59,8 +57,7 @@ public:
         } else {
             m_trend = 0;
 
-            Trace(context(),
-                  6,
+            Trace(6,
                   "%s got no output trend (source_trend)"
                   " : assuming 0\n",
                   getModelName().c_str());
@@ -83,8 +80,7 @@ public:
         }
 
         if (my_list.size() > 1) {
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning: multiple output ports."
                   " Will use only port %s\n",
                   m_output_port_label.c_str());

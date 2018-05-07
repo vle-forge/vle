@@ -59,6 +59,16 @@ struct vle_log_stderr : Context::LogFunctor
         fprintf(stderr, "%s: ", fn);
         vfprintf(stderr, format, args);
     }
+
+    void write(const Context& ctx,
+               int priority,
+               const std::string& str) noexcept override
+    {
+        (void)ctx;
+        (void)priority;
+
+        fprintf(stderr, "%s\n", str.c_str());
+    }
 };
 
 ContextPtr
@@ -518,6 +528,12 @@ Context::get_log_priority() const noexcept
  * ContextPrivate.hpp source code to use the pimpl pointer.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+void
+Context::log(int priority, const std::string& str)
+{
+    m_pimpl->log_fn->write(*this, priority, str);
+}
 
 void
 Context::log(int priority,

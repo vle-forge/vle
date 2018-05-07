@@ -34,8 +34,7 @@ public:
         if (events.exist("X_0")) {
             x_0_val = vv::toDouble(events.get("X_0"));
         } else {
-            Trace(context(),
-                  6,
+            Trace(6,
                   "%s: got no initial value : assuming 0.\n",
                   getModelName().c_str());
 
@@ -68,8 +67,7 @@ public:
         }
 
         if (my_list.size() > 1) {
-            Trace(context(),
-                  6,
+            Trace(6,
                   "Warning: multiple output ports."
                   " Will use only port %s.\n",
                   m_output_port_label.c_str());

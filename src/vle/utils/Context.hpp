@@ -431,7 +431,13 @@ public:
                            const char* fn,
                            const char* format,
                            va_list args) noexcept = 0;
-        virtual ~LogFunctor(){};
+
+        virtual void write(const Context& ctx,
+                           int priority,
+                           const std::string& str) noexcept = 0;
+
+        LogFunctor() = default;
+        virtual ~LogFunctor() = default;
     };
 
     void set_log_function(std::unique_ptr<LogFunctor> fn) noexcept;
@@ -439,6 +445,8 @@ public:
     void set_log_priority(int priority) noexcept;
 
     int get_log_priority() const noexcept;
+
+    void log(int priority, const std::string& str);
 
     void log(int priority,
              const char* file,

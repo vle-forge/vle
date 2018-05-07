@@ -39,8 +39,7 @@ public:
             if (m_outputs.find(event.first) != m_outputs.end())
                 it->second = std::shared_ptr<vv::Value>(event.second->clone());
             else
-                Trace(context(),
-                      3,
+                Trace(3,
                       "Constant model %s: no port for data %s",
                       getModelName().c_str(),
                       event.first.c_str());
@@ -52,8 +51,7 @@ public:
     vd::Time init(vd::Time /* time */) override
     {
         if (m_outputs.empty()) {
-            Trace(context(),
-                  3,
+            Trace(3,
                   "Constant model %s: no output port",
                   getModelName().c_str());
 
@@ -67,8 +65,7 @@ public:
     {
         for (const auto& port : m_outputs) {
             if (not port.second.get())
-                Trace(context(),
-                      3,
+                Trace(3,
                       "Constant model %s: no data to sound through port %s",
                       getModelName().c_str(),
                       port.first.c_str());

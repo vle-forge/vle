@@ -58,6 +58,25 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
 
     void write(const vle::utils::Context& /*ctx*/,
                int priority,
+               const std::string& str) noexcept override
+    {
+        if (not fp) {
+            std::stringstream s;
+            s.imbue(std::locale::classic());
+            s << "vle_manager_thread_" << th << ".log";
+            fp = fopen(s.str().c_str(), "w");
+        }
+
+        if (fp) {
+            if (priority == 7)
+                fprintf(fp, "[dbg] %s\n", str.c_str());
+            else
+                fprintf(fp, "%s\n", str.c_str());
+        }
+    }
+
+    void write(const vle::utils::Context& /*ctx*/,
+               int priority,
                const char* file,
                int line,
                const char* fn,
