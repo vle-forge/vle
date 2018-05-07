@@ -409,33 +409,6 @@ public:
     void initInternalOutputConnections();
 
     /**
-     * @brief calculate the distance between two models
-     * @param src the first model
-     * @param dst the second model
-     */
-    float distanceModels(BaseModel* src, BaseModel* dst);
-
-    /**
-     * @brief calculate the repulsion force for all models
-     */
-    void repulsionForce();
-
-    /**
-     * @brief calculate the atttraction force of all models
-     */
-    void attractionForce();
-
-    /**
-     * @brief set the new position
-     */
-    bool newPosition();
-
-    /**
-     * @brief order the models
-     */
-    void order();
-
-    /**
      * @brief return true if the model list has no connection with another
      * model which are no part of the model list.
      * @param lst list of models to test
