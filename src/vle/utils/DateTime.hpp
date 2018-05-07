@@ -66,9 +66,9 @@ public:
      * vle::utils::DateTime::year(2451545) == 2000u;
      * @endcode
      * @param time The simulation time.
-     * @return An unsigned int.
+     * @return An int.
      */
-    static unsigned int year(double time);
+    static int year(double time);
 
     /**
      * @brief Get the month in the simulation time.
@@ -76,9 +76,9 @@ public:
      * vle::utils::DateTime::month(2451545) == 1u;
      * @endcode
      * @param time The simulation time.
-     * @return An unsigned int.
+     * @return An int.
      */
-    static unsigned int month(double time);
+    static int month(double time);
 
     /**
      * @brief Get the day of the month in the simulation time.
@@ -86,9 +86,9 @@ public:
      * vle::utils::DateTime::dayOfMonth((2451545)) == 1u;
      * @endcode
      * @param time The simulation time.
-     * @return An unsigned int.
+     * @return An int.
      */
-    static unsigned int dayOfMonth(double time);
+    static int dayOfMonth(double time);
 
     /**
      * @brief Get the day in the week of the simulation time.
@@ -96,9 +96,9 @@ public:
      * vle::utils::DateTime::dayOfWeek((2451545)) == 6u;
      * @endcode
      * @param time The simulation time.
-     * @return An unsigned int.
+     * @return An int.
      */
-    static unsigned int dayOfWeek(double time);
+    static int dayOfWeek(double time);
 
     /**
      * @brief Get the day in the year of the simulation time.
@@ -106,9 +106,9 @@ public:
      * vle::utils::DateTime::dayOfYear((2451545)) == 1u;
      * @endcode
      * @param time The simulation time.
-     * @return An unsigned int.
+     * @return An int.
      */
-    static unsigned int dayOfYear(double time);
+    static int dayOfYear(double time);
 
     /**
      * @brief Get the week in the year of the simulation time.
@@ -116,9 +116,9 @@ public:
      * vle::utils::DateTime::dayOfYear((2451545)) == 1u;
      * @endcode
      * @param time The simulation time.
-     * @return An unsigned int.
+     * @return An int.
      */
-    static unsigned int weekOfYear(double time);
+    static int weekOfYear(double time);
 
     /**
      * @brief Check if the simulation time is a leap year.
@@ -239,7 +239,7 @@ public:
      * @param date The date to convert.
      * @return A string representation of the julian day.
      */
-    static std::string toJulianDayNumber(unsigned long date);
+    static std::string toJulianDayNumber(int date);
 
     /**
      * @brief Convert a string into a julian day number;
@@ -249,7 +249,7 @@ public:
      * @param date The date to convert.
      * @return A julian day number.
      */
-    static long toJulianDayNumber(const std::string& date);
+    static int toJulianDayNumber(const std::string& date);
 
     /**
      * @brief Convert a julian date into a string.
@@ -300,12 +300,12 @@ public:
      * @return The remainder of the conversion.
      */
     static double toTime(double date,
-                         long& year,
-                         long& month,
-                         long& day,
-                         long& hours,
-                         long& minutes,
-                         long& seconds);
+                         int& year,
+                         int& month,
+                         int& day,
+                         int& hours,
+                         int& minutes,
+                         int& seconds);
 
     /**
      * @brief Explode current date to year, month, day in the
@@ -316,7 +316,7 @@ public:
      * @param day Output parameter to represent day in a month (1..31).
      *
      */
-    static void currentDate(long& year, long& month, long& day);
+    static void currentDate(int& year, int& month, int& day);
 };
 }
 } // namespace vle utils
