@@ -661,14 +661,14 @@ public:
               vle::manager::LOG_NONE,
               vle::manager::SIMULATION_NONE |
                 vle::manager::SIMULATION_SPAWN_PROCESS,
-              timeout,
+              m_timeout,
               nullptr));
         } else {
             m_simulator.reset(
               new vle::manager::Simulation(m_context,
                                            vle::manager::LOG_NONE,
                                            vle::manager::SIMULATION_NONE,
-                                           timeout,
+                                           m_timeout,
                                            nullptr));
         }
         m_context->set_log_priority(3);
