@@ -192,15 +192,13 @@ ExperimentGenerator::ExperimentGenerator(const std::string& vpz,
                                          uint32_t rank,
                                          uint32_t size)
   : mPimpl(new ExperimentGenerator::Pimpl(vpz, rank, size))
-{
-}
+{}
 
 ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& vpz,
                                          uint32_t rank,
                                          uint32_t size)
   : mPimpl(new ExperimentGenerator::Pimpl(vpz, rank, size))
-{
-}
+{}
 
 ExperimentGenerator::~ExperimentGenerator()
 {

@@ -47,8 +47,7 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
     vle_log_manager_thread(unsigned int _th)
       : fp(nullptr)
       , th(_th)
-    {
-    }
+    {}
 
     ~vle_log_manager_thread() override
     {
@@ -197,12 +196,10 @@ public:
           , threads(threads)
           , result(result)
           , error(error)
-        {
-        }
+        {}
 
         ~worker()
-        {
-        }
+        {}
 
         void operator()()
         {
@@ -268,10 +265,11 @@ public:
         return result;
     }
 
-    std::unique_ptr<value::Matrix> runManagerMono(std::unique_ptr<vpz::Vpz> vpz,
-                                                  uint32_t rank,
-                                                  uint32_t world,
-                                                  Error* error)
+    std::unique_ptr<value::Matrix> runManagerMono(
+      std::unique_ptr<vpz::Vpz> vpz,
+      uint32_t rank,
+      uint32_t world,
+      Error* error)
     {
         Simulation sim(
           mContext, mLogOption, mSimulationOption, mTimeout, nullptr);
@@ -344,8 +342,7 @@ Manager::Manager(utils::ContextPtr context,
                                             simulationoptions,
                                             std::chrono::milliseconds(0),
                                             output))
-{
-}
+{}
 
 Manager::Manager(utils::ContextPtr context,
                  LogOptions logoptions,
@@ -357,8 +354,7 @@ Manager::Manager(utils::ContextPtr context,
                                             simulationoptions,
                                             timeout,
                                             output))
-{
-}
+{}
 
 Manager::~Manager() = default;
 
@@ -373,7 +369,8 @@ Manager::run(std::unique_ptr<vpz::Vpz> exp,
 
     if (thread <= 0) {
         throw vle::utils::ArgError(
-          (fmt(_("Manager error: thread must be superior to 0 (%1%)")) % thread)
+          (fmt(_("Manager error: thread must be superior to 0 (%1%)")) %
+           thread)
             .str());
     }
 

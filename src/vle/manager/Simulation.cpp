@@ -173,8 +173,9 @@ public:
         return result;
     }
 
-    std::unique_ptr<value::Map> runVerboseSummary(std::unique_ptr<vpz::Vpz> vpz,
-                                                  Error* error)
+    std::unique_ptr<value::Map> runVerboseSummary(
+      std::unique_ptr<vpz::Vpz> vpz,
+      Error* error)
     {
         std::unique_ptr<value::Map> result;
         boost::timer timer;
@@ -258,9 +259,9 @@ public:
 
         try {
             m_context->get_setting("vle.command.vle.simulation", &command);
-            command =
-              (vle::fmt(command) % m_output_file.string() % m_vpz_file.string())
-                .str();
+            command = (vle::fmt(command) % m_output_file.string() %
+                       m_vpz_file.string())
+                        .str();
             vle::utils::Spawn spawn(m_context);
             auto argv = spawn.splitCommandLine(command);
             auto exe = std::move(argv.front());
@@ -366,8 +367,7 @@ Simulation::Simulation(utils::ContextPtr context,
                                                simulationoptionts,
                                                timeout,
                                                output))
-{
-}
+{}
 
 Simulation::~Simulation() = default;
 

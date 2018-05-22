@@ -48,8 +48,7 @@ using graphT =
 graph_generator::graph_generator(const parameter& params)
   : m_params(params)
   , m_metrics{ -1, -1, -1 }
-{
-}
+{}
 
 graph_generator::graph_metrics
 graph_generator::metrics() const

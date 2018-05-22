@@ -168,8 +168,7 @@ SaxParser::SaxParser(Vpz& vpz)
   , m_vpz(vpz)
   , m_isValue(false)
   , m_isVPZ(false)
-{
-}
+{}
 
 struct scope_exit
 {
@@ -177,8 +176,7 @@ struct scope_exit
 
     scope_exit(std::function<void(void)> fn_)
       : fn(fn_)
-    {
-    }
+    {}
 
     ~scope_exit()
     {
@@ -743,8 +741,7 @@ SaxParser::onEndString()
 
 void
 SaxParser::onEndKey()
-{
-}
+{}
 
 void
 SaxParser::onEndSet()
@@ -905,8 +902,7 @@ SaxParser::onEndConnections()
 
 void
 SaxParser::onEndConnection()
-{
-}
+{}
 
 void
 SaxParser::onEndVLEProject()
@@ -970,28 +966,23 @@ SaxParser::onEndDestination()
 
 void
 SaxParser::onEndView()
-{
-}
+{}
 
 void
 SaxParser::onEndOrigin()
-{
-}
+{}
 
 void
 SaxParser::onEndReplicas()
-{
-}
+{}
 
 void
 SaxParser::onEndAttachedView()
-{
-}
+{}
 
 void
 SaxParser::onEndDynamic()
-{
-}
+{}
 
 void
 SaxParser::onEndOutput()

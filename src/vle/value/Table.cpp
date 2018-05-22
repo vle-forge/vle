@@ -72,8 +72,7 @@ Table::Table()
   : m_value(1, 0.0)
   , m_width(1)
   , m_height(1)
-{
-}
+{}
 
 Table::Table(std::size_t width, std::size_t height)
   : m_value(width * height)
@@ -129,7 +128,8 @@ Table::writeString(std::ostream& out) const
 void
 Table::writeXml(std::ostream& out) const
 {
-    out << "<table width=\"" << m_width << "\" height=\"" << m_height << "\" >";
+    out << "<table width=\"" << m_width << "\" height=\"" << m_height
+        << "\" >";
     for (index j = 0; j < m_height; ++j) {
         for (index i = 0; i < m_width; ++i) {
             out << get(i, j) << " ";

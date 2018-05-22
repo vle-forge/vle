@@ -529,8 +529,7 @@ public:
     {
         AttachModel(CoupledModel* model)
           : model(model)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& val)
         {
@@ -550,8 +549,7 @@ public:
         UpdateDynamics(const std::string& oldname, const std::string& newname)
           : oldname(oldname)
           , newname(newname)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& value)
         {
@@ -571,8 +569,7 @@ public:
     {
         PurgeDynamics(const std::set<std::string>& dynamics)
           : dynamics(dynamics)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& value)
         {
@@ -589,11 +586,11 @@ public:
      */
     struct UpdateObservable
     {
-        UpdateObservable(const std::string& oldname, const std::string& newname)
+        UpdateObservable(const std::string& oldname,
+                         const std::string& newname)
           : oldname(oldname)
           , newname(newname)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& value)
         {
@@ -613,8 +610,7 @@ public:
     {
         PurgeObservable(const std::set<std::string>& observables)
           : observables(observables)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& value)
         {
@@ -631,11 +627,11 @@ public:
      */
     struct UpdateConditions
     {
-        UpdateConditions(const std::string& oldname, const std::string& newname)
+        UpdateConditions(const std::string& oldname,
+                         const std::string& newname)
           : oldname(oldname)
           , newname(newname)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& value)
         {
@@ -655,8 +651,7 @@ public:
     {
         PurgeConditions(const std::set<std::string>& conditions)
           : conditions(conditions)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& value)
         {
@@ -674,8 +669,7 @@ public:
     {
         DetachModel(CoupledModel* model)
           : model(model)
-        {
-        }
+        {}
 
         inline void operator()(const ModelList::value_type& value)
         {
@@ -693,8 +687,7 @@ public:
     {
         DeleteModel(CoupledModel* model)
           : model(model)
-        {
-        }
+        {}
 
         void operator()(ModelList::value_type& value)
         {
@@ -715,8 +708,7 @@ public:
         IsInModelList(int x, int y)
           : x(x)
           , y(y)
-        {
-        }
+        {}
 
         inline bool operator()(const ModelList::value_type& value) const
         {
@@ -739,8 +731,7 @@ public:
 
         CloneModel(CoupledModel* parent)
           : parent(parent)
-        {
-        }
+        {}
 
         inline void operator()(ModelList::value_type& x) const
         {

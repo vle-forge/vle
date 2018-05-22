@@ -36,8 +36,7 @@ AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent)
   : BaseModel(name, parent)
   , m_simulator(nullptr)
   , m_debug(false)
-{
-}
+{}
 
 AtomicModel::AtomicModel(const std::string& name,
                          CoupledModel* parent,

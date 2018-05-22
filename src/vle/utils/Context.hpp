@@ -129,7 +129,8 @@ public:
      *
      * @return true if insertion is successful.
      */
-    bool set_setting(const std::string& key, const std::string& value) noexcept;
+    bool set_setting(const std::string& key,
+                     const std::string& value) noexcept;
 
     /**
      * Insert an @c double into the specified key.
@@ -193,7 +194,8 @@ public:
      * @throw utils::ArgError if section, key do not exist or if the value
      * is not an @c std::string.
      */
-    bool get_setting(const std::string& key, std::string* value) const noexcept;
+    bool get_setting(const std::string& key, std::string* value) const
+      noexcept;
 
     /**
      * Get a @c double from specified key.

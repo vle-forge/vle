@@ -465,12 +465,10 @@ public:
       , oldline(0)
       , column(0)
       , oldcolumn(0)
-    {
-    }
+    {}
 
     ~DescriptionParser()
-    {
-    }
+    {}
 
     void read_packages(const std::string& distribution, Packages* pkgs)
     {

@@ -39,8 +39,7 @@ namespace vpz {
 
 CoupledModel::CoupledModel(const std::string& name, CoupledModel* parent)
   : BaseModel(name, parent)
-{
-}
+{}
 
 CoupledModel::CoupledModel(const CoupledModel& mdl)
   : BaseModel(mdl)
@@ -637,7 +636,8 @@ CoupledModel::getBasicConnections(const ModelList& models) const
         }
 
         const ConnectionList& cnts((*it).second->getOutputPortList());
-        for (ConnectionList::const_iterator jt = cnts.begin(); jt != cnts.end();
+        for (ConnectionList::const_iterator jt = cnts.begin();
+             jt != cnts.end();
              ++jt) {
             for (ModelPortList::const_iterator kt = jt->second.begin();
                  kt != jt->second.end();
@@ -941,7 +941,8 @@ CoupledModel::writeConnections(std::ostream& out) const
          it != m_modelList.end();
          ++it) {
         const ConnectionList& cnts((*it).second->getOutputPortList());
-        for (ConnectionList::const_iterator jt = cnts.begin(); jt != cnts.end();
+        for (ConnectionList::const_iterator jt = cnts.begin();
+             jt != cnts.end();
              ++jt) {
             for (ModelPortList::const_iterator kt = jt->second.begin();
                  kt != jt->second.end();
@@ -1009,8 +1010,9 @@ void
 CoupledModel::updateDynamics(const std::string& oldname,
                              const std::string& newname)
 {
-    std::for_each(
-      m_modelList.begin(), m_modelList.end(), UpdateDynamics(oldname, newname));
+    std::for_each(m_modelList.begin(),
+                  m_modelList.end(),
+                  UpdateDynamics(oldname, newname));
 }
 
 void
@@ -1062,8 +1064,8 @@ CoupledModel::writeConnection(std::ostream& out) const
 BaseModel*
 CoupledModel::find(int x, int y) const
 {
-    ModelList::const_iterator it =
-      std::find_if(m_modelList.begin(), m_modelList.end(), IsInModelList(x, y));
+    ModelList::const_iterator it = std::find_if(
+      m_modelList.begin(), m_modelList.end(), IsInModelList(x, y));
     return (it == m_modelList.end()) ? 0 : it->second;
 }
 
@@ -1250,7 +1252,8 @@ CoupledModel::saveOutputConnections(ModelList& models)
 
     while (it != models.end()) {
         ConnectionList connectOut;
-        ConnectionList::iterator iter = it->second->getOutputPortList().begin();
+        ConnectionList::iterator iter =
+          it->second->getOutputPortList().begin();
 
         while (iter != it->second->getOutputPortList().end()) {
             ModelPortList lst(it->second->getOutPort(iter->first));
@@ -1318,8 +1321,8 @@ CoupledModel::restoreInputConnections(ModelList& models,
                                          .str();
                             destination->addInputPort(portName);
                             inputPorts[std::make_pair(
-                              iterModel->first->getName(), iterModel->second)] =
-                              portName;
+                              iterModel->first->getName(),
+                              iterModel->second)] = portName;
                         } else {
                             portName = it->second;
                         }
@@ -1399,8 +1402,8 @@ CoupledModel::restoreOutputConnections(CoupledModel* destination,
                                          .str();
                             destination->addOutputPort(portName);
                             outputPorts[std::make_pair(
-                              iterModel->first->getName(), iterModel->second)] =
-                              portName;
+                              iterModel->first->getName(),
+                              iterModel->second)] = portName;
                         } else {
                             portName = it->second;
                         }
@@ -1443,7 +1446,8 @@ CoupledModel::initConnections()
          ++it) {
         const ConnectionList& outs(it->second->getOutputPortList());
 
-        for (ConnectionList::const_iterator jt = outs.begin(); jt != outs.end();
+        for (ConnectionList::const_iterator jt = outs.begin();
+             jt != outs.end();
              ++jt) {
             const ModelPortList& ports(jt->second);
 

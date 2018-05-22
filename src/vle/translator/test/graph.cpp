@@ -38,35 +38,35 @@ using namespace vle;
 #define xstringify(a) stringify(a)
 #define stringify(a) #a
 
-#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                               \
-    extern "C" {                                                               \
-    VLE_MODULE vle::devs::Dynamics* symbol_(                                   \
-      const vle::devs::DynamicsInit& init,                                     \
-      const vle::devs::InitEventList& events)                                  \
-    {                                                                          \
-        return new model_(init, events);                                       \
-    }                                                                          \
+#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                              \
+    extern "C" {                                                              \
+    VLE_MODULE vle::devs::Dynamics* symbol_(                                  \
+      const vle::devs::DynamicsInit& init,                                    \
+      const vle::devs::InitEventList& events)                                 \
+    {                                                                         \
+        return new model_(init, events);                                      \
+    }                                                                         \
     }
 
-#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                              \
-    extern "C" {                                                               \
-    VLE_MODULE vle::devs::Dynamics* symbol_(                                   \
-      const vle::devs::ExecutiveInit& init,                                    \
-      const vle::devs::InitEventList& events)                                  \
-    {                                                                          \
-        std::string symbol_test(xstringify(symbol_));                          \
-        Ensures(symbol_test.length() > 4);                                     \
-        Ensures(symbol_test.compare(0, 4, "exe_") == 0);                       \
-        return new model_(init, events);                                       \
-    }                                                                          \
+#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                             \
+    extern "C" {                                                              \
+    VLE_MODULE vle::devs::Dynamics* symbol_(                                  \
+      const vle::devs::ExecutiveInit& init,                                   \
+      const vle::devs::InitEventList& events)                                 \
+    {                                                                         \
+        std::string symbol_test(xstringify(symbol_));                         \
+        Ensures(symbol_test.length() > 4);                                    \
+        Ensures(symbol_test.compare(0, 4, "exe_") == 0);                      \
+        return new model_(init, events);                                      \
+    }                                                                         \
     }
 
-#define DECLARE_OOV_SYMBOL(symbol_, model_)                                    \
-    extern "C" {                                                               \
-    VLE_MODULE vle::oov::Plugin* symbol_(const std::string& location)          \
-    {                                                                          \
-        return new model_(location);                                           \
-    }                                                                          \
+#define DECLARE_OOV_SYMBOL(symbol_, model_)                                   \
+    extern "C" {                                                              \
+    VLE_MODULE vle::oov::Plugin* symbol_(const std::string& location)         \
+    {                                                                         \
+        return new model_(location);                                          \
+    }                                                                         \
     }
 
 class Beep : public devs::Dynamics
@@ -74,8 +74,7 @@ class Beep : public devs::Dynamics
 public:
     Beep(const devs::DynamicsInit& model, const devs::InitEventList& events)
       : devs::Dynamics(model, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -97,10 +96,10 @@ public:
 class Transform : public devs::Dynamics
 {
 public:
-    Transform(const devs::DynamicsInit& atom, const devs::InitEventList& events)
+    Transform(const devs::DynamicsInit& atom,
+              const devs::InitEventList& events)
       : devs::Dynamics(atom, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -170,8 +169,7 @@ public:
       : devs::Executive(mdl, events)
       , generator(123)
       , generator_type(events.getString("generator"))
-    {
-    }
+    {}
 
     static void maker(const translator::graph_generator::node_metrics& metrics,
                       std::string& name,

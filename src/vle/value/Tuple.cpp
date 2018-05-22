@@ -60,8 +60,7 @@ namespace value {
 
 Tuple::Tuple(size_type n, double value)
   : m_value(n, value)
-{
-}
+{}
 
 Value::type
 Tuple::getType() const
