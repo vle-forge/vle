@@ -243,9 +243,9 @@ struct Access
     }
 
     /**
-     * \c value function tries to convert the \c Access object into a
-     * \c vle::value::Value pointer by browsing the experimental condition
-     * of the \e vpz arguement.
+     * \c value function tries to convert the \c Access object into a \c
+     * vle::value::Value pointer by browsing the experimental condition of the
+     * \e vpz arguement.
      */
     vle::value::Value* value(VpzPtr vpz) const
     {
@@ -328,110 +328,149 @@ cleanup_token(const std::string& str)
     return str;
 }
 
-/**
- * @brief Convert and assign a string to a @e vle::value::Value.
- * @details Convert the string @e str and convert it into the @e
- *     vle::value::Value. Conversion only works for boolean, integer, double
- *     and string. Otherwise, an std::runtime_error is thrown.
- *
- * @param value The value to assign.
- * @param str The string to convert.
- *
- * @return [description]
- */
-static void
-assign_string_to_value(vle::value::Value* value, const std::string& str)
+class Columns
 {
-    assert(value);
-
-    switch (value->getType()) {
-    case vle::value::Value::BOOLEAN:
-        value->toBoolean().value() = vle::utils::to<bool>(str);
-        break;
-
-    case vle::value::Value::INTEGER:
-        value->toInteger().value() = vle::utils::to<std::int32_t>(str);
-        break;
-
-    case vle::value::Value::DOUBLE:
-        value->toDouble().value() = vle::utils::to<double>(str);
-        break;
-
-    case vle::value::Value::STRING:
-        value->toString().value() = str;
-        break;
-
-    default:
-        throw vle::utils::ArgError(
-          _("fail to assign string token `%s' to value"), str.c_str());
-    }
-}
-
-struct ColumnDefinition
-{
-    ColumnDefinition(const std::string& str_)
-      : str(str_)
-      , value(nullptr)
-    {}
-
-    ColumnDefinition(vle::value::Value* value_)
-      : str()
-      , value(value_)
-    {}
-
-    std::string str;
-    vle::value::Value* value;
-};
-
-struct Columns
-{
-    typedef std::vector<ColumnDefinition> container_type;
-    typedef container_type::iterator iterator;
-    typedef container_type::const_iterator const_iterator;
-
-    void add(const std::string& str)
+public:
+    struct KeepColumnDefinition
     {
-        data.emplace_back(str);
+        KeepColumnDefinition(std::string str_)
+            : str(str_)
+        {}
+
+        std::string str;
+    };
+
+    /*
+     * @c ValueColumnDefinition stores the clone of the value into a unique_ptr
+     * and keep a reference to the pointer since this pointer come from a
+     * shared_ptr (direct access to the condition port) or a unique_ptr (a child
+     * in the value's tree).
+     */
+    struct ValueColumnDefinition
+    {
+        ValueColumnDefinition(vle::value::Value *value_)
+            : default_value(value_->clone())
+            , value(value_)
+        {
+            assert(value && "InternalError: nullptr value column");
+        }
+
+        std::unique_ptr<vle::value::Value> default_value;
+        vle::value::Value* value;
+    };
+
+private:
+    std::vector<KeepColumnDefinition> keep_vector;
+    std::vector<ValueColumnDefinition> value_vector;
+    std::vector<std::pair<int, int>> indices;
+
+    enum
+    {
+        keep_column_option = 0,
+        value_column_option
+    };
+
+    void check(std::size_t size) const
+    {
+        if (size > std::numeric_limits<int>::max()) {
+            fprintf(
+              stderr,
+              "Column definition: cvle can not store more than %d columns.",
+              std::numeric_limits<int>::max());
+
+            throw vle::utils::ArgError(_("Too many column"));
+        }
+    }
+
+public:
+    void add(std::string str)
+    {
+        indices.emplace_back(keep_column_option,
+                             static_cast<int>(keep_vector.size()));
+
+        keep_vector.emplace_back(str);
+
+        check(keep_vector.size());
     }
 
     void add(vle::value::Value* value)
     {
-        data.emplace_back(value);
+        indices.emplace_back(value_column_option,
+                             static_cast<int>(value_vector.size()));
+
+        value_vector.emplace_back(value);
+
+        check(value_vector.size());
     }
 
     std::size_t size() const
     {
-        return data.size();
+        return indices.size();
     }
 
-    void update(std::size_t id, const std::string& str)
+    void update(std::size_t i, const std::string& str)
     {
-        if (id >= data.size())
-            throw vle::utils::InternalError(_("Too many column data"));
+        assert(i >= indices.size() && "Too many column");
 
-        if (not data[id].value)
-            data[id].str = str;
-        else
-            assign_string_to_value(data[id].value, str);
+        int id = indices[i].second;
+
+        if (indices[id].first == keep_column_option) {
+            keep_vector[id].str = str;
+        } else {
+            // If @c str is empty, user want to use the default @c
+            // vle::value::Value from the origin VPZ file. Otherwise, we
+            // convert the value from the string.
+
+            switch (value_vector[id].default_value->getType()) {
+            case vle::value::Value::BOOLEAN:
+                value_vector[id].value->toBoolean().value() =
+                  str.empty()
+                    ? value_vector[id].default_value->toBoolean().value()
+                    : vle::utils::to<bool>(str);
+                break;
+
+            case vle::value::Value::INTEGER:
+                value_vector[id].value->toInteger().value() =
+                  str.empty()
+                    ? value_vector[id].default_value->toInteger().value()
+                    : vle::utils::to<std::int32_t>(str);
+                break;
+
+            case vle::value::Value::DOUBLE:
+                value_vector[id].value->toDouble().value() =
+                  str.empty()
+                    ? value_vector[id].default_value->toDouble().value()
+                    : vle::utils::to<double>(str);
+                break;
+
+            case vle::value::Value::STRING:
+                value_vector[id].value->toString().value() =
+                  str.empty()
+                    ? value_vector[id].default_value->toString().value()
+                    : str;
+                break;
+
+            default:
+                break;
+            }
+        }
     }
 
     void printf(FILE* f) const
     {
-        for (std::size_t i = 0, e = data.size(); i != e; ++i)
-            if (not data[i].value)
-                fprintf(f, "%s ", data[i].str.c_str());
+        for (const auto& elem : indices)
+            if (elem.first == keep_column_option)
+                fprintf(f, "%s ", keep_vector[elem.second].str.c_str());
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Columns& columns)
     {
-        for (std::size_t i = 0, e = columns.data.size(); i != e; ++i)
-            if (not columns.data[i].value)
-                os << columns.data[i].str << ' ';
+        for (const auto& elem : columns.indices)
+            if (elem.first == keep_column_option)
+                os << columns.keep_vector[elem.second].str.c_str() << ' ';
 
         return os;
     }
-
-    container_type data;
 };
 
 struct ConditionsBackup
@@ -708,8 +747,8 @@ public:
         std::string::size_type begin = 0u;
         std::string::size_type end;
         result.imbue(std::locale::classic());
-        result << std::setprecision(std::floor(
-                    std::numeric_limits<double>::digits * std::log10(2) + 2))
+        result << std::setprecision(static_cast<int>(std::floor(
+                    std::numeric_limits<double>::digits * std::log10(2) + 2)))
                << std::scientific;
 
         for (begin = 0, end = block.find('\n'); begin < block.size();
