@@ -35,10 +35,8 @@
 #include <vle/vpz/SaxParser.hpp>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/program_options.hpp>
+
+#include <mpi.h>
 
 #include <fstream>
 #include <iomanip>
@@ -69,6 +67,61 @@
 #endif
 
 typedef std::shared_ptr<vle::vpz::Vpz> VpzPtr;
+
+enum CommunicationTag
+{
+    worker_block_header_tag,
+    worker_block_todo_tag,
+    worker_block_end_tag,
+    worker_end_tag
+};
+
+static inline CommunicationTag
+from_int(int tag)
+{
+    return static_cast<CommunicationTag>(tag);
+}
+
+static void
+mpi_send_string(int target, CommunicationTag tag, const std::string& msg)
+{
+    if (MPI_Send(msg.data(),
+                 static_cast<int>(msg.size()),
+                 MPI_CHAR,
+                 target,
+                 tag,
+                 MPI_COMM_WORLD) != MPI_SUCCESS)
+        fprintf(stderr,
+                "Sending buffer (size: %d) to %d failed\n",
+                static_cast<int>(msg.size()),
+                target);
+}
+
+static std::tuple<std::string, int, CommunicationTag>
+mpi_recv_string()
+{
+    MPI_Status status;
+    MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+    int size;
+    MPI_Get_count(&status, MPI_CHAR, &size);
+
+    std::string ret(static_cast<std::string::size_type>(size), '\0');
+
+    if (MPI_Recv(&ret[0],
+                 static_cast<int>(ret.size()),
+                 MPI_CHAR,
+                 status.MPI_SOURCE,
+                 status.MPI_TAG,
+                 MPI_COMM_WORLD,
+                 &status) != MPI_SUCCESS)
+        fprintf(stderr,
+                "Receiving buffer (size: %d) from %d failed\n",
+                size,
+                status.MPI_SOURCE);
+
+    return std::make_tuple(ret, status.MPI_SOURCE, from_int(status.MPI_TAG));
+}
 
 void
 generate_template_line(std::ostream& header,
@@ -262,8 +315,7 @@ struct Access
                 long int val = strtol(params[i].c_str(), NULL, 10);
 
                 if (errno or val < 0 or
-                    val >=
-                      boost::numeric_cast<long int>(current->toSet().size()))
+                    val >= static_cast<long int>(current->toSet().size()))
                     throw vle::utils::ArgError(
                       _("Fails to convert '%s.%s' parameter '%zu'"
                         " as correct set index"),
@@ -271,7 +323,8 @@ struct Access
                       port.c_str(),
                       i);
 
-                current = current->toSet()[val].get();
+                current =
+                  current->toSet()[static_cast<std::size_t>(val)].get();
             } else if (current->isMap()) {
                 auto it = current->toMap().find(params[i]);
 
@@ -334,7 +387,7 @@ public:
     struct KeepColumnDefinition
     {
         KeepColumnDefinition(std::string str_)
-            : str(str_)
+          : str(str_)
         {}
 
         std::string str;
@@ -343,14 +396,14 @@ public:
     /*
      * @c ValueColumnDefinition stores the clone of the value into a unique_ptr
      * and keep a reference to the pointer since this pointer come from a
-     * shared_ptr (direct access to the condition port) or a unique_ptr (a child
-     * in the value's tree).
+     * shared_ptr (direct access to the condition port) or a unique_ptr (a
+     * child in the value's tree).
      */
     struct ValueColumnDefinition
     {
-        ValueColumnDefinition(vle::value::Value *value_)
-            : default_value(value_->clone())
-            , value(value_)
+        ValueColumnDefinition(vle::value::Value* value_)
+          : default_value(value_->clone())
+          , value(value_)
         {
             assert(value && "InternalError: nullptr value column");
         }
@@ -410,7 +463,7 @@ public:
 
     void update(std::size_t i, const std::string& str)
     {
-        assert(i >= indices.size() && "Too many column");
+        assert(i < indices.size() && "Too many column");
 
         int id = indices[i].second;
 
@@ -861,13 +914,6 @@ public:
     }
 };
 
-enum CommunicationTag
-{
-    worker_block_todo_tag,
-    worker_block_end_tag,
-    worker_end_tag
-};
-
 int
 run_as_master(const std::string& inputfile,
               const std::string& outputfile,
@@ -877,49 +923,55 @@ run_as_master(const std::string& inputfile,
     int blockid = 0;
 
     try {
+        int world_size;
+        MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
         Root r(inputfile, outputfile, blocksize);
-        boost::mpi::communicator comm;
-        std::vector<bool> workers(comm.size(), false);
+        std::vector<bool> workers(world_size, false);
         std::string block, header;
         r.header(header);
-        boost::mpi::broadcast(comm, header, 0);
 
-        for (int child = 1; child < comm.size(); ++child) {
+        for (int rank = 1; rank != world_size; ++rank)
+            mpi_send_string(rank, worker_block_header_tag, header);
+
+        for (int rank = 1; rank < world_size; ++rank) {
             if (r.read(block)) {
-                printf(_("master sends block %d to %d\n"), blockid++, child);
-                comm.send(child, worker_block_todo_tag, block);
-                workers[child] = true;
+                printf(_("master sends block %d to %d\n"), blockid++, rank);
+                mpi_send_string(rank, worker_block_todo_tag, block);
+                workers[rank] = true;
             } else
                 break;
         }
 
-        bool end = false;
-
+        bool end = false; // Stop when all buffer are sent.
+        int from;
+        CommunicationTag tag;
         while (end == false) {
-            boost::mpi::status msg = comm.probe();
-            comm.recv(msg.source(), worker_block_end_tag, block);
-            workers[msg.source()] = false;
+            std::tie(block, from, tag) = mpi_recv_string();
+
+            assert(tag == worker_block_end_tag);
+
+            workers[from] = false;
             r.write(block);
             end = !r.read(block);
 
-            if (!block.empty()) {
-                printf(
-                  _("master sends block %d to %d\n"), blockid++, msg.source());
-                comm.send(msg.source(), worker_block_todo_tag, block);
-                workers[msg.source()] = true;
+            if (not block.empty()) {
+                printf(_("master sends block %d to %d\n"), blockid++, from);
+                mpi_send_string(from, worker_block_todo_tag, block);
+                workers[from] = true;
             }
         }
 
         while (std::find(workers.begin(), workers.end(), true) !=
                workers.end()) {
-            boost::mpi::status msg = comm.probe();
-            comm.recv(msg.source(), worker_block_end_tag, block);
-            workers[msg.source()] = false;
+            std::tie(block, from, tag) = mpi_recv_string();
+            assert(tag == worker_block_end_tag);
+            workers[from] = false;
             r.write(block);
         }
 
-        for (int child = 1; child < comm.size(); ++child)
-            comm.send(child, worker_end_tag);
+        for (int rank = 1; rank < world_size; ++rank)
+            mpi_send_string(rank, worker_end_tag, "ok");
     } catch (const std::exception& e) {
         std::fprintf(stderr, "master fails: %s\n", e.what());
         ret = EXIT_SUCCESS;
@@ -938,28 +990,32 @@ run_as_worker(const std::string& package,
     int ret = EXIT_SUCCESS;
 
     try {
-        boost::mpi::communicator comm;
         Worker w(package, timeout, vpz, withoutspawn, warnings);
         std::string block;
-        boost::mpi::broadcast(comm, block, 0);
+        int from;
+        CommunicationTag tag;
+
+        std::tie(block, from, tag) = mpi_recv_string();
+        assert(tag == worker_block_header_tag);
         w.init(block);
 
         bool end = false;
-
         while (not end) {
-            boost::mpi::status msg = comm.probe();
+            std::tie(block, from, tag) = mpi_recv_string();
 
-            switch (msg.tag()) {
+            switch (tag) {
             case worker_block_todo_tag:
-                comm.recv(0, worker_block_todo_tag, block);
                 block = w.run(block);
-                comm.send(0, worker_block_end_tag, block);
+                mpi_send_string(0, worker_block_end_tag, block);
                 break;
 
             case worker_end_tag:
-                comm.recv(0, worker_end_tag);
                 end = true;
                 break;
+
+            default:
+                assert(false && "Internal error in MPI message order");
+                ::abort();
             }
         }
     } catch (const std::exception& e) {
@@ -1076,23 +1132,26 @@ main(int argc, char* argv[])
         return ret;
     }
 
-    boost::mpi::environment env(argc, argv);
-    boost::mpi::communicator comm;
-
     std::vector<std::string> vpz(argv + ::optind, argv + argc);
     if (vpz.size() > 1)
         fprintf(
           stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
 
-    if (comm.rank() == 0 and not template_file.empty())
+    MPI_Init(&argc, &argv);
+    int rank = 0, world_size = 0;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (rank == 0 and not template_file.empty())
         generate_template(template_file, package_name, vpz.front());
 
-    if (comm.size() == 1) {
+    if (world_size == 1) {
         fprintf(stderr, _("cvle needs two processors.\n"));
         return EXIT_FAILURE;
     }
 
-    if (comm.rank() == 0) {
+    int status;
+    if (rank == 0) {
         printf(_("block size: %d\n"
                  "package   : %s\n"
                  "timeout   : %ld\n"
@@ -1108,8 +1167,14 @@ main(int argc, char* argv[])
         for (const auto& elem : vpz)
             printf("%s ", elem.c_str());
         printf("\n");
-        return run_as_master(input_file, output_file, block_size);
+
+        status = run_as_master(input_file, output_file, block_size);
+    } else {
+        status = run_as_worker(
+          package_name, vpz.front(), timeout, withoutspawn, warnings);
     }
-    return run_as_worker(
-      package_name, vpz.front(), timeout, withoutspawn, warnings);
+
+    MPI_Finalize();
+
+    return status;
 }
