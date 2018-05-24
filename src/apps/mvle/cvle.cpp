@@ -205,9 +205,6 @@ generate_template(std::string file,
             auto endj = it->second.end();
 
             while (jt != endj) {
-                if (not jt->second.empty() or not jt->second[0])
-                    continue;
-
                 std::string name = it->first;
                 name += '.';
                 name += jt->first;
