@@ -452,9 +452,8 @@ private:
  * @param priority An integer in range [0-7] define message type.
  * @param format The printf function like message type.
  */
-void
+VLE_API void
 Trace(utils::ContextPtr ctx, int priority, const char* format, ...);
-
 }
 } // namespace vle devs
 
