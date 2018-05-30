@@ -106,7 +106,7 @@ mpi_recv_string()
     int size;
     MPI_Get_count(&status, MPI_CHAR, &size);
 
-    std::string ret(static_cast<std::string::size_type>(size), '\0');
+    std::string ret(static_cast<std::string::size_type>(size), ' ');
 
     if (MPI_Recv(&ret[0],
                  static_cast<int>(ret.size()),
@@ -410,15 +410,15 @@ public:
     };
 
 private:
+    enum class column_type
+    {
+        keep_column = 0,
+        value_column
+    };
+
     std::vector<KeepColumnDefinition> keep_vector;
     std::vector<ValueColumnDefinition> value_vector;
-    std::vector<std::pair<int, int>> indices;
-
-    enum
-    {
-        keep_column_option = 0,
-        value_column_option
-    };
+    std::vector<std::pair<column_type, int>> indices;
 
     void check(std::size_t size) const
     {
@@ -435,7 +435,7 @@ private:
 public:
     void add(std::string str)
     {
-        indices.emplace_back(keep_column_option,
+        indices.emplace_back(column_type::keep_column,
                              static_cast<int>(keep_vector.size()));
 
         keep_vector.emplace_back(str);
@@ -445,7 +445,7 @@ public:
 
     void add(vle::value::Value* value)
     {
-        indices.emplace_back(value_column_option,
+        indices.emplace_back(column_type::value_column,
                              static_cast<int>(value_vector.size()));
 
         value_vector.emplace_back(value);
@@ -464,7 +464,7 @@ public:
 
         int id = indices[i].second;
 
-        if (indices[id].first == keep_column_option) {
+        if (indices[i].first == column_type::keep_column) {
             keep_vector[id].str = str;
         } else {
             // If @c str is empty, user want to use the default @c
@@ -509,14 +509,14 @@ public:
     void printf(FILE* f) const
     {
         for (const auto& elem : indices)
-            if (elem.first == keep_column_option)
+            if (elem.first == column_type::keep_column)
                 fprintf(f, "%s ", keep_vector[elem.second].str.c_str());
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Columns& columns)
     {
         for (const auto& elem : columns.indices)
-            if (elem.first == keep_column_option)
+            if (elem.first == column_type::keep_column)
                 os << columns.keep_vector[elem.second].str.c_str() << ' ';
 
         return os;
@@ -933,7 +933,6 @@ run_as_master(const std::string& inputfile,
 
         for (int rank = 1; rank < world_size; ++rank) {
             if (r.read(block)) {
-                printf(_("master sends block %d to %d\n"), blockid++, rank);
                 mpi_send_string(rank, worker_block_todo_tag, block);
                 workers[rank] = true;
             } else
