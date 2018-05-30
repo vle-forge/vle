@@ -517,7 +517,7 @@ public:
     {
         for (const auto& elem : columns.indices)
             if (elem.first == column_type::keep_column)
-                os << columns.keep_vector[elem.second].str.c_str() << ' ';
+                os << columns.keep_vector[elem.second].str.c_str() << ',';
 
         return os;
     }
@@ -694,7 +694,6 @@ private:
         vle::manager::Error error;
 
         auto vpz = std::make_unique<vle::vpz::Vpz>(*m_vpz.get());
-
         auto result = m_simulator->run(std::move(vpz), &error);
 
         if (error.code) {
@@ -725,8 +724,7 @@ private:
             for (auto it = result->begin(), et = result->end(); it != et;
                  ++it) {
                 if (it->second && it->second->isMatrix()) {
-                    os << "view:" << it->first << "\n"
-                       << vle::value::toMatrixValue(it->second);
+                    it->second->writeFile(os);
                 }
             }
         }
@@ -813,9 +811,8 @@ public:
                     m_columns->update(i, current);
                 }
 
-                result << *m_columns << "\n";
+                result << *m_columns;
                 simulate(result);
-                result << '\n';
             } else { // use vpz
                 vle::vpz::Vpz temp;
                 vle::vpz::SaxParser parser(temp);
