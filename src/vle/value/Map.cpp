@@ -132,7 +132,7 @@ Map::writeFile(std::ostream& out) const
 {
     for (auto it = begin(); it != end(); ++it) {
         if (it != begin())
-            out << " ";
+            out << ",";
 
         out << "(" << (*it).first.c_str() << ", ";
         (*it).second->writeFile(out);

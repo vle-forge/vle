@@ -211,7 +211,9 @@ Matrix::writeFile(std::ostream& out) const
             } else {
                 out << "NA";
             }
-            out << " ";
+
+            if (c + 1 < m_nbcol)
+                out << ",";
         }
         out << "\n";
     }
@@ -227,7 +229,9 @@ Matrix::writeString(std::ostream& out) const
             } else {
                 out << "NA";
             }
-            out << " ";
+
+            if (c + 1 < m_nbcol)
+                out << " ";
         }
         out << "\n";
     }
