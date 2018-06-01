@@ -207,7 +207,7 @@ tokenize(const std::string& str,
  * @return true if @c static_cast<Target>(Source) is valid.
  */
 template<typename Target, typename Source>
-VLE_CXX14_CONSTEXPR inline bool
+inline bool
 is_numeric_castable(Source arg)
 {
     static_assert(std::is_integral<Source>::value, "Integer required.");
@@ -262,7 +262,7 @@ struct VLE_API numeric_cast_error : public std::exception
  * @return @c static_cast<Target>(Source) integer.
  */
 template<typename Target, typename Source>
-VLE_CXX14_CONSTEXPR inline Target
+inline Target
 numeric_cast(Source s)
 {
     if (not is_numeric_castable<Target>(s))
