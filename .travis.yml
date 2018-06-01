@@ -68,17 +68,6 @@ matrix:
       env:
         - CXX_COMPILER=g++-7 C_COMPILER=gcc-7
         - QT_SELECT=qt5
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - *common_packages
-            - g++-8
-      env:
-        - CXX_COMPILER=g++-8 C_COMPILER=gcc-8
-        - QT_SELECT=qt5
     - compiler: clang
       addons:
         apt:
