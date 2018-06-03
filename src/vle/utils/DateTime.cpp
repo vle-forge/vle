@@ -24,11 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
-#include <ctime>
+#include <vle/utils/DateTime.hpp>
+#include <vle/utils/Tools.hpp>
+
 #include <regex>
 #include <sstream>
-#include <vle/utils/DateTime.hpp>
+
+#include <cmath>
+#include <ctime>
 
 namespace vle {
 namespace utils {
@@ -469,27 +472,23 @@ struct intern_date
 std::string
 DateTime::currentDate()
 {
+    static const char mon_name[][4] = { "Jan", "Feb", "Mar", "Apr",
+                                        "May", "Jun", "Jul", "Aug",
+                                        "Sep", "Oct", "Nov", "Dec" };
+
     time_t rawtime;
     struct tm* timeinfo;
 
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
-    static const char mon_name[][4] = { "Jan", "Feb", "Mar", "Apr",
-                                        "May", "Jun", "Jul", "Aug",
-                                        "Sep", "Oct", "Nov", "Dec" };
-
-    char result[26];
-    sprintf(result,
-            "%d-%.3s-%d %.2d:%.2d:%.2d \n",
-            1900 + timeinfo->tm_year,
-            mon_name[timeinfo->tm_mon],
-            timeinfo->tm_mday,
-            timeinfo->tm_hour,
-            timeinfo->tm_min,
-            timeinfo->tm_sec);
-
-    return result;
+    return format("%d-%.3s-%d %.2d:%.2d:%.2d \n",
+                  1900 + timeinfo->tm_year,
+                  mon_name[timeinfo->tm_mon],
+                  timeinfo->tm_mday,
+                  timeinfo->tm_hour,
+                  timeinfo->tm_min,
+                  timeinfo->tm_sec);
 }
 
 int
