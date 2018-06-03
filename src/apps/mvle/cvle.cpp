@@ -47,6 +47,7 @@
 #include <stack>
 
 #include <cassert>
+#include <cmath>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
