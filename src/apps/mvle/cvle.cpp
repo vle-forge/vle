@@ -36,6 +36,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#define OMPI_SKIP_MPICXX
 #include <mpi.h>
 
 #include <fstream>
