@@ -799,7 +799,7 @@ SaxParser::onEndTable()
     size_t size;
     try {
         size = boost::numeric_cast<size_t>(table.width() * table.height());
-    } catch (const std::exception /*e*/) {
+    } catch (const std::exception& /*e*/) {
         throw utils::SaxParserError(
           (fmt(_("VPZ parser: bad height (%1%) or width (%2%) "
                  "table ")) %
