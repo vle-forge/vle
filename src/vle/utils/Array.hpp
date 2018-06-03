@@ -111,7 +111,7 @@ public:
     const_reference operator()(size_type col, size_type row) const;
     reference operator()(size_type col, size_type row);
 
-    void swap(Array& c) noexcept(noexcept(swap(m_c, c.m_c)));
+    void swap(Array& c) noexcept(noexcept(m_c.swap(c.m_c)));
 
 private:
     void m_check_index(size_type col, size_type) const;
@@ -352,7 +352,7 @@ Array<T, Container>::operator()(size_type column, size_type row)
 
 template<typename T, class Container>
 void
-Array<T, Container>::swap(Array& c) noexcept(noexcept(swap(m_c, c.m_c)))
+Array<T, Container>::swap(Array& c) noexcept(noexcept(m_c.swap(c.m_c)))
 {
     std::swap(m_c, c.m_c);
     std::swap(m_columns, c.m_columns);
