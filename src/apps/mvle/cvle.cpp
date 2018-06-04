@@ -48,8 +48,8 @@
 #include <stack>
 
 #include <cassert>
-#include <cmath>
 #include <cerrno>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <getopt.h>
@@ -78,6 +78,14 @@ enum CommunicationTag
     worker_end_tag
 };
 
+enum ErrorCode
+{
+    internal_failure_errorcode = -4,
+    send_errorcode,
+    recv_errorcode,
+    message_order_errorcode,
+};
+
 static inline CommunicationTag
 from_int(int tag)
 {
@@ -92,11 +100,13 @@ mpi_send_string(int target, CommunicationTag tag, const std::string& msg)
                  MPI_CHAR,
                  target,
                  tag,
-                 MPI_COMM_WORLD) != MPI_SUCCESS)
+                 MPI_COMM_WORLD) != MPI_SUCCESS) {
         fprintf(stderr,
-                "Sending buffer (size: %d) to %d failed\n",
+                "Sending header (size: %d) to %d failed\n",
                 static_cast<int>(msg.size()),
                 target);
+        MPI_Abort(MPI_COMM_WORLD, send_errorcode);
+    }
 }
 
 static std::tuple<std::string, int, CommunicationTag>
@@ -116,13 +126,92 @@ mpi_recv_string()
                  status.MPI_SOURCE,
                  status.MPI_TAG,
                  MPI_COMM_WORLD,
+                 &status) != MPI_SUCCESS) {
+        fprintf(stderr,
+                "Receiving header (size: %d) from %d failed\n",
+                size,
+                status.MPI_SOURCE);
+        MPI_Abort(MPI_COMM_WORLD, recv_errorcode);
+    }
+
+    return std::make_tuple(ret, status.MPI_SOURCE, from_int(status.MPI_TAG));
+}
+
+static void
+mpi_send_block(int target,
+               CommunicationTag tag,
+               const std::string& block,
+               int first,
+               int last)
+{
+    std::array<int, 2> ids{ { first, last } };
+
+    if (MPI_Send(block.data(),
+                 static_cast<int>(block.size()),
+                 MPI_CHAR,
+                 target,
+                 tag,
+                 MPI_COMM_WORLD) != MPI_SUCCESS) {
+        fprintf(stderr,
+                "Sending block buffer (size: %d) to %d failed\n",
+                static_cast<int>(block.size()),
+                target);
+        MPI_Abort(MPI_COMM_WORLD, send_errorcode);
+    }
+
+    if (MPI_Send(ids.data(),
+                 static_cast<int>(ids.size()),
+                 MPI_INT,
+                 target,
+                 tag,
+                 MPI_COMM_WORLD) != MPI_SUCCESS) {
+        fprintf(stderr,
+                "Sending block rows identifier %d to %d to rank %d failed\n",
+                first,
+                last,
+                target);
+        MPI_Abort(MPI_COMM_WORLD, send_errorcode);
+    }
+}
+
+static std::tuple<std::string, int, int, CommunicationTag>
+mpi_worker()
+{
+    MPI_Status status;
+    MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+    int size;
+    MPI_Get_count(&status, MPI_CHAR, &size);
+    std::string ret(static_cast<std::string::size_type>(size), ' ');
+
+    if (MPI_Recv(&ret[0],
+                 static_cast<int>(ret.size()),
+                 MPI_CHAR,
+                 status.MPI_SOURCE,
+                 status.MPI_TAG,
+                 MPI_COMM_WORLD,
                  &status) != MPI_SUCCESS)
         fprintf(stderr,
-                "Receiving buffer (size: %d) from %d failed\n",
+                "Receiving block buffer (size: %d) from %d failed\n",
                 size,
                 status.MPI_SOURCE);
 
-    return std::make_tuple(ret, status.MPI_SOURCE, from_int(status.MPI_TAG));
+    if (status.MPI_TAG == worker_end_tag)
+        return std::make_tuple(ret, -1, -1, worker_end_tag);
+
+    std::array<int, 2> ids;
+    if (MPI_Recv(ids.data(),
+                 static_cast<int>(ids.size()),
+                 MPI_INT,
+                 status.MPI_SOURCE,
+                 status.MPI_TAG,
+                 MPI_COMM_WORLD,
+                 &status) != MPI_SUCCESS)
+        fprintf(stderr,
+                "Receiving block rows identifier from %d failed\n",
+                status.MPI_SOURCE);
+
+    return std::make_tuple(ret, ids[0], ids[1], from_int(status.MPI_TAG));
 }
 
 void
@@ -691,11 +780,13 @@ private:
     std::unique_ptr<ConditionsBackup> m_conditions; // used for complex values
     bool m_warnings;
 
-    void simulate(std::ostream& os)
+    void simulate(std::ostream& os, int row_id)
     {
         vle::manager::Error error;
 
         auto vpz = std::make_unique<vle::vpz::Vpz>(*m_vpz.get());
+        vpz->project().setInstance(row_id);
+
         auto result = m_simulator->run(std::move(vpz), &error);
 
         if (error.code) {
@@ -790,8 +881,10 @@ public:
         }
     }
 
-    std::string run(const std::string& block)
+    std::string run(const std::string& block, int first, int last)
     {
+        fprintf(stdout, "worker run row %d to %d\n", first, last);
+
         std::ostringstream result;
         std::vector<std::string> output;
         std::string::size_type begin = 0u;
@@ -814,7 +907,7 @@ public:
                 }
 
                 result << *m_columns;
-                simulate(result);
+                simulate(result, first++);
             } else { // use vpz
                 vle::vpz::Vpz temp;
                 vle::vpz::SaxParser parser(temp);
@@ -824,11 +917,13 @@ public:
                 std::vector<std::string> condNames = conds.conditionnames();
                 m_conditions->modify(*m_vpz, conds);
                 result << m_conditions->getId(conds) << "\n";
-                simulate(result);
+                simulate(result, first++);
                 m_conditions->restoreBackup(*m_vpz, conds);
                 result << '\n';
             }
         }
+
+        fprintf(stdout, "worker finishes at %d (%d)\n", first, last);
 
         return result.str();
     }
@@ -858,8 +953,8 @@ class Root
     std::shared_ptr<std::istream> m_is;
     std::shared_ptr<std::ostream> m_os;
     std::ofstream m_ofs;
-    unsigned long int m_first_id;
-    unsigned long int m_last_id;
+    int m_first_id;
+    int m_last_id;
     int m_blocksize;
 
 public:
@@ -883,9 +978,7 @@ public:
         return m_is.get()->good();
     }
 
-    bool read(std::string& block,
-              unsigned long int& first,
-              unsigned long int& last)
+    bool read(std::string& block, int& first, int& last)
     {
         m_first_id = m_last_id;
         int i = 0;
@@ -930,7 +1023,7 @@ run_as_master(const std::string& inputfile,
 {
     int ret = EXIT_SUCCESS;
     int blockid = 0;
-    unsigned long int first, last;
+    int first, last;
 
     try {
         int world_size;
@@ -946,7 +1039,8 @@ run_as_master(const std::string& inputfile,
 
         for (int rank = 1; rank < world_size; ++rank) {
             if (r.read(block, first, last)) {
-                mpi_send_string(rank, worker_block_todo_tag, block);
+                mpi_send_block(
+                  rank, worker_block_todo_tag, block, first, last);
                 workers[rank] = true;
             } else
                 break;
@@ -966,7 +1060,8 @@ run_as_master(const std::string& inputfile,
 
             if (not block.empty()) {
                 printf(_("master sends block %d to %d\n"), blockid++, from);
-                mpi_send_string(from, worker_block_todo_tag, block);
+                mpi_send_block(
+                  from, worker_block_todo_tag, block, first, last);
                 workers[from] = true;
             }
         }
@@ -996,43 +1091,59 @@ run_as_worker(const std::string& package,
               bool withoutspawn,
               bool warnings)
 {
-    int ret = EXIT_SUCCESS;
-
     try {
         Worker w(package, timeout, vpz, withoutspawn, warnings);
         std::string block;
         int from;
+        int first, last;
         CommunicationTag tag;
 
+        //
+        // Worker requires the header from the master mpi process.
+        //
+
         std::tie(block, from, tag) = mpi_recv_string();
-        assert(tag == worker_block_header_tag);
+
+        if (from != 0 or tag != worker_block_header_tag) {
+            fprintf(stderr, "Worker fails to receive the header\n");
+            MPI_Abort(MPI_COMM_WORLD, message_order_errorcode);
+            return EXIT_FAILURE;
+        }
+
         w.init(block);
+
+        //
+        // Worker receives block of data to simulate or a end message to stop
+        // the current process.
+        //
 
         bool end = false;
         while (not end) {
-            std::tie(block, from, tag) = mpi_recv_string();
+            std::tie(block, first, last, tag) = mpi_worker();
 
             switch (tag) {
-            case worker_block_todo_tag:
-                block = w.run(block);
-                mpi_send_string(0, worker_block_end_tag, block);
-                break;
-
             case worker_end_tag:
                 end = true;
                 break;
 
+            case worker_block_todo_tag:
+                block = w.run(block, first, last);
+                mpi_send_string(0, worker_block_end_tag, block);
+                break;
+
             default:
-                assert(false && "Internal error in MPI message order");
-                ::abort();
+                fprintf(stderr, "Internal error in MPI message order\n");
+                MPI_Abort(MPI_COMM_WORLD, message_order_errorcode);
             }
         }
     } catch (const std::exception& e) {
-        std::fprintf(stderr, "worker fails: %s\n", e.what());
-        ret = EXIT_FAILURE;
+        fprintf(stderr, "worker fails: %s\n", e.what());
+        MPI_Abort(MPI_COMM_WORLD, internal_failure_errorcode);
+
+        return EXIT_FAILURE;
     }
 
-    return ret;
+    return EXIT_SUCCESS;
 }
 
 void
