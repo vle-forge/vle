@@ -858,12 +858,16 @@ class Root
     std::shared_ptr<std::istream> m_is;
     std::shared_ptr<std::ostream> m_os;
     std::ofstream m_ofs;
+    unsigned long int m_first_id;
+    unsigned long int m_last_id;
     int m_blocksize;
 
 public:
     Root(const std::string& input, const std::string& output, int blocksize)
       : m_is(&std::cin, no_deleter<std::istream>())
       , m_os(&std::cout, no_deleter<std::ostream>())
+      , m_first_id(0)
+      , m_last_id(0)
       , m_blocksize(blocksize)
     {
         if (!input.empty())
@@ -879,8 +883,11 @@ public:
         return m_is.get()->good();
     }
 
-    bool read(std::string& block)
+    bool read(std::string& block,
+              unsigned long int& first,
+              unsigned long int& last)
     {
+        m_first_id = m_last_id;
         int i = 0;
         block.clear();
 
@@ -892,13 +899,19 @@ public:
             std::getline(*m_is.get(), tmp);
 
             if (not tmp.empty()) {
+                ++m_last_id;
                 block += tmp;
                 block += '\n';
                 ++i;
             } else {
+                first = m_first_id;
+                last = m_last_id;
+
                 return not block.empty();
             }
         }
+        first = m_first_id;
+        last = m_last_id;
 
         return true;
     }
@@ -917,6 +930,7 @@ run_as_master(const std::string& inputfile,
 {
     int ret = EXIT_SUCCESS;
     int blockid = 0;
+    unsigned long int first, last;
 
     try {
         int world_size;
@@ -931,7 +945,7 @@ run_as_master(const std::string& inputfile,
             mpi_send_string(rank, worker_block_header_tag, header);
 
         for (int rank = 1; rank < world_size; ++rank) {
-            if (r.read(block)) {
+            if (r.read(block, first, last)) {
                 mpi_send_string(rank, worker_block_todo_tag, block);
                 workers[rank] = true;
             } else
@@ -948,7 +962,7 @@ run_as_master(const std::string& inputfile,
 
             workers[from] = false;
             r.write(block);
-            end = !r.read(block);
+            end = !r.read(block, first, last);
 
             if (not block.empty()) {
                 printf(_("master sends block %d to %d\n"), blockid++, from);
