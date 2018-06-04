@@ -12,7 +12,7 @@ addons:
     packages: &common_packages
       - cmake
       - libboost-dev
-      - libopenmpi-dev
+      - libmpich-dev
       - libxml2-dev
       - qttools5-dev
       - qttools5-dev-tools
