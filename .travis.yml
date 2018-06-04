@@ -107,7 +107,7 @@ matrix:
 before_script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_GVLE=ON ..
+  - cmake -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_GVLE=ON -DWITH_CVLE=ON -DWITH_MVLE=ON ..
 script:
   - make
   - sudo make install
