@@ -80,15 +80,17 @@ Coordinator::Coordinator(utils::ContextPtr context,
   , m_simulators_thread_pool(m_context)
   , m_modelFactory(context, m_eventViewList, dyn, cls, experiment)
   , m_isStarted(false)
-{
-}
+{}
 
 void
-Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
+Coordinator::init(const vpz::Model& mdls,
+                  Time current,
+                  Time duration,
+                  int instance)
 {
     m_currentTime = current;
     m_durationTime = duration;
-    buildViews();
+    buildViews(instance);
     addModels(mdls);
     m_isStarted = true;
 
@@ -484,7 +486,7 @@ Coordinator::dispatchExternalEvent(std::vector<Simulator*>& simulators,
 }
 
 void
-Coordinator::buildViews()
+Coordinator::buildViews(int instance)
 {
     const vpz::Outputs& outs(m_modelFactory.outputs());
     const vpz::Views& views(m_modelFactory.views());
@@ -492,10 +494,17 @@ Coordinator::buildViews()
 
     for (const auto& elem : viewlist) {
         if (elem.second.is_enable()) {
-            auto file =
-              utils::format("%s_%s",
-                            m_modelFactory.experiment().name().c_str(),
-                            elem.first.c_str());
+            std::string file;
+
+            file =
+              instance >= 0
+                ? utils::format("%s_%s-%d",
+                                m_modelFactory.experiment().name().c_str(),
+                                elem.first.c_str(),
+                                instance)
+                : utils::format("%s_%s",
+                                m_modelFactory.experiment().name().c_str(),
+                                elem.first.c_str());
 
             const auto& output = outs.get(elem.second.output());
 

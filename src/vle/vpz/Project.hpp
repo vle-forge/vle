@@ -51,8 +51,7 @@ public:
     Project();
 
     ~Project() override
-    {
-    }
+    {}
 
     /**
      * @brief Set a new name for the experiment and a new date.
@@ -208,6 +207,10 @@ public:
 
     /**
      * @brief Get the number of the instance aissgned to this project.
+     *
+     * Negative instance have not effect on devs::View and devs::Observation
+     * and output plug-ins. If the instance have a value greater or equal to 0,
+     * the devs::Coordinator will add this instance value to the file name.
      *
      * @return The number of the instance.
      */

@@ -38,8 +38,7 @@ RootCoordinator::RootCoordinator(utils::ContextPtr context)
   , m_end(1.0)
   , m_coordinator(nullptr)
   , m_root(nullptr)
-{
-}
+{}
 
 RootCoordinator::~RootCoordinator() = default;
 
@@ -55,7 +54,8 @@ RootCoordinator::load(vpz::Vpz& io)
                                                   io.project().classes(),
                                                   io.project().experiment());
 
-    m_coordinator->init(io.project().model(), m_currentTime, m_end);
+    m_coordinator->init(
+      io.project().model(), m_currentTime, m_end, io.project().instance());
 
     m_root = io.project().model().graph();
 }

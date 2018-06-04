@@ -58,21 +58,25 @@ public:
     ~Coordinator() = default;
 
     /**
-     * @brief Initialise Coordinator before running simulation. Rand is
-     * initialized, send to all Simulator the first init event found and
-     * call for each Simulator the processInitEvent. Before this,
-     * dispatchStateEvent is call for all StateEvent.
+     * @brief Initialise Coordinator before running simulation.
+     *
+     * Send to all Simulator the first init event found and call for each
+     * Simulator the processInitEvent. Before this, dispatchStateEvent is call
+     * for all StateEvent.
+     *
+     * @param instance Negative instance have not effect on devs::View and
+     *     devs::Observation and output plug-ins. If the instance have a value
+     *     greater or equal to 0, the devs::Coordinator will add this instance
+     *     value to the file name. This parameter come from the vpz::Project
+     *     instance attribute.
      *
      * @throw Exception::Internal if a condition have no model port name
      * associed.
      */
-    void init(const vpz::Model& mdls, Time current, Time duration);
-
-    /**
-     * \brief Returns the next time.
-     * @return A devs::Time.
-     */
-    // Time getNextTime() noexcept { return m_eventTable.getNextTime(); }
+    void init(const vpz::Model& mdls,
+              Time current,
+              Time duration,
+              int instance);
 
     /**
      * @brief Pop the next devs::CompleteEventBagModel from the
@@ -299,9 +303,16 @@ private:
 
     /**
      * @brief Build, for each vpz::View a StreamWriter and View.
+     *
+     * @param instance Negative instance have not effect on devs::View and
+     *     devs::Observation and output plug-ins. If the instance have a value
+     *     greater or equal to 0, the devs::Coordinator will add this instance
+     *     value to the file name. This parameter come from the vpz::Project
+     *     instance attribute.
+     *
      * @throw utils::ArgError if the output or the view does not exist.
      */
-    void buildViews();
+    void buildViews(int instance);
 
     /**
      * @brief build the simulator from the vpz::BaseModel stock.

@@ -143,7 +143,8 @@ public:
      * @param event the external event with of the port.
      * @param time the date of occurrence of this event.
      */
-    void externalTransition(const ExternalEventList& event, Time time) override;
+    void externalTransition(const ExternalEventList& event,
+                            Time time) override;
 
     /**
      * Process the confluent transition: select the transition to
@@ -177,8 +178,7 @@ inline DynamicsObserver::DynamicsObserver(
   std::vector<Observation>& observations)
   : Dynamics(init, events)
   , mObservations(observations)
-{
-}
+{}
 
 inline bool
 DynamicsObserver::isExecutive() const
