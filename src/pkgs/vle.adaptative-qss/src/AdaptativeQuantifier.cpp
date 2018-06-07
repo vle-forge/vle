@@ -129,7 +129,7 @@ public:
                 if ((val > m_upthreshold) || (val < m_downthreshold))
                     Trace(6,
                           "%s: treating out of bonds val: %f "
-                          "(quantizer interval : [%f,%f] at date: %f",
+                          "(quantizer interval : [%f,%f] at date: %f\n",
                           getModelName().c_str(),
                           val,
                           m_downthreshold,
@@ -161,7 +161,7 @@ public:
                               shifting_factor);
                         if (1 < shifting_factor)
                             throw vu::ModellingError(
-                              "Bad shifting value ( value : %f, "
+                              "Bad shifting value (value : %f, "
                               "should be less than 1)\n",
                               shifting_factor);
                         ;
@@ -173,7 +173,7 @@ public:
                             }
                             Trace(6,
                                   "Quantifier %s new quantas while "
-                                  "treating new val %f at date %f",
+                                  "treating new val %f at date %f\n",
                                   getModelName().c_str(),
                                   val,
                                   time);
@@ -181,14 +181,14 @@ public:
                             Trace(6,
                                   "Quantizer interval:  [%f, %f], "
                                   "amplitude: %f "
-                                  "(default amplitude: %f)",
+                                  "(default amplitude: %f)\n",
                                   m_downthreshold,
                                   m_upthreshold,
                                   (m_upthreshold - m_downthreshold),
                                   (2 * m_step_size));
 
                             Trace(6,
-                                  "Quantifier %s shifting : %f",
+                                  "Quantifier %s shifting : %f\n",
                                   getModelName().c_str(),
                                   shifting_factor);
 
@@ -330,9 +330,8 @@ private:
     void update_thresholds(double factor)
     {
         double step_number = static_cast<double>(m_step_number);
-        
-        m_upthreshold =
-          m_offset + m_step_size * (step_number + (1 - factor));
+
+        m_upthreshold = m_offset + m_step_size * (step_number + (1 - factor));
         m_downthreshold =
           m_offset + m_step_size * (step_number - (1 - factor));
     }
@@ -359,7 +358,8 @@ private:
         if (m_zero_init_offset) {
             m_offset = 0;
         } else {
-            m_offset = value - static_cast<double>(m_step_number) * m_step_size;
+            m_offset =
+              value - static_cast<double>(m_step_number) * m_step_size;
         }
     }
 
@@ -370,7 +370,7 @@ private:
         if (oscillating(m_past_length - 1) &&
             (0 != (archive.back().date - archive.front().date))) {
             Trace(7,
-                  "Oscillating, archive size = %lu (m_past_length = %u) ",
+                  "Oscillating, archive size = %lu (m_past_length = %u)\n",
                   vle::utils::numeric_cast<unsigned long int>(archive.size()),
                   m_past_length);
             double acc;
