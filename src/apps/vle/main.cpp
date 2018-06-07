@@ -74,8 +74,7 @@ struct vle_log_standard : vle::utils::Context::LogFunctor
 #else
       , color(false)
 #endif
-    {
-    }
+    {}
 
     void write(const vle::utils::Context& ctx,
                int priority,
@@ -111,21 +110,25 @@ struct vle_log_standard : vle::utils::Context::LogFunctor
         (void)ctx;
 
         if (color) {
-            if (priority == 7)
-                fprintf(
-                  stream, "\e[90m[dbg] %s:%d %s: \e[39m", file, line, fn);
-            else if (priority == 6)
-                fprintf(stream, "%s: \e[39m", fn);
-            else
-                fprintf(stream, "\e[91m[Error]\e[31m %s:\e[39m ", fn);
+            if (file and line >= 0 and fn) {
+                if (priority == 7)
+                    fprintf(
+                      stream, "\e[90m[dbg] %s:%d %s: \e[39m", file, line, fn);
+                else if (priority == 6)
+                    fprintf(stream, "%s: \e[39m", fn);
+                else
+                    fprintf(stream, "\e[91m[Error]\e[31m %s:\e[39m ", fn);
+            }
             vfprintf(stream, format, args);
         } else {
-            if (priority == 7)
-                fprintf(stream, "[dbg] %s:%d %s: ", file, line, fn);
-            else if (priority == 6)
-                fprintf(stream, "%s: ", fn);
-            else
-                fprintf(stream, "[Error] %s: ", fn);
+            if (file and line >= 0 and fn) {
+                if (priority == 7)
+                    fprintf(stream, "[dbg] %s:%d %s: ", file, line, fn);
+                else if (priority == 6)
+                    fprintf(stream, "%s: ", fn);
+                else
+                    fprintf(stream, "[Error] %s: ", fn);
+            }
             vfprintf(stream, format, args);
         }
     }
@@ -137,8 +140,7 @@ struct vle_log_file : vle::utils::Context::LogFunctor
 
     vle_log_file()
       : fp(nullptr)
-    {
-    }
+    {}
 
     ~vle_log_file() override
     {

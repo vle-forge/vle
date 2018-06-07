@@ -426,6 +426,23 @@ public:
 
     struct LogFunctor
     {
+        /**
+         * @brief Write the message to the logging system.
+         * @details Call the @c write function of the current selected @c
+         *     Context::LogFunctor. Default, the Context::LogFunctor of VFL
+         *     write all data into standard output or error stream.
+         *
+         * @param ctx Current context
+         * @param priority An integer between 0 and 7.
+         * @param file In debug message, the filename of the source code that
+         *     uses the logging system.
+         * @param line In debug mode, the line of the source code that uses the
+         *     logging system.
+         * @param fn In debug mode, the function of the source code that uses
+         *     the logging system.
+         * @param format A @c printf format.
+         * @param args A @c printf format.
+         */
         virtual void write(const Context& ctx,
                            int priority,
                            const char* file,
@@ -434,6 +451,16 @@ public:
                            const char* format,
                            va_list args) noexcept = 0;
 
+        /**
+         * @brief Write the message to the logging system.
+         * @details Call the @c write function of the current selected @c
+         *     Context::LogFunctor. Default, the Context::LogFunctor of VFL
+         *     write all data into standard output or error stream.
+         *
+         * @param ctx Current context
+         * @param priority An integer between 0 and 7.
+         * @param str Message to send.
+         */
         virtual void write(const Context& ctx,
                            int priority,
                            const std::string& str) noexcept = 0;
